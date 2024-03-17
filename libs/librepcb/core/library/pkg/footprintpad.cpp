@@ -36,7 +36,7 @@ namespace librepcb {
  ******************************************************************************/
 
 template <>
-SExpression serialize(const FootprintPad::Shape& obj) {
+std::unique_ptr<SExpression> serialize(const FootprintPad::Shape& obj) {
   switch (obj) {
     case FootprintPad::Shape::RoundedRect:
       return SExpression::createToken("roundrect");
@@ -65,7 +65,7 @@ inline FootprintPad::Shape deserialize(const SExpression& node) {
 }
 
 template <>
-SExpression serialize(const FootprintPad::ComponentSide& obj) {
+std::unique_ptr<SExpression> serialize(const FootprintPad::ComponentSide& obj) {
   switch (obj) {
     case FootprintPad::ComponentSide::Top:
       return SExpression::createToken("top");
@@ -91,7 +91,7 @@ inline FootprintPad::ComponentSide deserialize(const SExpression& node) {
 }
 
 template <>
-SExpression serialize(const FootprintPad::Function& obj) {
+std::unique_ptr<SExpression> serialize(const FootprintPad::Function& obj) {
   switch (obj) {
     case FootprintPad::Function::Unspecified:
       return SExpression::createToken("unspecified");

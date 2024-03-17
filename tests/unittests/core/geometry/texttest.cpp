@@ -42,12 +42,12 @@ class TextTest : public ::testing::Test {};
  ******************************************************************************/
 
 TEST_F(TextTest, testConstructFromSExpression) {
-  SExpression sexpr = SExpression::parse(
+  std::unique_ptr<SExpression> sexpr = SExpression::parse(
       "(text eabf43fb-496b-4dc8-8ff7-ffac67991390 (layer sym_names) "
       "(value \"{{NAME}}\") (align center bottom) (height 2.54) "
       "(position 1.234 2.345) (rotation 45.0))",
       FilePath());
-  Text obj(sexpr);
+  Text obj(*sexpr);
   EXPECT_EQ(Uuid::fromString("eabf43fb-496b-4dc8-8ff7-ffac67991390"),
             obj.getUuid());
   EXPECT_EQ("sym_names", obj.getLayer().getId());
@@ -62,14 +62,14 @@ TEST_F(TextTest, testSerializeAndDeserialize) {
   Text obj1(Uuid::createRandom(), Layer::botCopper(), "foo bar", Point(12, 34),
             Angle(56), PositiveLength(78),
             Alignment(HAlign::right(), VAlign::center()));
-  SExpression sexpr1 = SExpression::createList("obj");
-  obj1.serialize(sexpr1);
+  std::unique_ptr<SExpression> sexpr1 = SExpression::createList("obj");
+  obj1.serialize(*sexpr1);
 
-  Text obj2(sexpr1);
-  SExpression sexpr2 = SExpression::createList("obj");
-  obj2.serialize(sexpr2);
+  Text obj2(*sexpr1);
+  std::unique_ptr<SExpression> sexpr2 = SExpression::createList("obj");
+  obj2.serialize(*sexpr2);
 
-  EXPECT_EQ(sexpr1.toByteArray(), sexpr2.toByteArray());
+  EXPECT_EQ(sexpr1->toByteArray(), sexpr2->toByteArray());
 }
 
 /*******************************************************************************

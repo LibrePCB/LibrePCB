@@ -261,7 +261,7 @@ QList<LengthUnit> LengthUnit::getAllUnits() noexcept {
  ******************************************************************************/
 
 template <>
-SExpression serialize(const LengthUnit& obj) {
+std::unique_ptr<SExpression> serialize(const LengthUnit& obj) {
   return SExpression::createToken(obj.toStr());
 }
 

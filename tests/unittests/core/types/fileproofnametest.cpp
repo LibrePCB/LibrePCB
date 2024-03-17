@@ -72,21 +72,19 @@ TEST_P(FileProofNameTest, testSerialize) {
 
   if (data.valid) {
     FileProofName obj(data.input);
-    EXPECT_EQ("\"" % data.input % "\"\n", serialize(obj).toByteArray());
+    EXPECT_EQ("\"" % data.input % "\"\n", serialize(obj)->toByteArray());
   }
 }
 
 TEST_P(FileProofNameTest, testDeserialize) {
   const FileProofNameTestData& data = GetParam();
 
+  const std::unique_ptr<const SExpression> sexpr =
+      SExpression::createString(data.input);
   if (data.valid) {
-    EXPECT_EQ(
-        FileProofName(data.input),
-        deserialize<FileProofName>(SExpression::createString(data.input)));
+    EXPECT_EQ(FileProofName(data.input), deserialize<FileProofName>(*sexpr));
   } else {
-    EXPECT_THROW(
-        deserialize<FileProofName>(SExpression::createString(data.input)),
-        RuntimeError);
+    EXPECT_THROW(deserialize<FileProofName>(*sexpr), RuntimeError);
   }
 }
 

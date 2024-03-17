@@ -39,7 +39,8 @@ namespace librepcb {
  ******************************************************************************/
 
 template <>
-SExpression serialize(const GraphicsExportSettings::Orientation& obj) {
+std::unique_ptr<SExpression> serialize(
+    const GraphicsExportSettings::Orientation& obj) {
   if (obj == GraphicsExportSettings::Orientation::Landscape) {
     return SExpression::createToken("landscape");
   } else if (obj == GraphicsExportSettings::Orientation::Portrait) {
@@ -66,7 +67,7 @@ GraphicsExportSettings::Orientation deserialize(const SExpression& node) {
 }
 
 template <>
-SExpression serialize(const tl::optional<UnsignedRatio>& obj) {
+std::unique_ptr<SExpression> serialize(const tl::optional<UnsignedRatio>& obj) {
   if (obj) {
     return serialize(*obj);
   } else {

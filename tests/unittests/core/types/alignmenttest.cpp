@@ -56,12 +56,13 @@ class AlignmentTest : public ::testing::TestWithParam<AlignmentTestData> {};
 TEST_P(AlignmentTest, testConstructFromSExpression) {
   const AlignmentTestData& data = GetParam();
 
-  SExpression sexpr = SExpression::parse(data.serialized, FilePath());
+  std::unique_ptr<SExpression> sexpr =
+      SExpression::parse(data.serialized, FilePath());
 
   if (data.validSExpression) {
-    EXPECT_EQ(Alignment(data.hAlign, data.vAlign), Alignment(sexpr));
+    EXPECT_EQ(Alignment(data.hAlign, data.vAlign), Alignment(*sexpr));
   } else {
-    EXPECT_THROW({ Alignment a(sexpr); }, RuntimeError);
+    EXPECT_THROW({ Alignment a(*sexpr); }, RuntimeError);
   }
 }
 
@@ -70,9 +71,9 @@ TEST_P(AlignmentTest, testSerialize) {
 
   if (data.validSExpression) {
     Alignment alignment(data.hAlign, data.vAlign);
-    SExpression sexpr = SExpression::createList("align");
-    alignment.serialize(sexpr);
-    EXPECT_EQ(data.serialized, sexpr.toByteArray());
+    std::unique_ptr<SExpression> sexpr = SExpression::createList("align");
+    alignment.serialize(*sexpr);
+    EXPECT_EQ(data.serialized, sexpr->toByteArray());
   }
 }
 

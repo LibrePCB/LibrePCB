@@ -42,7 +42,7 @@ class PolygonTest : public ::testing::Test {};
  ******************************************************************************/
 
 TEST_F(PolygonTest, testConstructFromSExpression) {
-  SExpression sexpr = SExpression::parse(
+  std::unique_ptr<SExpression> sexpr = SExpression::parse(
       "(polygon 2889d60c-1d18-44c3-bf9e-07733b67e480 (layer bot_stop_mask)\n"
       " (width 0.1) (fill true) (grab_area false)\n"
       " (vertex (position 0.0 0.0) (angle 0.0))\n"
@@ -52,7 +52,7 @@ TEST_F(PolygonTest, testConstructFromSExpression) {
       " (vertex (position 0.0 0.0) (angle 0.0))\n"
       ")\n",
       FilePath());
-  Polygon obj(sexpr);
+  Polygon obj(*sexpr);
   EXPECT_EQ(Uuid::fromString("2889d60c-1d18-44c3-bf9e-07733b67e480"),
             obj.getUuid());
   EXPECT_EQ("bot_stop_mask", obj.getLayer().getId());
@@ -67,14 +67,14 @@ TEST_F(PolygonTest, testSerializeAndDeserialize) {
       Uuid::createRandom(), Layer::botCopper(), UnsignedLength(456), true,
       false,
       Path({Vertex(Point(1, 2), Angle(3)), Vertex(Point(4, 5), Angle(6))}));
-  SExpression sexpr1 = SExpression::createList("obj");
-  obj1.serialize(sexpr1);
+  std::unique_ptr<SExpression> sexpr1 = SExpression::createList("obj");
+  obj1.serialize(*sexpr1);
 
-  Polygon obj2(sexpr1);
-  SExpression sexpr2 = SExpression::createList("obj");
-  obj2.serialize(sexpr2);
+  Polygon obj2(*sexpr1);
+  std::unique_ptr<SExpression> sexpr2 = SExpression::createList("obj");
+  obj2.serialize(*sexpr2);
 
-  EXPECT_EQ(sexpr1.toByteArray(), sexpr2.toByteArray());
+  EXPECT_EQ(sexpr1->toByteArray(), sexpr2->toByteArray());
 }
 
 /*******************************************************************************

@@ -106,9 +106,9 @@ std::unique_ptr<Device> Device::open(
 
   // Load element.
   const QString fileName = getLongElementName() % ".lp";
-  const SExpression root = SExpression::parse(directory->read(fileName),
-                                              directory->getAbsPath(fileName));
-  std::unique_ptr<Device> obj(new Device(std::move(directory), root));
+  const std::unique_ptr<const SExpression> root = SExpression::parse(
+      directory->read(fileName), directory->getAbsPath(fileName));
+  std::unique_ptr<Device> obj(new Device(std::move(directory), *root));
   if (!migrations.isEmpty()) {
     obj->removeObsoleteMessageApprovals();
     obj->save();  // Format all files correctly as the migration doesn't!

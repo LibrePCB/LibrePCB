@@ -42,14 +42,14 @@ class StrokeTextTest : public ::testing::Test {};
  ******************************************************************************/
 
 TEST_F(StrokeTextTest, testConstructFromSExpression) {
-  SExpression sexpr = SExpression::parse(
+  std::unique_ptr<SExpression> sexpr = SExpression::parse(
       "(stroke_text 0a8d7180-68e1-4749-bf8c-538b0d88f08c "
       "(layer bot_names) (height 1.0) (stroke_width 0.2) "
       "(letter_spacing auto) (line_spacing auto) (align left bottom) "
       "(position 1.234 2.345) (rotation 45.0) (auto_rotate true) "
       "(mirror true) (value \"Foo Bar\"))",
       FilePath());
-  StrokeText obj(sexpr);
+  StrokeText obj(*sexpr);
   EXPECT_EQ(Uuid::fromString("0a8d7180-68e1-4749-bf8c-538b0d88f08c"),
             obj.getUuid());
   EXPECT_EQ("bot_names", obj.getLayer().getId());
@@ -71,14 +71,14 @@ TEST_F(StrokeTextTest, testSerializeAndDeserialize) {
                   UnsignedLength(456), StrokeTextSpacing(),
                   StrokeTextSpacing(Ratio(1234)),
                   Alignment(HAlign::right(), VAlign::center()), true, false);
-  SExpression sexpr1 = SExpression::createList("obj");
-  obj1.serialize(sexpr1);
+  std::unique_ptr<SExpression> sexpr1 = SExpression::createList("obj");
+  obj1.serialize(*sexpr1);
 
-  StrokeText obj2(sexpr1);
-  SExpression sexpr2 = SExpression::createList("obj");
-  obj2.serialize(sexpr2);
+  StrokeText obj2(*sexpr1);
+  std::unique_ptr<SExpression> sexpr2 = SExpression::createList("obj");
+  obj2.serialize(*sexpr2);
 
-  EXPECT_EQ(sexpr1.toByteArray(), sexpr2.toByteArray());
+  EXPECT_EQ(sexpr1->toByteArray(), sexpr2->toByteArray());
 }
 
 /*******************************************************************************

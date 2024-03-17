@@ -45,9 +45,9 @@ protected:
   std::string str(const Layer& l) const { return l.getId().toStdString(); }
 
   std::string str(const Point& p) const {
-    SExpression sexpr = SExpression::createList("pos");
-    p.serialize(sexpr);
-    return sexpr.toByteArray().toStdString();
+    std::unique_ptr<SExpression> sexpr = SExpression::createList("pos");
+    p.serialize(*sexpr);
+    return sexpr->toByteArray().toStdString();
   }
 
   std::string str(const Angle& a) const {
@@ -55,9 +55,9 @@ protected:
   }
 
   std::string str(const Path& p) const {
-    SExpression sexpr = SExpression::createList("path");
-    p.serialize(sexpr);
-    return sexpr.toByteArray().toStdString();
+    std::unique_ptr<SExpression> sexpr = SExpression::createList("path");
+    p.serialize(*sexpr);
+    return sexpr->toByteArray().toStdString();
   }
 };
 

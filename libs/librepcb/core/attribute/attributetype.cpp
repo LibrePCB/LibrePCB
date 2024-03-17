@@ -129,7 +129,7 @@ const AttributeType& AttributeType::fromString(const QString& type) {
  ******************************************************************************/
 
 template <>
-SExpression serialize(const AttributeType& obj) {
+std::unique_ptr<SExpression> serialize(const AttributeType& obj) {
   return SExpression::createToken(obj.getName());
 }
 

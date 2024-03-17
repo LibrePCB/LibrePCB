@@ -144,7 +144,7 @@ qint32 Angle::degStringToMicrodeg(const QString& degrees) {
 // Non-Member Functions
 
 template <>
-SExpression serialize(const Angle& obj) {
+std::unique_ptr<SExpression> serialize(const Angle& obj) {
   return SExpression::createToken(obj.toDegString());
 }
 

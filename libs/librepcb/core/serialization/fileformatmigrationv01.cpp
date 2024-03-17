@@ -77,18 +77,19 @@ void FileFormatMigrationV01::upgradeSymbol(TransactionalDirectory& dir) {
   // Content File.
   {
     const QString fp = "symbol.lp";
-    SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-    root.appendChild("generated_by", QString());
+    std::unique_ptr<SExpression> root =
+        SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+    root->appendChild("generated_by", QString());
 
     // Various strings.
-    upgradeStrings(root);
+    upgradeStrings(*root);
 
     // Layers.
-    upgradeLayers(root);
+    upgradeLayers(*root);
 
     // Pins.
-    upgradeInversionCharacters(root, "pin", "name/@0");
-    for (SExpression* pinNode : root.getChildren("pin")) {
+    upgradeInversionCharacters(*root, "pin", "name/@0");
+    for (SExpression* pinNode : root->getChildren("pin")) {
       const UnsignedLength length =
           deserialize<UnsignedLength>(pinNode->getChild("length/@0"));
       const Point namePos(length + Length(1270000), 0);
@@ -99,7 +100,7 @@ void FileFormatMigrationV01::upgradeSymbol(TransactionalDirectory& dir) {
       nameAlign.serialize(pinNode->appendList("name_align"));
     }
 
-    dir.write(fp, root.toByteArray());
+    dir.write(fp, root->toByteArray());
   }
 }
 
@@ -110,20 +111,21 @@ void FileFormatMigrationV01::upgradePackage(TransactionalDirectory& dir) {
   // Content File.
   {
     const QString fp = "package.lp";
-    SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-    root.appendChild("generated_by", QString());
+    std::unique_ptr<SExpression> root =
+        SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+    root->appendChild("generated_by", QString());
 
     // Various strings.
-    upgradeStrings(root);
+    upgradeStrings(*root);
 
     // Layers.
-    upgradeLayers(root);
+    upgradeLayers(*root);
 
     // Assembly type.
-    root.appendChild("assembly_type", SExpression::createToken("auto"));
+    root->appendChild("assembly_type", SExpression::createToken("auto"));
 
     // Footprints.
-    for (SExpression* fptNode : root.getChildren("footprint")) {
+    for (SExpression* fptNode : root->getChildren("footprint")) {
       // Add 3D model position.
       SExpression& modelPosition = fptNode->appendList("3d_position");
       modelPosition.appendChild(SExpression::createToken("0.0"));
@@ -153,7 +155,9 @@ void FileFormatMigrationV01::upgradePackage(TransactionalDirectory& dir) {
         padNode->appendChild(
             "radius", SExpression::createToken(isRoundShape ? "1.0" : "0.0"));
         if (isRoundShape || isRectShape) {
-          padShape = SExpression::createToken("roundrect");
+          std::unique_ptr<const SExpression> sexpr =
+              SExpression::createToken("roundrect");
+          padShape = *sexpr;
         }
 
         // Convert holes.
@@ -176,7 +180,9 @@ void FileFormatMigrationV01::upgradePackage(TransactionalDirectory& dir) {
         if (boardSideNode.getValue() == "tht") {
           // THT is no longer a valid value. Since footprints are always drawn
           // from the top view, it should be safe to set it to "top" now.
-          boardSideNode = SExpression::createToken("top");
+          std::unique_ptr<const SExpression> sexpr =
+              SExpression::createToken("top");
+          boardSideNode = *sexpr;
         }
 
         // Add mask configs.
@@ -217,7 +223,9 @@ void FileFormatMigrationV01::upgradePackage(TransactionalDirectory& dir) {
       for (SExpression* txtNode : fptNode->getChildren("stroke_text")) {
         if (deserialize<bool>(txtNode->getChild("mirror/@0"))) {
           SExpression& rotNode = txtNode->getChild("rotation/@0");
-          rotNode = serialize(-deserialize<Angle>(rotNode));
+          const std::unique_ptr<const SExpression> sexpr =
+              serialize(-deserialize<Angle>(rotNode));
+          rotNode = *sexpr;
         }
       }
 
@@ -228,7 +236,7 @@ void FileFormatMigrationV01::upgradePackage(TransactionalDirectory& dir) {
       upgradeCutouts(*fptNode, nullptr);
     }
 
-    dir.write(fp, root.toByteArray());
+    dir.write(fp, root->toByteArray());
   }
 }
 
@@ -239,16 +247,17 @@ void FileFormatMigrationV01::upgradeComponent(TransactionalDirectory& dir) {
   // Content File.
   {
     const QString fp = "component.lp";
-    SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-    root.appendChild("generated_by", QString());
+    std::unique_ptr<SExpression> root =
+        SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+    root->appendChild("generated_by", QString());
 
     // Signals.
-    upgradeInversionCharacters(root, "signal", "name/@0");
+    upgradeInversionCharacters(*root, "signal", "name/@0");
 
     // Various strings.
-    upgradeStrings(root);
+    upgradeStrings(*root);
 
-    dir.write(fp, root.toByteArray());
+    dir.write(fp, root->toByteArray());
   }
 }
 
@@ -259,13 +268,14 @@ void FileFormatMigrationV01::upgradeDevice(TransactionalDirectory& dir) {
   // Content File.
   {
     const QString fp = "device.lp";
-    SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-    root.appendChild("generated_by", QString());
+    std::unique_ptr<SExpression> root =
+        SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+    root->appendChild("generated_by", QString());
 
     // Various strings.
-    upgradeStrings(root);
+    upgradeStrings(*root);
 
-    dir.write(fp, root.toByteArray());
+    dir.write(fp, root->toByteArray());
   }
 }
 
@@ -276,9 +286,10 @@ void FileFormatMigrationV01::upgradeLibrary(TransactionalDirectory& dir) {
   // Content File.
   {
     const QString fp = "library.lp";
-    SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-    root.appendChild("manufacturer", QString());
-    dir.write(fp, root.toByteArray());
+    std::unique_ptr<SExpression> root =
+        SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+    root->appendChild("manufacturer", QString());
+    dir.write(fp, root->toByteArray());
   }
 }
 
@@ -298,13 +309,13 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
     TransactionalDirectory subDir(dir, "library/sym/" % dirName);
     if (subDir.fileExists(".librepcb-sym")) {
       const QString fp = "symbol.lp";
-      SExpression root =
+      std::unique_ptr<SExpression> root =
           SExpression::parse(subDir.read(fp), subDir.getAbsPath(fp));
-      const Uuid uuid = deserialize<Uuid>(root.getChild("@0"));
+      const Uuid uuid = deserialize<Uuid>(root->getChild("@0"));
       Symbol sym;
 
       // Texts.
-      for (SExpression* textNode : root.getChildren("text")) {
+      for (SExpression* textNode : root->getChildren("text")) {
         sym.texts.append(Text{
             deserialize<Uuid>(textNode->getChild("@0")),
             textNode->getChild("layer/@0").getValue(),
@@ -327,11 +338,11 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
     TransactionalDirectory subDir(dir, "library/pkg/" % dirName);
     if (subDir.fileExists(".librepcb-pkg")) {
       const QString fp = "package.lp";
-      SExpression root =
+      std::unique_ptr<SExpression> root =
           SExpression::parse(subDir.read(fp), subDir.getAbsPath(fp));
 
       // Footprints.
-      for (SExpression* fptNode : root.getChildren("footprint")) {
+      for (SExpression* fptNode : root->getChildren("footprint")) {
         context.holesCount += fptNode->getChildren("hole").count();
         foreach (
             const SExpression* geometryNode,
@@ -351,14 +362,15 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
     TransactionalDirectory subDir(dir, "library/cmp/" % dirName);
     if (subDir.fileExists(".librepcb-cmp")) {
       const QString fp = "component.lp";
-      SExpression root =
+      std::unique_ptr<SExpression> root =
           SExpression::parse(subDir.read(fp), subDir.getAbsPath(fp));
-      const Uuid uuid = deserialize<Uuid>(root.getChild("@0"));
+      const Uuid uuid = deserialize<Uuid>(root->getChild("@0"));
       Component cmp;
-      cmp.schematicOnly = deserialize<bool>(root.getChild("schematic_only/@0"));
+      cmp.schematicOnly =
+          deserialize<bool>(root->getChild("schematic_only/@0"));
 
       // Symbol variants.
-      for (SExpression* varNode : root.getChildren("variant")) {
+      for (SExpression* varNode : root->getChildren("variant")) {
         ComponentSymbolVariant symbVar{
             deserialize<Uuid>(varNode->getChild("@0")),
             {},
@@ -393,8 +405,9 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
   foreach (const QString& dirName, dir.getDirs("boards")) {
     QString fp = "boards/" % dirName % "/board.lp";
     if (dir.fileExists(fp)) {
-      SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-      foreach (const SExpression* devNode, root.getChildren("device")) {
+      std::unique_ptr<SExpression> root =
+          SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+      foreach (const SExpression* devNode, root->getChildren("device")) {
         const Uuid cmpUuid = deserialize<Uuid>(devNode->getChild("@0"));
         const Uuid libDevUuid =
             deserialize<Uuid>(devNode->getChild("lib_device/@0"));
@@ -409,29 +422,32 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
   // Metadata.
   {
     const QString fp = "project/metadata.lp";
-    SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-    context.projectUuid = root.getChild("@0").getValue();
-    upgradeMetadata(root);
-    dir.write(fp, root.toByteArray());
+    std::unique_ptr<SExpression> root =
+        SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+    context.projectUuid = root->getChild("@0").getValue();
+    upgradeMetadata(*root);
+    dir.write(fp, root->toByteArray());
   }
 
   // Settings.
   {
     const QString fp = "project/settings.lp";
-    SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-    upgradeSettings(root);
-    dir.write(fp, root.toByteArray());
+    std::unique_ptr<SExpression> root =
+        SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+    upgradeSettings(*root);
+    dir.write(fp, root->toByteArray());
   }
 
   // Circuit.
   {
     const QString fp = "circuit/circuit.lp";
-    SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-    upgradeCircuit(root, context);
-    dir.write(fp, root.toByteArray());
+    std::unique_ptr<SExpression> root =
+        SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+    upgradeCircuit(*root, context);
+    dir.write(fp, root->toByteArray());
 
     // Component instances.
-    for (SExpression* cmpNode : root.getChildren("component")) {
+    for (SExpression* cmpNode : root->getChildren("component")) {
       const Uuid uuid = deserialize<Uuid>(cmpNode->getChild("@0"));
       ComponentInstance cmpInst{
           deserialize<Uuid>(cmpNode->getChild("lib_component/@0")),
@@ -444,18 +460,20 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
   // ERC.
   {
     const QString fp = "circuit/erc.lp";
-    SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-    upgradeErc(root, context);
-    dir.write(fp, root.toByteArray());
+    std::unique_ptr<SExpression> root =
+        SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+    upgradeErc(*root, context);
+    dir.write(fp, root->toByteArray());
   }
 
   // Schematics.
   foreach (const QString& dirName, dir.getDirs("schematics")) {
     const QString fp = "schematics/" % dirName % "/schematic.lp";
     if (dir.fileExists(fp)) {
-      SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-      upgradeSchematic(root, context);
-      dir.write(fp, root.toByteArray());
+      std::unique_ptr<SExpression> root =
+          SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+      upgradeSchematic(*root, context);
+      dir.write(fp, root->toByteArray());
     }
   }
 
@@ -464,17 +482,19 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
     // Board content.
     QString fp = "boards/" % dirName % "/board.lp";
     if (dir.fileExists(fp)) {
-      SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-      upgradeBoard(root, context);
-      dir.write(fp, root.toByteArray());
+      std::unique_ptr<SExpression> root =
+          SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+      upgradeBoard(*root, context);
+      dir.write(fp, root->toByteArray());
     }
 
     // User settings.
     fp = "boards/" % dirName % "/settings.user.lp";
     if (dir.fileExists(fp)) {
-      SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-      upgradeBoardUserSettings(root);
-      dir.write(fp, root.toByteArray());
+      std::unique_ptr<SExpression> root =
+          SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+      upgradeBoardUserSettings(*root);
+      dir.write(fp, root->toByteArray());
     }
   }
 
@@ -567,19 +587,29 @@ void FileFormatMigrationV01::upgradeWorkspaceData(TransactionalDirectory& dir) {
   // Upgrade settings.
   const QString settingsFp = "settings.lp";
   if (dir.fileExists(settingsFp)) {
-    SExpression root =
+    std::unique_ptr<SExpression> root =
         SExpression::parse(dir.read(settingsFp), dir.getAbsPath(settingsFp));
-    if (SExpression* node = root.tryGetChild("repositories")) {
+    if (SExpression* node = root->tryGetChild("repositories")) {
       foreach (SExpression* child, node->getChildren("repository")) {
         child->setName("url");
       }
       node->setName("api_endpoints");
     }
-    root.replaceRecursive(SExpression::createToken("board_placement_top"),
-                          SExpression::createToken("board_legend_top"));
-    root.replaceRecursive(SExpression::createToken("board_placement_bottom"),
-                          SExpression::createToken("board_legend_bottom"));
-    dir.write(settingsFp, root.toByteArray());
+    {
+      const std::unique_ptr<const SExpression> search =
+          SExpression::createToken("board_placement_top");
+      const std::unique_ptr<const SExpression> replace =
+          SExpression::createToken("board_legend_top");
+      root->replaceRecursive(*search, *replace);
+    }
+    {
+      const std::unique_ptr<const SExpression> search =
+          SExpression::createToken("board_placement_bottom");
+      const std::unique_ptr<const SExpression> replace =
+          SExpression::createToken("board_legend_bottom");
+      root->replaceRecursive(*search, *replace);
+    }
+    dir.write(settingsFp, root->toByteArray());
   }
 }
 
@@ -588,8 +618,9 @@ void FileFormatMigrationV01::upgradeWorkspaceData(TransactionalDirectory& dir) {
  ******************************************************************************/
 
 void FileFormatMigrationV01::createOutputJobs(TransactionalDirectory& dir) {
-  SExpression root = SExpression::createList("librepcb_jobs");
-  dir.write("project/jobs.lp", root.toByteArray());
+  const std::unique_ptr<const SExpression> root =
+      SExpression::createList("librepcb_jobs");
+  dir.write("project/jobs.lp", root->toByteArray());
 }
 
 void FileFormatMigrationV01::upgradeMetadata(SExpression& root) {
@@ -677,26 +708,27 @@ void FileFormatMigrationV01::upgradeCircuit(SExpression& root,
 
 void FileFormatMigrationV01::upgradeErc(SExpression& root,
                                         ProjectContext& context) {
-  SExpression newRoot = SExpression::createList(root.getName());
+  std::unique_ptr<SExpression> newRoot =
+      SExpression::createList(root.getName());
   for (const SExpression* node : root.getChildren("approved")) {
     const QString msgClass = node->getChild("class/@0").getValue();
     const QString instance = node->getChild("instance/@0").getValue();
     const QString message = node->getChild("message/@0").getValue();
     if ((msgClass == "NetClass") && (message == "Unused")) {
-      SExpression& child = newRoot.appendList("approved");
+      SExpression& child = newRoot->appendList("approved");
       child.appendChild(SExpression::createToken("unused_netclass"));
       child.appendChild("netclass", SExpression::createToken(instance));
     } else if ((msgClass == "NetSignal") && (message == "Unused")) {
-      SExpression& child = newRoot.appendList("approved");
+      SExpression& child = newRoot->appendList("approved");
       child.appendChild(SExpression::createToken("open_net"));
       child.appendChild("net", SExpression::createToken(instance));
     } else if ((msgClass == "NetSignal") &&
                (message == "ConnectedToLessThanTwoPins")) {
-      SExpression& child = newRoot.appendList("approved");
+      SExpression& child = newRoot->appendList("approved");
       child.appendChild(SExpression::createToken("open_net"));
       child.appendChild("net", SExpression::createToken(instance));
     } else if (message == "UnconnectedRequiredSignal") {
-      SExpression& child = newRoot.appendList("approved");
+      SExpression& child = newRoot->appendList("approved");
       child.appendChild(
           SExpression::createToken("unconnected_required_signal"));
       child.ensureLineBreak();
@@ -707,7 +739,7 @@ void FileFormatMigrationV01::upgradeErc(SExpression& root,
                         SExpression::createToken(instance.split("/").last()));
       child.ensureLineBreak();
     } else if (message == "ForcedNetSignalNameConflict") {
-      SExpression& child = newRoot.appendList("approved");
+      SExpression& child = newRoot->appendList("approved");
       child.appendChild(
           SExpression::createToken("unconnected_required_signal"));
       child.ensureLineBreak();
@@ -721,7 +753,7 @@ void FileFormatMigrationV01::upgradeErc(SExpression& root,
       ++context.removedErcApprovals;
     }
   }
-  root = newRoot;
+  root = *newRoot;
 }
 
 void FileFormatMigrationV01::upgradeSchematic(SExpression& root,
@@ -806,7 +838,9 @@ void FileFormatMigrationV01::upgradeSchematic(SExpression& root,
     // Swap transformation order of mirror/rotate.
     if (symMirror) {
       SExpression& rotNode = symNode->getChild("rotation/@0");
-      rotNode = serialize(-deserialize<Angle>(rotNode));
+      const std::unique_ptr<const SExpression> sexpr =
+          serialize(-deserialize<Angle>(rotNode));
+      rotNode = *sexpr;
     }
   }
 
@@ -866,13 +900,17 @@ void FileFormatMigrationV01::upgradeBoard(SExpression& root,
   for (SExpression* devNode : root.getChildren("device")) {
     if (deserialize<bool>(devNode->getChild("mirror/@0"))) {
       SExpression& rotNode = devNode->getChild("rotation/@0");
-      rotNode = serialize(-deserialize<Angle>(rotNode));
+      const std::unique_ptr<const SExpression> sexpr =
+          serialize(-deserialize<Angle>(rotNode));
+      rotNode = *sexpr;
     }
     devNode->appendChild("lock", SExpression::createToken("false"));
     for (SExpression* txtNode : devNode->getChildren("stroke_text")) {
       if (deserialize<bool>(txtNode->getChild("mirror/@0"))) {
         SExpression& rotNode = txtNode->getChild("rotation/@0");
-        rotNode = serialize(-deserialize<Angle>(rotNode));
+        const std::unique_ptr<const SExpression> sexpr =
+            serialize(-deserialize<Angle>(rotNode));
+        rotNode = *sexpr;
       }
       txtNode->appendChild("lock", SExpression::createToken("false"));
     }
@@ -912,7 +950,9 @@ void FileFormatMigrationV01::upgradeBoard(SExpression& root,
   for (SExpression* txtNode : root.getChildren("stroke_text")) {
     if (deserialize<bool>(txtNode->getChild("mirror/@0"))) {
       SExpression& rotNode = txtNode->getChild("rotation/@0");
-      rotNode = serialize(-deserialize<Angle>(rotNode));
+      const std::unique_ptr<const SExpression> sexpr =
+          serialize(-deserialize<Angle>(rotNode));
+      rotNode = *sexpr;
     }
     txtNode->appendChild("lock", SExpression::createToken("false"));
   }
@@ -1090,29 +1130,56 @@ void FileFormatMigrationV01::upgradeHoles(SExpression& node, bool isBoardHole) {
 
 void FileFormatMigrationV01::upgradeLayers(SExpression& node) {
   // Rename "sch_scheet_frames" to "sch_frames".
-  node.replaceRecursive(SExpression::createToken("sch_scheet_frames"),
-                        SExpression::createToken("sch_frames"));
+  {
+    const std::unique_ptr<const SExpression> search =
+        SExpression::createToken("sch_scheet_frames");
+    const std::unique_ptr<const SExpression> replace =
+        SExpression::createToken("sch_frames");
+    node.replaceRecursive(*search, *replace);
+  }
 
   // Rename "brd_sheet_frames" to "brd_frames".
-  node.replaceRecursive(SExpression::createToken("brd_sheet_frames"),
-                        SExpression::createToken("brd_frames"));
+  {
+    const std::unique_ptr<const SExpression> search =
+        SExpression::createToken("brd_sheet_frames");
+    const std::unique_ptr<const SExpression> replace =
+        SExpression::createToken("brd_frames");
+    node.replaceRecursive(*search, *replace);
+  }
 
   // Rename "brd_milling_pth" to "brd_plated_cutouts".
-  node.replaceRecursive(SExpression::createToken("brd_milling_pth"),
-                        SExpression::createToken("brd_plated_cutouts"));
+  {
+    const std::unique_ptr<const SExpression> search =
+        SExpression::createToken("brd_milling_pth");
+    const std::unique_ptr<const SExpression> replace =
+        SExpression::createToken("brd_plated_cutouts");
+    node.replaceRecursive(*search, *replace);
+  }
 
   // Remove nodes on never officially existing layer "brd_keepout".
-  SExpression search = SExpression::createList("layer");
-  search.appendChild(SExpression::createToken("brd_keepout"));
-  node.removeChildrenWithNodeRecursive(search);
+  {
+    std::unique_ptr<SExpression> search = SExpression::createList("layer");
+    search->appendChild(SExpression::createToken("brd_keepout"));
+    node.removeChildrenWithNodeRecursive(*search);
+  }
 
   // Rename "top_placement" to "top_legend".
-  node.replaceRecursive(SExpression::createToken("top_placement"),
-                        SExpression::createToken("top_legend"));
+  {
+    const std::unique_ptr<const SExpression> search =
+        SExpression::createToken("top_placement");
+    const std::unique_ptr<const SExpression> replace =
+        SExpression::createToken("top_legend");
+    node.replaceRecursive(*search, *replace);
+  }
 
   // Rename "bot_placement" to "bot_legend".
-  node.replaceRecursive(SExpression::createToken("bot_placement"),
-                        SExpression::createToken("bot_legend"));
+  {
+    const std::unique_ptr<const SExpression> search =
+        SExpression::createToken("bot_placement");
+    const std::unique_ptr<const SExpression> replace =
+        SExpression::createToken("bot_legend");
+    node.replaceRecursive(*search, *replace);
+  }
 }
 
 void FileFormatMigrationV01::upgradeInversionCharacters(

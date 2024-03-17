@@ -75,10 +75,10 @@ std::unique_ptr<PackageCategory> PackageCategory::open(
 
   // Load element.
   const QString fileName = getLongElementName() % ".lp";
-  const SExpression root = SExpression::parse(directory->read(fileName),
-                                              directory->getAbsPath(fileName));
+  const std::unique_ptr<const SExpression> root = SExpression::parse(
+      directory->read(fileName), directory->getAbsPath(fileName));
   std::unique_ptr<PackageCategory> obj(
-      new PackageCategory(std::move(directory), root));
+      new PackageCategory(std::move(directory), *root));
   if (!migrations.isEmpty()) {
     obj->removeObsoleteMessageApprovals();
     obj->save();  // Format all files correctly as the migration doesn't!

@@ -124,7 +124,7 @@ inline QString operator%(const CircuitIdentifier& lhs,
 }
 
 template <>
-inline SExpression serialize(const CircuitIdentifier& obj) {
+inline std::unique_ptr<SExpression> serialize(const CircuitIdentifier& obj) {
   return SExpression::createString(*obj);
 }
 
@@ -134,7 +134,8 @@ inline CircuitIdentifier deserialize(const SExpression& node) {
 }
 
 template <>
-inline SExpression serialize(const tl::optional<CircuitIdentifier>& obj) {
+inline std::unique_ptr<SExpression> serialize(
+    const tl::optional<CircuitIdentifier>& obj) {
   if (obj) {
     return serialize(*obj);
   } else {

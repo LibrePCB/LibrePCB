@@ -75,7 +75,7 @@ const QList<SignalRole>& SignalRole::getAllRoles() noexcept {
  ******************************************************************************/
 
 template <>
-SExpression serialize(const SignalRole& obj) {
+std::unique_ptr<SExpression> serialize(const SignalRole& obj) {
   return SExpression::createToken(obj.toStr());
 }
 

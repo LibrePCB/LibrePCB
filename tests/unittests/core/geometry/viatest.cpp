@@ -42,12 +42,12 @@ class ViaTest : public ::testing::Test {};
  ******************************************************************************/
 
 TEST_F(ViaTest, testConstructFromSExpression) {
-  SExpression sexpr = SExpression::parse(
+  std::unique_ptr<SExpression> sexpr = SExpression::parse(
       "(via b9445237-8982-4a9f-af06-bfc6c507e010 (from top_cu) (to in2_cu)"
       " (position 1.234 2.345) (size 0.9) (drill 0.4) (exposure off)"
       ")",
       FilePath());
-  Via obj(sexpr);
+  Via obj(*sexpr);
   EXPECT_EQ(Uuid::fromString("b9445237-8982-4a9f-af06-bfc6c507e010"),
             obj.getUuid());
   EXPECT_EQ(&Layer::topCopper(), &obj.getStartLayer());
@@ -62,14 +62,14 @@ TEST_F(ViaTest, testSerializeAndDeserialize) {
   Via obj1(Uuid::createRandom(), Layer::topCopper(), Layer::botCopper(),
            Point(123, 456), PositiveLength(789), PositiveLength(321),
            MaskConfig::off());
-  SExpression sexpr1 = SExpression::createList("obj");
-  obj1.serialize(sexpr1);
+  std::unique_ptr<SExpression> sexpr1 = SExpression::createList("obj");
+  obj1.serialize(*sexpr1);
 
-  Via obj2(sexpr1);
-  SExpression sexpr2 = SExpression::createList("obj");
-  obj2.serialize(sexpr2);
+  Via obj2(*sexpr1);
+  std::unique_ptr<SExpression> sexpr2 = SExpression::createList("obj");
+  obj2.serialize(*sexpr2);
 
-  EXPECT_EQ(sexpr1.toByteArray(), sexpr2.toByteArray());
+  EXPECT_EQ(sexpr1->toByteArray(), sexpr2->toByteArray());
 }
 
 /*******************************************************************************

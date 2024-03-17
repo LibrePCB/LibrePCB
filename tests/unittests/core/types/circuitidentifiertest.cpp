@@ -77,24 +77,25 @@ TEST_P(CircuitIdentifierTest, testSerialize) {
   const CircuitIdentifierTestData& data = GetParam();
   if (data.valid) {
     CircuitIdentifier identifier(data.input);
-    EXPECT_EQ(data.input, serialize(identifier).getValue());
-    EXPECT_EQ(data.input, serialize(tl::make_optional(identifier)).getValue());
+    EXPECT_EQ(data.input, serialize(identifier)->getValue());
+    EXPECT_EQ(data.input, serialize(tl::make_optional(identifier))->getValue());
   }
 }
 
 TEST_P(CircuitIdentifierTest, testDeserialize) {
   const CircuitIdentifierTestData& data = GetParam();
-  SExpression sexpr = SExpression::createToken(data.input);
+  std::unique_ptr<SExpression> sexpr = SExpression::createToken(data.input);
   if (data.valid) {
-    EXPECT_EQ(data.input, *deserialize<CircuitIdentifier>(sexpr));
-    EXPECT_EQ(data.input, *deserialize<tl::optional<CircuitIdentifier>>(sexpr));
+    EXPECT_EQ(data.input, *deserialize<CircuitIdentifier>(*sexpr));
+    EXPECT_EQ(data.input,
+              *deserialize<tl::optional<CircuitIdentifier>>(*sexpr));
   } else {
-    EXPECT_THROW(deserialize<CircuitIdentifier>(sexpr), Exception);
+    EXPECT_THROW(deserialize<CircuitIdentifier>(*sexpr), Exception);
     if (data.input.isEmpty()) {
       EXPECT_EQ(tl::nullopt,
-                deserialize<tl::optional<CircuitIdentifier>>(sexpr));
+                deserialize<tl::optional<CircuitIdentifier>>(*sexpr));
     } else {
-      EXPECT_THROW(deserialize<tl::optional<CircuitIdentifier>>(sexpr),
+      EXPECT_THROW(deserialize<tl::optional<CircuitIdentifier>>(*sexpr),
                    Exception);
     }
   }
@@ -102,12 +103,12 @@ TEST_P(CircuitIdentifierTest, testDeserialize) {
 
 TEST(CircuitIdentifierTest, testSerializeOptional) {
   tl::optional<CircuitIdentifier> identifier = tl::nullopt;
-  EXPECT_EQ("", serialize(identifier).getValue());
+  EXPECT_EQ("", serialize(identifier)->getValue());
 }
 
 TEST(CircuitIdentifierTest, testDeserializeOptional) {
-  SExpression sexpr = SExpression::createToken("");
-  EXPECT_EQ(tl::nullopt, deserialize<tl::optional<CircuitIdentifier>>(sexpr));
+  std::unique_ptr<SExpression> sexpr = SExpression::createToken("");
+  EXPECT_EQ(tl::nullopt, deserialize<tl::optional<CircuitIdentifier>>(*sexpr));
 }
 
 /*******************************************************************************

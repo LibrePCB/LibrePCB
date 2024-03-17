@@ -184,31 +184,31 @@ TEST_P(UuidTest, testSerialize) {
   const UuidTestData& data = GetParam();
   if (data.valid) {
     Uuid uuid = Uuid::fromString(data.uuid);
-    EXPECT_EQ(data.uuid, serialize(uuid).getValue());
-    EXPECT_EQ(data.uuid, serialize(tl::make_optional(uuid)).getValue());
+    EXPECT_EQ(data.uuid, serialize(uuid)->getValue());
+    EXPECT_EQ(data.uuid, serialize(tl::make_optional(uuid))->getValue());
   }
 }
 
 TEST_P(UuidTest, testDeserialize) {
   const UuidTestData& data = GetParam();
-  SExpression sexpr = SExpression::createToken(data.uuid);
+  std::unique_ptr<SExpression> sexpr = SExpression::createToken(data.uuid);
   if (data.valid) {
-    EXPECT_EQ(data.uuid, deserialize<Uuid>(sexpr).toStr());
-    EXPECT_EQ(data.uuid, deserialize<tl::optional<Uuid>>(sexpr)->toStr());
+    EXPECT_EQ(data.uuid, deserialize<Uuid>(*sexpr).toStr());
+    EXPECT_EQ(data.uuid, deserialize<tl::optional<Uuid>>(*sexpr)->toStr());
   } else {
-    EXPECT_THROW(deserialize<Uuid>(sexpr), Exception);
-    EXPECT_THROW(deserialize<tl::optional<Uuid>>(sexpr), Exception);
+    EXPECT_THROW(deserialize<Uuid>(*sexpr), Exception);
+    EXPECT_THROW(deserialize<tl::optional<Uuid>>(*sexpr), Exception);
   }
 }
 
 TEST(UuidTest, testSerializeOptional) {
   tl::optional<Uuid> uuid = tl::nullopt;
-  EXPECT_EQ("none", serialize(uuid).getValue());
+  EXPECT_EQ("none", serialize(uuid)->getValue());
 }
 
 TEST(UuidTest, testDeserializeOptional) {
-  SExpression sexpr = SExpression::createToken("none");
-  EXPECT_EQ(tl::nullopt, deserialize<tl::optional<Uuid>>(sexpr));
+  std::unique_ptr<SExpression> sexpr = SExpression::createToken("none");
+  EXPECT_EQ(tl::nullopt, deserialize<tl::optional<Uuid>>(*sexpr));
 }
 
 /*******************************************************************************

@@ -200,24 +200,24 @@ TEST(RatioTest, testOperatorBool) {
 TEST_P(RatioTest, testSerialize) {
   const RatioTestData_t& data = GetParam();
 
-  EXPECT_EQ(data.string % "\n", serialize(data.ratio).toByteArray());
+  EXPECT_EQ(data.string % "\n", serialize(data.ratio)->toByteArray());
 }
 
 TEST_P(RatioTest, testDeserialize) {
   const RatioTestData_t& data = GetParam();
 
-  SExpression sexpr = SExpression::createString(data.string);
-  EXPECT_EQ(data.ratio, deserialize<Ratio>(sexpr));
+  std::unique_ptr<SExpression> sexpr = SExpression::createString(data.string);
+  EXPECT_EQ(data.ratio, deserialize<Ratio>(*sexpr));
 }
 
 TEST(RatioTest, testDeserializeEmpty) {
-  SExpression sexpr = SExpression::createString("");
-  EXPECT_THROW(deserialize<Ratio>(sexpr), RuntimeError);
+  std::unique_ptr<SExpression> sexpr = SExpression::createString("");
+  EXPECT_THROW(deserialize<Ratio>(*sexpr), RuntimeError);
 }
 
 TEST(RatioTest, testDeserializeInvalid) {
-  SExpression sexpr = SExpression::createString("foo");
-  EXPECT_THROW(deserialize<Ratio>(sexpr), RuntimeError);
+  std::unique_ptr<SExpression> sexpr = SExpression::createString("foo");
+  EXPECT_THROW(deserialize<Ratio>(*sexpr), RuntimeError);
 }
 
 /*******************************************************************************

@@ -106,10 +106,10 @@ Workspace::Workspace(const FilePath& wsPath, const QString& dataDirName,
   const QString settingsFilePath = "settings.lp";
   if (mFileSystem->fileExists(settingsFilePath)) {
     qDebug("Load workspace settings...");
-    SExpression root =
+    const std::unique_ptr<const SExpression> root =
         SExpression::parse(mFileSystem->read(settingsFilePath),
                            mFileSystem->getAbsPath(settingsFilePath));
-    mWorkspaceSettings->load(root, loadedFileFormat);
+    mWorkspaceSettings->load(*root, loadedFileFormat);
     qDebug("Successfully loaded workspace settings.");
   } else {
     qInfo("Workspace settings file not found, default settings will be used.");
@@ -276,9 +276,10 @@ void Workspace::setMostRecentlyUsedWorkspacePath(
  ******************************************************************************/
 
 void Workspace::saveSettingsToTransactionalFileSystem() {
-  mFileSystem->write(
-      "settings.lp",
-      mWorkspaceSettings->serialize().toByteArray());  // can throw
+  const std::unique_ptr<const SExpression> sexpr =
+      mWorkspaceSettings->serialize();  // can throw
+  mFileSystem->write("settings.lp",
+                     sexpr->toByteArray());  // can throw
 }
 
 /*******************************************************************************

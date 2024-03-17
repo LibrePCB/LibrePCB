@@ -43,7 +43,7 @@ class FootprintPadTest : public ::testing::Test {};
  ******************************************************************************/
 
 TEST_F(FootprintPadTest, testConstructFromSExpressionConnected) {
-  SExpression sexpr = SExpression::parse(
+  std::unique_ptr<SExpression> sexpr = SExpression::parse(
       "(pad 7040952d-7016-49cd-8c3e-6078ecca98b9 (side top) (shape roundrect)\n"
       " (position 1.234 2.345) (rotation 45.0) (size 1.1 2.2) (radius 0.5)\n"
       " (stop_mask auto) (solder_paste 0.25) (clearance 0.33)"
@@ -51,7 +51,7 @@ TEST_F(FootprintPadTest, testConstructFromSExpressionConnected) {
       " (package_pad d48b8bd2-a46c-4495-87a5-662747034098)\n"
       ")",
       FilePath());
-  FootprintPad obj(sexpr);
+  FootprintPad obj(*sexpr);
   EXPECT_EQ(Uuid::fromString("7040952d-7016-49cd-8c3e-6078ecca98b9"),
             obj.getUuid());
   EXPECT_EQ(Uuid::fromString("d48b8bd2-a46c-4495-87a5-662747034098"),
@@ -71,7 +71,7 @@ TEST_F(FootprintPadTest, testConstructFromSExpressionConnected) {
 }
 
 TEST_F(FootprintPadTest, testConstructFromSExpressionUnconnected) {
-  SExpression sexpr = SExpression::parse(
+  std::unique_ptr<SExpression> sexpr = SExpression::parse(
       "(pad 7040952d-7016-49cd-8c3e-6078ecca98b9 (side bottom) (shape custom)\n"
       " (position 1.234 2.345) (rotation 45.0) (size 1.1 2.2) (radius 0.5)\n"
       " (stop_mask off) (solder_paste auto) (clearance 0.33)"
@@ -88,7 +88,7 @@ TEST_F(FootprintPadTest, testConstructFromSExpressionUnconnected) {
       " )\n"
       ")",
       FilePath());
-  FootprintPad obj(sexpr);
+  FootprintPad obj(*sexpr);
   EXPECT_EQ(Uuid::fromString("7040952d-7016-49cd-8c3e-6078ecca98b9"),
             obj.getUuid());
   EXPECT_EQ(tl::nullopt, obj.getPackagePadUuid());
@@ -124,14 +124,14 @@ TEST_F(FootprintPadTest, testSerializeAndDeserialize) {
                                     PositiveLength(200000),
                                     makeNonEmptyPath(Point(300, 400))),
       });
-  SExpression sexpr1 = SExpression::createList("obj");
-  obj1.serialize(sexpr1);
+  std::unique_ptr<SExpression> sexpr1 = SExpression::createList("obj");
+  obj1.serialize(*sexpr1);
 
-  FootprintPad obj2(sexpr1);
-  SExpression sexpr2 = SExpression::createList("obj");
-  obj2.serialize(sexpr2);
+  FootprintPad obj2(*sexpr1);
+  std::unique_ptr<SExpression> sexpr2 = SExpression::createList("obj");
+  obj2.serialize(*sexpr2);
 
-  EXPECT_EQ(sexpr1.toByteArray(), sexpr2.toByteArray());
+  EXPECT_EQ(sexpr1->toByteArray(), sexpr2->toByteArray());
 }
 
 /*******************************************************************************

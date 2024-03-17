@@ -46,9 +46,9 @@ FavoriteProjectsModel::FavoriteProjectsModel(
   try {
     mFilePath = mWorkspace.getDataPath().getPathTo("favorite_projects.lp");
     if (mFilePath.isExistingFile()) {
-      const SExpression root =
+      const std::unique_ptr<const SExpression> root =
           SExpression::parse(FileUtils::readFile(mFilePath), mFilePath);
-      foreach (const SExpression* child, root.getChildren("project")) {
+      foreach (const SExpression* child, root->getChildren("project")) {
         QString path = child->getChild("@0").getValue();
         FilePath absPath = FilePath::fromRelative(mWorkspace.getPath(), path);
         mAllProjects.append(absPath);
@@ -108,13 +108,14 @@ void FavoriteProjectsModel::updateVisibleProjects() noexcept {
 void FavoriteProjectsModel::save() noexcept {
   try {
     // save the new list in the workspace
-    SExpression root = SExpression::createList("librepcb_favorite_projects");
+    std::unique_ptr<SExpression> root =
+        SExpression::createList("librepcb_favorite_projects");
     foreach (const FilePath& filepath, mAllProjects) {
-      root.ensureLineBreak();
-      root.appendChild("project", filepath.toRelative(mWorkspace.getPath()));
+      root->ensureLineBreak();
+      root->appendChild("project", filepath.toRelative(mWorkspace.getPath()));
     }
-    root.ensureLineBreak();
-    FileUtils::writeFile(mFilePath, root.toByteArray());  // can throw
+    root->ensureLineBreak();
+    FileUtils::writeFile(mFilePath, root->toByteArray());  // can throw
   } catch (const Exception& e) {
     qWarning() << "Failed to save favorite projects file:" << e.getMsg();
   }

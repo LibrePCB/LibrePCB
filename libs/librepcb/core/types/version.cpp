@@ -128,7 +128,7 @@ tl::optional<Version> Version::tryFromString(const QString& str) noexcept {
  ******************************************************************************/
 
 template <>
-SExpression serialize(const Version& obj) {
+std::unique_ptr<SExpression> serialize(const Version& obj) {
   return SExpression::createString(obj.toStr());
 }
 

@@ -36,7 +36,8 @@ namespace librepcb {
  ******************************************************************************/
 
 template <>
-SExpression serialize(const BoardDesignRuleCheckSettings::AllowedSlots& obj) {
+std::unique_ptr<SExpression> serialize(
+    const BoardDesignRuleCheckSettings::AllowedSlots& obj) {
   switch (obj) {
     case BoardDesignRuleCheckSettings::AllowedSlots::None:
       return SExpression::createToken("none");

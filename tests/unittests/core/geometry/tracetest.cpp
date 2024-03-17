@@ -42,13 +42,13 @@ class TraceTest : public ::testing::Test {};
  ******************************************************************************/
 
 TEST_F(TraceTest, testConstructFromSExpression) {
-  SExpression sexpr = SExpression::parse(
+  std::unique_ptr<SExpression> sexpr = SExpression::parse(
       "(trace c893f5a0-3fec-498b-99d6-467d5d69825d (layer bot_cu) (width 0.5) "
       "(from (device 0d8f2ef9-34f4-4400-a313-f17cdcdfe924) "
       "(pad 65ab6c75-b264-4fed-b445-d3d98c956008)) "
       "(to (via 1e80206f-158b-48e6-9cb4-6e368af7b7d7)))",
       FilePath());
-  Trace obj(sexpr);
+  Trace obj(*sexpr);
   EXPECT_EQ(Uuid::fromString("c893f5a0-3fec-498b-99d6-467d5d69825d"),
             obj.getUuid());
   EXPECT_EQ("bot_cu", obj.getLayer().getId());
@@ -66,14 +66,14 @@ TEST_F(TraceTest, testSerializeAndDeserialize) {
   Trace obj1(Uuid::createRandom(), Layer::topCopper(), PositiveLength(123),
              TraceAnchor::junction(Uuid::createRandom()),
              TraceAnchor::pad(Uuid::createRandom(), Uuid::createRandom()));
-  SExpression sexpr1 = SExpression::createList("obj");
-  obj1.serialize(sexpr1);
+  std::unique_ptr<SExpression> sexpr1 = SExpression::createList("obj");
+  obj1.serialize(*sexpr1);
 
-  Trace obj2(sexpr1);
-  SExpression sexpr2 = SExpression::createList("obj");
-  obj2.serialize(sexpr2);
+  Trace obj2(*sexpr1);
+  std::unique_ptr<SExpression> sexpr2 = SExpression::createList("obj");
+  obj2.serialize(*sexpr2);
 
-  EXPECT_EQ(sexpr1.toByteArray(), sexpr2.toByteArray());
+  EXPECT_EQ(sexpr1->toByteArray(), sexpr2->toByteArray());
 }
 
 /*******************************************************************************

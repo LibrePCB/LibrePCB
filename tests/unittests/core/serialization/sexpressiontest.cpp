@@ -22,9 +22,12 @@
  ******************************************************************************/
 #include <gtest/gtest.h>
 #include <librepcb/core/exceptions.h>
+#include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/serialization/sexpression.h>
 
 #include <QtCore>
+
+#include <chrono>
 
 /*******************************************************************************
  *  Namespace
@@ -64,8 +67,8 @@ TEST(SExpressionTest, testParseTooManyClosingBraces) {
 }
 
 TEST(SExpressionTest, testParseEmptyList) {
-  SExpression s = SExpression::parse("(test)", FilePath());
-  EXPECT_TRUE(s.isList());
+  std::unique_ptr<SExpression> s = SExpression::parse("(test)", FilePath());
+  EXPECT_TRUE(s->isList());
 }
 
 TEST(SExpressionTest, testParseStringWithMissingEndQuote) {
@@ -73,31 +76,35 @@ TEST(SExpressionTest, testParseStringWithMissingEndQuote) {
 }
 
 TEST(SExpressionTest, testParseString) {
-  SExpression s = SExpression::parse("(test \"foo bar\")", FilePath());
-  EXPECT_TRUE(s.isList());
-  EXPECT_EQ(1, s.getChildren().count());
-  EXPECT_EQ("foo bar", s.getChild("@0").getValue());
+  std::unique_ptr<SExpression> s =
+      SExpression::parse("(test \"foo bar\")", FilePath());
+  EXPECT_TRUE(s->isList());
+  EXPECT_EQ(1, s->getChildCount());
+  EXPECT_EQ("foo bar", s->getChild("@0").getValue());
 }
 
 TEST(SExpressionTest, testParseStringWithQuotes) {
-  SExpression s = SExpression::parse("(test \"foo \\\"bar\\\"\")", FilePath());
-  EXPECT_TRUE(s.isList());
-  EXPECT_EQ(1, s.getChildren().count());
-  EXPECT_EQ("foo \"bar\"", s.getChild("@0").getValue());
+  std::unique_ptr<SExpression> s =
+      SExpression::parse("(test \"foo \\\"bar\\\"\")", FilePath());
+  EXPECT_TRUE(s->isList());
+  EXPECT_EQ(1, s->getChildCount());
+  EXPECT_EQ("foo \"bar\"", s->getChild("@0").getValue());
 }
 
 TEST(SExpressionTest, testParseStringWithNewlines) {
-  SExpression s = SExpression::parse("(test \"foo\\nbar\")", FilePath());
-  EXPECT_TRUE(s.isList());
-  EXPECT_EQ(1, s.getChildren().count());
-  EXPECT_EQ("foo\nbar", s.getChild("@0").getValue());
+  std::unique_ptr<SExpression> s =
+      SExpression::parse("(test \"foo\\nbar\")", FilePath());
+  EXPECT_TRUE(s->isList());
+  EXPECT_EQ(1, s->getChildCount());
+  EXPECT_EQ("foo\nbar", s->getChild("@0").getValue());
 }
 
 TEST(SExpressionTest, testParseStringWithBackslash) {
-  SExpression s = SExpression::parse("(test \"foo\\\\bar\")", FilePath());
-  EXPECT_TRUE(s.isList());
-  EXPECT_EQ(1, s.getChildren().count());
-  EXPECT_EQ("foo\\bar", s.getChild("@0").getValue());
+  std::unique_ptr<SExpression> s =
+      SExpression::parse("(test \"foo\\\\bar\")", FilePath());
+  EXPECT_TRUE(s->isList());
+  EXPECT_EQ(1, s->getChildCount());
+  EXPECT_EQ("foo\\bar", s->getChild("@0").getValue());
 }
 
 TEST(SExpressionTest, testParseExpressionWithChildrenAndComments) {
@@ -114,16 +121,16 @@ TEST(SExpressionTest, testParseExpressionWithChildrenAndComments) {
       "  )\n"
       " )\n"
       ")\n";
-  SExpression s = SExpression::parse(input, FilePath());
-  EXPECT_EQ("newstroke.bene", s.getChild("default_font/@0").getValue());
-  EXPECT_EQ("0.15875", s.getChild("grid/interval/@0").getValue());
+  std::unique_ptr<SExpression> s = SExpression::parse(input, FilePath());
+  EXPECT_EQ("newstroke.bene", s->getChild("default_font/@0").getValue());
+  EXPECT_EQ("0.15875", s->getChild("grid/interval/@0").getValue());
   EXPECT_EQ("./output/{{VERSION}}/gerber/{{PROJECT}}",
-            s.getChild("fabrication_output_settings/base_path/@0").getValue());
+            s->getChild("fabrication_output_settings/base_path/@0").getValue());
   EXPECT_EQ(
       "",
-      s.getChild("fabrication_output_settings/outlines/suffix/@0").getValue());
+      s->getChild("fabrication_output_settings/outlines/suffix/@0").getValue());
   EXPECT_EQ(".gto",
-            s.getChild("fabrication_output_settings/silkscreen_top/suffix/@0")
+            s->getChild("fabrication_output_settings/silkscreen_top/suffix/@0")
                 .getValue());
 }
 
@@ -151,8 +158,9 @@ TEST(SExpressionTest, testParsePartialExpression) {
 }
 
 TEST(SExpressionTest, testSerializeStringWithEscaping) {
-  SExpression s = SExpression::createString("Foo\n \r\n \" \\ Bar");
-  EXPECT_EQ("\"Foo\\n \\r\\n \\\" \\\\ Bar\"\n", s.toByteArray());
+  std::unique_ptr<SExpression> s =
+      SExpression::createString("Foo\n \r\n \" \\ Bar");
+  EXPECT_EQ("\"Foo\\n \\r\\n \\\" \\\\ Bar\"\n", s->toByteArray());
 }
 
 TEST(SExpressionTest, testRoundtrip) {
@@ -180,8 +188,8 @@ TEST(SExpressionTest, testRoundtrip) {
       ")\n"
       "(empty)\n"
       ")\n";
-  SExpression s = SExpression::parse(input, FilePath());
-  QByteArray actual = s.toByteArray();
+  std::unique_ptr<SExpression> s = SExpression::parse(input, FilePath());
+  QByteArray actual = s->toByteArray();
   QByteArray expected =
       "(librepcb_board 71762d7e-e7f1-403c-8020-db9670c01e9b\n"
       " (default_font \"newstroke.bene\")\n"
@@ -209,11 +217,11 @@ TEST(SExpressionTest, testRoundtrip) {
 }
 
 TEST(SExpressionTest, testGetChildSkipsLineBreaks) {
-  SExpression s =
+  std::unique_ptr<SExpression> s =
       SExpression::parse("(root \n (child \n 0 \n 1 \n 2 \n ))", FilePath());
-  EXPECT_EQ("0", s.getChild("child/@0").getValue().toStdString());
-  EXPECT_EQ("1", s.getChild("child/@1").getValue().toStdString());
-  EXPECT_EQ("2", s.getChild("child/@2").getValue().toStdString());
+  EXPECT_EQ("0", s->getChild("child/@0").getValue().toStdString());
+  EXPECT_EQ("1", s->getChild("child/@1").getValue().toStdString());
+  EXPECT_EQ("2", s->getChild("child/@2").getValue().toStdString());
 }
 
 TEST(SExpressionTest, testRemoveChild) {
@@ -222,10 +230,10 @@ TEST(SExpressionTest, testRemoveChild) {
       " (child1 a b c)\n"
       " (child2 a b c)\n"
       ")\n";
-  SExpression s = SExpression::parse(input, FilePath());
-  SExpression& child = s.getChild("child1");
-  s.removeChild(child);
-  const QByteArray actual = s.toByteArray();
+  std::unique_ptr<SExpression> s = SExpression::parse(input, FilePath());
+  SExpression& child = s->getChild("child1");
+  s->removeChild(child);
+  const QByteArray actual = s->toByteArray();
   const QByteArray expected =
       "(test value\n\n"
       " (child2 a b c)\n"
@@ -239,53 +247,71 @@ TEST(SExpressionTest, testRemoveInvalidChild) {
       " (child1 a b c)\n"
       " (child2 a b c)\n"
       ")\n";
-  SExpression s = SExpression::parse(input, FilePath());
-  SExpression& child = s.getChild("child1/@0");
-  EXPECT_THROW(s.removeChild(child), LogicError);
+  std::unique_ptr<SExpression> s = SExpression::parse(input, FilePath());
+  SExpression& child = s->getChild("child1/@0");
+  EXPECT_THROW(s->removeChild(child), LogicError);
 }
 
 TEST(SExpressionTest, testToByteArrayEmptyList) {
-  SExpression s = SExpression::createList("test");
-  EXPECT_EQ("(test)\n", s.toByteArray().toStdString());
+  std::unique_ptr<SExpression> s = SExpression::createList("test");
+  EXPECT_EQ("(test)\n", s->toByteArray().toStdString());
 }
 
 TEST(SExpressionTest, testToByteArrayEmptyListWithTrailingLineBreak) {
-  SExpression s = SExpression::createList("test");
-  s.ensureLineBreak();
+  std::unique_ptr<SExpression> s = SExpression::createList("test");
+  s->ensureLineBreak();
   EXPECT_EQ(
       "(test\n"
       ")\n",
-      s.toByteArray().toStdString());
+      s->toByteArray().toStdString());
 }
 
 TEST(SExpressionTest, testToByteArrayListWithLineBreaks) {
-  SExpression s = SExpression::createList("test");
-  s.appendChild("child", SExpression::createToken("1"));
-  s.ensureLineBreak();
-  s.appendChild("child", SExpression::createToken("2"));
-  s.ensureLineBreak();
+  std::unique_ptr<SExpression> s = SExpression::createList("test");
+  s->appendChild("child", SExpression::createToken("1"));
+  s->ensureLineBreak();
+  s->appendChild("child", SExpression::createToken("2"));
+  s->ensureLineBreak();
   EXPECT_EQ(
       "(test (child 1)\n"
       " (child 2)\n"
       ")\n",
-      s.toByteArray().toStdString());
+      s->toByteArray().toStdString());
 }
 
 TEST(SExpressionTest, testToByteArrayListWithTooManyLineBreaks) {
-  SExpression s = SExpression::createList("test");
-  s.appendChild("child", SExpression::createToken("1"));
-  s.ensureLineBreak();
-  s.ensureLineBreak();
-  s.ensureLineBreak();
-  s.appendChild("child", SExpression::createToken("2"));
-  s.ensureLineBreak();
-  s.ensureLineBreak();
-  s.ensureLineBreak();
+  std::unique_ptr<SExpression> s = SExpression::createList("test");
+  s->appendChild("child", SExpression::createToken("1"));
+  s->ensureLineBreak();
+  s->ensureLineBreak();
+  s->ensureLineBreak();
+  s->appendChild("child", SExpression::createToken("2"));
+  s->ensureLineBreak();
+  s->ensureLineBreak();
+  s->ensureLineBreak();
   EXPECT_EQ(
       "(test (child 1)\n"
       " (child 2)\n"
       ")\n",
-      s.toByteArray().toStdString());
+      s->toByteArray().toStdString());
+}
+
+TEST(SExpressionTest, testParsePerformance) {
+  const FilePath fp(TEST_DATA_DIR
+                    "/projects/Nested Planes/boards/default/board.lp");
+  const QByteArray content = FileUtils::readFile(fp);
+
+  std::chrono::time_point<std::chrono::high_resolution_clock> start, end;
+  start = std::chrono::high_resolution_clock::now();
+  int n;
+  for (n = 0; n < 5000; ++n) {
+    auto s = SExpression::parse(content, fp);
+    Q_UNUSED(s);
+  }
+  end = std::chrono::high_resolution_clock::now();
+  std::chrono::duration<double> elapsed_seconds = end - start;
+  std::cout << "Needed " << elapsed_seconds.count() << "s for " << n
+            << " loops\n";
 }
 
 /*******************************************************************************

@@ -466,7 +466,7 @@ bool Layer::lessThan(const Layer* a, const Layer* b) noexcept {
  ******************************************************************************/
 
 template <>
-SExpression serialize(const Layer& obj) {
+std::unique_ptr<SExpression> serialize(const Layer& obj) {
   return SExpression::createToken(obj.getId());
 }
 

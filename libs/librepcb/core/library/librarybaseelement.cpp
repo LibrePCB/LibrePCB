@@ -121,9 +121,10 @@ RuleCheckMessageList LibraryBaseElement::runChecks() const {
 
 void LibraryBaseElement::save() {
   // Content.
-  SExpression root = SExpression::createList("librepcb_" % mLongElementName);
-  serialize(root);
-  mDirectory->write(mLongElementName % ".lp", root.toByteArray());
+  std::unique_ptr<SExpression> root =
+      SExpression::createList("librepcb_" % mLongElementName);
+  serialize(*root);
+  mDirectory->write(mLongElementName % ".lp", root->toByteArray());
 
   // Version file.
   mDirectory->write(

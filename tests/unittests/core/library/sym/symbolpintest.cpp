@@ -43,14 +43,14 @@ class SymbolPinTest : public ::testing::Test {};
  ******************************************************************************/
 
 TEST_F(SymbolPinTest, testConstructFromSExpression) {
-  SExpression sexpr = SExpression::parse(
+  std::unique_ptr<SExpression> sexpr = SExpression::parse(
       "(pin d48b8bd2-a46c-4495-87a5-662747034098 (name \"1\")\n"
       " (position 1.234 2.345) (rotation 45.0) (length 0.5)\n"
       " (name_position 0.1 0.2) (name_rotation -90.0) (name_height 1.234)\n"
       " (name_align center bottom)\n"
       ")",
       FilePath());
-  SymbolPin obj(sexpr);
+  SymbolPin obj(*sexpr);
   EXPECT_EQ(Uuid::fromString("d48b8bd2-a46c-4495-87a5-662747034098"),
             obj.getUuid());
   EXPECT_EQ("1", obj.getName()->toStdString());
@@ -69,14 +69,14 @@ TEST_F(SymbolPinTest, testSerializeAndDeserialize) {
                  Point(123, 567), UnsignedLength(321), Angle(789),
                  Point(100000, 200000), Angle(321), PositiveLength(123456),
                  Alignment(HAlign::center(), VAlign::bottom()));
-  SExpression sexpr1 = SExpression::createList("obj");
-  obj1.serialize(sexpr1);
+  std::unique_ptr<SExpression> sexpr1 = SExpression::createList("obj");
+  obj1.serialize(*sexpr1);
 
-  SymbolPin obj2(sexpr1);
-  SExpression sexpr2 = SExpression::createList("obj");
-  obj2.serialize(sexpr2);
+  SymbolPin obj2(*sexpr1);
+  std::unique_ptr<SExpression> sexpr2 = SExpression::createList("obj");
+  obj2.serialize(*sexpr2);
 
-  EXPECT_EQ(sexpr1.toByteArray(), sexpr2.toByteArray());
+  EXPECT_EQ(sexpr1->toByteArray(), sexpr2->toByteArray());
 }
 
 /*******************************************************************************

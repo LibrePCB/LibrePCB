@@ -381,112 +381,118 @@ void Project::save() {
 
   // Metadata.
   {
-    SExpression root = SExpression::createList("librepcb_project_metadata");
-    root.appendChild(mUuid);
-    root.ensureLineBreak();
-    root.appendChild("name", mName);
-    root.ensureLineBreak();
-    root.appendChild("author", mAuthor);
-    root.ensureLineBreak();
-    root.appendChild("version", mVersion);
-    root.ensureLineBreak();
-    root.appendChild("created", mCreated);
-    root.ensureLineBreak();
-    mAttributes.serialize(root);
-    root.ensureLineBreak();
-    mDirectory->write("project/metadata.lp", root.toByteArray());
+    std::unique_ptr<SExpression> root =
+        SExpression::createList("librepcb_project_metadata");
+    root->appendChild(mUuid);
+    root->ensureLineBreak();
+    root->appendChild("name", mName);
+    root->ensureLineBreak();
+    root->appendChild("author", mAuthor);
+    root->ensureLineBreak();
+    root->appendChild("version", mVersion);
+    root->ensureLineBreak();
+    root->appendChild("created", mCreated);
+    root->ensureLineBreak();
+    mAttributes.serialize(*root);
+    root->ensureLineBreak();
+    mDirectory->write("project/metadata.lp", root->toByteArray());
   }
 
   // Settings.
   {
-    SExpression root = SExpression::createList("librepcb_project_settings");
-    root.ensureLineBreak();
+    std::unique_ptr<SExpression> root =
+        SExpression::createList("librepcb_project_settings");
+    root->ensureLineBreak();
     {
-      SExpression& node = root.appendList("library_locale_order");
+      SExpression& node = root->appendList("library_locale_order");
       foreach (const QString& locale, mLocaleOrder) {
         node.ensureLineBreak();
         node.appendChild("locale", locale);
       }
       node.ensureLineBreak();
     }
-    root.ensureLineBreak();
+    root->ensureLineBreak();
     {
-      SExpression& node = root.appendList("library_norm_order");
+      SExpression& node = root->appendList("library_norm_order");
       foreach (const QString& norm, mNormOrder) {
         node.ensureLineBreak();
         node.appendChild("norm", norm);
       }
       node.ensureLineBreak();
     }
-    root.ensureLineBreak();
+    root->ensureLineBreak();
     {
-      SExpression& node = root.appendList("custom_bom_attributes");
+      SExpression& node = root->appendList("custom_bom_attributes");
       foreach (const QString& key, mCustomBomAttributes) {
         node.ensureLineBreak();
         node.appendChild("attribute", key);
       }
       node.ensureLineBreak();
     }
-    root.ensureLineBreak();
-    root.appendChild("default_lock_component_assembly",
-                     mDefaultLockComponentAssembly);
-    root.ensureLineBreak();
-    mDirectory->write("project/settings.lp", root.toByteArray());
+    root->ensureLineBreak();
+    root->appendChild("default_lock_component_assembly",
+                      mDefaultLockComponentAssembly);
+    root->ensureLineBreak();
+    mDirectory->write("project/settings.lp", root->toByteArray());
   }
 
   // Output jobs.
   {
-    SExpression root = SExpression::createList("librepcb_jobs");
-    root.ensureLineBreak();
-    mOutputJobs.serialize(root);
-    root.ensureLineBreak();
-    mDirectory->write("project/jobs.lp", root.toByteArray());
+    std::unique_ptr<SExpression> root =
+        SExpression::createList("librepcb_jobs");
+    root->ensureLineBreak();
+    mOutputJobs.serialize(*root);
+    root->ensureLineBreak();
+    mDirectory->write("project/jobs.lp", root->toByteArray());
   }
 
   // Circuit.
   {
-    SExpression root = SExpression::createList("librepcb_circuit");
-    mCircuit->serialize(root);
-    mDirectory->write("circuit/circuit.lp", root.toByteArray());
+    std::unique_ptr<SExpression> root =
+        SExpression::createList("librepcb_circuit");
+    mCircuit->serialize(*root);
+    mDirectory->write("circuit/circuit.lp", root->toByteArray());
   }
 
   // ERC.
   {
-    SExpression root = SExpression::createList("librepcb_erc");
+    std::unique_ptr<SExpression> root = SExpression::createList("librepcb_erc");
     foreach (const SExpression& node,
              Toolbox::sortedQSet(mErcMessageApprovals)) {
-      root.ensureLineBreak();
-      root.appendChild(node);
+      root->ensureLineBreak();
+      root->appendChild(node);
     }
-    root.ensureLineBreak();
-    mDirectory->write("circuit/erc.lp", root.toByteArray());
+    root->ensureLineBreak();
+    mDirectory->write("circuit/erc.lp", root->toByteArray());
   }
 
   // Schematics.
   {
-    SExpression root = SExpression::createList("librepcb_schematics");
+    std::unique_ptr<SExpression> root =
+        SExpression::createList("librepcb_schematics");
     foreach (Schematic* schematic, mSchematics) {
-      root.ensureLineBreak();
-      root.appendChild(
+      root->ensureLineBreak();
+      root->appendChild(
           "schematic",
           "schematics/" + schematic->getDirectoryName() + "/schematic.lp");
       schematic->save();
     }
-    root.ensureLineBreak();
-    mDirectory->write("schematics/schematics.lp", root.toByteArray());
+    root->ensureLineBreak();
+    mDirectory->write("schematics/schematics.lp", root->toByteArray());
   }
 
   // Boards.
   {
-    SExpression root = SExpression::createList("librepcb_boards");
+    std::unique_ptr<SExpression> root =
+        SExpression::createList("librepcb_boards");
     foreach (Board* board, mBoards) {
-      root.ensureLineBreak();
-      root.appendChild("board",
-                       "boards/" + board->getDirectoryName() + "/board.lp");
+      root->ensureLineBreak();
+      root->appendChild("board",
+                        "boards/" + board->getDirectoryName() + "/board.lp");
       board->save();
     }
-    root.ensureLineBreak();
-    mDirectory->write("boards/boards.lp", root.toByteArray());
+    root->ensureLineBreak();
+    mDirectory->write("boards/boards.lp", root->toByteArray());
   }
 
   // Update the datetime attribute of the project.

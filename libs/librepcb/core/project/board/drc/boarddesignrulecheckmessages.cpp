@@ -71,9 +71,9 @@ DrcMsgMissingDevice::DrcMsgMissingDevice(
            "device in the board, so the circuit of the PCB is not "
            "complete.\n\nUse the \"Place Devices\" dock to add the device."),
         "missing_device", {}) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("device", component.getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("device", component.getUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -95,11 +95,11 @@ DrcMsgMissingConnection::DrcMsgMissingConnection(const BI_NetLineAnchor& p1,
            "origin of footprint pads to make the airwire and this message "
            "disappearing."),
         "missing_connection", locations) {
-  mApproval.ensureLineBreak();
-  SExpression& fromNode = mApproval.appendList("tmp");
-  mApproval.ensureLineBreak();
-  SExpression& toNode = mApproval.appendList("tmp");
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  SExpression& fromNode = mApproval->appendList("tmp");
+  mApproval->ensureLineBreak();
+  SExpression& toNode = mApproval->appendList("tmp");
+  mApproval->ensureLineBreak();
 
   // Sort nodes to make the approval canonical.
   serializeAnchor(fromNode, p1);
@@ -195,13 +195,13 @@ DrcMsgOpenBoardOutlinePolygon::DrcMsgOpenBoardOutlinePolygon(
                "polygon and append an explicit last vertex to make the polygon "
                "closed."),
         "open_board_outline", locations) {
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
   if (device) {
-    mApproval.appendChild("device", device->getComponentInstanceUuid());
-    mApproval.ensureLineBreak();
+    mApproval->appendChild("device", device->getComponentInstanceUuid());
+    mApproval->ensureLineBreak();
   }
-  mApproval.appendChild("polygon", polygon);
-  mApproval.ensureLineBreak();
+  mApproval->appendChild("polygon", polygon);
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -244,9 +244,9 @@ DrcMsgEmptyNetSegment::DrcMsgEmptyNetSegment(
                      "bug. But no worries, this issue is not harmful at all "
                      "so you can safely ignore this message.",
                      "empty_netsegment", {}) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("netsegment", netSegment.getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("netsegment", netSegment.getUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -264,13 +264,13 @@ DrcMsgUnconnectedJunction::DrcMsgUnconnectedJunction(
         "no worries, this issue is not harmful at all so you can safely "
         "ignore this message.",
         "unconnected_junction", locations) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("board", netPoint.getBoard().getUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("netsegment", netPoint.getNetSegment().getUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("junction", netPoint.getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("board", netPoint.getBoard().getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("netsegment", netPoint.getNetSegment().getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("junction", netPoint.getUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -295,13 +295,13 @@ DrcMsgMinimumTextHeightViolation::DrcMsgMinimumTextHeightViolation(
             tr("Check the DRC settings and increase the text height if "
                "needed."),
         "minimum_text_height_violation", locations) {
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
   if (const BI_Device* device = text.getDevice()) {
-    mApproval.appendChild("device", device->getComponentInstanceUuid());
-    mApproval.ensureLineBreak();
+    mApproval->appendChild("device", device->getComponentInstanceUuid());
+    mApproval->ensureLineBreak();
   }
-  mApproval.appendChild("stroke_text", text.getData().getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->appendChild("stroke_text", text.getData().getUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -324,11 +324,11 @@ DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
             tr("Check the DRC settings and increase the trace width if "
                "needed."),
         "minimum_width_violation", locations) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("netsegment", netLine.getNetSegment().getUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("trace", netLine.getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("netsegment", netLine.getNetSegment().getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("trace", netLine.getUuid());
+  mApproval->ensureLineBreak();
 }
 
 DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
@@ -347,9 +347,9 @@ DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
             tr("Check the DRC settings and increase the minimum plane width in "
                "its properties if needed."),
         "minimum_width_violation", locations) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("plane", plane.getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("plane", plane.getUuid());
+  mApproval->ensureLineBreak();
 }
 
 DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
@@ -368,9 +368,9 @@ DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
             tr("Check the DRC settings and increase the polygon line width if "
                "needed."),
         "minimum_width_violation", locations) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("polygon", polygon.getData().getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("polygon", polygon.getData().getUuid());
+  mApproval->ensureLineBreak();
 }
 
 DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
@@ -389,13 +389,13 @@ DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
             tr("Check the DRC settings and increase the text stroke width if "
                "needed."),
         "minimum_width_violation", locations) {
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
   if (const BI_Device* device = text.getDevice()) {
-    mApproval.appendChild("device", device->getComponentInstanceUuid());
-    mApproval.ensureLineBreak();
+    mApproval->appendChild("device", device->getComponentInstanceUuid());
+    mApproval->ensureLineBreak();
   }
-  mApproval.appendChild("stroke_text", text.getData().getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->appendChild("stroke_text", text.getData().getUuid());
+  mApproval->ensureLineBreak();
 }
 
 DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
@@ -417,11 +417,11 @@ DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
             tr("Check the DRC settings and increase the polygon line width if "
                "needed."),
         "minimum_width_violation", locations) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("device", device.getComponentInstanceUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("polygon", polygon.getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("device", device.getComponentInstanceUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("polygon", polygon.getUuid());
+  mApproval->ensureLineBreak();
 }
 
 DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
@@ -442,11 +442,11 @@ DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
             tr("Check the DRC settings and increase the circle line width if "
                "needed."),
         "minimum_width_violation", locations) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("device", device.getComponentInstanceUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("circle", circle.getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("device", device.getComponentInstanceUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("circle", circle.getUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -475,11 +475,11 @@ DrcMsgCopperCopperClearanceViolation::DrcMsgCopperCopperClearanceViolation(
             tr("Check the DRC settings and move the objects to increase their "
                "clearance if needed."),
         "copper_clearance_violation", locations) {
-  mApproval.ensureLineBreak();
-  SExpression& node1 = mApproval.appendList("object");
-  mApproval.ensureLineBreak();
-  SExpression& node2 = mApproval.appendList("object");
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  SExpression& node1 = mApproval->appendList("object");
+  mApproval->ensureLineBreak();
+  SExpression& node2 = mApproval->appendList("object");
+  mApproval->ensureLineBreak();
 
   // Sort nodes to make the approval canonical.
   serializeObject(node1, item1, polygon1, circle1);
@@ -604,11 +604,11 @@ DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
                          tr("Check the DRC settings and move the via away from "
                             "the board outline if needed."),
                      "copper_board_clearance_violation", locations) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("netsegment", via.getNetSegment().getUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("via", via.getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("netsegment", via.getNetSegment().getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("via", via.getUuid());
+  mApproval->ensureLineBreak();
 }
 
 DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
@@ -626,11 +626,11 @@ DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
             tr("Check the DRC settings and move the trace away from the board "
                "outline if needed."),
         "copper_board_clearance_violation", locations) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("netsegment", netLine.getNetSegment().getUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("trace", netLine.getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("netsegment", netLine.getNetSegment().getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("trace", netLine.getUuid());
+  mApproval->ensureLineBreak();
 }
 
 DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
@@ -648,11 +648,11 @@ DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
             tr("Check the DRC settings and move the device away from the board "
                "outline if needed."),
         "copper_board_clearance_violation", locations) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("device", pad.getDevice().getComponentInstanceUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("pad", pad.getLibPadUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("device", pad.getDevice().getComponentInstanceUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("pad", pad.getLibPadUuid());
+  mApproval->ensureLineBreak();
 }
 
 DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
@@ -670,9 +670,9 @@ DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
             tr("Check the DRC settings and increase the configured plane "
                "clearance if needed."),
         "copper_board_clearance_violation", locations) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("plane", plane.getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("plane", plane.getUuid());
+  mApproval->ensureLineBreak();
 }
 
 DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
@@ -681,9 +681,9 @@ DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
   : RuleCheckMessage(Severity::Warning, getPolygonMessage(minClearance),
                      getPolygonDescription(),
                      "copper_board_clearance_violation", locations) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("polygon", polygon.getData().getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("polygon", polygon.getData().getUuid());
+  mApproval->ensureLineBreak();
 }
 
 DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
@@ -692,11 +692,11 @@ DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
   : RuleCheckMessage(Severity::Warning, getPolygonMessage(minClearance),
                      getPolygonDescription(),
                      "copper_board_clearance_violation", locations) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("device", device.getComponentInstanceUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("polygon", polygon.getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("device", device.getComponentInstanceUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("polygon", polygon.getUuid());
+  mApproval->ensureLineBreak();
 }
 
 DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
@@ -713,11 +713,11 @@ DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
             tr("Check the DRC settings and move the circle away from the board "
                "outline if needed."),
         "copper_board_clearance_violation", locations) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("device", device.getComponentInstanceUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("circle", circle.getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("device", device.getComponentInstanceUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("circle", circle.getUuid());
+  mApproval->ensureLineBreak();
 }
 
 DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
@@ -735,13 +735,13 @@ DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
             tr("Check the DRC settings and move the stroke text away from the "
                "board outline if needed."),
         "copper_board_clearance_violation", locations) {
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
   if (const BI_Device* device = strokeText.getDevice()) {
-    mApproval.appendChild("device", device->getComponentInstanceUuid());
-    mApproval.ensureLineBreak();
+    mApproval->appendChild("device", device->getComponentInstanceUuid());
+    mApproval->ensureLineBreak();
   }
-  mApproval.appendChild("stroke_text", strokeText.getData().getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->appendChild("stroke_text", strokeText.getData().getUuid());
+  mApproval->ensureLineBreak();
 }
 
 QString DrcMsgCopperBoardClearanceViolation::getPolygonMessage(
@@ -770,9 +770,9 @@ DrcMsgCopperHoleClearanceViolation::DrcMsgCopperHoleClearanceViolation(
   : RuleCheckMessage(Severity::Error, getMessage(minClearance),
                      getDescription(), "copper_hole_clearance_violation",
                      locations) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("hole", hole.getData().getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("hole", hole.getData().getUuid());
+  mApproval->ensureLineBreak();
 }
 
 DrcMsgCopperHoleClearanceViolation::DrcMsgCopperHoleClearanceViolation(
@@ -781,11 +781,11 @@ DrcMsgCopperHoleClearanceViolation::DrcMsgCopperHoleClearanceViolation(
   : RuleCheckMessage(Severity::Error, getMessage(minClearance),
                      getDescription(), "copper_hole_clearance_violation",
                      locations) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("device", device.getComponentInstanceUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("hole", hole.getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("device", device.getComponentInstanceUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("hole", hole.getUuid());
+  mApproval->ensureLineBreak();
 }
 
 QString DrcMsgCopperHoleClearanceViolation::getMessage(
@@ -816,12 +816,12 @@ DrcMsgCopperInKeepoutZone::DrcMsgCopperInKeepoutZone(
         tr("Pad in copper keepout zone: '%1'", "Placeholder is pad name")
             .arg(pad.getText()),
         getDescription(), "copper_in_keepout_zone", locations) {
-  mApproval.appendChild("device", pad.getDevice().getComponentInstanceUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("pad", pad.getLibPadUuid());
-  mApproval.ensureLineBreak();
+  mApproval->appendChild("device", pad.getDevice().getComponentInstanceUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("pad", pad.getLibPadUuid());
+  mApproval->ensureLineBreak();
   addZoneApprovalNodes(boardZone, zoneDevice, deviceZone);
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
 }
 
 DrcMsgCopperInKeepoutZone::DrcMsgCopperInKeepoutZone(
@@ -833,12 +833,12 @@ DrcMsgCopperInKeepoutZone::DrcMsgCopperInKeepoutZone(
         tr("Via in copper keepout zone: '%1'", "Placeholder is net name")
             .arg(via.getNetSegment().getNetNameToDisplay(true)),
         getDescription(), "copper_in_keepout_zone", locations) {
-  mApproval.appendChild("netsegment", via.getNetSegment().getUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("via", via.getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->appendChild("netsegment", via.getNetSegment().getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("via", via.getUuid());
+  mApproval->ensureLineBreak();
   addZoneApprovalNodes(boardZone, zoneDevice, deviceZone);
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
 }
 
 DrcMsgCopperInKeepoutZone::DrcMsgCopperInKeepoutZone(
@@ -850,12 +850,12 @@ DrcMsgCopperInKeepoutZone::DrcMsgCopperInKeepoutZone(
         tr("Trace in copper keepout zone: '%1'", "Placeholder is net name")
             .arg(netLine.getNetSegment().getNetNameToDisplay(true)),
         getDescription(), "copper_in_keepout_zone", locations) {
-  mApproval.appendChild("netsegment", netLine.getNetSegment().getUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("trace", netLine.getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->appendChild("netsegment", netLine.getNetSegment().getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("trace", netLine.getUuid());
+  mApproval->ensureLineBreak();
   addZoneApprovalNodes(boardZone, zoneDevice, deviceZone);
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
 }
 
 DrcMsgCopperInKeepoutZone::DrcMsgCopperInKeepoutZone(
@@ -864,10 +864,10 @@ DrcMsgCopperInKeepoutZone::DrcMsgCopperInKeepoutZone(
     const QVector<Path>& locations) noexcept
   : RuleCheckMessage(Severity::Error, tr("Polygon in copper keepout zone"),
                      getDescription(), "copper_in_keepout_zone", locations) {
-  mApproval.appendChild("polygon", polygon.getData().getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->appendChild("polygon", polygon.getData().getUuid());
+  mApproval->ensureLineBreak();
   addZoneApprovalNodes(boardZone, zoneDevice, deviceZone);
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
 }
 
 DrcMsgCopperInKeepoutZone::DrcMsgCopperInKeepoutZone(
@@ -879,12 +879,12 @@ DrcMsgCopperInKeepoutZone::DrcMsgCopperInKeepoutZone(
         tr("Polygon in copper keepout zone: '%1'", "Placeholder is device name")
             .arg(*device.getComponentInstance().getName()),
         getDescription(), "copper_in_keepout_zone", locations) {
-  mApproval.appendChild("device", device.getComponentInstanceUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("polygon", polygon.getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->appendChild("device", device.getComponentInstanceUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("polygon", polygon.getUuid());
+  mApproval->ensureLineBreak();
   addZoneApprovalNodes(boardZone, zoneDevice, deviceZone);
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
 }
 
 DrcMsgCopperInKeepoutZone::DrcMsgCopperInKeepoutZone(
@@ -896,29 +896,29 @@ DrcMsgCopperInKeepoutZone::DrcMsgCopperInKeepoutZone(
         tr("Circle in copper keepout zone: '%1'", "Placeholder is device name")
             .arg(*device.getComponentInstance().getName()),
         getDescription(), "copper_in_keepout_zone", locations) {
-  mApproval.appendChild("device", device.getComponentInstanceUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("circle", circle.getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->appendChild("device", device.getComponentInstanceUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("circle", circle.getUuid());
+  mApproval->ensureLineBreak();
   addZoneApprovalNodes(boardZone, zoneDevice, deviceZone);
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
 }
 
 void DrcMsgCopperInKeepoutZone::addZoneApprovalNodes(
     const BI_Zone* boardZone, const BI_Device* zoneDevice,
     const Zone* deviceZone) noexcept {
   if (boardZone) {
-    mApproval.ensureLineBreak();
-    mApproval.appendChild("zone", boardZone->getData().getUuid());
+    mApproval->ensureLineBreak();
+    mApproval->appendChild("zone", boardZone->getData().getUuid());
   }
   if (deviceZone) {
-    mApproval.ensureLineBreak();
-    mApproval.appendChild("zone", deviceZone->getUuid());
+    mApproval->ensureLineBreak();
+    mApproval->appendChild("zone", deviceZone->getUuid());
   }
   if (zoneDevice) {
-    mApproval.ensureLineBreak();
-    mApproval.appendChild("from_device",
-                          zoneDevice->getComponentInstanceUuid());
+    mApproval->ensureLineBreak();
+    mApproval->appendChild("from_device",
+                           zoneDevice->getComponentInstanceUuid());
   }
 }
 
@@ -945,11 +945,11 @@ DrcMsgDrillDrillClearanceViolation::DrcMsgDrillDrillClearanceViolation(
                          tr("Check the DRC settings and move the drills to "
                             "increase their distance if needed."),
                      "drill_clearance_violation", locations) {
-  mApproval.ensureLineBreak();
-  SExpression& node1 = mApproval.appendList("drill");
-  mApproval.ensureLineBreak();
-  SExpression& node2 = mApproval.appendList("drill");
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  SExpression& node1 = mApproval->appendList("drill");
+  mApproval->ensureLineBreak();
+  SExpression& node2 = mApproval->appendList("drill");
+  mApproval->ensureLineBreak();
 
   // Sort nodes to make the approval canonical.
   serializeObject(node1, item1, hole1);
@@ -1000,11 +1000,11 @@ DrcMsgDrillBoardClearanceViolation::DrcMsgDrillBoardClearanceViolation(
   : RuleCheckMessage(Severity::Error, getMessage(minClearance),
                      getDescription(), "drill_board_clearance_violation",
                      locations) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("netsegment", via.getNetSegment().getUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("via", via.getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("netsegment", via.getNetSegment().getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("via", via.getUuid());
+  mApproval->ensureLineBreak();
 }
 
 DrcMsgDrillBoardClearanceViolation::DrcMsgDrillBoardClearanceViolation(
@@ -1013,13 +1013,13 @@ DrcMsgDrillBoardClearanceViolation::DrcMsgDrillBoardClearanceViolation(
   : RuleCheckMessage(Severity::Error, getMessage(minClearance),
                      getDescription(), "drill_board_clearance_violation",
                      locations) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("device", pad.getDevice().getComponentInstanceUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("pad", pad.getLibPadUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("hole", hole.getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("device", pad.getDevice().getComponentInstanceUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("pad", pad.getLibPadUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("hole", hole.getUuid());
+  mApproval->ensureLineBreak();
 }
 
 DrcMsgDrillBoardClearanceViolation::DrcMsgDrillBoardClearanceViolation(
@@ -1028,9 +1028,9 @@ DrcMsgDrillBoardClearanceViolation::DrcMsgDrillBoardClearanceViolation(
   : RuleCheckMessage(Severity::Error, getMessage(minClearance),
                      getDescription(), "drill_board_clearance_violation",
                      locations) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("hole", hole.getData().getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("hole", hole.getData().getUuid());
+  mApproval->ensureLineBreak();
 }
 
 DrcMsgDrillBoardClearanceViolation::DrcMsgDrillBoardClearanceViolation(
@@ -1039,11 +1039,11 @@ DrcMsgDrillBoardClearanceViolation::DrcMsgDrillBoardClearanceViolation(
   : RuleCheckMessage(Severity::Error, getMessage(minClearance),
                      getDescription(), "drill_board_clearance_violation",
                      locations) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("device", device.getComponentInstanceUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("hole", hole.getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("device", device.getComponentInstanceUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("hole", hole.getUuid());
+  mApproval->ensureLineBreak();
 }
 
 QString DrcMsgDrillBoardClearanceViolation::getMessage(
@@ -1083,15 +1083,15 @@ DrcMsgDeviceInCourtyard::DrcMsgDeviceInCourtyard(
                "this message if you're sure they can be assembled without "
                "problems."),
         "device_in_courtyard", locations) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("device",
-                        std::min(device1.getComponentInstanceUuid(),
-                                 device2.getComponentInstanceUuid()));
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("device",
-                        std::max(device1.getComponentInstanceUuid(),
-                                 device2.getComponentInstanceUuid()));
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("device",
+                         std::min(device1.getComponentInstanceUuid(),
+                                  device2.getComponentInstanceUuid()));
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("device",
+                         std::max(device1.getComponentInstanceUuid(),
+                                  device2.getComponentInstanceUuid()));
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -1116,15 +1116,15 @@ DrcMsgOverlappingDevices::DrcMsgOverlappingDevices(
                "this message if you're sure they can be assembled without "
                "problems (or only one of them gets assembled)."),
         "overlapping_devices", locations) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("device",
-                        std::min(device1.getComponentInstanceUuid(),
-                                 device2.getComponentInstanceUuid()));
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("device",
-                        std::max(device1.getComponentInstanceUuid(),
-                                 device2.getComponentInstanceUuid()));
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("device",
+                         std::min(device1.getComponentInstanceUuid(),
+                                  device2.getComponentInstanceUuid()));
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("device",
+                         std::max(device1.getComponentInstanceUuid(),
+                                  device2.getComponentInstanceUuid()));
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -1140,27 +1140,27 @@ DrcMsgDeviceInKeepoutZone::DrcMsgDeviceInKeepoutZone(
         tr("Device in keepout zone: '%1'", "Placeholder is device name")
             .arg(*device.getComponentInstance().getName()),
         getDescription(), "device_in_keepout_zone", locations) {
-  mApproval.appendChild("device", device.getComponentInstanceUuid());
-  mApproval.ensureLineBreak();
+  mApproval->appendChild("device", device.getComponentInstanceUuid());
+  mApproval->ensureLineBreak();
   addZoneApprovalNodes(boardZone, zoneDevice, deviceZone);
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
 }
 
 void DrcMsgDeviceInKeepoutZone::addZoneApprovalNodes(
     const BI_Zone* boardZone, const BI_Device* zoneDevice,
     const Zone* deviceZone) noexcept {
   if (boardZone) {
-    mApproval.ensureLineBreak();
-    mApproval.appendChild("zone", boardZone->getData().getUuid());
+    mApproval->ensureLineBreak();
+    mApproval->appendChild("zone", boardZone->getData().getUuid());
   }
   if (deviceZone) {
-    mApproval.ensureLineBreak();
-    mApproval.appendChild("zone", deviceZone->getUuid());
+    mApproval->ensureLineBreak();
+    mApproval->appendChild("zone", deviceZone->getUuid());
   }
   if (zoneDevice) {
-    mApproval.ensureLineBreak();
-    mApproval.appendChild("from_device",
-                          zoneDevice->getComponentInstanceUuid());
+    mApproval->ensureLineBreak();
+    mApproval->appendChild("from_device",
+                           zoneDevice->getComponentInstanceUuid());
   }
 }
 
@@ -1182,12 +1182,12 @@ DrcMsgExposureInKeepoutZone::DrcMsgExposureInKeepoutZone(
         tr("Pad in exposure keepout zone: '%1'", "Placeholder is pad name")
             .arg(pad.getText()),
         getDescription(), "exposure_in_keepout_zone", locations) {
-  mApproval.appendChild("device", pad.getDevice().getComponentInstanceUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("pad", pad.getLibPadUuid());
-  mApproval.ensureLineBreak();
+  mApproval->appendChild("device", pad.getDevice().getComponentInstanceUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("pad", pad.getLibPadUuid());
+  mApproval->ensureLineBreak();
   addZoneApprovalNodes(boardZone, zoneDevice, deviceZone);
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
 }
 
 DrcMsgExposureInKeepoutZone::DrcMsgExposureInKeepoutZone(
@@ -1199,12 +1199,12 @@ DrcMsgExposureInKeepoutZone::DrcMsgExposureInKeepoutZone(
         tr("Via in exposure keepout zone: '%1'", "Placeholder is net name")
             .arg(via.getNetSegment().getNetNameToDisplay(true)),
         getDescription(), "exposure_in_keepout_zone", locations) {
-  mApproval.appendChild("netsegment", via.getNetSegment().getUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("via", via.getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->appendChild("netsegment", via.getNetSegment().getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("via", via.getUuid());
+  mApproval->ensureLineBreak();
   addZoneApprovalNodes(boardZone, zoneDevice, deviceZone);
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
 }
 
 DrcMsgExposureInKeepoutZone::DrcMsgExposureInKeepoutZone(
@@ -1213,10 +1213,10 @@ DrcMsgExposureInKeepoutZone::DrcMsgExposureInKeepoutZone(
     const QVector<Path>& locations) noexcept
   : RuleCheckMessage(Severity::Error, tr("Polygon in exposure keepout zone"),
                      getDescription(), "exposure_in_keepout_zone", locations) {
-  mApproval.appendChild("polygon", polygon.getData().getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->appendChild("polygon", polygon.getData().getUuid());
+  mApproval->ensureLineBreak();
   addZoneApprovalNodes(boardZone, zoneDevice, deviceZone);
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
 }
 
 DrcMsgExposureInKeepoutZone::DrcMsgExposureInKeepoutZone(
@@ -1228,12 +1228,12 @@ DrcMsgExposureInKeepoutZone::DrcMsgExposureInKeepoutZone(
                         "Placeholder is device name")
                          .arg(*device.getComponentInstance().getName()),
                      getDescription(), "exposure_in_keepout_zone", locations) {
-  mApproval.appendChild("device", device.getComponentInstanceUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("polygon", polygon.getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->appendChild("device", device.getComponentInstanceUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("polygon", polygon.getUuid());
+  mApproval->ensureLineBreak();
   addZoneApprovalNodes(boardZone, zoneDevice, deviceZone);
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
 }
 
 DrcMsgExposureInKeepoutZone::DrcMsgExposureInKeepoutZone(
@@ -1245,29 +1245,29 @@ DrcMsgExposureInKeepoutZone::DrcMsgExposureInKeepoutZone(
                         "Placeholder is device name")
                          .arg(*device.getComponentInstance().getName()),
                      getDescription(), "exposure_in_keepout_zone", locations) {
-  mApproval.appendChild("device", device.getComponentInstanceUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("circle", circle.getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->appendChild("device", device.getComponentInstanceUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("circle", circle.getUuid());
+  mApproval->ensureLineBreak();
   addZoneApprovalNodes(boardZone, zoneDevice, deviceZone);
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
 }
 
 void DrcMsgExposureInKeepoutZone::addZoneApprovalNodes(
     const BI_Zone* boardZone, const BI_Device* zoneDevice,
     const Zone* deviceZone) noexcept {
   if (boardZone) {
-    mApproval.ensureLineBreak();
-    mApproval.appendChild("zone", boardZone->getData().getUuid());
+    mApproval->ensureLineBreak();
+    mApproval->appendChild("zone", boardZone->getData().getUuid());
   }
   if (deviceZone) {
-    mApproval.ensureLineBreak();
-    mApproval.appendChild("zone", deviceZone->getUuid());
+    mApproval->ensureLineBreak();
+    mApproval->appendChild("zone", deviceZone->getUuid());
   }
   if (zoneDevice) {
-    mApproval.ensureLineBreak();
-    mApproval.appendChild("from_device",
-                          zoneDevice->getComponentInstanceUuid());
+    mApproval->ensureLineBreak();
+    mApproval->appendChild("from_device",
+                           zoneDevice->getComponentInstanceUuid());
   }
 }
 
@@ -1296,11 +1296,11 @@ DrcMsgMinimumAnnularRingViolation::DrcMsgMinimumAnnularRingViolation(
             " " % seriousTroublesTr() % "\n\n" %
             tr("Check the DRC settings and increase the via size if needed."),
         "minimum_annular_ring_violation", locations) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("netsegment", via.getNetSegment().getUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("via", via.getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("netsegment", via.getNetSegment().getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("via", via.getUuid());
+  mApproval->ensureLineBreak();
 }
 
 DrcMsgMinimumAnnularRingViolation::DrcMsgMinimumAnnularRingViolation(
@@ -1317,11 +1317,11 @@ DrcMsgMinimumAnnularRingViolation::DrcMsgMinimumAnnularRingViolation(
             " " % seriousTroublesTr() % "\n\n" %
             tr("Check the DRC settings and increase the pad size if needed."),
         "minimum_annular_ring_violation", locations) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("device", pad.getDevice().getComponentInstanceUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("pad", pad.getLibPadUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("device", pad.getDevice().getComponentInstanceUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("pad", pad.getLibPadUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -1336,9 +1336,9 @@ DrcMsgMinimumDrillDiameterViolation::DrcMsgMinimumDrillDiameterViolation(
         determineMessage(hole.getData().getDiameter(), minDiameter),
         determineDescription(false, false), "minimum_drill_diameter_violation",
         locations) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("hole", hole.getData().getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("hole", hole.getData().getUuid());
+  mApproval->ensureLineBreak();
 }
 
 DrcMsgMinimumDrillDiameterViolation::DrcMsgMinimumDrillDiameterViolation(
@@ -1348,11 +1348,11 @@ DrcMsgMinimumDrillDiameterViolation::DrcMsgMinimumDrillDiameterViolation(
                      determineMessage(hole.getDiameter(), minDiameter),
                      determineDescription(false, false),
                      "minimum_drill_diameter_violation", locations) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("device", device.getComponentInstanceUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("hole", hole.getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("device", device.getComponentInstanceUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("hole", hole.getUuid());
+  mApproval->ensureLineBreak();
 }
 
 DrcMsgMinimumDrillDiameterViolation::DrcMsgMinimumDrillDiameterViolation(
@@ -1367,11 +1367,11 @@ DrcMsgMinimumDrillDiameterViolation::DrcMsgMinimumDrillDiameterViolation(
                  minDiameter->toMmString(), "mm"),
         determineDescription(true, false), "minimum_drill_diameter_violation",
         locations) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("netsegment", via.getNetSegment().getUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("via", via.getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("netsegment", via.getNetSegment().getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("via", via.getUuid());
+  mApproval->ensureLineBreak();
 }
 
 DrcMsgMinimumDrillDiameterViolation::DrcMsgMinimumDrillDiameterViolation(
@@ -1385,13 +1385,13 @@ DrcMsgMinimumDrillDiameterViolation::DrcMsgMinimumDrillDiameterViolation(
                  minDiameter->toMmString(), "mm"),
         determineDescription(false, true), "minimum_drill_diameter_violation",
         locations) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("device", pad.getDevice().getComponentInstanceUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("pad", pad.getLibPadUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("hole", padHole.getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("device", pad.getDevice().getComponentInstanceUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("pad", pad.getLibPadUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("hole", padHole.getUuid());
+  mApproval->ensureLineBreak();
 }
 
 QString DrcMsgMinimumDrillDiameterViolation::determineMessage(
@@ -1434,9 +1434,9 @@ DrcMsgMinimumSlotWidthViolation::DrcMsgMinimumSlotWidthViolation(
                      determineMessage(hole.getData().getDiameter(), minWidth),
                      determineDescription(false),
                      "minimum_slot_width_violation", locations) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("hole", hole.getData().getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("hole", hole.getData().getUuid());
+  mApproval->ensureLineBreak();
 }
 
 DrcMsgMinimumSlotWidthViolation::DrcMsgMinimumSlotWidthViolation(
@@ -1446,11 +1446,11 @@ DrcMsgMinimumSlotWidthViolation::DrcMsgMinimumSlotWidthViolation(
                      determineMessage(hole.getDiameter(), minWidth),
                      determineDescription(false),
                      "minimum_slot_width_violation", locations) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("device", device.getComponentInstanceUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("hole", hole.getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("device", device.getComponentInstanceUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("hole", hole.getUuid());
+  mApproval->ensureLineBreak();
 }
 
 DrcMsgMinimumSlotWidthViolation::DrcMsgMinimumSlotWidthViolation(
@@ -1463,13 +1463,13 @@ DrcMsgMinimumSlotWidthViolation::DrcMsgMinimumSlotWidthViolation(
             .arg(pad.getText(), padHole.getDiameter()->toMmString(),
                  minWidth->toMmString(), "mm"),
         determineDescription(true), "minimum_slot_width_violation", locations) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("device", pad.getDevice().getComponentInstanceUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("pad", pad.getLibPadUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("hole", padHole.getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("device", pad.getDevice().getComponentInstanceUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("pad", pad.getLibPadUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("hole", padHole.getUuid());
+  mApproval->ensureLineBreak();
 }
 
 QString DrcMsgMinimumSlotWidthViolation::determineMessage(
@@ -1514,12 +1514,12 @@ DrcMsgInvalidPadConnection::DrcMsgInvalidPadConnection(
            "connected fully. This issue needs to be fixed in the "
            "library."),
         "invalid_pad_connection", locations) {
-  mApproval.appendChild("layer", layer);
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("device", pad.getDevice().getComponentInstanceUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("pad", pad.getLibPadUuid());
-  mApproval.ensureLineBreak();
+  mApproval->appendChild("layer", layer);
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("device", pad.getDevice().getComponentInstanceUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("pad", pad.getLibPadUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -1532,9 +1532,9 @@ DrcMsgForbiddenSlot::DrcMsgForbiddenSlot(
                      determineMessage(hole.getData().getPath()),
                      determineDescription(hole.getData().getPath()),
                      "forbidden_slot", locations) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("hole", hole.getData().getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("hole", hole.getData().getUuid());
+  mApproval->ensureLineBreak();
 }
 
 DrcMsgForbiddenSlot::DrcMsgForbiddenSlot(
@@ -1543,11 +1543,11 @@ DrcMsgForbiddenSlot::DrcMsgForbiddenSlot(
   : RuleCheckMessage(Severity::Warning, determineMessage(hole.getPath()),
                      determineDescription(hole.getPath()), "forbidden_slot",
                      locations) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("device", device.getComponentInstanceUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("hole", hole.getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("device", device.getComponentInstanceUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("hole", hole.getUuid());
+  mApproval->ensureLineBreak();
 }
 
 DrcMsgForbiddenSlot::DrcMsgForbiddenSlot(
@@ -1556,13 +1556,13 @@ DrcMsgForbiddenSlot::DrcMsgForbiddenSlot(
   : RuleCheckMessage(Severity::Warning, determineMessage(padHole.getPath()),
                      determineDescription(padHole.getPath()), "forbidden_slot",
                      locations) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("device", pad.getDevice().getComponentInstanceUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("pad", pad.getLibPadUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("hole", padHole.getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("device", pad.getDevice().getComponentInstanceUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("pad", pad.getLibPadUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("hole", padHole.getUuid());
+  mApproval->ensureLineBreak();
 }
 
 QString DrcMsgForbiddenSlot::determineMessage(
@@ -1609,9 +1609,9 @@ DrcMsgForbiddenVia::DrcMsgForbiddenVia(const BI_Via& via,
                                        const QVector<Path>& locations) noexcept
   : RuleCheckMessage(Severity::Error, determineMessage(via),
                      determineDescription(via), "forbidden_via", locations) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("via", via.getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("via", via.getUuid());
+  mApproval->ensureLineBreak();
 }
 
 QString DrcMsgForbiddenVia::determineMessage(const BI_Via& via) noexcept {
@@ -1659,13 +1659,13 @@ DrcMsgSilkscreenClearanceViolation::DrcMsgSilkscreenClearanceViolation(
             tr("Check the DRC settings and move the text away from the "
                "solder resist opening if needed."),
         "silkscreen_clearance_violation", locations) {
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
   if (const BI_Device* device = strokeText.getDevice()) {
-    mApproval.appendChild("device", device->getComponentInstanceUuid());
-    mApproval.ensureLineBreak();
+    mApproval->appendChild("device", device->getComponentInstanceUuid());
+    mApproval->ensureLineBreak();
   }
-  mApproval.appendChild("stroke_text", strokeText.getData().getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->appendChild("stroke_text", strokeText.getData().getUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -1678,9 +1678,9 @@ DrcMsgUselessZone::DrcMsgUselessZone(const BI_Zone& zone,
         Severity::Warning, tr("Useless zone"),
         tr("The zone has no layer or rule enabled so it is useless."),
         "useless_zone", locations) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("zone", zone.getData().getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("zone", zone.getData().getUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -1695,9 +1695,9 @@ DrcMsgUselessVia::DrcMsgUselessVia(const BI_Via& via,
                      tr("The via is connected on less than two layers, thus it "
                         "seems to be useless."),
                      "useless_via", locations) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("via", via.getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("via", via.getUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************

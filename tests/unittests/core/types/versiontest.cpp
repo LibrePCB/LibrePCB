@@ -242,22 +242,22 @@ TEST(VersionTest, testOperatorNotEqual) {
 
 TEST(VersionTest, testSerialize) {
   Version obj = Version::fromString("0.1.0");
-  EXPECT_EQ(QByteArray("\"0.1\"\n"), serialize(obj).toByteArray());
+  EXPECT_EQ(QByteArray("\"0.1\"\n"), serialize(obj)->toByteArray());
 }
 
 TEST(VersionTest, testDeserialize) {
-  SExpression sexpr = SExpression::createString("0.1");
-  EXPECT_EQ(Version::fromString("0.1"), deserialize<Version>(sexpr));
+  std::unique_ptr<SExpression> sexpr = SExpression::createString("0.1");
+  EXPECT_EQ(Version::fromString("0.1"), deserialize<Version>(*sexpr));
 }
 
 TEST(VersionTest, testDeserializeEmpty) {
-  SExpression sexpr = SExpression::createString("");
-  EXPECT_THROW(deserialize<Version>(sexpr), RuntimeError);
+  std::unique_ptr<SExpression> sexpr = SExpression::createString("");
+  EXPECT_THROW(deserialize<Version>(*sexpr), RuntimeError);
 }
 
 TEST(VersionTest, testDeserializeInvalid) {
-  SExpression sexpr = SExpression::createString("foo");
-  EXPECT_THROW(deserialize<Version>(sexpr), RuntimeError);
+  std::unique_ptr<SExpression> sexpr = SExpression::createString("foo");
+  EXPECT_THROW(deserialize<Version>(*sexpr), RuntimeError);
 }
 
 /*******************************************************************************

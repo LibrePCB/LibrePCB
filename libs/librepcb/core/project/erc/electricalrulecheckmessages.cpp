@@ -49,7 +49,7 @@ ErcMsgUnusedNetClass::ErcMsgUnusedNetClass(const NetClass& netClass) noexcept
                      tr("There are no nets assigned to the net class, so you "
                         "could remove it."),
                      "unused_netclass") {
-  mApproval.appendChild("netclass", netClass.getUuid());
+  mApproval->appendChild("netclass", netClass.getUuid());
 }
 
 /*******************************************************************************
@@ -63,7 +63,7 @@ ErcMsgOpenNet::ErcMsgOpenNet(const NetSignal& net) noexcept
                         "does not represent an electrical connection. Check if "
                         "you missed to connect more pins."),
                      "open_net") {
-  mApproval.appendChild("net", net.getUuid());
+  mApproval->appendChild("net", net.getUuid());
 }
 
 /*******************************************************************************
@@ -80,7 +80,7 @@ ErcMsgOpenWireInSegment::ErcMsgOpenWireInSegment(
            "if a connection to another wire or pin is missing (denoted by a "
            "cross mark)."),
         "open_wire") {
-  mApproval.appendChild("segment", segment.getUuid());
+  mApproval->appendChild("segment", segment.getUuid());
 }
 
 /*******************************************************************************
@@ -97,11 +97,11 @@ ErcMsgUnconnectedRequiredSignal::ErcMsgUnconnectedRequiredSignal(
                         "not connected to any net. Add a wire to the "
                         "corresponding symbol pin to connect it to a net."),
                      "unconnected_required_signal") {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("component", signal.getComponentInstance().getUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("signal", signal.getCompSignal().getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("component", signal.getComponentInstance().getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("signal", signal.getCompSignal().getUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -121,11 +121,11 @@ ErcMsgForcedNetSignalNameConflict::ErcMsgForcedNetSignalNameConflict(
            "this connection.")
             .arg(signal.getForcedNetSignalName(), getSignalNet(signal)),
         "forced_net_name_conflict") {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("component", signal.getComponentInstance().getUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("signal", signal.getCompSignal().getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("component", signal.getComponentInstance().getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("signal", signal.getCompSignal().getUuid());
+  mApproval->ensureLineBreak();
 }
 
 QString ErcMsgForcedNetSignalNameConflict::getSignalNet(
@@ -148,11 +148,11 @@ ErcMsgUnplacedRequiredGate::ErcMsgUnplacedRequiredGate(
                         "is not added to the schematic.")
                          .arg(*gate.getSuffix(), *component.getName()),
                      "unplaced_required_gate") {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("component", component.getUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("gate", gate.getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("component", component.getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("gate", gate.getUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -169,11 +169,11 @@ ErcMsgUnplacedOptionalGate::ErcMsgUnplacedOptionalGate(
         tr("The optional gate '%1' of '%2' is not added to the schematic.")
             .arg(*gate.getSuffix(), *component.getName()),
         "unplaced_optional_gate") {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("component", component.getUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("gate", gate.getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("component", component.getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("gate", gate.getUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -190,13 +190,13 @@ ErcMsgConnectedPinWithoutWire::ErcMsgConnectedPinWithoutWire(
            "attached so this connection is not visible in the schematic. Add a "
            "wire to make the connection visible."),
         "connected_pin_without_wire") {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("schematic", pin.getSchematic().getUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("symbol", pin.getSymbol().getUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("pin", pin.getLibPinUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("schematic", pin.getSchematic().getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("symbol", pin.getSymbol().getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("pin", pin.getLibPinUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -214,13 +214,13 @@ ErcMsgUnconnectedJunction::ErcMsgUnconnectedJunction(
         "no worries, this issue is not harmful at all so you can safely "
         "ignore this message.",
         "unconnected_junction") {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("schematic", netPoint.getSchematic().getUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("netsegment", netPoint.getNetSegment().getUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("junction", netPoint.getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("schematic", netPoint.getSchematic().getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("netsegment", netPoint.getNetSegment().getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("junction", netPoint.getUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************

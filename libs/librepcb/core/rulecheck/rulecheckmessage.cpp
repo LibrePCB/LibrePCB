@@ -35,7 +35,7 @@ RuleCheckMessage::RuleCheckMessage(const RuleCheckMessage& other) noexcept
   : mSeverity(other.mSeverity),
     mMessage(other.mMessage),
     mDescription(other.mDescription),
-    mApproval(other.mApproval),
+    mApproval(new SExpression(*other.mApproval)),
     mLocations(other.mLocations) {
 }
 
@@ -48,7 +48,7 @@ RuleCheckMessage::RuleCheckMessage(Severity severity, const QString& msg,
     mDescription(description),
     mApproval(SExpression::createList("approved")),
     mLocations(locations) {
-  mApproval.appendChild(SExpression::createToken(approvalName));  // snake_case
+  mApproval->appendChild(SExpression::createToken(approvalName));  // snake_case
 }
 
 RuleCheckMessage::~RuleCheckMessage() noexcept {

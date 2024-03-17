@@ -237,7 +237,7 @@ void BI_Plane::serialize(SExpression& root) const {
  ******************************************************************************/
 
 template <>
-SExpression serialize(const BI_Plane::ConnectStyle& obj) {
+std::unique_ptr<SExpression> serialize(const BI_Plane::ConnectStyle& obj) {
   switch (obj) {
     case BI_Plane::ConnectStyle::None:
       return SExpression::createToken("none");

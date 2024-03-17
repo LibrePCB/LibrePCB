@@ -101,7 +101,7 @@ const QList<CmpSigPinDisplayType>&
  ******************************************************************************/
 
 template <>
-SExpression serialize(const CmpSigPinDisplayType& obj) {
+std::unique_ptr<SExpression> serialize(const CmpSigPinDisplayType& obj) {
   return SExpression::createToken(obj.toString());
 }
 

@@ -59,31 +59,31 @@ BoardClipboardData::BoardClipboardData(const QByteArray& mimeData)
   : BoardClipboardData(Uuid::createRandom(), Point()) {
   mFileSystem->loadFromZip(mimeData);  // can throw
 
-  SExpression root =
+  const std::unique_ptr<const SExpression> root =
       SExpression::parse(mFileSystem->read("board.lp"), FilePath());
-  mBoardUuid = deserialize<Uuid>(root.getChild("board/@0"));
-  mCursorPos = Point(root.getChild("cursor_position"));
-  mDevices.loadFromSExpression(root);
-  mNetSegments.loadFromSExpression(root);
-  mPlanes.loadFromSExpression(root);
+  mBoardUuid = deserialize<Uuid>(root->getChild("board/@0"));
+  mCursorPos = Point(root->getChild("cursor_position"));
+  mDevices.loadFromSExpression(*root);
+  mNetSegments.loadFromSExpression(*root);
+  mPlanes.loadFromSExpression(*root);
 
-  foreach (const SExpression* child, root.getChildren("zone")) {
+  foreach (const SExpression* child, root->getChildren("zone")) {
     mZones.append(BoardZoneData(*child));
   }
 
-  foreach (const SExpression* child, root.getChildren("polygon")) {
+  foreach (const SExpression* child, root->getChildren("polygon")) {
     mPolygons.append(BoardPolygonData(*child));
   }
 
-  foreach (const SExpression* child, root.getChildren("stroke_text")) {
+  foreach (const SExpression* child, root->getChildren("stroke_text")) {
     mStrokeTexts.append(BoardStrokeTextData(*child));
   }
 
-  foreach (const SExpression* child, root.getChildren("hole")) {
+  foreach (const SExpression* child, root->getChildren("hole")) {
     mHoles.append(BoardHoleData(*child));
   }
 
-  foreach (const SExpression* child, root.getChildren("pad_position")) {
+  foreach (const SExpression* child, root->getChildren("pad_position")) {
     mPadPositions.insert(
         std::make_pair(deserialize<Uuid>(child->getChild("device/@0")),
                        deserialize<Uuid>(child->getChild("pad/@0"))),
@@ -120,48 +120,48 @@ std::unique_ptr<TransactionalDirectory> BoardClipboardData::getDirectory(
  ******************************************************************************/
 
 std::unique_ptr<QMimeData> BoardClipboardData::toMimeData() const {
-  SExpression root = SExpression::createList("librepcb_clipboard_board");
-  root.ensureLineBreak();
-  mCursorPos.serialize(root.appendList("cursor_position"));
-  root.ensureLineBreak();
-  root.appendChild("board", mBoardUuid);
-  root.ensureLineBreak();
-  mDevices.serialize(root);
-  root.ensureLineBreak();
-  mNetSegments.serialize(root);
-  root.ensureLineBreak();
-  mPlanes.serialize(root);
+  std::unique_ptr<SExpression> root =
+      SExpression::createList("librepcb_clipboard_board");
+  root->ensureLineBreak();
+  mCursorPos.serialize(root->appendList("cursor_position"));
+  root->ensureLineBreak();
+  root->appendChild("board", mBoardUuid);
+  root->ensureLineBreak();
+  mDevices.serialize(*root);
+  root->ensureLineBreak();
+  mNetSegments.serialize(*root);
+  root->ensureLineBreak();
+  mPlanes.serialize(*root);
   for (const BoardZoneData& data : mZones) {
-    root.ensureLineBreak();
-    data.serialize(root.appendList("zone"));
+    root->ensureLineBreak();
+    data.serialize(root->appendList("zone"));
   }
-  root.ensureLineBreak();
+  root->ensureLineBreak();
   for (const BoardPolygonData& data : mPolygons) {
-    root.ensureLineBreak();
-    data.serialize(root.appendList("polygon"));
+    root->ensureLineBreak();
+    data.serialize(root->appendList("polygon"));
   }
-  root.ensureLineBreak();
+  root->ensureLineBreak();
   for (const BoardStrokeTextData& data : mStrokeTexts) {
-    root.ensureLineBreak();
-    data.serialize(root.appendList("stroke_text"));
+    root->ensureLineBreak();
+    data.serialize(root->appendList("stroke_text"));
   }
-  root.ensureLineBreak();
+  root->ensureLineBreak();
   for (const BoardHoleData& data : mHoles) {
-    root.ensureLineBreak();
-    data.serialize(root.appendList("hole"));
+    root->ensureLineBreak();
+    data.serialize(root->appendList("hole"));
   }
-  root.ensureLineBreak();
+  root->ensureLineBreak();
   for (auto it = mPadPositions.begin(); it != mPadPositions.end(); ++it) {
-    SExpression child = SExpression::createList("pad_position");
+    root->ensureLineBreak();
+    SExpression& child = root->appendList("pad_position");
     child.appendChild("device", it.key().first);
     child.appendChild("pad", it.key().second);
     it.value().serialize(child.appendList("position"));
-    root.ensureLineBreak();
-    root.appendChild(child);
   }
-  root.ensureLineBreak();
+  root->ensureLineBreak();
 
-  const QByteArray sexpr = root.toByteArray();
+  const QByteArray sexpr = root->toByteArray();
   mFileSystem->write("board.lp", sexpr);
   const QByteArray zip = mFileSystem->exportToZip();
 

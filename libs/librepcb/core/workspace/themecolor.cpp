@@ -92,11 +92,11 @@ void ThemeColor::load(const SExpression& root) {
   tryLoadColor(mSecondary, "secondary/@0");
 }
 
-SExpression ThemeColor::serialize() const {
-  SExpression root = SExpression::createList(mIdentifier);
-  root.appendChild("primary", mPrimary);
+std::unique_ptr<SExpression> ThemeColor::serialize() const {
+  std::unique_ptr<SExpression> root = SExpression::createList(mIdentifier);
+  root->appendChild("primary", mPrimary);
   if (mSecondary.isValid()) {
-    root.appendChild("secondary", mSecondary);
+    root->appendChild("secondary", mSecondary);
   }
   return root;
 }

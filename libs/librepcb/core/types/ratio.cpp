@@ -75,17 +75,17 @@ qint32 Ratio::normalizedStringToPpm(const QString& normalized) {
 // Non-Member Functions
 
 template <>
-SExpression serialize(const Ratio& obj) {
+std::unique_ptr<SExpression> serialize(const Ratio& obj) {
   return SExpression::createToken(obj.toNormalizedString());
 }
 
 template <>
-SExpression serialize(const UnsignedRatio& obj) {
+std::unique_ptr<SExpression> serialize(const UnsignedRatio& obj) {
   return serialize(*obj);
 }
 
 template <>
-SExpression serialize(const UnsignedLimitedRatio& obj) {
+std::unique_ptr<SExpression> serialize(const UnsignedLimitedRatio& obj) {
   return serialize(*obj);
 }
 

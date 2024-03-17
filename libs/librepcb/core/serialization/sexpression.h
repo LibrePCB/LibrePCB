@@ -27,6 +27,9 @@
 
 #include <QtCore>
 
+#include <memory>
+#include <vector>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -43,7 +46,7 @@ class SExpression;
  * @throws      ::librepcb::Exception in case of an error.
  */
 template <typename T>
-SExpression serialize(const T& obj);
+std::unique_ptr<SExpression> serialize(const T& obj);
 
 /**
  * Deserialize an ::librepcb::SExpression node to an object
@@ -89,14 +92,10 @@ public:
   bool isLineBreak() const noexcept { return mType == Type::LineBreak; }
   const QString& getName() const;
   const QString& getValue() const;
-  /**
-   * @brief Get all children of this node
-   *
-   * @attention The returned list may even contain linebreak-elements!
-   *
-   * @return All children
-   */
-  const QList<SExpression>& getChildren() const noexcept { return mChildren; }
+  std::size_t getChildCount() const noexcept { return mChildren.size(); }
+  bool containsChild(const SExpression& child) const noexcept;
+  SExpression& getChild(int index);
+  const SExpression& getChild(int index) const;
   QList<SExpression*> getChildren(Type type) noexcept;
   QList<const SExpression*> getChildren(Type type) const noexcept;
   QList<SExpression*> getChildren(const QString& name) noexcept;
@@ -163,15 +162,20 @@ public:
   // General Methods
   void ensureLineBreak();
   SExpression& appendList(const QString& name);
-  SExpression& appendChild(const SExpression& child);
+  void appendChild(std::unique_ptr<SExpression> child);
   template <typename T>
   SExpression& appendChild(const T& obj) {
     appendChild(serialize(obj));
-    return *this;
+    return *mChildren.back();
+  }
+  void appendChild(const QString& child, std::unique_ptr<SExpression> obj) {
+    Q_ASSERT(obj);
+    appendList(child).appendChild(std::move(obj));
   }
   template <typename T>
   SExpression& appendChild(const QString& child, const T& obj) {
-    return appendList(child).appendChild(obj);
+    appendChild(child, serialize(obj));
+    return *mChildren.back();
   }
   void removeChild(const SExpression& child);
   void removeChildrenWithNodeRecursive(const SExpression& search) noexcept;
@@ -188,22 +192,25 @@ public:
   SExpression& operator=(const SExpression& rhs) noexcept;
 
   // Static Methods
-  static SExpression createList(const QString& name);
-  static SExpression createToken(const QString& token);
-  static SExpression createString(const QString& string);
-  static SExpression createLineBreak();
-  static SExpression parse(const QByteArray& content, const FilePath& filePath);
+  static std::unique_ptr<SExpression> createList(const QString& name);
+  static std::unique_ptr<SExpression> createToken(const QString& token);
+  static std::unique_ptr<SExpression> createString(const QString& string);
+  static std::unique_ptr<SExpression> createLineBreak();
+  static std::unique_ptr<SExpression> parse(const QByteArray& content,
+                                            const FilePath& filePath);
 
 private:  // Methods
   SExpression(Type type, const QString& value);
 
   bool isMultiLine() const noexcept;
-  static bool skipLineBreaks(const QList<SExpression>& children,
-                             int& index) noexcept;
-  static SExpression parse(const QString& content, int& index,
-                           const FilePath& filePath);
-  static SExpression parseList(const QString& content, int& index,
-                               const FilePath& filePath);
+  static bool skipLineBreaks(
+      const std::vector<std::unique_ptr<SExpression>>& children,
+      int& index) noexcept;
+  static std::unique_ptr<SExpression> parse(const QString& content, int& index,
+                                            const FilePath& filePath);
+  static std::unique_ptr<SExpression> parseList(const QString& content,
+                                                int& index,
+                                                const FilePath& filePath);
   static QString parseToken(const QString& content, int& index,
                             const FilePath& filePath);
   static QString parseString(const QString& content, int& index,
@@ -218,31 +225,20 @@ private:  // Methods
 private:  // Data
   Type mType;
   QString mValue;  ///< either a list name, a token or a string
-  QList<SExpression> mChildren;
+  // Note: For memory-safe removal operations we don't use a Qt container class!
+  std::vector<std::unique_ptr<SExpression>> mChildren;
   FilePath mFilePath;
+
+  // qHash() needs access to mChildrenNew.
+  friend uint qHash(const SExpression& node, uint seed) noexcept;
 };
 
 /*******************************************************************************
  *  Non-Member Functions
  ******************************************************************************/
 
-inline uint qHash(const SExpression& node, uint seed = 0) noexcept {
-  switch (node.getType()) {
-    case SExpression::Type::LineBreak:
-      return ::qHash(static_cast<int>(node.getType()), seed);
-    case SExpression::Type::String:
-    case SExpression::Type::Token:
-      return ::qHash(
-          qMakePair(static_cast<int>(node.getType()), node.getValue()), seed);
-    case SExpression::Type::List: {
-      const QList<SExpression>& children = node.getChildren();
-      return ::qHashRange(children.begin(), children.end(), seed);
-    }
-    default:
-      Q_ASSERT(false);
-      return 0;
-  }
-}
+uint qHash(const SExpression& node, uint seed = 0) noexcept;
+uint qHash(const std::unique_ptr<SExpression>& ptr, uint seed = 0) noexcept;
 
 /*******************************************************************************
  *  End of File

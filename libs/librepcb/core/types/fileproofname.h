@@ -113,7 +113,7 @@ inline FileProofName operator%(const FileProofName& lhs,
 }
 
 template <>
-inline SExpression serialize(const FileProofName& obj) {
+inline std::unique_ptr<SExpression> serialize(const FileProofName& obj) {
   return SExpression::createString(*obj);
 }
 

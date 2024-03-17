@@ -206,17 +206,17 @@ LengthBase_t Length::mmStringToNm(const QString& millimeters) {
  ******************************************************************************/
 
 template <>
-SExpression serialize(const Length& obj) {
+std::unique_ptr<SExpression> serialize(const Length& obj) {
   return SExpression::createToken(obj.toMmString());
 }
 
 template <>
-SExpression serialize(const UnsignedLength& obj) {
+std::unique_ptr<SExpression> serialize(const UnsignedLength& obj) {
   return serialize(*obj);
 }
 
 template <>
-SExpression serialize(const PositiveLength& obj) {
+std::unique_ptr<SExpression> serialize(const PositiveLength& obj) {
   return serialize(*obj);
 }
 

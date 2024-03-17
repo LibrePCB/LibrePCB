@@ -697,9 +697,9 @@ bool CommandLineInterface::openProject(
         try {
           qDebug() << "Load custom DRC settings:" << drcSettingsPath;
           const FilePath fp(QFileInfo(drcSettingsPath).absoluteFilePath());
-          const SExpression root =
+          const std::unique_ptr<const SExpression> root =
               SExpression::parse(FileUtils::readFile(fp), fp);
-          customSettings = BoardDesignRuleCheckSettings(root);  // can throw
+          customSettings = BoardDesignRuleCheckSettings(*root);  // can throw
         } catch (const Exception& e) {
           printErr(
               tr("ERROR: Failed to load custom settings: %1").arg(e.getMsg()));
@@ -734,9 +734,9 @@ bool CommandLineInterface::openProject(
         try {
           qDebug() << "Load custom output jobs:" << customJobsPath;
           const FilePath fp(QFileInfo(customJobsPath).absoluteFilePath());
-          const SExpression root =
+          const std::unique_ptr<const SExpression> root =
               SExpression::parse(FileUtils::readFile(fp), fp);
-          allJobs = deserialize<OutputJobList>(root);  // can throw
+          allJobs = deserialize<OutputJobList>(*root);  // can throw
         } catch (const Exception& e) {
           printErr(tr("ERROR: Failed to load custom output jobs: %1")
                        .arg(e.getMsg()));
@@ -897,9 +897,9 @@ bool CommandLineInterface::openProject(
                    << pcbFabricationSettingsPath;
           const FilePath fp(
               QFileInfo(pcbFabricationSettingsPath).absoluteFilePath());
-          const SExpression root =
+          const std::unique_ptr<const SExpression> root =
               SExpression::parse(FileUtils::readFile(fp), fp);
-          customSettings = BoardFabricationOutputSettings(root);  // can throw
+          customSettings = BoardFabricationOutputSettings(*root);  // can throw
         } catch (const Exception& e) {
           printErr(
               tr("ERROR: Failed to load custom settings: %1").arg(e.getMsg()));

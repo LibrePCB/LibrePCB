@@ -39,13 +39,13 @@ namespace tests {
 class TangentPathJoinerTest : public ::testing::Test {
 protected:
   std::string str(QVector<Path> paths, const QString& name = "paths") const {
-    SExpression root = SExpression::createList(name);
+    std::unique_ptr<SExpression> root = SExpression::createList(name);
     foreach (const Path& p, paths) {
-      root.ensureLineBreak();
-      p.serialize(root.appendList("path"));
+      root->ensureLineBreak();
+      p.serialize(root->appendList("path"));
     }
-    root.ensureLineBreak();
-    return root.toByteArray().toStdString();
+    root->ensureLineBreak();
+    return root->toByteArray().toStdString();
   }
 
   std::string debug(const QVector<Path>& expected,

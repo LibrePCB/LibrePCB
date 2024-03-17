@@ -48,7 +48,7 @@ AttributeUnit::~AttributeUnit() noexcept {
  ******************************************************************************/
 
 template <>
-SExpression serialize(const AttributeUnit& obj) {
+std::unique_ptr<SExpression> serialize(const AttributeUnit& obj) {
   return SExpression::createToken(obj.getName());
 }
 

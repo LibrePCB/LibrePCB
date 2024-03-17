@@ -35,7 +35,8 @@ namespace librepcb {
  ******************************************************************************/
 
 template <>
-SExpression serialize(const GraphicsOutputJob::Content::Type& obj) {
+std::unique_ptr<SExpression> serialize(
+    const GraphicsOutputJob::Content::Type& obj) {
   if (obj == GraphicsOutputJob::Content::Type::Schematic) {
     return SExpression::createToken("schematic");
   } else if (obj == GraphicsOutputJob::Content::Type::Board) {

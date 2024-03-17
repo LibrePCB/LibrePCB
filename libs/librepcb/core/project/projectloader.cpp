@@ -175,15 +175,15 @@ std::unique_ptr<Project> ProjectLoader::open(
 void ProjectLoader::loadMetadata(Project& p) {
   qDebug() << "Load project metadata...";
   const QString fp = "project/metadata.lp";
-  SExpression root = SExpression::parse(p.getDirectory().read(fp),
-                                        p.getDirectory().getAbsPath(fp));
+  const std::unique_ptr<const SExpression> root = SExpression::parse(
+      p.getDirectory().read(fp), p.getDirectory().getAbsPath(fp));
 
-  p.setUuid(deserialize<Uuid>(root.getChild("@0")));
-  p.setName(deserialize<ElementName>(root.getChild("name/@0")));
-  p.setAuthor(root.getChild("author/@0").getValue());
-  p.setVersion(deserialize<FileProofName>(root.getChild("version/@0")));
-  p.setCreated(deserialize<QDateTime>(root.getChild("created/@0")));
-  p.setAttributes(AttributeList(root));
+  p.setUuid(deserialize<Uuid>(root->getChild("@0")));
+  p.setName(deserialize<ElementName>(root->getChild("name/@0")));
+  p.setAuthor(root->getChild("author/@0").getValue());
+  p.setVersion(deserialize<FileProofName>(root->getChild("version/@0")));
+  p.setCreated(deserialize<QDateTime>(root->getChild("created/@0")));
+  p.setAttributes(AttributeList(*root));
 
   qDebug() << "Successfully loaded project metadata.";
 }
@@ -191,13 +191,13 @@ void ProjectLoader::loadMetadata(Project& p) {
 void ProjectLoader::loadSettings(Project& p) {
   qDebug() << "Load project settings...";
   const QString fp = "project/settings.lp";
-  const SExpression root = SExpression::parse(p.getDirectory().read(fp),
-                                              p.getDirectory().getAbsPath(fp));
+  const std::unique_ptr<const SExpression> root = SExpression::parse(
+      p.getDirectory().read(fp), p.getDirectory().getAbsPath(fp));
 
   {
     QStringList l;
     foreach (const SExpression* node,
-             root.getChild("library_locale_order").getChildren("locale")) {
+             root->getChild("library_locale_order").getChildren("locale")) {
       l.append(node->getChild("@0").getValue());
     }
     p.setLocaleOrder(l);
@@ -206,7 +206,7 @@ void ProjectLoader::loadSettings(Project& p) {
   {
     QStringList l;
     foreach (const SExpression* node,
-             root.getChild("library_norm_order").getChildren("norm")) {
+             root->getChild("library_norm_order").getChildren("norm")) {
       l.append(node->getChild("@0").getValue());
     }
     p.setNormOrder(l);
@@ -215,14 +215,14 @@ void ProjectLoader::loadSettings(Project& p) {
   {
     QStringList l;
     foreach (const SExpression* node,
-             root.getChild("custom_bom_attributes").getChildren("attribute")) {
+             root->getChild("custom_bom_attributes").getChildren("attribute")) {
       l.append(node->getChild("@0").getValue());
     }
     p.setCustomBomAttributes(l);
   }
 
   p.setDefaultLockComponentAssembly(
-      deserialize<bool>(root.getChild("default_lock_component_assembly/@0")));
+      deserialize<bool>(root->getChild("default_lock_component_assembly/@0")));
 
   qDebug() << "Successfully loaded project settings.";
 }
@@ -230,9 +230,9 @@ void ProjectLoader::loadSettings(Project& p) {
 void ProjectLoader::loadOutputJobs(Project& p) {
   qDebug() << "Load output jobs...";
   const QString fp = "project/jobs.lp";
-  const SExpression root = SExpression::parse(p.getDirectory().read(fp),
-                                              p.getDirectory().getAbsPath(fp));
-  p.getOutputJobs() = deserialize<OutputJobList>(root);
+  const std::unique_ptr<const SExpression> root = SExpression::parse(
+      p.getDirectory().read(fp), p.getDirectory().getAbsPath(fp));
+  p.getOutputJobs() = deserialize<OutputJobList>(*root);
   qDebug() << "Successfully loaded output jobs.";
 }
 
@@ -280,11 +280,11 @@ void ProjectLoader::loadLibraryElements(
 void ProjectLoader::loadCircuit(Project& p) {
   qDebug() << "Load circuit...";
   const QString fp = "circuit/circuit.lp";
-  SExpression root = SExpression::parse(p.getDirectory().read(fp),
-                                        p.getDirectory().getAbsPath(fp));
+  const std::unique_ptr<const SExpression> root = SExpression::parse(
+      p.getDirectory().read(fp), p.getDirectory().getAbsPath(fp));
 
   // Load assembly variants.
-  foreach (const SExpression* node, root.getChildren("variant")) {
+  foreach (const SExpression* node, root->getChildren("variant")) {
     auto av = std::make_shared<AssemblyVariant>(*node);
     p.getCircuit().addAssemblyVariant(av);
   }
@@ -293,7 +293,7 @@ void ProjectLoader::loadCircuit(Project& p) {
   }
 
   // Load net classes.
-  foreach (const SExpression* node, root.getChildren("netclass")) {
+  foreach (const SExpression* node, root->getChildren("netclass")) {
     NetClass* netclass =
         new NetClass(p.getCircuit(), deserialize<Uuid>(node->getChild("@0")),
                      deserialize<ElementName>(node->getChild("name/@0")));
@@ -301,7 +301,7 @@ void ProjectLoader::loadCircuit(Project& p) {
   }
 
   // Load net signals.
-  foreach (const SExpression* node, root.getChildren("net")) {
+  foreach (const SExpression* node, root->getChildren("net")) {
     const Uuid netclassUuid = deserialize<Uuid>(node->getChild("netclass/@0"));
     NetClass* netclass = p.getCircuit().getNetClasses().value(netclassUuid);
     if (!netclass) {
@@ -317,7 +317,7 @@ void ProjectLoader::loadCircuit(Project& p) {
   }
 
   // Load component instances.
-  foreach (const SExpression* node, root.getChildren("component")) {
+  foreach (const SExpression* node, root->getChildren("component")) {
     const Uuid cmpUuid = deserialize<Uuid>(node->getChild("lib_component/@0"));
     const Component* libCmp = p.getLibrary().getComponent(cmpUuid);
     if (!libCmp) {
@@ -381,12 +381,12 @@ void ProjectLoader::loadCircuit(Project& p) {
 void ProjectLoader::loadErc(Project& p) {
   qDebug() << "Load ERC approvals...";
   const QString fp = "circuit/erc.lp";
-  const SExpression root = SExpression::parse(p.getDirectory().read(fp),
-                                              p.getDirectory().getAbsPath(fp));
+  const std::unique_ptr<const SExpression> root = SExpression::parse(
+      p.getDirectory().read(fp), p.getDirectory().getAbsPath(fp));
 
   // Load approvals.
   QSet<SExpression> approvals;
-  foreach (const SExpression* node, root.getChildren("approved")) {
+  foreach (const SExpression* node, root->getChildren("approved")) {
     approvals.insert(*node);
   }
   p.setErcMessageApprovals(approvals);
@@ -397,9 +397,9 @@ void ProjectLoader::loadErc(Project& p) {
 void ProjectLoader::loadSchematics(Project& p) {
   qDebug() << "Load schematics...";
   const QString fp = "schematics/schematics.lp";
-  const SExpression indexRoot = SExpression::parse(
+  const std::unique_ptr<const SExpression> indexRoot = SExpression::parse(
       p.getDirectory().read(fp), p.getDirectory().getAbsPath(fp));
-  foreach (const SExpression* indexNode, indexRoot.getChildren("schematic")) {
+  foreach (const SExpression* indexNode, indexRoot->getChildren("schematic")) {
     loadSchematic(p, indexNode->getChild("@0").getValue());
   }
   qDebug() << "Successfully loaded" << p.getSchematics().count()
@@ -410,29 +410,30 @@ void ProjectLoader::loadSchematic(Project& p, const QString& relativeFilePath) {
   const FilePath fp = FilePath::fromRelative(p.getPath(), relativeFilePath);
   std::unique_ptr<TransactionalDirectory> dir(new TransactionalDirectory(
       p.getDirectory(), fp.getParentDir().toRelative(p.getPath())));
-  const SExpression root = SExpression::parse(dir->read(fp.getFilename()), fp);
+  const std::unique_ptr<const SExpression> root =
+      SExpression::parse(dir->read(fp.getFilename()), fp);
 
   Schematic* schematic =
       new Schematic(p, std::move(dir), fp.getParentDir().getFilename(),
-                    deserialize<Uuid>(root.getChild("@0")),
-                    deserialize<ElementName>(root.getChild("name/@0")));
+                    deserialize<Uuid>(root->getChild("@0")),
+                    deserialize<ElementName>(root->getChild("name/@0")));
   schematic->setGridInterval(
-      deserialize<PositiveLength>(root.getChild("grid/interval/@0")));
+      deserialize<PositiveLength>(root->getChild("grid/interval/@0")));
   schematic->setGridUnit(
-      deserialize<LengthUnit>(root.getChild("grid/unit/@0")));
+      deserialize<LengthUnit>(root->getChild("grid/unit/@0")));
   p.addSchematic(*schematic);
 
-  foreach (const SExpression* node, root.getChildren("symbol")) {
+  foreach (const SExpression* node, root->getChildren("symbol")) {
     loadSchematicSymbol(*schematic, *node);
   }
-  foreach (const SExpression* node, root.getChildren("netsegment")) {
+  foreach (const SExpression* node, root->getChildren("netsegment")) {
     loadSchematicNetSegment(*schematic, *node);
   }
-  foreach (const SExpression* node, root.getChildren("polygon")) {
+  foreach (const SExpression* node, root->getChildren("polygon")) {
     SI_Polygon* polygon = new SI_Polygon(*schematic, Polygon(*node));
     schematic->addPolygon(*polygon);
   }
-  foreach (const SExpression* node, root.getChildren("text")) {
+  foreach (const SExpression* node, root->getChildren("text")) {
     SI_Text* text = new SI_Text(*schematic, Text(*node));
     schematic->addText(*text);
   }
@@ -543,9 +544,9 @@ void ProjectLoader::loadSchematicNetSegment(Schematic& s,
 void ProjectLoader::loadBoards(Project& p) {
   qDebug() << "Load boards...";
   const QString fp = "boards/boards.lp";
-  const SExpression indexRoot = SExpression::parse(
+  const std::unique_ptr<const SExpression> indexRoot = SExpression::parse(
       p.getDirectory().read(fp), p.getDirectory().getAbsPath(fp));
-  foreach (const SExpression* node, indexRoot.getChildren("board")) {
+  foreach (const SExpression* node, indexRoot->getChildren("board")) {
     loadBoard(p, node->getChild("@0").getValue());
   }
   qDebug() << "Successfully loaded" << p.getBoards().count() << "boards.";
@@ -555,27 +556,28 @@ void ProjectLoader::loadBoard(Project& p, const QString& relativeFilePath) {
   const FilePath fp = FilePath::fromRelative(p.getPath(), relativeFilePath);
   std::unique_ptr<TransactionalDirectory> dir(new TransactionalDirectory(
       p.getDirectory(), fp.getParentDir().toRelative(p.getPath())));
-  const SExpression root = SExpression::parse(dir->read(fp.getFilename()), fp);
+  const std::unique_ptr<const SExpression> root =
+      SExpression::parse(dir->read(fp.getFilename()), fp);
 
   Board* board = new Board(p, std::move(dir), fp.getParentDir().getFilename(),
-                           deserialize<Uuid>(root.getChild("@0")),
-                           deserialize<ElementName>(root.getChild("name/@0")));
+                           deserialize<Uuid>(root->getChild("@0")),
+                           deserialize<ElementName>(root->getChild("name/@0")));
   board->setGridInterval(
-      deserialize<PositiveLength>(root.getChild("grid/interval/@0")));
-  board->setGridUnit(deserialize<LengthUnit>(root.getChild("grid/unit/@0")));
-  board->setDefaultFontName(root.getChild("default_font/@0").getValue());
+      deserialize<PositiveLength>(root->getChild("grid/interval/@0")));
+  board->setGridUnit(deserialize<LengthUnit>(root->getChild("grid/unit/@0")));
+  board->setDefaultFontName(root->getChild("default_font/@0").getValue());
   board->setInnerLayerCount(
-      deserialize<uint>(root.getChild("layers/inner/@0")));
+      deserialize<uint>(root->getChild("layers/inner/@0")));
   board->setPcbThickness(
-      deserialize<PositiveLength>(root.getChild("thickness/@0")));
+      deserialize<PositiveLength>(root->getChild("thickness/@0")));
   board->setSolderResist(
-      deserialize<const PcbColor*>(root.getChild("solder_resist/@0")));
+      deserialize<const PcbColor*>(root->getChild("solder_resist/@0")));
   board->setSilkscreenColor(
-      deserialize<const PcbColor&>(root.getChild("silkscreen/@0")));
+      deserialize<const PcbColor&>(root->getChild("silkscreen/@0")));
   {
     QVector<const Layer*> layers;
     foreach (const SExpression* child,
-             root.getChild("silkscreen_layers_top")
+             root->getChild("silkscreen_layers_top")
                  .getChildren(SExpression::Type::Token)) {
       layers.append(deserialize<const Layer*>(*child));
     }
@@ -584,15 +586,15 @@ void ProjectLoader::loadBoard(Project& p, const QString& relativeFilePath) {
   {
     QVector<const Layer*> layers;
     foreach (const SExpression* child,
-             root.getChild("silkscreen_layers_bot")
+             root->getChild("silkscreen_layers_bot")
                  .getChildren(SExpression::Type::Token)) {
       layers.append(deserialize<const Layer*>(*child));
     }
     board->setSilkscreenLayersBot(layers);
   }
-  board->setDesignRules(BoardDesignRules(root.getChild("design_rules")));
+  board->setDesignRules(BoardDesignRules(root->getChild("design_rules")));
   {
-    const SExpression& node = root.getChild("design_rule_check");
+    const SExpression& node = root->getChild("design_rule_check");
     const Version approvalsVersion =
         deserialize<Version>(node.getChild("approvals_version/@0"));
     QSet<SExpression> approvals;
@@ -603,31 +605,31 @@ void ProjectLoader::loadBoard(Project& p, const QString& relativeFilePath) {
     board->loadDrcMessageApprovals(approvalsVersion, approvals);
   }
   board->getFabricationOutputSettings() = BoardFabricationOutputSettings(
-      root.getChild("fabrication_output_settings"));
+      root->getChild("fabrication_output_settings"));
   p.addBoard(*board);
 
-  foreach (const SExpression* node, root.getChildren("device")) {
+  foreach (const SExpression* node, root->getChildren("device")) {
     loadBoardDeviceInstance(*board, *node);
   }
-  foreach (const SExpression* node, root.getChildren("netsegment")) {
+  foreach (const SExpression* node, root->getChildren("netsegment")) {
     loadBoardNetSegment(*board, *node);
   }
-  foreach (const SExpression* node, root.getChildren("plane")) {
+  foreach (const SExpression* node, root->getChildren("plane")) {
     loadBoardPlane(*board, *node);
   }
-  foreach (const SExpression* node, root.getChildren("zone")) {
+  foreach (const SExpression* node, root->getChildren("zone")) {
     BI_Zone* zone = new BI_Zone(*board, BoardZoneData(*node));
     board->addZone(*zone);
   }
-  foreach (const SExpression* node, root.getChildren("polygon")) {
+  foreach (const SExpression* node, root->getChildren("polygon")) {
     BI_Polygon* polygon = new BI_Polygon(*board, BoardPolygonData(*node));
     board->addPolygon(*polygon);
   }
-  foreach (const SExpression* node, root.getChildren("stroke_text")) {
+  foreach (const SExpression* node, root->getChildren("stroke_text")) {
     BI_StrokeText* text = new BI_StrokeText(*board, BoardStrokeTextData(*node));
     board->addStrokeText(*text);
   }
-  foreach (const SExpression* node, root.getChildren("hole")) {
+  foreach (const SExpression* node, root->getChildren("hole")) {
     BI_Hole* hole = new BI_Hole(*board, BoardHoleData(*node));
     board->addHole(*hole);
   }
@@ -802,19 +804,19 @@ void ProjectLoader::loadBoardPlane(Board& b, const SExpression& node) {
 void ProjectLoader::loadBoardUserSettings(Board& b) {
   try {
     const QString fp = "settings.user.lp";
-    const SExpression root = SExpression::parse(
+    const std::unique_ptr<const SExpression> root = SExpression::parse(
         b.getDirectory().read(fp), b.getDirectory().getAbsPath(fp));
 
     // Layers.
     QMap<QString, bool> layersVisibility;
-    for (const SExpression* node : root.getChildren("layer")) {
+    for (const SExpression* node : root->getChildren("layer")) {
       const QString name = node->getChild("@0").getValue();
       layersVisibility[name] = deserialize<bool>(node->getChild("visible/@0"));
     }
     b.setLayersVisibility(layersVisibility);
 
     // Planes visibility.
-    foreach (const SExpression* node, root.getChildren("plane")) {
+    foreach (const SExpression* node, root->getChildren("plane")) {
       const Uuid uuid = deserialize<Uuid>(node->getChild("@0"));
       if (BI_Plane* plane = b.getPlanes().value(uuid)) {
         plane->setVisible(deserialize<bool>(node->getChild("visible/@0")));
