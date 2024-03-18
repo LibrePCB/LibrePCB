@@ -158,6 +158,7 @@ private slots:
                                         int column) noexcept;
   void treeComponents_itemExpanded(QTreeWidgetItem* item) noexcept;
   void cbxSymbVar_currentIndexChanged(int index) noexcept;
+  void customComponentsContextMenuRequested(const QPoint& pos) noexcept;
 
 private:
   // Private Methods
@@ -203,6 +204,9 @@ private:
   QList<std::shared_ptr<Symbol>> mPreviewSymbols;
   QList<std::shared_ptr<SymbolGraphicsItem>> mPreviewSymbolGraphicsItems;
   QScopedPointer<FootprintGraphicsItem> mPreviewFootprintGraphicsItem;
+
+  // Actions
+  QScopedPointer<QAction> mActionCopyMpn;
 };
 
 /*******************************************************************************
