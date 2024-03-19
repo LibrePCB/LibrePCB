@@ -8,22 +8,22 @@ set -euv -o pipefail
 # we adjust PATH.
 export PATH="/usr/bin:$PATH"
 
-if [ "$OS" = "linux" ]
-then
-  EXECUTABLE_EXT="run"
-elif [ "$OS" = "mac" ]
-then
-  EXECUTABLE_EXT="dmg"
-elif [ "$OS" = "windows" ]
-then
-  EXECUTABLE_EXT="exe"
-fi
 TARGET="$OS-$ARCH"
-# Note: Omit the release candidate number (e.g. "rc1") as it is not allowed!
-./dist/installer/update_metadata.sh "$TARGET" "1.0.1-1"
-PACKAGES_DIR="./artifacts/installer_packages/$TARGET"
-mkdir -p $PACKAGES_DIR/librepcb.stable.app/data/stable
-cp -r ./dist/installer/output/packages/. $PACKAGES_DIR/
-cp -r ./build/install/opt/. $PACKAGES_DIR/librepcb.stable.app/data/stable/
-binarycreator --online-only -c ./dist/installer/output/config/config.xml -p $PACKAGES_DIR \
-              ./artifacts/nightly_builds/librepcb-installer-nightly-$TARGET.$EXECUTABLE_EXT
+
+if [ "$ARCH" = "x86_64" ]
+then
+  cp -r ./dist/innosetup/* ./build/dist/innosetup/
+  cp -r ./build/install/opt/. ./build/dist/innosetup/files
+  iscc ./build/dist/innosetup/installer.iss \
+    //O".\\artifacts\\nightly_builds" \
+    //F"librepcb-installer-nightly-$TARGET"
+else
+  # Note: Omit the release candidate number (e.g. "rc1") as it is not allowed!
+  ./dist/installer/update_metadata.sh "$TARGET" "1.0.1-1"
+  PACKAGES_DIR="./artifacts/installer_packages/$TARGET"
+  mkdir -p $PACKAGES_DIR/librepcb.stable.app/data/stable
+  cp -r ./dist/installer/output/packages/. $PACKAGES_DIR/
+  cp -r ./build/install/opt/. $PACKAGES_DIR/librepcb.stable.app/data/stable/
+  binarycreator --online-only -c ./dist/installer/output/config/config.xml -p $PACKAGES_DIR \
+                ./artifacts/nightly_builds/librepcb-installer-nightly-$TARGET.exe
+fi
