@@ -45,7 +45,7 @@ MsgDuplicatePinName::MsgDuplicatePinName(const SymbolPin& pin) noexcept
            "should add only one of these pins to the symbol. The assignment to "
            "multiple leads should be done in the device editor instead."),
         "duplicate_pin_name") {
-  mApproval.appendChild("name", *pin.getName());
+  mApproval->appendChild("name", *pin.getName());
 }
 
 /*******************************************************************************
@@ -92,9 +92,9 @@ MsgNonFunctionalSymbolPinInversionSign::MsgNonFunctionalSymbolPinInversionSign(
             .arg("!"),
         "nonfunctional_inversion_sign"),
     mPin(pin) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("pin", pin->getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("pin", pin->getUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -117,10 +117,10 @@ MsgOverlappingSymbolPins::MsgOverlappingSymbolPins(
               return a->getUuid() < b->getUuid();
             });
   foreach (const auto& pin, pins) {
-    mApproval.ensureLineBreak();
-    mApproval.appendChild("pin", pin->getUuid());
+    mApproval->ensureLineBreak();
+    mApproval->appendChild("pin", pin->getUuid());
   }
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
 }
 
 QString MsgOverlappingSymbolPins::buildMessage(
@@ -150,9 +150,9 @@ MsgSymbolPinNotOnGrid::MsgSymbolPinNotOnGrid(
         "pin_not_on_grid"),
     mPin(pin),
     mGridInterval(gridInterval) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("pin", pin->getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("pin", pin->getUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -170,9 +170,9 @@ MsgWrongSymbolTextLayer::MsgWrongSymbolTextLayer(
         "unusual_text_layer"),
     mText(text),
     mExpectedLayer(&expectedLayer) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("text", text->getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("text", text->getUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************

@@ -84,20 +84,20 @@ TEST(BoardPlaneFragmentsBuilderTest, testFragments) {
   }
 
   // write actual plane fragments into file (useful for debugging purposes)
-  SExpression actualSexpr = SExpression::createList("actual");
+  std::unique_ptr<SExpression> actualSexpr = SExpression::createList("actual");
   foreach (const Uuid& uuid, actualPlaneFragments.keys()) {
-    SExpression child = SExpression::createList("plane");
-    child.appendChild(uuid);
+    std::unique_ptr<SExpression> child = SExpression::createList("plane");
+    child->appendChild(uuid);
     foreach (const Path& fragment, actualPlaneFragments[uuid]) {
-      child.ensureLineBreak();
-      fragment.serialize(child.appendList("fragment"));
+      child->ensureLineBreak();
+      fragment.serialize(child->appendList("fragment"));
     }
-    child.ensureLineBreak();
-    actualSexpr.ensureLineBreak();
-    actualSexpr.appendChild(child);
+    child->ensureLineBreak();
+    actualSexpr->ensureLineBreak();
+    actualSexpr->appendChild(std::move(child));
   }
-  actualSexpr.ensureLineBreak();
-  QByteArray actual = actualSexpr.toByteArray();
+  actualSexpr->ensureLineBreak();
+  QByteArray actual = actualSexpr->toByteArray();
   FileUtils::writeFile(testDataDir.getPathTo("actual.lp"), actual);
 
   // compare with expected plane fragments loaded from file

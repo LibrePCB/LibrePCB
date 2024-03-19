@@ -74,31 +74,32 @@ FootprintClipboardData::~FootprintClipboardData() noexcept {
 
 std::unique_ptr<QMimeData> FootprintClipboardData::toMimeData(
     const IF_GraphicsLayerProvider& lp) {
-  SExpression root = SExpression::createList("librepcb_clipboard_footprint");
-  root.ensureLineBreak();
-  mCursorPos.serialize(root.appendList("cursor_position"));
-  root.ensureLineBreak();
-  root.appendChild("footprint", mFootprintUuid);
-  root.ensureLineBreak();
+  std::unique_ptr<SExpression> root =
+      SExpression::createList("librepcb_clipboard_footprint");
+  root->ensureLineBreak();
+  mCursorPos.serialize(root->appendList("cursor_position"));
+  root->ensureLineBreak();
+  root->appendChild("footprint", mFootprintUuid);
+  root->ensureLineBreak();
   {
-    SExpression& node = root.appendList("package");
+    SExpression& node = root->appendList("package");
     mPackagePads.serialize(node);
   }
-  root.ensureLineBreak();
-  mFootprintPads.serialize(root);
-  root.ensureLineBreak();
-  mPolygons.serialize(root);
-  root.ensureLineBreak();
-  mCircles.serialize(root);
-  root.ensureLineBreak();
-  mStrokeTexts.serialize(root);
-  root.ensureLineBreak();
-  mZones.serialize(root);
-  root.ensureLineBreak();
-  mHoles.serialize(root);
-  root.ensureLineBreak();
+  root->ensureLineBreak();
+  mFootprintPads.serialize(*root);
+  root->ensureLineBreak();
+  mPolygons.serialize(*root);
+  root->ensureLineBreak();
+  mCircles.serialize(*root);
+  root->ensureLineBreak();
+  mStrokeTexts.serialize(*root);
+  root->ensureLineBreak();
+  mZones.serialize(*root);
+  root->ensureLineBreak();
+  mHoles.serialize(*root);
+  root->ensureLineBreak();
 
-  const QByteArray sexpr = root.toByteArray();
+  const QByteArray sexpr = root->toByteArray();
   std::unique_ptr<QMimeData> data(new QMimeData());
   data->setImageData(generatePixmap(lp));
   data->setData(getMimeType(), sexpr);
@@ -113,9 +114,10 @@ std::unique_ptr<FootprintClipboardData> FootprintClipboardData::fromMimeData(
     const QMimeData* mime) {
   QByteArray content = mime ? mime->data(getMimeType()) : QByteArray();
   if (!content.isNull()) {
-    SExpression root = SExpression::parse(content, FilePath());
+    const std::unique_ptr<const SExpression> root =
+        SExpression::parse(content, FilePath());
     return std::unique_ptr<FootprintClipboardData>(
-        new FootprintClipboardData(root));  // can throw
+        new FootprintClipboardData(*root));  // can throw
   } else {
     return nullptr;
   }

@@ -54,19 +54,19 @@ protected:
    */
   template <typename T>
   static std::string str(const T& obj) {
-    SExpression node = SExpression::createList("object");
-    obj.serialize(node);
-    return node.toByteArray().toStdString();
+    std::unique_ptr<SExpression> node = SExpression::createList("object");
+    obj.serialize(*node);
+    return node->toByteArray().toStdString();
   }
 
   /**
    * @brief Helper to easily compare objects as strings for easier debugging
    */
   static std::string str(const DxfReader::Circle& circle) {
-    SExpression s = SExpression::createList("object");
-    circle.position.serialize(s.appendList("position"));
-    s.appendChild("diameter", circle.diameter);
-    return s.toByteArray().toStdString();
+    std::unique_ptr<SExpression> s = SExpression::createList("object");
+    circle.position.serialize(s->appendList("position"));
+    s->appendChild("diameter", circle.diameter);
+    return s->toByteArray().toStdString();
   }
 };
 

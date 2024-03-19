@@ -188,12 +188,12 @@ const PcbColor& PcbColor::get(const QString& id) {
  ******************************************************************************/
 
 template <>
-SExpression serialize(const PcbColor& obj) {
+std::unique_ptr<SExpression> serialize(const PcbColor& obj) {
   return SExpression::createToken(obj.getId());
 }
 
 template <>
-SExpression serialize(const PcbColor* const& obj) {
+std::unique_ptr<SExpression> serialize(const PcbColor* const& obj) {
   if (obj) {
     return SExpression::createToken(obj->getId());
   } else {

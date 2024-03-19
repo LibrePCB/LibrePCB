@@ -45,9 +45,9 @@ RecentProjectsModel::RecentProjectsModel(const Workspace& workspace) noexcept
   try {
     mFilePath = mWorkspace.getDataPath().getPathTo("recent_projects.lp");
     if (mFilePath.isExistingFile()) {
-      const SExpression root =
+      const std::unique_ptr<const SExpression> root =
           SExpression::parse(FileUtils::readFile(mFilePath), mFilePath);
-      foreach (const SExpression* child, root.getChildren("project")) {
+      foreach (const SExpression* child, root->getChildren("project")) {
         QString path = child->getChild("@0").getValue();
         FilePath absPath = FilePath::fromRelative(mWorkspace.getPath(), path);
         mAllProjects.append(absPath);
@@ -100,13 +100,14 @@ void RecentProjectsModel::updateVisibleProjects() noexcept {
 void RecentProjectsModel::save() noexcept {
   try {
     // save the new list in the workspace
-    SExpression root = SExpression::createList("librepcb_recent_projects");
+    std::unique_ptr<SExpression> root =
+        SExpression::createList("librepcb_recent_projects");
     foreach (const FilePath& filepath, mAllProjects) {
-      root.ensureLineBreak();
-      root.appendChild("project", filepath.toRelative(mWorkspace.getPath()));
+      root->ensureLineBreak();
+      root->appendChild("project", filepath.toRelative(mWorkspace.getPath()));
     }
-    root.ensureLineBreak();
-    FileUtils::writeFile(mFilePath, root.toByteArray());  // can throw
+    root->ensureLineBreak();
+    FileUtils::writeFile(mFilePath, root->toByteArray());  // can throw
   } catch (const Exception& e) {
     qWarning() << "Failed to save recent projects file:" << e.getMsg();
   }

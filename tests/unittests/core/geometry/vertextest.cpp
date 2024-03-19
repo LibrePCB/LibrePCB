@@ -41,23 +41,23 @@ class VertexTest : public ::testing::Test {};
  ******************************************************************************/
 
 TEST_F(VertexTest, testConstructFromSExpression) {
-  SExpression sexpr = SExpression::parse(
+  std::unique_ptr<SExpression> sexpr = SExpression::parse(
       "(vertex (position 1.2 3.4) (angle 45.0))", FilePath());
-  Vertex obj(sexpr);
+  Vertex obj(*sexpr);
   EXPECT_EQ(Point(1200000, 3400000), obj.getPos());
   EXPECT_EQ(Angle::deg45(), obj.getAngle());
 }
 
 TEST_F(VertexTest, testSerializeAndDeserialize) {
   Vertex obj1(Point(123, 567), Angle(789));
-  SExpression sexpr1 = SExpression::createList("obj");
-  obj1.serialize(sexpr1);
+  std::unique_ptr<SExpression> sexpr1 = SExpression::createList("obj");
+  obj1.serialize(*sexpr1);
 
-  Vertex obj2(sexpr1);
-  SExpression sexpr2 = SExpression::createList("obj");
-  obj2.serialize(sexpr2);
+  Vertex obj2(*sexpr1);
+  std::unique_ptr<SExpression> sexpr2 = SExpression::createList("obj");
+  obj2.serialize(*sexpr2);
 
-  EXPECT_EQ(sexpr1.toByteArray(), sexpr2.toByteArray());
+  EXPECT_EQ(sexpr1->toByteArray(), sexpr2->toByteArray());
 }
 
 /*******************************************************************************

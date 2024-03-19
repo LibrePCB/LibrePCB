@@ -84,7 +84,7 @@ public:
    *
    * @return ::librepcb::SExpression node containing all settings.
    */
-  SExpression serialize();
+  std::unique_ptr<SExpression> serialize();
 
   // Operator Overloadings
   WorkspaceSettings& operator=(const WorkspaceSettings& rhs) = delete;

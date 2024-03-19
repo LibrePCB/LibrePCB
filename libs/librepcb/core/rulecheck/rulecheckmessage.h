@@ -62,7 +62,7 @@ public:
   const QIcon& getSeverityIcon() const noexcept;
   const QString& getMessage() const noexcept { return mMessage; }
   const QString& getDescription() const noexcept { return mDescription; }
-  const SExpression& getApproval() const noexcept { return mApproval; }
+  const SExpression& getApproval() const noexcept { return *mApproval; }
   const QVector<Path>& getLocations() const noexcept { return mLocations; }
 
   // General Methods
@@ -97,7 +97,7 @@ protected:  // Data
   Severity mSeverity;
   QString mMessage;
   QString mDescription;
-  SExpression mApproval;
+  std::unique_ptr<SExpression> mApproval;
   QVector<Path> mLocations;
 };
 

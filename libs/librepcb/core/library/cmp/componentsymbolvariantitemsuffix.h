@@ -113,7 +113,8 @@ inline QString operator%(const QString& lhs,
 }
 
 template <>
-inline SExpression serialize(const ComponentSymbolVariantItemSuffix& obj) {
+inline std::unique_ptr<SExpression> serialize(
+    const ComponentSymbolVariantItemSuffix& obj) {
   return SExpression::createString(*obj);
 }
 

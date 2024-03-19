@@ -292,36 +292,37 @@ void Schematic::removeFromProject() {
 }
 
 void Schematic::save() {
-  SExpression root = SExpression::createList("librepcb_schematic");
-  root.appendChild(mUuid);
-  root.ensureLineBreak();
-  root.appendChild("name", mName);
-  root.ensureLineBreak();
-  SExpression& gridNode = root.appendList("grid");
+  std::unique_ptr<SExpression> root =
+      SExpression::createList("librepcb_schematic");
+  root->appendChild(mUuid);
+  root->ensureLineBreak();
+  root->appendChild("name", mName);
+  root->ensureLineBreak();
+  SExpression& gridNode = root->appendList("grid");
   gridNode.appendChild("interval", mGridInterval);
   gridNode.appendChild("unit", mGridUnit);
-  root.ensureLineBreak();
+  root->ensureLineBreak();
   for (const SI_Symbol* obj : mSymbols) {
-    root.ensureLineBreak();
-    obj->serialize(root.appendList("symbol"));
+    root->ensureLineBreak();
+    obj->serialize(root->appendList("symbol"));
   }
-  root.ensureLineBreak();
+  root->ensureLineBreak();
   for (const SI_NetSegment* obj : mNetSegments) {
-    root.ensureLineBreak();
-    obj->serialize(root.appendList("netsegment"));
+    root->ensureLineBreak();
+    obj->serialize(root->appendList("netsegment"));
   }
-  root.ensureLineBreak();
+  root->ensureLineBreak();
   for (const SI_Polygon* obj : mPolygons) {
-    root.ensureLineBreak();
-    obj->getPolygon().serialize(root.appendList("polygon"));
+    root->ensureLineBreak();
+    obj->getPolygon().serialize(root->appendList("polygon"));
   }
-  root.ensureLineBreak();
+  root->ensureLineBreak();
   for (const SI_Text* obj : mTexts) {
-    root.ensureLineBreak();
-    obj->getTextObj().serialize(root.appendList("text"));
+    root->ensureLineBreak();
+    obj->getTextObj().serialize(root->appendList("text"));
   }
-  root.ensureLineBreak();
-  mDirectory->write("schematic.lp", root.toByteArray());
+  root->ensureLineBreak();
+  mDirectory->write("schematic.lp", root->toByteArray());
 }
 
 void Schematic::updateAllNetLabelAnchors() noexcept {

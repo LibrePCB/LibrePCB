@@ -106,7 +106,7 @@ inline ElementName operator%(const ElementName& lhs,
 }
 
 template <>
-inline SExpression serialize(const ElementName& obj) {
+inline std::unique_ptr<SExpression> serialize(const ElementName& obj) {
   return SExpression::createString(*obj);
 }
 
@@ -116,7 +116,8 @@ inline ElementName deserialize(const SExpression& node) {
 }
 
 template <>
-inline SExpression serialize(const tl::optional<ElementName>& obj) {
+inline std::unique_ptr<SExpression> serialize(
+    const tl::optional<ElementName>& obj) {
   return SExpression::createString(obj ? **obj : "");
 }
 

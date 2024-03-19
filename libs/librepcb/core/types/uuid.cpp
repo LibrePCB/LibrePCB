@@ -129,12 +129,12 @@ tl::optional<Uuid> Uuid::tryFromString(const QString& str) noexcept {
  ******************************************************************************/
 
 template <>
-SExpression serialize(const Uuid& obj) {
+std::unique_ptr<SExpression> serialize(const Uuid& obj) {
   return SExpression::createToken(obj.toStr());
 }
 
 template <>
-SExpression serialize(const tl::optional<Uuid>& obj) {
+std::unique_ptr<SExpression> serialize(const tl::optional<Uuid>& obj) {
   if (obj) {
     return serialize(*obj);
   } else {

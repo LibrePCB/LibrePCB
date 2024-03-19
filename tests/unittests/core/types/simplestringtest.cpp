@@ -72,20 +72,19 @@ TEST_P(SimpleStringTest, testSerialize) {
 
   if (data.valid) {
     SimpleString obj(data.input);
-    EXPECT_EQ("\"" % data.input % "\"\n", serialize(obj).toByteArray());
+    EXPECT_EQ("\"" % data.input % "\"\n", serialize(obj)->toByteArray());
   }
 }
 
 TEST_P(SimpleStringTest, testDeserialize) {
   const SimpleStringTestData& data = GetParam();
 
+  const std::unique_ptr<const SExpression> sexpr =
+      SExpression::createString(data.input);
   if (data.valid) {
-    EXPECT_EQ(SimpleString(data.input),
-              deserialize<SimpleString>(SExpression::createString(data.input)));
+    EXPECT_EQ(SimpleString(data.input), deserialize<SimpleString>(*sexpr));
   } else {
-    EXPECT_THROW(
-        deserialize<SimpleString>(SExpression::createString(data.input)),
-        RuntimeError);
+    EXPECT_THROW(deserialize<SimpleString>(*sexpr), RuntimeError);
   }
 }
 

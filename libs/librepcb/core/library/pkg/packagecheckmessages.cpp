@@ -72,7 +72,7 @@ MsgDuplicatePadName::MsgDuplicatePadName(const PackagePad& pad) noexcept
            "be named only by numbers anyway, not by functionality (e.g. name "
            "them '1', '2', '3' instead of 'D', 'G', 'S')."),
         "duplicate_pad_name") {
-  mApproval.appendChild("name", *pad.getName());
+  mApproval->appendChild("name", *pad.getName());
 }
 
 /*******************************************************************************
@@ -93,11 +93,11 @@ MsgFiducialClearanceLessThanStopMask::MsgFiducialClearanceLessThanStopMask(
         "fiducial_copper_clearance_less_than_stop_mask"),
     mFootprint(footprint),
     mPad(pad) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("footprint", footprint->getUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("pad", pad->getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("footprint", footprint->getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("pad", pad->getUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -117,11 +117,11 @@ MsgFiducialStopMaskNotSet::MsgFiducialStopMaskNotSet(
         "fiducial_stop_mask_not_set"),
     mFootprint(footprint),
     mPad(pad) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("footprint", footprint->getUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("pad", pad->getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("footprint", footprint->getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("pad", pad->getUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -143,11 +143,11 @@ MsgHoleWithoutStopMask::MsgHoleWithoutStopMask(
         "hole_without_stop_mask"),
     mFootprint(footprint),
     mHole(hole) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("footprint", footprint->getUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("hole", hole->getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("footprint", footprint->getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("hole", hole->getUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -167,11 +167,11 @@ MsgInvalidCustomPadOutline::MsgInvalidCustomPadOutline(
         "invalid_custom_pad_outline"),
     mFootprint(footprint),
     mPad(pad) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("footprint", footprint->getUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("pad", pad->getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("footprint", footprint->getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("pad", pad->getUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -190,11 +190,11 @@ MsgInvalidPadConnection::MsgInvalidPadConnection(
         "invalid_pad_connection"),
     mFootprint(footprint),
     mPad(pad) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("footprint", footprint->getUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("pad", pad->getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("footprint", footprint->getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("pad", pad->getUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -217,9 +217,9 @@ MsgMissingCourtyard::MsgMissingCourtyard(
                "small offset. If you're unsure, just ignore this message."),
         "missing_courtyard"),
     mFootprint(footprint) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("footprint", footprint->getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("footprint", footprint->getUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -248,9 +248,9 @@ MsgMissingFootprintModel::MsgMissingFootprintModel(
            "missing in the 3D viewer and in 3D data exports. However, this has "
            "no impact on the PCB production data."),
         "missing_footprint_3d_model") {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("footprint", footprint->getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("footprint", footprint->getUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -270,9 +270,9 @@ MsgMissingFootprintName::MsgMissingFootprintName(
            "ignore this message."),
         "missing_name_text"),
     mFootprint(footprint) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("footprint", footprint->getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("footprint", footprint->getUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -292,9 +292,9 @@ MsgMissingFootprintValue::MsgMissingFootprintValue(
            "ignore this message."),
         "missing_value_text"),
     mFootprint(footprint) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("footprint", footprint->getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("footprint", footprint->getUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -314,9 +314,9 @@ MsgMissingPackageOutline::MsgMissingPackageOutline(
             .arg(Layer::topPackageOutlines().getNameTr()),
         "missing_package_outline"),
     mFootprint(footprint) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("footprint", footprint->getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("footprint", footprint->getUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -361,11 +361,11 @@ MsgPadAnnularRingViolation::MsgPadAnnularRingViolation(
         "small_pad_annular_ring"),
     mFootprint(footprint),
     mPad(pad) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("footprint", footprint->getUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("pad", pad->getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("footprint", footprint->getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("pad", pad->getUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -391,13 +391,13 @@ MsgPadClearanceViolation::MsgPadClearanceViolation(
     mFootprint(footprint),
     mPad1(pad1),
     mPad2(pad2) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("footprint", footprint->getUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("pad", std::min(pad1->getUuid(), pad2->getUuid()));
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("pad", std::max(pad1->getUuid(), pad2->getUuid()));
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("footprint", footprint->getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("pad", std::min(pad1->getUuid(), pad2->getUuid()));
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("pad", std::max(pad1->getUuid(), pad2->getUuid()));
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -417,11 +417,11 @@ MsgPadHoleOutsideCopper::MsgPadHoleOutsideCopper(
         "pad_hole_outside_copper"),
     mFootprint(footprint),
     mPad(pad) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("footprint", footprint->getUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("pad", pad->getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("footprint", footprint->getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("pad", pad->getUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -443,11 +443,11 @@ MsgPadOriginOutsideCopper::MsgPadOriginOutsideCopper(
         "pad_origin_outside_copper"),
     mFootprint(footprint),
     mPad(pad) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("footprint", footprint->getUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("pad", pad->getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("footprint", footprint->getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("pad", pad->getUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -469,11 +469,11 @@ MsgPadOverlapsWithLegend::MsgPadOverlapsWithLegend(
         "pad_overlaps_legend"),
     mFootprint(footprint),
     mPad(pad) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("footprint", footprint->getUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("pad", pad->getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("footprint", footprint->getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("pad", pad->getUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -494,11 +494,11 @@ MsgPadStopMaskOff::MsgPadStopMaskOff(std::shared_ptr<const Footprint> footprint,
         "pad_stop_mask_off"),
     mFootprint(footprint),
     mPad(pad) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("footprint", footprint->getUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("pad", pad->getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("footprint", footprint->getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("pad", pad->getUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -521,11 +521,11 @@ MsgPadWithCopperClearance::MsgPadWithCopperClearance(
         "pad_with_copper_clearance"),
     mFootprint(footprint),
     mPad(pad) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("footprint", footprint->getUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("pad", pad->getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("footprint", footprint->getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("pad", pad->getUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -546,11 +546,11 @@ MsgSmtPadWithSolderPaste::MsgSmtPadWithSolderPaste(
         "smt_pad_with_solder_paste"),
     mFootprint(footprint),
     mPad(pad) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("footprint", footprint->getUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("pad", pad->getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("footprint", footprint->getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("pad", pad->getUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -571,11 +571,11 @@ MsgSmtPadWithoutSolderPaste::MsgSmtPadWithoutSolderPaste(
         "smt_pad_without_solder_paste"),
     mFootprint(footprint),
     mPad(pad) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("footprint", footprint->getUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("pad", pad->getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("footprint", footprint->getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("pad", pad->getUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -598,11 +598,11 @@ MsgSuspiciousPadFunction::MsgSuspiciousPadFunction(
         "suspicious_pad_function"),
     mFootprint(footprint),
     mPad(pad) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("footprint", footprint->getUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("pad", pad->getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("footprint", footprint->getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("pad", pad->getUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -624,11 +624,11 @@ MsgThtPadWithSolderPaste::MsgThtPadWithSolderPaste(
         "tht_pad_with_solder_paste"),
     mFootprint(footprint),
     mPad(pad) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("footprint", footprint->getUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("pad", pad->getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("footprint", footprint->getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("pad", pad->getUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -653,11 +653,11 @@ MsgUnspecifiedPadFunction::MsgUnspecifiedPadFunction(
         "pad_function_unspecified"),
     mFootprint(footprint),
     mPad(pad) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("footprint", footprint->getUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("pad", pad->getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("footprint", footprint->getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("pad", pad->getUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -676,11 +676,11 @@ MsgUnusedCustomPadOutline::MsgUnusedCustomPadOutline(
         "unused_custom_pad_outline"),
     mFootprint(footprint),
     mPad(pad) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("footprint", footprint->getUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("pad", pad->getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("footprint", footprint->getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("pad", pad->getUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -698,11 +698,11 @@ MsgUselessZone::MsgUselessZone(std::shared_ptr<const Footprint> footprint,
         "useless_zone"),
     mFootprint(footprint),
     mZone(zone) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("footprint", footprint->getUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("zone", zone->getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("footprint", footprint->getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("zone", zone->getUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -723,11 +723,11 @@ MsgWrongFootprintTextLayer::MsgWrongFootprintTextLayer(
     mFootprint(footprint),
     mText(text),
     mExpectedLayer(&expectedLayer) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("footprint", footprint->getUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("text", text->getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("footprint", footprint->getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("text", text->getUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************

@@ -46,7 +46,7 @@ class WorkspaceSettingsTest : public ::testing::Test {};
 TEST_F(WorkspaceSettingsTest, testLoadFromSExpressionV01) {
   // Attention: Do NOT modify this string! It represents the freezed(!) file
   // format V0.1 and even current versions of LibrePCB must be able to load it!
-  SExpression root = SExpression::parse(
+  std::unique_ptr<SExpression> root = SExpression::parse(
       "(librepcb_workspace_settings\n"
       " (user \"Foo Bar\")\n"
       " (application_locale \"de_CH\")\n"
@@ -66,7 +66,7 @@ TEST_F(WorkspaceSettingsTest, testLoadFromSExpressionV01) {
       FilePath());
 
   WorkspaceSettings obj;
-  obj.load(root, Version::fromString("0.1"));
+  obj.load(*root, Version::fromString("0.1"));
   EXPECT_EQ("Foo Bar", obj.userName.get());
   EXPECT_EQ("de_CH", obj.applicationLocale.get());
   EXPECT_EQ(LengthUnit::micrometers(), obj.defaultLengthUnit.get());
@@ -81,7 +81,7 @@ TEST_F(WorkspaceSettingsTest, testLoadFromSExpressionV01) {
 }
 
 TEST_F(WorkspaceSettingsTest, testLoadFromSExpressionCurrentVersion) {
-  SExpression root = SExpression::parse(
+  std::unique_ptr<SExpression> root = SExpression::parse(
       "(librepcb_workspace_settings\n"
       " (user \"Foo Bar\")\n"
       " (application_locale \"de_CH\")\n"
@@ -114,7 +114,7 @@ TEST_F(WorkspaceSettingsTest, testLoadFromSExpressionCurrentVersion) {
       FilePath());
 
   WorkspaceSettings obj;
-  obj.load(root, Application::getFileFormatVersion());
+  obj.load(*root, Application::getFileFormatVersion());
   EXPECT_EQ("Foo Bar", obj.userName.get());
   EXPECT_EQ("de_CH", obj.applicationLocale.get());
   EXPECT_EQ(LengthUnit::micrometers(), obj.defaultLengthUnit.get());
@@ -149,11 +149,11 @@ TEST_F(WorkspaceSettingsTest, testStoreAndLoad) {
   obj1.externalFileManagerCommands.set({"file", "manager"});
   obj1.externalPdfReaderCommands.set({"pdf", "reader"});
   obj1.dismissedMessages.set({"foo", "bar"});
-  const SExpression root1 = obj1.serialize();
+  const std::unique_ptr<const SExpression> root1 = obj1.serialize();
 
   // Load
   WorkspaceSettings obj2;
-  obj2.load(root1, Application::getFileFormatVersion());
+  obj2.load(*root1, Application::getFileFormatVersion());
   EXPECT_EQ(obj1.userName.get().toStdString(),
             obj2.userName.get().toStdString());
   EXPECT_EQ(obj1.applicationLocale.get().toStdString(),
@@ -172,11 +172,11 @@ TEST_F(WorkspaceSettingsTest, testStoreAndLoad) {
   EXPECT_EQ(obj1.externalPdfReaderCommands.get(),
             obj2.externalPdfReaderCommands.get());
   EXPECT_EQ(obj1.dismissedMessages.get(), obj2.dismissedMessages.get());
-  const SExpression root2 = obj2.serialize();
+  const std::unique_ptr<const SExpression> root2 = obj2.serialize();
 
   // Check if serialization of loaded settings leads to same file content
-  EXPECT_EQ(root1.toByteArray().toStdString(),
-            root2.toByteArray().toStdString());
+  EXPECT_EQ(root1->toByteArray().toStdString(),
+            root2->toByteArray().toStdString());
 }
 
 // Verify that serializing does only overwrite modified settings, but keeps
@@ -193,7 +193,7 @@ TEST_F(WorkspaceSettingsTest, testStoreAndLoad) {
 // time, users would keep the settings at the time writing the settings file
 // the first time forever.
 TEST_F(WorkspaceSettingsTest, testSaveOnlyModifiedSettings) {
-  SExpression root = SExpression::parse(
+  std::unique_ptr<SExpression> root = SExpression::parse(
       "(librepcb_workspace_settings\n"
       " (project_autosave_interval 1234)\n"
       " (unknown_item \"Foo Bar\")\n"
@@ -204,12 +204,12 @@ TEST_F(WorkspaceSettingsTest, testSaveOnlyModifiedSettings) {
       FilePath());
 
   WorkspaceSettings obj;
-  obj.load(root, Application::getFileFormatVersion());
+  obj.load(*root, Application::getFileFormatVersion());
   EXPECT_EQ(1234U, obj.projectAutosaveIntervalSeconds.get());
   obj.projectAutosaveIntervalSeconds.set(42);
-  const SExpression root2 = obj.serialize();
+  const std::unique_ptr<const SExpression> root2 = obj.serialize();
 
-  QString actualContent = root2.toByteArray();
+  QString actualContent = root2->toByteArray();
   QString expectedContent =
       "(librepcb_workspace_settings\n"
       " (project_autosave_interval 42)\n"
@@ -225,9 +225,9 @@ TEST_F(WorkspaceSettingsTest, testSaveOnlyModifiedSettings) {
 // shall create a file without any entries.
 TEST_F(WorkspaceSettingsTest, testDefaultSerializeEmpty) {
   WorkspaceSettings obj;
-  const SExpression root = obj.serialize();
+  const std::unique_ptr<const SExpression> root = obj.serialize();
 
-  QString actualContent = root.toByteArray();
+  QString actualContent = root->toByteArray();
   QString expectedContent =
       "(librepcb_workspace_settings\n"
       ")\n";
@@ -237,7 +237,7 @@ TEST_F(WorkspaceSettingsTest, testDefaultSerializeEmpty) {
 // Test that restoring all default values also removes unknown entries from the
 // settings file, since an empty file is the real default.
 TEST_F(WorkspaceSettingsTest, testRestoreDefaultsClearsFile) {
-  SExpression root = SExpression::parse(
+  std::unique_ptr<SExpression> root = SExpression::parse(
       "(librepcb_workspace_settings\n"
       " (project_autosave_interval 1234)\n"
       " (unknown_value \"Foo Bar\")\n"
@@ -248,11 +248,11 @@ TEST_F(WorkspaceSettingsTest, testRestoreDefaultsClearsFile) {
       FilePath());
 
   WorkspaceSettings obj;
-  obj.load(root, Application::getFileFormatVersion());
+  obj.load(*root, Application::getFileFormatVersion());
   obj.restoreDefaults();
-  const SExpression root2 = obj.serialize();
+  const std::unique_ptr<const SExpression> root2 = obj.serialize();
 
-  QString actualContent = root2.toByteArray();
+  QString actualContent = root2->toByteArray();
   QString expectedContent =
       "(librepcb_workspace_settings\n"
       ")\n";
@@ -264,7 +264,7 @@ TEST_F(WorkspaceSettingsTest, testRestoreDefaultsClearsFile) {
 // an entry has if it was removed in some LibrePCB version, and then re-added
 // some day later.
 TEST_F(WorkspaceSettingsTest, testUpgradeFileFormat) {
-  SExpression root = SExpression::parse(
+  std::unique_ptr<SExpression> root = SExpression::parse(
       "(librepcb_workspace_settings\n"
       " (dismissed_messages\n"
       "  (message \"SOME_MESSAGE: foo\")\n"
@@ -286,12 +286,12 @@ TEST_F(WorkspaceSettingsTest, testUpgradeFileFormat) {
       FilePath());
 
   WorkspaceSettings obj;
-  obj.load(root, Version::fromString("0.1"));
+  obj.load(*root, Version::fromString("0.1"));
   EXPECT_EQ(1234U, obj.projectAutosaveIntervalSeconds.get());
   obj.projectAutosaveIntervalSeconds.set(42);
-  const SExpression root2 = obj.serialize();
+  const std::unique_ptr<const SExpression> root2 = obj.serialize();
 
-  QString actualContent = root2.toByteArray();
+  QString actualContent = root2->toByteArray();
   QString expectedContent =
       "(librepcb_workspace_settings\n"
       " (dismissed_messages\n"

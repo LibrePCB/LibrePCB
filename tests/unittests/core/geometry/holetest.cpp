@@ -41,13 +41,13 @@ class HoleTest : public ::testing::Test {};
  ******************************************************************************/
 
 TEST_F(HoleTest, testConstructFromSExpression) {
-  SExpression sexpr = SExpression::parse(
+  std::unique_ptr<SExpression> sexpr = SExpression::parse(
       "(hole b9445237-8982-4a9f-af06-bfc6c507e010"
       " (diameter 0.5) (stop_mask auto)"
       " (vertex (position 1.234 2.345) (angle 45.0))"
       ")",
       FilePath());
-  Hole obj(sexpr);
+  Hole obj(*sexpr);
   EXPECT_EQ(Uuid::fromString("b9445237-8982-4a9f-af06-bfc6c507e010"),
             obj.getUuid());
   EXPECT_EQ(PositiveLength(500000), obj.getDiameter());
@@ -63,14 +63,14 @@ TEST_F(HoleTest, testSerializeAndDeserialize) {
             NonEmptyPath(Path({Vertex(Point(123, 456), Angle::deg45()),
                                Vertex(Point(789, 321), Angle::deg0())})),
             MaskConfig::manual(Length(123456)));
-  SExpression sexpr1 = SExpression::createList("obj");
-  obj1.serialize(sexpr1);
+  std::unique_ptr<SExpression> sexpr1 = SExpression::createList("obj");
+  obj1.serialize(*sexpr1);
 
-  Hole obj2(sexpr1);
-  SExpression sexpr2 = SExpression::createList("obj");
-  obj2.serialize(sexpr2);
+  Hole obj2(*sexpr1);
+  std::unique_ptr<SExpression> sexpr2 = SExpression::createList("obj");
+  obj2.serialize(*sexpr2);
 
-  EXPECT_EQ(sexpr1.toByteArray(), sexpr2.toByteArray());
+  EXPECT_EQ(sexpr1->toByteArray(), sexpr2->toByteArray());
 }
 
 /*******************************************************************************

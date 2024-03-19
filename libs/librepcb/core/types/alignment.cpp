@@ -51,7 +51,7 @@ HAlign& HAlign::mirror() noexcept {
 }
 
 template <>
-SExpression serialize(const VAlign& obj) {
+std::unique_ptr<SExpression> serialize(const VAlign& obj) {
   switch (obj.toQtAlignFlag()) {
     case Qt::AlignTop:
       return SExpression::createToken("top");
@@ -101,7 +101,7 @@ VAlign& VAlign::mirror() noexcept {
 }
 
 template <>
-SExpression serialize(const HAlign& obj) {
+std::unique_ptr<SExpression> serialize(const HAlign& obj) {
   switch (obj.toQtAlignFlag()) {
     case Qt::AlignLeft:
       return SExpression::createToken("left");

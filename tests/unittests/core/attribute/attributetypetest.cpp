@@ -42,7 +42,7 @@ class AttributeTypeTest : public ::testing::Test {};
 
 TEST_F(AttributeTypeTest, testSerialize) {
   const AttributeType& type = AttrTypeVoltage::instance();
-  EXPECT_EQ("voltage\n", serialize(type).toByteArray());
+  EXPECT_EQ("voltage\n", serialize(type)->toByteArray());
 }
 
 /*******************************************************************************

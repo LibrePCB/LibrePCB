@@ -74,9 +74,11 @@ private:
  ******************************************************************************/
 
 TEST_F(SerializableObjectListTest, testInstantiationWithMinimalElementClass) {
+  std::unique_ptr<const SExpression> sexpr = SExpression::createList("list");
+
   MinimalList l1;  // default ctor
   MinimalList l2(std::move(l1));  // move ctor
-  MinimalList l3(SExpression::createList("list"));  // SExpression ctor
+  MinimalList l3(*sexpr);  // SExpression ctor
   l3.append(std::make_shared<MinimalMock>("foo"));
   EXPECT_TRUE(l1.isEmpty());
   EXPECT_EQ(0, l2.count());
@@ -121,15 +123,15 @@ TEST_F(SerializableObjectListTest, testValueInitializerListConstructor) {
 }
 
 TEST_F(SerializableObjectListTest, testSExpressionConstructor) {
-  SExpression e = SExpression::createList("list");
-  e.ensureLineBreak();
-  e.appendChild("test", mMocks[0]->mUuid).appendChild<QString>("name", "foo");
-  e.ensureLineBreak();
-  e.appendChild("test", mMocks[1]->mUuid).appendChild<QString>("name", "bar");
-  e.ensureLineBreak();
-  e.appendChild("none", mMocks[2]->mUuid).appendChild<QString>("name", "bar");
-  e.ensureLineBreak();
-  List l(e);
+  std::unique_ptr<SExpression> e = SExpression::createList("list");
+  e->ensureLineBreak();
+  e->appendChild("test", mMocks[0]->mUuid).appendChild<QString>("name", "foo");
+  e->ensureLineBreak();
+  e->appendChild("test", mMocks[1]->mUuid).appendChild<QString>("name", "bar");
+  e->ensureLineBreak();
+  e->appendChild("none", mMocks[2]->mUuid).appendChild<QString>("name", "bar");
+  e->ensureLineBreak();
+  List l(*e);
   EXPECT_EQ(2, l.count());
   EXPECT_EQ(mMocks[0]->mUuid, l[0]->mUuid);
   EXPECT_EQ(mMocks[1]->mUuid, l[1]->mUuid);
@@ -289,9 +291,9 @@ TEST_F(SerializableObjectListTest, testClear) {
 }
 
 TEST_F(SerializableObjectListTest, testSerialize) {
-  SExpression e = SExpression::createList("list");
+  std::unique_ptr<SExpression> e = SExpression::createList("list");
   List l{mMocks[0], mMocks[1], mMocks[2]};
-  l.serialize(e);
+  l.serialize(*e);
   // (list
   //  (test c2ceffd2-4cc5-43c6-941c-fc64a341d026
   //    (name "foo")
@@ -303,35 +305,34 @@ TEST_F(SerializableObjectListTest, testSerialize) {
   //   (name "pcb")
   //  )
   // )
-  EXPECT_EQ(7, e.getChildren().count());
+  EXPECT_EQ(7, e->getChildCount());
   for (int i = 0; i < 3; ++i) {
-    const SExpression& lineBreak = e.getChildren().at(i * 2);
+    const SExpression& lineBreak = e->getChild(i * 2);
     EXPECT_EQ(SExpression::Type::LineBreak, lineBreak.getType());
-    const SExpression& list = e.getChildren().at(i * 2 + 1);
+    const SExpression& list = e->getChild(i * 2 + 1);
     EXPECT_EQ(SExpression::Type::List, list.getType());
     EXPECT_EQ("test", list.getName().toStdString());
-    EXPECT_EQ(4, list.getChildren().count());
-    EXPECT_EQ(SExpression::Type::Token, list.getChildren()[0].getType());
-    EXPECT_EQ(mMocks[i]->getUuid().toStr(), list.getChildren()[0].getValue());
-    EXPECT_EQ(SExpression::Type::LineBreak, list.getChildren()[1].getType());
-    EXPECT_EQ(SExpression::Type::List, list.getChildren()[2].getType());
-    EXPECT_EQ("name", list.getChildren()[2].getName());
-    EXPECT_EQ(1, list.getChildren()[2].getChildren().count());
-    EXPECT_EQ(mMocks[i]->getName(),
-              list.getChildren()[2].getChildren().at(0).getValue());
-    EXPECT_EQ(SExpression::Type::LineBreak, list.getChildren()[3].getType());
+    EXPECT_EQ(4, list.getChildCount());
+    EXPECT_EQ(SExpression::Type::Token, list.getChild(0).getType());
+    EXPECT_EQ(mMocks[i]->getUuid().toStr(), list.getChild(0).getValue());
+    EXPECT_EQ(SExpression::Type::LineBreak, list.getChild(1).getType());
+    EXPECT_EQ(SExpression::Type::List, list.getChild(2).getType());
+    EXPECT_EQ("name", list.getChild(2).getName());
+    EXPECT_EQ(1, list.getChild(2).getChildCount());
+    EXPECT_EQ(mMocks[i]->getName(), list.getChild(2).getChild(0).getValue());
+    EXPECT_EQ(SExpression::Type::LineBreak, list.getChild(3).getType());
   }
-  EXPECT_EQ(SExpression::Type::LineBreak, e.getChildren().at(6).getType());
+  EXPECT_EQ(SExpression::Type::LineBreak, e->getChild(6).getType());
 }
 
 TEST_F(SerializableObjectListTest, testSerializeEmpty) {
-  SExpression e = SExpression::createList("list");
+  std::unique_ptr<SExpression> e = SExpression::createList("list");
   List l;
-  l.serialize(e);
+  l.serialize(*e);
   // (list
   // )
-  EXPECT_EQ(1, e.getChildren().count());
-  EXPECT_EQ(SExpression::Type::LineBreak, e.getChildren().at(0).getType());
+  EXPECT_EQ(1, e->getChildCount());
+  EXPECT_EQ(SExpression::Type::LineBreak, e->getChild(0).getType());
 }
 
 TEST_F(SerializableObjectListTest, testOperatorEqual) {

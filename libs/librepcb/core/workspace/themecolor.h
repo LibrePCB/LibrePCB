@@ -64,7 +64,7 @@ public:
 
   // General Methods
   void load(const SExpression& root);
-  SExpression serialize() const;
+  std::unique_ptr<SExpression> serialize() const;
 
   // Operator Overloadings
   bool operator==(const ThemeColor& rhs) const noexcept;

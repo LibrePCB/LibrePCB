@@ -37,9 +37,9 @@ namespace tests {
 class PathTest : public ::testing::Test {
 protected:
   std::string str(const Path& path) const {
-    SExpression sexpr = SExpression::createList("path");
-    path.serialize(sexpr);
-    return sexpr.toByteArray().toStdString();
+    std::unique_ptr<SExpression> sexpr = SExpression::createList("path");
+    path.serialize(*sexpr);
+    return sexpr->toByteArray().toStdString();
   }
 };
 

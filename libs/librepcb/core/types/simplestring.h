@@ -113,7 +113,7 @@ inline static SimpleString cleanSimpleString(
 }
 
 template <>
-inline SExpression serialize(const SimpleString& obj) {
+inline std::unique_ptr<SExpression> serialize(const SimpleString& obj) {
   return SExpression::createString(*obj);
 }
 

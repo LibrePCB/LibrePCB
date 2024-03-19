@@ -36,7 +36,7 @@ namespace librepcb {
  ******************************************************************************/
 
 template <>
-SExpression serialize(const StrokeTextSpacing& obj) {
+std::unique_ptr<SExpression> serialize(const StrokeTextSpacing& obj) {
   if (const tl::optional<Ratio>& ratio = obj.getRatio()) {
     return serialize(*ratio);
   } else {

@@ -100,24 +100,26 @@ void WorkspaceSettings::restoreDefaults() noexcept {
   mFileContent.clear();  // Remove even unknown settings!
 }
 
-SExpression WorkspaceSettings::serialize() {
+std::unique_ptr<SExpression> WorkspaceSettings::serialize() {
   foreach (const WorkspaceSettingsItem* item, getAllItems()) {
     if (item->isEdited() || mUpgradeRequired) {
       if (item->isDefaultValue()) {
         mFileContent.remove(item->getKey());
       } else {
-        SExpression node = SExpression::createList(item->getKey());
-        item->serialize(node);  // can throw
-        mFileContent.insert(item->getKey(), node);
+        std::unique_ptr<SExpression> node =
+            SExpression::createList(item->getKey());
+        item->serialize(*node);  // can throw
+        mFileContent.insert(item->getKey(), *node);
       }
     }
   }
-  SExpression root = SExpression::createList("librepcb_workspace_settings");
+  std::unique_ptr<SExpression> root =
+      SExpression::createList("librepcb_workspace_settings");
   foreach (const SExpression& child, mFileContent) {
-    root.ensureLineBreak();
-    root.appendChild(child);
+    root->ensureLineBreak();
+    root->appendChild(child);
   }
-  root.ensureLineBreak();
+  root->ensureLineBreak();
   return root;
 }
 

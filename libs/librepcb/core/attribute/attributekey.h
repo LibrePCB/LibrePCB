@@ -96,7 +96,7 @@ inline bool operator!=(const QString& lhs, const AttributeKey& rhs) noexcept {
 }
 
 template <>
-inline SExpression serialize(const AttributeKey& obj) {
+inline std::unique_ptr<SExpression> serialize(const AttributeKey& obj) {
   return SExpression::createString(*obj);
 }
 

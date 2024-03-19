@@ -62,14 +62,14 @@ TEST_F(BoardFabricationOutputSettingsTest, testSerializeAndDeserialize) {
   obj1.setUseG85SlotCommand(!obj1.getUseG85SlotCommand());
   obj1.setEnableSolderPasteTop(!obj1.getEnableSolderPasteTop());
   obj1.setEnableSolderPasteBot(!obj1.getEnableSolderPasteBot());
-  SExpression sexpr1 = SExpression::createList("obj");
-  obj1.serialize(sexpr1);
+  std::unique_ptr<SExpression> sexpr1 = SExpression::createList("obj");
+  obj1.serialize(*sexpr1);
 
-  BoardFabricationOutputSettings obj2(sexpr1);
-  SExpression sexpr2 = SExpression::createList("obj");
-  obj2.serialize(sexpr2);
+  BoardFabricationOutputSettings obj2(*sexpr1);
+  std::unique_ptr<SExpression> sexpr2 = SExpression::createList("obj");
+  obj2.serialize(*sexpr2);
 
-  EXPECT_EQ(sexpr1.toByteArray(), sexpr2.toByteArray());
+  EXPECT_EQ(sexpr1->toByteArray(), sexpr2->toByteArray());
 }
 
 /*******************************************************************************

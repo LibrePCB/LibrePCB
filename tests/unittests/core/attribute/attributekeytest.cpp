@@ -78,20 +78,19 @@ TEST_P(AttributeKeyTest, testSerialize) {
 
   if (data.valid) {
     AttributeKey obj(data.input);
-    EXPECT_EQ("\"" % data.input % "\"\n", serialize(obj).toByteArray());
+    EXPECT_EQ("\"" % data.input % "\"\n", serialize(obj)->toByteArray());
   }
 }
 
 TEST_P(AttributeKeyTest, testDeserialize) {
   const AttributeKeyTestData& data = GetParam();
 
+  std::unique_ptr<const SExpression> sexpr =
+      SExpression::createString(data.input);
   if (data.valid) {
-    EXPECT_EQ(AttributeKey(data.input),
-              deserialize<AttributeKey>(SExpression::createString(data.input)));
+    EXPECT_EQ(AttributeKey(data.input), deserialize<AttributeKey>(*sexpr));
   } else {
-    EXPECT_THROW(
-        deserialize<AttributeKey>(SExpression::createString(data.input)),
-        RuntimeError);
+    EXPECT_THROW(deserialize<AttributeKey>(*sexpr), RuntimeError);
   }
 }
 

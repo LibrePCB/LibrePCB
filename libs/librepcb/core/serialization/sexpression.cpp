@@ -46,10 +46,10 @@ SExpression::SExpression(Type type, const QString& value)
 }
 
 SExpression::SExpression(const SExpression& other) noexcept
-  : mType(other.mType),
-    mValue(other.mValue),
-    mChildren(other.mChildren),
-    mFilePath(other.mFilePath) {
+  : mType(other.mType), mValue(other.mValue), mFilePath(other.mFilePath) {
+  for (const auto& ptr : other.mChildren) {
+    mChildren.emplace_back(new SExpression(*ptr));
+  }
 }
 
 SExpression::~SExpression() noexcept {
@@ -76,11 +76,26 @@ const QString& SExpression::getValue() const {
   return mValue;
 }
 
+bool SExpression::containsChild(const SExpression& child) const noexcept {
+  for (const auto& ptr : mChildren) {
+    if ((*ptr) == child) return true;
+  }
+  return false;
+}
+
+SExpression& SExpression::getChild(int index) {
+  return *mChildren.at(index);
+}
+
+const SExpression& SExpression::getChild(int index) const {
+  return *mChildren.at(index);
+}
+
 QList<SExpression*> SExpression::getChildren(Type type) noexcept {
   QList<SExpression*> children;
-  for (SExpression& child : mChildren) {
-    if (child.getType() == type) {
-      children.append(&child);
+  for (const auto& child : mChildren) {
+    if (child->getType() == type) {
+      children.append(child.get());
     }
   }
   return children;
@@ -88,9 +103,9 @@ QList<SExpression*> SExpression::getChildren(Type type) noexcept {
 
 QList<const SExpression*> SExpression::getChildren(Type type) const noexcept {
   QList<const SExpression*> children;
-  for (const SExpression& child : mChildren) {
-    if (child.getType() == type) {
-      children.append(&child);
+  for (const auto& child : mChildren) {
+    if (child->getType() == type) {
+      children.append(child.get());
     }
   }
   return children;
@@ -98,9 +113,9 @@ QList<const SExpression*> SExpression::getChildren(Type type) const noexcept {
 
 QList<SExpression*> SExpression::getChildren(const QString& name) noexcept {
   QList<SExpression*> children;
-  for (SExpression& child : mChildren) {
-    if (child.isList() && (child.mValue == name)) {
-      children.append(&child);
+  for (const auto& child : mChildren) {
+    if (child->isList() && (child->mValue == name)) {
+      children.append(child.get());
     }
   }
   return children;
@@ -109,9 +124,9 @@ QList<SExpression*> SExpression::getChildren(const QString& name) noexcept {
 QList<const SExpression*> SExpression::getChildren(
     const QString& name) const noexcept {
   QList<const SExpression*> children;
-  for (const SExpression& child : mChildren) {
-    if (child.isList() && (child.mValue == name)) {
-      children.append(&child);
+  for (const auto& child : mChildren) {
+    if (child->isList() && (child->mValue == name)) {
+      children.append(child.get());
     }
   }
   return children;
@@ -138,15 +153,15 @@ SExpression* SExpression::tryGetChild(const QString& path) noexcept {
       bool valid = false;
       int index = name.mid(1).toInt(&valid);
       if ((valid) && (index >= 0) && skipLineBreaks(child->mChildren, index)) {
-        child = &child->mChildren[index];
+        child = child->mChildren.at(index).get();
       } else {
         return nullptr;
       }
     } else {
       bool found = false;
-      for (SExpression& childchild : child->mChildren) {
-        if (childchild.isList() && (childchild.mValue == name)) {
-          child = &childchild;
+      for (const auto& childchild : child->mChildren) {
+        if (childchild->isList() && (childchild->mValue == name)) {
+          child = childchild.get();
           found = true;
           break;
         }
@@ -189,28 +204,29 @@ void SExpression::setValue(const QString& value) {
  ******************************************************************************/
 
 void SExpression::ensureLineBreak() {
-  if (mChildren.isEmpty() || (!mChildren.last().isLineBreak())) {
-    mChildren.append(createLineBreak());
+  if (mChildren.empty() || (!mChildren.back()->isLineBreak())) {
+    mChildren.emplace_back(new SExpression(Type::LineBreak, QString()));
   }
 }
 
 SExpression& SExpression::appendList(const QString& name) {
-  return appendChild(createList(name));
+  appendChild(createList(name));
+  return *mChildren.back();
 }
 
-SExpression& SExpression::appendChild(const SExpression& child) {
+void SExpression::appendChild(std::unique_ptr<SExpression> child) {
+  Q_ASSERT(child);
   if (mType == Type::List) {
-    mChildren.append(child);
-    return mChildren.last();
+    mChildren.emplace_back(std::move(child));
   } else {
     throw LogicError(__FILE__, __LINE__);
   }
 }
 
 void SExpression::removeChild(const SExpression& child) {
-  for (int i = 0; i < mChildren.count(); ++i) {
-    if (&mChildren.at(i) == &child) {
-      mChildren.removeAt(i);
+  for (auto it = mChildren.begin(); it != mChildren.end(); ++it) {
+    if (it->get() == &child) {
+      mChildren.erase(it);
       return;
     }
   }
@@ -219,22 +235,23 @@ void SExpression::removeChild(const SExpression& child) {
 
 void SExpression::removeChildrenWithNodeRecursive(
     const SExpression& search) noexcept {
-  for (int i = mChildren.count() - 1; i >= 0; --i) {
-    if (mChildren.at(i).mChildren.contains(search)) {
-      mChildren.removeAt(i);
+  for (std::size_t i = mChildren.size(); i > 0; --i) {
+    auto it = mChildren.begin() + i - 1;
+    if ((*it)->containsChild(search)) {
+      mChildren.erase(it);
     } else {
-      mChildren[i].removeChildrenWithNodeRecursive(search);
+      (*it)->removeChildrenWithNodeRecursive(search);
     }
   }
 }
 
 void SExpression::replaceRecursive(const SExpression& search,
                                    const SExpression& replace) noexcept {
-  for (SExpression& child : mChildren) {
-    if (child == search) {
-      child = replace;
+  for (const auto& child : mChildren) {
+    if ((*child) == search) {
+      (*child) = replace;
     } else {
-      child.replaceRecursive(search, replace);
+      child->replaceRecursive(search, replace);
     }
   }
 }
@@ -253,8 +270,13 @@ QByteArray SExpression::toByteArray() const {
 
 bool SExpression::operator==(const SExpression& rhs) const noexcept {
   // Note: Ignore the filepath since it's not part of the actual node.
-  return (mType == rhs.mType) && (mValue == rhs.mValue) &&
-      (mChildren == rhs.mChildren);
+  if (mType != rhs.mType) return false;
+  if (mValue != rhs.mValue) return false;
+  if (mChildren.size() != rhs.mChildren.size()) return false;
+  for (std::size_t i = 0; i < mChildren.size(); ++i) {
+    if ((*mChildren.at(i)) != (*rhs.mChildren.at(i))) return false;
+  }
+  return true;
 }
 
 bool SExpression::operator<(const SExpression& rhs) const noexcept {
@@ -263,20 +285,21 @@ bool SExpression::operator<(const SExpression& rhs) const noexcept {
   } else if (mValue != rhs.mValue) {
     return mValue < rhs.mValue;
   } else {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
-    return mChildren < rhs.mChildren;
-#else
-    return std::lexicographical_compare(mChildren.begin(), mChildren.end(),
-                                        rhs.mChildren.begin(),
-                                        rhs.mChildren.end());
-#endif
+    return std::lexicographical_compare(
+        mChildren.begin(), mChildren.end(), rhs.mChildren.begin(),
+        rhs.mChildren.end(),
+        [](const std::unique_ptr<SExpression>& a,
+           const std::unique_ptr<SExpression>& b) { return (*a) < (*b); });
   }
 }
 
 SExpression& SExpression::operator=(const SExpression& rhs) noexcept {
   mType = rhs.mType;
   mValue = rhs.mValue;
-  mChildren = rhs.mChildren;
+  mChildren.resize(rhs.mChildren.size());
+  for (std::size_t i = 0; i < rhs.mChildren.size(); ++i) {
+    mChildren[i].reset(new SExpression(*rhs.mChildren.at(i)));
+  }
   mFilePath = rhs.mFilePath;
   return *this;
 }
@@ -335,14 +358,14 @@ QString SExpression::toString(int indent) const {
     }
     QString str = '(' + mValue;
     bool lastCharIsSpace = false;
-    const int lastIndex = mChildren.count() - 1;
-    for (int i = 0; i < mChildren.count(); ++i) {
-      const SExpression& child = mChildren.at(i);
+    const std::size_t lastIndex = mChildren.size() - 1;
+    for (std::size_t i = 0; i < mChildren.size(); ++i) {
+      const SExpression& child = *mChildren.at(i);
       if ((!lastCharIsSpace) && (!child.isLineBreak())) {
         str += ' ';
       }
       const bool nextChildIsLineBreak =
-          (i < lastIndex) && mChildren.at(i + 1).isLineBreak();
+          (i < lastIndex) && mChildren.at(i + 1)->isLineBreak();
       int currentIndent =
           (child.isLineBreak() && nextChildIsLineBreak) ? 0 : (indent + 1);
       lastCharIsSpace = child.isLineBreak() && (currentIndent > 0);
@@ -371,24 +394,25 @@ QString SExpression::toString(int indent) const {
  *  Static Methods
  ******************************************************************************/
 
-SExpression SExpression::createList(const QString& name) {
-  return SExpression(Type::List, name);
+std::unique_ptr<SExpression> SExpression::createList(const QString& name) {
+  return std::unique_ptr<SExpression>(new SExpression(Type::List, name));
 }
 
-SExpression SExpression::createToken(const QString& token) {
-  return SExpression(Type::Token, token);
+std::unique_ptr<SExpression> SExpression::createToken(const QString& token) {
+  return std::unique_ptr<SExpression>(new SExpression(Type::Token, token));
 }
 
-SExpression SExpression::createString(const QString& string) {
-  return SExpression(Type::String, string);
+std::unique_ptr<SExpression> SExpression::createString(const QString& string) {
+  return std::unique_ptr<SExpression>(new SExpression(Type::String, string));
 }
 
-SExpression SExpression::createLineBreak() {
-  return SExpression(Type::LineBreak, QString());
+std::unique_ptr<SExpression> SExpression::createLineBreak() {
+  return std::unique_ptr<SExpression>(
+      new SExpression(Type::LineBreak, QString()));
 }
 
-SExpression SExpression::parse(const QByteArray& content,
-                               const FilePath& filePath) {
+std::unique_ptr<SExpression> SExpression::parse(const QByteArray& content,
+                                                const FilePath& filePath) {
   int index = 0;
   QString contentStr = QString::fromUtf8(content);
   skipWhitespaceAndComments(contentStr, index, true);  // Skip newlines as well.
@@ -396,7 +420,7 @@ SExpression SExpression::parse(const QByteArray& content,
     throw FileParseError(__FILE__, __LINE__, filePath, -1, -1, QString(),
                          "No S-Expression node found.");
   }
-  SExpression root = parse(contentStr, index, filePath);
+  std::unique_ptr<SExpression> root = parse(contentStr, index, filePath);
   skipWhitespaceAndComments(contentStr, index, true);  // Skip newlines as well.
   if (index < contentStr.length()) {
     throw FileParseError(__FILE__, __LINE__, filePath, -1, -1, QString(),
@@ -413,8 +437,8 @@ bool SExpression::isMultiLine() const noexcept {
   if (isLineBreak()) {
     return true;
   } else if (isList()) {
-    foreach (const SExpression& child, mChildren) {
-      if (child.isMultiLine()) {
+    for (const auto& child : mChildren) {
+      if (child->isMultiLine()) {
         return true;
       }
     }
@@ -422,20 +446,22 @@ bool SExpression::isMultiLine() const noexcept {
   return false;
 }
 
-bool SExpression::skipLineBreaks(const QList<SExpression>& children,
-                                 int& index) noexcept {
-  for (int i = 0; i < children.count(); ++i) {
-    if (children.at(i).isLineBreak()) {
+bool SExpression::skipLineBreaks(
+    const std::vector<std::unique_ptr<SExpression> >& children,
+    int& index) noexcept {
+  for (std::size_t i = 0; i < children.size(); ++i) {
+    if (children.at(i)->isLineBreak()) {
       ++index;
-    } else if (i == index) {
+    } else if (static_cast<int>(i) == index) {
       return true;
     }
   }
   return false;
 }
 
-SExpression SExpression::parse(const QString& content, int& index,
-                               const FilePath& filePath) {
+std::unique_ptr<SExpression> SExpression::parse(const QString& content,
+                                                int& index,
+                                                const FilePath& filePath) {
   Q_ASSERT(index < content.length());
 
   if (content.at(index) == '\n') {
@@ -451,13 +477,15 @@ SExpression SExpression::parse(const QString& content, int& index,
   }
 }
 
-SExpression SExpression::parseList(const QString& content, int& index,
-                                   const FilePath& filePath) {
+std::unique_ptr<SExpression> SExpression::parseList(const QString& content,
+                                                    int& index,
+                                                    const FilePath& filePath) {
   Q_ASSERT((index < content.length()) && (content.at(index) == '('));
 
   ++index;  // consume the '('
 
-  SExpression list = createList(parseToken(content, index, filePath));
+  std::unique_ptr<SExpression> list =
+      createList(parseToken(content, index, filePath));
 
   while (true) {
     if (index >= content.length()) {
@@ -469,7 +497,7 @@ SExpression SExpression::parseList(const QString& content, int& index,
       skipWhitespaceAndComments(content, index);  // consume following spaces
       break;
     } else {
-      list.appendChild(parse(content, index, filePath));
+      list->mChildren.emplace_back(parse(content, index, filePath));
     }
   }
 
@@ -572,49 +600,54 @@ void SExpression::skipWhitespaceAndComments(const QString& content, int& index,
  ******************************************************************************/
 
 template <>
-SExpression serialize(const QColor& obj) {
+std::unique_ptr<SExpression> serialize(const SExpression& obj) {
+  return std::unique_ptr<SExpression>(new SExpression(obj));
+}
+
+template <>
+std::unique_ptr<SExpression> serialize(const QColor& obj) {
   return SExpression::createString(obj.isValid() ? obj.name(QColor::HexArgb)
                                                  : "");
 }
 
 template <>
-SExpression serialize(const QUrl& obj) {
+std::unique_ptr<SExpression> serialize(const QUrl& obj) {
   return SExpression::createString(
       obj.isValid() ? obj.toString(QUrl::PrettyDecoded) : "");
 }
 
 template <>
-SExpression serialize(const QDateTime& obj) {
+std::unique_ptr<SExpression> serialize(const QDateTime& obj) {
   return SExpression::createToken(obj.toUTC().toString(Qt::ISODate));
 }
 
 template <>
-SExpression serialize(const QString& obj) {
+std::unique_ptr<SExpression> serialize(const QString& obj) {
   return SExpression::createString(obj);
 }
 
 template <>
-SExpression serialize(const uint& obj) {
+std::unique_ptr<SExpression> serialize(const uint& obj) {
   return SExpression::createToken(QString::number(obj));
 }
 
 template <>
-SExpression serialize(const int& obj) {
+std::unique_ptr<SExpression> serialize(const int& obj) {
   return SExpression::createToken(QString::number(obj));
 }
 
 template <>
-SExpression serialize(const long& obj) {
+std::unique_ptr<SExpression> serialize(const long& obj) {
   return SExpression::createToken(QString::number(obj));
 }
 
 template <>
-SExpression serialize(const qlonglong& obj) {
+std::unique_ptr<SExpression> serialize(const qlonglong& obj) {
   return SExpression::createToken(QString::number(obj));
 }
 
 template <>
-SExpression serialize(const bool& obj) {
+std::unique_ptr<SExpression> serialize(const bool& obj) {
   return SExpression::createToken(obj ? "true" : "false");
 }
 
@@ -720,6 +753,31 @@ bool deserialize(const SExpression& node) {
     throw RuntimeError(__FILE__, __LINE__,
                        QString("Invalid boolean: '%1'").arg(node.getValue()));
   }
+}
+
+/*******************************************************************************
+ *  Non-Member Functions
+ ******************************************************************************/
+
+uint qHash(const SExpression& node, uint seed) noexcept {
+  switch (node.getType()) {
+    case SExpression::Type::LineBreak:
+      return ::qHash(static_cast<int>(node.getType()), seed);
+    case SExpression::Type::String:
+    case SExpression::Type::Token:
+      return ::qHash(
+          qMakePair(static_cast<int>(node.getType()), node.getValue()), seed);
+    case SExpression::Type::List: {
+      return ::qHashRange(node.mChildren.begin(), node.mChildren.end(), seed);
+    }
+    default:
+      Q_ASSERT(false);
+      return 0;
+  }
+}
+
+uint qHash(const std::unique_ptr<SExpression>& ptr, uint seed) noexcept {
+  return ptr ? ::qHash(*ptr, seed) : ::qHash(nullptr, seed);
 }
 
 /*******************************************************************************

@@ -65,12 +65,12 @@ void WorkspaceSettingsItem_KeyboardShortcuts::set(
   for (auto it = overrides.begin(); it != overrides.end(); it++) {
     if (!mOverrides.contains(it.key()) ||
         (mOverrides.value(it.key()) != it.value())) {
-      SExpression node = SExpression::createList("shortcut");
-      node.appendChild(SExpression::createToken(it.key()));
+      std::unique_ptr<SExpression> node = SExpression::createList("shortcut");
+      node->appendChild(SExpression::createToken(it.key()));
       foreach (const QKeySequence& sequence, it.value()) {
-        node.appendChild(sequence.toString(QKeySequence::PortableText));
+        node->appendChild(sequence.toString(QKeySequence::PortableText));
       }
-      mNodes.insert(it.key(), node);
+      mNodes.insert(it.key(), *node);
       mOverrides[it.key()] = it.value();
       modified = true;
     }

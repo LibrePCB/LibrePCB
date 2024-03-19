@@ -60,12 +60,13 @@ TEST_P(AttributeTest, testConstructFromSExpression) {
   const AttributeType& type = AttributeType::fromString(data.type);
   Attribute attribute(AttributeKey(data.key), type, data.value,
                       type.getUnitFromString(data.unit));
-  SExpression sexpr = SExpression::parse(data.serialized, FilePath());
+  std::unique_ptr<SExpression> sexpr =
+      SExpression::parse(data.serialized, FilePath());
 
   if (data.validSExpression) {
-    EXPECT_EQ(attribute, Attribute(sexpr));
+    EXPECT_EQ(attribute, Attribute(*sexpr));
   } else {
-    EXPECT_THROW({ Attribute a(sexpr); }, Exception);
+    EXPECT_THROW({ Attribute a(*sexpr); }, Exception);
   }
 }
 
@@ -77,9 +78,9 @@ TEST_P(AttributeTest, testSerialize) {
                       type.getUnitFromString(data.unit));
 
   if (data.validSExpression) {
-    SExpression sexpr = SExpression::createList("attribute");
-    attribute.serialize(sexpr);
-    EXPECT_EQ(data.serialized, sexpr.toByteArray());
+    std::unique_ptr<SExpression> sexpr = SExpression::createList("attribute");
+    attribute.serialize(*sexpr);
+    EXPECT_EQ(data.serialized, sexpr->toByteArray());
   }
 }
 

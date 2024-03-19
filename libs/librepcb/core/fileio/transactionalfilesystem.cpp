@@ -490,51 +490,52 @@ void TransactionalFileSystem::saveDiff(const QString& type) const {
     throw RuntimeError(__FILE__, __LINE__, tr("File system is read-only."));
   }
 
-  SExpression root = SExpression::createList("librepcb_" % type);
-  root.ensureLineBreak();
-  root.appendChild("created", dt);
-  root.ensureLineBreak();
-  root.appendChild("modified_files_directory", filesDir.getFilename());
+  std::unique_ptr<SExpression> root =
+      SExpression::createList("librepcb_" % type);
+  root->ensureLineBreak();
+  root->appendChild("created", dt);
+  root->ensureLineBreak();
+  root->appendChild("modified_files_directory", filesDir.getFilename());
   foreach (const QString& filepath, Toolbox::sorted(mModifiedFiles.keys())) {
-    root.ensureLineBreak();
-    root.appendChild("modified_file", filepath);
+    root->ensureLineBreak();
+    root->appendChild("modified_file", filepath);
     FileUtils::writeFile(filesDir.getPathTo(filepath),
                          mModifiedFiles.value(filepath));  // can throw
   }
   foreach (const QString& filepath, Toolbox::sorted(mRemovedFiles.values())) {
-    root.ensureLineBreak();
-    root.appendChild("removed_file", filepath);
+    root->ensureLineBreak();
+    root->appendChild("removed_file", filepath);
   }
   foreach (const QString& filepath, Toolbox::sorted(mRemovedDirs.values())) {
-    root.ensureLineBreak();
-    root.appendChild("removed_directory", filepath);
+    root->ensureLineBreak();
+    root->appendChild("removed_directory", filepath);
   }
-  root.ensureLineBreak();
+  root->ensureLineBreak();
 
   // Writing the main file must be the last operation to "mark" this diff as
   // complete!
   FileUtils::writeFile(dir.getPathTo(type % ".lp"),
-                       root.toByteArray());  // can throw
+                       root->toByteArray());  // can throw
 }
 
 void TransactionalFileSystem::loadDiff(const FilePath& fp) {
   discardChanges();  // get a clean state first
 
-  SExpression root =
+  const std::unique_ptr<const SExpression> root =
       SExpression::parse(FileUtils::readFile(fp), fp);  // can throw
   QString modifiedFilesDirName =
-      root.getChild("modified_files_directory/@0").getValue();
+      root->getChild("modified_files_directory/@0").getValue();
   FilePath modifiedFilesDir = fp.getParentDir().getPathTo(modifiedFilesDirName);
-  foreach (const SExpression* node, root.getChildren("modified_file")) {
+  foreach (const SExpression* node, root->getChildren("modified_file")) {
     QString relPath = node->getChild("@0").getValue();
     FilePath absPath = modifiedFilesDir.getPathTo(relPath);
     mModifiedFiles.insert(relPath, FileUtils::readFile(absPath));  // can throw
   }
-  foreach (const SExpression* node, root.getChildren("removed_file")) {
+  foreach (const SExpression* node, root->getChildren("removed_file")) {
     QString relPath = node->getChild("@0").getValue();
     mRemovedFiles.insert(relPath);
   }
-  foreach (const SExpression* node, root.getChildren("removed_directory")) {
+  foreach (const SExpression* node, root->getChildren("removed_directory")) {
     QString relPath = node->getChild("@0").getValue();
     mRemovedDirs.insert(relPath);
   }

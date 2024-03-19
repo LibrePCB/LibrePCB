@@ -884,46 +884,47 @@ void Board::removeFromProject() {
 void Board::save() {
   // Content.
   {
-    SExpression root = SExpression::createList("librepcb_board");
-    root.appendChild(mUuid);
-    root.ensureLineBreak();
-    root.appendChild("name", mName);
-    root.ensureLineBreak();
-    root.appendChild("default_font", mDefaultFontFileName);
-    root.ensureLineBreak();
-    SExpression& gridNode = root.appendList("grid");
+    std::unique_ptr<SExpression> root =
+        SExpression::createList("librepcb_board");
+    root->appendChild(mUuid);
+    root->ensureLineBreak();
+    root->appendChild("name", mName);
+    root->ensureLineBreak();
+    root->appendChild("default_font", mDefaultFontFileName);
+    root->ensureLineBreak();
+    SExpression& gridNode = root->appendList("grid");
     gridNode.appendChild("interval", mGridInterval);
     gridNode.appendChild("unit", mGridUnit);
-    root.ensureLineBreak();
+    root->ensureLineBreak();
     {
-      SExpression& node = root.appendList("layers");
+      SExpression& node = root->appendList("layers");
       node.appendChild("inner", mInnerLayerCount);
     }
-    root.ensureLineBreak();
-    root.appendChild("thickness", mPcbThickness);
-    root.ensureLineBreak();
-    root.appendChild("solder_resist", mSolderResist);
-    root.ensureLineBreak();
-    root.appendChild("silkscreen", mSilkscreenColor);
-    root.ensureLineBreak();
+    root->ensureLineBreak();
+    root->appendChild("thickness", mPcbThickness);
+    root->ensureLineBreak();
+    root->appendChild("solder_resist", mSolderResist);
+    root->ensureLineBreak();
+    root->appendChild("silkscreen", mSilkscreenColor);
+    root->ensureLineBreak();
     {
-      SExpression& node = root.appendList("silkscreen_layers_top");
+      SExpression& node = root->appendList("silkscreen_layers_top");
       foreach (const Layer* layer, mSilkscreenLayersTop) {
         node.appendChild(*layer);
       }
     }
-    root.ensureLineBreak();
+    root->ensureLineBreak();
     {
-      SExpression& node = root.appendList("silkscreen_layers_bot");
+      SExpression& node = root->appendList("silkscreen_layers_bot");
       foreach (const Layer* layer, mSilkscreenLayersBot) {
         node.appendChild(*layer);
       }
     }
-    root.ensureLineBreak();
-    mDesignRules->serialize(root.appendList("design_rules"));
-    root.ensureLineBreak();
+    root->ensureLineBreak();
+    mDesignRules->serialize(root->appendList("design_rules"));
+    root->ensureLineBreak();
     {
-      SExpression& node = root.appendList("design_rule_check");
+      SExpression& node = root->appendList("design_rule_check");
       mDrcSettings->serialize(node);
       node.appendChild("approvals_version", mDrcMessageApprovalsVersion);
       node.ensureLineBreak();
@@ -933,67 +934,67 @@ void Board::save() {
         node.ensureLineBreak();
       }
     }
-    root.ensureLineBreak();
+    root->ensureLineBreak();
     mFabricationOutputSettings->serialize(
-        root.appendList("fabrication_output_settings"));
-    root.ensureLineBreak();
+        root->appendList("fabrication_output_settings"));
+    root->ensureLineBreak();
     for (const BI_Device* obj : mDeviceInstances) {
-      root.ensureLineBreak();
-      obj->serialize(root.appendList("device"));
+      root->ensureLineBreak();
+      obj->serialize(root->appendList("device"));
     }
-    root.ensureLineBreak();
+    root->ensureLineBreak();
     for (const BI_NetSegment* obj : mNetSegments) {
-      root.ensureLineBreak();
-      obj->serialize(root.appendList("netsegment"));
+      root->ensureLineBreak();
+      obj->serialize(root->appendList("netsegment"));
     }
-    root.ensureLineBreak();
+    root->ensureLineBreak();
     for (const BI_Plane* obj : mPlanes) {
-      root.ensureLineBreak();
-      obj->serialize(root.appendList("plane"));
+      root->ensureLineBreak();
+      obj->serialize(root->appendList("plane"));
     }
     for (const BI_Zone* obj : mZones) {
-      root.ensureLineBreak();
-      obj->getData().serialize(root.appendList("zone"));
+      root->ensureLineBreak();
+      obj->getData().serialize(root->appendList("zone"));
     }
-    root.ensureLineBreak();
+    root->ensureLineBreak();
     for (const BI_Polygon* obj : mPolygons) {
-      root.ensureLineBreak();
-      obj->getData().serialize(root.appendList("polygon"));
+      root->ensureLineBreak();
+      obj->getData().serialize(root->appendList("polygon"));
     }
-    root.ensureLineBreak();
+    root->ensureLineBreak();
     for (const BI_StrokeText* obj : mStrokeTexts) {
-      root.ensureLineBreak();
-      obj->getData().serialize(root.appendList("stroke_text"));
+      root->ensureLineBreak();
+      obj->getData().serialize(root->appendList("stroke_text"));
     }
-    root.ensureLineBreak();
+    root->ensureLineBreak();
     for (const BI_Hole* obj : mHoles) {
-      root.ensureLineBreak();
-      obj->getData().serialize(root.appendList("hole"));
+      root->ensureLineBreak();
+      obj->getData().serialize(root->appendList("hole"));
     }
-    root.ensureLineBreak();
-    mDirectory->write("board.lp", root.toByteArray());
+    root->ensureLineBreak();
+    mDirectory->write("board.lp", root->toByteArray());
   }
 
   // User settings.
   {
-    SExpression root = SExpression::createList("librepcb_board_user_settings");
+    std::unique_ptr<SExpression> root =
+        SExpression::createList("librepcb_board_user_settings");
     for (auto it = mLayersVisibility.begin(); it != mLayersVisibility.end();
          it++) {
-      root.ensureLineBreak();
-      SExpression& child = root.appendList("layer");
+      root->ensureLineBreak();
+      SExpression& child = root->appendList("layer");
       child.appendChild(SExpression::createToken(it.key()));
       child.appendChild("visible", it.value());
     }
-    root.ensureLineBreak();
+    root->ensureLineBreak();
     for (const BI_Plane* plane : mPlanes) {
-      root.ensureLineBreak();
-      SExpression node = SExpression::createList("plane");
+      root->ensureLineBreak();
+      SExpression& node = root->appendList("plane");
       node.appendChild(plane->getUuid());
       node.appendChild("visible", plane->isVisible());
-      root.appendChild(node);
     }
-    root.ensureLineBreak();
-    mDirectory->write("settings.user.lp", root.toByteArray());
+    root->ensureLineBreak();
+    mDirectory->write("settings.user.lp", root->toByteArray());
   }
 }
 

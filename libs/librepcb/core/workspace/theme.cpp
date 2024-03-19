@@ -37,7 +37,7 @@ namespace librepcb {
  ******************************************************************************/
 
 template <>
-SExpression serialize(const Theme::GridStyle& obj) {
+std::unique_ptr<SExpression> serialize(const Theme::GridStyle& obj) {
   switch (obj) {
     case Theme::GridStyle::None:
       return SExpression::createToken("none");
@@ -244,7 +244,8 @@ void Theme::setColors(const QList<ThemeColor>& colors) noexcept {
     // Merge modified settings into existing settings.
     foreach (const ThemeColor& color, colors) {
       if (color.isEdited()) {
-        childs[color.getIdentifier()] = color.serialize();
+        std::unique_ptr<const SExpression> sexpr = color.serialize();
+        childs[color.getIdentifier()] = *sexpr;
       }
     }
 
@@ -375,7 +376,8 @@ void Theme::addColor(const QString& id, const QString& category,
 }
 
 SExpression& Theme::addNode(const QString& name) noexcept {
-  mNodes[name] = SExpression::createList(name);
+  std::unique_ptr<const SExpression> sexpr = SExpression::createList(name);
+  mNodes[name] = *sexpr;
   return mNodes[name];
 }
 

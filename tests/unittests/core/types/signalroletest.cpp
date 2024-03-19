@@ -43,22 +43,22 @@ class SignalRoleTest : public ::testing::Test {};
  ******************************************************************************/
 
 TEST(SignalRoleTest, testSerialize) {
-  EXPECT_EQ("opendrain\n", serialize(SignalRole::opendrain()).toByteArray());
+  EXPECT_EQ("opendrain\n", serialize(SignalRole::opendrain())->toByteArray());
 }
 
 TEST(SignalRoleTest, testDeserialize) {
-  SExpression sexpr = SExpression::createString("opendrain");
-  EXPECT_EQ(SignalRole::opendrain(), deserialize<SignalRole>(sexpr));
+  std::unique_ptr<SExpression> sexpr = SExpression::createString("opendrain");
+  EXPECT_EQ(SignalRole::opendrain(), deserialize<SignalRole>(*sexpr));
 }
 
 TEST(SignalRoleTest, testDeserializeEmpty) {
-  SExpression sexpr = SExpression::createString("");
-  EXPECT_THROW(deserialize<SignalRole>(sexpr), RuntimeError);
+  std::unique_ptr<SExpression> sexpr = SExpression::createString("");
+  EXPECT_THROW(deserialize<SignalRole>(*sexpr), RuntimeError);
 }
 
 TEST(SignalRoleTest, testDeserializeInvalid) {
-  SExpression sexpr = SExpression::createString("foo");
-  EXPECT_THROW(deserialize<SignalRole>(sexpr), RuntimeError);
+  std::unique_ptr<SExpression> sexpr = SExpression::createString("foo");
+  EXPECT_THROW(deserialize<SignalRole>(*sexpr), RuntimeError);
 }
 
 /*******************************************************************************

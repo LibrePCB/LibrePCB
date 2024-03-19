@@ -507,9 +507,9 @@ void PartInformationProvider::loadCacheFromDisk() noexcept {
   if (!mCacheFp.isExistingFile()) return;
 
   try {
-    const SExpression root =
+    const std::unique_ptr<const SExpression> root =
         SExpression::parse(FileUtils::readFile(mCacheFp), mCacheFp);
-    foreach (const SExpression* node, root.getChildren("part")) {
+    foreach (const SExpression* node, root->getChildren("part")) {
       std::shared_ptr<PartInformation> info =
           std::make_shared<PartInformation>();
       info->load(*node);
@@ -533,13 +533,14 @@ void PartInformationProvider::saveCacheToDisk() noexcept {
   if (!mCacheModified) return;
 
   try {
-    SExpression root = SExpression::createList("librepcb_parts_cache");
-    root.ensureLineBreak();
+    std::unique_ptr<SExpression> root =
+        SExpression::createList("librepcb_parts_cache");
+    root->ensureLineBreak();
     for (auto it = mCache.begin(); it != mCache.end(); it++) {
-      it.value()->serialize(root.appendList("part"));
-      root.ensureLineBreak();
+      it.value()->serialize(root->appendList("part"));
+      root->ensureLineBreak();
     }
-    FileUtils::writeFile(mCacheFp, root.toByteArray());
+    FileUtils::writeFile(mCacheFp, root->toByteArray());
     qInfo().nospace() << "Saved parts information cache to "
                       << mCacheFp.toNative() << ".";
     mCacheModified = false;

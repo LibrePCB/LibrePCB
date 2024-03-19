@@ -41,7 +41,7 @@ class BoardDesignRulesTest : public ::testing::Test {};
  ******************************************************************************/
 
 TEST_F(BoardDesignRulesTest, testConstructFromSExpression) {
-  SExpression sexpr = SExpression::parse(
+  std::unique_ptr<SExpression> sexpr = SExpression::parse(
       "(design_rules\n"
       " (stopmask_max_via_drill_diameter 0.2)\n"
       " (stopmask_clearance (ratio 0.1) (min 1.1) (max 2.1))\n"
@@ -51,7 +51,7 @@ TEST_F(BoardDesignRulesTest, testConstructFromSExpression) {
       " (via_annular_ring (ratio 0.5) (min 1.5) (max 2.5))\n"
       ")",
       FilePath());
-  BoardDesignRules obj(sexpr);
+  BoardDesignRules obj(*sexpr);
   EXPECT_EQ(UnsignedLength(200000), obj.getStopMaskMaxViaDiameter());
   EXPECT_EQ(UnsignedRatio(Ratio(100000)),
             obj.getStopMaskClearance().getRatio());
@@ -86,14 +86,14 @@ TEST_F(BoardDesignRulesTest, testSerializeAndDeserialize) {
       UnsignedRatio(Ratio(88)), UnsignedLength(99), UnsignedLength(111)));
   obj1.setViaAnnularRing(BoundedUnsignedRatio(
       UnsignedRatio(Ratio(222)), UnsignedLength(333), UnsignedLength(444)));
-  SExpression sexpr1 = SExpression::createList("obj");
-  obj1.serialize(sexpr1);
+  std::unique_ptr<SExpression> sexpr1 = SExpression::createList("obj");
+  obj1.serialize(*sexpr1);
 
-  BoardDesignRules obj2(sexpr1);
-  SExpression sexpr2 = SExpression::createList("obj");
-  obj2.serialize(sexpr2);
+  BoardDesignRules obj2(*sexpr1);
+  std::unique_ptr<SExpression> sexpr2 = SExpression::createList("obj");
+  obj2.serialize(*sexpr2);
 
-  EXPECT_EQ(sexpr1.toByteArray(), sexpr2.toByteArray());
+  EXPECT_EQ(sexpr1->toByteArray(), sexpr2->toByteArray());
 }
 
 /*******************************************************************************

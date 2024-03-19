@@ -109,7 +109,7 @@ inline QString operator%(const QString& lhs,
 }
 
 template <>
-inline SExpression serialize(const ComponentPrefix& obj) {
+inline std::unique_ptr<SExpression> serialize(const ComponentPrefix& obj) {
   return SExpression::createString(*obj);
 }
 

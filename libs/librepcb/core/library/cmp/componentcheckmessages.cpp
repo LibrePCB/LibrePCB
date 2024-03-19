@@ -46,7 +46,7 @@ MsgDuplicateSignalName::MsgDuplicateSignalName(
            "component signal. The assignment to multiple pins should be done "
            "in the device editor instead."),
         "duplicate_signal_name") {
-  mApproval.appendChild("name", *signal.getName());
+  mApproval->appendChild("name", *signal.getName());
 }
 
 /*******************************************************************************
@@ -109,9 +109,9 @@ MsgMissingSymbolVariantItem::MsgMissingSymbolVariantItem(
            "it can't be added to schematics."),
         "missing_gates"),
     mSymbVar(symbVar) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("variant", symbVar->getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("variant", symbVar->getUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -131,9 +131,9 @@ MsgNonFunctionalComponentSignalInversionSign::
             .arg("!"),
         "nonfunctional_inversion_sign"),
     mSignal(signal) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("signal", signal->getUuid());
-  mApproval.ensureLineBreak();
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("signal", signal->getUuid());
+  mApproval->ensureLineBreak();
 }
 
 /*******************************************************************************

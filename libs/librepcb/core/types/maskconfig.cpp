@@ -66,7 +66,7 @@ MaskConfig& MaskConfig::operator=(const MaskConfig& rhs) noexcept {
  ******************************************************************************/
 
 template <>
-SExpression serialize(const MaskConfig& obj) {
+std::unique_ptr<SExpression> serialize(const MaskConfig& obj) {
   if (!obj.isEnabled()) {
     return SExpression::createToken("off");
   } else if (tl::optional<Length> offset = obj.getOffset()) {

@@ -42,7 +42,7 @@ class AttributeUnitTest : public ::testing::Test {};
 
 TEST_F(AttributeUnitTest, testSerialize) {
   AttributeUnit unit("volt", "V", {});
-  EXPECT_EQ("volt\n", serialize(unit).toByteArray());
+  EXPECT_EQ("volt\n", serialize(unit)->toByteArray());
 }
 
 /*******************************************************************************
