@@ -772,6 +772,7 @@ void LibraryEditor::createToolBars() noexcept {
   mToolBarView->addAction(mActionZoomIn.data());
   mToolBarView->addAction(mActionZoomOut.data());
   mToolBarView->addAction(mActionZoomFit.data());
+  mToolBarView->addAction(mActionToggle3D.data());
   addToolBar(Qt::TopToolBarArea, mToolBarView.data());
 
   // Search.
