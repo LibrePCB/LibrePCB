@@ -88,6 +88,7 @@ public:
 
   // General Methods
   void initializeEmptyWorkspace() const;
+  void installExampleProjects() const noexcept;
 
   // Operator Overloadings
   InitializeWorkspaceWizardContext& operator=(
