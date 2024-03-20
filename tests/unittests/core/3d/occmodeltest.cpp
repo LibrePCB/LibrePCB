@@ -176,6 +176,8 @@ TEST_F(OccModelTest, testMinifyStep) {
       "#6 = PRODUCT_DEFINITION(#2, #3);\n"
       "#7 = SHAPE_REPRESENTATION(#2, #3);\n"
       "#8 = SHAPE_REPRESENTATION(#2, #3);\n"
+      "#9 = ANYREPRESENTATION(#2, #3);\n"
+      "#10 = ANYREPRESENTATION(#2, #3);\n"
       "ENDSEC;\n"
       "footer;\n";
   const QByteArray expected =
@@ -187,6 +189,8 @@ TEST_F(OccModelTest, testMinifyStep) {
       "#4=PRODUCT_DEFINITION(#1, #2);\n"  // Merging not allowed!
       "#5=SHAPE_REPRESENTATION(#1, #2);\n"  // Merging not allowed!
       "#6=SHAPE_REPRESENTATION(#1, #2);\n"  // Merging not allowed!
+      "#7=ANYREPRESENTATION(#1, #2);\n"  // Merging not allowed!
+      "#8=ANYREPRESENTATION(#1, #2);\n"  // Merging not allowed!
       "ENDSEC;\n"
       "footer;\n";
   const QByteArray result = OccModel::minifyStep(input);
@@ -204,6 +208,27 @@ TEST_F(OccModelTest, testMinifyStepValid) {
   // Validate minified STEP file.
   if (OccModel::isAvailable()) {
     EXPECT_NO_THROW(OccModel::loadStep(result));
+  }
+
+  // Check that additional minification has no effect.
+  const QByteArray result2 = OccModel::minifyStep(result);
+  EXPECT_EQ(result, result2);
+}
+
+// https://github.com/LibrePCB/LibrePCB/issues/1286
+TEST_F(OccModelTest, testMinifyStepColors) {
+  const FilePath fp(TEST_DATA_DIR
+                    "/unittests/librepcbcommon/OccModelTest/colors.step");
+  const QByteArray content = FileUtils::readFile(fp);
+  const QByteArray result = OccModel::minifyStep(content);
+  EXPECT_LE(result.count(), content.count());
+  EXPECT_GT(result.count(), 0);
+
+  // Validate minified STEP file.
+  if (OccModel::isAvailable()) {
+    std::unique_ptr<OccModel> model = OccModel::loadStep(result);
+    QMap<OccModel::Color, QVector<QVector3D>> triangles = model->tesselate();
+    EXPECT_EQ(5, triangles.count());
   }
 
   // Check that additional minification has no effect.
