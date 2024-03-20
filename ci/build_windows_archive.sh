@@ -3,15 +3,32 @@
 # set shell settings (see https://sipb.mit.edu/doc/safe-shell/)
 set -euv -o pipefail
 
+if [ "$ARCH" = "x86_64" ]
+then
+  WINDOWS_SYSTEM_DIR="C:/Windows/System32"
+  OPENCASCADE_DIR="C:/OpenCascade/win64"
+  # OPENSSL_ROOT already set in Docker image
+else
+  WINDOWS_SYSTEM_DIR="C:/Windows/SysWOW64"
+  OPENCASCADE_DIR="C:/OpenCascade/win32"
+  OPENSSL_ROOT="C:/Qt/Tools/OpenSSL/Win_x86"
+fi
+
 # Copy VC Runtime DLLs (no idea what I'm doing here, but it seems to work...)
-cp -v C:/Windows/SysWOW64/vc*140.dll ./build/install/opt/bin/
-cp -v C:/Windows/SysWOW64/msvcp140*.dll ./build/install/opt/bin/
+cp -v $WINDOWS_SYSTEM_DIR/vc*140.dll ./build/install/opt/bin/
+cp -v $WINDOWS_SYSTEM_DIR/msvcp140*.dll ./build/install/opt/bin/
+
+# ZLib DLL (for Qt5, it is bundled already)
+if [ "$ARCH" = "x86_64" ]
+then
+  cp -v $ZLIB_ROOT/bin/libzlib.dll ./build/install/opt/bin/
+fi
 
 # Copy OpenSSL DLLs (required to get HTTPS working)
-cp -v C:/Qt/Tools/OpenSSL/Win_x86/bin/lib*.dll ./build/install/opt/bin/
+cp -v $OPENSSL_ROOT/bin/lib*.dll ./build/install/opt/bin/
 
 # Copy OpenCascade DLLs
-cp -v C:/OpenCascade/win32/gcc/bin/libTK*.dll ./build/install/opt/bin/
+cp -v $OPENCASCADE_DIR/gcc/bin/libTK*.dll ./build/install/opt/bin/
 
 # Copy MinGW DLLs
 cp -v "`qmake -query QT_INSTALL_PREFIX`"/bin/lib*.dll ./build/install/opt/bin/
@@ -27,4 +44,10 @@ windeployqt --compiler-runtime --force ./build/install/opt/bin/librepcb-cli.exe
 ./build/install/opt/bin/librepcb.exe --exit-after-startup
 
 # Copy everything to artifacts directory for deployment
-cp -r ./build/install/opt/. ./artifacts/nightly_builds/librepcb-nightly-windows-x86/
+if [ "$QT" = "6" ]
+then
+  SUFFIX="$ARCH-qt6"
+else
+  SUFFIX="$ARCH"
+fi
+cp -r ./build/install/opt/. ./artifacts/nightly_builds/librepcb-nightly-windows-$SUFFIX/

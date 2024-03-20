@@ -5,7 +5,8 @@ jobs:
     timeoutInMinutes: 180
     variables:
       OS: 'windows'
-      ARCH: 'x86'
+      ARCH: $[ variables['ARCH'] ]
+      QT: $[ variables['QT'] ]
       CCACHE_DIR: $(Pipeline.Workspace)/.ccache
       CMAKE_CXX_COMPILER_LAUNCHER: ccache
       CMAKE_GENERATOR: 'Ninja'
@@ -14,6 +15,13 @@ jobs:
       matrix:
         Qt_5_15_MinGW_32bit:
           IMAGE: librepcb/librepcb-dev:windowsservercore-ltsc2019-qt5.15.2-32bit-5
+          ARCH: 'x86'
+          QT: 5
+          DEPLOY: true
+        Qt6_MinGW_64bit:
+          IMAGE: librepcb/librepcb-dev:windowsservercore-ltsc2019-qt6.6-64bit-1
+          ARCH: 'x86_64'
+          QT: 6
           DEPLOY: true
     container: $[ variables['IMAGE'] ]
     steps:
@@ -36,9 +44,9 @@ jobs:
     - bash: ./ci/build_windows_archive.sh
       displayName: Build Archive
       condition: and(succeeded(), eq(variables['DEPLOY'], 'true'))
-    - bash: ./ci/build_installer.sh
+    - bash: ./ci/build_windows_installer.sh
       displayName: Build Installer
-      condition: and(succeeded(), eq(variables['DEPLOY'], 'true'))
+      condition: and(succeeded(), eq(variables['DEPLOY'], 'true'), eq(variables['ARCH'], 'x86'))
     - script: build\\tests\\unittests\\librepcb-unittests.exe
       displayName: Run LibrePCB Unittests
     - script: pytest -vvv --librepcb-executable="build/install/opt/bin/librepcb-cli.exe" ./tests/cli
