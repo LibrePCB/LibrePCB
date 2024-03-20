@@ -102,6 +102,9 @@ AddComponentDialog::AddComponentDialog(const WorkspaceLibraryDb& db,
   mUi->treeComponents->setItemDelegateForColumn(
       2, new PartInformationDelegate(true, this));
   mUi->treeComponents->setColumnHidden(2, true);
+  mUi->treeComponents->setContextMenuPolicy(Qt::CustomContextMenu);
+  connect(mUi->treeComponents, &QTreeWidget::customContextMenuRequested, this,
+          &AddComponentDialog::customComponentsContextMenuRequested);
   mUi->lblCompDescription->hide();
   mUi->cbxSymbVar->hide();
   connect(mUi->edtSearch, &QLineEdit::textChanged, this,
@@ -162,6 +165,15 @@ AddComponentDialog::AddComponentDialog(const WorkspaceLibraryDb& db,
 
   // Add actions.
   const EditorCommandSet& cmd = EditorCommandSet::instance();
+  mActionCopyMpn.reset(cmd.copyMpnToClipboard.createAction(
+      this, this,
+      [this]() {
+        if (mSelectedPart) {
+          qApp->clipboard()->setText(*mSelectedPart->getMpn());
+        }
+      },
+      EditorCommand::ActionFlag::WidgetShortcut));
+  mUi->treeComponents->addAction(mActionCopyMpn.data());
   addAction(cmd.find.createAction(this, this, [this]() {
     mUi->edtSearch->setFocus(Qt::ShortcutFocusReason);
   }));
@@ -433,6 +445,48 @@ void AddComponentDialog::cbxSymbVar_currentIndexChanged(int index) noexcept {
   } else {
     setSelectedSymbVar(nullptr);
   }
+}
+
+void AddComponentDialog::customComponentsContextMenuRequested(
+    const QPoint& pos) noexcept {
+  Q_UNUSED(pos);
+
+  if ((!mSelectedPart) || (!mActionCopyMpn)) {
+    return;
+  }
+
+  const EditorCommandSet& cmd = EditorCommandSet::instance();
+  auto partInfo = PartInformationProvider::instance().getPartInfo(
+      PartInformationProvider::Part{*mSelectedPart->getMpn(),
+                                    *mSelectedPart->getManufacturer()});
+
+  QMenu menu(this);
+  menu.addAction(mActionCopyMpn.get());
+  if (partInfo && partInfo->productUrl.isValid()) {
+    menu.addAction(
+        cmd.openProductWebsite.createAction(this, this, [this, partInfo]() {
+          DesktopServices ds(mSettings, this);
+          ds.openWebUrl(partInfo->productUrl);
+        }));
+  }
+  if (partInfo && partInfo->pricingUrl.isValid()) {
+    menu.addAction(
+        cmd.openPricingWebsite.createAction(this, this, [this, partInfo]() {
+          DesktopServices ds(mSettings, this);
+          ds.openWebUrl(partInfo->pricingUrl);
+        }));
+  }
+  if (partInfo && (!partInfo->resources.isEmpty())) {
+    QAction* action =
+        new QAction(QIcon(":/img/actions/pdf.png"),
+                    partInfo->resources.first().name + "...", &menu);
+    connect(action, &QAction::triggered, this, [this, partInfo]() {
+      DesktopServices ds(mSettings, this);
+      ds.openWebUrl(partInfo->resources.first().url);
+    });
+    menu.addAction(action);
+  }
+  menu.exec(QCursor::pos());
 }
 
 /*******************************************************************************

@@ -1707,6 +1707,33 @@ public:
       {},
       &categoryContextMenu,
   };
+  EditorCommand copyMpnToClipboard{
+      "copy_mpn_to_clipboard",  // clang-format break
+      QT_TR_NOOP("Copy MPN to Clipboard"),
+      QT_TR_NOOP("Copy this MPN into the clipboard"),
+      ":/img/actions/copy.png",
+      EditorCommand::Flags(),
+      {QKeySequence(Qt::CTRL + Qt::Key_C)},
+      &categoryContextMenu,
+  };
+  EditorCommand openProductWebsite{
+      "open_product_website",  // clang-format break
+      QT_TR_NOOP("Open Product Website"),
+      QT_TR_NOOP("Open product details about this part in the web browser"),
+      ":/img/actions/open_browser.png",
+      EditorCommand::Flag::OpensPopup,
+      {},
+      &categoryContextMenu,
+  };
+  EditorCommand openPricingWebsite{
+      "open_pricing_website",  // clang-format break
+      QT_TR_NOOP("Open Pricing Website"),
+      QT_TR_NOOP("Open pricing details about this part in the web browser"),
+      ":/img/library/part.png",
+      EditorCommand::Flag::OpensPopup,
+      {},
+      &categoryContextMenu,
+  };
   EditorCommand generateContent{
       // Actually not really for the context menu :-/
       "generate_content",  // clang-format break
