@@ -23,6 +23,7 @@
 #include "initializeworkspacewizardcontext.h"
 
 #include <librepcb/core/application.h>
+#include <librepcb/core/network/filedownload.h>
 #include <librepcb/core/utils/toolbox.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
@@ -95,6 +96,7 @@ void InitializeWorkspaceWizardContext::setWorkspacePath(const FilePath& fp) {
 void InitializeWorkspaceWizardContext::initializeEmptyWorkspace() const {
   if (!mWorkspaceExists) {
     Workspace::createNewWorkspace(mWorkspacePath);  // can throw
+    installExampleProjects();
   }
   Workspace ws(mWorkspacePath, mDataDir);  // can throw
   ws.getSettings().applicationLocale.set(mAppLocale);
@@ -102,6 +104,36 @@ void InitializeWorkspaceWizardContext::initializeEmptyWorkspace() const {
   ws.getSettings().libraryNormOrder.set(mLibraryNormOrder);
   ws.getSettings().userName.set(mUserName);
   ws.saveSettings();  // can throw
+}
+
+void InitializeWorkspaceWizardContext::installExampleProjects() const noexcept {
+  const QVector<std::pair<QString, QString>> projects = {
+      // clang-format off
+    {
+      "can2usb",
+      "https://github.com/LibrePCB/librepcb-example-projects/raw/796c06a52ae431a623a822a60c54c3b1384abd7f/can2usb.lppz",
+    },
+    {
+      "d0-reader",
+      "https://github.com/LibrePCB/librepcb-example-projects/raw/796c06a52ae431a623a822a60c54c3b1384abd7f/d0-reader.lppz",
+    },
+      // clang-format on
+  };
+
+  // Start downloads.
+  const FilePath dir = mWorkspacePath.getPathTo("projects/Examples");
+  foreach (const auto& project, projects) {
+    const FilePath dst = dir.getPathTo(project.first);
+    if (!dst.isExistingDir()) {
+      FileDownload* dl =
+          new FileDownload(QUrl(project.second), FilePath::getRandomTempPath());
+      dl->setZipExtractionDirectory(dst);
+      QGuiApplication::setOverrideCursor(Qt::WaitCursor);
+      connect(dl, &FileDownload::finished, qApp,
+              []() { QGuiApplication::restoreOverrideCursor(); });
+      dl->start();
+    }
+  }
 }
 
 /*******************************************************************************

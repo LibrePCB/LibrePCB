@@ -283,6 +283,8 @@ void ControlPanel::createActions() noexcept {
   mActionCloseAllProjects.reset(cmd.projectCloseAll.createAction(
       this, this, [this]() { closeAllProjects(true); },
       EditorCommand::ActionFlag::ApplicationShortcut));
+  mActionAddExampleProjects.reset(cmd.addExampleProjects.createAction(
+      this, this, &ControlPanel::addExampleProjects));
   mActionImportEagleProject.reset(cmd.importEagleProject.createAction(
       this, this, [this]() { newProject(true); }));
   mActionAboutLibrePcb.reset(cmd.aboutLibrePcb.createAction(
@@ -349,6 +351,7 @@ void ControlPanel::createMenus() noexcept {
   mb.addSeparator();
   {
     MenuBuilder smb(mb.addSubMenu(&MenuBuilder::createImportMenu));
+    smb.addAction(mActionAddExampleProjects);
     smb.addAction(mActionImportEagleProject);
   }
   mb.addSeparator();
@@ -441,6 +444,24 @@ void ControlPanel::openLibraryManager() noexcept {
   mLibraryManager->raise();
   mLibraryManager->activateWindow();
   mLibraryManager->updateOnlineLibraryList();
+}
+
+void ControlPanel::addExampleProjects() noexcept {
+  const QString msg =
+      tr("This downloads some example projects from the internet and copies "
+         "them into the workspace to help you evaluating LibrePCB with real "
+         "projects.") %
+      "\n\n" %
+      tr("Once you don't need them anymore, just delete the examples directory "
+         "to get rid of them.");
+  const int ret = QMessageBox::information(
+      this, EditorCommandSet::instance().addExampleProjects.getText(), msg,
+      QMessageBox::Ok | QMessageBox::Cancel);
+  if (ret == QMessageBox::Ok) {
+    InitializeWorkspaceWizardContext ctx(this);
+    ctx.setWorkspacePath(mWorkspace.getPath());
+    ctx.installExampleProjects();
+  }
 }
 
 void ControlPanel::switchWorkspace() noexcept {
