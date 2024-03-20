@@ -297,8 +297,9 @@ Files:
  img/actions/ruler.png
  img/actions/view_3d.png
  img/library/part.png
-Copyright: Icons8
-License: LicenseRef-Icons8
+Copyright: 2024 Federico Ceratto <federico@debian.org>
+License: MIT
+Comments: Based on components from https://icons.getbootstrap.com/ under MIT license
 
 Files: libs/delaunay-triangulation/*
 Copyright: 2015 Simon Zeni
