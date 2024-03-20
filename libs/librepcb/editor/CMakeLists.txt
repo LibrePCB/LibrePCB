@@ -975,20 +975,25 @@ target_link_libraries(
          Optional::Optional
          TypeSafe::TypeSafe
          # Qt
-         Qt5::Core
-         Qt5::Gui
-         Qt5::OpenGL
-         Qt5::PrintSupport
-         Qt5::Svg
-         Qt5::Network
-         Qt5::Widgets
+         ${QT}::Core
+         ${QT}::Gui
+         ${QT}::OpenGL
+         ${QT}::PrintSupport
+         ${QT}::Svg
+         ${QT}::Network
+         ${QT}::Widgets
 )
+if(QT_MAJOR_VERSION GREATER 5)
+  target_link_libraries(librepcb_editor PUBLIC ${QT}::OpenGLWidgets)
+endif()
 if(BUILD_QTQUICK_TEST)
-  target_link_libraries(librepcb_editor PUBLIC Qt5::Quick Qt5::QuickControls2)
+  target_link_libraries(
+    librepcb_editor PUBLIC ${QT}::Quick ${QT}::QuickControls2
+  )
 endif()
 
 # Hoedown is only needed on Qt <5.14
-if(Qt5Core_VERSION_MAJOR EQUAL 5 AND Qt5Core_VERSION_MINOR LESS 14)
+if(Qt_VERSION_MAJOR EQUAL 5 AND Qt_VERSION_MINOR LESS 14)
   target_link_libraries(librepcb_editor PRIVATE Hoedown::Hoedown)
 endif()
 

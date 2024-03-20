@@ -20,7 +20,7 @@ target_link_libraries(
           # Third party
           Optional::Optional
           # Qt
-          Qt5::Core
+          ${QT}::Core
 )
 set_target_properties(librepcb_cli PROPERTIES OUTPUT_NAME librepcb-cli)
 
