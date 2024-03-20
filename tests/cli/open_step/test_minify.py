@@ -17,7 +17,7 @@ def test_valid_file(cli):
     assert stdout == \
         "Open STEP file '{path}'...\n" \
         "Perform minify...\n" \
-        " - Minified from 28,521 bytes to 11,716 bytes (-59%)\n" \
+        " - Minified from 28,521 bytes to 18,336 bytes (-36%)\n" \
         "Load model...\n" \
         "SUCCESS\n".format(path=fp)
     assert code == 0
@@ -47,7 +47,7 @@ def test_on_save_to_output(cli):
     assert stdout == \
         "Open STEP file '{path}'...\n" \
         "Perform minify...\n" \
-        " - Minified from 28,521 bytes to 11,716 bytes (-59%)\n" \
+        " - Minified from 28,521 bytes to 18,336 bytes (-36%)\n" \
         "Save to '{outpath}'...\n" \
         "Load model...\n" \
         "SUCCESS\n".format(path=fp, outpath=fp_out)

@@ -641,7 +641,7 @@ std::unique_ptr<OccModel> OccModel::loadStep(const QByteArray content) {
 
     if (!stepReader.Transfer(doc)) {
       doc->Close();
-      throw RuntimeError(__FILE__, __LINE__);
+      throw RuntimeError(__FILE__, __LINE__, "Failed to transfer STEP model.");
     }
     result.reset(
         new OccModel(std::unique_ptr<Data>(new Data{doc, TDF_Label()})));
@@ -730,8 +730,9 @@ QByteArray OccModel::minifyStep(const QByteArray& content) {
     // identical. When merged, the STEP model won't be rendered anymore
     // and FreeCAD displays a wrong shape object tree. We add a unique
     // number to these entries to ensure they are left untouched.
+    // See also https://github.com/LibrePCB/LibrePCB/issues/1286.
     if (valueStr.contains("PRODUCT_DEFINITION") ||
-        valueStr.contains("SHAPE_REPRESENTATION")) {
+        valueStr.contains("REPRESENTATION")) {
       value.second.append(data.count() + 1);
     } else {
       value.second.append(0);
