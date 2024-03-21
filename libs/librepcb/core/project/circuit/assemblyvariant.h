@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../qtcompat.h"
 #include "../../serialization/serializableobjectlist.h"
 #include "../../types/fileproofname.h"
 #include "../../types/uuid.h"
@@ -92,8 +93,8 @@ private:
  *  Non-Member Functions
  ******************************************************************************/
 
-inline uint qHash(const std::shared_ptr<AssemblyVariant>& key,
-                  uint seed = 0) noexcept {
+inline QtCompat::Hash qHash(const std::shared_ptr<AssemblyVariant>& key,
+                            QtCompat::Hash seed = 0) noexcept {
   return ::qHash(key.get(), seed);
 }
 

@@ -219,7 +219,11 @@ private:  // Data
   bool mIsWritable;
   DirectoryLock mLock;
   bool mRestoredFromAutosave;
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
+  mutable QRecursiveMutex mMutex;
+#else
   mutable QMutex mMutex;
+#endif
 
   // File system modifications
   QHash<QString, QByteArray> mModifiedFiles;

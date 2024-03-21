@@ -389,7 +389,7 @@ void GraphicsOutputJobWidget::removeClicked() noexcept {
     content.removeAt(index);
     mJob->setContent(content);
     updateContentList();
-    mUi->lstContent->setCurrentRow(std::min(index, content.count() - 1));
+    mUi->lstContent->setCurrentRow(std::min(index, int(content.count()) - 1));
     updatePreview();
   }
 }

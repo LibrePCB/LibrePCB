@@ -79,7 +79,7 @@ TEST_F(LibraryTest, testUpgradeV01) {
   // Re-open.
   ASSERT_TRUE(
       FileUtils::readFile(mTmpDir.getPathTo(".librepcb-lib"))
-          .startsWith(Application::getFileFormatVersion().toStr().toUtf8() %
+          .startsWith(Application::getFileFormatVersion().toStr().toUtf8() +
                       "\n"));
   { std::unique_ptr<Library> obj = Library::open(createDir()); }
 }

@@ -226,7 +226,7 @@ void ControlPanel::closeEvent(QCloseEvent* event) {
   QMainWindow::closeEvent(event);
 
   // if the control panel is closed, we will quit the whole application
-  QApplication::quit();
+  QApplication::exit();
 }
 
 bool ControlPanel::eventFilter(QObject* watched, QEvent* event) {

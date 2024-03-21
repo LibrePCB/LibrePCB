@@ -57,7 +57,7 @@ public:
 
   // Constructors / Destructor
   PackageModelListModel() = delete;
-  PackageModelListModel(const PackageModelListModel& other) noexcept;
+  PackageModelListModel(const PackageModelListModel& other) = delete;
   explicit PackageModelListModel(QObject* parent = nullptr) noexcept;
   ~PackageModelListModel() noexcept;
 

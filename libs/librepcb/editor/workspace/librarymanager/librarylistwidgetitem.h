@@ -53,7 +53,7 @@ class LibraryListWidgetItem final : public QWidget {
 
 public:
   // Constructors / Destructor
-  LibraryListWidgetItem() noexcept;
+  LibraryListWidgetItem() = delete;
   LibraryListWidgetItem(const LibraryListWidgetItem& other) = delete;
   LibraryListWidgetItem(Workspace& ws, const FilePath& libDir,
                         const QString& name = "",

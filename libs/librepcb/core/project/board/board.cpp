@@ -165,8 +165,8 @@ std::shared_ptr<SceneData3D> Board::buildScene3D(
   data->setThickness(mPcbThickness);
   data->setSolderResist(mSolderResist);
   data->setSilkscreen(mSilkscreenColor);
-  data->setSilkscreenLayersTop(mSilkscreenLayersTop.toList().toSet());
-  data->setSilkscreenLayersBot(mSilkscreenLayersBot.toList().toSet());
+  data->setSilkscreenLayersTop(Toolbox::toSet(mSilkscreenLayersTop));
+  data->setSilkscreenLayersBot(Toolbox::toSet(mSilkscreenLayersBot));
   foreach (const BI_Device* obj, mDeviceInstances) {
     const Transform transform(*obj);
     if (auto model = obj->getLibModel()) {
@@ -633,7 +633,7 @@ void Board::triggerAirWiresRebuild() noexcept {
           QScopedPointer<BI_AirWire> airWire(
               new BI_AirWire(*this, *netsignal, *points.first, *points.second));
           airWire->addToBoard();  // can throw
-          mAirWires.insertMulti(netsignal, airWire.data());
+          mAirWires.insert(netsignal, airWire.data());
           emit airWireAdded(*airWire.take());
         }
       }

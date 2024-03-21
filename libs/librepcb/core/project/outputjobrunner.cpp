@@ -44,6 +44,7 @@
 #include "../job/netlistoutputjob.h"
 #include "../job/pickplaceoutputjob.h"
 #include "../job/projectjsonoutputjob.h"
+#include "../utils/toolbox.h"
 #include "board/board.h"
 #include "board/boardd356netlistexport.h"
 #include "board/boardfabricationoutputsettings.h"
@@ -262,9 +263,9 @@ void OutputJobRunner::runImpl(const GraphicsOutputJob& job) {
   QSet<Board*> allBoards;
   QSet<std::shared_ptr<AssemblyVariant>> allAssemblyVariants;
   foreach (const GraphicsOutputJob::Content& content, job.getContent()) {
-    allBoards |= getBoards(content.boards, false).toSet();
+    allBoards |= Toolbox::toSet(getBoards(content.boards, false));
     allAssemblyVariants |=
-        getAssemblyVariants(content.assemblyVariants, false).toList().toSet();
+        Toolbox::toSet(getAssemblyVariants(content.assemblyVariants, false));
   }
 
   // Determine output path.

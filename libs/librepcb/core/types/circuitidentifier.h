@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../exceptions.h"
+#include "../qtcompat.h"
 #include "../serialization/sexpression.h"
 #include "../utils/toolbox.h"
 
@@ -163,7 +164,8 @@ inline QDebug operator<<(QDebug stream, const CircuitIdentifier& obj) {
   return stream;
 }
 
-inline uint qHash(const CircuitIdentifier& key, uint seed = 0) noexcept {
+inline QtCompat::Hash qHash(const CircuitIdentifier& key,
+                            QtCompat::Hash seed = 0) noexcept {
   return ::qHash(*key, seed);
 }
 

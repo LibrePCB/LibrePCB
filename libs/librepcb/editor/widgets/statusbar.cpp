@@ -73,7 +73,7 @@ StatusBar::StatusBar(QWidget* parent) noexcept
   addPermanentWidget(mProgressBarPlaceHolder.data());
 
   // init
-  setFields(0);
+  setFields(Fields(0));
   updateAbsoluteCursorPosition();
   setProgressBarPercent(100);
 }

@@ -399,7 +399,8 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
               .arg(qVersion(), QT_VERSION_STR));
     print("OpenCascade " % OccModel::getOccVersionString());
     print(QString("Built at %1")
-              .arg(Application::getBuildDate().toString(Qt::LocalDate)));
+              .arg(QLocale().toString(Application::getBuildDate(),
+                                      QLocale::ShortFormat)));
     return 0;
   }
 
@@ -1425,12 +1426,12 @@ bool CommandLineInterface::failIfFileFormatUnstable() noexcept {
 
 void CommandLineInterface::print(const QString& str) noexcept {
   QTextStream s(stdout);
-  s << str << endl;
+  s << str << '\n';
 }
 
 void CommandLineInterface::printErr(const QString& str) noexcept {
   QTextStream s(stderr);
-  s << str << endl;
+  s << str << '\n';
 }
 
 /*******************************************************************************

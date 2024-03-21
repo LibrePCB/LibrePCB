@@ -54,7 +54,7 @@ public:
 
   // Constructors / Destructor
   PathModel() = delete;
-  PathModel(const PathModel& other) noexcept;
+  PathModel(const PathModel& other) = delete;
   explicit PathModel(QObject* parent = nullptr) noexcept;
   ~PathModel() noexcept;
 

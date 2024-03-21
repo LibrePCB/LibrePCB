@@ -90,8 +90,13 @@ bool BoardPlaneFragmentsBuilder::startAsynchronously(
     Board& board, const QSet<const Layer*>* layers) noexcept {
   if (auto data = createJob(board, layers)) {
     cancel();
+#if (QT_VERSION_MAJOR >= 6)
+    mFuture =
+        QtConcurrent::run(&BoardPlaneFragmentsBuilder::run, this, data, false);
+#else
     mFuture =
         QtConcurrent::run(this, &BoardPlaneFragmentsBuilder::run, data, false);
+#endif
     mWatcher.setFuture(mFuture);
     return true;
   } else {

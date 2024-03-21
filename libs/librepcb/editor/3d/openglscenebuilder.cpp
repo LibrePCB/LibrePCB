@@ -32,6 +32,7 @@
 #include <librepcb/core/types/pcbcolor.h>
 #include <librepcb/core/utils/clipperhelpers.h>
 #include <librepcb/core/utils/scopeguard.h>
+#include <librepcb/core/utils/toolbox.h>
 #include <librepcb_build_env.h>
 
 #include <QtConcurrent>
@@ -72,7 +73,11 @@ OpenGlSceneBuilder::~OpenGlSceneBuilder() noexcept {
 
 void OpenGlSceneBuilder::start(std::shared_ptr<SceneData3D> data) noexcept {
   cancel();
+#if (QT_VERSION_MAJOR >= 6)
+  mFuture = QtConcurrent::run(&OpenGlSceneBuilder::run, this, data);
+#else
   mFuture = QtConcurrent::run(this, &OpenGlSceneBuilder::run, data);
+#endif
 }
 
 bool OpenGlSceneBuilder::isBusy() const noexcept {
@@ -277,7 +282,7 @@ void OpenGlSceneBuilder::run(std::shared_ptr<SceneData3D> data) noexcept {
     }
 
     // Remove all no longer existing devices.
-    foreach (const Uuid& uuid, mDevices.keys().toSet() - deviceUuids) {
+    foreach (const Uuid& uuid, Toolbox::toSet(mDevices.keys()) - deviceUuids) {
       foreach (auto obj, mDevices.take(uuid)) {
         emit objectRemoved(obj);
       }

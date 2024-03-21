@@ -60,6 +60,12 @@ NetworkRequestBase::NetworkRequestBase(const QUrl& url,
   mRequest.setRawHeader("X-LibrePCB-FileFormatVersion",
                         Application::getFileFormatVersion().toStr().toUtf8());
 
+  // In Qt6, redirect implementation has changed.
+#if QT_VERSION_MAJOR >= 6
+  mRequest.setAttribute(QNetworkRequest::RedirectPolicyAttribute,
+                        QNetworkRequest::ManualRedirectPolicy);
+#endif
+
   // create queued connection to let executeRequest() execute in download thread
   connect(this, &NetworkRequestBase::startRequested, this,
           &NetworkRequestBase::executeRequest, Qt::QueuedConnection);
@@ -173,10 +179,15 @@ void NetworkRequestBase::executeRequest() noexcept {
   }
   connect(mReply.data(), &QNetworkReply::readyRead, this,
           &NetworkRequestBase::replyReadyReadSlot);
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
+  connect(mReply.data(), &QNetworkReply::errorOccurred, this,
+          &NetworkRequestBase::replyErrorSlot);
+#else
   connect(mReply.data(),
           static_cast<void (QNetworkReply::*)(QNetworkReply::NetworkError)>(
               &QNetworkReply::error),
           this, &NetworkRequestBase::replyErrorSlot);
+#endif
   connect(mReply.data(), &QNetworkReply::sslErrors, this,
           &NetworkRequestBase::replySslErrorsSlot);
   connect(mReply.data(), &QNetworkReply::finished, this,

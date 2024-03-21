@@ -183,9 +183,7 @@ public:
    *          and without duplicates. Empty if no elements were found.
    */
   template <typename ElementType>
-  QList<Uuid> find(const QString& keyword) const {
-    return find(getTable<ElementType>(), keyword);
-  }
+  QList<Uuid> find(const QString& keyword) const;
 
   /**
    * @brief Find parts by keyword

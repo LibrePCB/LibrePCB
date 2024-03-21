@@ -59,7 +59,7 @@ protected:
 
   FilePath getTestProcessExePath() const noexcept {
     FilePath generatedDir(qApp->applicationDirPath());
-#if defined(Q_OS_UNIX) || defined(Q_OS_OSX)  // UNIX/Linux or macOS
+#if defined(Q_OS_UNIX) || defined(Q_OS_MACOS)  // UNIX/Linux or macOS
     return generatedDir.getPathTo("dummy-binary");
 #elif defined(Q_OS_WIN32) || defined(Q_OS_WIN64)  // Windows
     return generatedDir.getPathTo("dummy-binary.exe");

@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../qtcompat.h"
 #include "../serialization/serializableobjectlist.h"
 #include "../types/length.h"
 
@@ -175,7 +176,8 @@ using NetLineList =
  *  Non-Member Functions
  ******************************************************************************/
 
-inline uint qHash(const NetLineAnchor& key, uint seed) noexcept {
+inline QtCompat::Hash qHash(const NetLineAnchor& key,
+                            QtCompat::Hash seed = 0) noexcept {
   QString s;
   if (tl::optional<Uuid> anchor = key.tryGetJunction()) {
     s += anchor->toStr();

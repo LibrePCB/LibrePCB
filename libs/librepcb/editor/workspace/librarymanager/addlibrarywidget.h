@@ -58,7 +58,7 @@ class AddLibraryWidget final : public QWidget {
 
 public:
   // Constructors / Destructor
-  AddLibraryWidget() noexcept;
+  AddLibraryWidget() = delete;
   AddLibraryWidget(const AddLibraryWidget& other) = delete;
   explicit AddLibraryWidget(Workspace& ws) noexcept;
   ~AddLibraryWidget() noexcept;

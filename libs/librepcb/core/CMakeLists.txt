@@ -417,6 +417,7 @@ add_library(
   project/schematic/schematicnetsegmentsplitter.h
   project/schematic/schematicpainter.cpp
   project/schematic/schematicpainter.h
+  qtcompat.h
   rulecheck/rulecheckmessage.cpp
   rulecheck/rulecheckmessage.h
   serialization/fileformatmigration.cpp

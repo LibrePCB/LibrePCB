@@ -47,7 +47,12 @@ TransactionalFileSystem::TransactionalFileSystem(
     mIsWritable(writable),
     mLock(filepath),
     mRestoredFromAutosave(false),
-    mMutex(QMutex::Recursive) {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
+    mMutex()
+#else
+    mMutex(QMutex::Recursive)
+#endif
+{
   // Load the backup if there is one (i.e. last save operation has failed).
   FilePath backupFile = mFilePath.getPathTo(".backup/backup.lp");
   if (backupFile.isExistingFile()) {
@@ -414,7 +419,7 @@ void TransactionalFileSystem::releaseLock() {
 QString TransactionalFileSystem::cleanPath(QString path) noexcept {
   return path.trimmed()
       .replace('\\', '/')
-      .split('/', QString::SkipEmptyParts)
+      .split('/', QtCompat::skipEmptyParts())
       .join('/')
       .trimmed();
 }

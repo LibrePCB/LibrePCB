@@ -81,7 +81,7 @@ TEST_F(PackageCategoryTest, testUpgradeV01) {
   // Re-open.
   ASSERT_TRUE(
       FileUtils::readFile(mTmpDir.getPathTo(".librepcb-pkgcat"))
-          .startsWith(Application::getFileFormatVersion().toStr().toUtf8() %
+          .startsWith(Application::getFileFormatVersion().toStr().toUtf8() +
                       "\n"));
   { std::unique_ptr<PackageCategory> obj = PackageCategory::open(createDir()); }
 }

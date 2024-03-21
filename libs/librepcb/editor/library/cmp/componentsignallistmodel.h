@@ -57,7 +57,7 @@ public:
 
   // Constructors / Destructor
   ComponentSignalListModel() = delete;
-  ComponentSignalListModel(const ComponentSignalListModel& other) noexcept;
+  ComponentSignalListModel(const ComponentSignalListModel& other) = delete;
   explicit ComponentSignalListModel(QObject* parent = nullptr) noexcept;
   ~ComponentSignalListModel() noexcept;
 

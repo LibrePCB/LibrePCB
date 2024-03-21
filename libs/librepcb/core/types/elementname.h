@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../exceptions.h"
+#include "../qtcompat.h"
 #include "../serialization/sexpression.h"
 #include "../utils/toolbox.h"
 
@@ -138,7 +139,8 @@ inline QDebug operator<<(QDebug stream, const ElementName& obj) {
   return stream;
 }
 
-inline uint qHash(const ElementName& key, uint seed = 0) noexcept {
+inline QtCompat::Hash qHash(const ElementName& key,
+                            QtCompat::Hash seed = 0) noexcept {
   return ::qHash(*key, seed);
 }
 

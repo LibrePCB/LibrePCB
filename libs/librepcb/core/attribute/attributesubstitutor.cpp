@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "attributesubstitutor.h"
 
+#include "../qtcompat.h"
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -91,7 +93,7 @@ bool AttributeSubstitutor::searchVariablesInText(const QString& text,
   QRegularExpressionMatch match = re.match(text, startPos);
   if (match.hasMatch() && match.capturedLength() > 0) {
     pos = match.capturedStart();
-    if (text.midRef(pos).startsWith("{{ '}}' }}")) {
+    if (QtCompat::midRef(text, pos).startsWith(QLatin1String("{{ '}}' }}"))) {
       // special case to escape '}}' as it doesn't work with the regex above
       length = 10;
       keys = QStringList{"'}}'"};

@@ -26,6 +26,7 @@
 #include <gtest/gtest.h>
 #include <librepcb/core/types/layer.h>
 #include <librepcb/core/types/lengthunit.h>
+#include <librepcb/core/utils/toolbox.h>
 #include <librepcb/editor/dialogs/dxfimportdialog.h>
 #include <librepcb/editor/widgets/doublespinbox.h>
 #include <librepcb/editor/widgets/lengthedit.h>
@@ -68,8 +69,8 @@ TEST_F(DxfImportDialogTest, testLayerName) {
   const int newIndex = 2;
 
   {
-    DxfImportDialog dialog(mLayers.toSet(), *mLayers[defaultIndex], true,
-                           LengthUnit::millimeters(), "test");
+    DxfImportDialog dialog(Toolbox::toSet(mLayers), *mLayers[defaultIndex],
+                           true, LengthUnit::millimeters(), "test");
 
     // Check if the layer combobox contains all layers.
     QComboBox& cbx =
@@ -97,8 +98,8 @@ TEST_F(DxfImportDialogTest, testLayerName) {
 
   // Check if the setting is saved and restored automatically.
   {
-    DxfImportDialog dialog(mLayers.toSet(), *mLayers[defaultIndex], true,
-                           LengthUnit::millimeters(), "test");
+    DxfImportDialog dialog(Toolbox::toSet(mLayers), *mLayers[defaultIndex],
+                           true, LengthUnit::millimeters(), "test");
     QComboBox& cbx =
         TestHelpers::getChild<QComboBox>(dialog, "cbxLayer/QComboBox");
     EXPECT_EQ(newIndex, cbx.currentIndex());
@@ -114,7 +115,7 @@ TEST_F(DxfImportDialogTest, testCirclesAsDrills) {
   const bool newValue = true;
 
   {
-    DxfImportDialog dialog(mLayers.toSet(), *mLayers[0], true,
+    DxfImportDialog dialog(Toolbox::toSet(mLayers), *mLayers[0], true,
                            LengthUnit::millimeters(), "test");
 
     // Check the default value.
@@ -130,7 +131,7 @@ TEST_F(DxfImportDialogTest, testCirclesAsDrills) {
 
   // Check if the setting is saved and restored automatically.
   {
-    DxfImportDialog dialog(mLayers.toSet(), *mLayers[0], true,
+    DxfImportDialog dialog(Toolbox::toSet(mLayers), *mLayers[0], true,
                            LengthUnit::millimeters(), "test");
     QCheckBox& cbx =
         TestHelpers::getChild<QCheckBox>(dialog, "cbxCirclesAsDrills");
@@ -144,7 +145,7 @@ TEST_F(DxfImportDialogTest, testJoinTangentPolylines) {
   const bool newValue = false;
 
   {
-    DxfImportDialog dialog(mLayers.toSet(), *mLayers[0], true,
+    DxfImportDialog dialog(Toolbox::toSet(mLayers), *mLayers[0], true,
                            LengthUnit::millimeters(), "test");
 
     // Check the default value.
@@ -160,7 +161,7 @@ TEST_F(DxfImportDialogTest, testJoinTangentPolylines) {
 
   // Check if the setting is saved and restored automatically.
   {
-    DxfImportDialog dialog(mLayers.toSet(), *mLayers[0], true,
+    DxfImportDialog dialog(Toolbox::toSet(mLayers), *mLayers[0], true,
                            LengthUnit::millimeters(), "test");
     QCheckBox& cbx =
         TestHelpers::getChild<QCheckBox>(dialog, "cbxJoinTangentPolylines");
@@ -174,7 +175,7 @@ TEST_F(DxfImportDialogTest, testLineWidth) {
   const UnsignedLength newValue(1230000);
 
   {
-    DxfImportDialog dialog(mLayers.toSet(), *mLayers[0], true,
+    DxfImportDialog dialog(Toolbox::toSet(mLayers), *mLayers[0], true,
                            LengthUnit::millimeters(), "test");
 
     // Check the default value.
@@ -190,7 +191,7 @@ TEST_F(DxfImportDialogTest, testLineWidth) {
 
   // Check if the setting is saved and restored automatically.
   {
-    DxfImportDialog dialog(mLayers.toSet(), *mLayers[0], true,
+    DxfImportDialog dialog(Toolbox::toSet(mLayers), *mLayers[0], true,
                            LengthUnit::millimeters(), "test");
     UnsignedLengthEdit& edt =
         TestHelpers::getChild<UnsignedLengthEdit>(dialog, "edtLineWidth");
@@ -204,7 +205,7 @@ TEST_F(DxfImportDialogTest, testScaleFactor) {
   const qreal newValue = 0.5;
 
   {
-    DxfImportDialog dialog(mLayers.toSet(), *mLayers[0], true,
+    DxfImportDialog dialog(Toolbox::toSet(mLayers), *mLayers[0], true,
                            LengthUnit::millimeters(), "test");
 
     // Check the default value.
@@ -220,7 +221,7 @@ TEST_F(DxfImportDialogTest, testScaleFactor) {
 
   // Check if the setting is saved and restored automatically.
   {
-    DxfImportDialog dialog(mLayers.toSet(), *mLayers[0], true,
+    DxfImportDialog dialog(Toolbox::toSet(mLayers), *mLayers[0], true,
                            LengthUnit::millimeters(), "test");
     DoubleSpinBox& spbx =
         TestHelpers::getChild<DoubleSpinBox>(dialog, "spbxScaleFactor");
@@ -234,7 +235,7 @@ TEST_F(DxfImportDialogTest, testPlacementPosition) {
   const tl::optional<Point> newValue = Point(1000000, 2000000);
 
   {
-    DxfImportDialog dialog(mLayers.toSet(), *mLayers[0], true,
+    DxfImportDialog dialog(Toolbox::toSet(mLayers), *mLayers[0], true,
                            LengthUnit::millimeters(), "test");
 
     // Check the default value.
@@ -258,7 +259,7 @@ TEST_F(DxfImportDialogTest, testPlacementPosition) {
 
   // Check if the setting is saved and restored automatically.
   {
-    DxfImportDialog dialog(mLayers.toSet(), *mLayers[0], true,
+    DxfImportDialog dialog(Toolbox::toSet(mLayers), *mLayers[0], true,
                            LengthUnit::millimeters(), "test");
     QCheckBox& cbxInteractive =
         TestHelpers::getChild<QCheckBox>(dialog, "cbxInteractivePlacement");
@@ -275,7 +276,7 @@ TEST_F(DxfImportDialogTest, testPlacementPosition) {
 
 TEST_F(DxfImportDialogTest, testHolesSupport) {
   for (bool enable : {true, false}) {
-    DxfImportDialog dialog(mLayers.toSet(), *mLayers[0], enable,
+    DxfImportDialog dialog(Toolbox::toSet(mLayers), *mLayers[0], enable,
                            LengthUnit::millimeters(), "test");
     QCheckBox& cbx =
         TestHelpers::getChild<QCheckBox>(dialog, "cbxCirclesAsDrills");
@@ -284,7 +285,7 @@ TEST_F(DxfImportDialogTest, testHolesSupport) {
 }
 
 TEST_F(DxfImportDialogTest, testTabOrder) {
-  DxfImportDialog dialog(mLayers.toSet(), *mLayers[0], true,
+  DxfImportDialog dialog(Toolbox::toSet(mLayers), *mLayers[0], true,
                          LengthUnit::millimeters(), "test");
   TestHelpers::testTabOrder(dialog);
 }

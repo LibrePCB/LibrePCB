@@ -31,6 +31,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -98,9 +100,9 @@ private:
 
 private:  // Data
   FilePath mFilePath;
-  QFuture<fontobene::Font> mFuture;
-  QFutureWatcher<fontobene::Font> mWatcher;
-  mutable QScopedPointer<fontobene::Font> mFont;
+  QFuture<std::shared_ptr<fontobene::Font>> mFuture;
+  QFutureWatcher<std::shared_ptr<fontobene::Font>> mWatcher;
+  mutable std::shared_ptr<fontobene::Font> mFont;
   mutable QScopedPointer<fontobene::GlyphListCache> mGlyphListCache;
   mutable QScopedPointer<fontobene::GlyphListAccessor> mGlyphListAccessor;
 };

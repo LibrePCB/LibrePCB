@@ -87,7 +87,7 @@ public:
       QT_TR_NOOP("Add a new item"),
       ":/img/actions/new.png",
       EditorCommand::Flag::OpensPopup,
-      {QKeySequence(Qt::CTRL + Qt::Key_N)},
+      {QKeySequence(Qt::CTRL | Qt::Key_N)},
       &categoryEditor,
   };
   EditorCommand itemOpen{
@@ -105,7 +105,7 @@ public:
       QT_TR_NOOP("Save changes to filesystem"),
       ":/img/actions/save.png",
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL + Qt::Key_S)},
+      {QKeySequence(Qt::CTRL | Qt::Key_S)},
       &categoryEditor,
   };
   EditorCommand saveAll{
@@ -114,7 +114,7 @@ public:
       QT_TR_NOOP("Save all elements to filesystem"),
       QString(),
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_S)},
+      {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_S)},
       &categoryEditor,
   };
   EditorCommand selectAll{
@@ -123,7 +123,7 @@ public:
       QT_TR_NOOP("Select all visible objects"),
       ":/img/actions/select_all.png",
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL + Qt::Key_A)},
+      {QKeySequence(Qt::CTRL | Qt::Key_A)},
       &categoryEditor,
   };
   EditorCommand find{
@@ -132,7 +132,7 @@ public:
       QT_TR_NOOP("Find or filter objects"),
       ":/img/actions/search.png",
       EditorCommand::Flag::OpensPopup,
-      {QKeySequence(Qt::CTRL + Qt::Key_F)},
+      {QKeySequence(Qt::CTRL | Qt::Key_F)},
       &categoryEditor,
   };
   EditorCommand findNext{
@@ -150,7 +150,7 @@ public:
       QT_TR_NOOP("Go to the previous found object"),
       QString(),
       EditorCommand::Flags(),
-      {QKeySequence(Qt::SHIFT + Qt::Key_F3)},
+      {QKeySequence(Qt::SHIFT | Qt::Key_F3)},
       &categoryEditor,
   };
   EditorCommand fileManager{
@@ -168,7 +168,7 @@ public:
       QT_TR_NOOP("Bring the control panel window to front"),
       ":/img/actions/home.png",
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_Home)},
+      {QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_Home)},
       &categoryEditor,
   };
   EditorCommand workspaceSwitch{
@@ -186,7 +186,7 @@ public:
       QT_TR_NOOP("Open the workspace settings dialog"),
       ":/img/actions/settings.png",
       EditorCommand::Flag::OpensPopup | EditorCommand::Flag::PreferencesRole,
-      {QKeySequence(Qt::CTRL + Qt::Key_Comma)},
+      {QKeySequence(Qt::CTRL | Qt::Key_Comma)},
       &categoryEditor,
   };
   EditorCommand workspaceLibrariesRescan{
@@ -204,7 +204,7 @@ public:
       QT_TR_NOOP("Open the library manager window"),
       ":/img/library/package.png",
       EditorCommand::Flag::OpensPopup,
-      {QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_M)},
+      {QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_M)},
       &categoryEditor,
   };
   EditorCommand libraryElementNew{
@@ -213,7 +213,7 @@ public:
       QT_TR_NOOP("Create a new library element"),
       ":/img/actions/new.png",
       EditorCommand::Flag::OpensPopup,
-      {QKeySequence(Qt::CTRL + Qt::Key_N)},
+      {QKeySequence(Qt::CTRL | Qt::Key_N)},
       &categoryEditor,
   };
   EditorCommand libraryElementDuplicate{
@@ -222,7 +222,7 @@ public:
       QT_TR_NOOP("Create a new element by duplicating this one"),
       ":/img/actions/clone.png",
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL + Qt::Key_D)},
+      {QKeySequence(Qt::CTRL | Qt::Key_D)},
       &categoryEditor,
   };
   EditorCommand projectNew{
@@ -231,7 +231,7 @@ public:
       QT_TR_NOOP("Create a new project"),
       ":/img/actions/new.png",
       EditorCommand::Flag::OpensPopup,
-      {QKeySequence(Qt::CTRL + Qt::Key_N)},
+      {QKeySequence(Qt::CTRL | Qt::Key_N)},
       &categoryEditor,
   };
   EditorCommand projectOpen{
@@ -240,7 +240,7 @@ public:
       QT_TR_NOOP("Open an existing project"),
       ":/img/actions/open.png",
       EditorCommand::Flag::OpensPopup,
-      {QKeySequence(Qt::CTRL + Qt::Key_O)},
+      {QKeySequence(Qt::CTRL | Qt::Key_O)},
       &categoryEditor,
   };
   EditorCommand projectSave{
@@ -249,7 +249,7 @@ public:
       QT_TR_NOOP("Save the currently opened project"),
       ":/img/actions/save.png",
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL + Qt::Key_S)},
+      {QKeySequence(Qt::CTRL | Qt::Key_S)},
       &categoryEditor,
   };
   EditorCommand projectSetup{
@@ -285,7 +285,7 @@ public:
       QT_TR_NOOP("Run only the most important copper checks from the DRC"),
       ":/img/actions/quick_check.png",
       EditorCommand::Flags(),
-      {QKeySequence(Qt::SHIFT + Qt::Key_F8)},
+      {QKeySequence(Qt::SHIFT | Qt::Key_F8)},
       &categoryEditor,
   };
   EditorCommand runDesignRuleCheck{
@@ -304,7 +304,7 @@ public:
           "Update the project's library elements from workspace libraries"),
       ":/img/actions/refresh.png",
       EditorCommand::Flag::OpensPopup,
-      {QKeySequence(Qt::CTRL + Qt::Key_F5)},
+      {QKeySequence(Qt::CTRL | Qt::Key_F5)},
       &categoryEditor,
   };
   EditorCommand schematicEditor{
@@ -313,7 +313,7 @@ public:
       QT_TR_NOOP("Bring the schematic editor window to front"),
       ":/img/actions/schematic.png",
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_S)},
+      {QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_S)},
       &categoryEditor,
   };
   EditorCommand sheetNew{
@@ -322,7 +322,7 @@ public:
       QT_TR_NOOP("Add a new schematic sheet to the project"),
       ":/img/actions/new.png",
       EditorCommand::Flag::OpensPopup,
-      {QKeySequence(Qt::CTRL + Qt::Key_N)},
+      {QKeySequence(Qt::CTRL | Qt::Key_N)},
       &categoryEditor,
   };
   EditorCommand sheetRename{
@@ -331,7 +331,7 @@ public:
       QT_TR_NOOP("Rename the current schematic sheet"),
       QString(),
       EditorCommand::Flag::OpensPopup,
-      {QKeySequence(Qt::CTRL + Qt::Key_F2)},
+      {QKeySequence(Qt::CTRL | Qt::Key_F2)},
       &categoryEditor,
   };
   EditorCommand sheetRemove{
@@ -340,7 +340,7 @@ public:
       QT_TR_NOOP("Remove the current schematic sheet from the project"),
       ":/img/actions/delete.png",
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL + Qt::Key_Delete)},
+      {QKeySequence(Qt::CTRL | Qt::Key_Delete)},
       &categoryEditor,
   };
   EditorCommand boardEditor{
@@ -349,7 +349,7 @@ public:
       QT_TR_NOOP("Bring the board editor window to front"),
       ":/img/actions/board_editor.png",
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_B)},
+      {QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_B)},
       &categoryEditor,
   };
   EditorCommand boardNew{
@@ -358,7 +358,7 @@ public:
       QT_TR_NOOP("Add a new board to the project"),
       ":/img/actions/new.png",
       EditorCommand::Flag::OpensPopup,
-      {QKeySequence(Qt::CTRL + Qt::Key_N)},
+      {QKeySequence(Qt::CTRL | Qt::Key_N)},
       &categoryEditor,
   };
   EditorCommand boardCopy{
@@ -367,7 +367,7 @@ public:
       QT_TR_NOOP("Add a copy of the current board to the project"),
       ":/img/actions/copy.png",
       EditorCommand::Flag::OpensPopup,
-      {QKeySequence(Qt::CTRL + Qt::Key_D)},
+      {QKeySequence(Qt::CTRL | Qt::Key_D)},
       &categoryEditor,
   };
   EditorCommand boardRemove{
@@ -376,7 +376,7 @@ public:
       QT_TR_NOOP("Remove the current board from the project"),
       ":/img/actions/delete.png",
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL + Qt::Key_Delete)},
+      {QKeySequence(Qt::CTRL | Qt::Key_Delete)},
       &categoryEditor,
   };
   EditorCommand planeShowAll{
@@ -403,7 +403,7 @@ public:
       QT_TR_NOOP("Re-calculate the filled areas of all planes"),
       ":/img/actions/rebuild_plane.png",
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_R)},
+      {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_R)},
       &categoryEditor,
   };
 
@@ -415,7 +415,7 @@ public:
       QT_TR_NOOP("Open file or directory browser"),
       ":/img/actions/open.png",
       EditorCommand::Flag::OpensPopup,
-      {QKeySequence(Qt::CTRL + Qt::Key_B)},
+      {QKeySequence(Qt::CTRL | Qt::Key_B)},
       &categoryTextInput,
   };
   EditorCommand inputUnitChange{
@@ -424,7 +424,7 @@ public:
       QT_TR_NOOP("Change the measurement unit of the text input"),
       ":/img/actions/ruler.png",
       EditorCommand::Flag::OpensPopup,
-      {QKeySequence(Qt::CTRL + Qt::Key_M)},
+      {QKeySequence(Qt::CTRL | Qt::Key_M)},
       &categoryTextInput,
   };
   EditorCommand inputRemove{
@@ -433,7 +433,7 @@ public:
       QT_TR_NOOP("Remove this item"),
       ":/img/actions/delete.png",
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL + Qt::Key_Delete)},
+      {QKeySequence(Qt::CTRL | Qt::Key_Delete)},
       &categoryTextInput,
   };
   EditorCommand inputAcceptAdd{
@@ -499,7 +499,7 @@ public:
       QT_TR_NOOP("Export graphics as a pixmap"),
       ":/img/actions/export_pixmap.png",
       EditorCommand::Flag::OpensPopup,
-      {QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_I)},
+      {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_I)},
       &categoryImportExport,
   };
   EditorCommand exportPdf{
@@ -508,7 +508,7 @@ public:
       QT_TR_NOOP("Export graphics as a PDF"),
       ":/img/actions/pdf.png",
       EditorCommand::Flag::OpensPopup,
-      {QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_P)},
+      {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_P)},
       &categoryImportExport,
   };
   EditorCommand exportStep{
@@ -517,7 +517,7 @@ public:
       QT_TR_NOOP("Export PCB as a STEP file for loading it into MCAD software"),
       ":/img/actions/export_step.png",
       EditorCommand::Flag::OpensPopup,
-      {QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_T)},
+      {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_T)},
       &categoryImportExport,
   };
   EditorCommand print{
@@ -526,7 +526,7 @@ public:
       QT_TR_NOOP("Send graphics to a printer"),
       ":/img/actions/print.png",
       EditorCommand::Flag::OpensPopup,
-      {QKeySequence(Qt::CTRL + Qt::Key_P)},
+      {QKeySequence(Qt::CTRL | Qt::Key_P)},
       &categoryImportExport,
   };
   EditorCommand generateBom{
@@ -592,7 +592,7 @@ public:
       QT_TR_NOOP("Revert the last modification"),
       ":/img/actions/undo.png",
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL + Qt::Key_Z)},
+      {QKeySequence(Qt::CTRL | Qt::Key_Z)},
       &categoryModify,
   };
   EditorCommand redo{
@@ -601,8 +601,8 @@ public:
       QT_TR_NOOP("Re-apply the last reverted modification"),
       ":/img/actions/redo.png",
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL + Qt::Key_Y),
-       QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_Z)},
+      {QKeySequence(Qt::CTRL | Qt::Key_Y),
+       QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_Z)},
       &categoryModify,
   };
   EditorCommand clipboardCut{
@@ -611,7 +611,7 @@ public:
       QT_TR_NOOP("Cut the selected object(s) to clipboard"),
       ":/img/actions/cut.png",
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL + Qt::Key_X)},
+      {QKeySequence(Qt::CTRL | Qt::Key_X)},
       &categoryModify,
   };
   EditorCommand clipboardCopy{
@@ -620,7 +620,7 @@ public:
       QT_TR_NOOP("Copy the selected object(s) to clipboard"),
       ":/img/actions/copy.png",
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL + Qt::Key_C)},
+      {QKeySequence(Qt::CTRL | Qt::Key_C)},
       &categoryModify,
   };
   EditorCommand clipboardPaste{
@@ -629,7 +629,7 @@ public:
       QT_TR_NOOP("Paste object(s) from the clipboard"),
       ":/img/actions/paste.png",
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL + Qt::Key_V)},
+      {QKeySequence(Qt::CTRL | Qt::Key_V)},
       &categoryModify,
   };
   EditorCommand moveLeft{
@@ -683,7 +683,7 @@ public:
       QT_TR_NOOP("Rotate the selected object(s) clockwise"),
       ":/img/actions/rotate_right.png",
       EditorCommand::Flags(),
-      {QKeySequence(Qt::SHIFT + Qt::Key_R)},
+      {QKeySequence(Qt::SHIFT | Qt::Key_R)},
       &categoryModify,
   };
   EditorCommand mirrorHorizontal{
@@ -701,7 +701,7 @@ public:
       QT_TR_NOOP("Mirror the selected object(s) vertically"),
       ":/img/actions/mirror_vertical.png",
       EditorCommand::Flags(),
-      {QKeySequence(Qt::SHIFT + Qt::Key_M)},
+      {QKeySequence(Qt::SHIFT | Qt::Key_M)},
       &categoryModify,
   };
   EditorCommand flipHorizontal{
@@ -721,7 +721,7 @@ public:
           "Flip the selected object(s) vertically to the other board side"),
       ":/img/actions/flip_vertical.png",
       EditorCommand::Flags(),
-      {QKeySequence(Qt::SHIFT + Qt::Key_F)},
+      {QKeySequence(Qt::SHIFT | Qt::Key_F)},
       &categoryModify,
   };
   EditorCommand snapToGrid{
@@ -739,7 +739,7 @@ public:
       QT_TR_NOOP("Lock the placement of the selected object(s)"),
       ":/img/status/locked.png",
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL + Qt::Key_L)},
+      {QKeySequence(Qt::CTRL | Qt::Key_L)},
       &categoryModify,
   };
   EditorCommand unlock{
@@ -748,7 +748,7 @@ public:
       QT_TR_NOOP("Unlock the placement of the selected object(s)"),
       ":/img/status/unlocked.png",
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL + Qt::Key_U)},
+      {QKeySequence(Qt::CTRL | Qt::Key_U)},
       &categoryModify,
   };
   EditorCommand setLineWidth{
@@ -806,7 +806,7 @@ public:
       QT_TR_NOOP("Set the zoom level to fit the whole content"),
       ":/img/actions/zoom_all.png",
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL + Qt::Key_Home)},
+      {QKeySequence(Qt::CTRL | Qt::Key_Home)},
       &categoryView,
   };
   EditorCommand zoomIn{
@@ -815,7 +815,7 @@ public:
       QT_TR_NOOP("Increase the zoom level"),
       ":/img/actions/zoom_in.png",
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL + Qt::Key_Plus)},
+      {QKeySequence(Qt::CTRL | Qt::Key_Plus)},
       &categoryView,
   };
   EditorCommand zoomOut{
@@ -824,7 +824,7 @@ public:
       QT_TR_NOOP("Decrease the zoom level"),
       ":/img/actions/zoom_out.png",
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL + Qt::Key_Minus)},
+      {QKeySequence(Qt::CTRL | Qt::Key_Minus)},
       &categoryView,
   };
   EditorCommand gridIncrease{
@@ -833,7 +833,7 @@ public:
       QT_TR_NOOP("Increase the grid interval"),
       QString(),
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_Plus)},
+      {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_Plus)},
       &categoryView,
   };
   EditorCommand gridDecrease{
@@ -842,7 +842,7 @@ public:
       QT_TR_NOOP("Decrease the grid interval"),
       QString(),
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_Minus)},
+      {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_Minus)},
       &categoryView,
   };
   EditorCommand showPinNumbers{
@@ -860,7 +860,7 @@ public:
       QT_TR_NOOP("Allow dragging locked items"),
       ":/img/status/unlocked.png",
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_L)},
+      {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_L)},
       &categoryView,
   };
   EditorCommand toggle3d{
@@ -869,7 +869,7 @@ public:
       QT_TR_NOOP("Switch between 2D and 3D viewer mode"),
       ":/img/actions/view_3d.png",
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL + Qt::Key_3)},
+      {QKeySequence(Qt::CTRL | Qt::Key_3)},
       &categoryView,
   };
 
@@ -926,7 +926,7 @@ public:
       QT_TR_NOOP("Draw graphical arcs"),
       ":/img/actions/draw_arc.png",
       EditorCommand::Flags(),
-      {QKeySequence(Qt::SHIFT + Qt::Key_C)},
+      {QKeySequence(Qt::SHIFT | Qt::Key_C)},
       &categoryTools,
   };
   EditorCommand toolText{
@@ -1134,7 +1134,7 @@ public:
       QT_TR_NOOP("Measure the distance between two points"),
       ":/img/actions/ruler.png",
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL + Qt::Key_M)},
+      {QKeySequence(Qt::CTRL | Qt::Key_M)},
       &categoryTools,
   };
 
@@ -1460,7 +1460,7 @@ public:
       QT_TR_NOOP("Go to the pages dock"),
       QString(),
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_G)},
+      {QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_G)},
       &categoryDocks,
   };
   EditorCommand dockErc{
@@ -1469,7 +1469,7 @@ public:
       QT_TR_NOOP("Go to the ERC messages dock"),
       QString(),
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_E)},
+      {QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_E)},
       &categoryDocks,
   };
   EditorCommand dockDrc{
@@ -1478,7 +1478,7 @@ public:
       QT_TR_NOOP("Go to the DRC messages dock"),
       QString(),
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_D)},
+      {QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_D)},
       &categoryDocks,
   };
   EditorCommand dockLayers{
@@ -1487,7 +1487,7 @@ public:
       QT_TR_NOOP("Go to the layers dock"),
       QString(),
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_L)},
+      {QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_L)},
       &categoryDocks,
   };
   EditorCommand dockPlaceDevices{
@@ -1496,7 +1496,7 @@ public:
       QT_TR_NOOP("Go to the dock for placing devices"),
       QString(),
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_P)},
+      {QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_P)},
       &categoryDocks,
   };
 
@@ -1509,7 +1509,7 @@ public:
       QT_TR_NOOP("Navigate to the next tab or page"),
       QString(),
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL + Qt::Key_Tab)},
+      {QKeySequence(Qt::CTRL | Qt::Key_Tab)},
       &categoryWindowManagement,
   };
   EditorCommand pagePrevious{
@@ -1518,7 +1518,7 @@ public:
       QT_TR_NOOP("Navigate to the previous tab or page"),
       QString(),
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_Tab)},
+      {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_Tab)},
       &categoryWindowManagement,
   };
   EditorCommand tabClose{
@@ -1527,7 +1527,7 @@ public:
       QT_TR_NOOP("Close the currently opened tab"),
       QString(),
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL + Qt::Key_W)},
+      {QKeySequence(Qt::CTRL | Qt::Key_W)},
       &categoryWindowManagement,
   };
   EditorCommand tabCloseAll{
@@ -1536,7 +1536,7 @@ public:
       QT_TR_NOOP("Close all currently opened tabs"),
       QString(),
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_W)},
+      {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_W)},
       &categoryWindowManagement,
   };
   EditorCommand windowClose{
@@ -1545,7 +1545,7 @@ public:
       QT_TR_NOOP("Close this window"),
       QString(),
       EditorCommand::Flags(),
-      {QKeySequence(Qt::ALT + Qt::Key_F4)},
+      {QKeySequence(Qt::ALT | Qt::Key_F4)},
       &categoryWindowManagement,
   };
   EditorCommand projectClose{
@@ -1554,7 +1554,7 @@ public:
       QT_TR_NOOP("Close the currently opened project"),
       ":/img/actions/close.png",
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL + Qt::Key_F4)},
+      {QKeySequence(Qt::CTRL | Qt::Key_F4)},
       &categoryWindowManagement,
   };
   EditorCommand projectCloseAll{
@@ -1563,7 +1563,7 @@ public:
       QT_TR_NOOP("Close all currently opened projects"),
       ":/img/actions/close.png",
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_F4)},
+      {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_F4)},
       &categoryWindowManagement,
   };
   EditorCommand applicationQuit{
@@ -1572,7 +1572,7 @@ public:
       QT_TR_NOOP("Close the whole application"),
       ":/img/actions/quit.png",
       EditorCommand::Flag::QuitRole,
-      {QKeySequence(Qt::CTRL + Qt::Key_Q)},
+      {QKeySequence(Qt::CTRL | Qt::Key_Q)},
       &categoryWindowManagement,
   };
 
@@ -1620,7 +1620,7 @@ public:
       QT_TR_NOOP("Open a quick reference about the keyboard shortcuts"),
       QString(),
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL + Qt::Key_F1)},
+      {QKeySequence(Qt::CTRL | Qt::Key_F1)},
       &categoryHelp,
   };
 
@@ -1722,7 +1722,7 @@ public:
       QT_TR_NOOP("Copy this MPN into the clipboard"),
       ":/img/actions/copy.png",
       EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL + Qt::Key_C)},
+      {QKeySequence(Qt::CTRL | Qt::Key_C)},
       &categoryContextMenu,
   };
   EditorCommand openProductWebsite{

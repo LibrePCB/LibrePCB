@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../qtcompat.h"
+
 #include <QtCore>
 
 #include <optional.hpp>
@@ -172,14 +174,16 @@ inline QDebug operator<<(QDebug stream, const Uuid& uuid) noexcept {
   return stream;
 }
 
-inline uint qHash(const Uuid& key, uint seed) noexcept {
+inline QtCompat::Hash qHash(const Uuid& key, QtCompat::Hash seed = 0) noexcept {
   return ::qHash(key.toStr(), seed);
 }
 
 }  // namespace librepcb
 
 namespace tl {
-inline uint qHash(const optional<librepcb::Uuid>& key, uint seed) noexcept {
+inline ::librepcb::QtCompat::Hash qHash(
+    const optional<librepcb::Uuid>& key,
+    ::librepcb::QtCompat::Hash seed = 0) noexcept {
   return ::qHash(key ? key->toStr() : QString(), seed);
 }
 }  // namespace tl

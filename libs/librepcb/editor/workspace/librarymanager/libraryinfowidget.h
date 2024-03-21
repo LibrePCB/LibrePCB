@@ -54,7 +54,7 @@ class LibraryInfoWidget final : public QWidget {
 
 public:
   // Constructors / Destructor
-  LibraryInfoWidget() noexcept;
+  LibraryInfoWidget() = delete;
   LibraryInfoWidget(const LibraryInfoWidget& other) = delete;
   LibraryInfoWidget(Workspace& ws, const FilePath& libDir);
   ~LibraryInfoWidget() noexcept;

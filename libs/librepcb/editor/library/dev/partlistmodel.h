@@ -57,7 +57,7 @@ public:
 
   // Constructors / Destructor
   PartListModel() = delete;
-  PartListModel(const PartListModel& other) noexcept;
+  PartListModel(const PartListModel& other) = delete;
   explicit PartListModel(QObject* parent = nullptr) noexcept;
   ~PartListModel() noexcept;
 

@@ -70,7 +70,7 @@ public:
    *
    * @param other Object to copy.
    */
-  MessageLogger(const MessageLogger& other) noexcept;
+  MessageLogger(const MessageLogger& other) = delete;
 
   /**
    * @brief Destructor
@@ -98,7 +98,11 @@ signals:
   void msgEmitted(const Message& msg);
 
 private:  // Data
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
+  mutable QRecursiveMutex mMutex;
+#else
   mutable QMutex mMutex;
+#endif
   QPointer<MessageLogger> mParent;
   QString mPrefix;
   bool mRecord;
