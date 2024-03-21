@@ -197,7 +197,7 @@ public:  // Methods
   virtual void prepareRequest() = 0;
   virtual void finalizeRequest() = 0;
   virtual void emitSuccessfullyFinishedSignals() noexcept = 0;
-  virtual void fetchNewData() noexcept = 0;
+  virtual void fetchNewData(QIODevice& device) noexcept = 0;
 
 private:  // Methods
   void executeRequest() noexcept;

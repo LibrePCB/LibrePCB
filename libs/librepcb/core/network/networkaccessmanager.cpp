@@ -95,6 +95,18 @@ QNetworkReply* NetworkAccessManager::post(const QNetworkRequest& request,
   }
 }
 
+std::unique_ptr<QIODevice> NetworkAccessManager::readFromCache(
+    const QUrl& url) noexcept {
+  Q_ASSERT(QThread::currentThread() == this);
+
+  if (mManager) {
+    if (auto cache = mManager->cache()) {
+      return std::unique_ptr<QIODevice>(cache->data(url));
+    }
+  }
+  return nullptr;
+}
+
 bool NetworkAccessManager::setMinimumCacheExpirationDate(
     const QUrl& url, const QDateTime& dt) noexcept {
   Q_ASSERT(QThread::currentThread() == this);

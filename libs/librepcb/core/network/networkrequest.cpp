@@ -63,8 +63,8 @@ void NetworkRequest::emitSuccessfullyFinishedSignals() noexcept {
   emit dataReceived(mReceivedData);
 }
 
-void NetworkRequest::fetchNewData() noexcept {
-  QByteArray data = mReply->readAll();
+void NetworkRequest::fetchNewData(QIODevice& device) noexcept {
+  QByteArray data = device.readAll();
   if (mReceivedData.size() <= 100 * 1000 * 1000) {
     mReceivedData.append(data);
   }
