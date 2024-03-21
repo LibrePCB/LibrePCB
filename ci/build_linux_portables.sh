@@ -3,6 +3,24 @@
 # set shell settings (see https://sipb.mit.edu/doc/safe-shell/)
 set -euv -o pipefail
 
+if command -v qmake6 &> /dev/null
+then
+  SUFFIX="$ARCH-qt6"
+else
+  SUFFIX="$ARCH"
+fi
+
+# Fix deployment warning (not sure if critical).
+export LANG="C.UTF-8"
+
+# Remove unneeded SQL plugins to fix deployment issue:
+# https://forum.qt.io/topic/151452/what-qt-specific-files-exactly-do-i-need-to-add-when-deploying
+if command -v qmake6 &> /dev/null
+then
+  rm -f $QTDIR/plugins/sqldrivers/libqsqlmimer.so
+  rm -f $QTDIR/plugins/sqldrivers/libqsqlmysql.so
+fi
+
 # Helper to extract and rebuild AppImages with appimagetool to get the static
 # runtime which doesn't need libfuse2 and thus also runs on Ubuntu 22.04, see
 # https://github.com/LibrePCB/LibrePCB/issues/980.
@@ -16,13 +34,15 @@ patch_appimage () {
 
 # Copy OpenSSL libraries manually since these runtime dependencies cannot
 # be detected by linuxdeployqt.
+LIBSSL=(/usr/lib/libssl.so.*)
+LIBCRYPTO=(/usr/lib/libcrypto.so.*)
 mkdir -p "./build/install/opt/lib"
-cp -f "/usr/lib/libssl.so.1.1" "./build/install/opt/lib/"
-cp -f "/usr/lib/libcrypto.so.1.1" "./build/install/opt/lib/"
+cp -fv "$LIBSSL" "./build/install/opt/lib/"
+cp -fv "$LIBCRYPTO" "./build/install/opt/lib/"
 
 # Determine common linuxdeployqt flags
-LINUXDEPLOYQT_FLAGS="-executable=./build/install/opt/lib/libssl.so.1.1"
-LINUXDEPLOYQT_FLAGS+=" -executable=./build/install/opt/lib/libcrypto.so.1.1"
+LINUXDEPLOYQT_FLAGS="-executable=./build/install/opt/lib/$(basename $LIBSSL)"
+LINUXDEPLOYQT_FLAGS+=" -executable=./build/install/opt/lib/$(basename $LIBCRYPTO)"
 LINUXDEPLOYQT_FLAGS+=" -bundle-non-qt-libs"
 
 # Build CLI AppImage.
@@ -33,7 +53,7 @@ cp "./build/appimage-cli/opt/share/icons/hicolor/scalable/apps/org.librepcb.Libr
 linuxdeployqt "./build/appimage-cli/opt/share/applications/org.librepcb.LibrePCB.desktop" \
   $LINUXDEPLOYQT_FLAGS -appimage
 patch_appimage
-mv ./LibrePCB-*-x86_64.AppImage ./artifacts/nightly_builds/librepcb-cli-nightly-linux-x86_64.AppImage
+mv ./LibrePCB-*-x86_64.AppImage ./artifacts/nightly_builds/librepcb-cli-nightly-linux-$SUFFIX.AppImage
 
 # Build LibrePCB AppImage.
 cp -r "./build/install" "./build/appimage"
@@ -43,7 +63,7 @@ linuxdeployqt "./build/appimage/opt/share/applications/org.librepcb.LibrePCB.des
   -qmldir="./build/appimage/opt/share/librepcb/qml" \
   $LINUXDEPLOYQT_FLAGS -appimage
 patch_appimage
-mv ./LibrePCB-*-x86_64.AppImage ./artifacts/nightly_builds/librepcb-nightly-linux-x86_64.AppImage
+mv ./LibrePCB-*-x86_64.AppImage ./artifacts/nightly_builds/librepcb-nightly-linux-$SUFFIX.AppImage
 
 # Run linuxdeployqt to bundle all libraries into the portable packages.
 linuxdeployqt "./build/install/opt/bin/librepcb-cli" $LINUXDEPLOYQT_FLAGS -always-overwrite
@@ -56,4 +76,4 @@ xvfb-run -a ./build/install/opt/bin/librepcb-cli --version
 xvfb-run -a ./build/install/opt/bin/librepcb --exit-after-startup
 
 # Copy to artifacts.
-cp -r "./build/install/opt" "./artifacts/nightly_builds/librepcb-nightly-linux-x86_64"
+cp -r "./build/install/opt" "./artifacts/nightly_builds/librepcb-nightly-linux-$SUFFIX"
