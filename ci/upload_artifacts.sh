@@ -23,5 +23,5 @@ then
   BASENAME=$(echo $BRANCH_NAME | sed -e 's/[^A-Za-z0-9_-]/_/g')
   tar -cjf "./$BASENAME.tbz2" ./artifacts.tar.sha256 ./artifacts.tar
   # upload archive
-  curl --fail --basic -u "$UPLOAD_USER:$UPLOAD_PASS" -T "./$BASENAME.tbz2" "$UPLOAD_URL/$BASENAME.tbz2"
+  curl --fail --basic -u "$UPLOAD_USER:$UPLOAD_PASS" -F "path=@$BASENAME.tbz2" "$UPLOAD_URL"
 fi
