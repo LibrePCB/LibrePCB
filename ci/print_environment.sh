@@ -14,6 +14,7 @@ echo
 
 echo "=== Qt ==="
 qmake --version
+qmake6 --version
 echo
 
 echo "=== CMake ==="

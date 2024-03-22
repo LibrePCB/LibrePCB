@@ -88,7 +88,7 @@ TEST_F(ProjectTest, testUpgradeV01) {
   // Re-open project.
   ASSERT_TRUE(
       FileUtils::readFile(mProjectDir.getPathTo(".librepcb-project"))
-          .startsWith(Application::getFileFormatVersion().toStr().toUtf8() %
+          .startsWith(Application::getFileFormatVersion().toStr().toUtf8() +
                       "\n"));
   {
     ProjectLoader loader;

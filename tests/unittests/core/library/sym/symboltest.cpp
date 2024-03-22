@@ -81,7 +81,7 @@ TEST_F(SymbolTest, testUpgradeV01) {
   // Re-open.
   ASSERT_TRUE(
       FileUtils::readFile(mTmpDir.getPathTo(".librepcb-sym"))
-          .startsWith(Application::getFileFormatVersion().toStr().toUtf8() %
+          .startsWith(Application::getFileFormatVersion().toStr().toUtf8() +
                       "\n"));
   { std::unique_ptr<Symbol> obj = Symbol::open(createDir()); }
 }

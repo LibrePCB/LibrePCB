@@ -51,6 +51,7 @@
 #include <librepcb/core/project/board/items/bi_stroketext.h>
 #include <librepcb/core/project/board/items/bi_via.h>
 #include <librepcb/core/project/board/items/bi_zone.h>
+#include <librepcb/core/utils/toolbox.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
@@ -360,7 +361,8 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
     for (auto it = scene->getZones().begin(); it != scene->getZones().end();
          it++) {
       if ((!cuLayer) || (it.key()->getData().getLayers().contains(&*cuLayer))) {
-        QList<const Layer*> layers = it.key()->getData().getLayers().toList();
+        QList<const Layer*> layers =
+            Toolbox::toList(it.key()->getData().getLayers());
         std::sort(layers.begin(), layers.end(), &Layer::lessThan);
         int priority = 30;
         if (!layers.isEmpty()) {

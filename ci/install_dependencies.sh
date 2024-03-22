@@ -13,7 +13,7 @@ then
   powershell -Command "Invoke-WebRequest $QT_IMAGEFORMATS_URL -OutFile 'C:/tmp.7z' -UseBasicParsing ;" \
     && 7z x C:/tmp.7z -oC:/Qt -bsp1 \
     && rm C:/tmp.7z
-elif [ "$OS" = "linux" ] && [ "${DEPLOY-}" = "true" ]
+elif [ "$OS" = "linux" ] && [ "${QT-}" = "5" ] && [ "${DEPLOY-}" = "true" ]
 then
   QT_IMAGEFORMATS_URL="https://download.qt.io/online/qtsdkrepository/linux_x64/desktop/qt5_5152/qt.qt5.5152.gcc_64/5.15.2-0-202011130601qtimageformats-Linux-RHEL_7_6-GCC-Linux-RHEL_7_6-X86_64.7z"
   wget -c "$QT_IMAGEFORMATS_URL" -O /tmp/tmp.7z
@@ -47,11 +47,20 @@ then
   export PATH="/usr/local/opt/python/libexec/bin:$PATH"
 
   # Install Qt
-  echo "Installing qt5..."
-  brew install --force-bottle --overwrite qt5
-  echo "Linking qt5..."
-  brew link --force --overwrite qt5
-  export PATH="$(brew --prefix qt5)/bin:$PATH"
+  if [ "$QT" = "6" ]
+  then
+    echo "Installing qt6..."
+    brew install --force-bottle --overwrite qt6
+    echo "Linking qt6..."
+    brew link --force --overwrite qt6
+    export PATH="$(brew --prefix qt6)/bin:$PATH"
+  else
+    echo "Installing qt5..."
+    brew install --force-bottle --overwrite qt5
+    echo "Linking qt5..."
+    brew link --force --overwrite qt5
+    export PATH="$(brew --prefix qt5)/bin:$PATH"
+  fi
 
   # Install OpenCascade
   echo "Installing opencascade..."

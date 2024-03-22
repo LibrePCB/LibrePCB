@@ -119,7 +119,7 @@ QAction* EditorCommand::setupAction(QAction* action,
                                     ActionFlags flags) const noexcept {
   QString name = "action";
   foreach (const QString& fragment, mIdentifier.split('.').last().split('_')) {
-    name.append(fragment.mid(0, 1).toUpper() % fragment.midRef(1));
+    name.append(fragment.mid(0, 1).toUpper() % fragment.mid(1));
   }
   action->setObjectName(name);
   QString text = mText;

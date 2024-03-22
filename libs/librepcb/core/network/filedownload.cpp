@@ -160,8 +160,8 @@ void FileDownload::emitSuccessfullyFinishedSignals() noexcept {
   }
 }
 
-void FileDownload::fetchNewData() noexcept {
-  mFile->write(mReply->readAll());
+void FileDownload::fetchNewData(QIODevice& device) noexcept {
+  mFile->write(device.readAll());
 }
 
 /*******************************************************************************

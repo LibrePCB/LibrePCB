@@ -82,7 +82,7 @@ TEST_F(ComponentCategoryTest, testUpgradeV01) {
   // Re-open.
   ASSERT_TRUE(
       FileUtils::readFile(mTmpDir.getPathTo(".librepcb-cmpcat"))
-          .startsWith(Application::getFileFormatVersion().toStr().toUtf8() %
+          .startsWith(Application::getFileFormatVersion().toStr().toUtf8() +
                       "\n"));
   {
     std::unique_ptr<ComponentCategory> obj =

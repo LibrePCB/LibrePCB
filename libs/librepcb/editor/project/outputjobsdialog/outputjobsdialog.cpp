@@ -298,7 +298,7 @@ void OutputJobsDialog::removeUnknownFiles() noexcept {
       startLog();
       writeLogLine(tr("No unknown files in output directory."));
     } else {
-      const int linesLimit = std::min(files.count(), 15);
+      const int linesLimit = std::min(int(files.count()), 15);
       const int remainingFiles =
           (files.count() <= linesLimit) ? 0 : (files.count() + 1 - linesLimit);
       QString text = tr("Are you sure to remove the following files?");

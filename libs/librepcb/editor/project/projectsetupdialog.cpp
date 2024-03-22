@@ -35,6 +35,7 @@
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/netclass.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/utils/toolbox.h>
 
 #include <QtCore>
 
@@ -223,7 +224,7 @@ void ProjectSetupDialog::load() noexcept {
   mUi->edtProjectAuthor->setText(mProject.getAuthor());
   mUi->edtProjectVersion->setText(*mProject.getVersion());
   mUi->lblProjectCreated->setText(
-      mProject.getCreated().toString(Qt::DefaultLocaleLongDate));
+      QLocale().toString(mProject.getCreated(), QLocale::LongFormat));
 
   // Tab: Locales & Norms
   mUi->lstLocaleOrder->clear();
@@ -301,8 +302,8 @@ bool ProjectSetupDialog::apply() noexcept {
 
       // Remove no longer existing net classes.
       foreach (NetClass* netClass,
-               mProject.getCircuit().getNetClasses().values().toSet() -
-                   items.values().toSet()) {
+               Toolbox::toSet(mProject.getCircuit().getNetClasses().values()) -
+                   Toolbox::toSet(items.values())) {
         transaction.append(new CmdNetClassRemove(*netClass));
       }
 

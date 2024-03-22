@@ -7,10 +7,17 @@ endif()
 
 # Support older macOS versions. Needs to be set before calling project()!
 # https://github.com/LibrePCB/LibrePCB/issues/1091
-set(CMAKE_OSX_DEPLOYMENT_TARGET
-    "10.14"
-    CACHE STRING "Minimum OS X deployment version"
-)
+if(QT_MAJOR_VERSION EQUAL 6)
+  set(CMAKE_OSX_DEPLOYMENT_TARGET
+      "10.15"
+      CACHE STRING "Minimum OS X deployment version"
+  )
+else()
+  set(CMAKE_OSX_DEPLOYMENT_TARGET
+      "10.14"
+      CACHE STRING "Minimum OS X deployment version"
+  )
+endif()
 
 # WARNING:
 # Read the release workflow documentation (at https://developers.librepcb.org)
@@ -82,8 +89,20 @@ set(BUILD_SHARED_LIBS
 # Auto-include current directory
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-# Use C++11
-set(CMAKE_CXX_STANDARD 11)
+# If Qt version is not explicitly specified, automatically determine it
+if(NOT QT_MAJOR_VERSION)
+  find_package(Qt NAMES Qt5 Qt6 REQUIRED COMPONENTS Core)
+  set(QT_MAJOR_VERSION ${Qt_VERSION_MAJOR})
+endif()
+set(QT "Qt${QT_MAJOR_VERSION}")
+set(PARSEAGLE_QT_MAJOR_VERSION ${QT_MAJOR_VERSION})
+
+# Use C++11 (Qt5) or C++17 (Qt6)
+if(QT_MAJOR_VERSION EQUAL 6)
+  set(CMAKE_CXX_STANDARD 17)
+else()
+  set(CMAKE_CXX_STANDARD 11)
+endif()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -117,6 +136,11 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   target_compile_options(common INTERFACE -Wno-nested-anon-types)
 endif()
 
+# Avoid "file too big" error for debug builds on Windows.
+if(WIN32)
+  target_compile_options(common INTERFACE $<$<CONFIG:Debug>:-Wa,-mbig-obj>)
+endif()
+
 # Enforce UNICODE on Windows to avoid an incompatibility with OpenCascade.
 if(WIN32)
   add_definitions(-DUNICODE -D_UNICODE)
@@ -136,38 +160,44 @@ add_definitions(
   -DOCCT_NO_DEPRECATED # OpenCascade
 )
 
-# Find required Qt packages
-find_package(
-  Qt5 5.5.0
-  COMPONENTS Concurrent
-             Gui
-             LinguistTools
-             Network
-             OpenGL
-             PrintSupport
-             Sql
-             Svg
-             Widgets
-  REQUIRED
+# Determine required Qt components
+set(QT_COMPONENTS
+    Concurrent
+    Core
+    Gui
+    LinguistTools
+    Network
+    OpenGL
+    PrintSupport
+    Sql
+    Svg
+    Widgets
 )
+if(QT_MAJOR_VERSION GREATER 5)
+  list(APPEND QT_COMPONENTS OpenGLWidgets)
+endif()
 if(BUILD_QTQUICK_TEST)
-  find_package(
-    Qt5 5.5.0
-    COMPONENTS Quick QuickControls2
-    REQUIRED
-  )
+  list(APPEND QT_COMPONENTS Quick QuickControls2)
 endif()
 if(BUILD_TESTS)
-  find_package(
-    Qt5 5.5.0
-    COMPONENTS Test
-    REQUIRED
+  list(APPEND QT_COMPONENTS Test)
+endif()
+
+# Find Qt
+find_package(${QT} 5.5.0 REQUIRED COMPONENTS ${QT_COMPONENTS})
+set(QT_VERSION "${${QT}_VERSION}")
+message(STATUS "Building LibrePCB with Qt ${QT_VERSION}")
+if(QT_MAJOR_VERSION EQUAL 6)
+  message(
+    WARNING
+      "EXPERIMENTAL: Builds with Qt6 are not tested very well yet and thus \
+      might still contain critical bugs. It's highly recommended to build \
+      official releases with Qt5 for now."
   )
 endif()
-message(STATUS "Building with Qt${Qt5Core_VERSION}")
 
 # For the ParsEagle library, use the same Qt version as for LibrePCB
-set(PARSEAGLE_QT_MAJOR_VERSION 5)
+set(PARSEAGLE_QT_MAJOR_VERSION ${QT_MAJOR_VERSION})
 
 # Find third party libraries
 find_package(DelaunayTriangulation REQUIRED)
@@ -184,7 +214,7 @@ if(BUILD_TESTS)
   find_package(GTest REQUIRED)
 endif()
 # Hoedown is only needed on Qt <5.14
-if(Qt5Core_VERSION VERSION_LESS 5.14)
+if(QT_VERSION VERSION_LESS 5.14)
   message(STATUS "Qt <5.14 detected, using Hoedown for markdown support")
   find_package(Hoedown REQUIRED)
 endif()
@@ -215,11 +245,13 @@ file(
 set_source_files_properties(
   ${LIBREPCB_TS_FILES} PROPERTIES OUTPUT_LOCATION "${LIBREPCB_QM_FILES_DIR}"
 )
-if(Qt5_VERSION VERSION_LESS 5.12)
+if(QT_VERSION VERSION_LESS 5.12)
   # Qt <5.12 doesn't support OPTIONS
   qt5_add_translation(LIBREPCB_QM_FILES ${LIBREPCB_TS_FILES})
-else()
+elseif(QT_VERSION VERSION_LESS 6.0)
   qt5_add_translation(LIBREPCB_QM_FILES ${LIBREPCB_TS_FILES} OPTIONS -silent)
+else()
+  qt6_add_translation(LIBREPCB_QM_FILES ${LIBREPCB_TS_FILES} OPTIONS -silent)
 endif()
 add_custom_target(librepcb_translations DEPENDS ${LIBREPCB_QM_FILES})
 add_dependencies(librepcb librepcb_translations)

@@ -23,6 +23,7 @@
 #include "outputdirectorywriter.h"
 
 #include "../exceptions.h"
+#include "../qtcompat.h"
 #include "../types/uuid.h"
 #include "fileutils.h"
 
@@ -67,9 +68,10 @@ bool OutputDirectoryWriter::loadIndex() {
     mIndex.clear();
     if (mIndexFilePath.isExistingFile()) {
       const QString content = FileUtils::readFile(mIndexFilePath);  // can throw
-      const QStringList lines = content.split("\n", QString::SkipEmptyParts);
+      const QStringList lines = content.split("\n", QtCompat::skipEmptyParts());
       foreach (const QString& line, lines) {
-        const QStringList values = line.split(" | ", QString::KeepEmptyParts);
+        const QStringList values =
+            line.split(" | ", QtCompat::keepEmptyParts());
         if (values.count() >= 2) {
           const QString file = values.first();
           const Uuid uuid = Uuid::fromString(values.value(1));

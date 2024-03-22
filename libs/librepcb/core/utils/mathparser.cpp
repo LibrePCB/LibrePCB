@@ -51,10 +51,17 @@ MathParser::Result MathParser::parse(const QString& expression) const noexcept {
   MathParser::Result result;
 
   try {
+    const QString decimalPoint(mLocale.decimalPoint());
+    const QString groupSeparator(mLocale.groupSeparator());
+
     mu::Parser parser;
     parser.SetArgSep(';');  // avoid conflict with other separators
-    parser.SetDecSep(mLocale.decimalPoint().toLatin1());
-    parser.SetThousandsSep(mLocale.groupSeparator().toLatin1());
+    if (decimalPoint.length() == 1) {
+      parser.SetDecSep(decimalPoint.at(0).toLatin1());
+    }
+    if (groupSeparator.length() == 1) {
+      parser.SetThousandsSep(groupSeparator.at(0).toLatin1());
+    }
 #if defined(_UNICODE)
     parser.SetExpr(expression.toStdWString());
 #else

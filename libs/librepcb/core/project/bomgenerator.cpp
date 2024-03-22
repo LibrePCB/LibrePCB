@@ -153,7 +153,7 @@ std::shared_ptr<Bom> BomGenerator::generate(
           AttributeSubstitutor::substitute(lookup(attribute), lookup));
     }
     if (item.mount) {
-      maxPartNumber = std::max(maxPartNumber, item.parts.count());
+      maxPartNumber = std::max(maxPartNumber, int(item.parts.count()));
     }
     items.append(item);
   }

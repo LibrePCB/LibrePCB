@@ -30,6 +30,8 @@
 
 #include <QtCore>
 
+#include <tuple>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -161,8 +163,11 @@ QStringList Application::getTranslationLocales() noexcept {
 const QFont& Application::getDefaultSansSerifFont() noexcept {
   auto create = []() {
     QFont font;
-    font.setStyleStrategy(
-        QFont::StyleStrategy(QFont::OpenGLCompatible | QFont::PreferQuality));
+    font.setStyleStrategy(QFont::StyleStrategy(
+#if QT_VERSION_MAJOR < 6
+        QFont::OpenGLCompatible |
+#endif
+        QFont::PreferQuality));
     font.setStyleHint(QFont::SansSerif);
     font.setFamily("Noto Sans");
     return font;
@@ -175,8 +180,11 @@ const QFont& Application::getDefaultSansSerifFont() noexcept {
 const QFont& Application::getDefaultMonospaceFont() noexcept {
   auto create = []() {
     QFont font;
-    font.setStyleStrategy(
-        QFont::StyleStrategy(QFont::OpenGLCompatible | QFont::PreferQuality));
+    font.setStyleStrategy(QFont::StyleStrategy(
+#if QT_VERSION_MAJOR < 6
+        QFont::OpenGLCompatible |
+#endif
+        QFont::PreferQuality));
     font.setStyleHint(QFont::TypeWriter);
     font.setFamily("Noto Sans Mono");
     return font;
@@ -246,8 +254,9 @@ void Application::setTranslationLocale(const QLocale& locale) noexcept {
 
   // Install Qt translations
   QTranslator* qtTranslator = new QTranslator(qApp);
-  qtTranslator->load("qt_" % locale.name(),
-                     QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+  std::ignore = qtTranslator->load(
+      "qt_" % locale.name(),
+      QLibraryInfo::location(QLibraryInfo::TranslationsPath));
   qApp->installTranslator(qtTranslator);
   installedTranslators.append(qtTranslator);
 
@@ -255,19 +264,20 @@ void Application::setTranslationLocale(const QLocale& locale) noexcept {
   // system settings, in the defined order)
   const QString dir = Application::getResourcesDir().getPathTo("i18n").toStr();
   QTranslator* systemTranslator = new QTranslator(qApp);
-  systemTranslator->load(locale, "librepcb", "_", dir);
+  std::ignore = systemTranslator->load(locale, "librepcb", "_", dir);
   qApp->installTranslator(systemTranslator);
   installedTranslators.append(systemTranslator);
 
   // Install language translations (like "de" for German)
   QTranslator* appTranslator1 = new QTranslator(qApp);
-  appTranslator1->load("librepcb_" % locale.name().split("_").at(0), dir);
+  std::ignore =
+      appTranslator1->load("librepcb_" % locale.name().split("_").at(0), dir);
   qApp->installTranslator(appTranslator1);
   installedTranslators.append(appTranslator1);
 
   // Install language/country translations (like "de_ch" for German/Switzerland)
   QTranslator* appTranslator2 = new QTranslator(qApp);
-  appTranslator2->load("librepcb_" % locale.name(), dir);
+  std::ignore = appTranslator2->load("librepcb_" % locale.name(), dir);
   qApp->installTranslator(appTranslator2);
   installedTranslators.append(appTranslator2);
 }

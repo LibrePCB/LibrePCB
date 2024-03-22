@@ -12,14 +12,14 @@ Test command "open-library --save"
 def test_save(cli):
     library = params.POPULATED_LIBRARY
     cli.add_library(library.dir)
-    # append some zeros to the library file and a symbol file
+    # append some spaces to the library file and a symbol file
     paths = [
         cli.abspath(library.dir + '/library.lp'),
         cli.abspath(library.dir + '/sym/9b75d0ce-ac4e-4a52-a88a-8777f66d3241/symbol.lp'),
     ]
     for path in paths:
         with open(path, 'ab') as f:
-            f.write(b'\0\0')
+            f.write(b'  ')
     original_filesizes = [os.path.getsize(path) for path in paths]
     # save library (must remove the appended zeros)
     code, stdout, stderr = cli.run('open-library', '--all', '--save',

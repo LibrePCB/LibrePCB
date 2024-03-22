@@ -26,6 +26,9 @@
 #include "../../../types/point.h"
 #include "../../../types/uuid.h"
 #include "bi_base.h"
+#include "bi_netline.h"
+#include "bi_netpoint.h"
+#include "bi_via.h"
 
 #include <QtCore>
 
@@ -36,10 +39,7 @@ namespace librepcb {
 
 class BI_Device;
 class BI_FootprintPad;
-class BI_NetLine;
 class BI_NetLineAnchor;
-class BI_NetPoint;
-class BI_Via;
 class NetSignal;
 
 /*******************************************************************************

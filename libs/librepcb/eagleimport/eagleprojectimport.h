@@ -84,10 +84,10 @@ public:
 
   // Getters
   std::shared_ptr<MessageLogger> getLogger() const noexcept { return mLogger; }
-  bool isReady() const noexcept { return mSchematic; }
+  bool isReady() const noexcept { return !mSchematic.isNull(); }
   const QString& getProjectName() const noexcept { return mProjectName; }
   int getSheetCount() const noexcept;
-  bool hasBoard() const noexcept { return mBoard; }
+  bool hasBoard() const noexcept { return !mBoard.isNull(); }
 
   // General Methods
   void reset() noexcept;

@@ -46,7 +46,7 @@ Debug::Debug()
   QString datetime =
       QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss");
   QString dataDir =
-      QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+      QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
   if (!dataDir.isEmpty())
     mLogFilepath.setPath(dataDir % "/logs/" % datetime % ".log");
 
@@ -158,13 +158,14 @@ void Debug::print(DebugLevel_t level, const QString& msg, const char* file,
 
   if (mDebugLevelStderr >= level) {
     // write to stderr
-    *mStderrStream << logMsg << endl;
+    *mStderrStream << logMsg << '\n';
+    mStderrStream->flush();
   }
 
   if ((mDebugLevelLogFile >= level) && (mLogFile)) {
     // write to the log file
     QTextStream logFileStream(mLogFile);
-    logFileStream << logMsg << endl;
+    logFileStream << logMsg << '\n';
   }
 }
 

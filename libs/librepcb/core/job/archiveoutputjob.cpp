@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "archiveoutputjob.h"
 
+#include "../utils/toolbox.h"
+
 #include <QtCore>
 #include <QtGui>
 
@@ -74,7 +76,7 @@ QIcon ArchiveOutputJob::getTypeIcon() const noexcept {
 }
 
 QSet<Uuid> ArchiveOutputJob::getDependencies() const noexcept {
-  return mInputJobs.keys().toSet();
+  return Toolbox::toSet(mInputJobs.keys());
 }
 
 /*******************************************************************************

@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../qtcompat.h"
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -447,7 +449,8 @@ inline QDebug operator<<(QDebug stream, const Angle& angle) {
   return stream;
 }
 
-inline uint qHash(const Angle& key, uint seed = 0) noexcept {
+inline QtCompat::Hash qHash(const Angle& key,
+                            QtCompat::Hash seed = 0) noexcept {
   return ::qHash(key.toMicroDeg(), seed);
 }
 

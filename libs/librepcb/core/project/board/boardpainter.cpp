@@ -145,7 +145,7 @@ void BoardPainter::paint(
 
   // Draw THT pads & vias depending on copper layers visibility.
   const QSet<QString> enabledCopperLayers =
-      settings.getPaintOrder().toSet() & Theme::getCopperColorNames();
+      Toolbox::toSet(settings.getPaintOrder()) & Theme::getCopperColorNames();
   bool thtOnlyOnCopperLayers = !enabledCopperLayers.isEmpty();
 
   // Draw pad circles only if holes are enabled, but pads not.

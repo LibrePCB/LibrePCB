@@ -38,8 +38,8 @@ then
     ./LibrePCB-CLI.dmg ./LibrePCB-CLI.app
 else
   # On x86_64, directly create the *.dmg with macdeployqt.
-  macdeployqt "LibrePCB.app" -dmg -always-overwrite \
-    -qmldir=./LibrePCB.app/Contents/share/librepcb/qml
+  ln -s /usr/local/lib ./lib
+  macdeployqt "LibrePCB.app" -dmg -always-overwrite
   macdeployqt "LibrePCB-CLI.app" -dmg -always-overwrite
 fi
 popd
@@ -53,5 +53,11 @@ mv "./build/install/opt/LibrePCB-CLI.app" "./build/install/opt/librepcb-cli.app"
 ./build/install/opt/librepcb.app/Contents/MacOS/librepcb --exit-after-startup
 
 # Move bundles to artifacts directory
-mv ./build/install/opt/LibrePCB.dmg ./artifacts/nightly_builds/librepcb-nightly-mac-$ARCH.dmg
-mv ./build/install/opt/LibrePCB-CLI.dmg ./artifacts/nightly_builds/librepcb-cli-nightly-mac-$ARCH.dmg
+if [ "$QT" = "6" ]
+then
+  SUFFIX="$ARCH-qt6"
+else
+  SUFFIX="$ARCH"
+fi
+mv ./build/install/opt/LibrePCB.dmg ./artifacts/nightly_builds/librepcb-nightly-mac-$SUFFIX.dmg
+mv ./build/install/opt/LibrePCB-CLI.dmg ./artifacts/nightly_builds/librepcb-cli-nightly-mac-$SUFFIX.dmg

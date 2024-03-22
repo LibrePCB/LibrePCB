@@ -61,7 +61,7 @@ public:
 
   // Constructors / Destructor
   ComponentPinSignalMapModel() = delete;
-  ComponentPinSignalMapModel(const ComponentPinSignalMapModel& other) noexcept;
+  ComponentPinSignalMapModel(const ComponentPinSignalMapModel& other) = delete;
   explicit ComponentPinSignalMapModel(QObject* parent = nullptr) noexcept;
   ~ComponentPinSignalMapModel() noexcept;
 

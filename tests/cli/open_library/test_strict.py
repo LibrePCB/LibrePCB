@@ -30,14 +30,14 @@ def test_valid_lp(cli):
 def test_invalid_lp(cli):
     library = params.POPULATED_LIBRARY
     cli.add_library(library.dir)
-    # append some zeros to the library file and a symbol file
+    # append some spaces to the library file and a symbol file
     paths = [
         library.dir + '/library.lp',
         library.dir + '/sym/9b75d0ce-ac4e-4a52-a88a-8777f66d3241/symbol.lp',
     ]
     for path in paths:
         with open(cli.abspath(path), 'ab') as f:
-            f.write(b'\0\0')
+            f.write(b'  ')
     # open library
     code, stdout, stderr = cli.run('open-library', '--all', '--strict',
                                    library.dir)

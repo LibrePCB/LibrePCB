@@ -60,6 +60,12 @@ NetworkRequestBase::NetworkRequestBase(const QUrl& url,
   mRequest.setRawHeader("X-LibrePCB-FileFormatVersion",
                         Application::getFileFormatVersion().toStr().toUtf8());
 
+  // In Qt6, redirect implementation has changed.
+#if QT_VERSION_MAJOR >= 6
+  mRequest.setAttribute(QNetworkRequest::RedirectPolicyAttribute,
+                        QNetworkRequest::ManualRedirectPolicy);
+#endif
+
   // create queued connection to let executeRequest() execute in download thread
   connect(this, &NetworkRequestBase::startRequested, this,
           &NetworkRequestBase::executeRequest, Qt::QueuedConnection);
@@ -144,6 +150,7 @@ void NetworkRequestBase::executeRequest() noexcept {
   }
 
   // prepare request
+  mRequest.setUrl(mUrl);
   try {
     prepareRequest();  // can throw
   } catch (const Exception& e) {
@@ -151,8 +158,26 @@ void NetworkRequestBase::executeRequest() noexcept {
     return;
   }
 
+  // With Qt6 the AlwaysCache mode doesn't seem to work (receiving empty
+  // bytearray in its response), no idea why (bug?). As a workaround, we
+  // handle this case manually instead of making a normal network request.
+  if (mRequest.attribute(QNetworkRequest::CacheLoadControlAttribute).toInt() ==
+      QNetworkRequest::AlwaysCache) {
+    if (std::unique_ptr<QIODevice> dev = nam->readFromCache(mUrl)) {
+      try {
+        fetchNewData(*dev);
+        finalizeRequest();  // can throw
+        finalize();
+      } catch (const Exception& e) {
+        finalize(e.getMsg());
+      }
+    } else {
+      finalize("Not in cache.");  // No tr().
+    }
+    return;
+  }
+
   // start request
-  mRequest.setUrl(mUrl);
   if (!mPostData.isNull()) {
     mReply.reset(nam->post(mRequest, mPostData));
   } else {
@@ -173,10 +198,15 @@ void NetworkRequestBase::executeRequest() noexcept {
   }
   connect(mReply.data(), &QNetworkReply::readyRead, this,
           &NetworkRequestBase::replyReadyReadSlot);
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
+  connect(mReply.data(), &QNetworkReply::errorOccurred, this,
+          &NetworkRequestBase::replyErrorSlot);
+#else
   connect(mReply.data(),
           static_cast<void (QNetworkReply::*)(QNetworkReply::NetworkError)>(
               &QNetworkReply::error),
           this, &NetworkRequestBase::replyErrorSlot);
+#endif
   connect(mReply.data(), &QNetworkReply::sslErrors, this,
           &NetworkRequestBase::replySslErrorsSlot);
   connect(mReply.data(), &QNetworkReply::finished, this,
@@ -222,7 +252,8 @@ void NetworkRequestBase::replyDownloadProgressSlot(qint64 bytesReceived,
 
 void NetworkRequestBase::replyReadyReadSlot() noexcept {
   Q_ASSERT(QThread::currentThread() == NetworkAccessManager::instance());
-  fetchNewData();
+  Q_ASSERT(mReply);
+  fetchNewData(*mReply);
 }
 
 void NetworkRequestBase::replyErrorSlot(
@@ -302,11 +333,17 @@ void NetworkRequestBase::replyFinishedSlot() noexcept {
 void NetworkRequestBase::finalize(const QString& errorMsg) noexcept {
   Q_ASSERT(QThread::currentThread() == NetworkAccessManager::instance());
 
+  const bool onlyFromCache =
+      (mRequest.attribute(QNetworkRequest::CacheLoadControlAttribute).toInt() ==
+       QNetworkRequest::AlwaysCache);
+
   if (errorMsg.isNull()) {
     // If a minimum cache time was specified, apply it to the cache now.
     NetworkAccessManager* nam = NetworkAccessManager::instance();
-    const bool fromCache = mReply &&
-        mReply->attribute(QNetworkRequest::SourceIsFromCacheAttribute).toBool();
+    const bool fromCache = onlyFromCache ||
+        (mReply &&
+         mReply->attribute(QNetworkRequest::SourceIsFromCacheAttribute)
+             .toBool());
     const bool cacheExtended = (!fromCache) && (mMinimumCacheTime > 0) && nam &&
         nam->setMinimumCacheExpirationDate(
             mUrl, QDateTime::currentDateTimeUtc().addSecs(mMinimumCacheTime));
@@ -323,12 +360,9 @@ void NetworkRequestBase::finalize(const QString& errorMsg) noexcept {
     emit progressState(tr("Request aborted."));
     emit aborted();
     emit finished(false);
-  } else if ((mReply &&
-              (mReply->error() == QNetworkReply::ContentNotFoundError)) &&
-             (mRequest.attribute(QNetworkRequest::CacheLoadControlAttribute)
-                  .toInt() == QNetworkRequest::AlwaysCache)) {
+  } else if (onlyFromCache) {
     qDebug() << "Not in cache:" << mUrl.toString();
-    emit progressState(QString("Not in cache: %1").arg(errorMsg));  // No tr().
+    emit progressState(QString("Not in cache."));  // No tr().
     emit errored(errorMsg);
     emit finished(false);
   } else {

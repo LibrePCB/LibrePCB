@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../../exceptions.h"
+#include "../../qtcompat.h"
 #include "../../serialization/sexpression.h"
 #include "../../utils/toolbox.h"
 
@@ -135,8 +136,8 @@ inline QDebug operator<<(QDebug stream,
   return stream;
 }
 
-inline uint qHash(const ComponentSymbolVariantItemSuffix& key,
-                  uint seed = 0) noexcept {
+inline QtCompat::Hash qHash(const ComponentSymbolVariantItemSuffix& key,
+                            QtCompat::Hash seed = 0) noexcept {
   return ::qHash(*key, seed);
 }
 

@@ -117,7 +117,7 @@ private:  // Methods
   void prepareRequest() override;
   void finalizeRequest() override;
   void emitSuccessfullyFinishedSignals() noexcept override;
-  void fetchNewData() noexcept override;
+  void fetchNewData(QIODevice& device) noexcept override;
 
 private:  // Data
   FilePath mDestination;

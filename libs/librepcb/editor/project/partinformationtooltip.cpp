@@ -300,7 +300,7 @@ void PartInformationToolTip::startLoadPicture(bool onlyCache) noexcept {
         mPartInfo->pictureUrl.fileName().split('.').last().toLower();
     connect(
         request, &NetworkRequest::dataReceived, this,
-        [this, format](const QByteArray& data) {
+        [this, onlyCache, format](const QByteArray& data) {
           QPixmap pixmap;
           if (!format.isEmpty()) {
             pixmap.loadFromData(data, qPrintable(format));
@@ -318,7 +318,10 @@ void PartInformationToolTip::startLoadPicture(bool onlyCache) noexcept {
                 << "Failed to display image of format " << format
                 << ". Maybe the Qt image formats plugin is not installed?";
           }
-          mPictureDelayTimer->stop();
+          // If the picture couldn't be loaded from cache, try again later.
+          if ((!onlyCache) || (!data.isEmpty())) {
+            mPictureDelayTimer->stop();
+          }
         },
         Qt::QueuedConnection);
     connect(request, &NetworkRequest::finished, this,

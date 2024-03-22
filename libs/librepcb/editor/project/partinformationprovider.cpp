@@ -339,8 +339,8 @@ void PartInformationProvider::requestScheduledParts() noexcept {
   }
 
   QVector<ApiEndpoint::Part> batch;
-  const int batchSize = std::min(mScheduledParts.count(), mQueryMaxPartCount);
-  for (int i = 0; i < batchSize; ++i) {
+  const int count = std::min(int(mScheduledParts.count()), mQueryMaxPartCount);
+  for (int i = 0; i < count; ++i) {
     const auto& part = mScheduledParts.at(i);
     if (mCache.contains(part)) {
       qWarning() << "Requested part information of already cached part.";
@@ -348,7 +348,7 @@ void PartInformationProvider::requestScheduledParts() noexcept {
     batch.append(ApiEndpoint::Part{part.mpn, part.manufacturer});
     mRequestedParts.insert(part);
   }
-  mScheduledParts.remove(0, batchSize);
+  mScheduledParts.remove(0, count);
   mEndpoint->requestPartsInformation(mQueryUrl, batch);
 }
 

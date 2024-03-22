@@ -128,7 +128,7 @@ TEST_F(GraphicsExportTest, testExportImageWithManualScaling) {
   std::shared_ptr<GraphicsExportSettings> settings =
       std::make_shared<GraphicsExportSettings>();
   settings->setPixmapDpi(100);
-  settings->setScale(UnsignedRatio(Ratio::fromNormalized(4)));
+  settings->setScale(UnsignedRatio(Ratio::fromNormalized(2)));
   settings->setMarginLeft(UnsignedLength(25400000));  // 5% of width.
   settings->setMarginTop(UnsignedLength(12700000));  // 5% of height.
   settings->setMarginRight(UnsignedLength(50800000));  // 10% of width.
@@ -145,7 +145,7 @@ TEST_F(GraphicsExportTest, testExportImageWithManualScaling) {
   EXPECT_EQ(str({outFile}), str(result.writtenFiles));
   EXPECT_EQ(str({outFile}), str(mSavedFiles));
   EXPECT_TRUE(outFile.isExistingFile());
-  EXPECT_EQ("8300x4150", str(getImageSize(outFile)));  // 8000x4000 + margins.
+  EXPECT_EQ("4300x2150", str(getImageSize(outFile)));  // 4000x2000 + margins.
 }
 
 TEST_F(GraphicsExportTest, testExportMultipleImages) {

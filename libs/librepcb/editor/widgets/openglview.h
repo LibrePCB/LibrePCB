@@ -27,6 +27,10 @@
 #include <QtOpenGL>
 #include <QtWidgets>
 
+#if QT_VERSION_MAJOR >= 6
+#include <QtOpenGLWidgets>
+#endif
+
 #include <memory>
 
 /*******************************************************************************
@@ -81,8 +85,8 @@ protected:
   void paintGL() override;
 
 private:
-  void zoom(const QPoint& center, qreal factor) noexcept;
-  QPointF toNormalizedPos(const QPoint& pos) const noexcept;
+  void zoom(const QPointF& center, qreal factor) noexcept;
+  QPointF toNormalizedPos(const QPointF& pos) const noexcept;
   QPointF toModelPos(const QPointF& pos) const noexcept;
 
 private:

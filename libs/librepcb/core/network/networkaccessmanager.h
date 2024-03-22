@@ -28,6 +28,8 @@
 #include <QtCore>
 #include <QtNetwork>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -72,6 +74,7 @@ public:
   QNetworkReply* get(const QNetworkRequest& request) noexcept;
   QNetworkReply* post(const QNetworkRequest& request,
                       const QByteArray& data) noexcept;
+  std::unique_ptr<QIODevice> readFromCache(const QUrl& url) noexcept;
   bool setMinimumCacheExpirationDate(const QUrl& url,
                                      const QDateTime& dt) noexcept;
 

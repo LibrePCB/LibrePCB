@@ -31,7 +31,7 @@
 #include <fontobene-qt/glyphlistaccessor.h>
 #endif
 
-#include <QtConcurrent/QtConcurrent>
+#include <QtConcurrent>
 #include <QtCore>
 
 /*******************************************************************************
@@ -53,7 +53,7 @@ StrokeFont::StrokeFont(const FilePath& fontFilePath,
            << "in worker thread...";
   mFuture = QtConcurrent::run([content]() {
     QTextStream s(content);
-    return fb::Font(s);
+    return std::make_shared<fb::Font>(s);
   });
   connect(&mWatcher, &QFutureWatcher<fb::Font>::finished, this,
           &StrokeFont::fontLoaded);
@@ -211,11 +211,11 @@ void StrokeFont::fontLoaded() noexcept {
 const fb::GlyphListAccessor& StrokeFont::accessor() const noexcept {
   if (!mFont) {
     try {
-      mFont.reset(new fb::Font(mFuture.result()));  // can throw
+      mFont = mFuture.result();  // can throw
       qDebug() << "Successfully loaded stroke font" << mFilePath.toNative()
                << "with" << mFont->glyphs.count() << "glyphs.";
     } catch (const fb::Exception& e) {
-      mFont.reset(new fb::Font());
+      mFont = std::make_shared<fb::Font>();
       qCritical().nospace() << "Failed to load stroke font "
                             << mFilePath.toNative() << ": " << e.msg();
     }

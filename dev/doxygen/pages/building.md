@@ -58,6 +58,19 @@ installing [ccache](https://ccache.dev/) and passing
 
     cmake .. -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
 
+## Choosing Qt Version
+
+By default the used Qt version is automatically detected by CMake while Qt5
+is preferred over Qt6. To explicitly specify the Qt version to use, set the
+CMake variable `QT_MAJOR_VERSION` to either `5` or `6`:
+
+    cmake .. -DQT_MAJOR_VERSION=6
+
+Please note that currently Qt6 support for LibrePCB is experimental and should
+not be used for official releases. However, we plan to make Qt6 the default
+soon (after more testing), and even removing Qt5 support (and thus also this
+CMake option) afterwards.
+
 ## Changing the Install Prefix
 
 By passing in the `CMAKE_INSTALL_PREFIX` parameter, you can change the install

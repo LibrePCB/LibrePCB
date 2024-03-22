@@ -29,6 +29,7 @@
 #include <librepcb/core/project/circuit/assemblyvariant.h>
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/qtcompat.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -72,7 +73,7 @@ BomOutputJobWidget::BomOutputJobWidget(Project& project,
   connect(mUi->edtCustomAttributes, &QLineEdit::textEdited, this,
           [this](QString text) {
             mJob->setCustomAttributes(
-                text.remove(" ").split(",", QString::SkipEmptyParts));
+                text.remove(" ").split(",", QtCompat::skipEmptyParts()));
           });
 
   // List custom boards.

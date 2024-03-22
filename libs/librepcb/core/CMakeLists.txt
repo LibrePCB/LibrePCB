@@ -417,6 +417,7 @@ add_library(
   project/schematic/schematicnetsegmentsplitter.h
   project/schematic/schematicpainter.cpp
   project/schematic/schematicpainter.h
+  qtcompat.h
   rulecheck/rulecheckmessage.cpp
   rulecheck/rulecheckmessage.h
   serialization/fileformatmigration.cpp
@@ -532,13 +533,13 @@ target_link_libraries(
          Polyclipping::Polyclipping
          TypeSafe::TypeSafe
          # Qt
-         Qt5::Concurrent
-         Qt5::Core
-         Qt5::Gui
-         Qt5::Network
-         Qt5::PrintSupport
-         Qt5::Sql
-         Qt5::Svg
+         ${QT}::Concurrent
+         ${QT}::Core
+         ${QT}::Gui
+         ${QT}::Network
+         ${QT}::PrintSupport
+         ${QT}::Sql
+         ${QT}::Svg
          # Link with -lproc on SunOS / Solaris / Illumos
          # This is required for proc_get_psinfo
          $<$<STREQUAL:$<PLATFORM_ID>,SunOS>:proc>

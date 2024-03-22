@@ -234,7 +234,7 @@ bool ZonePropertiesDialog::applyChanges() noexcept {
 
 template <typename T>
 void ZonePropertiesDialog::applyChanges(T& cmd) {
-  Zone::Rules rules = 0;
+  Zone::Rules rules(0);
   rules.setFlag(Zone::Rule::NoCopper, mUi->cbxNoCopper->isChecked());
   rules.setFlag(Zone::Rule::NoPlanes, mUi->cbxNoPlanes->isChecked());
   rules.setFlag(Zone::Rule::NoExposure, mUi->cbxNoExposure->isChecked());

@@ -75,11 +75,76 @@ public:
    * @return The created QSet.
    */
   template <typename T>
-  static QSet<T> toSet(const QList<T>& list) noexcept {
+  static inline QSet<T> toSet(const QList<T>& list) noexcept {
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
     return QSet<T>(list.begin(), list.end());
 #else
     return list.toSet();
+#endif
+  }
+
+#if (QT_VERSION_MAJOR < 6)
+  /**
+   * @brief Helper method to convert a QVector<T> to a QSet<T>
+   *
+   * Until Qt 5.13, QVector::toList() was the way to do this conversion. But
+   * since Qt 5.14 this is deprecated, and a range constructor was added to
+   * QSet instead. This wrapper chooses the proper method depending on the Qt
+   * version to avoid raising any deprecation warnings.
+   *
+   * @param vector    The QVector to be converted.
+   *
+   * @return The created QSet.
+   */
+  template <typename T>
+  static inline QSet<T> toSet(const QVector<T>& vector) noexcept {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+    return QSet<T>(vector.begin(), vector.end());
+#else
+    return vector.toList().toSet();
+#endif
+  }
+#endif
+
+  /**
+   * @brief Helper method to convert a QSet<T> to a QVector<T>
+   *
+   * Until Qt 5.13, QSet::toList() was the way to do this conversion. But since
+   * Qt 5.14 this is deprecated, and a range constructor was added to QVector
+   * instead. This wrapper chooses the proper method depending on the Qt
+   * version to avoid raising any deprecation warnings.
+   *
+   * @param set   The QSet to be converted.
+   *
+   * @return The created QVector (in arbitrary order!).
+   */
+  template <typename T>
+  static inline QVector<T> toVector(const QSet<T>& set) noexcept {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+    return QVector<T>(set.begin(), set.end());
+#else
+    return set.toList().toVector();
+#endif
+  }
+
+  /**
+   * @brief Helper method to convert a QSet<T> to a QList<T>
+   *
+   * Until Qt 5.13, QSet::toList() was the way to do this conversion. But since
+   * Qt 5.14 this is deprecated, and a range constructor was added to QVector
+   * instead. This wrapper chooses the proper method depending on the Qt
+   * version to avoid raising any deprecation warnings.
+   *
+   * @param set   The QSet to be converted.
+   *
+   * @return The created QVector (in arbitrary order!).
+   */
+  template <typename T>
+  static inline QList<T> toList(const QSet<T>& set) noexcept {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+    return QList<T>(set.begin(), set.end());
+#else
+    return set.toList();
 #endif
   }
 

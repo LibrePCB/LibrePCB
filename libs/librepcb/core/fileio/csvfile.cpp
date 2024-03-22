@@ -24,6 +24,7 @@
 
 #include "../exceptions.h"
 #include "../fileio/fileutils.h"
+#include "../qtcompat.h"
 
 #include <QtCore>
 
@@ -83,7 +84,7 @@ void CsvFile::saveToFile(const FilePath& csvFp) const {
 QString CsvFile::getCommentLines() const noexcept {
   QString str;
   if (!mComment.isEmpty()) {
-    foreach (QString line, mComment.split("\n", QString::KeepEmptyParts)) {
+    foreach (QString line, mComment.split("\n", QtCompat::keepEmptyParts())) {
       str += "# " % line;
       while (str[str.count() - 1].isSpace()) {
         str.chop(1);

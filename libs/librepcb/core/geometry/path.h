@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../exceptions.h"
+#include "../qtcompat.h"
 #include "vertex.h"
 
 #include <type_safe/constrained_type.hpp>
@@ -183,7 +184,7 @@ private:  // Data
  *  Non-Member Functions
  ******************************************************************************/
 
-inline uint qHash(const Path& key, uint seed = 0) noexcept {
+inline QtCompat::Hash qHash(const Path& key, QtCompat::Hash seed = 0) noexcept {
   return qHashRange(key.getVertices().begin(), key.getVertices().end(), seed);
 }
 
@@ -219,7 +220,8 @@ struct NonEmptyPathConstraint {
 using NonEmptyPath = type_safe::constrained_type<Path, NonEmptyPathConstraint,
                                                  NonEmptyPathVerifier>;
 
-inline uint qHash(const NonEmptyPath& key, uint seed = 0) noexcept {
+inline QtCompat::Hash qHash(const NonEmptyPath& key,
+                            QtCompat::Hash seed = 0) noexcept {
   return ::qHash(*key, seed);
 }
 
@@ -261,7 +263,8 @@ using StraightAreaPath =
     type_safe::constrained_type<Path, StraightAreaPathConstraint,
                                 StraightAreaPathVerifier>;
 
-inline uint qHash(const StraightAreaPath& key, uint seed = 0) noexcept {
+inline QtCompat::Hash qHash(const StraightAreaPath& key,
+                            QtCompat::Hash seed = 0) noexcept {
   return ::qHash(*key, seed);
 }
 

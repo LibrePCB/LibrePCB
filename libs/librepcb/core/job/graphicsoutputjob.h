@@ -194,6 +194,7 @@ public:
       }
     }
     Content(const Content& other) = default;
+    Content& operator=(const Content& rhs) = default;
     bool operator==(const Content& rhs) const noexcept {
       return (type == rhs.type)  //
           && (title == rhs.title)  //

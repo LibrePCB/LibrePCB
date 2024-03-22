@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/core/project/circuit/netsignal.h>
 #include <librepcb/core/rulecheck/rulecheckmessage.h>
 #include <librepcb/core/serialization/fileformatmigration.h>
 #include <optional/tl/optional.hpp>
@@ -42,7 +43,6 @@ namespace librepcb {
 class Board;
 class FilePath;
 class LengthUnit;
-class NetSignal;
 class Project;
 class Workspace;
 

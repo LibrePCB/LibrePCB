@@ -6,7 +6,7 @@ if(EXISTS "${FONTOBENE_SUBMODULE_BASEPATH}"
   message(STATUS "Using vendored FontoBeneQt")
 
   # Use same Qt version as for LibrePCB
-  set(FONTOBENE_QT_MAJOR_VERSION 5)
+  set(FONTOBENE_QT_MAJOR_VERSION ${QT_MAJOR_VERSION})
 
   # Include local submodule
   add_subdirectory(

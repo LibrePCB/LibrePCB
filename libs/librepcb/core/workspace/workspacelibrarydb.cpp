@@ -34,6 +34,7 @@
 #include "../library/library.h"
 #include "../library/pkg/package.h"
 #include "../library/sym/symbol.h"
+#include "../qtcompat.h"
 #include "../serialization/sexpression.h"
 #include "../sqlitedatabase.h"
 #include "workspacelibrarydbwriter.h"
@@ -47,8 +48,8 @@
  ******************************************************************************/
 namespace librepcb {
 
-static inline uint qHash(const WorkspaceLibraryDb::Part& key,
-                         uint seed) noexcept {
+static inline QtCompat::Hash qHash(const WorkspaceLibraryDb::Part& key,
+                                   QtCompat::Hash seed = 0) noexcept {
   return ::qHash(qMakePair(key.mpn, key.manufacturer), seed);
 }
 
@@ -111,6 +112,20 @@ int WorkspaceLibraryDb::getScanProgressPercent() const noexcept {
   return mLibraryScanner->getProgressPercent();
 }
 
+template <typename ElementType>
+QList<Uuid> WorkspaceLibraryDb::find(const QString& keyword) const {
+  return find(getTable<ElementType>(), keyword);
+}
+
+// explicit template instantiations
+template QList<Uuid> WorkspaceLibraryDb::find<Symbol>(
+    const QString& keyword) const;
+template QList<Uuid> WorkspaceLibraryDb::find<Component>(
+    const QString& keyword) const;
+template QList<Uuid> WorkspaceLibraryDb::find<Device>(
+    const QString& keyword) const;
+
+// specialization for Package
 template <>
 QList<Uuid> WorkspaceLibraryDb::find<Package>(const QString& keyword) const {
   // ATTENTION: Keep SQL in sync with the generig find() method below!

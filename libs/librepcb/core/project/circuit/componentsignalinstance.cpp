@@ -27,6 +27,7 @@
 #include "../../library/cmp/component.h"
 #include "../../library/pkg/packagepad.h"
 #include "../../utils/scopeguardlist.h"
+#include "../../utils/toolbox.h"
 #include "../board/items/bi_footprintpad.h"
 #include "../project.h"
 #include "../projectattributelookup.h"
@@ -217,7 +218,7 @@ void ComponentSignalInstance::updatePadNames() noexcept {
       }
     }
   }
-  QStringList sortedNames = names.toList();
+  QStringList sortedNames = Toolbox::toList(names);
   Toolbox::sortNumeric(sortedNames);
 
   if (sortedNames != mPadNames) {

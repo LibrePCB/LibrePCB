@@ -152,7 +152,7 @@ bool PackageEditorState_DrawPolygonBase::entry() noexcept {
 
   mLastScenePos =
       mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos(), true, true);
-  updateCursorPosition(0);
+  updateCursorPosition(Qt::KeyboardModifier::NoModifier);
   updateStatusBarMessage();
 
   mContext.graphicsView.setCursor(Qt::CrossCursor);

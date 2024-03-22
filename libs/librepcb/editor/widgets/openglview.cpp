@@ -27,6 +27,7 @@
 
 #include <librepcb/core/application.h>
 #include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/qtcompat.h>
 #include <librepcb/core/types/angle.h>
 
 #include <QtCore>
@@ -201,7 +202,15 @@ void OpenGlView::mouseMoveEvent(QMouseEvent* e) {
 }
 
 void OpenGlView::wheelEvent(QWheelEvent* e) {
-  zoom(e->pos(), qPow(sZoomStepFactor, e->delta() / qreal(120)));
+  if (e->angleDelta().y() != 0) {
+    zoom(
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+        e->position(),
+#else
+        e->pos(),
+#endif
+        qPow(sZoomStepFactor, e->angleDelta().y() / qreal(120)));
+  }
 }
 
 void OpenGlView::smoothTo(qreal fov, const QPointF& center,
@@ -237,7 +246,7 @@ void OpenGlView::initializeGL() {
   } else {
     qCritical() << "Failed to initialize OpenGL!";
     foreach (const QString& line,
-             mProgram.log().split('\n', QString::SkipEmptyParts)) {
+             mProgram.log().split('\n', QtCompat::skipEmptyParts())) {
       qCritical().noquote() << "OpenGL:" << line;
     }
     glClearColor(1, 0, 0, 1);
@@ -289,7 +298,7 @@ void OpenGlView::paintGL() {
  *  Private Methods
  ******************************************************************************/
 
-void OpenGlView::zoom(const QPoint& center, qreal factor) noexcept {
+void OpenGlView::zoom(const QPointF& center, qreal factor) noexcept {
   mAnimation->stop();
 
   const QPointF centerNormalized = toNormalizedPos(center);
@@ -302,7 +311,7 @@ void OpenGlView::zoom(const QPoint& center, qreal factor) noexcept {
   update();
 }
 
-QPointF OpenGlView::toNormalizedPos(const QPoint& pos) const noexcept {
+QPointF OpenGlView::toNormalizedPos(const QPointF& pos) const noexcept {
   const qreal w = width();
   const qreal h = height();
   return QPointF((pos.x() / w) - 0.5, ((h - pos.y()) / h) - 0.5);

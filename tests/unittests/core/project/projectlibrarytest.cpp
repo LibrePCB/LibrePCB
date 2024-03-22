@@ -63,11 +63,11 @@ protected:
     TransactionalDirectory libSymDir(mLibFs, "sym");
     mExistingSymbol->saveIntoParentDirectory(libSymDir);
     mLibFs->save();
-    mExistingSymbolFile =
+    mExistingSymbolFile.setFile(
         mLibDir
             .getPathTo(QString("sym/%1/symbol.lp")
                            .arg(mExistingSymbol->getUuid().toStr()))
-            .toStr();
+            .toStr());
 
     // create symbol outside the project library (emulating workspace library)
     mNewSymbol.reset(new Symbol(Uuid::createRandom(), Version::fromString("1"),
@@ -75,11 +75,11 @@ protected:
     TransactionalDirectory tempSymDir(mTempFs);
     mNewSymbol->saveIntoParentDirectory(tempSymDir);
     mTempFs->save();
-    mNewSymbolFile =
+    mNewSymbolFile.setFile(
         mLibDir
             .getPathTo(
                 QString("sym/%1/symbol.lp").arg(mNewSymbol->getUuid().toStr()))
-            .toStr();
+            .toStr());
 
     // modify new symbol to detect the file format upgrade
     QByteArray newContent = mNewSymbol->getDirectory().read("symbol.lp") + " ";

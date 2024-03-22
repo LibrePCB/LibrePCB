@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../exceptions.h"
+#include "../qtcompat.h"
 
 #include <type_safe/constrained_type.hpp>
 
@@ -293,7 +294,8 @@ inline QDebug operator<<(QDebug stream, const Ratio& ratio) {
   return stream;
 }
 
-inline uint qHash(const Ratio& key, uint seed = 0) noexcept {
+inline QtCompat::Hash qHash(const Ratio& key,
+                            QtCompat::Hash seed = 0) noexcept {
   return ::qHash(key.toPpm(), seed);
 }
 
@@ -338,7 +340,8 @@ inline QDebug operator<<(QDebug stream, const UnsignedRatio& ratio) {
   return stream;
 }
 
-inline uint qHash(const UnsignedRatio& key, uint seed = 0) noexcept {
+inline QtCompat::Hash qHash(const UnsignedRatio& key,
+                            QtCompat::Hash seed = 0) noexcept {
   return ::qHash(key->toPpm(), seed);
 }
 
@@ -385,7 +388,8 @@ inline QDebug operator<<(QDebug stream, const UnsignedLimitedRatio& ratio) {
   return stream;
 }
 
-inline uint qHash(const UnsignedLimitedRatio& key, uint seed = 0) noexcept {
+inline QtCompat::Hash qHash(const UnsignedLimitedRatio& key,
+                            QtCompat::Hash seed = 0) noexcept {
   return ::qHash(key->toPpm(), seed);
 }
 

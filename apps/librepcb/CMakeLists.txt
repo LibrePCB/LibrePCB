@@ -23,9 +23,9 @@ target_link_libraries(
           LibrePCB::Editor
           LibrePCB::Core
           # Qt
-          Qt5::Core
-          Qt5::Gui
-          Qt5::Widgets
+          ${QT}::Core
+          ${QT}::Gui
+          ${QT}::Widgets
 )
 
 # Install target

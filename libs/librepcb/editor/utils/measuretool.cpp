@@ -175,7 +175,7 @@ void MeasureTool::enter() noexcept {
     mView->setCursor(Qt::CrossCursor);
     mLastScenePos = mView->mapGlobalPosToScenePos(QCursor::pos(), true, true);
   }
-  updateCursorPosition(0);
+  updateCursorPosition(Qt::KeyboardModifier::NoModifier);
   updateStatusBarMessage();
 }
 
@@ -409,7 +409,7 @@ void MeasureTool::updateRulerPositions() noexcept {
     return;
   }
 
-  GraphicsView::CursorOptions cursorOptions = 0;
+  GraphicsView::CursorOptions cursorOptions(0);
   if ((!mStartPos) || mEndPos) {
     cursorOptions |= GraphicsView::CursorOption::Cross;
   }

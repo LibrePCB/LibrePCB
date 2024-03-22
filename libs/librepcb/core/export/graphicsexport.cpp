@@ -72,7 +72,11 @@ void GraphicsExport::startPreview(const Pages& pages) noexcept {
   RunArgs args{
       true, pages, FilePath(), QString(), QPrinter::DuplexNone, 1,
   };
+#if (QT_VERSION_MAJOR >= 6)
+  mFuture = QtConcurrent::run(&GraphicsExport::run, this, args);
+#else
   mFuture = QtConcurrent::run(this, &GraphicsExport::run, args);
+#endif
 }
 
 void GraphicsExport::startExport(const Pages& pages,
@@ -81,7 +85,11 @@ void GraphicsExport::startExport(const Pages& pages,
   RunArgs args{
       false, pages, filePath, QString(), QPrinter::DuplexNone, 1,
   };
+#if (QT_VERSION_MAJOR >= 6)
+  mFuture = QtConcurrent::run(&GraphicsExport::run, this, args);
+#else
   mFuture = QtConcurrent::run(this, &GraphicsExport::run, args);
+#endif
 }
 
 void GraphicsExport::startPrint(const Pages& pages, const QString& printerName,
@@ -91,7 +99,11 @@ void GraphicsExport::startPrint(const Pages& pages, const QString& printerName,
   RunArgs args{
       false, pages, FilePath(), printerName, duplex, copies,
   };
+#if (QT_VERSION_MAJOR >= 6)
+  mFuture = QtConcurrent::run(&GraphicsExport::run, this, args);
+#else
   mFuture = QtConcurrent::run(this, &GraphicsExport::run, args);
+#endif
 }
 
 GraphicsExport::Result GraphicsExport::waitForFinished() noexcept {
