@@ -44,10 +44,4 @@ windeployqt --compiler-runtime --force ./build/install/opt/bin/librepcb-cli.exe
 ./build/install/opt/bin/librepcb.exe --exit-after-startup
 
 # Copy everything to artifacts directory for deployment
-if [ "$QT" = "6" ]
-then
-  SUFFIX="$ARCH-qt6"
-else
-  SUFFIX="$ARCH"
-fi
-cp -r ./build/install/opt/. ./artifacts/nightly_builds/librepcb-nightly-windows-$SUFFIX/
+cp -r ./build/install/opt/. ./artifacts/nightly_builds/librepcb-nightly-windows-$ARCH/
