@@ -116,10 +116,11 @@ void BoardDesignRuleCheck::execute(bool quick) {
     checkAllowedPthSlots(76);  // 1%
     checkInvalidPadConnections(78);  // 2%
     checkDeviceClearances(88);  // 10%
-    checkBoardOutline(91);  // 3%
-    checkForUnplacedComponents(93);  // 2%
-    checkForMissingConnections(95);  // 2%
-    checkForStaleObjects(97);  // 2%
+    checkBoardOutline(90);  // 2%
+    checkUsedLayers(92);  // 2%
+    checkForUnplacedComponents(94);  // 2%
+    checkForMissingConnections(96);  // 2%
+    checkForStaleObjects(98);  // 2%
   }
 
   emitStatus(
@@ -1624,6 +1625,65 @@ void BoardDesignRuleCheck::checkBoardOutline(int progressEnd) {
           std::make_shared<DrcMsgMinimumBoardOutlineInnerRadiusViolation>(
               minEdgeRadius, locations));
     }
+  }
+
+  emitProgress(progressEnd);
+}
+
+void BoardDesignRuleCheck::checkUsedLayers(int progressEnd) {
+  emitStatus(tr("Check used layers..."));
+
+  // Determine all used copper layers.
+  QSet<const Layer*> usedLayers;
+  usedLayers.insert(&Layer::topCopper());  // Can't be disabled -> no warning.
+  usedLayers.insert(&Layer::botCopper());  // Can't be disabled -> no warning.
+  foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
+    const Transform transform(*device);
+    for (const Polygon& polygon : device->getLibFootprint().getPolygons()) {
+      if (polygon.getLayer().isCopper()) {
+        usedLayers.insert(&transform.map(polygon.getLayer()));
+      }
+    }
+    for (const Circle& circle : device->getLibFootprint().getCircles()) {
+      if (circle.getLayer().isCopper()) {
+        usedLayers.insert(&transform.map(circle.getLayer()));
+      }
+    }
+  }
+  foreach (const BI_NetSegment* segment, mBoard.getNetSegments()) {
+    foreach (const BI_NetLine* netline, segment->getNetLines()) {
+      usedLayers.insert(&netline->getLayer());
+    }
+  }
+  foreach (const BI_Plane* plane, mBoard.getPlanes()) {
+    usedLayers.insert(&plane->getLayer());
+  }
+  foreach (const BI_Polygon* polygon, mBoard.getPolygons()) {
+    if (polygon->getData().getLayer().isCopper()) {
+      usedLayers.insert(&polygon->getData().getLayer());
+    }
+  }
+  foreach (const BI_StrokeText* text, mBoard.getStrokeTexts()) {
+    if (text->getData().getLayer().isCopper()) {
+      usedLayers.insert(&text->getData().getLayer());
+    }
+  }
+
+  // Comparison function to sort layers.
+  auto cmp = [](const Layer* a, const Layer* b) {
+    return a->getCopperNumber() < b->getCopperNumber();
+  };
+
+  // Warn about disabled layers.
+  foreach (const Layer* layer,
+           Toolbox::sortedQSet(usedLayers - mBoard.getCopperLayers(), cmp)) {
+    emitMessage(std::make_shared<DrcMsgDisabledLayer>(*layer));
+  }
+
+  // Warn about unused layers.
+  foreach (const Layer* layer,
+           Toolbox::sortedQSet(mBoard.getCopperLayers() - usedLayers, cmp)) {
+    emitMessage(std::make_shared<DrcMsgUnusedLayer>(*layer));
   }
 
   emitProgress(progressEnd);

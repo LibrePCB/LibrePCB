@@ -845,6 +845,44 @@ public:
 };
 
 /*******************************************************************************
+ *  Class DrcMsgDisabledLayer
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgDisabledLayer class
+ */
+class DrcMsgDisabledLayer final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgDisabledLayer)
+
+public:
+  // Constructors / Destructor
+  DrcMsgDisabledLayer() = delete;
+  explicit DrcMsgDisabledLayer(const Layer& layer) noexcept;
+  DrcMsgDisabledLayer(const DrcMsgDisabledLayer& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~DrcMsgDisabledLayer() noexcept {}
+};
+
+/*******************************************************************************
+ *  Class DrcMsgUnusedLayer
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgUnusedLayer class
+ */
+class DrcMsgUnusedLayer final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgUnusedLayer)
+
+public:
+  // Constructors / Destructor
+  DrcMsgUnusedLayer() = delete;
+  explicit DrcMsgUnusedLayer(const Layer& layer) noexcept;
+  DrcMsgUnusedLayer(const DrcMsgUnusedLayer& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~DrcMsgUnusedLayer() noexcept {}
+};
+
+/*******************************************************************************
  *  End of File
  ******************************************************************************/
 
