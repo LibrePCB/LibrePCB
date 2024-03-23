@@ -1,0 +1,361 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: librepcb
+Source: https://librepcb.org/
+Files-Excluded: libs/parseagle/specs/eagle*dtd
+Comment:
+ Exclude libs/parseagle/specs/eagle_7.5.0.dtd as it is released
+ under CC-BY-ND-3 and not required for building or installing.
+
+Files:
+ apps/*
+ cmake/*
+ dev/*
+ dist/*
+ i18n/*
+ img/app/librepcb.icns
+ img/app/librepcb.ico
+ img/app/librepcb.png
+ img/app/librepcb.svg
+ img/logo/32x32.png
+ img/logo/48x48.png
+ img/logo/64x64.png
+ img/images.qrc
+ libs/librepcb/*
+ share/*
+ tests/*
+ CMakeLists.txt
+Copyright: LibrePCB Developers, see AUTHORS.md
+License: GPL-3.0-or-later
+
+Files:
+ .github/*
+ .tx/*
+ ci/*
+ img/actions/add_hole.png
+ img/actions/add_name_dark.png
+ img/actions/add_name.png
+ img/actions/add_plane.png
+ img/actions/add_smt_pad.png
+ img/actions/add_symbol_pin.png
+ img/actions/add_text_dark.png
+ img/actions/add_text.png
+ img/actions/add_tht_pad.png
+ img/actions/add_value_dark.png
+ img/actions/add_value.png
+ img/actions/add_via.png
+ img/actions/board_editor.png
+ img/actions/draw_line_dark.png
+ img/actions/draw_line.png
+ img/actions/draw_netlabel_dark.png
+ img/actions/draw_netlabel.png
+ img/actions/draw_wire_dark.png
+ img/actions/draw_wire.png
+ img/actions/draw_zone.png
+ img/actions/grid_dark.png
+ img/actions/grid.png
+ img/actions/hide_planes.png
+ img/actions/layers.png
+ img/actions/rebuild_plane.png
+ img/actions/schematic.png
+ img/actions/show_pin_numbers_dark.png
+ img/actions/show_pin_numbers.png
+ img/actions/show_planes.png
+ img/command_toolbars/pad_bottom.png
+ img/command_toolbars/pad_tht.png
+ img/command_toolbars/pad_top.png
+ img/command_toolbars/shape_octagon.png
+ img/command_toolbars/shape_rect.png
+ img/command_toolbars/shape_round.png
+ img/command_toolbars/shape_rounded_rect.png
+ img/command_toolbars/via_octagon.png
+ img/command_toolbars/via_round.png
+ img/command_toolbars/via_square.png
+ img/command_toolbars/wire_45_90_dark.png
+ img/command_toolbars/wire_45_90.png
+ img/command_toolbars/wire_90_45_dark.png
+ img/command_toolbars/wire_90_45.png
+ img/command_toolbars/wire_h_v_dark.png
+ img/command_toolbars/wire_h_v.png
+ img/command_toolbars/wire_straight_dark.png
+ img/command_toolbars/wire_straight.png
+ img/command_toolbars/wire_v_h_dark.png
+ img/command_toolbars/wire_v_h.png
+ img/library/bipolar_capacitor_eu_dark.png
+ img/library/bipolar_capacitor_eu.png
+ img/library/bipolar_capacitor_us_dark.png
+ img/library/bipolar_capacitor_us.png
+ img/library/footprint.png
+ img/library/gnd_dark.png
+ img/library/gnd.png
+ img/library/inductor_eu_dark.png
+ img/library/inductor_eu.png
+ img/library/inductor_us_dark.png
+ img/library/inductor_us.png
+ img/library/resistor_eu_dark.png
+ img/library/resistor_eu.png
+ img/library/resistor_us_dark.png
+ img/library/resistor_us.png
+ img/library/symbol.png
+ img/library/unipolar_capacitor_eu_dark.png
+ img/library/unipolar_capacitor_eu.png
+ img/library/unipolar_capacitor_us_dark.png
+ img/library/unipolar_capacitor_us.png
+ img/library/vcc_dark.png
+ img/library/vcc.png
+ img/norm/iec_60617_dark.png
+ img/norm/iec_60617.png
+ img/norm/ieee_315_dark.png
+ img/norm/ieee_315.png
+ img/wizards/watermark.jpg
+ img/empty.png
+ img/README.md
+ libs/README.md
+ .clang-format
+ .cmake-format.py
+ .editorconfig
+ .git-blame-ignore-revs
+ .gitattributes
+ .gitbugtraq
+ .gitignore
+ .gitmodules
+ AUTHORS.md
+ CONTRIBUTING.md
+ README.md
+ SECURITY.md
+Copyright: LibrePCB Developers, see AUTHORS.md
+License: CC0-1.0
+
+Files:
+ img/logo/ngi0-entrust.png
+Copyright: Next Generation Internet
+License: CC-BY-SA-4.0
+
+Files:
+ img/actions/export_gerber.png
+Copyright: Ucamco
+License: LicenseRef-CopyrightedFreeUsage
+
+Files:
+ img/wizards/eagle_watermark.png
+Copyright: publicdomainvectors.org and LibrePCB Developers
+License: CC0-1.0
+
+Files:
+ img/actions/select.png
+Copyright: publicdomainvectors.org
+License: CC0-1.0
+
+Files:
+ img/actions/new_folder.png
+ img/places/folder_gray.png
+ img/places/folder_green.png
+ img/places/folder_open_gray.png
+ img/places/folder_open_green.png
+ img/places/folder_open.png
+ img/places/folder.png
+ img/places/project_folder.png
+Copyright: Humanity Project and LibrePCB Developers
+License: GPL-2.0-only
+
+Files:
+ img/library/package.png
+Copyright: Part-DB Developers and LibrePCB Developers
+License: GPL-2.0-only
+
+Files:
+ img/library/3d_model.png
+ img/library/device.png
+Copyright: Part-DB Developers
+License: GPL-2.0-only
+
+Files:
+ img/actions/add_component.png
+ img/actions/bookmark_gray.png
+Copyright: Open Icon Library and LibrePCB Developers
+License: LGPL-2.1-only
+
+Files:
+ img/actions/minus.png
+ img/actions/undo.png
+Copyright: Open Icon Library and LibrePCB Developers
+License: GPL-2.0-only
+
+Files:
+ img/actions/clean.png
+ img/actions/down.png
+ img/actions/select_all.png
+ img/actions/up.png
+ img/actions/working.png
+ img/command_toolbars/cancel.png
+ img/status/success.png
+Copyright: Open Icon Library
+License: CC0-1.0
+
+Files:
+ img/actions/add.png
+ img/actions/apply.png
+ img/actions/bookmark.png
+ img/actions/cancel.png
+ img/actions/cut.png
+ img/actions/edit.png
+ img/actions/export_step.png
+ img/actions/generate_bom.png
+ img/actions/help.png
+ img/actions/new.png
+ img/actions/plus_2.png
+ img/actions/print_preview.png
+ img/actions/search.png
+ img/actions/settings.png
+ img/library/component.png
+ img/places/file.png
+Copyright: Open Icon Library
+License: LGPL-2.1-only
+
+Files:
+ img/actions/delete.png
+ img/actions/export_zip.png
+ img/actions/home.png
+ img/actions/new_2.png
+ img/actions/open_browser.png
+ img/actions/output_jobs.png
+ img/actions/paste.png
+ img/actions/plus.png
+ img/actions/quit.png
+ img/actions/recent.png
+ img/actions/redo.png
+ img/actions/save.png
+ img/actions/stop.png
+ img/actions/zoom_all.png
+ img/actions/zoom_in.png
+ img/actions/zoom_out.png
+ img/status/dialog_error.png
+Copyright: Open Icon Library
+License: GPL-2.0-only
+
+Files:
+ img/actions/cam_export.png
+Copyright: Open Icon Library
+License: GPL-3.0-only
+
+Files:
+ img/status/info.png
+Copyright: Open Icon Library
+License: CC-BY-3.0
+
+Files:
+ img/actions/close.png
+ img/actions/copy.png
+ img/actions/download.png
+ img/actions/draw_arc.png
+ img/actions/draw_circle.png
+ img/actions/draw_polygon.png
+ img/actions/draw_rectangle.png
+ img/actions/export_svg.png
+ img/actions/info.png
+ img/actions/mirror_horizontal.png
+ img/actions/mirror_vertical.png
+ img/actions/move.png
+ img/actions/open.png
+ img/actions/pdf.png
+ img/actions/print.png
+ img/actions/quick_check.png
+ img/actions/refresh.png
+ img/actions/rotate_left.png
+ img/actions/rotate_right.png
+ img/actions/run_all.png
+ img/actions/run.png
+ img/actions/select_rect.png
+ img/actions/wizard.png
+ img/command_toolbars/align_horizontal_center.png
+ img/command_toolbars/align_horizontal_left.png
+ img/command_toolbars/align_horizontal_right.png
+ img/command_toolbars/align_vertical_bottom.png
+ img/command_toolbars/align_vertical_center.png
+ img/command_toolbars/align_vertical_top.png
+ img/status/dialog_warning.png
+ img/status/locked.png
+ img/status/unlocked.png
+Copyright: Open Icon Library
+License: CC-BY-SA-3.0 or LGPL-2.1-only
+
+Files:
+ img/actions/clone.png
+ img/actions/drc.png
+ img/actions/export_pick_place_file.png
+ img/actions/export_pixmap.png
+ img/actions/export.png
+ img/actions/flip_horizontal.png
+ img/actions/flip_vertical.png
+ img/actions/import.png
+ img/actions/move_to.png
+ img/actions/order_pcb.png
+ img/actions/ruler.png
+ img/actions/view_3d.png
+ img/library/part.png
+Copyright: Icons8
+License: LicenseRef-Icons8
+
+Files: libs/delaunay-triangulation/*
+Copyright: 2015 Simon Zeni
+License: MIT
+
+Files: libs/dxflib/*
+Copyright: 2001 Robert J. Campbell Jr., 2001-2013 RibbonSoft GmbH
+License: GPL-2.0-or-later
+
+Files: libs/fontobene-qt/*
+Copyright: Fontobene Developers
+License: MIT or Apache-2.0
+
+Files: libs/googletest/*
+Copyright: Google and various contributors
+License: BSD-3-Clause
+
+Files: libs/googletest/googlemock/scripts/generator/*
+Copyright: Google and various contributors
+License: Apache-2.0
+
+Files: libs/hoedown/*
+Copyright: 2008-2014 Natacha Porté, Vicent Martí, Xavier Mendez, Devin Torres and the Hoedown authors
+License: ISC
+
+Files: libs/muparser/*
+Copyright: 2020 Ingo Berg
+License: BSD-2-Clause
+
+Files: libs/optional/*
+Copyright: 2017 by Simon Brand
+License: CC0-1.0
+
+Files: libs/optional/tests/catch.hpp
+Copyright: 2017 Two Blue Cubes Ltd
+License: BSL-1.0
+
+Files: libs/parseagle/*
+Copyright: U. Bruhin
+License: MIT or Apache-2.0
+
+Files: libs/polyclipping/*
+Copyright: Angus Johnson
+License: BSL-1.0
+
+Files: libs/quazip/*
+Copyright: 1998-2018 Gilles Vollant, Sergey A. Tachenov, Even Rouault, Adam Walczak
+           2010 Roberto Pompermaier, Adam Walczak
+License: LGPL-2.1-only-static-linking
+
+Files: libs/type_safe/*
+Copyright: 2016-2019, Jonathan Müller
+License: MIT
+
+Files: libs/type_safe/external/debug_assert/*
+Copyright: 2016-2018, Jonathan Müller
+License: Zlib
+
+Files: share/librepcb/fonts/Noto*
+Copyright: 2018 The Noto Project Authors
+License: OFL-1.1
+
+Files: tests/data/*
+Copyright: LibrePCB Developers, see AUTHORS.md
+License: CC0-1.0
