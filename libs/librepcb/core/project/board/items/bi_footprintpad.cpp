@@ -223,6 +223,8 @@ void BI_FootprintPad::deviceEdited(const BI_Device& obj,
                                    BI_Device::Event event) noexcept {
   Q_UNUSED(obj);
   switch (event) {
+    case BI_Device::Event::BoardLayersChanged:
+      break;  // Already handled by a signal-slot connection to the board.
     case BI_Device::Event::PositionChanged:
     case BI_Device::Event::RotationChanged:
     case BI_Device::Event::MirroredChanged:
