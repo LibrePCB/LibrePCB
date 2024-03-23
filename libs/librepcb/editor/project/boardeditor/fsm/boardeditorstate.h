@@ -193,7 +193,7 @@ protected:  // Methods
   bool getIgnoreLocks() const noexcept;
   PositiveLength getGridInterval() const noexcept;
   const LengthUnit& getLengthUnit() const noexcept;
-  static const QSet<const Layer*>& getAllowedGeometryLayers() noexcept;
+  QSet<const Layer*> getAllowedGeometryLayers() noexcept;
   void makeLayerVisible(const QString& layer) noexcept;
   void abortBlockingToolsInOtherEditors() noexcept;
   bool execCmd(UndoCommand* cmd);
