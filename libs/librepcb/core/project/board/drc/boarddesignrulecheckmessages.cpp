@@ -1701,6 +1701,45 @@ DrcMsgUselessVia::DrcMsgUselessVia(const BI_Via& via,
 }
 
 /*******************************************************************************
+ *  DrcMsgDisabledLayer
+ ******************************************************************************/
+
+DrcMsgDisabledLayer::DrcMsgDisabledLayer(const Layer& layer) noexcept
+  : RuleCheckMessage(
+        Severity::Warning,
+        tr("Objects on disabled layer: '%1'").arg(layer.getNameTr()),
+        tr("The layer contains copper objects, but it is disabled in the board "
+           "setup dialog and thus will be ignored in any production data "
+           "exports. Either increase the layer count to get this layer "
+           "exported, or remove all objects on this layer (by temporarily "
+           "enabling this layer to see them)."),
+        "disabled_layer") {
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("layer", layer.getId());
+  mApproval->ensureLineBreak();
+}
+
+/*******************************************************************************
+ *  DrcMsgUnusedLayer
+ ******************************************************************************/
+
+DrcMsgUnusedLayer::DrcMsgUnusedLayer(const Layer& layer) noexcept
+  : RuleCheckMessage(
+        Severity::Hint, tr("Unused layer: '%1'").arg(layer.getNameTr()),
+        tr("The layer contains no copper objects (except the automatically "
+           "generated through-hole annular rings, if any) so it is useless. "
+           "This is not critical, but if your intention is to flood it with "
+           "copper, you need to add a plane manually. Or if you don't need "
+           "this layer, you might want to reduce the layer count in the board "
+           "setup dialog to avoid unnecessary production costs. Also some PCB "
+           "manufacturers might be confused by empty layers."),
+        "unused_layer") {
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("layer", layer.getId());
+  mApproval->ensureLineBreak();
+}
+
+/*******************************************************************************
  *  End of File
  ******************************************************************************/
 

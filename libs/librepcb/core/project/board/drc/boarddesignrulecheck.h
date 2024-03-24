@@ -98,6 +98,7 @@ private:  // Methods
   void checkInvalidPadConnections(int progressEnd);
   void checkDeviceClearances(int progressEnd);
   void checkBoardOutline(int progressEnd);
+  void checkUsedLayers(int progressEnd);
   void checkForUnplacedComponents(int progressEnd);
   void checkForMissingConnections(int progressEnd);
   void checkForStaleObjects(int progressEnd);
