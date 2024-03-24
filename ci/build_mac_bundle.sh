@@ -3,6 +3,11 @@
 # set shell settings (see https://sipb.mit.edu/doc/safe-shell/)
 set -euv -o pipefail
 
+# Fix macdeployqt issue (https://github.com/actions/runner-images/issues/7522)
+echo "Killing XProtect..."
+sudo pkill -9 XProtect >/dev/null || true;
+while pgrep XProtect; do sleep 3; done;
+
 # replace "bin" and "share" directories with the single *.app directory
 cp -r "./build/install/opt/bin/librepcb.app" "./build/install/opt/LibrePCB.app"
 cp -r "./build/install/opt/share" "./build/install/opt/LibrePCB.app/Contents/"
