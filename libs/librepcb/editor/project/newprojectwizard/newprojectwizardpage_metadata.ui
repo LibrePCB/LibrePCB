@@ -94,10 +94,11 @@
         </size>
        </property>
        <property name="toolTip">
-        <string>https://en.wikipedia.org/wiki/Creative_Commons_license</string>
+        <string>Note that additional actions might be required to fully license the project.
+For more information about licensing, click on this icon.</string>
        </property>
        <property name="text">
-        <string notr="true">&lt;a href=&quot;https://en.wikipedia.org/wiki/Creative_Commons_license&quot;&gt;&lt;img src=&quot;:/img/status/info.png&quot; width=&quot;25&quot; height=&quot;25&quot;/&gt;&lt;/a&gt;</string>
+        <string notr="true">&lt;a href=&quot;https://librepcb.org/docs/user-manual/licenses/&quot;&gt;&lt;img src=&quot;:/img/status/info.png&quot; width=&quot;25&quot; height=&quot;25&quot;/&gt;&lt;/a&gt;</string>
        </property>
        <property name="scaledContents">
         <bool>true</bool>
@@ -161,16 +162,6 @@
      </property>
      <property name="text">
       <string/>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="9" column="1">
-    <widget class="QLabel" name="lblLicenseAdditionalActions">
-     <property name="text">
-      <string>Additional actions might be required to fully license the project. See the license text for more information.</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>
