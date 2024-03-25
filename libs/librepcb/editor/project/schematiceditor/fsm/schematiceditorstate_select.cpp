@@ -338,12 +338,21 @@ bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
         return true;
       }
 
-      // Check if there's already an item selected.
+      // Check if there's already an item selected. If a symbol is selected,
+      // make sure to ignore its texts because they have been be selected
+      // automatically too.
+      auto isTextOfSymbol = [](const std::shared_ptr<QGraphicsItem>& text,
+                               const std::shared_ptr<QGraphicsItem>& symbol) {
+        if (auto textItem = dynamic_cast<SGI_Text*>(text.get())) {
+          return textItem->getSymbolGraphicsItem().lock() == symbol;
+        }
+        return false;
+      };
       std::shared_ptr<QGraphicsItem> selectedItem;
       foreach (auto item, items) {
-        if (item->isSelected()) {
+        if ((item->isSelected()) &&
+            ((!selectedItem) || (!isTextOfSymbol(item, selectedItem)))) {
           selectedItem = item;
-          break;
         }
       }
       if (mouseEvent.modifiers() & Qt::ControlModifier) {
@@ -352,13 +361,8 @@ bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
         item->setSelected(!item->isSelected());
       } else if (mouseEvent.modifiers() & Qt::ShiftModifier) {
         // Cycle Selection, when holding shift.
-        int nextSelectionIndex = 0;
-        for (int i = 0; i < items.count(); ++i) {
-          if (items.at(i)->isSelected()) {
-            nextSelectionIndex = (i + 1) % items.count();
-            break;
-          }
-        }
+        const int nextSelectionIndex =
+            (items.indexOf(selectedItem) + 1) % items.count();
         Q_ASSERT((nextSelectionIndex >= 0) &&
                  (nextSelectionIndex < items.count()));
         scene->clearSelection();
