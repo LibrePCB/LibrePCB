@@ -493,7 +493,6 @@ void LibraryOverviewWidget::openContextMenuAtPos(const QPoint& pos) noexcept {
   Q_ASSERT(list);
   QHash<QListWidgetItem*, FilePath> selectedItemPaths =
       getElementListItemFilePaths(list->selectedItems());
-  QHash<QAction*, FilePath> aCopyToLibChildren;
   QHash<QAction*, FilePath> aMoveToLibChildren;
 
   // Build the context menu
@@ -512,22 +511,16 @@ void LibraryOverviewWidget::openContextMenuAtPos(const QPoint& pos) noexcept {
   aRemove->setEnabled(!mContext.readOnly);
   mb.addAction(aRemove);
   if (!selectedItemPaths.isEmpty()) {
-    QMenu* menuCopyToLib =
-        mb.addSubMenu(&MenuBuilder::createCopyToOtherLibraryMenu);
     QMenu* menuMoveToLib =
         mb.addSubMenu(&MenuBuilder::createMoveToOtherLibraryMenu);
     foreach (const LibraryMenuItem& item, getLocalLibraries()) {
       if (item.filepath != mLibrary->getDirectory().getAbsPath()) {
-        QAction* actionCopy = menuCopyToLib->addAction(item.pixmap, item.name);
-        aCopyToLibChildren.insert(actionCopy, item.filepath);
         QAction* actionMove = menuMoveToLib->addAction(item.pixmap, item.name);
         aMoveToLibChildren.insert(actionMove, item.filepath);
       }
     }
     // Disable menu item if it doesn't contain children.
-    menuCopyToLib->setEnabled(!aCopyToLibChildren.isEmpty());
-    menuMoveToLib->setEnabled((!aMoveToLibChildren.isEmpty()) &&
-                              (!mContext.readOnly));
+    menuMoveToLib->setEnabled(!aMoveToLibChildren.isEmpty());
   }
   if (!selectedItemPaths.isEmpty()) {
     mb.addSeparator();
@@ -559,14 +552,10 @@ void LibraryOverviewWidget::openContextMenuAtPos(const QPoint& pos) noexcept {
     removeItems(selectedItemPaths);
   } else if (action == aNew) {
     newItem(list);
-  } else if (aCopyToLibChildren.contains(action)) {
-    Q_ASSERT(selectedItemPaths.count() > 0);
-    copyElementsToOtherLibrary(selectedItemPaths, aCopyToLibChildren[action],
-                               action->text(), false);
   } else if (aMoveToLibChildren.contains(action)) {
     Q_ASSERT(selectedItemPaths.count() > 0);
     copyElementsToOtherLibrary(selectedItemPaths, aMoveToLibChildren[action],
-                               action->text(), true);
+                               action->text());
   }
 }
 
@@ -669,15 +658,13 @@ void LibraryOverviewWidget::removeItems(
 
 void LibraryOverviewWidget::copyElementsToOtherLibrary(
     const QHash<QListWidgetItem*, FilePath>& selectedItemPaths,
-    const FilePath& libFp, const QString& libName,
-    bool removeFromSource) noexcept {
+    const FilePath& libFp, const QString& libName) noexcept {
   // Build message (list only the first few elements to avoid a huge message
   // box)
-  QString msg = removeFromSource
-      ? tr("Are you sure to move the following elements into the library '%1'?")
-      : tr("Are you sure to copy the following elements into the library "
-           "'%1'?");
-  msg = msg.arg(libName) % "\n\n";
+  QString msg =
+      tr("Are you sure to move the following elements into the library '%1'?")
+          .arg(libName) %
+      "\n\n";
   QList<QListWidgetItem*> listedItems = selectedItemPaths.keys().mid(0, 10);
   foreach (QListWidgetItem* item, listedItems) {
     msg.append(" - " % item->text() % "\n");
@@ -685,21 +672,56 @@ void LibraryOverviewWidget::copyElementsToOtherLibrary(
   if (selectedItemPaths.count() > listedItems.count()) {
     msg.append(" - ...\n");
   }
-  msg.append("\n" % tr("Note: This cannot be easily undone!"));
+  msg.append("\n" % tr("Note: This operation cannot be easily undone!") % "\n");
 
-  // Show message box
-  QString title =
-      removeFromSource ? tr("Move %1 elements") : tr("Copy %1 elements");
-  int ret = QMessageBox::warning(this, title.arg(selectedItemPaths.count()),
-                                 msg, QMessageBox::Yes, QMessageBox::Cancel);
-  if (ret == QMessageBox::Yes) {
+  // Show confirmation dialog.
+  QDialog dialog(this);
+  dialog.setWindowTitle(tr("Move %1 elements").arg(selectedItemPaths.count()));
+  QVBoxLayout* vLayoutOuter = new QVBoxLayout(&dialog);
+  QHBoxLayout* hLayoutTop = new QHBoxLayout();
+  vLayoutOuter->addItem(hLayoutTop);
+  hLayoutTop->setSpacing(9);
+  QVBoxLayout* vLayoutLeft = new QVBoxLayout();
+  hLayoutTop->addItem(vLayoutLeft);
+  QLabel* lblIcon = new QLabel(&dialog);
+  lblIcon->setPixmap(QPixmap(":/img/status/dialog_warning.png"));
+  lblIcon->setScaledContents(true);
+  lblIcon->setFixedSize(48, 48);
+  vLayoutLeft->addWidget(lblIcon);
+  vLayoutLeft->addItem(new QSpacerItem(0, 0, QSizePolicy::Minimum,
+                                       QSizePolicy::MinimumExpanding));
+  QVBoxLayout* vLayoutRight = new QVBoxLayout();
+  hLayoutTop->addItem(vLayoutRight);
+  QLabel* lblMsg = new QLabel(msg, &dialog);
+  lblMsg->setMinimumWidth(300);
+  lblMsg->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+  lblMsg->setWordWrap(true);
+  vLayoutRight->addWidget(lblMsg);
+  QHBoxLayout* hLayoutBot = new QHBoxLayout();
+  hLayoutBot->setSpacing(9);
+  vLayoutOuter->addItem(hLayoutBot);
+  QCheckBox* cbxKeep = new QCheckBox(
+      tr("Keep elements in current library (make a copy)"), &dialog);
+  cbxKeep->setChecked(mContext.readOnly);
+  cbxKeep->setEnabled(!mContext.readOnly);
+  hLayoutBot->addWidget(cbxKeep);
+  hLayoutBot->setStretch(0, 1);
+  QDialogButtonBox* btnBox =
+      new QDialogButtonBox(QDialogButtonBox::Yes | QDialogButtonBox::Cancel,
+                           Qt::Horizontal, &dialog);
+  connect(btnBox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
+  connect(btnBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+  hLayoutBot->addWidget(btnBox);
+  const int ret = dialog.exec();
+
+  if (ret == QDialog::Accepted) {
     foreach (QListWidgetItem* item, selectedItemPaths.keys()) {
       FilePath itemPath = selectedItemPaths.value(item);
       QString relativePath =
           itemPath.toRelative(itemPath.getParentDir().getParentDir());
       FilePath destination = libFp.getPathTo(relativePath);
       try {
-        if (removeFromSource) {
+        if (!cbxKeep->isChecked()) {
           qInfo().nospace()
               << "Move library element from " << itemPath.toNative() << " to "
               << destination.toNative() << "...";
