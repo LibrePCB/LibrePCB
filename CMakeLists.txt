@@ -280,3 +280,13 @@ install(
   DIRECTORY ${CMAKE_BINARY_DIR}/i18n
   DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/librepcb
 )
+
+# Windows installer configuration
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/dist/innosetup/config.iss.in
+  ${CMAKE_BINARY_DIR}/dist/innosetup/config.iss @ONLY
+)
+add_custom_target(
+  librepcb_installer DEPENDS ${CMAKE_BINARY_DIR}/dist/innosetup/config.iss
+)
+add_dependencies(librepcb librepcb_installer)
