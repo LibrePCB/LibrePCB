@@ -152,14 +152,21 @@ QList<std::shared_ptr<QGraphicsItem>> SchematicEditorState::findItemsAtPos(
   //   10: hidden netpoints
   //   20: netlines
   //   30: netlabels
-  //   40: symbols
-  //   50: pins
-  //   60: polygons
-  //   70: texts
+  //   40: pins
+  //   50: symbols with origin close to cursor
+  //   60: texts
+  //   70: symbols with any grab area below cursor
+  //   80: polygons
   //
   // And for items not directly under the cursor, but very close to the cursor,
   // add +1000. For items not under the cursor, but on the next grid interval,
   // add +2000.
+  //
+  // Note regarding priority of symbols and texts: Although texts are drawn on
+  // top of symbols, selection order must be the other way around when clicking
+  // on the origin of a symbol. Otherwise "zero-area" symbols like GND or VCC
+  // with a text at position (0,0) can't be selected because the text gets
+  // selected instead (which is very cumbersome).
   QMultiMap<std::pair<int, int>, std::shared_ptr<QGraphicsItem>> items;
   tl::optional<std::pair<int, int>> lowestPriority;
   auto addItem = [&items, &lowestPriority](
@@ -177,50 +184,56 @@ QList<std::shared_ptr<QGraphicsItem>> SchematicEditorState::findItemsAtPos(
   auto processItem = [&pos, &posExact, &posArea, &posAreaLarge, &posAreaInGrid,
                       flags, &except, &addItem, &canSkip](
                          std::shared_ptr<QGraphicsItem> item,
-                         const Point& nearestPos, int priority, bool large) {
+                         const Point& nearestPos, int priority, bool large,
+                         const tl::optional<UnsignedLength>& maxDistance) {
     if (except.contains(item)) {
-      return;
+      return false;
     }
     auto prio = std::make_pair(priority, 0);
     if (canSkip(prio)) {
-      return;
+      return false;
     }
     const QPainterPath grabArea = item->mapToScene(item->shape());
-    const int distance = qRound((nearestPos - pos).getLength()->toPx());
-    prio = std::make_pair(priority, distance);
+    const UnsignedLength distance = (nearestPos - pos).getLength();
+    if ((maxDistance) && (distance > (*maxDistance))) {
+      return false;
+    }
+    const int distanceInt = qRound(distance->toPx());
+    prio = std::make_pair(priority, distanceInt);
     if (canSkip(prio)) {
-      return;
+      return false;
     }
     if (grabArea.contains(posExact)) {
       addItem(prio, item);
-      return;
+      return true;
     }
-    prio = std::make_pair(priority + 1000, distance);
+    prio = std::make_pair(priority + 1000, distanceInt);
     if (canSkip(prio)) {
-      return;
+      return false;
     }
     if ((flags &
          (FindFlag::AcceptNearMatch | FindFlag::AcceptNearestWithinGrid)) &&
         grabArea.intersects(large ? posAreaLarge : posArea)) {
       addItem(prio, item);
-      return;
+      return true;
     }
-    prio = std::make_pair(distance + 2000, priority);  // Swapped order!
+    prio = std::make_pair(distanceInt + 2000, priority);  // Swapped order!
     if (canSkip(prio)) {
-      return;
+      return false;
     }
     if ((flags & FindFlag::AcceptNearestWithinGrid) &&
         (!posAreaInGrid.isEmpty()) && grabArea.intersects(posAreaInGrid)) {
       addItem(prio, item);
-      return;
+      return true;
     }
+    return false;
   };
 
   if (flags.testFlag(FindFlag::NetPoints)) {
     for (auto it = scene->getNetPoints().begin();
          it != scene->getNetPoints().end(); it++) {
       processItem(it.value(), it.key()->getPosition(),
-                  it.key()->isVisibleJunction() ? 0 : 10, false);
+                  it.key()->isVisibleJunction() ? 0 : 10, false, tl::nullopt);
     }
   }
 
@@ -232,21 +245,27 @@ QList<std::shared_ptr<QGraphicsItem>> SchematicEditorState::findItemsAtPos(
           Toolbox::nearestPointOnLine(pos.mappedToGrid(getGridInterval()),
                                       it.key()->getStartPoint().getPosition(),
                                       it.key()->getEndPoint().getPosition()),
-          20, true);  // Large grab area, better usability!
+          20, true, tl::nullopt);  // Large grab area, better usability!
     }
   }
 
   if (flags.testFlag(FindFlag::NetLabels)) {
     for (auto it = scene->getNetLabels().begin();
          it != scene->getNetLabels().end(); it++) {
-      processItem(it.value(), it.key()->getPosition(), 30, false);
+      processItem(it.value(), it.key()->getPosition(), 30, false, tl::nullopt);
     }
   }
 
   if (flags.testFlag(FindFlag::Symbols)) {
     for (auto it = scene->getSymbols().begin(); it != scene->getSymbols().end();
          it++) {
-      processItem(it.value(), it.key()->getPosition(), 40, false);
+      // Higher priority if origin cross is below cursor. Required for
+      // https://github.com/LibrePCB/LibrePCB/issues/1319.
+      if (!processItem(it.value(), it.key()->getPosition(), 40, false,
+                       UnsignedLength(700000))) {
+        processItem(it.value(), it.key()->getPosition(), 70, false,
+                    tl::nullopt);
+      }
     }
   }
 
@@ -256,7 +275,8 @@ QList<std::shared_ptr<QGraphicsItem>> SchematicEditorState::findItemsAtPos(
          it != scene->getSymbolPins().end(); it++) {
       if (flags.testFlag(FindFlag::SymbolPins) ||
           (it.key()->getComponentSignalInstance())) {
-        processItem(it.value(), it.key()->getPosition(), 50, false);
+        processItem(it.value(), it.key()->getPosition(), 40, false,
+                    tl::nullopt);
       }
     }
   }
@@ -267,15 +287,14 @@ QList<std::shared_ptr<QGraphicsItem>> SchematicEditorState::findItemsAtPos(
       processItem(
           it.value(),
           it.key()->getPolygon().getPath().calcNearestPointBetweenVertices(pos),
-          60,
-          true);  // Probably large grab area makes sense?
+          80, true, tl::nullopt);  // Probably large grab area makes sense?
     }
   }
 
   if (flags.testFlag(FindFlag::Texts)) {
     for (auto it = scene->getTexts().begin(); it != scene->getTexts().end();
          it++) {
-      processItem(it.value(), it.key()->getPosition(), 70, false);
+      processItem(it.value(), it.key()->getPosition(), 60, false, tl::nullopt);
     }
   }
 
