@@ -186,15 +186,6 @@ QMenu* MenuBuilder::createChangeModelMenu(QWidget* parent) noexcept {
                     QIcon(":/img/library/3d_model.png"), parent);
 }
 
-QMenu* MenuBuilder::createCopyToOtherLibraryMenu(QWidget* parent) noexcept {
-  QMenu* menu =
-      createMenu("menuCopyToOtherLibrary", tr("Copy to Other Library"),
-                 QIcon(":/img/actions/copy.png"), parent);
-  menu->setStatusTip(tr(
-      "Create a copy of this element (preserving UUIDs) in another library"));
-  return menu;
-}
-
 QMenu* MenuBuilder::createMoveToOtherLibraryMenu(QWidget* parent) noexcept {
   QMenu* menu =
       createMenu("menuMoveToOtherLibrary", tr("Move to Other Library"),
