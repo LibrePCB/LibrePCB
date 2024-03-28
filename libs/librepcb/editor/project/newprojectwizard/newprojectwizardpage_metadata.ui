@@ -94,10 +94,11 @@
         </size>
        </property>
        <property name="toolTip">
-        <string>https://en.wikipedia.org/wiki/Creative_Commons_license</string>
+        <string>Note that additional actions might be required to fully license the project.
+For more information about licensing, click on this icon.</string>
        </property>
        <property name="text">
-        <string notr="true">&lt;a href=&quot;https://en.wikipedia.org/wiki/Creative_Commons_license&quot;&gt;&lt;img src=&quot;:/img/status/info.png&quot; width=&quot;25&quot; height=&quot;25&quot;/&gt;&lt;/a&gt;</string>
+        <string notr="true">&lt;a href=&quot;https://librepcb.org/docs/user-manual/licenses/&quot;&gt;&lt;img src=&quot;:/img/status/info.png&quot; width=&quot;25&quot; height=&quot;25&quot;/&gt;&lt;/a&gt;</string>
        </property>
        <property name="scaledContents">
         <bool>true</bool>
