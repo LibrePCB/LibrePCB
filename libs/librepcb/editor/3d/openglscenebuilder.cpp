@@ -119,6 +119,7 @@ void OpenGlSceneBuilder::run(std::shared_ptr<SceneData3D> data) noexcept {
     const qreal scaleFactor =
         1.0 / std::max(std::max(width, height).toMm(), qreal(1));
     const qreal d = data->getThickness()->toMm() / 2;
+    const qreal epsilon = 0.005;  // Too small value causes flicker!
     if (mAbort) return;
 
     // Show error if the board outline is invalid.
@@ -207,7 +208,7 @@ void OpenGlSceneBuilder::run(std::shared_ptr<SceneData3D> data) noexcept {
       ClipperLib::Paths paths = ClipperHelpers::flattenTree(*tree);
       publishTriangleData(
           layers.first(), QColor(188, 156, 105),
-          extrude(paths, (d - 0.001) * side, 0.035 * side, scaleFactor));
+          extrude(paths, (d - epsilon) * side, 0.035 * side, scaleFactor));
       if (mAbort) return;
 
       // Solder resist.
@@ -228,7 +229,7 @@ void OpenGlSceneBuilder::run(std::shared_ptr<SceneData3D> data) noexcept {
                                             mMaxArcTolerance);
         solderResist = ClipperHelpers::flattenTree(*tree);
         publishTriangleData(layers.first(), color->toSolderResistColor(),
-                            extrude(solderResist, (d + 0.001) * side,
+                            extrude(solderResist, (d + epsilon) * side,
                                     0.05 * side, scaleFactor));
       } else {
         publishTriangleData(layers.first(), Qt::transparent, {});
