@@ -63,6 +63,9 @@ public:
                             QWidget* parent = nullptr) noexcept;
   ~OutputJobsDialog() noexcept;
 
+  // General Methods
+  virtual void reject() noexcept override;
+
   // Operator Overloads
   OutputJobsDialog& operator=(const OutputJobsDialog& rhs) = delete;
 
