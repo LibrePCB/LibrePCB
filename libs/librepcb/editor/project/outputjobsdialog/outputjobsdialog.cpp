@@ -189,6 +189,24 @@ OutputJobsDialog::~OutputJobsDialog() noexcept {
 }
 
 /*******************************************************************************
+ *  Public Methods
+ ******************************************************************************/
+
+void OutputJobsDialog::reject() noexcept {
+  if (mJobs != mProject.getOutputJobs()) {
+    const int ret = QMessageBox::question(
+        this, tr("Discard Changes?"),
+        tr("You made changes to output jobs which will be lost when closing "
+           "the dialog. Are you sure to discard them?"),
+        QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
+    if (ret != QMessageBox::Yes) {
+      return;
+    }
+  }
+  QDialog::reject();
+}
+
+/*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
