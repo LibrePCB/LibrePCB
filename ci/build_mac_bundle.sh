@@ -4,9 +4,12 @@
 set -euv -o pipefail
 
 # Fix macdeployqt issue (https://github.com/actions/runner-images/issues/7522)
-echo "Killing XProtect..."
-sudo pkill -9 XProtect >/dev/null || true;
-while pgrep XProtect; do sleep 3; done;
+if [ -n "${AZURE_PIPELINES-}" ]
+then
+  echo "Killing XProtect..."
+  sudo pkill -9 XProtect >/dev/null || true;
+  while pgrep XProtect; do sleep 3; done;
+fi
 
 # replace "bin" and "share" directories with the single *.app directory
 cp -r "./build/install/opt/bin/librepcb.app" "./build/install/opt/LibrePCB.app"
@@ -30,8 +33,8 @@ then
   # Silicon Mac. Apple Silicon requires the binary to be signed, but
   # somehow macdeployqt fails on that so we have to do it manually.
   # Requirement: brew install create-dmg
-  macdeployqt "LibrePCB.app" -always-overwrite \
-    -qmldir=./LibrePCB.app/Contents/share/librepcb/qml
+  ln -s /opt/homebrew/lib ./lib  # https://github.com/orgs/Homebrew/discussions/2823
+  macdeployqt "LibrePCB.app" -always-overwrite
   macdeployqt "LibrePCB-CLI.app" -always-overwrite
   codesign --force --deep -s - ./LibrePCB.app/Contents/MacOS/librepcb
   codesign --force --deep -s - ./LibrePCB-CLI.app/Contents/MacOS/librepcb-cli
@@ -43,7 +46,7 @@ then
     ./LibrePCB-CLI.dmg ./LibrePCB-CLI.app
 else
   # On x86_64, directly create the *.dmg with macdeployqt.
-  ln -s /usr/local/lib ./lib
+  ln -s /usr/local/lib ./lib  # https://github.com/orgs/Homebrew/discussions/2823
   macdeployqt "LibrePCB.app" -dmg -always-overwrite
   macdeployqt "LibrePCB-CLI.app" -dmg -always-overwrite
 fi
