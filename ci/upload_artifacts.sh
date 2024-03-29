@@ -21,6 +21,7 @@ then
   openssl dgst -sha256 -sign <(echo -e "$UPLOAD_SIGN_KEY") -out ./artifacts.tar.sha256 ./artifacts.tar
   # create archive containing the artifacts and its digital signature
   BASENAME=$(echo $BRANCH_NAME | sed -e 's/[^A-Za-z0-9_-]/_/g')
+  BASENAME+="~$(date +%s)"  # timestamp to avoid filename conflicts on server
   tar -cjf "./$BASENAME.tbz2" ./artifacts.tar.sha256 ./artifacts.tar
   # upload archive
   curl --fail --basic -u "$UPLOAD_USER:$UPLOAD_PASS" -F "path=@$BASENAME.tbz2" "$UPLOAD_URL"
