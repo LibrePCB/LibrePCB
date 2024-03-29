@@ -101,6 +101,31 @@ OutputJobsDialog::OutputJobsDialog(const WorkspaceSettings& settings,
   connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
           &OutputJobsDialog::buttonBoxClicked);
 
+  // Initialize message widget.
+  mUi->msgAddDefaultJobs->init(
+      tr("Click on the %1 button below to add output jobs. Or "
+         "for a quick start, <a href=\"%2\">add a default set</a> of jobs.</p>")
+          .arg("<b>⨁</b>", "init"),
+      mJobs.isEmpty());
+  connect(mUi->msgAddDefaultJobs, &MessageWidget::linkActivated, this,
+          [this](const QString& link) {
+            Q_UNUSED(link);
+            auto gerber = GerberExcellonOutputJob::defaultStyle();
+            auto pnp = std::make_shared<PickPlaceOutputJob>();
+            auto archive = std::make_shared<ArchiveOutputJob>();
+            archive->setInputJobs({
+                {gerber->getUuid(), QString()},
+            });
+            mJobs.append(GraphicsOutputJob::schematicPdf());
+            mJobs.append(GraphicsOutputJob::boardAssemblyPdf());
+            mJobs.append(gerber);
+            mJobs.append(pnp);
+            mJobs.append(std::make_shared<BomOutputJob>());
+            mJobs.append(archive);
+            mJobs.append(std::make_shared<LppzOutputJob>());
+            updateJobsList();
+          });
+
   // Add keyboard shortcuts.
   EditorCommandSet& cmd = EditorCommandSet::instance();
   addAction(cmd.projectOpen.createAction(
@@ -583,6 +608,7 @@ void OutputJobsDialog::jobListEdited(
   switch (event) {
     case OutputJobList::Event::ElementAdded:
     case OutputJobList::Event::ElementRemoved:
+      mUi->msgAddDefaultJobs->setActive(list.isEmpty());
       break;
     case OutputJobList::Event::ElementEdited: {
       if (auto item = mUi->lstJobs->item(index + 1)) {
