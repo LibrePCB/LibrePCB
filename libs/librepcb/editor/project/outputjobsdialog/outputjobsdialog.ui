@@ -73,6 +73,9 @@
       </widget>
      </item>
      <item>
+      <widget class="librepcb::editor::MessageWidget" name="msgAddDefaultJobs" native="true"/>
+     </item>
+     <item>
       <layout class="QHBoxLayout" name="horizontalLayout">
        <property name="spacing">
         <number>0</number>
@@ -308,6 +311,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>librepcb::editor::MessageWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/editor/widgets/messagewidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>
