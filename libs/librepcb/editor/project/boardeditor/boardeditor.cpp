@@ -164,6 +164,8 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
           &StatusBar::setProgressBarPercent, Qt::QueuedConnection);
   mUi->statusbar->setProgressBarPercent(
       mProjectEditor.getWorkspace().getLibraryDb().getScanProgressPercent());
+  connect(&mProjectEditor, &ProjectEditor::showTemporaryStatusBarMessage,
+          mUi->statusbar, &StatusBar::showMessage);
 
   // Set window title.
   QString filenameStr = mProject.getFilepath().getFilename();

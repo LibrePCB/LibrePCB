@@ -32,6 +32,7 @@
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/project/erc/electricalrulecheck.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
@@ -323,6 +324,12 @@ void ProjectEditor::execOrderPcbDialog(QWidget* parent) noexcept {
 
 bool ProjectEditor::saveProject() noexcept {
   try {
+    // SHow waiting cursor during operation for immediate feedback even though
+    // the operation can take some time.
+    QGuiApplication::setOverrideCursor(Qt::WaitCursor);
+    auto csg = scopeGuard([]() { QGuiApplication::restoreOverrideCursor(); });
+
+    // Save project.
     qDebug() << "Save project...";
     emit projectAboutToBeSaved();
     mProject.save();  // can throw
@@ -333,11 +340,12 @@ bool ProjectEditor::saveProject() noexcept {
     // saving was successful --> clean the undo stack
     mUndoStack->setClean();
     emit projectSavedToDisk();
+    emit showTemporaryStatusBarMessage(tr("Project saved!"), 2000);
     qDebug() << "Successfully saved project.";
     return true;
-  } catch (Exception& exc) {
-    QMessageBox::critical(0, tr("Error while saving the project"),
-                          exc.getMsg());
+  } catch (const Exception& e) {
+    QMessageBox::critical(nullptr, tr("Error while saving the project"),
+                          e.getMsg());
     return false;
   }
 }

@@ -1011,6 +1011,7 @@ bool PackageEditorState_Select::copySelectedItemsToClipboard() noexcept {
     if (data.getItemCount() > 0) {
       qApp->clipboard()->setMimeData(
           data.toMimeData(mContext.editorContext.layerProvider).release());
+      emit statusBarMessageChanged(tr("Copied to clipboard!"), 2000);
     }
   } catch (const Exception& e) {
     QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
