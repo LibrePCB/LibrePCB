@@ -1560,6 +1560,7 @@ bool BoardEditorState_Select::copySelectedItemsToClipboard() noexcept {
     BoardClipboardDataBuilder builder(*scene);
     std::unique_ptr<BoardClipboardData> data = builder.generate(cursorPos);
     qApp->clipboard()->setMimeData(data->toMimeData().release());
+    emit statusBarMessageChanged(tr("Copied to clipboard!"), 2000);
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }

@@ -254,6 +254,7 @@ signals:
   void showControlPanelClicked();
   void openProjectLibraryUpdaterClicked(const FilePath& fp);
   void projectEditorClosed();
+  void showTemporaryStatusBarMessage(const QString& message, int timeoutMs);
 
 private:  // Methods
   void runErc() noexcept;
