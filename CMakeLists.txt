@@ -19,6 +19,10 @@ else()
   )
 endif()
 
+# Fix missing libOpenGL.so.0 error of binary Linux releases, see
+# https://github.com/probonopd/linuxdeployqt/issues/486.
+set(OpenGL_GL_PREFERENCE LEGACY)
+
 # WARNING:
 # Read the release workflow documentation (at https://developers.librepcb.org)
 # before making changes to the version numbers!
