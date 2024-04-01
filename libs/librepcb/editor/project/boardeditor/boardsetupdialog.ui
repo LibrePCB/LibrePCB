@@ -868,7 +868,7 @@ QAbstractScrollArea {
            <item row="10" column="2">
             <widget class="QLabel" name="label_34">
              <property name="text">
-              <string>SIlkscreen Text Height:</string>
+              <string>Silkscreen Text Height:</string>
              </property>
             </widget>
            </item>
