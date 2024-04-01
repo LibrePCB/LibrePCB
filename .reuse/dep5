@@ -364,3 +364,11 @@ License: OFL-1.1
 Files: tests/data/*
 Copyright: LibrePCB Developers, see AUTHORS.md
 License: CC0-1.0
+
+Files: tests/data/unittests/eagleimport/arduino-micro/*
+Copyright: Arduino SA
+License: CC-BY-SA-2.5
+
+Files: tests/data/unittests/eagleimport/nodino-rc7/*
+Copyright: Aisenke Electronic Technology Co. Ltd.
+License: CC-BY-SA-3.0

@@ -422,18 +422,21 @@ std::unique_ptr<Component> EagleLibraryConverter::createComponent(
 }
 
 std::unique_ptr<Device> EagleLibraryConverter::createDevice(
-    const QString& libName, const QString& libUrn,
+    const QString& devLibName, const QString& devLibUrn,
     const parseagle::DeviceSet& eagleDeviceSet,
-    const parseagle::Device& eagleDevice, MessageLogger& log) {
+    const parseagle::Device& eagleDevice, const QString& pkgLibName,
+    const QString& pkgLibUrn, MessageLogger& log) {
   Q_UNUSED(log);
-  const QStringList componentKey = {libName, libUrn, eagleDeviceSet.getName()};
+  const QStringList componentKey = {devLibName, devLibUrn,
+                                    eagleDeviceSet.getName()};
   const tl::optional<Uuid> componentUuid = mComponentMap.value(componentKey);
   if (!componentUuid) {
     throw RuntimeError(__FILE__, __LINE__,
                        tr("Dependent component \"%1\" not imported.")
                            .arg(eagleDeviceSet.getName()));
   }
-  const QStringList packageKey = {libName, libUrn, eagleDevice.getPackage()};
+  const QStringList packageKey = {pkgLibName, pkgLibUrn,
+                                  eagleDevice.getPackage()};
   const tl::optional<Uuid> packageUuid = mPackageMap.value(packageKey);
   if (!packageUuid) {
     throw RuntimeError(__FILE__, __LINE__,

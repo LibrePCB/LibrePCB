@@ -51,12 +51,12 @@ protected:
 
   ~EagleProjectImportTest() { QDir(mTmpDir.toStr()).removeRecursively(); }
 
-  FilePath getSch() const noexcept {
-    return FilePath(TEST_DATA_DIR "/unittests/eagleimport/testproject.sch");
+  FilePath getSch(const QString& fp) const noexcept {
+    return FilePath(TEST_DATA_DIR "/unittests/eagleimport/" % fp);
   }
 
-  FilePath getBrd() const noexcept {
-    return FilePath(TEST_DATA_DIR "/unittests/eagleimport/testproject.brd");
+  FilePath getBrd(const QString& fp) const noexcept {
+    return FilePath(TEST_DATA_DIR "/unittests/eagleimport/" % fp);
   }
 
   std::unique_ptr<TransactionalDirectory> getProjectDir() const {
@@ -73,7 +73,7 @@ TEST_F(EagleProjectImportTest, testImportOnlySchematic) {
   EagleProjectImport import;
   EXPECT_FALSE(import.isReady());
 
-  const QStringList msgs = import.open(getSch(), FilePath());
+  const QStringList msgs = import.open(getSch("testproject.sch"), FilePath());
   EXPECT_TRUE(import.isReady());
   EXPECT_EQ("testproject", import.getProjectName().toStdString());
   EXPECT_EQ("Project contains buses which are not supported yet!",
@@ -101,11 +101,69 @@ TEST_F(EagleProjectImportTest, testImportWithBoard) {
   EagleProjectImport import;
   EXPECT_FALSE(import.isReady());
 
-  const QStringList msgs = import.open(getSch(), getBrd());
+  const QStringList msgs =
+      import.open(getSch("testproject.sch"), getBrd("testproject.brd"));
   EXPECT_TRUE(import.isReady());
   EXPECT_EQ("testproject", import.getProjectName().toStdString());
   EXPECT_EQ("Project contains buses which are not supported yet!",
             msgs.join(";").toStdString());
+
+  {
+    // Populate and save project.
+    std::unique_ptr<Project> project =
+        Project::create(getProjectDir(), "test.lpp");
+    import.import(*project);
+    project->save();
+    project->getDirectory().getFileSystem()->save();
+  }
+
+  {
+    // Open project again to see if there's no problem with it.
+    ProjectLoader loader;
+    std::unique_ptr<Project> project = loader.open(getProjectDir(), "test.lpp");
+    EXPECT_EQ(1, project->getSchematics().count());
+    EXPECT_EQ(1, project->getBoards().count());
+  }
+}
+
+// This project has strange embedded libraries which shall be tested.
+TEST_F(EagleProjectImportTest, testArduinoMicro) {
+  EagleProjectImport import;
+  EXPECT_FALSE(import.isReady());
+
+  const QStringList msgs = import.open(getSch("arduino-micro/Micro_Rev1j.sch"),
+                                       getBrd("arduino-micro/Micro_Rev1j.brd"));
+  EXPECT_TRUE(import.isReady());
+  EXPECT_EQ("Micro_Rev1j", import.getProjectName().toStdString());
+  EXPECT_EQ("", msgs.join(";").toStdString());
+
+  {
+    // Populate and save project.
+    std::unique_ptr<Project> project =
+        Project::create(getProjectDir(), "test.lpp");
+    import.import(*project);
+    project->save();
+    project->getDirectory().getFileSystem()->save();
+  }
+
+  {
+    // Open project again to see if there's no problem with it.
+    ProjectLoader loader;
+    std::unique_ptr<Project> project = loader.open(getProjectDir(), "test.lpp");
+    EXPECT_EQ(1, project->getSchematics().count());
+    EXPECT_EQ(1, project->getBoards().count());
+  }
+}
+
+TEST_F(EagleProjectImportTest, testNodino) {
+  EagleProjectImport import;
+  EXPECT_FALSE(import.isReady());
+
+  const QStringList msgs = import.open(getSch("nodino-rc7/Nodino-RC7.sch"),
+                                       getBrd("nodino-rc7/Nodino-RC7.brd"));
+  EXPECT_TRUE(import.isReady());
+  EXPECT_EQ("Nodino-RC7", import.getProjectName().toStdString());
+  EXPECT_EQ("", msgs.join(";").toStdString());
 
   {
     // Populate and save project.
