@@ -101,17 +101,20 @@ int EagleProjectImport::getSheetCount() const noexcept {
  ******************************************************************************/
 
 void EagleProjectImport::reset() noexcept {
-  mProjectName.clear();
-  mSchematic.reset();
-  mBoard.reset();
-  mLibSymbolMap.clear();
-  mLibComponentMap.clear();
-  mLibComponentGateMap.clear();
-  mLibPackageMap.clear();
-  mLibDeviceMap.clear();
-  mComponentMap.clear();
-  mSchematicDirNames.clear();
   mNetSignalMap.clear();
+  mSchematicDirNames.clear();
+  mComponentMap.clear();
+  mLibDeviceMap.clear();
+  mLibPackageMap.clear();
+  mLibComponentGateMap.clear();
+  mLibComponentMap.clear();
+  mLibSymbolMap.clear();
+  mDeviceSets.clear();
+  mPackages.clear();
+  mSymbols.clear();
+  mBoard.reset();
+  mSchematic.reset();
+  mProjectName.clear();
   mLogger->clear();
 }
 
@@ -146,6 +149,10 @@ QStringList EagleProjectImport::open(const FilePath& sch, const FilePath& brd) {
   mProjectName = sch.getCompleteBasename();
   mSchematic.reset(schematic.take());
   mBoard.reset(board.take());
+  importLibraries(mSchematic->getLibraries(), false);
+  if (mBoard) {
+    importLibraries(mBoard->getLibraries(), true);
+  }
   return warnings;
 }
 
@@ -195,12 +202,10 @@ void EagleProjectImport::import(Project& project) {
       }
       AttributeList attributes = cmp->getAttributes();
       C::tryConvertAttributes(part.getAttributes(), attributes, log);
-      const parseagle::Library& eagleLib = getLibrary(
-          mSchematic->getLibraries(), part.getLibrary(), part.getLibraryUrn());
-      const parseagle::DeviceSet eagleDevSet =
-          getDeviceSet(eagleLib, part.getDeviceSet());
+      auto eagleDevSet = getDeviceSet(part.getLibrary(), part.getLibraryUrn(),
+                                      part.getDeviceSet());
       const parseagle::Device eagleDev =
-          getDevice(eagleDevSet, part.getDevice());
+          getDevice(*eagleDevSet, part.getDevice());
       if (const parseagle::Technology* eagleTech =
               tryGetTechnology(eagleDev, part.getTechnology())) {
         C::tryConvertAttributes(eagleTech->getAttributes(), attributes, log);
@@ -215,9 +220,10 @@ void EagleProjectImport::import(Project& project) {
         }
       }
       cmp->setAttributes(attributes);
-      mComponentMap.insert(part.getName(),
-                           std::make_tuple(part.getDeviceSet(),
-                                           part.getDevice(), cmp->getUuid()));
+      mComponentMap.insert(
+          part.getName(),
+          ComponentMap{part.getLibrary(), part.getLibraryUrn(),
+                       part.getDeviceSet(), part.getDevice(), cmp->getUuid()});
       project.getCircuit().addComponentInstance(*cmp);
     }
 
@@ -266,13 +272,10 @@ const Symbol& EagleProjectImport::importLibrarySymbol(
   const QStringList key = {libName, libUrn, symName};
   auto it = mLibSymbolMap.find(key);
   if (it == mLibSymbolMap.end()) {
-    const parseagle::Library& eagleLib =
-        getLibrary(mSchematic->getLibraries(), libName, libUrn);
-    const parseagle::Symbol& eagleSymbol = getSymbol(eagleLib, symName);
-    MessageLogger log(mLogger.get(), eagleSymbol.getName());
+    auto eagleSymbol = getSymbol(libName, libUrn, symName);
+    MessageLogger log(mLogger.get(), eagleSymbol->getName());
     std::unique_ptr<Symbol> sym =
-        converter.createSymbol(eagleLib.getEmbeddedName(),
-                               eagleLib.getEmbeddedUrn(), eagleSymbol, log);
+        converter.createSymbol(libName, libUrn, *eagleSymbol, log);
     it = mLibSymbolMap.insert(key, sym->getUuid());
     library.addSymbol(*sym.release());
   }
@@ -287,25 +290,21 @@ const Component& EagleProjectImport::importLibraryComponent(
   const QStringList key = {libName, libUrn, devSetName};
   auto it = mLibComponentMap.find(key);
   if (it == mLibComponentMap.end()) {
-    const parseagle::Library& eagleLib =
-        getLibrary(mSchematic->getLibraries(), libName, libUrn);
-    const parseagle::DeviceSet& eagleDevSet =
-        getDeviceSet(eagleLib, devSetName);
-    foreach (const parseagle::Gate& eagleGate, eagleDevSet.getGates()) {
+    auto eagleDevSet = getDeviceSet(libName, libUrn, devSetName);
+    foreach (const parseagle::Gate& eagleGate, eagleDevSet->getGates()) {
       importLibrarySymbol(converter, library, libName, libUrn,
                           eagleGate.getSymbol());
     }
-    MessageLogger log(mLogger.get(), eagleDevSet.getName());
+    MessageLogger log(mLogger.get(), eagleDevSet->getName());
     std::unique_ptr<Component> cmp =
-        converter.createComponent(eagleLib.getEmbeddedName(),
-                                  eagleLib.getEmbeddedUrn(), eagleDevSet, log);
+        converter.createComponent(libName, libUrn, *eagleDevSet, log);
     if ((cmp->getSymbolVariants().count() != 1) ||
         (cmp->getSymbolVariants().first()->getSymbolItems().count() !=
-         eagleDevSet.getGates().count())) {
+         eagleDevSet->getGates().count())) {
       throw LogicError(__FILE__, __LINE__);
     }
-    for (int i = 0; i < eagleDevSet.getGates().count(); ++i) {
-      const QString gateName = eagleDevSet.getGates().at(i).getName();
+    for (int i = 0; i < eagleDevSet->getGates().count(); ++i) {
+      const QString gateName = eagleDevSet->getGates().at(i).getName();
       const Uuid gateUuid =
           cmp->getSymbolVariants().first()->getSymbolItems().at(i)->getUuid();
       const QStringList key = {cmp->getUuid().toStr(), gateName};
@@ -325,13 +324,10 @@ const Package& EagleProjectImport::importLibraryPackage(
   const QStringList key = {libName, libUrn, pkgName};
   auto it = mLibPackageMap.find(key);
   if (it == mLibPackageMap.end()) {
-    const parseagle::Library& eagleLib =
-        getLibrary(mBoard->getLibraries(), libName, libUrn);
-    const parseagle::Package& eaglePackage = getPackage(eagleLib, pkgName);
-    MessageLogger log(mLogger.get(), eaglePackage.getName());
+    auto eaglePackage = getPackage(libName, libUrn, pkgName);
+    MessageLogger log(mLogger.get(), eaglePackage->getName());
     std::unique_ptr<Package> pkg =
-        converter.createPackage(eagleLib.getEmbeddedName(),
-                                eagleLib.getEmbeddedUrn(), eaglePackage, log);
+        converter.createPackage(libName, libUrn, *eaglePackage, log);
     it = mLibPackageMap.insert(key, pkg->getUuid());
     library.addPackage(*pkg.release());
   }
@@ -343,27 +339,49 @@ const Package& EagleProjectImport::importLibraryPackage(
 const Device& EagleProjectImport::importLibraryDevice(
     EagleLibraryConverter& converter, ProjectLibrary& library,
     const QString& libName, const QString& libUrn, const QString& devSetName,
-    const QString& devName) {
+    const QString& devName, const QString& pkgLibName,
+    const QString& pkgLibUrn) {
   const QStringList key = {libName, libUrn, devSetName, devName};
   auto it = mLibDeviceMap.find(key);
   if (it == mLibDeviceMap.end()) {
-    const parseagle::Library& eagleLib =
-        getLibrary(mSchematic->getLibraries(), libName, libUrn);
-    const parseagle::DeviceSet& eagleDevSet =
-        getDeviceSet(eagleLib, devSetName);
-    const parseagle::Device& eagleDev = getDevice(eagleDevSet, devName);
-    importLibraryPackage(converter, library, libName, libUrn,
+    auto eagleDevSet = getDeviceSet(libName, libUrn, devSetName);
+    const parseagle::Device& eagleDev = getDevice(*eagleDevSet, devName);
+    importLibraryPackage(converter, library, pkgLibName, pkgLibUrn,
                          eagleDev.getPackage());
     MessageLogger log(mLogger.get(), eagleDev.getName());
     std::unique_ptr<Device> dev = converter.createDevice(
-        eagleLib.getEmbeddedName(), eagleLib.getEmbeddedUrn(), eagleDevSet,
-        eagleDev, log);
+        libName, libUrn, *eagleDevSet, eagleDev, pkgLibName, pkgLibUrn, log);
     it = mLibDeviceMap.insert(key, dev->getUuid());
     library.addDevice(*dev.release());
   }
   auto dev = library.getDevice(*it);
   Q_ASSERT(dev);
   return *dev;
+}
+
+void EagleProjectImport::importLibraries(const QList<parseagle::Library>& libs,
+                                         bool isBoard) {
+  foreach (const parseagle::Library& lib, libs) {
+    const QStringList libKey{lib.getEmbeddedName(), lib.getEmbeddedUrn()};
+    foreach (const parseagle::Symbol& sym, lib.getSymbols()) {
+      const auto key = libKey + QStringList{sym.getName()};
+      if ((!mSymbols.contains(key)) || (!isBoard)) {
+        mSymbols[key] = std::make_shared<parseagle::Symbol>(sym);
+      }
+    }
+    foreach (const parseagle::Package& pkg, lib.getPackages()) {
+      const auto key = libKey + QStringList{pkg.getName()};
+      if ((!mPackages.contains(key)) || (isBoard)) {
+        mPackages[key] = std::make_shared<parseagle::Package>(pkg);
+      }
+    }
+    foreach (const parseagle::DeviceSet& dev, lib.getDeviceSets()) {
+      const auto key = libKey + QStringList{dev.getName()};
+      if ((!mDeviceSets.contains(key)) || (!isBoard)) {
+        mDeviceSets[key] = std::make_shared<parseagle::DeviceSet>(dev);
+      }
+    }
+  }
 }
 
 void EagleProjectImport::importSchematic(Project& project,
@@ -412,7 +430,7 @@ void EagleProjectImport::importSchematic(Project& project,
           QString("Component instance not found: %1").arg(eagleInst.getPart()));
     }
     ComponentInstance* cmpInst =
-        project.getCircuit().getComponentInstanceByUuid(std::get<2>(*cmpIt));
+        project.getCircuit().getComponentInstanceByUuid(cmpIt->uuid);
     if (!cmpInst) throw LogicError(__FILE__, __LINE__);
     auto gateIt = mLibComponentGateMap.find(QStringList{
         cmpInst->getLibComponent().getUuid().toStr(), eagleInst.getGate()});
@@ -528,8 +546,7 @@ void EagleProjectImport::importSchematic(Project& project,
             throw LogicError(__FILE__, __LINE__, "Component not found.");
           }
           ComponentInstance* cmpInst =
-              project.getCircuit().getComponentInstanceByUuid(
-                  std::get<2>(*cmpIt));
+              project.getCircuit().getComponentInstanceByUuid(cmpIt->uuid);
           if (!cmpInst) {
             throw LogicError(__FILE__, __LINE__, "Component not found.");
           }
@@ -813,7 +830,7 @@ void EagleProjectImport::importBoard(Project& project,
       continue;
     }
     ComponentInstance* cmpInst =
-        project.getCircuit().getComponentInstanceByUuid(std::get<2>(*cmpIt));
+        project.getCircuit().getComponentInstanceByUuid(cmpIt->uuid);
     if (!cmpInst) throw LogicError(__FILE__, __LINE__);
     const Package& libPkg = importLibraryPackage(
         converter, project.getLibrary(), eagleElem.getLibrary(),
@@ -821,9 +838,10 @@ void EagleProjectImport::importBoard(Project& project,
     if (libPkg.getFootprints().count() != 1) {
       throw LogicError(__FILE__, __LINE__);
     }
-    const Device& libDev = importLibraryDevice(
-        converter, project.getLibrary(), eagleElem.getLibrary(),
-        eagleElem.getLibraryUrn(), std::get<0>(*cmpIt), std::get<1>(*cmpIt));
+    const Device& libDev =
+        importLibraryDevice(converter, project.getLibrary(), cmpIt->libName,
+                            cmpIt->libUrn, cmpIt->devSetName, cmpIt->devName,
+                            eagleElem.getLibrary(), eagleElem.getLibraryUrn());
     const bool mirror = eagleElem.getRotation().getMirror();
     const Angle rotation = C::convertAngle(eagleElem.getRotation().getAngle());
     BI_Device* devInst = new BI_Device(
@@ -1269,52 +1287,37 @@ tl::optional<BoundedUnsignedRatio> EagleProjectImport::tryGetDrcRatio(
   return tl::nullopt;
 }
 
-const parseagle::Library& EagleProjectImport::getLibrary(
-    const QList<parseagle::Library>& libs, const QString& name,
-    const QString& urn) const {
-  foreach (const parseagle::Library& obj, libs) {
-    if ((obj.getEmbeddedName() == name) && (obj.getEmbeddedUrn() == urn)) {
-      return obj;
-    }
+std::shared_ptr<const parseagle::Symbol> EagleProjectImport::getSymbol(
+    const QString& libName, const QString& libUrn, const QString& name) const {
+  const QStringList key{libName, libUrn, name};
+  if (auto ptr = mSymbols.value(key)) {
+    return ptr;
+  }
+  throw RuntimeError(
+      __FILE__, __LINE__,
+      QString("Symbol not found in embedded library: %1").arg(key.join("::")));
+}
+
+std::shared_ptr<const parseagle::Package> EagleProjectImport::getPackage(
+    const QString& libName, const QString& libUrn, const QString& name) const {
+  const QStringList key{libName, libUrn, name};
+  if (auto ptr = mPackages.value(key)) {
+    return ptr;
+  }
+  throw RuntimeError(
+      __FILE__, __LINE__,
+      QString("Package not found in embedded library: %1").arg(key.join("::")));
+}
+
+std::shared_ptr<const parseagle::DeviceSet> EagleProjectImport::getDeviceSet(
+    const QString& libName, const QString& libUrn, const QString& name) const {
+  const QStringList key{libName, libUrn, name};
+  if (auto ptr = mDeviceSets.value(key)) {
+    return ptr;
   }
   throw RuntimeError(__FILE__, __LINE__,
-                     QString("Embedded library not found: %1").arg(name));
-}
-
-const parseagle::Symbol& EagleProjectImport::getSymbol(
-    const parseagle::Library& lib, const QString& name) const {
-  foreach (const parseagle::Symbol& obj, lib.getSymbols()) {
-    if (obj.getName() == name) {
-      return obj;
-    }
-  }
-  throw RuntimeError(
-      __FILE__, __LINE__,
-      QString("Symbol not found in embedded library: %1").arg(name));
-}
-
-const parseagle::Package& EagleProjectImport::getPackage(
-    const parseagle::Library& lib, const QString& name) const {
-  foreach (const parseagle::Package& obj, lib.getPackages()) {
-    if (obj.getName() == name) {
-      return obj;
-    }
-  }
-  throw RuntimeError(
-      __FILE__, __LINE__,
-      QString("Package not found in embedded library: %1").arg(name));
-}
-
-const parseagle::DeviceSet& EagleProjectImport::getDeviceSet(
-    const parseagle::Library& lib, const QString& name) const {
-  foreach (const parseagle::DeviceSet& obj, lib.getDeviceSets()) {
-    if (obj.getName() == name) {
-      return obj;
-    }
-  }
-  throw RuntimeError(
-      __FILE__, __LINE__,
-      QString("Device set not found in embedded library: %1").arg(name));
+                     QString("Device set not found in embedded library: %1")
+                         .arg(key.join("::")));
 }
 
 const parseagle::Device& EagleProjectImport::getDevice(

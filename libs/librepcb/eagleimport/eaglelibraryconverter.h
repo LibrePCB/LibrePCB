@@ -113,9 +113,10 @@ public:
       const QString& libName, const QString& libUrn,
       const parseagle::DeviceSet& eagleDeviceSet, MessageLogger& log);
   std::unique_ptr<Device> createDevice(
-      const QString& libName, const QString& libUrn,
+      const QString& devLibName, const QString& devLibUrn,
       const parseagle::DeviceSet& eagleDeviceSet,
-      const parseagle::Device& eagleDevice, MessageLogger& log);
+      const parseagle::Device& eagleDevice, const QString& pkgLibName,
+      const QString& pkgLibUrn, MessageLogger& log);
 
   // Operator Overloadings
   EagleLibraryConverter& operator=(const EagleLibraryConverter& rhs) = delete;

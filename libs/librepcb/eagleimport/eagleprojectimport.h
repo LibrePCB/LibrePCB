@@ -113,13 +113,13 @@ private:  // Methods
                                       const QString& libName,
                                       const QString& libUrn,
                                       const QString& pkgName);
-  const Device& importLibraryDevice(EagleLibraryConverter& converter,
-                                    ProjectLibrary& library,
-                                    const QString& libName,
-                                    const QString& libUrn,
-                                    const QString& devSetName,
-                                    const QString& devName);
+  const Device& importLibraryDevice(
+      EagleLibraryConverter& converter, ProjectLibrary& library,
+      const QString& devLibName, const QString& devLibUrn,
+      const QString& devSetName, const QString& devName,
+      const QString& pkgLibName, const QString& pkgLibUrn);
   NetSignal& importNet(Project& project, const parseagle::Net& net);
+  void importLibraries(const QList<parseagle::Library>& libs, bool isBoard);
   void importSchematic(Project& project, EagleLibraryConverter& converter,
                        const parseagle::Sheet& sheet);
   void importBoard(Project& project, EagleLibraryConverter& converter);
@@ -127,15 +127,13 @@ private:  // Methods
   tl::optional<BoundedUnsignedRatio> tryGetDrcRatio(const QString& nr,
                                                     const QString& nmin,
                                                     const QString& nmax) const;
-  const parseagle::Library& getLibrary(const QList<parseagle::Library>& libs,
-                                       const QString& name,
-                                       const QString& urn) const;
-  const parseagle::Symbol& getSymbol(const parseagle::Library& lib,
-                                     const QString& name) const;
-  const parseagle::Package& getPackage(const parseagle::Library& lib,
-                                       const QString& name) const;
-  const parseagle::DeviceSet& getDeviceSet(const parseagle::Library& lib,
-                                           const QString& name) const;
+  std::shared_ptr<const parseagle::Symbol> getSymbol(const QString& libName,
+                                                     const QString& libUrn,
+                                                     const QString& name) const;
+  std::shared_ptr<const parseagle::Package> getPackage(
+      const QString& libName, const QString& libUrn, const QString& name) const;
+  std::shared_ptr<const parseagle::DeviceSet> getDeviceSet(
+      const QString& libName, const QString& libUrn, const QString& name) const;
   const parseagle::Device& getDevice(const parseagle::DeviceSet& devSet,
                                      const QString& name) const;
   const parseagle::Technology* tryGetTechnology(const parseagle::Device& dev,
@@ -147,6 +145,15 @@ private:  // Data
   QString mProjectName;
   QScopedPointer<parseagle::Schematic> mSchematic;
   QScopedPointer<parseagle::Board> mBoard;
+
+  /// Key={libName, libUrn, symName}
+  QHash<QStringList, std::shared_ptr<const parseagle::Symbol>> mSymbols;
+
+  /// Key={libName, libUrn, pkgName}
+  QHash<QStringList, std::shared_ptr<const parseagle::Package>> mPackages;
+
+  /// Key={libName, libUrn, devSetName}
+  QHash<QStringList, std::shared_ptr<const parseagle::DeviceSet>> mDeviceSets;
 
   /// Key={libName, libUrn, symName}, Value=libSymUuid
   QHash<QStringList, Uuid> mLibSymbolMap;
@@ -163,8 +170,14 @@ private:  // Data
   /// Key={libName, libUrn, devSetname, devName}, Value=libDevUuid
   QHash<QStringList, Uuid> mLibDeviceMap;
 
-  /// Key=partName, Value={devSetname, devName, circuitCmpUuid}
-  QHash<QString, std::tuple<QString, QString, Uuid>> mComponentMap;
+  struct ComponentMap {
+    QString libName;
+    QString libUrn;
+    QString devSetName;
+    QString devName;
+    Uuid uuid;
+  };
+  QHash<QString, ComponentMap> mComponentMap;
 
   /// All already imported schematic directory names
   QSet<QString> mSchematicDirNames;

@@ -412,7 +412,8 @@ void EagleLibraryImport::run() noexcept {
     try {
       emit progressStatus(dev.displayName);
       auto device = converter.createDevice(QString(), QString(), *dev.deviceSet,
-                                           *dev.device, log);  // can throw
+                                           *dev.device, QString(), QString(),
+                                           log);  // can throw
       TransactionalDirectory dir(TransactionalFileSystem::openRW(
           mDestinationLibraryFp
               .getPathTo(librepcb::Device::getShortElementName())
