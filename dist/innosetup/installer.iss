@@ -64,6 +64,8 @@ Name: "ukrainian"; MessagesFile: "compiler:Languages\Ukrainian.isl"
 Source: "files\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Registry]
+; Cleanup leftover from old QtIFW installer to fix broken icon in file explorer
+Root: HKCU; Subkey: "Software\Classes\LibrePCB.lpp"; ValueType: none; ValueData: ""; Flags: deletekey
 ; *.lpp file extension
 Root: HKA; Subkey: "Software\Classes\.lpp\OpenWithProgids"; ValueType: string; ValueName: "LibrePCB.lpp"; ValueData: ""; Flags: uninsdeletevalue
 Root: HKA; Subkey: "Software\Classes\LibrePCB.lpp"; ValueType: string; ValueName: ""; ValueData: "LibrePCB Project"; Flags: uninsdeletekey
