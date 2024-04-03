@@ -19,7 +19,7 @@ then
     //F"librepcb-installer-nightly-$TARGET"
 else
   # Note: Omit the release candidate number (e.g. "rc1") as it is not allowed!
-  ./dist/installer/update_metadata.sh "$TARGET" "1.1.0-1"
+  ./dist/installer/update_metadata.sh "$TARGET" "1.1.1-1"
   PACKAGES_DIR="./artifacts/installer_packages/$TARGET"
   mkdir -p $PACKAGES_DIR/librepcb.stable.app/data/stable
   cp -r ./dist/installer/output/packages/. $PACKAGES_DIR/
