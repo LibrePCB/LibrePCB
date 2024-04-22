@@ -12,9 +12,6 @@ jobs:
     CMAKE_OPTIONS: $[ variables['CMAKE_OPTIONS'] ]
   strategy:
     matrix:
-      Qt5:
-        QT: 5
-        CMAKE_OPTIONS: "-DQT_MAJOR_VERSION=5 -DBUILD_QTQUICK_TEST=1"
       Qt6:
         QT: 6
         CMAKE_OPTIONS: "-DQT_MAJOR_VERSION=6 -DBUILD_QTQUICK_TEST=0"
