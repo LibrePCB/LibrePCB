@@ -2,15 +2,9 @@ jobs:
 - job: Stylecheck
   pool:
     vmImage: 'ubuntu-22.04'
-  container: librepcb/librepcb-dev:ubuntu-20.04-6
+  container: librepcb/librepcb-dev:devtools-3
   steps:
   - bash: ./ci/print_environment.sh
     displayName: Print Environment
-  - bash: |
-      pip install --user reuse==3.0.1
-      export PATH="$PATH:`python -m site --user-base`/bin"
-      # Pass modified PATH to following steps:
-      echo "##vso[task.setvariable variable=PATH]$PATH"
-    displayName: Install dependencies
   - bash: ./ci/stylecheck.sh
     displayName: Run Stylecheck
