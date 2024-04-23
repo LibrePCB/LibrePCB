@@ -3,13 +3,6 @@
 # set shell settings (see https://sipb.mit.edu/doc/safe-shell/)
 set -euv -o pipefail
 
-if command -v qmake6 &> /dev/null
-then
-  SUFFIX="$ARCH-qt6"
-else
-  SUFFIX="$ARCH"
-fi
-
 # Fix deployment warning (not sure if critical).
 export LANG="C.UTF-8"
 
@@ -53,7 +46,7 @@ cp "./build/appimage-cli/opt/share/icons/hicolor/scalable/apps/org.librepcb.Libr
 linuxdeployqt "./build/appimage-cli/opt/share/applications/org.librepcb.LibrePCB.desktop" \
   $LINUXDEPLOYQT_FLAGS -appimage
 patch_appimage
-mv ./LibrePCB-*-x86_64.AppImage ./artifacts/nightly_builds/librepcb-cli-nightly-linux-$SUFFIX.AppImage
+mv ./LibrePCB-*-x86_64.AppImage ./artifacts/nightly_builds/librepcb-cli-nightly-linux-$ARCH.AppImage
 
 # Build LibrePCB AppImage.
 cp -r "./build/install" "./build/appimage"
@@ -63,7 +56,7 @@ linuxdeployqt "./build/appimage/opt/share/applications/org.librepcb.LibrePCB.des
   -qmldir="./build/appimage/opt/share/librepcb/qml" \
   $LINUXDEPLOYQT_FLAGS -appimage
 patch_appimage
-mv ./LibrePCB-*-x86_64.AppImage ./artifacts/nightly_builds/librepcb-nightly-linux-$SUFFIX.AppImage
+mv ./LibrePCB-*-x86_64.AppImage ./artifacts/nightly_builds/librepcb-nightly-linux-$ARCH.AppImage
 
 # Run linuxdeployqt to bundle all libraries into the portable packages.
 linuxdeployqt "./build/install/opt/bin/librepcb-cli" $LINUXDEPLOYQT_FLAGS -always-overwrite
@@ -76,4 +69,4 @@ xvfb-run -a ./build/install/opt/bin/librepcb-cli --version
 xvfb-run -a ./build/install/opt/bin/librepcb --exit-after-startup
 
 # Copy to artifacts.
-cp -r "./build/install/opt" "./artifacts/nightly_builds/librepcb-nightly-linux-$SUFFIX"
+cp -r "./build/install/opt" "./artifacts/nightly_builds/librepcb-nightly-linux-$ARCH"
