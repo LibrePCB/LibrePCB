@@ -32,7 +32,7 @@ jobs:
     displayName: Build Bundle
   - bash: ./build/tests/unittests/librepcb-unittests
     displayName: Run LibrePCB Unittests
-  - bash: pytest -vvv --librepcb-executable="build/install/opt/librepcb-cli.app/Contents/MacOS/librepcb-cli" ./tests/cli
+  - bash: pytest -vvv --librepcb-executable="build/install/opt/LibrePCB.app/Contents/MacOS/librepcb-cli" ./tests/cli
     displayName: Run LibrePCB-CLI Functional Tests
   # Note: Functional tests need to be run with the non-bundled app, otherwise
   # we get the error "Cannot add multiple registrations for QtQml.Models 2".
