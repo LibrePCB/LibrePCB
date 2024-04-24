@@ -28,6 +28,7 @@
 #include "../utils/menubuilder.h"
 #include "../utils/standardeditorcommandhandler.h"
 #include "../utils/undostackactiongroup.h"
+#include "../widgets/openglview.h"
 #include "../widgets/searchtoolbar.h"
 #include "cat/componentcategoryeditorwidget.h"
 #include "cat/packagecategoryeditorwidget.h"
@@ -73,6 +74,15 @@ LibraryEditor::LibraryEditor(Workspace& ws, const FilePath& libFp,
     mCurrentEditorWidget(nullptr),
     mLibrary(nullptr) {
   mUi->setupUi(this);
+
+#if QT_VERSION_MAJOR >= 6
+  // Workaround for automatically closing window when opening 3D viewer,
+  // see https://github.com/LibrePCB/LibrePCB/issues/1363.
+  {
+    QOpenGLWidget* w = new QOpenGLWidget(this);
+    w->hide();
+  }
+#endif
 
   // Create all actions, window menus, toolbars and dock widgets.
   createActions();
