@@ -7,14 +7,14 @@ endif()
 
 # Support older macOS versions. Needs to be set before calling project()!
 # https://github.com/LibrePCB/LibrePCB/issues/1091
-if(QT_MAJOR_VERSION EQUAL 6)
+if(QT_MAJOR_VERSION EQUAL 5)
   set(CMAKE_OSX_DEPLOYMENT_TARGET
-      "10.15"
+      "10.14"
       CACHE STRING "Minimum OS X deployment version"
   )
 else()
   set(CMAKE_OSX_DEPLOYMENT_TARGET
-      "10.14"
+      "10.15"
       CACHE STRING "Minimum OS X deployment version"
   )
 endif()
@@ -95,7 +95,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # If Qt version is not explicitly specified, automatically determine it
 if(NOT QT_MAJOR_VERSION)
-  find_package(Qt NAMES Qt5 Qt6 REQUIRED COMPONENTS Core)
+  find_package(Qt NAMES Qt6 Qt5 REQUIRED COMPONENTS Core)
   set(QT_MAJOR_VERSION ${Qt_VERSION_MAJOR})
 endif()
 set(QT "Qt${QT_MAJOR_VERSION}")
@@ -191,12 +191,11 @@ endif()
 find_package(${QT} 5.5.0 REQUIRED COMPONENTS ${QT_COMPONENTS})
 set(QT_VERSION "${${QT}_VERSION}")
 message(STATUS "Building LibrePCB with Qt ${QT_VERSION}")
-if(QT_MAJOR_VERSION EQUAL 6)
+if(QT_MAJOR_VERSION EQUAL 5)
   message(
-    WARNING
-      "EXPERIMENTAL: Builds with Qt6 are not tested very well yet and thus \
-      might still contain critical bugs. It's highly recommended to build \
-      official releases with Qt5 for now."
+    DEPRECATION
+      "Building with Qt5 is considered as deprecated and will be removed in
+      an upcoming release. Please use Qt6 instead."
   )
 endif()
 

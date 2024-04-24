@@ -1,18 +1,13 @@
 jobs:
 - job: Linux
   pool:
-    vmImage: 'ubuntu-20.04'  # Workaround for sudo doesn't work on 22.04
+    vmImage: 'ubuntu-22.04'
   timeoutInMinutes: 120
   variables:
     OS: 'linux'
     ARCH: 'x86_64'
   strategy:
     matrix:
-      Ubuntu_1804_Qt_5_15_GCC:
-        IMAGE: librepcb/librepcb-dev:ubuntu-18.04-qt5.15.2-3
-        DEPLOY: true
-        NO_HOEDOWN: true
-        QT: 5  # Used in install_dependencies.sh
       Ubuntu_2004_Qt_6_6_GCC:
         IMAGE: librepcb/librepcb-dev:ubuntu-20.04-qt6.6-1
         DEPLOY: true
@@ -35,8 +30,6 @@ jobs:
         FUNQ_QT_MAJOR_VERSION: 6
   container:
     image: $[ variables['IMAGE'] ]
-    # Temporari hack for installing the imageformats plugin!
-    options: '--name mycontainer -v /usr/bin/docker:/tmp/docker:ro'
   steps:
   - checkout: self
     clean: true

@@ -50,10 +50,8 @@ productive use, please install an official release as described in the
 
 To compile and run LibrePCB, you need the following software components:
 
-To compile LibrePCB, you need the following software components:
-
-- g++ >= 4.8, MinGW >= 4.8, or Clang >= 3.3 (C++11 for Qt5; C++17 for Qt6)
-- [Qt](http://www.qt.io/download-open-source/) 5.5...5.15 or >= 6.2 (make
+- Compiler: g++, MinGW or Clang (any version with C++17 support should work)
+- [Qt](http://www.qt.io/download-open-source/) >= 6.2 or 5.5...5.15 (make
   sure the [imageformats](https://doc.qt.io/qt-5/qtimageformats-index.html)
   plugin is installed too as it will be needed at runtime!).
 - [OpenCASCADE](https://www.opencascade.com/) OCCT or OCE (optional)
@@ -99,7 +97,7 @@ sudo apt-get install qt5-doc qtcreator # optional
 ```bash
 sudo pacman -S base-devel git cmake openssl zlib desktop-file-utils shared-mime-info \
      qt6-base qt6-5compat qt6-declarative qt6-svg qt6-tools qt6-imageformats opencascade
-sudo pacman -S qt5-doc qtcreator # optional
+sudo pacman -S qt6-doc qtcreator # optional
 ```
 
 *Note: Instead of installing the dependencies and building LibrePCB manually,
@@ -112,19 +110,21 @@ GitHub.*
 
 1. Install Xcode through the app store and start it at least once (for the license)
 2. Install [homebrew](https://github.com/Homebrew/brew) (**the** package manager)
-3. Install dependencies: `brew update && brew install qt5 cmake opencascade`
-4. Make the toolchain available: `brew unlink qt && brew link --force qt5`
+3. Install dependencies: `brew update && brew install qt6 cmake opencascade`
+4. Make the toolchain available: `brew unlink qt && brew link --force qt6`
 
 #### Installation on Windows
 
 Download and run the
-[Qt for Windows (MinGW) installer](http://download.qt.io/official_releases/qt/5.8/5.8.0/qt-opensource-windows-x86-mingw530-5.8.0.exe)
+[Qt for Windows installer](https://download.qt.io/official_releases/online_installers/qt-unified-windows-x64-online.exe)
 from [here](https://www.qt.io/download-open-source/). LibrePCB does not compile
 with MSVC, so you must install following components with the Qt installer:
 
-- The MinGW compiler itself
-- The Qt libraries for MinGW
-- cmake
+- MinGW 11.2.0 64-bit compiler
+- Qt binaries for MinGW 11.2.0 64-bit (use the latest 6.x version)
+- Qt 5 Compatibility Module for MinGW 11.2.0 64-bit
+- Qt Image Formats for MinGW 11.2.0 64-bit
+- CMake
 
 For the OpenCascade library the installation procedure is not that easy
 unfortunately. Basically you have to build it by yourself, see instructions
