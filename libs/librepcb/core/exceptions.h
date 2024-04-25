@@ -119,6 +119,8 @@ public:
    * @brief Get the error message (translated)
    *
    * @return The error message in the user's language
+   *
+   * @hidecallergraph
    */
   const QString& getMsg() const { return mMsg; }
 

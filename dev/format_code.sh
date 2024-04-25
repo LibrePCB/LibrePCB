@@ -60,17 +60,10 @@ done
 REPO_ROOT=$(git rev-parse --show-toplevel)
 
 if [ "$DOCKER" == "--docker" ]; then
-  DOCKER_IMAGE=librepcb/devtools:2.1.0
-
-  if [ "$($DOCKER_CMD images -q $DOCKER_IMAGE | wc -l)" == "0" ]; then
-    echo "Building devtools container..."
-    $DOCKER_CMD build "$REPO_ROOT/dev/devtools" -t $DOCKER_IMAGE
-  fi
-
   echo "[Re-running format_code.sh inside Docker container]"
   $DOCKER_CMD run --rm -t --user "$(id -u):$(id -g)" \
     -v "$REPO_ROOT:/code" \
-    $DOCKER_IMAGE \
+    librepcb/librepcb-dev:devtools-3 \
     /usr/bin/env bash -c "cd /code && dev/format_code.sh --base \"$BASE\" $CHECK"
 
   echo "[Docker done.]"

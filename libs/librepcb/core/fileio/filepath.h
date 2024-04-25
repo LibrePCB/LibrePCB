@@ -99,10 +99,10 @@ namespace librepcb {
  * @code
  *    FilePath fp("C:\\foo\\bar.txt"); // a file
  *    qDebug(fp.toStr());      // "C:/foo/bar.txt"
- *    qDebug(fp.toNative());   // "C:/foo/bar.txt" ("C:\foo\bar.txt" on Windows)
+ *    qDebug(fp.toNative());   // "C:/foo/bar.txt" ("C:\\foo\\bar.txt" on Windows)
  *    fp.setPath("/foo/bar/"); // a directory
  *    qDebug(fp.toStr());      // "/foo/bar" (trailing slash removed!)
- *    qDebug(fp.toNative());   // "/foo/bar" ("\foo\bar" on Windows)
+ *    qDebug(fp.toNative());   // "/foo/bar" ("\\foo\\bar" on Windows)
  * @endcode
  *
  * @note    A filepath represented by a FilePath object do not need to exist on
