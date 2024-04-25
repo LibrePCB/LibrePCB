@@ -17,9 +17,12 @@ fi
 # Helper to extract and rebuild AppImages with appimagetool to get the static
 # runtime which doesn't need libfuse2 and thus also runs on Ubuntu 22.04, see
 # https://github.com/LibrePCB/LibrePCB/issues/980.
+# In addition, replace AppRun by a script which allows to run the CLI.
 patch_appimage () {
   ./LibrePCB-*-x86_64.AppImage --appimage-extract
   chmod -R 755 ./squashfs-root
+  rm ./squashfs-root/AppRun
+  cp ./dist/appimage/AppRun ./squashfs-root/
   rm ./LibrePCB-*-x86_64.AppImage
   appimagetool ./squashfs-root
   rm -rf ./squashfs-root
@@ -38,21 +41,13 @@ LINUXDEPLOYQT_FLAGS="-executable=./build/install/opt/lib/$(basename $LIBSSL)"
 LINUXDEPLOYQT_FLAGS+=" -executable=./build/install/opt/lib/$(basename $LIBCRYPTO)"
 LINUXDEPLOYQT_FLAGS+=" -bundle-non-qt-libs"
 
-# Build CLI AppImage.
-cp -r "./build/install" "./build/appimage-cli"
-mv -f "./build/appimage-cli/opt/bin/librepcb-cli" "./build/appimage-cli/opt/bin/librepcb"
-cp "./build/appimage-cli/opt/share/icons/hicolor/scalable/apps/org.librepcb.LibrePCB.svg" \
-  "./build/appimage-cli/org.librepcb.LibrePCB.svg"
-linuxdeployqt "./build/appimage-cli/opt/share/applications/org.librepcb.LibrePCB.desktop" \
-  $LINUXDEPLOYQT_FLAGS -appimage
-patch_appimage
-mv ./LibrePCB-*-x86_64.AppImage ./artifacts/nightly_builds/librepcb-cli-nightly-linux-$ARCH.AppImage
-
-# Build LibrePCB AppImage.
+# Build AppImage.
 cp -r "./build/install" "./build/appimage"
 cp "./build/appimage/opt/share/icons/hicolor/scalable/apps/org.librepcb.LibrePCB.svg" \
   "./build/appimage/org.librepcb.LibrePCB.svg"
 linuxdeployqt "./build/appimage/opt/share/applications/org.librepcb.LibrePCB.desktop" \
+  -executable="./build/appimage/opt/bin/librepcb" \
+  -executable="./build/appimage/opt/bin/librepcb-cli" \
   -qmldir="./build/appimage/opt/share/librepcb/qml" \
   $LINUXDEPLOYQT_FLAGS -appimage
 patch_appimage
