@@ -543,6 +543,8 @@ target_link_libraries(
          # Link with -lproc on SunOS / Solaris / Illumos
          # This is required for proc_get_psinfo
          $<$<STREQUAL:$<PLATFORM_ID>,SunOS>:proc>
+         # On Windows, NetUserGetInfo() requires to link with netapi32.dll.
+         $<$<STREQUAL:$<PLATFORM_ID>,Windows>:netapi32>
 )
 
 # Alias to namespaced variant
