@@ -1,0 +1,16 @@
+#!/usr/bin/env sh
+
+# Wrapper allowing to bundle both the GUI and the CLI in a single AppImage.
+# If the called AppImage has "cli" in its name, the CLI executable is invoked.
+# If not, the GUI executable is invoked.
+
+# See https://discourse.appimage.org/t/call-alternative-binary-from-appimage/93.
+
+HERE="$(dirname "$(readlink -f "${0}")")"
+BINARY_NAME=$(basename "$ARGV0")
+
+case $BINARY_NAME in
+  *cli*) exec "$HERE/opt/bin/librepcb-cli" "$@";;
+  *CLI*) exec "$HERE/opt/bin/librepcb-cli" "$@";;
+  *) exec "$HERE/opt/bin/librepcb" "$@";;
+esac
