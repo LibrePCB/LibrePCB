@@ -121,6 +121,15 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
   mUi->tabBar->setDocumentMode(true);  // For MacOS
   mUi->lblUnplacedComponentsNote->hide();
 
+#if QT_VERSION_MAJOR >= 6
+  // Workaround for automatically closing window when opening 3D viewer,
+  // see https://github.com/LibrePCB/LibrePCB/issues/1363.
+  {
+    QOpenGLWidget* w = new QOpenGLWidget(this);
+    w->hide();
+  }
+#endif
+
   // Setup graphics view.
   const Theme& theme =
       mProjectEditor.getWorkspace().getSettings().themes.getActive();
