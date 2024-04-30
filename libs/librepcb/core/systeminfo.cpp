@@ -59,6 +59,8 @@
 #define WINVER 0x0600
 #define _WIN32_WINNT 0x0600
 #include <windows.h>
+// nosort
+#include <lm.h>
 #else
 #error "Unknown operating system!"
 #endif
@@ -116,19 +118,36 @@ const QString& SystemInfo::getFullUsername() noexcept {
       s = gecosString.section(',', 0, 0).remove('\n').remove('\r').trimmed();
     }
 #elif defined(Q_OS_WIN32) || defined(Q_OS_WIN64)  // Windows
-    QString command("net user %USERNAME%");
-    QProcess process;
-    process.start("cmd", QStringList() << "/c" << command);
-    process.waitForFinished(500);
-    QStringList lines = QString(process.readAllStandardOutput()).split('\n');
-    foreach (const QString& line, lines) {
-      if (line.contains("Full Name")) {
-        s = QString(line)
-                .remove("Full Name")
-                .remove('\n')
-                .remove('\r')
-                .trimmed();
-        break;
+    // From
+    // https://learn.microsoft.com/en-us/windows/win32/api/lmaccess/nf-lmaccess-netusergetinfo.
+    LPUSER_INFO_2 buf = NULL;
+    const std::wstring username = getUsername().toStdWString();
+    const NET_API_STATUS status =
+        NetUserGetInfo(NULL, username.data(), 2, (LPBYTE*)&buf);
+    if (buf != NULL) {
+      if (status == NERR_Success) {
+        s = QString::fromWCharArray(buf->usri2_full_name);
+      }
+      NetApiBufferFree(buf);
+      buf = NULL;
+    }
+    if (s.isEmpty()) {
+      // Fallback which generally is known to be working, but only for ASCII
+      // names (see https://github.com/LibrePCB/LibrePCB/issues/1365).
+      QString command("net user %USERNAME%");
+      QProcess process;
+      process.start("cmd", QStringList() << "/c" << command);
+      process.waitForFinished(500);
+      QStringList lines = QString(process.readAllStandardOutput()).split('\n');
+      foreach (const QString& line, lines) {
+        if (line.contains("Full Name")) {
+          s = QString(line)
+                  .remove("Full Name")
+                  .remove('\n')
+                  .remove('\r')
+                  .trimmed();
+          break;
+        }
       }
     }
 #else
