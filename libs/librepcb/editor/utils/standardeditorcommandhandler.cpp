@@ -27,6 +27,7 @@
 #include "../workspace/desktopservices.h"
 #include "shortcutsreferencegenerator.h"
 
+#include <librepcb/core/application.h>
 #include <librepcb/core/exceptions.h>
 #include <librepcb/core/fileio/filepath.h>
 #include <librepcb/core/utils/scopeguard.h>
@@ -85,8 +86,15 @@ void StandardEditorCommandHandler::shortcutsReference() const noexcept {
     auto cursorScopeGuard = scopeGuard(
         [this]() { QTimer::singleShot(1000, mParent, &QWidget::unsetCursor); });
 
-    FilePath fp = FilePath::getApplicationTempPath().getPathTo(
+    // Important: Don't store the PDF in /tmp because if LibrePCB runs in a
+    // sandbox, the PDF reader won't have access to read that file. It seems
+    // that the cache directory is globally readable even for Snap and Flatpak,
+    // so we store the PDF there.
+    // See https://github.com/LibrePCB/LibrePCB/issues/1361.
+    const FilePath fp = Application::getCacheDir().getPathTo(
         "librepcb-shortcuts-reference.pdf");
+    qInfo().nospace() << "Saving keyboard shortcuts reference to "
+                      << fp.toNative() << "...";
     ShortcutsReferenceGenerator generator(EditorCommandSet::instance());
     generator.generatePdf(fp);
 
