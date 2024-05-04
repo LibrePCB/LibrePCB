@@ -59,7 +59,7 @@ To compile and run LibrePCB, you need the following software components:
   GLU (optional)
 - [zlib](http://www.zlib.net/)
 - [OpenSSL](https://www.openssl.org/)
-- [CMake](https://cmake.org/) 3.5 or newer
+- [CMake](https://cmake.org/) 3.16 or newer
 
 #### Prepared Docker Image
 
