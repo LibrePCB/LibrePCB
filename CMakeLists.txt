@@ -150,10 +150,10 @@ if(WIN32)
   add_definitions(-DUNICODE -D_UNICODE)
 endif()
 
-# Disable Qt functions which are deprecated in Qt <= 5.5 to enforce us
+# Disable Qt functions which are deprecated in Qt <= 5.12 to enforce us
 # migrating away from them. Always set this to the lowest Qt version we want
 # to support.
-add_definitions(-DQT_DISABLE_DEPRECATED_BEFORE=0x050500)
+add_definitions(-DQT_DISABLE_DEPRECATED_BEFORE=0x050C00)
 
 # Not sure what we should do with deprecation warnings. Better keeping
 # backwards compatibility with already existing & supported environments
@@ -188,7 +188,7 @@ if(BUILD_TESTS)
 endif()
 
 # Find Qt
-find_package(${QT} 5.5.0 REQUIRED COMPONENTS ${QT_COMPONENTS})
+find_package(${QT} 5.12.0 REQUIRED COMPONENTS ${QT_COMPONENTS})
 set(QT_VERSION "${${QT}_VERSION}")
 message(STATUS "Building LibrePCB with Qt ${QT_VERSION}")
 if(QT_MAJOR_VERSION EQUAL 5)
