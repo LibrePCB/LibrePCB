@@ -514,10 +514,7 @@ protected:  // Data
  *would create a deep copy of the list! You should use C++11 range based for
  *loops instead.
  ******************************************************************************/
-
-#if (QT_VERSION > QT_VERSION_CHECK(5, 9, 0))
 namespace QtPrivate {
-#endif
 
 template <typename T, typename P, typename... OnEditedArgs>
 class QForeachContainer<
@@ -532,9 +529,7 @@ public:
   ~QForeachContainer() = delete;
 };
 
-#if (QT_VERSION > QT_VERSION_CHECK(5, 9, 0))
 }  // namespace QtPrivate
-#endif
 
 /*******************************************************************************
  *  End of File

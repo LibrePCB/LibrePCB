@@ -351,13 +351,7 @@ Path& Path::operator=(const Path& rhs) noexcept {
 }
 
 bool Path::operator<(const Path& rhs) const noexcept {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
   return mVertices < rhs.mVertices;
-#else
-  return std::lexicographical_compare(mVertices.begin(), mVertices.end(),
-                                      rhs.mVertices.begin(),
-                                      rhs.mVertices.end());
-#endif
 }
 
 /*******************************************************************************

@@ -788,7 +788,6 @@ void SchematicEditor::createDockWidgets() noexcept {
   addDockWidget(Qt::RightDockWidgetArea, mDockErc.data(), Qt::Vertical);
 
   // Set reasonable default dock size.
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
   resizeDocks(
       {
           mDockPages.data(),
@@ -799,7 +798,6 @@ void SchematicEditor::createDockWidgets() noexcept {
           150,
       },
       Qt::Horizontal);
-#endif
 }
 
 void SchematicEditor::createMenus() noexcept {

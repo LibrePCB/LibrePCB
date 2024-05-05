@@ -114,8 +114,7 @@ protected:
     QTest::keyClick(&dlg, Qt::Key_Enter);
 
     // Wait until the dialog is hidden, which means the export has finished.
-    EXPECT_TRUE(
-        TestHelpers::waitFor([&]() { return !dlg.isVisible(); }, timeoutMs));
+    EXPECT_TRUE(QTest::qWaitFor([&]() { return !dlg.isVisible(); }, timeoutMs));
 
     // Make dialog ready again for further tests.
     dlg.show();
@@ -133,8 +132,7 @@ protected:
     btn.click();
 
     // Wait until the dialog is hidden, which means the export has finished.
-    EXPECT_TRUE(
-        TestHelpers::waitFor([&]() { return !dlg.isVisible(); }, timeoutMs));
+    EXPECT_TRUE(QTest::qWaitFor([&]() { return !dlg.isVisible(); }, timeoutMs));
 
     // Make dialog ready again for further tests.
     dlg.show();
