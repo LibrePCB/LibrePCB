@@ -1,8 +1,6 @@
-import QtQuick 2.0
-import QtQuick.Controls 1.5
-import QtQuick.Controls 2.0 as Controls2
-import QtQuick.Layouts 1.2
-import QtQuick.Window 2.0
+import QtQuick 6.2
+import QtQuick.Controls 6.2
+import QtQuick.Layouts 6.2
 
 ApplicationWindow {
     id: window
@@ -15,24 +13,24 @@ ApplicationWindow {
     menuBar: MenuBar {
         Menu {
             title: qsTr("&File")
-            MenuItem { text: qsTr("&New...") }
-            MenuItem { text: qsTr("&Open...") }
-            MenuItem { text: qsTr("&Save") }
-            MenuItem { text: qsTr("Save &As...") }
-            MenuItem { text: qsTr("&Quit") }
+            Action { text: qsTr("&New...") }
+            Action { text: qsTr("&Open...") }
+            Action { text: qsTr("&Save") }
+            Action { text: qsTr("Save &As...") }
+            Action { text: qsTr("&Quit") }
         }
         Menu {
             title: qsTr("&Extras")
-            MenuItem {
+            Action {
                 text: qsTr("Workspace Settings") + "..."
-                iconSource: "qrc:///img/actions/settings.png"
+                icon.source: "qrc:///img/actions/settings.png"
                 shortcut: "Ctrl+,"
                 onTriggered: cppApp.openWorkspaceSettings()
             }
         }
         Menu {
             title: qsTr("&Help")
-            MenuItem { text: qsTr("&About") }
+            Action { text: qsTr("&About") }
         }
     }
 
@@ -121,7 +119,7 @@ ApplicationWindow {
         }
     }
 
-    statusBar: StatusBar {
+    footer: ToolBar {
         implicitHeight: 22
         RowLayout {
             anchors.fill: parent

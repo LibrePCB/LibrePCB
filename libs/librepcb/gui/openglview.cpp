@@ -107,7 +107,7 @@ void OpenGlView::mouseMoveEvent(QMouseEvent* e) {
 void OpenGlView::wheelEvent(QWheelEvent* e) {
   const QVector2D center =
       toScenePos(mTransform, mapFromGlobal(QCursor::pos()));
-  const float factor = qPow(sZoomStepFactor, e->delta() / qreal(120));
+  const float factor = qPow(sZoomStepFactor, e->angleDelta().y() / qreal(120));
 
   mAnimation->stop();
   mTransform.translate(center.x(), center.y());

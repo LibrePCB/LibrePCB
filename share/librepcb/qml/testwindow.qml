@@ -1,7 +1,6 @@
-// Note: These dependencies require at least Qt 5.7 to run.
-import QtQuick 2.7
-import QtQuick.Controls 2.0
-import QtQuick.Layouts 1.2
+import QtQuick 6.2
+import QtQuick.Controls 6.2
+import QtQuick.Layouts 6.2
 
 ColumnLayout {
     anchors.fill: parent
