@@ -1,9 +1,6 @@
 # CMake version configuration
-# (Note: The minimal version 3.5 is shipped with Ubuntu 16.04)
-cmake_minimum_required(VERSION 3.5...3.19)
-if(${CMAKE_VERSION} VERSION_LESS 3.12)
-  cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
-endif()
+# (Note: The minimal version 3.16 is shipped with Ubuntu 20.04)
+cmake_minimum_required(VERSION 3.16...3.19)
 
 # Support older macOS versions. Needs to be set before calling project()!
 # https://github.com/LibrePCB/LibrePCB/issues/1091
@@ -150,10 +147,10 @@ if(WIN32)
   add_definitions(-DUNICODE -D_UNICODE)
 endif()
 
-# Disable Qt functions which are deprecated in Qt <= 5.5 to enforce us
+# Disable Qt functions which are deprecated in Qt <= 5.12 to enforce us
 # migrating away from them. Always set this to the lowest Qt version we want
 # to support.
-add_definitions(-DQT_DISABLE_DEPRECATED_BEFORE=0x050500)
+add_definitions(-DQT_DISABLE_DEPRECATED_BEFORE=0x050C00)
 
 # Not sure what we should do with deprecation warnings. Better keeping
 # backwards compatibility with already existing & supported environments
@@ -188,7 +185,7 @@ if(BUILD_TESTS)
 endif()
 
 # Find Qt
-find_package(${QT} 5.5.0 REQUIRED COMPONENTS ${QT_COMPONENTS})
+find_package(${QT} 5.12.0 REQUIRED COMPONENTS ${QT_COMPONENTS})
 set(QT_VERSION "${${QT}_VERSION}")
 message(STATUS "Building LibrePCB with Qt ${QT_VERSION}")
 if(QT_MAJOR_VERSION EQUAL 5)

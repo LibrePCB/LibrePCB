@@ -246,14 +246,7 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
     mKeyboardShortcutsFilterModel->setFilterCaseSensitivity(
         Qt::CaseInsensitive);
     mKeyboardShortcutsFilterModel->setFilterKeyColumn(-1);  // All columns.
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
     mKeyboardShortcutsFilterModel->setRecursiveFilteringEnabled(true);
-#else
-    // Filtering would be more complicated with Qt < 5.10, not really worth
-    // the effort. Thus simply don't provide the filter feature.
-    mUi->line->hide();
-    mUi->edtCommandFilter->hide();
-#endif
     connect(mUi->edtCommandFilter, &QLineEdit::textChanged,
             mKeyboardShortcutsFilterModel.data(),
             &QSortFilterProxyModel::setFilterFixedString);

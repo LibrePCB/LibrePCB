@@ -76,11 +76,7 @@ void OrderPcbApiRequest::startUpload(const QByteArray& lppz,
 
   // Check file size.
   if ((mMaxFileSize > 0) && (lppz.size() > mMaxFileSize)) {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
-    QString size = QLocale().formattedDataSize(lppz.size(), 0);
-#else
-    QString size = QString("%1 MB").arg(lppz.size() / (1024 * 1024));
-#endif
+    const QString size = QLocale().formattedDataSize(lppz.size(), 0);
     emit uploadFailed(
         tr("The project is too large (%1). If you manually added files to "
            "the project directory, you might need to move them out of the "

@@ -330,14 +330,9 @@ void PadSignalMapEditorWidget::keyPressEvent(QKeyEvent* e) noexcept {
  ******************************************************************************/
 
 void PadSignalMapEditorWidget::scheduleToolButtonPositionUpdate() noexcept {
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
   QMetaObject::invokeMethod(this,
                             &PadSignalMapEditorWidget::updateToolButtonPosition,
                             Qt::QueuedConnection);
-#else
-  QMetaObject::invokeMethod(this, "updateToolButtonPosition",
-                            Qt::QueuedConnection);
-#endif
 }
 
 void PadSignalMapEditorWidget::updateToolButtonPosition() noexcept {

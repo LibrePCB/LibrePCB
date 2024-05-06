@@ -51,7 +51,7 @@ productive use, please install an official release as described in the
 To compile and run LibrePCB, you need the following software components:
 
 - Compiler: g++, MinGW or Clang (any version with C++17 support should work)
-- [Qt](http://www.qt.io/download-open-source/) >= 6.2 or 5.5...5.15 (make
+- [Qt](http://www.qt.io/download-open-source/) >= 6.2 or 5.12...5.15 (make
   sure the [imageformats](https://doc.qt.io/qt-5/qtimageformats-index.html)
   plugin is installed too as it will be needed at runtime!).
 - [OpenCASCADE](https://www.opencascade.com/) OCCT or OCE (optional)
@@ -59,7 +59,7 @@ To compile and run LibrePCB, you need the following software components:
   GLU (optional)
 - [zlib](http://www.zlib.net/)
 - [OpenSSL](https://www.openssl.org/)
-- [CMake](https://cmake.org/) 3.5 or newer
+- [CMake](https://cmake.org/) 3.16 or newer
 
 #### Prepared Docker Image
 
@@ -71,7 +71,7 @@ actually used for CI, but are also useful to build LibrePCB locally.
 
 #### Installation on Debian/Ubuntu/Mint
 
-##### Ubuntu 22.04
+##### Ubuntu >= 22.04
 
 ```bash
 sudo apt-get install build-essential git cmake openssl zlib1g zlib1g-dev \
@@ -82,7 +82,7 @@ sudo apt-get install build-essential git cmake openssl zlib1g zlib1g-dev \
 sudo apt-get install qtcreator # optional
 ```
 
-##### Older Ubuntu Versions
+##### Ubuntu 20.04
 
 ```bash
 sudo apt-get install build-essential git cmake openssl zlib1g zlib1g-dev \

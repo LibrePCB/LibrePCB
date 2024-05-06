@@ -192,13 +192,8 @@ bool EditorCommand::eventFilter(QObject* obj, QEvent* event) noexcept {
                 });
       if (!candidates.empty()) {
         qDebug() << "Ambiguous shortcut resolved:" << se->key().toString();
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
         QMetaObject::invokeMethod(candidates.first(), &QAction::trigger,
                                   Qt::QueuedConnection);
-#else
-        QMetaObject::invokeMethod(candidates.first(), "trigger",
-                                  Qt::QueuedConnection);
-#endif
         return true;
       }
     }

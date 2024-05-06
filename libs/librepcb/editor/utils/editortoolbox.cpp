@@ -112,9 +112,7 @@ bool EditorToolbox::removeFormLayoutRow(QLayout& layout,
       if ((labelItem) && (labelItem->widget() == &label) && (fieldItem)) {
         hideLayoutItem(*labelItem);
         hideLayoutItem(*fieldItem);
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 8, 0))
         formLayout->takeRow(i);  // Avoid ugly space caused by the empty rows.
-#endif
         return true;
       }
     }
