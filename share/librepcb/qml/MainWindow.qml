@@ -98,7 +98,8 @@ ApplicationWindow {
             Layout.fillHeight: true
             visible: !btnHome.checked
             Column {
-                Layout.minimumWidth: 100
+                SplitView.minimumWidth: 100
+                SplitView.preferredWidth: 300
                 width: 300
                 ProjectPanel {
                     width: parent.width
@@ -112,9 +113,9 @@ ApplicationWindow {
                 }
             }
             SchematicEditor {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.minimumWidth: 100
+                SplitView.fillWidth: true
+                SplitView.fillHeight: true
+                SplitView.minimumWidth: 100
             }
         }
     }
