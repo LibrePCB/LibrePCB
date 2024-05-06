@@ -1,6 +1,6 @@
-import QtQuick 2.0
-import QtQuick.Controls 1.5
-import QtQuick.Layouts 1.2
+import QtQuick 6.2
+import QtQuick.Controls 6.2
+import QtQuick.Layouts 6.2
 
 ColumnLayout {
     Rectangle {

@@ -187,9 +187,9 @@ void OpenGlRenderer::render() noexcept {
     glDrawArrays(GL_POINTS, 0, layer.primitives.count());
   }
 
-  if (mWindow) {
-    mWindow->resetOpenGLState();
-  }
+  // f (mWindow) {
+  //  mWindow->resetOpenGLState();
+  //
 }
 
 /*******************************************************************************
