@@ -33,12 +33,13 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-ThemeColor::ThemeColor(const QString& identifier, const QString& categoryTr,
-                       const QString& nameTr, const QColor& primary,
-                       const QColor& secondary) noexcept
+ThemeColor::ThemeColor(const QString& identifier, const char* category,
+                       const char* name, const QString& nameSuffix,
+                       const QColor& primary, const QColor& secondary) noexcept
   : mIdentifier(identifier),
-    mCategoryTr(categoryTr),
-    mNameTr(nameTr),
+    mCategoryNoTr(category),
+    mNameNoTr(name),
+    mNameSuffix(nameSuffix),
     mPrimary(primary),
     mSecondary(secondary),
     mEdited(false) {
@@ -46,14 +47,31 @@ ThemeColor::ThemeColor(const QString& identifier, const QString& categoryTr,
 
 ThemeColor::ThemeColor(const ThemeColor& other) noexcept
   : mIdentifier(other.mIdentifier),
-    mCategoryTr(other.mCategoryTr),
-    mNameTr(other.mNameTr),
+    mCategoryNoTr(other.mCategoryNoTr),
+    mNameNoTr(other.mNameNoTr),
+    mNameSuffix(other.mNameSuffix),
     mPrimary(other.mPrimary),
     mSecondary(other.mSecondary),
     mEdited(other.mEdited) {
 }
 
 ThemeColor::~ThemeColor() noexcept {
+}
+
+/*******************************************************************************
+ *  Getters
+ ******************************************************************************/
+
+QString ThemeColor::getCategoryTr() const noexcept {
+  // Lazy load required to fix https://github.com/LibrePCB/LibrePCB/issues/1357.
+  // Note: Translations are done within the Theme context.
+  return QCoreApplication::translate("Theme", mCategoryNoTr);
+}
+
+QString ThemeColor::getNameTr() const noexcept {
+  // Lazy load required to fix https://github.com/LibrePCB/LibrePCB/issues/1357.
+  // Note: Translations are done within the Theme context.
+  return QCoreApplication::translate("Theme", mNameNoTr) % mNameSuffix;
 }
 
 /*******************************************************************************
@@ -115,8 +133,9 @@ bool ThemeColor::operator==(const ThemeColor& rhs) const noexcept {
 
 ThemeColor& ThemeColor::operator=(const ThemeColor& rhs) noexcept {
   mIdentifier = rhs.mIdentifier;
-  mCategoryTr = rhs.mCategoryTr;
-  mNameTr = rhs.mNameTr;
+  mCategoryNoTr = rhs.mCategoryNoTr;
+  mNameNoTr = rhs.mNameNoTr;
+  mNameSuffix = rhs.mNameSuffix;
   mPrimary = rhs.mPrimary;
   mSecondary = rhs.mSecondary;
   mEdited = rhs.mEdited;

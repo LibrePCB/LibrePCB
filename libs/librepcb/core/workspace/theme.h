@@ -164,8 +164,9 @@ public:
   static QString getGrabAreaColorName(const QString& outlineColorName) noexcept;
 
 private:  // Methods
-  void addColor(const QString& id, const QString& category, const QString& name,
-                const QColor& primary, const QColor& secondary) noexcept;
+  void addColor(const QString& id, const char* category, const char* name,
+                const QColor& primary, const QColor& secondary,
+                const QString& nameSuffix = QString()) noexcept;
   SExpression& addNode(const QString& name) noexcept;
 
 private:  // Data
