@@ -170,6 +170,7 @@ set(QT_COMPONENTS
     Network
     OpenGL
     PrintSupport
+    QuickWidgets
     Sql
     Svg
     Widgets

@@ -864,8 +864,12 @@ add_library(
   widgets/messagewidget.h
   widgets/numbereditbase.cpp
   widgets/numbereditbase.h
+  widgets/openglrenderer.cpp
+  widgets/openglrenderer.h
   widgets/openglview.cpp
   widgets/openglview.h
+  widgets/openglview2d.cpp
+  widgets/openglview2d.h
   widgets/patheditorwidget.cpp
   widgets/patheditorwidget.h
   widgets/plaintextedit.cpp
@@ -979,6 +983,7 @@ target_link_libraries(
          ${QT}::Gui
          ${QT}::OpenGL
          ${QT}::PrintSupport
+         ${QT}::QuickWidgets
          ${QT}::Svg
          ${QT}::Network
          ${QT}::Widgets

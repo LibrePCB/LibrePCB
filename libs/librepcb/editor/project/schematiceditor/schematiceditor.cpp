@@ -36,6 +36,8 @@
 #include "../../utils/standardeditorcommandhandler.h"
 #include "../../utils/toolbarproxy.h"
 #include "../../utils/undostackactiongroup.h"
+#include "../../widgets/graphicsview.h"
+#include "../../widgets/openglview2d.h"
 #include "../../widgets/rulecheckdock.h"
 #include "../../widgets/searchtoolbar.h"
 #include "../../workspace/desktopservices.h"
@@ -90,24 +92,32 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
     mFsm() {
   mUi->setupUi(this);
 
+  qmlRegisterType<OpenGlView2D>("org.librepcb.qmlcomponents", 1, 0,
+                                "OpenGlView2D");
+
   // Setup graphics view.
   const Theme& theme =
       mProjectEditor.getWorkspace().getSettings().themes.getActive();
-  mUi->graphicsView->setBackgroundColors(
-      theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor(),
-      theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
-  mUi->graphicsView->setOverlayColors(
-      theme.getColor(Theme::Color::sSchematicOverlays).getPrimaryColor(),
-      theme.getColor(Theme::Color::sSchematicOverlays).getSecondaryColor());
-  mUi->graphicsView->setInfoBoxColors(
-      theme.getColor(Theme::Color::sSchematicInfoBox).getPrimaryColor(),
-      theme.getColor(Theme::Color::sSchematicInfoBox).getSecondaryColor());
-  mUi->graphicsView->setGridStyle(theme.getSchematicGridStyle());
-  mUi->graphicsView->setUseOpenGl(
-      mProjectEditor.getWorkspace().getSettings().useOpenGl.get());
-  mUi->graphicsView->setEventHandlerObject(this);
-  connect(mUi->graphicsView, &GraphicsView::cursorScenePositionChanged,
-          mUi->statusbar, &StatusBar::setAbsoluteCursorPosition);
+  // mUi->graphicsView->setBackgroundColors(
+  //     theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor(),
+  //     theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
+  // mUi->graphicsView->setOverlayColors(
+  //     theme.getColor(Theme::Color::sSchematicOverlays).getPrimaryColor(),
+  //     theme.getColor(Theme::Color::sSchematicOverlays).getSecondaryColor());
+  // mUi->graphicsView->setInfoBoxColors(
+  //     theme.getColor(Theme::Color::sSchematicInfoBox).getPrimaryColor(),
+  //     theme.getColor(Theme::Color::sSchematicInfoBox).getSecondaryColor());
+  // mUi->graphicsView->setGridStyle(theme.getSchematicGridStyle());
+  // mUi->graphicsView->setUseOpenGl(
+  //     mProjectEditor.getWorkspace().getSettings().useOpenGl.get());
+  // mUi->graphicsView->setEventHandlerObject(this);
+  // connect(mUi->graphicsView, &GraphicsView::cursorScenePositionChanged,
+  //         mUi->statusbar, &StatusBar::setAbsoluteCursorPosition);
+
+  mUi->quickWidget->setSource(Application::getResourcesDir()
+                                  .getPathTo("qml/SchematicEditor.qml")
+                                  .toQUrl());
+  qDebug() << mUi->quickWidget->errors();
 
   // Setup status bar.
   mUi->statusbar->setFields(StatusBar::AbsolutePosition |
@@ -132,11 +142,13 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
   addLayers(theme);
 
   // Build the whole schematic editor finite state machine.
+  GraphicsView* dummyGraphicsView = new GraphicsView(this);
+  dummyGraphicsView->hide();
   SchematicEditorFsm::Context fsmContext{mProjectEditor.getWorkspace(),
                                          mProject,
                                          mProjectEditor,
                                          *this,
-                                         *mUi->graphicsView,
+                                         *dummyGraphicsView,
                                          *mCommandToolBarProxy,
                                          mProjectEditor.getUndoStack()};
   mFsm.reset(new SchematicEditorFsm(fsmContext));
@@ -205,11 +217,11 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
 
   // Set focus to graphics view (avoid having the focus in some arbitrary
   // widget).
-  mUi->graphicsView->setFocus();
+  // mUi->graphicsView->setFocus();
 
   // mGraphicsView->zoomAll(); does not work properly here, should be executed
   // later in the event loop (ugly, but seems to work...)
-  QTimer::singleShot(200, mUi->graphicsView, &GraphicsView::zoomAll);
+  // QTimer::singleShot(200, mUi->graphicsView, &GraphicsView::zoomAll);
 }
 
 SchematicEditor::~SchematicEditor() {
@@ -251,10 +263,10 @@ bool SchematicEditor::setActiveSchematicIndex(int index) noexcept {
   Schematic* schematic = getActiveSchematic();
   if (schematic) {
     // Save current view scene rect.
-    mVisibleSceneRect[schematic->getUuid()] =
-        mUi->graphicsView->getVisibleSceneRect();
+    // mVisibleSceneRect[schematic->getUuid()] =
+    //    mUi->graphicsView->getVisibleSceneRect();
   }
-  mUi->graphicsView->setScene(nullptr);
+  // mUi->graphicsView->setScene(nullptr);
   mGraphicsScene.reset();
   while (!mSchematicConnections.isEmpty()) {
     disconnect(mSchematicConnections.takeLast());
@@ -274,12 +286,12 @@ bool SchematicEditor::setActiveSchematicIndex(int index) noexcept {
     mGraphicsScene->setSelectionRectColors(
         theme.getColor(Theme::Color::sSchematicSelection).getPrimaryColor(),
         theme.getColor(Theme::Color::sSchematicSelection).getSecondaryColor());
-    mUi->graphicsView->setScene(mGraphicsScene.data());
+    // mUi->graphicsView->setScene(mGraphicsScene.data());
     const QRectF sceneRect = mVisibleSceneRect.value(schematic->getUuid());
     if (!sceneRect.isEmpty()) {
-      mUi->graphicsView->setVisibleSceneRect(sceneRect);
+      // mUi->graphicsView->setVisibleSceneRect(sceneRect);
     }
-    mUi->graphicsView->setGridInterval(schematic->getGridInterval());
+    // mUi->graphicsView->setGridInterval(schematic->getGridInterval());
     mUi->statusbar->setLengthUnit(schematic->getGridUnit());
     mSchematicConnections.append(
         connect(schematic, &Schematic::symbolAdded, this,
@@ -288,7 +300,7 @@ bool SchematicEditor::setActiveSchematicIndex(int index) noexcept {
         connect(schematic, &Schematic::symbolRemoved, this,
                 &SchematicEditor::updateEmptySchematicMessage));
   } else {
-    mUi->graphicsView->setScene(nullptr);
+    // mUi->graphicsView->setScene(nullptr);
   }
 
   // update toolbars
@@ -469,18 +481,18 @@ void SchematicEditor::createActions() noexcept {
       this, this, &SchematicEditor::execGridPropertiesDialog));
   mActionGridIncrease.reset(cmd.gridIncrease.createAction(this, this, [this]() {
     if (const Schematic* schematic = getActiveSchematic()) {
-      const Length interval = schematic->getGridInterval() * 2;
-      setGridProperties(PositiveLength(interval), schematic->getGridUnit(),
-                        mUi->graphicsView->getGridStyle(), true);
+      // const Length interval = schematic->getGridInterval() * 2;
+      // setGridProperties(PositiveLength(interval), schematic->getGridUnit(),
+      //                   mUi->graphicsView->getGridStyle(), true);
     }
   }));
   mActionGridDecrease.reset(cmd.gridDecrease.createAction(this, this, [this]() {
     if (const Schematic* schematic = getActiveSchematic()) {
       const Length interval = *schematic->getGridInterval();
       if ((interval % 2) == 0) {
-        setGridProperties(PositiveLength(interval / 2),
-                          schematic->getGridUnit(),
-                          mUi->graphicsView->getGridStyle(), true);
+        // setGridProperties(PositiveLength(interval / 2),
+        //                   schematic->getGridUnit(),
+        //                   mUi->graphicsView->getGridStyle(), true);
       }
     }
   }));
@@ -496,12 +508,12 @@ void SchematicEditor::createActions() noexcept {
   mActionShowPinNumbers->setCheckable(true);
   mActionShowPinNumbers->setChecked(pinNumbersLayer &&
                                     pinNumbersLayer->isVisible());
-  mActionZoomFit.reset(cmd.zoomFitContent.createAction(this, mUi->graphicsView,
-                                                       &GraphicsView::zoomAll));
-  mActionZoomIn.reset(
-      cmd.zoomIn.createAction(this, mUi->graphicsView, &GraphicsView::zoomIn));
-  mActionZoomOut.reset(cmd.zoomOut.createAction(this, mUi->graphicsView,
-                                                &GraphicsView::zoomOut));
+  mActionZoomFit.reset(cmd.zoomFitContent.createAction(this/*, mUi->graphicsView,
+                                                       &GraphicsView::zoomAll*/));
+  mActionZoomIn.reset(cmd.zoomIn.createAction(
+      this /*, mUi->graphicsView, &GraphicsView::zoomIn*/));
+  mActionZoomOut.reset(cmd.zoomOut.createAction(this/*, mUi->graphicsView,
+                                                &GraphicsView::zoomOut*/));
   mActionUndo.reset(cmd.undo.createAction(this));
   mActionRedo.reset(cmd.redo.createAction(this));
   mActionCut.reset(cmd.clipboardCut.createAction(
@@ -511,35 +523,39 @@ void SchematicEditor::createActions() noexcept {
   mActionPaste.reset(cmd.clipboardPaste.createAction(
       this, mFsm.data(), &SchematicEditorFsm::processPaste));
   mActionMoveLeft.reset(cmd.moveLeft.createAction(this, this, [this]() {
-    if (!mFsm->processMove(Point(-mUi->graphicsView->getGridInterval(), 0))) {
-      // Workaround for consumed keyboard shortcuts for scrolling.
-      mUi->graphicsView->horizontalScrollBar()->triggerAction(
-          QScrollBar::SliderSingleStepSub);
-    }
+    // if (!mFsm->processMove(Point(-mUi->graphicsView->getGridInterval(), 0)))
+    // {
+    //   // Workaround for consumed keyboard shortcuts for scrolling.
+    //   mUi->graphicsView->horizontalScrollBar()->triggerAction(
+    //       QScrollBar::SliderSingleStepSub);
+    // }
   }));
   addAction(mActionMoveLeft.data());
   mActionMoveRight.reset(cmd.moveRight.createAction(this, this, [this]() {
-    if (!mFsm->processMove(Point(*mUi->graphicsView->getGridInterval(), 0))) {
-      // Workaround for consumed keyboard shortcuts for scrolling.
-      mUi->graphicsView->horizontalScrollBar()->triggerAction(
-          QScrollBar::SliderSingleStepAdd);
-    }
+    // if (!mFsm->processMove(Point(*mUi->graphicsView->getGridInterval(), 0)))
+    // {
+    //   // Workaround for consumed keyboard shortcuts for scrolling.
+    //   mUi->graphicsView->horizontalScrollBar()->triggerAction(
+    //       QScrollBar::SliderSingleStepAdd);
+    // }
   }));
   addAction(mActionMoveRight.data());
   mActionMoveUp.reset(cmd.moveUp.createAction(this, this, [this]() {
-    if (!mFsm->processMove(Point(0, *mUi->graphicsView->getGridInterval()))) {
-      // Workaround for consumed keyboard shortcuts for scrolling.
-      mUi->graphicsView->verticalScrollBar()->triggerAction(
-          QScrollBar::SliderSingleStepSub);
-    }
+    // if (!mFsm->processMove(Point(0, *mUi->graphicsView->getGridInterval())))
+    // {
+    //   // Workaround for consumed keyboard shortcuts for scrolling.
+    //   mUi->graphicsView->verticalScrollBar()->triggerAction(
+    //       QScrollBar::SliderSingleStepSub);
+    // }
   }));
   addAction(mActionMoveUp.data());
   mActionMoveDown.reset(cmd.moveDown.createAction(this, this, [this]() {
-    if (!mFsm->processMove(Point(0, -mUi->graphicsView->getGridInterval()))) {
-      // Workaround for consumed keyboard shortcuts for scrolling.
-      mUi->graphicsView->verticalScrollBar()->triggerAction(
-          QScrollBar::SliderSingleStepAdd);
-    }
+    // if (!mFsm->processMove(Point(0, -mUi->graphicsView->getGridInterval())))
+    // {
+    //   // Workaround for consumed keyboard shortcuts for scrolling.
+    //   mUi->graphicsView->verticalScrollBar()->triggerAction(
+    //       QScrollBar::SliderSingleStepAdd);
+    // }
   }));
   addAction(mActionMoveDown.data());
   mActionRotateCcw.reset(cmd.rotateCcw.createAction(
@@ -625,12 +641,12 @@ void SchematicEditor::createActions() noexcept {
   }));
 
   // Widget shortcuts.
-  mUi->graphicsView->addAction(cmd.commandToolBarFocus.createAction(
-      this, this,
-      [this]() {
-        mCommandToolBarProxy->startTabFocusCycle(*mUi->graphicsView);
-      },
-      EditorCommand::ActionFlag::WidgetShortcut));
+  // mUi->graphicsView->addAction(cmd.commandToolBarFocus.createAction(
+  //    this, this,
+  //    [this]() {
+  //      mCommandToolBarProxy->startTabFocusCycle(*mUi->graphicsView);
+  //    },
+  //    EditorCommand::ActionFlag::WidgetShortcut));
 
   // Undo stack action group.
   mUndoStackActionGroup.reset(
@@ -1150,7 +1166,7 @@ void SchematicEditor::goToSymbol(const QString& name, int index) noexcept {
             std::min(1.5f * std::max(rect.size().width(), rect.size().height()),
                      Length::fromMm(10).toPx());
         rect.adjust(-margin, -margin, margin, margin);
-        mUi->graphicsView->zoomToRect(rect);
+        // mUi->graphicsView->zoomToRect(rect);
       }
     }
   }
@@ -1181,8 +1197,8 @@ void SchematicEditor::setGridProperties(const PositiveLength& interval,
                                         const LengthUnit& unit,
                                         Theme::GridStyle style,
                                         bool applyToSchematics) noexcept {
-  mUi->graphicsView->setGridInterval(interval);
-  mUi->graphicsView->setGridStyle(style);
+  // mUi->graphicsView->setGridInterval(interval);
+  // mUi->graphicsView->setGridStyle(style);
   mUi->statusbar->setLengthUnit(unit);
 
   if (applyToSchematics) {
@@ -1194,20 +1210,20 @@ void SchematicEditor::setGridProperties(const PositiveLength& interval,
 }
 
 void SchematicEditor::execGridPropertiesDialog() noexcept {
-  if (const Schematic* schematic = getActiveSchematic()) {
-    GridSettingsDialog dialog(schematic->getGridInterval(),
-                              schematic->getGridUnit(),
-                              mUi->graphicsView->getGridStyle(), this);
-    connect(&dialog, &GridSettingsDialog::gridPropertiesChanged,
-            [this](const PositiveLength& interval, const LengthUnit& unit,
-                   Theme::GridStyle style) {
-              setGridProperties(interval, unit, style, false);
-            });
-    if (dialog.exec()) {
-      setGridProperties(dialog.getInterval(), dialog.getUnit(),
-                        dialog.getStyle(), true);
-    }
-  }
+  // if (const Schematic* schematic = getActiveSchematic()) {
+  //   GridSettingsDialog dialog(schematic->getGridInterval(),
+  //                             schematic->getGridUnit(),
+  //                             mUi->graphicsView->getGridStyle(), this);
+  //   connect(&dialog, &GridSettingsDialog::gridPropertiesChanged,
+  //           [this](const PositiveLength& interval, const LengthUnit& unit,
+  //                  Theme::GridStyle style) {
+  //             setGridProperties(interval, unit, style, false);
+  //           });
+  //   if (dialog.exec()) {
+  //     setGridProperties(dialog.getInterval(), dialog.getUnit(),
+  //                       dialog.getStyle(), true);
+  //   }
+  // }
 }
 
 void SchematicEditor::execGraphicsExportDialog(

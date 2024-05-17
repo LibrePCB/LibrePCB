@@ -41,9 +41,15 @@
      <widget class="librepcb::editor::MessageWidget" name="msgEmptySchematic" native="true"/>
     </item>
     <item>
-     <widget class="librepcb::editor::GraphicsView" name="graphicsView">
-      <property name="frameShape">
-       <enum>QFrame::NoFrame</enum>
+     <widget class="QQuickWidget" name="quickWidget">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="resizeMode">
+       <enum>QQuickWidget::SizeRootObjectToView</enum>
       </property>
      </widget>
     </item>
@@ -55,7 +61,7 @@
      <x>0</x>
      <y>0</y>
      <width>920</width>
-     <height>23</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>
@@ -63,14 +69,14 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>QQuickWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">QtQuickWidgets/QQuickWidget</header>
+  </customwidget>
+  <customwidget>
    <class>librepcb::editor::StatusBar</class>
    <extends>QStatusBar</extends>
    <header location="global">librepcb/editor/widgets/statusbar.h</header>
-  </customwidget>
-  <customwidget>
-   <class>librepcb::editor::GraphicsView</class>
-   <extends>QGraphicsView</extends>
-   <header location="global">librepcb/editor/widgets/graphicsview.h</header>
   </customwidget>
   <customwidget>
    <class>librepcb::editor::MessageWidget</class>
