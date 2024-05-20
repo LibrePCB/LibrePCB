@@ -44,16 +44,16 @@ class ThemeColor final {
 public:
   // Constructors / Destructor
   ThemeColor() = delete;
-  ThemeColor(const QString& identifier, const QString& categoryTr,
-             const QString& nameTr, const QColor& primary,
+  ThemeColor(const QString& identifier, const char* category, const char* name,
+             const QString& nameSuffix, const QColor& primary,
              const QColor& secondary) noexcept;
   ThemeColor(const ThemeColor& other) noexcept;
   ~ThemeColor() noexcept;
 
   // Getters
   const QString& getIdentifier() const noexcept { return mIdentifier; }
-  const QString& getCategoryTr() const noexcept { return mCategoryTr; }
-  const QString& getNameTr() const noexcept { return mNameTr; }
+  QString getCategoryTr() const noexcept;
+  QString getNameTr() const noexcept;
   const QColor& getPrimaryColor() const noexcept { return mPrimary; }
   const QColor& getSecondaryColor() const noexcept { return mSecondary; }
   bool isEdited() const noexcept { return mEdited; }
@@ -75,8 +75,9 @@ public:
 
 private:  // Data
   QString mIdentifier;
-  QString mCategoryTr;
-  QString mNameTr;
+  const char* mCategoryNoTr;
+  const char* mNameNoTr;
+  QString mNameSuffix;
   QColor mPrimary;
   QColor mSecondary;  ///< Null if not applicable
   bool mEdited;
