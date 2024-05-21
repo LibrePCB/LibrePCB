@@ -109,14 +109,14 @@ QString StepExport::run(std::shared_ptr<SceneData3D> data, FilePath fp,
     std::unique_ptr<OccModel> model =
         OccModel::createAssembly(data->getProjectName());
 
-    // Add PCB body, if there is a valid outline.
+    // Add PCB bodies (export all for consistency with built-in 3D viewer,
+    // see https://github.com/LibrePCB/LibrePCB/issues/1364).
     emit progressStatus(tr("Exporting PCB..."));
-    Path outline;
+    QList<Path> outlines;
     for (const auto& obj : data->getAreas()) {
       if ((obj.layer->getId() == Layer::boardOutlines().getId()) &&
           (obj.outline.isClosed())) {
-        outline = obj.outline;
-        break;
+        outlines.append(obj.outline);
       }
     }
     QVector<Path> holes;
@@ -136,10 +136,13 @@ QString StepExport::run(std::shared_ptr<SceneData3D> data, FilePath fp,
     if (const PcbColor* c = data->getSolderResist()) {
       color = c->toSolderResistColor().darker();
     }
-    if (!outline.getVertices().isEmpty()) {
-      std::unique_ptr<OccModel> pcb =
-          OccModel::createBoard(outline, holes, data->getThickness(), color);
-      model->addToAssembly(*pcb, Point3D(), Angle3D(), Transform(), "PCB");
+    for (int i = 0; i < outlines.size(); ++i) {
+      std::unique_ptr<OccModel> pcb = OccModel::createBoard(
+          outlines.at(i), holes, data->getThickness(), color);
+      const QString suffix =
+          (outlines.size() > 1) ? QString::number(i + 1) : QString();
+      model->addToAssembly(*pcb, Point3D(), Angle3D(), Transform(),
+                           "PCB" % suffix);
     }
     emit progressPercent(20);
 
