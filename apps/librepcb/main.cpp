@@ -84,7 +84,6 @@ int main(int argc, char* argv[]) {
   // (from http://www.qtcentre.org/threads/1904)
   app.setStyleSheet("QStatusBar::item { border: 0px solid black; }");
 
-  // Windows auto dark mode from https://forum.qt.io/topic/101391/windows-10-dark-theme/4 (color adjustments made to match system colors)
   #ifdef Q_OS_WIN and (QT_VERSION_MAJOR >= 6)
         qApp->setStyle(QStyleFactory::create("Fusion"));
   #endif
