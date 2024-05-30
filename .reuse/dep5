@@ -51,6 +51,7 @@ Files:
  img/actions/draw_wire_dark.png
  img/actions/draw_wire.png
  img/actions/draw_zone.png
+ img/actions/export_pick_place_file.png
  img/actions/grid_dark.png
  img/actions/grid.png
  img/actions/hide_planes.png
@@ -286,7 +287,6 @@ License: CC-BY-SA-3.0 or LGPL-2.1-only
 Files:
  img/actions/clone.png
  img/actions/drc.png
- img/actions/export_pick_place_file.png
  img/actions/export_pixmap.png
  img/actions/export.png
  img/actions/flip_horizontal.png
@@ -297,9 +297,8 @@ Files:
  img/actions/ruler.png
  img/actions/view_3d.png
  img/library/part.png
-Copyright: 2024 Federico Ceratto <federico@debian.org>
-License: MIT
-Comments: Based on components from https://icons.getbootstrap.com/ under MIT license
+Copyright: Icons8
+License: LicenseRef-Icons8
 
 Files: libs/delaunay-triangulation/*
 Copyright: 2015 Simon Zeni
