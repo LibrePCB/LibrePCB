@@ -84,10 +84,18 @@ int main(int argc, char* argv[]) {
   // (from http://www.qtcentre.org/threads/1904)
   app.setStyleSheet("QStatusBar::item { border: 0px solid black; }");
 
-  // Use Fusion style on Windows to allow automatic dark mode
-  #ifdef Q_OS_WIN and (QT_VERSION_MAJOR >= 6)
-        qApp->setStyle(QStyleFactory::create("Fusion"));
-  #endif
+  // Use Fusion style on Windows with dark theme to enable dark theme also for
+  // LibrePCB (see https://github.com/LibrePCB/LibrePCB/issues/1390).
+  // Note: As a fallback solution if the dark theme causes troubles or users
+  // don't like it, the environment variable LIBREPCB_DISABLE_DARK_THEME=1
+  // could be set. We may remove this fallback if nobody asks for it.
+#if defined(Q_OS_WIN) && (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
+  if ((app.styleHints()->colorScheme() == Qt::ColorScheme::Dark) &&
+      (qgetenv("LIBREPCB_DISABLE_DARK_THEME") != "1")) {
+    qDebug() << "Switching to Fusion style because of dark system theme.";
+    app.setStyle(QStyleFactory::create("Fusion"));
+  }
+#endif
 
   // Start network access manager thread with HTTP cache to avoid extensive
   // requests (e.g. downloading library pictures each time opening the manager).
