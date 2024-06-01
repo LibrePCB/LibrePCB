@@ -12,7 +12,7 @@ jobs:
   strategy:
     matrix:
       Qt6:
-        CMAKE_OPTIONS: "-DQT_MAJOR_VERSION=6 -DBUILD_QTQUICK_TEST=0"
+        CMAKE_OPTIONS: "-DQT_MAJOR_VERSION=6"
   steps:
   - checkout: self
     clean: true

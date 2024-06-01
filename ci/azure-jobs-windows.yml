@@ -15,7 +15,6 @@ jobs:
         Qt6_MinGW_64bit:
           IMAGE: librepcb/librepcb-dev:windowsservercore-ltsc2019-qt6.6-64bit-1
           ARCH: 'x86_64'
-          CMAKE_OPTIONS: "-DBUILD_QTQUICK_TEST=0"
           DEPLOY: true
     container: $[ variables['IMAGE'] ]
     steps:

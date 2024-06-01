@@ -19,6 +19,16 @@ cp "./build/install/opt/bin/librepcb-cli.app/Contents/MacOS/librepcb-cli" \
 cp -r "./build/install/opt/bin/librepcb.app" "./build/install/opt/LibrePCB.app"
 cp -r "./build/install/opt/share" "./build/install/opt/LibrePCB.app/Contents/"
 
+# Fix failure of macdeployqt according to
+# https://github.com/orgs/Homebrew/discussions/2823.
+# Note: The last 3 symlinks are required for QtQuick.
+fix_macdeployqt () {
+  ln -s $1 ./lib  # https://github.com/orgs/Homebrew/discussions/2823
+  ln -s $1 ../lib
+  rm -rf ../../lib && ln -s $1 ../../lib  # Directory already exists.
+  ln -s $1 ../../../lib
+}
+
 # Build bundle
 pushd "./build/install/opt/"  # Avoid having path in DMG name
 dylibbundler -ns -od -b \
@@ -32,10 +42,11 @@ then
   # Silicon Mac. Apple Silicon requires the binary to be signed, but
   # somehow macdeployqt fails on that so we have to do it manually.
   # Requirement: brew install create-dmg
-  ln -s /opt/homebrew/lib ./lib  # https://github.com/orgs/Homebrew/discussions/2823
+  fix_macdeployqt "/opt/homebrew/lib"
   macdeployqt "LibrePCB.app" -always-overwrite \
     -executable="./LibrePCB.app/Contents/MacOS/librepcb" \
-    -executable="./LibrePCB.app/Contents/MacOS/librepcb-cli"
+    -executable="./LibrePCB.app/Contents/MacOS/librepcb-cli" \
+    -qmldir="./LibrePCB.app/Contents/share/librepcb/qml"
   codesign --force --deep -s - ./LibrePCB.app/Contents/MacOS/librepcb
   codesign --force --deep -s - ./LibrePCB.app/Contents/MacOS/librepcb-cli
   create-dmg --skip-jenkins --volname "LibrePCB" \
@@ -43,10 +54,11 @@ then
     ./LibrePCB.dmg ./LibrePCB.app
 else
   # On x86_64, directly create the *.dmg with macdeployqt.
-  ln -s /usr/local/lib ./lib  # https://github.com/orgs/Homebrew/discussions/2823
+  fix_macdeployqt "/usr/local/lib"
   macdeployqt "LibrePCB.app" -dmg -always-overwrite \
     -executable="./LibrePCB.app/Contents/MacOS/librepcb" \
-    -executable="./LibrePCB.app/Contents/MacOS/librepcb-cli"
+    -executable="./LibrePCB.app/Contents/MacOS/librepcb-cli" \
+    -qmldir="./LibrePCB.app/Contents/share/librepcb/qml"
 fi
 popd
 
