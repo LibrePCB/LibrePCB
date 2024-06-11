@@ -33,6 +33,7 @@
 #include <librepcb/editor/workspace/initializeworkspacewizard/initializeworkspacewizard.h>
 
 #include <QtCore>
+#include <QtQuick>
 #include <QtWidgets>
 
 /*******************************************************************************
@@ -79,6 +80,11 @@ int main(int argc, char* argv[]) {
   // shown.
   Application::loadBundledFonts();
   Application::setTranslationLocale(QLocale::system());
+
+  // Force rendering with OpenGL because it's used for our own 2D rendering.
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+  QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
+#endif
 
   // This is to remove the ugly frames around widgets in all status bars...
   // (from http://www.qtcentre.org/threads/1904)
