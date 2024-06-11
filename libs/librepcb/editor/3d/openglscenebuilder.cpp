@@ -41,6 +41,11 @@
 #if USE_GLU
 #ifdef __APPLE__
 #include <OpenGL/glu.h>
+#elif defined(Q_OS_WIN)
+#include <windef.h>
+// Including <windef.h> first fixes compile error on some systems, see
+// https://stackoverflow.com/questions/19198244/how-do-i-get-rid-of-these-compiler-errors-in-glu-h.
+#include <GL/glu.h>
 #else
 #include <GL/glu.h>
 #endif
