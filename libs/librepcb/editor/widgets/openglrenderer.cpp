@@ -50,11 +50,11 @@ OpenGlRenderer::OpenGlRenderer() noexcept
       Application::getResourcesDir()
           .getPathTo("opengl/2d-vertex-shader.glsl")
           .toStr());
-  mProgram.addShaderFromSourceFile(
-      QOpenGLShader::Geometry,
-      Application::getResourcesDir()
-          .getPathTo("opengl/2d-geometry-shader.glsl")
-          .toStr());
+  // mProgram.addShaderFromSourceFile(
+  //     QOpenGLShader::Geometry,
+  //     Application::getResourcesDir()
+  //         .getPathTo("opengl/2d-geometry-shader.glsl")
+  //         .toStr());
   mProgram.addShaderFromSourceFile(
       QOpenGLShader::Fragment,
       Application::getResourcesDir()
@@ -114,7 +114,7 @@ void OpenGlRenderer::render() noexcept {
   mProgram.setUniformValue("u_resolution", mResolution);
   mProgram.setUniformValue("mvp_matrix", mTransform);
 
-  struct Primitive {
+  /*struct Primitive {
     // Type 1: Triangle [p0, p1, p2]
     // Type 2: Circle [pos, diameter]
     // Type 3: Line [p0, p1, width]
@@ -185,7 +185,38 @@ void OpenGlRenderer::render() noexcept {
     glBlendColor(layer.color.x(), layer.color.y(), layer.color.z(),
                  layer.color.w());
     glDrawArrays(GL_POINTS, 0, layer.primitives.count());
-  }
+  }*/
+
+  float right = 1.0;
+  float bottom = -0.5;
+  float left = -1.0;
+  float top = 0.5;
+  float quad[] = {
+      right, bottom, 0, 1.0,  -1.0,  //
+      right, top,    0, 1.0,  1.0,  //
+      left,  top,    0, -1.0, 1.0,  //
+      left,  bottom, 0, -1.0, -1.0,  //
+  };
+
+
+  mProgram.setUniformValue("u_circle", QVector4D(0, 0, 0.4, 0.2));
+
+  QOpenGLBuffer buf;
+  buf.create();
+  buf.bind();
+  buf.allocate(quad, sizeof(float) * 20);
+
+  int vertexLocation = mProgram.attributeLocation("a_position");
+  mProgram.enableAttributeArray(vertexLocation);
+  mProgram.setAttributeBuffer(vertexLocation, GL_FLOAT, 0, 3,
+                              sizeof(float)*5);
+
+  //int valueLocation = mProgram.attributeLocation("a_value");
+  //mProgram.enableAttributeArray(valueLocation);
+  //mProgram.setAttributeBuffer(valueLocation, GL_FLOAT, 12, 2,
+  //                            sizeof(float)*5);
+
+  glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
   // f (mWindow) {
   //  mWindow->resetOpenGLState();

@@ -1,19 +1,11 @@
-#version 330 core
+attribute vec4 a_position;
+attribute vec2 a_center;
 
-uniform float u_z;
-uniform vec4 u_color;
+uniform mat4 mvp_matrix;
 
-attribute float a_type;
-attribute vec2 a_position;
-attribute vec4 a_params;
-
-out float vg_type;
-out vec4 vg_params;
-out vec4 vg_color;
+varying vec2 pos;
 
 void main() {
-    vg_type = a_type;
-    gl_Position = vec4(a_position, u_z, 1.0);
-    vg_params = a_params;
-    vg_color = u_color;
+    pos = a_position.xy;
+    gl_Position = mvp_matrix * a_position;
 }
