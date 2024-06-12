@@ -198,8 +198,8 @@ void OpenGlRenderer::render() noexcept {
       left,  bottom, 0, -1.0, -1.0,  //
   };
 
-
-  mProgram.setUniformValue("u_circle", QVector4D(0, 0, 0.4, 0.2));
+  mProgram.setUniformValue("u_line1", QVector3D(-0.1, 0, 0.4));
+  mProgram.setUniformValue("u_line2", QVector3D(0.1, 0, 0.2));
 
   QOpenGLBuffer buf;
   buf.create();
@@ -209,12 +209,12 @@ void OpenGlRenderer::render() noexcept {
   int vertexLocation = mProgram.attributeLocation("a_position");
   mProgram.enableAttributeArray(vertexLocation);
   mProgram.setAttributeBuffer(vertexLocation, GL_FLOAT, 0, 3,
-                              sizeof(float)*5);
+                              sizeof(float) * 5);
 
-  //int valueLocation = mProgram.attributeLocation("a_value");
-  //mProgram.enableAttributeArray(valueLocation);
-  //mProgram.setAttributeBuffer(valueLocation, GL_FLOAT, 12, 2,
-  //                            sizeof(float)*5);
+  // int valueLocation = mProgram.attributeLocation("a_value");
+  // mProgram.enableAttributeArray(valueLocation);
+  // mProgram.setAttributeBuffer(valueLocation, GL_FLOAT, 12, 2,
+  //                             sizeof(float)*5);
 
   glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
