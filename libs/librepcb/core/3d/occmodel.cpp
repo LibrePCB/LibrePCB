@@ -326,8 +326,14 @@ void OccModel::addToAssembly(const OccModel& model, const Point3D& pos,
       TDF_Label shapeLabel = assemblyShapeTool->AddShape(shape, Standard_False);
       const QString shapeName = QString("%1:%2").arg(cleanString(name)).arg(i);
       TDataStd_Name::Set(shapeLabel, shapeName.toStdString().c_str());
+      // ATTENTION: Until LibrePCB 1.1.0 we passed shape.Location() instead of
+      // TopLoc_Location(), but this caused wrong placement in rare cases.
+      // Although TopLoc_Location() sounds wrong(?), it fixes the issue without
+      // observing any negative consequences so far. If any issues are observed
+      // in future, we might have to reconsider this change.
+      // See details in https://github.com/LibrePCB/LibrePCB/issues/1387.
       TDF_Label cmpLabel = assemblyShapeTool->AddComponent(newLabel, shapeLabel,
-                                                           shape.Location());
+                                                           TopLoc_Location());
 
       // Copy face colors.
       modelExplorer.Init(shape, TopAbs_FACE);
