@@ -331,7 +331,7 @@ License: CC0-1.0
 
 Files: libs/optional/tests/catch.hpp
 Copyright: 2017, Two Blue Cubes Ltd
-License: BSL-1
+License: BSL-1.0
 
 Files: libs/parseagle/*
 Copyright: 2012-2020, U. Bruhin
