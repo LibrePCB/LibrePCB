@@ -872,6 +872,8 @@ add_library(
   widgets/plaintextedit.h
   widgets/positivelengthedit.cpp
   widgets/positivelengthedit.h
+  widgets/quickgraphicsview.cpp
+  widgets/quickgraphicsview.h
   widgets/ratioedit.cpp
   widgets/ratioedit.h
   widgets/rulecheckdock.cpp
@@ -979,6 +981,7 @@ target_link_libraries(
          ${QT}::Gui
          ${QT}::OpenGL
          ${QT}::PrintSupport
+         ${QT}::QuickWidgets
          ${QT}::Svg
          ${QT}::Network
          ${QT}::Widgets

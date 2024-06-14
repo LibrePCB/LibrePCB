@@ -31,6 +31,7 @@
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/rulecheck/rulecheckmessage.h>
 #include <librepcb/core/types/uuid.h>
+#include <librepcb/core/workspace/theme.h>
 
 #include <QtCore>
 #include <QtWidgets>
