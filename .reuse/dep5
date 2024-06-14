@@ -1,9 +1,6 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: librepcb
 Source: https://librepcb.org/
-Comment:
- Exclude libs/parseagle/specs/eagle_7.5.0.dtd as it is released
- under CC-BY-ND-3 and not required for building or installing.
 
 Files:
  apps/*
@@ -352,6 +349,10 @@ License: LGPL-2.1-only-static-linking
 Files: libs/type_safe/*
 Copyright: 2016-2019, Jonathan Müller
 License: MIT
+
+Files: libs/type_safe/external/debug_assert/*
+Copyright: 2016-2018, Jonathan Müller
+License: Zlib
 
 Files: share/librepcb/fonts/Noto*
 Copyright: 2018 The Noto Project Authors
