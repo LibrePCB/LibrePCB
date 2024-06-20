@@ -42,8 +42,8 @@ namespace editor {
 
 class BoardEditor;
 class BoardEditorState;
-class GraphicsView;
 class ProjectEditor;
+class QuickGraphicsView;
 class ToolBarProxy;
 class UndoStack;
 
@@ -90,7 +90,7 @@ public:
     Project& project;
     ProjectEditor& projectEditor;
     BoardEditor& editor;
-    GraphicsView& editorGraphicsView;
+    QuickGraphicsView& editorGraphicsView;
     ToolBarProxy& commandToolBar;
     UndoStack& undoStack;
   };

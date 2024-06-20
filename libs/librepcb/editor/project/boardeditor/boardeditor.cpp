@@ -131,33 +131,37 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
   }
 #endif
 
-  // Setup graphics view.
-  const Theme& theme =
-      mProjectEditor.getWorkspace().getSettings().themes.getActive();
-  /*mUi->graphicsView->setBackgroundColors(
-      theme.getColor(Theme::Color::sBoardBackground).getPrimaryColor(),
-      theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor());
-  mUi->graphicsView->setOverlayColors(
-      theme.getColor(Theme::Color::sBoardOverlays).getPrimaryColor(),
-      theme.getColor(Theme::Color::sBoardOverlays).getSecondaryColor());
-  mUi->graphicsView->setInfoBoxColors(
-      theme.getColor(Theme::Color::sBoardInfoBox).getPrimaryColor(),
-      theme.getColor(Theme::Color::sBoardInfoBox).getSecondaryColor());
-  mUi->graphicsView->setGridStyle(theme.getBoardGridStyle());
-  mUi->graphicsView->setUseOpenGl(
-      mProjectEditor.getWorkspace().getSettings().useOpenGl.get());
-  mUi->graphicsView->setEventHandlerObject(this);
-  connect(mUi->graphicsView, &GraphicsView::cursorScenePositionChanged,
-          mUi->statusbar, &StatusBar::setAbsoluteCursorPosition);
-  connect(mPlaneFragmentsBuilder.data(), &BoardPlaneFragmentsBuilder::started,
-          mUi->graphicsView, &GraphicsView::showWaitingSpinner);
-  connect(mPlaneFragmentsBuilder.data(), &BoardPlaneFragmentsBuilder::finished,
-          mUi->graphicsView, &GraphicsView::hideWaitingSpinner);*/
-
+  // Setup quick widget.
   mUi->quickWidget->setSource(Application::getResourcesDir()
                                   .getPathTo("qml/GraphicsEditor2D.qml")
                                   .toQUrl());
-  qDebug() << mUi->quickWidget->errors();
+  mGraphicsView =
+      mUi->quickWidget->rootObject()->findChild<QuickGraphicsView*>("view");
+  if (!mGraphicsView) {
+    throw LogicError(__FILE__, __LINE__,
+                     "Could not find graphics view. Maybe an OpenGL problem?");
+  }
+
+  // Setup graphics view.
+  const Theme& theme =
+      mProjectEditor.getWorkspace().getSettings().themes.getActive();
+  mGraphicsView->setBackgroundColors(
+      theme.getColor(Theme::Color::sBoardBackground).getPrimaryColor(),
+      theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor());
+  mGraphicsView->setOverlayColors(
+      theme.getColor(Theme::Color::sBoardOverlays).getPrimaryColor(),
+      theme.getColor(Theme::Color::sBoardOverlays).getSecondaryColor());
+  mGraphicsView->setInfoBoxColors(
+      theme.getColor(Theme::Color::sBoardInfoBox).getPrimaryColor(),
+      theme.getColor(Theme::Color::sBoardInfoBox).getSecondaryColor());
+  mGraphicsView->setGridStyle(theme.getBoardGridStyle());
+  mGraphicsView->setEventHandlerObject(this);
+  connect(mGraphicsView, &QuickGraphicsView::cursorScenePositionChanged,
+          mUi->statusbar, &StatusBar::setAbsoluteCursorPosition);
+  connect(mPlaneFragmentsBuilder.data(), &BoardPlaneFragmentsBuilder::started,
+          mGraphicsView, &QuickGraphicsView::showWaitingSpinner);
+  connect(mPlaneFragmentsBuilder.data(), &BoardPlaneFragmentsBuilder::finished,
+          mGraphicsView, &QuickGraphicsView::hideWaitingSpinner);
 
   // Setup 3D view.
   connect(mUi->btnShow3D, &QToolButton::clicked, this,
@@ -193,13 +197,11 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
   addLayers(theme);
 
   // Build the whole board editor finite state machine.
-  GraphicsView* dummyGraphicsView = new GraphicsView(this);
-  dummyGraphicsView->hide();
   BoardEditorFsm::Context fsmContext{mProjectEditor.getWorkspace(),
                                      mProject,
                                      mProjectEditor,
                                      *this,
-                                     *dummyGraphicsView,
+                                     *mGraphicsView,
                                      *mCommandToolBarProxy,
                                      mProjectEditor.getUndoStack()};
   mFsm.reset(new BoardEditorFsm(fsmContext));
@@ -267,11 +269,11 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
 
   // Set focus to graphics view (avoid having the focus in some arbitrary
   // widget).
-  // mUi->graphicsView->setFocus();
+  // mGraphicsView->setFocus();
 
   // mGraphicsView->zoomAll(); does not work properly here, should be executed
   // later in the event loop (ugly, but seems to work...)
-  // QTimer::singleShot(200, mUi->graphicsView, &GraphicsView::zoomAll);
+  QTimer::singleShot(200, mGraphicsView, &QuickGraphicsView::zoomAll);
 }
 
 BoardEditor::~BoardEditor() {
@@ -316,13 +318,12 @@ bool BoardEditor::setActiveBoardIndex(int index) noexcept {
                  mActiveBoard.data(), &Board::triggerAirWiresRebuild);
       // Save current view scene rect.
       // mVisibleSceneRect[mActiveBoard->getUuid()] =
-      //    mUi->graphicsView->getVisibleSceneRect();
+      //    mGraphicsView->getVisibleSceneRect();
       // Save layers visibility.
       storeLayersVisibility();
     }
 
-    mUi->quickWidget->rootObject()->setProperty("scene",
-                                                QVariant::fromValue(nullptr));
+    mGraphicsView->setScene(nullptr);
     mGraphicsScene.reset();
     mActiveBoard = newBoard;
 
@@ -343,20 +344,17 @@ bool BoardEditor::setActiveBoardIndex(int index) noexcept {
       mGraphicsScene->setSelectionRectColors(
           theme.getColor(Theme::Color::sBoardSelection).getPrimaryColor(),
           theme.getColor(Theme::Color::sBoardSelection).getSecondaryColor());
-      mUi->quickWidget->rootObject()->setProperty(
-          "scene", QVariant::fromValue(mGraphicsScene.data()));
+      mGraphicsView->setScene(mGraphicsScene.data());
       const QRectF sceneRect = mVisibleSceneRect.value(mActiveBoard->getUuid());
       if (!sceneRect.isEmpty()) {
-        // mUi->graphicsView->setVisibleSceneRect(sceneRect);
+        // mGraphicsView->setVisibleSceneRect(sceneRect);
       }
-      // mUi->graphicsView->setGridInterval(mActiveBoard->getGridInterval());
+      mGraphicsView->setGridInterval(mActiveBoard->getGridInterval());
       mUi->statusbar->setLengthUnit(mActiveBoard->getGridUnit());
       // force airwire rebuild immediately and on every project modification
       mActiveBoard->triggerAirWiresRebuild();
       connect(&mProjectEditor.getUndoStack(), &UndoStack::stateModified,
               mActiveBoard.data(), &Board::triggerAirWiresRebuild);
-    } else {
-      // mUi->graphicsView->setScene(nullptr);
     }
 
     // update dock widgets
@@ -683,19 +681,19 @@ void BoardEditor::createActions() noexcept {
       this, mFsm.data(), &BoardEditorFsm::processSelectAll));
   mActionGridProperties.reset(cmd.gridProperties.createAction(
       this, this, &BoardEditor::execGridPropertiesDialog));
-  mActionGridIncrease.reset(cmd.gridIncrease.createAction(this, this, []() {
-    // if (const Board* board = getActiveBoard()) {
-    // const Length interval = board->getGridInterval() * 2;
-    //  setGridProperties(PositiveLength(interval), board->getGridUnit(),
-    //                    mUi->graphicsView->getGridStyle(), true);
-    //}
+  mActionGridIncrease.reset(cmd.gridIncrease.createAction(this, this, [this]() {
+    if (const Board* board = getActiveBoard()) {
+      const Length interval = board->getGridInterval() * 2;
+      setGridProperties(PositiveLength(interval), board->getGridUnit(),
+                        mGraphicsView->getGridStyle(), true);
+    }
   }));
   mActionGridDecrease.reset(cmd.gridDecrease.createAction(this, this, [this]() {
     if (const Board* board = getActiveBoard()) {
       const Length interval = *board->getGridInterval();
       if ((interval % 2) == 0) {
-        // setGridProperties(PositiveLength(interval / 2), board->getGridUnit(),
-        //                   mUi->graphicsView->getGridStyle(), true);
+        setGridProperties(PositiveLength(interval / 2), board->getGridUnit(),
+                          mGraphicsView->getGridStyle(), true);
       }
     }
   }));
@@ -705,21 +703,21 @@ void BoardEditor::createActions() noexcept {
     if (mOpenGlView && mOpenGlView->isVisible()) {
       mOpenGlView->zoomAll();
     } else {
-      // mUi->graphicsView->zoomAll();
+      mGraphicsView->zoomAll();
     }
   }));
   mActionZoomIn.reset(cmd.zoomIn.createAction(this, this, [this]() {
     if (mOpenGlView && mOpenGlView->isVisible()) {
       mOpenGlView->zoomIn();
     } else {
-      // mUi->graphicsView->zoomIn();
+      mGraphicsView->zoomIn();
     }
   }));
   mActionZoomOut.reset(cmd.zoomOut.createAction(this, this, [this]() {
     if (mOpenGlView && mOpenGlView->isVisible()) {
       mOpenGlView->zoomOut();
     } else {
-      // mUi->graphicsView->zoomOut();
+      mGraphicsView->zoomOut();
     }
   }));
   mActionToggle3D.reset(cmd.toggle3d.createAction(this, this, [this]() {
@@ -737,36 +735,36 @@ void BoardEditor::createActions() noexcept {
   mActionPaste.reset(cmd.clipboardPaste.createAction(
       this, mFsm.data(), &BoardEditorFsm::processPaste));
   mActionMoveLeft.reset(cmd.moveLeft.createAction(this, this, []() {
-    // if (!mFsm->processMove(Point(-mUi->graphicsView->getGridInterval(), 0)))
+    // if (!mFsm->processMove(Point(-mGraphicsView->getGridInterval(), 0)))
     // {
     //  Workaround for consumed keyboard shortcuts for scrolling.
-    // mUi->graphicsView->horizontalScrollBar()->triggerAction(
+    // mGraphicsView->horizontalScrollBar()->triggerAction(
     //     QScrollBar::SliderSingleStepSub);
     //}
   }));
   addAction(mActionMoveLeft.data());
   mActionMoveRight.reset(cmd.moveRight.createAction(this, this, []() {
-    // if (!mFsm->processMove(Point(*mUi->graphicsView->getGridInterval(), 0)))
+    // if (!mFsm->processMove(Point(*mGraphicsView->getGridInterval(), 0)))
     // { Workaround for consumed keyboard shortcuts for scrolling.
-    // mUi->graphicsView->horizontalScrollBar()->triggerAction(
+    // mGraphicsView->horizontalScrollBar()->triggerAction(
     //    QScrollBar::SliderSingleStepAdd);
     //}
   }));
   addAction(mActionMoveRight.data());
   mActionMoveUp.reset(cmd.moveUp.createAction(this, this, []() {
-    // if (!mFsm->processMove(Point(0, *mUi->graphicsView->getGridInterval())))
+    // if (!mFsm->processMove(Point(0, *mGraphicsView->getGridInterval())))
     // {
     //  Workaround for consumed keyboard shortcuts for scrolling.
-    // mUi->graphicsView->verticalScrollBar()->triggerAction(
+    // mGraphicsView->verticalScrollBar()->triggerAction(
     //     QScrollBar::SliderSingleStepSub);
     // }
   }));
   addAction(mActionMoveUp.data());
   mActionMoveDown.reset(cmd.moveDown.createAction(this, this, []() {
-    // if (!mFsm->processMove(Point(0, -mUi->graphicsView->getGridInterval())))
+    // if (!mFsm->processMove(Point(0, -mGraphicsView->getGridInterval())))
     // {
     //  Workaround for consumed keyboard shortcuts for scrolling.
-    // mUi->graphicsView->verticalScrollBar()->triggerAction(
+    // mGraphicsView->verticalScrollBar()->triggerAction(
     //     QScrollBar::SliderSingleStepAdd);
     //}
   }));
@@ -849,10 +847,10 @@ void BoardEditor::createActions() noexcept {
       }));
 
   // Widget shortcuts.
-  // mUi->graphicsView->addAction(cmd.commandToolBarFocus.createAction(
+  // mGraphicsView->addAction(cmd.commandToolBarFocus.createAction(
   //    this, this,
   //    [this]() {
-  //      mCommandToolBarProxy->startTabFocusCycle(*mUi->graphicsView);
+  //      mCommandToolBarProxy->startTabFocusCycle(*mGraphicsView);
   //    },
   //    EditorCommand::ActionFlag::WidgetShortcut));
 
@@ -1386,7 +1384,7 @@ void BoardEditor::highlightDrcMessage(const RuleCheckMessage& msg,
   /*if (msg.getLocations().isEmpty()) {
     // Position on board not known.
     clearDrcMarker();
-  } else if (QGraphicsScene* scene = mUi->graphicsView->scene()) {
+  } else if (QGraphicsScene* scene = mGraphicsView->scene()) {
     const ThemeColor& color =
         mProjectEditor.getWorkspace().getSettings().themes.getActive().getColor(
             Theme::Color::sBoardOverlays);
@@ -1401,9 +1399,9 @@ void BoardEditor::highlightDrcMessage(const RuleCheckMessage& msg,
     qreal margin = Length(1000000).toPx();
     QRectF rect = path.boundingRect();
     rect.adjust(-margin, -margin, margin, margin);
-    mUi->graphicsView->setSceneRectMarker(rect);
+    mGraphicsView->setSceneRectMarker(rect);
     if (zoomTo) {
-      mUi->graphicsView->zoomToRect(rect);
+      mGraphicsView->zoomToRect(rect);
     }
   }*/
 }
@@ -1419,7 +1417,7 @@ void BoardEditor::setDrcMessageApproved(const RuleCheckMessage& msg,
 
 void BoardEditor::clearDrcMarker() noexcept {
   mDrcLocationGraphicsItem.reset();
-  // mUi->graphicsView->setSceneRectMarker(QRectF());
+  // mGraphicsView->setSceneRectMarker(QRectF());
 }
 
 QList<BI_Device*> BoardEditor::getSearchCandidates() noexcept {
@@ -1472,7 +1470,7 @@ void BoardEditor::goToDevice(const QString& name, int index) noexcept {
           std::min(1.5f * std::max(rect.size().width(), rect.size().height()),
                    Length::fromMm(10).toPx());
       rect.adjust(-margin, -margin, margin, margin);
-      // mUi->graphicsView->zoomToRect(rect);
+      // mGraphicsView->zoomToRect(rect);
     }
   }
 }
@@ -1484,10 +1482,9 @@ void BoardEditor::scheduleOpenGlSceneUpdate() noexcept {
 void BoardEditor::performScheduledTasks() noexcept {
   const bool commandActive =
       mProjectEditor.getUndoStack().isCommandGroupActive() ||
-      false;  // mUi->graphicsView->isMouseButtonPressed(Qt::LeftButton |
+      false;  // mGraphicsView->isMouseButtonPressed(Qt::LeftButton |
               //                                   Qt::MiddleButton);
-  const bool userInputIdle =
-      false;  //(mUi->graphicsView->getIdleTimeMs() >= 700);
+  const bool userInputIdle = false;  //(mGraphicsView->getIdleTimeMs() >= 700);
   const bool updateAllowedInCurrentState = ((!commandActive) || userInputIdle);
 
   // Rebuild planes, if needed. Depending on various conditions to avoid too
@@ -1556,7 +1553,7 @@ bool BoardEditor::isActiveTopLevelWindow() const noexcept {
     }
     w = w->parentWidget();
   }
-  // if ((mUi->graphicsView->getIdleTimeMs() < 2000) ||
+  // if ((mGraphicsView->getIdleTimeMs() < 2000) ||
   //     (mOpenGlView && (mOpenGlView->getIdleTimeMs() < 2000))) {
   //   return true;  // Safe fallback if active window detection is not
   //   reliable.
@@ -1640,8 +1637,8 @@ void BoardEditor::setGridProperties(const PositiveLength& interval,
                                     Theme::GridStyle style,
                                     bool applyToBoard) noexcept {
   Q_UNUSED(style);
-  // mUi->graphicsView->setGridInterval(interval);
-  // mUi->graphicsView->setGridStyle(style);
+  mGraphicsView->setGridInterval(interval);
+  mGraphicsView->setGridStyle(style);
   mUi->statusbar->setLengthUnit(unit);
 
   // In contrast to schematics, apply the grid only on the currently active
@@ -1654,9 +1651,9 @@ void BoardEditor::setGridProperties(const PositiveLength& interval,
 }
 
 void BoardEditor::execGridPropertiesDialog() noexcept {
-  /*if (Board* board = getActiveBoard()) {
+  if (Board* board = getActiveBoard()) {
     GridSettingsDialog dialog(board->getGridInterval(), board->getGridUnit(),
-                              mUi->graphicsView->getGridStyle(), this);
+                              mGraphicsView->getGridStyle(), this);
     connect(&dialog, &GridSettingsDialog::gridPropertiesChanged,
             [this](const PositiveLength& interval, const LengthUnit& unit,
                    Theme::GridStyle style) {
@@ -1666,7 +1663,7 @@ void BoardEditor::execGridPropertiesDialog() noexcept {
       setGridProperties(dialog.getInterval(), dialog.getUnit(),
                         dialog.getStyle(), true);
     }
-  }*/
+  }
 }
 
 void BoardEditor::execBoardSetupDialog(bool switchToDrcSettings) noexcept {
@@ -1821,22 +1818,22 @@ bool BoardEditor::show3DView() noexcept {
     scheduleOpenGlSceneUpdate();
     mUi->btnHide3D->setEnabled(true);
     return true;
-  } /*else if (mUi->graphicsView->isVisible()) {
-    mUi->graphicsView->hide();
+  } else if (mUi->quickWidget->isVisible()) {
+    mUi->quickWidget->hide();
     mUi->btnShow3D->setEnabled(false);
     return true;
-  }*/
+  }
   return false;
 }
 
 void BoardEditor::hide3DView() noexcept {
-  /*if (!mUi->graphicsView->isVisible()) {
-    mUi->graphicsView->show();
+  if (!mUi->quickWidget->isVisible()) {
+    mUi->quickWidget->show();
     mUi->btnShow3D->setEnabled(true);
   } else {
     mOpenGlView.reset();
     mUi->btnHide3D->setEnabled(false);
-  }*/
+  }
 }
 
 /*******************************************************************************

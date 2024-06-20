@@ -32,7 +32,7 @@
 #include "../../../library/pkg/footprintclipboarddata.h"
 #include "../../../undostack.h"
 #include "../../../utils/menubuilder.h"
-#include "../../../widgets/graphicsview.h"
+#include "../../../widgets/quickgraphicsview.h"
 #include "../../../widgets/unsignedlengthedit.h"
 #include "../../cmd/cmdadddevicetoboard.h"
 #include "../../cmd/cmdboardplaneedit.h"

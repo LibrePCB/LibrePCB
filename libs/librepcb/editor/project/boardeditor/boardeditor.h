@@ -57,6 +57,7 @@ class OpenGlSceneBuilder;
 class OpenGlSceneBuilder;
 class OpenGlView;
 class ProjectEditor;
+class QuickGraphicsView;
 class RuleCheckDock;
 class SearchToolBar;
 class StandardEditorCommandHandler;
@@ -179,6 +180,7 @@ private:
   ProjectEditor& mProjectEditor;
   Project& mProject;
   QScopedPointer<Ui::BoardEditor> mUi;
+  QPointer<QuickGraphicsView> mGraphicsView;
   QScopedPointer<OpenGlView> mOpenGlView;
   QScopedPointer<ToolBarProxy> mCommandToolBarProxy;
   QScopedPointer<StandardEditorCommandHandler> mStandardCommandHandler;

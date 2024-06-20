@@ -24,7 +24,7 @@
 
 #include "../../../graphics/graphicslayer.h"
 #include "../../../undostack.h"
-#include "../../../widgets/graphicsview.h"
+#include "../../../widgets/quickgraphicsview.h"
 #include "../boardeditor.h"
 #include "../boardgraphicsscene.h"
 #include "../graphicsitems/bgi_device.h"

@@ -25,6 +25,9 @@
  ******************************************************************************/
 #include "../graphics/graphicsscene.h"
 
+#include <librepcb/core/types/point.h>
+#include <librepcb/core/workspace/theme.h>
+
 #include <QtCore>
 #include <QtQuick>
 
@@ -35,6 +38,7 @@ namespace librepcb {
 namespace editor {
 
 class GraphicsScene;
+class IF_GraphicsViewEventHandler;
 
 /*******************************************************************************
  *  Class QuickGraphicsView
@@ -57,20 +61,45 @@ public:
 
   // Getters
   QObject* getScene() const noexcept;
+  Theme::GridStyle getGridStyle() const noexcept { return mGridStyle; }
+  const PositiveLength& getGridInterval() const noexcept {
+    return mGridInterval;
+  }
 
   // Setters
   void setScene(QObject* scene) noexcept;
+  void setBackgroundColors(const QColor& fill, const QColor& grid) noexcept;
+  void setOverlayColors(const QColor& fill, const QColor& content) noexcept;
+  void setInfoBoxColors(const QColor& fill, const QColor& text) noexcept;
+  void setGridStyle(Theme::GridStyle style) noexcept;
+  void setGridInterval(const PositiveLength& interval) noexcept;
+  void setEventHandlerObject(
+      IF_GraphicsViewEventHandler* eventHandler) noexcept;
 
   // General Methods
+  Point mapGlobalPosToScenePos(const QPoint& globalPosPx, bool boundToView,
+                               bool mapToGrid) const noexcept;
+  QPainterPath calcPosWithTolerance(const Point& pos,
+                                    qreal multiplier = 1) const noexcept;
   void paint(QPainter* painter) noexcept override;
+  bool event(QEvent* event) noexcept override;
 
 public slots:
   void zoomIn() noexcept;
   void zoomOut() noexcept;
   void zoomAll() noexcept;
+  void showWaitingSpinner() noexcept;
+  void hideWaitingSpinner() noexcept;
 
 signals:
   void sceneChanged(QObject* scene);
+
+  /**
+   * @brief Cursor scene position changed signal
+   *
+   * @param pos   The new cursor position (*not* mapped to grid!)
+   */
+  void cursorScenePositionChanged(const Point& pos);
 
 protected:  // Methods
   void mousePressEvent(QMouseEvent* e) override;
@@ -81,17 +110,49 @@ protected:  // Methods
                        const QPointF& widgetPos) const noexcept;
 
 private:
+  // General Attributes
+  // QScopedPointer<WaitingSpinnerWidget> mWaitingSpinnerWidget;
+  // QScopedPointer<QLabel> mInfoBoxLabel;
+  IF_GraphicsViewEventHandler* mEventHandlerObject;
+  QPointer<GraphicsScene> mScene;
+  // QVariantAnimation* mZoomAnimation;
+  Theme::GridStyle mGridStyle;
+  PositiveLength mGridInterval;
+  QColor mBackgroundColor;
+  QColor mGridColor;
+  QColor mOverlayFillColor;
+  QColor mOverlayContentColor;
+  // QRectF mSceneRectMarker;
+  // bool mOriginCrossVisible;
+  // bool mGrayOut;
+
+  /// If not nullopt, a cursor will be shown at the given position
+  // tl::optional<std::pair<Point, CursorOptions>> mSceneCursor;
+
+  // Configuration for the ruler overlay
+  // struct RulerGauge {
+  //  int xScale;
+  //  LengthUnit unit;
+  //  QString unitSeparator;
+  //  Length minTickInterval;
+  //  Length currentTickInterval;
+  //};
+  // QVector<RulerGauge> mRulerGauges;
+  // tl::optional<std::pair<Point, Point>> mRulerPositions;
+
+  // State
   QMatrix4x4 mTransform;
   QMatrix4x4 mMousePressTransform;
   QVector2D mMousePressScenePos;
+  Qt::MouseButtons mPressedMouseButtons;
+  volatile bool mPanningActive;
+  Qt::MouseButton mPanningButton;
+  QCursor mCursorBeforePanning;
 
   // Transform Animation
   QMatrix4x4 mAnimationTransformStart;
   QMatrix4x4 mAnimationTransformDelta;
   QScopedPointer<QVariantAnimation> mAnimation;
-
-  // Content
-  QPointer<GraphicsScene> mScene;
 
   // Static Variables
   static constexpr qreal sZoomStepFactor = 1.3;

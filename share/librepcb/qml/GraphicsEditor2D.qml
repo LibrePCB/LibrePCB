@@ -9,6 +9,7 @@ Rectangle {
     color: "#4f4f4f"
     QuickGraphicsView {
         id: view
+        objectName: "view"
         anchors.fill: parent
     }
 

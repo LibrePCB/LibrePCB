@@ -41,8 +41,9 @@ namespace editor {
 
 BoardEditorState_Measure::BoardEditorState_Measure(
     const Context& context) noexcept
-  : BoardEditorState(context),
-    mTool(new MeasureTool(mContext.editorGraphicsView, getLengthUnit())) {
+  : BoardEditorState(context) /*,
+     mTool(new MeasureTool(mContext.editorGraphicsView, getLengthUnit()))*/
+{
   connect(mTool.data(), &MeasureTool::statusBarMessageChanged, this,
           &BoardEditorState_Measure::statusBarMessageChanged);
 }
@@ -55,9 +56,10 @@ BoardEditorState_Measure::~BoardEditorState_Measure() noexcept {
  ******************************************************************************/
 
 bool BoardEditorState_Measure::entry() noexcept {
-  mTool->setBoard(getActiveBoard());
-  mTool->enter();
-  return true;
+  return false;
+  // mTool->setBoard(getActiveBoard());
+  // mTool->enter();
+  // return true;
 }
 
 bool BoardEditorState_Measure::exit() noexcept {

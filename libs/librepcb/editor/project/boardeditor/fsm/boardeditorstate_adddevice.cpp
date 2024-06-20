@@ -23,7 +23,7 @@
 #include "boardeditorstate_adddevice.h"
 
 #include "../../../undostack.h"
-#include "../../../widgets/graphicsview.h"
+#include "../../../widgets/quickgraphicsview.h"
 #include "../../cmd/cmdadddevicetoboard.h"
 #include "../../cmd/cmddeviceinstanceeditall.h"
 #include "../boardeditor.h"
