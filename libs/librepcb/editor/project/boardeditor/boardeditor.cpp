@@ -321,12 +321,10 @@ bool BoardEditor::setActiveBoardIndex(int index) noexcept {
       storeLayersVisibility();
     }
 
-    mUi->quickWidget->rootObject()->setProperty("board",
+    mUi->quickWidget->rootObject()->setProperty("scene",
                                                 QVariant::fromValue(nullptr));
     mGraphicsScene.reset();
     mActiveBoard = newBoard;
-    mUi->quickWidget->rootObject()->setProperty("board",
-                                                QVariant::fromValue(this));
 
     if (mActiveBoard) {
       // Update layers.
@@ -345,7 +343,8 @@ bool BoardEditor::setActiveBoardIndex(int index) noexcept {
       mGraphicsScene->setSelectionRectColors(
           theme.getColor(Theme::Color::sBoardSelection).getPrimaryColor(),
           theme.getColor(Theme::Color::sBoardSelection).getSecondaryColor());
-      // mUi->graphicsView->setScene(mGraphicsScene.data());
+      mUi->quickWidget->rootObject()->setProperty(
+          "scene", QVariant::fromValue(mGraphicsScene.data()));
       const QRectF sceneRect = mVisibleSceneRect.value(mActiveBoard->getUuid());
       if (!sceneRect.isEmpty()) {
         // mUi->graphicsView->setVisibleSceneRect(sceneRect);

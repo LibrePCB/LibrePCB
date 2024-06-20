@@ -4,7 +4,7 @@ import QtQuick.Layouts 6.2
 import org.librepcb.qmlcomponents
 
 Rectangle {
-    property alias board: view.board
+    property alias scene: view.scene
 
     color: "#4f4f4f"
     QuickGraphicsView {

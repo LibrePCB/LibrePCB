@@ -60,17 +60,18 @@ QuickGraphicsView::~QuickGraphicsView() noexcept {
  *  Getters
  ******************************************************************************/
 
-QObject* QuickGraphicsView::getBoard() const noexcept {
-  return mBoard;
+QObject* QuickGraphicsView::getScene() const noexcept {
+  return mScene;
 }
 
 /*******************************************************************************
  *  Setters
  ******************************************************************************/
 
-void QuickGraphicsView::setBoard(QObject* board) noexcept {
-  mBoard = dynamic_cast<BoardEditor*>(board);
-  qDebug() << "--- Board set to" << mBoard;
+void QuickGraphicsView::setScene(QObject* scene) noexcept {
+  mScene = dynamic_cast<GraphicsScene*>(scene);
+  emit sceneChanged(scene);
+  update();
 }
 
 /*******************************************************************************
@@ -80,17 +81,19 @@ void QuickGraphicsView::setBoard(QObject* board) noexcept {
 void QuickGraphicsView::paint(QPainter* painter) noexcept {
   const QRectF target(0, 0, width(), height());
 
-  if (!mBoard) {
+  if (!mScene) {
     painter->fillRect(target, Qt::red);
     painter->fillRect(target.adjusted(5, 5, -5, -5), Qt::blue);
     return;
   }
 
+  painter->setRenderHints(QPainter::Antialiasing |
+                          QPainter::SmoothPixmapTransform);
   painter->fillRect(target, Qt::black);
 
-  if (QGraphicsScene* scene = mBoard->getActiveBoardScene()) {
+  if (mScene) {
     const QRectF source = mTransform.inverted().mapRect(target);
-    scene->render(painter, target, source, Qt::KeepAspectRatioByExpanding);
+    mScene->render(painter, target, source, Qt::KeepAspectRatioByExpanding);
   }
 }
 
@@ -111,17 +114,16 @@ void QuickGraphicsView::zoomOut() noexcept {
 }
 
 void QuickGraphicsView::zoomAll() noexcept {
-  if (mBoard) {
-    if (QGraphicsScene* scene = mBoard->getActiveBoardScene()) {
-      const QRectF source = scene->itemsBoundingRect();
-      const QRectF target(0, 0, width(), height());
+  if (mScene) {
+    const QRectF source = mScene->itemsBoundingRect();
+    const QRectF target(0, 0, width(), height());
 
-      QMatrix4x4 t;
-      t.translate(target.center().x() - source.center().x(),
-                  target.center().y() - source.center().y(), 0);
-      t.scale(target.width() / source.width());
-      smoothTo(t);
-    }
+    QMatrix4x4 t;
+    t.translate(target.center().x(), target.center().y(), 0);
+    t.scale(std::min(target.width() / source.width(),
+                     target.height() / source.height()));
+    t.translate(-source.center().x(), -source.center().y(), 0);
+    smoothTo(t);
   }
 }
 

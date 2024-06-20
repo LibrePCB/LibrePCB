@@ -266,7 +266,8 @@ bool SchematicEditor::setActiveSchematicIndex(int index) noexcept {
     // mVisibleSceneRect[schematic->getUuid()] =
     //    mUi->graphicsView->getVisibleSceneRect();
   }
-  // mUi->graphicsView->setScene(nullptr);
+  mUi->quickWidget->rootObject()->setProperty("scene",
+                                              QVariant::fromValue(nullptr));
   mGraphicsScene.reset();
   while (!mSchematicConnections.isEmpty()) {
     disconnect(mSchematicConnections.takeLast());
@@ -286,7 +287,8 @@ bool SchematicEditor::setActiveSchematicIndex(int index) noexcept {
     mGraphicsScene->setSelectionRectColors(
         theme.getColor(Theme::Color::sSchematicSelection).getPrimaryColor(),
         theme.getColor(Theme::Color::sSchematicSelection).getSecondaryColor());
-    // mUi->graphicsView->setScene(mGraphicsScene.data());
+    mUi->quickWidget->rootObject()->setProperty(
+        "scene", QVariant::fromValue(mGraphicsScene.data()));
     const QRectF sceneRect = mVisibleSceneRect.value(schematic->getUuid());
     if (!sceneRect.isEmpty()) {
       // mUi->graphicsView->setVisibleSceneRect(sceneRect);

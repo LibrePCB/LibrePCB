@@ -23,7 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/project/board/board.h>
+#include "../graphics/graphicsscene.h"
 
 #include <QtCore>
 #include <QtQuick>
@@ -34,7 +34,7 @@
 namespace librepcb {
 namespace editor {
 
-class BoardEditor;
+class GraphicsScene;
 
 /*******************************************************************************
  *  Class QuickGraphicsView
@@ -53,13 +53,13 @@ public:
   virtual ~QuickGraphicsView() noexcept;
 
   // Properties
-  Q_PROPERTY(QObject* board READ getBoard WRITE setBoard NOTIFY boardChanged)
+  Q_PROPERTY(QObject* scene READ getScene WRITE setScene NOTIFY sceneChanged)
 
   // Getters
-  QObject* getBoard() const noexcept;
+  QObject* getScene() const noexcept;
 
   // Setters
-  void setBoard(QObject* board) noexcept;
+  void setScene(QObject* scene) noexcept;
 
   // General Methods
   void paint(QPainter* painter) noexcept override;
@@ -70,7 +70,7 @@ public slots:
   void zoomAll() noexcept;
 
 signals:
-  void boardChanged(QObject* board);
+  void sceneChanged(QObject* scene);
 
 protected:  // Methods
   void mousePressEvent(QMouseEvent* e) override;
@@ -91,7 +91,7 @@ private:
   QScopedPointer<QVariantAnimation> mAnimation;
 
   // Content
-  BoardEditor* mBoard = nullptr;
+  QPointer<GraphicsScene> mScene;
 
   // Static Variables
   static constexpr qreal sZoomStepFactor = 1.3;
