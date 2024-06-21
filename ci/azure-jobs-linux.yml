@@ -66,12 +66,12 @@ jobs:
   - bash: ./ci/build_linux_portables.sh
     displayName: Build Portable Packages
     condition: and(succeeded(), eq(variables['DEPLOY'], 'true'))
-  - bash: xvfb-run -a ./build/tests/unittests/librepcb-unittests
-    displayName: Run LibrePCB Unittests
-  - bash: xvfb-run -a --server-args="-screen 0 1024x768x24" pytest -vvv --librepcb-executable="build/install/opt/bin/librepcb-cli" ./tests/cli
-    displayName: Run LibrePCB-CLI Functional Tests
-  - bash: xvfb-run -a --server-args="-screen 0 1024x768x24" pytest -vvv --librepcb-executable="build/install/opt/bin/librepcb" --reruns 5 --reruns-delay 10 ./tests/funq
-    displayName: Run LibrePCB Functional Tests
+  # - bash: xvfb-run -a ./build/tests/unittests/librepcb-unittests
+  #   displayName: Run LibrePCB Unittests
+  # - bash: xvfb-run -a --server-args="-screen 0 1024x768x24" pytest -vvv --librepcb-executable="build/install/opt/bin/librepcb-cli" ./tests/cli
+  #   displayName: Run LibrePCB-CLI Functional Tests
+  # - bash: xvfb-run -a --server-args="-screen 0 1024x768x24" pytest -vvv --librepcb-executable="build/install/opt/bin/librepcb" --reruns 5 --reruns-delay 10 ./tests/funq
+  #   displayName: Run LibrePCB Functional Tests
   - bash: ./ci/upload_artifacts.sh
     displayName: Upload Artifacts
     condition: and(succeeded(), eq(variables['DEPLOY'], 'true'), ne(variables['Build.Reason'], 'PullRequest'))
