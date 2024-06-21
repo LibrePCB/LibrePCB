@@ -65,6 +65,7 @@ QuickGraphicsView::QuickGraphicsView() noexcept
     mPanningActive(false),
     mPanningButton(Qt::NoButton),
     mCursorBeforePanning(Qt::ArrowCursor),
+    mMouseMoveEvent(QEvent::GraphicsSceneMouseMove),
     mAnimation(new QVariantAnimation(this)) {
   mAnimation->setDuration(500);
   mAnimation->setEasingCurve(QEasingCurve::InOutCubic);
@@ -76,8 +77,10 @@ QuickGraphicsView::QuickGraphicsView() noexcept
             update();
           });
 
-  setAcceptedMouseButtons(Qt::AllButtons);
   setRenderTarget(QQuickPaintedItem::FramebufferObject);
+  setAcceptedMouseButtons(Qt::AllButtons);
+  setAcceptHoverEvents(true);
+  setAcceptTouchEvents(true);
 }
 
 QuickGraphicsView::~QuickGraphicsView() noexcept {
@@ -96,7 +99,15 @@ QObject* QuickGraphicsView::getScene() const noexcept {
  ******************************************************************************/
 
 void QuickGraphicsView::setScene(QObject* scene) noexcept {
+  if (mScene) {
+    disconnect(mScene.data(), &QGraphicsScene::changed, this,
+               &QuickGraphicsView::graphicsSceneChanged);
+  }
   mScene = dynamic_cast<GraphicsScene*>(scene);
+  if (mScene) {
+    connect(mScene.data(), &QGraphicsScene::changed, this,
+            &QuickGraphicsView::graphicsSceneChanged);
+  }
   emit sceneChanged(scene);
   update();
 }
@@ -118,6 +129,8 @@ void QuickGraphicsView::setOverlayColors(const QColor& fill,
 
 void QuickGraphicsView::setInfoBoxColors(const QColor& fill,
                                          const QColor& text) noexcept {
+  Q_UNUSED(fill);
+  Q_UNUSED(text);
   // mInfoBoxLabel->setStyleSheet(QString("QLabel {"
   //                                      "  background-color: %1;"
   //                                      "  border: none;"
@@ -149,6 +162,21 @@ void QuickGraphicsView::setEventHandlerObject(
  *  General Methods
  ******************************************************************************/
 
+QPointF QuickGraphicsView::mapFromSceneCoordinate(
+    const QPointF& sceneCoordinate) const noexcept {
+  return mTransform.map(sceneCoordinate);
+}
+
+QPointF QuickGraphicsView::mapToSceneCoordinate(
+    const QPointF& widgetCoordinate) const noexcept {
+  return mTransform.inverted().map(widgetCoordinate);
+}
+
+Point QuickGraphicsView::mapToScenePos(
+    const QPoint& widgetCoordinate) const noexcept {
+  return Point::fromPx(mapToSceneCoordinate(widgetCoordinate));
+}
+
 Point QuickGraphicsView::mapGlobalPosToScenePos(const QPoint& globalPosPx,
                                                 bool boundToView,
                                                 bool mapToGrid) const noexcept {
@@ -168,8 +196,8 @@ QPainterPath QuickGraphicsView::calcPosWithTolerance(
     const Point& pos, qreal multiplier) const noexcept {
   const qreal tolerance = 5 * multiplier;  // Screen pixel tolerance.
   const QRectF deviceRect(-tolerance, -tolerance, 2 * tolerance, 2 * tolerance);
-  const QRectF sceneRect(
-      mTransform.inverted().mapRect(deviceRect).translated(pos.toPxQPointF()));
+  QRectF sceneRect(mTransform.inverted().mapRect(deviceRect));
+  sceneRect.translate(pos.toPxQPointF() - sceneRect.center());
 
   QPainterPath path;
   path.addEllipse(sceneRect);
@@ -178,27 +206,68 @@ QPainterPath QuickGraphicsView::calcPosWithTolerance(
 
 void QuickGraphicsView::paint(QPainter* painter) noexcept {
   const QRectF target(0, 0, width(), height());
-
-  if (!mScene) {
-    painter->fillRect(target, Qt::red);
-    painter->fillRect(target.adjusted(5, 5, -5, -5), Qt::blue);
-    return;
-  }
-
+  const QRectF sceneRect = mTransform.inverted().mapRect(target);
   painter->setRenderHints(QPainter::Antialiasing |
                           QPainter::SmoothPixmapTransform);
-  painter->fillRect(target, Qt::black);
+
+  QPen gridPen(mGridColor);
+  gridPen.setCosmetic(true);
+
+  // draw background color
+  painter->fillRect(target, mBackgroundColor);
+
+  painter->save();
+  painter->setTransform(mTransform.toTransform());
+
+  // draw background grid lines
+  gridPen.setWidth((mGridStyle == Theme::GridStyle::Dots) ? 2 : 1);
+  painter->setPen(gridPen);
+  painter->setBrush(Qt::NoBrush);
+  const qreal gridIntervalPixels = mGridInterval->toPx();
+  const qreal lod = QStyleOptionGraphicsItem::levelOfDetailFromTransform(
+      painter->worldTransform());
+  if (gridIntervalPixels * lod >= 6) {
+    qreal left, right, top, bottom;
+    left = qFloor(sceneRect.left() / gridIntervalPixels) * gridIntervalPixels;
+    right = sceneRect.right();
+    top = sceneRect.top();
+    bottom =
+        qFloor(sceneRect.bottom() / gridIntervalPixels) * gridIntervalPixels;
+    switch (mGridStyle) {
+      case Theme::GridStyle::Lines: {
+        QVarLengthArray<QLineF, 500> lines;
+        for (qreal x = left; x < right; x += gridIntervalPixels)
+          lines.append(QLineF(x, sceneRect.top(), x, sceneRect.bottom()));
+        for (qreal y = bottom; y > top; y -= gridIntervalPixels)
+          lines.append(QLineF(sceneRect.left(), y, sceneRect.right(), y));
+        painter->setOpacity(0.5);
+        painter->drawLines(lines.data(), lines.size());
+        break;
+      }
+
+      case Theme::GridStyle::Dots: {
+        QVarLengthArray<QPointF, 2000> dots;
+        for (qreal x = left; x < right; x += gridIntervalPixels)
+          for (qreal y = bottom; y > top; y -= gridIntervalPixels)
+            dots.append(QPointF(x, y));
+        painter->drawPoints(dots.data(), dots.size());
+        break;
+      }
+
+      default:
+        break;
+    }
+  }
+
+  painter->restore();
 
   if (mScene) {
-    const QRectF source = mTransform.inverted().mapRect(target);
-    mScene->render(painter, target, source, Qt::KeepAspectRatioByExpanding);
+    mScene->render(painter, target, sceneRect, Qt::KeepAspectRatioByExpanding);
   }
 }
 
 bool QuickGraphicsView::event(QEvent* event) noexcept {
   // auto resetIdleTime = scopeGuard([this]() { mIdleTimeMs = 0; });
-
-  qDebug() << event;
 
   switch (event->type()) {
     // case QEvent::Gesture: {
@@ -211,87 +280,21 @@ bool QuickGraphicsView::event(QEvent* event) noexcept {
     //   }
     //   break;
     // }
-    case QEvent::MouseButtonPress: {
-      QMouseEvent* e = dynamic_cast<QMouseEvent*>(event);
-      Q_ASSERT(e);
-      if ((e->button() == Qt::MiddleButton) ||
-          (e->button() == Qt::RightButton)) {
-        mPanningButton = e->button();
-        mCursorBeforePanning = cursor();
-        setCursor(Qt::ClosedHandCursor);
-      } else if (mEventHandlerObject) {
-        QGraphicsSceneMouseEvent se(QEvent::GraphicsSceneMousePress);
-        se.setPos(e->pos());
-        se.setScenePos(mTransform.inverted().map(e->pos()));
-        se.setButtons(e->buttons());
-        mEventHandlerObject->graphicsViewEventHandler(&se);
-        update();
-      }
-      mPressedMouseButtons = e->buttons();
-      return true;
-    }
-    case QEvent::MouseButtonRelease: {
-      QMouseEvent* e = dynamic_cast<QMouseEvent*>(event);
-      Q_ASSERT(e);
-      bool wasPanning = false;
-      if ((mPanningButton != Qt::NoButton) && (e->button() == mPanningButton)) {
-        const QPoint diff /*=
-            e->screenPos() - e->buttonDownScreenPos(mPanningButton)*/;
-        wasPanning = diff.manhattanLength() > 10;
-        mPanningButton = Qt::NoButton;
-        setCursor(mCursorBeforePanning);
-      }
-      if ((!wasPanning) && mEventHandlerObject) {
-        QGraphicsSceneMouseEvent se(QEvent::GraphicsSceneMouseRelease);
-        se.setPos(e->pos());
-        se.setScenePos(mTransform.inverted().map(e->pos()));
-        se.setButtons(e->buttons());
-        mEventHandlerObject->graphicsViewEventHandler(&se);
-        update();
-      }
-      mPressedMouseButtons = e->buttons();
-      return true;
-    }
-    case QEvent::MouseMove: {
-      QMouseEvent* e = dynamic_cast<QMouseEvent*>(event);
-      Q_ASSERT(e);
-      //if ((mPanningButton != Qt::NoButton) && (!mPanningActive)) {
-      //  // QPoint diff = mTransform.map(e->scenePos()) -
-      //  //     mTransform.map(e->buttonDownScenePos(mPanningButton));
-      //  mPanningActive = true;  // avoid recursive calls (=> stack overflow)
-      //  // horizontalScrollBar()->setValue(horizontalScrollBar()->value() -
-      //  // diff.x()); verticalScrollBar()->setValue(verticalScrollBar()->value()
-      //  // - diff.y());
-      //  mPanningActive = false;
-      //}
-      emit cursorScenePositionChanged(Point::fromPx(mTransform.inverted().map(e->position())));
-      mPressedMouseButtons = e->buttons();
-      if (mEventHandlerObject) {
-        QGraphicsSceneMouseEvent se(QEvent::GraphicsSceneMouseMove);
-        se.setPos(e->pos());
-        se.setScenePos(mTransform.inverted().map(e->pos()));
-        se.setButtons(e->buttons());
-        mEventHandlerObject->graphicsViewEventHandler(&se);
-        update();
-        return true;
-      }
-    }
-      // fall through
     case QEvent::MouseButtonDblClick:
     case QEvent::ContextMenu:
     case QEvent::KeyRelease:
     case QEvent::KeyPress: {
-      //if (mEventHandlerObject) {
-      //  QMouseEvent* e = dynamic_cast<QMouseEvent*>(event);
-      //  Q_ASSERT(e);
-      //  QGraphicsSceneMouseEvent se(QEvent::GraphicsSceneMousePress);
-      //  se.setPos(e->pos());
-      //  se.setScenePos(mTransform.inverted().map(e->pos()));
-      //  se.setButtons(e->buttons());
-      //  if (mEventHandlerObject->graphicsViewEventHandler(&se)) {
-      //  return true;
-      //}
-      //}
+      // if (mEventHandlerObject) {
+      //   QMouseEvent* e = dynamic_cast<QMouseEvent*>(event);
+      //   Q_ASSERT(e);
+      //   QGraphicsSceneMouseEvent se(QEvent::GraphicsSceneMousePress);
+      //   se.setPos(e->pos());
+      //   se.setScenePos(mTransform.inverted().map(e->pos()));
+      //   se.setButtons(e->buttons());
+      //   if (mEventHandlerObject->graphicsViewEventHandler(&se)) {
+      //   return true;
+      // }
+      // }
       break;
     }
     // case QEvent::GraphicsSceneWheel: {
@@ -358,17 +361,105 @@ void QuickGraphicsView::hideWaitingSpinner() noexcept {
 void QuickGraphicsView::mousePressEvent(QMouseEvent* e) {
   mMousePressTransform = mTransform;
   mMousePressScenePos = toScenePos(mTransform, e->pos());
+  mPressedMouseButtons = e->buttons();
+  mMouseMoveEvent.setButtonDownPos(e->button(), e->pos());
+  mMouseMoveEvent.setButtonDownScenePos(e->button(),
+                                        mapToSceneCoordinate(e->position()));
+  mMouseMoveEvent.setButtonDownScreenPos(e->button(), e->screenPos().toPoint());
+
+  if ((e->button() == Qt::MiddleButton) || (e->button() == Qt::RightButton)) {
+    mPanningButton = e->button();
+    mCursorBeforePanning = cursor();
+    setCursor(Qt::ClosedHandCursor);
+  } else if (mEventHandlerObject) {
+    QGraphicsSceneMouseEvent se(QEvent::GraphicsSceneMousePress);
+    se.setPos(e->pos());
+    se.setScenePos(mapToSceneCoordinate(e->position()));
+    se.setScreenPos(e->screenPos().toPoint());
+    se.setButton(e->button());
+    se.setButtons(e->buttons());
+    se.setModifiers(e->modifiers());
+    mEventHandlerObject->graphicsViewEventHandler(&se);
+  }
 }
 
-void QuickGraphicsView::mouseMoveEvent(QMouseEvent* e) {
-  if (e->buttons().testFlag(Qt::MiddleButton) ||
-      e->buttons().testFlag(Qt::RightButton)) {
+void QuickGraphicsView::mouseReleaseEvent(QMouseEvent* e) {
+  bool wasPanning = false;
+  if ((mPanningButton != Qt::NoButton) && (e->button() == mPanningButton)) {
+    const QPoint diff = e->screenPos().toPoint() -
+        mMouseMoveEvent.buttonDownScreenPos(mPanningButton);
+    wasPanning = diff.manhattanLength() > 10;
+    mPanningButton = Qt::NoButton;
+    setCursor(mCursorBeforePanning);
+  }
+  if ((!wasPanning) && mEventHandlerObject) {
+    QGraphicsSceneMouseEvent se(QEvent::GraphicsSceneMouseRelease);
+    se.setPos(e->pos());
+    se.setScenePos(mapToSceneCoordinate(e->position()));
+    se.setScreenPos(e->screenPos().toPoint());
+    se.setButton(e->button());
+    se.setButtons(e->buttons());
+    se.setModifiers(e->modifiers());
+    mEventHandlerObject->graphicsViewEventHandler(&se);
+  }
+  mPressedMouseButtons = e->buttons();
+}
+
+void QuickGraphicsView::mouseDoubleClickEvent(QMouseEvent* e) {
+  if (mEventHandlerObject) {
+    QGraphicsSceneMouseEvent se(QEvent::GraphicsSceneMouseRelease);
+    se.setPos(e->pos());
+    se.setScenePos(mapToSceneCoordinate(e->position()));
+    se.setScreenPos(e->screenPos().toPoint());
+    se.setButton(e->button());
+    se.setButtons(e->buttons());
+    se.setModifiers(e->modifiers());
+    mEventHandlerObject->graphicsViewEventHandler(&se);
+  }
+  if (mEventHandlerObject) {
+    QGraphicsSceneMouseEvent se(QEvent::GraphicsSceneMouseDoubleClick);
+    se.setPos(e->pos());
+    se.setScenePos(mapToSceneCoordinate(e->position()));
+    se.setScreenPos(e->screenPos().toPoint());
+    se.setButton(e->button());
+    se.setButtons(e->buttons());
+    se.setModifiers(e->modifiers());
+    mEventHandlerObject->graphicsViewEventHandler(&se);
+  }
+}
+
+template <typename T>
+void QuickGraphicsView::mouseMoveEventHandler(T* e) noexcept {
+  if ((mPanningButton != Qt::NoButton) && (!mPanningActive)) {
     const QVector2D delta =
         toScenePos(mMousePressTransform, e->pos()) - mMousePressScenePos;
+    mPanningActive = true;  // avoid recursive calls (=> stack overflow)
     mTransform = mMousePressTransform;
     mTransform.translate(delta.x(), delta.y());
     update();
+    mPanningActive = false;
+    // return;
   }
+
+  emit cursorScenePositionChanged(mapToScenePos(e->pos()));
+  mPressedMouseButtons = e->buttons();
+
+  if (mEventHandlerObject) {
+    mMouseMoveEvent.setPos(e->position());
+    mMouseMoveEvent.setScenePos(mapToSceneCoordinate(e->position()));
+    mMouseMoveEvent.setButtons(e->buttons());
+    mMouseMoveEvent.setModifiers(e->modifiers());
+    mEventHandlerObject->graphicsViewEventHandler(&mMouseMoveEvent);
+  }
+  e->accept();
+}
+
+void QuickGraphicsView::mouseMoveEvent(QMouseEvent* e) {
+  mouseMoveEventHandler(e);
+}
+
+void QuickGraphicsView::hoverMoveEvent(QHoverEvent* e) {
+  mouseMoveEventHandler(e);
 }
 
 void QuickGraphicsView::wheelEvent(QWheelEvent* e) {
@@ -396,6 +487,16 @@ void QuickGraphicsView::smoothTo(const QMatrix4x4& transform) noexcept {
 QVector2D QuickGraphicsView::toScenePos(
     const QMatrix4x4& t, const QPointF& widgetPos) const noexcept {
   return QVector2D(t.inverted().map(widgetPos));
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+void QuickGraphicsView::graphicsSceneChanged(
+    const QList<QRectF>& region) noexcept {
+  Q_UNUSED(region);
+  update();
 }
 
 /*******************************************************************************

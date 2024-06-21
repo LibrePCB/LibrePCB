@@ -41,8 +41,9 @@ namespace editor {
 
 SchematicEditorState_Measure::SchematicEditorState_Measure(
     const Context& context) noexcept
-  : SchematicEditorState(context),
-    mTool(new MeasureTool(mContext.editorGraphicsView, getLengthUnit())) {
+  : SchematicEditorState(context) /*,
+     mTool(new MeasureTool(mContext.editorGraphicsView, getLengthUnit()))*/
+{
   connect(mTool.data(), &MeasureTool::statusBarMessageChanged, this,
           &SchematicEditorState_Measure::statusBarMessageChanged);
 }
@@ -55,9 +56,10 @@ SchematicEditorState_Measure::~SchematicEditorState_Measure() noexcept {
  ******************************************************************************/
 
 bool SchematicEditorState_Measure::entry() noexcept {
-  mTool->setSchematic(getActiveSchematic());
-  mTool->enter();
-  return true;
+  return false;
+  // mTool->setSchematic(getActiveSchematic());
+  // mTool->enter();
+  // return true;
 }
 
 bool SchematicEditorState_Measure::exit() noexcept {

@@ -24,7 +24,7 @@
 
 #include "../../../graphics/polygongraphicsitem.h"
 #include "../../../undostack.h"
-#include "../../../widgets/graphicsview.h"
+#include "../../../widgets/quickgraphicsview.h"
 #include "../graphicsitems/sgi_netlabel.h"
 #include "../graphicsitems/sgi_netline.h"
 #include "../graphicsitems/sgi_netpoint.h"

@@ -47,8 +47,8 @@ class Theme;
 namespace editor {
 
 class ExclusiveActionGroup;
-class GraphicsView;
 class ProjectEditor;
+class QuickGraphicsView;
 class RuleCheckDock;
 class SchematicEditorFsm;
 class SchematicGraphicsScene;
@@ -151,6 +151,7 @@ private:
   ProjectEditor& mProjectEditor;
   Project& mProject;
   QScopedPointer<Ui::SchematicEditor> mUi;
+  QPointer<QuickGraphicsView> mGraphicsView;
   QScopedPointer<ToolBarProxy> mCommandToolBarProxy;
   QScopedPointer<StandardEditorCommandHandler> mStandardCommandHandler;
   int mActiveSchematicIndex;

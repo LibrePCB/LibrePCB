@@ -25,7 +25,7 @@
 #include "../../../editorcommandset.h"
 #include "../../../undostack.h"
 #include "../../../utils/toolbarproxy.h"
-#include "../../../widgets/graphicsview.h"
+#include "../../../widgets/quickgraphicsview.h"
 #include "../../cmd/cmdchangenetsignalofschematicnetsegment.h"
 #include "../../cmd/cmdcombineschematicnetsegments.h"
 #include "../../cmd/cmdcompsiginstsetnetsignal.h"

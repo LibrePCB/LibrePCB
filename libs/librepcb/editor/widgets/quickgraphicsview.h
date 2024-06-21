@@ -77,6 +77,9 @@ public:
       IF_GraphicsViewEventHandler* eventHandler) noexcept;
 
   // General Methods
+  QPointF mapFromSceneCoordinate(const QPointF& sceneCoordinate) const noexcept;
+  QPointF mapToSceneCoordinate(const QPointF& widgetCoordinate) const noexcept;
+  Point mapToScenePos(const QPoint& widgetCoordinate) const noexcept;
   Point mapGlobalPosToScenePos(const QPoint& globalPosPx, bool boundToView,
                                bool mapToGrid) const noexcept;
   QPainterPath calcPosWithTolerance(const Point& pos,
@@ -103,11 +106,19 @@ signals:
 
 protected:  // Methods
   void mousePressEvent(QMouseEvent* e) override;
+  void mouseReleaseEvent(QMouseEvent* e) override;
+  void mouseDoubleClickEvent(QMouseEvent* e) override;
   void mouseMoveEvent(QMouseEvent* e) override;
+  void hoverMoveEvent(QHoverEvent* e) override;
   void wheelEvent(QWheelEvent* e) override;
   void smoothTo(const QMatrix4x4& transform) noexcept;
   QVector2D toScenePos(const QMatrix4x4& t,
                        const QPointF& widgetPos) const noexcept;
+
+private:
+  template <typename T>
+  void mouseMoveEventHandler(T* e) noexcept;
+  void graphicsSceneChanged(const QList<QRectF>& region) noexcept;
 
 private:
   // General Attributes
@@ -148,6 +159,7 @@ private:
   volatile bool mPanningActive;
   Qt::MouseButton mPanningButton;
   QCursor mCursorBeforePanning;
+  QGraphicsSceneMouseEvent mMouseMoveEvent;
 
   // Transform Animation
   QMatrix4x4 mAnimationTransformStart;

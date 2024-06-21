@@ -25,7 +25,7 @@
 #include "../../../undostack.h"
 #include "../../../utils/toolbarproxy.h"
 #include "../../../widgets/attributeunitcombobox.h"
-#include "../../../widgets/graphicsview.h"
+#include "../../../widgets/quickgraphicsview.h"
 #include "../../addcomponentdialog.h"
 #include "../../cmd/cmdaddcomponenttocircuit.h"
 #include "../../cmd/cmdaddsymboltoschematic.h"

@@ -1,5 +1,6 @@
 import QtQuick 6.2
 import QtQuick.Controls 6.2
+import Qt5Compat.GraphicalEffects
 
 Item {
     id:root
@@ -7,6 +8,7 @@ Item {
     height: width
 
     property alias icon: image.source
+    property alias color: overlay.color
     signal clicked()
 
     MouseArea {
@@ -22,5 +24,13 @@ Item {
         anchors.centerIn: parent
         width: mouseArea.containsMouse ? parent.width * 1.2 : parent.width
         height: mouseArea.containsMouse ? parent.height * 1.2 : parent.height
+        visible: false
+    }
+
+    ColorOverlay {
+        id: overlay
+        anchors.fill: image
+        source: image
+        color: "#888888"
     }
 }

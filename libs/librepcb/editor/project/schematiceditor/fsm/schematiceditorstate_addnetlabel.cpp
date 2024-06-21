@@ -23,7 +23,7 @@
 #include "schematiceditorstate_addnetlabel.h"
 
 #include "../../../undostack.h"
-#include "../../../widgets/graphicsview.h"
+#include "../../../widgets/quickgraphicsview.h"
 #include "../../cmd/cmdschematicnetlabeladd.h"
 #include "../../cmd/cmdschematicnetlabeledit.h"
 #include "../../projecteditor.h"

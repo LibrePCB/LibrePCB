@@ -39,8 +39,8 @@ class Workspace;
 
 namespace editor {
 
-class GraphicsView;
 class ProjectEditor;
+class QuickGraphicsView;
 class SchematicEditor;
 class SchematicEditorState;
 class ToolBarProxy;
@@ -83,7 +83,7 @@ public:
     Project& project;
     ProjectEditor& projectEditor;
     SchematicEditor& editor;
-    GraphicsView& editorGraphicsView;
+    QuickGraphicsView& editorGraphicsView;
     ToolBarProxy& commandToolBar;
     UndoStack& undoStack;
   };

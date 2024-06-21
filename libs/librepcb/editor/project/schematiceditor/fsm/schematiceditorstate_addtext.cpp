@@ -26,9 +26,9 @@
 #include "../../../editorcommandset.h"
 #include "../../../undostack.h"
 #include "../../../utils/toolbarproxy.h"
-#include "../../../widgets/graphicsview.h"
 #include "../../../widgets/layercombobox.h"
 #include "../../../widgets/positivelengthedit.h"
+#include "../../../widgets/quickgraphicsview.h"
 #include "../../cmd/cmdschematictextadd.h"
 #include "../schematiceditor.h"
 

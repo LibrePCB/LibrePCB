@@ -52,7 +52,6 @@ class BoardEditorFsm;
 class BoardGraphicsScene;
 class BoardLayersDock;
 class ExclusiveActionGroup;
-class GraphicsView;
 class OpenGlSceneBuilder;
 class OpenGlSceneBuilder;
 class OpenGlView;
