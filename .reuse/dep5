@@ -1,10 +1,6 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: librepcb
 Source: https://librepcb.org/
-Files-Excluded: libs/parseagle/specs/eagle*dtd
-Comment:
- Exclude libs/parseagle/specs/eagle_7.5.0.dtd as it is released
- under CC-BY-ND-3 and not required for building or installing.
 
 Files:
  apps/*
@@ -301,19 +297,20 @@ Copyright: Icons8
 License: LicenseRef-Icons8
 
 Files: libs/delaunay-triangulation/*
-Copyright: 2015 Simon Zeni
+Copyright: 2015, Simon Zeni
 License: MIT
 
 Files: libs/dxflib/*
-Copyright: 2001 Robert J. Campbell Jr., 2001-2013 RibbonSoft GmbH
+Copyright: 2001-2013, RibbonSoft GmbH
 License: GPL-2.0-or-later
 
 Files: libs/fontobene-qt/*
-Copyright: Fontobene Developers
+Copyright: 2012-2020, Fontobene Developers
 License: MIT or Apache-2.0
 
 Files: libs/googletest/*
-Copyright: Google and various contributors
+Copyright: 2005-2020, Google Inc and various contributors
+           2018-2019, Google LLC
 License: BSD-3-Clause
 
 Files: libs/googletest/googlemock/scripts/generator/*
@@ -321,27 +318,27 @@ Copyright: Google and various contributors
 License: Apache-2.0
 
 Files: libs/hoedown/*
-Copyright: 2008-2014 Natacha Porté, Vicent Martí, Xavier Mendez, Devin Torres and the Hoedown authors
+Copyright: 2008-2014, Natacha Porté, Vicent Martí, Xavier Mendez, Devin Torres and the Hoedown authors
 License: ISC
 
 Files: libs/muparser/*
-Copyright: 2020 Ingo Berg
+Copyright: 2004-2020, Ingo Berg
 License: BSD-2-Clause
 
 Files: libs/optional/*
-Copyright: 2017 by Simon Brand
+Copyright: 2017, Simon Brand
 License: CC0-1.0
 
 Files: libs/optional/tests/catch.hpp
-Copyright: 2017 Two Blue Cubes Ltd
+Copyright: 2017, Two Blue Cubes Ltd
 License: BSL-1.0
 
 Files: libs/parseagle/*
-Copyright: U. Bruhin
+Copyright: 2012-2020, U. Bruhin
 License: MIT or Apache-2.0
 
 Files: libs/polyclipping/*
-Copyright: Angus Johnson
+Copyright: 2010-2017, Angus Johnson
 License: BSL-1.0
 
 Files: libs/quazip/*
