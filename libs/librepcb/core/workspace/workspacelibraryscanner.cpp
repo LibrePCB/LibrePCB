@@ -58,7 +58,11 @@ WorkspaceLibraryScanner::WorkspaceLibraryScanner(
       this, &WorkspaceLibraryScanner::scanProgressUpdate, this,
       [this](int percent) { mLastProgressPercent = percent; },
       Qt::QueuedConnection);
-  start();
+
+  // Run thread with the lowest priority to not risk blocking the GUI thread.
+  // In manual tests with Qt6Quick it was observed that any higher priority
+  // sometimes freezes the GUI significantly.
+  start(QThread::LowestPriority);
 }
 
 WorkspaceLibraryScanner::~WorkspaceLibraryScanner() noexcept {

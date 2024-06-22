@@ -60,6 +60,10 @@ static int appExec() noexcept;
 int main(int argc, char* argv[]) {
   QApplication app(argc, argv);
 
+  // Give the main thread a higher priority than most other threads as GUI
+  // rendering and event processing are important for a smooth user experience.
+  QThread::currentThread()->setPriority(QThread::HighPriority);
+
   // Set the organization / application names must be done very early because
   // some other classes will use these values (for example QSettings, Debug)!
   setApplicationMetadata();
