@@ -163,9 +163,8 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
   connect(mPlaneFragmentsBuilder.data(), &BoardPlaneFragmentsBuilder::finished,
           mGraphicsView, &QuickGraphicsView::hideWaitingSpinner);
 
-  mUi->quickWidget->rootObject()->setProperty(
-      "overlayColor",
-      theme.getColor(Theme::Color::sBoardOverlays).getSecondaryColor());
+  mUi->quickWidget->rootObject()->setProperty("overlayColor",
+                                              QColor(Qt::white));
 
   // Setup 3D view.
   connect(mUi->btnShow3D, &QToolButton::clicked, this,

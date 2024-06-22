@@ -122,9 +122,8 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
   connect(mGraphicsView, &QuickGraphicsView::cursorScenePositionChanged,
           mUi->statusbar, &StatusBar::setAbsoluteCursorPosition);
 
-  mUi->quickWidget->rootObject()->setProperty(
-      "overlayColor",
-      theme.getColor(Theme::Color::sSchematicOverlays).getSecondaryColor());
+  mUi->quickWidget->rootObject()->setProperty("overlayColor",
+                                              QColor(Qt::black));
 
   // Setup status bar.
   mUi->statusbar->setFields(StatusBar::AbsolutePosition |

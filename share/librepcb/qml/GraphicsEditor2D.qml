@@ -5,10 +5,11 @@ import org.librepcb.qmlcomponents
 
 Rectangle {
     id: root
+    color: "#4f4f4f"
+
     property alias scene: view.scene
     property color overlayColor: "#888888"
 
-    color: "#4f4f4f"
     QuickGraphicsView {
         id: view
         objectName: "view"
