@@ -325,7 +325,10 @@ void BomGeneratorDialog::updateTable() noexcept {
         text.replace("\n", " ");
         QTableWidgetItem* item = new QTableWidgetItem(text);
         if (csv->getValues()[row][0] == "0") {
-          item->setBackground(Qt::gray);
+          // Don't use hardcoded colors because of light/dark theme support.
+          item->setBackground(
+              palette().color(QPalette::Disabled, QPalette::Base));
+          item->setForeground(palette().color(QPalette::PlaceholderText));
         }
         mUi->tableWidget->setItem(row, column, item);
       }
