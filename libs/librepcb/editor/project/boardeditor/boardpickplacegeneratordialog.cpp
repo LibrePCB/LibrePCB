@@ -209,7 +209,10 @@ void BoardPickPlaceGeneratorDialog::updateData() noexcept {
         QTableWidgetItem* item = new QTableWidgetItem(text);
         if ((row >= mData->getItems().count()) ||
             (!mData->getItems().at(row).isMount())) {
-          item->setBackground(Qt::gray);
+          // Don't use hardcoded colors because of light/dark theme support.
+          item->setBackground(
+              palette().color(QPalette::Disabled, QPalette::Base));
+          item->setForeground(palette().color(QPalette::PlaceholderText));
         }
         mUi->tableWidget->setItem(row, column, item);
       }
