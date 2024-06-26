@@ -56,8 +56,9 @@ NetworkAccessManager::NetworkAccessManager(const FilePath& cache) noexcept
   connect(qApp, &QCoreApplication::aboutToQuit, this,
           &NetworkAccessManager::stop, Qt::DirectConnection);
 
-  // start the thread and wait until the thread is started successfully
-  start();
+  // Start the thread and wait until the thread is started successfully.
+  // Use a lower priority to not risk blocking the GUI thread.
+  start(QThread::LowPriority);
   mThreadStartSemaphore.acquire();
 }
 
