@@ -34,6 +34,7 @@
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/dev/device.h>
 #include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectlibrary.h>
@@ -204,12 +205,48 @@ bool SymbolInstancePropertiesDialog::applyChanges() noexcept {
     UndoStackTransaction transaction(
         mUndoStack, tr("Change properties of %1").arg(mSymbol.getName()));
 
+    // Check for already used component name and ask to swap them as it is
+    // annoying to get just a "name already used" error.
+    const CircuitIdentifier oldName(mComponentInstance.getName());
+    const CircuitIdentifier newName(
+        mUi->edtCompInstName->text().trimmed());  // can throw
+    ComponentInstance* otherCmp =
+        mProject.getCircuit().getComponentInstanceByName(*newName);
+    if (otherCmp && (otherCmp != &mComponentInstance)) {
+      QString msgTmpl = tr("%1 gets renamed to %2");
+      QString msg = tr("There is already a component with the name '%1' in the "
+                       "schematic. Do you want to swap their names?")
+                        .arg(*newName);
+      msg += "\n\n • " % msgTmpl.arg(*newName).arg(*oldName);
+      msg += "\n • " % msgTmpl.arg(*oldName).arg(*newName);
+      const int answer = QMessageBox::question(
+          this, tr("Name already in use"), msg,
+          QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Yes);
+      if (answer != QMessageBox::Yes) {
+        return false;
+      }
+      {
+        // Change this components name to something temporary.
+        QScopedPointer<CmdComponentInstanceEdit> cmdCmp(
+            new CmdComponentInstanceEdit(mProject.getCircuit(),
+                                         mComponentInstance));
+        cmdCmp->setName(CircuitIdentifier("_tmp_swap_names_"));
+        transaction.append(cmdCmp.take());
+      }
+      {
+        // Apply this components name to the other component.
+        QScopedPointer<CmdComponentInstanceEdit> cmdCmp(
+            new CmdComponentInstanceEdit(mProject.getCircuit(), *otherCmp));
+        cmdCmp->setName(oldName);
+        transaction.append(cmdCmp.take());
+      }
+    }
+
     // Component Instance
     QScopedPointer<CmdComponentInstanceEdit> cmdCmp(
         new CmdComponentInstanceEdit(mProject.getCircuit(),
                                      mComponentInstance));
-    cmdCmp->setName(CircuitIdentifier(
-        mUi->edtCompInstName->text().trimmed()));  // can throw
+    cmdCmp->setName(newName);
     cmdCmp->setValue(mUi->edtCompInstValue->toPlainText());
     cmdCmp->setAttributes(mAttributes);
     cmdCmp->setAssemblyOptions(
