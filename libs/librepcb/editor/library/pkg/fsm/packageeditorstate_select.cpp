@@ -23,7 +23,9 @@
 #include "packageeditorstate_select.h"
 
 #include "../../../cmd/cmdcircleedit.h"
+#include "../../../cmd/cmdholeedit.h"
 #include "../../../cmd/cmdpolygonedit.h"
+#include "../../../cmd/cmdstroketextedit.h"
 #include "../../../cmd/cmdzoneedit.h"
 #include "../../../dialogs/circlepropertiesdialog.h"
 #include "../../../dialogs/dxfimportdialog.h"
@@ -43,6 +45,7 @@
 #include "../../../widgets/graphicsview.h"
 #include "../../../widgets/positivelengthedit.h"
 #include "../../cmd/cmddragselectedfootprintitems.h"
+#include "../../cmd/cmdfootprintpadedit.h"
 #include "../../cmd/cmdpastefootprintitems.h"
 #include "../../cmd/cmdremoveselectedfootprintitems.h"
 #include "../footprintclipboarddata.h"
@@ -430,7 +433,14 @@ bool PackageEditorState_Select::processPaste() noexcept {
             FootprintClipboardData::fromMimeData(
                 qApp->clipboard()->mimeData());  // can throw
         if (data) {
-          return startPaste(std::move(data), tl::nullopt);
+          if (canPasteGeometry(data)) {
+            // Only one object in clipboard and objects of same type selected,
+            // thus only paste the geometry to the selected pads (not inserting
+            // the copied object).
+            return pasteGeometryFromClipboard(std::move(data));
+          } else {
+            return startPaste(std::move(data), tl::nullopt);
+          }
         }
       } catch (const Exception& e) {
         QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
@@ -853,6 +863,28 @@ bool PackageEditorState_Select::openContextMenuAtPos(
       &menu, this, [this]() { copySelectedItemsToClipboard(); });
   aCopy->setEnabled(features.contains(EditorWidgetBase::Feature::Copy));
   mb.addAction(aCopy);
+
+  // If exactly one object is in the clipboard and objects of the same type are
+  // selected, provide the "paste geometry" action.
+  std::unique_ptr<FootprintClipboardData> clipboardData;
+  try {
+    clipboardData = FootprintClipboardData::fromMimeData(
+        qApp->clipboard()->mimeData());  // can throw
+    if (canPasteGeometry(clipboardData)) {
+      QAction* aPaste = cmd.clipboardPaste.createAction(
+          &menu, this, [this, &clipboardData]() {
+            pasteGeometryFromClipboard(std::move(clipboardData));
+          });
+      aPaste->setText(tr("Paste Geometry"));
+      aPaste->setToolTip(
+          tr("Apply the same geometry as the object in the clipboard"));
+      aPaste->setEnabled(features.contains(EditorWidgetBase::Feature::Paste));
+      mb.addAction(aPaste);
+    }
+  } catch (const Exception& e) {
+    qCritical() << e.getMsg();
+  }
+
   QAction* aRemove =
       cmd.remove.createAction(&menu, this, [this]() { removeSelectedItems(); });
   aRemove->setEnabled(features.contains(EditorWidgetBase::Feature::Remove));
@@ -1016,6 +1048,145 @@ bool PackageEditorState_Select::copySelectedItemsToClipboard() noexcept {
     QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
   }
   return true;
+}
+
+template <typename TCpy, typename TSel>
+static bool hasSelectedObjects(const TCpy& copied,
+                               const TSel& selected) noexcept {
+  if (auto copiedObj = copied.value(0)) {
+    foreach (const auto& sel, selected) {
+      if (sel && (sel->getObj().getUuid() != copiedObj->getUuid())) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+bool PackageEditorState_Select::canPasteGeometry(
+    const std::unique_ptr<FootprintClipboardData>& data) const noexcept {
+  if ((!data) || (!mContext.currentFootprint) ||
+      (!mContext.currentGraphicsItem)) {
+    return false;
+  }
+
+  // Can paste only if there is exactly one object in clipboard.
+  if (data->getFootprintPads().count() + data->getPolygons().count() +
+          data->getCircles().count() + data->getStrokeTexts().count() +
+          data->getZones().count() + data->getHoles().count() !=
+      1) {
+    return false;
+  }
+
+  // Can paste only if there is at least one object selected of the same type
+  // as the object in clipboard. But don't count the object in clipboard since
+  // it would not allow to copy&paste a single object!
+  auto g = mContext.currentGraphicsItem;
+  return hasSelectedObjects(data->getFootprintPads(), g->getSelectedPads()) ||
+      hasSelectedObjects(data->getPolygons(), g->getSelectedPolygons()) ||
+      hasSelectedObjects(data->getCircles(), g->getSelectedCircles()) ||
+      hasSelectedObjects(data->getStrokeTexts(), g->getSelectedStrokeTexts()) ||
+      hasSelectedObjects(data->getZones(), g->getSelectedZones()) ||
+      hasSelectedObjects(data->getHoles(), g->getSelectedHoles());
+}
+
+bool PackageEditorState_Select::pasteGeometryFromClipboard(
+    std::unique_ptr<FootprintClipboardData> data) noexcept {
+  Q_ASSERT(data);
+
+  // Abort if no footprint is selected or the clipboard data is invalid.
+  if ((!mContext.currentFootprint) || (!mContext.currentGraphicsItem) ||
+      (!canPasteGeometry(data))) {
+    return false;
+  }
+
+  // Paste geometry.
+  try {
+    UndoStackTransaction transaction(mContext.undoStack, tr("Paste Geometry"));
+    if (auto src = data->getFootprintPads().value(0)) {
+      foreach (const auto& dst,
+               mContext.currentGraphicsItem->getSelectedPads()) {
+        Q_ASSERT(dst);
+        QScopedPointer<CmdFootprintPadEdit> cmd(
+            new CmdFootprintPadEdit(dst->getObj()));
+        cmd->setComponentSide(src->getComponentSide(), false);
+        cmd->setFunction(src->getFunction(), false);
+        cmd->setShape(src->getShape(), false);
+        cmd->setWidth(src->getWidth(), false);
+        cmd->setHeight(src->getHeight(), false);
+        cmd->setRadius(src->getRadius(), false);
+        cmd->setCustomShapeOutline(src->getCustomShapeOutline());
+        cmd->setStopMaskConfig(src->getStopMaskConfig(), false);
+        cmd->setSolderPasteConfig(src->getSolderPasteConfig());
+        cmd->setCopperClearance(src->getCopperClearance());
+        cmd->setHoles(src->getHoles(), false);
+        transaction.append(cmd.take());
+      }
+    }
+    if (auto src = data->getPolygons().value(0)) {
+      foreach (const auto& dst,
+               mContext.currentGraphicsItem->getSelectedPolygons()) {
+        Q_ASSERT(dst);
+        QScopedPointer<CmdPolygonEdit> cmd(new CmdPolygonEdit(dst->getObj()));
+        cmd->setLayer(src->getLayer(), false);
+        cmd->setLineWidth(src->getLineWidth(), false);
+        cmd->setIsFilled(src->isFilled(), false);
+        cmd->setIsGrabArea(src->isGrabArea(), false);
+        transaction.append(cmd.take());
+      }
+    }
+    if (auto src = data->getCircles().value(0)) {
+      foreach (const auto& dst,
+               mContext.currentGraphicsItem->getSelectedCircles()) {
+        Q_ASSERT(dst);
+        QScopedPointer<CmdCircleEdit> cmd(new CmdCircleEdit(dst->getObj()));
+        cmd->setLayer(src->getLayer(), false);
+        cmd->setLineWidth(src->getLineWidth(), false);
+        cmd->setIsFilled(src->isFilled(), false);
+        cmd->setIsGrabArea(src->isGrabArea(), false);
+        cmd->setDiameter(src->getDiameter(), false);
+        transaction.append(cmd.take());
+      }
+    }
+    if (auto src = data->getStrokeTexts().value(0)) {
+      foreach (const auto& dst,
+               mContext.currentGraphicsItem->getSelectedStrokeTexts()) {
+        Q_ASSERT(dst);
+        QScopedPointer<CmdStrokeTextEdit> cmd(
+            new CmdStrokeTextEdit(dst->getObj()));
+        cmd->setLayer(src->getLayer(), false);
+        cmd->setHeight(src->getHeight(), false);
+        cmd->setStrokeWidth(src->getStrokeWidth(), false);
+        cmd->setLetterSpacing(src->getLetterSpacing(), false);
+        cmd->setLineSpacing(src->getLineSpacing(), false);
+        transaction.append(cmd.take());
+      }
+    }
+    if (auto src = data->getZones().value(0)) {
+      foreach (const auto& dst,
+               mContext.currentGraphicsItem->getSelectedZones()) {
+        Q_ASSERT(dst);
+        QScopedPointer<CmdZoneEdit> cmd(new CmdZoneEdit(dst->getObj()));
+        cmd->setLayers(src->getLayers(), false);
+        cmd->setRules(src->getRules(), false);
+        transaction.append(cmd.take());
+      }
+    }
+    if (auto src = data->getHoles().value(0)) {
+      foreach (const auto& dst,
+               mContext.currentGraphicsItem->getSelectedHoles()) {
+        Q_ASSERT(dst);
+        QScopedPointer<CmdHoleEdit> cmd(new CmdHoleEdit(dst->getObj()));
+        cmd->setDiameter(src->getDiameter(), false);
+        cmd->setStopMaskConfig(src->getStopMaskConfig());
+        transaction.append(cmd.take());
+      }
+    }
+    return transaction.commit();  // can throw
+  } catch (const Exception& e) {
+    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    return false;
+  }
 }
 
 bool PackageEditorState_Select::startPaste(
