@@ -67,40 +67,40 @@ bool CmdRemoveSelectedFootprintItems::performExecute() {
   // remove pins
   foreach (const auto& pad, mContext.currentGraphicsItem->getSelectedPads()) {
     appendChild(new CmdFootprintPadRemove(mContext.currentFootprint->getPads(),
-                                          pad->getPad().get()));
+                                          &pad->getObj()));
   }
 
   // remove circles
   foreach (const auto& circle,
            mContext.currentGraphicsItem->getSelectedCircles()) {
     appendChild(new CmdCircleRemove(mContext.currentFootprint->getCircles(),
-                                    &circle->getCircle()));
+                                    &circle->getObj()));
   }
 
   // remove polygons
   foreach (const auto& polygon,
            mContext.currentGraphicsItem->getSelectedPolygons()) {
     appendChild(new CmdPolygonRemove(mContext.currentFootprint->getPolygons(),
-                                     &polygon->getPolygon()));
+                                     &polygon->getObj()));
   }
 
   // remove texts
   foreach (const auto& text,
            mContext.currentGraphicsItem->getSelectedStrokeTexts()) {
     appendChild(new CmdStrokeTextRemove(
-        mContext.currentFootprint->getStrokeTexts(), &text->getText()));
+        mContext.currentFootprint->getStrokeTexts(), &text->getObj()));
   }
 
   // remove zones
   foreach (const auto& zone, mContext.currentGraphicsItem->getSelectedZones()) {
     appendChild(new CmdZoneRemove(mContext.currentFootprint->getZones(),
-                                  &zone->getZone()));
+                                  &zone->getObj()));
   }
 
   // remove holes
   foreach (const auto& hole, mContext.currentGraphicsItem->getSelectedHoles()) {
     appendChild(new CmdHoleRemove(mContext.currentFootprint->getHoles(),
-                                  &hole->getHole()));
+                                  &hole->getObj()));
   }
 
   // execute all child commands

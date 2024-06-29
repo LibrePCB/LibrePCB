@@ -55,7 +55,7 @@ public:
   virtual ~PolygonGraphicsItem() noexcept;
 
   // Getters
-  Polygon& getPolygon() noexcept { return mPolygon; }
+  Polygon& getObj() noexcept { return mPolygon; }
 
   /// Get the line segment at a specific position
   ///

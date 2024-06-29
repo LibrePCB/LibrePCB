@@ -219,8 +219,8 @@ QList<std::shared_ptr<QGraphicsItem>> FootprintGraphicsItem::findItemsAtPos(
   if (flags.testFlag(FindFlag::Pads)) {
     foreach (auto ptr, mPadGraphicsItems) {
       int priority = 10;
-      if (!ptr->getPad()->isTht()) {
-        priority += priorityFromLayer(ptr->getPad()->getSmtLayer());
+      if (!ptr->getObj().isTht()) {
+        priority += priorityFromLayer(ptr->getObj().getSmtLayer());
       }
       processItem(std::dynamic_pointer_cast<QGraphicsItem>(ptr), priority,
                   false);
@@ -230,13 +230,13 @@ QList<std::shared_ptr<QGraphicsItem>> FootprintGraphicsItem::findItemsAtPos(
   if (flags.testFlag(FindFlag::StrokeTexts)) {
     foreach (auto ptr, mStrokeTextGraphicsItems) {
       processItem(std::dynamic_pointer_cast<QGraphicsItem>(ptr),
-                  20 + priorityFromLayer(ptr->getText().getLayer()), false);
+                  20 + priorityFromLayer(ptr->getObj().getLayer()), false);
     }
   }
 
   if (flags.testFlag(FindFlag::Circles)) {
     foreach (auto ptr, mCircleGraphicsItems) {
-      int priority = 30 + priorityFromLayer(ptr->getCircle().getLayer());
+      int priority = 30 + priorityFromLayer(ptr->getObj().getLayer());
       if (ptr->zValue() > 0) priority -= 1;
       if (ptr->zValue() < 0) priority += 1;
       processItem(std::dynamic_pointer_cast<QGraphicsItem>(ptr), priority,
@@ -246,7 +246,7 @@ QList<std::shared_ptr<QGraphicsItem>> FootprintGraphicsItem::findItemsAtPos(
 
   if (flags.testFlag(FindFlag::Polygons)) {
     foreach (auto ptr, mPolygonGraphicsItems) {
-      int priority = 30 + priorityFromLayer(ptr->getPolygon().getLayer());
+      int priority = 30 + priorityFromLayer(ptr->getObj().getLayer());
       if (ptr->zValue() > 0) priority -= 1;
       if (ptr->zValue() < 0) priority += 1;
       processItem(std::dynamic_pointer_cast<QGraphicsItem>(ptr), priority,
@@ -257,11 +257,11 @@ QList<std::shared_ptr<QGraphicsItem>> FootprintGraphicsItem::findItemsAtPos(
   if (flags.testFlag(FindFlag::Zones)) {
     foreach (auto ptr, mZoneGraphicsItems) {
       int priority = 40;
-      if (ptr->getZone().getLayers().testFlag(Zone::Layer::Top)) {
+      if (ptr->getObj().getLayers().testFlag(Zone::Layer::Top)) {
         priority += 100;
-      } else if (ptr->getZone().getLayers().testFlag(Zone::Layer::Inner)) {
+      } else if (ptr->getObj().getLayers().testFlag(Zone::Layer::Inner)) {
         priority += 200;
-      } else if (ptr->getZone().getLayers().testFlag(Zone::Layer::Bottom)) {
+      } else if (ptr->getObj().getLayers().testFlag(Zone::Layer::Bottom)) {
         priority += 300;
       }
       processItem(std::dynamic_pointer_cast<QGraphicsItem>(ptr), priority,
@@ -514,7 +514,7 @@ void FootprintGraphicsItem::substituteText(
       }
     };
     text.setTextOverride(
-        AttributeSubstitutor::substitute(text.getText().getText(), lookup));
+        AttributeSubstitutor::substitute(text.getObj().getText(), lookup));
   }
 }
 

@@ -62,9 +62,9 @@ CmdDragSelectedSymbolItems::CmdDragSelectedSymbolItems(
       context.symbolGraphicsItem.getSelectedPins();
   foreach (const std::shared_ptr<SymbolPinGraphicsItem>& pin, pins) {
     Q_ASSERT(pin);
-    mPinEditCmds.append(new CmdSymbolPinEdit(pin->getPin()));
-    mCenterPos += pin->getPin()->getPosition();
-    if (!pin->getPin()->getPosition().isOnGrid(grid)) {
+    mPinEditCmds.append(new CmdSymbolPinEdit(pin->getPtr()));
+    mCenterPos += pin->getObj().getPosition();
+    if (!pin->getObj().getPosition().isOnGrid(grid)) {
       mHasOffTheGridElements = true;
     }
     ++count;
@@ -74,9 +74,9 @@ CmdDragSelectedSymbolItems::CmdDragSelectedSymbolItems(
       context.symbolGraphicsItem.getSelectedCircles();
   foreach (const std::shared_ptr<CircleGraphicsItem>& circle, circles) {
     Q_ASSERT(circle);
-    mCircleEditCmds.append(new CmdCircleEdit(circle->getCircle()));
-    mCenterPos += circle->getCircle().getCenter();
-    if (!circle->getCircle().getCenter().isOnGrid(grid)) {
+    mCircleEditCmds.append(new CmdCircleEdit(circle->getObj()));
+    mCenterPos += circle->getObj().getCenter();
+    if (!circle->getObj().getCenter().isOnGrid(grid)) {
       mHasOffTheGridElements = true;
     }
     ++count;
@@ -86,9 +86,8 @@ CmdDragSelectedSymbolItems::CmdDragSelectedSymbolItems(
       context.symbolGraphicsItem.getSelectedPolygons();
   foreach (const std::shared_ptr<PolygonGraphicsItem>& polygon, polygons) {
     Q_ASSERT(polygon);
-    mPolygonEditCmds.append(new CmdPolygonEdit(polygon->getPolygon()));
-    foreach (const Vertex& vertex,
-             polygon->getPolygon().getPath().getVertices()) {
+    mPolygonEditCmds.append(new CmdPolygonEdit(polygon->getObj()));
+    foreach (const Vertex& vertex, polygon->getObj().getPath().getVertices()) {
       mCenterPos += vertex.getPos();
       if (!vertex.getPos().isOnGrid(grid)) {
         mHasOffTheGridElements = true;
@@ -101,9 +100,9 @@ CmdDragSelectedSymbolItems::CmdDragSelectedSymbolItems(
       context.symbolGraphicsItem.getSelectedTexts();
   foreach (const std::shared_ptr<TextGraphicsItem>& text, texts) {
     Q_ASSERT(text);
-    mTextEditCmds.append(new CmdTextEdit(text->getText()));
-    mCenterPos += text->getText().getPosition();
-    if (!text->getText().getPosition().isOnGrid(grid)) {
+    mTextEditCmds.append(new CmdTextEdit(text->getObj()));
+    mCenterPos += text->getObj().getPosition();
+    if (!text->getObj().getPosition().isOnGrid(grid)) {
       mHasOffTheGridElements = true;
     }
     ++count;

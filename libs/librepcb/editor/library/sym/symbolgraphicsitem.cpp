@@ -365,7 +365,7 @@ void SymbolGraphicsItem::substituteText(TextGraphicsItem& text) noexcept {
       }
     };
     text.setTextOverride(
-        AttributeSubstitutor::substitute(text.getText().getText(), lookup));
+        AttributeSubstitutor::substitute(text.getObj().getText(), lookup));
   }
 }
 

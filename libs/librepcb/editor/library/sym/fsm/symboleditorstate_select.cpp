@@ -658,7 +658,7 @@ bool SymbolEditorState_Select::openContextMenuAtPos(const Point& pos) noexcept {
 
   // If a polygon line is under the cursor, add vertex menu items
   if (auto i = std::dynamic_pointer_cast<PolygonGraphicsItem>(selectedItem)) {
-    if (auto polygon = mContext.symbol.getPolygons().find(&i->getPolygon())) {
+    if (auto polygon = mContext.symbol.getPolygons().find(&i->getObj())) {
       QVector<int> vertices = i->getVertexIndicesAtPosition(pos);
       if (!vertices.isEmpty()) {
         QAction* aRemoveVertex = cmd.vertexRemove.createAction(
@@ -738,13 +738,13 @@ bool SymbolEditorState_Select::openPropertiesDialogOfItem(
 
   if (auto i = std::dynamic_pointer_cast<SymbolPinGraphicsItem>(item)) {
     SymbolPinPropertiesDialog dialog(
-        i->getPin(), mContext.undoStack, getLengthUnit(),
+        i->getPtr(), mContext.undoStack, getLengthUnit(),
         "symbol_editor/pin_properties_dialog", &mContext.editorWidget);
     dialog.setReadOnly(mContext.editorContext.readOnly);
     dialog.exec();
     return true;
   } else if (auto i = std::dynamic_pointer_cast<TextGraphicsItem>(item)) {
-    TextPropertiesDialog dialog(i->getText(), mContext.undoStack,
+    TextPropertiesDialog dialog(i->getObj(), mContext.undoStack,
                                 getAllowedTextLayers(), getLengthUnit(),
                                 "symbol_editor/text_properties_dialog",
                                 &mContext.editorWidget);
@@ -753,7 +753,7 @@ bool SymbolEditorState_Select::openPropertiesDialogOfItem(
     return true;
   } else if (auto i = std::dynamic_pointer_cast<PolygonGraphicsItem>(item)) {
     PolygonPropertiesDialog dialog(
-        i->getPolygon(), mContext.undoStack, getAllowedCircleAndPolygonLayers(),
+        i->getObj(), mContext.undoStack, getAllowedCircleAndPolygonLayers(),
         getLengthUnit(), "symbol_editor/polygon_properties_dialog",
         &mContext.editorWidget);
     dialog.setReadOnly(mContext.editorContext.readOnly);
@@ -761,7 +761,7 @@ bool SymbolEditorState_Select::openPropertiesDialogOfItem(
     return true;
   } else if (auto i = std::dynamic_pointer_cast<CircleGraphicsItem>(item)) {
     CirclePropertiesDialog dialog(
-        i->getCircle(), mContext.undoStack, getAllowedCircleAndPolygonLayers(),
+        i->getObj(), mContext.undoStack, getAllowedCircleAndPolygonLayers(),
         getLengthUnit(), "symbol_editor/circle_properties_dialog",
         &mContext.editorWidget);
     dialog.setReadOnly(mContext.editorContext.readOnly);
@@ -790,23 +790,22 @@ bool SymbolEditorState_Select::copySelectedItemsToClipboard() noexcept {
     foreach (const std::shared_ptr<SymbolPinGraphicsItem>& pin,
              mContext.symbolGraphicsItem.getSelectedPins()) {
       Q_ASSERT(pin);
-      data.getPins().append(std::make_shared<SymbolPin>(*pin->getPin()));
+      data.getPins().append(std::make_shared<SymbolPin>(pin->getObj()));
     }
     foreach (const std::shared_ptr<CircleGraphicsItem>& circle,
              mContext.symbolGraphicsItem.getSelectedCircles()) {
       Q_ASSERT(circle);
-      data.getCircles().append(std::make_shared<Circle>(circle->getCircle()));
+      data.getCircles().append(std::make_shared<Circle>(circle->getObj()));
     }
     foreach (const std::shared_ptr<PolygonGraphicsItem>& polygon,
              mContext.symbolGraphicsItem.getSelectedPolygons()) {
       Q_ASSERT(polygon);
-      data.getPolygons().append(
-          std::make_shared<Polygon>(polygon->getPolygon()));
+      data.getPolygons().append(std::make_shared<Polygon>(polygon->getObj()));
     }
     foreach (const std::shared_ptr<TextGraphicsItem>& text,
              mContext.symbolGraphicsItem.getSelectedTexts()) {
       Q_ASSERT(text);
-      data.getTexts().append(std::make_shared<Text>(text->getText()));
+      data.getTexts().append(std::make_shared<Text>(text->getObj()));
     }
     if (data.getItemCount() > 0) {
       qApp->clipboard()->setMimeData(

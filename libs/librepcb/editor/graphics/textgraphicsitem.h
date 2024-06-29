@@ -56,7 +56,7 @@ public:
   virtual ~TextGraphicsItem() noexcept;
 
   // Getters
-  Text& getText() noexcept { return mText; }
+  Text& getObj() noexcept { return mText; }
 
   // Setters
   void setTextOverride(const tl::optional<QString>& text) noexcept;
