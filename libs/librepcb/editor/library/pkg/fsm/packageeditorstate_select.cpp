@@ -780,7 +780,7 @@ bool PackageEditorState_Select::openContextMenuAtPos(
   if (auto i = std::dynamic_pointer_cast<PolygonGraphicsItem>(selectedItem)) {
     if (mContext.currentFootprint) {
       if (auto polygon =
-              mContext.currentFootprint->getPolygons().find(&i->getPolygon())) {
+              mContext.currentFootprint->getPolygons().find(&i->getObj())) {
         QVector<int> vertices = i->getVertexIndicesAtPosition(pos);
         if (!vertices.isEmpty()) {
           QAction* aRemove = cmd.vertexRemove.createAction(
@@ -814,7 +814,7 @@ bool PackageEditorState_Select::openContextMenuAtPos(
   if (auto i = std::dynamic_pointer_cast<ZoneGraphicsItem>(selectedItem)) {
     if (mContext.currentFootprint) {
       if (auto zone =
-              mContext.currentFootprint->getZones().find(&i->getZone())) {
+              mContext.currentFootprint->getZones().find(&i->getObj())) {
         QVector<int> vertices = i->getVertexIndicesAtPosition(pos);
         if (!vertices.isEmpty()) {
           QAction* aRemove = cmd.vertexRemove.createAction(
@@ -903,7 +903,7 @@ bool PackageEditorState_Select::openPropertiesDialogOfItem(
 
   if (auto i = std::dynamic_pointer_cast<FootprintPadGraphicsItem>(item)) {
     FootprintPadPropertiesDialog dialog(
-        mContext.package, *i->getPad(), mContext.undoStack, getLengthUnit(),
+        mContext.package, i->getObj(), mContext.undoStack, getLengthUnit(),
         "package_editor/footprint_pad_properties_dialog",
         &mContext.editorWidget);
     dialog.setReadOnly(mContext.editorContext.readOnly);
@@ -911,7 +911,7 @@ bool PackageEditorState_Select::openPropertiesDialogOfItem(
     return true;
   } else if (auto i = std::dynamic_pointer_cast<StrokeTextGraphicsItem>(item)) {
     StrokeTextPropertiesDialog dialog(
-        i->getText(), mContext.undoStack, getAllowedTextLayers(),
+        i->getObj(), mContext.undoStack, getAllowedTextLayers(),
         getLengthUnit(), "package_editor/stroke_text_properties_dialog",
         &mContext.editorWidget);
     dialog.setReadOnly(mContext.editorContext.readOnly);
@@ -919,7 +919,7 @@ bool PackageEditorState_Select::openPropertiesDialogOfItem(
     return true;
   } else if (auto i = std::dynamic_pointer_cast<PolygonGraphicsItem>(item)) {
     PolygonPropertiesDialog dialog(
-        i->getPolygon(), mContext.undoStack, getAllowedCircleAndPolygonLayers(),
+        i->getObj(), mContext.undoStack, getAllowedCircleAndPolygonLayers(),
         getLengthUnit(), "package_editor/polygon_properties_dialog",
         &mContext.editorWidget);
     dialog.setReadOnly(mContext.editorContext.readOnly);
@@ -927,7 +927,7 @@ bool PackageEditorState_Select::openPropertiesDialogOfItem(
     return true;
   } else if (auto i = std::dynamic_pointer_cast<CircleGraphicsItem>(item)) {
     CirclePropertiesDialog dialog(
-        i->getCircle(), mContext.undoStack, getAllowedCircleAndPolygonLayers(),
+        i->getObj(), mContext.undoStack, getAllowedCircleAndPolygonLayers(),
         getLengthUnit(), "package_editor/circle_properties_dialog",
         &mContext.editorWidget);
     dialog.setReadOnly(mContext.editorContext.readOnly);
@@ -935,7 +935,7 @@ bool PackageEditorState_Select::openPropertiesDialogOfItem(
     return true;
   } else if (auto i = std::dynamic_pointer_cast<ZoneGraphicsItem>(item)) {
     ZonePropertiesDialog dialog(
-        i->getZone(), mContext.undoStack, getLengthUnit(),
+        i->getObj(), mContext.undoStack, getLengthUnit(),
         mContext.editorContext.layerProvider,
         "package_editor/zone_properties_dialog", &mContext.editorWidget);
     dialog.setReadOnly(mContext.editorContext.readOnly);
@@ -945,7 +945,7 @@ bool PackageEditorState_Select::openPropertiesDialogOfItem(
     // Note: The const_cast<> is a bit ugly, but it was by far the easiest
     // way and is safe since here we know that we're allowed to modify the hole.
     HolePropertiesDialog dialog(
-        const_cast<Hole&>(i->getHole()), mContext.undoStack, getLengthUnit(),
+        const_cast<Hole&>(i->getObj()), mContext.undoStack, getLengthUnit(),
         "package_editor/hole_properties_dialog", &mContext.editorWidget);
     dialog.setReadOnly(mContext.editorContext.readOnly);
     dialog.exec();
@@ -979,34 +979,33 @@ bool PackageEditorState_Select::copySelectedItemsToClipboard() noexcept {
              mContext.currentGraphicsItem->getSelectedPads()) {
       Q_ASSERT(pad);
       data.getFootprintPads().append(
-          std::make_shared<FootprintPad>(*pad->getPad()));
+          std::make_shared<FootprintPad>(pad->getObj()));
     }
     foreach (const std::shared_ptr<CircleGraphicsItem>& circle,
              mContext.currentGraphicsItem->getSelectedCircles()) {
       Q_ASSERT(circle);
-      data.getCircles().append(std::make_shared<Circle>(circle->getCircle()));
+      data.getCircles().append(std::make_shared<Circle>(circle->getObj()));
     }
     foreach (const std::shared_ptr<PolygonGraphicsItem>& polygon,
              mContext.currentGraphicsItem->getSelectedPolygons()) {
       Q_ASSERT(polygon);
-      data.getPolygons().append(
-          std::make_shared<Polygon>(polygon->getPolygon()));
+      data.getPolygons().append(std::make_shared<Polygon>(polygon->getObj()));
     }
     foreach (const std::shared_ptr<StrokeTextGraphicsItem>& text,
              mContext.currentGraphicsItem->getSelectedStrokeTexts()) {
       Q_ASSERT(text);
       data.getStrokeTexts().append(
-          std::make_shared<StrokeText>(text->getText()));
+          std::make_shared<StrokeText>(text->getObj()));
     }
     foreach (const std::shared_ptr<ZoneGraphicsItem>& zone,
              mContext.currentGraphicsItem->getSelectedZones()) {
       Q_ASSERT(zone);
-      data.getZones().append(std::make_shared<Zone>(zone->getZone()));
+      data.getZones().append(std::make_shared<Zone>(zone->getObj()));
     }
     foreach (const std::shared_ptr<HoleGraphicsItem>& hole,
              mContext.currentGraphicsItem->getSelectedHoles()) {
       Q_ASSERT(hole);
-      data.getHoles().append(std::make_shared<Hole>(hole->getHole()));
+      data.getHoles().append(std::make_shared<Hole>(hole->getObj()));
     }
     if (data.getItemCount() > 0) {
       qApp->clipboard()->setMimeData(

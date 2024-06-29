@@ -55,7 +55,7 @@ public:
   virtual ~ZoneGraphicsItem() noexcept;
 
   // Getters
-  Zone& getZone() noexcept { return mZone; }
+  Zone& getObj() noexcept { return mZone; }
 
   // Operator Overloadings
   ZoneGraphicsItem& operator=(const ZoneGraphicsItem& rhs) = delete;

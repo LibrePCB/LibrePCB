@@ -56,7 +56,7 @@ public:
   virtual ~HoleGraphicsItem() noexcept;
 
   // Getters
-  Hole& getHole() noexcept { return mHole; }
+  Hole& getObj() noexcept { return mHole; }
 
   // Inherited from QGraphicsItem
   QPainterPath shape() const noexcept override;

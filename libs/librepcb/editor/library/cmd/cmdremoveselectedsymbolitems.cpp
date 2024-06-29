@@ -62,27 +62,26 @@ bool CmdRemoveSelectedSymbolItems::performExecute() {
   // remove pins
   foreach (const auto& pin, mContext.symbolGraphicsItem.getSelectedPins()) {
     appendChild(
-        new CmdSymbolPinRemove(mContext.symbol.getPins(), pin->getPin().get()));
+        new CmdSymbolPinRemove(mContext.symbol.getPins(), &pin->getObj()));
   }
 
   // remove circles
   foreach (const auto& circle,
            mContext.symbolGraphicsItem.getSelectedCircles()) {
-    appendChild(new CmdCircleRemove(mContext.symbol.getCircles(),
-                                    &circle->getCircle()));
+    appendChild(
+        new CmdCircleRemove(mContext.symbol.getCircles(), &circle->getObj()));
   }
 
   // remove polygons
   foreach (const auto& polygon,
            mContext.symbolGraphicsItem.getSelectedPolygons()) {
     appendChild(new CmdPolygonRemove(mContext.symbol.getPolygons(),
-                                     &polygon->getPolygon()));
+                                     &polygon->getObj()));
   }
 
   // remove texts
   foreach (const auto& text, mContext.symbolGraphicsItem.getSelectedTexts()) {
-    appendChild(
-        new CmdTextRemove(mContext.symbol.getTexts(), &text->getText()));
+    appendChild(new CmdTextRemove(mContext.symbol.getTexts(), &text->getObj()));
   }
 
   // execute all child commands

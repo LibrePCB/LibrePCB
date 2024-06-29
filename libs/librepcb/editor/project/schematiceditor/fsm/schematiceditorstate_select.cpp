@@ -549,7 +549,7 @@ bool SchematicEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
   } else if (auto item =
                  std::dynamic_pointer_cast<PolygonGraphicsItem>(selectedItem)) {
     SI_Polygon* polygon =
-        scene->getSchematic().getPolygons().value(item->getPolygon().getUuid());
+        scene->getSchematic().getPolygons().value(item->getObj().getUuid());
     if (!polygon) return false;
 
     int lineIndex = item->getLineIndexAtPosition(pos);
@@ -883,7 +883,7 @@ bool SchematicEditorState_Select::openPropertiesDialog(
     return true;
   } else if (auto polygon =
                  std::dynamic_pointer_cast<PolygonGraphicsItem>(item)) {
-    openPolygonPropertiesDialog(polygon->getPolygon());
+    openPolygonPropertiesDialog(polygon->getObj());
     return true;
   } else if (auto text = std::dynamic_pointer_cast<SGI_Text>(item)) {
     openTextPropertiesDialog(text->getText().getTextObj());
