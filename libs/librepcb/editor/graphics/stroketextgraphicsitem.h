@@ -57,7 +57,7 @@ public:
   virtual ~StrokeTextGraphicsItem() noexcept;
 
   // Getters
-  StrokeText& getText() noexcept { return mText; }
+  StrokeText& getObj() noexcept { return mText; }
 
   // General Methods
   void setTextOverride(const tl::optional<QString>& text) noexcept;

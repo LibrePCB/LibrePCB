@@ -55,7 +55,7 @@ public:
   virtual ~CircleGraphicsItem() noexcept;
 
   // Getters
-  Circle& getCircle() noexcept { return mCircle; }
+  Circle& getObj() noexcept { return mCircle; }
 
   // Operator Overloadings
   CircleGraphicsItem& operator=(const CircleGraphicsItem& rhs) = delete;

@@ -69,9 +69,9 @@ CmdDragSelectedFootprintItems::CmdDragSelectedFootprintItems(
       context.currentGraphicsItem->getSelectedPads();
   foreach (const std::shared_ptr<FootprintPadGraphicsItem>& pad, pads) {
     Q_ASSERT(pad);
-    mPadEditCmds.append(new CmdFootprintPadEdit(*pad->getPad()));
-    mCenterPos += pad->getPad()->getPosition();
-    if (!pad->getPad()->getPosition().isOnGrid(grid)) {
+    mPadEditCmds.append(new CmdFootprintPadEdit(pad->getObj()));
+    mCenterPos += pad->getObj().getPosition();
+    if (!pad->getObj().getPosition().isOnGrid(grid)) {
       mHasOffTheGridElements = true;
     }
     ++count;
@@ -81,9 +81,9 @@ CmdDragSelectedFootprintItems::CmdDragSelectedFootprintItems(
       context.currentGraphicsItem->getSelectedCircles();
   foreach (const std::shared_ptr<CircleGraphicsItem>& circle, circles) {
     Q_ASSERT(circle);
-    mCircleEditCmds.append(new CmdCircleEdit(circle->getCircle()));
-    mCenterPos += circle->getCircle().getCenter();
-    if (!circle->getCircle().getCenter().isOnGrid(grid)) {
+    mCircleEditCmds.append(new CmdCircleEdit(circle->getObj()));
+    mCenterPos += circle->getObj().getCenter();
+    if (!circle->getObj().getCenter().isOnGrid(grid)) {
       mHasOffTheGridElements = true;
     }
     ++count;
@@ -93,9 +93,8 @@ CmdDragSelectedFootprintItems::CmdDragSelectedFootprintItems(
       context.currentGraphicsItem->getSelectedPolygons();
   foreach (const std::shared_ptr<PolygonGraphicsItem>& polygon, polygons) {
     Q_ASSERT(polygon);
-    mPolygonEditCmds.append(new CmdPolygonEdit(polygon->getPolygon()));
-    foreach (const Vertex& vertex,
-             polygon->getPolygon().getPath().getVertices()) {
+    mPolygonEditCmds.append(new CmdPolygonEdit(polygon->getObj()));
+    foreach (const Vertex& vertex, polygon->getObj().getPath().getVertices()) {
       mCenterPos += vertex.getPos();
       if (!vertex.getPos().isOnGrid(grid)) {
         mHasOffTheGridElements = true;
@@ -108,9 +107,9 @@ CmdDragSelectedFootprintItems::CmdDragSelectedFootprintItems(
       context.currentGraphicsItem->getSelectedStrokeTexts();
   foreach (const std::shared_ptr<StrokeTextGraphicsItem>& text, texts) {
     Q_ASSERT(text);
-    mTextEditCmds.append(new CmdStrokeTextEdit(text->getText()));
-    mCenterPos += text->getText().getPosition();
-    if (!text->getText().getPosition().isOnGrid(grid)) {
+    mTextEditCmds.append(new CmdStrokeTextEdit(text->getObj()));
+    mCenterPos += text->getObj().getPosition();
+    if (!text->getObj().getPosition().isOnGrid(grid)) {
       mHasOffTheGridElements = true;
     }
     ++count;
@@ -120,8 +119,8 @@ CmdDragSelectedFootprintItems::CmdDragSelectedFootprintItems(
       context.currentGraphicsItem->getSelectedZones();
   foreach (const std::shared_ptr<ZoneGraphicsItem>& zone, zones) {
     Q_ASSERT(zone);
-    mZoneEditCmds.append(new CmdZoneEdit(zone->getZone()));
-    foreach (const Vertex& vertex, zone->getZone().getOutline().getVertices()) {
+    mZoneEditCmds.append(new CmdZoneEdit(zone->getObj()));
+    foreach (const Vertex& vertex, zone->getObj().getOutline().getVertices()) {
       mCenterPos += vertex.getPos();
       if (!vertex.getPos().isOnGrid(grid)) {
         mHasOffTheGridElements = true;
@@ -136,8 +135,8 @@ CmdDragSelectedFootprintItems::CmdDragSelectedFootprintItems(
     Q_ASSERT(hole);
     // Note: The const_cast<> is a bit ugly, but it was by far the easiest
     // way and is safe since here we know that we're allowed to modify the hole.
-    mHoleEditCmds.append(new CmdHoleEdit(const_cast<Hole&>(hole->getHole())));
-    const Point pos = hole->getHole().getPath()->getVertices().first().getPos();
+    mHoleEditCmds.append(new CmdHoleEdit(hole->getObj()));
+    const Point pos = hole->getObj().getPath()->getVertices().first().getPos();
     mCenterPos += pos;
     if (!pos.isOnGrid(grid)) {
       mHasOffTheGridElements = true;

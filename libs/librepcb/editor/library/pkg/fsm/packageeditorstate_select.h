@@ -116,6 +116,10 @@ private:  // Methods
   bool openPropertiesDialogOfItem(std::shared_ptr<QGraphicsItem> item) noexcept;
   bool openPropertiesDialogOfItemAtPos(const Point& pos) noexcept;
   bool copySelectedItemsToClipboard() noexcept;
+  bool canPasteGeometry(
+      const std::unique_ptr<FootprintClipboardData>& data) const noexcept;
+  bool pasteGeometryFromClipboard(
+      std::unique_ptr<FootprintClipboardData> data) noexcept;
   bool startPaste(std::unique_ptr<FootprintClipboardData> data,
                   const tl::optional<Point>& fixedPosition);
   bool rotateSelectedItems(const Angle& angle) noexcept;

@@ -63,7 +63,8 @@ public:
   ~SymbolPinGraphicsItem() noexcept;
 
   // Getters
-  const std::shared_ptr<SymbolPin>& getPin() noexcept { return mPin; }
+  SymbolPin& getObj() noexcept { return *mPin; }
+  const std::shared_ptr<SymbolPin>& getPtr() noexcept { return mPin; }
 
   // General Methods
   void updateText() noexcept;

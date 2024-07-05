@@ -59,7 +59,7 @@ public:
   ~FootprintPadGraphicsItem() noexcept;
 
   // Getters
-  const std::shared_ptr<FootprintPad>& getPad() noexcept { return mPad; }
+  FootprintPad& getObj() noexcept { return *mPad; }
 
   // General Methods
   void updateText() noexcept;
