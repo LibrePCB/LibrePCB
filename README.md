@@ -54,7 +54,8 @@ To compile and run LibrePCB, you need the following software components:
 - [Qt](http://www.qt.io/download-open-source/) >= 6.2 or 5.12...5.15 (make
   sure the [imageformats](https://doc.qt.io/qt-5/qtimageformats-index.html)
   plugin is installed too as it will be needed at runtime!).
-- [OpenCASCADE](https://www.opencascade.com/) OCCT or OCE (optional)
+- [OpenCASCADE](https://www.opencascade.com/) OCCT or OCE (optional,
+  OCCT highly preferred)
 - [OpenGL Utility Library](https://en.wikipedia.org/wiki/OpenGL_Utility_Library)
   GLU (optional)
 - [zlib](http://www.zlib.net/)
@@ -77,8 +78,8 @@ actually used for CI, but are also useful to build LibrePCB locally.
 sudo apt-get install build-essential git cmake openssl zlib1g zlib1g-dev \
      qt6-base-dev qt6-tools-dev qt6-tools-dev-tools qt6-l10n-tools \
      libqt6core5compat6-dev qt6-declarative-dev libqt6opengl6-dev libqt6svg6-dev \
-     qt6-image-formats-plugins libglu1-mesa-dev \
-     liboce-foundation-dev liboce-modeling-dev liboce-ocaf-dev
+     qt6-image-formats-plugins libglu1-mesa-dev libtbb-dev libxi-dev \
+     occt-misc libocct-*-dev
 sudo apt-get install qtcreator # optional
 ```
 
