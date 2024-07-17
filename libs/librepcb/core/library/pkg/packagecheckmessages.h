@@ -33,6 +33,7 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Circle;
 class Footprint;
 class FootprintPad;
 class Hole;
@@ -250,6 +251,55 @@ public:
 private:
   std::shared_ptr<const Footprint> mFootprint;
   std::shared_ptr<const FootprintPad> mPad;
+};
+
+/*******************************************************************************
+ *  Class MsgMinimumWidthViolation
+ ******************************************************************************/
+
+/**
+ * @brief The MsgMinimumWidthViolation class
+ */
+class MsgMinimumWidthViolation final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgMinimumWidthViolation)
+
+public:
+  // Constructors / Destructor
+  MsgMinimumWidthViolation() = delete;
+  MsgMinimumWidthViolation(std::shared_ptr<const Footprint> footprint,
+                           std::shared_ptr<const Polygon> polygon,
+                           const Length& minWidth) noexcept;
+  MsgMinimumWidthViolation(std::shared_ptr<const Footprint> footprint,
+                           std::shared_ptr<const Circle> circle,
+                           const Length& minWidth) noexcept;
+  MsgMinimumWidthViolation(std::shared_ptr<const Footprint> footprint,
+                           std::shared_ptr<const StrokeText> text,
+                           const Length& minWidth) noexcept;
+  MsgMinimumWidthViolation(const MsgMinimumWidthViolation& other) noexcept
+    : RuleCheckMessage(other), mFootprint(other.mFootprint) {}
+  virtual ~MsgMinimumWidthViolation() noexcept {}
+
+  // Getters
+  std::shared_ptr<const Footprint> getFootprint() const noexcept {
+    return mFootprint;
+  }
+  std::shared_ptr<const Polygon> getPolygon() const noexcept {
+    return mPolygon;
+  }
+  std::shared_ptr<const Circle> getCircle() const noexcept { return mCircle; }
+  std::shared_ptr<const StrokeText> getStrokeText() const noexcept {
+    return mStrokeText;
+  }
+
+private:
+  static QString getMessage(std::shared_ptr<const Footprint> footprint,
+                            const Layer& layer) noexcept;
+  static QString getDescriptionAppendix() noexcept;
+
+  std::shared_ptr<const Footprint> mFootprint;
+  std::shared_ptr<const Polygon> mPolygon;
+  std::shared_ptr<const Circle> mCircle;
+  std::shared_ptr<const StrokeText> mStrokeText;
 };
 
 /*******************************************************************************

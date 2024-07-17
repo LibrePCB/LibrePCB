@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "packagecheck.h"
 
+#include "../../geometry/polygon.h"
 #include "../../utils/toolbox.h"
 #include "../../utils/transform.h"
 #include "package.h"
@@ -69,6 +70,7 @@ RuleCheckMessageList PackageCheck::runChecks() const {
   checkCopperClearanceOnPads(msgs);
   checkPadFunctions(msgs);
   checkHolesStopMask(msgs);
+  checkLineWidths(msgs);
   checkZones(msgs);
   checkFootprintModels(msgs);
   return msgs;
@@ -570,6 +572,48 @@ void PackageCheck::checkHolesStopMask(MsgList& msgs) const {
       std::shared_ptr<const Hole> hole = itHole.ptr();
       if (!hole->getStopMaskConfig().isEnabled()) {
         msgs.append(std::make_shared<MsgHoleWithoutStopMask>(footprint, hole));
+      }
+    }
+  }
+}
+
+void PackageCheck::checkLineWidths(MsgList& msgs) const {
+  const QList<const Layer*> silkscreenLayers = {
+      &Layer::topLegend(), &Layer::botLegend(), &Layer::topNames(),
+      &Layer::botNames(),  &Layer::topValues(), &Layer::botValues(),
+  };
+  const Length minSilkscreenWidth(150000);  // See BoardDesignRuleCheckSettings.
+
+  for (auto itFtp = mPackage.getFootprints().begin();
+       itFtp != mPackage.getFootprints().end(); ++itFtp) {
+    std::shared_ptr<const Footprint> footprint = itFtp.ptr();
+    for (auto itPolygon = (*itFtp).getPolygons().begin();
+         itPolygon != (*itFtp).getPolygons().end(); ++itPolygon) {
+      std::shared_ptr<const Polygon> polygon = itPolygon.ptr();
+      if (silkscreenLayers.contains(&polygon->getLayer()) &&
+          (polygon->getLineWidth() < minSilkscreenWidth) &&
+          (!polygon->isFilled())) {
+        msgs.append(std::make_shared<MsgMinimumWidthViolation>(
+            footprint, polygon, minSilkscreenWidth));
+      }
+    }
+    for (auto itCircle = (*itFtp).getCircles().begin();
+         itCircle != (*itFtp).getCircles().end(); ++itCircle) {
+      std::shared_ptr<const Circle> circle = itCircle.ptr();
+      if (silkscreenLayers.contains(&circle->getLayer()) &&
+          (circle->getLineWidth() < minSilkscreenWidth) &&
+          (!circle->isFilled())) {
+        msgs.append(std::make_shared<MsgMinimumWidthViolation>(
+            footprint, circle, minSilkscreenWidth));
+      }
+    }
+    for (auto itText = (*itFtp).getStrokeTexts().begin();
+         itText != (*itFtp).getStrokeTexts().end(); ++itText) {
+      std::shared_ptr<const StrokeText> text = itText.ptr();
+      if (silkscreenLayers.contains(&text->getLayer()) &&
+          (text->getStrokeWidth() < minSilkscreenWidth)) {
+        msgs.append(std::make_shared<MsgMinimumWidthViolation>(
+            footprint, text, minSilkscreenWidth));
       }
     }
   }

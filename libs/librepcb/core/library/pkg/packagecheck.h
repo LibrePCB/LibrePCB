@@ -74,6 +74,7 @@ protected:  // Methods
   void checkCopperClearanceOnPads(MsgList& msgs) const;
   void checkPadFunctions(MsgList& msgs) const;
   void checkHolesStopMask(MsgList& msgs) const;
+  void checkLineWidths(MsgList& msgs) const;
   void checkZones(MsgList& msgs) const;
   void checkFootprintModels(MsgList& msgs) const;
 
