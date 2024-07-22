@@ -23,7 +23,9 @@
 #include "packageeditorwidget.h"
 
 #include "../../3d/openglscenebuilder.h"
+#include "../../cmd/cmdcircleedit.h"
 #include "../../cmd/cmdholeedit.h"
+#include "../../cmd/cmdpolygonedit.h"
 #include "../../cmd/cmdstroketextedit.h"
 #include "../../dialogs/gridsettingsdialog.h"
 #include "../../editorcommandset.h"
@@ -32,6 +34,7 @@
 #include "../../utils/toolbarproxy.h"
 #include "../../widgets/openglview.h"
 #include "../../widgets/statusbar.h"
+#include "../../widgets/unsignedlengthedit.h"
 #include "../../workspace/desktopservices.h"
 #include "../cmd/cmdfootprintedit.h"
 #include "../cmd/cmdfootprintpadedit.h"
@@ -770,6 +773,48 @@ void PackageEditorWidget::fixMsg(const MsgMissingPackageOutline& msg) {
 }
 
 template <>
+void PackageEditorWidget::fixMsg(const MsgMinimumWidthViolation& msg) {
+  if (!mCurrentFootprint) return;
+
+  QDialog dlg(this);
+  dlg.setWindowTitle(tr("New Line Width"));
+  QVBoxLayout* vLayout = new QVBoxLayout(&dlg);
+  UnsignedLengthEdit* edtWidth = new UnsignedLengthEdit(&dlg);
+  edtWidth->configure(mLengthUnit, LengthEditBase::Steps::generic(),
+                      "package_editor/fix_minimum_width_dialog");
+  edtWidth->setValue(UnsignedLength(200000));
+  edtWidth->setFocus();
+  vLayout->addWidget(edtWidth);
+  QDialogButtonBox* btnBox = new QDialogButtonBox(&dlg);
+  btnBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+  connect(btnBox, &QDialogButtonBox::rejected, &dlg, &QDialog::reject);
+  connect(btnBox, &QDialogButtonBox::accepted, &dlg, &QDialog::accept);
+  vLayout->addWidget(btnBox);
+  if (dlg.exec() != QDialog::Accepted) {
+    return;
+  }
+
+  if (auto p = mCurrentFootprint->getPolygons().find(msg.getPolygon().get())) {
+    QScopedPointer<CmdPolygonEdit> cmd(new CmdPolygonEdit(*p));
+    cmd->setLineWidth(edtWidth->getValue(), false);
+    mUndoStack->execCmd(cmd.take());
+  } else if (auto c =
+                 mCurrentFootprint->getCircles().find(msg.getCircle().get())) {
+    QScopedPointer<CmdCircleEdit> cmd(new CmdCircleEdit(*c));
+    cmd->setLineWidth(edtWidth->getValue(), false);
+    mUndoStack->execCmd(cmd.take());
+  } else if (auto t = mCurrentFootprint->getStrokeTexts().find(
+                 msg.getStrokeText().get())) {
+    QScopedPointer<CmdStrokeTextEdit> cmd(new CmdStrokeTextEdit(*t));
+    cmd->setStrokeWidth(edtWidth->getValue(), false);
+    mUndoStack->execCmd(cmd.take());
+  } else {
+    throw LogicError(__FILE__, __LINE__,
+                     "Whoops, not implemented! Please open a bug report.");
+  }
+}
+
+template <>
 void PackageEditorWidget::fixMsg(const MsgMissingCourtyard& msg) {
   mUi->footprintEditorWidget->setCurrentIndex(
       mPackage->getFootprints().indexOf(msg.getFootprint().get()));
@@ -988,6 +1033,7 @@ bool PackageEditorWidget::processRuleCheckMessage(
   if (fixMsgHelper<MsgMissingAuthor>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgMissingCategories>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgMissingPackageOutline>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgMinimumWidthViolation>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgMissingCourtyard>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgMissingFootprint>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgMissingFootprintModel>(msg, applyFix)) return true;

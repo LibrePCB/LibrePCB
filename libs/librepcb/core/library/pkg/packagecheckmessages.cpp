@@ -198,6 +198,84 @@ MsgInvalidPadConnection::MsgInvalidPadConnection(
 }
 
 /*******************************************************************************
+ *  MsgMinimumWidthViolation
+ ******************************************************************************/
+
+MsgMinimumWidthViolation::MsgMinimumWidthViolation(
+    std::shared_ptr<const Footprint> footprint,
+    std::shared_ptr<const Polygon> polygon, const Length& minWidth) noexcept
+  : RuleCheckMessage(
+        Severity::Warning, getMessage(footprint, polygon->getLayer()),
+        tr("It is recommended that polygons on layer '%1' have a line width of "
+           "at least %2.")
+                .arg(polygon->getLayer().getNameTr())
+                .arg(QString::number(minWidth.toMm() * 1000) % "μm") %
+            " " % getDescriptionAppendix(),
+        "thin_line"),
+    mFootprint(footprint),
+    mPolygon(polygon) {
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("footprint", footprint->getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("polygon", polygon->getUuid());
+  mApproval->ensureLineBreak();
+}
+
+MsgMinimumWidthViolation::MsgMinimumWidthViolation(
+    std::shared_ptr<const Footprint> footprint,
+    std::shared_ptr<const Circle> circle, const Length& minWidth) noexcept
+  : RuleCheckMessage(
+        Severity::Warning, getMessage(footprint, circle->getLayer()),
+        tr("It is recommended that circles on layer '%1' have a line width of "
+           "at least %2.")
+                .arg(circle->getLayer().getNameTr())
+                .arg(QString::number(minWidth.toMm() * 1000) % "μm") %
+            " " % getDescriptionAppendix(),
+        "thin_line"),
+    mFootprint(footprint),
+    mCircle(circle) {
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("footprint", footprint->getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("circle", circle->getUuid());
+  mApproval->ensureLineBreak();
+}
+
+MsgMinimumWidthViolation::MsgMinimumWidthViolation(
+    std::shared_ptr<const Footprint> footprint,
+    std::shared_ptr<const StrokeText> text, const Length& minWidth) noexcept
+  : RuleCheckMessage(
+        Severity::Warning, getMessage(footprint, text->getLayer()),
+        tr("It is recommended that stroke texts on layer '%1' have a stroke "
+           "width of at least %2.")
+                .arg(text->getLayer().getNameTr())
+                .arg(QString::number(minWidth.toMm() * 1000) % "μm") %
+            " " % getDescriptionAppendix(),
+        "thin_line"),
+    mFootprint(footprint),
+    mStrokeText(text) {
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("footprint", footprint->getUuid());
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("text", text->getUuid());
+  mApproval->ensureLineBreak();
+}
+
+QString MsgMinimumWidthViolation::getMessage(
+    std::shared_ptr<const Footprint> footprint, const Layer& layer) noexcept {
+  return tr("Minimum width of '%1' in '%2'")
+      .arg(layer.getNameTr())
+      .arg(*footprint->getNames().getDefaultValue());
+}
+
+QString MsgMinimumWidthViolation::getDescriptionAppendix() noexcept {
+  return tr(
+      "Otherwise it could lead to manufacturing problems in some cases "
+      "(depending on board settings and/or the capabilities of the PCB "
+      "manufacturer).");
+}
+
+/*******************************************************************************
  *  MsgMissingCourtyard
  ******************************************************************************/
 
