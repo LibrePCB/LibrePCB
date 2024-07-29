@@ -1,0 +1,110 @@
+import { Button, ListView } from "std-widgets.slint";
+import { PanelButton } from "./panelbutton.slint";
+
+export struct ListItem {
+    text: string,
+    selected: bool,
+}
+
+export component AppWindow inherits Window {
+    background: #4f4f4f;
+    title: "Test";
+    icon: @image-url("librepcb.png");
+    preferred-width: 1024px;
+    preferred-height: 768px;
+    panel := Rectangle {
+        x: 0px;
+        y: 0px;
+        z: 100;
+        width: 50px;
+        height: 100%;
+        background: #353535;
+        VerticalLayout {
+            spacing: 0px;
+            b1 := PanelButton {
+                icon: @image-url("home.svg");
+                toolTip: "Home";
+                checked: true;
+                clicked => {b2.checked = false;}
+            }
+            b2 := PanelButton {
+                icon: @image-url("libraries.png");
+                toolTip: "Libraries";
+                clicked => {b1.checked = false;}
+            }
+        }
+    }
+
+    out property<length> scene_width <=> image.width;
+    out property<length> scene_height <=> image.height;
+    in property<image> scene <=> image.source;
+    image := Image {
+        x: panel.width;
+        y: 0;
+        width: (root.width - panel.width) / 2;
+        height: 100%;
+        visible: b1.checked;
+        image-fit: ImageFit.preserve;
+    }
+
+    pure callback resized(length, length, length, length, bool) -> bool;
+    no-frame: resized(image.x + image.width, 0, root.width - image.width - image.x, image.height, image.visible);
+
+    Rectangle {
+        x: panel.width;
+        y: 0;
+        width: root.width - panel.width;
+        height: 100%;
+        visible: !b1.checked;
+        background: gray;
+    }
+
+    in-out property<[ListItem]> model : [
+        { text: "Blue", color: #0000ff, bg: #eeeeee, selected: false},
+        { text: "Red", color: #ff0000, bg: #eeeeee, selected: false},
+        { text: "Green", color: #00ff00, bg: #eeeeee, selected: false},
+        { text: "Yellow", color: #ffff00, bg: #222222, selected: false },
+        { text: "Black", color: #000000, bg: #eeeeee, selected: false },
+        { text: "White", color: #ffffff, bg: #222222, selected: false },
+        { text: "Magenta", color: #ff00ff, bg: #eeeeee, selected: false },
+        { text: "Cyan", color: #00ffff, bg: #222222, selected: false },
+    ];
+    Rectangle {
+        x: panel.width;
+        y: 0;
+        width: 150px;
+        height: parent.height / 3;
+        visible: b2.checked;
+        border-color: #FF0000;
+        border-width: 1px;
+        ListView {
+            x: 1px;
+            y: 1px;
+            width: parent.width - 2px;
+            height: parent.height - 2px;
+            for data in model : Rectangle {
+                height: 30px;
+                background: data.selected ? #0000FF : (touch.has-hover ? #555555 : #FFFFFF);
+                width: parent.width;
+                Text {
+                    x: 0;
+                    text: data.text;
+                    color: #000000;
+                }
+                touch := TouchArea {
+                    clicked => {
+                        data.selected = !data.selected;
+                    }
+                }
+            }
+        }
+    }
+
+    callback close();
+    Button {
+        x : root.width - self.width - 10px;
+        y: root.height - self.height - 10px;
+        text: "Close";
+        clicked => { close(); }
+    }
+}

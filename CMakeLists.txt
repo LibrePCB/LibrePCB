@@ -100,7 +100,7 @@ set(PARSEAGLE_QT_MAJOR_VERSION ${QT_MAJOR_VERSION})
 
 # Use C++11 (Qt5) or C++17 (Qt6)
 if(QT_MAJOR_VERSION EQUAL 6)
-  set(CMAKE_CXX_STANDARD 17)
+  set(CMAKE_CXX_STANDARD 20)
 else()
   set(CMAKE_CXX_STANDARD 11)
 endif()
@@ -195,6 +195,24 @@ if(QT_MAJOR_VERSION EQUAL 5)
       an upcoming release. Please use Qt6 instead."
   )
 endif()
+
+# Find Slint
+find_package(Slint QUIET)
+if(NOT Slint_FOUND)
+  message(
+    "Slint could not be located in the CMake module search path. Downloading it from Git and building it locally"
+  )
+  include(FetchContent)
+  FetchContent_Declare(
+    Slint
+    GIT_REPOSITORY https://github.com/slint-ui/slint.git
+    # `release/1` will auto-upgrade to the latest Slint >= 1.0.0 and < 2.0.0
+    # `release/1.0` will auto-upgrade to the latest Slint >= 1.0.0 and < 1.1.0
+    GIT_TAG release/1
+    SOURCE_SUBDIR api/cpp
+  )
+  FetchContent_MakeAvailable(Slint)
+endif(NOT Slint_FOUND)
 
 # For the ParsEagle library, use the same Qt version as for LibrePCB
 set(PARSEAGLE_QT_MAJOR_VERSION ${QT_MAJOR_VERSION})

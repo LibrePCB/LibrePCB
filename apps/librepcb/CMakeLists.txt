@@ -12,6 +12,7 @@ add_executable(
   MACOSX_BUNDLE
   ../../img/images.qrc main.cpp
 )
+slint_target_sources(librepcb ui/appwindow.slint NAMESPACE ui)
 target_include_directories(
   librepcb
   PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../../libs"
@@ -26,6 +27,8 @@ target_link_libraries(
           ${QT}::Core
           ${QT}::Gui
           ${QT}::Widgets
+          # Slint
+          Slint::Slint
 )
 
 # Install target

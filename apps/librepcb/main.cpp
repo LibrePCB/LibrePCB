@@ -20,20 +20,31 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "appwindow.h"
+
 #include <librepcb/core/application.h>
 #include <librepcb/core/debug.h>
 #include <librepcb/core/exceptions.h>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/network/networkaccessmanager.h>
+#include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectloader.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 #include <librepcb/editor/dialogs/directorylockhandlerdialog.h>
 #include <librepcb/editor/editorcommandset.h>
+#include <librepcb/editor/graphics/defaultgraphicslayerprovider.h>
+#include <librepcb/editor/project/boardeditor/boardgraphicsscene.h>
 #include <librepcb/editor/project/partinformationprovider.h>
+#include <librepcb/editor/project/schematiceditor/schematicgraphicsscene.h>
+#include <librepcb/editor/widgets/graphicsview.h>
 #include <librepcb/editor/workspace/controlpanel/controlpanel.h>
 #include <librepcb/editor/workspace/initializeworkspacewizard/initializeworkspacewizard.h>
-
+#include <librepcb/core/project/board/boardplanefragmentsbuilder.h>
 #include <QtCore>
 #include <QtWidgets>
+
+#include <slint.h>
 
 /*******************************************************************************
  *  Namespace
@@ -51,7 +62,6 @@ static void writeLogHeader() noexcept;
 static int runApplication() noexcept;
 static bool isFileFormatStableOrAcceptUnstable() noexcept;
 static int openWorkspace(FilePath& path);
-static int appExec() noexcept;
 
 /*******************************************************************************
  *  main()
@@ -323,30 +333,86 @@ static int openWorkspace(FilePath& path) {
                    &WorkspaceSettingsItem::edited,
                    &ws.getSettings().keyboardShortcuts, applyKeyboardShortcuts);
 
-  // Open the control panel.
-  ControlPanel p(ws, wizard.getWorkspaceContainsNewerFileFormats());
-  p.show();
+  // Open the main window.
+  auto ui = ui::AppWindow::create();
 
-  return appExec();
-}
+  ui->on_close([&] {
+    QMessageBox::information(nullptr, "Hello", "Foo!");
+    slint::quit_event_loop();
+  });
 
-/*******************************************************************************
- *  appExec()
- ******************************************************************************/
+  auto model = std::make_shared<slint::VectorModel<ui::ListItem>>();
+  model->push_back(ui::ListItem{"1", false});
+  model->push_back(ui::ListItem{"2", false});
+  model->push_back(ui::ListItem{"3", false});
+  ui->set_model(model);
 
-static int appExec() noexcept {
-  // please note that we shouldn't show a dialog or message box in the catch()
-  // blocks! from http://qt-project.org/doc/qt-5/exceptionsafety.html:
-  //      "After an exception is thrown, the connection to the windowing server
-  //      might already be closed. It is not safe to call a GUI related function
-  //      after catching an exception."
+  // Open project.
+  std::unique_ptr<Project> project;
+  SchematicGraphicsScene* schScene = nullptr;
+  BoardGraphicsScene* brdScene = nullptr;
   try {
-    return QApplication::exec();
-  } catch (std::exception& e) {
-    qFatal("UNCAUGHT EXCEPTION: %s --- PROGRAM EXITED", e.what());
-  } catch (...) {
-    qFatal("UNCAUGHT EXCEPTION --- PROGRAM EXITED");
+    QSettings s;
+    const FilePath fp(s.value("controlpanel/last_open_project").toString());
+    std::shared_ptr<TransactionalFileSystem> fs =
+        TransactionalFileSystem::openRW(fp.getParentDir());
+    ProjectLoader loader;
+    project = loader.open(
+        std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(fs)),
+        fp.getFilename());  // can throw
+
+    DefaultGraphicsLayerProvider* lp =
+        new DefaultGraphicsLayerProvider(ws.getSettings().themes.getActive());
+    if (Schematic* sch = project->getSchematicByIndex(0)) {
+      schScene = new SchematicGraphicsScene(
+          *sch, *lp, std::make_shared<const QSet<const NetSignal*>>());
+    }
+    if (Board* brd = project->getBoardByIndex(0)) {
+      BoardPlaneFragmentsBuilder builder;
+      builder.runSynchronously(*brd);
+      brdScene = new BoardGraphicsScene(
+          *brd, *lp, std::make_shared<const QSet<const NetSignal*>>());
+    }
+  } catch (const Exception& e) {
+    qCritical() << e.getMsg();
+    return -1;
   }
 
-  return -1;
+  QWidget* widget =
+      static_cast<QWidget*>(slint::cbindgen_private::slint_qt_get_widget(
+          &ui->window().window_handle()));
+  GraphicsView* view = new GraphicsView(widget);
+  view->setBackgroundColors(Qt::black, Qt::transparent);
+  view->setScene(brdScene);
+  view->zoomAll();
+
+  QObject::connect(view, &GraphicsView::dragged, [&](){
+    float w = ui->get_scene_width();
+    float h = ui->get_scene_height();
+    QImage image(int(w), int(h), QImage::Format_RGBA8888);
+    image.fill(Qt::white);
+
+    QPainter painter(&image);
+    painter.setRenderHints(QPainter::Antialiasing |
+                           QPainter::SmoothPixmapTransform);
+    if (schScene) {
+      schScene->render(&painter, QRectF(), view->getVisibleSceneRect());
+    }
+
+    slint::SharedPixelBuffer<slint::Rgba8Pixel> buf(
+        int(w), int(h), (slint::Rgba8Pixel*)image.bits());
+    ui->set_scene(slint::Image(buf));
+  });
+
+  ui->on_resized([&](float x, float y, float w, float h, bool v) {
+    view->setGeometry(x, y, w, h);
+    view->setVisible(v);
+    return false;
+  });
+
+  ui->show();
+
+  // Run the event loop.
+  slint::run_event_loop();
+  return 0;
 }

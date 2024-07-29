@@ -1,0 +1,46 @@
+import { Button, VerticalBox } from "std-widgets.slint";
+
+export component PanelButton inherits Rectangle {
+    in property<image> icon <=> image.source;
+    in-out property<string> toolTip <=> popupText.text;
+    in-out property<bool> checked : false;
+    callback clicked;
+
+    background: self.checked ? #1c1c1c : (touch.pressed ? #555555 : (touch.has-hover ? #424242 : #353535));
+    height: self.width;
+    Rectangle {
+        x: 0px;
+        width: 3px;
+        background: #d8d8d8;
+        visible: parent.checked;
+    }
+    touch := TouchArea {
+        clicked => {
+            root.clicked();
+            parent.checked = true;
+        }
+    }
+    image := Image {
+        width: 70%;
+        height: 70%;
+    }
+    popup := Rectangle {
+        x: root.width + 5px;
+        y: (root.height / 2) - (self.height / 2);
+        width: popupText.preferred-width + 10px;
+        height: 25px;
+        background: #3b3b3b;
+        border-radius: 3px;
+        visible: touch.has-hover;
+        opacity: touch.has-hover ? 1 : 0;
+        animate opacity { duration: 150ms; }
+        popupText := Text {
+            x: 5px;
+            color: #ffffffca;
+            horizontal-alignment: TextHorizontalAlignment.left;
+            vertical-alignment: TextVerticalAlignment.center;
+            wrap: TextWrap.no-wrap;
+            overflow: TextOverflow.elide;
+        }
+    }
+}
