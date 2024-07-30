@@ -459,9 +459,9 @@ bool PackageModelListModel::chooseStepFile(QByteArray& content,
   QSettings clientSettings;
   QString key = "library_editor/package_editor/step_file";
   QString initialFp = clientSettings.value(key, QDir::homePath()).toString();
-  FilePath fp(FileDialog::getOpenFileName(qobject_cast<QWidget*>(parent()),
-                                          tr("Choose STEP Model"), initialFp,
-                                          "STEP Models (*.step *.stp)"));
+  FilePath fp(FileDialog::getOpenFileName(
+      qobject_cast<QWidget*>(parent()), tr("Choose STEP Model"), initialFp,
+      "STEP Models (*.step *.stp *.STEP *.STP *.Step *.Stp)"));
   if (selectedFile) {
     *selectedFile = fp;
   }
