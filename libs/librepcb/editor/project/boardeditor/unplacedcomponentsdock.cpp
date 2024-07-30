@@ -28,6 +28,7 @@
 #include "../../project/cmd/cmdcomponentinstanceedit.h"
 #include "../../undostack.h"
 #include "../../widgets/graphicsview.h"
+#include "../../workspace/desktopservices.h"
 #include "../cmd/cmdadddevicetoboard.h"
 #include "../projecteditor.h"
 #include "ui_unplacedcomponentsdock.h"
@@ -87,6 +88,19 @@ UnplacedComponentsDock::UnplacedComponentsDock(ProjectEditor& editor,
     mPreviewGraphicsScene(new GraphicsScene()),
     mPreviewGraphicsItem(nullptr) {
   mUi->setupUi(this);
+
+  // Setup "no devices found" label.
+  mUi->lblNoDeviceFound->setText(
+      mUi->lblNoDeviceFound->text() % " " %
+      tr("See details <a href=\"%1\">here</a>.")
+          .arg("https://librepcb.org/_branches/develop/faq/"
+               "#error-no-dev-or-pkg-found"));
+  connect(mUi->lblNoDeviceFound, &QLabel::linkActivated, this,
+          [this](const QString& url) {
+            DesktopServices ds(mProjectEditor.getWorkspace().getSettings(),
+                               this);
+            ds.openWebUrl(QUrl(url));
+          });
 
   // Setup graphics view.
   const Theme& theme =
