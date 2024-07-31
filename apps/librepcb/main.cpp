@@ -382,10 +382,6 @@ static int openWorkspace(FilePath& path) {
   QWidget* widget =
       static_cast<QWidget*>(slint::cbindgen_private::slint_qt_get_widget(
           &app->window().window_handle()));
-  // GraphicsView* view = new GraphicsView(widget);
-  // view->setBackgroundColors(Qt::black, Qt::transparent);
-  // view->setScene(brdScene);
-  // view->zoomAll();
 
   class EventFilter : public QObject {
     slint::ComponentHandle<ui::AppWindow> app;
@@ -414,30 +410,6 @@ static int openWorkspace(FilePath& path) {
 
   EventFilter* filter = new EventFilter(app, schScene);
   widget->installEventFilter(filter);
-
-  /*QObject::connect(view, &GraphicsView::dragged, [&]() {
-    float w = ui->get_scene_width();
-    float h = ui->get_scene_height();
-    QImage image(int(w), int(h), QImage::Format_RGBA8888);
-    image.fill(Qt::white);
-
-    QPainter painter(&image);
-    painter.setRenderHints(QPainter::Antialiasing |
-                           QPainter::SmoothPixmapTransform);
-    if (schScene) {
-      schScene->render(&painter, QRectF(), view->getVisibleSceneRect());
-    }
-
-    slint::SharedPixelBuffer<slint::Rgba8Pixel> buf(
-        int(w), int(h), (slint::Rgba8Pixel*)image.bits());
-    ui->set_scene(slint::Image(buf));
-  });*/
-
-  /*ui->on_resized([&](float x, float y, float w, float h, bool v) {
-    view->setGeometry(x, y, w, h);
-    view->setVisible(v);
-    return false;
-  });*/
 
   app->show();
 

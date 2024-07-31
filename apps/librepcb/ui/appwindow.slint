@@ -35,24 +35,12 @@ export component AppWindow inherits Window {
         }
     }
 
-    out property<length> scene_x: image.x + image.width;
-    out property<length> scene_y: image.y;
-    out property<length> scene_width: image.width;
-    out property<length> scene_height: image.height;
-    in property<image> scene <=> image.source;
-    image := Image {
-        x: panel.width;
-        y: 0;
-        width: (root.width - panel.width) / 2;
-        height: 100%;
-        visible: b1.checked;
-        image-fit: ImageFit.preserve;
-    }
 
-    pure callback resized(length, length, length, length, bool) -> bool;
-    no-frame: resized(image.x + image.width, 0, root.width - image.width - image.x, image.height, image.visible);
-
-    Rectangle {
+    out property<length> scene_x: scene.x;
+    out property<length> scene_y: scene.y;
+    out property<length> scene_width: scene.width;
+    out property<length> scene_height: scene.height;
+    scene := Rectangle {
         x: panel.width;
         y: 0;
         width: root.width - panel.width;
