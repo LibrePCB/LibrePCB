@@ -35,8 +35,10 @@ export component AppWindow inherits Window {
         }
     }
 
-    out property<length> scene_width <=> image.width;
-    out property<length> scene_height <=> image.height;
+    out property<length> scene_x: image.x + image.width;
+    out property<length> scene_y: image.y;
+    out property<length> scene_width: image.width;
+    out property<length> scene_height: image.height;
     in property<image> scene <=> image.source;
     image := Image {
         x: panel.width;

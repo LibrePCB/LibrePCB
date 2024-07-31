@@ -27,6 +27,7 @@
 #include <librepcb/core/exceptions.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/network/networkaccessmanager.h>
+#include <librepcb/core/project/board/boardplanefragmentsbuilder.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectloader.h>
 #include <librepcb/core/workspace/workspace.h>
@@ -40,7 +41,7 @@
 #include <librepcb/editor/widgets/graphicsview.h>
 #include <librepcb/editor/workspace/controlpanel/controlpanel.h>
 #include <librepcb/editor/workspace/initializeworkspacewizard/initializeworkspacewizard.h>
-#include <librepcb/core/project/board/boardplanefragmentsbuilder.h>
+
 #include <QtCore>
 #include <QtWidgets>
 
@@ -334,9 +335,9 @@ static int openWorkspace(FilePath& path) {
                    &ws.getSettings().keyboardShortcuts, applyKeyboardShortcuts);
 
   // Open the main window.
-  auto ui = ui::AppWindow::create();
+  auto app = ui::AppWindow::create();
 
-  ui->on_close([&] {
+  app->on_close([&] {
     QMessageBox::information(nullptr, "Hello", "Foo!");
     slint::quit_event_loop();
   });
@@ -345,7 +346,7 @@ static int openWorkspace(FilePath& path) {
   model->push_back(ui::ListItem{"1", false});
   model->push_back(ui::ListItem{"2", false});
   model->push_back(ui::ListItem{"3", false});
-  ui->set_model(model);
+  app->set_model(model);
 
   // Open project.
   std::unique_ptr<Project> project;
@@ -380,13 +381,41 @@ static int openWorkspace(FilePath& path) {
 
   QWidget* widget =
       static_cast<QWidget*>(slint::cbindgen_private::slint_qt_get_widget(
-          &ui->window().window_handle()));
-  GraphicsView* view = new GraphicsView(widget);
-  view->setBackgroundColors(Qt::black, Qt::transparent);
-  view->setScene(brdScene);
-  view->zoomAll();
+          &app->window().window_handle()));
+  // GraphicsView* view = new GraphicsView(widget);
+  // view->setBackgroundColors(Qt::black, Qt::transparent);
+  // view->setScene(brdScene);
+  // view->zoomAll();
 
-  QObject::connect(view, &GraphicsView::dragged, [&](){
+  class EventFilter : public QObject {
+    slint::ComponentHandle<ui::AppWindow> app;
+    GraphicsScene* scene;
+
+  public:
+    EventFilter(slint::ComponentHandle<ui::AppWindow> app, GraphicsScene* scene)
+      : QObject(), app(app), scene(scene) {}
+    virtual bool eventFilter(QObject* watched, QEvent* event) override {
+      if (event->type() == QEvent::Paint) {
+        QWidget* w = static_cast<QWidget*>(watched);
+        // QPaintEvent* e = static_cast<QPaintEvent*>(event);
+        QPainter p(w);
+        p.setRenderHints(QPainter::Antialiasing |
+                         QPainter::SmoothPixmapTransform);
+        QRectF rect(app->get_scene_x(), app->get_scene_y(),
+                    app->get_scene_width(), app->get_scene_height());
+        p.fillRect(rect, Qt::white);
+        if (scene) {
+          scene->render(&p, rect, QRectF());
+        }
+      }
+      return QObject::eventFilter(watched, event);
+    }
+  };
+
+  EventFilter* filter = new EventFilter(app, schScene);
+  widget->installEventFilter(filter);
+
+  /*QObject::connect(view, &GraphicsView::dragged, [&]() {
     float w = ui->get_scene_width();
     float h = ui->get_scene_height();
     QImage image(int(w), int(h), QImage::Format_RGBA8888);
@@ -402,15 +431,15 @@ static int openWorkspace(FilePath& path) {
     slint::SharedPixelBuffer<slint::Rgba8Pixel> buf(
         int(w), int(h), (slint::Rgba8Pixel*)image.bits());
     ui->set_scene(slint::Image(buf));
-  });
+  });*/
 
-  ui->on_resized([&](float x, float y, float w, float h, bool v) {
+  /*ui->on_resized([&](float x, float y, float w, float h, bool v) {
     view->setGeometry(x, y, w, h);
     view->setVisible(v);
     return false;
-  });
+  });*/
 
-  ui->show();
+  app->show();
 
   // Run the event loop.
   slint::run_event_loop();
