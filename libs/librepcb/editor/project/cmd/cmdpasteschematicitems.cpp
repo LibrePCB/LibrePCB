@@ -61,6 +61,7 @@
 #include <librepcb/core/project/schematic/items/si_text.h>
 #include <librepcb/core/project/schematic/schematic.h>
 #include <librepcb/core/utils/scopeguard.h>
+#include <librepcb/core/utils/toolbox.h>
 
 #include <QtCore>
 
@@ -151,15 +152,26 @@ bool CmdPasteSchematicItems::performExecute() {
     }
   }
 
+  // Sort components by name to avoid a random mess, see
+  // https://github.com/LibrePCB/LibrePCB/issues/1418.
+  auto componentInstances = mData->getComponentInstances().values();
+  Toolbox::sortNumeric(
+      componentInstances,
+      [](const QCollator& cmp,
+         const std::shared_ptr<SchematicClipboardData::ComponentInstance>& a,
+         const std::shared_ptr<SchematicClipboardData::ComponentInstance>& b) {
+        return cmp(*a->name, *b->name);
+      });
+
   // Paste components
   QHash<Uuid, Uuid> componentInstanceMap;
-  for (const SchematicClipboardData::ComponentInstance& cmp :
-       mData->getComponentInstances()) {
+  for (const std::shared_ptr<SchematicClipboardData::ComponentInstance>& cmp :
+       componentInstances) {
     const Component* libCmp =
-        mProject.getLibrary().getComponent(cmp.libComponentUuid);
+        mProject.getLibrary().getComponent(cmp->libComponentUuid);
     if (!libCmp) throw LogicError(__FILE__, __LINE__);
 
-    CircuitIdentifier name = cmp.name;
+    CircuitIdentifier name = cmp->name;
     if (mProject.getCircuit().getComponentInstanceByName(*name)) {
       name = CircuitIdentifier(
           mProject.getCircuit().generateAutoComponentInstanceName(
@@ -167,17 +179,17 @@ bool CmdPasteSchematicItems::performExecute() {
     }
     QScopedPointer<ComponentInstance> copy(
         new ComponentInstance(mProject.getCircuit(), Uuid::createRandom(),
-                              *libCmp, cmp.libVariantUuid, name));
-    copy->setValue(cmp.value);
-    copy->setAttributes(cmp.attributes);
-    ComponentAssemblyOptionList assemblyOptions = cmp.assemblyOptions;
+                              *libCmp, cmp->libVariantUuid, name));
+    copy->setValue(cmp->value);
+    copy->setAttributes(cmp->attributes);
+    ComponentAssemblyOptionList assemblyOptions = cmp->assemblyOptions;
     for (ComponentAssemblyOption& option : assemblyOptions) {
       option.setAssemblyVariants(
           convertAssemblyVariants(option.getAssemblyVariants()));
     }
     copy->setAssemblyOptions(assemblyOptions);
-    copy->setLockAssembly(cmp.lockAssembly);
-    componentInstanceMap.insert(cmp.uuid, copy->getUuid());
+    copy->setLockAssembly(cmp->lockAssembly);
+    componentInstanceMap.insert(cmp->uuid, copy->getUuid());
     execNewChildCmd(
         new CmdComponentInstanceAdd(mProject.getCircuit(), copy.take()));
   }
