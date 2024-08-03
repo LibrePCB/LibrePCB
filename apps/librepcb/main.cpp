@@ -384,12 +384,21 @@ static int openWorkspace(FilePath& path) {
           &app->window().window_handle()));
 
   class EventFilter : public QObject {
+  public:
     slint::ComponentHandle<ui::AppWindow> app;
     GraphicsScene* scene;
+    QTransform oldTransform;
+    QTransform transform;
 
-  public:
     EventFilter(slint::ComponentHandle<ui::AppWindow> app, GraphicsScene* scene)
-      : QObject(), app(app), scene(scene) {}
+      : QObject(), app(app), scene(scene) {
+      if (scene) {
+        auto center = scene->itemsBoundingRect().center();
+        transform.translate(center.x(), center.y());
+      }
+      oldTransform = transform;
+    }
+
     virtual bool eventFilter(QObject* watched, QEvent* event) override {
       if (event->type() == QEvent::Paint) {
         QWidget* w = static_cast<QWidget*>(watched);
@@ -397,11 +406,12 @@ static int openWorkspace(FilePath& path) {
         QPainter p(w);
         p.setRenderHints(QPainter::Antialiasing |
                          QPainter::SmoothPixmapTransform);
-        QRectF rect(app->get_scene_x(), app->get_scene_y(),
-                    app->get_scene_width(), app->get_scene_height());
-        p.fillRect(rect, Qt::white);
+        QRectF targetRect(app->get_scene_x(), app->get_scene_y(),
+                          app->get_scene_width(), app->get_scene_height());
+        p.fillRect(targetRect, Qt::white);
         if (scene) {
-          scene->render(&p, rect, QRectF());
+          QRectF sourceRect = transform.mapRect(targetRect);
+          scene->render(&p, targetRect, sourceRect);
         }
       }
       return QObject::eventFilter(watched, event);
@@ -410,6 +420,34 @@ static int openWorkspace(FilePath& path) {
 
   EventFilter* filter = new EventFilter(app, schScene);
   widget->installEventFilter(filter);
+  bool moving = false;
+  app->on_pointer_event([&](float x1, float y1, float x0, float y0,
+                            slint::private_api::PointerEvent e) {
+    if (e.button == slint::private_api::PointerEventButton::Left) {
+      if (e.kind == slint::private_api::PointerEventKind::Down) {
+        filter->oldTransform = filter->transform;
+        moving = true;
+      } else if (e.kind == slint::private_api::PointerEventKind::Up) {
+        moving = false;
+      }
+    }
+    if (moving && (e.kind == slint::private_api::PointerEventKind::Move)) {
+      filter->transform = filter->oldTransform;
+      filter->transform.translate(x0 - x1, y0 - y1);
+      app->window().request_redraw();
+    }
+    return slint::private_api::EventResult::Accept;
+  });
+  app->on_scrolled(
+      [&](float x, float y, slint::private_api::PointerScrollEvent e) {
+        QPointF scenePos = filter->transform.map(QPointF(x, y));
+        qreal scaleFactor = qPow(1.3, e.delta_y / qreal(-120));
+        filter->transform.translate(scenePos.x(), scenePos.y());
+        filter->transform.scale(scaleFactor, scaleFactor);
+        filter->transform.translate(-scenePos.x(), -scenePos.y());
+        app->window().request_redraw();
+        return slint::private_api::EventResult::Accept;
+      });
 
   app->show();
 

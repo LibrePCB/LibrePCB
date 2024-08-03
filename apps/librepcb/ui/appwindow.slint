@@ -6,6 +6,10 @@ export struct ListItem {
     selected: bool,
 }
 
+export struct Tab {
+    title: string,
+}
+
 export component AppWindow inherits Window {
     background: #4f4f4f;
     title: "Test";
@@ -35,12 +39,58 @@ export component AppWindow inherits Window {
         }
     }
 
+    in-out property<[Tab]> tabs : [
+        { title: "Tab 1"},
+        { title: "Tab 2"},
+        { title: "Tab 3"},
+    ];
+    tabBar := Rectangle {
+        x: panel.width;
+        y: 0;
+        width: parent.width - panel.width;
+        height: 30px;
+        background: #353535;
+        HorizontalLayout {
+            alignment: LayoutAlignment.start;
+            property<int> current-index : 0;
+            for tab[index] in tabs : Rectangle {
+                width: tabText.preferred-width + 20px;
+                background: (index == current-index) ? root.background : (tabArea.has-hover ? #414141 : #1c1c1c);
+                tabText := Text {
+                    x: 10px;
+                    text: tab.title;
+                    color: white;
+                }
+                tabArea := TouchArea {
+                    clicked => {
+                        current-index = index;
+                    }
+                }
+            }
+        }
+    }
 
     out property<length> scene_x: scene.x;
     out property<length> scene_y: scene.y;
     out property<length> scene_width: scene.width;
     out property<length> scene_height: scene.height;
-    scene := Rectangle {
+    callback pointer_event(length, length, length, length, PointerEvent) -> EventResult;
+    callback scrolled(length, length, PointerScrollEvent) -> EventResult;
+    scene := TouchArea {
+        x: panel.width;
+        y: tabBar.height;
+        width: parent.width - panel.width;
+        height: parent.height - tabBar.height;
+        visible: b1.checked;
+        pointer-event(e) => {
+            return pointer_event(self.mouse-x, self.mouse-y, self.pressed-x, self.pressed-y, e);
+        }
+        scroll-event(e) => {
+            return scrolled(self.mouse-x, self.mouse-y, e);
+        }
+    }
+
+    Rectangle {
         x: panel.width;
         y: 0;
         width: root.width - panel.width;
