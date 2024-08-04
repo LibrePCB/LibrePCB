@@ -28,6 +28,8 @@
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/network/networkaccessmanager.h>
 #include <librepcb/core/project/board/boardplanefragmentsbuilder.h>
+#include <librepcb/core/project/board/board.h>
+#include <librepcb/core/3d/scenedata3d.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectloader.h>
 #include <librepcb/core/workspace/workspace.h>
@@ -41,7 +43,8 @@
 #include <librepcb/editor/widgets/graphicsview.h>
 #include <librepcb/editor/workspace/controlpanel/controlpanel.h>
 #include <librepcb/editor/workspace/initializeworkspacewizard/initializeworkspacewizard.h>
-
+#include <librepcb/editor/widgets/openglview.h>
+#include <librepcb/editor/3d/openglscenebuilder.h>
 #include <QtCore>
 #include <QtWidgets>
 
@@ -69,6 +72,7 @@ static int openWorkspace(FilePath& path);
  ******************************************************************************/
 
 int main(int argc, char* argv[]) {
+  QApplication::setAttribute( Qt::AA_UseDesktopOpenGL );
   QApplication app(argc, argv);
 
   // Give the main thread a higher priority than most other threads as GUI
@@ -352,6 +356,10 @@ static int openWorkspace(FilePath& path) {
   std::unique_ptr<Project> project;
   SchematicGraphicsScene* schScene = nullptr;
   BoardGraphicsScene* brdScene = nullptr;
+  OpenGlView* view3d = new OpenGlView();
+  OpenGlSceneBuilder openglBuilder;
+  QObject::connect(&openglBuilder, &OpenGlSceneBuilder::objectAdded,
+                   view3d, &OpenGlView::addObject);
   try {
     QSettings s;
     const FilePath fp(s.value("controlpanel/last_open_project").toString());
@@ -375,11 +383,14 @@ static int openWorkspace(FilePath& path) {
       brdScene = new BoardGraphicsScene(
           *brd, *lp, std::make_shared<const QSet<const NetSignal*>>());
       brdScene->setBackgroundBrush(Qt::black);
+
+      openglBuilder.start(brd->buildScene3D(tl::nullopt));
     }
   } catch (const Exception& e) {
     qCritical() << e.getMsg();
     return -1;
   }
+
 
   QWidget* widget =
       static_cast<QWidget*>(slint::cbindgen_private::slint_qt_get_widget(
@@ -389,6 +400,7 @@ static int openWorkspace(FilePath& path) {
   public:
     slint::ComponentHandle<ui::AppWindow> app;
     GraphicsScene* scene;
+    OpenGlView* view3d = nullptr;
     QTransform oldTransform;
     QTransform transform;
 
@@ -414,6 +426,9 @@ static int openWorkspace(FilePath& path) {
           p.fillRect(targetRect, scene->backgroundBrush());
           QRectF sourceRect = transform.mapRect(targetRect);
           scene->render(&p, targetRect, sourceRect);
+        } else if (view3d) {
+          view3d->resize(app->get_scene_width(), app->get_scene_height());
+          view3d->render(&p, QPoint(app->get_scene_x(), app->get_scene_y()));
         } else {
           p.fillRect(targetRect, Qt::red);
         }
@@ -456,10 +471,13 @@ static int openWorkspace(FilePath& path) {
   app->on_current_index_changed([&](int index){
     if (index == 0) {
       filter->scene = schScene;
+      filter->view3d = nullptr;
     } else if (index == 1) {
       filter->scene = brdScene;
+      filter->view3d = nullptr;
     } else {
       filter->scene = nullptr;
+      filter->view3d = view3d;
     }
     app->window().request_redraw();
   });

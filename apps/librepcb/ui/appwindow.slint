@@ -92,13 +92,13 @@ export component AppWindow inherits Window {
         }
     }
 
-    Rectangle {
+    in property<image> opengl_scene <=> opengl_image.source;
+    opengl_image := Image {
         x: panel.width;
         y: 0;
         width: root.width - panel.width;
         height: 100%;
         visible: !b1.checked;
-        background: gray;
     }
 
     in-out property<[ListItem]> model : [
