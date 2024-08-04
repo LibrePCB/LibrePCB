@@ -367,12 +367,14 @@ static int openWorkspace(FilePath& path) {
     if (Schematic* sch = project->getSchematicByIndex(0)) {
       schScene = new SchematicGraphicsScene(
           *sch, *lp, std::make_shared<const QSet<const NetSignal*>>());
+      schScene->setBackgroundBrush(Qt::white);
     }
     if (Board* brd = project->getBoardByIndex(0)) {
       BoardPlaneFragmentsBuilder builder;
       builder.runSynchronously(*brd);
       brdScene = new BoardGraphicsScene(
           *brd, *lp, std::make_shared<const QSet<const NetSignal*>>());
+      brdScene->setBackgroundBrush(Qt::black);
     }
   } catch (const Exception& e) {
     qCritical() << e.getMsg();
@@ -408,10 +410,12 @@ static int openWorkspace(FilePath& path) {
                          QPainter::SmoothPixmapTransform);
         QRectF targetRect(app->get_scene_x(), app->get_scene_y(),
                           app->get_scene_width(), app->get_scene_height());
-        p.fillRect(targetRect, Qt::white);
         if (scene) {
+          p.fillRect(targetRect, scene->backgroundBrush());
           QRectF sourceRect = transform.mapRect(targetRect);
           scene->render(&p, targetRect, sourceRect);
+        } else {
+          p.fillRect(targetRect, Qt::red);
         }
       }
       return QObject::eventFilter(watched, event);
@@ -448,6 +452,17 @@ static int openWorkspace(FilePath& path) {
         app->window().request_redraw();
         return slint::private_api::EventResult::Accept;
       });
+
+  app->on_current_index_changed([&](int index){
+    if (index == 0) {
+      filter->scene = schScene;
+    } else if (index == 1) {
+      filter->scene = brdScene;
+    } else {
+      filter->scene = nullptr;
+    }
+    app->window().request_redraw();
+  });
 
   app->show();
 

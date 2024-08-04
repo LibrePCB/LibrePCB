@@ -44,6 +44,7 @@ export component AppWindow inherits Window {
         { title: "Tab 2"},
         { title: "Tab 3"},
     ];
+    callback current_index_changed(int);
     tabBar := Rectangle {
         x: panel.width;
         y: 0;
@@ -52,10 +53,10 @@ export component AppWindow inherits Window {
         background: #353535;
         HorizontalLayout {
             alignment: LayoutAlignment.start;
-            property<int> current-index : 0;
+            property<int> current_index : 0;
             for tab[index] in tabs : Rectangle {
                 width: tabText.preferred-width + 20px;
-                background: (index == current-index) ? root.background : (tabArea.has-hover ? #414141 : #1c1c1c);
+                background: (index == current_index) ? root.background : (tabArea.has-hover ? #414141 : #1c1c1c);
                 tabText := Text {
                     x: 10px;
                     text: tab.title;
@@ -63,7 +64,8 @@ export component AppWindow inherits Window {
                 }
                 tabArea := TouchArea {
                     clicked => {
-                        current-index = index;
+                        current_index = index;
+                        current_index_changed(index);
                     }
                 }
             }
