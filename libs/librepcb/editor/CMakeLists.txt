@@ -34,6 +34,9 @@ add_library(
   dialogs/circlepropertiesdialog.cpp
   dialogs/circlepropertiesdialog.h
   dialogs/circlepropertiesdialog.ui
+  dialogs/circuitidentifierimportdialog.cpp
+  dialogs/circuitidentifierimportdialog.h
+  dialogs/circuitidentifierimportdialog.ui
   dialogs/directorylockhandlerdialog.cpp
   dialogs/directorylockhandlerdialog.h
   dialogs/directorylockhandlerdialog.ui

@@ -87,6 +87,7 @@ private:  // Methods
   bool addNextPin(const Point& pos) noexcept;
   void nameLineEditTextChanged(const QString& text) noexcept;
   void lengthEditValueChanged(const UnsignedLength& value) noexcept;
+  void execMassImport() noexcept;
   QString determineNextPinName() const noexcept;
   bool hasPin(const QString& name) const noexcept;
 

@@ -24,6 +24,7 @@
 
 #include "../../../widgets/graphicsview.h"
 #include "../../editorwidgetbase.h"
+#include "../symbolclipboarddata.h"
 
 #include <librepcb/core/types/layer.h>
 
@@ -47,8 +48,23 @@ SymbolEditorState::~SymbolEditorState() noexcept {
 }
 
 /*******************************************************************************
+ *  Public Methods
+ ******************************************************************************/
+
+std::unique_ptr<SymbolClipboardData>
+    SymbolEditorState::takeDataToPaste() noexcept {
+  return std::move(mDataToPaste);
+}
+
+/*******************************************************************************
  *  Protected Methods
  ******************************************************************************/
+
+void SymbolEditorState::requestPaste(
+    std::unique_ptr<SymbolClipboardData> data) noexcept {
+  mDataToPaste = std::move(data);
+  emit pasteRequested();
+}
 
 const PositiveLength& SymbolEditorState::getGridInterval() const noexcept {
   return mContext.graphicsView.getGridInterval();

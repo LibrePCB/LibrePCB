@@ -22,10 +22,12 @@
  ******************************************************************************/
 #include "symboleditorstate_addpins.h"
 
+#include "../../../dialogs/circuitidentifierimportdialog.h"
 #include "../../../editorcommandset.h"
 #include "../../../widgets/graphicsview.h"
 #include "../../../widgets/unsignedlengthedit.h"
 #include "../../cmd/cmdsymbolpinedit.h"
+#include "../symbolclipboarddata.h"
 #include "../symboleditorwidget.h"
 #include "../symbolgraphicsitem.h"
 #include "../symbolpingraphicsitem.h"
@@ -88,6 +90,14 @@ bool SymbolEditorState_AddPins::entry() noexcept {
   connect(edtLength.get(), &UnsignedLengthEdit::valueChanged, this,
           &SymbolEditorState_AddPins::lengthEditValueChanged);
   mContext.commandToolBar.addWidget(std::move(edtLength));
+
+  std::unique_ptr<QToolButton> toolButtonImport(new QToolButton());
+  toolButtonImport->setIcon(QIcon(":/img/actions/import.png"));
+  toolButtonImport->setText(tr("Mass Import"));
+  toolButtonImport->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+  connect(toolButtonImport.get(), &QToolButton::clicked, this,
+          &SymbolEditorState_AddPins::execMassImport);
+  mContext.commandToolBar.addWidget(std::move(toolButtonImport));
 
   Point pos =
       mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos(), true, true);
@@ -233,6 +243,34 @@ void SymbolEditorState_AddPins::lengthEditValueChanged(
     mEditCmd->setLength(mLastLength, true);
     mEditCmd->setNamePosition(SymbolPin::getDefaultNamePosition(mLastLength),
                               true);
+  }
+}
+
+void SymbolEditorState_AddPins::execMassImport() noexcept {
+  try {
+    CircuitIdentifierImportDialog dlg("symbol_editor/import_pins_dialog",
+                                      &mContext.editorWidget);
+    if (dlg.exec() != QDialog::Accepted) {
+      return;
+    }
+    const QList<CircuitIdentifier> names = dlg.getValues();
+    if (names.isEmpty()) {
+      return;
+    }
+    std::unique_ptr<SymbolClipboardData> data(
+        new SymbolClipboardData(mContext.symbol.getUuid(), Point(0, 0)));
+    Point pos(0, 0);
+    foreach (const auto& name, names) {
+      data->getPins().append(std::make_shared<SymbolPin>(
+          Uuid::createRandom(), name, pos, mLastLength, Angle::deg0(),
+          SymbolPin::getDefaultNamePosition(mLastLength), Angle::deg0(),
+          SymbolPin::getDefaultNameHeight(),
+          SymbolPin::getDefaultNameAlignment()));
+      pos.setY(pos.getY() - Length(2540000));
+    }
+    requestPaste(std::move(data));
+  } catch (const Exception& e) {
+    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
   }
 }
 
