@@ -485,7 +485,9 @@ bool SchematicEditorState_AddComponent::abortCommand(
 std::shared_ptr<const Attribute>
     SchematicEditorState_AddComponent::getToolbarAttribute() const noexcept {
   if (mCurrentComponent) {
-    QString value = mCurrentComponent->getValue();
+    // Only take the first line into account to avoid the problem described at
+    // https://github.com/LibrePCB-Libraries/LibrePCB_Base.lplib/pull/138.
+    QString value = mCurrentComponent->getValue().split("\n").value(0);
     QString key = QString(value).remove("{{").remove("}}").trimmed();
     auto attr = mCurrentComponent->getAttributes().find(key);
     if (attr && value.startsWith("{{") && value.endsWith("}}")) {
@@ -537,6 +539,8 @@ void SchematicEditorState_AddComponent::updateValueToolbar() noexcept {
     mValueComboBox->addItem("{{" + *attribute.getKey() + "}}");
   }
   mValueComboBox->setCurrentText(toSingleLine(mCurrentComponent->getValue()));
+  // Make sure the start of the value is visible, even if the value is long.
+  mValueComboBox->lineEdit()->setCursorPosition(0);
   mValueComboBox->blockSignals(false);
 }
 
