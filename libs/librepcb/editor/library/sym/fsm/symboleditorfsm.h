@@ -151,6 +151,7 @@ private:  // Methods
   bool leaveCurrentState() noexcept;
   bool enterNextState(State state) noexcept;
   bool switchToPreviousState() noexcept;
+  void handlePasteRequest() noexcept;
 
 private:  // Data
   QMap<State, SymbolEditorState*> mStates;

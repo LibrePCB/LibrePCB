@@ -91,7 +91,8 @@ public:
   bool processSelectAll() noexcept override;
   bool processCut() noexcept override;
   bool processCopy() noexcept override;
-  bool processPaste() noexcept override;
+  bool processPaste(
+      std::unique_ptr<SymbolClipboardData> data = nullptr) noexcept override;
   bool processMove(Qt::ArrowType direction) noexcept override;
   bool processRotate(const Angle& rotation) noexcept override;
   bool processMirror(Qt::Orientation orientation) noexcept override;

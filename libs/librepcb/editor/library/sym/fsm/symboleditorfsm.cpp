@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "symboleditorfsm.h"
 
+#include "../symbolclipboarddata.h"
 #include "symboleditorstate_addnames.h"
 #include "symboleditorstate_addpins.h"
 #include "symboleditorstate_addvalues.h"
@@ -369,6 +370,8 @@ bool SymbolEditorFsm::leaveCurrentState() noexcept {
     }
     disconnect(state, &SymbolEditorState::availableFeaturesChanged, this,
                &SymbolEditorFsm::updateAvailableFeatures);
+    disconnect(state, &SymbolEditorState::pasteRequested, this,
+               &SymbolEditorFsm::handlePasteRequest);
   }
   if (mCurrentState != State::SELECT) {
     // Only memorize states other than SELECT.
@@ -387,6 +390,8 @@ bool SymbolEditorFsm::enterNextState(State state) noexcept {
     }
     connect(nextState, &SymbolEditorState::availableFeaturesChanged, this,
             &SymbolEditorFsm::updateAvailableFeatures);
+    connect(nextState, &SymbolEditorState::pasteRequested, this,
+            &SymbolEditorFsm::handlePasteRequest, Qt::QueuedConnection);
   }
   mCurrentState = state;
   emit toolChanged(getCurrentTool());
@@ -399,6 +404,18 @@ bool SymbolEditorFsm::switchToPreviousState() noexcept {
     nextState = State::SELECT;
   }
   return setNextState(nextState);
+}
+
+void SymbolEditorFsm::handlePasteRequest() noexcept {
+  if (SymbolEditorState* oldState = getCurrentState()) {
+    if (auto data = oldState->takeDataToPaste()) {
+      if (setNextState(State::SELECT)) {
+        if (SymbolEditorState* newState = getCurrentState()) {
+          newState->processPaste(std::move(data));
+        }
+      }
+    }
+  }
 }
 
 /*******************************************************************************

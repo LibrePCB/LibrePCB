@@ -371,14 +371,16 @@ bool SymbolEditorState_Select::processCopy() noexcept {
   }
 }
 
-bool SymbolEditorState_Select::processPaste() noexcept {
+bool SymbolEditorState_Select::processPaste(
+    std::unique_ptr<SymbolClipboardData> data) noexcept {
   switch (mState) {
     case SubState::IDLE: {
       try {
         // Get footprint items from clipboard, if none provided.
-        std::unique_ptr<SymbolClipboardData> data =
-            SymbolClipboardData::fromMimeData(
-                qApp->clipboard()->mimeData());  // can throw
+        if (!data) {
+          data = SymbolClipboardData::fromMimeData(
+              qApp->clipboard()->mimeData());  // can throw
+        }
         if (data) {
           return startPaste(std::move(data), tl::nullopt);
         }

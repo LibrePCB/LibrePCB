@@ -41,6 +41,8 @@ class LengthUnit;
 
 namespace editor {
 
+class SymbolClipboardData;
+
 /*******************************************************************************
  *  Class SymbolEditorState
  ******************************************************************************/
@@ -66,6 +68,7 @@ public:
   virtual bool exit() noexcept { return true; }
   virtual QSet<EditorWidgetBase::Feature> getAvailableFeatures()
       const noexcept = 0;
+  std::unique_ptr<SymbolClipboardData> takeDataToPaste() noexcept;
 
   // Event Handlers
   virtual bool processKeyPressed(const QKeyEvent& e) noexcept {
@@ -104,7 +107,11 @@ public:
   virtual bool processSelectAll() noexcept { return false; }
   virtual bool processCut() noexcept { return false; }
   virtual bool processCopy() noexcept { return false; }
-  virtual bool processPaste() noexcept { return false; }
+  virtual bool processPaste(
+      std::unique_ptr<SymbolClipboardData> data = nullptr) noexcept {
+    Q_UNUSED(data);
+    return false;
+  }
   virtual bool processMove(Qt::ArrowType direction) {
     Q_UNUSED(direction);
     return false;
@@ -129,12 +136,17 @@ public:
 signals:
   void availableFeaturesChanged();
   void statusBarMessageChanged(const QString& message, int timeoutMs = -1);
+  void pasteRequested();
 
 protected:  // Methods
+  void requestPaste(std::unique_ptr<SymbolClipboardData> data) noexcept;
   const PositiveLength& getGridInterval() const noexcept;
   const LengthUnit& getLengthUnit() const noexcept;
   static const QSet<const Layer*>& getAllowedTextLayers() noexcept;
   static const QSet<const Layer*>& getAllowedCircleAndPolygonLayers() noexcept;
+
+private:  // Data
+  std::unique_ptr<SymbolClipboardData> mDataToPaste;
 
 protected:  // Data
   Context mContext;
