@@ -97,6 +97,7 @@ public slots:
   bool rotate(const librepcb::Angle& rotation) noexcept override;
   bool mirror(Qt::Orientation orientation) noexcept override;
   bool flip(Qt::Orientation orientation) noexcept override;
+  bool moveAlign() noexcept override;
   bool snapToGrid() noexcept override;
   bool remove() noexcept override;
   bool editProperties() noexcept override;

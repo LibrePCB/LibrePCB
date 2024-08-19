@@ -30,6 +30,7 @@
 #include "../../../dialogs/circlepropertiesdialog.h"
 #include "../../../dialogs/dxfimportdialog.h"
 #include "../../../dialogs/holepropertiesdialog.h"
+#include "../../../dialogs/movealigndialog.h"
 #include "../../../dialogs/polygonpropertiesdialog.h"
 #include "../../../dialogs/stroketextpropertiesdialog.h"
 #include "../../../dialogs/zonepropertiesdialog.h"
@@ -123,6 +124,9 @@ QSet<EditorWidgetBase::Feature>
         features |= EditorWidgetBase::Feature::Rotate;
         features |= EditorWidgetBase::Feature::Mirror;
         features |= EditorWidgetBase::Feature::Flip;
+        if (!cmd.getPositions().isEmpty()) {
+          features |= EditorWidgetBase::Feature::MoveAlign;
+        }
         if (cmd.hasOffTheGridElements()) {
           features |= EditorWidgetBase::Feature::SnapToGrid;
         }
@@ -546,6 +550,17 @@ bool PackageEditorState_Select::processFlip(
   }
 }
 
+bool PackageEditorState_Select::processMoveAlign() noexcept {
+  switch (mState) {
+    case SubState::IDLE: {
+      return moveAlignSelectedItems();
+    }
+    default: {
+      return false;
+    }
+  }
+}
+
 bool PackageEditorState_Select::processSnapToGrid() noexcept {
   switch (mState) {
     case SubState::IDLE:
@@ -918,6 +933,11 @@ bool PackageEditorState_Select::openContextMenuAtPos(
   aFlipVertical->setEnabled(features.contains(EditorWidgetBase::Feature::Flip));
   mb.addAction(aFlipVertical);
   mb.addSeparator();
+  QAction* aMoveAlign = cmd.moveAlign.createAction(
+      &menu, this, &PackageEditorState_Select::moveAlignSelectedItems);
+  aMoveAlign->setEnabled(
+      features.contains(EditorWidgetBase::Feature::MoveAlign));
+  mb.addAction(aMoveAlign);
   QAction* aSnapToGrid = cmd.snapToGrid.createAction(
       &menu, this, &PackageEditorState_Select::snapSelectedItemsToGrid);
   aSnapToGrid->setEnabled(
@@ -1270,6 +1290,35 @@ bool PackageEditorState_Select::mirrorSelectedItems(Qt::Orientation orientation,
     QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
   }
   return true;  // TODO: return false if no items were selected
+}
+
+bool PackageEditorState_Select::moveAlignSelectedItems() noexcept {
+  try {
+    QScopedPointer<CmdDragSelectedFootprintItems> cmdMove(
+        new CmdDragSelectedFootprintItems(mContext));
+    MoveAlignDialog dlg(cmdMove->getPositions(),
+                        "symbol_editor/move_align_dialog",
+                        &mContext.editorWidget);
+    const QPoint globalPos = mContext.graphicsView.mapToGlobal(QPoint(
+        mContext.graphicsView.width(), mContext.graphicsView.height() / 2));
+    dlg.move(globalPos - dlg.geometry().center());
+    connect(&dlg, &MoveAlignDialog::positionsChanged, this,
+            [&](const QList<Point>& positions) {
+              try {
+                cmdMove->setNewPositions(positions);  // can throw
+              } catch (const Exception& e) {
+                QMessageBox::critical(&dlg, tr("Error"), e.getMsg());
+              }
+            });
+    if (dlg.exec() != QDialog::Accepted) {
+      return false;
+    }
+    cmdMove->setNewPositions(dlg.getNewPositions());  // can throw
+    mContext.undoStack.execCmd(cmdMove.take());
+  } catch (const Exception& e) {
+    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+  }
+  return true;
 }
 
 bool PackageEditorState_Select::snapSelectedItemsToGrid() noexcept {

@@ -138,6 +138,7 @@ public:
   bool processRotate(const Angle& rotation) noexcept;
   bool processMirror(Qt::Orientation orientation) noexcept;
   bool processFlip(Qt::Orientation orientation) noexcept;
+  bool processMoveAlign() noexcept;
   bool processSnapToGrid() noexcept;
   bool processRemove() noexcept;
   bool processEditProperties() noexcept;

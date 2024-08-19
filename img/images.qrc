@@ -14,6 +14,8 @@
         <file>actions/add_value.png</file>
         <file>actions/add_value_dark.png</file>
         <file>actions/add_via.png</file>
+        <file>actions/align_horizontally.svg</file>
+        <file>actions/align_vertically.svg</file>
         <file>actions/apply.png</file>
         <file>actions/board_editor.png</file>
         <file>actions/bookmark.png</file>

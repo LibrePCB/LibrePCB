@@ -117,6 +117,7 @@ public:
     Q_UNUSED(orientation);
     return false;
   }
+  virtual bool processMoveAlign() noexcept { return false; }
   virtual bool processSnapToGrid() noexcept { return false; }
   virtual bool processFlip(Qt::Orientation orientation) noexcept {
     Q_UNUSED(orientation);

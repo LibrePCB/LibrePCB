@@ -114,6 +114,7 @@ public:
     Rotate,
     Mirror,
     Flip,
+    MoveAlign,
     SnapToGrid,
     Properties,
   };
@@ -164,6 +165,7 @@ public slots:
     Q_UNUSED(orientation);
     return false;
   }
+  virtual bool moveAlign() noexcept { return false; }
   virtual bool snapToGrid() noexcept { return false; }
   virtual bool remove() noexcept { return false; }
   virtual bool editProperties() noexcept { return false; }

@@ -61,6 +61,12 @@ void CmdHoleEdit::setPath(const NonEmptyPath& path, bool immediate) noexcept {
   if (immediate) mHole.setPath(mNewPath);
 }
 
+void CmdHoleEdit::setPositionOfFirstVertex(const Point& pos,
+                                           bool immediate) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  translate(pos - mNewPath->getVertices().first().getPos(), immediate);
+}
+
 void CmdHoleEdit::translate(const Point& deltaPos, bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   setPath(NonEmptyPath(mNewPath->translated(deltaPos)), immediate);

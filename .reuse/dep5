@@ -123,6 +123,8 @@ Copyright: LibrePCB Developers, see AUTHORS.md
 License: CC0-1.0
 
 Files:
+ img/actions/align_horizontally.svg
+ img/actions/align_vertically.svg
  img/actions/donate_white.svg
 Copyright: Font Awesome
 License: CC-BY-4.0

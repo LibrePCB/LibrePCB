@@ -223,6 +223,7 @@ private:  // Data
   QScopedPointer<QAction> mActionMirrorVertical;
   QScopedPointer<QAction> mActionFlipHorizontal;
   QScopedPointer<QAction> mActionFlipVertical;
+  QScopedPointer<QAction> mActionMoveAlign;
   QScopedPointer<QAction> mActionSnapToGrid;
   QScopedPointer<QAction> mActionProperties;
   QScopedPointer<QAction> mActionRemove;

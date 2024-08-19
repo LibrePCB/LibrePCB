@@ -64,10 +64,12 @@ public:
   // Getters
   int getSelectedItemsCount() const noexcept;
   bool hasOffTheGridElements() const noexcept { return mHasOffTheGridElements; }
+  const QList<Point>& getPositions() const noexcept { return mPositions; }
 
   // General Methods
   void snapToGrid() noexcept;
   void setDeltaToStartPos(const Point& delta) noexcept;
+  void setNewPositions(QList<Point> positions);
   void translate(const Point& deltaPos) noexcept;
   void rotate(const Angle& angle) noexcept;
   void mirrorGeometry(Qt::Orientation orientation) noexcept;
@@ -87,12 +89,14 @@ private:
 
   // Private Member Variables
   const PackageEditorState::Context& mContext;
+  QList<Point> mPositions;
   Point mCenterPos;
   Point mDeltaPos;
   Angle mDeltaRot;
   bool mMirroredGeometry;
   bool mMirroredLayer;
   bool mSnappedToGrid;
+  bool mNewPositionsSet;
   bool mHasOffTheGridElements;
 
   // Move commands
