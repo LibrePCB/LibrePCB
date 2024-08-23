@@ -377,6 +377,10 @@ bool PackageEditorWidget::flip(Qt::Orientation orientation) noexcept {
   return mFsm->processFlip(orientation);
 }
 
+bool PackageEditorWidget::moveAlign() noexcept {
+  return mFsm->processMoveAlign();
+}
+
 bool PackageEditorWidget::snapToGrid() noexcept {
   return mFsm->processSnapToGrid();
 }

@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>librepcb::editor::MoveAlignDialog</class>
+ <widget class="QDialog" name="librepcb::editor::MoveAlignDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>244</width>
+    <height>288</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Move/Align Elements</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="leftMargin">
+    <number>6</number>
+   </property>
+   <property name="topMargin">
+    <number>6</number>
+   </property>
+   <property name="rightMargin">
+    <number>6</number>
+   </property>
+   <property name="bottomMargin">
+    <number>6</number>
+   </property>
+   <item>
+    <widget class="QGroupBox" name="gbxRefPos">
+     <property name="title">
+      <string>Reference Position (Top Left)</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Mode:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QRadioButton" name="rbtnModeAbsolute">
+          <property name="text">
+           <string>Absolute</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="rbtnModeRelative">
+          <property name="text">
+           <string>Relative</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>X:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="librepcb::editor::LengthEdit" name="edtX" native="true"/>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnCenterHorizontally">
+          <property name="toolTip">
+           <string>Center around Y-axis</string>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>:/img/command_toolbars/align_horizontal_center.png</normaloff>:/img/command_toolbars/align_horizontal_center.png</iconset>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Y:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="librepcb::editor::LengthEdit" name="edtY" native="true"/>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnCenterVertically">
+          <property name="toolTip">
+           <string>Center around X-axis</string>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>:/img/command_toolbars/align_vertical_center.png</normaloff>:/img/command_toolbars/align_vertical_center.png</iconset>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="gbxInterval">
+     <property name="title">
+      <string>Pitch</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout_2">
+      <property name="leftMargin">
+       <number>6</number>
+      </property>
+      <property name="topMargin">
+       <number>6</number>
+      </property>
+      <property name="rightMargin">
+       <number>6</number>
+      </property>
+      <property name="bottomMargin">
+       <number>6</number>
+      </property>
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="cbxIntervalX">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>ΔX:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="librepcb::editor::LengthEdit" name="edtIntervalX" native="true">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnVertically">
+          <property name="toolTip">
+           <string>Align vertically (ΔX=0)</string>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>:/img/actions/align_vertically.svg</normaloff>:/img/actions/align_vertically.svg</iconset>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="cbxIntervalY">
+        <property name="text">
+         <string>ΔY:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="librepcb::editor::LengthEdit" name="edtIntervalY" native="true">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnHorizontally">
+          <property name="toolTip">
+           <string>Align horizontally (ΔY=0)</string>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>:/img/actions/align_horizontally.svg</normaloff>:/img/actions/align_horizontally.svg</iconset>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>librepcb::editor::LengthEdit</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/editor/widgets/lengthedit.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>rbtnModeAbsolute</tabstop>
+  <tabstop>rbtnModeRelative</tabstop>
+  <tabstop>edtX</tabstop>
+  <tabstop>btnCenterHorizontally</tabstop>
+  <tabstop>edtY</tabstop>
+  <tabstop>btnCenterVertically</tabstop>
+  <tabstop>cbxIntervalX</tabstop>
+  <tabstop>edtIntervalX</tabstop>
+  <tabstop>btnVertically</tabstop>
+  <tabstop>cbxIntervalY</tabstop>
+  <tabstop>edtIntervalY</tabstop>
+  <tabstop>btnHorizontally</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

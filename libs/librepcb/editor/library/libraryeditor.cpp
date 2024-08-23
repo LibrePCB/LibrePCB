@@ -640,6 +640,9 @@ void LibraryEditor::createActions() noexcept {
   mActionFlipVertical.reset(cmd.flipVertical.createAction(this, this, [this]() {
     if (mCurrentEditorWidget) mCurrentEditorWidget->flip(Qt::Vertical);
   }));
+  mActionMoveAlign.reset(cmd.moveAlign.createAction(this, this, [this]() {
+    if (mCurrentEditorWidget) mCurrentEditorWidget->moveAlign();
+  }));
   mActionSnapToGrid.reset(cmd.snapToGrid.createAction(this, this, [this]() {
     if (mCurrentEditorWidget) mCurrentEditorWidget->snapToGrid();
   }));
@@ -899,6 +902,7 @@ void LibraryEditor::createMenus() noexcept {
   mb.addAction(mActionMirrorVertical);
   mb.addAction(mActionFlipHorizontal);
   mb.addAction(mActionFlipVertical);
+  mb.addAction(mActionMoveAlign);
   mb.addAction(mActionSnapToGrid);
   mb.addSeparator();
   mb.addAction(mActionCopy);
@@ -1000,6 +1004,7 @@ void LibraryEditor::setAvailableFeatures(
   mActionMirrorVertical->setEnabled(features.contains(Feature::Mirror));
   mActionFlipHorizontal->setEnabled(features.contains(Feature::Flip));
   mActionFlipVertical->setEnabled(features.contains(Feature::Flip));
+  mActionMoveAlign->setEnabled(features.contains(Feature::MoveAlign));
   mActionGenerate->setEnabled(features.contains(Feature::GenerateOutline) ||
                               features.contains(Feature::GenerateCourtyard));
   mActionGenerateOutline->setEnabled(

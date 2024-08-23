@@ -724,6 +724,16 @@ public:
       {QKeySequence(Qt::SHIFT | Qt::Key_F)},
       &categoryModify,
   };
+  EditorCommand moveAlign{
+      "move_align",  // clang-format break
+      QT_TR_NOOP("Move/Align Objects"),
+      QT_TR_NOOP("Move and/or align the selected object(s) vertically or "
+                 "horizontally"),
+      ":/img/actions/move.png",
+      EditorCommand::Flags(),
+      {QKeySequence(Qt::Key_A)},
+      &categoryModify,
+  };
   EditorCommand snapToGrid{
       "snap_to_grid",  // clang-format break
       QT_TR_NOOP("Snap to Grid"),

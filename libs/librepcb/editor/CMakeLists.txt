@@ -54,6 +54,9 @@ add_library(
   dialogs/holepropertiesdialog.cpp
   dialogs/holepropertiesdialog.h
   dialogs/holepropertiesdialog.ui
+  dialogs/movealigndialog.cpp
+  dialogs/movealigndialog.h
+  dialogs/movealigndialog.ui
   dialogs/polygonpropertiesdialog.cpp
   dialogs/polygonpropertiesdialog.h
   dialogs/polygonpropertiesdialog.ui

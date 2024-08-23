@@ -53,12 +53,14 @@ CmdDragSelectedFootprintItems::CmdDragSelectedFootprintItems(
     const PackageEditorState::Context& context) noexcept
   : UndoCommandGroup(tr("Drag Footprint Elements")),
     mContext(context),
+    mPositions(),
     mCenterPos(0, 0),
     mDeltaPos(0, 0),
     mDeltaRot(0),
     mMirroredGeometry(false),
     mMirroredLayer(false),
     mSnappedToGrid(false),
+    mNewPositionsSet(false),
     mHasOffTheGridElements(false) {
   Q_ASSERT(context.currentFootprint && context.currentGraphicsItem);
 
@@ -74,6 +76,7 @@ CmdDragSelectedFootprintItems::CmdDragSelectedFootprintItems(
     if (!pad->getObj().getPosition().isOnGrid(grid)) {
       mHasOffTheGridElements = true;
     }
+    mPositions.append(pad->getObj().getPosition());
     ++count;
   }
 
@@ -86,6 +89,7 @@ CmdDragSelectedFootprintItems::CmdDragSelectedFootprintItems(
     if (!circle->getObj().getCenter().isOnGrid(grid)) {
       mHasOffTheGridElements = true;
     }
+    mPositions.append(circle->getObj().getCenter());
     ++count;
   }
 
@@ -112,6 +116,7 @@ CmdDragSelectedFootprintItems::CmdDragSelectedFootprintItems(
     if (!text->getObj().getPosition().isOnGrid(grid)) {
       mHasOffTheGridElements = true;
     }
+    mPositions.append(text->getObj().getPosition());
     ++count;
   }
 
@@ -141,6 +146,7 @@ CmdDragSelectedFootprintItems::CmdDragSelectedFootprintItems(
     if (!pos.isOnGrid(grid)) {
       mHasOffTheGridElements = true;
     }
+    mPositions.append(pos);
     ++count;
   }
 
@@ -195,6 +201,32 @@ void CmdDragSelectedFootprintItems::snapToGrid() noexcept {
 void CmdDragSelectedFootprintItems::setDeltaToStartPos(
     const Point& delta) noexcept {
   translate(delta - mDeltaPos);
+}
+
+void CmdDragSelectedFootprintItems::setNewPositions(QList<Point> positions) {
+  auto takeNext = [&]() {
+    if (positions.isEmpty()) {
+      throw LogicError(__FILE__, __LINE__);
+    }
+    return positions.takeFirst();
+  };
+
+  foreach (CmdFootprintPadEdit* cmd, mPadEditCmds) {
+    cmd->setPosition(takeNext(), true);
+  }
+  foreach (CmdCircleEdit* cmd, mCircleEditCmds) {
+    cmd->setCenter(takeNext(), true);
+  }
+  foreach (CmdStrokeTextEdit* cmd, mTextEditCmds) {
+    cmd->setPosition(takeNext(), true);
+  }
+  foreach (CmdHoleEdit* cmd, mHoleEditCmds) {
+    cmd->setPositionOfFirstVertex(takeNext(), true);
+  }
+  if (!positions.isEmpty()) {
+    throw LogicError(__FILE__, __LINE__);
+  }
+  mNewPositionsSet = true;
 }
 
 void CmdDragSelectedFootprintItems::translate(const Point& deltaPos) noexcept {
@@ -292,7 +324,7 @@ void CmdDragSelectedFootprintItems::mirrorLayer() noexcept {
 
 bool CmdDragSelectedFootprintItems::performExecute() {
   if (mDeltaPos.isOrigin() && (mDeltaRot == 0) && (!mMirroredGeometry) &&
-      (!mMirroredLayer) && (!mSnappedToGrid)) {
+      (!mMirroredLayer) && (!mSnappedToGrid) && (!mNewPositionsSet)) {
     // no movement required --> discard all move commands
     deleteAllCommands();
     return false;

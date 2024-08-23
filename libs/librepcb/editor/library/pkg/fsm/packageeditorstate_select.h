@@ -99,6 +99,7 @@ public:
   bool processRotate(const Angle& rotation) noexcept override;
   bool processMirror(Qt::Orientation orientation) noexcept override;
   bool processFlip(Qt::Orientation orientation) noexcept override;
+  bool processMoveAlign() noexcept override;
   bool processSnapToGrid() noexcept override;
   bool processRemove() noexcept override;
   bool processEditProperties() noexcept override;
@@ -125,6 +126,7 @@ private:  // Methods
   bool rotateSelectedItems(const Angle& angle) noexcept;
   bool mirrorSelectedItems(Qt::Orientation orientation,
                            bool flipLayers) noexcept;
+  bool moveAlignSelectedItems() noexcept;
   bool snapSelectedItemsToGrid() noexcept;
   bool removeSelectedItems() noexcept;
   bool generateOutline() noexcept;
