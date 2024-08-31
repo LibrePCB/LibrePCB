@@ -90,6 +90,7 @@ public:
     ADD_SMT_PADS,
     ADD_HOLES,
     MEASURE,
+    RENUMBER_PADS,
   };
 
   enum class Feature {
@@ -101,6 +102,7 @@ public:
     ExportGraphics,
     GenerateOutline,
     GenerateCourtyard,
+    ReNumberPads,
 
     // Handled by FSM states (dynamic).
     SelectGraphics,

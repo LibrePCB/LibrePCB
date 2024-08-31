@@ -266,6 +266,7 @@ QSet<EditorWidgetBase::Feature> PackageEditorWidget::getAvailableFeatures()
       EditorWidgetBase::Feature::ExportGraphics,
       EditorWidgetBase::Feature::GenerateOutline,
       EditorWidgetBase::Feature::GenerateCourtyard,
+      EditorWidgetBase::Feature::ReNumberPads,
   };
   return features + mFsm->getAvailableFeatures();
 }
@@ -296,6 +297,7 @@ void PackageEditorWidget::connectEditor(
   mToolsActionGroup->setActionEnabled(Tool::DRAW_ZONE, enabled);
   mToolsActionGroup->setActionEnabled(Tool::ADD_HOLES, enabled);
   mToolsActionGroup->setActionEnabled(Tool::MEASURE, true);
+  mToolsActionGroup->setActionEnabled(Tool::RENUMBER_PADS, enabled);
   mToolsActionGroup->setCurrentAction(mFsm->getCurrentTool());
   connect(mFsm.data(), &PackageEditorFsm::toolChanged, mToolsActionGroup,
           &ExclusiveActionGroup::setCurrentAction);
@@ -611,6 +613,8 @@ bool PackageEditorWidget::toolChangeRequested(Tool newTool,
       return mFsm->processStartAddingHoles();
     case Tool::MEASURE:
       return mFsm->processStartMeasure();
+    case Tool::RENUMBER_PADS:
+      return mFsm->processStartReNumberPads();
     default:
       return false;
   }

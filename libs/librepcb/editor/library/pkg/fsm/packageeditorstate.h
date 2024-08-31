@@ -134,6 +134,7 @@ public:
   PackageEditorState& operator=(const PackageEditorState& rhs) = delete;
 
 signals:
+  void abortRequested();
   void availableFeaturesChanged();
   void statusBarMessageChanged(const QString& message, int timeoutMs = -1);
 

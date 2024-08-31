@@ -38,6 +38,7 @@
 #include "packageeditorstate_drawtext.h"
 #include "packageeditorstate_drawzone.h"
 #include "packageeditorstate_measure.h"
+#include "packageeditorstate_renumberpads.h"
 #include "packageeditorstate_select.h"
 
 #include <librepcb/core/application.h>
@@ -107,6 +108,8 @@ PackageEditorFsm::PackageEditorFsm(const Context& context) noexcept
   mStates.insert(State::DRAW_ZONE, new PackageEditorState_DrawZone(mContext));
   mStates.insert(State::ADD_HOLES, new PackageEditorState_AddHoles(mContext));
   mStates.insert(State::MEASURE, new PackageEditorState_Measure(mContext));
+  mStates.insert(State::RENUMBER_PADS,
+                 new PackageEditorState_ReNumberPads(mContext));
 
   foreach (PackageEditorState* state, mStates) {
     connect(state, &PackageEditorState::statusBarMessageChanged, this,
@@ -164,6 +167,8 @@ EditorWidgetBase::Tool PackageEditorFsm::getCurrentTool() const noexcept {
       return EditorWidgetBase::Tool::ADD_HOLES;
     case State::MEASURE:
       return EditorWidgetBase::Tool::MEASURE;
+    case State::RENUMBER_PADS:
+      return EditorWidgetBase::Tool::RENUMBER_PADS;
     default:
       Q_ASSERT(false);
       return EditorWidgetBase::Tool::NONE;
@@ -518,6 +523,10 @@ bool PackageEditorFsm::processStartMeasure() noexcept {
   return setNextState(State::MEASURE);
 }
 
+bool PackageEditorFsm::processStartReNumberPads() noexcept {
+  return setNextState(State::RENUMBER_PADS);
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
@@ -547,6 +556,8 @@ bool PackageEditorFsm::leaveCurrentState() noexcept {
     if (!state->exit()) {
       return false;
     }
+    disconnect(state, &PackageEditorState::abortRequested, this,
+               &PackageEditorFsm::processAbortCommand);
     disconnect(state, &PackageEditorState::availableFeaturesChanged, this,
                &PackageEditorFsm::updateAvailableFeatures);
   }
@@ -565,6 +576,8 @@ bool PackageEditorFsm::enterNextState(State state) noexcept {
     if (!nextState->entry()) {
       return false;
     }
+    connect(nextState, &PackageEditorState::abortRequested, this,
+            &PackageEditorFsm::processAbortCommand, Qt::QueuedConnection);
     connect(nextState, &PackageEditorState::availableFeaturesChanged, this,
             &PackageEditorFsm::updateAvailableFeatures);
   }

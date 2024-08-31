@@ -227,7 +227,7 @@ private:  // Data
   QScopedPointer<QAction> mActionSnapToGrid;
   QScopedPointer<QAction> mActionProperties;
   QScopedPointer<QAction> mActionRemove;
-  QScopedPointer<QAction> mActionGenerate;
+  QScopedPointer<QAction> mActionHelperTools;
   QScopedPointer<QAction> mActionGenerateOutline;
   QScopedPointer<QAction> mActionGenerateCourtyard;
   QScopedPointer<QAction> mActionAbort;
@@ -252,6 +252,7 @@ private:  // Data
   QScopedPointer<QAction> mActionToolZone;
   QScopedPointer<QAction> mActionToolHole;
   QScopedPointer<QAction> mActionToolMeasure;
+  QScopedPointer<QAction> mActionReNumberPads;
 
   // Action groups
   QScopedPointer<UndoStackActionGroup> mUndoStackActionGroup;

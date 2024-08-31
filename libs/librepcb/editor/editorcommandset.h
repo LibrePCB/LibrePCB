@@ -1138,6 +1138,15 @@ public:
       {},
       &categoryTools,
   };
+  EditorCommand toolReNumberPads{
+      "tool_renumber_pads",  // clang-format break
+      QT_TR_NOOP("Re-Number Pads"),
+      QT_TR_NOOP("Helper tool to interactively change pad numbers"),
+      ":/img/actions/wizard.png",
+      EditorCommand::Flag::OpensPopup,
+      {},
+      &categoryTools,
+  };
   EditorCommand toolMeasure{
       "tool_measure",  // clang-format break
       QT_TR_NOOP("Measure Distance"),
@@ -1753,11 +1762,11 @@ public:
       {},
       &categoryContextMenu,
   };
-  EditorCommand generateContent{
+  EditorCommand helperTools{
       // Actually not really for the context menu :-/
-      "generate_content",  // clang-format break
+      "helper_tools",  // clang-format break
       QT_TR_NOOP("Generate Content"),
-      QT_TR_NOOP("Automatically generate some content"),
+      QT_TR_NOOP("Various helper tools to generate or modify objects"),
       ":/img/actions/wizard.png",
       EditorCommand::Flag::OpensPopup,
       {},

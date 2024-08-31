@@ -83,6 +83,7 @@ private:  // Types
     DRAW_ZONE,
     ADD_HOLES,
     MEASURE,
+    RENUMBER_PADS,
   };
 
 public:  // Types
@@ -161,6 +162,7 @@ public:
   bool processStartAddingHoles() noexcept;
   bool processStartDxfImport() noexcept;
   bool processStartMeasure() noexcept;
+  bool processStartReNumberPads() noexcept;
 
   // Operator Overloadings
   PackageEditorFsm& operator=(const PackageEditorFsm& rhs) = delete;
