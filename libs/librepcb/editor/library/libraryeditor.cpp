@@ -652,7 +652,7 @@ void LibraryEditor::createActions() noexcept {
   mActionRemove.reset(cmd.remove.createAction(this, this, [this]() {
     if (mCurrentEditorWidget) mCurrentEditorWidget->remove();
   }));
-  mActionGenerate.reset(cmd.generateContent.createAction(this));
+  mActionHelperTools.reset(cmd.helperTools.createAction(this));
   mActionGenerateOutline.reset(
       cmd.toolGenerateOutline.createAction(this, this, [this]() {
         if (mCurrentEditorWidget)
@@ -690,6 +690,7 @@ void LibraryEditor::createActions() noexcept {
   mActionToolZone.reset(cmd.toolZone.createAction(this));
   mActionToolHole.reset(cmd.toolHole.createAction(this));
   mActionToolMeasure.reset(cmd.toolMeasure.createAction(this));
+  mActionReNumberPads.reset(cmd.toolReNumberPads.createAction(this));
 
   // Undo stack action group.
   mUndoStackActionGroup.reset(new UndoStackActionGroup(
@@ -749,6 +750,8 @@ void LibraryEditor::createActions() noexcept {
                                EditorWidgetBase::Tool::ADD_HOLES);
   mToolsActionGroup->addAction(mActionToolMeasure.data(),
                                EditorWidgetBase::Tool::MEASURE);
+  mToolsActionGroup->addAction(mActionReNumberPads.data(),
+                               EditorWidgetBase::Tool::RENUMBER_PADS);
   mToolsActionGroup->setEnabled(false);
 }
 
@@ -845,12 +848,13 @@ void LibraryEditor::createToolBars() noexcept {
   mToolBarTools->addAction(mActionToolZone.data());
   mToolBarTools->addAction(mActionToolHole.data());
   mToolBarTools->addSeparator();
-  mToolBarTools->addAction(mActionGenerate.data());
+  mToolBarTools->addAction(mActionHelperTools.data());
   if (auto btn = qobject_cast<QToolButton*>(
-          mToolBarTools->widgetForAction(mActionGenerate.data()))) {
+          mToolBarTools->widgetForAction(mActionHelperTools.data()))) {
     QMenu* menu = new QMenu(mToolBarTools.data());
     menu->addAction(mActionGenerateOutline.data());
     menu->addAction(mActionGenerateCourtyard.data());
+    menu->addAction(mActionReNumberPads.data());
     btn->setMenu(menu);
     btn->setPopupMode(QToolButton::InstantPopup);
   }
@@ -953,6 +957,7 @@ void LibraryEditor::createMenus() noexcept {
   mb.addSeparator();
   mb.addAction(mActionGenerateOutline);
   mb.addAction(mActionGenerateCourtyard);
+  mb.addAction(mActionReNumberPads);
   mb.addSeparator();
   mb.addAction(mActionToolMeasure);
 
@@ -1005,12 +1010,13 @@ void LibraryEditor::setAvailableFeatures(
   mActionFlipHorizontal->setEnabled(features.contains(Feature::Flip));
   mActionFlipVertical->setEnabled(features.contains(Feature::Flip));
   mActionMoveAlign->setEnabled(features.contains(Feature::MoveAlign));
-  mActionGenerate->setEnabled(features.contains(Feature::GenerateOutline) ||
-                              features.contains(Feature::GenerateCourtyard));
+  mActionHelperTools->setEnabled(features.contains(Feature::GenerateOutline) ||
+                                 features.contains(Feature::GenerateCourtyard));
   mActionGenerateOutline->setEnabled(
       features.contains(Feature::GenerateOutline));
   mActionGenerateCourtyard->setEnabled(
       features.contains(Feature::GenerateCourtyard));
+  mActionReNumberPads->setEnabled(features.contains(Feature::ReNumberPads));
   mActionImportDxf->setEnabled(features.contains(Feature::ImportGraphics));
   mActionSnapToGrid->setEnabled(features.contains(Feature::SnapToGrid));
   mActionProperties->setEnabled(features.contains(Feature::Properties));

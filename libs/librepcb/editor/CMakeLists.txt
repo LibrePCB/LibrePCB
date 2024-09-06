@@ -326,6 +326,8 @@ add_library(
   library/pkg/fsm/packageeditorstate_drawzone.h
   library/pkg/fsm/packageeditorstate_measure.cpp
   library/pkg/fsm/packageeditorstate_measure.h
+  library/pkg/fsm/packageeditorstate_renumberpads.cpp
+  library/pkg/fsm/packageeditorstate_renumberpads.h
   library/pkg/fsm/packageeditorstate_select.cpp
   library/pkg/fsm/packageeditorstate_select.h
   library/pkg/packagechooserdialog.cpp
