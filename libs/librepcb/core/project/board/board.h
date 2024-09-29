@@ -243,8 +243,8 @@ public:
 
   // Operator Overloadings
   Board& operator=(const Board& rhs) = delete;
-  bool operator==(const Board& rhs) noexcept { return (this == &rhs); }
-  bool operator!=(const Board& rhs) noexcept { return (this != &rhs); }
+  bool operator==(const Board& rhs) const noexcept { return (this == &rhs); }
+  bool operator!=(const Board& rhs) const noexcept { return (this != &rhs); }
 
 signals:
   void attributesChanged();

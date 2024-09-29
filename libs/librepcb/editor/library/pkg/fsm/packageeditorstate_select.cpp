@@ -821,9 +821,10 @@ bool PackageEditorState_Select::openContextMenuAtPos(
 
         int lineIndex = i->getLineIndexAtPosition(pos);
         if (lineIndex >= 0) {
-          QAction* aAddVertex = cmd.vertexAdd.createAction(&menu, this, [=]() {
-            startAddingPolygonVertex(polygon, lineIndex, pos);
-          });
+          QAction* aAddVertex = cmd.vertexAdd.createAction(
+              &menu, this, [this, polygon, lineIndex, pos]() {
+                startAddingPolygonVertex(polygon, lineIndex, pos);
+              });
           aAddVertex->setEnabled(!mContext.editorContext.readOnly);
           mb.addAction(aAddVertex);
         }
@@ -854,9 +855,10 @@ bool PackageEditorState_Select::openContextMenuAtPos(
 
         int lineIndex = i->getLineIndexAtPosition(pos);
         if (lineIndex >= 0) {
-          QAction* aAddVertex = cmd.vertexAdd.createAction(&menu, this, [=]() {
-            startAddingZoneVertex(zone, lineIndex, pos);
-          });
+          QAction* aAddVertex = cmd.vertexAdd.createAction(
+              &menu, this, [this, zone, lineIndex, pos]() {
+                startAddingZoneVertex(zone, lineIndex, pos);
+              });
           aAddVertex->setEnabled(!mContext.editorContext.readOnly);
           mb.addAction(aAddVertex);
         }
