@@ -85,7 +85,12 @@ include(GNUInstallDirs)
 # Create "common" interface library which is used for DRY configuration of
 # build flags.
 add_library(common INTERFACE)
-target_compile_options(common INTERFACE -Wall -Wextra -Wpedantic)
+target_compile_options(common INTERFACE -Wall -Wextra)
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  # Slint generated code leads to warnings which we can suppress only for Clang,
+  # see https://github.com/slint-ui/slint/issues/2681
+  target_compile_options(common INTERFACE -Wpedantic)
+endif()
 if(BUILD_DISALLOW_WARNINGS)
   target_compile_options(common INTERFACE -Werror)
 endif()
@@ -147,6 +152,10 @@ message(STATUS "Building LibrePCB with Qt ${QT_VERSION}")
 # For the ParsEagle library, use the same Qt version as for LibrePCB
 set(PARSEAGLE_QT_MAJOR_VERSION ${QT_MAJOR_VERSION})
 
+# Set Slint options
+set(DEFAULT_SLINT_EMBED_RESOURCES embed-files)
+set(SLINT_STYLE "cosmic-dark")
+
 # Find third party libraries
 find_package(DelaunayTriangulation REQUIRED)
 find_package(Dxflib REQUIRED)
@@ -155,6 +164,7 @@ find_package(GLU REQUIRED)
 find_package(MuParser REQUIRED)
 find_package(OpenCascade REQUIRED)
 find_package(Polyclipping REQUIRED)
+find_package(Slint REQUIRED)
 find_package(TypeSafe REQUIRED)
 if(BUILD_TESTS)
   find_package(GTest REQUIRED)
