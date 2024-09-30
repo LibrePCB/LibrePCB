@@ -1,0 +1,158 @@
+import { ListView } from "std-widgets.slint";
+
+enum FolderTreeItemType {
+    folder,
+    file,
+    project,
+}
+
+struct FolderTreeItem {
+    type: FolderTreeItemType,
+    level: int,
+    icon: image,
+    name: string,
+}
+
+component FolderTree inherits ListView {
+    property <int> current-index: -1;
+    property <length> item-height: 20px;
+    in-out property <[FolderTreeItem]> model;
+
+    preferred-height: model.length * item-height;
+
+    for item[index] in model: Rectangle {
+        width: parent.width;
+        height: item-height;
+        background: (current-index == index) ? #454545 : (touch.has-hover ? #383838 : transparent);
+
+        HorizontalLayout {
+            spacing: 5px;
+            padding-left: (item.type == FolderTreeItemType.project) ? 0px : (item.level * imgIcon.width);
+
+            Text {
+                color: #dddddd;
+                font-size: 14px;
+                font-weight: 700;
+                overflow: TextOverflow.elide;
+                visible: item.type == FolderTreeItemType.folder;
+                width: (item.type == FolderTreeItemType.project) ? 0px : self.preferred-width;
+                text: "▸";
+            }
+
+            imgIcon := Image {
+                y: 1px;
+                width: parent.height - 2px;
+                height: parent.height - 2px;
+                source: item.icon;
+            }
+
+            Text {
+                horizontal-stretch: 1;
+                color: #dddddd;
+                font-size: 14px;
+                font-weight: 700;
+                overflow: TextOverflow.elide;
+                text: item.name;
+            }
+        }
+
+        touch := TouchArea {
+            clicked => {
+                current-index = index;
+            }
+        }
+    }
+}
+
+export component HomePanel inherits Rectangle {
+    background: #2a2a2a;
+
+    VerticalLayout {
+        padding-top: 5px;
+
+        Text {
+            x: 5px;
+            width: root.width;
+            height: self.preferred-height;
+            font-weight: 700;
+            text: @tr("WORKSPACE");
+        }
+
+        Rectangle {
+            height: 1px;
+            background: #555555;
+        }
+
+        FolderTree {
+            vertical-stretch: 2;
+            model: [
+                {
+                    type: FolderTreeItemType.folder,
+                    level: 0,
+                    icon: @image-url("img/library.png"),
+                    name: "my-project",
+                },
+                {
+                    type: FolderTreeItemType.file,
+                    level: 1,
+                    icon: @image-url("img/library.png"),
+                    name: "my-project.lpp",
+                },
+            ];
+        }
+
+        Rectangle { }
+
+        Text {
+            x: 5px;
+            width: root.width;
+            height: self.preferred-height;
+            font-weight: 700;
+            text: @tr("RECENTLY OPENED");
+        }
+
+        Rectangle {
+            height: 1px;
+            background: #555555;
+        }
+
+        FolderTree {
+            vertical-stretch: 0;
+            model: [
+                {
+                    type: FolderTreeItemType.project,
+                    icon: @image-url("img/library.png"),
+                    name: "my-project.lpp",
+                },
+            ];
+        }
+
+        Rectangle { }
+
+        Text {
+            x: 5px;
+            width: root.width;
+            height: self.preferred-height;
+            font-weight: 700;
+            text: @tr("FAVORITES");
+        }
+
+        Rectangle {
+            height: 1px;
+            background: #555555;
+        }
+
+        FolderTree {
+            vertical-stretch: 0;
+            model: [
+                {
+                    type: FolderTreeItemType.project,
+                    icon: @image-url("img/library.png"),
+                    name: "my-project.lpp",
+                },
+            ];
+        }
+
+        Rectangle { }
+    }
+}

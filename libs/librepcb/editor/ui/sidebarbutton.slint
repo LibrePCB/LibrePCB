@@ -1,0 +1,67 @@
+import { Button, VerticalBox } from "std-widgets.slint";
+
+export component SideBarButton inherits Rectangle {
+    in property <image> icon <=> image.source;
+    in property <string> toolTip <=> popupText.text;
+    in property <color> status-background;
+    in property <color> status-color;
+    in property <string> status-text;
+    in-out property <bool> checked: false;
+    callback clicked;
+
+    background: self.checked ? #1c1c1c : (touch.pressed ? #555555 : (touch.has-hover ? #424242 : #353535));
+    height: self.width;
+    Rectangle {
+        x: 0px;
+        width: 3px;
+        background: #d8d8d8;
+        visible: parent.checked;
+    }
+
+    touch := TouchArea {
+        clicked => {
+            root.clicked();
+        }
+    }
+
+    image := Image {
+        width: 70%;
+        height: 70%;
+    }
+
+    status := Rectangle {
+        x: parent.width - self.width - 2px;
+        y: parent.height - self.height - 2px;
+        width: max(lblStatus.preferred-width + 8px, self.height * 1.5);
+        height: lblStatus.preferred-height + 2px;
+        border-radius: self.height / 2;
+        background: status-background;
+        visible: status-text != "";
+        lblStatus := Text {
+            font-size: 10px;
+            font-weight: 700;
+            color: status-color;
+            text: status-text;
+        }
+    }
+
+    popup := Rectangle {
+        x: root.width + 5px;
+        y: (root.height / 2) - (self.height / 2);
+        width: popupText.preferred-width + 10px;
+        height: 25px;
+        background: #3b3b3b;
+        border-radius: 3px;
+        visible: touch.has-hover;
+        opacity: touch.has-hover ? 1 : 0;
+        animate opacity { duration: 150ms; }
+        popupText := Text {
+            x: 5px;
+            color: #ffffffca;
+            horizontal-alignment: TextHorizontalAlignment.left;
+            vertical-alignment: TextVerticalAlignment.center;
+            wrap: TextWrap.no-wrap;
+            overflow: TextOverflow.elide;
+        }
+    }
+}

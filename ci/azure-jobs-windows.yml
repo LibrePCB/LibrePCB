@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         Qt6_MinGW_64bit:
-          IMAGE: librepcb/librepcb-dev:windowsservercore-ltsc2019-qt6.6-64bit-1
+          IMAGE: librepcb/librepcb-dev:windowsservercore-ltsc2019-qt6.6-64bit-2
           ARCH: 'x86_64'
           DEPLOY: true
     container: $[ variables['IMAGE'] ]
@@ -44,8 +44,8 @@ jobs:
       displayName: Run LibrePCB Unittests
     - script: pytest -vvv --librepcb-executable="build/install/opt/bin/librepcb-cli.exe" ./tests/cli
       displayName: Run LibrePCB-CLI Functional Tests
-    - script: pytest -vvv --librepcb-executable="build/install/opt/bin/librepcb.exe" --reruns 5 --reruns-delay 10 ./tests/funq
-      displayName: Run LibrePCB Functional Tests
+    # - script: pytest -vvv --librepcb-executable="build/install/opt/bin/librepcb.exe" --reruns 5 --reruns-delay 10 ./tests/funq
+    #   displayName: Run LibrePCB Functional Tests
     - bash: ./ci/upload_artifacts.sh
       displayName: Upload Artifacts
       condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))

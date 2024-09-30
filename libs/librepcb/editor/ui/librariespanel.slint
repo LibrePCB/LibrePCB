@@ -1,0 +1,195 @@
+import { Button, ListView } from "std-widgets.slint";
+
+struct LibraryListItem {
+    name: string,
+    description: string,
+    icon: image,
+    version: string,
+    is-local: bool,
+    up-to-date: bool,
+}
+
+component LibraryList inherits ListView {
+    property <int> current-index: -1;
+    property <length> item-height: 50px;
+    in property <bool> show-version: false;
+    in property <bool> installed: false;
+    in-out property <[LibraryListItem]> model;
+
+    preferred-height: model.length * item-height;
+
+    for lib[index] in model: Rectangle {
+        width: parent.width;
+        height: item-height;
+        background: (current-index == index) ? #454545 : (touch.has-hover ? #383838 : transparent);
+
+        imgIcon := Image {
+            x: 3px;
+            y: 3px;
+            width: parent.height - 6px;
+            height: parent.height - 6px;
+            source: lib.icon;
+        }
+
+        lblName := Text {
+            x: imgIcon.width + 10px;
+            y: imgIcon.y;
+            width: pillVersion.x - self.x - 5px;
+            color: #dddddd;
+            font-size: 14px;
+            font-weight: 700;
+            overflow: TextOverflow.elide;
+            text: lib.name;
+        }
+
+        lblDesc := Text {
+            x: lblName.x;
+            y: lblName.y + lblName.height;
+            width: (btnInstall.visible ? btnInstall.x : btnUninstall.x) - self.x - 5px;
+            height: parent.height - self.y;
+            vertical-alignment: TextVerticalAlignment.center;
+            color: #dddddd;
+            font-size: 11px;
+            font-weight: 700;
+            overflow: TextOverflow.elide;
+            text: lib.description;
+            wrap: TextWrap.word-wrap;
+        }
+
+        pillVersion := Rectangle {
+            x: parent.width - self.width - 5px;
+            y: 3px;
+            width: lblVersion.preferred-width + 10px;
+            height: lblVersion.preferred-height + 2px;
+            background: lib.is-local ? black : (lib.up-to-date ? #006600 : #aa0000);
+            border-radius: self.height / 2;
+            visible: show-version;
+            lblVersion := Text {
+                color: white;
+                font-size: 11px;
+                text: lib.is-local ? ("local | " + lib.version) : lib.version;
+            }
+        }
+
+        touch := TouchArea {
+            clicked => {
+                current-index = index;
+            }
+
+            btnInstall := Button {
+                x: btnUninstall.visible ? (btnUninstall.x - self.width - 2px) : btnUninstall.x;
+                y: parent.height - self.height - 2px;
+                height: 26px;
+                visible: (!installed) || (!lib.up-to-date);
+                icon: @image-url("img/download.svg");
+            }
+
+            btnUninstall := Button {
+                x: parent.width - self.width - 2px;
+                y: parent.height - self.height - 2px;
+                height: 26px;
+                visible: installed;
+                icon: @image-url("img/delete.svg");
+            }
+        }
+    }
+}
+
+export component LibrariesPanel inherits Rectangle {
+    background: #2a2a2a;
+
+    VerticalLayout {
+        padding-top: 5px;
+
+        Text {
+            x: 5px;
+            width: root.width;
+            height: self.preferred-height;
+            font-weight: 700;
+            text: @tr("INSTALLED");
+        }
+
+        Rectangle {
+            height: 1px;
+            background: #555555;
+        }
+
+        LibraryList {
+            installed: true;
+            show-version: true;
+            vertical-stretch: 0;
+            model: [
+                {
+                    name: "My Library",
+                    description: "My own local library.",
+                    icon: @image-url("img/library.png"),
+                    version: "v1.0",
+                    is-local: true,
+                    up-to-date: true,
+                },
+                {
+                    name: "LibrePCB Base",
+                    description: "Official LibrePCB Base Library",
+                    icon: @image-url("img/librepcb.png"),
+                    is-local: false,
+                    version: "v1.2.3",
+                    up-to-date: true,
+                },
+                {
+                    name: "Microchip Technology / Atmel",
+                    description: "Integrated circuits and more (unofficial).",
+                    icon: @image-url("img/microchip.png"),
+                    version: "v0.5",
+                    is-local: false,
+                    up-to-date: false,
+                },
+            ];
+        }
+
+        Button {
+            text: @tr("Update all");
+        }
+
+        Rectangle { }
+
+        Text {
+            x: 5px;
+            width: root.width;
+            height: self.preferred-height;
+            font-weight: 700;
+            text: @tr("AVAILABLE");
+        }
+
+        Rectangle {
+            height: 1px;
+            background: #555555;
+        }
+
+        LibraryList {
+            vertical-stretch: 0;
+            installed: false;
+            model: [
+                {
+                    name: "LibrePCB Integrated Circuits",
+                    description: "Official LibrePCB Integrated Circuits Library",
+                    icon: @image-url("img/librepcb.png"),
+                    is-local: false,
+                    up-to-date: true,
+                },
+                {
+                    name: "Microchip Technology / Atmel",
+                    description: "Integrated circuits and more (unofficial).",
+                    icon: @image-url("img/microchip.png"),
+                    is-local: false,
+                    up-to-date: false,
+                },
+            ];
+        }
+
+        Button {
+            text: @tr("Install all");
+        }
+
+        Rectangle { }
+    }
+}

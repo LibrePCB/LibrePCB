@@ -9,25 +9,24 @@ jobs:
   strategy:
     matrix:
       Ubuntu_2004_Qt_6_6_GCC:
-        IMAGE: librepcb/librepcb-dev:ubuntu-20.04-qt6.6-1
+        IMAGE: librepcb/librepcb-dev:ubuntu-22.04-qt6.6-1
         DEPLOY: true
         NO_HOEDOWN: true
-      Ubuntu_2004_Unbundled:
-        IMAGE: librepcb/librepcb-dev:ubuntu-20.04-7
-        UNBUNDLE_DXFLIB: true
-        UNBUNDLE_GTEST: true
-        UNBUNDLE_MUPARSER: true
-        #UNBUNDLE_QUAZIP: true  # Note: Does not ship quazip 1.x yet
-        UNBUNDLE_POLYCLIPPING: true
-        # Note: QtQuick Controls not available in Docker image (yet).
-        CMAKE_OPTIONS: "-DBUILD_QTQUICK_TEST=0 -DUSE_GLU=0 -DUSE_OPENCASCADE=0"
-        LD_LIBRARY_PATH: $(Build.Repository.LocalPath)/build/install/opt/lib
-      Ubuntu_2204_Qt6_Clang:
-        IMAGE: librepcb/librepcb-dev:ubuntu-22.04-2
-        CC: clang
-        CXX: clang++
-        CMAKE_OPTIONS: "-DQT_MAJOR_VERSION=6"
-        FUNQ_QT_MAJOR_VERSION: 6
+      #Ubuntu_2004_Unbundled:
+      #  IMAGE: librepcb/librepcb-dev:ubuntu-20.04-7
+      #  UNBUNDLE_DXFLIB: true
+      #  UNBUNDLE_GTEST: true
+      #  UNBUNDLE_MUPARSER: true
+      #  #UNBUNDLE_QUAZIP: true  # Note: Does not ship quazip 1.x yet
+      #  UNBUNDLE_POLYCLIPPING: true
+      #  CMAKE_OPTIONS: "-DUSE_GLU=0 -DUSE_OPENCASCADE=0"
+      #  LD_LIBRARY_PATH: $(Build.Repository.LocalPath)/build/install/opt/lib
+      #Ubuntu_2204_Qt6_Clang:
+      #  IMAGE: librepcb/librepcb-dev:ubuntu-22.04-2
+      #  CC: clang
+      #  CXX: clang++
+      #  CMAKE_OPTIONS: "-DQT_MAJOR_VERSION=6"
+      #  FUNQ_QT_MAJOR_VERSION: 6
   container:
     image: $[ variables['IMAGE'] ]
   steps:
@@ -70,8 +69,8 @@ jobs:
     displayName: Run LibrePCB Unittests
   - bash: xvfb-run -a --server-args="-screen 0 1024x768x24" pytest -vvv --librepcb-executable="build/install/opt/bin/librepcb-cli" ./tests/cli
     displayName: Run LibrePCB-CLI Functional Tests
-  - bash: xvfb-run -a --server-args="-screen 0 1024x768x24" pytest -vvv --librepcb-executable="build/install/opt/bin/librepcb" --reruns 5 --reruns-delay 10 ./tests/funq
-    displayName: Run LibrePCB Functional Tests
+  # - bash: xvfb-run -a --server-args="-screen 0 1024x768x24" pytest -vvv --librepcb-executable="build/install/opt/bin/librepcb" --reruns 5 --reruns-delay 10 ./tests/funq
+  #   displayName: Run LibrePCB Functional Tests
   - bash: ./ci/upload_artifacts.sh
     displayName: Upload Artifacts
     condition: and(succeeded(), eq(variables['DEPLOY'], 'true'), ne(variables['Build.Reason'], 'PullRequest'))

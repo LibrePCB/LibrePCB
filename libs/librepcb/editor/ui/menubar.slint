@@ -1,0 +1,93 @@
+struct MenuItemData {
+    text: string,
+}
+
+struct MainMenuItemData {
+    text: string,
+    items: [MenuItemData],
+}
+
+component MenuItem inherits Rectangle {
+    in property <string> text <=> txt.text;
+    preferred-width: txt.preferred-width + 20px;
+    height: txt.preferred-height + 10px;
+    background: touch.has-hover ? #505050 : #353535;
+
+    txt := Text {
+        x: 10px;
+        width: 100%;
+    }
+
+    touch := TouchArea { }
+}
+
+component Menu inherits PopupWindow {
+    in property <[MenuItemData]> items;
+    Rectangle {
+        background: #353535;
+        VerticalLayout {
+
+            for item in items: MenuItem {
+                text: item.text;
+            }
+        }
+    }
+}
+
+component MainMenuItem inherits Rectangle {
+    in property <string> text <=> txt.text;
+    in property <[MenuItemData]> items;
+
+    width: txt.preferred-width + 20px;
+    background: touch.has-hover ? #505050 : #353535;
+
+    txt := Text {
+        x: 10px;
+        font-size: 13px;
+    }
+
+    touch := TouchArea {
+        clicked => {
+            menu.show();
+        }
+    }
+
+    menu := Menu {
+        x: 0;
+        y: 22px;
+        items: items;
+    }
+}
+
+export component MenuBar inherits Rectangle {
+    property <[MainMenuItemData]> items: [
+        {
+            text: "File",
+            items: [{ text: "Open project" }, { text: "Quit" }],
+        },
+        {
+            text: "Edit",
+            items: [{ text: "Test 1" }, { text: "Test 2" }],
+        },
+        {
+            text: "View",
+            items: [{ text: "Test 1" }, { text: "Test 2" }],
+        },
+        {
+            text: "Help",
+            items: [{ text: "Test 1" }, { text: "Test 2" }],
+        },
+    ];
+
+    x: 0;
+    y: 0;
+    height: 22px;
+    background: #353535;
+
+    HorizontalLayout {
+        for item in items: MainMenuItem {
+            text: item.text;
+            items: item.items;
+        }
+    }
+}
