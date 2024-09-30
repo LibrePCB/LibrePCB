@@ -22,6 +22,9 @@
  ******************************************************************************/
 #include "mainwindow.h"
 
+#include "guiapplication.h"
+#include "library/librariesmodel.h"
+
 #include <librepcb/core/application.h>
 #include <librepcb/core/types/lengthunit.h>
 #include <librepcb/core/workspace/workspace.h>
@@ -34,33 +37,43 @@
  ******************************************************************************/
 namespace librepcb {
 namespace editor {
+namespace app {
 
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
-MainWindow::MainWindow(Workspace& ws, QObject* parent) noexcept
-  : QObject(parent), mWorkspace(ws), mWindow(ui::AppWindow::create()) {
+MainWindow::MainWindow(GuiApplication& app, QObject* parent) noexcept
+  : QObject(parent), mApp(app), mWindow(ui::AppWindow::create()) {
   mWindow->set_window_title(
       QString("LibrePCB %1").arg(Application::getVersion()).toUtf8().data());
-  mWindow->set_workspace_path(ws.getPath().toNative().toUtf8().data());
+  mWindow->set_workspace_path(
+      app.getWorkspace().getPath().toNative().toUtf8().data());
 
-  QObject::connect(&ws.getLibraryDb(), &WorkspaceLibraryDb::scanProgressUpdate,
-                   this, [this](int progress) {
+  QObject::connect(&app.getWorkspace().getLibraryDb(),
+                   &WorkspaceLibraryDb::scanProgressUpdate, this,
+                   [this](int progress) {
                      mWindow->set_status_progress(progress / qreal(100));
                    });
-  ws.getLibraryDb().startLibraryRescan();
 
-  mWindow->global<ui::LengthEditGlobals>().on_parse_length_input(
+  mWindow->global<ui::Globals>().on_menu_item_triggered(
+      [this](ui::MenuItemId id) { menuItemTriggered(id); });
+
+  mWindow->global<ui::Globals>().set_installed_libraries(
+      mApp.getInstalledLibraries());
+  mWindow->global<ui::Globals>().set_available_libraries(
+      mApp.getAvailableLibraries());
+
+  mWindow->global<ui::Globals>().on_parse_length_input(
       [](slint::SharedString text, slint::SharedString unit) {
-        ui::LengthEditParseResult res{false, text, unit};
+        ui::EditParseResult res{false, text, unit};
         try {
           QString value = text.begin();
           foreach (const LengthUnit& unit, LengthUnit::getAllUnits()) {
             foreach (const QString& suffix, unit.getUserInputSuffixes()) {
               if (value.endsWith(suffix)) {
                 value.chop(suffix.length());
-                res.evaluatedUnit = unit.toShortStringTr().toStdString();
+                res.evaluated_unit = unit.toShortStringTr().toStdString();
               }
             }
           }
@@ -69,7 +82,7 @@ MainWindow::MainWindow(Workspace& ws, QObject* parent) noexcept
           if (value.endsWith(".0")) {
             value.chop(2);
           }
-          res.evaluatedValue = value.toStdString();
+          res.evaluated_value = value.toStdString();
           res.valid = true;
         } catch (const Exception& e) {
         }
@@ -85,12 +98,24 @@ MainWindow::~MainWindow() noexcept {
 }
 
 /*******************************************************************************
- *  General Methods
+ *  Private Methods
  ******************************************************************************/
+
+void MainWindow::menuItemTriggered(ui::MenuItemId id) noexcept {
+  switch (id) {
+    case ui::MenuItemId::NewWindow:
+      mApp.newWindow();
+      break;
+    default:
+      qWarning() << "Unknown menu item triggered:" << static_cast<int>(id);
+      break;
+  }
+}
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace app
 }  // namespace editor
 }  // namespace librepcb

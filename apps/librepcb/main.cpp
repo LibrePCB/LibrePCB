@@ -20,6 +20,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "guiapplication.h"
+
 #include <librepcb/core/3d/scenedata3d.h>
 #include <librepcb/core/application.h>
 #include <librepcb/core/debug.h>
@@ -38,7 +40,6 @@
 #include <librepcb/editor/dialogs/directorylockhandlerdialog.h>
 #include <librepcb/editor/editorcommandset.h>
 #include <librepcb/editor/graphics/defaultgraphicslayerprovider.h>
-#include <librepcb/editor/mainwindow.h>
 #include <librepcb/editor/project/boardeditor/boardgraphicsscene.h>
 #include <librepcb/editor/project/partinformationprovider.h>
 #include <librepcb/editor/project/schematiceditor/schematicgraphicsscene.h>
@@ -57,6 +58,7 @@
  ******************************************************************************/
 using namespace librepcb;
 using namespace librepcb::editor;
+using namespace librepcb::editor::app;
 
 /*******************************************************************************
  *  Function Prototypes
@@ -477,9 +479,8 @@ static int openWorkspace(FilePath& path) {
 
   win->show();*/
 
-  MainWindow win(ws);
-
-  // Run the event loop.
-  slint::run_event_loop();
+  // Run the application.
+  GuiApplication app(ws);
+  app.exec();
   return 0;
 }

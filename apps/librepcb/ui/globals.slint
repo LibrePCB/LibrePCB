@@ -1,0 +1,71 @@
+export enum MenuItemId {
+    new-window,
+}
+
+export struct Library {
+    id: string,
+    name: string,
+    description: string,
+    icon: image,
+    version: string,
+    is-local: bool,
+    up-to-date: bool,
+}
+
+export struct EditParseResult {
+    valid: bool,
+    evaluated-value: string,
+    evaluated-unit: string,
+}
+
+export global Globals {
+    pure callback menu-item-triggered(MenuItemId);
+
+    pure callback parse-length-input(string, string) -> EditParseResult;
+
+    in property <bool> refreshing-available-libraries: false;
+
+    in property <[Library]> installed-libraries: [
+        {
+            name: "My Library",
+            description: "My own local library.",
+            icon: @image-url("img/library.png"),
+            version: "v1.0",
+            is-local: true,
+            up-to-date: true,
+        },
+        {
+            name: "LibrePCB Base",
+            description: "Official LibrePCB Base Library",
+            icon: @image-url("img/librepcb.png"),
+            is-local: false,
+            version: "v1.2.3",
+            up-to-date: true,
+        },
+        {
+            name: "Microchip Technology / Atmel",
+            description: "Integrated circuits and more (unofficial).",
+            icon: @image-url("img/microchip.png"),
+            version: "v0.5",
+            is-local: false,
+            up-to-date: false,
+        },
+    ];
+
+    in property <[Library]> available-libraries: [
+        {
+            name: "LibrePCB Integrated Circuits",
+            description: "Official LibrePCB Integrated Circuits Library",
+            icon: @image-url("img/librepcb.png"),
+            is-local: false,
+            up-to-date: true,
+        },
+        {
+            name: "Microchip Technology / Atmel",
+            description: "Integrated circuits and more (unofficial).",
+            icon: @image-url("img/microchip.png"),
+            is-local: false,
+            up-to-date: false,
+        },
+    ];
+}

@@ -10,8 +10,18 @@ add_executable(
   WIN32
   # When building on macOS, create a bundle
   MACOSX_BUNDLE
-  ../../img/images.qrc main.cpp
+  # Resources
+  ../../img/images.qrc
+  # Sources
+  guiapplication.cpp
+  guiapplication.h
+  library/librariesmodel.cpp
+  library/librariesmodel.h
+  main.cpp
+  mainwindow.cpp
+  mainwindow.h
 )
+slint_target_sources(librepcb ui/appwindow.slint NAMESPACE ui)
 target_include_directories(
   librepcb
   PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../../libs"
@@ -22,6 +32,8 @@ target_link_libraries(
           # LibrePCB
           LibrePCB::Editor
           LibrePCB::Core
+          # Third party
+          Slint::Slint
           # Qt
           ${QT}::Core
           ${QT}::Gui

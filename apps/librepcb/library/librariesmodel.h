@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_MAINWINDOW_H
-#define LIBREPCB_EDITOR_MAINWINDOW_H
+#ifndef LIBREPCB_LIBRARY_LIBRARIESMODEL_H
+#define LIBREPCB_LIBRARY_LIBRARIESMODEL_H
 
 /*******************************************************************************
  *  Includes
@@ -27,44 +27,57 @@
 
 #include <QtCore>
 
+#include <vector>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
 class Workspace;
+class ApiEndpoint;
 
 namespace editor {
+namespace app {
 
 /*******************************************************************************
- *  Class MainWindow
+ *  Class LibrariesModel
  ******************************************************************************/
 
 /**
- * @brief The MainWindow class
+ * @brief The LibrariesModel class
  */
-class MainWindow : public QObject {
+class LibrariesModel : public QObject, public slint::Model<ui::Library> {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  MainWindow() = delete;
-  MainWindow(const MainWindow& other) = delete;
-  explicit MainWindow(Workspace& ws, QObject* parent = nullptr) noexcept;
-  virtual ~MainWindow() noexcept;
+  LibrariesModel() = delete;
+  LibrariesModel(const LibrariesModel& other) = delete;
+  explicit LibrariesModel(Workspace& ws, QObject* parent = nullptr) noexcept;
+  virtual ~LibrariesModel() noexcept;
+
+  // General Methods
+  std::size_t row_count() const override;
+  std::optional<ui::Library> row_data(std::size_t i) const override;
 
   // Operator Overloadings
-  MainWindow& operator=(const MainWindow& rhs) = delete;
+  LibrariesModel& operator=(const LibrariesModel& rhs) = delete;
 
 private:
+  void refreshLocalLibraries() noexcept;
+  void refreshRemoteLibraries() noexcept;
+
   Workspace& mWorkspace;
-  slint::ComponentHandle<ui::AppWindow> mWindow;
+  QList<std::shared_ptr<ApiEndpoint>> mApiEndpointsInProgress;
+  std::vector<ui::Library> mLibs;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace app
 }  // namespace editor
 }  // namespace librepcb
 

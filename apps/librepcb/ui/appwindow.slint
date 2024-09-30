@@ -1,19 +1,20 @@
 import { Button, ProgressIndicator, StandardButton } from "std-widgets.slint";
 import { SideBar, MainPage } from "./sidebar.slint";
-import { LengthEdit, LengthEditGlobals } from "./lengthedit.slint";
+import { LengthEdit } from "./lengthedit.slint";
 import { LibrariesPanel } from "./librariespanel.slint";
 import { ProjectsPanel } from "./projectspanel.slint";
 import { HomePanel } from "./homepanel.slint";
 import { MenuBar } from "./menubar.slint";
+import { Globals } from "./globals.slint";
 
-export { LengthEditGlobals }
+export { Globals }
 
 export struct Tab {
     title: string,
 }
 
 export component AppWindow inherits Window {
-    property <length> panel-width: (self.width <= 800px) ? 250px : 300px;
+    property <length> panel-width: (self.width <= 800px) ? 250px : 350px;
     in property <string> window-title <=> self.title;
 
     background: #4f4f4f;
@@ -60,6 +61,7 @@ export component AppWindow inherits Window {
         { title: "Tab 2" },
         { title: "Tab 3" },
     ];
+    y: 0mm;
     callback current_index_changed(int);
     tabBar := Rectangle {
         x: sideBar.width + panel-width;
