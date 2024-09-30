@@ -23,10 +23,10 @@ cp -r "./build/install/opt/share" "./build/install/opt/LibrePCB.app/Contents/"
 # https://github.com/orgs/Homebrew/discussions/2823.
 # Note: The last 3 symlinks are required for QtQuick.
 fix_macdeployqt () {
-  ln -s $1 ./lib  # https://github.com/orgs/Homebrew/discussions/2823
-  ln -s $1 ../lib
-  rm -rf ../../lib && ln -s $1 ../../lib  # Directory already exists.
-  ln -s $1 ../../../lib
+  ln -fs $1 ./lib  # https://github.com/orgs/Homebrew/discussions/2823
+  ln -fs $1 ../lib
+  rm -rf ../../lib && ln -fs $1 ../../lib  # Directory already exists.
+  ln -fs $1 ../../../lib
 }
 
 # Build bundle
@@ -34,6 +34,7 @@ pushd "./build/install/opt/"  # Avoid having path in DMG name
 dylibbundler -ns -od -b \
   -x LibrePCB.app/Contents/MacOS/librepcb \
   -x LibrePCB.app/Contents/MacOS/librepcb-cli \
+  -x lib/libslint_cpp.dylib \
   -d LibrePCB.app/Contents/Frameworks/ \
   -p @executable_path/../Frameworks/
 if [ "$ARCH" = "arm64" ]
@@ -46,6 +47,7 @@ then
   macdeployqt "LibrePCB.app" -always-overwrite \
     -executable="./LibrePCB.app/Contents/MacOS/librepcb" \
     -executable="./LibrePCB.app/Contents/MacOS/librepcb-cli" \
+    -executable="./LibrePCB.app/Contents/Frameworks/libslint_cpp.dylib" \
     -qmldir="./LibrePCB.app/Contents/share/librepcb/qml"
   codesign --force --deep -s - ./LibrePCB.app/Contents/MacOS/librepcb
   codesign --force --deep -s - ./LibrePCB.app/Contents/MacOS/librepcb-cli
@@ -61,6 +63,7 @@ else
       macdeployqt "LibrePCB.app" -dmg -always-overwrite \
         -executable="./LibrePCB.app/Contents/MacOS/librepcb" \
         -executable="./LibrePCB.app/Contents/MacOS/librepcb-cli" \
+        -executable="./LibrePCB.app/Contents/Frameworks/libslint_cpp.dylib" \
         -qmldir="./LibrePCB.app/Contents/share/librepcb/qml"
       sleep 5
     fi
