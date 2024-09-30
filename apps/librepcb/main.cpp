@@ -20,20 +20,37 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/core/3d/scenedata3d.h>
 #include <librepcb/core/application.h>
 #include <librepcb/core/debug.h>
 #include <librepcb/core/exceptions.h>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/network/networkaccessmanager.h>
+#include <librepcb/core/project/board/board.h>
+#include <librepcb/core/project/board/boardplanefragmentsbuilder.h>
+#include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectloader.h>
+#include <librepcb/core/types/length.h>
 #include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <librepcb/core/workspace/workspacesettings.h>
+#include <librepcb/editor/3d/openglscenebuilder.h>
 #include <librepcb/editor/dialogs/directorylockhandlerdialog.h>
 #include <librepcb/editor/editorcommandset.h>
+#include <librepcb/editor/graphics/defaultgraphicslayerprovider.h>
+#include <librepcb/editor/mainwindow.h>
+#include <librepcb/editor/project/boardeditor/boardgraphicsscene.h>
 #include <librepcb/editor/project/partinformationprovider.h>
+#include <librepcb/editor/project/schematiceditor/schematicgraphicsscene.h>
+#include <librepcb/editor/widgets/graphicsview.h>
+#include <librepcb/editor/widgets/openglview.h>
 #include <librepcb/editor/workspace/controlpanel/controlpanel.h>
 #include <librepcb/editor/workspace/initializeworkspacewizard/initializeworkspacewizard.h>
 
 #include <QtCore>
 #include <QtWidgets>
+
+#include <slint.h>
 
 /*******************************************************************************
  *  Namespace
@@ -51,13 +68,13 @@ static void writeLogHeader() noexcept;
 static int runApplication() noexcept;
 static bool isFileFormatStableOrAcceptUnstable() noexcept;
 static int openWorkspace(FilePath& path);
-static int appExec() noexcept;
 
 /*******************************************************************************
  *  main()
  ******************************************************************************/
 
 int main(int argc, char* argv[]) {
+  QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
   QApplication app(argc, argv);
 
   // Give the main thread a higher priority than most other threads as GUI
@@ -323,30 +340,146 @@ static int openWorkspace(FilePath& path) {
                    &WorkspaceSettingsItem::edited,
                    &ws.getSettings().keyboardShortcuts, applyKeyboardShortcuts);
 
-  // Open the control panel.
-  ControlPanel p(ws, wizard.getWorkspaceContainsNewerFileFormats());
-  p.show();
+  // auto model = std::make_shared<slint::VectorModel<ui::ListItem>>();
+  // model->push_back(ui::ListItem{"1", false});
+  // model->push_back(ui::ListItem{"2", false});
+  // model->push_back(ui::ListItem{"3", false});
+  // win->set_model(model);
 
-  return appExec();
-}
-
-/*******************************************************************************
- *  appExec()
- ******************************************************************************/
-
-static int appExec() noexcept {
-  // please note that we shouldn't show a dialog or message box in the catch()
-  // blocks! from http://qt-project.org/doc/qt-5/exceptionsafety.html:
-  //      "After an exception is thrown, the connection to the windowing server
-  //      might already be closed. It is not safe to call a GUI related function
-  //      after catching an exception."
+  // Open project.
+  std::unique_ptr<Project> project;
+  SchematicGraphicsScene* schScene = nullptr;
+  BoardGraphicsScene* brdScene = nullptr;
+  OpenGlView* view3d = new OpenGlView();
+  OpenGlSceneBuilder openglBuilder;
+  QObject::connect(&openglBuilder, &OpenGlSceneBuilder::objectAdded, view3d,
+                   &OpenGlView::addObject);
   try {
-    return QApplication::exec();
-  } catch (std::exception& e) {
-    qFatal("UNCAUGHT EXCEPTION: %s --- PROGRAM EXITED", e.what());
-  } catch (...) {
-    qFatal("UNCAUGHT EXCEPTION --- PROGRAM EXITED");
+    QSettings s;
+    const FilePath fp(s.value("controlpanel/last_open_project").toString());
+    std::shared_ptr<TransactionalFileSystem> fs =
+        TransactionalFileSystem::openRW(fp.getParentDir());
+    ProjectLoader loader;
+    project = loader.open(
+        std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(fs)),
+        fp.getFilename());  // can throw
+
+    DefaultGraphicsLayerProvider* lp =
+        new DefaultGraphicsLayerProvider(ws.getSettings().themes.getActive());
+    if (Schematic* sch = project->getSchematicByIndex(0)) {
+      schScene = new SchematicGraphicsScene(
+          *sch, *lp, std::make_shared<const QSet<const NetSignal*>>());
+      schScene->setBackgroundBrush(Qt::white);
+    }
+    if (Board* brd = project->getBoardByIndex(0)) {
+      BoardPlaneFragmentsBuilder builder;
+      builder.runSynchronously(*brd);
+      brdScene = new BoardGraphicsScene(
+          *brd, *lp, std::make_shared<const QSet<const NetSignal*>>());
+      brdScene->setBackgroundBrush(Qt::black);
+
+      openglBuilder.start(brd->buildScene3D(tl::nullopt));
+    }
+  } catch (const Exception& e) {
+    qCritical() << e.getMsg();
   }
 
-  return -1;
+  /*QWidget* widget =
+      static_cast<QWidget*>(slint::cbindgen_private::slint_qt_get_widget(
+          &win->window().window_handle()));
+
+  class EventFilter : public QObject {
+  public:
+    slint::ComponentHandle<ui::MainWindow> win;
+    GraphicsScene* scene;
+    OpenGlView* view3d = nullptr;
+    QTransform oldTransform;
+    QTransform transform;
+
+    EventFilter(slint::ComponentHandle<ui::MainWindow> win,
+                GraphicsScene* scene)
+      : QObject(), win(win), scene(scene) {
+      if (scene) {
+        auto center = scene->itemsBoundingRect().center();
+        transform.translate(center.x(), center.y());
+      }
+      oldTransform = transform;
+    }
+
+    virtual bool eventFilter(QObject* watched, QEvent* event) override {
+      if ((event->type() == QEvent::Paint) && (win->get_scene_visible())) {
+        QWidget* w = static_cast<QWidget*>(watched);
+        // QPaintEvent* e = static_cast<QPaintEvent*>(event);
+        QPainter p(w);
+        p.setRenderHints(QPainter::Antialiasing |
+                         QPainter::SmoothPixmapTransform);
+        QRectF targetRect(win->get_scene_x(), win->get_scene_y(),
+                          win->get_scene_width(), win->get_scene_height());
+        if (scene) {
+          p.fillRect(targetRect, scene->backgroundBrush());
+          QRectF sourceRect = transform.mapRect(targetRect);
+          scene->render(&p, targetRect, sourceRect);
+        } else if (view3d) {
+          view3d->resize(win->get_scene_width(), win->get_scene_height());
+          view3d->render(&p, QPoint(win->get_scene_x(), win->get_scene_y()));
+        } else {
+          p.fillRect(targetRect, Qt::red);
+        }
+      }
+      return QObject::eventFilter(watched, event);
+    }
+  };
+
+  EventFilter* filter = new EventFilter(win, schScene);
+  widget->installEventFilter(filter);
+  bool moving = false;
+  win->on_pointer_event([&](float x1, float y1, float x0, float y0,
+                            slint::private_api::PointerEvent e) {
+    if (e.button == slint::private_api::PointerEventButton::Left) {
+      if (e.kind == slint::private_api::PointerEventKind::Down) {
+        filter->oldTransform = filter->transform;
+        moving = true;
+      } else if (e.kind == slint::private_api::PointerEventKind::Up) {
+        moving = false;
+      }
+    }
+    if (moving && (e.kind == slint::private_api::PointerEventKind::Move)) {
+      filter->transform = filter->oldTransform;
+      filter->transform.translate(x0 - x1, y0 - y1);
+      win->window().request_redraw();
+    }
+    return slint::private_api::EventResult::Accept;
+  });
+  win->on_scrolled(
+      [&](float x, float y, slint::private_api::PointerScrollEvent e) {
+        QPointF scenePos = filter->transform.map(QPointF(x, y));
+        qreal scaleFactor = qPow(1.3, e.delta_y / qreal(-120));
+        filter->transform.translate(scenePos.x(), scenePos.y());
+        filter->transform.scale(scaleFactor, scaleFactor);
+        filter->transform.translate(-scenePos.x(), -scenePos.y());
+        win->window().request_redraw();
+        return slint::private_api::EventResult::Accept;
+      });
+
+  win->on_current_index_changed([&](int index) {
+    if (index == 0) {
+      filter->scene = schScene;
+      filter->view3d = nullptr;
+    } else if (index == 1) {
+      filter->scene = brdScene;
+      filter->view3d = nullptr;
+    } else {
+      filter->scene = nullptr;
+      filter->view3d = view3d;
+    }
+    win->window().request_redraw();
+  });
+
+  win->show();*/
+
+  MainWindow win(ws);
+
+  // Run the event loop.
+  slint::run_event_loop();
+  return 0;
 }

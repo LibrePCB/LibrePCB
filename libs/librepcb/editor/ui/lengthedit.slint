@@ -1,0 +1,178 @@
+import { LineEdit, VerticalBox } from "std-widgets.slint";
+
+export struct LengthEditParseResult {
+    valid: bool,
+    evaluatedValue: string,
+    evaluatedUnit: string,
+}
+
+export global LengthEditGlobals {
+    pure callback parse-length-input(string, string) -> LengthEditParseResult;
+}
+
+export component UpDownButton inherits Rectangle {
+    in property <string> text <=> lblText.text;
+    width: 15px;
+    background: black;
+    lblText := Text {
+        font-size: touch.has-hover ? 12px : 8px;
+        color: touch.has-hover ? white : #cccccc;
+    }
+
+    touch := TouchArea {
+        mouse-cursor: MouseCursor.pointer;
+    }
+}
+
+export component UnitMenuItem {
+    in property <string> unit <=> lblText.text;
+    callback clicked <=> touch.clicked;
+    lblText := Text {
+        font-size: 12px;
+        color: touch.has-hover ? white : #cccccc;
+    }
+
+    touch := TouchArea {
+        mouse-cursor: MouseCursor.pointer;
+    }
+}
+
+export component LengthEdit inherits Rectangle {
+    in-out property <string> value: "0";
+    // Validated length
+    in-out property <string> unit: "mm";
+    property <LengthEditParseResult> parseResult;
+    preferred-width: edit.preferred-width + btnUp.width + rectUnit.width;
+    preferred-height: 27px;
+    width: self.preferred-width;
+    height: self.preferred-height;
+    forward-focus: edit;
+    edit := LineEdit {
+        x: 0;
+        y: 0;
+        width: parent.width;
+        height: parent.height;
+        font-size: 14px;
+        init => {
+            self.text = root.value;
+            parseResult.valid = true;
+        }
+        edited(s) => {
+            parseResult = LengthEditGlobals.parse-length-input(s, unit);
+            if (parseResult.valid) {
+                value = parseResult.evaluatedValue;
+                unit = parseResult.evaluatedUnit;
+            }
+        }
+        accepted(s) => {
+            self.text = value;
+            parseResult.evaluatedValue = value;
+            parseResult.evaluatedUnit = unit;
+            parseResult.valid = true;
+            self.clear-focus();
+        }
+    }
+
+    btnUp := UpDownButton {
+        x: rectUnit.x - self.width;
+        y: 1px;
+        height: (parent.height - 2px) / 2;
+        text: "▲";
+    }
+
+    btnDown := UpDownButton {
+        x: rectUnit.x - self.width;
+        y: parent.height / 2;
+        height: (parent.height - 2px) / 2;
+        text: "▼";
+    }
+
+    rectUnit := Rectangle {
+        x: parent.width - self.width;
+        y: 1px;
+        width: lblText.preferred-width + 10px;
+        height: parent.height - 2px;
+        background: black;
+        border-top-right-radius: 8px;
+        border-bottom-right-radius: 8px;
+        lblText := Text {
+            vertical-alignment: TextVerticalAlignment.center;
+            color: touch.has-hover ? white : #cccccc;
+            text: root.unit;
+        }
+
+        popup := PopupWindow {
+            x: 0;
+            y: parent.height + 2px;
+            width: rectUnit.width;
+            Rectangle {
+                background: black;
+                border-radius: 8px;
+                VerticalBox {
+                    padding-left: 5px;
+                    padding-right: 5px;
+                    UnitMenuItem {
+                        unit: "mm";
+                        clicked(v) => {
+                            root.unit = self.unit;
+                        }
+                    }
+
+                    UnitMenuItem {
+                        unit: "μm";
+                        clicked(v) => {
+                            root.unit = self.unit;
+                        }
+                    }
+
+                    UnitMenuItem {
+                        unit: "nm";
+                        clicked(v) => {
+                            root.unit = self.unit;
+                        }
+                    }
+
+                    UnitMenuItem {
+                        unit: "″";
+                        clicked(v) => {
+                            root.unit = self.unit;
+                        }
+                    }
+
+                    UnitMenuItem {
+                        unit: "mils";
+                        clicked(v) => {
+                            root.unit = self.unit;
+                        }
+                    }
+                }
+            }
+        }
+
+        touch := TouchArea {
+            mouse-cursor: MouseCursor.pointer;
+            clicked => {
+                popup.show();
+            }
+        }
+    }
+
+    Rectangle {
+        x: rectUnit.x;
+        y: 6px;
+        width: 1px;
+        height: parent.height - 12px;
+        background: gray;
+    }
+
+    Rectangle {
+        x: -1px;
+        y: -1px;
+        width: parent.width + 2px;
+        height: parent.height + 2px;
+        border-width: 2px;
+        border-radius: 10px;
+        border-color: #ff0000;
+        visible: !parseResult.valid;
+    }
+}

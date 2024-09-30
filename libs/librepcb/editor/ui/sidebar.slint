@@ -1,0 +1,88 @@
+import { SideBarButton } from "./sidebarbutton.slint";
+
+export enum MainPage {
+    home,
+    libraries,
+    project,
+    drc,
+    search,
+    help,
+    preferences,
+}
+
+export component SideBar inherits Rectangle {
+    in-out property <MainPage> page: MainPage.home;
+    background: #353535;
+    VerticalLayout {
+        spacing: 0px;
+        SideBarButton {
+            icon: @image-url("img/home.svg");
+            toolTip: "Home";
+            checked: page == MainPage.home;
+            clicked => {
+                page = MainPage.home;
+            }
+        }
+
+        SideBarButton {
+            icon: @image-url("img/libraries.png");
+            toolTip: "Libraries";
+            status-background: #d4d400;
+            status-color: black;
+            status-text: "1";
+            checked: page == MainPage.libraries;
+            clicked => {
+                page = MainPage.libraries;
+            }
+        }
+
+        SideBarButton {
+            icon: @image-url("img/projects.png");
+            toolTip: "Project";
+            checked: page == MainPage.project;
+            clicked => {
+                page = MainPage.project;
+            }
+        }
+
+        SideBarButton {
+            icon: @image-url("img/drc.svg");
+            toolTip: "Design Rule Check";
+            checked: page == MainPage.drc;
+            clicked => {
+                page = MainPage.drc;
+            }
+        }
+
+        SideBarButton {
+            icon: @image-url("img/search.svg");
+            toolTip: "Search";
+            checked: page == MainPage.search;
+            clicked => {
+                page = MainPage.search;
+            }
+        }
+
+        Rectangle {
+            vertical-stretch: 1;
+        }
+
+        SideBarButton {
+            icon: @image-url("img/help.svg");
+            toolTip: "Help";
+            checked: page == MainPage.help;
+            clicked => {
+                page = MainPage.help;
+            }
+        }
+
+        SideBarButton {
+            icon: @image-url("img/settings.svg");
+            toolTip: "Preferences";
+            checked: page == MainPage.preferences;
+            clicked => {
+                page = MainPage.preferences;
+            }
+        }
+    }
+}

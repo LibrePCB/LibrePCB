@@ -287,6 +287,7 @@ void GraphicsView::handleMouseWheelEvent(
     scale(scaleFactor, scaleFactor);
   }
   event->setAccepted(true);
+  emit dragged();
 }
 
 /*******************************************************************************
@@ -415,6 +416,7 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
                                         diff.x());
         verticalScrollBar()->setValue(verticalScrollBar()->value() - diff.y());
         mPanningActive = false;
+        emit dragged();
       }
       emit cursorScenePositionChanged(Point::fromPx(e->scenePos()));
       mPressedMouseButtons = e->buttons();

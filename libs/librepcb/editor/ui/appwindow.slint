@@ -1,0 +1,208 @@
+import { Button, ProgressIndicator, StandardButton } from "std-widgets.slint";
+import { SideBar, MainPage } from "./sidebar.slint";
+import { LengthEdit, LengthEditGlobals } from "./lengthedit.slint";
+import { LibrariesPanel } from "./librariespanel.slint";
+import { ProjectsPanel } from "./projectspanel.slint";
+import { HomePanel } from "./homepanel.slint";
+import { MenuBar } from "./menubar.slint";
+
+export { LengthEditGlobals }
+
+export struct Tab {
+    title: string,
+}
+
+export component AppWindow inherits Window {
+    property <length> panel-width: (self.width <= 800px) ? 250px : 300px;
+    in property <string> window-title <=> self.title;
+
+    background: #4f4f4f;
+    icon: @image-url("img/librepcb.png");
+    preferred-width: 1024px;
+    preferred-height: 768px;
+
+    menuBar := MenuBar { }
+
+    sideBar := SideBar {
+        x: 0px;
+        y: menuBar.height;
+        z: 100;
+        width: (root.width <= 800px) ? 40px : 50px;
+        height: parent.height - self.y - statusBar.height - 1px;
+    }
+
+    homePanel := HomePanel {
+        x: sideBar.width;
+        y: sideBar.y;
+        width: panel-width;
+        height: sideBar.height;
+        visible: sideBar.page == MainPage.home;
+    }
+
+    libsPanel := LibrariesPanel {
+        x: sideBar.width;
+        y: sideBar.y;
+        width: panel-width;
+        height: sideBar.height;
+        visible: sideBar.page == MainPage.libraries;
+    }
+
+    prjPanel := ProjectsPanel {
+        x: sideBar.width;
+        y: sideBar.y;
+        width: panel-width;
+        height: sideBar.height;
+        visible: sideBar.page == MainPage.project;
+    }
+
+    in-out property <[Tab]> tabs: [
+        { title: "Tab 1" },
+        { title: "Tab 2" },
+        { title: "Tab 3" },
+    ];
+    callback current_index_changed(int);
+    tabBar := Rectangle {
+        x: sideBar.width + panel-width;
+        y: sideBar.y;
+        width: parent.width - self.x;
+        height: 30px;
+        visible: (sideBar.page != MainPage.home) && (sideBar.page != MainPage.preferences);
+        background: #353535;
+        HorizontalLayout {
+            alignment: LayoutAlignment.start;
+            property <int> current_index: 0;
+            for tab[index] in tabs: Rectangle {
+                width: tabText.preferred-width + 30px;
+                background: (index == current_index) ? root.background : (tabArea.has-hover ? #414141 : #1c1c1c);
+                tabText := Text {
+                    x: 7px;
+                    text: tab.title;
+                    color: white;
+                }
+
+                tabArea := TouchArea {
+                    clicked => {
+                        current_index = index;
+                        current_index_changed(index);
+                    }
+                }
+
+                btnClose := Rectangle {
+                    x: tabText.x + tabText.width + 4px;
+                    width: icon.width;
+                    height: icon.height;
+                    background: btnArea.has-hover ? #454545 : transparent;
+                    border-radius: 3px;
+                    icon := Image {
+                        source: @image-url("img/close.svg");
+                        colorize: (index == current_index) ? white : gray;
+                    }
+
+                    btnArea := TouchArea { }
+                }
+            }
+        }
+    }
+
+    out property <bool> scene_visible: scene.visible;
+    out property <length> scene_x: scene.x;
+    out property <length> scene_y: scene.y;
+    out property <length> scene_width: scene.width;
+    out property <length> scene_height: scene.height;
+    callback pointer_event(length, length, length, length, PointerEvent) -> EventResult;
+    callback scrolled(length, length, PointerScrollEvent) -> EventResult;
+    scene := TouchArea {
+        x: sideBar.width + panel-width;
+        y: tabBar.y + tabBar.height;
+        width: parent.width - self.x;
+        height: parent.height - tabBar.height;
+        visible: tabBar.visible;
+        pointer-event(e) => {
+            return pointer_event(self.mouse-x, self.mouse-y, self.pressed-x, self.pressed-y, e);
+        }
+        scroll-event(e) => {
+            return scrolled(self.mouse-x, self.mouse-y, e);
+        }
+    }
+
+    e1 := LengthEdit {
+        x: 100px;
+        y: 50px;
+        visible: sideBar.page == MainPage.preferences;
+    }
+
+    e2 := LengthEdit {
+        x: 100px;
+        y: 100px;
+        visible: sideBar.page == MainPage.preferences;
+    }
+
+    in property <string> workspace_path <=> lblStatusLeft.text;
+    in property <float> status_progress <=> prgStatus.progress;
+    statusBar := Rectangle {
+        x: 0;
+        y: parent.height - self.height;
+        width: parent.width;
+        height: 25px;
+        background: sideBar.background;
+        HorizontalLayout {
+            padding: 5px;
+            spacing: 10px;
+            lblStatusLeft := Text {
+                color: white;
+                text: "Workspace Path";
+            }
+
+            Rectangle {
+                width: 150px;
+                prgStatus := ProgressIndicator {
+                    width: 100%;
+                    visible: self.progress > 0 && self.progress < 1;
+                }
+            }
+        }
+    }
+
+    dialog := PopupWindow {
+        Dialog {
+            x: parent.width / 2;
+            y: parent.height / 2;
+            width: 100px;
+            height: 100px;
+            background: black;
+            title: "Dialog";
+            Text {
+                text: "Hello World!";
+            }
+
+            StandardButton {
+                kind: ok;
+            }
+
+            StandardButton {
+                kind: cancel;
+            }
+        }
+    }
+
+    Button {
+        x: root.width - self.width - 10px;
+        y: root.height - self.height - 100px;
+        text: "Dialog";
+        visible: sideBar.page == MainPage.home;
+        clicked => {
+            dialog.show();
+        }
+    }
+
+    callback close();
+    Button {
+        x: root.width - self.width - 10px;
+        y: root.height - self.height - 50px;
+        text: "Close";
+        visible: sideBar.page == MainPage.home;
+        clicked => {
+            close();
+        }
+    }
+}
