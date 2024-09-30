@@ -1,14 +1,5 @@
 import { LineEdit, VerticalBox } from "std-widgets.slint";
-
-export struct LengthEditParseResult {
-    valid: bool,
-    evaluatedValue: string,
-    evaluatedUnit: string,
-}
-
-export global LengthEditGlobals {
-    pure callback parse-length-input(string, string) -> LengthEditParseResult;
-}
+import { Globals, EditParseResult } from "./globals.slint";
 
 export component UpDownButton inherits Rectangle {
     in property <string> text <=> lblText.text;
@@ -39,9 +30,8 @@ export component UnitMenuItem {
 
 export component LengthEdit inherits Rectangle {
     in-out property <string> value: "0";
-    // Validated length
     in-out property <string> unit: "mm";
-    property <LengthEditParseResult> parseResult;
+    property <EditParseResult> parse-result;
     preferred-width: edit.preferred-width + btnUp.width + rectUnit.width;
     preferred-height: 27px;
     width: self.preferred-width;
@@ -55,20 +45,20 @@ export component LengthEdit inherits Rectangle {
         font-size: 14px;
         init => {
             self.text = root.value;
-            parseResult.valid = true;
+            parse-result.valid = true;
         }
         edited(s) => {
-            parseResult = LengthEditGlobals.parse-length-input(s, unit);
-            if (parseResult.valid) {
-                value = parseResult.evaluatedValue;
-                unit = parseResult.evaluatedUnit;
+            parse-result = Globals.parse-length-input(s, unit);
+            if (parse-result.valid) {
+                value = parse-result.evaluated-value;
+                unit = parse-result.evaluated-unit;
             }
         }
         accepted(s) => {
             self.text = value;
-            parseResult.evaluatedValue = value;
-            parseResult.evaluatedUnit = unit;
-            parseResult.valid = true;
+            parse-result.evaluated-value = value;
+            parse-result.evaluated-unit = unit;
+            parse-result.valid = true;
             self.clear-focus();
         }
     }
@@ -173,6 +163,6 @@ export component LengthEdit inherits Rectangle {
         border-width: 2px;
         border-radius: 10px;
         border-color: #ff0000;
-        visible: !parseResult.valid;
+        visible: !parse-result.valid;
     }
 }

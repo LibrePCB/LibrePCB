@@ -1,4 +1,7 @@
+import { Globals, MenuItemId } from "./globals.slint";
+
 struct MenuItemData {
+    id: MenuItemId,
     text: string,
 }
 
@@ -8,7 +11,9 @@ struct MainMenuItemData {
 }
 
 component MenuItem inherits Rectangle {
+    in property <MenuItemId> id;
     in property <string> text <=> txt.text;
+
     preferred-width: txt.preferred-width + 20px;
     height: txt.preferred-height + 10px;
     background: touch.has-hover ? #505050 : #353535;
@@ -18,11 +23,16 @@ component MenuItem inherits Rectangle {
         width: 100%;
     }
 
-    touch := TouchArea { }
+    touch := TouchArea {
+        clicked => {
+            Globals.menu-item-triggered(id);
+        }
+    }
 }
 
 component Menu inherits PopupWindow {
     in property <[MenuItemData]> items;
+
     Rectangle {
         background: #353535;
         VerticalLayout {
@@ -62,20 +72,13 @@ component MainMenuItem inherits Rectangle {
 export component MenuBar inherits Rectangle {
     property <[MainMenuItemData]> items: [
         {
-            text: "File",
-            items: [{ text: "Open project" }, { text: "Quit" }],
-        },
-        {
-            text: "Edit",
-            items: [{ text: "Test 1" }, { text: "Test 2" }],
-        },
-        {
-            text: "View",
-            items: [{ text: "Test 1" }, { text: "Test 2" }],
-        },
-        {
-            text: "Help",
-            items: [{ text: "Test 1" }, { text: "Test 2" }],
+            text: "Window",
+            items: [
+                {
+                    id: MenuItemId.new-window,
+                    text: "New Window",
+                },
+            ],
         },
     ];
 
