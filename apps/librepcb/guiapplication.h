@@ -39,6 +39,7 @@ class Workspace;
 namespace editor {
 namespace app {
 
+class LibrariesModel;
 class MainWindow;
 
 /*******************************************************************************
@@ -60,6 +61,7 @@ public:
 
   // Getters
   Workspace& getWorkspace() noexcept { return mWorkspace; }
+  std::shared_ptr<LibrariesModel> getLibraries() noexcept { return mLibraries; }
   std::shared_ptr<slint::FilterModel<ui::Library>>
       getInstalledLibraries() noexcept {
     return mInstalledLibraries;
@@ -78,6 +80,7 @@ public:
 
 private:
   Workspace& mWorkspace;
+  std::shared_ptr<LibrariesModel> mLibraries;
   std::shared_ptr<slint::FilterModel<ui::Library>> mInstalledLibraries;
   std::shared_ptr<slint::FilterModel<ui::Library>> mAvailableLibraries;
   QList<std::shared_ptr<MainWindow>> mWindows;

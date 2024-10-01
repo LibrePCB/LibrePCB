@@ -13,6 +13,8 @@ add_executable(
   # Resources
   ../../img/images.qrc
   # Sources
+  apptoolbox.cpp
+  apptoolbox.h
   guiapplication.cpp
   guiapplication.h
   library/librariesmodel.cpp

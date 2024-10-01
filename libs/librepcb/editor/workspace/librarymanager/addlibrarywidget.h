@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/network/apiendpoint.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -78,7 +79,7 @@ private:  // Methods
   void createLocalLibraryButtonClicked() noexcept;
   void downloadZippedLibraryButtonClicked() noexcept;
   void downloadZipFinished(bool success, const QString& errMsg) noexcept;
-  void onlineLibraryListReceived(const QJsonArray& libs) noexcept;
+  void onlineLibraryListReceived(QList<ApiEndpoint::Library> libs) noexcept;
   void errorWhileFetchingLibraryList(const QString& errorMsg) noexcept;
   void clearOnlineLibraryList() noexcept;
   void repoLibraryDownloadCheckedChanged(bool checked) noexcept;

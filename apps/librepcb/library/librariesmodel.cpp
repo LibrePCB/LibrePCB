@@ -22,12 +22,17 @@
  ******************************************************************************/
 #include "librariesmodel.h"
 
+#include "../apptoolbox.h"
+
+#include <librepcb/core/network/apiendpoint.h>
+#include <librepcb/core/network/networkrequest.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <librepcb/core/workspace/workspacesettings.h>
-#include <librepcb/core/network/apiendpoint.h>
 
 #include <QtCore>
+
+#include <optional>
 
 /*******************************************************************************
  *  Namespace
@@ -42,8 +47,9 @@ namespace app {
 
 LibrariesModel::LibrariesModel(Workspace& ws, QObject* parent) noexcept
   : QObject(parent), mWorkspace(ws) {
-  refreshLocalLibraries();
-  refreshRemoteLibraries();
+  connect(&mWorkspace.getLibraryDb(),
+          &WorkspaceLibraryDb::scanLibraryListUpdated, this,
+          &LibrariesModel::refreshLocalLibraries, Qt::QueuedConnection);
 }
 
 LibrariesModel::~LibrariesModel() noexcept {
@@ -53,12 +59,78 @@ LibrariesModel::~LibrariesModel() noexcept {
  *  General Methods
  ******************************************************************************/
 
+void LibrariesModel::ensurePopulated() noexcept {
+  refreshLocalLibraries();
+  refreshRemoteLibraries();
+}
+
+void LibrariesModel::installLibrary(const slint::SharedString& id) noexcept {
+  // Determine library.
+  std::optional<ApiEndpoint::Library> lib;
+  for (const auto& l : mRemoteLibs) {
+    if (l.uuid.toStr() == id) {
+      lib = l;
+      break;
+    }
+  }
+  if (!lib) {
+    qCritical() << "Failed to determine library!";
+    return;
+  }
+
+  // Determine destination directory.
+  const FilePath destDir = mWorkspace.getLibrariesPath().getPathTo(
+      "remote/" % lib->uuid.toStr() % ".lplib");
+
+  // Start download.
+  auto dl = std::make_shared<LibraryDownload>(lib->downloadUrl, destDir);
+  if (lib->downloadSize > 0) {
+    dl->setExpectedZipFileSize(lib->downloadSize);
+  }
+  if (!lib->downloadSha256.isEmpty()) {
+    dl->setExpectedChecksum(QCryptographicHash::Sha256,
+                            QByteArray::fromHex(lib->downloadSha256));
+  }
+  const Uuid uuid = lib->uuid;
+  connect(
+      dl.get(), &LibraryDownload::progressPercent, this,
+      [this, uuid](int percent) {
+        if (auto i = findLib(uuid.toStr())) {
+          mMergedLibs.at(*i).progress = percent;
+          row_changed(*i);
+        }
+      },
+      Qt::QueuedConnection);
+  connect(
+      dl.get(), &LibraryDownload::finished, this,
+      [this, uuid, dl](bool success, const QString& errMsg) {
+        if (auto i = findLib(uuid.toStr())) {
+          mMergedLibs.at(*i).progress = 0;
+          row_changed(*i);
+        }
+        mDownloadsInProgress.removeOne(dl);
+        mWorkspace.getLibraryDb().startLibraryRescan();
+      },
+      Qt::QueuedConnection);
+  mDownloadsInProgress.append(dl);
+  dl->start();
+}
+
+void LibrariesModel::uninstallLibrary(const slint::SharedString& id) noexcept {
+  qDebug() << "Uninstall" << id.data();
+}
+
+/*******************************************************************************
+ *  Implementations
+ ******************************************************************************/
+
 std::size_t LibrariesModel::row_count() const {
-  return mLibs.size();
+  return mMergedLibs.size();
 }
 
 std::optional<ui::Library> LibrariesModel::row_data(std::size_t i) const {
-  return (i < mLibs.size()) ? std::optional(mLibs.at(i)) : std::nullopt;
+  return (i < mMergedLibs.size()) ? std::optional(mMergedLibs.at(i))
+                                  : std::nullopt;
 }
 
 /*******************************************************************************
@@ -66,13 +138,16 @@ std::optional<ui::Library> LibrariesModel::row_data(std::size_t i) const {
  ******************************************************************************/
 
 void LibrariesModel::refreshLocalLibraries() noexcept {
+  mLocalLibs.clear();
+
   try {
     QMultiMap<Version, FilePath> libraries =
         mWorkspace.getLibraryDb().getAll<Library>();  // can throw
 
     foreach (const FilePath& libDir, libraries) {
+      Uuid uuid = Uuid::createRandom();
       Version version = Version::fromString("1");
-      mWorkspace.getLibraryDb().getMetadata<Library>(libDir, nullptr,
+      mWorkspace.getLibraryDb().getMetadata<Library>(libDir, &uuid,
                                                      &version);  // can throw
       QString name, description, keywords;
       mWorkspace.getLibraryDb().getTranslations<Library>(
@@ -80,46 +155,120 @@ void LibrariesModel::refreshLocalLibraries() noexcept {
           &description, &keywords);  // can throw
       QPixmap icon;
       mWorkspace.getLibraryDb().getLibraryMetadata(libDir, &icon);  // can throw
+      const bool isRemote =
+          libDir.isLocatedInDir(mWorkspace.getRemoteLibrariesPath());
 
-      QImage image = icon.toImage();
-      image.convertTo(QImage::Format_RGBA8888);
-      slint::SharedPixelBuffer<slint::Rgba8Pixel> img(
-          image.width(), image.height(),
-          reinterpret_cast<const slint::Rgba8Pixel*>(image.bits()));
-
-      mLibs.push_back(ui::Library{
-          libDir.toStr().toUtf8().data(),
-          name.toUtf8().data(),
-          description.toUtf8().data(),
-          img,
-          version.toStr().toUtf8().data(),
-          true,
-          true,
-      });
+      mLocalLibs.insert(
+          uuid,
+          ui::Library{
+              q2s(libDir.toStr()),
+              q2s(name),
+              q2s(description),
+              q2s(version.toStr()),
+              q2s(icon),
+              isRemote ? ui::LibraryType::Remote : ui::LibraryType::Local,
+              ui::LibraryState::Unknown,
+              0,
+          });
     }
-
-    std::sort(mLibs.begin(), mLibs.end(),
-              [](const ui::Library& a, const ui::Library& b) {
-                return a.name < b.name;
-              });
   } catch (const Exception& e) {
     qCritical() << "Failed to update library list:" << e.getMsg();
   }
 
-  reset();
+  refreshMergedLibs();
 }
 
 void LibrariesModel::refreshRemoteLibraries() noexcept {
   mApiEndpointsInProgress.clear();  // disconnects all signal/slot connections
+  mRemoteLibs.clear();
   foreach (const QUrl& url, mWorkspace.getSettings().apiEndpoints.get()) {
     std::shared_ptr<ApiEndpoint> repo = std::make_shared<ApiEndpoint>(url);
-    //connect(repo.get(), &ApiEndpoint::libraryListReceived, this,
-    //        &AddLibraryWidget::onlineLibraryListReceived);
-    //connect(repo.get(), &ApiEndpoint::errorWhileFetchingLibraryList, this,
-    //        &AddLibraryWidget::errorWhileFetchingLibraryList);
-    repo->requestLibraryList();
+    connect(repo.get(), &ApiEndpoint::libraryListReceived, this,
+            &LibrariesModel::onlineLibraryListReceived);
+    connect(repo.get(), &ApiEndpoint::errorWhileFetchingLibraryList, this,
+            &LibrariesModel::errorWhileFetchingLibraryList);
     mApiEndpointsInProgress.append(repo);
+    repo->requestLibraryList();
   }
+  if (!mApiEndpointsInProgress.isEmpty()) {
+    remoteLibrariesFetchingChanged(true);
+  }
+}
+
+void LibrariesModel::onlineLibraryListReceived(
+    QList<ApiEndpoint::Library> libs) noexcept {
+  mRemoteLibs.append(libs);
+  for (const auto& lib : libs) {
+    const Uuid uuid = lib.uuid;
+    if (!mRemoteIcons.contains(uuid)) {
+      NetworkRequest* request = new NetworkRequest(lib.iconUrl);
+      request->setMinimumCacheTime(24 * 3600);  // 1 day
+      connect(
+          request, &NetworkRequest::dataReceived, this,
+          [this, uuid](const QByteArray& data) {
+            QPixmap pixmap;
+            pixmap.loadFromData(data);
+            mRemoteIcons[uuid] = pixmap;
+            for (std::size_t i = 0; i < mMergedLibs.size(); ++i) {
+              if (mMergedLibs.at(i).id == uuid.toStr()) {
+                mMergedLibs.at(i).icon = q2s(pixmap);
+                row_changed(i);
+              }
+            }
+          },
+          Qt::QueuedConnection);
+      request->start();
+    }
+  }
+  refreshMergedLibs();
+  remoteLibrariesFetchingChanged(false);
+}
+
+void LibrariesModel::errorWhileFetchingLibraryList(QString errorMsg) noexcept {
+  Q_UNUSED(errorMsg);
+  if (mApiEndpointsInProgress.isEmpty()) {
+    remoteLibrariesFetchingChanged(false);
+  }
+}
+
+void LibrariesModel::refreshMergedLibs() noexcept {
+  mMergedLibs.clear();
+  for (const auto& lib : mRemoteLibs) {
+    auto it = mLocalLibs.find(lib.uuid);
+    if (it != mLocalLibs.end()) {
+      it->state = (Version::fromString(it->version.data()) >= lib.version)
+          ? ui::LibraryState::UpToDate
+          : ui::LibraryState::Outdated;
+    } else {
+      mMergedLibs.push_back(ui::Library{
+          q2s(lib.uuid.toStr()),
+          q2s(lib.name),
+          q2s(lib.description),
+          q2s(lib.version.toStr()),
+          q2s(mRemoteIcons.value(lib.uuid)),
+          ui::LibraryType::Online,
+          ui::LibraryState::Unknown,
+          0,
+      });
+    }
+  }
+  for (const auto& lib : mLocalLibs) {
+    mMergedLibs.push_back(lib);
+  }
+  std::sort(mMergedLibs.begin(), mMergedLibs.end(),
+            [](const ui::Library& a, const ui::Library& b) {
+              return a.name < b.name;
+            });
+  reset();
+}
+
+std::optional<std::size_t> LibrariesModel::findLib(const QString& id) noexcept {
+  for (std::size_t i = 0; i < mMergedLibs.size(); ++i) {
+    if (mMergedLibs.at(i).id == id) {
+      return i;
+    }
+  }
+  return std::nullopt;
 }
 
 /*******************************************************************************

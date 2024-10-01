@@ -1,5 +1,5 @@
-import { Button, ListView, Spinner } from "std-widgets.slint";
-import { Globals, Library } from "./globals.slint";
+import { Button, ListView, ProgressIndicator, Spinner } from "std-widgets.slint";
+import { Globals, Library, LibraryType, LibraryState } from "./globals.slint";
 
 component LibraryList inherits ListView {
     property <int> current-index: -1;
@@ -15,73 +15,103 @@ component LibraryList inherits ListView {
         height: item-height;
         background: (current-index == index) ? #454545 : (touch.has-hover ? #383838 : transparent);
 
-        imgIcon := Image {
-            x: 3px;
-            y: 3px;
-            width: parent.height - 6px;
-            height: parent.height - 6px;
-            source: lib.icon;
-        }
+        HorizontalLayout {
+            padding: 2px;
 
-        lblName := Text {
-            x: imgIcon.width + 10px;
-            y: imgIcon.y;
-            width: pillVersion.x - self.x - 5px;
-            color: #dddddd;
-            font-size: 14px;
-            font-weight: 700;
-            overflow: TextOverflow.elide;
-            text: lib.name;
-        }
+            Image {
+                width: parent.height - 6px;
+                height: parent.height - 6px;
+                source: lib.icon;
+            }
 
-        lblDesc := Text {
-            x: lblName.x;
-            y: lblName.y + lblName.height;
-            width: (btnInstall.visible ? btnInstall.x : btnUninstall.x) - self.x - 5px;
-            height: parent.height - self.y;
-            vertical-alignment: TextVerticalAlignment.center;
-            color: #dddddd;
-            font-size: 11px;
-            font-weight: 700;
-            overflow: TextOverflow.elide;
-            text: lib.description;
-            wrap: TextWrap.word-wrap;
-        }
+            VerticalLayout {
+                padding: 3px;
 
-        pillVersion := Rectangle {
-            x: parent.width - self.width - 10px;
-            y: 3px;
-            width: lblVersion.preferred-width + 10px;
-            height: lblVersion.preferred-height + 2px;
-            background: lib.is-local ? black : (lib.up-to-date ? #006600 : #aa0000);
-            border-radius: self.height / 2;
-            visible: show-version;
-            lblVersion := Text {
-                color: white;
-                font-size: 11px;
-                text: lib.is-local ? ("local | " + lib.version) : lib.version;
+                HorizontalLayout {
+                    vertical-stretch: 0;
+
+                    Text {
+                        color: #dddddd;
+                        font-size: 13px;
+                        font-weight: 700;
+                        overflow: TextOverflow.elide;
+                        text: lib.name;
+                    }
+
+                    if show-version: Rectangle {
+                        width: lblVersion.preferred-width + 10px;
+                        height: lblVersion.preferred-height + 2px;
+                        background: (lib.state == LibraryState.up-to-date) ? #006600 : ((lib.state == LibraryState.outdated) ? #aa0000 : black);
+                        border-radius: self.height / 2;
+                        lblVersion := Text {
+                            color: white;
+                            font-size: 10px;
+                            text: (lib.type == LibraryType.local) ? ("local | " + lib.version) : lib.version;
+                        }
+                    }
+                }
+
+                Text {
+                    vertical-alignment: TextVerticalAlignment.center;
+                    color: #dddddd;
+                    font-size: 10px;
+                    font-weight: 200;
+                    overflow: TextOverflow.elide;
+                    text: lib.description;
+                    wrap: TextWrap.word-wrap;
+                }
+
+                if lib.progress > 0: ProgressIndicator {
+                    vertical-stretch: 0;
+                    progress: lib.progress;
+                }
             }
         }
 
         touch := TouchArea {
+            property <bool> buttons-visible: self.has-hover || (current-index == index);
+            property <bool> installable: buttons-visible && (lib.progress == 0) && ((!installed) || ((lib.type == LibraryType.remote) && (lib.state == LibraryState.outdated)));
+            property <bool> uninstallable: buttons-visible && installed;
+
             clicked => {
                 current-index = index;
             }
 
-            btnInstall := Button {
-                x: btnUninstall.visible ? (btnUninstall.x - self.width - 7px) : btnUninstall.x;
+            if installable: Button {
+                x: parent.width - self.width - 7px - (uninstallable ? (self.width + 7px) : 0px);
                 y: parent.height - self.height - 2px;
                 height: 26px;
-                visible: (!installed) || (!lib.up-to-date);
                 icon: @image-url("img/download.svg");
+                clicked => {
+                    Globals.install-library(lib.id);
+                }
             }
 
-            btnUninstall := Button {
+            if uninstallable: Button {
                 x: parent.width - self.width - 7px;
                 y: parent.height - self.height - 2px;
                 height: 26px;
-                visible: installed;
                 icon: @image-url("img/delete.svg");
+                clicked => {
+                    uninstallPopup.show();
+                    //Globals.uninstall-library(lib.id);
+                }
+            }
+
+            uninstallPopup := PopupWindow {
+                Rectangle {
+                    height: 100%;
+                    width: 100%;
+                    background: gray;
+                    Text {
+                        text: "Foo";
+                    }
+                }
+
+                x: 0;
+                y: 0;
+                width: 100px;
+                height: 100px;
             }
         }
     }
@@ -89,6 +119,10 @@ component LibraryList inherits ListView {
 
 export component LibrariesPanel inherits Rectangle {
     background: #2a2a2a;
+
+    init => {
+        Globals.ensure-libraries-populated();
+    }
 
     VerticalLayout {
         padding-top: 5px;
@@ -114,6 +148,8 @@ export component LibrariesPanel inherits Rectangle {
         }
 
         Button {
+            x: 8px;
+            width: parent.width - 16px;
             text: @tr("Update all");
         }
 
@@ -128,10 +164,10 @@ export component LibrariesPanel inherits Rectangle {
                 text: @tr("AVAILABLE");
             }
 
-            Spinner {
+            if Globals.refreshing-available-libraries: Spinner {
                 width: txt.height;
                 height: txt.height;
-                indeterminate: Globals.refreshing-available-libraries;
+                indeterminate: true;
             }
         }
 
@@ -146,7 +182,9 @@ export component LibrariesPanel inherits Rectangle {
             model: Globals.available-libraries;
         }
 
-        Button {
+        if Globals.available-libraries.length > 0: Button {
+            x: 8px;
+            width: parent.width - 16px;
             text: @tr("Install all");
         }
 

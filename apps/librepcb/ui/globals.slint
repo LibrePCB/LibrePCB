@@ -2,14 +2,27 @@ export enum MenuItemId {
     new-window,
 }
 
+export enum LibraryType {
+    local,
+    remote,
+    online,
+}
+
+export enum LibraryState {
+    unknown,
+    up-to-date,
+    outdated,
+}
+
 export struct Library {
     id: string,
     name: string,
     description: string,
-    icon: image,
     version: string,
-    is-local: bool,
-    up-to-date: bool,
+    icon: image,
+    type: LibraryType,
+    state: LibraryState,
+    progress: int, // 0 if not installing
 }
 
 export struct EditParseResult {
@@ -23,32 +36,46 @@ export global Globals {
 
     pure callback parse-length-input(string, string) -> EditParseResult;
 
+    // Populate the installed-libraries and available-libraries models with data
+    // if not done yet (lazy loading only if libraries are visible in the UI).
+    pure callback ensure-libraries-populated();
+
+    // Install a library
+    //
+    // - Library ID (see Library::id)
+    pure callback install-library(string);
+
+    // Uninstall a library
+    //
+    // - Library ID (see Library::id)
+    pure callback uninstall-library(string);
+
     in property <bool> refreshing-available-libraries: false;
 
     in property <[Library]> installed-libraries: [
         {
             name: "My Library",
             description: "My own local library.",
-            icon: @image-url("img/library.png"),
             version: "v1.0",
-            is-local: true,
-            up-to-date: true,
+            icon: @image-url("img/library.png"),
+            type: LibraryType.local,
+            state: LibraryState.unknown,
         },
         {
             name: "LibrePCB Base",
             description: "Official LibrePCB Base Library",
-            icon: @image-url("img/librepcb.png"),
-            is-local: false,
             version: "v1.2.3",
-            up-to-date: true,
+            icon: @image-url("img/librepcb.png"),
+            type: LibraryType.remote,
+            state: LibraryState.up-to-date,
         },
         {
             name: "Microchip Technology / Atmel",
             description: "Integrated circuits and more (unofficial).",
-            icon: @image-url("img/microchip.png"),
             version: "v0.5",
-            is-local: false,
-            up-to-date: false,
+            icon: @image-url("img/microchip.png"),
+            type: LibraryType.remote,
+            state: LibraryState.outdated,
         },
     ];
 
@@ -57,15 +84,14 @@ export global Globals {
             name: "LibrePCB Integrated Circuits",
             description: "Official LibrePCB Integrated Circuits Library",
             icon: @image-url("img/librepcb.png"),
-            is-local: false,
-            up-to-date: true,
+            type: LibraryType.online,
         },
         {
             name: "Microchip Technology / Atmel",
             description: "Integrated circuits and more (unofficial).",
             icon: @image-url("img/microchip.png"),
-            is-local: false,
-            up-to-date: false,
+            type: LibraryType.online,
+            progress: 42,
         },
     ];
 }

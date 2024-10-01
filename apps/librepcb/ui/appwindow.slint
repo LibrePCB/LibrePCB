@@ -17,6 +17,8 @@ export component AppWindow inherits Window {
     property <length> panel-width: (self.width <= 800px) ? 250px : 350px;
     in property <string> window-title <=> self.title;
 
+    callback close();
+
     background: #4f4f4f;
     icon: @image-url("img/librepcb.png");
     preferred-width: 1024px;
@@ -30,30 +32,46 @@ export component AppWindow inherits Window {
         z: 100;
         width: (root.width <= 800px) ? 40px : 50px;
         height: parent.height - self.y - statusBar.height - 1px;
+        page: MainPage.libraries;
     }
 
-    homePanel := HomePanel {
+    if sideBar.page == MainPage.home: homePanel := HomePanel {
         x: sideBar.width;
         y: sideBar.y;
         width: panel-width;
         height: sideBar.height;
-        visible: sideBar.page == MainPage.home;
     }
 
-    libsPanel := LibrariesPanel {
+    if sideBar.page == MainPage.home: Button {
+        x: root.width - self.width - 10px;
+        y: root.height - self.height - 100px;
+        text: "Dialog";
+        clicked => {
+            dialog.show();
+        }
+    }
+
+    if sideBar.page == MainPage.home: Button {
+        x: root.width - self.width - 10px;
+        y: root.height - self.height - 50px;
+        text: "Close";
+        clicked => {
+            close();
+        }
+    }
+
+    if sideBar.page == MainPage.libraries: libsPanel := LibrariesPanel {
         x: sideBar.width;
         y: sideBar.y;
         width: panel-width;
         height: sideBar.height;
-        visible: sideBar.page == MainPage.libraries;
     }
 
-    prjPanel := ProjectsPanel {
+    if sideBar.page == MainPage.project: prjPanel := ProjectsPanel {
         x: sideBar.width;
         y: sideBar.y;
         width: panel-width;
         height: sideBar.height;
-        visible: sideBar.page == MainPage.project;
     }
 
     in-out property <[Tab]> tabs: [
@@ -127,16 +145,14 @@ export component AppWindow inherits Window {
         }
     }
 
-    e1 := LengthEdit {
+    if sideBar.page == MainPage.preferences: e1 := LengthEdit {
         x: 100px;
         y: 50px;
-        visible: sideBar.page == MainPage.preferences;
     }
 
-    e2 := LengthEdit {
+    if sideBar.page == MainPage.preferences: e2 := LengthEdit {
         x: 100px;
         y: 100px;
-        visible: sideBar.page == MainPage.preferences;
     }
 
     in property <string> workspace_path <=> lblStatusLeft.text;
@@ -184,27 +200,6 @@ export component AppWindow inherits Window {
             StandardButton {
                 kind: cancel;
             }
-        }
-    }
-
-    Button {
-        x: root.width - self.width - 10px;
-        y: root.height - self.height - 100px;
-        text: "Dialog";
-        visible: sideBar.page == MainPage.home;
-        clicked => {
-            dialog.show();
-        }
-    }
-
-    callback close();
-    Button {
-        x: root.width - self.width - 10px;
-        y: root.height - self.height - 50px;
-        text: "Close";
-        visible: sideBar.page == MainPage.home;
-        clicked => {
-            close();
         }
     }
 }

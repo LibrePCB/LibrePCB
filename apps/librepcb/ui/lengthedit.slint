@@ -155,7 +155,7 @@ export component LengthEdit inherits Rectangle {
         background: gray;
     }
 
-    Rectangle {
+    if !parse-result.valid: Rectangle {
         x: -1px;
         y: -1px;
         width: parent.width + 2px;
@@ -163,6 +163,5 @@ export component LengthEdit inherits Rectangle {
         border-width: 2px;
         border-radius: 10px;
         border-color: #ff0000;
-        visible: !parse-result.valid;
     }
 }

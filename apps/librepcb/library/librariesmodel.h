@@ -25,8 +25,12 @@
  ******************************************************************************/
 #include "appwindow.h"
 
+#include <librepcb/core/network/apiendpoint.h>
+#include <librepcb/editor/workspace/librarymanager/librarydownload.h>
+
 #include <QtCore>
 
+#include <optional>
 #include <vector>
 
 /*******************************************************************************
@@ -34,10 +38,13 @@
  ******************************************************************************/
 namespace librepcb {
 
-class Workspace;
 class ApiEndpoint;
+class Workspace;
 
 namespace editor {
+
+class LibraryDownload;
+
 namespace app {
 
 /*******************************************************************************
@@ -58,19 +65,38 @@ public:
   virtual ~LibrariesModel() noexcept;
 
   // General Methods
+  void ensurePopulated() noexcept;
+  bool isFetchingRemoteLibraries() const noexcept {
+    return !mApiEndpointsInProgress.isEmpty();
+  }
+  void installLibrary(const slint::SharedString& id) noexcept;
+  void uninstallLibrary(const slint::SharedString& id) noexcept;
+
+  // Implementations
   std::size_t row_count() const override;
   std::optional<ui::Library> row_data(std::size_t i) const override;
 
   // Operator Overloadings
   LibrariesModel& operator=(const LibrariesModel& rhs) = delete;
 
+signals:
+  void remoteLibrariesFetchingChanged(bool fetching);
+
 private:
   void refreshLocalLibraries() noexcept;
   void refreshRemoteLibraries() noexcept;
+  void onlineLibraryListReceived(QList<ApiEndpoint::Library> libs) noexcept;
+  void errorWhileFetchingLibraryList(QString errorMsg) noexcept;
+  void refreshMergedLibs() noexcept;
+  std::optional<std::size_t> findLib(const QString& id) noexcept;
 
   Workspace& mWorkspace;
   QList<std::shared_ptr<ApiEndpoint>> mApiEndpointsInProgress;
-  std::vector<ui::Library> mLibs;
+  QList<std::shared_ptr<LibraryDownload>> mDownloadsInProgress;
+  QHash<Uuid, ui::Library> mLocalLibs;
+  QList<ApiEndpoint::Library> mRemoteLibs;
+  QHash<Uuid, QPixmap> mRemoteIcons;
+  std::vector<ui::Library> mMergedLibs;
 };
 
 /*******************************************************************************
