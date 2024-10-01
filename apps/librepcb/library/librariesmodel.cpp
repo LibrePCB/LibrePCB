@@ -24,6 +24,7 @@
 
 #include "../apptoolbox.h"
 
+#include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/network/apiendpoint.h>
 #include <librepcb/core/network/networkrequest.h>
 #include <librepcb/core/workspace/workspace.h>
@@ -64,60 +65,70 @@ void LibrariesModel::ensurePopulated() noexcept {
   refreshRemoteLibraries();
 }
 
-void LibrariesModel::installLibrary(const slint::SharedString& id) noexcept {
-  // Determine library.
-  std::optional<ApiEndpoint::Library> lib;
-  for (const auto& l : mRemoteLibs) {
-    if (l.uuid.toStr() == id) {
-      lib = l;
-      break;
+int LibrariesModel::getInstallableLibraries() const noexcept {
+  int count = 0;
+  for (const auto& lib : mMergedLibs) {
+    if (lib.checked) ++count;
+  }
+  return count;
+}
+
+void LibrariesModel::installCheckedLibraries() noexcept {
+  for (auto& lib : mMergedLibs) {
+    if (!lib.checked) continue;
+
+    auto uuid = Uuid::tryFromString(s2q(lib.id));
+    if (!uuid) continue;
+
+    const auto remoteLib = mRemoteLibs.find(*uuid);
+    if (remoteLib == mRemoteLibs.end()) continue;
+
+    // Determine destination directory.
+    const FilePath destDir = mWorkspace.getLibrariesPath().getPathTo(
+        "remote/" % remoteLib->uuid.toStr() % ".lplib");
+
+    // Start download.
+    auto dl =
+        std::make_shared<LibraryDownload>(remoteLib->downloadUrl, destDir);
+    if (remoteLib->downloadSize > 0) {
+      dl->setExpectedZipFileSize(remoteLib->downloadSize);
     }
+    if (!remoteLib->downloadSha256.isEmpty()) {
+      dl->setExpectedChecksum(QCryptographicHash::Sha256,
+                              QByteArray::fromHex(remoteLib->downloadSha256));
+    }
+    connect(
+        dl.get(), &LibraryDownload::progressPercent, this,
+        [this, uuid](int percent) {
+          if (auto i = findLib(uuid->toStr())) {
+            mMergedLibs.at(*i).progress = percent;
+            row_changed(*i);
+          }
+        },
+        Qt::QueuedConnection);
+    connect(
+        dl.get(), &LibraryDownload::finished, this,
+        [this, uuid, dl](bool success, const QString& errMsg) {
+          if (auto i = findLib(uuid->toStr())) {
+            mMergedLibs.at(*i).progress = 0;
+            row_changed(*i);
+          }
+          mDownloadsInProgress.removeOne(dl);
+          mWorkspace.getLibraryDb().startLibraryRescan();
+        },
+        Qt::QueuedConnection);
+    mDownloadsInProgress.append(dl);
+    dl->start();
   }
-  if (!lib) {
-    qCritical() << "Failed to determine library!";
-    return;
-  }
-
-  // Determine destination directory.
-  const FilePath destDir = mWorkspace.getLibrariesPath().getPathTo(
-      "remote/" % lib->uuid.toStr() % ".lplib");
-
-  // Start download.
-  auto dl = std::make_shared<LibraryDownload>(lib->downloadUrl, destDir);
-  if (lib->downloadSize > 0) {
-    dl->setExpectedZipFileSize(lib->downloadSize);
-  }
-  if (!lib->downloadSha256.isEmpty()) {
-    dl->setExpectedChecksum(QCryptographicHash::Sha256,
-                            QByteArray::fromHex(lib->downloadSha256));
-  }
-  const Uuid uuid = lib->uuid;
-  connect(
-      dl.get(), &LibraryDownload::progressPercent, this,
-      [this, uuid](int percent) {
-        if (auto i = findLib(uuid.toStr())) {
-          mMergedLibs.at(*i).progress = percent;
-          row_changed(*i);
-        }
-      },
-      Qt::QueuedConnection);
-  connect(
-      dl.get(), &LibraryDownload::finished, this,
-      [this, uuid, dl](bool success, const QString& errMsg) {
-        if (auto i = findLib(uuid.toStr())) {
-          mMergedLibs.at(*i).progress = 0;
-          row_changed(*i);
-        }
-        mDownloadsInProgress.removeOne(dl);
-        mWorkspace.getLibraryDb().startLibraryRescan();
-      },
-      Qt::QueuedConnection);
-  mDownloadsInProgress.append(dl);
-  dl->start();
 }
 
 void LibrariesModel::uninstallLibrary(const slint::SharedString& id) noexcept {
-  qDebug() << "Uninstall" << id.data();
+  try {
+    FileUtils::removeDirRecursively(FilePath(s2q(id)));  // can throw
+  } catch (const Exception& e) {
+    // TODO
+  }
+  mWorkspace.getLibraryDb().startLibraryRescan();
 }
 
 /*******************************************************************************
@@ -131,6 +142,14 @@ std::size_t LibrariesModel::row_count() const {
 std::optional<ui::Library> LibrariesModel::row_data(std::size_t i) const {
   return (i < mMergedLibs.size()) ? std::optional(mMergedLibs.at(i))
                                   : std::nullopt;
+}
+
+void LibrariesModel::set_row_data(std::size_t i,
+                                  const ui::Library& obj) noexcept {
+  if (i < mMergedLibs.size()) {
+    mMergedLibs.at(i) = obj;
+  }
+  emit installableLibrariesChanged(getInstallableLibraries());
 }
 
 /*******************************************************************************
@@ -169,6 +188,7 @@ void LibrariesModel::refreshLocalLibraries() noexcept {
               isRemote ? ui::LibraryType::Remote : ui::LibraryType::Local,
               ui::LibraryState::Unknown,
               0,
+              false,
           });
     }
   } catch (const Exception& e) {
@@ -191,14 +211,14 @@ void LibrariesModel::refreshRemoteLibraries() noexcept {
     repo->requestLibraryList();
   }
   if (!mApiEndpointsInProgress.isEmpty()) {
-    remoteLibrariesFetchingChanged(true);
+    fetchingRemoteLibrariesChanged(true);
   }
 }
 
 void LibrariesModel::onlineLibraryListReceived(
     QList<ApiEndpoint::Library> libs) noexcept {
-  mRemoteLibs.append(libs);
   for (const auto& lib : libs) {
+    mRemoteLibs.insert(lib.uuid, lib);
     const Uuid uuid = lib.uuid;
     if (!mRemoteIcons.contains(uuid)) {
       NetworkRequest* request = new NetworkRequest(lib.iconUrl);
@@ -221,13 +241,13 @@ void LibrariesModel::onlineLibraryListReceived(
     }
   }
   refreshMergedLibs();
-  remoteLibrariesFetchingChanged(false);
+  fetchingRemoteLibrariesChanged(false);
 }
 
 void LibrariesModel::errorWhileFetchingLibraryList(QString errorMsg) noexcept {
   Q_UNUSED(errorMsg);
   if (mApiEndpointsInProgress.isEmpty()) {
-    remoteLibrariesFetchingChanged(false);
+    fetchingRemoteLibrariesChanged(false);
   }
 }
 
@@ -239,6 +259,7 @@ void LibrariesModel::refreshMergedLibs() noexcept {
       it->state = (Version::fromString(it->version.data()) >= lib.version)
           ? ui::LibraryState::UpToDate
           : ui::LibraryState::Outdated;
+      it->checked = (it->state == ui::LibraryState::Outdated);
     } else {
       mMergedLibs.push_back(ui::Library{
           q2s(lib.uuid.toStr()),
@@ -249,6 +270,7 @@ void LibrariesModel::refreshMergedLibs() noexcept {
           ui::LibraryType::Online,
           ui::LibraryState::Unknown,
           0,
+          lib.recommended,
       });
     }
   }
@@ -257,9 +279,14 @@ void LibrariesModel::refreshMergedLibs() noexcept {
   }
   std::sort(mMergedLibs.begin(), mMergedLibs.end(),
             [](const ui::Library& a, const ui::Library& b) {
-              return a.name < b.name;
+              if (a.type != b.type) {
+                return static_cast<int>(a.type) < static_cast<int>(b.type);
+              } else {
+                return a.name < b.name;
+              }
             });
   reset();
+  emit installableLibrariesChanged(getInstallableLibraries());
 }
 
 std::optional<std::size_t> LibrariesModel::findLib(const QString& id) noexcept {

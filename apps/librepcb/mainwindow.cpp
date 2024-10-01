@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "mainwindow.h"
 
+#include "apptoolbox.h"
 #include "guiapplication.h"
 #include "library/librariesmodel.h"
 
@@ -39,45 +40,34 @@ namespace librepcb {
 namespace editor {
 namespace app {
 
+template <typename TTarget, typename TSlint, typename TClass, typename TQt>
+static void bind(MainWindow* context, const TTarget& target,
+                 void (TTarget::*setter)(const TSlint&) const, TClass* source,
+                 void (TClass::*signal)(TQt),
+                 const TSlint& defaultValue) noexcept {
+  QObject::connect(source, signal, context,
+                   std::bind(setter, &target, std::placeholders::_1));
+  (target.*setter)(defaultValue);
+}
+
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
 MainWindow::MainWindow(GuiApplication& app, QObject* parent) noexcept
   : QObject(parent), mApp(app), mWindow(ui::AppWindow::create()) {
+  // Setup window object.
   mWindow->set_window_title(
       QString("LibrePCB %1").arg(Application::getVersion()).toUtf8().data());
   mWindow->set_workspace_path(
       app.getWorkspace().getPath().toNative().toUtf8().data());
+  mWindow->on_close([&] { slint::quit_event_loop(); });
 
-  QObject::connect(&app.getWorkspace().getLibraryDb(),
-                   &WorkspaceLibraryDb::scanProgressUpdate, this,
-                   [this](int progress) {
-                     mWindow->set_status_progress(progress / qreal(100));
-                   });
-
-  mWindow->global<ui::Globals>().on_menu_item_triggered(
-      [this](ui::MenuItemId id) { menuItemTriggered(id); });
-
+  // Register global callbacks.
   const ui::Globals& globals = mWindow->global<ui::Globals>();
-  globals.on_ensure_libraries_populated(
-      std::bind(&LibrariesModel::ensurePopulated, mApp.getLibraries().get()));
-  globals.set_refreshing_available_libraries(
-      mApp.getLibraries()->isFetchingRemoteLibraries());
-  connect(mApp.getLibraries().get(),
-          &LibrariesModel::remoteLibrariesFetchingChanged,
-          std::bind(&ui::Globals::set_refreshing_available_libraries, &globals,
-                    std::placeholders::_1));
-  globals.set_installed_libraries(mApp.getInstalledLibraries());
-  globals.set_available_libraries(mApp.getAvailableLibraries());
-  globals.on_install_library(std::bind(&LibrariesModel::installLibrary,
-                                       mApp.getLibraries().get(),
-                                       std::placeholders::_1));
-  globals.on_uninstall_library(std::bind(&LibrariesModel::uninstallLibrary,
-                                         mApp.getLibraries().get(),
-                                         std::placeholders::_1));
-
-  mWindow->global<ui::Globals>().on_parse_length_input(
+  globals.on_menu_item_triggered(
+      [this](ui::MenuItemId id) { menuItemTriggered(id); });
+  globals.on_parse_length_input(
       [](slint::SharedString text, slint::SharedString unit) {
         ui::EditParseResult res{false, text, unit};
         try {
@@ -101,9 +91,28 @@ MainWindow::MainWindow(GuiApplication& app, QObject* parent) noexcept
         }
         return res;
       });
+  globals.on_ensure_libraries_populated(
+      std::bind(&LibrariesModel::ensurePopulated, mApp.getLibraries().get()));
+  globals.set_libraries(mApp.getLibraries());
+  globals.on_install_checked_libraries(std::bind(
+      &LibrariesModel::installCheckedLibraries, mApp.getLibraries().get()));
+  globals.on_uninstall_library(std::bind(&LibrariesModel::uninstallLibrary,
+                                         mApp.getLibraries().get(),
+                                         std::placeholders::_1));
 
-  mWindow->on_close([&] { slint::quit_event_loop(); });
+  // Bind global properties.
+  bind(this, globals, &ui::Globals::set_status_bar_progress,
+       &app.getWorkspace().getLibraryDb(),
+       &WorkspaceLibraryDb::scanProgressUpdate, 0);
+  bind(this, globals, &ui::Globals::set_installable_libraries,
+       mApp.getLibraries().get(), &LibrariesModel::installableLibrariesChanged,
+       mApp.getLibraries()->getInstallableLibraries());
+  bind(this, globals, &ui::Globals::set_refreshing_available_libraries,
+       mApp.getLibraries().get(),
+       &LibrariesModel::fetchingRemoteLibrariesChanged,
+       mApp.getLibraries()->isFetchingRemoteLibraries());
 
+  // Show window.
   mWindow->show();
 }
 
