@@ -20,15 +20,10 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "guiapplication.h"
-
-#include "library/librariesmodel.h"
-#include "mainwindow.h"
-
-#include <librepcb/core/workspace/workspace.h>
-#include <librepcb/core/workspace/workspacelibrarydb.h>
+#include "apptoolbox.h"
 
 #include <QtCore>
+#include <QtGui>
 
 /*******************************************************************************
  *  Namespace
@@ -38,40 +33,44 @@ namespace editor {
 namespace app {
 
 /*******************************************************************************
- *  Constructors / Destructor
+ *  Non-Member Functions
  ******************************************************************************/
 
-GuiApplication::GuiApplication(Workspace& ws, QObject* parent) noexcept
-  : QObject(parent), mWorkspace(ws) {
-  mLibraries = std::make_shared<LibrariesModel>(mWorkspace, this);
-  mInstalledLibraries = std::make_shared<slint::FilterModel<ui::Library>>(
-      mLibraries, [](const ui::Library& lib) {
-        return lib.type != ui::LibraryType::Online;
-      });
-  mAvailableLibraries = std::make_shared<slint::FilterModel<ui::Library>>(
-      mLibraries, [](const ui::Library& lib) {
-        return lib.type == ui::LibraryType::Online;
-      });
-
-  mWorkspace.getLibraryDb().startLibraryRescan();
-  newWindow();
+slint::SharedString q2s(const QString& s) noexcept {
+  return slint::SharedString(s.toUtf8().data());
 }
 
-GuiApplication::~GuiApplication() noexcept {
+slint::Image q2s(const QPixmap& p) noexcept {
+  if (p.isNull()) {
+    return slint::Image();
+  }
+
+  QImage img = p.toImage();
+  img.convertTo(QImage::Format_RGBA8888);
+  return slint::Image(slint::SharedPixelBuffer<slint::Rgba8Pixel>(
+      img.width(), img.height(),
+      reinterpret_cast<const slint::Rgba8Pixel*>(img.bits())));
 }
 
-/*******************************************************************************
- *  General Methods
- ******************************************************************************/
-
-std::shared_ptr<MainWindow> GuiApplication::newWindow() noexcept {
-  auto ptr = std::make_shared<MainWindow>(*this, this);
-  mWindows.append(ptr);
-  return ptr;
+QString s2q(const slint::SharedString& s) noexcept {
+  std::string_view view(s);
+  return QString::fromUtf8(view.data(), view.size());
 }
 
-void GuiApplication::exec() {
-  slint::run_event_loop();
+bool operator==(const QString& s1, const slint::SharedString& s2) noexcept {
+  return s1.toUtf8().data() == std::string_view(s2);
+}
+
+bool operator!=(const QString& s1, const slint::SharedString& s2) noexcept {
+  return s1.toUtf8().data() != std::string_view(s2);
+}
+
+bool operator==(const slint::SharedString& s1, const QString& s2) noexcept {
+  return std::string_view(s1) == s2.toUtf8().data();
+}
+
+bool operator!=(const slint::SharedString& s1, const QString& s2) noexcept {
+  return std::string_view(s1) != s2.toUtf8().data();
 }
 
 /*******************************************************************************

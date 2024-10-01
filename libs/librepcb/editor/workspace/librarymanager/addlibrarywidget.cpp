@@ -380,10 +380,10 @@ void AddLibraryWidget::downloadZipFinished(bool success,
 }
 
 void AddLibraryWidget::onlineLibraryListReceived(
-    const QJsonArray& libs) noexcept {
-  foreach (const QJsonValue& libVal, libs) {
+    QList<ApiEndpoint::Library> libs) noexcept {
+  foreach (const ApiEndpoint::Library& lib, libs) {
     OnlineLibraryListWidgetItem* widget =
-        new OnlineLibraryListWidgetItem(mWorkspace, libVal.toObject());
+        new OnlineLibraryListWidgetItem(mWorkspace, lib);
     if (mManualCheckStateForAllRemoteLibraries) {
       widget->setChecked(mUi->cbxOnlineLibrariesSelectAll->isChecked());
     }
@@ -395,7 +395,7 @@ void AddLibraryWidget::onlineLibraryListReceived(
     // Set item text to make searching by keyboard working (type to find
     // library). However, the text would mess up the look, thus it is made
     // hidden with a stylesheet set in the constructor (see above).
-    item->setText(widget->getName());
+    item->setText(widget->getLibrary().name);
     item->setSizeHint(widget->sizeHint());
     mUi->lstOnlineLibraries->setItemWidget(item, widget);
   }
@@ -431,7 +431,7 @@ void AddLibraryWidget::repoLibraryDownloadCheckedChanged(
       auto* widget = dynamic_cast<OnlineLibraryListWidgetItem*>(
           mUi->lstOnlineLibraries->itemWidget(item));
       if (widget && widget->isChecked()) {
-        libs.unite(widget->getDependencies());
+        libs.unite(widget->getLibrary().dependencies);
       }
     }
     for (int i = 0; i < mUi->lstOnlineLibraries->count(); i++) {
@@ -439,7 +439,7 @@ void AddLibraryWidget::repoLibraryDownloadCheckedChanged(
       Q_ASSERT(item);
       auto* widget = dynamic_cast<OnlineLibraryListWidgetItem*>(
           mUi->lstOnlineLibraries->itemWidget(item));
-      if (widget && widget->getUuid() && (libs.contains(*widget->getUuid()))) {
+      if (widget && libs.contains(widget->getLibrary().uuid)) {
         widget->setChecked(true);
       }
     }
@@ -452,8 +452,8 @@ void AddLibraryWidget::repoLibraryDownloadCheckedChanged(
       Q_ASSERT(item);
       auto* widget = dynamic_cast<OnlineLibraryListWidgetItem*>(
           mUi->lstOnlineLibraries->itemWidget(item));
-      if (widget && widget->isChecked() && widget->getUuid()) {
-        libs.insert(*widget->getUuid());
+      if (widget && widget->isChecked()) {
+        libs.insert(widget->getLibrary().uuid);
       }
     }
     for (int i = 0; i < mUi->lstOnlineLibraries->count(); i++) {
@@ -461,7 +461,7 @@ void AddLibraryWidget::repoLibraryDownloadCheckedChanged(
       Q_ASSERT(item);
       auto* widget = dynamic_cast<OnlineLibraryListWidgetItem*>(
           mUi->lstOnlineLibraries->itemWidget(item));
-      if (widget && (!libs.contains(widget->getDependencies()))) {
+      if (widget && (!libs.contains(widget->getLibrary().dependencies))) {
         widget->setChecked(false);
       }
     }

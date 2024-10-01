@@ -59,10 +59,23 @@ MainWindow::MainWindow(GuiApplication& app, QObject* parent) noexcept
   mWindow->global<ui::Globals>().on_menu_item_triggered(
       [this](ui::MenuItemId id) { menuItemTriggered(id); });
 
-  mWindow->global<ui::Globals>().set_installed_libraries(
-      mApp.getInstalledLibraries());
-  mWindow->global<ui::Globals>().set_available_libraries(
-      mApp.getAvailableLibraries());
+  const ui::Globals& globals = mWindow->global<ui::Globals>();
+  globals.on_ensure_libraries_populated(
+      std::bind(&LibrariesModel::ensurePopulated, mApp.getLibraries().get()));
+  globals.set_refreshing_available_libraries(
+      mApp.getLibraries()->isFetchingRemoteLibraries());
+  connect(mApp.getLibraries().get(),
+          &LibrariesModel::remoteLibrariesFetchingChanged,
+          std::bind(&ui::Globals::set_refreshing_available_libraries, &globals,
+                    std::placeholders::_1));
+  globals.set_installed_libraries(mApp.getInstalledLibraries());
+  globals.set_available_libraries(mApp.getAvailableLibraries());
+  globals.on_install_library(std::bind(&LibrariesModel::installLibrary,
+                                       mApp.getLibraries().get(),
+                                       std::placeholders::_1));
+  globals.on_uninstall_library(std::bind(&LibrariesModel::uninstallLibrary,
+                                         mApp.getLibraries().get(),
+                                         std::placeholders::_1));
 
   mWindow->global<ui::Globals>().on_parse_length_input(
       [](slint::SharedString text, slint::SharedString unit) {

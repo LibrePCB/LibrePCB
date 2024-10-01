@@ -131,14 +131,52 @@ void ApiEndpoint::libraryListResponseReceived(const QByteArray& data) noexcept {
                  << nextResultsLink.toString();
     }
   }
-  QJsonValue reposVal = doc.object().value("results");
-  if ((reposVal.isNull()) || (!reposVal.isArray())) {
+  const QJsonValue results = doc.object().value("results");
+  if ((results.isNull()) || (!results.isArray())) {
     emit errorWhileFetchingLibraryList(
         tr("Received JSON object does not contain "
            "any results."));
     return;
   }
-  emit libraryListReceived(reposVal.toArray());
+
+  // Parse JSON.
+  QList<Library> libs;
+  foreach (const QJsonValue& item, results.toArray()) {
+    const QJsonObject obj = item.toObject();
+    auto uuid = Uuid::tryFromString(obj.value("uuid").toString());
+    auto version = Version::tryFromString(obj.value("version").toString());
+    if (!uuid) {
+      qCritical() << "Invalid UUID received:" << obj.value("uuid").toString();
+      continue;
+    }
+    if (!version) {
+      qCritical() << "Invalid version received:"
+                  << obj.value("version").toString();
+      continue;
+    }
+    Library lib{
+        *uuid,
+        obj.value("name").toObject().value("default").toString(),
+        obj.value("description").toObject().value("default").toString(),
+        obj.value("author").toString(),
+        *version,
+        obj.value("recommended").toBool(),
+        {},
+        QUrl(obj.value("icon_url").toString()),
+        QUrl(obj.value("download_url").toString()),
+        obj.value("download_size").toInt(-1),
+        obj.value("download_sha256").toString().toUtf8(),
+    };
+    foreach (const QJsonValue& value, obj.value("dependencies").toArray()) {
+      if (auto uuid = Uuid::tryFromString(value.toString())) {
+        lib.dependencies.insert(*uuid);
+      } else {
+        qWarning() << "Invalid library dependency UUID:" << value.toString();
+      }
+    }
+    libs.append(lib);
+  }
+  emit libraryListReceived(libs);
 }
 
 void ApiEndpoint::partsInformationStatusResponseReceived(

@@ -24,8 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include <librepcb/core/fileio/filepath.h>
-#include <librepcb/core/types/uuid.h>
-#include <librepcb/core/types/version.h>
+#include <librepcb/core/network/apiendpoint.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -60,13 +59,12 @@ public:
   OnlineLibraryListWidgetItem() = delete;
   OnlineLibraryListWidgetItem(const OnlineLibraryListWidgetItem& other) =
       delete;
-  OnlineLibraryListWidgetItem(Workspace& ws, const QJsonObject& obj) noexcept;
+  OnlineLibraryListWidgetItem(Workspace& ws,
+                              const ApiEndpoint::Library& obj) noexcept;
   ~OnlineLibraryListWidgetItem() noexcept;
 
   // Getters
-  const tl::optional<Uuid>& getUuid() const noexcept { return mUuid; }
-  const QString& getName() const noexcept { return mName; }
-  const QSet<Uuid>& getDependencies() const noexcept { return mDependencies; }
+  const ApiEndpoint::Library& getLibrary() const noexcept { return mLibrary; }
   bool isChecked() const noexcept;
 
   // Setters
@@ -89,12 +87,7 @@ private:  // Methods
 
 private:  // Data
   Workspace& mWorkspace;
-  QJsonObject mJsonObject;
-  tl::optional<Uuid> mUuid;
-  QString mName;
-  tl::optional<Version> mVersion;
-  bool mIsRecommended;
-  QSet<Uuid> mDependencies;
+  const ApiEndpoint::Library mLibrary;
   QScopedPointer<Ui::OnlineLibraryListWidgetItem> mUi;
   QScopedPointer<LibraryDownload> mLibraryDownload;
   bool mAutoCheck;

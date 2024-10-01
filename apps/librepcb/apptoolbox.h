@@ -17,62 +17,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBREPCB_APPTOOLBOX_H
+#define LIBREPCB_APPTOOLBOX_H
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "guiapplication.h"
-
-#include "library/librariesmodel.h"
-#include "mainwindow.h"
-
-#include <librepcb/core/workspace/workspace.h>
-#include <librepcb/core/workspace/workspacelibrarydb.h>
-
 #include <QtCore>
+#include <QtGui>
+
+#include <slint.h>
 
 /*******************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 namespace editor {
 namespace app {
 
 /*******************************************************************************
- *  Constructors / Destructor
+ *  Non-Member Functions
  ******************************************************************************/
 
-GuiApplication::GuiApplication(Workspace& ws, QObject* parent) noexcept
-  : QObject(parent), mWorkspace(ws) {
-  mLibraries = std::make_shared<LibrariesModel>(mWorkspace, this);
-  mInstalledLibraries = std::make_shared<slint::FilterModel<ui::Library>>(
-      mLibraries, [](const ui::Library& lib) {
-        return lib.type != ui::LibraryType::Online;
-      });
-  mAvailableLibraries = std::make_shared<slint::FilterModel<ui::Library>>(
-      mLibraries, [](const ui::Library& lib) {
-        return lib.type == ui::LibraryType::Online;
-      });
+slint::SharedString q2s(const QString& s) noexcept;
+slint::Image q2s(const QPixmap& p) noexcept;
 
-  mWorkspace.getLibraryDb().startLibraryRescan();
-  newWindow();
-}
+QString s2q(const slint::SharedString& s) noexcept;
 
-GuiApplication::~GuiApplication() noexcept {
-}
-
-/*******************************************************************************
- *  General Methods
- ******************************************************************************/
-
-std::shared_ptr<MainWindow> GuiApplication::newWindow() noexcept {
-  auto ptr = std::make_shared<MainWindow>(*this, this);
-  mWindows.append(ptr);
-  return ptr;
-}
-
-void GuiApplication::exec() {
-  slint::run_event_loop();
-}
+bool operator==(const QString& s1, const slint::SharedString& s2) noexcept;
+bool operator!=(const QString& s1, const slint::SharedString& s2) noexcept;
+bool operator==(const slint::SharedString& s1, const QString& s2) noexcept;
+bool operator!=(const slint::SharedString& s1, const QString& s2) noexcept;
 
 /*******************************************************************************
  *  End of File
@@ -81,3 +56,5 @@ void GuiApplication::exec() {
 }  // namespace app
 }  // namespace editor
 }  // namespace librepcb
+
+#endif
