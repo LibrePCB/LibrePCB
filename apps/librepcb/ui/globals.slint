@@ -22,7 +22,8 @@ export struct Library {
     icon: image,
     type: LibraryType,
     state: LibraryState,
-    progress: int, // 0 if not installing
+    progress: int, // [%], 0 if not installing
+    checked: bool,
 }
 
 export struct EditParseResult {
@@ -40,19 +41,21 @@ export global Globals {
     // if not done yet (lazy loading only if libraries are visible in the UI).
     pure callback ensure-libraries-populated();
 
-    // Install a library
-    //
-    // - Library ID (see Library::id)
-    pure callback install-library(string);
+    // Install all checked libraries
+    pure callback install-checked-libraries();
 
     // Uninstall a library
     //
     // - Library ID (see Library::id)
     pure callback uninstall-library(string);
 
+    in property <int> status-bar-progress: 50;
+
     in property <bool> refreshing-available-libraries: false;
 
-    in property <[Library]> installed-libraries: [
+    in property <int> installable-libraries: 3;
+
+    in property <[Library]> libraries: [
         {
             name: "My Library",
             description: "My own local library.",
@@ -77,9 +80,6 @@ export global Globals {
             type: LibraryType.remote,
             state: LibraryState.outdated,
         },
-    ];
-
-    in property <[Library]> available-libraries: [
         {
             name: "LibrePCB Integrated Circuits",
             description: "Official LibrePCB Integrated Circuits Library",

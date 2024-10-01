@@ -44,15 +44,6 @@ namespace app {
 GuiApplication::GuiApplication(Workspace& ws, QObject* parent) noexcept
   : QObject(parent), mWorkspace(ws) {
   mLibraries = std::make_shared<LibrariesModel>(mWorkspace, this);
-  mInstalledLibraries = std::make_shared<slint::FilterModel<ui::Library>>(
-      mLibraries, [](const ui::Library& lib) {
-        return lib.type != ui::LibraryType::Online;
-      });
-  mAvailableLibraries = std::make_shared<slint::FilterModel<ui::Library>>(
-      mLibraries, [](const ui::Library& lib) {
-        return lib.type == ui::LibraryType::Online;
-      });
-
   mWorkspace.getLibraryDb().startLibraryRescan();
   newWindow();
 }

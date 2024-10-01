@@ -32,7 +32,6 @@ export component AppWindow inherits Window {
         z: 100;
         width: (root.width <= 800px) ? 40px : 50px;
         height: parent.height - self.y - statusBar.height - 1px;
-        page: MainPage.libraries;
     }
 
     if sideBar.page == MainPage.home: homePanel := HomePanel {
@@ -156,7 +155,6 @@ export component AppWindow inherits Window {
     }
 
     in property <string> workspace_path <=> lblStatusLeft.text;
-    in property <float> status_progress <=> prgStatus.progress;
     statusBar := Rectangle {
         x: 0;
         y: parent.height - self.height;
@@ -176,6 +174,7 @@ export component AppWindow inherits Window {
                 prgStatus := ProgressIndicator {
                     width: 100%;
                     visible: self.progress > 0 && self.progress < 1;
+                    progress: Globals.status-bar-progress / 100;
                 }
             }
         }

@@ -66,21 +66,24 @@ public:
 
   // General Methods
   void ensurePopulated() noexcept;
+  int getInstallableLibraries() const noexcept;
   bool isFetchingRemoteLibraries() const noexcept {
     return !mApiEndpointsInProgress.isEmpty();
   }
-  void installLibrary(const slint::SharedString& id) noexcept;
+  void installCheckedLibraries() noexcept;
   void uninstallLibrary(const slint::SharedString& id) noexcept;
 
   // Implementations
   std::size_t row_count() const override;
   std::optional<ui::Library> row_data(std::size_t i) const override;
+  void set_row_data(std::size_t i, const ui::Library& obj) noexcept;
 
   // Operator Overloadings
   LibrariesModel& operator=(const LibrariesModel& rhs) = delete;
 
 signals:
-  void remoteLibrariesFetchingChanged(bool fetching);
+  void installableLibrariesChanged(int count);
+  void fetchingRemoteLibrariesChanged(bool fetching);
 
 private:
   void refreshLocalLibraries() noexcept;
@@ -94,7 +97,7 @@ private:
   QList<std::shared_ptr<ApiEndpoint>> mApiEndpointsInProgress;
   QList<std::shared_ptr<LibraryDownload>> mDownloadsInProgress;
   QHash<Uuid, ui::Library> mLocalLibs;
-  QList<ApiEndpoint::Library> mRemoteLibs;
+  QHash<Uuid, ApiEndpoint::Library> mRemoteLibs;
   QHash<Uuid, QPixmap> mRemoteIcons;
   std::vector<ui::Library> mMergedLibs;
 };
