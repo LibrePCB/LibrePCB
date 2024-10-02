@@ -1,4 +1,5 @@
 import { SideBarButton } from "./sidebarbutton.slint";
+import { Globals } from "./globals.slint";
 
 export enum MainPage {
     home,
@@ -29,7 +30,7 @@ export component SideBar inherits Rectangle {
             toolTip: "Libraries";
             status-background: #d4d400;
             status-color: black;
-            status-text: "1";
+            status-text: (Globals.outdated-libraries > 0) ? Globals.outdated-libraries : "";
             checked: page == MainPage.libraries;
             clicked => {
                 page = MainPage.libraries;

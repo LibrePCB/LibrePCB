@@ -179,7 +179,7 @@ export component LibrariesPanel inherits Rectangle {
             vertical-stretch: 0;
         }
 
-        if Globals.installable-libraries > 0: Button {
+        if Globals.checked-libraries > 0: Button {
             text: @tr("Install/update");
             clicked => {
                 Globals.install-checked-libraries();

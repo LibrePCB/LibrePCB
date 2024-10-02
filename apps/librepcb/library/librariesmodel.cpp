@@ -65,7 +65,15 @@ void LibrariesModel::ensurePopulated() noexcept {
   refreshRemoteLibraries();
 }
 
-int LibrariesModel::getInstallableLibraries() const noexcept {
+int LibrariesModel::getOutdatedLibraries() const noexcept {
+  int count = 0;
+  for (const auto& lib : mMergedLibs) {
+    if (lib.state == ui::LibraryState::Outdated) ++count;
+  }
+  return count;
+}
+
+int LibrariesModel::getCheckedLibraries() const noexcept {
   int count = 0;
   for (const auto& lib : mMergedLibs) {
     if (lib.checked) ++count;
@@ -149,7 +157,7 @@ void LibrariesModel::set_row_data(std::size_t i,
   if (i < mMergedLibs.size()) {
     mMergedLibs.at(i) = obj;
   }
-  emit installableLibrariesChanged(getInstallableLibraries());
+  emit checkedLibrariesChanged(getCheckedLibraries());
 }
 
 /*******************************************************************************
@@ -279,14 +287,18 @@ void LibrariesModel::refreshMergedLibs() noexcept {
   }
   std::sort(mMergedLibs.begin(), mMergedLibs.end(),
             [](const ui::Library& a, const ui::Library& b) {
-              if (a.type != b.type) {
+              if ((a.state == ui::LibraryState::Outdated) !=
+                  (b.state == ui::LibraryState::Outdated)) {
+                return a.state == ui::LibraryState::Outdated;
+              } else if (a.type != b.type) {
                 return static_cast<int>(a.type) < static_cast<int>(b.type);
               } else {
                 return a.name < b.name;
               }
             });
   reset();
-  emit installableLibrariesChanged(getInstallableLibraries());
+  emit outdatedLibrariesChanged(getOutdatedLibraries());
+  emit checkedLibrariesChanged(getCheckedLibraries());
 }
 
 std::optional<std::size_t> LibrariesModel::findLib(const QString& id) noexcept {
