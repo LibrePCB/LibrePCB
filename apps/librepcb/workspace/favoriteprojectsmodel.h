@@ -17,47 +17,68 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_APPTOOLBOX_H
-#define LIBREPCB_APPTOOLBOX_H
+#ifndef LIBREPCB_WORKSPACE_FAVORITEPROJECTSMODEL_H
+#define LIBREPCB_WORKSPACE_FAVORITEPROJECTSMODEL_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <QtCore>
-#include <QtGui>
+#include "appwindow.h"
 
-#include <slint.h>
+#include <librepcb/core/fileio/filepath.h>
+
+#include <QtCore>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Workspace;
+
 namespace editor {
 namespace app {
 
 /*******************************************************************************
- *  Non-Member Functions
+ *  Class FavoriteProjectsModel
  ******************************************************************************/
 
-slint::SharedString q2s(const QString& s) noexcept;
-slint::Image q2s(const QPixmap& p) noexcept;
+/**
+ * @brief The FavoriteProjectsModel class
+ */
+class FavoriteProjectsModel : public QObject,
+                              public slint::Model<ui::FolderTreeItem> {
+  Q_OBJECT
 
-QString s2q(const slint::SharedString& s) noexcept;
+public:
+  // Constructors / Destructor
+  FavoriteProjectsModel() = delete;
+  FavoriteProjectsModel(const FavoriteProjectsModel& other) = delete;
+  explicit FavoriteProjectsModel(Workspace& ws,
+                                 QObject* parent = nullptr) noexcept;
+  virtual ~FavoriteProjectsModel() noexcept;
 
-bool operator==(const QString& s1, const slint::SharedString& s2) noexcept;
-bool operator!=(const QString& s1, const slint::SharedString& s2) noexcept;
-bool operator==(const slint::SharedString& s1, const QString& s2) noexcept;
-bool operator!=(const slint::SharedString& s1, const QString& s2) noexcept;
+  // General Methods
+  void add(const FilePath& fp) noexcept;
+  void remove(const FilePath& fp) noexcept;
 
-template <typename TTarget, typename TSlint, typename TClass, typename TQt>
-static void bind(QObject* context, const TTarget& target,
-                 void (TTarget::*setter)(const TSlint&) const, TClass* source,
-                 void (TClass::*signal)(TQt),
-                 const TSlint& defaultValue) noexcept {
-  QObject::connect(source, signal, context,
-                   std::bind(setter, &target, std::placeholders::_1));
-  (target.*setter)(defaultValue);
-}
+  // Implementations
+  std::size_t row_count() const override;
+  std::optional<ui::FolderTreeItem> row_data(std::size_t i) const override;
+
+  // Operator Overloadings
+  FavoriteProjectsModel& operator=(const FavoriteProjectsModel& rhs) = delete;
+
+private:
+  void load() noexcept;
+  void save() noexcept;
+  void refreshItems() noexcept;
+
+  const Workspace& mWorkspace;
+  const FilePath mFilePath;
+  QList<FilePath> mPaths;
+  std::vector<ui::FolderTreeItem> mItems;
+};
 
 /*******************************************************************************
  *  End of File

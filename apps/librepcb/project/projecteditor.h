@@ -17,47 +17,50 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_APPTOOLBOX_H
-#define LIBREPCB_APPTOOLBOX_H
+#ifndef LIBREPCB_PROJECT_PROJECTEDITOR_H
+#define LIBREPCB_PROJECT_PROJECTEDITOR_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include <QtCore>
-#include <QtGui>
 
-#include <slint.h>
+#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Project;
+
 namespace editor {
 namespace app {
 
 /*******************************************************************************
- *  Non-Member Functions
+ *  Class ProjectEditor
  ******************************************************************************/
 
-slint::SharedString q2s(const QString& s) noexcept;
-slint::Image q2s(const QPixmap& p) noexcept;
+/**
+ * @brief The ProjectEditor class
+ */
+class ProjectEditor : public QObject {
+  Q_OBJECT
 
-QString s2q(const slint::SharedString& s) noexcept;
+public:
+  // Constructors / Destructor
+  ProjectEditor() = delete;
+  ProjectEditor(const ProjectEditor& other) = delete;
+  explicit ProjectEditor(std::unique_ptr<Project> project,
+                         QObject* parent = nullptr) noexcept;
+  virtual ~ProjectEditor() noexcept;
 
-bool operator==(const QString& s1, const slint::SharedString& s2) noexcept;
-bool operator!=(const QString& s1, const slint::SharedString& s2) noexcept;
-bool operator==(const slint::SharedString& s1, const QString& s2) noexcept;
-bool operator!=(const slint::SharedString& s1, const QString& s2) noexcept;
+  // Operator Overloadings
+  ProjectEditor& operator=(const ProjectEditor& rhs) = delete;
 
-template <typename TTarget, typename TSlint, typename TClass, typename TQt>
-static void bind(QObject* context, const TTarget& target,
-                 void (TTarget::*setter)(const TSlint&) const, TClass* source,
-                 void (TClass::*signal)(TQt),
-                 const TSlint& defaultValue) noexcept {
-  QObject::connect(source, signal, context,
-                   std::bind(setter, &target, std::placeholders::_1));
-  (target.*setter)(defaultValue);
-}
+private:
+  std::unique_ptr<Project> mProject;
+};
 
 /*******************************************************************************
  *  End of File

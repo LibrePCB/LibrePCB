@@ -2,142 +2,163 @@ import { CheckBox, Button, ListView, ProgressIndicator, Spinner, HorizontalBox, 
 import { Globals, Library, LibraryType, LibraryState } from "./globals.slint";
 
 component LibraryList inherits ListView {
+    in property <length> bottom-padding: 50px;
     property <int> current-index: -1;
     property <length> item-height: 50px;
     in-out property <[Library]> model;
 
-    preferred-height: model.length * item-height;
+    preferred-height: model.length * item-height + bottom-padding;
 
     for lib[index] in model: Rectangle {
+        property <bool> add-separator: (index > 0) && (model[index - 1].type != lib.type);
+        property <bool> last-item: index == (model.length - 1);
+
         width: parent.width;
-        height: item-height;
-        background: (current-index == index) ? #454545 : (touch.has-hover ? #383838 : transparent);
+        height: item-height + (last-item ? bottom-padding : 0);
 
-        touch := TouchArea {
-            property <bool> buttons-visible: self.has-hover || (current-index == index);
-            property <bool> installable: (lib.type == LibraryType.online);
-            property <bool> updatable: (lib.type == LibraryType.remote) && (lib.state == LibraryState.outdated);
+        Rectangle {
+            y: 0;
+            height: item-height;
+            background: (current-index == index) ? #454545 : (touch.has-hover ? #383838 : transparent);
 
-            clicked => {
-                current-index = index;
-            }
+            touch := TouchArea {
+                property <bool> buttons-visible: self.has-hover || (current-index == index);
+                property <bool> installable: (lib.type == LibraryType.online);
+                property <bool> updatable: (lib.type == LibraryType.remote) && (lib.state == LibraryState.outdated);
 
-            HorizontalLayout {
-                padding: 2px;
-                padding-right: 10px;
-
-                Image {
-                    width: parent.height - 6px;
-                    height: parent.height - 6px;
-                    source: lib.icon;
+                clicked => {
+                    current-index = index;
                 }
 
-                VerticalLayout {
-                    padding: 3px;
+                HorizontalLayout {
+                    padding: 2px;
+                    padding-right: 10px;
 
-                    HorizontalLayout {
-                        vertical-stretch: 0;
+                    Image {
+                        width: item-height - 6px;
+                        height: item-height - 6px;
+                        source: lib.icon;
+                    }
 
-                        Text {
-                            color: #dddddd;
-                            font-size: 13px;
-                            font-weight: 700;
-                            overflow: TextOverflow.elide;
-                            text: lib.name;
+                    VerticalLayout {
+                        padding: 3px;
+
+                        HorizontalLayout {
+                            vertical-stretch: 0;
+
+                            Text {
+                                color: #dddddd;
+                                font-size: 13px;
+                                font-weight: 700;
+                                overflow: TextOverflow.elide;
+                                text: lib.name;
+                            }
+
+                            if lib.type != LibraryType.online: Rectangle {
+                                width: lblVersion.preferred-width + 10px;
+                                height: lblVersion.preferred-height + 2px;
+                                background: (lib.state == LibraryState.up-to-date) ? #006600 : ((lib.state == LibraryState.outdated) ? #aa0000 : #505050);
+                                border-radius: self.height / 2;
+                                lblVersion := Text {
+                                    color: white;
+                                    font-size: 10px;
+                                    text: lib.version + ((lib.type == LibraryType.local) ? " | local" : " | remote");
+                                }
+                            }
                         }
 
-                        if lib.type != LibraryType.online: Rectangle {
-                            width: lblVersion.preferred-width + 10px;
-                            height: lblVersion.preferred-height + 2px;
-                            background: (lib.state == LibraryState.up-to-date) ? #006600 : ((lib.state == LibraryState.outdated) ? #aa0000 : #505050);
-                            border-radius: self.height / 2;
-                            lblVersion := Text {
-                                color: white;
+                        HorizontalLayout {
+                            spacing: 5px;
+
+                            if lib.progress == 0: Text {
+                                vertical-alignment: TextVerticalAlignment.center;
+                                color: #dddddd;
                                 font-size: 10px;
-                                text: lib.version + ((lib.type == LibraryType.local) ? " | local" : " | remote");
+                                font-weight: 200;
+                                overflow: TextOverflow.elide;
+                                text: lib.description;
+                                wrap: TextWrap.word-wrap;
                             }
-                        }
-                    }
 
-                    HorizontalLayout {
-                        spacing: 5px;
-
-                        Text {
-                            vertical-alignment: TextVerticalAlignment.center;
-                            color: #dddddd;
-                            font-size: 10px;
-                            font-weight: 200;
-                            overflow: TextOverflow.elide;
-                            text: lib.description;
-                            wrap: TextWrap.word-wrap;
-                        }
-
-                        Button {
-                            y: (parent.height - self.height) / 2;
-                            width: self.visible ? self.preferred-width : 0px;
-                            height: 26px;
-                            icon: @image-url("img/delete.svg");
-                            // TODO: https://github.com/slint-ui/slint/issues/6426
-                            visible: buttons-visible && (lib.type != LibraryType.online);
-                            clicked => {
-                                uninstallPopup.show();
+                            if lib.progress > 0: ProgressIndicator {
+                                y: (parent.height - self.height) / 2;
+                                height: 8px;
+                                progress: lib.progress / 100;
                             }
-                        }
 
-                        if updatable || installable: CheckBox {
-                            checked: lib.checked;
-                            toggled => {
-                                lib.checked = self.checked;
-                            }
-                        }
-                    }
-
-                    if lib.progress > 0: ProgressIndicator {
-                        vertical-stretch: 0;
-                        progress: lib.progress / 100;
-                    }
-                }
-            }
-
-            uninstallPopup := PopupWindow {
-                Rectangle {
-                    background: #790000;
-
-                    VerticalBox {
-                        Text {
-                            font-size: 14px;
-                            font-weight: 900;
-                            text: @tr("Attention! This will remove the whole library directory and is not reversible:");
-                        }
-
-                        Text {
-                            font-family: "monospace";
-                            text: lib.id;
-                        }
-
-                        Text {
-                            text: @tr("Are you really sure to remove '{0}'?", lib.name);
-                        }
-
-                        HorizontalBox {
-                            alignment: LayoutAlignment.center;
-                            StandardButton {
-                                kind: yes;
+                            Button {
+                                y: (parent.height - self.height) / 2;
+                                width: self.visible ? self.preferred-width : 0px;
+                                height: 24px;
+                                icon: @image-url("img/delete.svg");
+                                // TODO: https://github.com/slint-ui/slint/issues/6426
+                                visible: buttons-visible && (lib.type != LibraryType.online);
                                 clicked => {
-                                    Globals.uninstall-library(lib.id);
+                                    uninstallPopup.show();
                                 }
                             }
 
-                            StandardButton {
-                                kind: cancel;
+                            if updatable || installable: CheckBox {
+                                checked: lib.checked;
+                                toggled => {
+                                    lib.checked = self.checked;
+                                }
                             }
                         }
                     }
                 }
 
-                x: root.width;
-                y: item-height / 2 - self.height / 2;
+                uninstallPopup := PopupWindow {
+                    Rectangle {
+                        background: #790000;
+
+                        VerticalBox {
+                            Text {
+                                font-size: 14px;
+                                font-weight: 900;
+                                text: @tr("Attention! This will remove the whole library directory and is not reversible:");
+                            }
+
+                            Text {
+                                font-family: "monospace";
+                                text: lib.id;
+                            }
+
+                            Text {
+                                text: @tr("Are you really sure to remove '{0}'?", lib.name);
+                            }
+
+                            HorizontalBox {
+                                alignment: LayoutAlignment.center;
+                                StandardButton {
+                                    kind: yes;
+                                    clicked => {
+                                        Globals.uninstall-library(lib.id);
+                                    }
+                                }
+
+                                StandardButton {
+                                    kind: cancel;
+                                }
+                            }
+                        }
+                    }
+
+                    x: root.width;
+                    y: item-height / 2 - self.height / 2;
+                }
             }
+        }
+
+        if add-separator: Rectangle {
+            y: 0;
+            height: 1px;
+            background: #555555;
+        }
+
+        if last-item: Rectangle {
+            y: item-height;
+            height: bottom-padding;
         }
     }
 }
@@ -176,11 +197,35 @@ export component LibrariesPanel inherits Rectangle {
 
         LibraryList {
             model: Globals.libraries;
+            bottom-padding: installBtn.height + 5px;
             vertical-stretch: 0;
         }
+    }
 
-        if Globals.checked-libraries > 0: Button {
-            text: @tr("Install/update");
+    installBtn := Rectangle {
+        y: parent.height - self.height - 5px;
+        width: self.preferred-width;
+        height: self.preferred-height;
+        background: #ff5100;
+        border-radius: self.height / 2;
+        visible: Globals.checked-libraries > 0;
+
+        installBox := HorizontalBox {
+            Image {
+                width: installTxt.preferred-height;
+                height: installTxt.preferred-height;
+                source: @image-url("img/download.svg");
+                colorize: installTxt.color;
+            }
+
+            installTxt := Text {
+                color: installTouch.has-hover ? white : black;
+                font-size: 14px;
+                text: @tr("Install/update {n} library" | "Install/update {n} libraries" % Globals.checked-libraries);
+            }
+        }
+
+        installTouch := TouchArea {
             clicked => {
                 Globals.install-checked-libraries();
             }

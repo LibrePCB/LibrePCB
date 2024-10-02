@@ -20,14 +20,15 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "mainwindow.h"
+#include "filesystemmodel.h"
 
-#include "apptoolbox.h"
-#include "guiapplication.h"
+#include "../apptoolbox.h"
 
-#include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/exceptions.h>
+#include <librepcb/core/fileio/fileutils.h>
+#include <librepcb/core/serialization/sexpression.h>
 #include <librepcb/core/workspace/workspace.h>
-#include <librepcb/editor/workspace/desktopservices.h>
+#include <librepcb/editor/workspace/controlpanel/fileiconprovider.h>
 
 #include <QtCore>
 
@@ -42,36 +43,55 @@ namespace app {
  *  Constructors / Destructor
  ******************************************************************************/
 
-MainWindow::MainWindow(GuiApplication& app,
-                       slint::ComponentHandle<ui::AppWindow> win, int index,
-                       QObject* parent) noexcept
-  : QObject(parent), mApp(app), mWindow(win), mIndex(index) {
-  // Register global callbacks.
-  const ui::Globals& globals = mWindow->global<ui::Globals>();
-  globals.on_project_item_doubleclicked(std::bind(
-      &MainWindow::projectItemDoubleClicked, this, std::placeholders::_1));
-
-  mWindow->show();
+FileSystemModel::FileSystemModel(const Workspace& ws, const FilePath& root,
+                                 QObject* parent) noexcept
+  : QObject(parent), mWorkspace(ws), mRoot(root) {
+  refresh();
 }
 
-MainWindow::~MainWindow() noexcept {
+FileSystemModel::~FileSystemModel() noexcept {
+}
+
+/*******************************************************************************
+ *  Implementations
+ ******************************************************************************/
+
+std::size_t FileSystemModel::row_count() const {
+  return mItems.size();
+}
+
+std::optional<ui::FolderTreeItem> FileSystemModel::row_data(
+    std::size_t i) const {
+  return (i < mItems.size()) ? std::optional(mItems.at(i)) : std::nullopt;
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
-void MainWindow::projectItemDoubleClicked(
-    const slint::SharedString& path) noexcept {
-  const FilePath fp(s2q(path));
-  if (!fp.isValid()) {
-    qWarning() << "Invalid file path:" << path.data();
-    return;
-  }
-  if ((fp.getSuffix() == "lpp") || (fp.getSuffix() == "lppz")) {
-  } else {
-    DesktopServices ds(mApp.getWorkspace().getSettings(), nullptr);
-    ds.openLocalPath(fp);
+void FileSystemModel::refresh() noexcept {
+  mItems.clear();
+  FileIconProvider ip;
+  scanDir(mRoot.toStr(), 0, ip);
+  reset();
+}
+
+void FileSystemModel::scanDir(const QString& fp, int level,
+                              const FileIconProvider& ip) noexcept {
+  QDir dir(fp);
+  dir.setFilter(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
+  dir.setSorting(QDir::Name | QDir::DirsFirst);
+  foreach (const QFileInfo& info, dir.entryInfoList()) {
+    mItems.push_back(ui::FolderTreeItem{
+        level,
+        q2s(ip.icon(info).pixmap(48)),
+        q2s(info.fileName()),
+        q2s(info.filePath()),
+        info.isDir(),
+    });
+    if (info.isDir() && (level < 1)) {
+      scanDir(info.filePath(), level + 1, ip);
+    }
   }
 }
 

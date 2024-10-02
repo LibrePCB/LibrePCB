@@ -33,8 +33,6 @@
 
 #include <QtCore>
 
-#include <optional>
-
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -156,6 +154,7 @@ void LibrariesModel::set_row_data(std::size_t i,
                                   const ui::Library& obj) noexcept {
   if (i < mMergedLibs.size()) {
     mMergedLibs.at(i) = obj;
+    row_changed(i);
   }
   emit checkedLibrariesChanged(getCheckedLibraries());
 }
@@ -193,6 +192,7 @@ void LibrariesModel::refreshLocalLibraries() noexcept {
               q2s(description),
               q2s(version.toStr()),
               q2s(icon),
+              false,
               isRemote ? ui::LibraryType::Remote : ui::LibraryType::Local,
               ui::LibraryState::Unknown,
               0,
@@ -275,6 +275,7 @@ void LibrariesModel::refreshMergedLibs() noexcept {
           q2s(lib.description),
           q2s(lib.version.toStr()),
           q2s(mRemoteIcons.value(lib.uuid)),
+          lib.recommended,
           ui::LibraryType::Online,
           ui::LibraryState::Unknown,
           0,
@@ -292,6 +293,8 @@ void LibrariesModel::refreshMergedLibs() noexcept {
                 return a.state == ui::LibraryState::Outdated;
               } else if (a.type != b.type) {
                 return static_cast<int>(a.type) < static_cast<int>(b.type);
+              } else if (a.recommended != b.recommended) {
+                return a.recommended;
               } else {
                 return a.name < b.name;
               }
