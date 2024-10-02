@@ -1,17 +1,5 @@
 import { ListView } from "std-widgets.slint";
-
-enum FolderTreeItemType {
-    folder,
-    file,
-    project,
-}
-
-struct FolderTreeItem {
-    type: FolderTreeItemType,
-    level: int,
-    icon: image,
-    name: string,
-}
+import { Globals, FolderTreeItem } from "./globals.slint";
 
 component FolderTree inherits ListView {
     property <int> current-index: -1;
@@ -27,15 +15,14 @@ component FolderTree inherits ListView {
 
         HorizontalLayout {
             spacing: 5px;
-            padding-left: (item.type == FolderTreeItemType.project) ? 0px : (item.level * imgIcon.width);
+            padding-left: 5px + item.level * imgIcon.width;
 
-            Text {
+            if (item.is-folder) || (item.level > 0): Text {
                 color: #dddddd;
                 font-size: 14px;
                 font-weight: 700;
                 overflow: TextOverflow.elide;
-                visible: item.type == FolderTreeItemType.folder;
-                width: (item.type == FolderTreeItemType.project) ? 0px : self.preferred-width;
+                visible: item.is-folder;
                 text: "▸";
             }
 
@@ -50,7 +37,7 @@ component FolderTree inherits ListView {
                 horizontal-stretch: 1;
                 color: #dddddd;
                 font-size: 14px;
-                font-weight: 700;
+                font-weight: 400;
                 overflow: TextOverflow.elide;
                 text: item.name;
             }
@@ -59,6 +46,9 @@ component FolderTree inherits ListView {
         touch := TouchArea {
             clicked => {
                 current-index = index;
+            }
+            double-clicked => {
+                Globals.project-item-doubleclicked(item.path);
             }
         }
     }
@@ -75,39 +65,6 @@ export component HomePanel inherits Rectangle {
             width: root.width;
             height: self.preferred-height;
             font-weight: 700;
-            text: @tr("WORKSPACE");
-        }
-
-        Rectangle {
-            height: 1px;
-            background: #555555;
-        }
-
-        FolderTree {
-            vertical-stretch: 2;
-            model: [
-                {
-                    type: FolderTreeItemType.folder,
-                    level: 0,
-                    icon: @image-url("img/library.png"),
-                    name: "my-project",
-                },
-                {
-                    type: FolderTreeItemType.file,
-                    level: 1,
-                    icon: @image-url("img/library.png"),
-                    name: "my-project.lpp",
-                },
-            ];
-        }
-
-        Rectangle { }
-
-        Text {
-            x: 5px;
-            width: root.width;
-            height: self.preferred-height;
-            font-weight: 700;
             text: @tr("RECENTLY OPENED");
         }
 
@@ -118,16 +75,12 @@ export component HomePanel inherits Rectangle {
 
         FolderTree {
             vertical-stretch: 0;
-            model: [
-                {
-                    type: FolderTreeItemType.project,
-                    icon: @image-url("img/library.png"),
-                    name: "my-project.lpp",
-                },
-            ];
+            model: Globals.recent-projects;
         }
 
-        Rectangle { }
+        Rectangle {
+            min-height: 15px;
+        }
 
         Text {
             x: 5px;
@@ -144,13 +97,29 @@ export component HomePanel inherits Rectangle {
 
         FolderTree {
             vertical-stretch: 0;
-            model: [
-                {
-                    type: FolderTreeItemType.project,
-                    icon: @image-url("img/library.png"),
-                    name: "my-project.lpp",
-                },
-            ];
+            model: Globals.favorite-projects;
+        }
+
+        Rectangle {
+            min-height: 15px;
+        }
+
+        Text {
+            x: 5px;
+            width: root.width;
+            height: self.preferred-height;
+            font-weight: 700;
+            text: @tr("WORKSPACE");
+        }
+
+        Rectangle {
+            height: 1px;
+            background: #555555;
+        }
+
+        FolderTree {
+            vertical-stretch: 2;
+            model: Globals.workspace-folder;
         }
 
         Rectangle { }

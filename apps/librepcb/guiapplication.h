@@ -39,8 +39,11 @@ class Workspace;
 namespace editor {
 namespace app {
 
+class FavoriteProjectsModel;
 class LibrariesModel;
 class MainWindow;
+class ProjectsModel;
+class RecentProjectsModel;
 
 /*******************************************************************************
  *  Class GuiApplication
@@ -64,15 +67,20 @@ public:
   std::shared_ptr<LibrariesModel> getLibraries() noexcept { return mLibraries; }
 
   // General Methods
-  std::shared_ptr<MainWindow> newWindow() noexcept;
   void exec();
 
   // Operator Overloadings
   GuiApplication& operator=(const GuiApplication& rhs) = delete;
 
 private:
+  void createNewWindow() noexcept;
+  void menuItemTriggered(ui::MenuItemId id) noexcept;
+
   Workspace& mWorkspace;
+  std::shared_ptr<RecentProjectsModel> mRecentProjects;
+  std::shared_ptr<FavoriteProjectsModel> mFavoriteProjects;
   std::shared_ptr<LibrariesModel> mLibraries;
+  std::shared_ptr<ProjectsModel> mProjects;
   QList<std::shared_ptr<MainWindow>> mWindows;
 };
 

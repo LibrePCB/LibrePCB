@@ -50,17 +50,20 @@ public:
   // Constructors / Destructor
   MainWindow() = delete;
   MainWindow(const MainWindow& other) = delete;
-  explicit MainWindow(GuiApplication& app, QObject* parent = nullptr) noexcept;
+  explicit MainWindow(GuiApplication& app,
+                      slint::ComponentHandle<ui::AppWindow> win, int index,
+                      QObject* parent = nullptr) noexcept;
   virtual ~MainWindow() noexcept;
 
   // Operator Overloadings
   MainWindow& operator=(const MainWindow& rhs) = delete;
 
 private:
-  void menuItemTriggered(ui::MenuItemId id) noexcept;
+  void projectItemDoubleClicked(const slint::SharedString& path) noexcept;
 
   GuiApplication& mApp;
   slint::ComponentHandle<ui::AppWindow> mWindow;
+  const int mIndex;
 };
 
 /*******************************************************************************

@@ -17,47 +17,66 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_APPTOOLBOX_H
-#define LIBREPCB_APPTOOLBOX_H
+#ifndef LIBREPCB_WORKSPACE_FILESYSTEMMODEL_H
+#define LIBREPCB_WORKSPACE_FILESYSTEMMODEL_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <QtCore>
-#include <QtGui>
+#include "appwindow.h"
 
-#include <slint.h>
+#include <librepcb/core/fileio/filepath.h>
+
+#include <QtCore>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Workspace;
+
 namespace editor {
+
+class FileIconProvider;
+
 namespace app {
 
 /*******************************************************************************
- *  Non-Member Functions
+ *  Class FileSystemModel
  ******************************************************************************/
 
-slint::SharedString q2s(const QString& s) noexcept;
-slint::Image q2s(const QPixmap& p) noexcept;
+/**
+ * @brief The FileSystemModel class
+ */
+class FileSystemModel : public QObject,
+                        public slint::Model<ui::FolderTreeItem> {
+  Q_OBJECT
 
-QString s2q(const slint::SharedString& s) noexcept;
+public:
+  // Constructors / Destructor
+  FileSystemModel() = delete;
+  FileSystemModel(const FileSystemModel& other) = delete;
+  explicit FileSystemModel(const Workspace& ws, const FilePath& root,
+                           QObject* parent = nullptr) noexcept;
+  virtual ~FileSystemModel() noexcept;
 
-bool operator==(const QString& s1, const slint::SharedString& s2) noexcept;
-bool operator!=(const QString& s1, const slint::SharedString& s2) noexcept;
-bool operator==(const slint::SharedString& s1, const QString& s2) noexcept;
-bool operator!=(const slint::SharedString& s1, const QString& s2) noexcept;
+  // Implementations
+  std::size_t row_count() const override;
+  std::optional<ui::FolderTreeItem> row_data(std::size_t i) const override;
 
-template <typename TTarget, typename TSlint, typename TClass, typename TQt>
-static void bind(QObject* context, const TTarget& target,
-                 void (TTarget::*setter)(const TSlint&) const, TClass* source,
-                 void (TClass::*signal)(TQt),
-                 const TSlint& defaultValue) noexcept {
-  QObject::connect(source, signal, context,
-                   std::bind(setter, &target, std::placeholders::_1));
-  (target.*setter)(defaultValue);
-}
+  // Operator Overloadings
+  FileSystemModel& operator=(const FileSystemModel& rhs) = delete;
+
+private:
+  void refresh() noexcept;
+  void scanDir(const QString& fp, int level,
+               const FileIconProvider& ip) noexcept;
+
+  const Workspace& mWorkspace;
+  const FilePath mRoot;
+  std::vector<ui::FolderTreeItem> mItems;
+};
 
 /*******************************************************************************
  *  End of File

@@ -22,6 +22,16 @@ add_executable(
   main.cpp
   mainwindow.cpp
   mainwindow.h
+  project/projecteditor.cpp
+  project/projecteditor.h
+  project/projectsmodel.cpp
+  project/projectsmodel.h
+  workspace/favoriteprojectsmodel.cpp
+  workspace/favoriteprojectsmodel.h
+  workspace/filesystemmodel.cpp
+  workspace/filesystemmodel.h
+  workspace/recentprojectsmodel.cpp
+  workspace/recentprojectsmodel.h
 )
 slint_target_sources(librepcb ui/appwindow.slint NAMESPACE ui)
 target_include_directories(

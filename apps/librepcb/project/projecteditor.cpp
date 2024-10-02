@@ -17,47 +17,41 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_APPTOOLBOX_H
-#define LIBREPCB_APPTOOLBOX_H
-
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <QtCore>
-#include <QtGui>
+#include "projecteditor.h"
 
-#include <slint.h>
+#include <librepcb/core/project/project.h>
+
+#include <QtCore>
 
 /*******************************************************************************
- *  Namespace / Forward Declarations
+ *  Namespace
  ******************************************************************************/
 namespace librepcb {
 namespace editor {
 namespace app {
 
 /*******************************************************************************
- *  Non-Member Functions
+ *  Constructors / Destructor
  ******************************************************************************/
 
-slint::SharedString q2s(const QString& s) noexcept;
-slint::Image q2s(const QPixmap& p) noexcept;
-
-QString s2q(const slint::SharedString& s) noexcept;
-
-bool operator==(const QString& s1, const slint::SharedString& s2) noexcept;
-bool operator!=(const QString& s1, const slint::SharedString& s2) noexcept;
-bool operator==(const slint::SharedString& s1, const QString& s2) noexcept;
-bool operator!=(const slint::SharedString& s1, const QString& s2) noexcept;
-
-template <typename TTarget, typename TSlint, typename TClass, typename TQt>
-static void bind(QObject* context, const TTarget& target,
-                 void (TTarget::*setter)(const TSlint&) const, TClass* source,
-                 void (TClass::*signal)(TQt),
-                 const TSlint& defaultValue) noexcept {
-  QObject::connect(source, signal, context,
-                   std::bind(setter, &target, std::placeholders::_1));
-  (target.*setter)(defaultValue);
+ProjectEditor::ProjectEditor(std::unique_ptr<Project> project,
+                             QObject* parent) noexcept
+  : QObject(parent), mProject(std::move(project)) {
 }
+
+ProjectEditor::~ProjectEditor() noexcept {
+}
+
+/*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
 
 /*******************************************************************************
  *  End of File
@@ -66,5 +60,3 @@ static void bind(QObject* context, const TTarget& target,
 }  // namespace app
 }  // namespace editor
 }  // namespace librepcb
-
-#endif

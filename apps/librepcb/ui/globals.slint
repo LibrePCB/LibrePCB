@@ -20,10 +20,29 @@ export struct Library {
     description: string,
     version: string,
     icon: image,
+    recommended: bool,
     type: LibraryType,
     state: LibraryState,
     progress: int, // [%], 0 if not installing
     checked: bool,
+}
+
+export struct FolderTreeItem {
+    level: int,
+    icon: image,
+    name: string,
+    path: string,
+    is-folder: bool,
+}
+
+export struct Project {
+    path: string,
+    name: string,
+}
+
+export struct ProjectData {
+    valid: bool,
+    name: string,
 }
 
 export struct EditParseResult {
@@ -34,6 +53,11 @@ export struct EditParseResult {
 
 export global Globals {
     pure callback menu-item-triggered(MenuItemId);
+
+    // An item in a project tree view has been double-clicked.
+    //
+    // - File path (see FolderTreeItem::path)
+    pure callback project-item-doubleclicked(string);
 
     pure callback parse-length-input(string, string) -> EditParseResult;
 
@@ -48,6 +72,52 @@ export global Globals {
     //
     // - Library ID (see Library::id)
     pure callback uninstall-library(string);
+
+    in property <[FolderTreeItem]> workspace-folder: [
+        {
+            icon: @image-url("img/library.png"),
+            name: "project-1",
+            path: "/path/to",
+            is-folder: true,
+        },
+        {
+            level: 1,
+            icon: @image-url("img/library.png"),
+            name: "project-2.lpp",
+            path: "/path/to/project-2.lpp",
+        },
+    ];
+
+    in property <[FolderTreeItem]> recent-projects: [
+        {
+            icon: @image-url("img/library.png"),
+            name: "project-1.lpp",
+            path: "/path/to/project-1.lpp",
+        },
+        {
+            icon: @image-url("img/library.png"),
+            name: "project-2.lpp",
+            path: "/path/to/project-2.lpp",
+        },
+    ];
+
+    in property <[FolderTreeItem]> favorite-projects: recent-projects;
+
+    in property <[Project]> open-projects: [
+        {
+            path: "/path/to/project-1.lpp",
+            name: "Project 1",
+        },
+        {
+            path: "/path/to/project-2.lpp",
+            name: "Project 2",
+        },
+    ];
+
+    in property <ProjectData> current-project: {
+        valid: true,
+        name: "Project 1",
+    };
 
     in property <int> status-bar-progress: 50;
 

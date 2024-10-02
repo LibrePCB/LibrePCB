@@ -17,47 +17,73 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_APPTOOLBOX_H
-#define LIBREPCB_APPTOOLBOX_H
+#ifndef LIBREPCB_PROJECT_PROJECTSMODEL_H
+#define LIBREPCB_PROJECT_PROJECTSMODEL_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <QtCore>
-#include <QtGui>
+#include "appwindow.h"
 
-#include <slint.h>
+#include <QtCore>
+
+#include <vector>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class FilePath;
+
 namespace editor {
 namespace app {
 
+class ProjectEditor;
+
 /*******************************************************************************
- *  Non-Member Functions
+ *  Class ProjectsModel
  ******************************************************************************/
 
-slint::SharedString q2s(const QString& s) noexcept;
-slint::Image q2s(const QPixmap& p) noexcept;
+/**
+ * @brief The ProjectsModel class
+ */
+class ProjectsModel : public QObject, public slint::Model<ui::Project> {
+  Q_OBJECT
 
-QString s2q(const slint::SharedString& s) noexcept;
+public:
+  // Constructors / Destructor
+  ProjectsModel() = delete;
+  ProjectsModel(const ProjectsModel& other) = delete;
+  explicit ProjectsModel(QObject* parent = nullptr) noexcept;
+  virtual ~ProjectsModel() noexcept;
 
-bool operator==(const QString& s1, const slint::SharedString& s2) noexcept;
-bool operator!=(const QString& s1, const slint::SharedString& s2) noexcept;
-bool operator==(const slint::SharedString& s1, const QString& s2) noexcept;
-bool operator!=(const slint::SharedString& s1, const QString& s2) noexcept;
+  // General Methods
+  void openProject(const FilePath& fp);
 
-template <typename TTarget, typename TSlint, typename TClass, typename TQt>
-static void bind(QObject* context, const TTarget& target,
-                 void (TTarget::*setter)(const TSlint&) const, TClass* source,
-                 void (TClass::*signal)(TQt),
-                 const TSlint& defaultValue) noexcept {
-  QObject::connect(source, signal, context,
-                   std::bind(setter, &target, std::placeholders::_1));
-  (target.*setter)(defaultValue);
-}
+  // Implementations
+  std::size_t row_count() const override;
+  std::optional<ui::Project> row_data(std::size_t i) const override;
+
+  // Operator Overloadings
+  ProjectsModel& operator=(const ProjectsModel& rhs) = delete;
+
+private:
+  /**
+   * @brief Ask the user whether to restore a backup of a project
+   *
+   * @param dir   The project directory to be restored.
+   *
+   * @retval true   Restore backup.
+   * @retval false  Do not restore backup.
+   *
+   * @throw Exception to abort opening the project.
+   */
+  static bool askForRestoringBackup(const FilePath& dir);
+
+  QMap<QString, std::shared_ptr<ProjectEditor>> mEditors;
+  std::vector<ui::Project> mItems;
+};
 
 /*******************************************************************************
  *  End of File
