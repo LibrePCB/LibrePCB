@@ -104,9 +104,12 @@ MainWindow::MainWindow(GuiApplication& app, QObject* parent) noexcept
   bind(this, globals, &ui::Globals::set_status_bar_progress,
        &app.getWorkspace().getLibraryDb(),
        &WorkspaceLibraryDb::scanProgressUpdate, 0);
-  bind(this, globals, &ui::Globals::set_installable_libraries,
-       mApp.getLibraries().get(), &LibrariesModel::installableLibrariesChanged,
-       mApp.getLibraries()->getInstallableLibraries());
+  bind(this, globals, &ui::Globals::set_outdated_libraries,
+       mApp.getLibraries().get(), &LibrariesModel::outdatedLibrariesChanged,
+       mApp.getLibraries()->getOutdatedLibraries());
+  bind(this, globals, &ui::Globals::set_checked_libraries,
+       mApp.getLibraries().get(), &LibrariesModel::checkedLibrariesChanged,
+       mApp.getLibraries()->getCheckedLibraries());
   bind(this, globals, &ui::Globals::set_refreshing_available_libraries,
        mApp.getLibraries().get(),
        &LibrariesModel::fetchingRemoteLibrariesChanged,

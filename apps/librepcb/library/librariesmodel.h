@@ -66,7 +66,8 @@ public:
 
   // General Methods
   void ensurePopulated() noexcept;
-  int getInstallableLibraries() const noexcept;
+  int getOutdatedLibraries() const noexcept;
+  int getCheckedLibraries() const noexcept;
   bool isFetchingRemoteLibraries() const noexcept {
     return !mApiEndpointsInProgress.isEmpty();
   }
@@ -82,7 +83,8 @@ public:
   LibrariesModel& operator=(const LibrariesModel& rhs) = delete;
 
 signals:
-  void installableLibrariesChanged(int count);
+  void outdatedLibrariesChanged(int count);
+  void checkedLibrariesChanged(int count);
   void fetchingRemoteLibrariesChanged(bool fetching);
 
 private:
