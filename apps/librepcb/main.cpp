@@ -391,49 +391,6 @@ static int openWorkspace(FilePath& path) {
 
   EventFilter* filter = new EventFilter(win, schScene);
   widget->installEventFilter(filter);
-  bool moving = false;
-  win->on_pointer_event([&](float x1, float y1, float x0, float y0,
-                            slint::private_api::PointerEvent e) {
-    if (e.button == slint::private_api::PointerEventButton::Left) {
-      if (e.kind == slint::private_api::PointerEventKind::Down) {
-        filter->oldTransform = filter->transform;
-        moving = true;
-      } else if (e.kind == slint::private_api::PointerEventKind::Up) {
-        moving = false;
-      }
-    }
-    if (moving && (e.kind == slint::private_api::PointerEventKind::Move)) {
-      filter->transform = filter->oldTransform;
-      filter->transform.translate(x0 - x1, y0 - y1);
-      win->window().request_redraw();
-    }
-    return slint::private_api::EventResult::Accept;
-  });
-  win->on_scrolled(
-      [&](float x, float y, slint::private_api::PointerScrollEvent e) {
-        QPointF scenePos = filter->transform.map(QPointF(x, y));
-        qreal scaleFactor = qPow(1.3, e.delta_y / qreal(-120));
-        filter->transform.translate(scenePos.x(), scenePos.y());
-        filter->transform.scale(scaleFactor, scaleFactor);
-        filter->transform.translate(-scenePos.x(), -scenePos.y());
-        win->window().request_redraw();
-        return slint::private_api::EventResult::Accept;
-      });
-
-  win->on_current_index_changed([&](int index) {
-    if (index == 0) {
-      filter->scene = schScene;
-      filter->view3d = nullptr;
-    } else if (index == 1) {
-      filter->scene = brdScene;
-      filter->view3d = nullptr;
-    } else {
-      filter->scene = nullptr;
-      filter->view3d = view3d;
-    }
-    win->window().request_redraw();
-  });
-
   win->show();*/
 
   // Run the application.

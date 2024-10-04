@@ -17,56 +17,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_PROJECTEDITOR_H
-#define LIBREPCB_PROJECT_PROJECTEDITOR_H
-
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "schematiceditor.h"
+
+#include <librepcb/core/project/schematic/schematic.h>
+
 #include <QtCore>
 
-#include <memory>
-
 /*******************************************************************************
- *  Namespace / Forward Declarations
+ *  Namespace
  ******************************************************************************/
 namespace librepcb {
-
-class Project;
-
 namespace editor {
 namespace app {
 
-class SchematicEditor;
-
 /*******************************************************************************
- *  Class ProjectEditor
+ *  Constructors / Destructor
  ******************************************************************************/
 
-/**
- * @brief The ProjectEditor class
- */
-class ProjectEditor : public QObject {
-  Q_OBJECT
+SchematicEditor::SchematicEditor(Schematic& schematic, QObject* parent) noexcept
+  : QObject(parent), mSchematic(schematic) {
+}
 
-public:
-  // Constructors / Destructor
-  ProjectEditor() = delete;
-  ProjectEditor(const ProjectEditor& other) = delete;
-  explicit ProjectEditor(std::unique_ptr<Project> project,
-                         QObject* parent = nullptr) noexcept;
-  virtual ~ProjectEditor() noexcept;
+SchematicEditor::~SchematicEditor() noexcept {
+}
 
-  // Getters
-  Project& getProject() noexcept { return *mProject; }
+/*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
 
-  // Operator Overloadings
-  ProjectEditor& operator=(const ProjectEditor& rhs) = delete;
-
-private:
-  std::unique_ptr<Project> mProject;
-  std::vector<std::shared_ptr<SchematicEditor>> mSchematics;
-};
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
 
 /*******************************************************************************
  *  End of File
@@ -75,5 +59,3 @@ private:
 }  // namespace app
 }  // namespace editor
 }  // namespace librepcb
-
-#endif

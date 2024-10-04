@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "projecteditor.h"
 
+#include "schematiceditor.h"
+
 #include <librepcb/core/project/project.h>
 
 #include <QtCore>
@@ -40,6 +42,9 @@ namespace app {
 ProjectEditor::ProjectEditor(std::unique_ptr<Project> project,
                              QObject* parent) noexcept
   : QObject(parent), mProject(std::move(project)) {
+  for (auto sch : mProject->getSchematics()) {
+    mSchematics.push_back(std::make_shared<SchematicEditor>(*sch));
+  }
 }
 
 ProjectEditor::~ProjectEditor() noexcept {
