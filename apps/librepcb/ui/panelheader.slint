@@ -1,0 +1,27 @@
+export component PanelHeader inherits Rectangle {
+    in property <length> spacing-top <=> layout.padding-top;
+    in property <string> title <=> txt.text;
+
+    layout := VerticalLayout {
+        padding-top: 3px;
+
+        HorizontalLayout {
+            height: txt.preferred-height;
+            padding-left: 5px;
+            spacing: 3px;
+
+            txt := Text {
+                height: self.preferred-height;
+                horizontal-stretch: 1;
+                font-weight: 700;
+            }
+
+            @children
+        }
+
+        Rectangle {
+            height: 1px;
+            background: #555555;
+        }
+    }
+}

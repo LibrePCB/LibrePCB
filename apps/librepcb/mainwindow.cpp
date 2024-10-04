@@ -24,12 +24,13 @@
 
 #include "apptoolbox.h"
 #include "guiapplication.h"
-
+#include <librepcb/core/project/project.h>
 #include <librepcb/core/fileio/filepath.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/editor/workspace/desktopservices.h>
-
+#include "project/projectsmodel.h"
 #include <QtCore>
+#include "project/projecteditor.h"
 
 /*******************************************************************************
  *  Namespace
@@ -48,6 +49,7 @@ MainWindow::MainWindow(GuiApplication& app,
   : QObject(parent), mApp(app), mWindow(win), mIndex(index) {
   // Register global callbacks.
   const ui::Globals& globals = mWindow->global<ui::Globals>();
+  globals.set_current_project(ui::ProjectData{});
   globals.on_project_item_doubleclicked(std::bind(
       &MainWindow::projectItemDoubleClicked, this, std::placeholders::_1));
 
@@ -69,6 +71,14 @@ void MainWindow::projectItemDoubleClicked(
     return;
   }
   if ((fp.getSuffix() == "lpp") || (fp.getSuffix() == "lppz")) {
+    mProject = mApp.getProjects().openProject(fp);
+
+    const ui::Globals& globals = mWindow->global<ui::Globals>();
+    globals.set_current_project(ui::ProjectData{
+                                  true,
+                                  q2s(*mProject->getProject().getName()),
+                                });
+    mWindow->set_page(ui::MainPage::Project);
   } else {
     DesktopServices ds(mApp.getWorkspace().getSettings(), nullptr);
     ds.openLocalPath(fp);

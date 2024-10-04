@@ -21,14 +21,17 @@
  *  Includes
  ******************************************************************************/
 #include "projectsmodel.h"
-#include <librepcb/core/fileio/transactionalfilesystem.h>
-#include <librepcb/editor/dialogs/directorylockhandlerdialog.h>
+
 #include "../apptoolbox.h"
-#include <librepcb/core/project/projectloader.h>
-#include <librepcb/core/project/project.h>
-#include <librepcb/core/utils/scopeguard.h>
-#include <QtCore>
 #include "projecteditor.h"
+
+#include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectloader.h>
+#include <librepcb/core/utils/scopeguard.h>
+#include <librepcb/editor/dialogs/directorylockhandlerdialog.h>
+
+#include <QtCore>
 #include <QtWidgets>
 
 /*******************************************************************************
@@ -52,14 +55,15 @@ ProjectsModel::~ProjectsModel() noexcept {
  *  General Methods
  ******************************************************************************/
 
-void ProjectsModel::openProject(const FilePath& fp) {
+std::shared_ptr<ProjectEditor> ProjectsModel::openProject(const FilePath& fp) {
   const QString uniqueFp = fp.toUnique().toStr();
-  if (mEditors.contains(uniqueFp)) return;
+  if (mEditors.contains(uniqueFp)) return mEditors.value(uniqueFp);
 
   // Opening the project can take some time, use wait cursor to provide
   // immediate UI feedback.
   QApplication::setOverrideCursor(Qt::WaitCursor);
-  auto cursorScopeGuard = scopeGuard([this]() { QApplication::restoreOverrideCursor(); });
+  auto cursorScopeGuard =
+      scopeGuard([this]() { QApplication::restoreOverrideCursor(); });
 
   // Open file system.
   std::shared_ptr<TransactionalFileSystem> fs;
@@ -83,16 +87,20 @@ void ProjectsModel::openProject(const FilePath& fp) {
 
   // Open project.
   ProjectLoader loader;
-  std::unique_ptr<Project> project =
-      loader.open(std::unique_ptr<TransactionalDirectory>(
-                      new TransactionalDirectory(fs)),
-                  projectFileName);  // can throw
+  std::unique_ptr<Project> project = loader.open(
+      std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(fs)),
+      projectFileName);  // can throw
 
   // Open editor.
   auto editor = std::make_shared<ProjectEditor>(std::move(project), this);
 
   // Keep handle.
   mEditors.insert(uniqueFp, editor);
+  mItems.push_back(ui::Project{
+      q2s(uniqueFp),
+      q2s(*editor->getProject().getName()),
+  });
+  return editor;
 }
 
 /*******************************************************************************

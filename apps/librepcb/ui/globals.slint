@@ -43,6 +43,12 @@ export struct Project {
 export struct ProjectData {
     valid: bool,
     name: string,
+    schematics: [string],
+    boards: [string],
+}
+
+export struct Tab {
+    title: string,
 }
 
 export struct EditParseResult {
@@ -54,12 +60,22 @@ export struct EditParseResult {
 export global Globals {
     pure callback menu-item-triggered(MenuItemId);
 
+    pure callback parse-length-input(string, string) -> EditParseResult;
+
     // An item in a project tree view has been double-clicked.
     //
     // - File path (see FolderTreeItem::path)
     pure callback project-item-doubleclicked(string);
 
-    pure callback parse-length-input(string, string) -> EditParseResult;
+    // A schematic in the projects panel has been clicked.
+    //
+    // - Schematic index
+    pure callback schematic-clicked(int);
+
+    // A board in the projects panel has been clicked.
+    //
+    // - Board index
+    pure callback board-clicked(int);
 
     // Populate the installed-libraries and available-libraries models with data
     // if not done yet (lazy loading only if libraries are visible in the UI).
@@ -72,6 +88,10 @@ export global Globals {
     //
     // - Library ID (see Library::id)
     pure callback uninstall-library(string);
+
+    pure callback scene-pointer-event(int, length, length, length, length, PointerEvent) -> EventResult;
+
+    pure callback scene-scrolled(int, length, length, PointerScrollEvent) -> EventResult;
 
     in property <[FolderTreeItem]> workspace-folder: [
         {
@@ -117,11 +137,13 @@ export global Globals {
     in property <ProjectData> current-project: {
         valid: true,
         name: "Project 1",
+        schematics: ["Power", "Logic"],
+        boards: ["Default", "Experiment"],
     };
 
     in property <int> status-bar-progress: 50;
 
-    in property <bool> refreshing-available-libraries: false;
+    in property <bool> refreshing-available-libraries: true;
 
     in property <int> outdated-libraries: 2;
 
@@ -165,5 +187,17 @@ export global Globals {
             type: LibraryType.online,
             progress: 42,
         },
+    ];
+
+    in property <[Tab]> tabs-left: [
+        { title: "Tab 1" },
+        { title: "Tab 2" },
+        { title: "Tab 3" },
+    ];
+
+    in property <[Tab]> tabs-right: [
+        { title: "Tab 4" },
+        { title: "Tab 5" },
+        { title: "Tab 6" },
     ];
 }

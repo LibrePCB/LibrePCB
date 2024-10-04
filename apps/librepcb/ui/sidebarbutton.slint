@@ -6,6 +6,7 @@ export component SideBarButton inherits Rectangle {
     in property <color> status-background;
     in property <color> status-color;
     in property <string> status-text;
+    in-out property <bool> enabled: true;
     in-out property <bool> checked: false;
     callback clicked;
 
@@ -19,6 +20,7 @@ export component SideBarButton inherits Rectangle {
     }
 
     touch := TouchArea {
+        enabled: enabled;
         clicked => {
             root.clicked();
         }
@@ -27,6 +29,7 @@ export component SideBarButton inherits Rectangle {
     image := Image {
         width: 70%;
         height: 70%;
+        colorize: enabled ? transparent : gray;
     }
 
     if status-text != "": Rectangle {
