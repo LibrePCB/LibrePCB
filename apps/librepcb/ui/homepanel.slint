@@ -1,4 +1,5 @@
 import { ListView } from "std-widgets.slint";
+import { PanelHeader } from "./panelheader.slint";
 import { Globals, FolderTreeItem } from "./globals.slint";
 
 component FolderTree inherits ListView {
@@ -58,19 +59,8 @@ export component HomePanel inherits Rectangle {
     background: #2a2a2a;
 
     VerticalLayout {
-        padding-top: 5px;
-
-        Text {
-            x: 5px;
-            width: root.width;
-            height: self.preferred-height;
-            font-weight: 700;
-            text: @tr("RECENTLY OPENED");
-        }
-
-        Rectangle {
-            height: 1px;
-            background: #555555;
+        PanelHeader {
+            title: @tr("RECENTLY OPENED");
         }
 
         FolderTree {
@@ -78,21 +68,9 @@ export component HomePanel inherits Rectangle {
             model: Globals.recent-projects;
         }
 
-        Rectangle {
-            min-height: 15px;
-        }
-
-        Text {
-            x: 5px;
-            width: root.width;
-            height: self.preferred-height;
-            font-weight: 700;
-            text: @tr("FAVORITES");
-        }
-
-        Rectangle {
-            height: 1px;
-            background: #555555;
+        PanelHeader {
+            spacing-top: 15px;
+            title: @tr("FAVORITES");
         }
 
         FolderTree {
@@ -100,21 +78,9 @@ export component HomePanel inherits Rectangle {
             model: Globals.favorite-projects;
         }
 
-        Rectangle {
-            min-height: 15px;
-        }
-
-        Text {
-            x: 5px;
-            width: root.width;
-            height: self.preferred-height;
-            font-weight: 700;
-            text: @tr("WORKSPACE");
-        }
-
-        Rectangle {
-            height: 1px;
-            background: #555555;
+        PanelHeader {
+            spacing-top: 15px;
+            title: @tr("WORKSPACE");
         }
 
         FolderTree {

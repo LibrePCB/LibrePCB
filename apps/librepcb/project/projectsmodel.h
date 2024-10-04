@@ -59,7 +59,7 @@ public:
   virtual ~ProjectsModel() noexcept;
 
   // General Methods
-  void openProject(const FilePath& fp);
+  std::shared_ptr<ProjectEditor> openProject(const FilePath& fp);
 
   // Implementations
   std::size_t row_count() const override;

@@ -55,6 +55,9 @@ public:
                          QObject* parent = nullptr) noexcept;
   virtual ~ProjectEditor() noexcept;
 
+  // Getters
+  Project& getProject() noexcept { return *mProject; }
+
   // Operator Overloadings
   ProjectEditor& operator=(const ProjectEditor& rhs) = delete;
 

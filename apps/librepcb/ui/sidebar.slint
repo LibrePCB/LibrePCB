@@ -40,6 +40,7 @@ export component SideBar inherits Rectangle {
         SideBarButton {
             icon: @image-url("img/projects.png");
             toolTip: "Project";
+            enabled: Globals.current-project.valid;
             checked: page == MainPage.project;
             clicked => {
                 page = MainPage.project;
@@ -50,6 +51,7 @@ export component SideBar inherits Rectangle {
             icon: @image-url("img/drc.svg");
             toolTip: "Design Rule Check";
             checked: page == MainPage.drc;
+            enabled: Globals.current-project.valid;
             clicked => {
                 page = MainPage.drc;
             }

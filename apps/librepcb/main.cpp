@@ -343,50 +343,6 @@ static int openWorkspace(FilePath& path) {
                    &WorkspaceSettingsItem::edited,
                    &ws.getSettings().keyboardShortcuts, applyKeyboardShortcuts);
 
-  // auto model = std::make_shared<slint::VectorModel<ui::ListItem>>();
-  // model->push_back(ui::ListItem{"1", false});
-  // model->push_back(ui::ListItem{"2", false});
-  // model->push_back(ui::ListItem{"3", false});
-  // win->set_model(model);
-
-  // Open project.
-  std::unique_ptr<Project> project;
-  SchematicGraphicsScene* schScene = nullptr;
-  BoardGraphicsScene* brdScene = nullptr;
-  OpenGlView* view3d = new OpenGlView();
-  OpenGlSceneBuilder openglBuilder;
-  QObject::connect(&openglBuilder, &OpenGlSceneBuilder::objectAdded, view3d,
-                   &OpenGlView::addObject);
-  try {
-    QSettings s;
-    const FilePath fp(s.value("controlpanel/last_open_project").toString());
-    std::shared_ptr<TransactionalFileSystem> fs =
-        TransactionalFileSystem::openRW(fp.getParentDir());
-    ProjectLoader loader;
-    project = loader.open(
-        std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(fs)),
-        fp.getFilename());  // can throw
-
-    DefaultGraphicsLayerProvider* lp =
-        new DefaultGraphicsLayerProvider(ws.getSettings().themes.getActive());
-    if (Schematic* sch = project->getSchematicByIndex(0)) {
-      schScene = new SchematicGraphicsScene(
-          *sch, *lp, std::make_shared<const QSet<const NetSignal*>>());
-      schScene->setBackgroundBrush(Qt::white);
-    }
-    if (Board* brd = project->getBoardByIndex(0)) {
-      BoardPlaneFragmentsBuilder builder;
-      builder.runSynchronously(*brd);
-      brdScene = new BoardGraphicsScene(
-          *brd, *lp, std::make_shared<const QSet<const NetSignal*>>());
-      brdScene->setBackgroundBrush(Qt::black);
-
-      openglBuilder.start(brd->buildScene3D(tl::nullopt));
-    }
-  } catch (const Exception& e) {
-    qCritical() << e.getMsg();
-  }
-
   /*QWidget* widget =
       static_cast<QWidget*>(slint::cbindgen_private::slint_qt_get_widget(
           &win->window().window_handle()));

@@ -35,6 +35,7 @@ namespace editor {
 namespace app {
 
 class GuiApplication;
+class ProjectEditor;
 
 /*******************************************************************************
  *  Class MainWindow
@@ -64,6 +65,7 @@ private:
   GuiApplication& mApp;
   slint::ComponentHandle<ui::AppWindow> mWindow;
   const int mIndex;
+  std::shared_ptr<ProjectEditor> mProject;
 };
 
 /*******************************************************************************

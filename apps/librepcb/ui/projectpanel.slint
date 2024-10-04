@@ -1,0 +1,56 @@
+import { PanelHeader } from "./panelheader.slint";
+import { Globals } from "./globals.slint";
+
+component ProjectItem inherits Rectangle {
+    in property <string> text <=> txt.text;
+
+    callback clicked <=> touch.clicked;
+
+    background: touch.has-hover ? #404040 : transparent;
+
+    HorizontalLayout {
+        padding: 2px;
+        padding-left: 12px;
+        padding-right: 5px;
+
+        txt := Text { }
+    }
+
+    touch := TouchArea { }
+}
+
+export component ProjectPanel inherits Rectangle {
+    background: #2a2a2a;
+
+    VerticalLayout {
+        alignment: LayoutAlignment.start;
+
+        PanelHeader {
+            title: Globals.current-project.name;
+        }
+
+        PanelHeader {
+            title: @tr("SCHEMATICS");
+        }
+
+        for schematic[index] in Globals.current-project.schematics: ProjectItem {
+            text: schematic;
+
+            clicked => {
+                Globals.schematic-clicked(index);
+            }
+        }
+
+        PanelHeader {
+            title: @tr("BOARDS");
+        }
+
+        for board[index] in Globals.current-project.boards: ProjectItem {
+            text: board;
+
+            clicked => {
+                Globals.board-clicked(index);
+            }
+        }
+    }
+}
