@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_PROJECTEDITOR_H
-#define LIBREPCB_PROJECT_PROJECTEDITOR_H
+#ifndef LIBREPCB_PROJECT_SCHEMATICEDITOR_H
+#define LIBREPCB_PROJECT_SCHEMATICEDITOR_H
 
 /*******************************************************************************
  *  Includes
@@ -32,40 +32,37 @@
  ******************************************************************************/
 namespace librepcb {
 
-class Project;
+class Schematic;
 
 namespace editor {
 namespace app {
 
-class SchematicEditor;
-
 /*******************************************************************************
- *  Class ProjectEditor
+ *  Class SchematicEditor
  ******************************************************************************/
 
 /**
- * @brief The ProjectEditor class
+ * @brief The SchematicEditor class
  */
-class ProjectEditor : public QObject {
+class SchematicEditor : public QObject {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  ProjectEditor() = delete;
-  ProjectEditor(const ProjectEditor& other) = delete;
-  explicit ProjectEditor(std::unique_ptr<Project> project,
-                         QObject* parent = nullptr) noexcept;
-  virtual ~ProjectEditor() noexcept;
+  SchematicEditor() = delete;
+  SchematicEditor(const SchematicEditor& other) = delete;
+  explicit SchematicEditor(Schematic& schematic,
+                           QObject* parent = nullptr) noexcept;
+  virtual ~SchematicEditor() noexcept;
 
   // Getters
-  Project& getProject() noexcept { return *mProject; }
+  Schematic& getSchematic() noexcept { return mSchematic; }
 
   // Operator Overloadings
-  ProjectEditor& operator=(const ProjectEditor& rhs) = delete;
+  SchematicEditor& operator=(const SchematicEditor& rhs) = delete;
 
 private:
-  std::unique_ptr<Project> mProject;
-  std::vector<std::shared_ptr<SchematicEditor>> mSchematics;
+  Schematic& mSchematic;
 };
 
 /*******************************************************************************

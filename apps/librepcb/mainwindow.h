@@ -32,6 +32,10 @@
  ******************************************************************************/
 namespace librepcb {
 namespace editor {
+
+class GraphicsScene;
+class IF_GraphicsLayerProvider;
+
 namespace app {
 
 class GuiApplication;
@@ -61,11 +65,29 @@ public:
 
 private:
   void projectItemDoubleClicked(const slint::SharedString& path) noexcept;
+  void schematicItemClicked(int index) noexcept;
+  void boardItemClicked(int index) noexcept;
+  void tabClicked(int group, int index) noexcept;
+  slint::Image renderScene(int section, float width, float height,
+                           int frame) noexcept;
+  slint::private_api::EventResult onScnePointerEvent(
+      int section, float x1, float y1, float x0, float y0,
+      slint::private_api::PointerEvent e) noexcept;
+  slint::private_api::EventResult onSceneScrolled(
+      int section, float x, float y,
+      slint::private_api::PointerScrollEvent e) noexcept;
 
   GuiApplication& mApp;
   slint::ComponentHandle<ui::AppWindow> mWindow;
+  const ui::Globals& mGlobals;
   const int mIndex;
   std::shared_ptr<ProjectEditor> mProject;
+  std::unique_ptr<IF_GraphicsLayerProvider> mLayerProvider;
+  QVector<std::shared_ptr<slint::VectorModel<ui::Tab>>> mTabs;  ///< count=2
+  QVector<std::shared_ptr<GraphicsScene>> mScenes;  ///< count=2
+  QVector<QTransform> mOldTransforms;
+  QVector<QTransform> mTransforms;
+  QVector<bool> mMoving;
 };
 
 /*******************************************************************************

@@ -1,70 +1,82 @@
-import { Globals, Tab } from "./globals.slint";
+import { Globals, Tab, TabType } from "./globals.slint";
 export component WindowSection inherits Rectangle {
-    in property <int> group;
+    in property <int> section;
     in property <[Tab]> tabs;
-    in property <image> scene-image <=> scene.source;
+    in-out property <int> current-tab-index;
+    in property <int> scene-frame;
 
-    out property <length> scene-width: scene.width;
-    out property <length> scene-height: scene.height;
+    tabBar := Rectangle {
+        x: 0;
+        y: 0;
+        height: 30px;
+        background: #353535;
 
-    //callback scene-resized(length, length);
+        HorizontalLayout {
+            alignment: LayoutAlignment.start;
 
-    //init => {
-    //    scene-resized(scene.width, scene.height);
-    //}
+            for tab[index] in tabs: Rectangle {
+                background: (index == current-tab-index) ? #505050 : (ta-tab.has-hover ? #404040 : #303030);
 
-    VerticalLayout {
-        tabBar := Rectangle {
-            height: 30px;
-            background: #353535;
-
-            HorizontalLayout {
-                property <int> current_index: 0;
-
-                alignment: LayoutAlignment.start;
-
-                for tab[index] in tabs: Rectangle {
-                    width: tabText.preferred-width + 30px;
-                    background: (index == current_index) ? #505050 : (tabArea.has-hover ? #404040 : #303030);
-
-                    tabText := Text {
-                        x: 7px;
-                        text: tab.title;
-                        color: (index == current_index) ? white : #a0a0a0;
-                    }
-
-                    tabArea := TouchArea {
-                        clicked => {
-                            current_index = index;
+                ta-tab := TouchArea {
+                    clicked => {
+                        if Globals.preview-mode {
+                            current-tab-index = index;
+                        } else {
+                            Globals.tab-clicked(section, index);
                         }
                     }
+                }
 
-                    btnClose := Rectangle {
-                        x: tabText.x + tabText.width + 4px;
+                HorizontalLayout {
+                    padding-left: 4px;
+                    padding-right: 2px;
+                    spacing: 3px;
+
+                    Image {
+                        width: 16px;
+                        source: (tab.type == TabType.board) ? @image-url("img/projects.png") : @image-url("img/image.svg");
+                    }
+
+                    t-tab := Text {
+                        vertical-alignment: TextVerticalAlignment.center;
+                        color: (index == current-tab-index) ? white : #a0a0a0;
+                        text: tab.title;
+                    }
+
+                    Rectangle {
+                        y: (parent.height - self.height) / 2;
                         width: icon.width;
                         height: icon.height;
-                        background: btnArea.has-hover ? #454545 : transparent;
+                        background: ta-close.has-hover ? #454545 : transparent;
                         border-radius: 3px;
 
                         icon := Image {
                             source: @image-url("img/close.svg");
-                            colorize: tabText.color;
+                            colorize: t-tab.color;
                         }
 
-                        btnArea := TouchArea { }
+                        ta-close := TouchArea { }
                     }
                 }
             }
         }
+    }
 
-        scene := Image {
-            TouchArea {
-                pointer-event(e) => {
-                    return Globals.scene-pointer_event(group, self.mouse-x, self.mouse-y, self.pressed-x, self.pressed-y, e);
-                }
-                scroll-event(e) => {
-                    return Globals.scene-scrolled(group, self.mouse-x, self.mouse-y, e);
-                }
+    scene := Image {
+        x: 0;
+        y: tabBar.height;
+        width: 100%;
+        height: parent.height - self.y;
+        image-fit: ImageFit.preserve;
+        image-rendering: ImageRendering.pixelated;
+        source: Globals.render-scene(section, self.width, self.height, scene-frame);
+
+        TouchArea {
+            pointer-event(e) => {
+                return Globals.scene-pointer_event(section, self.mouse-x, self.mouse-y, self.pressed-x, self.pressed-y, e);
+            }
+            scroll-event(e) => {
+                return Globals.scene-scrolled(section, self.mouse-x, self.mouse-y, e);
             }
         }
     }

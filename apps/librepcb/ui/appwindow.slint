@@ -30,7 +30,6 @@ export component AppWindow inherits Window {
         z: 100;
         width: (root.width <= 800px) ? 40px : 50px;
         height: parent.height - self.y - statusBar.height - 1px;
-        page: MainPage.project;
     }
 
     if sideBar.page == MainPage.home: homePanel := HomePanel {
@@ -72,11 +71,14 @@ export component AppWindow inherits Window {
         height: sideBar.height;
     }
 
-    in property <image> left-scene-image;
-    in property <image> right-scene-image;
-
-    out property <length> left-scene-width;
-    //out property <length> scene-height: section-left.scene-height;
+    property <int> scene-frame-left: 0;
+    property <int> scene-frame-right: 0;
+    public function refresh-scene-left() {
+        scene-frame-left += 1;
+    }
+    public function refresh-scene-right() {
+        scene-frame-right += 1;
+    }
 
     HorizontalLayout {
         property <int> section-count: min(Globals.tabs-left.length, 1) + min(Globals.tabs-right.length, 1);
@@ -97,15 +99,10 @@ export component AppWindow inherits Window {
         }
 
         if Globals.tabs-left.length > 0: section-left := WindowSection {
-            min-width: 100px;
-            preferred-width: 200px;
-            group: 0;
+            section: 0;
             tabs: Globals.tabs-left;
-            scene-image: left-scene-image;
-
-            changed scene-width => {
-                left-scene-width = self.scene-width;
-            }
+            current-tab-index <=> Globals.tab-index-left;
+            scene-frame: scene-frame-left;
         }
 
         if section-count == 2: Rectangle {
@@ -113,11 +110,10 @@ export component AppWindow inherits Window {
         }
 
         if Globals.tabs-right.length > 0: section-right := WindowSection {
-            min-width: 100px;
-            preferred-width: 200px;
-            group: 1;
+            section: 1;
             tabs: Globals.tabs-right;
-            scene-image: right-scene-image;
+            current-tab-index <=> Globals.tab-index-right;
+            scene-frame: scene-frame-right;
         }
     }
 

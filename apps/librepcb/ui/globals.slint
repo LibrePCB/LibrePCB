@@ -47,7 +47,14 @@ export struct ProjectData {
     boards: [string],
 }
 
+export enum TabType {
+    schematic,
+    board,
+}
+
 export struct Tab {
+    type: TabType,
+    index: int,  // Index of schematic or board in the project (not tab index)
     title: string,
 }
 
@@ -77,6 +84,12 @@ export global Globals {
     // - Board index
     pure callback board-clicked(int);
 
+    // Requested to switch to a particular tab
+    //
+    // - Section index (0 = left, 1 = right)
+    // - Clicked tab index
+    pure callback tab-clicked(int, int);
+
     // Populate the installed-libraries and available-libraries models with data
     // if not done yet (lazy loading only if libraries are visible in the UI).
     pure callback ensure-libraries-populated();
@@ -89,9 +102,19 @@ export global Globals {
     // - Library ID (see Library::id)
     pure callback uninstall-library(string);
 
+    // Render a graphics scene image
+    //
+    // - Scene section (0 = left, 1 = right)
+    // - Scene width
+    // - Scene height
+    // - Frame number (to be ignored)
+    pure callback render-scene(int, length, length, int) -> image;
+
     pure callback scene-pointer-event(int, length, length, length, length, PointerEvent) -> EventResult;
 
     pure callback scene-scrolled(int, length, length, PointerScrollEvent) -> EventResult;
+
+    in property <bool> preview-mode: true;
 
     in property <[FolderTreeItem]> workspace-folder: [
         {
@@ -190,14 +213,18 @@ export global Globals {
     ];
 
     in property <[Tab]> tabs-left: [
-        { title: "Tab 1" },
-        { title: "Tab 2" },
-        { title: "Tab 3" },
+        { type: TabType.schematic, index: 0, title: "Tab 1" },
+        { type: TabType.board, index: 0, title: "Tab 2" },
+        { type: TabType.schematic, index: 1, title: "Tab 3" },
     ];
 
+    in property <int> tab-index-left: 0;
+
     in property <[Tab]> tabs-right: [
-        { title: "Tab 4" },
-        { title: "Tab 5" },
-        { title: "Tab 6" },
+        { type: TabType.schematic, index: 0, title: "Tab 4" },
+        { type: TabType.board, index: 0, title: "Tab 5" },
+        { type: TabType.schematic, index: 1, title: "Tab 6" },
     ];
+
+    in property <int> tab-index-right: 0;
 }

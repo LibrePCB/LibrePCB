@@ -64,7 +64,7 @@ public:
 
   // Getters
   Workspace& getWorkspace() noexcept { return mWorkspace; }
-  ProjectsModel& getProjects() noexcept {return *mProjects;}
+  ProjectsModel& getProjects() noexcept { return *mProjects; }
 
   // General Methods
   void exec();

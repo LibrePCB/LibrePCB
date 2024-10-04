@@ -83,8 +83,11 @@ void GuiApplication::createNewWindow() noexcept {
   win->set_workspace_path(mWorkspace.getPath().toNative().toUtf8().data());
   win->on_close([&] { slint::quit_event_loop(); });
 
-  // Register global callbacks.
+  // Set static data.
   const ui::Globals& globals = win->global<ui::Globals>();
+  globals.set_preview_mode(false);
+
+  // Register global callbacks.
   globals.on_menu_item_triggered(
       [this](ui::MenuItemId id) { menuItemTriggered(id); });
   globals.on_parse_length_input(
