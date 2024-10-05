@@ -90,6 +90,12 @@ export global Globals {
     // - Clicked tab index
     pure callback tab-clicked(int, int);
 
+    // Requested to close a particular tab
+    //
+    // - Section index (0 = left, 1 = right)
+    // - Clicked tab index
+    pure callback tab-close-clicked(int, int);
+
     // Populate the installed-libraries and available-libraries models with data
     // if not done yet (lazy loading only if libraries are visible in the UI).
     pure callback ensure-libraries-populated();
