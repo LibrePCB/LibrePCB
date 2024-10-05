@@ -17,7 +17,7 @@ export component AppWindow inherits Window {
 
     callback close();
 
-    background: #4f4f4f;
+    background: #2a2a2a;
     icon: @image-url("img/librepcb.png");
     preferred-width: 1024px;
     preferred-height: 768px;
@@ -87,6 +87,11 @@ export component AppWindow inherits Window {
         y: sideBar.y + 1px;
         width: parent.width - self.x;
         height: sideBar.height - 1px;
+
+        Rectangle {
+            background: #555555;
+            width: 1px;
+        }
 
         if section-count == 0: Text {
             width: parent.width;

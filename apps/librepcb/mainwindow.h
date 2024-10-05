@@ -67,7 +67,8 @@ private:
   void projectItemDoubleClicked(const slint::SharedString& path) noexcept;
   void schematicItemClicked(int index) noexcept;
   void boardItemClicked(int index) noexcept;
-  void tabClicked(int group, int index) noexcept;
+  void tabClicked(int section, int index) noexcept;
+  void tabCloseClicked(int section, int index) noexcept;
   slint::Image renderScene(int section, float width, float height,
                            int frame) noexcept;
   slint::private_api::EventResult onScnePointerEvent(

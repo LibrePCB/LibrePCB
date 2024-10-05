@@ -70,11 +70,11 @@ MainWindow::MainWindow(GuiApplication& app,
     mTransforms({{}, {}}),
     mMoving({false, false}) {
   // Set initial data.
+  mGlobals.set_current_project(ui::ProjectData{});
   mGlobals.set_tab_index_left(-1);
   mGlobals.set_tab_index_right(-1);
 
   // Register global callbacks.
-  mGlobals.set_current_project(ui::ProjectData{});
   mGlobals.on_project_item_doubleclicked(std::bind(
       &MainWindow::projectItemDoubleClicked, this, std::placeholders::_1));
   mGlobals.on_schematic_clicked(std::bind(&MainWindow::schematicItemClicked,
@@ -84,6 +84,9 @@ MainWindow::MainWindow(GuiApplication& app,
   mGlobals.on_tab_clicked(std::bind(&MainWindow::tabClicked, this,
                                     std::placeholders::_1,
                                     std::placeholders::_2));
+  mGlobals.on_tab_close_clicked(std::bind(&MainWindow::tabCloseClicked, this,
+                                          std::placeholders::_1,
+                                          std::placeholders::_2));
   mGlobals.on_render_scene(std::bind(
       &MainWindow::renderScene, this, std::placeholders::_1,
       std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
@@ -164,21 +167,21 @@ void MainWindow::boardItemClicked(int index) noexcept {
   }
 }
 
-void MainWindow::tabClicked(int group, int index) noexcept {
-  auto tabs = mTabs[group];
+void MainWindow::tabClicked(int section, int index) noexcept {
+  auto tabs = mTabs[section];
   auto tab = tabs ? tabs->row_data(index) : std::nullopt;
   bool success = false;
   if (tab) {
     if (tab->type == ui::TabType::Schematic) {
       if (auto sch = mProject->getProject().getSchematicByIndex(tab->index)) {
-        mScenes[group].reset(new SchematicGraphicsScene(
+        mScenes[section].reset(new SchematicGraphicsScene(
             *sch, *mLayerProvider, std::make_shared<QSet<const NetSignal*>>(),
             this));
         success = true;
       }
     } else if (tab->type == ui::TabType::Board) {
       if (auto brd = mProject->getProject().getBoardByIndex(tab->index)) {
-        mScenes[group].reset(new BoardGraphicsScene(
+        mScenes[section].reset(new BoardGraphicsScene(
             *brd, *mLayerProvider, std::make_shared<QSet<const NetSignal*>>(),
             this));
         success = true;
@@ -186,12 +189,30 @@ void MainWindow::tabClicked(int group, int index) noexcept {
     }
   }
   if (success) {
-    if (group == 0) {
+    if (section == 0) {
       mGlobals.set_tab_index_left(index);
       mWindow->fn_refresh_scene_left();
-    } else if (group == 1) {
+    } else if (section == 1) {
       mGlobals.set_tab_index_right(index);
       mWindow->fn_refresh_scene_right();
+    }
+  }
+}
+
+void MainWindow::tabCloseClicked(int section, int index) noexcept {
+  auto getter = std::bind((section == 1) ? &ui::Globals::get_tab_index_right
+                                         : &ui::Globals::get_tab_index_left,
+                          &mGlobals);
+
+  if (auto tabs = mTabs[section]) {
+    const int tabCount = static_cast<int>(tabs->row_count());
+    if ((index >= 0) && (index < tabCount)) {
+      tabs->erase(index);
+      int currentIndex = getter();
+      if (index < currentIndex) {
+        --currentIndex;
+      }
+      tabClicked(section, std::min(currentIndex, tabCount - 2));
     }
   }
 }

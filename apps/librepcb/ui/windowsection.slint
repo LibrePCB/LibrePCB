@@ -55,7 +55,11 @@ export component WindowSection inherits Rectangle {
                             colorize: t-tab.color;
                         }
 
-                        ta-close := TouchArea { }
+                        ta-close := TouchArea {
+                            clicked => {
+                                Globals.tab-close-clicked(section, index);
+                            }
+                        }
                     }
                 }
             }
