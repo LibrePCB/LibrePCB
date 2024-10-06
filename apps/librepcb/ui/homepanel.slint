@@ -12,11 +12,11 @@ component FolderTree inherits ListView {
     for item[index] in model: Rectangle {
         width: parent.width;
         height: item-height;
-        background: (current-index == index) ? #454545 : (touch.has-hover ? #383838 : transparent);
+        background: (current-index == index) ? #454545 : (ta.has-hover ? #383838 : transparent);
 
         HorizontalLayout {
             spacing: 5px;
-            padding-left: 5px + item.level * imgIcon.width;
+            padding-left: 5px + item.level * i-icon.width;
 
             if (item.is-folder) || (item.level > 0): Text {
                 color: #dddddd;
@@ -27,7 +27,7 @@ component FolderTree inherits ListView {
                 text: "▸";
             }
 
-            imgIcon := Image {
+            i-icon := Image {
                 y: 1px;
                 width: parent.height - 2px;
                 height: parent.height - 2px;
@@ -44,7 +44,7 @@ component FolderTree inherits ListView {
             }
         }
 
-        touch := TouchArea {
+        ta := TouchArea {
             clicked => {
                 current-index = index;
             }

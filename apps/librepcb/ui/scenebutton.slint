@@ -1,0 +1,17 @@
+export component SceneButton inherits Rectangle {
+    in property <image> image <=> i-icon.source;
+    in property <brush> colorize <=> i-icon.colorize;
+
+    width: 25px;
+    height: 25px;
+    border-radius: self.height / 2;
+
+    i-icon := Image {
+        width: parent.width * (ta.has-hover ? 1.0 : 0.8);
+        image-fit: ImageFit.fill;
+    }
+
+    ta := TouchArea {
+        mouse-cursor: MouseCursor.pointer;
+    }
+}

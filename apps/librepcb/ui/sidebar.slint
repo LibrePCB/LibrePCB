@@ -13,9 +13,12 @@ export enum MainPage {
 
 export component SideBar inherits Rectangle {
     in-out property <MainPage> page: MainPage.home;
+
     background: #353535;
+
     VerticalLayout {
         spacing: 0px;
+
         SideBarButton {
             icon: @image-url("img/home.svg");
             toolTip: "Home";

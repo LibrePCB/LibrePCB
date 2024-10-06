@@ -31,6 +31,9 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class BoardPlaneFragmentsBuilder;
+
 namespace editor {
 
 class GraphicsScene;
@@ -83,6 +86,7 @@ private:
   const ui::Globals& mGlobals;
   const int mIndex;
   std::shared_ptr<ProjectEditor> mProject;
+  std::unique_ptr<BoardPlaneFragmentsBuilder> mPlaneBuilder;
   std::unique_ptr<IF_GraphicsLayerProvider> mLayerProvider;
   QVector<std::shared_ptr<slint::VectorModel<ui::Tab>>> mTabs;  ///< count=2
   QVector<std::shared_ptr<GraphicsScene>> mScenes;  ///< count=2

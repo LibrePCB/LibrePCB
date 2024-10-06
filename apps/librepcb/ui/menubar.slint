@@ -12,18 +12,18 @@ struct MainMenuItemData {
 
 component MenuItem inherits Rectangle {
     in property <MenuItemId> id;
-    in property <string> text <=> txt.text;
+    in property <string> text <=> t-title.text;
 
-    preferred-width: txt.preferred-width + 20px;
-    height: txt.preferred-height + 10px;
-    background: touch.has-hover ? #505050 : #353535;
+    preferred-width: t-title.preferred-width + 20px;
+    height: t-title.preferred-height + 10px;
+    background: ta.has-hover ? #505050 : #353535;
 
-    txt := Text {
+    t-title := Text {
         x: 10px;
         width: 100%;
     }
 
-    touch := TouchArea {
+    ta := TouchArea {
         clicked => {
             Globals.menu-item-triggered(id);
         }
@@ -35,8 +35,8 @@ component Menu inherits PopupWindow {
 
     Rectangle {
         background: #353535;
-        VerticalLayout {
 
+        VerticalLayout {
             for item in items: MenuItem {
                 text: item.text;
             }
@@ -45,18 +45,18 @@ component Menu inherits PopupWindow {
 }
 
 component MainMenuItem inherits Rectangle {
-    in property <string> text <=> txt.text;
+    in property <string> text <=> t-title.text;
     in property <[MenuItemData]> items;
 
-    width: txt.preferred-width + 20px;
-    background: touch.has-hover ? #505050 : #353535;
+    width: t-title.preferred-width + 20px;
+    background: ta.has-hover ? #505050 : #353535;
 
-    txt := Text {
+    t-title := Text {
         x: 10px;
         font-size: 13px;
     }
 
-    touch := TouchArea {
+    ta := TouchArea {
         clicked => {
             menu.show();
         }

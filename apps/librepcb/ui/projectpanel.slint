@@ -2,21 +2,21 @@ import { PanelHeader } from "./panelheader.slint";
 import { Globals } from "./globals.slint";
 
 component ProjectItem inherits Rectangle {
-    in property <string> text <=> txt.text;
+    in property <string> text <=> t-title.text;
 
-    callback clicked <=> touch.clicked;
+    callback clicked <=> ta.clicked;
 
-    background: touch.has-hover ? #404040 : transparent;
+    background: ta.has-hover ? #404040 : transparent;
 
     HorizontalLayout {
         padding: 2px;
         padding-left: 12px;
         padding-right: 5px;
 
-        txt := Text { }
+        t-title := Text { }
     }
 
-    touch := TouchArea { }
+    ta := TouchArea { }
 }
 
 export component ProjectPanel inherits Rectangle {

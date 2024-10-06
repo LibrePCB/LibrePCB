@@ -20,9 +20,9 @@ component LibraryList inherits ListView {
         Rectangle {
             y: 0;
             height: item-height;
-            background: (current-index == index) ? #454545 : (touch.has-hover ? #383838 : transparent);
+            background: (current-index == index) ? #454545 : (ta-lib.has-hover ? #383838 : transparent);
 
-            touch := TouchArea {
+            ta-lib := TouchArea {
                 property <bool> buttons-visible: self.has-hover || (current-index == index);
                 property <bool> installable: (lib.type == LibraryType.online);
                 property <bool> updatable: (lib.type == LibraryType.remote) && (lib.state == LibraryState.outdated);
@@ -56,11 +56,11 @@ component LibraryList inherits ListView {
                             }
 
                             if lib.type != LibraryType.online: Rectangle {
-                                width: lblVersion.preferred-width + 10px;
-                                height: lblVersion.preferred-height + 2px;
+                                width: t-version.preferred-width + 10px;
+                                height: t-version.preferred-height + 2px;
                                 background: (lib.state == LibraryState.up-to-date) ? #006600 : ((lib.state == LibraryState.outdated) ? #aa0000 : #505050);
                                 border-radius: self.height / 2;
-                                lblVersion := Text {
+                                t-version := Text {
                                     color: white;
                                     font-size: 10px;
                                     text: lib.version + ((lib.type == LibraryType.local) ? " | local" : " | remote");
@@ -95,7 +95,7 @@ component LibraryList inherits ListView {
                                 // TODO: https://github.com/slint-ui/slint/issues/6426
                                 visible: buttons-visible && (lib.type != LibraryType.online);
                                 clicked => {
-                                    uninstallPopup.show();
+                                    p-uninstall.show();
                                 }
                             }
 
@@ -109,7 +109,10 @@ component LibraryList inherits ListView {
                     }
                 }
 
-                uninstallPopup := PopupWindow {
+                p-uninstall := PopupWindow {
+                    x: root.width;
+                    y: item-height / 2 - self.height / 2;
+
                     Rectangle {
                         background: #790000;
 
@@ -131,6 +134,7 @@ component LibraryList inherits ListView {
 
                             HorizontalBox {
                                 alignment: LayoutAlignment.center;
+
                                 StandardButton {
                                     kind: yes;
                                     clicked => {
@@ -144,9 +148,6 @@ component LibraryList inherits ListView {
                             }
                         }
                     }
-
-                    x: root.width;
-                    y: item-height / 2 - self.height / 2;
                 }
             }
         }
@@ -189,12 +190,12 @@ export component LibrariesPanel inherits Rectangle {
 
         LibraryList {
             model: Globals.libraries;
-            bottom-padding: installBtn.height + 5px;
+            bottom-padding: btn-install.height + 5px;
             vertical-stretch: 0;
         }
     }
 
-    installBtn := Rectangle {
+    btn-install := Rectangle {
         y: parent.height - self.height - 5px;
         width: self.preferred-width;
         height: self.preferred-height;
@@ -202,22 +203,22 @@ export component LibrariesPanel inherits Rectangle {
         border-radius: self.height / 2;
         visible: Globals.checked-libraries > 0;
 
-        installBox := HorizontalBox {
+        HorizontalBox {
             Image {
-                width: installTxt.preferred-height;
-                height: installTxt.preferred-height;
+                width: t-install.preferred-height;
+                height: t-install.preferred-height;
                 source: @image-url("img/download.svg");
-                colorize: installTxt.color;
+                colorize: t-install.color;
             }
 
-            installTxt := Text {
-                color: installTouch.has-hover ? white : black;
+            t-install := Text {
+                color: ta-install.has-hover ? white : black;
                 font-size: 14px;
                 text: @tr("Install/update {n} library" | "Install/update {n} libraries" % Globals.checked-libraries);
             }
         }
 
-        installTouch := TouchArea {
+        ta-install := TouchArea {
             clicked => {
                 Globals.install-checked-libraries();
             }

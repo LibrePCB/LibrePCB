@@ -58,6 +58,12 @@ export struct Tab {
     title: string,
 }
 
+export struct SectionData {
+    index: int,
+    tab-index: int,
+    overlay-color: brush,
+}
+
 export struct EditParseResult {
     valid: bool,
     evaluated-value: string,
@@ -224,7 +230,11 @@ export global Globals {
         { type: TabType.schematic, index: 1, title: "Tab 3" },
     ];
 
-    in property <int> tab-index-left: 0;
+    in property <SectionData> section-left: {
+        index: 0,
+        tab-index: 0,
+        overlay-color: Colors.gray,
+    };
 
     in property <[Tab]> tabs-right: [
         { type: TabType.schematic, index: 0, title: "Tab 4" },
@@ -232,5 +242,9 @@ export global Globals {
         { type: TabType.schematic, index: 1, title: "Tab 6" },
     ];
 
-    in property <int> tab-index-right: 0;
+    in property <SectionData> section-right: {
+        index: 1,
+        tab-index: 0,
+        overlay-color: Colors.gray,
+    };
 }
