@@ -52,6 +52,10 @@ slint::Image q2s(const QPixmap& p) noexcept {
       reinterpret_cast<const slint::Rgba8Pixel*>(img.bits())));
 }
 
+slint::Color q2s(const QColor& c) noexcept {
+  return slint::Color::from_argb_uint8(c.alpha(), c.red(), c.green(), c.blue());
+}
+
 QString s2q(const slint::SharedString& s) noexcept {
   std::string_view view(s);
   return QString::fromUtf8(view.data(), view.size());

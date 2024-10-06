@@ -41,9 +41,9 @@ namespace app {
 
 slint::SharedString q2s(const QString& s) noexcept;
 slint::Image q2s(const QPixmap& p) noexcept;
+slint::Color q2s(const QColor& c) noexcept;
 
 QString s2q(const slint::SharedString& s) noexcept;
-
 bool operator==(const QString& s1, const slint::SharedString& s2) noexcept;
 bool operator!=(const QString& s1, const slint::SharedString& s2) noexcept;
 bool operator==(const slint::SharedString& s1, const QString& s2) noexcept;

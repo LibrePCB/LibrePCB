@@ -13,7 +13,7 @@ export { Globals }
 export component AppWindow inherits Window {
     property <length> panel-width: (self.width <= 800px) ? 250px : 350px;
     in property <string> window-title <=> self.title;
-    in-out property <MainPage> page <=> sideBar.page;
+    in-out property <MainPage> page <=> sidebar.page;
 
     callback close();
 
@@ -22,24 +22,24 @@ export component AppWindow inherits Window {
     preferred-width: 1024px;
     preferred-height: 768px;
 
-    menuBar := MenuBar { }
+    menubar := MenuBar { }
 
-    sideBar := SideBar {
+    sidebar := SideBar {
         x: 0px;
-        y: menuBar.height;
+        y: menubar.height;
         z: 100;
         width: (root.width <= 800px) ? 40px : 50px;
-        height: parent.height - self.y - statusBar.height - 1px;
+        height: parent.height - self.y - statusbar.height - 1px;
     }
 
-    if sideBar.page == MainPage.home: homePanel := HomePanel {
-        x: sideBar.width;
-        y: sideBar.y;
+    if sidebar.page == MainPage.home: HomePanel {
+        x: sidebar.width;
+        y: sidebar.y;
         width: panel-width;
-        height: sideBar.height;
+        height: sidebar.height;
     }
 
-    if sideBar.page == MainPage.home: Button {
+    if sidebar.page == MainPage.home: Button {
         x: root.width - self.width - 10px;
         y: root.height - self.height - 100px;
         text: "Dialog";
@@ -48,7 +48,7 @@ export component AppWindow inherits Window {
         }
     }
 
-    if sideBar.page == MainPage.home: Button {
+    if sidebar.page == MainPage.home: Button {
         x: root.width - self.width - 10px;
         y: root.height - self.height - 50px;
         text: "Close";
@@ -57,18 +57,18 @@ export component AppWindow inherits Window {
         }
     }
 
-    if sideBar.page == MainPage.libraries: libsPanel := LibrariesPanel {
-        x: sideBar.width;
-        y: sideBar.y;
+    if sidebar.page == MainPage.libraries: LibrariesPanel {
+        x: sidebar.width;
+        y: sidebar.y;
         width: panel-width;
-        height: sideBar.height;
+        height: sidebar.height;
     }
 
-    if sideBar.page == MainPage.project: prjPanel := ProjectPanel {
-        x: sideBar.width;
-        y: sideBar.y;
+    if sidebar.page == MainPage.project: ProjectPanel {
+        x: sidebar.width;
+        y: sidebar.y;
         width: panel-width;
-        height: sideBar.height;
+        height: sidebar.height;
     }
 
     property <int> scene-frame-left: 0;
@@ -83,10 +83,10 @@ export component AppWindow inherits Window {
     HorizontalLayout {
         property <int> section-count: min(Globals.tabs-left.length, 1) + min(Globals.tabs-right.length, 1);
 
-        x: sideBar.width + panel-width;
-        y: sideBar.y + 1px;
+        x: sidebar.width + panel-width;
+        y: sidebar.y + 1px;
         width: parent.width - self.x;
-        height: sideBar.height - 1px;
+        height: sidebar.height - 1px;
 
         Rectangle {
             background: #555555;
@@ -103,10 +103,9 @@ export component AppWindow inherits Window {
             text: @tr("Open a library, schematic or board.");
         }
 
-        if Globals.tabs-left.length > 0: section-left := WindowSection {
-            section: 0;
+        if Globals.tabs-left.length > 0: WindowSection {
             tabs: Globals.tabs-left;
-            current-tab-index <=> Globals.tab-index-left;
+            section <=> Globals.section-left;
             scene-frame: scene-frame-left;
         }
 
@@ -114,43 +113,61 @@ export component AppWindow inherits Window {
             width: 1px;
         }
 
-        if Globals.tabs-right.length > 0: section-right := WindowSection {
-            section: 1;
+        if Globals.tabs-right.length > 0: WindowSection {
             tabs: Globals.tabs-right;
-            current-tab-index <=> Globals.tab-index-right;
+            section <=> Globals.section-right;
             scene-frame: scene-frame-right;
         }
     }
 
-    if sideBar.page == MainPage.preferences: e1 := LengthEdit {
+    if sidebar.page == MainPage.preferences: LengthEdit {
         x: 100px;
         y: 50px;
     }
 
-    if sideBar.page == MainPage.preferences: e2 := LengthEdit {
+    if sidebar.page == MainPage.preferences: LengthEdit {
         x: 100px;
         y: 100px;
     }
 
-    in property <string> workspace-path <=> lblStatusLeft.text;
+    in property <string> workspace-path <=> t-status.text;
+    in property <string> cursor-coordinate <=> t-coordinate.text;
 
-    statusBar := Rectangle {
+    statusbar := Rectangle {
         x: 0;
         y: parent.height - self.height;
         width: parent.width;
         height: 25px;
-        background: sideBar.background;
+        background: sidebar.background;
+
         HorizontalLayout {
             padding: 5px;
-            spacing: 10px;
-            lblStatusLeft := Text {
+            spacing: 20px;
+
+            t-status := Text {
                 color: white;
                 text: "Workspace Path";
             }
 
             Rectangle {
-                width: 150px;
-                prgStatus := ProgressIndicator {
+                HorizontalLayout {
+                    spacing: 5px;
+                    alignment: LayoutAlignment.center;
+
+                    t-coordinate := Text {
+                        text: "123.456, 123.456";
+                    }
+
+                    if cursor-coordinate != "": Text {
+                        text: "mm";
+                    }
+                }
+            }
+
+            Rectangle {
+                max-width: 150px;
+
+                ProgressIndicator {
                     width: 100%;
                     visible: self.progress > 0 && self.progress < 1;
                     progress: Globals.status-bar-progress / 100;
@@ -167,6 +184,7 @@ export component AppWindow inherits Window {
             height: 100px;
             background: black;
             title: "Dialog";
+
             Text {
                 text: "Hello World!";
             }
