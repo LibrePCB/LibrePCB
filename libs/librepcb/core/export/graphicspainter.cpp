@@ -63,7 +63,9 @@ void GraphicsPainter::drawLine(const Point& p1, const Point& p2,
   mPainter.setPen(QPen(color, getPenWidthPx(width), Qt::SolidLine, Qt::RoundCap,
                        Qt::RoundJoin));
   mPainter.setBrush(Qt::NoBrush);
-  mPainter.drawLine(p1.toPxQPointF(), p2.toPxQPointF());
+  // See https://github.com/LibrePCB/LibrePCB/issues/1440
+  const QLineF line(p1.toPxQPointF(), p2.toPxQPointF());
+  line.isNull() ? mPainter.drawPoint(line.p1()) : mPainter.drawLine(line);
 }
 
 void GraphicsPainter::drawPath(const QPainterPath& path,
@@ -86,7 +88,13 @@ void GraphicsPainter::drawPath(const QPainterPath& path,
 void GraphicsPainter::drawPolygon(const Path& path, const Length& lineWidth,
                                   const QColor& lineColor,
                                   const QColor& fillColor) noexcept {
-  drawPath(path.toQPainterPathPx(), lineWidth, lineColor, fillColor);
+  if ((!path.getVertices().isEmpty()) && path.isZeroLength()) {
+    // See https://github.com/LibrePCB/LibrePCB/issues/1440
+    drawCircle(path.getVertices().first().getPos(), lineWidth, Length(0),
+               Qt::transparent, lineColor);
+  } else {
+    drawPath(path.toQPainterPathPx(), lineWidth, lineColor, fillColor);
+  }
 }
 
 void GraphicsPainter::drawCircle(const Point& center, const Length& diameter,

@@ -70,6 +70,7 @@ public:
   // Getters
   bool isClosed() const noexcept;
   bool isCurved() const noexcept;
+  bool isZeroLength() const noexcept;
   QVector<Vertex>& getVertices() noexcept {
     invalidatePainterPath();
     return mVertices;

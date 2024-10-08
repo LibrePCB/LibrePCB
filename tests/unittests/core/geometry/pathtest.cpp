@@ -86,6 +86,36 @@ TEST_F(PathTest, testIsCurvedTrue) {
                   .isCurved());
 }
 
+TEST_F(PathTest, testIsZeroLengthTrue) {
+  EXPECT_TRUE(Path().isZeroLength());
+  EXPECT_TRUE(Path({Vertex(Point(0, 0), Angle::deg90())}).isZeroLength());
+  EXPECT_TRUE(Path({
+                       Vertex(Point(0, 0), Angle::deg90()),
+                       Vertex(Point(0, 0)),
+                   })
+                  .isZeroLength());
+  EXPECT_TRUE(Path({
+                       Vertex(Point(0, 0)),
+                       Vertex(Point(0, 0)),
+                       Vertex(Point(0, 0)),
+                   })
+                  .isZeroLength());
+}
+
+TEST_F(PathTest, testIsZeroLengthFalse) {
+  EXPECT_FALSE(Path({
+                        Vertex(Point(0, 0)),
+                        Vertex(Point(0, 1)),
+                    })
+                   .isZeroLength());
+  EXPECT_FALSE(Path({
+                        Vertex(Point(0, 0)),
+                        Vertex(Point(0, 0)),
+                        Vertex(Point(1, 0)),
+                    })
+                   .isZeroLength());
+}
+
 TEST_F(PathTest, testGetTotalStraightLength) {
   QVector<Vertex> vertices;
   EXPECT_EQ(UnsignedLength(0), Path(vertices).getTotalStraightLength());
