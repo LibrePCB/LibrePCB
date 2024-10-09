@@ -1901,8 +1901,10 @@ ClipperLib::Paths BoardDesignRuleCheck::getBoardClearanceArea(
   });
 
   ClipperLib::Paths result;
+  // Larger tolerance is required to avoid false-positives, see
+  // https://github.com/LibrePCB/LibrePCB/issues/1434.
   const PositiveLength clearanceWidth(
-      std::max(clearance + clearance - maxArcTolerance() - 1, Length(1)));
+      std::max(clearance + clearance - maxArcTolerance() * 2, Length(1)));
   foreach (const Path& outline, outlines) {
     const ClipperLib::Paths clipperPaths = ClipperHelpers::convert(
         outline.toOutlineStrokes(clearanceWidth), maxArcTolerance());
