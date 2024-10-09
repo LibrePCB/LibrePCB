@@ -21,8 +21,10 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
+#include <librepcb/core/application.h>
 #include <librepcb/core/library/pkg/footprintpad.h>
 #include <librepcb/core/serialization/sexpression.h>
+#include <librepcb/core/types/version.h>
 
 #include <QtCore>
 
@@ -41,6 +43,41 @@ class FootprintPadTest : public ::testing::Test {};
 /*******************************************************************************
  *  Test Methods
  ******************************************************************************/
+
+#if QT_VERSION_MAJOR >= 6  // Avoid strange linker error of one job on CI.
+TEST_F(FootprintPadTest, testFunctionsSerialization) {
+  const std::vector<std::pair<FootprintPad::Function, QString>> items = {
+      {FootprintPad::Function::Unspecified, "unspecified"},
+      {FootprintPad::Function::StandardPad, "standard"},
+      {FootprintPad::Function::PressFitPad, "pressfit"},
+      {FootprintPad::Function::ThermalPad, "thermal"},
+      {FootprintPad::Function::BgaPad, "bga"},
+      {FootprintPad::Function::EdgeConnectorPad, "edge_connector"},
+      {FootprintPad::Function::TestPad, "test"},
+      {FootprintPad::Function::LocalFiducial, "local_fiducial"},
+      {FootprintPad::Function::GlobalFiducial, "global_fiducial"},
+  };
+  for (const auto& item : items) {
+    // Serialize
+    auto sexpr = serialize(item.first);
+    ASSERT_TRUE(sexpr != nullptr);
+    EXPECT_EQ(item.second.toStdString(), sexpr->getValue().toStdString());
+
+    // Deserialize
+    sexpr = SExpression::createToken(item.second);
+    EXPECT_EQ(item.first, deserialize<FootprintPad::Function>(*sexpr));
+  }
+
+  // In LibrePCB 1.x, "press_fit" shall also be deserializable.
+  auto sexpr = SExpression::createToken("press_fit");
+  if (Application::getFileFormatVersion() == Version::fromString("1")) {
+    EXPECT_EQ(FootprintPad::Function::PressFitPad,
+              deserialize<FootprintPad::Function>(*sexpr));
+  } else {
+    EXPECT_THROW(deserialize<FootprintPad::Function>(*sexpr), Exception);
+  }
+}
+#endif
 
 TEST_F(FootprintPadTest, testConstructFromSExpressionConnected) {
   std::unique_ptr<SExpression> sexpr = SExpression::parse(
