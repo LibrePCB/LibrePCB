@@ -65,6 +65,7 @@
 #include <librepcb/core/project/board/boardd356netlistexport.h>
 #include <librepcb/core/project/board/boardpainter.h>
 #include <librepcb/core/project/board/boardplanefragmentsbuilder.h>
+#include <librepcb/core/project/board/boardspecctraexport.h>
 #include <librepcb/core/project/board/drc/boarddesignrulecheck.h>
 #include <librepcb/core/project/board/items/bi_device.h>
 #include <librepcb/core/project/board/items/bi_footprintpad.h>
@@ -602,8 +603,10 @@ void BoardEditor::createActions() noexcept {
   mActionExportPdf.reset(cmd.exportPdf.createAction(this, this, [this]() {
     execGraphicsExportDialog(GraphicsExportDialog::Output::Pdf, "pdf_export");
   }));
-  mActionExportStep.reset(cmd.exportStep.createAction(
+  mActionExportSpecctra.reset(cmd.exportStep.createAction(
       this, this, &BoardEditor::execStepExportDialog));
+  mActionExportSpecctra.reset(cmd.exportSpecctraDsn.createAction(
+      this, this, &BoardEditor::execSpecctraExportDialog));
   mActionPrint.reset(cmd.print.createAction(this, this, [this]() {
     execGraphicsExportDialog(GraphicsExportDialog::Output::Print, "print");
   }));
@@ -1032,6 +1035,7 @@ void BoardEditor::createMenus() noexcept {
     smb.addAction(mActionExportPdf);
     smb.addAction(mActionExportImage);
     smb.addAction(mActionExportStep);
+    smb.addAction(mActionExportSpecctra);
     smb.addAction(mActionExportLppz);
   }
   {
@@ -1774,6 +1778,27 @@ void BoardEditor::execD356NetlistExportDialog() noexcept {
     BoardD356NetlistExport exp(*board);
     FileUtils::writeFile(fp, exp.generate());  // can throw
     qDebug() << "Successfully exported netlist.";
+  } catch (const Exception& e) {
+    QMessageBox::critical(this, tr("Error"), e.getMsg());
+  }
+}
+
+void BoardEditor::execSpecctraExportDialog() noexcept {
+  Board* board = getActiveBoard();
+  if (!board) return;
+
+  try {
+    QString path = FileDialog::getSaveFileName(
+        this, tr("Export Specctra DSN"),
+        QString("/home/urban/Downloads/librepcb.dsn"), "*.dsn");
+    if (path.isEmpty()) return;
+    if (!path.contains(".")) path.append(".dsn");
+
+    FilePath fp(path);
+    qDebug().nospace() << "Export Specctra DSN to " << fp.toNative() << "...";
+    BoardSpecctraExport exp(*board);
+    FileUtils::writeFile(fp, exp.generate());  // can throw
+    qDebug() << "Successfully exported DSN.";
   } catch (const Exception& e) {
     QMessageBox::critical(this, tr("Error"), e.getMsg());
   }

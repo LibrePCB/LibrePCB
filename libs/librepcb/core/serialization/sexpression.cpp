@@ -256,8 +256,8 @@ void SExpression::replaceRecursive(const SExpression& search,
   }
 }
 
-QByteArray SExpression::toByteArray() const {
-  QString str = toString(0);  // can throw
+QByteArray SExpression::toByteArray(bool validate) const {
+  QString str = toString(0, validate);  // can throw
   if (!str.endsWith('\n')) {
     str += '\n';  // newline at end of file
   }
@@ -349,9 +349,9 @@ bool SExpression::isValidTokenChar(const QChar& c) noexcept {
       ((c >= '0') && (c <= '9')) || allowedSpecialChars.contains(c);
 }
 
-QString SExpression::toString(int indent) const {
+QString SExpression::toString(int indent, bool validate) const {
   if (mType == Type::List) {
-    if (!isValidToken(mValue)) {
+    if (validate && (!isValidToken(mValue))) {
       throw LogicError(
           __FILE__, __LINE__,
           QString("Invalid S-Expression list name: %1").arg(mValue));
@@ -372,11 +372,11 @@ QString SExpression::toString(int indent) const {
       if (lastCharIsSpace && (i == lastIndex)) {
         --currentIndent;
       }
-      str += child.toString(currentIndent);
+      str += child.toString(currentIndent, validate);
     }
     return str + ')';
   } else if (mType == Type::Token) {
-    if (!isValidToken(mValue)) {
+    if (validate && (!isValidToken(mValue))) {
       throw LogicError(__FILE__, __LINE__,
                        QString("Invalid S-Expression token: %1").arg(mValue));
     }
