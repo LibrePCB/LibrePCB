@@ -426,6 +426,8 @@ add_library(
   serialization/fileformatmigrationunstable.h
   serialization/fileformatmigrationv01.cpp
   serialization/fileformatmigrationv01.h
+  serialization/fileformatmigrationv1.cpp
+  serialization/fileformatmigrationv1.h
   serialization/serializablekeyvaluemap.h
   serialization/serializableobjectlist.h
   serialization/sexpression.cpp
