@@ -321,6 +321,8 @@ add_library(
   project/board/boardplanefragmentsbuilder.h
   project/board/boardpolygondata.cpp
   project/board/boardpolygondata.h
+  project/board/boardspecctraexport.cpp
+  project/board/boardspecctraexport.h
   project/board/boardstroketextdata.cpp
   project/board/boardstroketextdata.h
   project/board/boardzonedata.cpp

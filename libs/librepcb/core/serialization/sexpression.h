@@ -181,7 +181,7 @@ public:
   void removeChildrenWithNodeRecursive(const SExpression& search) noexcept;
   void replaceRecursive(const SExpression& search,
                         const SExpression& replace) noexcept;
-  QByteArray toByteArray() const;
+  QByteArray toByteArray(bool validate = true) const;
 
   // Operator Overloadings
   bool operator==(const SExpression& rhs) const noexcept;
@@ -220,7 +220,7 @@ private:  // Methods
   static QString escapeString(const QString& string) noexcept;
   static bool isValidToken(const QString& token) noexcept;
   static bool isValidTokenChar(const QChar& c) noexcept;
-  QString toString(int indent) const;
+  QString toString(int indent, bool validate) const;
 
 private:  // Data
   Type mType;

@@ -520,6 +520,15 @@ public:
       {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_T)},
       &categoryImportExport,
   };
+  EditorCommand exportSpecctraDsn{
+      "export_specctra_dsn",  // clang-format break
+      QT_TR_NOOP("Export Specctra DSN"),
+      QT_TR_NOOP("Export PCB to Specctra format for external autorouters etc."),
+      QString(),
+      EditorCommand::Flag::OpensPopup,
+      {},
+      &categoryImportExport,
+  };
   EditorCommand print{
       "print",  // clang-format break
       QT_TR_NOOP("Print"),
