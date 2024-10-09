@@ -70,6 +70,19 @@ bool Path::isCurved() const noexcept {
   return false;
 }
 
+bool Path::isZeroLength() const noexcept {
+  if (mVertices.count() < 2) {
+    return true;
+  }
+
+  for (int i = 1; i < mVertices.count(); ++i) {
+    if (mVertices.at(i).getPos() != mVertices.first().getPos()) {
+      return false;
+    }
+  }
+  return true;
+}
+
 UnsignedLength Path::getTotalStraightLength() const noexcept {
   UnsignedLength length(0);
   if (mVertices.count() >= 2) {

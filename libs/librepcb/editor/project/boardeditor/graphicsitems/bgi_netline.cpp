@@ -88,7 +88,9 @@ void BGI_NetLine::paint(QPainter* painter,
     QPen pen(mLayer->getColor(highlight), mNetLine.getWidth()->toPx(),
              Qt::SolidLine, Qt::RoundCap);
     painter->setPen(pen);
-    painter->drawLine(mLineF);
+    // See https://github.com/LibrePCB/LibrePCB/issues/1440
+    mLineF.isNull() ? painter->drawPoint(mLineF.p1())
+                    : painter->drawLine(mLineF);
   }
 }
 
