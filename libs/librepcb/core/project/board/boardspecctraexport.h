@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../serialization/sexpression.h"
 #include "../../types/length.h"
 
 #include <QtCore>
@@ -43,6 +42,7 @@ class BI_Via;
 class Board;
 class Footprint;
 class Path;
+class SExpression;
 
 /*******************************************************************************
  *  Class BoardSpecctraExport
@@ -53,11 +53,6 @@ class Path;
  */
 class BoardSpecctraExport final : public QObject {
   Q_OBJECT
-
-  struct ComponentData {
-    std::unique_ptr<SExpression> image;
-    std::vector<std::unique_ptr<SExpression>> placements;
-  };
 
 public:
   // Constructors / Destructor
@@ -76,22 +71,21 @@ private:
   std::unique_ptr<SExpression> genParser() const;
   std::unique_ptr<SExpression> genResolution() const;
   std::unique_ptr<SExpression> genStructure() const;
-  std::unique_ptr<SExpression> genPlacement(
-      std::map<QString, ComponentData>& components) const;
+  std::unique_ptr<SExpression> genPlacement() const;
   std::unique_ptr<SExpression> genLibrary(
-      std::map<QString, ComponentData>& components,
       std::vector<std::unique_ptr<SExpression>>& padStacks) const;
+  std::unique_ptr<SExpression> genLibraryImage(
+      const BI_Device& dev,
+      std::vector<std::unique_ptr<SExpression>>& padStacks) const;
+  std::unique_ptr<SExpression> getLibraryPadStack(
+      const BI_FootprintPad& pad) const;
   std::unique_ptr<SExpression> genNetwork() const;
   std::unique_ptr<SExpression> genWiring() const;
 
-  std::unique_ptr<SExpression> toPlacement(const BI_Device& dev) const;
-  std::unique_ptr<SExpression> toImage(
-      const QString& id, const Footprint& footprint,
-      std::vector<std::unique_ptr<SExpression>>& padStacks) const;
   std::unique_ptr<SExpression> toPath(const QString& layer,
                                       const UnsignedLength& width,
                                       const Path& path, bool multiline) const;
-  std::unique_ptr<SExpression> toPadStack(const BI_FootprintPad& pad) const;
+
   std::unique_ptr<SExpression> toToken(const Length& length) const;
 
   // Private Member Variables
