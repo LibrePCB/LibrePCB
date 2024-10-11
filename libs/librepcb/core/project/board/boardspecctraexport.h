@@ -40,8 +40,8 @@ class BI_Device;
 class BI_FootprintPad;
 class BI_Via;
 class Board;
-class Footprint;
 class Path;
+class Point;
 class SExpression;
 
 /*******************************************************************************
@@ -77,16 +77,21 @@ private:
   std::unique_ptr<SExpression> genLibraryImage(
       const BI_Device& dev,
       std::vector<std::unique_ptr<SExpression>>& padStacks) const;
-  std::unique_ptr<SExpression> getLibraryPadStack(
+  std::unique_ptr<SExpression> genLibraryPadStack(
       const BI_FootprintPad& pad) const;
   std::unique_ptr<SExpression> genNetwork() const;
-  std::unique_ptr<SExpression> genWiring() const;
+  std::unique_ptr<SExpression> genWiring(
+      const QList<std::tuple<Point, QString, std::size_t>>& vias) const;
+  std::unique_ptr<SExpression> genWiringPadStack(const BI_Via& via) const;
 
   std::unique_ptr<SExpression> toPath(const QString& layer,
                                       const UnsignedLength& width,
                                       const Path& path, bool multiline) const;
 
   std::unique_ptr<SExpression> toToken(const Length& length) const;
+  static std::size_t addToPadStacks(
+      std::vector<std::unique_ptr<SExpression>>& padStacks,
+      std::unique_ptr<SExpression> padStack);
 
   // Private Member Variables
   const Board& mBoard;
