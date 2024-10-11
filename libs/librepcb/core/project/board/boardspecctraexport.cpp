@@ -499,7 +499,7 @@ std::unique_ptr<SExpression> BoardSpecctraExport::toKeepout(
       mBoard.getDrcSettings().getMinCopperNpthClearance() * 2);
   if (hole.isSlot()) {
     root->appendChild(
-        toPath("signal", positiveToUnsigned(width), *hole.getPath(), false));
+        toPath("signal", positiveToUnsigned(width), *hole.getPath(), true));
   } else {
     root->appendChild(toCircle("signal", width,
                                hole.getPath()->getVertices().first().getPos()));

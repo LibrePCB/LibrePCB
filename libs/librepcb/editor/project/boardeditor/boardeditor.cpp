@@ -1789,7 +1789,11 @@ void BoardEditor::execSpecctraExportDialog() noexcept {
 
   try {
     // Default file path.
-    QString path = "output/{{VERSION}}/{{PROJECT}}_{{BOARD}}.dsn";
+    QString path = "output/{{VERSION}}/{{PROJECT}}";
+    if (mProject.getBoards().count() > 1) {
+      path += "_{{BOARD}}";
+    }
+    path += ".dsn";
     path = AttributeSubstitutor::substitute(
         path, ProjectAttributeLookup(*board, nullptr), [&](const QString& str) {
           return FilePath::cleanFileName(
@@ -1828,6 +1832,7 @@ void BoardEditor::execSpecctraExportDialog() noexcept {
     BoardSpecctraExport exp(*board);
     FileUtils::writeFile(fp, exp.generate());  // can throw
     qDebug() << "Successfully exported Specctra DSN.";
+    mUi->statusbar->showMessage(tr("Success!"), 3000);
   } catch (const Exception& e) {
     QMessageBox::critical(this, tr("Error"), e.getMsg());
   }

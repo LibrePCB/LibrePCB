@@ -524,7 +524,7 @@ public:
       "export_specctra_dsn",  // clang-format break
       QT_TR_NOOP("Export Specctra DSN"),
       QT_TR_NOOP("Export PCB to Specctra format for external autorouters etc."),
-      QString(),
+      ":/img/actions/generate_bom.png",  // No Specctra icon yet.
       EditorCommand::Flag::OpensPopup,
       {},
       &categoryImportExport,
