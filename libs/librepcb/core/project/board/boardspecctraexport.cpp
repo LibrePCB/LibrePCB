@@ -27,6 +27,7 @@
 #include "../../library/pkg/package.h"
 #include "../../serialization/sexpression.h"
 #include "../../types/layer.h"
+#include "../../utils/clipperhelpers.h"
 #include "../../utils/transform.h"
 #include "../circuit/circuit.h"
 #include "../circuit/componentinstance.h"
@@ -78,6 +79,7 @@ BoardSpecctraExport::~BoardSpecctraExport() noexcept {
  ******************************************************************************/
 
 QByteArray BoardSpecctraExport::generate() const {
+  // Add via pad stacks.
   std::vector<std::unique_ptr<SExpression>> padStacks;
   QList<std::tuple<Point, QString, std::size_t>> vias;
   for (const auto& segment : mBoard.getNetSegments()) {
@@ -97,7 +99,7 @@ QByteArray BoardSpecctraExport::generate() const {
   root->ensureLineBreak();
   root->appendChild("unit", SExpression::createToken("mm"));
   root->ensureLineBreak();
-  root->appendChild(genStructure());
+  root->appendChild(genStructure(padStacks));
   root->ensureLineBreak();
   root->appendChild(genPlacement());
   root->ensureLineBreak();
@@ -135,8 +137,11 @@ std::unique_ptr<SExpression> BoardSpecctraExport::genResolution() const {
   return root;
 }
 
-std::unique_ptr<SExpression> BoardSpecctraExport::genStructure() const {
+std::unique_ptr<SExpression> BoardSpecctraExport::genStructure(
+    std::vector<std::unique_ptr<SExpression>>& padStacks) const {
   std::unique_ptr<SExpression> root = SExpression::createList("structure");
+
+  // Layers.
   for (int i = 0; i < (mBoard.getInnerLayerCount() + 2); ++i) {
     root->ensureLineBreak();
     auto& node = root->appendList("layer");
@@ -150,32 +155,81 @@ std::unique_ptr<SExpression> BoardSpecctraExport::genStructure() const {
     }
     node.appendChild("type", SExpression::createToken("signal"));
   }
-  root->ensureLineBreak();
-  {
-    auto& boundaryNode = root->appendList("boundary");
-    boundaryNode.ensureLineBreak();
-    foreach (const auto& polygon, mBoard.getPolygons()) {
-      if (polygon->getData().getLayer() == Layer::boardOutlines()) {
-        boundaryNode.appendChild(
-            toPath("pcb", UnsignedLength(200000),
-                   polygon->getData().getPath().toClosedPath(), true));
-        boundaryNode.ensureLineBreak();
-      }
+
+  // PCB boundary.
+  foreach (const auto& polygon, mBoard.getPolygons()) {
+    if (polygon->getData().getLayer() == Layer::boardOutlines()) {
+      root->ensureLineBreak();
+      auto& node = root->appendList("boundary");
+      node.ensureLineBreak();
+      node.appendChild(
+          toPath("pcb", UnsignedLength(0), polygon->getData().getPath(), true));
+      node.ensureLineBreak();
     }
   }
-  root->ensureLineBreak();
-  root->appendChild("via", SExpression::createToken("0"));
+
+  // Planes.
+  foreach (const auto& plane, mBoard.getPlanes()) {
+    if (auto net = plane->getNetSignal()) {
+      root->ensureLineBreak();
+      auto& node = root->appendList("plane");
+      node.appendChild(net->getName());
+      node.ensureLineBreak();
+      node.appendChild(toPolygon(plane->getLayer().getId(), UnsignedLength(0),
+                                 plane->getOutline(), true));
+      node.ensureLineBreak();
+    }
+  }
+
+  // Keepout areas.
+  foreach (const auto& polygon, mBoard.getPolygons()) {
+    if (polygon->getData().getLayer() == Layer::boardCutouts()) {
+      root->ensureLineBreak();
+      root->appendChild(toKeepout(polygon->getData().getPath()));
+    }
+  }
+  for (const auto& hole : mBoard.getHoles()) {
+    root->ensureLineBreak();
+    root->appendChild(toKeepout(hole->getData()));
+  }
+
+  // Vias.
   root->ensureLineBreak();
   {
-    auto& ruleNode = root->appendList("rule");
-    ruleNode.ensureLineBreak();
-    ruleNode.appendChild("width",
-                         toToken(*mBoard.getDrcSettings().getMinCopperWidth()));
-    ruleNode.ensureLineBreak();
-    ruleNode.appendChild(
-        "clearance",
-        toToken(*mBoard.getDrcSettings().getMinCopperCopperClearance()));
-    ruleNode.ensureLineBreak();
+    auto& node = root->appendList("via");
+    for (std::size_t i = 0; i < padStacks.size(); ++i) {
+      node.ensureLineBreak();
+      node.appendChild("via-" + QString::number(i));
+    }
+    node.ensureLineBreak();
+  }
+
+  root->ensureLineBreak();
+  root->appendChild(genStructureRule());
+  root->ensureLineBreak();
+  return root;
+}
+
+std::unique_ptr<SExpression> BoardSpecctraExport::genStructureRule() const {
+  std::unique_ptr<SExpression> root = SExpression::createList("rule");
+  root->ensureLineBreak();
+  root->appendChild("width",
+                    toToken(*mBoard.getDrcSettings().getMinCopperWidth()));
+  root->ensureLineBreak();
+  root->appendChild(
+      "clearance",
+      toToken(*mBoard.getDrcSettings().getMinCopperCopperClearance()));
+  root->ensureLineBreak();
+  {
+    auto& node = root->appendList("clearance");
+    node.appendChild(toToken(Length(0)));
+    node.appendChild("type", SExpression::createToken("smd_via_same_net"));
+  }
+  root->ensureLineBreak();
+  {
+    auto& node = root->appendList("clearance");
+    node.appendChild(toToken(Length(0)));
+    node.appendChild("type", SExpression::createToken("via_via_same_net"));
   }
   root->ensureLineBreak();
   return root;
@@ -216,7 +270,8 @@ std::unique_ptr<SExpression> BoardSpecctraExport::genLibrary(
   }
   root->ensureLineBreak();
   for (std::size_t i = 0; i < padStacks.size(); ++i) {
-    padStacks[i]->getChild(0).setValue(QString::number(i));
+    padStacks[i]->getChild(0).setValue(padStacks[i]->getChild(0).getValue() +
+                                       QString::number(i));
     root->ensureLineBreak();
     root->appendChild(std::move(padStacks[i]));
   }
@@ -233,27 +288,38 @@ std::unique_ptr<SExpression> BoardSpecctraExport::genLibraryImage(
 
   std::unique_ptr<SExpression> root = SExpression::createList("image");
   root->appendChild(id);
-  const QSet<const Layer*> layers = {&Layer::topDocumentation()};
   for (const auto& polygon : dev.getLibFootprint().getPolygons()) {
-    if (!layers.contains(&polygon.getLayer())) continue;
-    root->ensureLineBreak();
-    auto& outlineNode = root->appendList("outline");
-    Path path = polygon.getPath();
-    if (polygon.getLayer().getPolygonsRepresentAreas()) {
-      path.close();
+    if (polygon.getLayer() == Layer::topDocumentation()) {
+      root->ensureLineBreak();
+      auto& outlineNode = root->appendList("outline");
+      Path path = polygon.getPath();
+      if (polygon.getLayer().getPolygonsRepresentAreas()) {
+        path.close();
+      }
+      outlineNode.appendChild(
+          toPath("signal", polygon.getLineWidth(), path, true));
+      outlineNode.ensureLineBreak();
+    } else if (polygon.getLayer() == Layer::boardCutouts()) {
+      root->ensureLineBreak();
+      root->appendChild(toKeepout(polygon.getPath()));
     }
-    outlineNode.appendChild(
-        toPath("signal", polygon.getLineWidth(), path, true));
-    outlineNode.ensureLineBreak();
   }
   for (const auto& pad : dev.getPads()) {
-    const std::size_t id = addToPadStacks(padStacks, genLibraryPadStack(*pad));
+    const QString id = "pad-" +
+        QString::number(addToPadStacks(padStacks, genLibraryPadStack(*pad)));
     root->ensureLineBreak();
     auto& pinNode = root->appendList("pin");
-    pinNode.appendChild(SExpression::createToken(QString::number(id)));
+    pinNode.appendChild(id);
+    pinNode.appendChild(
+        "rotate",
+        SExpression::createToken(pad->getLibPad().getRotation().toDegString()));
     pinNode.appendChild(pad->getLibPadUuid().toStr().replace("-", ""));
     pinNode.appendChild(toToken(pad->getLibPad().getPosition().getX()));
     pinNode.appendChild(toToken(pad->getLibPad().getPosition().getY()));
+  }
+  for (const auto& hole : dev.getLibFootprint().getHoles()) {
+    root->ensureLineBreak();
+    root->appendChild(toKeepout(hole));
   }
   root->ensureLineBreak();
   return root;
@@ -262,22 +328,37 @@ std::unique_ptr<SExpression> BoardSpecctraExport::genLibraryImage(
 std::unique_ptr<SExpression> BoardSpecctraExport::genLibraryPadStack(
     const BI_FootprintPad& pad) const {
   std::unique_ptr<SExpression> root = SExpression::createList("padstack");
-  root->appendChild(SExpression::createToken("n"));  // Will be replaced later.
+  root->appendChild(QString("pad-"));
   root->ensureLineBreak();
   const Transform transform(pad);
   const auto& geometries = pad.getGeometries();
   for (auto it = geometries.begin(); it != geometries.end(); it++) {
     if (!it.key()->isCopper()) continue;
     const Layer& layer = transform.map(*it.key());
-    for (const PadGeometry& geometry : it.value()) {
-      root->ensureLineBreak();
+
+    // Always use full THT pad annular rings because automatic annulars depend
+    // on whether a trace is connected or not. But connections might be made
+    // in an external software, so we don't know which pads will be connected.
+    // It's not a nice solution, but safer than exporting too small annular
+    // rings. Probably this could be improved with 'reduced_shape_descriptor'?
+    QList<PadGeometry> shapes = it.value();
+    if (pad.getLibPad().isTht()) {
+      const Layer* solderLayer =
+          (pad.getComponentSide() == FootprintPad::ComponentSide::Top)
+          ? &Layer::botCopper()
+          : &Layer::topCopper();
+      shapes = geometries.value(solderLayer);
+    }
+
+    for (const PadGeometry& geometry : shapes) {
       const PadGeometry::Shape s = geometry.getShape();
       const Length w = geometry.getWidth();
       const Length h = geometry.getHeight();
       const Length r = *geometry.getCornerRadius();
-      if (((s == PadGeometry::Shape::RoundedRect) ||
-           (s == PadGeometry::Shape::RoundedOctagon)) &&
-          (w > 0) && (h > 0) && (r == 0)) {
+      if ((s == PadGeometry::Shape::RoundedRect) && (w > 0) && (h > 0) &&
+          (r == 0)) {
+        // Rectangular pad.
+        root->ensureLineBreak();
         auto& node = root->appendList("shape");
         auto& child = node.appendList("rect");
         child.appendChild(SExpression::createToken(layer.getId()));
@@ -288,19 +369,49 @@ std::unique_ptr<SExpression> BoardSpecctraExport::genLibraryPadStack(
       } else if (((s == PadGeometry::Shape::RoundedRect) ||
                   (s == PadGeometry::Shape::RoundedOctagon)) &&
                  (w == h) && (w > 0) && (r >= (w / 2))) {
+        // Circular pad.
+        root->ensureLineBreak();
         auto& node = root->appendList("shape");
-        auto& child = node.appendList("circle");
-        child.appendChild(SExpression::createToken(layer.getId()));
-        child.appendChild(toToken(w));
-      } else /*if ((s == PadGeometry::Shape::RoundedRect) && (w > 0) && (h > 0)
-                && (r >= (w / 2)))*/
-      {
-        const Path path = (w > h)
-            ? Path::line(Point(-(w - h) / 2, 0), Point((w - h) / 2, 0))
-            : Path::line(Point(0, -(h - w) / 2), Point(0, (h - w) / 2));
+        node.appendChild(toCircle(layer.getId(), PositiveLength(w)));
+      } else if ((s == PadGeometry::Shape::Stroke) &&
+                 (geometry.getPath().getVertices().count() == 1) && (w > 0)) {
+        // Circular pad.
+        root->ensureLineBreak();
         auto& node = root->appendList("shape");
-        node.appendChild(
-            toPath(layer.getId(), UnsignedLength(std::min(w, h)), path, false));
+        node.appendChild(toCircle(layer.getId(), PositiveLength(w)));
+      } else if (((s == PadGeometry::Shape::RoundedRect) ||
+                  (s == PadGeometry::Shape::RoundedOctagon)) &&
+                 (w > h) && (h > 0) && (r >= (h / 2))) {
+        // Oblong pad (horizontal).
+        root->ensureLineBreak();
+        auto& node = root->appendList("shape");
+        node.appendChild(toPath(
+            layer.getId(), UnsignedLength(h),
+            Path::line(Point(-(w - h) / 2, 0), Point((w - h) / 2, 0)), false));
+      } else if (((s == PadGeometry::Shape::RoundedRect) ||
+                  (s == PadGeometry::Shape::RoundedOctagon)) &&
+                 (h > w) && (w > 0) && (r >= (w / 2))) {
+        // Oblong pad (vertical).
+        root->ensureLineBreak();
+        auto& node = root->appendList("shape");
+        node.appendChild(toPath(
+            layer.getId(), UnsignedLength(w),
+            Path::line(Point(0, (h - w) / 2), Point(0, (h - w) / 2)), false));
+      } else if ((s == PadGeometry::Shape::Stroke) &&
+                 (geometry.getPath().getVertices().count() > 1) && (w > 0)) {
+        // Circular stroke pad.
+        root->ensureLineBreak();
+        auto& node = root->appendList("shape");
+        node.appendChild(toPath(layer.getId(), UnsignedLength(w),
+                                geometry.getPath(), false));
+      } else {
+        // Fallback: Arbitrary pads as polygons.
+        for (const Path& p : geometry.toOutlines()) {
+          root->ensureLineBreak();
+          auto& node = root->appendList("shape");
+          node.appendChild(
+              toPolygon(layer.getId(), UnsignedLength(0), p, true));
+        }
       }
     }
   }
@@ -352,8 +463,7 @@ std::unique_ptr<SExpression> BoardSpecctraExport::genWiring(
   for (const auto& via : vias) {
     root->ensureLineBreak();
     auto& viaNode = root->appendList("via");
-    viaNode.appendChild(
-        SExpression::createToken(QString::number(std::get<2>(via))));
+    viaNode.appendChild("via-" + QString::number(std::get<2>(via)));
     viaNode.appendChild(toToken(std::get<0>(via).getX()));
     viaNode.appendChild(toToken(std::get<0>(via).getY()));
     viaNode.appendChild("net", std::get<1>(via));
@@ -366,19 +476,56 @@ std::unique_ptr<SExpression> BoardSpecctraExport::genWiring(
 std::unique_ptr<SExpression> BoardSpecctraExport::genWiringPadStack(
     const BI_Via& via) const {
   std::unique_ptr<SExpression> root = SExpression::createList("padstack");
-  root->appendChild(SExpression::createToken("n"));  // Will be replaced later.
+  root->appendChild(QString("via-"));
   for (const Layer* layer : mBoard.getCopperLayers()) {
     if (via.getVia().isOnLayer(*layer)) {
       root->ensureLineBreak();
       auto& node = root->appendList("shape");
-      auto& child = node.appendList("circle");
-      child.appendChild(SExpression::createToken(layer->getId()));
-      child.appendChild(toToken(*via.getSize()));
+      node.appendChild(toCircle(layer->getId(), via.getSize()));
     }
   }
   root->ensureLineBreak();
   root->appendChild("attach", SExpression::createToken("off"));
   root->ensureLineBreak();
+  return root;
+}
+
+template <typename THole>
+std::unique_ptr<SExpression> BoardSpecctraExport::toKeepout(
+    const THole& hole) const {
+  std::unique_ptr<SExpression> root = SExpression::createList("keepout");
+  const PositiveLength width(
+      hole.getDiameter() +
+      mBoard.getDrcSettings().getMinCopperNpthClearance() * 2);
+  if (hole.isSlot()) {
+    root->appendChild(
+        toPath("signal", positiveToUnsigned(width), *hole.getPath(), false));
+  } else {
+    root->appendChild(toCircle("signal", width,
+                               hole.getPath()->getVertices().first().getPos()));
+  }
+  return root;
+}
+
+std::unique_ptr<SExpression> BoardSpecctraExport::toKeepout(
+    const Path& cutout) const {
+  const Length offset =
+      *mBoard.getDrcSettings().getMinCopperBoardClearance() + maxArcTolerance();
+  ClipperLib::Paths paths{ClipperHelpers::convert(cutout, maxArcTolerance())};
+  ClipperHelpers::offset(paths, offset, maxArcTolerance());
+  if (paths.size() != 1) throw LogicError(__FILE__, __LINE__);
+
+  std::unique_ptr<SExpression> root = SExpression::createList("keepout");
+  root->appendChild(toPolygon("signal", UnsignedLength(0),
+                              ClipperHelpers::convert(paths.at(0)), true));
+  return root;
+}
+
+std::unique_ptr<SExpression> BoardSpecctraExport::toPolygon(
+    const QString& layer, const UnsignedLength& width, const Path& path,
+    bool multiline) const {
+  std::unique_ptr<SExpression> root = toPath(layer, width, path, multiline);
+  root->setName("polygon");
   return root;
 }
 
@@ -388,12 +535,26 @@ std::unique_ptr<SExpression> BoardSpecctraExport::toPath(
   std::unique_ptr<SExpression> root = SExpression::createList("path");
   root->appendChild(SExpression::createToken(layer));
   root->appendChild(toToken(*width));
-  foreach (const auto& vertex, path.getVertices()) {
+  const Path flattenedPath = path.flattenedArcs(PositiveLength(5000));
+  foreach (const auto& vertex, flattenedPath.getVertices()) {
     if (multiline) root->ensureLineBreak();
     root->appendChild(toToken(vertex.getPos().getX()));
     root->appendChild(toToken(vertex.getPos().getY()));
   }
   if (multiline) root->ensureLineBreak();
+  return root;
+}
+
+std::unique_ptr<SExpression> BoardSpecctraExport::toCircle(
+    const QString& layer, const PositiveLength& diameter,
+    const Point& pos) const {
+  std::unique_ptr<SExpression> root = SExpression::createList("circle");
+  root->appendChild(SExpression::createToken(layer));
+  root->appendChild(toToken(*diameter));
+  if (!pos.isOrigin()) {
+    root->appendChild(toToken(pos.getX()));
+    root->appendChild(toToken(pos.getY()));
+  }
   return root;
 }
 

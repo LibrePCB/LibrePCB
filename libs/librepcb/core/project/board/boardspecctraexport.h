@@ -23,7 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../types/length.h"
+#include "../../types/point.h"
 
 #include <QtCore>
 
@@ -40,6 +40,7 @@ class BI_Device;
 class BI_FootprintPad;
 class BI_Via;
 class Board;
+class Hole;
 class Path;
 class Point;
 class SExpression;
@@ -70,7 +71,9 @@ public:
 private:
   std::unique_ptr<SExpression> genParser() const;
   std::unique_ptr<SExpression> genResolution() const;
-  std::unique_ptr<SExpression> genStructure() const;
+  std::unique_ptr<SExpression> genStructure(
+      std::vector<std::unique_ptr<SExpression>>& padStacks) const;
+  std::unique_ptr<SExpression> genStructureRule() const;
   std::unique_ptr<SExpression> genPlacement() const;
   std::unique_ptr<SExpression> genLibrary(
       std::vector<std::unique_ptr<SExpression>>& padStacks) const;
@@ -84,14 +87,30 @@ private:
       const QList<std::tuple<Point, QString, std::size_t>>& vias) const;
   std::unique_ptr<SExpression> genWiringPadStack(const BI_Via& via) const;
 
+  template <typename THole>
+  std::unique_ptr<SExpression> toKeepout(const THole& hole) const;
+  std::unique_ptr<SExpression> toKeepout(const Path& cutout) const;
+  std::unique_ptr<SExpression> toPolygon(const QString& layer,
+                                         const UnsignedLength& width,
+                                         const Path& path,
+                                         bool multiline) const;
   std::unique_ptr<SExpression> toPath(const QString& layer,
                                       const UnsignedLength& width,
                                       const Path& path, bool multiline) const;
-
+  std::unique_ptr<SExpression> toCircle(const QString& layer,
+                                        const PositiveLength& diameter,
+                                        const Point& pos = Point()) const;
   std::unique_ptr<SExpression> toToken(const Length& length) const;
   static std::size_t addToPadStacks(
       std::vector<std::unique_ptr<SExpression>>& padStacks,
       std::unique_ptr<SExpression> padStack);
+
+  /**
+   * Returns the maximum allowed arc tolerance when flattening arcs.
+   */
+  static PositiveLength maxArcTolerance() noexcept {
+    return PositiveLength(5000);
+  }
 
   // Private Member Variables
   const Board& mBoard;
