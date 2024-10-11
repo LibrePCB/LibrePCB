@@ -484,6 +484,15 @@ public:
       {},
       &categoryImportExport,
   };
+  EditorCommand importSpecctraSes{
+      "import_specctra_ses",  // clang-format break
+      QT_TR_NOOP("Import Specctra SES"),
+      QT_TR_NOOP("Import a Specctra session, e.g. from external autorouters"),
+      ":/img/actions/generate_bom.png",  // No Specctra icon yet.
+      EditorCommand::Flag::OpensPopup,
+      {},
+      &categoryImportExport,
+  };
   EditorCommand exportLppz{
       "export_lppz",  // clang-format break
       QT_TR_NOOP("Export *.lppz Archive"),
@@ -511,15 +520,6 @@ public:
       {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_P)},
       &categoryImportExport,
   };
-  EditorCommand exportStep{
-      "export_step",  // clang-format break
-      QT_TR_NOOP("Export STEP Model"),
-      QT_TR_NOOP("Export PCB as a STEP file for loading it into MCAD software"),
-      ":/img/actions/export_step.png",
-      EditorCommand::Flag::OpensPopup,
-      {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_T)},
-      &categoryImportExport,
-  };
   EditorCommand exportSpecctraDsn{
       "export_specctra_dsn",  // clang-format break
       QT_TR_NOOP("Export Specctra DSN"),
@@ -527,6 +527,15 @@ public:
       ":/img/actions/generate_bom.png",  // No Specctra icon yet.
       EditorCommand::Flag::OpensPopup,
       {},
+      &categoryImportExport,
+  };
+  EditorCommand exportStep{
+      "export_step",  // clang-format break
+      QT_TR_NOOP("Export STEP Model"),
+      QT_TR_NOOP("Export PCB as a STEP file for loading it into MCAD software"),
+      ":/img/actions/export_step.png",
+      EditorCommand::Flag::OpensPopup,
+      {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_T)},
       &categoryImportExport,
   };
   EditorCommand print{

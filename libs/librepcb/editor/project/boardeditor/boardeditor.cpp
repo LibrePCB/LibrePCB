@@ -42,6 +42,7 @@
 #include "../../widgets/searchtoolbar.h"
 #include "../../workspace/desktopservices.h"
 #include "../bomgeneratordialog.h"
+#include "../cmd/cmdboardspecctraimport.h"
 #include "../outputjobsdialog/outputjobsdialog.h"
 #include "../projecteditor.h"
 #include "../projectsetupdialog.h"
@@ -594,6 +595,8 @@ void BoardEditor::createActions() noexcept {
       this, this, [this]() { runDrc(false); }));
   mActionImportDxf.reset(cmd.importDxf.createAction(
       this, mFsm.data(), &BoardEditorFsm::processImportDxf));
+  mActionImportSpecctra.reset(cmd.importSpecctraSes.createAction(
+      this, this, &BoardEditor::execSpecctraImportDialog));
   mActionExportLppz.reset(cmd.exportLppz.createAction(
       this, this, [this]() { mProjectEditor.execLppzExportDialog(this); }));
   mActionExportImage.reset(cmd.exportImage.createAction(this, this, [this]() {
@@ -1029,6 +1032,7 @@ void BoardEditor::createMenus() noexcept {
   {
     MenuBuilder smb(mb.addSubMenu(&MenuBuilder::createImportMenu));
     smb.addAction(mActionImportDxf);
+    smb.addAction(mActionImportSpecctra);
   }
   {
     MenuBuilder smb(mb.addSubMenu(&MenuBuilder::createExportMenu));
@@ -1778,6 +1782,43 @@ void BoardEditor::execD356NetlistExportDialog() noexcept {
     BoardD356NetlistExport exp(*board);
     FileUtils::writeFile(fp, exp.generate());  // can throw
     qDebug() << "Successfully exported netlist.";
+  } catch (const Exception& e) {
+    QMessageBox::critical(this, tr("Error"), e.getMsg());
+  }
+}
+
+void BoardEditor::execSpecctraImportDialog() noexcept {
+  Board* board = getActiveBoard();
+  if (!board) return;
+
+  try {
+    // Use memorized export file path, if board path and version number match.
+    QSettings cs;
+    const QString csId =
+        board->getDirectory().getAbsPath().toStr() + *mProject.getVersion();
+    const QString csKey = "board_editor/dsn_export/" %
+        QString(QCryptographicHash::hash(csId.toUtf8(), QCryptographicHash::Md5)
+                    .toHex());
+    QString path = cs.value(csKey, path).toString();
+
+    // Make file path absolute.
+    if (QFileInfo(path).isRelative()) {
+      path = mProject.getPath().getPathTo(path).toStr();
+    }
+
+    // Choose file path.
+    path = FileDialog::getOpenFileName(this, tr("Import Specctra SES"), path,
+                                       "*.ses");
+    if (path.isEmpty()) return;
+    const FilePath fp(path);
+
+    // Perform import.
+    qDebug().nospace() << "Import Specctra SES from " << fp.toNative() << "...";
+    const QByteArray content = FileUtils::readFile(fp);  // can throw
+    mProjectEditor.getUndoStack().execCmd(
+        new CmdBoardSpecctraImport(*board, content));  // can throw
+    qDebug() << "Successfully imported Specctra SES.";
+    mUi->statusbar->showMessage(tr("Success!"), 3000);
   } catch (const Exception& e) {
     QMessageBox::critical(this, tr("Error"), e.getMsg());
   }
