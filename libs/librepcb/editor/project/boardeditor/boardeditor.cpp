@@ -1788,17 +1788,46 @@ void BoardEditor::execSpecctraExportDialog() noexcept {
   if (!board) return;
 
   try {
-    QString path = FileDialog::getSaveFileName(
-        this, tr("Export Specctra DSN"),
-        QString("/home/urban/Downloads/librepcb.dsn"), "*.dsn");
+    // Default file path.
+    QString path = "output/{{VERSION}}/{{PROJECT}}_{{BOARD}}.dsn";
+    path = AttributeSubstitutor::substitute(
+        path, ProjectAttributeLookup(*board, nullptr), [&](const QString& str) {
+          return FilePath::cleanFileName(
+              str, FilePath::ReplaceSpaces | FilePath::KeepCase);
+        });
+
+    // Use memorized file path, if board path and version number match.
+    QSettings cs;
+    const QString csId =
+        board->getDirectory().getAbsPath().toStr() + *mProject.getVersion();
+    const QString csKey = "board_editor/dsn_export/" %
+        QString(QCryptographicHash::hash(csId.toUtf8(), QCryptographicHash::Md5)
+                    .toHex());
+    path = cs.value(csKey, path).toString();
+
+    // Make file path absolute.
+    if (QFileInfo(path).isRelative()) {
+      path = mProject.getPath().getPathTo(path).toStr();
+    }
+
+    // Choose file path.
+    path = FileDialog::getSaveFileName(this, tr("Export Specctra DSN"), path,
+                                       "*.dsn");
     if (path.isEmpty()) return;
     if (!path.contains(".")) path.append(".dsn");
+    const FilePath fp(path);
 
-    FilePath fp(path);
+    // Memorize file path.
+    cs.setValue(csKey,
+                fp.isLocatedInDir(mProject.getPath())
+                    ? fp.toRelative(mProject.getPath())
+                    : fp.toNative());
+
+    // Perform export.
     qDebug().nospace() << "Export Specctra DSN to " << fp.toNative() << "...";
     BoardSpecctraExport exp(*board);
     FileUtils::writeFile(fp, exp.generate());  // can throw
-    qDebug() << "Successfully exported DSN.";
+    qDebug() << "Successfully exported Specctra DSN.";
   } catch (const Exception& e) {
     QMessageBox::critical(this, tr("Error"), e.getMsg());
   }
