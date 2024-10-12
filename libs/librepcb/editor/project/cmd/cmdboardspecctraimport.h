@@ -25,7 +25,13 @@
  ******************************************************************************/
 #include "../../undocommandgroup.h"
 
+#include <librepcb/core/geometry/path.h>
+#include <librepcb/core/types/angle.h>
+#include <librepcb/core/types/point.h>
+
 #include <QtCore>
+
+#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -33,6 +39,11 @@
 namespace librepcb {
 
 class Board;
+class Circuit;
+class Layer;
+class MessageLogger;
+class Project;
+class SExpression;
 
 namespace editor {
 
@@ -45,17 +56,55 @@ namespace editor {
  */
 class CmdBoardSpecctraImport : public UndoCommandGroup {
 public:
+  // Types
+  enum class Side { Front, Back };
+
+  struct ComponentOut {
+    QString name;
+    Point pos;
+    Side side;
+    Angle rot;
+  };
+
+  struct PadStackOut {
+    const Layer* startLayer;
+    const Layer* endLayer;
+    Length diameter;
+  };
+
+  struct ViaOut {
+    QString padStackId;
+    Point pos;
+  };
+
+  struct WireOut {
+    const Layer* layer;
+    Length width;
+    Path path;
+  };
+
+  struct NetOut {
+    QString netName;
+    QList<ViaOut> vias;
+    QList<WireOut> wires;
+  };
+
   // Constructors / Destructor
-  explicit CmdBoardSpecctraImport(Board& board,
-                                  const QByteArray& content) noexcept;
+  explicit CmdBoardSpecctraImport(Board& board, const SExpression& root,
+                                  std::shared_ptr<MessageLogger> logger);
   ~CmdBoardSpecctraImport() noexcept;
 
 private:  // Methods
   /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;
 
+  Project& mProject;
+  Circuit& mCircuit;
   Board& mBoard;
-  const QByteArray mContent;
+  std::shared_ptr<MessageLogger> mLogger;
+  QList<ComponentOut> mComponents;
+  QHash<QString, PadStackOut> mPadStacks;
+  QList<NetOut> mNets;
 };
 
 /*******************************************************************************

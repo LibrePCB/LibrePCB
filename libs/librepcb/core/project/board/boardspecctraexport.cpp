@@ -109,7 +109,7 @@ QByteArray BoardSpecctraExport::generate() const {
   root->ensureLineBreak();
   root->appendChild(genWiring(vias));
   root->ensureLineBreak();
-  return root->toByteArray(false);
+  return root->toByteArray(SExpression::Mode::Permissive);
 }
 
 /*******************************************************************************

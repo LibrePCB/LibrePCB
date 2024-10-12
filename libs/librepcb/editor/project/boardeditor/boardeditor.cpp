@@ -81,6 +81,7 @@
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectattributelookup.h>
 #include <librepcb/core/types/layer.h>
+#include <librepcb/core/utils/messagelogger.h>
 #include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/utils/toolbox.h>
 #include <librepcb/core/workspace/workspace.h>
@@ -1799,7 +1800,7 @@ void BoardEditor::execSpecctraImportDialog() noexcept {
     const QString csKey = "board_editor/dsn_export/" %
         QString(QCryptographicHash::hash(csId.toUtf8(), QCryptographicHash::Md5)
                     .toHex());
-    QString path = cs.value(csKey, path).toString();
+    QString path = cs.value(csKey).toString().replace(".dsn", ".ses");
 
     // Make file path absolute.
     if (QFileInfo(path).isRelative()) {
@@ -1808,15 +1809,22 @@ void BoardEditor::execSpecctraImportDialog() noexcept {
 
     // Choose file path.
     path = FileDialog::getOpenFileName(this, tr("Import Specctra SES"), path,
-                                       "*.ses");
+                                       "*.ses;;*");
     if (path.isEmpty()) return;
     const FilePath fp(path);
+
+    // Set UI into busy state during the import.
+    setCursor(Qt::WaitCursor);
+    auto busyScopeGuard = scopeGuard([this]() { unsetCursor(); });
 
     // Perform import.
     qDebug().nospace() << "Import Specctra SES from " << fp.toNative() << "...";
     const QByteArray content = FileUtils::readFile(fp);  // can throw
+    std::unique_ptr<SExpression> root =
+        SExpression::parse(content, fp, SExpression::Mode::Permissive);
+    auto logger = std::make_shared<MessageLogger>();
     mProjectEditor.getUndoStack().execCmd(
-        new CmdBoardSpecctraImport(*board, content));  // can throw
+        new CmdBoardSpecctraImport(*board, *root, logger));  // can throw
     qDebug() << "Successfully imported Specctra SES.";
     mUi->statusbar->showMessage(tr("Success!"), 3000);
   } catch (const Exception& e) {
