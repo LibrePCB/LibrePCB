@@ -100,9 +100,14 @@ void SGI_NetLabel::paint(QPainter* painter,
                          const QStyleOptionGraphicsItem* option,
                          QWidget* widget) noexcept {
   Q_UNUSED(widget);
+
+  // If the net label layer is disabled, do not draw anything.
+  if ((!mNetLabelLayer) || (!mNetLabelLayer->isVisible())) {
+    return;
+  }
+
   const qreal lod =
       option->levelOfDetailFromTransform(painter->worldTransform());
-
   const bool highlight = option->state.testFlag(QStyle::State_Selected) ||
       mHighlightedNetSignals->contains(&mNetLabel.getNetSignalOfNetSegment());
 
@@ -112,7 +117,7 @@ void SGI_NetLabel::paint(QPainter* painter,
     painter->drawLines(sOriginCrossLines);
   }
 
-  if (mNetLabelLayer && mNetLabelLayer->isVisible() && (lod > 1)) {
+  if (lod > 1) {
     // draw text
     painter->setPen(QPen(mNetLabelLayer->getColor(highlight), 0));
     painter->setFont(mFont);
