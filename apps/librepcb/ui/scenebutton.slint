@@ -1,14 +1,28 @@
 export component SceneButton inherits Rectangle {
-    in property <image> image <=> i-icon.source;
-    in property <brush> colorize <=> i-icon.colorize;
+    in property <string> text;
+    in property <image> image;
+    in property <brush> colorize;
+
+    callback clicked <=> ta.clicked;
 
     width: 25px;
     height: 25px;
     border-radius: self.height / 2;
 
-    i-icon := Image {
+    if text != "": t-text := Text {
+        height: self.width;
+        vertical-alignment: TextVerticalAlignment.center;
+        horizontal-alignment: TextHorizontalAlignment.center;
+        color: colorize;
+        font-size: ta.has-hover ? 19px : 14px;
+        text: text;
+    }
+
+    if text == "": i-icon := Image {
         width: parent.width * (ta.has-hover ? 1.0 : 0.8);
         image-fit: ImageFit.fill;
+        source: image;
+        colorize: colorize;
     }
 
     ta := TouchArea {

@@ -35,7 +35,7 @@ export component WindowSection inherits Rectangle {
 
                     Image {
                         width: 16px;
-                        source: (tab.type == TabType.board) ? @image-url("img/projects.png") : @image-url("img/image.svg");
+                        source: (tab.type == TabType.schematic) ? @image-url("img/image.svg") : @image-url("img/projects.png");
                     }
 
                     t-tab := Text {
@@ -104,6 +104,14 @@ export component WindowSection inherits Rectangle {
             SceneButton {
                 image: @image-url("img/zoom-out.svg");
                 colorize: section.overlay-color;
+            }
+
+            if tabs[section.tab-index].type == TabType.board-2d: SceneButton {
+                text: "3D";
+                colorize: section.overlay-color;
+                clicked => {
+                    Globals.board-3d-clicked(tabs[section.tab-index].index);
+                }
             }
         }
     }
