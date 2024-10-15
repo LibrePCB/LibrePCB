@@ -1114,5 +1114,5 @@ QString KiCadTypeConverter::getLayerName(int id,
  *  End of File
  ******************************************************************************/
 
-}  // namespace eagleimport
+}  // namespace kicadimport
 }  // namespace librepcb

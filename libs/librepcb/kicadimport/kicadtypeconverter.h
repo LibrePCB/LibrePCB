@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_KiCadIMPORT_KiCadTYPECONVERTER_H
-#define LIBREPCB_KiCadIMPORT_KiCadTYPECONVERTER_H
+#ifndef LIBREPCB_KICADIMPORT_KICADTYPECONVERTER_H
+#define LIBREPCB_KICADIMPORT_KICADTYPECONVERTER_H
 
 /*******************************************************************************
  *  Includes
@@ -201,8 +201,8 @@ public:
    *
    * @return LibrePCB attribute (nullptr on failure)
    */
-  //static std::shared_ptr<Attribute> tryConvertAttribute(
-  //    const parseagle::Attribute& a, MessageLogger& log);
+  // static std::shared_ptr<Attribute> tryConvertAttribute(
+  //     const parseagle::Attribute& a, MessageLogger& log);
 
   /**
    * @brief Try converting a list of attributes
@@ -217,8 +217,8 @@ public:
    *
    * @see #tryConvertAttribute()
    */
-  //static void tryConvertAttributes(const QList<parseagle::Attribute>& in,
-  //                                 AttributeList& out, MessageLogger& log);
+  // static void tryConvertAttributes(const QList<parseagle::Attribute>& in,
+  //                                  AttributeList& out, MessageLogger& log);
 
   /**
    * @brief Try extracting MPN and manufacturer from a list of attributes
@@ -266,7 +266,7 @@ public:
    *
    * @return LibrePCB alignment
    */
-  //static Alignment convertAlignment(parseagle::Alignment a);
+  // static Alignment convertAlignment(parseagle::Alignment a);
 
   /**
    * @brief Convert a length
@@ -301,8 +301,8 @@ public:
    *
    * @throws If the value could not be converted
    */
-  //template <typename T>
-  //static T convertParamTo(const parseagle::Param& p);
+  // template <typename T>
+  // static T convertParamTo(const parseagle::Param& p);
 
   /**
    * @brief Convert a point
@@ -311,7 +311,7 @@ public:
    *
    * @return LibrePCB point
    */
-  //static Point convertPoint(const parseagle::Point& p);
+  // static Point convertPoint(const parseagle::Point& p);
 
   /**
    * @brief Convert an angle
@@ -332,8 +332,8 @@ public:
    * @param interval  LibrePCB grid interval (output)
    * @param unit      LibrePCB grid unit (output)
    */
-  //static void convertGrid(const parseagle::Grid& g, PositiveLength& interval,
-  //                        LengthUnit& unit);
+  // static void convertGrid(const parseagle::Grid& g, PositiveLength& interval,
+  //                         LengthUnit& unit);
 
   /**
    * @brief Convert a vertex
@@ -342,7 +342,7 @@ public:
    *
    * @return LibrePCB vertex
    */
-  //static Vertex convertVertex(const parseagle::Vertex& v);
+  // static Vertex convertVertex(const parseagle::Vertex& v);
 
   /**
    * @brief Convert vertices
@@ -352,7 +352,7 @@ public:
    *
    * @return LibrePCB path
    */
-  //static Path convertVertices(const QList<parseagle::Vertex>& v, bool close);
+  // static Path convertVertices(const QList<parseagle::Vertex>& v, bool close);
 
   /**
    * @brief Try to join and convert multiple wires to polygons
@@ -364,9 +364,9 @@ public:
    *
    * @return Joined polygons as intermediate geometries
    */
-  //static QList<Geometry> convertAndJoinWires(
-  //    const QList<parseagle::Wire>& wires, bool isGrabAreaIfClosed,
-  //    MessageLogger& log);
+  // static QList<Geometry> convertAndJoinWires(
+  //     const QList<parseagle::Wire>& wires, bool isGrabAreaIfClosed,
+  //     MessageLogger& log);
 
   /**
    * @brief Convert a rectangle
@@ -376,8 +376,8 @@ public:
    *
    * @return Intermediate geometry containing 4 line segments
    */
-  //static Geometry convertRectangle(const parseagle::Rectangle& r,
-  //                                 bool isGrabArea);
+  // static Geometry convertRectangle(const parseagle::Rectangle& r,
+  //                                  bool isGrabArea);
 
   /**
    * @brief Convert a polygon
@@ -387,7 +387,8 @@ public:
    *
    * @return Intermediate geometry (always closed)
    */
-  //static Geometry convertPolygon(const parseagle::Polygon& p, bool isGrabArea);
+  // static Geometry convertPolygon(const parseagle::Polygon& p, bool
+  // isGrabArea);
 
   /**
    * @brief Convert a circle
@@ -397,7 +398,7 @@ public:
    *
    * @return Intermediate geometry
    */
-  //static Geometry convertCircle(const parseagle::Circle& c, bool isGrabArea);
+  // static Geometry convertCircle(const parseagle::Circle& c, bool isGrabArea);
 
   /**
    * @brief Convert a hole
@@ -406,7 +407,7 @@ public:
    *
    * @return LibrePCB hole
    */
-  //static std::shared_ptr<Hole> convertHole(const parseagle::Hole& h);
+  // static std::shared_ptr<Hole> convertHole(const parseagle::Hole& h);
 
   /**
    * @brief Convert a frame
@@ -415,7 +416,7 @@ public:
    *
    * @return Intermediate geometry containing 4 line segments
    */
-  //static Geometry convertFrame(const parseagle::Frame& f);
+  // static Geometry convertFrame(const parseagle::Frame& f);
 
   /**
    * @brief Convert a text value
@@ -424,7 +425,7 @@ public:
    *
    * @return LibrePCB text value (e.g. "{{NAME}}")
    */
-  //static QString convertTextValue(const QString& v);
+  // static QString convertTextValue(const QString& v);
 
   /**
    * @brief Convert the size (height) of a schematic text
@@ -442,8 +443,8 @@ public:
    *
    * @return LibrePCB text if the layer is supported, otherwise `nullptr`
    */
-  //static std::shared_ptr<Text> tryConvertSchematicText(
-  //    const parseagle::Text& t);
+  // static std::shared_ptr<Text> tryConvertSchematicText(
+  //     const parseagle::Text& t);
 
   /**
    * @brief Try to convert a schematic/symbol attribute text
@@ -452,8 +453,8 @@ public:
    *
    * @return LibrePCB text if the layer is supported, otherwise `nullptr`
    */
-  //static std::shared_ptr<Text> tryConvertSchematicAttribute(
-  //    const parseagle::Attribute& t);
+  // static std::shared_ptr<Text> tryConvertSchematicAttribute(
+  //     const parseagle::Attribute& t);
 
   /**
    * @brief Convert the size (height) of a board text
@@ -484,8 +485,8 @@ public:
    *
    * @return LibrePCB text if the layer is supported, otherwise `nullptr`
    */
-  //static std::shared_ptr<StrokeText> tryConvertBoardText(
-  //    const parseagle::Text& t);
+  // static std::shared_ptr<StrokeText> tryConvertBoardText(
+  //     const parseagle::Text& t);
 
   /**
    * @brief Try to convert a board/footprint attribute text
@@ -494,8 +495,8 @@ public:
    *
    * @return LibrePCB text if the layer is supported, otherwise `nullptr`
    */
-  //static std::shared_ptr<StrokeText> tryConvertBoardAttribute(
-  //    const parseagle::Attribute& t);
+  // static std::shared_ptr<StrokeText> tryConvertBoardAttribute(
+  //     const parseagle::Attribute& t);
 
   /**
    * @brief Convert a symbol pin
@@ -504,7 +505,7 @@ public:
    *
    * @return LibrePCB objects to represent the pin
    */
-  //static Pin convertSymbolPin(const parseagle::Pin& p);
+  // static Pin convertSymbolPin(const parseagle::Pin& p);
 
   /**
    * @brief Convert a THT pad
@@ -516,9 +517,10 @@ public:
    *
    * @return LibrePCB package pad + footprint pad
    */
-  //static std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad>>
-  //    convertThtPad(const parseagle::ThtPad& p,
-  //                  const BoundedUnsignedRatio& autoAnnularWidth);
+  // static std::pair<std::shared_ptr<PackagePad>,
+  // std::shared_ptr<FootprintPad>>
+  //     convertThtPad(const parseagle::ThtPad& p,
+  //                   const BoundedUnsignedRatio& autoAnnularWidth);
 
   /**
    * @brief Convert an SMT pad
@@ -527,8 +529,9 @@ public:
    *
    * @return LibrePCB package pad + footprint pad
    */
-  //static std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad>>
-  //    convertSmtPad(const parseagle::SmtPad& p);
+  // static std::pair<std::shared_ptr<PackagePad>,
+  // std::shared_ptr<FootprintPad>>
+  //     convertSmtPad(const parseagle::SmtPad& p);
 
   /**
    * @brief Try to convert an intermediate geometry to a schematic circle
@@ -613,7 +616,7 @@ public:
  *  End of File
  ******************************************************************************/
 
-}  // namespace eagleimport
+}  // namespace kicadimport
 }  // namespace librepcb
 
 #endif

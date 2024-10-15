@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EAGLEIMPORT_EAGLELIBRARYIMPORT_H
-#define LIBREPCB_EAGLEIMPORT_EAGLELIBRARYIMPORT_H
+#ifndef LIBREPCB_KICADIMPORT_KICADLIBRARYIMPORT_H
+#define LIBREPCB_KICADIMPORT_KICADLIBRARYIMPORT_H
 
 /*******************************************************************************
  *  Includes
@@ -53,17 +53,15 @@ class KiCadLibraryImport final : public QThread {
 
 public:
   struct Symbol {
-    QString displayName;  // Same as symbol->getName()
-    QString description;  // Same as symbol->getDescription()
+    QString displayName;
     Qt::CheckState checkState;
-    //std::shared_ptr<parseagle::Symbol> symbol;
+    // std::shared_ptr<parseagle::Symbol> symbol;
   };
 
   struct Package {
     QString displayName;  // Same as package->getName()
-    QString description;  // Same as package->getDescription()
     Qt::CheckState checkState;
-    //std::shared_ptr<parseagle::Package> package;
+    // std::shared_ptr<parseagle::Package> package;
   };
 
   struct Component {
@@ -71,7 +69,7 @@ public:
     QString description;  // Same as deviceSet->getDescription()
     Qt::CheckState checkState;
     QSet<QString> symbolDisplayNames;
-    //std::shared_ptr<parseagle::DeviceSet> deviceSet;
+    // std::shared_ptr<parseagle::DeviceSet> deviceSet;
   };
 
   struct Device {
@@ -80,8 +78,8 @@ public:
     Qt::CheckState checkState;
     QString componentDisplayName;
     QString packageDisplayName;
-    //std::shared_ptr<parseagle::Device> device;
-    //std::shared_ptr<parseagle::DeviceSet> deviceSet;
+    // std::shared_ptr<parseagle::Device> device;
+    // std::shared_ptr<parseagle::DeviceSet> deviceSet;
   };
 
   // Constructors / Destructor
@@ -94,31 +92,31 @@ public:
   std::shared_ptr<MessageLogger> getLogger() const noexcept { return mLogger; }
   const FilePath& getLoadedFilePath() const noexcept { return mLoadedFilePath; }
   int getTotalElementsCount() const noexcept;
-  int getCheckedElementsCount() const noexcept;
-  int getCheckedSymbolsCount() const noexcept;
-  int getCheckedPackagesCount() const noexcept;
-  int getCheckedComponentsCount() const noexcept;
-  int getCheckedDevicesCount() const noexcept;
+  // int getCheckedElementsCount() const noexcept;
+  // int getCheckedSymbolsCount() const noexcept;
+  // int getCheckedPackagesCount() const noexcept;
+  // int getCheckedComponentsCount() const noexcept;
+  // int getCheckedDevicesCount() const noexcept;
   const QVector<Symbol>& getSymbols() const noexcept { return mSymbols; }
   const QVector<Package>& getPackages() const noexcept { return mPackages; }
-  const QVector<Component>& getComponents() const noexcept {
-    return mComponents;
-  }
-  const QVector<Device>& getDevices() const noexcept { return mDevices; }
+  // const QVector<Component>& getComponents() const noexcept {
+  //   return mComponents;
+  // }
+  // const QVector<Device>& getDevices() const noexcept { return mDevices; }
 
   // Setters
-  void setSymbolCategories(const QSet<Uuid>& uuids) noexcept;
-  void setPackageCategories(const QSet<Uuid>& uuids) noexcept;
-  void setComponentCategories(const QSet<Uuid>& uuids) noexcept;
-  void setDeviceCategories(const QSet<Uuid>& uuids) noexcept;
-  void setSymbolChecked(const QString& name, bool checked) noexcept;
-  void setPackageChecked(const QString& name, bool checked) noexcept;
-  void setComponentChecked(const QString& name, bool checked) noexcept;
-  void setDeviceChecked(const QString& name, bool checked) noexcept;
+  // void setSymbolCategories(const QSet<Uuid>& uuids) noexcept;
+  // void setPackageCategories(const QSet<Uuid>& uuids) noexcept;
+  // void setComponentCategories(const QSet<Uuid>& uuids) noexcept;
+  // void setDeviceCategories(const QSet<Uuid>& uuids) noexcept;
+  // void setSymbolChecked(const QString& name, bool checked) noexcept;
+  // void setPackageChecked(const QString& name, bool checked) noexcept;
+  // void setComponentChecked(const QString& name, bool checked) noexcept;
+  // void setDeviceChecked(const QString& name, bool checked) noexcept;
 
   // General Methods
   void reset() noexcept;
-  QStringList open(const FilePath& lbr);
+  QStringList open(const FilePath& dir);
 
   // Operator Overloadings
   KiCadLibraryImport& operator=(const KiCadLibraryImport& rhs) = delete;
@@ -132,6 +130,7 @@ signals:
   void finished();
 
 private:  // Methods
+  void open(const FilePath& dir, QStringList& errors);
   template <typename T>
   int getCheckedElementsCount(const QVector<T>& elements) const noexcept;
   template <typename T>
@@ -162,7 +161,7 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
-}  // namespace eagleimport
+}  // namespace kicadimport
 }  // namespace librepcb
 
 #endif

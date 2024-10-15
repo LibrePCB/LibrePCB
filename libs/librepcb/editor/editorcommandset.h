@@ -484,6 +484,15 @@ public:
       {},
       &categoryImportExport,
   };
+  EditorCommand importKiCadLibrary{
+      "import_kicad_library",  // clang-format break
+      QT_TR_NOOP("Import KiCad Library"),
+      QT_TR_NOOP("Import symbols and footprints from KiCad libraries"),
+      QString(),
+      EditorCommand::Flag::OpensPopup,
+      {},
+      &categoryImportExport,
+  };
   EditorCommand importSpecctraSes{
       "import_specctra_ses",  // clang-format break
       QT_TR_NOOP("Import Specctra SES"),

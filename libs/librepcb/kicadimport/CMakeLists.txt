@@ -12,6 +12,8 @@ add_library(
   kicadlibraryimport.h
   kicadtypeconverter.cpp
   kicadtypeconverter.h
+  kicadtypes.cpp
+  kicadtypes.h
 )
 target_include_directories(
   librepcb_kicadimport

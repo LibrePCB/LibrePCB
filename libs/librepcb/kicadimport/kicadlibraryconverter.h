@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_KiCadIMPORT_KiCadLibraryConverter_H
-#define LIBREPCB_KiCadIMPORT_KiCadLibraryConverter_H
+#ifndef LIBREPCB_KICADIMPORT_KICADLIBRARYCONVERTER_H
+#define LIBREPCB_KICADIMPORT_KICADLIBRARYCONVERTER_H
 
 /*******************************************************************************
  *  Includes
@@ -56,15 +56,15 @@ namespace kicadimport {
 struct KiCadLibraryConverterSettings final {
   KiCadLibraryConverterSettings() noexcept;
 
-  //QString namePrefix;
-  //Version version;
+  // QString namePrefix;
+  // Version version;
   QString author;
   QString keywords;
   QSet<Uuid> symbolCategories;
   QSet<Uuid> packageCategories;
   QSet<Uuid> componentCategories;
   QSet<Uuid> deviceCategories;
-  //BoundedUnsignedRatio autoThtAnnularWidth;
+  // BoundedUnsignedRatio autoThtAnnularWidth;
 };
 
 /*******************************************************************************
@@ -93,22 +93,22 @@ public:
 
   // General Methods
   void reset() noexcept;
-  //std::unique_ptr<Symbol> createSymbol(const QString& libName,
-  //                                     const QString& libUrn,
-  //                                     const parseagle::Symbol& eagleSymbol,
-  //                                     MessageLogger& log);
-  //std::unique_ptr<Package> createPackage(const QString& libName,
-  //                                       const QString& libUrn,
-  //                                       const parseagle::Package& eaglePackage,
-  //                                       MessageLogger& log);
-  //std::unique_ptr<Component> createComponent(
-  //    const QString& libName, const QString& libUrn,
-  //    const parseagle::DeviceSet& eagleDeviceSet, MessageLogger& log);
-  //std::unique_ptr<Device> createDevice(
-  //    const QString& devLibName, const QString& devLibUrn,
-  //    const parseagle::DeviceSet& eagleDeviceSet,
-  //    const parseagle::Device& eagleDevice, const QString& pkgLibName,
-  //    const QString& pkgLibUrn, MessageLogger& log);
+  // std::unique_ptr<Symbol> createSymbol(const QString& libName,
+  //                                      const QString& libUrn,
+  //                                      const parseagle::Symbol& eagleSymbol,
+  //                                      MessageLogger& log);
+  // std::unique_ptr<Package> createPackage(const QString& libName,
+  //                                        const QString& libUrn,
+  //                                        const parseagle::Package&
+  //                                        eaglePackage, MessageLogger& log);
+  // std::unique_ptr<Component> createComponent(
+  //     const QString& libName, const QString& libUrn,
+  //     const parseagle::DeviceSet& eagleDeviceSet, MessageLogger& log);
+  // std::unique_ptr<Device> createDevice(
+  //     const QString& devLibName, const QString& devLibUrn,
+  //     const parseagle::DeviceSet& eagleDeviceSet,
+  //     const parseagle::Device& eagleDevice, const QString& pkgLibName,
+  //     const QString& pkgLibUrn, MessageLogger& log);
 
   // Operator Overloadings
   KiCadLibraryConverter& operator=(const KiCadLibraryConverter& rhs) = delete;
@@ -127,10 +127,11 @@ private:  // Data
 
   /// Key: [Library Name, Library URN, Symbol Name] | Pin Name
   /// Value: (KiCad Pin Object, LibrePCB Symbol Pin UUID)
-  //QHash<QStringList,
-  //      QMap<QString,
-  //           std::pair<std::shared_ptr<parseagle::Pin>, tl::optional<Uuid> > > >
-  //    mSymbolPinMap;
+  // QHash<QStringList,
+  //       QMap<QString,
+  //            std::pair<std::shared_ptr<parseagle::Pin>, tl::optional<Uuid> >
+  //            > >
+  //     mSymbolPinMap;
 
   /// Key: [Library Name, Library URN, Package Name]
   /// Value: LibrePCB Package UUID
@@ -153,7 +154,7 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
-}  // namespace eagleimport
+}  // namespace kicadimport
 }  // namespace librepcb
 
 #endif

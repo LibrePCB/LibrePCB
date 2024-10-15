@@ -189,6 +189,7 @@
         <file>status/success.png</file>
         <file>status/unlocked.png</file>
         <file>wizards/eagle_watermark.png</file>
+        <file>wizards/kicad_watermark.png</file>
         <file>wizards/watermark.jpg</file>
     </qresource>
 </RCC>

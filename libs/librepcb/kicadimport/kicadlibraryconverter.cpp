@@ -88,7 +88,7 @@ Uuid KiCadLibraryConverter::getComponentSignalOfSymbolPin(
 
 void KiCadLibraryConverter::reset() noexcept {
   mSymbolMap.clear();
-  //mSymbolPinMap.clear();
+  // mSymbolPinMap.clear();
   mPackageMap.clear();
   mPackagePadMap.clear();
   mComponentMap.clear();
@@ -494,5 +494,5 @@ void KiCadLibraryConverter::tryOrLogError(std::function<void()> func,
  *  End of File
  ******************************************************************************/
 
-}  // namespace eagleimport
+}  // namespace kicadimport
 }  // namespace librepcb

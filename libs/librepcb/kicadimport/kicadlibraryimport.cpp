@@ -24,7 +24,9 @@
 
 #include "kicadlibraryconverter.h"
 #include "kicadtypeconverter.h"
+#include "kicadtypes.h"
 
+#include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/fileio/transactionaldirectory.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/library/cmp/component.h>
@@ -69,7 +71,7 @@ int KiCadLibraryImport::getTotalElementsCount() const noexcept {
       mDevices.count();
 }
 
-int KiCadLibraryImport::getCheckedElementsCount() const noexcept {
+/*int KiCadLibraryImport::getCheckedElementsCount() const noexcept {
   return getCheckedSymbolsCount() + getCheckedPackagesCount() +
       getCheckedComponentsCount() + getCheckedDevicesCount();
 }
@@ -88,14 +90,14 @@ int KiCadLibraryImport::getCheckedComponentsCount() const noexcept {
 
 int KiCadLibraryImport::getCheckedDevicesCount() const noexcept {
   return getCheckedElementsCount(mDevices);
-}
+}*/
 
 /*******************************************************************************
  *  Setters
  ******************************************************************************/
 
-void KiCadLibraryImport::setSymbolCategories(const QSet<Uuid>& uuids) noexcept {
-  mSettings->symbolCategories = uuids;
+/*void KiCadLibraryImport::setSymbolCategories(const QSet<Uuid>& uuids) noexcept
+{ mSettings->symbolCategories = uuids;
 }
 
 void KiCadLibraryImport::setPackageCategories(
@@ -130,7 +132,7 @@ void KiCadLibraryImport::setComponentChecked(const QString& name,
 void KiCadLibraryImport::setDeviceChecked(const QString& name,
                                           bool checked) noexcept {
   setElementChecked(mDevices, name, checked);
-}
+}*/
 
 /*******************************************************************************
  *  General Methods
@@ -144,99 +146,116 @@ void KiCadLibraryImport::reset() noexcept {
   mLoadedFilePath = FilePath();
 }
 
-QStringList KiCadLibraryImport::open(const FilePath& lbr) {
+QStringList KiCadLibraryImport::open(const FilePath& dir) {
   reset();
 
+  // Scan directory for libraries.
   QStringList errors;
+  open(dir, errors);
 
-  /*try {
-    parseagle::Library lib(lbr.toStr(), &errors);
+  // Scan subdirectories for libraries (not recursive).
+  QDir qDir(dir.toStr());
+  qDir.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
+  foreach (const QFileInfo& info, qDir.entryInfoList()) {
+    open(FilePath{info.absoluteFilePath()}, errors);
+  }
 
-    foreach (const parseagle::Symbol& symbol, lib.getSymbols()) {
-      mSymbols.append(Symbol{
-          symbol.getName(),
-          symbol.getDescription(),
-          Qt::Unchecked,
-          std::make_shared<parseagle::Symbol>(symbol),
-      });
-    }
+  // Sort all elements by name to improve readability.
+  /*Toolbox::sortNumeric(
+      mSymbols,
+      [](const QCollator& cmp, const Symbol& lhs, const Symbol& rhs) {
+        return cmp(lhs.displayName, rhs.displayName);
+      },
+      Qt::CaseInsensitive, false);
+  Toolbox::sortNumeric(
+      mPackages,
+      [](const QCollator& cmp, const Package& lhs, const Package& rhs) {
+        return cmp(lhs.displayName, rhs.displayName);
+      },
+      Qt::CaseInsensitive, false);
+  Toolbox::sortNumeric(
+      mComponents,
+      [](const QCollator& cmp, const Component& lhs, const Component& rhs) {
+        return cmp(lhs.displayName, rhs.displayName);
+      },
+      Qt::CaseInsensitive, false);
+  Toolbox::sortNumeric(
+      mDevices,
+      [](const QCollator& cmp, const Device& lhs, const Device& rhs) {
+        return cmp(lhs.displayName, rhs.displayName);
+      },
+      Qt::CaseInsensitive, false);*/
 
-    foreach (const parseagle::Package& package, lib.getPackages()) {
-      mPackages.append(Package{
-          package.getName(),
-          package.getDescription(),
-          Qt::Unchecked,
-          std::make_shared<parseagle::Package>(package),
-      });
-    }
-
-    foreach (const parseagle::DeviceSet& deviceSet, lib.getDeviceSets()) {
-      QSet<QString> symbolDisplayNames;
-      foreach (const parseagle::Gate& gate, deviceSet.getGates()) {
-        symbolDisplayNames.insert(gate.getSymbol());
-      }
-      const QString cmpName =
-          *EagleTypeConverter::convertComponentName(deviceSet.getName());
-      mComponents.append(Component{
-          cmpName,
-          deviceSet.getDescription(),
-          Qt::Unchecked,
-          symbolDisplayNames,
-          std::make_shared<parseagle::DeviceSet>(deviceSet),
-      });
-      foreach (const parseagle::Device& device, deviceSet.getDevices()) {
-        mDevices.append(Device{
-            *EagleTypeConverter::convertDeviceName(deviceSet.getName(),
-                                                   device.getName()),
-            deviceSet.getDescription(),
-            Qt::Unchecked,
-            cmpName,
-            device.getPackage(),
-            std::make_shared<parseagle::Device>(device),
-            std::make_shared<parseagle::DeviceSet>(deviceSet),
-        });
-      }
-    }
-
-    // Sort all elements by name to improve readability.
-    Toolbox::sortNumeric(
-        mSymbols,
-        [](const QCollator& cmp, const Symbol& lhs, const Symbol& rhs) {
-          return cmp(lhs.displayName, rhs.displayName);
-        },
-        Qt::CaseInsensitive, false);
-    Toolbox::sortNumeric(
-        mPackages,
-        [](const QCollator& cmp, const Package& lhs, const Package& rhs) {
-          return cmp(lhs.displayName, rhs.displayName);
-        },
-        Qt::CaseInsensitive, false);
-    Toolbox::sortNumeric(
-        mComponents,
-        [](const QCollator& cmp, const Component& lhs, const Component& rhs) {
-          return cmp(lhs.displayName, rhs.displayName);
-        },
-        Qt::CaseInsensitive, false);
-    Toolbox::sortNumeric(
-        mDevices,
-        [](const QCollator& cmp, const Device& lhs, const Device& rhs) {
-          return cmp(lhs.displayName, rhs.displayName);
-        },
-        Qt::CaseInsensitive, false);
-
-    mAbort = false;
-    mLoadedFilePath = lbr;
-  } catch (const std::exception& e) {
-    qWarning() << "Failed to parse EAGLE library:" << e.what();
-    throw RuntimeError(__FILE__, __LINE__, e.what());
-  }*/
-
+  mAbort = false;
+  mLoadedFilePath = dir;
   return errors;
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void KiCadLibraryImport::open(const FilePath& dir, QStringList& errors) {
+  MessageLogger log;
+
+  // Find symbol libraries.
+  QDir qDir(dir.toStr());
+  /*qDir.setFilter(QDir::Files | QDir::NoDotAndDotDot);
+  qDir.setNameFilters({"*.kicad_sym"});
+  foreach (const QFileInfo& info, qDir.entryInfoList()) {
+    const FilePath fp{info.absoluteFilePath()};
+    MessageLogger symLog(&log, info.fileName());
+    try {
+      std::unique_ptr<SExpression> root = SExpression::parse(
+          FileUtils::readFile(fp), fp, SExpression::Mode::Permissive);
+      KiCadSymbolLibrary lib = KiCadSymbolLibrary::parse(*root, symLog);
+      foreach (const auto& symbol, lib.symbols) {
+        mSymbols.append(Symbol{
+            symbol.name, Qt::Unchecked,
+            // std::make_shared<parseagle::Symbol>(symbol),
+        });
+      }
+    } catch (const Exception& e) {
+      symLog.critical(e.getMsg());
+    }
+  }*/
+
+  // Find footprint libraries.
+  qDir.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
+  qDir.setNameFilters({"*.pretty"});
+  foreach (const QFileInfo& dirInfo, qDir.entryInfoList()) {
+    QDir qDir(dirInfo.absoluteFilePath());
+    qDir.setFilter(QDir::Files | QDir::NoDotAndDotDot);
+    qDir.setNameFilters({"*.kicad_mod"});
+    foreach (const QFileInfo& fileInfo, qDir.entryInfoList()) {
+      const FilePath fp{fileInfo.absoluteFilePath()};
+      MessageLogger fptLog(&log, fileInfo.fileName());
+      try {
+        std::unique_ptr<SExpression> root = SExpression::parse(
+            FileUtils::readFile(fp), fp, SExpression::Mode::Permissive);
+        KiCadFootprint fpt = KiCadFootprint::parse(*root, fptLog);
+        mPackages.append(Package{
+            fpt.name, Qt::Unchecked,
+            // std::make_shared<parseagle::Symbol>(symbol),
+        });
+      } catch (const Exception& e) {
+        fptLog.critical(e.getMsg());
+      }
+    }
+  }
+
+  // Find 3D model libraries.
+  /*qDir.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
+  qDir.setNameFilters({"*.3dshapes"});
+  foreach (const QFileInfo& dirInfo, qDir.entryInfoList()) {
+    QDir qDir(dirInfo.absoluteFilePath());
+    qDir.setFilter(QDir::Files | QDir::NoDotAndDotDot);
+    qDir.setNameFilters({"*.step"});
+    foreach (const QFileInfo& fileInfo, qDir.entryInfoList()) {
+      const FilePath fp{fileInfo.absoluteFilePath()};
+    }
+  }*/
+}
 
 template <typename T>
 int KiCadLibraryImport::getCheckedElementsCount(
@@ -317,122 +336,120 @@ void KiCadLibraryImport::run() noexcept {
   std::shared_ptr<MessageLogger> globalLog = mLogger;
   KiCadLibraryConverter converter(*mSettings, this);
 
-  int totalCount = getCheckedElementsCount();
+  /*int totalCount = getCheckedElementsCount();
   int count = 0;
 
- /* foreach (const Symbol& sym, mSymbols) {
-    if (mAbort) {
-      break;
-    }
-    if (sym.checkState == Qt::Unchecked) {
-      continue;
-    }
-    MessageLogger log(globalLog.get(), sym.displayName);
-    try {
-      emit progressStatus(sym.displayName);
-      auto symbol = converter.createSymbol(QString(), QString(), *sym.symbol,
-                                           log);  // can throw
-      TransactionalDirectory dir(TransactionalFileSystem::openRW(
-          mDestinationLibraryFp
-              .getPathTo(librepcb::Symbol::getShortElementName())
-              .getPathTo(symbol->getUuid().toStr())));
-      symbol->saveTo(dir);
-      dir.getFileSystem()->save();
-    } catch (const Exception& e) {
-      log.critical(tr("Skipped symbol due to error: %1").arg(e.getMsg()));
-    }
-    ++count;
-    emit progressPercent((100 * count) / std::max(totalCount, 1));
-  }
+   foreach (const Symbol& sym, mSymbols) {
+     if (mAbort) {
+       break;
+     }
+     if (sym.checkState == Qt::Unchecked) {
+       continue;
+     }
+     MessageLogger log(globalLog.get(), sym.displayName);
+     try {
+       emit progressStatus(sym.displayName);
+       auto symbol = converter.createSymbol(QString(), QString(), *sym.symbol,
+                                            log);  // can throw
+       TransactionalDirectory dir(TransactionalFileSystem::openRW(
+           mDestinationLibraryFp
+               .getPathTo(librepcb::Symbol::getShortElementName())
+               .getPathTo(symbol->getUuid().toStr())));
+       symbol->saveTo(dir);
+       dir.getFileSystem()->save();
+     } catch (const Exception& e) {
+       log.critical(tr("Skipped symbol due to error: %1").arg(e.getMsg()));
+     }
+     ++count;
+     emit progressPercent((100 * count) / std::max(totalCount, 1));
+   }
 
-  foreach (const Package& pkg, mPackages) {
-    if (mAbort) {
-      break;
-    }
-    if (pkg.checkState == Qt::Unchecked) {
-      continue;
-    }
-    MessageLogger log(globalLog.get(), pkg.displayName);
-    try {
-      emit progressStatus(pkg.displayName);
-      auto package = converter.createPackage(QString(), QString(), *pkg.package,
-                                             log);  // can throw
-      TransactionalDirectory dir(TransactionalFileSystem::openRW(
-          mDestinationLibraryFp
-              .getPathTo(librepcb::Package::getShortElementName())
-              .getPathTo(package->getUuid().toStr())));
-      package->saveTo(dir);
-      dir.getFileSystem()->save();
-    } catch (const Exception& e) {
-      log.critical(tr("Skipped package due to error: %1").arg(e.getMsg()));
-    }
-    ++count;
-    emit progressPercent((100 * count) / std::max(totalCount, 1));
-  }
+   foreach (const Package& pkg, mPackages) {
+     if (mAbort) {
+       break;
+     }
+     if (pkg.checkState == Qt::Unchecked) {
+       continue;
+     }
+     MessageLogger log(globalLog.get(), pkg.displayName);
+     try {
+       emit progressStatus(pkg.displayName);
+       auto package = converter.createPackage(QString(), QString(),
+   *pkg.package, log);  // can throw TransactionalDirectory
+   dir(TransactionalFileSystem::openRW( mDestinationLibraryFp
+               .getPathTo(librepcb::Package::getShortElementName())
+               .getPathTo(package->getUuid().toStr())));
+       package->saveTo(dir);
+       dir.getFileSystem()->save();
+     } catch (const Exception& e) {
+       log.critical(tr("Skipped package due to error: %1").arg(e.getMsg()));
+     }
+     ++count;
+     emit progressPercent((100 * count) / std::max(totalCount, 1));
+   }
 
-  foreach (const Component& cmp, mComponents) {
-    if (mAbort) {
-      break;
-    }
-    if (cmp.checkState == Qt::Unchecked) {
-      continue;
-    }
-    MessageLogger log(globalLog.get(), cmp.displayName);
-    try {
-      emit progressStatus(cmp.displayName);
-      auto component =
-          converter.createComponent(QString(), QString(), *cmp.deviceSet,
-                                    log);  // can throw
-      TransactionalDirectory dir(TransactionalFileSystem::openRW(
-          mDestinationLibraryFp
-              .getPathTo(librepcb::Component::getShortElementName())
-              .getPathTo(component->getUuid().toStr())));
-      component->saveTo(dir);
-      dir.getFileSystem()->save();
-    } catch (const Exception& e) {
-      log.critical(tr("Skipped component due to error: %1").arg(e.getMsg()));
-    }
-    ++count;
-    emit progressPercent((100 * count) / std::max(totalCount, 1));
-  }
+   foreach (const Component& cmp, mComponents) {
+     if (mAbort) {
+       break;
+     }
+     if (cmp.checkState == Qt::Unchecked) {
+       continue;
+     }
+     MessageLogger log(globalLog.get(), cmp.displayName);
+     try {
+       emit progressStatus(cmp.displayName);
+       auto component =
+           converter.createComponent(QString(), QString(), *cmp.deviceSet,
+                                     log);  // can throw
+       TransactionalDirectory dir(TransactionalFileSystem::openRW(
+           mDestinationLibraryFp
+               .getPathTo(librepcb::Component::getShortElementName())
+               .getPathTo(component->getUuid().toStr())));
+       component->saveTo(dir);
+       dir.getFileSystem()->save();
+     } catch (const Exception& e) {
+       log.critical(tr("Skipped component due to error: %1").arg(e.getMsg()));
+     }
+     ++count;
+     emit progressPercent((100 * count) / std::max(totalCount, 1));
+   }
 
-  foreach (const Device& dev, mDevices) {
-    if (mAbort) {
-      break;
-    }
-    if (dev.checkState == Qt::Unchecked) {
-      continue;
-    }
-    MessageLogger log(globalLog.get(), dev.displayName);
-    try {
-      emit progressStatus(dev.displayName);
-      auto device = converter.createDevice(QString(), QString(), *dev.deviceSet,
-                                           *dev.device, QString(), QString(),
-                                           log);  // can throw
-      TransactionalDirectory dir(TransactionalFileSystem::openRW(
-          mDestinationLibraryFp
-              .getPathTo(librepcb::Device::getShortElementName())
-              .getPathTo(device->getUuid().toStr())));
-      device->saveTo(dir);
-      dir.getFileSystem()->save();
-    } catch (const Exception& e) {
-      log.critical(tr("Skipped device due to error: %1").arg(e.getMsg()));
-    }
-    ++count;
-    emit progressPercent((100 * count) / std::max(totalCount, 1));
-  }*/
+   foreach (const Device& dev, mDevices) {
+     if (mAbort) {
+       break;
+     }
+     if (dev.checkState == Qt::Unchecked) {
+       continue;
+     }
+     MessageLogger log(globalLog.get(), dev.displayName);
+     try {
+       emit progressStatus(dev.displayName);
+       auto device = converter.createDevice(QString(), QString(),
+   *dev.deviceSet, *dev.device, QString(), QString(), log);  // can throw
+       TransactionalDirectory dir(TransactionalFileSystem::openRW(
+           mDestinationLibraryFp
+               .getPathTo(librepcb::Device::getShortElementName())
+               .getPathTo(device->getUuid().toStr())));
+       device->saveTo(dir);
+       dir.getFileSystem()->save();
+     } catch (const Exception& e) {
+       log.critical(tr("Skipped device due to error: %1").arg(e.getMsg()));
+     }
+     ++count;
+     emit progressPercent((100 * count) / std::max(totalCount, 1));
+   }
 
   emit progressPercent(100);
   emit progressStatus(tr("Finished: %1 of %2 element(s) imported",
                          "Placeholders are numbers", totalCount)
                           .arg(count)
                           .arg(totalCount));
-  emit finished();
+  emit finished();*/
 }
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace eagleimport
+}  // namespace kicadimport
 }  // namespace librepcb
