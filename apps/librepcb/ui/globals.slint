@@ -49,7 +49,8 @@ export struct ProjectData {
 
 export enum TabType {
     schematic,
-    board,
+    board-2d,
+    board-3d,
 }
 
 export struct Tab {
@@ -59,8 +60,8 @@ export struct Tab {
 }
 
 export struct SectionData {
-    index: int,
-    tab-index: int,
+    index: int,  // Section index (0 = left most)
+    tab-index: int,  // Currently opened tab in this section
     overlay-color: brush,
 }
 
@@ -89,6 +90,11 @@ export global Globals {
     //
     // - Board index
     pure callback board-clicked(int);
+
+    // The 3D viewer for a board has been requested.
+    //
+    // - Board index
+    pure callback board-3d-clicked(int);
 
     // Requested to switch to a particular tab
     //
@@ -226,7 +232,7 @@ export global Globals {
 
     in property <[Tab]> tabs-left: [
         { type: TabType.schematic, index: 0, title: "Tab 1" },
-        { type: TabType.board, index: 0, title: "Tab 2" },
+        { type: TabType.board-2d, index: 0, title: "Tab 2" },
         { type: TabType.schematic, index: 1, title: "Tab 3" },
     ];
 
@@ -237,9 +243,9 @@ export global Globals {
     };
 
     in property <[Tab]> tabs-right: [
-        { type: TabType.schematic, index: 0, title: "Tab 4" },
-        { type: TabType.board, index: 0, title: "Tab 5" },
-        { type: TabType.schematic, index: 1, title: "Tab 6" },
+        { type: TabType.board-2d, index: 0, title: "Tab 4" },
+        { type: TabType.schematic, index: 0, title: "Tab 5" },
+        { type: TabType.board-3d, index: 1, title: "Tab 6" },
     ];
 
     in property <SectionData> section-right: {

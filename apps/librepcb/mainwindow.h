@@ -38,6 +38,8 @@ namespace editor {
 
 class GraphicsScene;
 class IF_GraphicsLayerProvider;
+class OpenGlSceneBuilder;
+class OpenGlView;
 
 namespace app {
 
@@ -70,6 +72,7 @@ private:
   void projectItemDoubleClicked(const slint::SharedString& path) noexcept;
   void schematicItemClicked(int index) noexcept;
   void boardItemClicked(int index) noexcept;
+  void board3dItemClicked(int index) noexcept;
   void tabClicked(int section, int index) noexcept;
   void tabCloseClicked(int section, int index) noexcept;
   slint::Image renderScene(int section, float width, float height,
@@ -90,6 +93,8 @@ private:
   std::unique_ptr<IF_GraphicsLayerProvider> mLayerProvider;
   QVector<std::shared_ptr<slint::VectorModel<ui::Tab>>> mTabs;  ///< count=2
   QVector<std::shared_ptr<GraphicsScene>> mScenes;  ///< count=2
+  QVector<std::shared_ptr<OpenGlView>> m3dViews;
+  QVector<std::shared_ptr<OpenGlSceneBuilder>> m3dSceneBuilders;
   QVector<QTransform> mOldTransforms;
   QVector<QTransform> mTransforms;
   QVector<bool> mMoving;
