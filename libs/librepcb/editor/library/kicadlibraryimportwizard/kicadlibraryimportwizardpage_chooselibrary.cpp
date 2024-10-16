@@ -27,6 +27,7 @@
 #include "kicadlibraryimportwizardcontext.h"
 #include "ui_kicadlibraryimportwizardpage_chooselibrary.h"
 
+#include <librepcb/core/utils/messagelogger.h>
 #include <librepcb/kicadimport/kicadlibraryimport.h>
 
 #include <QtCore>
@@ -51,9 +52,23 @@ KiCadLibraryImportWizardPage_ChooseLibrary::
     mContext(context) {
   mUi->setupUi(this);
   mUi->edtDirPath->setText("-");  // Workaround to force initial library load.
-  //connect(mUi->edtDirPath, &QLineEdit::textChanged, mContext.get(),
-  //        &KiCadLibraryImportWizardContext::setLibsDirPath,
-  //        Qt::QueuedConnection);
+
+  std::shared_ptr<MessageLogger> log = std::make_shared<MessageLogger>(false);
+  connect(log.get(), &MessageLogger::msgEmitted, this,
+          [this](const MessageLogger::Message& msg) {
+            const QString txt = mUi->lblMessages->text();
+            mUi->lblMessages->setText(txt + "\n" + msg.message);
+          });
+  connect(
+      mUi->edtDirPath, &QLineEdit::textChanged, this,
+      [this, log](const QString& filePath) {
+        mUi->lblMessages->clear();
+        mContext->setLibsDirPath(filePath, log);
+      },
+      Qt::QueuedConnection);
+  connect(mContext.get(), &KiCadLibraryImportWizardContext::scanFinished, this,
+          &KiCadLibraryImportWizardPage_ChooseLibrary::completeChanged,
+          Qt::QueuedConnection);
 
   // Add browse action.
   const EditorCommandSet& cmd = EditorCommandSet::instance();
@@ -86,7 +101,7 @@ void KiCadLibraryImportWizardPage_ChooseLibrary::initializePage() {
 }
 
 bool KiCadLibraryImportWizardPage_ChooseLibrary::isComplete() const {
-  return false;  // return mContext->getImport().getTotalElementsCount() > 0;
+  return mContext->getImport().canStartParsing();
 }
 
 /*******************************************************************************

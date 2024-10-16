@@ -25,6 +25,7 @@
 #include "kicadlibraryimportwizardcontext.h"
 #include "ui_kicadlibraryimportwizardpage_selectelements.h"
 
+#include <librepcb/core/utils/messagelogger.h>
 #include <librepcb/kicadimport/kicadlibraryimport.h>
 
 #include <QtCore>
@@ -50,6 +51,15 @@ KiCadLibraryImportWizardPage_SelectElements::
     mUi(new Ui::KiCadLibraryImportWizardPage_SelectElements),
     mContext(context) {
   mUi->setupUi(this);
+  mUi->treeWidget->hide();
+  connect(&mContext->getImport(), &KiCadLibraryImport::progressPercent,
+          mUi->progressBar, &QProgressBar::setValue);
+  connect(&mContext->getImport(), &KiCadLibraryImport::parseFinished,
+          mUi->progressBar, &QProgressBar::hide);
+  connect(&mContext->getImport(), &KiCadLibraryImport::parseFinished, this,
+          &KiCadLibraryImportWizardPage_SelectElements::completeChanged,
+          Qt::QueuedConnection);
+
   /*connect(mUi->treeWidget, &QTreeWidget::itemChanged, this,
           &KiCadLibraryImportWizardPage_SelectElements::treeItemChanged);
   connect(
@@ -87,6 +97,19 @@ KiCadLibraryImportWizardPage_SelectElements::
  ******************************************************************************/
 
 void KiCadLibraryImportWizardPage_SelectElements::initializePage() {
+  mUi->treeWidget->hide();
+  mUi->txtMessages->clear();
+  mUi->txtMessages->show();
+  mUi->progressBar->setValue(0);
+  mUi->progressBar->show();
+
+  std::shared_ptr<MessageLogger> log = std::make_shared<MessageLogger>(false);
+  connect(log.get(), &MessageLogger::msgEmitted, this,
+          [this](const MessageLogger::Message& msg) {
+            mUi->txtMessages->append(msg.toRichText());
+          });
+  mContext->getImport().startParse(log);
+
   /* mUi->treeWidget->clear();
 
    // List devices.
@@ -157,7 +180,7 @@ void KiCadLibraryImportWizardPage_SelectElements::initializePage() {
 }
 
 bool KiCadLibraryImportWizardPage_SelectElements::isComplete() const {
-  return false;  // return mContext->getImport().getCheckedElementsCount() > 0;
+  return mContext->getImport().canStartImport();
 }
 
 /*******************************************************************************

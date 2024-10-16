@@ -45,36 +45,35 @@ KiCadLibraryImportWizardContext::KiCadLibraryImportWizardContext(
     Workspace& workspace, const FilePath& dstLibFp, QObject* parent) noexcept
   : QObject(parent),
     mWorkspace(workspace),
-    mImport(new KiCadLibraryImport(dstLibFp, parent)),
     mLibsDirPath(),
     mComponentCategoryUuid(),
-    mPackageCategoryUuid() {
+    mPackageCategoryUuid(),
+    mImport(new KiCadLibraryImport(dstLibFp, parent)) {
+  connect(mImport.get(), &KiCadLibraryImport::scanFinished, this,
+          &KiCadLibraryImportWizardContext::scanFinished, Qt::QueuedConnection);
+
   // Load settings.
-  QSettings clientSettings;
+  QSettings cs;
   mLibsDirPath.setPath(
-      clientSettings.value("library_editor/kicad_import_wizard/directory")
-          .toString());
+      cs.value("library_editor/kicad_import_wizard/directory").toString());
   setComponentCategory(Uuid::tryFromString(
-      clientSettings
-          .value("library_editor/kicad_import_wizard/component_category")
+      cs.value("library_editor/kicad_import_wizard/component_category")
           .toString()));
   setPackageCategory(Uuid::tryFromString(
-      clientSettings
-          .value("library_editor/kicad_import_wizard/package_category")
+      cs.value("library_editor/kicad_import_wizard/package_category")
           .toString()));
 }
 
 KiCadLibraryImportWizardContext::~KiCadLibraryImportWizardContext() noexcept {
   // Save settings.
-  QSettings clientSettings;
-  clientSettings.setValue("library_editor/kicad_import_wizard/directory",
-                          mLibsDirPath.toStr());
-  clientSettings.setValue(
+  QSettings cs;
+  cs.setValue("library_editor/kicad_import_wizard/directory",
+              mLibsDirPath.toStr());
+  cs.setValue(
       "library_editor/kicad_import_wizard/component_category",
       mComponentCategoryUuid ? mComponentCategoryUuid->toStr() : QString());
-  clientSettings.setValue(
-      "library_editor/kicad_import_wizard/package_category",
-      mPackageCategoryUuid ? mPackageCategoryUuid->toStr() : QString());
+  cs.setValue("library_editor/kicad_import_wizard/package_category",
+              mPackageCategoryUuid ? mPackageCategoryUuid->toStr() : QString());
 }
 
 /*******************************************************************************
@@ -82,11 +81,16 @@ KiCadLibraryImportWizardContext::~KiCadLibraryImportWizardContext() noexcept {
  ******************************************************************************/
 
 void KiCadLibraryImportWizardContext::setLibsDirPath(
-    const FilePath& fp) noexcept {
-  if (fp != mLibsDirPath) {
-    mLibsDirPath = fp;
-    mLibraryData.reset();
+    const QString& filePath, std::shared_ptr<MessageLogger> log) noexcept {
+  const FilePath fp(filePath);
+  if (!fp.isValid()) {
     mImport->reset();
+    log->info(tr("No directory selected."));
+    emit scanFinished();
+  } else if (fp != mImport->getLoadedDirectory()) {
+    mLibsDirPath = fp;
+    mImport->reset();
+    mImport->startScan(fp, log);
   }
 }
 

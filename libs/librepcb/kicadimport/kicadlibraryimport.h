@@ -52,10 +52,12 @@ class KiCadLibraryImport final : public QObject {
 public:
   enum class State {
     Reset,
-    Busy,
+    Scanning,
     Scanned,
+    Parsing,
     Parsed,
-    Done,
+    Importing,
+    Imported,
   };
 
   struct Symbol {
@@ -91,6 +93,7 @@ public:
     QList<SymbolLibrary> symbolLibs;
     QList<FootprintLibrary> footprintLibs;
     QList<Package3DLibrary> package3dLibs;
+    int fileCount = 0;
   };
 
   // Constructors / Destructor
@@ -100,13 +103,18 @@ public:
   ~KiCadLibraryImport() noexcept;
 
   // Getters
-  std::shared_ptr<MessageLogger> getLogger() const noexcept { return mLogger; }
+  const FilePath& getLoadedDirectory() const noexcept {
+    return mLoadedDirectory;
+  }
+  bool canStartParsing() const noexcept;
+  bool canStartImport() const noexcept;
 
   // General Methods
   void reset() noexcept;
-  void startScan(const FilePath& dir, MessageLogger& log);
-  void startParse(MessageLogger& log);
-  void startImport();
+  bool startScan(const FilePath& dir,
+                 std::shared_ptr<MessageLogger> log) noexcept;
+  bool startParse(std::shared_ptr<MessageLogger> log) noexcept;
+  bool startImport(std::shared_ptr<MessageLogger> log) noexcept;
   std::shared_ptr<Result> getResult() noexcept;
   void cancel() noexcept;
 
@@ -114,17 +122,19 @@ public:
   KiCadLibraryImport& operator=(const KiCadLibraryImport& rhs) = delete;
 
 signals:
-  void progressStatus(const QString& status);
   void progressPercent(int percent);
   void scanFinished();
   void parseFinished();
   void importFinished();
 
 private:
-  std::shared_ptr<Result> scan(FilePath dir) noexcept;
+  std::shared_ptr<Result> scan(FilePath dir,
+                               std::shared_ptr<MessageLogger> log) noexcept;
+  std::shared_ptr<Result> parse(std::shared_ptr<Result> result,
+                                std::shared_ptr<MessageLogger> log) noexcept;
 
   const FilePath mDestinationLibraryFp;
-  std::shared_ptr<MessageLogger> mLogger;
+  FilePath mLoadedDirectory;
   QFuture<std::shared_ptr<Result>> mFuture;
   State mState;
   bool mAbort;

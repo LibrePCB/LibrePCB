@@ -34,6 +34,7 @@
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/utils/messagelogger.h>
+
 #include <QtConcurrent>
 #include <QtCore>
 
@@ -49,14 +50,34 @@ namespace kicadimport {
 
 KiCadLibraryImport::KiCadLibraryImport(const FilePath& dstLibFp,
                                        QObject* parent) noexcept
-  : QObject(parent),
-    mDestinationLibraryFp(dstLibFp),
-    mLogger(new MessageLogger(true)),
-    mAbort(false) {
+  : QObject(parent), mDestinationLibraryFp(dstLibFp), mAbort(false) {
 }
 
 KiCadLibraryImport::~KiCadLibraryImport() noexcept {
   cancel();
+}
+
+/*******************************************************************************
+ *  Getters
+ ******************************************************************************/
+
+bool KiCadLibraryImport::canStartParsing() const noexcept {
+  if ((mState != State::Scanned) && (mState != State::Parsed) &&
+      (mState != State::Imported)) {
+    return false;
+  }
+
+  auto result = mFuture.result();
+  return (result && (result->fileCount > 0));
+}
+
+bool KiCadLibraryImport::canStartImport() const noexcept {
+  if ((mState != State::Parsed) && (mState != State::Imported)) {
+    return false;
+  }
+
+  auto result = mFuture.result();
+  return (result && (result->fileCount > 0));
 }
 
 /*******************************************************************************
@@ -66,27 +87,61 @@ KiCadLibraryImport::~KiCadLibraryImport() noexcept {
 void KiCadLibraryImport::reset() noexcept {
   cancel();
   mState = State::Reset;
+  mLoadedDirectory = FilePath();
 }
 
-void KiCadLibraryImport::startScan(const FilePath& dir, MessageLogger& log) {
-  if (mState != State::Reset) {throw LogicError(__FILE__, __LINE__, "Unexpected state.");}
+bool KiCadLibraryImport::startScan(
+    const FilePath& dir, std::shared_ptr<MessageLogger> log) noexcept {
+  if (mState != State::Reset) {
+    log->critical("Unexpected state.");
+    emit scanFinished();
+    return false;
+  }
 
+  mAbort = false;
+  mState = State::Scanning;
 #if (QT_VERSION_MAJOR >= 6)
-  mFuture = QtConcurrent::run(&KiCadLibraryImport::scan, this, dir);
+  mFuture = QtConcurrent::run(&KiCadLibraryImport::scan, this, dir, log);
 #else
-  mFuture = QtConcurrent::run(this, &GraphicsExport::run, args);
+  mFuture = QtConcurrent::run(this, &GraphicsExport::scan, dir, log);
 #endif
+  return true;
 }
 
-void KiCadLibraryImport::startParse(MessageLogger& log) {
+bool KiCadLibraryImport::startParse(
+    std::shared_ptr<MessageLogger> log) noexcept {
+  if (mState != State::Scanned) {
+    log->critical("Unexpected state.");
+    parseFinished();
+    return false;
+  }
 
+  mAbort = false;
+  mState = State::Parsing;
+  log->info(tr("Parse libraries..."));
+#if (QT_VERSION_MAJOR >= 6)
+  mFuture = QtConcurrent::run(&KiCadLibraryImport::parse, this,
+                              mFuture.result(), log);
+#else
+  mFuture =
+      QtConcurrent::run(this, &GraphicsExport::parse, mFuture.result(), log);
+#endif
+  return true;
 }
 
-void KiCadLibraryImport::startImport() {
+bool KiCadLibraryImport::startImport(
+    std::shared_ptr<MessageLogger> log) noexcept {
+  if (mState != State::Parsed) {
+    log->critical("Unexpected state.");
+    parseFinished();
+    return false;
+  }
 
+  return true;
 }
 
-std::shared_ptr<KiCadLibraryImport::Result> KiCadLibraryImport::getResult() noexcept {
+std::shared_ptr<KiCadLibraryImport::Result>
+    KiCadLibraryImport::getResult() noexcept {
   mFuture.waitForFinished();
   return mFuture.result();
 }
@@ -94,21 +149,20 @@ std::shared_ptr<KiCadLibraryImport::Result> KiCadLibraryImport::getResult() noex
 void KiCadLibraryImport::cancel() noexcept {
   mAbort = true;
   mFuture.waitForFinished();
-  mAbort = false;
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
-std::shared_ptr<KiCadLibraryImport::Result> KiCadLibraryImport::scan(FilePath dir) noexcept {
+std::shared_ptr<KiCadLibraryImport::Result> KiCadLibraryImport::scan(
+    FilePath dir, std::shared_ptr<MessageLogger> log) noexcept {
   // Note: This method is called from a different thread, thus be careful with
   //       calling other methods to only call thread-safe methods!
 
   QElapsedTimer timer;
   timer.start();
-  qDebug() << "Start graphics export in worker thread...";
-  emit progressPercent(10);
+  qDebug() << "Searching for KiCad libraries in worker thread...";
 
   // Helper to find files or directories in a directory.
   auto findItems = [](const FilePath& dir, QDir::Filter filter,
@@ -138,13 +192,13 @@ std::shared_ptr<KiCadLibraryImport::Result> KiCadLibraryImport::scan(FilePath di
   auto findSymbols = [&](const FilePath& dir) {
     for (const FilePath& fp : findItems(dir, QDir::Files, "*.kicad_sym")) {
       result->symbolLibs.append(SymbolLibrary{fp, Qt::Unchecked, {}});
+      ++(result->fileCount);
     }
   };
 
   // Scan directory for libraries.
   findSymbols(dir);
   findLibs(dir);
-  emit progressPercent(20);
 
   // Scan subdirectories for libraries (not recursive).
   QDir qDir(dir.toStr());
@@ -154,18 +208,43 @@ std::shared_ptr<KiCadLibraryImport::Result> KiCadLibraryImport::scan(FilePath di
     findSymbols(subdir);
     findLibs(subdir);
   }
-  emit progressPercent(30);
 
   // Find footprints & package models.
   for (FootprintLibrary& lib : result->footprintLibs) {
     for (const FilePath& fp : findItems(lib.dir, QDir::Files, "*.kicad_mod")) {
       lib.footprints.append(Footprint{fp, QString(), Qt::Unchecked});
+      ++(result->fileCount);
     }
   }
   for (Package3DLibrary& lib : result->package3dLibs) {
     lib.stepFiles += findItems(lib.dir, QDir::Files, "*.step");
+    result->fileCount += lib.stepFiles.count();
   }
-  emit progressPercent(50);
+
+  log->info(tr("Found %1 symbol libraries.").arg(result->symbolLibs.count()));
+  log->info(
+      tr("Found %1 footprint libraries.").arg(result->footprintLibs.count()));
+  log->info(tr("Found %1 package model libraries.")
+                .arg(result->package3dLibs.count()));
+
+  qDebug() << "Found" << result->fileCount << "KiCad library files in"
+           << timer.elapsed() << "ms.";
+  mLoadedDirectory = dir;
+  mState = mAbort ? State::Reset : State::Scanned;
+  emit scanFinished();
+  return result;
+}
+
+std::shared_ptr<KiCadLibraryImport::Result> KiCadLibraryImport::parse(
+    std::shared_ptr<Result> result,
+    std::shared_ptr<MessageLogger> log) noexcept {
+  // Note: This method is called from a different thread, thus be careful with
+  //       calling other methods to only call thread-safe methods!
+
+  QElapsedTimer timer;
+  timer.start();
+  qDebug() << "Parsing KiCad libraries in worker thread...";
+  emit progressPercent(5);
 
   // Helper to get the footprint ID of a symbol.
   auto getFootprintId = [](const KiCadSymbol& symbol) {
@@ -178,8 +257,11 @@ std::shared_ptr<KiCadLibraryImport::Result> KiCadLibraryImport::scan(FilePath di
   };
 
   // Load symbols.
+  int i = 0;
   for (SymbolLibrary& lib : result->symbolLibs) {
-    MessageLogger symLog(mLogger.get(), lib.file.getFilename());
+    if (mAbort) break;
+
+    MessageLogger symLog(log.get(), lib.file.getFilename());
     try {
       std::unique_ptr<SExpression> root =
           SExpression::parse(FileUtils::readFile(lib.file), lib.file,
@@ -192,12 +274,16 @@ std::shared_ptr<KiCadLibraryImport::Result> KiCadLibraryImport::scan(FilePath di
     } catch (const Exception& e) {
       symLog.critical(e.getMsg());
     }
+    emit progressPercent(5 + (45 * (++i) / result->symbolLibs.count()));
   }
 
   // Load footprints.
+  i = 0;
   for (FootprintLibrary& lib : result->footprintLibs) {
     for (Footprint& fpt : lib.footprints) {
-      MessageLogger fptLog(mLogger.get(), lib.dir.getFilename());
+      if (mAbort) break;
+
+      MessageLogger fptLog(log.get(), lib.dir.getFilename());
       try {
         std::unique_ptr<SExpression> root =
             SExpression::parse(FileUtils::readFile(fpt.file), fpt.file,
@@ -208,25 +294,39 @@ std::shared_ptr<KiCadLibraryImport::Result> KiCadLibraryImport::scan(FilePath di
         fptLog.critical(e.getMsg());
       }
     }
+    emit progressPercent(50 + (45 * (++i) / result->footprintLibs.count()));
   }
 
   // Sort all elements by name to improve readability.
-  Toolbox::sortNumeric(
-      result->symbolLibs,
-      [](const QCollator& cmp, const SymbolLibrary& lhs,
-         const SymbolLibrary& rhs) {
-        return cmp(lhs.file.getFilename(), rhs.file.getFilename());
-      },
-      Qt::CaseInsensitive, false);
-  Toolbox::sortNumeric(
-      result->footprintLibs,
-      [](const QCollator& cmp, const FootprintLibrary& lhs,
-         const FootprintLibrary& rhs) {
-        return cmp(lhs.dir.getFilename(), rhs.dir.getFilename());
-      },
-      Qt::CaseInsensitive, false);
+  if (!mAbort) {
+    Toolbox::sortNumeric(
+        result->symbolLibs,
+        [](const QCollator& cmp, const SymbolLibrary& lhs,
+           const SymbolLibrary& rhs) {
+          return cmp(lhs.file.getFilename(), rhs.file.getFilename());
+        },
+        Qt::CaseInsensitive, false);
+    Toolbox::sortNumeric(
+        result->footprintLibs,
+        [](const QCollator& cmp, const FootprintLibrary& lhs,
+           const FootprintLibrary& rhs) {
+          return cmp(lhs.dir.getFilename(), rhs.dir.getFilename());
+        },
+        Qt::CaseInsensitive, false);
+  }
 
+  qDebug() << "Parsed all KiCad libraries in" << timer.elapsed() << "ms.";
+
+  if (mAbort) {
+    log->info(tr("Aborted."));
+    mState = State::Scanned;
+  } else {
+    log->info(
+        tr("Done! Please review the messages (if any) before continuing."));
+    mState = State::Parsed;
+  }
   emit progressPercent(100);
+  emit parseFinished();
   return result;
 }
 
