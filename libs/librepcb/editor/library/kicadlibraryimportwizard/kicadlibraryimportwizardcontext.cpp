@@ -23,6 +23,7 @@
 #include "kicadlibraryimportwizardcontext.h"
 
 #include <librepcb/core/exceptions.h>
+#include <librepcb/core/utils/messagelogger.h>
 #include <librepcb/kicadimport/kicadlibraryimport.h>
 
 #include <QtCore>
@@ -82,24 +83,24 @@ KiCadLibraryImportWizardContext::~KiCadLibraryImportWizardContext() noexcept {
 
 void KiCadLibraryImportWizardContext::setLibsDirPath(
     const QString& filePath) noexcept {
-  QStringList msg;
+  MessageLogger log;
   try {
     FilePath fp(filePath);
     if (!fp.isValid()) {
       mImport->reset();
-      msg.append(tr("No file selected."));
+      log.info(tr("No file selected."));
     } else if (fp != mImport->getLoadedFilePath()) {
       mLibsDirPath = fp;
-      msg = mImport->open(fp);
-      msg.append(
-          tr("Found %1 symbol(s) and %2 footprint(s) in the selected library.")
-              .arg(mImport->getSymbols().count())
-              .arg(mImport->getPackages().count()));
+      mImport->open(fp, log);
+      log.info(tr("Found %1 symbol- and %2 footprint libraries in the "
+                  "selected directory.")
+                   .arg(mImport->getSymbolLibraries().count())
+                   .arg(mImport->getFootprintLibraries().count()));
     }
   } catch (const Exception& e) {
-    msg = QStringList{e.getMsg()};
+    log.critical(e.getMsg());
   }
-  emit parseCompleted(msg.join("\n"));
+  emit parseCompleted(log.getMessagesPlain().join("\n"));
 }
 
 void KiCadLibraryImportWizardContext::setComponentCategory(

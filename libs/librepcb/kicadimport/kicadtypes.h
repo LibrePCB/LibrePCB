@@ -45,7 +45,12 @@ namespace kicadimport {
 
 enum class KiCadStrokeType {
   Unknown,  // Parse error
+  Dash,
+  DashDot,
+  DashDotDOt,
+  Dot,
   Default,
+  Solid,
 };
 
 enum class KiCadFillType {
@@ -98,10 +103,10 @@ public:
   QString key;
   QString value;
   QVector3D position;
-  QString layer;  // May be empty.
-  QSizeF fontSize;  // May be invalid.
-  qreal fontThickness;  // May be 0 (not set).
-  bool hide;
+  QString layer;  // May not be set.
+  QSizeF fontSize;  // May not be set.
+  qreal fontThickness = 0;  // May not be set.
+  bool hide = false;  // May not be set.
 
   static KiCadProperty parse(const SExpression& node, MessageLogger& log);
 };
@@ -219,9 +224,9 @@ struct KiCadSymbol final {
 
 public:
   QString name;
-  bool excludeFromSim;
-  bool inBom;
-  bool onBoard;
+  bool excludeFromSim = false;  // May not be set.
+  bool inBom = true;  // May not be set.
+  bool onBoard = true;  // May not be set.
   QList<KiCadProperty> properties;
   QList<KiCadSymbolGate> gates;
 
@@ -277,13 +282,13 @@ struct KiCadFootprint final {
 
 public:
   QString name;
-  int version;  // -1 if unknown
-  QString generator;
-  bool isSmd;
-  bool isThroughHole;
-  bool boardOnly;
-  bool excludeFromPosFiles;
-  bool excludeFromBom;
+  int version = -1;  // May not be set.
+  QString generator;  // May not be set.
+  bool isSmd = false;  // May not be set.
+  bool isThroughHole = false;  // May not be set.
+  bool boardOnly = false;  // May not be set.
+  bool excludeFromPosFiles = false;  // May not be set.
+  bool excludeFromBom = false;  // May not be set.
   QList<KiCadProperty> properties;
   QList<KiCadFootprintLine> lines;
   QList<KiCadFootprintArc> arcs;

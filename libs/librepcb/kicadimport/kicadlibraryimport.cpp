@@ -66,11 +66,6 @@ KiCadLibraryImport::~KiCadLibraryImport() noexcept {
  *  Getters
  ******************************************************************************/
 
-int KiCadLibraryImport::getTotalElementsCount() const noexcept {
-  return mSymbols.count() + mPackages.count() + mComponents.count() +
-      mDevices.count();
-}
-
 /*int KiCadLibraryImport::getCheckedElementsCount() const noexcept {
   return getCheckedSymbolsCount() + getCheckedPackagesCount() +
       getCheckedComponentsCount() + getCheckedDevicesCount();
@@ -139,68 +134,58 @@ void KiCadLibraryImport::setDeviceChecked(const QString& name,
  ******************************************************************************/
 
 void KiCadLibraryImport::reset() noexcept {
-  mSymbols.clear();
-  mPackages.clear();
-  mComponents.clear();
-  mDevices.clear();
+  mSymbolLibs.clear();
+  mFootprintLibs.clear();
   mLoadedFilePath = FilePath();
 }
 
-QStringList KiCadLibraryImport::open(const FilePath& dir) {
+void KiCadLibraryImport::open(const FilePath& dir, MessageLogger& log) {
   reset();
 
   // Scan directory for libraries.
-  QStringList errors;
-  open(dir, errors);
+  openImpl(dir, log);
 
   // Scan subdirectories for libraries (not recursive).
   QDir qDir(dir.toStr());
   qDir.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
   foreach (const QFileInfo& info, qDir.entryInfoList()) {
-    open(FilePath{info.absoluteFilePath()}, errors);
+    openImpl(FilePath{info.absoluteFilePath()}, log);
   }
 
   // Sort all elements by name to improve readability.
-  /*Toolbox::sortNumeric(
-      mSymbols,
-      [](const QCollator& cmp, const Symbol& lhs, const Symbol& rhs) {
-        return cmp(lhs.displayName, rhs.displayName);
-      },
+  Toolbox::sortNumeric(
+      mSymbolLibs,
+      [](const QCollator& cmp, const SymbolLibrary& lhs,
+         const SymbolLibrary& rhs) { return cmp(lhs.name, rhs.name); },
       Qt::CaseInsensitive, false);
   Toolbox::sortNumeric(
-      mPackages,
-      [](const QCollator& cmp, const Package& lhs, const Package& rhs) {
-        return cmp(lhs.displayName, rhs.displayName);
-      },
+      mFootprintLibs,
+      [](const QCollator& cmp, const FootprintLibrary& lhs,
+         const FootprintLibrary& rhs) { return cmp(lhs.name, rhs.name); },
       Qt::CaseInsensitive, false);
-  Toolbox::sortNumeric(
-      mComponents,
-      [](const QCollator& cmp, const Component& lhs, const Component& rhs) {
-        return cmp(lhs.displayName, rhs.displayName);
-      },
-      Qt::CaseInsensitive, false);
-  Toolbox::sortNumeric(
-      mDevices,
-      [](const QCollator& cmp, const Device& lhs, const Device& rhs) {
-        return cmp(lhs.displayName, rhs.displayName);
-      },
-      Qt::CaseInsensitive, false);*/
 
   mAbort = false;
   mLoadedFilePath = dir;
-  return errors;
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
-void KiCadLibraryImport::open(const FilePath& dir, QStringList& errors) {
-  MessageLogger log;
+void KiCadLibraryImport::openImpl(const FilePath& dir, MessageLogger& log) {
+  // Helper to get the footprint ID of a symbol.
+  auto getFootprintId = [](const KiCadSymbol& symbol) {
+    for (const auto& p : symbol.properties) {
+      if (p.key == "Footprint") {
+        return p.value;
+      }
+    }
+    return QString();
+  };
 
   // Find symbol libraries.
   QDir qDir(dir.toStr());
-  /*qDir.setFilter(QDir::Files | QDir::NoDotAndDotDot);
+  qDir.setFilter(QDir::Files | QDir::NoDotAndDotDot);
   qDir.setNameFilters({"*.kicad_sym"});
   foreach (const QFileInfo& info, qDir.entryInfoList()) {
     const FilePath fp{info.absoluteFilePath()};
@@ -208,22 +193,23 @@ void KiCadLibraryImport::open(const FilePath& dir, QStringList& errors) {
     try {
       std::unique_ptr<SExpression> root = SExpression::parse(
           FileUtils::readFile(fp), fp, SExpression::Mode::Permissive);
-      KiCadSymbolLibrary lib = KiCadSymbolLibrary::parse(*root, symLog);
-      foreach (const auto& symbol, lib.symbols) {
-        mSymbols.append(Symbol{
-            symbol.name, Qt::Unchecked,
-            // std::make_shared<parseagle::Symbol>(symbol),
-        });
+      KiCadSymbolLibrary kiLib = KiCadSymbolLibrary::parse(*root, symLog);
+      SymbolLibrary lib{fp.getFilename(), Qt::Unchecked, {}};
+      foreach (const auto& symbol, kiLib.symbols) {
+        lib.symbols.append(
+            Symbol{symbol.name, getFootprintId(symbol), Qt::Unchecked});
       }
+      mSymbolLibs.append(lib);
     } catch (const Exception& e) {
       symLog.critical(e.getMsg());
     }
-  }*/
+  }
 
   // Find footprint libraries.
   qDir.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
   qDir.setNameFilters({"*.pretty"});
   foreach (const QFileInfo& dirInfo, qDir.entryInfoList()) {
+    FootprintLibrary lib{dirInfo.fileName(), Qt::Unchecked, {}};
     QDir qDir(dirInfo.absoluteFilePath());
     qDir.setFilter(QDir::Files | QDir::NoDotAndDotDot);
     qDir.setNameFilters({"*.kicad_mod"});
@@ -234,14 +220,12 @@ void KiCadLibraryImport::open(const FilePath& dir, QStringList& errors) {
         std::unique_ptr<SExpression> root = SExpression::parse(
             FileUtils::readFile(fp), fp, SExpression::Mode::Permissive);
         KiCadFootprint fpt = KiCadFootprint::parse(*root, fptLog);
-        mPackages.append(Package{
-            fpt.name, Qt::Unchecked,
-            // std::make_shared<parseagle::Symbol>(symbol),
-        });
+        lib.footprints.append(Footprint{fpt.name, Qt::Unchecked});
       } catch (const Exception& e) {
         fptLog.critical(e.getMsg());
       }
     }
+    mFootprintLibs.append(lib);
   }
 
   // Find 3D model libraries.
@@ -283,7 +267,7 @@ void KiCadLibraryImport::setElementChecked(QVector<T>& elements,
 }
 
 void KiCadLibraryImport::updateDependencies() noexcept {
-  QSet<QString> dependentPackages;
+  /*QSet<QString> dependentPackages;
   QSet<QString> dependentComponents;
   foreach (const Device& dev, mDevices) {
     if (dev.checkState != Qt::Unchecked) {
@@ -313,7 +297,7 @@ void KiCadLibraryImport::updateDependencies() noexcept {
     if (setElementDependent(sym, dependentSymbols.contains(sym.displayName))) {
       emit symbolCheckStateChanged(sym.displayName, sym.checkState);
     }
-  }
+  }*/
 }
 
 template <typename T>

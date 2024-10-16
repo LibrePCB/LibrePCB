@@ -53,33 +53,26 @@ class KiCadLibraryImport final : public QThread {
 
 public:
   struct Symbol {
-    QString displayName;
+    QString name;
+    QString footprint;  // LIBNAME:FOOTPRINTNAME (optional)
     Qt::CheckState checkState;
-    // std::shared_ptr<parseagle::Symbol> symbol;
   };
 
-  struct Package {
-    QString displayName;  // Same as package->getName()
+  struct SymbolLibrary {
+    QString name;
     Qt::CheckState checkState;
-    // std::shared_ptr<parseagle::Package> package;
+    QList<Symbol> symbols;
   };
 
-  struct Component {
-    QString displayName;  // Like deviceSet->getName() but without trailing [-_]
-    QString description;  // Same as deviceSet->getDescription()
+  struct Footprint {
+    QString name;
     Qt::CheckState checkState;
-    QSet<QString> symbolDisplayNames;
-    // std::shared_ptr<parseagle::DeviceSet> deviceSet;
   };
 
-  struct Device {
-    QString displayName;  // Built from names of deviceSet and device
-    QString description;  // Same as deviceSet->getDescription()
+  struct FootprintLibrary {
+    QString name;
     Qt::CheckState checkState;
-    QString componentDisplayName;
-    QString packageDisplayName;
-    // std::shared_ptr<parseagle::Device> device;
-    // std::shared_ptr<parseagle::DeviceSet> deviceSet;
+    QList<Footprint> footprints;
   };
 
   // Constructors / Destructor
@@ -91,14 +84,17 @@ public:
   // Getters
   std::shared_ptr<MessageLogger> getLogger() const noexcept { return mLogger; }
   const FilePath& getLoadedFilePath() const noexcept { return mLoadedFilePath; }
-  int getTotalElementsCount() const noexcept;
   // int getCheckedElementsCount() const noexcept;
   // int getCheckedSymbolsCount() const noexcept;
   // int getCheckedPackagesCount() const noexcept;
   // int getCheckedComponentsCount() const noexcept;
   // int getCheckedDevicesCount() const noexcept;
-  const QVector<Symbol>& getSymbols() const noexcept { return mSymbols; }
-  const QVector<Package>& getPackages() const noexcept { return mPackages; }
+  const QList<SymbolLibrary>& getSymbolLibraries() const noexcept {
+    return mSymbolLibs;
+  }
+  const QList<FootprintLibrary>& getFootprintLibraries() const noexcept {
+    return mFootprintLibs;
+  }
   // const QVector<Component>& getComponents() const noexcept {
   //   return mComponents;
   // }
@@ -116,7 +112,7 @@ public:
 
   // General Methods
   void reset() noexcept;
-  QStringList open(const FilePath& dir);
+  void open(const FilePath& dir, MessageLogger& log);
 
   // Operator Overloadings
   KiCadLibraryImport& operator=(const KiCadLibraryImport& rhs) = delete;
@@ -130,7 +126,7 @@ signals:
   void finished();
 
 private:  // Methods
-  void open(const FilePath& dir, QStringList& errors);
+  void openImpl(const FilePath& dir, MessageLogger& log);
   template <typename T>
   int getCheckedElementsCount(const QVector<T>& elements) const noexcept;
   template <typename T>
@@ -151,10 +147,8 @@ private:  // Data
   FilePath mLoadedFilePath;
 
   // Library elements
-  QVector<Symbol> mSymbols;
-  QVector<Package> mPackages;
-  QVector<Component> mComponents;
-  QVector<Device> mDevices;
+  QList<SymbolLibrary> mSymbolLibs;
+  QList<FootprintLibrary> mFootprintLibs;
 };
 
 /*******************************************************************************

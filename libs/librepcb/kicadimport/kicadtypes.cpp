@@ -40,8 +40,7 @@ float deserialize(const SExpression& node) {
   if (ok) {
     return value;
   } else {
-    throw RuntimeError(__FILE__, __LINE__,
-                       QString("Invalid float: '%1'").arg(node.getValue()));
+    throw RuntimeError(__FILE__, __LINE__, "Invalid float: " + node.getValue());
   }
 }
 
@@ -53,7 +52,7 @@ double deserialize(const SExpression& node) {
     return value;
   } else {
     throw RuntimeError(__FILE__, __LINE__,
-                       QString("Invalid double: '%1'").arg(node.getValue()));
+                       "Invalid double: " + node.getValue());
   }
 }
 
@@ -85,18 +84,26 @@ static bool deserializeBool(const SExpression& node) {
   } else if (value == "no") {
     return false;
   } else {
-    throw RuntimeError(__FILE__, __LINE__,
-                       QString("Invalid bool: '%1'").arg(value));
+    throw RuntimeError(__FILE__, __LINE__, "Invalid bool: " + value);
   }
 }
 
 static kicadimport::KiCadStrokeType deserializeStrokeType(
     const SExpression& node, MessageLogger& log) {
-  if (node.getValue() == "default") {
+  if (node.getValue() == "dash") {
+    return kicadimport::KiCadStrokeType::Dash;
+  } else if (node.getValue() == "dash_dot") {
+    return kicadimport::KiCadStrokeType::DashDot;
+  } else if (node.getValue() == "dash_dot_dot") {
+    return kicadimport::KiCadStrokeType::DashDotDOt;
+  } else if (node.getValue() == "dot") {
+    return kicadimport::KiCadStrokeType::Dot;
+  } else if (node.getValue() == "default") {
     return kicadimport::KiCadStrokeType::Default;
+  } else if (node.getValue() == "solid") {
+    return kicadimport::KiCadStrokeType::Solid;
   } else {
-    log.warning(QString("Unknown stroke type '%1', using default instead.")
-                    .arg(node.getValue()));
+    log.warning("Unknown stroke type: " + node.getValue());
     return kicadimport::KiCadStrokeType::Unknown;
   }
 }
@@ -110,8 +117,7 @@ static kicadimport::KiCadFillType deserializeFillType(const SExpression& node,
   } else if (node.getValue() == "background") {
     return kicadimport::KiCadFillType::Background;
   } else {
-    log.warning(QString("Unknown fill type '%1', using default instead.")
-                    .arg(node.getValue()));
+    log.warning("Unknown fill type: " + node.getValue());
     return kicadimport::KiCadFillType::Unknown;
   }
 }
@@ -143,8 +149,7 @@ static kicadimport::KiCadPinType deserializePinType(const SExpression& node,
   } else if (node.getValue() == "no_connect") {
     return kicadimport::KiCadPinType::NoConnect;
   } else {
-    log.warning(QString("Unknown pin type '%1', using default instead.")
-                    .arg(node.getValue()));
+    log.warning("Unknown pin type: " + node.getValue());
     return kicadimport::KiCadPinType::Unknown;
   }
 }
@@ -170,8 +175,7 @@ static kicadimport::KiCadPinStyle deserializePinStyle(const SExpression& node,
   } else if (node.getValue() == "non_logic") {
     return kicadimport::KiCadPinStyle::NonLogic;
   } else {
-    log.warning(QString("Unknown pin shape '%1', using default instead.")
-                    .arg(node.getValue()));
+    log.warning("Unknown pin shape: " + node.getValue());
     return kicadimport::KiCadPinStyle::Unknown;
   }
 }
@@ -195,13 +199,9 @@ KiCadProperty KiCadProperty::parse(const SExpression& node,
   if (const SExpression* child =
           node.tryGetChild("effects/font/thickness/@0")) {
     obj.fontThickness = deserialize<qreal>(*child);
-  } else {
-    obj.fontThickness = 0;
   }
-  if (const SExpression* child = node.tryGetChild("effects/hide")) {
+  if (const SExpression* child = node.tryGetChild("effects/hide/@0")) {
     obj.hide = deserializeBool(*child);
-  } else {
-    obj.hide = false;
   }
   return obj;
 }
@@ -232,7 +232,7 @@ KiCadFootprintLine KiCadFootprintLine::parse(const SExpression& node,
   obj.end = deserialize<QPointF>(node.getChild("end"));
   obj.strokeWidth = deserialize<qreal>(node.getChild("stroke/width/@0"));
   obj.strokeType = deserializeStrokeType(node.getChild("stroke/type/@0"), log);
-  obj.layer = node.getChild("layer").getValue();
+  obj.layer = node.getChild("layer/@0").getValue();
   return obj;
 }
 
@@ -248,7 +248,7 @@ KiCadFootprintArc KiCadFootprintArc::parse(const SExpression& node,
   obj.end = deserialize<QPointF>(node.getChild("end"));
   obj.strokeWidth = deserialize<qreal>(node.getChild("stroke/width/@0"));
   obj.strokeType = deserializeStrokeType(node.getChild("stroke/type/@0"), log);
-  obj.layer = node.getChild("layer").getValue();
+  obj.layer = node.getChild("layer/@0").getValue();
   return obj;
 }
 
@@ -275,19 +275,13 @@ KiCadSymbolPin KiCadSymbolPin::parse(const SExpression& node,
 KiCadSymbolGate KiCadSymbolGate::parse(const SExpression& node,
                                        MessageLogger& log) {
   KiCadSymbolGate obj;
-  const QStringList nameParts = node.getChild(0).getValue().split("_");
-  if (nameParts.count() < 3) {
-    throw RuntimeError(__FILE__, __LINE__,
-                       QString("Invalid symbol gate name: '%1'")
-                           .arg(node.getChild(0).getValue()));
-  }
   obj.name = node.getChild(0).getValue();
+  const QStringList nameParts = obj.name.split("_");
   bool ok;
-  obj.index = nameParts.at(nameParts.count() - 2).toInt(&ok);
-  if (!ok) {
+  obj.index = nameParts.value(nameParts.count() - 2).toInt(&ok);
+  if ((nameParts.count() < 3) || (!ok)) {
     throw RuntimeError(__FILE__, __LINE__,
-                       QString("Invalid symbol gate name: '%1'")
-                           .arg(node.getChild(0).getValue()));
+                       "Invalid symbol gate name: " + obj.name);
   }
   foreach (const SExpression* child, node.getChildren("rectangle")) {
     obj.rectangles.append(KiCadRectangle::parse(*child, log));
@@ -307,18 +301,12 @@ KiCadSymbol KiCadSymbol::parse(const SExpression& node, MessageLogger& log) {
   obj.name = node.getChild(0).getValue();
   if (const SExpression* child = node.tryGetChild("exclude_from_sim/@0")) {
     obj.excludeFromSim = deserializeBool(*child);
-  } else {
-    obj.excludeFromSim = false;
   }
   if (const SExpression* child = node.tryGetChild("in_bom/@0")) {
     obj.inBom = deserializeBool(*child);
-  } else {
-    obj.inBom = true;
   }
   if (const SExpression* child = node.tryGetChild("on_board/@0")) {
     obj.onBoard = deserializeBool(*child);
-  } else {
-    obj.onBoard = true;
   }
   foreach (const SExpression* child, node.getChildren("property")) {
     obj.properties.append(KiCadProperty::parse(*child, log));
@@ -386,22 +374,21 @@ KiCadFootprint KiCadFootprint::parse(const SExpression& node,
   obj.name = node.getChild(0).getValue();
   if (const SExpression* child = node.tryGetChild("version/@0")) {
     obj.version = deserialize<int>(*child);
-  } else {
-    obj.version = -1;
   }
   if (const SExpression* child = node.tryGetChild("generator/@0")) {
     obj.generator = child->getValue();
   }
-  obj.isSmd =
-      node.getChild("attr").containsChild(*SExpression::createToken("smd"));
-  obj.isThroughHole = node.getChild("attr").containsChild(
-      *SExpression::createToken("through_hole"));
-  obj.boardOnly = node.getChild("attr").containsChild(
-      *SExpression::createToken("board_only"));
-  obj.excludeFromPosFiles = node.getChild("attr").containsChild(
-      *SExpression::createToken("exclude_from_pos_files"));
-  obj.excludeFromBom = node.getChild("attr").containsChild(
-      *SExpression::createToken("exclude_from_bom"));
+  if (const SExpression* child = node.tryGetChild("attr")) {
+    obj.isSmd = child->containsChild(*SExpression::createToken("smd"));
+    obj.isThroughHole =
+        child->containsChild(*SExpression::createToken("through_hole"));
+    obj.boardOnly =
+        child->containsChild(*SExpression::createToken("board_only"));
+    obj.excludeFromPosFiles = child->containsChild(
+        *SExpression::createToken("exclude_from_pos_files"));
+    obj.excludeFromBom =
+        child->containsChild(*SExpression::createToken("exclude_from_bom"));
+  }
   foreach (const SExpression* child, node.getChildren("property")) {
     obj.properties.append(KiCadProperty::parse(*child, log));
   }
