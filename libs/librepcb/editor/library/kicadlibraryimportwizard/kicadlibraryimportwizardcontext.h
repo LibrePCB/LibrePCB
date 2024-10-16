@@ -26,6 +26,7 @@
 #include <librepcb/core/fileio/filepath.h>
 #include <librepcb/core/types/uuid.h>
 #include <optional/tl/optional.hpp>
+#include <librepcb/kicadimport/kicadlibraryscanner.h>
 
 #include <QtCore>
 
@@ -64,7 +65,6 @@ public:
 
   // Getters
   Workspace& getWorkspace() const noexcept { return mWorkspace; }
-  // kicadimport::KiCadLibraryImport& getImport() noexcept { return *mImport; }
   const FilePath& getLibsDirPath() const noexcept { return mLibsDirPath; }
   const tl::optional<Uuid>& getComponentCategory() const noexcept {
     return mComponentCategoryUuid;
@@ -74,7 +74,7 @@ public:
   }
 
   // Setters
-  void setLibsDirPath(const QString& filePath) noexcept;
+  void setLibsDirPath(const FilePath& fp) noexcept;
   void setComponentCategory(const tl::optional<Uuid>& uuid) noexcept;
   void setPackageCategory(const tl::optional<Uuid>& uuid) noexcept;
 
@@ -82,15 +82,13 @@ public:
   KiCadLibraryImportWizardContext& operator=(
       const KiCadLibraryImportWizardContext& rhs) = delete;
 
-signals:
-  void parseCompleted(const QString& messages);
-
 private:  // Data
   Workspace& mWorkspace;
-  QScopedPointer<kicadimport::KiCadLibraryImport> mImport;
   FilePath mLibsDirPath;
   tl::optional<Uuid> mComponentCategoryUuid;
   tl::optional<Uuid> mPackageCategoryUuid;
+  std::shared_ptr<kicadimport::KiCadLibraryScanner::Result> mLibraryData;
+  QScopedPointer<kicadimport::KiCadLibraryImport> mImport;
 };
 
 /*******************************************************************************

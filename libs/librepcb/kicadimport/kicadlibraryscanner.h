@@ -17,14 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_KICADIMPORT_KICADLIBRARYIMPORT_H
-#define LIBREPCB_KICADIMPORT_KICADLIBRARYIMPORT_H
+#ifndef LIBREPCB_KICADIMPORT_KICADLIBRARYSCANNER_H
+#define LIBREPCB_KICADIMPORT_KICADLIBRARYSCANNER_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include <librepcb/core/fileio/filepath.h>
-#include <librepcb/core/types/uuid.h>
 
 #include <QtCore>
 
@@ -40,93 +39,45 @@ class MessageLogger;
 namespace kicadimport {
 
 /*******************************************************************************
- *  Class KiCadLibraryImport
+ *  Class KiCadLibraryScanner
  ******************************************************************************/
 
 /**
- * @brief KiCad library import
+ * @brief KiCad library directory scanner
  */
-class KiCadLibraryImport final : public QObject {
+class KiCadLibraryScanner final : public QObject {
   Q_OBJECT
 
 public:
-  enum class State {
-    Reset,
-    Busy,
-    Scanned,
-    Parsed,
-    Done,
-  };
-
-  struct Symbol {
-    QString name;
-    QString footprint;  // LIBNAME:FOOTPRINTNAME (optional)
-    Qt::CheckState checkState;
-  };
-
-  struct SymbolLibrary {
-    FilePath file;
-    Qt::CheckState checkState;
-    QList<Symbol> symbols;
-  };
-
-  struct Footprint {
-    FilePath file;
-    QString name;
-    Qt::CheckState checkState;
-  };
-
-  struct FootprintLibrary {
-    FilePath dir;
-    Qt::CheckState checkState;
-    QList<Footprint> footprints;
-  };
-
-  struct Package3DLibrary {
-    FilePath dir;
-    QList<FilePath> stepFiles;
-  };
-
-  struct Result {
-    QList<SymbolLibrary> symbolLibs;
-    QList<FootprintLibrary> footprintLibs;
-    QList<Package3DLibrary> package3dLibs;
-  };
+  struct Result{};
 
   // Constructors / Destructor
-  KiCadLibraryImport(const KiCadLibraryImport& other) = delete;
-  KiCadLibraryImport(const FilePath& dstLibFp,
-                     QObject* parent = nullptr) noexcept;
-  ~KiCadLibraryImport() noexcept;
-
-  // Getters
-  std::shared_ptr<MessageLogger> getLogger() const noexcept { return mLogger; }
+  KiCadLibraryScanner(const KiCadLibraryScanner& other) = delete;
+  explicit KiCadLibraryScanner(QObject* parent = nullptr) noexcept;
+  ~KiCadLibraryScanner() noexcept;
 
   // General Methods
-  void reset() noexcept;
-  void startScan(const FilePath& dir, MessageLogger& log);
-  void startParse(MessageLogger& log);
-  void startImport();
+  void startScan(const FilePath& fp);
   std::shared_ptr<Result> getResult() noexcept;
   void cancel() noexcept;
 
   // Operator Overloadings
-  KiCadLibraryImport& operator=(const KiCadLibraryImport& rhs) = delete;
+  KiCadLibraryScanner& operator=(const KiCadLibraryScanner& rhs) = delete;
 
 signals:
   void progressStatus(const QString& status);
   void progressPercent(int percent);
-  void scanFinished();
-  void parseFinished();
-  void importFinished();
+  void finished();
 
 private:
-  std::shared_ptr<Result> scan(FilePath dir) noexcept;
+  // Methods
+  std::shared_ptr<Result> run(FilePath dir) noexcept;
 
-  const FilePath mDestinationLibraryFp;
+  // Data
   std::shared_ptr<MessageLogger> mLogger;
   QFuture<std::shared_ptr<Result>> mFuture;
-  State mState;
+
+  // State
   bool mAbort;
 };
 

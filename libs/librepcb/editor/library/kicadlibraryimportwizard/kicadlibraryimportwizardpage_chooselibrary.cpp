@@ -51,9 +51,9 @@ KiCadLibraryImportWizardPage_ChooseLibrary::
     mContext(context) {
   mUi->setupUi(this);
   mUi->edtDirPath->setText("-");  // Workaround to force initial library load.
-  connect(mUi->edtDirPath, &QLineEdit::textChanged, mContext.get(),
-          &KiCadLibraryImportWizardContext::setLibsDirPath,
-          Qt::QueuedConnection);
+  //connect(mUi->edtDirPath, &QLineEdit::textChanged, mContext.get(),
+  //        &KiCadLibraryImportWizardContext::setLibsDirPath,
+  //        Qt::QueuedConnection);
 
   // Add browse action.
   const EditorCommandSet& cmd = EditorCommandSet::instance();
@@ -71,11 +71,6 @@ KiCadLibraryImportWizardPage_ChooseLibrary::
       },
       EditorCommand::ActionFlag::WidgetShortcut);
   mUi->edtDirPath->addAction(aBrowse, QLineEdit::TrailingPosition);
-
-  connect(mContext.get(), &KiCadLibraryImportWizardContext::parseCompleted,
-          mUi->lblMessages, &QLabel::setText);
-  connect(mContext.get(), &KiCadLibraryImportWizardContext::parseCompleted,
-          this, &QWizardPage::completeChanged);
 }
 
 KiCadLibraryImportWizardPage_ChooseLibrary::

@@ -10,6 +10,8 @@ add_library(
   kicadlibraryconverter.h
   kicadlibraryimport.cpp
   kicadlibraryimport.h
+  kicadlibraryscanner.cpp
+  kicadlibraryscanner.h
   kicadtypeconverter.cpp
   kicadtypeconverter.h
   kicadtypes.cpp

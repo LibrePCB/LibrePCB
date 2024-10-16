@@ -34,7 +34,7 @@
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/utils/messagelogger.h>
-
+#include <QtConcurrent>
 #include <QtCore>
 
 /*******************************************************************************
@@ -49,130 +49,124 @@ namespace kicadimport {
 
 KiCadLibraryImport::KiCadLibraryImport(const FilePath& dstLibFp,
                                        QObject* parent) noexcept
-  : QThread(parent),
+  : QObject(parent),
     mDestinationLibraryFp(dstLibFp),
-    mSettings(new KiCadLibraryConverterSettings()),
     mLogger(new MessageLogger(true)),
     mAbort(false) {
 }
 
 KiCadLibraryImport::~KiCadLibraryImport() noexcept {
-  // Deleting a QThread while it is running will lead to a crash.
-  mAbort = true;
-  wait();
+  cancel();
 }
-
-/*******************************************************************************
- *  Getters
- ******************************************************************************/
-
-/*int KiCadLibraryImport::getCheckedElementsCount() const noexcept {
-  return getCheckedSymbolsCount() + getCheckedPackagesCount() +
-      getCheckedComponentsCount() + getCheckedDevicesCount();
-}
-
-int KiCadLibraryImport::getCheckedSymbolsCount() const noexcept {
-  return getCheckedElementsCount(mSymbols);
-}
-
-int KiCadLibraryImport::getCheckedPackagesCount() const noexcept {
-  return getCheckedElementsCount(mPackages);
-}
-
-int KiCadLibraryImport::getCheckedComponentsCount() const noexcept {
-  return getCheckedElementsCount(mComponents);
-}
-
-int KiCadLibraryImport::getCheckedDevicesCount() const noexcept {
-  return getCheckedElementsCount(mDevices);
-}*/
-
-/*******************************************************************************
- *  Setters
- ******************************************************************************/
-
-/*void KiCadLibraryImport::setSymbolCategories(const QSet<Uuid>& uuids) noexcept
-{ mSettings->symbolCategories = uuids;
-}
-
-void KiCadLibraryImport::setPackageCategories(
-    const QSet<Uuid>& uuids) noexcept {
-  mSettings->packageCategories = uuids;
-}
-
-void KiCadLibraryImport::setComponentCategories(
-    const QSet<Uuid>& uuids) noexcept {
-  mSettings->componentCategories = uuids;
-}
-
-void KiCadLibraryImport::setDeviceCategories(const QSet<Uuid>& uuids) noexcept {
-  mSettings->deviceCategories = uuids;
-}
-
-void KiCadLibraryImport::setSymbolChecked(const QString& name,
-                                          bool checked) noexcept {
-  setElementChecked(mSymbols, name, checked);
-}
-
-void KiCadLibraryImport::setPackageChecked(const QString& name,
-                                           bool checked) noexcept {
-  setElementChecked(mPackages, name, checked);
-}
-
-void KiCadLibraryImport::setComponentChecked(const QString& name,
-                                             bool checked) noexcept {
-  setElementChecked(mComponents, name, checked);
-}
-
-void KiCadLibraryImport::setDeviceChecked(const QString& name,
-                                          bool checked) noexcept {
-  setElementChecked(mDevices, name, checked);
-}*/
 
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
 
 void KiCadLibraryImport::reset() noexcept {
-  mSymbolLibs.clear();
-  mFootprintLibs.clear();
-  mLoadedFilePath = FilePath();
+  cancel();
+  mState = State::Reset;
 }
 
-void KiCadLibraryImport::open(const FilePath& dir, MessageLogger& log) {
-  reset();
+void KiCadLibraryImport::startScan(const FilePath& dir, MessageLogger& log) {
+  if (mState != State::Reset) {throw LogicError(__FILE__, __LINE__, "Unexpected state.");}
 
-  // Scan directory for libraries.
-  openImpl(dir, log);
+#if (QT_VERSION_MAJOR >= 6)
+  mFuture = QtConcurrent::run(&KiCadLibraryImport::scan, this, dir);
+#else
+  mFuture = QtConcurrent::run(this, &GraphicsExport::run, args);
+#endif
+}
 
-  // Scan subdirectories for libraries (not recursive).
-  QDir qDir(dir.toStr());
-  qDir.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
-  foreach (const QFileInfo& info, qDir.entryInfoList()) {
-    openImpl(FilePath{info.absoluteFilePath()}, log);
-  }
+void KiCadLibraryImport::startParse(MessageLogger& log) {
 
-  // Sort all elements by name to improve readability.
-  Toolbox::sortNumeric(
-      mSymbolLibs,
-      [](const QCollator& cmp, const SymbolLibrary& lhs,
-         const SymbolLibrary& rhs) { return cmp(lhs.name, rhs.name); },
-      Qt::CaseInsensitive, false);
-  Toolbox::sortNumeric(
-      mFootprintLibs,
-      [](const QCollator& cmp, const FootprintLibrary& lhs,
-         const FootprintLibrary& rhs) { return cmp(lhs.name, rhs.name); },
-      Qt::CaseInsensitive, false);
+}
 
+void KiCadLibraryImport::startImport() {
+
+}
+
+std::shared_ptr<KiCadLibraryImport::Result> KiCadLibraryImport::getResult() noexcept {
+  mFuture.waitForFinished();
+  return mFuture.result();
+}
+
+void KiCadLibraryImport::cancel() noexcept {
+  mAbort = true;
+  mFuture.waitForFinished();
   mAbort = false;
-  mLoadedFilePath = dir;
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
-void KiCadLibraryImport::openImpl(const FilePath& dir, MessageLogger& log) {
+std::shared_ptr<KiCadLibraryImport::Result> KiCadLibraryImport::scan(FilePath dir) noexcept {
+  // Note: This method is called from a different thread, thus be careful with
+  //       calling other methods to only call thread-safe methods!
+
+  QElapsedTimer timer;
+  timer.start();
+  qDebug() << "Start graphics export in worker thread...";
+  emit progressPercent(10);
+
+  // Helper to find files or directories in a directory.
+  auto findItems = [](const FilePath& dir, QDir::Filter filter,
+                      const QString& pattern) {
+    QList<FilePath> files;
+    QDir qDir(dir.toStr());
+    qDir.setFilter(filter | QDir::NoDotAndDotDot);
+    qDir.setNameFilters({pattern});
+    foreach (const QFileInfo& info, qDir.entryInfoList()) {
+      files.append(FilePath{info.absoluteFilePath()});
+    }
+    return files;
+  };
+
+  // Helper to find libraries in a directory.
+  auto result = std::make_shared<Result>();
+  auto findLibs = [&](const FilePath& dir) {
+    for (const FilePath& fp : findItems(dir, QDir::Dirs, "*.pretty")) {
+      result->footprintLibs.append(FootprintLibrary{fp, Qt::Unchecked, {}});
+    }
+    for (const FilePath& fp : findItems(dir, QDir::Dirs, "*.3dshapes")) {
+      result->package3dLibs.append(Package3DLibrary{fp, {}});
+    }
+  };
+
+  // Helper to find library files in a directory.
+  auto findSymbols = [&](const FilePath& dir) {
+    for (const FilePath& fp : findItems(dir, QDir::Files, "*.kicad_sym")) {
+      result->symbolLibs.append(SymbolLibrary{fp, Qt::Unchecked, {}});
+    }
+  };
+
+  // Scan directory for libraries.
+  findSymbols(dir);
+  findLibs(dir);
+  emit progressPercent(20);
+
+  // Scan subdirectories for libraries (not recursive).
+  QDir qDir(dir.toStr());
+  qDir.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
+  foreach (const QFileInfo& info, qDir.entryInfoList()) {
+    const FilePath subdir{info.absoluteFilePath()};
+    findSymbols(subdir);
+    findLibs(subdir);
+  }
+  emit progressPercent(30);
+
+  // Find footprints & package models.
+  for (FootprintLibrary& lib : result->footprintLibs) {
+    for (const FilePath& fp : findItems(lib.dir, QDir::Files, "*.kicad_mod")) {
+      lib.footprints.append(Footprint{fp, QString(), Qt::Unchecked});
+    }
+  }
+  for (Package3DLibrary& lib : result->package3dLibs) {
+    lib.stepFiles += findItems(lib.dir, QDir::Files, "*.step");
+  }
+  emit progressPercent(50);
+
   // Helper to get the footprint ID of a symbol.
   auto getFootprintId = [](const KiCadSymbol& symbol) {
     for (const auto& p : symbol.properties) {
@@ -183,252 +177,57 @@ void KiCadLibraryImport::openImpl(const FilePath& dir, MessageLogger& log) {
     return QString();
   };
 
-  // Find symbol libraries.
-  QDir qDir(dir.toStr());
-  qDir.setFilter(QDir::Files | QDir::NoDotAndDotDot);
-  qDir.setNameFilters({"*.kicad_sym"});
-  foreach (const QFileInfo& info, qDir.entryInfoList()) {
-    const FilePath fp{info.absoluteFilePath()};
-    MessageLogger symLog(&log, info.fileName());
+  // Load symbols.
+  for (SymbolLibrary& lib : result->symbolLibs) {
+    MessageLogger symLog(mLogger.get(), lib.file.getFilename());
     try {
-      std::unique_ptr<SExpression> root = SExpression::parse(
-          FileUtils::readFile(fp), fp, SExpression::Mode::Permissive);
+      std::unique_ptr<SExpression> root =
+          SExpression::parse(FileUtils::readFile(lib.file), lib.file,
+                             SExpression::Mode::Permissive);
       KiCadSymbolLibrary kiLib = KiCadSymbolLibrary::parse(*root, symLog);
-      SymbolLibrary lib{fp.getFilename(), Qt::Unchecked, {}};
       foreach (const auto& symbol, kiLib.symbols) {
         lib.symbols.append(
             Symbol{symbol.name, getFootprintId(symbol), Qt::Unchecked});
       }
-      mSymbolLibs.append(lib);
     } catch (const Exception& e) {
       symLog.critical(e.getMsg());
     }
   }
 
-  // Find footprint libraries.
-  qDir.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
-  qDir.setNameFilters({"*.pretty"});
-  foreach (const QFileInfo& dirInfo, qDir.entryInfoList()) {
-    FootprintLibrary lib{dirInfo.fileName(), Qt::Unchecked, {}};
-    QDir qDir(dirInfo.absoluteFilePath());
-    qDir.setFilter(QDir::Files | QDir::NoDotAndDotDot);
-    qDir.setNameFilters({"*.kicad_mod"});
-    foreach (const QFileInfo& fileInfo, qDir.entryInfoList()) {
-      const FilePath fp{fileInfo.absoluteFilePath()};
-      MessageLogger fptLog(&log, fileInfo.fileName());
+  // Load footprints.
+  for (FootprintLibrary& lib : result->footprintLibs) {
+    for (Footprint& fpt : lib.footprints) {
+      MessageLogger fptLog(mLogger.get(), lib.dir.getFilename());
       try {
-        std::unique_ptr<SExpression> root = SExpression::parse(
-            FileUtils::readFile(fp), fp, SExpression::Mode::Permissive);
-        KiCadFootprint fpt = KiCadFootprint::parse(*root, fptLog);
-        lib.footprints.append(Footprint{fpt.name, Qt::Unchecked});
+        std::unique_ptr<SExpression> root =
+            SExpression::parse(FileUtils::readFile(fpt.file), fpt.file,
+                               SExpression::Mode::Permissive);
+        KiCadFootprint kiFpt = KiCadFootprint::parse(*root, fptLog);
+        fpt.name = kiFpt.name;
       } catch (const Exception& e) {
         fptLog.critical(e.getMsg());
       }
     }
-    mFootprintLibs.append(lib);
   }
 
-  // Find 3D model libraries.
-  /*qDir.setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
-  qDir.setNameFilters({"*.3dshapes"});
-  foreach (const QFileInfo& dirInfo, qDir.entryInfoList()) {
-    QDir qDir(dirInfo.absoluteFilePath());
-    qDir.setFilter(QDir::Files | QDir::NoDotAndDotDot);
-    qDir.setNameFilters({"*.step"});
-    foreach (const QFileInfo& fileInfo, qDir.entryInfoList()) {
-      const FilePath fp{fileInfo.absoluteFilePath()};
-    }
-  }*/
-}
-
-template <typename T>
-int KiCadLibraryImport::getCheckedElementsCount(
-    const QVector<T>& elements) const noexcept {
-  return std::count_if(elements.begin(), elements.end(), [](const T& element) {
-    return element.checkState != Qt::Unchecked;
-  });
-}
-
-template <typename T>
-void KiCadLibraryImport::setElementChecked(QVector<T>& elements,
-                                           const QString& name,
-                                           bool checked) noexcept {
-  bool modified = false;
-  Qt::CheckState checkState = checked ? Qt::Checked : Qt::Unchecked;
-  for (T& element : elements) {
-    if ((element.displayName == name) && (element.checkState != checkState)) {
-      element.checkState = checkState;
-      modified = true;
-    }
-  }
-  if (modified) {
-    updateDependencies();
-  }
-}
-
-void KiCadLibraryImport::updateDependencies() noexcept {
-  /*QSet<QString> dependentPackages;
-  QSet<QString> dependentComponents;
-  foreach (const Device& dev, mDevices) {
-    if (dev.checkState != Qt::Unchecked) {
-      dependentComponents.insert(dev.componentDisplayName);
-      dependentPackages.insert(dev.packageDisplayName);
-    }
-  }
-
-  QSet<QString> dependentSymbols;
-  for (Component& cmp : mComponents) {
-    if (setElementDependent(cmp,
-                            dependentComponents.contains(cmp.displayName))) {
-      emit componentCheckStateChanged(cmp.displayName, cmp.checkState);
-    }
-    if (cmp.checkState != Qt::Unchecked) {
-      dependentSymbols |= cmp.symbolDisplayNames;
-    }
-  }
-
-  for (Package& pkg : mPackages) {
-    if (setElementDependent(pkg, dependentPackages.contains(pkg.displayName))) {
-      emit packageCheckStateChanged(pkg.displayName, pkg.checkState);
-    }
-  }
-
-  for (Symbol& sym : mSymbols) {
-    if (setElementDependent(sym, dependentSymbols.contains(sym.displayName))) {
-      emit symbolCheckStateChanged(sym.displayName, sym.checkState);
-    }
-  }*/
-}
-
-template <typename T>
-bool KiCadLibraryImport::setElementDependent(T& element,
-                                             bool dependent) noexcept {
-  if (dependent && (element.checkState == Qt::Unchecked)) {
-    element.checkState = Qt::PartiallyChecked;
-    return true;
-  } else if ((!dependent) && (element.checkState == Qt::PartiallyChecked)) {
-    element.checkState = Qt::Unchecked;
-    return true;
-  }
-  return false;
-}
-
-void KiCadLibraryImport::run() noexcept {
-  // Note: This method is called from a different thread, thus be careful with
-  //       calling other methods to only call thread-safe methods!
-
-  std::shared_ptr<MessageLogger> globalLog = mLogger;
-  KiCadLibraryConverter converter(*mSettings, this);
-
-  /*int totalCount = getCheckedElementsCount();
-  int count = 0;
-
-   foreach (const Symbol& sym, mSymbols) {
-     if (mAbort) {
-       break;
-     }
-     if (sym.checkState == Qt::Unchecked) {
-       continue;
-     }
-     MessageLogger log(globalLog.get(), sym.displayName);
-     try {
-       emit progressStatus(sym.displayName);
-       auto symbol = converter.createSymbol(QString(), QString(), *sym.symbol,
-                                            log);  // can throw
-       TransactionalDirectory dir(TransactionalFileSystem::openRW(
-           mDestinationLibraryFp
-               .getPathTo(librepcb::Symbol::getShortElementName())
-               .getPathTo(symbol->getUuid().toStr())));
-       symbol->saveTo(dir);
-       dir.getFileSystem()->save();
-     } catch (const Exception& e) {
-       log.critical(tr("Skipped symbol due to error: %1").arg(e.getMsg()));
-     }
-     ++count;
-     emit progressPercent((100 * count) / std::max(totalCount, 1));
-   }
-
-   foreach (const Package& pkg, mPackages) {
-     if (mAbort) {
-       break;
-     }
-     if (pkg.checkState == Qt::Unchecked) {
-       continue;
-     }
-     MessageLogger log(globalLog.get(), pkg.displayName);
-     try {
-       emit progressStatus(pkg.displayName);
-       auto package = converter.createPackage(QString(), QString(),
-   *pkg.package, log);  // can throw TransactionalDirectory
-   dir(TransactionalFileSystem::openRW( mDestinationLibraryFp
-               .getPathTo(librepcb::Package::getShortElementName())
-               .getPathTo(package->getUuid().toStr())));
-       package->saveTo(dir);
-       dir.getFileSystem()->save();
-     } catch (const Exception& e) {
-       log.critical(tr("Skipped package due to error: %1").arg(e.getMsg()));
-     }
-     ++count;
-     emit progressPercent((100 * count) / std::max(totalCount, 1));
-   }
-
-   foreach (const Component& cmp, mComponents) {
-     if (mAbort) {
-       break;
-     }
-     if (cmp.checkState == Qt::Unchecked) {
-       continue;
-     }
-     MessageLogger log(globalLog.get(), cmp.displayName);
-     try {
-       emit progressStatus(cmp.displayName);
-       auto component =
-           converter.createComponent(QString(), QString(), *cmp.deviceSet,
-                                     log);  // can throw
-       TransactionalDirectory dir(TransactionalFileSystem::openRW(
-           mDestinationLibraryFp
-               .getPathTo(librepcb::Component::getShortElementName())
-               .getPathTo(component->getUuid().toStr())));
-       component->saveTo(dir);
-       dir.getFileSystem()->save();
-     } catch (const Exception& e) {
-       log.critical(tr("Skipped component due to error: %1").arg(e.getMsg()));
-     }
-     ++count;
-     emit progressPercent((100 * count) / std::max(totalCount, 1));
-   }
-
-   foreach (const Device& dev, mDevices) {
-     if (mAbort) {
-       break;
-     }
-     if (dev.checkState == Qt::Unchecked) {
-       continue;
-     }
-     MessageLogger log(globalLog.get(), dev.displayName);
-     try {
-       emit progressStatus(dev.displayName);
-       auto device = converter.createDevice(QString(), QString(),
-   *dev.deviceSet, *dev.device, QString(), QString(), log);  // can throw
-       TransactionalDirectory dir(TransactionalFileSystem::openRW(
-           mDestinationLibraryFp
-               .getPathTo(librepcb::Device::getShortElementName())
-               .getPathTo(device->getUuid().toStr())));
-       device->saveTo(dir);
-       dir.getFileSystem()->save();
-     } catch (const Exception& e) {
-       log.critical(tr("Skipped device due to error: %1").arg(e.getMsg()));
-     }
-     ++count;
-     emit progressPercent((100 * count) / std::max(totalCount, 1));
-   }
+  // Sort all elements by name to improve readability.
+  Toolbox::sortNumeric(
+      result->symbolLibs,
+      [](const QCollator& cmp, const SymbolLibrary& lhs,
+         const SymbolLibrary& rhs) {
+        return cmp(lhs.file.getFilename(), rhs.file.getFilename());
+      },
+      Qt::CaseInsensitive, false);
+  Toolbox::sortNumeric(
+      result->footprintLibs,
+      [](const QCollator& cmp, const FootprintLibrary& lhs,
+         const FootprintLibrary& rhs) {
+        return cmp(lhs.dir.getFilename(), rhs.dir.getFilename());
+      },
+      Qt::CaseInsensitive, false);
 
   emit progressPercent(100);
-  emit progressStatus(tr("Finished: %1 of %2 element(s) imported",
-                         "Placeholders are numbers", totalCount)
-                          .arg(count)
-                          .arg(totalCount));
-  emit finished();*/
+  return result;
 }
 
 /*******************************************************************************

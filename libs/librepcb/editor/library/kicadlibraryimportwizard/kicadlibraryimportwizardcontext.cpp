@@ -82,25 +82,12 @@ KiCadLibraryImportWizardContext::~KiCadLibraryImportWizardContext() noexcept {
  ******************************************************************************/
 
 void KiCadLibraryImportWizardContext::setLibsDirPath(
-    const QString& filePath) noexcept {
-  MessageLogger log;
-  try {
-    FilePath fp(filePath);
-    if (!fp.isValid()) {
-      mImport->reset();
-      log.info(tr("No file selected."));
-    } else if (fp != mImport->getLoadedFilePath()) {
-      mLibsDirPath = fp;
-      mImport->open(fp, log);
-      log.info(tr("Found %1 symbol- and %2 footprint libraries in the "
-                  "selected directory.")
-                   .arg(mImport->getSymbolLibraries().count())
-                   .arg(mImport->getFootprintLibraries().count()));
-    }
-  } catch (const Exception& e) {
-    log.critical(e.getMsg());
+    const FilePath& fp) noexcept {
+  if (fp != mLibsDirPath) {
+    mLibsDirPath = fp;
+    mLibraryData.reset();
+    mImport->reset();
   }
-  emit parseCompleted(log.getMessagesPlain().join("\n"));
 }
 
 void KiCadLibraryImportWizardContext::setComponentCategory(
