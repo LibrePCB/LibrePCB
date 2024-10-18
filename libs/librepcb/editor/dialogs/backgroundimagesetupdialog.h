@@ -109,6 +109,7 @@ private:
   void takeScreenshot() noexcept;
   void pasteFromClipboard() noexcept;
   void loadFromFile() noexcept;
+  void cropImage() noexcept;
   void setImage(const QImage& image) noexcept;
   void updateImage() noexcept;
   void updateReferenceMarker() noexcept;

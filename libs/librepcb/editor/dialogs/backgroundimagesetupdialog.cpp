@@ -197,6 +197,8 @@ BackgroundImageSetupDialog::BackgroundImageSetupDialog(
           &BackgroundImageSetupDialog::pasteFromClipboard);
   connect(mUi->btnOpen, &QPushButton::clicked, this,
           &BackgroundImageSetupDialog::loadFromFile);
+  connect(mUi->btnCrop, &QToolButton::clicked, this,
+          &BackgroundImageSetupDialog::cropImage);
   connect(mUi->btnSelectReference, &QToolButton::clicked, this,
           [this]() { setState(State::SelectReference); });
   connect(mUi->btnMeasureScale, &QToolButton::clicked, this,
@@ -264,7 +266,9 @@ void BackgroundImageSetupDialog::setSettings(
   mUi->edtOffsetY->setValue(s.offset.getY());
   mUi->edtRotation->setValue(s.rotation);
 
-  QTimer::singleShot(10, this, &BackgroundImageSetupDialog::updateImage);
+  QTimer::singleShot(10, this, [this](){
+    mUi->graphicsView->setVisibleSceneRect(mImage.rect());
+  });
 }
 
 BackgroundImageSettings BackgroundImageSetupDialog::getSettings()
@@ -406,6 +410,22 @@ void BackgroundImageSetupDialog::loadFromFile() noexcept {
   setImage(image);
 }
 
+void BackgroundImageSetupDialog::cropImage() noexcept {
+  QPoint topLeft = mUi->graphicsView->mapToScene(0, 0).toPoint();
+  QPoint bottomRight = mUi->graphicsView->mapToScene(QPoint(mUi->graphicsView->width(), mUi->graphicsView->height())).toPoint();
+  if (topLeft.x() < 0) topLeft.setX(0);
+  if (topLeft.y() < 0) topLeft.setY(0);
+  if (bottomRight.x() >= mImage.width()) bottomRight.setX(mImage.width()-1);
+  if (bottomRight.y() >= mImage.height()) bottomRight.setY(mImage.height()-1);
+  mUi->spbxReferenceX->setValue(mUi->spbxReferenceX->value() - topLeft.x());
+  mUi->spbxReferenceY->setValue(mUi->spbxReferenceY->value() - topLeft.y());
+  updateReferenceMarker();
+  mImage = mImage.copy(QRect(topLeft, bottomRight));
+  updateImage();
+  mUi->graphicsView->setVisibleSceneRect(mImage.rect());
+  emit settingsModified();
+}
+
 void BackgroundImageSetupDialog::setImage(const QImage& image) noexcept {
   mImage = image;
   mUi->spbxReferenceX->setValue(image.width() / 2);
@@ -413,7 +433,7 @@ void BackgroundImageSetupDialog::setImage(const QImage& image) noexcept {
   mUi->spbxDpiX->setValue(image.width());
   mUi->spbxDpiY->setValue(image.width());
   updateImage();
-  mUi->graphicsView->zoomAll();
+  mUi->graphicsView->setVisibleSceneRect(mImage.rect());
   emit settingsModified();
 }
 
