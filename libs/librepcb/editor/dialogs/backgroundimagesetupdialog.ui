@@ -17,27 +17,43 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0,1">
+      <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,1">
        <item>
-        <widget class="QPushButton" name="btnScreenshot">
-         <property name="text">
-          <string>Take Screenshot</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="btnPaste">
-         <property name="text">
-          <string>Paste From Clipboard</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="btnOpen">
-         <property name="text">
-          <string>Load From File</string>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QPushButton" name="btnScreenshot">
+           <property name="text">
+            <string>Screenshot</string>
+           </property>
+           <property name="icon">
+              <iconset>
+               <normaloff>:/img/actions/export_pixmap.png</normaloff>:/img/actions/export_pixmap.png</iconset>
+             </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnPaste">
+           <property name="text">
+            <string>Paste</string>
+           </property>
+           <property name="icon">
+              <iconset>
+               <normaloff>:/img/actions/paste.png</normaloff>:/img/actions/paste.png</iconset>
+             </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnOpen">
+           <property name="text">
+            <string>Open</string>
+           </property>
+           <property name="icon">
+              <iconset>
+               <normaloff>:/img/actions/open.png</normaloff>:/img/actions/open.png</iconset>
+             </property>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item>
         <layout class="QGridLayout" name="gridLayout">

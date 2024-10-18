@@ -70,7 +70,7 @@ namespace editor {
  *  Class BackgroundImageSettings
  ******************************************************************************/
 
-void BackgroundImageSettings::tryLoadFromDir(const FilePath& dir) noexcept {
+bool BackgroundImageSettings::tryLoadFromDir(const FilePath& dir) noexcept {
   try {
     const FilePath fp = dir.getPathTo("settings.lp");
     if (fp.isExistingFile()) {
@@ -85,10 +85,12 @@ void BackgroundImageSettings::tryLoadFromDir(const FilePath& dir) noexcept {
                            deserialize<qreal>(root->getChild("dpi/@1")));
       offset = Point(root->getChild("offset"));
       rotation = deserialize<Angle>(root->getChild("rotation/@0"));
+      return true;
     }
   } catch (const Exception& e) {
     qWarning() << "Failed to load background image data:" << e.getMsg();
   }
+  return false;
 }
 
 void BackgroundImageSettings::saveToDir(const FilePath& dir) noexcept {
@@ -152,7 +154,7 @@ BackgroundImageSetupDialog::BackgroundImageSetupDialog(
   connect(mUi->buttonBox, &QDialogButtonBox::rejected, this,
           &BackgroundImageSetupDialog::reject);
   connect(mUi->btnScreenshot, &QPushButton::clicked, this,
-          &BackgroundImageSetupDialog::takeScreenshot);
+          &BackgroundImageSetupDialog::startScreenshot);
   connect(mUi->btnPaste, &QPushButton::clicked, this,
           &BackgroundImageSetupDialog::pasteFromClipboard);
   connect(mUi->btnOpen, &QPushButton::clicked, this,
@@ -203,7 +205,13 @@ BackgroundImageSetupDialog::~BackgroundImageSetupDialog() noexcept {
 
 void BackgroundImageSetupDialog::setSettings(
     const BackgroundImageSettings& s) noexcept {
-  mImage = s.image;
+  QImage image = s.image;
+  // If no image was loaded but is available in clipboard, use it.
+  if (image.isNull()) {
+    image = qApp->clipboard()->image();
+  }
+  setImage(image);
+
   mUi->spbxReferenceX->setValue(s.referencePos.x());
   mUi->spbxReferenceY->setValue(s.referencePos.y());
   mUi->spbxDpiX->setValue(s.dpi.first);
@@ -211,6 +219,7 @@ void BackgroundImageSetupDialog::setSettings(
   mUi->edtOffsetX->setValue(s.offset.getX());
   mUi->edtOffsetY->setValue(s.offset.getY());
   mUi->edtRotation->setValue(s.rotation);
+
   QTimer::singleShot(10, this, &BackgroundImageSetupDialog::updateImageLabel);
 }
 
@@ -233,6 +242,7 @@ BackgroundImageSettings BackgroundImageSetupDialog::getSettings()
 void BackgroundImageSetupDialog::keyPressEvent(QKeyEvent* event) noexcept {
   if ((mState != State::Idle) && (event->key() == Qt::Key_Escape)) {
     setState(State::Idle);
+    updateImageLabel();
     event->accept();
     return;
   }
@@ -261,6 +271,7 @@ bool BackgroundImageSetupDialog::eventFilter(QObject* obj, QEvent* e) noexcept {
       mMeasurePos2 = pos;
       setState(State::MeasureStep3);
     }
+    updateImageLabel();
   } else if (e->type() == QEvent::Resize) {
     updateImageLabel();
   }
@@ -268,17 +279,88 @@ bool BackgroundImageSetupDialog::eventFilter(QObject* obj, QEvent* e) noexcept {
   return QDialog::eventFilter(obj, e);
 }
 
+void BackgroundImageSetupDialog::startScreenshot() noexcept {
+  QList<QScreen*> screens = QGuiApplication::screens();
+  mScreen = screens.value(0);
+  if (screens.count() > 1) {
+    QMenu menu;
+    QHash<QAction*, QScreen*> screenMap;
+    for (QScreen* screen : screens) {
+      screenMap.insert(menu.addAction(tr("Screen %1: %2")
+                                          .arg(screenMap.count() + 1)
+                                          .arg(screen->model())),
+                       screen);
+    }
+    mScreen = screenMap.value(menu.exec(QCursor::pos()));
+    if (!mScreen) return;
+  }
+
+  mCountdownSecs = 3;
+  QTimer::singleShot(1000, this, &BackgroundImageSetupDialog::screenshotCountdownTick);
+}
+
+void BackgroundImageSetupDialog::screenshotCountdownTick() noexcept {
+  --mCountdownSecs;
+  if (mCountdownSecs <= 0) {
+    takeScreenshot();
+  } else {
+    QTimer::singleShot(1000, this, &BackgroundImageSetupDialog::screenshotCountdownTick);
+  }
+}
+
 void BackgroundImageSetupDialog::takeScreenshot() noexcept {
-  emit settingsModified();
+  if (mScreen) {
+      QPixmap pixmap = mScreen->grabWindow(0);
+    if (pixmap.isNull()) {
+      QMessageBox::critical(
+          this, tr("Error"),
+          tr("Could not take a screenshot. Note that this feature does not work "
+             "on some systems due to security mechanisms."));
+    } else {
+      setImage(pixmap.toImage());
+    }
+  }
 }
 
 void BackgroundImageSetupDialog::pasteFromClipboard() noexcept {
-  mImage = qApp->clipboard()->image();
-  updateImageLabel();
-  emit settingsModified();
+  QImage image = qApp->clipboard()->image();
+  if (image.isNull()) {
+    QMessageBox::warning(
+        this, tr("No image in clipboard"),
+        tr("Please make sure to copy an image into the clipboard."));
+  }
+  setImage(image);
 }
 
 void BackgroundImageSetupDialog::loadFromFile() noexcept {
+  QString extensionsStr;
+  foreach (const QString& ext, QImageReader::supportedImageFormats()) {
+    extensionsStr += "*." % ext % " ";
+  }
+
+  QSettings cs;
+  QString key = mSettingsPrefix % "/file";
+  QString fp = cs.value(key, QDir::homePath()).toString();
+  fp = FileDialog::getOpenFileName(parentWidget(), tr("Choose image"), fp,
+                                   extensionsStr);
+  if (!fp.isEmpty()) {
+    cs.setValue(key, fp);
+  }
+  QImage image;
+  if (!image.load(fp)) {
+    QMessageBox::warning(this, tr("Error"),
+                         tr("Failed to open the selected image file."));
+  }
+  setImage(image);
+}
+
+void BackgroundImageSetupDialog::setImage(const QImage& image) noexcept {
+  mImage = image;
+  mUi->spbxReferenceX->setValue(image.width() / 2);
+  mUi->spbxReferenceY->setValue(image.height() / 2);
+  mUi->spbxDpiX->setValue(image.width());
+  mUi->spbxDpiY->setValue(image.width());
+  updateImageLabel();
   emit settingsModified();
 }
 

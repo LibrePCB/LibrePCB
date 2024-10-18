@@ -47,14 +47,14 @@ class BackgroundImageSetupDialog;
  ******************************************************************************/
 
 struct BackgroundImageSettings {
-  bool enabled = true;  ///< Whether the background is enabled or not
+  bool enabled = false;  ///< Whether the background is enabled or not
   QImage image;  ///< The original loaded image
   QPointF referencePos;  ///< Reference in #image [pixels]
   std::pair<qreal, qreal> dpi = {0, 0};  ///< Scale X/Y [dpi]
   Point offset;  ///< Destination scene position of #referencePos
   Angle rotation;  ///< Rotation in scene
 
-  void tryLoadFromDir(const FilePath& dir) noexcept;
+  bool tryLoadFromDir(const FilePath& dir) noexcept;
   void saveToDir(const FilePath& dir) noexcept;
 
   bool operator==(const BackgroundImageSettings& rhs) const noexcept;
@@ -101,9 +101,12 @@ signals:
 private:
   void keyPressEvent(QKeyEvent* event) noexcept override;
   bool eventFilter(QObject* obj, QEvent* e) noexcept override;
+  void startScreenshot() noexcept;
+  void screenshotCountdownTick() noexcept;
   void takeScreenshot() noexcept;
   void pasteFromClipboard() noexcept;
   void loadFromFile() noexcept;
+  void setImage(const QImage& image) noexcept;
   void updateImageLabel() noexcept;
   void setState(State state) noexcept;
 
@@ -115,6 +118,8 @@ private:
   QPointF mMeasurePos1;  // In image pixel coordinates
   QPointF mMeasurePos2;  // In image pixel coordinates
   QPointF mCurrentCursorPos;  // In image pixel coordinates
+  QPointer<QScreen> mScreen;
+  int mCountdownSecs;
 };
 
 /*******************************************************************************
