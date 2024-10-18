@@ -264,6 +264,10 @@ PackageEditorWidget::~PackageEditorWidget() noexcept {
  *  Getters
  ******************************************************************************/
 
+bool PackageEditorWidget::isBackgroundImageSet() const noexcept {
+  return mBackgroundImageSettings->enabled;
+}
+
 QSet<EditorWidgetBase::Feature> PackageEditorWidget::getAvailableFeatures()
     const noexcept {
   QSet<EditorWidgetBase::Feature> features = {
@@ -476,34 +480,39 @@ bool PackageEditorWidget::decreaseGridInterval() noexcept {
   return true;
 }
 
-bool PackageEditorWidget::setBackgroundImage() noexcept {
-  toggle3DMode(false);
+bool PackageEditorWidget::toggleBackgroundImage() noexcept {
+  if (mBackgroundImageSettings->enabled) {
+    mBackgroundImageSettings->enabled = false;
+  } else {
+    toggle3DMode(false);
 
-  // Restore current settings on cancel.
-  BackgroundImageSettings backup = *mBackgroundImageSettings;
-  auto sg = scopeGuard([&]() {
-    *mBackgroundImageSettings = backup;
-    applyBackgroundImageSettings();
-  });
+    // Restore current settings on cancel.
+    BackgroundImageSettings backup = *mBackgroundImageSettings;
+    auto sg = scopeGuard([&]() {
+      *mBackgroundImageSettings = backup;
+      applyBackgroundImageSettings();
+    });
 
-  // Show dialog.
-  BackgroundImageSetupDialog dlg("package_editor", this);
-  dlg.setSettings(*mBackgroundImageSettings);
-  connect(&dlg, &BackgroundImageSetupDialog::settingsModified, this, [&]() {
-    *mBackgroundImageSettings = dlg.getSettings();
-    applyBackgroundImageSettings();
-  });
-  if (dlg.exec() != QDialog::Accepted) {
-    return true;  // Aborted.
-  }
-  if (dlg.getSettings() == backup) {
-    return true;  // No change.
+    // Show dialog.
+    BackgroundImageSetupDialog dlg("package_editor", this);
+    mBackgroundImageSettings->enabled = true;
+    dlg.setSettings(*mBackgroundImageSettings);
+    connect(&dlg, &BackgroundImageSetupDialog::settingsModified, this, [&]() {
+      *mBackgroundImageSettings = dlg.getSettings();
+      applyBackgroundImageSettings();
+    });
+    if (dlg.exec() != QDialog::Accepted) {
+      return false;  // Aborted.
+    }
+
+    // Keep settings.
+    sg.dismiss();
   }
 
   // Store new settings.
   mBackgroundImageSettings->saveToDir(getBackgroundImageCacheDir());
-  sg.dismiss();
-  return true;
+  applyBackgroundImageSettings();
+  return mBackgroundImageSettings->enabled;
 }
 
 /*******************************************************************************

@@ -580,6 +580,14 @@ void LibraryEditor::createActions() noexcept {
   mActionGridDecrease.reset(cmd.gridDecrease.createAction(this, this, [this]() {
     if (mCurrentEditorWidget) mCurrentEditorWidget->decreaseGridInterval();
   }));
+  mActionSetBgImage.reset(
+      cmd.setBackgroundImage.createAction(this, this, [this]() {
+        if (mCurrentEditorWidget) {
+          const bool enabled = mCurrentEditorWidget->toggleBackgroundImage();
+          mActionSetBgImage->setCheckable(enabled);
+          mActionSetBgImage->setChecked(enabled);
+        }
+      }));
   mActionZoomFit.reset(cmd.zoomFitContent.createAction(this, this, [this]() {
     if (mCurrentEditorWidget) mCurrentEditorWidget->zoomAll();
   }));
@@ -592,12 +600,6 @@ void LibraryEditor::createActions() noexcept {
   mActionToggle3D.reset(cmd.toggle3d.createAction(this, this, [this]() {
     if (mCurrentEditorWidget) mCurrentEditorWidget->toggle3D();
   }));
-  mActionSetBgImage.reset(
-      cmd.setBackgroundImage.createAction(this, this, [this]() {
-        if (mCurrentEditorWidget) {
-          mCurrentEditorWidget->setBackgroundImage();
-        }
-      }));
   mActionUndo.reset(cmd.undo.createAction(this));
   mActionRedo.reset(cmd.redo.createAction(this));
   mActionCut.reset(cmd.clipboardCut.createAction(this, this, [this]() {
@@ -791,10 +793,10 @@ void LibraryEditor::createToolBars() noexcept {
   mToolBarView.reset(new QToolBar(tr("View"), this));
   mToolBarView->setObjectName("toolBarView");
   mToolBarView->addAction(mActionGridProperties.data());
+  mToolBarView->addAction(mActionSetBgImage.data());
   mToolBarView->addAction(mActionZoomIn.data());
   mToolBarView->addAction(mActionZoomOut.data());
   mToolBarView->addAction(mActionZoomFit.data());
-  mToolBarView->addAction(mActionSetBgImage.data());
   mToolBarView->addAction(mActionToggle3D.data());
   addToolBar(Qt::TopToolBarArea, mToolBarView.data());
 
@@ -930,12 +932,12 @@ void LibraryEditor::createMenus() noexcept {
   mb.addAction(mActionGridProperties);
   mb.addAction(mActionGridIncrease.data());
   mb.addAction(mActionGridDecrease.data());
+  mb.addAction(mActionSetBgImage);
   mb.addSeparator();
   mb.addAction(mActionZoomIn);
   mb.addAction(mActionZoomOut);
   mb.addAction(mActionZoomFit);
   mb.addSeparator();
-  mb.addAction(mActionSetBgImage);
   mb.addAction(mActionToggle3D);
 
   // Tools.
@@ -1009,10 +1011,10 @@ void LibraryEditor::setAvailableFeatures(
   mActionRotateCcw->setEnabled(features.contains(Feature::Rotate));
   mActionRotateCw->setEnabled(features.contains(Feature::Rotate));
   mActionSelectAll->setEnabled(features.contains(Feature::SelectGraphics));
+  mActionSetBgImage->setEnabled(features.contains(Feature::BackgroundImage));
   mActionZoomFit->setEnabled(features.contains(Feature::GraphicsView));
   mActionZoomIn->setEnabled(features.contains(Feature::GraphicsView));
   mActionZoomOut->setEnabled(features.contains(Feature::GraphicsView));
-  mActionSetBgImage->setEnabled(features.contains(Feature::BackgroundImage));
   mActionToggle3D->setEnabled(features.contains(Feature::OpenGlView));
   mActionMirrorHorizontal->setEnabled(features.contains(Feature::Mirror));
   mActionMirrorVertical->setEnabled(features.contains(Feature::Mirror));
@@ -1046,10 +1048,14 @@ void LibraryEditor::setActiveEditorWidget(EditorWidgetBase* widget) {
     mCurrentEditorWidget->connectEditor(*mUndoStackActionGroup,
                                         *mToolsActionGroup, *mToolBarCommand,
                                         *mUi->statusBar);
+    const bool bgImageSet = mCurrentEditorWidget->isBackgroundImageSet();
+    mActionSetBgImage->setCheckable(bgImageSet);
+    mActionSetBgImage->setChecked(bgImageSet);
     setAvailableFeatures(mCurrentEditorWidget->getAvailableFeatures());
     connect(mCurrentEditorWidget, &EditorWidgetBase::availableFeaturesChanged,
             this, &LibraryEditor::setAvailableFeatures);
   } else {
+    mActionSetBgImage->setChecked(false);
     setAvailableFeatures({});
   }
   updateTabTitles();  // force updating the "Save" action title

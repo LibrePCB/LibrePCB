@@ -76,6 +76,7 @@ public:
   ~PackageEditorWidget() noexcept;
 
   // Getters
+  bool isBackgroundImageSet() const noexcept override;
   QSet<Feature> getAvailableFeatures() const noexcept override;
 
   // Setters
@@ -113,7 +114,7 @@ public slots:
   bool editGridProperties() noexcept override;
   bool increaseGridInterval() noexcept override;
   bool decreaseGridInterval() noexcept override;
-  bool setBackgroundImage() noexcept override;
+  bool toggleBackgroundImage() noexcept override;
 
 private:  // Methods
   void updateMetadata() noexcept;

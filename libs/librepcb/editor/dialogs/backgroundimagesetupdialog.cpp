@@ -162,10 +162,9 @@ BackgroundImageSetupDialog::BackgroundImageSetupDialog(
   connect(mUi->btnMeasureScale, &QToolButton::clicked, this,
           [this]() { setState(State::MeasureStep1); });
   connect(mUi->btnMeasureFinish, &QToolButton::clicked, this, [this]() {
-    mUi->spbxDpiX->setValue(mMeasuredDistance.x() /
-                            mUi->edtMeasureX->getValue().toInch());
-    mUi->spbxDpiY->setValue(mMeasuredDistance.y() /
-                            mUi->edtMeasureY->getValue().toInch());
+    const QPointF diff = mMeasurePos2 - mMeasurePos1;
+    mUi->spbxDpiX->setValue(diff.x() / mUi->edtMeasureX->getValue().toInch());
+    mUi->spbxDpiY->setValue(diff.y() / mUi->edtMeasureY->getValue().toInch());
     setState(State::Idle);
   });
 
@@ -182,8 +181,6 @@ BackgroundImageSetupDialog::BackgroundImageSetupDialog(
   connect(mUi->edtOffsetY, &LengthEdit::valueChanged, this,
           &BackgroundImageSetupDialog::settingsModified);
   connect(mUi->edtRotation, &AngleEdit::valueChanged, this,
-          &BackgroundImageSetupDialog::settingsModified);
-  connect(mUi->cbxEnable, &QCheckBox::toggled, this,
           &BackgroundImageSetupDialog::settingsModified);
 
   // Reset state.
@@ -206,7 +203,6 @@ BackgroundImageSetupDialog::~BackgroundImageSetupDialog() noexcept {
 
 void BackgroundImageSetupDialog::setSettings(
     const BackgroundImageSettings& s) noexcept {
-  mUi->cbxEnable->setChecked(s.enabled);
   mImage = s.image;
   mUi->spbxReferenceX->setValue(s.referencePos.x());
   mUi->spbxReferenceY->setValue(s.referencePos.y());
@@ -221,7 +217,7 @@ void BackgroundImageSetupDialog::setSettings(
 BackgroundImageSettings BackgroundImageSetupDialog::getSettings()
     const noexcept {
   return BackgroundImageSettings{
-      mUi->cbxEnable->isChecked(),
+      true,
       mImage,
       QPointF(mUi->spbxReferenceX->value(), mUi->spbxReferenceY->value()),
       std::make_pair(mUi->spbxDpiX->value(), mUi->spbxDpiY->value()),
@@ -247,24 +243,22 @@ void BackgroundImageSetupDialog::keyPressEvent(QKeyEvent* event) noexcept {
 bool BackgroundImageSetupDialog::eventFilter(QObject* obj, QEvent* e) noexcept {
   if (e->type() == QEvent::MouseMove) {
     QMouseEvent* me = static_cast<QMouseEvent*>(e);
-    const QPointF pos = me->position() / mViewScaleFactor;
-    if (mState == State::SelectReference) {
-      mCursorPos = pos;
+    mCurrentCursorPos = me->position() / mViewScaleFactor;
+    if (mState != State::Idle) {
       updateImageLabel();
     }
-  } else
-  if (e->type() == QEvent::MouseButtonPress) {
+  } else if (e->type() == QEvent::MouseButtonPress) {
     QMouseEvent* me = static_cast<QMouseEvent*>(e);
     const QPointF pos = me->position() / mViewScaleFactor;
     if (mState == State::SelectReference) {
-      mUi->spbxReferenceX->setValue(mCursorPos.x());
-      mUi->spbxReferenceY->setValue(mCursorPos.y());
+      mUi->spbxReferenceX->setValue(mCurrentCursorPos.x());
+      mUi->spbxReferenceY->setValue(mCurrentCursorPos.y());
       setState(State::Idle);
     } else if (mState == State::MeasureStep1) {
-      mCursorPos = pos;
+      mMeasurePos1 = pos;
       setState(State::MeasureStep2);
     } else if (mState == State::MeasureStep2) {
-      mMeasuredDistance = pos - mCursorPos;
+      mMeasurePos2 = pos;
       setState(State::MeasureStep3);
     }
   } else if (e->type() == QEvent::Resize) {
@@ -302,14 +296,37 @@ void BackgroundImageSetupDialog::updateImageLabel() noexcept {
       mImage.size() * mViewScaleFactor, Qt::KeepAspectRatio,
       Qt::SmoothTransformation);
 
-  // Draw origin cross.
+  // Draw content.
   {
-   const QPointF pos = ((mState == State::SelectReference) ? mCursorPos : QPointF(mUi->spbxReferenceX->value(), mUi->spbxReferenceY->value())) * mViewScaleFactor;
-    const qreal r = 30;
-   QPainter painter(&pixmap);
-   painter.setPen(QPen(Qt::red, 0));
-  painter.drawLine(pos.x() - r, pos.y(), pos.x()+r, pos.y());
-  painter.drawLine(pos.x(), pos.y() - r, pos.x(), pos.y() + r);
+    QPainter painter(&pixmap);
+
+    auto drawCross = [&](const QColor& color, QPointF pos) {
+      const qreal r = 30;
+      painter.setPen(QPen(color, 0));
+      pos *= mViewScaleFactor;
+      painter.drawLine(pos.x() - r, pos.y(), pos.x() + r, pos.y());
+      painter.drawLine(pos.x(), pos.y() - r, pos.x(), pos.y() + r);
+      painter.drawEllipse(pos, r / 2, r / 2);
+    };
+
+    if (mState == State::SelectReference) {
+      drawCross(Qt::red, mCurrentCursorPos);
+    } else {
+      drawCross(
+          Qt::red,
+          QPointF(mUi->spbxReferenceX->value(), mUi->spbxReferenceY->value()));
+    }
+    if ((mState >= State::MeasureStep1) && (mState <= State::MeasureStep3)) {
+      const QPointF p1 =
+          (mState > State::MeasureStep1) ? mMeasurePos1 : mCurrentCursorPos;
+      const QPointF p2 =
+          (mState > State::MeasureStep2) ? mMeasurePos2 : mCurrentCursorPos;
+      drawCross(Qt::blue, p1);
+      if (mState >= State::MeasureStep2) {
+        drawCross(Qt::blue, p2);
+        painter.drawLine(p1 * mViewScaleFactor, p2 * mViewScaleFactor);
+      }
+    }
   }
 
   // Show image.
@@ -338,8 +355,7 @@ void BackgroundImageSetupDialog::setState(State state) noexcept {
   mUi->edtOffsetX->setEnabled(state == State::Idle);
   mUi->edtOffsetY->setEnabled(state == State::Idle);
   mUi->edtRotation->setEnabled(state == State::Idle);
-  mUi->cbxEnable->setEnabled(state == State::Idle);
-  if (state != State::Idle) {
+  if ((state != State::Idle) && (state != State::MeasureStep3)) {
     mUi->lblImage->setCursor(Qt::BlankCursor);
   } else {
     mUi->lblImage->unsetCursor();

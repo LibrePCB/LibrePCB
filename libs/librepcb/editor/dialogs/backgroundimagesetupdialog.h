@@ -112,8 +112,9 @@ private:
   State mState;
   QImage mImage;
   qreal mViewScaleFactor;
-  QPointF mCursorPos;
-  QPointF mMeasuredDistance;
+  QPointF mMeasurePos1;  // In image pixel coordinates
+  QPointF mMeasurePos2;  // In image pixel coordinates
+  QPointF mCurrentCursorPos;  // In image pixel coordinates
 };
 
 /*******************************************************************************
