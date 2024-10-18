@@ -46,6 +46,7 @@ class PackageModel;
 
 namespace editor {
 
+class BackgroundImageSettings;
 class GraphicsScene;
 class OpenGlSceneBuilder;
 class OpenGlView;
@@ -112,6 +113,7 @@ public slots:
   bool editGridProperties() noexcept override;
   bool increaseGridInterval() noexcept override;
   bool decreaseGridInterval() noexcept override;
+  bool setBackgroundImage() noexcept override;
 
 private:  // Methods
   void updateMetadata() noexcept;
@@ -143,6 +145,8 @@ private:  // Methods
                          Theme::GridStyle style) noexcept;
   void toggle3DMode(bool enable) noexcept;
   bool is3DModeEnabled() const noexcept;
+  FilePath getBackgroundImageCacheDir() const noexcept;
+  void applyBackgroundImageSettings() noexcept;
 
 private:  // Data
   QScopedPointer<Ui::PackageEditorWidget> mUi;
@@ -151,10 +155,12 @@ private:  // Data
   QScopedPointer<GraphicsScene> mGraphicsScene;
   QScopedPointer<OpenGlSceneBuilder> mOpenGlSceneBuilder;
   bool mOpenGlSceneBuildScheduled;
+  QScopedPointer<BackgroundImageSettings> mBackgroundImageSettings;
   LengthUnit mLengthUnit;
   std::unique_ptr<Package> mPackage;
   std::shared_ptr<Footprint> mCurrentFootprint;
   std::shared_ptr<PackageModel> mCurrentModel;
+  QScopedPointer<QGraphicsPixmapItem> mBackgroundImageGraphicsItem;
 
   // broken interface detection
   QSet<Uuid> mOriginalPadUuids;

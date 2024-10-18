@@ -31,6 +31,9 @@ add_library(
   dialogs/aboutdialog.cpp
   dialogs/aboutdialog.h
   dialogs/aboutdialog.ui
+  dialogs/backgroundimagesetupdialog.cpp
+  dialogs/backgroundimagesetupdialog.h
+  dialogs/backgroundimagesetupdialog.ui
   dialogs/circlepropertiesdialog.cpp
   dialogs/circlepropertiesdialog.h
   dialogs/circlepropertiesdialog.ui

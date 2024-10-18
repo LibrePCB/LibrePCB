@@ -99,6 +99,7 @@ public:
     Filter,
     GraphicsView,
     OpenGlView,
+    BackgroundImage,
     ExportGraphics,
     GenerateOutline,
     GenerateCourtyard,
@@ -185,6 +186,7 @@ public slots:
   virtual bool editGridProperties() noexcept { return false; }
   virtual bool increaseGridInterval() noexcept { return false; }
   virtual bool decreaseGridInterval() noexcept { return false; }
+  virtual bool setBackgroundImage() noexcept { return false; }
 
 protected:  // Methods
   void setupInterfaceBrokenWarningWidget(QWidget& widget) noexcept;

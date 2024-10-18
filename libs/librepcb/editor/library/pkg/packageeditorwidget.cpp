@@ -27,6 +27,7 @@
 #include "../../cmd/cmdholeedit.h"
 #include "../../cmd/cmdpolygonedit.h"
 #include "../../cmd/cmdstroketextedit.h"
+#include "../../dialogs/backgroundimagesetupdialog.h"
 #include "../../dialogs/gridsettingsdialog.h"
 #include "../../editorcommandset.h"
 #include "../../graphics/graphicsscene.h"
@@ -51,6 +52,7 @@
 #include <librepcb/core/library/pkg/packagecheckmessages.h>
 #include <librepcb/core/types/pcbcolor.h>
 #include <librepcb/core/utils/clipperhelpers.h>
+#include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
@@ -72,7 +74,8 @@ PackageEditorWidget::PackageEditorWidget(const Context& context,
   : EditorWidgetBase(context, fp, parent),
     mUi(new Ui::PackageEditorWidget),
     mGraphicsScene(new GraphicsScene()),
-    mOpenGlSceneBuildScheduled(false) {
+    mOpenGlSceneBuildScheduled(false),
+    mBackgroundImageSettings(new BackgroundImageSettings()) {
   mUi->setupUi(this);
   mUi->lstMessages->setHandler(this);
   mUi->lstMessages->setReadOnly(mContext.readOnly);
@@ -233,6 +236,10 @@ PackageEditorWidget::PackageEditorWidget(const Context& context,
           &PackageEditorWidget::setStatusBarMessage);
   currentFootprintChanged(0);  // small hack to select the first footprint...
 
+  // Load background from cache.
+  mBackgroundImageSettings->tryLoadFromDir(getBackgroundImageCacheDir());
+  applyBackgroundImageSettings();
+
   // Last but not least, connect the graphics scene events with the FSM.
   mUi->graphicsView->setEventHandlerObject(this);
 }
@@ -263,6 +270,7 @@ QSet<EditorWidgetBase::Feature> PackageEditorWidget::getAvailableFeatures()
       EditorWidgetBase::Feature::Close,
       EditorWidgetBase::Feature::GraphicsView,
       EditorWidgetBase::Feature::OpenGlView,
+      EditorWidgetBase::Feature::BackgroundImage,
       EditorWidgetBase::Feature::ExportGraphics,
       EditorWidgetBase::Feature::GenerateOutline,
       EditorWidgetBase::Feature::GenerateCourtyard,
@@ -465,6 +473,36 @@ bool PackageEditorWidget::decreaseGridInterval() noexcept {
     setGridProperties(PositiveLength(interval / 2), mLengthUnit,
                       mUi->graphicsView->getGridStyle());
   }
+  return true;
+}
+
+bool PackageEditorWidget::setBackgroundImage() noexcept {
+  toggle3DMode(false);
+
+  // Restore current settings on cancel.
+  BackgroundImageSettings backup = *mBackgroundImageSettings;
+  auto sg = scopeGuard([&]() {
+    *mBackgroundImageSettings = backup;
+    applyBackgroundImageSettings();
+  });
+
+  // Show dialog.
+  BackgroundImageSetupDialog dlg("package_editor", this);
+  dlg.setSettings(*mBackgroundImageSettings);
+  connect(&dlg, &BackgroundImageSetupDialog::settingsModified, this, [&]() {
+    *mBackgroundImageSettings = dlg.getSettings();
+    applyBackgroundImageSettings();
+  });
+  if (dlg.exec() != QDialog::Accepted) {
+    return true;  // Aborted.
+  }
+  if (dlg.getSettings() == backup) {
+    return true;  // No change.
+  }
+
+  // Store new settings.
+  mBackgroundImageSettings->saveToDir(getBackgroundImageCacheDir());
+  sg.dismiss();
   return true;
 }
 
@@ -1153,6 +1191,61 @@ void PackageEditorWidget::toggle3DMode(bool enable) noexcept {
 
 bool PackageEditorWidget::is3DModeEnabled() const noexcept {
   return mUi->modelListEditorWidget->isVisible();
+}
+
+FilePath PackageEditorWidget::getBackgroundImageCacheDir() const noexcept {
+  return Application::getCacheDir()
+      .getPathTo("backgrounds")
+      .getPathTo(mPackage->getUuid().toStr());
+}
+
+void PackageEditorWidget::applyBackgroundImageSettings() noexcept {
+  mBackgroundImageGraphicsItem.reset();
+
+  const BackgroundImageSettings& s = *mBackgroundImageSettings;
+  if (s.enabled && (!s.image.isNull())) {
+    QImage image = s.image.convertToFormat(QImage::Format_ARGB32);
+
+    // If the image background color is the inverse of the graphics view
+    // background, invert the image to get good contrast for lines in the image.
+    const Theme& theme = mContext.workspace.getSettings().themes.getActive();
+    const QColor bgColor =
+        theme.getColor(Theme::Color::sBoardBackground).getPrimaryColor();
+    if (std::abs(image.pixelColor(0, 0).lightnessF() - bgColor.lightnessF()) >
+        0.5) {
+      image.invertPixels();
+    }
+
+    // Make the image background transparent.
+    const QColor imgBgColor = image.pixelColor(0, 0);
+    for (int i = 0; i < image.width(); ++i) {
+      for (int k = 0; k < image.height(); ++k) {
+        if (image.pixelColor(i, k) == imgBgColor) {
+          image.setPixelColor(i, k, Qt::transparent);
+        }
+      }
+    }
+
+    // Calculate the transform.
+    const qreal scaleFactorX = Length(25400000).toPx() / s.dpi.first;
+    const qreal scaleFactorY = Length(25400000).toPx() / s.dpi.second;
+    QTransform t;
+    t.rotate(-s.rotation.toDeg());
+    t.translate(-s.referencePos.x() * scaleFactorX,
+                -s.referencePos.y() * scaleFactorY);
+    t.scale(scaleFactorX, scaleFactorY);
+
+    // Add the image to the graphics scene.
+    mBackgroundImageGraphicsItem.reset(
+        new QGraphicsPixmapItem(QPixmap::fromImage(image)));
+    mBackgroundImageGraphicsItem->setTransformationMode(
+        Qt::SmoothTransformation);
+    mBackgroundImageGraphicsItem->setZValue(-1000);
+    mBackgroundImageGraphicsItem->setOpacity(0.8);
+    mBackgroundImageGraphicsItem->setTransform(t);
+    mBackgroundImageGraphicsItem->setPos(s.offset.toPxQPointF());
+    mGraphicsScene->addItem(*mBackgroundImageGraphicsItem);
+  }
 }
 
 /*******************************************************************************

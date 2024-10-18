@@ -592,6 +592,12 @@ void LibraryEditor::createActions() noexcept {
   mActionToggle3D.reset(cmd.toggle3d.createAction(this, this, [this]() {
     if (mCurrentEditorWidget) mCurrentEditorWidget->toggle3D();
   }));
+  mActionSetBgImage.reset(
+      cmd.setBackgroundImage.createAction(this, this, [this]() {
+        if (mCurrentEditorWidget) {
+          mCurrentEditorWidget->setBackgroundImage();
+        }
+      }));
   mActionUndo.reset(cmd.undo.createAction(this));
   mActionRedo.reset(cmd.redo.createAction(this));
   mActionCut.reset(cmd.clipboardCut.createAction(this, this, [this]() {
@@ -788,6 +794,7 @@ void LibraryEditor::createToolBars() noexcept {
   mToolBarView->addAction(mActionZoomIn.data());
   mToolBarView->addAction(mActionZoomOut.data());
   mToolBarView->addAction(mActionZoomFit.data());
+  mToolBarView->addAction(mActionSetBgImage.data());
   mToolBarView->addAction(mActionToggle3D.data());
   addToolBar(Qt::TopToolBarArea, mToolBarView.data());
 
@@ -928,6 +935,7 @@ void LibraryEditor::createMenus() noexcept {
   mb.addAction(mActionZoomOut);
   mb.addAction(mActionZoomFit);
   mb.addSeparator();
+  mb.addAction(mActionSetBgImage);
   mb.addAction(mActionToggle3D);
 
   // Tools.
@@ -1004,6 +1012,7 @@ void LibraryEditor::setAvailableFeatures(
   mActionZoomFit->setEnabled(features.contains(Feature::GraphicsView));
   mActionZoomIn->setEnabled(features.contains(Feature::GraphicsView));
   mActionZoomOut->setEnabled(features.contains(Feature::GraphicsView));
+  mActionSetBgImage->setEnabled(features.contains(Feature::BackgroundImage));
   mActionToggle3D->setEnabled(features.contains(Feature::OpenGlView));
   mActionMirrorHorizontal->setEnabled(features.contains(Feature::Mirror));
   mActionMirrorVertical->setEnabled(features.contains(Feature::Mirror));
