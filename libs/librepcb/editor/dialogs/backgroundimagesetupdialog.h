@@ -108,6 +108,7 @@ private:
   void loadFromFile() noexcept;
   void setImage(const QImage& image) noexcept;
   void updateImageLabel() noexcept;
+  void setMessage(const QString& msg) noexcept;
   void setState(State state) noexcept;
 
   QScopedPointer<Ui::BackgroundImageSetupDialog> mUi;

@@ -26,9 +26,9 @@
             <string>Screenshot</string>
            </property>
            <property name="icon">
-              <iconset>
-               <normaloff>:/img/actions/export_pixmap.png</normaloff>:/img/actions/export_pixmap.png</iconset>
-             </property>
+            <iconset>
+             <normaloff>:/img/actions/export_pixmap.png</normaloff>:/img/actions/export_pixmap.png</iconset>
+           </property>
           </widget>
          </item>
          <item>
@@ -37,9 +37,9 @@
             <string>Paste</string>
            </property>
            <property name="icon">
-              <iconset>
-               <normaloff>:/img/actions/paste.png</normaloff>:/img/actions/paste.png</iconset>
-             </property>
+            <iconset>
+             <normaloff>:/img/actions/paste.png</normaloff>:/img/actions/paste.png</iconset>
+           </property>
           </widget>
          </item>
          <item>
@@ -48,9 +48,9 @@
             <string>Open</string>
            </property>
            <property name="icon">
-              <iconset>
-               <normaloff>:/img/actions/open.png</normaloff>:/img/actions/open.png</iconset>
-             </property>
+            <iconset>
+             <normaloff>:/img/actions/open.png</normaloff>:/img/actions/open.png</iconset>
+           </property>
           </widget>
          </item>
         </layout>
@@ -257,14 +257,25 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="font">
+           <font>
+            <pointsize>20</pointsize>
+           </font>
+          </property>
           <property name="mouseTracking">
            <bool>true</bool>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">color: gray;</string>
           </property>
           <property name="text">
            <string notr="true"/>
           </property>
           <property name="alignment">
            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
           </property>
          </widget>
         </item>

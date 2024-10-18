@@ -295,8 +295,8 @@ void BackgroundImageSetupDialog::startScreenshot() noexcept {
     if (!mScreen) return;
   }
 
-  mCountdownSecs = 3;
-  QTimer::singleShot(1000, this, &BackgroundImageSetupDialog::screenshotCountdownTick);
+  mCountdownSecs = 4;
+  screenshotCountdownTick();
 }
 
 void BackgroundImageSetupDialog::screenshotCountdownTick() noexcept {
@@ -304,22 +304,26 @@ void BackgroundImageSetupDialog::screenshotCountdownTick() noexcept {
   if (mCountdownSecs <= 0) {
     takeScreenshot();
   } else {
-    QTimer::singleShot(1000, this, &BackgroundImageSetupDialog::screenshotCountdownTick);
+    setMessage(QString::number(mCountdownSecs));
+    QTimer::singleShot(1000, this,
+                       &BackgroundImageSetupDialog::screenshotCountdownTick);
   }
 }
 
 void BackgroundImageSetupDialog::takeScreenshot() noexcept {
   if (mScreen) {
-      QPixmap pixmap = mScreen->grabWindow(0);
+    QPixmap pixmap = mScreen->grabWindow(0);
     if (pixmap.isNull()) {
-      QMessageBox::critical(
-          this, tr("Error"),
-          tr("Could not take a screenshot. Note that this feature does not work "
-             "on some systems due to security mechanisms."));
+      QMessageBox::critical(this, tr("Error"),
+                            tr("Could not take a screenshot. Note that this "
+                               "feature does not work "
+                               "on some systems due to security mechanisms."));
     } else {
       setImage(pixmap.toImage());
+      return;
     }
   }
+  updateImageLabel();
 }
 
 void BackgroundImageSetupDialog::pasteFromClipboard() noexcept {
@@ -366,7 +370,7 @@ void BackgroundImageSetupDialog::setImage(const QImage& image) noexcept {
 
 void BackgroundImageSetupDialog::updateImageLabel() noexcept {
   if ((mImage.isNull()) || (!mImage.width()) || (!mImage.height())) {
-    mUi->lblImage->setPixmap(QPixmap());
+    setMessage(tr("Load an image with one of the buttons on the left side."));
     return;
   }
 
@@ -412,7 +416,17 @@ void BackgroundImageSetupDialog::updateImageLabel() noexcept {
   }
 
   // Show image.
+  mUi->lblImage->setMargin(0);
+  mUi->lblImage->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+  mUi->lblImage->setText(QString());
   mUi->lblImage->setPixmap(pixmap);
+}
+
+void BackgroundImageSetupDialog::setMessage(const QString& msg) noexcept {
+  mUi->lblImage->setPixmap(QPixmap());
+  mUi->lblImage->setText(msg);
+  mUi->lblImage->setAlignment(Qt::AlignCenter);
+  mUi->lblImage->setMargin(50);
 }
 
 void BackgroundImageSetupDialog::setState(State state) noexcept {
