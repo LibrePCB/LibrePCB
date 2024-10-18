@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../widgets/if_graphicsvieweventhandler.h"
+
 #include <librepcb/core/types/angle.h>
 #include <librepcb/core/types/point.h>
 
@@ -68,7 +70,8 @@ struct BackgroundImageSettings {
 /**
  * @brief Dialog (GUI) to configure the background image of a 2D view
  */
-class BackgroundImageSetupDialog final : public QDialog {
+class BackgroundImageSetupDialog final : public QDialog,
+                                         private IF_GraphicsViewEventHandler {
   Q_OBJECT
 
   enum class State {
@@ -100,25 +103,27 @@ signals:
 
 private:
   void keyPressEvent(QKeyEvent* event) noexcept override;
-  bool eventFilter(QObject* obj, QEvent* e) noexcept override;
+  bool graphicsViewEventHandler(QEvent* event) noexcept override;
   void startScreenshot() noexcept;
   void screenshotCountdownTick() noexcept;
   void takeScreenshot() noexcept;
   void pasteFromClipboard() noexcept;
   void loadFromFile() noexcept;
   void setImage(const QImage& image) noexcept;
-  void updateImageLabel() noexcept;
+  void updateImage() noexcept;
+  void updateReferenceMarker() noexcept;
   void setMessage(const QString& msg) noexcept;
   void setState(State state) noexcept;
 
   QScopedPointer<Ui::BackgroundImageSetupDialog> mUi;
   const QString mSettingsPrefix;
+  QScopedPointer<QGraphicsPixmapItem> mImageGraphicsItem;
+  QScopedPointer<QGraphicsPathItem> mReferenceGraphicsItem;
+  QScopedPointer<QGraphicsPathItem> mMeasure1GraphicsItem;
+  QScopedPointer<QGraphicsPathItem> mMeasure2GraphicsItem;
+  QScopedPointer<QGraphicsLineItem> mMeasureLineGraphicsItem;
   State mState;
   QImage mImage;
-  qreal mViewScaleFactor;
-  QPointF mMeasurePos1;  // In image pixel coordinates
-  QPointF mMeasurePos2;  // In image pixel coordinates
-  QPointF mCurrentCursorPos;  // In image pixel coordinates
   QPointer<QScreen> mScreen;
   int mCountdownSecs;
 };

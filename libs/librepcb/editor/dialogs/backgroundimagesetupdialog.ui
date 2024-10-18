@@ -250,34 +250,7 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="QLabel" name="lblImage">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="font">
-           <font>
-            <pointsize>20</pointsize>
-           </font>
-          </property>
-          <property name="mouseTracking">
-           <bool>true</bool>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">color: gray;</string>
-          </property>
-          <property name="text">
-           <string notr="true"/>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-          </property>
-          <property name="wordWrap">
-           <bool>true</bool>
-          </property>
-         </widget>
+         <widget class="librepcb::editor::GraphicsView" name="graphicsView" native="true"/>
         </item>
        </layout>
       </widget>
@@ -307,6 +280,12 @@
    <class>librepcb::editor::AngleEdit</class>
    <extends>QWidget</extends>
    <header location="global">librepcb/editor/widgets/angleedit.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>librepcb::editor::GraphicsView</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/editor/widgets/graphicsview.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

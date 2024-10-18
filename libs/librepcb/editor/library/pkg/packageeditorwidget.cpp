@@ -493,9 +493,12 @@ bool PackageEditorWidget::toggleBackgroundImage() noexcept {
       applyBackgroundImageSettings();
     });
 
+    // Enable background image.
+    mBackgroundImageSettings->enabled = true;
+    applyBackgroundImageSettings();
+
     // Show dialog.
     BackgroundImageSetupDialog dlg("package_editor", this);
-    mBackgroundImageSettings->enabled = true;
     dlg.setSettings(*mBackgroundImageSettings);
     connect(&dlg, &BackgroundImageSetupDialog::settingsModified, this, [&]() {
       *mBackgroundImageSettings = dlg.getSettings();
