@@ -1255,7 +1255,7 @@ void PackageEditorWidget::applyBackgroundImageSettings() noexcept {
     mBackgroundImageGraphicsItem->setZValue(-1000);
     mBackgroundImageGraphicsItem->setOpacity(0.8);
     mBackgroundImageGraphicsItem->setTransform(t);
-    mBackgroundImageGraphicsItem->setPos(s.offset.toPxQPointF());
+    mBackgroundImageGraphicsItem->setPos(s.position.toPxQPointF());
     mGraphicsScene->addItem(*mBackgroundImageGraphicsItem);
   }
 }

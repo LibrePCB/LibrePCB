@@ -53,7 +53,7 @@ struct BackgroundImageSettings {
   QImage image;  ///< The original loaded image
   QPointF referencePos;  ///< Reference in #image [pixels]
   std::pair<qreal, qreal> dpi = {0, 0};  ///< Scale X/Y [dpi]
-  Point offset;  ///< Destination scene position of #referencePos
+  Point position;  ///< Destination scene position of #referencePos
   Angle rotation;  ///< Rotation in scene
 
   bool tryLoadFromDir(const FilePath& dir) noexcept;

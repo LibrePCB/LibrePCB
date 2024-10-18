@@ -84,7 +84,7 @@ bool BackgroundImageSettings::tryLoadFromDir(const FilePath& dir) noexcept {
                   deserialize<qreal>(root->getChild("reference/@1")));
       dpi = std::make_pair(deserialize<qreal>(root->getChild("dpi/@0")),
                            deserialize<qreal>(root->getChild("dpi/@1")));
-      offset = Point(root->getChild("offset"));
+      position = Point(root->getChild("position"));
       rotation = deserialize<Angle>(root->getChild("rotation/@0"));
       return true;
     }
@@ -112,7 +112,7 @@ void BackgroundImageSettings::saveToDir(const FilePath& dir) noexcept {
       dpiNode.appendChild(dpi.first);
       dpiNode.appendChild(dpi.second);
       root->ensureLineBreak();
-      offset.serialize(root->appendList("offset"));
+      position.serialize(root->appendList("position"));
       root->ensureLineBreak();
       root->appendChild("rotation", rotation);
       root->ensureLineBreak();
@@ -129,7 +129,7 @@ bool BackgroundImageSettings::operator==(
     const BackgroundImageSettings& rhs) const noexcept {
   return (enabled == rhs.enabled) && (image == rhs.image) &&
       (referencePos == rhs.referencePos) && (dpi == rhs.dpi) &&
-      (offset == rhs.offset) && (rotation == rhs.rotation);
+      (position == rhs.position) && (rotation == rhs.rotation);
 }
 
 bool BackgroundImageSettings::operator!=(
@@ -222,9 +222,9 @@ BackgroundImageSetupDialog::BackgroundImageSetupDialog(
           &BackgroundImageSetupDialog::settingsModified);
   connect(mUi->spbxDpiY, &QDoubleSpinBox::valueChanged, this,
           &BackgroundImageSetupDialog::settingsModified);
-  connect(mUi->edtOffsetX, &LengthEdit::valueChanged, this,
+  connect(mUi->edtPositionX, &LengthEdit::valueChanged, this,
           &BackgroundImageSetupDialog::settingsModified);
-  connect(mUi->edtOffsetY, &LengthEdit::valueChanged, this,
+  connect(mUi->edtPositionY, &LengthEdit::valueChanged, this,
           &BackgroundImageSetupDialog::settingsModified);
   connect(mUi->edtRotation, &AngleEdit::valueChanged, this,
           &BackgroundImageSetupDialog::settingsModified);
@@ -262,8 +262,8 @@ void BackgroundImageSetupDialog::setSettings(
   mUi->spbxReferenceY->setValue(s.referencePos.y());
   mUi->spbxDpiX->setValue(s.dpi.first);
   mUi->spbxDpiY->setValue(s.dpi.second);
-  mUi->edtOffsetX->setValue(s.offset.getX());
-  mUi->edtOffsetY->setValue(s.offset.getY());
+  mUi->edtPositionX->setValue(s.position.getX());
+  mUi->edtPositionY->setValue(s.position.getY());
   mUi->edtRotation->setValue(s.rotation);
 
   QTimer::singleShot(10, this, [this](){
@@ -278,7 +278,7 @@ BackgroundImageSettings BackgroundImageSetupDialog::getSettings()
       mImage,
       QPointF(mUi->spbxReferenceX->value(), mUi->spbxReferenceY->value()),
       std::make_pair(mUi->spbxDpiX->value(), mUi->spbxDpiY->value()),
-      Point(mUi->edtOffsetX->getValue(), mUi->edtOffsetY->getValue()),
+      Point(mUi->edtPositionX->getValue(), mUi->edtPositionY->getValue()),
       mUi->edtRotation->getValue(),
   };
 }
@@ -477,8 +477,8 @@ void BackgroundImageSetupDialog::setState(State state) noexcept {
   mUi->edtMeasureX->setEnabled(state == State::MeasureStep3);
   mUi->edtMeasureY->setEnabled(state == State::MeasureStep3);
   mUi->btnMeasureFinish->setEnabled(state == State::MeasureStep3);
-  mUi->edtOffsetX->setEnabled(state == State::Idle);
-  mUi->edtOffsetY->setEnabled(state == State::Idle);
+  mUi->edtPositionX->setEnabled(state == State::Idle);
+  mUi->edtPositionY->setEnabled(state == State::Idle);
   mUi->edtRotation->setEnabled(state == State::Idle);
   mMeasure1GraphicsItem->setVisible(state >= State::MeasureStep1);
   mMeasure2GraphicsItem->setVisible(state >= State::MeasureStep2);
