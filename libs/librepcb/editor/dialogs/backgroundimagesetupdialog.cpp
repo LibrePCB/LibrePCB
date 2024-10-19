@@ -211,18 +211,30 @@ BackgroundImageSetupDialog::BackgroundImageSetupDialog(
     setState(State::MeasureStep1);
   });
 
-  connect(mUi->spbxReferenceX, &QDoubleSpinBox::valueChanged, this,
-          &BackgroundImageSetupDialog::settingsModified);
-  connect(mUi->spbxReferenceX, &QDoubleSpinBox::valueChanged, this,
-          &BackgroundImageSetupDialog::updateReferenceMarker);
-  connect(mUi->spbxReferenceY, &QDoubleSpinBox::valueChanged, this,
-          &BackgroundImageSetupDialog::settingsModified);
-  connect(mUi->spbxReferenceY, &QDoubleSpinBox::valueChanged, this,
-          &BackgroundImageSetupDialog::updateReferenceMarker);
-  connect(mUi->spbxDpiX, &QDoubleSpinBox::valueChanged, this,
-          &BackgroundImageSetupDialog::settingsModified);
-  connect(mUi->spbxDpiY, &QDoubleSpinBox::valueChanged, this,
-          &BackgroundImageSetupDialog::settingsModified);
+  connect(mUi->spbxReferenceX,
+          static_cast<void (QDoubleSpinBox::*)(double)>(
+              &QDoubleSpinBox::valueChanged),
+          this, &BackgroundImageSetupDialog::settingsModified);
+  connect(mUi->spbxReferenceX,
+          static_cast<void (QDoubleSpinBox::*)(double)>(
+              &QDoubleSpinBox::valueChanged),
+          this, &BackgroundImageSetupDialog::updateReferenceMarker);
+  connect(mUi->spbxReferenceY,
+          static_cast<void (QDoubleSpinBox::*)(double)>(
+              &QDoubleSpinBox::valueChanged),
+          this, &BackgroundImageSetupDialog::settingsModified);
+  connect(mUi->spbxReferenceY,
+          static_cast<void (QDoubleSpinBox::*)(double)>(
+              &QDoubleSpinBox::valueChanged),
+          this, &BackgroundImageSetupDialog::updateReferenceMarker);
+  connect(mUi->spbxDpiX,
+          static_cast<void (QDoubleSpinBox::*)(double)>(
+              &QDoubleSpinBox::valueChanged),
+          this, &BackgroundImageSetupDialog::settingsModified);
+  connect(mUi->spbxDpiY,
+          static_cast<void (QDoubleSpinBox::*)(double)>(
+              &QDoubleSpinBox::valueChanged),
+          this, &BackgroundImageSetupDialog::settingsModified);
   connect(mUi->edtPositionX, &LengthEdit::valueChanged, this,
           &BackgroundImageSetupDialog::settingsModified);
   connect(mUi->edtPositionY, &LengthEdit::valueChanged, this,
@@ -519,7 +531,24 @@ void BackgroundImageSetupDialog::setImage(const QImage& image) noexcept {
 
 void BackgroundImageSetupDialog::updateImage() noexcept {
   if ((mImage.isNull()) || (!mImage.width()) || (!mImage.height())) {
-    setMessage(tr("Load an image with one of the buttons on the left side."));
+    QStringList lines;
+    lines.append(tr("Load an image with one of the buttons on the left side."));
+    lines.append(tr("Select the reference point (e.g. [0, 0]) in the image."));
+    lines.append(tr(
+        "Measure a distance in X-direction to calibrate the X scale factor."));
+    lines.append(tr(
+        "Measure a distance in Y-direction to calibrate the Y scale factor."));
+    lines.append(
+        tr("Specify the position & rotation of the image in the footprint "
+           "editor."));
+    QString msg = tr("<p>This tool allows you to set a background image in the footprint editor to easily verify the size &amp; position of footprint pads etc. Typically a screenshot of the package drawing from the part's datasheet may be used as background.</p>");
+    msg += "<ol>";
+    for (const QString& line : lines) {
+      msg += QString("<li>%1</li>").arg(line);
+    }
+    msg += "</ol>";
+    msg += "<p><b>Important: Make sure to zoom in as much as possible when taking the screenshot, to get a reasonably high resolution!</b></p>";
+    setMessage(msg);
     return;
   }
 
