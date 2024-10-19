@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>890</width>
-    <height>469</height>
+    <width>899</width>
+    <height>485</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,11 +17,11 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0">
+      <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,0,0">
        <item>
         <widget class="QGroupBox" name="groupBox">
          <property name="title">
-          <string>Image</string>
+          <string>Step 1: Capture Image</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_2">
           <property name="leftMargin">
@@ -36,25 +36,21 @@
           <property name="bottomMargin">
            <number>3</number>
           </property>
-          <item row="5" column="0">
-           <widget class="QLabel" name="label_2">
-            <property name="text">
-             <string>Scale X:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="3">
-           <widget class="QToolButton" name="btnMeasureScaleX">
+          <item row="2" column="0" colspan="2">
+           <widget class="QPushButton" name="btnPaste">
             <property name="toolTip">
-             <string>Measure scale in X-direction</string>
+             <string>Paste image from clipboard</string>
+            </property>
+            <property name="text">
+             <string>Paste from Clipboard</string>
             </property>
             <property name="icon">
              <iconset>
-              <normaloff>:/img/actions/ruler.png</normaloff>:/img/actions/ruler.png</iconset>
+              <normaloff>:/img/actions/paste.png</normaloff>:/img/actions/paste.png</iconset>
             </property>
            </widget>
           </item>
-          <item row="1" column="0" colspan="3">
+          <item row="1" column="0" colspan="2">
            <widget class="QPushButton" name="btnScreenshot">
             <property name="toolTip">
              <string>Take a screenshot</string>
@@ -68,7 +64,118 @@
             </property>
            </widget>
           </item>
-          <item row="4" column="1">
+          <item row="3" column="0" colspan="2">
+           <widget class="QPushButton" name="btnOpen">
+            <property name="toolTip">
+             <string>Open image from file</string>
+            </property>
+            <property name="text">
+             <string>Load From File</string>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>:/img/actions/open.png</normaloff>:/img/actions/open.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2" rowspan="3">
+           <widget class="QToolButton" name="btnReset">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="MinimumExpanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>:/img/actions/clean.png</normaloff>:/img/actions/clean.png</iconset>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_4">
+         <property name="title">
+          <string>Step 2: Crop Image</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_6">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QPushButton" name="btnCrop">
+            <property name="text">
+             <string>Crop Image With Cursor</string>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>:/img/actions/cut.png</normaloff>:/img/actions/cut.png</iconset>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_3">
+         <property name="title">
+          <string>Step 3: Rotate Image</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_5">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="librepcb::editor::AngleEdit" name="edtRotation" native="true"/>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_2">
+         <property name="title">
+          <string>Step 4: Set Reference Point</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout">
+          <property name="leftMargin">
+           <number>3</number>
+          </property>
+          <property name="topMargin">
+           <number>3</number>
+          </property>
+          <property name="rightMargin">
+           <number>3</number>
+          </property>
+          <property name="bottomMargin">
+           <number>3</number>
+          </property>
+          <item row="1" column="2">
+           <widget class="librepcb::editor::LengthEdit" name="edtPositionY" native="true"/>
+          </item>
+          <item row="0" column="1">
            <widget class="QDoubleSpinBox" name="spbxReferenceX">
             <property name="buttonSymbols">
              <enum>QAbstractSpinBox::NoButtons</enum>
@@ -84,32 +191,14 @@
             </property>
            </widget>
           </item>
-          <item row="6" column="3">
-           <widget class="QToolButton" name="btnMeasureScaleY">
-            <property name="toolTip">
-             <string>Measure scale in Y-direction</string>
-            </property>
-            <property name="icon">
-             <iconset>
-              <normaloff>:/img/actions/ruler.png</normaloff>:/img/actions/ruler.png</iconset>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0" colspan="3">
-           <widget class="QPushButton" name="btnPaste">
-            <property name="toolTip">
-             <string>Paste image from clipboard</string>
-            </property>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_4">
             <property name="text">
-             <string>Paste from Clipboard</string>
-            </property>
-            <property name="icon">
-             <iconset>
-              <normaloff>:/img/actions/paste.png</normaloff>:/img/actions/paste.png</iconset>
+             <string>In Footprint:</string>
             </property>
            </widget>
           </item>
-          <item row="4" column="2">
+          <item row="0" column="2">
            <widget class="QDoubleSpinBox" name="spbxReferenceY">
             <property name="buttonSymbols">
              <enum>QAbstractSpinBox::NoButtons</enum>
@@ -125,7 +214,52 @@
             </property>
            </widget>
           </item>
-          <item row="5" column="1" colspan="2">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>In Image:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="librepcb::editor::LengthEdit" name="edtPositionX" native="true"/>
+          </item>
+          <item row="0" column="3">
+           <widget class="QToolButton" name="btnSelectReference">
+            <property name="toolTip">
+             <string>Select reference point</string>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>:/img/actions/select.png</normaloff>:/img/actions/select.png</iconset>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_5">
+         <property name="title">
+          <string>Step 5: Set X/Y Scale Factors</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_3">
+          <property name="leftMargin">
+           <number>3</number>
+          </property>
+          <property name="topMargin">
+           <number>3</number>
+          </property>
+          <property name="rightMargin">
+           <number>3</number>
+          </property>
+          <property name="bottomMargin">
+           <number>3</number>
+          </property>
+          <property name="horizontalSpacing">
+           <number>3</number>
+          </property>
+          <item row="0" column="0">
            <widget class="QDoubleSpinBox" name="spbxDpiX">
             <property name="buttonSymbols">
              <enum>QAbstractSpinBox::NoButtons</enum>
@@ -141,7 +275,7 @@
             </property>
            </widget>
           </item>
-          <item row="6" column="1" colspan="2">
+          <item row="0" column="2">
            <widget class="QDoubleSpinBox" name="spbxDpiY">
             <property name="buttonSymbols">
              <enum>QAbstractSpinBox::NoButtons</enum>
@@ -157,127 +291,25 @@
             </property>
            </widget>
           </item>
-          <item row="6" column="0">
-           <widget class="QLabel" name="label_6">
-            <property name="text">
-             <string>Scale Y:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0" colspan="3">
-           <widget class="QPushButton" name="btnOpen">
-            <property name="toolTip">
-             <string>Open image from file</string>
-            </property>
-            <property name="text">
-             <string>Load From File</string>
-            </property>
-            <property name="icon">
-             <iconset>
-              <normaloff>:/img/actions/open.png</normaloff>:/img/actions/open.png</iconset>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="3">
-           <widget class="QToolButton" name="btnSelectReference">
-            <property name="toolTip">
-             <string>Select reference point</string>
-            </property>
-            <property name="icon">
-             <iconset>
-              <normaloff>:/img/actions/select.png</normaloff>:/img/actions/select.png</iconset>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="label_3">
-            <property name="text">
-             <string>Reference:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="3" rowspan="3">
-           <layout class="QVBoxLayout" name="verticalLayout_4">
-            <item>
-             <widget class="QToolButton" name="btnReset">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="MinimumExpanding">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>:/img/actions/cancel.png</normaloff>:/img/actions/cancel.png</iconset>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QToolButton" name="btnCrop">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="MinimumExpanding">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="toolTip">
-               <string>Crop image to current view</string>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>:/img/actions/cut.png</normaloff>:/img/actions/cut.png</iconset>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="groupBox_2">
-         <property name="title">
-          <string>Placement</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout">
-          <property name="leftMargin">
-           <number>3</number>
-          </property>
-          <property name="topMargin">
-           <number>3</number>
-          </property>
-          <property name="rightMargin">
-           <number>3</number>
-          </property>
-          <property name="bottomMargin">
-           <number>3</number>
-          </property>
-          <item row="1" column="1" colspan="2">
-           <widget class="librepcb::editor::AngleEdit" name="edtRotation" native="true"/>
-          </item>
-          <item row="0" column="2">
-           <widget class="librepcb::editor::LengthEdit" name="edtPositionY" native="true"/>
-          </item>
           <item row="0" column="1">
-           <widget class="librepcb::editor::LengthEdit" name="edtPositionX" native="true"/>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_4">
-            <property name="text">
-             <string>Position:</string>
+           <widget class="QToolButton" name="btnMeasureScaleX">
+            <property name="toolTip">
+             <string>Measure scale in X-direction</string>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>:/img/actions/ruler.png</normaloff>:/img/actions/ruler.png</iconset>
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_5">
-            <property name="text">
-             <string>Rotation:</string>
+          <item row="0" column="3">
+           <widget class="QToolButton" name="btnMeasureScaleY">
+            <property name="toolTip">
+             <string>Measure scale in Y-direction</string>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>:/img/actions/ruler.png</normaloff>:/img/actions/ruler.png</iconset>
             </property>
            </widget>
           </item>

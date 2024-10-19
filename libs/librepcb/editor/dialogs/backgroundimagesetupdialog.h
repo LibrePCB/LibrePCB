@@ -78,6 +78,8 @@ class BackgroundImageSetupDialog final : public QDialog,
 
   enum class State {
     Idle,
+    Crop,
+    Rotate,
     SelectReference,
     MeasureStep1,
     MeasureStep2,
@@ -106,28 +108,31 @@ signals:
 private:
   void keyPressEvent(QKeyEvent* event) noexcept override;
   bool graphicsViewEventHandler(QEvent* event) noexcept override;
-  void cancelOperation() noexcept;
-  void commitMeasurement() noexcept;
   void startScreenshot() noexcept;
   void screenshotCountdownTick() noexcept;
   void takeScreenshot() noexcept;
   void pasteFromClipboard() noexcept;
   void loadFromFile() noexcept;
-  void cropImage() noexcept;
+  void cancelOperation() noexcept;
+  void commitOperation() noexcept;
   void setImage(const QImage& image) noexcept;
-  void updateImage() noexcept;
   void updateReferenceMarker() noexcept;
-  void setMessage(const QString& msg, bool centered) noexcept;
   void setState(State state) noexcept;
-  void updateControls() noexcept;
+  void updateUi(QString msg = QString()) noexcept;
+  void fitImageInView() noexcept;
+  static QImage cropImage(const QImage& img, const QPainterPath& p,
+                          QPointF& delta) noexcept;
 
   QScopedPointer<Ui::BackgroundImageSetupDialog> mUi;
   const QString mSettingsPrefix;
   QScopedPointer<QGraphicsPixmapItem> mImageGraphicsItem;
+  QScopedPointer<QGraphicsPathItem> mCursorGraphicsItem;
+  QScopedPointer<QGraphicsPathItem> mCropGraphicsItem;
   QScopedPointer<QGraphicsPathItem> mReferenceGraphicsItem;
   QScopedPointer<QGraphicsPathItem> mMeasure1GraphicsItem;
   QScopedPointer<QGraphicsPathItem> mMeasure2GraphicsItem;
   QScopedPointer<QGraphicsLineItem> mMeasureLineGraphicsItem;
+  QScopedPointer<QWidget> mRotateWidget;
   QScopedPointer<QWidget> mMeasuredLengthWidget;
   QPointer<LengthEdit> mMeasuredLengthEdit;
   State mState;
