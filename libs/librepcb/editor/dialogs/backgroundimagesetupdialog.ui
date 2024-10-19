@@ -36,40 +36,61 @@
           <property name="bottomMargin">
            <number>3</number>
           </property>
-          <item row="2" column="1">
-           <widget class="QDoubleSpinBox" name="spbxDpiX">
-            <property name="buttonSymbols">
-             <enum>QAbstractSpinBox::NoButtons</enum>
+          <item row="1" column="3">
+           <widget class="QToolButton" name="btnSelectReference">
+            <property name="toolTip">
+             <string>Select reference point</string>
             </property>
-            <property name="suffix">
-             <string notr="true"> dpi</string>
-            </property>
-            <property name="decimals">
-             <number>3</number>
-            </property>
-            <property name="maximum">
-             <double>99999.000000000000000</double>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_3">
-            <property name="text">
-             <string>Reference:</string>
+            <property name="icon">
+             <iconset>
+              <normaloff>:/img/actions/select.png</normaloff>:/img/actions/select.png</iconset>
             </property>
            </widget>
           </item>
           <item row="2" column="3">
-           <widget class="QToolButton" name="btnMeasureScale">
-            <property name="text">
-             <string>...</string>
+           <widget class="QToolButton" name="btnMeasureScaleX">
+            <property name="toolTip">
+             <string>Measure scale in X-direction</string>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>:/img/actions/ruler.png</normaloff>:/img/actions/ruler.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QToolButton" name="btnCrop">
+            <property name="toolTip">
+             <string>Crop image to current view</string>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>:/img/actions/cut.png</normaloff>:/img/actions/cut.png</iconset>
             </property>
            </widget>
           </item>
           <item row="3" column="0">
            <widget class="QLabel" name="label_6">
             <property name="text">
-             <string>Measured Δ:</string>
+             <string>Scale Y:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="3">
+           <widget class="QToolButton" name="btnMeasureScaleY">
+            <property name="toolTip">
+             <string>Measure scale in Y-direction</string>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>:/img/actions/ruler.png</normaloff>:/img/actions/ruler.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>Scale X:</string>
             </property>
            </widget>
           </item>
@@ -89,21 +110,58 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="2">
-           <widget class="QDoubleSpinBox" name="spbxDpiY">
-            <property name="buttonSymbols">
-             <enum>QAbstractSpinBox::NoButtons</enum>
-            </property>
-            <property name="suffix">
-             <string notr="true"> dpi</string>
-            </property>
-            <property name="decimals">
-             <number>3</number>
-            </property>
-            <property name="maximum">
-             <double>99999.000000000000000</double>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>Reference:</string>
             </property>
            </widget>
+          </item>
+          <item row="0" column="0" colspan="3">
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <item>
+             <widget class="QPushButton" name="btnScreenshot">
+              <property name="toolTip">
+               <string>Take a screenshot</string>
+              </property>
+              <property name="text">
+               <string>Screenshot</string>
+              </property>
+              <property name="icon">
+               <iconset>
+                <normaloff>:/img/actions/export_pixmap.png</normaloff>:/img/actions/export_pixmap.png</iconset>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btnPaste">
+              <property name="toolTip">
+               <string>Paste image from clipboard</string>
+              </property>
+              <property name="text">
+               <string>Clipboard</string>
+              </property>
+              <property name="icon">
+               <iconset>
+                <normaloff>:/img/actions/paste.png</normaloff>:/img/actions/paste.png</iconset>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btnOpen">
+              <property name="toolTip">
+               <string>Open image from file</string>
+              </property>
+              <property name="text">
+               <string>Open</string>
+              </property>
+              <property name="icon">
+               <iconset>
+                <normaloff>:/img/actions/open.png</normaloff>:/img/actions/open.png</iconset>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
           <item row="1" column="1">
            <widget class="QDoubleSpinBox" name="spbxReferenceX">
@@ -121,81 +179,35 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="3">
-           <widget class="QToolButton" name="btnMeasureFinish">
-            <property name="text">
-             <string>...</string>
+          <item row="2" column="1" colspan="2">
+           <widget class="QDoubleSpinBox" name="spbxDpiX">
+            <property name="buttonSymbols">
+             <enum>QAbstractSpinBox::NoButtons</enum>
+            </property>
+            <property name="suffix">
+             <string notr="true"> dpi</string>
+            </property>
+            <property name="decimals">
+             <number>3</number>
+            </property>
+            <property name="maximum">
+             <double>99999.000000000000000</double>
             </property>
            </widget>
           </item>
-          <item row="3" column="2">
-           <widget class="librepcb::editor::LengthEdit" name="edtMeasureY" native="true"/>
-          </item>
-          <item row="1" column="3">
-           <widget class="QToolButton" name="btnSelectReference">
-            <property name="text">
-             <string>...</string>
+          <item row="3" column="1" colspan="2">
+           <widget class="QDoubleSpinBox" name="spbxDpiY">
+            <property name="buttonSymbols">
+             <enum>QAbstractSpinBox::NoButtons</enum>
             </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="librepcb::editor::LengthEdit" name="edtMeasureX" native="true"/>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_2">
-            <property name="text">
-             <string>Scale:</string>
+            <property name="suffix">
+             <string notr="true"> dpi</string>
             </property>
-           </widget>
-          </item>
-          <item row="0" column="0" colspan="3">
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
-            <property name="rightMargin">
-             <number>6</number>
+            <property name="decimals">
+             <number>3</number>
             </property>
-            <item>
-             <widget class="QPushButton" name="btnScreenshot">
-              <property name="text">
-               <string>Screenshot</string>
-              </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>:/img/actions/export_pixmap.png</normaloff>:/img/actions/export_pixmap.png</iconset>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="btnPaste">
-              <property name="text">
-               <string>Paste</string>
-              </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>:/img/actions/paste.png</normaloff>:/img/actions/paste.png</iconset>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="btnOpen">
-              <property name="text">
-               <string>Open</string>
-              </property>
-              <property name="icon">
-               <iconset>
-                <normaloff>:/img/actions/open.png</normaloff>:/img/actions/open.png</iconset>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item row="0" column="3">
-           <widget class="QToolButton" name="btnCrop">
-            <property name="toolTip">
-             <string>Crop image to current view</string>
-            </property>
-            <property name="icon">
-             <iconset>
-              <normaloff>:/img/actions/cut.png</normaloff>:/img/actions/cut.png</iconset>
+            <property name="maximum">
+             <double>99999.000000000000000</double>
             </property>
            </widget>
           </item>
@@ -289,6 +301,27 @@
          <number>0</number>
         </property>
         <item>
+         <widget class="QLabel" name="lblMessage">
+          <property name="font">
+           <font>
+            <pointsize>20</pointsize>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">color: gray;</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+          <property name="margin">
+           <number>50</number>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="librepcb::editor::GraphicsView" name="graphicsView" native="true"/>
         </item>
        </layout>
@@ -297,14 +330,28 @@
     </layout>
    </item>
    <item>
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,0">
+     <item>
+      <widget class="QLabel" name="lblStatusBar">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDialogButtonBox" name="buttonBox">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="standardButtons">
+        <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

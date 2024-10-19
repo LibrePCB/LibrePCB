@@ -44,6 +44,8 @@ namespace Ui {
 class BackgroundImageSetupDialog;
 }
 
+class LengthEdit;
+
 /*******************************************************************************
  *  Class BackgroundImageSettings
  ******************************************************************************/
@@ -104,6 +106,8 @@ signals:
 private:
   void keyPressEvent(QKeyEvent* event) noexcept override;
   bool graphicsViewEventHandler(QEvent* event) noexcept override;
+  void cancelOperation() noexcept;
+  void commitMeasurement() noexcept;
   void startScreenshot() noexcept;
   void screenshotCountdownTick() noexcept;
   void takeScreenshot() noexcept;
@@ -115,6 +119,7 @@ private:
   void updateReferenceMarker() noexcept;
   void setMessage(const QString& msg) noexcept;
   void setState(State state) noexcept;
+  void updateControls() noexcept;
 
   QScopedPointer<Ui::BackgroundImageSetupDialog> mUi;
   const QString mSettingsPrefix;
@@ -123,7 +128,11 @@ private:
   QScopedPointer<QGraphicsPathItem> mMeasure1GraphicsItem;
   QScopedPointer<QGraphicsPathItem> mMeasure2GraphicsItem;
   QScopedPointer<QGraphicsLineItem> mMeasureLineGraphicsItem;
+  QScopedPointer<QWidget> mMeasuredLengthWidget;
+  QPointer<LengthEdit> mMeasuredLengthEdit;
   State mState;
+  bool mAutoNextState;
+  Qt::Orientation mMeasureDirection;
   QImage mImage;
   QPointer<QScreen> mScreen;
   int mCountdownSecs;
