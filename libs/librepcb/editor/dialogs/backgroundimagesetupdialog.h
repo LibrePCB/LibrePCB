@@ -117,7 +117,7 @@ private:
   void setImage(const QImage& image) noexcept;
   void updateImage() noexcept;
   void updateReferenceMarker() noexcept;
-  void setMessage(const QString& msg) noexcept;
+  void setMessage(const QString& msg, bool centered) noexcept;
   void setState(State state) noexcept;
   void updateControls() noexcept;
 

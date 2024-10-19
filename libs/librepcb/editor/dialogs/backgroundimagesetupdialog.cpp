@@ -198,6 +198,8 @@ BackgroundImageSetupDialog::BackgroundImageSetupDialog(
           &BackgroundImageSetupDialog::pasteFromClipboard);
   connect(mUi->btnOpen, &QPushButton::clicked, this,
           &BackgroundImageSetupDialog::loadFromFile);
+  connect(mUi->btnReset, &QToolButton::clicked, this,
+          [this]() { setSettings(BackgroundImageSettings()); });
   connect(mUi->btnCrop, &QToolButton::clicked, this,
           &BackgroundImageSetupDialog::cropImage);
   connect(mUi->btnSelectReference, &QToolButton::clicked, this,
@@ -308,6 +310,10 @@ void BackgroundImageSetupDialog::keyPressEvent(QKeyEvent* event) noexcept {
   } else if ((mState == State::MeasureStep3) &&
              (event->key() == Qt::Key_Return)) {
     commitMeasurement();
+    return;
+  } else if (mScreen) {
+    mScreen = nullptr;
+    screenshotCountdownTick();
     return;
   }
 
@@ -433,38 +439,42 @@ void BackgroundImageSetupDialog::startScreenshot() noexcept {
 
 void BackgroundImageSetupDialog::screenshotCountdownTick() noexcept {
   --mCountdownSecs;
-  if (mCountdownSecs <= 0) {
+  if (!mScreen) {
+    // Screen disappeared or screenshot aborted.
+    updateImage();
+    updateControls();
+  } else if (mCountdownSecs <= 0) {
     takeScreenshot();
   } else {
-    setMessage(QString::number(mCountdownSecs));
+    setMessage(QString::number(mCountdownSecs), true);
     QTimer::singleShot(1000, this,
                        &BackgroundImageSetupDialog::screenshotCountdownTick);
   }
 }
 
 void BackgroundImageSetupDialog::takeScreenshot() noexcept {
-  if (mScreen) {
-    QPixmap pixmap = mScreen->grabWindow(0);
-    setImage(pixmap.toImage());
-    if (pixmap.isNull()) {
-      setMessage(
-          tr("Could not take a screenshot. Note that this feature does not "
-             "work on some systems due to security mechanisms."));
-    } else {
-      mAutoNextState = true;
-      setState(State::SelectReference);
-    }
-    return;
+  if (!mScreen) return;
+
+  QPixmap pixmap = mScreen->grabWindow(0);
+  setImage(pixmap.toImage());
+  mScreen = nullptr;
+  if (pixmap.isNull()) {
+    setMessage(
+        tr("Could not take a screenshot. Note that this feature does not "
+           "work on some systems due to security mechanisms."),
+        true);
+  } else {
+    mAutoNextState = true;
+    setState(State::SelectReference);
   }
-  updateImage();
-  updateControls();
 }
 
 void BackgroundImageSetupDialog::pasteFromClipboard() noexcept {
   QImage image = qApp->clipboard()->image();
   setImage(image);
   if (image.isNull()) {
-    setMessage(tr("Please make sure to copy an image into the clipboard."));
+    setMessage(tr("Please make sure to copy an image into the clipboard."),
+               true);
   } else {
     mAutoNextState = true;
     setState(State::SelectReference);
@@ -533,7 +543,7 @@ void BackgroundImageSetupDialog::updateImage() noexcept {
   if ((mImage.isNull()) || (!mImage.width()) || (!mImage.height())) {
     QStringList lines;
     lines.append(tr("Load an image with one of the buttons on the left side."));
-    lines.append(tr("Select the reference point (e.g. [0, 0]) in the image."));
+    lines.append(tr("Select a reference point (e.g. [0, 0]) in the image."));
     lines.append(tr(
         "Measure a distance in X-direction to calibrate the X scale factor."));
     lines.append(tr(
@@ -541,14 +551,24 @@ void BackgroundImageSetupDialog::updateImage() noexcept {
     lines.append(
         tr("Specify the position & rotation of the image in the footprint "
            "editor."));
-    QString msg = tr("<p>This tool allows you to set a background image in the footprint editor to easily verify the size &amp; position of footprint pads etc. Typically a screenshot of the package drawing from the part's datasheet may be used as background.</p>");
+    lines.append(
+        tr("If required, crop the image to contain only the footprint."));
+    QString msg = "<p>" %
+        tr("This tool allows you to set a background image in the footprint "
+           "editor to easily verify the size &amp; position of footprint pads "
+           "etc. Typically a screenshot of the package drawing from the part's "
+           "datasheet may be used as background.") %
+        "</p>";
     msg += "<ol>";
     for (const QString& line : lines) {
       msg += QString("<li>%1</li>").arg(line);
     }
     msg += "</ol>";
-    msg += "<p><b>Important: Make sure to zoom in as much as possible when taking the screenshot, to get a reasonably high resolution!</b></p>";
-    setMessage(msg);
+    msg += "<p><b>" %
+        tr("Important: Make sure to zoom in as much as possible when taking "
+           "the screenshot, to get a reasonably high resolution!") %
+        "</b></p>";
+    setMessage(msg, false);
     return;
   }
 
@@ -562,8 +582,15 @@ void BackgroundImageSetupDialog::updateReferenceMarker() noexcept {
                                  mUi->spbxReferenceY->value());
 }
 
-void BackgroundImageSetupDialog::setMessage(const QString& msg) noexcept {
+void BackgroundImageSetupDialog::setMessage(const QString& msg,
+                                            bool centered) noexcept {
+  QFont f = mUi->lblMessage->font();
+  f.setPointSize(centered ? 30 : 12);
+  mUi->lblMessage->setFont(f);
+
   mUi->graphicsView->hide();
+  mUi->lblMessage->setAlignment(centered ? Qt::AlignCenter
+                                         : (Qt::AlignLeft | Qt::AlignVCenter));
   mUi->lblMessage->setText(msg);
   mUi->lblMessage->show();
 }
@@ -579,6 +606,7 @@ void BackgroundImageSetupDialog::updateControls() noexcept {
   mUi->btnScreenshot->setEnabled(idle);
   mUi->btnPaste->setEnabled(idle);
   mUi->btnOpen->setEnabled(idle);
+  mUi->btnReset->setEnabled(idle);
   mUi->btnCrop->setEnabled(valid && idle);
   mUi->spbxReferenceX->setEnabled(valid && idle);
   mUi->spbxReferenceY->setEnabled(valid && idle);
