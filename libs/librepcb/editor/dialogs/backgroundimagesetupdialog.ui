@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>875</width>
-    <height>494</height>
+    <width>890</width>
+    <height>469</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,1">
+      <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0">
        <item>
         <widget class="QGroupBox" name="groupBox">
          <property name="title">
@@ -161,6 +161,14 @@
               </property>
              </widget>
             </item>
+            <item>
+             <widget class="QToolButton" name="btnReset">
+              <property name="icon">
+             <iconset>
+              <normaloff>:/img/actions/cancel.png</normaloff>:/img/actions/cancel.png</iconset>
+            </property>
+             </widget>
+            </item>
            </layout>
           </item>
           <item row="1" column="1">
@@ -259,20 +267,17 @@
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This tool allows you to set a background image in the footprint editor to easily verify the size &amp;amp; position of footprint pads etc. Typically a screenshot of the package drawing from the part's datasheet may be used as background.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Important: Make sure to zoom in as much as possible when taking the screenshot, to get a reasonably high resolution!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
          </property>
-         <property name="textFormat">
-          <enum>Qt::RichText</enum>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
          </property>
-         <property name="alignment">
-          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
-        </widget>
+        </spacer>
        </item>
       </layout>
      </item>
