@@ -65,6 +65,10 @@ public:
                                       QWidget* parent = nullptr) noexcept;
   ~BackgroundImageSetupDialog() noexcept;
 
+  // General Methods
+  const QImage& getImage() const noexcept { return mImage; }
+  void setImage(const QImage& image) noexcept;
+
   // Operator Overloadings
   BackgroundImageSetupDialog& operator=(const BackgroundImageSetupDialog& rhs) =
       delete;

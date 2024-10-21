@@ -40,18 +40,17 @@
 #include "../cmd/cmdfootprintedit.h"
 #include "../cmd/cmdfootprintpadedit.h"
 #include "../cmd/cmdpackageedit.h"
+#include "backgroundimagegraphicsitem.h"
 #include "fsm/packageeditorfsm.h"
 #include "ui_packageeditorwidget.h"
 
 #include <librepcb/core/application.h>
-#include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/font/stroketextpathbuilder.h>
 #include <librepcb/core/library/librarybaseelementcheckmessages.h>
 #include <librepcb/core/library/libraryelementcheckmessages.h>
 #include <librepcb/core/library/pkg/footprintpainter.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/library/pkg/packagecheckmessages.h>
-#include <librepcb/core/serialization/sexpression.h>
 #include <librepcb/core/types/pcbcolor.h>
 #include <librepcb/core/utils/clipperhelpers.h>
 #include <librepcb/core/utils/scopeguard.h>
@@ -65,106 +64,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-
-template <>
-std::unique_ptr<SExpression> serialize(const float& obj) {
-  QString s = QString::number(obj, 'f', 6);
-  while (s.endsWith("0") && (!s.endsWith(".0"))) {
-    s.chop(1);
-  }
-  return SExpression::createToken(s);
-}
-
-template <>
-std::unique_ptr<SExpression> serialize(const double& obj) {
-  QString s = QString::number(obj, 'f', 6);
-  while (s.endsWith("0") && (!s.endsWith(".0"))) {
-    s.chop(1);
-  }
-  return SExpression::createToken(s);
-}
-
-template <>
-float deserialize(const SExpression& node) {
-  return node.getValue().toFloat();
-}
-
-template <>
-double deserialize(const SExpression& node) {
-  return node.getValue().toDouble();
-}
-
 namespace editor {
-
-/*******************************************************************************
- *  Class BackgroundImageSettings
- ******************************************************************************/
-
-bool BackgroundImageSettings::tryLoadFromDir(const FilePath& dir) noexcept {
-  try {
-    const FilePath fp = dir.getPathTo("settings.lp");
-    if (fp.isExistingFile()) {
-      image.load(dir.getPathTo("image.png").toStr(), "png");
-      std::unique_ptr<SExpression> root =
-          SExpression::parse(FileUtils::readFile(fp), fp);
-      enabled = deserialize<bool>(root->getChild("enabled/@0"));
-      referencePos =
-          QPointF(deserialize<qreal>(root->getChild("reference/@0")),
-                  deserialize<qreal>(root->getChild("reference/@1")));
-      dpi = std::make_pair(deserialize<qreal>(root->getChild("dpi/@0")),
-                           deserialize<qreal>(root->getChild("dpi/@1")));
-      position = Point(root->getChild("position"));
-      rotation = deserialize<Angle>(root->getChild("rotation/@0"));
-      return true;
-    }
-  } catch (const Exception& e) {
-    qWarning() << "Failed to load background image data:" << e.getMsg();
-  }
-  return false;
-}
-
-void BackgroundImageSettings::saveToDir(const FilePath& dir) noexcept {
-  try {
-    if (!image.isNull()) {
-      FileUtils::makePath(dir);
-      image.save(dir.getPathTo("image.png").toStr(), "png");
-      std::unique_ptr<SExpression> root =
-          SExpression::createList("librepcb_background_image");
-      root->ensureLineBreak();
-      root->appendChild("enabled", enabled);
-      root->ensureLineBreak();
-      SExpression& refNode = root->appendList("reference");
-      refNode.appendChild(referencePos.x());
-      refNode.appendChild(referencePos.y());
-      root->ensureLineBreak();
-      SExpression& dpiNode = root->appendList("dpi");
-      dpiNode.appendChild(dpi.first);
-      dpiNode.appendChild(dpi.second);
-      root->ensureLineBreak();
-      position.serialize(root->appendList("position"));
-      root->ensureLineBreak();
-      root->appendChild("rotation", rotation);
-      root->ensureLineBreak();
-      FileUtils::writeFile(dir.getPathTo("settings.lp"), root->toByteArray());
-    } else if (dir.isExistingDir()) {
-      FileUtils::removeDirRecursively(dir);
-    }
-  } catch (const Exception& e) {
-    qWarning() << "Failed to save background image data:" << e.getMsg();
-  }
-}
-
-bool BackgroundImageSettings::operator==(
-    const BackgroundImageSettings& rhs) const noexcept {
-  return (enabled == rhs.enabled) && (image == rhs.image) &&
-      (referencePos == rhs.referencePos) && (dpi == rhs.dpi) &&
-      (position == rhs.position) && (rotation == rhs.rotation);
-}
-
-bool BackgroundImageSettings::operator!=(
-    const BackgroundImageSettings& rhs) const noexcept {
-  return !(*this == rhs);
-}
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -176,7 +76,7 @@ PackageEditorWidget::PackageEditorWidget(const Context& context,
     mUi(new Ui::PackageEditorWidget),
     mGraphicsScene(new GraphicsScene()),
     mOpenGlSceneBuildScheduled(false),
-    mBackgroundImageSettings(new BackgroundImageSettings()) {
+    mBackgroundImageGraphicsItem(new BackgroundImageGraphicsItem()) {
   mUi->setupUi(this);
   mUi->lstMessages->setHandler(this);
   mUi->lstMessages->setReadOnly(mContext.readOnly);
@@ -337,9 +237,13 @@ PackageEditorWidget::PackageEditorWidget(const Context& context,
           &PackageEditorWidget::setStatusBarMessage);
   currentFootprintChanged(0);  // small hack to select the first footprint...
 
-  // Load background from cache.
-  mBackgroundImageSettings->tryLoadFromDir(getBackgroundImageCacheDir());
-  applyBackgroundImageSettings();
+  // Setup background image.
+  BackgroundImageSettings bgSettings;
+  bgSettings.tryLoadFromDir(getBackgroundImageCacheDir());
+  mBackgroundImageGraphicsItem->setBackgroundColor(
+      theme.getColor(Theme::Color::sBoardBackground).getPrimaryColor());
+  mBackgroundImageGraphicsItem->setSettings(bgSettings);
+  mGraphicsScene->addItem(*mBackgroundImageGraphicsItem);
 
   // Last but not least, connect the graphics scene events with the FSM.
   mUi->graphicsView->setEventHandlerObject(this);
@@ -366,7 +270,7 @@ PackageEditorWidget::~PackageEditorWidget() noexcept {
  ******************************************************************************/
 
 bool PackageEditorWidget::isBackgroundImageSet() const noexcept {
-  return mBackgroundImageSettings->enabled;
+  return mBackgroundImageGraphicsItem->isVisible();
 }
 
 QSet<EditorWidgetBase::Feature> PackageEditorWidget::getAvailableFeatures()
@@ -582,42 +486,32 @@ bool PackageEditorWidget::decreaseGridInterval() noexcept {
 }
 
 bool PackageEditorWidget::toggleBackgroundImage() noexcept {
-  if (mBackgroundImageSettings->enabled) {
-    mBackgroundImageSettings->enabled = false;
+  BackgroundImageSettings s = mBackgroundImageGraphicsItem->getSettings();
+
+  if (mBackgroundImageGraphicsItem->isVisible()) {
+    s.enabled = false;
   } else {
-    toggle3DMode(false);
-
-    // Restore current settings on cancel.
-    BackgroundImageSettings backup = *mBackgroundImageSettings;
-    auto sg = scopeGuard([&]() {
-      *mBackgroundImageSettings = backup;
-      applyBackgroundImageSettings();
-    });
-
-    // Enable background image.
-    mBackgroundImageSettings->enabled = true;
-    applyBackgroundImageSettings();
-
     // Show dialog.
     BackgroundImageSetupDialog dlg("package_editor", this);
-    // dlg.setSettings(*mBackgroundImageSettings);
-    // connect(&dlg, &BackgroundImageSetupDialog::settingsModified, this, [&]()
-    // {
-    //  //*mBackgroundImageSettings = dlg.getSettings();
-    //  applyBackgroundImageSettings();
-    //});
+    dlg.setImage(s.image);
     if (dlg.exec() != QDialog::Accepted) {
       return false;  // Aborted.
     }
 
-    // Keep settings.
-    sg.dismiss();
+    if (dlg.getImage() != s.image) {
+      s.image = dlg.getImage();
+      s.enabled = true;
+      s.referencePos = s.image.rect().center();
+      s.dpi = std::make_pair(s.image.width(), s.image.width());
+    }
+
+    toggle3DMode(false);
   }
 
   // Store new settings.
-  mBackgroundImageSettings->saveToDir(getBackgroundImageCacheDir());
-  applyBackgroundImageSettings();
-  return mBackgroundImageSettings->enabled;
+  s.saveToDir(getBackgroundImageCacheDir());
+  mBackgroundImageGraphicsItem->setSettings(s);
+  return mBackgroundImageGraphicsItem->isVisible();
 }
 
 /*******************************************************************************
@@ -1311,55 +1205,6 @@ FilePath PackageEditorWidget::getBackgroundImageCacheDir() const noexcept {
   return Application::getCacheDir()
       .getPathTo("backgrounds")
       .getPathTo(mPackage->getUuid().toStr());
-}
-
-void PackageEditorWidget::applyBackgroundImageSettings() noexcept {
-  mBackgroundImageGraphicsItem.reset();
-
-  const BackgroundImageSettings& s = *mBackgroundImageSettings;
-  if (s.enabled && (!s.image.isNull())) {
-    QImage image = s.image.convertToFormat(QImage::Format_ARGB32);
-
-    // If the image background color is the inverse of the graphics view
-    // background, invert the image to get good contrast for lines in the image.
-    const Theme& theme = mContext.workspace.getSettings().themes.getActive();
-    const QColor bgColor =
-        theme.getColor(Theme::Color::sBoardBackground).getPrimaryColor();
-    if (std::abs(image.pixelColor(0, 0).lightnessF() - bgColor.lightnessF()) >
-        0.5) {
-      image.invertPixels();
-    }
-
-    // Make the image background transparent.
-    const QColor imgBgColor = image.pixelColor(0, 0);
-    for (int i = 0; i < image.width(); ++i) {
-      for (int k = 0; k < image.height(); ++k) {
-        if (image.pixelColor(i, k) == imgBgColor) {
-          image.setPixelColor(i, k, Qt::transparent);
-        }
-      }
-    }
-
-    // Calculate the transform.
-    const qreal scaleFactorX = Length(25400000).toPx() / s.dpi.first;
-    const qreal scaleFactorY = Length(25400000).toPx() / s.dpi.second;
-    QTransform t;
-    t.rotate(-s.rotation.toDeg());
-    t.translate(-s.referencePos.x() * scaleFactorX,
-                -s.referencePos.y() * scaleFactorY);
-    t.scale(scaleFactorX, scaleFactorY);
-
-    // Add the image to the graphics scene.
-    mBackgroundImageGraphicsItem.reset(
-        new QGraphicsPixmapItem(QPixmap::fromImage(image)));
-    mBackgroundImageGraphicsItem->setTransformationMode(
-        Qt::SmoothTransformation);
-    mBackgroundImageGraphicsItem->setZValue(-1000);
-    mBackgroundImageGraphicsItem->setOpacity(0.8);
-    mBackgroundImageGraphicsItem->setTransform(t);
-    mBackgroundImageGraphicsItem->setPos(s.position.toPxQPointF());
-    mGraphicsScene->addItem(*mBackgroundImageGraphicsItem);
-  }
 }
 
 /*******************************************************************************

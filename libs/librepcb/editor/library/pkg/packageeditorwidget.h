@@ -46,7 +46,7 @@ class PackageModel;
 
 namespace editor {
 
-class BackgroundImageSettings;
+class BackgroundImageGraphicsItem;
 class GraphicsScene;
 class OpenGlSceneBuilder;
 class OpenGlView;
@@ -55,25 +55,6 @@ class PackageEditorFsm;
 namespace Ui {
 class PackageEditorWidget;
 }
-
-/*******************************************************************************
- *  Class BackgroundImageSettings
- ******************************************************************************/
-
-struct BackgroundImageSettings {
-  bool enabled = false;  ///< Whether the background is enabled or not
-  QImage image;  ///< The original loaded image
-  QPointF referencePos;  ///< Reference in #image [pixels]
-  std::pair<qreal, qreal> dpi = {0, 0};  ///< Scale X/Y [dpi]
-  Point position;  ///< Destination scene position of #referencePos
-  Angle rotation;  ///< Rotation in scene
-
-  bool tryLoadFromDir(const FilePath& dir) noexcept;
-  void saveToDir(const FilePath& dir) noexcept;
-
-  bool operator==(const BackgroundImageSettings& rhs) const noexcept;
-  bool operator!=(const BackgroundImageSettings& rhs) const noexcept;
-};
 
 /*******************************************************************************
  *  Class PackageEditorWidget
@@ -166,7 +147,6 @@ private:  // Methods
   void toggle3DMode(bool enable) noexcept;
   bool is3DModeEnabled() const noexcept;
   FilePath getBackgroundImageCacheDir() const noexcept;
-  void applyBackgroundImageSettings() noexcept;
 
 private:  // Data
   QScopedPointer<Ui::PackageEditorWidget> mUi;
@@ -175,12 +155,11 @@ private:  // Data
   QScopedPointer<GraphicsScene> mGraphicsScene;
   QScopedPointer<OpenGlSceneBuilder> mOpenGlSceneBuilder;
   bool mOpenGlSceneBuildScheduled;
-  QScopedPointer<BackgroundImageSettings> mBackgroundImageSettings;
   LengthUnit mLengthUnit;
   std::unique_ptr<Package> mPackage;
   std::shared_ptr<Footprint> mCurrentFootprint;
   std::shared_ptr<PackageModel> mCurrentModel;
-  QScopedPointer<QGraphicsPixmapItem> mBackgroundImageGraphicsItem;
+  QScopedPointer<BackgroundImageGraphicsItem> mBackgroundImageGraphicsItem;
 
   // broken interface detection
   QSet<Uuid> mOriginalPadUuids;

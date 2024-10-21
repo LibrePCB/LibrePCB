@@ -282,6 +282,8 @@ add_library(
   library/newelementwizard/newelementwizardpage_packagepads.cpp
   library/newelementwizard/newelementwizardpage_packagepads.h
   library/newelementwizard/newelementwizardpage_packagepads.ui
+  library/pkg/backgroundimagegraphicsitem.cpp
+  library/pkg/backgroundimagegraphicsitem.h
   library/pkg/boardsideselectorwidget.cpp
   library/pkg/boardsideselectorwidget.h
   library/pkg/footprintclipboarddata.cpp

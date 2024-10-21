@@ -93,6 +93,16 @@ BackgroundImageSetupDialog::~BackgroundImageSetupDialog() noexcept {
 }
 
 /*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+void BackgroundImageSetupDialog::setImage(const QImage& image) noexcept {
+  mImage = image;
+  updateUi();
+  QTimer::singleShot(10, this, &BackgroundImageSetupDialog::fitImageInView);
+}
+
+/*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
