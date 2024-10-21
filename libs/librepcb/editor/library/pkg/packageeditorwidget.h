@@ -57,6 +57,25 @@ class PackageEditorWidget;
 }
 
 /*******************************************************************************
+ *  Class BackgroundImageSettings
+ ******************************************************************************/
+
+struct BackgroundImageSettings {
+  bool enabled = false;  ///< Whether the background is enabled or not
+  QImage image;  ///< The original loaded image
+  QPointF referencePos;  ///< Reference in #image [pixels]
+  std::pair<qreal, qreal> dpi = {0, 0};  ///< Scale X/Y [dpi]
+  Point position;  ///< Destination scene position of #referencePos
+  Angle rotation;  ///< Rotation in scene
+
+  bool tryLoadFromDir(const FilePath& dir) noexcept;
+  void saveToDir(const FilePath& dir) noexcept;
+
+  bool operator==(const BackgroundImageSettings& rhs) const noexcept;
+  bool operator!=(const BackgroundImageSettings& rhs) const noexcept;
+};
+
+/*******************************************************************************
  *  Class PackageEditorWidget
  ******************************************************************************/
 

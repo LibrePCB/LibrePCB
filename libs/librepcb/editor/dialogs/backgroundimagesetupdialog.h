@@ -47,25 +47,6 @@ class BackgroundImageSetupDialog;
 class LengthEdit;
 
 /*******************************************************************************
- *  Class BackgroundImageSettings
- ******************************************************************************/
-
-struct BackgroundImageSettings {
-  bool enabled = false;  ///< Whether the background is enabled or not
-  QImage image;  ///< The original loaded image
-  QPointF referencePos;  ///< Reference in #image [pixels]
-  std::pair<qreal, qreal> dpi = {0, 0};  ///< Scale X/Y [dpi]
-  Point position;  ///< Destination scene position of #referencePos
-  Angle rotation;  ///< Rotation in scene
-
-  bool tryLoadFromDir(const FilePath& dir) noexcept;
-  void saveToDir(const FilePath& dir) noexcept;
-
-  bool operator==(const BackgroundImageSettings& rhs) const noexcept;
-  bool operator!=(const BackgroundImageSettings& rhs) const noexcept;
-};
-
-/*******************************************************************************
  *  Class BackgroundImageSetupDialog
  ******************************************************************************/
 
@@ -76,16 +57,6 @@ class BackgroundImageSetupDialog final : public QDialog,
                                          private IF_GraphicsViewEventHandler {
   Q_OBJECT
 
-  enum class State {
-    Idle,
-    Crop,
-    Rotate,
-    SelectReference,
-    MeasureStep1,
-    MeasureStep2,
-    MeasureStep3,
-  };
-
 public:
   // Constructors / Destructor
   BackgroundImageSetupDialog() = delete;
@@ -94,16 +65,9 @@ public:
                                       QWidget* parent = nullptr) noexcept;
   ~BackgroundImageSetupDialog() noexcept;
 
-  // General Methods
-  void setSettings(const BackgroundImageSettings& s) noexcept;
-  BackgroundImageSettings getSettings() const noexcept;
-
   // Operator Overloadings
   BackgroundImageSetupDialog& operator=(const BackgroundImageSetupDialog& rhs) =
       delete;
-
-signals:
-  void settingsModified();
 
 private:
   void keyPressEvent(QKeyEvent* event) noexcept override;
@@ -113,31 +77,14 @@ private:
   void takeScreenshot() noexcept;
   void pasteFromClipboard() noexcept;
   void loadFromFile() noexcept;
-  void cancelOperation() noexcept;
-  void commitOperation() noexcept;
-  void setImage(const QImage& image) noexcept;
-  void updateReferenceMarker() noexcept;
-  void setState(State state) noexcept;
   void updateUi(QString msg = QString()) noexcept;
   void fitImageInView() noexcept;
-  static QImage cropImage(const QImage& img, const QPainterPath& p,
-                          QPointF& delta) noexcept;
+  static QImage cropImage(const QImage& img, const QPainterPath& p) noexcept;
 
   QScopedPointer<Ui::BackgroundImageSetupDialog> mUi;
   const QString mSettingsPrefix;
   QScopedPointer<QGraphicsPixmapItem> mImageGraphicsItem;
-  QScopedPointer<QGraphicsPathItem> mCursorGraphicsItem;
   QScopedPointer<QGraphicsPathItem> mCropGraphicsItem;
-  QScopedPointer<QGraphicsPathItem> mReferenceGraphicsItem;
-  QScopedPointer<QGraphicsPathItem> mMeasure1GraphicsItem;
-  QScopedPointer<QGraphicsPathItem> mMeasure2GraphicsItem;
-  QScopedPointer<QGraphicsLineItem> mMeasureLineGraphicsItem;
-  QScopedPointer<QWidget> mRotateWidget;
-  QScopedPointer<QWidget> mMeasuredLengthWidget;
-  QPointer<LengthEdit> mMeasuredLengthEdit;
-  State mState;
-  bool mAutoNextState;
-  Qt::Orientation mMeasureDirection;
   QImage mImage;
   QPointer<QScreen> mScreen;
   int mCountdownSecs;

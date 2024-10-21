@@ -44,12 +44,14 @@
 #include "ui_packageeditorwidget.h"
 
 #include <librepcb/core/application.h>
+#include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/font/stroketextpathbuilder.h>
 #include <librepcb/core/library/librarybaseelementcheckmessages.h>
 #include <librepcb/core/library/libraryelementcheckmessages.h>
 #include <librepcb/core/library/pkg/footprintpainter.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/library/pkg/packagecheckmessages.h>
+#include <librepcb/core/serialization/sexpression.h>
 #include <librepcb/core/types/pcbcolor.h>
 #include <librepcb/core/utils/clipperhelpers.h>
 #include <librepcb/core/utils/scopeguard.h>
@@ -63,7 +65,106 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+
+template <>
+std::unique_ptr<SExpression> serialize(const float& obj) {
+  QString s = QString::number(obj, 'f', 6);
+  while (s.endsWith("0") && (!s.endsWith(".0"))) {
+    s.chop(1);
+  }
+  return SExpression::createToken(s);
+}
+
+template <>
+std::unique_ptr<SExpression> serialize(const double& obj) {
+  QString s = QString::number(obj, 'f', 6);
+  while (s.endsWith("0") && (!s.endsWith(".0"))) {
+    s.chop(1);
+  }
+  return SExpression::createToken(s);
+}
+
+template <>
+float deserialize(const SExpression& node) {
+  return node.getValue().toFloat();
+}
+
+template <>
+double deserialize(const SExpression& node) {
+  return node.getValue().toDouble();
+}
+
 namespace editor {
+
+/*******************************************************************************
+ *  Class BackgroundImageSettings
+ ******************************************************************************/
+
+bool BackgroundImageSettings::tryLoadFromDir(const FilePath& dir) noexcept {
+  try {
+    const FilePath fp = dir.getPathTo("settings.lp");
+    if (fp.isExistingFile()) {
+      image.load(dir.getPathTo("image.png").toStr(), "png");
+      std::unique_ptr<SExpression> root =
+          SExpression::parse(FileUtils::readFile(fp), fp);
+      enabled = deserialize<bool>(root->getChild("enabled/@0"));
+      referencePos =
+          QPointF(deserialize<qreal>(root->getChild("reference/@0")),
+                  deserialize<qreal>(root->getChild("reference/@1")));
+      dpi = std::make_pair(deserialize<qreal>(root->getChild("dpi/@0")),
+                           deserialize<qreal>(root->getChild("dpi/@1")));
+      position = Point(root->getChild("position"));
+      rotation = deserialize<Angle>(root->getChild("rotation/@0"));
+      return true;
+    }
+  } catch (const Exception& e) {
+    qWarning() << "Failed to load background image data:" << e.getMsg();
+  }
+  return false;
+}
+
+void BackgroundImageSettings::saveToDir(const FilePath& dir) noexcept {
+  try {
+    if (!image.isNull()) {
+      FileUtils::makePath(dir);
+      image.save(dir.getPathTo("image.png").toStr(), "png");
+      std::unique_ptr<SExpression> root =
+          SExpression::createList("librepcb_background_image");
+      root->ensureLineBreak();
+      root->appendChild("enabled", enabled);
+      root->ensureLineBreak();
+      SExpression& refNode = root->appendList("reference");
+      refNode.appendChild(referencePos.x());
+      refNode.appendChild(referencePos.y());
+      root->ensureLineBreak();
+      SExpression& dpiNode = root->appendList("dpi");
+      dpiNode.appendChild(dpi.first);
+      dpiNode.appendChild(dpi.second);
+      root->ensureLineBreak();
+      position.serialize(root->appendList("position"));
+      root->ensureLineBreak();
+      root->appendChild("rotation", rotation);
+      root->ensureLineBreak();
+      FileUtils::writeFile(dir.getPathTo("settings.lp"), root->toByteArray());
+    } else if (dir.isExistingDir()) {
+      FileUtils::removeDirRecursively(dir);
+    }
+  } catch (const Exception& e) {
+    qWarning() << "Failed to save background image data:" << e.getMsg();
+  }
+}
+
+bool BackgroundImageSettings::operator==(
+    const BackgroundImageSettings& rhs) const noexcept {
+  return (enabled == rhs.enabled) && (image == rhs.image) &&
+      (referencePos == rhs.referencePos) && (dpi == rhs.dpi) &&
+      (position == rhs.position) && (rotation == rhs.rotation);
+}
+
+bool BackgroundImageSettings::operator!=(
+    const BackgroundImageSettings& rhs) const noexcept {
+  return !(*this == rhs);
+}
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -499,11 +600,12 @@ bool PackageEditorWidget::toggleBackgroundImage() noexcept {
 
     // Show dialog.
     BackgroundImageSetupDialog dlg("package_editor", this);
-    dlg.setSettings(*mBackgroundImageSettings);
-    connect(&dlg, &BackgroundImageSetupDialog::settingsModified, this, [&]() {
-      *mBackgroundImageSettings = dlg.getSettings();
-      applyBackgroundImageSettings();
-    });
+    // dlg.setSettings(*mBackgroundImageSettings);
+    // connect(&dlg, &BackgroundImageSetupDialog::settingsModified, this, [&]()
+    // {
+    //  //*mBackgroundImageSettings = dlg.getSettings();
+    //  applyBackgroundImageSettings();
+    //});
     if (dlg.exec() != QDialog::Accepted) {
       return false;  // Aborted.
     }

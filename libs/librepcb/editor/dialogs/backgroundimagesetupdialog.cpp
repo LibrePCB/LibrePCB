@@ -37,130 +37,11 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-
-template <>
-std::unique_ptr<SExpression> serialize(const float& obj) {
-  QString s = QString::number(obj, 'f', 6);
-  while (s.endsWith("0") && (!s.endsWith(".0"))) {
-    s.chop(1);
-  }
-  return SExpression::createToken(s);
-}
-
-template <>
-std::unique_ptr<SExpression> serialize(const double& obj) {
-  QString s = QString::number(obj, 'f', 6);
-  while (s.endsWith("0") && (!s.endsWith(".0"))) {
-    s.chop(1);
-  }
-  return SExpression::createToken(s);
-}
-
-template <>
-float deserialize(const SExpression& node) {
-  return node.getValue().toFloat();
-}
-
-template <>
-double deserialize(const SExpression& node) {
-  return node.getValue().toDouble();
-}
-
 namespace editor {
-
-/*******************************************************************************
- *  Class BackgroundImageSettings
- ******************************************************************************/
-
-bool BackgroundImageSettings::tryLoadFromDir(const FilePath& dir) noexcept {
-  try {
-    const FilePath fp = dir.getPathTo("settings.lp");
-    if (fp.isExistingFile()) {
-      image.load(dir.getPathTo("image.png").toStr(), "png");
-      std::unique_ptr<SExpression> root =
-          SExpression::parse(FileUtils::readFile(fp), fp);
-      enabled = deserialize<bool>(root->getChild("enabled/@0"));
-      referencePos =
-          QPointF(deserialize<qreal>(root->getChild("reference/@0")),
-                  deserialize<qreal>(root->getChild("reference/@1")));
-      dpi = std::make_pair(deserialize<qreal>(root->getChild("dpi/@0")),
-                           deserialize<qreal>(root->getChild("dpi/@1")));
-      position = Point(root->getChild("position"));
-      rotation = deserialize<Angle>(root->getChild("rotation/@0"));
-      return true;
-    }
-  } catch (const Exception& e) {
-    qWarning() << "Failed to load background image data:" << e.getMsg();
-  }
-  return false;
-}
-
-void BackgroundImageSettings::saveToDir(const FilePath& dir) noexcept {
-  try {
-    if (!image.isNull()) {
-      FileUtils::makePath(dir);
-      image.save(dir.getPathTo("image.png").toStr(), "png");
-      std::unique_ptr<SExpression> root =
-          SExpression::createList("librepcb_background_image");
-      root->ensureLineBreak();
-      root->appendChild("enabled", enabled);
-      root->ensureLineBreak();
-      SExpression& refNode = root->appendList("reference");
-      refNode.appendChild(referencePos.x());
-      refNode.appendChild(referencePos.y());
-      root->ensureLineBreak();
-      SExpression& dpiNode = root->appendList("dpi");
-      dpiNode.appendChild(dpi.first);
-      dpiNode.appendChild(dpi.second);
-      root->ensureLineBreak();
-      position.serialize(root->appendList("position"));
-      root->ensureLineBreak();
-      root->appendChild("rotation", rotation);
-      root->ensureLineBreak();
-      FileUtils::writeFile(dir.getPathTo("settings.lp"), root->toByteArray());
-    } else if (dir.isExistingDir()) {
-      FileUtils::removeDirRecursively(dir);
-    }
-  } catch (const Exception& e) {
-    qWarning() << "Failed to save background image data:" << e.getMsg();
-  }
-}
-
-bool BackgroundImageSettings::operator==(
-    const BackgroundImageSettings& rhs) const noexcept {
-  return (enabled == rhs.enabled) && (image == rhs.image) &&
-      (referencePos == rhs.referencePos) && (dpi == rhs.dpi) &&
-      (position == rhs.position) && (rotation == rhs.rotation);
-}
-
-bool BackgroundImageSettings::operator!=(
-    const BackgroundImageSettings& rhs) const noexcept {
-  return !(*this == rhs);
-}
 
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
-
-template <typename T>
-static void setupGraphicsItem(T* item, QColor color, bool show) {
-  item->setPen(QPen(color, 0));
-  item->setVisible(show);
-}
-
-static void setupCrossGraphicsItem(QGraphicsPathItem* item, QColor color,
-                                   bool show) {
-  const qreal r = 30;
-  QPainterPath crossPath;
-  crossPath.moveTo(-r, 0);
-  crossPath.lineTo(r, 0);
-  crossPath.moveTo(0, -r);
-  crossPath.lineTo(0, r);
-  crossPath.addEllipse(-r / 4, -r / 4, r / 2, r / 2);
-  item->setPath(crossPath);
-  item->setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
-  setupGraphicsItem(item, color, show);
-}
 
 BackgroundImageSetupDialog::BackgroundImageSetupDialog(
     const QString& settingsPrefix, QWidget* parent) noexcept
@@ -168,34 +49,16 @@ BackgroundImageSetupDialog::BackgroundImageSetupDialog(
     mUi(new Ui::BackgroundImageSetupDialog),
     mSettingsPrefix(settingsPrefix % "/background_image_dialog"),
     mImageGraphicsItem(new QGraphicsPixmapItem()),
-    mCursorGraphicsItem(new QGraphicsPathItem()),
-    mCropGraphicsItem(new QGraphicsPathItem()),
-    mReferenceGraphicsItem(new QGraphicsPathItem()),
-    mMeasure1GraphicsItem(new QGraphicsPathItem()),
-    mMeasure2GraphicsItem(new QGraphicsPathItem()),
-    mMeasureLineGraphicsItem(new QGraphicsLineItem()),
-    mRotateWidget(),
-    mMeasuredLengthWidget(),
-    mState(State::Idle),
-    mAutoNextState(false) {
+    mCropGraphicsItem(new QGraphicsPathItem()) {
   mUi->setupUi(this);
   mUi->graphicsView->setOriginCrossVisible(false);
   mUi->graphicsView->setBackgroundColors(Qt::transparent, Qt::transparent);
   mUi->graphicsView->setScene(new GraphicsScene(this));
   mUi->graphicsView->setEventHandlerObject(this);
   mUi->graphicsView->scene()->addItem(mImageGraphicsItem.get());
-  mUi->graphicsView->scene()->addItem(mCursorGraphicsItem.get());
   mUi->graphicsView->scene()->addItem(mCropGraphicsItem.get());
-  mUi->graphicsView->scene()->addItem(mReferenceGraphicsItem.get());
-  mUi->graphicsView->scene()->addItem(mMeasure1GraphicsItem.get());
-  mUi->graphicsView->scene()->addItem(mMeasure2GraphicsItem.get());
-  mUi->graphicsView->scene()->addItem(mMeasureLineGraphicsItem.get());
-  setupCrossGraphicsItem(mCursorGraphicsItem.get(), Qt::blue, false);
-  setupGraphicsItem(mCropGraphicsItem.get(), Qt::blue, false);
-  setupCrossGraphicsItem(mReferenceGraphicsItem.get(), Qt::red, true);
-  setupCrossGraphicsItem(mMeasure1GraphicsItem.get(), Qt::blue, false);
-  setupCrossGraphicsItem(mMeasure2GraphicsItem.get(), Qt::blue, false);
-  setupGraphicsItem(mMeasureLineGraphicsItem.get(), Qt::blue, false);
+  mImageGraphicsItem->setTransformationMode(Qt::SmoothTransformation);
+  mCropGraphicsItem->setPen(QPen(Qt::blue, 0));
 
   // UI Handlers.
   connect(mUi->buttonBox, &QDialogButtonBox::accepted, this,
@@ -208,116 +71,17 @@ BackgroundImageSetupDialog::BackgroundImageSetupDialog(
           &BackgroundImageSetupDialog::pasteFromClipboard);
   connect(mUi->btnOpen, &QPushButton::clicked, this,
           &BackgroundImageSetupDialog::loadFromFile);
-  connect(mUi->btnReset, &QToolButton::clicked, this,
-          [this]() { setSettings(BackgroundImageSettings()); });
-  connect(mUi->btnCrop, &QToolButton::clicked, this,
-          [this]() { setState(State::Crop); });
-  connect(mUi->btnSelectReference, &QToolButton::clicked, this,
-          [this]() { setState(State::SelectReference); });
-  connect(mUi->btnMeasureScaleX, &QToolButton::clicked, this, [this]() {
-    mMeasureDirection = Qt::Horizontal;
-    setState(State::MeasureStep1);
-  });
-  connect(mUi->btnMeasureScaleY, &QToolButton::clicked, this, [this]() {
-    mMeasureDirection = Qt::Vertical;
-    setState(State::MeasureStep1);
-  });
-
-  // Modified signals.
-  connect(mUi->spbxReferenceX,
-          static_cast<void (QDoubleSpinBox::*)(double)>(
-              &QDoubleSpinBox::valueChanged),
-          this, [this]() {
-            updateUi();
-            emit settingsModified();
-          });
-  connect(mUi->spbxReferenceY,
-          static_cast<void (QDoubleSpinBox::*)(double)>(
-              &QDoubleSpinBox::valueChanged),
-          this, [this]() {
-            updateUi();
-            emit settingsModified();
-          });
-  connect(mUi->spbxDpiX,
-          static_cast<void (QDoubleSpinBox::*)(double)>(
-              &QDoubleSpinBox::valueChanged),
-          this, &BackgroundImageSetupDialog::settingsModified);
-  connect(mUi->spbxDpiY,
-          static_cast<void (QDoubleSpinBox::*)(double)>(
-              &QDoubleSpinBox::valueChanged),
-          this, &BackgroundImageSetupDialog::settingsModified);
-  connect(mUi->edtPositionX, &LengthEdit::valueChanged, this,
-          &BackgroundImageSetupDialog::settingsModified);
-  connect(mUi->edtPositionY, &LengthEdit::valueChanged, this,
-          &BackgroundImageSetupDialog::settingsModified);
-  connect(mUi->edtRotation, &AngleEdit::valueChanged, this, [this]() {
+  connect(mUi->btnReset, &QToolButton::clicked, this, [this]() {
+    mImage = QImage();
+    mCropGraphicsItem->setPath(QPainterPath());
     updateUi();
-    emit settingsModified();
   });
-
-  // Create widget for rotating.
-  {
-    mRotateWidget.reset(new QWidget(mUi->graphicsView));
-    mRotateWidget->setAutoFillBackground(true);
-    mRotateWidget->setLayout(new QHBoxLayout());
-    mRotateWidget->layout()->setContentsMargins(3, 3, 3, 3);
-    mRotateWidget->layout()->setSpacing(3);
-    QToolButton* btnRotateCcw = new QToolButton(mRotateWidget.get());
-    btnRotateCcw->setIcon(QIcon(":/img/actions/rotate_left.png"));
-    connect(btnRotateCcw, &QToolButton::clicked, this, [this]() {
-      mUi->edtRotation->setValue(mUi->edtRotation->getValue() + Angle::deg90());
-    });
-    mRotateWidget->layout()->addWidget(btnRotateCcw);
-    QToolButton* btnRotateCw = new QToolButton(mRotateWidget.get());
-    btnRotateCw->setIcon(QIcon(":/img/actions/rotate_right.png"));
-    connect(btnRotateCw, &QToolButton::clicked, this, [this]() {
-      mUi->edtRotation->setValue(mUi->edtRotation->getValue() - Angle::deg90());
-    });
-    mRotateWidget->layout()->addWidget(btnRotateCw);
-    QToolButton* btnApply = new QToolButton(mRotateWidget.get());
-    btnApply->setIcon(QIcon(":/img/actions/apply.png"));
-    connect(btnApply, &QToolButton::clicked, this,
-            &BackgroundImageSetupDialog::commitOperation);
-    mRotateWidget->layout()->addWidget(btnApply);
-    QToolButton* btnCancel = new QToolButton(mRotateWidget.get());
-    btnCancel->setIcon(QIcon(":/img/actions/cancel.png"));
-    connect(btnCancel, &QToolButton::clicked, this,
-            &BackgroundImageSetupDialog::cancelOperation);
-    mRotateWidget->layout()->addWidget(btnCancel);
-    mRotateWidget->adjustSize();
-  }
-
-  // Create widget for measurements.
-  {
-    mMeasuredLengthWidget.reset(new QWidget(mUi->graphicsView));
-    mMeasuredLengthWidget->setAutoFillBackground(true);
-    mMeasuredLengthWidget->setLayout(new QHBoxLayout());
-    mMeasuredLengthWidget->layout()->setContentsMargins(3, 3, 3, 3);
-    mMeasuredLengthWidget->layout()->setSpacing(3);
-    mMeasuredLengthWidget->layout()->addWidget(
-        new QLabel((mMeasureDirection == Qt::Vertical) ? "ΔY:" : "ΔX:",
-                   mMeasuredLengthWidget.get()));
-    mMeasuredLengthEdit = new LengthEdit(mMeasuredLengthWidget.get());
-    mMeasuredLengthWidget->layout()->addWidget(mMeasuredLengthEdit);
-    QToolButton* btnApply = new QToolButton(mMeasuredLengthWidget.get());
-    btnApply->setIcon(QIcon(":/img/actions/apply.png"));
-    connect(btnApply, &QToolButton::clicked, this,
-            &BackgroundImageSetupDialog::commitOperation);
-    mMeasuredLengthWidget->layout()->addWidget(btnApply);
-    QToolButton* btnCancel = new QToolButton(mMeasuredLengthWidget.get());
-    btnCancel->setIcon(QIcon(":/img/actions/cancel.png"));
-    connect(btnCancel, &QToolButton::clicked, this,
-            &BackgroundImageSetupDialog::cancelOperation);
-    mMeasuredLengthWidget->layout()->addWidget(btnCancel);
-    mMeasuredLengthWidget->adjustSize();
-  }
-
-  // Reset state.
-  setState(State::Idle);
 
   // Load initial values and window geometry.
   QSettings cs;
   restoreGeometry(cs.value(mSettingsPrefix % "/window_geometry").toByteArray());
+
+  updateUi();
 }
 
 BackgroundImageSetupDialog::~BackgroundImageSetupDialog() noexcept {
@@ -329,53 +93,15 @@ BackgroundImageSetupDialog::~BackgroundImageSetupDialog() noexcept {
 }
 
 /*******************************************************************************
- *  Getters
- ******************************************************************************/
-
-void BackgroundImageSetupDialog::setSettings(
-    const BackgroundImageSettings& s) noexcept {
-  QImage image = s.image;
-  // If no image was loaded but is available in clipboard, use it.
-  if (image.isNull()) {
-    image = qApp->clipboard()->image();
-  }
-  setImage(image);
-
-  mUi->spbxReferenceX->setValue(s.referencePos.x());
-  mUi->spbxReferenceY->setValue(s.referencePos.y());
-  mUi->spbxDpiX->setValue(s.dpi.first);
-  mUi->spbxDpiY->setValue(s.dpi.second);
-  mUi->edtPositionX->setValue(s.position.getX());
-  mUi->edtPositionY->setValue(s.position.getY());
-  mUi->edtRotation->setValue(s.rotation);
-
-  QTimer::singleShot(10, this, &BackgroundImageSetupDialog::fitImageInView);
-}
-
-BackgroundImageSettings BackgroundImageSetupDialog::getSettings()
-    const noexcept {
-  return BackgroundImageSettings{
-      true,
-      mImage,
-      QPointF(mUi->spbxReferenceX->value(), mUi->spbxReferenceY->value()),
-      std::make_pair(mUi->spbxDpiX->value(), mUi->spbxDpiY->value()),
-      Point(mUi->edtPositionX->getValue(), mUi->edtPositionY->getValue()),
-      mUi->edtRotation->getValue(),
-  };
-}
-
-/*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
 void BackgroundImageSetupDialog::keyPressEvent(QKeyEvent* event) noexcept {
-  if ((mState != State::Idle) && (event->key() == Qt::Key_Escape)) {
-    cancelOperation();
+  if ((event->key() == Qt::Key_Escape) &&
+      (mCropGraphicsItem->path().elementCount())) {
+    mCropGraphicsItem->setPath(QPainterPath());
+    updateUi();
     event->accept();
-    return;
-  } else if ((mState == State::MeasureStep3) &&
-             (event->key() == Qt::Key_Return)) {
-    commitOperation();
     return;
   } else if (mScreen) {
     mScreen = nullptr;
@@ -388,70 +114,38 @@ void BackgroundImageSetupDialog::keyPressEvent(QKeyEvent* event) noexcept {
 
 bool BackgroundImageSetupDialog::graphicsViewEventHandler(
     QEvent* event) noexcept {
-  if (event->type() == QEvent::GraphicsSceneMouseMove) {
+  if (event->type() == QEvent::GraphicsSceneMousePress) {
     QGraphicsSceneMouseEvent* e = static_cast<QGraphicsSceneMouseEvent*>(event);
-    mCursorGraphicsItem->setPos(e->scenePos());
-    if ((mState == State::Crop) && (mCropGraphicsItem->isVisible())) {
+    if (e->button() != Qt::LeftButton) return false;
+    QPainterPath p;
+    p.moveTo(e->scenePos());
+    mCropGraphicsItem->setPath(p);
+  } else if (event->type() == QEvent::GraphicsSceneMouseRelease) {
+    QGraphicsSceneMouseEvent* e = static_cast<QGraphicsSceneMouseEvent*>(event);
+    if (e->button() != Qt::LeftButton) return false;
+    QPainterPath path = mCropGraphicsItem->path();
+    mCropGraphicsItem->setPath(QPainterPath());
+    path.closeSubpath();
+    path.translate(-mImageGraphicsItem->pos());
+    if (path.elementCount() > 10) {
+      mImage = cropImage(mImage, path);
+      updateUi();
+      fitImageInView();
+    }
+  } else if (event->type() == QEvent::GraphicsSceneMouseMove) {
+    QGraphicsSceneMouseEvent* e = static_cast<QGraphicsSceneMouseEvent*>(event);
+    if (mCropGraphicsItem->path().elementCount() > 0) {
       QPainterPath p = mCropGraphicsItem->path();
       p.lineTo(e->scenePos());
       mCropGraphicsItem->setPath(p);
-    } else if (mState == State::SelectReference) {
-      mReferenceGraphicsItem->setPos(e->scenePos());
-    } else if (mState == State::MeasureStep1) {
-      mMeasure1GraphicsItem->setPos(e->scenePos());
-      mMeasure2GraphicsItem->setPos(e->scenePos());
-      mMeasureLineGraphicsItem->setLine(
-          QLineF(mMeasure1GraphicsItem->pos(), mMeasure2GraphicsItem->pos()));
-    } else if (mState == State::MeasureStep2) {
-      mMeasure2GraphicsItem->setPos(e->scenePos());
-      mMeasureLineGraphicsItem->setLine(
-          QLineF(mMeasure1GraphicsItem->pos(), mMeasure2GraphicsItem->pos()));
-    }
-  } else if (event->type() == QEvent::GraphicsSceneMousePress) {
-    QGraphicsSceneMouseEvent* e = static_cast<QGraphicsSceneMouseEvent*>(event);
-    if (e->button() != Qt::LeftButton) return false;
-    if (mState == State::Crop) {
-      QPainterPath p;
-      p.moveTo(e->scenePos());
-      mCropGraphicsItem->setPath(p);
-      mCropGraphicsItem->show();
-    } else if (mState == State::SelectReference) {
-      QPointF p = mImageGraphicsItem->mapFromScene(e->scenePos());
-      mUi->spbxReferenceX->setValue(p.x());
-      mUi->spbxReferenceY->setValue(p.y());
-      if (mAutoNextState) {
-        mMeasureDirection = Qt::Horizontal;
-        setState(State::MeasureStep1);
-      } else {
-        setState(State::Idle);
-      }
-    } else if (mState == State::MeasureStep1) {
-      setState(State::MeasureStep2);
-    } else if (mState == State::MeasureStep2) {
-      mMeasuredLengthEdit->setFocus(Qt::TabFocusReason);
-      setState(State::MeasureStep3);
-    }
-  } else if (event->type() == QEvent::GraphicsSceneMouseRelease) {
-    if (mState == State::Crop) {
-      QPainterPath path = mCropGraphicsItem->path();
-      path.closeSubpath();
-      path = mImageGraphicsItem->transform().inverted().map(path);
-      mCropGraphicsItem->hide();
-      if (path.elementCount() > 10) {
-        QPointF delta;
-        mImage = cropImage(mImage, path, delta);
-        mUi->spbxReferenceX->setValue(mUi->spbxReferenceX->value() - delta.x());
-        mUi->spbxReferenceY->setValue(mUi->spbxReferenceY->value() - delta.y());
-        updateUi();
-        fitImageInView();
-      }
-      setState(mAutoNextState ? State::Rotate : State::Idle);
     }
   }
   return false;
 }
 
 void BackgroundImageSetupDialog::startScreenshot() noexcept {
+  mImage = QImage();
+
   QList<QScreen*> screens = QGuiApplication::screens();
   mScreen = screens.value(0);
   if (screens.count() > 1) {
@@ -488,28 +182,23 @@ void BackgroundImageSetupDialog::screenshotCountdownTick() noexcept {
 void BackgroundImageSetupDialog::takeScreenshot() noexcept {
   if (!mScreen) return;
 
-  QPixmap pixmap = mScreen->grabWindow(0);
-  setImage(pixmap.toImage());
+  mImage = mScreen->grabWindow(0).toImage();
   mScreen = nullptr;
-  if (pixmap.isNull()) {
+  if (mImage.isNull()) {
     updateUi(
         tr("Could not take a screenshot. Note that this feature does not "
            "work on some systems due to security mechanisms."));
   } else {
-    mAutoNextState = true;
-    setState(State::Crop);
+    updateUi();
   }
+  fitImageInView();
 }
 
 void BackgroundImageSetupDialog::pasteFromClipboard() noexcept {
-  QImage image = qApp->clipboard()->image();
-  setImage(image);
-  if (image.isNull()) {
-    updateUi(tr("Please make sure to copy an image into the clipboard."));
-  } else {
-    mAutoNextState = true;
-    setState(State::Crop);
-  }
+  mImage = qApp->clipboard()->image();
+  updateUi(mImage.isNull() ? tr("No image found in the clipboard.")
+                           : QString());
+  fitImageInView();
 }
 
 void BackgroundImageSetupDialog::loadFromFile() noexcept {
@@ -527,138 +216,25 @@ void BackgroundImageSetupDialog::loadFromFile() noexcept {
     return;  // Aborted.
   }
   cs.setValue(key, fp);
-  QImage image;
-  if (!image.load(fp)) {
-    QMessageBox::warning(this, tr("Error"),
-                         tr("Failed to open the selected image file."));
+  mImage = QImage();
+  if (!mImage.load(fp)) {
+    updateUi(tr("Failed to open the selected image file."));
+  } else {
+    updateUi();
   }
-  setImage(image);
-  if (!image.isNull()) {
-    mAutoNextState = true;
-    setState(State::Crop);
-  }
-}
-
-void BackgroundImageSetupDialog::cancelOperation() noexcept {
-  mAutoNextState = false;
-  setState(State::Idle);
-  updateUi();
-}
-
-void BackgroundImageSetupDialog::commitOperation() noexcept {
-  if (mState == State::Rotate) {
-    setState(mAutoNextState ? State::SelectReference : State::Idle);
-  } else if (mState == State::MeasureStep3) {
-    if (!mMeasuredLengthEdit) return;
-    QPointF diff = mMeasure2GraphicsItem->pos() - mMeasure1GraphicsItem->pos();
-    const qreal len = (mMeasureDirection == Qt::Vertical) ? diff.y() : diff.x();
-    if (len < 50) {
-      QMessageBox::warning(
-          this, tr("Inaccurate measurement"),
-          tr("The measured distance is very short or the resolution is too "
-             "low, thus the calculated scale factor will be inaccurate. "
-             "Make sure to use a high-resolution image and measure distances "
-             "as long as possible."));
-    }
-    if (mMeasureDirection == Qt::Vertical) {
-      mUi->spbxDpiY->setValue(len / mMeasuredLengthEdit->getValue().toInch());
-    } else {
-      mUi->spbxDpiX->setValue(len / mMeasuredLengthEdit->getValue().toInch());
-    }
-    if (mAutoNextState && (mMeasureDirection == Qt::Horizontal)) {
-      mMeasureDirection = Qt::Vertical;
-      setState(State::MeasureStep1);
-    } else {
-      mAutoNextState = false;
-      setState(State::Idle);
-    }
-  }
-}
-
-void BackgroundImageSetupDialog::setImage(const QImage& image) noexcept {
-  mImage = image;
-  mUi->spbxReferenceX->setValue(image.width() / 2);
-  mUi->spbxReferenceY->setValue(image.height() / 2);
-  mUi->spbxDpiX->setValue(image.width());
-  mUi->spbxDpiY->setValue(image.width());
-  updateUi();
   fitImageInView();
-  emit settingsModified();
-}
-
-void BackgroundImageSetupDialog::setState(State state) noexcept {
-  mState = state;
-  updateUi();
 }
 
 void BackgroundImageSetupDialog::updateUi(QString msg) noexcept {
-  const bool valid = !mImage.isNull();
-  const bool idle = (mState == State::Idle);
-  mUi->btnScreenshot->setEnabled(idle);
-  mUi->btnPaste->setEnabled(idle);
-  mUi->btnOpen->setEnabled(idle);
-  mUi->btnReset->setEnabled(idle);
-  mUi->btnCrop->setEnabled(valid && idle);
-  mUi->spbxReferenceX->setEnabled(valid && idle);
-  mUi->spbxReferenceY->setEnabled(valid && idle);
-  mUi->btnSelectReference->setEnabled(valid && idle);
-  mUi->btnSelectReference->setCheckable(valid &&
-                                        (mState == State::SelectReference));
-  mUi->btnSelectReference->setChecked(valid &&
-                                      (mState == State::SelectReference));
-  mUi->spbxDpiX->setEnabled(valid && idle);
-  mUi->spbxDpiY->setEnabled(valid && idle);
-  mUi->btnMeasureScaleX->setEnabled(valid && idle);
-  mUi->btnMeasureScaleX->setCheckable((mState == State::MeasureStep1) ||
-                                      (mState == State::MeasureStep2));
-  mUi->btnMeasureScaleX->setChecked((mState == State::MeasureStep1) ||
-                                    (mState == State::MeasureStep2));
-  mUi->btnMeasureScaleY->setEnabled(valid && idle);
-  mUi->btnMeasureScaleY->setCheckable((mState == State::MeasureStep1) ||
-                                      (mState == State::MeasureStep2));
-  mUi->btnMeasureScaleY->setChecked((mState == State::MeasureStep1) ||
-                                    (mState == State::MeasureStep2));
-  mUi->edtPositionX->setEnabled(valid && idle);
-  mUi->edtPositionY->setEnabled(valid && idle);
-  mUi->edtRotation->setEnabled(valid && idle);
-  mCursorGraphicsItem->setVisible(
-      (mState == State::Crop) ||
-      ((mState >= State::MeasureStep1) && (mState < State::MeasureStep3)));
-  mMeasure1GraphicsItem->setVisible(mState >= State::MeasureStep1);
-  mMeasure2GraphicsItem->setVisible(mState >= State::MeasureStep2);
-  mMeasureLineGraphicsItem->setVisible(mState >= State::MeasureStep2);
-  mRotateWidget->setVisible(mState == State::Rotate);
-  if (mRotateWidget->isVisible()) {
-    mRotateWidget->move(mUi->graphicsView->rect().center() -
-                        mRotateWidget->rect().center());
-  }
-  mMeasuredLengthWidget->setVisible(mState == State::MeasureStep3);
-  if (mMeasuredLengthWidget->isVisible()) {
-    mMeasuredLengthWidget->move(mUi->graphicsView->rect().center() -
-                                mMeasuredLengthWidget->rect().center());
-  }
-  if ((mState == State::Crop) ||
-      ((mState >= State::SelectReference) && (mState < State::MeasureStep3))) {
-    mUi->graphicsView->setCursor(Qt::BlankCursor);
+  const bool valid = (!mImage.isNull()) && mImage.width() && mImage.height();
+  if (valid) {
+    mUi->graphicsView->setCursor(Qt::CrossCursor);
   } else {
     mUi->graphicsView->unsetCursor();
   }
 
   // Show message if no image available to display.
-  if (msg.isEmpty() &&
-      (mImage.isNull() || (!mImage.width()) || (!mImage.height()))) {
-    QStringList lines;
-    lines.append(tr("Load an image with one of the buttons on the left side."));
-    lines.append(tr("Draw a line around the footprint to cut it out."));
-    lines.append(tr("Rotate the image as desired."));
-    lines.append(tr("Select a reference point (e.g. [0, 0]) in the image."));
-    lines.append(tr(
-        "Measure a distance in X-direction to calibrate the X scale factor."));
-    lines.append(tr(
-        "Measure a distance in Y-direction to calibrate the Y scale factor."));
-    lines.append(
-        tr("Specify the position of the reference point in the footprint "
-           "editor."));
+  if (msg.isEmpty() && (!valid)) {
     msg = "<p>" %
         tr("This tool allows you to set a background image in the footprint "
            "editor to easily verify the size &amp; position of footprint pads "
@@ -666,6 +242,10 @@ void BackgroundImageSetupDialog::updateUi(QString msg) noexcept {
            "datasheet may be used as background.") %
         "</p>";
     msg += "<ol>";
+    QStringList lines;
+    lines.append(tr("Load an image with one of the buttons above."));
+    lines.append(
+        tr("Draw a line around the footprint to cut out the relevant area."));
     for (const QString& line : lines) {
       msg += QString("<li>%1</li>").arg(line);
     }
@@ -679,11 +259,8 @@ void BackgroundImageSetupDialog::updateUi(QString msg) noexcept {
   if (msg.isEmpty()) {
     // Show image.
     mUi->lblMessage->hide();
-    QTransform t;
-    t.rotate(-mUi->edtRotation->getValue().toDeg());
-    t.translate(-mImage.width() / 2, -mImage.height() / 2);
-    mImageGraphicsItem->setTransform(t);
     mImageGraphicsItem->setPixmap(QPixmap::fromImage(mImage));
+    mImageGraphicsItem->setPos(-mImage.rect().center());
     mUi->graphicsView->show();
   } else {
     // Show text.
@@ -699,55 +276,23 @@ void BackgroundImageSetupDialog::updateUi(QString msg) noexcept {
     mUi->lblMessage->show();
   }
 
-  // Update reference marker.
-  const QPointF p = mImageGraphicsItem->mapToScene(
-      mUi->spbxReferenceX->value(), mUi->spbxReferenceY->value());
-  mReferenceGraphicsItem->setPos(p);
-
   // Update status bar text.
-  switch (mState) {
-    case State::Crop: {
-      mUi->lblStatusBar->setText(
-          tr("Hold down the left mouse button while drawing a line around "
-             "the footprint"));
-      break;
-    }
-    case State::SelectReference: {
-      mUi->lblStatusBar->setText(
-          tr("Click into the image to specify the reference coordinates"));
-      break;
-    }
-    case State::MeasureStep1: {
-      mUi->lblStatusBar->setText(
-          tr("Click into the image to specify the first coordinate"));
-      break;
-    }
-    case State::MeasureStep2: {
-      mUi->lblStatusBar->setText(
-          tr("Click into the image to specify the second coordinate"));
-      break;
-    }
-    case State::MeasureStep3: {
-      mUi->lblStatusBar->setText(
-          tr("Specify the real X- or Y-distance of the measurement"));
-      break;
-    }
-    default: {
-      mUi->lblStatusBar->clear();
-      break;
-    }
+  if (valid) {
+    mUi->lblStatusBar->setText(
+        tr("Crop the image by drawing a line with the cursor around the "
+           "footprint"));
+  } else {
+    mUi->lblStatusBar->clear();
   }
 }
 
 void BackgroundImageSetupDialog::fitImageInView() noexcept {
-  QRectF br = mImageGraphicsItem->boundingRect();
-  br = mImageGraphicsItem->mapToScene(br).boundingRect();
-  mUi->graphicsView->setVisibleSceneRect(br);
+  mUi->graphicsView->setVisibleSceneRect(
+      mUi->graphicsView->scene()->itemsBoundingRect());
 }
 
 QImage BackgroundImageSetupDialog::cropImage(const QImage& img,
-                                             const QPainterPath& p,
-                                             QPointF& delta) noexcept {
+                                             const QPainterPath& p) noexcept {
   // Determine background color.
   QHash<QRgb, int> histogram;
   for (int i = 0; i <= 100; ++i) {
@@ -776,7 +321,6 @@ QImage BackgroundImageSetupDialog::cropImage(const QImage& img,
   QRect rect = p.boundingRect().toRect();
   const int m = std::min(rect.width(), rect.height()) / 20;
   rect = rect.adjusted(-m, -m, m, m);
-  delta = rect.topLeft();
   return pixmap.copy(rect).toImage();
 }
 
