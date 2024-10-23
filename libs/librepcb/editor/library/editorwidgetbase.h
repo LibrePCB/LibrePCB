@@ -99,6 +99,7 @@ public:
     Filter,
     GraphicsView,
     OpenGlView,
+    BackgroundImage,
     ExportGraphics,
     GenerateOutline,
     GenerateCourtyard,
@@ -133,6 +134,7 @@ public:
   bool isDirty() const noexcept {
     return mManualModificationsMade || (!mUndoStack->isClean());
   }
+  virtual bool isBackgroundImageSet() const noexcept { return false; }
   virtual QSet<Feature> getAvailableFeatures() const noexcept = 0;
 
   // Setters
@@ -185,6 +187,7 @@ public slots:
   virtual bool editGridProperties() noexcept { return false; }
   virtual bool increaseGridInterval() noexcept { return false; }
   virtual bool decreaseGridInterval() noexcept { return false; }
+  virtual bool toggleBackgroundImage() noexcept { return false; }
 
 protected:  // Methods
   void setupInterfaceBrokenWarningWidget(QWidget& widget) noexcept;

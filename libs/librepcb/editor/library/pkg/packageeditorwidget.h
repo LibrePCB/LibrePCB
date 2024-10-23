@@ -56,6 +56,21 @@ class PackageEditorWidget;
 }
 
 /*******************************************************************************
+ *  Class BackgroundImageSettings
+ ******************************************************************************/
+
+struct BackgroundImageSettings {
+  bool enabled = true;  ///< Whether the background is enabled or not
+  QImage image;  ///< The original loaded image
+  Angle rotation;  ///< Rotation in scene
+  QList<std::pair<QPointF, Point>> references;  ///< References in #image
+
+  bool tryLoadFromDir(const FilePath& dir) noexcept;
+  void saveToDir(const FilePath& dir) noexcept;
+  QPixmap buildPixmap(const QColor& bgColor) const noexcept;
+};
+
+/*******************************************************************************
  *  Class PackageEditorWidget
  ******************************************************************************/
 
@@ -75,6 +90,7 @@ public:
   ~PackageEditorWidget() noexcept;
 
   // Getters
+  bool isBackgroundImageSet() const noexcept override;
   QSet<Feature> getAvailableFeatures() const noexcept override;
 
   // Setters
@@ -112,6 +128,7 @@ public slots:
   bool editGridProperties() noexcept override;
   bool increaseGridInterval() noexcept override;
   bool decreaseGridInterval() noexcept override;
+  bool toggleBackgroundImage() noexcept override;
 
 private:  // Methods
   void updateMetadata() noexcept;
@@ -141,6 +158,8 @@ private:  // Methods
                                 const QString& settingsKey) noexcept override;
   void setGridProperties(const PositiveLength& interval, const LengthUnit& unit,
                          Theme::GridStyle style) noexcept;
+  void applyBackgroundImageSettings() noexcept;
+  FilePath getBackgroundImageCacheDir() const noexcept;
   void toggle3DMode(bool enable) noexcept;
   bool is3DModeEnabled() const noexcept;
 
@@ -155,6 +174,10 @@ private:  // Data
   std::unique_ptr<Package> mPackage;
   std::shared_ptr<Footprint> mCurrentFootprint;
   std::shared_ptr<PackageModel> mCurrentModel;
+
+  // Background image
+  BackgroundImageSettings mBackgroundImageSettings;
+  std::shared_ptr<QGraphicsPixmapItem> mBackgroundImageGraphicsItem;
 
   // broken interface detection
   QSet<Uuid> mOriginalPadUuids;

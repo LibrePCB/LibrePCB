@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>librepcb::editor::BackgroundImageSetupDialog</class>
+ <widget class="QDialog" name="librepcb::editor::BackgroundImageSetupDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>699</width>
+    <height>435</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Set Background Image</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_4">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="0" column="0">
+          <widget class="QPushButton" name="btnScreenshot">
+           <property name="text">
+            <string>Take Screenshot</string>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>:/img/actions/export_pixmap.png</normaloff>:/img/actions/export_pixmap.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QPushButton" name="btnPaste">
+           <property name="text">
+            <string>Paste From Clipboard</string>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>:/img/actions/paste.png</normaloff>:/img/actions/paste.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QPushButton" name="btnOpen">
+           <property name="text">
+            <string>Load From File</string>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>:/img/actions/open.png</normaloff>:/img/actions/open.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1" rowspan="3">
+          <widget class="QPushButton" name="btnReset">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="toolTip">
+            <string>Discard image</string>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>:/img/actions/clean.png</normaloff>:/img/actions/clean.png</iconset>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="Line" name="hLine">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="lblCoordinates">
+         <property name="text">
+          <string>Specify coordinates of reference points:</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="widgetsLayout"/>
+       </item>
+       <item>
+        <widget class="QLabel" name="lblStatus">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Ignored" vsizetype="MinimumExpanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="font">
+          <font>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="QFrame" name="frame">
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="lblMessage">
+          <property name="styleSheet">
+           <string notr="true">color: gray;</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+          <property name="margin">
+           <number>30</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="librepcb::editor::GraphicsView" name="graphicsView"/>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>librepcb::editor::GraphicsView</class>
+   <extends>QGraphicsView</extends>
+   <header location="global">librepcb/editor/widgets/graphicsview.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

@@ -873,6 +873,15 @@ public:
       {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_L)},
       &categoryView,
   };
+  EditorCommand toggleBackgroundImage{
+      "toggle_background_image",  // clang-format break
+      QT_TR_NOOP("Set/Unset Background Image"),
+      QT_TR_NOOP("Use a datasheet drawing as the background for verification"),
+      ":/img/actions/export_pixmap.png",
+      EditorCommand::Flag::OpensPopup,
+      {},
+      &categoryView,
+  };
   EditorCommand toggle3d{
       "toggle_3d",  // clang-format break
       QT_TR_NOOP("Toggle 2D/3D Mode"),
