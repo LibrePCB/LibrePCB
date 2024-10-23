@@ -580,6 +580,14 @@ void LibraryEditor::createActions() noexcept {
   mActionGridDecrease.reset(cmd.gridDecrease.createAction(this, this, [this]() {
     if (mCurrentEditorWidget) mCurrentEditorWidget->decreaseGridInterval();
   }));
+  mActionToggleBgImage.reset(
+      cmd.toggleBackgroundImage.createAction(this, this, [this]() {
+        if (mCurrentEditorWidget) {
+          const bool enabled = mCurrentEditorWidget->toggleBackgroundImage();
+          mActionToggleBgImage->setCheckable(enabled);
+          mActionToggleBgImage->setChecked(enabled);
+        }
+      }));
   mActionZoomFit.reset(cmd.zoomFitContent.createAction(this, this, [this]() {
     if (mCurrentEditorWidget) mCurrentEditorWidget->zoomAll();
   }));
@@ -785,6 +793,7 @@ void LibraryEditor::createToolBars() noexcept {
   mToolBarView.reset(new QToolBar(tr("View"), this));
   mToolBarView->setObjectName("toolBarView");
   mToolBarView->addAction(mActionGridProperties.data());
+  mToolBarView->addAction(mActionToggleBgImage.data());
   mToolBarView->addAction(mActionZoomIn.data());
   mToolBarView->addAction(mActionZoomOut.data());
   mToolBarView->addAction(mActionZoomFit.data());
@@ -923,6 +932,7 @@ void LibraryEditor::createMenus() noexcept {
   mb.addAction(mActionGridProperties);
   mb.addAction(mActionGridIncrease.data());
   mb.addAction(mActionGridDecrease.data());
+  mb.addAction(mActionToggleBgImage);
   mb.addSeparator();
   mb.addAction(mActionZoomIn);
   mb.addAction(mActionZoomOut);
@@ -1001,6 +1011,7 @@ void LibraryEditor::setAvailableFeatures(
   mActionRotateCcw->setEnabled(features.contains(Feature::Rotate));
   mActionRotateCw->setEnabled(features.contains(Feature::Rotate));
   mActionSelectAll->setEnabled(features.contains(Feature::SelectGraphics));
+  mActionToggleBgImage->setEnabled(features.contains(Feature::BackgroundImage));
   mActionZoomFit->setEnabled(features.contains(Feature::GraphicsView));
   mActionZoomIn->setEnabled(features.contains(Feature::GraphicsView));
   mActionZoomOut->setEnabled(features.contains(Feature::GraphicsView));
@@ -1037,10 +1048,14 @@ void LibraryEditor::setActiveEditorWidget(EditorWidgetBase* widget) {
     mCurrentEditorWidget->connectEditor(*mUndoStackActionGroup,
                                         *mToolsActionGroup, *mToolBarCommand,
                                         *mUi->statusBar);
+    const bool bgImageSet = mCurrentEditorWidget->isBackgroundImageSet();
+    mActionToggleBgImage->setCheckable(bgImageSet);
+    mActionToggleBgImage->setChecked(bgImageSet);
     setAvailableFeatures(mCurrentEditorWidget->getAvailableFeatures());
     connect(mCurrentEditorWidget, &EditorWidgetBase::availableFeaturesChanged,
             this, &LibraryEditor::setAvailableFeatures);
   } else {
+    mActionToggleBgImage->setChecked(false);
     setAvailableFeatures({});
   }
   updateTabTitles();  // force updating the "Save" action title
