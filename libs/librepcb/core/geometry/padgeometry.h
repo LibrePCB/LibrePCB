@@ -67,6 +67,7 @@ public:
   UnsignedLength getCornerRadius() const noexcept;
   const Path& getPath() const noexcept { return mPath; }
   const PadHoleList& getHoles() const noexcept { return mHoles; }
+  tl::optional<UnsignedLength> tryGetCircleRadius() const noexcept;
 
   // General Methods
   QVector<Path> toOutlines() const;

@@ -72,6 +72,17 @@ UnsignedLength PadGeometry::getCornerRadius() const noexcept {
   return UnsignedLength(std::max(Length(0), radius + mOffset));
 }
 
+tl::optional<UnsignedLength> PadGeometry::tryGetCircleRadius() const noexcept {
+  const Length width = getWidth();
+  if (((mShape == Shape::RoundedRect) || (mShape == Shape::RoundedOctagon)) &&
+      (*mRadius == Ratio::fromPercent(100)) && (width > 0) &&
+      (width == getHeight())) {
+    return UnsignedLength(mBaseWidth);
+  } else {
+    return tl::nullopt;
+  }
+}
+
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
