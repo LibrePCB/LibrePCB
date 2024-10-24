@@ -26,6 +26,7 @@
 #include "appwindow.h"
 
 #include <QtCore>
+#include <QtGui>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -57,6 +58,32 @@ class MainWindow : public QObject {
   Q_OBJECT
 
 public:
+  struct Tab {
+    std::shared_ptr<ProjectEditor> project;
+    ui::TabType type;
+    int objIndex = -1;
+    QPointF offset;
+    qreal scale = 1;
+    QRectF sceneRect;
+
+    qreal projectionFov = 15;
+    QPointF projectionCenter;
+    QMatrix4x4 transform;
+  };
+  struct Section {
+    QList<Tab> tabs;
+    std::shared_ptr<GraphicsScene> scene;
+    std::shared_ptr<OpenGlView> openGlView;
+    std::shared_ptr<OpenGlSceneBuilder> openGlSceneBuilder;
+    bool panning = false;
+    QPointF startScenePos;
+
+    QPointF mousePressPosition;
+    QMatrix4x4 mousePressTransform;
+    QPointF mousePressCenter;
+    QSet<slint::private_api::PointerEventButton> buttons;
+  };
+
   // Constructors / Destructor
   MainWindow() = delete;
   MainWindow(const MainWindow& other) = delete;
@@ -72,16 +99,17 @@ private:
   void projectItemDoubleClicked(const slint::SharedString& path) noexcept;
   void schematicItemClicked(int index) noexcept;
   void boardItemClicked(int index) noexcept;
-  void board3dItemClicked(int index) noexcept;
-  void tabClicked(int section, int index) noexcept;
-  void tabCloseClicked(int section, int index) noexcept;
-  slint::Image renderScene(int section, float width, float height,
+  void board3dItemClicked(int section, int tab) noexcept;
+  void addTab(ui::TabType type, const QString& title, int objIndex) noexcept;
+  void tabClicked(int section, int tab) noexcept;
+  void tabCloseClicked(int section, int tab) noexcept;
+  slint::Image renderScene(int section, int tab, float width, float height,
                            int frame) noexcept;
-  slint::private_api::EventResult onScnePointerEvent(
-      int section, float x1, float y1, float x0, float y0,
+  slint::private_api::EventResult onScenePointerEvent(
+      int section, int tab, float x, float y,
       slint::private_api::PointerEvent e) noexcept;
   slint::private_api::EventResult onSceneScrolled(
-      int section, float x, float y,
+      int section, int tab, float x, float y,
       slint::private_api::PointerScrollEvent e) noexcept;
 
   GuiApplication& mApp;
@@ -91,13 +119,8 @@ private:
   std::shared_ptr<ProjectEditor> mProject;
   std::unique_ptr<BoardPlaneFragmentsBuilder> mPlaneBuilder;
   std::unique_ptr<IF_GraphicsLayerProvider> mLayerProvider;
-  QVector<std::shared_ptr<slint::VectorModel<ui::Tab>>> mTabs;  ///< count=2
-  QVector<std::shared_ptr<GraphicsScene>> mScenes;  ///< count=2
-  QVector<std::shared_ptr<OpenGlView>> m3dViews;
-  QVector<std::shared_ptr<OpenGlSceneBuilder>> m3dSceneBuilders;
-  QVector<QTransform> mOldTransforms;
-  QVector<QTransform> mTransforms;
-  QVector<bool> mMoving;
+  QList<Section> mSections;
+  std::shared_ptr<slint::VectorModel<ui::SectionData>> mSectionsData;
 };
 
 /*******************************************************************************

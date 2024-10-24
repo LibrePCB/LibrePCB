@@ -693,21 +693,21 @@ void BoardEditor::createActions() noexcept {
   mActionIgnoreLocks->setCheckable(true);
   mActionZoomFit.reset(cmd.zoomFitContent.createAction(this, this, [this]() {
     if (mOpenGlView && mOpenGlView->isVisible()) {
-      mOpenGlView->zoomAll();
+      // mOpenGlView->zoomAll();
     } else {
       mUi->graphicsView->zoomAll();
     }
   }));
   mActionZoomIn.reset(cmd.zoomIn.createAction(this, this, [this]() {
     if (mOpenGlView && mOpenGlView->isVisible()) {
-      mOpenGlView->zoomIn();
+      // mOpenGlView->zoomIn();
     } else {
       mUi->graphicsView->zoomIn();
     }
   }));
   mActionZoomOut.reset(cmd.zoomOut.createAction(this, this, [this]() {
     if (mOpenGlView && mOpenGlView->isVisible()) {
-      mOpenGlView->zoomOut();
+      // mOpenGlView->zoomOut();
     } else {
       mUi->graphicsView->zoomOut();
     }
@@ -1784,10 +1784,10 @@ bool BoardEditor::show3DView() noexcept {
     mOpenGlView.reset(new OpenGlView(this));
     mUi->mainLayout->insertWidget(2, mOpenGlView.data(), 1);
     mOpenGlSceneBuilder.reset(new OpenGlSceneBuilder());
-    connect(mOpenGlSceneBuilder.data(), &OpenGlSceneBuilder::started,
-            mOpenGlView.data(), &OpenGlView::startSpinning);
-    connect(mOpenGlSceneBuilder.data(), &OpenGlSceneBuilder::finished,
-            mOpenGlView.data(), &OpenGlView::stopSpinning);
+    // connect(mOpenGlSceneBuilder.data(), &OpenGlSceneBuilder::started,
+    //         mOpenGlView.data(), &OpenGlView::startSpinning);
+    // connect(mOpenGlSceneBuilder.data(), &OpenGlSceneBuilder::finished,
+    //         mOpenGlView.data(), &OpenGlView::stopSpinning);
     connect(mOpenGlSceneBuilder.data(), &OpenGlSceneBuilder::finished, this,
             [this]() {
               mTimestampOfLastOpenGlSceneRebuild =

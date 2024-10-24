@@ -66,7 +66,6 @@ OpenGlView::OpenGlView(QWidget* parent) noexcept
     mProjectionFov(sInitialFov),
     mProjectionCenter(0, 0),
     mIdleTimeMs(0),
-    mWaitingSpinner(new WaitingSpinnerWidget(this)),
     mAnimation(new QVariantAnimation(this)) {
   QSurfaceFormat fmt = format();
   fmt.setSamples(4);
@@ -126,111 +125,16 @@ void OpenGlView::setObjects(
   update();
 }
 
-void OpenGlView::zoomIn() noexcept {
-  zoom(rect().center(), sZoomStepFactor);
-}
-
-void OpenGlView::zoomOut() noexcept {
-  zoom(rect().center(), 1 / sZoomStepFactor);
-}
-
-void OpenGlView::zoomAll() noexcept {
-  mIdleTimeMs = 0;
-  smoothTo(sInitialFov, QPointF(0, 0), QMatrix4x4());
-}
-
-void OpenGlView::startSpinning() noexcept {
-  mWaitingSpinner->show();
-}
-
-void OpenGlView::stopSpinning(QString errorMsg) noexcept {
-  mWaitingSpinner->hide();
-  if (errorMsg.isEmpty()) {
-    mErrorLabel->hide();
-  } else {
-    mErrorLabel->setText(errorMsg);
-    mErrorLabel->show();
-  }
+void OpenGlView::setTransform(const QMatrix4x4& transform, qreal fov,
+                              const QPointF& center) noexcept {
+  mTransform = transform;
+  mProjectionFov = fov;
+  mProjectionCenter = center;
 }
 
 /*******************************************************************************
  *  Protected Methods
  ******************************************************************************/
-
-void OpenGlView::mousePressEvent(QMouseEvent* e) {
-  mMousePressPosition = e->pos();
-  mMousePressTransform = mTransform;
-  mMousePressCenter = mProjectionCenter;
-  mIdleTimeMs = 0;
-}
-
-void OpenGlView::mouseMoveEvent(QMouseEvent* e) {
-  const QPointF posNorm = toNormalizedPos(e->pos());
-  const QPointF mousePressPosNorm = toNormalizedPos(mMousePressPosition);
-
-  if (e->buttons().testFlag(Qt::MiddleButton) ||
-      e->buttons().testFlag(Qt::RightButton)) {
-    const QPointF cursorPosOld = toModelPos(mousePressPosNorm);
-    const QPointF cursorPosNew = toModelPos(posNorm);
-    mProjectionCenter = mMousePressCenter + cursorPosNew - cursorPosOld;
-    update();
-  }
-  if (e->buttons() & Qt::LeftButton) {
-    mTransform = mMousePressTransform;
-    if (e->modifiers().testFlag(Qt::ShiftModifier)) {
-      // Rotate around Z axis.
-      const QPointF p1 = toModelPos(mousePressPosNorm) - mProjectionCenter;
-      const QPointF p2 = toModelPos(posNorm) - mProjectionCenter;
-      const qreal angle1 = std::atan2(p1.y(), p1.x());
-      const qreal angle2 = std::atan2(p2.y(), p2.x());
-      const Angle angle = Angle::fromRad(angle2 - angle1).mappedTo180deg();
-      const QVector3D axis =
-          mMousePressTransform.inverted().map(QVector3D(0, 0, angle.toDeg()));
-      mTransform.rotate(QQuaternion::fromAxisAndAngle(axis.normalized(),
-                                                      angle.abs().toDeg()));
-    } else {
-      // Rotate around X/Y axis.
-      const QVector2D delta(posNorm - mousePressPosNorm);
-      const QVector3D axis = mMousePressTransform.inverted().map(
-          QVector3D(-delta.y(), delta.x(), 0));
-      mTransform.rotate(QQuaternion::fromAxisAndAngle(axis.normalized(),
-                                                      delta.length() * 270));
-    }
-    update();
-  }
-  mIdleTimeMs = 0;
-}
-
-void OpenGlView::wheelEvent(QWheelEvent* e) {
-  if (e->angleDelta().y() != 0) {
-    zoom(
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
-        e->position(),
-#else
-        e->pos(),
-#endif
-        qPow(sZoomStepFactor, e->angleDelta().y() / qreal(120)));
-  }
-}
-
-void OpenGlView::smoothTo(qreal fov, const QPointF& center,
-                          const QMatrix4x4& transform) noexcept {
-  mAnimationDataStart = TransformData{
-      mProjectionFov,
-      mProjectionCenter,
-      mTransform,
-  };
-  mAnimationDataDelta = TransformData{
-      fov - mAnimationDataStart.fov,
-      center - mAnimationDataStart.center,
-      transform - mAnimationDataStart.transform,
-  };
-
-  mAnimation->stop();
-  mAnimation->setStartValue(qreal(0));
-  mAnimation->setEndValue(qreal(1));
-  mAnimation->start();
-}
 
 void OpenGlView::initializeGL() {
   initializeOpenGLFunctions();
@@ -297,19 +201,6 @@ void OpenGlView::paintGL() {
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
-
-void OpenGlView::zoom(const QPointF& center, qreal factor) noexcept {
-  mAnimation->stop();
-
-  const QPointF centerNormalized = toNormalizedPos(center);
-  const QPointF modelPosOld = toModelPos(centerNormalized);
-  mProjectionFov = qBound(qreal(0.01), mProjectionFov / factor, qreal(90));
-  const QPointF modelPosNew = toModelPos(centerNormalized);
-  mProjectionCenter += modelPosNew - modelPosOld;
-
-  mIdleTimeMs = 0;
-  update();
-}
 
 QPointF OpenGlView::toNormalizedPos(const QPointF& pos) const noexcept {
   const qreal w = width();

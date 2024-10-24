@@ -55,14 +55,15 @@ export enum TabType {
 
 export struct Tab {
     type: TabType,
-    index: int,  // Index of schematic or board in the project (not tab index)
     title: string,
 }
 
 export struct SectionData {
     index: int,  // Section index (0 = left most)
+    tabs: [Tab], // Tabs in this section
     tab-index: int,  // Currently opened tab in this section
     overlay-color: brush,
+    frame: int, // Frame index to trigger repainting
 }
 
 export struct EditParseResult {
@@ -93,19 +94,20 @@ export global Globals {
 
     // The 3D viewer for a board has been requested.
     //
-    // - Board index
-    pure callback board-3d-clicked(int);
+    // - Section index
+    // - Board tab index
+    pure callback board-3d-clicked(int, int);
 
     // Requested to switch to a particular tab
     //
-    // - Section index (0 = left, 1 = right)
-    // - Clicked tab index
+    // - Section index
+    // - Tab index
     pure callback tab-clicked(int, int);
 
     // Requested to close a particular tab
     //
-    // - Section index (0 = left, 1 = right)
-    // - Clicked tab index
+    // - Section index
+    // - Tab index
     pure callback tab-close-clicked(int, int);
 
     // Populate the installed-libraries and available-libraries models with data
@@ -120,17 +122,23 @@ export global Globals {
     // - Library ID (see Library::id)
     pure callback uninstall-library(string);
 
+    // Set the current section index
+    //
+    // - Section index
+    //pure callback set-current-section(int);
+
     // Render a graphics scene image
     //
-    // - Scene section (0 = left, 1 = right)
+    // - Scene section
+    // - Current tab in section
     // - Scene width
     // - Scene height
     // - Frame number (to be ignored)
-    pure callback render-scene(int, length, length, int) -> image;
+    pure callback render-scene(int, int, length, length, int) -> image;
 
-    pure callback scene-pointer-event(int, length, length, length, length, PointerEvent) -> EventResult;
+    pure callback scene-pointer-event(int, int, length, length, PointerEvent) -> EventResult;
 
-    pure callback scene-scrolled(int, length, length, PointerScrollEvent) -> EventResult;
+    pure callback scene-scrolled(int, int, length, length, PointerScrollEvent) -> EventResult;
 
     in property <bool> preview-mode: true;
 
@@ -230,27 +238,28 @@ export global Globals {
         },
     ];
 
-    in property <[Tab]> tabs-left: [
-        { type: TabType.schematic, index: 0, title: "Tab 1" },
-        { type: TabType.board-2d, index: 0, title: "Tab 2" },
-        { type: TabType.schematic, index: 1, title: "Tab 3" },
+    in property <[SectionData]> sections: [
+        {
+            index: 0,
+            tabs: [
+                { type: TabType.schematic, index: 0, title: "Tab 1" },
+                { type: TabType.board-2d, index: 0, title: "Tab 2" },
+                { type: TabType.schematic, index: 1, title: "Tab 3" },
+            ],
+            tab-index: 0,
+            overlay-color: Colors.gray,
+        },
+        {
+            index: 1,
+            tabs: [
+                { type: TabType.board-2d, index: 0, title: "Tab 4" },
+                { type: TabType.schematic, index: 0, title: "Tab 5" },
+                { type: TabType.board-3d, index: 1, title: "Tab 6" },
+            ],
+            tab-index: 0,
+            overlay-color: Colors.gray,
+        },
     ];
 
-    in property <SectionData> section-left: {
-        index: 0,
-        tab-index: 0,
-        overlay-color: Colors.gray,
-    };
-
-    in property <[Tab]> tabs-right: [
-        { type: TabType.board-2d, index: 0, title: "Tab 4" },
-        { type: TabType.schematic, index: 0, title: "Tab 5" },
-        { type: TabType.board-3d, index: 1, title: "Tab 6" },
-    ];
-
-    in property <SectionData> section-right: {
-        index: 1,
-        tab-index: 0,
-        overlay-color: Colors.gray,
-    };
+    in property <int> current-section: 0;
 }

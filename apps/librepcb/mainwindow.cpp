@@ -65,20 +65,9 @@ MainWindow::MainWindow(GuiApplication& app,
     mPlaneBuilder(new BoardPlaneFragmentsBuilder(false, this)),
     mLayerProvider(new DefaultGraphicsLayerProvider(
         app.getWorkspace().getSettings().themes.getActive())),
-    mTabs({
-        std::make_shared<slint::VectorModel<ui::Tab>>(),
-        std::make_shared<slint::VectorModel<ui::Tab>>(),
-    }),
-    mScenes({nullptr, nullptr}),
-    m3dViews({nullptr, nullptr}),
-    m3dSceneBuilders({nullptr, nullptr}),
-    mOldTransforms({{}, {}}),
-    mTransforms({{}, {}}),
-    mMoving({false, false}) {
+    mSectionsData(new slint::VectorModel<ui::SectionData>()) {
   // Set initial data.
   mGlobals.set_current_project(ui::ProjectData{});
-  mGlobals.set_section_left(ui::SectionData{0, -1, slint::Brush()});
-  mGlobals.set_section_right(ui::SectionData{1, -1, slint::Brush()});
   mWindow->set_cursor_coordinate(slint::SharedString());
 
   // Register global callbacks.
@@ -88,28 +77,30 @@ MainWindow::MainWindow(GuiApplication& app,
                                           this, std::placeholders::_1));
   mGlobals.on_board_clicked(
       std::bind(&MainWindow::boardItemClicked, this, std::placeholders::_1));
-  mGlobals.on_board_3d_clicked(
-      std::bind(&MainWindow::board3dItemClicked, this, std::placeholders::_1));
+  mGlobals.on_board_3d_clicked(std::bind(&MainWindow::board3dItemClicked, this,
+                                         std::placeholders::_1,
+                                         std::placeholders::_2));
   mGlobals.on_tab_clicked(std::bind(&MainWindow::tabClicked, this,
                                     std::placeholders::_1,
                                     std::placeholders::_2));
   mGlobals.on_tab_close_clicked(std::bind(&MainWindow::tabCloseClicked, this,
                                           std::placeholders::_1,
                                           std::placeholders::_2));
-  mGlobals.on_render_scene(std::bind(
-      &MainWindow::renderScene, this, std::placeholders::_1,
-      std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
-  mGlobals.on_scene_pointer_event(std::bind(
-      &MainWindow::onScnePointerEvent, this, std::placeholders::_1,
-      std::placeholders::_2, std::placeholders::_3, std::placeholders::_4,
-      std::placeholders::_5, std::placeholders::_6));
-  mGlobals.on_scene_scrolled(std::bind(
-      &MainWindow::onSceneScrolled, this, std::placeholders::_1,
-      std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
+  mGlobals.on_render_scene(
+      std::bind(&MainWindow::renderScene, this, std::placeholders::_1,
+                std::placeholders::_2, std::placeholders::_3,
+                std::placeholders::_4, std::placeholders::_5));
+  mGlobals.on_scene_pointer_event(
+      std::bind(&MainWindow::onScenePointerEvent, this, std::placeholders::_1,
+                std::placeholders::_2, std::placeholders::_3,
+                std::placeholders::_4, std::placeholders::_5));
+  mGlobals.on_scene_scrolled(
+      std::bind(&MainWindow::onSceneScrolled, this, std::placeholders::_1,
+                std::placeholders::_2, std::placeholders::_3,
+                std::placeholders::_4, std::placeholders::_5));
 
   // Set models.
-  mGlobals.set_tabs_left(mTabs[0]);
-  mGlobals.set_tabs_right(mTabs[1]);
+  mGlobals.set_sections(mSectionsData);
 
   // Show window.
   mWindow->show();
@@ -158,115 +149,158 @@ void MainWindow::projectItemDoubleClicked(
 
 void MainWindow::schematicItemClicked(int index) noexcept {
   if (!mProject) return;
-  auto section = (mTabs[0]->row_count() + mTabs[1]->row_count()) % 2;
   if (auto obj = mProject->getProject().getSchematicByIndex(index)) {
-    mTabs[section]->push_back(
-        ui::Tab{ui::TabType::Schematic, index, q2s(*obj->getName())});
-    tabClicked(section, mTabs[section]->row_count() - 1);
+    addTab(ui::TabType::Schematic, *obj->getName(), index);
   }
 }
 
 void MainWindow::boardItemClicked(int index) noexcept {
   if (!mProject) return;
-  auto section = (mTabs[0]->row_count() + mTabs[1]->row_count()) % 2;
   if (auto obj = mProject->getProject().getBoardByIndex(index)) {
-    mTabs[section]->push_back(
-        ui::Tab{ui::TabType::Board2d, index, q2s(*obj->getName())});
-    tabClicked(section, mTabs[section]->row_count() - 1);
+    addTab(ui::TabType::Board2d, *obj->getName(), index);
   }
 }
 
-void MainWindow::board3dItemClicked(int index) noexcept {
-  if (!mProject) return;
-  auto section = (mTabs[0]->row_count() + mTabs[1]->row_count()) % 2;
-  if (auto obj = mProject->getProject().getBoardByIndex(index)) {
-    mTabs[section]->push_back(
-        ui::Tab{ui::TabType::Board3d, index, q2s(*obj->getName())});
-    tabClicked(section, mTabs[section]->row_count() - 1);
+void MainWindow::board3dItemClicked(int section, int tab) noexcept {
+  if (section >= mSections.count()) return;
+  if (tab >= mSections[section].tabs.count()) return;
+  auto tabObj = mSections[section].tabs[tab];
+  if (auto obj =
+          tabObj.project->getProject().getBoardByIndex(tabObj.objIndex)) {
+    addTab(ui::TabType::Board3d, *obj->getName(), tabObj.objIndex);
   }
 }
 
-void MainWindow::tabClicked(int section, int index) noexcept {
-  auto tabs = mTabs[section];
-  auto tab = tabs ? tabs->row_data(index) : std::nullopt;
+void MainWindow::addTab(ui::TabType type, const QString& title,
+                        int objIndex) noexcept {
+  int section = 0;
+  if (mSections.count() < 2) {
+    mSections.append(Section{});
+    mSectionsData->push_back(ui::SectionData{
+        static_cast<int>(mSections.count() - 1),
+        std::make_shared<slint::VectorModel<ui::Tab>>(),
+        0,
+        slint::Brush(),
+        0,
+    });
+    section = mSections.count() - 1;
+  } else {
+    for (std::size_t i = 0; i < mSectionsData->row_count(); ++i) {
+      section += mSectionsData->row_data(i)->tabs->row_count();
+    }
+    section %= 2;
+  }
+
+  mSections[section].tabs.append(Tab{
+      mProject,
+      type,
+      objIndex,
+      QPointF(),
+      1,
+      QRectF(),
+  });
+  auto tabs = std::dynamic_pointer_cast<slint::VectorModel<ui::Tab>>(
+      mSectionsData->row_data(section)->tabs);
+  tabs->push_back(ui::Tab{type, q2s(title)});
+  tabClicked(section, tabs->row_count() - 1);
+}
+
+void MainWindow::tabClicked(int section, int tab) noexcept {
+  if (section >= mSections.count()) return;
+  auto& sectionObj = mSections[section];
+  if (tab >= sectionObj.tabs.count()) return;
+  auto& tabObj = mSections[section].tabs[tab];
+  auto sectionData = mSectionsData->row_data(section);
+  if (!sectionData) return;
+
   bool success = false;
-  ui::SectionData data{section, index, slint::Brush()};
-  if (tab) {
-    if (tab->type == ui::TabType::Schematic) {
-      if (auto sch = mProject->getProject().getSchematicByIndex(tab->index)) {
-        m3dSceneBuilders[section].reset();
-        m3dViews[section].reset();
-        mScenes[section].reset(new SchematicGraphicsScene(
-            *sch, *mLayerProvider, std::make_shared<QSet<const NetSignal*>>(),
-            this));
-        data.overlay_color = q2s(Qt::black);
-        success = true;
-      }
-    } else if (tab->type == ui::TabType::Board2d) {
-      if (auto brd = mProject->getProject().getBoardByIndex(tab->index)) {
-        mPlaneBuilder->startAsynchronously(*brd);
-        m3dSceneBuilders[section].reset();
-        m3dViews[section].reset();
-        mScenes[section].reset(new BoardGraphicsScene(
-            *brd, *mLayerProvider, std::make_shared<QSet<const NetSignal*>>(),
-            this));
-        data.overlay_color = q2s(Qt::white);
-        success = true;
-      }
-    } else if (tab->type == ui::TabType::Board3d) {
-      if (auto brd = mProject->getProject().getBoardByIndex(tab->index)) {
-        mPlaneBuilder->startAsynchronously(*brd);
-        mScenes[section].reset();
-        m3dViews[section].reset(new OpenGlView());
-        m3dViews[section]->stopSpinning(QString());
-        m3dSceneBuilders[section].reset(new OpenGlSceneBuilder(this));
-        connect(m3dSceneBuilders[section].get(),
-                &OpenGlSceneBuilder::objectAdded, m3dViews[section].get(),
-                &OpenGlView::addObject);
-        connect(m3dSceneBuilders[section].get(),
-                &OpenGlSceneBuilder::objectAdded, this, [this, section]() {
-                  (section == 0) ? mWindow->fn_refresh_scene_left():
-                  mWindow->fn_refresh_scene_right();
-                }, Qt::QueuedConnection);
-        m3dSceneBuilders[section]->start(brd->buildScene3D(tl::nullopt));
-        data.overlay_color = q2s(Qt::black);
-        success = true;
-      }
+  if (tabObj.type == ui::TabType::Schematic) {
+    if (auto sch =
+            tabObj.project->getProject().getSchematicByIndex(tabObj.objIndex)) {
+      sectionObj.openGlSceneBuilder.reset();
+      sectionObj.openGlView.reset();
+      sectionObj.scene.reset(new SchematicGraphicsScene(
+          *sch, *mLayerProvider, std::make_shared<QSet<const NetSignal*>>(),
+          this));
+      sectionData->overlay_color = q2s(Qt::black);
+      success = true;
+    }
+  } else if (tabObj.type == ui::TabType::Board2d) {
+    if (auto brd =
+            tabObj.project->getProject().getBoardByIndex(tabObj.objIndex)) {
+      mPlaneBuilder->startAsynchronously(*brd);
+      sectionObj.openGlSceneBuilder.reset();
+      sectionObj.openGlView.reset();
+      sectionObj.scene.reset(new BoardGraphicsScene(
+          *brd, *mLayerProvider, std::make_shared<QSet<const NetSignal*>>(),
+          this));
+      sectionData->overlay_color = q2s(Qt::white);
+      success = true;
+    }
+  } else if (tabObj.type == ui::TabType::Board3d) {
+    if (auto brd =
+            tabObj.project->getProject().getBoardByIndex(tabObj.objIndex)) {
+      mPlaneBuilder->startAsynchronously(*brd);
+      sectionObj.scene.reset();
+      sectionObj.openGlView.reset(new OpenGlView());
+      sectionObj.openGlSceneBuilder.reset(new OpenGlSceneBuilder(this));
+      connect(sectionObj.openGlSceneBuilder.get(),
+              &OpenGlSceneBuilder::objectAdded, sectionObj.openGlView.get(),
+              &OpenGlView::addObject);
+      connect(
+          sectionObj.openGlSceneBuilder.get(), &OpenGlSceneBuilder::objectAdded,
+          this, [this, section]() { mWindow->fn_refresh_scene(section); },
+          Qt::QueuedConnection);
+      sectionObj.openGlSceneBuilder->start(brd->buildScene3D(tl::nullopt));
+      sectionData->overlay_color = q2s(Qt::black);
+      success = true;
     }
   }
   if (success) {
-    if (section == 0) {
-      mGlobals.set_section_left(data);
-      mWindow->fn_refresh_scene_left();
-    } else if (section == 1) {
-      mGlobals.set_section_right(data);
-      mWindow->fn_refresh_scene_right();
-    }
+    sectionData->tab_index = tab;
+    mSectionsData->set_row_data(section, *sectionData);
+    mWindow->fn_refresh_scene(section);
   }
 }
 
-void MainWindow::tabCloseClicked(int section, int index) noexcept {
-  auto getSection = std::bind((section == 1) ? &ui::Globals::get_section_right
-                                             : &ui::Globals::get_section_left,
-                              &mGlobals);
+void MainWindow::tabCloseClicked(int section, int tab) noexcept {
+  if (section >= mSections.count()) return;
+  auto& sectionObj = mSections[section];
+  auto sectionData = mSectionsData->row_data(section);
+  if (!sectionData) return;
+  auto tabs =
+      std::dynamic_pointer_cast<slint::VectorModel<ui::Tab>>(sectionData->tabs);
 
-  if (auto tabs = mTabs[section]) {
-    const int tabCount = static_cast<int>(tabs->row_count());
-    if ((index >= 0) && (index < tabCount)) {
-      tabs->erase(index);
-      int currentIndex = getSection().tab_index;
-      if (index < currentIndex) {
-        --currentIndex;
-      }
-      tabClicked(section, std::min(currentIndex, tabCount - 2));
+  const int tabCount = static_cast<int>(tabs->row_count());
+  if (tabCount == 1) {
+    mSectionsData->erase(section);
+    mSections.remove(section);
+    for (std::size_t i = section; i < mSectionsData->row_count(); ++i) {
+      auto data = mSectionsData->row_data(i);
+      data->index--;
+      mSectionsData->set_row_data(i, *data);
     }
+  } else if ((tab >= 0) && (tab < tabCount)) {
+    sectionObj.tabs.remove(tab);
+    tabs->erase(tab);
+    int currentIndex = sectionData->tab_index;
+    if (tab < currentIndex) {
+      --currentIndex;
+    }
+    tabClicked(section, std::min(currentIndex, tabCount - 2));
   }
 }
 
-slint::Image MainWindow::renderScene(int section, float width, float height,
-                                     int frame) noexcept {
+slint::Image MainWindow::renderScene(int section, int tab, float width,
+                                     float height, int frame) noexcept {
   Q_UNUSED(frame);
-  if (auto scene = mScenes[section]) {
+
+  if (section >= mSections.count()) return slint::Image();
+  auto& sectionObj = mSections[section];
+  if (tab >= sectionObj.tabs.count()) return slint::Image();
+  auto& tabObj = sectionObj.tabs[tab];
+
+  if (auto scene = sectionObj.scene) {
     QPixmap pixmap(width, height);
     pixmap.fill(dynamic_cast<BoardGraphicsScene*>(scene.get()) ? Qt::black
                                                                : Qt::white);
@@ -275,11 +309,19 @@ slint::Image MainWindow::renderScene(int section, float width, float height,
       painter.setRenderHints(QPainter::Antialiasing |
                              QPainter::SmoothPixmapTransform);
       QRectF targetRect(0, 0, width, height);
-      QRectF sourceRect = mTransforms[section].mapRect(targetRect);
-      scene->render(&painter, targetRect, sourceRect);
+      if (tabObj.sceneRect.isEmpty()) {
+        const QRectF sceneRect = scene->itemsBoundingRect();
+        tabObj.scale = std::min(targetRect.width() / sceneRect.width(),
+                                targetRect.height() / sceneRect.height());
+        tabObj.offset = sceneRect.center() - targetRect.center() / tabObj.scale;
+      }
+      tabObj.sceneRect =
+          QRectF(0, 0, width / tabObj.scale, height / tabObj.scale);
+      tabObj.sceneRect.translate(tabObj.offset);
+      scene->render(&painter, targetRect, tabObj.sceneRect);
     }
     return q2s(pixmap);
-  } else if (auto view = m3dViews[section]) {
+  } else if (auto view = sectionObj.openGlView) {
     view->resize(width, height);
     return q2s(view->grab());
   } else {
@@ -287,44 +329,145 @@ slint::Image MainWindow::renderScene(int section, float width, float height,
   }
 }
 
-slint::private_api::EventResult MainWindow::onScnePointerEvent(
-    int section, float x1, float y1, float x0, float y0,
+slint::private_api::EventResult MainWindow::onScenePointerEvent(
+    int section, int tab, float x, float y,
     slint::private_api::PointerEvent e) noexcept {
-  if (e.button == slint::private_api::PointerEventButton::Left) {
+  if (section >= mSections.count()) {
+    return slint::private_api::EventResult::Reject;
+  }
+  auto& sectionObj = mSections[section];
+  if (tab >= sectionObj.tabs.count()) {
+    return slint::private_api::EventResult::Reject;
+  }
+  auto& tabObj = sectionObj.tabs[tab];
+
+  if (e.kind == slint::private_api::PointerEventKind::Down) {
+    mGlobals.set_current_section(section);
+  }
+
+  if (sectionObj.scene) {
+    QTransform t;
+    t.translate(tabObj.offset.x(), tabObj.offset.y());
+    t.scale(1 / tabObj.scale, 1 / tabObj.scale);
+    QPointF scenePosPx = t.map(QPointF(x, y));
+
+    if ((e.button == slint::private_api::PointerEventButton::Middle) ||
+        (e.button == slint::private_api::PointerEventButton::Right)) {
+      if (e.kind == slint::private_api::PointerEventKind::Down) {
+        sectionObj.startScenePos = scenePosPx;
+        sectionObj.panning = true;
+      } else if (e.kind == slint::private_api::PointerEventKind::Up) {
+        sectionObj.panning = false;
+      }
+    }
+    if (sectionObj.panning &&
+        (e.kind == slint::private_api::PointerEventKind::Move)) {
+      tabObj.offset -= scenePosPx - sectionObj.startScenePos;
+      mWindow->fn_refresh_scene(section);
+    }
+    const Point scenePos = Point::fromPx(scenePosPx);
+    mWindow->set_cursor_coordinate(q2s(QString("%1, %2")
+                                           .arg(scenePos.getX().toMm())
+                                           .arg(scenePos.getY().toMm())));
+  } else if (auto view = sectionObj.openGlView) {
     if (e.kind == slint::private_api::PointerEventKind::Down) {
-      mOldTransforms[section] = mTransforms[section];
-      mMoving[section] = true;
+      sectionObj.mousePressPosition = QPoint(x, y);
+      sectionObj.mousePressTransform = tabObj.transform;
+      sectionObj.mousePressCenter = tabObj.projectionCenter;
+      sectionObj.buttons.insert(e.button);
     } else if (e.kind == slint::private_api::PointerEventKind::Up) {
-      mMoving[section] = false;
+      sectionObj.buttons.remove(e.button);
+    } else if (e.kind == slint::private_api::PointerEventKind::Move) {
+      const QPointF posNorm = view->toNormalizedPos(QPointF(x, y));
+      const QPointF mousePressPosNorm =
+          view->toNormalizedPos(sectionObj.mousePressPosition);
+
+      if (sectionObj.buttons.contains(
+              slint::private_api::PointerEventButton::Middle) ||
+          sectionObj.buttons.contains(
+              slint::private_api::PointerEventButton::Right)) {
+        const QPointF cursorPosOld = view->toModelPos(mousePressPosNorm);
+        const QPointF cursorPosNew = view->toModelPos(posNorm);
+        tabObj.projectionCenter =
+            sectionObj.mousePressCenter + cursorPosNew - cursorPosOld;
+        view->setTransform(tabObj.transform, tabObj.projectionFov,
+                           tabObj.projectionCenter);
+        mWindow->fn_refresh_scene(section);
+      }
+      if (sectionObj.buttons.contains(
+              slint::private_api::PointerEventButton::Left)) {
+        tabObj.transform = sectionObj.mousePressTransform;
+        if (e.modifiers.shift) {
+          // Rotate around Z axis.
+          const QPointF p1 =
+              view->toModelPos(mousePressPosNorm) - tabObj.projectionCenter;
+          const QPointF p2 =
+              view->toModelPos(posNorm) - tabObj.projectionCenter;
+          const qreal angle1 = std::atan2(p1.y(), p1.x());
+          const qreal angle2 = std::atan2(p2.y(), p2.x());
+          const Angle angle = Angle::fromRad(angle2 - angle1).mappedTo180deg();
+          const QVector3D axis = sectionObj.mousePressTransform.inverted().map(
+              QVector3D(0, 0, angle.toDeg()));
+          tabObj.transform.rotate(QQuaternion::fromAxisAndAngle(
+              axis.normalized(), angle.abs().toDeg()));
+        } else {
+          // Rotate around X/Y axis.
+          const QVector2D delta(posNorm - mousePressPosNorm);
+          const QVector3D axis = sectionObj.mousePressTransform.inverted().map(
+              QVector3D(-delta.y(), delta.x(), 0));
+          tabObj.transform.rotate(QQuaternion::fromAxisAndAngle(
+              axis.normalized(), delta.length() * 270));
+        }
+        view->setTransform(tabObj.transform, tabObj.projectionFov,
+                           tabObj.projectionCenter);
+        mWindow->fn_refresh_scene(section);
+      }
     }
   }
-  if (mMoving[section] &&
-      (e.kind == slint::private_api::PointerEventKind::Move)) {
-    mTransforms[section] = mOldTransforms[section];
-    mTransforms[section].translate(x0 - x1, y0 - y1);
-    if (section == 0) {
-      mWindow->fn_refresh_scene_left();
-    } else {
-      mWindow->fn_refresh_scene_right();
-    }
-  }
-  mWindow->set_cursor_coordinate(q2s(QString("%1, %2").arg(x1).arg(y1)));
+
   return slint::private_api::EventResult::Accept;
 }
 
 slint::private_api::EventResult MainWindow::onSceneScrolled(
-    int section, float x, float y,
+    int section, int tab, float x, float y,
     slint::private_api::PointerScrollEvent e) noexcept {
-  QPointF scenePos = mTransforms[section].map(QPointF(x, y));
-  qreal scaleFactor = qPow(1.3, e.delta_y / qreal(-120));
-  mTransforms[section].translate(scenePos.x(), scenePos.y());
-  mTransforms[section].scale(scaleFactor, scaleFactor);
-  mTransforms[section].translate(-scenePos.x(), -scenePos.y());
-  if (section == 0) {
-    mWindow->fn_refresh_scene_left();
-  } else {
-    mWindow->fn_refresh_scene_right();
+  if (section >= mSections.count()) {
+    return slint::private_api::EventResult::Reject;
   }
+  auto& sectionObj = mSections[section];
+  if (tab >= sectionObj.tabs.count()) {
+    return slint::private_api::EventResult::Reject;
+  }
+  auto& tabObj = sectionObj.tabs[tab];
+
+  qreal factor = qPow(1.3, e.delta_y / qreal(120));
+
+  if (auto view = sectionObj.openGlView) {
+    const QPointF centerNormalized = view->toNormalizedPos(QPointF(x, y));
+    const QPointF modelPosOld = view->toModelPos(centerNormalized);
+    tabObj.projectionFov =
+        qBound(qreal(0.01), tabObj.projectionFov / factor, qreal(90));
+    const QPointF modelPosNew = view->toModelPos(centerNormalized);
+    tabObj.projectionCenter += modelPosNew - modelPosOld;
+    view->setTransform(tabObj.transform, tabObj.projectionFov,
+                       tabObj.projectionCenter);
+  } else {
+    QTransform t;
+    t.translate(tabObj.offset.x(), tabObj.offset.y());
+    t.scale(1 / tabObj.scale, 1 / tabObj.scale);
+    QPointF scenePos0 = t.map(QPointF(x, y));
+
+    tabObj.scale *= factor;
+
+    QTransform t2;
+    t2.translate(tabObj.offset.x(), tabObj.offset.y());
+    t2.scale(1 / tabObj.scale, 1 / tabObj.scale);
+    QPointF scenePos2 = t2.map(QPointF(x, y));
+
+    tabObj.offset -= scenePos2 - scenePos0;
+  }
+
+  mWindow->fn_refresh_scene(section);
   return slint::private_api::EventResult::Accept;
 }
 

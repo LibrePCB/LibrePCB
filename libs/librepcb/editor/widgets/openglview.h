@@ -65,44 +65,32 @@ public:
   void addObject(std::shared_ptr<OpenGlObject> obj) noexcept;
   void removeObject(std::shared_ptr<OpenGlObject> obj) noexcept;
   void setObjects(const QVector<std::shared_ptr<OpenGlObject>>& objs) noexcept;
-  void zoomIn() noexcept;
-  void zoomOut() noexcept;
-  void zoomAll() noexcept;
-  void startSpinning() noexcept;
-  void stopSpinning(QString errorMsg) noexcept;
+  void setTransform(const QMatrix4x4& transform, qreal fov,
+                    const QPointF& center) noexcept;
+
+  QPointF toNormalizedPos(const QPointF& pos) const noexcept;
+  QPointF toModelPos(const QPointF& pos) const noexcept;
 
   // Operator Overloadings
   OpenGlView& operator=(const OpenGlView& rhs) = delete;
 
 protected:
-  void mousePressEvent(QMouseEvent* e) override;
-  void mouseMoveEvent(QMouseEvent* e) override;
-  void wheelEvent(QWheelEvent* e) override;
-  void smoothTo(qreal fov, const QPointF& center,
-                const QMatrix4x4& transform) noexcept;
   void initializeGL() override;
   void resizeGL(int w, int h) override;
   void paintGL() override;
-
-private:
-  void zoom(const QPointF& center, qreal factor) noexcept;
-  QPointF toNormalizedPos(const QPointF& pos) const noexcept;
-  QPointF toModelPos(const QPointF& pos) const noexcept;
 
 private:
   QScopedPointer<QVBoxLayout> mLayout;
   QScopedPointer<QLabel> mErrorLabel;
   bool mInitialized;
   QOpenGLShaderProgram mProgram;
+
   qreal mProjectionAspectRatio;
   qreal mProjectionFov;
   QPointF mProjectionCenter;
   QMatrix4x4 mTransform;
-  QPoint mMousePressPosition;
-  QMatrix4x4 mMousePressTransform;
-  QPointF mMousePressCenter;
+
   qint64 mIdleTimeMs;
-  QScopedPointer<WaitingSpinnerWidget> mWaitingSpinner;
 
   // Transform Animation
   struct TransformData {

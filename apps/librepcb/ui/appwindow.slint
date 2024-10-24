@@ -71,18 +71,11 @@ export component AppWindow inherits Window {
         height: sidebar.height;
     }
 
-    property <int> scene-frame-left: 0;
-    property <int> scene-frame-right: 0;
-    public function refresh-scene-left() {
-        scene-frame-left += 1;
-    }
-    public function refresh-scene-right() {
-        scene-frame-right += 1;
+    public function refresh-scene(section: int) {
+        Globals.sections[section].frame += 1;
     }
 
     HorizontalLayout {
-        property <int> section-count: min(Globals.tabs-left.length, 1) + min(Globals.tabs-right.length, 1);
-
         x: sidebar.width + panel-width;
         y: sidebar.y + 1px;
         width: parent.width - self.x;
@@ -93,7 +86,7 @@ export component AppWindow inherits Window {
             width: 1px;
         }
 
-        if section-count == 0: Text {
+        if Globals.sections.length == 0: Text {
             width: parent.width;
             color: gray;
             horizontal-alignment: TextHorizontalAlignment.center;
@@ -103,20 +96,16 @@ export component AppWindow inherits Window {
             text: @tr("Open a library, schematic or board.");
         }
 
-        if Globals.tabs-left.length > 0: WindowSection {
-            tabs: Globals.tabs-left;
-            section <=> Globals.section-left;
-            scene-frame: scene-frame-left;
-        }
+        for section[i] in Globals.sections: HorizontalLayout {
+            WindowSection {
+                section: section;
+            }
 
-        if section-count == 2: Rectangle {
-            width: 1px;
-        }
-
-        if Globals.tabs-right.length > 0: WindowSection {
-            tabs: Globals.tabs-right;
-            section <=> Globals.section-right;
-            scene-frame: scene-frame-right;
+            if i < (Globals.sections.length - 1): Rectangle {
+                width: 1px;
+                horizontal-stretch: 0;
+                background: #555555;
+            }
         }
     }
 

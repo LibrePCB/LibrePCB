@@ -3,8 +3,6 @@ import { SceneButton } from "./scenebutton.slint";
 
 export component WindowSection inherits Rectangle {
     in-out property <SectionData> section;
-    in property <[Tab]> tabs;
-    in property <int> scene-frame;
 
     tabBar := Rectangle {
         x: 0;
@@ -15,7 +13,7 @@ export component WindowSection inherits Rectangle {
         HorizontalLayout {
             alignment: LayoutAlignment.start;
 
-            for tab[index] in tabs: Rectangle {
+            for tab[index] in section.tabs: Rectangle {
                 background: (index == section.tab-index) ? #505050 : (ta-tab.has-hover ? #404040 : #303030);
 
                 ta-tab := TouchArea {
@@ -74,14 +72,14 @@ export component WindowSection inherits Rectangle {
         height: parent.height - self.y;
         image-fit: ImageFit.preserve;
         image-rendering: ImageRendering.pixelated;
-        source: Globals.render-scene(section.index, self.width, self.height, scene-frame);
+        source: Globals.render-scene(section.index, section.tab-index, self.width, self.height, section.frame);
 
         TouchArea {
             pointer-event(e) => {
-                return Globals.scene-pointer_event(section.index, self.mouse-x, self.mouse-y, self.pressed-x, self.pressed-y, e);
+                return Globals.scene-pointer-event(section.index, section.tab-index, self.mouse-x, self.mouse-y, e);
             }
             scroll-event(e) => {
-                return Globals.scene-scrolled(section.index, self.mouse-x, self.mouse-y, e);
+                return Globals.scene-scrolled(section.index, section.tab-index, self.mouse-x, self.mouse-y, e);
             }
         }
 
@@ -106,13 +104,21 @@ export component WindowSection inherits Rectangle {
                 colorize: section.overlay-color;
             }
 
-            if tabs[section.tab-index].type == TabType.board-2d: SceneButton {
+            if section.tabs[section.tab-index].type == TabType.board-2d: SceneButton {
                 text: "3D";
                 colorize: section.overlay-color;
                 clicked => {
-                    Globals.board-3d-clicked(tabs[section.tab-index].index);
+                    Globals.board-3d-clicked(section.index, section.tab-index);
                 }
             }
         }
+    }
+
+    if section.index == Globals.current-section: Rectangle {
+        x: 0;
+        y: tabBar.height;
+        width: 100%;
+        height: 1px;
+        background: #29d682;
     }
 }
