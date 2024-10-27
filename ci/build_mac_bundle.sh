@@ -55,10 +55,16 @@ then
 else
   # On x86_64, directly create the *.dmg with macdeployqt.
   fix_macdeployqt "/usr/local/lib"
-  macdeployqt "LibrePCB.app" -dmg -always-overwrite \
-    -executable="./LibrePCB.app/Contents/MacOS/librepcb" \
-    -executable="./LibrePCB.app/Contents/MacOS/librepcb-cli" \
-    -qmldir="./LibrePCB.app/Contents/share/librepcb/qml"
+  # This is so crappy unstable, we have to try it several times :sob:
+  for run in {1..10}; do
+    if [ ! -f ./LibrePCB.dmg ]; then
+      macdeployqt "LibrePCB.app" -dmg -always-overwrite \
+        -executable="./LibrePCB.app/Contents/MacOS/librepcb" \
+        -executable="./LibrePCB.app/Contents/MacOS/librepcb-cli" \
+        -qmldir="./LibrePCB.app/Contents/share/librepcb/qml"
+      sleep 5
+    fi
+  done
 fi
 popd
 
