@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "eaglelibraryimportwizardpage_result.h"
 
+#include "../../utils/editortoolbox.h"
 #include "eaglelibraryimportwizardcontext.h"
 #include "ui_eaglelibraryimportwizardpage_result.h"
 
@@ -110,7 +111,10 @@ void EagleLibraryImportWizardPage_Result::importFinished() noexcept {
               &QProgressBar::setValue, Qt::QueuedConnection));
 
   const auto log = mContext->getImport().getLogger();
-  mUi->lblMessages->setText(log->getMessagesRichText());
+  mUi->lblMessages->setText(
+      log->getMessagesRichText(EditorToolbox::isWindowBackgroundDark()
+                                   ? MessageLogger::ColorTheme::Dark
+                                   : MessageLogger::ColorTheme::Light));
   mUi->prgImport->setFormat(tr("Scanning libraries") % " (%p%)");
   mUi->gbxErrors->setVisible(!log->getMessages().isEmpty());
   if (QWizard* wiz = wizard()) {

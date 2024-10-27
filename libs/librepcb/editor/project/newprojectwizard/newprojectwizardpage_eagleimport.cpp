@@ -24,6 +24,7 @@
 
 #include "../../dialogs/filedialog.h"
 #include "../../editorcommandset.h"
+#include "../../utils/editortoolbox.h"
 #include "../../widgets/waitingspinnerwidget.h"
 #include "../../workspace/desktopservices.h"
 #include "ui_newprojectwizardpage_eagleimport.h"
@@ -148,9 +149,12 @@ void NewProjectWizardPage_EagleImport::import(Project& project) {
     DesktopServices ds(ws->getSettings(), nullptr);
     ds.openUrl(url);
   });
+  const auto msgColors = EditorToolbox::isWindowBackgroundDark()
+      ? MessageLogger::ColorTheme::Dark
+      : MessageLogger::ColorTheme::Light;
   connect(mImport->getLogger().get(), &MessageLogger::msgEmitted, browser,
-          [browser](const MessageLogger::Message& msg) {
-            browser->append(msg.toRichText(true, true));
+          [browser, msgColors](const MessageLogger::Message& msg) {
+            browser->append(msg.toRichText(msgColors, true));
             browser->verticalScrollBar()->setValue(
                 browser->verticalScrollBar()->maximum());
             qApp->processEvents();
