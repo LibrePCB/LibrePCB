@@ -76,16 +76,16 @@ bool ShortcutsReferenceGenerator::generatePdf(const FilePath& fp) {
                        "Failed to start PDF export - invalid output file?");
   }
 
-  QRect imageRect(mmToPx(writer, 0), mmToPx(writer, 4), mmToPx(writer, 15),
+  QRect imageRect(mmToPx(writer, 0), mmToPx(writer, 0), mmToPx(writer, 15),
                   mmToPx(writer, 15));
   painter.drawImage(imageRect, QImage(":/img/app/librepcb.png"));
-  drawText(writer, painter, 17, 8.5, 12, 0, "LibrePCB");
-  drawText(writer, painter, 17.5, 17, 3.5, 0, "Keyboard Shortcuts Reference");
+  drawText(writer, painter, 17, 4.5, 12, 0, "LibrePCB");
+  drawText(writer, painter, 17.5, 13, 3.5, 0, "Keyboard Shortcuts Reference");
 
   qreal x = sPageWidth - 2 * sColumnWidth - sColumnSpacing;
   qreal shortcutsWidth = sColumnWidth;
-  qreal y = 6;
-  drawSectionTitle(writer, painter, x, sPageWidth, 1.5, "Built-In");
+  qreal y = 5.5;
+  drawSectionTitle(writer, painter, x, sPageWidth, 1.2, "Built-In");
   drawRow(writer, painter, x, y, sPageWidth - x, shortcutsWidth,
           "Switch Back to Last Used Tool", "Right Click", true);
   y += sRowHeight;
@@ -95,7 +95,7 @@ bool ShortcutsReferenceGenerator::generatePdf(const FilePath& fp) {
   drawRow(writer, painter, x, y, sPageWidth - x, shortcutsWidth, "Zoom View",
           "Scroll Wheel", true);
 
-  drawSectionTitle(writer, painter, 0, sPageWidth, 25.5,
+  drawSectionTitle(writer, painter, 0, sPageWidth, 19,
                    "Configured in Workspace Settings");
 
   // Use manual order of categories to get a compact page layout.
@@ -119,7 +119,7 @@ bool ShortcutsReferenceGenerator::generatePdf(const FilePath& fp) {
         "Editor command category not added to shortcuts reference export.");
   }
   x = 0;
-  y = 32;
+  y = 25;
   bool layoutOverflow = false;
   for (int i = 0; i < categories.count(); ++i) {
     if (!categories.at(i)->isConfigurable()) {
@@ -129,7 +129,7 @@ bool ShortcutsReferenceGenerator::generatePdf(const FilePath& fp) {
         mCommands.getCommands(categories.at(i)).count() * sRowHeight;
     if ((y + categoryHeight) > sPageHeight) {
       x += sColumnWidth + sColumnSpacing;
-      y = 32;
+      y = 25;
       if (((y + categoryHeight) > sPageHeight) ||
           ((x + sColumnWidth) > sPageWidth)) {
         layoutOverflow = true;

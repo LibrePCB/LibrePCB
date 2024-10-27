@@ -204,6 +204,7 @@ private:  // Data
   QScopedPointer<QAction> mActionGridProperties;
   QScopedPointer<QAction> mActionGridIncrease;
   QScopedPointer<QAction> mActionGridDecrease;
+  QScopedPointer<QAction> mActionToggleBgImage;
   QScopedPointer<QAction> mActionZoomFit;
   QScopedPointer<QAction> mActionZoomIn;
   QScopedPointer<QAction> mActionZoomOut;
