@@ -508,7 +508,21 @@
          </property>
         </widget>
        </item>
-       <item row="8" column="0">
+       <item row="7" column="0">
+        <widget class="Line" name="line_3">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="0" colspan="2">
+        <widget class="Line" name="line_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="0">
         <widget class="QLabel" name="label">
          <property name="text">
           <string>Messages:</string>
@@ -518,14 +532,7 @@
          </property>
         </widget>
        </item>
-       <item row="7" column="0" colspan="2">
-        <widget class="Line" name="line_2">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="1">
+       <item row="10" column="1">
         <widget class="librepcb::editor::RuleCheckListWidget" name="lstMessages" native="true">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
@@ -535,6 +542,41 @@
          </property>
         </widget>
        </item>
+       <item row="8" column="0">
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Datasheet</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLineEdit" name="edtDatasheet">
+           <property name="maxLength">
+            <number>255</number>
+           </property>
+           <property name="placeholderText">
+            <string>Direct URL to online PDF</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btnDownloadDatasheet">
+           <property name="toolTip">
+            <string>Download &amp; open</string>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>:/img/actions/download.png</normaloff>:/img/actions/download.png</iconset>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
       </layout>
      </item>
     </layout>
@@ -543,26 +585,26 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>librepcb::editor::AttributeListEditorWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">librepcb/editor/widgets/attributelisteditorwidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>librepcb::editor::PlainTextEdit</class>
    <extends>QPlainTextEdit</extends>
    <header location="global">librepcb/editor/widgets/plaintextedit.h</header>
-  </customwidget>
-  <customwidget>
-   <class>librepcb::editor::GraphicsView</class>
-   <extends>QGraphicsView</extends>
-   <header location="global">librepcb/editor/widgets/graphicsview.h</header>
   </customwidget>
   <customwidget>
    <class>librepcb::editor::RuleCheckListWidget</class>
    <extends>QWidget</extends>
    <header location="global">librepcb/editor/widgets/rulechecklistwidget.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>librepcb::editor::AttributeListEditorWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/editor/widgets/attributelisteditorwidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>librepcb::editor::GraphicsView</class>
+   <extends>QGraphicsView</extends>
+   <header location="global">librepcb/editor/widgets/graphicsview.h</header>
   </customwidget>
   <customwidget>
    <class>librepcb::editor::PadSignalMapEditorWidget</class>

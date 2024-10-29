@@ -23,6 +23,7 @@
 #include "componenteditorwidget.h"
 
 #include "../../widgets/signalrolecombobox.h"
+#include "../../workspace/desktopservices.h"
 #include "../cmd/cmdcomponentedit.h"
 #include "../cmd/cmdcomponentsignaledit.h"
 #include "../cmd/cmdcomponentsymbolvariantedit.h"
@@ -33,6 +34,7 @@
 #include <librepcb/core/library/cmp/componentcheckmessages.h>
 #include <librepcb/core/library/librarybaseelementcheckmessages.h>
 #include <librepcb/core/library/libraryelementcheckmessages.h>
+#include <librepcb/core/workspace/workspace.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -60,6 +62,14 @@ ComponentEditorWidget::ComponentEditorWidget(const Context& context,
   mUi->edtAuthor->setReadOnly(mContext.readOnly);
   mUi->edtVersion->setReadOnly(mContext.readOnly);
   mUi->cbxDeprecated->setCheckable(!mContext.readOnly);
+  mUi->edtDatasheet->setReadOnly(mContext.readOnly);
+  connect(mUi->btnDownloadDatasheet, &QToolButton::clicked, this, [this]() {
+    if (auto dbRes = mComponent->getResources().value(0)) {
+      DesktopServices::downloadAndOpenResourceAsync(
+          mContext.workspace.getSettings(), *dbRes->getName(),
+          dbRes->getMediaType(), dbRes->getUrl(), this);
+    }
+  });
   mUi->cbxSchematicOnly->setCheckable(!mContext.readOnly);
   mUi->edtPrefix->setReadOnly(mContext.readOnly);
   mUi->edtDefaultValue->setReadOnly(mContext.readOnly);
@@ -120,6 +130,8 @@ ComponentEditorWidget::ComponentEditorWidget(const Context& context,
   connect(mUi->edtVersion, &QLineEdit::editingFinished, this,
           &ComponentEditorWidget::commitMetadata);
   connect(mUi->cbxDeprecated, &QCheckBox::clicked, this,
+          &ComponentEditorWidget::commitMetadata);
+  connect(mUi->edtDatasheet, &QLineEdit::editingFinished, this,
           &ComponentEditorWidget::commitMetadata);
   connect(mCategoriesEditorWidget.data(), &CategoryListEditorWidget::edited,
           this, &ComponentEditorWidget::commitMetadata);
@@ -189,6 +201,12 @@ void ComponentEditorWidget::updateMetadata() noexcept {
   mUi->edtAuthor->setText(mComponent->getAuthor());
   mUi->edtVersion->setText(mComponent->getVersion().toStr());
   mUi->cbxDeprecated->setChecked(mComponent->isDeprecated());
+  if (auto dbRes = mComponent->getResources().value(0)) {
+    mUi->edtDatasheet->setText(dbRes->getUrl().toDisplayString());
+  } else {
+    mUi->edtDatasheet->clear();
+  }
+  mUi->btnDownloadDatasheet->setEnabled(!mUi->edtDatasheet->text().isEmpty());
   mUi->lstMessages->setApprovals(mComponent->getMessageApprovals());
   mCategoriesEditorWidget->setUuids(mComponent->getCategories());
   mUi->cbxSchematicOnly->setChecked(mComponent->isSchematicOnly());
@@ -214,6 +232,26 @@ QString ComponentEditorWidget::commitMetadata() noexcept {
     cmd->setAuthor(mUi->edtAuthor->text().trimmed());
     cmd->setDeprecated(mUi->cbxDeprecated->isChecked());
     cmd->setCategories(mCategoriesEditorWidget->getUuids());
+    try {
+      ResourceList resources = mComponent->getResources();
+      const ElementName name(
+          cleanElementName("Datasheet " % mUi->edtName->text().trimmed()));
+      const QString dbUrlStr = mUi->edtDatasheet->text().trimmed();
+      const QUrl dbUrl = QUrl::fromUserInput(dbUrlStr);
+      std::shared_ptr<Resource> res = resources.value(0);
+      if ((dbUrl.isValid()) && (!res)) {
+        resources.append(
+            std::make_shared<Resource>(name, "application/pdf", dbUrl));
+      } else if ((!dbUrl.isValid()) && res) {
+        resources.remove(res.get());
+      } else if ((dbUrl.isValid()) && res &&
+                 (dbUrlStr != res->getUrl().toDisplayString())) {
+        res->setName(name);
+        res->setUrl(dbUrl);
+      }
+      cmd->setResources(resources);
+    } catch (const Exception& e) {
+    }
     cmd->setIsSchematicOnly(mUi->cbxSchematicOnly->isChecked());
     try {
       // throws on invalid prefix

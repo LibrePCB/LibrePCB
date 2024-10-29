@@ -53,6 +53,7 @@ public:
 
   // Setters
   void setCategories(const QSet<Uuid>& uuids) noexcept;
+  void setResources(const ResourceList& resources) noexcept;
 
   // Operator Overloadings
   CmdLibraryElementEdit& operator=(const CmdLibraryElementEdit& rhs) = delete;
@@ -72,6 +73,8 @@ private:  // Data
 
   QSet<Uuid> mOldCategories;
   QSet<Uuid> mNewCategories;
+  ResourceList mOldResources;
+  ResourceList mNewResources;
 };
 
 /*******************************************************************************

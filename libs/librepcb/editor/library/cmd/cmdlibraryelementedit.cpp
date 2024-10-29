@@ -39,7 +39,9 @@ CmdLibraryElementEdit::CmdLibraryElementEdit(LibraryElement& element,
   : CmdLibraryBaseElementEdit(element, text),
     mElement(element),
     mOldCategories(element.getCategories()),
-    mNewCategories(mOldCategories) {
+    mNewCategories(mOldCategories),
+    mOldResources(element.getResources()),
+    mNewResources(mOldResources) {
 }
 
 CmdLibraryElementEdit::~CmdLibraryElementEdit() noexcept {
@@ -54,6 +56,12 @@ void CmdLibraryElementEdit::setCategories(const QSet<Uuid>& uuids) noexcept {
   mNewCategories = uuids;
 }
 
+void CmdLibraryElementEdit::setResources(
+    const ResourceList& resources) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewResources = resources;
+}
+
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/
@@ -61,17 +69,20 @@ void CmdLibraryElementEdit::setCategories(const QSet<Uuid>& uuids) noexcept {
 bool CmdLibraryElementEdit::performExecute() {
   if (CmdLibraryBaseElementEdit::performExecute()) return true;  // can throw
   if (mNewCategories != mOldCategories) return true;
+  if (mNewResources != mOldResources) return true;
   return false;
 }
 
 void CmdLibraryElementEdit::performUndo() {
   CmdLibraryBaseElementEdit::performUndo();  // can throw
   mElement.setCategories(mOldCategories);
+  mElement.setResources(mOldResources);
 }
 
 void CmdLibraryElementEdit::performRedo() {
   CmdLibraryBaseElementEdit::performRedo();  // can throw
   mElement.setCategories(mNewCategories);
+  mElement.setResources(mNewResources);
 }
 
 /*******************************************************************************

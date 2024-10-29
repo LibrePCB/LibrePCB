@@ -109,6 +109,14 @@ void NetworkRequestBase::setMinimumCacheTime(int seconds) noexcept {
   mMinimumCacheTime = seconds;
 }
 
+void NetworkRequestBase::useBrowserUserAgent() noexcept {
+  Q_ASSERT(QThread::currentThread() != NetworkAccessManager::instance());
+  Q_ASSERT(!mStarted);
+  mRequest.setHeader(QNetworkRequest::UserAgentHeader,
+                     "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:131.0) "
+                     "Gecko/20100101 Firefox/131.0");
+}
+
 void NetworkRequestBase::start() noexcept {
   Q_ASSERT(QThread::currentThread() != NetworkAccessManager::instance());
 
