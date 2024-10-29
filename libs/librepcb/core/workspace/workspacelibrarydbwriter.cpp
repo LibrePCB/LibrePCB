@@ -240,6 +240,15 @@ void WorkspaceLibraryDbWriter::createAllTables() {
       "`category_uuid` TEXT NOT NULL, "
       "UNIQUE(element_id, category_uuid)"
       ")");
+  queries << QString(
+      "CREATE TABLE IF NOT EXISTS components_res ("
+      "`id` INTEGER PRIMARY KEY NOT NULL, "
+      "`element_id` INTEGER "
+      "REFERENCES components(id) ON DELETE CASCADE NOT NULL, "
+      "`name` TEXT NOT NULL, "
+      "`media_type` TEXT NOT NULL, "
+      "`url` TEXT"
+      ")");
 
   // devices
   queries << QString(
@@ -271,6 +280,15 @@ void WorkspaceLibraryDbWriter::createAllTables() {
       "REFERENCES devices(id) ON DELETE CASCADE NOT NULL, "
       "`category_uuid` TEXT NOT NULL, "
       "UNIQUE(element_id, category_uuid)"
+      ")");
+  queries << QString(
+      "CREATE TABLE IF NOT EXISTS devices_res ("
+      "`id` INTEGER PRIMARY KEY NOT NULL, "
+      "`element_id` INTEGER "
+      "REFERENCES devices(id) ON DELETE CASCADE NOT NULL, "
+      "`name` TEXT NOT NULL, "
+      "`media_type` TEXT NOT NULL, "
+      "`url` TEXT"
       ")");
 
   // parts
@@ -565,6 +583,24 @@ int WorkspaceLibraryDbWriter::addToCategory(const QString& elementsTable,
       });
   query.bindValue(":element_id", elementId);
   query.bindValue(":category_uuid", category.toStr());
+  return mDb.insert(query);
+}
+
+int WorkspaceLibraryDbWriter::addResource(const QString& elementsTable,
+                                          int elementId, const QString& name,
+                                          const QString& mediaType,
+                                          const QUrl& url) {
+  QSqlQuery query = mDb.prepareQuery(
+      "INSERT INTO %elements_res "
+      "(element_id, name, media_type, url) VALUES "
+      "(:element_id, :name, :media_type, :url)",
+      {
+          {"%elements", elementsTable},
+      });
+  query.bindValue(":element_id", elementId);
+  query.bindValue(":name", nonNull(name));
+  query.bindValue(":media_type", nonNull(mediaType));
+  query.bindValue(":url", url);
   return mDb.insert(query);
 }
 

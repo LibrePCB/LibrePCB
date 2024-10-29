@@ -26,6 +26,7 @@
 #include "../attribute/attribute.h"
 #include "../attribute/attributetype.h"
 #include "../fileio/filepath.h"
+#include "../library/resource.h"
 #include "../types/uuid.h"
 #include "../types/version.h"
 
@@ -364,6 +365,23 @@ public:
   }
 
   /**
+   * @brief Get resources of a specific library element
+   *
+   * @tparam ElementType  Type of the library element.
+   *
+   *  @param elemDir       Library element directory.
+   *
+   * @return Element resources (empty if element doesn't exist).
+   */
+  template <typename ElementType>
+  ResourceList getResources(const FilePath elemDir) const {
+    static_assert(std::is_same<ElementType, Component>::value ||
+                      std::is_same<ElementType, Device>::value,
+                  "Unsupported ElementType");
+    return getResources(getTable<ElementType>(), elemDir);
+  }
+
+  /**
    * @brief Get all devices of a specific component
    *
    * @param component   Component UUID to get the devices of.
@@ -421,6 +439,8 @@ private:
   QSet<Uuid> getByCategory(const QString& elementsTable,
                            const QString& categoryTable,
                            const tl::optional<Uuid>& category, int limit) const;
+  ResourceList getResources(const QString& elementsTable,
+                            const FilePath& elemDir) const;
   static QSet<Uuid> getUuidSet(QSqlQuery& query);
   int getDbVersion() const noexcept;
   template <typename ElementType>
@@ -435,7 +455,7 @@ private:
   QScopedPointer<WorkspaceLibraryScanner> mLibraryScanner;
 
   // Constants
-  static const int sCurrentDbVersion = 5;
+  static const int sCurrentDbVersion = 6;
 };
 
 /*******************************************************************************

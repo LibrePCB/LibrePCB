@@ -335,6 +335,17 @@ int WorkspaceLibraryScanner::addElementToDb<Package>(
 }
 
 template <>
+int WorkspaceLibraryScanner::addElementToDb<Component>(
+    WorkspaceLibraryDbWriter& writer, int libId, const Component& element) {
+  const int id = writer.addElement<Component>(
+      libId, element.getDirectory().getAbsPath(), element.getUuid(),
+      element.getVersion(), element.isDeprecated());
+  addToCategories(writer, id, element);
+  addResourcesToDb(writer, id, element);
+  return id;
+}
+
+template <>
 int WorkspaceLibraryScanner::addElementToDb<Device>(
     WorkspaceLibraryDbWriter& writer, int libId, const Device& element) {
   const int id = writer.addDevice(
@@ -342,6 +353,7 @@ int WorkspaceLibraryScanner::addElementToDb<Device>(
       element.getVersion(), element.isDeprecated(), element.getComponentUuid(),
       element.getPackageUuid());
   addToCategories(writer, id, element);
+  addResourcesToDb(writer, id, element);
   for (const Part& part : element.getParts()) {
     if (!part.isEmpty()) {
       const int partId =
@@ -372,6 +384,16 @@ void WorkspaceLibraryScanner::addToCategories(WorkspaceLibraryDbWriter& writer,
                                               const ElementType& element) {
   foreach (const Uuid& category, element.getCategories()) {
     writer.addToCategory<ElementType>(elementId, category);
+  }
+}
+
+template <typename ElementType>
+void WorkspaceLibraryScanner::addResourcesToDb(WorkspaceLibraryDbWriter& writer,
+                                               int elementId,
+                                               const ElementType& element) {
+  for (const Resource& res : element.getResources()) {
+    writer.addResource<ElementType>(elementId, *res.getName(),
+                                    res.getMediaType(), res.getUrl());
   }
 }
 

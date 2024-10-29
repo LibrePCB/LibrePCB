@@ -550,6 +550,28 @@ QSet<Uuid> WorkspaceLibraryDb::getByCategory(const QString& elementsTable,
   return getUuidSet(query);
 }
 
+ResourceList WorkspaceLibraryDb::getResources(const QString& elementsTable,
+                                              const FilePath& elemDir) const {
+  QSqlQuery query = mDb->prepareQuery(
+      "SELECT name, media_type, url FROM %elements_res "
+      "LEFT JOIN %elements ON %elements.id = %elements_res.element_id "
+      "WHERE %elements.filepath = :filepath",
+      {
+          {"%elements", elementsTable},
+      });
+  query.bindValue(":filepath", elemDir.toRelative(mLibrariesPath));
+  mDb->exec(query);
+
+  ResourceList res;
+  while (query.next()) {
+    const ElementName name(query.value(0).toString());  // can throw
+    const QString mediaType = query.value(1).toString();
+    const QUrl url(query.value(2).toString());
+    res.append(std::make_shared<Resource>(name, mediaType, url));
+  }
+  return res;
+}
+
 QSet<Uuid> WorkspaceLibraryDb::getUuidSet(QSqlQuery& query) {
   QSet<Uuid> uuids;
   while (query.next()) {
