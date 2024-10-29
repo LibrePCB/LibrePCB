@@ -443,10 +443,9 @@ def test_if_export_with_invalid_settings_fails(cli, project):
                                    project.path)
     assert stderr == \
         "ERROR: Failed to load custom settings: File parse error: " \
-        "Child not found: base_path/@0\n\n" \
+        "Child not found: base_path/@0\n" \
         "File: \n" \
-        "Line,Column: -1,-1\n" \
-        "Invalid Content: \"\"\n"
+        "Invalid Content: ''\n"
     assert stdout == \
         "Open project '{project.path}'...\n" \
         "Export PCB fabrication data...\n" \

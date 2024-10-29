@@ -221,10 +221,9 @@ def test_invalid_jobs_fails(cli, project):
                                    project.path)
     assert stderr == \
         "ERROR: Failed to load custom output jobs: File parse error: " \
-        "Child not found: type/@0\n\n" \
+        "Child not found: type/@0\n" \
         "File: \n" \
-        "Line,Column: -1,-1\n" \
-        "Invalid Content: \"\"\n"
+        "Invalid Content: ''\n"
     assert stdout == \
         "Open project '{project.path}'...\n" \
         "Finished with errors!\n".format(project=project)

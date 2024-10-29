@@ -93,18 +93,15 @@ RangeError::RangeError(const RangeError& other) noexcept : RuntimeError(other) {
  ******************************************************************************/
 
 FileParseError::FileParseError(const char* file, int line,
-                               const FilePath& filePath, int fileLine,
-                               int fileColumn,
+                               const FilePath& filePath,
                                const QString& invalidFileContent,
                                const QString& msg) noexcept
-  : RuntimeError(file, line,
-                 QString("File parse error: %1\n\nFile: %2\nLine,Column: "
-                         "%3,%4\nInvalid Content: \"%5\"")
-                     .arg(msg)
-                     .arg(filePath.toNative())
-                     .arg(fileLine)
-                     .arg(fileColumn)
-                     .arg(invalidFileContent)) {
+  : RuntimeError(
+        file, line,
+        QString("File parse error: %1\nFile: %2\nInvalid Content: '%3'")
+            .arg(msg)
+            .arg(filePath.toNative())
+            .arg(invalidFileContent)) {
 }
 
 FileParseError::FileParseError(const FileParseError& other) noexcept

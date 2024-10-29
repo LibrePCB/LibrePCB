@@ -63,14 +63,14 @@ const QString& SExpression::getName() const {
   if (isList()) {
     return mValue;
   } else {
-    throw FileParseError(__FILE__, __LINE__, mFilePath, -1, -1, QString(),
+    throw FileParseError(__FILE__, __LINE__, mFilePath, QString(),
                          "Node is not a list.");
   }
 }
 
 const QString& SExpression::getValue() const {
   if (!isToken() && !isString()) {
-    throw FileParseError(__FILE__, __LINE__, mFilePath, -1, -1, mValue,
+    throw FileParseError(__FILE__, __LINE__, mFilePath, mValue,
                          "Node is not a token or string.");
   }
   return mValue;
@@ -137,7 +137,7 @@ SExpression& SExpression::getChild(const QString& path) {
   if (child) {
     return *child;
   } else {
-    throw FileParseError(__FILE__, __LINE__, mFilePath, -1, -1, QString(),
+    throw FileParseError(__FILE__, __LINE__, mFilePath, QString(),
                          QString("Child not found: %1").arg(path));
   }
 }
@@ -417,13 +417,13 @@ std::unique_ptr<SExpression> SExpression::parse(const QByteArray& content,
   QString contentStr = QString::fromUtf8(content);
   skipWhitespaceAndComments(contentStr, index, true);  // Skip newlines as well.
   if (index >= contentStr.length()) {
-    throw FileParseError(__FILE__, __LINE__, filePath, -1, -1, QString(),
+    throw FileParseError(__FILE__, __LINE__, filePath, QString(),
                          "No S-Expression node found.");
   }
   std::unique_ptr<SExpression> root = parse(contentStr, index, filePath);
   skipWhitespaceAndComments(contentStr, index, true);  // Skip newlines as well.
   if (index < contentStr.length()) {
-    throw FileParseError(__FILE__, __LINE__, filePath, -1, -1, QString(),
+    throw FileParseError(__FILE__, __LINE__, filePath, QString(),
                          "File contains more than one root node.");
   }
   return root;
@@ -489,7 +489,7 @@ std::unique_ptr<SExpression> SExpression::parseList(const QString& content,
 
   while (true) {
     if (index >= content.length()) {
-      throw FileParseError(__FILE__, __LINE__, filePath, -1, -1, QString(),
+      throw FileParseError(__FILE__, __LINE__, filePath, QString(),
                            "S-Expression node ended without closing ')'.");
     }
     if (content.at(index) == ')') {
@@ -513,7 +513,7 @@ QString SExpression::parseToken(const QString& content, int& index,
   QString token = content.mid(oldIndex, index - oldIndex);
   if (token.isEmpty()) {
     throw FileParseError(
-        __FILE__, __LINE__, filePath, -1, -1, QString(),
+        __FILE__, __LINE__, filePath, QString(),
         QString("Invalid token character detected: '%1'")
             .arg(index < content.length() ? content.at(index) : QChar()));
   }
@@ -547,7 +547,7 @@ QString SExpression::parseString(const QString& content, int& index,
   bool escaped = false;
   while (true) {
     if (index >= content.length()) {
-      throw FileParseError(__FILE__, __LINE__, filePath, -1, -1, QString(),
+      throw FileParseError(__FILE__, __LINE__, filePath, QString(),
                            "String ended without quote.");
     }
     const QChar& c = content.at(index);
@@ -557,7 +557,7 @@ QString SExpression::parseString(const QString& content, int& index,
         ++index;
         escaped = false;
       } else {
-        throw FileParseError(__FILE__, __LINE__, filePath, -1, -1, QString(),
+        throw FileParseError(__FILE__, __LINE__, filePath, QString(),
                              QString("Illegal escape sequence: '\\%1'").arg(c));
       }
     } else if (c == '"') {
