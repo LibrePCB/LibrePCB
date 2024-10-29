@@ -92,6 +92,7 @@ public:
   static QMenu* createChangeFootprintMenu(QWidget* parent) noexcept;
   static QMenu* createChangeModelMenu(QWidget* parent) noexcept;
   static QMenu* createMoveToOtherLibraryMenu(QWidget* parent) noexcept;
+  static QMenu* createMoreResourcesMenu(QWidget* parent) noexcept;
 
 private:  // Methods
   static QMenu* createMenu(const QString& objectName, const QString& text,

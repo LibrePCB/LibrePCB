@@ -23,12 +23,14 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/core/library/resource.h>
 #include <librepcb/core/project/circuit/netsignal.h>
 #include <librepcb/core/rulecheck/rulecheckmessage.h>
 #include <librepcb/core/serialization/fileformatmigration.h>
 #include <optional/tl/optional.hpp>
 
 #include <QtCore>
+#include <QtWidgets>
 
 #include <memory>
 
@@ -41,6 +43,7 @@ class QMainWindow;
 namespace librepcb {
 
 class Board;
+class ComponentInstance;
 class FilePath;
 class LengthUnit;
 class Project;
@@ -49,6 +52,7 @@ class Workspace;
 namespace editor {
 
 class BoardEditor;
+class MenuBuilder;
 class SchematicEditor;
 class UndoStack;
 
@@ -95,7 +99,15 @@ public:
    */
   UndoStack& getUndoStack() const noexcept { return *mUndoStack; }
 
+  ResourceList getComponentResources(
+      const ComponentInstance& cmp,
+      const tl::optional<Uuid>& filterDev = tl::nullopt) const noexcept;
+
   // General Methods
+
+  void addResourcesToMenu(MenuBuilder& mb, const ComponentInstance& cmp,
+                          const tl::optional<Uuid>& filterDev,
+                          QPointer<QWidget> editor, QMenu* root) const noexcept;
 
   /**
    * @brief Abort any active (blocking) tools in other editors
@@ -260,6 +272,8 @@ private:  // Methods
   void runErc() noexcept;
   void saveErcMessageApprovals(const QSet<SExpression>& approvals) noexcept;
   int getCountOfVisibleEditorWindows() const noexcept;
+  void searchAndOpenDatasheet(const QString& mpn, const QString& manufacturer,
+                              QPointer<QWidget> parent) const noexcept;
 
 private:  // Data
   Workspace& mWorkspace;

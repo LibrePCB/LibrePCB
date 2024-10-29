@@ -124,8 +124,10 @@ public:
   void setApiEndpoint(const QUrl& url) noexcept;
 
   // General Methods
-  void startOperation() noexcept;
+  bool startOperation(int timeoutMs = 0) noexcept;
   std::shared_ptr<PartInformation> getPartInfo(const Part& part) noexcept;
+  std::shared_ptr<PartInformation> waitForPartInfo(const Part& part,
+                                                   int timeoutMs) noexcept;
   bool isOngoing(const Part& part) const noexcept;
   void scheduleRequest(const Part& part) noexcept;
   void requestScheduledParts() noexcept;
