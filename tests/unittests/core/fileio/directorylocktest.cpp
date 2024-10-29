@@ -43,8 +43,7 @@ class DirectoryLockTest : public ::testing::Test {
 protected:
   virtual void SetUp() override {
     // create temporary, empty directory
-    mTempDir =
-        FilePath::getApplicationTempPath().getPathTo("DirectoryLockTest");
+    mTempDir = FilePath::getRandomTempPath();
     mTempLockFilePath = FilePath(mTempDir.toStr() % "/.lock");
     if (mTempDir.isExistingDir()) {
       FileUtils::removeDirRecursively(mTempDir);  // can throw

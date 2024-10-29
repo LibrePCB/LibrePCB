@@ -228,6 +228,8 @@ FilePath FilePath::getApplicationTempPath() noexcept {
 }
 
 FilePath FilePath::getRandomTempPath() noexcept {
+  // Attention: This pattern is assumed by
+  // Application::cleanTemporaryDirectory() to detect the age of tmp files!
   QString random = QString("%1_%2")
                        .arg(QDateTime::currentMSecsSinceEpoch())
                        .arg(QRandomGenerator::global()->generate());

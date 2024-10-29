@@ -99,7 +99,7 @@ namespace librepcb {
  * @code
  *    FilePath fp("C:\\foo\\bar.txt"); // a file
  *    qDebug(fp.toStr());      // "C:/foo/bar.txt"
- *    qDebug(fp.toNative());   // "C:/foo/bar.txt" ("C:\\foo\\bar.txt" on Windows)
+ *    qDebug(fp.toNative());   // "C:/foo/bar.txt"; Windows: "C:\\foo\\bar.txt"
  *    fp.setPath("/foo/bar/"); // a directory
  *    qDebug(fp.toStr());      // "/foo/bar" (trailing slash removed!)
  *    qDebug(fp.toNative());   // "/foo/bar" ("\\foo\\bar" on Windows)
@@ -375,6 +375,9 @@ public:  // Methods
   /**
    * @brief Get the path to the temporary directory (e.g. "/tmp" on Unix/Linux)
    *
+   * @attention Do not use this to store any files in it!
+   *            Use #getRandomTempPath() instead.
+   *
    * @return The filepath (in case of an error, the path can be invalid!)
    */
   static FilePath getTempPath() noexcept;
@@ -382,6 +385,9 @@ public:  // Methods
   /**
    * @brief Get the path to the temporary application directory (e.g.
    * "/tmp/librepcb")
+   *
+   * @attention Do not use this to store any files in it!
+   *            Use #getRandomTempPath() instead.
    *
    * @return The filepath (in case of an error, the path can be invalid!)
    */

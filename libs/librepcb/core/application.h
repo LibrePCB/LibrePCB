@@ -197,6 +197,17 @@ public:
    */
   static void setTranslationLocale(const QLocale& locale) noexcept;
 
+  /**
+   * @brief Clean up old files & folders in the temporary directory
+   *
+   * To be called from time to time (e.g. once on application startup) to
+   * keep the temporary directory clean, i.e. avoid filling the disk with
+   * data no longer used.
+   *
+   * @note This function is safe to be called from a thread.
+   */
+  static void cleanTemporaryDirectory() noexcept;
+
   // Operator Overloadings
   Application& operator=(const Application& rhs) = delete;
 };

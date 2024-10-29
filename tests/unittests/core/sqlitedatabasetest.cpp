@@ -43,8 +43,7 @@ class SQLiteDatabaseTest : public ::testing::Test {
 protected:
   virtual void SetUp() override {
     // create temporary, empty directory
-    mTempDir =
-        FilePath::getApplicationTempPath().getPathTo("SQLiteDatabaseTest");
+    mTempDir = FilePath::getRandomTempPath();
     mTempDbFilePath = mTempDir.getPathTo("db.sqlite");
     if (mTempDir.isExistingDir()) {
       FileUtils::removeDirRecursively(mTempDir);  // can throw
