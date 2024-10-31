@@ -52,26 +52,30 @@ typedef struct {
  ******************************************************************************/
 
 class FileDownloadTest : public ::testing::TestWithParam<FileDownloadTestData> {
-public:
-  static void SetUpTestCase() { sDownloadManager = new NetworkAccessManager(); }
+protected:
+  FilePath mTmpDir;
+  NetworkRequestBaseSignalReceiver mSignalReceiver;
+  static NetworkAccessManager* sDownloadManager;
 
-  static void TearDownTestCase() { delete sDownloadManager; }
+  FileDownloadTest() : mTmpDir(FilePath::getRandomTempPath()) {}
 
-  static FilePath getDestination(const FileDownloadTestData& data) {
-    return FilePath::getApplicationTempPath().getPathTo(data.destFilename);
+  ~FileDownloadTest() { QDir(mTmpDir.toStr()).removeRecursively(); }
+
+  FilePath getDestination(const FileDownloadTestData& data) {
+    return mTmpDir.getPathTo(data.destFilename);
   }
 
-  static FilePath getExtractToDir(const FileDownloadTestData& data) {
+  FilePath getExtractToDir(const FileDownloadTestData& data) {
     if (!data.extractDirname.isEmpty()) {
-      return FilePath::getApplicationTempPath().getPathTo(data.extractDirname);
+      return mTmpDir.getPathTo(data.extractDirname);
     } else {
       return FilePath();
     }
   }
 
-protected:
-  NetworkRequestBaseSignalReceiver mSignalReceiver;
-  static NetworkAccessManager* sDownloadManager;
+  static void SetUpTestCase() { sDownloadManager = new NetworkAccessManager(); }
+
+  static void TearDownTestCase() { delete sDownloadManager; }
 };
 
 NetworkAccessManager* FileDownloadTest::sDownloadManager = nullptr;

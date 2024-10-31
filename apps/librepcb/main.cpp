@@ -32,6 +32,7 @@
 #include <librepcb/editor/workspace/controlpanel/controlpanel.h>
 #include <librepcb/editor/workspace/initializeworkspacewizard/initializeworkspacewizard.h>
 
+#include <QtConcurrent>
 #include <QtCore>
 #include <QtWidgets>
 
@@ -83,6 +84,10 @@ int main(int argc, char* argv[]) {
   // shown.
   Application::loadBundledFonts();
   Application::setTranslationLocale(QLocale::system());
+
+  // Clean up old temporary files since at least on Windows this is not done
+  // automatically. Let's do it in a thread to avoid delaying application start.
+  std::ignore = QtConcurrent::run(&Application::cleanTemporaryDirectory);
 
   // This is to remove the ugly frames around widgets in all status bars...
   // (from http://www.qtcentre.org/threads/1904)

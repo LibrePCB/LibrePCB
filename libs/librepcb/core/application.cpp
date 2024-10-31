@@ -282,6 +282,37 @@ void Application::setTranslationLocale(const QLocale& locale) noexcept {
   installedTranslators.append(appTranslator2);
 }
 
+void Application::cleanTemporaryDirectory() noexcept {
+  const qint64 maxAgeMs = 60LL * 24LL * 3600LL * 1000LL;  // 60 days
+
+  QDir dir(FilePath::getApplicationTempPath().toStr());
+  dir.setFilter(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
+  foreach (const QFileInfo& info, dir.entryInfoList()) {
+    bool ok = false;
+    qlonglong ts = info.fileName().split("_").value(0).toLongLong(&ok);
+    if ((!ok) || (info.fileName().count("_") != 1)) {
+      const QDateTime dt = info.lastModified();
+      if (dt.isValid()) {
+        ts = dt.toMSecsSinceEpoch();
+      } else {
+        qWarning() << "Could not determine file age:"
+                   << info.absoluteFilePath();
+        ts = 0;
+      }
+    }
+    if ((QDateTime::currentMSecsSinceEpoch() - ts) > maxAgeMs) {
+      if (info.isDir()) {
+        qInfo() << "Removing old temporary directory:"
+                << info.absoluteFilePath();
+        QDir(info.absoluteFilePath()).removeRecursively();
+      } else {
+        qInfo() << "Removing old temporary file:" << info.absoluteFilePath();
+        QFile::remove(info.absoluteFilePath());
+      }
+    }
+  }
+}
+
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
