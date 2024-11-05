@@ -172,6 +172,7 @@ private:
   void execStepExportDialog() noexcept;
   void execD356NetlistExportDialog() noexcept;
   void execSpecctraExportDialog() noexcept;
+  void execSpecctraImportDialog() noexcept;
   bool show3DView() noexcept;
   void hide3DView() noexcept;
 
@@ -220,6 +221,7 @@ private:
   QScopedPointer<QAction> mActionRunQuickCheck;
   QScopedPointer<QAction> mActionRunDesignRuleCheck;
   QScopedPointer<QAction> mActionImportDxf;
+  QScopedPointer<QAction> mActionImportSpecctra;
   QScopedPointer<QAction> mActionExportLppz;
   QScopedPointer<QAction> mActionExportImage;
   QScopedPointer<QAction> mActionExportPdf;

@@ -484,6 +484,15 @@ public:
       {},
       &categoryImportExport,
   };
+  EditorCommand importSpecctraSes{
+      "import_specctra_ses",  // clang-format break
+      QT_TR_NOOP("Import Specctra SES"),
+      QT_TR_NOOP("Import a Specctra session, e.g. from external autorouters"),
+      ":/img/places/file.png",
+      EditorCommand::Flag::OpensPopup,
+      {},
+      &categoryImportExport,
+  };
   EditorCommand exportLppz{
       "export_lppz",  // clang-format break
       QT_TR_NOOP("Export *.lppz Archive"),

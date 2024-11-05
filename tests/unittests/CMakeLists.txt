@@ -111,6 +111,7 @@ add_executable(
   editor/modelview/pathmodeltest.cpp
   editor/project/addcomponentdialogtest.cpp
   editor/project/boardeditor/boardclipboarddatatest.cpp
+  editor/project/boardeditor/cmdboardspecctraimporttest.cpp
   editor/project/orderpcbdialogtest.cpp
   editor/project/schematiceditor/schematicclipboarddatatest.cpp
   editor/utils/shortcutsreferencegeneratortest.cpp
