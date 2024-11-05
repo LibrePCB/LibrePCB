@@ -511,6 +511,15 @@ public:
       {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_P)},
       &categoryImportExport,
   };
+  EditorCommand exportSpecctraDsn{
+      "export_specctra_dsn",  // clang-format break
+      QT_TR_NOOP("Export Specctra DSN"),
+      QT_TR_NOOP("Export PCB to Specctra format for external autorouters etc."),
+      ":/img/places/file.png",
+      EditorCommand::Flag::OpensPopup,
+      {},
+      &categoryImportExport,
+  };
   EditorCommand exportStep{
       "export_step",  // clang-format break
       QT_TR_NOOP("Export STEP Model"),

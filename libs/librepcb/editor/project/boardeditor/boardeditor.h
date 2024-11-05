@@ -171,6 +171,7 @@ private:
                                 const QString& settingsKey) noexcept;
   void execStepExportDialog() noexcept;
   void execD356NetlistExportDialog() noexcept;
+  void execSpecctraExportDialog() noexcept;
   bool show3DView() noexcept;
   void hide3DView() noexcept;
 
@@ -223,6 +224,7 @@ private:
   QScopedPointer<QAction> mActionExportImage;
   QScopedPointer<QAction> mActionExportPdf;
   QScopedPointer<QAction> mActionExportStep;
+  QScopedPointer<QAction> mActionExportSpecctra;
   QScopedPointer<QAction> mActionPrint;
   QScopedPointer<QAction> mActionGenerateBom;
   QScopedPointer<QAction> mActionGenerateFabricationData;
