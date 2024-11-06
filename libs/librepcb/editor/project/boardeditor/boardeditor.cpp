@@ -119,7 +119,7 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
     mTimestampOfLastOpenGlSceneRebuild(0),
     mVisibleSceneRect(),
     mFsm(),
-    mPlaneFragmentsBuilder(new BoardPlaneFragmentsBuilder(true, this)),
+    mPlaneFragmentsBuilder(new BoardPlaneFragmentsBuilder(this)),
     mTimestampOfLastPlaneRebuild(0) {
   mUi->setupUi(this);
   mUi->tabBar->setDocumentMode(true);  // For MacOS
@@ -164,9 +164,6 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
           &BoardEditor::hide3DView);
   connect(&mProjectEditor.getUndoStack(), &UndoStack::stateModified, this,
           &BoardEditor::scheduleOpenGlSceneUpdate);
-  connect(mPlaneFragmentsBuilder.data(),
-          &BoardPlaneFragmentsBuilder::boardPlanesModified, this,
-          &BoardEditor::scheduleOpenGlSceneUpdate);
 
   // Setup status bar.
   mUi->statusbar->setFields(StatusBar::AbsolutePosition |
@@ -210,7 +207,12 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
 
   // Setup plane rebuilder.
   connect(mPlaneFragmentsBuilder.data(), &BoardPlaneFragmentsBuilder::finished,
-          this, [this]() {
+          this, [this](BoardPlaneFragmentsBuilder::Result result) {
+            if (result.applyToBoard() && result.board) {
+              // Board has been modified, update air wires & 3D view.
+              result.board->forceAirWiresRebuild();
+              scheduleOpenGlSceneUpdate();
+            }
             mTimestampOfLastPlaneRebuild = QDateTime::currentMSecsSinceEpoch();
           });
 
@@ -1521,7 +1523,7 @@ void BoardEditor::startPlaneRebuild(bool full) noexcept {
   if (board && mPlaneFragmentsBuilder) {
     if (full) {
       // Forced rebuild -> all layers.
-      mPlaneFragmentsBuilder->startAsynchronously(*board);
+      mPlaneFragmentsBuilder->start(*board);
     } else {
       // Automatic rebuild -> only modified & visible layers. However, if the
       // 3D view is open, all planes on outer layers are visible!
@@ -1534,7 +1536,7 @@ void BoardEditor::startPlaneRebuild(bool full) noexcept {
           }
         }
       }
-      mPlaneFragmentsBuilder->startAsynchronously(*board, &layers);
+      mPlaneFragmentsBuilder->start(*board, &layers);
     }
   }
 }

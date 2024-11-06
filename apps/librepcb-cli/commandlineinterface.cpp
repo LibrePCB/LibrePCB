@@ -641,7 +641,7 @@ bool CommandLineInterface::openProject(
         qInfo().nospace().noquote() << "Rebuilding all planes of board '"
                                     << *board->getName() << "'...";
         BoardPlaneFragmentsBuilder builder;
-        builder.runSynchronously(*board);  // can throw
+        builder.runAndApply(*board);  // can throw
       }
     } else {
       qInfo() << "No need to rebuild planes, thus skipped.";

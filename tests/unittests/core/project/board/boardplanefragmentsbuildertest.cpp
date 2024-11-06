@@ -30,8 +30,11 @@
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectloader.h>
 #include <librepcb/core/serialization/sexpression.h>
+#include <librepcb/core/types/layer.h>
 
 #include <QtCore>
+
+#include <chrono>
 
 /*******************************************************************************
  *  Namespace
@@ -75,20 +78,20 @@ TEST(BoardPlaneFragmentsBuilderTest, testFragments) {
 
   // force planes rebuild
   BoardPlaneFragmentsBuilder builder;
-  builder.runSynchronously(*board);  // can throw
+  const QHash<Uuid, QVector<Path>> result =
+      builder.runAndApply(*board);  // can throw
 
-  // determine actual plane fragments
-  QMap<Uuid, QVector<Path>> actualPlaneFragments;
+  // Check if fragments have been applied.
   foreach (const BI_Plane* plane, board->getPlanes()) {
-    actualPlaneFragments[plane->getUuid()] = plane->getFragments();
+    EXPECT_TRUE(plane->getFragments() == result[plane->getUuid()]);
   }
 
   // write actual plane fragments into file (useful for debugging purposes)
   std::unique_ptr<SExpression> actualSexpr = SExpression::createList("actual");
-  foreach (const Uuid& uuid, actualPlaneFragments.keys()) {
+  foreach (const Uuid& uuid, Toolbox::sorted(result.keys())) {
     std::unique_ptr<SExpression> child = SExpression::createList("plane");
     child->appendChild(uuid);
-    foreach (const Path& fragment, actualPlaneFragments[uuid]) {
+    foreach (const Path& fragment, result[uuid]) {
       child->ensureLineBreak();
       fragment.serialize(child->appendList("fragment"));
     }
@@ -104,6 +107,64 @@ TEST(BoardPlaneFragmentsBuilderTest, testFragments) {
   FilePath expectedFp = testDataDir.getPathTo("expected.lp");
   QByteArray expected = FileUtils::readFile(expectedFp);
   EXPECT_EQ(expected.toStdString(), actual.toStdString());
+}
+
+TEST(BoardPlaneFragmentsBuilderTest, testManyThreads) {
+  // open project from test data directory
+  FilePath projectFp(TEST_DATA_DIR "/projects/Nested Planes/project.lpp");
+  std::shared_ptr<TransactionalFileSystem> projectFs =
+      TransactionalFileSystem::openRO(projectFp.getParentDir());
+  ProjectLoader loader;
+  std::unique_ptr<Project> project =
+      loader.open(std::unique_ptr<TransactionalDirectory>(
+                      new TransactionalDirectory(projectFs)),
+                  projectFp.getFilename());  // can throw
+  Board* board = project->getBoards().first();
+
+  // Copy planes on top layer to more layers, otherwise this test is quite
+  // meaningless.
+  board->setInnerLayerCount(40);
+  const QSet<const Layer*> otherLayers =
+      board->getCopperLayers() - QSet<const Layer*>{&Layer::topCopper()};
+  foreach (BI_Plane* plane, board->getPlanes()) {
+    foreach (const Layer* layer, otherLayers) {
+      BI_Plane* newPlane =
+          new BI_Plane(*board, Uuid::createRandom(), *layer,
+                       plane->getNetSignal(), plane->getOutline());
+      board->addPlane(*newPlane);
+    }
+  }
+  std::cout << "Testing with " << board->getPlanes().count() << " planes on "
+            << board->getCopperLayers().count() << " layers.\n";
+
+  // Run several times to heavily test multithreading.
+  const int runs = qBound(10, QThread::idealThreadCount() * 8, 50);
+  qreal totalTimeMs = 0;
+  BoardPlaneFragmentsBuilder builder;
+  QHash<Uuid, QVector<Path>> firstResult;
+  for (int i = 0; i < runs; ++i) {
+    std::chrono::time_point<std::chrono::high_resolution_clock> start =
+        std::chrono::high_resolution_clock::now();
+    builder.start(*board);
+    BoardPlaneFragmentsBuilder::Result result = builder.waitForFinished();
+    std::chrono::duration<double> elapsed =
+        std::chrono::high_resolution_clock::now() - start;
+    totalTimeMs += elapsed.count() * 1000;
+
+    // Check result.
+    EXPECT_EQ(board, result.board);
+    EXPECT_EQ(0, result.errors.count());
+    EXPECT_TRUE(result.finished);
+
+    // Check if every run leads to the same plane fragments.
+    if (i == 0) {
+      firstResult = result.planes;
+    } else {
+      EXPECT_TRUE(result.planes == firstResult);
+    }
+  }
+  std::cout << "Average time over " << runs << " runs: " << (totalTimeMs / runs)
+            << " ms\n";
 }
 
 /*******************************************************************************
