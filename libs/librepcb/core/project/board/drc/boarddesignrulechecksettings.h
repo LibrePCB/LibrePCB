@@ -159,10 +159,10 @@ public:
   }
   void setBlindViasAllowed(bool value) noexcept { mBlindViasAllowed = value; }
   void setBuriedViasAllowed(bool value) noexcept { mBuriedViasAllowed = value; }
-  void setAllowedPthSlots(AllowedSlots value) noexcept {
+  void setAllowedNpthSlots(AllowedSlots value) noexcept {
     mAllowedNpthSlots = value;
   }
-  void setAllowedNpthSlots(AllowedSlots value) noexcept {
+  void setAllowedPthSlots(AllowedSlots value) noexcept {
     mAllowedPthSlots = value;
   }
 
