@@ -715,6 +715,7 @@ void Board::copyFrom(const Board& other) {
   mSilkscreenLayersTop = other.mSilkscreenLayersTop;
   mSilkscreenLayersBot = other.mSilkscreenLayersBot;
   *mDesignRules = other.getDesignRules();
+  *mDrcSettings = other.getDrcSettings();
   *mFabricationOutputSettings = other.getFabricationOutputSettings();
 
   // Copy device instances.
