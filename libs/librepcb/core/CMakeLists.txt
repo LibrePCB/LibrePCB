@@ -331,6 +331,8 @@ add_library(
   project/board/drc/boardclipperpathgenerator.h
   project/board/drc/boarddesignrulecheck.cpp
   project/board/drc/boarddesignrulecheck.h
+  project/board/drc/boarddesignrulecheckdata.cpp
+  project/board/drc/boarddesignrulecheckdata.h
   project/board/drc/boarddesignrulecheckmessages.cpp
   project/board/drc/boarddesignrulecheckmessages.h
   project/board/drc/boarddesignrulechecksettings.cpp

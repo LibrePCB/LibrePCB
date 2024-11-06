@@ -319,6 +319,7 @@ bool BoardEditor::setActiveBoardIndex(int index) noexcept {
       storeLayersVisibility();
     }
 
+    clearDrcMarker();  // Avoid dangling pointers.
     mUi->graphicsView->setScene(nullptr);
     mGraphicsScene.reset();
     mActiveBoard = newBoard;
@@ -1350,21 +1351,22 @@ void BoardEditor::runDrc(bool quick) noexcept {
     // Run the DRC.
     QElapsedTimer timer;
     timer.start();
-    BoardDesignRuleCheck drc(*board, board->getDrcSettings());
+    BoardDesignRuleCheck drc;
     connect(&drc, &BoardDesignRuleCheck::progressPercent, mDockDrc.data(),
             &RuleCheckDock::setProgressPercent);
     connect(&drc, &BoardDesignRuleCheck::progressStatus, mDockDrc.data(),
             &RuleCheckDock::setProgressStatus);
-    drc.execute(quick);  // can throw
+    drc.start(*board, board->getDrcSettings(), quick);  // can throw
+    const BoardDesignRuleCheck::Result result = drc.waitForFinished();
 
     // Update DRC messages.
     clearDrcMarker();
-    mDrcMessages.insert(board->getUuid(), drc.getMessages());
-    mDockDrc->setMessages(drc.getMessages());
+    mDrcMessages.insert(board->getUuid(), result.messages);
+    mDockDrc->setMessages(result.messages);
 
     // Detect & remove disappeared messages.
     const QSet<SExpression> approvals =
-        RuleCheckMessage::getAllApprovals(drc.getMessages());
+        RuleCheckMessage::getAllApprovals(result.messages);
     if (board->updateDrcMessageApprovals(approvals, quick)) {
       mDockDrc->setApprovals(board->getDrcMessageApprovals());
       mProjectEditor.setManualModificationsMade();

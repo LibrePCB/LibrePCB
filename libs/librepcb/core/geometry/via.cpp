@@ -116,12 +116,7 @@ bool Via::isOnLayer(const Layer& layer) const noexcept {
 }
 
 bool Via::isOnAnyLayer(const QSet<const Layer*>& layers) const noexcept {
-  foreach (const Layer* layer, layers) {
-    if (layer && isOnLayer(*layer)) {
-      return true;
-    }
-  }
-  return false;
+  return isOnAnyLayer(layers, *mStartLayer, *mEndLayer);
 }
 
 QPainterPath Via::toQPainterPathPx(const Length& expansion) const noexcept {
@@ -259,6 +254,16 @@ bool Via::isOnLayer(const Layer& layer, const Layer& from,
                     const Layer& to) noexcept {
   const int nbr = layer.getCopperNumber();
   return ((nbr >= from.getCopperNumber()) && (nbr <= to.getCopperNumber()));
+}
+
+bool Via::isOnAnyLayer(const QSet<const Layer*>& layers, const Layer& from,
+                       const Layer& to) noexcept {
+  foreach (const Layer* layer, layers) {
+    if (layer && isOnLayer(*layer, from, to)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 QPainterPath Via::toQPainterPathPx(const PositiveLength& size,

@@ -710,13 +710,18 @@ bool CommandLineInterface::openProject(
       }
       foreach (Board* board, boardsToCheck) {
         print("  " % tr("Board '%1':").arg(*board->getName()));
-        BoardDesignRuleCheck drc(
-            *board, customSettings ? *customSettings : board->getDrcSettings());
-        drc.execute(false);
+        BoardDesignRuleCheck drc;
+        drc.start(*board,
+                  customSettings ? *customSettings : board->getDrcSettings(),
+                  false);
+        const BoardDesignRuleCheck::Result result = drc.waitForFinished();
+        for (const QString& msg : result.errors) {
+          printErr("FATAL ERROR: " % msg);
+          success = false;
+        }
         int approvedMsgCount = 0;
         const QStringList nonApproved = prepareRuleCheckMessages(
-            drc.getMessages(), board->getDrcMessageApprovals(),
-            approvedMsgCount);
+            result.messages, board->getDrcMessageApprovals(), approvedMsgCount);
         print("    " % tr("Approved messages: %1").arg(approvedMsgCount));
         print("    " %
               tr("Non-approved messages: %1").arg(nonApproved.count()));

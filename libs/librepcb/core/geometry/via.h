@@ -125,6 +125,8 @@ public:
                          const Length& expansion = Length(0)) noexcept;
   static bool isOnLayer(const Layer& layer, const Layer& from,
                         const Layer& to) noexcept;
+  static bool isOnAnyLayer(const QSet<const Layer*>& layers, const Layer& from,
+                           const Layer& to) noexcept;
   static QPainterPath toQPainterPathPx(
       const PositiveLength& size, const PositiveLength& drillDiameter,
       const Length& expansion = Length(0)) noexcept;
