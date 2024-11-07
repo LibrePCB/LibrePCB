@@ -71,6 +71,10 @@ class SExpression final {
 
 public:
   // Types
+  enum class Mode {
+    LibrePCB,  ///< LibrePCB syntax (very strict)
+    Permissive,  ///< Compatibility with other tools (very permissive)
+  };
   enum class Type {
     List,  ///< has a tag name and an arbitrary number of children
     Token,  ///< values without quotes (e.g. `-12.34`)
@@ -181,7 +185,7 @@ public:
   void removeChildrenWithNodeRecursive(const SExpression& search) noexcept;
   void replaceRecursive(const SExpression& search,
                         const SExpression& replace) noexcept;
-  QByteArray toByteArray() const;
+  QByteArray toByteArray(Mode mode = Mode::LibrePCB) const;
 
   // Operator Overloadings
   bool operator==(const SExpression& rhs) const noexcept;
@@ -197,7 +201,8 @@ public:
   static std::unique_ptr<SExpression> createString(const QString& string);
   static std::unique_ptr<SExpression> createLineBreak();
   static std::unique_ptr<SExpression> parse(const QByteArray& content,
-                                            const FilePath& filePath);
+                                            const FilePath& filePath,
+                                            Mode mode = Mode::LibrePCB);
 
 private:  // Methods
   SExpression(Type type, const QString& value);
@@ -207,20 +212,22 @@ private:  // Methods
       const std::vector<std::unique_ptr<SExpression>>& children,
       int& index) noexcept;
   static std::unique_ptr<SExpression> parse(const QString& content, int& index,
-                                            const FilePath& filePath);
+                                            const FilePath& filePath,
+                                            Mode mode);
   static std::unique_ptr<SExpression> parseList(const QString& content,
                                                 int& index,
-                                                const FilePath& filePath);
+                                                const FilePath& filePath,
+                                                Mode mode);
   static QString parseToken(const QString& content, int& index,
-                            const FilePath& filePath);
+                            const FilePath& filePath, Mode mode);
   static QString parseString(const QString& content, int& index,
                              const FilePath& filePath);
   static void skipWhitespaceAndComments(const QString& content, int& index,
                                         bool skipNewline = false);
   static QString escapeString(const QString& string) noexcept;
-  static bool isValidToken(const QString& token) noexcept;
-  static bool isValidTokenChar(const QChar& c) noexcept;
-  QString toString(int indent) const;
+  static bool isValidToken(const QString& token, Mode mode) noexcept;
+  static bool isValidTokenChar(const QChar& c, Mode mode) noexcept;
+  QString toString(int indent, Mode mode) const;
 
 private:  // Data
   Type mType;

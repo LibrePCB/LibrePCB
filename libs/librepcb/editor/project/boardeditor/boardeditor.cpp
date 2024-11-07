@@ -31,6 +31,7 @@
 #include "../../project/cmd/cmdboardadd.h"
 #include "../../project/cmd/cmdboardremove.h"
 #include "../../undostack.h"
+#include "../../utils/editortoolbox.h"
 #include "../../utils/exclusiveactiongroup.h"
 #include "../../utils/menubuilder.h"
 #include "../../utils/standardeditorcommandhandler.h"
@@ -42,6 +43,7 @@
 #include "../../widgets/searchtoolbar.h"
 #include "../../workspace/desktopservices.h"
 #include "../bomgeneratordialog.h"
+#include "../cmd/cmdboardspecctraimport.h"
 #include "../outputjobsdialog/outputjobsdialog.h"
 #include "../projecteditor.h"
 #include "../projectsetupdialog.h"
@@ -65,6 +67,7 @@
 #include <librepcb/core/project/board/boardd356netlistexport.h>
 #include <librepcb/core/project/board/boardpainter.h>
 #include <librepcb/core/project/board/boardplanefragmentsbuilder.h>
+#include <librepcb/core/project/board/boardspecctraexport.h>
 #include <librepcb/core/project/board/drc/boarddesignrulecheck.h>
 #include <librepcb/core/project/board/items/bi_device.h>
 #include <librepcb/core/project/board/items/bi_footprintpad.h>
@@ -79,6 +82,7 @@
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectattributelookup.h>
 #include <librepcb/core/types/layer.h>
+#include <librepcb/core/utils/messagelogger.h>
 #include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/utils/toolbox.h>
 #include <librepcb/core/workspace/workspace.h>
@@ -593,6 +597,8 @@ void BoardEditor::createActions() noexcept {
       this, this, [this]() { runDrc(false); }));
   mActionImportDxf.reset(cmd.importDxf.createAction(
       this, mFsm.data(), &BoardEditorFsm::processImportDxf));
+  mActionImportSpecctra.reset(cmd.importSpecctraSes.createAction(
+      this, this, &BoardEditor::execSpecctraImportDialog));
   mActionExportLppz.reset(cmd.exportLppz.createAction(
       this, this, [this]() { mProjectEditor.execLppzExportDialog(this); }));
   mActionExportImage.reset(cmd.exportImage.createAction(this, this, [this]() {
@@ -604,6 +610,8 @@ void BoardEditor::createActions() noexcept {
   }));
   mActionExportStep.reset(cmd.exportStep.createAction(
       this, this, &BoardEditor::execStepExportDialog));
+  mActionExportSpecctra.reset(cmd.exportSpecctraDsn.createAction(
+      this, this, &BoardEditor::execSpecctraExportDialog));
   mActionPrint.reset(cmd.print.createAction(this, this, [this]() {
     execGraphicsExportDialog(GraphicsExportDialog::Output::Print, "print");
   }));
@@ -1026,12 +1034,14 @@ void BoardEditor::createMenus() noexcept {
   {
     MenuBuilder smb(mb.addSubMenu(&MenuBuilder::createImportMenu));
     smb.addAction(mActionImportDxf);
+    smb.addAction(mActionImportSpecctra);
   }
   {
     MenuBuilder smb(mb.addSubMenu(&MenuBuilder::createExportMenu));
     smb.addAction(mActionExportPdf);
     smb.addAction(mActionExportImage);
     smb.addAction(mActionExportStep);
+    smb.addAction(mActionExportSpecctra);
     smb.addAction(mActionExportLppz);
   }
   {
@@ -1777,6 +1787,134 @@ void BoardEditor::execD356NetlistExportDialog() noexcept {
   } catch (const Exception& e) {
     QMessageBox::critical(this, tr("Error"), e.getMsg());
   }
+}
+
+void BoardEditor::execSpecctraExportDialog() noexcept {
+  Board* board = getActiveBoard();
+  if (!board) return;
+
+  try {
+    // Default file path.
+    QString path = "output/{{VERSION}}/{{PROJECT}}";
+    if (mProject.getBoards().count() > 1) {
+      path += "_{{BOARD}}";
+    }
+    path += ".dsn";
+    path = AttributeSubstitutor::substitute(
+        path, ProjectAttributeLookup(*board, nullptr), [&](const QString& str) {
+          return FilePath::cleanFileName(
+              str, FilePath::ReplaceSpaces | FilePath::KeepCase);
+        });
+
+    // Use memorized file path, if board path and version number match.
+    QSettings cs;
+    const QString csId =
+        board->getDirectory().getAbsPath().toStr() + *mProject.getVersion();
+    const QString csKey = "board_editor/dsn_export/" %
+        QString(QCryptographicHash::hash(csId.toUtf8(), QCryptographicHash::Md5)
+                    .toHex());
+    path = cs.value(csKey, path).toString();
+
+    // Make file path absolute.
+    if (QFileInfo(path).isRelative()) {
+      path = mProject.getPath().getPathTo(path).toStr();
+    }
+
+    // Choose file path.
+    path = FileDialog::getSaveFileName(
+        this, EditorCommandSet::instance().exportSpecctraDsn.getDisplayText(),
+        path, "*.dsn");
+    if (path.isEmpty()) return;
+    if (!path.contains(".")) path.append(".dsn");
+    const FilePath fp(path);
+
+    // Memorize file path.
+    cs.setValue(csKey,
+                fp.isLocatedInDir(mProject.getPath())
+                    ? fp.toRelative(mProject.getPath())
+                    : fp.toNative());
+
+    // Perform export.
+    qDebug().nospace() << "Export Specctra DSN to " << fp.toNative() << "...";
+    BoardSpecctraExport exp(*board);
+    FileUtils::writeFile(fp, exp.generate());  // can throw
+    qDebug() << "Successfully exported Specctra DSN.";
+    mUi->statusbar->showMessage(tr("Success!"), 3000);
+  } catch (const Exception& e) {
+    QMessageBox::critical(this, tr("Error"), e.getMsg());
+  }
+}
+
+void BoardEditor::execSpecctraImportDialog() noexcept {
+  Board* board = getActiveBoard();
+  if (!board) return;
+
+  auto logger = std::make_shared<MessageLogger>();
+  logger->warning(
+      tr("This is a new feature and we could test it only with very few "
+         "external routers. If you experience any compatibility issue with "
+         "your router, please let us know!"));
+  logger->warning(" → https://librepcb.org/help/");
+
+  try {
+    // Use memorized export file path, if board path and version number match.
+    QSettings cs;
+    const QString csId =
+        board->getDirectory().getAbsPath().toStr() + *mProject.getVersion();
+    const QString csKey = "board_editor/dsn_export/" %
+        QString(QCryptographicHash::hash(csId.toUtf8(), QCryptographicHash::Md5)
+                    .toHex());
+    QString path = cs.value(csKey).toString().replace(".dsn", ".ses");
+
+    // Make file path absolute.
+    if (QFileInfo(path).isRelative()) {
+      path = mProject.getPath().getPathTo(path).toStr();
+    }
+
+    // Choose file path.
+    path = FileDialog::getOpenFileName(
+        this, EditorCommandSet::instance().importSpecctraSes.getDisplayText(),
+        path, "*.ses;;*");
+    if (path.isEmpty()) return;
+    const FilePath fp(path);
+
+    // Set UI into busy state during the import.
+    setCursor(Qt::WaitCursor);
+    auto busyScopeGuard = scopeGuard([this]() { unsetCursor(); });
+
+    // Perform import.
+    qDebug().nospace() << "Import Specctra SES from " << fp.toNative() << "...";
+    logger->debug(tr("Parsing Specctra session '%1'...").arg(fp.toNative()));
+    const QByteArray content = FileUtils::readFile(fp);  // can throw
+    std::unique_ptr<SExpression> root =
+        SExpression::parse(content, fp, SExpression::Mode::Permissive);
+    mProjectEditor.getUndoStack().execCmd(
+        new CmdBoardSpecctraImport(*board, *root, logger));  // can throw
+    qDebug() << "Successfully imported Specctra SES.";
+  } catch (const Exception& e) {
+    logger->critical(e.getMsg());
+    logger->critical(tr("Import failed, no changes made to the board."));
+  }
+
+  // Display messages.
+  QDialog dlg(this);
+  dlg.setWindowTitle(tr("Specctra SES Import"));
+  dlg.setMinimumSize(600, 400);
+  QVBoxLayout* layout = new QVBoxLayout(&dlg);
+  QTextBrowser* txtBrowser = new QTextBrowser(&dlg);
+  txtBrowser->setReadOnly(true);
+  txtBrowser->setWordWrapMode(QTextOption::WordWrap);
+  txtBrowser->setText(
+      logger->getMessagesRichText(EditorToolbox::isWindowBackgroundDark()
+                                      ? MessageLogger::ColorTheme::Dark
+                                      : MessageLogger::ColorTheme::Light));
+  txtBrowser->verticalScrollBar()->setValue(
+      txtBrowser->verticalScrollBar()->maximum());
+  layout->addWidget(txtBrowser);
+  QPushButton* btnClose = new QPushButton(tr("Close"), &dlg);
+  connect(btnClose, &QPushButton::clicked, &dlg, &QDialog::accept);
+  layout->addWidget(btnClose);
+  dlg.exec();
 }
 
 bool BoardEditor::show3DView() noexcept {

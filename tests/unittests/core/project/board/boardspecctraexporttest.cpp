@@ -24,7 +24,7 @@
 #include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/fileio/transactionaldirectory.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
-#include <librepcb/core/project/board/boardd356netlistexport.h>
+#include <librepcb/core/project/board/boardspecctraexport.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectloader.h>
 
@@ -40,15 +40,15 @@ namespace tests {
  *  Test Class
  ******************************************************************************/
 
-class BoardD356NetlistExportTest : public ::testing::Test {};
+class BoardSpecctraExportTest : public ::testing::Test {};
 
 /*******************************************************************************
  *  Test Methods
  ******************************************************************************/
 
-TEST_F(BoardD356NetlistExportTest, test) {
+TEST_F(BoardSpecctraExportTest, test) {
   FilePath testDataDir(TEST_DATA_DIR
-                       "/unittests/librepcbproject/BoardD356NetlistExportTest");
+                       "/unittests/librepcbproject/BoardSpecctraExportTest");
 
   // Open project from test data directory.
   FilePath projectFp(TEST_DATA_DIR "/projects/Gerber Test/project.lpp");
@@ -60,22 +60,20 @@ TEST_F(BoardD356NetlistExportTest, test) {
                       new TransactionalDirectory(projectFs)),
                   projectFp.getFilename());  // can throw
 
-  // Export netlist.
-  const FilePath fp = testDataDir.getPathTo("actual.d356");
+  // Export DSN.
+  const FilePath fp = testDataDir.getPathTo("actual.dsn");
   Board* board = project->getBoards().first();
-  BoardD356NetlistExport exp(*board);
+  BoardSpecctraExport exp(*board);
   QString content = exp.generate();  // can throw
 
   // Replace volatile data in exported files with well-known, constant data.
-  content.replace(QRegularExpression("Generation Software: LibrePCB (.*)"),
-                  "Generation Software:");
-  content.replace(QRegularExpression("Generation Date: (.*)"),
-                  "Generation Date:");
+  content.replace(QRegularExpression("\\(host_version \"(.*)\"\\)"),
+                  "(host_version \"0\")");
   FileUtils::writeFile(fp, content.toUtf8());
 
   // Compare generated file with expected content.
   const QString expected =
-      FileUtils::readFile(testDataDir.getPathTo("expected.d356"));
+      FileUtils::readFile(testDataDir.getPathTo("expected.dsn"));
   EXPECT_EQ(expected.toStdString(), content.toStdString());
 }
 

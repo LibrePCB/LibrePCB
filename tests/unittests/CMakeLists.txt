@@ -69,6 +69,7 @@ add_executable(
   core/project/board/boardgerberexporttest.cpp
   core/project/board/boardpickplacegeneratortest.cpp
   core/project/board/boardplanefragmentsbuildertest.cpp
+  core/project/board/boardspecctraexporttest.cpp
   core/project/projectjsonexporttest.cpp
   core/project/projectlibrarytest.cpp
   core/project/projecttest.cpp
@@ -110,6 +111,7 @@ add_executable(
   editor/modelview/pathmodeltest.cpp
   editor/project/addcomponentdialogtest.cpp
   editor/project/boardeditor/boardclipboarddatatest.cpp
+  editor/project/boardeditor/cmdboardspecctraimporttest.cpp
   editor/project/orderpcbdialogtest.cpp
   editor/project/schematiceditor/schematicclipboarddatatest.cpp
   editor/utils/shortcutsreferencegeneratortest.cpp

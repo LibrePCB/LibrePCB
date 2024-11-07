@@ -484,6 +484,15 @@ public:
       {},
       &categoryImportExport,
   };
+  EditorCommand importSpecctraSes{
+      "import_specctra_ses",  // clang-format break
+      QT_TR_NOOP("Import Specctra SES"),
+      QT_TR_NOOP("Import a Specctra session, e.g. from external autorouters"),
+      ":/img/places/file.png",
+      EditorCommand::Flag::OpensPopup,
+      {},
+      &categoryImportExport,
+  };
   EditorCommand exportLppz{
       "export_lppz",  // clang-format break
       QT_TR_NOOP("Export *.lppz Archive"),
@@ -509,6 +518,15 @@ public:
       ":/img/actions/pdf.png",
       EditorCommand::Flag::OpensPopup,
       {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_P)},
+      &categoryImportExport,
+  };
+  EditorCommand exportSpecctraDsn{
+      "export_specctra_dsn",  // clang-format break
+      QT_TR_NOOP("Export Specctra DSN"),
+      QT_TR_NOOP("Export PCB to Specctra format for external autorouters etc."),
+      ":/img/places/file.png",
+      EditorCommand::Flag::OpensPopup,
+      {},
       &categoryImportExport,
   };
   EditorCommand exportStep{

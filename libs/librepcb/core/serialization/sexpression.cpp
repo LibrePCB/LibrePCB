@@ -256,8 +256,8 @@ void SExpression::replaceRecursive(const SExpression& search,
   }
 }
 
-QByteArray SExpression::toByteArray() const {
-  QString str = toString(0);  // can throw
+QByteArray SExpression::toByteArray(Mode mode) const {
+  QString str = toString(0, mode);  // can throw
   if (!str.endsWith('\n')) {
     str += '\n';  // newline at end of file
   }
@@ -331,27 +331,29 @@ QString SExpression::escapeString(const QString& string) noexcept {
   return escaped;
 }
 
-bool SExpression::isValidToken(const QString& token) noexcept {
+bool SExpression::isValidToken(const QString& token, Mode mode) noexcept {
   if (token.isEmpty()) {
     return false;
   }
   foreach (const QChar& c, token) {
-    if (!isValidTokenChar(c)) {
+    if (!isValidTokenChar(c, mode)) {
       return false;
     }
   }
   return true;
 }
 
-bool SExpression::isValidTokenChar(const QChar& c) noexcept {
+bool SExpression::isValidTokenChar(const QChar& c, Mode mode) noexcept {
   static QSet<QChar> allowedSpecialChars = {'\\', '.', ':', '_', '-'};
   return ((c >= 'a') && (c <= 'z')) || ((c >= 'A') && (c <= 'Z')) ||
-      ((c >= '0') && (c <= '9')) || allowedSpecialChars.contains(c);
+      ((c >= '0') && (c <= '9')) || allowedSpecialChars.contains(c) ||
+      ((mode == Mode::Permissive) && (c != '(') && (c != ')') &&
+       (!c.isSpace()));
 }
 
-QString SExpression::toString(int indent) const {
+QString SExpression::toString(int indent, Mode mode) const {
   if (mType == Type::List) {
-    if (!isValidToken(mValue)) {
+    if (!isValidToken(mValue, mode)) {
       throw LogicError(
           __FILE__, __LINE__,
           QString("Invalid S-Expression list name: %1").arg(mValue));
@@ -372,11 +374,11 @@ QString SExpression::toString(int indent) const {
       if (lastCharIsSpace && (i == lastIndex)) {
         --currentIndent;
       }
-      str += child.toString(currentIndent);
+      str += child.toString(currentIndent, mode);
     }
     return str + ')';
   } else if (mType == Type::Token) {
-    if (!isValidToken(mValue)) {
+    if (!isValidToken(mValue, mode)) {
       throw LogicError(__FILE__, __LINE__,
                        QString("Invalid S-Expression token: %1").arg(mValue));
     }
@@ -412,7 +414,8 @@ std::unique_ptr<SExpression> SExpression::createLineBreak() {
 }
 
 std::unique_ptr<SExpression> SExpression::parse(const QByteArray& content,
-                                                const FilePath& filePath) {
+                                                const FilePath& filePath,
+                                                Mode mode) {
   int index = 0;
   QString contentStr = QString::fromUtf8(content);
   skipWhitespaceAndComments(contentStr, index, true);  // Skip newlines as well.
@@ -420,7 +423,7 @@ std::unique_ptr<SExpression> SExpression::parse(const QByteArray& content,
     throw FileParseError(__FILE__, __LINE__, filePath, QString(),
                          "No S-Expression node found.");
   }
-  std::unique_ptr<SExpression> root = parse(contentStr, index, filePath);
+  std::unique_ptr<SExpression> root = parse(contentStr, index, filePath, mode);
   skipWhitespaceAndComments(contentStr, index, true);  // Skip newlines as well.
   if (index < contentStr.length()) {
     throw FileParseError(__FILE__, __LINE__, filePath, QString(),
@@ -461,7 +464,8 @@ bool SExpression::skipLineBreaks(
 
 std::unique_ptr<SExpression> SExpression::parse(const QString& content,
                                                 int& index,
-                                                const FilePath& filePath) {
+                                                const FilePath& filePath,
+                                                Mode mode) {
   Q_ASSERT(index < content.length());
 
   if (content.at(index) == '\n') {
@@ -469,23 +473,24 @@ std::unique_ptr<SExpression> SExpression::parse(const QString& content,
     skipWhitespaceAndComments(content, index);  // consume following spaces
     return createLineBreak();
   } else if (content.at(index) == '(') {
-    return parseList(content, index, filePath);
+    return parseList(content, index, filePath, mode);
   } else if (content.at(index) == '"') {
     return createString(parseString(content, index, filePath));
   } else {
-    return createToken(parseToken(content, index, filePath));
+    return createToken(parseToken(content, index, filePath, mode));
   }
 }
 
 std::unique_ptr<SExpression> SExpression::parseList(const QString& content,
                                                     int& index,
-                                                    const FilePath& filePath) {
+                                                    const FilePath& filePath,
+                                                    Mode mode) {
   Q_ASSERT((index < content.length()) && (content.at(index) == '('));
 
   ++index;  // consume the '('
 
   std::unique_ptr<SExpression> list =
-      createList(parseToken(content, index, filePath));
+      createList(parseToken(content, index, filePath, mode));
 
   while (true) {
     if (index >= content.length()) {
@@ -497,7 +502,7 @@ std::unique_ptr<SExpression> SExpression::parseList(const QString& content,
       skipWhitespaceAndComments(content, index);  // consume following spaces
       break;
     } else {
-      list->mChildren.emplace_back(parse(content, index, filePath));
+      list->mChildren.emplace_back(parse(content, index, filePath, mode));
     }
   }
 
@@ -505,9 +510,10 @@ std::unique_ptr<SExpression> SExpression::parseList(const QString& content,
 }
 
 QString SExpression::parseToken(const QString& content, int& index,
-                                const FilePath& filePath) {
+                                const FilePath& filePath, Mode mode) {
   int oldIndex = index;
-  while ((index < content.length()) && (isValidTokenChar(content.at(index)))) {
+  while ((index < content.length()) &&
+         (isValidTokenChar(content.at(index), mode))) {
     ++index;
   }
   QString token = content.mid(oldIndex, index - oldIndex);
