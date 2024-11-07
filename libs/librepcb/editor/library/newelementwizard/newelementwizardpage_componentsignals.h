@@ -66,9 +66,11 @@ public:
   NewElementWizardPage_ComponentSignals& operator=(
       const NewElementWizardPage_ComponentSignals& rhs) = delete;
 
+  // Static Methods
+  static QString appendNumberToSignalName(QString name, int number) noexcept;
+
 private:  // Methods
-  QHash<Uuid, CircuitIdentifier> getPinNames(
-      const Uuid& symbol, const QString& suffix) const noexcept;
+  QHash<Uuid, CircuitIdentifier> getPinNames(const Uuid& symbol) const noexcept;
   void initializePage() noexcept override;
   void cleanupPage() noexcept override;
 
