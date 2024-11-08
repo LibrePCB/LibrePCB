@@ -47,8 +47,8 @@ namespace librepcb {
  ******************************************************************************/
 
 BoardClipperPathGenerator::BoardClipperPathGenerator(
-    Board& board, const PositiveLength& maxArcTolerance) noexcept
-  : mBoard(board), mMaxArcTolerance(maxArcTolerance), mPaths() {
+    const PositiveLength& maxArcTolerance) noexcept
+  : mMaxArcTolerance(maxArcTolerance), mPaths() {
 }
 
 BoardClipperPathGenerator::~BoardClipperPathGenerator() noexcept {
@@ -68,168 +68,161 @@ void BoardClipperPathGenerator::takePathsTo(ClipperLib::Paths& out) noexcept {
  ******************************************************************************/
 
 void BoardClipperPathGenerator::addCopper(
-    const Layer& layer, const QSet<const NetSignal*>& netsignals,
-    bool ignorePlanes) {
+    const Data& data, const Layer& layer,
+    const QSet<tl::optional<Uuid> >& netsignals, bool ignorePlanes) {
   // Board polygons.
-  foreach (const BI_Polygon* polygon, mBoard.getPolygons()) {
-    if ((polygon->getData().getLayer() == layer) &&
-        (netsignals.isEmpty() || (netsignals.contains(nullptr)))) {
-      addPolygon(polygon->getData().getPath(),
-                 polygon->getData().getLineWidth(),
-                 polygon->getData().isFilled());
+  for (const Data::Polygon& polygon : data.polygons) {
+    if ((polygon.layer == &layer) &&
+        (netsignals.isEmpty() || (netsignals.contains(tl::nullopt)))) {
+      addPolygon(polygon.path, polygon.lineWidth, polygon.filled);
     }
   }
 
   // Stroke texts.
-  foreach (const BI_StrokeText* strokeText, mBoard.getStrokeTexts()) {
-    if ((strokeText->getData().getLayer() == layer) &&
-        (netsignals.isEmpty() || (netsignals.contains(nullptr)))) {
-      addStrokeText(*strokeText);
+  for (const Data::StrokeText& st : data.strokeTexts) {
+    if ((st.layer == &layer) &&
+        (netsignals.isEmpty() || (netsignals.contains(tl::nullopt)))) {
+      addStrokeText(st);
     }
   }
 
   // Planes.
   if (!ignorePlanes) {
-    foreach (const BI_Plane* plane, mBoard.getPlanes()) {
-      if ((plane->getLayer() == layer) &&
-          (netsignals.isEmpty() ||
-           netsignals.contains(plane->getNetSignal()))) {
-        addPlane(*plane);
+    for (const Data::Plane& plane : data.planes) {
+      if ((plane.layer == &layer) &&
+          (netsignals.isEmpty() || netsignals.contains(plane.net))) {
+        addPlane(plane.fragments);
       }
     }
   }
 
   // Devices.
-  foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
-    Transform transform(*device);
+  for (const Data::Device& dev : data.devices) {
+    Transform transform(dev.position, dev.rotation, dev.mirror);
 
     // Polygons.
-    for (const Polygon& polygon : device->getLibFootprint().getPolygons()) {
-      const Layer& polygonLayer = transform.map(polygon.getLayer());
+    for (const Data::Polygon& polygon : dev.polygons) {
+      const Layer& polygonLayer = transform.map(*polygon.layer);
       if ((polygonLayer == layer) &&
-          (netsignals.isEmpty() || netsignals.contains(nullptr))) {
-        addPolygon(transform.map(polygon.getPath()), polygon.getLineWidth(),
-                   polygon.isFilled());
+          (netsignals.isEmpty() || netsignals.contains(tl::nullopt))) {
+        addPolygon(transform.map(polygon.path), polygon.lineWidth,
+                   polygon.filled);
       }
     }
 
     // Circles.
-    for (const Circle& circle : device->getLibFootprint().getCircles()) {
-      const Layer& circleLayer = transform.map(circle.getLayer());
+    for (const Data::Circle& circle : dev.circles) {
+      const Layer& circleLayer = transform.map(*circle.layer);
       if ((circleLayer == layer) &&
-          (netsignals.isEmpty() || netsignals.contains(nullptr))) {
+          (netsignals.isEmpty() || netsignals.contains(tl::nullopt))) {
         addCircle(circle, transform);
       }
     }
 
     // Stroke texts.
-    foreach (const BI_StrokeText* strokeText, device->getStrokeTexts()) {
+    for (const Data::StrokeText& st : dev.strokeTexts) {
       // Do *not* mirror layer since it is independent of the device!
-      if ((strokeText->getData().getLayer() == layer) &&
-          (netsignals.isEmpty() || netsignals.contains(nullptr))) {
-        addStrokeText(*strokeText);
+      if ((st.layer == &layer) &&
+          (netsignals.isEmpty() || netsignals.contains(tl::nullopt))) {
+        addStrokeText(st);
       }
     }
 
     // Pads.
-    foreach (const BI_FootprintPad* pad, device->getPads()) {
-      if (pad->isOnLayer(layer) &&
-          (netsignals.isEmpty() ||
-           netsignals.contains(pad->getCompSigInstNetSignal()))) {
-        addPad(*pad, layer);
+    for (const Data::Pad& pad : dev.pads) {
+      if ((!pad.geometries[&layer].isEmpty()) &&
+          (netsignals.isEmpty() || netsignals.contains(pad.net))) {
+        addPad(pad, layer);
       }
     }
   }
 
   // Net segment items.
-  foreach (const BI_NetSegment* netsegment, mBoard.getNetSegments()) {
-    if (netsignals.isEmpty() ||
-        netsignals.contains(netsegment->getNetSignal())) {
+  for (const Data::Segment& ns : data.segments) {
+    if (netsignals.isEmpty() || netsignals.contains(ns.net)) {
       // Vias.
-      foreach (const BI_Via* via, netsegment->getVias()) {
-        if (via->getVia().isOnLayer(layer)) {
-          addVia(*via);
+      for (const Data::Via& via : ns.vias) {
+        if (Via::isOnLayer(layer, *via.startLayer, *via.endLayer)) {
+          addVia(via);
         }
       }
 
       // Net lines.
-      foreach (const BI_NetLine* netLine, netsegment->getNetLines()) {
-        if (netLine->getLayer() == layer) {
-          addNetLine(*netLine);
+      for (const Data::Trace& trace : ns.traces) {
+        if (trace.layer == &layer) {
+          addTrace(trace);
         }
       }
     }
   }
 }
 
-void BoardClipperPathGenerator::addStopMaskOpenings(const Layer& layer,
+void BoardClipperPathGenerator::addStopMaskOpenings(const Data& data,
+                                                    const Layer& layer,
                                                     const Length& offset) {
   // Board polygons.
-  foreach (const BI_Polygon* polygon, mBoard.getPolygons()) {
-    if (polygon->getData().getLayer() == layer) {
-      addPolygon(polygon->getData().getPath(),
-                 polygon->getData().getLineWidth(),
-                 polygon->getData().isFilled(), offset);
+  for (const Data::Polygon& polygon : data.polygons) {
+    if (polygon.layer == &layer) {
+      addPolygon(polygon.path, polygon.lineWidth, polygon.filled, offset);
     }
   }
 
   // Stroke texts.
-  foreach (const BI_StrokeText* strokeText, mBoard.getStrokeTexts()) {
-    if (strokeText->getData().getLayer() == layer) {
-      addStrokeText(*strokeText, offset);
+  for (const Data::StrokeText& st : data.strokeTexts) {
+    if (st.layer == &layer) {
+      addStrokeText(st, offset);
     }
   }
 
   // Holes.
-  foreach (const BI_Hole* hole, mBoard.getHoles()) {
-    if (auto maskOffset = hole->getStopMaskOffset()) {
-      const Length maskDia = hole->getData().getDiameter() + (*maskOffset) * 2;
-      addHole(PositiveLength(maskDia), hole->getData().getPath(), Transform(),
-              offset);
+  for (const Data::Hole& hole : data.holes) {
+    if (hole.stopMaskOffset) {
+      const Length maskDia = hole.diameter + (*hole.stopMaskOffset) * 2;
+      addHole(PositiveLength(maskDia), hole.path, Transform(), offset);
     }
   }
 
   // Devices.
-  foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
-    Transform transform(*device);
+  for (const Data::Device& dev : data.devices) {
+    Transform transform(dev.position, dev.rotation, dev.mirror);
 
     // Polygons.
-    for (const Polygon& polygon : device->getLibFootprint().getPolygons()) {
-      const Layer& polygonLayer = transform.map(polygon.getLayer());
+    for (const Data::Polygon& polygon : dev.polygons) {
+      const Layer& polygonLayer = transform.map(*polygon.layer);
       if (polygonLayer == layer) {
-        addPolygon(transform.map(polygon.getPath()), polygon.getLineWidth(),
-                   polygon.isFilled(), offset);
+        addPolygon(transform.map(polygon.path), polygon.lineWidth,
+                   polygon.filled, offset);
       }
     }
 
     // Circles.
-    for (const Circle& circle : device->getLibFootprint().getCircles()) {
-      const Layer& circleLayer = transform.map(circle.getLayer());
+    for (const Data::Circle& circle : dev.circles) {
+      const Layer& circleLayer = transform.map(*circle.layer);
       if (circleLayer == layer) {
         addCircle(circle, transform, offset);
       }
     }
 
     // Stroke texts.
-    foreach (const BI_StrokeText* strokeText, device->getStrokeTexts()) {
+    for (const Data::StrokeText& st : dev.strokeTexts) {
       // Do *not* mirror layer since it is independent of the device!
-      if (strokeText->getData().getLayer() == layer) {
-        addStrokeText(*strokeText, offset);
+      if (st.layer == &layer) {
+        addStrokeText(st, offset);
       }
     }
 
     // Holes.
-    for (const Hole& hole : device->getLibFootprint().getHoles()) {
-      if (auto maskOffset = device->getHoleStopMasks().value(hole.getUuid())) {
-        const Length maskDia = hole.getDiameter() + (*maskOffset) * 2;
-        addHole(PositiveLength(maskDia), hole.getPath(), transform, offset);
+    for (const Data::Hole& hole : dev.holes) {
+      if (hole.stopMaskOffset) {
+        const Length maskDia = hole.diameter + (*hole.stopMaskOffset) * 2;
+        addHole(PositiveLength(maskDia), hole.path, transform, offset);
       }
     }
 
     // Pads.
-    foreach (const BI_FootprintPad* pad, device->getPads()) {
-      const Transform padTransform(*pad);
-      foreach (PadGeometry geometry, pad->getGeometries().value(&layer)) {
+    for (const Data::Pad& pad : dev.pads) {
+      const Transform padTransform(pad.position, pad.rotation, pad.mirror);
+      foreach (PadGeometry geometry, pad.geometries.value(&layer)) {
         if (offset != 0) {
           geometry = geometry.withOffset(offset);
         }
@@ -243,38 +236,44 @@ void BoardClipperPathGenerator::addStopMaskOpenings(const Layer& layer,
   }
 
   // Vias.
-  foreach (const BI_NetSegment* netsegment, mBoard.getNetSegments()) {
-    foreach (const BI_Via* via, netsegment->getVias()) {
-      const tl::optional<PositiveLength> stopMaskDia = layer.isTop()
-          ? via->getStopMaskDiameterTop()
-          : via->getStopMaskDiameterBottom();
+  for (const Data::Segment& ns : data.segments) {
+    for (const Data::Via& via : ns.vias) {
+      const tl::optional<PositiveLength> stopMaskDia =
+          layer.isTop() ? via.stopMaskDiameterTop : via.stopMaskDiameterBot;
       if (stopMaskDia) {
-        addHole(*stopMaskDia, makeNonEmptyPath(via->getPosition()), Transform(),
+        addHole(*stopMaskDia, makeNonEmptyPath(via.position), Transform(),
                 offset);
       }
     }
   }
 }
 
-void BoardClipperPathGenerator::addVia(const BI_Via& via,
+void BoardClipperPathGenerator::addVia(const Data::Via& via,
                                        const Length& offset) {
-  ClipperHelpers::unite(
-      mPaths,
-      {ClipperHelpers::convert(via.getVia().getSceneOutline(offset),
-                               mMaxArcTolerance)},
-      ClipperLib::pftEvenOdd, ClipperLib::pftEvenOdd);
+  const Length size = via.size + (offset * 2);
+  if (size > 0) {
+    const Path sceneOutline =
+        Path::circle(PositiveLength(size)).translated(via.position);
+    ClipperHelpers::unite(
+        mPaths, {ClipperHelpers::convert(sceneOutline, mMaxArcTolerance)},
+        ClipperLib::pftEvenOdd, ClipperLib::pftEvenOdd);
+  }
 }
 
-void BoardClipperPathGenerator::addNetLine(const BI_NetLine& netLine,
-                                           const Length& offset) {
-  ClipperHelpers::unite(mPaths,
-                        {ClipperHelpers::convert(
-                            netLine.getSceneOutline(offset), mMaxArcTolerance)},
-                        ClipperLib::pftEvenOdd, ClipperLib::pftEvenOdd);
+void BoardClipperPathGenerator::addTrace(const Data::Trace& trace,
+                                         const Length& offset) {
+  const Length width = trace.width + (offset * 2);
+  if (width > 0) {
+    const Path sceneOutline = Path::obround(
+        trace.startPosition, trace.endPosition, PositiveLength(width));
+    ClipperHelpers::unite(
+        mPaths, {ClipperHelpers::convert(sceneOutline, mMaxArcTolerance)},
+        ClipperLib::pftEvenOdd, ClipperLib::pftEvenOdd);
+  }
 }
 
-void BoardClipperPathGenerator::addPlane(const BI_Plane& plane) {
-  foreach (const Path& p, plane.getFragments()) {
+void BoardClipperPathGenerator::addPlane(const QVector<Path>& fragments) {
+  foreach (const Path& p, fragments) {
     ClipperHelpers::unite(mPaths,
                           {ClipperHelpers::convert(p, mMaxArcTolerance)},
                           ClipperLib::pftEvenOdd, ClipperLib::pftEvenOdd);
@@ -305,37 +304,38 @@ void BoardClipperPathGenerator::addPolygon(const Path& path,
   }
 }
 
-void BoardClipperPathGenerator::addCircle(const Circle& circle,
+void BoardClipperPathGenerator::addCircle(const Data::Circle& circle,
                                           const Transform& transform,
                                           const Length& offset) {
   const PositiveLength diameter(
-      std::max(*circle.getDiameter() + (offset * 2), Length(1)));
+      std::max(*circle.diameter + (offset * 2), Length(1)));
   const Path path =
-      Path::circle(diameter).translated(transform.map(circle.getCenter()));
+      Path::circle(diameter).translated(transform.map(circle.center));
 
   // Outline.
-  if (circle.getLineWidth() > 0) {
+  if (circle.lineWidth > 0) {
     QVector<Path> paths =
-        path.toOutlineStrokes(PositiveLength(*circle.getLineWidth()));
+        path.toOutlineStrokes(PositiveLength(*circle.lineWidth));
     ClipperHelpers::unite(mPaths,
                           ClipperHelpers::convert(paths, mMaxArcTolerance),
                           ClipperLib::pftEvenOdd, ClipperLib::pftNonZero);
   }
 
   // Area.
-  if (circle.isFilled()) {
+  if (circle.filled) {
     ClipperHelpers::unite(mPaths,
                           {ClipperHelpers::convert(path, mMaxArcTolerance)},
                           ClipperLib::pftEvenOdd, ClipperLib::pftEvenOdd);
   }
 }
 
-void BoardClipperPathGenerator::addStrokeText(const BI_StrokeText& strokeText,
-                                              const Length& offset) {
+void BoardClipperPathGenerator::addStrokeText(
+    const Data::StrokeText& strokeText, const Length& offset) {
   const PositiveLength width(
-      qMax(*strokeText.getData().getStrokeWidth() + (offset * 2), Length(1)));
-  const Transform transform(strokeText.getData());
-  foreach (const Path path, transform.map(strokeText.getPaths())) {
+      std::max(*strokeText.strokeWidth + (offset * 2), Length(1)));
+  const Transform transform(strokeText.position, strokeText.rotation,
+                            strokeText.mirror);
+  foreach (const Path path, transform.map(strokeText.paths)) {
     QVector<Path> paths = path.toOutlineStrokes(width);
     ClipperHelpers::unite(mPaths,
                           ClipperHelpers::convert(paths, mMaxArcTolerance),
@@ -355,11 +355,10 @@ void BoardClipperPathGenerator::addHole(const PositiveLength& diameter,
       ClipperLib::pftEvenOdd, ClipperLib::pftNonZero);
 }
 
-void BoardClipperPathGenerator::addPad(const BI_FootprintPad& pad,
-                                       const Layer& layer,
+void BoardClipperPathGenerator::addPad(const Data::Pad& pad, const Layer& layer,
                                        const Length& offset) {
-  const Transform transform(pad);
-  foreach (PadGeometry geometry, pad.getGeometries().value(&layer)) {
+  const Transform transform(pad.position, pad.rotation, pad.mirror);
+  foreach (PadGeometry geometry, pad.geometries.value(&layer)) {
     if (offset != 0) {
       geometry = geometry.withOffset(offset);
     }

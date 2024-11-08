@@ -24,7 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../../../rulecheck/rulecheckmessage.h"
-#include "../../../types/length.h"
+#include "boarddesignrulecheckdata.h"
 
 #include <QtCore>
 
@@ -33,29 +33,68 @@
  ******************************************************************************/
 namespace librepcb {
 
-class BI_Base;
-class BI_Device;
-class BI_FootprintPad;
-class BI_Hole;
-class BI_NetLine;
-class BI_NetLineAnchor;
-class BI_NetPoint;
-class BI_NetSegment;
-class BI_Plane;
-class BI_Polygon;
-class BI_StrokeText;
-class BI_Via;
-class BI_Zone;
-class Circle;
-class ComponentInstance;
-class Hole;
-class Layer;
-class NetSignal;
-class PadHole;
-class Polygon;
-class StrokeText;
-class Uuid;
-class Zone;
+/*******************************************************************************
+ *  Class DrcHoleRef
+ ******************************************************************************/
+
+struct DrcHoleRef {
+  using Data = BoardDesignRuleCheckData;
+
+  bool isPadHole() const noexcept { return mDevice && mPad && mHole; }
+  bool isViaHole() const noexcept { return mSegment && mVia; }
+  bool isPlated() const noexcept { return isPadHole() || isViaHole(); }
+  const QString& getNetName() const noexcept { return mNetName; }
+  const Data::Pad* getPad() const noexcept { return mPad; }
+  PositiveLength getDiameter() const noexcept {
+    if (mHole) {
+      return mHole->diameter;
+    } else if (mVia) {
+      return mVia->drillDiameter;
+    } else {
+      Q_ASSERT(false);
+      qCritical() << "DrcHoleRef: Unknown object type.";
+      return PositiveLength(1);
+    }
+  }
+  void serialize(SExpression& node) const;
+
+  static DrcHoleRef boardHole(const Data::Hole& hole) {
+    DrcHoleRef obj;
+    obj.mHole = &hole;
+    return obj;
+  }
+  static DrcHoleRef deviceHole(const Data::Device& device,
+                               const Data::Hole& hole) {
+    DrcHoleRef obj;
+    obj.mDevice = &device;
+    obj.mHole = &hole;
+    return obj;
+  }
+  static DrcHoleRef padHole(const Data::Device& device, const Data::Pad& pad,
+                            const Data::Hole& hole) {
+    DrcHoleRef obj;
+    obj.mDevice = &device;
+    obj.mPad = &pad;
+    obj.mHole = &hole;
+    obj.mNetName = pad.netName;
+    return obj;
+  }
+  static DrcHoleRef via(const Data::Segment& segment, const Data::Via& via) {
+    DrcHoleRef obj;
+    obj.mSegment = &segment;
+    obj.mVia = &via;
+    obj.mNetName = segment.netName;
+    return obj;
+  }
+
+private:
+  const Data::Hole* mHole = nullptr;
+  const Data::Segment* mSegment = nullptr;
+  const Data::Via* mVia = nullptr;
+  const Data::Device* mDevice = nullptr;
+  const Data::Pad* mPad = nullptr;
+  QString mNetName;  // Empty if no net.
+};
 
 /*******************************************************************************
  *  Class DrcMsgMissingDevice
@@ -70,7 +109,7 @@ class DrcMsgMissingDevice final : public RuleCheckMessage {
 public:
   // Constructors / Destructor
   DrcMsgMissingDevice() = delete;
-  explicit DrcMsgMissingDevice(const ComponentInstance& component) noexcept;
+  DrcMsgMissingDevice(const Uuid& uuid, const QString& name) noexcept;
   DrcMsgMissingDevice(const DrcMsgMissingDevice& other) noexcept
     : RuleCheckMessage(other) {}
   virtual ~DrcMsgMissingDevice() noexcept {}
@@ -87,20 +126,49 @@ class DrcMsgMissingConnection final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(DrcMsgMissingConnection)
 
 public:
+  using Data = BoardDesignRuleCheckData;
+  struct Anchor {
+    QString getName() const;
+    void serialize(SExpression& node) const;
+
+    static Anchor pad(const Data::Device& device, const Data::Pad& pad) {
+      Anchor obj;
+      obj.mDevice = &device;
+      obj.mPad = &pad;
+      return obj;
+    }
+    static Anchor junction(const Data::Segment& segment,
+                           const Data::Junction& junction) {
+      Anchor obj;
+      obj.mSegment = &segment;
+      obj.mJunction = &junction;
+      return obj;
+    }
+    static Anchor via(const Data::Segment& segment, const Data::Via& via) {
+      Anchor obj;
+      obj.mSegment = &segment;
+      obj.mVia = &via;
+      return obj;
+    }
+
+  private:
+    // Either it's a pad...
+    const Data::Device* mDevice = nullptr;
+    const Data::Pad* mPad = nullptr;
+    // ... or a junction or via
+    const Data::Segment* mSegment = nullptr;
+    const Data::Junction* mJunction = nullptr;
+    const Data::Via* mVia = nullptr;
+  };
+
   // Constructors / Destructor
   DrcMsgMissingConnection() = delete;
-  DrcMsgMissingConnection(const BI_NetLineAnchor& p1,
-                          const BI_NetLineAnchor& p2,
-                          const NetSignal& netSignal,
+  DrcMsgMissingConnection(const Anchor& p1, const Anchor& p2,
+                          const QString& netName,
                           const QVector<Path>& locations);
   DrcMsgMissingConnection(const DrcMsgMissingConnection& other) noexcept
     : RuleCheckMessage(other) {}
   virtual ~DrcMsgMissingConnection() noexcept {}
-
-private:
-  static QString getAnchorName(const BI_NetLineAnchor& anchor);
-  static void serializeAnchor(SExpression& node,
-                              const BI_NetLineAnchor& anchor);
 };
 
 /*******************************************************************************
@@ -152,7 +220,8 @@ class DrcMsgOpenBoardOutlinePolygon final : public RuleCheckMessage {
 public:
   // Constructors / Destructor
   DrcMsgOpenBoardOutlinePolygon() = delete;
-  DrcMsgOpenBoardOutlinePolygon(const BI_Device* device, const Uuid& polygon,
+  DrcMsgOpenBoardOutlinePolygon(const Uuid& polygon,
+                                const tl::optional<Uuid>& device,
                                 const QVector<Path>& locations) noexcept;
   DrcMsgOpenBoardOutlinePolygon(
       const DrcMsgOpenBoardOutlinePolygon& other) noexcept
@@ -193,9 +262,11 @@ class DrcMsgEmptyNetSegment final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(DrcMsgEmptyNetSegment)
 
 public:
+  using Data = BoardDesignRuleCheckData;
+
   // Constructors / Destructor
   DrcMsgEmptyNetSegment() = delete;
-  explicit DrcMsgEmptyNetSegment(const BI_NetSegment& netSegment) noexcept;
+  explicit DrcMsgEmptyNetSegment(const Data::Segment& ns) noexcept;
   DrcMsgEmptyNetSegment(const DrcMsgEmptyNetSegment& other) noexcept
     : RuleCheckMessage(other) {}
   virtual ~DrcMsgEmptyNetSegment() noexcept {}
@@ -212,9 +283,12 @@ class DrcMsgUnconnectedJunction final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(DrcMsgUnconnectedJunction)
 
 public:
+  using Data = BoardDesignRuleCheckData;
+
   // Constructors / Destructor
   DrcMsgUnconnectedJunction() = delete;
-  DrcMsgUnconnectedJunction(const BI_NetPoint& netPoint,
+  DrcMsgUnconnectedJunction(const Data::Junction& junction,
+                            const Data::Segment& ns,
                             const QVector<Path>& locations) noexcept;
   DrcMsgUnconnectedJunction(const DrcMsgUnconnectedJunction& other) noexcept
     : RuleCheckMessage(other) {}
@@ -232,9 +306,12 @@ class DrcMsgMinimumTextHeightViolation final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(DrcMsgMinimumTextHeightViolation)
 
 public:
+  using Data = BoardDesignRuleCheckData;
+
   // Constructors / Destructor
   DrcMsgMinimumTextHeightViolation() = delete;
-  DrcMsgMinimumTextHeightViolation(const BI_StrokeText& text,
+  DrcMsgMinimumTextHeightViolation(const Data::StrokeText& st,
+                                   const Data::Device* device,
                                    const UnsignedLength& minHeight,
                                    const QVector<Path>& locations) noexcept;
   DrcMsgMinimumTextHeightViolation(
@@ -254,24 +331,30 @@ class DrcMsgMinimumWidthViolation final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(DrcMsgMinimumWidthViolation)
 
 public:
+  using Data = BoardDesignRuleCheckData;
+
   // Constructors / Destructor
   DrcMsgMinimumWidthViolation() = delete;
-  DrcMsgMinimumWidthViolation(const BI_NetLine& netLine,
+  DrcMsgMinimumWidthViolation(const Data::Segment& segment,
+                              const Data::Trace& trace,
                               const UnsignedLength& minWidth,
                               const QVector<Path>& locations) noexcept;
-  DrcMsgMinimumWidthViolation(const BI_Plane& plane,
+  DrcMsgMinimumWidthViolation(const Data::Plane& plane,
                               const UnsignedLength& minWidth,
                               const QVector<Path>& locations) noexcept;
-  DrcMsgMinimumWidthViolation(const BI_Polygon& polygon,
+  DrcMsgMinimumWidthViolation(const Data::Polygon& polygon,
                               const UnsignedLength& minWidth,
                               const QVector<Path>& locations) noexcept;
-  DrcMsgMinimumWidthViolation(const BI_StrokeText& text,
+  DrcMsgMinimumWidthViolation(const Data::StrokeText& text,
+                              const Data::Device* device,
                               const UnsignedLength& minWidth,
                               const QVector<Path>& locations) noexcept;
-  DrcMsgMinimumWidthViolation(const BI_Device& device, const Polygon& polygon,
+  DrcMsgMinimumWidthViolation(const Data::Device& device,
+                              const Data::Polygon& polygon,
                               const UnsignedLength& minWidth,
                               const QVector<Path>& locations) noexcept;
-  DrcMsgMinimumWidthViolation(const BI_Device& device, const Circle& circle,
+  DrcMsgMinimumWidthViolation(const Data::Device& device,
+                              const Data::Circle& circle,
                               const UnsignedLength& minWidth,
                               const QVector<Path>& locations) noexcept;
   DrcMsgMinimumWidthViolation(const DrcMsgMinimumWidthViolation& other) noexcept
@@ -290,25 +373,99 @@ class DrcMsgCopperCopperClearanceViolation final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(DrcMsgCopperCopperClearanceViolation)
 
 public:
+  using Data = BoardDesignRuleCheckData;
+
+  struct Object {
+    QString getName() const;
+    void serialize(SExpression& node) const;
+
+    static Object pad(const Data::Pad& pad, const Data::Device& device) {
+      Object obj;
+      obj.mPad = &pad;
+      obj.mDevice = &device;
+      obj.mNetName = pad.netName;
+      return obj;
+    }
+    static Object trace(const Data::Trace& trace,
+                        const Data::Segment& segment) {
+      Object obj;
+      obj.mTrace = &trace;
+      obj.mSegment = &segment;
+      obj.mNetName = segment.netName;
+      return obj;
+    }
+    static Object via(const Data::Via& via, const Data::Segment& segment) {
+      Object obj;
+      obj.mVia = &via;
+      obj.mSegment = &segment;
+      obj.mNetName = segment.netName;
+      return obj;
+    }
+    static Object plane(const Data::Plane& plane) {
+      Object obj;
+      obj.mPlane = &plane;
+      obj.mNetName = plane.netName;
+      return obj;
+    }
+    static Object polygon(const Data::Polygon& polygon,
+                          const Data::Device* device) {
+      Object obj;
+      obj.mPolygon = &polygon;
+      obj.mDevice = device;
+      return obj;
+    }
+    static Object circle(const Data::Circle& circle,
+                         const Data::Device* device) {
+      Object obj;
+      obj.mCircle = &circle;
+      obj.mDevice = device;
+      return obj;
+    }
+    static Object strokeText(const Data::StrokeText& txt,
+                             const Data::Device* device) {
+      Object obj;
+      obj.mStrokeText = &txt;
+      obj.mDevice = device;
+      return obj;
+    }
+
+    bool operator==(const Object& rhs) const {
+      std::unique_ptr<SExpression> obj1 = SExpression::createList("object");
+      serialize(*obj1);
+      std::unique_ptr<SExpression> obj2 = SExpression::createList("object");
+      rhs.serialize(*obj2);
+      return (*obj1) == (*obj2);
+    }
+
+  private:
+    // Actual object (one of them)
+    const Data::Pad* mPad = nullptr;
+    const Data::Trace* mTrace = nullptr;
+    const Data::Via* mVia = nullptr;
+    const Data::Plane* mPlane = nullptr;
+    const Data::Polygon* mPolygon = nullptr;
+    const Data::Circle* mCircle = nullptr;
+    const Data::StrokeText* mStrokeText = nullptr;
+
+    // Optional context (depending on object type)
+    const Data::Segment* mSegment = nullptr;
+    const Data::Device* mDevice = nullptr;
+    QString mNetName;  // Empty if no net.
+  };
+
   // Constructors / Destructor
   DrcMsgCopperCopperClearanceViolation() = delete;
-  DrcMsgCopperCopperClearanceViolation(
-      const NetSignal* net1, const BI_Base& item1, const Polygon* polygon1,
-      const Circle* circle1, const NetSignal* net2, const BI_Base& item2,
-      const Polygon* polygon2, const Circle* circle2,
-      const QVector<const Layer*>& layers, const Length& minClearance,
-      const QVector<Path>& locations);
+  DrcMsgCopperCopperClearanceViolation(const Object& obj1, const Object& obj2,
+                                       const QSet<const Layer*>& layers,
+                                       const Length& minClearance,
+                                       const QVector<Path>& locations);
   DrcMsgCopperCopperClearanceViolation(
       const DrcMsgCopperCopperClearanceViolation& other) noexcept
     : RuleCheckMessage(other) {}
   virtual ~DrcMsgCopperCopperClearanceViolation() noexcept {}
 
 private:
-  static QString getLayerName(const QVector<const Layer*>& layers);
-  static QString getObjectName(const NetSignal* net, const BI_Base& item,
-                               const Polygon* polygon, const Circle* circle);
-  static void serializeObject(SExpression& node, const BI_Base& item,
-                              const Polygon* polygon, const Circle* circle);
+  static QString getLayerName(const QSet<const Layer*>& layers);
 };
 
 /*******************************************************************************
@@ -322,42 +479,41 @@ class DrcMsgCopperBoardClearanceViolation final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(DrcMsgCopperBoardClearanceViolation)
 
 public:
+  using Data = BoardDesignRuleCheckData;
+
   // Constructors / Destructor
   DrcMsgCopperBoardClearanceViolation() = delete;
-  DrcMsgCopperBoardClearanceViolation(const BI_Via& via,
+  DrcMsgCopperBoardClearanceViolation(const Data::Segment& segment,
+                                      const Data::Via& via,
                                       const UnsignedLength& minClearance,
                                       const QVector<Path>& locations) noexcept;
-  DrcMsgCopperBoardClearanceViolation(const BI_NetLine& netLine,
+  DrcMsgCopperBoardClearanceViolation(const Data::Segment& segment,
+                                      const Data::Trace& trace,
                                       const UnsignedLength& minClearance,
                                       const QVector<Path>& locations) noexcept;
-  DrcMsgCopperBoardClearanceViolation(const BI_FootprintPad& pad,
+  DrcMsgCopperBoardClearanceViolation(const Data::Device& device,
+                                      const Data::Pad& pad,
                                       const UnsignedLength& minClearance,
                                       const QVector<Path>& locations) noexcept;
-  DrcMsgCopperBoardClearanceViolation(const BI_Plane& plane,
+  DrcMsgCopperBoardClearanceViolation(const Data::Plane& plane,
                                       const UnsignedLength& minClearance,
                                       const QVector<Path>& locations) noexcept;
-  DrcMsgCopperBoardClearanceViolation(const BI_Polygon& polygon,
+  DrcMsgCopperBoardClearanceViolation(const Data::Polygon& polygon,
+                                      const Data::Device* device,
                                       const UnsignedLength& minClearance,
                                       const QVector<Path>& locations) noexcept;
-  DrcMsgCopperBoardClearanceViolation(const BI_Device& device,
-                                      const Polygon& polygon,
+  DrcMsgCopperBoardClearanceViolation(const Data::Device& device,
+                                      const Data::Circle& circle,
                                       const UnsignedLength& minClearance,
                                       const QVector<Path>& locations) noexcept;
-  DrcMsgCopperBoardClearanceViolation(const BI_Device& device,
-                                      const Circle& circle,
-                                      const UnsignedLength& minClearance,
-                                      const QVector<Path>& locations) noexcept;
-  DrcMsgCopperBoardClearanceViolation(const BI_StrokeText& strokeText,
+  DrcMsgCopperBoardClearanceViolation(const Data::StrokeText& strokeText,
+                                      const Data::Device* device,
                                       const UnsignedLength& minClearance,
                                       const QVector<Path>& locations) noexcept;
   DrcMsgCopperBoardClearanceViolation(
       const DrcMsgCopperBoardClearanceViolation& other) noexcept
     : RuleCheckMessage(other) {}
   virtual ~DrcMsgCopperBoardClearanceViolation() noexcept {}
-
-private:
-  static QString getPolygonMessage(const UnsignedLength& minClearance) noexcept;
-  static QString getPolygonDescription() noexcept;
 };
 
 /*******************************************************************************
@@ -371,22 +527,18 @@ class DrcMsgCopperHoleClearanceViolation final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(DrcMsgCopperHoleClearanceViolation)
 
 public:
+  using Data = BoardDesignRuleCheckData;
+
   // Constructors / Destructor
   DrcMsgCopperHoleClearanceViolation() = delete;
-  DrcMsgCopperHoleClearanceViolation(const BI_Hole& hole,
-                                     const UnsignedLength& minClearance,
-                                     const QVector<Path>& locations) noexcept;
-  DrcMsgCopperHoleClearanceViolation(const BI_Device& device, const Hole& hole,
+  DrcMsgCopperHoleClearanceViolation(const Data::Hole& hole,
+                                     const Data::Device* device,
                                      const UnsignedLength& minClearance,
                                      const QVector<Path>& locations) noexcept;
   DrcMsgCopperHoleClearanceViolation(
       const DrcMsgCopperHoleClearanceViolation& other) noexcept
     : RuleCheckMessage(other) {}
   virtual ~DrcMsgCopperHoleClearanceViolation() noexcept {}
-
-private:
-  static QString getMessage(const UnsignedLength& minClearance) noexcept;
-  static QString getDescription() noexcept;
 };
 
 /*******************************************************************************
@@ -400,40 +552,43 @@ class DrcMsgCopperInKeepoutZone final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(DrcMsgCopperInKeepoutZone)
 
 public:
+  using Data = BoardDesignRuleCheckData;
+
   // Constructors / Destructor
   DrcMsgCopperInKeepoutZone() = delete;
-  DrcMsgCopperInKeepoutZone(const BI_Zone* boardZone,
-                            const BI_Device* zoneDevice, const Zone* deviceZone,
-                            const BI_FootprintPad& pad,
+  DrcMsgCopperInKeepoutZone(const Data::Zone& zone,
+                            const Data::Device* zoneDevice,
+                            const Data::Device& device, const Data::Pad& pad,
                             const QVector<Path>& locations) noexcept;
-  DrcMsgCopperInKeepoutZone(const BI_Zone* boardZone,
-                            const BI_Device* zoneDevice, const Zone* deviceZone,
-                            const BI_Via& via,
+  DrcMsgCopperInKeepoutZone(const Data::Zone& zone,
+                            const Data::Device* zoneDevice,
+                            const Data::Segment& ns, const Data::Via& via,
                             const QVector<Path>& locations) noexcept;
-  DrcMsgCopperInKeepoutZone(const BI_Zone* boardZone,
-                            const BI_Device* zoneDevice, const Zone* deviceZone,
-                            const BI_NetLine& netLine,
+  DrcMsgCopperInKeepoutZone(const Data::Zone& zone,
+                            const Data::Device* zoneDevice,
+                            const Data::Segment& ns, const Data::Trace& trace,
                             const QVector<Path>& locations) noexcept;
-  DrcMsgCopperInKeepoutZone(const BI_Zone* boardZone,
-                            const BI_Device* zoneDevice, const Zone* deviceZone,
-                            const BI_Polygon& polygon,
+  DrcMsgCopperInKeepoutZone(const Data::Zone& zone,
+                            const Data::Device* zoneDevice,
+                            const Data::Polygon& polygon,
                             const QVector<Path>& locations) noexcept;
-  DrcMsgCopperInKeepoutZone(const BI_Zone* boardZone,
-                            const BI_Device* zoneDevice, const Zone* deviceZone,
-                            const BI_Device& device, const Polygon& polygon,
+  DrcMsgCopperInKeepoutZone(const Data::Zone& zone,
+                            const Data::Device* zoneDevice,
+                            const Data::Device& device,
+                            const Data::Polygon& polygon,
                             const QVector<Path>& locations) noexcept;
-  DrcMsgCopperInKeepoutZone(const BI_Zone* boardZone,
-                            const BI_Device* zoneDevice, const Zone* deviceZone,
-                            const BI_Device& device, const Circle& circle,
+  DrcMsgCopperInKeepoutZone(const Data::Zone& zone,
+                            const Data::Device* zoneDevice,
+                            const Data::Device& device,
+                            const Data::Circle& circle,
                             const QVector<Path>& locations) noexcept;
   DrcMsgCopperInKeepoutZone(const DrcMsgCopperInKeepoutZone& other) noexcept
     : RuleCheckMessage(other) {}
   virtual ~DrcMsgCopperInKeepoutZone() noexcept {}
 
 private:
-  void addZoneApprovalNodes(const BI_Zone* boardZone,
-                            const BI_Device* zoneDevice,
-                            const Zone* deviceZone) noexcept;
+  void addZoneApprovalNodes(const Data::Zone& zone,
+                            const Data::Device* zoneDevice) noexcept;
   static QString getDescription() noexcept;
 };
 
@@ -450,18 +605,14 @@ class DrcMsgDrillDrillClearanceViolation final : public RuleCheckMessage {
 public:
   // Constructors / Destructor
   DrcMsgDrillDrillClearanceViolation() = delete;
-  DrcMsgDrillDrillClearanceViolation(const BI_Base& item1, const Uuid& hole1,
-                                     const BI_Base& item2, const Uuid& hole2,
+  DrcMsgDrillDrillClearanceViolation(const DrcHoleRef& hole1,
+                                     const DrcHoleRef& hole2,
                                      const UnsignedLength& minClearance,
                                      const QVector<Path>& locations);
   DrcMsgDrillDrillClearanceViolation(
       const DrcMsgDrillDrillClearanceViolation& other) noexcept
     : RuleCheckMessage(other) {}
   virtual ~DrcMsgDrillDrillClearanceViolation() noexcept {}
-
-private:  // Methods
-  static void serializeObject(SExpression& node, const BI_Base& item,
-                              const Uuid& hole);
 };
 
 /*******************************************************************************
@@ -477,27 +628,13 @@ class DrcMsgDrillBoardClearanceViolation final : public RuleCheckMessage {
 public:
   // Constructors / Destructor
   DrcMsgDrillBoardClearanceViolation() = delete;
-  DrcMsgDrillBoardClearanceViolation(const BI_Via& via,
-                                     const UnsignedLength& minClearance,
-                                     const QVector<Path>& locations) noexcept;
-  DrcMsgDrillBoardClearanceViolation(const BI_FootprintPad& pad,
-                                     const PadHole& hole,
-                                     const UnsignedLength& minClearance,
-                                     const QVector<Path>& locations) noexcept;
-  DrcMsgDrillBoardClearanceViolation(const BI_Hole& hole,
-                                     const UnsignedLength& minClearance,
-                                     const QVector<Path>& locations) noexcept;
-  DrcMsgDrillBoardClearanceViolation(const BI_Device& device, const Hole& hole,
+  DrcMsgDrillBoardClearanceViolation(const DrcHoleRef& hole,
                                      const UnsignedLength& minClearance,
                                      const QVector<Path>& locations) noexcept;
   DrcMsgDrillBoardClearanceViolation(
       const DrcMsgDrillBoardClearanceViolation& other) noexcept
     : RuleCheckMessage(other) {}
   virtual ~DrcMsgDrillBoardClearanceViolation() noexcept {}
-
-private:  // Methods
-  static QString getMessage(const UnsignedLength& minClearance) noexcept;
-  static QString getDescription() noexcept;
 };
 
 /*******************************************************************************
@@ -511,9 +648,12 @@ class DrcMsgDeviceInCourtyard final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(DrcMsgDeviceInCourtyard)
 
 public:
+  using Data = BoardDesignRuleCheckData;
+
   // Constructors / Destructor
   DrcMsgDeviceInCourtyard() = delete;
-  DrcMsgDeviceInCourtyard(const BI_Device& device1, const BI_Device& device2,
+  DrcMsgDeviceInCourtyard(const Data::Device& device1,
+                          const Data::Device& device2,
                           const QVector<Path>& locations) noexcept;
   DrcMsgDeviceInCourtyard(const DrcMsgDeviceInCourtyard& other) noexcept
     : RuleCheckMessage(other) {}
@@ -531,9 +671,12 @@ class DrcMsgOverlappingDevices final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(DrcMsgOverlappingDevices)
 
 public:
+  using Data = BoardDesignRuleCheckData;
+
   // Constructors / Destructor
   DrcMsgOverlappingDevices() = delete;
-  DrcMsgOverlappingDevices(const BI_Device& device1, const BI_Device& device2,
+  DrcMsgOverlappingDevices(const Data::Device& device1,
+                           const Data::Device& device2,
                            const QVector<Path>& locations) noexcept;
   DrcMsgOverlappingDevices(const DrcMsgOverlappingDevices& other) noexcept
     : RuleCheckMessage(other) {}
@@ -551,20 +694,21 @@ class DrcMsgDeviceInKeepoutZone final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(DrcMsgDeviceInKeepoutZone)
 
 public:
+  using Data = BoardDesignRuleCheckData;
+
   // Constructors / Destructor
   DrcMsgDeviceInKeepoutZone() = delete;
-  DrcMsgDeviceInKeepoutZone(const BI_Zone* boardZone,
-                            const BI_Device* zoneDevice, const Zone* deviceZone,
-                            const BI_Device& device,
+  DrcMsgDeviceInKeepoutZone(const Data::Zone& zone,
+                            const Data::Device* zoneDevice,
+                            const Data::Device& device,
                             const QVector<Path>& locations) noexcept;
   DrcMsgDeviceInKeepoutZone(const DrcMsgDeviceInKeepoutZone& other) noexcept
     : RuleCheckMessage(other) {}
   virtual ~DrcMsgDeviceInKeepoutZone() noexcept {}
 
 private:
-  void addZoneApprovalNodes(const BI_Zone* boardZone,
-                            const BI_Device* zoneDevice,
-                            const Zone* deviceZone) noexcept;
+  void addZoneApprovalNodes(const Data::Zone& zone,
+                            const Data::Device* zoneDevice) noexcept;
   static QString getDescription() noexcept;
 };
 
@@ -579,39 +723,39 @@ class DrcMsgExposureInKeepoutZone final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(DrcMsgExposureInKeepoutZone)
 
 public:
+  using Data = BoardDesignRuleCheckData;
+
   // Constructors / Destructor
   DrcMsgExposureInKeepoutZone() = delete;
-  DrcMsgExposureInKeepoutZone(const BI_Zone* boardZone,
-                              const BI_Device* zoneDevice,
-                              const Zone* deviceZone,
-                              const BI_FootprintPad& pad,
+  DrcMsgExposureInKeepoutZone(const Data::Zone& zone,
+                              const Data::Device* zoneDevice,
+                              const Data::Device& device, const Data::Pad& pad,
                               const QVector<Path>& locations) noexcept;
-  DrcMsgExposureInKeepoutZone(const BI_Zone* boardZone,
-                              const BI_Device* zoneDevice,
-                              const Zone* deviceZone, const BI_Via& via,
+  DrcMsgExposureInKeepoutZone(const Data::Zone& zone,
+                              const Data::Device* zoneDevice,
+                              const Data::Segment& ns, const Data::Via& via,
                               const QVector<Path>& locations) noexcept;
-  DrcMsgExposureInKeepoutZone(const BI_Zone* boardZone,
-                              const BI_Device* zoneDevice,
-                              const Zone* deviceZone, const BI_Polygon& polygon,
+  DrcMsgExposureInKeepoutZone(const Data::Zone& zone,
+                              const Data::Device* zoneDevice,
+                              const Data::Polygon& polygon,
                               const QVector<Path>& locations) noexcept;
-  DrcMsgExposureInKeepoutZone(const BI_Zone* boardZone,
-                              const BI_Device* zoneDevice,
-                              const Zone* deviceZone, const BI_Device& device,
-                              const Polygon& polygon,
+  DrcMsgExposureInKeepoutZone(const Data::Zone& zone,
+                              const Data::Device* zoneDevice,
+                              const Data::Device& device,
+                              const Data::Polygon& polygon,
                               const QVector<Path>& locations) noexcept;
-  DrcMsgExposureInKeepoutZone(const BI_Zone* boardZone,
-                              const BI_Device* zoneDevice,
-                              const Zone* deviceZone, const BI_Device& device,
-                              const Circle& circle,
+  DrcMsgExposureInKeepoutZone(const Data::Zone& zone,
+                              const Data::Device* zoneDevice,
+                              const Data::Device& device,
+                              const Data::Circle& circle,
                               const QVector<Path>& locations) noexcept;
   DrcMsgExposureInKeepoutZone(const DrcMsgExposureInKeepoutZone& other) noexcept
     : RuleCheckMessage(other) {}
   virtual ~DrcMsgExposureInKeepoutZone() noexcept {}
 
 private:
-  void addZoneApprovalNodes(const BI_Zone* boardZone,
-                            const BI_Device* zoneDevice,
-                            const Zone* deviceZone) noexcept;
+  void addZoneApprovalNodes(const Data::Zone& zone,
+                            const Data::Device* zoneDevice) noexcept;
   static QString getDescription() noexcept;
 };
 
@@ -626,12 +770,16 @@ class DrcMsgMinimumAnnularRingViolation final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(DrcMsgMinimumAnnularRingViolation)
 
 public:
+  using Data = BoardDesignRuleCheckData;
+
   // Constructors / Destructor
   DrcMsgMinimumAnnularRingViolation() = delete;
-  DrcMsgMinimumAnnularRingViolation(const BI_Via& via,
+  DrcMsgMinimumAnnularRingViolation(const Data::Segment& ns,
+                                    const Data::Via& via,
                                     const UnsignedLength& minAnnularWidth,
                                     const QVector<Path>& locations) noexcept;
-  DrcMsgMinimumAnnularRingViolation(const BI_FootprintPad& pad,
+  DrcMsgMinimumAnnularRingViolation(const Data::Device& device,
+                                    const Data::Pad& pad,
                                     const UnsignedLength& minAnnularWidth,
                                     const QVector<Path>& locations) noexcept;
   DrcMsgMinimumAnnularRingViolation(
@@ -653,17 +801,7 @@ class DrcMsgMinimumDrillDiameterViolation final : public RuleCheckMessage {
 public:
   // Constructors / Destructor
   DrcMsgMinimumDrillDiameterViolation() = delete;
-  DrcMsgMinimumDrillDiameterViolation(const BI_Hole& hole,
-                                      const UnsignedLength& minDiameter,
-                                      const QVector<Path>& locations) noexcept;
-  DrcMsgMinimumDrillDiameterViolation(const BI_Device& device, const Hole& hole,
-                                      const UnsignedLength& minDiameter,
-                                      const QVector<Path>& locations) noexcept;
-  DrcMsgMinimumDrillDiameterViolation(const BI_Via& via,
-                                      const UnsignedLength& minDiameter,
-                                      const QVector<Path>& locations) noexcept;
-  DrcMsgMinimumDrillDiameterViolation(const BI_FootprintPad& pad,
-                                      const PadHole& padHole,
+  DrcMsgMinimumDrillDiameterViolation(const DrcHoleRef& hole,
                                       const UnsignedLength& minDiameter,
                                       const QVector<Path>& locations) noexcept;
   DrcMsgMinimumDrillDiameterViolation(
@@ -672,9 +810,9 @@ public:
   virtual ~DrcMsgMinimumDrillDiameterViolation() noexcept {}
 
 private:
-  static QString determineMessage(const PositiveLength& actualDiameter,
+  static QString determineMessage(const DrcHoleRef& hole,
                                   const UnsignedLength& minDiameter) noexcept;
-  static QString determineDescription(bool isVia, bool isPad) noexcept;
+  static QString determineDescription(const DrcHoleRef& hole) noexcept;
 };
 
 /*******************************************************************************
@@ -690,14 +828,7 @@ class DrcMsgMinimumSlotWidthViolation final : public RuleCheckMessage {
 public:
   // Constructors / Destructor
   DrcMsgMinimumSlotWidthViolation() = delete;
-  DrcMsgMinimumSlotWidthViolation(const BI_Hole& hole,
-                                  const UnsignedLength& minWidth,
-                                  const QVector<Path>& locations) noexcept;
-  DrcMsgMinimumSlotWidthViolation(const BI_Device& device, const Hole& hole,
-                                  const UnsignedLength& minWidth,
-                                  const QVector<Path>& locations) noexcept;
-  DrcMsgMinimumSlotWidthViolation(const BI_FootprintPad& pad,
-                                  const PadHole& padHole,
+  DrcMsgMinimumSlotWidthViolation(const DrcHoleRef& hole,
                                   const UnsignedLength& minWidth,
                                   const QVector<Path>& locations) noexcept;
   DrcMsgMinimumSlotWidthViolation(
@@ -706,9 +837,10 @@ public:
   virtual ~DrcMsgMinimumSlotWidthViolation() noexcept {}
 
 private:
-  static QString determineMessage(const PositiveLength& actualWidth,
+  static QString determineMessage(bool plated,
+                                  const PositiveLength& actualWidth,
                                   const UnsignedLength& minWidth) noexcept;
-  static QString determineDescription(bool isPad) noexcept;
+  static QString determineDescription(bool plated) noexcept;
 };
 
 /*******************************************************************************
@@ -722,9 +854,12 @@ class DrcMsgInvalidPadConnection final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(DrcMsgInvalidPadConnection)
 
 public:
+  using Data = BoardDesignRuleCheckData;
+
   // Constructors / Destructor
   DrcMsgInvalidPadConnection() = delete;
-  DrcMsgInvalidPadConnection(const BI_FootprintPad& pad, const Layer& layer,
+  DrcMsgInvalidPadConnection(const Data::Device& device, const Data::Pad& pad,
+                             const Layer& layer,
                              const QVector<Path>& locations) noexcept;
   DrcMsgInvalidPadConnection(const DrcMsgInvalidPadConnection& other) noexcept
     : RuleCheckMessage(other) {}
@@ -742,13 +877,12 @@ class DrcMsgForbiddenSlot final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(DrcMsgForbiddenSlot)
 
 public:
+  using Data = BoardDesignRuleCheckData;
+
   // Constructors / Destructor
   DrcMsgForbiddenSlot() = delete;
-  DrcMsgForbiddenSlot(const BI_Hole& hole,
-                      const QVector<Path>& locations) noexcept;
-  DrcMsgForbiddenSlot(const BI_Device& device, const Hole& hole,
-                      const QVector<Path>& locations) noexcept;
-  DrcMsgForbiddenSlot(const BI_FootprintPad& pad, const PadHole& padHole,
+  DrcMsgForbiddenSlot(const Data::Hole& hole, const Data::Device* device,
+                      const Data::Pad* pad,
                       const QVector<Path>& locations) noexcept;
   DrcMsgForbiddenSlot(const DrcMsgForbiddenSlot& other) noexcept
     : RuleCheckMessage(other) {}
@@ -770,17 +904,20 @@ class DrcMsgForbiddenVia final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(DrcMsgForbiddenVia)
 
 public:
+  using Data = BoardDesignRuleCheckData;
+
   // Constructors / Destructor
   DrcMsgForbiddenVia() = delete;
-  DrcMsgForbiddenVia(const BI_Via& via,
+  DrcMsgForbiddenVia(const Data::Segment& ns, const Data::Via& via,
                      const QVector<Path>& locations) noexcept;
   DrcMsgForbiddenVia(const DrcMsgForbiddenVia& other) noexcept
     : RuleCheckMessage(other) {}
   virtual ~DrcMsgForbiddenVia() noexcept {}
 
 private:
-  static QString determineMessage(const BI_Via& via) noexcept;
-  static QString determineDescription(const BI_Via& via) noexcept;
+  static QString determineMessage(const Data::Segment& ns,
+                                  const Data::Via& via) noexcept;
+  static QString determineDescription(const Data::Via& via) noexcept;
 };
 
 /*******************************************************************************
@@ -794,9 +931,12 @@ class DrcMsgSilkscreenClearanceViolation final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(DrcMsgSilkscreenClearanceViolation)
 
 public:
+  using Data = BoardDesignRuleCheckData;
+
   // Constructors / Destructor
   DrcMsgSilkscreenClearanceViolation() = delete;
-  DrcMsgSilkscreenClearanceViolation(const BI_StrokeText& strokeText,
+  DrcMsgSilkscreenClearanceViolation(const Data::StrokeText& st,
+                                     const Data::Device* device,
                                      const UnsignedLength& minClearance,
                                      const QVector<Path>& locations) noexcept;
   DrcMsgSilkscreenClearanceViolation(
@@ -816,9 +956,11 @@ class DrcMsgUselessZone final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(DrcMsgUselessZone)
 
 public:
+  using Data = BoardDesignRuleCheckData;
+
   // Constructors / Destructor
   DrcMsgUselessZone() = delete;
-  DrcMsgUselessZone(const BI_Zone& zone,
+  DrcMsgUselessZone(const Data::Zone& zone,
                     const QVector<Path>& locations) noexcept;
   DrcMsgUselessZone(const DrcMsgUselessZone& other) noexcept
     : RuleCheckMessage(other) {}
@@ -836,9 +978,12 @@ class DrcMsgUselessVia final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(DrcMsgUselessVia)
 
 public:
+  using Data = BoardDesignRuleCheckData;
+
   // Constructors / Destructor
   DrcMsgUselessVia() = delete;
-  DrcMsgUselessVia(const BI_Via& via, const QVector<Path>& locations) noexcept;
+  DrcMsgUselessVia(const Data::Segment& ns, const Data::Via& via,
+                   const QVector<Path>& locations) noexcept;
   DrcMsgUselessVia(const DrcMsgUselessVia& other) noexcept
     : RuleCheckMessage(other) {}
   virtual ~DrcMsgUselessVia() noexcept {}

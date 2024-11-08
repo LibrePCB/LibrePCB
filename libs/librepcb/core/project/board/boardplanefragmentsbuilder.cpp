@@ -52,19 +52,44 @@
 namespace librepcb {
 
 /*******************************************************************************
+ *  Class BoardPlaneFragmentsBuilder::Result
+ ******************************************************************************/
+
+void BoardPlaneFragmentsBuilder::Result::throwOnError() const {
+  if (!errors.isEmpty()) {
+    throw LogicError(
+        __FILE__, __LINE__,
+        QString("Plane rebuild failed with %1 errors. First error: %2")
+            .arg(errors.count())
+            .arg(errors.first()));
+  }
+}
+
+bool BoardPlaneFragmentsBuilder::Result::applyToBoard() noexcept {
+  bool modified = false;
+  if (board) {
+    for (auto it = planes.begin(); it != planes.end(); it++) {
+      if (BI_Plane* plane = board->getPlanes().value(it.key())) {
+        modified = modified || (plane->getFragments() != it.value());
+        plane->setCalculatedFragments(it.value());
+      }
+    }
+    if (!finished) {
+      // Job did not finish completely, thus re-schedule all layers.
+      foreach (const Layer* layer, layers) {
+        board->invalidatePlanes(layer);
+      }
+    }
+  }
+  return modified;
+}
+
+/*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
-BoardPlaneFragmentsBuilder::BoardPlaneFragmentsBuilder(bool rebuildAirWires,
-                                                       QObject* parent) noexcept
-  : QObject(parent),
-    mRebuildAirWires(rebuildAirWires),
-    mFuture(),
-    mWatcher(),
-    mAbort(false) {
-  connect(
-      &mWatcher, &QFutureWatcherBase::finished, this,
-      [this]() { applyToBoard(mFuture.result()); }, Qt::QueuedConnection);
+BoardPlaneFragmentsBuilder::BoardPlaneFragmentsBuilder(QObject* parent) noexcept
+  : QObject(parent), mFuture(), mAbort(false) {
 }
 
 BoardPlaneFragmentsBuilder::~BoardPlaneFragmentsBuilder() noexcept {
@@ -75,33 +100,37 @@ BoardPlaneFragmentsBuilder::~BoardPlaneFragmentsBuilder() noexcept {
  *  General Methods
  ******************************************************************************/
 
-void BoardPlaneFragmentsBuilder::runSynchronously(
+QHash<Uuid, QVector<Path>> BoardPlaneFragmentsBuilder::runAndApply(
     Board& board, const QSet<const Layer*>* layers) {
-  if (auto data = createJob(board, layers)) {
-    cancel();
-    if (!applyToBoard(run(data, true))) {  // can throw
-      throw LogicError(__FILE__, __LINE__,
-                       "Building planes did not complete?!");
-    }
+  if (start(board, layers)) {
+    Result result = waitForFinished();
+    result.throwOnError();  // can throw
+    result.applyToBoard();
+    return result.planes;
   }
+  return QHash<Uuid, QVector<Path>>();
 }
 
-bool BoardPlaneFragmentsBuilder::startAsynchronously(
+bool BoardPlaneFragmentsBuilder::start(
     Board& board, const QSet<const Layer*>* layers) noexcept {
   if (auto data = createJob(board, layers)) {
     cancel();
 #if (QT_VERSION_MAJOR >= 6)
     mFuture =
-        QtConcurrent::run(&BoardPlaneFragmentsBuilder::run, this, data, false);
+        QtConcurrent::run(&BoardPlaneFragmentsBuilder::run, this, &board, data);
 #else
     mFuture =
-        QtConcurrent::run(this, &BoardPlaneFragmentsBuilder::run, data, false);
+        QtConcurrent::run(this, &BoardPlaneFragmentsBuilder::run, &board, data);
 #endif
-    mWatcher.setFuture(mFuture);
     return true;
   } else {
     return false;
   }
+}
+
+BoardPlaneFragmentsBuilder::Result BoardPlaneFragmentsBuilder::waitForFinished()
+    const noexcept {
+  return mFuture.result();
 }
 
 bool BoardPlaneFragmentsBuilder::isBusy() const noexcept {
@@ -140,8 +169,7 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
   }
 
   auto data = std::make_shared<JobData>();
-  data->board = &board;
-  data->layers = layers;
+  data->layers = Toolbox::toList(layers);
   layers.insert(&Layer::boardOutlines());
   layers.insert(&Layer::boardCutouts());
   foreach (const BI_Device* device, board.getDeviceInstances()) {
@@ -255,9 +283,8 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
   return data;
 }
 
-std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
-    BoardPlaneFragmentsBuilder::run(std::shared_ptr<JobData> data,
-                                    bool exceptionOnError) {
+BoardPlaneFragmentsBuilder::Result BoardPlaneFragmentsBuilder::run(
+    QPointer<Board> board, std::shared_ptr<JobData> data) noexcept {
   // Note: This method is called from a different thread, thus be careful with
   //       calling other methods to only call thread-safe methods!
 
@@ -267,75 +294,149 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
            << "plane(s) on" << data->layers.count() << "layer(s)...";
   emit started();
 
-  // Preprocess data.
-  for (KeepoutZoneData& zone : data->keepoutZones) {
-    if (zone.layers.testFlag(Zone::Layer::Top)) {
-      zone.boardLayers.insert(&zone.transform.map(Layer::topCopper()));
-    }
-    if (zone.layers.testFlag(Zone::Layer::Inner)) {
-      foreach (const Layer* layer, data->layers) {
-        if (layer->isInner()) {
-          zone.boardLayers.insert(layer);
+  // Prepare result.
+  Result result;
+  result.board = board;
+  result.layers = Toolbox::toSet(data->layers);
+
+  try {
+    // Preprocess data.
+    for (KeepoutZoneData& zone : data->keepoutZones) {
+      if (zone.layers.testFlag(Zone::Layer::Top)) {
+        zone.boardLayers.insert(&zone.transform.map(Layer::topCopper()));
+      }
+      if (zone.layers.testFlag(Zone::Layer::Inner)) {
+        foreach (const Layer* layer, data->layers) {
+          if (layer->isInner()) {
+            zone.boardLayers.insert(layer);
+          }
         }
       }
+      if (zone.layers.testFlag(Zone::Layer::Bottom)) {
+        zone.boardLayers.insert(&zone.transform.map(Layer::botCopper()));
+      }
+      zone.outline = zone.transform.map(zone.outline.toClosedPath());
     }
-    if (zone.layers.testFlag(Zone::Layer::Bottom)) {
-      zone.boardLayers.insert(&zone.transform.map(Layer::botCopper()));
+    for (PolygonData& polygon : data->polygons) {
+      polygon.path = polygon.transform.map(polygon.path);
     }
-    zone.outline = zone.transform.map(zone.outline.toClosedPath());
-  }
-  for (PolygonData& polygon : data->polygons) {
-    polygon.path = polygon.transform.map(polygon.path);
-  }
-  for (auto& tuple : data->holes) {
-    std::get<2>(tuple) = std::get<0>(tuple).map(std::get<2>(tuple));
-  }
-  for (const TraceData& trace : data->traces) {
-    data->polygons.append(
-        PolygonData{Transform(), trace.layer, trace.netSignal,
-                    Path({Vertex(trace.startPos), Vertex(trace.endPos)}),
-                    positiveToUnsigned(trace.width), false});
-  }
-  data->traces.clear();
+    for (auto& tuple : data->holes) {
+      std::get<2>(tuple) = std::get<0>(tuple).map(std::get<2>(tuple));
+    }
+    for (const TraceData& trace : data->traces) {
+      data->polygons.append(
+          PolygonData{Transform(), trace.layer, trace.netSignal,
+                      Path({Vertex(trace.startPos), Vertex(trace.endPos)}),
+                      positiveToUnsigned(trace.width), false});
+    }
+    data->traces.clear();
 
-  // Determine board area.
-  QVector<Path> boardOutlines;
-  QVector<Path> boardCutouts;
-  foreach (const PolygonData& polygon, data->polygons) {
-    if ((polygon.layer == &Layer::boardOutlines()) && polygon.path.isClosed()) {
-      boardOutlines.append(polygon.path);
-    } else if ((polygon.layer == &Layer::boardCutouts()) &&
-               polygon.path.isClosed()) {
-      boardCutouts.append(polygon.path);
+    // Determine board area.
+    QVector<Path> boardOutlines;
+    QVector<Path> boardCutouts;
+    foreach (const PolygonData& polygon, data->polygons) {
+      if ((polygon.layer == &Layer::boardOutlines()) &&
+          polygon.path.isClosed()) {
+        boardOutlines.append(polygon.path);
+      } else if ((polygon.layer == &Layer::boardCutouts()) &&
+                 polygon.path.isClosed()) {
+        boardCutouts.append(polygon.path);
+      }
     }
-  }
-  ClipperLib::Paths boardArea =
-      ClipperHelpers::convert(boardOutlines, maxArcTolerance());
-  ClipperHelpers::subtract(
-      boardArea, ClipperHelpers::convert(boardCutouts, maxArcTolerance()),
-      ClipperLib::pftNonZero, ClipperLib::pftNonZero);
+    data->boardArea = std::make_shared<ClipperLib::Paths>(
+        ClipperHelpers::convert(boardOutlines, maxArcTolerance()));
+    ClipperHelpers::subtract(
+        *data->boardArea,
+        ClipperHelpers::convert(boardCutouts, maxArcTolerance()),
+        ClipperLib::pftNonZero, ClipperLib::pftNonZero);
 
-  // Sort planes: First by priority, then by uuid to get a really unique
-  // priority order over all existing planes. This way we can ensure that even
-  // planes with the same priority will always be filled in the same order.
-  // Random order would be dangerous!
-  std::sort(data->planes.begin(), data->planes.end(),
-            [](const PlaneData& p1, const PlaneData& p2) {
-              if (p1.priority != p2.priority) {
-                return p1.priority >= p2.priority;
-              } else {
-                return p1.uuid >= p2.uuid;
-              }
-            });
+    // Sort planes: First by priority, then by uuid to get a really unique
+    // priority order over all existing planes. This way we can ensure that even
+    // planes with the same priority will always be filled in the same order.
+    // Random order would be dangerous!
+    std::sort(data->planes.begin(), data->planes.end(),
+              [](const PlaneData& p1, const PlaneData& p2) {
+                if (p1.priority != p2.priority) {
+                  return p1.priority >= p2.priority;
+                } else {
+                  return p1.uuid >= p2.uuid;
+                }
+              });
+
+    // Calculate planes for each layer in a separate thread, except the last
+    // one to keep this thread busy too.
+    QList<QFuture<LayerJobResult>> futures;
+    for (int i = 0; i < data->layers.count(); ++i) {
+      const Layer* layer = data->layers.at(i);
+      if (i < data->layers.count() - 1) {
+        // Run in other thread -> Copy JobData for safe concurrent access.
+#if (QT_VERSION_MAJOR >= 6)
+        futures.append(
+            QtConcurrent::run(&BoardPlaneFragmentsBuilder::runLayer, this,
+                              std::make_shared<const JobData>(*data), layer));
+#else
+        futures.append(
+            QtConcurrent::run(this, &BoardPlaneFragmentsBuilder::runLayer,
+                              std::make_shared<const JobData>(*data), layer));
+#endif
+      } else {
+        // Run in this thread -> no copy of JobData required.
+        const LayerJobResult res = runLayer(data, layer);
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
+        result.planes.insert(res.planes);
+#else
+        for (auto it = res.planes.begin(); it != res.planes.end(); it++) {
+          result.planes.insert(it.key(), it.value());
+        }
+#endif
+        result.errors.append(res.errors);
+      }
+    }
+
+    // Fetch result of each thread (blocking until all threads finished).
+    foreach (const auto& future, futures) {
+      const LayerJobResult res = future.result();
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
+      result.planes.insert(res.planes);
+#else
+      for (auto it = res.planes.begin(); it != res.planes.end(); it++) {
+        result.planes.insert(it.key(), it.value());
+      }
+#endif
+      result.errors.append(res.errors);
+    }
+  } catch (const Exception& e) {
+    qCritical() << "Failed to calculate plane fragments:" << e.getMsg();
+    result.errors.append(e.getMsg());
+  }
+
+  if (mAbort) {
+    result.finished = false;
+    qDebug() << "Aborted calculating plane areas after" << timer.elapsed()
+             << "ms.";
+  } else {
+    result.finished = true;
+    qDebug() << "Calculated plane areas in" << timer.elapsed() << "ms.";
+  }
+
+  emit finished(result);
+  return result;
+}
+
+BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
+    std::shared_ptr<const JobData> data, const Layer* layer) noexcept {
+  LayerJobResult result;
 
   // Build all planes.
   for (auto it = data->planes.begin(); it != data->planes.end(); it++) {
+    if (it->layer != layer) continue;
+
     try {
       ClipperLib::Paths removedAreas;
       ClipperLib::Paths connectedNetSignalAreas;
 
       // Start with board outline shrinked by the given clearance.
-      ClipperLib::Paths fragments = boardArea;
+      ClipperLib::Paths fragments = *data->boardArea;
       ClipperHelpers::offset(fragments, -it->minClearance,
                              maxArcTolerance());  // can throw
       if (mAbort) {
@@ -360,7 +461,7 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
           const UnsignedLength clearance =
               std::max(it->minClearance, otherIt->minClearance);
           ClipperLib::Paths clipperPaths = ClipperHelpers::convert(
-              data->result.value(otherIt->uuid), maxArcTolerance());
+              result.planes.value(otherIt->uuid), maxArcTolerance());
           ClipperHelpers::offset(clipperPaths, *clearance,
                                  maxArcTolerance());  // can throw
           removedAreas.insert(removedAreas.end(), clipperPaths.begin(),
@@ -697,26 +798,14 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
       }
 
       // Memorize fragments for this plane.
-      data->result[it->uuid] = ClipperHelpers::convert(fragments);
+      result.planes[it->uuid] = ClipperHelpers::convert(fragments);
     } catch (const Exception& e) {
       qCritical() << "Failed to calculate plane areas, leaving empty:"
                   << e.getMsg();
-      if (exceptionOnError) {
-        throw;
-      }
+      result.errors.append(e.getMsg());
     }
   }
-
-  if (mAbort) {
-    qDebug() << "Aborted calculating plane areas after" << timer.elapsed()
-             << "ms.";
-  } else {
-    data->finished = true;
-    qDebug() << "Calculated plane areas in" << timer.elapsed() << "ms.";
-  }
-
-  emit finished();
-  return data;
+  return result;
 }
 
 QVector<std::pair<Point, Angle>>
@@ -784,33 +873,6 @@ QVector<std::pair<Point, Angle>>
 
   // For invalid strokes, add no spokes at all.
   return {};
-}
-
-bool BoardPlaneFragmentsBuilder::applyToBoard(
-    std::shared_ptr<JobData> data) noexcept {
-  if (data->board) {
-    bool modified = false;
-    for (auto it = data->result.begin(); it != data->result.end(); it++) {
-      if (BI_Plane* plane = data->board->getPlanes().value(it.key())) {
-        modified = modified || (plane->getFragments() != it.value());
-        plane->setCalculatedFragments(it.value());
-      }
-    }
-    if (!data->finished) {
-      // Job did not finish completely, thus re-schedule all layers.
-      foreach (const Layer* layer, data->layers) {
-        data->board->invalidatePlanes(layer);
-      }
-    }
-    if (modified) {
-      if (mRebuildAirWires) {
-        data->board->forceAirWiresRebuild();
-      }
-      emit boardPlanesModified();
-    }
-    return data->finished;
-  }
-  return false;
 }
 
 /*******************************************************************************

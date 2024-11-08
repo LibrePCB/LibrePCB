@@ -23,9 +23,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../rulecheck/rulecheckmessage.h"
 #include "../../../utils/transform.h"
-#include "boarddesignrulecheckmessages.h"
-#include "boarddesignrulechecksettings.h"
+#include "boarddesignrulecheckdata.h"
 
 #include <polyclipping/clipper.hpp>
 
@@ -35,11 +35,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class BI_Device;
-class Board;
-class Hole;
-class NetSignal;
 
 /*******************************************************************************
  *  Class BoardDesignRuleCheck
@@ -53,78 +48,110 @@ class BoardDesignRuleCheck final : public QObject {
   Q_OBJECT
 
 public:
+  // Types
+  using Data = BoardDesignRuleCheckData;
+  struct CalculatedJobData {
+    // This structure is filled by stage 1 jobs and read by stage 2 jobs.
+    // Each stage 2 job gets a copy of this structure, so no synchronization
+    // is needed for thread-safety. Stage 1 jobs however all get the same
+    // instance, thus require to lock it with the contained mutex.
+
+    mutable QMutex mutex;  // To be used by stage 1 jobs.
+
+    QHash<const Layer*, ClipperLib::Paths> copperPathsPerLayer;
+  };
+
+  struct Result {
+    RuleCheckMessageList messages;
+    QStringList errors;  // Empty on success.
+  };
+
   // Constructors / Destructor
-  explicit BoardDesignRuleCheck(Board& board,
-                                const BoardDesignRuleCheckSettings& settings,
-                                QObject* parent = nullptr) noexcept;
+  explicit BoardDesignRuleCheck(QObject* parent = nullptr) noexcept;
   ~BoardDesignRuleCheck() noexcept;
 
-  // Getters
-  const QStringList& getProgressStatus() const noexcept {
-    return mProgressStatus;
-  }
-  const RuleCheckMessageList& getMessages() const noexcept { return mMessages; }
-
   // General Methods
-  void execute(bool quick);
+  void start(Board& board, const BoardDesignRuleCheckSettings& settings,
+             bool quick) noexcept;
+
+  /**
+   * @brief Wait until the asynchronous operation is finished
+   *
+   * @return All emitted messages and occurred errors
+   */
+  Result waitForFinished() const noexcept;
+
+  /**
+   * @brief Cancel the current asynchronous job
+   */
+  void cancel() noexcept;
 
 signals:
   void started();
   void progressPercent(int percent);
   void progressStatus(const QString& msg);
-  void progressMessage(const QString& msg);
-  void finished();
+  void finished(Result result);
 
 private:  // Methods
-  void rebuildPlanes(int progressEnd);
-  void checkCopperCopperClearances(int progressEnd);
-  void checkCopperBoardClearances(int progressEnd);
-  void checkCopperHoleClearances(int progressEnd);
-  void checkDrillDrillClearances(int progressEnd);
-  void checkDrillBoardClearances(int progressEnd);
-  void checkSilkscreenStopmaskClearances(int progressEnd);
-  void checkMinimumCopperWidth(int progressEnd);
-  void checkMinimumPthAnnularRing(int progressEnd);
-  void checkMinimumNpthDrillDiameter(int progressEnd);
-  void checkMinimumNpthSlotWidth(int progressEnd);
-  void checkMinimumPthDrillDiameter(int progressEnd);
-  void checkMinimumPthSlotWidth(int progressEnd);
-  void checkMinimumSilkscreenWidth(int progressEnd);
-  void checkMinimumSilkscreenTextHeight(int progressEnd);
-  void checkZones(int progressEnd);
-  void checkVias(int progressEnd);
-  void checkAllowedNpthSlots(int progressEnd);
-  void checkAllowedPthSlots(int progressEnd);
-  void checkInvalidPadConnections(int progressEnd);
-  void checkDeviceClearances(int progressEnd);
-  void checkBoardOutline(int progressEnd);
-  void checkUsedLayers(int progressEnd);
-  void checkForUnplacedComponents(int progressEnd);
-  void checkForMissingConnections(int progressEnd);
-  void checkForStaleObjects(int progressEnd);
-  void checkMinimumWidth(const UnsignedLength& minWidth,
-                         std::function<bool(const Layer&)> layerFilter);
-  template <typename THole>
-  bool requiresHoleSlotWarning(
-      const THole& hole, BoardDesignRuleCheckSettings::AllowedSlots allowed);
-  ClipperLib::Paths getBoardClearanceArea(
-      const UnsignedLength& clearance) const;
-  QVector<Path> getBoardOutlines(
-      const QSet<const Layer*>& layers) const noexcept;
-  const ClipperLib::Paths& getCopperPaths(
-      const Layer& layer, const QSet<const NetSignal*>& netsignals);
-  ClipperLib::Paths getDeviceOutlinePaths(const BI_Device& device,
-                                          const Layer& layer);
-  QVector<Path> getDeviceLocation(const BI_Device& device) const;
-  QVector<Path> getViaLocation(const BI_Via& via) const noexcept;
-  template <typename THole>
-  QVector<Path> getHoleLocation(
-      const THole& hole,
-      const Transform& transform = Transform()) const noexcept;
+  typedef std::function<RuleCheckMessageList()> JobFunc;
+  typedef std::function<void(const Data&, CalculatedJobData&)> Stage1Func;
+  typedef RuleCheckMessageList (BoardDesignRuleCheck::*Stage2Func)(
+      const Data&, const CalculatedJobData&);
+  typedef RuleCheckMessageList (BoardDesignRuleCheck::*IndependentStageFunc)(
+      const Data&);
+
+  Result tryRunJob(JobFunc function, int weight) noexcept;
+  Result run(std::shared_ptr<const Data> data) noexcept;
+  void prepareCopperPaths(const Data& data, CalculatedJobData& calcData,
+                          const Layer& layer);
+  RuleCheckMessageList checkCopperCopperClearances(const Data& data);
+  RuleCheckMessageList checkCopperBoardClearances(const Data& data);
+  RuleCheckMessageList checkCopperHoleClearances(
+      const Data& data, const CalculatedJobData& calcData);
+  RuleCheckMessageList checkDrillDrillClearances(const Data& data);
+  RuleCheckMessageList checkDrillBoardClearances(const Data& data);
+  RuleCheckMessageList checkSilkscreenStopmaskClearances(const Data& data);
+  RuleCheckMessageList checkMinimumCopperWidth(const Data& data);
+  RuleCheckMessageList checkMinimumPthAnnularRing(
+      const Data& data, const CalculatedJobData& calcData);
+  RuleCheckMessageList checkMinimumNpthDrillDiameter(const Data& data);
+  RuleCheckMessageList checkMinimumNpthSlotWidth(const Data& data);
+  RuleCheckMessageList checkMinimumPthDrillDiameter(const Data& data);
+  RuleCheckMessageList checkMinimumPthSlotWidth(const Data& data);
+  RuleCheckMessageList checkMinimumSilkscreenWidth(const Data& data);
+  RuleCheckMessageList checkMinimumSilkscreenTextHeight(const Data& data);
+  RuleCheckMessageList checkZones(const Data& data);
+  RuleCheckMessageList checkVias(const Data& data);
+  RuleCheckMessageList checkAllowedNpthSlots(const Data& data);
+  RuleCheckMessageList checkAllowedPthSlots(const Data& data);
+  RuleCheckMessageList checkInvalidPadConnections(const Data& data);
+  RuleCheckMessageList checkDeviceClearances(const Data& data);
+  RuleCheckMessageList checkBoardOutline(const Data& data);
+  RuleCheckMessageList checkUsedLayers(const Data& data);
+  RuleCheckMessageList checkForUnplacedComponents(const Data& data);
+  RuleCheckMessageList checkForMissingConnections(const Data& data);
+  RuleCheckMessageList checkForStaleObjects(const Data& data);
+  static void checkMinimumWidth(RuleCheckMessageList& messages,
+                                const Data& data,
+                                const UnsignedLength& minWidth,
+                                std::function<bool(const Layer&)> layerFilter);
+  static bool requiresHoleSlotWarning(
+      const Data::Hole& hole,
+      BoardDesignRuleCheckSettings::AllowedSlots allowed);
+  static ClipperLib::Paths getBoardClearanceArea(
+      const Data& data, const UnsignedLength& clearance);
+  static QVector<Path> getBoardOutlines(
+      const Data& data, const QSet<const Layer*>& layers) noexcept;
+  static ClipperLib::Paths getDeviceOutlinePaths(const Data::Device& device,
+                                                 const Layer& layer);
+  static QVector<Path> getDeviceLocation(const Data::Device& device);
+  static QVector<Path> getViaLocation(const Data::Via& via) noexcept;
+  static QVector<Path> getTraceLocation(const Data::Trace& trace) noexcept;
+  static QVector<Path> getHoleLocation(
+      const Data::Hole& hole,
+      const Transform& transform = Transform()) noexcept;
   void emitProgress(int percent) noexcept;
   void emitStatus(const QString& status) noexcept;
-  void emitMessage(const std::shared_ptr<const RuleCheckMessage>& msg) noexcept;
-  QString formatLength(const Length& length) const noexcept;
 
   /**
    * Returns the maximum allowed arc tolerance when flattening arcs.
@@ -134,14 +161,11 @@ private:  // Methods
   }
 
 private:  // Data
-  Board& mBoard;
-  const BoardDesignRuleCheckSettings& mSettings;
-  bool mIgnorePlanes;
-  int mProgressPercent;
-  QStringList mProgressStatus;
-  RuleCheckMessageList mMessages;
-  QHash<QPair<const Layer*, QSet<const NetSignal*>>, ClipperLib::Paths>
-      mCachedPaths;
+  QMutex mMutex;
+  int mProgressTotal = 0;  // Only for progress range 20..100%
+  int mProgressCounter = 0;  // 0..mProgressTotal
+  QFuture<Result> mFuture;
+  bool mAbort = false;
 };
 
 /*******************************************************************************

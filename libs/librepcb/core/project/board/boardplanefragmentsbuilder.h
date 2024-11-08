@@ -29,6 +29,8 @@
 #include "../../utils/transform.h"
 #include "items/bi_plane.h"
 
+#include <polyclipping/clipper.hpp>
+
 #include <QtCore>
 
 #include <memory>
@@ -54,16 +56,32 @@ class BoardPlaneFragmentsBuilder final : public QObject {
   Q_OBJECT
 
 public:
+  // Types
+  struct Result {
+    QPointer<Board> board;  ///< The board of the calculated planes.
+    QSet<const Layer*> layers;  ///< All processed layers.
+    QHash<Uuid, QVector<Path>> planes;  ///< The calculated plane fragments.
+    QStringList errors;  ///< Any occurred errors (empty on success)
+    bool finished = false;  ///< Whether the run completed or was aborted.
+
+    /// Convenience error handling
+    void throwOnError() const;
+
+    /// Apply the results to the board
+    ///
+    /// @return Whether any plane has been modified or not
+    bool applyToBoard() noexcept;
+  };
+
   // Constructors / Destructor
-  explicit BoardPlaneFragmentsBuilder(bool rebuildAirWires = false,
-                                      QObject* parent = nullptr) noexcept;
+  explicit BoardPlaneFragmentsBuilder(QObject* parent = nullptr) noexcept;
   BoardPlaneFragmentsBuilder(const BoardPlaneFragmentsBuilder& other) = delete;
   ~BoardPlaneFragmentsBuilder() noexcept;
 
   // General Methods
 
   /**
-   * @brief Build and apply plane fragments synchronously (blocking)
+   * @brief Build and apply plane fragments (blocking)
    *
    * @param board   The board to rebuild the planes of.
    * @param layers  If not `nullptr`, rebuild only planes which are scheduled
@@ -71,10 +89,12 @@ public:
    *                If `nullptr` (default), rebuild all planes (more reliable,
    *                but slower).
    *
+   * @return All calculated plane fragments
+   *
    * @throws Exception if any error occurred.
    */
-  void runSynchronously(Board& board,
-                        const QSet<const Layer*>* layers = nullptr);
+  QHash<Uuid, QVector<Path>> runAndApply(
+      Board& board, const QSet<const Layer*>* layers = nullptr);
 
   /**
    * @brief Start building plane fragments asynchronously
@@ -92,8 +112,14 @@ public:
    * @retval false  If none of the planes need a rebuild, thus did not start
    *                a rebuild.
    */
-  bool startAsynchronously(Board& board,
-                           const QSet<const Layer*>* layers = nullptr) noexcept;
+  bool start(Board& board, const QSet<const Layer*>* layers = nullptr) noexcept;
+
+  /**
+   * @brief Wait until the asynchronous operation is finished
+   *
+   * @return See ::librepcb::BoardPlaneFragmentsBuilder::Result
+   */
+  Result waitForFinished() const noexcept;
 
   /**
    * @brief Check if there is currently a build in progress
@@ -114,8 +140,7 @@ public:
 
 signals:
   void started();
-  void finished();
-  void boardPlanesModified();
+  void finished(Result result);
 
 private:  // Methods
   struct PlaneData {
@@ -172,8 +197,14 @@ private:  // Methods
   };
 
   struct JobData {
-    QPointer<Board> board;
-    QSet<const Layer*> layers;
+    // NOTE: We create a `const` copy of this structure for each thread to
+    // ensure thread-safety. For the implicitly shared Qt containers this is
+    // a lightweight operation, but for ClipperLib::Paths we share it with a
+    // shared_ptr to avoid deep copying the whole container. This is safe
+    // because the underlying std::vector is thread-safe for read-only
+    // operations.
+
+    QList<const Layer*> layers;
     QList<PlaneData> planes;
     QList<KeepoutZoneData> keepoutZones;
     QList<PolygonData> polygons;
@@ -181,17 +212,21 @@ private:  // Methods
     QList<PadData> pads;
     QList<std::tuple<Transform, PositiveLength, NonEmptyPath>> holes;
     QList<TraceData> traces;  // Converted to polygons after preprocessing.
-    QHash<Uuid, QVector<Path>> result;
-    bool finished = false;
+    std::shared_ptr<ClipperLib::Paths> boardArea;  // Populated in preprocessing
+  };
+
+  struct LayerJobResult {
+    QHash<Uuid, QVector<Path>> planes;
+    QStringList errors;  // Empty on success.
   };
 
   std::shared_ptr<JobData> createJob(Board& board,
                                      const QSet<const Layer*>* filter) noexcept;
-  std::shared_ptr<JobData> run(std::shared_ptr<JobData> data,
-                               bool exceptionOnError);
+  Result run(QPointer<Board> board, std::shared_ptr<JobData> data) noexcept;
+  LayerJobResult runLayer(std::shared_ptr<const JobData> data,
+                          const Layer* layer) noexcept;
   static QVector<std::pair<Point, Angle>> determineThermalSpokes(
       const PadGeometry& geometry) noexcept;
-  bool applyToBoard(std::shared_ptr<JobData> data) noexcept;
 
   /**
    * Returns the maximum allowed arc tolerance when flattening arcs. Do not
@@ -203,9 +238,7 @@ private:  // Methods
   }
 
 private:  // Data
-  const bool mRebuildAirWires;
-  QFuture<std::shared_ptr<JobData>> mFuture;
-  QFutureWatcher<std::shared_ptr<JobData>> mWatcher;
+  QFuture<Result> mFuture;
   bool mAbort;
 };
 

@@ -57,22 +57,62 @@ static QString seriousTroublesTr() {
       "to a possibly non-functional PCB.");
 }
 
+static QString netNameWithFallback(const QString& netName) {
+  if (!netName.isEmpty()) {
+    return netName;
+  } else {
+    return QCoreApplication::translate("BoardDesignRuleCheckMessages",
+                                       "(no net)");
+  }
+}
+
+/*******************************************************************************
+ *  DrcHoleRef
+ ******************************************************************************/
+
+void DrcHoleRef::serialize(SExpression& node) const {
+  if (mDevice && mPad && mHole) {
+    node.ensureLineBreak();
+    node.appendChild("device", mDevice->uuid);
+    node.ensureLineBreak();
+    node.appendChild("pad", mPad->uuid);
+    node.ensureLineBreak();
+    node.appendChild("hole", mHole->uuid);
+    node.ensureLineBreak();
+  } else if (mDevice && mHole) {
+    node.ensureLineBreak();
+    node.appendChild("device", mDevice->uuid);
+    node.ensureLineBreak();
+    node.appendChild("hole", mHole->uuid);
+    node.ensureLineBreak();
+  } else if (mSegment && mVia) {
+    node.ensureLineBreak();
+    node.appendChild("netsegment", mSegment->uuid);
+    node.ensureLineBreak();
+    node.appendChild("via", mVia->uuid);
+    node.ensureLineBreak();
+  } else if (mHole) {
+    node.appendChild("hole", mHole->uuid);
+  } else {
+    throw LogicError(__FILE__, __LINE__, "Unknown drill clearance object.");
+  }
+}
+
 /*******************************************************************************
  *  DrcMsgMissingDevice
  ******************************************************************************/
 
-DrcMsgMissingDevice::DrcMsgMissingDevice(
-    const ComponentInstance& component) noexcept
+DrcMsgMissingDevice::DrcMsgMissingDevice(const Uuid& uuid,
+                                         const QString& name) noexcept
   : RuleCheckMessage(
         Severity::Error,
-        tr("Missing device: '%1'", "Placeholders: Device name")
-            .arg(*component.getName()),
+        tr("Missing device: '%1'", "Placeholders: Device name").arg(name),
         tr("There's a component in the schematics without a corresponding "
            "device in the board, so the circuit of the PCB is not "
            "complete.\n\nUse the \"Place Devices\" dock to add the device."),
         "missing_device", {}) {
   mApproval->ensureLineBreak();
-  mApproval->appendChild("device", component.getUuid());
+  mApproval->appendChild("device", uuid);
   mApproval->ensureLineBreak();
 }
 
@@ -80,15 +120,52 @@ DrcMsgMissingDevice::DrcMsgMissingDevice(
  *  DrcMsgMissingConnection
  ******************************************************************************/
 
-DrcMsgMissingConnection::DrcMsgMissingConnection(const BI_NetLineAnchor& p1,
-                                                 const BI_NetLineAnchor& p2,
-                                                 const NetSignal& netSignal,
+QString DrcMsgMissingConnection::Anchor::getName() const {
+  QString name;
+  if (mDevice && mPad) {
+    name = "'" % mDevice->cmpInstanceName;
+    if (!mPad->libPkgPadName.isEmpty()) {
+      name += ":" % mPad->libPkgPadName;
+    }
+    name += "'";
+  } else if (mSegment && mVia) {
+    name = tr("Via");
+  } else if (mSegment && mJunction) {
+    name = tr("Trace");
+  } else {
+    throw LogicError(__FILE__, __LINE__, "Unknown airwire anchor type.");
+  }
+  return name;
+}
+
+void DrcMsgMissingConnection::Anchor::serialize(SExpression& node) const {
+  if (mDevice && mPad) {
+    node.ensureLineBreak();
+    node.appendChild("device", mDevice->uuid);
+    node.ensureLineBreak();
+    node.appendChild("pad", mPad->uuid);
+    node.ensureLineBreak();
+  } else if (mSegment && mVia) {
+    // I *guess* we don't need to serialize the via since only one connection
+    // between a net segment any any other object can be missing(?).
+    node.appendChild("netsegment", mSegment->uuid);
+  } else if (mSegment && mJunction) {
+    // Same as for vias.
+    node.appendChild("netsegment", mSegment->uuid);
+  } else {
+    throw LogicError(__FILE__, __LINE__, "Unknown airwire anchor type.");
+  }
+}
+
+DrcMsgMissingConnection::DrcMsgMissingConnection(const Anchor& p1,
+                                                 const Anchor& p2,
+                                                 const QString& netName,
                                                  const QVector<Path>& locations)
   : RuleCheckMessage(
         Severity::Error,
         tr("Missing connection in '%1': %2 ↔ %3",
            "Placeholders: Net name, connection count")
-            .arg(*netSignal.getName(), getAnchorName(p1), getAnchorName(p2)),
+            .arg(netName, p1.getName(), p2.getName()),
         tr("There is a missing connection in the net, i.e. not all net items "
            "are connected together.\n\nAdd traces and/or planes to create the "
            "missing connections.\n\nNote that traces need to be snapped to the "
@@ -102,51 +179,13 @@ DrcMsgMissingConnection::DrcMsgMissingConnection(const BI_NetLineAnchor& p1,
   mApproval->ensureLineBreak();
 
   // Sort nodes to make the approval canonical.
-  serializeAnchor(fromNode, p1);
-  serializeAnchor(toNode, p2);
+  p1.serialize(fromNode);
+  p2.serialize(toNode);
   if (toNode < fromNode) {
     std::swap(fromNode, toNode);
   }
   fromNode.setName("from");
   toNode.setName("to");
-}
-
-QString DrcMsgMissingConnection::getAnchorName(const BI_NetLineAnchor& anchor) {
-  QString name;
-  if (dynamic_cast<const BI_Via*>(&anchor)) {
-    name = tr("Via");
-  } else if (const BI_FootprintPad* pad =
-                 dynamic_cast<const BI_FootprintPad*>(&anchor)) {
-    name = "'" % (*pad->getDevice().getComponentInstance().getName());
-    if (const PackagePad* pkgPad = pad->getLibPackagePad()) {
-      name += ":" % *pkgPad->getName();
-    }
-    name += "'";
-  } else if (dynamic_cast<const BI_NetPoint*>(&anchor)) {
-    name = tr("Trace");
-  } else {
-    throw LogicError(__FILE__, __LINE__, "Unknown airwire anchor type.");
-  }
-  return name;
-}
-
-void DrcMsgMissingConnection::serializeAnchor(SExpression& node,
-                                              const BI_NetLineAnchor& anchor) {
-  if (const BI_Via* via = dynamic_cast<const BI_Via*>(&anchor)) {
-    node.appendChild("netsegment", via->getNetSegment().getUuid());
-  } else if (const BI_FootprintPad* pad =
-                 dynamic_cast<const BI_FootprintPad*>(&anchor)) {
-    node.ensureLineBreak();
-    node.appendChild("device", pad->getDevice().getComponentInstanceUuid());
-    node.ensureLineBreak();
-    node.appendChild("pad", pad->getLibPadUuid());
-    node.ensureLineBreak();
-  } else if (const BI_NetPoint* netPoint =
-                 dynamic_cast<const BI_NetPoint*>(&anchor)) {
-    node.appendChild("netsegment", netPoint->getNetSegment().getUuid());
-  } else {
-    throw LogicError(__FILE__, __LINE__, "Unknown airwire anchor type.");
-  }
 }
 
 /*******************************************************************************
@@ -184,7 +223,7 @@ DrcMsgMultipleBoardOutlines::DrcMsgMultipleBoardOutlines(
  ******************************************************************************/
 
 DrcMsgOpenBoardOutlinePolygon::DrcMsgOpenBoardOutlinePolygon(
-    const BI_Device* device, const Uuid& polygon,
+    const Uuid& polygon, const tl::optional<Uuid>& device,
     const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Error, tr("Non-closed board outline"),
@@ -197,7 +236,7 @@ DrcMsgOpenBoardOutlinePolygon::DrcMsgOpenBoardOutlinePolygon(
         "open_board_outline", locations) {
   mApproval->ensureLineBreak();
   if (device) {
-    mApproval->appendChild("device", device->getComponentInstanceUuid());
+    mApproval->appendChild("device", *device);
     mApproval->ensureLineBreak();
   }
   mApproval->appendChild("polygon", polygon);
@@ -232,20 +271,18 @@ DrcMsgMinimumBoardOutlineInnerRadiusViolation::
  *  DrcMsgEmptyNetSegment
  ******************************************************************************/
 
-DrcMsgEmptyNetSegment::DrcMsgEmptyNetSegment(
-    const BI_NetSegment& netSegment) noexcept
+DrcMsgEmptyNetSegment::DrcMsgEmptyNetSegment(const Data::Segment& ns) noexcept
   : RuleCheckMessage(Severity::Hint,
                      tr("Empty segment of net '%1': '%2'",
                         "Placeholders: Net name, segment UUID")
-                         .arg(netSegment.getNetNameToDisplay(true),
-                              netSegment.getUuid().toStr()),
+                         .arg(netNameWithFallback(ns.netName), ns.uuid.toStr()),
                      "There's a net segment in the board without any via or "
                      "trace. This should not happen, please report it as a "
                      "bug. But no worries, this issue is not harmful at all "
                      "so you can safely ignore this message.",
                      "empty_netsegment", {}) {
   mApproval->ensureLineBreak();
-  mApproval->appendChild("netsegment", netSegment.getUuid());
+  mApproval->appendChild("netsegment", ns.uuid);
   mApproval->ensureLineBreak();
 }
 
@@ -254,22 +291,21 @@ DrcMsgEmptyNetSegment::DrcMsgEmptyNetSegment(
  ******************************************************************************/
 
 DrcMsgUnconnectedJunction::DrcMsgUnconnectedJunction(
-    const BI_NetPoint& netPoint, const QVector<Path>& locations) noexcept
+    const Data::Junction& junction, const Data::Segment& ns,
+    const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Hint,
         tr("Unconnected junction in net: '%1'")
-            .arg(netPoint.getNetSegment().getNetNameToDisplay(true)),
+            .arg(netNameWithFallback(ns.netName)),
         "There's an invisible junction in the board without any trace "
         "attached. This should not happen, please report it as a bug. But "
         "no worries, this issue is not harmful at all so you can safely "
         "ignore this message.",
         "unconnected_junction", locations) {
   mApproval->ensureLineBreak();
-  mApproval->appendChild("board", netPoint.getBoard().getUuid());
+  mApproval->appendChild("netsegment", ns.uuid);
   mApproval->ensureLineBreak();
-  mApproval->appendChild("netsegment", netPoint.getNetSegment().getUuid());
-  mApproval->ensureLineBreak();
-  mApproval->appendChild("junction", netPoint.getUuid());
+  mApproval->appendChild("junction", junction.uuid);
   mApproval->ensureLineBreak();
 }
 
@@ -278,14 +314,13 @@ DrcMsgUnconnectedJunction::DrcMsgUnconnectedJunction(
  ******************************************************************************/
 
 DrcMsgMinimumTextHeightViolation::DrcMsgMinimumTextHeightViolation(
-    const BI_StrokeText& text, const UnsignedLength& minHeight,
-    const QVector<Path>& locations) noexcept
+    const Data::StrokeText& st, const BoardDesignRuleCheckData::Device* device,
+    const UnsignedLength& minHeight, const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Warning,
         tr("Text height on '%1': %2 < %3 %4",
            "Placeholders: Layer name, actual height, minimum height, unit")
-            .arg(text.getData().getLayer().getNameTr(),
-                 text.getData().getHeight()->toMmString(),
+            .arg(st.layer->getNameTr(), st.height->toMmString(),
                  minHeight->toMmString(), "mm"),
         tr("The text height is smaller than the minimum height configured "
            "in the DRC settings. If the text is smaller than the minimum "
@@ -296,11 +331,11 @@ DrcMsgMinimumTextHeightViolation::DrcMsgMinimumTextHeightViolation(
                "needed."),
         "minimum_text_height_violation", locations) {
   mApproval->ensureLineBreak();
-  if (const BI_Device* device = text.getDevice()) {
-    mApproval->appendChild("device", device->getComponentInstanceUuid());
+  if (device) {
+    mApproval->appendChild("device", device->uuid);
     mApproval->ensureLineBreak();
   }
-  mApproval->appendChild("stroke_text", text.getData().getUuid());
+  mApproval->appendChild("stroke_text", st.uuid);
   mApproval->ensureLineBreak();
 }
 
@@ -309,15 +344,14 @@ DrcMsgMinimumTextHeightViolation::DrcMsgMinimumTextHeightViolation(
  ******************************************************************************/
 
 DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
-    const BI_NetLine& netLine, const UnsignedLength& minWidth,
-    const QVector<Path>& locations) noexcept
+    const Data::Segment& segment, const Data::Trace& trace,
+    const UnsignedLength& minWidth, const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Error,
         tr("Trace width on '%1': %2 < %3 %4",
            "Placeholders: Layer name, actual width, minimum width, unit")
-            .arg(netLine.getLayer().getNameTr(),
-                 netLine.getWidth()->toMmString(), minWidth->toMmString(),
-                 "mm"),
+            .arg(trace.layer->getNameTr(), trace.width->toMmString(),
+                 minWidth->toMmString(), "mm"),
         tr("The trace is thinner than the minimum copper width configured in "
            "the DRC settings.") %
             " " % seriousTroublesTr() % "\n\n" %
@@ -325,22 +359,21 @@ DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
                "needed."),
         "minimum_width_violation", locations) {
   mApproval->ensureLineBreak();
-  mApproval->appendChild("netsegment", netLine.getNetSegment().getUuid());
+  mApproval->appendChild("netsegment", segment.uuid);
   mApproval->ensureLineBreak();
-  mApproval->appendChild("trace", netLine.getUuid());
+  mApproval->appendChild("trace", trace.uuid);
   mApproval->ensureLineBreak();
 }
 
 DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
-    const BI_Plane& plane, const UnsignedLength& minWidth,
+    const Data::Plane& plane, const UnsignedLength& minWidth,
     const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Error,
         tr("Min. plane width on '%1': %2 < %3 %4",
            "Placeholders: Layer name, actual width, minimum width, unit")
-            .arg(plane.getLayer().getNameTr(),
-                 plane.getMinWidth()->toMmString(), minWidth->toMmString(),
-                 "mm"),
+            .arg(plane.layer->getNameTr(), plane.minWidth->toMmString(),
+                 minWidth->toMmString(), "mm"),
         tr("The configured minimum width of the plane is smaller than the "
            "minimum copper width configured in the DRC settings.") %
             " " % seriousTroublesTr() % "\n\n" %
@@ -348,19 +381,18 @@ DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
                "its properties if needed."),
         "minimum_width_violation", locations) {
   mApproval->ensureLineBreak();
-  mApproval->appendChild("plane", plane.getUuid());
+  mApproval->appendChild("plane", plane.uuid);
   mApproval->ensureLineBreak();
 }
 
 DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
-    const BI_Polygon& polygon, const UnsignedLength& minWidth,
+    const Data::Polygon& polygon, const UnsignedLength& minWidth,
     const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Warning,
         tr("Polygon width on '%1': %2 < %3 %4",
            "Placeholders: Layer name, actual width, minimum width, unit")
-            .arg(polygon.getData().getLayer().getNameTr(),
-                 polygon.getData().getLineWidth()->toMmString(),
+            .arg(polygon.layer->getNameTr(), polygon.lineWidth->toMmString(),
                  minWidth->toMmString(), "mm"),
         tr("The polygon line width is smaller than the minimum width "
            "configured in the DRC settings.") %
@@ -369,19 +401,19 @@ DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
                "needed."),
         "minimum_width_violation", locations) {
   mApproval->ensureLineBreak();
-  mApproval->appendChild("polygon", polygon.getData().getUuid());
+  mApproval->appendChild("polygon", polygon.uuid);
   mApproval->ensureLineBreak();
 }
 
 DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
-    const BI_StrokeText& text, const UnsignedLength& minWidth,
-    const QVector<Path>& locations) noexcept
+    const Data::StrokeText& text,
+    const BoardDesignRuleCheckData::Device* device,
+    const UnsignedLength& minWidth, const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Warning,
         tr("Stroke width on '%1': %2 < %3 %4",
            "Placeholders: Layer name, actual width, minimum width, unit")
-            .arg(text.getData().getLayer().getNameTr(),
-                 text.getData().getStrokeWidth()->toMmString(),
+            .arg(text.layer->getNameTr(), text.strokeWidth->toMmString(),
                  minWidth->toMmString(), "mm"),
         tr("The text stroke width is smaller than the minimum width configured "
            "in the DRC settings.") %
@@ -390,26 +422,28 @@ DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
                "needed."),
         "minimum_width_violation", locations) {
   mApproval->ensureLineBreak();
-  if (const BI_Device* device = text.getDevice()) {
-    mApproval->appendChild("device", device->getComponentInstanceUuid());
+  if (device) {
+    mApproval->appendChild("device", device->uuid);
     mApproval->ensureLineBreak();
   }
-  mApproval->appendChild("stroke_text", text.getData().getUuid());
+  mApproval->appendChild("stroke_text", text.uuid);
   mApproval->ensureLineBreak();
 }
 
 DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
-    const BI_Device& device, const Polygon& polygon,
-    const UnsignedLength& minWidth, const QVector<Path>& locations) noexcept
+    const BoardDesignRuleCheckData::Device& device,
+    const Data::Polygon& polygon, const UnsignedLength& minWidth,
+    const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Warning,
         tr("Polygon width of '%1' on '%2': %3 < %4 %5",
            "Placeholders: Device name, layer name, actual width, minimum "
            "width, unit")
-            .arg(*device.getComponentInstance().getName(),
-                 Transform(device).map(polygon.getLayer()).getNameTr(),
-                 polygon.getLineWidth()->toMmString(), minWidth->toMmString(),
-                 "mm"),
+            .arg(device.cmpInstanceName,
+                 Transform(device.position, device.rotation, device.mirror)
+                     .map(*polygon.layer)
+                     .getNameTr(),
+                 polygon.lineWidth->toMmString(), minWidth->toMmString(), "mm"),
         tr("The polygon line width is smaller than the minimum width "
            "configured "
            "in the DRC settings.") %
@@ -418,24 +452,25 @@ DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
                "needed."),
         "minimum_width_violation", locations) {
   mApproval->ensureLineBreak();
-  mApproval->appendChild("device", device.getComponentInstanceUuid());
+  mApproval->appendChild("device", device.uuid);
   mApproval->ensureLineBreak();
-  mApproval->appendChild("polygon", polygon.getUuid());
+  mApproval->appendChild("polygon", polygon.uuid);
   mApproval->ensureLineBreak();
 }
 
 DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
-    const BI_Device& device, const Circle& circle,
+    const BoardDesignRuleCheckData::Device& device, const Data::Circle& circle,
     const UnsignedLength& minWidth, const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Warning,
         tr("Circle width of '%1' on '%2': %3 < %4 %5",
            "Placeholders: Device name, layer name, actual width, minimum "
            "width, unit")
-            .arg(*device.getComponentInstance().getName(),
-                 Transform(device).map(circle.getLayer()).getNameTr(),
-                 circle.getLineWidth()->toMmString(), minWidth->toMmString(),
-                 "mm"),
+            .arg(device.cmpInstanceName,
+                 Transform(device.position, device.rotation, device.mirror)
+                     .map(*circle.layer)
+                     .getNameTr(),
+                 circle.lineWidth->toMmString(), minWidth->toMmString(), "mm"),
         tr("The circle line width is smaller than the minimum width configured "
            "in the DRC settings.") %
             "\n\n" %
@@ -443,9 +478,9 @@ DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
                "needed."),
         "minimum_width_violation", locations) {
   mApproval->ensureLineBreak();
-  mApproval->appendChild("device", device.getComponentInstanceUuid());
+  mApproval->appendChild("device", device.uuid);
   mApproval->ensureLineBreak();
-  mApproval->appendChild("circle", circle.getUuid());
+  mApproval->appendChild("circle", circle.uuid);
   mApproval->ensureLineBreak();
 }
 
@@ -453,20 +488,101 @@ DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
  *  DrcMsgCopperCopperClearanceViolation
  ******************************************************************************/
 
+QString DrcMsgCopperCopperClearanceViolation::Object::getName() const {
+  QString name;
+  if (!mNetName.isEmpty()) {
+    name += "'" % mNetName % "' ";
+  }
+  if (mPad && mDevice) {
+    name = "'" % mDevice->cmpInstanceName;
+    if (!mPad->libPkgPadName.isEmpty()) {
+      name += ":" % mPad->libPkgPadName;
+    }
+    name += "'";
+  } else if (mTrace) {
+    name += tr("trace");
+  } else if (mVia) {
+    name += tr("via");
+  } else if (mPlane) {
+    name += tr("plane");
+  } else if (mPolygon) {
+    name += tr("polygon");
+  } else if (mCircle) {
+    name += tr("circle");
+  } else if (mStrokeText) {
+    name += tr("text");
+  } else {
+    throw LogicError(__FILE__, __LINE__, "Unknown copper clearance object.");
+  }
+  return name;
+}
+
+void DrcMsgCopperCopperClearanceViolation::Object::serialize(
+    SExpression& node) const {
+  if (mPad && mDevice) {
+    node.ensureLineBreak();
+    node.appendChild("device", mDevice->uuid);
+    node.ensureLineBreak();
+    node.appendChild("pad", mPad->uuid);
+    node.ensureLineBreak();
+  } else if (mTrace && mSegment) {
+    node.ensureLineBreak();
+    node.appendChild("netsegment", mSegment->uuid);
+    node.ensureLineBreak();
+    node.appendChild("trace", mTrace->uuid);
+    node.ensureLineBreak();
+  } else if (mVia && mSegment) {
+    node.ensureLineBreak();
+    node.appendChild("netsegment", mSegment->uuid);
+    node.ensureLineBreak();
+    node.appendChild("via", mVia->uuid);
+    node.ensureLineBreak();
+  } else if (mPlane) {
+    node.appendChild("plane", mPlane->uuid);
+  } else if (mPolygon) {
+    if (mDevice) {
+      node.ensureLineBreak();
+      node.appendChild("device", mDevice->uuid);
+      node.ensureLineBreak();
+      node.appendChild("polygon", mPolygon->uuid);
+      node.ensureLineBreak();
+    } else {
+      node.appendChild("polygon", mPolygon->uuid);
+    }
+  } else if (mCircle) {
+    if (mDevice) {
+      node.ensureLineBreak();
+      node.appendChild("device", mDevice->uuid);
+      node.ensureLineBreak();
+      node.appendChild("circle", mCircle->uuid);
+      node.ensureLineBreak();
+    } else {
+      node.appendChild("circle", mCircle->uuid);
+    }
+  } else if (mStrokeText) {
+    if (mDevice) {
+      node.ensureLineBreak();
+      node.appendChild("device", mDevice->uuid);
+      node.ensureLineBreak();
+      node.appendChild("stroke_text", mStrokeText->uuid);
+      node.ensureLineBreak();
+    } else {
+      node.appendChild("stroke_text", mStrokeText->uuid);
+    }
+  } else {
+    throw LogicError(__FILE__, __LINE__, "Unknown copper clearance object.");
+  }
+}
+
 DrcMsgCopperCopperClearanceViolation::DrcMsgCopperCopperClearanceViolation(
-    const NetSignal* net1, const BI_Base& item1, const Polygon* polygon1,
-    const Circle* circle1, const NetSignal* net2, const BI_Base& item2,
-    const Polygon* polygon2, const Circle* circle2,
-    const QVector<const Layer*>& layers, const Length& minClearance,
-    const QVector<Path>& locations)
+    const Object& obj1, const Object& obj2, const QSet<const Layer*>& layers,
+    const Length& minClearance, const QVector<Path>& locations)
   : RuleCheckMessage(
         Severity::Error,
         tr("Clearance on %1: %2 ↔ %3 < %4 %5",
            "Placeholders: Layer name, object name, object name, "
            "Clearance value, unit")
-            .arg(getLayerName(layers),
-                 getObjectName(net1, item1, polygon1, circle1),
-                 getObjectName(net2, item2, polygon2, circle2),
+            .arg(getLayerName(layers), obj1.getName(), obj2.getName(),
                  minClearance.toMmString(), "mm"),
         tr("The clearance between two copper objects of different nets is "
            "smaller than the minimum copper clearance configured in the DRC "
@@ -482,107 +598,19 @@ DrcMsgCopperCopperClearanceViolation::DrcMsgCopperCopperClearanceViolation(
   mApproval->ensureLineBreak();
 
   // Sort nodes to make the approval canonical.
-  serializeObject(node1, item1, polygon1, circle1);
-  serializeObject(node2, item2, polygon2, circle2);
+  obj1.serialize(node1);
+  obj2.serialize(node2);
   if (node2 < node1) {
     std::swap(node1, node2);
   }
 }
 
 QString DrcMsgCopperCopperClearanceViolation::getLayerName(
-    const QVector<const Layer*>& layers) {
+    const QSet<const Layer*>& layers) {
   if (layers.count() == 1) {
-    return "'" % layers.first()->getNameTr() % "'";
+    return "'" % (*layers.begin())->getNameTr() % "'";
   } else {
     return tr("%1 layers", "Placeholder is a number > 1.").arg(layers.count());
-  }
-}
-
-QString DrcMsgCopperCopperClearanceViolation::getObjectName(
-    const NetSignal* net, const BI_Base& item, const Polygon* polygon,
-    const Circle* circle) {
-  QString name;
-  if (net) {
-    name += "'" % *net->getName() % "' ";
-  }
-  if (const BI_FootprintPad* pad =
-          dynamic_cast<const BI_FootprintPad*>(&item)) {
-    name = "'" % (*pad->getDevice().getComponentInstance().getName());
-    if (const PackagePad* pkgPad = pad->getLibPackagePad()) {
-      name += ":" % *pkgPad->getName();
-    }
-    name += "'";
-  } else if (dynamic_cast<const BI_Via*>(&item)) {
-    name += tr("via");
-  } else if (dynamic_cast<const BI_NetLine*>(&item)) {
-    name += tr("trace");
-  } else if (dynamic_cast<const BI_Plane*>(&item)) {
-    name += tr("plane");
-  } else if (polygon || dynamic_cast<const BI_Polygon*>(&item)) {
-    name += tr("polygon");
-  } else if (circle) {
-    name += tr("circle");
-  } else if (dynamic_cast<const BI_StrokeText*>(&item)) {
-    name += tr("text");
-  } else {
-    throw LogicError(__FILE__, __LINE__, "Unknown copper clearance object.");
-  }
-  return name;
-}
-
-void DrcMsgCopperCopperClearanceViolation::serializeObject(
-    SExpression& node, const BI_Base& item, const Polygon* polygon,
-    const Circle* circle) {
-  if (const BI_Device* device = dynamic_cast<const BI_Device*>(&item)) {
-    node.ensureLineBreak();
-    node.appendChild("device", device->getComponentInstanceUuid());
-    if (polygon) {
-      node.ensureLineBreak();
-      node.appendChild("polygon", polygon->getUuid());
-    }
-    if (circle) {
-      node.ensureLineBreak();
-      node.appendChild("circle", circle->getUuid());
-    }
-    node.ensureLineBreak();
-  } else if (const BI_FootprintPad* pad =
-                 dynamic_cast<const BI_FootprintPad*>(&item)) {
-    node.ensureLineBreak();
-    node.appendChild("device", pad->getDevice().getComponentInstanceUuid());
-    node.ensureLineBreak();
-    node.appendChild("pad", pad->getLibPadUuid());
-    node.ensureLineBreak();
-  } else if (const BI_Via* via = dynamic_cast<const BI_Via*>(&item)) {
-    node.ensureLineBreak();
-    node.appendChild("netsegment", via->getNetSegment().getUuid());
-    node.ensureLineBreak();
-    node.appendChild("via", via->getUuid());
-    node.ensureLineBreak();
-  } else if (const BI_NetLine* netLine =
-                 dynamic_cast<const BI_NetLine*>(&item)) {
-    node.ensureLineBreak();
-    node.appendChild("netsegment", netLine->getNetSegment().getUuid());
-    node.ensureLineBreak();
-    node.appendChild("trace", netLine->getUuid());
-    node.ensureLineBreak();
-  } else if (const BI_Plane* plane = dynamic_cast<const BI_Plane*>(&item)) {
-    node.appendChild("plane", plane->getUuid());
-  } else if (const BI_Polygon* polygon =
-                 dynamic_cast<const BI_Polygon*>(&item)) {
-    node.appendChild("polygon", polygon->getData().getUuid());
-  } else if (const BI_StrokeText* strokeText =
-                 dynamic_cast<const BI_StrokeText*>(&item)) {
-    if (const BI_Device* device = strokeText->getDevice()) {
-      node.ensureLineBreak();
-      node.appendChild("device", device->getComponentInstanceUuid());
-      node.ensureLineBreak();
-      node.appendChild("stroke_text", strokeText->getData().getUuid());
-      node.ensureLineBreak();
-    } else {
-      node.appendChild("stroke_text", strokeText->getData().getUuid());
-    }
-  } else {
-    throw LogicError(__FILE__, __LINE__, "Unknown copper clearance object.");
   }
 }
 
@@ -591,10 +619,10 @@ void DrcMsgCopperCopperClearanceViolation::serializeObject(
  ******************************************************************************/
 
 DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
-    const BI_Via& via, const UnsignedLength& minClearance,
-    const QVector<Path>& locations) noexcept
+    const Data::Segment& segment, const Data::Via& via,
+    const UnsignedLength& minClearance, const QVector<Path>& locations) noexcept
   : RuleCheckMessage(Severity::Error,
-                     tr("Clearance board outline ↔ via < %1 %2",
+                     tr("Clearance via ↔ board outline < %1 %2",
                         "Placeholders: Clearance value, unit")
                          .arg(minClearance->toMmString(), "mm"),
                      tr("The clearance between a via and the board outline is "
@@ -605,15 +633,15 @@ DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
                             "the board outline if needed."),
                      "copper_board_clearance_violation", locations) {
   mApproval->ensureLineBreak();
-  mApproval->appendChild("netsegment", via.getNetSegment().getUuid());
+  mApproval->appendChild("netsegment", segment.uuid);
   mApproval->ensureLineBreak();
-  mApproval->appendChild("via", via.getUuid());
+  mApproval->appendChild("via", via.uuid);
   mApproval->ensureLineBreak();
 }
 
 DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
-    const BI_NetLine& netLine, const UnsignedLength& minClearance,
-    const QVector<Path>& locations) noexcept
+    const Data::Segment& segment, const Data::Trace& trace,
+    const UnsignedLength& minClearance, const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Error,
         tr("Clearance trace ↔ board outline < %1 %2",
@@ -627,15 +655,16 @@ DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
                "outline if needed."),
         "copper_board_clearance_violation", locations) {
   mApproval->ensureLineBreak();
-  mApproval->appendChild("netsegment", netLine.getNetSegment().getUuid());
+  mApproval->appendChild("netsegment", segment.uuid);
   mApproval->ensureLineBreak();
-  mApproval->appendChild("trace", netLine.getUuid());
+  mApproval->appendChild("trace", trace.uuid);
   mApproval->ensureLineBreak();
 }
 
 DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
-    const BI_FootprintPad& pad, const UnsignedLength& minClearance,
-    const QVector<Path>& locations) noexcept
+    const BoardDesignRuleCheckData::Device& device,
+    const BoardDesignRuleCheckData::Pad& pad,
+    const UnsignedLength& minClearance, const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Error,
         tr("Clearance pad ↔ board outline < %1 %2",
@@ -649,14 +678,14 @@ DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
                "outline if needed."),
         "copper_board_clearance_violation", locations) {
   mApproval->ensureLineBreak();
-  mApproval->appendChild("device", pad.getDevice().getComponentInstanceUuid());
+  mApproval->appendChild("device", device.uuid);
   mApproval->ensureLineBreak();
-  mApproval->appendChild("pad", pad.getLibPadUuid());
+  mApproval->appendChild("pad", pad.uuid);
   mApproval->ensureLineBreak();
 }
 
 DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
-    const BI_Plane& plane, const UnsignedLength& minClearance,
+    const Data::Plane& plane, const UnsignedLength& minClearance,
     const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Error,
@@ -671,36 +700,36 @@ DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
                "clearance if needed."),
         "copper_board_clearance_violation", locations) {
   mApproval->ensureLineBreak();
-  mApproval->appendChild("plane", plane.getUuid());
+  mApproval->appendChild("plane", plane.uuid);
   mApproval->ensureLineBreak();
 }
 
 DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
-    const BI_Polygon& polygon, const UnsignedLength& minClearance,
-    const QVector<Path>& locations) noexcept
-  : RuleCheckMessage(Severity::Warning, getPolygonMessage(minClearance),
-                     getPolygonDescription(),
-                     "copper_board_clearance_violation", locations) {
-  mApproval->ensureLineBreak();
-  mApproval->appendChild("polygon", polygon.getData().getUuid());
-  mApproval->ensureLineBreak();
-}
-
-DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
-    const BI_Device& device, const Polygon& polygon,
+    const Data::Polygon& polygon,
+    const BoardDesignRuleCheckData::Device* device,
     const UnsignedLength& minClearance, const QVector<Path>& locations) noexcept
-  : RuleCheckMessage(Severity::Warning, getPolygonMessage(minClearance),
-                     getPolygonDescription(),
-                     "copper_board_clearance_violation", locations) {
+  : RuleCheckMessage(
+        Severity::Warning,
+        tr("Clearance copper polygon ↔ board outline < %1 %2",
+           "Placeholders: Clearance value, unit")
+            .arg(minClearance->toMmString(), "mm"),
+        tr("The clearance between a polygon and the board outline is smaller "
+           "than the board outline clearance configured in the DRC settings.") %
+            "\n\n" %
+            tr("Check the DRC settings and move the polygon away from the "
+               "board outline if needed."),
+        "copper_board_clearance_violation", locations) {
   mApproval->ensureLineBreak();
-  mApproval->appendChild("device", device.getComponentInstanceUuid());
-  mApproval->ensureLineBreak();
-  mApproval->appendChild("polygon", polygon.getUuid());
+  if (device) {
+    mApproval->appendChild("device", device->uuid);
+    mApproval->ensureLineBreak();
+  }
+  mApproval->appendChild("polygon", polygon.uuid);
   mApproval->ensureLineBreak();
 }
 
 DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
-    const BI_Device& device, const Circle& circle,
+    const BoardDesignRuleCheckData::Device& device, const Data::Circle& circle,
     const UnsignedLength& minClearance, const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Warning,
@@ -714,15 +743,16 @@ DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
                "outline if needed."),
         "copper_board_clearance_violation", locations) {
   mApproval->ensureLineBreak();
-  mApproval->appendChild("device", device.getComponentInstanceUuid());
+  mApproval->appendChild("device", device.uuid);
   mApproval->ensureLineBreak();
-  mApproval->appendChild("circle", circle.getUuid());
+  mApproval->appendChild("circle", circle.uuid);
   mApproval->ensureLineBreak();
 }
 
 DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
-    const BI_StrokeText& strokeText, const UnsignedLength& minClearance,
-    const QVector<Path>& locations) noexcept
+    const Data::StrokeText& strokeText,
+    const BoardDesignRuleCheckData::Device* device,
+    const UnsignedLength& minClearance, const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Warning,
         tr("Clearance copper text ↔ board outline < %1 %2",
@@ -736,28 +766,12 @@ DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
                "board outline if needed."),
         "copper_board_clearance_violation", locations) {
   mApproval->ensureLineBreak();
-  if (const BI_Device* device = strokeText.getDevice()) {
-    mApproval->appendChild("device", device->getComponentInstanceUuid());
+  if (device) {
+    mApproval->appendChild("device", device->uuid);
     mApproval->ensureLineBreak();
   }
-  mApproval->appendChild("stroke_text", strokeText.getData().getUuid());
+  mApproval->appendChild("stroke_text", strokeText.uuid);
   mApproval->ensureLineBreak();
-}
-
-QString DrcMsgCopperBoardClearanceViolation::getPolygonMessage(
-    const UnsignedLength& minClearance) noexcept {
-  return tr("Clearance copper polygon ↔ board outline < %1 %2",
-            "Placeholders: Clearance value, unit")
-      .arg(minClearance->toMmString(), "mm");
-}
-
-QString DrcMsgCopperBoardClearanceViolation::getPolygonDescription() noexcept {
-  return tr("The clearance between a polygon and the board outline is smaller "
-            "than the board outline clearance configured in the DRC "
-            "settings.") %
-      "\n\n" %
-      tr("Check the DRC settings and move the polygon away from the "
-         "board outline if needed.");
 }
 
 /*******************************************************************************
@@ -765,42 +779,27 @@ QString DrcMsgCopperBoardClearanceViolation::getPolygonDescription() noexcept {
  ******************************************************************************/
 
 DrcMsgCopperHoleClearanceViolation::DrcMsgCopperHoleClearanceViolation(
-    const BI_Hole& hole, const UnsignedLength& minClearance,
-    const QVector<Path>& locations) noexcept
-  : RuleCheckMessage(Severity::Error, getMessage(minClearance),
-                     getDescription(), "copper_hole_clearance_violation",
-                     locations) {
-  mApproval->ensureLineBreak();
-  mApproval->appendChild("hole", hole.getData().getUuid());
-  mApproval->ensureLineBreak();
-}
-
-DrcMsgCopperHoleClearanceViolation::DrcMsgCopperHoleClearanceViolation(
-    const BI_Device& device, const Hole& hole,
+    const BoardDesignRuleCheckData::Hole& hole,
+    const BoardDesignRuleCheckData::Device* device,
     const UnsignedLength& minClearance, const QVector<Path>& locations) noexcept
-  : RuleCheckMessage(Severity::Error, getMessage(minClearance),
-                     getDescription(), "copper_hole_clearance_violation",
-                     locations) {
+  : RuleCheckMessage(
+        Severity::Error,
+        tr("Clearance copper ↔ hole < %1 %2",
+           "Placeholders: Clearance value, unit")
+            .arg(minClearance->toMmString(), "mm"),
+        tr("The clearance between a non-plated hole and copper objects is "
+           "smaller than the hole clearance configured in the DRC settings.") %
+            " " % seriousTroublesTr() % "\n\n" %
+            tr("Check the DRC settings and move the copper objects away from "
+               "the hole if needed."),
+        "copper_hole_clearance_violation", locations) {
   mApproval->ensureLineBreak();
-  mApproval->appendChild("device", device.getComponentInstanceUuid());
+  if (device) {
+    mApproval->appendChild("device", device->uuid);
+    mApproval->ensureLineBreak();
+  }
+  mApproval->appendChild("hole", hole.uuid);
   mApproval->ensureLineBreak();
-  mApproval->appendChild("hole", hole.getUuid());
-  mApproval->ensureLineBreak();
-}
-
-QString DrcMsgCopperHoleClearanceViolation::getMessage(
-    const UnsignedLength& minClearance) noexcept {
-  return tr("Clearance copper ↔ hole < %1 %2",
-            "Placeholders: Clearance value, unit")
-      .arg(minClearance->toMmString(), "mm");
-}
-
-QString DrcMsgCopperHoleClearanceViolation::getDescription() noexcept {
-  return tr("The clearance between a non-plated hole and copper objects is "
-            "smaller than the hole clearance configured in the DRC settings.") %
-      " " % seriousTroublesTr() % "\n\n" %
-      tr("Check the DRC settings and move the copper objects away from "
-         "the hole if needed.");
 }
 
 /*******************************************************************************
@@ -808,117 +807,110 @@ QString DrcMsgCopperHoleClearanceViolation::getDescription() noexcept {
  ******************************************************************************/
 
 DrcMsgCopperInKeepoutZone::DrcMsgCopperInKeepoutZone(
-    const BI_Zone* boardZone, const BI_Device* zoneDevice,
-    const Zone* deviceZone, const BI_FootprintPad& pad,
+    const Data::Zone& zone, const BoardDesignRuleCheckData::Device* zoneDevice,
+    const BoardDesignRuleCheckData::Device& device,
+    const BoardDesignRuleCheckData::Pad& pad,
     const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Error,
         tr("Pad in copper keepout zone: '%1'", "Placeholder is pad name")
-            .arg(pad.getText()),
+            .arg(pad.libPkgPadName),
         getDescription(), "copper_in_keepout_zone", locations) {
-  mApproval->appendChild("device", pad.getDevice().getComponentInstanceUuid());
+  mApproval->appendChild("device", device.uuid);
   mApproval->ensureLineBreak();
-  mApproval->appendChild("pad", pad.getLibPadUuid());
+  mApproval->appendChild("pad", pad.uuid);
   mApproval->ensureLineBreak();
-  addZoneApprovalNodes(boardZone, zoneDevice, deviceZone);
+  addZoneApprovalNodes(zone, zoneDevice);
   mApproval->ensureLineBreak();
 }
 
 DrcMsgCopperInKeepoutZone::DrcMsgCopperInKeepoutZone(
-    const BI_Zone* boardZone, const BI_Device* zoneDevice,
-    const Zone* deviceZone, const BI_Via& via,
+    const Data::Zone& zone, const BoardDesignRuleCheckData::Device* zoneDevice,
+    const Data::Segment& ns, const Data::Via& via,
     const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Error,
         tr("Via in copper keepout zone: '%1'", "Placeholder is net name")
-            .arg(via.getNetSegment().getNetNameToDisplay(true)),
+            .arg(netNameWithFallback(ns.netName)),
         getDescription(), "copper_in_keepout_zone", locations) {
-  mApproval->appendChild("netsegment", via.getNetSegment().getUuid());
+  mApproval->appendChild("netsegment", ns.uuid);
   mApproval->ensureLineBreak();
-  mApproval->appendChild("via", via.getUuid());
+  mApproval->appendChild("via", via.uuid);
   mApproval->ensureLineBreak();
-  addZoneApprovalNodes(boardZone, zoneDevice, deviceZone);
+  addZoneApprovalNodes(zone, zoneDevice);
   mApproval->ensureLineBreak();
 }
 
 DrcMsgCopperInKeepoutZone::DrcMsgCopperInKeepoutZone(
-    const BI_Zone* boardZone, const BI_Device* zoneDevice,
-    const Zone* deviceZone, const BI_NetLine& netLine,
+    const Data::Zone& zone, const BoardDesignRuleCheckData::Device* zoneDevice,
+    const Data::Segment& ns, const Data::Trace& trace,
     const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Error,
         tr("Trace in copper keepout zone: '%1'", "Placeholder is net name")
-            .arg(netLine.getNetSegment().getNetNameToDisplay(true)),
+            .arg(netNameWithFallback(ns.netName)),
         getDescription(), "copper_in_keepout_zone", locations) {
-  mApproval->appendChild("netsegment", netLine.getNetSegment().getUuid());
+  mApproval->appendChild("netsegment", ns.uuid);
   mApproval->ensureLineBreak();
-  mApproval->appendChild("trace", netLine.getUuid());
+  mApproval->appendChild("trace", trace.uuid);
   mApproval->ensureLineBreak();
-  addZoneApprovalNodes(boardZone, zoneDevice, deviceZone);
+  addZoneApprovalNodes(zone, zoneDevice);
   mApproval->ensureLineBreak();
 }
 
 DrcMsgCopperInKeepoutZone::DrcMsgCopperInKeepoutZone(
-    const BI_Zone* boardZone, const BI_Device* zoneDevice,
-    const Zone* deviceZone, const BI_Polygon& polygon,
-    const QVector<Path>& locations) noexcept
+    const Data::Zone& zone, const BoardDesignRuleCheckData::Device* zoneDevice,
+    const Data::Polygon& polygon, const QVector<Path>& locations) noexcept
   : RuleCheckMessage(Severity::Error, tr("Polygon in copper keepout zone"),
                      getDescription(), "copper_in_keepout_zone", locations) {
-  mApproval->appendChild("polygon", polygon.getData().getUuid());
+  mApproval->appendChild("polygon", polygon.uuid);
   mApproval->ensureLineBreak();
-  addZoneApprovalNodes(boardZone, zoneDevice, deviceZone);
+  addZoneApprovalNodes(zone, zoneDevice);
   mApproval->ensureLineBreak();
 }
 
 DrcMsgCopperInKeepoutZone::DrcMsgCopperInKeepoutZone(
-    const BI_Zone* boardZone, const BI_Device* zoneDevice,
-    const Zone* deviceZone, const BI_Device& device, const Polygon& polygon,
-    const QVector<Path>& locations) noexcept
+    const Data::Zone& zone, const BoardDesignRuleCheckData::Device* zoneDevice,
+    const BoardDesignRuleCheckData::Device& device,
+    const Data::Polygon& polygon, const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Error,
         tr("Polygon in copper keepout zone: '%1'", "Placeholder is device name")
-            .arg(*device.getComponentInstance().getName()),
+            .arg(device.cmpInstanceName),
         getDescription(), "copper_in_keepout_zone", locations) {
-  mApproval->appendChild("device", device.getComponentInstanceUuid());
+  mApproval->appendChild("device", device.uuid);
   mApproval->ensureLineBreak();
-  mApproval->appendChild("polygon", polygon.getUuid());
+  mApproval->appendChild("polygon", polygon.uuid);
   mApproval->ensureLineBreak();
-  addZoneApprovalNodes(boardZone, zoneDevice, deviceZone);
+  addZoneApprovalNodes(zone, zoneDevice);
   mApproval->ensureLineBreak();
 }
 
 DrcMsgCopperInKeepoutZone::DrcMsgCopperInKeepoutZone(
-    const BI_Zone* boardZone, const BI_Device* zoneDevice,
-    const Zone* deviceZone, const BI_Device& device, const Circle& circle,
+    const Data::Zone& zone, const BoardDesignRuleCheckData::Device* zoneDevice,
+    const BoardDesignRuleCheckData::Device& device, const Data::Circle& circle,
     const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Error,
         tr("Circle in copper keepout zone: '%1'", "Placeholder is device name")
-            .arg(*device.getComponentInstance().getName()),
+            .arg(device.cmpInstanceName),
         getDescription(), "copper_in_keepout_zone", locations) {
-  mApproval->appendChild("device", device.getComponentInstanceUuid());
+  mApproval->appendChild("device", device.uuid);
   mApproval->ensureLineBreak();
-  mApproval->appendChild("circle", circle.getUuid());
+  mApproval->appendChild("circle", circle.uuid);
   mApproval->ensureLineBreak();
-  addZoneApprovalNodes(boardZone, zoneDevice, deviceZone);
+  addZoneApprovalNodes(zone, zoneDevice);
   mApproval->ensureLineBreak();
 }
 
 void DrcMsgCopperInKeepoutZone::addZoneApprovalNodes(
-    const BI_Zone* boardZone, const BI_Device* zoneDevice,
-    const Zone* deviceZone) noexcept {
-  if (boardZone) {
-    mApproval->ensureLineBreak();
-    mApproval->appendChild("zone", boardZone->getData().getUuid());
-  }
-  if (deviceZone) {
-    mApproval->ensureLineBreak();
-    mApproval->appendChild("zone", deviceZone->getUuid());
-  }
+    const Data::Zone& zone,
+    const BoardDesignRuleCheckData::Device* zoneDevice) noexcept {
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("zone", zone.uuid);
   if (zoneDevice) {
     mApproval->ensureLineBreak();
-    mApproval->appendChild("from_device",
-                           zoneDevice->getComponentInstanceUuid());
+    mApproval->appendChild("from_device", zoneDevice->uuid);
   }
 }
 
@@ -932,9 +924,8 @@ QString DrcMsgCopperInKeepoutZone::getDescription() noexcept {
  ******************************************************************************/
 
 DrcMsgDrillDrillClearanceViolation::DrcMsgDrillDrillClearanceViolation(
-    const BI_Base& item1, const Uuid& hole1, const BI_Base& item2,
-    const Uuid& hole2, const UnsignedLength& minClearance,
-    const QVector<Path>& locations)
+    const DrcHoleRef& hole1, const DrcHoleRef& hole2,
+    const UnsignedLength& minClearance, const QVector<Path>& locations)
   : RuleCheckMessage(Severity::Error,
                      tr("Clearance drill ↔ drill < %1 %2",
                         "Placeholders: Clearance value, unit")
@@ -952,41 +943,10 @@ DrcMsgDrillDrillClearanceViolation::DrcMsgDrillDrillClearanceViolation(
   mApproval->ensureLineBreak();
 
   // Sort nodes to make the approval canonical.
-  serializeObject(node1, item1, hole1);
-  serializeObject(node2, item2, hole2);
+  hole1.serialize(node1);
+  hole2.serialize(node2);
   if (node2 < node1) {
     std::swap(node1, node2);
-  }
-}
-
-void DrcMsgDrillDrillClearanceViolation::serializeObject(SExpression& node,
-                                                         const BI_Base& item,
-                                                         const Uuid& hole) {
-  if (const BI_Via* via = dynamic_cast<const BI_Via*>(&item)) {
-    node.ensureLineBreak();
-    node.appendChild("netsegment", via->getNetSegment().getUuid());
-    node.ensureLineBreak();
-    node.appendChild("via", via->getUuid());
-    node.ensureLineBreak();
-  } else if (const BI_Hole* boardHole = dynamic_cast<const BI_Hole*>(&item)) {
-    node.appendChild("hole", boardHole->getData().getUuid());
-  } else if (const BI_FootprintPad* pad =
-                 dynamic_cast<const BI_FootprintPad*>(&item)) {
-    node.ensureLineBreak();
-    node.appendChild("device", pad->getDevice().getComponentInstanceUuid());
-    node.ensureLineBreak();
-    node.appendChild("pad", pad->getLibPadUuid());
-    node.ensureLineBreak();
-    node.appendChild("hole", hole);
-    node.ensureLineBreak();
-  } else if (const BI_Device* device = dynamic_cast<const BI_Device*>(&item)) {
-    node.ensureLineBreak();
-    node.appendChild("device", device->getComponentInstanceUuid());
-    node.ensureLineBreak();
-    node.appendChild("hole", hole);
-    node.ensureLineBreak();
-  } else {
-    throw LogicError(__FILE__, __LINE__, "Unknown drill clearance object.");
   }
 }
 
@@ -995,70 +955,22 @@ void DrcMsgDrillDrillClearanceViolation::serializeObject(SExpression& node,
  ******************************************************************************/
 
 DrcMsgDrillBoardClearanceViolation::DrcMsgDrillBoardClearanceViolation(
-    const BI_Via& via, const UnsignedLength& minClearance,
+    const DrcHoleRef& hole, const UnsignedLength& minClearance,
     const QVector<Path>& locations) noexcept
-  : RuleCheckMessage(Severity::Error, getMessage(minClearance),
-                     getDescription(), "drill_board_clearance_violation",
-                     locations) {
+  : RuleCheckMessage(
+        Severity::Error,
+        tr("Clearance drill ↔ board outline < %1 %2",
+           "Placeholders: Clearance value, unit")
+            .arg(minClearance->toMmString(), "mm"),
+        tr("The clearance between a drill and the board outline is smaller "
+           "than the drill clearance configured in the DRC settings.") %
+            " " % seriousTroublesTr() % "\n\n" %
+            tr("Check the DRC settings and move the drill away from the board "
+               "outline if needed."),
+        "drill_board_clearance_violation", locations) {
   mApproval->ensureLineBreak();
-  mApproval->appendChild("netsegment", via.getNetSegment().getUuid());
+  hole.serialize(*mApproval);
   mApproval->ensureLineBreak();
-  mApproval->appendChild("via", via.getUuid());
-  mApproval->ensureLineBreak();
-}
-
-DrcMsgDrillBoardClearanceViolation::DrcMsgDrillBoardClearanceViolation(
-    const BI_FootprintPad& pad, const PadHole& hole,
-    const UnsignedLength& minClearance, const QVector<Path>& locations) noexcept
-  : RuleCheckMessage(Severity::Error, getMessage(minClearance),
-                     getDescription(), "drill_board_clearance_violation",
-                     locations) {
-  mApproval->ensureLineBreak();
-  mApproval->appendChild("device", pad.getDevice().getComponentInstanceUuid());
-  mApproval->ensureLineBreak();
-  mApproval->appendChild("pad", pad.getLibPadUuid());
-  mApproval->ensureLineBreak();
-  mApproval->appendChild("hole", hole.getUuid());
-  mApproval->ensureLineBreak();
-}
-
-DrcMsgDrillBoardClearanceViolation::DrcMsgDrillBoardClearanceViolation(
-    const BI_Hole& hole, const UnsignedLength& minClearance,
-    const QVector<Path>& locations) noexcept
-  : RuleCheckMessage(Severity::Error, getMessage(minClearance),
-                     getDescription(), "drill_board_clearance_violation",
-                     locations) {
-  mApproval->ensureLineBreak();
-  mApproval->appendChild("hole", hole.getData().getUuid());
-  mApproval->ensureLineBreak();
-}
-
-DrcMsgDrillBoardClearanceViolation::DrcMsgDrillBoardClearanceViolation(
-    const BI_Device& device, const Hole& hole,
-    const UnsignedLength& minClearance, const QVector<Path>& locations) noexcept
-  : RuleCheckMessage(Severity::Error, getMessage(minClearance),
-                     getDescription(), "drill_board_clearance_violation",
-                     locations) {
-  mApproval->ensureLineBreak();
-  mApproval->appendChild("device", device.getComponentInstanceUuid());
-  mApproval->ensureLineBreak();
-  mApproval->appendChild("hole", hole.getUuid());
-  mApproval->ensureLineBreak();
-}
-
-QString DrcMsgDrillBoardClearanceViolation::getMessage(
-    const UnsignedLength& minClearance) noexcept {
-  return tr("Clearance drill ↔ board outline < %1 %2",
-            "Placeholders: Clearance value, unit")
-      .arg(minClearance->toMmString(), "mm");
-}
-
-QString DrcMsgDrillBoardClearanceViolation::getDescription() noexcept {
-  return tr("The clearance between a drill and the board outline is smaller "
-            "than the drill clearance configured in the DRC settings.") %
-      " " % seriousTroublesTr() % "\n\n" %
-      tr("Check the DRC settings and move the drill away from the board "
-         "outline if needed.");
 }
 
 /*******************************************************************************
@@ -1066,16 +978,15 @@ QString DrcMsgDrillBoardClearanceViolation::getDescription() noexcept {
  ******************************************************************************/
 
 DrcMsgDeviceInCourtyard::DrcMsgDeviceInCourtyard(
-    const BI_Device& device1, const BI_Device& device2,
+    const BoardDesignRuleCheckData::Device& device1,
+    const BoardDesignRuleCheckData::Device& device2,
     const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Warning,
         tr("Device in courtyard: '%1' ↔ '%2'",
            "Placeholders: Device 1 name, device 2 name")
-            .arg(std::min(*device1.getComponentInstance().getName(),
-                          *device2.getComponentInstance().getName()),
-                 std::max(*device1.getComponentInstance().getName(),
-                          *device2.getComponentInstance().getName())),
+            .arg(std::min(device1.cmpInstanceName, device2.cmpInstanceName),
+                 std::max(device1.cmpInstanceName, device2.cmpInstanceName)),
         tr("A device is placed within the courtyard of another device, which "
            "might cause troubles during assembly of these parts.") %
             "\n\n" %
@@ -1084,13 +995,9 @@ DrcMsgDeviceInCourtyard::DrcMsgDeviceInCourtyard(
                "problems."),
         "device_in_courtyard", locations) {
   mApproval->ensureLineBreak();
-  mApproval->appendChild("device",
-                         std::min(device1.getComponentInstanceUuid(),
-                                  device2.getComponentInstanceUuid()));
+  mApproval->appendChild("device", std::min(device1.uuid, device2.uuid));
   mApproval->ensureLineBreak();
-  mApproval->appendChild("device",
-                         std::max(device1.getComponentInstanceUuid(),
-                                  device2.getComponentInstanceUuid()));
+  mApproval->appendChild("device", std::max(device1.uuid, device2.uuid));
   mApproval->ensureLineBreak();
 }
 
@@ -1099,16 +1006,15 @@ DrcMsgDeviceInCourtyard::DrcMsgDeviceInCourtyard(
  ******************************************************************************/
 
 DrcMsgOverlappingDevices::DrcMsgOverlappingDevices(
-    const BI_Device& device1, const BI_Device& device2,
+    const BoardDesignRuleCheckData::Device& device1,
+    const BoardDesignRuleCheckData::Device& device2,
     const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Error,
         tr("Device overlap: '%1' ↔ '%2'",
            "Placeholders: Device 1 name, device 2 name")
-            .arg(std::min(*device1.getComponentInstance().getName(),
-                          *device2.getComponentInstance().getName()),
-                 std::max(*device1.getComponentInstance().getName(),
-                          *device2.getComponentInstance().getName())),
+            .arg(std::min(device1.cmpInstanceName, device2.cmpInstanceName),
+                 std::max(device1.cmpInstanceName, device2.cmpInstanceName)),
         tr("Two devices are overlapping and thus probably cannot be assembled "
            "both at the same time.") %
             "\n\n" %
@@ -1117,13 +1023,9 @@ DrcMsgOverlappingDevices::DrcMsgOverlappingDevices(
                "problems (or only one of them gets assembled)."),
         "overlapping_devices", locations) {
   mApproval->ensureLineBreak();
-  mApproval->appendChild("device",
-                         std::min(device1.getComponentInstanceUuid(),
-                                  device2.getComponentInstanceUuid()));
+  mApproval->appendChild("device", std::min(device1.uuid, device2.uuid));
   mApproval->ensureLineBreak();
-  mApproval->appendChild("device",
-                         std::max(device1.getComponentInstanceUuid(),
-                                  device2.getComponentInstanceUuid()));
+  mApproval->appendChild("device", std::max(device1.uuid, device2.uuid));
   mApproval->ensureLineBreak();
 }
 
@@ -1132,35 +1034,28 @@ DrcMsgOverlappingDevices::DrcMsgOverlappingDevices(
  ******************************************************************************/
 
 DrcMsgDeviceInKeepoutZone::DrcMsgDeviceInKeepoutZone(
-    const BI_Zone* boardZone, const BI_Device* zoneDevice,
-    const Zone* deviceZone, const BI_Device& device,
+    const Data::Zone& zone, const BoardDesignRuleCheckData::Device* zoneDevice,
+    const BoardDesignRuleCheckData::Device& device,
     const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Error,
         tr("Device in keepout zone: '%1'", "Placeholder is device name")
-            .arg(*device.getComponentInstance().getName()),
+            .arg(device.cmpInstanceName),
         getDescription(), "device_in_keepout_zone", locations) {
-  mApproval->appendChild("device", device.getComponentInstanceUuid());
+  mApproval->appendChild("device", device.uuid);
   mApproval->ensureLineBreak();
-  addZoneApprovalNodes(boardZone, zoneDevice, deviceZone);
+  addZoneApprovalNodes(zone, zoneDevice);
   mApproval->ensureLineBreak();
 }
 
 void DrcMsgDeviceInKeepoutZone::addZoneApprovalNodes(
-    const BI_Zone* boardZone, const BI_Device* zoneDevice,
-    const Zone* deviceZone) noexcept {
-  if (boardZone) {
-    mApproval->ensureLineBreak();
-    mApproval->appendChild("zone", boardZone->getData().getUuid());
-  }
-  if (deviceZone) {
-    mApproval->ensureLineBreak();
-    mApproval->appendChild("zone", deviceZone->getUuid());
-  }
+    const Data::Zone& zone,
+    const BoardDesignRuleCheckData::Device* zoneDevice) noexcept {
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("zone", zone.uuid);
   if (zoneDevice) {
     mApproval->ensureLineBreak();
-    mApproval->appendChild("from_device",
-                           zoneDevice->getComponentInstanceUuid());
+    mApproval->appendChild("from_device", zoneDevice->uuid);
   }
 }
 
@@ -1174,100 +1069,93 @@ QString DrcMsgDeviceInKeepoutZone::getDescription() noexcept {
  ******************************************************************************/
 
 DrcMsgExposureInKeepoutZone::DrcMsgExposureInKeepoutZone(
-    const BI_Zone* boardZone, const BI_Device* zoneDevice,
-    const Zone* deviceZone, const BI_FootprintPad& pad,
+    const Data::Zone& zone, const BoardDesignRuleCheckData::Device* zoneDevice,
+    const BoardDesignRuleCheckData::Device& device,
+    const BoardDesignRuleCheckData::Pad& pad,
     const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Error,
         tr("Pad in exposure keepout zone: '%1'", "Placeholder is pad name")
-            .arg(pad.getText()),
+            .arg(pad.libPkgPadName),
         getDescription(), "exposure_in_keepout_zone", locations) {
-  mApproval->appendChild("device", pad.getDevice().getComponentInstanceUuid());
+  mApproval->appendChild("device", device.uuid);
   mApproval->ensureLineBreak();
-  mApproval->appendChild("pad", pad.getLibPadUuid());
+  mApproval->appendChild("pad", pad.uuid);
   mApproval->ensureLineBreak();
-  addZoneApprovalNodes(boardZone, zoneDevice, deviceZone);
+  addZoneApprovalNodes(zone, zoneDevice);
   mApproval->ensureLineBreak();
 }
 
 DrcMsgExposureInKeepoutZone::DrcMsgExposureInKeepoutZone(
-    const BI_Zone* boardZone, const BI_Device* zoneDevice,
-    const Zone* deviceZone, const BI_Via& via,
+    const Data::Zone& zone, const BoardDesignRuleCheckData::Device* zoneDevice,
+    const Data::Segment& ns, const Data::Via& via,
     const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Error,
         tr("Via in exposure keepout zone: '%1'", "Placeholder is net name")
-            .arg(via.getNetSegment().getNetNameToDisplay(true)),
+            .arg(netNameWithFallback(ns.netName)),
         getDescription(), "exposure_in_keepout_zone", locations) {
-  mApproval->appendChild("netsegment", via.getNetSegment().getUuid());
+  mApproval->appendChild("netsegment", ns.uuid);
   mApproval->ensureLineBreak();
-  mApproval->appendChild("via", via.getUuid());
+  mApproval->appendChild("via", via.uuid);
   mApproval->ensureLineBreak();
-  addZoneApprovalNodes(boardZone, zoneDevice, deviceZone);
+  addZoneApprovalNodes(zone, zoneDevice);
   mApproval->ensureLineBreak();
 }
 
 DrcMsgExposureInKeepoutZone::DrcMsgExposureInKeepoutZone(
-    const BI_Zone* boardZone, const BI_Device* zoneDevice,
-    const Zone* deviceZone, const BI_Polygon& polygon,
-    const QVector<Path>& locations) noexcept
+    const Data::Zone& zone, const BoardDesignRuleCheckData::Device* zoneDevice,
+    const Data::Polygon& polygon, const QVector<Path>& locations) noexcept
   : RuleCheckMessage(Severity::Error, tr("Polygon in exposure keepout zone"),
                      getDescription(), "exposure_in_keepout_zone", locations) {
-  mApproval->appendChild("polygon", polygon.getData().getUuid());
+  mApproval->appendChild("polygon", polygon.uuid);
   mApproval->ensureLineBreak();
-  addZoneApprovalNodes(boardZone, zoneDevice, deviceZone);
+  addZoneApprovalNodes(zone, zoneDevice);
   mApproval->ensureLineBreak();
 }
 
 DrcMsgExposureInKeepoutZone::DrcMsgExposureInKeepoutZone(
-    const BI_Zone* boardZone, const BI_Device* zoneDevice,
-    const Zone* deviceZone, const BI_Device& device, const Polygon& polygon,
-    const QVector<Path>& locations) noexcept
+    const Data::Zone& zone, const BoardDesignRuleCheckData::Device* zoneDevice,
+    const BoardDesignRuleCheckData::Device& device,
+    const Data::Polygon& polygon, const QVector<Path>& locations) noexcept
   : RuleCheckMessage(Severity::Error,
                      tr("Polygon in exposure keepout zone: '%1'",
                         "Placeholder is device name")
-                         .arg(*device.getComponentInstance().getName()),
+                         .arg(device.cmpInstanceName),
                      getDescription(), "exposure_in_keepout_zone", locations) {
-  mApproval->appendChild("device", device.getComponentInstanceUuid());
+  mApproval->appendChild("device", device.uuid);
   mApproval->ensureLineBreak();
-  mApproval->appendChild("polygon", polygon.getUuid());
+  mApproval->appendChild("polygon", polygon.uuid);
   mApproval->ensureLineBreak();
-  addZoneApprovalNodes(boardZone, zoneDevice, deviceZone);
+  addZoneApprovalNodes(zone, zoneDevice);
   mApproval->ensureLineBreak();
 }
 
 DrcMsgExposureInKeepoutZone::DrcMsgExposureInKeepoutZone(
-    const BI_Zone* boardZone, const BI_Device* zoneDevice,
-    const Zone* deviceZone, const BI_Device& device, const Circle& circle,
+    const Data::Zone& zone, const BoardDesignRuleCheckData::Device* zoneDevice,
+    const BoardDesignRuleCheckData::Device& device, const Data::Circle& circle,
     const QVector<Path>& locations) noexcept
   : RuleCheckMessage(Severity::Error,
                      tr("Circle in exposure keepout zone: '%1'",
                         "Placeholder is device name")
-                         .arg(*device.getComponentInstance().getName()),
+                         .arg(device.cmpInstanceName),
                      getDescription(), "exposure_in_keepout_zone", locations) {
-  mApproval->appendChild("device", device.getComponentInstanceUuid());
+  mApproval->appendChild("device", device.uuid);
   mApproval->ensureLineBreak();
-  mApproval->appendChild("circle", circle.getUuid());
+  mApproval->appendChild("circle", circle.uuid);
   mApproval->ensureLineBreak();
-  addZoneApprovalNodes(boardZone, zoneDevice, deviceZone);
+  addZoneApprovalNodes(zone, zoneDevice);
   mApproval->ensureLineBreak();
 }
 
 void DrcMsgExposureInKeepoutZone::addZoneApprovalNodes(
-    const BI_Zone* boardZone, const BI_Device* zoneDevice,
-    const Zone* deviceZone) noexcept {
-  if (boardZone) {
-    mApproval->ensureLineBreak();
-    mApproval->appendChild("zone", boardZone->getData().getUuid());
-  }
-  if (deviceZone) {
-    mApproval->ensureLineBreak();
-    mApproval->appendChild("zone", deviceZone->getUuid());
-  }
+    const Data::Zone& zone,
+    const BoardDesignRuleCheckData::Device* zoneDevice) noexcept {
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("zone", zone.uuid);
   if (zoneDevice) {
     mApproval->ensureLineBreak();
-    mApproval->appendChild("from_device",
-                           zoneDevice->getComponentInstanceUuid());
+    mApproval->appendChild("from_device", zoneDevice->uuid);
   }
 }
 
@@ -1282,14 +1170,15 @@ QString DrcMsgExposureInKeepoutZone::getDescription() noexcept {
  ******************************************************************************/
 
 DrcMsgMinimumAnnularRingViolation::DrcMsgMinimumAnnularRingViolation(
-    const BI_Via& via, const UnsignedLength& minAnnularWidth,
+    const Data::Segment& ns, const Data::Via& via,
+    const UnsignedLength& minAnnularWidth,
     const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Error,
         tr("Via annular ring of '%1' < %2 %3",
            "Placeholders: Net name, minimum annular width, unit")
-            .arg(via.getNetSegment().getNetNameToDisplay(true),
-                 minAnnularWidth->toMmString(), "mm"),
+            .arg(netNameWithFallback(ns.netName), minAnnularWidth->toMmString(),
+                 "mm"),
         tr("The via annular ring width (i.e. the copper around the hole) is "
            "smaller than the minimum annular width configured in the DRC "
            "settings.") %
@@ -1297,20 +1186,23 @@ DrcMsgMinimumAnnularRingViolation::DrcMsgMinimumAnnularRingViolation(
             tr("Check the DRC settings and increase the via size if needed."),
         "minimum_annular_ring_violation", locations) {
   mApproval->ensureLineBreak();
-  mApproval->appendChild("netsegment", via.getNetSegment().getUuid());
+  mApproval->appendChild("netsegment", ns.uuid);
   mApproval->ensureLineBreak();
-  mApproval->appendChild("via", via.getUuid());
+  mApproval->appendChild("via", via.uuid);
   mApproval->ensureLineBreak();
 }
 
 DrcMsgMinimumAnnularRingViolation::DrcMsgMinimumAnnularRingViolation(
-    const BI_FootprintPad& pad, const UnsignedLength& minAnnularWidth,
+    const BoardDesignRuleCheckData::Device& device,
+    const BoardDesignRuleCheckData::Pad& pad,
+    const UnsignedLength& minAnnularWidth,
     const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Error,
         tr("Pad annular ring of '%1' < %2 %3",
            "Placeholders: Net name, minimum annular width, unit")
-            .arg(pad.getText(), minAnnularWidth->toMmString(), "mm"),
+            .arg(device.cmpInstanceName + "::" + pad.libPkgPadName,
+                 minAnnularWidth->toMmString(), "mm"),
         tr("The through-hole pad annular ring width (i.e. the copper around "
            "the hole) is smaller than the minimum annular width configured in "
            "the DRC settings.") %
@@ -1318,9 +1210,9 @@ DrcMsgMinimumAnnularRingViolation::DrcMsgMinimumAnnularRingViolation(
             tr("Check the DRC settings and increase the pad size if needed."),
         "minimum_annular_ring_violation", locations) {
   mApproval->ensureLineBreak();
-  mApproval->appendChild("device", pad.getDevice().getComponentInstanceUuid());
+  mApproval->appendChild("device", device.uuid);
   mApproval->ensureLineBreak();
-  mApproval->appendChild("pad", pad.getLibPadUuid());
+  mApproval->appendChild("pad", pad.uuid);
   mApproval->ensureLineBreak();
 }
 
@@ -1329,87 +1221,43 @@ DrcMsgMinimumAnnularRingViolation::DrcMsgMinimumAnnularRingViolation(
  ******************************************************************************/
 
 DrcMsgMinimumDrillDiameterViolation::DrcMsgMinimumDrillDiameterViolation(
-    const BI_Hole& hole, const UnsignedLength& minDiameter,
+    const DrcHoleRef& hole, const UnsignedLength& minDiameter,
     const QVector<Path>& locations) noexcept
-  : RuleCheckMessage(
-        Severity::Warning,
-        determineMessage(hole.getData().getDiameter(), minDiameter),
-        determineDescription(false, false), "minimum_drill_diameter_violation",
-        locations) {
-  mApproval->ensureLineBreak();
-  mApproval->appendChild("hole", hole.getData().getUuid());
-  mApproval->ensureLineBreak();
-}
-
-DrcMsgMinimumDrillDiameterViolation::DrcMsgMinimumDrillDiameterViolation(
-    const BI_Device& device, const Hole& hole,
-    const UnsignedLength& minDiameter, const QVector<Path>& locations) noexcept
-  : RuleCheckMessage(Severity::Warning,
-                     determineMessage(hole.getDiameter(), minDiameter),
-                     determineDescription(false, false),
+  : RuleCheckMessage(Severity::Warning, determineMessage(hole, minDiameter),
+                     determineDescription(hole),
                      "minimum_drill_diameter_violation", locations) {
   mApproval->ensureLineBreak();
-  mApproval->appendChild("device", device.getComponentInstanceUuid());
-  mApproval->ensureLineBreak();
-  mApproval->appendChild("hole", hole.getUuid());
-  mApproval->ensureLineBreak();
-}
-
-DrcMsgMinimumDrillDiameterViolation::DrcMsgMinimumDrillDiameterViolation(
-    const BI_Via& via, const UnsignedLength& minDiameter,
-    const QVector<Path>& locations) noexcept
-  : RuleCheckMessage(
-        Severity::Warning,
-        tr("Via drill diameter of '%1': %2 < %3 %4",
-           "Placeholders: Net name, actual diameter, minimum diameter")
-            .arg(via.getNetSegment().getNetNameToDisplay(true),
-                 via.getDrillDiameter()->toMmString(),
-                 minDiameter->toMmString(), "mm"),
-        determineDescription(true, false), "minimum_drill_diameter_violation",
-        locations) {
-  mApproval->ensureLineBreak();
-  mApproval->appendChild("netsegment", via.getNetSegment().getUuid());
-  mApproval->ensureLineBreak();
-  mApproval->appendChild("via", via.getUuid());
-  mApproval->ensureLineBreak();
-}
-
-DrcMsgMinimumDrillDiameterViolation::DrcMsgMinimumDrillDiameterViolation(
-    const BI_FootprintPad& pad, const PadHole& padHole,
-    const UnsignedLength& minDiameter, const QVector<Path>& locations) noexcept
-  : RuleCheckMessage(
-        Severity::Warning,
-        tr("Pad drill diameter of '%1': %2 < %3 %4",
-           "Placeholders: Net name, actual diameter, minimum diameter")
-            .arg(pad.getText(), padHole.getDiameter()->toMmString(),
-                 minDiameter->toMmString(), "mm"),
-        determineDescription(false, true), "minimum_drill_diameter_violation",
-        locations) {
-  mApproval->ensureLineBreak();
-  mApproval->appendChild("device", pad.getDevice().getComponentInstanceUuid());
-  mApproval->ensureLineBreak();
-  mApproval->appendChild("pad", pad.getLibPadUuid());
-  mApproval->ensureLineBreak();
-  mApproval->appendChild("hole", padHole.getUuid());
+  hole.serialize(*mApproval);
   mApproval->ensureLineBreak();
 }
 
 QString DrcMsgMinimumDrillDiameterViolation::determineMessage(
-    const PositiveLength& actualDiameter,
-    const UnsignedLength& minDiameter) noexcept {
-  return tr("NPTH drill diameter: %1 < %2 %3",
-            "Placeholders: Actual diameter, minimum diameter, unit")
-      .arg(actualDiameter->toMmString(), minDiameter->toMmString(), "mm");
+    const DrcHoleRef& hole, const UnsignedLength& minDiameter) noexcept {
+  if (hole.isViaHole()) {
+    return tr("Via drill diameter of '%1': %2 < %3 %4",
+              "Placeholders: Net name, actual diameter, minimum diameter")
+        .arg(netNameWithFallback(hole.getNetName()),
+             hole.getDiameter()->toMmString(), minDiameter->toMmString(), "mm");
+  } else if (const BoardDesignRuleCheckData::Pad* pad = hole.getPad()) {
+    return tr("Pad drill diameter of '%1': %2 < %3 %4",
+              "Placeholders: Net name, actual diameter, minimum diameter")
+        .arg(pad->libPkgPadName, hole.getDiameter()->toMmString(),
+             minDiameter->toMmString(), "mm");
+  } else {
+    return tr("NPTH drill diameter: %1 < %2 %3",
+              "Placeholders: Actual diameter, minimum diameter, unit")
+        .arg(hole.getDiameter()->toMmString(), minDiameter->toMmString(), "mm");
+  }
 }
 
 QString DrcMsgMinimumDrillDiameterViolation::determineDescription(
-    bool isVia, bool isPad) noexcept {
+    const DrcHoleRef& hole) noexcept {
   QString s;
-  if (isVia) {
+  if (hole.isViaHole()) {
     s +=
         tr("The drill diameter of the via is smaller than the minimum plated "
            "drill diameter configured in the DRC settings.");
-  } else if (isPad) {
+  } else if (hole.isPadHole()) {
     s +=
         tr("The drill diameter of the through-hole pad is smaller than the "
            "minimum plated drill diameter configured in the DRC settings.");
@@ -1428,62 +1276,36 @@ QString DrcMsgMinimumDrillDiameterViolation::determineDescription(
  ******************************************************************************/
 
 DrcMsgMinimumSlotWidthViolation::DrcMsgMinimumSlotWidthViolation(
-    const BI_Hole& hole, const UnsignedLength& minWidth,
+    const DrcHoleRef& hole, const UnsignedLength& minWidth,
     const QVector<Path>& locations) noexcept
-  : RuleCheckMessage(Severity::Warning,
-                     determineMessage(hole.getData().getDiameter(), minWidth),
-                     determineDescription(false),
-                     "minimum_slot_width_violation", locations) {
-  mApproval->ensureLineBreak();
-  mApproval->appendChild("hole", hole.getData().getUuid());
-  mApproval->ensureLineBreak();
-}
-
-DrcMsgMinimumSlotWidthViolation::DrcMsgMinimumSlotWidthViolation(
-    const BI_Device& device, const Hole& hole, const UnsignedLength& minWidth,
-    const QVector<Path>& locations) noexcept
-  : RuleCheckMessage(Severity::Warning,
-                     determineMessage(hole.getDiameter(), minWidth),
-                     determineDescription(false),
-                     "minimum_slot_width_violation", locations) {
-  mApproval->ensureLineBreak();
-  mApproval->appendChild("device", device.getComponentInstanceUuid());
-  mApproval->ensureLineBreak();
-  mApproval->appendChild("hole", hole.getUuid());
-  mApproval->ensureLineBreak();
-}
-
-DrcMsgMinimumSlotWidthViolation::DrcMsgMinimumSlotWidthViolation(
-    const BI_FootprintPad& pad, const PadHole& padHole,
-    const UnsignedLength& minWidth, const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Warning,
-        tr("Pad slot width of '%1': %2 < %3 %4",
-           "Placeholders: Net name, actual width, minimum width, unit")
-            .arg(pad.getText(), padHole.getDiameter()->toMmString(),
-                 minWidth->toMmString(), "mm"),
-        determineDescription(true), "minimum_slot_width_violation", locations) {
+        determineMessage(hole.isPlated(), hole.getDiameter(), minWidth),
+        determineDescription(hole.isPlated()), "minimum_slot_width_violation",
+        locations) {
   mApproval->ensureLineBreak();
-  mApproval->appendChild("device", pad.getDevice().getComponentInstanceUuid());
-  mApproval->ensureLineBreak();
-  mApproval->appendChild("pad", pad.getLibPadUuid());
-  mApproval->ensureLineBreak();
-  mApproval->appendChild("hole", padHole.getUuid());
+  hole.serialize(*mApproval);
   mApproval->ensureLineBreak();
 }
 
 QString DrcMsgMinimumSlotWidthViolation::determineMessage(
-    const PositiveLength& actualWidth,
+    bool plated, const PositiveLength& actualWidth,
     const UnsignedLength& minWidth) noexcept {
-  return tr("NPTH slot width: %1 < %2 %3",
-            "Placeholders: Actual width, minimum width, unit")
-      .arg(actualWidth->toMmString(), minWidth->toMmString(), "mm");
+  if (plated) {
+    return tr("Plated slot width: %1 < %2 %3",
+              "Placeholders: Actual width, minimum width, unit")
+        .arg(actualWidth->toMmString(), minWidth->toMmString(), "mm");
+  } else {
+    return tr("NPTH slot width: %1 < %2 %3",
+              "Placeholders: Actual width, minimum width, unit")
+        .arg(actualWidth->toMmString(), minWidth->toMmString(), "mm");
+  }
 }
 
 QString DrcMsgMinimumSlotWidthViolation::determineDescription(
-    bool isPad) noexcept {
+    bool plated) noexcept {
   QString s;
-  if (isPad) {
+  if (plated) {
     s +=
         tr("The width of the plated slot is smaller than the minimum plated "
            "slot width configured in the DRC settings.");
@@ -1502,23 +1324,23 @@ QString DrcMsgMinimumSlotWidthViolation::determineDescription(
  ******************************************************************************/
 
 DrcMsgInvalidPadConnection::DrcMsgInvalidPadConnection(
-    const BI_FootprintPad& pad, const Layer& layer,
+    const BoardDesignRuleCheckData::Device& device,
+    const BoardDesignRuleCheckData::Pad& pad, const Layer& layer,
     const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Error,
         tr("Invalid connection of pad '%1' on '%2'",
            "Placeholders: Pad name, layer name")
-            .arg(pad.getText()),
+            .arg(pad.libPkgPadName),
         tr("The pad origin must be located within the pads copper area, "
            "or for THT pads within a hole. Otherwise traces might not be"
-           "connected fully. This issue needs to be fixed in the "
-           "library."),
+           "connected fully. This issue needs to be fixed in the library."),
         "invalid_pad_connection", locations) {
   mApproval->appendChild("layer", layer);
   mApproval->ensureLineBreak();
-  mApproval->appendChild("device", pad.getDevice().getComponentInstanceUuid());
+  mApproval->appendChild("device", device.uuid);
   mApproval->ensureLineBreak();
-  mApproval->appendChild("pad", pad.getLibPadUuid());
+  mApproval->appendChild("pad", pad.uuid);
   mApproval->ensureLineBreak();
 }
 
@@ -1527,41 +1349,23 @@ DrcMsgInvalidPadConnection::DrcMsgInvalidPadConnection(
  ******************************************************************************/
 
 DrcMsgForbiddenSlot::DrcMsgForbiddenSlot(
-    const BI_Hole& hole, const QVector<Path>& locations) noexcept
-  : RuleCheckMessage(Severity::Warning,
-                     determineMessage(hole.getData().getPath()),
-                     determineDescription(hole.getData().getPath()),
-                     "forbidden_slot", locations) {
-  mApproval->ensureLineBreak();
-  mApproval->appendChild("hole", hole.getData().getUuid());
-  mApproval->ensureLineBreak();
-}
-
-DrcMsgForbiddenSlot::DrcMsgForbiddenSlot(
-    const BI_Device& device, const Hole& hole,
+    const BoardDesignRuleCheckData::Hole& hole,
+    const BoardDesignRuleCheckData::Device* device,
+    const BoardDesignRuleCheckData::Pad* pad,
     const QVector<Path>& locations) noexcept
-  : RuleCheckMessage(Severity::Warning, determineMessage(hole.getPath()),
-                     determineDescription(hole.getPath()), "forbidden_slot",
+  : RuleCheckMessage(Severity::Warning, determineMessage(hole.path),
+                     determineDescription(hole.path), "forbidden_slot",
                      locations) {
   mApproval->ensureLineBreak();
-  mApproval->appendChild("device", device.getComponentInstanceUuid());
-  mApproval->ensureLineBreak();
-  mApproval->appendChild("hole", hole.getUuid());
-  mApproval->ensureLineBreak();
-}
-
-DrcMsgForbiddenSlot::DrcMsgForbiddenSlot(
-    const BI_FootprintPad& pad, const PadHole& padHole,
-    const QVector<Path>& locations) noexcept
-  : RuleCheckMessage(Severity::Warning, determineMessage(padHole.getPath()),
-                     determineDescription(padHole.getPath()), "forbidden_slot",
-                     locations) {
-  mApproval->ensureLineBreak();
-  mApproval->appendChild("device", pad.getDevice().getComponentInstanceUuid());
-  mApproval->ensureLineBreak();
-  mApproval->appendChild("pad", pad.getLibPadUuid());
-  mApproval->ensureLineBreak();
-  mApproval->appendChild("hole", padHole.getUuid());
+  if (device) {
+    mApproval->appendChild("device", device->uuid);
+    mApproval->ensureLineBreak();
+  }
+  if (pad) {
+    mApproval->appendChild("pad", pad->uuid);
+    mApproval->ensureLineBreak();
+  }
+  mApproval->appendChild("hole", hole.uuid);
   mApproval->ensureLineBreak();
 }
 
@@ -1605,29 +1409,34 @@ QString DrcMsgForbiddenSlot::determineDescription(
  *  DrcMsgForbiddenVia
  ******************************************************************************/
 
-DrcMsgForbiddenVia::DrcMsgForbiddenVia(const BI_Via& via,
-                                       const QVector<Path>& locations) noexcept
-  : RuleCheckMessage(Severity::Error, determineMessage(via),
+DrcMsgForbiddenVia::DrcMsgForbiddenVia(
+    const BoardDesignRuleCheckData::Segment& ns, const Data::Via& via,
+    const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(Severity::Error, determineMessage(ns, via),
                      determineDescription(via), "forbidden_via", locations) {
   mApproval->ensureLineBreak();
-  mApproval->appendChild("via", via.getUuid());
+  mApproval->appendChild("netsegment", ns.uuid);
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("via", via.uuid);
   mApproval->ensureLineBreak();
 }
 
-QString DrcMsgForbiddenVia::determineMessage(const BI_Via& via) noexcept {
-  const QString net = via.getNetSegment().getNetNameToDisplay(true);
-  if (via.getVia().isBlind()) {
-    return tr("Blind via in net '%1'").arg(net);
+QString DrcMsgForbiddenVia::determineMessage(
+    const BoardDesignRuleCheckData::Segment& ns,
+    const Data::Via& via) noexcept {
+  if (via.isBlind) {
+    return tr("Blind via in net '%1'").arg(netNameWithFallback(ns.netName));
   } else {
-    return tr("Buried via in net '%1'").arg(net);
+    return tr("Buried via in net '%1'").arg(netNameWithFallback(ns.netName));
   }
 }
 
-QString DrcMsgForbiddenVia::determineDescription(const BI_Via& via) noexcept {
+QString DrcMsgForbiddenVia::determineDescription(
+    const Data::Via& via) noexcept {
   const QString suggestion = "\n" %
       tr("Either avoid them or check if your PCB manufacturer supports them "
          "and adjust the DRC settings accordingly.");
-  if (via.getVia().isBlind()) {
+  if (via.isBlind) {
     return tr("Blind vias are expensive to manufacture and not every PCB "
               "manufacturer is able to create them.") %
         suggestion;
@@ -1643,28 +1452,27 @@ QString DrcMsgForbiddenVia::determineDescription(const BI_Via& via) noexcept {
  ******************************************************************************/
 
 DrcMsgSilkscreenClearanceViolation::DrcMsgSilkscreenClearanceViolation(
-    const BI_StrokeText& strokeText, const UnsignedLength& minClearance,
-    const QVector<Path>& locations) noexcept
+    const Data::StrokeText& st, const BoardDesignRuleCheckData::Device* device,
+    const UnsignedLength& minClearance, const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Warning,
         tr("Clearance silkscreen text ↔ stop mask < %1 %2",
            "Placeholders: Clearance value, unit")
             .arg(minClearance->toMmString(), "mm"),
         tr("The clearance between a silkscreen text and a solder resist "
-           "opening "
-           "is smaller than the minimum clearance configured in the DRC "
-           "settings. This could lead to clipped silkscreen during "
+           "opening is smaller than the minimum clearance configured in the "
+           "DRC settings. This could lead to clipped silkscreen during "
            "production.") %
             "\n\n" %
             tr("Check the DRC settings and move the text away from the "
                "solder resist opening if needed."),
         "silkscreen_clearance_violation", locations) {
   mApproval->ensureLineBreak();
-  if (const BI_Device* device = strokeText.getDevice()) {
-    mApproval->appendChild("device", device->getComponentInstanceUuid());
+  if (device) {
+    mApproval->appendChild("device", device->uuid);
     mApproval->ensureLineBreak();
   }
-  mApproval->appendChild("stroke_text", strokeText.getData().getUuid());
+  mApproval->appendChild("stroke_text", st.uuid);
   mApproval->ensureLineBreak();
 }
 
@@ -1672,14 +1480,14 @@ DrcMsgSilkscreenClearanceViolation::DrcMsgSilkscreenClearanceViolation(
  *  DrcMsgUselessZone
  ******************************************************************************/
 
-DrcMsgUselessZone::DrcMsgUselessZone(const BI_Zone& zone,
+DrcMsgUselessZone::DrcMsgUselessZone(const Data::Zone& zone,
                                      const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Warning, tr("Useless zone"),
         tr("The zone has no layer or rule enabled so it is useless."),
         "useless_zone", locations) {
   mApproval->ensureLineBreak();
-  mApproval->appendChild("zone", zone.getData().getUuid());
+  mApproval->appendChild("zone", zone.uuid);
   mApproval->ensureLineBreak();
 }
 
@@ -1687,16 +1495,19 @@ DrcMsgUselessZone::DrcMsgUselessZone(const BI_Zone& zone,
  *  DrcMsgUselessVia
  ******************************************************************************/
 
-DrcMsgUselessVia::DrcMsgUselessVia(const BI_Via& via,
+DrcMsgUselessVia::DrcMsgUselessVia(const BoardDesignRuleCheckData::Segment& ns,
+                                   const Data::Via& via,
                                    const QVector<Path>& locations) noexcept
   : RuleCheckMessage(Severity::Warning,
                      tr("Useless via in net '%1'", "Placeholders: Net name")
-                         .arg(via.getNetSegment().getNetNameToDisplay(true)),
+                         .arg(netNameWithFallback(ns.netName)),
                      tr("The via is connected on less than two layers, thus it "
                         "seems to be useless."),
                      "useless_via", locations) {
   mApproval->ensureLineBreak();
-  mApproval->appendChild("via", via.getUuid());
+  mApproval->appendChild("netsegment", ns.uuid);
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("via", via.uuid);
   mApproval->ensureLineBreak();
 }
 

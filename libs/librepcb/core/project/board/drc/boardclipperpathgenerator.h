@@ -26,6 +26,7 @@
 #include "../../../geometry/path.h"
 #include "../../../types/length.h"
 #include "../../../utils/transform.h"
+#include "boarddesignrulecheckdata.h"
 
 #include <polyclipping/clipper.hpp>
 
@@ -36,30 +37,20 @@
  ******************************************************************************/
 namespace librepcb {
 
-class BI_FootprintPad;
-class BI_NetLine;
-class BI_Plane;
-class BI_StrokeText;
-class BI_Via;
-class Board;
-class Circle;
-class Hole;
-class Layer;
-class NetSignal;
-
 /*******************************************************************************
  *  Class BoardClipperPathGenerator
  ******************************************************************************/
 
 /**
- * @brief The BoardClipperPathGenerator class creates a Clipper path from
- *        a ::librepcb::Board
+ * @brief Helper to create Clipper paths for ::librepcb::BoardDesignRuleCheck
  */
 class BoardClipperPathGenerator final {
 public:
+  using Data = BoardDesignRuleCheckData;
+
   // Constructors / Destructor
   explicit BoardClipperPathGenerator(
-      Board& board, const PositiveLength& maxArcTolerance) noexcept;
+      const PositiveLength& maxArcTolerance) noexcept;
   ~BoardClipperPathGenerator() noexcept;
 
   // Getters
@@ -67,27 +58,27 @@ public:
   void takePathsTo(ClipperLib::Paths& out) noexcept;
 
   // General Methods
-  void addCopper(const Layer& layer, const QSet<const NetSignal*>& netsignals,
+  void addCopper(const Data& data, const Layer& layer,
+                 const QSet<tl::optional<Uuid>>& netsignals,
                  bool ignorePlanes = false);
-  void addStopMaskOpenings(const Layer& layer,
+  void addStopMaskOpenings(const Data& data, const Layer& layer,
                            const Length& offset = Length(0));
-  void addVia(const BI_Via& via, const Length& offset = Length(0));
-  void addNetLine(const BI_NetLine& netLine, const Length& offset = Length(0));
-  void addPlane(const BI_Plane& plane);
+  void addVia(const Data::Via& via, const Length& offset = Length(0));
+  void addTrace(const Data::Trace& trace, const Length& offset = Length(0));
+  void addPlane(const QVector<Path>& fragments);
   void addPolygon(const Path& path, const UnsignedLength& lineWidth,
                   bool filled, const Length& offset = Length(0));
-  void addCircle(const Circle& circle, const Transform& transform,
+  void addCircle(const Data::Circle& circle, const Transform& transform,
                  const Length& offset = Length(0));
-  void addStrokeText(const BI_StrokeText& strokeText,
+  void addStrokeText(const Data::StrokeText& strokeText,
                      const Length& offset = Length(0));
   void addHole(const PositiveLength& diameter, const NonEmptyPath& path,
                const Transform& transform = Transform(),
                const Length& offset = Length(0));
-  void addPad(const BI_FootprintPad& pad, const Layer& layer,
+  void addPad(const Data::Pad& pad, const Layer& layer,
               const Length& offset = Length(0));
 
 private:  // Data
-  Board& mBoard;
   PositiveLength mMaxArcTolerance;
   ClipperLib::Paths mPaths;
 };

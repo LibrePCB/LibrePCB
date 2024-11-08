@@ -22,19 +22,15 @@
  ******************************************************************************/
 #include <gtest/gtest.h>
 #include <librepcb/core/application.h>
-#include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/project/board/board.h>
-#include <librepcb/core/project/board/boardplanefragmentsbuilder.h>
-#include <librepcb/core/project/board/items/bi_plane.h>
+#include <librepcb/core/project/board/drc/boarddesignrulecheck.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectloader.h>
 #include <librepcb/core/serialization/sexpression.h>
-#include <librepcb/core/types/layer.h>
+#include <librepcb/core/utils/toolbox.h>
 
 #include <QtCore>
-
-#include <chrono>
 
 /*******************************************************************************
  *  Namespace
@@ -46,27 +42,22 @@ namespace tests {
  *  Test Class
  ******************************************************************************/
 
-/**
- * @brief The BoardPlaneFragmentsBuilderTest checks if board plane fragments are
- * correct
- *
- * In the test data directory is a project containing some planes and a file
- * with the expected paths of all plane fragments. This test then re-calculates
- * all plane fragments and compares them with the expected fragments.
- */
-class BoardPlaneFragmentsBuilderTest : public ::testing::Test {};
+class BoardDesignRuleCheckTest : public ::testing::Test {};
 
 /*******************************************************************************
  *  Test Methods
  ******************************************************************************/
 
-TEST(BoardPlaneFragmentsBuilderTest, testFragments) {
-  FilePath testDataDir(
-      TEST_DATA_DIR
-      "/unittests/librepcbproject/BoardPlaneFragmentsBuilderTest");
+TEST(BoardDesignRuleCheckTest, testMessages) {
+  // Ignore certain messages in all boards, except on whitelisted ones.
+  QHash<QString, QStringList> whitelist = {
+      {"missing_device", {"checkForUnplacedComponents"}},
+      {"missing_connection", {"checkForMissingConnections"}},
+      {"unused_layer", {"checkUsedLayers"}},
+  };
 
-  // open project from test data directory
-  FilePath projectFp(TEST_DATA_DIR "/projects/Nested Planes/project.lpp");
+  // Open project from test data directory.
+  FilePath projectFp(TEST_DATA_DIR "/projects/DRC/project.lpp");
   std::shared_ptr<TransactionalFileSystem> projectFs =
       TransactionalFileSystem::openRO(projectFp.getParentDir());
   ProjectLoader loader;
@@ -74,44 +65,67 @@ TEST(BoardPlaneFragmentsBuilderTest, testFragments) {
       loader.open(std::unique_ptr<TransactionalDirectory>(
                       new TransactionalDirectory(projectFs)),
                   projectFp.getFilename());  // can throw
-  Board* board = project->getBoards().first();
 
-  // force planes rebuild
-  BoardPlaneFragmentsBuilder builder;
-  const QHash<Uuid, QVector<Path>> result =
-      builder.runAndApply(*board);  // can throw
+  // Run DRC for each board.
+  foreach (Board* board, project->getBoards()) {
+    std::cout << "- Run DRC for board '" << board->getName()->toStdString()
+              << "':\n";
 
-  // Check if fragments have been applied.
-  foreach (const BI_Plane* plane, board->getPlanes()) {
-    EXPECT_TRUE(plane->getFragments() == result[plane->getUuid()]);
-  }
+    BoardDesignRuleCheck drc;
+    drc.start(*board, board->getDrcSettings(), false);
+    const BoardDesignRuleCheck::Result result = drc.waitForFinished();
 
-  // write actual plane fragments into file (useful for debugging purposes)
-  std::unique_ptr<SExpression> actualSexpr = SExpression::createList("actual");
-  foreach (const Uuid& uuid, Toolbox::sorted(result.keys())) {
-    std::unique_ptr<SExpression> child = SExpression::createList("plane");
-    child->appendChild(uuid);
-    foreach (const Path& fragment, result[uuid]) {
-      child->ensureLineBreak();
-      fragment.serialize(child->appendList("fragment"));
+    // Filter messages, get approvals and check uniqueness of their approval.
+    QSet<SExpression> approvals;
+    for (const auto& msg : result.messages) {
+      // Skip some messages.
+      const QString msgType = msg->getApproval().getChild("@0").getValue();
+      if (whitelist.contains(msgType)) {
+        if (!whitelist[msgType].contains(*board->getName())) {
+          continue;
+        }
+      }
+
+      // Check for ambiguous approvals.
+      if (approvals.contains(msg->getApproval())) {
+        std::cout << "  * Ambiguous approval for message '"
+                  << msg->getMessage().toStdString() << "':\n"
+                  << msg->getApproval().toByteArray().toStdString() << "\n";
+        ADD_FAILURE();
+      }
+
+      approvals.insert(msg->getApproval());
     }
-    child->ensureLineBreak();
-    actualSexpr->ensureLineBreak();
-    actualSexpr->appendChild(std::move(child));
-  }
-  actualSexpr->ensureLineBreak();
-  QByteArray actual = actualSexpr->toByteArray();
-  FileUtils::writeFile(testDataDir.getPathTo("actual.lp"), actual);
 
-  // compare with expected plane fragments loaded from file
-  FilePath expectedFp = testDataDir.getPathTo("expected.lp");
-  QByteArray expected = FileUtils::readFile(expectedFp);
-  EXPECT_EQ(expected.toStdString(), actual.toStdString());
+    // Build actual approvals.
+    std::unique_ptr<SExpression> actual = SExpression::createList("node");
+    foreach (const SExpression& node, Toolbox::sortedQSet(approvals)) {
+      actual->ensureLineBreak();
+      actual->appendChild(node);
+    }
+    actual->ensureLineBreak();
+
+    // Build expected approvals.
+    std::unique_ptr<SExpression> expected = SExpression::createList("node");
+    foreach (const SExpression& node,
+             Toolbox::sortedQSet(board->getDrcMessageApprovals())) {
+      expected->ensureLineBreak();
+      expected->appendChild(node);
+    }
+    expected->ensureLineBreak();
+
+    // Compare.
+    std::cout << "  * Emitted " << approvals.count() << " messages, "
+              << board->getDrcMessageApprovals().count() << " approved\n";
+    EXPECT_EQ(expected->toByteArray().toStdString(),
+              actual->toByteArray().toStdString());
+    EXPECT_EQ(board->getDrcMessageApprovals().count(), approvals.count());
+  }
 }
 
-TEST(BoardPlaneFragmentsBuilderTest, testManyThreads) {
+TEST(BoardDesignRuleCheckTest, testMultithreading) {
   // open project from test data directory
-  FilePath projectFp(TEST_DATA_DIR "/projects/Nested Planes/project.lpp");
+  FilePath projectFp(TEST_DATA_DIR "/projects/Gerber Test/project.lpp");
   std::shared_ptr<TransactionalFileSystem> projectFs =
       TransactionalFileSystem::openRO(projectFp.getParentDir());
   ProjectLoader loader;
@@ -120,48 +134,22 @@ TEST(BoardPlaneFragmentsBuilderTest, testManyThreads) {
                       new TransactionalDirectory(projectFs)),
                   projectFp.getFilename());  // can throw
   Board* board = project->getBoards().first();
-
-  // Copy planes on top layer to more layers, otherwise this test is quite
-  // meaningless.
-  board->setInnerLayerCount(40);
-  const QSet<const Layer*> otherLayers =
-      board->getCopperLayers() - QSet<const Layer*>{&Layer::topCopper()};
-  foreach (BI_Plane* plane, board->getPlanes()) {
-    foreach (const Layer* layer, otherLayers) {
-      BI_Plane* newPlane =
-          new BI_Plane(*board, Uuid::createRandom(), *layer,
-                       plane->getNetSignal(), plane->getOutline());
-      board->addPlane(*newPlane);
-    }
-  }
-  std::cout << "Testing with " << board->getPlanes().count() << " planes on "
-            << board->getCopperLayers().count() << " layers.\n";
 
   // Run several times to heavily test multithreading.
   const int runs = qBound(10, QThread::idealThreadCount() * 8, 50);
   qreal totalTimeMs = 0;
-  BoardPlaneFragmentsBuilder builder;
-  QHash<Uuid, QVector<Path>> firstResult;
+  BoardDesignRuleCheck drc;
   for (int i = 0; i < runs; ++i) {
     std::chrono::time_point<std::chrono::high_resolution_clock> start =
         std::chrono::high_resolution_clock::now();
-    builder.start(*board);
-    BoardPlaneFragmentsBuilder::Result result = builder.waitForFinished();
+    drc.start(*board, board->getDrcSettings(), false);
+    const BoardDesignRuleCheck::Result result = drc.waitForFinished();
     std::chrono::duration<double> elapsed =
         std::chrono::high_resolution_clock::now() - start;
     totalTimeMs += elapsed.count() * 1000;
 
     // Check result.
-    EXPECT_EQ(board, result.board);
     EXPECT_EQ(0, result.errors.count());
-    EXPECT_TRUE(result.finished);
-
-    // Check if every run leads to the same plane fragments.
-    if (i == 0) {
-      firstResult = result.planes;
-    } else {
-      EXPECT_TRUE(result.planes == firstResult);
-    }
   }
   std::cout << "Average time over " << runs << " runs: " << (totalTimeMs / runs)
             << " ms\n";

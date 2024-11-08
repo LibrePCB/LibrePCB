@@ -36,6 +36,8 @@ namespace librepcb {
 
 /**
  * @brief The Layer class provides all supported geometry layers
+ *
+ * @note All methods of this class are thread-safe.
  */
 class Layer final {
   Q_DECLARE_TR_FUNCTIONS(Layer)
