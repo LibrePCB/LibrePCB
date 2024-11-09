@@ -64,6 +64,13 @@ public:
   bool openWebUrl(const QUrl& url) const noexcept;
   bool openLocalPath(const FilePath& filePath) const noexcept;
 
+  // Static Methods
+  static void downloadAndOpenResourceAsync(const WorkspaceSettings& settings,
+                                           const QString& name,
+                                           const QString& mediaType,
+                                           const QUrl& url,
+                                           QPointer<QWidget> parent) noexcept;
+
   // Operator Overloadings
   DesktopServices& operator=(const DesktopServices& rhs) = delete;
 

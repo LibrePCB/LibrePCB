@@ -22,7 +22,10 @@
  ******************************************************************************/
 #include "desktopservices.h"
 
+#include <librepcb/core/application.h>
 #include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/network/filedownload.h>
+#include <librepcb/core/types/fileproofname.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
@@ -88,6 +91,93 @@ bool DesktopServices::openLocalPath(const FilePath& filePath) const noexcept {
                                     mSettings.externalPdfReaderCommands.get());
   } else {
     return openUrlFallback(QUrl::fromLocalFile(filePath.toNative()));
+  }
+}
+
+void DesktopServices::downloadAndOpenResourceAsync(
+    const WorkspaceSettings& settings, const QString& name,
+    const QString& mediaType, const QUrl& url,
+    QPointer<QWidget> parent) noexcept {
+  // Determine destination directory. This must not be /tmp as it may no
+  // accessible for applications outside of a sandboxed librepcb.
+  const QString md5 = QCryptographicHash::hash(url.toDisplayString().toUtf8(),
+                                               QCryptographicHash::Md5)
+                          .toHex();
+  const FilePath dstDir =
+      Application::getCacheDir().getPathTo("resources").getPathTo(md5);
+
+  // Determine destination file path.
+  QHash<QString, QString> extensions = {
+      // clang-format off
+     {"application/msword", ".doc"},
+     {"application/pdf", ".pdf"},
+     {"application/vnd.oasis.opendocument.text", ".odt"},
+     {"application/vnd.openxmlformats-officedocument.wordprocessingml.document", ".docx"},
+     {"application/zip", ".zip"},
+      // clang-format on
+  };
+  const QString ext = extensions.value(mediaType);
+  QString fileName = url.fileName();
+  if (fileName.toLower().endsWith(ext)) fileName.chop(ext.count());
+  fileName = cleanFileProofName(fileName);
+  if (fileName.isEmpty()) fileName = cleanFileProofName(name);
+  if (fileName.isEmpty()) fileName = "unnamed";
+  fileName += ext;
+  const FilePath dst = dstDir.getPathTo(fileName);
+
+  // If the destination directory exists, but the file not, clean the directory
+  // as maybe it has been renamed -> avoid cluttering the cache with old files.
+  if (dstDir.isExistingDir() && (!dst.isExistingFile())) {
+    QDir(dstDir.toStr()).removeRecursively();
+  }
+
+  // Helper to open the local file.
+  auto doOpen = [&settings, parent, dst]() {
+    DesktopServices ds(settings, parent);
+    ds.openLocalPath(dst);
+  };
+
+  // If the file exists, just open it. Otherwise download it first.
+  if (dst.isExistingFile()) {
+    doOpen();
+  } else {
+    QProgressDialog dlg(parent);
+    dlg.setWindowModality(Qt::WindowModal);
+    dlg.setLabelText(url.toDisplayString());
+    dlg.setAutoClose(false);
+    dlg.setAutoReset(false);
+
+    // Determine accepted types (without it, some downloads fail).
+    QStringList accepted;
+    if (extensions.contains(mediaType)) {
+      accepted.append(mediaType % ";q=0.9");
+    }
+    accepted.append("*/*;q=0.8");
+
+    FileDownload* dl = new FileDownload(url, dst);
+    dl->setHeaderField("Accept", accepted.join(", ").toUtf8());
+    // Some websites block non-browser downloads so let's fake the user agent.
+    dl->useBrowserUserAgent();
+    QObject::connect(dl, &FileDownload::progressPercent, &dlg,
+                     &QProgressDialog::setValue);
+    QObject::connect(dl, &FileDownload::finished, &dlg,
+                     &QProgressDialog::accept);
+    QObject::connect(
+        dl, &FileDownload::errored, parent,
+        [&settings, url, parent]() {
+          // Failed, now try it in the web browser.
+          qInfo()
+              << "Failed to download resource, try it in the web browser...";
+          DesktopServices ds(settings, parent);
+          ds.openUrl(url);
+        },
+        Qt::QueuedConnection);
+    QObject::connect(dl, &FileDownload::succeeded, parent, doOpen,
+                     Qt::QueuedConnection);
+    QObject::connect(&dlg, &QProgressDialog::canceled, dl,
+                     &FileDownload::abort);
+    dl->start();
+    dlg.exec();  // Blocks until download is finished.
   }
 }
 

@@ -24,16 +24,26 @@
 
 #include "../dialogs/filedialog.h"
 #include "../undostack.h"
+#include "../utils/menubuilder.h"
+#include "../workspace/desktopservices.h"
 #include "boardeditor/boardeditor.h"
 #include "orderpcbdialog.h"
+#include "partinformationprovider.h"
 #include "schematiceditor/schematiceditor.h"
 
 #include <librepcb/core/application.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/library/cmp/component.h>
+#include <librepcb/core/library/dev/device.h>
+#include <librepcb/core/project/board/items/bi_device.h>
+#include <librepcb/core/project/circuit/circuit.h>
+#include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/erc/electricalrulecheck.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectlibrary.h>
 #include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
@@ -145,9 +155,161 @@ const LengthUnit& ProjectEditor::getDefaultLengthUnit() const noexcept {
   return mWorkspace.getSettings().defaultLengthUnit.get();
 }
 
+ResourceList ProjectEditor::getComponentResources(
+    const ComponentInstance& cmp,
+    const tl::optional<Uuid>& filterDev) const noexcept {
+  // Helper to skip duplicate URLs.
+  ResourceList resources;
+  QSet<QUrl> urls;
+  auto addResources = [&](const ResourceList& list) {
+    for (const Resource& res : list) {
+      if (res.getUrl().isValid() && (!urls.contains(res.getUrl()))) {
+        resources.append(std::make_shared<Resource>(res));
+        urls.insert(res.getUrl());
+      }
+    }
+  };
+
+  // Helper to catch exceptions and provide fallback resources.
+  auto tryAddResources = [&](std::function<ResourceList()> getter,
+                             const ResourceList& fallback) {
+    ResourceList lst;
+    try {
+      lst = getter();  // can throw
+    } catch (const Exception& e) {
+      qWarning() << "Failed to get resources:" << e.getMsg();
+    }
+    addResources(lst.isEmpty() ? fallback : lst);
+  };
+
+  // Get resources of component.
+  tryAddResources(
+      [&]() {
+        return mWorkspace.getLibraryDb().getResources<Component>(
+            mWorkspace.getLibraryDb().getLatest<Component>(
+                cmp.getLibComponent().getUuid()));
+      },
+      cmp.getLibComponent().getResources());
+
+  // Determine relevant devices.
+  QList<Uuid> devices;
+  if (filterDev) {
+    devices.append(*filterDev);
+  } else {
+    for (const BI_Device* dev : cmp.getDevices()) {
+      if (!devices.contains(dev->getLibDevice().getUuid())) {
+        devices.append(dev->getLibDevice().getUuid());
+      }
+    }
+    for (const ComponentAssemblyOption& option : cmp.getAssemblyOptions()) {
+      if (!devices.contains(option.getDevice())) {
+        devices.append(option.getDevice());
+      }
+    }
+  }
+
+  // Get resources of devices.
+  for (const Uuid& uuid : devices) {
+    const Device* dev =
+        cmp.getCircuit().getProject().getLibrary().getDevice(uuid);
+    tryAddResources(
+        [&]() {
+          return mWorkspace.getLibraryDb().getResources<Device>(
+              mWorkspace.getLibraryDb().getLatest<Device>(uuid));
+        },
+        dev ? dev->getResources() : ResourceList());
+  }
+
+  return resources;
+}
+
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
+
+void ProjectEditor::addResourcesToMenu(MenuBuilder& mb,
+                                       const ComponentInstance& cmp,
+                                       const tl::optional<Uuid>& filterDev,
+                                       QPointer<QWidget> editor,
+                                       QMenu* root) const noexcept {
+  // Get all relevant resources.
+  ResourceList resources = getComponentResources(cmp, filterDev);
+
+  // Limit number of resources.
+  while (resources.count() > 15) {
+    resources.remove(resources.count() - 1);
+  }
+
+  // Detect duplicate names.
+  QStringList names;
+  for (const auto& res : resources) {
+    names.append(*res.getName());
+  }
+
+  // Build list of actions.
+  QList<QAction*> actions;
+  for (const Resource& res : resources) {
+    QString name = *res.getName();
+    if (names.count(name) > 1) {
+      name += " (" % res.getUrl().fileName() % ")";
+    }
+    if (name.length() > 100) {
+      name = name.left(97) + "…";
+    }
+    QAction* a =
+        new QAction(QIcon(":/img/actions/pdf.png"), name % "...", root);
+    connect(a, &QAction::triggered, this, [this, res, editor]() {
+      DesktopServices::downloadAndOpenResourceAsync(
+          mWorkspace.getSettings(), *res.getName(), res.getMediaType(),
+          res.getUrl(), editor);
+    });
+    actions.append(a);
+  }
+
+  // If MPNs are available, provide search through API.
+  if (!mWorkspace.getSettings().apiEndpoints.get().isEmpty()) {
+    QList<Part> parts;
+    for (const ComponentAssemblyOption& ao : cmp.getAssemblyOptions()) {
+      for (const Part& part : ao.getParts()) {
+        std::shared_ptr<PartInformationProvider::PartInformation> info =
+            PartInformationProvider::instance().getPartInfo(
+                PartInformationProvider::Part{*part.getMpn(),
+                                              *part.getManufacturer()});
+        if ((!part.getMpn()->isEmpty()) &&
+            (!part.getManufacturer()->isEmpty()) &&
+            ((!info) || (info->resources.value(0).url.isValid())) &&
+            (!parts.contains(part)) && (actions.count() < 20)) {
+          QAction* a = new QAction(
+              QIcon(":/img/actions/search.png"),
+              tr("Search datasheet for '%1'").arg(*part.getMpn()) % "...",
+              root);
+          connect(a, &QAction::triggered, this, [this, part, editor]() {
+            searchAndOpenDatasheet(*part.getMpn(), *part.getManufacturer(),
+                                   editor);
+          });
+          actions.append(a);
+          parts.append(part);
+        }
+      }
+    }
+  }
+
+  // Add menu items.
+  if (!actions.isEmpty()) {
+    mb.addSeparator();
+  }
+  const int nRoot = actions.count() > 3 ? 2 : 3;
+  for (int i = 0; i < std::min(static_cast<int>(actions.count()), nRoot); ++i) {
+    mb.addAction(actions.at(i));
+  }
+  if (actions.count() > nRoot) {
+    QMenu* sm = mb.addSubMenu(&MenuBuilder::createMoreResourcesMenu);
+    MenuBuilder smb(sm);
+    for (int i = nRoot; i < actions.count(); ++i) {
+      smb.addAction(actions.at(i));
+    }
+  }
+}
 
 void ProjectEditor::abortBlockingToolsInOtherEditors(QWidget* editor) noexcept {
   if (mUndoStack->isCommandGroupActive()) {
@@ -482,6 +644,47 @@ int ProjectEditor::getCountOfVisibleEditorWindows() const noexcept {
     count++;
   }
   return count;
+}
+
+void ProjectEditor::searchAndOpenDatasheet(
+    const QString& mpn, const QString& manufacturer,
+    QPointer<QWidget> parent) const noexcept {
+  auto openPartDatasheet =
+      [this,
+       parent](std::shared_ptr<PartInformationProvider::PartInformation> info) {
+        if (info && (!info->resources.isEmpty()) &&
+            (info->resources[0].url.isValid())) {
+          DesktopServices::downloadAndOpenResourceAsync(
+              mWorkspace.getSettings(), info->mpn, info->resources[0].mediaType,
+              info->resources[0].url, parent);
+        } else {
+          QMessageBox::information(
+              parent, tr("No datasheet found"),
+              tr("Sorry, no datasheet found for the requested part :-("));
+        }
+      };
+
+  PartInformationProvider& pip = PartInformationProvider::instance();
+  const PartInformationProvider::Part pipPart{mpn, manufacturer};
+  if (auto info = pip.getPartInfo(pipPart)) {
+    openPartDatasheet(info);
+    return;
+  }
+  QGuiApplication::setOverrideCursor(Qt::WaitCursor);
+  if ((!pip.isOperational()) && (!pip.startOperation(5000))) {
+    QGuiApplication::restoreOverrideCursor();
+    QMessageBox::critical(parent, tr("Error"),
+                          "Sorry, the API server is currently not "
+                          "available. Please try again later.");
+    return;
+  }
+  if (!pip.isOngoing(pipPart)) {
+    pip.scheduleRequest(pipPart);
+  }
+  pip.requestScheduledParts();
+  auto part = pip.waitForPartInfo(pipPart, 5000);
+  QGuiApplication::restoreOverrideCursor();
+  openPartDatasheet(part);
 }
 
 /*******************************************************************************

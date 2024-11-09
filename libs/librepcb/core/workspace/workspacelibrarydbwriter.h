@@ -264,6 +264,26 @@ public:
   }
 
   /**
+   * @brief Add a resource for a library element
+   *
+   * @tparam ElementType  Type of element of the resource.
+   * @param elementId     ID of the element of the resource.
+   * @param name          Resource name
+   * @param mediaType     Resource media type.
+   * @param url           Resource URL.
+   * @return ID of the added resource.
+   */
+  template <typename ElementType>
+  int addResource(int elementId, const QString& name, const QString& mediaType,
+                  const QUrl& url) {
+    static_assert(std::is_same<ElementType, Component>::value ||
+                      std::is_same<ElementType, Device>::value,
+                  "Unsupported ElementType");
+    return addResource(getElementTable<ElementType>(), elementId, name,
+                       mediaType, url);
+  }
+
+  /**
    * @brief Add an alternative name to a previously added package
    *
    * @param pkgId         ID of the package for this alternative name.
@@ -315,6 +335,9 @@ private:  // Methods
   void removeAllTranslations(const QString& elementsTable);
   int addToCategory(const QString& elementsTable, int elementId,
                     const Uuid& category);
+  int addResource(const QString& elementsTable, int elementId,
+                  const QString& name, const QString& mediaType,
+                  const QUrl& url);
   QString filePathToString(const FilePath& fp) const noexcept;
   static QString nonNull(const QString& s) noexcept;
 

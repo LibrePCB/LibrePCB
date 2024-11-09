@@ -33,11 +33,13 @@
 #include "../../cmd/cmddragselectedschematicitems.h"
 #include "../../cmd/cmdpasteschematicitems.h"
 #include "../../cmd/cmdremoveselectedschematicitems.h"
+#include "../../projecteditor.h"
 #include "../graphicsitems/sgi_netlabel.h"
 #include "../graphicsitems/sgi_symbol.h"
 #include "../graphicsitems/sgi_text.h"
 #include "../renamenetsegmentdialog.h"
 #include "../schematicclipboarddatabuilder.h"
+#include "../schematiceditor.h"
 #include "../schematicgraphicsscene.h"
 #include "../schematicselectionquery.h"
 #include "../symbolinstancepropertiesdialog.h"
@@ -500,7 +502,7 @@ bool SchematicEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
   QMenu menu;
   MenuBuilder mb(&menu);
   const EditorCommandSet& cmd = EditorCommandSet::instance();
-  if (std::dynamic_pointer_cast<SGI_Symbol>(selectedItem)) {
+  if (auto sym = std::dynamic_pointer_cast<SGI_Symbol>(selectedItem)) {
     mb.addAction(
         cmd.properties.createAction(
             &menu, this,
@@ -528,6 +530,10 @@ bool SchematicEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
     mb.addAction(cmd.deviceResetTextAll.createAction(
         &menu, this,
         &SchematicEditorState_Select::resetAllTextsOfSelectedItems));
+    mContext.editor.getProjectEditor().addResourcesToMenu(
+        mb, sym->getSymbol().getComponentInstance(), tl::nullopt,
+        &mContext.editor, &menu);
+
   } else if (std::dynamic_pointer_cast<SGI_NetLabel>(selectedItem)) {
     mb.addAction(
         cmd.properties.createAction(

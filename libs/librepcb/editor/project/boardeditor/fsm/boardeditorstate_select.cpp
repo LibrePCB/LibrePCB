@@ -45,6 +45,7 @@
 #include "../../cmd/cmdpasteboarditems.h"
 #include "../../cmd/cmdremoveselectedboarditems.h"
 #include "../../cmd/cmdreplacedevice.h"
+#include "../../projecteditor.h"
 #include "../boardclipboarddatabuilder.h"
 #include "../boardeditor.h"
 #include "../boardgraphicsscene.h"
@@ -864,6 +865,11 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
         }
       }
       modMenu->setEnabled(!modMenu->isEmpty());
+
+      mContext.editor.getProjectEditor().addResourcesToMenu(
+          mb, device->getDevice().getComponentInstance(),
+          device->getDevice().getLibDevice().getUuid(), &mContext.editor,
+          &menu);
     } else if (auto netline =
                    std::dynamic_pointer_cast<BGI_NetLine>(selectedItem)) {
       mb.addAction(cmd.setLineWidth.createAction(

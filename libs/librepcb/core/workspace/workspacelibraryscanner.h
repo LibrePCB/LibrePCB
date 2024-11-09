@@ -99,6 +99,9 @@ private:  // Methods
   void addToCategories(WorkspaceLibraryDbWriter& writer, int elementId,
                        const ElementType& element);
   template <typename ElementType>
+  void addResourcesToDb(WorkspaceLibraryDbWriter& writer, int elementId,
+                        const ElementType& element);
+  template <typename ElementType>
   std::unique_ptr<ElementType> openAndMigrate(const FilePath& fp);
 
 private:  // Data

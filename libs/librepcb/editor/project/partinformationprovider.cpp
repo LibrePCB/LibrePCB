@@ -313,13 +313,32 @@ void PartInformationProvider::setApiEndpoint(const QUrl& url) noexcept {
  *  General Methods
  ******************************************************************************/
 
-void PartInformationProvider::startOperation() noexcept {
+bool PartInformationProvider::startOperation(int timeoutMs) noexcept {
+  const qint64 endMs = QDateTime::currentMSecsSinceEpoch() + timeoutMs;
   requestStatus();
+  while ((timeoutMs > 0) && (!isOperational()) &&
+         (QDateTime::currentMSecsSinceEpoch() < endMs)) {
+    QThread::msleep(50);
+    qApp->processEvents();
+  }
+  return isOperational();
 }
 
 std::shared_ptr<PartInformationProvider::PartInformation>
     PartInformationProvider::getPartInfo(const Part& part) noexcept {
   return mCache.value(part);
+}
+
+std::shared_ptr<PartInformationProvider::PartInformation>
+    PartInformationProvider::waitForPartInfo(const Part& part,
+                                             int timeoutMs) noexcept {
+  const qint64 endMs = QDateTime::currentMSecsSinceEpoch() + timeoutMs;
+  while ((!mCache.contains(part)) &&
+         (QDateTime::currentMSecsSinceEpoch() < endMs)) {
+    QThread::msleep(50);
+    qApp->processEvents();
+  }
+  return getPartInfo(part);
 }
 
 bool PartInformationProvider::isOngoing(const Part& part) const noexcept {

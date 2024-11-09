@@ -194,6 +194,10 @@ QMenu* MenuBuilder::createMoveToOtherLibraryMenu(QWidget* parent) noexcept {
   return menu;
 }
 
+QMenu* MenuBuilder::createMoreResourcesMenu(QWidget* parent) noexcept {
+  return createMenu("menuMoreResources", tr("More Resources"), QIcon(), parent);
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
