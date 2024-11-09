@@ -297,7 +297,7 @@ int WorkspaceLibraryScanner::addElementToDb(WorkspaceLibraryDbWriter& writer,
                                             const ElementType& element) {
   const int id = writer.addElement<ElementType>(
       libId, element.getDirectory().getAbsPath(), element.getUuid(),
-      element.getVersion(), element.isDeprecated());
+      element.getVersion(), element.isDeprecated(), element.getGeneratedBy());
   addToCategories(writer, id, element);
   return id;
 }
@@ -325,7 +325,7 @@ int WorkspaceLibraryScanner::addElementToDb<Package>(
     WorkspaceLibraryDbWriter& writer, int libId, const Package& element) {
   const int id = writer.addElement<Package>(
       libId, element.getDirectory().getAbsPath(), element.getUuid(),
-      element.getVersion(), element.isDeprecated());
+      element.getVersion(), element.isDeprecated(), element.getGeneratedBy());
   addToCategories(writer, id, element);
   foreach (const Package::AlternativeName& name,
            element.getAlternativeNames()) {
@@ -339,7 +339,7 @@ int WorkspaceLibraryScanner::addElementToDb<Component>(
     WorkspaceLibraryDbWriter& writer, int libId, const Component& element) {
   const int id = writer.addElement<Component>(
       libId, element.getDirectory().getAbsPath(), element.getUuid(),
-      element.getVersion(), element.isDeprecated());
+      element.getVersion(), element.isDeprecated(), element.getGeneratedBy());
   addToCategories(writer, id, element);
   addResourcesToDb(writer, id, element);
   return id;
@@ -350,8 +350,8 @@ int WorkspaceLibraryScanner::addElementToDb<Device>(
     WorkspaceLibraryDbWriter& writer, int libId, const Device& element) {
   const int id = writer.addDevice(
       libId, element.getDirectory().getAbsPath(), element.getUuid(),
-      element.getVersion(), element.isDeprecated(), element.getComponentUuid(),
-      element.getPackageUuid());
+      element.getVersion(), element.isDeprecated(), element.getGeneratedBy(),
+      element.getComponentUuid(), element.getPackageUuid());
   addToCategories(writer, id, element);
   addResourcesToDb(writer, id, element);
   for (const Part& part : element.getParts()) {
