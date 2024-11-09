@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "componentsymbolvariantitemlistmodel.h"
 
+#include "../../undocommandgroup.h"
 #include "../../undostack.h"
 #include "../cmd/cmdcomponentsymbolvariantedit.h"
 #include "../cmd/cmdcomponentsymbolvariantitemedit.h"
@@ -119,7 +120,8 @@ void ComponentSymbolVariantItemListModel::add(
             mNewIsRequired, ComponentSymbolVariantItemSuffix(mNewSuffix));
     item->getPinSignalMap() =
         ComponentPinSignalMapHelpers::create(symbol->getPins().getUuidSet());
-    execCmd(new CmdComponentSymbolVariantItemInsert(*mItemList, item));
+    execCmd(new CmdComponentSymbolVariantItemInsert(*mItemList, item),
+            mNewSuffix.isEmpty());
   } catch (const Exception& e) {
     QMessageBox::critical(0, tr("Error"), e.getMsg());
   }
@@ -447,7 +449,7 @@ bool ComponentSymbolVariantItemListModel::setData(const QModelIndex& index,
       return false;  // do not execute command!
     }
     if (cmd) {
-      execCmd(cmd.take());
+      execCmd(cmd.take(), false);
     } else if (!item) {
       emit dataChanged(index, index);
     }
@@ -488,13 +490,50 @@ void ComponentSymbolVariantItemListModel::itemListEdited(
   }
 }
 
-void ComponentSymbolVariantItemListModel::execCmd(UndoCommand* cmd) {
+void ComponentSymbolVariantItemListModel::execCmd(UndoCommand* cmd,
+                                                  bool updateSuffixes) {
+  // Apply automatic suffix only if it already conforms to our system.
+  const QString suffixes = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  for (int i = 0; updateSuffixes && mItemList && (i < mItemList->count());
+       ++i) {
+    const QString expected =
+        (mItemList->count() == 1) ? QString() : suffixes.mid(i, 1);
+    updateSuffixes = (mItemList->at(i)->getSuffix() == expected);
+  }
+
   if (mUndoStack) {
-    mUndoStack->execCmd(cmd);
+    UndoStackTransaction transaction(*mUndoStack, cmd->getText());
+    transaction.append(cmd);
+    if (updateSuffixes) {
+      transaction.append(createSuffixUpdateCmd().release());
+    }
+    transaction.commit();
   } else {
     QScopedPointer<UndoCommand> cmdGuard(cmd);
     cmdGuard->execute();
+    if (updateSuffixes) {
+      createSuffixUpdateCmd()->execute();
+    }
   }
+}
+
+std::unique_ptr<UndoCommandGroup>
+    ComponentSymbolVariantItemListModel::createSuffixUpdateCmd() {
+  // See https://github.com/LibrePCB/LibrePCB/issues/1426.
+  std::unique_ptr<UndoCommandGroup> cmdGroup(
+      new UndoCommandGroup("Update symbol suffixes"));
+  const QString suffixes = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  for (int i = 0; (mItemList) && (i < mItemList->count()); ++i) {
+    std::shared_ptr<ComponentSymbolVariantItem> item = mItemList->value(i);
+    const QString suffix =
+        (mItemList->count() == 1) ? QString() : suffixes.mid(i, 1);
+    QScopedPointer<CmdComponentSymbolVariantItemEdit> cmd(
+        new CmdComponentSymbolVariantItemEdit(*item));
+    cmd->setSuffix(ComponentSymbolVariantItemSuffix(
+        cleanComponentSymbolVariantItemSuffix(suffix)));
+    cmdGroup->appendChild(cmd.take());
+  }
+  return cmdGroup;
 }
 
 /*******************************************************************************

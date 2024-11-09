@@ -27,6 +27,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -35,6 +37,7 @@ namespace editor {
 
 class LibraryElementCache;
 class UndoCommand;
+class UndoCommandGroup;
 class UndoStack;
 
 /*******************************************************************************
@@ -97,11 +100,12 @@ public:
       const ComponentSymbolVariantItemListModel& rhs) noexcept;
 
 private:
+  std::unique_ptr<UndoCommandGroup> createSuffixUpdateCmd();
   void itemListEdited(
       const ComponentSymbolVariantItemList& list, int index,
       const std::shared_ptr<const ComponentSymbolVariantItem>& item,
       ComponentSymbolVariantItemList::Event event) noexcept;
-  void execCmd(UndoCommand* cmd);
+  void execCmd(UndoCommand* cmd, bool updateSuffixes = true);
 
 private:  // Data
   ComponentSymbolVariantItemList* mItemList;
