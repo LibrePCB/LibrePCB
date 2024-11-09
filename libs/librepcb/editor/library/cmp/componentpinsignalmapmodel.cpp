@@ -25,6 +25,7 @@
 #include "../../undostack.h"
 #include "../cmd/cmdcomponentpinsignalmapitemedit.h"
 #include "../libraryelementcache.h"
+#include "../newelementwizard/newelementwizardpage_componentsignals.h"
 
 #include <librepcb/core/library/sym/symbol.h>
 
@@ -109,15 +110,25 @@ void ComponentPinSignalMapModel::autoAssignSignals() noexcept {
   }
 
   try {
+    QHash<QString, int> numbers;  // Memory how many ambiguous names were used.
     for (ComponentSymbolVariantItem& item : mSymbolVariant->getSymbolItems()) {
-      std::shared_ptr<const Symbol> symbol =
-          mSymbolsCache->getSymbol(item.getSymbolUuid());
-      if (symbol) {
+      if (std::shared_ptr<const Symbol> symbol =
+              mSymbolsCache->getSymbol(item.getSymbolUuid())) {
         for (ComponentPinSignalMapItem& map : item.getPinSignalMap()) {
           CircuitIdentifier pinName =
               symbol->getPins().get(map.getPinUuid())->getName();
           std::shared_ptr<const ComponentSignal> signal =
               mSignals->find(*pinName);
+          if (!signal) {
+            // Also look for names with a number at the end.
+            int number = numbers.value(*pinName, 0) + 1;
+            signal = mSignals->find(
+                NewElementWizardPage_ComponentSignals::appendNumberToSignalName(
+                    *pinName, number));
+            if (signal) {
+              numbers[*pinName] = number;
+            }
+          }
           tl::optional<Uuid> signalUuid =
               signal ? tl::make_optional(signal->getUuid()) : tl::nullopt;
           QScopedPointer<CmdComponentPinSignalMapItemEdit> cmd(

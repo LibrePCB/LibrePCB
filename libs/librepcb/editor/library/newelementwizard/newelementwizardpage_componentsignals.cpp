@@ -69,12 +69,26 @@ int NewElementWizardPage_ComponentSignals::nextId() const noexcept {
 }
 
 /*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+QString NewElementWizardPage_ComponentSignals::appendNumberToSignalName(
+    QString name, int number) noexcept {
+  name.truncate(CircuitIdentifierConstraint::MAX_LENGTH - 4);
+  if ((!name.isEmpty()) && (name.back().isDigit())) {
+    name.append("_");
+  }
+  name.append(QString::number(number));
+  return cleanCircuitIdentifier(name);
+}
+
+/*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
 QHash<Uuid, CircuitIdentifier>
     NewElementWizardPage_ComponentSignals::getPinNames(
-        const Uuid& symbol, const QString& suffix) const noexcept {
+        const Uuid& symbol) const noexcept {
   QHash<Uuid, CircuitIdentifier> names;
   try {
     FilePath fp = mContext.getWorkspace().getLibraryDb().getLatest<Symbol>(
@@ -83,8 +97,7 @@ QHash<Uuid, CircuitIdentifier>
         std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
             TransactionalFileSystem::openRO(fp))));  // can throw
     for (const SymbolPin& pin : symbol->getPins()) {
-      names.insert(pin.getUuid(),
-                   CircuitIdentifier(suffix % pin.getName()));  // can throw
+      names.insert(pin.getUuid(), pin.getName());
     }
   } catch (const Exception& e) {
     // TODO: what could we do here?
@@ -95,19 +108,39 @@ QHash<Uuid, CircuitIdentifier>
 void NewElementWizardPage_ComponentSignals::initializePage() noexcept {
   QWizardPage::initializePage();
 
-  // automatically create signals if no signals exist
+  // Automatically create signals if no signals exist.
   const ComponentSymbolVariant* variant =
       mContext.mComponentSymbolVariants.value(0).get();
   if (variant && mContext.mComponentSignals.count() < 1) {
+    // First collect all pin names to allow making signal names unique
+    // (https://github.com/LibrePCB/LibrePCB/issues/1425).
+    QHash<std::pair<Uuid, Uuid>, QString> names;
     for (const ComponentSymbolVariantItem& item : variant->getSymbolItems()) {
-      QHash<Uuid, CircuitIdentifier> names =
-          getPinNames(item.getSymbolUuid(), *item.getSuffix());
+      QHash<Uuid, CircuitIdentifier> tmp = getPinNames(item.getSymbolUuid());
+      for (auto it = tmp.begin(); it != tmp.end(); it++) {
+        names.insert(std::make_pair(item.getUuid(), it.key()), *it.value());
+      }
+    }
+
+    // Now add the signals.
+    QSet<QString> usedNames = Toolbox::toSet(names.values());
+    for (const ComponentSymbolVariantItem& item : variant->getSymbolItems()) {
       for (const ComponentPinSignalMapItem& map : item.getPinSignalMap()) {
-        auto i = names.find(map.getPinUuid());
-        if (i != names.end() && (i.key() == map.getPinUuid())) {
+        QString name =
+            names.value(std::make_pair(item.getUuid(), map.getPinUuid()));
+        if (names.values().count(name) > 1) {
+          // Append number to make the signal name unique.
+          int number = 1;
+          while (usedNames.contains(appendNumberToSignalName(name, number))) {
+            ++number;
+          }
+          name = appendNumberToSignalName(name, number);
+          usedNames.insert(name);
+        }
+        if (CircuitIdentifierConstraint()(name)) {
           mContext.mComponentSignals.append(std::make_shared<ComponentSignal>(
-              Uuid::createRandom(), i.value(), SignalRole::passive(), QString(),
-              false, false, false));
+              Uuid::createRandom(), CircuitIdentifier(name),
+              SignalRole::passive(), QString(), false, false, false));
         }
       }
     }
