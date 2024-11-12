@@ -114,14 +114,17 @@ void PrimitiveFootprintPadGraphicsItem::setText(const QString& text) noexcept {
       Application::getDefaultStrokeFont(), StrokeTextSpacing(),
       StrokeTextSpacing(), PositiveLength(1000000), UnsignedLength(100000),
       Alignment(HAlign::center(), VAlign::center()), Angle(0), false, text);
+  mTextGraphicsItem->setPath(Path::toQPainterPathPx(paths, false));
+  updateTextHeight();
+}
 
+void PrimitiveFootprintPadGraphicsItem::setToolTipText(
+    const QString& text) noexcept {
   setToolTip(text);
   mOriginCrossGraphicsItem->setToolTip(text);
-  mTextGraphicsItem->setPath(Path::toQPainterPathPx(paths, false));
   foreach (auto& item, mPathGraphicsItems) {
     item.item->setToolTip(text);
   }
-  updateTextHeight();
 }
 
 void PrimitiveFootprintPadGraphicsItem::setLayer(
