@@ -384,6 +384,12 @@ void ComponentEditorWidget::fixMsg(
   mUndoStack->execCmd(cmd.take());
 }
 
+template <>
+void ComponentEditorWidget::fixMsg(
+    const MsgNoPinsInSymbolVariantConnected& msg) {
+  mUi->symbolVariantsEditorWidget->openEditor(msg.getSymbVar()->getUuid());
+}
+
 template <typename MessageType>
 bool ComponentEditorWidget::fixMsgHelper(
     std::shared_ptr<const RuleCheckMessage> msg, bool applyFix) {
@@ -404,6 +410,8 @@ bool ComponentEditorWidget::processRuleCheckMessage(
   if (fixMsgHelper<MsgMissingComponentDefaultValue>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgMissingSymbolVariant>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgNonFunctionalComponentSignalInversionSign>(msg, applyFix))
+    return true;
+  if (fixMsgHelper<MsgNoPinsInSymbolVariantConnected>(msg, applyFix))
     return true;
   return false;
 }

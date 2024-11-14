@@ -89,7 +89,7 @@ ComponentSymbolVariantListWidget::~ComponentSymbolVariantListWidget() noexcept {
 }
 
 /*******************************************************************************
- *  Setters
+ *  General Methods
  ******************************************************************************/
 
 void ComponentSymbolVariantListWidget::setFrameStyle(int style) noexcept {
@@ -108,6 +108,12 @@ void ComponentSymbolVariantListWidget::setReferences(
   mSymbolVariantList = list;
   mUndoStack = undoStack;
   mEditorProvider = editorProvider;
+}
+
+void ComponentSymbolVariantListWidget::openEditor(const Uuid& uuid) noexcept {
+  if (mSymbolVariantList && mUndoStack && mEditorProvider) {
+    editVariant(uuid);
+  }
 }
 
 /*******************************************************************************
