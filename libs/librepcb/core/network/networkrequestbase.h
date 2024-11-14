@@ -206,7 +206,8 @@ signals:
 public:  // Methods
   virtual void prepareRequest() = 0;
   virtual void finalizeRequest() = 0;
-  virtual void emitSuccessfullyFinishedSignals() noexcept = 0;
+  virtual void emitSuccessfullyFinishedSignals(
+      QString contentType) noexcept = 0;
   virtual void fetchNewData(QIODevice& device) noexcept = 0;
 
 private:  // Methods
@@ -218,7 +219,8 @@ private:  // Methods
   void replyErrorSlot(QNetworkReply::NetworkError code) noexcept;
   void replySslErrorsSlot(const QList<QSslError>& errors) noexcept;
   void replyFinishedSlot() noexcept;
-  void finalize(const QString& errorMsg = QString()) noexcept;
+  void finalize(const QString& errorMsg,
+                const QString& contentType = QString()) noexcept;
   static QString formatFileSize(qint64 bytes) noexcept;
   static QString getUserAgent() noexcept;
 

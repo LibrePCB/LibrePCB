@@ -97,11 +97,16 @@ QNetworkReply* NetworkAccessManager::post(const QNetworkRequest& request,
 }
 
 std::unique_ptr<QIODevice> NetworkAccessManager::readFromCache(
-    const QUrl& url) noexcept {
+    const QUrl& url, QString& contentType) noexcept {
   Q_ASSERT(QThread::currentThread() == this);
 
   if (mManager) {
     if (auto cache = mManager->cache()) {
+      foreach (const auto& pair, cache->metaData(url).rawHeaders()) {
+        if (QString(pair.first).toLower() == "content-type") {
+          contentType = QString(pair.second);
+        }
+      }
       return std::unique_ptr<QIODevice>(cache->data(url));
     }
   }

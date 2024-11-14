@@ -59,8 +59,9 @@ void NetworkRequest::finalizeRequest() {
   }
 }
 
-void NetworkRequest::emitSuccessfullyFinishedSignals() noexcept {
-  emit dataReceived(mReceivedData);
+void NetworkRequest::emitSuccessfullyFinishedSignals(
+    QString contentType) noexcept {
+  emit dataReceived(mReceivedData, contentType);
 }
 
 void NetworkRequest::fetchNewData(QIODevice& device) noexcept {

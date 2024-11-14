@@ -24,7 +24,8 @@
 
 #include <librepcb/core/application.h>
 #include <librepcb/core/fileio/filepath.h>
-#include <librepcb/core/network/filedownload.h>
+#include <librepcb/core/fileio/fileutils.h>
+#include <librepcb/core/network/networkrequest.h>
 #include <librepcb/core/types/fileproofname.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
@@ -125,21 +126,21 @@ void DesktopServices::downloadAndOpenResourceAsync(
   fileName += ext;
   const FilePath dst = dstDir.getPathTo(fileName);
 
-  // If the destination directory exists, but the file not, clean the directory
-  // as maybe it has been renamed -> avoid cluttering the cache with old files.
-  if (dstDir.isExistingDir() && (!dst.isExistingFile())) {
-    QDir(dstDir.toStr()).removeRecursively();
-  }
-
   // Helper to open the local file.
-  auto doOpen = [&settings, parent, dst]() {
+  auto openCachedFile = [&settings, parent, dst]() {
     DesktopServices ds(settings, parent);
     ds.openLocalPath(dst);
   };
 
+  // Helper to open the URL in web browser.
+  auto openInBrowser = [&settings, parent, url]() {
+    DesktopServices ds(settings, parent);
+    ds.openWebUrl(url);
+  };
+
   // If the file exists, just open it. Otherwise download it first.
   if (dst.isExistingFile()) {
-    doOpen();
+    openCachedFile();
   } else {
     QProgressDialog dlg(parent);
     dlg.setWindowModality(Qt::WindowModal);
@@ -154,16 +155,17 @@ void DesktopServices::downloadAndOpenResourceAsync(
     }
     accepted.append("*/*;q=0.8");
 
-    FileDownload* dl = new FileDownload(url, dst);
-    dl->setHeaderField("Accept", accepted.join(", ").toUtf8());
+    NetworkRequest* req = new NetworkRequest(url);
+    req->setMinimumCacheTime(24 * 3600);
+    req->setHeaderField("Accept", accepted.join(", ").toUtf8());
     // Some websites block non-browser downloads so let's fake the user agent.
-    dl->useBrowserUserAgent();
-    QObject::connect(dl, &FileDownload::progressPercent, &dlg,
+    req->useBrowserUserAgent();
+    QObject::connect(req, &NetworkRequest::progressPercent, &dlg,
                      &QProgressDialog::setValue);
-    QObject::connect(dl, &FileDownload::finished, &dlg,
+    QObject::connect(req, &NetworkRequest::finished, &dlg,
                      &QProgressDialog::accept);
     QObject::connect(
-        dl, &FileDownload::errored, parent,
+        req, &NetworkRequest::errored, parent,
         [&settings, url, parent]() {
           // Failed, now try it in the web browser.
           qInfo()
@@ -172,11 +174,29 @@ void DesktopServices::downloadAndOpenResourceAsync(
           ds.openUrl(url);
         },
         Qt::QueuedConnection);
-    QObject::connect(dl, &FileDownload::succeeded, parent, doOpen,
-                     Qt::QueuedConnection);
-    QObject::connect(&dlg, &QProgressDialog::canceled, dl,
-                     &FileDownload::abort);
-    dl->start();
+    QObject::connect(
+        req, &NetworkRequest::dataReceived, parent,
+        [dst, openCachedFile, openInBrowser](QByteArray data,
+                                             QString contentType) {
+          try {
+            if (!contentType.toLower().contains("html")) {
+              // Save file in cache and open it.
+              FileUtils::writeFile(dst, data);
+              openCachedFile();
+              return;
+            }
+            qInfo() << "Downloaded file seems to be a HTML site, opening it in "
+                       "the web browser...";
+          } catch (const Exception& e) {
+            // As fallback, open it in the browser.
+            qWarning() << "Failed to save downloaded resource:" << e.getMsg();
+          }
+          openInBrowser();
+        },
+        Qt::QueuedConnection);
+    QObject::connect(&dlg, &QProgressDialog::canceled, req,
+                     &NetworkRequest::abort);
+    req->start();
     dlg.exec();  // Blocks until download is finished.
   }
 }

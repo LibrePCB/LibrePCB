@@ -150,6 +150,7 @@ TEST_P(FileDownloadTest, testDownload) {
   EXPECT_EQ(0, mSignalReceiver.mDataReceivedCallCount);
   EXPECT_TRUE(mSignalReceiver.mReceivedData.isNull())
       << qPrintable(mSignalReceiver.mReceivedData);
+  EXPECT_TRUE(mSignalReceiver.mReceivedContentType.isEmpty());
   if (data.success) {
     EXPECT_GE(mSignalReceiver.mSimpleProgressCallCount, 1);
     EXPECT_EQ(1, mSignalReceiver.mSucceededCallCount);

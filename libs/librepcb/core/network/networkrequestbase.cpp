@@ -171,11 +171,13 @@ void NetworkRequestBase::executeRequest() noexcept {
   // handle this case manually instead of making a normal network request.
   if (mRequest.attribute(QNetworkRequest::CacheLoadControlAttribute).toInt() ==
       QNetworkRequest::AlwaysCache) {
-    if (std::unique_ptr<QIODevice> dev = nam->readFromCache(mUrl)) {
+    QString contentType;
+    if (std::unique_ptr<QIODevice> dev =
+            nam->readFromCache(mUrl, contentType)) {
       try {
         fetchNewData(*dev);
         finalizeRequest();  // can throw
-        finalize();
+        finalize(QString(), contentType);
       } catch (const Exception& e) {
         finalize(e.getMsg());
       }
@@ -335,10 +337,13 @@ void NetworkRequestBase::replyFinishedSlot() noexcept {
   }
 
   // download successfully finished!
-  finalize();
+  const QString contentType =
+      mReply->header(QNetworkRequest::ContentTypeHeader).toString();
+  finalize(QString(), contentType);
 }
 
-void NetworkRequestBase::finalize(const QString& errorMsg) noexcept {
+void NetworkRequestBase::finalize(const QString& errorMsg,
+                                  const QString& contentType) noexcept {
   Q_ASSERT(QThread::currentThread() == NetworkAccessManager::instance());
 
   const bool onlyFromCache =
@@ -360,7 +365,7 @@ void NetworkRequestBase::finalize(const QString& errorMsg) noexcept {
         << (cacheExtended ? QString(" (set max_age=%1)").arg(mMinimumCacheTime)
                           : (fromCache ? " (from cache)" : ""));
     emit progressState(tr("Request successfully finished."));
-    emitSuccessfullyFinishedSignals();
+    emitSuccessfullyFinishedSignals(contentType);
     emit succeeded();
     emit finished(true);
   } else if (mAborted) {

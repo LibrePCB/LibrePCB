@@ -116,7 +116,7 @@ signals:
 private:  // Methods
   void prepareRequest() override;
   void finalizeRequest() override;
-  void emitSuccessfullyFinishedSignals() noexcept override;
+  void emitSuccessfullyFinishedSignals(QString contentType) noexcept override;
   void fetchNewData(QIODevice& device) noexcept override;
 
 private:  // Data

@@ -140,6 +140,7 @@ TEST_P(NetworkRequestTest, testDownload) {
     EXPECT_FALSE(mSignalReceiver.mFinishedSuccess);
     EXPECT_TRUE(mSignalReceiver.mReceivedData.isEmpty());
   }
+  EXPECT_TRUE(mSignalReceiver.mReceivedContentType.isEmpty());
   EXPECT_TRUE(
       mSignalReceiver.mReceivedData.trimmed().startsWith(data.contentStart))
       << qPrintable(mSignalReceiver.mReceivedData);

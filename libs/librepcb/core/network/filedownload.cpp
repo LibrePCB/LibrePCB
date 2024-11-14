@@ -153,7 +153,9 @@ void FileDownload::finalizeRequest() {
   }
 }
 
-void FileDownload::emitSuccessfullyFinishedSignals() noexcept {
+void FileDownload::emitSuccessfullyFinishedSignals(
+    QString contentType) noexcept {
+  Q_UNUSED(contentType);
   emit fileDownloaded(mDestination);
   if (mExtractZipToDir.isValid()) {
     emit zipFileExtracted(mExtractZipToDir);

@@ -57,6 +57,7 @@ public:
   QString mErrorMessage;
   bool mFinishedSuccess;
   QByteArray mReceivedData;
+  QString mReceivedContentType;
   FilePath mDownloadedToFilePath;
   FilePath mExtractedToFilePath;
 
@@ -121,8 +122,9 @@ public:
     mFinishedCallCount++;
   }
 
-  void dataReceived(QByteArray data) {
+  void dataReceived(QByteArray data, QString contentType) {
     mReceivedData = data;
+    mReceivedContentType = contentType;
     mDataReceivedCallCount++;
   }
 

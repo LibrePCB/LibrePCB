@@ -61,12 +61,12 @@ signals:
   /**
    * @brief Data successfully received signal (emitted right before #finished())
    */
-  void dataReceived(QByteArray data);
+  void dataReceived(QByteArray data, QString contentType);
 
 private:  // Methods
   void prepareRequest() override;
   void finalizeRequest() override;
-  void emitSuccessfullyFinishedSignals() noexcept override;
+  void emitSuccessfullyFinishedSignals(QString contentType) noexcept override;
   void fetchNewData(QIODevice& device) noexcept override;
 
 private:  // Data
