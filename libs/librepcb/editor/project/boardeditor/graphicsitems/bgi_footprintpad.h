@@ -52,6 +52,8 @@ class PrimitiveFootprintPadGraphicsItem;
  * @brief The BGI_FootprintPad class
  */
 class BGI_FootprintPad final : public QGraphicsItemGroup {
+  Q_DECLARE_TR_FUNCTIONS(BGI_FootprintPad)
+
 public:
   // Constructors / Destructor
   BGI_FootprintPad() = delete;
@@ -83,6 +85,7 @@ private:  // Methods
   virtual QVariant itemChange(GraphicsItemChange change,
                               const QVariant& value) noexcept override;
   void updateLayer() noexcept;
+  void updateToolTip() noexcept;
   void updateHightlighted(bool selected) noexcept;
 
 private:  // Data

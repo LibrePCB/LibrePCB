@@ -25,8 +25,12 @@
 #include "../../../graphics/primitivefootprintpadgraphicsitem.h"
 #include "../boardgraphicsscene.h"
 
+#include <librepcb/core/library/cmp/componentsignal.h>
+#include <librepcb/core/library/pkg/packagepad.h>
 #include <librepcb/core/project/board/items/bi_device.h>
 #include <librepcb/core/project/board/items/bi_footprintpad.h>
+#include <librepcb/core/project/circuit/componentsignalinstance.h>
+#include <librepcb/core/project/circuit/netsignal.h>
 #include <librepcb/core/types/layer.h>
 #include <librepcb/core/workspace/theme.h>
 
@@ -65,6 +69,7 @@ BGI_FootprintPad::BGI_FootprintPad(BI_FootprintPad& pad,
   mGraphicsItem->setGeometries(mPad.getGeometries(),
                                *mPad.getLibPad().getCopperClearance());
   updateLayer();
+  updateToolTip();
 
   mPad.onEdited.attach(mOnPadEditedSlot);
   if (auto ptr = mDeviceGraphicsItem.lock()) {
@@ -120,6 +125,7 @@ void BGI_FootprintPad::padEdited(const BI_FootprintPad& obj,
       break;
     case BI_FootprintPad::Event::TextChanged:
       mGraphicsItem->setText(obj.getText());
+      updateToolTip();
       break;
     case BI_FootprintPad::Event::GeometriesChanged:
       mGraphicsItem->setGeometries(obj.getGeometries(),
@@ -150,6 +156,30 @@ void BGI_FootprintPad::updateLayer() noexcept {
     setZValue(BoardGraphicsScene::ZValue_FootprintPadsBottom);
     mGraphicsItem->setLayer(Theme::Color::sBoardCopperBot);
   }
+}
+
+void BGI_FootprintPad::updateToolTip() noexcept {
+  Q_ASSERT(mGraphicsItem);
+  QString s;
+  s += "<b>" % tr("Pad:") % " ";
+  if (const PackagePad* pad = mPad.getLibPackagePad()) {
+    s += *pad->getName();
+  } else {
+    s += "✖";
+  }
+  s += "</b><br>" % tr("Signal:") % " ";
+  if (const ComponentSignalInstance* sig = mPad.getComponentSignalInstance()) {
+    s += *sig->getCompSignal().getName();
+  } else {
+    s += "✖";
+  }
+  s += "<br>" % tr("Net:") % " ";
+  if (const NetSignal* net = mPad.getCompSigInstNetSignal()) {
+    s += *net->getName();
+  } else {
+    s += "✖";
+  }
+  mGraphicsItem->setToolTipText(s);
 }
 
 void BGI_FootprintPad::updateHightlighted(bool selected) noexcept {

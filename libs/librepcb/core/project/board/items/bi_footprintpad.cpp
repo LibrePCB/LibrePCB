@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "bi_footprintpad.h"
 
+#include "../../../library/cmp/componentsignal.h"
 #include "../../../library/dev/device.h"
 #include "../../../library/pkg/footprint.h"
 #include "../../../library/pkg/package.h"
@@ -290,8 +291,24 @@ void BI_FootprintPad::updateText() noexcept {
   if (mPackagePad) {
     text += *mPackagePad->getName();
   }
+  // Show the component signal name too if it differs from the pad name,
+  // because it is much more expressive. To avoid long texts, only display the
+  // text up to the first "/" as it is usually unique already for the device.
+  if (const ComponentSignalInstance* signal = getComponentSignalInstance()) {
+    const QString fullName = *signal->getCompSignal().getName();
+    const int sepPos = fullName.indexOf("/", 1);  // Ignore leading slash.
+    const QString shortName = (sepPos != -1) ? fullName.left(sepPos) : fullName;
+    if ((fullName != text) && (shortName != text)) {
+      text += ":" % shortName;
+    }
+  }
+  // To avoid too small text size, truncate text.
+  if (text.count() > 8) {
+    text = text.left(6) % "…";
+  }
+  // Show the net name on the next line to avoid too long texts.
   if (NetSignal* signal = getCompSigInstNetSignal()) {
-    text += ": " % *signal->getName();
+    text += "\n" % *signal->getName();
   }
   if (text != mText) {
     mText = text;
