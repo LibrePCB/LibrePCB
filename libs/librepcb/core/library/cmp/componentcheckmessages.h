@@ -121,7 +121,7 @@ class MsgMissingSymbolVariantItem final : public RuleCheckMessage {
 
 public:
   // Constructors / Destructor
-  MsgMissingSymbolVariantItem() noexcept;
+  MsgMissingSymbolVariantItem() = delete;
   explicit MsgMissingSymbolVariantItem(
       std::shared_ptr<const ComponentSymbolVariant> symbVar) noexcept;
   MsgMissingSymbolVariantItem(const MsgMissingSymbolVariantItem& other) noexcept
@@ -165,6 +165,35 @@ public:
 
 private:
   std::shared_ptr<const ComponentSignal> mSignal;
+};
+
+/*******************************************************************************
+ *  Class MsgNoPinsInSymbolVariantConnected
+ ******************************************************************************/
+
+/**
+ * @brief The MsgNoPinsInSymbolVariantConnected class
+ */
+class MsgNoPinsInSymbolVariantConnected final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgNoPinsInSymbolVariantConnected)
+
+public:
+  // Constructors / Destructor
+  MsgNoPinsInSymbolVariantConnected() = delete;
+  explicit MsgNoPinsInSymbolVariantConnected(
+      std::shared_ptr<const ComponentSymbolVariant> symbVar) noexcept;
+  MsgNoPinsInSymbolVariantConnected(
+      const MsgNoPinsInSymbolVariantConnected& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~MsgNoPinsInSymbolVariantConnected() noexcept {}
+
+  // Getters
+  std::shared_ptr<const ComponentSymbolVariant> getSymbVar() const noexcept {
+    return mSymbVar;
+  }
+
+private:
+  std::shared_ptr<const ComponentSymbolVariant> mSymbVar;
 };
 
 /*******************************************************************************

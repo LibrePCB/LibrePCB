@@ -137,6 +137,28 @@ MsgNonFunctionalComponentSignalInversionSign::
 }
 
 /*******************************************************************************
+ *  MsgNoPinsInSymbolVariantConnected
+ ******************************************************************************/
+
+MsgNoPinsInSymbolVariantConnected::MsgNoPinsInSymbolVariantConnected(
+    std::shared_ptr<const ComponentSymbolVariant> symbVar) noexcept
+  : RuleCheckMessage(
+        Severity::Error,
+        tr("No pins connected in '%1'")
+            .arg(*symbVar->getNames().getDefaultValue()),
+        tr("The chosen symbols contain pins, but none of them are connected "
+           "to component signals. So when adding this component to a "
+           "schematic, no wires can be attached to them.\n\nTo fix this "
+           "issue, connect the symbol pins to their corresponding component "
+           "signals in the symbol variant editor dialog."),
+        "no_pins_connected"),
+    mSymbVar(symbVar) {
+  mApproval->ensureLineBreak();
+  mApproval->appendChild("variant", symbVar->getUuid());
+  mApproval->ensureLineBreak();
+}
+
+/*******************************************************************************
  *  End of File
  ******************************************************************************/
 

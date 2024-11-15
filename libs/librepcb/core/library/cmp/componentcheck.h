@@ -62,6 +62,7 @@ protected:  // Methods
   void checkSignalNamesInversionSign(MsgList& msgs) const;
   void checkMissingSymbolVariants(MsgList& msgs) const;
   void checkMissingSymbolVariantItems(MsgList& msgs) const;
+  void checkNoPinsConnected(MsgList& msgs) const;
 
 private:  // Data
   const Component& mComponent;

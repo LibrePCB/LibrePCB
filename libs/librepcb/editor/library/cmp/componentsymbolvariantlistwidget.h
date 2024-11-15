@@ -57,12 +57,13 @@ public:
       const ComponentSymbolVariantListWidget& other) = delete;
   ~ComponentSymbolVariantListWidget() noexcept;
 
-  // Setters
+  // General Methods
   void setFrameStyle(int style) noexcept;
   void setReadOnly(bool readOnly) noexcept;
   void setReferences(
       UndoStack* undoStack, ComponentSymbolVariantList* list,
       IF_ComponentSymbolVariantEditorProvider* editorProvider) noexcept;
+  void openEditor(const Uuid& uuid) noexcept;
 
   // Operator Overloadings
   ComponentSymbolVariantListWidget& operator=(

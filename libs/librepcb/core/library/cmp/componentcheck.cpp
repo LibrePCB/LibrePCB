@@ -55,6 +55,7 @@ RuleCheckMessageList ComponentCheck::runChecks() const {
   checkSignalNamesInversionSign(msgs);
   checkMissingSymbolVariants(msgs);
   checkMissingSymbolVariantItems(msgs);
+  checkNoPinsConnected(msgs);
   return msgs;
 }
 
@@ -110,6 +111,29 @@ void ComponentCheck::checkMissingSymbolVariantItems(MsgList& msgs) const {
     std::shared_ptr<const ComponentSymbolVariant> symbVar = it.ptr();
     if (symbVar->getSymbolItems().isEmpty()) {
       msgs.append(std::make_shared<MsgMissingSymbolVariantItem>(symbVar));
+    }
+  }
+}
+
+void ComponentCheck::checkNoPinsConnected(MsgList& msgs) const {
+  // This warning makes no sense if there are no component signals.
+  if (mComponent.getSignals().isEmpty()) {
+    return;
+  }
+
+  for (auto it = mComponent.getSymbolVariants().begin();
+       it != mComponent.getSymbolVariants().end(); ++it) {
+    std::shared_ptr<const ComponentSymbolVariant> symbVar = it.ptr();
+    int connectedPins = 0;
+    for (const ComponentSymbolVariantItem& item : symbVar->getSymbolItems()) {
+      for (const ComponentPinSignalMapItem& map : item.getPinSignalMap()) {
+        if (map.getSignalUuid()) {
+          ++connectedPins;
+        }
+      }
+    }
+    if ((connectedPins == 0) && (!symbVar->getSymbolItems().isEmpty())) {
+      msgs.append(std::make_shared<MsgNoPinsInSymbolVariantConnected>(symbVar));
     }
   }
 }
