@@ -348,10 +348,10 @@ bool PackageEditorFsm::processPaste() noexcept {
   }
 }
 
-bool PackageEditorFsm::processMove(Qt::ArrowType direction) noexcept {
+bool PackageEditorFsm::processMove(const Point& delta) noexcept {
   if (getCurrentState() && mContext.currentFootprint &&
       mContext.currentGraphicsItem) {
-    return getCurrentState()->processMove(direction);
+    return getCurrentState()->processMove(delta);
   } else {
     return false;
   }

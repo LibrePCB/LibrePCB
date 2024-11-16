@@ -95,7 +95,7 @@ public:
   bool processCut() noexcept override;
   bool processCopy() noexcept override;
   bool processPaste() noexcept override;
-  bool processMove(Qt::ArrowType direction) noexcept override;
+  bool processMove(const Point& delta) noexcept override;
   bool processRotate(const Angle& rotation) noexcept override;
   bool processMirror(Qt::Orientation orientation) noexcept override;
   bool processFlip(Qt::Orientation orientation) noexcept override;

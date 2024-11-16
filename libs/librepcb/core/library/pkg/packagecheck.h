@@ -63,6 +63,7 @@ protected:  // Methods
   void checkWrongTextLayers(MsgList& msgs) const;
   void checkPackageOutlines(MsgList& msgs) const;
   void checkCourtyards(MsgList& msgs) const;
+  void checkOriginInCenter(MsgList& msgs) const;
   void checkPadsPackagePadUuid(MsgList& msgs) const;
   void checkPadsClearanceToPads(MsgList& msgs) const;
   void checkPadsClearanceToLegend(MsgList& msgs) const;

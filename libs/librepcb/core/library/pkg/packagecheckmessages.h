@@ -452,6 +452,39 @@ private:
 };
 
 /*******************************************************************************
+ *  Class MsgFootprintOriginNotInCenter
+ ******************************************************************************/
+
+/**
+ * @brief The MsgFootprintOriginNotInCenter class
+ */
+class MsgFootprintOriginNotInCenter final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgFootprintOriginNotInCenter)
+
+public:
+  // Constructors / Destructor
+  MsgFootprintOriginNotInCenter() = delete;
+  MsgFootprintOriginNotInCenter(std::shared_ptr<const Footprint> footprint,
+                                const Point& center) noexcept;
+  MsgFootprintOriginNotInCenter(
+      const MsgFootprintOriginNotInCenter& other) noexcept
+    : RuleCheckMessage(other),
+      mFootprint(other.mFootprint),
+      mCenter(other.mCenter) {}
+  virtual ~MsgFootprintOriginNotInCenter() noexcept {}
+
+  // Getters
+  std::shared_ptr<const Footprint> getFootprint() const noexcept {
+    return mFootprint;
+  }
+  const Point& getCenter() const noexcept { return mCenter; }
+
+private:
+  std::shared_ptr<const Footprint> mFootprint;
+  const Point mCenter;
+};
+
+/*******************************************************************************
  *  Class MsgOverlappingPads
  ******************************************************************************/
 

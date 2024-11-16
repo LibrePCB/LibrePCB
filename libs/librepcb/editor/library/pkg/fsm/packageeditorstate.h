@@ -105,8 +105,8 @@ public:
   virtual bool processCut() noexcept { return false; }
   virtual bool processCopy() noexcept { return false; }
   virtual bool processPaste() noexcept { return false; }
-  virtual bool processMove(Qt::ArrowType direction) {
-    Q_UNUSED(direction);
+  virtual bool processMove(const Point& delta) {
+    Q_UNUSED(delta);
     return false;
   }
   virtual bool processRotate(const Angle& rotation) noexcept {

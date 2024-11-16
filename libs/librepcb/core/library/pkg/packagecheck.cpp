@@ -59,6 +59,7 @@ RuleCheckMessageList PackageCheck::runChecks() const {
   checkWrongTextLayers(msgs);
   checkPackageOutlines(msgs);
   checkCourtyards(msgs);
+  checkOriginInCenter(msgs);
   checkPadsPackagePadUuid(msgs);
   checkPadsClearanceToPads(msgs);
   checkPadsClearanceToLegend(msgs);
@@ -191,6 +192,113 @@ void PackageCheck::checkCourtyards(MsgList& msgs) const {
       if (count == 0) {
         msgs.append(std::make_shared<MsgMissingCourtyard>(itFtp.ptr()));
       }
+    }
+  }
+}
+
+void PackageCheck::checkOriginInCenter(MsgList& msgs) const {
+  for (auto itFtp = mPackage.getFootprints().begin();
+       itFtp != mPackage.getFootprints().end(); ++itFtp) {
+    // Specify a relative and an absolute tolerance.
+    qreal toleranceFactor = 0.01;
+    Length toleranceAbs(100000);
+
+    // Allow higher tolerance for THT parts.
+    if (mPackage.getAssemblyType(false) != Package::AssemblyType::Smt) {
+      toleranceFactor = 0.05;
+      toleranceAbs = Length(635000);
+    }
+
+    // Helper to increase tolerance.
+    auto increaseToleranceFactor = [&](qreal newFactor) {
+      toleranceFactor = std::max(newFactor, toleranceFactor);
+    };
+
+    // Consider mainly the package outlines since this is the most reliable
+    // source for this check.
+    QSet<Length> x, y;
+    for (const Circle& c : (*itFtp).getCircles()) {
+      if (c.getLayer() == Layer::topPackageOutlines()) {
+        const Length r = c.getDiameter() / 2;
+        x.insert(c.getCenter().getX() - r);
+        x.insert(c.getCenter().getX() + r);
+        y.insert(c.getCenter().getY() - r);
+        y.insert(c.getCenter().getY() + r);
+      }
+    }
+    for (const Polygon& p : (*itFtp).getPolygons()) {
+      if (p.getLayer() == Layer::topPackageOutlines()) {
+        if (p.getPath().isCurved()) {
+          const QRectF rectPx =
+              p.getPath().toClosedPath().toQPainterPathPx().boundingRect();
+          const Point topLeft = Point::fromPx(rectPx.topLeft());
+          const Point botRight = Point::fromPx(rectPx.bottomRight());
+          x.insert(topLeft.getX());
+          x.insert(botRight.getX());
+          y.insert(topLeft.getY());
+          y.insert(botRight.getY());
+          increaseToleranceFactor(0.15);  // Relax check due to complex shape.
+        } else {
+          for (const Vertex& v : p.getPath().getVertices()) {
+            x.insert(v.getPos().getX());
+            y.insert(v.getPos().getY());
+          }
+          if (p.getPath().toOpenPath().cleaned().getVertices().count() != 4) {
+            increaseToleranceFactor(0.1);  // Relax check due to complex shape.
+          }
+        }
+      }
+    }
+
+    // Only if we didn't find a package body, take more objects into account
+    // but allow much larger tolerance.
+    if (x.isEmpty() || y.isEmpty()) {
+      increaseToleranceFactor(0.3);
+      for (const FootprintPad& pad : (*itFtp).getPads()) {
+        x.insert(pad.getPosition().getX());
+        y.insert(pad.getPosition().getY());
+      }
+      for (const Circle& c : (*itFtp).getCircles()) {
+        if (c.getLayer() == Layer::topDocumentation()) {
+          const Length r = c.getDiameter() / 2;
+          x.insert(c.getCenter().getX() - r);
+          x.insert(c.getCenter().getX() + r);
+          y.insert(c.getCenter().getY() - r);
+          y.insert(c.getCenter().getY() + r);
+        }
+      }
+      for (const Polygon& p : (*itFtp).getPolygons()) {
+        if (p.getLayer() == Layer::topDocumentation()) {
+          const QRectF rectPx =
+              p.getPath().toClosedPath().toQPainterPathPx().boundingRect();
+          const Point topLeft = Point::fromPx(rectPx.topLeft());
+          const Point botRight = Point::fromPx(rectPx.bottomRight());
+          x.insert(topLeft.getX());
+          x.insert(botRight.getX());
+          y.insert(topLeft.getY());
+          y.insert(botRight.getY());
+        }
+      }
+    }
+
+    // If there is no boundary, abort.
+    if (x.isEmpty() || y.isEmpty()) {
+      continue;
+    }
+
+    // Calculate and check center.
+    const Length minX = *std::min_element(x.begin(), x.end());
+    const Length maxX = *std::max_element(x.begin(), x.end());
+    const Length minY = *std::min_element(y.begin(), y.end());
+    const Length maxY = *std::max_element(y.begin(), y.end());
+    const Point center((minX + maxX) / 2, (minY + maxY) / 2);
+    const Length width = maxX - minX;
+    const Length height = maxY - minY;
+    const Length tolX = std::max(width.scaled(toleranceFactor), toleranceAbs);
+    const Length tolY = std::max(height.scaled(toleranceFactor), toleranceAbs);
+    if ((center.getX().abs() > tolX) || (center.getY().abs() > tolY)) {
+      msgs.append(
+          std::make_shared<MsgFootprintOriginNotInCenter>(itFtp.ptr(), center));
     }
   }
 }
