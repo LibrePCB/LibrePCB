@@ -55,6 +55,7 @@ RuleCheckMessageList SymbolCheck::runChecks() const {
   checkOverlappingPins(msgs);
   checkMissingTexts(msgs);
   checkWrongTextLayers(msgs);
+  checkOriginInCenter(msgs);
   return msgs;
 }
 
@@ -134,6 +135,81 @@ void SymbolCheck::checkWrongTextLayers(MsgList& msgs) const {
       msgs.append(
           std::make_shared<MsgWrongSymbolTextLayer>(it.ptr(), *expectedLayer));
     }
+  }
+}
+
+void SymbolCheck::checkOriginInCenter(MsgList& msgs) const {
+  // Suppress this warning for symbols which have no pins and no grab areas.
+  // This avoids false-positives on very special symbols like schematic frames.
+  bool isNormalSymbol = !mSymbol.getPins().isEmpty();
+  if (!isNormalSymbol) {
+    for (const Circle& c : mSymbol.getCircles()) {
+      if ((c.getLayer() == Layer::symbolOutlines()) && (c.isGrabArea())) {
+        isNormalSymbol = true;
+      }
+    }
+    for (const Polygon& p : mSymbol.getPolygons()) {
+      if ((p.getLayer() == Layer::symbolOutlines()) && (p.isGrabArea())) {
+        isNormalSymbol = true;
+      }
+    }
+  }
+  if (!isNormalSymbol) {
+    return;
+  }
+
+  // Determine bounding area of grab area polygons, as they are the best
+  // indicator for the symbol body.
+  QSet<Length> x, y;
+  for (const Polygon& p : mSymbol.getPolygons()) {
+    if ((p.getLayer() == Layer::symbolOutlines()) && (!p.isFilled()) &&
+        p.isGrabArea() && p.getPath().isClosed() && (!p.getPath().isCurved())) {
+      for (const Vertex& v : p.getPath().getVertices()) {
+        x.insert(v.getPos().getX());
+        y.insert(v.getPos().getY());
+      }
+    }
+  }
+
+  // Only if we didn't find a symbol body, take more objects into account.
+  if (x.isEmpty() || y.isEmpty()) {
+    for (const SymbolPin& pin : mSymbol.getPins()) {
+      x.insert(pin.getPosition().getX());
+      y.insert(pin.getPosition().getY());
+    }
+    for (const Circle& circle : mSymbol.getCircles()) {
+      if (circle.getLayer() == Layer::symbolOutlines()) {
+        const Length r = circle.getDiameter() / 2;
+        x.insert(circle.getCenter().getX() - r);
+        x.insert(circle.getCenter().getX() + r);
+        y.insert(circle.getCenter().getY() - r);
+        y.insert(circle.getCenter().getY() + r);
+      }
+    }
+    for (const Polygon& p : mSymbol.getPolygons()) {
+      if (p.getLayer() == Layer::symbolOutlines()) {
+        for (const Vertex& v : p.getPath().getVertices()) {
+          x.insert(v.getPos().getX());
+          y.insert(v.getPos().getY());
+        }
+      }
+    }
+  }
+
+  // If there is no boundary, abort.
+  if (x.isEmpty() || y.isEmpty()) {
+    return;
+  }
+
+  // Calculate and check center.
+  const Length minX = *std::min_element(x.begin(), x.end());
+  const Length maxX = *std::max_element(x.begin(), x.end());
+  const Length minY = *std::min_element(y.begin(), y.end());
+  const Length maxY = *std::max_element(y.begin(), y.end());
+  const Point center((minX + maxX) / 2, (minY + maxY) / 2);
+  const Length tolerance = Length(2540000 - 1);  // Not ideal, but good enough?
+  if (std::max(center.getX().abs(), center.getY().abs()) > tolerance) {
+    msgs.append(std::make_shared<MsgSymbolOriginNotInCenter>(center));
   }
 }
 

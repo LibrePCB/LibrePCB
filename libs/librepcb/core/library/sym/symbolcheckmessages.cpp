@@ -98,6 +98,24 @@ MsgNonFunctionalSymbolPinInversionSign::MsgNonFunctionalSymbolPinInversionSign(
 }
 
 /*******************************************************************************
+ *  MsgSymbolOriginNotInCenter
+ ******************************************************************************/
+
+MsgSymbolOriginNotInCenter::MsgSymbolOriginNotInCenter(
+    const Point& center) noexcept
+  : RuleCheckMessage(
+        Severity::Hint, tr("Origin not in center"),
+        tr("Generally the origin (0, 0) should be in the center of the symbol "
+           "body (roughly, mapped to grid). It's not recommended to have it at "
+           "pin-1 coordinate, top-left or something like that.\n\nIt looks "
+           "like this rule is not followed in this symbol. However, for "
+           "irregular symbol shapes this warning may not be justified. In such "
+           "cases, just approve it."),
+        "origin_not_in_center"),
+    mCenter(center) {
+}
+
+/*******************************************************************************
  *  MsgOverlappingSymbolPins
  ******************************************************************************/
 
