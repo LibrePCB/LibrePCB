@@ -62,6 +62,7 @@ protected:  // Methods
   void checkOverlappingPins(MsgList& msgs) const;
   void checkMissingTexts(MsgList& msgs) const;
   void checkWrongTextLayers(MsgList& msgs) const;
+  void checkOriginInCenter(MsgList& msgs) const;
 
 private:  // Data
   const Symbol& mSymbol;

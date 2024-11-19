@@ -287,7 +287,31 @@ bool SymbolEditorWidget::paste() noexcept {
 }
 
 bool SymbolEditorWidget::move(Qt::ArrowType direction) noexcept {
-  return mFsm->processMove(direction);
+  Point delta;
+  switch (direction) {
+    case Qt::LeftArrow: {
+      delta.setX(-mUi->graphicsView->getGridInterval());
+      break;
+    }
+    case Qt::RightArrow: {
+      delta.setX(*mUi->graphicsView->getGridInterval());
+      break;
+    }
+    case Qt::UpArrow: {
+      delta.setY(*mUi->graphicsView->getGridInterval());
+      break;
+    }
+    case Qt::DownArrow: {
+      delta.setY(-mUi->graphicsView->getGridInterval());
+      break;
+    }
+    default: {
+      qWarning() << "Unhandled switch-case in SymbolEditorWidget::move():"
+                 << direction;
+      break;
+    }
+  }
+  return mFsm->processMove(delta);
 }
 
 bool SymbolEditorWidget::rotate(const Angle& rotation) noexcept {
@@ -567,6 +591,16 @@ void SymbolEditorWidget::fixMsg(
   mUndoStack->execCmd(cmd.take());
 }
 
+template <>
+void SymbolEditorWidget::fixMsg(const MsgSymbolOriginNotInCenter& msg) {
+  mFsm->processAbortCommand();
+  mFsm->processAbortCommand();
+  mFsm->processSelectAll();
+  mFsm->processMove(
+      -msg.getCenter().mappedToGrid(mUi->graphicsView->getGridInterval()));
+  mFsm->processAbortCommand();  // Clear selection.
+}
+
 template <typename MessageType>
 bool SymbolEditorWidget::fixMsgHelper(
     std::shared_ptr<const RuleCheckMessage> msg, bool applyFix) {
@@ -590,6 +624,7 @@ bool SymbolEditorWidget::processRuleCheckMessage(
   if (fixMsgHelper<MsgSymbolPinNotOnGrid>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgNonFunctionalSymbolPinInversionSign>(msg, applyFix))
     return true;
+  if (fixMsgHelper<MsgSymbolOriginNotInCenter>(msg, applyFix)) return true;
   return false;
 }
 

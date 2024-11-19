@@ -460,7 +460,7 @@ bool PackageEditorState_Select::processPaste() noexcept {
   return false;
 }
 
-bool PackageEditorState_Select::processMove(Qt::ArrowType direction) noexcept {
+bool PackageEditorState_Select::processMove(const Point& delta) noexcept {
   if ((!mContext.currentFootprint) || (!mContext.currentGraphicsItem)) {
     return false;
   }
@@ -468,31 +468,6 @@ bool PackageEditorState_Select::processMove(Qt::ArrowType direction) noexcept {
   switch (mState) {
     case SubState::IDLE: {
       try {
-        Point delta;
-        switch (direction) {
-          case Qt::LeftArrow: {
-            delta.setX(-getGridInterval());
-            break;
-          }
-          case Qt::RightArrow: {
-            delta.setX(*getGridInterval());
-            break;
-          }
-          case Qt::UpArrow: {
-            delta.setY(*getGridInterval());
-            break;
-          }
-          case Qt::DownArrow: {
-            delta.setY(-getGridInterval());
-            break;
-          }
-          default: {
-            qWarning() << "Unhandled switch-case in "
-                          "PackageEditorState_Select::processMove():"
-                       << direction;
-            break;
-          }
-        }
         QScopedPointer<CmdDragSelectedFootprintItems> cmd(
             new CmdDragSelectedFootprintItems(mContext));
         cmd->translate(delta);

@@ -233,9 +233,9 @@ bool SymbolEditorFsm::processPaste() noexcept {
   }
 }
 
-bool SymbolEditorFsm::processMove(Qt::ArrowType direction) noexcept {
+bool SymbolEditorFsm::processMove(const Point& delta) noexcept {
   if (getCurrentState()) {
-    return getCurrentState()->processMove(direction);
+    return getCurrentState()->processMove(delta);
   } else {
     return false;
   }

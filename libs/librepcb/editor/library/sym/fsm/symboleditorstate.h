@@ -112,8 +112,8 @@ public:
     Q_UNUSED(data);
     return false;
   }
-  virtual bool processMove(Qt::ArrowType direction) {
-    Q_UNUSED(direction);
+  virtual bool processMove(const Point& delta) {
+    Q_UNUSED(delta);
     return false;
   }
   virtual bool processRotate(const Angle& rotation) noexcept {

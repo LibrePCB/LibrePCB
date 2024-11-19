@@ -398,6 +398,28 @@ MsgMissingPackageOutline::MsgMissingPackageOutline(
 }
 
 /*******************************************************************************
+ *  MsgFootprintOriginNotInCenter
+ ******************************************************************************/
+
+MsgFootprintOriginNotInCenter::MsgFootprintOriginNotInCenter(
+    std::shared_ptr<const Footprint> footprint, const Point& center) noexcept
+  : RuleCheckMessage(
+        Severity::Hint,
+        tr("Origin of '%1' not in center")
+            .arg(*footprint->getNames().getDefaultValue()),
+        tr("Generally the origin (0, 0) should be at the coordinate used for "
+           "pick&place which is typically in the center of the package body. "
+           "It should even be (more or less) <b>exactly</b> in the center, not "
+           "aligned to a grid (off-grid pads are fine).\n\nIt looks like this "
+           "rule is not followed in this footprint. However, for irregular "
+           "package shapes or other special cases this warning may not be "
+           "justified. In such cases, just approve it."),
+        "origin_not_in_center"),
+    mFootprint(footprint),
+    mCenter(center) {
+}
+
+/*******************************************************************************
  *  MsgOverlappingPads
  ******************************************************************************/
 

@@ -497,7 +497,31 @@ bool PackageEditorWidget::paste() noexcept {
 }
 
 bool PackageEditorWidget::move(Qt::ArrowType direction) noexcept {
-  return mFsm->processMove(direction);
+  Point delta;
+  switch (direction) {
+    case Qt::LeftArrow: {
+      delta.setX(-mUi->graphicsView->getGridInterval());
+      break;
+    }
+    case Qt::RightArrow: {
+      delta.setX(*mUi->graphicsView->getGridInterval());
+      break;
+    }
+    case Qt::UpArrow: {
+      delta.setY(*mUi->graphicsView->getGridInterval());
+      break;
+    }
+    case Qt::DownArrow: {
+      delta.setY(-mUi->graphicsView->getGridInterval());
+      break;
+    }
+    default: {
+      qWarning() << "Unhandled switch-case in PackageEditorWidget::move():"
+                 << direction;
+      break;
+    }
+  }
+  return mFsm->processMove(delta);
 }
 
 bool PackageEditorWidget::rotate(const Angle& rotation) noexcept {
@@ -1023,6 +1047,17 @@ void PackageEditorWidget::fixMsg(const MsgMissingFootprintValue& msg) {
 }
 
 template <>
+void PackageEditorWidget::fixMsg(const MsgFootprintOriginNotInCenter& msg) {
+  mFsm->processAbortCommand();
+  mFsm->processAbortCommand();
+  currentFootprintChanged(
+      mPackage->getFootprints().indexOf(msg.getFootprint().get()));
+  mFsm->processSelectAll();
+  mFsm->processMove(-msg.getCenter());
+  mFsm->processAbortCommand();  // Clear selection.
+}
+
+template <>
 void PackageEditorWidget::fixMsg(const MsgWrongFootprintTextLayer& msg) {
   std::shared_ptr<Footprint> footprint =
       mPackage->getFootprints().get(msg.getFootprint().get());
@@ -1210,6 +1245,7 @@ bool PackageEditorWidget::processRuleCheckMessage(
   if (fixMsgHelper<MsgMissingFootprintModel>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgMissingFootprintName>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgMissingFootprintValue>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgFootprintOriginNotInCenter>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgWrongFootprintTextLayer>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgUnusedCustomPadOutline>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgInvalidCustomPadOutline>(msg, applyFix)) return true;

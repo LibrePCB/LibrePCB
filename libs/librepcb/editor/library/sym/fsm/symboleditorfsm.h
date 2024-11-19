@@ -117,7 +117,7 @@ public:
   bool processCut() noexcept;
   bool processCopy() noexcept;
   bool processPaste() noexcept;
-  bool processMove(Qt::ArrowType direction) noexcept;
+  bool processMove(const Point& delta) noexcept;
   bool processRotate(const Angle& rotation) noexcept;
   bool processMirror(Qt::Orientation orientation) noexcept;
   bool processSnapToGrid() noexcept;

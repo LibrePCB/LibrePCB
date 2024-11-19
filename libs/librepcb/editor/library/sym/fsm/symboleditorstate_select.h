@@ -93,7 +93,7 @@ public:
   bool processCopy() noexcept override;
   bool processPaste(
       std::unique_ptr<SymbolClipboardData> data = nullptr) noexcept override;
-  bool processMove(Qt::ArrowType direction) noexcept override;
+  bool processMove(const Point& delta) noexcept override;
   bool processRotate(const Angle& rotation) noexcept override;
   bool processMirror(Qt::Orientation orientation) noexcept override;
   bool processSnapToGrid() noexcept override;

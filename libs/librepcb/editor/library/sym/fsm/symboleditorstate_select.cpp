@@ -398,35 +398,10 @@ bool SymbolEditorState_Select::processPaste(
   return false;
 }
 
-bool SymbolEditorState_Select::processMove(Qt::ArrowType direction) noexcept {
+bool SymbolEditorState_Select::processMove(const Point& delta) noexcept {
   switch (mState) {
     case SubState::IDLE: {
       try {
-        Point delta;
-        switch (direction) {
-          case Qt::LeftArrow: {
-            delta.setX(-getGridInterval());
-            break;
-          }
-          case Qt::RightArrow: {
-            delta.setX(*getGridInterval());
-            break;
-          }
-          case Qt::UpArrow: {
-            delta.setY(*getGridInterval());
-            break;
-          }
-          case Qt::DownArrow: {
-            delta.setY(-getGridInterval());
-            break;
-          }
-          default: {
-            qWarning() << "Unhandled switch-case in "
-                          "SymbolEditorState_Select::processMove():"
-                       << direction;
-            break;
-          }
-        }
         QScopedPointer<CmdDragSelectedSymbolItems> cmd(
             new CmdDragSelectedSymbolItems(mContext));
         cmd->translate(delta);

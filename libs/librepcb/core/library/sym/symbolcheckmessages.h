@@ -122,6 +122,31 @@ private:
 };
 
 /*******************************************************************************
+ *  Class MsgSymbolOriginNotInCenter
+ ******************************************************************************/
+
+/**
+ * @brief The MsgSymbolOriginNotInCenter class
+ */
+class MsgSymbolOriginNotInCenter final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgSymbolOriginNotInCenter)
+
+public:
+  // Constructors / Destructor
+  MsgSymbolOriginNotInCenter() = delete;
+  explicit MsgSymbolOriginNotInCenter(const Point& center) noexcept;
+  MsgSymbolOriginNotInCenter(const MsgSymbolOriginNotInCenter& other) noexcept
+    : RuleCheckMessage(other), mCenter(other.mCenter) {}
+  virtual ~MsgSymbolOriginNotInCenter() noexcept {}
+
+  // Getters
+  const Point& getCenter() const noexcept { return mCenter; }
+
+private:
+  const Point mCenter;
+};
+
+/*******************************************************************************
  *  Class MsgOverlappingSymbolPins
  ******************************************************************************/
 
