@@ -121,6 +121,21 @@ Angle Toolbox::arcAngle(const Point& p1, const Point& p2,
   return Angle::fromRad(angle2 - angle1).mapTo0_360deg();
 }
 
+Angle Toolbox::arcAngleFrom3Points(const Point& start, const Point& mid,
+                                   const Point& end) noexcept {
+  const UnsignedLength h = shortestDistanceBetweenPointAndLine(mid, start, end);
+  const UnsignedLength c = (end - start).getLength();
+  const qreal phi = 4 * std::atan((2 * h->toMm()) / c->toMm());
+  const Angle angleMid = angleBetweenPoints(start, mid);
+  const Angle angleEnd = angleBetweenPoints(start, end);
+  const Angle angleDelta = angleMid - angleEnd;
+  if (angleDelta.mappedTo180deg() < 0) {
+    return Angle::fromRad(phi);
+  } else {
+    return -Angle::fromRad(phi);
+  }
+}
+
 Angle Toolbox::angleBetweenPoints(const Point& p1, const Point& p2) noexcept {
   const Point delta = p2 - p1;
   if (delta.isOrigin()) {
