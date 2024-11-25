@@ -386,6 +386,8 @@ void LibraryOverviewWidget::ruleCheckApproveRequested(
 }
 
 void LibraryOverviewWidget::updateElementLists() noexcept {
+  // For big libraries this can take a while.
+  qApp->setOverrideCursor(Qt::WaitCursor);
   updateElementList<ComponentCategory>(*mUi->lstCmpCat,
                                        QIcon(":/img/places/folder.png"));
   updateElementList<PackageCategory>(*mUi->lstPkgCat,
@@ -395,6 +397,7 @@ void LibraryOverviewWidget::updateElementLists() noexcept {
   updateElementList<Component>(*mUi->lstCmp,
                                QIcon(":/img/library/component.png"));
   updateElementList<Device>(*mUi->lstDev, QIcon(":/img/library/device.png"));
+  qApp->restoreOverrideCursor();
 }
 
 template <typename ElementType>
