@@ -278,6 +278,11 @@ void OpenGlView::paintGL() {
   // Clear color and depth buffer.
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+  // Bind the shader program.
+  if (!mProgram.bind()) {
+    qCritical() << "Failed to bind OpenGL shader program.";
+  }
+
   // Set modelview-projection matrix.
   const qreal zNear = 0.1;
   const qreal zFar = 100.0;
