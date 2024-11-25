@@ -142,6 +142,8 @@ public:
   static Path line(const Point& p1, const Point& p2,
                    const Angle& angle = Angle::deg0()) noexcept;
   static Path circle(const PositiveLength& diameter) noexcept;
+  static Path donut(const PositiveLength& outerDiameter,
+                    const PositiveLength& innerDiameter) noexcept;
   static Path obround(const PositiveLength& width,
                       const PositiveLength& height) noexcept;
   static Path obround(const Point& p1, const Point& p2,
@@ -152,6 +154,14 @@ public:
   static Path centeredRect(
       const PositiveLength& width, const PositiveLength& height,
       const UnsignedLength& cornerRadius = UnsignedLength(0)) noexcept;
+  static Path chamferedRect(const PositiveLength& width,
+                            const PositiveLength& height,
+                            const UnsignedLength& chamferSize, bool topLeft,
+                            bool topRight, bool bottomLeft,
+                            bool bottomRight) noexcept;
+  static Path trapezoid(const PositiveLength& width,
+                        const PositiveLength& height, const Length& dw,
+                        const Length dh) noexcept;
   static Path octagon(
       const PositiveLength& width, const PositiveLength& height,
       const UnsignedLength& cornerRadius = UnsignedLength(0)) noexcept;

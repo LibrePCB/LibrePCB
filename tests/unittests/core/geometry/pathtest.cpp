@@ -398,6 +398,39 @@ TEST_F(PathTest, testCircle) {
   EXPECT_TRUE(path.isClosed());
 }
 
+TEST_F(PathTest, testDonut) {
+  const PositiveLength outerDiameter(1000);
+  const PositiveLength innerDiameter(500);
+
+  const Point ot(Length(0), Length(500));
+  const Point ob(Length(0), Length(-500));
+  const Point it(Length(0), Length(250));
+  const Point ib(Length(0), Length(-250));
+  Path expected;
+  expected.addVertex(ot, -Angle::deg180());
+  expected.addVertex(ob, Angle::deg0());
+  expected.addVertex(ib, Angle::deg180());
+  expected.addVertex(it, Angle::deg180());
+  expected.addVertex(ib, Angle::deg0());
+  expected.addVertex(ob, -Angle::deg180());
+  expected.addVertex(ot, Angle::deg0());
+
+  const Path actual = Path::donut(outerDiameter, innerDiameter);
+
+  EXPECT_EQ(str(expected), str(actual));
+  EXPECT_TRUE(actual.isClosed());
+}
+
+TEST_F(PathTest, testDonutInvalid) {
+  const PositiveLength outerDiameter(1000);
+  const PositiveLength innerDiameter = outerDiameter;
+
+  const Path expected;  // Empty.
+  const Path actual = Path::donut(outerDiameter, innerDiameter);
+
+  EXPECT_EQ(str(expected), str(actual));
+}
+
 TEST_F(PathTest, testCenteredRectRoundedCorners) {
   Path expected = Path({
       Vertex(Point(-30000, 75000), Angle::deg0()),
@@ -420,6 +453,145 @@ TEST_F(PathTest, testCenteredRectRoundedCornersSaturation) {
   Path actual = Path::centeredRect(
       PositiveLength(100000), PositiveLength(150000), UnsignedLength(60000));
   EXPECT_EQ(str(expected), str(actual));
+}
+
+TEST_F(PathTest, testChamferedRect) {
+  const PositiveLength w(1000);
+  const PositiveLength h(500);
+  const UnsignedLength c(100);
+
+  Path expected;
+  expected.addVertex(Point(-500, 150), Angle::deg0());
+  expected.addVertex(Point(-400, 250), Angle::deg0());
+  expected.addVertex(Point(400, 250), Angle::deg0());
+  expected.addVertex(Point(500, 150), Angle::deg0());
+  expected.addVertex(Point(500, -150), Angle::deg0());
+  expected.addVertex(Point(400, -250), Angle::deg0());
+  expected.addVertex(Point(-400, -250), Angle::deg0());
+  expected.addVertex(Point(-500, -150), Angle::deg0());
+  expected.addVertex(Point(-500, 150), Angle::deg0());
+
+  const Path actual = Path::chamferedRect(w, h, c, true, true, true, true);
+
+  EXPECT_EQ(str(expected), str(actual));
+  EXPECT_TRUE(actual.isClosed());
+}
+
+TEST_F(PathTest, testChamferedRectTopRight) {
+  const PositiveLength w(1000);
+  const PositiveLength h(500);
+  const UnsignedLength c(100);
+
+  Path expected;
+  expected.addVertex(Point(-500, 250), Angle::deg0());
+  expected.addVertex(Point(400, 250), Angle::deg0());
+  expected.addVertex(Point(500, 150), Angle::deg0());
+  expected.addVertex(Point(500, -250), Angle::deg0());
+  expected.addVertex(Point(-500, -250), Angle::deg0());
+  expected.addVertex(Point(-500, 250), Angle::deg0());
+
+  const Path actual = Path::chamferedRect(w, h, c, false, true, false, false);
+
+  EXPECT_EQ(str(expected), str(actual));
+  EXPECT_TRUE(actual.isClosed());
+}
+
+TEST_F(PathTest, testChamferedRectSaturated) {
+  const PositiveLength w(1000);
+  const PositiveLength h(500);
+  const UnsignedLength c(300);  // Must be clipped to 250.
+
+  Path expected;
+  expected.addVertex(Point(-500, 0), Angle::deg0());
+  expected.addVertex(Point(-250, 250), Angle::deg0());
+  expected.addVertex(Point(250, 250), Angle::deg0());
+  expected.addVertex(Point(500, 0), Angle::deg0());
+  expected.addVertex(Point(250, -250), Angle::deg0());
+  expected.addVertex(Point(-250, -250), Angle::deg0());
+  expected.addVertex(Point(-500, 0), Angle::deg0());
+
+  const Path actual = Path::chamferedRect(w, h, c, true, true, true, true);
+
+  EXPECT_EQ(str(expected), str(actual));
+  EXPECT_TRUE(actual.isClosed());
+}
+
+TEST_F(PathTest, testTrapezoid) {
+  const PositiveLength w(1000);
+  const PositiveLength h(800);
+  const Length dw(200);
+  const Length dh(100);
+
+  Path expected;
+  expected.addVertex(Point(-600, 350), Angle::deg0());
+  expected.addVertex(Point(600, 450), Angle::deg0());
+  expected.addVertex(Point(400, -450), Angle::deg0());
+  expected.addVertex(Point(-400, -350), Angle::deg0());
+  expected.addVertex(Point(-600, 350), Angle::deg0());
+
+  const Path actual = Path::trapezoid(w, h, dw, dh);
+
+  EXPECT_EQ(str(expected), str(actual));
+  EXPECT_TRUE(actual.isClosed());
+}
+
+// Note: This is actually a very strange case, in real world we'll probably
+// never create such trapezoids which do not look like a trapezoid anymore.
+TEST_F(PathTest, testTrapezoidSaturated) {
+  const PositiveLength w(1000);
+  const PositiveLength h(800);
+  const Length dw(1200);  // Must be clipped to 1000.
+  const Length dh(-1200);  // Must be clipped to -800.
+
+  Path expected;
+  expected.addVertex(Point(-1000, 800), Angle::deg0());
+  expected.addVertex(Point(1000, 0), Angle::deg0());
+  expected.addVertex(Point(0, 0), Angle::deg0());
+  expected.addVertex(Point(0, -800), Angle::deg0());
+  expected.addVertex(Point(-1000, 800), Angle::deg0());
+
+  const Path actual = Path::trapezoid(w, h, dw, dh);
+
+  EXPECT_EQ(str(expected), str(actual));
+  EXPECT_TRUE(actual.isClosed());
+}
+
+TEST_F(PathTest, testTrapezoidDw) {
+  const PositiveLength w(1000);
+  const PositiveLength h(800);
+  const Length dw(200);
+  const Length dh(0);
+
+  Path expected;
+  expected.addVertex(Point(-600, 400), Angle::deg0());
+  expected.addVertex(Point(600, 400), Angle::deg0());
+  expected.addVertex(Point(400, -400), Angle::deg0());
+  expected.addVertex(Point(-400, -400), Angle::deg0());
+  expected.addVertex(Point(-600, 400), Angle::deg0());
+
+  const Path actual = Path::trapezoid(w, h, dw, dh);
+
+  EXPECT_EQ(str(expected), str(actual));
+  EXPECT_TRUE(actual.isClosed());
+}
+
+TEST_F(PathTest, testTrapezoidDh) {
+  const PositiveLength w(1000);
+  const PositiveLength h(800);
+  const Length dw(0);
+  const Length dh(-200);
+
+  Path expected;
+  expected.addVertex(Point(-500, 500), Angle::deg0());
+  expected.addVertex(Point(500, 300), Angle::deg0());
+  expected.addVertex(Point(500, -300), Angle::deg0());
+  expected.addVertex(Point(-500, -500), Angle::deg0());
+  expected.addVertex(Point(-500, 500), Angle::deg0());
+
+  const Path actual = Path::trapezoid(w, h, dw, dh);
+
+  EXPECT_EQ(str(expected), str(actual));
+  EXPECT_TRUE(actual.isClosed());
 }
 
 TEST_F(PathTest, testOctagonRoundedCornersSaturation) {
