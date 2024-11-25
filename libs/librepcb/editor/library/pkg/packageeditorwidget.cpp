@@ -83,16 +83,6 @@ std::unique_ptr<SExpression> serialize(const double& obj) {
   return SExpression::createToken(s);
 }
 
-template <>
-float deserialize(const SExpression& node) {
-  return node.getValue().toFloat();
-}
-
-template <>
-double deserialize(const SExpression& node) {
-  return node.getValue().toDouble();
-}
-
 namespace editor {
 
 /*******************************************************************************

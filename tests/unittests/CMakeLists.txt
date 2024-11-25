@@ -123,6 +123,7 @@ add_executable(
   editor/widgets/unsignedlengthedittest.cpp
   editor/workspace/categorytreemodeltest.cpp
   editor/workspace/librarymanager/librarydownloadtest.cpp
+  kicadimport/kicadlibraryimporttest.cpp
   main.cpp
   testhelpers.cpp
   testhelpers.h
