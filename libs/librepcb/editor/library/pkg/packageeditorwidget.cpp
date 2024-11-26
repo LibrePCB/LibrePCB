@@ -637,7 +637,7 @@ bool PackageEditorWidget::toggleBackgroundImage() noexcept {
                   mBackgroundImageSettings.references);
     }
     if (dlg.exec() != QDialog::Accepted) {
-      return true;  // Aborted.
+      return mBackgroundImageGraphicsItem->isVisible();  // Aborted.
     }
 
     mBackgroundImageSettings.image = dlg.getImage();
