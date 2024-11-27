@@ -193,6 +193,7 @@ private:  // Data
   QScopedPointer<QAction> mActionRescanLibraries;
   QScopedPointer<QAction> mActionImportDxf;
   QScopedPointer<QAction> mActionImportEagleLibrary;
+  QScopedPointer<QAction> mActionImportKiCadLibrary;
   QScopedPointer<QAction> mActionExportImage;
   QScopedPointer<QAction> mActionExportPdf;
   QScopedPointer<QAction> mActionPrint;

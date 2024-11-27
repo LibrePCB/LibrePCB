@@ -35,6 +35,7 @@
 #include "cmp/componenteditorwidget.h"
 #include "dev/deviceeditorwidget.h"
 #include "eaglelibraryimportwizard/eaglelibraryimportwizard.h"
+#include "kicadlibraryimportwizard/kicadlibraryimportwizard.h"
 #include "lib/libraryoverviewwidget.h"
 #include "pkg/packageeditorwidget.h"
 #include "sym/symboleditorwidget.h"
@@ -533,6 +534,13 @@ void LibraryEditor::createActions() noexcept {
         wizard.exec();
       }));
   mActionImportEagleLibrary->setEnabled(!mIsOpenedReadOnly);
+  mActionImportKiCadLibrary.reset(
+      cmd.importKiCadLibrary.createAction(this, this, [this]() {
+        KiCadLibraryImportWizard wizard(
+            mWorkspace, mLibrary->getDirectory().getAbsPath(), this);
+        wizard.exec();
+      }));
+  mActionImportKiCadLibrary->setEnabled(!mIsOpenedReadOnly);
   mActionExportImage.reset(cmd.exportImage.createAction(this, this, [this]() {
     if (mCurrentEditorWidget) mCurrentEditorWidget->exportImage();
   }));
@@ -887,6 +895,7 @@ void LibraryEditor::createMenus() noexcept {
     MenuBuilder smb(mb.addSubMenu(&MenuBuilder::createImportMenu));
     smb.addAction(mActionImportDxf);
     smb.addAction(mActionImportEagleLibrary);
+    smb.addAction(mActionImportKiCadLibrary);
   }
   {
     MenuBuilder smb(mb.addSubMenu(&MenuBuilder::createExportMenu));

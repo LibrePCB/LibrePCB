@@ -145,6 +145,11 @@ Copyright: publicdomainvectors.org and LibrePCB Developers
 License: CC0-1.0
 
 Files:
+ img/wizards/kicad_watermark.png
+Copyright: KiCad and LibrePCB Developers
+License: GPL-3.0-or-later
+
+Files:
  img/actions/select.png
 Copyright: publicdomainvectors.org
 License: CC0-1.0
