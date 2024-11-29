@@ -138,6 +138,8 @@ signals:
    */
   void cursorScenePositionChanged(const Point& pos);
 
+  void dragged();
+
 private slots:
 
   // Private Slots

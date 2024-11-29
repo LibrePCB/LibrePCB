@@ -255,6 +255,7 @@ void NetworkRequestBase::replyReadyReadSlot() noexcept {
   Q_ASSERT(QThread::currentThread() == NetworkAccessManager::instance());
   Q_ASSERT(mReply);
   fetchNewData(*mReply);
+  QThread::msleep(50);
 }
 
 void NetworkRequestBase::replyErrorSlot(
