@@ -544,7 +544,7 @@ bool PackageEditorWidget::editProperties() noexcept {
 
 bool PackageEditorWidget::zoomIn() noexcept {
   if (mOpenGlView && is3DModeEnabled()) {
-    mOpenGlView->zoomIn();
+    // mOpenGlView->zoomIn();
   } else {
     mUi->graphicsView->zoomIn();
   }
@@ -553,7 +553,7 @@ bool PackageEditorWidget::zoomIn() noexcept {
 
 bool PackageEditorWidget::zoomOut() noexcept {
   if (mOpenGlView && is3DModeEnabled()) {
-    mOpenGlView->zoomOut();
+    // mOpenGlView->zoomOut();
   } else {
     mUi->graphicsView->zoomOut();
   }
@@ -562,7 +562,7 @@ bool PackageEditorWidget::zoomOut() noexcept {
 
 bool PackageEditorWidget::zoomAll() noexcept {
   if (mOpenGlView && is3DModeEnabled()) {
-    mOpenGlView->zoomAll();
+    // mOpenGlView->zoomAll();
   } else {
     mUi->graphicsView->zoomAll();
   }
@@ -1365,10 +1365,10 @@ void PackageEditorWidget::toggle3DMode(bool enable) noexcept {
     mOpenGlView.reset(new OpenGlView(this));
     mUi->mainLayout->insertWidget(0, mOpenGlView.data(), 2);
     mOpenGlSceneBuilder.reset(new OpenGlSceneBuilder());
-    connect(mOpenGlSceneBuilder.data(), &OpenGlSceneBuilder::started,
-            mOpenGlView.data(), &OpenGlView::startSpinning);
-    connect(mOpenGlSceneBuilder.data(), &OpenGlSceneBuilder::finished,
-            mOpenGlView.data(), &OpenGlView::stopSpinning);
+    // connect(mOpenGlSceneBuilder.data(), &OpenGlSceneBuilder::started,
+    //         mOpenGlView.data(), &OpenGlView::startSpinning);
+    // connect(mOpenGlSceneBuilder.data(), &OpenGlSceneBuilder::finished,
+    //         mOpenGlView.data(), &OpenGlView::stopSpinning);
     connect(mOpenGlSceneBuilder.data(), &OpenGlSceneBuilder::objectAdded,
             mOpenGlView.data(), &OpenGlView::addObject);
     connect(mOpenGlSceneBuilder.data(), &OpenGlSceneBuilder::objectRemoved,
