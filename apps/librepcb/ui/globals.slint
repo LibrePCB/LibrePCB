@@ -1,0 +1,302 @@
+export enum MenuItemId {
+    new-window,
+}
+
+export enum LibraryType {
+    local,
+    remote,
+    online,
+}
+
+export enum LibraryState {
+    unknown,
+    up-to-date,
+    outdated,
+}
+
+export struct Library {
+    id: string,
+    name: string,
+    description: string,
+    version: string,
+    icon: image,
+    recommended: bool,
+    type: LibraryType,
+    state: LibraryState,
+    progress: int, // [%], 0 if not installing
+    checked: bool,
+}
+
+export struct FolderTreeItem {
+    level: int,
+    icon: image,
+    name: string,
+    path: string,
+    is-folder: bool,
+}
+
+export struct Project {
+    path: string,
+    name: string,
+}
+
+export struct ProjectData {
+    valid: bool,
+    name: string,
+    schematics: [string],
+    boards: [string],
+}
+
+export enum TabType {
+    schematic,
+    board-2d,
+    board-3d,
+}
+
+export struct Tab {
+    type: TabType,
+    title: string,
+}
+
+export struct WindowSection {
+    index: int,  // Section index (0 = left most)
+    tabs: [Tab], // Tabs in this section
+    tab-index: int,  // Currently opened tab in this section
+    overlay-color: brush,
+    frame: int, // Frame index to trigger repainting
+}
+
+export struct EditParseResult {
+    valid: bool,
+    evaluated-value: string,
+    evaluated-unit: string,
+}
+
+export global Globals {
+    pure callback menu-item-triggered(MenuItemId);
+
+    pure callback parse-length-input(string, string) -> EditParseResult;
+
+    // An item in a project tree view has been double-clicked.
+    //
+    // - File path (see FolderTreeItem::path)
+    pure callback project-item-doubleclicked(string);
+
+    // A schematic in the projects panel has been clicked.
+    //
+    // - Schematic index
+    pure callback schematic-clicked(int);
+
+    // A board in the projects panel has been clicked.
+    //
+    // - Board index
+    pure callback board-clicked(int);
+
+    // The 3D viewer for a board has been requested.
+    //
+    // - Section index
+    // - Board tab index
+    pure callback board-3d-clicked(int, int);
+
+    // Requested to switch to a particular tab
+    //
+    // - Section index
+    // - Tab index
+    pure callback tab-clicked(int, int);
+
+    // Requested to close a particular tab
+    //
+    // - Section index
+    // - Tab index
+    pure callback tab-close-clicked(int, int);
+
+    // Populate the installed-libraries and available-libraries models with data
+    // if not done yet (lazy loading only if libraries are visible in the UI).
+    pure callback ensure-libraries-populated();
+
+    // Install all checked libraries
+    pure callback install-checked-libraries();
+
+    // Uninstall a library
+    //
+    // - Library ID (see Library::id)
+    pure callback uninstall-library(string);
+
+    // Set the current section index
+    //
+    // - Section index
+    //pure callback set-current-section(int);
+
+    // Render a graphics scene image
+    //
+    // - Scene section
+    // - Current tab in section
+    // - Scene width
+    // - Scene height
+    // - Frame number (to be ignored)
+    pure callback render-scene(int, int, length, length, int) -> image;
+
+    // Scene pointer event
+    //
+    // - Scene section index
+    // - Cursor X
+    // - Cursor Y
+    // - Scene width
+    // - Scene height
+    // - Pointer event
+    pure callback scene-pointer-event(int, length, length, length, length, PointerEvent) -> EventResult;
+
+    // Scene scrolled event
+    //
+    // - Scene section index
+    // - Cursor X
+    // - Cursor Y
+    // - Scene width
+    // - Scene height
+    // - Scroll event
+    pure callback scene-scrolled(int, length, length, length, length, PointerScrollEvent) -> EventResult;
+
+    // Scene button "zoom to fit content" clicked
+    //
+    // - Scene section index
+    // - Scene width
+    // - Scene height
+    pure callback scene-zoom-fit-clicked(int, length, length);
+
+    // Scene button "zoom in" clicked
+    //
+    // - Scene section index
+    // - Scene width
+    // - Scene height
+    pure callback scene-zoom-in-clicked(int, length, length);
+
+    // Scene button "zoom out" clicked
+    //
+    // - Scene section index
+    // - Scene width
+    // - Scene height
+    pure callback scene-zoom-out-clicked(int, length, length);
+
+    in property <bool> preview-mode: true;
+
+    in property <[FolderTreeItem]> workspace-folder: [
+        {
+            icon: @image-url("img/library.png"),
+            name: "project-1",
+            path: "/path/to",
+            is-folder: true,
+        },
+        {
+            level: 1,
+            icon: @image-url("img/library.png"),
+            name: "project-2.lpp",
+            path: "/path/to/project-2.lpp",
+        },
+    ];
+
+    in property <[FolderTreeItem]> recent-projects: [
+        {
+            icon: @image-url("img/library.png"),
+            name: "project-1.lpp",
+            path: "/path/to/project-1.lpp",
+        },
+        {
+            icon: @image-url("img/library.png"),
+            name: "project-2.lpp",
+            path: "/path/to/project-2.lpp",
+        },
+    ];
+
+    in property <[FolderTreeItem]> favorite-projects: recent-projects;
+
+    in property <[Project]> open-projects: [
+        {
+            path: "/path/to/project-1.lpp",
+            name: "Project 1",
+        },
+        {
+            path: "/path/to/project-2.lpp",
+            name: "Project 2",
+        },
+    ];
+
+    in property <ProjectData> current-project: {
+        valid: true,
+        name: "Project 1",
+        schematics: ["Power", "Logic"],
+        boards: ["Default", "Experiment"],
+    };
+
+    in property <int> status-bar-progress: 50;
+
+    in property <bool> refreshing-available-libraries: true;
+
+    in property <int> outdated-libraries: 2;
+
+    in property <int> checked-libraries: 3;
+
+    in property <[Library]> libraries: [
+        {
+            name: "My Library",
+            description: "My own local library.",
+            version: "v1.0",
+            icon: @image-url("img/library.png"),
+            type: LibraryType.local,
+            state: LibraryState.unknown,
+        },
+        {
+            name: "LibrePCB Base",
+            description: "Official LibrePCB Base Library",
+            version: "v1.2.3",
+            icon: @image-url("img/librepcb.png"),
+            type: LibraryType.remote,
+            state: LibraryState.up-to-date,
+        },
+        {
+            name: "Microchip Technology / Atmel",
+            description: "Integrated circuits and more (unofficial).",
+            version: "v0.5",
+            icon: @image-url("img/microchip.png"),
+            type: LibraryType.remote,
+            state: LibraryState.outdated,
+        },
+        {
+            name: "LibrePCB Integrated Circuits",
+            description: "Official LibrePCB Integrated Circuits Library",
+            icon: @image-url("img/librepcb.png"),
+            type: LibraryType.online,
+        },
+        {
+            name: "Microchip Technology / Atmel",
+            description: "Integrated circuits and more (unofficial).",
+            icon: @image-url("img/microchip.png"),
+            type: LibraryType.online,
+            progress: 42,
+        },
+    ];
+
+    in property <[WindowSection]> sections: [
+        {
+            index: 0,
+            tabs: [
+                { type: TabType.schematic, index: 0, title: "Tab 1" },
+                { type: TabType.board-2d, index: 0, title: "Tab 2" },
+                { type: TabType.schematic, index: 1, title: "Tab 3" },
+            ],
+            tab-index: 0,
+            overlay-color: Colors.gray,
+        },
+        {
+            index: 1,
+            tabs: [
+                { type: TabType.board-2d, index: 0, title: "Tab 4" },
+                { type: TabType.schematic, index: 0, title: "Tab 5" },
+                { type: TabType.board-3d, index: 1, title: "Tab 6" },
+            ],
+            tab-index: 0,
+            overlay-color: Colors.gray,
+        },
+    ];
+
+    in property <int> current-section: 0;
+}
