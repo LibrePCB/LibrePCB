@@ -1,0 +1,227 @@
+import { CheckBox, Button, ListView, ProgressIndicator, Spinner, HorizontalBox, VerticalBox, StandardButton } from "std-widgets.slint";
+import { PanelHeader } from "./panelheader.slint";
+import { Globals, Library, LibraryType, LibraryState } from "./globals.slint";
+
+component LibraryList inherits ListView {
+    in property <length> bottom-padding: 50px;
+    property <int> current-index: -1;
+    property <length> item-height: 50px;
+    in-out property <[Library]> model;
+
+    preferred-height: model.length * item-height + bottom-padding;
+
+    for lib[index] in model: Rectangle {
+        property <bool> add-separator: (index > 0) && (model[index - 1].type != lib.type);
+        property <bool> last-item: index == (model.length - 1);
+
+        width: parent.width;
+        height: item-height + (last-item ? bottom-padding : 0);
+
+        Rectangle {
+            y: 0;
+            height: item-height;
+            background: (current-index == index) ? #454545 : (ta-lib.has-hover ? #383838 : transparent);
+
+            ta-lib := TouchArea {
+                property <bool> buttons-visible: self.has-hover || (current-index == index);
+                property <bool> installable: (lib.type == LibraryType.online);
+                property <bool> updatable: (lib.type == LibraryType.remote) && (lib.state == LibraryState.outdated);
+
+                clicked => {
+                    current-index = index;
+                }
+
+                HorizontalLayout {
+                    padding: 2px;
+                    padding-right: 10px;
+
+                    Image {
+                        width: item-height - 6px;
+                        height: item-height - 6px;
+                        source: lib.icon;
+                    }
+
+                    VerticalLayout {
+                        padding: 3px;
+
+                        HorizontalLayout {
+                            vertical-stretch: 0;
+
+                            Text {
+                                color: #dddddd;
+                                font-size: 13px;
+                                font-weight: 700;
+                                overflow: TextOverflow.elide;
+                                text: lib.name;
+                            }
+
+                            if lib.type != LibraryType.online: Rectangle {
+                                width: t-version.preferred-width + 10px;
+                                height: t-version.preferred-height + 2px;
+                                background: (lib.state == LibraryState.up-to-date) ? #006600 : ((lib.state == LibraryState.outdated) ? #aa0000 : #505050);
+                                border-radius: self.height / 2;
+                                t-version := Text {
+                                    color: white;
+                                    font-size: 10px;
+                                    text: lib.version + ((lib.type == LibraryType.local) ? " | local" : " | remote");
+                                }
+                            }
+                        }
+
+                        HorizontalLayout {
+                            spacing: 5px;
+
+                            if lib.progress == 0: Text {
+                                vertical-alignment: TextVerticalAlignment.center;
+                                color: #dddddd;
+                                font-size: 10px;
+                                font-weight: 200;
+                                overflow: TextOverflow.elide;
+                                text: lib.description;
+                                wrap: TextWrap.word-wrap;
+                            }
+
+                            if lib.progress > 0: ProgressIndicator {
+                                y: (parent.height - self.height) / 2;
+                                height: 8px;
+                                progress: lib.progress / 100;
+                            }
+
+                            Button {
+                                y: (parent.height - self.height) / 2;
+                                width: self.visible ? self.preferred-width : 0px;
+                                height: 24px;
+                                icon: @image-url("img/delete.svg");
+                                // TODO: https://github.com/slint-ui/slint/issues/6426
+                                visible: buttons-visible && (lib.type != LibraryType.online);
+                                clicked => {
+                                    p-uninstall.show();
+                                }
+                            }
+
+                            if updatable || installable: CheckBox {
+                                checked: lib.checked;
+                                toggled => {
+                                    lib.checked = self.checked;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                p-uninstall := PopupWindow {
+                    x: root.width;
+                    y: item-height / 2 - self.height / 2;
+
+                    Rectangle {
+                        background: #790000;
+
+                        VerticalBox {
+                            Text {
+                                font-size: 14px;
+                                font-weight: 900;
+                                text: @tr("Attention! This will remove the whole library directory and is not reversible:");
+                            }
+
+                            Text {
+                                font-family: "monospace";
+                                text: lib.id;
+                            }
+
+                            Text {
+                                text: @tr("Are you really sure to remove '{0}'?", lib.name);
+                            }
+
+                            HorizontalBox {
+                                alignment: LayoutAlignment.center;
+
+                                StandardButton {
+                                    kind: yes;
+                                    clicked => {
+                                        Globals.uninstall-library(lib.id);
+                                    }
+                                }
+
+                                StandardButton {
+                                    kind: cancel;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if add-separator: Rectangle {
+            y: 0;
+            height: 1px;
+            background: #555555;
+        }
+
+        if last-item: Rectangle {
+            y: item-height;
+            height: bottom-padding;
+        }
+    }
+}
+
+export component LibrariesPanel inherits Rectangle {
+    background: #2a2a2a;
+
+    init => {
+        Globals.ensure-libraries-populated();
+    }
+
+    VerticalLayout {
+        alignment: LayoutAlignment.start;
+
+        PanelHeader {
+            title: @tr("LIBRARIES");
+
+            if Globals.refreshing-available-libraries: Spinner {
+                indeterminate: true;
+            }
+        }
+
+        Rectangle {
+            height: 1px;
+            background: #555555;
+        }
+
+        LibraryList {
+            model: Globals.libraries;
+            bottom-padding: btn-install.height + 5px;
+            vertical-stretch: 0;
+        }
+    }
+
+    btn-install := Rectangle {
+        y: parent.height - self.height - 5px;
+        width: self.preferred-width;
+        height: self.preferred-height;
+        background: #ff5100;
+        border-radius: self.height / 2;
+        visible: Globals.checked-libraries > 0;
+
+        HorizontalBox {
+            Image {
+                width: t-install.preferred-height;
+                height: t-install.preferred-height;
+                source: @image-url("img/download.svg");
+                colorize: t-install.color;
+            }
+
+            t-install := Text {
+                color: ta-install.has-hover ? white : black;
+                font-size: 14px;
+                text: @tr("Install/update {n} library" | "Install/update {n} libraries" % Globals.checked-libraries);
+            }
+        }
+
+        ta-install := TouchArea {
+            clicked => {
+                Globals.install-checked-libraries();
+            }
+        }
+    }
+}

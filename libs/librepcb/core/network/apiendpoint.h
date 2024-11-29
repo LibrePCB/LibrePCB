@@ -23,6 +23,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../types/uuid.h"
+#include "../types/version.h"
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -48,6 +51,19 @@ public:
     QString mpn;
     QString manufacturer;
   };
+  struct Library {
+    Uuid uuid;
+    QString name;
+    QString description;
+    QString author;
+    Version version;
+    bool recommended;
+    QSet<Uuid> dependencies;
+    QUrl iconUrl;
+    QUrl downloadUrl;
+    qint64 downloadSize;
+    QByteArray downloadSha256;
+  };
 
   // Constructors / Destructor
   ApiEndpoint() = delete;
@@ -68,7 +84,7 @@ public:
   ApiEndpoint& operator=(const ApiEndpoint& rhs) = delete;
 
 signals:
-  void libraryListReceived(const QJsonArray& libs);
+  void libraryListReceived(QList<Library> libs);
   void errorWhileFetchingLibraryList(const QString& errorMsg);
   void errorWhileFetchingPartsInformationStatus(const QString& errorMsg);
   void partsInformationStatusReceived(const QJsonObject& status);
