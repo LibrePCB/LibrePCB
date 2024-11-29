@@ -250,7 +250,7 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: palette(base); }</string>
               </size>
              </property>
              <property name="pixmap">
-              <pixmap>:/img/logo/ngi0-entrust.png</pixmap>
+              <pixmap>:/img/logo/ngi0.png</pixmap>
              </property>
              <property name="scaledContents">
               <bool>true</bool>
@@ -272,7 +272,7 @@ QScrollArea &gt; QWidget &gt; QScrollBar { background: palette(base); }</string>
               </font>
              </property>
              <property name="text">
-              <string notr="true">This project is funded through the &lt;a href=&quot;https://nlnet.nl/entrust/&quot;&gt;NGI0 Entrust&lt;/a&gt; Fund, a fund established by &lt;a href=&quot;https://nlnet.nl&quot;&gt;NLnet&lt;/a&gt; with financial support from the European Commission’s &lt;a href=&quot;https://ngi.eu&quot;&gt;Next Generation Internet&lt;/a&gt; programme, under the aegis of DG Communications Networks, Content and Technology under grant agreement No 101069594.</string>
+              <string notr="true">This project is funded through the &lt;a href=&quot;https://nlnet.nl/commonsfund/&quot;&gt;NGI0 Commons&lt;/a&gt; Fund, a fund established by &lt;a href=&quot;https://nlnet.nl&quot;&gt;NLnet&lt;/a&gt; with financial support from the European Commission’s &lt;a href=&quot;https://ngi.eu&quot;&gt;Next Generation Internet&lt;/a&gt; programme, under the aegis of DG Communications Networks, Content and Technology under grant agreement No 101135429.</string>
              </property>
              <property name="wordWrap">
               <bool>true</bool>
