@@ -1,0 +1,93 @@
+import { ListView } from "std-widgets.slint";
+import { PanelHeader } from "./panelheader.slint";
+import { Globals, FolderTreeItem } from "./globals.slint";
+
+component FolderTree inherits ListView {
+    property <int> current-index: -1;
+    property <length> item-height: 20px;
+    in-out property <[FolderTreeItem]> model;
+
+    preferred-height: model.length * item-height;
+
+    for item[index] in model: Rectangle {
+        width: parent.width;
+        height: item-height;
+        background: (current-index == index) ? #454545 : (ta.has-hover ? #383838 : transparent);
+
+        HorizontalLayout {
+            spacing: 5px;
+            padding-left: 5px + item.level * i-icon.width;
+
+            if (item.is-folder) || (item.level > 0): Text {
+                color: #dddddd;
+                font-size: 14px;
+                font-weight: 700;
+                overflow: TextOverflow.elide;
+                visible: item.is-folder;
+                text: "▸";
+            }
+
+            i-icon := Image {
+                y: 1px;
+                width: parent.height - 2px;
+                height: parent.height - 2px;
+                source: item.icon;
+            }
+
+            Text {
+                horizontal-stretch: 1;
+                color: #dddddd;
+                font-size: 14px;
+                font-weight: 400;
+                overflow: TextOverflow.elide;
+                text: item.name;
+            }
+        }
+
+        ta := TouchArea {
+            clicked => {
+                current-index = index;
+            }
+            double-clicked => {
+                Globals.project-item-doubleclicked(item.path);
+            }
+        }
+    }
+}
+
+export component HomePanel inherits Rectangle {
+    background: #2a2a2a;
+
+    VerticalLayout {
+        PanelHeader {
+            title: @tr("RECENTLY OPENED");
+        }
+
+        FolderTree {
+            vertical-stretch: 0;
+            model: Globals.recent-projects;
+        }
+
+        PanelHeader {
+            spacing-top: 15px;
+            title: @tr("FAVORITES");
+        }
+
+        FolderTree {
+            vertical-stretch: 0;
+            model: Globals.favorite-projects;
+        }
+
+        PanelHeader {
+            spacing-top: 15px;
+            title: @tr("WORKSPACE");
+        }
+
+        FolderTree {
+            vertical-stretch: 2;
+            model: Globals.workspace-folder;
+        }
+
+        Rectangle { }
+    }
+}
