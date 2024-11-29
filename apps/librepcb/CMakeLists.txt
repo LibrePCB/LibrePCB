@@ -10,7 +10,37 @@ add_executable(
   WIN32
   # When building on macOS, create a bundle
   MACOSX_BUNDLE
-  ../../img/images.qrc main.cpp
+  # Resources
+  ../../img/images.qrc
+  # Sources
+  apptoolbox.cpp
+  apptoolbox.h
+  guiapplication.cpp
+  guiapplication.h
+  library/librariesmodel.cpp
+  library/librariesmodel.h
+  main.cpp
+  mainwindow.cpp
+  mainwindow.h
+  project/projecteditor.cpp
+  project/projecteditor.h
+  project/projectsmodel.cpp
+  project/projectsmodel.h
+  project/schematiceditor.cpp
+  project/schematiceditor.h
+  windowsection.cpp
+  windowsection.h
+  windowsectionsmodel.cpp
+  windowsectionsmodel.h
+  workspace/favoriteprojectsmodel.cpp
+  workspace/favoriteprojectsmodel.h
+  workspace/filesystemmodel.cpp
+  workspace/filesystemmodel.h
+  workspace/recentprojectsmodel.cpp
+  workspace/recentprojectsmodel.h
+)
+slint_target_sources(
+  librepcb ui/appwindow.slint NAMESPACE ui COMPILATION_UNITS 8
 )
 target_include_directories(
   librepcb
@@ -22,6 +52,8 @@ target_link_libraries(
           # LibrePCB
           LibrePCB::Editor
           LibrePCB::Core
+          # Third party
+          Slint::Slint
           # Qt
           ${QT}::Core
           ${QT}::Gui

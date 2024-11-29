@@ -1,0 +1,186 @@
+import { Button, ProgressIndicator, StandardButton } from "std-widgets.slint";
+import { SideBar, MainPage } from "./sidebar.slint";
+import { LengthEdit } from "./lengthedit.slint";
+import { LibrariesPanel } from "./librariespanel.slint";
+import { ProjectPanel } from "./projectpanel.slint";
+import { HomePanel } from "./homepanel.slint";
+import { MenuBar } from "./menubar.slint";
+import { WindowSection } from "./windowsection.slint";
+import { Globals, Tab } from "./globals.slint";
+
+export { Globals }
+
+export component AppWindow inherits Window {
+    property <length> panel-width: (self.width <= 800px) ? 250px : 350px;
+    in property <string> window-title <=> self.title;
+    in-out property <MainPage> page <=> sidebar.page;
+
+    callback close();
+
+    background: #2a2a2a;
+    icon: @image-url("img/librepcb.png");
+    preferred-width: 1024px;
+    preferred-height: 768px;
+
+    menubar := MenuBar { }
+
+    sidebar := SideBar {
+        x: 0px;
+        y: menubar.height;
+        z: 100;
+        width: (root.width <= 800px) ? 40px : 50px;
+        height: parent.height - self.y - statusbar.height - 1px;
+    }
+
+    if sidebar.page == MainPage.home: HomePanel {
+        x: sidebar.width;
+        y: sidebar.y;
+        width: panel-width;
+        height: sidebar.height;
+    }
+
+    if sidebar.page == MainPage.home: Button {
+        x: root.width - self.width - 10px;
+        y: root.height - self.height - 100px;
+        text: "Dialog";
+        clicked => {
+            dialog.show();
+        }
+    }
+
+    if sidebar.page == MainPage.home: Button {
+        x: root.width - self.width - 10px;
+        y: root.height - self.height - 50px;
+        text: "Close";
+        clicked => {
+            close();
+        }
+    }
+
+    if sidebar.page == MainPage.libraries: LibrariesPanel {
+        x: sidebar.width;
+        y: sidebar.y;
+        width: panel-width;
+        height: sidebar.height;
+    }
+
+    if sidebar.page == MainPage.project: ProjectPanel {
+        x: sidebar.width;
+        y: sidebar.y;
+        width: panel-width;
+        height: sidebar.height;
+    }
+
+    HorizontalLayout {
+        x: sidebar.width + panel-width;
+        y: sidebar.y + 1px;
+        width: parent.width - self.x;
+        height: sidebar.height - 1px;
+
+        Rectangle {
+            background: #555555;
+            width: 1px;
+        }
+
+        if Globals.sections.length == 0: Text {
+            width: parent.width;
+            color: gray;
+            horizontal-alignment: TextHorizontalAlignment.center;
+            vertical-alignment: TextVerticalAlignment.center;
+            font-size: 30px;
+            wrap: TextWrap.word-wrap;
+            text: @tr("Open a library, schematic or board.");
+        }
+
+        for section[i] in Globals.sections: HorizontalLayout {
+            WindowSection {
+                section: section;
+            }
+
+            if i < (Globals.sections.length - 1): Rectangle {
+                width: 1px;
+                horizontal-stretch: 0;
+                background: #555555;
+            }
+        }
+    }
+
+    if sidebar.page == MainPage.preferences: LengthEdit {
+        x: 100px;
+        y: 50px;
+    }
+
+    if sidebar.page == MainPage.preferences: LengthEdit {
+        x: 100px;
+        y: 100px;
+    }
+
+    in property <string> workspace-path <=> t-status.text;
+    in property <string> cursor-coordinate <=> t-coordinate.text;
+
+    statusbar := Rectangle {
+        x: 0;
+        y: parent.height - self.height;
+        width: parent.width;
+        height: 25px;
+        background: sidebar.background;
+
+        HorizontalLayout {
+            padding: 5px;
+            spacing: 20px;
+
+            t-status := Text {
+                color: white;
+                text: "Workspace Path";
+            }
+
+            Rectangle {
+                HorizontalLayout {
+                    spacing: 5px;
+                    alignment: LayoutAlignment.center;
+
+                    t-coordinate := Text {
+                        text: "123.456, 123.456";
+                    }
+
+                    if cursor-coordinate != "": Text {
+                        text: "mm";
+                    }
+                }
+            }
+
+            Rectangle {
+                max-width: 150px;
+
+                ProgressIndicator {
+                    width: 100%;
+                    visible: self.progress > 0 && self.progress < 1;
+                    progress: Globals.status-bar-progress / 100;
+                }
+            }
+        }
+    }
+
+    dialog := PopupWindow {
+        Dialog {
+            x: parent.width / 2;
+            y: parent.height / 2;
+            width: 100px;
+            height: 100px;
+            background: black;
+            title: "Dialog";
+
+            Text {
+                text: "Hello World!";
+            }
+
+            StandardButton {
+                kind: ok;
+            }
+
+            StandardButton {
+                kind: cancel;
+            }
+        }
+    }
+}
