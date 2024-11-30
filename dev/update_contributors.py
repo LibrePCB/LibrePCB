@@ -9,7 +9,7 @@ Just call this script with no arguments provided.
 
 Requirements:
 
-    pip install PyGithub
+    pip install PyGithub~=2.5
 """
 
 import os
@@ -45,6 +45,12 @@ if __name__ == '__main__':
     start_pattern = '## Contributors\n'
     start_index = content.find(start_pattern) + len(start_pattern)
     end_index = content.find('\n\n', start_index)
-    content = content[:start_index] + '\n'.join(lines) + content[end_index:]
+    manual_lines = []
+    for line in content[start_index:end_index].splitlines():
+        if line.startswith('- ') and ('github.com' not in line):
+            manual_lines.append(line)
+    content = content[:start_index] + \
+        '\n'.join(lines + sorted(manual_lines)) + \
+        content[end_index:]
     with open(authors_file, 'w') as f:
         f.write(content)
