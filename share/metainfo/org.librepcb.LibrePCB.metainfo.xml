@@ -80,6 +80,24 @@
         - Remove development releases when stable release is ready!
         - For prereleases, use tilde instead of dash (e.g. "1.0.0~rc1")!
     -->
+    <release version="1.2.0" date="2024-12-01" type="stable">
+      <description>
+        <p>Highlights:</p>
+        <ul>
+          <li>KiCad library import</li>
+          <li>Specctra DSN export / SES import</li>
+          <li>Open datasheets from schematic</li>
+          <li>Datasheet overlay for footprints</li>
+          <li>Mass import symbol pins from datasheets</li>
+          <li>Move &amp; align multiple footprint objects at once</li>
+          <li>Copy properties from one footprint object to other objects</li>
+          <li>Interactively re-number pads of a footprint</li>
+          <li>Much faster DRC &amp; plane rebuilding</li>
+          <li>Dark theme on Windows &amp; theme improvements</li>
+        </ul>
+      </description>
+      <url type="details">https://librepcb.org/blog/2024-12-01_release_1.2.0/</url>
+    </release>
     <release version="1.1.0" date="2024-04-03" type="stable">
       <description>
         <p>Highlights:</p>
