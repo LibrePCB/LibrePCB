@@ -21,6 +21,7 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
+#include <librepcb/core/serialization/sexpression.h>
 #include <librepcb/core/utils/toolbox.h>
 
 #include <QtCore>
@@ -172,6 +173,60 @@ static ToolboxArcAngleTestData sToolboxArcAngleTestData[] = {
 
 INSTANTIATE_TEST_SUITE_P(ToolboxArcAngleTest, ToolboxArcAngleTest,
                          ::testing::ValuesIn(sToolboxArcAngleTestData));
+
+/*******************************************************************************
+ *  Parametrized arcAngleFrom3Points() Tests
+ ******************************************************************************/
+
+struct ToolboxArcAngleFrom3PointsTestData {
+  Point start;
+  Point mid;
+  Point end;
+  Angle angle;
+};
+
+class ToolboxArcAngleFrom3PointsTest
+  : public ToolboxTest,
+    public ::testing::WithParamInterface<ToolboxArcAngleFrom3PointsTestData> {
+protected:
+  static std::string str(const Point& p) {
+    std::unique_ptr<SExpression> sexpr = SExpression::createList("pos");
+    p.serialize(*sexpr);
+    return sexpr->toByteArray().toStdString();
+  }
+};
+
+TEST_P(ToolboxArcAngleFrom3PointsTest, test) {
+  const ToolboxArcAngleFrom3PointsTestData& data = GetParam();
+
+  // Currently the function under test is not needed for important things,
+  // thus we allow quite some tolerance.
+  EXPECT_NEAR(
+      data.angle.toDeg(),
+      Toolbox::arcAngleFrom3Points(data.start, data.mid, data.end).toDeg(),
+      0.01);
+}
+
+// clang-format off
+static ToolboxArcAngleFrom3PointsTestData sToolboxArcAngleFrom3PointsTestData[] = {
+// start,                     mid,                     end,                       angle
+  {Point(0, 0),               Point(0, 0),             Point(0, 0),               Angle::deg0()   },
+  {Point(2000000, 0),         Point(1500000, 0),       Point(1000000, 0),         Angle::deg0()   },
+  {Point(2000000, 0),         Point(500000, 1500000),  Point(-1000000, 0),        Angle::deg180() },
+  {Point(2000000, 0),         Point(500000, -1500000), Point(-1000000, 0),       -Angle::deg180() },
+  {Point(2000000, 3000000),   Point(292893, 3121320),           Point(-1000000, 2000000),  Angle::deg90()  },
+  {Point(2000000, 3000000),   Point(707107, 1878680),           Point(-1000000, 2000000), -Angle::deg90() },
+  {Point(-1000000, 2000000),  Point(1707107, -1121320),           Point(2000000, 3000000),   Angle::deg270() },
+  {Point(2000000, 3000000),   Point(-1121320, 292893),           Point(3000000, 0),         Angle::deg270() },
+  {Point(2000000, 3000000),   Point(6121320, 2707107),           Point(3000000, 0),        -Angle::deg270() },
+  {Point(3000000, 0),         Point(3121320, 1707107),           Point(2000000, 3000000),   Angle::deg90()  },
+  {Point(3000000, 0),         Point(1878680, 1292893),           Point(2000000, 3000000),  -Angle::deg90()  }
+};
+// clang-format on
+
+INSTANTIATE_TEST_SUITE_P(
+    ToolboxArcAngleFrom3PointsTest, ToolboxArcAngleFrom3PointsTest,
+    ::testing::ValuesIn(sToolboxArcAngleFrom3PointsTestData));
 
 /*******************************************************************************
  *  Parametrized angleBetweenPoints() Tests

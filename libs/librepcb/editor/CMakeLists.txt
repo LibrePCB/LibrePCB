@@ -239,6 +239,29 @@ add_library(
   library/eaglelibraryimportwizard/eaglelibraryimportwizardpage_start.ui
   library/editorwidgetbase.cpp
   library/editorwidgetbase.h
+  library/kicadlibraryimportwizard/kicadlibraryimportwizard.cpp
+  library/kicadlibraryimportwizard/kicadlibraryimportwizard.h
+  library/kicadlibraryimportwizard/kicadlibraryimportwizard.ui
+  library/kicadlibraryimportwizard/kicadlibraryimportwizardcontext.cpp
+  library/kicadlibraryimportwizard/kicadlibraryimportwizardcontext.h
+  library/kicadlibraryimportwizard/kicadlibraryimportwizardpage_chooselibrary.cpp
+  library/kicadlibraryimportwizard/kicadlibraryimportwizardpage_chooselibrary.h
+  library/kicadlibraryimportwizard/kicadlibraryimportwizardpage_chooselibrary.ui
+  library/kicadlibraryimportwizard/kicadlibraryimportwizardpage_parse.cpp
+  library/kicadlibraryimportwizard/kicadlibraryimportwizardpage_parse.h
+  library/kicadlibraryimportwizard/kicadlibraryimportwizardpage_parse.ui
+  library/kicadlibraryimportwizard/kicadlibraryimportwizardpage_result.cpp
+  library/kicadlibraryimportwizard/kicadlibraryimportwizardpage_result.h
+  library/kicadlibraryimportwizard/kicadlibraryimportwizardpage_result.ui
+  library/kicadlibraryimportwizard/kicadlibraryimportwizardpage_selectelements.cpp
+  library/kicadlibraryimportwizard/kicadlibraryimportwizardpage_selectelements.h
+  library/kicadlibraryimportwizard/kicadlibraryimportwizardpage_selectelements.ui
+  library/kicadlibraryimportwizard/kicadlibraryimportwizardpage_setoptions.cpp
+  library/kicadlibraryimportwizard/kicadlibraryimportwizardpage_setoptions.h
+  library/kicadlibraryimportwizard/kicadlibraryimportwizardpage_setoptions.ui
+  library/kicadlibraryimportwizard/kicadlibraryimportwizardpage_start.cpp
+  library/kicadlibraryimportwizard/kicadlibraryimportwizardpage_start.h
+  library/kicadlibraryimportwizard/kicadlibraryimportwizardpage_start.ui
   library/lib/librarylisteditorwidget.cpp
   library/lib/librarylisteditorwidget.h
   library/lib/librarylisteditorwidget.ui
@@ -977,6 +1000,7 @@ target_link_libraries(
   PRIVATE common
           # LibrePCB
           LibrePCB::EagleImport
+          LibrePCB::KiCadImport
           # Third party
           OpenGL::GLU
 )

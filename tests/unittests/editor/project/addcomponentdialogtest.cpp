@@ -147,21 +147,22 @@ TEST_F(AddComponentDialogTest, testChooseComponentDevice) {
   mWriter->addTranslation<ComponentCategory>(catId, "", ElementName("cat 2"),
                                              tl::nullopt, tl::nullopt);
   int cmpId = mWriter->addElement<Component>(0, toAbs("cmp1"), uuid(3),
-                                             version("0.1"), false);
+                                             version("0.1"), false, QString());
   mWriter->addTranslation<Component>(cmpId, "", ElementName("cmp 1"),
                                      tl::nullopt, tl::nullopt);
   mWriter->addToCategory<Component>(cmpId, uuid(2));
   cmpId = mWriter->addElement<Component>(0, toAbs(uuid(4).toStr()), uuid(4),
-                                         version("0.1"), false);
+                                         version("0.1"), false, QString());
   mWriter->addTranslation<Component>(cmpId, "", ElementName("cmp 2"),
                                      tl::nullopt, tl::nullopt);
   mWriter->addToCategory<Component>(cmpId, uuid(2));
   int pkgId = mWriter->addElement<Package>(0, toAbs(uuid(5).toStr()), uuid(5),
-                                           version("0.1"), false);
+                                           version("0.1"), false, QString());
   mWriter->addTranslation<Package>(pkgId, "", ElementName("pkg 1"), tl::nullopt,
                                    tl::nullopt);
-  int devId = mWriter->addDevice(0, toAbs(uuid(6).toStr()), uuid(6),
-                                 version("0.1"), false, uuid(4), uuid(5));
+  int devId =
+      mWriter->addDevice(0, toAbs(uuid(6).toStr()), uuid(6), version("0.1"),
+                         false, QString(), uuid(4), uuid(5));
   mWriter->addTranslation<Device>(devId, "", ElementName("dev 1"), tl::nullopt,
                                   tl::nullopt);
 
@@ -253,7 +254,7 @@ TEST_F(AddComponentDialogTest, testSetNormOrder) {
   mWriter->addTranslation<ComponentCategory>(catId, "", ElementName("cat 1"),
                                              tl::nullopt, tl::nullopt);
   int cmpId = mWriter->addElement<Component>(0, toAbs(uuid(3).toStr()), uuid(3),
-                                             version("0.1"), false);
+                                             version("0.1"), false, QString());
   mWriter->addTranslation<Component>(cmpId, "", ElementName("cmp 1"),
                                      tl::nullopt, tl::nullopt);
   mWriter->addToCategory<Component>(cmpId, uuid(1));
@@ -299,11 +300,11 @@ TEST_F(AddComponentDialogTest, testSetNormOrder) {
 
 TEST_F(AddComponentDialogTest, testSearch) {
   int cmpId = mWriter->addElement<Component>(0, toAbs("cmp1"), uuid(1),
-                                             version("0.1"), false);
+                                             version("0.1"), false, QString());
   mWriter->addTranslation<Component>(cmpId, "", ElementName("cmp 1"),
                                      tl::nullopt, "key 1");
   cmpId = mWriter->addElement<Component>(0, toAbs("cmp2"), uuid(2),
-                                         version("0.1"), false);
+                                         version("0.1"), false, QString());
   mWriter->addTranslation<Component>(cmpId, "", ElementName("cmp 2"),
                                      tl::nullopt, tl::nullopt);
 

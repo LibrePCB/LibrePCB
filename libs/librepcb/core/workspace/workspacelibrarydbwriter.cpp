@@ -151,7 +151,8 @@ void WorkspaceLibraryDbWriter::createAllTables() {
       "`filepath` TEXT UNIQUE NOT NULL, "
       "`uuid` TEXT NOT NULL, "
       "`version` TEXT NOT NULL, "
-      "`deprecated` BOOLEAN NOT NULL"
+      "`deprecated` BOOLEAN NOT NULL, "
+      "`generated_by` TEXT"
       ")");
   queries << QString(
       "CREATE TABLE IF NOT EXISTS symbols_tr ("
@@ -181,7 +182,8 @@ void WorkspaceLibraryDbWriter::createAllTables() {
       "`filepath` TEXT UNIQUE NOT NULL, "
       "`uuid` TEXT NOT NULL, "
       "`version` TEXT NOT NULL, "
-      "`deprecated` BOOLEAN NOT NULL"
+      "`deprecated` BOOLEAN NOT NULL, "
+      "`generated_by` TEXT"
       ")");
   queries << QString(
       "CREATE TABLE IF NOT EXISTS packages_tr ("
@@ -219,7 +221,8 @@ void WorkspaceLibraryDbWriter::createAllTables() {
       "`filepath` TEXT UNIQUE NOT NULL, "
       "`uuid` TEXT NOT NULL, "
       "`version` TEXT NOT NULL, "
-      "`deprecated` BOOLEAN NOT NULL"
+      "`deprecated` BOOLEAN NOT NULL, "
+      "`generated_by` TEXT"
       ")");
   queries << QString(
       "CREATE TABLE IF NOT EXISTS components_tr ("
@@ -260,7 +263,8 @@ void WorkspaceLibraryDbWriter::createAllTables() {
       "`version` TEXT NOT NULL, "
       "`deprecated` BOOLEAN NOT NULL, "
       "`component_uuid` TEXT NOT NULL, "
-      "`package_uuid` TEXT NOT NULL"
+      "`package_uuid` TEXT NOT NULL, "
+      "`generated_by` TEXT"
       ")");
   queries << QString(
       "CREATE TABLE IF NOT EXISTS devices_tr ("
@@ -363,19 +367,21 @@ void WorkspaceLibraryDbWriter::updateLibrary(
 int WorkspaceLibraryDbWriter::addDevice(int libId, const FilePath& fp,
                                         const Uuid& uuid,
                                         const Version& version, bool deprecated,
+                                        const QString& generatedBy,
                                         const Uuid& component,
                                         const Uuid& package) {
   QSqlQuery query = mDb.prepareQuery(
       "INSERT INTO devices "
-      "(library_id, filepath, uuid, version, deprecated, component_uuid, "
-      "package_uuid) VALUES "
-      "(:library_id, :filepath, :uuid, :version, :deprecated, :component_uuid, "
-      ":package_uuid)");
+      "(library_id, filepath, uuid, version, deprecated, generated_by, "
+      "component_uuid, package_uuid) VALUES "
+      "(:library_id, :filepath, :uuid, :version, :deprecated, :generated_by, "
+      ":component_uuid, :package_uuid)");
   query.bindValue(":library_id", libId);
   query.bindValue(":filepath", filePathToString(fp));
   query.bindValue(":uuid", uuid.toStr());
   query.bindValue(":version", version.toStr());
   query.bindValue(":deprecated", deprecated);
+  query.bindValue(":generated_by", nonEmptyOrNull(generatedBy));
   query.bindValue(":component_uuid", component.toStr());
   query.bindValue(":package_uuid", package.toStr());
   return mDb.insert(query);
@@ -489,11 +495,12 @@ int WorkspaceLibraryDbWriter::addElement(const QString& elementsTable,
                                          int libId, const FilePath& fp,
                                          const Uuid& uuid,
                                          const Version& version,
-                                         bool deprecated) {
+                                         bool deprecated,
+                                         const QString& generatedBy) {
   QSqlQuery query = mDb.prepareQuery(
       "INSERT INTO %elements "
-      "(library_id, filepath, uuid, version, deprecated) VALUES "
-      "(:library_id, :filepath, :uuid, :version, :deprecated)",
+      "(library_id, filepath, uuid, version, deprecated, generated_by) VALUES "
+      "(:library_id, :filepath, :uuid, :version, :deprecated, :generated_by)",
       {
           {"%elements", elementsTable},
       });
@@ -502,6 +509,7 @@ int WorkspaceLibraryDbWriter::addElement(const QString& elementsTable,
   query.bindValue(":uuid", uuid.toStr());
   query.bindValue(":version", version.toStr());
   query.bindValue(":deprecated", deprecated);
+  query.bindValue(":generated_by", nonEmptyOrNull(generatedBy));
   return mDb.insert(query);
 }
 
@@ -607,6 +615,10 @@ int WorkspaceLibraryDbWriter::addResource(const QString& elementsTable,
 QString WorkspaceLibraryDbWriter::filePathToString(
     const FilePath& fp) const noexcept {
   return fp.toRelative(mLibrariesRoot);
+}
+
+QString WorkspaceLibraryDbWriter::nonEmptyOrNull(const QString& s) noexcept {
+  return s.isEmpty() ? QString() : s;
 }
 
 QString WorkspaceLibraryDbWriter::nonNull(const QString& s) noexcept {

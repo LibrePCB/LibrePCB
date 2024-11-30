@@ -262,6 +262,22 @@ public:
                         const Point& center = Point(0, 0)) noexcept;
 
   /**
+   * @brief Calculate the angle of an arc given by 3 points
+   *
+   * @attention This method might not be 100% accurate and thus should not be
+   *            used for important things. It this is needed some day, unit
+   *            tests should be changed to allow no (or very small) tolerance.
+   *
+   * @param start   Arc start point.
+   * @param mid     Arc middle point (50% of length).
+   * @param end     Arc end point.
+   * @return Angle counter-clockwise from start to end (0..360°).
+   *         Zero if it could not be determined.
+   */
+  static Angle arcAngleFrom3Points(const Point& start, const Point& mid,
+                                   const Point& end) noexcept;
+
+  /**
    * @brief Calculate the angle between two points
    *
    * @param p1      First point.

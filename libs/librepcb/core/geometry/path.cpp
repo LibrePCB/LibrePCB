@@ -379,6 +379,23 @@ Path Path::circle(const PositiveLength& diameter) noexcept {
   return obround(diameter, diameter);
 }
 
+Path Path::donut(const PositiveLength& outerDiameter,
+                 const PositiveLength& innerDiameter) noexcept {
+  Path p;
+  const Length ro = outerDiameter / 2;
+  const Length ri = innerDiameter / 2;
+  if (ro > ri) {
+    p.addVertex(Point(0, ro), -Angle::deg180());
+    p.addVertex(Point(0, -ro), Angle::deg0());
+    p.addVertex(Point(0, -ri), Angle::deg180());
+    p.addVertex(Point(0, ri), Angle::deg180());
+    p.addVertex(Point(0, -ri), Angle::deg0());
+    p.addVertex(Point(0, -ro), -Angle::deg180());
+    p.addVertex(Point(0, ro), Angle::deg0());
+  }
+  return p;
+}
+
 Path Path::obround(const PositiveLength& width,
                    const PositiveLength& height) noexcept {
   Path p;
@@ -486,6 +503,64 @@ Path Path::centeredRect(const PositiveLength& width,
     p.addVertex(Point(-rx, ry - cornerRadius), -Angle::deg90());
   }
   p.close();
+  return p;
+}
+
+Path Path::chamferedRect(const PositiveLength& width,
+                         const PositiveLength& height,
+                         const UnsignedLength& chamferSize, bool topLeft,
+                         bool topRight, bool bottomLeft,
+                         bool bottomRight) noexcept {
+  Path p;
+  const Length c = std::min(std::min(*chamferSize, (width / 2)), (height / 2));
+  const Length cx = (width / 2) - c;
+  const Length cy = (height / 2) - c;
+  if (topLeft) {
+    p.addVertex(Point(-width / 2, cy));
+    p.addVertex(Point(-cx, height / 2));
+  } else {
+    p.addVertex(Point(-width / 2, height / 2));
+  }
+  if (topRight) {
+    p.addVertex(Point(cx, height / 2));
+    p.addVertex(Point(width / 2, cy));
+  } else {
+    p.addVertex(Point(width / 2, height / 2));
+  }
+  if (bottomRight) {
+    p.addVertex(Point(width / 2, -cy));
+    p.addVertex(Point(cx, -height / 2));
+  } else {
+    p.addVertex(Point(width / 2, -height / 2));
+  }
+  if (bottomLeft) {
+    p.addVertex(Point(-cx, -height / 2));
+    p.addVertex(Point(-width / 2, -cy));
+  } else {
+    p.addVertex(Point(-width / 2, -height / 2));
+  }
+  p.close();
+  p.clean();
+  return p;
+}
+
+Path Path::trapezoid(const PositiveLength& width, const PositiveLength& height,
+                     const Length& dw, const Length dh) noexcept {
+  Path p;
+  const Length dwClipped =
+      (dw >= 0) ? std::min(dw, *width) : std::max(dw, -width);
+  const Length dhClipped =
+      (dh >= 0) ? std::min(dh, *height) : std::max(dh, -height);
+  const Length xt = (width / 2) + (dwClipped / 2);
+  const Length xb = (width / 2) - (dwClipped / 2);
+  const Length yl = (height / 2) - (dhClipped / 2);
+  const Length yr = (height / 2) + (dhClipped / 2);
+  p.addVertex(Point(-xt, yl));
+  p.addVertex(Point(xt, yr));
+  p.addVertex(Point(xb, -yr));
+  p.addVertex(Point(-xb, -yl));
+  p.close();
+  p.clean();
   return p;
 }
 

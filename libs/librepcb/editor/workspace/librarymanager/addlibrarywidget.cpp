@@ -71,6 +71,10 @@ AddLibraryWidget::AddLibraryWidget(Workspace& ws) noexcept
             DesktopServices ds(mWorkspace.getSettings(), this);
             ds.openWebUrl(QUrl(url));
           });
+  mUi->lblImportNote->setText(
+      mUi->lblImportNote->text().arg("KiCad Import").arg("Eagle Import"));
+  connect(mUi->lblImportNote, &QLabel::linkActivated, mUi->edtLocalName,
+          &QLineEdit::setText);
   connect(mUi->cbxOnlineLibrariesSelectAll, &QCheckBox::clicked, this,
           [this]() { mManualCheckStateForAllRemoteLibraries = true; });
 

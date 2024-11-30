@@ -550,6 +550,25 @@ QSet<Uuid> WorkspaceLibraryDb::getByCategory(const QString& elementsTable,
   return getUuidSet(query);
 }
 
+QSet<Uuid> WorkspaceLibraryDb::getGenerated(const QString& elementsTable,
+                                            const QString& generatedBy) const {
+  if (generatedBy.isEmpty()) {
+    return QSet<Uuid>();
+  }
+
+  QSqlQuery query;
+  query = mDb->prepareQuery(
+      "SELECT uuid FROM %elements "
+      "WHERE generated_by = :generated_by "
+      "GROUP BY uuid",
+      {
+          {"%elements", elementsTable},
+      });
+  query.bindValue(":generated_by", generatedBy);
+  mDb->exec(query);
+  return getUuidSet(query);
+}
+
 ResourceList WorkspaceLibraryDb::getResources(const QString& elementsTable,
                                               const FilePath& elemDir) const {
   QSqlQuery query = mDb->prepareQuery(

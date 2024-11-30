@@ -170,13 +170,14 @@ TEST_F(WorkspaceLibraryDbTest, testGetAll) {
                                           version("0.3." % number), false,
                                           tl::nullopt);
     mWriter->addElement<Symbol>(0, toAbs("sym" % number), uuid(),
-                                version("0.4." % number), false);
+                                version("0.4." % number), false, QString());
     mWriter->addElement<Package>(0, toAbs("pkg" % number), uuid(),
-                                 version("0.5." % number), false);
+                                 version("0.5." % number), false, QString());
     mWriter->addElement<Component>(0, toAbs("cmp" % number), uuid(),
-                                   version("0.6." % number), false);
+                                   version("0.6." % number), false, QString());
     mWriter->addDevice(0, toAbs("dev" % number), uuid(),
-                       version("0.7." % number), false, uuid(), uuid());
+                       version("0.7." % number), false, QString(), uuid(),
+                       uuid());
   }
 
   EXPECT_EQ(str({{version("0.1.1"), toAbs("lib1")},
@@ -212,13 +213,13 @@ TEST_F(WorkspaceLibraryDbTest, testGetAllWithDuplicates) {
   int lib2 = mWriter->addLibrary(toAbs("lib2"), uuid(), version("2"), false,
                                  QByteArray(), QString());
   mWriter->addElement<Symbol>(lib1, toAbs("sym1"), uuid(1), version("0.1"),
-                              false);
+                              false, QString());
   mWriter->addElement<Symbol>(lib1, toAbs("sym2"), uuid(2), version("0.2"),
-                              false);
+                              false, QString());
   mWriter->addElement<Symbol>(lib2, toAbs("sym3"), uuid(1), version("0.3"),
-                              false);
+                              false, QString());
   mWriter->addElement<Symbol>(lib2, toAbs("sym4"), uuid(2), version("0.2"),
-                              false);
+                              false, QString());
 
   EXPECT_EQ(str({{version("0.1"), toAbs("sym1")},
                  {version("0.2"), toAbs("sym2")},
@@ -233,13 +234,13 @@ TEST_F(WorkspaceLibraryDbTest, testGetAllWithUuid) {
   int lib2 = mWriter->addLibrary(toAbs("lib2"), uuid(), version("2"), false,
                                  QByteArray(), QString());
   mWriter->addElement<Symbol>(lib1, toAbs("sym1"), uuid(1), version("0.1"),
-                              false);
+                              false, QString());
   mWriter->addElement<Symbol>(lib1, toAbs("sym2"), uuid(2), version("0.2"),
-                              false);
+                              false, QString());
   mWriter->addElement<Symbol>(lib2, toAbs("sym3"), uuid(1), version("0.3"),
-                              false);
+                              false, QString());
   mWriter->addElement<Symbol>(lib2, toAbs("sym4"), uuid(2), version("0.2"),
-                              false);
+                              false, QString());
 
   EXPECT_EQ(
       str({{version("0.1"), toAbs("sym1")}, {version("0.3"), toAbs("sym3")}}),
@@ -252,13 +253,13 @@ TEST_F(WorkspaceLibraryDbTest, testGetAllWithLibrary) {
   int lib2 = mWriter->addLibrary(toAbs("lib2"), uuid(), version("2"), false,
                                  QByteArray(), QString());
   mWriter->addElement<Symbol>(lib1, toAbs("sym1"), uuid(1), version("0.1"),
-                              false);
+                              false, QString());
   mWriter->addElement<Symbol>(lib1, toAbs("sym2"), uuid(2), version("0.2"),
-                              false);
+                              false, QString());
   mWriter->addElement<Symbol>(lib2, toAbs("sym3"), uuid(1), version("0.3"),
-                              false);
+                              false, QString());
   mWriter->addElement<Symbol>(lib2, toAbs("sym4"), uuid(2), version("0.2"),
-                              false);
+                              false, QString());
 
   EXPECT_EQ(
       str({{version("0.3"), toAbs("sym3")}, {version("0.2"), toAbs("sym4")}}),
@@ -271,13 +272,13 @@ TEST_F(WorkspaceLibraryDbTest, testGetAllWithUuidAndLibrary) {
   int lib2 = mWriter->addLibrary(toAbs("lib2"), uuid(), version("2"), false,
                                  QByteArray(), QString());
   mWriter->addElement<Symbol>(lib1, toAbs("sym1"), uuid(1), version("0.1"),
-                              false);
+                              false, QString());
   mWriter->addElement<Symbol>(lib1, toAbs("sym2"), uuid(2), version("0.2"),
-                              false);
+                              false, QString());
   mWriter->addElement<Symbol>(lib2, toAbs("sym3"), uuid(1), version("0.3"),
-                              false);
+                              false, QString());
   mWriter->addElement<Symbol>(lib2, toAbs("sym4"), uuid(2), version("0.2"),
-                              false);
+                              false, QString());
 
   EXPECT_EQ(str({{version("0.3"), toAbs("sym3")}}),
             str(mWsDb->getAll<Symbol>(uuid(1), toAbs("lib2"))));
@@ -300,13 +301,13 @@ TEST_F(WorkspaceLibraryDbTest, testGetLatest) {
   int lib2 = mWriter->addLibrary(toAbs("lib2"), uuid(), version("2"), false,
                                  QByteArray(), QString());
   mWriter->addElement<Symbol>(lib1, toAbs("sym1"), uuid(0), version("0.1"),
-                              false);
+                              false, QString());
   mWriter->addElement<Symbol>(lib1, toAbs("sym2"), uuid(0), version("0.2"),
-                              false);
+                              false, QString());
   mWriter->addElement<Symbol>(lib2, toAbs("sym3"), uuid(0), version("0.3"),
-                              false);
+                              false, QString());
   mWriter->addElement<Symbol>(lib2, toAbs("sym4"), uuid(0), version("0.2"),
-                              false);
+                              false, QString());
 
   EXPECT_EQ(str(toAbs("sym3")), str(mWsDb->getLatest<Symbol>(uuid(0))));
 }
@@ -326,7 +327,7 @@ TEST_F(WorkspaceLibraryDbTest, testFindEmptyKeyword) {
   int lib = mWriter->addLibrary(toAbs("lib"), uuid(), version("1"), false,
                                 QByteArray(), QString());
   int sym = mWriter->addElement<Symbol>(lib, toAbs("sym1"), uuid(),
-                                        version("0.1"), false);
+                                        version("0.1"), false, QString());
   mWriter->addTranslation<Symbol>(sym, "", ElementName("some name"),
                                   "some desc", "some keywords");
 
@@ -337,15 +338,15 @@ TEST_F(WorkspaceLibraryDbTest, testFind) {
   int lib = mWriter->addLibrary(toAbs("lib"), uuid(), version("1"), false,
                                 QByteArray(), QString());
   int sym = mWriter->addElement<Symbol>(lib, toAbs("sym1"), uuid(1),
-                                        version("0.1"), false);
+                                        version("0.1"), false, QString());
   mWriter->addTranslation<Symbol>(sym, "", ElementName("the sym1 name"),
                                   "the sym1 desc", "the sym1 keywords");
   sym = mWriter->addElement<Symbol>(lib, toAbs("sym2"), uuid(2), version("0.2"),
-                                    false);
+                                    false, QString());
   mWriter->addTranslation<Symbol>(sym, "", ElementName("the sym2 name"),
                                   "the sym2 desc", "the sym2 keywords");
   sym = mWriter->addElement<Symbol>(lib, toAbs("sym3"), uuid(3), version("0.3"),
-                                    false);
+                                    false, QString());
   mWriter->addTranslation<Symbol>(sym, "", ElementName("the sym3 name"),
                                   "the sym3 desc", "the sym3 keywords");
 
@@ -363,15 +364,15 @@ TEST_F(WorkspaceLibraryDbTest, testFindWithDuplicates) {
   int lib = mWriter->addLibrary(toAbs("lib"), uuid(), version("1"), false,
                                 QByteArray(), QString());
   int sym = mWriter->addElement<Symbol>(lib, toAbs("sym1"), uuid(1),
-                                        version("0.1"), false);
+                                        version("0.1"), false, QString());
   mWriter->addTranslation<Symbol>(sym, "", ElementName("the sym1 name"),
                                   "the sym1 desc", "the sym1 keywords");
   sym = mWriter->addElement<Symbol>(lib, toAbs("sym2"), uuid(1), version("0.2"),
-                                    false);
+                                    false, QString());
   mWriter->addTranslation<Symbol>(sym, "", ElementName("the sym2 name"),
                                   "the sym2 desc", "the sym2 keywords");
   sym = mWriter->addElement<Symbol>(lib, toAbs("sym3"), uuid(2), version("0.3"),
-                                    false);
+                                    false, QString());
   mWriter->addTranslation<Symbol>(sym, "", ElementName("the sym3 name"),
                                   "the sym3 desc", "the sym3 keywords");
 
@@ -384,7 +385,7 @@ TEST_F(WorkspaceLibraryDbTest, testFindWithMultipleTranslations) {
   int lib = mWriter->addLibrary(toAbs("lib"), uuid(), version("1"), false,
                                 QByteArray(), QString());
   int sym = mWriter->addElement<Symbol>(lib, toAbs("sym1"), uuid(1),
-                                        version("0.1"), false);
+                                        version("0.1"), false, QString());
   mWriter->addTranslation<Symbol>(sym, "", ElementName("the sym1 name"),
                                   "the sym1 desc", "the sym1 keywords");
   mWriter->addTranslation<Symbol>(
@@ -394,7 +395,7 @@ TEST_F(WorkspaceLibraryDbTest, testFindWithMultipleTranslations) {
       sym, "de_DE", ElementName("the sym1 de_DE name"), "the sym1 de_DE desc",
       "the sym1 de_DE keywords");
   sym = mWriter->addElement<Symbol>(lib, toAbs("sym2"), uuid(2), version("0.2"),
-                                    false);
+                                    false, QString());
   mWriter->addTranslation<Symbol>(sym, "", ElementName("the sym2 name"),
                                   "the sym2 desc", "the sym2 keywords");
 
@@ -441,14 +442,14 @@ TEST_F(WorkspaceLibraryDbTest, testGetTranslationsEmpty) {
                                           version("0.1"), false, tl::nullopt);
   mWriter->addCategory<PackageCategory>(libId, toAbs("fp"), uuid(),
                                         version("0.1"), false, tl::nullopt);
-  mWriter->addElement<Symbol>(libId, toAbs("fp"), uuid(), version("0.1"),
-                              false);
+  mWriter->addElement<Symbol>(libId, toAbs("fp"), uuid(), version("0.1"), false,
+                              QString());
   mWriter->addElement<Package>(libId, toAbs("fp"), uuid(), version("0.1"),
-                               false);
+                               false, QString());
   mWriter->addElement<Component>(libId, toAbs("fp"), uuid(), version("0.1"),
-                                 false);
-  mWriter->addDevice(libId, toAbs("fp"), uuid(), version("0.1"), false, uuid(),
-                     uuid());
+                                 false, QString());
+  mWriter->addDevice(libId, toAbs("fp"), uuid(), version("0.1"), false,
+                     QString(), uuid(), uuid());
 
   testGetTr<Library>(*mWsDb, toAbs("fp"), {}, false, "", "", "");
   testGetTr<ComponentCategory>(*mWsDb, toAbs("fp"), {}, false, "", "", "");
@@ -473,19 +474,19 @@ TEST_F(WorkspaceLibraryDbTest, testGetTranslationsDefaultLocale) {
   mWriter->addTranslation<PackageCategory>(id, "", ElementName("pkgcat_n"),
                                            "pkgcat_d", "pkgcat_k");
   id = mWriter->addElement<Symbol>(libId, toAbs("fp"), uuid(), version("0.1"),
-                                   false);
+                                   false, QString());
   mWriter->addTranslation<Symbol>(id, "", ElementName("sym_n"), "sym_d",
                                   "sym_k");
   id = mWriter->addElement<Package>(libId, toAbs("fp"), uuid(), version("0.1"),
-                                    false);
+                                    false, QString());
   mWriter->addTranslation<Package>(id, "", ElementName("pkg_n"), "pkg_d",
                                    "pkg_k");
   id = mWriter->addElement<Component>(libId, toAbs("fp"), uuid(),
-                                      version("0.1"), false);
+                                      version("0.1"), false, QString());
   mWriter->addTranslation<Component>(id, "", ElementName("cmp_n"), "cmp_d",
                                      "cmp_k");
   id = mWriter->addDevice(libId, toAbs("fp"), uuid(), version("0.1"), false,
-                          uuid(), uuid());
+                          QString(), uuid(), uuid());
   mWriter->addTranslation<Device>(id, "", ElementName("dev_n"), "dev_d",
                                   "dev_k");
 
@@ -507,7 +508,7 @@ TEST_F(WorkspaceLibraryDbTest, testGetTranslationsDefaultLocale) {
 
 TEST_F(WorkspaceLibraryDbTest, testGetTranslationsDefaultWithOrder) {
   int id = mWriter->addElement<Symbol>(0, toAbs("fp"), uuid(), version("0.1"),
-                                       false);
+                                       false, QString());
   mWriter->addTranslation<Symbol>(id, "", ElementName("_n"), "_d", "_k");
 
   testGetTr<Symbol>(*mWsDb, toAbs("fp"), QStringList{"en_US", "zh_CN", "de_DE"},
@@ -516,7 +517,7 @@ TEST_F(WorkspaceLibraryDbTest, testGetTranslationsDefaultWithOrder) {
 
 TEST_F(WorkspaceLibraryDbTest, testGetTranslationsMultipleWithoutOrder) {
   int id = mWriter->addElement<Symbol>(0, toAbs("fp"), uuid(), version("0.1"),
-                                       false);
+                                       false, QString());
   mWriter->addTranslation<Symbol>(id, "de_DE", tl::nullopt, "de_d",
                                   tl::nullopt);
   mWriter->addTranslation<Symbol>(id, "", ElementName("_n"), "_d", "_k");
@@ -530,7 +531,7 @@ TEST_F(WorkspaceLibraryDbTest, testGetTranslationsMultipleWithoutOrder) {
 
 TEST_F(WorkspaceLibraryDbTest, testGetTranslationsMultipleWithOrder) {
   int id = mWriter->addElement<Symbol>(0, toAbs("fp"), uuid(), version("0.1"),
-                                       false);
+                                       false, QString());
   mWriter->addTranslation<Symbol>(id, "de_DE", tl::nullopt, "de_d",
                                   tl::nullopt);
   mWriter->addTranslation<Symbol>(id, "", tl::nullopt, "_d", "_k");
@@ -545,7 +546,7 @@ TEST_F(WorkspaceLibraryDbTest, testGetTranslationsMultipleWithOrder) {
 
 TEST_F(WorkspaceLibraryDbTest, testGetTranslationsNullptr) {
   int id = mWriter->addElement<Symbol>(0, toAbs("fp"), uuid(), version("0.1"),
-                                       false);
+                                       false, QString());
   mWriter->addTranslation<Symbol>(id, "", ElementName("_n"), "_d", "_k");
 
   QStringList localeOrder{"en_US", "zh_CN", "de_DE"};
@@ -615,10 +616,14 @@ TEST_F(WorkspaceLibraryDbTest, testGetMetadata) {
                                           true, tl::nullopt);
   mWriter->addCategory<PackageCategory>(libId, fp, uuid(3), version("3.3"),
                                         false, tl::nullopt);
-  mWriter->addElement<Symbol>(libId, fp, uuid(4), version("4.4"), true);
-  mWriter->addElement<Package>(libId, fp, uuid(5), version("5.5"), false);
-  mWriter->addElement<Component>(libId, fp, uuid(6), version("6.6"), true);
-  mWriter->addDevice(libId, fp, uuid(7), version("7.7"), false, uuid(), uuid());
+  mWriter->addElement<Symbol>(libId, fp, uuid(4), version("4.4"), true,
+                              QString());
+  mWriter->addElement<Package>(libId, fp, uuid(5), version("5.5"), false,
+                               QString());
+  mWriter->addElement<Component>(libId, fp, uuid(6), version("6.6"), true,
+                                 QString());
+  mWriter->addDevice(libId, fp, uuid(7), version("7.7"), false, QString(),
+                     uuid(), uuid());
 
   testGetMetadata<Library>(*mWsDb, fp, true, uuid(1), version("1.1"), false);
   testGetMetadata<ComponentCategory>(*mWsDb, fp, true, uuid(2), version("2.2"),
@@ -637,7 +642,7 @@ TEST_F(WorkspaceLibraryDbTest, testGetMetadata) {
 
 TEST_F(WorkspaceLibraryDbTest, testGetMetadataNullptr) {
   FilePath fp = toAbs("fp");
-  mWriter->addElement<Symbol>(0, fp, uuid(1), version("1.1"), true);
+  mWriter->addElement<Symbol>(0, fp, uuid(1), version("1.1"), true, QString());
 
   Uuid retUuid = Uuid::createRandom();
   Version retVersion = version("1");
@@ -773,7 +778,8 @@ TEST_F(WorkspaceLibraryDbTest, testGetDeviceMetadataInexistent) {
 
 TEST_F(WorkspaceLibraryDbTest, testGetDeviceMetadata) {
   FilePath fp = toAbs("fp");
-  mWriter->addDevice(0, fp, uuid(), version("1.1"), false, uuid(1), uuid(2));
+  mWriter->addDevice(0, fp, uuid(), version("1.1"), false, QString(), uuid(1),
+                     uuid(2));
 
   Uuid cmpUuid = Uuid::createRandom();
   Uuid pkgUuid = Uuid::createRandom();
@@ -784,7 +790,8 @@ TEST_F(WorkspaceLibraryDbTest, testGetDeviceMetadata) {
 
 TEST_F(WorkspaceLibraryDbTest, testGetDeviceMetadataNullptr) {
   FilePath fp = toAbs("fp");
-  mWriter->addDevice(0, fp, uuid(), version("1.1"), false, uuid(1), uuid(2));
+  mWriter->addDevice(0, fp, uuid(), version("1.1"), false, QString(), uuid(1),
+                     uuid(2));
 
   Uuid cmpUuid = Uuid::createRandom();
   Uuid pkgUuid = Uuid::createRandom();
@@ -898,16 +905,16 @@ TEST_F(WorkspaceLibraryDbTest, testGetByCategory) {
   mWriter->addCategory<PackageCategory>(0, toAbs("pkgcat"), uuid(2),
                                         version("0.1"), false, tl::nullopt);
   int sym = mWriter->addElement<Symbol>(0, toAbs("sym"), uuid(3),
-                                        version("0.1"), false);
+                                        version("0.1"), false, QString());
   mWriter->addToCategory<Symbol>(sym, uuid(1));
   int pkg = mWriter->addElement<Package>(0, toAbs("pkg"), uuid(4),
-                                         version("0.1"), false);
+                                         version("0.1"), false, QString());
   mWriter->addToCategory<Package>(pkg, uuid(2));
   int cmp = mWriter->addElement<Component>(0, toAbs("cmp"), uuid(5),
-                                           version("0.1"), false);
+                                           version("0.1"), false, QString());
   mWriter->addToCategory<Component>(cmp, uuid(1));
   int dev = mWriter->addDevice(0, toAbs("dev"), uuid(6), version("0.1"), false,
-                               uuid(), uuid());
+                               QString(), uuid(), uuid());
   mWriter->addToCategory<Device>(dev, uuid(1));
 
   EXPECT_EQ(str(QSet<Uuid>{uuid(3)}),
@@ -928,7 +935,7 @@ TEST_F(WorkspaceLibraryDbTest, testGetByCategoryInvalidParent) {
   mWriter->addCategory<ComponentCategory>(0, toAbs("cmpcat"), uuid(1),
                                           version("0.1"), false, uuid(2));
   int cmp = mWriter->addElement<Component>(0, toAbs("fp"), uuid(3),
-                                           version("0.1"), false);
+                                           version("0.1"), false, QString());
   mWriter->addToCategory<Component>(cmp, uuid(1));
 
   // The category "uuid(1)" does not have a valid parent, but it will still
@@ -946,7 +953,7 @@ TEST_F(WorkspaceLibraryDbTest, testGetByCategoryEndlessRecursion) {
   mWriter->addCategory<ComponentCategory>(0, toAbs("cmpcat2"), uuid(2),
                                           version("0.1"), false, uuid(1));
   int cmp = mWriter->addElement<Component>(0, toAbs("fp"), uuid(3),
-                                           version("0.1"), false);
+                                           version("0.1"), false, QString());
   mWriter->addToCategory<Component>(cmp, uuid(1));
 
   // None of the categories will be shown in the category tree, which is not
@@ -969,16 +976,62 @@ TEST_F(WorkspaceLibraryDbTest, testGetByCategoryDuplicates) {
   mWriter->addCategory<ComponentCategory>(1, toAbs("cmpcat4"), uuid(1),
                                           version("0.1"), false, uuid(2));
   int cmp1 = mWriter->addElement<Component>(0, toAbs("cmp1"), uuid(3),
-                                            version("0.1"), false);
+                                            version("0.1"), false, QString());
   mWriter->addToCategory<Component>(cmp1, uuid(1));
   int cmp2 = mWriter->addElement<Component>(0, toAbs("cmp2"), uuid(3),
-                                            version("0.1"), false);
+                                            version("0.1"), false, QString());
   mWriter->addToCategory<Component>(cmp2, uuid(1));
 
   EXPECT_EQ(str(QSet<Uuid>{uuid(3)}),
             str(mWsDb->getByCategory<Component>(uuid(1))));
   EXPECT_EQ(str(QSet<Uuid>{}),
             str(mWsDb->getByCategory<Component>(tl::nullopt)));
+}
+
+/*******************************************************************************
+ *  Tests for getGenerated()
+ ******************************************************************************/
+
+TEST_F(WorkspaceLibraryDbTest, testGetGeneratedEmptyDb) {
+  EXPECT_EQ(str(QSet<Uuid>{}), str(mWsDb->getGenerated<Symbol>(QString())));
+  EXPECT_EQ(str(QSet<Uuid>{}), str(mWsDb->getGenerated<Package>("")));
+  EXPECT_EQ(str(QSet<Uuid>{}), str(mWsDb->getGenerated<Component>("foo")));
+  EXPECT_EQ(str(QSet<Uuid>{}), str(mWsDb->getGenerated<Device>("bar")));
+}
+
+TEST_F(WorkspaceLibraryDbTest, testGetGenerated) {
+  mWriter->addElement<Symbol>(0, toAbs("sym1"), uuid(1), version("0.1"), false,
+                              "");
+  mWriter->addElement<Symbol>(0, toAbs("sym2"), uuid(2), version("0.1"), false,
+                              "gen:1");
+  mWriter->addElement<Package>(0, toAbs("pkg1"), uuid(3), version("0.1"), false,
+                               QString());
+  mWriter->addElement<Package>(0, toAbs("pkg2"), uuid(4), version("0.1"), false,
+                               "gen:2");
+  mWriter->addElement<Component>(0, toAbs("cmp1"), uuid(5), version("0.1"),
+                                 false, QString());
+  mWriter->addElement<Component>(0, toAbs("cmp2"), uuid(6), version("0.1"),
+                                 false, "gen:3");
+  mWriter->addDevice(0, toAbs("dev1"), uuid(7), version("0.1"), false,
+                     QString(), uuid(), uuid());
+  mWriter->addDevice(0, toAbs("dev2"), uuid(8), version("0.1"), false, "gen:1",
+                     uuid(), uuid());
+
+  EXPECT_EQ(str(QSet<Uuid>{}), str(mWsDb->getGenerated<Symbol>("")));
+  EXPECT_EQ(str(QSet<Uuid>{uuid(2)}),
+            str(mWsDb->getGenerated<Symbol>("gen:1")));
+
+  EXPECT_EQ(str(QSet<Uuid>{}), str(mWsDb->getGenerated<Package>(QString())));
+  EXPECT_EQ(str(QSet<Uuid>{uuid(4)}),
+            str(mWsDb->getGenerated<Package>("gen:2")));
+
+  EXPECT_EQ(str(QSet<Uuid>{}), str(mWsDb->getGenerated<Component>("gen:2")));
+  EXPECT_EQ(str(QSet<Uuid>{uuid(6)}),
+            str(mWsDb->getGenerated<Component>("gen:3")));
+
+  EXPECT_EQ(str(QSet<Uuid>{}), str(mWsDb->getGenerated<Device>("gen:2")));
+  EXPECT_EQ(str(QSet<Uuid>{uuid(8)}),
+            str(mWsDb->getGenerated<Device>("gen:1")));
 }
 
 /*******************************************************************************
@@ -990,24 +1043,24 @@ TEST_F(WorkspaceLibraryDbTest, testGetComponentDevicesEmptyDb) {
 }
 
 TEST_F(WorkspaceLibraryDbTest, testGetComponentDevices) {
-  mWriter->addDevice(0, toAbs("dev1"), uuid(1), version("0.1"), false, uuid(0),
-                     uuid());
-  mWriter->addDevice(0, toAbs("dev2"), uuid(2), version("0.1"), false, uuid(0),
-                     uuid());
-  mWriter->addDevice(0, toAbs("dev3"), uuid(3), version("0.1"), false, uuid(),
-                     uuid());
+  mWriter->addDevice(0, toAbs("dev1"), uuid(1), version("0.1"), false,
+                     QString(), uuid(0), uuid());
+  mWriter->addDevice(0, toAbs("dev2"), uuid(2), version("0.1"), false,
+                     QString(), uuid(0), uuid());
+  mWriter->addDevice(0, toAbs("dev3"), uuid(3), version("0.1"), false,
+                     QString(), uuid(), uuid());
 
   EXPECT_EQ(str(QSet<Uuid>{uuid(1), uuid(2)}),
             str(mWsDb->getComponentDevices(uuid(0))));
 }
 
 TEST_F(WorkspaceLibraryDbTest, testGetComponentDevicesDuplicates) {
-  mWriter->addDevice(0, toAbs("dev1"), uuid(1), version("0.1"), false, uuid(0),
-                     uuid());
-  mWriter->addDevice(1, toAbs("dev2"), uuid(1), version("0.1"), false, uuid(0),
-                     uuid());
-  mWriter->addDevice(1, toAbs("dev3"), uuid(2), version("0.1"), false, uuid(),
-                     uuid());
+  mWriter->addDevice(0, toAbs("dev1"), uuid(1), version("0.1"), false,
+                     QString(), uuid(0), uuid());
+  mWriter->addDevice(1, toAbs("dev2"), uuid(1), version("0.1"), false,
+                     QString(), uuid(0), uuid());
+  mWriter->addDevice(1, toAbs("dev3"), uuid(2), version("0.1"), false,
+                     QString(), uuid(), uuid());
 
   EXPECT_EQ(str(QSet<Uuid>{uuid(1)}), str(mWsDb->getComponentDevices(uuid(0))));
 }

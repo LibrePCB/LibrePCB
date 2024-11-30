@@ -128,6 +128,8 @@ public:
   Qt::Alignment toQtAlign() const noexcept {
     return mH.toQtAlignFlag() | mV.toQtAlignFlag();
   }
+  static Alignment fromQt(Qt::Alignment align,
+                          const Alignment& fallback = Alignment()) noexcept;
   Alignment& mirror() noexcept;
   Alignment& mirrorH() noexcept;
   Alignment& mirrorV() noexcept;

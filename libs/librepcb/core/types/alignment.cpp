@@ -159,6 +159,26 @@ void Alignment::serialize(SExpression& root) const {
   root.appendChild(mV);
 }
 
+Alignment Alignment::fromQt(Qt::Alignment align,
+                            const Alignment& fallback) noexcept {
+  Alignment a = fallback;
+  if (align.testFlag(Qt::AlignLeft)) {
+    a.setH(HAlign::left());
+  } else if (align.testFlag(Qt::AlignRight)) {
+    a.setH(HAlign::right());
+  } else if (align.testFlag(Qt::AlignHCenter)) {
+    a.setH(HAlign::center());
+  }
+  if (align.testFlag(Qt::AlignTop)) {
+    a.setV(VAlign::top());
+  } else if (align.testFlag(Qt::AlignBottom)) {
+    a.setV(VAlign::bottom());
+  } else if (align.testFlag(Qt::AlignVCenter)) {
+    a.setV(VAlign::center());
+  }
+  return a;
+}
+
 /*******************************************************************************
  *  End of File
  ******************************************************************************/

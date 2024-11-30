@@ -300,7 +300,7 @@ TEST_F(CategoryTreeModelTest, testCmpCatWithSymbols) {
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 3"),
                                              tl::nullopt, tl::nullopt);
   int sym = mWriter->addElement<Symbol>(0, toAbs("sym"), uuid(), version("0.1"),
-                                        false);
+                                        false, QString());
   mWriter->addToCategory<Symbol>(sym, uuid(3));
 
   CategoryTreeModel model(*mWsDb, {},
@@ -331,7 +331,7 @@ TEST_F(CategoryTreeModelTest, testCmpCatWithComponents) {
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 3"),
                                              tl::nullopt, tl::nullopt);
   int cmp = mWriter->addElement<Component>(0, toAbs("cmp"), uuid(),
-                                           version("0.1"), false);
+                                           version("0.1"), false, QString());
   mWriter->addToCategory<Component>(cmp, uuid(3));
 
   CategoryTreeModel model(*mWsDb, {},
@@ -362,7 +362,7 @@ TEST_F(CategoryTreeModelTest, testCmpCatWithDevices) {
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 3"),
                                              tl::nullopt, tl::nullopt);
   int dev = mWriter->addDevice(0, toAbs("dev"), uuid(), version("0.1"), false,
-                               uuid(), uuid());
+                               QString(), uuid(), uuid());
   mWriter->addToCategory<Device>(dev, uuid(3));
 
   CategoryTreeModel model(*mWsDb, {},
@@ -415,7 +415,7 @@ TEST_F(CategoryTreeModelTest, testPkgCatWithPackages) {
   mWriter->addTranslation<PackageCategory>(cat, "", ElementName("cat 3"),
                                            tl::nullopt, tl::nullopt);
   int pkg = mWriter->addElement<Package>(0, toAbs("pkg"), uuid(),
-                                         version("0.1"), false);
+                                         version("0.1"), false, QString());
   mWriter->addToCategory<Package>(pkg, uuid(3));
 
   CategoryTreeModel model(*mWsDb, {},
@@ -430,8 +430,8 @@ TEST_F(CategoryTreeModelTest, testPkgCatWithPackages) {
 }
 
 TEST_F(CategoryTreeModelTest, testWithoutCategory) {
-  mWriter->addDevice(0, toAbs("dev"), uuid(), version("0.1"), false, uuid(),
-                     uuid());
+  mWriter->addDevice(0, toAbs("dev"), uuid(), version("0.1"), false, QString(),
+                     uuid(), uuid());
 
   CategoryTreeModel model(*mWsDb, {},
                           CategoryTreeModel::Filter::CmpCatWithDevices);
@@ -443,7 +443,7 @@ TEST_F(CategoryTreeModelTest, testWithoutCategory) {
 
 TEST_F(CategoryTreeModelTest, testInexistentCategory) {
   int dev = mWriter->addDevice(0, toAbs("dev"), uuid(), version("0.1"), false,
-                               uuid(), uuid());
+                               QString(), uuid(), uuid());
   mWriter->addToCategory<Device>(dev, uuid(1));  // Inexistent category.
 
   CategoryTreeModel model(*mWsDb, {},

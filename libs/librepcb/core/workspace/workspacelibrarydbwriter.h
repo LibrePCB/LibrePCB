@@ -117,17 +117,19 @@ public:
    * @param uuid          UUID of the element.
    * @param version       Version of the element.
    * @param deprecated    Whether the element is deprecated or not.
+   * @param generatedBy   The generator name if generated or imported.
    * @return ID of the added element.
    */
   template <typename ElementType>
   int addElement(int libId, const FilePath& fp, const Uuid& uuid,
-                 const Version& version, bool deprecated) {
+                 const Version& version, bool deprecated,
+                 const QString& generatedBy) {
     static_assert(std::is_same<ElementType, Symbol>::value ||
                       std::is_same<ElementType, Package>::value ||
                       std::is_same<ElementType, Component>::value,
                   "Unsupported ElementType");
     return addElement(getElementTable<ElementType>(), libId, fp, uuid, version,
-                      deprecated);
+                      deprecated, generatedBy);
   }
 
   /**
@@ -161,12 +163,14 @@ public:
    * @param uuid          UUID of the device.
    * @param version       Version of the device.
    * @param deprecated    Whether the device is deprecated or not.
+   * @param generatedBy   The generator name if generated or imported.
    * @param component     Component UUID of the device.
    * @param package       Package UUID of the device.
    * @return ID of the added device.
    */
   int addDevice(int libId, const FilePath& fp, const Uuid& uuid,
-                const Version& version, bool deprecated, const Uuid& component,
+                const Version& version, bool deprecated,
+                const QString& generatedBy, const Uuid& component,
                 const Uuid& package);
 
   /**
@@ -321,7 +325,8 @@ public:
 
 private:  // Methods
   int addElement(const QString& elementsTable, int libId, const FilePath& fp,
-                 const Uuid& uuid, const Version& version, bool deprecated);
+                 const Uuid& uuid, const Version& version, bool deprecated,
+                 const QString& generatedBy);
   int addCategory(const QString& categoriesTable, int libId, const FilePath& fp,
                   const Uuid& uuid, const Version& version, bool deprecated,
                   const tl::optional<Uuid>& parent);
@@ -339,6 +344,7 @@ private:  // Methods
                   const QString& name, const QString& mediaType,
                   const QUrl& url);
   QString filePathToString(const FilePath& fp) const noexcept;
+  static QString nonEmptyOrNull(const QString& s) noexcept;
   static QString nonNull(const QString& s) noexcept;
 
 private:  // Data

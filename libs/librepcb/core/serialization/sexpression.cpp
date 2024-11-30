@@ -749,6 +749,32 @@ qlonglong deserialize(const SExpression& node) {
   }
 }
 
+// Note: No serialization for float because it's not 100% accurate!
+template <>
+float deserialize(const SExpression& node) {
+  bool ok = false;
+  const float value = node.getValue().toFloat(&ok);
+  if (ok) {
+    return value;
+  } else {
+    throw RuntimeError(__FILE__, __LINE__,
+                       QString("Invalid float: '%1'").arg(node.getValue()));
+  }
+}
+
+// Note: No serialization for double because it's not 100% accurate!
+template <>
+double deserialize(const SExpression& node) {
+  bool ok = false;
+  const double value = node.getValue().toDouble(&ok);
+  if (ok) {
+    return value;
+  } else {
+    throw RuntimeError(__FILE__, __LINE__,
+                       QString("Invalid double: '%1'").arg(node.getValue()));
+  }
+}
+
 template <>
 bool deserialize(const SExpression& node) {
   if (node.getValue() == "true") {

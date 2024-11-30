@@ -42,6 +42,15 @@ namespace eagleimport {
 
 using C = EagleTypeConverter;
 
+static QString generatedBy(QString libName, QStringList keys) {
+  if (libName.toLower().endsWith(".lbr")) {
+    libName.chop(4);
+  }
+  keys.prepend(libName);
+  keys.prepend("EagleImport");
+  return keys.join("::");
+}
+
 /*******************************************************************************
  *  Struct EagleLibraryConverterSettings
  ******************************************************************************/
@@ -109,6 +118,7 @@ std::unique_ptr<Symbol> EagleLibraryConverter::createSymbol(
       C::convertElementName(mSettings.namePrefix + eagleSymbol.getName()),
       C::convertElementDescription(eagleSymbol.getDescription()),
       mSettings.keywords));
+  symbol->setGeneratedBy(generatedBy(libName, {eagleSymbol.getName()}));
   symbol->setCategories(mSettings.symbolCategories);
 
   QList<C::Geometry> geometries;
@@ -219,6 +229,7 @@ std::unique_ptr<Package> EagleLibraryConverter::createPackage(
       C::convertElementName(mSettings.namePrefix + eaglePackage.getName()),
       C::convertElementDescription(eaglePackage.getDescription()),
       mSettings.keywords, librepcb::Package::AssemblyType::Auto));
+  package->setGeneratedBy(generatedBy(libName, {eaglePackage.getName()}));
   package->setCategories(mSettings.packageCategories);
   auto footprint = std::make_shared<Footprint>(Uuid::createRandom(),
                                                ElementName("default"), "");
@@ -342,6 +353,7 @@ std::unique_ptr<Component> EagleLibraryConverter::createComponent(
       C::convertComponentName(mSettings.namePrefix + eagleDeviceSet.getName()),
       C::convertElementDescription(eagleDeviceSet.getDescription()),
       mSettings.keywords));
+  component->setGeneratedBy(generatedBy(libName, {eagleDeviceSet.getName()}));
   component->setCategories(mSettings.componentCategories);
   component->setPrefixes(NormDependentPrefixMap(
       C::convertComponentPrefix(eagleDeviceSet.getPrefix())));
@@ -449,6 +461,8 @@ std::unique_ptr<Device> EagleLibraryConverter::createDevice(
                            eagleDevice.getName()),
       C::convertElementDescription(eagleDeviceSet.getDescription()),
       mSettings.keywords, *componentUuid, *packageUuid));
+  device->setGeneratedBy(generatedBy(
+      devLibName, {eagleDeviceSet.getName(), eagleDevice.getName()}));
   device->setCategories(mSettings.deviceCategories);
   for (auto padIt = mPackagePadMap[packageKey].constBegin();
        padIt != mPackagePadMap[packageKey].constEnd(); padIt++) {

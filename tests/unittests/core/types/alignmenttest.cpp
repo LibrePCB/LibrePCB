@@ -39,6 +39,7 @@ typedef struct {
   VAlign vAlign;
   HAlign hMirrored;
   VAlign vMirrored;
+  Qt::Alignment qtAlign;
   QByteArray serialized;
   bool validSExpression;
 } AlignmentTestData;
@@ -75,6 +76,20 @@ TEST_P(AlignmentTest, testSerialize) {
     alignment.serialize(*sexpr);
     EXPECT_EQ(data.serialized, sexpr->toByteArray());
   }
+}
+
+TEST_P(AlignmentTest, testToQtAlign) {
+  const AlignmentTestData& data = GetParam();
+
+  const Alignment alignment = Alignment(data.hAlign, data.vAlign);
+  EXPECT_EQ(alignment.toQtAlign(), alignment.toQtAlign());
+}
+
+TEST_P(AlignmentTest, testFromQt) {
+  const AlignmentTestData& data = GetParam();
+
+  const Alignment alignment = Alignment(data.hAlign, data.vAlign);
+  EXPECT_EQ(alignment, Alignment::fromQt(data.qtAlign));
 }
 
 TEST_P(AlignmentTest, testMirror) {
@@ -137,28 +152,36 @@ INSTANTIATE_TEST_SUITE_P(AlignmentTest, AlignmentTest, ::testing::Values(
   // Invalid serialization
   AlignmentTestData({HAlign::center(), VAlign::center(),
                      HAlign::center(), VAlign::center(),
+                     Qt::AlignHCenter | Qt::AlignVCenter,
                      "(align \"\" \"\")\n", false}),
   AlignmentTestData({HAlign::center(), VAlign::center(),
                      HAlign::center(), VAlign::center(),
+                     Qt::AlignHCenter | Qt::AlignVCenter,
                      "(align center foo)\n", false}),
   AlignmentTestData({HAlign::center(), VAlign::center(),
                      HAlign::center(), VAlign::center(),
+                     Qt::AlignHCenter | Qt::AlignVCenter,
                      "(align center)\n", false}),
   AlignmentTestData({HAlign::center(), VAlign::center(),
                      HAlign::center(), VAlign::center(),
+                     Qt::AlignHCenter | Qt::AlignVCenter,
                      "(align)\n", false}),
   AlignmentTestData({HAlign::center(), VAlign::center(),
                      HAlign::center(), VAlign::center(),
+                     Qt::AlignHCenter | Qt::AlignVCenter,
                      "center\n", false}),
   // Valid serialization
   AlignmentTestData({HAlign::left(),   VAlign::bottom(),
                      HAlign::right(),  VAlign::top(),
+                     Qt::AlignLeft | Qt::AlignBottom,
                      "(align left bottom)\n", true}),
   AlignmentTestData({HAlign::right(),  VAlign::top(),
                      HAlign::left(),   VAlign::bottom(),
+                     Qt::AlignRight | Qt::AlignTop,
                      "(align right top)\n", true}),
   AlignmentTestData({HAlign::center(), VAlign::center(),
                      HAlign::center(), VAlign::center(),
+                     Qt::AlignHCenter | Qt::AlignVCenter,
                      "(align center center)\n", true})
 ));
 // clang-format on
