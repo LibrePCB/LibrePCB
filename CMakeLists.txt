@@ -29,7 +29,7 @@ set(OpenGL_GL_PREFERENCE LEGACY)
 #  - Unstable (development) versions: Suffix "-unstable", e.g. "1.0.0-unstable"
 #  - Release candidates: Suffix "-rc#", e.g. "1.0.0-rc3"
 #  - Releases: No suffix, e.g. "1.0.0"
-set(LIBREPCB_APP_VERSION "1.2.0")
+set(LIBREPCB_APP_VERSION "1.2.1-unstable")
 
 # File format version:
 #  - Must be equal to the major version of APP_VERSION!
