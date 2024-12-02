@@ -27,7 +27,6 @@
 
 #include <librepcb/core/application.h>
 #include <librepcb/core/fileio/filepath.h>
-#include <librepcb/core/qtcompat.h>
 #include <librepcb/core/types/angle.h>
 
 #include <QtCore>
@@ -203,13 +202,8 @@ void OpenGlView::mouseMoveEvent(QMouseEvent* e) {
 
 void OpenGlView::wheelEvent(QWheelEvent* e) {
   if (e->angleDelta().y() != 0) {
-    zoom(
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
-        e->position(),
-#else
-        e->pos(),
-#endif
-        qPow(sZoomStepFactor, e->angleDelta().y() / qreal(120)));
+    zoom(e->position(),
+         qPow(sZoomStepFactor, e->angleDelta().y() / qreal(120)));
   }
 }
 
@@ -246,7 +240,7 @@ void OpenGlView::initializeGL() {
   } else {
     qCritical() << "Failed to initialize OpenGL!";
     foreach (const QString& line,
-             mProgram.log().split('\n', QtCompat::skipEmptyParts())) {
+             mProgram.log().split('\n', Qt::SkipEmptyParts)) {
       qCritical().noquote() << "OpenGL:" << line;
     }
     glClearColor(1, 0, 0, 1);

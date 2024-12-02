@@ -24,13 +24,7 @@
 
 #include <QtCore>
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
 #include <qtextdocument.h>
-#else
-extern "C" {
-#include <hoedown/src/html.h>
-}
-#endif
 
 /*******************************************************************************
  *  Namespace
@@ -52,40 +46,6 @@ QString MarkdownConverter::convertMarkdownToHtml(
   }
 }
 
-#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
-QString MarkdownConverter::convertMarkdownToHtml(
-    const QString& markdown) noexcept {
-  // create HTML renderer
-  hoedown_html_flags flags = static_cast<hoedown_html_flags>(0);
-  hoedown_renderer* renderer = hoedown_html_renderer_new(flags, 0);
-
-  // create document parser
-  hoedown_extensions extensions = static_cast<hoedown_extensions>(
-      HOEDOWN_EXT_TABLES | HOEDOWN_EXT_FENCED_CODE | HOEDOWN_EXT_AUTOLINK |
-      HOEDOWN_EXT_STRIKETHROUGH | HOEDOWN_EXT_NO_INTRA_EMPHASIS);
-  hoedown_document* document = hoedown_document_new(renderer, extensions, 16);
-
-  // render markdown
-  QByteArray markdownUtf8 = markdown.toUtf8();
-  const uchar* markdownData =
-      reinterpret_cast<const uchar*>(markdownUtf8.constData());
-  hoedown_buffer* htmlBuffer = hoedown_buffer_new(64);
-  hoedown_document_render(document, htmlBuffer, markdownData,
-                          markdownUtf8.size());
-
-  // get HTML output
-  QString html = QString::fromUtf8(hoedown_buffer_cstr(htmlBuffer));
-
-  // clean up
-  hoedown_buffer_free(htmlBuffer);
-  hoedown_document_free(document);
-  hoedown_html_renderer_free(renderer);
-
-  return html;
-}
-#endif
-
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
 QString MarkdownConverter::convertMarkdownToHtml(
     const QString& markdown) noexcept {
   // Use a temporary QTextDocument to convert markdown to HTML.
@@ -97,7 +57,6 @@ QString MarkdownConverter::convertMarkdownToHtml(
   document.setMarkdown(markdown, QTextDocument::MarkdownDialectGitHub);
   return document.toHtml();
 }
-#endif
 
 /*******************************************************************************
  *  End of File

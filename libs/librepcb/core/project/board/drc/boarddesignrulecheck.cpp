@@ -89,11 +89,7 @@ void BoardDesignRuleCheck::start(Board& board,
   emitProgress(12);
 
   // Pass data to new thread.
-#if (QT_VERSION_MAJOR >= 6)
   mFuture = QtConcurrent::run(&BoardDesignRuleCheck::run, this, data);
-#else
-  mFuture = QtConcurrent::run(this, &BoardDesignRuleCheck::run, data);
-#endif
 }
 
 BoardDesignRuleCheck::Result BoardDesignRuleCheck::waitForFinished()

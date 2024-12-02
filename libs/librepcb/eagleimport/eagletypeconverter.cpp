@@ -25,7 +25,6 @@
 #include <librepcb/core/attribute/attribute.h>
 #include <librepcb/core/attribute/attributekey.h>
 #include <librepcb/core/attribute/attrtypestring.h>
-#include <librepcb/core/qtcompat.h>
 #include <librepcb/core/types/boundedunsignedratio.h>
 #include <librepcb/core/types/lengthunit.h>
 #include <librepcb/core/utils/clipperhelpers.h>
@@ -70,10 +69,7 @@ ElementName EagleTypeConverter::convertElementName(const QString& n) {
 QString EagleTypeConverter::convertElementDescription(const QString& d) {
   QTextDocument doc;
   doc.setHtml(QString(d).replace("\n", "<br/>"));
-  return doc.toPlainText()
-      .trimmed()
-      .split("\n", QtCompat::skipEmptyParts())
-      .join("\n");
+  return doc.toPlainText().trimmed().split("\n", Qt::SkipEmptyParts).join("\n");
 }
 
 ElementName EagleTypeConverter::convertComponentName(QString n) {
@@ -323,8 +319,7 @@ QHash<const Layer*, const Layer*> EagleTypeConverter::convertLayerSetup(
   QString tmp = s;
   tmp.replace(QRegularExpression("[:\\*+\\(\\)\\[\\]]"), " ");
   QSet<int> numbers;
-  foreach (const QString& numberStr,
-           tmp.split(" ", QtCompat::skipEmptyParts())) {
+  foreach (const QString& numberStr, tmp.split(" ", Qt::SkipEmptyParts)) {
     const int id = numberStr.toInt();
     if ((id < 1) || (id > 16)) {
       throw RuntimeError(__FILE__, __LINE__,

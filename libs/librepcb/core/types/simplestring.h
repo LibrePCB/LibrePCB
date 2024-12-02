@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../exceptions.h"
-#include "../qtcompat.h"
 #include "../serialization/sexpression.h"
 
 #include <type_safe/constrained_type.hpp>
@@ -133,8 +132,8 @@ inline QDebug operator<<(QDebug stream, const SimpleString& obj) {
   return stream;
 }
 
-inline QtCompat::Hash qHash(const SimpleString& key,
-                            QtCompat::Hash seed = 0) noexcept {
+inline std::size_t qHash(const SimpleString& key,
+                         std::size_t seed = 0) noexcept {
   return ::qHash(*key, seed);
 }
 

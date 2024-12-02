@@ -163,11 +163,7 @@ QStringList Application::getTranslationLocales() noexcept {
 const QFont& Application::getDefaultSansSerifFont() noexcept {
   auto create = []() {
     QFont font;
-    font.setStyleStrategy(QFont::StyleStrategy(
-#if QT_VERSION_MAJOR < 6
-        QFont::OpenGLCompatible |
-#endif
-        QFont::PreferQuality));
+    font.setStyleStrategy(QFont::StyleStrategy(QFont::PreferQuality));
     font.setStyleHint(QFont::SansSerif);
     font.setFamily("Noto Sans");
     return font;
@@ -180,11 +176,7 @@ const QFont& Application::getDefaultSansSerifFont() noexcept {
 const QFont& Application::getDefaultMonospaceFont() noexcept {
   auto create = []() {
     QFont font;
-    font.setStyleStrategy(QFont::StyleStrategy(
-#if QT_VERSION_MAJOR < 6
-        QFont::OpenGLCompatible |
-#endif
-        QFont::PreferQuality));
+    font.setStyleStrategy(QFont::StyleStrategy(QFont::PreferQuality));
     font.setStyleHint(QFont::TypeWriter);
     font.setFamily("Noto Sans Mono");
     return font;

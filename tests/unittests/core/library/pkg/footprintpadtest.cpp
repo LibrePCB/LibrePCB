@@ -44,7 +44,6 @@ class FootprintPadTest : public ::testing::Test {};
  *  Test Methods
  ******************************************************************************/
 
-#if QT_VERSION_MAJOR >= 6  // Avoid strange linker error of one job on CI.
 TEST_F(FootprintPadTest, testFunctionsSerialization) {
   const std::vector<std::pair<FootprintPad::Function, QString>> items = {
       {FootprintPad::Function::Unspecified, "unspecified"},
@@ -77,7 +76,6 @@ TEST_F(FootprintPadTest, testFunctionsSerialization) {
     EXPECT_THROW(deserialize<FootprintPad::Function>(*sexpr), Exception);
   }
 }
-#endif
 
 TEST_F(FootprintPadTest, testConstructFromSExpressionConnected) {
   std::unique_ptr<SExpression> sexpr = SExpression::parse(

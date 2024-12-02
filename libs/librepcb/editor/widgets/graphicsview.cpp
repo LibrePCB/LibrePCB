@@ -35,11 +35,8 @@
 #include <librepcb/core/utils/toolbox.h>
 
 #include <QtCore>
-#include <QtWidgets>
-
-#if QT_VERSION_MAJOR >= 6
 #include <QtOpenGLWidgets>
-#endif
+#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace

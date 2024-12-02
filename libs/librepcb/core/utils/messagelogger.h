@@ -100,11 +100,7 @@ signals:
   void msgEmitted(const Message& msg);
 
 private:  // Data
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
   mutable QRecursiveMutex mMutex;
-#else
-  mutable QMutex mMutex;
-#endif
   QPointer<MessageLogger> mParent;
   QString mPrefix;
   bool mRecord;

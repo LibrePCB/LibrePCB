@@ -28,7 +28,6 @@
 #include "../widgets/rulechecklistwidget.h"
 
 #include <librepcb/core/fileio/transactionalfilesystem.h>
-#include <librepcb/core/qtcompat.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -271,8 +270,8 @@ protected:  // Data
   QSet<SExpression> mDisappearedApprovals;
 };
 
-inline QtCompat::Hash qHash(const EditorWidgetBase::Feature& feature,
-                            QtCompat::Hash seed = 0) noexcept {
+inline std::size_t qHash(const EditorWidgetBase::Feature& feature,
+                         std::size_t seed = 0) noexcept {
   return ::qHash(static_cast<int>(feature), seed);
 }
 

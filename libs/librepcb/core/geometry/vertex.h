@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../qtcompat.h"
 #include "../types/angle.h"
 #include "../types/point.h"
 
@@ -98,8 +97,7 @@ private:  // Data
 
 QDebug operator<<(QDebug stream, const Vertex& vertex);
 
-inline QtCompat::Hash qHash(const Vertex& key,
-                            QtCompat::Hash seed = 0) noexcept {
+inline std::size_t qHash(const Vertex& key, std::size_t seed = 0) noexcept {
   return ::qHash(qMakePair(key.getPos(), key.getAngle()), seed);
 }
 

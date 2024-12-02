@@ -25,11 +25,8 @@
  ******************************************************************************/
 #include <QtCore>
 #include <QtOpenGL>
-#include <QtWidgets>
-
-#if QT_VERSION_MAJOR >= 6
 #include <QtOpenGLWidgets>
-#endif
+#include <QtWidgets>
 
 #include <memory>
 

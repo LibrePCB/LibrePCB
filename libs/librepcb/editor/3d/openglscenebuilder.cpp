@@ -78,11 +78,7 @@ OpenGlSceneBuilder::~OpenGlSceneBuilder() noexcept {
 
 void OpenGlSceneBuilder::start(std::shared_ptr<SceneData3D> data) noexcept {
   cancel();
-#if (QT_VERSION_MAJOR >= 6)
   mFuture = QtConcurrent::run(&OpenGlSceneBuilder::run, this, data);
-#else
-  mFuture = QtConcurrent::run(this, &OpenGlSceneBuilder::run, data);
-#endif
 }
 
 bool OpenGlSceneBuilder::isBusy() const noexcept {

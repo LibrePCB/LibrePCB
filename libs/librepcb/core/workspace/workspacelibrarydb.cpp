@@ -34,7 +34,6 @@
 #include "../library/library.h"
 #include "../library/pkg/package.h"
 #include "../library/sym/symbol.h"
-#include "../qtcompat.h"
 #include "../serialization/sexpression.h"
 #include "../sqlitedatabase.h"
 #include "workspacelibrarydbwriter.h"
@@ -48,8 +47,8 @@
  ******************************************************************************/
 namespace librepcb {
 
-static inline QtCompat::Hash qHash(const WorkspaceLibraryDb::Part& key,
-                                   QtCompat::Hash seed = 0) noexcept {
+static inline std::size_t qHash(const WorkspaceLibraryDb::Part& key,
+                                std::size_t seed = 0) noexcept {
   return ::qHash(qMakePair(key.mpn, key.manufacturer), seed);
 }
 

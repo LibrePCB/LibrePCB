@@ -47,7 +47,6 @@
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectattributelookup.h>
 #include <librepcb/core/project/projectlibrary.h>
-#include <librepcb/core/qtcompat.h>
 #include <librepcb/core/utils/toolbox.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
@@ -223,7 +222,7 @@ void UnplacedComponentsDock::updateComponentsList() noexcept {
                                     component->getParts(tl::nullopt).value(0));
       const QString value =
           AttributeSubstitutor::substitute(lookup("VALUE"), lookup)
-              .split("\n", QtCompat::skipEmptyParts())
+              .split("\n", Qt::SkipEmptyParts)
               .join("|");
       QString libCmpName = *component->getLibComponent().getNames().value(
           mProject.getLocaleOrder());
