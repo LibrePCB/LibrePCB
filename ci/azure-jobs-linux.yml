@@ -54,9 +54,6 @@ jobs:
   - bash: rm -rf libs/polyclipping
     displayName: Remove bundled polyclipping lib
     condition: and(succeeded(), eq(variables['UNBUNDLE_POLYCLIPPING'], 'true'))
-  - bash: rm -rf libs/hoedown
-    displayName: Remove bundled hoedown lib
-    condition: and(succeeded(), eq(variables['NO_HOEDOWN'], 'true'))
   - bash: ./ci/build_librepcb.sh
     displayName: Build LibrePCB
   - bash: ./ci/build_linux_portables.sh
