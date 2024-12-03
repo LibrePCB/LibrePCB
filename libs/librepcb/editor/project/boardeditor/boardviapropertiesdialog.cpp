@@ -161,10 +161,8 @@ bool BoardViaPropertiesDialog::applyChanges() noexcept {
                      false);
     cmd->setSize(mUi->edtSize->getValue(), false);
     cmd->setDrillDiameter(mUi->edtDrillDiameter->getValue(), false);
-    const tl::optional<const Layer&> startLayer =
-        mUi->cbxStartLayer->getCurrentLayer();
-    const tl::optional<const Layer&> endLayer =
-        mUi->cbxEndLayer->getCurrentLayer();
+    const Layer* startLayer = mUi->cbxStartLayer->getCurrentLayer();
+    const Layer* endLayer = mUi->cbxEndLayer->getCurrentLayer();
     cmd->setLayers(startLayer ? *startLayer : mVia.getVia().getStartLayer(),
                    endLayer ? *endLayer : mVia.getVia().getEndLayer());
     if (mUi->rbtnExposureOff->isChecked()) {

@@ -166,7 +166,7 @@ QWidget* BoardEditorState::parentWidget() noexcept {
 }
 
 QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
-    const Point& pos, FindFlags flags, const tl::optional<const Layer&> cuLayer,
+    const Point& pos, FindFlags flags, const Layer* cuLayer,
     const QSet<const NetSignal*>& netsignals,
     const QVector<std::shared_ptr<QGraphicsItem>>& except) noexcept {
   BoardGraphicsScene* scene = getActiveBoardScene();
