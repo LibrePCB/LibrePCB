@@ -31,7 +31,7 @@
 #include <QtWidgets>
 
 #include <memory>
-#include <optional.hpp>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -112,7 +112,7 @@ private:  // Methods
   bool openPropertiesDialogOfItemAtPos(const Point& pos) noexcept;
   bool copySelectedItemsToClipboard() noexcept;
   bool startPaste(std::unique_ptr<SymbolClipboardData> data,
-                  const tl::optional<Point>& fixedPosition);
+                  const std::optional<Point>& fixedPosition);
   bool rotateSelectedItems(const Angle& angle) noexcept;
   bool mirrorSelectedItems(Qt::Orientation orientation) noexcept;
   bool snapSelectedItemsToGrid() noexcept;

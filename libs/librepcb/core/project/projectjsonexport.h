@@ -25,9 +25,9 @@
  ******************************************************************************/
 #include "../types/point.h"
 
-#include <optional/tl/optional.hpp>
-
 #include <QtCore>
+
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -54,7 +54,7 @@ class ProjectJsonExport final {
 public:
   // Types
   struct BoundingBox {
-    tl::optional<std::pair<Point, Point>> points;
+    std::optional<std::pair<Point, Point>> points;
   };
   struct ToolList {
     QList<Length> diameters;
@@ -68,7 +68,7 @@ public:
   // General Methods
   QJsonArray toJson(const QStringList& obj) const;
   QJsonValue toJson(const Length& obj) const;
-  QJsonValue toJson(const tl::optional<Length>& obj) const;
+  QJsonValue toJson(const std::optional<Length>& obj) const;
   QJsonArray toJson(const QSet<Length>& obj) const;
   QJsonValue toJson(const PcbColor* obj) const;
   QJsonObject toJson(const AssemblyVariant& obj) const;

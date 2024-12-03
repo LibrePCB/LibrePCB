@@ -50,8 +50,8 @@ protected:
       GerberApertureList l;
 
       QVector<GerberApertureList::Function> functions = {
-          tl::nullopt,
-          tl::make_optional(GerberAttribute::ApertureFunction::Conductor),
+          std::nullopt,
+          std::make_optional(GerberAttribute::ApertureFunction::Conductor),
       };
 
       for (auto function : functions) {
@@ -256,10 +256,10 @@ TEST_F(GerberApertureListTest, testNotUsingMacroCenterLine) {
 TEST_F(GerberApertureListTest, testSamePropertiesAndAttributes) {
   GerberApertureList l;
 
-  EXPECT_EQ(10, l.addCircle(UnsignedLength(0), tl::nullopt));
+  EXPECT_EQ(10, l.addCircle(UnsignedLength(0), std::nullopt));
   EXPECT_EQ("%ADD10C,0.0*%\n", l.generateString().toStdString());
 
-  EXPECT_EQ(10, l.addCircle(UnsignedLength(0), tl::nullopt));
+  EXPECT_EQ(10, l.addCircle(UnsignedLength(0), std::nullopt));
   EXPECT_EQ("%ADD10C,0.0*%\n", l.generateString().toStdString());
 }
 
@@ -268,10 +268,10 @@ TEST_F(GerberApertureListTest, testSamePropertiesAndAttributes) {
 TEST_F(GerberApertureListTest, testDifferentProperties) {
   GerberApertureList l;
 
-  EXPECT_EQ(10, l.addCircle(UnsignedLength(0), tl::nullopt));
+  EXPECT_EQ(10, l.addCircle(UnsignedLength(0), std::nullopt));
   EXPECT_EQ("%ADD10C,0.0*%\n", l.generateString().toStdString());
 
-  EXPECT_EQ(11, l.addCircle(UnsignedLength(100000), tl::nullopt));
+  EXPECT_EQ(11, l.addCircle(UnsignedLength(100000), std::nullopt));
   EXPECT_EQ("%ADD10C,0.0*%\n%ADD11C,0.1*%\n", l.generateString().toStdString());
 }
 
@@ -280,7 +280,7 @@ TEST_F(GerberApertureListTest, testDifferentProperties) {
 TEST_F(GerberApertureListTest, testDifferentAttributes) {
   GerberApertureList l;
 
-  EXPECT_EQ(10, l.addCircle(UnsignedLength(0), tl::nullopt));
+  EXPECT_EQ(10, l.addCircle(UnsignedLength(0), std::nullopt));
   EXPECT_EQ("%ADD10C,0.0*%\n", l.generateString().toStdString());
 
   const char* expected =
@@ -299,7 +299,7 @@ TEST_F(GerberApertureListTest, testDifferentAttributes) {
 TEST_F(GerberApertureListTest, testDifferentPropertiesAndAttributes) {
   GerberApertureList l;
 
-  EXPECT_EQ(10, l.addCircle(UnsignedLength(0), tl::nullopt));
+  EXPECT_EQ(10, l.addCircle(UnsignedLength(0), std::nullopt));
   EXPECT_EQ("%ADD10C,0.0*%\n", l.generateString().toStdString());
 
   const char* expected =
@@ -319,7 +319,7 @@ TEST_F(GerberApertureListTest, testAttributesGetDeletedAtEnd) {
   GerberApertureList l;
 
   // No attribute set -> nothing to clear.
-  EXPECT_EQ(10, l.addCircle(UnsignedLength(0), tl::nullopt));
+  EXPECT_EQ(10, l.addCircle(UnsignedLength(0), std::nullopt));
   EXPECT_EQ("%ADD10C,0.0*%\n", l.generateString().toStdString());
 
   // Attribute set -> must be cleared at end.
@@ -340,7 +340,7 @@ TEST_F(GerberApertureListTest, testAttributesGetDeletedAtEnd) {
       "%ADD11C,0.1*%\n"
       "G04 #@! TD*\n"
       "%ADD12C,0.2*%\n";
-  EXPECT_EQ(12, l.addCircle(UnsignedLength(200000), tl::nullopt));
+  EXPECT_EQ(12, l.addCircle(UnsignedLength(200000), std::nullopt));
   EXPECT_EQ(expected, l.generateString().toStdString());
 }
 
@@ -348,15 +348,15 @@ TEST_F(GerberApertureListTest, testAttributesGetDeletedAtEnd) {
 TEST_F(GerberApertureListTest, testCircleDiameterZero) {
   GerberApertureList l;
 
-  EXPECT_EQ(10, l.addCircle(UnsignedLength(0), tl::nullopt));
+  EXPECT_EQ(10, l.addCircle(UnsignedLength(0), std::nullopt));
   EXPECT_EQ("%ADD10C,0.0*%\n", l.generateString().toStdString());
 
   // Set same aperture again to see if it gets reused.
-  EXPECT_EQ(10, l.addCircle(UnsignedLength(0), tl::nullopt));
+  EXPECT_EQ(10, l.addCircle(UnsignedLength(0), std::nullopt));
   EXPECT_EQ("%ADD10C,0.0*%\n", l.generateString().toStdString());
 
   // Set another size to see if a new aperture gets created.
-  EXPECT_EQ(11, l.addCircle(UnsignedLength(100000), tl::nullopt));
+  EXPECT_EQ(11, l.addCircle(UnsignedLength(100000), std::nullopt));
   EXPECT_EQ("%ADD10C,0.0*%\n%ADD11C,0.1*%\n", l.generateString().toStdString());
 }
 
@@ -364,15 +364,15 @@ TEST_F(GerberApertureListTest, testCircleDiameterZero) {
 TEST_F(GerberApertureListTest, testCircleDiameterNonZero) {
   GerberApertureList l;
 
-  EXPECT_EQ(10, l.addCircle(UnsignedLength(1230000), tl::nullopt));
+  EXPECT_EQ(10, l.addCircle(UnsignedLength(1230000), std::nullopt));
   EXPECT_EQ("%ADD10C,1.23*%\n", l.generateString().toStdString());
 
   // Set same aperture again to see if it gets reused.
-  EXPECT_EQ(10, l.addCircle(UnsignedLength(1230000), tl::nullopt));
+  EXPECT_EQ(10, l.addCircle(UnsignedLength(1230000), std::nullopt));
   EXPECT_EQ("%ADD10C,1.23*%\n", l.generateString().toStdString());
 
   // Set another size to see if a new aperture gets created.
-  EXPECT_EQ(11, l.addCircle(UnsignedLength(100000), tl::nullopt));
+  EXPECT_EQ(11, l.addCircle(UnsignedLength(100000), std::nullopt));
   EXPECT_EQ("%ADD10C,1.23*%\n%ADD11C,0.1*%\n",
             l.generateString().toStdString());
 }
@@ -384,19 +384,19 @@ TEST_F(GerberApertureListTest, testObroundSameSize) {
 
   EXPECT_EQ(10,
             l.addObround(PositiveLength(1230000), PositiveLength(1230000),
-                         Angle::deg0(), tl::nullopt));
+                         Angle::deg0(), std::nullopt));
   EXPECT_EQ("%ADD10C,1.23*%\n", l.generateString().toStdString());
 
   // Set same aperture again to see if it gets reused.
   EXPECT_EQ(10,
             l.addObround(PositiveLength(1230000), PositiveLength(1230000),
-                         Angle::deg90(), tl::nullopt));
+                         Angle::deg90(), std::nullopt));
   EXPECT_EQ("%ADD10C,1.23*%\n", l.generateString().toStdString());
 
   // Set another size to see if a new aperture gets created.
   EXPECT_EQ(11,
             l.addObround(PositiveLength(100000), PositiveLength(100000),
-                         Angle::deg90(), tl::nullopt));
+                         Angle::deg90(), std::nullopt));
   EXPECT_EQ("%ADD10C,1.23*%\n%ADD11C,0.1*%\n",
             l.generateString().toStdString());
 }
@@ -416,7 +416,7 @@ TEST_F(GerberApertureListTest, testHighObround0deg) {
   const char* expected = "%ADD10O,0.1X0.2*%\n";
 
   for (const Angle& rot : rotations) {
-    EXPECT_EQ(10, l.addObround(w, h, rot, tl::nullopt));
+    EXPECT_EQ(10, l.addObround(w, h, rot, std::nullopt));
     EXPECT_EQ(expected, l.generateString().toStdString());
   }
 }
@@ -436,7 +436,7 @@ TEST_F(GerberApertureListTest, testWideObround0deg) {
   const char* expected = "%ADD10O,0.2X0.1*%\n";
 
   for (const Angle& rot : rotations) {
-    EXPECT_EQ(10, l.addObround(w, h, rot, tl::nullopt));
+    EXPECT_EQ(10, l.addObround(w, h, rot, std::nullopt));
     EXPECT_EQ(expected, l.generateString().toStdString());
   }
 }
@@ -457,7 +457,7 @@ TEST_F(GerberApertureListTest, testHighObround90deg) {
   const char* expected = "%ADD10O,0.2X0.1*%\n";
 
   for (const Angle& rot : rotations) {
-    EXPECT_EQ(10, l.addObround(w, h, rot, tl::nullopt));
+    EXPECT_EQ(10, l.addObround(w, h, rot, std::nullopt));
     EXPECT_EQ(expected, l.generateString().toStdString());
   }
 }
@@ -478,7 +478,7 @@ TEST_F(GerberApertureListTest, testWideObround90deg) {
   const char* expected = "%ADD10O,0.1X0.2*%\n";
 
   for (const Angle& rot : rotations) {
-    EXPECT_EQ(10, l.addObround(w, h, rot, tl::nullopt));
+    EXPECT_EQ(10, l.addObround(w, h, rot, std::nullopt));
     EXPECT_EQ(expected, l.generateString().toStdString());
   }
 }
@@ -506,7 +506,7 @@ TEST_F(GerberApertureListTest, testHighObround10deg) {
       "%ADD10ROTATEDOBROUND10*%\n";
 
   for (const Angle& rot : rotations) {
-    EXPECT_EQ(10, l.addObround(w, h, rot, tl::nullopt));
+    EXPECT_EQ(10, l.addObround(w, h, rot, std::nullopt));
     EXPECT_EQ(expected, l.generateString().toStdString());
   }
 }
@@ -534,7 +534,7 @@ TEST_F(GerberApertureListTest, testWideObround10deg) {
       "%ADD10ROTATEDOBROUND10*%\n";
 
   for (const Angle& rot : rotations) {
-    EXPECT_EQ(10, l.addObround(w, h, rot, tl::nullopt));
+    EXPECT_EQ(10, l.addObround(w, h, rot, std::nullopt));
     EXPECT_EQ(expected, l.generateString().toStdString());
   }
 }
@@ -555,7 +555,7 @@ TEST_F(GerberApertureListTest, testHighRect0deg) {
   const char* expected = "%ADD10R,0.1X0.15*%\n";
 
   for (const Angle& rot : rotations) {
-    EXPECT_EQ(10, l.addRect(w, h, r, rot, tl::nullopt));
+    EXPECT_EQ(10, l.addRect(w, h, r, rot, std::nullopt));
     EXPECT_EQ(expected, l.generateString().toStdString());
   }
 }
@@ -576,7 +576,7 @@ TEST_F(GerberApertureListTest, testWideRect0deg) {
   const char* expected = "%ADD10R,0.15X0.1*%\n";
 
   for (const Angle& rot : rotations) {
-    EXPECT_EQ(10, l.addRect(w, h, r, rot, tl::nullopt));
+    EXPECT_EQ(10, l.addRect(w, h, r, rot, std::nullopt));
     EXPECT_EQ(expected, l.generateString().toStdString());
   }
 }
@@ -598,7 +598,7 @@ TEST_F(GerberApertureListTest, testHighRect90deg) {
   const char* expected = "%ADD10R,0.15X0.1*%\n";
 
   for (const Angle& rot : rotations) {
-    EXPECT_EQ(10, l.addRect(w, h, r, rot, tl::nullopt));
+    EXPECT_EQ(10, l.addRect(w, h, r, rot, std::nullopt));
     EXPECT_EQ(expected, l.generateString().toStdString());
   }
 }
@@ -620,7 +620,7 @@ TEST_F(GerberApertureListTest, testWideRect90deg) {
   const char* expected = "%ADD10R,0.1X0.15*%\n";
 
   for (const Angle& rot : rotations) {
-    EXPECT_EQ(10, l.addRect(w, h, r, rot, tl::nullopt));
+    EXPECT_EQ(10, l.addRect(w, h, r, rot, std::nullopt));
     EXPECT_EQ(expected, l.generateString().toStdString());
   }
 }
@@ -647,7 +647,7 @@ TEST_F(GerberApertureListTest, testHighRect10deg) {
       "%ADD10ROTATEDRECT10*%\n";
 
   for (const Angle& rot : rotations) {
-    EXPECT_EQ(10, l.addRect(w, h, r, rot, tl::nullopt));
+    EXPECT_EQ(10, l.addRect(w, h, r, rot, std::nullopt));
     EXPECT_EQ(expected, l.generateString().toStdString());
   }
 }
@@ -674,7 +674,7 @@ TEST_F(GerberApertureListTest, testWideRect10deg) {
       "%ADD10ROTATEDRECT10*%\n";
 
   for (const Angle& rot : rotations) {
-    EXPECT_EQ(10, l.addRect(w, h, r, rot, tl::nullopt));
+    EXPECT_EQ(10, l.addRect(w, h, r, rot, std::nullopt));
     EXPECT_EQ(expected, l.generateString().toStdString());
   }
 }
@@ -706,7 +706,7 @@ TEST_F(GerberApertureListTest, testHighRoundedRect10deg) {
       "%ADD10ROUNDEDRECT10*%\n";
 
   for (const Angle& rot : rotations) {
-    EXPECT_EQ(10, l.addRect(w, h, r, rot, tl::nullopt));
+    EXPECT_EQ(10, l.addRect(w, h, r, rot, std::nullopt));
     EXPECT_EQ(expected, l.generateString().toStdString());
   }
 }
@@ -738,7 +738,7 @@ TEST_F(GerberApertureListTest, testWideRoundedRect10deg) {
       "%ADD10ROUNDEDRECT10*%\n";
 
   for (const Angle& rot : rotations) {
-    EXPECT_EQ(10, l.addRect(w, h, r, rot, tl::nullopt));
+    EXPECT_EQ(10, l.addRect(w, h, r, rot, std::nullopt));
     EXPECT_EQ(expected, l.generateString().toStdString());
   }
 }
@@ -759,8 +759,8 @@ TEST_F(GerberApertureListTest, testObroundRoundedRect0deg) {
   const char* expected = "%ADD10O,0.15X0.1*%\n";
 
   for (const Angle& rot : rotations) {
-    EXPECT_EQ(10, l.addRect(w, h, r, rot, tl::nullopt));
-    EXPECT_EQ(10, l.addObround(w, h, rot, tl::nullopt));
+    EXPECT_EQ(10, l.addRect(w, h, r, rot, std::nullopt));
+    EXPECT_EQ(10, l.addObround(w, h, rot, std::nullopt));
     EXPECT_EQ(expected, l.generateString().toStdString());
   }
 }
@@ -786,8 +786,8 @@ TEST_F(GerberApertureListTest, testObroundRoundedRect10deg) {
       "%ADD10ROTATEDOBROUND10*%\n";
 
   for (const Angle& rot : rotations) {
-    EXPECT_EQ(10, l.addRect(w, h, r, rot, tl::nullopt));
-    EXPECT_EQ(10, l.addObround(w, h, rot, tl::nullopt));
+    EXPECT_EQ(10, l.addRect(w, h, r, rot, std::nullopt));
+    EXPECT_EQ(10, l.addObround(w, h, rot, std::nullopt));
     EXPECT_EQ(expected, l.generateString().toStdString());
   }
 }
@@ -824,7 +824,7 @@ TEST_F(GerberApertureListTest, testRegularOctagon0deg) {
       "%ADD10ROTATEDOCTAGON10*%\n";
 
   for (const Angle& rot : rotations) {
-    EXPECT_EQ(10, l.addOctagon(w, h, r, rot, tl::nullopt));
+    EXPECT_EQ(10, l.addOctagon(w, h, r, rot, std::nullopt));
     EXPECT_EQ(expected, l.generateString().toStdString());
   }
 }
@@ -863,7 +863,7 @@ TEST_F(GerberApertureListTest, testRegularOctagon10deg) {
       "%ADD10ROTATEDOCTAGON10*%\n";
 
   for (const Angle& rot : rotations) {
-    EXPECT_EQ(10, l.addOctagon(w, h, r, rot, tl::nullopt));
+    EXPECT_EQ(10, l.addOctagon(w, h, r, rot, std::nullopt));
     EXPECT_EQ(expected, l.generateString().toStdString());
   }
 }
@@ -897,7 +897,7 @@ TEST_F(GerberApertureListTest, testHighOctagon0deg) {
       "%ADD10ROTATEDOCTAGON10*%\n";
 
   for (const Angle& rot : rotations) {
-    EXPECT_EQ(10, l.addOctagon(w, h, r, rot, tl::nullopt));
+    EXPECT_EQ(10, l.addOctagon(w, h, r, rot, std::nullopt));
     EXPECT_EQ(expected, l.generateString().toStdString());
   }
 }
@@ -931,7 +931,7 @@ TEST_F(GerberApertureListTest, testWideOctagon0deg) {
       "%ADD10ROTATEDOCTAGON10*%\n";
 
   for (const Angle& rot : rotations) {
-    EXPECT_EQ(10, l.addOctagon(w, h, r, rot, tl::nullopt));
+    EXPECT_EQ(10, l.addOctagon(w, h, r, rot, std::nullopt));
     EXPECT_EQ(expected, l.generateString().toStdString());
   }
 }
@@ -966,7 +966,7 @@ TEST_F(GerberApertureListTest, testHighOctagon100deg) {
       "%ADD10ROTATEDOCTAGON10*%\n";
 
   for (const Angle& rot : rotations) {
-    EXPECT_EQ(10, l.addOctagon(w, h, r, rot, tl::nullopt));
+    EXPECT_EQ(10, l.addOctagon(w, h, r, rot, std::nullopt));
     EXPECT_EQ(expected, l.generateString().toStdString());
   }
 }
@@ -1001,7 +1001,7 @@ TEST_F(GerberApertureListTest, testWideOctagon100deg) {
       "%ADD10ROTATEDOCTAGON10*%\n";
 
   for (const Angle& rot : rotations) {
-    EXPECT_EQ(10, l.addOctagon(w, h, r, rot, tl::nullopt));
+    EXPECT_EQ(10, l.addOctagon(w, h, r, rot, std::nullopt));
     EXPECT_EQ(expected, l.generateString().toStdString());
   }
 }
@@ -1032,7 +1032,7 @@ TEST_F(GerberApertureListTest, testOutline10deg) {
       "%ADD10OUTLINE10*%\n";
 
   for (const Angle& rot : rotations) {
-    EXPECT_EQ(10, l.addOutline(p, rot, tl::nullopt));
+    EXPECT_EQ(10, l.addOutline(p, rot, std::nullopt));
     EXPECT_EQ(expected, l.generateString().toStdString());
   }
 }

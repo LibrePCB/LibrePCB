@@ -57,7 +57,7 @@ PackageEditorState_AddPads::PackageEditorState_AddPads(
     mCurrentGraphicsItem(nullptr),
     mPackagePadComboBox(nullptr),
     mLastPad(
-        Uuid::createRandom(), tl::nullopt, Point(0, 0), Angle::deg0(),
+        Uuid::createRandom(), std::nullopt, Point(0, 0), Angle::deg0(),
         FootprintPad::Shape::RoundedRect,  // Commonly used pad shape
         PositiveLength(2500000),  // There is no default/recommended pad size
         PositiveLength(1300000),  // -> choose reasonable multiple of 0.1mm
@@ -307,7 +307,7 @@ bool PackageEditorState_AddPads::entry() noexcept {
     edtFiducialClearance->configure(
         getLengthUnit(), LengthEditBase::Steps::generic(),
         "package_editor/add_pads/fiducial_clearance");
-    const tl::optional<Length> offset =
+    const std::optional<Length> offset =
         mLastPad.getStopMaskConfig().getOffset();
     if (offset && (*offset > 0)) {
       edtFiducialClearance->setValue(UnsignedLength(*offset));
@@ -490,7 +490,7 @@ bool PackageEditorState_AddPads::abortAddPad() noexcept {
 
 void PackageEditorState_AddPads::selectNextFreePadInComboBox() noexcept {
   if (mContext.currentFootprint && mPackagePadComboBox) {
-    tl::optional<Uuid> pad;
+    std::optional<Uuid> pad;
     for (const PackagePad& pkgPad : mContext.package.getPads()) {
       bool connected = false;
       for (const FootprintPad& fptPad : mContext.currentFootprint->getPads()) {
@@ -508,7 +508,7 @@ void PackageEditorState_AddPads::selectNextFreePadInComboBox() noexcept {
 }
 
 void PackageEditorState_AddPads::packagePadComboBoxCurrentPadChanged(
-    tl::optional<Uuid> pad) noexcept {
+    std::optional<Uuid> pad) noexcept {
   mLastPad.setPackagePadUuid(pad);
   if (mEditCmd) {
     mEditCmd->setPackagePadUuid(mLastPad.getPackagePadUuid(), true);

@@ -85,7 +85,7 @@ protected:
 
   template <typename ElementType>
   void test(const QStringList& localeOrder, bool nulloptIsRootCategory,
-            const tl::optional<Uuid>& category, bool expSuccess,
+            const std::optional<Uuid>& category, bool expSuccess,
             const QStringList& expOutput) {
     CategoryTreeBuilder<ElementType> builder(*mWsDb, localeOrder,
                                              nulloptIsRootCategory);
@@ -111,13 +111,13 @@ TEST_F(CategoryTreeBuilderTest, testDatabaseError) {
 }
 
 TEST_F(CategoryTreeBuilderTest, testEmptyDbNull) {
-  test<ComponentCategory>({}, false, tl::nullopt, true, {});
-  test<PackageCategory>({}, false, tl::nullopt, true, {});
+  test<ComponentCategory>({}, false, std::nullopt, true, {});
+  test<PackageCategory>({}, false, std::nullopt, true, {});
 }
 
 TEST_F(CategoryTreeBuilderTest, testEmptyRootDbNull) {
-  test<ComponentCategory>({}, true, tl::nullopt, true, {"Root category"});
-  test<PackageCategory>({}, true, tl::nullopt, true, {"Root category"});
+  test<ComponentCategory>({}, true, std::nullopt, true, {"Root category"});
+  test<PackageCategory>({}, true, std::nullopt, true, {"Root category"});
 }
 
 TEST_F(CategoryTreeBuilderTest, testInexistent) {
@@ -134,11 +134,11 @@ TEST_F(CategoryTreeBuilderTest, testInexistentParent) {
   int cmpCat = mWriter->addCategory<ComponentCategory>(
       0, toAbs("cmpcat"), uuid(1), version("0.1"), false, parentUuid);
   mWriter->addTranslation<ComponentCategory>(cmpCat, "", ElementName("cmp cat"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   int pkgCat = mWriter->addCategory<PackageCategory>(
       0, toAbs("pkgcat"), uuid(2), version("0.1"), false, parentUuid);
   mWriter->addTranslation<PackageCategory>(pkgCat, "", ElementName("pkg cat"),
-                                           tl::nullopt, tl::nullopt);
+                                           std::nullopt, std::nullopt);
 
   test<ComponentCategory>({}, false, uuid(1), false,
                           {"ERROR: a39c1053 not found", "cmp cat"});
@@ -156,7 +156,7 @@ TEST_F(CategoryTreeBuilderTest, testInexistentParent) {
 
 TEST_F(CategoryTreeBuilderTest, testNullptr) {
   CategoryTreeBuilder<ComponentCategory> builder(*mWsDb, {}, false);
-  QStringList output = builder.buildTree(tl::nullopt);
+  QStringList output = builder.buildTree(std::nullopt);
   EXPECT_EQ(str({}), str(output));
 }
 
@@ -164,23 +164,23 @@ TEST_F(CategoryTreeBuilderTest, testLocaleOrder) {
   int cat = mWriter->addCategory<ComponentCategory>(
       0, toAbs("cat1"), uuid(1), version("0.1"), false, uuid(2));
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 1"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   mWriter->addTranslation<ComponentCategory>(
-      cat, "de_DE", ElementName("cat 1 de"), tl::nullopt, tl::nullopt);
+      cat, "de_DE", ElementName("cat 1 de"), std::nullopt, std::nullopt);
   mWriter->addTranslation<ComponentCategory>(
-      cat, "it_IT", ElementName("cat 1 it"), tl::nullopt, tl::nullopt);
+      cat, "it_IT", ElementName("cat 1 it"), std::nullopt, std::nullopt);
   cat = mWriter->addCategory<ComponentCategory>(0, toAbs("cat2"), uuid(2),
                                                 version("0.1"), false, uuid(3));
   mWriter->addTranslation<ComponentCategory>(
-      cat, "it_IT", ElementName("cat 2 it"), tl::nullopt, tl::nullopt);
+      cat, "it_IT", ElementName("cat 2 it"), std::nullopt, std::nullopt);
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 2"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   mWriter->addTranslation<ComponentCategory>(
-      cat, "de_CH", ElementName("cat 2 ch"), tl::nullopt, tl::nullopt);
+      cat, "de_CH", ElementName("cat 2 ch"), std::nullopt, std::nullopt);
   cat = mWriter->addCategory<ComponentCategory>(
-      0, toAbs("cat3"), uuid(3), version("0.1"), false, tl::nullopt);
+      0, toAbs("cat3"), uuid(3), version("0.1"), false, std::nullopt);
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 3"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
 
   test<ComponentCategory>({"fr_FR", "de_CH", "de_DE"}, false, uuid(1), true,
                           {"cat 3", "cat 2 ch", "cat 1 de"});
@@ -192,19 +192,19 @@ TEST_F(CategoryTreeBuilderTest, testMultipleParents) {
   int cat = mWriter->addCategory<ComponentCategory>(
       0, toAbs("cat1"), uuid(1), version("0.1"), false, uuid(2));
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 1"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   cat = mWriter->addCategory<ComponentCategory>(0, toAbs("cat2"), uuid(2),
                                                 version("0.1"), false, uuid(3));
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 2"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   cat = mWriter->addCategory<ComponentCategory>(0, toAbs("cat3"), uuid(3),
                                                 version("0.1"), false, uuid(4));
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 3"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   cat = mWriter->addCategory<ComponentCategory>(
-      0, toAbs("cat4"), uuid(4), version("0.1"), false, tl::nullopt);
+      0, toAbs("cat4"), uuid(4), version("0.1"), false, std::nullopt);
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 4"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
 
   test<ComponentCategory>({}, false, uuid(1), true,
                           {"cat 4", "cat 3", "cat 2", "cat 1"});
@@ -217,11 +217,11 @@ TEST_F(CategoryTreeBuilderTest, testEndlessRecursionDirect) {
   int cat = mWriter->addCategory<ComponentCategory>(
       0, toAbs("cat1"), uuid(1), version("0.1"), false, uuid(2));
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 1"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   cat = mWriter->addCategory<ComponentCategory>(0, toAbs("cat2"), uuid(2),
                                                 version("0.1"), false, uuid(1));
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 2"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
 
   test<ComponentCategory>({}, false, uuid(1), false,
                           {"ERROR: Endless recursion", "cat 2", "cat 1"});
@@ -233,19 +233,19 @@ TEST_F(CategoryTreeBuilderTest, testEndlessRecursionMultipleParents) {
   int cat = mWriter->addCategory<ComponentCategory>(
       0, toAbs("cat1"), uuid(1), version("0.1"), false, uuid(2));
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 1"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   cat = mWriter->addCategory<ComponentCategory>(0, toAbs("cat2"), uuid(2),
                                                 version("0.1"), false, uuid(3));
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 2"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   cat = mWriter->addCategory<ComponentCategory>(0, toAbs("cat3"), uuid(3),
                                                 version("0.1"), false, uuid(4));
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 3"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   cat = mWriter->addCategory<ComponentCategory>(0, toAbs("cat4"), uuid(4),
                                                 version("0.1"), false, uuid(2));
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 4"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
 
   test<ComponentCategory>(
       {}, false, uuid(1), false,

@@ -57,7 +57,7 @@ CategoryTreeBuilder<ElementType>::~CategoryTreeBuilder() noexcept {
 
 template <typename ElementType>
 QStringList CategoryTreeBuilder<ElementType>::buildTree(
-    const tl::optional<Uuid>& category, bool* success) const {
+    const std::optional<Uuid>& category, bool* success) const {
   QStringList names;
   QSet<FilePath> paths;
   bool isSuccessful = getParentNames(category, names, paths);  // can throw
@@ -73,11 +73,11 @@ QStringList CategoryTreeBuilder<ElementType>::buildTree(
 
 template <typename ElementType>
 bool CategoryTreeBuilder<ElementType>::getParentNames(
-    const tl::optional<Uuid>& category, QStringList& names,
+    const std::optional<Uuid>& category, QStringList& names,
     QSet<FilePath>& filePaths) const {
   if (category) {
     QString name;
-    tl::optional<Uuid> parent;
+    std::optional<Uuid> parent;
     FilePath fp = mDb.getLatest<ElementType>(*category);
     if (filePaths.contains(fp)) {
       names.prepend("ERROR: Endless recursion");

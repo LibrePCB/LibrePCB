@@ -661,7 +661,7 @@ void FileFormatMigrationV01::upgradeCircuit(SExpression& root,
         (!context.components.value(libCmpUuid).schematicOnly) && (!isLogo);
     const SExpression& libDevNode = cmpNode->getChild("lib_device");
     QSet<Uuid> libDeviceUuids = context.devicesUsedInBoards.value(cmpUuid);
-    if (auto u = deserialize<tl::optional<Uuid>>(libDevNode.getChild("@0"))) {
+    if (auto u = deserialize<std::optional<Uuid>>(libDevNode.getChild("@0"))) {
       libDeviceUuids.insert(*u);
     }
 

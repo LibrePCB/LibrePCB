@@ -50,7 +50,7 @@ CmdDevicePadSignalMapItemEdit::~CmdDevicePadSignalMapItemEdit() noexcept {
  ******************************************************************************/
 
 void CmdDevicePadSignalMapItemEdit::setSignalUuid(
-    const tl::optional<Uuid>& uuid) noexcept {
+    const std::optional<Uuid>& uuid) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewSignalUuid = uuid;
 }

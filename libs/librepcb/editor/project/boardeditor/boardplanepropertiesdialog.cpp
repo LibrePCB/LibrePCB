@@ -174,7 +174,7 @@ bool BoardPlanePropertiesDialog::applyChanges() noexcept {
     std::unique_ptr<CmdBoardPlaneEdit> cmd(new CmdBoardPlaneEdit(mPlane));
 
     // net signal
-    const tl::optional<Uuid> netSignalUuid =
+    const std::optional<Uuid> netSignalUuid =
         Uuid::tryFromString(mUi->cbxNetSignal->currentData().toString());
     if (!netSignalUuid) {
       cmd->setNetSignal(nullptr);

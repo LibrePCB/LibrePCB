@@ -132,7 +132,7 @@ GraphicsExport::Pages OutputJobRunner::buildPages(
   foreach (const GraphicsOutputJob::Content& content, job.getContent()) {
     std::shared_ptr<GraphicsExportSettings> settings =
         std::make_shared<GraphicsExportSettings>();
-    tl::optional<QPageSize> pageSize;
+    std::optional<QPageSize> pageSize;
     if (content.pageSizeKey) {
       for (int i = 0; i < QPageSize::LastPageSize; ++i) {
         const QPageSize::PageSizeId id = static_cast<QPageSize::PageSizeId>(i);
@@ -193,7 +193,7 @@ GraphicsExport::Pages OutputJobRunner::buildPages(
           // some configuration options.
           if (content.options.contains("realistic")) {
             painter = std::make_shared<RealisticBoardPainter>(
-                board->buildScene3D(tl::nullopt));
+                board->buildScene3D(std::nullopt));
           } else {
             painter = std::make_shared<BoardPainter>(*board);
           }
@@ -529,7 +529,7 @@ void OutputJobRunner::runImpl(const Board3DOutputJob& job) {
               }));  // can throw
 
       std::shared_ptr<SceneData3D> data = board->buildScene3D(
-          av ? tl::make_optional(av->getUuid()) : tl::nullopt);
+          av ? std::make_optional(av->getUuid()) : std::nullopt);
 
       if ((fp.getSuffix().toLower() == "step") ||
           (fp.getSuffix().toLower() == "stp")) {
@@ -693,7 +693,7 @@ void OutputJobRunner::runImpl(const ArchiveOutputJob& job) {
 }
 
 QList<Board*> OutputJobRunner::getBoards(
-    const OutputJob::ObjectSet<tl::optional<Uuid>>& set,
+    const OutputJob::ObjectSet<std::optional<Uuid>>& set,
     bool includeNullInAll) const {
   QList<Board*> result;
   if (set.isAll()) {
@@ -704,10 +704,10 @@ QList<Board*> OutputJobRunner::getBoards(
   } else if (set.isDefault()) {
     result.append(mProject.getBoardByIndex(0));
   } else {
-    QSet<tl::optional<Uuid>> remainingUuids = set.getSet();
-    if (set.getSet().contains(tl::nullopt)) {
+    QSet<std::optional<Uuid>> remainingUuids = set.getSet();
+    if (set.getSet().contains(std::nullopt)) {
       result.append(nullptr);
-      remainingUuids.remove(tl::nullopt);
+      remainingUuids.remove(std::nullopt);
     }
     foreach (auto board, mProject.getBoards()) {
       if (remainingUuids.contains(board->getUuid())) {
@@ -751,7 +751,7 @@ QList<Board*> OutputJobRunner::getBoards(
 }
 
 QVector<std::shared_ptr<AssemblyVariant>> OutputJobRunner::getAssemblyVariants(
-    const OutputJob::ObjectSet<tl::optional<Uuid>>& set,
+    const OutputJob::ObjectSet<std::optional<Uuid>>& set,
     bool includeNullInAll) const {
   QVector<std::shared_ptr<AssemblyVariant>> result;
   if (set.isAll()) {
@@ -762,10 +762,10 @@ QVector<std::shared_ptr<AssemblyVariant>> OutputJobRunner::getAssemblyVariants(
   } else if (set.isDefault()) {
     result.append(mProject.getCircuit().getAssemblyVariants().value(0));
   } else {
-    QSet<tl::optional<Uuid>> remainingUuids = set.getSet();
-    if (set.getSet().contains(tl::nullopt)) {
+    QSet<std::optional<Uuid>> remainingUuids = set.getSet();
+    if (set.getSet().contains(std::nullopt)) {
       result.append(nullptr);
-      remainingUuids.remove(tl::nullopt);
+      remainingUuids.remove(std::nullopt);
     }
     foreach (auto av, mProject.getCircuit().getAssemblyVariants().values()) {
       if (remainingUuids.contains(av->getUuid())) {

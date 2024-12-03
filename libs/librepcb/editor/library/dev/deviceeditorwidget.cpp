@@ -318,7 +318,7 @@ void DeviceEditorWidget::btnChooseComponentClicked() noexcept {
   ComponentChooserDialog dialog(mContext.workspace,
                                 mGraphicsLayerProvider.data(), this);
   if (dialog.exec() == QDialog::Accepted) {
-    tl::optional<Uuid> cmpUuid = dialog.getSelectedComponentUuid();
+    std::optional<Uuid> cmpUuid = dialog.getSelectedComponentUuid();
     if (cmpUuid && (*cmpUuid != mDevice->getComponentUuid())) {
       try {
         // load component
@@ -338,11 +338,11 @@ void DeviceEditorWidget::btnChooseComponentClicked() noexcept {
         cmdDevEdit->setComponentUuid(*cmpUuid);
         cmdGroup->appendChild(cmdDevEdit.release());
         for (DevicePadSignalMapItem& item : mDevice->getPadSignalMap()) {
-          tl::optional<Uuid> signalUuid = item.getSignalUuid();
+          std::optional<Uuid> signalUuid = item.getSignalUuid();
           if (!signalUuid || !cmp->getSignals().contains(*signalUuid)) {
             std::unique_ptr<CmdDevicePadSignalMapItemEdit> cmdItem(
                 new CmdDevicePadSignalMapItemEdit(item));
-            cmdItem->setSignalUuid(tl::nullopt);
+            cmdItem->setSignalUuid(std::nullopt);
             cmdGroup->appendChild(cmdItem.release());
           }
         }
@@ -358,7 +358,7 @@ void DeviceEditorWidget::btnChoosePackageClicked() noexcept {
   PackageChooserDialog dialog(mContext.workspace, mGraphicsLayerProvider.data(),
                               this);
   if (dialog.exec() == QDialog::Accepted) {
-    tl::optional<Uuid> pkgUuid = dialog.getSelectedPackageUuid();
+    std::optional<Uuid> pkgUuid = dialog.getSelectedPackageUuid();
     if (pkgUuid && (*pkgUuid != mDevice->getPackageUuid())) {
       try {
         // load package
@@ -388,7 +388,7 @@ void DeviceEditorWidget::btnChoosePackageClicked() noexcept {
                  pads - mDevice->getPadSignalMap().getUuidSet()) {
           cmdGroup->appendChild(new CmdDevicePadSignalMapItemInsert(
               mDevice->getPadSignalMap(),
-              std::make_shared<DevicePadSignalMapItem>(pad, tl::nullopt)));
+              std::make_shared<DevicePadSignalMapItem>(pad, std::nullopt)));
         }
         mUndoStack->execCmd(cmdGroup.release());
         Q_ASSERT(mDevice->getPadSignalMap().getUuidSet() == pads);

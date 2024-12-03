@@ -289,7 +289,7 @@ void WorkspaceLibraryDb::startLibraryRescan() noexcept {
  ******************************************************************************/
 
 QMultiMap<Version, FilePath> WorkspaceLibraryDb::getAll(
-    const QString& elementsTable, const tl::optional<Uuid>& uuid,
+    const QString& elementsTable, const std::optional<Uuid>& uuid,
     const FilePath& lib) const {
   if (lib.isValid() && (elementsTable == "libraries")) {
     throw LogicError(__FILE__, __LINE__,
@@ -440,9 +440,9 @@ bool WorkspaceLibraryDb::getMetadata(const QString& elementsTable,
   return true;
 }
 
-bool WorkspaceLibraryDb::getCategoryMetadata(const QString& categoriesTable,
-                                             const FilePath catDir,
-                                             tl::optional<Uuid>* parent) const {
+bool WorkspaceLibraryDb::getCategoryMetadata(
+    const QString& categoriesTable, const FilePath catDir,
+    std::optional<Uuid>* parent) const {
   QSqlQuery query = mDb->prepareQuery(
       "SELECT parent_uuid FROM %categories "
       "WHERE filepath = :filepath "
@@ -486,7 +486,7 @@ AttributeList WorkspaceLibraryDb::getPartAttributes(int partId) const {
 
 QSet<Uuid> WorkspaceLibraryDb::getChilds(
     const QString& categoriesTable,
-    const tl::optional<Uuid>& categoryUuid) const {
+    const std::optional<Uuid>& categoryUuid) const {
   QSqlQuery query;
   SQLiteDatabase::Replacements replacements = {
       {"%categories", categoriesTable},
@@ -511,10 +511,9 @@ QSet<Uuid> WorkspaceLibraryDb::getChilds(
   return getUuidSet(query);
 }
 
-QSet<Uuid> WorkspaceLibraryDb::getByCategory(const QString& elementsTable,
-                                             const QString& categoryTable,
-                                             const tl::optional<Uuid>& category,
-                                             int limit) const {
+QSet<Uuid> WorkspaceLibraryDb::getByCategory(
+    const QString& elementsTable, const QString& categoryTable,
+    const std::optional<Uuid>& category, int limit) const {
   QSqlQuery query;
   SQLiteDatabase::Replacements replacements = {
       {"%elements", elementsTable},

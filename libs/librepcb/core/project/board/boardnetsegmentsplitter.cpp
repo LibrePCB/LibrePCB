@@ -123,13 +123,13 @@ TraceAnchor BoardNetSegmentSplitter::replaceAnchor(
 void BoardNetSegmentSplitter::findConnectedLinesAndPoints(
     const TraceAnchor& anchor, ViaList& availableVias,
     TraceList& availableTraces, Segment& segment) noexcept {
-  if (tl::optional<Uuid> junctionUuid = anchor.tryGetJunction()) {
+  if (std::optional<Uuid> junctionUuid = anchor.tryGetJunction()) {
     if (std::shared_ptr<Junction> junction = mJunctions.find(*junctionUuid)) {
       if (!segment.junctions.contains(junction->getUuid())) {
         segment.junctions.append(junction);
       }
     }
-  } else if (tl::optional<Uuid> viaUuid = anchor.tryGetVia()) {
+  } else if (std::optional<Uuid> viaUuid = anchor.tryGetVia()) {
     if (std::shared_ptr<Via> via = mVias.find(*viaUuid)) {
       if (availableVias.contains(via->getUuid())) {
         segment.vias.append(via);

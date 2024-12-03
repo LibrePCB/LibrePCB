@@ -25,9 +25,9 @@
  ******************************************************************************/
 #include "length.h"
 
-#include <optional/tl/optional.hpp>
-
 #include <QtCore>
+
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -53,7 +53,7 @@ public:
 
   // Getters
   bool isEnabled() const noexcept { return mEnabled; }
-  const tl::optional<Length>& getOffset() const noexcept { return mOffset; }
+  const std::optional<Length>& getOffset() const noexcept { return mOffset; }
 
   // Operator Overloadings
   bool operator==(const MaskConfig& rhs) const noexcept;
@@ -63,23 +63,23 @@ public:
   MaskConfig& operator=(const MaskConfig& rhs) noexcept;
 
   // Static Methods
-  static MaskConfig off() noexcept { return MaskConfig(false, tl::nullopt); }
+  static MaskConfig off() noexcept { return MaskConfig(false, std::nullopt); }
   static MaskConfig automatic() noexcept {
-    return MaskConfig(true, tl::nullopt);
+    return MaskConfig(true, std::nullopt);
   }
   static MaskConfig manual(const Length& offset) noexcept {
     return MaskConfig(true, offset);
   }
-  static MaskConfig maybe(const tl::optional<Length>& offset) noexcept {
+  static MaskConfig maybe(const std::optional<Length>& offset) noexcept {
     return MaskConfig(offset.has_value(), offset);
   }
 
 private:  // Methods
-  MaskConfig(bool enabled, const tl::optional<Length>& offset) noexcept;
+  MaskConfig(bool enabled, const std::optional<Length>& offset) noexcept;
 
 private:  // Data
   bool mEnabled;  ///< Whether an automatic mask is added or not
-  tl::optional<Length> mOffset;  ///< `nullopt` means "from design rules"
+  std::optional<Length> mOffset;  ///< `nullopt` means "from design rules"
 };
 
 /*******************************************************************************

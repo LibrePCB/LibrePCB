@@ -112,7 +112,7 @@ NetLineAnchor SchematicNetSegmentSplitter::replacePinAnchor(
 void SchematicNetSegmentSplitter::findConnectedLinesAndPoints(
     const NetLineAnchor& anchor, NetLineList& availableNetLines,
     Segment& segment) noexcept {
-  if (tl::optional<Uuid> junctionUuid = anchor.tryGetJunction()) {
+  if (std::optional<Uuid> junctionUuid = anchor.tryGetJunction()) {
     if (std::shared_ptr<Junction> junction = mJunctions.find(*junctionUuid)) {
       if (!segment.junctions.contains(junction->getUuid())) {
         segment.junctions.append(junction);
@@ -173,7 +173,7 @@ Point SchematicNetSegmentSplitter::getAnchorPosition(
     const NetLineAnchor& anchor) const noexcept {
   if (mPinPositions.contains(anchor)) {
     return mPinPositions[anchor];
-  } else if (tl::optional<Uuid> junctionUuid = anchor.tryGetJunction()) {
+  } else if (std::optional<Uuid> junctionUuid = anchor.tryGetJunction()) {
     if (mJunctions.contains(*junctionUuid)) {
       return mJunctions.get(*junctionUuid)->getPosition();
     }

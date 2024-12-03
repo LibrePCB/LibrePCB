@@ -55,7 +55,7 @@ SchematicPagesDock::SchematicPagesDock(Project& project, UndoStack& undoStack,
     mBackgroundColor(
         theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor()),
     mScheduledThumbnailSchematics(),
-    mCurrentThumbnailSchematic(tl::nullopt),
+    mCurrentThumbnailSchematic(std::nullopt),
     mThumbnailGenerator(),
     mThumbnailSettings(),
     mThumbnailTimer() {
@@ -236,7 +236,7 @@ void SchematicPagesDock::thumbnailReady(int index, const QSize& pageSize,
         break;
       }
     }
-    mCurrentThumbnailSchematic = tl::nullopt;
+    mCurrentThumbnailSchematic = std::nullopt;
   }
 }
 

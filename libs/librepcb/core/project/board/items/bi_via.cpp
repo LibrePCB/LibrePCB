@@ -61,12 +61,12 @@ BI_Via::~BI_Via() noexcept {
  *  Getters
  ******************************************************************************/
 
-tl::optional<std::pair<const Layer*, const Layer*>> BI_Via::getDrillLayerSpan()
+std::optional<std::pair<const Layer*, const Layer*>> BI_Via::getDrillLayerSpan()
     const noexcept {
   // If start layer is not enabled, the via is invalid.
   const int startLayerNumber = mVia.getStartLayer().getCopperNumber();
   if (startLayerNumber > mBoard.getInnerLayerCount()) {
-    return tl::nullopt;
+    return std::nullopt;
   }
   // If the via ends at the bottom layer, the via is valid.
   if (mVia.getEndLayer().isBottom()) {
@@ -79,7 +79,7 @@ tl::optional<std::pair<const Layer*, const Layer*>> BI_Via::getDrillLayerSpan()
   if (endLayer && (startLayerNumber < endLayerNumber)) {
     return std::make_pair(&mVia.getStartLayer(), endLayer);
   } else {
-    return tl::nullopt;
+    return std::nullopt;
   }
 }
 
@@ -222,14 +222,14 @@ void BI_Via::updateStopMaskDiameters() noexcept {
              *mVia.getDrillDiameter()) *
          2);
   }
-  const tl::optional<PositiveLength> diaTop =
+  const std::optional<PositiveLength> diaTop =
       (mVia.getStartLayer().isTop() && (dia > 0))
-      ? tl::make_optional(PositiveLength(dia))
-      : tl::nullopt;
-  const tl::optional<PositiveLength> diaBottom =
+      ? std::make_optional(PositiveLength(dia))
+      : std::nullopt;
+  const std::optional<PositiveLength> diaBottom =
       (mVia.getEndLayer().isBottom() && (dia > 0))
-      ? tl::make_optional(PositiveLength(dia))
-      : tl::nullopt;
+      ? std::make_optional(PositiveLength(dia))
+      : std::nullopt;
 
   if ((diaTop != mStopMaskDiameterTop) ||
       (diaBottom != mStopMaskDiameterBottom)) {

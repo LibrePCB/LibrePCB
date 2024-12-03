@@ -41,7 +41,7 @@ LengthEditBase::LengthEditBase(const Length& min, const Length& max,
   : QAbstractSpinBox(parent),
     mChangeUnitAction(nullptr),
     mDefaultUnit(LengthUnit::millimeters()),
-    mSelectedUnit(tl::nullopt),
+    mSelectedUnit(std::nullopt),
     mMinimum(min),
     mMaximum(max),
     mValue(value),
@@ -131,7 +131,7 @@ void LengthEditBase::setSteps(const QVector<PositiveLength>& steps) noexcept {
 
 void LengthEditBase::resetUnit() noexcept {
   if (mSelectedUnit) {
-    mSelectedUnit = tl::nullopt;
+    mSelectedUnit = std::nullopt;
     updateText();
   }
 }
@@ -143,9 +143,9 @@ void LengthEditBase::configureClientSettings(
   try {
     QSettings clientSettings;
     const QString unitStr = clientSettings.value(mSettingsKey).toString();
-    const tl::optional<LengthUnit> unit = (!unitStr.isEmpty())
-        ? tl::make_optional(LengthUnit::fromString(unitStr))  // can throw
-        : tl::nullopt;
+    const std::optional<LengthUnit> unit = (!unitStr.isEmpty())
+        ? std::make_optional(LengthUnit::fromString(unitStr))  // can throw
+        : std::nullopt;
     if (unit != mSelectedUnit) {
       mSelectedUnit = unit;
       updateText();
@@ -348,8 +348,8 @@ void LengthEditBase::changeUnitActionTriggered() noexcept {
 }
 
 void LengthEditBase::setSelectedUnit(const LengthUnit& unit) noexcept {
-  tl::optional<LengthUnit> selectedUnit =
-      (unit != mDefaultUnit) ? tl::make_optional(unit) : tl::nullopt;
+  std::optional<LengthUnit> selectedUnit =
+      (unit != mDefaultUnit) ? std::make_optional(unit) : std::nullopt;
   if (selectedUnit != mSelectedUnit) {
     mSelectedUnit = selectedUnit;
     saveSelectedUnit();

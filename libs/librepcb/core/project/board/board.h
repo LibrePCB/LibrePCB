@@ -102,7 +102,7 @@ public:
   bool isEmpty() const noexcept;
   QList<BI_Base*> getAllItems() const noexcept;
   std::shared_ptr<SceneData3D> buildScene3D(
-      const tl::optional<Uuid>& assemblyVariant) const noexcept;
+      const std::optional<Uuid>& assemblyVariant) const noexcept;
 
   // Getters: Attributes
   const Uuid& getUuid() const noexcept { return mUuid; }
@@ -234,7 +234,7 @@ public:
   void forceAirWiresRebuild() noexcept;
 
   // General Methods
-  tl::optional<std::pair<Point, Point>> calculateBoundingRect() const noexcept;
+  std::optional<std::pair<Point, Point>> calculateBoundingRect() const noexcept;
   void addDefaultContent();
   void copyFrom(const Board& other);
   void addToProject();

@@ -40,7 +40,7 @@ namespace editor {
 RuleCheckDock::RuleCheckDock(Mode mode, QWidget* parent) noexcept
   : QDockWidget(parent), mMode(mode), mUi(new Ui::RuleCheckDock) {
   mUi->setupUi(this);
-  updateTitle(tl::nullopt);
+  updateTitle(std::nullopt);
   mUi->lstMessages->setHandler(this);
   mUi->cbxCenterInView->setVisible(mode == Mode::BoardDesignRuleCheck);
   mUi->prgProgress->hide();
@@ -90,7 +90,7 @@ void RuleCheckDock::setProgressStatus(const QString& status) noexcept {
 }
 
 void RuleCheckDock::setMessages(
-    const tl::optional<RuleCheckMessageList>& messages) noexcept {
+    const std::optional<RuleCheckMessageList>& messages) noexcept {
   mUi->prgProgress->hide();
   mUi->prgProgress->setValue(0);
   mUi->prgProgress->setFormat(QString());
@@ -110,7 +110,8 @@ void RuleCheckDock::setApprovals(const QSet<SExpression>& approvals) noexcept {
  *  Private Methods
  ******************************************************************************/
 
-void RuleCheckDock::updateTitle(tl::optional<int> unapprovedMessages) noexcept {
+void RuleCheckDock::updateTitle(
+    std::optional<int> unapprovedMessages) noexcept {
   QString title;
   switch (mMode) {
     case Mode::ElectricalRuleCheck:

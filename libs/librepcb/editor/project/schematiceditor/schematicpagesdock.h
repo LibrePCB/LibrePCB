@@ -102,7 +102,7 @@ private:  // Data
 
   // Thumbnail generator.
   QSet<Uuid> mScheduledThumbnailSchematics;
-  tl::optional<Uuid> mCurrentThumbnailSchematic;
+  std::optional<Uuid> mCurrentThumbnailSchematic;
   QScopedPointer<GraphicsExport> mThumbnailGenerator;
   std::shared_ptr<GraphicsExportSettings> mThumbnailSettings;
   QTimer mThumbnailTimer;

@@ -109,15 +109,15 @@ private:  // Methods
   void currentDeviceIndexChanged(int index) noexcept;
   void currentFootprintIndexChanged(int index) noexcept;
   void setSelectedComponentInstance(ComponentInstance* cmp) noexcept;
-  void setSelectedDeviceAndPackage(const tl::optional<Uuid>& deviceUuid,
+  void setSelectedDeviceAndPackage(const std::optional<Uuid>& deviceUuid,
                                    Package* package,
                                    bool packageOwned) noexcept;
-  void setSelectedFootprintUuid(const tl::optional<Uuid>& uuid) noexcept;
+  void setSelectedFootprintUuid(const std::optional<Uuid>& uuid) noexcept;
   void addSelectedDeviceToBoard() noexcept;
   void addSimilarDevicesToBoard() noexcept;
   void addAllDevicesToBoard() noexcept;
   void autoAddDevicesToBoard(
-      const tl::optional<Uuid>& libCmpUuidFilter) noexcept;
+      const std::optional<Uuid>& libCmpUuidFilter) noexcept;
 
   /**
    * @brief Get all available devices for a specific component instance
@@ -129,7 +129,7 @@ private:  // Methods
    */
   std::pair<QList<DeviceMetadata>, int> getAvailableDevices(
       ComponentInstance& cmp) const noexcept;
-  tl::optional<Uuid> getSuggestedFootprint(
+  std::optional<Uuid> getSuggestedFootprint(
       const Uuid& libPkgUuid) const noexcept;
 
 private:  // Data
@@ -147,10 +147,10 @@ private:  // Data
 
   // Current selection
   ComponentInstance* mSelectedComponent;
-  tl::optional<Uuid> mSelectedDeviceUuid;
+  std::optional<Uuid> mSelectedDeviceUuid;
   Package* mSelectedPackage;
   bool mSelectedPackageOwned;
-  tl::optional<Uuid> mSelectedFootprintUuid;
+  std::optional<Uuid> mSelectedFootprintUuid;
 
   // Preview graphics scene
   QScopedPointer<DefaultGraphicsLayerProvider> mGraphicsLayerProvider;

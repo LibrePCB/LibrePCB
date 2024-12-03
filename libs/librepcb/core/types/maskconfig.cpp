@@ -36,7 +36,7 @@ namespace librepcb {
  ******************************************************************************/
 
 MaskConfig::MaskConfig(bool enabled,
-                       const tl::optional<Length>& offset) noexcept
+                       const std::optional<Length>& offset) noexcept
   : mEnabled(enabled), mOffset(offset) {
 }
 
@@ -69,7 +69,7 @@ template <>
 std::unique_ptr<SExpression> serialize(const MaskConfig& obj) {
   if (!obj.isEnabled()) {
     return SExpression::createToken("off");
-  } else if (tl::optional<Length> offset = obj.getOffset()) {
+  } else if (std::optional<Length> offset = obj.getOffset()) {
     return serialize(*offset);
   } else {
     return SExpression::createToken("auto");

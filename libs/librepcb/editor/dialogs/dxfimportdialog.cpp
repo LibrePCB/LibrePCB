@@ -136,9 +136,9 @@ qreal DxfImportDialog::getScaleFactor() const noexcept {
   return mUi->spbxScaleFactor->value();
 }
 
-tl::optional<Point> DxfImportDialog::getPlacementPosition() const noexcept {
+std::optional<Point> DxfImportDialog::getPlacementPosition() const noexcept {
   if (mUi->cbxInteractivePlacement->isChecked()) {
-    return tl::nullopt;
+    return std::nullopt;
   } else {
     return Point(mUi->edtPosX->getValue(), mUi->edtPosY->getValue());
   }

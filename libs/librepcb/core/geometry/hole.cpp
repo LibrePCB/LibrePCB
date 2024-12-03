@@ -81,10 +81,10 @@ bool Hole::isCurvedSlot() const noexcept {
   return mPath->isCurved();
 }
 
-tl::optional<Length> Hole::getPreviewStopMaskOffset() const noexcept {
-  tl::optional<Length> offset;
+std::optional<Length> Hole::getPreviewStopMaskOffset() const noexcept {
+  std::optional<Length> offset;
   if (!mStopMaskConfig.isEnabled()) {
-    offset = tl::nullopt;
+    offset = std::nullopt;
   } else if (auto value = mStopMaskConfig.getOffset()) {
     offset = *value;
   } else {

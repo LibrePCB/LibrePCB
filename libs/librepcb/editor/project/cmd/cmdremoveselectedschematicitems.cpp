@@ -224,19 +224,19 @@ void CmdRemoveSelectedSchematicItems::removeNetSegmentItems(
     }
     for (const NetLine& netline : segment.netlines) {
       SI_NetLineAnchor* start = nullptr;
-      if (tl::optional<Uuid> anchor =
+      if (std::optional<Uuid> anchor =
               netline.getStartPoint().tryGetJunction()) {
         start = junctionMap[*anchor];
-      } else if (tl::optional<NetLineAnchor::PinAnchor> anchor =
+      } else if (std::optional<NetLineAnchor::PinAnchor> anchor =
                      netline.getStartPoint().tryGetPin()) {
         SI_Symbol* symbol =
             mScene.getSchematic().getSymbols().value(anchor->symbol);
         start = symbol ? symbol->getPin(anchor->pin) : nullptr;
       }
       SI_NetLineAnchor* end = nullptr;
-      if (tl::optional<Uuid> anchor = netline.getEndPoint().tryGetJunction()) {
+      if (std::optional<Uuid> anchor = netline.getEndPoint().tryGetJunction()) {
         end = junctionMap[*anchor];
-      } else if (tl::optional<NetLineAnchor::PinAnchor> anchor =
+      } else if (std::optional<NetLineAnchor::PinAnchor> anchor =
                      netline.getEndPoint().tryGetPin()) {
         SI_Symbol* symbol =
             mScene.getSchematic().getSymbols().value(anchor->symbol);

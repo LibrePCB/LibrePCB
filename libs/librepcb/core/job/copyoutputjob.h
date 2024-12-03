@@ -25,10 +25,10 @@
  ******************************************************************************/
 #include "outputjob.h"
 
-#include <optional/tl/optional.hpp>
-
 #include <QtCore>
 #include <QtGui>
+
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -46,8 +46,8 @@ class CopyOutputJob final : public OutputJob {
   Q_DECLARE_TR_FUNCTIONS(CopyOutputJob)
 
 public:
-  using BoardSet = ObjectSet<tl::optional<Uuid>>;
-  using AssemblyVariantSet = ObjectSet<tl::optional<Uuid>>;
+  using BoardSet = ObjectSet<std::optional<Uuid>>;
+  using AssemblyVariantSet = ObjectSet<std::optional<Uuid>>;
 
   // Constructors / Destructor
   CopyOutputJob() noexcept;

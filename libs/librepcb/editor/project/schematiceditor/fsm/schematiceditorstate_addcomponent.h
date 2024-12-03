@@ -33,7 +33,7 @@
 #include <QtWidgets>
 
 #include <memory>
-#include <optional.hpp>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -95,10 +95,10 @@ public:
 
 private:  // Methods
   void startAddingComponent(
-      const tl::optional<Uuid>& cmp = tl::nullopt,
-      const tl::optional<Uuid>& symbVar = tl::nullopt,
-      const tl::optional<librepcb::ComponentAssemblyOptionList>& options =
-          tl::nullopt,
+      const std::optional<Uuid>& cmp = std::nullopt,
+      const std::optional<Uuid>& symbVar = std::nullopt,
+      const std::optional<librepcb::ComponentAssemblyOptionList>& options =
+          std::nullopt,
       const QString& searchTerm = QString(), bool keepValue = false);
   bool abortCommand(bool showErrMsgBox) noexcept;
   std::shared_ptr<const Attribute> getToolbarAttribute() const noexcept;

@@ -70,7 +70,7 @@ public:
   ~ComponentChooserDialog() noexcept;
 
   // Getters
-  const tl::optional<Uuid>& getSelectedComponentUuid() const noexcept {
+  const std::optional<Uuid>& getSelectedComponentUuid() const noexcept {
     return mSelectedComponentUuid;
   }
 
@@ -85,8 +85,8 @@ private:  // Methods
                                          QListWidgetItem* previous) noexcept;
   void listComponents_itemDoubleClicked(QListWidgetItem* item) noexcept;
   void searchComponents(const QString& input);
-  void setSelectedCategory(const tl::optional<Uuid>& uuid) noexcept;
-  void setSelectedComponent(const tl::optional<Uuid>& uuid) noexcept;
+  void setSelectedCategory(const std::optional<Uuid>& uuid) noexcept;
+  void setSelectedComponent(const std::optional<Uuid>& uuid) noexcept;
   void updatePreview(const FilePath& fp) noexcept;
   void accept() noexcept override;
   const QStringList& localeOrder() const noexcept;
@@ -97,8 +97,8 @@ private:  // Data
   QScopedPointer<Ui::ComponentChooserDialog> mUi;
   QScopedPointer<QAbstractItemModel> mCategoryTreeModel;
   bool mCategorySelected;
-  tl::optional<Uuid> mSelectedCategoryUuid;
-  tl::optional<Uuid> mSelectedComponentUuid;
+  std::optional<Uuid> mSelectedCategoryUuid;
+  std::optional<Uuid> mSelectedComponentUuid;
 
   // preview
   std::shared_ptr<Component> mComponent;

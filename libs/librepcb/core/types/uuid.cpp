@@ -121,11 +121,11 @@ Uuid Uuid::fromString(const QString& str) {
   }
 }
 
-tl::optional<Uuid> Uuid::tryFromString(const QString& str) noexcept {
+std::optional<Uuid> Uuid::tryFromString(const QString& str) noexcept {
   if (isValid(str)) {
     return Uuid(str);
   } else {
-    return tl::nullopt;
+    return std::nullopt;
   }
 }
 
@@ -139,7 +139,7 @@ std::unique_ptr<SExpression> serialize(const Uuid& obj) {
 }
 
 template <>
-std::unique_ptr<SExpression> serialize(const tl::optional<Uuid>& obj) {
+std::unique_ptr<SExpression> serialize(const std::optional<Uuid>& obj) {
   if (obj) {
     return serialize(*obj);
   } else {
@@ -153,9 +153,9 @@ Uuid deserialize(const SExpression& node) {
 }
 
 template <>
-tl::optional<Uuid> deserialize(const SExpression& node) {
+std::optional<Uuid> deserialize(const SExpression& node) {
   if (node.getValue() == "none") {
-    return tl::nullopt;
+    return std::nullopt;
   } else {
     return deserialize<Uuid>(node);  // can throw
   }

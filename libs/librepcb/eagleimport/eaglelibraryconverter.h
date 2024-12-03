@@ -26,11 +26,11 @@
 #include <librepcb/core/types/boundedunsignedratio.h>
 #include <librepcb/core/types/uuid.h>
 #include <librepcb/core/types/version.h>
-#include <optional/tl/optional.hpp>
 
 #include <QtCore>
 
 #include <memory>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -131,30 +131,31 @@ private:  // Data
 
   /// Key: [Library Name, Library URN, Symbol Name]
   /// Value: LibrePCB Symbol UUID
-  QHash<QStringList, tl::optional<Uuid> > mSymbolMap;
+  QHash<QStringList, std::optional<Uuid> > mSymbolMap;
 
   /// Key: [Library Name, Library URN, Symbol Name] | Pin Name
   /// Value: (EAGLE Pin Object, LibrePCB Symbol Pin UUID)
-  QHash<QStringList,
-        QMap<QString,
-             std::pair<std::shared_ptr<parseagle::Pin>, tl::optional<Uuid> > > >
+  QHash<
+      QStringList,
+      QMap<QString,
+           std::pair<std::shared_ptr<parseagle::Pin>, std::optional<Uuid> > > >
       mSymbolPinMap;
 
   /// Key: [Library Name, Library URN, Package Name]
   /// Value: LibrePCB Package UUID
-  QHash<QStringList, tl::optional<Uuid> > mPackageMap;
+  QHash<QStringList, std::optional<Uuid> > mPackageMap;
 
   /// Key: [Library Name, Library URN, Package Name] | Pad Name
   /// Value: LibrePCB Package Pad UUID
-  QHash<QStringList, QMap<QString, tl::optional<Uuid> > > mPackagePadMap;
+  QHash<QStringList, QMap<QString, std::optional<Uuid> > > mPackagePadMap;
 
   /// Key: [Library Name, Library URN, Device Set Name]
   /// Value: LibrePCB Component UUID
-  QHash<QStringList, tl::optional<Uuid> > mComponentMap;
+  QHash<QStringList, std::optional<Uuid> > mComponentMap;
 
   /// Key: [Library Name, Library URN, Device Set Name, Gate Name, Pin Name]
   /// Value: LibrePCB Component Signal UUID
-  QHash<QStringList, tl::optional<Uuid> > mComponentSignalMap;
+  QHash<QStringList, std::optional<Uuid> > mComponentSignalMap;
 };
 
 /*******************************************************************************

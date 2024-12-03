@@ -413,7 +413,7 @@ void LibraryOverviewWidget::updateElementList(QListWidget& listWidget,
     // get all library element names
     QMultiMap<Version, FilePath> dbElements =
         mContext.workspace.getLibraryDb().getAll<ElementType>(
-            tl::nullopt,
+            std::nullopt,
             mLibrary->getDirectory().getAbsPath());  // can throw
     foreach (const FilePath& filepath, dbElements) {
       Element element;

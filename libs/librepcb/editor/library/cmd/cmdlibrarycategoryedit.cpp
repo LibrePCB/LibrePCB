@@ -50,7 +50,7 @@ CmdLibraryCategoryEdit::~CmdLibraryCategoryEdit() noexcept {
  ******************************************************************************/
 
 void CmdLibraryCategoryEdit::setParentUuid(
-    const tl::optional<Uuid>& parentUuid) noexcept {
+    const std::optional<Uuid>& parentUuid) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewParentUuid = parentUuid;
 }

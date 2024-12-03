@@ -31,11 +31,11 @@
 #include <librepcb/core/types/elementname.h>
 #include <librepcb/core/types/uuid.h>
 #include <librepcb/core/types/version.h>
-#include <optional/tl/optional.hpp>
 
 #include <QtCore>
 
 #include <memory>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -144,7 +144,7 @@ public:
   static Pad convertPad(const KiCadFootprintPad& p, qreal fptSolderMaskMargin,
                         qreal fptSolderPasteMargin, qreal fptSolderPasteRatio,
                         qreal fptClearance, MessageLogger& log);
-  static tl::optional<KiCadProperty> findProperty(
+  static std::optional<KiCadProperty> findProperty(
       const QList<KiCadProperty>& props, const QString& key);
 
   // Operator Overloadings

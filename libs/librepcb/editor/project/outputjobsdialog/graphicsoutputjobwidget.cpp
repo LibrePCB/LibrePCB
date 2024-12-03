@@ -104,7 +104,7 @@ GraphicsOutputJobWidget::GraphicsOutputJobWidget(
 
   // Page size.
   mPageSizes = {
-      tl::nullopt,  // Auto size.
+      std::nullopt,  // Auto size.
       QPageSize(QPageSize::A0),
       QPageSize(QPageSize::A1),
       QPageSize(QPageSize::A2),
@@ -147,7 +147,7 @@ GraphicsOutputJobWidget::GraphicsOutputJobWidget(
       QPageSize(QPageSize::AnsiD),
       QPageSize(QPageSize::AnsiE),
   };
-  foreach (const tl::optional<QPageSize>& size, mPageSizes) {
+  foreach (const std::optional<QPageSize>& size, mPageSizes) {
     mUi->cbxPageSize->addItem(size ? size->name()
                                    : tr("Custom (adjust to content)"));
   }
@@ -159,7 +159,7 @@ GraphicsOutputJobWidget::GraphicsOutputJobWidget(
           if (auto size = mPageSizes.value(index)) {
             c.pageSizeKey = size->key();
           } else {
-            c.pageSizeKey = tl::nullopt;
+            c.pageSizeKey = std::nullopt;
           }
         });
       });
@@ -238,8 +238,8 @@ GraphicsOutputJobWidget::GraphicsOutputJobWidget(
           &UnsignedRatioEdit::setDisabled);
   connect(mUi->cbxScaleAuto, &QCheckBox::toggled, this, [this](bool checked) {
     modify([this, checked](GraphicsOutputJob::Content& c) {
-      c.scale = checked ? tl::nullopt
-                        : tl::make_optional(mUi->spbxScaleFactor->getValue());
+      c.scale = checked ? std::nullopt
+                        : std::make_optional(mUi->spbxScaleFactor->getValue());
     });
   });
   connect(
@@ -405,7 +405,7 @@ void GraphicsOutputJobWidget::currentContentChanged(int index) noexcept {
 
     // Page size.
     for (int i = 0; i < mPageSizes.count(); ++i) {
-      tl::optional<QPageSize> value = mPageSizes.at(i);
+      std::optional<QPageSize> value = mPageSizes.at(i);
       if (((!c.pageSizeKey) && (!value)) ||
           (c.pageSizeKey && value && (*c.pageSizeKey == value->key()))) {
         mUi->cbxPageSize->setCurrentIndex(i);

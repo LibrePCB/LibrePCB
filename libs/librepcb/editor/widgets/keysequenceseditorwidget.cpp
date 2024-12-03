@@ -57,7 +57,7 @@ KeySequencesEditorWidget::~KeySequencesEditorWidget() noexcept {
  ******************************************************************************/
 
 void KeySequencesEditorWidget::setOverrides(
-    const tl::optional<QList<QKeySequence> >& overrides) noexcept {
+    const std::optional<QList<QKeySequence> >& overrides) noexcept {
   mOverrides = overrides;
   updateWidgets();
 }
@@ -136,7 +136,7 @@ void KeySequencesEditorWidget::updateWidgets() noexcept {
       btnReset->setIcon(QIcon(":/img/actions/undo.png"));
       btnReset->setEnabled(mOverrides.has_value());
       connect(btnReset, &QToolButton::clicked, this, [this]() {
-        mOverrides = tl::nullopt;
+        mOverrides = std::nullopt;
         updateWidgets();
       });
       hLayout->addWidget(btnReset);

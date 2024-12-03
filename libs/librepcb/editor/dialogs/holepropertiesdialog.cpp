@@ -109,7 +109,7 @@ void HolePropertiesDialog::load(const T& obj) noexcept {
   mUi->holeEditorWidget->setPath(obj.getPath());
   if (!obj.getStopMaskConfig().isEnabled()) {
     mUi->rbtnStopMaskOff->setChecked(true);
-  } else if (tl::optional<Length> offset =
+  } else if (std::optional<Length> offset =
                  obj.getStopMaskConfig().getOffset()) {
     mUi->rbtnStopMaskManual->setChecked(true);
     mUi->edtStopMaskOffset->setValue(*offset);

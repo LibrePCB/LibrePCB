@@ -91,11 +91,11 @@ PackageChooserDialog::PackageChooserDialog(
   addSpinner(mUi->treeCategories);
   addSpinner(mUi->listPackages);
 
-  setSelectedPackage(tl::nullopt);
+  setSelectedPackage(std::nullopt);
 }
 
 PackageChooserDialog::~PackageChooserDialog() noexcept {
-  setSelectedPackage(tl::nullopt);
+  setSelectedPackage(std::nullopt);
 }
 
 /*******************************************************************************
@@ -130,7 +130,7 @@ void PackageChooserDialog::listPackages_currentItemChanged(
     setSelectedPackage(
         Uuid::tryFromString(current->data(Qt::UserRole).toString()));
   } else {
-    setSelectedPackage(tl::nullopt);
+    setSelectedPackage(std::nullopt);
   }
 }
 
@@ -144,7 +144,7 @@ void PackageChooserDialog::listPackages_itemDoubleClicked(
 }
 
 void PackageChooserDialog::searchPackages(const QString& input) {
-  setSelectedPackage(tl::nullopt);
+  setSelectedPackage(std::nullopt);
   mUi->listPackages->clear();
   mCategorySelected = false;
 
@@ -169,10 +169,10 @@ void PackageChooserDialog::searchPackages(const QString& input) {
 }
 
 void PackageChooserDialog::setSelectedCategory(
-    const tl::optional<Uuid>& uuid) noexcept {
+    const std::optional<Uuid>& uuid) noexcept {
   if ((mCategorySelected) && (uuid == mSelectedCategoryUuid)) return;
 
-  setSelectedPackage(tl::nullopt);
+  setSelectedPackage(std::nullopt);
   mUi->listPackages->clear();
   mSelectedCategoryUuid = uuid;
   mCategorySelected = true;
@@ -204,7 +204,7 @@ void PackageChooserDialog::setSelectedCategory(
 }
 
 void PackageChooserDialog::setSelectedPackage(
-    const tl::optional<Uuid>& uuid) noexcept {
+    const std::optional<Uuid>& uuid) noexcept {
   FilePath fp;
   QString name = tr("No package selected");
   QString desc;

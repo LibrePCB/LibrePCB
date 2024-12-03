@@ -146,7 +146,7 @@ private:  // Methods
   struct PlaneData {
     Uuid uuid;
     const Layer* layer;
-    tl::optional<Uuid> netSignal;
+    std::optional<Uuid> netSignal;
     Path outline;
     UnsignedLength minWidth;
     UnsignedLength minClearance;
@@ -167,14 +167,14 @@ private:  // Methods
   struct PolygonData {
     Transform transform;  // Applied to path after preprocessing.
     const Layer* layer;
-    tl::optional<Uuid> netSignal;
+    std::optional<Uuid> netSignal;
     Path path;
     UnsignedLength width;
     bool filled;
   };
 
   struct ViaData {
-    tl::optional<Uuid> netSignal;
+    std::optional<Uuid> netSignal;
     Point position;
     PositiveLength diameter;
     const Layer* startLayer;
@@ -183,14 +183,14 @@ private:  // Methods
 
   struct PadData {
     Transform transform;
-    tl::optional<Uuid> netSignal;
+    std::optional<Uuid> netSignal;
     UnsignedLength clearance;
     QHash<const Layer*, QList<PadGeometry>> geometries;
   };
 
   struct TraceData {
     const Layer* layer;
-    tl::optional<Uuid> netSignal;
+    std::optional<Uuid> netSignal;
     Point startPos;
     Point endPos;
     PositiveLength width;

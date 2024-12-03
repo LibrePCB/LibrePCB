@@ -51,7 +51,7 @@ public:
   virtual ~CmdLibraryCategoryEdit() noexcept;
 
   // Setters
-  void setParentUuid(const tl::optional<Uuid>& parentUuid) noexcept;
+  void setParentUuid(const std::optional<Uuid>& parentUuid) noexcept;
 
   // Operator Overloadings
   CmdLibraryCategoryEdit& operator=(const CmdLibraryCategoryEdit& rhs) = delete;
@@ -69,8 +69,8 @@ private:  // Methods
 private:  // Data
   LibraryCategory& mCategory;
 
-  tl::optional<Uuid> mOldParentUuid;
-  tl::optional<Uuid> mNewParentUuid;
+  std::optional<Uuid> mOldParentUuid;
+  std::optional<Uuid> mNewParentUuid;
 };
 
 /*******************************************************************************

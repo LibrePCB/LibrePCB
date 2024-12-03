@@ -470,7 +470,7 @@ bool PackageModelListModel::chooseStepFile(QByteArray& content,
   }
   clientSettings.setValue(key, fp.toStr());
 
-  tl::optional<QString> minifyError;
+  std::optional<QString> minifyError;
   {
     // Loading and minifying the STEP file can block the UI some time, so let's
     // indicate the ongoing operation with a wait cursor.

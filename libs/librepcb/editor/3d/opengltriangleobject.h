@@ -25,10 +25,10 @@
  ******************************************************************************/
 #include "openglobject.h"
 
-#include <optional/tl/optional.hpp>
-
 #include <QtCore>
 #include <QtOpenGL>
+
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -64,7 +64,7 @@ private:  // Data
 
   QMutex mMutex;
   QColor mColor;
-  tl::optional<QVector<QVector3D>> mNewTriangles;
+  std::optional<QVector<QVector3D>> mNewTriangles;
 };
 
 /*******************************************************************************

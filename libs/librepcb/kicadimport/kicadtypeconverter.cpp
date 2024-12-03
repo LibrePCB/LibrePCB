@@ -820,8 +820,8 @@ KiCadTypeConverter::Pad KiCadTypeConverter::convertPad(
   }
 
   // Convert drill.
-  tl::optional<PositiveLength> drillDiameter;
-  tl::optional<NonEmptyPath> drillPath;
+  std::optional<PositiveLength> drillDiameter;
+  std::optional<NonEmptyPath> drillPath;
   const Length drillWidth = Length::fromMm(std::max(p.drill.width(), qreal(0)));
   const Length drillHeight =
       Length::fromMm(std::max(p.drill.height(), qreal(0)));
@@ -844,8 +844,8 @@ KiCadTypeConverter::Pad KiCadTypeConverter::convertPad(
       (p.type != KiCadPadType::ThruHole) &&
       (p.type != KiCadPadType::NpThruHole)) {
     log.warning("SMD pad has a drill diameter specified, it will be ignored.");
-    drillDiameter = tl::nullopt;
-    drillPath = tl::nullopt;
+    drillDiameter = std::nullopt;
+    drillPath = std::nullopt;
   }
 
   // Determine stop mask config.
@@ -990,7 +990,7 @@ KiCadTypeConverter::Pad KiCadTypeConverter::convertPad(
     // Create the pad.
     result.fptPad = std::make_shared<FootprintPad>(
         Uuid::createRandom(),  // UUID
-        tl::nullopt,  // Package pad UUID
+        std::nullopt,  // Package pad UUID
         position,  // Position
         rotation,  // Rotation
         shape,  // Shape
@@ -1065,14 +1065,14 @@ KiCadTypeConverter::Pad KiCadTypeConverter::convertPad(
   return result;
 }
 
-tl::optional<KiCadProperty> KiCadTypeConverter::findProperty(
+std::optional<KiCadProperty> KiCadTypeConverter::findProperty(
     const QList<KiCadProperty>& props, const QString& key) {
   for (const KiCadProperty& p : props) {
     if (p.key.toLower() == key.toLower()) {
       return p;
     }
   }
-  return tl::nullopt;
+  return std::nullopt;
 }
 
 /*******************************************************************************

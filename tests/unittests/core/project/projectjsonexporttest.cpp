@@ -113,9 +113,9 @@ TEST_F(ProjectJsonExportTest, testLength) {
 
 TEST_F(ProjectJsonExportTest, testOptionalLength) {
   ProjectJsonExport exp;
-  EXPECT_TRUE(exp.toJson(tl::optional<Length>()).isNull());
+  EXPECT_TRUE(exp.toJson(std::optional<Length>()).isNull());
   EXPECT_EQ(QJsonValue(qreal(-5.5)),
-            exp.toJson(tl::make_optional(Length(-5500000))));
+            exp.toJson(std::make_optional(Length(-5500000))));
 }
 
 TEST_F(ProjectJsonExportTest, testLengthSet) {
@@ -155,7 +155,7 @@ TEST_F(ProjectJsonExportTest, testBoundingBox) {
 
   ProjectJsonExport exp;
   EXPECT_EQ(QJsonValue(QJsonValue::Type::Null),
-            exp.toJson(ProjectJsonExport::BoundingBox{tl::nullopt}));
+            exp.toJson(ProjectJsonExport::BoundingBox{std::nullopt}));
   const char* expected =
       "{"
       " \"x\": 0,"

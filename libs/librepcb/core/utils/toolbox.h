@@ -28,13 +28,13 @@
 #include "../types/length.h"
 #include "../types/point.h"
 
-#include <optional/tl/optional.hpp>
 #include <type_traits>
 
 #include <QtCore>
 #include <QtGui>
 
 #include <algorithm>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -209,10 +209,10 @@ public:
       const QPainterPath& path, const QPen& pen, const QBrush& brush,
       const UnsignedLength& minWidth = UnsignedLength(0)) noexcept;
 
-  static tl::optional<Length> arcRadius(const Point& p1, const Point& p2,
+  static std::optional<Length> arcRadius(const Point& p1, const Point& p2,
+                                         const Angle& angle) noexcept;
+  static std::optional<Point> arcCenter(const Point& p1, const Point& p2,
                                         const Angle& angle) noexcept;
-  static tl::optional<Point> arcCenter(const Point& p1, const Point& p2,
-                                       const Angle& angle) noexcept;
 
   /**
    * @brief Calculate the angle between two given points

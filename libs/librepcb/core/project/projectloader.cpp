@@ -91,7 +91,7 @@ std::unique_ptr<Project> ProjectLoader::open(
     std::unique_ptr<TransactionalDirectory> directory,
     const QString& filename) {
   Q_ASSERT(directory);
-  mUpgradeMessages = tl::nullopt;
+  mUpgradeMessages = std::nullopt;
 
   QElapsedTimer timer;
   timer.start();
@@ -351,8 +351,8 @@ void ProjectLoader::loadCircuit(Project& p) {
                                .arg(cmpSigUuid.toStr()));
       }
       loadedSignals.insert(cmpSigUuid);
-      if (const tl::optional<Uuid> netSignalUuid =
-              deserialize<tl::optional<Uuid>>(child->getChild("net/@0"))) {
+      if (const std::optional<Uuid> netSignalUuid =
+              deserialize<std::optional<Uuid>>(child->getChild("net/@0"))) {
         NetSignal* netSignal =
             p.getCircuit().getNetSignals().value(*netSignalUuid);
         if (!netSignal) {
@@ -659,8 +659,8 @@ void ProjectLoader::loadBoardDeviceInstance(Board& b, const SExpression& node) {
   {
     // Load 3D package model. But after upgrading the project library, assign
     // the default package model if no valid model is set on this device.
-    tl::optional<Uuid> model =
-        deserialize<tl::optional<Uuid>>(node.getChild("lib_3d_model/@0"));
+    std::optional<Uuid> model =
+        deserialize<std::optional<Uuid>>(node.getChild("lib_3d_model/@0"));
     if (mAutoAssignDeviceModels &&
         ((!model) || (!device->getLibPackage().getModels().contains(*model)) ||
          (!device->getLibFootprint().getModels().contains(*model)))) {
@@ -675,8 +675,8 @@ void ProjectLoader::loadBoardDeviceInstance(Board& b, const SExpression& node) {
 }
 
 void ProjectLoader::loadBoardNetSegment(Board& b, const SExpression& node) {
-  const tl::optional<Uuid> netSignalUuid =
-      deserialize<tl::optional<Uuid>>(node.getChild("net/@0"));
+  const std::optional<Uuid> netSignalUuid =
+      deserialize<std::optional<Uuid>>(node.getChild("net/@0"));
   NetSignal* netSignal = netSignalUuid
       ? b.getProject().getCircuit().getNetSignals().value(*netSignalUuid)
       : nullptr;
@@ -772,8 +772,8 @@ void ProjectLoader::loadBoardNetSegment(Board& b, const SExpression& node) {
 }
 
 void ProjectLoader::loadBoardPlane(Board& b, const SExpression& node) {
-  const tl::optional<Uuid> netSignalUuid =
-      deserialize<tl::optional<Uuid>>(node.getChild("net/@0"));
+  const std::optional<Uuid> netSignalUuid =
+      deserialize<std::optional<Uuid>>(node.getChild("net/@0"));
   NetSignal* netSignal = netSignalUuid
       ? b.getProject().getCircuit().getNetSignals().value(*netSignalUuid)
       : nullptr;

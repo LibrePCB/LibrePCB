@@ -51,20 +51,20 @@ public:
   ~PackagePadComboBox() noexcept;
 
   // Getters
-  tl::optional<Uuid> getCurrentPad() const noexcept;
+  std::optional<Uuid> getCurrentPad() const noexcept;
 
   // Setters
   void setPads(const PackagePadList& pads) noexcept;
-  void setCurrentPad(tl::optional<Uuid> pad) noexcept;
+  void setCurrentPad(std::optional<Uuid> pad) noexcept;
 
   // Operator Overloadings
   PackagePadComboBox& operator=(const PackagePadComboBox& rhs) = delete;
 
 signals:
-  void currentPadChanged(tl::optional<Uuid> pad);
+  void currentPadChanged(std::optional<Uuid> pad);
 
 private:  // Methods
-  tl::optional<Uuid> getPadAtIndex(int index) const noexcept;
+  std::optional<Uuid> getPadAtIndex(int index) const noexcept;
   void currentIndexChanged(int index) noexcept;
 
 private:  // Data

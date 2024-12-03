@@ -103,18 +103,18 @@ std::shared_ptr<Bom> BomGenerator::generate(
         parts = device->getParts(assemblyVariant);
         if (parts.isEmpty()) {
           item.mount = false;
-          parts = device->getParts(tl::nullopt);  // Fallback for convenience.
+          parts = device->getParts(std::nullopt);  // Fallback for convenience.
         }
         assemblyExpected = device->doesPackageRequireAssembly(false);
       } else {
-        parts = cmpInst->getParts(tl::nullopt);  // For convenience.
+        parts = cmpInst->getParts(std::nullopt);  // For convenience.
         item.mount = false;
       }
     } else {
       parts = cmpInst->getParts(assemblyVariant);
       if (parts.isEmpty()) {
         item.mount = false;
-        parts = cmpInst->getParts(tl::nullopt);  // Fallback for convenience.
+        parts = cmpInst->getParts(std::nullopt);  // Fallback for convenience.
       }
     }
 

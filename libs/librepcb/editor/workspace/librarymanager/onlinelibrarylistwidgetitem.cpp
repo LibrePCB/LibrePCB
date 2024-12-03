@@ -69,7 +69,7 @@ OnlineLibraryListWidgetItem::OnlineLibraryListWidgetItem(
   QUrl iconUrl = QUrl(mJsonObject.value("icon_url").toString());
   const auto dependenciesArray = mJsonObject.value("dependencies").toArray();
   for (const QJsonValue& value : dependenciesArray) {
-    tl::optional<Uuid> uuid = Uuid::tryFromString(value.toString());
+    std::optional<Uuid> uuid = Uuid::tryFromString(value.toString());
     if (uuid) {
       mDependencies.insert(*uuid);
     } else {
@@ -195,7 +195,7 @@ void OnlineLibraryListWidgetItem::updateInstalledStatus() noexcept {
   }
 
   if (mUuid) {
-    tl::optional<Version> installedVersion;
+    std::optional<Version> installedVersion;
     try {
       FilePath fp =
           mWorkspace.getLibraryDb().getLatest<Library>(*mUuid);  // can throw

@@ -149,7 +149,7 @@ std::unique_ptr<BoardClipboardData> BoardClipboardDataBuilder::generate(
 
     foreach (const BoardNetSegmentSplitter::Segment& segment,
              splitter.split()) {
-      tl::optional<CircuitIdentifier> netName;
+      std::optional<CircuitIdentifier> netName;
       if (const NetSignal* netsignal = it.key()->getNetSignal()) {
         netName = netsignal->getName();
       }
@@ -168,8 +168,8 @@ std::unique_ptr<BoardClipboardData> BoardClipboardDataBuilder::generate(
         std::make_shared<BoardClipboardData::Plane>(
             plane->getUuid(), plane->getLayer(),
             plane->getNetSignal()
-                ? tl::make_optional(plane->getNetSignal()->getName())
-                : tl::nullopt,
+                ? std::make_optional(plane->getNetSignal()->getName())
+                : std::nullopt,
             plane->getOutline(), plane->getMinWidth(), plane->getMinClearance(),
             plane->getKeepIslands(), plane->getPriority(),
             plane->getConnectStyle(), plane->getThermalGap(),

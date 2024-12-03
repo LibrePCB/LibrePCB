@@ -59,7 +59,7 @@ SI_SymbolPin::SI_SymbolPin(SI_Symbol& symbol, const Uuid& pinUuid)
                           .getPinSignalMap()
                           .get(pinUuid)
                           .get();  // can throw
-  tl::optional<Uuid> cmpSignalUuid = mPinSignalMapItem->getSignalUuid();
+  std::optional<Uuid> cmpSignalUuid = mPinSignalMapItem->getSignalUuid();
   if (cmpSignalUuid) {
     mComponentSignalInstance =
         mSymbol.getComponentInstance().getSignalInstance(*cmpSignalUuid);

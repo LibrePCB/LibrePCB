@@ -74,7 +74,8 @@ public:
   bool setInteractive(bool interactive) noexcept;
   void setProgressPercent(int percent) noexcept;
   void setProgressStatus(const QString& status) noexcept;
-  void setMessages(const tl::optional<RuleCheckMessageList>& messages) noexcept;
+  void setMessages(
+      const std::optional<RuleCheckMessageList>& messages) noexcept;
   void setApprovals(const QSet<SExpression>& approvals) noexcept;
 
   // Operator Overloadings
@@ -88,7 +89,7 @@ signals:
   void messageSelected(const RuleCheckMessage& msg, bool zoomTo);
 
 private:  // Methods
-  void updateTitle(tl::optional<int> unapprovedMessages) noexcept;
+  void updateTitle(std::optional<int> unapprovedMessages) noexcept;
   virtual bool ruleCheckFixAvailable(
       std::shared_ptr<const RuleCheckMessage> msg) noexcept override;
   virtual void ruleCheckFixRequested(

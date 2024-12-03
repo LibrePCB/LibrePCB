@@ -42,7 +42,7 @@ RuleCheckListWidget::RuleCheckListWidget(QWidget* parent) noexcept
     mReadOnly(false),
     mHandler(nullptr),
     mApprovals(),
-    mUnapprovedMessageCount(tl::nullopt) {
+    mUnapprovedMessageCount(std::nullopt) {
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->setContentsMargins(0, 0, 0, 0);
   layout->addWidget(mListWidget.data());
@@ -72,7 +72,7 @@ void RuleCheckListWidget::setHandler(IF_RuleCheckHandler* handler) noexcept {
 }
 
 void RuleCheckListWidget::setMessages(
-    const tl::optional<RuleCheckMessageList>& messages) noexcept {
+    const std::optional<RuleCheckMessageList>& messages) noexcept {
   if (messages != mMessages) {
     mMessages = messages;
     updateList();
@@ -142,7 +142,7 @@ void RuleCheckListWidget::updateList() noexcept {
   if (mMessages) {
     mUnapprovedMessageCount = unapprovedMessageCount;
   } else {
-    mUnapprovedMessageCount = tl::nullopt;
+    mUnapprovedMessageCount = std::nullopt;
   }
 }
 

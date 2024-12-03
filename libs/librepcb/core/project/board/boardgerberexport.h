@@ -28,12 +28,11 @@
 #include "../../fileio/filepath.h"
 #include "../../types/length.h"
 
-#include <optional/tl/optional.hpp>
-
 #include <QtCore>
 
 #include <functional>
 #include <memory>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -132,7 +131,7 @@ private:
   void drawPolygon(GerberGenerator& gen, const Layer& layer,
                    const Path& outline, const UnsignedLength& lineWidth,
                    bool fill, GerberGenerator::Function function,
-                   const tl::optional<QString>& net,
+                   const std::optional<QString>& net,
                    const QString& component) const;
   QVector<Path> getComponentOutlines(const BI_Device& device,
                                      const Layer& layer) const;

@@ -78,9 +78,9 @@ void D356NetlistGenerator::smtPad(const QString& netName,
                                   const Angle& rotation, int layer) {
   mRecords.append(Record{
       OperationCode::SurfaceMount, netName, checkedComponentName(cmpName),
-      padName, false, tl::nullopt, layer, position, width, height, rotation,
+      padName, false, std::nullopt, layer, position, width, height, rotation,
       (layer == 1) ? SolderMask::SecondarySide : SolderMask::PrimarySide,
-      tl::nullopt, tl::nullopt});
+      std::nullopt, std::nullopt});
 }
 
 void D356NetlistGenerator::thtPad(const QString& netName,
@@ -93,7 +93,7 @@ void D356NetlistGenerator::thtPad(const QString& netName,
   mRecords.append(Record{
       OperationCode::ThroughHole, netName, checkedComponentName(cmpName),
       padName, false, std::make_pair(drillDiameter, true), 0, position, width,
-      height, rotation, SolderMask::None, tl::nullopt, tl::nullopt});
+      height, rotation, SolderMask::None, std::nullopt, std::nullopt});
 }
 
 void D356NetlistGenerator::throughVia(
@@ -103,8 +103,8 @@ void D356NetlistGenerator::throughVia(
   mRecords.append(Record{
       OperationCode::ThroughHole, netName, "VIA", QString(), true,
       std::make_pair(drillDiameter, true), 0, position, width, height, rotation,
-      solderMaskCovered ? SolderMask::BothSides : SolderMask::None, tl::nullopt,
-      tl::nullopt});
+      solderMaskCovered ? SolderMask::BothSides : SolderMask::None,
+      std::nullopt, std::nullopt});
 }
 
 void D356NetlistGenerator::blindVia(
@@ -119,12 +119,12 @@ void D356NetlistGenerator::blindVia(
       : (isTop ? SolderMask::SecondarySide : SolderMask::PrimarySide);
   mRecords.append(Record{OperationCode::BlindOrBuriedVia, netName, "VIA",
                          QString(), true, std::make_pair(drillDiameter, true),
-                         accessCode, position, tl::nullopt, tl::nullopt,
-                         tl::nullopt, mask, startLayer, endLayer});
-  mRecords.append(Record{OperationCode::Continuation, tl::nullopt, "VIA",
-                         QString(), false, tl::nullopt, accessCode, position,
-                         width, height, rotation, tl::nullopt, tl::nullopt,
-                         tl::nullopt});
+                         accessCode, position, std::nullopt, std::nullopt,
+                         std::nullopt, mask, startLayer, endLayer});
+  mRecords.append(Record{OperationCode::Continuation, std::nullopt, "VIA",
+                         QString(), false, std::nullopt, accessCode, position,
+                         width, height, rotation, std::nullopt, std::nullopt,
+                         std::nullopt});
 }
 
 void D356NetlistGenerator::buriedVia(const QString& netName,
@@ -133,8 +133,8 @@ void D356NetlistGenerator::buriedVia(const QString& netName,
                                      int startLayer, int endLayer) {
   mRecords.append(Record{
       OperationCode::BlindOrBuriedVia, netName, "VIA", QString(), true,
-      std::make_pair(drillDiameter, true), tl::nullopt, position, tl::nullopt,
-      tl::nullopt, tl::nullopt, SolderMask::BothSides, startLayer, endLayer});
+      std::make_pair(drillDiameter, true), std::nullopt, position, std::nullopt,
+      std::nullopt, std::nullopt, SolderMask::BothSides, startLayer, endLayer});
 }
 
 QByteArray D356NetlistGenerator::generate() const {

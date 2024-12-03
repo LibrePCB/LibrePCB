@@ -63,11 +63,11 @@ public:
   ~TraceAnchor() noexcept;
 
   // Getters
-  const tl::optional<Uuid>& tryGetJunction() const noexcept {
+  const std::optional<Uuid>& tryGetJunction() const noexcept {
     return mJunction;
   }
-  const tl::optional<Uuid>& tryGetVia() const noexcept { return mVia; }
-  const tl::optional<PadAnchor>& tryGetPad() const noexcept { return mPad; }
+  const std::optional<Uuid>& tryGetVia() const noexcept { return mVia; }
+  const std::optional<PadAnchor>& tryGetPad() const noexcept { return mPad; }
 
   // General Methods
 
@@ -91,13 +91,14 @@ public:
   static TraceAnchor pad(const Uuid& device, const Uuid& pad) noexcept;
 
 private:  // Methods
-  TraceAnchor(const tl::optional<Uuid>& junction, const tl::optional<Uuid>& via,
-              const tl::optional<PadAnchor>& pad) noexcept;
+  TraceAnchor(const std::optional<Uuid>& junction,
+              const std::optional<Uuid>& via,
+              const std::optional<PadAnchor>& pad) noexcept;
 
 private:  // Data
-  tl::optional<Uuid> mJunction;
-  tl::optional<Uuid> mVia;
-  tl::optional<PadAnchor> mPad;
+  std::optional<Uuid> mJunction;
+  std::optional<Uuid> mVia;
+  std::optional<PadAnchor> mPad;
 };
 
 /*******************************************************************************
@@ -186,13 +187,13 @@ using TraceList =
 inline std::size_t qHash(const TraceAnchor& key,
                          std::size_t seed = 0) noexcept {
   QString s;
-  if (tl::optional<Uuid> anchor = key.tryGetJunction()) {
+  if (std::optional<Uuid> anchor = key.tryGetJunction()) {
     s += anchor->toStr();
   }
-  if (tl::optional<Uuid> anchor = key.tryGetVia()) {
+  if (std::optional<Uuid> anchor = key.tryGetVia()) {
     s += anchor->toStr();
   }
-  if (tl::optional<TraceAnchor::PadAnchor> anchor = key.tryGetPad()) {
+  if (std::optional<TraceAnchor::PadAnchor> anchor = key.tryGetPad()) {
     s += anchor->device.toStr();
     s += anchor->pad.toStr();
   }

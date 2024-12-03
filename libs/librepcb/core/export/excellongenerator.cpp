@@ -238,7 +238,7 @@ void ExcellonGenerator::printLinearInterpolation(const Point& pos) noexcept {
 void ExcellonGenerator::printCircularInterpolation(
     const Point& from, const Point& to, const Angle& angle) noexcept {
   const QString cmd = (angle < 0) ? "G02" : "G03";
-  tl::optional<Length> radius = Toolbox::arcRadius(from, to, angle);
+  std::optional<Length> radius = Toolbox::arcRadius(from, to, angle);
   if (!radius) {
     qCritical() << "Failed to calculate arc radius in ExcellonGenerator, will "
                    "apply clipping.";

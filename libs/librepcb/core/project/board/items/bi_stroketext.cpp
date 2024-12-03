@@ -229,7 +229,7 @@ void BI_StrokeText::updateText() noexcept {
   const QString text = AttributeSubstitutor::substitute(
       mData.getText(),
       mDevice ? ProjectAttributeLookup(*mDevice,
-                                       mDevice->getParts(tl::nullopt).value(0))
+                                       mDevice->getParts(std::nullopt).value(0))
               : ProjectAttributeLookup(mBoard, nullptr));
   if (text != mSubstitutedText) {
     mSubstitutedText = text;

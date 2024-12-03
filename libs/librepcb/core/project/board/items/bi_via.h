@@ -74,15 +74,15 @@ public:
     return mVia.getDrillDiameter();
   }
   const PositiveLength& getSize() const noexcept { return mVia.getSize(); }
-  const tl::optional<PositiveLength>& getStopMaskDiameterTop() const noexcept {
+  const std::optional<PositiveLength>& getStopMaskDiameterTop() const noexcept {
     return mStopMaskDiameterTop;
   }
-  const tl::optional<PositiveLength>& getStopMaskDiameterBottom()
+  const std::optional<PositiveLength>& getStopMaskDiameterBottom()
       const noexcept {
     return mStopMaskDiameterBottom;
   }
   bool isUsed() const noexcept { return (mRegisteredNetLines.count() > 0); }
-  tl::optional<std::pair<const Layer*, const Layer*> > getDrillLayerSpan()
+  std::optional<std::pair<const Layer*, const Layer*> > getDrillLayerSpan()
       const noexcept;
   TraceAnchor toTraceAnchor() const noexcept override;
 
@@ -118,8 +118,8 @@ private:  // Data
   QMetaObject::Connection mNetSignalNameChangedConnection;
 
   // Cached Attributes
-  tl::optional<PositiveLength> mStopMaskDiameterTop;
-  tl::optional<PositiveLength> mStopMaskDiameterBottom;
+  std::optional<PositiveLength> mStopMaskDiameterTop;
+  std::optional<PositiveLength> mStopMaskDiameterBottom;
 
   // Registered Elements
   QSet<BI_NetLine*> mRegisteredNetLines;

@@ -143,17 +143,17 @@ public:
   struct NetSegment {
     static constexpr const char* tagname = "netsegment";
 
-    tl::optional<CircuitIdentifier> netName;
+    std::optional<CircuitIdentifier> netName;
     ViaList vias;
     JunctionList junctions;
     TraceList traces;
     Signal<NetSegment> onEdited;  ///< Dummy event, not used
 
-    explicit NetSegment(const tl::optional<CircuitIdentifier>& netName)
+    explicit NetSegment(const std::optional<CircuitIdentifier>& netName)
       : netName(netName), vias(), junctions(), traces(), onEdited(*this) {}
 
     explicit NetSegment(const SExpression& node)
-      : netName(deserialize<tl::optional<CircuitIdentifier>>(
+      : netName(deserialize<std::optional<CircuitIdentifier>>(
             node.getChild("net/@0"))),
         vias(node),
         junctions(node),
@@ -183,7 +183,7 @@ public:
 
     Uuid uuid;
     const Layer* layer;
-    tl::optional<CircuitIdentifier> netSignalName;
+    std::optional<CircuitIdentifier> netSignalName;
     Path outline;
     UnsignedLength minWidth;
     UnsignedLength minClearance;
@@ -196,7 +196,7 @@ public:
     Signal<Plane> onEdited;  ///< Dummy event, not used
 
     Plane(const Uuid& uuid, const Layer& layer,
-          const tl::optional<CircuitIdentifier>& netSignalName,
+          const std::optional<CircuitIdentifier>& netSignalName,
           const Path& outline, const UnsignedLength& minWidth,
           const UnsignedLength& minClearance, bool keepIslands, int priority,
           BI_Plane::ConnectStyle connectStyle, const PositiveLength& thermalGap,
@@ -218,7 +218,7 @@ public:
     explicit Plane(const SExpression& node)
       : uuid(deserialize<Uuid>(node.getChild("@0"))),
         layer(deserialize<const Layer*>(node.getChild("layer/@0"))),
-        netSignalName(deserialize<tl::optional<CircuitIdentifier>>(
+        netSignalName(deserialize<std::optional<CircuitIdentifier>>(
             node.getChild("net/@0"))),
         outline(node),
         minWidth(deserialize<UnsignedLength>(node.getChild("min_width/@0"))),

@@ -605,7 +605,7 @@ void PadSignalMapEditorWidget::commitInteractiveMode(
   if (mPadSignalMap && pad && listItem) {
     std::shared_ptr<DevicePadSignalMapItem> item =
         mPadSignalMap->find(pad->getUuid());
-    const tl::optional<Uuid> sigUuid =
+    const std::optional<Uuid> sigUuid =
         Uuid::tryFromString(listItem->data(Qt::UserRole).toString());
     if (item && sigUuid && mUndoStack) {
       try {
@@ -662,8 +662,8 @@ void PadSignalMapEditorWidget::setMap(const QString& cmdText,
   std::unique_ptr<UndoCommandGroup> cmdGrp(new UndoCommandGroup(cmdText));
   for (auto& item : *mPadSignalMap) {
     auto it = map.find(item.getPadUuid());
-    const tl::optional<Uuid> sig =
-        (it != map.end()) ? tl::make_optional(*it) : tl::nullopt;
+    const std::optional<Uuid> sig =
+        (it != map.end()) ? std::make_optional(*it) : std::nullopt;
     if (item.getSignalUuid() != sig) {
       std::unique_ptr<CmdDevicePadSignalMapItemEdit> cmd(
           new CmdDevicePadSignalMapItemEdit(item));

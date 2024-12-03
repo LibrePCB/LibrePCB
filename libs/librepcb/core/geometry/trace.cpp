@@ -33,9 +33,9 @@ namespace librepcb {
  *  Class TraceAnchor
  ******************************************************************************/
 
-TraceAnchor::TraceAnchor(const tl::optional<Uuid>& junction,
-                         const tl::optional<Uuid>& via,
-                         const tl::optional<PadAnchor>& pad) noexcept
+TraceAnchor::TraceAnchor(const std::optional<Uuid>& junction,
+                         const std::optional<Uuid>& via,
+                         const std::optional<PadAnchor>& pad) noexcept
   : mJunction(junction), mVia(via), mPad(pad) {
   Q_ASSERT(((junction) && (!via) && (!pad)) ||
            ((!junction) && (via) && (!pad)) ||
@@ -86,15 +86,15 @@ TraceAnchor& TraceAnchor::operator=(const TraceAnchor& rhs) noexcept {
 }
 
 TraceAnchor TraceAnchor::junction(const Uuid& junction) noexcept {
-  return TraceAnchor(junction, tl::nullopt, tl::nullopt);
+  return TraceAnchor(junction, std::nullopt, std::nullopt);
 }
 
 TraceAnchor TraceAnchor::via(const Uuid& via) noexcept {
-  return TraceAnchor(tl::nullopt, via, tl::nullopt);
+  return TraceAnchor(std::nullopt, via, std::nullopt);
 }
 
 TraceAnchor TraceAnchor::pad(const Uuid& device, const Uuid& pad) noexcept {
-  return TraceAnchor(tl::nullopt, tl::nullopt, PadAnchor{device, pad});
+  return TraceAnchor(std::nullopt, std::nullopt, PadAnchor{device, pad});
 }
 
 /*******************************************************************************

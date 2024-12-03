@@ -76,11 +76,11 @@ private:  // Methods
   void listWidget_currentItemChanged(QListWidgetItem* current,
                                      QListWidgetItem* previous) noexcept;
   void listWidget_itemDoubleClicked(QListWidgetItem* item) noexcept;
-  void setSelectedCategory(const tl::optional<Uuid>& uuid) noexcept;
+  void setSelectedCategory(const std::optional<Uuid>& uuid) noexcept;
   void setSelectedElement(const FilePath& fp) noexcept;
   void setCategoryTreeModel(QAbstractItemModel* model) noexcept;
-  FilePath getCategoryFilePath(const tl::optional<Uuid>& category) const;
-  QSet<Uuid> getElementsByCategory(const tl::optional<Uuid>& category) const;
+  FilePath getCategoryFilePath(const std::optional<Uuid>& category) const;
+  QSet<Uuid> getElementsByCategory(const std::optional<Uuid>& category) const;
   void getElementMetadata(const Uuid& uuid, FilePath& fp, QString& name) const;
   void initializePage() noexcept override;
   void cleanupPage() noexcept override;
@@ -90,7 +90,7 @@ private:  // Data
   QScopedPointer<Ui::NewElementWizardPage_CopyFrom> mUi;
   QScopedPointer<QAbstractItemModel> mCategoryTreeModel;
   bool mIsCategoryElement;
-  tl::optional<Uuid> mSelectedCategoryUuid;
+  std::optional<Uuid> mSelectedCategoryUuid;
   bool mIsComplete;
 };
 

@@ -99,8 +99,8 @@ bool CmdPasteFootprintItems::performExecute() {
     if (pkgPad) {
       pkgPad = mPackage.getPads().find(*pkgPad->getName());
     }
-    tl::optional<Uuid> pkgPadUuid =
-        pkgPad ? pkgPad->getUuid() : tl::optional<Uuid>();
+    std::optional<Uuid> pkgPadUuid =
+        pkgPad ? pkgPad->getUuid() : std::optional<Uuid>();
     std::shared_ptr<FootprintPad> copy = std::make_shared<FootprintPad>(
         uuid, pkgPadUuid, pad.getPosition() + mPosOffset, pad.getRotation(),
         pad.getShape(), pad.getWidth(), pad.getHeight(), pad.getRadius(),

@@ -65,15 +65,15 @@ struct BoardDesignRuleCheckData final {
     PositiveLength drillDiameter;
     const Layer* startLayer;
     const Layer* endLayer;
-    tl::optional<std::pair<const Layer*, const Layer*>> drillLayerSpan;
+    std::optional<std::pair<const Layer*, const Layer*>> drillLayerSpan;
     bool isBuried;
     bool isBlind;
-    tl::optional<PositiveLength> stopMaskDiameterTop;
-    tl::optional<PositiveLength> stopMaskDiameterBot;
+    std::optional<PositiveLength> stopMaskDiameterTop;
+    std::optional<PositiveLength> stopMaskDiameterBot;
   };
   struct Segment {
     Uuid uuid;
-    tl::optional<Uuid> net;
+    std::optional<Uuid> net;
     QString netName;  // Empty if no net.
     QHash<Uuid, Junction> junctions;
     QList<Trace> traces;
@@ -81,11 +81,11 @@ struct BoardDesignRuleCheckData final {
   };
   struct AirWireAnchor {
     Point position;
-    tl::optional<Uuid> device;  // If it's a pad.
-    tl::optional<Uuid> pad;  // If it's a pad.
-    tl::optional<Uuid> segment;  // If it's a junction or via.
-    tl::optional<Uuid> junction;  // If it's a junction.
-    tl::optional<Uuid> via;  // If it's a via.
+    std::optional<Uuid> device;  // If it's a pad.
+    std::optional<Uuid> pad;  // If it's a pad.
+    std::optional<Uuid> segment;  // If it's a junction or via.
+    std::optional<Uuid> junction;  // If it's a junction.
+    std::optional<Uuid> via;  // If it's a via.
   };
   struct AirWire {
     AirWireAnchor p1;
@@ -94,7 +94,7 @@ struct BoardDesignRuleCheckData final {
   };
   struct Plane {
     Uuid uuid;
-    tl::optional<Uuid> net;
+    std::optional<Uuid> net;
     QString netName;  // Empty if no net.
     const Layer* layer;
     UnsignedLength minWidth;
@@ -130,7 +130,7 @@ struct BoardDesignRuleCheckData final {
     Uuid uuid;
     PositiveLength diameter;
     NonEmptyPath path;
-    tl::optional<Length> stopMaskOffset;
+    std::optional<Length> stopMaskOffset;
   };
   struct Zone {
     Uuid uuid;
@@ -149,7 +149,7 @@ struct BoardDesignRuleCheckData final {
     QHash<const Layer*, QList<PadGeometry>> geometries;
     QSet<const Layer*> layersWithTraces;  // Layers where traces are connected.
     UnsignedLength copperClearance;
-    tl::optional<Uuid> net;
+    std::optional<Uuid> net;
     QString netName;  // Empty if no net.
   };
   struct Device {

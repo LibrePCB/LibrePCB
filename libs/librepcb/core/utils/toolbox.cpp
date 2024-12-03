@@ -61,11 +61,11 @@ QPainterPath Toolbox::shapeFromPath(const QPainterPath& path, const QPen& pen,
   }
 }
 
-tl::optional<Length> Toolbox::arcRadius(const Point& p1, const Point& p2,
-                                        const Angle& angle) noexcept {
+std::optional<Length> Toolbox::arcRadius(const Point& p1, const Point& p2,
+                                         const Angle& angle) noexcept {
   const Angle angleMapped = angle.mappedTo180deg();
   if ((angleMapped == 0) || (p1 == p2)) {
-    return tl::nullopt;  // Given input is a straight line.
+    return std::nullopt;  // Given input is a straight line.
   }
 
   const qreal x1 = p1.getX().toMm();
@@ -77,15 +77,15 @@ tl::optional<Length> Toolbox::arcRadius(const Point& p1, const Point& p2,
   if (Length::isValidMm(r)) {
     return Length::fromMm(r);
   } else {
-    return tl::nullopt;  // Too large radius.
+    return std::nullopt;  // Too large radius.
   }
 }
 
-tl::optional<Point> Toolbox::arcCenter(const Point& p1, const Point& p2,
-                                       const Angle& angle) noexcept {
+std::optional<Point> Toolbox::arcCenter(const Point& p1, const Point& p2,
+                                        const Angle& angle) noexcept {
   const Angle angleMapped = angle.mappedTo180deg();
   if ((angleMapped == 0) || (p1 == p2)) {
-    return tl::nullopt;  // Given input is a straight line.
+    return std::nullopt;  // Given input is a straight line.
   }
 
   // http://math.stackexchange.com/questions/27535/how-to-find-center-of-an-arc-given-start-point-end-point-radius-and-arc-direc
@@ -105,7 +105,8 @@ tl::optional<Point> Toolbox::arcCenter(const Point& p1, const Point& p2,
   if (Length::isValidMm(a) && Length::isValidMm(b)) {
     return Point::fromMm(a, b);
   } else {
-    return tl::nullopt;  // Center too far away, consider it as a straight line.
+    return std::nullopt;  // Center too far away, consider it as a straight
+                          // line.
   }
 }
 

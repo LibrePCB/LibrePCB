@@ -69,7 +69,7 @@ public:
   void setErrorText(const QString& error) noexcept;
 
   // General Methods
-  bool updateText(const tl::optional<Uuid>& category) noexcept;
+  bool updateText(const std::optional<Uuid>& category) noexcept;
 
   // Operator Overloadings
   CategoryTreeLabelTextBuilder& operator=(

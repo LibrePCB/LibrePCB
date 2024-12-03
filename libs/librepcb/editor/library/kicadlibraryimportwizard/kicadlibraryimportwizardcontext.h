@@ -25,9 +25,10 @@
  ******************************************************************************/
 #include <librepcb/core/fileio/filepath.h>
 #include <librepcb/core/types/uuid.h>
-#include <optional/tl/optional.hpp>
 
 #include <QtCore>
+
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -70,10 +71,10 @@ public:
   const FilePath& getLibsPath() const noexcept { return mLibsPath; }
   const FilePath& getShapes3dPath() const noexcept { return mShapes3dPath; }
   bool getAddNamePrefix() const noexcept { return mAddNamePrefix; }
-  const tl::optional<Uuid>& getComponentCategory() const noexcept {
+  const std::optional<Uuid>& getComponentCategory() const noexcept {
     return mComponentCategoryUuid;
   }
-  const tl::optional<Uuid>& getPackageCategory() const noexcept {
+  const std::optional<Uuid>& getPackageCategory() const noexcept {
     return mPackageCategoryUuid;
   }
   kicadimport::KiCadLibraryImport& getImport() const noexcept {
@@ -84,8 +85,8 @@ public:
   void setLibsPath(const QString& libsPath, const QString& shapes3dPath,
                    std::shared_ptr<MessageLogger> log) noexcept;
   void setAddNamePrefix(bool add) noexcept;
-  void setComponentCategory(const tl::optional<Uuid>& uuid) noexcept;
-  void setPackageCategory(const tl::optional<Uuid>& uuid) noexcept;
+  void setComponentCategory(const std::optional<Uuid>& uuid) noexcept;
+  void setPackageCategory(const std::optional<Uuid>& uuid) noexcept;
 
   // Operator Overloadings
   KiCadLibraryImportWizardContext& operator=(
@@ -99,8 +100,8 @@ private:  // Data
   FilePath mLibsPath;
   FilePath mShapes3dPath;
   bool mAddNamePrefix;
-  tl::optional<Uuid> mComponentCategoryUuid;
-  tl::optional<Uuid> mPackageCategoryUuid;
+  std::optional<Uuid> mComponentCategoryUuid;
+  std::optional<Uuid> mPackageCategoryUuid;
   QScopedPointer<kicadimport::KiCadLibraryImport> mImport;
 };
 

@@ -75,7 +75,7 @@ public:
   bool isSlot() const noexcept;
   bool isMultiSegmentSlot() const noexcept;
   bool isCurvedSlot() const noexcept;
-  tl::optional<Length> getPreviewStopMaskOffset() const noexcept;
+  std::optional<Length> getPreviewStopMaskOffset() const noexcept;
 
   // Setters
   bool setDiameter(const PositiveLength& diameter) noexcept;

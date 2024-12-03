@@ -46,7 +46,7 @@ StrokeTextGraphicsItem::StrokeTextGraphicsItem(
     mText(text),
     mLayerProvider(lp),
     mFont(font),
-    mTextOverride(tl::nullopt),
+    mTextOverride(std::nullopt),
     mPathGraphicsItem(new PrimitivePathGraphicsItem(this)),
     mOriginCrossGraphicsItem(new OriginCrossGraphicsItem(this)),
     mOnEditedSlot(*this, &StrokeTextGraphicsItem::strokeTextEdited) {
@@ -74,7 +74,7 @@ StrokeTextGraphicsItem::~StrokeTextGraphicsItem() noexcept {
  ******************************************************************************/
 
 void StrokeTextGraphicsItem::setTextOverride(
-    const tl::optional<QString>& text) noexcept {
+    const std::optional<QString>& text) noexcept {
   if (text != mTextOverride) {
     mTextOverride = text;
     updateText();

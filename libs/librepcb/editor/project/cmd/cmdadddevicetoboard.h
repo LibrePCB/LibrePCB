@@ -56,8 +56,8 @@ public:
   // Constructors / Destructor
   CmdAddDeviceToBoard(Workspace& workspace, Board& board,
                       ComponentInstance& cmpInstance, const Uuid& deviceUuid,
-                      const tl::optional<Uuid>& footprintUuid,
-                      const tl::optional<Uuid>& preferredModelUuid,
+                      const std::optional<Uuid>& footprintUuid,
+                      const std::optional<Uuid>& preferredModelUuid,
                       const Point& position = Point(),
                       const Angle& rotation = Angle(),
                       bool mirror = false) noexcept;
@@ -79,8 +79,8 @@ private:
   Board& mBoard;
   ComponentInstance& mComponentInstance;
   Uuid mDeviceUuid;
-  tl::optional<Uuid> mFootprintUuid;
-  tl::optional<Uuid> mPreferredModelUuid;
+  std::optional<Uuid> mFootprintUuid;
+  std::optional<Uuid> mPreferredModelUuid;
   Point mPosition;
   Angle mRotation;
   bool mMirror;

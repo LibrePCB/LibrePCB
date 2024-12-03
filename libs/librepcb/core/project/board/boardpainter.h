@@ -65,8 +65,8 @@ class BoardPainter final : public GraphicsPagePainter {
     PositiveLength drill;
     const Layer* startLayer;
     const Layer* endLayer;
-    tl::optional<PositiveLength> stopMaskDiameterTop;
-    tl::optional<PositiveLength> stopMaskDiameterBottom;
+    std::optional<PositiveLength> stopMaskDiameterTop;
+    std::optional<PositiveLength> stopMaskDiameterBottom;
   };
 
   struct Pad {
@@ -86,7 +86,7 @@ class BoardPainter final : public GraphicsPagePainter {
   struct HoleData {
     PositiveLength diameter;
     NonEmptyPath path;
-    tl::optional<Length> stopMaskOffset;
+    std::optional<Length> stopMaskOffset;
   };
 
   struct StrokeTextData {

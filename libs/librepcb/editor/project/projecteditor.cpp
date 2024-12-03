@@ -60,7 +60,7 @@ namespace editor {
 
 ProjectEditor::ProjectEditor(
     Workspace& workspace, Project& project,
-    const tl::optional<QList<FileFormatMigration::Message>>& upgradeMessages)
+    const std::optional<QList<FileFormatMigration::Message>>& upgradeMessages)
   : QObject(nullptr),
     mWorkspace(workspace),
     mProject(project),
@@ -157,7 +157,7 @@ const LengthUnit& ProjectEditor::getDefaultLengthUnit() const noexcept {
 
 ResourceList ProjectEditor::getComponentResources(
     const ComponentInstance& cmp,
-    const tl::optional<Uuid>& filterDev) const noexcept {
+    const std::optional<Uuid>& filterDev) const noexcept {
   // Helper to skip duplicate URLs.
   ResourceList resources;
   QSet<QUrl> urls;
@@ -229,7 +229,7 @@ ResourceList ProjectEditor::getComponentResources(
 
 void ProjectEditor::addResourcesToMenu(MenuBuilder& mb,
                                        const ComponentInstance& cmp,
-                                       const tl::optional<Uuid>& filterDev,
+                                       const std::optional<Uuid>& filterDev,
                                        QPointer<QWidget> editor,
                                        QMenu* root) const noexcept {
   // Get all relevant resources.

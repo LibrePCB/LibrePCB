@@ -87,8 +87,8 @@ void SceneData3D::addVia(
     const Point& position, const PositiveLength& size,
     const PositiveLength& drillDiameter, const Layer& startLayer,
     const Layer& endLayer,
-    const tl::optional<PositiveLength>& stopMaskDiameterTop,
-    const tl::optional<PositiveLength>& stopMaskDiameterBottom) noexcept {
+    const std::optional<PositiveLength>& stopMaskDiameterTop,
+    const std::optional<PositiveLength>& stopMaskDiameterBottom) noexcept {
   mVias.append(ViaData{position, size, drillDiameter, &startLayer, &endLayer,
                        stopMaskDiameterTop, stopMaskDiameterBottom});
 }
