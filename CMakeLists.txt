@@ -105,10 +105,10 @@ if(WIN32)
   add_definitions(-DUNICODE -D_UNICODE)
 endif()
 
-# Disable Qt functions which are deprecated in Qt <= 5.12 to enforce us
+# Disable Qt functions which are deprecated in Qt <= 6.2 to enforce us
 # migrating away from them. Always set this to the lowest Qt version we want
 # to support.
-add_definitions(-DQT_DISABLE_DEPRECATED_BEFORE=0x050C00)
+add_definitions(-DQT_DISABLE_DEPRECATED_BEFORE=0x060200)
 
 # Not sure what we should do with deprecation warnings. Better keeping
 # backwards compatibility with already existing & supported environments

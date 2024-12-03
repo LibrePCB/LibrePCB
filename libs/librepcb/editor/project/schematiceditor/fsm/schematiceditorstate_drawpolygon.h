@@ -30,6 +30,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -99,7 +101,7 @@ private:  // Data
   // Information about the current polygon to place. Only valid if
   // mIsUndoCmdActive == true.
   SI_Polygon* mCurrentPolygon;
-  QScopedPointer<CmdPolygonEdit> mCurrentPolygonEditCmd;
+  std::unique_ptr<CmdPolygonEdit> mCurrentPolygonEditCmd;
 };
 
 /*******************************************************************************

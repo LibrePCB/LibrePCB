@@ -43,13 +43,13 @@ KeyboardShortcutsModel::KeyboardShortcutsModel(QObject* parent) noexcept
     if (!category->isConfigurable()) {
       continue;
     }
-    QScopedPointer<Category> cat(new Category{category, {}});
+    std::unique_ptr<Category> cat(new Category{category, {}});
     foreach (const EditorCommand* command,
              EditorCommandSet::instance().getCommands(category)) {
       cat->commands.append(command);
     }
     if (!cat->commands.isEmpty()) {
-      mCategories.append(cat.take());
+      mCategories.append(cat.release());
     }
   }
 }

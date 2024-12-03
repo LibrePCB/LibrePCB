@@ -30,6 +30,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -132,14 +134,14 @@ private:  // Data
 
   SubState mSubState;  ///< the current substate
   Point mStartPos;
-  QScopedPointer<CmdDragSelectedSchematicItems> mSelectedItemsDragCommand;
+  std::unique_ptr<CmdDragSelectedSchematicItems> mSelectedItemsDragCommand;
 
   /// The current polygon selected for editing (nullptr if none)
   SI_Polygon* mSelectedPolygon;
   /// The polygon vertex indices selected for editing (empty if none)
   QVector<int> mSelectedPolygonVertices;
   /// The polygon edit command (nullptr if not editing)
-  QScopedPointer<CmdPolygonEdit> mCmdPolygonEdit;
+  std::unique_ptr<CmdPolygonEdit> mCmdPolygonEdit;
 };
 
 /*******************************************************************************

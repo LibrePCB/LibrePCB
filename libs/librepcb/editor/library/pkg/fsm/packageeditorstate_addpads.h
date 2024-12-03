@@ -110,7 +110,7 @@ signals:
 
 private:  // Types / Data
   PadType mPadType;
-  QScopedPointer<CmdFootprintPadEdit> mEditCmd;
+  std::unique_ptr<CmdFootprintPadEdit> mEditCmd;
   std::shared_ptr<FootprintPad> mCurrentPad;
   std::shared_ptr<FootprintPadGraphicsItem> mCurrentGraphicsItem;
   PackagePadComboBox* mPackagePadComboBox;

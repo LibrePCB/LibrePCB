@@ -259,7 +259,7 @@ bool AssemblyVariantListModel::setData(const QModelIndex& index,
   try {
     std::shared_ptr<AssemblyVariant> item =
         mCircuit->getAssemblyVariants().value(index.row());
-    QScopedPointer<CmdAssemblyVariantEdit> cmd;
+    std::unique_ptr<CmdAssemblyVariantEdit> cmd;
     if (item) {
       cmd.reset(new CmdAssemblyVariantEdit(*mCircuit, item));
     }
@@ -278,7 +278,7 @@ bool AssemblyVariantListModel::setData(const QModelIndex& index,
       return false;  // do not execute command!
     }
     if (cmd) {
-      execCmd(cmd.take());
+      execCmd(cmd.release());
     } else if (!item) {
       emit dataChanged(index, index);
       return true;

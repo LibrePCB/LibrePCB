@@ -27,6 +27,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -98,7 +100,7 @@ private:  // Methods
   FilePath getPathToLibDir() noexcept;
 
 private:  // Data
-  QScopedPointer<FileDownload> mFileDownload;
+  std::unique_ptr<FileDownload> mFileDownload;
   FilePath mDestDir;
   FilePath mTempDestDir;
   FilePath mTempZipFile;

@@ -217,7 +217,7 @@ bool BoardEditorState_DrawPolygon::addSegment(const Point& pos) noexcept {
   try {
     // Finish undo command to allow reverting segment by segment
     if (mCurrentPolygonEditCmd) {
-      mContext.undoStack.appendToCmdGroup(mCurrentPolygonEditCmd.take());
+      mContext.undoStack.appendToCmdGroup(mCurrentPolygonEditCmd.release());
     }
     mContext.undoStack.commitCmdGroup();
     mIsUndoCmdActive = false;

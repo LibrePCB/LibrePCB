@@ -29,6 +29,7 @@
 
 #include <QtCore>
 
+#include <memory>
 #include <optional.hpp>
 
 /*******************************************************************************
@@ -107,7 +108,7 @@ private:  // Data
   // Information about the current via to place. Only valid if
   // mIsUndoCmdActive == true.
   BI_Via* mCurrentViaToPlace;
-  QScopedPointer<CmdBoardViaEdit> mCurrentViaEditCmd;
+  std::unique_ptr<CmdBoardViaEdit> mCurrentViaEditCmd;
 
   // Widgets for the command toolbar
   QPointer<QComboBox> mNetSignalComboBox;

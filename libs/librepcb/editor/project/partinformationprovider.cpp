@@ -454,7 +454,7 @@ void PartInformationProvider::partsInformationReceived(
     const QJsonObject& json) noexcept {
   const qint64 timestamp = QDateTime::currentSecsSinceEpoch();
   const auto parts = json["parts"].toArray();
-  foreach (const QJsonValue& partJson, parts) {
+  for (const QJsonValue& partJson : parts) {
     const QJsonObject partObj = partJson.toObject();
     const Part part{
         partObj["mpn"].toString(),
@@ -473,11 +473,13 @@ void PartInformationProvider::partsInformationReceived(
     if (availability != INT_MIN) {
       info->availability = availability;
     }
-    foreach (const QJsonValue& priceJson, partJson["prices"].toArray()) {
+    const auto pricesArray = partJson["prices"].toArray();
+    for (const QJsonValue& priceJson : pricesArray) {
       info->prices.insert(priceJson["quantity"].toInt(),
                           priceJson["price"].toDouble());
     }
-    foreach (const QJsonValue& resJson, partJson["resources"].toArray()) {
+    const auto resourcesArray = partJson["resources"].toArray();
+    for (const QJsonValue& resJson : resourcesArray) {
       info->resources.append(PartResource{
           resJson["name"].toString(),
           resJson["mediatype"].toString(),

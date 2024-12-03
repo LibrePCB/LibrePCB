@@ -401,7 +401,7 @@ void SymbolEditorWidget::updateMetadata() noexcept {
 
 QString SymbolEditorWidget::commitMetadata() noexcept {
   try {
-    QScopedPointer<CmdLibraryElementEdit> cmd(
+    std::unique_ptr<CmdLibraryElementEdit> cmd(
         new CmdLibraryElementEdit(*mSymbol, tr("Edit symbol metadata")));
     try {
       // throws on invalid name
@@ -420,7 +420,7 @@ QString SymbolEditorWidget::commitMetadata() noexcept {
     cmd->setCategories(mCategoriesEditorWidget->getUuids());
 
     // Commit all changes.
-    mUndoStack->execCmd(cmd.take());  // can throw
+    mUndoStack->execCmd(cmd.release());  // can throw
 
     // Reload metadata into widgets to discard invalid input.
     updateMetadata();
@@ -568,27 +568,27 @@ void SymbolEditorWidget::fixMsg(const MsgMissingSymbolValue& msg) {
 template <>
 void SymbolEditorWidget::fixMsg(const MsgWrongSymbolTextLayer& msg) {
   std::shared_ptr<Text> text = mSymbol->getTexts().get(msg.getText().get());
-  QScopedPointer<CmdTextEdit> cmd(new CmdTextEdit(*text));
+  std::unique_ptr<CmdTextEdit> cmd(new CmdTextEdit(*text));
   cmd->setLayer(msg.getExpectedLayer(), false);
-  mUndoStack->execCmd(cmd.take());
+  mUndoStack->execCmd(cmd.release());
 }
 
 template <>
 void SymbolEditorWidget::fixMsg(const MsgSymbolPinNotOnGrid& msg) {
   std::shared_ptr<SymbolPin> pin = mSymbol->getPins().get(msg.getPin().get());
   Point newPos = pin->getPosition().mappedToGrid(msg.getGridInterval());
-  QScopedPointer<CmdSymbolPinEdit> cmd(new CmdSymbolPinEdit(pin));
+  std::unique_ptr<CmdSymbolPinEdit> cmd(new CmdSymbolPinEdit(pin));
   cmd->setPosition(newPos, false);
-  mUndoStack->execCmd(cmd.take());
+  mUndoStack->execCmd(cmd.release());
 }
 
 template <>
 void SymbolEditorWidget::fixMsg(
     const MsgNonFunctionalSymbolPinInversionSign& msg) {
   std::shared_ptr<SymbolPin> pin = mSymbol->getPins().get(msg.getPin().get());
-  QScopedPointer<CmdSymbolPinEdit> cmd(new CmdSymbolPinEdit(pin));
+  std::unique_ptr<CmdSymbolPinEdit> cmd(new CmdSymbolPinEdit(pin));
   cmd->setName(CircuitIdentifier("!" % pin->getName()->mid(1)), false);
-  mUndoStack->execCmd(cmd.take());
+  mUndoStack->execCmd(cmd.release());
 }
 
 template <>

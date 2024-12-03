@@ -76,7 +76,7 @@ bool CmdReplaceDevice::performExecute() {
   foreach (BI_FootprintPad* pad, mDeviceInstance.getPads()) {
     BI_NetSegment* netsegment = pad->getNetSegmentOfLines();
     if (netsegment) {
-      QScopedPointer<CmdBoardNetSegmentAddElements> cmdAdd(
+      std::unique_ptr<CmdBoardNetSegmentAddElements> cmdAdd(
           new CmdBoardNetSegmentAddElements(*netsegment));
       QMap<const Layer*, BI_NetPoint*> newNetPoints = {};
       QSet<BI_NetLine*> connectedNetLines = pad->getNetLines();
@@ -91,11 +91,11 @@ bool CmdReplaceDevice::performExecute() {
                              netline->getLayer(), netline->getWidth());
         }
       }
-      execNewChildCmd(cmdAdd.take());
-      QScopedPointer<CmdRemoveBoardItems> cmdRemove(
+      execNewChildCmd(cmdAdd.release());
+      std::unique_ptr<CmdRemoveBoardItems> cmdRemove(
           new CmdRemoveBoardItems(netsegment->getBoard()));
       cmdRemove->removeNetLines(pad->getNetLines());
-      execNewChildCmd(cmdRemove.take());  // can throw
+      execNewChildCmd(cmdRemove.release());  // can throw
     }
   }
 
@@ -123,11 +123,11 @@ bool CmdReplaceDevice::performExecute() {
           options.remove(i);
         }
       }
-      QScopedPointer<CmdComponentInstanceEdit> cmd(
+      std::unique_ptr<CmdComponentInstanceEdit> cmd(
           new CmdComponentInstanceEdit(mDeviceInstance.getCircuit(),
                                        mDeviceInstance.getComponentInstance()));
       cmd->setAssemblyOptions(options);
-      execNewChildCmd(cmd.take());
+      execNewChildCmd(cmd.release());
     }
   }
 

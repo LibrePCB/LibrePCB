@@ -216,7 +216,7 @@ void ComponentEditorWidget::updateMetadata() noexcept {
 
 QString ComponentEditorWidget::commitMetadata() noexcept {
   try {
-    QScopedPointer<CmdComponentEdit> cmd(new CmdComponentEdit(*mComponent));
+    std::unique_ptr<CmdComponentEdit> cmd(new CmdComponentEdit(*mComponent));
     try {
       // throws on invalid name
       cmd->setName("", ElementName(mUi->edtName->text().trimmed()));
@@ -261,7 +261,7 @@ QString ComponentEditorWidget::commitMetadata() noexcept {
     cmd->setDefaultValue(mUi->edtDefaultValue->toPlainText().trimmed());
 
     // Commit all changes.
-    mUndoStack->execCmd(cmd.take());  // can throw
+    mUndoStack->execCmd(cmd.release());  // can throw
 
     // Reload metadata into widgets to discard invalid input.
     updateMetadata();
@@ -352,8 +352,11 @@ void ComponentEditorWidget::fixMsg(const MsgMissingComponentDefaultValue& msg) {
   QString question =
       tr("Is this rather a (manufacturer-)specific component than a generic "
          "component?");
-  int answer = QMessageBox::question(this, title, question, QMessageBox::Cancel,
-                                     QMessageBox::Yes, QMessageBox::No);
+  int answer = QMessageBox::question(this, title, question,
+                                     QMessageBox::StandardButton::Yes |
+                                         QMessageBox::StandardButton::No |
+                                         QMessageBox::StandardButton::Cancel,
+                                     QMessageBox::StandardButton::Cancel);
   if (answer == QMessageBox::Yes) {
     mUi->edtDefaultValue->setPlainText("{{MPN or DEVICE or COMPONENT}}");
     commitMetadata();
@@ -378,10 +381,10 @@ void ComponentEditorWidget::fixMsg(
     const MsgNonFunctionalComponentSignalInversionSign& msg) {
   std::shared_ptr<ComponentSignal> signal =
       mComponent->getSignals().get(msg.getSignal().get());
-  QScopedPointer<CmdComponentSignalEdit> cmd(
+  std::unique_ptr<CmdComponentSignalEdit> cmd(
       new CmdComponentSignalEdit(*signal));
   cmd->setName(CircuitIdentifier("!" % signal->getName()->mid(1)));
-  mUndoStack->execCmd(cmd.take());
+  mUndoStack->execCmd(cmd.release());
 }
 
 template <>

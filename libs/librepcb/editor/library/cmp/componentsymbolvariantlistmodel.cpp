@@ -305,7 +305,7 @@ bool ComponentSymbolVariantListModel::setData(const QModelIndex& index,
   try {
     std::shared_ptr<ComponentSymbolVariant> item =
         mSymbolVariantList->value(index.row());
-    QScopedPointer<CmdComponentSymbolVariantEdit> cmd;
+    std::unique_ptr<CmdComponentSymbolVariantEdit> cmd;
     if (item) {
       cmd.reset(new CmdComponentSymbolVariantEdit(*item));
     }
@@ -341,7 +341,7 @@ bool ComponentSymbolVariantListModel::setData(const QModelIndex& index,
       return false;  // do not execute command!
     }
     if (cmd) {
-      execCmd(cmd.take());
+      execCmd(cmd.release());
     } else if (!item) {
       emit dataChanged(index, index);
     }

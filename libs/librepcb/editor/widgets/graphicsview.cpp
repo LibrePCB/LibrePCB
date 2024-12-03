@@ -335,7 +335,7 @@ void GraphicsView::hideWaitingSpinner() noexcept {
  ******************************************************************************/
 
 void GraphicsView::zoomAnimationValueChanged(const QVariant& value) noexcept {
-  if (value.canConvert(QMetaType::QRectF))
+  if (value.canConvert<QRectF>())
     fitInView(value.toRectF(), Qt::KeepAspectRatio);  // zoom smoothly
 }
 

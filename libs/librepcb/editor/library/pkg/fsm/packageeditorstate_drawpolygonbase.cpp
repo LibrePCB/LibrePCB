@@ -347,7 +347,7 @@ bool PackageEditorState_DrawPolygonBase::addNextSegment() noexcept {
 
     // Commit current polygon segment.
     mEditCmd->setPath(Path(vertices), true);
-    mContext.undoStack.appendToCmdGroup(mEditCmd.take());
+    mContext.undoStack.appendToCmdGroup(mEditCmd.release());
     mContext.undoStack.commitCmdGroup();
     mIsUndoCmdActive = false;
 

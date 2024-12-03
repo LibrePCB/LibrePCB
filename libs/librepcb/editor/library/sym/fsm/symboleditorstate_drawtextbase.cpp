@@ -63,7 +63,7 @@ SymbolEditorState_DrawTextBase::SymbolEditorState_DrawTextBase(
 }
 
 SymbolEditorState_DrawTextBase::~SymbolEditorState_DrawTextBase() noexcept {
-  Q_ASSERT(mEditCmd.isNull());
+  Q_ASSERT(!mEditCmd);
 }
 
 /*******************************************************************************
@@ -274,7 +274,7 @@ bool SymbolEditorState_DrawTextBase::finishAddText(const Point& pos) noexcept {
     mCurrentGraphicsItem->setSelected(false);
     mCurrentGraphicsItem.reset();
     mCurrentText.reset();
-    mContext.undoStack.appendToCmdGroup(mEditCmd.take());
+    mContext.undoStack.appendToCmdGroup(mEditCmd.release());
     mContext.undoStack.commitCmdGroup();
     return true;
   } catch (const Exception& e) {

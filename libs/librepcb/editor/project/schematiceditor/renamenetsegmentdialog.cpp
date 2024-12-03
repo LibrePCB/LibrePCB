@@ -116,10 +116,10 @@ void RenameNetSegmentDialog::accept() noexcept {
     CircuitIdentifier name(mNewNetName);  // can throw
     switch (mAction) {
       case Action::RENAME_NETSIGNAL: {
-        QScopedPointer<CmdNetSignalEdit> cmd(new CmdNetSignalEdit(
+        std::unique_ptr<CmdNetSignalEdit> cmd(new CmdNetSignalEdit(
             mNetSegment.getCircuit(), mNetSegment.getNetSignal()));
         cmd->setName(name, false);
-        mUndoStack.execCmd(cmd.take());  // can throw
+        mUndoStack.execCmd(cmd.release());  // can throw
         break;
       }
       case Action::MERGE_NETSIGNALS: {

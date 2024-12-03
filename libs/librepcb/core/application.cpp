@@ -246,9 +246,9 @@ void Application::setTranslationLocale(const QLocale& locale) noexcept {
 
   // Install Qt translations
   QTranslator* qtTranslator = new QTranslator(qApp);
-  std::ignore = qtTranslator->load(
-      "qt_" % locale.name(),
-      QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+  std::ignore =
+      qtTranslator->load("qt_" % locale.name(),
+                         QLibraryInfo::path(QLibraryInfo::TranslationsPath));
   qApp->installTranslator(qtTranslator);
   installedTranslators.append(qtTranslator);
 

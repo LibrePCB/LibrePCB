@@ -179,7 +179,7 @@ public:
           *this,
           &SerializableObjectList<T, P,
                                   OnEditedArgs...>::elementEditedHandler) {
-    foreach (const std::shared_ptr<T>& obj, elements) {
+    for (const std::shared_ptr<T>& obj : elements) {
       append(obj);
     }
   }
@@ -201,7 +201,7 @@ public:
   std::vector<Uuid> getUuids() const noexcept {
     std::vector<Uuid> uuids;
     uuids.reserve(mObjects.count());
-    foreach (const std::shared_ptr<T>& obj, mObjects) {
+    for (const std::shared_ptr<T>& obj : mObjects) {
       uuids.push_back(obj->getUuid());
     }
     return uuids;
@@ -209,7 +209,7 @@ public:
   QSet<Uuid> getUuidSet() const noexcept {
     QSet<Uuid> uuids;
     uuids.reserve(mObjects.count());
-    foreach (const std::shared_ptr<T>& obj, mObjects) {
+    for (const std::shared_ptr<T>& obj : mObjects) {
       uuids.insert(obj->getUuid());
     }
     return uuids;
@@ -344,7 +344,7 @@ public:
   }
   void append(SerializableObjectList& list) noexcept {  // shallow -> NOT const!
     mObjects.reserve(mObjects.count() + list.count());
-    foreach (const std::shared_ptr<T>& ptr, list.mObjects) {
+    for (const std::shared_ptr<T>& ptr : list.mObjects) {
       append(ptr);  // copy only the pointer, NOT the object
     }
   }
@@ -377,7 +377,7 @@ public:
    * @param root    Root node to serialize into.
    */
   void serialize(SExpression& root) const {
-    foreach (const std::shared_ptr<T>& ptr, mObjects) {
+    for (const std::shared_ptr<T>& ptr : mObjects) {
       root.ensureLineBreak();
       ptr->serialize(root.appendList(P::tagname));  // can throw
     }
@@ -428,7 +428,7 @@ public:
       const SerializableObjectList<T, P, OnEditedArgs...>& rhs) noexcept {
     clear();
     mObjects.reserve(rhs.count());
-    foreach (const std::shared_ptr<T>& ptr, rhs.mObjects) {
+    for (const std::shared_ptr<T>& ptr : rhs.mObjects) {
       append(copyObject(
           *ptr, typename std::is_nothrow_copy_constructible<T>::type()));
     }
@@ -438,7 +438,7 @@ public:
       SerializableObjectList<T, P, OnEditedArgs...>&& rhs) noexcept {
     clear();
     mObjects.reserve(rhs.count());
-    foreach (const std::shared_ptr<T>& ptr, rhs.mObjects) {
+    for (const std::shared_ptr<T>& ptr : rhs.mObjects) {
       append(ptr);  // copy only the pointer, NOT the object
     }
     rhs.clear();
@@ -510,9 +510,9 @@ protected:  // Data
 }  // namespace librepcb
 
 /*******************************************************************************
- * Prevent from using SerializableObjectList in a foreach loop because it always
- *would create a deep copy of the list! You should use C++11 range based for
- *loops instead.
+ * Prevent from using SerializableObjectList in a foreach loop because it
+ * always would create a deep copy of the list! You should use C++11 range
+ * based for loops instead.
  ******************************************************************************/
 namespace QtPrivate {
 

@@ -67,8 +67,8 @@ OnlineLibraryListWidgetItem::OnlineLibraryListWidgetItem(
       mJsonObject.value("description").toObject().value("default").toString();
   QString author = mJsonObject.value("author").toString();
   QUrl iconUrl = QUrl(mJsonObject.value("icon_url").toString());
-  foreach (const QJsonValue& value,
-           mJsonObject.value("dependencies").toArray()) {
+  const auto dependenciesArray = mJsonObject.value("dependencies").toArray();
+  for (const QJsonValue& value : dependenciesArray) {
     tl::optional<Uuid> uuid = Uuid::tryFromString(value.toString());
     if (uuid) {
       mDependencies.insert(*uuid);

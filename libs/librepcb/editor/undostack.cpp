@@ -157,7 +157,7 @@ void UndoStack::setClean() noexcept {
 bool UndoStack::execCmd(UndoCommand* cmd, bool forceKeepCmd) {
   // make sure "cmd" is deleted when going out of scope (e.g. because of an
   // exception)
-  QScopedPointer<UndoCommand> cmdScopeGuard(cmd);
+  std::unique_ptr<UndoCommand> cmdScopeGuard(cmd);
 
   if (isCommandGroupActive()) {
     throw RuntimeError(
@@ -184,7 +184,7 @@ bool UndoStack::execCmd(UndoCommand* cmd, bool forceKeepCmd) {
 
     // add command to the command stack
     mCommands.append(
-        cmdScopeGuard.take());  // move ownership of "cmd" to "mCommands"
+        cmdScopeGuard.release());  // move ownership of "cmd" to "mCommands"
     mCurrentIndex++;
 
     // emit signals
@@ -221,7 +221,7 @@ void UndoStack::beginCmdGroup(const QString& text) {
 bool UndoStack::appendToCmdGroup(UndoCommand* cmd) {
   // make sure "cmd" is deleted when going out of scope (e.g. because of an
   // exception)
-  QScopedPointer<UndoCommand> cmdScopeGuard(cmd);
+  std::unique_ptr<UndoCommand> cmdScopeGuard(cmd);
 
   if (!isCommandGroupActive()) {
     throw LogicError(__FILE__, __LINE__, tr("No command group active!"));
@@ -232,7 +232,7 @@ bool UndoStack::appendToCmdGroup(UndoCommand* cmd) {
   // append new command as a child of active command group
   // note: this will also execute the new command!
   bool commandHasDoneSomething =
-      mActiveCommandGroup->appendChild(cmdScopeGuard.take());  // can throw
+      mActiveCommandGroup->appendChild(cmdScopeGuard.release());  // can throw
 
   // emit signals
   emit stateModified();

@@ -31,6 +31,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -94,7 +96,7 @@ private:  // Data
   // Information about the current zone to place. Only valid if
   // mIsUndoCmdActive == true.
   BI_Zone* mCurrentZone;
-  QScopedPointer<CmdBoardZoneEdit> mCurrentZoneEditCmd;
+  std::unique_ptr<CmdBoardZoneEdit> mCurrentZoneEditCmd;
 };
 
 /*******************************************************************************

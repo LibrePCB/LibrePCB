@@ -60,7 +60,7 @@ SymbolEditorState_DrawCircle::SymbolEditorState_DrawCircle(
 }
 
 SymbolEditorState_DrawCircle::~SymbolEditorState_DrawCircle() noexcept {
-  Q_ASSERT(mEditCmd.isNull());
+  Q_ASSERT(!mEditCmd);
 }
 
 /*******************************************************************************
@@ -216,7 +216,7 @@ bool SymbolEditorState_DrawCircle::finishAddCircle(const Point& pos) noexcept {
     mCurrentGraphicsItem->setSelected(false);
     mCurrentGraphicsItem.reset();
     mCurrentCircle.reset();
-    mContext.undoStack.appendToCmdGroup(mEditCmd.take());
+    mContext.undoStack.appendToCmdGroup(mEditCmd.release());
     mContext.undoStack.commitCmdGroup();
     return true;
   } catch (const Exception& e) {

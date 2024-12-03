@@ -53,18 +53,18 @@ CmdBoardSplitNetLine::~CmdBoardSplitNetLine() noexcept {
  ******************************************************************************/
 
 bool CmdBoardSplitNetLine::performExecute() {
-  QScopedPointer<CmdBoardNetSegmentAddElements> cmdAdd(
+  std::unique_ptr<CmdBoardNetSegmentAddElements> cmdAdd(
       new CmdBoardNetSegmentAddElements(mOldNetLine.getNetSegment()));
   cmdAdd->addNetPoint(*mSplitPoint);
   cmdAdd->addNetLine(*mSplitPoint, mOldNetLine.getStartPoint(),
                      mOldNetLine.getLayer(), mOldNetLine.getWidth());
   cmdAdd->addNetLine(*mSplitPoint, mOldNetLine.getEndPoint(),
                      mOldNetLine.getLayer(), mOldNetLine.getWidth());
-  QScopedPointer<CmdBoardNetSegmentRemoveElements> cmdRemove(
+  std::unique_ptr<CmdBoardNetSegmentRemoveElements> cmdRemove(
       new CmdBoardNetSegmentRemoveElements(mOldNetLine.getNetSegment()));
   cmdRemove->removeNetLine(mOldNetLine);
-  appendChild(cmdAdd.take());
-  appendChild(cmdRemove.take());
+  appendChild(cmdAdd.release());
+  appendChild(cmdRemove.release());
   return UndoCommandGroup::performExecute();
 }
 

@@ -29,6 +29,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -109,7 +111,7 @@ private:  // Data
   // Information about the current text to place. Only valid if
   // mIsUndoCmdActive == true.
   BI_StrokeText* mCurrentTextToPlace;
-  QScopedPointer<CmdBoardStrokeTextEdit> mCurrentTextEditCmd;
+  std::unique_ptr<CmdBoardStrokeTextEdit> mCurrentTextEditCmd;
 
   // Widgets for the command toolbar
   QPointer<LayerComboBox> mLayerComboBox;

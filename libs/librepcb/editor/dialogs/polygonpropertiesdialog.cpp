@@ -138,16 +138,16 @@ void PolygonPropertiesDialog::buttonBoxClicked(
 bool PolygonPropertiesDialog::applyChanges() noexcept {
   try {
     if (mLibraryObj) {
-      QScopedPointer<CmdPolygonEdit> cmd(new CmdPolygonEdit(*mLibraryObj));
+      std::unique_ptr<CmdPolygonEdit> cmd(new CmdPolygonEdit(*mLibraryObj));
       applyChanges(*cmd);
-      mUndoStack.execCmd(cmd.take());  // can throw
+      mUndoStack.execCmd(cmd.release());  // can throw
     }
     if (mBoardObj) {
-      QScopedPointer<CmdBoardPolygonEdit> cmd(
+      std::unique_ptr<CmdBoardPolygonEdit> cmd(
           new CmdBoardPolygonEdit(*mBoardObj));
       applyChanges(*cmd);
       cmd->setLocked(mUi->cbxLock->isChecked());
-      mUndoStack.execCmd(cmd.take());  // can throw
+      mUndoStack.execCmd(cmd.release());  // can throw
     }
     return true;
   } catch (const Exception& e) {

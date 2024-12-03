@@ -372,7 +372,7 @@ void BoardSetupDialog::load() noexcept {
 
 bool BoardSetupDialog::apply() noexcept {
   try {
-    QScopedPointer<CmdBoardEdit> cmd(new CmdBoardEdit(mBoard));
+    std::unique_ptr<CmdBoardEdit> cmd(new CmdBoardEdit(mBoard));
 
     // Tab: General
     cmd->setName(
@@ -444,7 +444,7 @@ bool BoardSetupDialog::apply() noexcept {
             .value<BoardDesignRuleCheckSettings::AllowedSlots>());
     cmd->setDrcSettings(s);
 
-    mUndoStack.execCmd(cmd.take());  // can throw
+    mUndoStack.execCmd(cmd.release());  // can throw
     return true;
   } catch (const Exception& e) {
     QMessageBox::warning(this, tr("Could not apply settings"), e.getMsg());

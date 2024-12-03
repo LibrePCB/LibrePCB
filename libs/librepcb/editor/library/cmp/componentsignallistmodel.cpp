@@ -91,7 +91,7 @@ void ComponentSignalListModel::add(
   }
 
   try {
-    QScopedPointer<UndoCommandGroup> cmd(
+    std::unique_ptr<UndoCommandGroup> cmd(
         new UndoCommandGroup(tr("Add component signal(s)")));
     foreach (const QString& name, Toolbox::expandRangesInString(mNewName)) {
       std::shared_ptr<ComponentSignal> sig = std::make_shared<ComponentSignal>(
@@ -100,7 +100,7 @@ void ComponentSignalListModel::add(
           false);
       cmd->appendChild(new CmdComponentSignalInsert(*mSignalList, sig));
     }
-    execCmd(cmd.take());
+    execCmd(cmd.release());
     mNewName = QString();
     mNewIsRequired = false;
     mNewForcedNetName = QString();
@@ -264,7 +264,7 @@ bool ComponentSignalListModel::setData(const QModelIndex& index,
 
   try {
     std::shared_ptr<ComponentSignal> item = mSignalList->value(index.row());
-    QScopedPointer<CmdComponentSignalEdit> cmd;
+    std::unique_ptr<CmdComponentSignalEdit> cmd;
     if (item) {
       cmd.reset(new CmdComponentSignalEdit(*item));
     }
@@ -303,7 +303,7 @@ bool ComponentSignalListModel::setData(const QModelIndex& index,
       return false;  // do not execute command!
     }
     if (cmd) {
-      execCmd(cmd.take());
+      execCmd(cmd.release());
     } else if (!item) {
       emit dataChanged(index, index);
     }

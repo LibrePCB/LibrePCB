@@ -666,7 +666,7 @@ void PackageEditorWidget::updateMetadata() noexcept {
 
 QString PackageEditorWidget::commitMetadata() noexcept {
   try {
-    QScopedPointer<CmdPackageEdit> cmd(new CmdPackageEdit(*mPackage));
+    std::unique_ptr<CmdPackageEdit> cmd(new CmdPackageEdit(*mPackage));
     try {
       // throws on invalid name
       cmd->setName("", ElementName(mUi->edtName->text().trimmed()));
@@ -688,7 +688,7 @@ QString PackageEditorWidget::commitMetadata() noexcept {
     cmd->setCategories(mCategoriesEditorWidget->getUuids());
 
     // Commit all changes.
-    mUndoStack->execCmd(cmd.take());  // can throw
+    mUndoStack->execCmd(cmd.release());  // can throw
 
     // Reload metadata into widgets to discard invalid input.
     updateMetadata();
@@ -918,17 +918,17 @@ bool PackageEditorWidget::runChecks(RuleCheckMessageList& msgs) const {
 template <>
 void PackageEditorWidget::fixMsg(const MsgDeprecatedAssemblyType& msg) {
   Q_UNUSED(msg);
-  QScopedPointer<CmdPackageEdit> cmd(new CmdPackageEdit(*mPackage));
+  std::unique_ptr<CmdPackageEdit> cmd(new CmdPackageEdit(*mPackage));
   cmd->setAssemblyType(mPackage->guessAssemblyType());
-  mUndoStack->execCmd(cmd.take());
+  mUndoStack->execCmd(cmd.release());
 }
 
 template <>
 void PackageEditorWidget::fixMsg(const MsgSuspiciousAssemblyType& msg) {
   Q_UNUSED(msg);
-  QScopedPointer<CmdPackageEdit> cmd(new CmdPackageEdit(*mPackage));
+  std::unique_ptr<CmdPackageEdit> cmd(new CmdPackageEdit(*mPackage));
   cmd->setAssemblyType(mPackage->guessAssemblyType());
-  mUndoStack->execCmd(cmd.take());
+  mUndoStack->execCmd(cmd.release());
 }
 
 template <>
@@ -980,19 +980,19 @@ void PackageEditorWidget::fixMsg(const MsgMinimumWidthViolation& msg) {
   }
 
   if (auto p = mCurrentFootprint->getPolygons().find(msg.getPolygon().get())) {
-    QScopedPointer<CmdPolygonEdit> cmd(new CmdPolygonEdit(*p));
+    std::unique_ptr<CmdPolygonEdit> cmd(new CmdPolygonEdit(*p));
     cmd->setLineWidth(edtWidth->getValue(), false);
-    mUndoStack->execCmd(cmd.take());
+    mUndoStack->execCmd(cmd.release());
   } else if (auto c =
                  mCurrentFootprint->getCircles().find(msg.getCircle().get())) {
-    QScopedPointer<CmdCircleEdit> cmd(new CmdCircleEdit(*c));
+    std::unique_ptr<CmdCircleEdit> cmd(new CmdCircleEdit(*c));
     cmd->setLineWidth(edtWidth->getValue(), false);
-    mUndoStack->execCmd(cmd.take());
+    mUndoStack->execCmd(cmd.release());
   } else if (auto t = mCurrentFootprint->getStrokeTexts().find(
                  msg.getStrokeText().get())) {
-    QScopedPointer<CmdStrokeTextEdit> cmd(new CmdStrokeTextEdit(*t));
+    std::unique_ptr<CmdStrokeTextEdit> cmd(new CmdStrokeTextEdit(*t));
     cmd->setStrokeWidth(edtWidth->getValue(), false);
-    mUndoStack->execCmd(cmd.take());
+    mUndoStack->execCmd(cmd.release());
   } else {
     throw LogicError(__FILE__, __LINE__,
                      "Whoops, not implemented! Please open a bug report.");
@@ -1053,9 +1053,9 @@ void PackageEditorWidget::fixMsg(const MsgWrongFootprintTextLayer& msg) {
       mPackage->getFootprints().get(msg.getFootprint().get());
   std::shared_ptr<StrokeText> text =
       footprint->getStrokeTexts().get(msg.getText().get());
-  QScopedPointer<CmdStrokeTextEdit> cmd(new CmdStrokeTextEdit(*text));
+  std::unique_ptr<CmdStrokeTextEdit> cmd(new CmdStrokeTextEdit(*text));
   cmd->setLayer(msg.getExpectedLayer(), false);
-  mUndoStack->execCmd(cmd.take());
+  mUndoStack->execCmd(cmd.release());
 }
 
 template <>
@@ -1064,9 +1064,9 @@ void PackageEditorWidget::fixMsg(const MsgUnusedCustomPadOutline& msg) {
       mPackage->getFootprints().get(msg.getFootprint().get());
   std::shared_ptr<FootprintPad> pad =
       footprint->getPads().get(msg.getPad().get());
-  QScopedPointer<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(*pad));
+  std::unique_ptr<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(*pad));
   cmd->setCustomShapeOutline(Path());
-  mUndoStack->execCmd(cmd.take());
+  mUndoStack->execCmd(cmd.release());
 }
 
 template <>
@@ -1075,9 +1075,9 @@ void PackageEditorWidget::fixMsg(const MsgInvalidCustomPadOutline& msg) {
       mPackage->getFootprints().get(msg.getFootprint().get());
   std::shared_ptr<FootprintPad> pad =
       footprint->getPads().get(msg.getPad().get());
-  QScopedPointer<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(*pad));
+  std::unique_ptr<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(*pad));
   cmd->setShape(FootprintPad::Shape::RoundedRect, false);
-  mUndoStack->execCmd(cmd.take());
+  mUndoStack->execCmd(cmd.release());
 }
 
 template <>
@@ -1086,9 +1086,9 @@ void PackageEditorWidget::fixMsg(const MsgPadStopMaskOff& msg) {
       mPackage->getFootprints().get(msg.getFootprint().get());
   std::shared_ptr<FootprintPad> pad =
       footprint->getPads().get(msg.getPad().get());
-  QScopedPointer<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(*pad));
+  std::unique_ptr<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(*pad));
   cmd->setStopMaskConfig(MaskConfig::automatic(), false);
-  mUndoStack->execCmd(cmd.take());
+  mUndoStack->execCmd(cmd.release());
 }
 
 template <>
@@ -1097,9 +1097,9 @@ void PackageEditorWidget::fixMsg(const MsgSmtPadWithSolderPaste& msg) {
       mPackage->getFootprints().get(msg.getFootprint().get());
   std::shared_ptr<FootprintPad> pad =
       footprint->getPads().get(msg.getPad().get());
-  QScopedPointer<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(*pad));
+  std::unique_ptr<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(*pad));
   cmd->setSolderPasteConfig(MaskConfig::off());
-  mUndoStack->execCmd(cmd.take());
+  mUndoStack->execCmd(cmd.release());
 }
 
 template <>
@@ -1108,9 +1108,9 @@ void PackageEditorWidget::fixMsg(const MsgThtPadWithSolderPaste& msg) {
       mPackage->getFootprints().get(msg.getFootprint().get());
   std::shared_ptr<FootprintPad> pad =
       footprint->getPads().get(msg.getPad().get());
-  QScopedPointer<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(*pad));
+  std::unique_ptr<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(*pad));
   cmd->setSolderPasteConfig(MaskConfig::off());
-  mUndoStack->execCmd(cmd.take());
+  mUndoStack->execCmd(cmd.release());
 }
 
 template <>
@@ -1119,9 +1119,9 @@ void PackageEditorWidget::fixMsg(const MsgPadWithCopperClearance& msg) {
       mPackage->getFootprints().get(msg.getFootprint().get());
   std::shared_ptr<FootprintPad> pad =
       footprint->getPads().get(msg.getPad().get());
-  QScopedPointer<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(*pad));
+  std::unique_ptr<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(*pad));
   cmd->setCopperClearance(UnsignedLength(0));
-  mUndoStack->execCmd(cmd.take());
+  mUndoStack->execCmd(cmd.release());
 }
 
 template <>
@@ -1133,9 +1133,9 @@ void PackageEditorWidget::fixMsg(
       footprint->getPads().get(msg.getPad().get());
   const tl::optional<Length> offset = pad->getStopMaskConfig().getOffset();
   if (offset && (*offset > 0)) {
-    QScopedPointer<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(*pad));
+    std::unique_ptr<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(*pad));
     cmd->setCopperClearance(UnsignedLength(*offset));
-    mUndoStack->execCmd(cmd.take());
+    mUndoStack->execCmd(cmd.release());
   }
 }
 
@@ -1144,9 +1144,9 @@ void PackageEditorWidget::fixMsg(const MsgHoleWithoutStopMask& msg) {
   std::shared_ptr<Footprint> footprint =
       mPackage->getFootprints().get(msg.getFootprint().get());
   std::shared_ptr<Hole> hole = footprint->getHoles().get(msg.getHole().get());
-  QScopedPointer<CmdHoleEdit> cmd(new CmdHoleEdit(*hole));
+  std::unique_ptr<CmdHoleEdit> cmd(new CmdHoleEdit(*hole));
   cmd->setStopMaskConfig(MaskConfig::automatic());
-  mUndoStack->execCmd(cmd.take());
+  mUndoStack->execCmd(cmd.release());
 }
 
 template <>
@@ -1188,11 +1188,11 @@ void PackageEditorWidget::fixPadFunction(const MessageType& msg) {
       for (auto& footprint : mPackage->getFootprints()) {
         for (auto& pad : footprint.getPads()) {
           if (pad.getFunction() == FootprintPad::Function::Unspecified) {
-            QScopedPointer<CmdFootprintPadEdit> cmd(
+            std::unique_ptr<CmdFootprintPadEdit> cmd(
                 new CmdFootprintPadEdit(pad));
             cmd->setFunction(action->data().value<FootprintPad::Function>(),
                              false);
-            transaction.append(cmd.take());
+            transaction.append(cmd.release());
           }
         }
       }
@@ -1202,9 +1202,9 @@ void PackageEditorWidget::fixPadFunction(const MessageType& msg) {
           mPackage->getFootprints().get(msg.getFootprint().get());
       std::shared_ptr<FootprintPad> pad =
           footprint->getPads().get(msg.getPad().get());
-      QScopedPointer<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(*pad));
+      std::unique_ptr<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(*pad));
       cmd->setFunction(action->data().value<FootprintPad::Function>(), false);
-      mUndoStack->execCmd(cmd.take());
+      mUndoStack->execCmd(cmd.release());
     }
   }
 }

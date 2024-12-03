@@ -118,7 +118,7 @@ PackageEditorState_AddPads::PackageEditorState_AddPads(
 }
 
 PackageEditorState_AddPads::~PackageEditorState_AddPads() noexcept {
-  Q_ASSERT(mEditCmd.isNull());
+  Q_ASSERT(!mEditCmd);
 }
 
 /*******************************************************************************
@@ -463,7 +463,7 @@ bool PackageEditorState_AddPads::finishAddPad(const Point& pos) noexcept {
     mCurrentGraphicsItem.reset();
     mLastPad = *mCurrentPad;
     mCurrentPad.reset();
-    mContext.undoStack.appendToCmdGroup(mEditCmd.take());
+    mContext.undoStack.appendToCmdGroup(mEditCmd.release());
     mContext.undoStack.commitCmdGroup();
     selectNextFreePadInComboBox();
     return true;

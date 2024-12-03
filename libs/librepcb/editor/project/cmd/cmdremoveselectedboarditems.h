@@ -27,6 +27,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -69,7 +71,7 @@ private:  // Methods
 private:  // Data
   BoardGraphicsScene& mScene;
   bool mIncludeLockedItems;
-  QScopedPointer<CmdRemoveBoardItems> mWrappedCommand;
+  std::unique_ptr<CmdRemoveBoardItems> mWrappedCommand;
 };
 
 /*******************************************************************************

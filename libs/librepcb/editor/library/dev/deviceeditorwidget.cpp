@@ -265,7 +265,7 @@ void DeviceEditorWidget::updateMetadata() noexcept {
 
 QString DeviceEditorWidget::commitMetadata() noexcept {
   try {
-    QScopedPointer<CmdLibraryElementEdit> cmd(
+    std::unique_ptr<CmdLibraryElementEdit> cmd(
         new CmdLibraryElementEdit(*mDevice, tr("Edit device metadata")));
     try {
       // throws on invalid name
@@ -304,7 +304,7 @@ QString DeviceEditorWidget::commitMetadata() noexcept {
     }
 
     // Commit all changes.
-    mUndoStack->execCmd(cmd.take());  // can throw
+    mUndoStack->execCmd(cmd.release());  // can throw
 
     // Reload metadata into widgets to discard invalid input.
     updateMetadata();
@@ -332,21 +332,21 @@ void DeviceEditorWidget::btnChooseComponentClicked() noexcept {
                 TransactionalFileSystem::openRO(fp))));  // can throw
 
         // edit device
-        QScopedPointer<UndoCommandGroup> cmdGroup(
+        std::unique_ptr<UndoCommandGroup> cmdGroup(
             new UndoCommandGroup(tr("Change component")));
-        QScopedPointer<CmdDeviceEdit> cmdDevEdit(new CmdDeviceEdit(*mDevice));
+        std::unique_ptr<CmdDeviceEdit> cmdDevEdit(new CmdDeviceEdit(*mDevice));
         cmdDevEdit->setComponentUuid(*cmpUuid);
-        cmdGroup->appendChild(cmdDevEdit.take());
+        cmdGroup->appendChild(cmdDevEdit.release());
         for (DevicePadSignalMapItem& item : mDevice->getPadSignalMap()) {
           tl::optional<Uuid> signalUuid = item.getSignalUuid();
           if (!signalUuid || !cmp->getSignals().contains(*signalUuid)) {
-            QScopedPointer<CmdDevicePadSignalMapItemEdit> cmdItem(
+            std::unique_ptr<CmdDevicePadSignalMapItemEdit> cmdItem(
                 new CmdDevicePadSignalMapItemEdit(item));
             cmdItem->setSignalUuid(tl::nullopt);
-            cmdGroup->appendChild(cmdItem.take());
+            cmdGroup->appendChild(cmdItem.release());
           }
         }
-        mUndoStack->execCmd(cmdGroup.take());
+        mUndoStack->execCmd(cmdGroup.release());
       } catch (const Exception& e) {
         QMessageBox::critical(this, tr("Could not set component"), e.getMsg());
       }
@@ -373,11 +373,11 @@ void DeviceEditorWidget::btnChoosePackageClicked() noexcept {
         QSet<Uuid> pads = pkg->getPads().getUuidSet();
 
         // edit device
-        QScopedPointer<UndoCommandGroup> cmdGroup(
+        std::unique_ptr<UndoCommandGroup> cmdGroup(
             new UndoCommandGroup(tr("Change package")));
-        QScopedPointer<CmdDeviceEdit> cmdDevEdit(new CmdDeviceEdit(*mDevice));
+        std::unique_ptr<CmdDeviceEdit> cmdDevEdit(new CmdDeviceEdit(*mDevice));
         cmdDevEdit->setPackageUuid(*pkgUuid);
-        cmdGroup->appendChild(cmdDevEdit.take());
+        cmdGroup->appendChild(cmdDevEdit.release());
         for (const DevicePadSignalMapItem& item : mDevice->getPadSignalMap()) {
           if (!pads.contains(item.getPadUuid())) {
             cmdGroup->appendChild(new CmdDevicePadSignalMapItemRemove(
@@ -390,7 +390,7 @@ void DeviceEditorWidget::btnChoosePackageClicked() noexcept {
               mDevice->getPadSignalMap(),
               std::make_shared<DevicePadSignalMapItem>(pad, tl::nullopt)));
         }
-        mUndoStack->execCmd(cmdGroup.take());
+        mUndoStack->execCmd(cmdGroup.release());
         Q_ASSERT(mDevice->getPadSignalMap().getUuidSet() == pads);
       } catch (const Exception& e) {
         QMessageBox::critical(this, tr("Could not set package"), e.getMsg());

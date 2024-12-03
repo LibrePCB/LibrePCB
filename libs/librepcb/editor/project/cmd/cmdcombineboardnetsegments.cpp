@@ -72,7 +72,7 @@ bool CmdCombineBoardNetSegments::performExecute() {
     throw LogicError(__FILE__, __LINE__);
 
   // move all required vias/netpoints/netlines to the resulting netsegment
-  QScopedPointer<CmdBoardNetSegmentAddElements> cmdAdd(
+  std::unique_ptr<CmdBoardNetSegmentAddElements> cmdAdd(
       new CmdBoardNetSegmentAddElements(mNewSegment));
   QHash<BI_NetLineAnchor*, BI_NetLineAnchor*> anchorMap;
   foreach (BI_Via* via, mOldSegment.getVias()) {
@@ -104,7 +104,7 @@ bool CmdCombineBoardNetSegments::performExecute() {
     Q_ASSERT(newNetLine);
   }
   execNewChildCmd(new CmdBoardNetSegmentRemove(mOldSegment));  // can throw
-  execNewChildCmd(cmdAdd.take());  // can throw
+  execNewChildCmd(cmdAdd.release());  // can throw
 
   undoScopeGuard.dismiss();  // no undo required
   return true;

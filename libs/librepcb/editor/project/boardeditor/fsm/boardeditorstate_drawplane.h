@@ -30,6 +30,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -97,7 +99,7 @@ private:  // Data
   // Information about the current text to place. Only valid if
   // mIsUndoCmdActive == true.
   BI_Plane* mCurrentPlane;
-  QScopedPointer<CmdBoardPlaneEdit> mCurrentPlaneEditCmd;
+  std::unique_ptr<CmdBoardPlaneEdit> mCurrentPlaneEditCmd;
 };
 
 /*******************************************************************************

@@ -150,7 +150,7 @@ bool CmdPasteBoardItems::performExecute() {
     }
 
     // Add device instance to board
-    QScopedPointer<BI_Device> device(
+    std::unique_ptr<BI_Device> device(
         new BI_Device(mBoard, *cmpInst, dev.libDeviceUuid, dev.libFootprintUuid,
                       dev.position + mPosOffset, dev.rotation, dev.mirrored,
                       dev.locked, false));
@@ -163,7 +163,7 @@ bool CmdPasteBoardItems::performExecute() {
       device->addStrokeText(*item);
     }
     execNewChildCmd(new CmdDeviceInstanceAdd(*device));
-    if (auto item = mScene.getDevices().value(device.take())) {
+    if (auto item = mScene.getDevices().value(device.release())) {
       item->setSelected(true);
     }
     pastedDevices.insert(dev.componentUuid);
@@ -202,7 +202,7 @@ bool CmdPasteBoardItems::performExecute() {
       execNewChildCmd(new CmdBoardNetSegmentAdd(*copy));
 
       // Add vias, netpoints and netlines
-      QScopedPointer<CmdBoardNetSegmentAddElements> cmdAddElements(
+      std::unique_ptr<CmdBoardNetSegmentAddElements> cmdAddElements(
           new CmdBoardNetSegmentAddElements(*copy));
       QHash<Uuid, BI_Via*> viaMap;
       for (const Via& v : segment.vias) {
@@ -252,7 +252,7 @@ bool CmdPasteBoardItems::performExecute() {
         cmdAddElements->addNetLine(*start, *end, trace.getLayer(),
                                    trace.getWidth());
       }
-      execNewChildCmd(cmdAddElements.take());
+      execNewChildCmd(cmdAddElements.release());
 
       // Select pasted net segment items.
       foreach (BI_Via* via, copy->getVias()) {

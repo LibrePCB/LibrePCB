@@ -56,7 +56,7 @@ PackageEditorState_AddHoles::PackageEditorState_AddHoles(
 }
 
 PackageEditorState_AddHoles::~PackageEditorState_AddHoles() noexcept {
-  Q_ASSERT(mEditCmd.isNull());
+  Q_ASSERT(!mEditCmd);
 }
 
 /*******************************************************************************
@@ -168,7 +168,7 @@ bool PackageEditorState_AddHoles::finishAddHole(const Point& pos) noexcept {
     mCurrentGraphicsItem->setSelected(false);
     mCurrentGraphicsItem.reset();
     mCurrentHole.reset();
-    mContext.undoStack.appendToCmdGroup(mEditCmd.take());
+    mContext.undoStack.appendToCmdGroup(mEditCmd.release());
     mContext.undoStack.commitCmdGroup();
     return true;
   } catch (const Exception& e) {

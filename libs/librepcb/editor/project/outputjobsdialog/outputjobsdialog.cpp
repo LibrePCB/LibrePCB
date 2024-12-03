@@ -568,9 +568,9 @@ void OutputJobsDialog::buttonBoxClicked(QAbstractButton* button) noexcept {
 
 bool OutputJobsDialog::applyChanges() noexcept {
   try {
-    QScopedPointer<CmdProjectEdit> cmd(new CmdProjectEdit(mProject));
+    std::unique_ptr<CmdProjectEdit> cmd(new CmdProjectEdit(mProject));
     cmd->setOutputJobs(mJobs);
-    mUndoStack.execCmd(cmd.take());
+    mUndoStack.execCmd(cmd.release());
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(this, tr("Error"), e.getMsg());

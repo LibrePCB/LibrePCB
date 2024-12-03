@@ -109,7 +109,7 @@ private:  // Methods
 private:  // Types / Data
   Mode mMode;
   Point mStartPos;
-  QScopedPointer<CmdStrokeTextEdit> mEditCmd;
+  std::unique_ptr<CmdStrokeTextEdit> mEditCmd;
   std::shared_ptr<StrokeText> mCurrentText;
   std::shared_ptr<StrokeTextGraphicsItem> mCurrentGraphicsItem;
   QPointer<LayerComboBox> mLayerComboBox;

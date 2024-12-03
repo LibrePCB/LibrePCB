@@ -90,7 +90,7 @@ private:  // Methods
   void grabAreaCheckBoxCheckedChanged(bool checked) noexcept;
 
 private:  // Types / Data
-  QScopedPointer<CmdCircleEdit> mEditCmd;
+  std::unique_ptr<CmdCircleEdit> mEditCmd;
   std::shared_ptr<Circle> mCurrentCircle;
   std::shared_ptr<CircleGraphicsItem> mCurrentGraphicsItem;
 

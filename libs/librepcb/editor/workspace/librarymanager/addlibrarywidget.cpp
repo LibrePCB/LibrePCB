@@ -385,7 +385,7 @@ void AddLibraryWidget::downloadZipFinished(bool success,
 
 void AddLibraryWidget::onlineLibraryListReceived(
     const QJsonArray& libs) noexcept {
-  foreach (const QJsonValue& libVal, libs) {
+  for (const QJsonValue& libVal : libs) {
     OnlineLibraryListWidgetItem* widget =
         new OnlineLibraryListWidgetItem(mWorkspace, libVal.toObject());
     if (mManualCheckStateForAllRemoteLibraries) {

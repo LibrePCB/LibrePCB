@@ -1090,9 +1090,9 @@ void SchematicEditor::renameSchematic(int index) noexcept {
 
   try {
     abortBlockingToolsInOtherEditors();  // Release undo stack.
-    QScopedPointer<CmdSchematicEdit> cmd(new CmdSchematicEdit(*schematic));
+    std::unique_ptr<CmdSchematicEdit> cmd(new CmdSchematicEdit(*schematic));
     cmd->setName(ElementName(cleanElementName(name)));  // can throw
-    mProjectEditor.getUndoStack().execCmd(cmd.take());
+    mProjectEditor.getUndoStack().execCmd(cmd.release());
   } catch (Exception& e) {
     QMessageBox::critical(this, tr("Error"), e.getMsg());
   }

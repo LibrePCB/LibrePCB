@@ -236,7 +236,7 @@ bool BoardEditorState_DrawPlane::addSegment(const Point& pos) noexcept {
     // If the plane has more than 2 vertices, start a new undo command
     if (mCurrentPlane->getOutline().getVertices().count() > 2) {
       if (mCurrentPlaneEditCmd) {
-        mContext.undoStack.appendToCmdGroup(mCurrentPlaneEditCmd.take());
+        mContext.undoStack.appendToCmdGroup(mCurrentPlaneEditCmd.release());
       }
       mContext.undoStack.commitCmdGroup();
       mIsUndoCmdActive = false;

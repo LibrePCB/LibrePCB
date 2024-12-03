@@ -318,7 +318,7 @@ bool AttributeListModel::setData(const QModelIndex& index,
 
   try {
     std::shared_ptr<Attribute> item = mAttributeList->value(index.row());
-    QScopedPointer<CmdAttributeEdit> cmd;
+    std::unique_ptr<CmdAttributeEdit> cmd;
     if (item) {
       cmd.reset(new CmdAttributeEdit(*item));
     }
@@ -375,7 +375,7 @@ bool AttributeListModel::setData(const QModelIndex& index,
       return false;  // do not execute command!
     }
     if (cmd) {
-      execCmd(cmd.take());
+      execCmd(cmd.release());
     } else if (!item) {
       emit dataChanged(index, index);
     }

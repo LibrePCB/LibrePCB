@@ -127,9 +127,10 @@ void CmdChangeNetSignalOfSchematicNetSegment::updateCompSigInstNetSignal(
   }
   for (auto it = boardNetLinesToRemove.constBegin();
        it != boardNetLinesToRemove.constEnd(); ++it) {
-    QScopedPointer<CmdRemoveBoardItems> cmd(new CmdRemoveBoardItems(*it.key()));
+    std::unique_ptr<CmdRemoveBoardItems> cmd(
+        new CmdRemoveBoardItems(*it.key()));
     cmd->removeNetLines(it.value());
-    execNewChildCmd(cmd.take());  // can throw
+    execNewChildCmd(cmd.release());  // can throw
   }
 
   // change netsignal of component signal instance

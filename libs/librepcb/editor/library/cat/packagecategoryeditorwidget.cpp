@@ -151,7 +151,7 @@ void PackageCategoryEditorWidget::updateMetadata() noexcept {
 
 QString PackageCategoryEditorWidget::commitMetadata() noexcept {
   try {
-    QScopedPointer<CmdLibraryCategoryEdit> cmd(
+    std::unique_ptr<CmdLibraryCategoryEdit> cmd(
         new CmdLibraryCategoryEdit(*mCategory));
     try {
       // throws on invalid name
@@ -170,7 +170,7 @@ QString PackageCategoryEditorWidget::commitMetadata() noexcept {
     cmd->setParentUuid(mParentUuid);
 
     // Commit all changes.
-    mUndoStack->execCmd(cmd.take());  // can throw
+    mUndoStack->execCmd(cmd.release());  // can throw
 
     // Reload metadata into widgets to discard invalid input.
     updateMetadata();

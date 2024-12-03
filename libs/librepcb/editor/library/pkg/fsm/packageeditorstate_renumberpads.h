@@ -92,7 +92,7 @@ private:  // Data
 
   std::shared_ptr<FootprintPadGraphicsItem> mPreviousPad;
   std::shared_ptr<FootprintPadGraphicsItem> mCurrentPad;
-  QScopedPointer<UndoCommandGroup> mTmpCmd;
+  std::unique_ptr<UndoCommandGroup> mTmpCmd;
 
   Point mCurrentPos;
   Qt::KeyboardModifiers mCurrentModifiers;

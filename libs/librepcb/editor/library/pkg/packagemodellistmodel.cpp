@@ -165,10 +165,10 @@ void PackageModelListModel::edit(
       return;
     }
 
-    QScopedPointer<CmdPackageModelEdit> cmd(
+    std::unique_ptr<CmdPackageModelEdit> cmd(
         new CmdPackageModelEdit(*mPackage, *obj));
     cmd->setStepContent(content);
-    execCmd(cmd.take());
+    execCmd(cmd.release());
   } catch (const Exception& e) {
     QMessageBox::critical(nullptr, tr("Error"), e.getMsg());
   }
@@ -345,11 +345,11 @@ bool PackageModelListModel::setData(const QModelIndex& index,
   try {
     std::shared_ptr<PackageModel> item =
         mPackage->getModels().value(index.row());
-    QScopedPointer<CmdPackageModelEdit> cmd;
+    std::unique_ptr<CmdPackageModelEdit> cmd;
     if (item) {
       cmd.reset(new CmdPackageModelEdit(*mPackage, *item));
     }
-    QScopedPointer<CmdFootprintEdit> cmdFpt;
+    std::unique_ptr<CmdFootprintEdit> cmdFpt;
     if (mFootprint) {
       cmdFpt.reset(new CmdFootprintEdit(*mFootprint));
     }
@@ -381,10 +381,10 @@ bool PackageModelListModel::setData(const QModelIndex& index,
       return false;  // do not execute command!
     }
     if (cmd) {
-      execCmd(cmd.take());
+      execCmd(cmd.release());
     }
     if (cmdFpt) {
-      execCmd(cmdFpt.take());
+      execCmd(cmdFpt.release());
     }
     if (!item) {
       emit dataChanged(index, index);

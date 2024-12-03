@@ -87,7 +87,7 @@ void PackagePadListModel::add(const QPersistentModelIndex& itemIndex) noexcept {
   }
 
   try {
-    QScopedPointer<UndoCommandGroup> cmd(
+    std::unique_ptr<UndoCommandGroup> cmd(
         new UndoCommandGroup(tr("Add package pad(s)")));
     // if no name is set we search for the next free numerical pad name
     if (mNewName.isEmpty()) {
@@ -98,7 +98,7 @@ void PackagePadListModel::add(const QPersistentModelIndex& itemIndex) noexcept {
           Uuid::createRandom(), validateNameOrThrow(name));
       cmd->appendChild(new CmdPackagePadInsert(*mPadList, pad));
     }
-    execCmd(cmd.take());
+    execCmd(cmd.release());
     mNewName = QString();
   } catch (const Exception& e) {
     QMessageBox::critical(0, tr("Error"), e.getMsg());
@@ -233,7 +233,7 @@ bool PackagePadListModel::setData(const QModelIndex& index,
 
   try {
     std::shared_ptr<PackagePad> item = mPadList->value(index.row());
-    QScopedPointer<CmdPackagePadEdit> cmd;
+    std::unique_ptr<CmdPackagePadEdit> cmd;
     if (item) {
       cmd.reset(new CmdPackagePadEdit(*item));
     }
@@ -256,7 +256,7 @@ bool PackagePadListModel::setData(const QModelIndex& index,
       return false;  // do not execute command!
     }
     if (cmd) {
-      execCmd(cmd.take());
+      execCmd(cmd.release());
     } else if (!item) {
       emit dataChanged(index, index);
     }

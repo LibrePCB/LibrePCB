@@ -217,9 +217,9 @@ bool BoardEditorState_AddStrokeText::addText(const Point& pos) noexcept {
                             mLastRotation, mLastHeight, mLastStrokeWidth,
                             StrokeTextSpacing(), StrokeTextSpacing(),
                             mLastAlignment, mLastMirrored, true, false));
-    QScopedPointer<CmdBoardStrokeTextAdd> cmdAdd(
+    std::unique_ptr<CmdBoardStrokeTextAdd> cmdAdd(
         new CmdBoardStrokeTextAdd(*mCurrentTextToPlace));
-    mContext.undoStack.appendToCmdGroup(cmdAdd.take());
+    mContext.undoStack.appendToCmdGroup(cmdAdd.release());
     mCurrentTextEditCmd.reset(new CmdBoardStrokeTextEdit(*mCurrentTextToPlace));
     return true;
   } catch (const Exception& e) {
@@ -272,7 +272,7 @@ bool BoardEditorState_AddStrokeText::fixPosition(const Point& pos) noexcept {
   try {
     if (mCurrentTextEditCmd) {
       mCurrentTextEditCmd->setPosition(pos, false);
-      mContext.undoStack.appendToCmdGroup(mCurrentTextEditCmd.take());
+      mContext.undoStack.appendToCmdGroup(mCurrentTextEditCmd.release());
     }
     mContext.undoStack.commitCmdGroup();
     mIsUndoCmdActive = false;

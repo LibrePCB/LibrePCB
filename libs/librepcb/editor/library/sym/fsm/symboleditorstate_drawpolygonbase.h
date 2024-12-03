@@ -107,7 +107,7 @@ private:  // Methods
 private:  // Types / Data
   Mode mMode;
   bool mIsUndoCmdActive;
-  QScopedPointer<CmdPolygonEdit> mEditCmd;
+  std::unique_ptr<CmdPolygonEdit> mEditCmd;
   std::shared_ptr<Polygon> mCurrentPolygon;
   std::shared_ptr<PolygonGraphicsItem> mCurrentGraphicsItem;
   Point mLastScenePos;

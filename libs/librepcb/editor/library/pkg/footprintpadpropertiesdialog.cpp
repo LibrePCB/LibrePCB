@@ -476,7 +476,7 @@ bool FootprintPadPropertiesDialog::applyChanges() noexcept {
   }
 
   try {
-    QScopedPointer<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(mPad));
+    std::unique_ptr<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(mPad));
     tl::optional<Uuid> pkgPad =
         Uuid::tryFromString(mUi->cbxPackagePad->currentData().toString());
     cmd->setPackagePadUuid(pkgPad, false);
@@ -523,7 +523,7 @@ bool FootprintPadPropertiesDialog::applyChanges() noexcept {
     cmd->setPosition(Point(mUi->edtPosX->getValue(), mUi->edtPosY->getValue()),
                      false);
     cmd->setRotation(mUi->edtRotation->getValue(), false);
-    mUndoStack.execCmd(cmd.take());
+    mUndoStack.execCmd(cmd.release());
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(this, tr("Error"), e.getMsg());

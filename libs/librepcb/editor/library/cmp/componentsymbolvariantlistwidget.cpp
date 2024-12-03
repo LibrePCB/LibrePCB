@@ -146,13 +146,13 @@ void ComponentSymbolVariantListWidget::editVariant(const Uuid& uuid) noexcept {
     auto variant = mSymbolVariantList->get(uuid);
     auto copy = std::make_shared<ComponentSymbolVariant>(*variant);
     if (mEditorProvider->openComponentSymbolVariantEditor(copy)) {
-      QScopedPointer<CmdComponentSymbolVariantEdit> cmd(
+      std::unique_ptr<CmdComponentSymbolVariantEdit> cmd(
           new CmdComponentSymbolVariantEdit(*variant));
       cmd->setNorm(copy->getNorm());
       cmd->setNames(copy->getNames());
       cmd->setDescriptions(copy->getDescriptions());
       cmd->setSymbolItems(copy->getSymbolItems());
-      mUndoStack->execCmd(cmd.take());
+      mUndoStack->execCmd(cmd.release());
     }
   } catch (const Exception& e) {
     QMessageBox::critical(this, tr("Could not edit symbol variant"),

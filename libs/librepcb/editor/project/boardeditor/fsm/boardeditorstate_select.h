@@ -194,28 +194,28 @@ private:  // Data
   bool mIsUndoCmdActive;
 
   /// When dragging items, this undo command will be active
-  QScopedPointer<CmdDragSelectedBoardItems> mSelectedItemsDragCommand;
+  std::unique_ptr<CmdDragSelectedBoardItems> mSelectedItemsDragCommand;
 
   /// The current polygon selected for editing (nullptr if none)
   BI_Polygon* mSelectedPolygon;
   /// The polygon vertex indices selected for editing (empty if none)
   QVector<int> mSelectedPolygonVertices;
   /// The polygon edit command (nullptr if not editing)
-  QScopedPointer<CmdBoardPolygonEdit> mCmdPolygonEdit;
+  std::unique_ptr<CmdBoardPolygonEdit> mCmdPolygonEdit;
 
   /// The current plane selected for editing (nullptr if none)
   BI_Plane* mSelectedPlane;
   /// The plane vertex indices selected for editing (empty if none)
   QVector<int> mSelectedPlaneVertices;
   /// The plane edit command (nullptr if not editing)
-  QScopedPointer<CmdBoardPlaneEdit> mCmdPlaneEdit;
+  std::unique_ptr<CmdBoardPlaneEdit> mCmdPlaneEdit;
 
   /// The current zone selected for editing (nullptr if none)
   BI_Zone* mSelectedZone;
   /// The zone vertex indices selected for editing (empty if none)
   QVector<int> mSelectedZoneVertices;
   /// The zone edit command (nullptr if not editing)
-  QScopedPointer<CmdBoardZoneEdit> mCmdZoneEdit;
+  std::unique_ptr<CmdBoardZoneEdit> mCmdZoneEdit;
 };
 
 /*******************************************************************************

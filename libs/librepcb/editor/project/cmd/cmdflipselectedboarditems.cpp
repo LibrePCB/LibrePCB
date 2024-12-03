@@ -186,77 +186,77 @@ bool CmdFlipSelectedBoardItems::performExecute() {
   // flip all device instances
   foreach (BI_Device* device, query.getDeviceInstances()) {
     Q_ASSERT(device);
-    QScopedPointer<CmdDeviceInstanceEdit> cmd(
+    std::unique_ptr<CmdDeviceInstanceEdit> cmd(
         new CmdDeviceInstanceEdit(*device));
     cmd->mirror(center, mOrientation, false);  // can throw
-    execNewChildCmd(cmd.take());  // can throw
+    execNewChildCmd(cmd.release());  // can throw
   }
 
   // mirror all netlines
   const int innerLayerCount = mScene.getBoard().getInnerLayerCount();
   foreach (BI_NetLine* netline, query.getNetLines()) {
     Q_ASSERT(netline);
-    QScopedPointer<CmdBoardNetLineEdit> cmd(new CmdBoardNetLineEdit(*netline));
+    std::unique_ptr<CmdBoardNetLineEdit> cmd(new CmdBoardNetLineEdit(*netline));
     cmd->setLayer(netline->getLayer().mirrored(innerLayerCount));
-    execNewChildCmd(cmd.take());  // can throw
+    execNewChildCmd(cmd.release());  // can throw
   }
 
   // move all netpoints
   foreach (BI_NetPoint* netpoint, query.getNetPoints()) {
     Q_ASSERT(netpoint);
-    QScopedPointer<CmdBoardNetPointEdit> cmd(
+    std::unique_ptr<CmdBoardNetPointEdit> cmd(
         new CmdBoardNetPointEdit(*netpoint));
     cmd->setPosition(netpoint->getPosition().mirrored(mOrientation, center),
                      false);
-    execNewChildCmd(cmd.take());  // can throw
+    execNewChildCmd(cmd.release());  // can throw
   }
 
   // flip all vias
   foreach (BI_Via* via, query.getVias()) {
     Q_ASSERT(via);
-    QScopedPointer<CmdBoardViaEdit> cmd(new CmdBoardViaEdit(*via));
+    std::unique_ptr<CmdBoardViaEdit> cmd(new CmdBoardViaEdit(*via));
     cmd->setPosition(via->getPosition().mirrored(mOrientation, center), false);
     cmd->mirrorLayers(innerLayerCount);
-    execNewChildCmd(cmd.take());  // can throw
+    execNewChildCmd(cmd.release());  // can throw
   }
 
   // flip all planes
   foreach (BI_Plane* plane, query.getPlanes()) {
-    QScopedPointer<CmdBoardPlaneEdit> cmd(new CmdBoardPlaneEdit(*plane));
+    std::unique_ptr<CmdBoardPlaneEdit> cmd(new CmdBoardPlaneEdit(*plane));
     cmd->mirror(center, mOrientation, innerLayerCount, false);
-    execNewChildCmd(cmd.take());  // can throw
+    execNewChildCmd(cmd.release());  // can throw
   }
 
   // flip all zones
   foreach (BI_Zone* zone, query.getZones()) {
-    QScopedPointer<CmdBoardZoneEdit> cmd(new CmdBoardZoneEdit(*zone));
+    std::unique_ptr<CmdBoardZoneEdit> cmd(new CmdBoardZoneEdit(*zone));
     cmd->mirrorGeometry(mOrientation, center, false);
     cmd->mirrorLayers(innerLayerCount, false);  // can throw
-    execNewChildCmd(cmd.take());  // can throw
+    execNewChildCmd(cmd.release());  // can throw
   }
 
   // flip all polygons
   foreach (BI_Polygon* polygon, query.getPolygons()) {
-    QScopedPointer<CmdBoardPolygonEdit> cmd(new CmdBoardPolygonEdit(*polygon));
+    std::unique_ptr<CmdBoardPolygonEdit> cmd(new CmdBoardPolygonEdit(*polygon));
     cmd->mirrorGeometry(mOrientation, center, false);
     cmd->mirrorLayer(innerLayerCount, false);
-    execNewChildCmd(cmd.take());  // can throw
+    execNewChildCmd(cmd.release());  // can throw
   }
 
   // flip all stroke texts
   foreach (BI_StrokeText* text, query.getStrokeTexts()) {
-    QScopedPointer<CmdBoardStrokeTextEdit> cmd(
+    std::unique_ptr<CmdBoardStrokeTextEdit> cmd(
         new CmdBoardStrokeTextEdit(*text));
     cmd->mirrorGeometry(mOrientation, center, false);
     cmd->mirrorLayer(innerLayerCount, false);
-    execNewChildCmd(cmd.take());  // can throw
+    execNewChildCmd(cmd.release());  // can throw
   }
 
   // mirror all holes
   foreach (BI_Hole* hole, query.getHoles()) {
-    QScopedPointer<CmdBoardHoleEdit> cmd(new CmdBoardHoleEdit(*hole));
+    std::unique_ptr<CmdBoardHoleEdit> cmd(new CmdBoardHoleEdit(*hole));
     cmd->mirror(mOrientation, center, false);
-    execNewChildCmd(cmd.take());  // can throw
+    execNewChildCmd(cmd.release());  // can throw
   }
 
   // reconnect all netsegments

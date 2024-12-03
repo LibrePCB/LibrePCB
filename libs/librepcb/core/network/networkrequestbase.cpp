@@ -191,26 +191,26 @@ void NetworkRequestBase::executeRequest() noexcept {
   } else {
     mReply.reset(nam->get(mRequest));
   }
-  if (mReply.isNull()) {
+  if (!mReply) {
     finalize("Network request failed with unknown error!");  // No tr() needed.
     return;
   }
 
   // connect to signals of reply
   if (!mPostData.isNull()) {
-    connect(mReply.data(), &QNetworkReply::uploadProgress, this,
+    connect(mReply.get(), &QNetworkReply::uploadProgress, this,
             &NetworkRequestBase::uploadProgressSlot);
   } else {
-    connect(mReply.data(), &QNetworkReply::downloadProgress, this,
+    connect(mReply.get(), &QNetworkReply::downloadProgress, this,
             &NetworkRequestBase::replyDownloadProgressSlot);
   }
-  connect(mReply.data(), &QNetworkReply::readyRead, this,
+  connect(mReply.get(), &QNetworkReply::readyRead, this,
           &NetworkRequestBase::replyReadyReadSlot);
-  connect(mReply.data(), &QNetworkReply::errorOccurred, this,
+  connect(mReply.get(), &QNetworkReply::errorOccurred, this,
           &NetworkRequestBase::replyErrorSlot);
-  connect(mReply.data(), &QNetworkReply::sslErrors, this,
+  connect(mReply.get(), &QNetworkReply::sslErrors, this,
           &NetworkRequestBase::replySslErrorsSlot);
-  connect(mReply.data(), &QNetworkReply::finished, this,
+  connect(mReply.get(), &QNetworkReply::finished, this,
           &NetworkRequestBase::replyFinishedSlot);
 }
 
@@ -305,7 +305,7 @@ void NetworkRequestBase::replyFinishedSlot() noexcept {
       qDebug().nospace() << "Redirect from " << mUrl.toString() << " to "
                          << redirectUrl.toString() << ".";
       emit progressState(tr("Redirect to %1...").arg(redirectUrl.toString()));
-      mReply.take()->deleteLater();
+      mReply.release()->deleteLater();
       mRedirectedUrls.append(mUrl);
       mUrl = redirectUrl;
       executeRequest();  // restart download with new url

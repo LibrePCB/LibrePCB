@@ -30,6 +30,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -102,7 +104,7 @@ private:  // Data
   // Information about the current text to place. Only valid if
   // mIsUndoCmdActive == true.
   SI_Text* mCurrentTextToPlace;
-  QScopedPointer<CmdTextEdit> mCurrentTextEditCmd;
+  std::unique_ptr<CmdTextEdit> mCurrentTextEditCmd;
 };
 
 /*******************************************************************************

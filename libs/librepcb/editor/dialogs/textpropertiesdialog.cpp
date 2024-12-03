@@ -123,7 +123,7 @@ void TextPropertiesDialog::on_buttonBox_clicked(QAbstractButton* button) {
 
 bool TextPropertiesDialog::applyChanges() noexcept {
   try {
-    QScopedPointer<CmdTextEdit> cmd(new CmdTextEdit(mText));
+    std::unique_ptr<CmdTextEdit> cmd(new CmdTextEdit(mText));
     if (auto layer = mUi->cbxLayer->getCurrentLayer()) {
       cmd->setLayer(*layer, false);
     }
@@ -133,7 +133,7 @@ bool TextPropertiesDialog::applyChanges() noexcept {
     cmd->setPosition(Point(mUi->edtPosX->getValue(), mUi->edtPosY->getValue()),
                      false);
     cmd->setRotation(mUi->edtRotation->getValue(), false);
-    mUndoStack.execCmd(cmd.take());
+    mUndoStack.execCmd(cmd.release());
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(this, tr("Error"), e.getMsg());

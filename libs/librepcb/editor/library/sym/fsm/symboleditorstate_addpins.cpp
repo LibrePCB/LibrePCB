@@ -158,7 +158,7 @@ bool SymbolEditorState_AddPins::processGraphicsSceneLeftMouseButtonPressed(
   try {
     if (mEditCmd) {
       mEditCmd->setPosition(currentPos, true);
-      mContext.undoStack.appendToCmdGroup(mEditCmd.take());
+      mContext.undoStack.appendToCmdGroup(mEditCmd.release());
     }
     mContext.undoStack.commitCmdGroup();
     mCurrentGraphicsItem->setSelected(false);
