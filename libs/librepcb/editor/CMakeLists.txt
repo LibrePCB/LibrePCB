@@ -1009,7 +1009,6 @@ target_link_libraries(
   PUBLIC # LibrePCB
          LibrePCB::Core
          # Third party
-         Optional::Optional
          TypeSafe::TypeSafe
          # Qt
          ${QT}::Core

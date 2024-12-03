@@ -17,8 +17,6 @@ target_link_libraries(
   PRIVATE common
           # LibrePCB
           LibrePCB::Core
-          # Third party
-          Optional::Optional
           # Qt
           ${QT}::Core
 )
