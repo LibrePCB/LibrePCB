@@ -159,7 +159,7 @@ TEST_F(SQLiteDatabaseTest, testConcurrentReadAccessWhileWriteTransaction) {
     qint64 timeout = QDateTime::currentMSecsSinceEpoch() + 120000;
     while ((!cancel) && (QDateTime::currentMSecsSinceEpoch() < timeout)) {
       db.exec("INSERT INTO test (name) VALUES ('hello')");
-      ++count;
+      count = count + 1;
     }
     db.commitTransaction();
     std::cout << "Transaction committed." << std::endl;

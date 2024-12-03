@@ -88,7 +88,8 @@ PadSignalMapEditorWidget::PadSignalMapEditorWidget(QWidget* parent) noexcept
   mView->verticalScrollBar()->installEventFilter(this);
 
   mInteractiveFrame->setObjectName("interactiveFrame");
-  mInteractiveFrame->setFrameStyle(QFrame::Box | QFrame::Plain);
+  mInteractiveFrame->setFrameStyle(static_cast<int>(QFrame::Box) |
+                                   QFrame::Plain);
   mInteractiveFrame->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
   mInteractiveFrame->setStyleSheet(
       "#interactiveFrame {border: 1px solid gray; border-radius: 2px;}");

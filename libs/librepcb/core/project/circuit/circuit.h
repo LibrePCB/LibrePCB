@@ -139,8 +139,8 @@ public:
 
   // Operator Overloadings
   Circuit& operator=(const Circuit& rhs) = delete;
-  bool operator==(const Circuit& rhs) noexcept { return (this == &rhs); }
-  bool operator!=(const Circuit& rhs) noexcept { return (this != &rhs); }
+  bool operator==(const Circuit& rhs) const noexcept { return (this == &rhs); }
+  bool operator!=(const Circuit& rhs) const noexcept { return (this != &rhs); }
 
 signals:
   void assemblyVariantAdded(std::shared_ptr<AssemblyVariant>& av);
