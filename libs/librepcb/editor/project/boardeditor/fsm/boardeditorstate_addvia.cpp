@@ -80,7 +80,7 @@ BoardEditorState_AddVia::BoardEditorState_AddVia(
                        MaskConfig::off()  // Exposure
                        ),
     mUseAutoNetSignal(true),
-    mCurrentNetSignal(tl::nullopt),
+    mCurrentNetSignal(std::nullopt),
     mClosestNetSignalIsUpToDate(false),
     mCurrentViaToPlace(nullptr) {
 }

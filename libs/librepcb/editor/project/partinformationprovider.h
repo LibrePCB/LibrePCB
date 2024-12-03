@@ -24,10 +24,11 @@
  *  Includes
  ******************************************************************************/
 #include <librepcb/core/fileio/filepath.h>
-#include <optional/tl/optional.hpp>
 
 #include <QtCore>
 #include <QtGui>
+
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -82,7 +83,7 @@ public:
     QUrl pictureUrl;  // Empty if N/A
     QUrl pricingUrl;  // Empty if N/A
     QString status;  // Empty if N/A
-    tl::optional<int> availability;  // nullopt if N/A
+    std::optional<int> availability;  // nullopt if N/A
     QMap<int, qreal> prices;  // Empty if N/A
     QVector<PartResource> resources;  // Empty if N/A
 

@@ -26,12 +26,12 @@
 #include "partinformationprovider.h"
 
 #include <librepcb/core/fileio/filepath.h>
-#include <optional/tl/optional.hpp>
 
 #include <QtCore>
 #include <QtWidgets>
 
 #include <memory>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -94,7 +94,7 @@ private:  // Methods
   void updateTable() noexcept;
   void updatePartsInformation() noexcept;
   std::shared_ptr<AssemblyVariant> getAssemblyVariant() const noexcept;
-  tl::optional<Uuid> getAssemblyVariantUuid(bool throwIfNullopt) const;
+  std::optional<Uuid> getAssemblyVariantUuid(bool throwIfNullopt) const;
   FilePath getOutputFilePath() const noexcept;
 
 private:  // Data

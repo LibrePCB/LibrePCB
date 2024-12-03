@@ -26,12 +26,12 @@
 #include "boardeditorfsm.h"
 
 #include <librepcb/core/types/length.h>
-#include <optional/tl/optional.hpp>
 
 #include <QtCore>
 #include <QtWidgets>
 
 #include <memory>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations

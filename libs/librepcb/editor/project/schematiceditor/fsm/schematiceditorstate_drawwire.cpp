@@ -292,7 +292,7 @@ bool SchematicEditorState_DrawWire::startPositioning(
     // determine the fixed anchor (create one if it doesn't exist already)
     NetSignal* netsignal = nullptr;
     SI_NetSegment* netsegment = nullptr;
-    tl::optional<CircuitIdentifier> forcedNetName;
+    std::optional<CircuitIdentifier> forcedNetName;
     Point pos = mCursorPos.mappedToGrid(getGridInterval());
     if (snap || fixedPoint) {
       std::shared_ptr<QGraphicsItem> item = findItem(mCursorPos);

@@ -131,7 +131,7 @@ void NewElementWizardPage_CopyFrom::listWidget_itemDoubleClicked(
 }
 
 void NewElementWizardPage_CopyFrom::setSelectedCategory(
-    const tl::optional<Uuid>& uuid) noexcept {
+    const std::optional<Uuid>& uuid) noexcept {
   if (uuid && (uuid == mSelectedCategoryUuid)) return;
 
   setSelectedElement(FilePath());
@@ -187,7 +187,7 @@ void NewElementWizardPage_CopyFrom::setCategoryTreeModel(
 }
 
 FilePath NewElementWizardPage_CopyFrom::getCategoryFilePath(
-    const tl::optional<Uuid>& category) const {
+    const std::optional<Uuid>& category) const {
   if (category) {
     switch (mContext.mElementType) {
       case NewElementWizardContext::ElementType::ComponentCategory:
@@ -207,7 +207,7 @@ FilePath NewElementWizardPage_CopyFrom::getCategoryFilePath(
 }
 
 QSet<Uuid> NewElementWizardPage_CopyFrom::getElementsByCategory(
-    const tl::optional<Uuid>& category) const {
+    const std::optional<Uuid>& category) const {
   switch (mContext.mElementType) {
     case NewElementWizardContext::ElementType::Symbol:
       return mContext.getWorkspace().getLibraryDb().getByCategory<Symbol>(

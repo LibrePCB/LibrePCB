@@ -664,8 +664,8 @@ TEST_F(GraphicsExportDialogTest, testMirror) {
 }
 
 TEST_F(GraphicsExportDialogTest, testScale) {
-  const tl::optional<UnsignedRatio> defaultValue = tl::nullopt;
-  const tl::optional<UnsignedRatio> newValue =
+  const std::optional<UnsignedRatio> defaultValue = std::nullopt;
+  const std::optional<UnsignedRatio> newValue =
       UnsignedRatio(Ratio::fromNormalized(2));
   QString widgetCbx =
       "tabWidget/qt_tabwidget_stackedwidget/tabGeneral/cbxScaleAuto";

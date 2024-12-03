@@ -64,7 +64,7 @@ public:
 
   // Getters
   const BoardHoleData& getData() const noexcept { return mData; }
-  const tl::optional<Length>& getStopMaskOffset() const noexcept {
+  const std::optional<Length>& getStopMaskOffset() const noexcept {
     return mStopMaskOffset;
   }
 
@@ -88,7 +88,7 @@ private:  // Data
   BoardHoleData mData;
 
   // Cached Attributes
-  tl::optional<Length> mStopMaskOffset;
+  std::optional<Length> mStopMaskOffset;
 };
 
 /*******************************************************************************

@@ -69,7 +69,7 @@ public:
   ~PackageChooserDialog() noexcept;
 
   // Getters
-  const tl::optional<Uuid>& getSelectedPackageUuid() const noexcept {
+  const std::optional<Uuid>& getSelectedPackageUuid() const noexcept {
     return mSelectedPackageUuid;
   }
 
@@ -84,8 +84,8 @@ private:  // Methods
                                        QListWidgetItem* previous) noexcept;
   void listPackages_itemDoubleClicked(QListWidgetItem* item) noexcept;
   void searchPackages(const QString& input);
-  void setSelectedCategory(const tl::optional<Uuid>& uuid) noexcept;
-  void setSelectedPackage(const tl::optional<Uuid>& uuid) noexcept;
+  void setSelectedCategory(const std::optional<Uuid>& uuid) noexcept;
+  void setSelectedPackage(const std::optional<Uuid>& uuid) noexcept;
   void updatePreview(const FilePath& fp) noexcept;
   void accept() noexcept override;
   const QStringList& localeOrder() const noexcept;
@@ -96,8 +96,8 @@ private:  // Data
   QScopedPointer<Ui::PackageChooserDialog> mUi;
   QScopedPointer<QAbstractItemModel> mCategoryTreeModel;
   bool mCategorySelected;
-  tl::optional<Uuid> mSelectedCategoryUuid;
-  tl::optional<Uuid> mSelectedPackageUuid;
+  std::optional<Uuid> mSelectedCategoryUuid;
+  std::optional<Uuid> mSelectedPackageUuid;
 
   // preview
   std::unique_ptr<Package> mPackage;

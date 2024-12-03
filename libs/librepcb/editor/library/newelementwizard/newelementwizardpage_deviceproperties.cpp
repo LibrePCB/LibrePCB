@@ -80,7 +80,7 @@ void NewElementWizardPage_DeviceProperties::
   ComponentChooserDialog dialog(mContext.getWorkspace(),
                                 &mContext.getLayerProvider(), this);
   if (dialog.exec() == QDialog::Accepted) {
-    tl::optional<Uuid> uuid = dialog.getSelectedComponentUuid();
+    std::optional<Uuid> uuid = dialog.getSelectedComponentUuid();
     setComponent(uuid);
   }
 }
@@ -89,13 +89,13 @@ void NewElementWizardPage_DeviceProperties::btnChoosePackageClicked() noexcept {
   PackageChooserDialog dialog(mContext.getWorkspace(),
                               &mContext.getLayerProvider(), this);
   if (dialog.exec() == QDialog::Accepted) {
-    tl::optional<Uuid> uuid = dialog.getSelectedPackageUuid();
+    std::optional<Uuid> uuid = dialog.getSelectedPackageUuid();
     setPackage(uuid);
   }
 }
 
 void NewElementWizardPage_DeviceProperties::setComponent(
-    const tl::optional<Uuid>& uuid) noexcept {
+    const std::optional<Uuid>& uuid) noexcept {
   mContext.mDeviceComponentUuid = uuid;
   if (uuid) {
     try {
@@ -118,7 +118,7 @@ void NewElementWizardPage_DeviceProperties::setComponent(
 }
 
 void NewElementWizardPage_DeviceProperties::setPackage(
-    const tl::optional<Uuid>& uuid) noexcept {
+    const std::optional<Uuid>& uuid) noexcept {
   mContext.mDevicePackageUuid = uuid;
   if (uuid) {
     try {
@@ -136,7 +136,7 @@ void NewElementWizardPage_DeviceProperties::setPackage(
     } catch (const Exception& e) {
       mUi->lblPackageName->setText(tr("ERROR:"));
       mUi->lblPackageDescription->setText(e.getMsg());
-      mContext.mDevicePackageUuid = tl::nullopt;  // invalid package!
+      mContext.mDevicePackageUuid = std::nullopt;  // invalid package!
     }
   } else {
     mUi->lblPackageName->setText(tr("No package selected"));

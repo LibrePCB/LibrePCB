@@ -114,7 +114,7 @@ BI_Device::BI_Device(Board& board, ComponentInstance& compInstance,
 
   // Check pad-signal-map.
   for (const DevicePadSignalMapItem& item : mLibDevice->getPadSignalMap()) {
-    tl::optional<Uuid> signalUuid = item.getSignalUuid();
+    std::optional<Uuid> signalUuid = item.getSignalUuid();
     if ((signalUuid) && (!mCompInstance.getSignalInstance(*signalUuid))) {
       throw RuntimeError(
           __FILE__, __LINE__,
@@ -183,20 +183,20 @@ const Uuid& BI_Device::getComponentInstanceUuid() const noexcept {
   return mCompInstance.getUuid();
 }
 
-tl::optional<Uuid> BI_Device::getLibModelUuid() const noexcept {
-  return mLibModel ? tl::make_optional(mLibModel->getUuid()) : tl::nullopt;
+std::optional<Uuid> BI_Device::getLibModelUuid() const noexcept {
+  return mLibModel ? std::make_optional(mLibModel->getUuid()) : std::nullopt;
 }
 
-tl::optional<Uuid> BI_Device::getDefaultLibModelUuid() const noexcept {
+std::optional<Uuid> BI_Device::getDefaultLibModelUuid() const noexcept {
   for (const std::shared_ptr<const PackageModel>& model :
        mLibPackage->getModelsForFootprint(mLibFootprint->getUuid())) {
     return model->getUuid();
   }
-  return tl::nullopt;
+  return std::nullopt;
 }
 
 QVector<std::shared_ptr<const Part>> BI_Device::getParts(
-    const tl::optional<Uuid>& assemblyVariant) const noexcept {
+    const std::optional<Uuid>& assemblyVariant) const noexcept {
   QVector<std::shared_ptr<const Part>> parts;
   for (const ComponentAssemblyOption& opt :
        mCompInstance.getAssemblyOptions()) {
@@ -332,7 +332,7 @@ void BI_Device::setAttributes(const AttributeList& attributes) noexcept {
   }
 }
 
-void BI_Device::setModel(const tl::optional<Uuid>& uuid) {
+void BI_Device::setModel(const std::optional<Uuid>& uuid) {
   const PackageModel* model =
       uuid ? mLibPackage->getModels().get(*uuid).get() : nullptr;  // can throw
   if (model != mLibModel) {
@@ -392,7 +392,7 @@ void BI_Device::serialize(SExpression& root) const {
   root.ensureLineBreak();
   root.appendChild(
       "lib_3d_model",
-      mLibModel ? tl::make_optional(mLibModel->getUuid()) : tl::nullopt);
+      mLibModel ? std::make_optional(mLibModel->getUuid()) : std::nullopt);
   root.ensureLineBreak();
   mPosition.serialize(root.appendList("position"));
   root.appendChild("rotation", mRotation);
@@ -419,10 +419,10 @@ bool BI_Device::checkAttributesValidity() const noexcept {
 }
 
 void BI_Device::updateHoleStopMaskOffsets() noexcept {
-  QHash<Uuid, tl::optional<Length>> offsets;
+  QHash<Uuid, std::optional<Length>> offsets;
   for (const Hole& hole : mLibFootprint->getHoles()) {
     if (!hole.getStopMaskConfig().isEnabled()) {
-      offsets[hole.getUuid()] = tl::nullopt;
+      offsets[hole.getUuid()] = std::nullopt;
     } else if (auto offset = hole.getStopMaskConfig().getOffset()) {
       offsets[hole.getUuid()] = offset;
     } else {

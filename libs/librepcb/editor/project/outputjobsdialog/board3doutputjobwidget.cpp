@@ -104,20 +104,20 @@ Board3DOutputJobWidget::Board3DOutputJobWidget(
   mUi->rbtnBoardsCustom->setChecked(job->getBoards().isCustom());
 
   // List custom assembly variants.
-  QVector<tl::optional<Uuid>> allVariantUuids;
+  QVector<std::optional<Uuid>> allVariantUuids;
   QHash<Uuid, QString> avNames;
-  allVariantUuids.append(tl::nullopt);
+  allVariantUuids.append(std::nullopt);
   for (const auto& av : mProject.getCircuit().getAssemblyVariants()) {
     allVariantUuids.append(av.getUuid());
     avNames[av.getUuid()] = av.getDisplayText();
   }
-  foreach (const tl::optional<Uuid>& uuid,
+  foreach (const std::optional<Uuid>& uuid,
            mJob->getAssemblyVariants().getSet()) {
     if (!allVariantUuids.contains(uuid)) {
       allVariantUuids.append(uuid);
     }
   }
-  foreach (const tl::optional<Uuid>& uuid, allVariantUuids) {
+  foreach (const std::optional<Uuid>& uuid, allVariantUuids) {
     QListWidgetItem* item =
         new QListWidgetItem(uuid ? avNames.value(*uuid, uuid->toStr())
                                  : tr("None (just the plain PCB)"),
@@ -190,7 +190,7 @@ void Board3DOutputJobWidget::applyVariants(bool checked) noexcept {
         Board3DOutputJob::AssemblyVariantSet::onlyDefault());
     mUi->lstVariants->setEnabled(false);
   } else if (mUi->rbtnVariantsCustom->isChecked()) {
-    QSet<tl::optional<Uuid>> uuids;
+    QSet<std::optional<Uuid>> uuids;
     for (int i = 0; i < mUi->lstVariants->count(); ++i) {
       if (QListWidgetItem* item = mUi->lstVariants->item(i)) {
         auto uuid = Uuid::tryFromString(item->data(Qt::UserRole).toString());

@@ -24,10 +24,11 @@
  *  Includes
  ******************************************************************************/
 #include <librepcb/core/types/point.h>
-#include <optional/tl/optional.hpp>
 
 #include <QtCore>
 #include <QtWidgets>
+
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -49,7 +50,7 @@ class MoveAlignDialog;
 class MoveAlignDialog final : public QDialog {
   Q_OBJECT
 
-  typedef tl::optional<PositiveLength> Interval;
+  typedef std::optional<PositiveLength> Interval;
 
 public:
   // Constructors / Destructor

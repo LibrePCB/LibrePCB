@@ -27,12 +27,12 @@
 #include <librepcb/core/project/circuit/netsignal.h>
 #include <librepcb/core/rulecheck/rulecheckmessage.h>
 #include <librepcb/core/serialization/fileformatmigration.h>
-#include <optional/tl/optional.hpp>
 
 #include <QtCore>
 #include <QtWidgets>
 
 #include <memory>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -74,9 +74,9 @@ public:
   /**
    * @brief The constructor
    */
-  ProjectEditor(
-      Workspace& workspace, Project& project,
-      const tl::optional<QList<FileFormatMigration::Message>>& upgradeMessages);
+  ProjectEditor(Workspace& workspace, Project& project,
+                const std::optional<QList<FileFormatMigration::Message>>&
+                    upgradeMessages);
 
   /**
    * @brief The destructor
@@ -101,12 +101,12 @@ public:
 
   ResourceList getComponentResources(
       const ComponentInstance& cmp,
-      const tl::optional<Uuid>& filterDev = tl::nullopt) const noexcept;
+      const std::optional<Uuid>& filterDev = std::nullopt) const noexcept;
 
   // General Methods
 
   void addResourcesToMenu(MenuBuilder& mb, const ComponentInstance& cmp,
-                          const tl::optional<Uuid>& filterDev,
+                          const std::optional<Uuid>& filterDev,
                           QPointer<QWidget> editor, QMenu* root) const noexcept;
 
   /**

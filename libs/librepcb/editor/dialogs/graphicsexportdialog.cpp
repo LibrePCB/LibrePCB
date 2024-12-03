@@ -63,7 +63,7 @@ GraphicsExportDialog::GraphicsExportDialog(
     mDefaultSettings(new GraphicsExportSettings()),
     mColors(),
     mSettingsPrinterName(),
-    mSettingsPageSize(tl::nullopt),
+    mSettingsPageSize(std::nullopt),
     mSettingsDuplexMode(QPrinter::DuplexNone),
     mDisableApplySettings(true),
     mUi(new Ui::GraphicsExportDialog),
@@ -149,8 +149,8 @@ GraphicsExportDialog::GraphicsExportDialog(
   // Page size.
   if ((output == Output::Pdf) || (output == Output::Print)) {
     if (output == Output::Pdf) {
-      QList<tl::optional<QPageSize>> sizes = {
-          tl::nullopt,  // Auto size.
+      QList<std::optional<QPageSize>> sizes = {
+          std::nullopt,  // Auto size.
           QPageSize(QPageSize::A0),
           QPageSize(QPageSize::A1),
           QPageSize(QPageSize::A2),
@@ -635,8 +635,8 @@ void GraphicsExportDialog::syncClientSettings(
     } else {
       QString value = s.value(mSettingsPrefix % "/page_size").toString();
       if (value == "auto") {
-        mSettingsPageSize = tl::nullopt;
-        setPageSize(tl::nullopt);
+        mSettingsPageSize = std::nullopt;
+        setPageSize(std::nullopt);
       } else if (!value.isEmpty()) {
         for (int i = 0; i < QPageSize::LastPageSize; ++i) {
           QPageSize::PageSizeId id = static_cast<QPageSize::PageSizeId>(i);
@@ -919,7 +919,7 @@ void GraphicsExportDialog::printerChanged(int index) noexcept {
   QPrinterInfo printer = mAvailablePrinters.value(index);
 
   bool wasEmpty = mAvailablePageSizes.isEmpty();
-  QList<tl::optional<QPageSize>> sizes;
+  QList<std::optional<QPageSize>> sizes;
   foreach (const auto& size, printer.supportedPageSizes()) {
     sizes.append(size);
   }
@@ -953,12 +953,12 @@ void GraphicsExportDialog::printerChanged(int index) noexcept {
 }
 
 void GraphicsExportDialog::setAvailablePageSizes(
-    QList<tl::optional<QPageSize>> sizes) noexcept {
+    QList<std::optional<QPageSize>> sizes) noexcept {
   // Sort page sizes.
   Toolbox::sortNumeric(
       sizes,
-      [](const QCollator& cmp, const tl::optional<QPageSize>& lhs,
-         const tl::optional<QPageSize>& rhs) {
+      [](const QCollator& cmp, const std::optional<QPageSize>& lhs,
+         const std::optional<QPageSize>& rhs) {
         if (lhs && rhs) {
           return cmp(lhs->name(), rhs->name());
         } else {
@@ -967,15 +967,15 @@ void GraphicsExportDialog::setAvailablePageSizes(
       },
       Qt::CaseInsensitive, false);
 
-  tl::optional<QPageSize> selectedSize = getPageSize();
+  std::optional<QPageSize> selectedSize = getPageSize();
   mAvailablePageSizes = sizes;
   mUi->cbxPageSize->clear();
-  foreach (const tl::optional<QPageSize>& size, sizes) {
+  foreach (const std::optional<QPageSize>& size, sizes) {
     mUi->cbxPageSize->addItem(size ? size->name()
                                    : tr("Custom (adjust to content)"));
   }
-  setPageSize(selectedSize ? tl::make_optional(selectedSize->id())
-                           : tl::nullopt);
+  setPageSize(selectedSize ? std::make_optional(selectedSize->id())
+                           : std::nullopt);
 }
 
 void GraphicsExportDialog::layerListItemDoubleClicked(
@@ -1013,8 +1013,8 @@ void GraphicsExportDialog::applySettings() noexcept {
   settings->setMarginBottom(getMarginBottom());
   settings->setRotate(getRotate());
   settings->setMirror(getMirror());
-  settings->setScale(getFitToPage() ? tl::nullopt
-                                    : tl::make_optional(getScaleFactor()));
+  settings->setScale(getFitToPage() ? std::nullopt
+                                    : std::make_optional(getScaleFactor()));
   settings->setMinLineWidth(getMinLineWidth());
   settings->setBlackWhite(getBlackWhite());
   settings->setBackgroundColor(getBackgroundColor());
@@ -1210,9 +1210,9 @@ bool GraphicsExportDialog::eventFilter(QObject* object,
  ******************************************************************************/
 
 void GraphicsExportDialog::setPageSize(
-    const tl::optional<QPageSize::PageSizeId>& size) noexcept {
+    const std::optional<QPageSize::PageSizeId>& size) noexcept {
   for (int i = 0; i < mAvailablePageSizes.count(); ++i) {
-    tl::optional<QPageSize> value = mAvailablePageSizes.at(i);
+    std::optional<QPageSize> value = mAvailablePageSizes.at(i);
     if (((!size) && (!value)) || (size && value && size == value->id())) {
       mUi->cbxPageSize->setCurrentIndex(i);
       return;
@@ -1220,7 +1220,7 @@ void GraphicsExportDialog::setPageSize(
   }
 }
 
-tl::optional<QPageSize> GraphicsExportDialog::getPageSize() const noexcept {
+std::optional<QPageSize> GraphicsExportDialog::getPageSize() const noexcept {
   return mAvailablePageSizes.value(mUi->cbxPageSize->currentIndex());
 }
 

@@ -71,7 +71,7 @@ void OpenGlTriangleObject::draw(QOpenGLFunctions& gl,
       mBuffer.allocate(mNewTriangles->data(),
                        mNewTriangles->count() * sizeof(QVector3D));
       mCount = mNewTriangles->count();
-      mNewTriangles = tl::nullopt;
+      mNewTriangles = std::nullopt;
     }
   }
 

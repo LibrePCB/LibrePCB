@@ -139,12 +139,12 @@ TEST_F(WorkspaceLibraryDbTest, testGetAllEmptyDbWithUuid) {
 TEST_F(WorkspaceLibraryDbTest, testGetAllEmptyDbWithLibrary) {
   FilePath lib = toAbs("lib");
   // Note: Library filter with getAll<Library> is not possible, thus not tested.
-  EXPECT_EQ(0, mWsDb->getAll<ComponentCategory>(tl::nullopt, lib).count());
-  EXPECT_EQ(0, mWsDb->getAll<PackageCategory>(tl::nullopt, lib).count());
-  EXPECT_EQ(0, mWsDb->getAll<Symbol>(tl::nullopt, lib).count());
-  EXPECT_EQ(0, mWsDb->getAll<Package>(tl::nullopt, lib).count());
-  EXPECT_EQ(0, mWsDb->getAll<Component>(tl::nullopt, lib).count());
-  EXPECT_EQ(0, mWsDb->getAll<Device>(tl::nullopt, lib).count());
+  EXPECT_EQ(0, mWsDb->getAll<ComponentCategory>(std::nullopt, lib).count());
+  EXPECT_EQ(0, mWsDb->getAll<PackageCategory>(std::nullopt, lib).count());
+  EXPECT_EQ(0, mWsDb->getAll<Symbol>(std::nullopt, lib).count());
+  EXPECT_EQ(0, mWsDb->getAll<Package>(std::nullopt, lib).count());
+  EXPECT_EQ(0, mWsDb->getAll<Component>(std::nullopt, lib).count());
+  EXPECT_EQ(0, mWsDb->getAll<Device>(std::nullopt, lib).count());
 }
 
 TEST_F(WorkspaceLibraryDbTest, testGetAllEmptyDbWithUuidAndLibrary) {
@@ -165,10 +165,10 @@ TEST_F(WorkspaceLibraryDbTest, testGetAll) {
                         false, QByteArray(), QString());
     mWriter->addCategory<ComponentCategory>(0, toAbs("cmpcat" % number), uuid(),
                                             version("0.2." % number), false,
-                                            tl::nullopt);
+                                            std::nullopt);
     mWriter->addCategory<PackageCategory>(0, toAbs("pkgcat" % number), uuid(),
                                           version("0.3." % number), false,
-                                          tl::nullopt);
+                                          std::nullopt);
     mWriter->addElement<Symbol>(0, toAbs("sym" % number), uuid(),
                                 version("0.4." % number), false, QString());
     mWriter->addElement<Package>(0, toAbs("pkg" % number), uuid(),
@@ -263,7 +263,7 @@ TEST_F(WorkspaceLibraryDbTest, testGetAllWithLibrary) {
 
   EXPECT_EQ(
       str({{version("0.3"), toAbs("sym3")}, {version("0.2"), toAbs("sym4")}}),
-      str(mWsDb->getAll<Symbol>(tl::nullopt, toAbs("lib2"))));
+      str(mWsDb->getAll<Symbol>(std::nullopt, toAbs("lib2"))));
 }
 
 TEST_F(WorkspaceLibraryDbTest, testGetAllWithUuidAndLibrary) {
@@ -439,9 +439,9 @@ TEST_F(WorkspaceLibraryDbTest, testGetTranslationsEmpty) {
   int libId = mWriter->addLibrary(toAbs("fp"), uuid(), version("0.1"), false,
                                   QByteArray(), QString());
   mWriter->addCategory<ComponentCategory>(libId, toAbs("fp"), uuid(),
-                                          version("0.1"), false, tl::nullopt);
+                                          version("0.1"), false, std::nullopt);
   mWriter->addCategory<PackageCategory>(libId, toAbs("fp"), uuid(),
-                                        version("0.1"), false, tl::nullopt);
+                                        version("0.1"), false, std::nullopt);
   mWriter->addElement<Symbol>(libId, toAbs("fp"), uuid(), version("0.1"), false,
                               QString());
   mWriter->addElement<Package>(libId, toAbs("fp"), uuid(), version("0.1"),
@@ -466,11 +466,11 @@ TEST_F(WorkspaceLibraryDbTest, testGetTranslationsDefaultLocale) {
   mWriter->addTranslation<Library>(libId, "", ElementName("lib_n"), "lib_d",
                                    "lib_k");
   int id = mWriter->addCategory<ComponentCategory>(
-      libId, toAbs("fp"), uuid(), version("0.1"), false, tl::nullopt);
+      libId, toAbs("fp"), uuid(), version("0.1"), false, std::nullopt);
   mWriter->addTranslation<ComponentCategory>(id, "", ElementName("cmpcat_n"),
                                              "cmpcat_d", "cmpcat_k");
   id = mWriter->addCategory<PackageCategory>(
-      libId, toAbs("fp"), uuid(), version("0.1"), false, tl::nullopt);
+      libId, toAbs("fp"), uuid(), version("0.1"), false, std::nullopt);
   mWriter->addTranslation<PackageCategory>(id, "", ElementName("pkgcat_n"),
                                            "pkgcat_d", "pkgcat_k");
   id = mWriter->addElement<Symbol>(libId, toAbs("fp"), uuid(), version("0.1"),
@@ -518,11 +518,11 @@ TEST_F(WorkspaceLibraryDbTest, testGetTranslationsDefaultWithOrder) {
 TEST_F(WorkspaceLibraryDbTest, testGetTranslationsMultipleWithoutOrder) {
   int id = mWriter->addElement<Symbol>(0, toAbs("fp"), uuid(), version("0.1"),
                                        false, QString());
-  mWriter->addTranslation<Symbol>(id, "de_DE", tl::nullopt, "de_d",
-                                  tl::nullopt);
+  mWriter->addTranslation<Symbol>(id, "de_DE", std::nullopt, "de_d",
+                                  std::nullopt);
   mWriter->addTranslation<Symbol>(id, "", ElementName("_n"), "_d", "_k");
-  mWriter->addTranslation<Symbol>(id, "en_US", ElementName("en_n"), tl::nullopt,
-                                  tl::nullopt);
+  mWriter->addTranslation<Symbol>(id, "en_US", ElementName("en_n"),
+                                  std::nullopt, std::nullopt);
   mWriter->addTranslation<Symbol>(id, "it_IT", ElementName("it_n"), "it_d",
                                   "it_k");
 
@@ -532,11 +532,11 @@ TEST_F(WorkspaceLibraryDbTest, testGetTranslationsMultipleWithoutOrder) {
 TEST_F(WorkspaceLibraryDbTest, testGetTranslationsMultipleWithOrder) {
   int id = mWriter->addElement<Symbol>(0, toAbs("fp"), uuid(), version("0.1"),
                                        false, QString());
-  mWriter->addTranslation<Symbol>(id, "de_DE", tl::nullopt, "de_d",
-                                  tl::nullopt);
-  mWriter->addTranslation<Symbol>(id, "", tl::nullopt, "_d", "_k");
-  mWriter->addTranslation<Symbol>(id, "en_US", ElementName("en_n"), tl::nullopt,
-                                  tl::nullopt);
+  mWriter->addTranslation<Symbol>(id, "de_DE", std::nullopt, "de_d",
+                                  std::nullopt);
+  mWriter->addTranslation<Symbol>(id, "", std::nullopt, "_d", "_k");
+  mWriter->addTranslation<Symbol>(id, "en_US", ElementName("en_n"),
+                                  std::nullopt, std::nullopt);
   mWriter->addTranslation<Symbol>(id, "it_IT", ElementName("it_n"), "it_d",
                                   "it_k");
 
@@ -569,9 +569,9 @@ TEST_F(WorkspaceLibraryDbTest, testGetTranslationsNullptr) {
 
 template <typename ElementType>
 static void testGetMetadata(WorkspaceLibraryDb& db, const FilePath& fp,
-                            bool expRetVal, const tl::optional<Uuid>& expUuid,
-                            const tl::optional<Version>& expVersion,
-                            const tl::optional<bool>& expDeprecated) {
+                            bool expRetVal, const std::optional<Uuid>& expUuid,
+                            const std::optional<Version>& expVersion,
+                            const std::optional<bool>& expDeprecated) {
   Uuid retUuid = Uuid::createRandom();
   Version retVersion = Version::fromString("1");
   bool retDeprecated = false;
@@ -592,20 +592,20 @@ static void testGetMetadata(WorkspaceLibraryDb& db, const FilePath& fp,
 
 TEST_F(WorkspaceLibraryDbTest, testGetMetadataInexistent) {
   FilePath fp = toAbs("fp");
-  testGetMetadata<Library>(*mWsDb, fp, false, tl::nullopt, tl::nullopt,
-                           tl::nullopt);
-  testGetMetadata<ComponentCategory>(*mWsDb, fp, false, tl::nullopt,
-                                     tl::nullopt, tl::nullopt);
-  testGetMetadata<PackageCategory>(*mWsDb, fp, false, tl::nullopt, tl::nullopt,
-                                   tl::nullopt);
-  testGetMetadata<Symbol>(*mWsDb, fp, false, tl::nullopt, tl::nullopt,
-                          tl::nullopt);
-  testGetMetadata<Package>(*mWsDb, fp, false, tl::nullopt, tl::nullopt,
-                           tl::nullopt);
-  testGetMetadata<Component>(*mWsDb, fp, false, tl::nullopt, tl::nullopt,
-                             tl::nullopt);
-  testGetMetadata<Device>(*mWsDb, fp, false, tl::nullopt, tl::nullopt,
-                          tl::nullopt);
+  testGetMetadata<Library>(*mWsDb, fp, false, std::nullopt, std::nullopt,
+                           std::nullopt);
+  testGetMetadata<ComponentCategory>(*mWsDb, fp, false, std::nullopt,
+                                     std::nullopt, std::nullopt);
+  testGetMetadata<PackageCategory>(*mWsDb, fp, false, std::nullopt,
+                                   std::nullopt, std::nullopt);
+  testGetMetadata<Symbol>(*mWsDb, fp, false, std::nullopt, std::nullopt,
+                          std::nullopt);
+  testGetMetadata<Package>(*mWsDb, fp, false, std::nullopt, std::nullopt,
+                           std::nullopt);
+  testGetMetadata<Component>(*mWsDb, fp, false, std::nullopt, std::nullopt,
+                             std::nullopt);
+  testGetMetadata<Device>(*mWsDb, fp, false, std::nullopt, std::nullopt,
+                          std::nullopt);
 }
 
 TEST_F(WorkspaceLibraryDbTest, testGetMetadata) {
@@ -613,9 +613,9 @@ TEST_F(WorkspaceLibraryDbTest, testGetMetadata) {
   int libId = mWriter->addLibrary(fp, uuid(1), version("1.1"), false,
                                   QByteArray(), QString());
   mWriter->addCategory<ComponentCategory>(libId, fp, uuid(2), version("2.2"),
-                                          true, tl::nullopt);
+                                          true, std::nullopt);
   mWriter->addCategory<PackageCategory>(libId, fp, uuid(3), version("3.3"),
-                                        false, tl::nullopt);
+                                        false, std::nullopt);
   mWriter->addElement<Symbol>(libId, fp, uuid(4), version("4.4"), true,
                               QString());
   mWriter->addElement<Package>(libId, fp, uuid(5), version("5.5"), false,
@@ -697,7 +697,7 @@ TEST_F(WorkspaceLibraryDbTest, testGetLibraryMetadataNullptr) {
  ******************************************************************************/
 
 TEST_F(WorkspaceLibraryDbTest, testGetCategoryMetadataEmptyDb) {
-  tl::optional<Uuid> parent;
+  std::optional<Uuid> parent;
   EXPECT_FALSE(
       mWsDb->getCategoryMetadata<ComponentCategory>(toAbs("fp"), &parent));
   EXPECT_FALSE(
@@ -708,11 +708,11 @@ TEST_F(WorkspaceLibraryDbTest, testGetCategoryMetadataInexistent) {
   int libId = mWriter->addLibrary(toAbs("fp"), uuid(), version("1.1"), false,
                                   QByteArray(), QString());
   mWriter->addCategory<ComponentCategory>(libId, toAbs("fp"), uuid(),
-                                          version("2.2"), false, tl::nullopt);
+                                          version("2.2"), false, std::nullopt);
   mWriter->addCategory<PackageCategory>(libId, toAbs("fp"), uuid(),
-                                        version("3.3"), false, tl::nullopt);
+                                        version("3.3"), false, std::nullopt);
 
-  tl::optional<Uuid> parent;
+  std::optional<Uuid> parent;
   EXPECT_FALSE(
       mWsDb->getCategoryMetadata<ComponentCategory>(toAbs("foo"), &parent));
   EXPECT_FALSE(
@@ -723,15 +723,15 @@ TEST_F(WorkspaceLibraryDbTest, testGetCategoryMetadata) {
   int libId = mWriter->addLibrary(toAbs("fp"), uuid(), version("1.1"), false,
                                   QByteArray(), QString());
   mWriter->addCategory<ComponentCategory>(libId, toAbs("fp1"), uuid(1),
-                                          version("2.2"), false, tl::nullopt);
+                                          version("2.2"), false, std::nullopt);
   mWriter->addCategory<ComponentCategory>(libId, toAbs("fp2"), uuid(2),
                                           version("3.3"), false, uuid(1));
   mWriter->addCategory<PackageCategory>(libId, toAbs("fp3"), uuid(2),
-                                        version("4.4"), false, tl::nullopt);
+                                        version("4.4"), false, std::nullopt);
   mWriter->addCategory<PackageCategory>(libId, toAbs("fp4"), uuid(1),
                                         version("5.5"), false, uuid(2));
 
-  tl::optional<Uuid> parent;
+  std::optional<Uuid> parent;
 
   EXPECT_TRUE(
       mWsDb->getCategoryMetadata<ComponentCategory>(toAbs("fp1"), &parent));
@@ -754,11 +754,11 @@ TEST_F(WorkspaceLibraryDbTest, testGetCategoryMetadataNullptr) {
   int libId = mWriter->addLibrary(toAbs("fp"), uuid(), version("1.1"), false,
                                   QByteArray(), QString());
   mWriter->addCategory<ComponentCategory>(libId, toAbs("fp1"), uuid(1),
-                                          version("2.2"), false, tl::nullopt);
+                                          version("2.2"), false, std::nullopt);
   mWriter->addCategory<ComponentCategory>(libId, toAbs("fp2"), uuid(2),
                                           version("3.3"), false, uuid(1));
 
-  tl::optional<Uuid> parent;
+  std::optional<Uuid> parent;
 
   EXPECT_TRUE(mWsDb->getCategoryMetadata<ComponentCategory>(toAbs("fp2")));
   EXPECT_TRUE(
@@ -808,16 +808,16 @@ TEST_F(WorkspaceLibraryDbTest, testGetDeviceMetadataNullptr) {
 
 TEST_F(WorkspaceLibraryDbTest, testGetChildsEmptyDb) {
   EXPECT_EQ(str(QSet<Uuid>{}),
-            str(mWsDb->getChilds<ComponentCategory>(tl::nullopt)));
+            str(mWsDb->getChilds<ComponentCategory>(std::nullopt)));
   EXPECT_EQ(str(QSet<Uuid>{}),
-            str(mWsDb->getChilds<PackageCategory>(tl::nullopt)));
+            str(mWsDb->getChilds<PackageCategory>(std::nullopt)));
 }
 
 TEST_F(WorkspaceLibraryDbTest, testGetChildsInexistent) {
   mWriter->addCategory<ComponentCategory>(0, toAbs("cmpcat"), uuid(1),
-                                          version("0.1"), false, tl::nullopt);
+                                          version("0.1"), false, std::nullopt);
   mWriter->addCategory<PackageCategory>(0, toAbs("pkgcat"), uuid(2),
-                                        version("0.1"), false, tl::nullopt);
+                                        version("0.1"), false, std::nullopt);
 
   EXPECT_EQ(str(QSet<Uuid>{}),
             str(mWsDb->getChilds<ComponentCategory>(uuid(2))));
@@ -843,9 +843,9 @@ TEST_F(WorkspaceLibraryDbTest, testGetChildsInvalidWithoutUuid) {
                                         version("0.1"), false, uuid(4));
 
   EXPECT_EQ(str(QSet<Uuid>{uuid(1)}),
-            str(mWsDb->getChilds<ComponentCategory>(tl::nullopt)));
+            str(mWsDb->getChilds<ComponentCategory>(std::nullopt)));
   EXPECT_EQ(str(QSet<Uuid>{uuid(3)}),
-            str(mWsDb->getChilds<PackageCategory>(tl::nullopt)));
+            str(mWsDb->getChilds<PackageCategory>(std::nullopt)));
 }
 
 // Further tests only check with ComponentCategory, since the implementation
@@ -854,11 +854,11 @@ TEST_F(WorkspaceLibraryDbTest, testGetChildsInvalidWithoutUuid) {
 
 TEST_F(WorkspaceLibraryDbTest, testGetChildsDuplicatesWithUuid) {
   mWriter->addCategory<ComponentCategory>(0, toAbs("cmpcat1"), uuid(1),
-                                          version("0.1"), false, tl::nullopt);
+                                          version("0.1"), false, std::nullopt);
   mWriter->addCategory<ComponentCategory>(0, toAbs("cmpcat2"), uuid(2),
                                           version("0.1"), false, uuid(1));
   mWriter->addCategory<ComponentCategory>(1, toAbs("cmpcat3"), uuid(1),
-                                          version("0.1"), false, tl::nullopt);
+                                          version("0.1"), false, std::nullopt);
   mWriter->addCategory<ComponentCategory>(1, toAbs("cmpcat4"), uuid(2),
                                           version("0.1"), false, uuid(1));
 
@@ -868,16 +868,16 @@ TEST_F(WorkspaceLibraryDbTest, testGetChildsDuplicatesWithUuid) {
 
 TEST_F(WorkspaceLibraryDbTest, testGetChildsDuplicatesWithoutUuid) {
   mWriter->addCategory<ComponentCategory>(0, toAbs("cmpcat1"), uuid(1),
-                                          version("0.1"), false, tl::nullopt);
+                                          version("0.1"), false, std::nullopt);
   mWriter->addCategory<ComponentCategory>(0, toAbs("cmpcat2"), uuid(2),
                                           version("0.1"), false, uuid(1));
   mWriter->addCategory<ComponentCategory>(1, toAbs("cmpcat3"), uuid(1),
-                                          version("0.1"), false, tl::nullopt);
+                                          version("0.1"), false, std::nullopt);
   mWriter->addCategory<ComponentCategory>(1, toAbs("cmpcat4"), uuid(2),
                                           version("0.1"), false, uuid(1));
 
   EXPECT_EQ(str(QSet<Uuid>{uuid(1)}),
-            str(mWsDb->getChilds<ComponentCategory>(tl::nullopt)));
+            str(mWsDb->getChilds<ComponentCategory>(std::nullopt)));
 }
 
 /*******************************************************************************
@@ -885,11 +885,12 @@ TEST_F(WorkspaceLibraryDbTest, testGetChildsDuplicatesWithoutUuid) {
  ******************************************************************************/
 
 TEST_F(WorkspaceLibraryDbTest, testGetByCategoryEmptyDb) {
-  EXPECT_EQ(str(QSet<Uuid>{}), str(mWsDb->getByCategory<Symbol>(tl::nullopt)));
-  EXPECT_EQ(str(QSet<Uuid>{}), str(mWsDb->getByCategory<Package>(tl::nullopt)));
+  EXPECT_EQ(str(QSet<Uuid>{}), str(mWsDb->getByCategory<Symbol>(std::nullopt)));
   EXPECT_EQ(str(QSet<Uuid>{}),
-            str(mWsDb->getByCategory<Component>(tl::nullopt)));
-  EXPECT_EQ(str(QSet<Uuid>{}), str(mWsDb->getByCategory<Device>(tl::nullopt)));
+            str(mWsDb->getByCategory<Package>(std::nullopt)));
+  EXPECT_EQ(str(QSet<Uuid>{}),
+            str(mWsDb->getByCategory<Component>(std::nullopt)));
+  EXPECT_EQ(str(QSet<Uuid>{}), str(mWsDb->getByCategory<Device>(std::nullopt)));
 }
 
 TEST_F(WorkspaceLibraryDbTest, testGetByCategoryInexistent) {
@@ -901,9 +902,9 @@ TEST_F(WorkspaceLibraryDbTest, testGetByCategoryInexistent) {
 
 TEST_F(WorkspaceLibraryDbTest, testGetByCategory) {
   mWriter->addCategory<ComponentCategory>(0, toAbs("cmpcat"), uuid(1),
-                                          version("0.1"), false, tl::nullopt);
+                                          version("0.1"), false, std::nullopt);
   mWriter->addCategory<PackageCategory>(0, toAbs("pkgcat"), uuid(2),
-                                        version("0.1"), false, tl::nullopt);
+                                        version("0.1"), false, std::nullopt);
   int sym = mWriter->addElement<Symbol>(0, toAbs("sym"), uuid(3),
                                         version("0.1"), false, QString());
   mWriter->addToCategory<Symbol>(sym, uuid(1));
@@ -944,7 +945,7 @@ TEST_F(WorkspaceLibraryDbTest, testGetByCategoryInvalidParent) {
   EXPECT_EQ(str(QSet<Uuid>{uuid(3)}),
             str(mWsDb->getByCategory<Component>(uuid(1))));
   EXPECT_EQ(str(QSet<Uuid>{}),
-            str(mWsDb->getByCategory<Component>(tl::nullopt)));
+            str(mWsDb->getByCategory<Component>(std::nullopt)));
 }
 
 TEST_F(WorkspaceLibraryDbTest, testGetByCategoryEndlessRecursion) {
@@ -963,16 +964,16 @@ TEST_F(WorkspaceLibraryDbTest, testGetByCategoryEndlessRecursion) {
   EXPECT_EQ(str(QSet<Uuid>{uuid(3)}),
             str(mWsDb->getByCategory<Component>(uuid(1))));
   EXPECT_EQ(str(QSet<Uuid>{}),
-            str(mWsDb->getByCategory<Component>(tl::nullopt)));
+            str(mWsDb->getByCategory<Component>(std::nullopt)));
 }
 
 TEST_F(WorkspaceLibraryDbTest, testGetByCategoryDuplicates) {
   mWriter->addCategory<ComponentCategory>(0, toAbs("cmpcat1"), uuid(2),
-                                          version("0.1"), false, tl::nullopt);
+                                          version("0.1"), false, std::nullopt);
   mWriter->addCategory<ComponentCategory>(0, toAbs("cmpcat2"), uuid(1),
                                           version("0.1"), false, uuid(2));
   mWriter->addCategory<ComponentCategory>(1, toAbs("cmpcat3"), uuid(2),
-                                          version("0.1"), false, tl::nullopt);
+                                          version("0.1"), false, std::nullopt);
   mWriter->addCategory<ComponentCategory>(1, toAbs("cmpcat4"), uuid(1),
                                           version("0.1"), false, uuid(2));
   int cmp1 = mWriter->addElement<Component>(0, toAbs("cmp1"), uuid(3),
@@ -985,7 +986,7 @@ TEST_F(WorkspaceLibraryDbTest, testGetByCategoryDuplicates) {
   EXPECT_EQ(str(QSet<Uuid>{uuid(3)}),
             str(mWsDb->getByCategory<Component>(uuid(1))));
   EXPECT_EQ(str(QSet<Uuid>{}),
-            str(mWsDb->getByCategory<Component>(tl::nullopt)));
+            str(mWsDb->getByCategory<Component>(std::nullopt)));
 }
 
 /*******************************************************************************

@@ -26,13 +26,13 @@
 #include <librepcb/core/export/graphicsexportsettings.h>
 #include <librepcb/core/fileio/filepath.h>
 #include <librepcb/core/types/length.h>
-#include <optional/tl/optional.hpp>
 
 #include <QtCore>
 #include <QtPrintSupport>
 #include <QtWidgets>
 
 #include <memory>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -120,7 +120,7 @@ private:  // Methods
   void buttonBoxClicked(QDialogButtonBox::StandardButton btn) noexcept;
   void printersAvailable() noexcept;
   void printerChanged(int index) noexcept;
-  void setAvailablePageSizes(QList<tl::optional<QPageSize>> sizes) noexcept;
+  void setAvailablePageSizes(QList<std::optional<QPageSize>> sizes) noexcept;
   void layerListItemDoubleClicked(QListWidgetItem* item) noexcept;
   void applySettings() noexcept;
   void startExport(bool toClipboard) noexcept;
@@ -128,8 +128,8 @@ private:  // Methods
   bool eventFilter(QObject* object, QEvent* event) noexcept override;
 
   // GUI Access Methods
-  void setPageSize(const tl::optional<QPageSize::PageSizeId>& size) noexcept;
-  tl::optional<QPageSize> getPageSize() const noexcept;
+  void setPageSize(const std::optional<QPageSize::PageSizeId>& size) noexcept;
+  std::optional<QPageSize> getPageSize() const noexcept;
   void setOrientation(GraphicsExportSettings::Orientation orientation) noexcept;
   GraphicsExportSettings::Orientation getOrientation() const noexcept;
   void setMarginLeft(const UnsignedLength& margin) noexcept;
@@ -182,7 +182,7 @@ private:  // Data
   QList<std::pair<QString, QColor>> mColors;
 
   QString mSettingsPrinterName;
-  tl::optional<QPageSize::PageSizeId> mSettingsPageSize;
+  std::optional<QPageSize::PageSizeId> mSettingsPageSize;
   QPrinter::DuplexMode mSettingsDuplexMode;
 
   bool mDisableApplySettings;
@@ -191,7 +191,7 @@ private:  // Data
 
   QScopedPointer<QFutureWatcher<QList<QPrinterInfo>>> mPrinterWatcher;
   QList<QPrinterInfo> mAvailablePrinters;
-  QList<tl::optional<QPageSize>> mAvailablePageSizes;
+  QList<std::optional<QPageSize>> mAvailablePageSizes;
   QList<ContentItem> mPageContentItems;
   QList<Page> mPages;
 

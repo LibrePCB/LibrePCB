@@ -56,7 +56,7 @@ public:
   ~CmdDevicePadSignalMapItemEdit() noexcept;
 
   // Setters
-  void setSignalUuid(const tl::optional<Uuid>& uuid) noexcept;
+  void setSignalUuid(const std::optional<Uuid>& uuid) noexcept;
 
   // Operator Overloadings
   CmdDevicePadSignalMapItemEdit& operator=(
@@ -75,8 +75,8 @@ private:  // Methods
 private:  // Data
   DevicePadSignalMapItem& mItem;
 
-  tl::optional<Uuid> mOldSignalUuid;
-  tl::optional<Uuid> mNewSignalUuid;
+  std::optional<Uuid> mOldSignalUuid;
+  std::optional<Uuid> mNewSignalUuid;
 };
 
 /*******************************************************************************

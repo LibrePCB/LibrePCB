@@ -62,7 +62,7 @@ BI_FootprintPad::BI_FootprintPad(BI_Device& device, const Uuid& padUuid)
                       .get(*mFootprintPad->getPackagePadUuid())
                       .get();  // can throw
 
-    tl::optional<Uuid> cmpSignalUuid =
+    std::optional<Uuid> cmpSignalUuid =
         mDevice.getLibDevice()
             .getPadSignalMap()
             .get(*mFootprintPad->getPackagePadUuid())
@@ -386,7 +386,7 @@ QList<PadGeometry> BI_FootprintPad::getGeometryOnLayer(
   }
 
   QList<PadGeometry> result;
-  tl::optional<Length> offset;
+  std::optional<Length> offset;
   if (layer.isStopMask()) {
     const MaskConfig& cfg = mFootprintPad->getStopMaskConfig();
     const bool isThtSolderSide =
@@ -409,7 +409,7 @@ QList<PadGeometry> BI_FootprintPad::getGeometryOnLayer(
         (layer.isTop() ==
          (getComponentSide() == FootprintPad::ComponentSide::Bottom));
     if (cfg.isEnabled() && ((!mFootprintPad->isTht()) || isThtSolderSide)) {
-      if (const tl::optional<Length>& manualOffset = cfg.getOffset()) {
+      if (const std::optional<Length>& manualOffset = cfg.getOffset()) {
         // Use offset configured in pad.
         offset = -(*manualOffset);
       } else {

@@ -39,7 +39,7 @@ namespace editor {
 
 CmdNetSignalAdd::CmdNetSignalAdd(
     Circuit& circuit, NetClass& netclass,
-    const tl::optional<CircuitIdentifier>& name) noexcept
+    const std::optional<CircuitIdentifier>& name) noexcept
   : UndoCommand(tr("Add netsignal")),
     mCircuit(circuit),
     mNetClass(netclass),

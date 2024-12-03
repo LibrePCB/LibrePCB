@@ -111,7 +111,7 @@ private:  // Data
   ComponentSymbolVariantItemList* mItemList;
   std::shared_ptr<const LibraryElementCache> mSymbolsCache;
   UndoStack* mUndoStack;
-  tl::optional<Uuid> mNewSymbolUuid;
+  std::optional<Uuid> mNewSymbolUuid;
   QString mNewSuffix;
   bool mNewIsRequired;
   Point mNewPosition;

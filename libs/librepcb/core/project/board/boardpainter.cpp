@@ -258,7 +258,7 @@ void BoardPainter::initContentByColor() const noexcept {
         mContentByColor[Theme::Color::sBoardHoles].holes.append(hole);
         PadGeometry geometry =
             PadGeometry::stroke(hole.diameter, hole.path, {});
-        if (const tl::optional<Length>& offset = hole.stopMaskOffset) {
+        if (const std::optional<Length>& offset = hole.stopMaskOffset) {
           geometry = geometry.withOffset(*offset);
         }
         const QPainterPath stopMask = geometry.toFilledQPainterPathPx();
@@ -287,7 +287,7 @@ void BoardPainter::initContentByColor() const noexcept {
         for (const PadHole& hole : pad.holes) {
           mContentByColor[Theme::Color::sBoardHoles].padHoles.append(
               HoleData{hole.getDiameter(), pad.transform.map(hole.getPath()),
-                       tl::nullopt});
+                       std::nullopt});
         }
       }
     }
@@ -344,7 +344,7 @@ void BoardPainter::initContentByColor() const noexcept {
     foreach (const HoleData& hole, mHoles) {
       mContentByColor[Theme::Color::sBoardHoles].holes.append(hole);
       PadGeometry geometry = PadGeometry::stroke(hole.diameter, hole.path, {});
-      if (const tl::optional<Length>& offset = hole.stopMaskOffset) {
+      if (const std::optional<Length>& offset = hole.stopMaskOffset) {
         geometry = geometry.withOffset(*offset);
       }
       const QPainterPath stopMask = geometry.toFilledQPainterPathPx();

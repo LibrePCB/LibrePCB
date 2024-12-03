@@ -121,11 +121,11 @@ public:  // Data
   // common
   QHash<QString, QByteArray> mFiles;
   ElementType mElementType;
-  tl::optional<ElementName> mElementName;
+  std::optional<ElementName> mElementName;
   QString mElementDescription;
   QString mElementKeywords;
   QString mElementAuthor;
-  tl::optional<Version> mElementVersion;
+  std::optional<Version> mElementVersion;
   QSet<Uuid> mElementCategoryUuids;
 
   // symbol
@@ -149,8 +149,8 @@ public:  // Data
   ComponentSymbolVariantList mComponentSymbolVariants;
 
   // device
-  tl::optional<Uuid> mDeviceComponentUuid;
-  tl::optional<Uuid> mDevicePackageUuid;
+  std::optional<Uuid> mDeviceComponentUuid;
+  std::optional<Uuid> mDevicePackageUuid;
   DevicePadSignalMap mDevicePadSignalMap;
   AttributeList mDeviceAttributes;
   PartList mDeviceParts;

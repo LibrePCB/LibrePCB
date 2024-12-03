@@ -124,8 +124,8 @@ private:  // Data
   QScopedPointer<FootprintGraphicsItem> mFootprintGraphicsItem;
 
   // broken interface detection
-  tl::optional<Uuid> mOriginalComponentUuid;
-  tl::optional<Uuid> mOriginalPackageUuid;
+  std::optional<Uuid> mOriginalComponentUuid;
+  std::optional<Uuid> mOriginalPackageUuid;
   DevicePadSignalMap mOriginalPadSignalMap;
 };
 

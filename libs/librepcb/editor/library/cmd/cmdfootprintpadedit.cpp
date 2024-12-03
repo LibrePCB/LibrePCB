@@ -55,7 +55,7 @@ CmdFootprintPadEdit::~CmdFootprintPadEdit() noexcept {
  *  Setters
  ******************************************************************************/
 
-void CmdFootprintPadEdit::setPackagePadUuid(const tl::optional<Uuid>& pad,
+void CmdFootprintPadEdit::setPackagePadUuid(const std::optional<Uuid>& pad,
                                             bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewProperties.setPackagePadUuid(pad);

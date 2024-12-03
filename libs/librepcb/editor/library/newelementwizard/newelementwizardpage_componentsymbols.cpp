@@ -66,7 +66,7 @@ bool NewElementWizardPage_ComponentSymbols::validatePage() noexcept {
     for (auto& var : mContext.mComponentSymbolVariants) {
       for (auto& item : var.getSymbolItems()) {
         for (auto& map : item.getPinSignalMap()) {
-          map.setSignalUuid(tl::nullopt);
+          map.setSignalUuid(std::nullopt);
         }
       }
     }

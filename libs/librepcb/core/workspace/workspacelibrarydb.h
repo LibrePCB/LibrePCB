@@ -155,7 +155,7 @@ public:
    */
   template <typename ElementType>
   QMultiMap<Version, FilePath> getAll(
-      const tl::optional<Uuid>& uuid = tl::nullopt,
+      const std::optional<Uuid>& uuid = std::nullopt,
       const FilePath& lib = FilePath()) const {
     return getAll(getTable<ElementType>(), uuid, lib);
   }
@@ -292,7 +292,7 @@ public:
    */
   template <typename ElementType>
   bool getCategoryMetadata(const FilePath catDir,
-                           tl::optional<Uuid>* parent = nullptr) const {
+                           std::optional<Uuid>* parent = nullptr) const {
     static_assert(std::is_same<ElementType, ComponentCategory>::value ||
                       std::is_same<ElementType, PackageCategory>::value,
                   "Unsupported ElementType");
@@ -328,7 +328,7 @@ public:
    *          doesn't exist.
    */
   template <typename ElementType>
-  QSet<Uuid> getChilds(const tl::optional<Uuid>& parent) const {
+  QSet<Uuid> getChilds(const std::optional<Uuid>& parent) const {
     static_assert(std::is_same<ElementType, ComponentCategory>::value ||
                       std::is_same<ElementType, PackageCategory>::value,
                   "Unsupported ElementType");
@@ -353,7 +353,7 @@ public:
    * @return UUIDs of elements. Empty if the passed category doesn't exist.
    */
   template <typename ElementType>
-  QSet<Uuid> getByCategory(const tl::optional<Uuid>& category,
+  QSet<Uuid> getByCategory(const std::optional<Uuid>& category,
                            int limit = -1) const {
     static_assert(std::is_same<ElementType, Symbol>::value ||
                       std::is_same<ElementType, Package>::value ||
@@ -440,7 +440,7 @@ signals:
 private:
   // Private Methods
   QMultiMap<Version, FilePath> getAll(const QString& elementsTable,
-                                      const tl::optional<Uuid>& uuid,
+                                      const std::optional<Uuid>& uuid,
                                       const FilePath& lib) const;
   FilePath getLatestVersionFilePath(
       const QMultiMap<Version, FilePath>& list) const noexcept;
@@ -452,13 +452,14 @@ private:
                    Uuid* uuid, Version* version, bool* deprecated) const;
   bool getCategoryMetadata(const QString& categoriesTable,
                            const FilePath catDir,
-                           tl::optional<Uuid>* parent) const;
+                           std::optional<Uuid>* parent) const;
   AttributeList getPartAttributes(int partId) const;
   QSet<Uuid> getChilds(const QString& categoriesTable,
-                       const tl::optional<Uuid>& categoryUuid) const;
+                       const std::optional<Uuid>& categoryUuid) const;
   QSet<Uuid> getByCategory(const QString& elementsTable,
                            const QString& categoryTable,
-                           const tl::optional<Uuid>& category, int limit) const;
+                           const std::optional<Uuid>& category,
+                           int limit) const;
   QSet<Uuid> getGenerated(const QString& elementsTable,
                           const QString& generatedBy) const;
   ResourceList getResources(const QString& elementsTable,

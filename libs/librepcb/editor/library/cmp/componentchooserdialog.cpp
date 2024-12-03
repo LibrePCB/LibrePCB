@@ -92,11 +92,11 @@ ComponentChooserDialog::ComponentChooserDialog(
   addSpinner(mUi->treeCategories);
   addSpinner(mUi->listComponents);
 
-  setSelectedComponent(tl::nullopt);
+  setSelectedComponent(std::nullopt);
 }
 
 ComponentChooserDialog::~ComponentChooserDialog() noexcept {
-  setSelectedComponent(tl::nullopt);
+  setSelectedComponent(std::nullopt);
 }
 
 /*******************************************************************************
@@ -132,7 +132,7 @@ void ComponentChooserDialog::listComponents_currentItemChanged(
     setSelectedComponent(
         Uuid::tryFromString(current->data(Qt::UserRole).toString()));
   } else {
-    setSelectedComponent(tl::nullopt);
+    setSelectedComponent(std::nullopt);
   }
 }
 
@@ -146,7 +146,7 @@ void ComponentChooserDialog::listComponents_itemDoubleClicked(
 }
 
 void ComponentChooserDialog::searchComponents(const QString& input) {
-  setSelectedComponent(tl::nullopt);
+  setSelectedComponent(std::nullopt);
   mUi->listComponents->clear();
   mCategorySelected = false;
 
@@ -171,10 +171,10 @@ void ComponentChooserDialog::searchComponents(const QString& input) {
 }
 
 void ComponentChooserDialog::setSelectedCategory(
-    const tl::optional<Uuid>& uuid) noexcept {
+    const std::optional<Uuid>& uuid) noexcept {
   if ((mCategorySelected) && (uuid == mSelectedCategoryUuid)) return;
 
-  setSelectedComponent(tl::nullopt);
+  setSelectedComponent(std::nullopt);
   mUi->listComponents->clear();
   mSelectedCategoryUuid = uuid;
   mCategorySelected = true;
@@ -207,7 +207,7 @@ void ComponentChooserDialog::setSelectedCategory(
 }
 
 void ComponentChooserDialog::setSelectedComponent(
-    const tl::optional<Uuid>& uuid) noexcept {
+    const std::optional<Uuid>& uuid) noexcept {
   FilePath fp;
   QString name = tr("No component selected");
   QString desc;

@@ -31,7 +31,7 @@
 #include <QtCore>
 #include <QtWidgets>
 
-#include <optional.hpp>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -198,7 +198,7 @@ public:
       return QVariant();
     }
 
-    tl::optional<ValueType> value = mNewValue;
+    std::optional<ValueType> value = mNewValue;
     if ((index.row() >= 0) && (index.row() < mValues.count())) {
       value = mValues.at(index.row());
     }
@@ -320,24 +320,24 @@ private:  // Methods
     return value;
   }
 
-  tl::optional<Uuid> convertInputValue(
-      const QVariant& input, const tl::optional<Uuid>& tag) const noexcept {
+  std::optional<Uuid> convertInputValue(
+      const QVariant& input, const std::optional<Uuid>& tag) const noexcept {
     Q_UNUSED(tag);  // used only for template tag dispatching
     return Uuid::tryFromString(input.toString());
   }
 
-  tl::optional<QString> convertInputValue(
-      const QVariant& input, const tl::optional<QString>& tag) const noexcept {
+  std::optional<QString> convertInputValue(
+      const QVariant& input, const std::optional<QString>& tag) const noexcept {
     Q_UNUSED(tag);  // used only for template tag dispatching
     QString str = input.toString().trimmed();
-    return str.isEmpty() ? tl::nullopt : tl::make_optional(str);
+    return str.isEmpty() ? std::nullopt : std::make_optional(str);
   }
 
-  tl::optional<QUrl> convertInputValue(
-      const QVariant& input, const tl::optional<QUrl>& tag) const noexcept {
+  std::optional<QUrl> convertInputValue(
+      const QVariant& input, const std::optional<QUrl>& tag) const noexcept {
     Q_UNUSED(tag);  // used only for template tag dispatching
     QUrl url = QUrl::fromUserInput(input.toString());
-    return url.isValid() ? tl::make_optional(url) : tl::nullopt;
+    return url.isValid() ? std::make_optional(url) : std::nullopt;
   }
 
   void updateComboBoxItems() noexcept {
@@ -353,8 +353,8 @@ private:  // Methods
 private:  // Data
   T mChoices;
   T mValues;
-  tl::optional<ValueType> mDefaultValue;
-  tl::optional<ValueType> mNewValue;
+  std::optional<ValueType> mDefaultValue;
+  std::optional<ValueType> mNewValue;
   QString mPlaceholderText;
   QHash<ValueType, QString> mDisplayTexts;
   QHash<ValueType, QIcon> mIcons;

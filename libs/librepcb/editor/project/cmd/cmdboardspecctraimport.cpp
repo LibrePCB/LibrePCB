@@ -327,17 +327,17 @@ bool CmdBoardSpecctraImport::performExecute() {
           if (fuzzyCompare(np.pos, pos) && (np.layer == layer) &&
               (!reusedUuids.contains(np.uuid))) {
             reusedUuids.insert(np.uuid);
-            return tl::make_optional(np);
+            return std::make_optional(np);
           }
         }
       }
     }
     ++newUuids;
-    return tl::optional<OldJunction>();
+    return std::optional<OldJunction>();
   };
   auto findNetLineImpl = [&](const NetSignal* net, Point start, Point end,
                              const Layer& layer,
-                             const tl::optional<Length>& width) {
+                             const std::optional<Length>& width) {
     if (start > end) std::swap(start, end);
     for (const OldSegment& seg : oldSegments) {
       if (seg.net == net) {
@@ -349,12 +349,12 @@ bool CmdBoardSpecctraImport::performExecute() {
               (nl.layer == &layer) && ((!width) || (nl.width == *width)) &&
               (!reusedUuids.contains(nl.uuid))) {
             reusedUuids.insert(nl.uuid);
-            return tl::make_optional(nl);
+            return std::make_optional(nl);
           }
         }
       }
     }
-    return tl::optional<OldTrace>();
+    return std::optional<OldTrace>();
   };
   auto findNetLine = [&](const NetSignal* net, Point start, Point end,
                          const Layer& layer, const Length& width) {
@@ -362,11 +362,12 @@ bool CmdBoardSpecctraImport::performExecute() {
     // might have been changed during the DSN -> SES roundtrip.
     if (auto nl = findNetLineImpl(net, start, end, layer, width)) {
       return nl;
-    } else if (auto nl = findNetLineImpl(net, start, end, layer, tl::nullopt)) {
+    } else if (auto nl =
+                   findNetLineImpl(net, start, end, layer, std::nullopt)) {
       return nl;
     } else {
       ++newUuids;
-      return tl::optional<OldTrace>();
+      return std::optional<OldTrace>();
     }
   };
   auto findVia = [&](const NetSignal* net, const Point& pos, const Layer& start,
@@ -378,13 +379,13 @@ bool CmdBoardSpecctraImport::performExecute() {
               (via.getStartLayer() == start) && (via.getEndLayer() == end) &&
               (!reusedUuids.contains(via.getUuid()))) {
             reusedUuids.insert(via.getUuid());
-            return tl::make_optional(via);
+            return std::make_optional(via);
           }
         }
       }
     }
     ++newUuids;
-    return tl::optional<Via>();
+    return std::optional<Via>();
   };
   auto anyRefInSegment = [](const OldSegment& seg, const QSet<Uuid>& refs) {
     foreach (const OldJunction& np, seg.junctions) {
@@ -409,12 +410,12 @@ bool CmdBoardSpecctraImport::performExecute() {
       if (seg.net == net) {
         if (anyRefInSegment(seg, refs) && (!reusedUuids.contains(seg.uuid))) {
           reusedUuids.insert(seg.uuid);
-          return tl::make_optional(seg);
+          return std::make_optional(seg);
         }
       }
     }
     ++newUuids;
-    return tl::optional<OldSegment>();
+    return std::optional<OldSegment>();
   };
 
   //////////////////////////////////////////////////////////////////////////////
@@ -499,10 +500,10 @@ bool CmdBoardSpecctraImport::performExecute() {
         if ((anchor.pos == pos) &&
             (layerNumber >= anchor.startLayer->getCopperNumber()) &&
             (layerNumber <= anchor.endLayer->getCopperNumber())) {
-          return tl::make_optional(anchor.anchor);
+          return std::make_optional(anchor.anchor);
         }
       }
-      return tl::optional<TraceAnchor>();
+      return std::optional<TraceAnchor>();
     };
 
     // Add anchors for each pad corresponding to imported wire coordinates.
@@ -552,14 +553,14 @@ bool CmdBoardSpecctraImport::performExecute() {
     BoardNetSegmentSplitter splitter;
     for (const auto& via : net.vias) {
       const PadStackOut& padStack = mPadStacks.value(via.padStackId);
-      const tl::optional<Via> oldVia =
+      const std::optional<Via> oldVia =
           findVia(netSignal, via.pos, *padStack.startLayer, *padStack.endLayer);
       const Uuid uuid = oldVia ? oldVia->getUuid() : Uuid::createRandom();
       // Note: How can we know the drill diameter??? Use this logic for now:
       //  - If position & size not modified, keep original drill diameter too
       //  - Try to extract drill diameter from pad stack ID
       //  - If this didn't work, use minimum annular ring as fallback
-      tl::optional<PositiveLength> drillDiameter;
+      std::optional<PositiveLength> drillDiameter;
       if (oldVia) {
         drillDiameter = oldVia->getDrillDiameter();
       } else if (auto dia = extractViaDrillDiameter(via.padStackId)) {
@@ -589,7 +590,7 @@ bool CmdBoardSpecctraImport::performExecute() {
         return *anchor;
       } else {
         // Create new junction.
-        const tl::optional<OldJunction> oldNp =
+        const std::optional<OldJunction> oldNp =
             findNetPoint(netSignal, pos, layer);
         const Uuid uuid = oldNp ? oldNp->uuid : Uuid::createRandom();
         splitter.addJunction(Junction(uuid, oldNp ? oldNp->pos : pos));
@@ -602,7 +603,7 @@ bool CmdBoardSpecctraImport::performExecute() {
       for (int i = 1; i < wire.path.getVertices().count(); ++i) {
         Point p0 = wire.path.getVertices().at(i - 1).getPos();
         Point p1 = wire.path.getVertices().at(i).getPos();
-        const tl::optional<OldTrace> oldNl =
+        const std::optional<OldTrace> oldNl =
             findNetLine(netSignal, p0, p1, *wire.layer, wire.width);
         if (oldNl && (!fuzzyCompare(oldNl->start, p0))) {
           std::swap(p0, p1);  // Avoid change in file format.
@@ -628,7 +629,7 @@ bool CmdBoardSpecctraImport::performExecute() {
       for (const Via& via : segment.vias) {
         nsRefs.insert(via.getUuid());
       }
-      const tl::optional<OldSegment> oldNs = findNetSegment(netSignal, nsRefs);
+      const std::optional<OldSegment> oldNs = findNetSegment(netSignal, nsRefs);
 
       // Add new segment
       BI_NetSegment* copy = new BI_NetSegment(
@@ -654,25 +655,25 @@ bool CmdBoardSpecctraImport::performExecute() {
       }
       for (const Trace& trace : segment.traces) {
         BI_NetLineAnchor* start = nullptr;
-        if (tl::optional<Uuid> anchor =
+        if (std::optional<Uuid> anchor =
                 trace.getStartPoint().tryGetJunction()) {
           start = netPointMap[*anchor];
-        } else if (tl::optional<Uuid> anchor =
+        } else if (std::optional<Uuid> anchor =
                        trace.getStartPoint().tryGetVia()) {
           start = viaMap[*anchor];
-        } else if (tl::optional<TraceAnchor::PadAnchor> anchor =
+        } else if (std::optional<TraceAnchor::PadAnchor> anchor =
                        trace.getStartPoint().tryGetPad()) {
           BI_Device* device =
               mBoard.getDeviceInstanceByComponentUuid(anchor->device);
           start = device ? device->getPad(anchor->pad) : nullptr;
         }
         BI_NetLineAnchor* end = nullptr;
-        if (tl::optional<Uuid> anchor = trace.getEndPoint().tryGetJunction()) {
+        if (std::optional<Uuid> anchor = trace.getEndPoint().tryGetJunction()) {
           end = netPointMap[*anchor];
-        } else if (tl::optional<Uuid> anchor =
+        } else if (std::optional<Uuid> anchor =
                        trace.getEndPoint().tryGetVia()) {
           end = viaMap[*anchor];
-        } else if (tl::optional<TraceAnchor::PadAnchor> anchor =
+        } else if (std::optional<TraceAnchor::PadAnchor> anchor =
                        trace.getEndPoint().tryGetPad()) {
           BI_Device* device =
               mBoard.getDeviceInstanceByComponentUuid(anchor->device);
@@ -703,7 +704,7 @@ bool CmdBoardSpecctraImport::performExecute() {
   return getChildCount() > 0;
 }
 
-tl::optional<PositiveLength> CmdBoardSpecctraImport::extractViaDrillDiameter(
+std::optional<PositiveLength> CmdBoardSpecctraImport::extractViaDrillDiameter(
     const QString& padStackId) noexcept {
   // Note: Keep in sync with BoardSpecctraExport::getWiringPadStackId().
   const QStringList tokens = padStackId.split("-");
@@ -714,10 +715,10 @@ tl::optional<PositiveLength> CmdBoardSpecctraImport::extractViaDrillDiameter(
       // Not critical.
     }
   }
-  return tl::nullopt;
+  return std::nullopt;
 }
 
-tl::optional<MaskConfig> CmdBoardSpecctraImport::extractViaExposureConfig(
+std::optional<MaskConfig> CmdBoardSpecctraImport::extractViaExposureConfig(
     const QString& padStackId) noexcept {
   // Note: Keep in sync with BoardSpecctraExport::getWiringPadStackId().
   const QStringList tokens = padStackId.split("-");
@@ -735,7 +736,7 @@ tl::optional<MaskConfig> CmdBoardSpecctraImport::extractViaExposureConfig(
       }
     }
   }
-  return tl::nullopt;
+  return std::nullopt;
 }
 
 /*******************************************************************************

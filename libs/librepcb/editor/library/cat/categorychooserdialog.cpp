@@ -71,7 +71,7 @@ CategoryChooserDialog::~CategoryChooserDialog() noexcept {
  *  Getters
  ******************************************************************************/
 
-tl::optional<Uuid> CategoryChooserDialog::getSelectedCategoryUuid()
+std::optional<Uuid> CategoryChooserDialog::getSelectedCategoryUuid()
     const noexcept {
   QModelIndex index = mUi->treeView->currentIndex();
   return Uuid::tryFromString(index.data(Qt::UserRole).toString());

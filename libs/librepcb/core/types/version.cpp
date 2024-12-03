@@ -83,12 +83,12 @@ QString Version::toComparableStr() const noexcept {
  ******************************************************************************/
 
 bool Version::isValid(const QString& str) noexcept {
-  tl::optional<Version> version = tryFromString(str);
+  std::optional<Version> version = tryFromString(str);
   return version.has_value();
 }
 
 Version Version::fromString(const QString& str) {
-  tl::optional<Version> version = tryFromString(str);
+  std::optional<Version> version = tryFromString(str);
   if (version) {
     return *version;
   } else {
@@ -98,7 +98,7 @@ Version Version::fromString(const QString& str) {
   }
 }
 
-tl::optional<Version> Version::tryFromString(const QString& str) noexcept {
+std::optional<Version> Version::tryFromString(const QString& str) noexcept {
   QVector<uint> numbers;
   // split and convert to integer
   QStringList splitted = str.split('.', Qt::KeepEmptyParts, Qt::CaseSensitive);
@@ -106,7 +106,7 @@ tl::optional<Version> Version::tryFromString(const QString& str) noexcept {
     bool ok = false;
     uint number = numberStr.toUInt(&ok);
     if ((!ok) || (number > 99999)) {
-      return tl::nullopt;
+      return std::nullopt;
     }
     numbers.append(number);
   }
@@ -117,7 +117,7 @@ tl::optional<Version> Version::tryFromString(const QString& str) noexcept {
   }
   // check number count
   if (numbers.empty() || (numbers.count() > 10)) {
-    return tl::nullopt;
+    return std::nullopt;
   }
   return Version(numbers);
 }

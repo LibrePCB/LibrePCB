@@ -117,20 +117,20 @@ void GerberGenerator::setLayerPolarity(Polarity p) noexcept {
 
 void GerberGenerator::drawLine(const Point& start, const Point& end,
                                const UnsignedLength& width, Function function,
-                               const tl::optional<QString>& net,
+                               const std::optional<QString>& net,
                                const QString& component) noexcept {
   setCurrentAperture(mApertureList->addCircle(width, function));
-  setCurrentAttributes(tl::nullopt,  // Aperture: Function
+  setCurrentAttributes(std::nullopt,  // Aperture: Function
                        net,  // Object: Net name
                        component,  // Object: Component designator
                        QString(),  // Object: Pin number/name
                        QString(),  // Object: Pin signal
                        QString(),  // Object: Component value
-                       tl::nullopt,  // Object: Component mount type
+                       std::nullopt,  // Object: Component mount type
                        QString(),  // Object: Component manufacturer
                        QString(),  // Object: Component MPN
                        QString(),  // Object: Component footprint name
-                       tl::nullopt  // Object: Component rotation
+                       std::nullopt  // Object: Component rotation
   );
   moveToPosition(start);
   linearInterpolateToPosition(end);
@@ -139,24 +139,24 @@ void GerberGenerator::drawLine(const Point& start, const Point& end,
 void GerberGenerator::drawPathOutline(const Path& path,
                                       const UnsignedLength& lineWidth,
                                       Function function,
-                                      const tl::optional<QString>& net,
+                                      const std::optional<QString>& net,
                                       const QString& component) noexcept {
   if (path.getVertices().count() < 2) {
     qWarning() << "Invalid path was ignored in gerber output!";
     return;
   }
   setCurrentAperture(mApertureList->addCircle(lineWidth, function));
-  setCurrentAttributes(tl::nullopt,  // Aperture: Function
+  setCurrentAttributes(std::nullopt,  // Aperture: Function
                        net,  // Object: Net name
                        component,  // Object: Component designator
                        QString(),  // Object: Pin number/name
                        QString(),  // Object: Pin signal
                        QString(),  // Object: Component value
-                       tl::nullopt,  // Object: Component mount type
+                       std::nullopt,  // Object: Component mount type
                        QString(),  // Object: Component manufacturer
                        QString(),  // Object: Component MPN
                        QString(),  // Object: Component footprint name
-                       tl::nullopt  // Object: Component rotation
+                       std::nullopt  // Object: Component rotation
   );
   moveToPosition(path.getVertices().first().getPos());
   for (int i = 1; i < path.getVertices().count(); ++i) {
@@ -167,7 +167,7 @@ void GerberGenerator::drawPathOutline(const Path& path,
 }
 
 void GerberGenerator::drawPathArea(const Path& path, Function function,
-                                   const tl::optional<QString>& net,
+                                   const std::optional<QString>& net,
                                    const QString& component) noexcept {
   if (!path.isClosed()) {
     qWarning() << "Non-closed path was ignored in gerber output!";
@@ -186,11 +186,11 @@ void GerberGenerator::drawPathArea(const Path& path, Function function,
                        QString(),  // Object: Pin number/name
                        QString(),  // Object: Pin signal
                        QString(),  // Object: Component value
-                       tl::nullopt,  // Object: Component mount type
+                       std::nullopt,  // Object: Component mount type
                        QString(),  // Object: Component manufacturer
                        QString(),  // Object: Component MPN
                        QString(),  // Object: Component footprint name
-                       tl::nullopt  // Object: Component rotation
+                       std::nullopt  // Object: Component rotation
   );
   setRegionModeOn();
   moveToPosition(path.getVertices().first().getPos());
@@ -213,8 +213,8 @@ void GerberGenerator::drawComponentOutline(
   }
   setCurrentAperture(
       mApertureList->addCircle(UnsignedLength(100000), function));
-  setCurrentAttributes(tl::nullopt,  // Aperture: Function
-                       tl::nullopt,  // Object: Net name
+  setCurrentAttributes(std::nullopt,  // Aperture: Function
+                       std::nullopt,  // Object: Net name
                        designator,  // Object: Component designator
                        QString(),  // Object: Pin number/name
                        QString(),  // Object: Pin signal
@@ -235,22 +235,22 @@ void GerberGenerator::drawComponentOutline(
 
 void GerberGenerator::flashCircle(const Point& pos, const PositiveLength& dia,
                                   Function function,
-                                  const tl::optional<QString>& net,
+                                  const std::optional<QString>& net,
                                   const QString& component, const QString& pin,
                                   const QString& signal) noexcept {
   setCurrentAperture(
       mApertureList->addCircle(positiveToUnsigned(dia), function));
-  setCurrentAttributes(tl::nullopt,  // Aperture: Function
+  setCurrentAttributes(std::nullopt,  // Aperture: Function
                        net,  // Object: Net name
                        component,  // Object: Component designator
                        pin,  // Object: Pin number/name
                        signal,  // Object: Pin signal
                        QString(),  // Object: Component value
-                       tl::nullopt,  // Object: Component mount type
+                       std::nullopt,  // Object: Component mount type
                        QString(),  // Object: Component manufacturer
                        QString(),  // Object: Component MPN
                        QString(),  // Object: Component footprint name
-                       tl::nullopt  // Object: Component rotation
+                       std::nullopt  // Object: Component rotation
   );
   flashAtPosition(pos);
 }
@@ -259,21 +259,21 @@ void GerberGenerator::flashRect(const Point& pos, const PositiveLength& w,
                                 const PositiveLength& h,
                                 const UnsignedLength& radius, const Angle& rot,
                                 Function function,
-                                const tl::optional<QString>& net,
+                                const std::optional<QString>& net,
                                 const QString& component, const QString& pin,
                                 const QString& signal) noexcept {
   setCurrentAperture(mApertureList->addRect(w, h, radius, rot, function));
-  setCurrentAttributes(tl::nullopt,  // Aperture: Function
+  setCurrentAttributes(std::nullopt,  // Aperture: Function
                        net,  // Object: Net name
                        component,  // Object: Component designator
                        pin,  // Object: Pin number/name
                        signal,  // Object: Pin signal
                        QString(),  // Object: Component value
-                       tl::nullopt,  // Object: Component mount type
+                       std::nullopt,  // Object: Component mount type
                        QString(),  // Object: Component manufacturer
                        QString(),  // Object: Component MPN
                        QString(),  // Object: Component footprint name
-                       tl::nullopt  // Object: Component rotation
+                       std::nullopt  // Object: Component rotation
   );
   flashAtPosition(pos);
 }
@@ -281,21 +281,21 @@ void GerberGenerator::flashRect(const Point& pos, const PositiveLength& w,
 void GerberGenerator::flashObround(const Point& pos, const PositiveLength& w,
                                    const PositiveLength& h, const Angle& rot,
                                    Function function,
-                                   const tl::optional<QString>& net,
+                                   const std::optional<QString>& net,
                                    const QString& component, const QString& pin,
                                    const QString& signal) noexcept {
   setCurrentAperture(mApertureList->addObround(w, h, rot, function));
-  setCurrentAttributes(tl::nullopt,  // Aperture: Function
+  setCurrentAttributes(std::nullopt,  // Aperture: Function
                        net,  // Object: Net name
                        component,  // Object: Component designator
                        pin,  // Object: Pin number/name
                        signal,  // Object: Pin signal
                        QString(),  // Object: Component value
-                       tl::nullopt,  // Object: Component mount type
+                       std::nullopt,  // Object: Component mount type
                        QString(),  // Object: Component manufacturer
                        QString(),  // Object: Component MPN
                        QString(),  // Object: Component footprint name
-                       tl::nullopt  // Object: Component rotation
+                       std::nullopt  // Object: Component rotation
   );
   flashAtPosition(pos);
 }
@@ -304,21 +304,21 @@ void GerberGenerator::flashOctagon(const Point& pos, const PositiveLength& w,
                                    const PositiveLength& h,
                                    const UnsignedLength& radius,
                                    const Angle& rot, Function function,
-                                   const tl::optional<QString>& net,
+                                   const std::optional<QString>& net,
                                    const QString& component, const QString& pin,
                                    const QString& signal) noexcept {
   setCurrentAperture(mApertureList->addOctagon(w, h, radius, rot, function));
-  setCurrentAttributes(tl::nullopt,  // Aperture: Function
+  setCurrentAttributes(std::nullopt,  // Aperture: Function
                        net,  // Object: Net name
                        component,  // Object: Component designator
                        pin,  // Object: Pin number/name
                        signal,  // Object: Pin signal
                        QString(),  // Object: Component value
-                       tl::nullopt,  // Object: Component mount type
+                       std::nullopt,  // Object: Component mount type
                        QString(),  // Object: Component manufacturer
                        QString(),  // Object: Component MPN
                        QString(),  // Object: Component footprint name
-                       tl::nullopt  // Object: Component rotation
+                       std::nullopt  // Object: Component rotation
   );
   flashAtPosition(pos);
 }
@@ -326,21 +326,21 @@ void GerberGenerator::flashOctagon(const Point& pos, const PositiveLength& w,
 void GerberGenerator::flashOutline(const Point& pos,
                                    const StraightAreaPath& path,
                                    const Angle& rot, Function function,
-                                   const tl::optional<QString>& net,
+                                   const std::optional<QString>& net,
                                    const QString& component, const QString& pin,
                                    const QString& signal) noexcept {
   setCurrentAperture(mApertureList->addOutline(path, rot, function));
-  setCurrentAttributes(tl::nullopt,  // Aperture: Function
+  setCurrentAttributes(std::nullopt,  // Aperture: Function
                        net,  // Object: Net name
                        component,  // Object: Component designator
                        pin,  // Object: Pin number/name
                        signal,  // Object: Pin signal
                        QString(),  // Object: Component value
-                       tl::nullopt,  // Object: Component mount type
+                       std::nullopt,  // Object: Component mount type
                        QString(),  // Object: Component manufacturer
                        QString(),  // Object: Component MPN
                        QString(),  // Object: Component footprint name
-                       tl::nullopt  // Object: Component rotation
+                       std::nullopt  // Object: Component rotation
   );
   flashAtPosition(pos);
 }
@@ -352,8 +352,8 @@ void GerberGenerator::flashComponent(const Point& pos, const Angle& rot,
                                      const QString& mpn,
                                      const QString& footprintName) noexcept {
   setCurrentAperture(mApertureList->addComponentMain());
-  setCurrentAttributes(tl::nullopt,  // Aperture: Function
-                       tl::nullopt,  // Object: Net name
+  setCurrentAttributes(std::nullopt,  // Aperture: Function
+                       std::nullopt,  // Object: Net name
                        designator,  // Object: Component designator
                        QString(),  // Object: Pin number/name
                        QString(),  // Object: Pin signal
@@ -373,8 +373,8 @@ void GerberGenerator::flashComponentPin(
     const QString& mpn, const QString& footprintName, const QString& pin,
     const QString& signal, bool isPin1) noexcept {
   setCurrentAperture(mApertureList->addComponentPin(isPin1));
-  setCurrentAttributes(tl::nullopt,  // Aperture: Function
-                       tl::nullopt,  // Object: Net name
+  setCurrentAttributes(std::nullopt,  // Aperture: Function
+                       std::nullopt,  // Object: Net name
                        designator,  // Object: Component designator
                        pin,  // Object: Pin number/name
                        signal,  // Object: Pin signal
@@ -412,13 +412,13 @@ void GerberGenerator::saveToFile(const FilePath& filepath) const {
  ******************************************************************************/
 
 void GerberGenerator::setCurrentAttributes(
-    Function apertureFunction, const tl::optional<QString>& netName,
+    Function apertureFunction, const std::optional<QString>& netName,
     const QString& componentDesignator, const QString& pinName,
     const QString& pinSignal, const QString& componentValue,
-    const tl::optional<MountType>& componentMountType,
+    const std::optional<MountType>& componentMountType,
     const QString& componentManufacturer, const QString& componentMpn,
     const QString& componentFootprint,
-    const tl::optional<Angle>& componentRotation) noexcept {
+    const std::optional<Angle>& componentRotation) noexcept {
   QList<GerberAttribute> attributes;
   if (apertureFunction) {
     attributes.append(GerberAttribute::apertureFunction(*apertureFunction));

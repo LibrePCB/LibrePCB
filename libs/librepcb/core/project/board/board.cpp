@@ -158,7 +158,7 @@ QList<BI_Base*> Board::getAllItems() const noexcept {
 }
 
 std::shared_ptr<SceneData3D> Board::buildScene3D(
-    const tl::optional<Uuid>& assemblyVariant) const noexcept {
+    const std::optional<Uuid>& assemblyVariant) const noexcept {
   auto data = std::make_shared<SceneData3D>(
       std::make_shared<TransactionalDirectory>(mProject.getDirectory()), false);
   data->setProjectName(*mProject.getName());
@@ -208,7 +208,7 @@ std::shared_ptr<SceneData3D> Board::buildScene3D(
     for (const Hole& hole : obj->getLibFootprint().getHoles()) {
       data->addHole(hole.getPath(), hole.getDiameter(), false, false,
                     transform);
-      if (const tl::optional<Length>& offset =
+      if (const std::optional<Length>& offset =
               obj->getHoleStopMasks().value(hole.getUuid())) {
         for (const Layer* layer :
              {&Layer::topStopMask(), &Layer::botStopMask()}) {
@@ -239,7 +239,7 @@ std::shared_ptr<SceneData3D> Board::buildScene3D(
   foreach (const BI_Hole* obj, mHoles) {
     data->addHole(obj->getData().getPath(), obj->getData().getDiameter(), false,
                   false, Transform());
-    if (const tl::optional<Length>& offset = obj->getStopMaskOffset()) {
+    if (const std::optional<Length>& offset = obj->getStopMaskOffset()) {
       for (const Layer* layer :
            {&Layer::topStopMask(), &Layer::botStopMask()}) {
         data->addStroke(*layer, {*obj->getData().getPath()},
@@ -656,7 +656,7 @@ void Board::forceAirWiresRebuild() noexcept {
  *  General Methods
  ******************************************************************************/
 
-tl::optional<std::pair<Point, Point>> Board::calculateBoundingRect()
+std::optional<std::pair<Point, Point>> Board::calculateBoundingRect()
     const noexcept {
   QList<Path> outlines;
   foreach (const BI_Polygon* polygon, mPolygons) {
@@ -689,7 +689,7 @@ tl::optional<std::pair<Point, Point>> Board::calculateBoundingRect()
     const Point topRight = Point::fromPx(rectPx.topRight());
     return std::make_pair(bottomLeft, topRight);
   } else {
-    return tl::nullopt;
+    return std::nullopt;
   }
 }
 

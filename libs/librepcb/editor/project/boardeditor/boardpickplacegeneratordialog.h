@@ -72,7 +72,7 @@ private:  // Methods
   void btnGenerateClicked() noexcept;
   void updateData() noexcept;
   std::shared_ptr<AssemblyVariant> getAssemblyVariant() const noexcept;
-  tl::optional<Uuid> getAssemblyVariantUuid(bool throwIfNullopt) const;
+  std::optional<Uuid> getAssemblyVariantUuid(bool throwIfNullopt) const;
   FilePath getOutputFilePath(const QString& text) const noexcept;
 
 private:  // Data

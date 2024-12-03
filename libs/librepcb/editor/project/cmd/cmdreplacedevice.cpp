@@ -52,7 +52,7 @@ namespace editor {
 CmdReplaceDevice::CmdReplaceDevice(
     Workspace& workspace, Board& board, BI_Device& device,
     const Uuid& newDeviceUuid,
-    const tl::optional<Uuid>& newFootprintUuid) noexcept
+    const std::optional<Uuid>& newFootprintUuid) noexcept
   : UndoCommandGroup(tr("Change Device")),
     mWorkspace(workspace),
     mBoard(board),

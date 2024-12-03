@@ -23,10 +23,10 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <optional/tl/optional.hpp>
-
 #include <QtCore>
 #include <QtGui>
+
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -757,7 +757,7 @@ public:
   qreal solderPasteMargin = 0;  // May not be set.
   qreal solderPasteRatio = 0;  // May not be set.
   qreal clearance = 0;  // May not be set.
-  tl::optional<KiCadZoneConnect> zoneConnect;  // May not be set.
+  std::optional<KiCadZoneConnect> zoneConnect;  // May not be set.
   QList<QStringList> netTiePadGroups;  // May not be set.
   QList<KiCadProperty> properties;
   QList<KiCadFootprintLine> lines;

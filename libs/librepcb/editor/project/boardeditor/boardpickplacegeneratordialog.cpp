@@ -231,9 +231,9 @@ std::shared_ptr<AssemblyVariant>
       : std::shared_ptr<AssemblyVariant>();
 }
 
-tl::optional<Uuid> BoardPickPlaceGeneratorDialog::getAssemblyVariantUuid(
+std::optional<Uuid> BoardPickPlaceGeneratorDialog::getAssemblyVariantUuid(
     bool throwIfNullopt) const {
-  const tl::optional<Uuid> uuid =
+  const std::optional<Uuid> uuid =
       Uuid::tryFromString(mUi->cbxAssemblyVariant->currentData().toString());
   if ((!uuid) && throwIfNullopt) {
     throw LogicError(__FILE__, __LINE__, "No assembly variant selected.");

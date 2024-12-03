@@ -23,9 +23,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <optional/tl/optional.hpp>
-
 #include <QtCore>
+
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -64,7 +64,7 @@ public:
   /**
    * @brief Build the parents tree for a specific category
    *
-   * @param category  The category to get the tree from. If tl::nullopt,
+   * @param category  The category to get the tree from. If std::nullopt,
    *                  it is assumed to represent the root category.
    * @param success   If not sullptr, this is set to whether the tree was
    *                  successfully built or not.
@@ -75,14 +75,14 @@ public:
    *         is either empty or contains error messages.
    * @throw In case of database errors.
    */
-  QStringList buildTree(const tl::optional<Uuid>& category,
+  QStringList buildTree(const std::optional<Uuid>& category,
                         bool* success = nullptr) const;
 
   // Operator Overloadings
   CategoryTreeBuilder& operator=(const CategoryTreeBuilder& rhs) = delete;
 
 private:  // Methods
-  bool getParentNames(const tl::optional<Uuid>& category, QStringList& names,
+  bool getParentNames(const std::optional<Uuid>& category, QStringList& names,
                       QSet<FilePath>& filePaths) const;
 
 private:  // Data

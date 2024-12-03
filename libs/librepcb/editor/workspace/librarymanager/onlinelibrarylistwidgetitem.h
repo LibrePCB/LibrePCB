@@ -64,7 +64,7 @@ public:
   ~OnlineLibraryListWidgetItem() noexcept;
 
   // Getters
-  const tl::optional<Uuid>& getUuid() const noexcept { return mUuid; }
+  const std::optional<Uuid>& getUuid() const noexcept { return mUuid; }
   const QString& getName() const noexcept { return mName; }
   const QSet<Uuid>& getDependencies() const noexcept { return mDependencies; }
   bool isChecked() const noexcept;
@@ -90,9 +90,9 @@ private:  // Methods
 private:  // Data
   Workspace& mWorkspace;
   QJsonObject mJsonObject;
-  tl::optional<Uuid> mUuid;
+  std::optional<Uuid> mUuid;
   QString mName;
-  tl::optional<Version> mVersion;
+  std::optional<Version> mVersion;
   bool mIsRecommended;
   QSet<Uuid> mDependencies;
   QScopedPointer<Ui::OnlineLibraryListWidgetItem> mUi;

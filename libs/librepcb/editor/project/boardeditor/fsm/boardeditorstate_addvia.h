@@ -30,7 +30,7 @@
 #include <QtCore>
 
 #include <memory>
-#include <optional.hpp>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -100,7 +100,7 @@ private:  // Data
   bool mUseAutoNetSignal;
 
   /// The current net signal of the via
-  tl::optional<Uuid> mCurrentNetSignal;
+  std::optional<Uuid> mCurrentNetSignal;
 
   /// Whether #mCurrentNetSignal contains an up-to-date closest net signal
   bool mClosestNetSignalIsUpToDate;

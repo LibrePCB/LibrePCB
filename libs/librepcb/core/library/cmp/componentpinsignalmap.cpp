@@ -42,7 +42,7 @@ ComponentPinSignalMapItem::ComponentPinSignalMapItem(
 }
 
 ComponentPinSignalMapItem::ComponentPinSignalMapItem(
-    const Uuid& pin, const tl::optional<Uuid>& signal,
+    const Uuid& pin, const std::optional<Uuid>& signal,
     const CmpSigPinDisplayType& displayType) noexcept
   : onEdited(*this),
     mPinUuid(pin),
@@ -53,7 +53,7 @@ ComponentPinSignalMapItem::ComponentPinSignalMapItem(
 ComponentPinSignalMapItem::ComponentPinSignalMapItem(const SExpression& node)
   : onEdited(*this),
     mPinUuid(deserialize<Uuid>(node.getChild("@0"))),
-    mSignalUuid(deserialize<tl::optional<Uuid>>(node.getChild("signal/@0"))),
+    mSignalUuid(deserialize<std::optional<Uuid>>(node.getChild("signal/@0"))),
     mDisplayType(
         deserialize<const CmpSigPinDisplayType&>(node.getChild("text/@0"))) {
 }
@@ -66,7 +66,7 @@ ComponentPinSignalMapItem::~ComponentPinSignalMapItem() noexcept {
  ******************************************************************************/
 
 bool ComponentPinSignalMapItem::setSignalUuid(
-    const tl::optional<Uuid>& uuid) noexcept {
+    const std::optional<Uuid>& uuid) noexcept {
   if (uuid == mSignalUuid) {
     return false;
   }

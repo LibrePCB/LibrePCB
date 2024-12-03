@@ -30,12 +30,12 @@
 #include <librepcb/core/library/dev/part.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/types/uuid.h>
-#include <optional/tl/optional.hpp>
 
 #include <QtCore>
 #include <QtWidgets>
 
 #include <memory>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -75,7 +75,7 @@ class AddComponentDialog final : public QDialog {
 
   // Types
   struct SearchResultDevice {
-    tl::optional<Uuid> uuid;
+    std::optional<Uuid> uuid;
     QString name;
     bool deprecated = false;
     FilePath pkgFp;
@@ -120,7 +120,7 @@ public:
   std::shared_ptr<const Part> getSelectedPart() const noexcept {
     return mSelectedPart;
   }
-  tl::optional<Package::AssemblyType> getSelectedPackageAssemblyType()
+  std::optional<Package::AssemblyType> getSelectedPackageAssemblyType()
       const noexcept;
 
   /**
@@ -142,7 +142,7 @@ public:
   // General Methods
   void selectComponentByKeyword(
       const QString keyword,
-      const tl::optional<Uuid>& selectedDevice = tl::nullopt) noexcept;
+      const std::optional<Uuid>& selectedDevice = std::nullopt) noexcept;
   virtual bool eventFilter(QObject* obj, QEvent* e) noexcept override;
 
 protected:
@@ -162,11 +162,12 @@ private slots:
 
 private:
   // Private Methods
-  void searchComponents(const QString& input,
-                        const tl::optional<Uuid>& selectedDevice = tl::nullopt,
-                        bool selectFirstDevice = false);
+  void searchComponents(
+      const QString& input,
+      const std::optional<Uuid>& selectedDevice = std::nullopt,
+      bool selectFirstDevice = false);
   SearchResult search(const QString& input);
-  void setSelectedCategory(const tl::optional<Uuid>& categoryUuid);
+  void setSelectedCategory(const std::optional<Uuid>& categoryUuid);
   void setSelectedComponent(std::shared_ptr<const Component> cmp);
   void setSelectedSymbVar(
       std::shared_ptr<const ComponentSymbolVariant> symbVar);
@@ -195,7 +196,7 @@ private:
   QString mCurrentSearchTerm;
 
   // Attributes
-  tl::optional<Uuid> mSelectedCategoryUuid;
+  std::optional<Uuid> mSelectedCategoryUuid;
   std::shared_ptr<const Component> mSelectedComponent;
   std::shared_ptr<const ComponentSymbolVariant> mSelectedSymbVar;
   std::shared_ptr<const Device> mSelectedDevice;

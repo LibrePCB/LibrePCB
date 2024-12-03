@@ -59,7 +59,7 @@ QVector<Path> StrokeTextPathBuilder::build(
 Length StrokeTextPathBuilder::calcLetterSpacing(
     const StrokeFont& font, const StrokeTextSpacing& spacing,
     const PositiveLength& height, const UnsignedLength& strokeWidth) noexcept {
-  if (const tl::optional<Ratio>& ratio = spacing.getRatio()) {
+  if (const std::optional<Ratio>& ratio = spacing.getRatio()) {
     // Use given letter spacing without additional factor or stroke width
     // offset. Also don't use recommended letter spacing of font.
     return Length(height->toNm() * ratio->toNormalized());
@@ -74,7 +74,7 @@ Length StrokeTextPathBuilder::calcLetterSpacing(
 Length StrokeTextPathBuilder::calcLineSpacing(
     const StrokeFont& font, const StrokeTextSpacing& spacing,
     const PositiveLength& height, const UnsignedLength& strokeWidth) noexcept {
-  if (const tl::optional<Ratio>& ratio = spacing.getRatio()) {
+  if (const std::optional<Ratio>& ratio = spacing.getRatio()) {
     // Use given line spacing without additional factor or stroke width offset.
     // Also don't use recommended line spacing of font.
     return Length(height->toNm() * ratio->toNormalized());

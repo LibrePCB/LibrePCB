@@ -155,7 +155,7 @@ protected:  // Methods
 protected:  // Data
   QPointer<QAction> mChangeUnitAction;
   LengthUnit mDefaultUnit;
-  tl::optional<LengthUnit> mSelectedUnit;
+  std::optional<LengthUnit> mSelectedUnit;
   Length mMinimum;
   Length mMaximum;
   Length mValue;

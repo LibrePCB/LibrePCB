@@ -382,7 +382,7 @@ bool SymbolEditorState_Select::processPaste(
               qApp->clipboard()->mimeData());  // can throw
         }
         if (data) {
-          return startPaste(std::move(data), tl::nullopt);
+          return startPaste(std::move(data), std::nullopt);
         }
       } catch (const Exception& e) {
         QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
@@ -797,7 +797,7 @@ bool SymbolEditorState_Select::copySelectedItemsToClipboard() noexcept {
 
 bool SymbolEditorState_Select::startPaste(
     std::unique_ptr<SymbolClipboardData> data,
-    const tl::optional<Point>& fixedPosition) {
+    const std::optional<Point>& fixedPosition) {
   Q_ASSERT(data);
 
   // Start undo command group.

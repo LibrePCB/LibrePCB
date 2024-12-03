@@ -162,7 +162,7 @@ bool PackageEditorState_DrawZone::exit() noexcept {
   mContext.commandToolBar.clear();
 
   mContext.graphicsView.unsetCursor();
-  mContext.graphicsView.setSceneCursor(tl::nullopt);
+  mContext.graphicsView.setSceneCursor(std::nullopt);
   mContext.graphicsView.setInfoBoxText(QString());
   emit statusBarMessageChanged(QString());
   return true;

@@ -69,11 +69,11 @@ void BoardClipperPathGenerator::takePathsTo(ClipperLib::Paths& out) noexcept {
 
 void BoardClipperPathGenerator::addCopper(
     const Data& data, const Layer& layer,
-    const QSet<tl::optional<Uuid> >& netsignals, bool ignorePlanes) {
+    const QSet<std::optional<Uuid> >& netsignals, bool ignorePlanes) {
   // Board polygons.
   for (const Data::Polygon& polygon : data.polygons) {
     if ((polygon.layer == &layer) &&
-        (netsignals.isEmpty() || (netsignals.contains(tl::nullopt)))) {
+        (netsignals.isEmpty() || (netsignals.contains(std::nullopt)))) {
       addPolygon(polygon.path, polygon.lineWidth, polygon.filled);
     }
   }
@@ -81,7 +81,7 @@ void BoardClipperPathGenerator::addCopper(
   // Stroke texts.
   for (const Data::StrokeText& st : data.strokeTexts) {
     if ((st.layer == &layer) &&
-        (netsignals.isEmpty() || (netsignals.contains(tl::nullopt)))) {
+        (netsignals.isEmpty() || (netsignals.contains(std::nullopt)))) {
       addStrokeText(st);
     }
   }
@@ -104,7 +104,7 @@ void BoardClipperPathGenerator::addCopper(
     for (const Data::Polygon& polygon : dev.polygons) {
       const Layer& polygonLayer = transform.map(*polygon.layer);
       if ((polygonLayer == layer) &&
-          (netsignals.isEmpty() || netsignals.contains(tl::nullopt))) {
+          (netsignals.isEmpty() || netsignals.contains(std::nullopt))) {
         addPolygon(transform.map(polygon.path), polygon.lineWidth,
                    polygon.filled);
       }
@@ -114,7 +114,7 @@ void BoardClipperPathGenerator::addCopper(
     for (const Data::Circle& circle : dev.circles) {
       const Layer& circleLayer = transform.map(*circle.layer);
       if ((circleLayer == layer) &&
-          (netsignals.isEmpty() || netsignals.contains(tl::nullopt))) {
+          (netsignals.isEmpty() || netsignals.contains(std::nullopt))) {
         addCircle(circle, transform);
       }
     }
@@ -123,7 +123,7 @@ void BoardClipperPathGenerator::addCopper(
     for (const Data::StrokeText& st : dev.strokeTexts) {
       // Do *not* mirror layer since it is independent of the device!
       if ((st.layer == &layer) &&
-          (netsignals.isEmpty() || netsignals.contains(tl::nullopt))) {
+          (netsignals.isEmpty() || netsignals.contains(std::nullopt))) {
         addStrokeText(st);
       }
     }
@@ -238,7 +238,7 @@ void BoardClipperPathGenerator::addStopMaskOpenings(const Data& data,
   // Vias.
   for (const Data::Segment& ns : data.segments) {
     for (const Data::Via& via : ns.vias) {
-      const tl::optional<PositiveLength> stopMaskDia =
+      const std::optional<PositiveLength> stopMaskDia =
           layer.isTop() ? via.stopMaskDiameterTop : via.stopMaskDiameterBot;
       if (stopMaskDia) {
         addHole(*stopMaskDia, makeNonEmptyPath(via.position), Transform(),

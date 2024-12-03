@@ -57,7 +57,7 @@ public:
   ~CmdComponentPinSignalMapItemEdit() noexcept;
 
   // Setters
-  void setSignalUuid(const tl::optional<Uuid>& uuid) noexcept;
+  void setSignalUuid(const std::optional<Uuid>& uuid) noexcept;
   void setDisplayType(const CmpSigPinDisplayType& type) noexcept;
 
   // Operator Overloadings
@@ -77,8 +77,8 @@ private:  // Methods
 private:  // Data
   ComponentPinSignalMapItem& mItem;
 
-  tl::optional<Uuid> mOldSignalUuid;
-  tl::optional<Uuid> mNewSignalUuid;
+  std::optional<Uuid> mOldSignalUuid;
+  std::optional<Uuid> mNewSignalUuid;
   CmpSigPinDisplayType mOldDisplayType;
   CmpSigPinDisplayType mNewDisplayType;
 };

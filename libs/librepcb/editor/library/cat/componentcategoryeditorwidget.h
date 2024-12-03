@@ -31,7 +31,7 @@
 #include <QtWidgets>
 
 #include <memory>
-#include <optional.hpp>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -95,7 +95,7 @@ private:  // Methods
 private:  // Data
   QScopedPointer<Ui::ComponentCategoryEditorWidget> mUi;
   std::unique_ptr<ComponentCategory> mCategory;
-  tl::optional<Uuid> mParentUuid;
+  std::optional<Uuid> mParentUuid;
 };
 
 /*******************************************************************************

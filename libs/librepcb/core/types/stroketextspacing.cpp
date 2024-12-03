@@ -37,7 +37,7 @@ namespace librepcb {
 
 template <>
 std::unique_ptr<SExpression> serialize(const StrokeTextSpacing& obj) {
-  if (const tl::optional<Ratio>& ratio = obj.getRatio()) {
+  if (const std::optional<Ratio>& ratio = obj.getRatio()) {
     return serialize(*ratio);
   } else {
     return SExpression::createToken("auto");
@@ -57,7 +57,7 @@ StrokeTextSpacing deserialize(const SExpression& node) {
  *  Constructors / Destructor
  ******************************************************************************/
 
-StrokeTextSpacing::StrokeTextSpacing(const tl::optional<Ratio>& ratio) noexcept
+StrokeTextSpacing::StrokeTextSpacing(const std::optional<Ratio>& ratio) noexcept
   : mRatio(ratio) {
 }
 

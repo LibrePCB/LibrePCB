@@ -113,7 +113,7 @@ GraphicsOutputJob::GraphicsOutputJob(const SExpression& node)
         deserialize<UnsignedLength>(contentNode->getChild("margins/bottom/@0"));
     c.mirror = deserialize<bool>(contentNode->getChild("mirror/@0"));
     c.rotate = deserialize<bool>(contentNode->getChild("rotate/@0"));
-    c.scale = deserialize<tl::optional<UnsignedRatio>>(
+    c.scale = deserialize<std::optional<UnsignedRatio>>(
         contentNode->getChild("scale/@0"));
     c.pixmapDpi = deserialize<uint>(contentNode->getChild("dpi/@0"));
     c.monochrome = deserialize<bool>(contentNode->getChild("monochrome/@0"));

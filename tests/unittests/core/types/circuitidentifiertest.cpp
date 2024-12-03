@@ -78,7 +78,8 @@ TEST_P(CircuitIdentifierTest, testSerialize) {
   if (data.valid) {
     CircuitIdentifier identifier(data.input);
     EXPECT_EQ(data.input, serialize(identifier)->getValue());
-    EXPECT_EQ(data.input, serialize(tl::make_optional(identifier))->getValue());
+    EXPECT_EQ(data.input,
+              serialize(std::make_optional(identifier))->getValue());
   }
 }
 
@@ -88,27 +89,28 @@ TEST_P(CircuitIdentifierTest, testDeserialize) {
   if (data.valid) {
     EXPECT_EQ(data.input, *deserialize<CircuitIdentifier>(*sexpr));
     EXPECT_EQ(data.input,
-              *deserialize<tl::optional<CircuitIdentifier>>(*sexpr));
+              *deserialize<std::optional<CircuitIdentifier>>(*sexpr));
   } else {
     EXPECT_THROW(deserialize<CircuitIdentifier>(*sexpr), Exception);
     if (data.input.isEmpty()) {
-      EXPECT_EQ(tl::nullopt,
-                deserialize<tl::optional<CircuitIdentifier>>(*sexpr));
+      EXPECT_EQ(std::nullopt,
+                deserialize<std::optional<CircuitIdentifier>>(*sexpr));
     } else {
-      EXPECT_THROW(deserialize<tl::optional<CircuitIdentifier>>(*sexpr),
+      EXPECT_THROW(deserialize<std::optional<CircuitIdentifier>>(*sexpr),
                    Exception);
     }
   }
 }
 
 TEST(CircuitIdentifierTest, testSerializeOptional) {
-  tl::optional<CircuitIdentifier> identifier = tl::nullopt;
+  std::optional<CircuitIdentifier> identifier = std::nullopt;
   EXPECT_EQ("", serialize(identifier)->getValue());
 }
 
 TEST(CircuitIdentifierTest, testDeserializeOptional) {
   std::unique_ptr<SExpression> sexpr = SExpression::createToken("");
-  EXPECT_EQ(tl::nullopt, deserialize<tl::optional<CircuitIdentifier>>(*sexpr));
+  EXPECT_EQ(std::nullopt,
+            deserialize<std::optional<CircuitIdentifier>>(*sexpr));
 }
 
 /*******************************************************************************

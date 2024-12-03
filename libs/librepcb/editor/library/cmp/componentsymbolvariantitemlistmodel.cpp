@@ -191,7 +191,7 @@ void ComponentSymbolVariantItemListModel::browse(
                          tr("Symbol '%1' not found in workspace library!")
                              .arg(symbol.toStr()));
     }
-    tl::optional<Uuid> uuid =
+    std::optional<Uuid> uuid =
         Uuid::tryFromString(itemIndex.data(Qt::EditRole).toString());
     if (uuid) {
       std::shared_ptr<ComponentSymbolVariantItem> item = mItemList->get(*uuid);
@@ -242,7 +242,7 @@ QVariant ComponentSymbolVariantItemListModel::data(const QModelIndex& index,
   switch (index.column()) {
     case COLUMN_SYMBOL: {
       std::shared_ptr<const Symbol> symbol;
-      tl::optional<Uuid> uuid = item ? item->getSymbolUuid() : mNewSymbolUuid;
+      std::optional<Uuid> uuid = item ? item->getSymbolUuid() : mNewSymbolUuid;
       if (mSymbolsCache && uuid) {
         symbol = mSymbolsCache->getSymbol(*uuid);
       }

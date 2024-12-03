@@ -53,7 +53,7 @@ public:
   DevicePadSignalMapItem() = delete;
   DevicePadSignalMapItem(const DevicePadSignalMapItem& other) noexcept;
   DevicePadSignalMapItem(const Uuid& pad,
-                         const tl::optional<Uuid>& signal) noexcept;
+                         const std::optional<Uuid>& signal) noexcept;
   explicit DevicePadSignalMapItem(const SExpression& node);
   ~DevicePadSignalMapItem() noexcept;
 
@@ -62,12 +62,12 @@ public:
     return mPadUuid;
   }  // used for UuidObjectMap
   const Uuid& getPadUuid() const noexcept { return mPadUuid; }
-  const tl::optional<Uuid>& getSignalUuid() const noexcept {
+  const std::optional<Uuid>& getSignalUuid() const noexcept {
     return mSignalUuid;
   }
 
   // Setters
-  bool setSignalUuid(const tl::optional<Uuid>& uuid) noexcept;
+  bool setSignalUuid(const std::optional<Uuid>& uuid) noexcept;
 
   // General Methods
 
@@ -87,7 +87,8 @@ public:
 
 private:  // Data
   Uuid mPadUuid;  ///< must be valid
-  tl::optional<Uuid> mSignalUuid;  ///< tl::nullopt if not connected to a signal
+  std::optional<Uuid>
+      mSignalUuid;  ///< std::nullopt if not connected to a signal
 };
 
 /*******************************************************************************
@@ -110,16 +111,16 @@ class DevicePadSignalMapHelpers {
 public:
   DevicePadSignalMapHelpers() = delete;  // disable instantiation
 
-  static tl::optional<Uuid> tryGetSignalUuid(const DevicePadSignalMap& map,
-                                             const Uuid& pad) noexcept {
+  static std::optional<Uuid> tryGetSignalUuid(const DevicePadSignalMap& map,
+                                              const Uuid& pad) noexcept {
     std::shared_ptr<const DevicePadSignalMapItem> item = map.find(pad);
-    return item ? item->getSignalUuid() : tl::nullopt;
+    return item ? item->getSignalUuid() : std::nullopt;
   }
 
   static DevicePadSignalMap create(const QSet<Uuid> pads) noexcept {
     DevicePadSignalMap map;
     foreach (const Uuid& pad, pads) {
-      map.append(std::make_shared<DevicePadSignalMapItem>(pad, tl::nullopt));
+      map.append(std::make_shared<DevicePadSignalMapItem>(pad, std::nullopt));
     }
     return map;
   }
@@ -129,7 +130,7 @@ public:
       map.remove(pad);
     }
     foreach (const Uuid& pad, pads - map.getUuidSet()) {
-      map.append(std::make_shared<DevicePadSignalMapItem>(pad, tl::nullopt));
+      map.append(std::make_shared<DevicePadSignalMapItem>(pad, std::nullopt));
     }
     Q_ASSERT(map.getUuidSet() == pads);
   }

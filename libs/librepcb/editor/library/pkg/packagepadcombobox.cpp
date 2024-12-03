@@ -58,7 +58,7 @@ PackagePadComboBox::~PackagePadComboBox() noexcept {
  *  Getters
  ******************************************************************************/
 
-tl::optional<Uuid> PackagePadComboBox::getCurrentPad() const noexcept {
+std::optional<Uuid> PackagePadComboBox::getCurrentPad() const noexcept {
   return getPadAtIndex(mComboBox->currentIndex());
 }
 
@@ -75,7 +75,7 @@ void PackagePadComboBox::setPads(const PackagePadList& pads) noexcept {
   mComboBox->setCurrentIndex(-1);
 }
 
-void PackagePadComboBox::setCurrentPad(tl::optional<Uuid> pad) noexcept {
+void PackagePadComboBox::setCurrentPad(std::optional<Uuid> pad) noexcept {
   int index = pad ? mComboBox->findData(pad->toStr(), Qt::UserRole) : -1;
   mComboBox->setCurrentIndex(std::max(index, 0));
 }
@@ -84,7 +84,8 @@ void PackagePadComboBox::setCurrentPad(tl::optional<Uuid> pad) noexcept {
  *  Private Methods
  ******************************************************************************/
 
-tl::optional<Uuid> PackagePadComboBox::getPadAtIndex(int index) const noexcept {
+std::optional<Uuid> PackagePadComboBox::getPadAtIndex(
+    int index) const noexcept {
   return Uuid::tryFromString(
       mComboBox->itemData(index, Qt::UserRole).toString());
 }

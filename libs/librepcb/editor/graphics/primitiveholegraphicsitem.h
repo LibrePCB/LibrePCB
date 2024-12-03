@@ -25,12 +25,12 @@
  ******************************************************************************/
 #include <librepcb/core/geometry/path.h>
 #include <librepcb/core/types/length.h>
-#include <optional/tl/optional.hpp>
 
 #include <QtCore>
 #include <QtWidgets>
 
 #include <memory>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -62,7 +62,7 @@ public:
 
   // Setters
   void setHole(const NonEmptyPath& path, const PositiveLength& diameter,
-               const tl::optional<Length>& stopMaskOffset) noexcept;
+               const std::optional<Length>& stopMaskOffset) noexcept;
 
   // Inherited from QGraphicsItem
   QPainterPath shape() const noexcept override;

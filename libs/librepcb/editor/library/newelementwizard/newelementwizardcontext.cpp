@@ -76,7 +76,7 @@ void NewElementWizardContext::reset(ElementType newType) noexcept {
   // common
   mFiles.clear();
   mElementType = newType;
-  mElementName = tl::nullopt;
+  mElementName = std::nullopt;
   mElementDescription.clear();
   mElementKeywords.clear();
   mElementAuthor = mWorkspace.getSettings().userName.get();
@@ -104,8 +104,8 @@ void NewElementWizardContext::reset(ElementType newType) noexcept {
   mComponentSymbolVariants.clear();
 
   // device
-  mDeviceComponentUuid = tl::nullopt;
-  mDevicePackageUuid = tl::nullopt;
+  mDeviceComponentUuid = std::nullopt;
+  mDevicePackageUuid = std::nullopt;
   mDevicePadSignalMap.clear();
   mDeviceAttributes.clear();
   mDeviceParts.clear();
@@ -211,7 +211,7 @@ void NewElementWizardContext::copyElement(ElementType type,
       Q_ASSERT(package);
       mPackageAssemblyType = package->getAssemblyType(false);
       // copy pads but generate new UUIDs
-      QHash<Uuid, tl::optional<Uuid>> padUuidMap;
+      QHash<Uuid, std::optional<Uuid>> padUuidMap;
       mPackagePads.clear();
       for (const PackagePad& pad : package->getPads()) {
         Uuid newUuid = Uuid::createRandom();
@@ -220,7 +220,7 @@ void NewElementWizardContext::copyElement(ElementType type,
             std::make_shared<PackagePad>(newUuid, pad.getName()));
       }
       // Copy 3D models but generate new UUIDs.
-      QHash<Uuid, tl::optional<Uuid>> modelsUuidMap;
+      QHash<Uuid, std::optional<Uuid>> modelsUuidMap;
       mPackageModels.clear();
       for (const PackageModel& model : package->getModels()) {
         auto newModel = std::make_shared<PackageModel>(Uuid::createRandom(),
@@ -252,7 +252,7 @@ void NewElementWizardContext::copyElement(ElementType type,
         newFootprint->setModels(models);
         // copy pads but generate new UUIDs
         for (const FootprintPad& pad : footprint.getPads()) {
-          tl::optional<Uuid> pkgPad = pad.getPackagePadUuid();
+          std::optional<Uuid> pkgPad = pad.getPackagePadUuid();
           if (pkgPad) {
             pkgPad = padUuidMap.value(*pkgPad);  // Translate to new UUID
           }
@@ -337,7 +337,7 @@ void NewElementWizardContext::copyElement(ElementType type,
                   item.isRequired(), item.getSuffix()));
           // copy pin-signal-map
           for (const ComponentPinSignalMapItem& map : item.getPinSignalMap()) {
-            tl::optional<Uuid> signal = map.getSignalUuid();
+            std::optional<Uuid> signal = map.getSignalUuid();
             if (signal) {
               signal = *signalUuidMap.find(*map.getSignalUuid());
             }
@@ -373,7 +373,7 @@ void NewElementWizardContext::createLibraryElement() {
   if (!mElementName) throw LogicError(__FILE__, __LINE__);
   if (!mElementVersion) throw LogicError(__FILE__, __LINE__);
 
-  tl::optional<Uuid> rootCategoryUuid = tl::nullopt;
+  std::optional<Uuid> rootCategoryUuid = std::nullopt;
   if (mElementCategoryUuids.count()) {
     rootCategoryUuid = mElementCategoryUuids.values().first();
   }

@@ -54,7 +54,7 @@ public:
   ~CmdFootprintPadEdit() noexcept;
 
   // Setters
-  void setPackagePadUuid(const tl::optional<Uuid>& pad,
+  void setPackagePadUuid(const std::optional<Uuid>& pad,
                          bool immediate) noexcept;
   void setComponentSide(FootprintPad::ComponentSide side,
                         bool immediate) noexcept;

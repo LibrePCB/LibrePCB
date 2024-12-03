@@ -360,7 +360,7 @@ RuleCheckMessageList BoardDesignRuleCheck::checkCopperCopperClearances(
     DrcMsgCopperCopperClearanceViolation::Object object;
     const Layer* startLayer;
     const Layer* endLayer;
-    tl::optional<Uuid> net;  // nullopt = no net
+    std::optional<Uuid> net;  // nullopt = no net
     Length clearance;
     ClipperLib::Paths copperArea;  // Exact copper outlines
     ClipperLib::Paths clearanceArea;  // Copper outlines + clearance - tolerance
@@ -439,7 +439,7 @@ RuleCheckMessageList BoardDesignRuleCheck::checkCopperCopperClearances(
                                                                      nullptr),
                polygon.layer,
                polygon.layer,
-               tl::nullopt,
+               std::nullopt,
                *clearance,
                {},
                {}});
@@ -460,7 +460,7 @@ RuleCheckMessageList BoardDesignRuleCheck::checkCopperCopperClearances(
                    st, nullptr),
                st.layer,
                st.layer,
-               tl::nullopt,
+               std::nullopt,
                *clearance,
                {},
                {}});
@@ -508,7 +508,7 @@ RuleCheckMessageList BoardDesignRuleCheck::checkCopperCopperClearances(
                                                                        &dev),
                  &layer,
                  &layer,
-                 tl::nullopt,
+                 std::nullopt,
                  *clearance,
                  {},
                  {}});
@@ -531,7 +531,7 @@ RuleCheckMessageList BoardDesignRuleCheck::checkCopperCopperClearances(
                                                                       &dev),
                  &layer,
                  &layer,
-                 tl::nullopt,
+                 std::nullopt,
                  *clearance,
                  {},
                  {}});
@@ -552,7 +552,7 @@ RuleCheckMessageList BoardDesignRuleCheck::checkCopperCopperClearances(
                                                                           &dev),
                  st.layer,
                  st.layer,
-                 tl::nullopt,
+                 std::nullopt,
                  *clearance,
                  {},
                  {}});
@@ -1811,7 +1811,7 @@ RuleCheckMessageList BoardDesignRuleCheck::checkBoardOutline(const Data& data) {
       const QVector<Path> locations = polygon.path.toOutlineStrokes(
           PositiveLength(std::max(*polygon.lineWidth, Length(100000))));
       messages.append(std::make_shared<DrcMsgOpenBoardOutlinePolygon>(
-          polygon.uuid, tl::nullopt, locations));
+          polygon.uuid, std::nullopt, locations));
     }
   }
   for (const Data::Device& dev : data.devices) {

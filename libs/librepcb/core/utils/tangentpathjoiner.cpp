@@ -183,7 +183,7 @@ void TangentPathJoiner::findAllPaths(QVector<Result>& result,
     }
     if (!prefix.indices.contains(i)) {
       for (bool reverse : {false, true}) {
-        if (tl::optional<Result> r = join(paths, prefix, i, reverse)) {
+        if (std::optional<Result> r = join(paths, prefix, i, reverse)) {
           result.append(*r);
           if (!r->isClosed()) {
             findAllPaths(result, paths, timer, timeoutMs, *r);
@@ -194,7 +194,7 @@ void TangentPathJoiner::findAllPaths(QVector<Result>& result,
   }
 }
 
-tl::optional<TangentPathJoiner::Result> TangentPathJoiner::join(
+std::optional<TangentPathJoiner::Result> TangentPathJoiner::join(
     const QVector<Path>& paths, const Result& prefix, int index,
     bool reverse) noexcept {
   const Path& path = paths.at(index);
@@ -206,7 +206,7 @@ tl::optional<TangentPathJoiner::Result> TangentPathJoiner::join(
       (!prefix.junctions.contains(end))) {
     return prefix.sub(index, reverse, start, end);
   } else {
-    return tl::nullopt;
+    return std::nullopt;
   }
 }
 

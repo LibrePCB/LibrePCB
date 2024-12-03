@@ -27,9 +27,9 @@
 #include "../types/elementname.h"
 #include "../types/simplestring.h"
 
-#include <optional/tl/optional.hpp>
-
 #include <QtCore>
+
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -147,7 +147,7 @@ public:
   template <typename ElementType>
   int addCategory(int libId, const FilePath& fp, const Uuid& uuid,
                   const Version& version, bool deprecated,
-                  const tl::optional<Uuid>& parent) {
+                  const std::optional<Uuid>& parent) {
     static_assert(std::is_same<ElementType, ComponentCategory>::value ||
                       std::is_same<ElementType, PackageCategory>::value,
                   "Unsupported ElementType");
@@ -232,9 +232,9 @@ public:
    */
   template <typename ElementType>
   int addTranslation(int elementId, const QString& locale,
-                     const tl::optional<ElementName>& name,
-                     const tl::optional<QString>& description,
-                     const tl::optional<QString>& keywords) {
+                     const std::optional<ElementName>& name,
+                     const std::optional<QString>& description,
+                     const std::optional<QString>& keywords) {
     return addTranslation(getElementTable<ElementType>(), elementId, locale,
                           name, description, keywords);
   }
@@ -329,14 +329,14 @@ private:  // Methods
                  const QString& generatedBy);
   int addCategory(const QString& categoriesTable, int libId, const FilePath& fp,
                   const Uuid& uuid, const Version& version, bool deprecated,
-                  const tl::optional<Uuid>& parent);
+                  const std::optional<Uuid>& parent);
   void removeElement(const QString& elementsTable, const FilePath& fp);
   void removeAllElements(const QString& elementsTable);
   int addTranslation(const QString& elementsTable, int elementId,
                      const QString& locale,
-                     const tl::optional<ElementName>& name,
-                     const tl::optional<QString>& description,
-                     const tl::optional<QString>& keywords);
+                     const std::optional<ElementName>& name,
+                     const std::optional<QString>& description,
+                     const std::optional<QString>& keywords);
   void removeAllTranslations(const QString& elementsTable);
   int addToCategory(const QString& elementsTable, int elementId,
                     const Uuid& category);
