@@ -3,20 +3,15 @@ jobs:
     pool:
       vmImage: 'windows-2019'
     timeoutInMinutes: 180
+    container: librepcb/librepcb-dev:windowsservercore-ltsc2019-qt6.6-64bit-1
     variables:
       OS: 'windows'
-      ARCH: $[ variables['ARCH'] ]
+      ARCH: 'x86_64'
       CCACHE_DIR: $(Pipeline.Workspace)/.ccache
       CMAKE_CXX_COMPILER_LAUNCHER: ccache
       CMAKE_GENERATOR: 'Ninja'
       FUNQ_MAKE_PATH: 'ninja'
-    strategy:
-      matrix:
-        Qt6_MinGW_64bit:
-          IMAGE: librepcb/librepcb-dev:windowsservercore-ltsc2019-qt6.6-64bit-1
-          ARCH: 'x86_64'
-          DEPLOY: true
-    container: $[ variables['IMAGE'] ]
+      DEPLOY: true
     steps:
     - checkout: self
       clean: true
