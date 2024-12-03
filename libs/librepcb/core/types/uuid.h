@@ -74,7 +74,12 @@ public:
   /**
    * @brief Destructor
    */
-  ~Uuid() noexcept = default;
+  ~Uuid() noexcept
+#if defined(__GNUC__) && (__GNUC__ == 13) && (__GNUC_MINOR__ == 2)
+      ;  // Workaround for compiler warning "maybe-uninitialized".
+#else
+      = default;
+#endif
 
   // Getters
 

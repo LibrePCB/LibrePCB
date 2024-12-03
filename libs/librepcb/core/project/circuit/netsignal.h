@@ -107,8 +107,12 @@ public:
 
   // Operator Overloadings
   NetSignal& operator=(const NetSignal& rhs) = delete;
-  bool operator==(const NetSignal& rhs) noexcept { return (this == &rhs); }
-  bool operator!=(const NetSignal& rhs) noexcept { return (this != &rhs); }
+  bool operator==(const NetSignal& rhs) const noexcept {
+    return (this == &rhs);
+  }
+  bool operator!=(const NetSignal& rhs) const noexcept {
+    return (this != &rhs);
+  }
 
 signals:
 
