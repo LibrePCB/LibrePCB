@@ -111,9 +111,9 @@ KiCadLibraryImport::KiCadLibraryImport(WorkspaceLibraryDb& db,
                                        const FilePath& dstLibFp,
                                        QObject* parent) noexcept
   : QObject(parent),
+    mDestinationLibraryFp(dstLibFp),
     mLibraryDb(db),
     mSettings(new KiCadLibraryConverterSettings()),
-    mDestinationLibraryFp(dstLibFp),
     mState(State::Reset),
     mAbort(false) {
 }
@@ -147,14 +147,10 @@ bool KiCadLibraryImport::canStartSelecting() const noexcept {
   }
 
   for (const SymbolLibrary& lib : result->symbolLibs) {
-    for (const Symbol& sym : lib.symbols) {
-      return true;
-    }
+    if (!lib.symbols.isEmpty()) return true;
   }
   for (const FootprintLibrary& lib : result->footprintLibs) {
-    for (const Footprint& fpt : lib.footprints) {
-      return true;
-    }
+    if (!lib.footprints.isEmpty()) return true;
   }
   return false;
 }
@@ -456,7 +452,7 @@ std::shared_ptr<KiCadLibraryImport::Result> KiCadLibraryImport::scan(
     ++(result->fileCount);
   };
   auto addFootprintLib = [&](const FilePath& fp) {
-    FootprintLibrary lib{fp, {}};
+    FootprintLibrary lib{fp, {}, {}};
     for (const FilePath& subFp : findItems(fp, QDir::Files, "*.kicad_mod")) {
       addFootprintToLib(lib, subFp);
     }
@@ -488,7 +484,7 @@ std::shared_ptr<KiCadLibraryImport::Result> KiCadLibraryImport::scan(
   } else if (suffix == "kicad_mod") {
     // Footprint selected.
     if (libsFp.getParentDir().getSuffix().toLower() == "pretty") {
-      FootprintLibrary lib{libsFp.getParentDir(), {}};
+      FootprintLibrary lib{libsFp.getParentDir(), {}, {}};
       addFootprintToLib(lib, libsFp);
       result->footprintLibs.append(lib);
     } else {
@@ -984,9 +980,7 @@ bool KiCadLibraryImport::isAlreadyImported(
   return false;
 }
 
-template <typename T>
-static bool setDependent(T& obj, bool dependent,
-                         Qt::CheckState& checkState) noexcept {
+static bool setDependent(bool dependent, Qt::CheckState& checkState) noexcept {
   if (dependent && (checkState == Qt::Unchecked)) {
     checkState = Qt::PartiallyChecked;
     return true;
@@ -1014,13 +1008,12 @@ void KiCadLibraryImport::updateDependencies(
   for (SymbolLibrary& lib : result->symbolLibs) {
     for (Symbol& sym : lib.symbols) {
       if (sym.extends.isEmpty()) {
-        if (setDependent(sym, dependentComponents.contains(sym.cmpGeneratedBy),
+        if (setDependent(dependentComponents.contains(sym.cmpGeneratedBy),
                          sym.cmpChecked)) {
           emit componentCheckStateChanged(lib.file.getCompleteBasename(),
                                           sym.name, sym.cmpChecked);
         }
-        if (setDependent(sym, sym.cmpChecked != Qt::Unchecked,
-                         sym.symChecked)) {
+        if (setDependent(sym.cmpChecked != Qt::Unchecked, sym.symChecked)) {
           emit symbolCheckStateChanged(lib.file.getCompleteBasename(), sym.name,
                                        sym.symChecked);
         }
@@ -1030,7 +1023,7 @@ void KiCadLibraryImport::updateDependencies(
 
   for (FootprintLibrary& lib : result->footprintLibs) {
     for (Footprint& fpt : lib.footprints) {
-      if (setDependent(fpt, dependentPackages.contains(fpt.generatedBy),
+      if (setDependent(dependentPackages.contains(fpt.generatedBy),
                        fpt.checked)) {
         emit packageCheckStateChanged(lib.dir.getCompleteBasename(), fpt.name,
                                       fpt.checked);

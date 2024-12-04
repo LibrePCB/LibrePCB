@@ -388,6 +388,8 @@ static kicadimport::KiCadLayer deserializeLayer(const SExpression& node,
 
 KiCadProperty KiCadProperty::parse(const SExpression& node,
                                    MessageLogger& log) {
+  Q_UNUSED(log);
+
   KiCadProperty obj;
   obj.key = node.getChild(0).getValue();
   obj.value = node.getChild(1).getValue();
@@ -424,6 +426,8 @@ KiCadProperty KiCadProperty::parse(const SExpression& node,
 
 KiCadGraphicalLine KiCadGraphicalLine::parse(const SExpression& node,
                                              MessageLogger& log) {
+  Q_UNUSED(log);
+
   KiCadGraphicalLine obj;
   obj.start = deserialize<QPointF>(node.getChild("start"));
   obj.end = deserialize<QPointF>(node.getChild("end"));
@@ -437,6 +441,8 @@ KiCadGraphicalLine KiCadGraphicalLine::parse(const SExpression& node,
 
 KiCadGraphicalArc KiCadGraphicalArc::parse(const SExpression& node,
                                            MessageLogger& log) {
+  Q_UNUSED(log);
+
   KiCadGraphicalArc obj;
   obj.start = deserialize<QPointF>(node.getChild("start"));
   obj.mid = deserialize<QPointF>(node.getChild("mid"));
@@ -451,6 +457,8 @@ KiCadGraphicalArc KiCadGraphicalArc::parse(const SExpression& node,
 
 KiCadGraphicalCircle KiCadGraphicalCircle::parse(const SExpression& node,
                                                  MessageLogger& log) {
+  Q_UNUSED(log);
+
   KiCadGraphicalCircle obj;
   obj.center = deserialize<QPointF>(node.getChild("center"));
   obj.end = deserialize<QPointF>(node.getChild("end"));
@@ -467,6 +475,8 @@ KiCadGraphicalCircle KiCadGraphicalCircle::parse(const SExpression& node,
 
 KiCadGraphicalPolygon KiCadGraphicalPolygon::parse(const SExpression& node,
                                                    MessageLogger& log) {
+  Q_UNUSED(log);
+
   KiCadGraphicalPolygon obj;
   foreach (const SExpression* child, node.getChild("pts").getChildren("xy")) {
     obj.coordinates.append(deserialize<QPointF>(*child));
@@ -584,6 +594,8 @@ KiCadSymbolPolyline KiCadSymbolPolyline::parse(const SExpression& node,
 
 KiCadSymbolText KiCadSymbolText::parse(const SExpression& node,
                                        MessageLogger& log) {
+  Q_UNUSED(log);
+
   KiCadSymbolText obj;
   obj.text = node.getChild("@0").getValue();
   obj.position = deserialize<QPointF>(node.getChild("at"));
@@ -981,6 +993,8 @@ KiCadFootprintPad KiCadFootprintPad::parse(const SExpression& node,
 
 KiCadFootprintModel KiCadFootprintModel::parse(const SExpression& node,
                                                MessageLogger& log) {
+  Q_UNUSED(log);
+
   KiCadFootprintModel obj;
   obj.path = node.getChild(0).getValue();
   if (const SExpression* child = node.tryGetChild("at/xyz")) {

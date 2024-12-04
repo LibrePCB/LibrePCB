@@ -40,7 +40,7 @@ class WorkspaceLibraryDb;
 
 namespace kicadimport {
 
-class KiCadLibraryConverterSettings;
+struct KiCadLibraryConverterSettings;
 
 /*******************************************************************************
  *  Class KiCadLibraryImport
