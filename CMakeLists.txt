@@ -131,12 +131,6 @@ endif()
 # interest, so let's suppress them.
 target_compile_options(common INTERFACE -Wno-noexcept-type)
 
-# Clang emits some warnings within the muParser library when compiling with
-# -Wpedantic, so let's suppress these warnings when compiling with Clang.
-if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  target_compile_options(common INTERFACE -Wno-nested-anon-types)
-endif()
-
 # Avoid "file too big" error for debug builds on Windows.
 if(WIN32)
   target_compile_options(common INTERFACE $<$<CONFIG:Debug>:-Wa,-mbig-obj>)
