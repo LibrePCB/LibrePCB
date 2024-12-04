@@ -1,6 +1,6 @@
 # CMake version configuration
-# (Note: The minimal version 3.16 is shipped with Ubuntu 20.04)
-cmake_minimum_required(VERSION 3.16...3.19)
+# (Note: The minimal version 3.22 is shipped with Ubuntu 22.04)
+cmake_minimum_required(VERSION 3.22)
 
 # Support older macOS versions. Needs to be set before calling project()!
 # https://github.com/LibrePCB/LibrePCB/issues/1091
