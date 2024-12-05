@@ -25,6 +25,8 @@ jobs:
     displayName: Build LibrePCB
   - bash: ./ci/build_mac_bundle.sh
     displayName: Build Bundle
+  - bash: cd libs/librepcb/rust-core && cargo test --features=fail-on-warnings
+    displayName: Run rust-core tests
   - bash: ./build/tests/unittests/librepcb-unittests
     displayName: Run LibrePCB Unittests
   - bash: pytest -vvv --librepcb-executable="build/install/opt/LibrePCB.app/Contents/MacOS/librepcb-cli" ./tests/cli

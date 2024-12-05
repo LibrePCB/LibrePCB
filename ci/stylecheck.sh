@@ -12,6 +12,16 @@ set -euv -o pipefail
 # check if no file contains tabulators (with some exceptions)
 (git grep -Il $'\t' -- ':/' ':!/LICENSES/' ':!/libs/polyclipping/' ':!/share/librepcb/licenses/' ':!*.ui') && exit 1
 
+# check rust code formatting
+for f in $(git ls-files -- '*.rs'); do
+  (rustfmt --check "$f") || exit 1
+done
+
+# lint rust crates
+for f in $(git ls-files -- '**Cargo.toml'); do
+  (cargo clippy --manifest-path="$f" --features="fail-on-warnings") || exit 1
+done
+
 # run python style checks
 (flake8 --ignore=E501 dev tests) || exit 1
 

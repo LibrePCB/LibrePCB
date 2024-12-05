@@ -35,6 +35,8 @@ jobs:
     - bash: ./ci/build_windows_installer.sh
       displayName: Build Installer
       condition: and(succeeded(), eq(variables['DEPLOY'], 'true'))
+    - script: cd libs\\librepcb\\rust-core && cargo test --features=fail-on-warnings
+      displayName: Run rust-core tests
     - script: build\\tests\\unittests\\librepcb-unittests.exe
       displayName: Run LibrePCB Unittests
     - script: pytest -vvv --librepcb-executable="build/install/opt/bin/librepcb-cli.exe" ./tests/cli
