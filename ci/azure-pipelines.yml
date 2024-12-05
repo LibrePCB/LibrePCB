@@ -4,6 +4,7 @@ variables:
   # Specify build author as an environment variable because on Apple Silicon
   # build_librepcb.sh is run locally where we want to use a different author.
   LIBREPCB_BUILD_AUTHOR: "LibrePCB CI"
+  CARGO_INCREMENTAL: 0  # Probably required for sccache(?)
 
 jobs:
 - template: azure-jobs-stylecheck.yml
