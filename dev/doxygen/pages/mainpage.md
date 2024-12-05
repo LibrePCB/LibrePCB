@@ -18,6 +18,11 @@ LibrePCB Developers Documentation {#mainpage}
 - @ref doc_server_api
 
 
+# Rust Modules
+
+- [librepcb-rust-core](./librepcb_rust_core/index.html)
+
+
 # External Links {#doc_main_external}
 
 - Contribution Guidelines: https://github.com/LibrePCB/LibrePCB/blob/master/CONTRIBUTING.md
