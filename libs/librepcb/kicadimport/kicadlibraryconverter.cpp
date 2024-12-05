@@ -495,7 +495,7 @@ std::unique_ptr<Device> KiCadLibraryConverter::createDevice(
     const QList<std::pair<QString, QStringList>> pinNames =
         C::convertSymbolPinNames(gate.pins);
     for (const auto& pair : pinNames) {
-      for (const QString padNumber : pair.second) {
+      for (const QString& padNumber : pair.second) {
         if (!connectedPads.contains(padNumber)) {
           throw RuntimeError(__FILE__, __LINE__,
                              QString("Pad '%1' not found in imported package.")

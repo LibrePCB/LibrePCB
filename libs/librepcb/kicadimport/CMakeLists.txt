@@ -21,6 +21,10 @@ target_include_directories(
 )
 target_link_libraries(
   librepcb_kicadimport
+  PRIVATE common
+)
+target_link_libraries(
+  librepcb_kicadimport
   PUBLIC # LibrePCB
          LibrePCB::Core
          # Qt
