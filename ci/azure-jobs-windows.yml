@@ -3,12 +3,13 @@ jobs:
     pool:
       vmImage: 'windows-2019'
     timeoutInMinutes: 180
-    container: librepcb/librepcb-dev:windowsservercore-ltsc2019-qt6.6-64bit-1
+    container: librepcb/librepcb-dev:windowsservercore-ltsc2019-qt6.6-64bit-2
     variables:
       OS: 'windows'
       ARCH: 'x86_64'
-      CCACHE_DIR: $(Pipeline.Workspace)/.ccache
-      CMAKE_CXX_COMPILER_LAUNCHER: ccache
+      SCCACHE_DIR: $(Pipeline.Workspace)/.sccache
+      CMAKE_CXX_COMPILER_LAUNCHER: sccache
+      RUSTC_WRAPPER: sccache
       CMAKE_GENERATOR: 'Ninja'
       FUNQ_MAKE_PATH: 'ninja'
       DEPLOY: true
@@ -22,9 +23,9 @@ jobs:
       displayName: Install Dependencies
     - task: Cache@2
       inputs:
-        key: 'ccache | "$(System.JobName)"'
-        path: $(CCACHE_DIR)
-      displayName: Setup ccache
+        key: 'sccache | "$(System.JobName)"'
+        path: $(SCCACHE_DIR)
+      displayName: Setup sccache
     - bash: ./ci/print_environment.sh
       displayName: Print New Environment  # Print again since it has been modified
     - bash: ./ci/build_librepcb.sh
