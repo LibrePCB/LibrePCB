@@ -12,5 +12,10 @@ fail-on-warnings = []
 [build-dependencies]
 cbindgen = "0.27"
 
+[dependencies.regex]
+version = "1.11"
+default-features = false
+features = ["std", "unicode"]
+
 [dev-dependencies]
 parameterized_test = "0.2.1"

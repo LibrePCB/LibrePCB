@@ -33,6 +33,11 @@ extern const uint16_t *ffi_qstring_utf16(const QString * NONNULL obj);
 
 extern void ffi_qstring_set(QString * NONNULL obj, const char *s, size_t len);
 
+/**
+ * Wrapper for [increment_number_in_string]
+ */
+void ffi_increment_number_in_string(QString * NONNULL s);
+
 }  // extern "C"
 
 }  // namespace rs
