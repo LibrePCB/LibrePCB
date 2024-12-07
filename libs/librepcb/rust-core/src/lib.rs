@@ -7,6 +7,7 @@
 
 // Modules.
 mod ffi;
+mod toolbox;
 
 // Allow using the create! macro to create parametrized tests in test modules
 // without explicitly importing the parameterized_test crate every time.
