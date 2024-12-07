@@ -14,7 +14,7 @@ set -eufo pipefail
 #     then be created and used so you don't have to install any dependencies.
 #   - To run docker with sudo, use the "--sudo" parameter.
 #   - Without docker, make sure the executables "git", "clang-format",
-#     "cmake-format", "python3" and "xmlsort" are available in PATH.
+#     "cmake-format", "rustfmt", "python3" and "xmlsort" are available in PATH.
 #   - To format all files (instead of only modified ones), add the "--all"
 #     parameter. This is intended only for LibrePCB maintainers, usually you
 #     should not use this!
@@ -29,6 +29,7 @@ DOCKER=""
 DOCKER_CMD="docker"
 DOCKER_IMAGE="librepcb/librepcb-dev:devtools-4"
 CLANGFORMAT=${CLANGFORMAT:-clang-format}
+RUSTFMT=${RUSTFMT:-rustfmt}
 BASE="master"
 CHECK=""
 for i in "$@"
@@ -92,6 +93,17 @@ search_files() {
   done
 }
 
+# Helper to count and print a modified file
+file_modified() {
+  echo "[M] $1"
+  COUNTER=$((COUNTER+1))
+}
+
+# Helper to print a non-modified file
+file_not_modified() {
+  echo "[ ] $1"
+}
+
 # This function tracks modifications of file and prints out information that
 # file has been processed by the script. It increments processed file counter.
 #
@@ -106,11 +118,10 @@ update_file() {
     if [ "$CHECK" == "" ]; then
       printf "%s\n" "$NEW_CONTENT" > "$1"
     fi
-    echo "[M] $1"
-    COUNTER=$((COUNTER+1))
+    file_modified "$1"
   else
     if [ "$CHECK" == "" ]; then
-      echo "[ ] $1"
+      file_not_modified "$1"
     fi
   fi
 }
@@ -129,6 +140,29 @@ for dir in apps/ libs/librepcb/ tests/unittests/ share/; do
   for file in $(search_files "${dir}**.cpp" "${dir}**.hpp" "${dir}**.h" "${dir}**.js"); do
     $CLANGFORMAT -style=file "$file" | "$REPO_ROOT/dev/format_code_helper.py" "$file" | update_file "$file" || clang_format_failed
   done
+done
+
+# Format rust files with rustfmt.
+# Note: Currently the --check mode doesn't work properly (script aborts
+# when a file is not formatted).
+rustfmt_failed() {
+  echo "" >&2
+  echo "ERROR: rustfmt failed!" >&2
+  echo "  Make sure that rustfmt is installed." >&2
+  echo "  On Linux, you can also run this script in a docker" >&2
+  echo "  container by using the '--docker' argument." >&2
+  exit 7
+}
+rustfmt_process() {
+  if [ -z $(cat) ]; then
+    file_not_modified "$1"
+  else
+    file_modified "$1"
+  fi
+}
+echo "Formatting Rust sources with $RUSTFMT..."
+for file in $(search_files "*.rs"); do
+  $RUSTFMT -q -l $CHECK "$file" | rustfmt_process "$file" || rustfmt_failed
 done
 
 # Format *.ui files with Python 3.

@@ -19,6 +19,27 @@ with section("parse"):
         'TARGETS': '+',
       },
     },
+    # Support Corrosion commands
+    'corrosion_experimental_cbindgen': {
+      'kwargs': {
+        'TARGET': 1,
+        'HEADER_NAME': 1,
+        'FLAGS': '*',
+      },
+    },
+    'corrosion_add_cxxbridge': {
+      'pargs': 1,
+      'kwargs': {
+        'CRATE': 1,
+        'MANIFEST_PATH': 1,
+        'FILES': {
+          'pargs': {
+            'nargs': '*',
+            'tags': ['file-list'],
+          },
+        },
+      },
+    },
   }
 
   # Override configurations per-command where available
