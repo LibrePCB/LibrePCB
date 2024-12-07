@@ -115,6 +115,7 @@ Files:
  .gitbugtraq
  .gitignore
  .gitmodules
+ .rustfmt.toml
  AUTHORS.md
  CONTRIBUTING.md
  README.md
