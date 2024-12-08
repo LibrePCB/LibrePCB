@@ -15,6 +15,11 @@
 namespace librepcb {
 namespace rs {
 
+/**
+ * Wrapper type for [Archive]
+ */
+struct ZipArchive;
+
 extern "C" {
 
 extern size_t ffi_qbytearray_len(const QByteArray * NONNULL obj);
@@ -37,6 +42,50 @@ extern void ffi_qstring_set(QString * NONNULL obj, const char *s, size_t len);
  * Wrapper for [increment_number_in_string]
  */
 void ffi_increment_number_in_string(QString * NONNULL s);
+
+/**
+ * Create a new [ZipArchive] object from file path
+ */
+ZipArchive *ffi_ziparchive_new_from_file(const QString * NONNULL path,
+                                         QString * NONNULL err);
+
+/**
+ * Create a new [ZipArchive] object from memory
+ */
+ZipArchive *ffi_ziparchive_new_from_mem(const QByteArray * NONNULL data,
+                                        QString * NONNULL err);
+
+/**
+ * Delete [ZipArchive] object
+ */
+void ffi_ziparchive_delete(ZipArchive *obj);
+
+/**
+ * Get number of files in [ZipArchive]
+ */
+size_t ffi_ziparchive_len(const ZipArchive * NONNULL obj);
+
+/**
+ * Get name of a file in [ZipArchive]
+ */
+bool ffi_ziparchive_name_for_index(ZipArchive * NONNULL obj,
+                                   size_t index,
+                                   QString * NONNULL name,
+                                   QString * NONNULL err);
+
+/**
+ * Read a file from [ZipArchive]
+ */
+bool ffi_ziparchive_read_by_index(ZipArchive * NONNULL obj,
+                                  size_t index,
+                                  QByteArray * NONNULL buf,
+                                  QString * NONNULL err);
+
+/**
+ * Extract [ZipArchive] to directory
+ */
+bool ffi_ziparchive_extract(ZipArchive * NONNULL obj,
+                            const QString * NONNULL dir);
 
 }  // extern "C"
 
