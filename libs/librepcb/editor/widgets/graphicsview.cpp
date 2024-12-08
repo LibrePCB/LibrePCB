@@ -35,11 +35,8 @@
 #include <librepcb/core/utils/toolbox.h>
 
 #include <QtCore>
-#include <QtWidgets>
-
-#if QT_VERSION_MAJOR >= 6
 #include <QtOpenGLWidgets>
-#endif
+#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace
@@ -338,7 +335,7 @@ void GraphicsView::hideWaitingSpinner() noexcept {
  ******************************************************************************/
 
 void GraphicsView::zoomAnimationValueChanged(const QVariant& value) noexcept {
-  if (value.canConvert(QMetaType::QRectF))
+  if (value.canConvert<QRectF>())
     fitInView(value.toRectF(), Qt::KeepAspectRatio);  // zoom smoothly
 }
 

@@ -227,23 +227,23 @@ bool SymbolInstancePropertiesDialog::applyChanges() noexcept {
       }
       {
         // Change this components name to something temporary.
-        QScopedPointer<CmdComponentInstanceEdit> cmdCmp(
+        std::unique_ptr<CmdComponentInstanceEdit> cmdCmp(
             new CmdComponentInstanceEdit(mProject.getCircuit(),
                                          mComponentInstance));
         cmdCmp->setName(CircuitIdentifier("_tmp_swap_names_"));
-        transaction.append(cmdCmp.take());
+        transaction.append(cmdCmp.release());
       }
       {
         // Apply this components name to the other component.
-        QScopedPointer<CmdComponentInstanceEdit> cmdCmp(
+        std::unique_ptr<CmdComponentInstanceEdit> cmdCmp(
             new CmdComponentInstanceEdit(mProject.getCircuit(), *otherCmp));
         cmdCmp->setName(oldName);
-        transaction.append(cmdCmp.take());
+        transaction.append(cmdCmp.release());
       }
     }
 
     // Component Instance
-    QScopedPointer<CmdComponentInstanceEdit> cmdCmp(
+    std::unique_ptr<CmdComponentInstanceEdit> cmdCmp(
         new CmdComponentInstanceEdit(mProject.getCircuit(),
                                      mComponentInstance));
     cmdCmp->setName(newName);
@@ -251,18 +251,18 @@ bool SymbolInstancePropertiesDialog::applyChanges() noexcept {
     cmdCmp->setAttributes(mAttributes);
     cmdCmp->setAssemblyOptions(
         mUi->assemblyOptionListEditorWidget->getOptions());
-    transaction.append(cmdCmp.take());
+    transaction.append(cmdCmp.release());
 
     // Symbol Instance
     bool mirrored = mUi->cbxMirror->isChecked();
-    QScopedPointer<CmdSymbolInstanceEditAll> cmdSym(
+    std::unique_ptr<CmdSymbolInstanceEditAll> cmdSym(
         new CmdSymbolInstanceEditAll(mSymbol));
     cmdSym->setPosition(Point(mUi->edtSymbInstPosX->getValue(),
                               mUi->edtSymbInstPosY->getValue()),
                         false);
     cmdSym->setRotation(mUi->edtSymbInstRotation->getValue(), false);
     cmdSym->setMirrored(mirrored, false);
-    transaction.append(cmdSym.take());
+    transaction.append(cmdSym.release());
 
     transaction.commit();  // can throw
     return true;

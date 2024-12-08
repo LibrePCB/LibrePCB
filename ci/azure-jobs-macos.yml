@@ -9,10 +9,6 @@ jobs:
     COPYFILE_DISABLE: 1 # Stop creating shit files (https://superuser.com/questions/259703/get-mac-tar-to-stop-putting-filenames-in-tar-archives)
     HOMEBREW_NO_INSTALL_CLEANUP: 1 # Might speed up homebrew commands(?)
     CMAKE_OPTIONS: $[ variables['CMAKE_OPTIONS'] ]
-  strategy:
-    matrix:
-      Qt6:
-        CMAKE_OPTIONS: "-DQT_MAJOR_VERSION=6"
   steps:
   - checkout: self
     clean: true

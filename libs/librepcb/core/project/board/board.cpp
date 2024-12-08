@@ -630,11 +630,11 @@ void Board::triggerAirWiresRebuild() noexcept {
 
         // add new airwires
         foreach (const auto& points, airwires) {
-          QScopedPointer<BI_AirWire> airWire(
+          std::unique_ptr<BI_AirWire> airWire(
               new BI_AirWire(*this, *netsignal, *points.first, *points.second));
           airWire->addToBoard();  // can throw
-          mAirWires.insert(netsignal, airWire.data());
-          emit airWireAdded(*airWire.take());
+          mAirWires.insert(netsignal, airWire.get());
+          emit airWireAdded(*airWire.release());
         }
       }
     }

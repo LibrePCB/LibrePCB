@@ -106,7 +106,7 @@ private:  // Methods
 private:  // Types / Data
   Mode mMode;
   Point mStartPos;
-  QScopedPointer<CmdTextEdit> mEditCmd;
+  std::unique_ptr<CmdTextEdit> mEditCmd;
   std::shared_ptr<Text> mCurrentText;
   std::shared_ptr<TextGraphicsItem> mCurrentGraphicsItem;
   QPointer<HAlignActionGroup> mHAlignActionGroup;

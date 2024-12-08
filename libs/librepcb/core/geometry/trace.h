@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../qtcompat.h"
 #include "../serialization/serializableobjectlist.h"
 #include "../types/length.h"
 
@@ -184,8 +183,8 @@ using TraceList =
  *  Non-Member Functions
  ******************************************************************************/
 
-inline QtCompat::Hash qHash(const TraceAnchor& key,
-                            QtCompat::Hash seed = 0) noexcept {
+inline std::size_t qHash(const TraceAnchor& key,
+                         std::size_t seed = 0) noexcept {
   QString s;
   if (tl::optional<Uuid> anchor = key.tryGetJunction()) {
     s += anchor->toStr();

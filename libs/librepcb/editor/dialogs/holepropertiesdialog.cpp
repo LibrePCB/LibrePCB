@@ -144,15 +144,15 @@ void HolePropertiesDialog::on_buttonBox_clicked(QAbstractButton* button) {
 bool HolePropertiesDialog::applyChanges() noexcept {
   try {
     if (mLibraryObj) {
-      QScopedPointer<CmdHoleEdit> cmd(new CmdHoleEdit(*mLibraryObj));
+      std::unique_ptr<CmdHoleEdit> cmd(new CmdHoleEdit(*mLibraryObj));
       applyChanges(*cmd);
-      mUndoStack.execCmd(cmd.take());  // can throw
+      mUndoStack.execCmd(cmd.release());  // can throw
     }
     if (mBoardObj) {
-      QScopedPointer<CmdBoardHoleEdit> cmd(new CmdBoardHoleEdit(*mBoardObj));
+      std::unique_ptr<CmdBoardHoleEdit> cmd(new CmdBoardHoleEdit(*mBoardObj));
       applyChanges(*cmd);
       cmd->setLocked(mUi->holeEditorWidget->getLocked());
-      mUndoStack.execCmd(cmd.take());  // can throw
+      mUndoStack.execCmd(cmd.release());  // can throw
     }
     return true;
   } catch (const Exception& e) {

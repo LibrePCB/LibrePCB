@@ -369,7 +369,7 @@ bool FootprintListModel::setData(const QModelIndex& index,
   try {
     std::shared_ptr<Footprint> item =
         mPackage->getFootprints().value(index.row());
-    QScopedPointer<CmdFootprintEdit> cmd;
+    std::unique_ptr<CmdFootprintEdit> cmd;
     if (item) {
       cmd.reset(new CmdFootprintEdit(*item));
     }
@@ -404,7 +404,7 @@ bool FootprintListModel::setData(const QModelIndex& index,
     if (cmd) {
       cmd->setModelPosition(modelPos);
       cmd->setModelRotation(modelRot);
-      execCmd(cmd.take());
+      execCmd(cmd.release());
     } else if (!item) {
       mNewModelPosition = modelPos;
       mNewModelRotation = modelRot;

@@ -448,7 +448,7 @@ bool CmdBoardSpecctraImport::performExecute() {
                 .arg(item.name));
         continue;
       }
-      QScopedPointer<CmdDeviceInstanceEditAll> cmd(
+      std::unique_ptr<CmdDeviceInstanceEditAll> cmd(
           new CmdDeviceInstanceEditAll(*dev));
       if (!fuzzyCompare(dev->getPosition(), item.pos)) {
         cmd->setPosition(item.pos, false);
@@ -458,7 +458,7 @@ bool CmdBoardSpecctraImport::performExecute() {
         cmd->setRotation(item.rot, false);
         updatedComponents.insert(cmp->getUuid());
       }
-      execNewChildCmd(cmd.take());
+      execNewChildCmd(cmd.release());
     }
 
     // Warn about missing components.
@@ -636,7 +636,7 @@ bool CmdBoardSpecctraImport::performExecute() {
       execNewChildCmd(new CmdBoardNetSegmentAdd(*copy));
 
       // Add vias, netpoints and netlines
-      QScopedPointer<CmdBoardNetSegmentAddElements> cmdAddElements(
+      std::unique_ptr<CmdBoardNetSegmentAddElements> cmdAddElements(
           new CmdBoardNetSegmentAddElements(*copy));
       QHash<Uuid, BI_Via*> viaMap;
       for (const Via& v : segment.vias) {
@@ -686,7 +686,7 @@ bool CmdBoardSpecctraImport::performExecute() {
                            trace.getLayer(), trace.getWidth());
         cmdAddElements->addNetLine(*netline);
       }
-      execNewChildCmd(cmdAddElements.take());
+      execNewChildCmd(cmdAddElements.release());
     }
   }
 

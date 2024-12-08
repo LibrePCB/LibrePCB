@@ -4,17 +4,10 @@ cmake_minimum_required(VERSION 3.16...3.19)
 
 # Support older macOS versions. Needs to be set before calling project()!
 # https://github.com/LibrePCB/LibrePCB/issues/1091
-if(QT_MAJOR_VERSION EQUAL 5)
-  set(CMAKE_OSX_DEPLOYMENT_TARGET
-      "10.14"
-      CACHE STRING "Minimum OS X deployment version"
-  )
-else()
-  set(CMAKE_OSX_DEPLOYMENT_TARGET
-      "10.15"
-      CACHE STRING "Minimum OS X deployment version"
-  )
-endif()
+set(CMAKE_OSX_DEPLOYMENT_TARGET
+    "10.15"
+    CACHE STRING "Minimum OS X deployment version"
+)
 
 # Fix missing libOpenGL.so.0 error of binary Linux releases, see
 # https://github.com/probonopd/linuxdeployqt/issues/486.
@@ -59,24 +52,12 @@ option(BUILD_QTQUICK_TEST "Build the QML test window." ON)
 option(UNBUNDLE_DXFLIB "Don't use vendored dxflib library." OFF)
 option(UNBUNDLE_FONTOBENE_QT "Don't use vendored FontoBeneQt library." OFF)
 option(UNBUNDLE_GTEST "Don't use vendored GoogleTest library." OFF)
-option(UNBUNDLE_HOEDOWN "Don't use vendored Hoedown library." OFF)
 option(UNBUNDLE_MUPARSER "Don't use vendored MuParser library." OFF)
 option(UNBUNDLE_POLYCLIPPING "Don't use vendored Polyclipping library." OFF)
 option(UNBUNDLE_QUAZIP "Don't use vendored QuaZip library." OFF)
 option(UNBUNDLE_ALL "Don't use any vendored library." OFF)
 option(USE_GLU "Include features depending on OpenGL Utility Library (GLU)." ON)
 option(USE_OPENCASCADE "Include features depending on OpenCascade." ON)
-
-# Deprecated options
-if(UNBUNDLE_FONTOBENE_QT5)
-  message(
-    WARNING
-      "Option 'UNBUNDLE_FONTOBENE_QT5' is deprecated and will be removed in \
-      the next release. Please replace the dependency fontobene-qt5 by its \
-      successor fontobene-qt and use the new option 'UNBUNDLE_FONTOBENE_QT'."
-  )
-  set(UNBUNDLE_FONTOBENE_QT ${UNBUNDLE_FONTOBENE_QT5})
-endif()
 
 # Create a release build by default
 include(DefaultBuildType)
@@ -90,34 +71,17 @@ set(BUILD_SHARED_LIBS
 # Auto-include current directory
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-# If Qt version is not explicitly specified, automatically determine it
-if(NOT QT_MAJOR_VERSION)
-  find_package(Qt NAMES Qt6 Qt5 REQUIRED COMPONENTS Core)
-  set(QT_MAJOR_VERSION ${Qt_VERSION_MAJOR})
-endif()
+# Use Qt6
+set(QT_MAJOR_VERSION 6)
 set(QT "Qt${QT_MAJOR_VERSION}")
-set(PARSEAGLE_QT_MAJOR_VERSION ${QT_MAJOR_VERSION})
 
-# Use C++11 (Qt5) or C++17 (Qt6)
-if(QT_MAJOR_VERSION EQUAL 6)
-  set(CMAKE_CXX_STANDARD 17)
-else()
-  set(CMAKE_CXX_STANDARD 11)
-endif()
+# Use C++17
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Include GNU install dirs variables
 include(GNUInstallDirs)
-
-# Workaround for builds on macOS with Qt installed through homebrew
-# https://github.com/Homebrew/homebrew-core/issues/8392#issuecomment-325226494
-if(APPLE AND EXISTS /usr/local/opt/qt5)
-  # Homebrew installs Qt5 (up to at least 5.9.1) in
-  # /usr/local/qt5, ensure it can be found by CMake since
-  # it is not in the default /usr/local prefix.
-  list(APPEND CMAKE_PREFIX_PATH "/usr/local/opt/qt5")
-endif()
 
 # Create "common" interface library which is used for DRY configuration of
 # build flags.
@@ -141,10 +105,10 @@ if(WIN32)
   add_definitions(-DUNICODE -D_UNICODE)
 endif()
 
-# Disable Qt functions which are deprecated in Qt <= 5.12 to enforce us
+# Disable Qt functions which are deprecated in Qt <= 6.2 to enforce us
 # migrating away from them. Always set this to the lowest Qt version we want
 # to support.
-add_definitions(-DQT_DISABLE_DEPRECATED_BEFORE=0x050C00)
+add_definitions(-DQT_DISABLE_DEPRECATED_BEFORE=0x060200)
 
 # Not sure what we should do with deprecation warnings. Better keeping
 # backwards compatibility with already existing & supported environments
@@ -163,14 +127,12 @@ set(QT_COMPONENTS
     LinguistTools
     Network
     OpenGL
+    OpenGLWidgets
     PrintSupport
     Sql
     Svg
     Widgets
 )
-if(QT_MAJOR_VERSION GREATER 5)
-  list(APPEND QT_COMPONENTS OpenGLWidgets)
-endif()
 if(BUILD_QTQUICK_TEST)
   list(APPEND QT_COMPONENTS Quick QuickControls2)
 endif()
@@ -179,16 +141,9 @@ if(BUILD_TESTS)
 endif()
 
 # Find Qt
-find_package(${QT} 5.12.0 REQUIRED COMPONENTS ${QT_COMPONENTS})
+find_package(${QT} 6.2.0 REQUIRED COMPONENTS ${QT_COMPONENTS})
 set(QT_VERSION "${${QT}_VERSION}")
 message(STATUS "Building LibrePCB with Qt ${QT_VERSION}")
-if(QT_MAJOR_VERSION EQUAL 5)
-  message(
-    DEPRECATION
-      "Building with Qt5 is considered as deprecated and will be removed in
-      an upcoming release. Please use Qt6 instead."
-  )
-endif()
 
 # For the ParsEagle library, use the same Qt version as for LibrePCB
 set(PARSEAGLE_QT_MAJOR_VERSION ${QT_MAJOR_VERSION})
@@ -206,11 +161,6 @@ find_package(QuaZip REQUIRED)
 find_package(TypeSafe REQUIRED)
 if(BUILD_TESTS)
   find_package(GTest REQUIRED)
-endif()
-# Hoedown is only needed on Qt <5.14
-if(QT_VERSION VERSION_LESS 5.14)
-  message(STATUS "Qt <5.14 detected, using Hoedown for markdown support")
-  find_package(Hoedown REQUIRED)
 endif()
 
 # Add libs
@@ -240,14 +190,7 @@ file(
 set_source_files_properties(
   ${LIBREPCB_TS_FILES} PROPERTIES OUTPUT_LOCATION "${LIBREPCB_QM_FILES_DIR}"
 )
-if(QT_VERSION VERSION_LESS 5.12)
-  # Qt <5.12 doesn't support OPTIONS
-  qt5_add_translation(LIBREPCB_QM_FILES ${LIBREPCB_TS_FILES})
-elseif(QT_VERSION VERSION_LESS 6.0)
-  qt5_add_translation(LIBREPCB_QM_FILES ${LIBREPCB_TS_FILES} OPTIONS -silent)
-else()
-  qt6_add_translation(LIBREPCB_QM_FILES ${LIBREPCB_TS_FILES} OPTIONS -silent)
-endif()
+qt6_add_translation(LIBREPCB_QM_FILES ${LIBREPCB_TS_FILES} OPTIONS -silent)
 add_custom_target(librepcb_translations DEPENDS ${LIBREPCB_QM_FILES})
 add_dependencies(librepcb librepcb_translations)
 

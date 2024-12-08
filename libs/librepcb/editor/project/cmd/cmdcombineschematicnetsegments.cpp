@@ -75,7 +75,7 @@ bool CmdCombineSchematicNetSegments::performExecute() {
     throw LogicError(__FILE__, __LINE__);
 
   // copy all required netpoints/netlines to the resulting netsegment
-  QScopedPointer<CmdSchematicNetSegmentAddElements> cmdAdd(
+  std::unique_ptr<CmdSchematicNetSegmentAddElements> cmdAdd(
       new CmdSchematicNetSegmentAddElements(mNewSegment));
   QHash<SI_NetLineAnchor*, SI_NetLineAnchor*> anchorMap;
   foreach (SI_NetPoint* netpoint, mOldSegment.getNetPoints()) {
@@ -98,7 +98,7 @@ bool CmdCombineSchematicNetSegments::performExecute() {
     Q_ASSERT(newNetLine);
   }
   execNewChildCmd(new CmdSchematicNetSegmentRemove(mOldSegment));  // can throw
-  execNewChildCmd(cmdAdd.take());  // can throw
+  execNewChildCmd(cmdAdd.release());  // can throw
 
   // copy net labels
   foreach (SI_NetLabel* netlabel, mOldSegment.getNetLabels()) {
@@ -106,9 +106,9 @@ bool CmdCombineSchematicNetSegments::performExecute() {
         mNewSegment,
         NetLabel(Uuid::createRandom(), netlabel->getPosition(),
                  netlabel->getRotation(), netlabel->getMirrored()));
-    QScopedPointer<CmdSchematicNetLabelAdd> cmd(
+    std::unique_ptr<CmdSchematicNetLabelAdd> cmd(
         new CmdSchematicNetLabelAdd(*newNetLabel));
-    execNewChildCmd(cmd.take());  // can throw
+    execNewChildCmd(cmd.release());  // can throw
   }
 
   // remove netsignals which are no longer required

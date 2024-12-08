@@ -95,7 +95,7 @@ private:  // Methods
 
 private:  // Types / Data
   bool mIsUndoCmdActive;
-  QScopedPointer<CmdZoneEdit> mEditCmd;
+  std::unique_ptr<CmdZoneEdit> mEditCmd;
   std::shared_ptr<Zone> mCurrentZone;
   std::shared_ptr<ZoneGraphicsItem> mCurrentGraphicsItem;
   Point mLastScenePos;

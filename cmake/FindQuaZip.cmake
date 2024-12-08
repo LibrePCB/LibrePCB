@@ -14,15 +14,6 @@ if(EXISTS "${QUAZIP_SUBMODULE_BASEPATH}"
       CACHE BOOL "" FORCE
   )
 
-  # Use Qt embedded ZLib as this simplifies deployment
-  # Note: Doesn't work with Qt6 anymore (at least on Windows).
-  if(QT_MAJOR_VERSION EQUAL 5)
-    set(QUAZIP_USE_QT_ZLIB
-        ON
-        CACHE STRING "" FORCE
-    )
-  endif()
-
   # We don't need to support installation when using the lib as a submodule
   set(QUAZIP_INSTALL
       OFF

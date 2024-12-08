@@ -83,7 +83,7 @@ private:  // Methods
   void diameterEditValueChanged(const PositiveLength& value) noexcept;
 
 private:  // Data
-  QScopedPointer<CmdHoleEdit> mEditCmd;
+  std::unique_ptr<CmdHoleEdit> mEditCmd;
   std::shared_ptr<Hole> mCurrentHole;
   std::shared_ptr<HoleGraphicsItem> mCurrentGraphicsItem;
 

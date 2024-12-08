@@ -202,7 +202,7 @@ bool ZonePropertiesDialog::applyChanges() noexcept {
     }
 
     if (mLibraryObj) {
-      QScopedPointer<CmdZoneEdit> cmd(new CmdZoneEdit(*mLibraryObj));
+      std::unique_ptr<CmdZoneEdit> cmd(new CmdZoneEdit(*mLibraryObj));
       applyChanges(*cmd);
       Zone::Layers layers = mLibraryObj->getLayers();
       layers.setFlag(Zone::Layer::Top,
@@ -211,18 +211,18 @@ bool ZonePropertiesDialog::applyChanges() noexcept {
       layers.setFlag(Zone::Layer::Bottom,
                      enabledLayers.contains(&Layer::botCopper()));
       cmd->setLayers(layers, false);
-      mUndoStack.execCmd(cmd.take());  // can throw
+      mUndoStack.execCmd(cmd.release());  // can throw
     }
 
     if (mBoardObj) {
-      QScopedPointer<CmdBoardZoneEdit> cmd(new CmdBoardZoneEdit(*mBoardObj));
+      std::unique_ptr<CmdBoardZoneEdit> cmd(new CmdBoardZoneEdit(*mBoardObj));
       applyChanges(*cmd);
       QSet<const Layer*> layers = mBoardObj->getData().getLayers();
       layers -= disabledLayers;
       layers += enabledLayers;
       cmd->setLayers(layers, false);
       cmd->setLocked(mUi->cbxLock->isChecked());
-      mUndoStack.execCmd(cmd.take());  // can throw
+      mUndoStack.execCmd(cmd.release());  // can throw
     }
 
     return true;

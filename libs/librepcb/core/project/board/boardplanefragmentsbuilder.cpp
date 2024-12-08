@@ -115,13 +115,8 @@ bool BoardPlaneFragmentsBuilder::start(
     Board& board, const QSet<const Layer*>* layers) noexcept {
   if (auto data = createJob(board, layers)) {
     cancel();
-#if (QT_VERSION_MAJOR >= 6)
     mFuture =
         QtConcurrent::run(&BoardPlaneFragmentsBuilder::run, this, &board, data);
-#else
-    mFuture =
-        QtConcurrent::run(this, &BoardPlaneFragmentsBuilder::run, &board, data);
-#endif
     return true;
   } else {
     return false;
@@ -370,25 +365,13 @@ BoardPlaneFragmentsBuilder::Result BoardPlaneFragmentsBuilder::run(
       const Layer* layer = data->layers.at(i);
       if (i < data->layers.count() - 1) {
         // Run in other thread -> Copy JobData for safe concurrent access.
-#if (QT_VERSION_MAJOR >= 6)
         futures.append(
             QtConcurrent::run(&BoardPlaneFragmentsBuilder::runLayer, this,
                               std::make_shared<const JobData>(*data), layer));
-#else
-        futures.append(
-            QtConcurrent::run(this, &BoardPlaneFragmentsBuilder::runLayer,
-                              std::make_shared<const JobData>(*data), layer));
-#endif
       } else {
         // Run in this thread -> no copy of JobData required.
         const LayerJobResult res = runLayer(data, layer);
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
         result.planes.insert(res.planes);
-#else
-        for (auto it = res.planes.begin(); it != res.planes.end(); it++) {
-          result.planes.insert(it.key(), it.value());
-        }
-#endif
         result.errors.append(res.errors);
       }
     }
@@ -396,13 +379,7 @@ BoardPlaneFragmentsBuilder::Result BoardPlaneFragmentsBuilder::run(
     // Fetch result of each thread (blocking until all threads finished).
     foreach (const auto& future, futures) {
       const LayerJobResult res = future.result();
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
       result.planes.insert(res.planes);
-#else
-      for (auto it = res.planes.begin(); it != res.planes.end(); it++) {
-        result.planes.insert(it.key(), it.value());
-      }
-#endif
       result.errors.append(res.errors);
     }
   } catch (const Exception& e) {

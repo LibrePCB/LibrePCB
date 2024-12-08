@@ -22,8 +22,6 @@
  ******************************************************************************/
 #include "overlinemarkupparser.h"
 
-#include "../qtcompat.h"
-
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -47,11 +45,11 @@ QVector<std::pair<int, int>> OverlineMarkupParser::extract(
   QVector<std::pair<int, int>> spans;
   int spanStart = -1;
   for (int i = 0; i < inputLength; ++i) {
-    if (QtCompat::midRef(input, i, 2) == QLatin1String("!!")) {
+    if (QStringView(input).mid(i, 2) == QLatin1String("!!")) {
       // Substitutte '!!' by '!'.
       output.append('!');
       ++i;
-    } else if (QtCompat::midRef(input, i, 2) == QLatin1String("!/")) {
+    } else if (QStringView(input).mid(i, 2) == QLatin1String("!/")) {
       // Do not end overline if '/' is prefixed with '!'.
       if (spanStart < 0) {
         spanStart = output.length();

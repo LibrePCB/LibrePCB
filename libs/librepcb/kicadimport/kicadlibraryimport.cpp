@@ -336,13 +336,8 @@ bool KiCadLibraryImport::startScan(
   mState = State::Scanning;
   mLoadedLibsFp = libsFp;
   mLoadedShapes3dFp = shapes3dFp;
-#if (QT_VERSION_MAJOR >= 6)
   mFuture = QtConcurrent::run(&KiCadLibraryImport::scan, this, libsFp,
                               shapes3dFp, log);
-#else
-  mFuture = QtConcurrent::run(this, &KiCadLibraryImport::scan, libsFp,
-                              shapes3dFp, log);
-#endif
   return true;
 }
 
@@ -356,13 +351,8 @@ bool KiCadLibraryImport::startParse(
 
   mAbort = false;
   mState = State::Parsing;
-#if (QT_VERSION_MAJOR >= 6)
   mFuture = QtConcurrent::run(&KiCadLibraryImport::parse, this,
                               mFuture.result(), log);
-#else
-  mFuture = QtConcurrent::run(this, &KiCadLibraryImport::parse,
-                              mFuture.result(), log);
-#endif
   return true;
 }
 
@@ -376,13 +366,8 @@ bool KiCadLibraryImport::startImport(
 
   mAbort = false;
   mState = State::Importing;
-#if (QT_VERSION_MAJOR >= 6)
   mFuture = QtConcurrent::run(&KiCadLibraryImport::import, this,
                               mFuture.result(), log);
-#else
-  mFuture = QtConcurrent::run(this, &KiCadLibraryImport::import,
-                              mFuture.result(), log);
-#endif
   return true;
 }
 

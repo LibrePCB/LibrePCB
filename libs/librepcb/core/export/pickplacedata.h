@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../qtcompat.h"
 #include "../types/angle.h"
 #include "../types/point.h"
 
@@ -172,8 +171,8 @@ private:
  *  Non-Member Functions
  ******************************************************************************/
 
-inline QtCompat::Hash qHash(PickPlaceDataItem::Type key,
-                            QtCompat::Hash seed = 0) noexcept {
+inline std::size_t qHash(PickPlaceDataItem::Type key,
+                         std::size_t seed = 0) noexcept {
   return ::qHash(static_cast<int>(key), seed);
 }
 

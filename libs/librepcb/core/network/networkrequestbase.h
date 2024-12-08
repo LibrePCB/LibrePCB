@@ -26,6 +26,8 @@
 #include <QtCore>
 #include <QtNetwork>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -234,7 +236,7 @@ protected:  // Data
   // internal data
   QList<QUrl> mRedirectedUrls;
   QNetworkRequest mRequest;
-  QScopedPointer<QNetworkReply> mReply;
+  std::unique_ptr<QNetworkReply> mReply;
   bool mStarted;
   bool mAborted;
   bool mErrored;

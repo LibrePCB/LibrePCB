@@ -163,15 +163,16 @@ bool EditorCommand::eventFilter(QObject* obj, QEvent* event) noexcept {
     if (se->isAmbiguous()) {
       QAction* action = static_cast<QAction*>(obj);
       QList<QAction*> candidates;
-      if (QWidget* widget = action->parentWidget()) {
+      if (QWidget* widget = qobject_cast<QWidget*>(action->parent())) {
         if (QWidget* window = widget->window()) {
           foreach (QAction* a, window->findChildren<QAction*>()) {
             if (a->shortcuts().contains(se->key())) {
+              QWidget* aParentWidget = qobject_cast<QWidget*>(a->parent());
               if ((a->shortcutContext() == Qt::ApplicationShortcut) ||
                   (a->shortcutContext() == Qt::WindowShortcut) ||
                   ((a->shortcutContext() == Qt::WidgetShortcut) &&
-                   (a->parentWidget()) && (qApp->focusWidget()) &&
-                   (a->parentWidget()->isAncestorOf(qApp->focusWidget())))) {
+                   (aParentWidget) && (qApp->focusWidget()) &&
+                   (aParentWidget->isAncestorOf(qApp->focusWidget())))) {
                 candidates.append(a);
               }
             }
@@ -185,8 +186,8 @@ bool EditorCommand::eventFilter(QObject* obj, QEvent* event) noexcept {
                   } else if (a->priority() != b->priority()) {
                     return a->priority() > b->priority();
                   } else {
-                    QWidget* pA = a->parentWidget();
-                    QWidget* pB = b->parentWidget();
+                    QWidget* pA = qobject_cast<QWidget*>(a->parent());
+                    QWidget* pB = qobject_cast<QWidget*>(b->parent());
                     return ((pA) && (pB) && (pB->isAncestorOf(pA)));
                   }
                 });

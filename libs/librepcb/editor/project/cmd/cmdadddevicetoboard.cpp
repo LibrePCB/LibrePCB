@@ -175,10 +175,10 @@ bool CmdAddDeviceToBoard::performExecute() {
     assemblyOptions.append(std::make_shared<ComponentAssemblyOption>(
         mDeviceUuid, mDeviceInstance->getLibDevice().getAttributes(),
         assemblyVariants, PartList{}));
-    QScopedPointer<CmdComponentInstanceEdit> cmd(new CmdComponentInstanceEdit(
+    std::unique_ptr<CmdComponentInstanceEdit> cmd(new CmdComponentInstanceEdit(
         mComponentInstance.getCircuit(), mComponentInstance));
     cmd->setAssemblyOptions(assemblyOptions);
-    execNewChildCmd(cmd.take());  // can throw
+    execNewChildCmd(cmd.release());  // can throw
   }
 
   // add a new device instance to the board

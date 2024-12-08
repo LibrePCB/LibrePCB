@@ -150,21 +150,21 @@ private:  // Methods
 private:  // Types / Data
   SubState mState;
   Point mStartPos;
-  QScopedPointer<CmdDragSelectedFootprintItems> mCmdDragSelectedItems;
+  std::unique_ptr<CmdDragSelectedFootprintItems> mCmdDragSelectedItems;
 
   /// The current polygon selected for editing (nullptr if none)
   std::shared_ptr<Polygon> mSelectedPolygon;
   /// The polygon vertex indices selected for editing (empty if none)
   QVector<int> mSelectedPolygonVertices;
   /// The polygon edit command (nullptr if not editing)
-  QScopedPointer<CmdPolygonEdit> mCmdPolygonEdit;
+  std::unique_ptr<CmdPolygonEdit> mCmdPolygonEdit;
 
   /// The current zone selected for editing (nullptr if none)
   std::shared_ptr<Zone> mSelectedZone;
   /// The zone vertex indices selected for editing (empty if none)
   QVector<int> mSelectedZoneVertices;
   /// The zone edit command (nullptr if not editing)
-  QScopedPointer<CmdZoneEdit> mCmdZoneEdit;
+  std::unique_ptr<CmdZoneEdit> mCmdZoneEdit;
 };
 
 /*******************************************************************************

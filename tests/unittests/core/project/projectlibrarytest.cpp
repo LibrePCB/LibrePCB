@@ -44,9 +44,9 @@ protected:
   FilePath mLibDir;
   std::shared_ptr<TransactionalFileSystem> mTempFs;
   std::shared_ptr<TransactionalFileSystem> mLibFs;
-  QScopedPointer<Symbol> mExistingSymbol;
+  std::unique_ptr<Symbol> mExistingSymbol;
   QFileInfo mExistingSymbolFile;
-  QScopedPointer<Symbol> mNewSymbol;
+  std::unique_ptr<Symbol> mNewSymbol;
   QFileInfo mNewSymbolFile;
   qint64 mNewSymbolCreationSize;
 
@@ -113,7 +113,7 @@ TEST_F(ProjectLibraryTest, testLoadSymbol) {
   {
     ProjectLibrary lib(std::unique_ptr<TransactionalDirectory>(
         new TransactionalDirectory(mLibFs)));
-    lib.addSymbol(*mExistingSymbol.take());
+    lib.addSymbol(*mExistingSymbol.release());
     EXPECT_EQ(1, lib.getSymbols().count());
     EXPECT_TRUE(mExistingSymbolFile.exists());
   }
@@ -124,7 +124,7 @@ TEST_F(ProjectLibraryTest, testAddSymbol) {
   {
     ProjectLibrary lib(std::unique_ptr<TransactionalDirectory>(
         new TransactionalDirectory(mLibFs)));
-    lib.addSymbol(*mNewSymbol.take());
+    lib.addSymbol(*mNewSymbol.release());
     EXPECT_EQ(1, lib.getSymbols().count());
     EXPECT_TRUE(mExistingSymbolFile.exists());
     EXPECT_FALSE(mNewSymbolFile.exists());
@@ -139,7 +139,7 @@ TEST_F(ProjectLibraryTest, testAddSymbol_Save) {
   {
     ProjectLibrary lib(std::unique_ptr<TransactionalDirectory>(
         new TransactionalDirectory(mLibFs)));
-    lib.addSymbol(*mNewSymbol.take());
+    lib.addSymbol(*mNewSymbol.release());
     saveToDisk();
     EXPECT_EQ(1, lib.getSymbols().count());
     EXPECT_TRUE(mExistingSymbolFile.exists());
@@ -156,7 +156,7 @@ TEST_F(ProjectLibraryTest, testAddRemoveSymbol) {
     ProjectLibrary lib(std::unique_ptr<TransactionalDirectory>(
         new TransactionalDirectory(mLibFs)));
     lib.addSymbol(*mNewSymbol);
-    lib.removeSymbol(*mNewSymbol.take());
+    lib.removeSymbol(*mNewSymbol.release());
     EXPECT_EQ(0, lib.getSymbols().count());
     EXPECT_TRUE(mExistingSymbolFile.exists());
     EXPECT_FALSE(mNewSymbolFile.exists());
@@ -172,7 +172,7 @@ TEST_F(ProjectLibraryTest, testAddRemoveSymbol_Save) {
     ProjectLibrary lib(std::unique_ptr<TransactionalDirectory>(
         new TransactionalDirectory(mLibFs)));
     lib.addSymbol(*mNewSymbol);
-    lib.removeSymbol(*mNewSymbol.take());
+    lib.removeSymbol(*mNewSymbol.release());
     saveToDisk();
     EXPECT_EQ(0, lib.getSymbols().count());
     EXPECT_TRUE(mExistingSymbolFile.exists());
@@ -188,7 +188,7 @@ TEST_F(ProjectLibraryTest, testRemoveSymbol) {
   {
     ProjectLibrary lib(std::unique_ptr<TransactionalDirectory>(
         new TransactionalDirectory(mLibFs)));
-    lib.addSymbol(*mExistingSymbol.take());
+    lib.addSymbol(*mExistingSymbol.release());
     lib.removeSymbol(*getFirstSymbol(lib));
     EXPECT_EQ(0, lib.getSymbols().count());
     EXPECT_TRUE(mExistingSymbolFile.exists());
@@ -200,7 +200,7 @@ TEST_F(ProjectLibraryTest, testRemoveSymbol_Save) {
   {
     ProjectLibrary lib(std::unique_ptr<TransactionalDirectory>(
         new TransactionalDirectory(mLibFs)));
-    lib.addSymbol(*mExistingSymbol.take());
+    lib.addSymbol(*mExistingSymbol.release());
     lib.removeSymbol(*getFirstSymbol(lib));
     saveToDisk();
     EXPECT_EQ(0, lib.getSymbols().count());
@@ -215,7 +215,7 @@ TEST_F(ProjectLibraryTest, testRemoveAddSymbol) {
   {
     ProjectLibrary lib(std::unique_ptr<TransactionalDirectory>(
         new TransactionalDirectory(mLibFs)));
-    lib.addSymbol(*mExistingSymbol.take());
+    lib.addSymbol(*mExistingSymbol.release());
     Symbol* sym = getFirstSymbol(lib);
     lib.removeSymbol(*sym);
     lib.addSymbol(*sym);
@@ -229,7 +229,7 @@ TEST_F(ProjectLibraryTest, testRemoveAddSymbol_Save) {
   {
     ProjectLibrary lib(std::unique_ptr<TransactionalDirectory>(
         new TransactionalDirectory(mLibFs)));
-    lib.addSymbol(*mExistingSymbol.take());
+    lib.addSymbol(*mExistingSymbol.release());
     Symbol* sym = getFirstSymbol(lib);
     lib.removeSymbol(*sym);
     lib.addSymbol(*sym);
@@ -249,7 +249,7 @@ TEST_F(ProjectLibraryTest, testSavingToExistingEmptyDirectory) {
   FileUtils::makePath(FilePath(mNewSymbolFile.dir().absolutePath()));
   EXPECT_TRUE(mNewSymbolFile.dir().exists());
 
-  lib.addSymbol(*mNewSymbol.take());
+  lib.addSymbol(*mNewSymbol.release());
   saveToDisk();
   EXPECT_TRUE(mNewSymbolFile.exists());
 }

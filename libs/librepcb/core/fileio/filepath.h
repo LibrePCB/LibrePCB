@@ -23,8 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../qtcompat.h"
-
 #include <QtCore>
 
 /*******************************************************************************
@@ -488,8 +486,7 @@ private:
 // Non-Member Functions
 QDataStream& operator<<(QDataStream& stream, const FilePath& filepath);
 QDebug& operator<<(QDebug& stream, const FilePath& filepath);
-inline QtCompat::Hash qHash(const FilePath& key,
-                            QtCompat::Hash seed = 0) noexcept {
+inline std::size_t qHash(const FilePath& key, std::size_t seed = 0) noexcept {
   return qHash(key.toStr(), seed);
 }
 

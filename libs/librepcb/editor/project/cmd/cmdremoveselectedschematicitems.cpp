@@ -310,10 +310,10 @@ void CmdRemoveSelectedSchematicItems::removeSymbol(SI_Symbol& symbol) {
       BI_Device* device =
           board->getDeviceInstanceByComponentUuid(component.getUuid());
       if (device) {
-        QScopedPointer<CmdRemoveBoardItems> cmd(
+        std::unique_ptr<CmdRemoveBoardItems> cmd(
             new CmdRemoveBoardItems(device->getBoard()));
         cmd->removeDeviceInstances({device});
-        execNewChildCmd(cmd.take());  // can throw
+        execNewChildCmd(cmd.release());  // can throw
       }
     }
     execNewChildCmd(new CmdComponentInstanceRemove(
@@ -332,9 +332,10 @@ void CmdRemoveSelectedSchematicItems::disconnectComponentSignalInstance(
   }
   for (auto it = boardNetLinesToRemove.constBegin();
        it != boardNetLinesToRemove.constEnd(); ++it) {
-    QScopedPointer<CmdRemoveBoardItems> cmd(new CmdRemoveBoardItems(*it.key()));
+    std::unique_ptr<CmdRemoveBoardItems> cmd(
+        new CmdRemoveBoardItems(*it.key()));
     cmd->removeNetLines(it.value());
-    execNewChildCmd(cmd.take());  // can throw
+    execNewChildCmd(cmd.release());  // can throw
   }
 
   // disconnect the component signal instance from the net signal

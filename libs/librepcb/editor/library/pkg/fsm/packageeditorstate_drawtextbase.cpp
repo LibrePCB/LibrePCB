@@ -66,7 +66,7 @@ PackageEditorState_DrawTextBase::PackageEditorState_DrawTextBase(
 }
 
 PackageEditorState_DrawTextBase::~PackageEditorState_DrawTextBase() noexcept {
-  Q_ASSERT(mEditCmd.isNull());
+  Q_ASSERT(!mEditCmd);
 }
 
 /*******************************************************************************
@@ -321,7 +321,7 @@ bool PackageEditorState_DrawTextBase::finishAddText(const Point& pos) noexcept {
     mCurrentGraphicsItem->setSelected(false);
     mCurrentGraphicsItem.reset();
     mCurrentText.reset();
-    mContext.undoStack.appendToCmdGroup(mEditCmd.take());
+    mContext.undoStack.appendToCmdGroup(mEditCmd.release());
     mContext.undoStack.commitCmdGroup();
     return true;
   } catch (const Exception& e) {

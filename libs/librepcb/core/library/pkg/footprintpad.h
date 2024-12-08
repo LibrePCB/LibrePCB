@@ -27,7 +27,6 @@
 #include "../../geometry/padgeometry.h"
 #include "../../geometry/padhole.h"
 #include "../../geometry/path.h"
-#include "../../qtcompat.h"
 #include "../../serialization/serializableobjectlist.h"
 #include "../../types/angle.h"
 #include "../../types/length.h"
@@ -230,8 +229,8 @@ private:  // Data
  *  Non-Member Functions
  ******************************************************************************/
 
-inline QtCompat::Hash qHash(const FootprintPad::Function& key,
-                            QtCompat::Hash seed = 0) noexcept {
+inline std::size_t qHash(const FootprintPad::Function& key,
+                         std::size_t seed = 0) noexcept {
   return ::qHash(static_cast<int>(key), seed);
 }
 

@@ -216,9 +216,9 @@ bool SchematicEditorState_AddText::addText(const Point& pos) noexcept {
     mLastTextProperties.setPosition(pos);
     mCurrentTextToPlace = new SI_Text(
         *schematic, Text(Uuid::createRandom(), mLastTextProperties));
-    QScopedPointer<CmdSchematicTextAdd> cmdAdd(
+    std::unique_ptr<CmdSchematicTextAdd> cmdAdd(
         new CmdSchematicTextAdd(*mCurrentTextToPlace));
-    mContext.undoStack.appendToCmdGroup(cmdAdd.take());
+    mContext.undoStack.appendToCmdGroup(cmdAdd.release());
     mCurrentTextEditCmd.reset(
         new CmdTextEdit(mCurrentTextToPlace->getTextObj()));
     return true;
@@ -253,7 +253,7 @@ bool SchematicEditorState_AddText::fixPosition(const Point& pos) noexcept {
   try {
     if (mCurrentTextEditCmd) {
       mCurrentTextEditCmd->setPosition(pos, false);
-      mContext.undoStack.appendToCmdGroup(mCurrentTextEditCmd.take());
+      mContext.undoStack.appendToCmdGroup(mCurrentTextEditCmd.release());
     }
     mContext.undoStack.commitCmdGroup();
     mIsUndoCmdActive = false;

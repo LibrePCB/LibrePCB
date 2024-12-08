@@ -94,7 +94,7 @@ private:  // Methods
 private:  // Types / Data
   std::shared_ptr<SymbolPin> mCurrentPin;
   std::shared_ptr<SymbolPinGraphicsItem> mCurrentGraphicsItem;
-  QScopedPointer<CmdSymbolPinEdit> mEditCmd;
+  std::unique_ptr<CmdSymbolPinEdit> mEditCmd;
   QLineEdit* mNameLineEdit;
 
   // parameter memory

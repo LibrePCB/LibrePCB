@@ -57,11 +57,7 @@ StepExport::~StepExport() noexcept {
 void StepExport::start(std::shared_ptr<SceneData3D> data, const FilePath& fp,
                        int finishDelayMs) noexcept {
   cancel();
-#if (QT_VERSION_MAJOR >= 6)
   mFuture = QtConcurrent::run(&StepExport::run, this, data, fp, finishDelayMs);
-#else
-  mFuture = QtConcurrent::run(this, &StepExport::run, data, fp, finishDelayMs);
-#endif
 }
 
 bool StepExport::isBusy() const noexcept {

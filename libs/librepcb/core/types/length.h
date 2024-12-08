@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../exceptions.h"
-#include "../qtcompat.h"
 
 #include <type_safe/constrained_type.hpp>
 
@@ -660,8 +659,7 @@ inline QDebug operator<<(QDebug stream, const Length& length) {
   return stream;
 }
 
-inline QtCompat::Hash qHash(const Length& key,
-                            QtCompat::Hash seed = 0) noexcept {
+inline std::size_t qHash(const Length& key, std::size_t seed = 0) noexcept {
   return ::qHash(key.toNm(), seed);
 }
 
@@ -776,8 +774,8 @@ inline QDebug operator<<(QDebug stream, const UnsignedLength& length) {
   return stream;
 }
 
-inline QtCompat::Hash qHash(const UnsignedLength& key,
-                            QtCompat::Hash seed = 0) noexcept {
+inline std::size_t qHash(const UnsignedLength& key,
+                         std::size_t seed = 0) noexcept {
   return ::qHash(key->toNm(), seed);
 }
 
@@ -977,8 +975,8 @@ inline QDebug operator<<(QDebug stream, const PositiveLength& length) {
   return stream;
 }
 
-inline QtCompat::Hash qHash(const PositiveLength& key,
-                            QtCompat::Hash seed = 0) noexcept {
+inline std::size_t qHash(const PositiveLength& key,
+                         std::size_t seed = 0) noexcept {
   return ::qHash(key->toNm(), seed);
 }
 

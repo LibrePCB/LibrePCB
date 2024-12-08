@@ -29,6 +29,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -89,7 +91,7 @@ private:  // Data
   // Information about the current hole to place. Only valid if
   // mIsUndoCmdActive == true.
   BI_Hole* mCurrentHoleToPlace;
-  QScopedPointer<CmdBoardHoleEdit> mCurrentHoleEditCmd;
+  std::unique_ptr<CmdBoardHoleEdit> mCurrentHoleEditCmd;
 };
 
 /*******************************************************************************

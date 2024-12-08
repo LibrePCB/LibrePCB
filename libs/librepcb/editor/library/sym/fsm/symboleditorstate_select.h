@@ -131,14 +131,14 @@ private:  // Methods
 private:  // Types / Data
   SubState mState;
   Point mStartPos;
-  QScopedPointer<CmdDragSelectedSymbolItems> mCmdDragSelectedItems;
+  std::unique_ptr<CmdDragSelectedSymbolItems> mCmdDragSelectedItems;
 
   /// The current polygon selected for editing (nullptr if none)
   std::shared_ptr<Polygon> mSelectedPolygon;
   /// The polygon vertex indices selected for editing (empty if none)
   QVector<int> mSelectedPolygonVertices;
   /// The polygon edit command (nullptr if not editing)
-  QScopedPointer<CmdPolygonEdit> mCmdPolygonEdit;
+  std::unique_ptr<CmdPolygonEdit> mCmdPolygonEdit;
 };
 
 /*******************************************************************************

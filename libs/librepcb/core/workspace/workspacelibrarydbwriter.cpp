@@ -531,8 +531,7 @@ int WorkspaceLibraryDbWriter::addCategory(const QString& categoriesTable,
   query.bindValue(":uuid", uuid.toStr());
   query.bindValue(":version", version.toStr());
   query.bindValue(":deprecated", deprecated);
-  query.bindValue(":parent_uuid",
-                  parent ? parent->toStr() : QVariant(QVariant::String));
+  query.bindValue(":parent_uuid", parent ? parent->toStr() : QVariant());
   return mDb.insert(query);
 }
 
@@ -566,11 +565,9 @@ int WorkspaceLibraryDbWriter::addTranslation(
       });
   query.bindValue(":element_id", elementId);
   query.bindValue(":locale", locale);
-  query.bindValue(":name", name ? **name : QVariant(QVariant::String));
-  query.bindValue(":description",
-                  description ? *description : QVariant(QVariant::String));
-  query.bindValue(":keywords",
-                  keywords ? *keywords : QVariant(QVariant::String));
+  query.bindValue(":name", name ? **name : QVariant());
+  query.bindValue(":description", description ? *description : QVariant());
+  query.bindValue(":keywords", keywords ? *keywords : QVariant());
   return mDb.insert(query);
 }
 

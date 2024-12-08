@@ -61,26 +61,12 @@ QString MessageLogger::Message::toRichText(ColorTheme theme,
  ******************************************************************************/
 
 MessageLogger::MessageLogger(bool record, QObject* parent) noexcept
-  : QObject(parent),
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
-    mMutex(),
-#else
-    mMutex(QMutex::Recursive),
-#endif
-    mParent(),
-    mRecord(record) {
+  : QObject(parent), mMutex(), mParent(), mRecord(record) {
 }
 
 MessageLogger::MessageLogger(MessageLogger* parentLogger, const QString& group,
                              bool record, QObject* parent) noexcept
-  : QObject(parent),
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
-    mMutex(),
-#else
-    mMutex(QMutex::Recursive),
-#endif
-    mParent(parentLogger),
-    mRecord(record) {
+  : QObject(parent), mMutex(), mParent(parentLogger), mRecord(record) {
   if (!group.isEmpty()) {
     mPrefix = "[" % group % "] ";
   }

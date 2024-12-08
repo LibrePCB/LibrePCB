@@ -142,9 +142,9 @@ bool BoardEditorState_AddHole::addHole(const Point& pos) noexcept {
         *board,
         BoardHoleData(Uuid::createRandom(), mLastDiameter,
                       makeNonEmptyPath(pos), MaskConfig::automatic(), false));
-    QScopedPointer<CmdBoardHoleAdd> cmdAdd(
+    std::unique_ptr<CmdBoardHoleAdd> cmdAdd(
         new CmdBoardHoleAdd(*mCurrentHoleToPlace));
-    mContext.undoStack.appendToCmdGroup(cmdAdd.take());
+    mContext.undoStack.appendToCmdGroup(cmdAdd.release());
     mCurrentHoleEditCmd.reset(new CmdBoardHoleEdit(*mCurrentHoleToPlace));
     return true;
   } catch (const Exception& e) {
@@ -169,7 +169,7 @@ bool BoardEditorState_AddHole::fixPosition(const Point& pos) noexcept {
   try {
     if (mCurrentHoleEditCmd) {
       mCurrentHoleEditCmd->setPath(makeNonEmptyPath(pos), false);
-      mContext.undoStack.appendToCmdGroup(mCurrentHoleEditCmd.take());
+      mContext.undoStack.appendToCmdGroup(mCurrentHoleEditCmd.release());
     }
     mContext.undoStack.commitCmdGroup();
     mIsUndoCmdActive = false;

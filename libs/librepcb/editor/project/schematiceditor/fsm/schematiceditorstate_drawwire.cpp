@@ -327,7 +327,7 @@ bool SchematicEditorState_DrawWire::startPositioning(
       } else if (auto netline = std::dynamic_pointer_cast<SGI_NetLine>(item)) {
         // split netline
         netsegment = &netline->getNetLine().getNetSegment();
-        QScopedPointer<CmdSchematicNetSegmentAddElements> cmdAdd(
+        std::unique_ptr<CmdSchematicNetSegmentAddElements> cmdAdd(
             new CmdSchematicNetSegmentAddElements(*netsegment));
         mFixedStartAnchor = cmdAdd->addNetPoint(Toolbox::nearestPointOnLine(
             pos, netline->getNetLine().getStartPoint().getPosition(),
@@ -336,11 +336,11 @@ bool SchematicEditorState_DrawWire::startPositioning(
                            netline->getNetLine().getStartPoint());
         cmdAdd->addNetLine(*mFixedStartAnchor,
                            netline->getNetLine().getEndPoint());
-        mContext.undoStack.appendToCmdGroup(cmdAdd.take());  // can throw
-        QScopedPointer<CmdSchematicNetSegmentRemoveElements> cmdRemove(
+        mContext.undoStack.appendToCmdGroup(cmdAdd.release());  // can throw
+        std::unique_ptr<CmdSchematicNetSegmentRemoveElements> cmdRemove(
             new CmdSchematicNetSegmentRemoveElements(*netsegment));
         cmdRemove->removeNetLine(netline->getNetLine());
-        mContext.undoStack.appendToCmdGroup(cmdRemove.take());  // can throw
+        mContext.undoStack.appendToCmdGroup(cmdRemove.release());  // can throw
       }
     }
 
@@ -451,19 +451,19 @@ bool SchematicEditorState_DrawWire::addNextNetPoint(
            mFixedStartAnchor->getPosition()) ||
           (mPositioningNetPoint1->getPosition() ==
            mPositioningNetPoint2->getPosition())) {
-        QScopedPointer<CmdSchematicNetSegmentRemoveElements> cmdRemove(
+        std::unique_ptr<CmdSchematicNetSegmentRemoveElements> cmdRemove(
             new CmdSchematicNetSegmentRemoveElements(
                 mPositioningNetPoint1->getNetSegment()));
         cmdRemove->removeNetPoint(*mPositioningNetPoint1);
         cmdRemove->removeNetLine(*mPositioningNetLine1);
         cmdRemove->removeNetLine(*mPositioningNetLine2);
-        QScopedPointer<CmdSchematicNetSegmentAddElements> cmdAdd(
+        std::unique_ptr<CmdSchematicNetSegmentAddElements> cmdAdd(
             new CmdSchematicNetSegmentAddElements(
                 mPositioningNetPoint1->getNetSegment()));
         mPositioningNetLine2 =
             cmdAdd->addNetLine(*mFixedStartAnchor, *mPositioningNetPoint2);
-        mContext.undoStack.appendToCmdGroup(cmdAdd.take());
-        mContext.undoStack.appendToCmdGroup(cmdRemove.take());
+        mContext.undoStack.appendToCmdGroup(cmdAdd.release());
+        mContext.undoStack.appendToCmdGroup(cmdRemove.release());
       }
 
       // find anchor under cursor
@@ -497,17 +497,18 @@ bool SchematicEditorState_DrawWire::addNextNetPoint(
                        std::dynamic_pointer_cast<SGI_NetLine>(item)) {
           // split netline
           otherNetSegment = &netline->getNetLine().getNetSegment();
-          QScopedPointer<CmdSchematicNetSegmentAddElements> cmdAdd(
+          std::unique_ptr<CmdSchematicNetSegmentAddElements> cmdAdd(
               new CmdSchematicNetSegmentAddElements(*otherNetSegment));
           otherAnchor = cmdAdd->addNetPoint(pos);
           cmdAdd->addNetLine(*otherAnchor,
                              netline->getNetLine().getStartPoint());
           cmdAdd->addNetLine(*otherAnchor, netline->getNetLine().getEndPoint());
-          mContext.undoStack.appendToCmdGroup(cmdAdd.take());  // can throw
-          QScopedPointer<CmdSchematicNetSegmentRemoveElements> cmdRemove(
+          mContext.undoStack.appendToCmdGroup(cmdAdd.release());  // can throw
+          std::unique_ptr<CmdSchematicNetSegmentRemoveElements> cmdRemove(
               new CmdSchematicNetSegmentRemoveElements(*otherNetSegment));
           cmdRemove->removeNetLine(netline->getNetLine());
-          mContext.undoStack.appendToCmdGroup(cmdRemove.take());  // can throw
+          mContext.undoStack.appendToCmdGroup(
+              cmdRemove.release());  // can throw
         }
       }
 
@@ -516,18 +517,19 @@ bool SchematicEditorState_DrawWire::addNextNetPoint(
       if (otherAnchor) {
         if ((!otherNetSegment) ||
             (otherNetSegment == &mPositioningNetPoint2->getNetSegment())) {
-          QScopedPointer<CmdSchematicNetSegmentAddElements> cmdAdd(
+          std::unique_ptr<CmdSchematicNetSegmentAddElements> cmdAdd(
               new CmdSchematicNetSegmentAddElements(
                   mPositioningNetPoint2->getNetSegment()));
           cmdAdd->addNetLine(*otherAnchor,
                              mPositioningNetLine2->getStartPoint());
-          mContext.undoStack.appendToCmdGroup(cmdAdd.take());  // can throw
-          QScopedPointer<CmdSchematicNetSegmentRemoveElements> cmdRemove(
+          mContext.undoStack.appendToCmdGroup(cmdAdd.release());  // can throw
+          std::unique_ptr<CmdSchematicNetSegmentRemoveElements> cmdRemove(
               new CmdSchematicNetSegmentRemoveElements(
                   mPositioningNetPoint2->getNetSegment()));
           cmdRemove->removeNetPoint(*mPositioningNetPoint2);
           cmdRemove->removeNetLine(*mPositioningNetLine2);
-          mContext.undoStack.appendToCmdGroup(cmdRemove.take());  // can throw
+          mContext.undoStack.appendToCmdGroup(
+              cmdRemove.release());  // can throw
         } else {
           // change net signal if needed
           NetSignal* thisSignal =
@@ -577,10 +579,10 @@ bool SchematicEditorState_DrawWire::addNextNetPoint(
                   new CmdChangeNetSignalOfSchematicNetSegment(
                       mPositioningNetPoint2->getNetSegment(), *signal));
             } else {
-              QScopedPointer<CmdNetSignalEdit> cmd(new CmdNetSignalEdit(
+              std::unique_ptr<CmdNetSignalEdit> cmd(new CmdNetSignalEdit(
                   mCircuit, mPositioningNetPoint2->getNetSignalOfNetSegment()));
               cmd->setName(name, false);
-              mContext.undoStack.appendToCmdGroup(cmd.take());
+              mContext.undoStack.appendToCmdGroup(cmd.release());
             }
           } catch (const Exception& e) {
             QMessageBox::warning(

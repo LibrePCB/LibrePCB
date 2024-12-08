@@ -195,10 +195,10 @@ bool DevicePadSignalMapModel::setData(const QModelIndex& index,
       if (!item) {
         return false;
       }
-      QScopedPointer<CmdDevicePadSignalMapItemEdit> cmd(
+      std::unique_ptr<CmdDevicePadSignalMapItemEdit> cmd(
           new CmdDevicePadSignalMapItemEdit(*item));
       cmd->setSignalUuid(Uuid::tryFromString(value.toString()));
-      execCmd(cmd.take());
+      execCmd(cmd.release());
       return true;
     }
   } catch (const Exception& e) {

@@ -241,12 +241,12 @@ bool BoardEditorState_AddVia::addVia(const Point& pos) noexcept {
     BI_NetSegment* netsegment = cmdAddSeg->getNetSegment();
     Q_ASSERT(netsegment);
     mLastViaProperties.setPosition(pos);
-    QScopedPointer<CmdBoardNetSegmentAddElements> cmdAddVia(
+    std::unique_ptr<CmdBoardNetSegmentAddElements> cmdAddVia(
         new CmdBoardNetSegmentAddElements(*netsegment));
     mCurrentViaToPlace =
         cmdAddVia->addVia(Via(Uuid::createRandom(), mLastViaProperties));
     Q_ASSERT(mCurrentViaToPlace);
-    mContext.undoStack.appendToCmdGroup(cmdAddVia.take());
+    mContext.undoStack.appendToCmdGroup(cmdAddVia.release());
     mCurrentViaEditCmd.reset(new CmdBoardViaEdit(*mCurrentViaToPlace));
 
     // Highlight all elements of the current netsignal.
@@ -313,15 +313,15 @@ bool BoardEditorState_AddVia::fixPosition(const Point& pos) noexcept {
               dynamic_cast<BI_NetPoint*>(&netline->getEndPoint()))) {
         // TODO(5n8ke) is this the best way to check whtether the NetLine
         // should be split?
-        QScopedPointer<CmdBoardSplitNetLine> cmdSplit(
+        std::unique_ptr<CmdBoardSplitNetLine> cmdSplit(
             new CmdBoardSplitNetLine(*netline, pos));
         otherNetPoints.append(cmdSplit->getSplitPoint());
-        mContext.undoStack.appendToCmdGroup(cmdSplit.take());
+        mContext.undoStack.appendToCmdGroup(cmdSplit.release());
       }
     }
 
     if (mCurrentViaEditCmd) {
-      mContext.undoStack.appendToCmdGroup(mCurrentViaEditCmd.take());
+      mContext.undoStack.appendToCmdGroup(mCurrentViaEditCmd.release());
     }
 
     // Combine all NetSegments that are not yet part of the via segment with it
@@ -344,10 +344,10 @@ bool BoardEditorState_AddVia::fixPosition(const Point& pos) noexcept {
       if (auto netPoint = std::dynamic_pointer_cast<BGI_NetPoint>(item)) {
         if (&netPoint->getNetPoint().getNetSegment() ==
             &mCurrentViaToPlace->getNetSegment()) {
-          QScopedPointer<CmdBoardNetSegmentAddElements> cmdAdd(
+          std::unique_ptr<CmdBoardNetSegmentAddElements> cmdAdd(
               new CmdBoardNetSegmentAddElements(
                   mCurrentViaToPlace->getNetSegment()));
-          QScopedPointer<CmdBoardNetSegmentRemoveElements> cmdRemove(
+          std::unique_ptr<CmdBoardNetSegmentRemoveElements> cmdRemove(
               new CmdBoardNetSegmentRemoveElements(
                   mCurrentViaToPlace->getNetSegment()));
           foreach (BI_NetLine* netline, netPoint->getNetPoint().getNetLines()) {
@@ -357,8 +357,8 @@ bool BoardEditorState_AddVia::fixPosition(const Point& pos) noexcept {
             cmdRemove->removeNetLine(*netline);
           }
           cmdRemove->removeNetPoint(netPoint->getNetPoint());
-          mContext.undoStack.appendToCmdGroup(cmdAdd.take());
-          mContext.undoStack.appendToCmdGroup(cmdRemove.take());
+          mContext.undoStack.appendToCmdGroup(cmdAdd.release());
+          mContext.undoStack.appendToCmdGroup(cmdRemove.release());
         }
       }
     }
@@ -430,10 +430,10 @@ void BoardEditorState_AddVia::applySelectedNetSignal() noexcept {
     try {
       mContext.undoStack.appendToCmdGroup(
           new CmdBoardNetSegmentRemove(mCurrentViaToPlace->getNetSegment()));
-      QScopedPointer<CmdBoardNetSegmentEdit> cmdEdit(
+      std::unique_ptr<CmdBoardNetSegmentEdit> cmdEdit(
           new CmdBoardNetSegmentEdit(mCurrentViaToPlace->getNetSegment()));
       cmdEdit->setNetSignal(netsignal);
-      mContext.undoStack.appendToCmdGroup(cmdEdit.take());
+      mContext.undoStack.appendToCmdGroup(cmdEdit.release());
       mContext.undoStack.appendToCmdGroup(
           new CmdBoardNetSegmentAdd(mCurrentViaToPlace->getNetSegment()));
     } catch (const Exception& e) {

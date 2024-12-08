@@ -12,22 +12,18 @@ jobs:
         IMAGE: librepcb/librepcb-dev:ubuntu-20.04-qt6.6-1
         DEPLOY: true
         NO_HOEDOWN: true
-      Ubuntu_2004_Unbundled:
-        IMAGE: librepcb/librepcb-dev:ubuntu-20.04-7
+      Ubuntu_2204_Clang:
+        IMAGE: librepcb/librepcb-dev:ubuntu-22.04-3
+        CC: clang
+        CXX: clang++
+      Ubuntu_2404_Unbundled:
+        IMAGE: librepcb/librepcb-dev:ubuntu-24.04-1
         UNBUNDLE_DXFLIB: true
         UNBUNDLE_GTEST: true
         UNBUNDLE_MUPARSER: true
-        #UNBUNDLE_QUAZIP: true  # Note: Does not ship quazip 1.x yet
+        UNBUNDLE_QUAZIP: true
         UNBUNDLE_POLYCLIPPING: true
-        # Note: QtQuick Controls not available in Docker image (yet).
-        CMAKE_OPTIONS: "-DBUILD_QTQUICK_TEST=0 -DUSE_GLU=0 -DUSE_OPENCASCADE=0"
         LD_LIBRARY_PATH: $(Build.Repository.LocalPath)/build/install/opt/lib
-      Ubuntu_2204_Qt6_Clang:
-        IMAGE: librepcb/librepcb-dev:ubuntu-22.04-2
-        CC: clang
-        CXX: clang++
-        CMAKE_OPTIONS: "-DQT_MAJOR_VERSION=6"
-        FUNQ_QT_MAJOR_VERSION: 6
   container:
     image: $[ variables['IMAGE'] ]
   steps:
@@ -58,9 +54,6 @@ jobs:
   - bash: rm -rf libs/polyclipping
     displayName: Remove bundled polyclipping lib
     condition: and(succeeded(), eq(variables['UNBUNDLE_POLYCLIPPING'], 'true'))
-  - bash: rm -rf libs/hoedown
-    displayName: Remove bundled hoedown lib
-    condition: and(succeeded(), eq(variables['NO_HOEDOWN'], 'true'))
   - bash: ./ci/build_librepcb.sh
     displayName: Build LibrePCB
   - bash: ./ci/build_linux_portables.sh

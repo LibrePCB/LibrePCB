@@ -291,7 +291,7 @@ bool PartListModel::setData(const QModelIndex& index, const QVariant& value,
 
   try {
     std::shared_ptr<Part> item = mPartList->value(index.row());
-    QScopedPointer<CmdPartEdit> cmd;
+    std::unique_ptr<CmdPartEdit> cmd;
     if (item) {
       cmd.reset(new CmdPartEdit(*item));
     }
@@ -314,7 +314,7 @@ bool PartListModel::setData(const QModelIndex& index, const QVariant& value,
       return false;  // do not execute command!
     }
     if (cmd) {
-      execCmd(cmd.take());
+      execCmd(cmd.release());
     } else if (!item) {
       emit dataChanged(index, index);
     }

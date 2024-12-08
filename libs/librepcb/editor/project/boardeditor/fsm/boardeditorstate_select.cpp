@@ -126,10 +126,10 @@ BoardEditorState_Select::~BoardEditorState_Select() noexcept {
 
 bool BoardEditorState_Select::entry() noexcept {
   Q_ASSERT(mIsUndoCmdActive == false);
-  Q_ASSERT(mSelectedItemsDragCommand.isNull());
-  Q_ASSERT(mCmdPolygonEdit.isNull());
-  Q_ASSERT(mCmdPlaneEdit.isNull());
-  Q_ASSERT(mCmdZoneEdit.isNull());
+  Q_ASSERT(!mSelectedItemsDragCommand);
+  Q_ASSERT(!mCmdPolygonEdit);
+  Q_ASSERT(!mCmdPlaneEdit);
+  Q_ASSERT(!mCmdZoneEdit);
   return true;
 }
 
@@ -549,7 +549,7 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
         mSelectedItemsDragCommand->setCurrentPosition(
             Point::fromPx(e.scenePos()));
         mContext.undoStack.appendToCmdGroup(
-            mSelectedItemsDragCommand.take());  // can throw
+            mSelectedItemsDragCommand.release());  // can throw
       }
       mContext.undoStack.commitCmdGroup();  // can throw
       mIsUndoCmdActive = false;
@@ -635,7 +635,7 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
       mSelectedItemsDragCommand->setCurrentPosition(
           Point::fromPx(e.scenePos()));
       mContext.undoStack.execCmd(
-          mSelectedItemsDragCommand.take());  // can throw
+          mSelectedItemsDragCommand.release());  // can throw
     } catch (const Exception& e) {
       QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
       abortCommand(false);
@@ -644,7 +644,7 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
   } else if (mCmdPolygonEdit) {
     // Stop moving polygon vertices
     try {
-      mContext.undoStack.execCmd(mCmdPolygonEdit.take());
+      mContext.undoStack.execCmd(mCmdPolygonEdit.release());
     } catch (const Exception& e) {
       QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     }
@@ -653,7 +653,7 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
   } else if (mCmdPlaneEdit) {
     // Stop moving plane vertices
     try {
-      mContext.undoStack.execCmd(mCmdPlaneEdit.take());
+      mContext.undoStack.execCmd(mCmdPlaneEdit.release());
     } catch (const Exception& e) {
       QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     }
@@ -662,7 +662,7 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
   } else if (mCmdZoneEdit) {
     // Stop moving zone vertices
     try {
-      mContext.undoStack.execCmd(mCmdZoneEdit.take());
+      mContext.undoStack.execCmd(mCmdZoneEdit.release());
     } catch (const Exception& e) {
       QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     }
@@ -854,10 +854,10 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
         } else {
           connect(a, &QAction::triggered, [this, device, uuid]() {
             try {
-              QScopedPointer<CmdDeviceInstanceEdit> cmd(
+              std::unique_ptr<CmdDeviceInstanceEdit> cmd(
                   new CmdDeviceInstanceEdit(device->getDevice()));
               cmd->setModel(uuid);
-              mContext.undoStack.execCmd(cmd.take());
+              mContext.undoStack.execCmd(cmd.release());
             } catch (const Exception& e) {
               QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
             }
@@ -1206,9 +1206,8 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
 
 bool BoardEditorState_Select::processSwitchToBoard(int index) noexcept {
   Q_UNUSED(index);
-  return (!mIsUndoCmdActive) && mSelectedItemsDragCommand.isNull() &&
-      mCmdPolygonEdit.isNull() && mCmdPlaneEdit.isNull() &&
-      mCmdZoneEdit.isNull();
+  return (!mIsUndoCmdActive) && (!mSelectedItemsDragCommand) &&
+      (!mCmdPolygonEdit) && (!mCmdPlaneEdit) && (!mCmdZoneEdit);
 }
 
 /*******************************************************************************
@@ -1217,7 +1216,7 @@ bool BoardEditorState_Select::processSwitchToBoard(int index) noexcept {
 
 bool BoardEditorState_Select::startMovingSelectedItems(
     BoardGraphicsScene& scene, const Point& startPos) noexcept {
-  Q_ASSERT(mSelectedItemsDragCommand.isNull());
+  Q_ASSERT(!mSelectedItemsDragCommand);
   mSelectedItemsDragCommand.reset(
       new CmdDragSelectedBoardItems(scene, getIgnoreLocks(), false, startPos));
   return true;
@@ -1228,10 +1227,11 @@ bool BoardEditorState_Select::moveSelectedItems(const Point& delta) noexcept {
   if ((!scene) || (mSelectedItemsDragCommand)) return false;
 
   try {
-    QScopedPointer<CmdDragSelectedBoardItems> cmd(new CmdDragSelectedBoardItems(
-        *scene, getIgnoreLocks(), false, Point(0, 0)));
+    std::unique_ptr<CmdDragSelectedBoardItems> cmd(
+        new CmdDragSelectedBoardItems(*scene, getIgnoreLocks(), false,
+                                      Point(0, 0)));
     cmd->setCurrentPosition(delta);
-    return execCmd(cmd.take());
+    return execCmd(cmd.release());
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     return false;
@@ -1246,10 +1246,10 @@ bool BoardEditorState_Select::rotateSelectedItems(const Angle& angle) noexcept {
     if (mSelectedItemsDragCommand) {
       mSelectedItemsDragCommand->rotate(angle, true);
     } else {
-      QScopedPointer<CmdDragSelectedBoardItems> cmd(
+      std::unique_ptr<CmdDragSelectedBoardItems> cmd(
           new CmdDragSelectedBoardItems(*scene, getIgnoreLocks()));
       cmd->rotate(angle, false);
-      mContext.undoStack.execCmd(cmd.take());
+      mContext.undoStack.execCmd(cmd.release());
     }
     return true;
   } catch (const Exception& e) {
@@ -1279,10 +1279,10 @@ bool BoardEditorState_Select::snapSelectedItemsToGrid() noexcept {
   if (!scene) return false;
 
   try {
-    QScopedPointer<CmdDragSelectedBoardItems> cmdMove(
+    std::unique_ptr<CmdDragSelectedBoardItems> cmdMove(
         new CmdDragSelectedBoardItems(*scene, getIgnoreLocks()));
     cmdMove->snapToGrid();
-    mContext.undoStack.execCmd(cmdMove.take());
+    mContext.undoStack.execCmd(cmdMove.release());
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -1295,10 +1295,10 @@ bool BoardEditorState_Select::lockSelectedItems(bool locked) noexcept {
   if (!scene) return false;
 
   try {
-    QScopedPointer<CmdDragSelectedBoardItems> cmd(
+    std::unique_ptr<CmdDragSelectedBoardItems> cmd(
         new CmdDragSelectedBoardItems(*scene, true));
     cmd->setLocked(locked);
-    mContext.undoStack.execCmd(cmd.take());
+    mContext.undoStack.execCmd(cmd.release());
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -1311,7 +1311,7 @@ bool BoardEditorState_Select::changeWidthOfSelectedItems(int step) noexcept {
   if (!scene) return false;
 
   try {
-    QScopedPointer<CmdDragSelectedBoardItems> cmd(
+    std::unique_ptr<CmdDragSelectedBoardItems> cmd(
         new CmdDragSelectedBoardItems(*scene, true, true));
     if (!cmd->hasAnythingSelected()) {
       return false;
@@ -1383,7 +1383,7 @@ bool BoardEditorState_Select::changeWidthOfSelectedItems(int step) noexcept {
       width = edtWidth->getValue();
     }
     cmd->setLineWidth(*width);
-    mContext.undoStack.execCmd(cmd.take());
+    mContext.undoStack.execCmd(cmd.release());
     emit statusBarMessageChanged(
         mContext.workspace.getSettings().defaultLengthUnit.get().format(
             **width, mContext.editor.locale()),
@@ -1400,10 +1400,10 @@ bool BoardEditorState_Select::resetAllTextsOfSelectedItems() noexcept {
   if (!scene) return false;
 
   try {
-    QScopedPointer<CmdDragSelectedBoardItems> cmdMove(
+    std::unique_ptr<CmdDragSelectedBoardItems> cmdMove(
         new CmdDragSelectedBoardItems(*scene, true));
     cmdMove->resetAllTexts();
-    mContext.undoStack.execCmd(cmdMove.take());
+    mContext.undoStack.execCmd(cmdMove.release());
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -1446,9 +1446,9 @@ void BoardEditorState_Select::removePolygonVertices(
     if (path.getVertices().count() < 2) {
       return;  // Do not allow to create invalid polygons!
     }
-    QScopedPointer<CmdBoardPolygonEdit> cmd(new CmdBoardPolygonEdit(polygon));
+    std::unique_ptr<CmdBoardPolygonEdit> cmd(new CmdBoardPolygonEdit(polygon));
     cmd->setPath(path, false);
-    mContext.undoStack.execCmd(cmd.take());
+    mContext.undoStack.execCmd(cmd.release());
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
@@ -1472,9 +1472,9 @@ void BoardEditorState_Select::removePlaneVertices(
     if (path.getVertices().count() < 2) {
       return;  // Do not allow to create invalid outlines!
     }
-    QScopedPointer<CmdBoardPlaneEdit> cmd(new CmdBoardPlaneEdit(plane));
+    std::unique_ptr<CmdBoardPlaneEdit> cmd(new CmdBoardPlaneEdit(plane));
     cmd->setOutline(path, false);
-    mContext.undoStack.execCmd(cmd.take());
+    mContext.undoStack.execCmd(cmd.release());
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
@@ -1494,9 +1494,9 @@ void BoardEditorState_Select::removeZoneVertices(
     if (path.getVertices().count() < 2) {
       return;  // Do not allow to create invalid outlines!
     }
-    QScopedPointer<CmdBoardZoneEdit> cmd(new CmdBoardZoneEdit(zone));
+    std::unique_ptr<CmdBoardZoneEdit> cmd(new CmdBoardZoneEdit(zone));
     cmd->setOutline(path, false);
-    mContext.undoStack.execCmd(cmd.take());
+    mContext.undoStack.execCmd(cmd.release());
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }

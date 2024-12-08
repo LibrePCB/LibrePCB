@@ -160,7 +160,7 @@ void SymbolPinPropertiesDialog::on_buttonBox_clicked(QAbstractButton* button) {
 bool SymbolPinPropertiesDialog::applyChanges() noexcept {
   try {
     CircuitIdentifier name(mUi->edtName->text().trimmed());  // can throw
-    QScopedPointer<CmdSymbolPinEdit> cmd(new CmdSymbolPinEdit(mSymbolPin));
+    std::unique_ptr<CmdSymbolPinEdit> cmd(new CmdSymbolPinEdit(mSymbolPin));
     cmd->setName(name, false);
     cmd->setLength(mUi->edtLength->getValue(), false);
     cmd->setPosition(Point(mUi->edtPosX->getValue(), mUi->edtPosY->getValue()),
@@ -172,7 +172,7 @@ bool SymbolPinPropertiesDialog::applyChanges() noexcept {
         false);
     cmd->setNameRotation(mUi->edtNameRotation->getValue(), false);
     cmd->setNameAlignment(mUi->edtNameAlignment->getAlignment(), false);
-    mUndoStack.execCmd(cmd.take());
+    mUndoStack.execCmd(cmd.release());
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(this, tr("Error"), e.getMsg());

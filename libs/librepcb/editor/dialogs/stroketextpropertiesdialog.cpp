@@ -186,17 +186,17 @@ void StrokeTextPropertiesDialog::on_buttonBox_clicked(QAbstractButton* button) {
 bool StrokeTextPropertiesDialog::applyChanges() noexcept {
   try {
     if (mLibraryObj) {
-      QScopedPointer<CmdStrokeTextEdit> cmd(
+      std::unique_ptr<CmdStrokeTextEdit> cmd(
           new CmdStrokeTextEdit(*mLibraryObj));
       applyChanges(*cmd);
-      mUndoStack.execCmd(cmd.take());  // can throw
+      mUndoStack.execCmd(cmd.release());  // can throw
     }
     if (mBoardObj) {
-      QScopedPointer<CmdBoardStrokeTextEdit> cmd(
+      std::unique_ptr<CmdBoardStrokeTextEdit> cmd(
           new CmdBoardStrokeTextEdit(*mBoardObj));
       applyChanges(*cmd);
       cmd->setLocked(mUi->cbxLock->isChecked());
-      mUndoStack.execCmd(cmd.take());  // can throw
+      mUndoStack.execCmd(cmd.release());  // can throw
     }
     return true;
   } catch (const Exception& e) {

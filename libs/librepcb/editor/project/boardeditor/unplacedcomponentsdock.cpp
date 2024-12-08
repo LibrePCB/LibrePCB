@@ -47,7 +47,6 @@
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectattributelookup.h>
 #include <librepcb/core/project/projectlibrary.h>
-#include <librepcb/core/qtcompat.h>
 #include <librepcb/core/utils/toolbox.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
@@ -223,7 +222,7 @@ void UnplacedComponentsDock::updateComponentsList() noexcept {
                                     component->getParts(tl::nullopt).value(0));
       const QString value =
           AttributeSubstitutor::substitute(lookup("VALUE"), lookup)
-              .split("\n", QtCompat::skipEmptyParts())
+              .split("\n", Qt::SkipEmptyParts)
               .join("|");
       QString libCmpName = *component->getLibComponent().getNames().value(
           mProject.getLocaleOrder());
@@ -453,7 +452,7 @@ void UnplacedComponentsDock::autoAddDevicesToBoard(
     const tl::optional<Uuid>& libCmpUuidFilter) noexcept {
   Q_ASSERT(mBoard);
   mProjectEditor.abortBlockingToolsInOtherEditors(this);  // Release undo stack.
-  QScopedPointer<UndoCommandGroup> cmd(
+  std::unique_ptr<UndoCommandGroup> cmd(
       new UndoCommandGroup(tr("Add devices to board")));
 
   for (int i = 0; i < mUi->lstUnplacedComponents->count(); i++) {
@@ -487,7 +486,7 @@ void UnplacedComponentsDock::autoAddDevicesToBoard(
 
   mDisableListUpdate = true;
   try {
-    mProjectEditor.getUndoStack().execCmd(cmd.take());
+    mProjectEditor.getUndoStack().execCmd(cmd.release());
   } catch (const Exception& e) {
     QMessageBox::critical(this, tr("Error"), e.getMsg());
   }

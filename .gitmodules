@@ -1,6 +1,3 @@
-[submodule "libs/hoedown"]
-    path = libs/hoedown
-    url = https://github.com/LibrePCB/hoedown.git
 [submodule "libs/quazip"]
     path = libs/quazip
     url = https://github.com/LibrePCB/quazip.git

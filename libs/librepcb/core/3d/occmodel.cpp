@@ -25,7 +25,6 @@
 #include "../exceptions.h"
 #include "../fileio/filepath.h"
 #include "../fileio/fileutils.h"
-#include "../qtcompat.h"
 #include "../utils/toolbox.h"
 #include "../utils/transform.h"
 #include "librepcb_build_env.h"
@@ -705,7 +704,7 @@ QByteArray OccModel::minifyStep(const QByteArray& content) {
       lines.mid(dataStart + 1, dataEnd - dataStart - 1)
           .join("")
           .replace(re, "0.\\1")
-          .split(';', QtCompat::skipEmptyParts());
+          .split(';', Qt::SkipEmptyParts);
 
   // Parse data into key-value structure.
   // Note: The last item of the QList<int> is not part of the data, but only

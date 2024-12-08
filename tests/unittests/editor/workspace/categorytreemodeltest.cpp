@@ -225,15 +225,6 @@ TEST_F(CategoryTreeModelTest, testPackageCategories) {
 }
 
 TEST_F(CategoryTreeModelTest, testSort) {
-  // It seems that either Qt or ICU has a bug in some versions which leads to
-  // wrong sort behavior. On our CI this only occurs with Qt 5.15 on Linux
-  // so let's skipt the test in exactly that configuration.
-#if defined(Q_OS_LINUX) && \
-    ((QT_VERSION == QT_VERSION_CHECK(5, 15, 2)) || \
-     (QT_VERSION == QT_VERSION_CHECK(5, 15, 3)))
-  GTEST_SKIP();
-#endif
-
   // - cat 9
   // - cat 10
   // - cat foo

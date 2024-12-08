@@ -1015,23 +1015,16 @@ target_link_libraries(
          ${QT}::Core
          ${QT}::Gui
          ${QT}::OpenGL
+         ${QT}::OpenGLWidgets
          ${QT}::PrintSupport
          ${QT}::Svg
          ${QT}::Network
          ${QT}::Widgets
 )
-if(QT_MAJOR_VERSION GREATER 5)
-  target_link_libraries(librepcb_editor PUBLIC ${QT}::OpenGLWidgets)
-endif()
 if(BUILD_QTQUICK_TEST)
   target_link_libraries(
     librepcb_editor PUBLIC ${QT}::Quick ${QT}::QuickControls2
   )
-endif()
-
-# Hoedown is only needed on Qt <5.14
-if(Qt_VERSION_MAJOR EQUAL 5 AND Qt_VERSION_MINOR LESS 14)
-  target_link_libraries(librepcb_editor PRIVATE Hoedown::Hoedown)
 endif()
 
 # Alias to namespaced variant

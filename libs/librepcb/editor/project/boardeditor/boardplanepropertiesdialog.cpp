@@ -171,7 +171,7 @@ void BoardPlanePropertiesDialog::buttonBoxClicked(
 
 bool BoardPlanePropertiesDialog::applyChanges() noexcept {
   try {
-    QScopedPointer<CmdBoardPlaneEdit> cmd(new CmdBoardPlaneEdit(mPlane));
+    std::unique_ptr<CmdBoardPlaneEdit> cmd(new CmdBoardPlaneEdit(mPlane));
 
     // net signal
     const tl::optional<Uuid> netSignalUuid =
@@ -213,7 +213,7 @@ bool BoardPlanePropertiesDialog::applyChanges() noexcept {
     cmd->setOutline(mUi->pathEditorWidget->getPath(), false);  // can throw
 
     // apply changes
-    mUndoStack.execCmd(cmd.take());
+    mUndoStack.execCmd(cmd.release());
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(this, tr("Error"), e.getMsg());

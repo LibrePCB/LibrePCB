@@ -122,8 +122,8 @@ QStringList EagleProjectImport::open(const FilePath& sch, const FilePath& brd) {
   reset();
 
   QStringList warnings;
-  QScopedPointer<parseagle::Schematic> schematic;
-  QScopedPointer<parseagle::Board> board;
+  std::unique_ptr<parseagle::Schematic> schematic;
+  std::unique_ptr<parseagle::Board> board;
 
   try {
     schematic.reset(new parseagle::Schematic(sch.toStr(), &warnings));
@@ -147,8 +147,8 @@ QStringList EagleProjectImport::open(const FilePath& sch, const FilePath& brd) {
   }
 
   mProjectName = sch.getCompleteBasename();
-  mSchematic.reset(schematic.take());
-  mBoard.reset(board.take());
+  mSchematic.reset(schematic.release());
+  mBoard.reset(board.release());
   importLibraries(mSchematic->getLibraries(), false);
   if (mBoard) {
     importLibraries(mBoard->getLibraries(), true);

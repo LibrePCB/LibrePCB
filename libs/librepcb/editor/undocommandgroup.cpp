@@ -55,7 +55,7 @@ UndoCommandGroup::~UndoCommandGroup() noexcept {
 bool UndoCommandGroup::appendChild(UndoCommand* cmd) {
   // make sure "cmd" is deleted when going out of scope (e.g. because of an
   // exception)
-  QScopedPointer<UndoCommand> cmdScopeGuard(cmd);
+  std::unique_ptr<UndoCommand> cmdScopeGuard(cmd);
 
   if ((!cmd) || (mChilds.contains(cmd)) || (wasEverReverted())) {
     throw LogicError(__FILE__, __LINE__);
@@ -63,14 +63,14 @@ bool UndoCommandGroup::appendChild(UndoCommand* cmd) {
 
   if (wasEverExecuted()) {
     if (cmdScopeGuard->execute()) {  // can throw
-      mChilds.append(cmdScopeGuard.take());
+      mChilds.append(cmdScopeGuard.release());
       return true;
     } else {
       cmdScopeGuard
           ->undo();  // just to be sure the command has executed nothing...
     }
   } else {
-    mChilds.append(cmdScopeGuard.take());
+    mChilds.append(cmdScopeGuard.release());
   }
   return false;
 }
@@ -127,14 +127,14 @@ void UndoCommandGroup::performRedo() {
  ******************************************************************************/
 
 void UndoCommandGroup::execNewChildCmd(UndoCommand* cmd) {
-  QScopedPointer<UndoCommand> cmdScopeGuard(cmd);
+  std::unique_ptr<UndoCommand> cmdScopeGuard(cmd);
 
   if ((!cmd) || (mChilds.contains(cmd)) || (wasEverExecuted())) {
     throw LogicError(__FILE__, __LINE__);
   }
 
   if (cmdScopeGuard->execute()) {  // can throw
-    mChilds.append(cmdScopeGuard.take());
+    mChilds.append(cmdScopeGuard.release());
     mHasDoneSomething = true;
     performPostExecution();
   } else {

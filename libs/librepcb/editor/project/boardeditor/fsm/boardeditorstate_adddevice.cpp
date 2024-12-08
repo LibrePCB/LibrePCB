@@ -112,7 +112,7 @@ bool BoardEditorState_AddDevice::processGraphicsSceneLeftMouseButtonPressed(
     // place the current device finally
     if (mCurrentDeviceEditCmd) {
       mCurrentDeviceEditCmd->setPosition(pos, false);
-      mContext.undoStack.appendToCmdGroup(mCurrentDeviceEditCmd.take());
+      mContext.undoStack.appendToCmdGroup(mCurrentDeviceEditCmd.release());
     }
     mContext.undoStack.commitCmdGroup();
     mIsUndoCmdActive = false;

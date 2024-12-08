@@ -156,7 +156,7 @@ void BoardViaPropertiesDialog::accept() {
 
 bool BoardViaPropertiesDialog::applyChanges() noexcept {
   try {
-    QScopedPointer<CmdBoardViaEdit> cmd(new CmdBoardViaEdit(mVia));
+    std::unique_ptr<CmdBoardViaEdit> cmd(new CmdBoardViaEdit(mVia));
     cmd->setPosition(Point(mUi->edtPosX->getValue(), mUi->edtPosY->getValue()),
                      false);
     cmd->setSize(mUi->edtSize->getValue(), false);
@@ -177,7 +177,7 @@ bool BoardViaPropertiesDialog::applyChanges() noexcept {
     } else {
       qCritical() << "Unknown UI configuration for via stop mask.";
     }
-    mUndoStack.execCmd(cmd.take());
+    mUndoStack.execCmd(cmd.release());
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(this, tr("Error"), e.getMsg());

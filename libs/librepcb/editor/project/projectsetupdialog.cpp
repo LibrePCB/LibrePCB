@@ -254,7 +254,7 @@ bool ProjectSetupDialog::apply() noexcept {
   try {
     UndoStackTransaction transaction(mUndoStack, tr("Modify Project Setup"));
 
-    QScopedPointer<CmdProjectEdit> cmd(new CmdProjectEdit(mProject));
+    std::unique_ptr<CmdProjectEdit> cmd(new CmdProjectEdit(mProject));
 
     // Tab: Metadata
     cmd->setName(ElementName(
@@ -283,7 +283,7 @@ bool ProjectSetupDialog::apply() noexcept {
       cmd->setNormOrder(norms);
     }
 
-    transaction.append(cmd.take());  // can throw
+    transaction.append(cmd.release());  // can throw
 
     // Tab: Net Classes
     {
@@ -322,9 +322,10 @@ bool ProjectSetupDialog::apply() noexcept {
       for (auto it = items.begin(); it != items.end(); it++) {
         const QString name = it.key()->text().trimmed();
         if (it.value() && (name != *it.value()->getName())) {
-          QScopedPointer<CmdNetClassEdit> cmd(new CmdNetClassEdit(*it.value()));
+          std::unique_ptr<CmdNetClassEdit> cmd(
+              new CmdNetClassEdit(*it.value()));
           cmd->setName(ElementName(name));  // can throw
-          transaction.append(cmd.take());
+          transaction.append(cmd.release());
         }
       }
     }

@@ -28,7 +28,6 @@
 #include "ui_graphicsexportdialog.h"
 
 #include <librepcb/core/export/graphicsexport.h>
-#include <librepcb/core/qtcompat.h>
 #include <librepcb/core/utils/toolbox.h>
 #include <librepcb/core/workspace/theme.h>
 
@@ -280,7 +279,6 @@ GraphicsExportDialog::GraphicsExportDialog(
           &GraphicsExportDialog::applySettings);
 
   // Black/white.
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
   auto setTabColorsHidden = [this](bool hidden) {
     mUi->tabWidget->setTabVisible(mUi->tabWidget->indexOf(mUi->tabColors),
                                   !hidden);
@@ -291,7 +289,6 @@ GraphicsExportDialog::GraphicsExportDialog(
   };
   setTabColorsHidden(mUi->cbxBlackWhite->isChecked());
   connect(mUi->cbxBlackWhite, &QCheckBox::toggled, this, setTabColorsHidden);
-#endif
   connect(mUi->cbxBlackWhite, &QCheckBox::toggled, this,
           &GraphicsExportDialog::applySettings);
 
@@ -1066,7 +1063,7 @@ void GraphicsExportDialog::applySettings() noexcept {
     QList<int> pageIndices;
     if (mUi->rbtnRangeCustom->isChecked()) {
       QStringList ranges =
-          mUi->edtPageRange->text().split(',', QtCompat::skipEmptyParts());
+          mUi->edtPageRange->text().split(',', Qt::SkipEmptyParts);
       foreach (const QString& range, ranges) {
         int start = qBound(1, range.split('-').first().trimmed().toInt(),
                            mInputPages.count());

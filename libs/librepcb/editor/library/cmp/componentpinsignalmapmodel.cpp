@@ -131,10 +131,10 @@ void ComponentPinSignalMapModel::autoAssignSignals() noexcept {
           }
           tl::optional<Uuid> signalUuid =
               signal ? tl::make_optional(signal->getUuid()) : tl::nullopt;
-          QScopedPointer<CmdComponentPinSignalMapItemEdit> cmd(
+          std::unique_ptr<CmdComponentPinSignalMapItemEdit> cmd(
               new CmdComponentPinSignalMapItemEdit(map));
           cmd->setSignalUuid(signalUuid);
-          execCmd(cmd.take());  // can throw
+          execCmd(cmd.release());  // can throw
         }
       }
     }
@@ -305,16 +305,16 @@ bool ComponentPinSignalMapModel::setData(const QModelIndex& index,
     }
 
     if ((index.column() == COLUMN_SIGNAL) && (role == Qt::EditRole)) {
-      QScopedPointer<CmdComponentPinSignalMapItemEdit> cmd(
+      std::unique_ptr<CmdComponentPinSignalMapItemEdit> cmd(
           new CmdComponentPinSignalMapItemEdit(*mapItem));
       cmd->setSignalUuid(Uuid::tryFromString(value.toString()));
-      execCmd(cmd.take());
+      execCmd(cmd.release());
       return true;
     } else if ((index.column() == COLUMN_DISPLAY) && (role == Qt::EditRole)) {
-      QScopedPointer<CmdComponentPinSignalMapItemEdit> cmd(
+      std::unique_ptr<CmdComponentPinSignalMapItemEdit> cmd(
           new CmdComponentPinSignalMapItemEdit(*mapItem));
       cmd->setDisplayType(CmpSigPinDisplayType::fromString(value.toString()));
-      execCmd(cmd.take());
+      execCmd(cmd.release());
       return true;
     }
   } catch (const Exception& e) {

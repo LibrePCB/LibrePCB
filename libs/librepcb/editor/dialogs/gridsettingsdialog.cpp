@@ -64,15 +64,8 @@ GridSettingsDialog::GridSettingsDialog(const PositiveLength& interval,
       ->setChecked(true);
 
   // connect UI signal with slots
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
   connect(mUi->rbtnGroup, &QButtonGroup::idClicked, this,
           &GridSettingsDialog::rbtnGroupClicked);
-#else
-  connect(
-      mUi->rbtnGroup,
-      static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked),
-      this, &GridSettingsDialog::rbtnGroupClicked);
-#endif
   connect(mUi->edtInterval, &PositiveLengthEdit::valueChanged, this,
           &GridSettingsDialog::edtIntervalValueChanged);
   connect(mUi->edtInterval, &PositiveLengthEdit::displayedUnitChanged, this,

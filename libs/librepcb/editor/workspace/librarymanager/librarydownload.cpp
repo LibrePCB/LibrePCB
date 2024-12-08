@@ -46,17 +46,17 @@ LibraryDownload::LibraryDownload(const QUrl& urlToZip,
     mTempZipFile(mDestDir.toStr() % ".zip") {
   mFileDownload.reset(new FileDownload(urlToZip, mTempZipFile));
   mFileDownload->setZipExtractionDirectory(mTempDestDir);
-  connect(mFileDownload.data(), &FileDownload::progressState, this,
+  connect(mFileDownload.get(), &FileDownload::progressState, this,
           &LibraryDownload::progressState, Qt::QueuedConnection);
-  connect(mFileDownload.data(), &FileDownload::progressPercent, this,
+  connect(mFileDownload.get(), &FileDownload::progressPercent, this,
           &LibraryDownload::progressPercent, Qt::QueuedConnection);
-  connect(mFileDownload.data(), &FileDownload::errored, this,
+  connect(mFileDownload.get(), &FileDownload::errored, this,
           &LibraryDownload::downloadErrored, Qt::QueuedConnection);
-  connect(mFileDownload.data(), &FileDownload::aborted, this,
+  connect(mFileDownload.get(), &FileDownload::aborted, this,
           &LibraryDownload::downloadAborted, Qt::QueuedConnection);
-  connect(mFileDownload.data(), &FileDownload::succeeded, this,
+  connect(mFileDownload.get(), &FileDownload::succeeded, this,
           &LibraryDownload::downloadSucceeded, Qt::QueuedConnection);
-  connect(this, &LibraryDownload::abortRequested, mFileDownload.data(),
+  connect(this, &LibraryDownload::abortRequested, mFileDownload.get(),
           &FileDownload::abort, Qt::QueuedConnection);
 }
 
@@ -123,7 +123,7 @@ void LibraryDownload::start() noexcept {
 
   // Release ownership of the FileDownload object because it will be deleted by
   // itself after the download finished!
-  mFileDownload.take()->start();
+  mFileDownload.release()->start();
 }
 
 void LibraryDownload::abort() noexcept {

@@ -122,7 +122,7 @@ void CirclePropertiesDialog::buttonBoxClicked(
 
 bool CirclePropertiesDialog::applyChanges() noexcept {
   try {
-    QScopedPointer<CmdCircleEdit> cmd(new CmdCircleEdit(mCircle));
+    std::unique_ptr<CmdCircleEdit> cmd(new CmdCircleEdit(mCircle));
     if (auto layer = mUi->cbxLayer->getCurrentLayer()) {
       cmd->setLayer(*layer, false);
     }
@@ -132,7 +132,7 @@ bool CirclePropertiesDialog::applyChanges() noexcept {
     cmd->setDiameter(mUi->edtDiameter->getValue(), false);
     cmd->setCenter(Point(mUi->edtPosX->getValue(), mUi->edtPosY->getValue()),
                    false);
-    mUndoStack.execCmd(cmd.take());
+    mUndoStack.execCmd(cmd.release());
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(this, tr("Error"), e.getMsg());

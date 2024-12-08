@@ -27,6 +27,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -95,7 +97,7 @@ private:
   // Information about the current device to place. Only valid if
   // mIsUndoCmdActive == true.
   BI_Device* mCurrentDeviceToPlace;
-  QScopedPointer<CmdDeviceInstanceEditAll> mCurrentDeviceEditCmd;
+  std::unique_ptr<CmdDeviceInstanceEditAll> mCurrentDeviceEditCmd;
 };
 
 /*******************************************************************************

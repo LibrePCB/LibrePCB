@@ -608,10 +608,10 @@ void PadSignalMapEditorWidget::commitInteractiveMode(
         Uuid::tryFromString(listItem->data(Qt::UserRole).toString());
     if (item && sigUuid && mUndoStack) {
       try {
-        QScopedPointer<CmdDevicePadSignalMapItemEdit> cmd(
+        std::unique_ptr<CmdDevicePadSignalMapItemEdit> cmd(
             new CmdDevicePadSignalMapItemEdit(*item));
         cmd->setSignalUuid(sigUuid);
-        mUndoStack->execCmd(cmd.take());
+        mUndoStack->execCmd(cmd.release());
       } catch (const Exception& e) {
         QMessageBox::critical(this, tr("Error"), e.getMsg());
       }
@@ -658,20 +658,20 @@ QMap<Uuid, Uuid> PadSignalMapEditorWidget::getMap() const noexcept {
 
 void PadSignalMapEditorWidget::setMap(const QString& cmdText,
                                       const QMap<Uuid, Uuid>& map) {
-  QScopedPointer<UndoCommandGroup> cmdGrp(new UndoCommandGroup(cmdText));
+  std::unique_ptr<UndoCommandGroup> cmdGrp(new UndoCommandGroup(cmdText));
   for (auto& item : *mPadSignalMap) {
     auto it = map.find(item.getPadUuid());
     const tl::optional<Uuid> sig =
         (it != map.end()) ? tl::make_optional(*it) : tl::nullopt;
     if (item.getSignalUuid() != sig) {
-      QScopedPointer<CmdDevicePadSignalMapItemEdit> cmd(
+      std::unique_ptr<CmdDevicePadSignalMapItemEdit> cmd(
           new CmdDevicePadSignalMapItemEdit(item));
       cmd->setSignalUuid(sig);
-      cmdGrp->appendChild(cmd.take());
+      cmdGrp->appendChild(cmd.release());
     }
   }
   if (mUndoStack) {
-    mUndoStack->execCmd(cmdGrp.take());
+    mUndoStack->execCmd(cmdGrp.release());
   }
 }
 

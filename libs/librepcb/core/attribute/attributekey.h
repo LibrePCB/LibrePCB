@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../qtcompat.h"
 #include "../serialization/sexpression.h"
 #include "../utils/toolbox.h"
 
@@ -116,8 +115,8 @@ inline QDebug operator<<(QDebug stream, const AttributeKey& obj) {
   return stream;
 }
 
-inline QtCompat::Hash qHash(const AttributeKey& key,
-                            QtCompat::Hash seed = 0) noexcept {
+inline std::size_t qHash(const AttributeKey& key,
+                         std::size_t seed = 0) noexcept {
   return ::qHash(*key, seed);
 }
 

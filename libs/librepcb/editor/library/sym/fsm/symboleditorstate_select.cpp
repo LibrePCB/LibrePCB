@@ -72,7 +72,7 @@ SymbolEditorState_Select::SymbolEditorState_Select(
 }
 
 SymbolEditorState_Select::~SymbolEditorState_Select() noexcept {
-  Q_ASSERT(mCmdDragSelectedItems.isNull());
+  Q_ASSERT(!mCmdDragSelectedItems);
 }
 
 /*******************************************************************************
@@ -243,7 +243,7 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
     case SubState::PASTING: {
       try {
         Q_ASSERT(mCmdDragSelectedItems);
-        mContext.undoStack.appendToCmdGroup(mCmdDragSelectedItems.take());
+        mContext.undoStack.appendToCmdGroup(mCmdDragSelectedItems.release());
         mContext.undoStack.commitCmdGroup();
         setState(SubState::IDLE);
         clearSelectionRect(true);
@@ -270,7 +270,7 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
     case SubState::MOVING: {
       if (mCmdDragSelectedItems) {
         try {
-          mContext.undoStack.execCmd(mCmdDragSelectedItems.take());
+          mContext.undoStack.execCmd(mCmdDragSelectedItems.release());
         } catch (const Exception& e) {
           QMessageBox::critical(&mContext.editorWidget, tr("Error"),
                                 e.getMsg());
@@ -282,7 +282,7 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
     case SubState::MOVING_POLYGON_VERTEX: {
       if (mCmdPolygonEdit) {
         try {
-          mContext.undoStack.execCmd(mCmdPolygonEdit.take());
+          mContext.undoStack.execCmd(mCmdPolygonEdit.release());
         } catch (const Exception& e) {
           QMessageBox::critical(&mContext.editorWidget, tr("Error"),
                                 e.getMsg());
@@ -402,10 +402,10 @@ bool SymbolEditorState_Select::processMove(const Point& delta) noexcept {
   switch (mState) {
     case SubState::IDLE: {
       try {
-        QScopedPointer<CmdDragSelectedSymbolItems> cmd(
+        std::unique_ptr<CmdDragSelectedSymbolItems> cmd(
             new CmdDragSelectedSymbolItems(mContext));
         cmd->translate(delta);
-        mContext.undoStack.execCmd(cmd.take());
+        mContext.undoStack.execCmd(cmd.release());
         return true;
       } catch (const Exception& e) {
         QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
@@ -811,9 +811,9 @@ bool SymbolEditorState_Select::startPaste(
   Point offset = fixedPosition
       ? (*fixedPosition)
       : (mStartPos - data->getCursorPos()).mappedToGrid(getGridInterval());
-  QScopedPointer<CmdPasteSymbolItems> cmd(new CmdPasteSymbolItems(
+  std::unique_ptr<CmdPasteSymbolItems> cmd(new CmdPasteSymbolItems(
       mContext.symbol, mContext.symbolGraphicsItem, std::move(data), offset));
-  if (mContext.undoStack.appendToCmdGroup(cmd.take())) {  // can throw
+  if (mContext.undoStack.appendToCmdGroup(cmd.release())) {  // can throw
     if (fixedPosition) {
       // Fixed position provided (no interactive placement), finish tool.
       mContext.undoStack.commitCmdGroup();
@@ -838,10 +838,10 @@ bool SymbolEditorState_Select::rotateSelectedItems(
     if (mCmdDragSelectedItems) {
       mCmdDragSelectedItems->rotate(angle);
     } else {
-      QScopedPointer<CmdDragSelectedSymbolItems> cmd(
+      std::unique_ptr<CmdDragSelectedSymbolItems> cmd(
           new CmdDragSelectedSymbolItems(mContext));
       cmd->rotate(angle);
-      mContext.undoStack.execCmd(cmd.take());
+      mContext.undoStack.execCmd(cmd.release());
     }
   } catch (const Exception& e) {
     QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
@@ -855,10 +855,10 @@ bool SymbolEditorState_Select::mirrorSelectedItems(
     if (mCmdDragSelectedItems) {
       mCmdDragSelectedItems->mirror(orientation);
     } else {
-      QScopedPointer<CmdDragSelectedSymbolItems> cmd(
+      std::unique_ptr<CmdDragSelectedSymbolItems> cmd(
           new CmdDragSelectedSymbolItems(mContext));
       cmd->mirror(orientation);
-      mContext.undoStack.execCmd(cmd.take());
+      mContext.undoStack.execCmd(cmd.release());
     }
   } catch (const Exception& e) {
     QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
@@ -868,10 +868,10 @@ bool SymbolEditorState_Select::mirrorSelectedItems(
 
 bool SymbolEditorState_Select::snapSelectedItemsToGrid() noexcept {
   try {
-    QScopedPointer<CmdDragSelectedSymbolItems> cmdMove(
+    std::unique_ptr<CmdDragSelectedSymbolItems> cmdMove(
         new CmdDragSelectedSymbolItems(mContext));
     cmdMove->snapToGrid();
-    mContext.undoStack.execCmd(cmdMove.take());
+    mContext.undoStack.execCmd(cmdMove.release());
   } catch (const Exception& e) {
     QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
   }
@@ -905,9 +905,9 @@ void SymbolEditorState_Select::removePolygonVertices(
     if (path.getVertices().count() < 2) {
       return;  // Do not allow to create invalid polygons!
     }
-    QScopedPointer<CmdPolygonEdit> cmd(new CmdPolygonEdit(*polygon));
+    std::unique_ptr<CmdPolygonEdit> cmd(new CmdPolygonEdit(*polygon));
     cmd->setPath(path, false);
-    mContext.undoStack.execCmd(cmd.take());
+    mContext.undoStack.execCmd(cmd.release());
   } catch (const Exception& e) {
     QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
   }

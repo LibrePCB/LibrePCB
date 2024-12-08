@@ -252,7 +252,7 @@ bool BoardEditorState_DrawZone::addSegment(const Point& pos) noexcept {
     // If the zone has more than 2 vertices, start a new undo command
     if (path.getVertices().count() > 2) {
       if (mCurrentZoneEditCmd) {
-        mContext.undoStack.appendToCmdGroup(mCurrentZoneEditCmd.take());
+        mContext.undoStack.appendToCmdGroup(mCurrentZoneEditCmd.release());
       }
       mContext.undoStack.commitCmdGroup();
       mIsUndoCmdActive = false;

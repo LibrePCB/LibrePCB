@@ -177,7 +177,7 @@ bool CmdPasteSchematicItems::performExecute() {
           mProject.getCircuit().generateAutoComponentInstanceName(
               libCmp->getPrefixes().value(mProject.getLocaleOrder())));
     }
-    QScopedPointer<ComponentInstance> copy(
+    std::unique_ptr<ComponentInstance> copy(
         new ComponentInstance(mProject.getCircuit(), Uuid::createRandom(),
                               *libCmp, cmp->libVariantUuid, name));
     copy->setValue(cmp->value);
@@ -191,7 +191,7 @@ bool CmdPasteSchematicItems::performExecute() {
     copy->setLockAssembly(cmp->lockAssembly);
     componentInstanceMap.insert(cmp->uuid, copy->getUuid());
     execNewChildCmd(
-        new CmdComponentInstanceAdd(mProject.getCircuit(), copy.take()));
+        new CmdComponentInstanceAdd(mProject.getCircuit(), copy.release()));
   }
 
   // Paste symbols
@@ -204,7 +204,7 @@ bool CmdPasteSchematicItems::performExecute() {
                                        Uuid::createRandom()));
     if (!cmpInst) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<SI_Symbol> symbol(new SI_Symbol(
+    std::unique_ptr<SI_Symbol> symbol(new SI_Symbol(
         mSchematic, Uuid::createRandom(), *cmpInst, sym.symbolVariantItemUuid,
         sym.position + mPosOffset, sym.rotation, sym.mirrored, false));
     for (const Text& text : sym.texts) {
@@ -217,7 +217,7 @@ bool CmdPasteSchematicItems::performExecute() {
     }
     symbolMap.insert(sym.uuid, symbol->getUuid());
     execNewChildCmd(new CmdSymbolInstanceAdd(*symbol));
-    if (auto item = mScene.getSymbols().value(symbol.take())) {
+    if (auto item = mScene.getSymbols().value(symbol.release())) {
       item->setSelected(true);
     }
   }
@@ -250,7 +250,7 @@ bool CmdPasteSchematicItems::performExecute() {
     execNewChildCmd(new CmdSchematicNetSegmentAdd(*copy));
 
     // Add netpoints and netlines
-    QScopedPointer<CmdSchematicNetSegmentAddElements> cmdAddElements(
+    std::unique_ptr<CmdSchematicNetSegmentAddElements> cmdAddElements(
         new CmdSchematicNetSegmentAddElements(*copy));
     QHash<Uuid, SI_NetPoint*> netPointMap;
     for (const Junction& junction : seg.junctions) {
@@ -305,7 +305,7 @@ bool CmdPasteSchematicItems::performExecute() {
       }
       cmdAddElements->addNetLine(*start, *end);
     }
-    execNewChildCmd(cmdAddElements.take());
+    execNewChildCmd(cmdAddElements.release());
 
     // Add netlabels
     for (const NetLabel& nl : seg.labels) {

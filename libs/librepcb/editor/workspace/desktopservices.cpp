@@ -66,12 +66,8 @@ bool DesktopServices::openWebUrl(const QUrl& url) const noexcept {
   showWaitCursor();
   foreach (QString cmd, mSettings.externalWebBrowserCommands.get()) {
     cmd.replace("{{URL}}", url.toString());
-#if QT_VERSION_MAJOR >= 6
     const QStringList tokens = QProcess::splitCommand(cmd);
     const bool success = QProcess::startDetached(tokens.first(), tokens.mid(1));
-#else
-    const bool success = QProcess::startDetached(cmd);
-#endif
     if (success) {
       qDebug() << "Successfully opened URL with command:" << cmd;
       return true;
@@ -216,12 +212,8 @@ bool DesktopServices::openLocalPathWithCommand(
   foreach (QString cmd, commands) {
     cmd.replace("{{FILEPATH}}", filePath.toNative());
     cmd.replace("{{URL}}", url.toString());
-#if QT_VERSION_MAJOR >= 6
     const QStringList tokens = QProcess::splitCommand(cmd);
     const bool success = QProcess::startDetached(tokens.first(), tokens.mid(1));
-#else
-    const bool success = QProcess::startDetached(cmd);
-#endif
     if (success) {
       qDebug() << "Successfully opened file or directory with command:" << cmd;
       return true;

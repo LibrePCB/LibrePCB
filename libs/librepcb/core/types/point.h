@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../qtcompat.h"
 #include "length.h"
 
 #include <QtCore>
@@ -520,8 +519,7 @@ private:
 QDataStream& operator<<(QDataStream& stream, const Point& point);
 QDebug operator<<(QDebug stream, const Point& point);
 
-inline QtCompat::Hash qHash(const Point& key,
-                            QtCompat::Hash seed = 0) noexcept {
+inline std::size_t qHash(const Point& key, std::size_t seed = 0) noexcept {
   return ::qHash(qMakePair(key.getX(), key.getY()), seed);
 }
 

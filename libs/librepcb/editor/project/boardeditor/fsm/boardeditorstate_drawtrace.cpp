@@ -474,10 +474,10 @@ bool BoardEditorState_DrawTrace::startPositioning(
       Point posOnNetline = Toolbox::nearestPointOnLine(
           posOnGrid, netline->getNetLine().getStartPoint().getPosition(),
           netline->getNetLine().getEndPoint().getPosition());
-      QScopedPointer<CmdBoardSplitNetLine> cmdSplit(
+      std::unique_ptr<CmdBoardSplitNetLine> cmdSplit(
           new CmdBoardSplitNetLine(netline->getNetLine(), posOnNetline));
       mFixedStartAnchor = cmdSplit->getSplitPoint();
-      mContext.undoStack.appendToCmdGroup(cmdSplit.take());  // can throw
+      mContext.undoStack.appendToCmdGroup(cmdSplit.release());  // can throw
     }
 
     // create new netsegment if none found
@@ -490,7 +490,7 @@ bool BoardEditorState_DrawTrace::startPositioning(
 
     // add netpoint if none found
     // TODO(5n8ke): Check if this could be even possible
-    QScopedPointer<CmdBoardNetSegmentAddElements> cmd(
+    std::unique_ptr<CmdBoardNetSegmentAddElements> cmd(
         new CmdBoardNetSegmentAddElements(*mCurrentNetSegment));
     if (!mFixedStartAnchor) {
       mFixedStartAnchor = cmd->addNetPoint(posOnGrid);
@@ -520,7 +520,7 @@ bool BoardEditorState_DrawTrace::startPositioning(
     mPositioningNetLine2 = cmd->addNetLine(
         *mPositioningNetPoint1, *mPositioningNetPoint2, *layer, mCurrentWidth);
     Q_ASSERT(mPositioningNetLine2);
-    mContext.undoStack.appendToCmdGroup(cmd.take());  // can throw
+    mContext.undoStack.appendToCmdGroup(cmd.release());  // can throw
 
     mSubState = SubState_PositioningNetPoint;
 
@@ -608,10 +608,10 @@ bool BoardEditorState_DrawTrace::addNextNetPoint(
           continue;
         }
         // TODO(5n8ke): does snapping need to be handled?
-        QScopedPointer<CmdBoardSplitNetLine> cmdSplit(
+        std::unique_ptr<CmdBoardSplitNetLine> cmdSplit(
             new CmdBoardSplitNetLine(netLine->getNetLine(), mTargetPos));
         otherAnchors.append(cmdSplit->getSplitPoint());
-        mContext.undoStack.appendToCmdGroup(cmdSplit.take());  // can throw
+        mContext.undoStack.appendToCmdGroup(cmdSplit.release());  // can throw
       }
     }
 
@@ -833,18 +833,18 @@ void BoardEditorState_DrawTrace::showVia(bool isVisible) noexcept {
       mContext.undoStack.appendToCmdGroup(cmdAdd);
       mContext.undoStack.appendToCmdGroup(cmdRemove);
     } else if (!isVisible && mTempVia) {
-      QScopedPointer<CmdBoardNetSegmentRemoveElements> cmdRemove(
+      std::unique_ptr<CmdBoardNetSegmentRemoveElements> cmdRemove(
           new CmdBoardNetSegmentRemoveElements(*mCurrentNetSegment));
       cmdRemove->removeVia(*mTempVia);
       cmdRemove->removeNetLine(*mPositioningNetLine2);
-      QScopedPointer<CmdBoardNetSegmentAddElements> cmdAdd(
+      std::unique_ptr<CmdBoardNetSegmentAddElements> cmdAdd(
           new CmdBoardNetSegmentAddElements(*mCurrentNetSegment));
       mPositioningNetPoint2 = cmdAdd->addNetPoint(mTempVia->getPosition());
       mPositioningNetLine2 = cmdAdd->addNetLine(
           *mPositioningNetPoint1, *mPositioningNetPoint2,
           mPositioningNetLine1->getLayer(), mPositioningNetLine2->getWidth());
-      mContext.undoStack.appendToCmdGroup(cmdAdd.take());
-      mContext.undoStack.appendToCmdGroup(cmdRemove.take());
+      mContext.undoStack.appendToCmdGroup(cmdAdd.release());
+      mContext.undoStack.appendToCmdGroup(cmdRemove.release());
       mTempVia = nullptr;
     } else if (mTempVia) {
       mTempVia->setPosition(mTargetPos);
@@ -872,9 +872,9 @@ BI_NetLineAnchor* BoardEditorState_DrawTrace::combineAnchors(
   Q_ASSERT(removePoint);
   Q_ASSERT(otherAnchor);
 
-  QScopedPointer<CmdBoardNetSegmentAddElements> cmdAdd(
+  std::unique_ptr<CmdBoardNetSegmentAddElements> cmdAdd(
       new CmdBoardNetSegmentAddElements(*mCurrentNetSegment));
-  QScopedPointer<CmdBoardNetSegmentRemoveElements> cmdRemove(
+  std::unique_ptr<CmdBoardNetSegmentRemoveElements> cmdRemove(
       new CmdBoardNetSegmentRemoveElements(*mCurrentNetSegment));
   foreach (BI_NetLine* netline, removePoint->getNetLines()) {
     BI_NetLineAnchor* anchor = netline->getOtherPoint(*removePoint);
@@ -885,8 +885,8 @@ BI_NetLineAnchor* BoardEditorState_DrawTrace::combineAnchors(
     cmdRemove->removeNetLine(*netline);
   }
   cmdRemove->removeNetPoint(*removePoint);
-  mContext.undoStack.appendToCmdGroup(cmdAdd.take());  // can throw
-  mContext.undoStack.appendToCmdGroup(cmdRemove.take());  // can throw
+  mContext.undoStack.appendToCmdGroup(cmdAdd.release());  // can throw
+  mContext.undoStack.appendToCmdGroup(cmdRemove.release());  // can throw
 
   return otherAnchor;
 }

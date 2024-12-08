@@ -310,7 +310,7 @@ void LibraryOverviewWidget::updateMetadata() noexcept {
 
 QString LibraryOverviewWidget::commitMetadata() noexcept {
   try {
-    QScopedPointer<CmdLibraryEdit> cmd(new CmdLibraryEdit(*mLibrary));
+    std::unique_ptr<CmdLibraryEdit> cmd(new CmdLibraryEdit(*mLibrary));
     try {
       // throws on invalid name
       cmd->setName("", ElementName(mUi->edtName->text().trimmed()));
@@ -331,7 +331,7 @@ QString LibraryOverviewWidget::commitMetadata() noexcept {
     cmd->setIcon(mIcon);
 
     // Commit all changes.
-    mUndoStack->execCmd(cmd.take());  // can throw
+    mUndoStack->execCmd(cmd.release());  // can throw
 
     // Reload metadata into widgets to discard invalid input.
     updateMetadata();

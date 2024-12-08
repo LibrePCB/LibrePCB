@@ -208,9 +208,9 @@ bool PackageEditorState_ReNumberPads::start() noexcept {
 
     // Clear all pad numbers.
     for (auto& pad : mContext.currentFootprint->getPads()) {
-      QScopedPointer<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(pad));
+      std::unique_ptr<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(pad));
       cmd->setPackagePadUuid(tl::nullopt, true);
-      mContext.undoStack.appendToCmdGroup(cmd.take());
+      mContext.undoStack.appendToCmdGroup(cmd.release());
     }
     return true;
   } catch (const Exception& e) {
@@ -320,10 +320,10 @@ void PackageEditorState_ReNumberPads::updateCurrentPad(bool force) noexcept {
     for (auto padPtr : pads) {
       if (std::shared_ptr<PackagePad> pkgPad =
               mPackagePads.value(pkgPadIndex)) {
-        QScopedPointer<CmdFootprintPadEdit> cmd(
+        std::unique_ptr<CmdFootprintPadEdit> cmd(
             new CmdFootprintPadEdit(*padPtr));
         cmd->setPackagePadUuid(pkgPad->getUuid(), true);
-        mTmpCmd->appendChild(cmd.take());
+        mTmpCmd->appendChild(cmd.release());
       }
       if (auto i = mContext.currentGraphicsItem->getGraphicsItem(padPtr)) {
         i->setSelected(true);
@@ -341,7 +341,7 @@ bool PackageEditorState_ReNumberPads::commitCurrentPad() noexcept {
     if (mCurrentPad && mTmpCmd) {
       const int count = mTmpCmd->getChildCount();
       mContext.graphicsScene.setSelectionArea(QPainterPath());
-      mContext.undoStack.appendToCmdGroup(mTmpCmd.take());
+      mContext.undoStack.appendToCmdGroup(mTmpCmd.release());
       mPreviousPad = mCurrentPad;
       mCurrentPad = nullptr;
       mAssignedFootprintPadCount += count;

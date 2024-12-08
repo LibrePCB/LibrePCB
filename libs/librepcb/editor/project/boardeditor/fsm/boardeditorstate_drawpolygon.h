@@ -31,6 +31,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -105,7 +107,7 @@ private:
   // Information about the current polygon to place. Only valid if
   // mIsUndoCmdActive == true.
   BI_Polygon* mCurrentPolygon;
-  QScopedPointer<CmdBoardPolygonEdit> mCurrentPolygonEditCmd;
+  std::unique_ptr<CmdBoardPolygonEdit> mCurrentPolygonEditCmd;
 };
 
 /*******************************************************************************

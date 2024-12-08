@@ -195,12 +195,12 @@ void ComponentSymbolVariantItemListModel::browse(
         Uuid::tryFromString(itemIndex.data(Qt::EditRole).toString());
     if (uuid) {
       std::shared_ptr<ComponentSymbolVariantItem> item = mItemList->get(*uuid);
-      QScopedPointer<CmdComponentSymbolVariantItemEdit> cmd(
+      std::unique_ptr<CmdComponentSymbolVariantItemEdit> cmd(
           new CmdComponentSymbolVariantItemEdit(*item));
       cmd->setSymbolUuid(symbol);
       cmd->setPinSignalMap(
           ComponentPinSignalMapHelpers::create(sym->getPins().getUuidSet()));
-      execCmd(cmd.take());
+      execCmd(cmd.release());
     } else {
       mNewSymbolUuid = symbol;
       emit dataChanged(index(rowCount() - 1, COLUMN_SYMBOL),
@@ -403,7 +403,7 @@ bool ComponentSymbolVariantItemListModel::setData(const QModelIndex& index,
   try {
     std::shared_ptr<ComponentSymbolVariantItem> item =
         mItemList->value(index.row());
-    QScopedPointer<CmdComponentSymbolVariantItemEdit> cmd;
+    std::unique_ptr<CmdComponentSymbolVariantItemEdit> cmd;
     if (item) {
       cmd.reset(new CmdComponentSymbolVariantItemEdit(*item));
     }
@@ -449,7 +449,7 @@ bool ComponentSymbolVariantItemListModel::setData(const QModelIndex& index,
       return false;  // do not execute command!
     }
     if (cmd) {
-      execCmd(cmd.take(), false);
+      execCmd(cmd.release(), false);
     } else if (!item) {
       emit dataChanged(index, index);
     }
@@ -527,11 +527,11 @@ std::unique_ptr<UndoCommandGroup>
     std::shared_ptr<ComponentSymbolVariantItem> item = mItemList->value(i);
     const QString suffix =
         (mItemList->count() == 1) ? QString() : suffixes.mid(i, 1);
-    QScopedPointer<CmdComponentSymbolVariantItemEdit> cmd(
+    std::unique_ptr<CmdComponentSymbolVariantItemEdit> cmd(
         new CmdComponentSymbolVariantItemEdit(*item));
     cmd->setSuffix(ComponentSymbolVariantItemSuffix(
         cleanComponentSymbolVariantItemSuffix(suffix)));
-    cmdGroup->appendChild(cmd.take());
+    cmdGroup->appendChild(cmd.release());
   }
   return cmdGroup;
 }

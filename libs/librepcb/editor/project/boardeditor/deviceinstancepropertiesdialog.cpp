@@ -198,7 +198,7 @@ bool DeviceInstancePropertiesDialog::applyChanges() noexcept {
             .arg(*mDevice.getComponentInstance().getName()));
 
     // Component instance properties.
-    QScopedPointer<CmdComponentInstanceEdit> cmdCmp(
+    std::unique_ptr<CmdComponentInstanceEdit> cmdCmp(
         new CmdComponentInstanceEdit(mProject.getCircuit(),
                                      mDevice.getComponentInstance()));
     cmdCmp->setName(CircuitIdentifier(
@@ -207,10 +207,10 @@ bool DeviceInstancePropertiesDialog::applyChanges() noexcept {
     cmdCmp->setAttributes(mAttributes);
     cmdCmp->setAssemblyOptions(
         mUi->assemblyOptionListEditorWidget->getOptions());
-    transaction.append(cmdCmp.take());  // can throw
+    transaction.append(cmdCmp.release());  // can throw
 
     // Device instance with associated elements.
-    QScopedPointer<CmdDeviceInstanceEditAll> cmdDevAll(
+    std::unique_ptr<CmdDeviceInstanceEditAll> cmdDevAll(
         new CmdDeviceInstanceEditAll(mDevice));
     cmdDevAll->setPosition(
         Point(mUi->edtPosX->getValue(), mUi->edtPosY->getValue()), false);
@@ -222,7 +222,7 @@ bool DeviceInstancePropertiesDialog::applyChanges() noexcept {
       // Do not apply to all elements if not modified!
       cmdDevAll->setLocked(mUi->cbxLock->isChecked());
     }
-    transaction.append(cmdDevAll.take());  // can throw
+    transaction.append(cmdDevAll.release());  // can throw
 
     transaction.commit();  // can throw
     return true;

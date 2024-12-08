@@ -58,17 +58,6 @@ installing [ccache](https://ccache.dev/) and passing
 
     cmake .. -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
 
-## Choosing Qt Version
-
-By default the used Qt version is automatically detected by CMake while Qt6
-is preferred over Qt5. To explicitly specify the Qt version to use, set the
-CMake variable `QT_MAJOR_VERSION` to either `5` or `6`:
-
-    cmake .. -DQT_MAJOR_VERSION=5
-
-Please note that Qt5 support is considered legacy and will be removed soon
-(and thus also this CMake option).
-
 ## Changing the Install Prefix
 
 By passing in the `CMAKE_INSTALL_PREFIX` parameter, you can change the install
@@ -198,7 +187,6 @@ Right now, the following libraries can be unbundled:
 | [dxflib] | `UNBUNDLE_DXFLIB` | `pkg-config` |
 | [fontobene-qt] | `UNBUNDLE_FONTOBENE_QT` | `pkg-config`, `find_path` |
 | [googletest] | `UNBUNDLE_GTEST` | `cmake`, `pkg-config` |
-| [hoedown] ¹ | `UNBUNDLE_HOEDOWN` | `pkg-config` |
 | [muparser] | `UNBUNDLE_MUPARSER` | `cmake`, `pkg-config` |
 | [polyclipping] | `UNBUNDLE_POLYCLIPPING` | `pkg-config` |
 | [quazip] ² | `UNBUNDLE_QUAZIP` | `cmake` |
@@ -206,13 +194,11 @@ Right now, the following libraries can be unbundled:
 [dxflib]: https://www.qcad.org/en/90-dxflib
 [fontobene-qt]: https://github.com/fontobene/fontobene-qt/
 [googletest]: https://github.com/google/googletest
-[hoedown]: https://github.com/hoedown/hoedown
 [muparser]: https://github.com/beltoforion/muparser
 [polyclipping]: https://sourceforge.net/projects/polyclipping/
 [quazip]: https://github.com/stachenov/quazip
 
-¹ Note: Hoedown is only needed on Qt <5.14.<br>
-² Due to packaging issues with QuaZip 0.x, we only support QuaZip 1.x when unbundling.
+¹ Due to packaging issues with QuaZip 0.x, we only support QuaZip 1.x when unbundling.
   Using QuaZip 0.9 should work as well, but then you'll have to patch the
   `cmake/FindQuaZip.cmake` find script as well as potentially the include paths
   (quazip -> quazip5) yourself.

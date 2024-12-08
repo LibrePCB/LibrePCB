@@ -120,7 +120,7 @@ const RealisticBoardPainter::Content& RealisticBoardPainter::getContent(
       auto toPainterPath = [](const ClipperLib::Paths& paths) {
         QPainterPath p;
         p.setFillRule(Qt::OddEvenFill);
-        foreach (const auto& path, paths) {
+        for (const auto& path : paths) {
           p.addPath(ClipperHelpers::convert(path).toQPainterPathPx());
         }
         return p;
