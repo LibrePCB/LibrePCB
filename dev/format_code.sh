@@ -199,6 +199,19 @@ else
   echo "  container by using the '--docker' argument."
 fi
 
+# Format .reuse/dep5 files with debian-copyright-sorter.
+DEP5="$REPO_ROOT/.reuse/dep5"
+dcs_failed() {
+  echo "" >&2
+  echo "ERROR: debian-copyright-sorter failed!" >&2
+  echo "  Make sure that debian-copyright-sorter is installed." >&2
+  echo "  On Linux, you can also run this script in a docker" >&2
+  echo "  container by using the '--docker' argument." >&2
+  exit 7
+}
+echo "Formatting $DEP5 with debian-copyright-sorter..."
+debian-copyright-sorter --iml -s casefold "$DEP5" | update_file "$DEP5" || dcs_failed
+
 echo "Finished: $COUNTER files modified."
 
 # Nonzero exit code.
