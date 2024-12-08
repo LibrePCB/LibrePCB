@@ -5,6 +5,7 @@ Source: https://librepcb.org/
 Files:
  apps/*
  cmake/*
+ CMakeLists.txt
  dev/*
  dist/*
  i18n/*
@@ -12,50 +13,59 @@ Files:
  img/app/librepcb.ico
  img/app/librepcb.png
  img/app/librepcb.svg
+ img/images.qrc
  img/logo/32x32.png
  img/logo/48x48.png
  img/logo/64x64.png
- img/images.qrc
  libs/librepcb/*
  share/*
  tests/*
- CMakeLists.txt
 Copyright: LibrePCB Developers, see AUTHORS.md
 License: GPL-3.0-or-later
 
 Files:
+ .clang-format
+ .cmake-format.py
+ .editorconfig
+ .git-blame-ignore-revs
+ .gitattributes
+ .gitbugtraq
  .github/*
+ .gitignore
+ .gitmodules
  .tx/*
+ AUTHORS.md
  ci/*
+ CONTRIBUTING.md
  img/actions/add_hole.png
- img/actions/add_name_dark.png
  img/actions/add_name.png
+ img/actions/add_name_dark.png
  img/actions/add_plane.png
  img/actions/add_smt_pad.png
  img/actions/add_symbol_pin.png
- img/actions/add_text_dark.png
  img/actions/add_text.png
+ img/actions/add_text_dark.png
  img/actions/add_tht_pad.png
- img/actions/add_value_dark.png
  img/actions/add_value.png
+ img/actions/add_value_dark.png
  img/actions/add_via.png
  img/actions/board_editor.png
- img/actions/draw_line_dark.png
  img/actions/draw_line.png
- img/actions/draw_netlabel_dark.png
+ img/actions/draw_line_dark.png
  img/actions/draw_netlabel.png
- img/actions/draw_wire_dark.png
+ img/actions/draw_netlabel_dark.png
  img/actions/draw_wire.png
+ img/actions/draw_wire_dark.png
  img/actions/draw_zone.png
  img/actions/export_pick_place_file.png
- img/actions/grid_dark.png
  img/actions/grid.png
+ img/actions/grid_dark.png
  img/actions/hide_planes.png
  img/actions/layers.png
  img/actions/rebuild_plane.png
  img/actions/schematic.png
- img/actions/show_pin_numbers_dark.png
  img/actions/show_pin_numbers.png
+ img/actions/show_pin_numbers_dark.png
  img/actions/show_planes.png
  img/command_toolbars/pad_bottom.png
  img/command_toolbars/pad_tht.png
@@ -67,56 +77,46 @@ Files:
  img/command_toolbars/via_octagon.png
  img/command_toolbars/via_round.png
  img/command_toolbars/via_square.png
- img/command_toolbars/wire_45_90_dark.png
  img/command_toolbars/wire_45_90.png
- img/command_toolbars/wire_90_45_dark.png
+ img/command_toolbars/wire_45_90_dark.png
  img/command_toolbars/wire_90_45.png
- img/command_toolbars/wire_h_v_dark.png
+ img/command_toolbars/wire_90_45_dark.png
  img/command_toolbars/wire_h_v.png
- img/command_toolbars/wire_straight_dark.png
+ img/command_toolbars/wire_h_v_dark.png
  img/command_toolbars/wire_straight.png
- img/command_toolbars/wire_v_h_dark.png
+ img/command_toolbars/wire_straight_dark.png
  img/command_toolbars/wire_v_h.png
- img/library/bipolar_capacitor_eu_dark.png
- img/library/bipolar_capacitor_eu.png
- img/library/bipolar_capacitor_us_dark.png
- img/library/bipolar_capacitor_us.png
- img/library/footprint.png
- img/library/gnd_dark.png
- img/library/gnd.png
- img/library/inductor_eu_dark.png
- img/library/inductor_eu.png
- img/library/inductor_us_dark.png
- img/library/inductor_us.png
- img/library/resistor_eu_dark.png
- img/library/resistor_eu.png
- img/library/resistor_us_dark.png
- img/library/resistor_us.png
- img/library/symbol.png
- img/library/unipolar_capacitor_eu_dark.png
- img/library/unipolar_capacitor_eu.png
- img/library/unipolar_capacitor_us_dark.png
- img/library/unipolar_capacitor_us.png
- img/library/vcc_dark.png
- img/library/vcc.png
- img/norm/iec_60617_dark.png
- img/norm/iec_60617.png
- img/norm/ieee_315_dark.png
- img/norm/ieee_315.png
- img/wizards/watermark.jpg
+ img/command_toolbars/wire_v_h_dark.png
  img/empty.png
+ img/library/bipolar_capacitor_eu.png
+ img/library/bipolar_capacitor_eu_dark.png
+ img/library/bipolar_capacitor_us.png
+ img/library/bipolar_capacitor_us_dark.png
+ img/library/footprint.png
+ img/library/gnd.png
+ img/library/gnd_dark.png
+ img/library/inductor_eu.png
+ img/library/inductor_eu_dark.png
+ img/library/inductor_us.png
+ img/library/inductor_us_dark.png
+ img/library/resistor_eu.png
+ img/library/resistor_eu_dark.png
+ img/library/resistor_us.png
+ img/library/resistor_us_dark.png
+ img/library/symbol.png
+ img/library/unipolar_capacitor_eu.png
+ img/library/unipolar_capacitor_eu_dark.png
+ img/library/unipolar_capacitor_us.png
+ img/library/unipolar_capacitor_us_dark.png
+ img/library/vcc.png
+ img/library/vcc_dark.png
+ img/norm/iec_60617.png
+ img/norm/iec_60617_dark.png
+ img/norm/ieee_315.png
+ img/norm/ieee_315_dark.png
  img/README.md
+ img/wizards/watermark.jpg
  libs/README.md
- .clang-format
- .cmake-format.py
- .editorconfig
- .git-blame-ignore-revs
- .gitattributes
- .gitbugtraq
- .gitignore
- .gitmodules
- AUTHORS.md
- CONTRIBUTING.md
  README.md
  SECURITY.md
 Copyright: LibrePCB Developers, see AUTHORS.md
@@ -129,45 +129,39 @@ Files:
 Copyright: Font Awesome
 License: CC-BY-4.0
 
-Files:
- img/logo/ngi0.png
+Files: img/logo/ngi0.png
 Copyright: Next Generation Internet
 License: CC-BY-SA-4.0
 
-Files:
- img/actions/export_gerber.png
+Files: img/actions/export_gerber.png
 Copyright: Ucamco
 License: LicenseRef-CopyrightedFreeUsage
 
-Files:
- img/wizards/eagle_watermark.png
+Files: img/wizards/eagle_watermark.png
 Copyright: publicdomainvectors.org and LibrePCB Developers
 License: CC0-1.0
 
-Files:
- img/wizards/kicad_watermark.png
+Files: img/wizards/kicad_watermark.png
 Copyright: KiCad and LibrePCB Developers
 License: GPL-3.0-or-later
 
-Files:
- img/actions/select.png
+Files: img/actions/select.png
 Copyright: publicdomainvectors.org
 License: CC0-1.0
 
 Files:
  img/actions/new_folder.png
+ img/places/folder.png
  img/places/folder_gray.png
  img/places/folder_green.png
+ img/places/folder_open.png
  img/places/folder_open_gray.png
  img/places/folder_open_green.png
- img/places/folder_open.png
- img/places/folder.png
  img/places/project_folder.png
 Copyright: Humanity Project and LibrePCB Developers
 License: GPL-2.0-only
 
-Files:
- img/library/package.png
+Files: img/library/package.png
 Copyright: Part-DB Developers and LibrePCB Developers
 License: GPL-2.0-only
 
@@ -241,13 +235,11 @@ Files:
 Copyright: Open Icon Library
 License: GPL-2.0-only
 
-Files:
- img/actions/cam_export.png
+Files: img/actions/cam_export.png
 Copyright: Open Icon Library
 License: GPL-3.0-only
 
-Files:
- img/status/info.png
+Files: img/status/info.png
 Copyright: Open Icon Library
 License: CC-BY-3.0
 
@@ -271,8 +263,8 @@ Files:
  img/actions/refresh.png
  img/actions/rotate_left.png
  img/actions/rotate_right.png
- img/actions/run_all.png
  img/actions/run.png
+ img/actions/run_all.png
  img/actions/select_rect.png
  img/actions/wizard.png
  img/command_toolbars/align_horizontal_center.png
@@ -290,8 +282,8 @@ License: CC-BY-SA-3.0 or LGPL-2.1-only
 Files:
  img/actions/clone.png
  img/actions/drc.png
- img/actions/export_pixmap.png
  img/actions/export.png
+ img/actions/export_pixmap.png
  img/actions/flip_horizontal.png
  img/actions/flip_vertical.png
  img/actions/import.png
