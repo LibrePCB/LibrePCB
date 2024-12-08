@@ -24,8 +24,8 @@
 #include <gtest/gtest.h>
 #include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/fileio/ziparchive.h>
 #include <librepcb/core/utils/toolbox.h>
-#include <quazip/quazip.h>
 
 /*******************************************************************************
  *  Namespace
@@ -620,10 +620,8 @@ TEST_F(TransactionalFileSystemTest, testExportZipByFilePathWithFilter) {
   };
   fs.exportToZip(zipFp, filter);
 
-  QuaZip zip(zipFp.toStr());
-  ASSERT_TRUE(zip.open(QuaZip::mdUnzip));
+  ZipArchive zip(zipFp);
   EXPECT_EQ(2, zip.getEntriesCount());
-  zip.close();
 }
 
 TEST_F(TransactionalFileSystemTest, testExportImportZipByByteArray) {
@@ -646,11 +644,8 @@ TEST_F(TransactionalFileSystemTest, testExportZipByByteArrayWithFilter) {
   };
   QByteArray content = fs.exportToZip(filter);
 
-  QBuffer buffer(&content);
-  QuaZip zip(&buffer);
-  ASSERT_TRUE(zip.open(QuaZip::mdUnzip));
+  ZipArchive zip(content);
   EXPECT_EQ(2, zip.getEntriesCount());
-  zip.close();
 }
 
 TEST_F(TransactionalFileSystemTest, testDiscardChanges) {
