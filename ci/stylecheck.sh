@@ -17,3 +17,7 @@ set -euv -o pipefail
 
 # run reuse checks
 (reuse --suppress-deprecation lint) || exit 1
+
+# check formatting of .reuse/dep5
+(debian-copyright-sorter --iml -s casefold -o ".reuse/dep5" ".reuse/dep5") || exit 1
+(git diff --exit-code -- ".reuse/dep5") || exit 1
