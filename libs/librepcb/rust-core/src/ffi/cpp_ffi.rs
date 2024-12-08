@@ -1,6 +1,8 @@
 //! FFI for base types
 
+use std::io::{Result, Seek, SeekFrom, Write};
 use std::os::raw::c_char;
+use std::ptr;
 
 /// cbindgen:no-export
 #[doc(hidden)]
@@ -56,6 +58,79 @@ pub fn qbytearray_to_slice_mut(obj: &mut QByteArray) -> &mut [u8] {
     let data = ffi_qbytearray_data_mut(obj);
     let len = ffi_qbytearray_len(obj);
     std::slice::from_raw_parts_mut(data, len)
+  }
+}
+
+/// Helper type which implements the [Write] and [Seek] traits on `QByteArray`
+pub struct QByteArrayWriter {
+  /// Underlying buffer
+  buf: *mut QByteArray,
+  /// Current cursor position
+  cursor: usize,
+}
+
+impl QByteArrayWriter {
+  /// Create new writer
+  ///
+  /// <div class="warning">
+  /// The buffer lifetime must not be shorter than the lifetime of the writer!
+  /// </div>
+  pub fn new(buf: *mut QByteArray) -> Self {
+    QByteArrayWriter { buf, cursor: 0 }
+  }
+}
+
+impl Write for QByteArrayWriter {
+  fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
+    unsafe {
+      let self_buf = self.buf.as_mut().unwrap();
+      if self.cursor + buf.len() > qbytearray_len(self_buf) {
+        qbytearray_resize(self_buf, self.cursor + buf.len(), 0);
+      }
+      let ptr = ffi_qbytearray_data_mut(self_buf);
+      ptr::copy(buf.as_ptr(), ptr.add(self.cursor), buf.len());
+    }
+    let bytes_written = buf.len();
+    self.cursor += bytes_written;
+    Ok(bytes_written)
+  }
+
+  fn flush(&mut self) -> Result<()> {
+    Ok(())
+  }
+}
+
+impl Seek for QByteArrayWriter {
+  fn seek(&mut self, pos: SeekFrom) -> std::io::Result<u64> {
+    unsafe {
+      let self_buf = self.buf.as_mut().unwrap();
+      let self_buf_len = qbytearray_len(self_buf);
+      let new_pos = match pos {
+        SeekFrom::Start(offset) => offset as usize,
+        SeekFrom::End(offset) => {
+          let new_pos = self_buf_len.wrapping_add(offset as usize);
+          if new_pos > self_buf_len {
+            return Err(std::io::Error::new(
+              std::io::ErrorKind::InvalidInput,
+              "Seek past end of buffer",
+            ));
+          }
+          new_pos
+        }
+        SeekFrom::Current(offset) => {
+          let new_pos = self.cursor.wrapping_add(offset as usize);
+          if new_pos > self_buf_len {
+            return Err(std::io::Error::new(
+              std::io::ErrorKind::InvalidInput,
+              "Seek past end of buffer",
+            ));
+          }
+          new_pos
+        }
+      };
+      self.cursor = new_pos;
+    }
+    Ok(self.cursor as u64)
   }
 }
 
