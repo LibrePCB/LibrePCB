@@ -25,12 +25,11 @@
  ******************************************************************************/
 #include "outputjob.h"
 
-#include <optional/tl/optional.hpp>
-
 #include <QtCore>
 #include <QtGui>
 
 #include <memory>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations

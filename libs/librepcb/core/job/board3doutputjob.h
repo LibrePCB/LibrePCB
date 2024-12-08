@@ -45,7 +45,7 @@ class Board3DOutputJob final : public OutputJob {
 
 public:
   using BoardSet = ObjectSet<Uuid>;
-  using AssemblyVariantSet = ObjectSet<tl::optional<Uuid>>;
+  using AssemblyVariantSet = ObjectSet<std::optional<Uuid>>;
 
   // Constructors / Destructor
   Board3DOutputJob() noexcept;

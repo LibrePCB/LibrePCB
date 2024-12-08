@@ -25,7 +25,7 @@
  ******************************************************************************/
 #include <QtCore>
 
-#include <optional.hpp>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -48,7 +48,7 @@ namespace librepcb {
  *
  * @note This class guarantees that only Uuid objects representing a valid UUID
  * can be created (in opposite to QUuid which allows "Null UUIDs")! If you need
- * a nullable UUID, use tl::optional<librepcb::Uuid> instead.
+ * a nullable UUID, use std::optional<librepcb::Uuid> instead.
  *
  * @see https://de.wikipedia.org/wiki/Universally_Unique_Identifier
  * @see https://tools.ietf.org/html/rfc4122
@@ -74,7 +74,12 @@ public:
   /**
    * @brief Destructor
    */
-  ~Uuid() noexcept = default;
+  ~Uuid() noexcept
+#if defined(__GNUC__) && (__GNUC__ == 13) && (__GNUC_MINOR__ == 2)
+      ;  // Workaround for compiler warning "maybe-uninitialized".
+#else
+      = default;
+#endif
 
   // Getters
 
@@ -142,9 +147,9 @@ public:
    * @param str           Input string
    *
    * @retval Uuid         The created Uuid object if str was valid
-   * @retval tl::nullopt  If str was not a valid UUID
+   * @retval std::nullopt  If str was not a valid UUID
    */
-  static tl::optional<Uuid> tryFromString(const QString& str) noexcept;
+  static std::optional<Uuid> tryFromString(const QString& str) noexcept;
 
 private:  // Methods
   /**
@@ -178,12 +183,12 @@ inline std::size_t qHash(const Uuid& key, std::size_t seed = 0) noexcept {
 
 }  // namespace librepcb
 
-namespace tl {
-inline std::size_t qHash(const optional<librepcb::Uuid>& key,
-                         std::size_t seed = 0) noexcept {
+namespace std {
+inline size_t qHash(const optional<librepcb::Uuid>& key,
+                    size_t seed = 0) noexcept {
   return ::qHash(key ? key->toStr() : QString(), seed);
 }
-}  // namespace tl
+}  // namespace std
 
 /*******************************************************************************
  *  End of File

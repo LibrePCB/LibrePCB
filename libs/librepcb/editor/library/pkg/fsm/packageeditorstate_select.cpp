@@ -443,7 +443,7 @@ bool PackageEditorState_Select::processPaste() noexcept {
             // the copied object).
             return pasteGeometryFromClipboard(std::move(data));
           } else {
-            return startPaste(std::move(data), tl::nullopt);
+            return startPaste(std::move(data), std::nullopt);
           }
         }
       } catch (const Exception& e) {
@@ -796,9 +796,10 @@ bool PackageEditorState_Select::openContextMenuAtPos(
 
         int lineIndex = i->getLineIndexAtPosition(pos);
         if (lineIndex >= 0) {
-          QAction* aAddVertex = cmd.vertexAdd.createAction(&menu, this, [=]() {
-            startAddingPolygonVertex(polygon, lineIndex, pos);
-          });
+          QAction* aAddVertex =
+              cmd.vertexAdd.createAction(&menu, this, [=, this]() {
+                startAddingPolygonVertex(polygon, lineIndex, pos);
+              });
           aAddVertex->setEnabled(!mContext.editorContext.readOnly);
           mb.addAction(aAddVertex);
         }
@@ -829,9 +830,9 @@ bool PackageEditorState_Select::openContextMenuAtPos(
 
         int lineIndex = i->getLineIndexAtPosition(pos);
         if (lineIndex >= 0) {
-          QAction* aAddVertex = cmd.vertexAdd.createAction(&menu, this, [=]() {
-            startAddingZoneVertex(zone, lineIndex, pos);
-          });
+          QAction* aAddVertex = cmd.vertexAdd.createAction(
+              &menu, this,
+              [=, this]() { startAddingZoneVertex(zone, lineIndex, pos); });
           aAddVertex->setEnabled(!mContext.editorContext.readOnly);
           mb.addAction(aAddVertex);
         }
@@ -1186,7 +1187,7 @@ bool PackageEditorState_Select::pasteGeometryFromClipboard(
 
 bool PackageEditorState_Select::startPaste(
     std::unique_ptr<FootprintClipboardData> data,
-    const tl::optional<Point>& fixedPosition) {
+    const std::optional<Point>& fixedPosition) {
   Q_ASSERT(data);
 
   // Abort if no footprint is selected.
@@ -1411,7 +1412,7 @@ bool PackageEditorState_Select::generateCourtyard() noexcept {
   }
 
   try {
-    tl::optional<PositiveLength> offset;
+    std::optional<PositiveLength> offset;
     auto getOffset = [&]() {
       if (!offset) {
         QDialog dlg(&mContext.editorWidget);

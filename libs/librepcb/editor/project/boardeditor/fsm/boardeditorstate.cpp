@@ -166,7 +166,7 @@ QWidget* BoardEditorState::parentWidget() noexcept {
 }
 
 QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
-    const Point& pos, FindFlags flags, const tl::optional<const Layer&> cuLayer,
+    const Point& pos, FindFlags flags, const Layer* cuLayer,
     const QSet<const NetSignal*>& netsignals,
     const QVector<std::shared_ptr<QGraphicsItem>>& except) noexcept {
   BoardGraphicsScene* scene = getActiveBoardScene();
@@ -223,7 +223,7 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
   // add +1000. For items not under the cursor, but on the next grid interval,
   // add +2000.
   QMultiMap<std::pair<int, int>, std::shared_ptr<QGraphicsItem>> items;
-  tl::optional<std::pair<int, int>> lowestPriority;
+  std::optional<std::pair<int, int>> lowestPriority;
   auto addItem = [&items, &lowestPriority](
                      const std::pair<int, int>& prio,
                      std::shared_ptr<QGraphicsItem> item) {

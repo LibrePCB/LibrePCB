@@ -87,8 +87,8 @@ public:
   const Package& getLibPackage() const noexcept { return *mLibPackage; }
   const Footprint& getLibFootprint() const noexcept { return *mLibFootprint; }
   const PackageModel* getLibModel() const noexcept { return mLibModel; }
-  tl::optional<Uuid> getLibModelUuid() const noexcept;
-  tl::optional<Uuid> getDefaultLibModelUuid() const noexcept;
+  std::optional<Uuid> getLibModelUuid() const noexcept;
+  std::optional<Uuid> getDefaultLibModelUuid() const noexcept;
   const Point& getPosition() const noexcept { return mPosition; }
   const Angle& getRotation() const noexcept { return mRotation; }
   bool getMirrored() const noexcept { return mMirrored; }
@@ -98,11 +98,11 @@ public:
     return mPads.value(padUuid);
   }
   const QMap<Uuid, BI_FootprintPad*>& getPads() const noexcept { return mPads; }
-  const QHash<Uuid, tl::optional<Length>>& getHoleStopMasks() const noexcept {
+  const QHash<Uuid, std::optional<Length>>& getHoleStopMasks() const noexcept {
     return mHoleStopMaskOffsets;
   }
   QVector<std::shared_ptr<const Part>> getParts(
-      const tl::optional<Uuid>& assemblyVariant) const noexcept;
+      const std::optional<Uuid>& assemblyVariant) const noexcept;
   bool isInAssemblyVariant(const Uuid& assemblyVariant) const noexcept;
   bool doesPackageRequireAssembly(bool resolveAuto) const noexcept;
   bool isUsed() const noexcept;
@@ -113,7 +113,7 @@ public:
   void setMirrored(bool mirror);
   void setLocked(bool locked) noexcept;
   void setAttributes(const AttributeList& attributes) noexcept;
-  void setModel(const tl::optional<Uuid>& uuid);
+  void setModel(const std::optional<Uuid>& uuid);
 
   // StrokeText Methods
   StrokeTextList getDefaultStrokeTexts() const noexcept;
@@ -164,7 +164,7 @@ private:
 
   QMap<Uuid, BI_FootprintPad*> mPads;  ///< key: footprint pad UUID
   QMap<Uuid, BI_StrokeText*> mStrokeTexts;
-  QHash<Uuid, tl::optional<Length>> mHoleStopMaskOffsets;
+  QHash<Uuid, std::optional<Length>> mHoleStopMaskOffsets;
 };
 
 /*******************************************************************************

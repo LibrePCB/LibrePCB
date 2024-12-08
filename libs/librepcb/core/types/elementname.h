@@ -27,10 +27,11 @@
 #include "../serialization/sexpression.h"
 #include "../utils/toolbox.h"
 
-#include <optional/tl/optional.hpp>
 #include <type_safe/constrained_type.hpp>
 
 #include <QtCore>
+
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -117,15 +118,15 @@ inline ElementName deserialize(const SExpression& node) {
 
 template <>
 inline std::unique_ptr<SExpression> serialize(
-    const tl::optional<ElementName>& obj) {
+    const std::optional<ElementName>& obj) {
   return SExpression::createString(obj ? **obj : "");
 }
 
 template <>
-inline tl::optional<ElementName> deserialize(const SExpression& node) {
+inline std::optional<ElementName> deserialize(const SExpression& node) {
   const QString str = node.getValue();
-  return str.isEmpty() ? tl::nullopt
-                       : tl::make_optional(ElementName(str));  // can throw
+  return str.isEmpty() ? std::nullopt
+                       : std::make_optional(ElementName(str));  // can throw
 }
 
 inline QDataStream& operator<<(QDataStream& stream, const ElementName& obj) {

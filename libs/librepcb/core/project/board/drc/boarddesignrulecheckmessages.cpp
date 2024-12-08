@@ -223,7 +223,7 @@ DrcMsgMultipleBoardOutlines::DrcMsgMultipleBoardOutlines(
  ******************************************************************************/
 
 DrcMsgOpenBoardOutlinePolygon::DrcMsgOpenBoardOutlinePolygon(
-    const Uuid& polygon, const tl::optional<Uuid>& device,
+    const Uuid& polygon, const std::optional<Uuid>& device,
     const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Error, tr("Non-closed board outline"),

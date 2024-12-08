@@ -390,7 +390,7 @@ std::unique_ptr<Component> KiCadLibraryConverter::createComponent(
   const QString suffixes = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   for (int i = 0; i < kiGates.count(); ++i) {
     const QString symGenBy = symGeneratedBy.value(i);
-    const tl::optional<Uuid> symbolUuid = mSymbolMap.value(symGenBy);
+    const std::optional<Uuid> symbolUuid = mSymbolMap.value(symGenBy);
     if (!symbolUuid) {
       throw LogicError(__FILE__, __LINE__);
     }
@@ -423,7 +423,7 @@ std::unique_ptr<Component> KiCadLibraryConverter::createComponent(
           signalUuid, CircuitIdentifier(pinName), signalRole, QString(),
           isRequired, isNegated, isClock));
 
-      tl::optional<Uuid> pinUuid =
+      std::optional<Uuid> pinUuid =
           mSymbolPinMap.value(std::make_pair(symGenBy, pinName));
       if (!pinUuid) {
         throw RuntimeError(
@@ -450,14 +450,14 @@ std::unique_ptr<Device> KiCadLibraryConverter::createDevice(
   if (!mComponentMap.contains(cmpGeneratedBy)) {
     loadAlreadyImportedComponent(cmpGeneratedBy);  // can throw
   }
-  const tl::optional<Uuid> componentUuid = mComponentMap.value(cmpGeneratedBy);
+  const std::optional<Uuid> componentUuid = mComponentMap.value(cmpGeneratedBy);
   if (!componentUuid) {
     throw LogicError(__FILE__, __LINE__);
   }
   if (!mPackageMap.contains(pkgGeneratedBy)) {
     loadAlreadyImportedPackage(pkgGeneratedBy);  // can throw
   }
-  const tl::optional<Uuid> packageUuid = mPackageMap.value(pkgGeneratedBy);
+  const std::optional<Uuid> packageUuid = mPackageMap.value(pkgGeneratedBy);
   if (!packageUuid) {
     throw LogicError(__FILE__, __LINE__);
   }
@@ -474,7 +474,7 @@ std::unique_ptr<Device> KiCadLibraryConverter::createDevice(
   QSet<QString> connectedPads;
   for (auto it = mPackagePadMap[pkgGeneratedBy].constBegin();
        it != mPackagePadMap[pkgGeneratedBy].constEnd(); it++) {
-    tl::optional<Uuid> signalUuid;
+    std::optional<Uuid> signalUuid;
     for (const KiCadSymbolGate& gate : kiGates) {
       const QList<std::pair<QString, QStringList>> pinNames =
           C::convertSymbolPinNames(gate.pins);

@@ -152,7 +152,7 @@ bool SchematicEditorState_AddComponent::processAddComponent(
     mLastAngle.setAngleMicroDeg(0);  // reset the angle
     mLastMirrored = false;
     mUseAddComponentDialog = true;
-    startAddingComponent(tl::nullopt, tl::nullopt, tl::nullopt, searchTerm);
+    startAddingComponent(std::nullopt, std::nullopt, std::nullopt, searchTerm);
     return true;
   } catch (UserCanceled& exc) {
   } catch (Exception& exc) {
@@ -170,7 +170,7 @@ bool SchematicEditorState_AddComponent::processAddComponent(
     mLastAngle.setAngleMicroDeg(0);  // reset the angle
     mLastMirrored = false;
     mUseAddComponentDialog = false;
-    startAddingComponent(cmp, symbVar, tl::nullopt);
+    startAddingComponent(cmp, symbVar, std::nullopt);
     return true;
   } catch (UserCanceled& exc) {
   } catch (Exception& exc) {
@@ -336,8 +336,8 @@ bool SchematicEditorState_AddComponent::
  ******************************************************************************/
 
 void SchematicEditorState_AddComponent::startAddingComponent(
-    const tl::optional<Uuid>& cmp, const tl::optional<Uuid>& symbVar,
-    const tl::optional<ComponentAssemblyOptionList>& options,
+    const std::optional<Uuid>& cmp, const std::optional<Uuid>& symbVar,
+    const std::optional<ComponentAssemblyOptionList>& options,
     const QString& searchTerm, bool keepValue) {
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();

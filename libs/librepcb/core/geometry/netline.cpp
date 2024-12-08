@@ -33,8 +33,8 @@ namespace librepcb {
  *  Class NetLineAnchor
  ******************************************************************************/
 
-NetLineAnchor::NetLineAnchor(const tl::optional<Uuid>& junction,
-                             const tl::optional<PinAnchor>& pin) noexcept
+NetLineAnchor::NetLineAnchor(const std::optional<Uuid>& junction,
+                             const std::optional<PinAnchor>& pin) noexcept
   : mJunction(junction), mPin(pin) {
   Q_ASSERT(((junction) && (!pin)) || ((!junction) && (pin)));
 }
@@ -77,11 +77,11 @@ NetLineAnchor& NetLineAnchor::operator=(const NetLineAnchor& rhs) noexcept {
 }
 
 NetLineAnchor NetLineAnchor::junction(const Uuid& junction) noexcept {
-  return NetLineAnchor(junction, tl::nullopt);
+  return NetLineAnchor(junction, std::nullopt);
 }
 
 NetLineAnchor NetLineAnchor::pin(const Uuid& symbol, const Uuid& pin) noexcept {
-  return NetLineAnchor(tl::nullopt, PinAnchor{symbol, pin});
+  return NetLineAnchor(std::nullopt, PinAnchor{symbol, pin});
 }
 
 /*******************************************************************************

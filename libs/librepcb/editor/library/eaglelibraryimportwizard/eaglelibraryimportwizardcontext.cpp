@@ -115,7 +115,7 @@ void EagleLibraryImportWizardContext::setAddNamePrefix(bool add) noexcept {
 }
 
 void EagleLibraryImportWizardContext::setComponentCategory(
-    const tl::optional<Uuid>& uuid) noexcept {
+    const std::optional<Uuid>& uuid) noexcept {
   mComponentCategoryUuid = uuid;
   mImport->setSymbolCategories(mComponentCategoryUuid
                                    ? QSet<Uuid>{*mComponentCategoryUuid}
@@ -129,7 +129,7 @@ void EagleLibraryImportWizardContext::setComponentCategory(
 }
 
 void EagleLibraryImportWizardContext::setPackageCategory(
-    const tl::optional<Uuid>& uuid) noexcept {
+    const std::optional<Uuid>& uuid) noexcept {
   mPackageCategoryUuid = uuid;
   mImport->setPackageCategories(
       mPackageCategoryUuid ? QSet<Uuid>{*mPackageCategoryUuid} : QSet<Uuid>{});

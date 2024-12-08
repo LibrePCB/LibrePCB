@@ -102,9 +102,10 @@ SymbolChooserDialog::~SymbolChooserDialog() noexcept {
  *  Getters
  ******************************************************************************/
 
-tl::optional<Uuid> SymbolChooserDialog::getSelectedSymbolUuid() const noexcept {
-  return mSelectedSymbol ? tl::make_optional(mSelectedSymbol->getUuid())
-                         : tl::nullopt;
+std::optional<Uuid> SymbolChooserDialog::getSelectedSymbolUuid()
+    const noexcept {
+  return mSelectedSymbol ? std::make_optional(mSelectedSymbol->getUuid())
+                         : std::nullopt;
 }
 
 QString SymbolChooserDialog::getSelectedSymbolNameTr() const noexcept {
@@ -187,7 +188,7 @@ void SymbolChooserDialog::searchSymbols(const QString& input) {
 }
 
 void SymbolChooserDialog::setSelectedCategory(
-    const tl::optional<Uuid>& uuid) noexcept {
+    const std::optional<Uuid>& uuid) noexcept {
   if ((mCategorySelected) && (uuid == mSelectedCategoryUuid)) return;
 
   setSelectedSymbol(FilePath());

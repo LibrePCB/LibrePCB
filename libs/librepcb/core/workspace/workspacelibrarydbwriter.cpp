@@ -518,7 +518,7 @@ int WorkspaceLibraryDbWriter::addCategory(const QString& categoriesTable,
                                           const Uuid& uuid,
                                           const Version& version,
                                           bool deprecated,
-                                          const tl::optional<Uuid>& parent) {
+                                          const std::optional<Uuid>& parent) {
   QSqlQuery query = mDb.prepareQuery(
       "INSERT INTO %categories "
       "(library_id, filepath, uuid, version, deprecated, parent_uuid) VALUES "
@@ -553,9 +553,9 @@ void WorkspaceLibraryDbWriter::removeAllElements(const QString& elementsTable) {
 
 int WorkspaceLibraryDbWriter::addTranslation(
     const QString& elementsTable, int elementId, const QString& locale,
-    const tl::optional<ElementName>& name,
-    const tl::optional<QString>& description,
-    const tl::optional<QString>& keywords) {
+    const std::optional<ElementName>& name,
+    const std::optional<QString>& description,
+    const std::optional<QString>& keywords) {
   QSqlQuery query = mDb.prepareQuery(
       "INSERT INTO %elements_tr "
       "(element_id, locale, name, description, keywords) VALUES "

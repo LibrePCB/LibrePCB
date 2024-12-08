@@ -76,7 +76,7 @@ void KeySequenceDelegate::setEditorData(QWidget* editor,
       static_cast<KeySequencesEditorWidget*>(editor);
   QVariant overrides = index.data(Qt::EditRole);
   if (overrides.isNull()) {
-    edt->setOverrides(tl::nullopt);
+    edt->setOverrides(std::nullopt);
   } else {
     edt->setOverrides(overrides.value<QList<QKeySequence>>());
   }

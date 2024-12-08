@@ -26,12 +26,12 @@
 #include "boardeditorfsm.h"
 
 #include <librepcb/core/types/length.h>
-#include <optional/tl/optional.hpp>
 
 #include <QtCore>
 #include <QtWidgets>
 
 #include <memory>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -199,14 +199,12 @@ protected:  // Methods
   bool execCmd(UndoCommand* cmd);
   QWidget* parentWidget() noexcept;
   QList<std::shared_ptr<QGraphicsItem>> findItemsAtPos(
-      const Point& pos, FindFlags flags,
-      const tl::optional<const Layer&> cuLayer = tl::nullopt,
+      const Point& pos, FindFlags flags, const Layer* cuLayer = nullptr,
       const QSet<const NetSignal*>& netsignals = {},
       const QVector<std::shared_ptr<QGraphicsItem>>& except = {}) noexcept;
   template <typename T = QGraphicsItem>
   std::shared_ptr<T> findItemAtPos(
-      const Point& pos, FindFlags flags,
-      const tl::optional<const Layer&> cuLayer = tl::nullopt,
+      const Point& pos, FindFlags flags, const Layer* cuLayer = nullptr,
       const QSet<const NetSignal*>& netsignals = {},
       const QVector<std::shared_ptr<QGraphicsItem>>& except = {}) noexcept {
     const QList<std::shared_ptr<QGraphicsItem>> items =

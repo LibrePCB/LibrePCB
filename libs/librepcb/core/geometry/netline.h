@@ -61,10 +61,10 @@ public:
   ~NetLineAnchor() noexcept;
 
   // Getters
-  const tl::optional<Uuid>& tryGetJunction() const noexcept {
+  const std::optional<Uuid>& tryGetJunction() const noexcept {
     return mJunction;
   }
-  const tl::optional<PinAnchor>& tryGetPin() const noexcept { return mPin; }
+  const std::optional<PinAnchor>& tryGetPin() const noexcept { return mPin; }
 
   // General Methods
 
@@ -87,12 +87,12 @@ public:
   static NetLineAnchor pin(const Uuid& symbol, const Uuid& pin) noexcept;
 
 private:  // Methods
-  NetLineAnchor(const tl::optional<Uuid>& junction,
-                const tl::optional<PinAnchor>& pin) noexcept;
+  NetLineAnchor(const std::optional<Uuid>& junction,
+                const std::optional<PinAnchor>& pin) noexcept;
 
 private:  // Data
-  tl::optional<Uuid> mJunction;
-  tl::optional<PinAnchor> mPin;
+  std::optional<Uuid> mJunction;
+  std::optional<PinAnchor> mPin;
 };
 
 /*******************************************************************************
@@ -178,10 +178,10 @@ using NetLineList =
 inline std::size_t qHash(const NetLineAnchor& key,
                          std::size_t seed = 0) noexcept {
   QString s;
-  if (tl::optional<Uuid> anchor = key.tryGetJunction()) {
+  if (std::optional<Uuid> anchor = key.tryGetJunction()) {
     s += anchor->toStr();
   }
-  if (tl::optional<NetLineAnchor::PinAnchor> anchor = key.tryGetPin()) {
+  if (std::optional<NetLineAnchor::PinAnchor> anchor = key.tryGetPin()) {
     s += anchor->symbol.toStr();
     s += anchor->pin.toStr();
   }

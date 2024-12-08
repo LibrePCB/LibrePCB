@@ -199,7 +199,8 @@ private:
   qint64 mTimestampOfLastPlaneRebuild;
 
   // DRC
-  QHash<Uuid, tl::optional<RuleCheckMessageList>> mDrcMessages;  ///< UUID=Board
+  QHash<Uuid, std::optional<RuleCheckMessageList>>
+      mDrcMessages;  ///< UUID=Board
   QScopedPointer<QGraphicsPathItem> mDrcLocationGraphicsItem;
 
   // Actions

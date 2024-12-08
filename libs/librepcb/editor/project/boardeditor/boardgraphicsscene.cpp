@@ -322,7 +322,7 @@ qreal BoardGraphicsScene::getZValueOfCopperLayer(const Layer& layer) noexcept {
     // 0.0 => TOP
     // 1.0 => BOTTOM
     const qreal delta = static_cast<qreal>(layer.getCopperNumber()) / 100.0;
-    return (ZValue_InnerTop - delta);
+    return (static_cast<int>(ZValue_InnerTop) - delta);
   } else {
     return ZValue_Default;
   }

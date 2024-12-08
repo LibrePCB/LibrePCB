@@ -26,8 +26,6 @@
 #include <QtCore>
 #include <QtWidgets>
 
-#include <optional.hpp>
-
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -54,7 +52,7 @@ public:
   ~LayerComboBox() noexcept;
 
   // Getters
-  tl::optional<const Layer&> getCurrentLayer() const noexcept;
+  const Layer* getCurrentLayer() const noexcept;
 
   // Setters
   void setLayers(const QSet<const Layer*>& layers) noexcept;

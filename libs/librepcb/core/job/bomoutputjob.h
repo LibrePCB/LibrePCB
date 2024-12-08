@@ -25,10 +25,10 @@
  ******************************************************************************/
 #include "outputjob.h"
 
-#include <optional/tl/optional.hpp>
-
 #include <QtCore>
 #include <QtGui>
+
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -46,7 +46,7 @@ class BomOutputJob final : public OutputJob {
   Q_DECLARE_TR_FUNCTIONS(BomOutputJob)
 
 public:
-  using BoardSet = ObjectSet<tl::optional<Uuid>>;
+  using BoardSet = ObjectSet<std::optional<Uuid>>;
   using AssemblyVariantSet = ObjectSet<Uuid>;
 
   // Constructors / Destructor

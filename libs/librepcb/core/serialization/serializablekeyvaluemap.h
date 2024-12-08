@@ -30,7 +30,7 @@
 
 #include <QtCore>
 
-#include <optional.hpp>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -111,13 +111,13 @@ public:
   bool contains(const QString& key) const noexcept {
     return mValues.contains(key);
   }
-  tl::optional<typename T::ValueType> tryGet(
+  std::optional<typename T::ValueType> tryGet(
       const QString& key) const noexcept {
     auto i = mValues.find(key);
     if ((i != mValues.end()) && (i.key() == key)) {
       return i.value();
     } else {
-      return tl::nullopt;
+      return std::nullopt;
     }
   }
   const typename T::ValueType& value(

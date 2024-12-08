@@ -29,7 +29,7 @@
 
 #include <QtCore>
 
-#include <optional.hpp>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -54,7 +54,7 @@ public:
   // Constructors / Destructor
   CmdNetSignalAdd(
       Circuit& circuit, NetClass& netclass,
-      const tl::optional<CircuitIdentifier>& name = tl::nullopt) noexcept;
+      const std::optional<CircuitIdentifier>& name = std::nullopt) noexcept;
   ~CmdNetSignalAdd() noexcept;
 
   // Getters
@@ -76,7 +76,7 @@ private:
 
   Circuit& mCircuit;
   NetClass& mNetClass;
-  tl::optional<CircuitIdentifier> mName;
+  std::optional<CircuitIdentifier> mName;
   NetSignal* mNetSignal;
 };
 

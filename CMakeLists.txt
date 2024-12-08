@@ -75,8 +75,8 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(QT_MAJOR_VERSION 6)
 set(QT "Qt${QT_MAJOR_VERSION}")
 
-# Use C++17
-set(CMAKE_CXX_STANDARD 17)
+# Use C++20
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -155,7 +155,6 @@ find_package(FontoBeneQt REQUIRED)
 find_package(GLU REQUIRED)
 find_package(MuParser REQUIRED)
 find_package(OpenCascade REQUIRED)
-find_package(Optional REQUIRED)
 find_package(Polyclipping REQUIRED)
 find_package(QuaZip REQUIRED)
 find_package(TypeSafe REQUIRED)

@@ -27,13 +27,12 @@
 #include "../types/length.h"
 #include "graphicsexportsettings.h"
 
-#include <optional/tl/optional.hpp>
-
 #include <QtCore>
 #include <QtGui>
 #include <QtPrintSupport>
 
 #include <memory>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations

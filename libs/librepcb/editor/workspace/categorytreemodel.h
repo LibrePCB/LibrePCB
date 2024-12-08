@@ -48,7 +48,7 @@ namespace editor {
 class CategoryTreeModel final : public QAbstractItemModel {
   struct Item {
     std::weak_ptr<Item> parent;  ///< nullptr for root categories
-    tl::optional<Uuid> uuid;  ///< tl::nullopt for items without category
+    std::optional<Uuid> uuid;  ///< std::nullopt for items without category
     QString text;
     QString tooltip;
     QVector<std::shared_ptr<Item>> childs;
@@ -104,7 +104,7 @@ private:  // Methods
   void update() noexcept;
   QVector<std::shared_ptr<Item>> getChilds(
       std::shared_ptr<Item> parent) const noexcept;
-  bool containsItems(const tl::optional<Uuid>& uuid) const;
+  bool containsItems(const std::optional<Uuid>& uuid) const;
   bool listAll() const noexcept;
   bool listPackageCategories() const noexcept;
   void updateModelItem(

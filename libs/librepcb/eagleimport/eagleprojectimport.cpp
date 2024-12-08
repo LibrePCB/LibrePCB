@@ -1268,7 +1268,7 @@ bool EagleProjectImport::hasBuses(
   return buses > 0;
 }
 
-tl::optional<BoundedUnsignedRatio> EagleProjectImport::tryGetDrcRatio(
+std::optional<BoundedUnsignedRatio> EagleProjectImport::tryGetDrcRatio(
     const QString& nr, const QString& nmin, const QString& nmax) const {
   if (mBoard) {
     const auto pr = mBoard->getDesignRules().tryGetParam(nr);
@@ -1280,11 +1280,11 @@ tl::optional<BoundedUnsignedRatio> EagleProjectImport::tryGetDrcRatio(
       const auto vmax = C::convertParamTo<UnsignedLength>(*pmax);
       // Note: Eagle allows to specify min>max so we have to correct this
       // case. It seems the min value is ignored then.
-      return tl::make_optional(
+      return std::make_optional(
           BoundedUnsignedRatio(vr, std::min(vmin, vmax), vmax));
     }
   }
-  return tl::nullopt;
+  return std::nullopt;
 }
 
 std::shared_ptr<const parseagle::Symbol> EagleProjectImport::getSymbol(

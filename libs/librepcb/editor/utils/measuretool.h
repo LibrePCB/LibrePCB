@@ -25,10 +25,11 @@
  ******************************************************************************/
 #include <librepcb/core/types/lengthunit.h>
 #include <librepcb/core/types/point.h>
-#include <optional/tl/optional.hpp>
 
 #include <QtCore>
 #include <QtWidgets>
+
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -107,8 +108,8 @@ private:  // Data
   Point mLastScenePos;
   Point mCursorPos;
   bool mCursorSnapped;
-  tl::optional<Point> mStartPos;
-  tl::optional<Point> mEndPos;
+  std::optional<Point> mStartPos;
+  std::optional<Point> mEndPos;
 };
 
 }  // namespace editor

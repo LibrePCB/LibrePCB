@@ -24,13 +24,13 @@
  *  Includes
  ******************************************************************************/
 #include <librepcb/core/job/graphicsoutputjob.h>
-#include <optional/tl/optional.hpp>
 
 #include <QtCore>
 #include <QtWidgets>
 
 #include <functional>
 #include <memory>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -89,7 +89,7 @@ private:  // Data
   std::shared_ptr<GraphicsOutputJob> mJob;
   QScopedPointer<OutputJobRunner> mPreviewRunner;
   QScopedPointer<GraphicsExport> mPreviewGraphicsExport;
-  QList<tl::optional<QPageSize>> mPageSizes;
+  QList<std::optional<QPageSize>> mPageSizes;
   bool mDisableModification;
   QScopedPointer<Ui::GraphicsOutputJobWidget> mUi;
 };

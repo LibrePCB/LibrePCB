@@ -219,7 +219,7 @@ void UnplacedComponentsDock::updateComponentsList() noexcept {
 
       // Add component to list.
       ProjectAttributeLookup lookup(*component, nullptr,
-                                    component->getParts(tl::nullopt).value(0));
+                                    component->getParts(std::nullopt).value(0));
       const QString value =
           AttributeSubstitutor::substitute(lookup("VALUE"), lookup)
               .split("\n", Qt::SkipEmptyParts)
@@ -256,7 +256,7 @@ void UnplacedComponentsDock::currentComponentListItemChanged(
 
   ComponentInstance* component = nullptr;
   if (mBoard && current) {
-    tl::optional<Uuid> cmpUuid =
+    std::optional<Uuid> cmpUuid =
         Uuid::tryFromString(current->data(Qt::UserRole).toString());
     if (cmpUuid)
       component = mProject.getCircuit().getComponentInstanceByUuid(*cmpUuid);
@@ -270,7 +270,7 @@ void UnplacedComponentsDock::currentDeviceIndexChanged(int index) noexcept {
 
   // Abort if index is out of bounds.
   if ((index < 0) || (index >= mCurrentDevices.count())) {
-    setSelectedDeviceAndPackage(tl::nullopt, nullptr, false);
+    setSelectedDeviceAndPackage(std::nullopt, nullptr, false);
     return;
   }
 
@@ -307,14 +307,14 @@ void UnplacedComponentsDock::currentFootprintIndexChanged(int index) noexcept {
   mUi->cbxSelectedFootprint->setToolTip(
       mUi->cbxSelectedFootprint->currentText());
 
-  tl::optional<Uuid> footprintUuid = Uuid::tryFromString(
+  std::optional<Uuid> footprintUuid = Uuid::tryFromString(
       mUi->cbxSelectedFootprint->itemData(index, Qt::UserRole).toString());
   setSelectedFootprintUuid(footprintUuid);
 }
 
 void UnplacedComponentsDock::setSelectedComponentInstance(
     ComponentInstance* cmp) noexcept {
-  setSelectedDeviceAndPackage(tl::nullopt, nullptr, false);
+  setSelectedDeviceAndPackage(std::nullopt, nullptr, false);
   mUi->lblNoDeviceFound->hide();
   mUi->cbxSelectedDevice->clear();
   mCurrentDevices.clear();
@@ -346,9 +346,9 @@ void UnplacedComponentsDock::setSelectedComponentInstance(
 }
 
 void UnplacedComponentsDock::setSelectedDeviceAndPackage(
-    const tl::optional<Uuid>& deviceUuid, Package* package,
+    const std::optional<Uuid>& deviceUuid, Package* package,
     bool packageOwned) noexcept {
-  setSelectedFootprintUuid(tl::nullopt);
+  setSelectedFootprintUuid(std::nullopt);
   mUi->lblNoDeviceFound->setVisible(deviceUuid && (!package));
   mUi->cbxSelectedFootprint->clear();
   if (mSelectedPackageOwned) {
@@ -356,7 +356,7 @@ void UnplacedComponentsDock::setSelectedDeviceAndPackage(
   }
   mSelectedPackage = nullptr;
   mSelectedPackageOwned = false;
-  mSelectedDeviceUuid = tl::nullopt;
+  mSelectedDeviceUuid = std::nullopt;
 
   if (mBoard && mSelectedComponent && deviceUuid && package) {
     mSelectedDeviceUuid = deviceUuid;
@@ -378,7 +378,7 @@ void UnplacedComponentsDock::setSelectedDeviceAndPackage(
                                              Qt::ToolTipRole);
 
       // Select most relevant footprint.
-      tl::optional<Uuid> fpt =
+      std::optional<Uuid> fpt =
           getSuggestedFootprint(mSelectedPackage->getUuid());
       int index = fpt ? mUi->cbxSelectedFootprint->findData(fpt->toStr()) : 0;
       mUi->cbxSelectedFootprint->setCurrentIndex(index);
@@ -389,7 +389,7 @@ void UnplacedComponentsDock::setSelectedDeviceAndPackage(
 }
 
 void UnplacedComponentsDock::setSelectedFootprintUuid(
-    const tl::optional<Uuid>& uuid) noexcept {
+    const std::optional<Uuid>& uuid) noexcept {
   mUi->btnAdd->setEnabled(false);
   mUi->btnAddSimilar->setEnabled(false);
   if (mPreviewGraphicsItem) {
@@ -442,21 +442,21 @@ void UnplacedComponentsDock::addSimilarDevicesToBoard() noexcept {
 
 void UnplacedComponentsDock::addAllDevicesToBoard() noexcept {
   if (mBoard) {
-    autoAddDevicesToBoard(tl::nullopt);
+    autoAddDevicesToBoard(std::nullopt);
   }
 
   updateComponentsList();
 }
 
 void UnplacedComponentsDock::autoAddDevicesToBoard(
-    const tl::optional<Uuid>& libCmpUuidFilter) noexcept {
+    const std::optional<Uuid>& libCmpUuidFilter) noexcept {
   Q_ASSERT(mBoard);
   mProjectEditor.abortBlockingToolsInOtherEditors(this);  // Release undo stack.
   std::unique_ptr<UndoCommandGroup> cmd(
       new UndoCommandGroup(tr("Add devices to board")));
 
   for (int i = 0; i < mUi->lstUnplacedComponents->count(); i++) {
-    tl::optional<Uuid> componentUuid = Uuid::tryFromString(
+    std::optional<Uuid> componentUuid = Uuid::tryFromString(
         mUi->lstUnplacedComponents->item(i)->data(Qt::UserRole).toString());
     if (!componentUuid) continue;
     ComponentInstance* component =
@@ -468,10 +468,10 @@ void UnplacedComponentsDock::autoAddDevicesToBoard(
           getAvailableDevices(*component);
       if ((devices.second >= 0) && (devices.second < devices.first.count())) {
         const DeviceMetadata& dev = devices.first.at(devices.second);
-        tl::optional<Uuid> fptUuid = getSuggestedFootprint(dev.packageUuid);
+        std::optional<Uuid> fptUuid = getSuggestedFootprint(dev.packageUuid);
         cmd->appendChild(new CmdAddDeviceToBoard(
             mProjectEditor.getWorkspace(), *mBoard, *component, dev.deviceUuid,
-            fptUuid, tl::nullopt, mNextPosition));
+            fptUuid, std::nullopt, mNextPosition));
 
         // Update current position.
         if (mNextPosition.getX() > Length::fromMm(100)) {
@@ -630,7 +630,7 @@ std::pair<QList<UnplacedComponentsDock::DeviceMetadata>, int>
   return std::make_pair(devices, devices.isEmpty() ? -1 : 0);
 }
 
-tl::optional<Uuid> UnplacedComponentsDock::getSuggestedFootprint(
+std::optional<Uuid> UnplacedComponentsDock::getSuggestedFootprint(
     const Uuid& libPkgUuid) const noexcept {
   // Prio 1: Use the footprint already used for the same device before.
   auto lastFootprintIterator = mLastFootprintOfPackage.find(libPkgUuid);
@@ -657,7 +657,7 @@ tl::optional<Uuid> UnplacedComponentsDock::getSuggestedFootprint(
   }
 
   // Prio 3: Fallback to the default footprint.
-  return tl::nullopt;
+  return std::nullopt;
 }
 
 /*******************************************************************************

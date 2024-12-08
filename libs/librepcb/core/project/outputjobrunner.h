@@ -107,11 +107,11 @@ private:  // Methods
   void runImpl(const LppzOutputJob& job);
   void runImpl(const CopyOutputJob& job);
   void runImpl(const ArchiveOutputJob& job);
-  QList<Board*> getBoards(const OutputJob::ObjectSet<tl::optional<Uuid>>& set,
+  QList<Board*> getBoards(const OutputJob::ObjectSet<std::optional<Uuid>>& set,
                           bool includeNullInAll) const;
   QList<Board*> getBoards(const OutputJob::ObjectSet<Uuid>& set) const;
   QVector<std::shared_ptr<AssemblyVariant>> getAssemblyVariants(
-      const OutputJob::ObjectSet<tl::optional<Uuid>>& set,
+      const OutputJob::ObjectSet<std::optional<Uuid>>& set,
       bool includeNullInAll) const;
   QVector<std::shared_ptr<AssemblyVariant>> getAssemblyVariants(
       const OutputJob::ObjectSet<Uuid>& set) const;

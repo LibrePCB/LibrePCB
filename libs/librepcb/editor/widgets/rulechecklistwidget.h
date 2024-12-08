@@ -24,12 +24,12 @@
  *  Includes
  ******************************************************************************/
 #include <librepcb/core/rulecheck/rulecheckmessage.h>
-#include <optional/tl/optional.hpp>
 
 #include <QtCore>
 #include <QtWidgets>
 
 #include <memory>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -175,14 +175,15 @@ public:
   ~RuleCheckListWidget() noexcept;
 
   // Getters
-  const tl::optional<int>& getUnapprovedMessageCount() const noexcept {
+  const std::optional<int>& getUnapprovedMessageCount() const noexcept {
     return mUnapprovedMessageCount;
   }
 
   // Setters
   void setReadOnly(bool readOnly) noexcept;
   void setHandler(IF_RuleCheckHandler* handler) noexcept;
-  void setMessages(const tl::optional<RuleCheckMessageList>& messages) noexcept;
+  void setMessages(
+      const std::optional<RuleCheckMessageList>& messages) noexcept;
   void setApprovals(const QSet<SExpression>& approvals) noexcept;
 
   // Operator Overloadings
@@ -210,10 +211,10 @@ private:  // Data
   QScopedPointer<QListWidget> mListWidget;
   bool mReadOnly;
   IF_RuleCheckHandler* mHandler;
-  tl::optional<RuleCheckMessageList> mMessages;
+  std::optional<RuleCheckMessageList> mMessages;
   RuleCheckMessageList mDisplayedMessages;
   QSet<SExpression> mApprovals;
-  tl::optional<int> mUnapprovedMessageCount;
+  std::optional<int> mUnapprovedMessageCount;
 };
 
 /*******************************************************************************

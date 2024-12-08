@@ -128,7 +128,7 @@ bool CmdPasteBoardItems::performExecute() {
     }
 
     // Copy new device to project library, if not existing already
-    tl::optional<Uuid> pgkUuid;
+    std::optional<Uuid> pgkUuid;
     if (const Device* libDev =
             mProject.getLibrary().getDevice(dev.libDeviceUuid)) {
       pgkUuid = libDev->getPackageUuid();
@@ -220,13 +220,13 @@ bool CmdPasteBoardItems::performExecute() {
       }
       for (const Trace& trace : segment.traces) {
         BI_NetLineAnchor* start = nullptr;
-        if (tl::optional<Uuid> anchor =
+        if (std::optional<Uuid> anchor =
                 trace.getStartPoint().tryGetJunction()) {
           start = netPointMap[*anchor];
-        } else if (tl::optional<Uuid> anchor =
+        } else if (std::optional<Uuid> anchor =
                        trace.getStartPoint().tryGetVia()) {
           start = viaMap[*anchor];
-        } else if (tl::optional<TraceAnchor::PadAnchor> anchor =
+        } else if (std::optional<TraceAnchor::PadAnchor> anchor =
                        trace.getStartPoint().tryGetPad()) {
           Q_ASSERT(pastedDevices.contains(anchor->device));
           BI_Device* device =
@@ -234,12 +234,12 @@ bool CmdPasteBoardItems::performExecute() {
           start = device ? device->getPad(anchor->pad) : nullptr;
         }
         BI_NetLineAnchor* end = nullptr;
-        if (tl::optional<Uuid> anchor = trace.getEndPoint().tryGetJunction()) {
+        if (std::optional<Uuid> anchor = trace.getEndPoint().tryGetJunction()) {
           end = netPointMap[*anchor];
-        } else if (tl::optional<Uuid> anchor =
+        } else if (std::optional<Uuid> anchor =
                        trace.getEndPoint().tryGetVia()) {
           end = viaMap[*anchor];
-        } else if (tl::optional<TraceAnchor::PadAnchor> anchor =
+        } else if (std::optional<TraceAnchor::PadAnchor> anchor =
                        trace.getEndPoint().tryGetPad()) {
           Q_ASSERT(pastedDevices.contains(anchor->device));
           BI_Device* device =

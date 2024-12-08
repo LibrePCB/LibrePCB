@@ -71,7 +71,7 @@ EagleLibraryImportWizardPage_SetOptions::
           });
   connect(mUi->btnResetComponentCategory, &QToolButton::clicked, this,
           [this]() {
-            mContext->setComponentCategory(tl::nullopt);
+            mContext->setComponentCategory(std::nullopt);
             updateComponentCategoryTreeLabel();
           });
   connect(mUi->btnChoosePackageCategory, &QToolButton::clicked, this, [this]() {
@@ -83,7 +83,7 @@ EagleLibraryImportWizardPage_SetOptions::
     }
   });
   connect(mUi->btnResetPackageCategory, &QToolButton::clicked, this, [this]() {
-    mContext->setPackageCategory(tl::nullopt);
+    mContext->setPackageCategory(std::nullopt);
     updatePackageCategoryTreeLabel();
   });
 }

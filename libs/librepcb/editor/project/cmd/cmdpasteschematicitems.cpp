@@ -242,7 +242,7 @@ bool CmdPasteSchematicItems::performExecute() {
     execNewChildCmd(cmdAddNetSignal);
     NetSignal* netSignal = cmdAddNetSignal->getNetSignal();
     Q_ASSERT(netSignal);
-    tl::optional<CircuitIdentifier> forcedNetName;
+    std::optional<CircuitIdentifier> forcedNetName;
 
     // Add new segment
     SI_NetSegment* copy =
@@ -260,10 +260,10 @@ bool CmdPasteSchematicItems::performExecute() {
     }
     for (const NetLine& nl : seg.lines) {
       SI_NetLineAnchor* start = nullptr;
-      if (tl::optional<Uuid> anchor = nl.getStartPoint().tryGetJunction()) {
+      if (std::optional<Uuid> anchor = nl.getStartPoint().tryGetJunction()) {
         start = netPointMap[*anchor];
         Q_ASSERT(start);
-      } else if (tl::optional<NetLineAnchor::PinAnchor> anchor =
+      } else if (std::optional<NetLineAnchor::PinAnchor> anchor =
                      nl.getStartPoint().tryGetPin()) {
         SI_Symbol* symbol = mSchematic.getSymbols().value(
             symbolMap.value(anchor->symbol, Uuid::createRandom()));
@@ -282,10 +282,10 @@ bool CmdPasteSchematicItems::performExecute() {
         throw LogicError(__FILE__, __LINE__);
       }
       SI_NetLineAnchor* end = nullptr;
-      if (tl::optional<Uuid> anchor = nl.getEndPoint().tryGetJunction()) {
+      if (std::optional<Uuid> anchor = nl.getEndPoint().tryGetJunction()) {
         end = netPointMap[*anchor];
         Q_ASSERT(end);
-      } else if (tl::optional<NetLineAnchor::PinAnchor> anchor =
+      } else if (std::optional<NetLineAnchor::PinAnchor> anchor =
                      nl.getEndPoint().tryGetPin()) {
         SI_Symbol* symbol = mSchematic.getSymbols().value(
             symbolMap.value(anchor->symbol, Uuid::createRandom()));

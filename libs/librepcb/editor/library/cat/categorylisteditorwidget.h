@@ -90,14 +90,14 @@ signals:
 private:  // Methods
   void btnAddClicked() noexcept;
   void btnRemoveClicked() noexcept;
-  void addItem(const tl::optional<Uuid>& category) noexcept;
-  void addItem(const tl::optional<Uuid>& category,
+  void addItem(const std::optional<Uuid>& category) noexcept;
+  void addItem(const std::optional<Uuid>& category,
                const QStringList& lines) noexcept;
-  void addItem(const tl::optional<Uuid>& category,
+  void addItem(const std::optional<Uuid>& category,
                const QString& text) noexcept;
   void updateColor() noexcept;
-  QStringList buildTree(const tl::optional<Uuid>& category) const;
-  tl::optional<Uuid> chooseCategoryWithDialog() noexcept;
+  QStringList buildTree(const std::optional<Uuid>& category) const;
+  std::optional<Uuid> chooseCategoryWithDialog() noexcept;
 
 private:  // Data
   const Workspace& mWorkspace;

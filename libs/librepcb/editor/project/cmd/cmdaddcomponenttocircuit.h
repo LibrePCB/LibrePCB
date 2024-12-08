@@ -57,7 +57,7 @@ public:
   CmdAddComponentToCircuit(
       Workspace& workspace, Project& project, const Uuid& component,
       const Uuid& symbolVariant,
-      const tl::optional<ComponentAssemblyOptionList>& options) noexcept;
+      const std::optional<ComponentAssemblyOptionList>& options) noexcept;
   ~CmdAddComponentToCircuit() noexcept;
 
   // Getters
@@ -76,7 +76,7 @@ private:
   Project& mProject;
   Uuid mComponentUuid;
   Uuid mSymbVarUuid;
-  tl::optional<ComponentAssemblyOptionList> mAssemblyOptions;
+  std::optional<ComponentAssemblyOptionList> mAssemblyOptions;
 
   // child commands
   CmdComponentInstanceAdd* mCmdAddToCircuit;

@@ -170,7 +170,7 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
   foreach (const BI_Device* device, board.getDeviceInstances()) {
     const Transform transform(*device);
     foreach (const BI_FootprintPad* pad, device->getPads()) {
-      tl::optional<Uuid> netSignalUuid;
+      std::optional<Uuid> netSignalUuid;
       if (const NetSignal* netSignal = pad->getCompSigInstNetSignal()) {
         netSignalUuid = netSignal->getUuid();
       }
@@ -182,7 +182,7 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
       const Layer& layer = transform.map(polygon.getLayer());
       if (layers.contains(&layer)) {
         data->polygons.append(
-            PolygonData{transform, &layer, tl::nullopt, polygon.getPath(),
+            PolygonData{transform, &layer, std::nullopt, polygon.getPath(),
                         polygon.getLineWidth(), polygon.isFilled()});
       }
     }
@@ -190,7 +190,7 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
       const Layer& layer = transform.map(circle.getLayer());
       if (layers.contains(&layer)) {
         data->polygons.append(PolygonData{
-            transform, &layer, tl::nullopt,
+            transform, &layer, std::nullopt,
             Path::circle(circle.getDiameter()).translated(circle.getCenter()),
             circle.getLineWidth(), circle.isFilled()});
       }
@@ -210,7 +210,7 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
         foreach (const Path& path, text->getPaths()) {
           data->polygons.append(PolygonData{
               Transform(text->getData()), &text->getData().getLayer(),
-              tl::nullopt, path, text->getData().getStrokeWidth(), false});
+              std::nullopt, path, text->getData().getStrokeWidth(), false});
         }
       }
     }
@@ -220,8 +220,8 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
       data->planes.append(
           PlaneData{plane->getUuid(), &plane->getLayer(),
                     plane->getNetSignal()
-                        ? tl::make_optional(plane->getNetSignal()->getUuid())
-                        : tl::nullopt,
+                        ? std::make_optional(plane->getNetSignal()->getUuid())
+                        : std::nullopt,
                     plane->getOutline(), plane->getMinWidth(),
                     plane->getMinClearance(), plane->getKeepIslands(),
                     plane->getPriority(), plane->getConnectStyle(),
@@ -238,7 +238,7 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
   foreach (const BI_Polygon* polygon, board.getPolygons()) {
     if (layers.contains(&polygon->getData().getLayer())) {
       data->polygons.append(PolygonData{
-          Transform(), &polygon->getData().getLayer(), tl::nullopt,
+          Transform(), &polygon->getData().getLayer(), std::nullopt,
           polygon->getData().getPath(), polygon->getData().getLineWidth(),
           polygon->getData().isFilled()});
     }
@@ -248,7 +248,7 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
       foreach (const Path& path, text->getPaths()) {
         data->polygons.append(PolygonData{
             Transform(text->getData()), &text->getData().getLayer(),
-            tl::nullopt, path, text->getData().getStrokeWidth(), false});
+            std::nullopt, path, text->getData().getStrokeWidth(), false});
       }
     }
   }
@@ -257,7 +257,7 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
         Transform(), hole->getData().getDiameter(), hole->getData().getPath()));
   }
   foreach (const BI_NetSegment* segment, board.getNetSegments()) {
-    tl::optional<Uuid> netSignalUuid;
+    std::optional<Uuid> netSignalUuid;
     if (const NetSignal* netSignal = segment->getNetSignal()) {
       netSignalUuid = netSignal->getUuid();
     }
@@ -704,7 +704,7 @@ BoardPlaneFragmentsBuilder::LayerJobResult BoardPlaneFragmentsBuilder::runLayer(
             "Thermal pads inconsistency, please open a bug report.");
       }
       auto isUnconnectedSpoke = [&](const ClipperLib::Path& fragment) {
-        tl::optional<std::size_t> padIndex;
+        std::optional<std::size_t> padIndex;
         for (std::size_t i = 0; i < thermalPadAreas.size(); ++i) {
           if (ClipperHelpers::anyPointsInside(fragment,
                                               thermalPadAreas.at(i))) {

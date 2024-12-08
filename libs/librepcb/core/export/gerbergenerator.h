@@ -80,13 +80,13 @@ public:
   void setLayerPolarity(Polarity p) noexcept;
   void drawLine(const Point& start, const Point& end,
                 const UnsignedLength& width, Function function,
-                const tl::optional<QString>& net,
+                const std::optional<QString>& net,
                 const QString& component) noexcept;
   void drawPathOutline(const Path& path, const UnsignedLength& lineWidth,
-                       Function function, const tl::optional<QString>& net,
+                       Function function, const std::optional<QString>& net,
                        const QString& component) noexcept;
   void drawPathArea(const Path& path, Function function,
-                    const tl::optional<QString>& net,
+                    const std::optional<QString>& net,
                     const QString& component) noexcept;
   void drawComponentOutline(const Path& path, const Angle& rot,
                             const QString& designator, const QString& value,
@@ -94,27 +94,27 @@ public:
                             const QString& mpn, const QString& footprintName,
                             Function function) noexcept;
   void flashCircle(const Point& pos, const PositiveLength& dia,
-                   Function function, const tl::optional<QString>& net,
+                   Function function, const std::optional<QString>& net,
                    const QString& component, const QString& pin,
                    const QString& signal) noexcept;
   void flashRect(const Point& pos, const PositiveLength& w,
                  const PositiveLength& h, const UnsignedLength& radius,
                  const Angle& rot, Function function,
-                 const tl::optional<QString>& net, const QString& component,
+                 const std::optional<QString>& net, const QString& component,
                  const QString& pin, const QString& signal) noexcept;
   void flashObround(const Point& pos, const PositiveLength& w,
                     const PositiveLength& h, const Angle& rot,
-                    Function function, const tl::optional<QString>& net,
+                    Function function, const std::optional<QString>& net,
                     const QString& component, const QString& pin,
                     const QString& signal) noexcept;
   void flashOctagon(const Point& pos, const PositiveLength& w,
                     const PositiveLength& h, const UnsignedLength& radius,
                     const Angle& rot, Function function,
-                    const tl::optional<QString>& net, const QString& component,
+                    const std::optional<QString>& net, const QString& component,
                     const QString& pin, const QString& signal) noexcept;
   void flashOutline(const Point& pos, const StraightAreaPath& path,
                     const Angle& rot, Function function,
-                    const tl::optional<QString>& net, const QString& component,
+                    const std::optional<QString>& net, const QString& component,
                     const QString& pin, const QString& signal) noexcept;
   void flashComponent(const Point& pos, const Angle& rot,
                       const QString& designator, const QString& value,
@@ -138,13 +138,13 @@ public:
 private:
   // Private Methods
   void setCurrentAttributes(
-      Function apertureFunction, const tl::optional<QString>& netName,
+      Function apertureFunction, const std::optional<QString>& netName,
       const QString& componentDesignator, const QString& pinName,
       const QString& pinSignal, const QString& componentValue,
-      const tl::optional<MountType>& componentMountType,
+      const std::optional<MountType>& componentMountType,
       const QString& componentManufacturer, const QString& componentMpn,
       const QString& componentFootprint,
-      const tl::optional<Angle>& componentRotation) noexcept;
+      const std::optional<Angle>& componentRotation) noexcept;
   void setCurrentAperture(int number) noexcept;
   void setRegionModeOn() noexcept;
   void setRegionModeOff() noexcept;

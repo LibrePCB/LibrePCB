@@ -49,7 +49,7 @@ LibraryCategory::LibraryCategory(
     std::unique_ptr<TransactionalDirectory> directory, const SExpression& root)
   : LibraryBaseElement(shortElementName, longElementName, true,
                        std::move(directory), root),
-    mParentUuid(deserialize<tl::optional<Uuid>>(root.getChild("parent/@0"))) {
+    mParentUuid(deserialize<std::optional<Uuid>>(root.getChild("parent/@0"))) {
 }
 
 LibraryCategory::~LibraryCategory() noexcept {

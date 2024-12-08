@@ -80,7 +80,7 @@ BoardEditorState_AddVia::BoardEditorState_AddVia(
                        MaskConfig::off()  // Exposure
                        ),
     mUseAutoNetSignal(true),
-    mCurrentNetSignal(tl::nullopt),
+    mCurrentNetSignal(std::nullopt),
     mClosestNetSignalIsUpToDate(false),
     mCurrentViaToPlace(nullptr) {
 }
@@ -297,7 +297,7 @@ bool BoardEditorState_AddVia::fixPosition(const Point& pos) noexcept {
     QList<BI_NetLine*> otherNetLines;
     foreach (auto item,
              findItemsAtPos(pos, FindFlag::NetPoints | FindFlag::NetLines,
-                            tl::nullopt, {netsignal})) {
+                            nullptr, {netsignal})) {
       if (auto netPoint = std::dynamic_pointer_cast<BGI_NetPoint>(item)) {
         otherNetPoints.append(&netPoint->getNetPoint());
       } else if (auto netLine = std::dynamic_pointer_cast<BGI_NetLine>(item)) {
@@ -338,9 +338,8 @@ bool BoardEditorState_AddVia::fixPosition(const Point& pos) noexcept {
     }
 
     // Replace all NetPoints at the given position with the newly added Via
-    foreach (
-        auto item,
-        findItemsAtPos(pos, FindFlag::NetPoints, tl::nullopt, {netsignal})) {
+    foreach (auto item,
+             findItemsAtPos(pos, FindFlag::NetPoints, nullptr, {netsignal})) {
       if (auto netPoint = std::dynamic_pointer_cast<BGI_NetPoint>(item)) {
         if (&netPoint->getNetPoint().getNetSegment() ==
             &mCurrentViaToPlace->getNetSegment()) {
@@ -452,11 +451,11 @@ void BoardEditorState_AddVia::updateClosestNetSignal(
   // Otherwise the last candidate is returned.
   if (!mClosestNetSignalIsUpToDate) {
     const NetSignal* netsignal = getCurrentNetSignal();
-    std::shared_ptr<QGraphicsItem> item = findItemAtPos(
-        pos,
-        FindFlag::Vias | FindFlag::FootprintPads | FindFlag::NetLines |
-            FindFlag::AcceptNextGridMatch,
-        tl::nullopt, {}, {scene.getVias().value(mCurrentViaToPlace)});
+    std::shared_ptr<QGraphicsItem> item =
+        findItemAtPos(pos,
+                      FindFlag::Vias | FindFlag::FootprintPads |
+                          FindFlag::NetLines | FindFlag::AcceptNextGridMatch,
+                      nullptr, {}, {scene.getVias().value(mCurrentViaToPlace)});
     if (auto netline = std::dynamic_pointer_cast<BGI_NetLine>(item)) {
       netsignal = netline->getNetLine().getNetSegment().getNetSignal();
     } else if (auto pad = std::dynamic_pointer_cast<BGI_FootprintPad>(item)) {
@@ -469,7 +468,8 @@ void BoardEditorState_AddVia::updateClosestNetSignal(
       // like "GND" where you need many vias.
       netsignal = mContext.project.getCircuit().getNetSignalWithMostElements();
     }
-    mCurrentNetSignal = netsignal ? netsignal->getUuid() : tl::optional<Uuid>();
+    mCurrentNetSignal =
+        netsignal ? netsignal->getUuid() : std::optional<Uuid>();
     mClosestNetSignalIsUpToDate = true;
     QTimer* timer = new QTimer(this);
     connect(timer, &QTimer::timeout, [this, timer]() {

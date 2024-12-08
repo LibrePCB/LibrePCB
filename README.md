@@ -50,7 +50,7 @@ productive use, please install an official release as described in the
 
 To compile and run LibrePCB, you need the following software components:
 
-- Compiler: g++, MinGW or Clang (any version with C++17 support should work)
+- Compiler: g++, MinGW or Clang (any version with C++20 support should work)
 - [Qt](http://www.qt.io/download-open-source/) >= 6.2 (make
   sure the [imageformats](https://doc.qt.io/qt-6/qtimageformats-index.html)
   plugin is installed too as it will be needed at runtime!).

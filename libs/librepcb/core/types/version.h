@@ -25,7 +25,7 @@
  ******************************************************************************/
 #include <QtCore>
 
-#include <optional.hpp>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -53,7 +53,7 @@ namespace librepcb {
  *
  * @note This class guarantees that only Version objects representing a valid
  * version number can be created! If you need a nullable Version, use
- *       tl::optional<librepcb::Version> instead.
+ *       std::optional<librepcb::Version> instead.
  */
 class Version final {
   Q_DECLARE_TR_FUNCTIONS(Version)
@@ -200,9 +200,9 @@ public:
    * @param str           Input string
    *
    * @retval Version      The created Version object if str was valid
-   * @retval tl::nullopt  If str was not a valid version number
+   * @retval std::nullopt  If str was not a valid version number
    */
-  static tl::optional<Version> tryFromString(const QString& str) noexcept;
+  static std::optional<Version> tryFromString(const QString& str) noexcept;
 
 private:  // Methods
   explicit Version(const QVector<uint>& numbers) noexcept : mNumbers(numbers) {}

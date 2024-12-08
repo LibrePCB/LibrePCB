@@ -63,12 +63,12 @@ protected:
       gen.setLayerPolarity(GerberGenerator::Polarity::Positive);
 
       QVector<GerberApertureList::Function> functions = {
-          tl::nullopt,
-          tl::make_optional(GerberAttribute::ApertureFunction::Conductor),
+          std::nullopt,
+          std::make_optional(GerberAttribute::ApertureFunction::Conductor),
       };
-      QVector<tl::optional<QString>> nets = {tl::optional<QString>(),
-                                             tl::make_optional(QString()),
-                                             tl::make_optional(QString("Foo"))};
+      QVector<std::optional<QString>> nets = {
+          std::optional<QString>(), std::make_optional(QString()),
+          std::make_optional(QString("Foo"))};
       QStringList components = {"", "Bar"};
       QStringList pins = {"", "42"};
       QStringList pinSignals = {"", "ENABLE"};

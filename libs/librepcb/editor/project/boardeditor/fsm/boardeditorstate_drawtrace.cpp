@@ -81,7 +81,7 @@ BoardEditorState_DrawTrace::BoardEditorState_DrawTrace(
                           PositiveLength(300000),  // Default drill diameter
                           MaskConfig::off()  // Exposure
                           ),
-    mViaLayer(tl::nullopt),
+    mViaLayer(nullptr),
     mTargetPos(),
     mCursorPos(),
     mCurrentWidth(500000),
@@ -559,7 +559,7 @@ bool BoardEditorState_DrawTrace::addNextNetPoint(
     QList<BI_NetLineAnchor*> otherAnchors = {};
     const QList<std::shared_ptr<QGraphicsItem>> items = findItemsAtPos(
         mTargetPos, FindFlag::Vias | FindFlag::NetPoints | FindFlag::NetLines,
-        mAddVia ? tl::nullopt : tl::optional<const Layer&>(layer), {netsignal},
+        mAddVia ? nullptr : &layer, {netsignal},
         {
             scene.getNetPoints().value(mPositioningNetPoint1),
             scene.getNetPoints().value(mPositioningNetPoint2),
@@ -569,26 +569,26 @@ bool BoardEditorState_DrawTrace::addNextNetPoint(
 
     // Only the combination with 1 via can be handled correctly
     if (mTempVia && mViaLayer) {
-      mCurrentLayer = &*mViaLayer;
+      mCurrentLayer = mViaLayer;
     } else {
       foreach (auto item, items) {
         if (auto via = std::dynamic_pointer_cast<BGI_Via>(item)) {
           if (mCurrentSnapActive || mTargetPos == via->getVia().getPosition()) {
             otherAnchors.append(&via->getVia());
             if (mAddVia && mViaLayer) {
-              mCurrentLayer = &*mViaLayer;
+              mCurrentLayer = mViaLayer;
             }
           }
         }
       }
       if (auto pad = findItemAtPos<BGI_FootprintPad>(
               mTargetPos,
-              FindFlag::FootprintPads | FindFlag::AcceptNextGridMatch, layer,
+              FindFlag::FootprintPads | FindFlag::AcceptNextGridMatch, &layer,
               {netsignal})) {
         if (mCurrentSnapActive || mTargetPos == pad->getPad().getPosition()) {
           otherAnchors.append(&pad->getPad());
           if (mAddVia && mViaLayer && pad->getPad().getLibPad().isTht()) {
-            mCurrentLayer = &*mViaLayer;
+            mCurrentLayer = mViaLayer;
           }
         }
       }
@@ -690,7 +690,7 @@ bool BoardEditorState_DrawTrace::addNextNetPoint(
         // connected
         Q_ASSERT(mAddVia);
         foreach (auto item,
-                 findItemsAtPos(mTargetPos, FindFlag::NetPoints, tl::nullopt,
+                 findItemsAtPos(mTargetPos, FindFlag::NetPoints, nullptr,
                                 {netsignal})) {
           if (auto netPoint = std::dynamic_pointer_cast<BGI_NetPoint>(item)) {
             combineAnchors(*mTempVia, netPoint->getNetPoint());
@@ -770,7 +770,7 @@ void BoardEditorState_DrawTrace::updateNetpointPositions() noexcept {
         mCursorPos,
         FindFlag::Vias | FindFlag::NetPoints | FindFlag::NetLines |
             FindFlag::FootprintPads | FindFlag::AcceptNextGridMatch,
-        layer, {netsignal},
+        &layer, {netsignal},
         {
             scene->getVias().value(mTempVia),
             scene->getNetPoints().value(mPositioningNetPoint1),
@@ -920,7 +920,7 @@ void BoardEditorState_DrawTrace::layerChanged(const Layer& layer) noexcept {
     } else {
       mAddVia = true;
       showVia(true);
-      mViaLayer = layer;
+      mViaLayer = &layer;
     }
   } else {
     mAddVia = false;

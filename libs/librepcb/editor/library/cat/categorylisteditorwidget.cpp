@@ -86,7 +86,7 @@ void CategoryListEditorWidget::setUuids(const QSet<Uuid>& uuids) noexcept {
  ******************************************************************************/
 
 void CategoryListEditorWidget::btnAddClicked() noexcept {
-  tl::optional<Uuid> uuid = chooseCategoryWithDialog();
+  std::optional<Uuid> uuid = chooseCategoryWithDialog();
   if (uuid && !mUuids.contains(*uuid)) {
     mUuids.insert(*uuid);
     addItem(*uuid);
@@ -97,9 +97,9 @@ void CategoryListEditorWidget::btnAddClicked() noexcept {
 
 void CategoryListEditorWidget::btnRemoveClicked() noexcept {
   QListWidgetItem* item = mUi->listWidget->currentItem();
-  tl::optional<Uuid> uuid = item
+  std::optional<Uuid> uuid = item
       ? Uuid::tryFromString(item->data(Qt::UserRole).toString())
-      : tl::nullopt;
+      : std::nullopt;
   if (item && uuid) {
     mUuids.remove(*uuid);
     delete item;
@@ -112,7 +112,7 @@ void CategoryListEditorWidget::btnRemoveClicked() noexcept {
 }
 
 void CategoryListEditorWidget::addItem(
-    const tl::optional<Uuid>& category) noexcept {
+    const std::optional<Uuid>& category) noexcept {
   try {
     addItem(category, buildTree(category));  // can throw
   } catch (const Exception& e) {
@@ -120,7 +120,7 @@ void CategoryListEditorWidget::addItem(
   }
 }
 
-void CategoryListEditorWidget::addItem(const tl::optional<Uuid>& category,
+void CategoryListEditorWidget::addItem(const std::optional<Uuid>& category,
                                        const QStringList& lines) noexcept {
   QString text;
   for (int i = 0; i < lines.count(); ++i) {
@@ -134,7 +134,7 @@ void CategoryListEditorWidget::addItem(const tl::optional<Uuid>& category,
   addItem(category, text);
 }
 
-void CategoryListEditorWidget::addItem(const tl::optional<Uuid>& category,
+void CategoryListEditorWidget::addItem(const std::optional<Uuid>& category,
                                        const QString& text) noexcept {
   QString uuidStr = category ? category->toStr() : QString();
   QListWidgetItem* item = new QListWidgetItem(text, mUi->listWidget);
@@ -152,7 +152,7 @@ void CategoryListEditorWidget::updateColor() noexcept {
 }
 
 QStringList CategoryListEditorWidget::buildTree(
-    const tl::optional<Uuid>& category) const {
+    const std::optional<Uuid>& category) const {
   if (mCategories == Categories::Package) {
     CategoryTreeBuilder<PackageCategory> builder(
         mWorkspace.getLibraryDb(),
@@ -166,7 +166,7 @@ QStringList CategoryListEditorWidget::buildTree(
   }
 }
 
-tl::optional<Uuid>
+std::optional<Uuid>
     CategoryListEditorWidget::chooseCategoryWithDialog() noexcept {
   CategoryChooserDialog dialog(mWorkspace,
                                (mCategories == Categories::Package)
@@ -176,7 +176,7 @@ tl::optional<Uuid>
   if (dialog.exec() == QDialog::Accepted) {
     return dialog.getSelectedCategoryUuid();
   } else {
-    return tl::nullopt;
+    return std::nullopt;
   }
 }
 

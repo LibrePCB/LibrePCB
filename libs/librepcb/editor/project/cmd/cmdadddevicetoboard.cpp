@@ -54,8 +54,8 @@ namespace editor {
 
 CmdAddDeviceToBoard::CmdAddDeviceToBoard(
     Workspace& workspace, Board& board, ComponentInstance& cmpInstance,
-    const Uuid& deviceUuid, const tl::optional<Uuid>& footprintUuid,
-    const tl::optional<Uuid>& preferredModelUuid, const Point& position,
+    const Uuid& deviceUuid, const std::optional<Uuid>& footprintUuid,
+    const std::optional<Uuid>& preferredModelUuid, const Point& position,
     const Angle& rotation, bool mirror) noexcept
   : UndoCommandGroup(tr("Add device to board")),
     mWorkspace(workspace),

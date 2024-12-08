@@ -41,12 +41,12 @@
 #include <librepcb/core/types/elementname.h>
 #include <librepcb/core/types/point.h>
 #include <librepcb/core/types/simplestring.h>
-#include <optional/tl/optional.hpp>
 #include <parseagle/common/enums.h>
 
 #include <QtCore>
 
 #include <memory>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -105,7 +105,7 @@ public:
     bool filled;
     bool grabArea;
     Path path;
-    tl::optional<std::pair<Point, PositiveLength>> circle;
+    std::optional<std::pair<Point, PositiveLength>> circle;
   };
 
   /**

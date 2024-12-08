@@ -31,7 +31,7 @@
 
 #include <QtCore>
 
-#include <optional.hpp>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -70,7 +70,7 @@ class GerberApertureList final {
 
 public:
   // Types
-  using Function = tl::optional<GerberAttribute::ApertureFunction>;
+  using Function = std::optional<GerberAttribute::ApertureFunction>;
 
   // Constructors / Destructor
   GerberApertureList() noexcept;

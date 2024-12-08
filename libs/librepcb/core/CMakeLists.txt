@@ -534,7 +534,6 @@ target_link_libraries(
 target_link_libraries(
   librepcb_core
   PUBLIC # Third party
-         Optional::Optional
          Polyclipping::Polyclipping
          TypeSafe::TypeSafe
          # Qt

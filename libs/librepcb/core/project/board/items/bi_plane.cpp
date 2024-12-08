@@ -216,7 +216,7 @@ void BI_Plane::serialize(SExpression& root) const {
   root.ensureLineBreak();
   root.appendChild(
       "net",
-      mNetSignal ? tl::make_optional(mNetSignal->getUuid()) : tl::nullopt);
+      mNetSignal ? std::make_optional(mNetSignal->getUuid()) : std::nullopt);
   root.appendChild("priority", mPriority);
   root.ensureLineBreak();
   root.appendChild("min_width", mMinWidth);

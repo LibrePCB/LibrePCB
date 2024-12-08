@@ -59,7 +59,7 @@ public:
 
   // General Methods
   void addCopper(const Data& data, const Layer& layer,
-                 const QSet<tl::optional<Uuid>>& netsignals,
+                 const QSet<std::optional<Uuid>>& netsignals,
                  bool ignorePlanes = false);
   void addStopMaskOpenings(const Data& data, const Layer& layer,
                            const Length& offset = Length(0));

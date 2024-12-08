@@ -25,9 +25,9 @@
  ******************************************************************************/
 #include "../geometry/path.h"
 
-#include <optional/tl/optional.hpp>
-
 #include <QtCore>
+
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -140,9 +140,9 @@ private:
                            const Result& prefix = Result(),
                            bool* timedOut = nullptr) noexcept;
 
-  static tl::optional<Result> join(const QVector<Path>& paths,
-                                   const Result& prefix, int index,
-                                   bool reverse) noexcept;
+  static std::optional<Result> join(const QVector<Path>& paths,
+                                    const Result& prefix, int index,
+                                    bool reverse) noexcept;
 };
 
 /*******************************************************************************

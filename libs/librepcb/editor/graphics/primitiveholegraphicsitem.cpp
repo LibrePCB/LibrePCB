@@ -90,7 +90,7 @@ PrimitiveHoleGraphicsItem::~PrimitiveHoleGraphicsItem() noexcept {
 
 void PrimitiveHoleGraphicsItem::setHole(
     const NonEmptyPath& path, const PositiveLength& diameter,
-    const tl::optional<Length>& stopMaskOffset) noexcept {
+    const std::optional<Length>& stopMaskOffset) noexcept {
   // Update hole outline.
   mHoleGraphicsItem->setPath(
       Path::toQPainterPathPx(path->toOutlineStrokes(diameter), false));

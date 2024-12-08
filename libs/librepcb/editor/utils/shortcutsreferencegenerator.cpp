@@ -224,7 +224,8 @@ int ShortcutsReferenceGenerator::drawText(QPdfWriter& writer, QPainter& painter,
   painter.setPen(QPen(Qt::black, 0));
   QRect rect(mmToPx(writer, x), mmToPx(writer, y - size),
              mmToPx(writer, maxLength), mmToPx(writer, 2 * size));
-  int intFlags = Qt::TextSingleLine | Qt::AlignVCenter;
+  int intFlags = Qt::TextSingleLine;
+  intFlags |= Qt::AlignVCenter;
   if (flags.testFlag(Flag::AlignCenter)) {
     intFlags |= Qt::AlignHCenter;
   } else if (flags.testFlag(Flag::AlignRight)) {

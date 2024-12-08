@@ -114,9 +114,9 @@ void BI_Hole::removeFromBoard() {
  ******************************************************************************/
 
 void BI_Hole::updateStopMaskOffset() noexcept {
-  tl::optional<Length> offset;
+  std::optional<Length> offset;
   if (!mData.getStopMaskConfig().isEnabled()) {
-    offset = tl::nullopt;
+    offset = std::nullopt;
   } else if (auto manualOffset = mData.getStopMaskConfig().getOffset()) {
     offset = *manualOffset;
   } else {

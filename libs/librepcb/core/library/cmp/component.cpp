@@ -69,10 +69,10 @@ Component::~Component() noexcept {
 std::shared_ptr<ComponentSignal> Component::getSignalOfPin(const Uuid& symbVar,
                                                            const Uuid& item,
                                                            const Uuid& pin) {
-  tl::optional<Uuid> sig = getSymbVarItem(symbVar, item)
-                               ->getPinSignalMap()
-                               .get(pin)
-                               ->getSignalUuid();  // can throw
+  std::optional<Uuid> sig = getSymbVarItem(symbVar, item)
+                                ->getPinSignalMap()
+                                .get(pin)
+                                ->getSignalUuid();  // can throw
   if (sig) {
     return mSignals.get(*sig);  // can throw
   } else {
@@ -82,10 +82,10 @@ std::shared_ptr<ComponentSignal> Component::getSignalOfPin(const Uuid& symbVar,
 
 std::shared_ptr<const ComponentSignal> Component::getSignalOfPin(
     const Uuid& symbVar, const Uuid& item, const Uuid& pin) const {
-  tl::optional<Uuid> sig = getSymbVarItem(symbVar, item)
-                               ->getPinSignalMap()
-                               .get(pin)
-                               ->getSignalUuid();  // can throw
+  std::optional<Uuid> sig = getSymbVarItem(symbVar, item)
+                                ->getPinSignalMap()
+                                .get(pin)
+                                ->getSignalUuid();  // can throw
   if (sig) {
     return mSignals.get(*sig);  // can throw
   } else {

@@ -70,7 +70,7 @@ BoardDesignRuleCheckData::BoardDesignRuleCheckData(
     const NetSignal* net = ns->getNetSignal();
     Segment nsd{
         ns->getUuid(),
-        net ? net->getUuid() : tl::optional<Uuid>(),
+        net ? net->getUuid() : std::optional<Uuid>(),
         net ? *net->getName() : QString(),
         {},
         {},
@@ -101,7 +101,7 @@ BoardDesignRuleCheckData::BoardDesignRuleCheckData(
     const NetSignal* net = plane->getNetSignal();
     planes.append(Plane{
         plane->getUuid(),
-        net ? tl::make_optional(net->getUuid()) : tl::optional<Uuid>(),
+        net ? std::make_optional(net->getUuid()) : std::optional<Uuid>(),
         net ? *net->getName() : QString(), &plane->getLayer(),
         plane->getMinWidth(), plane->getOutline(), plane->getFragments()});
   }
@@ -159,12 +159,12 @@ BoardDesignRuleCheckData::BoardDesignRuleCheckData(
           pad->getGeometries(),
           layersWithTraces,
           pad->getLibPad().getCopperClearance(),
-          net ? tl::make_optional(net->getUuid()) : tl::optional<Uuid>(),
+          net ? std::make_optional(net->getUuid()) : std::optional<Uuid>(),
           net ? *net->getName() : QString(),
       };
       for (const PadHole& hole : pad->getLibPad().getHoles()) {
         pd.holes.append(Hole{hole.getUuid(), hole.getDiameter(), hole.getPath(),
-                             tl::optional<Length>()});
+                             std::optional<Length>()});
       }
       dd.pads.insert(pad->getLibPadUuid(), pd);
     }

@@ -66,7 +66,7 @@ bool PartInformationDelegate::Data::getColors(QBrush& background, QPen& outline,
                                               QPen& text) const noexcept {
   if (info && (info->results == 1)) {
     const QString sts = info->status.toLower();
-    const tl::optional<int> av = info->availability;
+    const std::optional<int> av = info->availability;
     if (sts == "preview") {
       // Ignore availability in this case since preview state somehow indicates
       // the part might not be available *yet*, which users probably expect.

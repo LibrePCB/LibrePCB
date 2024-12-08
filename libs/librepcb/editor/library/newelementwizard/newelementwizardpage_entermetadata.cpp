@@ -127,7 +127,7 @@ void NewElementWizardPage_EnterMetadata::edtVersionTextChanged(
 }
 
 void NewElementWizardPage_EnterMetadata::btnChooseCategoryClicked() noexcept {
-  tl::optional<Uuid> categoryUuid;
+  std::optional<Uuid> categoryUuid;
   switch (mContext.mElementType) {
     case NewElementWizardContext::ElementType::ComponentCategory:
     case NewElementWizardContext::ElementType::Symbol:
@@ -168,7 +168,7 @@ void NewElementWizardPage_EnterMetadata::btnResetCategoryClicked() noexcept {
 }
 
 void NewElementWizardPage_EnterMetadata::updateCategoryTreeLabel() noexcept {
-  tl::optional<Uuid> rootCategoryUuid = tl::nullopt;
+  std::optional<Uuid> rootCategoryUuid = std::nullopt;
   if (mContext.mElementCategoryUuids.count()) {
     rootCategoryUuid = mContext.mElementCategoryUuids.values().first();
   }

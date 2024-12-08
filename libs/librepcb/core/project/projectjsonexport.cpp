@@ -66,7 +66,7 @@ QJsonValue ProjectJsonExport::toJson(const Length& obj) const {
   return QJsonValue(obj.toMm());
 }
 
-QJsonValue ProjectJsonExport::toJson(const tl::optional<Length>& obj) const {
+QJsonValue ProjectJsonExport::toJson(const std::optional<Length>& obj) const {
   return obj ? QJsonValue(obj->toMm()) : QJsonValue(QJsonValue::Null);
 }
 
@@ -165,9 +165,9 @@ QJsonObject ProjectJsonExport::toJson(const Board& obj) const {
   foreach (const BI_Plane* plane, obj.getPlanes()) {
     copperWidths.insert(*plane->getMinWidth());
   }
-  const tl::optional<Length> minCopperWidth = copperWidths.isEmpty()
-      ? tl::nullopt
-      : tl::make_optional(
+  const std::optional<Length> minCopperWidth = copperWidths.isEmpty()
+      ? std::nullopt
+      : std::make_optional(
             *std::min_element(copperWidths.begin(), copperWidths.end()));
 
   QJsonObject json;

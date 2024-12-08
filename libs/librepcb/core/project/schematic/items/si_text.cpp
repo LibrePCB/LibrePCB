@@ -128,8 +128,8 @@ void SI_Text::updateText() noexcept {
       QPointer<const BI_Device> device =
           mSymbol->getComponentInstance().getPrimaryDevice();
       std::shared_ptr<const Part> part = device
-          ? device->getParts(tl::nullopt).value(0)
-          : mSymbol->getComponentInstance().getParts(tl::nullopt).value(0);
+          ? device->getParts(std::nullopt).value(0)
+          : mSymbol->getComponentInstance().getParts(std::nullopt).value(0);
       return ProjectAttributeLookup(*mSymbol, device, part, nullptr);
     } else {
       return ProjectAttributeLookup(mSchematic, nullptr);

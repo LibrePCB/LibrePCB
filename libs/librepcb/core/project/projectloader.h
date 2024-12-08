@@ -25,11 +25,10 @@
  ******************************************************************************/
 #include "../serialization/fileformatmigration.h"
 
-#include <optional/tl/optional.hpp>
-
 #include <QtCore>
 
 #include <memory>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -68,7 +67,7 @@ public:
   std::unique_ptr<Project> open(
       std::unique_ptr<TransactionalDirectory> directory,
       const QString& filename);
-  const tl::optional<QList<FileFormatMigration::Message>>& getUpgradeMessages()
+  const std::optional<QList<FileFormatMigration::Message>>& getUpgradeMessages()
       const noexcept {
     return mUpgradeMessages;
   }
@@ -100,7 +99,7 @@ private:  // Methods
 
 private:  // Data
   bool mAutoAssignDeviceModels;
-  tl::optional<QList<FileFormatMigration::Message>> mUpgradeMessages;
+  std::optional<QList<FileFormatMigration::Message>> mUpgradeMessages;
 };
 
 /*******************************************************************************

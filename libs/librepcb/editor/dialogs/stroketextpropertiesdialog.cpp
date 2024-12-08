@@ -135,7 +135,7 @@ void StrokeTextPropertiesDialog::load(const T& obj,
   mUi->alignmentSelector->setAlignment(obj.getAlign());
   mUi->edtHeight->setValue(obj.getHeight());
   mUi->edtStrokeWidth->setValue(obj.getStrokeWidth());
-  if (const tl::optional<Ratio>& ratio = obj.getLetterSpacing().getRatio()) {
+  if (const std::optional<Ratio>& ratio = obj.getLetterSpacing().getRatio()) {
     mUi->cbxLetterSpacingAuto->setChecked(false);
     mUi->edtLetterSpacingRatio->setEnabled(true);
     mUi->edtLetterSpacingRatio->setValue(*ratio);
@@ -144,7 +144,7 @@ void StrokeTextPropertiesDialog::load(const T& obj,
     mUi->edtLetterSpacingRatio->setEnabled(false);
     mUi->edtLetterSpacingRatio->setValue(font.getLetterSpacing());
   }
-  if (const tl::optional<Ratio>& ratio = obj.getLineSpacing().getRatio()) {
+  if (const std::optional<Ratio>& ratio = obj.getLineSpacing().getRatio()) {
     mUi->cbxLineSpacingAuto->setChecked(false);
     mUi->edtLineSpacingRatio->setEnabled(true);
     mUi->edtLineSpacingRatio->setValue(*ratio);

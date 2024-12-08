@@ -204,13 +204,13 @@ void GraphicsView::setSceneRectMarker(const QRectF& rect) noexcept {
 }
 
 void GraphicsView::setSceneCursor(
-    const tl::optional<std::pair<Point, CursorOptions>>& cursor) noexcept {
+    const std::optional<std::pair<Point, CursorOptions>>& cursor) noexcept {
   mSceneCursor = cursor;
   setForegroundBrush(foregroundBrush());  // this will repaint the foreground
 }
 
 void GraphicsView::setRulerPositions(
-    const tl::optional<std::pair<Point, Point>>& pos) noexcept {
+    const std::optional<std::pair<Point, Point>>& pos) noexcept {
   mRulerPositions = pos;
   setForegroundBrush(foregroundBrush());  // this will repaint the foreground
 }
