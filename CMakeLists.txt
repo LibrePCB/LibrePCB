@@ -163,10 +163,12 @@ if(BUILD_TESTS)
 endif()
 
 # Add libs
+add_subdirectory(libs/corrosion)
 add_subdirectory(libs/librepcb/core)
 add_subdirectory(libs/librepcb/editor)
 add_subdirectory(libs/librepcb/eagleimport)
 add_subdirectory(libs/librepcb/kicadimport)
+add_subdirectory(libs/librepcb/rust-core)
 add_subdirectory(libs/parseagle)
 
 # Add apps
