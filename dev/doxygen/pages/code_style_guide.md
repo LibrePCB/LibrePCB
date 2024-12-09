@@ -30,9 +30,7 @@ This page describes the code style guide for LibrePCB developers.
 
 # General {#doc_code_style_guide_general}
 
-- Qt >= 5.12
-- C++11
-- Use strongly typed enums (`enum class`, C++11) whenever reasonable
+- Use strongly typed enums (`enum class`, since C++11) whenever reasonable
 - Use `nullptr` instead of `NULL` or `0`
 - Use keywords like `const`, `constexpr`, `final`, `override`, ... whenever
   possible
@@ -40,9 +38,9 @@ This page describes the code style guide for LibrePCB developers.
 
       void foo() noexcept;    // this method never throws exceptions
 
-- Use smart pointers `QScopedPointer`, `std::unique_ptr` or `std::shared_ptr`
-  for object ownership (instead of raw pointers). But don't use
-  `QSharedPointer`!
+- Use smart pointers `std::unique_ptr` or `std::shared_ptr` for object
+  ownership (instead of raw pointers). But never use `QSharedPointer`
+  and try to avoid `QScopedPointer` for new code.
 
 
 # Header Files {#doc_code_style_guide_header_files}
