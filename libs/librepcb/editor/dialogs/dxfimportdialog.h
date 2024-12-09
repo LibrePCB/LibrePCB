@@ -30,7 +30,7 @@
 #include <QtCore>
 #include <QtWidgets>
 
-#include <optional.hpp>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -71,7 +71,7 @@ public:
   const Layer& getLayer() const noexcept;
   UnsignedLength getLineWidth() const noexcept;
   qreal getScaleFactor() const noexcept;
-  tl::optional<Point> getPlacementPosition() const noexcept;
+  std::optional<Point> getPlacementPosition() const noexcept;
   bool getJoinTangentPolylines() const noexcept;
   bool getImportCirclesAsDrills() const noexcept;
 

@@ -28,12 +28,11 @@
 #include "../workspace/theme.h"
 #include "outputjob.h"
 
-#include <optional/tl/optional.hpp>
-
 #include <QtCore>
 #include <QtGui>
 
 #include <memory>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -51,8 +50,8 @@ class GraphicsOutputJob final : public OutputJob {
   Q_DECLARE_TR_FUNCTIONS(GraphicsOutputJob)
 
 public:
-  using BoardSet = ObjectSet<tl::optional<Uuid>>;
-  using AssemblyVariantSet = ObjectSet<tl::optional<Uuid>>;
+  using BoardSet = ObjectSet<std::optional<Uuid>>;
+  using AssemblyVariantSet = ObjectSet<std::optional<Uuid>>;
 
   struct Content {
     // Types
@@ -72,7 +71,7 @@ public:
     // Common options.
     Type type;
     QString title;
-    tl::optional<QString> pageSizeKey;  // nullopt = auto
+    std::optional<QString> pageSizeKey;  // nullopt = auto
     GraphicsExportSettings::Orientation orientation;
     UnsignedLength marginLeft;
     UnsignedLength marginTop;
@@ -80,7 +79,7 @@ public:
     UnsignedLength marginBottom;
     bool rotate;
     bool mirror;
-    tl::optional<UnsignedRatio> scale;
+    std::optional<UnsignedRatio> scale;
     uint pixmapDpi;
     bool monochrome;
     QColor backgroundColor;
@@ -97,7 +96,7 @@ public:
     Content(Preset preset) noexcept
       : type(Type::Schematic),
         title(),
-        pageSizeKey(tl::nullopt),
+        pageSizeKey(std::nullopt),
         orientation(GraphicsExportSettings::Orientation::Auto),
         marginLeft(10000000),  // 10mm
         marginTop(10000000),  // 10mm
@@ -105,21 +104,21 @@ public:
         marginBottom(10000000),  // 10mm
         rotate(false),
         mirror(false),
-        scale(tl::nullopt),  // Fit in page
+        scale(std::nullopt),  // Fit in page
         pixmapDpi(600),
         monochrome(false),
         backgroundColor(Qt::transparent),
         minLineWidth(100000),
         layers(),
-        boards(BoardSet::set({tl::nullopt})),
-        assemblyVariants(AssemblyVariantSet::set({tl::nullopt})),
+        boards(BoardSet::set({std::nullopt})),
+        assemblyVariants(AssemblyVariantSet::set({std::nullopt})),
         options() {
       QSet<QString> enabledLayers;
       if (preset == Preset::Schematic) {
         type = Type::Schematic;
         title = tr("Schematic");
-        boards = BoardSet::set({tl::nullopt});
-        assemblyVariants = AssemblyVariantSet::set({tl::nullopt});
+        boards = BoardSet::set({std::nullopt});
+        assemblyVariants = AssemblyVariantSet::set({std::nullopt});
         enabledLayers = {
             QString(Theme::Color::sSchematicFrames),
             QString(Theme::Color::sSchematicWires),
@@ -148,7 +147,7 @@ public:
           mirror = false;
         }
         boards = BoardSet::onlyDefault();
-        assemblyVariants = AssemblyVariantSet::set({tl::nullopt});
+        assemblyVariants = AssemblyVariantSet::set({std::nullopt});
         enabledLayers = {
             QString(Theme::Color::sBoardFrames),
             QString(Theme::Color::sBoardOutlines),

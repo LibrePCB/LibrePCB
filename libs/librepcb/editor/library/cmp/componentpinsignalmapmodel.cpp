@@ -129,8 +129,8 @@ void ComponentPinSignalMapModel::autoAssignSignals() noexcept {
               numbers[*pinName] = number;
             }
           }
-          tl::optional<Uuid> signalUuid =
-              signal ? tl::make_optional(signal->getUuid()) : tl::nullopt;
+          std::optional<Uuid> signalUuid =
+              signal ? std::make_optional(signal->getUuid()) : std::nullopt;
           std::unique_ptr<CmdComponentPinSignalMapItemEdit> cmd(
               new CmdComponentPinSignalMapItemEdit(map));
           cmd->setSignalUuid(signalUuid);
@@ -222,7 +222,7 @@ QVariant ComponentPinSignalMapModel::data(const QModelIndex& index,
       }
     }
     case COLUMN_SIGNAL: {
-      tl::optional<Uuid> uuid = mapItem->getSignalUuid();
+      std::optional<Uuid> uuid = mapItem->getSignalUuid();
       std::shared_ptr<const ComponentSignal> sig =
           uuid && mSignals ? mSignals->find(*uuid) : nullptr;
       switch (role) {

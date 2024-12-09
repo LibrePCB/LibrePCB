@@ -77,7 +77,7 @@ protected:
     QDir(mWsDir.toStr()).removeRecursively();
   }
 
-  std::string str(const tl::optional<Uuid>& uuid) {
+  std::string str(const std::optional<Uuid>& uuid) {
     return uuid ? uuid->toStr().toStdString() : "";
   }
 
@@ -139,32 +139,32 @@ TEST_F(AddComponentDialogTest, testChooseComponentDevice) {
   //     - cmp 2
   //       - dev 1
   int catId = mWriter->addCategory<ComponentCategory>(
-      0, toAbs("cat1"), uuid(1), version("0.1"), false, tl::nullopt);
+      0, toAbs("cat1"), uuid(1), version("0.1"), false, std::nullopt);
   mWriter->addTranslation<ComponentCategory>(catId, "", ElementName("cat 1"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   catId = mWriter->addCategory<ComponentCategory>(
       0, toAbs("cat2"), uuid(2), version("0.1"), false, uuid(1));
   mWriter->addTranslation<ComponentCategory>(catId, "", ElementName("cat 2"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   int cmpId = mWriter->addElement<Component>(0, toAbs("cmp1"), uuid(3),
                                              version("0.1"), false, QString());
   mWriter->addTranslation<Component>(cmpId, "", ElementName("cmp 1"),
-                                     tl::nullopt, tl::nullopt);
+                                     std::nullopt, std::nullopt);
   mWriter->addToCategory<Component>(cmpId, uuid(2));
   cmpId = mWriter->addElement<Component>(0, toAbs(uuid(4).toStr()), uuid(4),
                                          version("0.1"), false, QString());
   mWriter->addTranslation<Component>(cmpId, "", ElementName("cmp 2"),
-                                     tl::nullopt, tl::nullopt);
+                                     std::nullopt, std::nullopt);
   mWriter->addToCategory<Component>(cmpId, uuid(2));
   int pkgId = mWriter->addElement<Package>(0, toAbs(uuid(5).toStr()), uuid(5),
                                            version("0.1"), false, QString());
-  mWriter->addTranslation<Package>(pkgId, "", ElementName("pkg 1"), tl::nullopt,
-                                   tl::nullopt);
+  mWriter->addTranslation<Package>(pkgId, "", ElementName("pkg 1"),
+                                   std::nullopt, std::nullopt);
   int devId =
       mWriter->addDevice(0, toAbs(uuid(6).toStr()), uuid(6), version("0.1"),
                          false, QString(), uuid(4), uuid(5));
-  mWriter->addTranslation<Device>(devId, "", ElementName("dev 1"), tl::nullopt,
-                                  tl::nullopt);
+  mWriter->addTranslation<Device>(devId, "", ElementName("dev 1"), std::nullopt,
+                                  std::nullopt);
 
   // Create component
   TransactionalDirectory cmp2Dir(mFs, uuid(4).toStr());
@@ -250,13 +250,13 @@ TEST_F(AddComponentDialogTest, testSetNormOrder) {
   // - cat 1
   //   - cmp 1
   int catId = mWriter->addCategory<ComponentCategory>(
-      0, toAbs("cat1"), uuid(1), version("0.1"), false, tl::nullopt);
+      0, toAbs("cat1"), uuid(1), version("0.1"), false, std::nullopt);
   mWriter->addTranslation<ComponentCategory>(catId, "", ElementName("cat 1"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   int cmpId = mWriter->addElement<Component>(0, toAbs(uuid(3).toStr()), uuid(3),
                                              version("0.1"), false, QString());
   mWriter->addTranslation<Component>(cmpId, "", ElementName("cmp 1"),
-                                     tl::nullopt, tl::nullopt);
+                                     std::nullopt, std::nullopt);
   mWriter->addToCategory<Component>(cmpId, uuid(1));
 
   // Create component
@@ -302,11 +302,11 @@ TEST_F(AddComponentDialogTest, testSearch) {
   int cmpId = mWriter->addElement<Component>(0, toAbs("cmp1"), uuid(1),
                                              version("0.1"), false, QString());
   mWriter->addTranslation<Component>(cmpId, "", ElementName("cmp 1"),
-                                     tl::nullopt, "key 1");
+                                     std::nullopt, "key 1");
   cmpId = mWriter->addElement<Component>(0, toAbs("cmp2"), uuid(2),
                                          version("0.1"), false, QString());
   mWriter->addTranslation<Component>(cmpId, "", ElementName("cmp 2"),
-                                     tl::nullopt, tl::nullopt);
+                                     std::nullopt, std::nullopt);
 
   // Create dialog
   WorkspaceSettings settings;

@@ -234,7 +234,7 @@ void PackageCategoryEditorWidget::btnChooseParentCategoryClicked() noexcept {
 }
 
 void PackageCategoryEditorWidget::btnResetParentCategoryClicked() noexcept {
-  mParentUuid = tl::nullopt;
+  mParentUuid = std::nullopt;
   commitMetadata();
 }
 

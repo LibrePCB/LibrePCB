@@ -64,7 +64,7 @@ TEST(ScopeGuardTest, testScopeGuardPerformance) {
   volatile int setByGuard0 = 0;
   start = std::chrono::high_resolution_clock::now();
   for (int n = 0; n < 10000000; ++n) {
-    auto guard0 = scopeGuard([&] { setByGuard0 += 1; });
+    auto guard0 = scopeGuard([&] { setByGuard0 = setByGuard0 + 1; });
   }
   end = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> elapsed_seconds = end - start;
@@ -138,7 +138,7 @@ TEST(ScopeGuardTest, testScopeGuardListPerformance) {
   start = std::chrono::high_resolution_clock::now();
   for (int n = 0; n < 10000000; ++n) {
     auto guardList = ScopeGuardList();
-    guardList.add([&] { setByGuard0 += 1; });
+    guardList.add([&] { setByGuard0 = setByGuard0 + 1; });
   }
   end = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> elapsed_seconds = end - start;

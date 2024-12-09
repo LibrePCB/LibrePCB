@@ -76,19 +76,19 @@ BomOutputJobWidget::BomOutputJobWidget(Project& project,
           });
 
   // List custom boards.
-  QVector<tl::optional<Uuid>> allBoardUuids;
+  QVector<std::optional<Uuid>> allBoardUuids;
   QHash<Uuid, QString> boardNames;
-  allBoardUuids.append(tl::nullopt);
+  allBoardUuids.append(std::nullopt);
   foreach (const Board* board, mProject.getBoards()) {
     allBoardUuids.append(board->getUuid());
     boardNames[board->getUuid()] = *board->getName();
   }
-  foreach (const tl::optional<Uuid>& uuid, mJob->getBoards().getSet()) {
+  foreach (const std::optional<Uuid>& uuid, mJob->getBoards().getSet()) {
     if (!allBoardUuids.contains(uuid)) {
       allBoardUuids.append(uuid);
     }
   }
-  foreach (const tl::optional<Uuid>& uuid, allBoardUuids) {
+  foreach (const std::optional<Uuid>& uuid, allBoardUuids) {
     QListWidgetItem* item = new QListWidgetItem(
         uuid ? boardNames.value(*uuid, uuid->toStr()) : tr("None (generic)"),
         mUi->lstBoards);
@@ -169,7 +169,7 @@ void BomOutputJobWidget::applyBoards(bool checked) noexcept {
     mJob->setBoards(BomOutputJob::BoardSet::onlyDefault());
     mUi->lstBoards->setEnabled(false);
   } else if (mUi->rbtnBoardsCustom->isChecked()) {
-    QSet<tl::optional<Uuid>> uuids;
+    QSet<std::optional<Uuid>> uuids;
     for (int i = 0; i < mUi->lstBoards->count(); ++i) {
       if (QListWidgetItem* item = mUi->lstBoards->item(i)) {
         auto uuid = Uuid::tryFromString(item->data(Qt::UserRole).toString());

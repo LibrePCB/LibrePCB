@@ -81,19 +81,19 @@ CopyOutputJobWidget::CopyOutputJobWidget(Project& project,
           [this](bool checked) { mJob->setSubstituteVariables(checked); });
 
   // List custom boards.
-  QVector<tl::optional<Uuid>> allBoardUuids;
+  QVector<std::optional<Uuid>> allBoardUuids;
   QHash<Uuid, QString> boardNames;
-  allBoardUuids.append(tl::nullopt);
+  allBoardUuids.append(std::nullopt);
   foreach (const Board* board, mProject.getBoards()) {
     allBoardUuids.append(board->getUuid());
     boardNames[board->getUuid()] = *board->getName();
   }
-  foreach (const tl::optional<Uuid>& uuid, mJob->getBoards().getSet()) {
+  foreach (const std::optional<Uuid>& uuid, mJob->getBoards().getSet()) {
     if (!allBoardUuids.contains(uuid)) {
       allBoardUuids.append(uuid);
     }
   }
-  foreach (const tl::optional<Uuid>& uuid, allBoardUuids) {
+  foreach (const std::optional<Uuid>& uuid, allBoardUuids) {
     QListWidgetItem* item = new QListWidgetItem(
         uuid ? boardNames.value(*uuid, uuid->toStr()) : tr("None (generic)"),
         mUi->lstBoards);
@@ -119,20 +119,20 @@ CopyOutputJobWidget::CopyOutputJobWidget(Project& project,
   mUi->rbtnBoardsCustom->setChecked(job->getBoards().isCustom());
 
   // List custom assembly variants.
-  QVector<tl::optional<Uuid>> allVariantUuids;
+  QVector<std::optional<Uuid>> allVariantUuids;
   QHash<Uuid, QString> avNames;
-  allVariantUuids.append(tl::nullopt);
+  allVariantUuids.append(std::nullopt);
   for (const auto& av : mProject.getCircuit().getAssemblyVariants()) {
     allVariantUuids.append(av.getUuid());
     avNames[av.getUuid()] = av.getDisplayText();
   }
-  foreach (const tl::optional<Uuid>& uuid,
+  foreach (const std::optional<Uuid>& uuid,
            mJob->getAssemblyVariants().getSet()) {
     if (!allVariantUuids.contains(uuid)) {
       allVariantUuids.append(uuid);
     }
   }
-  foreach (const tl::optional<Uuid>& uuid, allVariantUuids) {
+  foreach (const std::optional<Uuid>& uuid, allVariantUuids) {
     QListWidgetItem* item = new QListWidgetItem(
         uuid ? avNames.value(*uuid, uuid->toStr()) : tr("None (generic)"),
         mUi->lstVariants);
@@ -177,7 +177,7 @@ void CopyOutputJobWidget::applyBoards(bool checked) noexcept {
     mJob->setBoards(CopyOutputJob::BoardSet::onlyDefault());
     mUi->lstBoards->setEnabled(false);
   } else if (mUi->rbtnBoardsCustom->isChecked()) {
-    QSet<tl::optional<Uuid>> uuids;
+    QSet<std::optional<Uuid>> uuids;
     for (int i = 0; i < mUi->lstBoards->count(); ++i) {
       if (QListWidgetItem* item = mUi->lstBoards->item(i)) {
         auto uuid = Uuid::tryFromString(item->data(Qt::UserRole).toString());
@@ -203,7 +203,7 @@ void CopyOutputJobWidget::applyVariants(bool checked) noexcept {
     mJob->setAssemblyVariants(CopyOutputJob::AssemblyVariantSet::onlyDefault());
     mUi->lstVariants->setEnabled(false);
   } else if (mUi->rbtnVariantsCustom->isChecked()) {
-    QSet<tl::optional<Uuid>> uuids;
+    QSet<std::optional<Uuid>> uuids;
     for (int i = 0; i < mUi->lstVariants->count(); ++i) {
       if (QListWidgetItem* item = mUi->lstVariants->item(i)) {
         auto uuid = Uuid::tryFromString(item->data(Qt::UserRole).toString());

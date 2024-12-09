@@ -46,7 +46,7 @@ CategoryTreeModel::CategoryTreeModel(const WorkspaceLibraryDb& library,
     mLibrary(library),
     mLocaleOrder(localeOrder),
     mFilters(filters),
-    mRootItem(new Item{std::weak_ptr<Item>(), tl::nullopt, {}, {}, {}}) {
+    mRootItem(new Item{std::weak_ptr<Item>(), std::nullopt, {}, {}, {}}) {
   update();
   connect(&mLibrary, &WorkspaceLibraryDb::scanSucceeded, this,
           &CategoryTreeModel::update);
@@ -142,10 +142,10 @@ void CategoryTreeModel::update() noexcept {
 
   // Add virtual category for library elements with no category assigned.
   try {
-    if (containsItems(tl::nullopt)) {
+    if (containsItems(std::nullopt)) {
       items.append(std::shared_ptr<Item>(
           new Item{std::weak_ptr<Item>(),
-                   tl::nullopt,
+                   std::nullopt,
                    tr("(Without Category)"),
                    tr("All library elements without a category"),
                    {}}));
@@ -163,7 +163,7 @@ void CategoryTreeModel::update() noexcept {
 QVector<std::shared_ptr<CategoryTreeModel::Item>> CategoryTreeModel::getChilds(
     std::shared_ptr<Item> parent) const noexcept {
   QVector<std::shared_ptr<Item>> childs;
-  tl::optional<Uuid> parentUuid = parent ? parent->uuid : tl::nullopt;
+  std::optional<Uuid> parentUuid = parent ? parent->uuid : std::nullopt;
   try {
     QSet<Uuid> uuids = listPackageCategories()
         ? mLibrary.getChilds<PackageCategory>(parentUuid)
@@ -204,7 +204,7 @@ QVector<std::shared_ptr<CategoryTreeModel::Item>> CategoryTreeModel::getChilds(
   return childs;
 }
 
-bool CategoryTreeModel::containsItems(const tl::optional<Uuid>& uuid) const {
+bool CategoryTreeModel::containsItems(const std::optional<Uuid>& uuid) const {
   if (listPackageCategories()) {
     if (mFilters.testFlag(Filter::PkgCatWithPackages) &&
         (mLibrary.getByCategory<Package>(uuid, 1).count() > 0)) {

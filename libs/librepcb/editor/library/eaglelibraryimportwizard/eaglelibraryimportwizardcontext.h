@@ -25,9 +25,10 @@
  ******************************************************************************/
 #include <librepcb/core/fileio/filepath.h>
 #include <librepcb/core/types/uuid.h>
-#include <optional/tl/optional.hpp>
 
 #include <QtCore>
+
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -69,18 +70,18 @@ public:
   eagleimport::EagleLibraryImport& getImport() noexcept { return *mImport; }
   const FilePath& getLbrFilePath() const noexcept { return mLbrFilePath; }
   bool getAddNamePrefix() const noexcept { return mAddNamePrefix; }
-  const tl::optional<Uuid>& getComponentCategory() const noexcept {
+  const std::optional<Uuid>& getComponentCategory() const noexcept {
     return mComponentCategoryUuid;
   }
-  const tl::optional<Uuid>& getPackageCategory() const noexcept {
+  const std::optional<Uuid>& getPackageCategory() const noexcept {
     return mPackageCategoryUuid;
   }
 
   // Setters
   void setLbrFilePath(const QString& filePath) noexcept;
   void setAddNamePrefix(bool add) noexcept;
-  void setComponentCategory(const tl::optional<Uuid>& uuid) noexcept;
-  void setPackageCategory(const tl::optional<Uuid>& uuid) noexcept;
+  void setComponentCategory(const std::optional<Uuid>& uuid) noexcept;
+  void setPackageCategory(const std::optional<Uuid>& uuid) noexcept;
 
   // Operator Overloadings
   EagleLibraryImportWizardContext& operator=(
@@ -94,8 +95,8 @@ private:  // Data
   QScopedPointer<eagleimport::EagleLibraryImport> mImport;
   FilePath mLbrFilePath;
   bool mAddNamePrefix;
-  tl::optional<Uuid> mComponentCategoryUuid;
-  tl::optional<Uuid> mPackageCategoryUuid;
+  std::optional<Uuid> mComponentCategoryUuid;
+  std::optional<Uuid> mPackageCategoryUuid;
 };
 
 /*******************************************************************************

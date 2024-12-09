@@ -221,7 +221,7 @@ public:
   // Constructors / Destructor
   DrcMsgOpenBoardOutlinePolygon() = delete;
   DrcMsgOpenBoardOutlinePolygon(const Uuid& polygon,
-                                const tl::optional<Uuid>& device,
+                                const std::optional<Uuid>& device,
                                 const QVector<Path>& locations) noexcept;
   DrcMsgOpenBoardOutlinePolygon(
       const DrcMsgOpenBoardOutlinePolygon& other) noexcept

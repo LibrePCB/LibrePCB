@@ -38,8 +38,8 @@ CopyOutputJob::CopyOutputJob() noexcept
   : OutputJob(getTypeName(), Uuid::createRandom(),
               elementNameFromTr("CopyOutputJob", QT_TR_NOOP("Custom File"))),
     mSubstituteVariables(false),
-    mBoards(BoardSet::set({tl::nullopt})),
-    mAssemblyVariants(AssemblyVariantSet::set({tl::nullopt})),
+    mBoards(BoardSet::set({std::nullopt})),
+    mAssemblyVariants(AssemblyVariantSet::set({std::nullopt})),
     mInputPath("resources/template.txt"),
     mOutputPath("{{PROJECT}}_{{VERSION}}.txt") {
 }

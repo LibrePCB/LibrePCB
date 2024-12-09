@@ -136,8 +136,12 @@ public:
 
   // Operator Overloadings
   Schematic& operator=(const Schematic& rhs) = delete;
-  bool operator==(const Schematic& rhs) noexcept { return (this == &rhs); }
-  bool operator!=(const Schematic& rhs) noexcept { return (this != &rhs); }
+  bool operator==(const Schematic& rhs) const noexcept {
+    return (this == &rhs);
+  }
+  bool operator!=(const Schematic& rhs) const noexcept {
+    return (this != &rhs);
+  }
 
 signals:
   void symbolAdded(SI_Symbol& symbol);

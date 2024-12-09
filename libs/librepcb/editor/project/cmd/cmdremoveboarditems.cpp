@@ -220,23 +220,23 @@ void CmdRemoveBoardItems::removeNetSegmentItems(
     }
     for (const Trace& trace : segment.traces) {
       BI_NetLineAnchor* start = nullptr;
-      if (tl::optional<Uuid> anchor = trace.getStartPoint().tryGetJunction()) {
+      if (std::optional<Uuid> anchor = trace.getStartPoint().tryGetJunction()) {
         start = junctionMap[*anchor];
-      } else if (tl::optional<Uuid> anchor =
+      } else if (std::optional<Uuid> anchor =
                      trace.getStartPoint().tryGetVia()) {
         start = viaMap[*anchor];
-      } else if (tl::optional<TraceAnchor::PadAnchor> anchor =
+      } else if (std::optional<TraceAnchor::PadAnchor> anchor =
                      trace.getStartPoint().tryGetPad()) {
         BI_Device* device =
             mBoard.getDeviceInstanceByComponentUuid(anchor->device);
         start = device ? device->getPad(anchor->pad) : nullptr;
       }
       BI_NetLineAnchor* end = nullptr;
-      if (tl::optional<Uuid> anchor = trace.getEndPoint().tryGetJunction()) {
+      if (std::optional<Uuid> anchor = trace.getEndPoint().tryGetJunction()) {
         end = junctionMap[*anchor];
-      } else if (tl::optional<Uuid> anchor = trace.getEndPoint().tryGetVia()) {
+      } else if (std::optional<Uuid> anchor = trace.getEndPoint().tryGetVia()) {
         end = viaMap[*anchor];
-      } else if (tl::optional<TraceAnchor::PadAnchor> anchor =
+      } else if (std::optional<TraceAnchor::PadAnchor> anchor =
                      trace.getEndPoint().tryGetPad()) {
         BI_Device* device =
             mBoard.getDeviceInstanceByComponentUuid(anchor->device);

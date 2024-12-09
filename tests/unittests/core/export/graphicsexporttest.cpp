@@ -100,7 +100,7 @@ TEST_F(GraphicsExportTest, testExportImageWithAutoScaling) {
   std::shared_ptr<GraphicsExportSettings> settings =
       std::make_shared<GraphicsExportSettings>();
   settings->setPixmapDpi(100);
-  settings->setScale(tl::nullopt);
+  settings->setScale(std::nullopt);
   settings->setMarginLeft(UnsignedLength(25400000));  // 5% of width.
   settings->setMarginTop(UnsignedLength(12700000));  // 5% of height.
   settings->setMarginRight(UnsignedLength(50800000));  // 10% of width.
@@ -156,7 +156,7 @@ TEST_F(GraphicsExportTest, testExportMultipleImages) {
   std::shared_ptr<GraphicsExportSettings> settings1 =
       std::make_shared<GraphicsExportSettings>();
   settings1->setPixmapDpi(10);
-  settings1->setScale(tl::nullopt);
+  settings1->setScale(std::nullopt);
   settings1->setMarginLeft(UnsignedLength(0));
   settings1->setMarginTop(UnsignedLength(0));
   settings1->setMarginRight(UnsignedLength(0));
@@ -207,7 +207,7 @@ TEST_F(GraphicsExportTest, testExportSvgWithAutoScaling) {
   std::shared_ptr<GraphicsExportSettings> settings =
       std::make_shared<GraphicsExportSettings>();
   settings->setPixmapDpi(100);
-  settings->setScale(tl::nullopt);
+  settings->setScale(std::nullopt);
   settings->setMarginLeft(UnsignedLength(25400000));  // 5% of width.
   settings->setMarginTop(UnsignedLength(12700000));  // 5% of height.
   settings->setMarginRight(UnsignedLength(50800000));  // 10% of width.
@@ -270,9 +270,9 @@ TEST_F(GraphicsExportTest, testExportPdfWithAutoScaling) {
           Length(100000000));
   std::shared_ptr<GraphicsExportSettings> settings =
       std::make_shared<GraphicsExportSettings>();
-  settings->setPageSize(tl::nullopt);
+  settings->setPageSize(std::nullopt);
   settings->setOrientation(GraphicsExportSettings::Orientation::Auto);
-  settings->setScale(tl::nullopt);
+  settings->setScale(std::nullopt);
   settings->setMarginLeft(UnsignedLength(10000000));  // 10mm.
   settings->setMarginTop(UnsignedLength(20000000));  // 20mm.
   settings->setMarginRight(UnsignedLength(30000000));  // 30mm.

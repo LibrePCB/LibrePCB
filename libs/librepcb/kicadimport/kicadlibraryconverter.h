@@ -27,11 +27,11 @@
 
 #include <librepcb/core/types/uuid.h>
 #include <librepcb/core/types/version.h>
-#include <optional/tl/optional.hpp>
 
 #include <QtCore>
 
 #include <memory>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -126,27 +126,27 @@ private:  // Data
 
   /// Key: generatedBy
   /// Value: LibrePCB Package UUID
-  QHash<QString, tl::optional<Uuid>> mPackageMap;
+  QHash<QString, std::optional<Uuid>> mPackageMap;
 
   /// Key: generatedBy | Pad Number (after conversion)
   /// Value: LibrePCB Package Pad UUID
-  QHash<QString, QMap<QString, tl::optional<Uuid>>> mPackagePadMap;
+  QHash<QString, QMap<QString, std::optional<Uuid>>> mPackagePadMap;
 
   /// Key: generatedBy
   /// Value: LibrePCB Symbol UUID
-  QHash<QString, tl::optional<Uuid>> mSymbolMap;
+  QHash<QString, std::optional<Uuid>> mSymbolMap;
 
   /// Key: [Symbol generatedBy, Pin Name (after conversion)]
   /// Value: LibrePCB Symbol Pin UUID
-  QHash<std::pair<QString, QString>, tl::optional<Uuid>> mSymbolPinMap;
+  QHash<std::pair<QString, QString>, std::optional<Uuid>> mSymbolPinMap;
 
   /// Key: generatedBy
   /// Value: LibrePCB Component UUID
-  QHash<QString, tl::optional<Uuid>> mComponentMap;
+  QHash<QString, std::optional<Uuid>> mComponentMap;
 
   /// Key: [Component generatedBy, Signal Name (after conversion)]
   /// Value: LibrePCB Component Signal UUID
-  QHash<std::pair<QString, QString>, tl::optional<Uuid>> mComponentSignalMap;
+  QHash<std::pair<QString, QString>, std::optional<Uuid>> mComponentSignalMap;
 };
 
 /*******************************************************************************

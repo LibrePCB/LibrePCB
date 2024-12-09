@@ -1131,7 +1131,7 @@ void PackageEditorWidget::fixMsg(
       mPackage->getFootprints().get(msg.getFootprint().get());
   std::shared_ptr<FootprintPad> pad =
       footprint->getPads().get(msg.getPad().get());
-  const tl::optional<Length> offset = pad->getStopMaskConfig().getOffset();
+  const std::optional<Length> offset = pad->getStopMaskConfig().getOffset();
   if (offset && (*offset > 0)) {
     std::unique_ptr<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(*pad));
     cmd->setCopperClearance(UnsignedLength(*offset));

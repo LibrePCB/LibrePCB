@@ -26,10 +26,11 @@
 #include <librepcb/core/types/lengthunit.h>
 #include <librepcb/core/types/point.h>
 #include <librepcb/core/workspace/theme.h>
-#include <optional/tl/optional.hpp>
 
 #include <QtCore>
 #include <QtWidgets>
+
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -101,9 +102,9 @@ public:
    */
   void setSceneRectMarker(const QRectF& rect) noexcept;
   void setSceneCursor(
-      const tl::optional<std::pair<Point, CursorOptions>>& cursor) noexcept;
+      const std::optional<std::pair<Point, CursorOptions>>& cursor) noexcept;
   void setRulerPositions(
-      const tl::optional<std::pair<Point, Point>>& pos) noexcept;
+      const std::optional<std::pair<Point, Point>>& pos) noexcept;
   void setInfoBoxText(const QString& text) noexcept;
   void setOriginCrossVisible(bool visible) noexcept;
   void setEventHandlerObject(
@@ -167,7 +168,7 @@ private:
   bool mGrayOut;
 
   /// If not nullopt, a cursor will be shown at the given position
-  tl::optional<std::pair<Point, CursorOptions>> mSceneCursor;
+  std::optional<std::pair<Point, CursorOptions>> mSceneCursor;
 
   // Configuration for the ruler overlay
   struct RulerGauge {
@@ -178,7 +179,7 @@ private:
     Length currentTickInterval;
   };
   QVector<RulerGauge> mRulerGauges;
-  tl::optional<std::pair<Point, Point>> mRulerPositions;
+  std::optional<std::pair<Point, Point>> mRulerPositions;
 
   // State
   volatile bool mPanningActive;

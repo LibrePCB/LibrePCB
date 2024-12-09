@@ -126,7 +126,7 @@ TEST_F(FootprintPadTest, testConstructFromSExpressionUnconnected) {
   FootprintPad obj(*sexpr);
   EXPECT_EQ(Uuid::fromString("7040952d-7016-49cd-8c3e-6078ecca98b9"),
             obj.getUuid());
-  EXPECT_EQ(tl::nullopt, obj.getPackagePadUuid());
+  EXPECT_EQ(std::nullopt, obj.getPackagePadUuid());
   EXPECT_EQ(Point(1234000, 2345000), obj.getPosition());
   EXPECT_EQ(Angle::deg45(), obj.getRotation());
   EXPECT_EQ(FootprintPad::Shape::Custom, obj.getShape());

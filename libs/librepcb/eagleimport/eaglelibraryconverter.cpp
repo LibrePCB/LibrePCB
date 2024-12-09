@@ -374,7 +374,7 @@ std::unique_ptr<Component> EagleLibraryConverter::createComponent(
   const bool addGateSuffixes = eagleDeviceSet.getGates().count() > 1;
   foreach (const auto& gate, eagleDeviceSet.getGates()) {
     const QStringList symbolKey = {libName, libUrn, gate.getSymbol()};
-    const tl::optional<Uuid> symbolUuid = mSymbolMap.value(symbolKey);
+    const std::optional<Uuid> symbolUuid = mSymbolMap.value(symbolKey);
     if (!symbolUuid) {
       throw RuntimeError(
           __FILE__, __LINE__,
@@ -441,7 +441,7 @@ std::unique_ptr<Device> EagleLibraryConverter::createDevice(
   Q_UNUSED(log);
   const QStringList componentKey = {devLibName, devLibUrn,
                                     eagleDeviceSet.getName()};
-  const tl::optional<Uuid> componentUuid = mComponentMap.value(componentKey);
+  const std::optional<Uuid> componentUuid = mComponentMap.value(componentKey);
   if (!componentUuid) {
     throw RuntimeError(__FILE__, __LINE__,
                        tr("Dependent component \"%1\" not imported.")
@@ -449,7 +449,7 @@ std::unique_ptr<Device> EagleLibraryConverter::createDevice(
   }
   const QStringList packageKey = {pkgLibName, pkgLibUrn,
                                   eagleDevice.getPackage()};
-  const tl::optional<Uuid> packageUuid = mPackageMap.value(packageKey);
+  const std::optional<Uuid> packageUuid = mPackageMap.value(packageKey);
   if (!packageUuid) {
     throw RuntimeError(__FILE__, __LINE__,
                        tr("Dependent package \"%1\" not imported.")
@@ -466,7 +466,7 @@ std::unique_ptr<Device> EagleLibraryConverter::createDevice(
   device->setCategories(mSettings.deviceCategories);
   for (auto padIt = mPackagePadMap[packageKey].constBegin();
        padIt != mPackagePadMap[packageKey].constEnd(); padIt++) {
-    tl::optional<Uuid> signalUuid;
+    std::optional<Uuid> signalUuid;
     foreach (const auto& connection, eagleDevice.getConnections()) {
       if (connection.getPads().contains(padIt.key())) {
         signalUuid = mComponentSignalMap[componentKey +

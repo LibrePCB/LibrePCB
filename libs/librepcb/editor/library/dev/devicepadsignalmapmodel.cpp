@@ -135,7 +135,7 @@ QVariant DevicePadSignalMapModel::data(const QModelIndex& index,
       }
     }
     case COLUMN_SIGNAL: {
-      tl::optional<Uuid> uuid = item->getSignalUuid();
+      std::optional<Uuid> uuid = item->getSignalUuid();
       std::shared_ptr<const ComponentSignal> sig =
           uuid ? mSignals.find(*uuid) : nullptr;
       switch (role) {

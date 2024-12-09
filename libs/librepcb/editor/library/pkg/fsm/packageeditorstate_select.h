@@ -31,7 +31,7 @@
 #include <QtWidgets>
 
 #include <memory>
-#include <optional.hpp>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -122,7 +122,7 @@ private:  // Methods
   bool pasteGeometryFromClipboard(
       std::unique_ptr<FootprintClipboardData> data) noexcept;
   bool startPaste(std::unique_ptr<FootprintClipboardData> data,
-                  const tl::optional<Point>& fixedPosition);
+                  const std::optional<Point>& fixedPosition);
   bool rotateSelectedItems(const Angle& angle) noexcept;
   bool mirrorSelectedItems(Qt::Orientation orientation,
                            bool flipLayers) noexcept;

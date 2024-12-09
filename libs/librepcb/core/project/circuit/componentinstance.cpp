@@ -99,7 +99,7 @@ QSet<Uuid> ComponentInstance::getCompatibleDevices() const noexcept {
 }
 
 QVector<std::shared_ptr<const Part>> ComponentInstance::getParts(
-    const tl::optional<Uuid>& assemblyVariant) const noexcept {
+    const std::optional<Uuid>& assemblyVariant) const noexcept {
   QVector<std::shared_ptr<const Part>> parts;
   for (const ComponentAssemblyOption& opt : mAssemblyOptions) {
     if (((!assemblyVariant) ||

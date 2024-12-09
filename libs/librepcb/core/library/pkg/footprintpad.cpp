@@ -173,7 +173,7 @@ FootprintPad::FootprintPad(const FootprintPad& other) noexcept
 }
 
 FootprintPad::FootprintPad(
-    const Uuid& uuid, const tl::optional<Uuid>& pkgPadUuid, const Point& pos,
+    const Uuid& uuid, const std::optional<Uuid>& pkgPadUuid, const Point& pos,
     const Angle& rot, Shape shape, const PositiveLength& width,
     const PositiveLength& height, const UnsignedLimitedRatio& radius,
     const Path& customShapeOutline, const MaskConfig& autoStopMask,
@@ -203,7 +203,7 @@ FootprintPad::FootprintPad(const SExpression& node)
   : onEdited(*this),
     mUuid(deserialize<Uuid>(node.getChild("@0"))),
     mPackagePadUuid(
-        deserialize<tl::optional<Uuid>>(node.getChild("package_pad/@0"))),
+        deserialize<std::optional<Uuid>>(node.getChild("package_pad/@0"))),
     mPosition(node.getChild("position")),
     mRotation(deserialize<Angle>(node.getChild("rotation/@0"))),
     mShape(deserialize<Shape>(node.getChild("shape/@0"))),
@@ -361,7 +361,7 @@ bool FootprintPad::setPosition(const Point& pos) noexcept {
   return true;
 }
 
-bool FootprintPad::setPackagePadUuid(const tl::optional<Uuid>& pad) noexcept {
+bool FootprintPad::setPackagePadUuid(const std::optional<Uuid>& pad) noexcept {
   if (pad == mPackagePadUuid) {
     return false;
   }

@@ -692,7 +692,7 @@ bool CommandLineInterface::openProject(
     // DRC
     if (runDrc) {
       print(tr("Run DRC..."));
-      tl::optional<BoardDesignRuleCheckSettings> customSettings;
+      std::optional<BoardDesignRuleCheckSettings> customSettings;
       QList<Board*> boardsToCheck = boards;
       if (!drcSettingsPath.isEmpty()) {
         try {
@@ -735,7 +735,7 @@ bool CommandLineInterface::openProject(
     // Run output jobs.
     if ((!runJobs.isEmpty()) || runAllJobs) {
       // Determine jobs.
-      tl::optional<OutputJobList> allJobs;
+      std::optional<OutputJobList> allJobs;
       if (!customJobsPath.isEmpty()) {
         try {
           qDebug() << "Load custom output jobs:" << customJobsPath;
@@ -895,7 +895,7 @@ bool CommandLineInterface::openProject(
     // Export PCB fabrication data
     if (exportPcbFabricationData) {
       print(tr("Export PCB fabrication data..."));
-      tl::optional<BoardFabricationOutputSettings> customSettings;
+      std::optional<BoardFabricationOutputSettings> customSettings;
       QList<Board*> boardsToExport = boards;
       if (!pcbFabricationSettingsPath.isEmpty()) {
         try {

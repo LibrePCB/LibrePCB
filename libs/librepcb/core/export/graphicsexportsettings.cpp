@@ -67,7 +67,8 @@ GraphicsExportSettings::Orientation deserialize(const SExpression& node) {
 }
 
 template <>
-std::unique_ptr<SExpression> serialize(const tl::optional<UnsignedRatio>& obj) {
+std::unique_ptr<SExpression> serialize(
+    const std::optional<UnsignedRatio>& obj) {
   if (obj) {
     return serialize(*obj);
   } else {
@@ -76,9 +77,9 @@ std::unique_ptr<SExpression> serialize(const tl::optional<UnsignedRatio>& obj) {
 }
 
 template <>
-tl::optional<UnsignedRatio> deserialize(const SExpression& node) {
+std::optional<UnsignedRatio> deserialize(const SExpression& node) {
   if (node.getValue() == "auto") {
-    return tl::nullopt;
+    return std::nullopt;
   } else {
     return deserialize<UnsignedRatio>(node);
   }
@@ -89,7 +90,7 @@ tl::optional<UnsignedRatio> deserialize(const SExpression& node) {
  ******************************************************************************/
 
 GraphicsExportSettings::GraphicsExportSettings() noexcept
-  : mPageSize(tl::nullopt),  // Auto
+  : mPageSize(std::nullopt),  // Auto
     mOrientation(Orientation::Auto),
     mMarginLeft(10000000),  // 10mm
     mMarginTop(10000000),  // 10mm
@@ -97,7 +98,7 @@ GraphicsExportSettings::GraphicsExportSettings() noexcept
     mMarginBottom(10000000),  // 10mm
     mRotate(false),
     mMirror(false),
-    mScale(tl::nullopt),  // Fit in page
+    mScale(std::nullopt),  // Fit in page
     mPixmapDpi(600),
     mBlackWhite(false),
     mBackgroundColor(Qt::transparent),

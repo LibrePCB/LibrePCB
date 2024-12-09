@@ -63,14 +63,14 @@ LayerComboBox::~LayerComboBox() noexcept {
  *  Getters
  ******************************************************************************/
 
-tl::optional<const Layer&> LayerComboBox::getCurrentLayer() const noexcept {
+const Layer* LayerComboBox::getCurrentLayer() const noexcept {
   const QString id = mComboBox->currentData(Qt::UserRole).toString();
   foreach (const Layer* layer, Layer::all()) {
     if (layer->getId() == id) {
-      return *layer;
+      return layer;
     }
   }
-  return tl::nullopt;
+  return nullptr;
 }
 
 /*******************************************************************************
@@ -82,7 +82,7 @@ void LayerComboBox::setLayers(const QSet<const Layer*>& layers) noexcept {
   std::sort(sorted.begin(), sorted.end(), &Layer::lessThan);
 
   blockSignals(true);
-  tl::optional<const Layer&> selected = getCurrentLayer();
+  const Layer* selected = getCurrentLayer();
   mComboBox->clear();
   foreach (const Layer* layer, sorted) {
     mComboBox->addItem(layer->getNameTr(), layer->getId());
@@ -92,7 +92,7 @@ void LayerComboBox::setLayers(const QSet<const Layer*>& layers) noexcept {
   }
   blockSignals(false);
 
-  tl::optional<const Layer&> current = getCurrentLayer();
+  const Layer* current = getCurrentLayer();
   if ((current != selected) && (current)) {
     emit currentLayerChanged(*current);
   }
@@ -126,7 +126,7 @@ void LayerComboBox::stepDown() noexcept {
 
 void LayerComboBox::currentIndexChanged(int index) noexcept {
   Q_UNUSED(index);
-  if (tl::optional<const Layer&> layer = getCurrentLayer()) {
+  if (const Layer* layer = getCurrentLayer()) {
     emit currentLayerChanged(*layer);
   }
 }

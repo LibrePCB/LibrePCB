@@ -60,7 +60,7 @@ public:
   StrokeText& getObj() noexcept { return mText; }
 
   // General Methods
-  void setTextOverride(const tl::optional<QString>& text) noexcept;
+  void setTextOverride(const std::optional<QString>& text) noexcept;
 
   // Inherited from QGraphicsItem
   QPainterPath shape() const noexcept override;
@@ -81,7 +81,7 @@ private:  // Data
   StrokeText& mText;
   const IF_GraphicsLayerProvider& mLayerProvider;
   const StrokeFont& mFont;
-  tl::optional<QString> mTextOverride;
+  std::optional<QString> mTextOverride;
   QScopedPointer<PrimitivePathGraphicsItem> mPathGraphicsItem;
   QScopedPointer<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
 

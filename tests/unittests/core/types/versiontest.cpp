@@ -94,7 +94,7 @@ TEST(VersionTest, testFromString_valid) {
 }
 
 TEST(VersionTest, testTryFromString_nulloptOnEmpty) {
-  EXPECT_EQ(tl::nullopt, Version::tryFromString(""));
+  EXPECT_EQ(std::nullopt, Version::tryFromString(""));
 }
 
 TEST(VersionTest, testTryFromString_valid) {

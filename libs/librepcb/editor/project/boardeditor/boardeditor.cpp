@@ -358,7 +358,7 @@ bool BoardEditor::setActiveBoardIndex(int index) noexcept {
     mDockUnplacedComponents->setBoard(mActiveBoard);
     mDockDrc->setInteractive(mActiveBoard != nullptr);
     mDockDrc->setMessages(mActiveBoard ? mDrcMessages[mActiveBoard->getUuid()]
-                                       : tl::nullopt);
+                                       : std::nullopt);
     mDockDrc->setApprovals(mActiveBoard ? mActiveBoard->getDrcMessageApprovals()
                                         : QSet<SExpression>());
 
@@ -1508,8 +1508,8 @@ void BoardEditor::performScheduledTasks() noexcept {
     std::shared_ptr<SceneData3D> data;
     if (Board* board = getActiveBoard()) {
       auto av = mProject.getCircuit().getAssemblyVariants().value(0);
-      data = board->buildScene3D(av ? tl::make_optional(av->getUuid())
-                                    : tl::nullopt);
+      data = board->buildScene3D(av ? std::make_optional(av->getUuid())
+                                    : std::nullopt);
     } else {
       data = std::make_shared<SceneData3D>();
     }
@@ -1742,8 +1742,8 @@ void BoardEditor::execStepExportDialog() noexcept {
 
   // Build data.
   auto av = mProject.getCircuit().getAssemblyVariants().value(0);
-  auto data =
-      board->buildScene3D(av ? tl::make_optional(av->getUuid()) : tl::nullopt);
+  auto data = board->buildScene3D(av ? std::make_optional(av->getUuid())
+                                     : std::nullopt);
 
   // Start export.
   StepExport exp;

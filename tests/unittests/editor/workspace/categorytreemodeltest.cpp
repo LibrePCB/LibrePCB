@@ -133,13 +133,13 @@ TEST_F(CategoryTreeModelTest, testData) {
   // - cat 1
   //   - cat 2
   int cat = mWriter->addCategory<ComponentCategory>(
-      0, toAbs("cat1"), uuid(1), version("0.1"), false, tl::nullopt);
+      0, toAbs("cat1"), uuid(1), version("0.1"), false, std::nullopt);
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 1"),
-                                             "desc 1", tl::nullopt);
+                                             "desc 1", std::nullopt);
   cat = mWriter->addCategory<ComponentCategory>(0, toAbs("cat2"), uuid(2),
                                                 version("0.1"), false, uuid(1));
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 2"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
 
   CategoryTreeModel model(*mWsDb, {}, CategoryTreeModel::Filter::CmpCat);
   QModelIndex i1 = model.index(0, 0);
@@ -158,21 +158,21 @@ TEST_F(CategoryTreeModelTest, testComponentCategories) {
   //     - cat 3
   //     - cat 4
   int cat = mWriter->addCategory<ComponentCategory>(
-      0, toAbs("cat1"), uuid(1), version("0.1"), false, tl::nullopt);
+      0, toAbs("cat1"), uuid(1), version("0.1"), false, std::nullopt);
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 1"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   cat = mWriter->addCategory<ComponentCategory>(0, toAbs("cat2"), uuid(2),
                                                 version("0.1"), false, uuid(1));
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 2"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   cat = mWriter->addCategory<ComponentCategory>(0, toAbs("cat3"), uuid(3),
                                                 version("0.1"), false, uuid(2));
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 3"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   cat = mWriter->addCategory<ComponentCategory>(0, toAbs("cat4"), uuid(4),
                                                 version("0.1"), false, uuid(2));
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 4"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
 
   CategoryTreeModel model(*mWsDb, {}, CategoryTreeModel::Filter::CmpCat);
   QVector<Item> expected = {
@@ -194,21 +194,21 @@ TEST_F(CategoryTreeModelTest, testPackageCategories) {
   //     - cat 3
   //     - cat 4
   int cat = mWriter->addCategory<PackageCategory>(
-      0, toAbs("cat1"), uuid(1), version("0.1"), false, tl::nullopt);
+      0, toAbs("cat1"), uuid(1), version("0.1"), false, std::nullopt);
   mWriter->addTranslation<PackageCategory>(cat, "", ElementName("cat 1"),
-                                           tl::nullopt, tl::nullopt);
+                                           std::nullopt, std::nullopt);
   cat = mWriter->addCategory<PackageCategory>(0, toAbs("cat2"), uuid(2),
                                               version("0.1"), false, uuid(1));
   mWriter->addTranslation<PackageCategory>(cat, "", ElementName("cat 2"),
-                                           tl::nullopt, tl::nullopt);
+                                           std::nullopt, std::nullopt);
   cat = mWriter->addCategory<PackageCategory>(0, toAbs("cat3"), uuid(3),
                                               version("0.1"), false, uuid(2));
   mWriter->addTranslation<PackageCategory>(cat, "", ElementName("cat 3"),
-                                           tl::nullopt, tl::nullopt);
+                                           std::nullopt, std::nullopt);
   cat = mWriter->addCategory<PackageCategory>(0, toAbs("cat4"), uuid(4),
                                               version("0.1"), false, uuid(2));
   mWriter->addTranslation<PackageCategory>(cat, "", ElementName("cat 4"),
-                                           tl::nullopt, tl::nullopt);
+                                           std::nullopt, std::nullopt);
 
   CategoryTreeModel model(*mWsDb, {}, CategoryTreeModel::Filter::PkgCat);
   QVector<Item> expected = {
@@ -229,17 +229,17 @@ TEST_F(CategoryTreeModelTest, testSort) {
   // - cat 10
   // - cat foo
   int cat = mWriter->addCategory<ComponentCategory>(
-      0, toAbs("cat1"), uuid(1), version("0.1"), false, tl::nullopt);
+      0, toAbs("cat1"), uuid(1), version("0.1"), false, std::nullopt);
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat foo"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   cat = mWriter->addCategory<ComponentCategory>(
-      0, toAbs("cat2"), uuid(2), version("0.1"), false, tl::nullopt);
+      0, toAbs("cat2"), uuid(2), version("0.1"), false, std::nullopt);
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 10"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   cat = mWriter->addCategory<ComponentCategory>(
-      0, toAbs("cat3"), uuid(3), version("0.1"), false, tl::nullopt);
+      0, toAbs("cat3"), uuid(3), version("0.1"), false, std::nullopt);
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 9"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
 
   CategoryTreeModel model(*mWsDb, {}, CategoryTreeModel::Filter::CmpCat);
   QVector<Item> expected = {
@@ -255,17 +255,17 @@ TEST_F(CategoryTreeModelTest, testCmpCatWithEmpty) {
   //   - cat 2 (0 elements)
   //   - cat 3 (0 elements)
   int cat = mWriter->addCategory<ComponentCategory>(
-      0, toAbs("cat1"), uuid(1), version("0.1"), false, tl::nullopt);
+      0, toAbs("cat1"), uuid(1), version("0.1"), false, std::nullopt);
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 1"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   cat = mWriter->addCategory<ComponentCategory>(0, toAbs("cat2"), uuid(2),
                                                 version("0.1"), false, uuid(1));
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 2"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   cat = mWriter->addCategory<ComponentCategory>(0, toAbs("cat3"), uuid(3),
                                                 version("0.1"), false, uuid(1));
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 3"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
 
   CategoryTreeModel model(*mWsDb, {},
                           CategoryTreeModel::Filter::CmpCatWithSymbols |
@@ -279,17 +279,17 @@ TEST_F(CategoryTreeModelTest, testCmpCatWithSymbols) {
   //   - cat 2 (0 elements)
   //   - cat 3 (1 elements)
   int cat = mWriter->addCategory<ComponentCategory>(
-      0, toAbs("cat1"), uuid(1), version("0.1"), false, tl::nullopt);
+      0, toAbs("cat1"), uuid(1), version("0.1"), false, std::nullopt);
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 1"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   cat = mWriter->addCategory<ComponentCategory>(0, toAbs("cat2"), uuid(2),
                                                 version("0.1"), false, uuid(1));
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 2"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   cat = mWriter->addCategory<ComponentCategory>(0, toAbs("cat3"), uuid(3),
                                                 version("0.1"), false, uuid(1));
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 3"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   int sym = mWriter->addElement<Symbol>(0, toAbs("sym"), uuid(), version("0.1"),
                                         false, QString());
   mWriter->addToCategory<Symbol>(sym, uuid(3));
@@ -310,17 +310,17 @@ TEST_F(CategoryTreeModelTest, testCmpCatWithComponents) {
   //   - cat 2 (0 elements)
   //   - cat 3 (1 elements)
   int cat = mWriter->addCategory<ComponentCategory>(
-      0, toAbs("cat1"), uuid(1), version("0.1"), false, tl::nullopt);
+      0, toAbs("cat1"), uuid(1), version("0.1"), false, std::nullopt);
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 1"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   cat = mWriter->addCategory<ComponentCategory>(0, toAbs("cat2"), uuid(2),
                                                 version("0.1"), false, uuid(1));
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 2"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   cat = mWriter->addCategory<ComponentCategory>(0, toAbs("cat3"), uuid(3),
                                                 version("0.1"), false, uuid(1));
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 3"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   int cmp = mWriter->addElement<Component>(0, toAbs("cmp"), uuid(),
                                            version("0.1"), false, QString());
   mWriter->addToCategory<Component>(cmp, uuid(3));
@@ -341,17 +341,17 @@ TEST_F(CategoryTreeModelTest, testCmpCatWithDevices) {
   //   - cat 2 (0 elements)
   //   - cat 3 (1 elements)
   int cat = mWriter->addCategory<ComponentCategory>(
-      0, toAbs("cat1"), uuid(1), version("0.1"), false, tl::nullopt);
+      0, toAbs("cat1"), uuid(1), version("0.1"), false, std::nullopt);
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 1"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   cat = mWriter->addCategory<ComponentCategory>(0, toAbs("cat2"), uuid(2),
                                                 version("0.1"), false, uuid(1));
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 2"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   cat = mWriter->addCategory<ComponentCategory>(0, toAbs("cat3"), uuid(3),
                                                 version("0.1"), false, uuid(1));
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 3"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   int dev = mWriter->addDevice(0, toAbs("dev"), uuid(), version("0.1"), false,
                                QString(), uuid(), uuid());
   mWriter->addToCategory<Device>(dev, uuid(3));
@@ -372,17 +372,17 @@ TEST_F(CategoryTreeModelTest, testPkgCatWithEmpty) {
   //   - cat 2 (0 elements)
   //   - cat 3 (0 elements)
   int cat = mWriter->addCategory<PackageCategory>(
-      0, toAbs("cat1"), uuid(1), version("0.1"), false, tl::nullopt);
+      0, toAbs("cat1"), uuid(1), version("0.1"), false, std::nullopt);
   mWriter->addTranslation<PackageCategory>(cat, "", ElementName("cat 1"),
-                                           tl::nullopt, tl::nullopt);
+                                           std::nullopt, std::nullopt);
   cat = mWriter->addCategory<PackageCategory>(0, toAbs("cat2"), uuid(2),
                                               version("0.1"), false, uuid(1));
   mWriter->addTranslation<PackageCategory>(cat, "", ElementName("cat 2"),
-                                           tl::nullopt, tl::nullopt);
+                                           std::nullopt, std::nullopt);
   cat = mWriter->addCategory<PackageCategory>(0, toAbs("cat3"), uuid(3),
                                               version("0.1"), false, uuid(1));
   mWriter->addTranslation<PackageCategory>(cat, "", ElementName("cat 3"),
-                                           tl::nullopt, tl::nullopt);
+                                           std::nullopt, std::nullopt);
 
   CategoryTreeModel model(*mWsDb, {},
                           CategoryTreeModel::Filter::PkgCatWithPackages);
@@ -394,17 +394,17 @@ TEST_F(CategoryTreeModelTest, testPkgCatWithPackages) {
   //   - cat 2 (0 elements)
   //   - cat 3 (1 elements)
   int cat = mWriter->addCategory<PackageCategory>(
-      0, toAbs("cat1"), uuid(1), version("0.1"), false, tl::nullopt);
+      0, toAbs("cat1"), uuid(1), version("0.1"), false, std::nullopt);
   mWriter->addTranslation<PackageCategory>(cat, "", ElementName("cat 1"),
-                                           tl::nullopt, tl::nullopt);
+                                           std::nullopt, std::nullopt);
   cat = mWriter->addCategory<PackageCategory>(0, toAbs("cat2"), uuid(2),
                                               version("0.1"), false, uuid(1));
   mWriter->addTranslation<PackageCategory>(cat, "", ElementName("cat 2"),
-                                           tl::nullopt, tl::nullopt);
+                                           std::nullopt, std::nullopt);
   cat = mWriter->addCategory<PackageCategory>(0, toAbs("cat3"), uuid(3),
                                               version("0.1"), false, uuid(1));
   mWriter->addTranslation<PackageCategory>(cat, "", ElementName("cat 3"),
-                                           tl::nullopt, tl::nullopt);
+                                           std::nullopt, std::nullopt);
   int pkg = mWriter->addElement<Package>(0, toAbs("pkg"), uuid(),
                                          version("0.1"), false, QString());
   mWriter->addToCategory<Package>(pkg, uuid(3));
@@ -455,21 +455,21 @@ TEST_F(CategoryTreeModelTest, testLiveUpdateAllNew) {
   //     - cat 3
   //     - cat 4
   int cat = mWriter->addCategory<ComponentCategory>(
-      0, toAbs("cat1"), uuid(1), version("0.1"), false, tl::nullopt);
+      0, toAbs("cat1"), uuid(1), version("0.1"), false, std::nullopt);
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 1"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   cat = mWriter->addCategory<ComponentCategory>(0, toAbs("cat2"), uuid(2),
                                                 version("0.1"), false, uuid(1));
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 2"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   cat = mWriter->addCategory<ComponentCategory>(0, toAbs("cat3"), uuid(3),
                                                 version("0.1"), false, uuid(2));
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 3"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   cat = mWriter->addCategory<ComponentCategory>(0, toAbs("cat4"), uuid(4),
                                                 version("0.1"), false, uuid(2));
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 4"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
 
   emit mWsDb->scanSucceeded(0);  // Triggers a tree model update.
   qApp->processEvents();
@@ -492,21 +492,21 @@ TEST_F(CategoryTreeModelTest, testLiveUpdateAllRemoved) {
   //     - cat 3
   //     - cat 4
   int cat = mWriter->addCategory<ComponentCategory>(
-      0, toAbs("cat1"), uuid(1), version("0.1"), false, tl::nullopt);
+      0, toAbs("cat1"), uuid(1), version("0.1"), false, std::nullopt);
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 1"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   cat = mWriter->addCategory<ComponentCategory>(0, toAbs("cat2"), uuid(2),
                                                 version("0.1"), false, uuid(1));
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 2"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   cat = mWriter->addCategory<ComponentCategory>(0, toAbs("cat3"), uuid(3),
                                                 version("0.1"), false, uuid(2));
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 3"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   cat = mWriter->addCategory<ComponentCategory>(0, toAbs("cat4"), uuid(4),
                                                 version("0.1"), false, uuid(2));
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 4"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
 
   CategoryTreeModel model(*mWsDb, {}, CategoryTreeModel::Filter::CmpCat);
   QVector<Item> expected = {
@@ -534,21 +534,21 @@ TEST_F(CategoryTreeModelTest, testLiveUpdateVariousModifications) {
   //     - cat 3
   //     - cat 4
   int cat = mWriter->addCategory<ComponentCategory>(
-      0, toAbs("cat1"), uuid(1), version("0.1"), false, tl::nullopt);
+      0, toAbs("cat1"), uuid(1), version("0.1"), false, std::nullopt);
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 1"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   cat = mWriter->addCategory<ComponentCategory>(0, toAbs("cat2"), uuid(2),
                                                 version("0.1"), false, uuid(1));
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 2"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   cat = mWriter->addCategory<ComponentCategory>(0, toAbs("cat3"), uuid(3),
                                                 version("0.1"), false, uuid(2));
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 3"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   cat = mWriter->addCategory<ComponentCategory>(0, toAbs("cat4"), uuid(4),
                                                 version("0.1"), false, uuid(2));
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 4"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
 
   CategoryTreeModel model(*mWsDb, {}, CategoryTreeModel::Filter::CmpCat);
   QVector<Item> expected = {
@@ -578,21 +578,21 @@ TEST_F(CategoryTreeModelTest, testLiveUpdateVariousModifications) {
   // - cat 7
   mWriter->removeAllElements<ComponentCategory>();
   cat = mWriter->addCategory<ComponentCategory>(
-      0, toAbs("cat1"), uuid(1), version("0.1"), false, tl::nullopt);
+      0, toAbs("cat1"), uuid(1), version("0.1"), false, std::nullopt);
   mWriter->addTranslation<ComponentCategory>(
-      cat, "", ElementName("cat 1 renamed"), tl::nullopt, tl::nullopt);
+      cat, "", ElementName("cat 1 renamed"), std::nullopt, std::nullopt);
   cat = mWriter->addCategory<ComponentCategory>(0, toAbs("cat5"), uuid(5),
                                                 version("0.1"), false, uuid(1));
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 5"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   cat = mWriter->addCategory<ComponentCategory>(0, toAbs("cat6"), uuid(6),
                                                 version("0.1"), false, uuid(5));
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 6"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   cat = mWriter->addCategory<ComponentCategory>(
-      0, toAbs("cat7"), uuid(7), version("0.1"), false, tl::nullopt);
+      0, toAbs("cat7"), uuid(7), version("0.1"), false, std::nullopt);
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 7"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
 
   emit mWsDb->scanSucceeded(0);  // Triggers a tree model update.
   qApp->processEvents();
@@ -616,15 +616,15 @@ TEST_F(CategoryTreeModelTest, testSetLocaleOrder) {
   // - cat 1
   // - cat 2, cat 0 (de_CH)
   int cat = mWriter->addCategory<ComponentCategory>(
-      0, toAbs("cat1"), uuid(1), version("0.1"), false, tl::nullopt);
+      0, toAbs("cat1"), uuid(1), version("0.1"), false, std::nullopt);
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 1"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   cat = mWriter->addCategory<ComponentCategory>(
-      0, toAbs("cat2"), uuid(2), version("0.1"), false, tl::nullopt);
+      0, toAbs("cat2"), uuid(2), version("0.1"), false, std::nullopt);
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 2"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
   mWriter->addTranslation<ComponentCategory>(cat, "de_CH", ElementName("cat 0"),
-                                             tl::nullopt, tl::nullopt);
+                                             std::nullopt, std::nullopt);
 
   CategoryTreeModel model(*mWsDb, {}, CategoryTreeModel::Filter::CmpCat);
   QVector<Item> expected = {

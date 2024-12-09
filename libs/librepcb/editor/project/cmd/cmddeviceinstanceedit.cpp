@@ -124,7 +124,7 @@ void CmdDeviceInstanceEdit::setLocked(bool locked) {
   mNewLocked = locked;
 }
 
-void CmdDeviceInstanceEdit::setModel(const tl::optional<Uuid>& uuid) noexcept {
+void CmdDeviceInstanceEdit::setModel(const std::optional<Uuid>& uuid) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewModelUuid = uuid;
 }

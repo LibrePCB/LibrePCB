@@ -63,7 +63,7 @@ public:
   // Constructors / Destructor
   ComponentPinSignalMapItem() = delete;
   ComponentPinSignalMapItem(const ComponentPinSignalMapItem& other) noexcept;
-  ComponentPinSignalMapItem(const Uuid& pin, const tl::optional<Uuid>& signal,
+  ComponentPinSignalMapItem(const Uuid& pin, const std::optional<Uuid>& signal,
                             const CmpSigPinDisplayType& displayType) noexcept;
   explicit ComponentPinSignalMapItem(const SExpression& node);
   ~ComponentPinSignalMapItem() noexcept;
@@ -73,7 +73,7 @@ public:
     return mPinUuid;
   }  // used for UuidObjectMap
   const Uuid& getPinUuid() const noexcept { return mPinUuid; }
-  const tl::optional<Uuid>& getSignalUuid() const noexcept {
+  const std::optional<Uuid>& getSignalUuid() const noexcept {
     return mSignalUuid;
   }
   const CmpSigPinDisplayType& getDisplayType() const noexcept {
@@ -81,7 +81,7 @@ public:
   }
 
   // Setters
-  bool setSignalUuid(const tl::optional<Uuid>& uuid) noexcept;
+  bool setSignalUuid(const std::optional<Uuid>& uuid) noexcept;
   bool setDisplayType(const CmpSigPinDisplayType& type) noexcept;
 
   // General Methods
@@ -103,7 +103,8 @@ public:
 
 private:  // Data
   Uuid mPinUuid;  ///< must be valid
-  tl::optional<Uuid> mSignalUuid;  ///< tl::nullopt if not connected to a signal
+  std::optional<Uuid>
+      mSignalUuid;  ///< std::nullopt if not connected to a signal
   CmpSigPinDisplayType mDisplayType;
 };
 
@@ -133,7 +134,7 @@ public:
           CmpSigPinDisplayType::componentSignal()) noexcept {
     ComponentPinSignalMap map;
     foreach (const Uuid& pin, pins) {
-      map.append(std::make_shared<ComponentPinSignalMapItem>(pin, tl::nullopt,
+      map.append(std::make_shared<ComponentPinSignalMapItem>(pin, std::nullopt,
                                                              display));
     }
     return map;

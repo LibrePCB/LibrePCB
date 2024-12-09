@@ -29,11 +29,11 @@
 #include <librepcb/core/types/angle.h>
 #include <librepcb/core/types/maskconfig.h>
 #include <librepcb/core/types/point.h>
-#include <optional/tl/optional.hpp>
 
 #include <QtCore>
 
 #include <memory>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -100,16 +100,16 @@ private:  // Methods
   /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;
 
-  static tl::optional<PositiveLength> extractViaDrillDiameter(
+  static std::optional<PositiveLength> extractViaDrillDiameter(
       const QString& padStackId) noexcept;
-  static tl::optional<MaskConfig> extractViaExposureConfig(
+  static std::optional<MaskConfig> extractViaExposureConfig(
       const QString& padStackId) noexcept;
 
   Project& mProject;
   Circuit& mCircuit;
   Board& mBoard;
   std::shared_ptr<MessageLogger> mLogger;
-  tl::optional<QList<ComponentOut>> mComponents;
+  std::optional<QList<ComponentOut>> mComponents;
   QHash<QString, PadStackOut> mPadStacks;
   QList<NetOut> mNets;
 };

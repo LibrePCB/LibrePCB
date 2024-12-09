@@ -26,9 +26,9 @@
 #include "../types/angle.h"
 #include "../types/point.h"
 
-#include <optional/tl/optional.hpp>
-
 #include <QtCore>
+
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -106,19 +106,19 @@ private:  // Data
 
   struct Record {
     OperationCode code;
-    tl::optional<QString> signalName;
+    std::optional<QString> signalName;
     QString componentName;
     QString padName;
     bool midPoint;
-    tl::optional<std::pair<PositiveLength, bool>> hole;
-    tl::optional<int> accessCode;
+    std::optional<std::pair<PositiveLength, bool>> hole;
+    std::optional<int> accessCode;
     Point position;
-    tl::optional<PositiveLength> width;
-    tl::optional<PositiveLength> height;
-    tl::optional<Angle> rotation;
-    tl::optional<SolderMask> solderMask;
-    tl::optional<int> startLayer;
-    tl::optional<int> endLayer;
+    std::optional<PositiveLength> width;
+    std::optional<PositiveLength> height;
+    std::optional<Angle> rotation;
+    std::optional<SolderMask> solderMask;
+    std::optional<int> startLayer;
+    std::optional<int> endLayer;
   };
 
   QStringList mComments;

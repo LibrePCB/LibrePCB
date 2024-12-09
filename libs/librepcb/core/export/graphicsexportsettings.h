@@ -26,10 +26,10 @@
 #include "../types/length.h"
 #include "../types/ratio.h"
 
-#include <optional/tl/optional.hpp>
-
 #include <QtCore>
 #include <QtGui>
+
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -63,7 +63,7 @@ public:
   ~GraphicsExportSettings() noexcept;
 
   // Getters
-  const tl::optional<QPageSize>& getPageSize() const noexcept {
+  const std::optional<QPageSize>& getPageSize() const noexcept {
     return mPageSize;
   }
   Orientation getOrientation() const noexcept { return mOrientation; }
@@ -75,7 +75,7 @@ public:
   }
   bool getRotate() const noexcept { return mRotate; }
   bool getMirror() const noexcept { return mMirror; }
-  const tl::optional<UnsignedRatio>& getScale() const noexcept {
+  const std::optional<UnsignedRatio>& getScale() const noexcept {
     return mScale;
   }
   int getPixmapDpi() const noexcept { return mPixmapDpi; }
@@ -93,7 +93,7 @@ public:
                       bool isGrabArea) const noexcept;
 
   // Setters
-  void setPageSize(const tl::optional<QPageSize>& size) noexcept {
+  void setPageSize(const std::optional<QPageSize>& size) noexcept {
     mPageSize = size;
   }
   void setOrientation(Orientation orientation) noexcept {
@@ -113,7 +113,7 @@ public:
   }
   void setRotate(bool rotate) noexcept { mRotate = rotate; }
   void setMirror(bool mirror) noexcept { mMirror = mirror; }
-  void setScale(tl::optional<UnsignedRatio> scale) noexcept { mScale = scale; }
+  void setScale(std::optional<UnsignedRatio> scale) noexcept { mScale = scale; }
   void setPixmapDpi(int dpi) noexcept { mPixmapDpi = dpi; }
   void setBlackWhite(bool blackWhite) noexcept { mBlackWhite = blackWhite; }
   void setBackgroundColor(const QColor& c) noexcept { mBackgroundColor = c; }
@@ -138,7 +138,7 @@ private:  // Methods
   QColor getColorImpl(const QString& name) const noexcept;
 
 private:  // Data
-  tl::optional<QPageSize> mPageSize;
+  std::optional<QPageSize> mPageSize;
   Orientation mOrientation;
   UnsignedLength mMarginLeft;
   UnsignedLength mMarginTop;
@@ -146,7 +146,7 @@ private:  // Data
   UnsignedLength mMarginBottom;
   bool mRotate;
   bool mMirror;
-  tl::optional<UnsignedRatio> mScale;
+  std::optional<UnsignedRatio> mScale;
   int mPixmapDpi;
   bool mBlackWhite;
   QColor mBackgroundColor;

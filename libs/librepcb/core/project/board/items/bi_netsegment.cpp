@@ -310,7 +310,7 @@ void BI_NetSegment::serialize(SExpression& root) const {
   root.appendChild(mUuid);
   root.ensureLineBreak();
   root.appendChild("net",
-                   mNetSignal ? mNetSignal->getUuid() : tl::optional<Uuid>());
+                   mNetSignal ? mNetSignal->getUuid() : std::optional<Uuid>());
   root.ensureLineBreak();
   for (const BI_Via* obj : mVias) {
     root.ensureLineBreak();

@@ -26,7 +26,7 @@
 #include <QtCore>
 #include <QtWidgets>
 
-#include <optional.hpp>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -57,7 +57,7 @@ public:
 
   // General Methods
   void setReadOnly(bool readOnly) noexcept;
-  void setSingleStep(tl::optional<double> step) noexcept;
+  void setSingleStep(std::optional<double> step) noexcept;
   void setFrame(bool frame) noexcept;
   void selectAll() noexcept;
 

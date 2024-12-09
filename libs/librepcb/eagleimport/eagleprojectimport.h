@@ -25,11 +25,11 @@
  ******************************************************************************/
 #include <librepcb/core/types/boundedunsignedratio.h>
 #include <librepcb/core/types/uuid.h>
-#include <optional/tl/optional.hpp>
 
 #include <QtCore>
 
 #include <memory>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -124,9 +124,9 @@ private:  // Methods
                        const parseagle::Sheet& sheet);
   void importBoard(Project& project, EagleLibraryConverter& converter);
   bool hasBuses(const parseagle::Schematic& schematic) const noexcept;
-  tl::optional<BoundedUnsignedRatio> tryGetDrcRatio(const QString& nr,
-                                                    const QString& nmin,
-                                                    const QString& nmax) const;
+  std::optional<BoundedUnsignedRatio> tryGetDrcRatio(const QString& nr,
+                                                     const QString& nmin,
+                                                     const QString& nmax) const;
   std::shared_ptr<const parseagle::Symbol> getSymbol(const QString& libName,
                                                      const QString& libUrn,
                                                      const QString& name) const;

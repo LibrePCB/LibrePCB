@@ -188,8 +188,8 @@ void MeasureTool::leave() noexcept {
   if (mView) {
     mView->unsetCursor();
     mView->setInfoBoxText(QString());
-    mView->setSceneCursor(tl::nullopt);
-    mView->setRulerPositions(tl::nullopt);
+    mView->setSceneCursor(std::nullopt);
+    mView->setRulerPositions(std::nullopt);
     mView->setGrayOut(false);
   }
 
@@ -232,7 +232,7 @@ bool MeasureTool::processGraphicsSceneLeftMouseButtonPressed(
   if ((!mStartPos) || mEndPos) {
     // Set first point.
     mStartPos = mCursorPos;
-    mEndPos = tl::nullopt;
+    mEndPos = std::nullopt;
   } else {
     // Set second point.
     mEndPos = mCursorPos;
@@ -259,8 +259,8 @@ bool MeasureTool::processCopy() noexcept {
 
 bool MeasureTool::processRemove() noexcept {
   if (mStartPos && mEndPos) {
-    mStartPos = tl::nullopt;
-    mEndPos = tl::nullopt;
+    mStartPos = std::nullopt;
+    mEndPos = std::nullopt;
     updateRulerPositions();
     updateStatusBarMessage();
     return true;
@@ -271,7 +271,7 @@ bool MeasureTool::processRemove() noexcept {
 
 bool MeasureTool::processAbortCommand() noexcept {
   if (mStartPos && (!mEndPos)) {
-    mStartPos = tl::nullopt;
+    mStartPos = std::nullopt;
     updateRulerPositions();
     updateStatusBarMessage();
     return true;
@@ -423,7 +423,7 @@ void MeasureTool::updateRulerPositions() noexcept {
   if (mStartPos) {
     mView->setRulerPositions(std::make_pair(startPos, endPos));
   } else {
-    mView->setRulerPositions(tl::nullopt);
+    mView->setRulerPositions(std::nullopt);
   }
 
   const Point diff = endPos - startPos;

@@ -192,7 +192,8 @@ QMap<QString, Version> Workspace::findDataDirectories(const FilePath& wsRoot) {
         result.insert(subdir, Version::fromString("0.1"));
       }
     } else if (subdir.startsWith('v')) {
-      if (tl::optional<Version> v = Version::tryFromString(subdir.mid(1, -1))) {
+      if (std::optional<Version> v =
+              Version::tryFromString(subdir.mid(1, -1))) {
         // IMPORTANT: Return the version number contained in the directory
         // name, *NOT* the version number of the file format contained within
         // that directory! The file format might be older, but the directory
@@ -239,7 +240,7 @@ QString Workspace::determineDataDirectory(
 
   // If there are older file formats available, the latest one should be
   // imported.
-  tl::optional<Version> versionToImport;
+  std::optional<Version> versionToImport;
   for (auto it = dataDirs.begin(); it != dataDirs.end(); it++) {
     if ((it.key() != defaultDirName) && (it.value() < fileFormat) &&
         ((!versionToImport) || (it.value() > (*versionToImport)))) {

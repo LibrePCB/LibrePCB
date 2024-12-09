@@ -155,7 +155,7 @@ void BoardGerberExport::exportComponentLayer(BoardSide side,
           polygon->getData().getLineWidth(), polygon->getData().getLayer());
       gen.drawPathOutline(polygon->getData().getPath(), lineWidth,
                           GerberAttribute::ApertureFunction::Profile,
-                          tl::nullopt, QString());
+                          std::nullopt, QString());
     }
   }
 
@@ -680,16 +680,16 @@ void BoardGerberExport::drawLayer(GerberGenerator& gen,
         gen.drawPathArea(
             fragment, GerberAttribute::ApertureFunction::Conductor,
             plane->getNetSignal()
-                ? tl::make_optional(*plane->getNetSignal()->getName())
-                : tl::nullopt,
+                ? std::make_optional(*plane->getNetSignal()->getName())
+                : std::nullopt,
             QString());
       }
     }
   }
 
   // draw polygons
-  GerberGenerator::Function graphicsFunction = tl::nullopt;
-  tl::optional<QString> graphicsNet = tl::nullopt;
+  GerberGenerator::Function graphicsFunction = std::nullopt;
+  std::optional<QString> graphicsNet = std::nullopt;
   if (layer.isBoardEdge()) {
     graphicsFunction = GerberAttribute::ApertureFunction::Profile;
   } else if (layer.isCopper()) {
@@ -707,7 +707,7 @@ void BoardGerberExport::drawLayer(GerberGenerator& gen,
   }
 
   // draw stroke texts
-  GerberGenerator::Function textFunction = tl::nullopt;
+  GerberGenerator::Function textFunction = std::nullopt;
   if (layer.isCopper()) {
     textFunction = GerberAttribute::ApertureFunction::NonConductor;
   }
@@ -727,18 +727,18 @@ void BoardGerberExport::drawLayer(GerberGenerator& gen,
   // Draw holes.
   if (layer.isStopMask()) {
     foreach (const BI_Hole* hole, mBoard.getHoles()) {
-      if (const tl::optional<Length>& offset = hole->getStopMaskOffset()) {
+      if (const std::optional<Length>& offset = hole->getStopMaskOffset()) {
         const Length diameter =
             (*hole->getData().getDiameter()) + (*offset) + (*offset);
         const Path path = hole->getData().getPath()->cleaned();
         if (diameter > 0) {
           if (path.getVertices().count() == 1) {
             gen.flashCircle(path.getVertices().first().getPos(),
-                            PositiveLength(diameter), tl::nullopt, tl::nullopt,
-                            QString(), QString(), QString());
+                            PositiveLength(diameter), std::nullopt,
+                            std::nullopt, QString(), QString(), QString());
           } else {
-            gen.drawPathOutline(path, UnsignedLength(diameter), tl::nullopt,
-                                tl::nullopt, QString());
+            gen.drawPathOutline(path, UnsignedLength(diameter), std::nullopt,
+                                std::nullopt, QString());
           }
         }
       }
@@ -750,14 +750,14 @@ void BoardGerberExport::drawVia(GerberGenerator& gen, const BI_Via& via,
                                 const Layer& layer,
                                 const QString& netName) const {
   const bool drawCopper = via.getVia().isOnLayer(layer);
-  const tl::optional<PositiveLength> stopMaskDiameter = layer.isStopMask()
+  const std::optional<PositiveLength> stopMaskDiameter = layer.isStopMask()
       ? (layer.isTop() ? via.getStopMaskDiameterTop()
                        : via.getStopMaskDiameterBottom())
-      : tl::nullopt;
+      : std::nullopt;
   if (drawCopper || stopMaskDiameter) {
     // Via attributes (only on copper layers).
-    GerberGenerator::Function function = tl::nullopt;
-    tl::optional<QString> net = tl::nullopt;
+    GerberGenerator::Function function = std::nullopt;
+    std::optional<QString> net = std::nullopt;
     if (drawCopper) {
       function = GerberAttribute::ApertureFunction::ViaPad;
       net = netName;
@@ -773,8 +773,8 @@ void BoardGerberExport::drawVia(GerberGenerator& gen, const BI_Via& via,
 void BoardGerberExport::drawDevice(GerberGenerator& gen,
                                    const BI_Device& device,
                                    const Layer& layer) const {
-  GerberGenerator::Function graphicsFunction = tl::nullopt;
-  tl::optional<QString> graphicsNet = tl::nullopt;
+  GerberGenerator::Function graphicsFunction = std::nullopt;
+  std::optional<QString> graphicsNet = std::nullopt;
   if (layer.isBoardEdge()) {
     graphicsFunction = GerberAttribute::ApertureFunction::Profile;
   } else if (layer.isCopper()) {
@@ -821,7 +821,7 @@ void BoardGerberExport::drawDevice(GerberGenerator& gen,
   }
 
   // draw stroke texts (from footprint instance, *NOT* from library footprint!)
-  GerberGenerator::Function textFunction = tl::nullopt;
+  GerberGenerator::Function textFunction = std::nullopt;
   if (layer.isCopper()) {
     textFunction = GerberAttribute::ApertureFunction::NonConductor;
   }
@@ -841,18 +841,18 @@ void BoardGerberExport::drawDevice(GerberGenerator& gen,
   if (layer.isStopMask()) {
     for (const Hole& hole :
          device.getLibFootprint().getHoles().sortedByUuid()) {
-      if (tl::optional<Length> offset =
+      if (std::optional<Length> offset =
               device.getHoleStopMasks().value(hole.getUuid())) {
         const Length diameter = (*hole.getDiameter()) + (*offset) + (*offset);
         if (diameter > 0) {
           const Path path = transform.map(hole.getPath()->cleaned());
           if (path.getVertices().count() == 1) {
             gen.flashCircle(path.getVertices().first().getPos(),
-                            PositiveLength(diameter), tl::nullopt, tl::nullopt,
-                            QString(), QString(), QString());
+                            PositiveLength(diameter), std::nullopt,
+                            std::nullopt, QString(), QString(), QString());
           } else {
-            gen.drawPathOutline(path, UnsignedLength(diameter), tl::nullopt,
-                                tl::nullopt, QString());
+            gen.drawPathOutline(path, UnsignedLength(diameter), std::nullopt,
+                                std::nullopt, QString());
           }
         }
       }
@@ -881,8 +881,8 @@ void BoardGerberExport::drawFootprintPad(GerberGenerator& gen,
 
   foreach (const PadGeometry& geometry, pad.getGeometries().value(&layer)) {
     // Pad attributes (most of them only on copper layers).
-    GerberGenerator::Function function = tl::nullopt;
-    tl::optional<QString> net = tl::nullopt;
+    GerberGenerator::Function function = std::nullopt;
+    std::optional<QString> net = std::nullopt;
     QString component = *pad.getDevice().getComponentInstance().getName();
     QString pin, signal;
     if (layer.isCopper()) {
@@ -983,7 +983,7 @@ void BoardGerberExport::drawPolygon(GerberGenerator& gen, const Layer& layer,
                                     const Path& outline,
                                     const UnsignedLength& lineWidth, bool fill,
                                     GerberGenerator::Function function,
-                                    const tl::optional<QString>& net,
+                                    const std::optional<QString>& net,
                                     const QString& component) const {
   // Don't draw zero-width outlines if the path gets filled! They have
   // no purpose and Gerber states that zero-width strokes shall not be

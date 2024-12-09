@@ -104,7 +104,7 @@ public:
   // Constructors / Destructor
   FootprintPad() = delete;
   FootprintPad(const FootprintPad& other) noexcept;
-  FootprintPad(const Uuid& uuid, const tl::optional<Uuid>& pkgPadUuid,
+  FootprintPad(const Uuid& uuid, const std::optional<Uuid>& pkgPadUuid,
                const Point& pos, const Angle& rot, Shape shape,
                const PositiveLength& width, const PositiveLength& height,
                const UnsignedLimitedRatio& radius,
@@ -117,7 +117,7 @@ public:
 
   // Getters
   const Uuid& getUuid() const noexcept { return mUuid; }
-  const tl::optional<Uuid>& getPackagePadUuid() const noexcept {
+  const std::optional<Uuid>& getPackagePadUuid() const noexcept {
     return mPackagePadUuid;
   }
   const Point& getPosition() const noexcept { return mPosition; }
@@ -158,7 +158,7 @@ public:
       const noexcept;
 
   // Setters
-  bool setPackagePadUuid(const tl::optional<Uuid>& pad) noexcept;
+  bool setPackagePadUuid(const std::optional<Uuid>& pad) noexcept;
   bool setPosition(const Point& pos) noexcept;
   bool setRotation(const Angle& rot) noexcept;
   bool setShape(Shape shape) noexcept;
@@ -204,9 +204,9 @@ private:  // Data
   /// The connected package pad
   ///
   /// This is the UUID of the package pad where this footprint pad is
-  /// connected to. It can be tl::nullopt, which means that the footprint pad
+  /// connected to. It can be std::nullopt, which means that the footprint pad
   /// is electrically not connected (e.g. for mechanical-only pads).
-  tl::optional<Uuid> mPackagePadUuid;
+  std::optional<Uuid> mPackagePadUuid;
   Point mPosition;
   Angle mRotation;
   Shape mShape;

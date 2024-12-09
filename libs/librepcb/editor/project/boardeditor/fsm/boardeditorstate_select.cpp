@@ -320,7 +320,7 @@ bool BoardEditorState_Select::processPaste() noexcept {
 
       // If there is something to paste, start the paste tool.
       if (data) {
-        return startPaste(*scene, std::move(data), tl::nullopt);  // can throw
+        return startPaste(*scene, std::move(data), std::nullopt);  // can throw
       }
     } catch (const Exception& e) {
       QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -799,7 +799,7 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
             try {
               CmdReplaceDevice* cmd = new CmdReplaceDevice(
                   mContext.workspace, scene->getBoard(), device->getDevice(),
-                  item.uuid, tl::optional<Uuid>());
+                  item.uuid, std::optional<Uuid>());
               mContext.undoStack.execCmd(cmd);
             } catch (const Exception& e) {
               QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -842,8 +842,8 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
               device->getDevice().getLibFootprint().getUuid());
       models.prepend(nullptr);
       foreach (const std::shared_ptr<const PackageModel>& model, models) {
-        const tl::optional<Uuid> uuid =
-            model ? tl::make_optional(model->getUuid()) : tl::nullopt;
+        const std::optional<Uuid> uuid =
+            model ? std::make_optional(model->getUuid()) : std::nullopt;
         QAction* a =
             modMenu->addAction(model ? modMenu->icon() : QIcon(),
                                model ? (*model->getName()) : tr("None"));
@@ -1317,7 +1317,7 @@ bool BoardEditorState_Select::changeWidthOfSelectedItems(int step) noexcept {
       return false;
     }
     const UnsignedLength currentWidth = cmd->getMedianLineWidth();
-    tl::optional<UnsignedLength> width;
+    std::optional<UnsignedLength> width;
     if (step != 0) {
       QSet<UnsignedLength> widths;
       auto addWidth = [&currentWidth, &widths, step](const UnsignedLength& w) {
@@ -1575,7 +1575,7 @@ bool BoardEditorState_Select::copySelectedItemsToClipboard() noexcept {
 
 bool BoardEditorState_Select::startPaste(
     BoardGraphicsScene& scene, std::unique_ptr<BoardClipboardData> data,
-    const tl::optional<Point>& fixedPosition) {
+    const std::optional<Point>& fixedPosition) {
   Q_ASSERT(data);
 
   // Start undo command group.

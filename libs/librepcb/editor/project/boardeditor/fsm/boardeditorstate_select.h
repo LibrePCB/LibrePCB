@@ -30,7 +30,7 @@
 #include <QtCore>
 
 #include <memory>
-#include <optional.hpp>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -142,7 +142,7 @@ private:  // Methods
   bool copySelectedItemsToClipboard() noexcept;
   bool startPaste(BoardGraphicsScene& scene,
                   std::unique_ptr<BoardClipboardData> data,
-                  const tl::optional<Point>& fixedPosition);
+                  const std::optional<Point>& fixedPosition);
   bool abortCommand(bool showErrMsgBox) noexcept;
   bool findPolygonVerticesAtPosition(const Point& pos) noexcept;
   bool findPlaneVerticesAtPosition(const Point& pos) noexcept;

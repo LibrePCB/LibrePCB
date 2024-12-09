@@ -59,7 +59,7 @@ public:
   Text& getObj() noexcept { return mText; }
 
   // Setters
-  void setTextOverride(const tl::optional<QString>& text) noexcept;
+  void setTextOverride(const std::optional<QString>& text) noexcept;
 
   // Inherited from QGraphicsItem
   QPainterPath shape() const noexcept override;
@@ -76,7 +76,7 @@ private:  // Methods
 private:  // Data
   Text& mText;
   const IF_GraphicsLayerProvider& mLayerProvider;
-  tl::optional<QString> mTextOverride;
+  std::optional<QString> mTextOverride;
   QScopedPointer<PrimitiveTextGraphicsItem> mTextGraphicsItem;
   QScopedPointer<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
 

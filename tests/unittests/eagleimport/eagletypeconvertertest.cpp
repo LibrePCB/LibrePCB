@@ -330,7 +330,7 @@ TEST_F(EagleTypeConverterTest, testConvertRectangle) {
                 Vertex(Point(1000000, 2000000), Angle(0)),
             }),
             out.path);
-  EXPECT_EQ(tl::nullopt, out.circle);
+  EXPECT_EQ(std::nullopt, out.circle);
 }
 
 TEST_F(EagleTypeConverterTest, testConvertRectangleRotated) {
@@ -350,7 +350,7 @@ TEST_F(EagleTypeConverterTest, testConvertRectangleRotated) {
                 Vertex(Point(3000000, 1000000), Angle(0)),
             }),
             out.path);
-  EXPECT_EQ(tl::nullopt, out.circle);
+  EXPECT_EQ(std::nullopt, out.circle);
 }
 
 TEST_F(EagleTypeConverterTest, testConvertPolygon) {
@@ -370,7 +370,7 @@ TEST_F(EagleTypeConverterTest, testConvertPolygon) {
                 Vertex(Point(1000000, 2000000), Angle(0)),
             }),
             out.path);
-  EXPECT_EQ(tl::nullopt, out.circle);
+  EXPECT_EQ(std::nullopt, out.circle);
 }
 
 TEST_F(EagleTypeConverterTest, testConvertCircle) {
@@ -437,7 +437,7 @@ TEST_F(EagleTypeConverterTest, testConvertFrame) {
                 Vertex(Point(13810000, 23810000), Angle(0)),
             }),
             out.path);
-  EXPECT_EQ(tl::nullopt, out.circle);
+  EXPECT_EQ(std::nullopt, out.circle);
 }
 
 TEST_F(EagleTypeConverterTest, testConvertTextValue) {

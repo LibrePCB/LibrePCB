@@ -596,7 +596,7 @@ void WorkspaceSettingsDialog::initColorTreeWidgetItem(
 
 Theme* WorkspaceSettingsDialog::getCurrentTheme() noexcept {
   const int index = mUi->cbxThemes->currentIndex();
-  const tl::optional<Uuid> uuid =
+  const std::optional<Uuid> uuid =
       Uuid::tryFromString(mUi->cbxThemes->itemData(index).toString());
   return (uuid && mThemes.contains(*uuid)) ? &mThemes[*uuid] : nullptr;
 }

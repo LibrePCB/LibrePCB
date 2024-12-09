@@ -168,7 +168,7 @@ QList<std::shared_ptr<QGraphicsItem>> SchematicEditorState::findItemsAtPos(
   // with a text at position (0,0) can't be selected because the text gets
   // selected instead (which is very cumbersome).
   QMultiMap<std::pair<int, int>, std::shared_ptr<QGraphicsItem>> items;
-  tl::optional<std::pair<int, int>> lowestPriority;
+  std::optional<std::pair<int, int>> lowestPriority;
   auto addItem = [&items, &lowestPriority](
                      const std::pair<int, int>& prio,
                      std::shared_ptr<QGraphicsItem> item) {
@@ -185,7 +185,7 @@ QList<std::shared_ptr<QGraphicsItem>> SchematicEditorState::findItemsAtPos(
                       flags, &except, &addItem, &canSkip](
                          std::shared_ptr<QGraphicsItem> item,
                          const Point& nearestPos, int priority, bool large,
-                         const tl::optional<UnsignedLength>& maxDistance) {
+                         const std::optional<UnsignedLength>& maxDistance) {
     if (except.contains(item)) {
       return false;
     }
@@ -233,7 +233,7 @@ QList<std::shared_ptr<QGraphicsItem>> SchematicEditorState::findItemsAtPos(
     for (auto it = scene->getNetPoints().begin();
          it != scene->getNetPoints().end(); it++) {
       processItem(it.value(), it.key()->getPosition(),
-                  it.key()->isVisibleJunction() ? 0 : 10, false, tl::nullopt);
+                  it.key()->isVisibleJunction() ? 0 : 10, false, std::nullopt);
     }
   }
 
@@ -245,14 +245,14 @@ QList<std::shared_ptr<QGraphicsItem>> SchematicEditorState::findItemsAtPos(
           Toolbox::nearestPointOnLine(pos.mappedToGrid(getGridInterval()),
                                       it.key()->getStartPoint().getPosition(),
                                       it.key()->getEndPoint().getPosition()),
-          20, true, tl::nullopt);  // Large grab area, better usability!
+          20, true, std::nullopt);  // Large grab area, better usability!
     }
   }
 
   if (flags.testFlag(FindFlag::NetLabels)) {
     for (auto it = scene->getNetLabels().begin();
          it != scene->getNetLabels().end(); it++) {
-      processItem(it.value(), it.key()->getPosition(), 30, false, tl::nullopt);
+      processItem(it.value(), it.key()->getPosition(), 30, false, std::nullopt);
     }
   }
 
@@ -264,7 +264,7 @@ QList<std::shared_ptr<QGraphicsItem>> SchematicEditorState::findItemsAtPos(
       if (!processItem(it.value(), it.key()->getPosition(), 40, false,
                        UnsignedLength(700000))) {
         processItem(it.value(), it.key()->getPosition(), 70, false,
-                    tl::nullopt);
+                    std::nullopt);
       }
     }
   }
@@ -276,7 +276,7 @@ QList<std::shared_ptr<QGraphicsItem>> SchematicEditorState::findItemsAtPos(
       if (flags.testFlag(FindFlag::SymbolPins) ||
           (it.key()->getComponentSignalInstance())) {
         processItem(it.value(), it.key()->getPosition(), 40, false,
-                    tl::nullopt);
+                    std::nullopt);
       }
     }
   }
@@ -287,14 +287,14 @@ QList<std::shared_ptr<QGraphicsItem>> SchematicEditorState::findItemsAtPos(
       processItem(
           it.value(),
           it.key()->getPolygon().getPath().calcNearestPointBetweenVertices(pos),
-          80, true, tl::nullopt);  // Probably large grab area makes sense?
+          80, true, std::nullopt);  // Probably large grab area makes sense?
     }
   }
 
   if (flags.testFlag(FindFlag::Texts)) {
     for (auto it = scene->getTexts().begin(); it != scene->getTexts().end();
          it++) {
-      processItem(it.value(), it.key()->getPosition(), 60, false, tl::nullopt);
+      processItem(it.value(), it.key()->getPosition(), 60, false, std::nullopt);
     }
   }
 

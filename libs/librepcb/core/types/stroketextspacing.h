@@ -25,9 +25,9 @@
  ******************************************************************************/
 #include "ratio.h"
 
-#include <optional/tl/optional.hpp>
-
 #include <QtCore>
+
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -46,12 +46,12 @@ class StrokeTextSpacing final {
 
 public:
   // Constructors / Destructor
-  StrokeTextSpacing(const tl::optional<Ratio>& ratio = tl::nullopt) noexcept;
+  StrokeTextSpacing(const std::optional<Ratio>& ratio = std::nullopt) noexcept;
   StrokeTextSpacing(const StrokeTextSpacing& other) noexcept;
   ~StrokeTextSpacing() noexcept;
 
   // Getters
-  const tl::optional<Ratio>& getRatio() const noexcept { return mRatio; }
+  const std::optional<Ratio>& getRatio() const noexcept { return mRatio; }
 
   // Operator Overloadings
   bool operator==(const StrokeTextSpacing& rhs) const noexcept;
@@ -61,7 +61,7 @@ public:
   StrokeTextSpacing& operator=(const StrokeTextSpacing& rhs) noexcept;
 
 private:  // Data
-  tl::optional<Ratio> mRatio;  ///< `nullopt` means automatic (from font)
+  std::optional<Ratio> mRatio;  ///< `nullopt` means automatic (from font)
 };
 
 /*******************************************************************************

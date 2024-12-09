@@ -209,7 +209,7 @@ bool PackageEditorState_ReNumberPads::start() noexcept {
     // Clear all pad numbers.
     for (auto& pad : mContext.currentFootprint->getPads()) {
       std::unique_ptr<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(pad));
-      cmd->setPackagePadUuid(tl::nullopt, true);
+      cmd->setPackagePadUuid(std::nullopt, true);
       mContext.undoStack.appendToCmdGroup(cmd.release());
     }
     return true;

@@ -513,7 +513,7 @@ QList<EagleTypeConverter::Geometry> EagleTypeConverter::convertAndJoinWires(
             false,  // Filled
             isGrabAreaIfClosed && p.isClosed(),  // Grab area
             p,  // Path
-            tl::nullopt,  // Circle
+            std::nullopt,  // Circle
         });
       }
     } catch (const Exception& e) {
@@ -541,7 +541,7 @@ EagleTypeConverter::Geometry EagleTypeConverter::convertRectangle(
       true,  // Filled
       isGrabArea,  // Grab area
       path,  // Path
-      tl::nullopt,  // Circle
+      std::nullopt,  // Circle
   };
 }
 
@@ -553,7 +553,7 @@ EagleTypeConverter::Geometry EagleTypeConverter::convertPolygon(
       true,  // Filled (EAGLE polygons are always filled)
       isGrabArea,  // Grab area
       convertVertices(p.getVertices(), true),  // Path (polygons are closed)
-      tl::nullopt,  // Circle
+      std::nullopt,  // Circle
   };
 }
 
@@ -598,7 +598,7 @@ EagleTypeConverter::Geometry EagleTypeConverter::convertFrame(
       false,  // Filled
       false,  // Grab area
       Path::rect(p1Abs, p2Abs),  // Path
-      tl::nullopt,  // Circle
+      std::nullopt,  // Circle
   };
 }
 

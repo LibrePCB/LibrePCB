@@ -531,7 +531,7 @@ bool SchematicEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
         &menu, this,
         &SchematicEditorState_Select::resetAllTextsOfSelectedItems));
     mContext.editor.getProjectEditor().addResourcesToMenu(
-        mb, sym->getSymbol().getComponentInstance(), tl::nullopt,
+        mb, sym->getSymbol().getComponentInstance(), std::nullopt,
         &mContext.editor, &menu);
 
   } else if (std::dynamic_pointer_cast<SGI_NetLabel>(selectedItem)) {

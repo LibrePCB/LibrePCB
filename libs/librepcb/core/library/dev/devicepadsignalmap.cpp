@@ -39,14 +39,14 @@ DevicePadSignalMapItem::DevicePadSignalMapItem(
 }
 
 DevicePadSignalMapItem::DevicePadSignalMapItem(
-    const Uuid& pad, const tl::optional<Uuid>& signal) noexcept
+    const Uuid& pad, const std::optional<Uuid>& signal) noexcept
   : onEdited(*this), mPadUuid(pad), mSignalUuid(signal) {
 }
 
 DevicePadSignalMapItem::DevicePadSignalMapItem(const SExpression& node)
   : onEdited(*this),
     mPadUuid(deserialize<Uuid>(node.getChild("@0"))),
-    mSignalUuid(deserialize<tl::optional<Uuid>>(node.getChild("signal/@0"))) {
+    mSignalUuid(deserialize<std::optional<Uuid>>(node.getChild("signal/@0"))) {
 }
 
 DevicePadSignalMapItem::~DevicePadSignalMapItem() noexcept {
@@ -57,7 +57,7 @@ DevicePadSignalMapItem::~DevicePadSignalMapItem() noexcept {
  ******************************************************************************/
 
 bool DevicePadSignalMapItem::setSignalUuid(
-    const tl::optional<Uuid>& uuid) noexcept {
+    const std::optional<Uuid>& uuid) noexcept {
   if (uuid == mSignalUuid) {
     return false;
   }

@@ -74,7 +74,7 @@ void CategoryTreeLabelTextBuilder<ElementType>::setErrorText(
 
 template <typename ElementType>
 bool CategoryTreeLabelTextBuilder<ElementType>::updateText(
-    const tl::optional<Uuid>& category) noexcept {
+    const std::optional<Uuid>& category) noexcept {
   try {
     QStringList lines = mBuilder.buildTree(category);
     if (lines.isEmpty() && mChooseIfEmpty) {

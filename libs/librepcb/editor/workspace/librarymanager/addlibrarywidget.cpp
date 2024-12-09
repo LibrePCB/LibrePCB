@@ -179,7 +179,7 @@ void AddLibraryWidget::createLocalLibraryButtonClicked() noexcept {
       getTextOrPlaceholderFromQLineEdit(mUi->edtLocalAuthor, false);
   QString versionStr =
       getTextOrPlaceholderFromQLineEdit(mUi->edtLocalVersion, false);
-  tl::optional<Version> version = Version::tryFromString(versionStr);
+  std::optional<Version> version = Version::tryFromString(versionStr);
   QString urlStr = mUi->edtLocalUrl->text().trimmed();
   QUrl url = QUrl::fromUserInput(urlStr);
   bool useCc0License = mUi->cbxLocalCc0License->isChecked();

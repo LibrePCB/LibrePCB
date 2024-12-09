@@ -48,7 +48,7 @@ namespace editor {
 CmdAddComponentToCircuit::CmdAddComponentToCircuit(
     Workspace& workspace, Project& project, const Uuid& component,
     const Uuid& symbolVariant,
-    const tl::optional<ComponentAssemblyOptionList>& options) noexcept
+    const std::optional<ComponentAssemblyOptionList>& options) noexcept
   : UndoCommandGroup(tr("Add component")),
     mWorkspace(workspace),
     mProject(project),

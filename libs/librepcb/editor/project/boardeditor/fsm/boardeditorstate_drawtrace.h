@@ -197,7 +197,7 @@ private:
   BI_Via* mTempVia;
   Via mCurrentViaProperties;  ///< The current Via properties
                               ///< diameter
-  tl::optional<const Layer&> mViaLayer;  ///< Layer where the via was started
+  const Layer* mViaLayer;  ///< Layer where the via was started
   Point mTargetPos;  ///< the current target position of the
                      ///< active trace
 

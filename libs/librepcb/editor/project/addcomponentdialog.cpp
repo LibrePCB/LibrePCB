@@ -275,12 +275,12 @@ void AddComponentDialog::setLocaleOrder(const QStringList& order) noexcept {
  *  Getters
  ******************************************************************************/
 
-tl::optional<Package::AssemblyType>
+std::optional<Package::AssemblyType>
     AddComponentDialog::getSelectedPackageAssemblyType() const noexcept {
   return (mSelectedComponent && mSelectedSymbVar && mSelectedDevice &&
           mSelectedPackage)
-      ? tl::make_optional(mSelectedPackage->getAssemblyType(true))
-      : tl::nullopt;
+      ? std::make_optional(mSelectedPackage->getAssemblyType(true))
+      : std::nullopt;
 }
 
 bool AddComponentDialog::getAutoOpenAgain() const noexcept {
@@ -292,7 +292,7 @@ bool AddComponentDialog::getAutoOpenAgain() const noexcept {
  ******************************************************************************/
 
 void AddComponentDialog::selectComponentByKeyword(
-    const QString keyword, const tl::optional<Uuid>& selectedDevice) noexcept {
+    const QString keyword, const std::optional<Uuid>& selectedDevice) noexcept {
   try {
     searchComponents(keyword, selectedDevice, true);
   } catch (const Exception& e) {
@@ -351,7 +351,7 @@ void AddComponentDialog::treeCategories_currentItemChanged(
   mUi->lblErrorMsg->clear();
 
   try {
-    tl::optional<Uuid> categoryUuid =
+    std::optional<Uuid> categoryUuid =
         Uuid::tryFromString(current.data(Qt::UserRole).toString());
     setSelectedCategory(categoryUuid);
   } catch (Exception& e) {
@@ -435,7 +435,7 @@ void AddComponentDialog::treeComponents_itemExpanded(
 
 void AddComponentDialog::cbxSymbVar_currentIndexChanged(int index) noexcept {
   if ((mSelectedComponent) && (index >= 0)) {
-    tl::optional<Uuid> uuid =
+    std::optional<Uuid> uuid =
         Uuid::tryFromString(mUi->cbxSymbVar->itemData(index).toString());
     if (uuid) {
       setSelectedSymbVar(mSelectedComponent->getSymbolVariants().find(*uuid));
@@ -494,7 +494,7 @@ void AddComponentDialog::customComponentsContextMenuRequested(
  ******************************************************************************/
 
 void AddComponentDialog::searchComponents(
-    const QString& input, const tl::optional<Uuid>& selectedDevice,
+    const QString& input, const std::optional<Uuid>& selectedDevice,
     bool selectFirstDevice) {
   mCurrentSearchTerm = input;
   setSelectedComponent(nullptr);
@@ -708,7 +708,7 @@ AddComponentDialog::SearchResult AddComponentDialog::search(
 }
 
 void AddComponentDialog::setSelectedCategory(
-    const tl::optional<Uuid>& categoryUuid) {
+    const std::optional<Uuid>& categoryUuid) {
   mCurrentSearchTerm.clear();
   setSelectedComponent(nullptr);
   mUi->treeComponents->clear();

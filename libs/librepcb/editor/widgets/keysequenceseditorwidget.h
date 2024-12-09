@@ -23,10 +23,10 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <optional/tl/optional.hpp>
-
 #include <QtCore>
 #include <QtWidgets>
+
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -55,11 +55,11 @@ public:
   ~KeySequencesEditorWidget() noexcept;
 
   // General Methods
-  const tl::optional<QList<QKeySequence>>& getOverrides() const noexcept {
+  const std::optional<QList<QKeySequence>>& getOverrides() const noexcept {
     return mOverrides;
   }
   void setOverrides(
-      const tl::optional<QList<QKeySequence>>& overrides) noexcept;
+      const std::optional<QList<QKeySequence>>& overrides) noexcept;
   void setRowHeight(int height) noexcept;
 
   // Operator Overloadings
@@ -76,7 +76,7 @@ private:  // Methods
 private:  // Data
   QPointer<QVBoxLayout> mLayout;
   QList<QKeySequence> mDefault;
-  tl::optional<QList<QKeySequence>> mOverrides;
+  std::optional<QList<QKeySequence>> mOverrides;
   int mRowHeight;
 };
 

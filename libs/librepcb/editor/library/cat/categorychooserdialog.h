@@ -65,7 +65,7 @@ public:
   ~CategoryChooserDialog() noexcept;
 
   // Getters
-  tl::optional<Uuid> getSelectedCategoryUuid() const noexcept;
+  std::optional<Uuid> getSelectedCategoryUuid() const noexcept;
 
   // Operator Overloadings
   CategoryChooserDialog& operator=(const CategoryChooserDialog& rhs) = delete;

@@ -122,7 +122,7 @@ void ComponentSymbolVariantListWidget::openEditor(const Uuid& uuid) noexcept {
 
 void ComponentSymbolVariantListWidget::btnEditClicked(
     const QPersistentModelIndex& itemIndex) noexcept {
-  tl::optional<Uuid> uuid =
+  std::optional<Uuid> uuid =
       Uuid::tryFromString(itemIndex.data(Qt::EditRole).toString());
   if (uuid && mSymbolVariantList && mUndoStack && mEditorProvider) {
     editVariant(*uuid);

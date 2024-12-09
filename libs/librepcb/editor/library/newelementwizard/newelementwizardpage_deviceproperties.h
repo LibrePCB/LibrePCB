@@ -68,8 +68,8 @@ public:
 private:  // Methods
   void btnChooseComponentClicked() noexcept;
   void btnChoosePackageClicked() noexcept;
-  void setComponent(const tl::optional<Uuid>& uuid) noexcept;
-  void setPackage(const tl::optional<Uuid>& uuid) noexcept;
+  void setComponent(const std::optional<Uuid>& uuid) noexcept;
+  void setPackage(const std::optional<Uuid>& uuid) noexcept;
   void initializePage() noexcept override;
   void cleanupPage() noexcept override;
 

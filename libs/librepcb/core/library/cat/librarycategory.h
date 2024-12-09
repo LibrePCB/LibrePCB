@@ -60,12 +60,12 @@ public:
   virtual ~LibraryCategory() noexcept;
 
   // Getters: Attributes
-  const tl::optional<Uuid>& getParentUuid() const noexcept {
+  const std::optional<Uuid>& getParentUuid() const noexcept {
     return mParentUuid;
   }
 
   // Setters: Attributes
-  void setParentUuid(const tl::optional<Uuid>& parentUuid) noexcept {
+  void setParentUuid(const std::optional<Uuid>& parentUuid) noexcept {
     mParentUuid = parentUuid;
   }
 
@@ -75,7 +75,7 @@ public:
 protected:
   virtual void serialize(SExpression& root) const override;
 
-  tl::optional<Uuid> mParentUuid;
+  std::optional<Uuid> mParentUuid;
 };
 
 /*******************************************************************************

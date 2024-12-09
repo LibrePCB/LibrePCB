@@ -231,8 +231,8 @@ TEST_F(DxfImportDialogTest, testScaleFactor) {
 }
 
 TEST_F(DxfImportDialogTest, testPlacementPosition) {
-  const tl::optional<Point> defaultValue = tl::nullopt;
-  const tl::optional<Point> newValue = Point(1000000, 2000000);
+  const std::optional<Point> defaultValue = std::nullopt;
+  const std::optional<Point> newValue = Point(1000000, 2000000);
 
   {
     DxfImportDialog dialog(Toolbox::toSet(mLayers), *mLayers[0], true,

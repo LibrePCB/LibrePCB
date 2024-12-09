@@ -69,7 +69,7 @@ public:
   ~SymbolChooserDialog() noexcept;
 
   // Getters
-  tl::optional<Uuid> getSelectedSymbolUuid() const noexcept;
+  std::optional<Uuid> getSelectedSymbolUuid() const noexcept;
   QString getSelectedSymbolNameTr() const noexcept;
   QString getSelectedSymbolDescriptionTr() const noexcept;
 
@@ -84,7 +84,7 @@ private:  // Methods
                                       QListWidgetItem* previous) noexcept;
   void listSymbols_itemDoubleClicked(QListWidgetItem* item) noexcept;
   void searchSymbols(const QString& input);
-  void setSelectedCategory(const tl::optional<Uuid>& uuid) noexcept;
+  void setSelectedCategory(const std::optional<Uuid>& uuid) noexcept;
   void setSelectedSymbol(const FilePath& fp) noexcept;
   void accept() noexcept override;
   const QStringList& localeOrder() const noexcept;
@@ -96,7 +96,7 @@ private:  // Data
   QScopedPointer<QAbstractItemModel> mCategoryTreeModel;
   QScopedPointer<GraphicsScene> mPreviewScene;
   bool mCategorySelected;
-  tl::optional<Uuid> mSelectedCategoryUuid;
+  std::optional<Uuid> mSelectedCategoryUuid;
   std::unique_ptr<Symbol> mSelectedSymbol;
   QScopedPointer<SymbolGraphicsItem> mGraphicsItem;
 };

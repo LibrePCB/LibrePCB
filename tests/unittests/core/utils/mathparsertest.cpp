@@ -24,7 +24,7 @@
 #include <gtest/gtest.h>
 #include <librepcb/core/utils/mathparser.h>
 
-#include <optional.hpp>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace
@@ -39,7 +39,7 @@ namespace tests {
 typedef struct {
   QString locale;
   QString input;
-  tl::optional<qreal> output;
+  std::optional<qreal> output;
 } MathParserTestData;
 
 /*******************************************************************************
@@ -86,11 +86,11 @@ INSTANTIATE_TEST_SUITE_P(MathParserTest, MathParserTest, ::testing::Values(
     MathParserTestData({"de_DE", "5,000", 5}), // decimal point
 
     // invalid cases
-    MathParserTestData({"en_US", "", tl::nullopt}),
-    MathParserTestData({"en_US", " ", tl::nullopt}),
-    MathParserTestData({"en_US", ".", tl::nullopt}),
-    MathParserTestData({"en_US", "/", tl::nullopt}),
-    MathParserTestData({"en_US", "(1+2", tl::nullopt})
+    MathParserTestData({"en_US", "", std::nullopt}),
+    MathParserTestData({"en_US", " ", std::nullopt}),
+    MathParserTestData({"en_US", ".", std::nullopt}),
+    MathParserTestData({"en_US", "/", std::nullopt}),
+    MathParserTestData({"en_US", "(1+2", std::nullopt})
 ));
 // clang-format on
 

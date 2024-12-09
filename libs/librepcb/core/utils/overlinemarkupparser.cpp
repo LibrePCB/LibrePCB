@@ -95,10 +95,12 @@ QVector<QLineF> OverlineMarkupParser::calculate(
   const qreal yBase = boundingRect.top() - fm.overlinePos();
   foreach (const auto& span, spans) {
     const QRectF prefixRect = fm.boundingRect(
-        QRectF(), Qt::TextDontClip | Qt::AlignBottom | Qt::AlignLeft,
+        QRectF(),
+        static_cast<int>(Qt::TextDontClip) | Qt::AlignBottom | Qt::AlignLeft,
         text.left(span.first));
     const QRectF suffixRect = fm.boundingRect(
-        QRectF(), Qt::TextDontClip | Qt::AlignBottom | Qt::AlignLeft,
+        QRectF(),
+        static_cast<int>(Qt::TextDontClip) | Qt::AlignBottom | Qt::AlignLeft,
         text.mid(span.first + span.second));
     overlines.append(QLineF(
         boundingRect.left() + prefixRect.width(), yBase - prefixRect.top(),

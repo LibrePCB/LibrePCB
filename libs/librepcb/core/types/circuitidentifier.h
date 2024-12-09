@@ -31,7 +31,7 @@
 
 #include <QtCore>
 
-#include <optional.hpp>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -135,7 +135,7 @@ inline CircuitIdentifier deserialize(const SExpression& node) {
 
 template <>
 inline std::unique_ptr<SExpression> serialize(
-    const tl::optional<CircuitIdentifier>& obj) {
+    const std::optional<CircuitIdentifier>& obj) {
   if (obj) {
     return serialize(*obj);
   } else {
@@ -144,9 +144,9 @@ inline std::unique_ptr<SExpression> serialize(
 }
 
 template <>
-inline tl::optional<CircuitIdentifier> deserialize(const SExpression& node) {
+inline std::optional<CircuitIdentifier> deserialize(const SExpression& node) {
   if (node.getValue().isEmpty()) {
-    return tl::nullopt;
+    return std::nullopt;
   } else {
     return deserialize<CircuitIdentifier>(node);  // can throw
   }

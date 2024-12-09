@@ -87,7 +87,7 @@ public:
   }
   QSet<Uuid> getCompatibleDevices() const noexcept;
   QVector<std::shared_ptr<const Part>> getParts(
-      const tl::optional<Uuid>& assemblyVariant) const noexcept;
+      const std::optional<Uuid>& assemblyVariant) const noexcept;
   bool getLockAssembly() const noexcept { return mLockAssembly; }
 
   // Getters: General

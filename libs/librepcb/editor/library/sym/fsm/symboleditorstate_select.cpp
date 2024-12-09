@@ -382,7 +382,7 @@ bool SymbolEditorState_Select::processPaste(
               qApp->clipboard()->mimeData());  // can throw
         }
         if (data) {
-          return startPaste(std::move(data), tl::nullopt);
+          return startPaste(std::move(data), std::nullopt);
         }
       } catch (const Exception& e) {
         QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
@@ -651,9 +651,9 @@ bool SymbolEditorState_Select::openContextMenuAtPos(const Point& pos) noexcept {
 
       int lineIndex = i->getLineIndexAtPosition(pos);
       if (lineIndex >= 0) {
-        QAction* aAddVertex = cmd.vertexAdd.createAction(&menu, this, [=]() {
-          startAddingPolygonVertex(polygon, lineIndex, pos);
-        });
+        QAction* aAddVertex = cmd.vertexAdd.createAction(
+            &menu, this,
+            [=, this]() { startAddingPolygonVertex(polygon, lineIndex, pos); });
         aAddVertex->setEnabled(!mContext.editorContext.readOnly);
         mb.addAction(aAddVertex);
       }
@@ -797,7 +797,7 @@ bool SymbolEditorState_Select::copySelectedItemsToClipboard() noexcept {
 
 bool SymbolEditorState_Select::startPaste(
     std::unique_ptr<SymbolClipboardData> data,
-    const tl::optional<Point>& fixedPosition) {
+    const std::optional<Point>& fixedPosition) {
   Q_ASSERT(data);
 
   // Start undo command group.

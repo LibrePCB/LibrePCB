@@ -236,7 +236,7 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
   mUi->customShapePathEditor->setPath(mPad.getCustomShapeOutline());
   if (!mPad.getStopMaskConfig().isEnabled()) {
     mUi->rbtnStopMaskOff->setChecked(true);
-  } else if (tl::optional<Length> offset =
+  } else if (std::optional<Length> offset =
                  mPad.getStopMaskConfig().getOffset()) {
     mUi->rbtnStopMaskManual->setChecked(true);
     mUi->edtStopMaskOffset->setValue(*offset);
@@ -245,7 +245,7 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
   }
   if (!mPad.getSolderPasteConfig().isEnabled()) {
     mUi->rbtnSolderPasteOff->setChecked(true);
-  } else if (tl::optional<Length> offset =
+  } else if (std::optional<Length> offset =
                  mPad.getSolderPasteConfig().getOffset()) {
     mUi->rbtnSolderPasteManual->setChecked(true);
     mUi->edtSolderPasteOffset->setValue(*offset);
@@ -477,7 +477,7 @@ bool FootprintPadPropertiesDialog::applyChanges() noexcept {
 
   try {
     std::unique_ptr<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(mPad));
-    tl::optional<Uuid> pkgPad =
+    std::optional<Uuid> pkgPad =
         Uuid::tryFromString(mUi->cbxPackagePad->currentData().toString());
     cmd->setPackagePadUuid(pkgPad, false);
     QVariant function = mUi->cbxFunction->currentData();

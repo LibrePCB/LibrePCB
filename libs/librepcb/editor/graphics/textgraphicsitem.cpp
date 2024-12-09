@@ -47,7 +47,7 @@ TextGraphicsItem::TextGraphicsItem(Text& text,
   : QGraphicsItemGroup(parent),
     mText(text),
     mLayerProvider(lp),
-    mTextOverride(tl::nullopt),
+    mTextOverride(std::nullopt),
     mTextGraphicsItem(new PrimitiveTextGraphicsItem(this)),
     mOriginCrossGraphicsItem(new OriginCrossGraphicsItem(this)),
     mOnEditedSlot(*this, &TextGraphicsItem::textEdited) {
@@ -81,7 +81,7 @@ TextGraphicsItem::~TextGraphicsItem() noexcept {
  ******************************************************************************/
 
 void TextGraphicsItem::setTextOverride(
-    const tl::optional<QString>& text) noexcept {
+    const std::optional<QString>& text) noexcept {
   if (text != mTextOverride) {
     mTextOverride = text;
     updateText();

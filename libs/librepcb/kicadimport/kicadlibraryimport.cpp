@@ -556,7 +556,7 @@ std::shared_ptr<KiCadLibraryImport::Result> KiCadLibraryImport::parse(
             {kiSymbol.extends.isEmpty() ? kiSymbol.name : kiSymbol.extends});
         const QString devGeneratedBy =
             generatedBy(lib.file.getCompleteBasename(), {kiSymbol.name});
-        const tl::optional<KiCadProperty> footprintProp =
+        const std::optional<KiCadProperty> footprintProp =
             KiCadTypeConverter::findProperty(kiSymbol.properties, "footprint");
         const QString footprintStr =
             footprintProp ? footprintProp->value.trimmed() : QString();

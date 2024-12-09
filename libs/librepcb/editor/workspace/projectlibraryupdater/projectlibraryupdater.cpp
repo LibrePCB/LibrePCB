@@ -178,7 +178,7 @@ void ProjectLibraryUpdater::updateElements(
     std::shared_ptr<TransactionalFileSystem> fs, const QString& type) {
   QString dirpath = "library/" % type;
   foreach (const QString& dirname, fs->getDirs(dirpath)) {
-    tl::optional<Uuid> uuid = Uuid::tryFromString(dirname);
+    std::optional<Uuid> uuid = Uuid::tryFromString(dirname);
     FilePath src =
         uuid ? mWorkspace.getLibraryDb().getLatest<T>(*uuid) : FilePath();
     QString dst = dirpath % "/" % dirname;

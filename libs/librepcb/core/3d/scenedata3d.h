@@ -28,11 +28,10 @@
 #include "../geometry/polygon.h"
 #include "../utils/transform.h"
 
-#include <optional/tl/optional.hpp>
-
 #include <QtCore>
 
 #include <memory>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -87,8 +86,8 @@ public:
     PositiveLength drillDiameter;
     const Layer* startLayer;
     const Layer* endLayer;
-    tl::optional<PositiveLength> stopMaskDiameterTop;
-    tl::optional<PositiveLength> stopMaskDiameterBottom;
+    std::optional<PositiveLength> stopMaskDiameterTop;
+    std::optional<PositiveLength> stopMaskDiameterBottom;
   };
 
   struct HoleData {
@@ -166,8 +165,8 @@ public:
       const Point& position, const PositiveLength& size,
       const PositiveLength& drillDiameter, const Layer& startLayer,
       const Layer& endLayer,
-      const tl::optional<PositiveLength>& stopMaskDiameterTop,
-      const tl::optional<PositiveLength>& stopMaskDiameterBottom) noexcept;
+      const std::optional<PositiveLength>& stopMaskDiameterTop,
+      const std::optional<PositiveLength>& stopMaskDiameterBottom) noexcept;
   void addHole(const NonEmptyPath& path, const PositiveLength& diameter,
                bool plated, bool via, const Transform& transform) noexcept;
   void addArea(const Layer& layer, const Path& outline,
