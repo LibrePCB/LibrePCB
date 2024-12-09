@@ -27,6 +27,7 @@ set -eufo pipefail
 
 DOCKER=""
 DOCKER_CMD="docker"
+DOCKER_IMAGE="librepcb/librepcb-dev:devtools-4"
 CLANGFORMAT=${CLANGFORMAT:-clang-format}
 BASE="master"
 CHECK=""
@@ -61,9 +62,8 @@ REPO_ROOT=$(git rev-parse --show-toplevel)
 
 if [ "$DOCKER" == "--docker" ]; then
   echo "[Re-running format_code.sh inside Docker container]"
-  $DOCKER_CMD run --rm -t --user "$(id -u):$(id -g)" \
-    -v "$REPO_ROOT:/code" \
-    librepcb/librepcb-dev:devtools-3 \
+  $DOCKER_CMD run --rm -t --user "$(id -u):$(id -g)" -v "$REPO_ROOT:/code" \
+    $DOCKER_IMAGE \
     /usr/bin/env bash -c "cd /code && dev/format_code.sh --base \"$BASE\" $CHECK"
 
   echo "[Docker done.]"
@@ -195,6 +195,26 @@ if [ -x ${QMLFORMAT} ]; then
 else
   echo "Formatting QML sources with qmlformat DISABLED ..."
   echo "  Make sure that qmlformat (qtdeclarative5-dev-tools) are installed."
+  echo "  On Linux, you can also run this script in a docker"
+  echo "  container by using the '--docker' argument."
+fi
+
+# Format .reuse/dep5 files with debian-copyright-sorter.
+dcs_failed() {
+  echo "" >&2
+  echo "ERROR: debian-copyright-sorter failed!" >&2
+  echo "  On Linux, you can also run this script in a docker" >&2
+  echo "  container by using the '--docker' argument." >&2
+  exit 7
+}
+if command -v debian-copyright-sorter 2>&1 >/dev/null; then
+  echo "Formatting license files with debian-copyright-sorter..."
+  for file in $(search_files "**/dep5"); do
+    debian-copyright-sorter --iml -s casefold "$file" | update_file "$file" || dcs_failed
+  done
+else
+  echo "Formatting license files with debian-copyright-sorter DISABLED ..."
+  echo "  Make sure that debian-copyright-sorter is installed."
   echo "  On Linux, you can also run this script in a docker"
   echo "  container by using the '--docker' argument."
 fi
