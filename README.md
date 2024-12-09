@@ -50,7 +50,8 @@ productive use, please install an official release as described in the
 
 To compile and run LibrePCB, you need the following software components:
 
-- Compiler: g++, MinGW or Clang (any version with C++20 support should work)
+- C++ compiler: g++, MinGW or Clang (any version with C++20 support should work)
+- [Rust](https://www.rust-lang.org/) toolchain (GNU, not MSVC)
 - [Qt](http://www.qt.io/download-open-source/) >= 6.2 (make
   sure the [imageformats](https://doc.qt.io/qt-6/qtimageformats-index.html)
   plugin is installed too as it will be needed at runtime!).
@@ -60,7 +61,7 @@ To compile and run LibrePCB, you need the following software components:
   GLU (optional)
 - [zlib](http://www.zlib.net/)
 - [OpenSSL](https://www.openssl.org/)
-- [CMake](https://cmake.org/) 3.16 or newer
+- [CMake](https://cmake.org/) 3.22 or newer
 
 #### Prepared Docker Image
 
@@ -79,7 +80,7 @@ sudo apt-get install build-essential git cmake openssl zlib1g zlib1g-dev \
      qt6-base-dev qt6-tools-dev qt6-tools-dev-tools qt6-l10n-tools \
      libqt6core5compat6-dev qt6-declarative-dev libqt6opengl6-dev libqt6svg6-dev \
      qt6-image-formats-plugins libglu1-mesa-dev libtbb-dev libxi-dev \
-     occt-misc libocct-*-dev
+     occt-misc libocct-*-dev rustc cargo
 sudo apt-get install qtcreator # optional
 ```
 
@@ -89,15 +90,16 @@ sudo apt-get install qtcreator # optional
 sudo apt-get install build-essential git cmake openssl zlib1g zlib1g-dev \
      qt5-default qtdeclarative5-dev qttools5-dev-tools qttools5-dev \
      qtquickcontrols2-5-dev libqt5opengl5-dev libqt5svg5-dev \
-     qt5-image-formats-plugins libglu1-mesa-dev liboce-*-dev
+     qt5-image-formats-plugins libglu1-mesa-dev liboce-*-dev rustc cargo
 sudo apt-get install qt5-doc qtcreator # optional
 ```
 
 #### Installation on Arch Linux
 
 ```bash
-sudo pacman -S base-devel git cmake openssl zlib desktop-file-utils shared-mime-info \
-     qt6-base qt6-5compat qt6-declarative qt6-svg qt6-tools qt6-imageformats opencascade
+sudo pacman -S base-devel git cmake openssl zlib desktop-file-utils \
+     shared-mime-info qt6-base qt6-5compat qt6-declarative qt6-svg qt6-tools \
+     qt6-imageformats opencascade rust
 sudo pacman -S qt6-doc qtcreator # optional
 ```
 
@@ -111,7 +113,7 @@ GitHub.*
 
 1. Install Xcode through the app store and start it at least once (for the license)
 2. Install [homebrew](https://github.com/Homebrew/brew) (**the** package manager)
-3. Install dependencies: `brew update && brew install qt6 cmake opencascade`
+3. Install dependencies: `brew update && brew install qt6 cmake opencascade rust`
 4. Make the toolchain available: `brew unlink qt && brew link --force qt6`
 
 #### Installation on Windows
@@ -126,6 +128,10 @@ with MSVC, so you must install following components with the Qt installer:
 - Qt 5 Compatibility Module for MinGW 11.2.0 64-bit
 - Qt Image Formats for MinGW 11.2.0 64-bit
 - CMake
+
+In addition, install the Rust toolchain with
+[Rustup](https://rust-lang.github.io/rustup/installation/windows.html).
+Use the toolchain `x86_64-pc-windows-gnu` as we don't support MSVC!
 
 For the OpenCascade library the installation procedure is not that easy
 unfortunately. Basically you have to build it by yourself, see instructions
