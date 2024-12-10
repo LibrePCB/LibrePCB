@@ -73,9 +73,9 @@ public:
 private:  // Methods
   TraceAnchor replaceAnchor(const TraceAnchor& anchor,
                             const Layer& layer) noexcept;
-  void findConnectedLinesAndPoints(const TraceAnchor& anchor,
-                                   ViaList& availableVias,
-                                   TraceList& availableTraces, Segment& segment)
+  void findConnectedLinesAndPoints(
+      const TraceAnchor& anchor, QList<std::shared_ptr<Via>>& availableVias,
+      QList<std::shared_ptr<Trace>>& availableTraces, Segment& segment)
 
       noexcept;
 

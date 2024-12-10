@@ -71,9 +71,9 @@ public:
 
 private:  // Methods
   NetLineAnchor replacePinAnchor(const NetLineAnchor& anchor) noexcept;
-  void findConnectedLinesAndPoints(const NetLineAnchor& anchor,
-                                   NetLineList& availableNetLines,
-                                   Segment& segment)
+  void findConnectedLinesAndPoints(
+      const NetLineAnchor& anchor,
+      QList<std::shared_ptr<NetLine>>& availableNetLines, Segment& segment)
 
       noexcept;
   void addNetLabelToNearestNetSegment(const NetLabel& netlabel,
