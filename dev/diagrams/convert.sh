@@ -12,8 +12,7 @@ do
 done
 
 # update images in doxygen documentation
-inkscape -z -w 1000 --export-background=white --export-type=png \
-  -o ../doxygen/images/architecture_overview.png svg/architecture_overview.svg
+cp -f architecture_overview.drawio.svg ../doxygen/images/architecture_overview.svg
 inkscape -z -w 1200 --export-background=white --export-type=png \
   -o ../doxygen/images/attributes_system.png svg/attributes_system.svg
 inkscape -z -w 1200 --export-background=white --export-type=png \
