@@ -76,6 +76,8 @@ pub fn from_qstring(obj: &QString) -> String {
   unsafe {
     let data = ffi_qstring_utf16(obj);
     let len = ffi_qstring_len(obj);
+    // Don't use QString::toUtf8() as it would allocate a temporary QByteArray
+    // for the whole string. The approach below avoids this unnecessary copy.
     String::from_utf16_lossy(std::slice::from_raw_parts(data, len))
   }
 }
