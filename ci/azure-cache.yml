@@ -4,35 +4,35 @@ steps:
   inputs:
     path: $(CCACHE_DIR)/
     key: '"ccache" | "$(System.JobName)" | "$(Build.SourceBranch)"'
-    restoreKeys: '"ccache" | "$(System.JobName)"'
+    restoreKeys: '"ccache" | "$(System.JobName)" | "refs/heads/master"'
 - task: Cache@2
   displayName: Cache .cargo/bin/
   inputs:
+    path: $(CARGO_HOME)/bin/
     key: 'libs/librepcb/**/Cargo.lock | "cargo-bin" | "$(System.JobName)" | "$(Build.SourceBranch)"'
-    restoreKeys: 'libs/librepcb/**/Cargo.lock | "cargo-bin" | "$(System.JobName)"'
-    path: ~/.cargo/bin/
+    restoreKeys: 'libs/librepcb/**/Cargo.lock | "cargo-bin" | "$(System.JobName)" | "refs/heads/master"'
 - task: Cache@2
   displayName: Cache .cargo/registry/index/
   inputs:
+    path: $(CARGO_HOME)/registry/index/
     key: 'libs/librepcb/**/Cargo.lock | "cargo-reg-index" | "$(System.JobName)" | "$(Build.SourceBranch)"'
-    restoreKeys: 'libs/librepcb/**/Cargo.lock | "cargo-reg-index" | "$(System.JobName)"'
-    path: ~/.cargo/registry/index/
+    restoreKeys: 'libs/librepcb/**/Cargo.lock | "cargo-reg-index" | "$(System.JobName)" | "refs/heads/master"'
 - task: Cache@2
   displayName: Cache .cargo/registry/cache/
   inputs:
+    path: $(CARGO_HOME)/registry/cache/
     key: 'libs/librepcb/**/Cargo.lock | "cargo-reg-cache" | "$(System.JobName)" | "$(Build.SourceBranch)"'
-    restoreKeys: 'libs/librepcb/**/Cargo.lock | "cargo-reg-cache" | "$(System.JobName)"'
-    path: ~/.cargo/registry/cache/
+    restoreKeys: 'libs/librepcb/**/Cargo.lock | "cargo-reg-cache" | "$(System.JobName)" | "refs/heads/master"'
 # No Git dependencies (yet), so this task would fail.
 #- task: Cache@2
 #  displayName: Cache .cargo/git/db/
 #  inputs:
+#    path: $(CARGO_HOME)/git/db/
 #    key: 'libs/librepcb/**/Cargo.lock | "cargo-git-db" | "$(System.JobName)" | "$(Build.SourceBranch)"'
-#    restoreKeys: 'libs/librepcb/**/Cargo.lock | "cargo-git-db" | "$(System.JobName)"'
-#    path: ~/.cargo/git/db/
+#    restoreKeys: 'libs/librepcb/**/Cargo.lock | "cargo-git-db" | "$(System.JobName)" | "refs/heads/master"'
 - task: Cache@2
   displayName: Cache ./libs/librepcb/rust-core/target/
   inputs:
-    key: 'libs/librepcb/**/Cargo.lock | "rust-core-target" | "$(System.JobName)" | "$(Build.SourceBranch)"'
-    restoreKeys: 'libs/librepcb/**/Cargo.lock | "rust-core-target" | "$(System.JobName)"'
     path: ./libs/librepcb/rust-core/target/
+    key: 'libs/librepcb/**/Cargo.lock | "rust-core-target" | "$(System.JobName)" | "$(Build.SourceBranch)"'
+    restoreKeys: 'libs/librepcb/**/Cargo.lock | "rust-core-target" | "$(System.JobName)" | "refs/heads/master"'
