@@ -5,12 +5,13 @@ steps:
     path: $(CCACHE_DIR)/
     key: '"ccache" | "$(System.JobName)" | "$(Build.SourceBranch)"'
     restoreKeys: '"ccache" | "$(System.JobName)" | "refs/heads/master"'
-- task: Cache@2
-  displayName: Cache .cargo/bin/
-  inputs:
-    path: $(CARGO_HOME)/bin/
-    key: 'libs/librepcb/**/Cargo.lock | "cargo-bin" | "$(System.JobName)" | "$(Build.SourceBranch)"'
-    restoreKeys: 'libs/librepcb/**/Cargo.lock | "cargo-bin" | "$(System.JobName)" | "refs/heads/master"'
+# No binaries (yet), so this task would fail.
+#- task: Cache@2
+#  displayName: Cache .cargo/bin/
+#  inputs:
+#    path: $(CARGO_HOME)/bin/
+#    key: 'libs/librepcb/**/Cargo.lock | "cargo-bin" | "$(System.JobName)" | "$(Build.SourceBranch)"'
+#    restoreKeys: 'libs/librepcb/**/Cargo.lock | "cargo-bin" | "$(System.JobName)" | "refs/heads/master"'
 - task: Cache@2
   displayName: Cache .cargo/registry/index/
   inputs:
