@@ -8,31 +8,31 @@ steps:
 - task: Cache@2
   displayName: Cache .cargo/bin/
   inputs:
-    key: '**/Cargo.lock | "cargo-bin" | "$(System.JobName)" | "$(Build.SourceBranch)"'
-    restoreKeys: '**/Cargo.lock | "cargo-bin" | "$(System.JobName)"'
+    key: 'libs/librepcb/**/Cargo.lock | "cargo-bin" | "$(System.JobName)" | "$(Build.SourceBranch)"'
+    restoreKeys: 'libs/librepcb/**/Cargo.lock | "cargo-bin" | "$(System.JobName)"'
     path: ~/.cargo/bin/
 - task: Cache@2
   displayName: Cache .cargo/registry/index/
   inputs:
-    key: '**/Cargo.lock | "cargo-reg-index" | "$(System.JobName)" | "$(Build.SourceBranch)"'
-    restoreKeys: '**/Cargo.lock | "cargo-reg-index" | "$(System.JobName)"'
+    key: 'libs/librepcb/**/Cargo.lock | "cargo-reg-index" | "$(System.JobName)" | "$(Build.SourceBranch)"'
+    restoreKeys: 'libs/librepcb/**/Cargo.lock | "cargo-reg-index" | "$(System.JobName)"'
     path: ~/.cargo/registry/index/
 - task: Cache@2
   displayName: Cache .cargo/registry/cache/
   inputs:
-    key: '**/Cargo.lock | "cargo-reg-cache" | "$(System.JobName)" | "$(Build.SourceBranch)"'
-    restoreKeys: '**/Cargo.lock | "cargo-reg-cache" | "$(System.JobName)"'
+    key: 'libs/librepcb/**/Cargo.lock | "cargo-reg-cache" | "$(System.JobName)" | "$(Build.SourceBranch)"'
+    restoreKeys: 'libs/librepcb/**/Cargo.lock | "cargo-reg-cache" | "$(System.JobName)"'
     path: ~/.cargo/registry/cache/
 # No Git dependencies (yet), so this task would fail.
 #- task: Cache@2
 #  displayName: Cache .cargo/git/db/
 #  inputs:
-#    key: '**/Cargo.lock | "cargo-git-db" | "$(System.JobName)" | "$(Build.SourceBranch)"'
-#    restoreKeys: '**/Cargo.lock | "cargo-git-db" | "$(System.JobName)"'
+#    key: 'libs/librepcb/**/Cargo.lock | "cargo-git-db" | "$(System.JobName)" | "$(Build.SourceBranch)"'
+#    restoreKeys: 'libs/librepcb/**/Cargo.lock | "cargo-git-db" | "$(System.JobName)"'
 #    path: ~/.cargo/git/db/
 - task: Cache@2
   displayName: Cache ./libs/librepcb/rust-core/target/
   inputs:
-    key: '**/Cargo.lock | "rust-core-target" | "$(System.JobName)" | "$(Build.SourceBranch)"'
-    restoreKeys: '**/Cargo.lock | "rust-core-target" | "$(System.JobName)"'
+    key: 'libs/librepcb/**/Cargo.lock | "rust-core-target" | "$(System.JobName)" | "$(Build.SourceBranch)"'
+    restoreKeys: 'libs/librepcb/**/Cargo.lock | "rust-core-target" | "$(System.JobName)"'
     path: ./libs/librepcb/rust-core/target/
