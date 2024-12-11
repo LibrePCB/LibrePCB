@@ -37,6 +37,7 @@ jobs:
       # Pass modified PATH to following steps:
       echo "##vso[task.setvariable variable=PATH]$PATH"
     displayName: Install Dependencies
+  - template: azure-cache.yml
   - bash: ./ci/print_environment.sh
     displayName: Print New Environment  # Print again since it has been modified
   - bash: rm -rf libs/dxflib
