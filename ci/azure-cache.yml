@@ -1,36 +1,37 @@
 steps:
 - task: Cache@2
-  displayName: Setup ccache
+  displayName: Cache .ccache/
   inputs:
     path: $(CCACHE_DIR)/
-    key: '**/Cargo.lock | "ccache" | "$(System.JobName)" | "$(Build.SourceBranch)"'
-    restoreKeys: '**/Cargo.lock | "ccache" | "$(System.JobName)"'
+    key: '"ccache" | "$(System.JobName)" | "$(Build.SourceBranch)"'
+    restoreKeys: '"ccache" | "$(System.JobName)"'
 - task: Cache@2
-  displayName: Setup cache for .cargo/bin/
+  displayName: Cache .cargo/bin/
   inputs:
     key: '**/Cargo.lock | "cargo-bin" | "$(System.JobName)" | "$(Build.SourceBranch)"'
     restoreKeys: '**/Cargo.lock | "cargo-bin" | "$(System.JobName)"'
     path: ~/.cargo/bin/
 - task: Cache@2
-  displayName: Setup cache for .cargo/registry/index/
+  displayName: Cache .cargo/registry/index/
   inputs:
     key: '**/Cargo.lock | "cargo-reg-index" | "$(System.JobName)" | "$(Build.SourceBranch)"'
     restoreKeys: '**/Cargo.lock | "cargo-reg-index" | "$(System.JobName)"'
     path: ~/.cargo/registry/index/
 - task: Cache@2
-  displayName: Setup cache for .cargo/registry/cache/
+  displayName: Cache .cargo/registry/cache/
   inputs:
     key: '**/Cargo.lock | "cargo-reg-cache" | "$(System.JobName)" | "$(Build.SourceBranch)"'
     restoreKeys: '**/Cargo.lock | "cargo-reg-cache" | "$(System.JobName)"'
     path: ~/.cargo/registry/cache/
+# No Git dependencies (yet), so this task would fail.
+#- task: Cache@2
+#  displayName: Cache .cargo/git/db/
+#  inputs:
+#    key: '**/Cargo.lock | "cargo-git-db" | "$(System.JobName)" | "$(Build.SourceBranch)"'
+#    restoreKeys: '**/Cargo.lock | "cargo-git-db" | "$(System.JobName)"'
+#    path: ~/.cargo/git/db/
 - task: Cache@2
-  displayName: Setup cache for .cargo/git/db/
-  inputs:
-    key: '**/Cargo.lock | "cargo-git-db" | "$(System.JobName)" | "$(Build.SourceBranch)"'
-    restoreKeys: '**/Cargo.lock | "cargo-git-db" | "$(System.JobName)"'
-    path: ~/.cargo/git/db/
-- task: Cache@2
-  displayName: Setup cache for ./libs/librepcb/rust-core/target/
+  displayName: Cache ./libs/librepcb/rust-core/target/
   inputs:
     key: '**/Cargo.lock | "rust-core-target" | "$(System.JobName)" | "$(Build.SourceBranch)"'
     restoreKeys: '**/Cargo.lock | "rust-core-target" | "$(System.JobName)"'
