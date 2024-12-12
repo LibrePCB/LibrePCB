@@ -1,17 +1,25 @@
 steps:
+  # Some cache dirs are not yet used or not used in some jobs, which would make
+  # the cache jobs fail in those cases. So let's create them manually.
+- bash: |
+    mkdir -p $(CCACHE_DIR)
+    mkdir -p $(CARGO_HOME)/bin
+    mkdir -p $(CARGO_HOME)/registry/index
+    mkdir -p $(CARGO_HOME)/registry/cache
+    mkdir -p $(CARGO_HOME)/git/db
+  displayName: Create cache dirs
 - task: Cache@2
   displayName: Cache .ccache/
   inputs:
     path: $(CCACHE_DIR)/
     key: '"ccache" | "$(System.JobName)" | "$(Build.SourceBranch)"'
     restoreKeys: '"ccache" | "$(System.JobName)" | "refs/heads/master"'
-# No binaries (yet), so this task would fail.
-#- task: Cache@2
-#  displayName: Cache .cargo/bin/
-#  inputs:
-#    path: $(CARGO_HOME)/bin/
-#    key: 'libs/librepcb/**/Cargo.lock | "cargo-bin" | "$(System.JobName)" | "$(Build.SourceBranch)"'
-#    restoreKeys: 'libs/librepcb/**/Cargo.lock | "cargo-bin" | "$(System.JobName)" | "refs/heads/master"'
+- task: Cache@2
+  displayName: Cache .cargo/bin/
+  inputs:
+    path: $(CARGO_HOME)/bin/
+    key: 'libs/librepcb/**/Cargo.lock | "cargo-bin" | "$(System.JobName)" | "$(Build.SourceBranch)"'
+    restoreKeys: 'libs/librepcb/**/Cargo.lock | "cargo-bin" | "$(System.JobName)" | "refs/heads/master"'
 - task: Cache@2
   displayName: Cache .cargo/registry/index/
   inputs:
@@ -24,13 +32,12 @@ steps:
     path: $(CARGO_HOME)/registry/cache/
     key: 'libs/librepcb/**/Cargo.lock | "cargo-reg-cache" | "$(System.JobName)" | "$(Build.SourceBranch)"'
     restoreKeys: 'libs/librepcb/**/Cargo.lock | "cargo-reg-cache" | "$(System.JobName)" | "refs/heads/master"'
-# No Git dependencies (yet), so this task would fail.
-#- task: Cache@2
-#  displayName: Cache .cargo/git/db/
-#  inputs:
-#    path: $(CARGO_HOME)/git/db/
-#    key: 'libs/librepcb/**/Cargo.lock | "cargo-git-db" | "$(System.JobName)" | "$(Build.SourceBranch)"'
-#    restoreKeys: 'libs/librepcb/**/Cargo.lock | "cargo-git-db" | "$(System.JobName)" | "refs/heads/master"'
+- task: Cache@2
+  displayName: Cache .cargo/git/db/
+  inputs:
+    path: $(CARGO_HOME)/git/db/
+    key: 'libs/librepcb/**/Cargo.lock | "cargo-git-db" | "$(System.JobName)" | "$(Build.SourceBranch)"'
+    restoreKeys: 'libs/librepcb/**/Cargo.lock | "cargo-git-db" | "$(System.JobName)" | "refs/heads/master"'
 - task: Cache@2
   displayName: Cache ./libs/librepcb/rust-core/target/
   inputs:
