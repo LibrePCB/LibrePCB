@@ -76,9 +76,11 @@ QList<BoardNetSegmentSplitter::Segment>
     BoardNetSegmentSplitter::split() noexcept {
   QList<Segment> segments;
 
-  // Split netsegment by anchors and lines
-  ViaList availableVias = mVias;
-  TraceList availableTraces = mTraces;
+  // Split netsegment by anchors and lines.
+  // IMPORTANT: Make shallow copies to keep all references valid even though
+  // findConnectedLinesAndPoints() removes items from these lists.
+  QList<std::shared_ptr<Via>> availableVias = mVias.values();
+  QList<std::shared_ptr<Trace>> availableTraces = mTraces.values();
   while (!availableTraces.isEmpty()) {
     Segment segment;
     findConnectedLinesAndPoints(availableTraces.first()->getStartPoint(),
@@ -90,7 +92,7 @@ QList<BoardNetSegmentSplitter::Segment>
   // Add remaining vias as separate segments
   while (!availableVias.isEmpty()) {
     Segment segment;
-    segment.vias.append(availableVias.take(0));
+    segment.vias.append(availableVias.takeAt(0));
     segments.append(segment);
   }
   Q_ASSERT(availableVias.isEmpty());
@@ -121,8 +123,8 @@ TraceAnchor BoardNetSegmentSplitter::replaceAnchor(
 }
 
 void BoardNetSegmentSplitter::findConnectedLinesAndPoints(
-    const TraceAnchor& anchor, ViaList& availableVias,
-    TraceList& availableTraces, Segment& segment) noexcept {
+    const TraceAnchor& anchor, QList<std::shared_ptr<Via>>& availableVias,
+    QList<std::shared_ptr<Trace>>& availableTraces, Segment& segment) noexcept {
   if (std::optional<Uuid> junctionUuid = anchor.tryGetJunction()) {
     if (std::shared_ptr<Junction> junction = mJunctions.find(*junctionUuid)) {
       if (!segment.junctions.contains(junction->getUuid())) {
@@ -131,9 +133,9 @@ void BoardNetSegmentSplitter::findConnectedLinesAndPoints(
     }
   } else if (std::optional<Uuid> viaUuid = anchor.tryGetVia()) {
     if (std::shared_ptr<Via> via = mVias.find(*viaUuid)) {
-      if (availableVias.contains(via->getUuid())) {
+      if (availableVias.contains(via)) {
         segment.vias.append(via);
-        availableVias.remove(via->getUuid());
+        availableVias.removeOne(via);
       }
     }
   }
@@ -141,10 +143,10 @@ void BoardNetSegmentSplitter::findConnectedLinesAndPoints(
     std::shared_ptr<Trace> trace = mTraces.value(i);
     if (((trace->getStartPoint() == anchor) ||
          (trace->getEndPoint() == anchor)) &&
-        availableTraces.contains(trace->getUuid()) &&
-        (!segment.traces.contains(trace->getUuid()))) {
+        availableTraces.contains(trace) &&
+        (!segment.traces.contains(trace.get()))) {
       segment.traces.append(trace);
-      availableTraces.remove(trace->getUuid());
+      availableTraces.removeOne(trace);
       findConnectedLinesAndPoints(trace->getStartPoint(), availableVias,
                                   availableTraces, segment);
       findConnectedLinesAndPoints(trace->getEndPoint(), availableVias,

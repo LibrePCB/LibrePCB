@@ -82,8 +82,10 @@ QList<SchematicNetSegmentSplitter::Segment>
     SchematicNetSegmentSplitter::split() noexcept {
   QList<Segment> segments;
 
-  // Split netsegment by anchors and lines
-  NetLineList availableNetLines = mNetLines;
+  // Split netsegment by anchors and lines.
+  // IMPORTANT: Make shallow copies to keep all references valid even though
+  // findConnectedLinesAndPoints() removes items from this list.
+  QList<std::shared_ptr<NetLine>> availableNetLines = mNetLines.values();
   while (!availableNetLines.isEmpty()) {
     Segment segment;
     findConnectedLinesAndPoints(availableNetLines.first()->getStartPoint(),
@@ -110,7 +112,8 @@ NetLineAnchor SchematicNetSegmentSplitter::replacePinAnchor(
 }
 
 void SchematicNetSegmentSplitter::findConnectedLinesAndPoints(
-    const NetLineAnchor& anchor, NetLineList& availableNetLines,
+    const NetLineAnchor& anchor,
+    QList<std::shared_ptr<NetLine>>& availableNetLines,
     Segment& segment) noexcept {
   if (std::optional<Uuid> junctionUuid = anchor.tryGetJunction()) {
     if (std::shared_ptr<Junction> junction = mJunctions.find(*junctionUuid)) {
@@ -123,10 +126,10 @@ void SchematicNetSegmentSplitter::findConnectedLinesAndPoints(
     std::shared_ptr<NetLine> netline = mNetLines.value(i);
     if (((netline->getStartPoint() == anchor) ||
          (netline->getEndPoint() == anchor)) &&
-        availableNetLines.contains(netline->getUuid()) &&
+        availableNetLines.contains(netline) &&
         (!segment.netlines.contains(netline->getUuid()))) {
       segment.netlines.append(netline);
-      availableNetLines.remove(netline->getUuid());
+      availableNetLines.removeOne(netline);
       findConnectedLinesAndPoints(netline->getStartPoint(), availableNetLines,
                                   segment);
       findConnectedLinesAndPoints(netline->getEndPoint(), availableNetLines,
