@@ -39,6 +39,12 @@ steps:
     key: 'libs/librepcb/**/Cargo.lock | "cargo-git-db" | "$(System.JobName)" | "$(Build.SourceBranch)"'
     restoreKeys: 'libs/librepcb/**/Cargo.lock | "cargo-git-db" | "$(System.JobName)" | "refs/heads/master"'
 - task: Cache@2
+  displayName: Cache ./build/cargo/
+  inputs:
+    path: ./build/cargo/
+    key: 'libs/librepcb/**/Cargo.lock | "build-cargo" | "$(System.JobName)" | "$(Build.SourceBranch)"'
+    restoreKeys: 'libs/librepcb/**/Cargo.lock | "build-cargo" | "$(System.JobName)" | "refs/heads/master"'
+- task: Cache@2
   displayName: Cache ./libs/librepcb/rust-core/target/
   inputs:
     path: ./libs/librepcb/rust-core/target/
