@@ -8,7 +8,7 @@ jobs:
     ARCH: 'x86_64'
     COPYFILE_DISABLE: 1 # Stop creating shit files (https://superuser.com/questions/259703/get-mac-tar-to-stop-putting-filenames-in-tar-archives)
     HOMEBREW_NO_INSTALL_CLEANUP: 1 # Might speed up homebrew commands(?)
-    CMAKE_OPTIONS: $[ variables['CMAKE_OPTIONS'] ]
+    CMAKE_CXX_COMPILER_LAUNCHER: ccache
   steps:
   - checkout: self
     clean: true
@@ -20,12 +20,15 @@ jobs:
       # Pass modified PATH to following steps:
       echo "##vso[task.setvariable variable=PATH]$PATH"
     displayName: Install Dependencies
+  - template: azure-cache.yml
   - bash: ./ci/print_environment.sh
     displayName: Print New Environment  # Print again since it has been modified
   - bash: ./ci/build_librepcb.sh
     displayName: Build LibrePCB
   - bash: ./ci/build_mac_bundle.sh
     displayName: Build Bundle
+  - bash: cd libs/librepcb/rust-core && cargo test --features=fail-on-warnings
+    displayName: Run rust-core tests
   - bash: ./build/tests/unittests/librepcb-unittests
     displayName: Run LibrePCB Unittests
   - bash: pytest -vvv --librepcb-executable="build/install/opt/LibrePCB.app/Contents/MacOS/librepcb-cli" ./tests/cli

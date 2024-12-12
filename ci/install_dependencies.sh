@@ -46,6 +46,14 @@ then
   echo "Installing dylibbundler..."
   brew install --force-bottle dylibbundler
 
+  # Install Rust toolchain
+  echo "Installing Rust toolchain..."
+  brew install --force-bottle rust
+
+  # Install ccache
+  echo "Installing ccache..."
+  brew install --force-bottle ccache
+
   # Fix macdeployqt issue (https://github.com/actions/runner-images/issues/7522)
   echo "Killing XProtect..."
   sudo pkill -9 XProtect >/dev/null || true;
