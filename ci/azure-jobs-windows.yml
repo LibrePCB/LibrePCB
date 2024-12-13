@@ -7,7 +7,6 @@ jobs:
     variables:
       OS: 'windows'
       ARCH: 'x86_64'
-      CCACHE_DIR: $(Pipeline.Workspace)/.ccache
       CMAKE_CXX_COMPILER_LAUNCHER: ccache
       CMAKE_GENERATOR: 'Ninja'
       FUNQ_MAKE_PATH: 'ninja'
@@ -20,11 +19,7 @@ jobs:
       displayName: Print Environment
     - bash: ./ci/install_dependencies.sh
       displayName: Install Dependencies
-    - task: Cache@2
-      inputs:
-        key: 'ccache | "$(System.JobName)"'
-        path: $(CCACHE_DIR)
-      displayName: Setup ccache
+    - template: azure-cache.yml
     - bash: ./ci/print_environment.sh
       displayName: Print New Environment  # Print again since it has been modified
     - bash: ./ci/build_librepcb.sh

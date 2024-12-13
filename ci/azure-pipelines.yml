@@ -4,6 +4,11 @@ variables:
   # Specify build author as an environment variable because on Apple Silicon
   # build_librepcb.sh is run locally where we want to use a different author.
   LIBREPCB_BUILD_AUTHOR: "LibrePCB CI"
+  # Configure ccache.
+  CCACHE_DIR: $(Agent.TempDirectory)/ccache-dir
+  CCACHE_MAXSIZE: 1G
+  # Set Cargo home for easier cache handling (well known path on any OS).
+  CARGO_HOME: $(Agent.TempDirectory)/cargo-home
   # Incremental builds make no sense on CI -> disable it to avoid creating
   # additional build artifacts.
   CARGO_INCREMENTAL: 0
