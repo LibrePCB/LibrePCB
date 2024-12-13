@@ -4,6 +4,9 @@ variables:
   # Specify build author as an environment variable because on Apple Silicon
   # build_librepcb.sh is run locally where we want to use a different author.
   LIBREPCB_BUILD_AUTHOR: "LibrePCB CI"
+  # Incremental builds make no sense on CI -> disable it to avoid creating
+  # additional build artifacts.
+  CARGO_INCREMENTAL: 0
 
 jobs:
 - template: azure-jobs-stylecheck.yml

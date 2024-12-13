@@ -9,7 +9,7 @@ jobs:
   strategy:
     matrix:
       Ubuntu_2004_Qt_6_6_GCC:
-        IMAGE: librepcb/librepcb-dev:ubuntu-20.04-qt6.6-1
+        IMAGE: librepcb/librepcb-dev:ubuntu-20.04-qt6.6-2
         DEPLOY: true
         NO_HOEDOWN: true
       Ubuntu_2204_Clang:

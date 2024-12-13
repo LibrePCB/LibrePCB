@@ -3,7 +3,7 @@ jobs:
     pool:
       vmImage: 'windows-2019'
     timeoutInMinutes: 180
-    container: librepcb/librepcb-dev:windowsservercore-ltsc2019-qt6.6-64bit-1
+    container: librepcb/librepcb-dev:windowsservercore-ltsc2019-qt6.6-64bit-2
     variables:
       OS: 'windows'
       ARCH: 'x86_64'
