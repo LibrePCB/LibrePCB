@@ -29,12 +29,19 @@ echo "=== Clang ==="
 clang --version
 echo
 
-echo "=== ccache ==="
-ccache --version
+echo "=== Cargo ==="
+cargo --version
+echo "CARGO_HOME=$CARGO_HOME"
 echo
 
-echo "=== QtIFW ==="
-installerbase --version
+echo "=== Rust ==="
+rustc --version
+echo
+
+echo "=== ccache ==="
+ccache --version
+ccache --show-stats
+echo "CCACHE_DIR=$CCACHE_DIR"
 echo
 
 echo "=== linuxdeployqt ==="

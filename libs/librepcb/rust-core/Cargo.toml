@@ -1,0 +1,21 @@
+[package]
+name = "librepcb-rust-core"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["staticlib"]
+
+[features]
+fail-on-warnings = []
+
+[build-dependencies]
+cbindgen = "0.27"
+
+[dependencies.regex]
+version = "1.11"
+default-features = false
+features = ["std", "unicode"]
+
+[dev-dependencies]
+parameterized_test = "0.2.1"

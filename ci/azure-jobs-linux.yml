@@ -9,7 +9,7 @@ jobs:
   strategy:
     matrix:
       Ubuntu_2004_Qt_6_6_GCC:
-        IMAGE: librepcb/librepcb-dev:ubuntu-20.04-qt6.6-1
+        IMAGE: librepcb/librepcb-dev:ubuntu-20.04-qt6.6-2
         DEPLOY: true
         NO_HOEDOWN: true
       Ubuntu_2204_Clang:
@@ -37,6 +37,7 @@ jobs:
       # Pass modified PATH to following steps:
       echo "##vso[task.setvariable variable=PATH]$PATH"
     displayName: Install Dependencies
+  - template: azure-cache.yml
   - bash: ./ci/print_environment.sh
     displayName: Print New Environment  # Print again since it has been modified
   - bash: rm -rf libs/dxflib
@@ -59,6 +60,8 @@ jobs:
   - bash: ./ci/build_linux_portables.sh
     displayName: Build Portable Packages
     condition: and(succeeded(), eq(variables['DEPLOY'], 'true'))
+  - bash: cd libs/librepcb/rust-core && cargo test --features=fail-on-warnings
+    displayName: Run rust-core tests
   - bash: xvfb-run -a ./build/tests/unittests/librepcb-unittests
     displayName: Run LibrePCB Unittests
   - bash: xvfb-run -a --server-args="-screen 0 1024x768x24" pytest -vvv --librepcb-executable="build/install/opt/bin/librepcb-cli" ./tests/cli

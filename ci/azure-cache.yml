@@ -1,0 +1,52 @@
+steps:
+  # Some cache dirs are not yet used or not used in some jobs, which would make
+  # the cache jobs fail in those cases. So let's create them manually.
+- bash: |
+    mkdir -v -p ${CCACHE_DIR//\\//}
+    mkdir -v -p ${CARGO_HOME//\\//}/bin
+    mkdir -v -p ${CARGO_HOME//\\//}/registry/index
+    mkdir -v -p ${CARGO_HOME//\\//}/registry/cache
+    mkdir -v -p ${CARGO_HOME//\\//}/git/db
+  displayName: Create cache dirs
+- task: Cache@2
+  displayName: Cache .ccache/
+  inputs:
+    path: $(CCACHE_DIR)/
+    key: '"ccache" | "$(System.JobDisplayName)" | "$(Build.SourceBranch)" | "dummy"'
+    restoreKeys: '"ccache" | "$(System.JobDisplayName)" | "refs/heads/master"'
+- task: Cache@2
+  displayName: Cache .cargo/bin/
+  inputs:
+    path: $(CARGO_HOME)/bin/
+    key: 'libs/librepcb/**/Cargo.lock | "cargo-bin" | "$(System.JobDisplayName)" | "$(Build.SourceBranch)" | "dummy"'
+    restoreKeys: 'libs/librepcb/**/Cargo.lock | "cargo-bin" | "$(System.JobDisplayName)" | "refs/heads/master"'
+- task: Cache@2
+  displayName: Cache .cargo/registry/index/
+  inputs:
+    path: $(CARGO_HOME)/registry/index/
+    key: 'libs/librepcb/**/Cargo.lock | "cargo-reg-index" | "$(System.JobDisplayName)" | "$(Build.SourceBranch)" | "dummy"'
+    restoreKeys: 'libs/librepcb/**/Cargo.lock | "cargo-reg-index" | "$(System.JobDisplayName)" | "refs/heads/master"'
+- task: Cache@2
+  displayName: Cache .cargo/registry/cache/
+  inputs:
+    path: $(CARGO_HOME)/registry/cache/
+    key: 'libs/librepcb/**/Cargo.lock | "cargo-reg-cache" | "$(System.JobDisplayName)" | "$(Build.SourceBranch)" | "dummy"'
+    restoreKeys: 'libs/librepcb/**/Cargo.lock | "cargo-reg-cache" | "$(System.JobDisplayName)" | "refs/heads/master"'
+- task: Cache@2
+  displayName: Cache .cargo/git/db/
+  inputs:
+    path: $(CARGO_HOME)/git/db/
+    key: 'libs/librepcb/**/Cargo.lock | "cargo-git-db" | "$(System.JobDisplayName)" | "$(Build.SourceBranch)" | "dummy"'
+    restoreKeys: 'libs/librepcb/**/Cargo.lock | "cargo-git-db" | "$(System.JobDisplayName)" | "refs/heads/master"'
+- task: Cache@2
+  displayName: Cache ./build/cargo/
+  inputs:
+    path: ./build/cargo/
+    key: 'libs/librepcb/**/Cargo.lock | "build-cargo" | "$(System.JobDisplayName)" | "$(Build.SourceBranch)" | "dummy"'
+    restoreKeys: 'libs/librepcb/**/Cargo.lock | "build-cargo" | "$(System.JobDisplayName)" | "refs/heads/master"'
+- task: Cache@2
+  displayName: Cache ./libs/librepcb/rust-core/target/
+  inputs:
+    path: ./libs/librepcb/rust-core/target/
+    key: 'libs/librepcb/**/Cargo.lock | "rust-core-target" | "$(System.JobDisplayName)" | "$(Build.SourceBranch)" | "dummy"'
+    restoreKeys: 'libs/librepcb/**/Cargo.lock | "rust-core-target" | "$(System.JobDisplayName)" | "refs/heads/master"'

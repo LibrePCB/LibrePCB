@@ -33,6 +33,7 @@ Files:
  .github/*
  .gitignore
  .gitmodules
+ .rustfmt.toml
  .tx/*
  AUTHORS.md
  ci/*

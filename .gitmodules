@@ -34,3 +34,6 @@
 [submodule "libs/dxflib"]
     path = libs/dxflib
     url = https://github.com/LibrePCB/dxflib.git
+[submodule "libs/corrosion"]
+    path = libs/corrosion
+    url = https://github.com/LibrePCB/corrosion.git

@@ -9,4 +9,4 @@ LibrePCB application or to other applications (e.g. developer tools).
 This diagram shows the available libraries, their purpose and their
 dependencies:
 
-![Architecture Overview Diagram](architecture_overview.png)
+![Architecture Overview Diagram](architecture_overview.svg)
