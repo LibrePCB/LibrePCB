@@ -81,8 +81,8 @@ std::shared_ptr<ProjectEditor> WindowSection::getCurrentProject() noexcept {
 }
 
 void WindowSection::addTab(std::shared_ptr<ProjectEditor> prj, ui::TabType type,
-                           int objIndex, const QString& title) noexcept {
-  mTabsModel->addTab(prj, type, objIndex, title);
+                           int objIndex) noexcept {
+  mTabsModel->addTab(prj, type, objIndex);
   setCurrentTab(mTabsModel->row_count() - 1);
 }
 
@@ -98,15 +98,9 @@ void WindowSection::closeTab(int index) noexcept {
 }
 
 void WindowSection::setCurrentTab(int index) noexcept {
-  if (index == mUiData.tab_index) {
-    return;  // No change.
-  }
-
   mTabsModel->setCurrentTab(index);
-
   mUiData.tab_index = index;
   emit uiDataChanged(mUiData.index);
-
   emit currentProjectChanged(getCurrentProject());
 }
 
