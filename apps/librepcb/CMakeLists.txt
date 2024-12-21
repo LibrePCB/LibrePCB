@@ -32,6 +32,10 @@ add_executable(
   windowsection.h
   windowsectionsmodel.cpp
   windowsectionsmodel.h
+  windowtab.cpp
+  windowtab.h
+  windowtabsmodel.cpp
+  windowtabsmodel.h
   workspace/favoriteprojectsmodel.cpp
   workspace/favoriteprojectsmodel.h
   workspace/filesystemmodel.cpp

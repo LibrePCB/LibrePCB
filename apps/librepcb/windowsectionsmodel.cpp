@@ -26,6 +26,7 @@
 #include "guiapplication.h"
 #include "project/projecteditor.h"
 #include "windowsection.h"
+#include "windowtab.h"
 
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/project.h>
@@ -75,10 +76,10 @@ void WindowSectionsModel::openBoard(std::shared_ptr<ProjectEditor> prj,
 
 void WindowSectionsModel::openBoard3dViewer(int section, int tab) noexcept {
   if (std::shared_ptr<WindowSection> s = mItems.value(section)) {
-    if (WindowSection::Tab* t = s->getTab(tab)) {
-      if (auto prj = t->project) {
-        if (auto obj = prj->getProject().getBoardByIndex(t->objIndex)) {
-          addTab(prj, ui::TabType::Board3d, *obj->getName(), t->objIndex);
+    if (std::shared_ptr<WindowTab> t = s->getTab(tab)) {
+      if (auto prj = t->getProject()) {
+        if (auto obj = prj->getProject().getBoardByIndex(t->getObjIndex())) {
+          addTab(prj, ui::TabType::Board3d, *obj->getName(), t->getObjIndex());
         }
       }
     }
@@ -102,9 +103,8 @@ void WindowSectionsModel::closeTab(int section, int tab) noexcept {
   if (std::shared_ptr<WindowSection> s = mItems.value(section)) {
     s->closeTab(tab);
     if (s->getTabCount() == 0) {
-      if (mCurrentSection >= section) {
+      if (section < mCurrentSection) {
         --mCurrentSection;
-        emit currentSectionChanged(mCurrentSection);
       }
       mItems.remove(section);
       row_removed(section, 1);
@@ -112,6 +112,9 @@ void WindowSectionsModel::closeTab(int section, int tab) noexcept {
         mItems[i]->setIndex(mItems[i]->getIndex() - 1);
         row_changed(i);
       }
+      emit currentSectionChanged(mCurrentSection);
+      auto sNew = mItems.value(mCurrentSection);
+      emit currentProjectChanged(sNew ? sNew->getCurrentProject() : nullptr);
     }
   }
 }

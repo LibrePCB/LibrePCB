@@ -99,7 +99,7 @@ export component WindowSection inherits Rectangle {
 
             SceneButton {
                 image: @image-url("img/zoom-fit.svg");
-                colorize: section.overlay-color;
+                colorize: section.tabs[section.tab-index].overlay-color;
                 clicked => {
                     Globals.scene-zoom-fit-clicked(section.index, scene.width, scene.height);
                 }
@@ -107,7 +107,7 @@ export component WindowSection inherits Rectangle {
 
             SceneButton {
                 image: @image-url("img/zoom-in.svg");
-                colorize: section.overlay-color;
+                colorize: section.tabs[section.tab-index].overlay-color;
                 clicked => {
                     Globals.scene-zoom-in-clicked(section.index, scene.width, scene.height);
                 }
@@ -115,7 +115,7 @@ export component WindowSection inherits Rectangle {
 
             SceneButton {
                 image: @image-url("img/zoom-out.svg");
-                colorize: section.overlay-color;
+                colorize: section.tabs[section.tab-index].overlay-color;
                 clicked => {
                     Globals.scene-zoom-out-clicked(section.index, scene.width, scene.height);
                 }
@@ -123,7 +123,7 @@ export component WindowSection inherits Rectangle {
 
             if section.tabs[section.tab-index].type == TabType.board-2d: SceneButton {
                 text: "3D";
-                colorize: section.overlay-color;
+                colorize: section.tabs[section.tab-index].overlay-color;
                 clicked => {
                     Globals.board-3d-clicked(section.index, section.tab-index);
                 }

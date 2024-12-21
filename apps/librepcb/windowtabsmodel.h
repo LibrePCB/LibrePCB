@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_WINDOWSECTION_H
-#define LIBREPCB_WINDOWSECTION_H
+#ifndef LIBREPCB_WINDOWTABSMODEL_H
+#define LIBREPCB_WINDOWTABSMODEL_H
 
 /*******************************************************************************
  *  Includes
@@ -40,57 +40,48 @@ namespace app {
 class GuiApplication;
 class ProjectEditor;
 class WindowTab;
-class WindowTabsModel;
 
 /*******************************************************************************
- *  Class WindowSection
+ *  Class WindowTabsModel
  ******************************************************************************/
 
 /**
- * @brief The WindowSection class
+ * @brief The WindowTabsModel class
  */
-class WindowSection : public QObject {
+class WindowTabsModel : public QObject, public slint::Model<ui::Tab> {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  WindowSection() = delete;
-  WindowSection(const WindowSection& other) = delete;
-  explicit WindowSection(GuiApplication& app, int index,
-                         QObject* parent = nullptr) noexcept;
-  virtual ~WindowSection() noexcept;
+  WindowTabsModel() = delete;
+  WindowTabsModel(const WindowTabsModel& other) = delete;
+  explicit WindowTabsModel(GuiApplication& app,
+                           QObject* parent = nullptr) noexcept;
+  virtual ~WindowTabsModel() noexcept;
 
   // General Methods
-  void setIndex(int index) noexcept;
-  int getIndex() const noexcept { return mUiData.index; }
-  const ui::WindowSection& getUiData() const noexcept { return mUiData; }
-  std::size_t getTabCount() const noexcept;
-  std::shared_ptr<WindowTab> getTab(int index) noexcept;
-  std::shared_ptr<ProjectEditor> getCurrentProject() noexcept;
+  std::shared_ptr<WindowTab> getTab(int index) noexcept {
+    return mItems.value(index);
+  }
   void addTab(std::shared_ptr<ProjectEditor> prj, ui::TabType type,
               int objIndex, const QString& title) noexcept;
   void closeTab(int index) noexcept;
   void setCurrentTab(int index) noexcept;
-  slint::Image renderScene(int tab, float width, float height) noexcept;
-  bool processScenePointerEvent(float x, float y, float width, float height,
-                                slint::private_api::PointerEvent e) noexcept;
-  bool processSceneScrolled(float x, float y, float width, float height,
-                            slint::private_api::PointerScrollEvent e) noexcept;
-  void zoomFit(float width, float height) noexcept;
-  void zoomIn(float width, float height) noexcept;
-  void zoomOut(float width, float height) noexcept;
+
+  // Implementations
+  std::size_t row_count() const override;
+  std::optional<ui::Tab> row_data(std::size_t i) const override;
 
   // Operator Overloadings
-  WindowSection& operator=(const WindowSection& rhs) = delete;
+  WindowTabsModel& operator=(const WindowTabsModel& rhs) = delete;
 
 signals:
-  void uiDataChanged(int section);
-  void currentProjectChanged(std::shared_ptr<ProjectEditor> prj);
   void cursorCoordinatesChanged(qreal x, qreal y);
+  void requestRepaint();
 
 private:
-  std::shared_ptr<WindowTabsModel> mTabsModel;
-  ui::WindowSection mUiData;
+  GuiApplication& mApp;
+  QList<std::shared_ptr<WindowTab>> mItems;
 };
 
 /*******************************************************************************
