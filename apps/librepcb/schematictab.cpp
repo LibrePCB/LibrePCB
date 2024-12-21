@@ -20,9 +20,15 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "windowtab.h"
+#include "schematictab.h"
 
 #include "apptoolbox.h"
+#include "guiapplication.h"
+#include "project/projecteditor.h"
+
+#include <librepcb/core/project/project.h>
+#include <librepcb/core/project/schematic/schematic.h>
+#include <librepcb/editor/project/schematiceditor/schematicgraphicsscene.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -38,17 +44,40 @@ namespace app {
  *  Constructors / Destructor
  ******************************************************************************/
 
-WindowTab::WindowTab(GuiApplication& app, std::shared_ptr<ProjectEditor> prj,
-                     ui::TabType type, int objIndex, const QString& title,
-                     QObject* parent) noexcept
-  : QObject(parent),
-    mUiData{type, q2s(title), slint::Brush()},
-    mProject(prj),
-    mObjIndex(objIndex) {
-  Q_UNUSED(app);
+static QString getTitle(std::shared_ptr<ProjectEditor> prj,
+                        int schematicIndex) {
+  if (auto s = prj->getProject().getSchematicByIndex(schematicIndex)) {
+    return *s->getName();
+  }
+  return QString();
 }
 
-WindowTab::~WindowTab() noexcept {
+SchematicTab::SchematicTab(GuiApplication& app,
+                           std::shared_ptr<ProjectEditor> prj,
+                           int schematicIndex, QObject* parent) noexcept
+  : GraphicsSceneTab(app, prj, ui::TabType::Schematic, schematicIndex,
+                     getTitle(prj, schematicIndex), Qt::white, parent) {
+}
+
+SchematicTab::~SchematicTab() noexcept {
+}
+
+/*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+void SchematicTab::activate() noexcept {
+  if (auto sch = mProject->getProject().getSchematicByIndex(mObjIndex)) {
+    mScene.reset(new SchematicGraphicsScene(
+        *sch, *mLayerProvider, std::make_shared<QSet<const NetSignal*>>(),
+        this));
+    mUiData.overlay_color = q2s(Qt::black);
+    emit requestRepaint();
+  }
+}
+
+void SchematicTab::deactivate() noexcept {
+  mScene.reset();
 }
 
 /*******************************************************************************
