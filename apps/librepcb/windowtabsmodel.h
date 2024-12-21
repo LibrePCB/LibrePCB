@@ -64,7 +64,7 @@ public:
     return mItems.value(index);
   }
   void addTab(std::shared_ptr<ProjectEditor> prj, ui::TabType type,
-              int objIndex, const QString& title) noexcept;
+              int objIndex) noexcept;
   void closeTab(int index) noexcept;
   void setCurrentTab(int index) noexcept;
 

@@ -68,7 +68,7 @@ public:
   std::shared_ptr<WindowTab> getTab(int index) noexcept;
   std::shared_ptr<ProjectEditor> getCurrentProject() noexcept;
   void addTab(std::shared_ptr<ProjectEditor> prj, ui::TabType type,
-              int objIndex, const QString& title) noexcept;
+              int objIndex) noexcept;
   void closeTab(int index) noexcept;
   void setCurrentTab(int index) noexcept;
   slint::Image renderScene(int tab, float width, float height) noexcept;

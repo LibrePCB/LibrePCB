@@ -22,7 +22,9 @@
  ******************************************************************************/
 #include "windowtabsmodel.h"
 
-#include "windowtab.h"
+#include "board2dtab.h"
+#include "board3dtab.h"
+#include "schematictab.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -50,9 +52,25 @@ WindowTabsModel::~WindowTabsModel() noexcept {
  ******************************************************************************/
 
 void WindowTabsModel::addTab(std::shared_ptr<ProjectEditor> prj,
-                             ui::TabType type, int objIndex,
-                             const QString& title) noexcept {
-  auto t = std::make_shared<WindowTab>(mApp, prj, type, objIndex, title);
+                             ui::TabType type, int objIndex) noexcept {
+  std::shared_ptr<WindowTab> t;
+  switch (type) {
+    case ui::TabType::Schematic: {
+      t = std::make_shared<SchematicTab>(mApp, prj, objIndex, this);
+      break;
+    }
+    case ui::TabType::Board2d: {
+      t = std::make_shared<Board2dTab>(mApp, prj, objIndex, this);
+      break;
+    }
+    case ui::TabType::Board3d: {
+      t = std::make_shared<Board3dTab>(mApp, prj, objIndex, this);
+      break;
+    }
+    default: {
+      return;
+    }
+  }
   connect(t.get(), &WindowTab::cursorCoordinatesChanged, this,
           &WindowTabsModel::cursorCoordinatesChanged);
   connect(t.get(), &WindowTab::requestRepaint, this,
@@ -93,10 +111,6 @@ std::optional<ui::Tab> WindowTabsModel::row_data(std::size_t i) const {
     return std::nullopt;
   }
 }
-
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
 
 /*******************************************************************************
  *  End of File
