@@ -92,7 +92,7 @@ signals:
 
 private:
   void addTab(std::shared_ptr<ProjectEditor> prj, ui::TabType type,
-              const QString& title, int objIndex) noexcept;
+              int objIndex) noexcept;
 
   GuiApplication& mApp;
   QList<std::shared_ptr<WindowSection>> mItems;

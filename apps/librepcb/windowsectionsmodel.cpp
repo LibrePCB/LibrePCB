@@ -62,25 +62,19 @@ WindowSectionsModel::~WindowSectionsModel() noexcept {
 
 void WindowSectionsModel::openSchematic(std::shared_ptr<ProjectEditor> prj,
                                         int index) noexcept {
-  if (auto obj = prj->getProject().getSchematicByIndex(index)) {
-    addTab(prj, ui::TabType::Schematic, *obj->getName(), index);
-  }
+  addTab(prj, ui::TabType::Schematic, index);
 }
 
 void WindowSectionsModel::openBoard(std::shared_ptr<ProjectEditor> prj,
                                     int index) noexcept {
-  if (auto obj = prj->getProject().getBoardByIndex(index)) {
-    addTab(prj, ui::TabType::Board2d, *obj->getName(), index);
-  }
+  addTab(prj, ui::TabType::Board2d, index);
 }
 
 void WindowSectionsModel::openBoard3dViewer(int section, int tab) noexcept {
   if (std::shared_ptr<WindowSection> s = mItems.value(section)) {
     if (std::shared_ptr<WindowTab> t = s->getTab(tab)) {
       if (auto prj = t->getProject()) {
-        if (auto obj = prj->getProject().getBoardByIndex(t->getObjIndex())) {
-          addTab(prj, ui::TabType::Board3d, *obj->getName(), t->getObjIndex());
-        }
+        addTab(prj, ui::TabType::Board3d, t->getObjIndex());
       }
     }
   }
@@ -201,8 +195,7 @@ std::optional<ui::WindowSection> WindowSectionsModel::row_data(
  ******************************************************************************/
 
 void WindowSectionsModel::addTab(std::shared_ptr<ProjectEditor> prj,
-                                 ui::TabType type, const QString& title,
-                                 int objIndex) noexcept {
+                                 ui::TabType type, int objIndex) noexcept {
   // Determine section.
   int section = 0;
   if (mItems.count() < 2) {
@@ -225,7 +218,7 @@ void WindowSectionsModel::addTab(std::shared_ptr<ProjectEditor> prj,
   }
 
   if (std::shared_ptr<WindowSection> s = mItems.value(section)) {
-    s->addTab(prj, type, objIndex, title);
+    s->addTab(prj, type, objIndex);
     setCurrentTab(section, s->getTabCount() - 1);
   }
 }

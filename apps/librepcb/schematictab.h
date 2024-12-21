@@ -17,18 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_WINDOWTAB_H
-#define LIBREPCB_WINDOWTAB_H
+#ifndef LIBREPCB_SCHEMATICTAB_H
+#define LIBREPCB_SCHEMATICTAB_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "appwindow.h"
+#include "graphicsscenetab.h"
 
 #include <QtCore>
 #include <QtGui>
-
-#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -45,52 +43,29 @@ class GuiApplication;
 class ProjectEditor;
 
 /*******************************************************************************
- *  Class WindowTab
+ *  Class SchematicTab
  ******************************************************************************/
 
 /**
- * @brief The WindowTab class
+ * @brief The SchematicTab class
  */
-class WindowTab : public QObject {
+class SchematicTab final : public GraphicsSceneTab {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  WindowTab() = delete;
-  WindowTab(const WindowTab& other) = delete;
-  explicit WindowTab(GuiApplication& app, std::shared_ptr<ProjectEditor> prj,
-                     ui::TabType type, int objIndex, const QString& title,
-                     QObject* parent = nullptr) noexcept;
-  virtual ~WindowTab() noexcept;
+  SchematicTab() = delete;
+  SchematicTab(const SchematicTab& other) = delete;
+  explicit SchematicTab(GuiApplication& app, std::shared_ptr<ProjectEditor> prj,
+                        int schematicIndex, QObject* parent = nullptr) noexcept;
+  virtual ~SchematicTab() noexcept;
 
   // General Methods
-  const ui::Tab& getUiData() const noexcept { return mUiData; }
-  std::shared_ptr<ProjectEditor> getProject() noexcept { return mProject; }
-  int getObjIndex() const noexcept { return mObjIndex; }
-  virtual void activate() noexcept = 0;
-  virtual void deactivate() noexcept = 0;
-  virtual slint::Image renderScene(float width, float height) noexcept = 0;
-  virtual bool processScenePointerEvent(
-      float x, float y, float width, float height,
-      slint::private_api::PointerEvent e) noexcept = 0;
-  virtual bool processSceneScrolled(
-      float x, float y, float width, float height,
-      slint::private_api::PointerScrollEvent e) noexcept = 0;
-  virtual void zoomFit(float width, float height) noexcept = 0;
-  virtual void zoomIn(float width, float height) noexcept = 0;
-  virtual void zoomOut(float width, float height) noexcept = 0;
+  void activate() noexcept override;
+  void deactivate() noexcept override;
 
   // Operator Overloadings
-  WindowTab& operator=(const WindowTab& rhs) = delete;
-
-signals:
-  void cursorCoordinatesChanged(qreal x, qreal y);
-  void requestRepaint();
-
-protected:
-  ui::Tab mUiData;
-  std::shared_ptr<ProjectEditor> mProject;
-  int mObjIndex = -1;
+  SchematicTab& operator=(const SchematicTab& rhs) = delete;
 };
 
 /*******************************************************************************
