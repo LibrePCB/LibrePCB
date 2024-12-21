@@ -56,13 +56,13 @@ export enum TabType {
 export struct Tab {
     type: TabType,
     title: string,
+    overlay-color: brush,
 }
 
 export struct WindowSection {
     index: int,  // Section index (0 = left most)
     tabs: [Tab], // Tabs in this section
     tab-index: int,  // Currently opened tab in this section
-    overlay-color: brush,
     frame: int, // Frame index to trigger repainting
 }
 
@@ -279,22 +279,50 @@ export global Globals {
         {
             index: 0,
             tabs: [
-                { type: TabType.schematic, index: 0, title: "Tab 1" },
-                { type: TabType.board-2d, index: 0, title: "Tab 2" },
-                { type: TabType.schematic, index: 1, title: "Tab 3" },
+                {
+                    type: TabType.schematic,
+                    index: 0,
+                    title: "Tab 1",
+                    overlay-color: Colors.black,
+                },
+                {
+                    type: TabType.board-2d,
+                    index: 0,
+                    title: "Tab 2",
+                    overlay-color: Colors.white,
+                },
+                {
+                    type: TabType.schematic,
+                    index: 1,
+                    title: "Tab 3",
+                    overlay-color: Colors.black,
+                },
             ],
             tab-index: 0,
-            overlay-color: Colors.gray,
         },
         {
             index: 1,
             tabs: [
-                { type: TabType.board-2d, index: 0, title: "Tab 4" },
-                { type: TabType.schematic, index: 0, title: "Tab 5" },
-                { type: TabType.board-3d, index: 1, title: "Tab 6" },
+                {
+                    type: TabType.board-2d,
+                    index: 0,
+                    title: "Tab 4",
+                    overlay-color: Colors.white,
+                },
+                {
+                    type: TabType.schematic,
+                    index: 0,
+                    title: "Tab 5",
+                    overlay-color: Colors.black,
+                },
+                {
+                    type: TabType.board-3d,
+                    index: 1,
+                    title: "Tab 6",
+                    overlay-color: Colors.gray,
+                },
             ],
             tab-index: 0,
-            overlay-color: Colors.gray,
         },
     ];
 
