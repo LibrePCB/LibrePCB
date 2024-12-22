@@ -534,7 +534,6 @@ target_link_libraries(
           Dxflib::Dxflib
           FontoBene::FontoBeneQt
           MuParser::MuParser
-          QuaZip::QuaZip
 )
 target_link_libraries(
   librepcb_core
