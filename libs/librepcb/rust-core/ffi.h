@@ -15,6 +15,8 @@
 namespace librepcb {
 namespace rs {
 
+struct InteractiveHtmlBom;
+
 /**
  * Wrapper type for [Archive]
  */
@@ -42,6 +44,22 @@ extern size_t ffi_qstring_len(const QString * NONNULL obj);
 extern const uint16_t *ffi_qstring_utf16(const QString * NONNULL obj);
 
 extern void ffi_qstring_set(QString * NONNULL obj, const char *s, size_t len);
+
+/**
+ * Create a new [InteractiveHtmlBom] object
+ */
+InteractiveHtmlBom *ffi_ibom_new();
+
+/**
+ * Delete [InteractiveHtmlBom] object
+ */
+void ffi_ibom_delete(InteractiveHtmlBom *obj);
+
+/**
+ * Wrapper for [generate]
+ */
+void ffi_ibom_generate(const InteractiveHtmlBom * NONNULL obj,
+                       QString * NONNULL out);
 
 /**
  * Wrapper for [increment_number_in_string]
