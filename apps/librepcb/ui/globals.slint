@@ -98,6 +98,16 @@ export global Globals {
     // - Board tab index
     pure callback board-3d-clicked(int, int);
 
+    // Requested to split a particular window section
+    //
+    // - Section index
+    pure callback section-split-clicked(int);
+
+    // Requested to close a particular window section
+    //
+    // - Section index
+    pure callback section-close-clicked(int);
+
     // Requested to switch to a particular tab
     //
     // - Section index
@@ -121,11 +131,6 @@ export global Globals {
     //
     // - Library ID (see Library::id)
     pure callback uninstall-library(string);
-
-    // Set the current section index
-    //
-    // - Section index
-    //pure callback set-current-section(int);
 
     // Render a graphics scene image
     //
@@ -303,18 +308,6 @@ export global Globals {
         {
             index: 1,
             tabs: [
-                {
-                    type: TabType.board-2d,
-                    index: 0,
-                    title: "Tab 4",
-                    overlay-color: Colors.white,
-                },
-                {
-                    type: TabType.schematic,
-                    index: 0,
-                    title: "Tab 5",
-                    overlay-color: Colors.black,
-                },
                 {
                     type: TabType.board-3d,
                     index: 1,
