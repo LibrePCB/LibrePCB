@@ -64,6 +64,8 @@ public:
   void openSchematic(std::shared_ptr<ProjectEditor> prj, int index) noexcept;
   void openBoard(std::shared_ptr<ProjectEditor> prj, int index) noexcept;
   void openBoard3dViewer(int section, int tab) noexcept;
+  void splitSection(int section) noexcept;
+  void closeSection(int section) noexcept;
   void setCurrentTab(int section, int tab) noexcept;
   void closeTab(int section, int tab) noexcept;
   slint::Image renderScene(int section, int tab, float width, float height,
