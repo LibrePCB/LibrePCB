@@ -1,6 +1,3 @@
-[submodule "libs/quazip"]
-    path = libs/quazip
-    url = https://github.com/LibrePCB/quazip.git
 [submodule "libs/googletest"]
     path = libs/googletest
     url = https://github.com/LibrePCB/googletest.git
