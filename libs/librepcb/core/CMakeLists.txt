@@ -144,6 +144,10 @@ add_library(
   fileio/transactionalfilesystem.h
   fileio/versionfile.cpp
   fileio/versionfile.h
+  fileio/ziparchive.cpp
+  fileio/ziparchive.h
+  fileio/zipwriter.cpp
+  fileio/zipwriter.h
   font/strokefont.cpp
   font/strokefont.h
   font/strokefontpool.cpp
@@ -480,6 +484,7 @@ add_library(
   utils/overlinemarkupparser.cpp
   utils/overlinemarkupparser.h
   utils/qtmetatyperegistration.h
+  utils/rusthandle.h
   utils/scopeguard.h
   utils/scopeguardlist.h
   utils/signalslot.h
@@ -529,7 +534,6 @@ target_link_libraries(
           Dxflib::Dxflib
           FontoBene::FontoBeneQt
           MuParser::MuParser
-          QuaZip::QuaZip
 )
 target_link_libraries(
   librepcb_core

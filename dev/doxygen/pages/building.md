@@ -189,16 +189,9 @@ Right now, the following libraries can be unbundled:
 | [googletest] | `UNBUNDLE_GTEST` | `cmake`, `pkg-config` |
 | [muparser] | `UNBUNDLE_MUPARSER` | `cmake`, `pkg-config` |
 | [polyclipping] | `UNBUNDLE_POLYCLIPPING` | `pkg-config` |
-| [quazip] ² | `UNBUNDLE_QUAZIP` | `cmake` |
 
 [dxflib]: https://www.qcad.org/en/90-dxflib
 [fontobene-qt]: https://github.com/fontobene/fontobene-qt/
 [googletest]: https://github.com/google/googletest
 [muparser]: https://github.com/beltoforion/muparser
 [polyclipping]: https://sourceforge.net/projects/polyclipping/
-[quazip]: https://github.com/stachenov/quazip
-
-¹ Due to packaging issues with QuaZip 0.x, we only support QuaZip 1.x when unbundling.
-  Using QuaZip 0.9 should work as well, but then you'll have to patch the
-  `cmake/FindQuaZip.cmake` find script as well as potentially the include paths
-  (quazip -> quazip5) yourself.
