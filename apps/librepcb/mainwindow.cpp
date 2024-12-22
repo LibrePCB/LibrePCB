@@ -74,6 +74,10 @@ MainWindow::MainWindow(GuiApplication& app,
   g.on_board_3d_clicked(std::bind(&WindowSectionsModel::openBoard3dViewer,
                                   mSections.get(), std::placeholders::_1,
                                   std::placeholders::_2));
+  g.on_section_split_clicked(std::bind(&WindowSectionsModel::splitSection,
+                             mSections.get(), std::placeholders::_1));
+  g.on_section_close_clicked(std::bind(&WindowSectionsModel::closeSection,
+                             mSections.get(), std::placeholders::_1));
   g.on_tab_clicked(std::bind(&WindowSectionsModel::setCurrentTab,
                              mSections.get(), std::placeholders::_1,
                              std::placeholders::_2));
@@ -145,6 +149,10 @@ void MainWindow::projectItemDoubleClicked(
 
 void MainWindow::setCurrentProject(
     std::shared_ptr<ProjectEditor> prj) noexcept {
+  if (!prj) {
+    return; // Temporary workaround for disappearing schematics/boards.
+  }
+
   if (prj != mCurrentProject) {
     mCurrentProject = prj;
 
