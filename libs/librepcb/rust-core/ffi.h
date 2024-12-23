@@ -15,6 +15,11 @@
 namespace librepcb {
 namespace rs {
 
+enum class InteractiveHtmlBomLayer {
+  Front,
+  Back,
+};
+
 struct InteractiveHtmlBom;
 
 /**
@@ -26,6 +31,11 @@ struct ZipArchive;
  * Wrapper type for [Writer]
  */
 struct ZipWriter;
+
+struct InteractiveHtmlBomRefMap {
+  const QString *reference;
+  size_t id;
+};
 
 extern "C" {
 
@@ -51,12 +61,88 @@ extern void ffi_qstring_set(QString * NONNULL obj, const char *s, size_t len);
 InteractiveHtmlBom *ffi_ibom_new(const QString * NONNULL title,
                                  const QString * NONNULL revision,
                                  const QString * NONNULL company,
-                                 const QString * NONNULL date);
+                                 const QString * NONNULL date,
+                                 float min_x,
+                                 float max_x,
+                                 float min_y,
+                                 float max_y);
 
 /**
  * Delete [InteractiveHtmlBom] object
  */
 void ffi_ibom_delete(InteractiveHtmlBom *obj);
+
+/**
+ * Wrapper for [add_edge]
+ */
+void ffi_ibom_add_edge_segment(InteractiveHtmlBom * NONNULL obj,
+                               float start_x,
+                               float start_y,
+                               float end_x,
+                               float end_y,
+                               float width);
+
+/**
+ * Wrapper for [add_silkscreen_front]
+ */
+void ffi_ibom_add_silkscreen_front_segment(InteractiveHtmlBom * NONNULL obj,
+                                           float start_x,
+                                           float start_y,
+                                           float end_x,
+                                           float end_y,
+                                           float width);
+
+/**
+ * Wrapper for [add_silkscreen_back]
+ */
+void ffi_ibom_add_silkscreen_back_segment(InteractiveHtmlBom * NONNULL obj,
+                                          float start_x,
+                                          float start_y,
+                                          float end_x,
+                                          float end_y,
+                                          float width);
+
+/**
+ * Wrapper for [add_fabrication_front]
+ */
+void ffi_ibom_add_fabrication_front_segment(InteractiveHtmlBom * NONNULL obj,
+                                            float start_x,
+                                            float start_y,
+                                            float end_x,
+                                            float end_y,
+                                            float width);
+
+/**
+ * Wrapper for [add_fabrication_back]
+ */
+void ffi_ibom_add_fabrication_back_segment(InteractiveHtmlBom * NONNULL obj,
+                                           float start_x,
+                                           float start_y,
+                                           float end_x,
+                                           float end_y,
+                                           float width);
+
+/**
+ * Wrapper for [add_footprint]
+ */
+size_t ffi_ibom_add_footprint(InteractiveHtmlBom * NONNULL obj,
+                              const QString * NONNULL reference,
+                              InteractiveHtmlBomLayer layer,
+                              float pos_x,
+                              float pos_y,
+                              float angle,
+                              float relpos_x,
+                              float relpos_y,
+                              float size_x,
+                              float size_y);
+
+/**
+ * Wrapper for [add_bom_both]
+ */
+void ffi_ibom_add_bom_line(InteractiveHtmlBom * NONNULL obj,
+                           InteractiveHtmlBomLayer layer,
+                           const InteractiveHtmlBomRefMap *parts,
+                           size_t size);
 
 /**
  * Wrapper for [generate]
