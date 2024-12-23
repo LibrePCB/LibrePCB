@@ -137,7 +137,7 @@ clang_format_failed() {
 }
 echo "Formatting sources with $CLANGFORMAT and Python..."
 for dir in apps/ libs/librepcb/ tests/unittests/ share/; do
-  for file in $(search_files "${dir}**.cpp" "${dir}**.hpp" "${dir}**.h" "${dir}**.js"); do
+  for file in $(search_files "${dir}**.cpp" "${dir}**.hpp" "${dir}**.h"); do
     $CLANGFORMAT -style=file "$file" | "$REPO_ROOT/dev/format_code_helper.py" "$file" | update_file "$file" || clang_format_failed
   done
 done

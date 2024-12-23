@@ -5,8 +5,18 @@ use crate::ibom::*;
 
 /// Create a new [InteractiveHtmlBom] object
 #[no_mangle]
-pub extern "C" fn ffi_ibom_new() -> *mut InteractiveHtmlBom {
-  let ibom = InteractiveHtmlBom::new();
+pub extern "C" fn ffi_ibom_new(
+  title: &QString,
+  revision: &QString,
+  company: &QString,
+  date: &QString,
+) -> *mut InteractiveHtmlBom {
+  let ibom = InteractiveHtmlBom::new(
+    from_qstring(title),
+    from_qstring(revision),
+    from_qstring(company),
+    from_qstring(date),
+  );
   Box::into_raw(Box::new(ibom))
 }
 
