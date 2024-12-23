@@ -121,6 +121,8 @@ add_library(
   export/graphicsexportsettings.h
   export/graphicspainter.cpp
   export/graphicspainter.h
+  export/interactivehtmlbom.cpp
+  export/interactivehtmlbom.h
   export/pickplacecsvwriter.cpp
   export/pickplacecsvwriter.h
   export/pickplacedata.cpp
@@ -516,7 +518,6 @@ add_library(
   workspace/workspacesettingsitem_keyboardshortcuts.h
   workspace/workspacesettingsitem_themes.cpp
   workspace/workspacesettingsitem_themes.h
-  export/interactivehtmlbom.h export/interactivehtmlbom.cpp
 )
 target_include_directories(
   librepcb_core

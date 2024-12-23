@@ -37,8 +37,11 @@ namespace librepcb {
  *  Class InteractiveHtmlBom
  ******************************************************************************/
 
-static RustHandle<rs::InteractiveHtmlBom> construct() {
-  if (auto obj = rs::ffi_ibom_new()) {
+static RustHandle<rs::InteractiveHtmlBom> construct(const QString& title,
+                                                    const QString& revision,
+                                                    const QString& company,
+                                                    const QString& date) {
+  if (auto obj = rs::ffi_ibom_new(&title, &revision, &company, &date)) {
     return RustHandle<rs::InteractiveHtmlBom>(*obj, &rs::ffi_ibom_delete);
   } else {
     throw RuntimeError(__FILE__, __LINE__,
@@ -46,12 +49,16 @@ static RustHandle<rs::InteractiveHtmlBom> construct() {
   }
 }
 
-InteractiveHtmlBom::InteractiveHtmlBom() : mHandle(construct()) {
+InteractiveHtmlBom::InteractiveHtmlBom(const QString& title,
+                                       const QString& revision,
+                                       const QString& company,
+                                       const QString& date)
+  : mHandle(construct(title, revision, company, date)) {
 }
 
 QString InteractiveHtmlBom::generate() const {
   QString out;
-  rs::ffi_ibom_generate(*mHandle, out);
+  rs::ffi_ibom_generate(*mHandle, &out);
   return out;
 }
 

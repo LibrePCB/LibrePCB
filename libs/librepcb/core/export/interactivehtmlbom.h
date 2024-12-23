@@ -49,9 +49,15 @@ struct InteractiveHtmlBom;
  */
 class InteractiveHtmlBom final {
 public:
-  // InteractiveHtmlBom() = delete;
+  InteractiveHtmlBom() = delete;
   InteractiveHtmlBom(const InteractiveHtmlBom& other) = delete;
   InteractiveHtmlBom& operator=(const InteractiveHtmlBom& rhs) = delete;
+
+  /**
+   * @brief Constructor
+   */
+  InteractiveHtmlBom(const QString& title, const QString& revision,
+                     const QString& company, const QString& date);
 
   /**
    * @brief Generate the HTML

@@ -12,6 +12,10 @@ fail-on-warnings = []
 [build-dependencies]
 cbindgen = "0.27"
 
+[dependencies]
+jzon = "0.12.5"
+lz-str = "0.2.1"
+
 [dependencies.regex]
 version = "1.11"
 default-features = false

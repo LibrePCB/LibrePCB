@@ -28,6 +28,7 @@
 #include "../export/bomcsvwriter.h"
 #include "../export/graphicsexport.h"
 #include "../export/graphicsexportsettings.h"
+#include "../export/interactivehtmlbom.h"
 #include "../export/pickplacecsvwriter.h"
 #include "../fileio/csvfile.h"
 #include "../fileio/fileutils.h"
@@ -503,6 +504,12 @@ void OutputJobRunner::runImpl(const BomOutputJob& job) {
         BomCsvWriter writer(*bom);
         std::shared_ptr<CsvFile> csv = writer.generateCsv();
         csv->saveToFile(fp);
+      } else if (fp.getSuffix().toLower() == "html") {
+        InteractiveHtmlBom ibom(*mProject.getName(), *mProject.getVersion(),
+                                mProject.getAuthor(),
+                                QDate::currentDate().toString());
+        const QString html = ibom.generate();
+        FileUtils::writeFile(fp, html.toUtf8());  // can throw
       } else {
         throw RuntimeError(
             __FILE__, __LINE__,

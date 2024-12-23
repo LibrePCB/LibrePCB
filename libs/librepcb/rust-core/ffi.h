@@ -48,7 +48,10 @@ extern void ffi_qstring_set(QString * NONNULL obj, const char *s, size_t len);
 /**
  * Create a new [InteractiveHtmlBom] object
  */
-InteractiveHtmlBom *ffi_ibom_new();
+InteractiveHtmlBom *ffi_ibom_new(const QString * NONNULL title,
+                                 const QString * NONNULL revision,
+                                 const QString * NONNULL company,
+                                 const QString * NONNULL date);
 
 /**
  * Delete [InteractiveHtmlBom] object
