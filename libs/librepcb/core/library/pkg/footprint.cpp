@@ -214,6 +214,48 @@ void Footprint::serialize(SExpression& root) const {
   root.ensureLineBreak();
 }
 
+std::pair<Point, Point> Footprint::calculateBoundingRect() const noexcept {
+  QPainterPath p;
+  auto addPath = [&](const Path& path, const UnsignedLength& width) {
+    if (width > 0) {
+      for (const Path& outline :
+           path.toOutlineStrokes(PositiveLength(*width))) {
+        p.addPath(outline.toQPainterPathPx());
+      }
+    } else {
+      p.addPath(path.toQPainterPathPx());
+    }
+  };
+  auto addLayer = [&](const Layer& layer){
+    for (const Polygon& polygon : mPolygons) {
+      if (polygon.getLayer() == layer) {
+      addPath(polygon.getPath(), polygon.getLineWidth());
+      }
+    }
+  };
+
+  // First, take only package outline layer into account.
+  addLayer(Layer::topPackageOutlines());
+  addLayer(Layer::botPackageOutlines());
+
+  // Only consider other layers if no package outlines are present.
+  if (p.isEmpty()) {
+    addLayer(Layer::topDocumentation());
+    addLayer(Layer::botDocumentation());
+  }
+
+  // Only consider courtyard as a last resort.
+  if (p.isEmpty()) {
+    addLayer(Layer::topCourtyard());
+    addLayer(Layer::botCourtyard());
+  }
+
+  const QRectF rectPx = p.boundingRect();
+  const Point bottomLeft = Point::fromPx(rectPx.bottomLeft());
+  const Point topRight = Point::fromPx(rectPx.topRight());
+  return std::make_pair(bottomLeft, topRight);
+}
+
 /*******************************************************************************
  *  Operator Overloadings
  ******************************************************************************/

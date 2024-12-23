@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../types/length.h"
 #include "../utils/rusthandle.h"
 
 #include <QtCore>
@@ -32,7 +33,10 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Angle;
 class FilePath;
+class Path;
+class Point;
 
 namespace rs {
 struct InteractiveHtmlBom;
@@ -57,14 +61,64 @@ public:
    * @brief Constructor
    */
   InteractiveHtmlBom(const QString& title, const QString& revision,
-                     const QString& company, const QString& date);
+                     const QString& company, const QString& date,
+                     const Length& minX, const Length& maxX, const Length& minY,
+                     const Length& maxY);
+
+  /**
+   * @brief Add PCB edge path
+   *
+   * @param path  Drawing path
+   */
+  void addEdge(const Path& path) noexcept;
+
+  /**
+   * @brief Add legend on top
+   *
+   * @param path  Drawing path
+   * @param width Line width
+   */
+  void addLegendTop(const Path& path, const UnsignedLength& width) noexcept;
+
+  /**
+   * @brief Add legend on bottom
+   *
+   * @param path  Drawing path
+   * @param width Line width
+   */
+  void addLegendBot(const Path& path, const UnsignedLength& width) noexcept;
+
+  /**
+   * @brief Add documentation on top
+   *
+   * @param path  Drawing path
+   * @param width Line width
+   */
+  void addDocumentationTop(const Path& path,
+                           const UnsignedLength& width) noexcept;
+
+  /**
+   * @brief Add documentation on bottom
+   *
+   * @param path  Drawing path
+   * @param width Line width
+   */
+  void addDocumentationBot(const Path& path,
+                           const UnsignedLength& width) noexcept;
+
+  std::size_t addFootprint(const QString& name, bool mirror, const Point& pos,
+                           const Angle& rot, const Length& minX,
+                           const Length& maxX, const Length& minY,
+                           const Length& maxY) noexcept;
+
+  void addBomRow(const QList<std::pair<QString, std::size_t>>& parts) noexcept;
 
   /**
    * @brief Generate the HTML
    *
    * @return HTML file content
    */
-  QString generate() const;
+  QString generate() const noexcept;
 
 private:
   RustHandle<rs::InteractiveHtmlBom> mHandle;

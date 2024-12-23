@@ -25,6 +25,7 @@
 #include "../3d/stepexport.h"
 #include "../application.h"
 #include "../attribute/attributesubstitutor.h"
+#include "../export/bom.h"
 #include "../export/bomcsvwriter.h"
 #include "../export/graphicsexport.h"
 #include "../export/graphicsexportsettings.h"
@@ -45,6 +46,8 @@
 #include "../job/netlistoutputjob.h"
 #include "../job/pickplaceoutputjob.h"
 #include "../job/projectjsonoutputjob.h"
+#include "../library/pkg/footprint.h"
+#include "../types/layer.h"
 #include "../utils/toolbox.h"
 #include "board/board.h"
 #include "board/boardd356netlistexport.h"
@@ -52,9 +55,12 @@
 #include "board/boardgerberexport.h"
 #include "board/boardpainter.h"
 #include "board/boardpickplacegenerator.h"
+#include "board/items/bi_device.h"
+#include "board/items/bi_polygon.h"
 #include "board/realisticboardpainter.h"
 #include "bomgenerator.h"
 #include "circuit/circuit.h"
+#include "circuit/componentinstance.h"
 #include "project.h"
 #include "projectattributelookup.h"
 #include "projectjsonexport.h"
@@ -504,10 +510,68 @@ void OutputJobRunner::runImpl(const BomOutputJob& job) {
         BomCsvWriter writer(*bom);
         std::shared_ptr<CsvFile> csv = writer.generateCsv();
         csv->saveToFile(fp);
-      } else if (fp.getSuffix().toLower() == "html") {
-        InteractiveHtmlBom ibom(*mProject.getName(), *mProject.getVersion(),
-                                mProject.getAuthor(),
-                                QDate::currentDate().toString());
+      } else if ((fp.getSuffix().toLower() == "html") && board) {
+        Length minX, maxX, minY, maxY;
+        if (std::optional<std::pair<Point, Point>> bbox =
+                board->calculateBoundingRect()) {
+          minX = bbox->first.getX();
+          maxX = bbox->second.getX();
+          minY = bbox->first.getY();
+          maxY = bbox->second.getY();
+        }
+        InteractiveHtmlBom ibom(
+            *mProject.getName(), *mProject.getVersion(), mProject.getAuthor(),
+            QDate::currentDate().toString(), minX, maxX, minY, maxY);
+        for (const auto p : board->getPolygons()) {
+          if ((p->getData().getLayer() == Layer::boardOutlines()) ||
+              (p->getData().getLayer() == Layer::boardCutouts())) {
+            ibom.addEdge(p->getData().getPath().toClosedPath());
+          } else if (p->getData().getLayer() == Layer::topLegend()) {
+            ibom.addLegendTop(p->getData().getPath(),
+                              p->getData().getLineWidth());
+          } else if (p->getData().getLayer() == Layer::botLegend()) {
+            ibom.addLegendBot(p->getData().getPath(),
+                              p->getData().getLineWidth());
+          } else if (p->getData().getLayer() == Layer::topDocumentation()) {
+            ibom.addDocumentationTop(p->getData().getPath(),
+                                     p->getData().getLineWidth());
+          } else if (p->getData().getLayer() == Layer::botDocumentation()) {
+            ibom.addDocumentationBot(p->getData().getPath(),
+                                     p->getData().getLineWidth());
+          }
+        }
+        QHash<QString, std::size_t> idMap;
+        for (const auto d : board->getDeviceInstances()) {
+          const Transform transform(*d);
+          const std::pair<Point, Point> bbox =
+              d->getLibFootprint().calculateBoundingRect();
+          const std::size_t id = ibom.addFootprint(
+              *d->getComponentInstance().getName(), d->getMirrored(),
+              d->getPosition(), d->getRotation(), bbox.first.getX(),
+              bbox.second.getX(), bbox.first.getY(), bbox.second.getY());
+          idMap.insert(*d->getComponentInstance().getName(), id);
+          for (const Polygon& p : d->getLibFootprint().getPolygons()) {
+            const Layer& layer = transform.map(p.getLayer());
+            if (layer == Layer::topLegend()) {
+              ibom.addLegendTop(transform.map(p.getPath()), p.getLineWidth());
+            } else if (layer == Layer::botLegend()) {
+              ibom.addLegendBot(transform.map(p.getPath()), p.getLineWidth());
+            } else if (layer == Layer::topDocumentation()) {
+              ibom.addDocumentationTop(transform.map(p.getPath()),
+                                       p.getLineWidth());
+            } else if (layer == Layer::botDocumentation()) {
+              ibom.addDocumentationBot(transform.map(p.getPath()),
+                                       p.getLineWidth());
+            }
+          }
+        }
+        for (const BomItem& item : bom->getItems()) {
+          QList<std::pair<QString, std::size_t>> parts;
+          for (const QString& name : item.getDesignators()) {
+            parts.append(std::make_pair(name, idMap[name]));
+          }
+          ibom.addBomRow(parts);
+        }
         const QString html = ibom.generate();
         FileUtils::writeFile(fp, html.toUtf8());  // can throw
       } else {
