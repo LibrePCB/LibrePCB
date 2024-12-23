@@ -75,52 +75,42 @@ void ffi_ibom_delete(InteractiveHtmlBom *obj);
 /**
  * Wrapper for [add_edge]
  */
-void ffi_ibom_add_edge_segment(InteractiveHtmlBom * NONNULL obj,
-                               float start_x,
-                               float start_y,
-                               float end_x,
-                               float end_y,
-                               float width);
+void ffi_ibom_add_edge(InteractiveHtmlBom * NONNULL obj,
+                       const QString * NONNULL svgpath,
+                       float width,
+                       bool filled);
 
 /**
  * Wrapper for [add_silkscreen_front]
  */
-void ffi_ibom_add_silkscreen_front_segment(InteractiveHtmlBom * NONNULL obj,
-                                           float start_x,
-                                           float start_y,
-                                           float end_x,
-                                           float end_y,
-                                           float width);
+void ffi_ibom_add_silkscreen_front(InteractiveHtmlBom * NONNULL obj,
+                                   const QString * NONNULL svgpath,
+                                   float width,
+                                   bool filled);
 
 /**
  * Wrapper for [add_silkscreen_back]
  */
-void ffi_ibom_add_silkscreen_back_segment(InteractiveHtmlBom * NONNULL obj,
-                                          float start_x,
-                                          float start_y,
-                                          float end_x,
-                                          float end_y,
-                                          float width);
+void ffi_ibom_add_silkscreen_back(InteractiveHtmlBom * NONNULL obj,
+                                  const QString * NONNULL svgpath,
+                                  float width,
+                                  bool filled);
 
 /**
  * Wrapper for [add_fabrication_front]
  */
-void ffi_ibom_add_fabrication_front_segment(InteractiveHtmlBom * NONNULL obj,
-                                            float start_x,
-                                            float start_y,
-                                            float end_x,
-                                            float end_y,
-                                            float width);
+void ffi_ibom_add_fabrication_front(InteractiveHtmlBom * NONNULL obj,
+                                    const QString * NONNULL svgpath,
+                                    float width,
+                                    bool filled);
 
 /**
  * Wrapper for [add_fabrication_back]
  */
-void ffi_ibom_add_fabrication_back_segment(InteractiveHtmlBom * NONNULL obj,
-                                           float start_x,
-                                           float start_y,
-                                           float end_x,
-                                           float end_y,
-                                           float width);
+void ffi_ibom_add_fabrication_back(InteractiveHtmlBom * NONNULL obj,
+                                   const QString * NONNULL svgpath,
+                                   float width,
+                                   bool filled);
 
 /**
  * Wrapper for [add_footprint]

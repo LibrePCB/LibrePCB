@@ -62,57 +62,36 @@ InteractiveHtmlBom::InteractiveHtmlBom(const QString& title,
 }
 
 void InteractiveHtmlBom::addEdge(const Path& path) noexcept {
-  for (int i = 1; i < path.getVertices().count(); ++i) {
-    const Vertex v0 = path.getVertices().at(i - 1);
-    const Vertex v1 = path.getVertices().at(i);
-    rs::ffi_ibom_add_edge_segment(
-        *mHandle, v0.getPos().getX().toMm(), -v0.getPos().getY().toMm(),
-        v1.getPos().getX().toMm(), -v1.getPos().getY().toMm(), 0.1f);
-  }
+  const QString svg = path.toSvgPathMm();
+  rs::ffi_ibom_add_edge(*mHandle, &svg, 0.1f, false);
 }
 
 void InteractiveHtmlBom::addLegendTop(const Path& path,
-                                      const UnsignedLength& width) noexcept {
-  for (int i = 1; i < path.getVertices().count(); ++i) {
-    const Vertex v0 = path.getVertices().at(i - 1);
-    const Vertex v1 = path.getVertices().at(i);
-    rs::ffi_ibom_add_silkscreen_front_segment(
-        *mHandle, v0.getPos().getX().toMm(), -v0.getPos().getY().toMm(),
-        v1.getPos().getX().toMm(), -v1.getPos().getY().toMm(), width->toMm());
-  }
+                                      const UnsignedLength& width,
+                                      bool fill) noexcept {
+  const QString svg = path.toSvgPathMm();
+  rs::ffi_ibom_add_silkscreen_front(*mHandle, &svg, width->toMm(), fill);
 }
 
 void InteractiveHtmlBom::addLegendBot(const Path& path,
-                                      const UnsignedLength& width) noexcept {
-  for (int i = 1; i < path.getVertices().count(); ++i) {
-    const Vertex v0 = path.getVertices().at(i - 1);
-    const Vertex v1 = path.getVertices().at(i);
-    rs::ffi_ibom_add_silkscreen_back_segment(
-        *mHandle, v0.getPos().getX().toMm(), -v0.getPos().getY().toMm(),
-        v1.getPos().getX().toMm(), -v1.getPos().getY().toMm(), width->toMm());
-  }
+                                      const UnsignedLength& width,
+                                      bool fill) noexcept {
+  const QString svg = path.toSvgPathMm();
+  rs::ffi_ibom_add_silkscreen_back(*mHandle, &svg, width->toMm(), fill);
 }
 
-void InteractiveHtmlBom::addDocumentationTop(
-    const Path& path, const UnsignedLength& width) noexcept {
-  for (int i = 1; i < path.getVertices().count(); ++i) {
-    const Vertex v0 = path.getVertices().at(i - 1);
-    const Vertex v1 = path.getVertices().at(i);
-    rs::ffi_ibom_add_fabrication_front_segment(
-        *mHandle, v0.getPos().getX().toMm(), -v0.getPos().getY().toMm(),
-        v1.getPos().getX().toMm(), -v1.getPos().getY().toMm(), width->toMm());
-  }
+void InteractiveHtmlBom::addDocumentationTop(const Path& path,
+                                             const UnsignedLength& width,
+                                             bool fill) noexcept {
+  const QString svg = path.toSvgPathMm();
+  rs::ffi_ibom_add_fabrication_front(*mHandle, &svg, width->toMm(), fill);
 }
 
-void InteractiveHtmlBom::addDocumentationBot(
-    const Path& path, const UnsignedLength& width) noexcept {
-  for (int i = 1; i < path.getVertices().count(); ++i) {
-    const Vertex v0 = path.getVertices().at(i - 1);
-    const Vertex v1 = path.getVertices().at(i);
-    rs::ffi_ibom_add_fabrication_back_segment(
-        *mHandle, v0.getPos().getX().toMm(), -v0.getPos().getY().toMm(),
-        v1.getPos().getX().toMm(), -v1.getPos().getY().toMm(), width->toMm());
-  }
+void InteractiveHtmlBom::addDocumentationBot(const Path& path,
+                                             const UnsignedLength& width,
+                                             bool fill) noexcept {
+  const QString svg = path.toSvgPathMm();
+  rs::ffi_ibom_add_fabrication_back(*mHandle, &svg, width->toMm(), fill);
 }
 
 std::size_t InteractiveHtmlBom::addFootprint(const QString& name, bool mirror,

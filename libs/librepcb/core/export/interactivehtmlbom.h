@@ -78,7 +78,8 @@ public:
    * @param path  Drawing path
    * @param width Line width
    */
-  void addLegendTop(const Path& path, const UnsignedLength& width) noexcept;
+  void addLegendTop(const Path& path, const UnsignedLength& width,
+                    bool fill) noexcept;
 
   /**
    * @brief Add legend on bottom
@@ -86,7 +87,8 @@ public:
    * @param path  Drawing path
    * @param width Line width
    */
-  void addLegendBot(const Path& path, const UnsignedLength& width) noexcept;
+  void addLegendBot(const Path& path, const UnsignedLength& width,
+                    bool fill) noexcept;
 
   /**
    * @brief Add documentation on top
@@ -94,8 +96,8 @@ public:
    * @param path  Drawing path
    * @param width Line width
    */
-  void addDocumentationTop(const Path& path,
-                           const UnsignedLength& width) noexcept;
+  void addDocumentationTop(const Path& path, const UnsignedLength& width,
+                           bool fill) noexcept;
 
   /**
    * @brief Add documentation on bottom
@@ -103,8 +105,8 @@ public:
    * @param path  Drawing path
    * @param width Line width
    */
-  void addDocumentationBot(const Path& path,
-                           const UnsignedLength& width) noexcept;
+  void addDocumentationBot(const Path& path, const UnsignedLength& width,
+                           bool fill) noexcept;
 
   std::size_t addFootprint(const QString& name, bool mirror, const Point& pos,
                            const Angle& rot, const Length& minX,

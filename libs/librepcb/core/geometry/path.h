@@ -83,6 +83,7 @@ public:
   Path toOpenPath() const noexcept;
   QVector<Path> toOutlineStrokes(const PositiveLength& width) const noexcept;
   const QPainterPath& toQPainterPathPx() const noexcept;
+  QString toSvgPathMm() const noexcept;
 
   // Transformations
   Path& translate(const Point& offset) noexcept;

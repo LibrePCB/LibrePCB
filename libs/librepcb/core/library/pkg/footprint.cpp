@@ -226,10 +226,10 @@ std::pair<Point, Point> Footprint::calculateBoundingRect() const noexcept {
       p.addPath(path.toQPainterPathPx());
     }
   };
-  auto addLayer = [&](const Layer& layer){
+  auto addLayer = [&](const Layer& layer) {
     for (const Polygon& polygon : mPolygons) {
       if (polygon.getLayer() == layer) {
-      addPath(polygon.getPath(), polygon.getLineWidth());
+        addPath(polygon.getPath(), polygon.getLineWidth());
       }
     }
   };

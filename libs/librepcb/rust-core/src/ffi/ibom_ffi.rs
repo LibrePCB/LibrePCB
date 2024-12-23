@@ -55,87 +55,57 @@ pub extern "C" fn ffi_ibom_delete(obj: *mut InteractiveHtmlBom) {
 
 /// Wrapper for [add_edge]
 #[no_mangle]
-extern "C" fn ffi_ibom_add_edge_segment(
+extern "C" fn ffi_ibom_add_edge(
   obj: &mut InteractiveHtmlBom,
-  start_x: f32,
-  start_y: f32,
-  end_x: f32,
-  end_y: f32,
+  svgpath: &QString,
   width: f32,
+  filled: bool,
 ) {
-  obj.add_edge(Drawing::Segment(DrawingSegment::new(
-    Coordinate::new(start_x, start_y),
-    Coordinate::new(end_x, end_y),
-    width,
-  )));
+  obj.add_edge(Drawing::new(from_qstring(svgpath), width, filled));
 }
 
 /// Wrapper for [add_silkscreen_front]
 #[no_mangle]
-extern "C" fn ffi_ibom_add_silkscreen_front_segment(
+extern "C" fn ffi_ibom_add_silkscreen_front(
   obj: &mut InteractiveHtmlBom,
-  start_x: f32,
-  start_y: f32,
-  end_x: f32,
-  end_y: f32,
+  svgpath: &QString,
   width: f32,
+  filled: bool,
 ) {
-  obj.add_silkscreen_front(Drawing::Segment(DrawingSegment::new(
-    Coordinate::new(start_x, start_y),
-    Coordinate::new(end_x, end_y),
-    width,
-  )));
+  obj.add_silkscreen_front(Drawing::new(from_qstring(svgpath), width, filled));
 }
 
 /// Wrapper for [add_silkscreen_back]
 #[no_mangle]
-extern "C" fn ffi_ibom_add_silkscreen_back_segment(
+extern "C" fn ffi_ibom_add_silkscreen_back(
   obj: &mut InteractiveHtmlBom,
-  start_x: f32,
-  start_y: f32,
-  end_x: f32,
-  end_y: f32,
+  svgpath: &QString,
   width: f32,
+  filled: bool,
 ) {
-  obj.add_silkscreen_back(Drawing::Segment(DrawingSegment::new(
-    Coordinate::new(start_x, start_y),
-    Coordinate::new(end_x, end_y),
-    width,
-  )));
+  obj.add_silkscreen_back(Drawing::new(from_qstring(svgpath), width, filled));
 }
 
 /// Wrapper for [add_fabrication_front]
 #[no_mangle]
-extern "C" fn ffi_ibom_add_fabrication_front_segment(
+extern "C" fn ffi_ibom_add_fabrication_front(
   obj: &mut InteractiveHtmlBom,
-  start_x: f32,
-  start_y: f32,
-  end_x: f32,
-  end_y: f32,
+  svgpath: &QString,
   width: f32,
+  filled: bool,
 ) {
-  obj.add_fabrication_front(Drawing::Segment(DrawingSegment::new(
-    Coordinate::new(start_x, start_y),
-    Coordinate::new(end_x, end_y),
-    width,
-  )));
+  obj.add_fabrication_front(Drawing::new(from_qstring(svgpath), width, filled));
 }
 
 /// Wrapper for [add_fabrication_back]
 #[no_mangle]
-extern "C" fn ffi_ibom_add_fabrication_back_segment(
+extern "C" fn ffi_ibom_add_fabrication_back(
   obj: &mut InteractiveHtmlBom,
-  start_x: f32,
-  start_y: f32,
-  end_x: f32,
-  end_y: f32,
+  svgpath: &QString,
   width: f32,
+  filled: bool,
 ) {
-  obj.add_fabrication_back(Drawing::Segment(DrawingSegment::new(
-    Coordinate::new(start_x, start_y),
-    Coordinate::new(end_x, end_y),
-    width,
-  )));
+  obj.add_fabrication_back(Drawing::new(from_qstring(svgpath), width, filled));
 }
 
 /// Wrapper for [add_footprint]
