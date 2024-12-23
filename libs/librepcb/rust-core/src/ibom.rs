@@ -65,37 +65,64 @@ impl Serializable for BoundingBox {
   }
 }
 
-pub struct DrawingSegment {
-  start: Coordinate,
-  end: Coordinate,
+//pub struct DrawingSegment {
+//  start: Coordinate,
+//  end: Coordinate,
+//  width: f32,
+//}
+//
+//impl DrawingSegment {
+//  pub fn new(start: Coordinate, end: Coordinate, width: f32) -> DrawingSegment {
+//    DrawingSegment { start, end, width }
+//  }
+//}
+//
+//impl Serializable for DrawingSegment {
+//  fn to_json(&self) -> JsonValue {
+//    object! {
+//      type: "segment",
+//      start: self.start.to_json(),
+//      end: self.end.to_json(),
+//      width: self.width,
+//    }
+//  }
+//}
+
+//pub enum Drawing {
+//  Segment(DrawingSegment),
+//}
+
+//impl Serializable for Drawing {
+//  fn to_json(&self) -> JsonValue {
+//    match self {
+//      Drawing::Segment(obj) => obj.to_json(),
+//    }
+//  }
+//}
+
+pub struct Drawing {
+  svgpath: String,
+  filled: bool,
   width: f32,
 }
 
-impl DrawingSegment {
-  pub fn new(start: Coordinate, end: Coordinate, width: f32) -> DrawingSegment {
-    DrawingSegment { start, end, width }
-  }
-}
-
-impl Serializable for DrawingSegment {
-  fn to_json(&self) -> JsonValue {
-    object! {
-      type: "segment",
-      start: self.start.to_json(),
-      end: self.end.to_json(),
-      width: self.width,
+impl Drawing {
+  pub fn new(svgpath: String, width: f32, filled: bool) -> Drawing {
+    Drawing {
+      svgpath,
+      width,
+      filled,
     }
   }
 }
 
-pub enum Drawing {
-  Segment(DrawingSegment),
-}
-
 impl Serializable for Drawing {
   fn to_json(&self) -> JsonValue {
-    match self {
-      Drawing::Segment(obj) => obj.to_json(),
+    object! {
+      type: "polygon",
+      svgpath: self.svgpath.clone(),
+      width: self.width,
+      filled: self.filled,
     }
   }
 }

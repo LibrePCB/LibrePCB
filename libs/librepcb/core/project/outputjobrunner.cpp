@@ -528,16 +528,20 @@ void OutputJobRunner::runImpl(const BomOutputJob& job) {
             ibom.addEdge(p->getData().getPath().toClosedPath());
           } else if (p->getData().getLayer() == Layer::topLegend()) {
             ibom.addLegendTop(p->getData().getPath(),
-                              p->getData().getLineWidth());
+                              p->getData().getLineWidth(),
+                              p->getData().isFilled());
           } else if (p->getData().getLayer() == Layer::botLegend()) {
             ibom.addLegendBot(p->getData().getPath(),
-                              p->getData().getLineWidth());
+                              p->getData().getLineWidth(),
+                              p->getData().isFilled());
           } else if (p->getData().getLayer() == Layer::topDocumentation()) {
             ibom.addDocumentationTop(p->getData().getPath(),
-                                     p->getData().getLineWidth());
+                                     p->getData().getLineWidth(),
+                                     p->getData().isFilled());
           } else if (p->getData().getLayer() == Layer::botDocumentation()) {
             ibom.addDocumentationBot(p->getData().getPath(),
-                                     p->getData().getLineWidth());
+                                     p->getData().getLineWidth(),
+                                     p->getData().isFilled());
           }
         }
         QHash<QString, std::size_t> idMap;
@@ -553,15 +557,17 @@ void OutputJobRunner::runImpl(const BomOutputJob& job) {
           for (const Polygon& p : d->getLibFootprint().getPolygons()) {
             const Layer& layer = transform.map(p.getLayer());
             if (layer == Layer::topLegend()) {
-              ibom.addLegendTop(transform.map(p.getPath()), p.getLineWidth());
+              ibom.addLegendTop(transform.map(p.getPath()), p.getLineWidth(),
+                                p.isFilled());
             } else if (layer == Layer::botLegend()) {
-              ibom.addLegendBot(transform.map(p.getPath()), p.getLineWidth());
+              ibom.addLegendBot(transform.map(p.getPath()), p.getLineWidth(),
+                                p.isFilled());
             } else if (layer == Layer::topDocumentation()) {
               ibom.addDocumentationTop(transform.map(p.getPath()),
-                                       p.getLineWidth());
+                                       p.getLineWidth(), p.isFilled());
             } else if (layer == Layer::botDocumentation()) {
               ibom.addDocumentationBot(transform.map(p.getPath()),
-                                       p.getLineWidth());
+                                       p.getLineWidth(), p.isFilled());
             }
           }
         }
