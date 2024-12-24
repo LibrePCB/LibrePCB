@@ -48,6 +48,13 @@ class BomGenerator final {
   Q_DECLARE_TR_FUNCTIONS(BoardBomGenerator)
 
 public:
+  enum class Side {
+    Top = (1 << 0),
+    Bottom = (1 << 1),
+    Both = Top | Bottom,
+  };
+  Q_DECLARE_FLAGS(Sides, Side)
+
   // Constructors / Destructor
   BomGenerator() = delete;
   BomGenerator(const BomGenerator& other) = delete;
@@ -60,8 +67,8 @@ public:
   }
 
   // General Methods
-  std::shared_ptr<Bom> generate(const Board* board,
-                                const Uuid& assemblyVariant) noexcept;
+  std::shared_ptr<Bom> generate(const Board* board, const Uuid& assemblyVariant,
+                                Sides sides = Side::Both) noexcept;
 
   // Operator Overloadings
   BomGenerator& operator=(const BomGenerator& rhs) = delete;

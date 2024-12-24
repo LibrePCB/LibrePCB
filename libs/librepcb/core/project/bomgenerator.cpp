@@ -56,8 +56,9 @@ BomGenerator::~BomGenerator() noexcept {
  *  General Methods
  ******************************************************************************/
 
-std::shared_ptr<Bom> BomGenerator::generate(
-    const Board* board, const Uuid& assemblyVariant) noexcept {
+std::shared_ptr<Bom> BomGenerator::generate(const Board* board,
+                                            const Uuid& assemblyVariant,
+                                            Sides sides) noexcept {
   // Parse custom attributes.
   QStringList customCommonAttributes;
   QStringList customPartAttributes;
@@ -99,6 +100,10 @@ std::shared_ptr<Bom> BomGenerator::generate(
     if (board) {
       device = board->getDeviceInstanceByComponentUuid(cmpInst->getUuid());
       if (device) {
+        if (((!device->getMirrored()) && (!sides.testFlag(Side::Top))) ||
+            (device->getMirrored() && (!sides.testFlag(Side::Bottom)))) {
+          continue;  // Filtered out.
+        }
         lookup = ProjectAttributeLookup(*device, nullptr);
         parts = device->getParts(assemblyVariant);
         if (parts.isEmpty()) {

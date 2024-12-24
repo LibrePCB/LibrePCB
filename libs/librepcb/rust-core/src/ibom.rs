@@ -9,6 +9,18 @@ trait Serializable {
   fn to_json(&self) -> JsonValue;
 }
 
+impl Serializable for usize {
+  fn to_json(&self) -> JsonValue {
+    (*self).into()
+  }
+}
+
+impl Serializable for String {
+  fn to_json(&self) -> JsonValue {
+    self.clone().into()
+  }
+}
+
 impl<T: Serializable> Serializable for Vec<T> {
   fn to_json(&self) -> JsonValue {
     let mut arr = array![];
@@ -127,6 +139,72 @@ impl Serializable for Drawing {
   }
 }
 
+pub struct Track {
+  start: Coordinate,
+  end: Coordinate,
+  width: f32,
+  drillsize: Option<f32>,
+  net: Option<String>,
+}
+
+impl Track {
+  pub fn new(
+    start: Coordinate,
+    end: Coordinate,
+    width: f32,
+    drillsize: Option<f32>,
+    net: Option<String>,
+  ) -> Track {
+    Track {
+      start,
+      end,
+      width,
+      drillsize,
+      net,
+    }
+  }
+}
+
+impl Serializable for Track {
+  fn to_json(&self) -> JsonValue {
+    let mut obj = object! {
+      start: self.start.to_json(),
+      end: self.end.to_json(),
+      width: self.width,
+    };
+    if self.drillsize.is_some() {
+      obj["drillsize"] = self.drillsize.unwrap().into();
+    }
+    if let Some(net) = &self.net {
+      obj["net"] = net.clone().into();
+    }
+    obj
+  }
+}
+
+pub struct Zone {
+  svgpath: String,
+  net: Option<String>,
+}
+
+impl Zone {
+  pub fn new(svgpath: String, net: Option<String>) -> Zone {
+    Zone { svgpath, net }
+  }
+}
+
+impl Serializable for Zone {
+  fn to_json(&self) -> JsonValue {
+    let mut obj = object! {
+      svgpath: self.svgpath.clone(),
+    };
+    if let Some(net) = &self.net {
+      obj["net"] = net.clone().into();
+    }
+    obj
+  }
+}
+
 pub enum Layer {
   Front,
   Back,
@@ -141,6 +219,69 @@ impl Serializable for Layer {
   }
 }
 
+pub enum Sides {
+  Front,
+  Back,
+  Both,
+}
+
+pub struct Pad {
+  layers: Vec<Layer>,
+  pos: Coordinate,
+  angle: f32,
+  svgpath: String,
+  drillsize: Option<(f32, f32)>,
+  net: Option<String>,
+}
+
+impl Pad {
+  pub fn new(
+    layers: Vec<Layer>,
+    pos: Coordinate,
+    angle: f32,
+    svgpath: String,
+    drillsize: Option<(f32, f32)>,
+    net: Option<String>,
+  ) -> Pad {
+    Pad {
+      layers,
+      pos,
+      angle,
+      svgpath,
+      drillsize,
+      net,
+    }
+  }
+}
+
+impl Serializable for Pad {
+  fn to_json(&self) -> JsonValue {
+    let mut obj = object! {
+      layers: self.layers.to_json(),
+      pos: self.pos.to_json(),
+      angle: self.angle,
+      shape: "custom",
+      svgpath: self.svgpath.clone(),
+    };
+    if let Some(drill) = &self.drillsize {
+      obj["type"] = "th".into();
+      obj["drillsize"] = array![drill.0, drill.1];
+      obj["drillshape"] = if drill.0 != drill.1 {
+        "oblong"
+      } else {
+        "circle"
+      }
+      .into();
+    } else {
+      obj["type"] = "smd".into();
+    }
+    if let Some(net) = &self.net {
+      obj["net"] = net.clone().into();
+    }
+    obj
+  }
+}
+
 pub struct Footprint {
   reference: String,
   layer: Layer,
@@ -148,6 +289,7 @@ pub struct Footprint {
   angle: f32,
   relpos: Coordinate,
   size: Coordinate,
+  pads: Vec<Pad>,
 }
 
 impl Footprint {
@@ -158,6 +300,7 @@ impl Footprint {
     angle: f32,
     relpos: Coordinate,
     size: Coordinate,
+    pads: Vec<Pad>,
   ) -> Footprint {
     Footprint {
       reference,
@@ -166,6 +309,7 @@ impl Footprint {
       angle,
       relpos,
       size,
+      pads,
     }
   }
 }
@@ -182,7 +326,7 @@ impl Serializable for Footprint {
       },
       drawings: array![],
       layer: self.layer.to_json(),
-      pads: array![],
+      pads: self.pads.to_json(),
     }
   }
 }
@@ -212,11 +356,18 @@ impl Serializable for RefMap {
 }
 
 pub struct InteractiveHtmlBom {
+  // Metadata
   title: String,
   revision: String,
   company: String,
   date: String,
   bbox: BoundingBox,
+
+  // Config
+  show_fabrication: bool,
+  show_silkscreen: bool,
+
+  // Content
   edges: Vec<Drawing>,
   silkscreen_front: Vec<Drawing>,
   silkscreen_back: Vec<Drawing>,
@@ -225,6 +376,13 @@ pub struct InteractiveHtmlBom {
   footprints: Vec<Footprint>,
   bom_front: Vec<Vec<RefMap>>,
   bom_back: Vec<Vec<RefMap>>,
+  bom_both: Vec<Vec<RefMap>>,
+  bom_skipped: Vec<usize>,
+  tracks_front: Vec<Track>,
+  tracks_back: Vec<Track>,
+  zones_front: Vec<Zone>,
+  zones_back: Vec<Zone>,
+  nets: Vec<String>,
 }
 
 impl InteractiveHtmlBom {
@@ -241,6 +399,8 @@ impl InteractiveHtmlBom {
       company,
       date,
       bbox,
+      show_fabrication: true,
+      show_silkscreen: true,
       edges: Vec::new(),
       silkscreen_front: Vec::new(),
       silkscreen_back: Vec::new(),
@@ -249,6 +409,13 @@ impl InteractiveHtmlBom {
       footprints: Vec::new(),
       bom_front: Vec::new(),
       bom_back: Vec::new(),
+      bom_both: Vec::new(),
+      bom_skipped: Vec::new(),
+      tracks_front: Vec::new(),
+      tracks_back: Vec::new(),
+      zones_front: Vec::new(),
+      zones_back: Vec::new(),
+      nets: Vec::new(),
     }
   }
 
@@ -272,37 +439,61 @@ impl InteractiveHtmlBom {
     self.fabrication_back.push(d);
   }
 
-  pub fn add_footprint(&mut self, f: Footprint) -> usize {
+  pub fn add_footprint(&mut self, f: Footprint, mount: bool) -> usize {
+    for pad in &f.pads {
+      if let Some(net) = &pad.net {
+        if !self.nets.contains(&net) {
+          self.nets.push(net.clone());
+        }
+      }
+    }
+    let id = self.footprints.len();
     self.footprints.push(f);
-    self.footprints.len() - 1
+    if !mount {
+      self.bom_skipped.push(id);
+    }
+    id
   }
 
-  pub fn add_bom_line(&mut self, layer: Layer, b: Vec<RefMap>) {
+  pub fn add_bom_line(&mut self, sides: Sides, b: Vec<RefMap>) {
+    match sides {
+      Sides::Front => self.bom_front.push(b),
+      Sides::Back => self.bom_back.push(b),
+      Sides::Both => self.bom_both.push(b),
+    }
+  }
+
+  pub fn add_track(&mut self, layer: Layer, t: Track) {
     match layer {
-      Layer::Front => self.bom_front.push(b),
-      Layer::Back => self.bom_back.push(b),
+      Layer::Front => self.tracks_front.push(t),
+      Layer::Back => self.tracks_back.push(t),
+    }
+  }
+
+  pub fn add_zone(&mut self, layer: Layer, z: Zone) {
+    match layer {
+      Layer::Front => self.zones_front.push(z),
+      Layer::Back => self.zones_back.push(z),
     }
   }
 
   pub fn generate(&self) -> String {
-    let config = r#"var config = {
-        "show_fabrication": true,
-        "redraw_on_drag": true,
-        "highlight_pin1": "none",
-        "offset_back_rotation": false,
-        "kicad_text_formatting": true,
-        "dark_mode": false,
-        "bom_view": "left-right",
-        "board_rotation": 0.0,
-        "checkboxes": "Sourced,Placed",
-        "show_silkscreen": true,
-        "fields": [
-        ],
-        "show_pads": true,
-        "layer_view": "FB"
-    }"#;
-
-    let bom_both = [&self.bom_front[..], &self.bom_back[..]].concat();
+    let config = object! {
+        board_rotation: 0.0,
+        bom_view: "left-right",
+        checkboxes: "Sourced,Placed",
+        dark_mode: false,
+        fields: [],
+        highlight_pin1: "none",
+        kicad_text_formatting: true,
+        layer_view: "FB",
+        offset_back_rotation: false,
+        redraw_on_drag: true,
+        show_fabrication: self.show_fabrication,
+        show_pads: true,
+        show_silkscreen: self.show_silkscreen,
+    };
+    let config_str = "var config = ".to_owned() + &config.dump();
 
     let mut data = object! {};
     data["ibom_version"] = "v2.9.0".into();
@@ -312,10 +503,10 @@ impl InteractiveHtmlBom {
     data["metadata"]["date"] = self.date.clone().into();
     data["bom"]["F"] = self.bom_front.to_json();
     data["bom"]["B"] = self.bom_back.to_json();
-    data["bom"]["both"] = bom_both.to_json();
-    data["bom"]["skipped"] = array! {};
+    data["bom"]["both"] = self.bom_both.to_json();
+    data["bom"]["skipped"] = self.bom_skipped.to_json();
     data["bom"]["fields"] = object! {};
-    for row in &bom_both {
+    for row in &self.bom_both {
       for map in row {
         data["bom"]["fields"][map.footprint_id.to_string()] = object! {};
       }
@@ -327,11 +518,16 @@ impl InteractiveHtmlBom {
     data["drawings"]["silkscreen"]["B"] = self.silkscreen_back.to_json();
     data["drawings"]["fabrication"]["F"] = self.fabrication_front.to_json();
     data["drawings"]["fabrication"]["B"] = self.fabrication_back.to_json();
+    data["tracks"]["F"] = self.tracks_front.to_json();
+    data["tracks"]["B"] = self.tracks_back.to_json();
+    data["zones"]["F"] = self.zones_front.to_json();
+    data["zones"]["B"] = self.zones_back.to_json();
+    data["nets"] = self.nets.to_json();
     let data_compressed = lz_str::compress_to_base64(&data.dump());
-    let pcbdata = "var pcbdata = JSON.parse(LZString.decompressFromBase64(\""
-      .to_owned()
-      + &data_compressed
-      + "\"))";
+    let pcbdata_str =
+      "var pcbdata = JSON.parse(LZString.decompressFromBase64(\"".to_owned()
+        + &data_compressed
+        + "\"))";
 
     let mut html =
       String::from_utf8_lossy(include_bytes!("ibom/web/ibom.html")).to_string();
@@ -351,8 +547,8 @@ impl InteractiveHtmlBom {
       "///POINTER_EVENTS_POLYFILL///",
       &String::from_utf8_lossy(include_bytes!("ibom/web/pep.js")),
     );
-    html = html.replace("///CONFIG///", config);
-    html = html.replace("///PCBDATA///", &pcbdata);
+    html = html.replace("///CONFIG///", &config_str);
+    html = html.replace("///PCBDATA///", &pcbdata_str);
     html = html.replace(
       "///UTILJS///",
       &String::from_utf8_lossy(include_bytes!("ibom/web/util.js")),

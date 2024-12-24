@@ -522,7 +522,7 @@ bool CmdBoardSpecctraImport::performExecute() {
         Point pos = pad->getPosition();
         QList<Point>& coordinates = pad->getLibPad().isTht()
             ? wireCoordinates
-            : wireCoordinatesPerLayer[&pad->getSmtLayer()];
+            : wireCoordinatesPerLayer[&pad->getSolderLayer()];
         if (!coordinates.contains(pos)) {
           // Find another coordinate which is very close (rounding errors).
           // In some tests, errors were up to 70 nm!
@@ -539,9 +539,10 @@ bool CmdBoardSpecctraImport::performExecute() {
         }
         const Layer* startLayer = pad->getLibPad().isTht()
             ? &Layer::topCopper()
-            : &pad->getSmtLayer();
-        const Layer* endLayer = pad->getLibPad().isTht() ? &Layer::botCopper()
-                                                         : &pad->getSmtLayer();
+            : &pad->getSolderLayer();
+        const Layer* endLayer = pad->getLibPad().isTht()
+            ? &Layer::botCopper()
+            : &pad->getSolderLayer();
         anchors.append(AnchorData{
             pos, startLayer, endLayer,
             TraceAnchor::pad(pad->getDevice().getComponentInstanceUuid(),

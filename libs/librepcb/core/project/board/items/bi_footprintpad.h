@@ -94,7 +94,7 @@ public:
   const Uuid& getLibPadUuid() const noexcept;
   BI_Device& getDevice() const noexcept { return mDevice; }
   FootprintPad::ComponentSide getComponentSide() const noexcept;
-  const Layer& getSmtLayer() const noexcept;
+  const Layer& getSolderLayer() const noexcept;
   bool isOnLayer(const Layer& layer) const noexcept;
   const FootprintPad& getLibPad() const noexcept { return *mFootprintPad; }
   const PackagePad* getLibPackagePad() const noexcept { return mPackagePad; }
