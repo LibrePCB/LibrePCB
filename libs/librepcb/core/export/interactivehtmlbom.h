@@ -23,20 +23,21 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../types/length.h"
+#include "../geometry/padgeometry.h"
+#include "../geometry/padhole.h"
+#include "../geometry/path.h"
 #include "../utils/rusthandle.h"
 
 #include <QtCore>
+
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
-class Angle;
 class FilePath;
-class Path;
-class Point;
 
 namespace rs {
 struct InteractiveHtmlBom;
@@ -53,6 +54,19 @@ struct InteractiveHtmlBom;
  */
 class InteractiveHtmlBom final {
 public:
+  enum class Layer { Top, Bottom };
+  enum class Sides { Top, Bottom, Both };
+  struct Pad {
+    bool onTop;
+    bool onBottom;
+    Point position;
+    Angle rotation;
+    bool mirrorGeometry;
+    QList<PadGeometry> geometries;
+    PadHoleList holes;
+    std::optional<QString> netName;
+  };
+
   InteractiveHtmlBom() = delete;
   InteractiveHtmlBom(const InteractiveHtmlBom& other) = delete;
   InteractiveHtmlBom& operator=(const InteractiveHtmlBom& rhs) = delete;
@@ -111,9 +125,22 @@ public:
   std::size_t addFootprint(const QString& name, bool mirror, const Point& pos,
                            const Angle& rot, const Length& minX,
                            const Length& maxX, const Length& minY,
-                           const Length& maxY) noexcept;
+                           const Length& maxY, bool mount,
+                           const QList<Pad>& pads) noexcept;
 
-  void addBomRow(const QList<std::pair<QString, std::size_t>>& parts) noexcept;
+  void addBomRow(Sides sides,
+                 const QList<std::pair<QString, std::size_t>>& parts) noexcept;
+
+  void addTrack(Layer layer, const Point& start, const Point& end,
+                const PositiveLength& width,
+                const std::optional<QString>& netName) noexcept;
+
+  void addVia(Layer layer, const Point& pos, const PositiveLength& diameter,
+              const PositiveLength& drillDiameter,
+              const std::optional<QString>& netName) noexcept;
+
+  void addPlaneFragment(Layer layer, const Path& fragment,
+                        const std::optional<QString>& netName) noexcept;
 
   /**
    * @brief Generate the HTML

@@ -35,6 +35,8 @@
 #include "../fileio/fileutils.h"
 #include "../fileio/outputdirectorywriter.h"
 #include "../fileio/transactionalfilesystem.h"
+#include "../geometry/padgeometry.h"
+#include "../geometry/padhole.h"
 #include "../job/archiveoutputjob.h"
 #include "../job/board3doutputjob.h"
 #include "../job/bomoutputjob.h"
@@ -56,11 +58,18 @@
 #include "board/boardpainter.h"
 #include "board/boardpickplacegenerator.h"
 #include "board/items/bi_device.h"
+#include "board/items/bi_footprintpad.h"
+#include "board/items/bi_hole.h"
+#include "board/items/bi_netline.h"
+#include "board/items/bi_netsegment.h"
+#include "board/items/bi_plane.h"
 #include "board/items/bi_polygon.h"
+#include "board/items/bi_via.h"
 #include "board/realisticboardpainter.h"
 #include "bomgenerator.h"
 #include "circuit/circuit.h"
 #include "circuit/componentinstance.h"
+#include "circuit/netsignal.h"
 #include "project.h"
 #include "projectattributelookup.h"
 #include "projectjsonexport.h"
@@ -503,10 +512,10 @@ void OutputJobRunner::runImpl(const BomOutputJob& job) {
                     str, FilePath::ReplaceSpaces | FilePath::KeepCase);
               }));  // can throw
 
-      BomGenerator gen(mProject);
-      gen.setAdditionalAttributes(job.getCustomAttributes());
-      std::shared_ptr<Bom> bom = gen.generate(board, av->getUuid());
       if (fp.getSuffix().toLower() == "csv") {
+        BomGenerator gen(mProject);
+        gen.setAdditionalAttributes(job.getCustomAttributes());
+        std::shared_ptr<Bom> bom = gen.generate(board, av->getUuid());
         BomCsvWriter writer(*bom);
         std::shared_ptr<CsvFile> csv = writer.generateCsv();
         csv->saveToFile(fp);
@@ -519,29 +528,43 @@ void OutputJobRunner::runImpl(const BomOutputJob& job) {
           minY = bbox->first.getY();
           maxY = bbox->second.getY();
         }
+        QString name = *mProject.getName();
+        if (mProject.getCircuit().getAssemblyVariants().count() > 1) {
+          name.append(QString(" (%1)").arg(*av->getName()));
+        }
         InteractiveHtmlBom ibom(
-            *mProject.getName(), *mProject.getVersion(), mProject.getAuthor(),
+            name, *mProject.getVersion(), mProject.getAuthor(),
             QDate::currentDate().toString(), minX, maxX, minY, maxY);
+        auto addDrawing = [&](const Path& path, const Layer& layer,
+                              const UnsignedLength& width, bool filled) {
+          if ((layer == Layer::boardOutlines()) ||
+              (layer == Layer::boardCutouts())) {
+            ibom.addEdge(path.toClosedPath());
+          } else if (board->getSilkscreenLayersTop().contains(&layer)) {
+            ibom.addLegendTop(path, width, filled);
+          } else if (board->getSilkscreenLayersBot().contains(&layer)) {
+            ibom.addLegendBot(path, width, filled);
+          } else if (layer == Layer::topDocumentation()) {
+            ibom.addDocumentationTop(path, width, filled);
+          } else if (layer == Layer::botDocumentation()) {
+            ibom.addDocumentationBot(path, width, filled);
+          }
+        };
         for (const auto p : board->getPolygons()) {
-          if ((p->getData().getLayer() == Layer::boardOutlines()) ||
-              (p->getData().getLayer() == Layer::boardCutouts())) {
-            ibom.addEdge(p->getData().getPath().toClosedPath());
-          } else if (p->getData().getLayer() == Layer::topLegend()) {
-            ibom.addLegendTop(p->getData().getPath(),
-                              p->getData().getLineWidth(),
-                              p->getData().isFilled());
-          } else if (p->getData().getLayer() == Layer::botLegend()) {
-            ibom.addLegendBot(p->getData().getPath(),
-                              p->getData().getLineWidth(),
-                              p->getData().isFilled());
-          } else if (p->getData().getLayer() == Layer::topDocumentation()) {
-            ibom.addDocumentationTop(p->getData().getPath(),
-                                     p->getData().getLineWidth(),
-                                     p->getData().isFilled());
-          } else if (p->getData().getLayer() == Layer::botDocumentation()) {
-            ibom.addDocumentationBot(p->getData().getPath(),
-                                     p->getData().getLineWidth(),
-                                     p->getData().isFilled());
+          addDrawing(p->getData().getPath(), p->getData().getLayer(),
+                     p->getData().getLineWidth(), p->getData().isFilled());
+        }
+        for (const auto t : board->getStrokeTexts()) {
+          const Transform transform(t->getData());
+          for (const Path& p : t->getPaths()) {
+            addDrawing(transform.map(p), t->getData().getLayer(),
+                       t->getData().getStrokeWidth(), false);
+          }
+        }
+        for (const auto h : board->getHoles()) {
+          for (const Path& p : h->getData().getPath()->toOutlineStrokes(
+                   h->getData().getDiameter())) {
+            addDrawing(p, Layer::boardCutouts(), UnsignedLength(0), false);
           }
         }
         QHash<QString, std::size_t> idMap;
@@ -549,34 +572,116 @@ void OutputJobRunner::runImpl(const BomOutputJob& job) {
           const Transform transform(*d);
           const std::pair<Point, Point> bbox =
               d->getLibFootprint().calculateBoundingRect();
+          QList<InteractiveHtmlBom::Pad> pads;
+          for (const auto& p : d->getPads()) {
+            const NetSignal* net = p->getCompSigInstNetSignal();
+            pads.append(InteractiveHtmlBom::Pad{
+                p->isOnLayer(Layer::topCopper()),
+                p->isOnLayer(Layer::botCopper()),
+                p->getPosition(),
+                p->getRotation(),
+                p->getMirrored(),
+                p->getGeometries().value(&p->getSolderLayer()),
+                p->getLibPad().getHoles(),
+                net ? std::make_optional(*net->getName()) : std::nullopt,
+            });
+          }
+          const auto parts = d->getParts(av->getUuid());
+          const bool mount = !parts.isEmpty();
           const std::size_t id = ibom.addFootprint(
               *d->getComponentInstance().getName(), d->getMirrored(),
               d->getPosition(), d->getRotation(), bbox.first.getX(),
-              bbox.second.getX(), bbox.first.getY(), bbox.second.getY());
+              bbox.second.getX(), bbox.first.getY(), bbox.second.getY(), mount,
+              pads);
           idMap.insert(*d->getComponentInstance().getName(), id);
+
           for (const Polygon& p : d->getLibFootprint().getPolygons()) {
             const Layer& layer = transform.map(p.getLayer());
-            if (layer == Layer::topLegend()) {
-              ibom.addLegendTop(transform.map(p.getPath()), p.getLineWidth(),
-                                p.isFilled());
-            } else if (layer == Layer::botLegend()) {
-              ibom.addLegendBot(transform.map(p.getPath()), p.getLineWidth(),
-                                p.isFilled());
-            } else if (layer == Layer::topDocumentation()) {
-              ibom.addDocumentationTop(transform.map(p.getPath()),
-                                       p.getLineWidth(), p.isFilled());
-            } else if (layer == Layer::botDocumentation()) {
-              ibom.addDocumentationBot(transform.map(p.getPath()),
-                                       p.getLineWidth(), p.isFilled());
+            addDrawing(transform.map(p.getPath()), layer, p.getLineWidth(),
+                       p.isFilled());
+          }
+          for (const Circle& c : d->getLibFootprint().getCircles()) {
+            const Layer& layer = transform.map(c.getLayer());
+            addDrawing(
+                transform.map(
+                    Path::circle(c.getDiameter()).translated(c.getCenter())),
+                layer, c.getLineWidth(), c.isFilled());
+          }
+          for (const auto t : d->getStrokeTexts()) {
+            const Transform transform(t->getData());
+            for (const Path& p : t->getPaths()) {
+              addDrawing(transform.map(p), t->getData().getLayer(),
+                         t->getData().getStrokeWidth(), false);
+            }
+          }
+          for (const Hole& h : d->getLibFootprint().getHoles()) {
+            for (const Path& p :
+                 h.getPath()->toOutlineStrokes(h.getDiameter())) {
+              addDrawing(transform.map(p), Layer::boardCutouts(),
+                         UnsignedLength(0), false);
             }
           }
         }
-        for (const BomItem& item : bom->getItems()) {
-          QList<std::pair<QString, std::size_t>> parts;
-          for (const QString& name : item.getDesignators()) {
-            parts.append(std::make_pair(name, idMap[name]));
+        for (auto cfg : {std::make_pair(InteractiveHtmlBom::Sides::Top,
+                                        BomGenerator::Side::Top),
+                         std::make_pair(InteractiveHtmlBom::Sides::Bottom,
+                                        BomGenerator::Side::Bottom),
+                         std::make_pair(InteractiveHtmlBom::Sides::Both,
+                                        BomGenerator::Side::Both)}) {
+          BomGenerator gen(mProject);
+          gen.setAdditionalAttributes(job.getCustomAttributes());
+          std::shared_ptr<Bom> bom =
+              gen.generate(board, av->getUuid(), cfg.second);
+          for (const BomItem& item : bom->getItems()) {
+            QList<std::pair<QString, std::size_t>> parts;
+            for (const QString& name : item.getDesignators()) {
+              if (idMap.contains(name)) {
+                parts.append(std::make_pair(name, idMap[name]));
+              }
+            }
+            if (!parts.isEmpty()) {
+              ibom.addBomRow(cfg.first, parts);
+            }
           }
-          ibom.addBomRow(parts);
+        }
+        const QHash<const Layer*, InteractiveHtmlBom::Layer> layerMap = {
+            {&Layer::topCopper(), InteractiveHtmlBom::Layer::Top},
+            {&Layer::botCopper(), InteractiveHtmlBom::Layer::Bottom},
+        };
+        for (const auto seg : board->getNetSegments()) {
+          const NetSignal* net = seg->getNetSignal();
+          const auto netName =
+              net ? std::make_optional(*net->getName()) : std::nullopt;
+          for (const auto nl : seg->getNetLines()) {
+            if (layerMap.contains(&nl->getLayer())) {
+              ibom.addTrack(
+                  layerMap[&nl->getLayer()], nl->getStartPoint().getPosition(),
+                  nl->getEndPoint().getPosition(), nl->getWidth(), netName);
+            }
+          }
+          for (const auto via : seg->getVias()) {
+            if (via->getVia().isOnLayer(Layer::topCopper())) {
+              ibom.addVia(InteractiveHtmlBom::Layer::Top,
+                          via->getVia().getPosition(), via->getSize(),
+                          via->getDrillDiameter(), netName);
+            }
+            if (via->getVia().isOnLayer(Layer::botCopper())) {
+              ibom.addVia(InteractiveHtmlBom::Layer::Bottom,
+                          via->getVia().getPosition(), via->getSize(),
+                          via->getDrillDiameter(), netName);
+            }
+          }
+        }
+        for (const auto& plane : board->getPlanes()) {
+          const NetSignal* net = plane->getNetSignal();
+          const auto netName =
+              net ? std::make_optional(*net->getName()) : std::nullopt;
+          if (layerMap.contains(&plane->getLayer())) {
+            for (const Path& fragment : plane->getFragments()) {
+              ibom.addPlaneFragment(layerMap[&plane->getLayer()], fragment,
+                                    netName);
+            }
+          }
         }
         const QString html = ibom.generate();
         FileUtils::writeFile(fp, html.toUtf8());  // can throw

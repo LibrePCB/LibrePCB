@@ -20,6 +20,12 @@ enum class InteractiveHtmlBomLayer {
   Back,
 };
 
+enum class InteractiveHtmlBomSides {
+  Front,
+  Back,
+  Both,
+};
+
 struct InteractiveHtmlBom;
 
 /**
@@ -31,6 +37,19 @@ struct ZipArchive;
  * Wrapper type for [Writer]
  */
 struct ZipWriter;
+
+struct InteractiveHtmlBomPad {
+  bool front;
+  bool back;
+  float pos_x;
+  float pos_y;
+  float angle;
+  const QString *svgpath;
+  bool has_drill;
+  float drillsize_x;
+  float drillsize_y;
+  const QString *netname;
+};
 
 struct InteractiveHtmlBomRefMap {
   const QString *reference;
@@ -124,15 +143,39 @@ size_t ffi_ibom_add_footprint(InteractiveHtmlBom * NONNULL obj,
                               float relpos_x,
                               float relpos_y,
                               float size_x,
-                              float size_y);
+                              float size_y,
+                              bool mount,
+                              const InteractiveHtmlBomPad *pads_array,
+                              size_t pads_size);
 
 /**
- * Wrapper for [add_bom_both]
+ * Wrapper for [add_bom_line]
  */
 void ffi_ibom_add_bom_line(InteractiveHtmlBom * NONNULL obj,
-                           InteractiveHtmlBomLayer layer,
-                           const InteractiveHtmlBomRefMap *parts,
-                           size_t size);
+                           InteractiveHtmlBomSides sides,
+                           const InteractiveHtmlBomRefMap *parts_array,
+                           size_t parts_size);
+
+/**
+ * Wrapper for [add_track]
+ */
+void ffi_ibom_add_track(InteractiveHtmlBom * NONNULL obj,
+                        InteractiveHtmlBomLayer layer,
+                        float start_x,
+                        float start_y,
+                        float end_x,
+                        float end_y,
+                        float width,
+                        const float *drillsize,
+                        const QString *net_name);
+
+/**
+ * Wrapper for [add_zone]
+ */
+void ffi_ibom_add_zone(InteractiveHtmlBom * NONNULL obj,
+                       InteractiveHtmlBomLayer layer,
+                       const QString * NONNULL svgpath,
+                       const QString *net_name);
 
 /**
  * Wrapper for [generate]

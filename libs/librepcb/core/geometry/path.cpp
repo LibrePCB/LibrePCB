@@ -199,9 +199,9 @@ const QPainterPath& Path::toQPainterPathPx() const noexcept {
 QString Path::toSvgPathMm() const noexcept {
   QString s;
   if (!mVertices.isEmpty()) {
-    s.append(
-        QString("M %1 %2").arg(mVertices.first().getPos().getX().toMmString(),
-                               (-mVertices.first().getPos().getY()).toMmString()));
+    s.append(QString("M %1 %2").arg(
+        mVertices.first().getPos().getX().toMmString(),
+        (-mVertices.first().getPos().getY()).toMmString()));
   }
   for (int i = 1; i < mVertices.count(); ++i) {
     const Vertex& v0 = mVertices.at(i - 1);
@@ -212,7 +212,7 @@ QString Path::toSvgPathMm() const noexcept {
                    .arg(radius->abs().toMmString())
                    .arg(0)
                    .arg(v0.getAngle().abs() >= Angle::deg180() ? 1 : 0)
-                   .arg(v0.getAngle() <0 ? 1 : 0)
+                   .arg(v0.getAngle() < 0 ? 1 : 0)
                    .arg(v1.getPos().getX().toMmString())
                    .arg((-v1.getPos().getY()).toMmString()));
     } else {
