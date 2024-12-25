@@ -20,6 +20,11 @@ namespace rs {
  */
 struct ZipArchive;
 
+/**
+ * Wrapper type for [Writer]
+ */
+struct ZipWriter;
+
 extern "C" {
 
 extern size_t ffi_qbytearray_len(const QByteArray * NONNULL obj);
@@ -86,6 +91,36 @@ bool ffi_ziparchive_read_by_index(ZipArchive * NONNULL obj,
  */
 bool ffi_ziparchive_extract(ZipArchive * NONNULL obj,
                             const QString * NONNULL dir);
+
+/**
+ * Create a new [ZipWriter] object writing to a file
+ */
+ZipWriter *ffi_zipwriter_new_to_file(const QString * NONNULL path,
+                                     QString * NONNULL err);
+
+/**
+ * Create a new [ZipWriter] object writing to memory
+ */
+ZipWriter *ffi_zipwriter_new_to_mem(QByteArray * NONNULL data);
+
+/**
+ * Delete [ZipWriter] object
+ */
+void ffi_zipwriter_delete(ZipWriter *obj);
+
+/**
+ * Write a file to [ZipWriter]
+ */
+bool ffi_zipwriter_write_file(ZipWriter * NONNULL obj,
+                              const QString * NONNULL name,
+                              const QByteArray * NONNULL data,
+                              uint32_t mode,
+                              QString * NONNULL err);
+
+/**
+ * Finish writing to [ZipWriter]
+ */
+bool ffi_zipwriter_finish(ZipWriter * NONNULL obj, QString * NONNULL err);
 
 }  // extern "C"
 

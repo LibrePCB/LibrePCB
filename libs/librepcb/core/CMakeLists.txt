@@ -146,6 +146,8 @@ add_library(
   fileio/versionfile.h
   fileio/ziparchive.cpp
   fileio/ziparchive.h
+  fileio/zipwriter.cpp
+  fileio/zipwriter.h
   font/strokefont.cpp
   font/strokefont.h
   font/strokefontpool.cpp
