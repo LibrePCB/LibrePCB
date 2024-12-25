@@ -74,6 +74,11 @@ extern const uint16_t *ffi_qstring_utf16(const QString * NONNULL obj);
 
 extern void ffi_qstring_set(QString * NONNULL obj, const char *s, size_t len);
 
+extern size_t ffi_qstringlist_len(const QStringList * NONNULL obj);
+
+extern const QString *ffi_qstringlist_at(const QStringList * NONNULL obj,
+                                         size_t index);
+
 /**
  * Create a new [InteractiveHtmlBom] object
  */
@@ -90,6 +95,12 @@ InteractiveHtmlBom *ffi_ibom_new(const QString * NONNULL title,
  * Delete [InteractiveHtmlBom] object
  */
 void ffi_ibom_delete(InteractiveHtmlBom *obj);
+
+/**
+ * Wrapper for [set_fields]
+ */
+void ffi_ibom_set_fields(InteractiveHtmlBom * NONNULL obj,
+                         const QStringList * NONNULL fields);
 
 /**
  * Wrapper for [add_edge]
@@ -145,6 +156,7 @@ size_t ffi_ibom_add_footprint(InteractiveHtmlBom * NONNULL obj,
                               float size_x,
                               float size_y,
                               bool mount,
+                              const QStringList * NONNULL fields,
                               const InteractiveHtmlBomPad *pads_array,
                               size_t pads_size);
 
@@ -180,8 +192,9 @@ void ffi_ibom_add_zone(InteractiveHtmlBom * NONNULL obj,
 /**
  * Wrapper for [generate]
  */
-void ffi_ibom_generate(const InteractiveHtmlBom * NONNULL obj,
-                       QString * NONNULL out);
+bool ffi_ibom_generate(const InteractiveHtmlBom * NONNULL obj,
+                       QString * NONNULL out,
+                       QString * NONNULL err);
 
 /**
  * Wrapper for [increment_number_in_string]

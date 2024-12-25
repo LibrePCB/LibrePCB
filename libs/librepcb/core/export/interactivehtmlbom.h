@@ -80,6 +80,13 @@ public:
                      const Length& maxY);
 
   /**
+   * @brief Set the extra fields of BOM lines
+   *
+   * @param fields  Extra fields
+   */
+  void setExtraFields(const QStringList& fields) noexcept;
+
+  /**
    * @brief Add PCB edge path
    *
    * @param path  Drawing path
@@ -126,6 +133,7 @@ public:
                            const Angle& rot, const Length& minX,
                            const Length& maxX, const Length& minY,
                            const Length& maxY, bool mount,
+                           const QStringList& fields,
                            const QList<Pad>& pads) noexcept;
 
   void addBomRow(Sides sides,
@@ -146,8 +154,10 @@ public:
    * @brief Generate the HTML
    *
    * @return HTML file content
+   *
+   * @throws If some of the data is invalid
    */
-  QString generate() const noexcept;
+  QString generate() const;
 
 private:
   RustHandle<rs::InteractiveHtmlBom> mHandle;

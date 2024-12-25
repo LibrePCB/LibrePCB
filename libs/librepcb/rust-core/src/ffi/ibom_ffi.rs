@@ -5,7 +5,7 @@ use crate::ibom::*;
 
 #[repr(C)]
 #[allow(dead_code)]
-pub enum InteractiveHtmlBomLayer {
+enum InteractiveHtmlBomLayer {
   Front,
   Back,
 }
@@ -21,7 +21,7 @@ impl InteractiveHtmlBomLayer {
 
 #[repr(C)]
 #[allow(dead_code)]
-pub enum InteractiveHtmlBomSides {
+enum InteractiveHtmlBomSides {
   Front,
   Back,
   Both,
@@ -59,7 +59,7 @@ struct InteractiveHtmlBomPad {
 
 /// Create a new [InteractiveHtmlBom] object
 #[no_mangle]
-pub extern "C" fn ffi_ibom_new(
+extern "C" fn ffi_ibom_new(
   title: &QString,
   revision: &QString,
   company: &QString,
@@ -81,9 +81,18 @@ pub extern "C" fn ffi_ibom_new(
 
 /// Delete [InteractiveHtmlBom] object
 #[no_mangle]
-pub extern "C" fn ffi_ibom_delete(obj: *mut InteractiveHtmlBom) {
+extern "C" fn ffi_ibom_delete(obj: *mut InteractiveHtmlBom) {
   assert!(!obj.is_null());
   unsafe { drop(Box::from_raw(obj)) };
+}
+
+/// Wrapper for [set_fields]
+#[no_mangle]
+extern "C" fn ffi_ibom_set_fields(
+  obj: &mut InteractiveHtmlBom,
+  fields: &QStringList,
+) {
+  obj.set_fields(from_qstringlist(fields));
 }
 
 /// Wrapper for [add_edge]
@@ -155,6 +164,7 @@ extern "C" fn ffi_ibom_add_footprint(
   size_x: f32,
   size_y: f32,
   mount: bool,
+  fields: &QStringList,
   pads_array: *const InteractiveHtmlBomPad,
   pads_size: usize,
 ) -> usize {
@@ -196,6 +206,7 @@ extern "C" fn ffi_ibom_add_footprint(
       angle,
       Coordinate::new(relpos_x, relpos_y),
       Coordinate::new(size_x, size_y),
+      from_qstringlist(fields),
       pads,
     ),
     mount,
@@ -267,7 +278,19 @@ extern "C" fn ffi_ibom_add_zone(
 
 /// Wrapper for [generate]
 #[no_mangle]
-extern "C" fn ffi_ibom_generate(obj: &InteractiveHtmlBom, out: &mut QString) {
-  let r_str = obj.generate();
-  qstring_set(out, &r_str);
+extern "C" fn ffi_ibom_generate(
+  obj: &InteractiveHtmlBom,
+  out: &mut QString,
+  err: &mut QString,
+) -> bool {
+  match obj.generate() {
+    Ok(html) => {
+      qstring_set(out, &html);
+      true
+    }
+    Err(msg) => {
+      qstring_set(err, &msg);
+      false
+    }
+  }
 }

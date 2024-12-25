@@ -62,6 +62,10 @@ InteractiveHtmlBom::InteractiveHtmlBom(const QString& title,
   : mHandle(construct(title, revision, company, date, minX, maxX, minY, maxY)) {
 }
 
+void InteractiveHtmlBom::setExtraFields(const QStringList& fields) noexcept {
+  rs::ffi_ibom_set_fields(*mHandle, &fields);
+}
+
 void InteractiveHtmlBom::addEdge(const Path& path) noexcept {
   const QString svg = path.toSvgPathMm();
   rs::ffi_ibom_add_edge(*mHandle, &svg, 0.0f, false);
@@ -98,7 +102,8 @@ void InteractiveHtmlBom::addDocumentationBot(const Path& path,
 std::size_t InteractiveHtmlBom::addFootprint(
     const QString& name, bool mirror, const Point& pos, const Angle& rot,
     const Length& minX, const Length& maxX, const Length& minY,
-    const Length& maxY, bool mount, const QList<Pad>& pads) noexcept {
+    const Length& maxY, bool mount, const QStringList& fields,
+    const QList<Pad>& pads) noexcept {
   std::vector<QString> svgs;
   svgs.reserve(pads.size());
   std::vector<rs::InteractiveHtmlBomPad> padsVec;
@@ -159,13 +164,13 @@ std::size_t InteractiveHtmlBom::addFootprint(
         pad.netName ? &(*pad.netName) : nullptr,
     });
   }
-  return rs::ffi_ibom_add_footprint(*mHandle, &name,
-                                    mirror ? rs::InteractiveHtmlBomLayer::Back
-                                           : rs::InteractiveHtmlBomLayer::Front,
-                                    pos.getX().toMm(), -pos.getY().toMm(),
-                                    rot.toDeg(), minX.toMm(), -maxY.toMm(),
-                                    (maxX - minX).toMm(), (maxY - minY).toMm(),
-                                    mount, padsVec.data(), padsVec.size());
+  return rs::ffi_ibom_add_footprint(
+      *mHandle, &name,
+      mirror ? rs::InteractiveHtmlBomLayer::Back
+             : rs::InteractiveHtmlBomLayer::Front,
+      pos.getX().toMm(), -pos.getY().toMm(), rot.toDeg(), minX.toMm(),
+      -maxY.toMm(), (maxX - minX).toMm(), (maxY - minY).toMm(), mount, &fields,
+      padsVec.data(), padsVec.size());
 }
 
 void InteractiveHtmlBom::addBomRow(
@@ -225,9 +230,11 @@ void InteractiveHtmlBom::addPlaneFragment(
                         netName ? &(*netName) : nullptr);
 }
 
-QString InteractiveHtmlBom::generate() const noexcept {
-  QString out;
-  rs::ffi_ibom_generate(*mHandle, &out);
+QString InteractiveHtmlBom::generate() const {
+  QString out, err;
+  if (!rs::ffi_ibom_generate(*mHandle, &out, &err)) {
+    throw RuntimeError(__FILE__, __LINE__, "Failed to generate IBOM: " % err);
+  }
   return out;
 }
 

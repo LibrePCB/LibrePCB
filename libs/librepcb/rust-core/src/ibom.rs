@@ -289,6 +289,7 @@ pub struct Footprint {
   angle: f32,
   relpos: Coordinate,
   size: Coordinate,
+  fields: Vec<String>,
   pads: Vec<Pad>,
 }
 
@@ -300,6 +301,7 @@ impl Footprint {
     angle: f32,
     relpos: Coordinate,
     size: Coordinate,
+    fields: Vec<String>,
     pads: Vec<Pad>,
   ) -> Footprint {
     Footprint {
@@ -309,6 +311,7 @@ impl Footprint {
       angle,
       relpos,
       size,
+      fields,
       pads,
     }
   }
@@ -366,6 +369,7 @@ pub struct InteractiveHtmlBom {
   // Config
   show_fabrication: bool,
   show_silkscreen: bool,
+  fields: Vec<String>,
 
   // Content
   edges: Vec<Drawing>,
@@ -401,6 +405,7 @@ impl InteractiveHtmlBom {
       bbox,
       show_fabrication: true,
       show_silkscreen: true,
+      fields: Vec::new(),
       edges: Vec::new(),
       silkscreen_front: Vec::new(),
       silkscreen_back: Vec::new(),
@@ -417,6 +422,10 @@ impl InteractiveHtmlBom {
       zones_back: Vec::new(),
       nets: Vec::new(),
     }
+  }
+
+  pub fn set_fields(&mut self, f: Vec<String>) {
+    self.fields = f;
   }
 
   pub fn add_edge(&mut self, d: Drawing) {
@@ -477,13 +486,13 @@ impl InteractiveHtmlBom {
     }
   }
 
-  pub fn generate(&self) -> String {
+  pub fn generate(&self) -> Result<String, String> {
     let config = object! {
         board_rotation: 0.0,
         bom_view: "left-right",
         checkboxes: "Sourced,Placed",
         dark_mode: false,
-        fields: [],
+        fields: self.fields.to_json(),
         highlight_pin1: "none",
         kicad_text_formatting: true,
         layer_view: "FB",
@@ -506,10 +515,11 @@ impl InteractiveHtmlBom {
     data["bom"]["both"] = self.bom_both.to_json();
     data["bom"]["skipped"] = self.bom_skipped.to_json();
     data["bom"]["fields"] = object! {};
-    for row in &self.bom_both {
-      for map in row {
-        data["bom"]["fields"][map.footprint_id.to_string()] = object! {};
+    for (id, fpt) in self.footprints.iter().enumerate() {
+      if fpt.fields.len() != self.fields.len() {
+        return Err("Inconsistent number of fields.".into());
       }
+      data["bom"]["fields"][id.to_string()] = fpt.fields.to_json();
     }
     data["edges_bbox"] = self.bbox.to_json();
     data["footprints"] = self.footprints.to_json();
@@ -568,6 +578,6 @@ impl InteractiveHtmlBom {
     html = html.replace("///USERJS///", "");
     html = html.replace("///USERHEADER///", "");
     html = html.replace("///USERFOOTER///", "");
-    html
+    Ok(html)
   }
 }

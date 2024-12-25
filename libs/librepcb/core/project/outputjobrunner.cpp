@@ -49,6 +49,7 @@
 #include "../job/pickplaceoutputjob.h"
 #include "../job/projectjsonoutputjob.h"
 #include "../library/pkg/footprint.h"
+#include "../library/pkg/package.h"
 #include "../types/layer.h"
 #include "../utils/toolbox.h"
 #include "board/board.h"
@@ -535,6 +536,7 @@ void OutputJobRunner::runImpl(const BomOutputJob& job) {
         InteractiveHtmlBom ibom(
             name, *mProject.getVersion(), mProject.getAuthor(),
             QDate::currentDate().toString(), minX, maxX, minY, maxY);
+        ibom.setExtraFields({"Value / MPN", "Package"});
         auto addDrawing = [&](const Path& path, const Layer& layer,
                               const UnsignedLength& width, bool filled) {
           if ((layer == Layer::boardOutlines()) ||
@@ -588,11 +590,26 @@ void OutputJobRunner::runImpl(const BomOutputJob& job) {
           }
           const auto parts = d->getParts(av->getUuid());
           const bool mount = !parts.isEmpty();
+          auto lookup = ProjectAttributeLookup(*d, parts.value(0));
+          const QString mpn = lookup("MPN");
+          QString valueMpn =
+              AttributeSubstitutor::substitute(lookup("VALUE"), lookup);
+          if (!valueMpn.contains(mpn)) {
+            if (valueMpn.trimmed().isEmpty()) {
+              valueMpn = mpn;
+            } else {
+              valueMpn.append(QString(" (%1)").arg(mpn));
+            }
+          }
+          const QStringList fields = {
+              valueMpn,
+              lookup("PACKAGE"),
+          };
           const std::size_t id = ibom.addFootprint(
               *d->getComponentInstance().getName(), d->getMirrored(),
               d->getPosition(), d->getRotation(), bbox.first.getX(),
               bbox.second.getX(), bbox.first.getY(), bbox.second.getY(), mount,
-              pads);
+              fields, pads);
           idMap.insert(*d->getComponentInstance().getName(), id);
 
           for (const Polygon& p : d->getLibFootprint().getPolygons()) {

@@ -57,12 +57,8 @@ extern "C" void ffi_qbytearray_resize(QByteArray* obj, std::size_t len,
 #endif
 }
 
-extern "C" QString* ffi_qstring_new(const char* s) {
-  return new QString(s);
-}
-
-extern "C" uintptr_t ffi_qstring_len(const QString* obj) {
-  return obj->size();
+extern "C" std::size_t ffi_qstring_len(const QString* obj) {
+  return static_cast<std::size_t>(obj->size());
 }
 
 extern "C" const uint16_t* ffi_qstring_utf16(const QString* obj) {
@@ -71,6 +67,16 @@ extern "C" const uint16_t* ffi_qstring_utf16(const QString* obj) {
 
 extern "C" void ffi_qstring_set(QString* obj, const char* s, std::size_t len) {
   *obj = QString::fromUtf8(s, len);
+}
+
+extern "C" std::size_t ffi_qstringlist_len(const QStringList* obj) {
+  return static_cast<std::size_t>(obj->size());
+}
+
+extern "C" const QString* ffi_qstringlist_at(const QStringList* obj,
+                                             std::size_t index) {
+  Q_ASSERT(index < static_cast<std::size_t>(obj->size()));
+  return &obj->at(index);
 }
 
 /*******************************************************************************
