@@ -21,7 +21,6 @@ jobs:
         UNBUNDLE_DXFLIB: true
         UNBUNDLE_GTEST: true
         UNBUNDLE_MUPARSER: true
-        UNBUNDLE_QUAZIP: true
         UNBUNDLE_POLYCLIPPING: true
         LD_LIBRARY_PATH: $(Build.Repository.LocalPath)/build/install/opt/lib
   container:
@@ -49,9 +48,6 @@ jobs:
   - bash: rm -rf libs/muparser
     displayName: Remove bundled muparser lib
     condition: and(succeeded(), eq(variables['UNBUNDLE_MUPARSER'], 'true'))
-  - bash: rm -rf libs/quazip
-    displayName: Remove bundled quazip lib
-    condition: and(succeeded(), eq(variables['UNBUNDLE_QUAZIP'], 'true'))
   - bash: rm -rf libs/polyclipping
     displayName: Remove bundled polyclipping lib
     condition: and(succeeded(), eq(variables['UNBUNDLE_POLYCLIPPING'], 'true'))

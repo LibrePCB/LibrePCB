@@ -17,5 +17,15 @@ version = "1.11"
 default-features = false
 features = ["std", "unicode"]
 
+# ATTENTION: Do *not* update to a newer version as long as there are concerns
+# regarding library maintenance, performance and security!
+# -> https://github.com/PyO3/python-pkginfo-rs/issues/13
+# -> https://github.com/zip-rs/zip2/issues/250
+# Maybe https://crates.io/crates/rc-zip-sync/ would be a better option?
+[dependencies.zip]
+version = "=0.6.6"
+default-features = false
+features = ["deflate", "time"]
+
 [dev-dependencies]
 parameterized_test = "0.2.1"

@@ -34,10 +34,9 @@
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
-
-class QuaZipFile;
-
 namespace librepcb {
+
+class ZipWriter;
 
 /*******************************************************************************
  *  Class TransactionalFileSystem
@@ -208,8 +207,8 @@ public:
 
 private:  // Methods
   bool isRemoved(const QString& path) const noexcept;
-  void exportDirToZip(QuaZipFile& file, const FilePath& zipFp,
-                      const QString& dir, FilterFunction filter) const;
+  void exportDirToZip(ZipWriter& zip, const FilePath& zipFp, const QString& dir,
+                      FilterFunction filter) const;
   void saveDiff(const QString& type) const;
   void loadDiff(const FilePath& fp);
   void removeDiff(const QString& type);

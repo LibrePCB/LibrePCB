@@ -25,10 +25,8 @@
 #include "../serialization/sexpression.h"
 #include "../utils/toolbox.h"
 #include "fileutils.h"
-
-#include <quazip/quazip.h>
-#include <quazip/quazipdir.h>
-#include <quazip/quazipfile.h>
+#include "ziparchive.h"
+#include "zipwriter.h"
 
 /*******************************************************************************
  *  Namespace
@@ -234,82 +232,47 @@ void TransactionalFileSystem::removeDirRecursively(const QString& path) {
  ******************************************************************************/
 
 void TransactionalFileSystem::loadFromZip(QByteArray content) {
-  QBuffer buffer(&content);
-  QuaZip zip(&buffer);
-  if (!zip.open(QuaZip::mdUnzip)) {
-    throw RuntimeError(__FILE__, __LINE__, tr("Failed to open ZIP file '%1'."));
-  }
-  QuaZipFile file(&zip);
+  ZipArchive zip(content);  // can throw
+
   QMutexLocker lock(&mMutex);
-  for (bool f = zip.goToFirstFile(); f; f = zip.goToNextFile()) {
-    const QString fileName = file.getActualFileName();
+  for (std::size_t i = 0; i < zip.getEntriesCount(); ++i) {
+    const QString fileName = zip.getFileName(i);  // can throw
     if ((!fileName.endsWith("/")) && (!fileName.endsWith("\\"))) {
-      file.open(QIODevice::ReadOnly);
-      write(fileName, file.readAll());
-      file.close();
+      write(fileName, zip.readFile(i));  // can throw
     }
   }
-  zip.close();
 }
 
 void TransactionalFileSystem::loadFromZip(const FilePath& fp) {
-  QuaZip zip(fp.toStr());
-  if (!zip.open(QuaZip::mdUnzip)) {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        tr("Failed to open the ZIP file '%1'.").arg(fp.toNative()));
-  }
-  QuaZipFile file(&zip);
+  ZipArchive zip(fp);  // can throw
+
   QMutexLocker lock(&mMutex);
-  for (bool f = zip.goToFirstFile(); f; f = zip.goToNextFile()) {
-    const QString fileName = file.getActualFileName();
+  for (std::size_t i = 0; i < zip.getEntriesCount(); ++i) {
+    const QString fileName = zip.getFileName(i);  // can throw
     if ((!fileName.endsWith("/")) && (!fileName.endsWith("\\"))) {
-      file.open(QIODevice::ReadOnly);
-      write(fileName, file.readAll());
-      file.close();
+      write(fileName, zip.readFile(i));  // can throw
     }
   }
-  zip.close();
 }
 
 QByteArray TransactionalFileSystem::exportToZip(FilterFunction filter) const {
-  FilePath fp = FilePath::getRandomTempPath();
-  QBuffer buffer;
-  QuaZip zip(&buffer);
-  if (!zip.open(QuaZip::mdCreate)) {
-    throw RuntimeError(__FILE__, __LINE__, tr("Failed to create ZIP file."));
-  }
-  try {
-    QuaZipFile file(&zip);
-    QMutexLocker lock(&mMutex);
-    exportDirToZip(file, fp, "", filter);
-    zip.close();
-  } catch (const Exception& e) {
-    // Remove ZIP file because it is not complete
-    QFile(fp.toStr()).remove();
-    zip.close();
-    throw;
-  }
-  return buffer.buffer();
+  ZipWriter zip;  // can throw
+  QMutexLocker lock(&mMutex);
+  exportDirToZip(zip, FilePath(), "", filter);  // can throw
+  zip.finish();  // can throw
+  return zip.getData();  // can throw
 }
 
 void TransactionalFileSystem::exportToZip(const FilePath& fp,
                                           FilterFunction filter) const {
-  QuaZip zip(fp.toStr());
-  if (!zip.open(QuaZip::mdCreate)) {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        tr("Failed to create the ZIP file '%1'.").arg(fp.toNative()));
-  }
   try {
-    QuaZipFile file(&zip);
+    ZipWriter zip(fp);  // can throw
     QMutexLocker lock(&mMutex);
-    exportDirToZip(file, fp, "", filter);
-    zip.close();
+    exportDirToZip(zip, fp, "", filter);  // can throw
+    zip.finish();  // can throw
   } catch (const Exception& e) {
     // Remove ZIP file because it is not complete
     QFile(fp.toStr()).remove();
-    zip.close();
     throw;
   }
 }
@@ -437,7 +400,7 @@ bool TransactionalFileSystem::isRemoved(const QString& path) const noexcept {
   return false;
 }
 
-void TransactionalFileSystem::exportDirToZip(QuaZipFile& file,
+void TransactionalFileSystem::exportDirToZip(ZipWriter& zip,
                                              const FilePath& zipFp,
                                              const QString& dir,
                                              FilterFunction filter) const {
@@ -447,13 +410,13 @@ void TransactionalFileSystem::exportDirToZip(QuaZipFile& file,
   foreach (const QString& dirname, getDirs(dir)) {
     // skip dotdirs, e.g. ".git", ".svn", ".autosave", ".backup"
     if (dirname.startsWith('.')) continue;
-    exportDirToZip(file, zipFp, path % dirname, filter);
+    exportDirToZip(zip, zipFp, path % dirname, filter);
   }
 
   // export files
   foreach (const QString& filename, getFiles(dir)) {
     QString filepath = path % filename;
-    if (filepath == zipFp.toRelative(mFilePath)) {
+    if (zipFp.isValid() && (filepath == zipFp.toRelative(mFilePath))) {
       // In case the exported ZIP file is located inside this file system,
       // we have to skip it. Otherwise we would get a ZIP inside the ZIP file.
       continue;
@@ -464,20 +427,8 @@ void TransactionalFileSystem::exportDirToZip(QuaZipFile& file,
     if (filter && (!filter(filepath))) continue;
     // read file content and add it to the ZIP archive
     const QByteArray& content = read(filepath);  // can throw
-    QuaZipNewInfo newFileInfo(filepath);
-    newFileInfo.setPermissions(QFileDevice::ReadOwner | QFileDevice::ReadGroup |
-                               QFileDevice::ReadOther |
-                               QFileDevice::WriteOwner);
-    if (!file.open(QIODevice::WriteOnly, newFileInfo)) {
-      throw RuntimeError(__FILE__, __LINE__);
-    }
-    qint64 bytesWritten = file.write(content);
-    file.close();
-    if (bytesWritten != content.length()) {
-      throw RuntimeError(__FILE__, __LINE__,
-                         tr("Failed to write file '%1' to '%2'.")
-                             .arg(filepath, zipFp.toNative()));
-    }
+    // write to zip
+    zip.writeFile(filepath, content, 0644);  // can throw
   }
 }
 

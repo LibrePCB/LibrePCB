@@ -23,9 +23,8 @@
 #include "filedownload.h"
 
 #include "../exceptions.h"
+#include "../fileio/ziparchive.h"
 #include "../utils/scopeguard.h"
-
-#include <quazip/JlCompress.h>
 
 #include <QtCore>
 
@@ -140,13 +139,8 @@ void FileDownload::finalizeRequest() {
   // extract zip file if necessary
   if (mExtractZipToDir.isValid()) {
     emit progressState(tr("Extract files..."));
-    QStringList files =
-        JlCompress::extractDir(mDestination.toStr(), mExtractZipToDir.toStr());
-    if (files.isEmpty()) {
-      throw RuntimeError(__FILE__, __LINE__,
-                         tr("Error while extracting the ZIP file \"%1\".")
-                             .arg(mDestination.toNative()));
-    }
+    ZipArchive zip(mDestination);  // can throw
+    zip.extractTo(mExtractZipToDir);  // can throw
   } else {
     // do NOT remove the downloaded file
     sg.dismiss();

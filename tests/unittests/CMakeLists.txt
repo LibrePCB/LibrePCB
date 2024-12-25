@@ -142,7 +142,6 @@ target_link_libraries(
           GTest::GTest
           GTest::GMock
           ParsEagle::ParsEagle
-          QuaZip::QuaZip
           # Qt
           ${QT}::Concurrent
           ${QT}::Core
