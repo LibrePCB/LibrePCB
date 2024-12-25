@@ -2,3 +2,4 @@
 
 mod cpp_ffi;
 mod toolbox_ffi;
+mod zip_archive_ffi;
