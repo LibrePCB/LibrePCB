@@ -92,8 +92,7 @@ UnplacedComponentsDock::UnplacedComponentsDock(ProjectEditor& editor,
   mUi->lblNoDeviceFound->setText(
       mUi->lblNoDeviceFound->text() % " " %
       tr("See details <a href=\"%1\">here</a>.")
-          .arg("https://librepcb.org/_branches/develop/faq/"
-               "#error-no-dev-or-pkg-found"));
+          .arg("https://librepcb.org/faq/#error-no-dev-or-pkg-found"));
   connect(mUi->lblNoDeviceFound, &QLabel::linkActivated, this,
           [this](const QString& url) {
             DesktopServices ds(mProjectEditor.getWorkspace().getSettings(),
