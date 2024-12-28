@@ -146,7 +146,6 @@ void ffi_ibom_add_fabrication_back(InteractiveHtmlBom * NONNULL obj,
  * Wrapper for [add_footprint]
  */
 size_t ffi_ibom_add_footprint(InteractiveHtmlBom * NONNULL obj,
-                              const QString * NONNULL reference,
                               InteractiveHtmlBomLayer layer,
                               float pos_x,
                               float pos_y,

@@ -154,7 +154,6 @@ extern "C" fn ffi_ibom_add_fabrication_back(
 #[no_mangle]
 extern "C" fn ffi_ibom_add_footprint(
   obj: &mut InteractiveHtmlBom,
-  reference: &QString,
   layer: InteractiveHtmlBomLayer,
   pos_x: f32,
   pos_y: f32,
@@ -200,7 +199,6 @@ extern "C" fn ffi_ibom_add_footprint(
 
   obj.add_footprint(
     Footprint::new(
-      from_qstring(reference),
       layer.convert(),
       Coordinate::new(pos_x, pos_y),
       angle,

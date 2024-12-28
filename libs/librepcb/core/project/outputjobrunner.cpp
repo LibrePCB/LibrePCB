@@ -602,14 +602,13 @@ void OutputJobRunner::runImpl(const BomOutputJob& job) {
             }
           }
           const QStringList fields = {
-              valueMpn,
+              valueMpn.split("\n", Qt::SkipEmptyParts).join(" "),
               lookup("PACKAGE"),
           };
           const std::size_t id = ibom.addFootprint(
-              *d->getComponentInstance().getName(), d->getMirrored(),
-              d->getPosition(), d->getRotation(), bbox.first.getX(),
-              bbox.second.getX(), bbox.first.getY(), bbox.second.getY(), mount,
-              fields, pads);
+              d->getMirrored(), d->getPosition(), d->getRotation(),
+              bbox.first.getX(), bbox.second.getX(), bbox.first.getY(),
+              bbox.second.getY(), mount, fields, pads);
           idMap.insert(*d->getComponentInstance().getName(), id);
 
           for (const Polygon& p : d->getLibFootprint().getPolygons()) {
@@ -650,6 +649,7 @@ void OutputJobRunner::runImpl(const BomOutputJob& job) {
           std::shared_ptr<Bom> bom =
               gen.generate(board, av->getUuid(), cfg.second);
           for (const BomItem& item : bom->getItems()) {
+            if (!item.isMount()) continue;
             QList<std::pair<QString, std::size_t>> parts;
             for (const QString& name : item.getDesignators()) {
               if (idMap.contains(name)) {

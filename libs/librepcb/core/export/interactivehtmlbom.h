@@ -129,10 +129,9 @@ public:
   void addDocumentationBot(const Path& path, const UnsignedLength& width,
                            bool fill) noexcept;
 
-  std::size_t addFootprint(const QString& name, bool mirror, const Point& pos,
-                           const Angle& rot, const Length& minX,
-                           const Length& maxX, const Length& minY,
-                           const Length& maxY, bool mount,
+  std::size_t addFootprint(bool mirror, const Point& pos, const Angle& rot,
+                           const Length& minX, const Length& maxX,
+                           const Length& minY, const Length& maxY, bool mount,
                            const QStringList& fields,
                            const QList<Pad>& pads) noexcept;
 

@@ -100,10 +100,9 @@ void InteractiveHtmlBom::addDocumentationBot(const Path& path,
 }
 
 std::size_t InteractiveHtmlBom::addFootprint(
-    const QString& name, bool mirror, const Point& pos, const Angle& rot,
-    const Length& minX, const Length& maxX, const Length& minY,
-    const Length& maxY, bool mount, const QStringList& fields,
-    const QList<Pad>& pads) noexcept {
+    bool mirror, const Point& pos, const Angle& rot, const Length& minX,
+    const Length& maxX, const Length& minY, const Length& maxY, bool mount,
+    const QStringList& fields, const QList<Pad>& pads) noexcept {
   std::vector<QString> svgs;
   svgs.reserve(pads.size());
   std::vector<rs::InteractiveHtmlBomPad> padsVec;
@@ -165,7 +164,7 @@ std::size_t InteractiveHtmlBom::addFootprint(
     });
   }
   return rs::ffi_ibom_add_footprint(
-      *mHandle, &name,
+      *mHandle,
       mirror ? rs::InteractiveHtmlBomLayer::Back
              : rs::InteractiveHtmlBomLayer::Front,
       pos.getX().toMm(), -pos.getY().toMm(), rot.toDeg(), minX.toMm(),

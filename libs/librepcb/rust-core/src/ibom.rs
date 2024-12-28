@@ -283,7 +283,6 @@ impl Serializable for Pad {
 }
 
 pub struct Footprint {
-  reference: String,
   layer: Layer,
   pos: Coordinate,
   angle: f32,
@@ -295,7 +294,6 @@ pub struct Footprint {
 
 impl Footprint {
   pub fn new(
-    reference: String,
     layer: Layer,
     pos: Coordinate,
     angle: f32,
@@ -305,7 +303,6 @@ impl Footprint {
     pads: Vec<Pad>,
   ) -> Footprint {
     Footprint {
-      reference,
       layer,
       pos,
       angle,
@@ -320,7 +317,6 @@ impl Footprint {
 impl Serializable for Footprint {
   fn to_json(&self) -> JsonValue {
     object! {
-      ref: self.reference.clone(),
       bbox: object!{
         pos: self.pos.to_json(),
         angle: self.angle,
