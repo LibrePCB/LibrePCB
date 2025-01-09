@@ -806,7 +806,11 @@ void OccModel::initOpenCascade() {
 
     // Apply global settings.
     XCAFDoc_ShapeTool::SetAutoNaming(false);
-    BRepBuilderAPI::Precision(1.0e-6);
+
+    // Initially we used 1e-6 (same as Horizon EDA) but it caused STEP export
+    // errors in rare cases, due to arc vertices not within the precision.
+    // Thus now allowing a larger tolerance.
+    BRepBuilderAPI::Precision(5.0e-6);
     return true;
   };
   static const bool done = initOnce();
