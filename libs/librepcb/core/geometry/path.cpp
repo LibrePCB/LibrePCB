@@ -196,6 +196,41 @@ const QPainterPath& Path::toQPainterPathPx() const noexcept {
   return mPainterPathPx;
 }
 
+QString Path::toSvgPathMm() const noexcept {
+  auto formatLength = [](const Length& value) {
+    QString s = value.toMmString();
+    if (s.endsWith(".0")) s.chop(2);
+    return s;
+  };
+
+  QString s;
+  if (!mVertices.isEmpty()) {
+    s.append(QString("M %1 %2 ")
+                 .arg(formatLength(mVertices.first().getPos().getX()),
+                      formatLength(-mVertices.first().getPos().getY())));
+  }
+  for (int i = 1; i < mVertices.count(); ++i) {
+    const Vertex& v0 = mVertices.at(i - 1);
+    const Vertex& v1 = mVertices.at(i);
+    if (auto radius =
+            Toolbox::arcRadius(v0.getPos(), v1.getPos(), v0.getAngle())) {
+      s.append(QString("A %1 %1 %2 %3 %4 %5 %6 ")
+                   .arg(formatLength(radius->abs()))
+                   .arg(0)
+                   .arg(v0.getAngle().abs() >= Angle::deg180() ? 1 : 0)
+                   .arg(v0.getAngle() < 0 ? 1 : 0)
+                   .arg(formatLength(v1.getPos().getX()))
+                   .arg(formatLength(-v1.getPos().getY())));
+    } else {
+      s.append(QString("L %1 %2 ")
+                   .arg(formatLength(v1.getPos().getX()),
+                        formatLength(-v1.getPos().getY())));
+    }
+  }
+  s.chop(1);
+  return s;
+}
+
 /*******************************************************************************
  *  Transformations
  ******************************************************************************/

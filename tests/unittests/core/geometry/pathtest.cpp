@@ -127,6 +127,31 @@ TEST_F(PathTest, testGetTotalStraightLength) {
   EXPECT_EQ(UnsignedLength(20), Path(vertices).getTotalStraightLength());
 }
 
+TEST_F(PathTest, testToSvgPathEmpty) {
+  const Path input = Path();
+  const QString expected = "";
+  const QString actual = input.toSvgPathMm();
+  EXPECT_EQ(expected.toStdString(), actual.toStdString());
+}
+
+TEST_F(PathTest, testToSvgPathOneVertex) {
+  const Path input = Path({Vertex(Point(1000000, 1234567), Angle::deg45())});
+  const QString expected = "M 1 -1.234567";
+  const QString actual = input.toSvgPathMm();
+  EXPECT_EQ(expected.toStdString(), actual.toStdString());
+}
+
+TEST_F(PathTest, testToSvgPath) {
+  const Path input = Path({
+      Vertex(Point(1000000, 1234567), Angle::deg0()),
+      Vertex(Point(0, 0), Angle::deg0()),
+      Vertex(Point(1000000, 1234567), Angle::deg0()),
+  });
+  const QString expected = "M 1 -1.234567 L 0 0 L 1 -1.234567";
+  const QString actual = input.toSvgPathMm();
+  EXPECT_EQ(expected.toStdString(), actual.toStdString());
+}
+
 TEST_F(PathTest, testReverseEmptyPath) {
   Path input = Path();
   Path expected = Path();
