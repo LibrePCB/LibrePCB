@@ -43,6 +43,11 @@ extern const uint16_t *ffi_qstring_utf16(const QString * NONNULL obj);
 
 extern void ffi_qstring_set(QString * NONNULL obj, const char *s, size_t len);
 
+extern size_t ffi_qstringlist_len(const QStringList * NONNULL obj);
+
+extern const QString *ffi_qstringlist_at(const QStringList * NONNULL obj,
+                                         size_t index);
+
 /**
  * Wrapper for [increment_number_in_string]
  */
