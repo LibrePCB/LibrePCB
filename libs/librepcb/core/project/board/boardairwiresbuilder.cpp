@@ -83,8 +83,8 @@ QVector<std::pair<const BI_NetLineAnchor*, const BI_NetLineAnchor*>>
                             Layer::botCopper().getCopperNumber());
       } else {
         pointLayerMap[id] =
-            std::make_tuple(pos, pad->getSmtLayer().getCopperNumber(),
-                            pad->getSmtLayer().getCopperNumber());
+            std::make_tuple(pos, pad->getSolderLayer().getCopperNumber(),
+                            pad->getSolderLayer().getCopperNumber());
       }
       anchorMap[pad] = id;
     }
