@@ -50,6 +50,7 @@
 #include <Poly_Triangulation.hxx>
 #include <Quantity_Color.hxx>
 #include <Standard_Version.hxx>
+#include <StdFail_NotDone.hxx>
 #include <STEPCAFControl_Reader.hxx>
 #include <STEPCAFControl_Writer.hxx>
 #include <STEPControl_Reader.hxx>
@@ -252,16 +253,15 @@ static void tesselateLabel(Handle(XCAFDoc_ShapeTool) shapeTool,
   }
 }
 
+static gp_Pnt convertPoint(const Point& xy, const Length& z) {
+  return gp_Pnt(xy.getX().toMm(), xy.getY().toMm(), z.toMm());
+}
+
 static TopoDS_Face pathToFace(const Path& path, const Length& z) {
   BRepBuilderAPI_MakeWire wire;
   for (int i = 1; i < path.getVertices().count(); ++i) {
     const Vertex& v0 = path.getVertices().at(i - 1);
     const Vertex& v1 = path.getVertices().at(i);
-    const gp_Pnt p0(v0.getPos().getX().toMm(), v0.getPos().getY().toMm(),
-                    z.toMm());
-    const gp_Pnt p1(v1.getPos().getX().toMm(), v1.getPos().getY().toMm(),
-                    z.toMm());
-    TopoDS_Edge edge;
     if (auto center =
             Toolbox::arcCenter(v0.getPos(), v1.getPos(), v0.getAngle())) {
       // Arc segment.
@@ -270,12 +270,27 @@ static TopoDS_Face pathToFace(const Path& path, const Length& z) {
           gp_Ax2(gp_Pnt(center->getX().toMm(), center->getY().toMm(), z.toMm()),
                  gp_Dir(0.0, 0.0, (v0.getAngle() < 0) ? -1.0 : 1.0)),
           radiusAbs->toMm());
-      edge = BRepBuilderAPI_MakeEdge(arc, p0, p1);
+      try {
+        wire.Add(BRepBuilderAPI_MakeEdge(arc, convertPoint(v0.getPos(), z),
+                                         convertPoint(v1.getPos(), z)));
+      } catch (const StdFail_NotDone&) {
+        // OpenCascade did not accept the arc due to precision errors. As
+        // a workaround, we approximate it with straight line segments.
+        qWarning() << "Failed to export arc to STEP, approximating with "
+                      "straight lines instead.";
+        const Path p = Path::flatArc(v0.getPos(), v1.getPos(), v0.getAngle(),
+                                     PositiveLength(10000));
+        for (int k = 1; k < p.getVertices().count(); ++k) {
+          wire.Add(BRepBuilderAPI_MakeEdge(
+              convertPoint(p.getVertices().at(k - 1).getPos(), z),
+              convertPoint(p.getVertices().at(k).getPos(), z)));
+        }
+      }
     } else {
       // Straight segment.
-      edge = BRepBuilderAPI_MakeEdge(p0, p1);
+      wire.Add(BRepBuilderAPI_MakeEdge(convertPoint(v0.getPos(), z),
+                                       convertPoint(v1.getPos(), z)));
     }
-    wire.Add(edge);
   }
   return BRepBuilderAPI_MakeFace(wire);
 }
