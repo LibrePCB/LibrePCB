@@ -202,6 +202,8 @@ add_library(
   job/gerberx3outputjob.h
   job/graphicsoutputjob.cpp
   job/graphicsoutputjob.h
+  job/interactivehtmlbomoutputjob.cpp
+  job/interactivehtmlbomoutputjob.h
   job/lppzoutputjob.cpp
   job/lppzoutputjob.h
   job/netlistoutputjob.cpp

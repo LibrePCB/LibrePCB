@@ -54,6 +54,7 @@
         <file>actions/flip_horizontal.png</file>
         <file>actions/flip_vertical.png</file>
         <file>actions/generate_bom.png</file>
+        <file>actions/generate_ibom.png</file>
         <file>actions/grid.png</file>
         <file>actions/grid_dark.png</file>
         <file>actions/help.png</file>

@@ -73,6 +73,8 @@ def test_project_with_jobs(cli, project):
         "  => '{project.output_dir_native}//Empty_Project_v1_Netlist.d356'\n" \
         "Run output job 'BOM'...\n" \
         "  => '{project.output_dir_native}//asm//Empty_Project_v1_BOM_AV.csv'\n" \
+        "Run output job 'Interactive BOM'...\n" \
+        "  => '{project.output_dir_native}//asm//Empty_Project_v1_BOM_AV.html'\n" \
         "Run output job 'STEP Model'...\n" \
         "  => '{project.output_dir_native}//Empty_Project_v1.step'\n" \
         "Run output job 'Custom File'...\n" \
@@ -273,6 +275,8 @@ def test_custom_outdir_relative(cli, project):
         "  => 'foo//Empty_Project_v1_Netlist.d356'\n" \
         "Run output job 'BOM'...\n" \
         "  => 'foo//asm//Empty_Project_v1_BOM_AV.csv'\n" \
+        "Run output job 'Interactive BOM'...\n" \
+        "  => 'foo//asm//Empty_Project_v1_BOM_AV.html'\n" \
         "Run output job 'STEP Model'...\n" \
         "  => 'foo//Empty_Project_v1.step'\n" \
         "Run output job 'Custom File'...\n" \
@@ -336,6 +340,8 @@ def test_custom_outdir_absolute(cli, project):
         "  => 'foo//Empty_Project_v1_Netlist.d356'\n" \
         "Run output job 'BOM'...\n" \
         "  => 'foo//asm//Empty_Project_v1_BOM_AV.csv'\n" \
+        "Run output job 'Interactive BOM'...\n" \
+        "  => 'foo//asm//Empty_Project_v1_BOM_AV.html'\n" \
         "Run output job 'STEP Model'...\n" \
         "  => 'foo//Empty_Project_v1.step'\n" \
         "Run output job 'Custom File'...\n" \
