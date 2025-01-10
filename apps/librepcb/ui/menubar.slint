@@ -1,47 +1,9 @@
 import { Globals, MenuItemId } from "./globals.slint";
-
-struct MenuItemData {
-    id: MenuItemId,
-    text: string,
-}
+import { MenuItemData, Menu } from "./menu.slint";
 
 struct MainMenuItemData {
     text: string,
     items: [MenuItemData],
-}
-
-component MenuItem inherits Rectangle {
-    in property <MenuItemId> id;
-    in property <string> text <=> t-title.text;
-
-    preferred-width: t-title.preferred-width + 20px;
-    height: t-title.preferred-height + 10px;
-    background: ta.has-hover ? #505050 : #353535;
-
-    t-title := Text {
-        x: 10px;
-        width: 100%;
-    }
-
-    ta := TouchArea {
-        clicked => {
-            Globals.menu-item-triggered(id);
-        }
-    }
-}
-
-component Menu inherits PopupWindow {
-    in property <[MenuItemData]> items;
-
-    Rectangle {
-        background: #353535;
-
-        VerticalLayout {
-            for item in items: MenuItem {
-                text: item.text;
-            }
-        }
-    }
 }
 
 component MainMenuItem inherits Rectangle {

@@ -1,0 +1,142 @@
+import { Button, LineEdit, CheckBox } from "std-widgets.slint";
+
+export component NewLibraryPopup inherits PopupWindow {
+    close-policy: PopupClosePolicy.close-on-click-outside;
+
+    Rectangle {
+        background: #29d682;
+        border-radius: 11px;
+
+        VerticalLayout {
+            padding: 1px;
+
+            Rectangle {
+                height: 20px;
+                background: #111111;
+                border-top-left-radius: 10px;
+                border-top-right-radius: 10px;
+
+                Text {
+                    font-size: 12px;
+                    font-weight: 600;
+                    text: @tr("Create a new local library in the currently opened workspace");
+                }
+            }
+
+            Rectangle {
+                background: #222222;
+                border-bottom-left-radius: 10px;
+                border-bottom-right-radius: 10px;
+
+                GridLayout {
+                    height: self.preferred-height;
+                    padding: 10px;
+                    spacing: 5px;
+
+                    Row {
+                        Text {
+                            colspan: 2;
+                            wrap: TextWrap.word-wrap;
+                            text: @tr("To import KiCad or Eagle libraries, create a new library called e.g. 'KiCad Import' or 'Eagle Import'. Then open the new library and start the import wizard via 'File -> Import'.");
+                        }
+                    }
+
+                    Row {
+                        Rectangle {
+                            colspan: 2;
+                            height: 1px;
+                            background: gray;
+                        }
+                    }
+
+                    Row {
+                        Text {
+                            text: @tr("Name:");
+                            vertical-alignment: center;
+                        }
+
+                        LineEdit {
+                            placeholder-text: @tr("My Library");
+                        }
+                    }
+
+                    Row {
+                        Text {
+                            text: @tr("Description:");
+                            vertical-alignment: center;
+                        }
+
+                        LineEdit { }
+                    }
+
+                    Row {
+                        Text {
+                            text: @tr("Author:");
+                            vertical-alignment: center;
+                        }
+
+                        LineEdit {
+                            placeholder-text: @tr("Me");
+                        }
+                    }
+
+                    Row {
+                        Text {
+                            text: @tr("Version:");
+                            vertical-alignment: center;
+                        }
+
+                        LineEdit {
+                            placeholder-text: "0.1";
+                        }
+                    }
+
+                    Row {
+                        Text {
+                            text: @tr("URL:");
+                            vertical-alignment: center;
+                        }
+
+                        LineEdit {
+                            placeholder-text: @tr("e.g. URL to the Git repository (optional)");
+                        }
+                    }
+
+                    Row {
+                        Text {
+                            text: @tr("License:");
+                            vertical-alignment: center;
+                        }
+
+                        CheckBox {
+                            horizontal-stretch: 1;
+                            text: @tr("Put library under the Public Domain License CC0-1.0\n(mandatory to publish it on librepcb.org)");
+                        }
+                    }
+
+                    Row {
+                        Text {
+                            text: @tr("Directory:");
+                            vertical-alignment: center;
+                        }
+
+                        LineEdit {
+                            placeholder-text: "My_Library.lplib";
+                        }
+                    }
+
+                    Row {
+                        Button {
+                            colspan: 2;
+                            text: @tr("Create Library");
+
+                            clicked => {
+                                root.close();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

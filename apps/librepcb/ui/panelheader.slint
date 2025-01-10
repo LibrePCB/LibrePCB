@@ -1,18 +1,21 @@
 export component PanelHeader inherits Rectangle {
     in property <length> spacing-top <=> vl-root.padding-top;
     in property <string> title <=> t-title.text;
+    out property <length> content-height: t-title.height;
+
+    height: spacing-top + t-title.height + 1px;
 
     vl-root := VerticalLayout {
-        padding-top: 3px;
+        padding-top: 5px;
 
         HorizontalLayout {
-            height: t-title.preferred-height;
             padding-left: 5px;
+            padding-right: 1px;
             spacing: 3px;
 
             t-title := Text {
-                height: self.preferred-height;
-                horizontal-stretch: 1;
+                y: 2px;
+                height: self.preferred-height + 4px;
                 font-weight: 700;
             }
 
