@@ -29,6 +29,7 @@ add_executable(
   core/export/gerbergeneratortest.cpp
   core/export/graphicsexporttest.cpp
   core/export/graphicsexporttest.h
+  core/export/interactivehtmlbomtest.cpp
   core/export/pickplacecsvwritertest.cpp
   core/fileio/asynccopyoperationtest.cpp
   core/fileio/csvfiletest.cpp

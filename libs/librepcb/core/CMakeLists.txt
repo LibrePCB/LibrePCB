@@ -121,6 +121,8 @@ add_library(
   export/graphicsexportsettings.h
   export/graphicspainter.cpp
   export/graphicspainter.h
+  export/interactivehtmlbom.cpp
+  export/interactivehtmlbom.h
   export/pickplacecsvwriter.cpp
   export/pickplacecsvwriter.h
   export/pickplacedata.cpp
