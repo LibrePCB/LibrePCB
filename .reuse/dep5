@@ -124,6 +124,11 @@ Copyright: LibrePCB Developers, see AUTHORS.md
 License: CC0-1.0
 
 Files:
+  apps/librepcb/ui/img/plus.svg
+Copyright: The Bootstrap Authors
+License: MIT
+
+Files:
  img/actions/align_horizontally.svg
  img/actions/align_vertically.svg
  img/actions/donate_white.svg

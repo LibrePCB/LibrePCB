@@ -1,0 +1,55 @@
+import { Globals, MenuItemId } from "./globals.slint";
+
+export struct MenuItemData {
+    id: MenuItemId,
+    text: string,
+    handle-in-backend: bool,
+}
+
+component MenuItem inherits Rectangle {
+    in property <MenuItemId> id;
+    in property <string> text <=> t-title.text;
+    in property <bool> handle-in-backend: false;
+
+    callback clicked(MenuItemId);
+
+    preferred-width: t-title.preferred-width + 20px;
+    height: t-title.preferred-height + 10px;
+    background: ta.has-hover ? #505050 : #353535;
+
+    t-title := Text {
+        x: 10px;
+        width: 100%;
+    }
+
+    ta := TouchArea {
+        clicked => {
+            if handle-in-backend {
+                Globals.menu-item-triggered(id);
+            } else {
+                clicked(id);
+            }
+        }
+    }
+}
+
+export component Menu inherits PopupWindow {
+    in property <[MenuItemData]> items;
+
+    callback clicked(MenuItemId);
+
+    Rectangle {
+        background: #353535;
+
+        VerticalLayout {
+            for item in items: MenuItem {
+                id: item.id;
+                text: item.text;
+                handle-in-backend: item.handle-in-backend;
+                clicked(id) => {
+                    clicked(id);
+                }
+            }
+        }
+    }
+}

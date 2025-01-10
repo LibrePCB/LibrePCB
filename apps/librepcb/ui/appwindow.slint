@@ -6,7 +6,8 @@ import { ProjectPanel } from "./projectpanel.slint";
 import { HomePanel } from "./homepanel.slint";
 import { MenuBar } from "./menubar.slint";
 import { WindowSection } from "./windowsection.slint";
-import { Globals, Tab } from "./globals.slint";
+import { Globals, Tab, MenuItemId } from "./globals.slint";
+import { NewLibraryPopup } from "./library/newlibrarypopup.slint";
 
 export { Globals }
 
@@ -39,29 +40,15 @@ export component AppWindow inherits Window {
         height: sidebar.height;
     }
 
-    if sidebar.page == MainPage.home: Button {
-        x: root.width - self.width - 10px;
-        y: root.height - self.height - 100px;
-        text: "Dialog";
-        clicked => {
-            dialog.show();
-        }
-    }
-
-    if sidebar.page == MainPage.home: Button {
-        x: root.width - self.width - 10px;
-        y: root.height - self.height - 50px;
-        text: "Close";
-        clicked => {
-            close();
-        }
-    }
-
     if sidebar.page == MainPage.libraries: LibrariesPanel {
         x: sidebar.width;
         y: sidebar.y;
         width: panel-width;
         height: sidebar.height;
+
+        action-triggered(id) => {
+            action-triggered(id);
+        }
     }
 
     if sidebar.page == MainPage.project: ProjectPanel {
@@ -115,6 +102,24 @@ export component AppWindow inherits Window {
         y: 100px;
     }
 
+    if sidebar.page == MainPage.preferences: Button {
+        x: 100px;
+        y: 150px;
+        text: "Dialog";
+        clicked => {
+            dialog.show();
+        }
+    }
+
+    if sidebar.page == MainPage.preferences: Button {
+        x: 100px;
+        y: 200px;
+        text: "Close";
+        clicked => {
+            close();
+        }
+    }
+
     in property <string> workspace-path <=> t-status.text;
     in property <string> cursor-coordinate <=> t-coordinate.text;
 
@@ -161,25 +166,41 @@ export component AppWindow inherits Window {
         }
     }
 
+    function action-triggered(id: MenuItemId) {
+        if id == MenuItemId.create-local-library {
+            debug("foo");
+            new-library-popup.show();
+        } else if id == MenuItemId.download-library-by-url {
+            //parent.background = #ff0000;
+        }
+    }
+
+    new-library-popup := NewLibraryPopup {
+        x: (root.width - self.width) / 2;
+        y: (root.height - self.height) / 2;
+        width: min(self.preferred-width, parent.width * 0.8);
+        height: min(self.preferred-height, parent.height * 0.8);
+    }
+
     dialog := PopupWindow {
-        Dialog {
-            x: parent.width / 2;
-            y: parent.height / 2;
-            width: 100px;
-            height: 100px;
-            background: black;
-            title: "Dialog";
+        x: parent.width / 2;
+        y: parent.height / 2;
 
-            Text {
-                text: "Hello World!";
-            }
+        Rectangle {
+            background: red;
 
-            StandardButton {
-                kind: ok;
-            }
+            VerticalLayout {
+                Text {
+                    text: "Hello World!";
+                }
 
-            StandardButton {
-                kind: cancel;
+                StandardButton {
+                    kind: ok;
+                }
+
+                StandardButton {
+                    kind: cancel;
+                }
             }
         }
     }
