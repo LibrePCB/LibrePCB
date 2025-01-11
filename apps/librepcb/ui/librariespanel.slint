@@ -1,7 +1,6 @@
 import { CheckBox, Button, ListView, ProgressIndicator, Spinner, HorizontalBox, VerticalBox, StandardButton } from "std-widgets.slint";
 import { PanelHeader } from "./panelheader.slint";
-import { Globals, Library, LibraryType, LibraryState, MenuItemId } from "./globals.slint";
-import { MenuItemData, Menu } from "./menu.slint";
+import { Globals, Library, LibraryType, LibraryState, ActionId } from "./globals.slint";
 
 component LibraryList inherits ListView {
     in property <length> bottom-padding: 50px;
@@ -167,7 +166,7 @@ component LibraryList inherits ListView {
 }
 
 export component LibrariesPanel inherits Rectangle {
-    callback action-triggered(MenuItemId);
+    callback action-triggered(ActionId);
 
     background: #2a2a2a;
 
@@ -206,29 +205,7 @@ export component LibrariesPanel inherits Rectangle {
 
                 ta-new := TouchArea {
                     clicked => {
-                        menu-new.show();
-                    }
-                }
-
-                menu-new := Menu {
-                    x: 0;
-                    y: parent.height;
-                    close-policy: PopupClosePolicy.close-on-click;
-                    items: [
-                        {
-                            id: MenuItemId.create-local-library,
-                            text: @tr("Create Local Library"),
-                            handle-in-backend: false,
-                        },
-                        {
-                            id: MenuItemId.download-library-by-url,
-                            text: @tr("Download Library By URL"),
-                            handle-in-backend: false,
-                        },
-                    ];
-
-                    clicked(id) => {
-                        action-triggered(id);
+                        action-triggered(ActionId.create-local-library);
                     }
                 }
             }

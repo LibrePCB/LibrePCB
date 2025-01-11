@@ -1,17 +1,17 @@
-import { Globals, MenuItemId } from "./globals.slint";
+import { Globals, ActionId } from "./globals.slint";
 
 export struct MenuItemData {
-    id: MenuItemId,
+    id: ActionId,
     text: string,
     handle-in-backend: bool,
 }
 
 component MenuItem inherits Rectangle {
-    in property <MenuItemId> id;
+    in property <ActionId> id;
     in property <string> text <=> t-title.text;
     in property <bool> handle-in-backend: false;
 
-    callback clicked(MenuItemId);
+    callback clicked(ActionId);
 
     preferred-width: t-title.preferred-width + 20px;
     height: t-title.preferred-height + 10px;
@@ -25,7 +25,7 @@ component MenuItem inherits Rectangle {
     ta := TouchArea {
         clicked => {
             if handle-in-backend {
-                Globals.menu-item-triggered(id);
+                Globals.action-triggered(id);
             } else {
                 clicked(id);
             }
@@ -36,7 +36,7 @@ component MenuItem inherits Rectangle {
 export component Menu inherits PopupWindow {
     in property <[MenuItemData]> items;
 
-    callback clicked(MenuItemId);
+    callback clicked(ActionId);
 
     Rectangle {
         background: #353535;

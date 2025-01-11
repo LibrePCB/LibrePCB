@@ -1,4 +1,4 @@
-export enum MenuItemId {
+export enum ActionId {
     new-window,
     create-local-library,
     download-library-by-url,
@@ -75,7 +75,7 @@ export struct EditParseResult {
 }
 
 export global Globals {
-    pure callback menu-item-triggered(MenuItemId);
+    pure callback action-triggered(ActionId);
 
     pure callback parse-length-input(string, string) -> EditParseResult;
 
