@@ -1,14 +1,14 @@
 import { HorizontalBox } from "std-widgets.slint";
-export component CustomLineEdit inherits Rectangle {
+export component LineEdit inherits Rectangle {
     in-out property <string> text <=> ti.text;
     in-out property <string> placeholder-text;
-    in-out property <bool> validate-input: false;
+    property <string> validation-error: input-handler(self.text);
 
-    pure callback is-input-invalid(text: string) -> bool;
+    pure callback input-handler(text: string) -> string;
 
     height: self.preferred-height;
     horizontal-stretch: 1;
-    border-color: (is-input-invalid(self.text)) ? #ff0000 : (ti.has-focus ? #29d682 : #555555);
+    border-color: (validation-error != "") ? #ff0000 : (ti.has-focus ? #29d682 : #555555);
     border-width: 1px;
     border-radius: 10px;
     forward-focus: ti;
@@ -33,5 +33,19 @@ export component CustomLineEdit inherits Rectangle {
         vertical-alignment: center;
         overflow: elide;
         text: placeholder-text;
+    }
+
+    if validation-error != "": Text {
+        x: ti.x + ti.width - self.width;
+        y: 0;
+        width: min(self.preferred-width, parent.width / 2);
+        height: root.height;
+        color: #ff0000;
+        font-size: 10px;
+        horizontal-alignment: right;
+        vertical-alignment: center;
+        wrap: word-wrap;
+        overflow: elide;
+        text: validation-error;
     }
 }

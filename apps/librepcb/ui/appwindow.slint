@@ -8,8 +8,9 @@ import { MenuBar } from "./menubar.slint";
 import { WindowSection } from "./windowsection.slint";
 import { Globals, Tab, ActionId } from "./globals.slint";
 import { NewLibraryPopup } from "./library/newlibrarypopup.slint";
+import { CreateLocalLibraryGlobals } from "./library/newlibrarypopup.slint";
 
-export { Globals }
+export { Globals, CreateLocalLibraryGlobals }
 
 export component AppWindow inherits Window {
     property <length> panel-width: (self.width <= 800px) ? 250px : 350px;

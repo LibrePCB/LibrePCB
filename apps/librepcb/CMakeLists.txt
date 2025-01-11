@@ -25,6 +25,8 @@ add_executable(
   guiapplication.h
   library/librariesmodel.cpp
   library/librariesmodel.h
+  library/librarycreator.cpp
+  library/librarycreator.h
   main.cpp
   mainwindow.cpp
   mainwindow.h
@@ -52,7 +54,9 @@ add_executable(
   workspace/recentprojectsmodel.h
 )
 slint_target_sources(
-  librepcb ui/appwindow.slint NAMESPACE ui COMPILATION_UNITS 8
+  librepcb ui/appwindow.slint
+  NAMESPACE ui
+  COMPILATION_UNITS 8
 )
 target_include_directories(
   librepcb
