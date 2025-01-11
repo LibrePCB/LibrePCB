@@ -92,7 +92,7 @@ void WindowSectionsModel::splitSection(int section) noexcept {
           &WindowSectionsModel::cursorCoordinatesChanged);
   mItems.insert(section, s);
   row_added(section, 1);
-  for (int i = section+1; i < mItems.count(); ++i) {
+  for (int i = section + 1; i < mItems.count(); ++i) {
     mItems[i]->setIndex(i);
     row_changed(i);
   }
@@ -104,7 +104,7 @@ void WindowSectionsModel::closeSection(int section) noexcept {
       s->closeTab(i);
     }
     mItems.remove(section);
-    mCurrentSection = qBound(-1, mCurrentSection, mItems.count()-1);
+    mCurrentSection = qBound(-1, mCurrentSection, mItems.count() - 1);
     row_removed(section, 1);
     for (int i = section; i < mItems.count(); ++i) {
       mItems[i]->setIndex(i);
