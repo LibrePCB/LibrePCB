@@ -119,14 +119,6 @@ void GuiApplication::createNewWindow() noexcept {
   globals.on_uninstall_library(std::bind(&LibrariesModel::uninstallLibrary,
                                          mLibraries.get(),
                                          std::placeholders::_1));
-  globals.on_create_local_library(
-      [this](const slint::SharedString& name,
-             const slint::SharedString& description,
-             const slint::SharedString& author,
-             const slint::SharedString& version, const slint::SharedString& url,
-             bool cc0, const slint::SharedString& directory) {
-        return slint::SharedString();
-      });
 
   // Set models.
   globals.set_workspace_folder(std::make_shared<FileSystemModel>(
@@ -165,10 +157,12 @@ void GuiApplication::actionTriggered(ui::ActionId id) noexcept {
   }
 }
 
-void GuiApplication::createLocalLibrary(const QString& name, const QString& description,
-                        const QString& author, const QString& version,
-                        const QString& url, bool cc0, const QString& directory) {
-
+void GuiApplication::createLocalLibrary(const QString& name,
+                                        const QString& description,
+                                        const QString& author,
+                                        const QString& version,
+                                        const QString& url, bool cc0,
+                                        const QString& directory) {
 }
 
 /*******************************************************************************
