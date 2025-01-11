@@ -74,7 +74,7 @@ public:
 
 private:
   void createNewWindow() noexcept;
-  void menuItemTriggered(ui::MenuItemId id) noexcept;
+  void actionTriggered(ui::ActionId id) noexcept;
 
   Workspace& mWorkspace;
   std::shared_ptr<RecentProjectsModel> mRecentProjects;

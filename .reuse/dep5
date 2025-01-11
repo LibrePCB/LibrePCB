@@ -123,8 +123,7 @@ Files:
 Copyright: LibrePCB Developers, see AUTHORS.md
 License: CC0-1.0
 
-Files:
-  apps/librepcb/ui/img/plus.svg
+Files: apps/librepcb/ui/img/plus.svg
 Copyright: The Bootstrap Authors
 License: MIT
 

@@ -1,4 +1,4 @@
-import { Globals, MenuItemId } from "./globals.slint";
+import { Globals, ActionId } from "./globals.slint";
 import { MenuItemData, Menu } from "./menu.slint";
 
 struct MainMenuItemData {
@@ -37,7 +37,7 @@ export component MenuBar inherits Rectangle {
             text: "Window",
             items: [
                 {
-                    id: MenuItemId.new-window,
+                    id: ActionId.new-window,
                     text: "New Window",
                 },
             ],

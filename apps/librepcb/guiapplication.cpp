@@ -81,15 +81,13 @@ void GuiApplication::createNewWindow() noexcept {
   win->set_window_title(
       QString("LibrePCB %1").arg(Application::getVersion()).toUtf8().data());
   win->set_workspace_path(mWorkspace.getPath().toNative().toUtf8().data());
-  win->on_close([&] { slint::quit_event_loop(); });
 
   // Set static data.
   const ui::Globals& globals = win->global<ui::Globals>();
   globals.set_preview_mode(false);
 
   // Register global callbacks.
-  globals.on_menu_item_triggered(
-      [this](ui::MenuItemId id) { menuItemTriggered(id); });
+  globals.on_action_triggered([this](ui::ActionId id) { actionTriggered(id); });
   globals.on_parse_length_input(
       [](slint::SharedString text, slint::SharedString unit) {
         ui::EditParseResult res{false, text, unit};
@@ -148,13 +146,13 @@ void GuiApplication::createNewWindow() noexcept {
       std::make_shared<MainWindow>(*this, win, mWindows.count(), this));
 }
 
-void GuiApplication::menuItemTriggered(ui::MenuItemId id) noexcept {
+void GuiApplication::actionTriggered(ui::ActionId id) noexcept {
   switch (id) {
-    case ui::MenuItemId::NewWindow:
+    case ui::ActionId::NewWindow:
       createNewWindow();
       break;
     default:
-      qWarning() << "Unknown menu item triggered:" << static_cast<int>(id);
+      qWarning() << "Unknown action triggered:" << static_cast<int>(id);
       break;
   }
 }

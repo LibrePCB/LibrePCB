@@ -75,9 +75,9 @@ MainWindow::MainWindow(GuiApplication& app,
                                   mSections.get(), std::placeholders::_1,
                                   std::placeholders::_2));
   g.on_section_split_clicked(std::bind(&WindowSectionsModel::splitSection,
-                             mSections.get(), std::placeholders::_1));
+                                       mSections.get(), std::placeholders::_1));
   g.on_section_close_clicked(std::bind(&WindowSectionsModel::closeSection,
-                             mSections.get(), std::placeholders::_1));
+                                       mSections.get(), std::placeholders::_1));
   g.on_tab_clicked(std::bind(&WindowSectionsModel::setCurrentTab,
                              mSections.get(), std::placeholders::_1,
                              std::placeholders::_2));
@@ -150,7 +150,7 @@ void MainWindow::projectItemDoubleClicked(
 void MainWindow::setCurrentProject(
     std::shared_ptr<ProjectEditor> prj) noexcept {
   if (!prj) {
-    return; // Temporary workaround for disappearing schematics/boards.
+    return;  // Temporary workaround for disappearing schematics/boards.
   }
 
   if (prj != mCurrentProject) {
