@@ -157,7 +157,7 @@ export component AppWindow inherits Window {
     new-library-popup := NewLibraryPopup {
         x: (root.width - self.width) / 2;
         y: (root.height - self.height) / 2;
-        width: min(self.preferred-width, parent.width * 0.8);
-        height: min(self.preferred-height, parent.height * 0.8);
+        width: min(self.preferred-width, parent.width * 0.9, 620px);
+        height: self.preferred-height;
     }
 }
