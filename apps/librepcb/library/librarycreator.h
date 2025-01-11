@@ -17,61 +17,81 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_MAINWINDOW_H
-#define LIBREPCB_MAINWINDOW_H
+#ifndef LIBREPCB_LIBRARY_LIBRARYCREATOR_H
+#define LIBREPCB_LIBRARY_LIBRARYCREATOR_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include "appwindow.h"
 
+#include <librepcb/core/types/elementname.h>
+#include <librepcb/core/types/fileproofname.h>
+#include <librepcb/core/types/version.h>
+
 #include <QtCore>
-#include <QtGui>
+
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Workspace;
+
 namespace editor {
 namespace app {
 
-class GuiApplication;
-class LibraryCreator;
-class ProjectEditor;
-class WindowSectionsModel;
-
 /*******************************************************************************
- *  Class MainWindow
+ *  Class LibraryCreator
  ******************************************************************************/
 
 /**
- * @brief The MainWindow class
+ * @brief The LibraryCreator class
  */
-class MainWindow : public QObject {
+class LibraryCreator : public QObject {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  MainWindow() = delete;
-  MainWindow(const MainWindow& other) = delete;
-  explicit MainWindow(GuiApplication& app,
-                      slint::ComponentHandle<ui::AppWindow> win, int index,
-                      QObject* parent = nullptr) noexcept;
-  virtual ~MainWindow() noexcept;
+  LibraryCreator() = delete;
+  LibraryCreator(const LibraryCreator& other) = delete;
+  explicit LibraryCreator(Workspace& ws, QObject* parent = nullptr) noexcept;
+  virtual ~LibraryCreator() noexcept;
+
+  // General Methods
+  QString setName(const QString& input) noexcept;
+  QString getName() const noexcept { return mName ? **mName : QString(); }
+  QString setDescription(const QString& input) noexcept;
+  QString getDescription() const noexcept {return mDescription;}
+  QString setAuthor(const QString& input) noexcept;
+  QString getAuthor() const noexcept {return mAuthor;}
+  QString setVersion(const QString& input) noexcept;
+  QString getVersion() const noexcept {return mVersion ? mVersion->toStr() : QString();}
+  QString setDirectory(const QString& input, const QString& fallback) noexcept;
+  QString getDirectory() const noexcept {
+    return mDirectory ? **mDirectory : QString();
+  }
+  static QString getDirectoryForName(const QString& input) noexcept;
+  QString create() noexcept;
 
   // Operator Overloadings
-  MainWindow& operator=(const MainWindow& rhs) = delete;
+  LibraryCreator& operator=(const LibraryCreator& rhs) = delete;
+
+signals:
+  void validChanged(bool valid);
 
 private:
-  void projectItemDoubleClicked(const slint::SharedString& path) noexcept;
-  void setCurrentProject(std::shared_ptr<ProjectEditor> prj) noexcept;
+  void validate() noexcept;
 
-  const int mIndex;
-  GuiApplication& mApp;
-  std::shared_ptr<WindowSectionsModel> mSections;
-  std::shared_ptr<ProjectEditor> mCurrentProject;
-  std::shared_ptr<LibraryCreator> mLibraryCreator;
-  slint::ComponentHandle<ui::AppWindow> mWindow;
+  Workspace& mWorkspace;
+  std::optional<ElementName> mName;
+  QString mDescription;
+  QString mAuthor;
+  std::optional<Version> mVersion;
+  std::optional<FileProofName> mDirectory;
+  std::optional<FileProofName> mFallbackDirectory;
 };
 
 /*******************************************************************************

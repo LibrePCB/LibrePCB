@@ -24,6 +24,7 @@
 
 #include "apptoolbox.h"
 #include "guiapplication.h"
+#include "library/librarycreator.h"
 #include "project/projecteditor.h"
 #include "project/projectsmodel.h"
 #include "windowsectionsmodel.h"
@@ -56,6 +57,8 @@ MainWindow::MainWindow(GuiApplication& app,
     mIndex(index),
     mApp(app),
     mSections(new WindowSectionsModel(app, this)),
+    mCurrentProject(),
+    mLibraryCreator(new LibraryCreator(app.getWorkspace(), this)),
     mWindow(win) {
   // Set initial data.
   const ui::Globals& g = mWindow->global<ui::Globals>();
@@ -108,6 +111,29 @@ MainWindow::MainWindow(GuiApplication& app,
 
   // Set models.
   g.set_sections(mSections);
+
+  // Library creator.
+  {
+    const ui::CreateLocalLibraryGlobals& g =
+        mWindow->global<ui::CreateLocalLibraryGlobals>();
+    g.on_get_name([this]() { return q2s(mLibraryCreator->getName()); });
+    g.on_name_edited([this](const slint::SharedString& text) {
+      return q2s(mLibraryCreator->setName(s2q(text)));
+    });
+    g.on_get_directory(
+        [this]() { return q2s(mLibraryCreator->getDirectory()); });
+    g.on_directory_edited([this](const slint::SharedString& input,
+                                 const slint::SharedString& fallback) {
+      return q2s(mLibraryCreator->setDirectory(s2q(input), s2q(fallback)));
+    });
+    g.on_get_directory_for_name([this](const slint::SharedString& name) {
+      return q2s(LibraryCreator::getDirectoryForName(s2q(name)));
+    });
+    g.on_create([this]() { return q2s(mLibraryCreator->create()); });
+
+    connect(mLibraryCreator.get(), &LibraryCreator::validChanged, this,
+            [&g](bool valid) { g.set_valid(valid); });
+  }
 
   // Connect model callbacks.
   connect(mSections.get(), &WindowSectionsModel::currentSectionChanged, this,

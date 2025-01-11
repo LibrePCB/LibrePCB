@@ -1,13 +1,40 @@
 import { Button, LineEdit, CheckBox } from "std-widgets.slint";
-import { CustomLineEdit } from "../lineedit.slint";
-import { Globals } from "../globals.slint";
+import { LineEdit } from "../lineedit.slint";
+
+global Globals {
+    pure callback get-name() -> string;
+    pure callback name-edited(string) -> string;
+
+    pure callback get-description() -> string;
+    pure callback description-edited(string) -> string;
+
+    pure callback get-author() -> string;
+    pure callback get-author-fallback() -> string;
+    pure callback author-edited(value: string, fallback: string) -> string;
+
+    pure callback get-version() -> string;
+    pure callback get-version-fallback() -> string;
+    pure callback version-edited(value: string, fallback: string) -> string;
+
+    pure callback get-url() -> string;
+    pure callback url-edited(string) -> string;
+
+    pure callback get-cc0() -> bool;
+    pure callback cc0-toggled(bool);
+
+    pure callback get-directory() -> string;
+    pure callback get-directory-fallback(name: string) -> string;
+    pure callback directory-edited(value: string, fallback: string) -> string;
+
+    pure callback create() -> string;
+
+    in-out property <bool> valid: false;
+}
+
+export { Globals as CreateLocalLibraryGlobals }
 
 export component NewLibraryPopup inherits PopupWindow {
     close-policy: PopupClosePolicy.close-on-click-outside;
-
-    init => {
-        le-name.focus();
-    }
 
     Rectangle {
         background: #202020;
@@ -50,8 +77,16 @@ export component NewLibraryPopup inherits PopupWindow {
                     vertical-alignment: center;
                 }
 
-                le-name := CustomLineEdit {
+                le-name := LineEdit {
                     placeholder-text: @tr("My Library");
+
+                    init => {
+                        self.text = Globals.get-name();
+                    }
+
+                    input-handler(t) => {
+                        Globals.name-edited(t);
+                    }
                 }
             }
 
@@ -61,7 +96,15 @@ export component NewLibraryPopup inherits PopupWindow {
                     vertical-alignment: center;
                 }
 
-                le-description := CustomLineEdit { }
+                le-description := LineEdit {
+                    init => {
+                        self.text = Globals.get-description();
+                    }
+
+                    input-handler(t) => {
+                        Globals.description-edited(t);
+                    }
+                }
             }
 
             Row {
@@ -71,7 +114,15 @@ export component NewLibraryPopup inherits PopupWindow {
                 }
 
                 le-author := LineEdit {
-                    placeholder-text: @tr("Me");
+                    placeholder-text: Globals.get-author-fallback();
+
+                    init => {
+                        self.text = Globals.get-author();
+                    }
+
+                    input-handler(t) => {
+                        Globals.author-edited(t, self.placeholder-text);
+                    }
                 }
             }
 
@@ -82,7 +133,15 @@ export component NewLibraryPopup inherits PopupWindow {
                 }
 
                 le-version := LineEdit {
-                    placeholder-text: "0.1";
+                    placeholder-text: Globals.get-version-fallback();
+
+                    init => {
+                        self.text = Globals.get-version();
+                    }
+
+                    input-handler(t) => {
+                        Globals.version-edited(t, self.placeholder-text);
+                    }
                 }
             }
 
@@ -94,6 +153,14 @@ export component NewLibraryPopup inherits PopupWindow {
 
                 le-url := LineEdit {
                     placeholder-text: @tr("e.g. URL to the Git repository (optional)");
+
+                    init => {
+                        self.text = Globals.get-url();
+                    }
+
+                    input-handler(t) => {
+                        Globals.url-edited(t);
+                    }
                 }
             }
 
@@ -105,7 +172,12 @@ export component NewLibraryPopup inherits PopupWindow {
 
                 cbx-cc0 := CheckBox {
                     horizontal-stretch: 1;
+                    checked: Globals.get-cc0();
                     text: @tr("Put library under the Public Domain License CC0-1.0\n(mandatory to publish it on librepcb.org)");
+
+                    init => {
+                        self.checked = Globals.get-cc0();
+                    }
                 }
             }
 
@@ -116,7 +188,15 @@ export component NewLibraryPopup inherits PopupWindow {
                 }
 
                 le-directory := LineEdit {
-                    placeholder-text: "My_Library.lplib";
+                    placeholder-text: Globals.get-directory-fallback(le-name.text);
+
+                    init => {
+                        self.text = Globals.get-directory();
+                    }
+
+                    input-handler(t) => {
+                        Globals.directory-edited(t, self.placeholder-text);
+                    }
                 }
             }
 
@@ -135,18 +215,11 @@ export component NewLibraryPopup inherits PopupWindow {
 
                     Button {
                         primary: true;
+                        enabled: Globals.valid;
                         text: @tr("Create Library");
 
                         clicked => {
-                            ti-error-msg.text = Globals.create-local-library(
-                                        le-name.text,
-                                        le-description.text,
-                                        le-author.text,
-                                        le-version.text,
-                                        le-url.text,
-                                        cbx-cc0.checked,
-                                        le-directory.text,
-                                    );
+                            ti-error-msg.text = Globals.create();
                             if ti-error-msg.text == "" {
                                 //root.close();
                             }
