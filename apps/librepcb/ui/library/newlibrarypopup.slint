@@ -1,140 +1,167 @@
 import { Button, LineEdit, CheckBox } from "std-widgets.slint";
+import { CustomLineEdit } from "../lineedit.slint";
+import { Globals } from "../globals.slint";
 
 export component NewLibraryPopup inherits PopupWindow {
     close-policy: PopupClosePolicy.close-on-click-outside;
 
+    init => {
+        le-name.focus();
+    }
+
     Rectangle {
-        background: #29d682;
-        border-radius: 11px;
+        background: #202020;
 
-        VerticalLayout {
-            padding: 1px;
+        GridLayout {
+            height: self.preferred-height;
+            padding: 10px;
+            spacing: 5px;
 
-            Rectangle {
-                height: 20px;
-                background: #111111;
-                border-top-left-radius: 10px;
-                border-top-right-radius: 10px;
-
+            Row {
                 Text {
-                    font-size: 12px;
+                    colspan: 2;
+                    height: self.preferred-height + 10px;
+                    font-size: 14px;
                     font-weight: 600;
+                    horizontal-alignment: center;
                     text: @tr("Create a new local library in the currently opened workspace");
                 }
             }
 
-            Rectangle {
-                background: #222222;
-                border-bottom-left-radius: 10px;
-                border-bottom-right-radius: 10px;
+            Row {
+                Text {
+                    colspan: 2;
+                    wrap: TextWrap.word-wrap;
+                    text: @tr("To import KiCad or Eagle libraries, create a new library called e.g. 'KiCad Import' or 'Eagle Import'. Then open the new library and start the import wizard via 'File -> Import'.");
+                }
+            }
 
-                GridLayout {
-                    height: self.preferred-height;
-                    padding: 10px;
-                    spacing: 5px;
+            Row {
+                Rectangle {
+                    colspan: 2;
+                    height: 1px;
+                    background: gray;
+                }
+            }
 
-                    Row {
-                        Text {
-                            colspan: 2;
-                            wrap: TextWrap.word-wrap;
-                            text: @tr("To import KiCad or Eagle libraries, create a new library called e.g. 'KiCad Import' or 'Eagle Import'. Then open the new library and start the import wizard via 'File -> Import'.");
+            Row {
+                Text {
+                    text: @tr("Name:");
+                    vertical-alignment: center;
+                }
+
+                le-name := CustomLineEdit {
+                    placeholder-text: @tr("My Library");
+                }
+            }
+
+            Row {
+                Text {
+                    text: @tr("Description:");
+                    vertical-alignment: center;
+                }
+
+                le-description := CustomLineEdit { }
+            }
+
+            Row {
+                Text {
+                    text: @tr("Author:");
+                    vertical-alignment: center;
+                }
+
+                le-author := LineEdit {
+                    placeholder-text: @tr("Me");
+                }
+            }
+
+            Row {
+                Text {
+                    text: @tr("Version:");
+                    vertical-alignment: center;
+                }
+
+                le-version := LineEdit {
+                    placeholder-text: "0.1";
+                }
+            }
+
+            Row {
+                Text {
+                    text: @tr("URL:");
+                    vertical-alignment: center;
+                }
+
+                le-url := LineEdit {
+                    placeholder-text: @tr("e.g. URL to the Git repository (optional)");
+                }
+            }
+
+            Row {
+                Text {
+                    text: @tr("License:");
+                    vertical-alignment: center;
+                }
+
+                cbx-cc0 := CheckBox {
+                    horizontal-stretch: 1;
+                    text: @tr("Put library under the Public Domain License CC0-1.0\n(mandatory to publish it on librepcb.org)");
+                }
+            }
+
+            Row {
+                Text {
+                    text: @tr("Directory:");
+                    vertical-alignment: center;
+                }
+
+                le-directory := LineEdit {
+                    placeholder-text: "My_Library.lplib";
+                }
+            }
+
+            Row {
+                HorizontalLayout {
+                    colspan: 2;
+                    alignment: end;
+
+                    Button {
+                        text: @tr("Cancel");
+
+                        clicked => {
+                            root.close();
                         }
                     }
 
-                    Row {
-                        Rectangle {
-                            colspan: 2;
-                            height: 1px;
-                            background: gray;
-                        }
-                    }
+                    Button {
+                        primary: true;
+                        text: @tr("Create Library");
 
-                    Row {
-                        Text {
-                            text: @tr("Name:");
-                            vertical-alignment: center;
-                        }
-
-                        LineEdit {
-                            placeholder-text: @tr("My Library");
-                        }
-                    }
-
-                    Row {
-                        Text {
-                            text: @tr("Description:");
-                            vertical-alignment: center;
-                        }
-
-                        LineEdit { }
-                    }
-
-                    Row {
-                        Text {
-                            text: @tr("Author:");
-                            vertical-alignment: center;
-                        }
-
-                        LineEdit {
-                            placeholder-text: @tr("Me");
-                        }
-                    }
-
-                    Row {
-                        Text {
-                            text: @tr("Version:");
-                            vertical-alignment: center;
-                        }
-
-                        LineEdit {
-                            placeholder-text: "0.1";
-                        }
-                    }
-
-                    Row {
-                        Text {
-                            text: @tr("URL:");
-                            vertical-alignment: center;
-                        }
-
-                        LineEdit {
-                            placeholder-text: @tr("e.g. URL to the Git repository (optional)");
-                        }
-                    }
-
-                    Row {
-                        Text {
-                            text: @tr("License:");
-                            vertical-alignment: center;
-                        }
-
-                        CheckBox {
-                            horizontal-stretch: 1;
-                            text: @tr("Put library under the Public Domain License CC0-1.0\n(mandatory to publish it on librepcb.org)");
-                        }
-                    }
-
-                    Row {
-                        Text {
-                            text: @tr("Directory:");
-                            vertical-alignment: center;
-                        }
-
-                        LineEdit {
-                            placeholder-text: "My_Library.lplib";
-                        }
-                    }
-
-                    Row {
-                        Button {
-                            colspan: 2;
-                            text: @tr("Create Library");
-
-                            clicked => {
-                                root.close();
+                        clicked => {
+                            ti-error-msg.text = Globals.create-local-library(
+                                        le-name.text,
+                                        le-description.text,
+                                        le-author.text,
+                                        le-version.text,
+                                        le-url.text,
+                                        cbx-cc0.checked,
+                                        le-directory.text,
+                                    );
+                            if ti-error-msg.text == "" {
+                                //root.close();
                             }
                         }
                     }
+                }
+            }
+
+            Row {
+                ti-error-msg := TextInput {
+                    colspan: 2;
+                    height: (self.text != "") ? self.preferred-height : 0;
+                    color: red;
+                    read-only: true;
+                    wrap: word-wrap;
                 }
             }
         }
