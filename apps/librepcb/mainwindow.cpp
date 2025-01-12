@@ -126,7 +126,7 @@ MainWindow::MainWindow(GuiApplication& app,
                                  const slint::SharedString& fallback) {
       return q2s(mLibraryCreator->setDirectory(s2q(input), s2q(fallback)));
     });
-    g.on_get_directory_for_name([this](const slint::SharedString& name) {
+    g.on_get_directory_fallback([this](const slint::SharedString& name) {
       return q2s(LibraryCreator::getDirectoryForName(s2q(name)));
     });
     g.on_create([this]() { return q2s(mLibraryCreator->create()); });
