@@ -23,6 +23,7 @@
 #include "mainwindow.h"
 
 #include "apptoolbox.h"
+#include "createlibrarytabsmodel.h"
 #include "guiapplication.h"
 #include "library/librarycreator.h"
 #include "project/projecteditor.h"
@@ -36,7 +37,6 @@
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 #include <librepcb/editor/workspace/desktopservices.h>
-#include "createlibrarytabsmodel.h"
 
 #include <QtCore>
 
@@ -139,8 +139,8 @@ MainWindow::MainWindow(GuiApplication& app,
   }
 
   // Connect model callbacks.
-  connect(mSections.get(), &WindowSectionsModel::currentSectionChanged, this,
-          [&g](int section) { g.set_current_section(section); });
+  connect(mSections.get(), &WindowSectionsModel::currentSectionIdChanged, this,
+          [&g](int id) { g.set_current_section_id(id); });
   connect(mSections.get(), &WindowSectionsModel::currentProjectChanged, this,
           &MainWindow::setCurrentProject);
   connect(

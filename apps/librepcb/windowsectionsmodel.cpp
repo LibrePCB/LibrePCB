@@ -50,7 +50,7 @@ namespace app {
 
 WindowSectionsModel::WindowSectionsModel(GuiApplication& app,
                                          QObject* parent) noexcept
-  : QObject(parent), mApp(app), mItems(), mCurrentSection(0) {
+  : QObject(parent), mApp(app), mItems(), mCurrentSectionId(1) {
   splitSection(0);
 }
 
@@ -75,8 +75,8 @@ void WindowSectionsModel::openBoard(std::shared_ptr<ProjectEditor> prj,
   addTab(ui::TabType::Board2d, prj, index);
 }
 
-void WindowSectionsModel::openBoard3dViewer(int section, int tab) noexcept {
-  if (std::shared_ptr<WindowSection> s = mItems.value(section)) {
+void WindowSectionsModel::openBoard3dViewer(int sectionId, int tab) noexcept {
+  if (std::shared_ptr<WindowSection> s = getSection(sectionId)) {
     if (std::shared_ptr<WindowTab> t = s->getTab(tab)) {
       if (auto prj = t->getProject()) {
         addTab(ui::TabType::Board3d, prj, t->getObjIndex());
@@ -85,121 +85,125 @@ void WindowSectionsModel::openBoard3dViewer(int section, int tab) noexcept {
   }
 }
 
-void WindowSectionsModel::splitSection(int section) noexcept {
-  section = qBound(0, section + 1, mItems.count());
+void WindowSectionsModel::splitSection(int sectionId) noexcept {
+  const int newIndex = qBound(0, mIndex.value(sectionId) + 1, mItems.count());
+  const int newId = ++mNextId;
   std::shared_ptr<WindowSection> s =
-      std::make_shared<WindowSection>(mApp, section, this);
+      std::make_shared<WindowSection>(mApp, newId, this);
   connect(s.get(), &WindowSection::uiDataChanged, this,
-          [this](int index) { row_changed(index); });
+          [this, newId]() { row_changed(mIndex.value(newId, -1)); });
   connect(s.get(), &WindowSection::currentProjectChanged, this,
           &WindowSectionsModel::currentProjectChanged);
   connect(s.get(), &WindowSection::cursorCoordinatesChanged, this,
           &WindowSectionsModel::cursorCoordinatesChanged);
-  mItems.insert(section, s);
-  row_added(section, 1);
-  for (int i = section + 1; i < mItems.count(); ++i) {
-    mItems[i]->setIndex(i);
-    row_changed(i);
-  }
+  mItems.insert(newIndex, s);
+  updateIndex();
+  row_added(newIndex, 1);
 }
 
-void WindowSectionsModel::closeSection(int section) noexcept {
+void WindowSectionsModel::closeSection(int sectionId) noexcept {
   if (mItems.count() <= 1) {
-    return; // Do not allow to close the last section.
+    return;  // Do not allow to close the last section.
   }
-  if (auto s = mItems.value(section)) {
+  int sectionIndex;
+  if (std::shared_ptr<WindowSection> s = getSection(sectionId, &sectionIndex)) {
     for (std::size_t i = 0; i < s->getTabCount(); ++i) {
       s->closeTab(i);
     }
-    mItems.remove(section);
-    mCurrentSection = qBound(-1, mCurrentSection, mItems.count() - 1);
-    row_removed(section, 1);
-    for (int i = section; i < mItems.count(); ++i) {
-      mItems[i]->setIndex(i);
-      row_changed(i);
+    mItems.remove(sectionIndex);
+    updateIndex();
+    const int currentIndex = mIndex.value(mCurrentSectionId);
+    if (auto s = mItems.value(qBound(-1, currentIndex, mItems.count() - 1))) {
+      mCurrentSectionId = s->getId();
+    } else {
+      mCurrentSectionId = -1;
     }
-    emit currentSectionChanged(mCurrentSection);
-    if (auto sNew = mItems.value(mCurrentSection)) {
+    row_removed(sectionIndex, 1);
+    emit currentSectionIdChanged(mCurrentSectionId);
+    if (auto sNew = getSection(mCurrentSectionId)) {
       emit currentProjectChanged(sNew->getCurrentProject());
     }
   }
 }
 
-void WindowSectionsModel::setCurrentTab(int section, int tab) noexcept {
-  if (std::shared_ptr<WindowSection> s = mItems.value(section)) {
-    if (section != mCurrentSection) {
-      mCurrentSection = section;
-      emit currentSectionChanged(mCurrentSection);
+void WindowSectionsModel::setCurrentTab(int sectionId, int tab) noexcept {
+  int sectionIndex;
+  if (std::shared_ptr<WindowSection> s = getSection(sectionId, &sectionIndex)) {
+    if (sectionIndex != mCurrentSectionId) {
+      mCurrentSectionId = sectionId;
+      emit currentSectionIdChanged(mCurrentSectionId);
       emit currentProjectChanged(s->getCurrentProject());
     }
 
     s->setCurrentTab(tab);
-    row_changed(section);  // TODO: signal
+    row_changed(sectionIndex);  // TODO: signal
   }
 }
 
-void WindowSectionsModel::closeTab(int section, int tab) noexcept {
-  if (std::shared_ptr<WindowSection> s = mItems.value(section)) {
+void WindowSectionsModel::closeTab(int sectionId, int tab) noexcept {
+  if (std::shared_ptr<WindowSection> s = getSection(sectionId)) {
     s->closeTab(tab);
   }
 }
 
-slint::Image WindowSectionsModel::renderScene(int section, int tab, float width,
-                                              float height,
+slint::Image WindowSectionsModel::renderScene(int sectionId, int tab,
+                                              float width, float height,
                                               int frame) noexcept {
   Q_UNUSED(frame);
-  if (std::shared_ptr<WindowSection> s = mItems.value(section)) {
+  if (std::shared_ptr<WindowSection> s = getSection(sectionId)) {
     return s->renderScene(tab, width, height);
   }
   return slint::Image();
 }
 
 slint::private_api::EventResult WindowSectionsModel::processScenePointerEvent(
-    int section, float x, float y, float width, float height,
+    int sectionId, float x, float y, float width, float height,
     slint::private_api::PointerEvent e) noexcept {
-  if (std::shared_ptr<WindowSection> s = mItems.value(section)) {
+  int sectionIndex;
+  if (std::shared_ptr<WindowSection> s = getSection(sectionId, &sectionIndex)) {
     if ((e.kind == slint::private_api::PointerEventKind::Down) &&
-        (section != mCurrentSection)) {
-      mCurrentSection = section;
-      emit currentSectionChanged(mCurrentSection);
+        (sectionId != mCurrentSectionId)) {
+      mCurrentSectionId = sectionId;
+      emit currentSectionIdChanged(mCurrentSectionId);
       emit currentProjectChanged(s->getCurrentProject());
     }
 
     if (s->processScenePointerEvent(x, y, width, height, e)) {
-      row_changed(section);
+      row_changed(sectionIndex);
     }
   }
   return slint::private_api::EventResult::Accept;
 }
 
 slint::private_api::EventResult WindowSectionsModel::processSceneScrolled(
-    int section, float x, float y, float width, float height,
+    int sectionId, float x, float y, float width, float height,
     slint::private_api::PointerScrollEvent e) noexcept {
-  if (std::shared_ptr<WindowSection> s = mItems.value(section)) {
+  int sectionIndex;
+  if (std::shared_ptr<WindowSection> s = getSection(sectionId, &sectionIndex)) {
     if (s->processSceneScrolled(x, y, width, height, e)) {
-      row_changed(section);
+      row_changed(sectionIndex);
     }
   }
   return slint::private_api::EventResult::Accept;
 }
 
-void WindowSectionsModel::zoomFit(int section, float width,
+void WindowSectionsModel::zoomFit(int sectionId, float width,
                                   float height) noexcept {
-  if (std::shared_ptr<WindowSection> s = mItems.value(section)) {
+  if (std::shared_ptr<WindowSection> s = getSection(sectionId)) {
     s->zoomFit(width, height);
   }
 }
 
-void WindowSectionsModel::zoomIn(int section, float width,
+void WindowSectionsModel::zoomIn(int sectionId, float width,
                                  float height) noexcept {
-  if (std::shared_ptr<WindowSection> s = mItems.value(section)) {
+  if (std::shared_ptr<WindowSection> s = getSection(sectionId)) {
     s->zoomIn(width, height);
   }
 }
 
-void WindowSectionsModel::zoomOut(int section, float width,
+void WindowSectionsModel::zoomOut(int sectionId, float width,
                                   float height) noexcept {
-  if (std::shared_ptr<WindowSection> s = mItems.value(section)) {
+  if (std::shared_ptr<WindowSection> s = getSection(sectionId)) {
     s->zoomOut(width, height);
   }
 }
@@ -228,10 +232,25 @@ std::optional<ui::WindowSection> WindowSectionsModel::row_data(
 void WindowSectionsModel::addTab(ui::TabType type,
                                  std::shared_ptr<ProjectEditor> prj,
                                  int objIndex) noexcept {
-  const int section = qBound(0, mCurrentSection, mItems.count() - 1);
-  if (std::shared_ptr<WindowSection> s = mItems.value(section)) {
+  const int sectionIndex =
+      qBound(0, mIndex.value(mCurrentSectionId, -1), mItems.count() - 1);
+  if (std::shared_ptr<WindowSection> s = mItems.value(sectionIndex)) {
     s->addTab(type, prj, objIndex);
-    setCurrentTab(section, s->getTabCount() - 1);
+    setCurrentTab(s->getId(), s->getTabCount() - 1);
+  }
+}
+
+std::shared_ptr<WindowSection> WindowSectionsModel::getSection(
+    int id, int* index) noexcept {
+  const int i = mIndex.value(id, -1);
+  if (index) *index = i;
+  return mItems.value(i);
+}
+
+void WindowSectionsModel::updateIndex() noexcept {
+  mIndex.clear();
+  for (int i = 0; i < mItems.count(); ++i) {
+    mIndex.insert(mItems.at(i)->getId(), i);
   }
 }
 

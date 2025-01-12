@@ -56,13 +56,12 @@ public:
   // Constructors / Destructor
   WindowSection() = delete;
   WindowSection(const WindowSection& other) = delete;
-  explicit WindowSection(GuiApplication& app, int index,
+  explicit WindowSection(GuiApplication& app, int id,
                          QObject* parent = nullptr) noexcept;
   virtual ~WindowSection() noexcept;
 
   // General Methods
-  void setIndex(int index) noexcept;
-  int getIndex() const noexcept { return mUiData.index; }
+  int getId() const noexcept { return mUiData.id; }
   const ui::WindowSection& getUiData() const noexcept { return mUiData; }
   std::size_t getTabCount() const noexcept;
   std::shared_ptr<WindowTab> getTab(int index) noexcept;
@@ -84,7 +83,7 @@ public:
   WindowSection& operator=(const WindowSection& rhs) = delete;
 
 signals:
-  void uiDataChanged(int section);
+  void uiDataChanged();
   void currentProjectChanged(std::shared_ptr<ProjectEditor> prj);
   void cursorCoordinatesChanged(qreal x, qreal y);
 

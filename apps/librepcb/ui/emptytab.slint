@@ -1,7 +1,7 @@
 import { Globals } from "./globals.slint";
 
 export component EmptyTab inherits Rectangle {
-    in-out property <int> section-index;
+    in-out property <int> section-id;
 
     Text {
         width: 90%;
@@ -15,10 +15,10 @@ export component EmptyTab inherits Rectangle {
 
     TouchArea {
         pointer-event(e) => {
-            return Globals.scene-pointer-event(section-index, self.mouse-x, self.mouse-y, root.width, root.height, e);
+            return Globals.scene-pointer-event(section-id, self.mouse-x, self.mouse-y, root.width, root.height, e);
         }
         scroll-event(e) => {
-            return Globals.scene-scrolled(section-index, self.mouse-x, self.mouse-y, root.width, root.height, e);
+            return Globals.scene-scrolled(section-id, self.mouse-x, self.mouse-y, root.width, root.height, e);
         }
     }
 }

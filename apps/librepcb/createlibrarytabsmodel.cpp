@@ -38,7 +38,8 @@ namespace app {
  *  Constructors / Destructor
  ******************************************************************************/
 
-CreateLibraryTabsModel::CreateLibraryTabsModel(GuiApplication& app, QObject* parent) noexcept
+CreateLibraryTabsModel::CreateLibraryTabsModel(GuiApplication& app,
+                                               QObject* parent) noexcept
   : QObject(parent), mItems() {
   mItems.push_back(std::make_shared<CreateLibraryTab>(app, this));
 }
@@ -67,8 +68,8 @@ std::optional<ui::CreateLibraryTabData> CreateLibraryTabsModel::row_data(
   }
 }
 
-void CreateLibraryTabsModel::set_row_data(size_t index,
-                          const ui::CreateLibraryTabData& data)  {
+void CreateLibraryTabsModel::set_row_data(
+    size_t index, const ui::CreateLibraryTabData& data) {
   if (std::shared_ptr<CreateLibraryTab> s = mItems.value(index)) {
     return s->setUiData(data);
   }

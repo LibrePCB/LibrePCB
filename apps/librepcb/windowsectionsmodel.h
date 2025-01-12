@@ -64,21 +64,21 @@ public:
   void openCreateLibraryTab() noexcept;
   void openSchematic(std::shared_ptr<ProjectEditor> prj, int index) noexcept;
   void openBoard(std::shared_ptr<ProjectEditor> prj, int index) noexcept;
-  void openBoard3dViewer(int section, int tab) noexcept;
-  void splitSection(int section) noexcept;
-  void closeSection(int section) noexcept;
-  void setCurrentTab(int section, int tab) noexcept;
-  void closeTab(int section, int tab) noexcept;
-  slint::Image renderScene(int section, int tab, float width, float height,
+  void openBoard3dViewer(int sectionId, int tab) noexcept;
+  void splitSection(int sectionId) noexcept;
+  void closeSection(int sectionId) noexcept;
+  void setCurrentTab(int sectionId, int tab) noexcept;
+  void closeTab(int sectionId, int tab) noexcept;
+  slint::Image renderScene(int sectionId, int tab, float width, float height,
                            int frame) noexcept;
   slint::private_api::EventResult processScenePointerEvent(
-      int section, float x, float y, float width, float height,
+      int sectionId, float x, float y, float width, float height,
       slint::private_api::PointerEvent e) noexcept;
   slint::private_api::EventResult processSceneScrolled(
-      int section, float x, float y, float width, float height,
+      int sectionId, float x, float y, float width, float height,
       slint::private_api::PointerScrollEvent e) noexcept;
-  void zoomFit(int section, float width, float height) noexcept;
-  void zoomIn(int section, float width, float height) noexcept;
+  void zoomFit(int sectionId, float width, float height) noexcept;
+  void zoomIn(int sectionId, float width, float height) noexcept;
   void zoomOut(int section, float width, float height) noexcept;
 
   // Implementations
@@ -89,17 +89,22 @@ public:
   WindowSectionsModel& operator=(const WindowSectionsModel& rhs) = delete;
 
 signals:
-  void currentSectionChanged(int section);
+  void currentSectionIdChanged(int id);
   void currentProjectChanged(std::shared_ptr<ProjectEditor> prj);
   void cursorCoordinatesChanged(qreal x, qreal y);
 
 private:
   void addTab(ui::TabType type, std::shared_ptr<ProjectEditor> prj,
               int objIndex) noexcept;
+  std::shared_ptr<WindowSection> getSection(int id,
+                                            int* index = nullptr) noexcept;
+  void updateIndex() noexcept;
 
   GuiApplication& mApp;
   QList<std::shared_ptr<WindowSection>> mItems;
-  int mCurrentSection;
+  QHash<int, int> mIndex;  ///< Map from section ID to #mItems index
+  int mNextId;  ///< Next free section ID
+  int mCurrentSectionId;
 };
 
 /*******************************************************************************

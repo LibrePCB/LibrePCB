@@ -41,16 +41,16 @@ namespace app {
  *  Constructors / Destructor
  ******************************************************************************/
 
-WindowSection::WindowSection(GuiApplication& app, int index,
+WindowSection::WindowSection(GuiApplication& app, int id,
                              QObject* parent) noexcept
   : QObject(parent),
     mTabsModel(new WindowTabsModel(app, this)),
-    mUiData{index, mTabsModel, -1, 0} {
+    mUiData{id, mTabsModel, -1, 0} {
   connect(mTabsModel.get(), &WindowTabsModel::cursorCoordinatesChanged, this,
           &WindowSection::cursorCoordinatesChanged);
   connect(mTabsModel.get(), &WindowTabsModel::requestRepaint, this, [this]() {
     mUiData.frame++;
-    uiDataChanged(mUiData.index);
+    uiDataChanged();
   });
 }
 
@@ -60,10 +60,6 @@ WindowSection::~WindowSection() noexcept {
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
-
-void WindowSection::setIndex(int index) noexcept {
-  mUiData.index = index;
-}
 
 std::size_t WindowSection::getTabCount() const noexcept {
   return mTabsModel->row_count();
@@ -100,7 +96,7 @@ void WindowSection::closeTab(int index) noexcept {
 void WindowSection::setCurrentTab(int index) noexcept {
   mTabsModel->setCurrentTab(index);
   mUiData.tab_index = index;
-  emit uiDataChanged(mUiData.index);
+  emit uiDataChanged();
   emit currentProjectChanged(getCurrentProject());
 }
 
