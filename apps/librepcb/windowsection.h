@@ -67,7 +67,7 @@ public:
   std::size_t getTabCount() const noexcept;
   std::shared_ptr<WindowTab> getTab(int index) noexcept;
   std::shared_ptr<ProjectEditor> getCurrentProject() noexcept;
-  void addTab(std::shared_ptr<ProjectEditor> prj, ui::TabType type,
+  void addTab(ui::TabType type, std::shared_ptr<ProjectEditor> prj,
               int objIndex) noexcept;
   void closeTab(int index) noexcept;
   void setCurrentTab(int index) noexcept;

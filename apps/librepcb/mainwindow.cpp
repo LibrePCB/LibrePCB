@@ -112,10 +112,11 @@ MainWindow::MainWindow(GuiApplication& app,
   // Set models.
   g.set_sections(mSections);
 
-  // Library creator.
+  // Create library tab.
+  g.on_open_create_library_tab([this]() { mSections->openCreateLibraryTab(); });
   {
-    const ui::CreateLocalLibraryGlobals& g =
-        mWindow->global<ui::CreateLocalLibraryGlobals>();
+    const ui::CreateLibraryGlobals& g =
+        mWindow->global<ui::CreateLibraryGlobals>();
     g.on_get_name([this]() { return q2s(mLibraryCreator->getName()); });
     g.on_name_edited([this](const slint::SharedString& text) {
       return q2s(mLibraryCreator->setName(s2q(text)));

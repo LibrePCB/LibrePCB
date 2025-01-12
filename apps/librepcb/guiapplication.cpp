@@ -157,14 +157,6 @@ void GuiApplication::actionTriggered(ui::ActionId id) noexcept {
   }
 }
 
-void GuiApplication::createLocalLibrary(const QString& name,
-                                        const QString& description,
-                                        const QString& author,
-                                        const QString& version,
-                                        const QString& url, bool cc0,
-                                        const QString& directory) {
-}
-
 /*******************************************************************************
  *  End of File
  ******************************************************************************/

@@ -80,9 +80,9 @@ std::shared_ptr<ProjectEditor> WindowSection::getCurrentProject() noexcept {
   return nullptr;
 }
 
-void WindowSection::addTab(std::shared_ptr<ProjectEditor> prj, ui::TabType type,
+void WindowSection::addTab(ui::TabType type, std::shared_ptr<ProjectEditor> prj,
                            int objIndex) noexcept {
-  mTabsModel->addTab(prj, type, objIndex);
+  mTabsModel->addTab(type, prj, objIndex);
   setCurrentTab(mTabsModel->row_count() - 1);
 }
 

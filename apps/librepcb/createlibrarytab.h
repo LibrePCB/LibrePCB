@@ -17,18 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_WINDOWTABSMODEL_H
-#define LIBREPCB_WINDOWTABSMODEL_H
+#ifndef LIBREPCB_CREATELIBRARYTAB_H
+#define LIBREPCB_CREATELIBRARYTAB_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "appwindow.h"
+#include "windowtab.h"
 
 #include <QtCore>
 #include <QtGui>
-
-#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -38,50 +36,31 @@ namespace editor {
 namespace app {
 
 class GuiApplication;
-class ProjectEditor;
-class WindowTab;
 
 /*******************************************************************************
- *  Class WindowTabsModel
+ *  Class CreateLibraryTab
  ******************************************************************************/
 
 /**
- * @brief The WindowTabsModel class
+ * @brief The CreateLibraryTab class
  */
-class WindowTabsModel : public QObject, public slint::Model<ui::Tab> {
+class CreateLibraryTab final : public WindowTab {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  WindowTabsModel() = delete;
-  WindowTabsModel(const WindowTabsModel& other) = delete;
-  explicit WindowTabsModel(GuiApplication& app,
-                           QObject* parent = nullptr) noexcept;
-  virtual ~WindowTabsModel() noexcept;
+  CreateLibraryTab() = delete;
+  CreateLibraryTab(const CreateLibraryTab& other) = delete;
+  explicit CreateLibraryTab(GuiApplication& app,
+                            QObject* parent = nullptr) noexcept;
+  virtual ~CreateLibraryTab() noexcept;
 
   // General Methods
-  std::shared_ptr<WindowTab> getTab(int index) noexcept {
-    return mItems.value(index);
-  }
-  void addTab(ui::TabType type, std::shared_ptr<ProjectEditor> prj,
-              int objIndex) noexcept;
-  void closeTab(int index) noexcept;
-  void setCurrentTab(int index) noexcept;
-
-  // Implementations
-  std::size_t row_count() const override;
-  std::optional<ui::Tab> row_data(std::size_t i) const override;
+  void activate() noexcept override;
+  void deactivate() noexcept override;
 
   // Operator Overloadings
-  WindowTabsModel& operator=(const WindowTabsModel& rhs) = delete;
-
-signals:
-  void cursorCoordinatesChanged(qreal x, qreal y);
-  void requestRepaint();
-
-private:
-  GuiApplication& mApp;
-  QList<std::shared_ptr<WindowTab>> mItems;
+  CreateLibraryTab& operator=(const CreateLibraryTab& rhs) = delete;
 };
 
 /*******************************************************************************

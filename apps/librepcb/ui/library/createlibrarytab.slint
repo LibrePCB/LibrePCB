@@ -1,0 +1,256 @@
+import { Button, LineEdit, CheckBox } from "std-widgets.slint";
+import { LineEdit } from "../lineedit.slint";
+import { Globals } from "../globals.slint";
+
+global Locals {
+    pure callback get-name() -> string;
+    pure callback name-edited(string) -> string;
+
+    pure callback get-description() -> string;
+    pure callback description-edited(string) -> string;
+
+    pure callback get-author() -> string;
+    pure callback get-author-fallback() -> string;
+    pure callback author-edited(value: string, fallback: string) -> string;
+
+    pure callback get-version() -> string;
+    pure callback get-version-fallback() -> string;
+    pure callback version-edited(value: string, fallback: string) -> string;
+
+    pure callback get-url() -> string;
+    pure callback url-edited(string) -> string;
+
+    pure callback get-cc0() -> bool;
+    pure callback cc0-toggled(bool);
+
+    pure callback get-directory() -> string;
+    pure callback get-directory-fallback(name: string) -> string;
+    pure callback directory-edited(value: string, fallback: string) -> string;
+
+    pure callback create() -> string;
+
+    in-out property <bool> valid: false;
+}
+
+export { Locals as CreateLibraryGlobals }
+
+export component CreateLibraryTab inherits Rectangle {
+    in property <int> section-index;
+    in property <int> tab-index;
+
+    GridLayout {
+        padding: 10px;
+        spacing: 5px;
+
+        Row {
+            Text {
+                colspan: 2;
+                height: self.preferred-height + 10px;
+                font-size: 14px;
+                font-weight: 600;
+                wrap: TextWrap.word-wrap;
+                text: @tr("Create a new local library in the currently opened workspace");
+            }
+        }
+
+        Row {
+            Text {
+                colspan: 2;
+                wrap: TextWrap.word-wrap;
+                text: @tr("To import KiCad or Eagle libraries, create a new library called e.g. 'KiCad Import' or 'Eagle Import'. Then open the new library and start the import wizard via 'File -> Import'.");
+            }
+        }
+
+        Row {
+            Rectangle {
+                colspan: 2;
+                height: 1px;
+                background: gray;
+            }
+        }
+
+        Row {
+            Text {
+                text: @tr("Name:");
+                vertical-alignment: center;
+            }
+
+            le-name := LineEdit {
+                placeholder-text: @tr("My Library");
+
+                init => {
+                    self.text = Locals.get-name();
+                }
+
+                input-handler(t) => {
+                    Locals.name-edited(t);
+                }
+            }
+        }
+
+        Row {
+            Text {
+                text: @tr("Description:");
+                vertical-alignment: center;
+            }
+
+            le-description := LineEdit {
+                init => {
+                    self.text = Locals.get-description();
+                }
+
+                input-handler(t) => {
+                    Locals.description-edited(t);
+                }
+            }
+        }
+
+        Row {
+            Text {
+                text: @tr("Author:");
+                vertical-alignment: center;
+            }
+
+            le-author := LineEdit {
+                placeholder-text: Locals.get-author-fallback();
+
+                init => {
+                    self.text = Locals.get-author();
+                }
+
+                input-handler(t) => {
+                    Locals.author-edited(t, self.placeholder-text);
+                }
+            }
+        }
+
+        Row {
+            Text {
+                text: @tr("Version:");
+                vertical-alignment: center;
+            }
+
+            le-version := LineEdit {
+                placeholder-text: Locals.get-version-fallback();
+
+                init => {
+                    self.text = Locals.get-version();
+                }
+
+                input-handler(t) => {
+                    Locals.version-edited(t, self.placeholder-text);
+                }
+            }
+        }
+
+        Row {
+            Text {
+                text: @tr("URL:");
+                vertical-alignment: center;
+            }
+
+            le-url := LineEdit {
+                placeholder-text: @tr("e.g. URL to the Git repository (optional)");
+
+                init => {
+                    self.text = Locals.get-url();
+                }
+
+                input-handler(t) => {
+                    Locals.url-edited(t);
+                }
+            }
+        }
+
+        Row {
+            Text {
+                text: @tr("License:");
+                vertical-alignment: center;
+            }
+
+            HorizontalLayout {
+                spacing: 8px;
+
+                cbx-cc0 := CheckBox {
+                    horizontal-stretch: 1;
+                    checked: Locals.get-cc0();
+
+                    init => {
+                        self.checked = Locals.get-cc0();
+                    }
+                }
+
+                Text {
+                    wrap: word-wrap;
+                    text: @tr("Put library under the Public Domain License CC0-1.0\n(mandatory to publish it on librepcb.org)");
+
+                    TouchArea {
+                        clicked => {
+                            cbx-cc0.checked = !cbx-cc0.checked;
+                        }
+                    }
+                }
+            }
+        }
+
+        Row {
+            Text {
+                text: @tr("Directory:");
+                vertical-alignment: center;
+            }
+
+            le-directory := LineEdit {
+                placeholder-text: Locals.get-directory-fallback(le-name.text);
+
+                init => {
+                    self.text = Locals.get-directory();
+                }
+
+                input-handler(t) => {
+                    Locals.directory-edited(t, self.placeholder-text);
+                }
+            }
+        }
+
+        Row {
+            HorizontalLayout {
+                colspan: 2;
+                alignment: end;
+
+                Button {
+                    text: @tr("Cancel");
+
+                    clicked => {
+                        Globals.tab-close-clicked(section-index, tab-index);
+                    }
+                }
+
+                Button {
+                    primary: true;
+                    enabled: Locals.valid;
+                    text: @tr("Create Library");
+
+                    clicked => {
+                        ti-error-msg.text = Locals.create();
+                    }
+                }
+            }
+        }
+
+        Row {
+            ti-error-msg := TextInput {
+                colspan: 2;
+                height: (self.text != "") ? self.preferred-height : 0;
+                color: red;
+                read-only: true;
+                wrap: word-wrap;
+            }
+        }
+
+        Row {
+            Rectangle {
+                vertical-stretch: 1;
+            }
+        }
+    }
+}

@@ -61,6 +61,7 @@ public:
   virtual ~WindowSectionsModel() noexcept;
 
   // General Methods
+  void openCreateLibraryTab() noexcept;
   void openSchematic(std::shared_ptr<ProjectEditor> prj, int index) noexcept;
   void openBoard(std::shared_ptr<ProjectEditor> prj, int index) noexcept;
   void openBoard3dViewer(int section, int tab) noexcept;
@@ -93,7 +94,7 @@ signals:
   void cursorCoordinatesChanged(qreal x, qreal y);
 
 private:
-  void addTab(std::shared_ptr<ProjectEditor> prj, ui::TabType type,
+  void addTab(ui::TabType type, std::shared_ptr<ProjectEditor> prj,
               int objIndex) noexcept;
 
   GuiApplication& mApp;
