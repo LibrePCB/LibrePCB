@@ -21,7 +21,9 @@
  *  Includes
  ******************************************************************************/
 #include "createlibrarytab.h"
+
 #include "apptoolbox.h"
+
 #include <QtCore>
 #include <QtWidgets>
 
@@ -58,7 +60,8 @@ void CreateLibraryTab::activate() noexcept {
 void CreateLibraryTab::deactivate() noexcept {
 }
 
-void CreateLibraryTab::setUiData(const ui::CreateLibraryTabData& data) noexcept {
+void CreateLibraryTab::setUiData(
+    const ui::CreateLibraryTabData& data) noexcept {
   mUiData = data;
 }
 

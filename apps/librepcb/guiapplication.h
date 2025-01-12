@@ -39,12 +39,12 @@ class Workspace;
 namespace editor {
 namespace app {
 
+class CreateLibraryTabsModel;
 class FavoriteProjectsModel;
 class LibrariesModel;
 class MainWindow;
 class ProjectsModel;
 class RecentProjectsModel;
-class CreateLibraryTabsModel;
 
 /*******************************************************************************
  *  Class GuiApplication
@@ -83,8 +83,7 @@ private:
   std::shared_ptr<FavoriteProjectsModel> mFavoriteProjects;
   std::shared_ptr<LibrariesModel> mLibraries;
   std::shared_ptr<ProjectsModel> mProjects;
-  std::shared_ptr<CreateLibraryTabsModel>
-      mCreateLibraryTabs;
+  std::shared_ptr<CreateLibraryTabsModel> mCreateLibraryTabs;
   QList<std::shared_ptr<MainWindow>> mWindows;
 };
 

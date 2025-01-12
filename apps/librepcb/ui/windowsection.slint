@@ -61,7 +61,7 @@ component TabItem inherits Rectangle {
 
 export component WindowSection inherits Rectangle {
     in-out property <WindowSection> section;
-    property <bool> is-current-section: (section.index == Globals.current-section);
+    property <bool> is-current-section: (section.id == Globals.current-section-id);
     property <bool> tab-open: (section.tab-index >= 0) && (section.tab-index < section.tabs.length);
     property <TabType> tab-type: section.tabs[section.tab-index].type;
 
@@ -90,12 +90,12 @@ export component WindowSection inherits Rectangle {
                         if Globals.preview-mode {
                             section.tab-index = index;
                         } else {
-                            Globals.tab-clicked(section.index, index);
+                            Globals.tab-clicked(section.id, index);
                         }
                     }
 
                     close-clicked => {
-                        Globals.tab-close-clicked(section.index, index);
+                        Globals.tab-close-clicked(section.id, index);
                     }
                 }
             }
@@ -119,7 +119,7 @@ export component WindowSection inherits Rectangle {
 
                 ta-section-split := TouchArea {
                     clicked => {
-                        Globals.section-split-clicked(section.index);
+                        Globals.section-split-clicked(section.id);
                     }
                 }
             }
@@ -137,7 +137,7 @@ export component WindowSection inherits Rectangle {
 
                 ta-section-close := TouchArea {
                     clicked => {
-                        Globals.section-close-clicked(section.index);
+                        Globals.section-close-clicked(section.id);
                     }
                 }
             }
@@ -149,7 +149,7 @@ export component WindowSection inherits Rectangle {
         y: tab-bar.height;
         width: root.width;
         height: parent.height - self.y;
-        section-index: section.index;
+        section-id: section.id;
     }
 
     if (tab-open) && (tab-type == TabType.create-library): CreateLibraryTab {
@@ -157,7 +157,7 @@ export component WindowSection inherits Rectangle {
         y: tab-bar.height;
         width: parent.width;
         height: parent.height - self.y;
-        section-index: section.index;
+        section-id: section.id;
         tab-index: section.tab-index;
         data-model: Globals.create-library-tab-data;
         data-index: section.tabs[section.tab-index].data-index;
@@ -168,7 +168,7 @@ export component WindowSection inherits Rectangle {
         y: tab-bar.height;
         width: 100%;
         height: parent.height - self.y;
-        section-index: section.index;
+        section-id: section.id;
         tab-index: section.tab-index;
         tab: section.tabs[section.tab-index];
         frame: section.frame;
@@ -179,7 +179,7 @@ export component WindowSection inherits Rectangle {
         y: tab-bar.height;
         width: 100%;
         height: parent.height - self.y;
-        section-index: section.index;
+        section-id: section.id;
         tab-index: section.tab-index;
         tab: section.tabs[section.tab-index];
         frame: section.frame;
@@ -190,7 +190,7 @@ export component WindowSection inherits Rectangle {
         y: tab-bar.height;
         width: 100%;
         height: parent.height - self.y;
-        section-index: section.index;
+        section-id: section.id;
         tab-index: section.tab-index;
         tab: section.tabs[section.tab-index];
         frame: section.frame;

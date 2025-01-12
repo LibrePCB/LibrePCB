@@ -23,6 +23,7 @@
 #include "guiapplication.h"
 
 #include "apptoolbox.h"
+#include "createlibrarytabsmodel.h"
 #include "library/librariesmodel.h"
 #include "mainwindow.h"
 #include "project/projecteditor.h"
@@ -35,7 +36,7 @@
 #include <librepcb/core/types/lengthunit.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
-#include "createlibrarytabsmodel.h"
+
 #include <QtCore>
 
 /*******************************************************************************

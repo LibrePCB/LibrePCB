@@ -35,7 +35,7 @@ global Locals {
 export {Locals as CreateLibraryGlobals}
 
 export component CreateLibraryTab inherits Rectangle {
-    in property <int> section-index;
+    in property <int> section-id;
     in property <int> tab-index;
     in-out property <[CreateLibraryTabData]> data-model;
     in property <int> data-index;
@@ -212,7 +212,7 @@ export component CreateLibraryTab inherits Rectangle {
                     text: @tr("Cancel");
 
                     clicked => {
-                        Globals.tab-close-clicked(section-index, tab-index);
+                        Globals.tab-close-clicked(section-id, tab-index);
                     }
                 }
 

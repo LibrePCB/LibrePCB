@@ -83,7 +83,7 @@ export struct CreateLibraryTabData {
 }
 
 export struct WindowSection {
-    index: int,  // Section index (0 = left most)
+    id: int,  // Unique section ID
     tabs: [Tab], // Tabs in this section
     tab-index: int,  // Currently opened tab in this section
     frame: int, // Frame index to trigger repainting
@@ -329,7 +329,7 @@ export global Globals {
 
     in property <[WindowSection]> sections: [
         {
-            index: 0,
+            id: 5,
             tabs: [
                 {
                     type: TabType.create-library,
@@ -349,7 +349,7 @@ export global Globals {
             tab-index: 0,
         },
         {
-            index: 1,
+            id: 10,
             tabs: [
                 {
                     type: TabType.board-3d,
@@ -361,5 +361,5 @@ export global Globals {
         },
     ];
 
-    in property <int> current-section: 0;
+    in property <int> current-section-id: 5;
 }
