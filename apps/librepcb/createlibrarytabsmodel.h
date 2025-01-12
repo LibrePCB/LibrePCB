@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_GUIAPPLICATION_H
-#define LIBREPCB_GUIAPPLICATION_H
+#ifndef LIBREPCB_CREATELIBRARYTABSMODEL_H
+#define LIBREPCB_CREATELIBRARYTABSMODEL_H
 
 /*******************************************************************************
  *  Includes
@@ -26,6 +26,7 @@
 #include "appwindow.h"
 
 #include <QtCore>
+#include <QtGui>
 
 #include <memory>
 
@@ -33,59 +34,43 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class Workspace;
-
 namespace editor {
 namespace app {
 
-class FavoriteProjectsModel;
-class LibrariesModel;
-class MainWindow;
-class ProjectsModel;
-class RecentProjectsModel;
-class CreateLibraryTabsModel;
+class CreateLibraryTab;
+class GuiApplication;
 
 /*******************************************************************************
- *  Class GuiApplication
+ *  Class CreateLibraryTabsModel
  ******************************************************************************/
 
 /**
- * @brief The GuiApplication class
+ * @brief The CreateLibraryTabsModel class
  */
-class GuiApplication : public QObject {
+class CreateLibraryTabsModel : public QObject,
+                               public slint::Model<ui::CreateLibraryTabData> {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  GuiApplication() = delete;
-  GuiApplication(const GuiApplication& other) = delete;
-  explicit GuiApplication(Workspace& ws, QObject* parent = nullptr) noexcept;
-  virtual ~GuiApplication() noexcept;
+  CreateLibraryTabsModel() = delete;
+  CreateLibraryTabsModel(const CreateLibraryTabsModel& other) = delete;
+  explicit CreateLibraryTabsModel(GuiApplication& app,
+                                  QObject* parent = nullptr) noexcept;
+  virtual ~CreateLibraryTabsModel() noexcept;
 
-  // Getters
-  Workspace& getWorkspace() noexcept { return mWorkspace; }
-  ProjectsModel& getProjects() noexcept { return *mProjects; }
-  auto getCreateLibraryTabs() noexcept { return mCreateLibraryTabs; }
-
-  // General Methods
-  void exec();
+  // Implementations
+  std::size_t row_count() const override;
+  std::optional<ui::CreateLibraryTabData> row_data(
+      std::size_t i) const override;
+  void set_row_data(size_t,
+                            const ui::CreateLibraryTabData& data) override;
 
   // Operator Overloadings
-  GuiApplication& operator=(const GuiApplication& rhs) = delete;
+  CreateLibraryTabsModel& operator=(const CreateLibraryTabsModel& rhs) = delete;
 
 private:
-  void createNewWindow() noexcept;
-  void actionTriggered(ui::ActionId id) noexcept;
-
-  Workspace& mWorkspace;
-  std::shared_ptr<RecentProjectsModel> mRecentProjects;
-  std::shared_ptr<FavoriteProjectsModel> mFavoriteProjects;
-  std::shared_ptr<LibrariesModel> mLibraries;
-  std::shared_ptr<ProjectsModel> mProjects;
-  std::shared_ptr<CreateLibraryTabsModel>
-      mCreateLibraryTabs;
-  QList<std::shared_ptr<MainWindow>> mWindows;
+  QList<std::shared_ptr<CreateLibraryTab>> mItems;
 };
 
 /*******************************************************************************

@@ -36,6 +36,7 @@
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 #include <librepcb/editor/workspace/desktopservices.h>
+#include "createlibrarytabsmodel.h"
 
 #include <QtCore>
 
@@ -110,6 +111,7 @@ MainWindow::MainWindow(GuiApplication& app,
       std::placeholders::_2, std::placeholders::_3));
 
   // Set models.
+  g.set_create_library_tab_data(mApp.getCreateLibraryTabs());
   g.set_sections(mSections);
 
   // Create library tab.
@@ -118,9 +120,9 @@ MainWindow::MainWindow(GuiApplication& app,
     const ui::CreateLibraryGlobals& g =
         mWindow->global<ui::CreateLibraryGlobals>();
     g.on_get_name([this]() { return q2s(mLibraryCreator->getName()); });
-    g.on_name_edited([this](const slint::SharedString& text) {
-      return q2s(mLibraryCreator->setName(s2q(text)));
-    });
+    // g.on_name_edited([this](const slint::SharedString& text) {
+    //   return q2s(mLibraryCreator->setName(s2q(text)));
+    // });
     g.on_get_directory(
         [this]() { return q2s(mLibraryCreator->getDirectory()); });
     g.on_directory_edited([this](const slint::SharedString& input,
@@ -132,8 +134,8 @@ MainWindow::MainWindow(GuiApplication& app,
     });
     g.on_create([this]() { return q2s(mLibraryCreator->create()); });
 
-    connect(mLibraryCreator.get(), &LibraryCreator::validChanged, this,
-            [&g](bool valid) { g.set_valid(valid); });
+    // connect(mLibraryCreator.get(), &LibraryCreator::validChanged, this,
+    //         [&g](bool valid) { g.set_valid(valid); });
   }
 
   // Connect model callbacks.
