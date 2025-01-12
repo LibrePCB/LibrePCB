@@ -36,9 +36,8 @@ export {Locals as CreateLibraryGlobals}
 
 export component CreateLibraryTab inherits Rectangle {
     in property <int> section-id;
-    in property <int> tab-index;
+    in property <int> tab-id;
     in-out property <[CreateLibraryTabData]> data-model;
-    in property <int> data-index;
 
     GridLayout {
         padding: 10px;
@@ -78,10 +77,10 @@ export component CreateLibraryTab inherits Rectangle {
             }
 
             le-name := LineEdit {
-                text: data-model[data-index].name;
+                text: data-model[tab-id].name;
 
                 changed text => {
-                    data-model[data-index].name = self.text;
+                    data-model[tab-id].name = self.text;
                 }
             }
         }
@@ -93,12 +92,10 @@ export component CreateLibraryTab inherits Rectangle {
             }
 
             le-description := LineEdit {
-                init => {
-                    self.text = Locals.get-description();
-                }
+                text: data-model[tab-id].description;
 
-                input-handler(t) => {
-                    Locals.description-edited(t);
+                changed text => {
+                    data-model[tab-id].description = self.text;
                 }
             }
         }
@@ -110,8 +107,8 @@ export component CreateLibraryTab inherits Rectangle {
             }
 
             le-author := LineEdit {
-                text: data-model[data-index].author;
-                placeholder-text: data-model[data-index].author-default;
+                text: data-model[tab-id].author;
+                placeholder-text: data-model[tab-id].author-default;
             }
         }
 
@@ -122,15 +119,7 @@ export component CreateLibraryTab inherits Rectangle {
             }
 
             le-version := LineEdit {
-                placeholder-text: Locals.get-version-fallback();
-
-                init => {
-                    self.text = Locals.get-version();
-                }
-
-                input-handler(t) => {
-                    Locals.version-edited(t, self.placeholder-text);
-                }
+                placeholder-text: data-model[tab-id].version-default;
             }
         }
 
@@ -212,13 +201,13 @@ export component CreateLibraryTab inherits Rectangle {
                     text: @tr("Cancel");
 
                     clicked => {
-                        Globals.tab-close-clicked(section-id, tab-index);
+                        Globals.tab-close-clicked(section-id, tab-id);
                     }
                 }
 
                 Button {
                     primary: true;
-                    //enabled: Locals.valid;
+                    enabled: data-model[tab-id].valid;
                     text: @tr("Create Library");
 
                     clicked => {

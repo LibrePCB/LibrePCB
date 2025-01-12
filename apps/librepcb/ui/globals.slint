@@ -57,10 +57,10 @@ export enum TabType {
 }
 
 export struct Tab {
+    id: int,  // Unique tab ID
     type: TabType,
     title: string,
     overlay-color: brush,
-    data-index: int,
 }
 
 export struct CreateLibraryTabData {
@@ -306,7 +306,7 @@ export global Globals {
         },
     ];
 
-    in property <[CreateLibraryTabData]> create-library-tab-data: [
+    in property <[CreateLibraryTabData]> create-library-tabs: [
         {
             used: true,
             name: "My Library",
@@ -332,15 +332,18 @@ export global Globals {
             id: 5,
             tabs: [
                 {
+                    id: 5,
                     type: TabType.create-library,
                     title: "New Lib",
                 },
                 {
+                    id: 6,
                     type: TabType.schematic,
                     title: "Schematic",
                     overlay-color: Colors.black,
                 },
                 {
+                    id: 7,
                     type: TabType.board-2d,
                     title: "Board",
                     overlay-color: Colors.white,
@@ -352,6 +355,7 @@ export global Globals {
             id: 10,
             tabs: [
                 {
+                    id: 8,
                     type: TabType.board-3d,
                     title: "3D",
                     overlay-color: Colors.gray,

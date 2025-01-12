@@ -60,6 +60,9 @@ public:
                                QObject* parent = nullptr) noexcept;
   virtual ~WindowSectionsModel() noexcept;
 
+  std::shared_ptr<WindowSection> getSection(int id,
+                                            int* index = nullptr) noexcept;
+
   // General Methods
   void openCreateLibraryTab() noexcept;
   void openSchematic(std::shared_ptr<ProjectEditor> prj, int index) noexcept;
@@ -96,8 +99,6 @@ signals:
 private:
   void addTab(ui::TabType type, std::shared_ptr<ProjectEditor> prj,
               int objIndex) noexcept;
-  std::shared_ptr<WindowSection> getSection(int id,
-                                            int* index = nullptr) noexcept;
   void updateIndex() noexcept;
 
   GuiApplication& mApp;

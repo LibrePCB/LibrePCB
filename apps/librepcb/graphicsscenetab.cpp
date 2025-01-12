@@ -45,12 +45,12 @@ namespace app {
  *  Constructors / Destructor
  ******************************************************************************/
 
-GraphicsSceneTab::GraphicsSceneTab(GuiApplication& app, ui::TabType type,
+GraphicsSceneTab::GraphicsSceneTab(GuiApplication& app, int id, ui::TabType type,
                                    std::shared_ptr<ProjectEditor> prj,
                                    int objIndex, const QString& title,
                                    const QColor& bgColor,
                                    QObject* parent) noexcept
-  : WindowTab(app, type, prj, objIndex, title, parent),
+  : WindowTab(app, id, type, prj, objIndex, title, parent),
     mBackgroundColor(bgColor),
     mLayerProvider(new DefaultGraphicsLayerProvider(
         app.getWorkspace().getSettings().themes.getActive())),

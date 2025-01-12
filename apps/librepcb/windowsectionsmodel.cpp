@@ -50,7 +50,7 @@ namespace app {
 
 WindowSectionsModel::WindowSectionsModel(GuiApplication& app,
                                          QObject* parent) noexcept
-  : QObject(parent), mApp(app), mItems(), mCurrentSectionId(1) {
+  : QObject(parent), mApp(app), mItems(), mNextId(1), mCurrentSectionId(1) {
   splitSection(0);
 }
 
@@ -87,7 +87,7 @@ void WindowSectionsModel::openBoard3dViewer(int sectionId, int tab) noexcept {
 
 void WindowSectionsModel::splitSection(int sectionId) noexcept {
   const int newIndex = qBound(0, mIndex.value(sectionId) + 1, mItems.count());
-  const int newId = ++mNextId;
+  const int newId = (mNextId++) << 16;
   std::shared_ptr<WindowSection> s =
       std::make_shared<WindowSection>(mApp, newId, this);
   connect(s.get(), &WindowSection::uiDataChanged, this,

@@ -51,7 +51,7 @@ public:
   // Constructors / Destructor
   CreateLibraryTab() = delete;
   CreateLibraryTab(const CreateLibraryTab& other) = delete;
-  explicit CreateLibraryTab(GuiApplication& app,
+  explicit CreateLibraryTab(GuiApplication& app, int id,
                             QObject* parent = nullptr) noexcept;
   virtual ~CreateLibraryTab() noexcept;
 
@@ -63,6 +63,9 @@ public:
 
   // Operator Overloadings
   CreateLibraryTab& operator=(const CreateLibraryTab& rhs) = delete;
+
+signals:
+  void uiDataChanged();
 
 private:
   ui::CreateLibraryTabData mUiData;

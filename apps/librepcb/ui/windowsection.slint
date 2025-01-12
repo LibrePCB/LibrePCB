@@ -158,9 +158,8 @@ export component WindowSection inherits Rectangle {
         width: parent.width;
         height: parent.height - self.y;
         section-id: section.id;
-        tab-index: section.tab-index;
-        data-model: Globals.create-library-tab-data;
-        data-index: section.tabs[section.tab-index].data-index;
+        tab-id: section.tabs[section.tab-index].id;
+        data-model: Globals.create-library-tabs;
     }
 
     if (tab-open) && (tab-type == TabType.schematic): SchematicTab {

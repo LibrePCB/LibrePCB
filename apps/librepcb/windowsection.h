@@ -65,6 +65,7 @@ public:
   const ui::WindowSection& getUiData() const noexcept { return mUiData; }
   std::size_t getTabCount() const noexcept;
   std::shared_ptr<WindowTab> getTab(int index) noexcept;
+  std::shared_ptr<WindowTab> getTabById(int id) noexcept;
   std::shared_ptr<ProjectEditor> getCurrentProject() noexcept;
   void addTab(ui::TabType type, std::shared_ptr<ProjectEditor> prj,
               int objIndex) noexcept;
