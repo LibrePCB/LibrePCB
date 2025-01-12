@@ -21,7 +21,7 @@
  *  Includes
  ******************************************************************************/
 #include "createlibrarytab.h"
-
+#include "apptoolbox.h"
 #include <QtCore>
 #include <QtWidgets>
 
@@ -39,7 +39,10 @@ namespace app {
 CreateLibraryTab::CreateLibraryTab(GuiApplication& app,
                                    QObject* parent) noexcept
   : WindowTab(app, ui::TabType::CreateLibrary, nullptr, -1, tr("New Library"),
-              parent) {
+              parent),
+    mUiData() {
+  mUiData.used = true;
+  mUiData.name = q2s(tr("My Library"));
 }
 
 CreateLibraryTab::~CreateLibraryTab() noexcept {
@@ -53,6 +56,10 @@ void CreateLibraryTab::activate() noexcept {
 }
 
 void CreateLibraryTab::deactivate() noexcept {
+}
+
+void CreateLibraryTab::setUiData(const ui::CreateLibraryTabData& data) noexcept {
+  mUiData = data;
 }
 
 /*******************************************************************************

@@ -1,10 +1,12 @@
 import { Button, LineEdit, CheckBox } from "std-widgets.slint";
 import { LineEdit } from "../lineedit.slint";
-import { Globals } from "../globals.slint";
+import { Globals, CreateLibraryTabData } from "../globals.slint";
+
+
 
 global Locals {
     pure callback get-name() -> string;
-    pure callback name-edited(string) -> string;
+    pure callback set-name(int, int, string) -> string;
 
     pure callback get-description() -> string;
     pure callback description-edited(string) -> string;
@@ -28,15 +30,15 @@ global Locals {
     pure callback directory-edited(value: string, fallback: string) -> string;
 
     pure callback create() -> string;
-
-    in-out property <bool> valid: false;
 }
 
-export { Locals as CreateLibraryGlobals }
+export {Locals as CreateLibraryGlobals}
 
 export component CreateLibraryTab inherits Rectangle {
     in property <int> section-index;
     in property <int> tab-index;
+    in-out property <[CreateLibraryTabData]> data-model;
+    in property <int> data-index;
 
     GridLayout {
         padding: 10px;
@@ -76,14 +78,10 @@ export component CreateLibraryTab inherits Rectangle {
             }
 
             le-name := LineEdit {
-                placeholder-text: @tr("My Library");
+                text: data-model[data-index].name;
 
-                init => {
-                    self.text = Locals.get-name();
-                }
-
-                input-handler(t) => {
-                    Locals.name-edited(t);
+                changed text => {
+                    data-model[data-index].name = self.text;
                 }
             }
         }
@@ -112,15 +110,8 @@ export component CreateLibraryTab inherits Rectangle {
             }
 
             le-author := LineEdit {
-                placeholder-text: Locals.get-author-fallback();
-
-                init => {
-                    self.text = Locals.get-author();
-                }
-
-                input-handler(t) => {
-                    Locals.author-edited(t, self.placeholder-text);
-                }
+                text: data-model[data-index].author;
+                placeholder-text: data-model[data-index].author-default;
             }
         }
 
@@ -227,7 +218,7 @@ export component CreateLibraryTab inherits Rectangle {
 
                 Button {
                     primary: true;
-                    enabled: Locals.valid;
+                    //enabled: Locals.valid;
                     text: @tr("Create Library");
 
                     clicked => {

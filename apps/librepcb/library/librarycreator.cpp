@@ -46,7 +46,7 @@ LibraryCreator::LibraryCreator(Workspace& ws, QObject* parent) noexcept
     mName(parseElementName("My Library")),
     mDescription(),
     mAuthor(ws.getSettings().userName.get().trimmed()),
-    mVersion(),
+    mVersion(Version::tryFromString("0.1")),
     mDirectory(),
     mFallbackDirectory() {
 }
