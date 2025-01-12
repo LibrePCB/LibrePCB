@@ -63,8 +63,7 @@ public:
   std::size_t row_count() const override;
   std::optional<ui::CreateLibraryTabData> row_data(
       std::size_t i) const override;
-  void set_row_data(size_t,
-                            const ui::CreateLibraryTabData& data) override;
+  void set_row_data(size_t, const ui::CreateLibraryTabData& data) override;
 
   // Operator Overloadings
   CreateLibraryTabsModel& operator=(const CreateLibraryTabsModel& rhs) = delete;
