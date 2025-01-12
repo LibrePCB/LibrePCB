@@ -1,0 +1,18 @@
+import { Globals } from "./globals.slint";
+
+export component EmptyTab inherits Rectangle {
+    in-out property <int> section-index;
+
+    Text {
+        text: "No tab open";
+    }
+
+    TouchArea {
+        pointer-event(e) => {
+            return Globals.scene-pointer-event(section-index, self.mouse-x, self.mouse-y, root.width, root.height, e);
+        }
+        scroll-event(e) => {
+            return Globals.scene-scrolled(section-index, self.mouse-x, self.mouse-y, root.width, root.height, e);
+        }
+    }
+}

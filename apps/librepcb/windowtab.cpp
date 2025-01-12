@@ -38,9 +38,9 @@ namespace app {
  *  Constructors / Destructor
  ******************************************************************************/
 
-WindowTab::WindowTab(GuiApplication& app, std::shared_ptr<ProjectEditor> prj,
-                     ui::TabType type, int objIndex, const QString& title,
-                     QObject* parent) noexcept
+WindowTab::WindowTab(GuiApplication& app, ui::TabType type,
+                     std::shared_ptr<ProjectEditor> prj, int objIndex,
+                     const QString& title, QObject* parent) noexcept
   : QObject(parent),
     mUiData{type, q2s(title), slint::Brush()},
     mProject(prj),

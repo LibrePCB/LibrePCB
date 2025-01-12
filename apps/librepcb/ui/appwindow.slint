@@ -7,10 +7,9 @@ import { HomePanel } from "./homepanel.slint";
 import { MenuBar } from "./menubar.slint";
 import { WindowSection } from "./windowsection.slint";
 import { Globals, Tab, ActionId } from "./globals.slint";
-import { NewLibraryPopup } from "./library/newlibrarypopup.slint";
-import { CreateLocalLibraryGlobals } from "./library/newlibrarypopup.slint";
+import { CreateLibraryGlobals } from "./library/createlibrarytab.slint";
 
-export { Globals, CreateLocalLibraryGlobals }
+export { Globals, CreateLibraryGlobals }
 
 export component AppWindow inherits Window {
     property <length> panel-width: (self.width <= 800px) ? 250px : 350px;
@@ -44,10 +43,6 @@ export component AppWindow inherits Window {
         y: sidebar.y;
         width: panel-width;
         height: sidebar.height;
-
-        action-triggered(id) => {
-            action-triggered(id);
-        }
     }
 
     if sidebar.page == MainPage.project: ProjectPanel {
@@ -145,20 +140,5 @@ export component AppWindow inherits Window {
                 }
             }
         }
-    }
-
-    function action-triggered(id: ActionId) {
-        if id == ActionId.create-local-library {
-            new-library-popup.show();
-        } else if id == ActionId.download-library-by-url {
-            //parent.background = #ff0000;
-        }
-    }
-
-    new-library-popup := NewLibraryPopup {
-        x: (root.width - self.width) / 2;
-        y: (root.height - self.height) / 2;
-        width: min(self.preferred-width, parent.width * 0.9, 620px);
-        height: self.preferred-height;
     }
 }

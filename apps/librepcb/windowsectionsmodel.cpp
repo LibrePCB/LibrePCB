@@ -60,21 +60,25 @@ WindowSectionsModel::~WindowSectionsModel() noexcept {
  *  General Methods
  ******************************************************************************/
 
+void WindowSectionsModel::openCreateLibraryTab() noexcept {
+  addTab(ui::TabType::CreateLibrary, nullptr, -1);
+}
+
 void WindowSectionsModel::openSchematic(std::shared_ptr<ProjectEditor> prj,
                                         int index) noexcept {
-  addTab(prj, ui::TabType::Schematic, index);
+  addTab(ui::TabType::Schematic, prj, index);
 }
 
 void WindowSectionsModel::openBoard(std::shared_ptr<ProjectEditor> prj,
                                     int index) noexcept {
-  addTab(prj, ui::TabType::Board2d, index);
+  addTab(ui::TabType::Board2d, prj, index);
 }
 
 void WindowSectionsModel::openBoard3dViewer(int section, int tab) noexcept {
   if (std::shared_ptr<WindowSection> s = mItems.value(section)) {
     if (std::shared_ptr<WindowTab> t = s->getTab(tab)) {
       if (auto prj = t->getProject()) {
-        addTab(prj, ui::TabType::Board3d, t->getObjIndex());
+        addTab(ui::TabType::Board3d, prj, t->getObjIndex());
       }
     }
   }
@@ -217,8 +221,9 @@ std::optional<ui::WindowSection> WindowSectionsModel::row_data(
  *  Private Methods
  ******************************************************************************/
 
-void WindowSectionsModel::addTab(std::shared_ptr<ProjectEditor> prj,
-                                 ui::TabType type, int objIndex) noexcept {
+void WindowSectionsModel::addTab(ui::TabType type,
+                                 std::shared_ptr<ProjectEditor> prj,
+                                 int objIndex) noexcept {
   if (mItems.isEmpty()) {
     splitSection(0);
     mCurrentSection = 0;
@@ -226,7 +231,7 @@ void WindowSectionsModel::addTab(std::shared_ptr<ProjectEditor> prj,
   }
   const int section = qBound(0, mCurrentSection, mItems.count() - 1);
   if (std::shared_ptr<WindowSection> s = mItems.value(section)) {
-    s->addTab(prj, type, objIndex);
+    s->addTab(type, prj, objIndex);
     setCurrentTab(section, s->getTabCount() - 1);
   }
 }

@@ -50,6 +50,7 @@ export struct ProjectData {
 }
 
 export enum TabType {
+    create-library,
     schematic,
     board-2d,
     board-3d,
@@ -133,6 +134,9 @@ export global Globals {
     //
     // - Library ID (see Library::id)
     pure callback uninstall-library(string);
+
+    // Open the tab for creating a new library
+    pure callback open-create-library-tab();
 
     // Render a graphics scene image
     //
@@ -287,22 +291,18 @@ export global Globals {
             index: 0,
             tabs: [
                 {
+                    type: TabType.create-library,
+                    title: "New Lib",
+                },
+                {
                     type: TabType.schematic,
-                    index: 0,
-                    title: "Tab 1",
+                    title: "Schematic",
                     overlay-color: Colors.black,
                 },
                 {
                     type: TabType.board-2d,
-                    index: 0,
-                    title: "Tab 2",
+                    title: "Board",
                     overlay-color: Colors.white,
-                },
-                {
-                    type: TabType.schematic,
-                    index: 1,
-                    title: "Tab 3",
-                    overlay-color: Colors.black,
                 },
             ],
             tab-index: 0,
@@ -313,7 +313,7 @@ export global Globals {
                 {
                     type: TabType.board-3d,
                     index: 1,
-                    title: "Tab 6",
+                    title: "3D",
                     overlay-color: Colors.gray,
                 },
             ],

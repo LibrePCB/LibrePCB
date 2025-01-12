@@ -56,7 +56,7 @@ static QString getTitle(std::shared_ptr<ProjectEditor> prj, int boardIndex) {
 
 Board3dTab::Board3dTab(GuiApplication& app, std::shared_ptr<ProjectEditor> prj,
                        int boardIndex, QObject* parent) noexcept
-  : WindowTab(app, prj, ui::TabType::Board3d, boardIndex,
+  : WindowTab(app, ui::TabType::Board3d, prj, boardIndex,
               getTitle(prj, boardIndex), parent),
     mAnimation(new QVariantAnimation(this)) {
   mAnimation->setDuration(500);
