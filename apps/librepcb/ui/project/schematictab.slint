@@ -1,0 +1,53 @@
+import { Globals, Tab, TabType, Tab } from "../globals.slint";
+import { SceneButton } from "../scenebutton.slint";
+
+export component SchematicTab inherits Image {
+    in-out property <int> section-index;
+    in-out property <int> tab-index;
+    in-out property <Tab> tab;
+    in-out property <int> frame;
+
+    image-fit: ImageFit.preserve;
+    image-rendering: ImageRendering.pixelated;
+    source: Globals.render-scene(section-index, tab-index, root.width, root.height, frame);
+
+    TouchArea {
+        pointer-event(e) => {
+            return Globals.scene-pointer-event(section-index, self.mouse-x, self.mouse-y, root.width, root.height, e);
+        }
+        scroll-event(e) => {
+            return Globals.scene-scrolled(section-index, self.mouse-x, self.mouse-y, root.width, root.height, e);
+        }
+    }
+
+    VerticalLayout {
+        x: parent.width - self.preferred-width - 10px;
+        y: 10px;
+        width: self.preferred-width;
+        spacing: 5px;
+
+        SceneButton {
+            image: @image-url("../img/zoom-fit.svg");
+            colorize: tab.overlay-color;
+            clicked => {
+                Globals.scene-zoom-fit-clicked(section-index, root.width, root.height);
+            }
+        }
+
+        SceneButton {
+            image: @image-url("../img/zoom-in.svg");
+            colorize: tab.overlay-color;
+            clicked => {
+                Globals.scene-zoom-in-clicked(section-index, root.width, root.height);
+            }
+        }
+
+        SceneButton {
+            image: @image-url("../img/zoom-out.svg");
+            colorize: tab.overlay-color;
+            clicked => {
+                Globals.scene-zoom-out-clicked(section-index, root.width, root.height);
+            }
+        }
+    }
+}

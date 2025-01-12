@@ -24,6 +24,7 @@
 
 #include "board2dtab.h"
 #include "board3dtab.h"
+#include "createlibrarytab.h"
 #include "schematictab.h"
 
 #include <QtCore>
@@ -51,10 +52,15 @@ WindowTabsModel::~WindowTabsModel() noexcept {
  *  General Methods
  ******************************************************************************/
 
-void WindowTabsModel::addTab(std::shared_ptr<ProjectEditor> prj,
-                             ui::TabType type, int objIndex) noexcept {
+void WindowTabsModel::addTab(ui::TabType type,
+                             std::shared_ptr<ProjectEditor> prj,
+                             int objIndex) noexcept {
   std::shared_ptr<WindowTab> t;
   switch (type) {
+    case ui::TabType::CreateLibrary: {
+      t = std::make_shared<CreateLibraryTab>(mApp, this);
+      break;
+    }
     case ui::TabType::Schematic: {
       t = std::make_shared<SchematicTab>(mApp, prj, objIndex, this);
       break;

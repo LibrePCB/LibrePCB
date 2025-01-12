@@ -58,27 +58,54 @@ public:
   // Constructors / Destructor
   WindowTab() = delete;
   WindowTab(const WindowTab& other) = delete;
-  explicit WindowTab(GuiApplication& app, std::shared_ptr<ProjectEditor> prj,
-                     ui::TabType type, int objIndex, const QString& title,
-                     QObject* parent = nullptr) noexcept;
+  explicit WindowTab(GuiApplication& app, ui::TabType type,
+                     std::shared_ptr<ProjectEditor> prj, int objIndex,
+                     const QString& title, QObject* parent = nullptr) noexcept;
   virtual ~WindowTab() noexcept;
 
   // General Methods
   const ui::Tab& getUiData() const noexcept { return mUiData; }
   std::shared_ptr<ProjectEditor> getProject() noexcept { return mProject; }
   int getObjIndex() const noexcept { return mObjIndex; }
-  virtual void activate() noexcept = 0;
-  virtual void deactivate() noexcept = 0;
-  virtual slint::Image renderScene(float width, float height) noexcept = 0;
+  virtual void activate() noexcept {}
+  virtual void deactivate() noexcept {}
+  virtual slint::Image renderScene(float width, float height) noexcept {
+    Q_UNUSED(width);
+    Q_UNUSED(height);
+    return slint::Image();
+  }
   virtual bool processScenePointerEvent(
       float x, float y, float width, float height,
-      slint::private_api::PointerEvent e) noexcept = 0;
+      slint::private_api::PointerEvent e) noexcept {
+    Q_UNUSED(x);
+    Q_UNUSED(y);
+    Q_UNUSED(width);
+    Q_UNUSED(height);
+    Q_UNUSED(e);
+    return false;
+  }
   virtual bool processSceneScrolled(
       float x, float y, float width, float height,
-      slint::private_api::PointerScrollEvent e) noexcept = 0;
-  virtual void zoomFit(float width, float height) noexcept = 0;
-  virtual void zoomIn(float width, float height) noexcept = 0;
-  virtual void zoomOut(float width, float height) noexcept = 0;
+      slint::private_api::PointerScrollEvent e) noexcept {
+    Q_UNUSED(x);
+    Q_UNUSED(y);
+    Q_UNUSED(width);
+    Q_UNUSED(height);
+    Q_UNUSED(e);
+    return false;
+  }
+  virtual void zoomFit(float width, float height) noexcept {
+    Q_UNUSED(width);
+    Q_UNUSED(height);
+  }
+  virtual void zoomIn(float width, float height) noexcept {
+    Q_UNUSED(width);
+    Q_UNUSED(height);
+  }
+  virtual void zoomOut(float width, float height) noexcept {
+    Q_UNUSED(width);
+    Q_UNUSED(height);
+  }
 
   // Operator Overloadings
   WindowTab& operator=(const WindowTab& rhs) = delete;

@@ -64,11 +64,13 @@ public:
   QString setName(const QString& input) noexcept;
   QString getName() const noexcept { return mName ? **mName : QString(); }
   QString setDescription(const QString& input) noexcept;
-  QString getDescription() const noexcept {return mDescription;}
+  QString getDescription() const noexcept { return mDescription; }
   QString setAuthor(const QString& input) noexcept;
-  QString getAuthor() const noexcept {return mAuthor;}
+  QString getAuthor() const noexcept { return mAuthor; }
   QString setVersion(const QString& input) noexcept;
-  QString getVersion() const noexcept {return mVersion ? mVersion->toStr() : QString();}
+  QString getVersion() const noexcept {
+    return mVersion ? mVersion->toStr() : QString();
+  }
   QString setDirectory(const QString& input, const QString& fallback) noexcept;
   QString getDirectory() const noexcept {
     return mDirectory ? **mDirectory : QString();

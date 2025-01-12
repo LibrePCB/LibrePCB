@@ -55,7 +55,7 @@ static QString getTitle(std::shared_ptr<ProjectEditor> prj,
 SchematicTab::SchematicTab(GuiApplication& app,
                            std::shared_ptr<ProjectEditor> prj,
                            int schematicIndex, QObject* parent) noexcept
-  : GraphicsSceneTab(app, prj, ui::TabType::Schematic, schematicIndex,
+  : GraphicsSceneTab(app, ui::TabType::Schematic, prj, schematicIndex,
                      getTitle(prj, schematicIndex), Qt::white, parent) {
 }
 
