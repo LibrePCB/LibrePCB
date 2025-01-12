@@ -39,7 +39,6 @@ class Workspace;
 namespace editor {
 namespace app {
 
-class CreateLibraryTabsModel;
 class FavoriteProjectsModel;
 class LibrariesModel;
 class MainWindow;
@@ -66,7 +65,6 @@ public:
   // Getters
   Workspace& getWorkspace() noexcept { return mWorkspace; }
   ProjectsModel& getProjects() noexcept { return *mProjects; }
-  auto getCreateLibraryTabs() noexcept { return mCreateLibraryTabs; }
 
   // General Methods
   void exec();
@@ -83,7 +81,6 @@ private:
   std::shared_ptr<FavoriteProjectsModel> mFavoriteProjects;
   std::shared_ptr<LibrariesModel> mLibraries;
   std::shared_ptr<ProjectsModel> mProjects;
-  std::shared_ptr<CreateLibraryTabsModel> mCreateLibraryTabs;
   QList<std::shared_ptr<MainWindow>> mWindows;
 };
 

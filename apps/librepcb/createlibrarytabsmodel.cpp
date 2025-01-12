@@ -23,6 +23,9 @@
 #include "createlibrarytabsmodel.h"
 
 #include "createlibrarytab.h"
+#include "windowsection.h"
+#include "windowsectionsmodel.h"
+#include "windowtabsmodel.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -38,10 +41,15 @@ namespace app {
  *  Constructors / Destructor
  ******************************************************************************/
 
-CreateLibraryTabsModel::CreateLibraryTabsModel(GuiApplication& app,
-                                               QObject* parent) noexcept
-  : QObject(parent), mItems() {
-  mItems.push_back(std::make_shared<CreateLibraryTab>(app, this));
+CreateLibraryTabsModel::CreateLibraryTabsModel(
+    std::shared_ptr<WindowSectionsModel> sections, QObject* parent) noexcept
+  : QObject(parent), mSections(sections) {
+  auto t = new QTimer();
+  t->setInterval(1000);
+  connect(t, &QTimer::timeout, this, [this](){
+    row_changed(0x00010002);
+  });
+  t->start();
 }
 
 CreateLibraryTabsModel::~CreateLibraryTabsModel() noexcept {
@@ -56,22 +64,32 @@ CreateLibraryTabsModel::~CreateLibraryTabsModel() noexcept {
  ******************************************************************************/
 
 std::size_t CreateLibraryTabsModel::row_count() const {
-  return mItems.size();
+  return 0x00010002;
 }
 
 std::optional<ui::CreateLibraryTabData> CreateLibraryTabsModel::row_data(
-    std::size_t i) const {
-  if (std::shared_ptr<CreateLibraryTab> s = mItems.value(i)) {
-    return s->getUiData();
-  } else {
-    return std::nullopt;
+    std::size_t tabId) const {
+  const int sectionId = tabId & 0xFFFF0000;
+  if (auto section = mSections->getSection(sectionId)) {
+    if (auto tab = section->getTabById(tabId)) {
+      if (auto ptr = std::dynamic_pointer_cast<CreateLibraryTab>(tab)) {
+        return ptr->getUiData();
+      }
+    }
   }
+  return std::nullopt;
 }
 
 void CreateLibraryTabsModel::set_row_data(
-    size_t index, const ui::CreateLibraryTabData& data) {
-  if (std::shared_ptr<CreateLibraryTab> s = mItems.value(index)) {
-    return s->setUiData(data);
+    size_t tabId, const ui::CreateLibraryTabData& data) {
+  const int sectionId = tabId & 0xFFFF0000;
+  if (auto section = mSections->getSection(sectionId)) {
+    if (auto tab = section->getTabById(tabId)) {
+      if (auto ptr = std::dynamic_pointer_cast<CreateLibraryTab>(tab)) {
+        ptr->setUiData(data);
+        return;
+      }
+    }
   }
 }
 

@@ -35,6 +35,7 @@ namespace librepcb {
 namespace editor {
 namespace app {
 
+class CreateLibraryTabsModel;
 class GuiApplication;
 class LibraryCreator;
 class ProjectEditor;
@@ -70,7 +71,7 @@ private:
   GuiApplication& mApp;
   std::shared_ptr<WindowSectionsModel> mSections;
   std::shared_ptr<ProjectEditor> mCurrentProject;
-  std::shared_ptr<LibraryCreator> mLibraryCreator;
+  std::shared_ptr<CreateLibraryTabsModel> mCreateLibraryTabs;
   slint::ComponentHandle<ui::AppWindow> mWindow;
 };
 

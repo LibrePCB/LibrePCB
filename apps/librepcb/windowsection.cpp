@@ -44,7 +44,7 @@ namespace app {
 WindowSection::WindowSection(GuiApplication& app, int id,
                              QObject* parent) noexcept
   : QObject(parent),
-    mTabsModel(new WindowTabsModel(app, this)),
+    mTabsModel(new WindowTabsModel(app, id, this)),
     mUiData{id, mTabsModel, -1, 0} {
   connect(mTabsModel.get(), &WindowTabsModel::cursorCoordinatesChanged, this,
           &WindowSection::cursorCoordinatesChanged);
@@ -66,7 +66,11 @@ std::size_t WindowSection::getTabCount() const noexcept {
 }
 
 std::shared_ptr<WindowTab> WindowSection::getTab(int index) noexcept {
-  return mTabsModel->getTab(index);
+  return mTabsModel->getTabByIndex(index);
+}
+
+std::shared_ptr<WindowTab> WindowSection::getTabById(int id) noexcept {
+  return mTabsModel->getTabById(id);
 }
 
 std::shared_ptr<ProjectEditor> WindowSection::getCurrentProject() noexcept {

@@ -38,13 +38,23 @@ namespace app {
  *  Constructors / Destructor
  ******************************************************************************/
 
-CreateLibraryTab::CreateLibraryTab(GuiApplication& app,
+CreateLibraryTab::CreateLibraryTab(GuiApplication& app, int id,
                                    QObject* parent) noexcept
-  : WindowTab(app, ui::TabType::CreateLibrary, nullptr, -1, tr("New Library"),
+  : WindowTab(app, id, ui::TabType::CreateLibrary, nullptr, -1, tr("New Library"),
               parent),
     mUiData() {
   mUiData.used = true;
   mUiData.name = q2s(tr("My Library"));
+  mUiData.description = q2s(QString("foo! %1").arg(id, 8, 16, QChar('0')));
+
+  auto t = new QTimer();
+  t->setInterval(1000);
+  connect(t, &QTimer::timeout, this, [this](){
+    mUiData.version_default = q2s(QDateTime::currentDateTime().toString());
+    mUiData.valid = !mUiData.valid;
+    emit uiDataChanged();
+  });
+  t->start();
 }
 
 CreateLibraryTab::~CreateLibraryTab() noexcept {
@@ -63,6 +73,7 @@ void CreateLibraryTab::deactivate() noexcept {
 void CreateLibraryTab::setUiData(
     const ui::CreateLibraryTabData& data) noexcept {
   mUiData = data;
+  qDebug() << data.description.begin();
 }
 
 /*******************************************************************************

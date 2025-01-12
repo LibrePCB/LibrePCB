@@ -59,7 +59,7 @@ public:
   // Constructors / Destructor
   Board2dTab() = delete;
   Board2dTab(const Board2dTab& other) = delete;
-  explicit Board2dTab(GuiApplication& app, std::shared_ptr<ProjectEditor> prj,
+  explicit Board2dTab(GuiApplication& app, int id,std::shared_ptr<ProjectEditor> prj,
                       int boardIndex, QObject* parent = nullptr) noexcept;
   virtual ~Board2dTab() noexcept;
 
