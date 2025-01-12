@@ -4,7 +4,13 @@ export component EmptyTab inherits Rectangle {
     in-out property <int> section-index;
 
     Text {
-        text: "No tab open";
+        width: 90%;
+        color: gray;
+        horizontal-alignment: center;
+        vertical-alignment: center;
+        font-size: 30px;
+        wrap: word-wrap;
+        text: @tr("Open a library, schematic or board.");
     }
 
     TouchArea {

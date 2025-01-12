@@ -124,7 +124,7 @@ export component WindowSection inherits Rectangle {
                 }
             }
 
-            if section.tabs.length == 0: Rectangle {
+            if (Globals.sections.length > 1) && (section.tabs.length == 0): Rectangle {
                 width: self.height;
                 background: ta-section-close.has-hover ? #454545 : transparent;
                 border-radius: 3px;
@@ -147,7 +147,7 @@ export component WindowSection inherits Rectangle {
     if (!tab-open): EmptyTab {
         x: 0;
         y: tab-bar.height;
-        width: min(root.width, 620px);
+        width: root.width;
         height: parent.height - self.y;
         section-index: section.index;
     }
@@ -155,10 +155,12 @@ export component WindowSection inherits Rectangle {
     if (tab-open) && (tab-type == TabType.create-library): CreateLibraryTab {
         x: 0;
         y: tab-bar.height;
-        width: min(root.width, 620px);
+        width: parent.width;
         height: parent.height - self.y;
         section-index: section.index;
         tab-index: section.tab-index;
+        data-model: Globals.create-library-tab-data;
+        data-index: section.tabs[section.tab-index].data-index;
     }
 
     if (tab-open) && (tab-type == TabType.schematic): SchematicTab {

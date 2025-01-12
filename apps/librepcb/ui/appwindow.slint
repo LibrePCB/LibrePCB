@@ -63,16 +63,6 @@ export component AppWindow inherits Window {
             width: 1px;
         }
 
-        if Globals.sections.length == 0: Text {
-            width: parent.width;
-            color: gray;
-            horizontal-alignment: TextHorizontalAlignment.center;
-            vertical-alignment: TextVerticalAlignment.center;
-            font-size: 30px;
-            wrap: TextWrap.word-wrap;
-            text: @tr("Open a library, schematic or board.");
-        }
-
         for section[i] in Globals.sections: HorizontalLayout {
             WindowSection {
                 section: section;

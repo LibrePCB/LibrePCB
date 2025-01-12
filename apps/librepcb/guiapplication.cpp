@@ -35,7 +35,7 @@
 #include <librepcb/core/types/lengthunit.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
-
+#include "createlibrarytabsmodel.h"
 #include <QtCore>
 
 /*******************************************************************************
@@ -55,7 +55,8 @@ GuiApplication::GuiApplication(Workspace& ws, QObject* parent) noexcept
     mRecentProjects(new RecentProjectsModel(ws, this)),
     mFavoriteProjects(new FavoriteProjectsModel(ws, this)),
     mLibraries(new LibrariesModel(ws, this)),
-    mProjects(new ProjectsModel(this)) {
+    mProjects(new ProjectsModel(this)),
+    mCreateLibraryTabs(new CreateLibraryTabsModel(*this, this)) {
   mWorkspace.getLibraryDb().startLibraryRescan();
   createNewWindow();
 }

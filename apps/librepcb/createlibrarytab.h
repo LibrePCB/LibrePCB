@@ -56,11 +56,16 @@ public:
   virtual ~CreateLibraryTab() noexcept;
 
   // General Methods
+  const ui::CreateLibraryTabData& getUiData() const noexcept { return mUiData; }
+  void setUiData(const ui::CreateLibraryTabData& data) noexcept;
   void activate() noexcept override;
   void deactivate() noexcept override;
 
   // Operator Overloadings
   CreateLibraryTab& operator=(const CreateLibraryTab& rhs) = delete;
+
+private:
+  ui::CreateLibraryTabData mUiData;
 };
 
 /*******************************************************************************

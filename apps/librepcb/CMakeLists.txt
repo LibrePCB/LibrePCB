@@ -21,6 +21,8 @@ add_executable(
   board3dtab.h
   createlibrarytab.cpp
   createlibrarytab.h
+  createlibrarytabsmodel.cpp
+  createlibrarytabsmodel.h
   graphicsscenetab.cpp
   graphicsscenetab.h
   guiapplication.cpp

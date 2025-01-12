@@ -50,7 +50,8 @@ namespace app {
 
 WindowSectionsModel::WindowSectionsModel(GuiApplication& app,
                                          QObject* parent) noexcept
-  : QObject(parent), mApp(app), mItems(), mCurrentSection(-1) {
+  : QObject(parent), mApp(app), mItems(), mCurrentSection(0) {
+  splitSection(0);
 }
 
 WindowSectionsModel::~WindowSectionsModel() noexcept {
@@ -103,6 +104,9 @@ void WindowSectionsModel::splitSection(int section) noexcept {
 }
 
 void WindowSectionsModel::closeSection(int section) noexcept {
+  if (mItems.count() <= 1) {
+    return; // Do not allow to close the last section.
+  }
   if (auto s = mItems.value(section)) {
     for (std::size_t i = 0; i < s->getTabCount(); ++i) {
       s->closeTab(i);
@@ -224,11 +228,6 @@ std::optional<ui::WindowSection> WindowSectionsModel::row_data(
 void WindowSectionsModel::addTab(ui::TabType type,
                                  std::shared_ptr<ProjectEditor> prj,
                                  int objIndex) noexcept {
-  if (mItems.isEmpty()) {
-    splitSection(0);
-    mCurrentSection = 0;
-    emit currentSectionChanged(mCurrentSection);
-  }
   const int section = qBound(0, mCurrentSection, mItems.count() - 1);
   if (std::shared_ptr<WindowSection> s = mItems.value(section)) {
     s->addTab(type, prj, objIndex);
