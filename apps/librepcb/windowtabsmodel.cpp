@@ -41,8 +41,8 @@ namespace app {
  *  Constructors / Destructor
  ******************************************************************************/
 
-WindowTabsModel::WindowTabsModel(GuiApplication& app, QObject* parent) noexcept
-  : QObject(parent), mApp(app), mItems() {
+WindowTabsModel::WindowTabsModel(GuiApplication& app, int sectionId, QObject* parent) noexcept
+  : QObject(parent), mApp(app), mSectionId(sectionId), mItems(), mNextId(1) {
 }
 
 WindowTabsModel::~WindowTabsModel() noexcept {
@@ -52,25 +52,30 @@ WindowTabsModel::~WindowTabsModel() noexcept {
  *  General Methods
  ******************************************************************************/
 
+std::shared_ptr<WindowTab> WindowTabsModel::getTabById(int id) noexcept {
+  return mItems.value(mIndex.value(id, -1));
+}
+
 void WindowTabsModel::addTab(ui::TabType type,
                              std::shared_ptr<ProjectEditor> prj,
                              int objIndex) noexcept {
   std::shared_ptr<WindowTab> t;
+  const int id = mSectionId | mNextId++;
   switch (type) {
     case ui::TabType::CreateLibrary: {
-      t = std::make_shared<CreateLibraryTab>(mApp, this);
+      t = std::make_shared<CreateLibraryTab>(mApp, id, this);
       break;
     }
     case ui::TabType::Schematic: {
-      t = std::make_shared<SchematicTab>(mApp, prj, objIndex, this);
+      t = std::make_shared<SchematicTab>(mApp, id, prj, objIndex, this);
       break;
     }
     case ui::TabType::Board2d: {
-      t = std::make_shared<Board2dTab>(mApp, prj, objIndex, this);
+      t = std::make_shared<Board2dTab>(mApp, id, prj, objIndex, this);
       break;
     }
     case ui::TabType::Board3d: {
-      t = std::make_shared<Board3dTab>(mApp, prj, objIndex, this);
+      t = std::make_shared<Board3dTab>(mApp, id, prj, objIndex, this);
       break;
     }
     default: {
@@ -82,6 +87,7 @@ void WindowTabsModel::addTab(ui::TabType type,
   connect(t.get(), &WindowTab::requestRepaint, this,
           &WindowTabsModel::requestRepaint);
   mItems.append(t);
+  updateIndex();
   row_added(mItems.count() - 1, 1);
 }
 
@@ -89,6 +95,7 @@ void WindowTabsModel::closeTab(int index) noexcept {
   const int tabCount = static_cast<int>(row_count());
   if ((index >= 0) && (index < tabCount)) {
     mItems.remove(index);
+    updateIndex();
     row_removed(index, 1);
   }
 }
@@ -97,7 +104,7 @@ void WindowTabsModel::setCurrentTab(int index) noexcept {
   for (auto t : mItems) {
     t->deactivate();
   }
-  if (std::shared_ptr<WindowTab> t = getTab(index)) {
+  if (std::shared_ptr<WindowTab> t = mItems.value(index)) {
     t->activate();
   }
 }
@@ -115,6 +122,17 @@ std::optional<ui::Tab> WindowTabsModel::row_data(std::size_t i) const {
     return s->getUiData();
   } else {
     return std::nullopt;
+  }
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+void WindowTabsModel::updateIndex() noexcept {
+  mIndex.clear();
+  for (int i = 0; i < mItems.count(); ++i) {
+    mIndex.insert(mItems.at(i)->getId(), i);
   }
 }
 

@@ -25,7 +25,6 @@
 #include "apptoolbox.h"
 #include "createlibrarytabsmodel.h"
 #include "guiapplication.h"
-#include "library/librarycreator.h"
 #include "project/projecteditor.h"
 #include "project/projectsmodel.h"
 #include "windowsectionsmodel.h"
@@ -59,7 +58,7 @@ MainWindow::MainWindow(GuiApplication& app,
     mApp(app),
     mSections(new WindowSectionsModel(app, this)),
     mCurrentProject(),
-    mLibraryCreator(new LibraryCreator(app.getWorkspace(), this)),
+    mCreateLibraryTabs(new CreateLibraryTabsModel(mSections, this)),
     mWindow(win) {
   // Set initial data.
   const ui::Globals& g = mWindow->global<ui::Globals>();
@@ -111,12 +110,12 @@ MainWindow::MainWindow(GuiApplication& app,
       std::placeholders::_2, std::placeholders::_3));
 
   // Set models.
-  g.set_create_library_tab_data(mApp.getCreateLibraryTabs());
+  g.set_create_library_tabs(mCreateLibraryTabs);
   g.set_sections(mSections);
 
   // Create library tab.
   g.on_open_create_library_tab([this]() { mSections->openCreateLibraryTab(); });
-  {
+  /*{
     const ui::CreateLibraryGlobals& g =
         mWindow->global<ui::CreateLibraryGlobals>();
     g.on_get_name([this]() { return q2s(mLibraryCreator->getName()); });
@@ -136,7 +135,7 @@ MainWindow::MainWindow(GuiApplication& app,
 
     // connect(mLibraryCreator.get(), &LibraryCreator::validChanged, this,
     //         [&g](bool valid) { g.set_valid(valid); });
-  }
+  }*/
 
   // Connect model callbacks.
   connect(mSections.get(), &WindowSectionsModel::currentSectionIdChanged, this,

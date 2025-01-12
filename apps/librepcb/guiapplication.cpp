@@ -23,7 +23,6 @@
 #include "guiapplication.h"
 
 #include "apptoolbox.h"
-#include "createlibrarytabsmodel.h"
 #include "library/librariesmodel.h"
 #include "mainwindow.h"
 #include "project/projecteditor.h"
@@ -56,8 +55,7 @@ GuiApplication::GuiApplication(Workspace& ws, QObject* parent) noexcept
     mRecentProjects(new RecentProjectsModel(ws, this)),
     mFavoriteProjects(new FavoriteProjectsModel(ws, this)),
     mLibraries(new LibrariesModel(ws, this)),
-    mProjects(new ProjectsModel(this)),
-    mCreateLibraryTabs(new CreateLibraryTabsModel(*this, this)) {
+    mProjects(new ProjectsModel(this)) {
   mWorkspace.getLibraryDb().startLibraryRescan();
   createNewWindow();
 }
