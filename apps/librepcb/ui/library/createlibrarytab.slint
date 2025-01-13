@@ -1,43 +1,11 @@
 import { Button, LineEdit, CheckBox } from "std-widgets.slint";
 import { LineEdit } from "../lineedit.slint";
-import { Globals, CreateLibraryTabData } from "../globals.slint";
-
-
-
-global Locals {
-    pure callback get-name() -> string;
-    pure callback set-name(int, int, string) -> string;
-
-    pure callback get-description() -> string;
-    pure callback description-edited(string) -> string;
-
-    pure callback get-author() -> string;
-    pure callback get-author-fallback() -> string;
-    pure callback author-edited(value: string, fallback: string) -> string;
-
-    pure callback get-version() -> string;
-    pure callback get-version-fallback() -> string;
-    pure callback version-edited(value: string, fallback: string) -> string;
-
-    pure callback get-url() -> string;
-    pure callback url-edited(string) -> string;
-
-    pure callback get-cc0() -> bool;
-    pure callback cc0-toggled(bool);
-
-    pure callback get-directory() -> string;
-    pure callback get-directory-fallback(name: string) -> string;
-    pure callback directory-edited(value: string, fallback: string) -> string;
-
-    pure callback create() -> string;
-}
-
-export {Locals as CreateLibraryGlobals}
+import { Globals, WindowSection, CreateLibraryTabData } from "../globals.slint";
 
 export component CreateLibraryTab inherits Rectangle {
-    in property <int> section-id;
-    in property <int> tab-id;
-    in-out property <[CreateLibraryTabData]> data-model;
+    in property <int> section-index;
+    in-out property <WindowSection> section;
+    property <[CreateLibraryTabData]> tabs: section.create-library-tabs;
 
     GridLayout {
         padding: 10px;
@@ -77,10 +45,11 @@ export component CreateLibraryTab inherits Rectangle {
             }
 
             le-name := LineEdit {
-                text: data-model[tab-id].name;
+                text: tabs[section.current-tab-index].name;
+                validation-error: tabs[section.current-tab-index].name-error;
 
                 changed text => {
-                    data-model[tab-id].name = self.text;
+                    tabs[section.current-tab-index].name = self.text;
                 }
             }
         }
@@ -92,10 +61,10 @@ export component CreateLibraryTab inherits Rectangle {
             }
 
             le-description := LineEdit {
-                text: data-model[tab-id].description;
+                text: tabs[section.current-tab-index].description;
 
                 changed text => {
-                    data-model[tab-id].description = self.text;
+                    tabs[section.current-tab-index].description = self.text;
                 }
             }
         }
@@ -107,8 +76,12 @@ export component CreateLibraryTab inherits Rectangle {
             }
 
             le-author := LineEdit {
-                text: data-model[tab-id].author;
-                placeholder-text: data-model[tab-id].author-default;
+                text: tabs[section.current-tab-index].author;
+                placeholder-text: tabs[section.current-tab-index].author-default;
+
+                changed text => {
+                    tabs[section.current-tab-index].author = self.text;
+                }
             }
         }
 
@@ -119,7 +92,13 @@ export component CreateLibraryTab inherits Rectangle {
             }
 
             le-version := LineEdit {
-                placeholder-text: data-model[tab-id].version-default;
+                text: tabs[section.current-tab-index].version;
+                placeholder-text: tabs[section.current-tab-index].version-default;
+                validation-error: tabs[section.current-tab-index].version-error;
+
+                changed text => {
+                    tabs[section.current-tab-index].version = self.text;
+                }
             }
         }
 
@@ -130,14 +109,12 @@ export component CreateLibraryTab inherits Rectangle {
             }
 
             le-url := LineEdit {
+                text: tabs[section.current-tab-index].url;
                 placeholder-text: @tr("e.g. URL to the Git repository (optional)");
+                validation-error: tabs[section.current-tab-index].url-error;
 
-                init => {
-                    self.text = Locals.get-url();
-                }
-
-                input-handler(t) => {
-                    Locals.url-edited(t);
+                changed text => {
+                    tabs[section.current-tab-index].url = self.text;
                 }
             }
         }
@@ -153,10 +130,10 @@ export component CreateLibraryTab inherits Rectangle {
 
                 cbx-cc0 := CheckBox {
                     horizontal-stretch: 1;
-                    checked: Locals.get-cc0();
+                    checked: tabs[section.current-tab-index].cc0;
 
-                    init => {
-                        self.checked = Locals.get-cc0();
+                    changed checked => {
+                        tabs[section.current-tab-index].cc0 = self.checked;
                     }
                 }
 
@@ -180,50 +157,55 @@ export component CreateLibraryTab inherits Rectangle {
             }
 
             le-directory := LineEdit {
-                placeholder-text: Locals.get-directory-fallback(le-name.text);
+                text: tabs[section.current-tab-index].directory;
+                placeholder-text: tabs[section.current-tab-index].directory-default;
+                validation-error: tabs[section.current-tab-index].directory-error;
 
-                init => {
-                    self.text = Locals.get-directory();
-                }
-
-                input-handler(t) => {
-                    Locals.directory-edited(t, self.placeholder-text);
+                changed text => {
+                    tabs[section.current-tab-index].directory = self.text;
                 }
             }
         }
 
         Row {
+            Rectangle { }
+
             HorizontalLayout {
-                colspan: 2;
-                alignment: end;
+                horizontal-stretch: 1;
+                alignment: start;
+
+                Button {
+                    primary: true;
+                    enabled: tabs[section.current-tab-index].valid;
+                    text: @tr("Create Library");
+
+                    clicked => {
+                        if (Globals.create-library(section-index)) {
+                            Globals.tab-close-clicked(section-index, section.current-tab-index);
+                        }
+                    }
+                }
 
                 Button {
                     text: @tr("Cancel");
 
                     clicked => {
-                        Globals.tab-close-clicked(section-id, tab-id);
-                    }
-                }
-
-                Button {
-                    primary: true;
-                    enabled: data-model[tab-id].valid;
-                    text: @tr("Create Library");
-
-                    clicked => {
-                        ti-error-msg.text = Locals.create();
+                        Globals.tab-close-clicked(section-index, section.current-tab-index);
                     }
                 }
             }
         }
 
         Row {
-            ti-error-msg := TextInput {
-                colspan: 2;
+            Rectangle { }
+
+            TextInput {
+                horizontal-stretch: 1;
                 height: (self.text != "") ? self.preferred-height : 0;
                 color: red;
                 read-only: true;
                 wrap: word-wrap;
+                text: tabs[section.current-tab-index].creation-error;
             }
         }
 

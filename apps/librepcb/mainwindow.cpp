@@ -23,7 +23,6 @@
 #include "mainwindow.h"
 
 #include "apptoolbox.h"
-#include "createlibrarytabsmodel.h"
 #include "guiapplication.h"
 #include "project/projecteditor.h"
 #include "project/projectsmodel.h"
@@ -58,7 +57,6 @@ MainWindow::MainWindow(GuiApplication& app,
     mApp(app),
     mSections(new WindowSectionsModel(app, this)),
     mCurrentProject(),
-    mCreateLibraryTabs(new CreateLibraryTabsModel(mSections, this)),
     mWindow(win) {
   // Set initial data.
   const ui::Globals& g = mWindow->global<ui::Globals>();
@@ -75,8 +73,7 @@ MainWindow::MainWindow(GuiApplication& app,
     if (mCurrentProject) mSections->openBoard(mCurrentProject, index);
   });
   g.on_board_3d_clicked(std::bind(&WindowSectionsModel::openBoard3dViewer,
-                                  mSections.get(), std::placeholders::_1,
-                                  std::placeholders::_2));
+                                  mSections.get(), std::placeholders::_1));
   g.on_section_split_clicked(std::bind(&WindowSectionsModel::splitSection,
                                        mSections.get(), std::placeholders::_1));
   g.on_section_close_clicked(std::bind(&WindowSectionsModel::closeSection,
@@ -87,10 +84,13 @@ MainWindow::MainWindow(GuiApplication& app,
   g.on_tab_close_clicked(std::bind(&WindowSectionsModel::closeTab,
                                    mSections.get(), std::placeholders::_1,
                                    std::placeholders::_2));
-  g.on_render_scene(std::bind(&WindowSectionsModel::renderScene,
-                              mSections.get(), std::placeholders::_1,
-                              std::placeholders::_2, std::placeholders::_3,
-                              std::placeholders::_4, std::placeholders::_5));
+  g.on_open_create_library_tab(
+      std::bind(&WindowSectionsModel::openCreateLibraryTab, mSections.get()));
+  g.on_create_library(std::bind(&WindowSectionsModel::createLibrary,
+                                mSections.get(), std::placeholders::_1));
+  g.on_render_scene(std::bind(
+      &WindowSectionsModel::renderScene, mSections.get(), std::placeholders::_1,
+      std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
   g.on_scene_pointer_event(std::bind(
       &WindowSectionsModel::processScenePointerEvent, mSections.get(),
       std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
@@ -110,36 +110,11 @@ MainWindow::MainWindow(GuiApplication& app,
       std::placeholders::_2, std::placeholders::_3));
 
   // Set models.
-  g.set_create_library_tabs(mCreateLibraryTabs);
   g.set_sections(mSections);
 
-  // Create library tab.
-  g.on_open_create_library_tab([this]() { mSections->openCreateLibraryTab(); });
-  /*{
-    const ui::CreateLibraryGlobals& g =
-        mWindow->global<ui::CreateLibraryGlobals>();
-    g.on_get_name([this]() { return q2s(mLibraryCreator->getName()); });
-    // g.on_name_edited([this](const slint::SharedString& text) {
-    //   return q2s(mLibraryCreator->setName(s2q(text)));
-    // });
-    g.on_get_directory(
-        [this]() { return q2s(mLibraryCreator->getDirectory()); });
-    g.on_directory_edited([this](const slint::SharedString& input,
-                                 const slint::SharedString& fallback) {
-      return q2s(mLibraryCreator->setDirectory(s2q(input), s2q(fallback)));
-    });
-    g.on_get_directory_fallback([this](const slint::SharedString& name) {
-      return q2s(LibraryCreator::getDirectoryForName(s2q(name)));
-    });
-    g.on_create([this]() { return q2s(mLibraryCreator->create()); });
-
-    // connect(mLibraryCreator.get(), &LibraryCreator::validChanged, this,
-    //         [&g](bool valid) { g.set_valid(valid); });
-  }*/
-
   // Connect model callbacks.
-  connect(mSections.get(), &WindowSectionsModel::currentSectionIdChanged, this,
-          [&g](int id) { g.set_current_section_id(id); });
+  connect(mSections.get(), &WindowSectionsModel::currentSectionIndexChanged,
+          this, [&g](int index) { g.set_current_section_index(index); });
   connect(mSections.get(), &WindowSectionsModel::currentProjectChanged, this,
           &MainWindow::setCurrentProject);
   connect(

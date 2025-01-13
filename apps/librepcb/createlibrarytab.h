@@ -25,8 +25,14 @@
  ******************************************************************************/
 #include "windowtab.h"
 
+#include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/types/elementname.h>
+#include <librepcb/core/types/version.h>
+
 #include <QtCore>
 #include <QtGui>
+
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -51,7 +57,7 @@ public:
   // Constructors / Destructor
   CreateLibraryTab() = delete;
   CreateLibraryTab(const CreateLibraryTab& other) = delete;
-  explicit CreateLibraryTab(GuiApplication& app, int id,
+  explicit CreateLibraryTab(GuiApplication& app,
                             QObject* parent = nullptr) noexcept;
   virtual ~CreateLibraryTab() noexcept;
 
@@ -60,15 +66,19 @@ public:
   void setUiData(const ui::CreateLibraryTabData& data) noexcept;
   void activate() noexcept override;
   void deactivate() noexcept override;
+  bool create() noexcept;
 
   // Operator Overloadings
   CreateLibraryTab& operator=(const CreateLibraryTab& rhs) = delete;
 
-signals:
-  void uiDataChanged();
-
 private:
+  void validate() noexcept;
+
   ui::CreateLibraryTabData mUiData;
+  std::optional<ElementName> mName;
+  std::optional<Version> mVersion;
+  std::optional<QUrl> mUrl;
+  FilePath mDirectory;
 };
 
 /*******************************************************************************

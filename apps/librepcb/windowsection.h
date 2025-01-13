@@ -56,22 +56,22 @@ public:
   // Constructors / Destructor
   WindowSection() = delete;
   WindowSection(const WindowSection& other) = delete;
-  explicit WindowSection(GuiApplication& app, int id,
+  explicit WindowSection(GuiApplication& app,
                          QObject* parent = nullptr) noexcept;
   virtual ~WindowSection() noexcept;
 
   // General Methods
-  int getId() const noexcept { return mUiData.id; }
   const ui::WindowSection& getUiData() const noexcept { return mUiData; }
   std::size_t getTabCount() const noexcept;
   std::shared_ptr<WindowTab> getTab(int index) noexcept;
-  std::shared_ptr<WindowTab> getTabById(int id) noexcept;
+  std::shared_ptr<WindowTab> getCurrentTab() noexcept;
   std::shared_ptr<ProjectEditor> getCurrentProject() noexcept;
   void addTab(ui::TabType type, std::shared_ptr<ProjectEditor> prj,
               int objIndex) noexcept;
   void closeTab(int index) noexcept;
   void setCurrentTab(int index) noexcept;
-  slint::Image renderScene(int tab, float width, float height) noexcept;
+  bool createLibrary() noexcept;
+  slint::Image renderScene(float width, float height) noexcept;
   bool processScenePointerEvent(float x, float y, float width, float height,
                                 slint::private_api::PointerEvent e) noexcept;
   bool processSceneScrolled(float x, float y, float width, float height,

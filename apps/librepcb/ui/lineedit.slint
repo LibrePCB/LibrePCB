@@ -2,9 +2,7 @@ import { HorizontalBox } from "std-widgets.slint";
 export component LineEdit inherits Rectangle {
     in-out property <string> text <=> ti.text;
     in-out property <string> placeholder-text;
-    property <string> validation-error: input-handler(self.text);
-
-    pure callback input-handler(text: string) -> string;
+    in-out property <string> validation-error;
 
     height: self.preferred-height;
     horizontal-stretch: 1;
@@ -13,39 +11,59 @@ export component LineEdit inherits Rectangle {
     border-radius: 10px;
     forward-focus: ti;
 
-    HorizontalLayout {
-        padding: 8px;
-        padding-left: 10px;
-        padding-right: 10px;
+    ta := TouchArea {
+        HorizontalLayout {
+            padding: 8px;
+            padding-left: 10px;
+            padding-right: 10px;
 
-        ti := TextInput {
-            font-size: 13px;
+            ti := TextInput {
+                font-size: 13px;
+            }
         }
-    }
 
-    if (text == "") && (placeholder-text != ""): Text {
-        x: ti.x;
-        y: 0;
-        width: ti.width;
-        height: root.height;
-        color: #808080;
-        font-size: 13px;
-        vertical-alignment: center;
-        overflow: elide;
-        text: placeholder-text;
-    }
+        HorizontalLayout {
+            padding-left: 10px;
+            padding-right: 10px;
+            x: 0;
+            y: 0;
+            width: root.width;
+            height: root.height;
 
-    if validation-error != "": Text {
-        x: ti.x + ti.width - self.width;
-        y: 0;
-        width: min(self.preferred-width, parent.width / 2);
-        height: root.height;
-        color: #ff0000;
-        font-size: 10px;
-        horizontal-alignment: right;
-        vertical-alignment: center;
-        wrap: word-wrap;
-        overflow: elide;
-        text: validation-error;
+            if (text == "") && (placeholder-text != ""): Text {
+                color: #808080;
+                font-size: 13px;
+                vertical-alignment: center;
+                overflow: elide;
+                text: placeholder-text;
+            }
+
+            Rectangle {
+                horizontal-stretch: 1;
+
+                if validation-error != "": Text {
+                    x: ti.x + ti.preferred-width;
+                    width: parent.width - self.x;
+                    horizontal-alignment: right;
+                    vertical-alignment: center;
+                    font-size: 11px;
+                    wrap: word-wrap;
+                    overflow: elide;
+                    color: #ff0000;
+                    text: validation-error;
+                }
+            }
+
+            if ta.has-hover && (ti.text != ""): Image {
+                source: @image-url("img/close.svg");
+                colorize: ta-clear.has-hover ? #ffffff : #b0b0b0;
+
+                ta-clear := TouchArea {
+                    clicked => {
+                        ti.text = "";
+                    }
+                }
+            }
+        }
     }
 }

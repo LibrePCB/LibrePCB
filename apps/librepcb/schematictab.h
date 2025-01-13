@@ -56,7 +56,7 @@ public:
   // Constructors / Destructor
   SchematicTab() = delete;
   SchematicTab(const SchematicTab& other) = delete;
-  explicit SchematicTab(GuiApplication& app,int id, std::shared_ptr<ProjectEditor> prj,
+  explicit SchematicTab(GuiApplication& app, std::shared_ptr<ProjectEditor> prj,
                         int schematicIndex, QObject* parent = nullptr) noexcept;
   virtual ~SchematicTab() noexcept;
 
