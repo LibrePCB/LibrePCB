@@ -86,8 +86,10 @@ MainWindow::MainWindow(GuiApplication& app,
                                    std::placeholders::_2));
   g.on_open_create_library_tab(
       std::bind(&WindowSectionsModel::openCreateLibraryTab, mSections.get()));
-  g.on_create_library(std::bind(&WindowSectionsModel::createLibrary,
-                                mSections.get(), std::placeholders::_1));
+  g.on_open_download_library_tab(
+      std::bind(&WindowSectionsModel::openDownloadLibraryTab, mSections.get()));
+  g.on_dialog_tab_finish(std::bind(&WindowSectionsModel::finish,
+                                   mSections.get(), std::placeholders::_1));
   g.on_render_scene(std::bind(
       &WindowSectionsModel::renderScene, mSections.get(), std::placeholders::_1,
       std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));

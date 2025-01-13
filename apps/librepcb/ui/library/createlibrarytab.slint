@@ -180,9 +180,7 @@ export component CreateLibraryTab inherits Rectangle {
                     text: @tr("Create Library");
 
                     clicked => {
-                        if (Globals.create-library(section-index)) {
-                            Globals.tab-close-clicked(section-index, section.current-tab-index);
-                        }
+                        Globals.dialog-tab-finish(section-index);
                     }
                 }
 

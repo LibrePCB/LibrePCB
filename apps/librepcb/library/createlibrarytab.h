@@ -17,18 +17,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CREATELIBRARYTABSMODEL_H
-#define LIBREPCB_CREATELIBRARYTABSMODEL_H
+#ifndef LIBREPCB_LIBRARY_CREATELIBRARYTAB_H
+#define LIBREPCB_LIBRARY_CREATELIBRARYTAB_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "appwindow.h"
+#include "windowtab.h"
+
+#include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/types/elementname.h>
+#include <librepcb/core/types/version.h>
 
 #include <QtCore>
 #include <QtGui>
 
-#include <memory>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -37,38 +41,44 @@ namespace librepcb {
 namespace editor {
 namespace app {
 
-class WindowTabsModel;
+class GuiApplication;
 
 /*******************************************************************************
- *  Class CreateLibraryTabsModel
+ *  Class CreateLibraryTab
  ******************************************************************************/
 
 /**
- * @brief The CreateLibraryTabsModel class
+ * @brief The CreateLibraryTab class
  */
-class CreateLibraryTabsModel : public QObject,
-                               public slint::Model<ui::CreateLibraryTabData> {
+class CreateLibraryTab final : public WindowTab {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  CreateLibraryTabsModel() = delete;
-  CreateLibraryTabsModel(const CreateLibraryTabsModel& other) = delete;
-  explicit CreateLibraryTabsModel(std::shared_ptr<WindowTabsModel> tabs,
-                                  QObject* parent = nullptr) noexcept;
-  virtual ~CreateLibraryTabsModel() noexcept;
+  CreateLibraryTab() = delete;
+  CreateLibraryTab(const CreateLibraryTab& other) = delete;
+  explicit CreateLibraryTab(GuiApplication& app,
+                            QObject* parent = nullptr) noexcept;
+  virtual ~CreateLibraryTab() noexcept;
 
-  // Implementations
-  std::size_t row_count() const override;
-  std::optional<ui::CreateLibraryTabData> row_data(
-      std::size_t i) const override;
-  void set_row_data(size_t i, const ui::CreateLibraryTabData& data) override;
+  // General Methods
+  const ui::CreateLibraryTabData& getUiData() const noexcept { return mUiData; }
+  void setUiData(const ui::CreateLibraryTabData& data) noexcept;
+  void activate() noexcept override;
+  void deactivate() noexcept override;
+  void finish() noexcept override;
 
   // Operator Overloadings
-  CreateLibraryTabsModel& operator=(const CreateLibraryTabsModel& rhs) = delete;
+  CreateLibraryTab& operator=(const CreateLibraryTab& rhs) = delete;
 
 private:
-  std::shared_ptr<WindowTabsModel> mModel;
+  void validate() noexcept;
+
+  ui::CreateLibraryTabData mUiData;
+  std::optional<ElementName> mName;
+  std::optional<Version> mVersion;
+  std::optional<QUrl> mUrl;
+  FilePath mDirectory;
 };
 
 /*******************************************************************************

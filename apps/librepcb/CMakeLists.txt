@@ -19,14 +19,14 @@ add_executable(
   board2dtab.h
   board3dtab.cpp
   board3dtab.h
-  createlibrarytab.cpp
-  createlibrarytab.h
-  createlibrarytabsmodel.cpp
-  createlibrarytabsmodel.h
   graphicsscenetab.cpp
   graphicsscenetab.h
   guiapplication.cpp
   guiapplication.h
+  library/createlibrarytab.cpp
+  library/createlibrarytab.h
+  library/downloadlibrarytab.cpp
+  library/downloadlibrarytab.h
   library/librariesmodel.cpp
   library/librariesmodel.h
   main.cpp
@@ -48,6 +48,7 @@ add_executable(
   windowtab.h
   windowtabsmodel.cpp
   windowtabsmodel.h
+  windowtabsmodeladapter.h
   workspace/favoriteprojectsmodel.cpp
   workspace/favoriteprojectsmodel.h
   workspace/filesystemmodel.cpp

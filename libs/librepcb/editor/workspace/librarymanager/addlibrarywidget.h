@@ -64,9 +64,6 @@ public:
   explicit AddLibraryWidget(Workspace& ws) noexcept;
   ~AddLibraryWidget() noexcept;
 
-  // General Methods
-  void updateOnlineLibraryList() noexcept;
-
   // Operator Overloadings
   AddLibraryWidget& operator=(const AddLibraryWidget& rhs) = delete;
 
@@ -78,7 +75,6 @@ private:  // Methods
   void downloadZipUrlLineEditTextChanged(QString urlStr) noexcept;
   void createLocalLibraryButtonClicked() noexcept;
   void downloadZippedLibraryButtonClicked() noexcept;
-  void downloadZipFinished(bool success, const QString& errMsg) noexcept;
   void onlineLibraryListReceived(QList<ApiEndpoint::Library> libs) noexcept;
   void errorWhileFetchingLibraryList(const QString& errorMsg) noexcept;
   void clearOnlineLibraryList() noexcept;
@@ -91,7 +87,6 @@ private:  // Methods
 private:  // Data
   Workspace& mWorkspace;
   QScopedPointer<Ui::AddLibraryWidget> mUi;
-  QScopedPointer<LibraryDownload> mManualLibraryDownload;
   QList<std::shared_ptr<ApiEndpoint>> mApiEndpoints;
   bool mManualCheckStateForAllRemoteLibraries;
 };

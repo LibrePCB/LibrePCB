@@ -65,11 +65,14 @@ void WindowSectionsModel::openCreateLibraryTab() noexcept {
   addTab(ui::TabType::CreateLibrary, nullptr, -1);
 }
 
-bool WindowSectionsModel::createLibrary(int sectionIndex) noexcept {
+void WindowSectionsModel::openDownloadLibraryTab() noexcept {
+  addTab(ui::TabType::DownloadLibrary, nullptr, -1);
+}
+
+void WindowSectionsModel::finish(int sectionIndex) noexcept {
   if (std::shared_ptr<WindowSection> s = mItems.value(sectionIndex)) {
-    return s->createLibrary();
+    s->finish();
   }
-  return false;
 }
 
 void WindowSectionsModel::openSchematic(std::shared_ptr<ProjectEditor> prj,
