@@ -23,6 +23,15 @@
 #include "createlibrarytab.h"
 
 #include "apptoolbox.h"
+#include "guiapplication.h"
+
+#include <librepcb/core/application.h>
+#include <librepcb/core/fileio/fileutils.h>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/library/library.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacelibrarydb.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -38,23 +47,29 @@ namespace app {
  *  Constructors / Destructor
  ******************************************************************************/
 
-CreateLibraryTab::CreateLibraryTab(GuiApplication& app, int id,
+CreateLibraryTab::CreateLibraryTab(GuiApplication& app,
                                    QObject* parent) noexcept
-  : WindowTab(app, id, ui::TabType::CreateLibrary, nullptr, -1, tr("New Library"),
+  : WindowTab(app, ui::TabType::CreateLibrary, nullptr, -1, tr("New Library"),
               parent),
-    mUiData() {
-  mUiData.used = true;
-  mUiData.name = q2s(tr("My Library"));
-  mUiData.description = q2s(QString("foo! %1").arg(id, 8, 16, QChar('0')));
-
-  auto t = new QTimer();
-  t->setInterval(1000);
-  connect(t, &QTimer::timeout, this, [this](){
-    mUiData.version_default = q2s(QDateTime::currentDateTime().toString());
-    mUiData.valid = !mUiData.valid;
-    emit uiDataChanged();
-  });
-  t->start();
+    mUiData{
+        q2s(tr("My Library")),  // Name
+        slint::SharedString(),  // Name error
+        slint::SharedString(),  // Description
+        slint::SharedString(),  // Author
+        q2s(app.getWorkspace().getSettings().userName.get()),  // Author default
+        slint::SharedString(),  // Version
+        "0.1",  // Version default
+        slint::SharedString(),  // Version error
+        slint::SharedString(),  // // URL
+        slint::SharedString(),  // URL error
+        false,  // CC0
+        slint::SharedString(),  // Directory
+        slint::SharedString(),  // Directory default
+        slint::SharedString(),  // Directory error
+        false,  // Valid
+        slint::SharedString(),  // Creation error
+    } {
+  validate();
 }
 
 CreateLibraryTab::~CreateLibraryTab() noexcept {
@@ -73,7 +88,137 @@ void CreateLibraryTab::deactivate() noexcept {
 void CreateLibraryTab::setUiData(
     const ui::CreateLibraryTabData& data) noexcept {
   mUiData = data;
-  qDebug() << data.description.begin();
+  validate();
+}
+
+bool CreateLibraryTab::create() noexcept {
+  try {
+    if ((!mName) || (!mVersion) || (!mDirectory.isValid())) {
+      throw LogicError(__FILE__, __LINE__);
+    }
+
+    // create transactional file system
+    std::shared_ptr<TransactionalFileSystem> fs =
+        TransactionalFileSystem::openRW(mDirectory);
+    TransactionalDirectory dir(fs);
+
+    // create the new library
+    QScopedPointer<Library> lib(new Library(
+        Uuid::createRandom(), *mVersion, s2q(mUiData.author).trimmed(), *mName,
+        s2q(mUiData.description).trimmed(),
+        QString("")));  // can throw
+    if (mUrl) {
+      lib->setUrl(*mUrl);
+    }
+    try {
+      lib->setIcon(FileUtils::readFile(Application::getResourcesDir().getPathTo(
+          "library/default_image.png")));
+    } catch (const Exception& e) {
+      qCritical() << "Could not open the library image:" << e.getMsg();
+    }
+    lib->moveTo(dir);  // can throw
+
+    // copy license file
+    if (mUiData.cc0) {
+      try {
+        FilePath source =
+            Application::getResourcesDir().getPathTo("licenses/cc0-1.0.txt");
+        fs->write("LICENSE.txt", FileUtils::readFile(source));  // can throw
+      } catch (Exception& e) {
+        qCritical() << "Could not copy the license file:" << e.getMsg();
+      }
+    }
+
+    // copy readme file
+    try {
+      FilePath source =
+          Application::getResourcesDir().getPathTo("library/readme_template");
+      QByteArray content = FileUtils::readFile(source);  // can throw
+      content.replace("{LIBRARY_NAME}", (*mName)->toUtf8());
+      if (mUiData.cc0) {
+        content.replace("{LICENSE_TEXT}",
+                        "Creative Commons (CC0-1.0). For the "
+                        "license text, see [LICENSE.txt](LICENSE.txt).");
+      } else {
+        content.replace("{LICENSE_TEXT}", "No license set.");
+      }
+      fs->write("README.md", content);  // can throw
+    } catch (Exception& e) {
+      qCritical() << "Could not copy the readme file:" << e.getMsg();
+    }
+
+    // copy .gitignore
+    try {
+      FilePath source = Application::getResourcesDir().getPathTo(
+          "library/gitignore_template");
+      fs->write(".gitignore", FileUtils::readFile(source));  // can throw
+    } catch (Exception& e) {
+      qCritical() << "Could not copy the .gitignore file:" << e.getMsg();
+    }
+
+    // copy .gitattributes
+    try {
+      FilePath source = Application::getResourcesDir().getPathTo(
+          "library/gitattributes_template");
+      fs->write(".gitattributes", FileUtils::readFile(source));  // can throw
+    } catch (Exception& e) {
+      qCritical() << "Could not copy the .gitattributes file:" << e.getMsg();
+    }
+
+    // save file system
+    fs->save();  // can throw
+
+    // Force rescan to index the new library.
+    mApp.getWorkspace().getLibraryDb().startLibraryRescan();
+    return true;
+  } catch (const Exception& e) {
+    mUiData.creation_error = q2s(e.getMsg());
+    emit uiDataChanged();
+    return false;
+  }
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+void CreateLibraryTab::validate() noexcept {
+  const QString nameStr = s2q(mUiData.name).remove(".lplib");
+  mName = validateElementName(nameStr, mUiData.name_error);
+
+  QString versionStr = s2q(mUiData.version).trimmed();
+  if (versionStr.isEmpty()) {
+    versionStr = s2q(mUiData.version_default);
+  }
+  mVersion = validateVersion(versionStr, mUiData.version_error);
+
+  mUrl = validateUrl(s2q(mUiData.url), mUiData.url_error, true);
+
+  QString dirDefault = FilePath::cleanFileName(
+      nameStr, FilePath::ReplaceSpaces | FilePath::KeepCase);
+  if (!dirDefault.isEmpty()) {
+    dirDefault.append(".lplib");
+  }
+  mUiData.directory_default = q2s(dirDefault);
+
+  QString dirStr = s2q(mUiData.directory).trimmed();
+  if (dirStr.isEmpty()) {
+    dirStr = s2q(mUiData.directory_default);
+  }
+  const std::optional<FileProofName> dirName =
+      validateFileProofName(dirStr, mUiData.directory_error, ".lplib");
+  mDirectory = dirName
+      ? mApp.getWorkspace().getLibrariesPath().getPathTo("local/" % *dirName)
+      : FilePath();
+  if (mDirectory.isValid() &&
+      (mDirectory.isExistingFile() || mDirectory.isExistingDir())) {
+    mDirectory = FilePath();
+    mUiData.directory_error = q2s(tr("Exists already"));
+  }
+
+  mUiData.valid =
+      mName && mVersion && mUiData.url_error.empty() && mDirectory.isValid();
+  emit uiDataChanged();
 }
 
 /*******************************************************************************

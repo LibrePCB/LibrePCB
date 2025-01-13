@@ -7,9 +7,8 @@ import { HomePanel } from "./homepanel.slint";
 import { MenuBar } from "./menubar.slint";
 import { WindowSection } from "./windowsection.slint";
 import { Globals, Tab, ActionId } from "./globals.slint";
-import { CreateLibraryGlobals } from "./library/createlibrarytab.slint";
 
-export { Globals, CreateLibraryGlobals }
+export { Globals }
 
 export component AppWindow inherits Window {
     property <length> panel-width: (self.width <= 800px) ? 250px : 350px;
@@ -65,6 +64,7 @@ export component AppWindow inherits Window {
 
         for section[i] in Globals.sections: HorizontalLayout {
             WindowSection {
+                section-index: i;
                 section: section;
             }
 

@@ -60,10 +60,11 @@ component TabItem inherits Rectangle {
 }
 
 export component WindowSection inherits Rectangle {
+    in-out property <int> section-index;
     in-out property <WindowSection> section;
-    property <bool> is-current-section: (section.id == Globals.current-section-id);
-    property <bool> tab-open: (section.tab-index >= 0) && (section.tab-index < section.tabs.length);
-    property <TabType> tab-type: section.tabs[section.tab-index].type;
+    property <bool> is-current-section: (section-index == Globals.current-section-index);
+    property <bool> tab-open: (section.current-tab-index >= 0) && (section.current-tab-index < section.tabs.length);
+    property <TabType> tab-type: section.tabs[section.current-tab-index].type;
 
     tab-bar := Rectangle {
         x: 0;
@@ -84,18 +85,18 @@ export component WindowSection inherits Rectangle {
                     tab: tab;
                     index: index;
                     is-current-section: is-current-section;
-                    is-current-tab: (index == section.tab-index);
+                    is-current-tab: (index == section.current-tab-index);
 
                     clicked => {
                         if Globals.preview-mode {
-                            section.tab-index = index;
+                            section.current-tab-index = index;
                         } else {
-                            Globals.tab-clicked(section.id, index);
+                            Globals.tab-clicked(section-index, index);
                         }
                     }
 
                     close-clicked => {
-                        Globals.tab-close-clicked(section.id, index);
+                        Globals.tab-close-clicked(section-index, index);
                     }
                 }
             }
@@ -119,7 +120,7 @@ export component WindowSection inherits Rectangle {
 
                 ta-section-split := TouchArea {
                     clicked => {
-                        Globals.section-split-clicked(section.id);
+                        Globals.section-split-clicked(section-index);
                     }
                 }
             }
@@ -137,61 +138,51 @@ export component WindowSection inherits Rectangle {
 
                 ta-section-close := TouchArea {
                     clicked => {
-                        Globals.section-close-clicked(section.id);
+                        Globals.section-close-clicked(section-index);
                     }
                 }
             }
         }
     }
 
-    if (!tab-open): EmptyTab {
+    Rectangle {
         x: 0;
         y: tab-bar.height;
         width: root.width;
         height: parent.height - self.y;
-        section-id: section.id;
-    }
 
-    if (tab-open) && (tab-type == TabType.create-library): CreateLibraryTab {
-        x: 0;
-        y: tab-bar.height;
-        width: parent.width;
-        height: parent.height - self.y;
-        section-id: section.id;
-        tab-id: section.tabs[section.tab-index].id;
-        data-model: Globals.create-library-tabs;
-    }
+        if (!tab-open): EmptyTab {
+            width: 100%;
+            height: 100%;
+            section-index: section-index;
+        }
 
-    if (tab-open) && (tab-type == TabType.schematic): SchematicTab {
-        x: 0;
-        y: tab-bar.height;
-        width: 100%;
-        height: parent.height - self.y;
-        section-id: section.id;
-        tab-index: section.tab-index;
-        tab: section.tabs[section.tab-index];
-        frame: section.frame;
-    }
+        if (tab-open) && (tab-type == TabType.create-library): CreateLibraryTab {
+            width: 100%;
+            height: 100%;
+            section-index: section-index;
+            section: section;
+        }
 
-    if (tab-open) && (tab-type == TabType.board-2d): Board2dTab {
-        x: 0;
-        y: tab-bar.height;
-        width: 100%;
-        height: parent.height - self.y;
-        section-id: section.id;
-        tab-index: section.tab-index;
-        tab: section.tabs[section.tab-index];
-        frame: section.frame;
-    }
+        if (tab-open) && (tab-type == TabType.schematic): SchematicTab {
+            width: 100%;
+            height: 100%;
+            section-index: section-index;
+            section: section;
+        }
 
-    if (tab-open) && (tab-type == TabType.board-3d): Board3dTab {
-        x: 0;
-        y: tab-bar.height;
-        width: 100%;
-        height: parent.height - self.y;
-        section-id: section.id;
-        tab-index: section.tab-index;
-        tab: section.tabs[section.tab-index];
-        frame: section.frame;
+        if (tab-open) && (tab-type == TabType.board-2d): Board2dTab {
+            width: 100%;
+            height: 100%;
+            section-index: section-index;
+            section: section;
+        }
+
+        if (tab-open) && (tab-type == TabType.board-3d): Board3dTab {
+            width: 100%;
+            height: 100%;
+            section-index: section-index;
+            section: section;
+        }
     }
 }

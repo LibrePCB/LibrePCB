@@ -37,7 +37,7 @@ namespace librepcb {
 namespace editor {
 namespace app {
 
-class WindowSectionsModel;
+class WindowTabsModel;
 
 /*******************************************************************************
  *  Class CreateLibraryTabsModel
@@ -54,20 +54,21 @@ public:
   // Constructors / Destructor
   CreateLibraryTabsModel() = delete;
   CreateLibraryTabsModel(const CreateLibraryTabsModel& other) = delete;
-  explicit CreateLibraryTabsModel(std::shared_ptr<WindowSectionsModel> sections,
+  explicit CreateLibraryTabsModel(std::shared_ptr<WindowTabsModel> tabs,
                                   QObject* parent = nullptr) noexcept;
   virtual ~CreateLibraryTabsModel() noexcept;
 
   // Implementations
   std::size_t row_count() const override;
-  std::optional<ui::CreateLibraryTabData> row_data(std::size_t tabId) const override;
-  void set_row_data(size_t tabId, const ui::CreateLibraryTabData& data) override;
+  std::optional<ui::CreateLibraryTabData> row_data(
+      std::size_t i) const override;
+  void set_row_data(size_t i, const ui::CreateLibraryTabData& data) override;
 
   // Operator Overloadings
   CreateLibraryTabsModel& operator=(const CreateLibraryTabsModel& rhs) = delete;
 
 private:
-  std::shared_ptr<WindowSectionsModel> mSections;
+  std::shared_ptr<WindowTabsModel> mModel;
 };
 
 /*******************************************************************************

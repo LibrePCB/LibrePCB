@@ -86,7 +86,7 @@ public:
   // Constructors / Destructor
   Board3dTab() = delete;
   Board3dTab(const Board3dTab& other) = delete;
-  explicit Board3dTab(GuiApplication& app, int id,std::shared_ptr<ProjectEditor> prj,
+  explicit Board3dTab(GuiApplication& app, std::shared_ptr<ProjectEditor> prj,
                       int boardIndex, QObject* parent = nullptr) noexcept;
   virtual ~Board3dTab() noexcept;
 

@@ -58,13 +58,12 @@ public:
   // Constructors / Destructor
   WindowTab() = delete;
   WindowTab(const WindowTab& other) = delete;
-  explicit WindowTab(GuiApplication& app, int id,ui::TabType type,
+  explicit WindowTab(GuiApplication& app, ui::TabType type,
                      std::shared_ptr<ProjectEditor> prj, int objIndex,
                      const QString& title, QObject* parent = nullptr) noexcept;
   virtual ~WindowTab() noexcept;
 
   // General Methods
-  int getId() const noexcept {return mUiData.id;}
   const ui::Tab& getUiData() const noexcept { return mUiData; }
   std::shared_ptr<ProjectEditor> getProject() noexcept { return mProject; }
   int getObjIndex() const noexcept { return mObjIndex; }
@@ -114,8 +113,10 @@ public:
 signals:
   void cursorCoordinatesChanged(qreal x, qreal y);
   void requestRepaint();
+  void uiDataChanged();
 
 protected:
+  GuiApplication& mApp;
   ui::Tab mUiData;
   std::shared_ptr<ProjectEditor> mProject;
   int mObjIndex = -1;

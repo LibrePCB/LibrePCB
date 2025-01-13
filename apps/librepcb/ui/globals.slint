@@ -57,14 +57,12 @@ export enum TabType {
 }
 
 export struct Tab {
-    id: int,  // Unique tab ID
     type: TabType,
     title: string,
     overlay-color: brush,
 }
 
 export struct CreateLibraryTabData {
-    used: bool,
     name: string,
     name-error: string,
     description: string,
@@ -80,12 +78,13 @@ export struct CreateLibraryTabData {
     directory-default: string,
     directory-error: string,
     valid: bool,
+    creation-error: string,
 }
 
 export struct WindowSection {
-    id: int,  // Unique section ID
     tabs: [Tab], // Tabs in this section
-    tab-index: int,  // Currently opened tab in this section
+    create-library-tabs: [CreateLibraryTabData],
+    current-tab-index: int,  // Currently opened tab in this section
     frame: int, // Frame index to trigger repainting
 }
 
@@ -118,8 +117,7 @@ export global Globals {
     // The 3D viewer for a board has been requested.
     //
     // - Section index
-    // - Board tab index
-    pure callback board-3d-clicked(int, int);
+    pure callback board-3d-clicked(int);
 
     // Requested to split a particular window section
     //
@@ -158,18 +156,23 @@ export global Globals {
     // Open the tab for creating a new library
     pure callback open-create-library-tab();
 
+    // Create the new library prepared in the "create library" tab
+    //
+    // - Section index
+    // -> Success
+    pure callback create-library(int) -> bool;
+
     // Render a graphics scene image
     //
-    // - Scene section
-    // - Current tab in section
+    // - Section index
     // - Scene width
     // - Scene height
     // - Frame number (to be ignored)
-    pure callback render-scene(int, int, length, length, int) -> image;
+    pure callback render-scene(int, length, length, int) -> image;
 
     // Scene pointer event
     //
-    // - Scene section index
+    // - Section index
     // - Cursor X
     // - Cursor Y
     // - Scene width
@@ -179,7 +182,7 @@ export global Globals {
 
     // Scene scrolled event
     //
-    // - Scene section index
+    // - Section index
     // - Cursor X
     // - Cursor Y
     // - Scene width
@@ -189,21 +192,21 @@ export global Globals {
 
     // Scene button "zoom to fit content" clicked
     //
-    // - Scene section index
+    // - Section index
     // - Scene width
     // - Scene height
     pure callback scene-zoom-fit-clicked(int, length, length);
 
     // Scene button "zoom in" clicked
     //
-    // - Scene section index
+    // - Section index
     // - Scene width
     // - Scene height
     pure callback scene-zoom-in-clicked(int, length, length);
 
     // Scene button "zoom out" clicked
     //
-    // - Scene section index
+    // - Section index
     // - Scene width
     // - Scene height
     pure callback scene-zoom-out-clicked(int, length, length);
@@ -306,64 +309,37 @@ export global Globals {
         },
     ];
 
-    in property <[CreateLibraryTabData]> create-library-tabs: [
-        {
-            used: true,
-            name: "My Library",
-            name-error: "",
-            description: "",
-            author: "",
-            author-default: "Me",
-            version: "",
-            version-default: "0.1",
-            version-error: "",
-            url: "",
-            url-error: "",
-            cc0: false,
-            directory: "",
-            directory-default: "My_Library.lplib",
-            directory-error: "test",
-            valid: true,
-        },
-    ];
-
     in property <[WindowSection]> sections: [
         {
-            id: 5,
             tabs: [
                 {
-                    id: 5,
                     type: TabType.create-library,
                     title: "New Lib",
                 },
                 {
-                    id: 6,
                     type: TabType.schematic,
                     title: "Schematic",
                     overlay-color: Colors.black,
                 },
                 {
-                    id: 7,
                     type: TabType.board-2d,
                     title: "Board",
                     overlay-color: Colors.white,
                 },
             ],
-            tab-index: 0,
+            current-tab-index: 0,
         },
         {
-            id: 10,
             tabs: [
                 {
-                    id: 8,
                     type: TabType.board-3d,
                     title: "3D",
                     overlay-color: Colors.gray,
                 },
             ],
-            tab-index: 0,
+            current-tab-index: 0,
         },
     ];
 
-    in property <int> current-section-id: 5;
+    in property <int> current-section-index: 0;
 }

@@ -23,6 +23,8 @@
 #include "windowsection.h"
 
 #include "apptoolbox.h"
+#include "createlibrarytab.h"
+#include "createlibrarytabsmodel.h"
 #include "guiapplication.h"
 #include "windowtab.h"
 #include "windowtabsmodel.h"
@@ -41,17 +43,19 @@ namespace app {
  *  Constructors / Destructor
  ******************************************************************************/
 
-WindowSection::WindowSection(GuiApplication& app, int id,
-                             QObject* parent) noexcept
+WindowSection::WindowSection(GuiApplication& app, QObject* parent) noexcept
   : QObject(parent),
-    mTabsModel(new WindowTabsModel(app, id, this)),
-    mUiData{id, mTabsModel, -1, 0} {
+    mTabsModel(new WindowTabsModel(app, this)),
+    mUiData{mTabsModel,
+            std::make_shared<CreateLibraryTabsModel>(mTabsModel, this), 0, 0} {
   connect(mTabsModel.get(), &WindowTabsModel::cursorCoordinatesChanged, this,
           &WindowSection::cursorCoordinatesChanged);
   connect(mTabsModel.get(), &WindowTabsModel::requestRepaint, this, [this]() {
     mUiData.frame++;
     uiDataChanged();
   });
+  connect(mTabsModel.get(), &WindowTabsModel::uiDataChanged, this,
+          &WindowSection::uiDataChanged);
 }
 
 WindowSection::~WindowSection() noexcept {
@@ -66,15 +70,15 @@ std::size_t WindowSection::getTabCount() const noexcept {
 }
 
 std::shared_ptr<WindowTab> WindowSection::getTab(int index) noexcept {
-  return mTabsModel->getTabByIndex(index);
+  return mTabsModel->getTab(index);
 }
 
-std::shared_ptr<WindowTab> WindowSection::getTabById(int id) noexcept {
-  return mTabsModel->getTabById(id);
+std::shared_ptr<WindowTab> WindowSection::getCurrentTab() noexcept {
+  return mTabsModel->getTab(mUiData.current_tab_index);
 }
 
 std::shared_ptr<ProjectEditor> WindowSection::getCurrentProject() noexcept {
-  if (std::shared_ptr<WindowTab> t = getTab(mUiData.tab_index)) {
+  if (std::shared_ptr<WindowTab> t = getTab(mUiData.current_tab_index)) {
     return t->getProject();
   }
   return nullptr;
@@ -89,7 +93,7 @@ void WindowSection::addTab(ui::TabType type, std::shared_ptr<ProjectEditor> prj,
 void WindowSection::closeTab(int index) noexcept {
   mTabsModel->closeTab(index);
 
-  int currentIndex = mUiData.tab_index;
+  int currentIndex = mUiData.current_tab_index;
   if (index < currentIndex) {
     --currentIndex;
   }
@@ -99,14 +103,20 @@ void WindowSection::closeTab(int index) noexcept {
 
 void WindowSection::setCurrentTab(int index) noexcept {
   mTabsModel->setCurrentTab(index);
-  mUiData.tab_index = index;
+  mUiData.current_tab_index = index;
   emit uiDataChanged();
   emit currentProjectChanged(getCurrentProject());
 }
 
-slint::Image WindowSection::renderScene(int tab, float width,
-                                        float height) noexcept {
-  if (std::shared_ptr<WindowTab> t = getTab(tab)) {
+bool WindowSection::createLibrary() noexcept {
+  if (auto t = std::dynamic_pointer_cast<CreateLibraryTab>(getCurrentTab())) {
+    return t->create();
+  }
+  return false;
+}
+
+slint::Image WindowSection::renderScene(float width, float height) noexcept {
+  if (std::shared_ptr<WindowTab> t = getCurrentTab()) {
     return t->renderScene(width, height);
   }
   return slint::Image();
@@ -115,7 +125,7 @@ slint::Image WindowSection::renderScene(int tab, float width,
 bool WindowSection::processScenePointerEvent(
     float x, float y, float width, float height,
     slint::private_api::PointerEvent e) noexcept {
-  if (std::shared_ptr<WindowTab> t = getTab(mUiData.tab_index)) {
+  if (std::shared_ptr<WindowTab> t = getTab(mUiData.current_tab_index)) {
     return t->processScenePointerEvent(x, y, width, height, e);
   }
   return false;
@@ -124,26 +134,26 @@ bool WindowSection::processScenePointerEvent(
 bool WindowSection::processSceneScrolled(
     float x, float y, float width, float height,
     slint::private_api::PointerScrollEvent e) noexcept {
-  if (std::shared_ptr<WindowTab> t = getTab(mUiData.tab_index)) {
+  if (std::shared_ptr<WindowTab> t = getTab(mUiData.current_tab_index)) {
     return t->processSceneScrolled(x, y, width, height, e);
   }
   return false;
 }
 
 void WindowSection::zoomFit(float width, float height) noexcept {
-  if (std::shared_ptr<WindowTab> t = getTab(mUiData.tab_index)) {
+  if (std::shared_ptr<WindowTab> t = getTab(mUiData.current_tab_index)) {
     return t->zoomFit(width, height);
   }
 }
 
 void WindowSection::zoomIn(float width, float height) noexcept {
-  if (std::shared_ptr<WindowTab> t = getTab(mUiData.tab_index)) {
+  if (std::shared_ptr<WindowTab> t = getTab(mUiData.current_tab_index)) {
     return t->zoomIn(width, height);
   }
 }
 
 void WindowSection::zoomOut(float width, float height) noexcept {
-  if (std::shared_ptr<WindowTab> t = getTab(mUiData.tab_index)) {
+  if (std::shared_ptr<WindowTab> t = getTab(mUiData.current_tab_index)) {
     return t->zoomOut(width, height);
   }
 }

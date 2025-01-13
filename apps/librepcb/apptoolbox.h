@@ -23,6 +23,10 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/core/types/elementname.h>
+#include <librepcb/core/types/fileproofname.h>
+#include <librepcb/core/types/version.h>
+
 #include <QtCore>
 #include <QtGui>
 
@@ -58,6 +62,20 @@ static void bind(QObject* context, const TTarget& target,
                    std::bind(setter, &target, std::placeholders::_1));
   (target.*setter)(defaultValue);
 }
+
+std::optional<ElementName> validateElementName(
+    const QString& input, slint::SharedString& error) noexcept;
+
+std::optional<Version> validateVersion(const QString& input,
+                                       slint::SharedString& error) noexcept;
+
+std::optional<FileProofName> validateFileProofName(
+    const QString& input, slint::SharedString& error,
+    const QString& requiredSuffix = QString()) noexcept;
+
+std::optional<QUrl> validateUrl(const QString& input,
+                                slint::SharedString& error,
+                                bool allowEmpty = false) noexcept;
 
 /*******************************************************************************
  *  End of File

@@ -56,13 +56,13 @@ public:
   WindowTabsModel() = delete;
   WindowTabsModel(const WindowTabsModel& other) = delete;
   explicit WindowTabsModel(GuiApplication& app,
-                           int sectionId,
                            QObject* parent = nullptr) noexcept;
   virtual ~WindowTabsModel() noexcept;
 
   // General Methods
-  std::shared_ptr<WindowTab> getTabById(int id) noexcept;
-  std::shared_ptr<WindowTab> getTabByIndex(int idx) noexcept{return mItems.value(idx);}
+  std::shared_ptr<WindowTab> getTab(int index) noexcept {
+    return mItems.value(index);
+  }
   void addTab(ui::TabType type, std::shared_ptr<ProjectEditor> prj,
               int objIndex) noexcept;
   void closeTab(int index) noexcept;
@@ -78,15 +78,11 @@ public:
 signals:
   void cursorCoordinatesChanged(qreal x, qreal y);
   void requestRepaint();
+  void uiDataChanged(std::size_t index);
 
 private:
-  void updateIndex() noexcept;
-
   GuiApplication& mApp;
-  const int mSectionId;
   QList<std::shared_ptr<WindowTab>> mItems;
-  QHash<int, int> mIndex;  ///< Map from tab ID to #mItems index
-  int mNextId;  ///< Next free tab ID
 };
 
 /*******************************************************************************
