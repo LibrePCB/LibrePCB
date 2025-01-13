@@ -23,11 +23,12 @@
 #include "windowsection.h"
 
 #include "apptoolbox.h"
-#include "createlibrarytab.h"
-#include "createlibrarytabsmodel.h"
 #include "guiapplication.h"
+#include "library/createlibrarytab.h"
+#include "library/downloadlibrarytab.h"
 #include "windowtab.h"
 #include "windowtabsmodel.h"
+#include "windowtabsmodeladapter.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -46,8 +47,15 @@ namespace app {
 WindowSection::WindowSection(GuiApplication& app, QObject* parent) noexcept
   : QObject(parent),
     mTabsModel(new WindowTabsModel(app, this)),
-    mUiData{mTabsModel,
-            std::make_shared<CreateLibraryTabsModel>(mTabsModel, this), 0, 0} {
+    mUiData{
+        mTabsModel,
+        std::make_shared<
+            WindowTabsModelAdapter<CreateLibraryTab, ui::CreateLibraryTabData>>(
+            mTabsModel, this),
+        std::make_shared<WindowTabsModelAdapter<DownloadLibraryTab,
+                                                ui::DownloadLibraryTabData>>(
+            mTabsModel, this),
+        0, 0} {
   connect(mTabsModel.get(), &WindowTabsModel::cursorCoordinatesChanged, this,
           &WindowSection::cursorCoordinatesChanged);
   connect(mTabsModel.get(), &WindowTabsModel::requestRepaint, this, [this]() {
@@ -108,11 +116,10 @@ void WindowSection::setCurrentTab(int index) noexcept {
   emit currentProjectChanged(getCurrentProject());
 }
 
-bool WindowSection::createLibrary() noexcept {
-  if (auto t = std::dynamic_pointer_cast<CreateLibraryTab>(getCurrentTab())) {
-    return t->create();
+void WindowSection::finish() noexcept {
+  if (std::shared_ptr<WindowTab> t = getCurrentTab()) {
+    t->finish();
   }
-  return false;
 }
 
 slint::Image WindowSection::renderScene(float width, float height) noexcept {

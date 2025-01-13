@@ -62,9 +62,6 @@ public:
   LibraryManager(Workspace& ws, QWidget* parent = nullptr) noexcept;
   ~LibraryManager() noexcept;
 
-  // General Methods
-  void updateOnlineLibraryList() noexcept;
-
   // Operator Overloadings
   LibraryManager& operator=(const LibraryManager& rhs) = delete;
 

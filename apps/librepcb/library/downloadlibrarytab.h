@@ -17,64 +17,75 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBREPCB_LIBRARY_DOWNLOADLIBRARYTAB_H
+#define LIBREPCB_LIBRARY_DOWNLOADLIBRARYTAB_H
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "createlibrarytabsmodel.h"
+#include "windowtab.h"
 
-#include "createlibrarytab.h"
-#include "windowtabsmodel.h"
+#include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/types/elementname.h>
+#include <librepcb/core/types/version.h>
 
 #include <QtCore>
-#include <QtWidgets>
+#include <QtGui>
+
+#include <optional>
 
 /*******************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 namespace editor {
+
+class LibraryDownload;
+
 namespace app {
 
-/*******************************************************************************
- *  Constructors / Destructor
- ******************************************************************************/
-
-CreateLibraryTabsModel::CreateLibraryTabsModel(
-    std::shared_ptr<WindowTabsModel> tabs, QObject* parent) noexcept
-  : QObject(parent), mModel(tabs) {
-  connect(mModel.get(), &WindowTabsModel::uiDataChanged, this,
-          [this](std::size_t index) { row_changed(index); });
-}
-
-CreateLibraryTabsModel::~CreateLibraryTabsModel() noexcept {
-}
+class GuiApplication;
 
 /*******************************************************************************
- *  General Methods
+ *  Class DownloadLibraryTab
  ******************************************************************************/
 
-/*******************************************************************************
- *  Implementations
- ******************************************************************************/
+/**
+ * @brief The DownloadLibraryTab class
+ */
+class DownloadLibraryTab final : public WindowTab {
+  Q_OBJECT
 
-std::size_t CreateLibraryTabsModel::row_count() const {
-  return mModel->row_count();
-}
+public:
+  // Constructors / Destructor
+  DownloadLibraryTab() = delete;
+  DownloadLibraryTab(const DownloadLibraryTab& other) = delete;
+  explicit DownloadLibraryTab(GuiApplication& app,
+                              QObject* parent = nullptr) noexcept;
+  virtual ~DownloadLibraryTab() noexcept;
 
-std::optional<ui::CreateLibraryTabData> CreateLibraryTabsModel::row_data(
-    std::size_t i) const {
-  if (auto t = std::dynamic_pointer_cast<CreateLibraryTab>(mModel->getTab(i))) {
-    return t->getUiData();
+  // General Methods
+  const ui::DownloadLibraryTabData& getUiData() const noexcept {
+    return mUiData;
   }
-  return std::nullopt;
-}
+  void setUiData(const ui::DownloadLibraryTabData& data) noexcept;
+  void activate() noexcept override;
+  void deactivate() noexcept override;
+  void finish() noexcept override;
 
-void CreateLibraryTabsModel::set_row_data(
-    size_t i, const ui::CreateLibraryTabData& data) {
-  if (auto t = std::dynamic_pointer_cast<CreateLibraryTab>(mModel->getTab(i))) {
-    t->setUiData(data);
-  }
-}
+  // Operator Overloadings
+  DownloadLibraryTab& operator=(const DownloadLibraryTab& rhs) = delete;
+
+private:
+  void validate() noexcept;
+  void downloadFinished(bool success, const QString& errMsg) noexcept;
+
+  ui::DownloadLibraryTabData mUiData;
+  std::optional<QUrl> mUrl;
+  FilePath mDirectory;
+
+  std::unique_ptr<LibraryDownload> mDownload;
+};
 
 /*******************************************************************************
  *  End of File
@@ -83,3 +94,5 @@ void CreateLibraryTabsModel::set_row_data(
 }  // namespace app
 }  // namespace editor
 }  // namespace librepcb
+
+#endif

@@ -1,4 +1,4 @@
-import { Button, LineEdit, CheckBox } from "std-widgets.slint";
+import { Button, CheckBox, ProgressIndicator } from "std-widgets.slint";
 import { LineEdit } from "../lineedit.slint";
 import { Globals, WindowSection, DownloadLibraryTabData } from "../globals.slint";
 
@@ -6,8 +6,12 @@ export component DownloadLibraryTab inherits Rectangle {
     in property <int> section-index;
     in-out property <WindowSection> section;
     property <[DownloadLibraryTabData]> tabs: section.download-library-tabs;
+    property <bool> read-only: tabs[section.current-tab-index].download-running;
+
+    clip: true;
 
     GridLayout {
+        width: root.width;
         padding: 10px;
         spacing: 5px;
 
@@ -26,7 +30,7 @@ export component DownloadLibraryTab inherits Rectangle {
             Text {
                 colspan: 2;
                 wrap: TextWrap.word-wrap;
-                text: @tr("Please note that this way of installing libraries is not recommended as there's no way to keep them updated in a simple way. For libraries available in the library manager, please install them with the library manager instead as there's an update mechanism provided.");
+                text: @tr("Please note that this is not the preferred way to install libraries as they won't be kept up to date. For our official libraries, please consider installing them in the libraries panel instead, which allows to keep libraries up to date.");
             }
         }
 
@@ -46,11 +50,53 @@ export component DownloadLibraryTab inherits Rectangle {
 
             le-url := LineEdit {
                 text: tabs[section.current-tab-index].url;
-                placeholder-text: @tr("URL to library (e.g. *.zip)");
+                placeholder-text: @tr("URL to a zipped library (*.zip)");
                 validation-error: tabs[section.current-tab-index].url-error;
+                read-only: read-only;
 
                 changed text => {
                     tabs[section.current-tab-index].url = self.text;
+                }
+            }
+        }
+
+        Row {
+            Rectangle {
+                vertical-stretch: 0;
+            }
+
+            Rectangle {
+                property <bool> has-suggestion: tabs[section.current-tab-index].url-suggestion != "";
+
+                height: has-suggestion ? self.preferred-height : 0;
+                visible: has-suggestion;
+                horizontal-stretch: 1;
+
+                VerticalLayout {
+                    spacing: 5px;
+
+                    Text {
+                        horizontal-stretch: 0;
+                        font-size: 11px;
+                        wrap: word-wrap;
+                        text: @tr("URL does not seem to point to a ZIP file. Consider using this URL instead:");
+                    }
+
+                    Text {
+                        horizontal-stretch: 0;
+                        color: white;
+                        overflow: elide;
+                        font-size: 10px;
+                        text: tabs[section.current-tab-index].url-suggestion;
+
+                        TouchArea {
+                            mouse-cursor: pointer;
+
+                            clicked => {
+                                le-url.text = tabs[section.current-tab-index].url-suggestion;
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -65,10 +111,20 @@ export component DownloadLibraryTab inherits Rectangle {
                 text: tabs[section.current-tab-index].directory;
                 placeholder-text: tabs[section.current-tab-index].directory-default;
                 validation-error: tabs[section.current-tab-index].directory-error;
+                read-only: read-only;
 
                 changed text => {
                     tabs[section.current-tab-index].directory = self.text;
                 }
+            }
+        }
+
+        Row {
+            Rectangle { }
+
+            ProgressIndicator {
+                visible: tabs[section.current-tab-index].download-running;
+                progress: tabs[section.current-tab-index].download-progress / 100;
             }
         }
 
@@ -81,13 +137,11 @@ export component DownloadLibraryTab inherits Rectangle {
 
                 Button {
                     primary: true;
-                    enabled: tabs[section.current-tab-index].valid;
+                    enabled: (!read-only) && tabs[section.current-tab-index].valid;
                     text: @tr("Download Library");
 
                     clicked => {
-                        if (Globals.create-library(section-index)) {
-                            Globals.tab-close-clicked(section-index, section.current-tab-index);
-                        }
+                        Globals.dialog-tab-finish(section-index);
                     }
                 }
 

@@ -69,6 +69,7 @@ public:
   int getObjIndex() const noexcept { return mObjIndex; }
   virtual void activate() noexcept {}
   virtual void deactivate() noexcept {}
+  virtual void finish() noexcept {}
   virtual slint::Image renderScene(float width, float height) noexcept {
     Q_UNUSED(width);
     Q_UNUSED(height);
@@ -112,6 +113,7 @@ public:
 
 signals:
   void cursorCoordinatesChanged(qreal x, qreal y);
+  void requestClose();
   void requestRepaint();
   void uiDataChanged();
 

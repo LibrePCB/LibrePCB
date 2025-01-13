@@ -60,7 +60,7 @@ CreateLibraryTab::CreateLibraryTab(GuiApplication& app,
         slint::SharedString(),  // Version
         "0.1",  // Version default
         slint::SharedString(),  // Version error
-        slint::SharedString(),  // // URL
+        slint::SharedString(),  // URL
         slint::SharedString(),  // URL error
         false,  // CC0
         slint::SharedString(),  // Directory
@@ -91,7 +91,7 @@ void CreateLibraryTab::setUiData(
   validate();
 }
 
-bool CreateLibraryTab::create() noexcept {
+void CreateLibraryTab::finish() noexcept {
   try {
     if ((!mName) || (!mVersion) || (!mDirectory.isValid())) {
       throw LogicError(__FILE__, __LINE__);
@@ -170,11 +170,12 @@ bool CreateLibraryTab::create() noexcept {
 
     // Force rescan to index the new library.
     mApp.getWorkspace().getLibraryDb().startLibraryRescan();
-    return true;
+
+    // Close tab as it is no longer required.
+    emit requestClose();
   } catch (const Exception& e) {
     mUiData.creation_error = q2s(e.getMsg());
     emit uiDataChanged();
-    return false;
   }
 }
 
