@@ -1,8 +1,9 @@
 import { Button, VerticalBox } from "std-widgets.slint";
+import { ToolTip } from "./tooltip.slint";
 
 export component SideBarButton inherits Rectangle {
     in property <image> icon <=> i-icon.source;
-    in property <string> toolTip;
+    in property <string> tooltip;
     in property <color> status-background;
     in property <color> status-color;
     in property <string> status-text;
@@ -49,24 +50,9 @@ export component SideBarButton inherits Rectangle {
         }
     }
 
-    if ta.has-hover: Rectangle {
+    if ta.has-hover: ToolTip {
         x: root.width + 5px;
         y: (root.height / 2) - (self.height / 2);
-        width: popupText.preferred-width + 10px;
-        height: 25px;
-        background: #3b3b3b;
-        border-radius: 3px;
-
-        animate opacity { duration: 150ms; }
-
-        popupText := Text {
-            x: 5px;
-            color: #ffffffca;
-            horizontal-alignment: TextHorizontalAlignment.left;
-            vertical-alignment: TextVerticalAlignment.center;
-            wrap: TextWrap.no-wrap;
-            overflow: TextOverflow.elide;
-            text: toolTip;
-        }
+        text: tooltip;
     }
 }

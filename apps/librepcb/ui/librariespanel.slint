@@ -1,6 +1,7 @@
 import { CheckBox, Button, ListView, ProgressIndicator, Spinner, HorizontalBox, VerticalBox, StandardButton } from "std-widgets.slint";
 import { PanelHeader } from "./panelheader.slint";
 import { Globals, Library, LibraryType, LibraryState, ActionId } from "./globals.slint";
+import { ToolTip } from "./tooltip.slint";
 
 component LibraryList inherits ListView {
     in property <length> bottom-padding: 50px;
@@ -176,6 +177,7 @@ export component LibrariesPanel inherits Rectangle {
         alignment: LayoutAlignment.start;
 
         header := PanelHeader {
+            z: 10;
             title: @tr("LIBRARIES");
 
             if Globals.refreshing-available-libraries: Spinner {
@@ -191,17 +193,51 @@ export component LibrariesPanel inherits Rectangle {
             Rectangle {
                 width: header.content-height;
                 height: header.content-height;
+                background: ta-download.has-hover ? #454545 : transparent;
+                border-radius: 3px;
+
+                ta-download := TouchArea {
+                    Image {
+                        y: 2px;
+                        width: self.height;
+                        height: header.content-height - 4px;
+                        source: @image-url("img/download.svg");
+                        colorize: white;
+                    }
+
+                    if ta-download.has-hover: ToolTip {
+                        x: (parent.width / 2) - (self.width / 2);
+                        y: parent.height + 5px;
+                        text: @tr("Download a Library") + "...";
+                    }
+
+                    clicked => {
+                        Globals.open-download-library-tab();
+                    }
+                }
+            }
+
+            Rectangle {
+                width: header.content-height;
+                height: header.content-height;
                 background: ta-new.has-hover ? #454545 : transparent;
                 border-radius: 3px;
 
-                i-new := Image {
-                    y: -3px;
-                    height: header.content-height + 6px;
-                    source: @image-url("img/plus.svg");
-                    colorize: white;
-                }
-
                 ta-new := TouchArea {
+                    Image {
+                        y: -3px;
+                        width: self.height;
+                        height: header.content-height + 6px;
+                        source: @image-url("img/plus.svg");
+                        colorize: white;
+                    }
+
+                    if ta-new.has-hover: ToolTip {
+                        x: (parent.width / 2) - (self.width / 2);
+                        y: parent.height + 5px;
+                        text: @tr("Create a New Library") + "...";
+                    }
+
                     clicked => {
                         Globals.open-create-library-tab();
                     }
