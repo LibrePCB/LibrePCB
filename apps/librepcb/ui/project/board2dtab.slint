@@ -1,22 +1,21 @@
-import { Globals, Tab, TabType, Tab } from "../globals.slint";
+import { Globals, WindowSection, Tab } from "../globals.slint";
 import { SceneButton } from "../scenebutton.slint";
 
 export component Board2dTab inherits Image {
-    in-out property <int> section-id;
-    in-out property <int> tab-index;
-    in-out property <Tab> tab;
-    in-out property <int> frame;
+    in property <int> section-index;
+    in-out property <WindowSection> section;
+    property <Tab> tab: section.tabs[section.current-tab-index];
 
     image-fit: ImageFit.preserve;
     image-rendering: ImageRendering.pixelated;
-    source: Globals.render-scene(section-id, tab-index, root.width, root.height, frame);
+    source: Globals.render-scene(section-index, root.width, root.height, section.frame);
 
     TouchArea {
         pointer-event(e) => {
-            return Globals.scene-pointer-event(section-id, self.mouse-x, self.mouse-y, root.width, root.height, e);
+            return Globals.scene-pointer-event(section-index, self.mouse-x, self.mouse-y, root.width, root.height, e);
         }
         scroll-event(e) => {
-            return Globals.scene-scrolled(section-id, self.mouse-x, self.mouse-y, root.width, root.height, e);
+            return Globals.scene-scrolled(section-index, self.mouse-x, self.mouse-y, root.width, root.height, e);
         }
     }
 
@@ -30,7 +29,7 @@ export component Board2dTab inherits Image {
             image: @image-url("../img/zoom-fit.svg");
             colorize: tab.overlay-color;
             clicked => {
-                Globals.scene-zoom-fit-clicked(section-id, root.width, root.height);
+                Globals.scene-zoom-fit-clicked(section-index, root.width, root.height);
             }
         }
 
@@ -38,7 +37,7 @@ export component Board2dTab inherits Image {
             image: @image-url("../img/zoom-in.svg");
             colorize: tab.overlay-color;
             clicked => {
-                Globals.scene-zoom-in-clicked(section-id, root.width, root.height);
+                Globals.scene-zoom-in-clicked(section-index, root.width, root.height);
             }
         }
 
@@ -46,7 +45,7 @@ export component Board2dTab inherits Image {
             image: @image-url("../img/zoom-out.svg");
             colorize: tab.overlay-color;
             clicked => {
-                Globals.scene-zoom-out-clicked(section-id, root.width, root.height);
+                Globals.scene-zoom-out-clicked(section-index, root.width, root.height);
             }
         }
 
@@ -54,7 +53,7 @@ export component Board2dTab inherits Image {
             text: "3D";
             colorize: tab.overlay-color;
             clicked => {
-                Globals.board-3d-clicked(section-id, tab-index);
+                Globals.board-3d-clicked(section-index);
             }
         }
     }

@@ -45,12 +45,12 @@ namespace app {
  *  Constructors / Destructor
  ******************************************************************************/
 
-GraphicsSceneTab::GraphicsSceneTab(GuiApplication& app, int id, ui::TabType type,
+GraphicsSceneTab::GraphicsSceneTab(GuiApplication& app, ui::TabType type,
                                    std::shared_ptr<ProjectEditor> prj,
                                    int objIndex, const QString& title,
                                    const QColor& bgColor,
                                    QObject* parent) noexcept
-  : WindowTab(app, id, type, prj, objIndex, title, parent),
+  : WindowTab(app, type, prj, objIndex, title, parent),
     mBackgroundColor(bgColor),
     mLayerProvider(new DefaultGraphicsLayerProvider(
         app.getWorkspace().getSettings().themes.getActive())),
@@ -196,8 +196,6 @@ void GraphicsSceneTab::smoothTo(const Projection& projection) noexcept {
 bool GraphicsSceneTab::applyProjection(const Projection& projection) noexcept {
   if (projection != mProjection) {
     mProjection = projection;
-    // mUiData.frame++;
-    // emit uiDataChanged(mUiData.index);
     emit requestRepaint();
     return true;
   }
