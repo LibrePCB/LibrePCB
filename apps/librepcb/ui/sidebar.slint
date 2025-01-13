@@ -21,7 +21,7 @@ export component SideBar inherits Rectangle {
 
         SideBarButton {
             icon: @image-url("img/home.svg");
-            toolTip: "Home";
+            tooltip: "Home";
             checked: page == MainPage.home;
             clicked => {
                 page = MainPage.home;
@@ -30,7 +30,7 @@ export component SideBar inherits Rectangle {
 
         SideBarButton {
             icon: @image-url("img/libraries.png");
-            toolTip: "Libraries";
+            tooltip: "Libraries";
             status-background: #d4d400;
             status-color: black;
             status-text: (Globals.outdated-libraries > 0) ? Globals.outdated-libraries : "";
@@ -42,7 +42,7 @@ export component SideBar inherits Rectangle {
 
         SideBarButton {
             icon: @image-url("img/projects.png");
-            toolTip: "Project";
+            tooltip: "Project";
             enabled: Globals.current-project.valid;
             checked: page == MainPage.project;
             clicked => {
@@ -52,7 +52,7 @@ export component SideBar inherits Rectangle {
 
         SideBarButton {
             icon: @image-url("img/drc.svg");
-            toolTip: "Design Rule Check";
+            tooltip: "Design Rule Check";
             checked: page == MainPage.drc;
             enabled: Globals.current-project.valid;
             clicked => {
@@ -62,7 +62,7 @@ export component SideBar inherits Rectangle {
 
         SideBarButton {
             icon: @image-url("img/search.svg");
-            toolTip: "Search";
+            tooltip: "Search";
             checked: page == MainPage.search;
             clicked => {
                 page = MainPage.search;
@@ -75,7 +75,7 @@ export component SideBar inherits Rectangle {
 
         SideBarButton {
             icon: @image-url("img/help.svg");
-            toolTip: "Help";
+            tooltip: "Help";
             checked: page == MainPage.help;
             clicked => {
                 page = MainPage.help;
@@ -84,7 +84,7 @@ export component SideBar inherits Rectangle {
 
         SideBarButton {
             icon: @image-url("img/settings.svg");
-            toolTip: "Preferences";
+            tooltip: "Preferences";
             checked: page == MainPage.preferences;
             clicked => {
                 page = MainPage.preferences;
