@@ -62,7 +62,8 @@ public:
 
   // General Methods
   void openCreateLibraryTab() noexcept;
-  bool createLibrary(int sectionIndex) noexcept;
+  void openDownloadLibraryTab() noexcept;
+  void finish(int sectionIndex) noexcept;
   void openSchematic(std::shared_ptr<ProjectEditor> prj, int index) noexcept;
   void openBoard(std::shared_ptr<ProjectEditor> prj, int index) noexcept;
   void openBoard3dViewer(int sectionIndex) noexcept;

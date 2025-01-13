@@ -17,22 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CREATELIBRARYTAB_H
-#define LIBREPCB_CREATELIBRARYTAB_H
+#ifndef LIBREPCB_WINDOWTABSMODELADAPTER_H
+#define LIBREPCB_WINDOWTABSMODELADAPTER_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "windowtab.h"
-
-#include <librepcb/core/fileio/filepath.h>
-#include <librepcb/core/types/elementname.h>
-#include <librepcb/core/types/version.h>
+#include "appwindow.h"
+#include "windowtabsmodel.h"
 
 #include <QtCore>
 #include <QtGui>
 
-#include <optional>
+#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -41,44 +38,48 @@ namespace librepcb {
 namespace editor {
 namespace app {
 
-class GuiApplication;
-
 /*******************************************************************************
- *  Class CreateLibraryTab
+ *  Class WindowTabsModelAdapter
  ******************************************************************************/
 
 /**
- * @brief The CreateLibraryTab class
+ * @brief The WindowTabsModelAdapter class
  */
-class CreateLibraryTab final : public WindowTab {
-  Q_OBJECT
-
+template <typename TTab, typename TModelData>
+class WindowTabsModelAdapter : public QObject, public slint::Model<TModelData> {
 public:
   // Constructors / Destructor
-  CreateLibraryTab() = delete;
-  CreateLibraryTab(const CreateLibraryTab& other) = delete;
-  explicit CreateLibraryTab(GuiApplication& app,
-                            QObject* parent = nullptr) noexcept;
-  virtual ~CreateLibraryTab() noexcept;
+  WindowTabsModelAdapter() = delete;
+  WindowTabsModelAdapter(const WindowTabsModelAdapter& other) = delete;
+  explicit WindowTabsModelAdapter(std::shared_ptr<WindowTabsModel> tabs,
+                                  QObject* parent = nullptr) noexcept
+    : QObject(parent), mModel(tabs) {
+    connect(mModel.get(), &WindowTabsModel::uiDataChanged, this,
+            [this](std::size_t index) {
+              slint::Model<TModelData>::row_changed(index);
+            });
+  }
+  virtual ~WindowTabsModelAdapter() noexcept {}
 
-  // General Methods
-  const ui::CreateLibraryTabData& getUiData() const noexcept { return mUiData; }
-  void setUiData(const ui::CreateLibraryTabData& data) noexcept;
-  void activate() noexcept override;
-  void deactivate() noexcept override;
-  bool create() noexcept;
+  // Implementations
+  std::size_t row_count() const override { return mModel->row_count(); }
+  std::optional<TModelData> row_data(std::size_t i) const override {
+    if (auto t = std::dynamic_pointer_cast<TTab>(mModel->getTab(i))) {
+      return t->getUiData();
+    }
+    return std::nullopt;
+  }
+  void set_row_data(size_t i, const TModelData& data) override {
+    if (auto t = std::dynamic_pointer_cast<TTab>(mModel->getTab(i))) {
+      t->setUiData(data);
+    }
+  }
 
   // Operator Overloadings
-  CreateLibraryTab& operator=(const CreateLibraryTab& rhs) = delete;
+  WindowTabsModelAdapter& operator=(const WindowTabsModelAdapter& rhs) = delete;
 
 private:
-  void validate() noexcept;
-
-  ui::CreateLibraryTabData mUiData;
-  std::optional<ElementName> mName;
-  std::optional<Version> mVersion;
-  std::optional<QUrl> mUrl;
-  FilePath mDirectory;
+  std::shared_ptr<WindowTabsModel> mModel;
 };
 
 /*******************************************************************************

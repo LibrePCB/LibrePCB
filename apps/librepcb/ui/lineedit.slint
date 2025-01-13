@@ -1,69 +1,70 @@
-import { HorizontalBox } from "std-widgets.slint";
+import { LineEdit, HorizontalBox } from "std-widgets.slint";
 export component LineEdit inherits Rectangle {
-    in-out property <string> text <=> ti.text;
-    in-out property <string> placeholder-text;
+    in-out property <string> text <=> le.text;
+    in-out property <string> placeholder-text <=> le.placeholder-text;
     in-out property <string> validation-error;
+    in-out property <bool> read-only <=> le.read-only;
 
-    height: self.preferred-height;
+    height: le.preferred-height + 16px;
     horizontal-stretch: 1;
-    border-color: (validation-error != "") ? #ff0000 : (ti.has-focus ? #29d682 : #555555);
-    border-width: 1px;
-    border-radius: 10px;
-    forward-focus: ti;
+    forward-focus: le;
 
     ta := TouchArea {
-        HorizontalLayout {
-            padding: 8px;
-            padding-left: 10px;
-            padding-right: 10px;
-
-            ti := TextInput {
-                font-size: 13px;
-            }
+        le := LineEdit {
+            width: 100%;
+            height: 100%;
+            font-size: 13px;
         }
 
-        HorizontalLayout {
-            padding-left: 10px;
-            padding-right: 10px;
-            x: 0;
-            y: 0;
-            width: root.width;
-            height: root.height;
+        if ta.has-hover && (le.text != ""): Rectangle {
+            x: root.width - self.width - (root.height - self.height) / 2;
+            y: (root.height - self.height) / 2;
+            width: 20px;
+            height: self.width;
+            background: #303030;
+            border-radius: self.height / 3;
 
-            if (text == "") && (placeholder-text != ""): Text {
-                color: #808080;
-                font-size: 13px;
-                vertical-alignment: center;
-                overflow: elide;
-                text: placeholder-text;
-            }
-
-            Rectangle {
-                horizontal-stretch: 1;
-
-                if validation-error != "": Text {
-                    x: ti.x + ti.preferred-width;
-                    width: parent.width - self.x;
-                    horizontal-alignment: right;
-                    vertical-alignment: center;
-                    font-size: 11px;
-                    wrap: word-wrap;
-                    overflow: elide;
-                    color: #ff0000;
-                    text: validation-error;
-                }
-            }
-
-            if ta.has-hover && (ti.text != ""): Image {
+            Image {
                 source: @image-url("img/close.svg");
                 colorize: ta-clear.has-hover ? #ffffff : #b0b0b0;
 
                 ta-clear := TouchArea {
                     clicked => {
-                        ti.text = "";
+                        le.text = "";
                     }
                 }
             }
+        }
+    }
+
+    if validation-error != "": Rectangle {
+        x: -1px;
+        y: -1px;
+        width: parent.width + 2px;
+        height: parent.height + 2px;
+        border-width: 1px;
+        border-radius: 10px;
+        border-color: #ff0000;
+    }
+
+    if validation-error != "": Rectangle {
+        x: root.width - self.width - 20px;
+        y: -8px;
+        width: min(t-validation-error.preferred-width + 10px, root.width * 0.8);
+        height: t-validation-error.preferred-height + 4px;
+        background: black;
+        border-width: 1px;
+        border-radius: self.height / 2;
+        border-color: #ff0000;
+
+        t-validation-error := Text {
+            x: 5px;
+            width: parent.width - 10px;
+            vertical-alignment: center;
+            font-size: 11px;
+            overflow: elide;
+            color: #ff0000;
+            text: validation-error;
         }
     }
 }

@@ -24,7 +24,8 @@
 
 #include "board2dtab.h"
 #include "board3dtab.h"
-#include "createlibrarytab.h"
+#include "library/createlibrarytab.h"
+#include "library/downloadlibrarytab.h"
 #include "schematictab.h"
 
 #include <QtCore>
@@ -61,6 +62,10 @@ void WindowTabsModel::addTab(ui::TabType type,
       t = std::make_shared<CreateLibraryTab>(mApp, this);
       break;
     }
+    case ui::TabType::DownloadLibrary: {
+      t = std::make_shared<DownloadLibraryTab>(mApp, this);
+      break;
+    }
     case ui::TabType::Schematic: {
       t = std::make_shared<SchematicTab>(mApp, prj, objIndex, this);
       break;
@@ -77,18 +82,24 @@ void WindowTabsModel::addTab(ui::TabType type,
       return;
     }
   }
-  connect(t.get(), &WindowTab::cursorCoordinatesChanged, this,
-          &WindowTabsModel::cursorCoordinatesChanged);
-  connect(t.get(), &WindowTab::requestRepaint, this,
-          &WindowTabsModel::requestRepaint);
-  connect(t.get(), &WindowTab::uiDataChanged, this, [this]() {
-    const WindowTab* tab = static_cast<WindowTab*>(sender());
+  auto getTabIndex = [this](QObject* obj) {
+    const WindowTab* tab = static_cast<WindowTab*>(obj);
     for (int i = 0; i < mItems.count(); ++i) {
       if (mItems.at(i).get() == tab) {
-        emit uiDataChanged(i);
+        return i;
       }
     }
-  });
+    return -1;
+  };
+  connect(t.get(), &WindowTab::cursorCoordinatesChanged, this,
+          &WindowTabsModel::cursorCoordinatesChanged);
+  connect(
+      t.get(), &WindowTab::requestClose, this,
+      [this, getTabIndex]() { closeTab(getTabIndex(sender())); }, Qt::QueuedConnection);
+  connect(t.get(), &WindowTab::requestRepaint, this,
+          &WindowTabsModel::requestRepaint);
+  connect(t.get(), &WindowTab::uiDataChanged, this,
+          [this, getTabIndex]() { emit uiDataChanged(getTabIndex(sender())); });
   mItems.append(t);
   row_added(mItems.count() - 1, 1);
 }

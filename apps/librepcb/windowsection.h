@@ -70,7 +70,7 @@ public:
               int objIndex) noexcept;
   void closeTab(int index) noexcept;
   void setCurrentTab(int index) noexcept;
-  bool createLibrary() noexcept;
+  void finish() noexcept;
   slint::Image renderScene(float width, float height) noexcept;
   bool processScenePointerEvent(float x, float y, float width, float height,
                                 slint::private_api::PointerEvent e) noexcept;

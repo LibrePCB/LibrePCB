@@ -85,10 +85,13 @@ export struct CreateLibraryTabData {
 export struct DownloadLibraryTabData {
     url: string,
     url-error: string,
+    url-suggestion: string,
     directory: string,
     directory-default: string,
     directory-error: string,
     valid: bool,
+    download-running: bool,
+    download-progress: int,
     download-error: string,
 }
 
@@ -171,11 +174,10 @@ export global Globals {
     // Open the tab for downloading a library
     pure callback open-download-library-tab();
 
-    // Create the new library prepared in the "create library" tab
+    // Generic handler for the "finish" button of dialog-like tabs
     //
     // - Section index
-    // -> Success
-    pure callback create-library(int) -> bool;
+    pure callback dialog-tab-finish(int);
 
     // Render a graphics scene image
     //
@@ -328,12 +330,12 @@ export global Globals {
         {
             tabs: [
                 {
-                    type: TabType.download-library,
-                    title: "Download Lib",
-                },
-                {
                     type: TabType.create-library,
                     title: "Create Lib",
+                },
+                {
+                    type: TabType.download-library,
+                    title: "Download Lib",
                 },
                 {
                     type: TabType.schematic,
@@ -346,7 +348,42 @@ export global Globals {
                     overlay-color: Colors.white,
                 },
             ],
-            current-tab-index: 0,
+            create-library-tabs: [
+                {
+                    name: "My Library",
+                    name-error: "Name error",
+                    description: "",
+                    author: "",
+                    author-default: "Me",
+                    version: "",
+                    version-default: "0.1",
+                    version-error: "Version error",
+                    url: "",
+                    url-error: "URL error",
+                    cc0: false,
+                    directory: "",
+                    directory-default: "My_Library.lplib",
+                    directory-error: "Directory error",
+                    valid: true,
+                    creation-error: "Creation error",
+                },
+            ],
+            download-library-tabs: [
+                { },
+                {
+                    url: "",
+                    url-error: "URL error",
+                    url-suggestion: "https://example.com/library.zip",
+                    directory: "",
+                    directory-default: "My_Library.lplib",
+                    directory-error: "Directory error",
+                    valid: true,
+                    download-running: true,
+                    download-progress: 42,
+                    download-error: "Download error",
+                },
+            ],
+            current-tab-index: 1,
         },
         {
             tabs: [

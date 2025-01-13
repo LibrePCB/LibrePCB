@@ -24,7 +24,6 @@
 
 #include "../../widgets/waitingspinnerwidget.h"
 #include "../desktopservices.h"
-#include "librarydownload.h"
 #include "onlinelibrarylistwidgetitem.h"
 #include "ui_addlibrarywidget.h"
 
@@ -56,12 +55,6 @@ AddLibraryWidget::AddLibraryWidget(Workspace& ws) noexcept
     mUi(new Ui::AddLibraryWidget),
     mManualCheckStateForAllRemoteLibraries(false) {
   mUi->setupUi(this);
-  connect(mUi->btnDownloadZip, &QPushButton::clicked, this,
-          &AddLibraryWidget::downloadZippedLibraryButtonClicked);
-  connect(mUi->edtLocalName, &QLineEdit::textChanged, this,
-          &AddLibraryWidget::localLibraryNameLineEditTextChanged);
-  connect(mUi->edtDownloadZipUrl, &QLineEdit::textChanged, this,
-          &AddLibraryWidget::downloadZipUrlLineEditTextChanged);
   connect(mUi->btnOnlineLibrariesDownload, &QPushButton::clicked, this,
           &AddLibraryWidget::downloadOnlineLibrariesButtonClicked);
   connect(mUi->lblLicenseLink, &QLabel::linkActivated, this,
@@ -75,35 +68,6 @@ AddLibraryWidget::AddLibraryWidget(Workspace& ws) noexcept
           &QLineEdit::setText);
   connect(mUi->cbxOnlineLibrariesSelectAll, &QCheckBox::clicked, this,
           [this]() { mManualCheckStateForAllRemoteLibraries = true; });
-
-  // Hide text in library list since text is displayed with custom item
-  // widgets, but list item texts are still set for keyboard navigation.
-  mUi->lstOnlineLibraries->setStyleSheet(
-      "QListWidget::item{"
-      "  color: transparent;"
-      "  selection-color: transparent;"
-      "}");
-
-  // tab "create local library": set placeholder texts
-  mUi->edtLocalName->setPlaceholderText("My Library");
-  mUi->edtLocalAuthor->setPlaceholderText(
-      mWorkspace.getSettings().userName.get());
-  mUi->edtLocalVersion->setPlaceholderText("0.1");
-  mUi->edtLocalUrl->setPlaceholderText(
-      tr("e.g. the URL to the Git repository (optional)"));
-  localLibraryNameLineEditTextChanged(mUi->edtLocalName->text());
-
-  // tab "download ZIP": set placeholder texts and hide widgets
-  mUi->edtDownloadZipUrl->setPlaceholderText(
-      tr("e.g. "
-         "https://github.com/LibrePCB-Libraries/LibrePCB_Base.lplib/archive/"
-         "master.zip"));
-  mUi->prgDownloadZipProgress->setVisible(false);
-  mUi->btnDownloadZipAbort->setVisible(false);
-  mUi->lblDownloadZipStatusMsg->setText("");
-
-  // select the default tab
-  mUi->tabWidget->setCurrentIndex(0);
 }
 
 AddLibraryWidget::~AddLibraryWidget() noexcept {
@@ -111,139 +75,8 @@ AddLibraryWidget::~AddLibraryWidget() noexcept {
 }
 
 /*******************************************************************************
- *  General Methods
- ******************************************************************************/
-
-void AddLibraryWidget::updateOnlineLibraryList() noexcept {
-  clearOnlineLibraryList();
-  foreach (const QUrl& url, mWorkspace.getSettings().apiEndpoints.get()) {
-    std::shared_ptr<ApiEndpoint> repo = std::make_shared<ApiEndpoint>(url);
-    connect(repo.get(), &ApiEndpoint::libraryListReceived, this,
-            &AddLibraryWidget::onlineLibraryListReceived);
-    connect(repo.get(), &ApiEndpoint::errorWhileFetchingLibraryList, this,
-            &AddLibraryWidget::errorWhileFetchingLibraryList);
-
-    // Add waiting spinner during library list download.
-    WaitingSpinnerWidget* spinner =
-        new WaitingSpinnerWidget(mUi->lstOnlineLibraries);
-    connect(repo.get(), &ApiEndpoint::libraryListReceived, spinner,
-            &WaitingSpinnerWidget::deleteLater);
-    connect(repo.get(), &ApiEndpoint::errorWhileFetchingLibraryList, spinner,
-            &WaitingSpinnerWidget::deleteLater);
-    spinner->show();
-
-    repo->requestLibraryList();
-    mApiEndpoints.append(repo);
-  }
-}
-
-/*******************************************************************************
  *  Private Methods
  ******************************************************************************/
-
-void AddLibraryWidget::localLibraryNameLineEditTextChanged(
-    QString name) noexcept {
-  if (name.isEmpty()) name = mUi->edtLocalName->placeholderText();
-  QString dirname = FilePath::cleanFileName(
-      name, FilePath::ReplaceSpaces | FilePath::KeepCase);
-  if (!dirname.endsWith(".lplib")) dirname.append(".lplib");
-  mUi->edtLocalDirectory->setPlaceholderText(dirname);
-}
-
-void AddLibraryWidget::downloadZipUrlLineEditTextChanged(
-    QString urlStr) noexcept {
-  QString left = urlStr.left(urlStr.indexOf(".lplib", Qt::CaseInsensitive));
-  QString libName = left.right(left.length() - left.lastIndexOf("/"));
-  if (libName == urlStr) {
-    libName = QUrl(urlStr).fileName();
-  }
-  QString dirname = FilePath::cleanFileName(
-      libName, FilePath::ReplaceSpaces | FilePath::KeepCase);
-  if (dirname.contains(".zip")) {
-    dirname.remove(".zip");
-  }
-  if (!dirname.isEmpty()) {
-    dirname.append(".lplib");
-  }
-  mUi->edtDownloadZipDirectory->setPlaceholderText(dirname);
-}
-
-void AddLibraryWidget::downloadZippedLibraryButtonClicked() noexcept {
-  if (mManualLibraryDownload) {
-    QMessageBox::critical(this, tr("Busy"),
-                          tr("A download is already running."));
-    return;
-  }
-
-  // get attributes
-  QUrl url = QUrl::fromUserInput(mUi->edtDownloadZipUrl->text().trimmed());
-  QString dirStr =
-      getTextOrPlaceholderFromQLineEdit(mUi->edtDownloadZipDirectory, true);
-  if ((!dirStr.isEmpty()) && (!dirStr.endsWith(".lplib"))) {
-    dirStr.append(".lplib");
-  }
-  FilePath extractToDir =
-      mWorkspace.getLibrariesPath().getPathTo("local/" % dirStr);
-
-  // check attributes validity
-  if (!url.isValid()) {
-    QMessageBox::critical(this, tr("Invalid Input"),
-                          tr("Please enter a valid URL."));
-    return;
-  }
-  if ((dirStr.isEmpty()) || (!extractToDir.isValid())) {
-    QMessageBox::critical(this, tr("Invalid Input"),
-                          tr("Please enter a valid directory."));
-    return;
-  }
-  if (extractToDir.isExistingFile() || extractToDir.isExistingDir()) {
-    QMessageBox::critical(this, tr("Directory exists already"),
-                          tr("The directory \"%1\" exists already.")
-                              .arg(extractToDir.toNative()));
-    return;
-  }
-
-  // update widgets
-  mUi->btnDownloadZip->setEnabled(false);
-  mUi->btnDownloadZipAbort->setVisible(true);
-  mUi->prgDownloadZipProgress->setVisible(true);
-  mUi->prgDownloadZipProgress->setValue(0);
-  mUi->lblDownloadZipStatusMsg->setText("");
-  mUi->lblDownloadZipStatusMsg->setStyleSheet("");
-
-  // download library
-  mManualLibraryDownload.reset(new LibraryDownload(url, extractToDir));
-  connect(mManualLibraryDownload.data(), &LibraryDownload::progressState,
-          mUi->lblDownloadZipStatusMsg, &QLabel::setText);
-  connect(mManualLibraryDownload.data(), &LibraryDownload::progressPercent,
-          mUi->prgDownloadZipProgress, &QProgressBar::setValue);
-  connect(mManualLibraryDownload.data(), &LibraryDownload::finished, this,
-          &AddLibraryWidget::downloadZipFinished);
-  connect(mUi->btnDownloadZipAbort, &QPushButton::clicked,
-          mManualLibraryDownload.data(), &LibraryDownload::abort);
-  mManualLibraryDownload->start();
-}
-
-void AddLibraryWidget::downloadZipFinished(bool success,
-                                           const QString& errMsg) noexcept {
-  Q_ASSERT(mManualLibraryDownload);
-
-  if (success) {
-    mUi->lblDownloadZipStatusMsg->setText("");
-    emit libraryAdded(mManualLibraryDownload->getDestinationDir());
-  } else {
-    mUi->lblDownloadZipStatusMsg->setText(errMsg);
-  }
-
-  // update widgets
-  mUi->btnDownloadZip->setEnabled(true);
-  mUi->btnDownloadZipAbort->setVisible(false);
-  mUi->prgDownloadZipProgress->setVisible(false);
-  mUi->lblDownloadZipStatusMsg->setStyleSheet("QLabel {color: red;}");
-
-  // delete download helper
-  mManualLibraryDownload.reset();
-}
 
 void AddLibraryWidget::onlineLibraryListReceived(
     QList<ApiEndpoint::Library> libs) noexcept {

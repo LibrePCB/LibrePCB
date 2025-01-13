@@ -181,8 +181,7 @@ export component LibrariesPanel inherits Rectangle {
             title: @tr("LIBRARIES");
 
             if Globals.refreshing-available-libraries: Spinner {
-                progress: 50;
-                //indeterminate: true;
+                indeterminate: true;
                 height: header.content-height - 2px;
             }
 
