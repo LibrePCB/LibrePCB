@@ -51,6 +51,7 @@ export struct ProjectData {
 
 export enum TabType {
     create-library,
+    download-library,
     schematic,
     board-2d,
     board-3d,
@@ -81,9 +82,20 @@ export struct CreateLibraryTabData {
     creation-error: string,
 }
 
+export struct DownloadLibraryTabData {
+    url: string,
+    url-error: string,
+    directory: string,
+    directory-default: string,
+    directory-error: string,
+    valid: bool,
+    download-error: string,
+}
+
 export struct WindowSection {
     tabs: [Tab], // Tabs in this section
     create-library-tabs: [CreateLibraryTabData],
+    download-library-tabs: [DownloadLibraryTabData],
     current-tab-index: int,  // Currently opened tab in this section
     frame: int, // Frame index to trigger repainting
 }
@@ -155,6 +167,9 @@ export global Globals {
 
     // Open the tab for creating a new library
     pure callback open-create-library-tab();
+
+    // Open the tab for downloading a library
+    pure callback open-download-library-tab();
 
     // Create the new library prepared in the "create library" tab
     //
@@ -313,8 +328,12 @@ export global Globals {
         {
             tabs: [
                 {
+                    type: TabType.download-library,
+                    title: "Download Lib",
+                },
+                {
                     type: TabType.create-library,
-                    title: "New Lib",
+                    title: "Create Lib",
                 },
                 {
                     type: TabType.schematic,

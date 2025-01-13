@@ -4,6 +4,7 @@ import { SchematicTab } from "./project/schematictab.slint";
 import { Board2dTab } from "./project/board2dtab.slint";
 import { Board3dTab } from "./project/board3dtab.slint";
 import { CreateLibraryTab } from "./library/createlibrarytab.slint";
+import { DownloadLibraryTab } from "./library/downloadlibrarytab.slint";
 
 component TabItem inherits Rectangle {
     in property <Tab> tab;
@@ -158,6 +159,13 @@ export component WindowSection inherits Rectangle {
         }
 
         if (tab-open) && (tab-type == TabType.create-library): CreateLibraryTab {
+            width: 100%;
+            height: 100%;
+            section-index: section-index;
+            section: section;
+        }
+
+        if (tab-open) && (tab-type == TabType.download-library): DownloadLibraryTab {
             width: 100%;
             height: 100%;
             section-index: section-index;
