@@ -91,6 +91,8 @@ public:
   virtual ~Board3dTab() noexcept;
 
   // General Methods
+  const ui::Board3dTabData& getUiData() const noexcept { return mUiData; }
+  void setUiData(const ui::Board3dTabData& data) noexcept;
   void activate() noexcept override;
   void deactivate() noexcept override;
   slint::Image renderScene(float width, float height) noexcept override;
@@ -111,6 +113,8 @@ private:
   bool zoom(const QPointF& center, const QSizeF& size, qreal factor) noexcept;
   void smoothTo(const Projection& projection) noexcept;
   bool applyProjection(const Projection& projection) noexcept;
+
+  ui::Board3dTabData mUiData;
 
   std::unique_ptr<BoardPlaneFragmentsBuilder> mPlaneBuilder;
   std::shared_ptr<OpenGlView> mOpenGlView;

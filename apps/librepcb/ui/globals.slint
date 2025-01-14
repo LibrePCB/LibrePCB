@@ -78,7 +78,6 @@ export enum TabType {
 export struct Tab {
     type: TabType,
     title: string,
-    overlay-color: brush,
 }
 
 export struct CreateLibraryTabData {
@@ -113,10 +112,40 @@ export struct DownloadLibraryTabData {
     download-error: string,
 }
 
+export enum SchematicTool {
+    select,
+    draw-wire,
+    add-netlabel,
+    draw-polygon,
+    add-text,
+    add-component,
+    measure,
+}
+
+export struct SchematicTabData {
+    background-color: brush,
+    overlay-color: brush,
+    show-pin-numbers: bool,
+    active-tool: SchematicTool,
+}
+
+export struct Board2dTabData {
+    background-color: brush,
+    overlay-color: brush,
+}
+
+export struct Board3dTabData {
+    background-color: brush,
+    overlay-color: brush,
+}
+
 export struct WindowSection {
     tabs: [Tab], // Tabs in this section
     create-library-tabs: [CreateLibraryTabData],
     download-library-tabs: [DownloadLibraryTabData],
+    schematic-tabs: [SchematicTabData],
+    board-2d-tabs: [Board2dTabData],
+    board-3d-tabs: [Board3dTabData],
     current-tab-index: int,  // Currently opened tab in this section
     frame: int, // Frame index to trigger repainting
 }
@@ -339,12 +368,10 @@ export global Globals {
                 {
                     type: TabType.schematic,
                     title: "Schematic",
-                    overlay-color: Colors.black,
                 },
                 {
                     type: TabType.board-2d,
                     title: "Board",
-                    overlay-color: Colors.white,
                 },
             ],
             create-library-tabs: [
@@ -382,13 +409,36 @@ export global Globals {
                     download-error: "Download error",
                 },
             ],
-            current-tab-index: 0,
+            schematic-tabs: [
+                { },
+                { },
+                {
+                    background-color: Colors.white,
+                    overlay-color: Colors.black,
+                    show-pin-numbers: false,
+                },
+            ],
+            board-2d-tabs: [
+                { },
+                { },
+                { },
+                {
+                    background-color: Colors.black,
+                    overlay-color: Colors.white,
+                },
+            ],
+            current-tab-index: 2,
         },
         {
             tabs: [
                 {
                     type: TabType.board-3d,
                     title: "3D",
+                },
+            ],
+            board-2d-tabs: [
+                {
+                    background-color: Colors.white,
                     overlay-color: Colors.gray,
                 },
             ],

@@ -1,10 +1,10 @@
-import { Globals, WindowSection, Tab } from "../globals.slint";
+import { Globals, WindowSection, Tab, Board3dTabData } from "../globals.slint";
 import { SceneButton } from "../scenebutton.slint";
 
 export component Board3dTab inherits Image {
     in property <int> section-index;
     in-out property <WindowSection> section;
-    property <Tab> tab: section.tabs[section.current-tab-index];
+    property <[Board3dTabData]> tabs: section.board-3d-tabs;
 
     image-fit: ImageFit.preserve;
     image-rendering: ImageRendering.pixelated;
@@ -27,7 +27,8 @@ export component Board3dTab inherits Image {
 
         SceneButton {
             image: @image-url("../img/zoom-fit.svg");
-            colorize: tab.overlay-color;
+            bg-color: tabs[section.current-tab-index].background-color;
+            fg-color: tabs[section.current-tab-index].overlay-color;
             clicked => {
                 Globals.scene-zoom-fit-clicked(section-index, root.width, root.height);
             }
@@ -35,7 +36,8 @@ export component Board3dTab inherits Image {
 
         SceneButton {
             image: @image-url("../img/zoom-in.svg");
-            colorize: tab.overlay-color;
+            bg-color: tabs[section.current-tab-index].background-color;
+            fg-color: tabs[section.current-tab-index].overlay-color;
             clicked => {
                 Globals.scene-zoom-in-clicked(section-index, root.width, root.height);
             }
@@ -43,7 +45,8 @@ export component Board3dTab inherits Image {
 
         SceneButton {
             image: @image-url("../img/zoom-out.svg");
-            colorize: tab.overlay-color;
+            bg-color: tabs[section.current-tab-index].background-color;
+            fg-color: tabs[section.current-tab-index].overlay-color;
             clicked => {
                 Globals.scene-zoom-out-clicked(section-index, root.width, root.height);
             }

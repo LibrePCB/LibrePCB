@@ -123,11 +123,20 @@ Files:
 Copyright: LibrePCB Developers, see AUTHORS.md
 License: CC0-1.0
 
-Files: apps/librepcb/ui/img/plus.svg
+Files:
+ apps/librepcb/ui/img/draw-wire.svg
+ apps/librepcb/ui/img/netlabel.svg
+ apps/librepcb/ui/img/output-jobs.svg
+ apps/librepcb/ui/img/plus.svg
+ apps/librepcb/ui/img/shopping-cart.svg
 Copyright: The Bootstrap Authors
 License: MIT
 
 Files:
+ apps/librepcb/ui/img/cursor.svg
+ apps/librepcb/ui/img/draw-polygon.svg
+ apps/librepcb/ui/img/draw-text.svg
+ apps/librepcb/ui/img/ruler.svg
  img/actions/align_horizontally.svg
  img/actions/align_vertically.svg
  img/actions/donate_white.svg

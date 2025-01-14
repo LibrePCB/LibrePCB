@@ -23,9 +23,12 @@
 #include "windowsection.h"
 
 #include "apptoolbox.h"
+#include "board2dtab.h"
+#include "board3dtab.h"
 #include "guiapplication.h"
 #include "library/createlibrarytab.h"
 #include "library/downloadlibrarytab.h"
+#include "schematictab.h"
 #include "windowtab.h"
 #include "windowtabsmodel.h"
 #include "windowtabsmodeladapter.h"
@@ -55,7 +58,17 @@ WindowSection::WindowSection(GuiApplication& app, QObject* parent) noexcept
         std::make_shared<WindowTabsModelAdapter<DownloadLibraryTab,
                                                 ui::DownloadLibraryTabData>>(
             mTabsModel, this),
-        0, 0} {
+        std::make_shared<
+            WindowTabsModelAdapter<SchematicTab, ui::SchematicTabData>>(
+            mTabsModel, this),
+        std::make_shared<
+            WindowTabsModelAdapter<Board2dTab, ui::Board2dTabData>>(mTabsModel,
+                                                                    this),
+        std::make_shared<
+            WindowTabsModelAdapter<Board3dTab, ui::Board3dTabData>>(mTabsModel,
+                                                                    this),
+        0,
+        0} {
   connect(mTabsModel.get(), &WindowTabsModel::cursorCoordinatesChanged, this,
           &WindowSection::cursorCoordinatesChanged);
   connect(mTabsModel.get(), &WindowTabsModel::requestRepaint, this, [this]() {

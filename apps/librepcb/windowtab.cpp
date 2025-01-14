@@ -43,7 +43,7 @@ WindowTab::WindowTab(GuiApplication& app, ui::TabType type,
                      const QString& title, QObject* parent) noexcept
   : QObject(parent),
     mApp(app),
-    mUiData{type, q2s(title), slint::Brush()},
+    mUiData{type, q2s(title)},
     mProject(prj),
     mObjIndex(objIndex) {
 }
