@@ -1,0 +1,189 @@
+import { ComboBox, CheckBox } from "std-widgets.slint";
+import { Globals, WindowSection, Tab, SchematicTabData, SchematicTool } from "../../globals.slint";
+import { SceneButton } from "../../scenebutton.slint";
+import { ToolButton } from "../../toolbutton.slint";
+import { LengthEdit } from "../../lengthedit.slint";
+import { DrawWireToolBar } from "./drawwiretoolbar.slint";
+import { DrawPolygonToolBar } from "./drawpolygontoolbar.slint";
+import { AddTextToolBar } from "./addtexttoolbar.slint";
+import { AddComponentToolBar } from "./addcomponenttoolbar.slint";
+
+export component SchematicTab inherits Image {
+    in property <int> section-index;
+    in-out property <WindowSection> section;
+    property <[SchematicTabData]> tabs: section.schematic-tabs;
+
+    image-fit: ImageFit.preserve;
+    image-rendering: ImageRendering.pixelated;
+    source: Globals.render-scene(section-index, root.width, root.height, section.frame);
+
+    if Globals.preview-mode: Rectangle {
+        background: white;
+    }
+
+    TouchArea {
+        pointer-event(e) => {
+            return Globals.scene-pointer-event(section-index, self.mouse-x, self.mouse-y, root.width, root.height, e);
+        }
+
+        scroll-event(e) => {
+            return Globals.scene-scrolled(section-index, self.mouse-x, self.mouse-y, root.width, root.height, e);
+        }
+    }
+
+    top-bar := Rectangle {
+        y: 0;
+        width: self.preferred-width;
+        height: self.preferred-height;
+        background: #505050;
+        border-bottom-left-radius: self.height / 2;
+        border-bottom-right-radius: self.height / 2;
+
+        HorizontalLayout {
+            alignment: center;
+            padding-left: 15px;
+            padding-right: 15px;
+            padding-top: 2px;
+            padding-bottom: 5px;
+
+            if tabs[section.current-tab-index].active-tool == SchematicTool.draw-wire: DrawWireToolBar { }
+
+            if tabs[section.current-tab-index].active-tool == SchematicTool.draw-polygon: DrawPolygonToolBar { }
+
+            if tabs[section.current-tab-index].active-tool == SchematicTool.add-text: AddTextToolBar { }
+
+            if tabs[section.current-tab-index].active-tool == SchematicTool.add-component: AddComponentToolBar { }
+        }
+    }
+
+    VerticalLayout {
+        x: 10px;
+        y: 40px;
+        width: self.preferred-width;
+        spacing: 5px;
+
+        ToolButton {
+            image: @image-url("../../img/cursor.svg");
+            checked: tabs[section.current-tab-index].active-tool == SchematicTool.select;
+
+            clicked => {
+                //if Globals.preview-mode {
+                    tabs[section.current-tab-index].active-tool = SchematicTool.select;
+                //}
+            }
+        }
+
+        ToolButton {
+            image: @image-url("../../img/draw-wire.svg");
+            checked: tabs[section.current-tab-index].active-tool == SchematicTool.draw-wire;
+
+            clicked => {
+                //if Globals.preview-mode {
+                    tabs[section.current-tab-index].active-tool = SchematicTool.draw-wire;
+                //}
+            }
+        }
+
+        ToolButton {
+            image: @image-url("../../img/netlabel.svg");
+            checked: tabs[section.current-tab-index].active-tool == SchematicTool.add-netlabel;
+
+            clicked => {
+                //if Globals.preview-mode {
+                    tabs[section.current-tab-index].active-tool = SchematicTool.add-netlabel;
+                //}
+            }
+        }
+
+        ToolButton {
+            image: @image-url("../../img/draw-polygon.svg");
+            checked: tabs[section.current-tab-index].active-tool == SchematicTool.draw-polygon;
+
+            clicked => {
+                //if Globals.preview-mode {
+                    tabs[section.current-tab-index].active-tool = SchematicTool.draw-polygon;
+                //}
+            }
+        }
+
+        ToolButton {
+            image: @image-url("../../img/draw-text.svg");
+            checked: tabs[section.current-tab-index].active-tool == SchematicTool.add-text;
+
+            clicked => {
+                //if Globals.preview-mode {
+                    tabs[section.current-tab-index].active-tool = SchematicTool.add-text;
+                //}
+            }
+        }
+
+        ToolButton {
+            image: @image-url("../../img/plus.svg");
+            checked: tabs[section.current-tab-index].active-tool == SchematicTool.add-component;
+
+            clicked => {
+                //if Globals.preview-mode {
+                    tabs[section.current-tab-index].active-tool = SchematicTool.add-component;
+                //}
+            }
+        }
+
+        ToolButton {
+            image: @image-url("../../img/ruler.svg");
+            checked: tabs[section.current-tab-index].active-tool == SchematicTool.measure;
+
+            clicked => {
+                //if Globals.preview-mode {
+                    tabs[section.current-tab-index].active-tool = SchematicTool.measure;
+                //}
+            }
+        }
+    }
+
+    VerticalLayout {
+        x: parent.width - self.preferred-width - 10px;
+        y: 40px;
+        width: self.preferred-width;
+        spacing: 5px;
+
+        SceneButton {
+            image: @image-url("../../img/zoom-fit.svg");
+            bg-color: tabs[section.current-tab-index].background-color;
+            fg-color: tabs[section.current-tab-index].overlay-color;
+            clicked => {
+                Globals.scene-zoom-fit-clicked(section-index, root.width, root.height);
+            }
+        }
+
+        SceneButton {
+            image: @image-url("../../img/zoom-in.svg");
+            bg-color: tabs[section.current-tab-index].background-color;
+            fg-color: tabs[section.current-tab-index].overlay-color;
+            clicked => {
+                Globals.scene-zoom-in-clicked(section-index, root.width, root.height);
+            }
+        }
+
+        SceneButton {
+            image: @image-url("../../img/zoom-out.svg");
+            bg-color: tabs[section.current-tab-index].background-color;
+            fg-color: tabs[section.current-tab-index].overlay-color;
+            clicked => {
+                Globals.scene-zoom-out-clicked(section-index, root.width, root.height);
+            }
+        }
+
+        SceneButton {
+            text: "pins";
+            font-size: 10px;
+            bg-color: tabs[section.current-tab-index].background-color;
+            fg-color: tabs[section.current-tab-index].overlay-color;
+            checkable: true;
+            checked: tabs[section.current-tab-index].show-pin-numbers;
+
+            changed checked => {
+                tabs[section.current-tab-index].show-pin-numbers = self.checked;
+            }
+        }
+    }
+}

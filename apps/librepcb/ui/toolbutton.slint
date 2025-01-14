@@ -1,0 +1,21 @@
+export component ToolButton inherits Rectangle {
+    in property <bool> checked: false;
+    in property <image> image;
+
+    callback clicked <=> ta.clicked;
+
+    width: 30px;
+    height: 30px;
+    background: checked ? blue : (ta.has-hover ? #606060 : #303030);
+    border-radius: 3px;
+
+    Image {
+        width: parent.width * 0.7;
+        height: self.width;
+        image-fit: contain;
+        colorize: white;
+        source: image;
+    }
+
+    ta := TouchArea { }
+}

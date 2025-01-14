@@ -1,0 +1,27 @@
+import { ComboBox, CheckBox } from "std-widgets.slint";
+import { Globals, WindowSection, Tab, SchematicTabData, SchematicTool } from "../../globals.slint";
+import { LengthEdit } from "../../lengthedit.slint";
+
+export component DrawPolygonToolBar inherits HorizontalLayout {
+    spacing: 5px;
+
+    Text {
+        vertical-alignment: center;
+        text: @tr("Layer:");
+    }
+
+    ComboBox {
+        model: ["Guide", "Schematic Frame"];
+    }
+
+    Text {
+        vertical-alignment: center;
+        text: @tr("Width:");
+    }
+
+    LengthEdit { }
+
+    CheckBox {
+        text: @tr("Fill");
+    }
+}
