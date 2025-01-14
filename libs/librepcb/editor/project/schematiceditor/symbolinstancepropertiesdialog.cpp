@@ -122,7 +122,7 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(
           .trimmed());
   connect(mUi->lblCompLibName, &QLabel::linkActivated, this,
           [this](const QString& url) {
-            DesktopServices ds(mWorkspace.getSettings(), this);
+            DesktopServices ds(mWorkspace.getSettings());
             ds.openLocalPath(FilePath(url));
           });
 
@@ -143,7 +143,7 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(
           .trimmed());
   connect(mUi->lblSymbLibName, &QLabel::linkActivated, this,
           [this](const QString& url) {
-            DesktopServices ds(mWorkspace.getSettings(), this);
+            DesktopServices ds(mWorkspace.getSettings());
             ds.openLocalPath(FilePath(url));
           });
 

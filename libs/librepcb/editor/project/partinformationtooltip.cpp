@@ -383,7 +383,7 @@ void PartInformationToolTip::setSourceDetailsExpanded(bool expanded,
 }
 
 void PartInformationToolTip::openUrl(const QUrl& url) noexcept {
-  DesktopServices ds(mSettings, this);
+  DesktopServices ds(mSettings);
   if (ds.openWebUrl(url)) {
     hideAndReset();
   }

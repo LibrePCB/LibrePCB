@@ -82,7 +82,7 @@ LibraryInfoWidget::LibraryInfoWidget(Workspace& ws, const FilePath& libDir)
           .arg(lib->getUrl().toEncoded(), lib->getUrl().toDisplayString()));
   connect(mUi->lblUrl, &QLabel::linkActivated, this,
           [this](const QString& url) {
-            DesktopServices ds(mWorkspace.getSettings(), this);
+            DesktopServices ds(mWorkspace.getSettings());
             ds.openWebUrl(QUrl(url));
           });
   mUi->lblCreated->setText(lib->getCreated().toString(Qt::TextDate));
@@ -113,7 +113,7 @@ LibraryInfoWidget::LibraryInfoWidget(Workspace& ws, const FilePath& libDir)
   mUi->lblDirectory->setToolTip(mLibDir.toNative());
   connect(mUi->lblDirectory, &QLabel::linkActivated, this,
           [this](const QString& url) {
-            DesktopServices ds(mWorkspace.getSettings(), this);
+            DesktopServices ds(mWorkspace.getSettings());
             ds.openLocalPath(FilePath(url));
           });
 }
