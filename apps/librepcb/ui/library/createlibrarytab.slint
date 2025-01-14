@@ -56,6 +56,38 @@ export component CreateLibraryTab inherits Rectangle {
         }
 
         Row {
+            Rectangle { }
+
+            Flickable {
+                viewport-width: hl-examples.preferred-width;
+                height: hl-examples.preferred-height;
+
+                hl-examples := HorizontalLayout {
+                    alignment: start;
+                    spacing: 8px;
+
+                    Text {
+                        text: @tr("Examples:");
+                    }
+
+                    for text[i] in ["My Library", "KiCad Import", "Eagle Import"]: Text {
+                        color: white;
+                        overflow: elide;
+                        text: text;
+
+                        TouchArea {
+                            mouse-cursor: pointer;
+
+                            clicked => {
+                                le-name.text = text;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Row {
             Text {
                 text: @tr("Description:");
                 vertical-alignment: center;

@@ -69,6 +69,8 @@ GuiApplication::~GuiApplication() noexcept {
 
 bool GuiApplication::actionTriggered(ui::ActionId id,
                                      int sectionIndex) noexcept {
+  Q_UNUSED(sectionIndex);
+
   if (id == ui::ActionId::WindowNew) {
     createNewWindow();
     return true;
@@ -126,10 +128,11 @@ void GuiApplication::createNewWindow() noexcept {
         }
         return res;
       });
-
   globals.on_uninstall_library(std::bind(&LibrariesModel::uninstallLibrary,
                                          mLibraries.get(),
                                          std::placeholders::_1));
+  globals.on_toggle_libraries_checked(std::bind(
+      &LibrariesModel::toggleAll, mLibraries.get(), std::placeholders::_1));
 
   // Set models.
   globals.set_workspace_folder(std::make_shared<FileSystemModel>(
