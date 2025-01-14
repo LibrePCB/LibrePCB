@@ -1,6 +1,6 @@
 import { Button, CheckBox, ProgressIndicator } from "std-widgets.slint";
 import { LineEdit } from "../lineedit.slint";
-import { Globals, WindowSection, DownloadLibraryTabData } from "../globals.slint";
+import { Globals, WindowSection, DownloadLibraryTabData, ActionId } from "../globals.slint";
 
 export component DownloadLibraryTab inherits Rectangle {
     in property <int> section-index;
@@ -139,7 +139,7 @@ export component DownloadLibraryTab inherits Rectangle {
                     text: @tr("Download Library");
 
                     clicked => {
-                        Globals.dialog-tab-finish(section-index);
+                        Globals.action-triggered(ActionId.section-ok, section-index);
                     }
                 }
 
@@ -147,7 +147,7 @@ export component DownloadLibraryTab inherits Rectangle {
                     text: @tr("Cancel");
 
                     clicked => {
-                        Globals.tab-close-clicked(section-index, section.current-tab-index);
+                        Globals.action-triggered(ActionId.section-cancel, section-index);
                     }
                 }
             }

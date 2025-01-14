@@ -1,4 +1,4 @@
-import { Globals, Tab, TabType, WindowSection } from "./globals.slint";
+import { Globals, Tab, TabType, WindowSection, ActionId } from "./globals.slint";
 import { EmptyTab } from "./emptytab.slint";
 import { SchematicTab } from "./project/schematictab.slint";
 import { Board2dTab } from "./project/board2dtab.slint";
@@ -121,7 +121,7 @@ export component WindowSection inherits Rectangle {
 
                 ta-section-split := TouchArea {
                     clicked => {
-                        Globals.section-split-clicked(section-index);
+                        Globals.action-triggered(ActionId.section-split, section-index);
                     }
                 }
             }
@@ -139,7 +139,7 @@ export component WindowSection inherits Rectangle {
 
                 ta-section-close := TouchArea {
                     clicked => {
-                        Globals.section-close-clicked(section-index);
+                        Globals.action-triggered(ActionId.section-close, section-index);
                     }
                 }
             }

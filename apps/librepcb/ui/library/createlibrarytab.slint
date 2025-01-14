@@ -1,6 +1,6 @@
 import { Button, LineEdit, CheckBox } from "std-widgets.slint";
 import { LineEdit } from "../lineedit.slint";
-import { Globals, WindowSection, CreateLibraryTabData } from "../globals.slint";
+import { Globals, WindowSection, CreateLibraryTabData, ActionId } from "../globals.slint";
 import { ToolTip } from "../tooltip.slint";
 
 export component CreateLibraryTab inherits Rectangle {
@@ -206,7 +206,7 @@ export component CreateLibraryTab inherits Rectangle {
                     text: @tr("Create Library");
 
                     clicked => {
-                        Globals.dialog-tab-finish(section-index);
+                        Globals.action-triggered(ActionId.section-ok, section-index);
                     }
                 }
 

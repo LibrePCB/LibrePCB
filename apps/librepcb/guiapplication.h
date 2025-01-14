@@ -67,6 +67,7 @@ public:
   ProjectsModel& getProjects() noexcept { return *mProjects; }
 
   // General Methods
+  bool actionTriggered(ui::ActionId id, int sectionIndex) noexcept;
   void exec();
 
   // Operator Overloadings
@@ -74,7 +75,6 @@ public:
 
 private:
   void createNewWindow() noexcept;
-  void actionTriggered(ui::ActionId id) noexcept;
 
   Workspace& mWorkspace;
   std::shared_ptr<RecentProjectsModel> mRecentProjects;

@@ -61,14 +61,9 @@ public:
   virtual ~WindowSectionsModel() noexcept;
 
   // General Methods
-  void openCreateLibraryTab() noexcept;
-  void openDownloadLibraryTab() noexcept;
-  void finish(int sectionIndex) noexcept;
+  bool actionTriggered(ui::ActionId id, int sectionIndex) noexcept;
   void openSchematic(std::shared_ptr<ProjectEditor> prj, int index) noexcept;
   void openBoard(std::shared_ptr<ProjectEditor> prj, int index) noexcept;
-  void openBoard3dViewer(int sectionIndex) noexcept;
-  void splitSection(int sectionIndex) noexcept;
-  void closeSection(int sectionIndex) noexcept;
   void setCurrentTab(int sectionIndex, int tabIndex) noexcept;
   void closeTab(int sectionIndex, int tabIndex) noexcept;
   slint::Image renderScene(int sectionIndex, float width, float height,
@@ -96,6 +91,7 @@ signals:
   void cursorCoordinatesChanged(qreal x, qreal y);
 
 private:
+  void splitSection(int sectionIndex) noexcept;
   void addTab(ui::TabType type, std::shared_ptr<ProjectEditor> prj,
               int objIndex) noexcept;
 

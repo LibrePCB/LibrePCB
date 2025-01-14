@@ -67,6 +67,21 @@ GuiApplication::~GuiApplication() noexcept {
  *  General Methods
  ******************************************************************************/
 
+bool GuiApplication::actionTriggered(ui::ActionId id,
+                                     int sectionIndex) noexcept {
+  if (id == ui::ActionId::WindowNew) {
+    createNewWindow();
+    return true;
+  } else if (id == ui::ActionId::LibraryPanelEnsurePopulated) {
+    mLibraries->ensurePopulated();
+    return true;
+  } else if (id == ui::ActionId::LibraryPanelInstall) {
+    mLibraries->installCheckedLibraries();
+    return true;
+  }
+  return false;
+}
+
 void GuiApplication::exec() {
   slint::run_event_loop();
 }
@@ -87,7 +102,6 @@ void GuiApplication::createNewWindow() noexcept {
   globals.set_preview_mode(false);
 
   // Register global callbacks.
-  globals.on_action_triggered([this](ui::ActionId id) { actionTriggered(id); });
   globals.on_parse_length_input(
       [](slint::SharedString text, slint::SharedString unit) {
         ui::EditParseResult res{false, text, unit};
@@ -112,10 +126,7 @@ void GuiApplication::createNewWindow() noexcept {
         }
         return res;
       });
-  globals.on_ensure_libraries_populated(
-      std::bind(&LibrariesModel::ensurePopulated, mLibraries.get()));
-  globals.on_install_checked_libraries(
-      std::bind(&LibrariesModel::installCheckedLibraries, mLibraries.get()));
+
   globals.on_uninstall_library(std::bind(&LibrariesModel::uninstallLibrary,
                                          mLibraries.get(),
                                          std::placeholders::_1));
@@ -144,17 +155,6 @@ void GuiApplication::createNewWindow() noexcept {
   // Build wrapper.
   mWindows.append(
       std::make_shared<MainWindow>(*this, win, mWindows.count(), this));
-}
-
-void GuiApplication::actionTriggered(ui::ActionId id) noexcept {
-  switch (id) {
-    case ui::ActionId::NewWindow:
-      createNewWindow();
-      break;
-    default:
-      qWarning() << "Unknown action triggered:" << static_cast<int>(id);
-      break;
-  }
 }
 
 /*******************************************************************************
