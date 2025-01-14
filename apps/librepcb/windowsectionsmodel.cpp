@@ -61,18 +61,44 @@ WindowSectionsModel::~WindowSectionsModel() noexcept {
  *  General Methods
  ******************************************************************************/
 
-void WindowSectionsModel::openCreateLibraryTab() noexcept {
-  addTab(ui::TabType::CreateLibrary, nullptr, -1);
-}
-
-void WindowSectionsModel::openDownloadLibraryTab() noexcept {
-  addTab(ui::TabType::DownloadLibrary, nullptr, -1);
-}
-
-void WindowSectionsModel::finish(int sectionIndex) noexcept {
-  if (std::shared_ptr<WindowSection> s = mItems.value(sectionIndex)) {
-    s->finish();
+bool WindowSectionsModel::actionTriggered(ui::ActionId id,
+                                          int sectionIndex) noexcept {
+  if (id == ui::ActionId::SectionSplit) {
+    splitSection(sectionIndex);
+    return true;
+  } else if ((id == ui::ActionId::SectionClose) && (mItems.count() > 1)) {
+    if (std::shared_ptr<WindowSection> s = mItems.value(sectionIndex)) {
+      for (std::size_t i = 0; i < s->getTabCount(); ++i) {
+        s->closeTab(i);
+      }
+      mItems.remove(sectionIndex);
+      mCurrentSectionIndex =
+          qBound(-1, mCurrentSectionIndex, mItems.count() - 1);
+      row_removed(sectionIndex, 1);
+      emit currentSectionIndexChanged(mCurrentSectionIndex);
+      if (auto sNew = mItems.value(mCurrentSectionIndex)) {
+        emit currentProjectChanged(sNew->getCurrentProject());
+      }
+      return true;
+    }
+  } else if (id == ui::ActionId::CreateLibraryTabOpen) {
+    addTab(ui::TabType::CreateLibrary, nullptr, -1);
+    return true;
+  } else if (id == ui::ActionId::DownloadLibraryTabOpen) {
+    addTab(ui::TabType::DownloadLibrary, nullptr, -1);
+    return true;
+  } else if (id == ui::ActionId::Board2dTabOpen3d) {
+    if (std::shared_ptr<WindowSection> s = mItems.value(sectionIndex)) {
+      if (auto t = s->getCurrentTab()) {
+        if (auto prj = t->getProject()) {
+          addTab(ui::TabType::Board3d, prj, t->getObjIndex());
+        }
+      }
+    }
+  } else if (std::shared_ptr<WindowSection> s = mItems.value(sectionIndex)) {
+    return s->actionTriggered(id);
   }
+  return false;
 }
 
 void WindowSectionsModel::openSchematic(std::shared_ptr<ProjectEditor> prj,
@@ -83,48 +109,6 @@ void WindowSectionsModel::openSchematic(std::shared_ptr<ProjectEditor> prj,
 void WindowSectionsModel::openBoard(std::shared_ptr<ProjectEditor> prj,
                                     int index) noexcept {
   addTab(ui::TabType::Board2d, prj, index);
-}
-
-void WindowSectionsModel::openBoard3dViewer(int sectionIndex) noexcept {
-  if (std::shared_ptr<WindowSection> s = mItems.value(sectionIndex)) {
-    if (std::shared_ptr<WindowTab> t = s->getCurrentTab()) {
-      if (auto prj = t->getProject()) {
-        addTab(ui::TabType::Board3d, prj, t->getObjIndex());
-      }
-    }
-  }
-}
-
-void WindowSectionsModel::splitSection(int sectionIndex) noexcept {
-  const int newIndex = qBound(0, sectionIndex + 1, mItems.count());
-  std::shared_ptr<WindowSection> s =
-      std::make_shared<WindowSection>(mApp, this);
-  connect(s.get(), &WindowSection::uiDataChanged, this,
-          [this, newIndex]() { row_changed(newIndex); });
-  connect(s.get(), &WindowSection::currentProjectChanged, this,
-          &WindowSectionsModel::currentProjectChanged);
-  connect(s.get(), &WindowSection::cursorCoordinatesChanged, this,
-          &WindowSectionsModel::cursorCoordinatesChanged);
-  mItems.insert(newIndex, s);
-  row_added(newIndex, 1);
-}
-
-void WindowSectionsModel::closeSection(int sectionIndex) noexcept {
-  if (mItems.count() <= 1) {
-    return;  // Do not allow to close the last section.
-  }
-  if (std::shared_ptr<WindowSection> s = mItems.value(sectionIndex)) {
-    for (std::size_t i = 0; i < s->getTabCount(); ++i) {
-      s->closeTab(i);
-    }
-    mItems.remove(sectionIndex);
-    mCurrentSectionIndex = qBound(-1, mCurrentSectionIndex, mItems.count() - 1);
-    row_removed(sectionIndex, 1);
-    emit currentSectionIndexChanged(mCurrentSectionIndex);
-    if (auto sNew = mItems.value(mCurrentSectionIndex)) {
-      emit currentProjectChanged(sNew->getCurrentProject());
-    }
-  }
 }
 
 void WindowSectionsModel::setCurrentTab(int sectionIndex,
@@ -227,6 +211,20 @@ std::optional<ui::WindowSection> WindowSectionsModel::row_data(
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void WindowSectionsModel::splitSection(int sectionIndex) noexcept {
+  const int newIndex = qBound(0, sectionIndex + 1, mItems.count());
+  std::shared_ptr<WindowSection> s =
+      std::make_shared<WindowSection>(mApp, this);
+  connect(s.get(), &WindowSection::uiDataChanged, this,
+          [this, newIndex]() { row_changed(newIndex); });
+  connect(s.get(), &WindowSection::currentProjectChanged, this,
+          &WindowSectionsModel::currentProjectChanged);
+  connect(s.get(), &WindowSection::cursorCoordinatesChanged, this,
+          &WindowSectionsModel::cursorCoordinatesChanged);
+  mItems.insert(newIndex, s);
+  row_added(newIndex, 1);
+}
 
 void WindowSectionsModel::addTab(ui::TabType type,
                                  std::shared_ptr<ProjectEditor> prj,

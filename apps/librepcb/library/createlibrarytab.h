@@ -66,7 +66,7 @@ public:
   void setUiData(const ui::CreateLibraryTabData& data) noexcept;
   void activate() noexcept override;
   void deactivate() noexcept override;
-  void finish() noexcept override;
+  bool actionTriggered(ui::ActionId id) noexcept override;
 
   // Operator Overloadings
   CreateLibraryTab& operator=(const CreateLibraryTab& rhs) = delete;

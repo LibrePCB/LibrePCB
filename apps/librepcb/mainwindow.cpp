@@ -64,6 +64,9 @@ MainWindow::MainWindow(GuiApplication& app,
   mWindow->set_cursor_coordinate(slint::SharedString());
 
   // Register global callbacks.
+  g.on_action_triggered(std::bind(&MainWindow::actionTriggered, this,
+                                  std::placeholders::_1,
+                                  std::placeholders::_2));
   g.on_project_item_doubleclicked(std::bind(
       &MainWindow::projectItemDoubleClicked, this, std::placeholders::_1));
   g.on_schematic_clicked([this](int index) {
@@ -72,24 +75,12 @@ MainWindow::MainWindow(GuiApplication& app,
   g.on_board_clicked([this](int index) {
     if (mCurrentProject) mSections->openBoard(mCurrentProject, index);
   });
-  g.on_board_3d_clicked(std::bind(&WindowSectionsModel::openBoard3dViewer,
-                                  mSections.get(), std::placeholders::_1));
-  g.on_section_split_clicked(std::bind(&WindowSectionsModel::splitSection,
-                                       mSections.get(), std::placeholders::_1));
-  g.on_section_close_clicked(std::bind(&WindowSectionsModel::closeSection,
-                                       mSections.get(), std::placeholders::_1));
   g.on_tab_clicked(std::bind(&WindowSectionsModel::setCurrentTab,
                              mSections.get(), std::placeholders::_1,
                              std::placeholders::_2));
   g.on_tab_close_clicked(std::bind(&WindowSectionsModel::closeTab,
                                    mSections.get(), std::placeholders::_1,
                                    std::placeholders::_2));
-  g.on_open_create_library_tab(
-      std::bind(&WindowSectionsModel::openCreateLibraryTab, mSections.get()));
-  g.on_open_download_library_tab(
-      std::bind(&WindowSectionsModel::openDownloadLibraryTab, mSections.get()));
-  g.on_dialog_tab_finish(std::bind(&WindowSectionsModel::finish,
-                                   mSections.get(), std::placeholders::_1));
   g.on_render_scene(std::bind(
       &WindowSectionsModel::renderScene, mSections.get(), std::placeholders::_1,
       std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
@@ -139,6 +130,17 @@ MainWindow::~MainWindow() noexcept {
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+bool MainWindow::actionTriggered(ui::ActionId id, int sectionIndex) noexcept {
+  if (mSections->actionTriggered(id, sectionIndex)) {
+    return true;
+  } else if (mApp.actionTriggered(id, sectionIndex)) {
+    return true;
+  }
+
+  qWarning() << "Unhandled action triggered:" << static_cast<int>(id);
+  return false;
+}
 
 void MainWindow::projectItemDoubleClicked(
     const slint::SharedString& path) noexcept {

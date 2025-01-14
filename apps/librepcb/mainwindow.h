@@ -64,6 +64,7 @@ public:
   MainWindow& operator=(const MainWindow& rhs) = delete;
 
 private:
+  bool actionTriggered(ui::ActionId id, int sectionIndex) noexcept;
   void projectItemDoubleClicked(const slint::SharedString& path) noexcept;
   void setCurrentProject(std::shared_ptr<ProjectEditor> prj) noexcept;
 
