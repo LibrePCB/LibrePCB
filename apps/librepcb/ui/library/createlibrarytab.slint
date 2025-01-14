@@ -1,6 +1,7 @@
 import { Button, LineEdit, CheckBox } from "std-widgets.slint";
 import { LineEdit } from "../lineedit.slint";
 import { Globals, WindowSection, CreateLibraryTabData } from "../globals.slint";
+import { ToolTip } from "../tooltip.slint";
 
 export component CreateLibraryTab inherits Rectangle {
     in property <int> section-index;
@@ -126,6 +127,7 @@ export component CreateLibraryTab inherits Rectangle {
             }
 
             HorizontalLayout {
+                z: 100;  // For the tooltip.
                 spacing: 8px;
 
                 cbx-cc0 := CheckBox {
@@ -145,6 +147,30 @@ export component CreateLibraryTab inherits Rectangle {
                         clicked => {
                             cbx-cc0.checked = !cbx-cc0.checked;
                         }
+                    }
+                }
+
+                Image {
+                    property <string> url: "https://en.wikipedia.org/wiki/Creative_Commons_license";
+
+                    y: (parent.height - self.height) / 2;
+                    width: 20px;
+                    height: 20px;
+                    source: @image-url("../img/help.svg");
+                    colorize: ta-license-info.has-hover ? white : #c0c0c0;
+
+                    ta-license-info := TouchArea {
+                        mouse-cursor: pointer;
+
+                        clicked => {
+                            Globals.open-url(url);
+                        }
+                    }
+
+                    if ta-license-info.has-hover: ToolTip {
+                        x: -5px - self.width;
+                        y: (parent.height - self.height) / 2;
+                        text: url;
                     }
                 }
             }

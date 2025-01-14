@@ -3,17 +3,23 @@ export component ToolTip inherits Rectangle {
 
     width: t.preferred-width + 10px;
     height: 25px;
-    background: #3b3b3b;
+    background: #101010;
     border-radius: 3px;
+    opacity: 0;
 
     animate opacity { duration: 150ms; }
 
     t := Text {
         x: 5px;
-        color: #ffffffca;
+        color: #eeeeee;
         horizontal-alignment: TextHorizontalAlignment.left;
         vertical-alignment: TextVerticalAlignment.center;
         wrap: TextWrap.no-wrap;
         overflow: TextOverflow.elide;
+        font-size: 13px;
+    }
+
+    init => {
+        self.opacity = 1;
     }
 }

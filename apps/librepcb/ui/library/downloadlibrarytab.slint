@@ -8,8 +8,6 @@ export component DownloadLibraryTab inherits Rectangle {
     property <[DownloadLibraryTabData]> tabs: section.download-library-tabs;
     property <bool> read-only: tabs[section.current-tab-index].download-running;
 
-    clip: true;
-
     GridLayout {
         width: root.width;
         padding: 10px;
@@ -30,7 +28,7 @@ export component DownloadLibraryTab inherits Rectangle {
             Text {
                 colspan: 2;
                 wrap: TextWrap.word-wrap;
-                text: @tr("Please note that this is not the preferred way to install libraries as they won't be kept up to date. For our official libraries, please consider installing them in the libraries panel instead, which allows to keep libraries up to date.");
+                text: @tr("Please note that this is not the preferred way to install libraries as they won't be kept up to date. For our official libraries, it's recommended to install them from the libraries panel instead, which allows to keep libraries up to date.");
             }
         }
 
