@@ -1,7 +1,7 @@
 import { CheckBox, Button, ListView, ProgressIndicator, Spinner, HorizontalBox, VerticalBox, StandardButton } from "std-widgets.slint";
-import { PanelHeader } from "./panelheader.slint";
-import { Globals, Library, LibraryType, LibraryState, ActionId } from "./globals.slint";
-import { ToolTip } from "./tooltip.slint";
+import { PanelHeader } from "../panelheader.slint";
+import { Globals, Library, LibraryType, LibraryState, ActionId } from "../globals.slint";
+import { ToolTip } from "../tooltip.slint";
 
 component LibraryList inherits ListView {
     in property <length> bottom-padding: 50px;
@@ -92,7 +92,7 @@ component LibraryList inherits ListView {
                                 y: (parent.height - self.height) / 2;
                                 width: self.visible ? self.preferred-width : 0px;
                                 height: 24px;
-                                icon: @image-url("img/delete.svg");
+                                icon: @image-url("../img/delete.svg");
                                 // TODO: https://github.com/slint-ui/slint/issues/6426
                                 visible: buttons-visible && (lib.type != LibraryType.online);
                                 clicked => {
@@ -177,16 +177,17 @@ export component LibrariesPanel inherits Rectangle {
         alignment: LayoutAlignment.start;
 
         header := PanelHeader {
-            z: 10;
+            z: 10;  // For the tooltip.
             title: @tr("LIBRARIES");
-
-            if Globals.refreshing-available-libraries: Spinner {
-                indeterminate: true;
-                height: header.content-height - 2px;
-            }
 
             Rectangle {
                 horizontal-stretch: 1;
+            }
+
+            if Globals.refreshing-available-libraries: Spinner {
+                indeterminate: true;
+                width: header.content-height - 4px;
+                height: header.content-height;
             }
 
             Rectangle {
@@ -200,7 +201,7 @@ export component LibrariesPanel inherits Rectangle {
                         y: 2px;
                         width: self.height;
                         height: header.content-height - 4px;
-                        source: @image-url("img/download.svg");
+                        source: @image-url("../img/download.svg");
                         colorize: white;
                     }
 
@@ -227,7 +228,7 @@ export component LibrariesPanel inherits Rectangle {
                         y: -3px;
                         width: self.height;
                         height: header.content-height + 6px;
-                        source: @image-url("img/plus.svg");
+                        source: @image-url("../img/plus.svg");
                         colorize: white;
                     }
 
@@ -252,6 +253,7 @@ export component LibrariesPanel inherits Rectangle {
     }
 
     btn-install := Rectangle {
+        x: (cbx-all.x - self.width) / 2;
         y: parent.height - self.height - 5px;
         width: self.preferred-width;
         height: self.preferred-height;
@@ -263,7 +265,7 @@ export component LibrariesPanel inherits Rectangle {
             Image {
                 width: t-install.preferred-height;
                 height: t-install.preferred-height;
-                source: @image-url("img/download.svg");
+                source: @image-url("../img/download.svg");
                 colorize: t-install.color;
             }
 
@@ -278,6 +280,16 @@ export component LibrariesPanel inherits Rectangle {
             clicked => {
                 Globals.action-triggered(ActionId.library-panel-install, -1);
             }
+        }
+    }
+
+    cbx-all := CheckBox {
+        x: parent.width - self.width - 15px;
+        y: btn-install.y;
+        height: btn-install.height;
+
+        toggled => {
+            Globals.toggle-libraries-checked(self.checked);
         }
     }
 }
