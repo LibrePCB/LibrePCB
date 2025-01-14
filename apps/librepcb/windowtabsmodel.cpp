@@ -95,7 +95,8 @@ void WindowTabsModel::addTab(ui::TabType type,
           &WindowTabsModel::cursorCoordinatesChanged);
   connect(
       t.get(), &WindowTab::requestClose, this,
-      [this, getTabIndex]() { closeTab(getTabIndex(sender())); }, Qt::QueuedConnection);
+      [this, getTabIndex]() { closeTab(getTabIndex(sender())); },
+      Qt::QueuedConnection);
   connect(t.get(), &WindowTab::requestRepaint, this,
           &WindowTabsModel::requestRepaint);
   connect(t.get(), &WindowTab::uiDataChanged, this,

@@ -110,6 +110,10 @@ MainWindow::MainWindow(GuiApplication& app,
   g.on_scene_zoom_out_clicked(std::bind(
       &WindowSectionsModel::zoomOut, mSections.get(), std::placeholders::_1,
       std::placeholders::_2, std::placeholders::_3));
+  g.on_open_url([this](const slint::SharedString& url) {
+    DesktopServices ds(mApp.getWorkspace().getSettings());
+    ds.openUrl(QUrl(s2q(url)));
+  });
 
   // Set models.
   g.set_sections(mSections);
@@ -147,7 +151,7 @@ void MainWindow::projectItemDoubleClicked(
     setCurrentProject(mApp.getProjects().openProject(fp));
     mWindow->set_page(ui::MainPage::Project);
   } else {
-    DesktopServices ds(mApp.getWorkspace().getSettings(), nullptr);
+    DesktopServices ds(mApp.getWorkspace().getSettings());
     ds.openLocalPath(fp);
   }
 }

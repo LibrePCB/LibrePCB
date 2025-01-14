@@ -21,6 +21,9 @@ if(EXISTS "${SLINT_SUBMODULE_BASEPATH}"
     target_compile_options(Slint INTERFACE -Wno-gnu-anonymous-struct)
   endif()
 
+  # Suppress compiler warning (https://github.com/slint-ui/slint/issues/7358)
+  target_compile_options(Slint INTERFACE -Wno-maybe-uninitialized)
+
   # Stop here, we're done
   return()
 endif()
