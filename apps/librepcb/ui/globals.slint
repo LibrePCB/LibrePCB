@@ -168,6 +168,11 @@ export global Globals {
     // - Library ID (see Library::id)
     pure callback uninstall-library(string);
 
+    // Toggle checked state of all libraries
+    //
+    // - Check state
+    pure callback toggle-libraries-checked(bool);
+
     // Render a graphics scene image
     //
     // - Section index

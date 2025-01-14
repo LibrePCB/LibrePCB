@@ -72,6 +72,7 @@ public:
   }
   void installCheckedLibraries() noexcept;
   void uninstallLibrary(const slint::SharedString& id) noexcept;
+  void toggleAll(bool checked) noexcept;
 
   // Implementations
   std::size_t row_count() const override;

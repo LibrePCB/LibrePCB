@@ -139,6 +139,13 @@ void LibrariesModel::uninstallLibrary(const slint::SharedString& id) noexcept {
   mWorkspace.getLibraryDb().startLibraryRescan();
 }
 
+void LibrariesModel::toggleAll(bool checked) noexcept {
+  for (std::size_t i = 0; i < mMergedLibs.size(); ++i) {
+    mMergedLibs[i].checked = checked;
+    row_changed(i);
+  }
+}
+
 /*******************************************************************************
  *  Implementations
  ******************************************************************************/
