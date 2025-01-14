@@ -69,7 +69,10 @@ public:
   int getObjIndex() const noexcept { return mObjIndex; }
   virtual void activate() noexcept {}
   virtual void deactivate() noexcept {}
-  virtual void finish() noexcept {}
+  virtual bool actionTriggered(ui::ActionId id) noexcept {
+    Q_UNUSED(id);
+    return false;
+  }
   virtual slint::Image renderScene(float width, float height) noexcept {
     Q_UNUSED(width);
     Q_UNUSED(height);

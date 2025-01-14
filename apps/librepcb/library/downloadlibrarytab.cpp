@@ -86,36 +86,49 @@ void DownloadLibraryTab::setUiData(
   validate();
 }
 
-void DownloadLibraryTab::finish() noexcept {
-  try {
-    if ((!mUrl) || (!mDirectory.isValid()) || mDownload) {
-      throw LogicError(__FILE__, __LINE__);
-    }
-
-    mUiData.download_running = true;
+bool DownloadLibraryTab::actionTriggered(ui::ActionId id) noexcept {
+  if ((id == ui::ActionId::SectionCancel) && (mDownload)) {
+    mDownload.reset();
+    mUiData.download_running = false;
     mUiData.download_progress = 0;
+    mUiData.download_error = slint::SharedString();
     emit uiDataChanged();
+    return true;
+  } else if ((id == ui::ActionId::SectionCancel) && (!mDownload)) {
+    emit requestClose();
+    return true;
+  } else if (id == ui::ActionId::SectionOk) {
+    try {
+      if ((!mUrl) || (!mDirectory.isValid()) || mDownload) {
+        throw LogicError(__FILE__, __LINE__);
+      }
 
-    mDownload.reset(new LibraryDownload(*mUrl, mDirectory));
-    connect(mDownload.get(), &LibraryDownload::progressState,
-            [this](const QString& state) {
-              mUiData.download_error = q2s(state);
-              emit uiDataChanged();
-            });
-    connect(mDownload.get(), &LibraryDownload::progressPercent,
-            [this](int percent) {
-              mUiData.download_progress = percent;
-              emit uiDataChanged();
-            });
-    connect(mDownload.get(), &LibraryDownload::finished, this,
-            &DownloadLibraryTab::downloadFinished);
-    // connect(mUi->btnDownloadZipAbort, &QPushButton::clicked,
-    //         mDownload.data(), &LibraryDownload::abort);
-    mDownload->start();
-  } catch (const Exception& e) {
-    mUiData.download_error = q2s(e.getMsg());
-    emit uiDataChanged();
+      mUiData.download_running = true;
+      mUiData.download_progress = 0;
+      emit uiDataChanged();
+
+      mDownload.reset(new LibraryDownload(*mUrl, mDirectory));
+      connect(mDownload.get(), &LibraryDownload::progressState,
+              [this](const QString& state) {
+                mUiData.download_error = q2s(state);
+                emit uiDataChanged();
+              });
+      connect(mDownload.get(), &LibraryDownload::progressPercent,
+              [this](int percent) {
+                mUiData.download_progress = percent;
+                emit uiDataChanged();
+              });
+      connect(mDownload.get(), &LibraryDownload::finished, this,
+              &DownloadLibraryTab::downloadFinished);
+      mDownload->start();
+    } catch (const Exception& e) {
+      mUiData.download_error = q2s(e.getMsg());
+      emit uiDataChanged();
+    }
+    return true;
   }
+
+  return false;
 }
 
 /*******************************************************************************
@@ -184,6 +197,8 @@ void DownloadLibraryTab::validate() noexcept {
 
 void DownloadLibraryTab::downloadFinished(bool success,
                                           const QString& errMsg) noexcept {
+  mDownload.reset();
+
   if (success) {
     mUiData.download_error = slint::SharedString();
 
@@ -197,8 +212,6 @@ void DownloadLibraryTab::downloadFinished(bool success,
   mUiData.download_running = false;
   mUiData.download_progress = 0;
   emit uiDataChanged();
-
-  mDownload.reset();
 }
 
 /*******************************************************************************

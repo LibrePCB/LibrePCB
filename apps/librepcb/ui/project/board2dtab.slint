@@ -1,4 +1,4 @@
-import { Globals, WindowSection, Tab } from "../globals.slint";
+import { Globals, WindowSection, Tab, ActionId } from "../globals.slint";
 import { SceneButton } from "../scenebutton.slint";
 
 export component Board2dTab inherits Image {
@@ -53,7 +53,7 @@ export component Board2dTab inherits Image {
             text: "3D";
             colorize: tab.overlay-color;
             clicked => {
-                Globals.board-3d-clicked(section-index);
+                Globals.action-triggered(ActionId.board-2d-tab-open-3d, section-index);
             }
         }
     }

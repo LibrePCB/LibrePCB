@@ -1,7 +1,25 @@
 export enum ActionId {
-    new-window,
-    create-local-library,
-    download-library-by-url,
+    // Window
+    window-new,
+
+    // Library panel
+    library-panel-ensure-populated,
+    library-panel-install,
+
+    // Window section
+    section-split,
+    section-close,
+    section-ok,
+    section-cancel,
+
+    // Create library tab
+    create-library-tab-open,
+
+    // Download library tab
+    download-library-tab-open,
+
+    // 2D board viewer tab
+    board-2d-tab-open-3d
 }
 
 export enum LibraryType {
@@ -110,7 +128,11 @@ export struct EditParseResult {
 }
 
 export global Globals {
-    pure callback action-triggered(ActionId);
+    // Some action has been triggered
+    //
+    // - Action ID
+    // - Section index (pass -1 for things outside a window section)
+    pure callback action-triggered(ActionId, int);
 
     pure callback parse-length-input(string, string) -> EditParseResult;
 
@@ -129,21 +151,6 @@ export global Globals {
     // - Board index
     pure callback board-clicked(int);
 
-    // The 3D viewer for a board has been requested.
-    //
-    // - Section index
-    pure callback board-3d-clicked(int);
-
-    // Requested to split a particular window section
-    //
-    // - Section index
-    pure callback section-split-clicked(int);
-
-    // Requested to close a particular window section
-    //
-    // - Section index
-    pure callback section-close-clicked(int);
-
     // Requested to switch to a particular tab
     //
     // - Section index
@@ -156,28 +163,10 @@ export global Globals {
     // - Tab index
     pure callback tab-close-clicked(int, int);
 
-    // Populate the installed-libraries and available-libraries models with data
-    // if not done yet (lazy loading only if libraries are visible in the UI).
-    pure callback ensure-libraries-populated();
-
-    // Install all checked libraries
-    pure callback install-checked-libraries();
-
     // Uninstall a library
     //
     // - Library ID (see Library::id)
     pure callback uninstall-library(string);
-
-    // Open the tab for creating a new library
-    pure callback open-create-library-tab();
-
-    // Open the tab for downloading a library
-    pure callback open-download-library-tab();
-
-    // Generic handler for the "finish" button of dialog-like tabs
-    //
-    // - Section index
-    pure callback dialog-tab-finish(int);
 
     // Render a graphics scene image
     //

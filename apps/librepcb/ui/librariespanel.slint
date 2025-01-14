@@ -170,7 +170,7 @@ export component LibrariesPanel inherits Rectangle {
     background: #2a2a2a;
 
     init => {
-        Globals.ensure-libraries-populated();
+        Globals.action-triggered(ActionId.library-panel-ensure-populated, -1);
     }
 
     VerticalLayout {
@@ -211,7 +211,7 @@ export component LibrariesPanel inherits Rectangle {
                     }
 
                     clicked => {
-                        Globals.open-download-library-tab();
+                        Globals.action-triggered(ActionId.download-library-tab-open, -1);
                     }
                 }
             }
@@ -238,7 +238,7 @@ export component LibrariesPanel inherits Rectangle {
                     }
 
                     clicked => {
-                        Globals.open-create-library-tab();
+                        Globals.action-triggered(ActionId.create-library-tab-open, -1);
                     }
                 }
             }
@@ -276,7 +276,7 @@ export component LibrariesPanel inherits Rectangle {
 
         ta-install := TouchArea {
             clicked => {
-                Globals.install-checked-libraries();
+                Globals.action-triggered(ActionId.library-panel-install, -1);
             }
         }
     }

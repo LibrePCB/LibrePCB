@@ -79,104 +79,109 @@ CreateLibraryTab::~CreateLibraryTab() noexcept {
  *  General Methods
  ******************************************************************************/
 
-void CreateLibraryTab::activate() noexcept {
-}
-
-void CreateLibraryTab::deactivate() noexcept {
-}
-
 void CreateLibraryTab::setUiData(
     const ui::CreateLibraryTabData& data) noexcept {
   mUiData = data;
   validate();
 }
 
-void CreateLibraryTab::finish() noexcept {
-  try {
-    if ((!mName) || (!mVersion) || (!mDirectory.isValid())) {
-      throw LogicError(__FILE__, __LINE__);
-    }
+void CreateLibraryTab::activate() noexcept {
+}
 
-    // create transactional file system
-    std::shared_ptr<TransactionalFileSystem> fs =
-        TransactionalFileSystem::openRW(mDirectory);
-    TransactionalDirectory dir(fs);
+void CreateLibraryTab::deactivate() noexcept {
+}
 
-    // create the new library
-    QScopedPointer<Library> lib(new Library(
-        Uuid::createRandom(), *mVersion, s2q(mUiData.author).trimmed(), *mName,
-        s2q(mUiData.description).trimmed(),
-        QString("")));  // can throw
-    if (mUrl) {
-      lib->setUrl(*mUrl);
-    }
+bool CreateLibraryTab::actionTriggered(ui::ActionId id) noexcept {
+  if (id == ui::ActionId::SectionOk) {
     try {
-      lib->setIcon(FileUtils::readFile(Application::getResourcesDir().getPathTo(
-          "library/default_image.png")));
-    } catch (const Exception& e) {
-      qCritical() << "Could not open the library image:" << e.getMsg();
-    }
-    lib->moveTo(dir);  // can throw
+      if ((!mName) || (!mVersion) || (!mDirectory.isValid())) {
+        throw LogicError(__FILE__, __LINE__);
+      }
 
-    // copy license file
-    if (mUiData.cc0) {
+      // create transactional file system
+      std::shared_ptr<TransactionalFileSystem> fs =
+          TransactionalFileSystem::openRW(mDirectory);
+      TransactionalDirectory dir(fs);
+
+      // create the new library
+      QScopedPointer<Library> lib(new Library(
+          Uuid::createRandom(), *mVersion, s2q(mUiData.author).trimmed(),
+          *mName, s2q(mUiData.description).trimmed(),
+          QString("")));  // can throw
+      if (mUrl) {
+        lib->setUrl(*mUrl);
+      }
+      try {
+        lib->setIcon(
+            FileUtils::readFile(Application::getResourcesDir().getPathTo(
+                "library/default_image.png")));
+      } catch (const Exception& e) {
+        qCritical() << "Could not open the library image:" << e.getMsg();
+      }
+      lib->moveTo(dir);  // can throw
+
+      // copy license file
+      if (mUiData.cc0) {
+        try {
+          FilePath source =
+              Application::getResourcesDir().getPathTo("licenses/cc0-1.0.txt");
+          fs->write("LICENSE.txt", FileUtils::readFile(source));  // can throw
+        } catch (Exception& e) {
+          qCritical() << "Could not copy the license file:" << e.getMsg();
+        }
+      }
+
+      // copy readme file
       try {
         FilePath source =
-            Application::getResourcesDir().getPathTo("licenses/cc0-1.0.txt");
-        fs->write("LICENSE.txt", FileUtils::readFile(source));  // can throw
+            Application::getResourcesDir().getPathTo("library/readme_template");
+        QByteArray content = FileUtils::readFile(source);  // can throw
+        content.replace("{LIBRARY_NAME}", (*mName)->toUtf8());
+        if (mUiData.cc0) {
+          content.replace("{LICENSE_TEXT}",
+                          "Creative Commons (CC0-1.0). For the "
+                          "license text, see [LICENSE.txt](LICENSE.txt).");
+        } else {
+          content.replace("{LICENSE_TEXT}", "No license set.");
+        }
+        fs->write("README.md", content);  // can throw
       } catch (Exception& e) {
-        qCritical() << "Could not copy the license file:" << e.getMsg();
+        qCritical() << "Could not copy the readme file:" << e.getMsg();
       }
-    }
 
-    // copy readme file
-    try {
-      FilePath source =
-          Application::getResourcesDir().getPathTo("library/readme_template");
-      QByteArray content = FileUtils::readFile(source);  // can throw
-      content.replace("{LIBRARY_NAME}", (*mName)->toUtf8());
-      if (mUiData.cc0) {
-        content.replace("{LICENSE_TEXT}",
-                        "Creative Commons (CC0-1.0). For the "
-                        "license text, see [LICENSE.txt](LICENSE.txt).");
-      } else {
-        content.replace("{LICENSE_TEXT}", "No license set.");
+      // copy .gitignore
+      try {
+        FilePath source = Application::getResourcesDir().getPathTo(
+            "library/gitignore_template");
+        fs->write(".gitignore", FileUtils::readFile(source));  // can throw
+      } catch (Exception& e) {
+        qCritical() << "Could not copy the .gitignore file:" << e.getMsg();
       }
-      fs->write("README.md", content);  // can throw
-    } catch (Exception& e) {
-      qCritical() << "Could not copy the readme file:" << e.getMsg();
+
+      // copy .gitattributes
+      try {
+        FilePath source = Application::getResourcesDir().getPathTo(
+            "library/gitattributes_template");
+        fs->write(".gitattributes", FileUtils::readFile(source));  // can throw
+      } catch (Exception& e) {
+        qCritical() << "Could not copy the .gitattributes file:" << e.getMsg();
+      }
+
+      // save file system
+      fs->save();  // can throw
+
+      // Force rescan to index the new library.
+      mApp.getWorkspace().getLibraryDb().startLibraryRescan();
+
+      // Close tab as it is no longer required.
+      emit requestClose();
+    } catch (const Exception& e) {
+      mUiData.creation_error = q2s(e.getMsg());
+      emit uiDataChanged();
     }
-
-    // copy .gitignore
-    try {
-      FilePath source = Application::getResourcesDir().getPathTo(
-          "library/gitignore_template");
-      fs->write(".gitignore", FileUtils::readFile(source));  // can throw
-    } catch (Exception& e) {
-      qCritical() << "Could not copy the .gitignore file:" << e.getMsg();
-    }
-
-    // copy .gitattributes
-    try {
-      FilePath source = Application::getResourcesDir().getPathTo(
-          "library/gitattributes_template");
-      fs->write(".gitattributes", FileUtils::readFile(source));  // can throw
-    } catch (Exception& e) {
-      qCritical() << "Could not copy the .gitattributes file:" << e.getMsg();
-    }
-
-    // save file system
-    fs->save();  // can throw
-
-    // Force rescan to index the new library.
-    mApp.getWorkspace().getLibraryDb().startLibraryRescan();
-
-    // Close tab as it is no longer required.
-    emit requestClose();
-  } catch (const Exception& e) {
-    mUiData.creation_error = q2s(e.getMsg());
-    emit uiDataChanged();
   }
+
+  return false;
 }
 
 /*******************************************************************************

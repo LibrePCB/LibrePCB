@@ -8,6 +8,7 @@ export struct MenuItemData {
 
 component MenuItem inherits Rectangle {
     in property <ActionId> id;
+    in property <int> section-index: -1;
     in property <string> text <=> t-title.text;
     in property <bool> handle-in-backend: false;
 
@@ -25,7 +26,7 @@ component MenuItem inherits Rectangle {
     ta := TouchArea {
         clicked => {
             if handle-in-backend {
-                Globals.action-triggered(id);
+                Globals.action-triggered(id, section-index);
             } else {
                 clicked(id);
             }
@@ -34,6 +35,7 @@ component MenuItem inherits Rectangle {
 }
 
 export component Menu inherits PopupWindow {
+    in property <int> section-index: -1;
     in property <[MenuItemData]> items;
 
     callback clicked(ActionId);
@@ -44,6 +46,7 @@ export component Menu inherits PopupWindow {
         VerticalLayout {
             for item in items: MenuItem {
                 id: item.id;
+                section-index: section-index;
                 text: item.text;
                 handle-in-backend: item.handle-in-backend;
                 clicked(id) => {

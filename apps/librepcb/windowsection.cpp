@@ -116,10 +116,14 @@ void WindowSection::setCurrentTab(int index) noexcept {
   emit currentProjectChanged(getCurrentProject());
 }
 
-void WindowSection::finish() noexcept {
+bool WindowSection::actionTriggered(ui::ActionId id) noexcept {
   if (std::shared_ptr<WindowTab> t = getCurrentTab()) {
-    t->finish();
+    if (t->actionTriggered(id)) {
+      return true;
+    }
   }
+
+  return false;
 }
 
 slint::Image WindowSection::renderScene(float width, float height) noexcept {
