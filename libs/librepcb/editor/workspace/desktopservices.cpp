@@ -42,9 +42,8 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-DesktopServices::DesktopServices(const WorkspaceSettings& settings,
-                                 QWidget* parent) noexcept
-  : mSettings(settings), mParent(parent) {
+DesktopServices::DesktopServices(const WorkspaceSettings& settings) noexcept
+  : mSettings(settings) {
 }
 
 DesktopServices::~DesktopServices() noexcept {
@@ -124,13 +123,13 @@ void DesktopServices::downloadAndOpenResourceAsync(
 
   // Helper to open the local file.
   auto openCachedFile = [&settings, parent, dst]() {
-    DesktopServices ds(settings, parent);
+    DesktopServices ds(settings);
     ds.openLocalPath(dst);
   };
 
   // Helper to open the URL in web browser.
   auto openInBrowser = [&settings, parent, url]() {
-    DesktopServices ds(settings, parent);
+    DesktopServices ds(settings);
     ds.openWebUrl(url);
   };
 
@@ -166,7 +165,7 @@ void DesktopServices::downloadAndOpenResourceAsync(
           // Failed, now try it in the web browser.
           qInfo()
               << "Failed to download resource, try it in the web browser...";
-          DesktopServices ds(settings, parent);
+          DesktopServices ds(settings);
           ds.openUrl(url);
         },
         Qt::QueuedConnection);

@@ -183,7 +183,7 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
             mApiEndpointModel.data(), &ApiEndpointModel::moveDown);
     connect(mUi->lblApiEndpointsInfo, &QLabel::linkActivated, this,
             [this](const QString& url) {
-              DesktopServices ds(mWorkspace.getSettings(), this);
+              DesktopServices ds(mWorkspace.getSettings());
               ds.openWebUrl(QUrl(url));
             });
   }

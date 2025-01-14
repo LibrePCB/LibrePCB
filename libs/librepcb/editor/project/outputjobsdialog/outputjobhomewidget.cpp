@@ -79,7 +79,7 @@ OutputJobHomeWidget::OutputJobHomeWidget(const WorkspaceSettings& settings,
   mUi->lblInfo->setText(info);
   connect(mUi->lblInfo, &QLabel::linkActivated, this,
           [this](const QString& url) {
-            DesktopServices ds(mSettings, this);
+            DesktopServices ds(mSettings);
             ds.openUrl(QUrl(url));
           });
 
@@ -94,7 +94,7 @@ OutputJobHomeWidget::OutputJobHomeWidget(const WorkspaceSettings& settings,
       " ♥</i></p>");
   connect(mUi->lblNote, &QLabel::linkActivated, this,
           [this](const QString& url) {
-            DesktopServices ds(mSettings, this);
+            DesktopServices ds(mSettings);
             ds.openUrl(QUrl(url));
           });
 }

@@ -57,7 +57,7 @@ KiCadLibraryImportWizardPage_Result::KiCadLibraryImportWizardPage_Result(
   mUi->setupUi(this);
   connect(mUi->txtMessages, &QTextBrowser::anchorClicked, this,
           [this](const QUrl& url) {
-            DesktopServices ds(mContext->getWorkspace().getSettings(), this);
+            DesktopServices ds(mContext->getWorkspace().getSettings());
             ds.openWebUrl(url);
           });
   connect(&mContext->getImport(), &KiCadLibraryImport::importFinished, this,

@@ -236,7 +236,7 @@ void BomGeneratorDialog::btnChooseOutputPathClicked() noexcept {
 }
 
 void BomGeneratorDialog::btnOpenOutputDirectoryClicked() noexcept {
-  DesktopServices ds(mSettings, this);
+  DesktopServices ds(mSettings);
   ds.openLocalPath(getOutputFilePath().getParentDir());
 }
 
@@ -266,7 +266,7 @@ void BomGeneratorDialog::tableCellDoubleClicked(int row, int column) noexcept {
     const auto data =
         item->data(Qt::UserRole).value<PartInformationDelegate::Data>();
     if (data.info && data.info->pricingUrl.isValid()) {
-      DesktopServices ds(mSettings, this);
+      DesktopServices ds(mSettings);
       ds.openWebUrl(data.info->pricingUrl);
     }
   }
