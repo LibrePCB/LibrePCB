@@ -228,6 +228,11 @@ export global Globals {
     // - Scene height
     pure callback scene-zoom-out-clicked(int, length, length);
 
+    // Generic callback to open an URL
+    //
+    // - URL
+    pure callback open-url(string);
+
     in property <bool> preview-mode: true;
 
     in property <[FolderTreeItem]> workspace-folder: [
@@ -383,7 +388,7 @@ export global Globals {
                     download-error: "Download error",
                 },
             ],
-            current-tab-index: 1,
+            current-tab-index: 0,
         },
         {
             tabs: [
