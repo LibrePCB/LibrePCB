@@ -55,7 +55,8 @@ static QString getTitle(std::shared_ptr<ProjectEditor> prj, int boardIndex) {
 Board2dTab::Board2dTab(GuiApplication& app, std::shared_ptr<ProjectEditor> prj,
                        int boardIndex, QObject* parent) noexcept
   : GraphicsSceneTab(app, ui::TabType::Board2d, prj, boardIndex,
-                     getTitle(prj, boardIndex), Qt::black, parent) {
+                     getTitle(prj, boardIndex), Qt::black, parent),
+    mUiData{q2s(mBackgroundColor), q2s(Qt::white)} {
 }
 
 Board2dTab::~Board2dTab() noexcept {
@@ -64,6 +65,10 @@ Board2dTab::~Board2dTab() noexcept {
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
+
+void Board2dTab::setUiData(const ui::Board2dTabData& data) noexcept {
+  mUiData = data;
+}
 
 void Board2dTab::activate() noexcept {
   if (auto brd = mProject->getProject().getBoardByIndex(mObjIndex)) {

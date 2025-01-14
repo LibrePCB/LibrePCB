@@ -61,6 +61,7 @@ MainWindow::MainWindow(GuiApplication& app,
   // Set initial data.
   const ui::Globals& g = mWindow->global<ui::Globals>();
   g.set_current_project(ui::ProjectData{});
+  mWindow->set_page(ui::MainPage::Home);
   mWindow->set_cursor_coordinate(slint::SharedString());
 
   // Register global callbacks.

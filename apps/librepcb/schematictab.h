@@ -61,11 +61,16 @@ public:
   virtual ~SchematicTab() noexcept;
 
   // General Methods
+  const ui::SchematicTabData& getUiData() const noexcept { return mUiData; }
+  void setUiData(const ui::SchematicTabData& data) noexcept;
   void activate() noexcept override;
   void deactivate() noexcept override;
 
   // Operator Overloadings
   SchematicTab& operator=(const SchematicTab& rhs) = delete;
+
+private:
+  ui::SchematicTabData mUiData;
 };
 
 /*******************************************************************************

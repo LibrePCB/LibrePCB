@@ -64,6 +64,8 @@ public:
   virtual ~Board2dTab() noexcept;
 
   // General Methods
+  const ui::Board2dTabData& getUiData() const noexcept { return mUiData; }
+  void setUiData(const ui::Board2dTabData& data) noexcept;
   void activate() noexcept override;
   void deactivate() noexcept override;
 
@@ -71,6 +73,7 @@ public:
   Board2dTab& operator=(const Board2dTab& rhs) = delete;
 
 private:
+  ui::Board2dTabData mUiData;
   std::unique_ptr<BoardPlaneFragmentsBuilder> mPlaneBuilder;
 };
 

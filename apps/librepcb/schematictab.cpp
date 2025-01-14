@@ -28,6 +28,8 @@
 
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/schematic/schematic.h>
+#include <librepcb/core/workspace/theme.h>
+#include <librepcb/editor/graphics/graphicslayer.h>
 #include <librepcb/editor/project/schematiceditor/schematicgraphicsscene.h>
 
 #include <QtCore>
@@ -56,7 +58,13 @@ SchematicTab::SchematicTab(GuiApplication& app,
                            std::shared_ptr<ProjectEditor> prj,
                            int schematicIndex, QObject* parent) noexcept
   : GraphicsSceneTab(app, ui::TabType::Schematic, prj, schematicIndex,
-                     getTitle(prj, schematicIndex), Qt::white, parent) {
+                     getTitle(prj, schematicIndex), Qt::white, parent),
+    mUiData{
+        q2s(mBackgroundColor),  // Background color
+        q2s(Qt::black),  // Overlay color
+        true,  // Show pin numbers
+        ui::SchematicTool::Select,  // Active tool
+    } {
 }
 
 SchematicTab::~SchematicTab() noexcept {
@@ -65,6 +73,16 @@ SchematicTab::~SchematicTab() noexcept {
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
+
+void SchematicTab::setUiData(const ui::SchematicTabData& data) noexcept {
+  mUiData = data;
+
+  if (auto l = mLayerProvider->getLayer(Theme::Color::sSchematicPinNumbers)) {
+    l->setVisible(mUiData.show_pin_numbers);
+  }
+
+  emit requestRepaint();
+}
 
 void SchematicTab::activate() noexcept {
   if (auto sch = mProject->getProject().getSchematicByIndex(mObjIndex)) {

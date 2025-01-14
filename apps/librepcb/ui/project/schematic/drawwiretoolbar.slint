@@ -1,0 +1,32 @@
+import { Globals, WindowSection, Tab, SchematicTabData, SchematicTool } from "../../globals.slint";
+import { LengthEdit } from "../../lengthedit.slint";
+
+export component DrawWireToolBar inherits HorizontalLayout {
+    spacing: 5px;
+    height: 25px;
+
+    Text {
+        vertical-alignment: center;
+        text: @tr("H-V");
+    }
+
+    Text {
+        vertical-alignment: center;
+        text: @tr("V-H");
+    }
+
+    Text {
+        vertical-alignment: center;
+        text: @tr("90-45");
+    }
+
+    Text {
+        vertical-alignment: center;
+        text: @tr("45-90");
+    }
+
+    Text {
+        vertical-alignment: center;
+        text: @tr("/");
+    }
+}

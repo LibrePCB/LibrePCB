@@ -6,13 +6,15 @@ export enum MainPage {
     libraries,
     project,
     drc,
+    output-jobs,
+    order,
     search,
     help,
     preferences,
 }
 
 export component SideBar inherits Rectangle {
-    in-out property <MainPage> page: MainPage.libraries;
+    in-out property <MainPage> page: MainPage.home;
 
     background: #353535;
 
@@ -57,6 +59,26 @@ export component SideBar inherits Rectangle {
             enabled: Globals.current-project.valid;
             clicked => {
                 page = MainPage.drc;
+            }
+        }
+
+        SideBarButton {
+            icon: @image-url("img/output-jobs.svg");
+            tooltip: "Output Jobs";
+            enabled: Globals.current-project.valid;
+            checked: page == MainPage.output-jobs;
+            clicked => {
+                page = MainPage.output-jobs;
+            }
+        }
+
+        SideBarButton {
+            icon: @image-url("img/shopping-cart.svg");
+            tooltip: "Order PCB";
+            enabled: Globals.current-project.valid;
+            checked: page == MainPage.order;
+            clicked => {
+                page = MainPage.order;
             }
         }
 

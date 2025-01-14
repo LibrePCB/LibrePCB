@@ -58,6 +58,7 @@ Board3dTab::Board3dTab(GuiApplication& app, std::shared_ptr<ProjectEditor> prj,
                        int boardIndex, QObject* parent) noexcept
   : WindowTab(app, ui::TabType::Board3d, prj, boardIndex,
               getTitle(prj, boardIndex), parent),
+    mUiData{q2s(Qt::white), q2s(Qt::black)},
     mAnimation(new QVariantAnimation(this)) {
   mAnimation->setDuration(500);
   mAnimation->setEasingCurve(QEasingCurve::InOutCubic);
@@ -74,6 +75,10 @@ Board3dTab::~Board3dTab() noexcept {
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
+
+void Board3dTab::setUiData(const ui::Board3dTabData& data) noexcept {
+  mUiData = data;
+}
 
 void Board3dTab::activate() noexcept {
   if (auto brd = mProject->getProject().getBoardByIndex(mObjIndex)) {
