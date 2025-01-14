@@ -80,7 +80,7 @@ BoardPickPlaceGeneratorDialog::BoardPickPlaceGeneratorDialog(
           &BoardPickPlaceGeneratorDialog::btnGenerateClicked);
   connect(mUi->btnBrowseOutputDir, &QPushButton::clicked, this,
           [this, &settings]() {
-            DesktopServices ds(settings, this);
+            DesktopServices ds(settings);
             ds.openLocalPath(
                 getOutputFilePath(mUi->edtTopFilePath->text()).getParentDir());
           });

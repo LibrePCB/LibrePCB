@@ -172,7 +172,7 @@ OutputJobsDialog::OutputJobsDialog(const WorkspaceSettings& settings,
           });
   connect(mUi->txtLogMessages, &QTextBrowser::anchorClicked, this,
           [this](const QUrl& url) {
-            DesktopServices ds(mSettings, this);
+            DesktopServices ds(mSettings);
             ds.openLocalPath(FilePath(url.toLocalFile()));
           });
   mUi->btnShowMessages->setChecked(false);
@@ -319,7 +319,7 @@ void OutputJobsDialog::openOutputDirectory() noexcept {
   OutputJobRunner runner(mProject);
   QDir().mkpath(runner.getOutputDirectory().toStr());
 
-  DesktopServices ds(mSettings, this);
+  DesktopServices ds(mSettings);
   ds.openLocalPath(runner.getOutputDirectory());
 }
 
@@ -466,7 +466,7 @@ void OutputJobsDialog::runJob(std::shared_ptr<OutputJob> job,
         }
       }
       if (commonOutPath.isValid() && (!commonOutPath.isRoot())) {
-        DesktopServices ds(mSettings, this);
+        DesktopServices ds(mSettings);
         ds.openLocalPath(commonOutPath);
         if (messagesWereHidden) {
           mUi->btnShowMessages->setChecked(false);
@@ -500,7 +500,7 @@ void OutputJobsDialog::currentItemChanged(QListWidgetItem* current,
         auto widget = new GerberExcellonOutputJobWidget(mProject, j);
         connect(widget, &GerberExcellonOutputJobWidget::openUrlRequested, this,
                 [this](const QUrl& url) {
-                  DesktopServices ds(mSettings, this);
+                  DesktopServices ds(mSettings);
                   ds.openWebUrl(url);
                 });
         connect(widget, &GerberExcellonOutputJobWidget::orderPcbDialogTriggered,

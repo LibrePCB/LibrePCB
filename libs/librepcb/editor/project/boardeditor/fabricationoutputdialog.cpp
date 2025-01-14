@@ -102,7 +102,7 @@ FabricationOutputDialog::FabricationOutputDialog(
             if (link == "order-pcb") {
               emit orderPcbDialogTriggered();
             } else {
-              DesktopServices ds(mSettings, this);
+              DesktopServices ds(mSettings);
               ds.openWebUrl(QUrl(link));
             }
           });
@@ -243,7 +243,7 @@ void FabricationOutputDialog::btnBrowseOutputDirClicked() {
   FilePath dir =
       grbExport.getOutputDirectory(mBoard.getFabricationOutputSettings());
   if (dir.isExistingDir()) {
-    DesktopServices ds(mSettings, this);
+    DesktopServices ds(mSettings);
     ds.openLocalPath(dir);
   } else {
     QMessageBox::warning(this, tr("Warning"), tr("Directory does not exist."));

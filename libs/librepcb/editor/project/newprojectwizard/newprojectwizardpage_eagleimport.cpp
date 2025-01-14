@@ -146,7 +146,7 @@ void NewProjectWizardPage_EagleImport::import(Project& project) {
   browser->setOpenLinks(false);
   const Workspace* ws = &mWorkspace;
   connect(browser, &QTextBrowser::anchorClicked, ws, [ws](const QUrl& url) {
-    DesktopServices ds(ws->getSettings(), nullptr);
+    DesktopServices ds(ws->getSettings());
     ds.openUrl(url);
   });
   const auto msgColors = EditorToolbox::isWindowBackgroundDark()
