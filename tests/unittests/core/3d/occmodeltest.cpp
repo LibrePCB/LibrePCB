@@ -83,6 +83,49 @@ TEST_F(OccModelTest, testCreateBoardWithHoles) {
   }
 }
 
+// The polygon in this test is a real use-case which failed to export due to
+// numeric inaccuracies of arcs.
+TEST_F(OccModelTest, testCreateBoardComplexOutline) {
+  if (!OccModel::isAvailable()) {
+    GTEST_SKIP();
+  }
+
+  const Path outline({
+      Vertex(Point(43025447, 19304541), Angle::deg0()),
+      Vertex(Point(56542699, 19304541), Angle(50675000)),
+      Vertex(Point(60472409, 21165259), Angle::deg0()),
+      Vertex(Point(98944660, 68127536), Angle(-13616000)),
+      Vertex(Point(99812946, 68962151), Angle::deg0()),
+      Vertex(Point(109762866, 76476139), Angle(90000000)),
+      Vertex(Point(110755338, 83591460), Angle::deg0()),
+      Vertex(Point(106049435, 89822952), Angle(40708000)),
+      Vertex(Point(103071931, 91726180), Angle::deg0()),
+      Vertex(Point(95945914, 93271181), Angle(-40708000)),
+      Vertex(Point(92968409, 95174409), Angle::deg0()),
+      Vertex(Point(82946383, 108445439), Angle(90000000)),
+      Vertex(Point(75831062, 109437911), Angle::deg0()),
+      Vertex(Point(64468733, 100857299), Angle(90000000)),
+      Vertex(Point(63476261, 93741978), Angle::deg0()),
+      Vertex(Point(74733128, 78835789), Angle(-49334000)),
+      Vertex(Point(75643100, 74694361), Angle::deg0()),
+      Vertex(Point(73426203, 64505146), Angle(-21336000)),
+      Vertex(Point(72693045, 62773124), Angle::deg0()),
+      Vertex(Point(61201151, 45483496), Angle(-44700000)),
+      Vertex(Point(57199238, 42780209), Angle::deg0()),
+      Vertex(Point(41507850, 39533900), Angle(-52475000)),
+      Vertex(Point(36073271, 40944336), Angle::deg0()),
+      Vertex(Point(33945392, 42780209), Angle(-67380000)),
+      Vertex(Point(32060026, 49567925), Angle(256860000)),
+      Vertex(Point(17127085, 44055011), Angle(-149836000)),
+      Vertex(Point(10138072, 20037785), Angle(215794000)),
+      Vertex(Point(15712129, 1521862), Angle::deg0()),
+      Vertex(Point(40137093, 18403513), Angle(-34651000)),
+      Vertex(Point(43025447, 19304541), Angle::deg0()),
+  });
+  std::unique_ptr<OccModel> model = OccModel::createBoard(
+      outline, QVector<Path>(), PositiveLength(1000000), Qt::black);
+}
+
 TEST_F(OccModelTest, testLoadStepValid) {
   const FilePath fp(TEST_DATA_DIR
                     "/unittests/librepcbcommon/OccModelTest/model.step");
