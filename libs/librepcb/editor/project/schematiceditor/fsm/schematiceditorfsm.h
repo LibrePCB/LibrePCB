@@ -39,6 +39,7 @@ class Workspace;
 
 namespace editor {
 
+class GraphicsScene;
 class GraphicsView;
 class ProjectEditor;
 class SchematicEditor;
@@ -83,6 +84,7 @@ public:
     Project& project;
     ProjectEditor& projectEditor;
     SchematicEditor& editor;
+    std::shared_ptr<GraphicsScene>& graphicsScene;
     GraphicsView& editorGraphicsView;
     ToolBarProxy& commandToolBar;
     UndoStack& undoStack;

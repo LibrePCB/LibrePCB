@@ -71,6 +71,8 @@ public:
   void setCurrentTab(int index) noexcept;
   bool actionTriggered(ui::ActionId id) noexcept;
   slint::Image renderScene(float width, float height) noexcept;
+  bool processSceneDoubleClicked(float x, float y, float width,
+                                 float height) noexcept;
   bool processScenePointerEvent(float x, float y, float width, float height,
                                 slint::private_api::PointerEvent e) noexcept;
   bool processSceneScrolled(float x, float y, float width, float height,

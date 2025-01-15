@@ -103,30 +103,44 @@ bool GraphicsSceneTab::processScenePointerEvent(
     slint::private_api::PointerEvent e) noexcept {
   Q_UNUSED(width);
   Q_UNUSED(height);
-  Projection projection = mProjection;
-  if (mScene) {
-    QTransform tf;
-    tf.translate(projection.offset.x(), projection.offset.y());
-    tf.scale(1 / projection.scale, 1 / projection.scale);
-    QPointF scenePosPx = tf.map(QPointF(x, y));
 
-    if ((e.button == slint::private_api::PointerEventButton::Middle) ||
-        (e.button == slint::private_api::PointerEventButton::Right)) {
-      if (e.kind == slint::private_api::PointerEventKind::Down) {
-        mStartScenePos = scenePosPx;
-        mPanning = true;
-      } else if (e.kind == slint::private_api::PointerEventKind::Up) {
-        mPanning = false;
-      }
+  if (!mScene) {
+    return false;
+  }
+
+  bool eventConsumed = false;
+
+  QTransform tf;
+  tf.translate(mProjection.offset.x(), mProjection.offset.y());
+  tf.scale(1 / mProjection.scale, 1 / mProjection.scale);
+  QPointF scenePosPx = tf.map(QPointF(x, y));
+
+  if ((e.button == slint::private_api::PointerEventButton::Middle) ||
+      (e.button == slint::private_api::PointerEventButton::Right)) {
+    if ((!mPanning) && e.kind == slint::private_api::PointerEventKind::Down) {
+      mStartScreenPos = QPointF(x, y);
+      mStartScenePos = scenePosPx;
+      mPanning = true;
+      eventConsumed = true;
+    } else if (mPanning &&
+               (e.kind == slint::private_api::PointerEventKind::Up)) {
+      mPanning = false;
+      eventConsumed = (QPointF(x, y) != mStartScreenPos);  // TODO: Not so nice.
     }
-    if (mPanning && (e.kind == slint::private_api::PointerEventKind::Move)) {
+  } else if (e.kind == slint::private_api::PointerEventKind::Move) {
+    if (mPanning) {
+      Projection projection = mProjection;
       projection.offset -= scenePosPx - mStartScenePos;
+      applyProjection(projection);
+      eventConsumed = true;
     }
+
     const Point scenePos = Point::fromPx(scenePosPx);
     emit cursorCoordinatesChanged(scenePos.getX().toMm(),
                                   scenePos.getY().toMm());
   }
-  return applyProjection(projection);
+
+  return eventConsumed;
 }
 
 bool GraphicsSceneTab::processSceneScrolled(
