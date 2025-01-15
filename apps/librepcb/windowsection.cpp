@@ -23,12 +23,12 @@
 #include "windowsection.h"
 
 #include "apptoolbox.h"
-#include "board2dtab.h"
-#include "board3dtab.h"
 #include "guiapplication.h"
 #include "library/createlibrarytab.h"
 #include "library/downloadlibrarytab.h"
-#include "schematictab.h"
+#include "project/board/board2dtab.h"
+#include "project/board/board3dtab.h"
+#include "project/schematic/schematictab.h"
 #include "windowtab.h"
 #include "windowtabsmodel.h"
 #include "windowtabsmodeladapter.h"
@@ -105,9 +105,8 @@ std::shared_ptr<ProjectEditor> WindowSection::getCurrentProject() noexcept {
   return nullptr;
 }
 
-void WindowSection::addTab(ui::TabType type, std::shared_ptr<ProjectEditor> prj,
-                           int objIndex) noexcept {
-  mTabsModel->addTab(type, prj, objIndex);
+void WindowSection::addTab(std::shared_ptr<WindowTab> tab) noexcept {
+  mTabsModel->addTab(tab);
   setCurrentTab(mTabsModel->row_count() - 1);
 }
 

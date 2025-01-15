@@ -24,7 +24,12 @@
 
 #include "apptoolbox.h"
 #include "guiapplication.h"
+#include "library/createlibrarytab.h"
+#include "library/downloadlibrarytab.h"
+#include "project/board/board2dtab.h"
+#include "project/board/board3dtab.h"
 #include "project/projecteditor.h"
+#include "project/schematic/schematictab.h"
 #include "windowsection.h"
 #include "windowtab.h"
 
@@ -82,16 +87,17 @@ bool WindowSectionsModel::actionTriggered(ui::ActionId id,
       return true;
     }
   } else if (id == ui::ActionId::CreateLibraryTabOpen) {
-    addTab(ui::TabType::CreateLibrary, nullptr, -1);
+    addTab(std::make_shared<CreateLibraryTab>(mApp, this));
     return true;
   } else if (id == ui::ActionId::DownloadLibraryTabOpen) {
-    addTab(ui::TabType::DownloadLibrary, nullptr, -1);
+    addTab(std::make_shared<DownloadLibraryTab>(mApp, this));
     return true;
   } else if (id == ui::ActionId::Board2dTabOpen3d) {
     if (std::shared_ptr<WindowSection> s = mItems.value(sectionIndex)) {
       if (auto t = s->getCurrentTab()) {
         if (auto prj = t->getProject()) {
-          addTab(ui::TabType::Board3d, prj, t->getObjIndex());
+          addTab(
+              std::make_shared<Board3dTab>(mApp, prj, t->getObjIndex(), this));
         }
       }
     }
@@ -103,12 +109,12 @@ bool WindowSectionsModel::actionTriggered(ui::ActionId id,
 
 void WindowSectionsModel::openSchematic(std::shared_ptr<ProjectEditor> prj,
                                         int index) noexcept {
-  addTab(ui::TabType::Schematic, prj, index);
+  addTab(std::make_shared<SchematicTab>(mApp, prj, index, this));
 }
 
 void WindowSectionsModel::openBoard(std::shared_ptr<ProjectEditor> prj,
                                     int index) noexcept {
-  addTab(ui::TabType::Board2d, prj, index);
+  addTab(std::make_shared<Board2dTab>(mApp, prj, index, this));
 }
 
 void WindowSectionsModel::setCurrentTab(int sectionIndex,
@@ -226,12 +232,10 @@ void WindowSectionsModel::splitSection(int sectionIndex) noexcept {
   row_added(newIndex, 1);
 }
 
-void WindowSectionsModel::addTab(ui::TabType type,
-                                 std::shared_ptr<ProjectEditor> prj,
-                                 int objIndex) noexcept {
+void WindowSectionsModel::addTab(std::shared_ptr<WindowTab> tab) noexcept {
   const int sectionIndex = qBound(0, mCurrentSectionIndex, mItems.count() - 1);
   if (std::shared_ptr<WindowSection> s = mItems.value(sectionIndex)) {
-    s->addTab(type, prj, objIndex);
+    s->addTab(tab);
     setCurrentTab(sectionIndex, s->getTabCount() - 1);
   }
 }

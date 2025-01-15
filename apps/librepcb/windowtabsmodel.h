@@ -63,8 +63,7 @@ public:
   std::shared_ptr<WindowTab> getTab(int index) noexcept {
     return mItems.value(index);
   }
-  void addTab(ui::TabType type, std::shared_ptr<ProjectEditor> prj,
-              int objIndex) noexcept;
+  void addTab(std::shared_ptr<WindowTab> tab) noexcept;
   void closeTab(int index) noexcept;
   void setCurrentTab(int index) noexcept;
 

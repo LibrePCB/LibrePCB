@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_BOARD3DTAB_H
-#define LIBREPCB_BOARD3DTAB_H
+#ifndef LIBREPCB_PROJECT_BOARD3DTAB_H
+#define LIBREPCB_PROJECT_BOARD3DTAB_H
 
 /*******************************************************************************
  *  Includes

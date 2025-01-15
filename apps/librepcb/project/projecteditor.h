@@ -37,8 +37,6 @@ class Project;
 namespace editor {
 namespace app {
 
-class SchematicEditor;
-
 /*******************************************************************************
  *  Class ProjectEditor
  ******************************************************************************/
@@ -65,7 +63,6 @@ public:
 
 private:
   std::unique_ptr<Project> mProject;
-  std::vector<std::shared_ptr<SchematicEditor>> mSchematics;
 };
 
 /*******************************************************************************
