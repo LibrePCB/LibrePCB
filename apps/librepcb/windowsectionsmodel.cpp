@@ -147,6 +147,16 @@ slint::Image WindowSectionsModel::renderScene(int sectionIndex, float width,
   return slint::Image();
 }
 
+void WindowSectionsModel::processSceneDoubleClicked(int sectionIndex, float x,
+                                                    float y, float width,
+                                                    float height) noexcept {
+  if (std::shared_ptr<WindowSection> s = mItems.value(sectionIndex)) {
+    if (s->processSceneDoubleClicked(x, y, width, height)) {
+      row_changed(sectionIndex);
+    }
+  }
+}
+
 slint::private_api::EventResult WindowSectionsModel::processScenePointerEvent(
     int sectionIndex, float x, float y, float width, float height,
     slint::private_api::PointerEvent e) noexcept {

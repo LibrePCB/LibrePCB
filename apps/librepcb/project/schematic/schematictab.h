@@ -36,6 +36,7 @@ namespace editor {
 
 class GraphicsScene;
 class IF_GraphicsLayerProvider;
+class SchematicEditorFsm;
 
 namespace app {
 
@@ -65,12 +66,18 @@ public:
   void setUiData(const ui::SchematicTabData& data) noexcept;
   void activate() noexcept override;
   void deactivate() noexcept override;
+  bool processSceneDoubleClicked(float x, float y, float width,
+                                 float height) noexcept override;
+  bool processScenePointerEvent(
+      float x, float y, float width, float height,
+      slint::private_api::PointerEvent e) noexcept override;
 
   // Operator Overloadings
   SchematicTab& operator=(const SchematicTab& rhs) = delete;
 
 private:
   ui::SchematicTabData mUiData;
+  QScopedPointer<SchematicEditorFsm> mFsm;
 };
 
 /*******************************************************************************

@@ -79,7 +79,7 @@ Schematic* SchematicEditorState::getActiveSchematic() noexcept {
 
 SchematicGraphicsScene*
     SchematicEditorState::getActiveSchematicScene() noexcept {
-  return mContext.editor.getActiveSchematicScene();
+  return dynamic_cast<SchematicGraphicsScene*>(mContext.graphicsScene.get());
 }
 
 PositiveLength SchematicEditorState::getGridInterval() const noexcept {

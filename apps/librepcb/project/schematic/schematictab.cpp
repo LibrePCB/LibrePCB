@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "schematictab.h"
 
+#include "../projecteditor.h"
 #include "apptoolbox.h"
 #include "guiapplication.h"
 #include "project/projecteditor.h"
@@ -30,7 +31,12 @@
 #include <librepcb/core/project/schematic/schematic.h>
 #include <librepcb/core/workspace/theme.h>
 #include <librepcb/editor/graphics/graphicslayer.h>
+#include <librepcb/editor/project/projecteditor.h>
+#include <librepcb/editor/project/schematiceditor/fsm/schematiceditorfsm.h>
+#include <librepcb/editor/project/schematiceditor/schematiceditor.h>
 #include <librepcb/editor/project/schematiceditor/schematicgraphicsscene.h>
+#include <librepcb/editor/utils/toolbarproxy.h>
+#include <librepcb/editor/widgets/graphicsview.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -64,7 +70,29 @@ SchematicTab::SchematicTab(GuiApplication& app,
         q2s(Qt::black),  // Overlay color
         true,  // Show pin numbers
         ui::SchematicTool::Select,  // Active tool
-    } {
+    },
+    mFsm() {
+  // Build the whole schematic editor finite state machine.
+  auto editor = new editor::ProjectEditor(mApp.getWorkspace(),
+                                          mProject->getProject(), std::nullopt);
+  SchematicEditorFsm::Context fsmContext{
+      mApp.getWorkspace(),
+      mProject->getProject(),
+      *editor,
+      *new editor::SchematicEditor(*editor, mProject->getProject()),
+      mScene,
+      *new GraphicsView(),
+      *new ToolBarProxy(),
+      editor->getUndoStack()};
+  mFsm.reset(new SchematicEditorFsm(fsmContext));
+  // connect(mFsm.data(), &SchematicEditorFsm::statusBarMessageChanged, this,
+  //         [this](const QString& message, int timeoutMs) {
+  //           if (timeoutMs < 0) {
+  //             mUi->statusbar->setPermanentMessage(message);
+  //           } else {
+  //             mUi->statusbar->showMessage(message, timeoutMs);
+  //           }
+  //         });
 }
 
 SchematicTab::~SchematicTab() noexcept {
@@ -96,6 +124,75 @@ void SchematicTab::activate() noexcept {
 
 void SchematicTab::deactivate() noexcept {
   mScene.reset();
+}
+
+bool SchematicTab::processSceneDoubleClicked(float x, float y, float width,
+                                             float height) noexcept {
+  Q_UNUSED(width);
+  Q_UNUSED(height);
+
+  QTransform tf;
+  tf.translate(mProjection.offset.x(), mProjection.offset.y());
+  tf.scale(1 / mProjection.scale, 1 / mProjection.scale);
+  const QPointF scenePosPx = tf.map(QPointF(x, y));
+
+  QGraphicsSceneMouseEvent qe;
+  qe.setScenePos(scenePosPx);
+  if (auto win = qApp->activeWindow()) {
+    qe.setScreenPos(win->mapToGlobal(QPointF(x, y)).toPoint());
+  }
+
+  bool handled = mFsm->processGraphicsSceneLeftMouseButtonDoubleClicked(qe);
+
+  qDebug() << handled;
+
+  if (handled) {
+    emit requestRepaint();
+  }
+
+  return handled;
+}
+
+bool SchematicTab::processScenePointerEvent(
+    float x, float y, float width, float height,
+    slint::private_api::PointerEvent e) noexcept {
+  if (GraphicsSceneTab::processScenePointerEvent(x, y, width, height, e)) {
+    return true;
+  }
+
+  QTransform tf;
+  tf.translate(mProjection.offset.x(), mProjection.offset.y());
+  tf.scale(1 / mProjection.scale, 1 / mProjection.scale);
+  const QPointF scenePosPx = tf.map(QPointF(x, y));
+
+  QGraphicsSceneMouseEvent qe;
+  qe.setScenePos(scenePosPx);
+  if (auto win = qApp->activeWindow()) {
+    qe.setScreenPos(win->mapToGlobal(QPointF(x, y)).toPoint());
+  }
+
+  bool handled = false;
+  if ((e.button == slint::private_api::PointerEventButton::Left) &&
+      (e.kind == slint::private_api::PointerEventKind::Down)) {
+    qe.setButton(Qt::LeftButton);
+    handled = mFsm->processGraphicsSceneLeftMouseButtonPressed(qe);
+  } else if ((e.button == slint::private_api::PointerEventButton::Left) &&
+             (e.kind == slint::private_api::PointerEventKind::Up)) {
+    qe.setButton(Qt::LeftButton);
+    handled = mFsm->processGraphicsSceneLeftMouseButtonReleased(qe);
+  } else if ((e.button == slint::private_api::PointerEventButton::Right) &&
+             (e.kind == slint::private_api::PointerEventKind::Up)) {
+    qe.setButton(Qt::RightButton);
+    handled = mFsm->processGraphicsSceneRightMouseButtonReleased(qe);
+  } else if (e.kind == slint::private_api::PointerEventKind::Move) {
+    handled = mFsm->processGraphicsSceneMouseMoved(qe);
+  }
+
+  if (handled) {
+    emit requestRepaint();
+  }
+
+  return handled;
 }
 
 /*******************************************************************************

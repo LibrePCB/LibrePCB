@@ -210,6 +210,15 @@ export global Globals {
     // - Frame number (to be ignored)
     pure callback render-scene(int, length, length, int) -> image;
 
+    // Scene double clicked
+    //
+    // - Section index
+    // - Cursor X
+    // - Cursor Y
+    // - Scene width
+    // - Scene height
+    pure callback scene-double-clicked(int, length, length, length, length);
+
     // Scene pointer event
     //
     // - Section index

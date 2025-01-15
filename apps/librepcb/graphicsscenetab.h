@@ -116,6 +116,7 @@ protected:
   Projection mProjection;
 
   bool mPanning = false;
+  QPointF mStartScreenPos;
   QPointF mStartScenePos;
 
   Projection mAnimationDataStart;

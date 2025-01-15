@@ -145,6 +145,14 @@ slint::Image WindowSection::renderScene(float width, float height) noexcept {
   return slint::Image();
 }
 
+bool WindowSection::processSceneDoubleClicked(float x, float y, float width,
+                                              float height) noexcept {
+  if (std::shared_ptr<WindowTab> t = getTab(mUiData.current_tab_index)) {
+    return t->processSceneDoubleClicked(x, y, width, height);
+  }
+  return false;
+}
+
 bool WindowSection::processScenePointerEvent(
     float x, float y, float width, float height,
     slint::private_api::PointerEvent e) noexcept {
