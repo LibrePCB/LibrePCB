@@ -85,6 +85,10 @@ MainWindow::MainWindow(GuiApplication& app,
   g.on_render_scene(std::bind(
       &WindowSectionsModel::renderScene, mSections.get(), std::placeholders::_1,
       std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
+  g.on_scene_double_clicked(std::bind(
+      &WindowSectionsModel::processSceneDoubleClicked, mSections.get(),
+      std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+      std::placeholders::_4, std::placeholders::_5));
   g.on_scene_pointer_event(std::bind(
       &WindowSectionsModel::processScenePointerEvent, mSections.get(),
       std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,

@@ -26,9 +26,9 @@
 #include "../../dialogs/graphicsexportdialog.h"
 #include "../../graphics/graphicslayer.h"
 #include "../../widgets/if_graphicsvieweventhandler.h"
-#include "ui_schematiceditor.h"
 
 #include <librepcb/core/serialization/fileformatmigration.h>
+#include <librepcb/core/workspace/theme.h>
 
 #include <QtCore>
 #include <QtWidgets>

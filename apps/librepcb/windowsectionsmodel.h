@@ -69,6 +69,8 @@ public:
   void closeTab(int sectionIndex, int tabIndex) noexcept;
   slint::Image renderScene(int sectionIndex, float width, float height,
                            int frame) noexcept;
+  void processSceneDoubleClicked(int sectionIndex, float x, float y,
+                                 float width, float height) noexcept;
   slint::private_api::EventResult processScenePointerEvent(
       int sectionIndex, float x, float y, float width, float height,
       slint::private_api::PointerEvent e) noexcept;

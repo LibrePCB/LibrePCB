@@ -47,6 +47,7 @@
 #include "graphicsitems/sgi_symbol.h"
 #include "schematicgraphicsscene.h"
 #include "schematicpagesdock.h"
+#include "ui_schematiceditor.h"
 
 #include <librepcb/core/application.h>
 #include <librepcb/core/project/circuit/circuit.h>
@@ -136,6 +137,7 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
                                          mProject,
                                          mProjectEditor,
                                          *this,
+                                         *new std::shared_ptr<GraphicsScene>(),
                                          *mUi->graphicsView,
                                          *mCommandToolBarProxy,
                                          mProjectEditor.getUndoStack()};

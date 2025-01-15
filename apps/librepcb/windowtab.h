@@ -78,6 +78,14 @@ public:
     Q_UNUSED(height);
     return slint::Image();
   }
+  virtual bool processSceneDoubleClicked(float x, float y, float width,
+                                         float height) noexcept {
+    Q_UNUSED(x);
+    Q_UNUSED(y);
+    Q_UNUSED(width);
+    Q_UNUSED(height);
+    return false;
+  }
   virtual bool processScenePointerEvent(
       float x, float y, float width, float height,
       slint::private_api::PointerEvent e) noexcept {
