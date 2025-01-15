@@ -15,10 +15,6 @@ add_executable(
   # Sources
   apptoolbox.cpp
   apptoolbox.h
-  board2dtab.cpp
-  board2dtab.h
-  board3dtab.cpp
-  board3dtab.h
   graphicsscenetab.cpp
   graphicsscenetab.h
   guiapplication.cpp
@@ -32,14 +28,16 @@ add_executable(
   main.cpp
   mainwindow.cpp
   mainwindow.h
+  project/board/board2dtab.cpp
+  project/board/board2dtab.h
+  project/board/board3dtab.cpp
+  project/board/board3dtab.h
   project/projecteditor.cpp
   project/projecteditor.h
   project/projectsmodel.cpp
   project/projectsmodel.h
-  project/schematiceditor.cpp
-  project/schematiceditor.h
-  schematictab.cpp
-  schematictab.h
+  project/schematic/schematictab.cpp
+  project/schematic/schematictab.h
   windowsection.cpp
   windowsection.h
   windowsectionsmodel.cpp

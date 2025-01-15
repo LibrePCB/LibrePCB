@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_BOARD2DTAB_H
-#define LIBREPCB_BOARD2DTAB_H
+#ifndef LIBREPCB_PROJECT_SCHEMATICTAB_H
+#define LIBREPCB_PROJECT_SCHEMATICTAB_H
 
 /*******************************************************************************
  *  Includes
@@ -32,9 +32,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class BoardPlaneFragmentsBuilder;
-
 namespace editor {
 
 class GraphicsScene;
@@ -46,35 +43,34 @@ class GuiApplication;
 class ProjectEditor;
 
 /*******************************************************************************
- *  Class Board2dTab
+ *  Class SchematicTab
  ******************************************************************************/
 
 /**
- * @brief The Board2dTab class
+ * @brief The SchematicTab class
  */
-class Board2dTab final : public GraphicsSceneTab {
+class SchematicTab final : public GraphicsSceneTab {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  Board2dTab() = delete;
-  Board2dTab(const Board2dTab& other) = delete;
-  explicit Board2dTab(GuiApplication& app, std::shared_ptr<ProjectEditor> prj,
-                      int boardIndex, QObject* parent = nullptr) noexcept;
-  virtual ~Board2dTab() noexcept;
+  SchematicTab() = delete;
+  SchematicTab(const SchematicTab& other) = delete;
+  explicit SchematicTab(GuiApplication& app, std::shared_ptr<ProjectEditor> prj,
+                        int schematicIndex, QObject* parent = nullptr) noexcept;
+  virtual ~SchematicTab() noexcept;
 
   // General Methods
-  const ui::Board2dTabData& getUiData() const noexcept { return mUiData; }
-  void setUiData(const ui::Board2dTabData& data) noexcept;
+  const ui::SchematicTabData& getUiData() const noexcept { return mUiData; }
+  void setUiData(const ui::SchematicTabData& data) noexcept;
   void activate() noexcept override;
   void deactivate() noexcept override;
 
   // Operator Overloadings
-  Board2dTab& operator=(const Board2dTab& rhs) = delete;
+  SchematicTab& operator=(const SchematicTab& rhs) = delete;
 
 private:
-  ui::Board2dTabData mUiData;
-  std::unique_ptr<BoardPlaneFragmentsBuilder> mPlaneBuilder;
+  ui::SchematicTabData mUiData;
 };
 
 /*******************************************************************************
