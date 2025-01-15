@@ -28,13 +28,15 @@ if(EXISTS "${SLINT_SUBMODULE_BASEPATH}"
   return()
 endif()
 
-# Otherwise, try to find shared library on the system
-find_package(Slint 1.8)
-if(Slint_FOUND)
-  message(STATUS "Using system Slint")
-
-  # Stop here, we're done
-  return()
-endif()
+# Otherwise, try to find shared library on the system.
+# Note: Currently disabled as in this early stage we have to update often to new
+# versions, sometimes not even released yet so we need the bundled submodule.
+#find_package(Slint 1.9)
+#if(Slint_FOUND)
+#  message(STATUS "Using system Slint")
+#
+#  # Stop here, we're done
+#  return()
+#endif()
 
 message(FATAL_ERROR "Did not find Slint system library")

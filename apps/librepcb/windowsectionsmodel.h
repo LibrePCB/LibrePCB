@@ -40,6 +40,7 @@ namespace app {
 class GuiApplication;
 class ProjectEditor;
 class WindowSection;
+class WindowTab;
 
 /*******************************************************************************
  *  Class WindowSectionsModel
@@ -92,8 +93,7 @@ signals:
 
 private:
   void splitSection(int sectionIndex) noexcept;
-  void addTab(ui::TabType type, std::shared_ptr<ProjectEditor> prj,
-              int objIndex) noexcept;
+  void addTab(std::shared_ptr<WindowTab> tab) noexcept;
 
   GuiApplication& mApp;
   QList<std::shared_ptr<WindowSection>> mItems;

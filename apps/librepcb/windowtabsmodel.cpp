@@ -22,11 +22,7 @@
  ******************************************************************************/
 #include "windowtabsmodel.h"
 
-#include "board2dtab.h"
-#include "board3dtab.h"
-#include "library/createlibrarytab.h"
-#include "library/downloadlibrarytab.h"
-#include "schematictab.h"
+#include "windowtab.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -53,55 +49,28 @@ WindowTabsModel::~WindowTabsModel() noexcept {
  *  General Methods
  ******************************************************************************/
 
-void WindowTabsModel::addTab(ui::TabType type,
-                             std::shared_ptr<ProjectEditor> prj,
-                             int objIndex) noexcept {
-  std::shared_ptr<WindowTab> t;
-  switch (type) {
-    case ui::TabType::CreateLibrary: {
-      t = std::make_shared<CreateLibraryTab>(mApp, this);
-      break;
-    }
-    case ui::TabType::DownloadLibrary: {
-      t = std::make_shared<DownloadLibraryTab>(mApp, this);
-      break;
-    }
-    case ui::TabType::Schematic: {
-      t = std::make_shared<SchematicTab>(mApp, prj, objIndex, this);
-      break;
-    }
-    case ui::TabType::Board2d: {
-      t = std::make_shared<Board2dTab>(mApp, prj, objIndex, this);
-      break;
-    }
-    case ui::TabType::Board3d: {
-      t = std::make_shared<Board3dTab>(mApp, prj, objIndex, this);
-      break;
-    }
-    default: {
-      return;
-    }
-  }
+void WindowTabsModel::addTab(std::shared_ptr<WindowTab> tab) noexcept {
   auto getTabIndex = [this](QObject* obj) {
-    const WindowTab* tab = static_cast<WindowTab*>(obj);
+    const WindowTab* t = static_cast<WindowTab*>(obj);
     for (int i = 0; i < mItems.count(); ++i) {
-      if (mItems.at(i).get() == tab) {
+      if (mItems.at(i).get() == t) {
         return i;
       }
     }
     return -1;
   };
-  connect(t.get(), &WindowTab::cursorCoordinatesChanged, this,
+
+  connect(tab.get(), &WindowTab::cursorCoordinatesChanged, this,
           &WindowTabsModel::cursorCoordinatesChanged);
   connect(
-      t.get(), &WindowTab::requestClose, this,
+      tab.get(), &WindowTab::requestClose, this,
       [this, getTabIndex]() { closeTab(getTabIndex(sender())); },
       Qt::QueuedConnection);
-  connect(t.get(), &WindowTab::requestRepaint, this,
+  connect(tab.get(), &WindowTab::requestRepaint, this,
           &WindowTabsModel::requestRepaint);
-  connect(t.get(), &WindowTab::uiDataChanged, this,
+  connect(tab.get(), &WindowTab::uiDataChanged, this,
           [this, getTabIndex]() { emit uiDataChanged(getTabIndex(sender())); });
-  mItems.append(t);
+  mItems.append(tab);
   row_added(mItems.count() - 1, 1);
 }
 
