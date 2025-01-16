@@ -1,7 +1,9 @@
 import { CheckBox, ListView, ProgressIndicator, Spinner, HorizontalBox, VerticalBox, StandardButton } from "std-widgets.slint";
 import { PanelHeader } from "../panelheader.slint";
-import { Globals, Library, LibraryType, LibraryState, ActionId } from "../globals.slint";
+import { Library, LibraryType, LibraryState, ActionId } from "../types.slint";
 import { ToolTip } from "../tooltip.slint";
+import { Callbacks } from "../callbacks.slint";
+import { Data } from "../data.slint";
 
 component LibraryList inherits ListView {
     in property <length> bottom-padding: 50px;
@@ -33,7 +35,7 @@ component LibraryList inherits ListView {
                 }
 
                 double-clicked => {
-                    Globals.open-library(lib.id);
+                    Callbacks.open-library(lib.id);
                 }
 
                 HorizontalLayout {
@@ -151,7 +153,7 @@ component LibraryList inherits ListView {
                                 StandardButton {
                                     kind: yes;
                                     clicked => {
-                                        Globals.uninstall-library(lib.id);
+                                        Callbacks.uninstall-library(lib.id);
                                     }
                                 }
 
@@ -182,7 +184,7 @@ export component LibrariesPanel inherits Rectangle {
     background: #2a2a2a;
 
     init => {
-        Globals.action-triggered(ActionId.library-panel-ensure-populated, -1);
+        Callbacks.action-triggered(ActionId.library-panel-ensure-populated, -1);
     }
 
     VerticalLayout {
@@ -196,7 +198,7 @@ export component LibrariesPanel inherits Rectangle {
                 horizontal-stretch: 1;
             }
 
-            if Globals.refreshing-available-libraries: Spinner {
+            if Data.refreshing-available-libraries: Spinner {
                 indeterminate: true;
                 width: header.content-height - 4px;
                 height: header.content-height;
@@ -224,7 +226,7 @@ export component LibrariesPanel inherits Rectangle {
                     }
 
                     clicked => {
-                        Globals.action-triggered(ActionId.download-library-tab-open, -1);
+                        Callbacks.action-triggered(ActionId.download-library-tab-open, -1);
                     }
                 }
             }
@@ -251,14 +253,14 @@ export component LibrariesPanel inherits Rectangle {
                     }
 
                     clicked => {
-                        Globals.action-triggered(ActionId.create-library-tab-open, -1);
+                        Callbacks.action-triggered(ActionId.create-library-tab-open, -1);
                     }
                 }
             }
         }
 
         LibraryList {
-            model: Globals.libraries;
+            model: Data.libraries;
             bottom-padding: btn-install.height + 5px;
             vertical-stretch: 0;
         }
@@ -271,7 +273,7 @@ export component LibrariesPanel inherits Rectangle {
         height: self.preferred-height;
         background: #ff5100;
         border-radius: self.height / 2;
-        visible: Globals.checked-libraries > 0;
+        visible: Data.checked-libraries > 0;
 
         HorizontalBox {
             Image {
@@ -284,13 +286,13 @@ export component LibrariesPanel inherits Rectangle {
             t-install := Text {
                 color: ta-install.has-hover ? white : black;
                 font-size: 14px;
-                text: @tr("Install/update {n} library" | "Install/update {n} libraries" % Globals.checked-libraries);
+                text: @tr("Install/update {n} library" | "Install/update {n} libraries" % Data.checked-libraries);
             }
         }
 
         ta-install := TouchArea {
             clicked => {
-                Globals.action-triggered(ActionId.library-panel-install, -1);
+                Callbacks.action-triggered(ActionId.library-panel-install, -1);
             }
         }
     }
@@ -301,7 +303,7 @@ export component LibrariesPanel inherits Rectangle {
         height: btn-install.height;
 
         toggled => {
-            Globals.toggle-libraries-checked(self.checked);
+            Callbacks.toggle-libraries-checked(self.checked);
         }
     }
 }

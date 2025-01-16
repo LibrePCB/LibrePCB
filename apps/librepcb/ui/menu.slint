@@ -1,4 +1,5 @@
-import { Globals, ActionId } from "./globals.slint";
+import { ActionId } from "./types.slint";
+import { Callbacks } from "./callbacks.slint";
 
 export struct MenuItemData {
     id: ActionId,
@@ -26,7 +27,7 @@ component MenuItem inherits Rectangle {
     ta := TouchArea {
         clicked => {
             if handle-in-backend {
-                Globals.action-triggered(id, section-index);
+                Callbacks.action-triggered(id, section-index);
             } else {
                 clicked(id);
             }

@@ -1,7 +1,9 @@
 import { Button, LineEdit, CheckBox } from "std-widgets.slint";
 import { LineEdit } from "../lineedit.slint";
-import { Globals, WindowSection, CreateLibraryTabData, ActionId } from "../globals.slint";
+import { Data } from "../data.slint";
+import { Callbacks } from "../callbacks.slint";
 import { ToolTip } from "../tooltip.slint";
+import { WindowSection, CreateLibraryTabData, ActionId } from "../types.slint";
 
 export component CreateLibraryTab inherits Rectangle {
     in property <int> section-index;
@@ -195,7 +197,7 @@ export component CreateLibraryTab inherits Rectangle {
                         mouse-cursor: pointer;
 
                         clicked => {
-                            Globals.open-url(url);
+                            Callbacks.open-url(url);
                         }
                     }
 
@@ -238,7 +240,7 @@ export component CreateLibraryTab inherits Rectangle {
                     text: @tr("Create Library");
 
                     clicked => {
-                        Globals.action-triggered(ActionId.section-ok, section-index);
+                        Callbacks.action-triggered(ActionId.section-ok, section-index);
                     }
                 }
 
@@ -246,7 +248,7 @@ export component CreateLibraryTab inherits Rectangle {
                     text: @tr("Cancel");
 
                     clicked => {
-                        Globals.tab-close-clicked(section-index, section.current-tab-index);
+                        Callbacks.tab-close-clicked(section-index, section.current-tab-index);
                     }
                 }
             }

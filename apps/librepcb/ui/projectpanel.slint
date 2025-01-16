@@ -1,5 +1,6 @@
 import { PanelHeader } from "./panelheader.slint";
-import { Globals } from "./globals.slint";
+import { Data } from "./data.slint";
+import { Callbacks } from "./callbacks.slint";
 
 component ProjectItem inherits Rectangle {
     in property <string> text <=> t-title.text;
@@ -26,18 +27,18 @@ export component ProjectPanel inherits Rectangle {
         alignment: LayoutAlignment.start;
 
         PanelHeader {
-            title: Globals.current-project.name;
+            title: Data.current-project.name;
         }
 
         PanelHeader {
             title: @tr("SCHEMATICS");
         }
 
-        for schematic[index] in Globals.current-project.schematics: ProjectItem {
+        for schematic[index] in Data.current-project.schematics: ProjectItem {
             text: schematic;
 
             clicked => {
-                Globals.schematic-clicked(index);
+                Callbacks.schematic-clicked(index);
             }
         }
 
@@ -45,11 +46,11 @@ export component ProjectPanel inherits Rectangle {
             title: @tr("BOARDS");
         }
 
-        for board[index] in Globals.current-project.boards: ProjectItem {
+        for board[index] in Data.current-project.boards: ProjectItem {
             text: board;
 
             clicked => {
-                Globals.board-clicked(index);
+                Callbacks.board-clicked(index);
             }
         }
     }

@@ -6,9 +6,11 @@ import { ProjectPanel } from "./projectpanel.slint";
 import { HomePanel } from "./homepanel.slint";
 import { MenuBar } from "./menubar.slint";
 import { WindowSection } from "./windowsection.slint";
-import { Globals, Tab, ActionId, MainPage } from "./globals.slint";
+import { MainPage } from "./types.slint";
+import { Callbacks } from "./callbacks.slint";
+import { Data } from "./data.slint";
 
-export { Globals }
+export { Callbacks, Data }
 
 export component AppWindow inherits Window {
     property <length> panel-width: (self.width <= 800px) ? 250px : 350px;
@@ -29,14 +31,14 @@ export component AppWindow inherits Window {
         height: parent.height - self.y - statusbar.height - 1px;
     }
 
-    if Globals.current-page == MainPage.home: HomePanel {
+    if Data.current-page == MainPage.home: HomePanel {
         x: sidebar.width;
         y: sidebar.y;
         width: panel-width;
         height: sidebar.height;
     }
 
-    if Globals.current-page == MainPage.libraries: LibrariesPanel {
+    if Data.current-page == MainPage.libraries: LibrariesPanel {
         x: sidebar.width;
         y: sidebar.y;
         z: 90;
@@ -44,7 +46,7 @@ export component AppWindow inherits Window {
         height: sidebar.height;
     }
 
-    if Globals.current-page == MainPage.project: ProjectPanel {
+    if Data.current-page == MainPage.project: ProjectPanel {
         x: sidebar.width;
         y: sidebar.y;
         width: panel-width;
@@ -62,13 +64,13 @@ export component AppWindow inherits Window {
             width: 1px;
         }
 
-        for section[i] in Globals.sections: HorizontalLayout {
+        for section[i] in Data.sections: HorizontalLayout {
             WindowSection {
                 section-index: i;
                 section: section;
             }
 
-            if i < (Globals.sections.length - 1): Rectangle {
+            if i < (Data.sections.length - 1): Rectangle {
                 width: 1px;
                 horizontal-stretch: 0;
                 background: #555555;
@@ -76,12 +78,12 @@ export component AppWindow inherits Window {
         }
     }
 
-    if Globals.current-page == MainPage.preferences: LengthEdit {
+    if Data.current-page == MainPage.preferences: LengthEdit {
         x: 100px;
         y: 50px;
     }
 
-    if Globals.current-page == MainPage.preferences: LengthEdit {
+    if Data.current-page == MainPage.preferences: LengthEdit {
         x: 100px;
         y: 100px;
     }
@@ -126,7 +128,7 @@ export component AppWindow inherits Window {
                 ProgressIndicator {
                     width: 100%;
                     visible: self.progress > 0 && self.progress < 1;
-                    progress: Globals.status-bar-progress / 100;
+                    progress: Data.status-bar-progress / 100;
                 }
             }
         }
