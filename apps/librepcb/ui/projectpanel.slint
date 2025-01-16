@@ -1,6 +1,6 @@
 import { PanelHeader } from "./panelheader.slint";
 import { Data } from "./data.slint";
-import { Callbacks } from "./callbacks.slint";
+import { Backend } from "./backend.slint";
 
 component ProjectItem inherits Rectangle {
     in property <string> text <=> t-title.text;
@@ -38,7 +38,7 @@ export component ProjectPanel inherits Rectangle {
             text: schematic;
 
             clicked => {
-                Callbacks.schematic-clicked(index);
+                Backend.schematic-clicked(index);
             }
         }
 
@@ -50,7 +50,7 @@ export component ProjectPanel inherits Rectangle {
             text: board;
 
             clicked => {
-                Callbacks.board-clicked(index);
+                Backend.board-clicked(index);
             }
         }
     }
