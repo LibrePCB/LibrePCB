@@ -69,13 +69,11 @@ public:
   void closeTab(int sectionIndex, int tabIndex) noexcept;
   slint::Image renderScene(int sectionIndex, float width, float height,
                            int frame) noexcept;
-  void processSceneDoubleClicked(int sectionIndex, float x, float y,
-                                 float width, float height) noexcept;
   slint::private_api::EventResult processScenePointerEvent(
-      int sectionIndex, float x, float y, float width, float height,
+      int sectionIndex, const QPointF& pos, const QPointF& globalPos,
       slint::private_api::PointerEvent e) noexcept;
   slint::private_api::EventResult processSceneScrolled(
-      int sectionIndex, float x, float y, float width, float height,
+      int sectionIndex, float x, float y,
       slint::private_api::PointerScrollEvent e) noexcept;
   void zoomFit(int sectionIndex, float width, float height) noexcept;
   void zoomIn(int sectionIndex, float width, float height) noexcept;

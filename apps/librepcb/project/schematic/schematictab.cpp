@@ -126,54 +126,40 @@ void SchematicTab::deactivate() noexcept {
   mScene.reset();
 }
 
-bool SchematicTab::processSceneDoubleClicked(float x, float y, float width,
-                                             float height) noexcept {
-  Q_UNUSED(width);
-  Q_UNUSED(height);
-
-  QTransform tf;
-  tf.translate(mProjection.offset.x(), mProjection.offset.y());
-  tf.scale(1 / mProjection.scale, 1 / mProjection.scale);
-  const QPointF scenePosPx = tf.map(QPointF(x, y));
-
-  QGraphicsSceneMouseEvent qe;
-  qe.setScenePos(scenePosPx);
-  if (auto win = qApp->activeWindow()) {
-    qe.setScreenPos(win->mapToGlobal(QPointF(x, y)).toPoint());
-  }
-
-  bool handled = mFsm->processGraphicsSceneLeftMouseButtonDoubleClicked(qe);
-
-  qDebug() << handled;
-
-  if (handled) {
-    emit requestRepaint();
-  }
-
-  return handled;
-}
-
 bool SchematicTab::processScenePointerEvent(
-    float x, float y, float width, float height,
+    const QPointF& pos, const QPointF& globalPos,
     slint::private_api::PointerEvent e) noexcept {
-  if (GraphicsSceneTab::processScenePointerEvent(x, y, width, height, e)) {
+  static qint64 lastClickTime = 0;
+
+  if (GraphicsSceneTab::processScenePointerEvent(pos, globalPos, e)) {
     return true;
   }
 
   QTransform tf;
   tf.translate(mProjection.offset.x(), mProjection.offset.y());
   tf.scale(1 / mProjection.scale, 1 / mProjection.scale);
-  const QPointF scenePosPx = tf.map(QPointF(x, y));
+  const QPointF scenePosPx = tf.map(pos);
 
   QGraphicsSceneMouseEvent qe;
   qe.setScenePos(scenePosPx);
-  if (auto win = qApp->activeWindow()) {
-    qe.setScreenPos(win->mapToGlobal(QPointF(x, y)).toPoint());
+  qe.setScreenPos(globalPos.toPoint());
+
+  bool isDoubleClick = false;
+  if (e.kind == slint::private_api::PointerEventKind::Down) {
+    const qint64 t = QDateTime::currentMSecsSinceEpoch();
+    if (t - lastClickTime < 300) {
+      isDoubleClick = true;
+    }
+    lastClickTime = t;
   }
 
   bool handled = false;
-  if ((e.button == slint::private_api::PointerEventButton::Left) &&
-      (e.kind == slint::private_api::PointerEventKind::Down)) {
+  if (isDoubleClick &&
+      (e.button == slint::private_api::PointerEventButton::Left)) {
+    qe.setButton(Qt::LeftButton);
+    handled = mFsm->processGraphicsSceneLeftMouseButtonDoubleClicked(qe);
+  } else if ((e.button == slint::private_api::PointerEventButton::Left) &&
+             (e.kind == slint::private_api::PointerEventKind::Down)) {
     qe.setButton(Qt::LeftButton);
     handled = mFsm->processGraphicsSceneLeftMouseButtonPressed(qe);
   } else if ((e.button == slint::private_api::PointerEventButton::Left) &&

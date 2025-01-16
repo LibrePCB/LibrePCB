@@ -1,19 +1,18 @@
 import { Button, ProgressIndicator, StandardButton } from "std-widgets.slint";
-import { SideBar, MainPage } from "./sidebar.slint";
+import { SideBar } from "./sidebar.slint";
 import { LengthEdit } from "./lengthedit.slint";
 import { LibrariesPanel } from "./library/librariespanel.slint";
 import { ProjectPanel } from "./projectpanel.slint";
 import { HomePanel } from "./homepanel.slint";
 import { MenuBar } from "./menubar.slint";
 import { WindowSection } from "./windowsection.slint";
-import { Globals, Tab, ActionId } from "./globals.slint";
+import { Globals, Tab, ActionId, MainPage } from "./globals.slint";
 
 export { Globals }
 
 export component AppWindow inherits Window {
     property <length> panel-width: (self.width <= 800px) ? 250px : 350px;
     in property <string> window-title <=> self.title;
-    in-out property <MainPage> page <=> sidebar.page;
 
     background: #2a2a2a;
     icon: @image-url("img/librepcb.png");
@@ -30,14 +29,14 @@ export component AppWindow inherits Window {
         height: parent.height - self.y - statusbar.height - 1px;
     }
 
-    if sidebar.page == MainPage.home: HomePanel {
+    if Globals.current-page == MainPage.home: HomePanel {
         x: sidebar.width;
         y: sidebar.y;
         width: panel-width;
         height: sidebar.height;
     }
 
-    if sidebar.page == MainPage.libraries: LibrariesPanel {
+    if Globals.current-page == MainPage.libraries: LibrariesPanel {
         x: sidebar.width;
         y: sidebar.y;
         z: 90;
@@ -45,7 +44,7 @@ export component AppWindow inherits Window {
         height: sidebar.height;
     }
 
-    if sidebar.page == MainPage.project: ProjectPanel {
+    if Globals.current-page == MainPage.project: ProjectPanel {
         x: sidebar.width;
         y: sidebar.y;
         width: panel-width;
@@ -77,12 +76,12 @@ export component AppWindow inherits Window {
         }
     }
 
-    if sidebar.page == MainPage.preferences: LengthEdit {
+    if Globals.current-page == MainPage.preferences: LengthEdit {
         x: 100px;
         y: 50px;
     }
 
-    if sidebar.page == MainPage.preferences: LengthEdit {
+    if Globals.current-page == MainPage.preferences: LengthEdit {
         x: 100px;
         y: 100px;
     }

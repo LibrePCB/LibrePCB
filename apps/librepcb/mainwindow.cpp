@@ -37,6 +37,7 @@
 #include <librepcb/editor/workspace/desktopservices.h>
 
 #include <QtCore>
+#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace
@@ -60,8 +61,8 @@ MainWindow::MainWindow(GuiApplication& app,
     mWindow(win) {
   // Set initial data.
   const ui::Globals& g = mWindow->global<ui::Globals>();
+  g.set_current_page(ui::MainPage::Home);
   g.set_current_project(ui::ProjectData{});
-  mWindow->set_page(ui::MainPage::Home);
   mWindow->set_cursor_coordinate(slint::SharedString());
 
   // Register global callbacks.
@@ -85,18 +86,21 @@ MainWindow::MainWindow(GuiApplication& app,
   g.on_render_scene(std::bind(
       &WindowSectionsModel::renderScene, mSections.get(), std::placeholders::_1,
       std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
-  g.on_scene_double_clicked(std::bind(
-      &WindowSectionsModel::processSceneDoubleClicked, mSections.get(),
-      std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
-      std::placeholders::_4, std::placeholders::_5));
-  g.on_scene_pointer_event(std::bind(
-      &WindowSectionsModel::processScenePointerEvent, mSections.get(),
-      std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
-      std::placeholders::_4, std::placeholders::_5, std::placeholders::_6));
-  g.on_scene_scrolled(std::bind(
-      &WindowSectionsModel::processSceneScrolled, mSections.get(),
-      std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
-      std::placeholders::_4, std::placeholders::_5, std::placeholders::_6));
+  g.on_scene_pointer_event([this](int sectionIndex, float x, float y,
+                                  const slint::Point<float>& scenePos,
+                                  slint::private_api::PointerEvent e) {
+    // const auto winPos = mWindow->window().position();
+    QPointF globalPos(scenePos.x + x, scenePos.y + y);
+    if (QWidget* win = qApp->activeWindow()) {
+      globalPos = win->mapToGlobal(globalPos);
+    }
+    return mSections->processScenePointerEvent(sectionIndex, QPointF(x, y),
+                                               globalPos, e);
+  });
+  g.on_scene_scrolled(std::bind(&WindowSectionsModel::processSceneScrolled,
+                                mSections.get(), std::placeholders::_1,
+                                std::placeholders::_2, std::placeholders::_3,
+                                std::placeholders::_4));
   g.on_scene_zoom_fit_clicked(std::bind(
       &WindowSectionsModel::zoomFit, mSections.get(), std::placeholders::_1,
       std::placeholders::_2, std::placeholders::_3));
@@ -156,7 +160,7 @@ void MainWindow::projectItemDoubleClicked(
   }
   if ((fp.getSuffix() == "lpp") || (fp.getSuffix() == "lppz")) {
     setCurrentProject(mApp.getProjects().openProject(fp));
-    mWindow->set_page(ui::MainPage::Project);
+    mWindow->global<ui::Globals>().set_current_page(ui::MainPage::Project);
   } else {
     DesktopServices ds(mApp.getWorkspace().getSettings());
     ds.openLocalPath(fp);

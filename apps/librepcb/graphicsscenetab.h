@@ -90,10 +90,10 @@ public:
   // General Methods
   virtual slint::Image renderScene(float width, float height) noexcept override;
   virtual bool processScenePointerEvent(
-      float x, float y, float width, float height,
+      const QPointF& pos, const QPointF& globalPos,
       slint::private_api::PointerEvent e) noexcept override;
   virtual bool processSceneScrolled(
-      float x, float y, float width, float height,
+      float x, float y,
       slint::private_api::PointerScrollEvent e) noexcept override;
   virtual void zoomFit(float width, float height) noexcept override;
   virtual void zoomIn(float width, float height) noexcept override;
@@ -103,8 +103,7 @@ public:
   GraphicsSceneTab& operator=(const GraphicsSceneTab& rhs) = delete;
 
 private:
-  virtual bool zoom(const QPointF& center, const QSizeF& size,
-                    qreal factor) noexcept;
+  virtual bool zoom(const QPointF& center, qreal factor) noexcept;
   virtual void smoothTo(const Projection& projection) noexcept;
   virtual bool applyProjection(const Projection& projection) noexcept;
 

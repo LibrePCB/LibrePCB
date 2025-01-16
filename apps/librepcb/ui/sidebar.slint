@@ -1,21 +1,7 @@
 import { SideBarButton } from "./sidebarbutton.slint";
-import { Globals } from "./globals.slint";
-
-export enum MainPage {
-    home,
-    libraries,
-    project,
-    drc,
-    output-jobs,
-    order,
-    search,
-    help,
-    preferences,
-}
+import { Globals, MainPage } from "./globals.slint";
 
 export component SideBar inherits Rectangle {
-    in-out property <MainPage> page: MainPage.home;
-
     background: #353535;
 
     VerticalLayout {
@@ -24,9 +10,9 @@ export component SideBar inherits Rectangle {
         SideBarButton {
             icon: @image-url("img/home.svg");
             tooltip: "Home";
-            checked: page == MainPage.home;
+            checked: Globals.current-page == MainPage.home;
             clicked => {
-                page = MainPage.home;
+                Globals.current-page = MainPage.home;
             }
         }
 
@@ -36,9 +22,9 @@ export component SideBar inherits Rectangle {
             status-background: #d4d400;
             status-color: black;
             status-text: (Globals.outdated-libraries > 0) ? Globals.outdated-libraries : "";
-            checked: page == MainPage.libraries;
+            checked: Globals.current-page == MainPage.libraries;
             clicked => {
-                page = MainPage.libraries;
+                Globals.current-page = MainPage.libraries;
             }
         }
 
@@ -46,19 +32,19 @@ export component SideBar inherits Rectangle {
             icon: @image-url("img/projects.png");
             tooltip: "Project";
             enabled: Globals.current-project.valid;
-            checked: page == MainPage.project;
+            checked: Globals.current-page == MainPage.project;
             clicked => {
-                page = MainPage.project;
+                Globals.current-page = MainPage.project;
             }
         }
 
         SideBarButton {
             icon: @image-url("img/drc.svg");
             tooltip: "Design Rule Check";
-            checked: page == MainPage.drc;
+            checked: Globals.current-page == MainPage.drc;
             enabled: Globals.current-project.valid;
             clicked => {
-                page = MainPage.drc;
+                Globals.current-page = MainPage.drc;
             }
         }
 
@@ -66,9 +52,9 @@ export component SideBar inherits Rectangle {
             icon: @image-url("img/output-jobs.svg");
             tooltip: "Output Jobs";
             enabled: Globals.current-project.valid;
-            checked: page == MainPage.output-jobs;
+            checked: Globals.current-page == MainPage.output-jobs;
             clicked => {
-                page = MainPage.output-jobs;
+                Globals.current-page = MainPage.output-jobs;
             }
         }
 
@@ -76,18 +62,18 @@ export component SideBar inherits Rectangle {
             icon: @image-url("img/shopping-cart.svg");
             tooltip: "Order PCB";
             enabled: Globals.current-project.valid;
-            checked: page == MainPage.order;
+            checked: Globals.current-page == MainPage.order;
             clicked => {
-                page = MainPage.order;
+                Globals.current-page = MainPage.order;
             }
         }
 
         SideBarButton {
             icon: @image-url("img/search.svg");
             tooltip: "Search";
-            checked: page == MainPage.search;
+            checked: Globals.current-page == MainPage.search;
             clicked => {
-                page = MainPage.search;
+                Globals.current-page = MainPage.search;
             }
         }
 
@@ -98,18 +84,18 @@ export component SideBar inherits Rectangle {
         SideBarButton {
             icon: @image-url("img/help.svg");
             tooltip: "Help";
-            checked: page == MainPage.help;
+            checked: Globals.current-page == MainPage.help;
             clicked => {
-                page = MainPage.help;
+                Globals.current-page = MainPage.help;
             }
         }
 
         SideBarButton {
             icon: @image-url("img/settings.svg");
             tooltip: "Preferences";
-            checked: page == MainPage.preferences;
+            checked: Globals.current-page == MainPage.preferences;
             clicked => {
-                page = MainPage.preferences;
+                Globals.current-page = MainPage.preferences;
             }
         }
     }
