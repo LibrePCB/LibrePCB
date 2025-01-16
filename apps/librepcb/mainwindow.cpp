@@ -59,34 +59,46 @@ MainWindow::MainWindow(GuiApplication& app,
     mSections(new WindowSectionsModel(app, this)),
     mCurrentProject(),
     mWindow(win) {
-  // Set initial data.
-  const ui::Globals& g = mWindow->global<ui::Globals>();
-  g.set_current_page(ui::MainPage::Home);
-  g.set_current_project(ui::ProjectData{});
-  mWindow->set_cursor_coordinate(slint::SharedString());
+  // Set global data.
+  const ui::Data& d = mWindow->global<ui::Data>();
+  d.set_current_page(ui::MainPage::Home);
+  d.set_current_project(ui::ProjectData{});
+  d.set_sections(mSections);
+  d.set_cursor_coordinates(slint::SharedString());
+
+  // Bind global data to signals.
+  connect(mSections.get(), &WindowSectionsModel::currentSectionIndexChanged,
+          this, [&d](int index) { d.set_current_section_index(index); });
+  connect(mSections.get(), &WindowSectionsModel::currentProjectChanged, this,
+          &MainWindow::setCurrentProject);
+  connect(mSections.get(), &WindowSectionsModel::cursorCoordinatesChanged, this,
+          [&d](qreal x, qreal y) {
+            d.set_cursor_coordinates(q2s(QString("%1, %2 mm").arg(x).arg(y)));
+          });
 
   // Register global callbacks.
-  g.on_action_triggered(std::bind(&MainWindow::actionTriggered, this,
+  const ui::Backend& b = mWindow->global<ui::Backend>();
+  b.on_action_triggered(std::bind(&MainWindow::actionTriggered, this,
                                   std::placeholders::_1,
                                   std::placeholders::_2));
-  g.on_project_item_doubleclicked(std::bind(
+  b.on_project_item_doubleclicked(std::bind(
       &MainWindow::projectItemDoubleClicked, this, std::placeholders::_1));
-  g.on_schematic_clicked([this](int index) {
+  b.on_schematic_clicked([this](int index) {
     if (mCurrentProject) mSections->openSchematic(mCurrentProject, index);
   });
-  g.on_board_clicked([this](int index) {
+  b.on_board_clicked([this](int index) {
     if (mCurrentProject) mSections->openBoard(mCurrentProject, index);
   });
-  g.on_tab_clicked(std::bind(&WindowSectionsModel::setCurrentTab,
+  b.on_tab_clicked(std::bind(&WindowSectionsModel::setCurrentTab,
                              mSections.get(), std::placeholders::_1,
                              std::placeholders::_2));
-  g.on_tab_close_clicked(std::bind(&WindowSectionsModel::closeTab,
+  b.on_tab_close_clicked(std::bind(&WindowSectionsModel::closeTab,
                                    mSections.get(), std::placeholders::_1,
                                    std::placeholders::_2));
-  g.on_render_scene(std::bind(
+  b.on_render_scene(std::bind(
       &WindowSectionsModel::renderScene, mSections.get(), std::placeholders::_1,
       std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
-  g.on_scene_pointer_event([this](int sectionIndex, float x, float y,
+  b.on_scene_pointer_event([this](int sectionIndex, float x, float y,
                                   const slint::Point<float>& scenePos,
                                   slint::private_api::PointerEvent e) {
     // const auto winPos = mWindow->window().position();
@@ -97,37 +109,23 @@ MainWindow::MainWindow(GuiApplication& app,
     return mSections->processScenePointerEvent(sectionIndex, QPointF(x, y),
                                                globalPos, e);
   });
-  g.on_scene_scrolled(std::bind(&WindowSectionsModel::processSceneScrolled,
+  b.on_scene_scrolled(std::bind(&WindowSectionsModel::processSceneScrolled,
                                 mSections.get(), std::placeholders::_1,
                                 std::placeholders::_2, std::placeholders::_3,
                                 std::placeholders::_4));
-  g.on_scene_zoom_fit_clicked(std::bind(
+  b.on_scene_zoom_fit_clicked(std::bind(
       &WindowSectionsModel::zoomFit, mSections.get(), std::placeholders::_1,
       std::placeholders::_2, std::placeholders::_3));
-  g.on_scene_zoom_in_clicked(std::bind(
+  b.on_scene_zoom_in_clicked(std::bind(
       &WindowSectionsModel::zoomIn, mSections.get(), std::placeholders::_1,
       std::placeholders::_2, std::placeholders::_3));
-  g.on_scene_zoom_out_clicked(std::bind(
+  b.on_scene_zoom_out_clicked(std::bind(
       &WindowSectionsModel::zoomOut, mSections.get(), std::placeholders::_1,
       std::placeholders::_2, std::placeholders::_3));
-  g.on_open_url([this](const slint::SharedString& url) {
+  b.on_open_url([this](const slint::SharedString& url) {
     DesktopServices ds(mApp.getWorkspace().getSettings());
     ds.openUrl(QUrl(s2q(url)));
   });
-
-  // Set models.
-  g.set_sections(mSections);
-
-  // Connect model callbacks.
-  connect(mSections.get(), &WindowSectionsModel::currentSectionIndexChanged,
-          this, [&g](int index) { g.set_current_section_index(index); });
-  connect(mSections.get(), &WindowSectionsModel::currentProjectChanged, this,
-          &MainWindow::setCurrentProject);
-  connect(
-      mSections.get(), &WindowSectionsModel::cursorCoordinatesChanged, this,
-      [this](qreal x, qreal y) {
-        mWindow->set_cursor_coordinate(q2s(QString("%1, %2").arg(x).arg(y)));
-      });
 
   // Show window.
   mWindow->show();
@@ -160,7 +158,7 @@ void MainWindow::projectItemDoubleClicked(
   }
   if ((fp.getSuffix() == "lpp") || (fp.getSuffix() == "lppz")) {
     setCurrentProject(mApp.getProjects().openProject(fp));
-    mWindow->global<ui::Globals>().set_current_page(ui::MainPage::Project);
+    mWindow->global<ui::Data>().set_current_page(ui::MainPage::Project);
   } else {
     DesktopServices ds(mApp.getWorkspace().getSettings());
     ds.openLocalPath(fp);
@@ -188,8 +186,7 @@ void MainWindow::setCurrentProject(
       }
     }
 
-    const ui::Globals& g = mWindow->global<ui::Globals>();
-    g.set_current_project(ui::ProjectData{
+    mWindow->global<ui::Data>().set_current_project(ui::ProjectData{
         mCurrentProject ? true : false,
         mCurrentProject ? q2s(*mCurrentProject->getProject().getName())
                         : slint::SharedString(),

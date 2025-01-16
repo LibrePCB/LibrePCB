@@ -5,7 +5,7 @@ import { Board2dTab } from "./project/board2dtab.slint";
 import { Board3dTab } from "./project/board3dtab.slint";
 import { CreateLibraryTab } from "./library/createlibrarytab.slint";
 import { DownloadLibraryTab } from "./library/downloadlibrarytab.slint";
-import { Callbacks } from "./callbacks.slint";
+import { Backend } from "./backend.slint";
 import { Data } from "./data.slint";
 
 component TabItem inherits Rectangle {
@@ -94,12 +94,12 @@ export component WindowSection inherits Rectangle {
                         if Data.preview-mode {
                             section.current-tab-index = index;
                         } else {
-                            Callbacks.tab-clicked(section-index, index);
+                            Backend.tab-clicked(section-index, index);
                         }
                     }
 
                     close-clicked => {
-                        Callbacks.tab-close-clicked(section-index, index);
+                        Backend.tab-close-clicked(section-index, index);
                     }
                 }
             }
@@ -123,7 +123,7 @@ export component WindowSection inherits Rectangle {
 
                 ta-section-split := TouchArea {
                     clicked => {
-                        Callbacks.action-triggered(ActionId.section-split, section-index);
+                        Backend.action-triggered(ActionId.section-split, section-index);
                     }
                 }
             }
@@ -141,7 +141,7 @@ export component WindowSection inherits Rectangle {
 
                 ta-section-close := TouchArea {
                     clicked => {
-                        Callbacks.action-triggered(ActionId.section-close, section-index);
+                        Backend.action-triggered(ActionId.section-close, section-index);
                     }
                 }
             }
