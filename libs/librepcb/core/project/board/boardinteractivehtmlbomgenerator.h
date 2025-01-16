@@ -17,71 +17,66 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBREPCB_CORE_BOARDINTERACTIVEHTMLBOMGENERATOR_H
+#define LIBREPCB_CORE_BOARDINTERACTIVEHTMLBOMGENERATOR_H
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "ffi.h"
+#include "../../types/uuid.h"
+
+#include <QtCore>
+
+#include <memory>
 
 /*******************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace rs {
+
+class AssemblyVariant;
+class Board;
+class InteractiveHtmlBom;
 
 /*******************************************************************************
- *  Functions
+ *  Class BoardInteractiveHtmlBomGenerator
  ******************************************************************************/
 
-extern "C" std::size_t ffi_qbytearray_len(const QByteArray* obj) {
-  return static_cast<std::size_t>(obj->size());
-}
+/**
+ * @brief The BoardInteractiveHtmlBomGenerator class
+ */
+class BoardInteractiveHtmlBomGenerator final {
+  Q_DECLARE_TR_FUNCTIONS(BoardInteractiveHtmlBomGenerator)
 
-extern "C" const uint8_t* ffi_qbytearray_data(const QByteArray* obj) {
-  return reinterpret_cast<const uint8_t*>(obj->data());
-}
+public:
+  // Constructors / Destructor
+  BoardInteractiveHtmlBomGenerator() = delete;
+  BoardInteractiveHtmlBomGenerator(
+      const BoardInteractiveHtmlBomGenerator& other) = delete;
+  explicit BoardInteractiveHtmlBomGenerator(
+      const Board& board, const std::shared_ptr<AssemblyVariant>& av) noexcept;
+  ~BoardInteractiveHtmlBomGenerator() noexcept;
 
-extern "C" uint8_t* ffi_qbytearray_data_mut(QByteArray* obj) {
-  return reinterpret_cast<uint8_t*>(obj->data());
-}
+  // General Methods
+  void setCustomAttributes(const QStringList& attributes) noexcept;
+  void setComponentOrder(const QStringList& order) noexcept;
+  std::shared_ptr<InteractiveHtmlBom> generate(const QDateTime& dt);
 
-extern "C" void ffi_qbytearray_resize(QByteArray* obj, std::size_t len,
-                                      uint8_t value) {
-#if QT_VERSION >= QT_VERSION_CHECK(6, 4, 0)
-  obj->resize(len, value);
-#else
-  if (len > static_cast<std::size_t>(obj->size())) {
-    obj->append(len - obj->size(), value);
-  } else {
-    obj->resize(len);
-  }
-#endif
-}
+  // Operator Overloadings
+  BoardInteractiveHtmlBomGenerator& operator=(
+      const BoardInteractiveHtmlBomGenerator& rhs) = delete;
 
-extern "C" std::size_t ffi_qstring_len(const QString* obj) {
-  return static_cast<std::size_t>(obj->size());
-}
-
-extern "C" const uint16_t* ffi_qstring_utf16(const QString* obj) {
-  return obj->utf16();
-}
-
-extern "C" void ffi_qstring_set(QString* obj, const char* s, std::size_t len) {
-  *obj = QString::fromUtf8(s, len);
-}
-
-extern "C" std::size_t ffi_qstringlist_len(const QStringList* obj) {
-  return static_cast<std::size_t>(obj->size());
-}
-
-extern "C" const QString* ffi_qstringlist_at(const QStringList* obj,
-                                             std::size_t index) {
-  Q_ASSERT(index < static_cast<std::size_t>(obj->size()));
-  return &obj->at(index);
-}
+private:
+  const Board& mBoard;
+  const std::shared_ptr<AssemblyVariant> mAssemblyVariant;
+  QStringList mCustomAttributes;
+  QStringList mComponentOrder;
+};
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace rs
 }  // namespace librepcb
+
+#endif

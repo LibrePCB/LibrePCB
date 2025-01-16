@@ -754,6 +754,9 @@ add_library(
   project/outputjobsdialog/graphicsoutputjobwidget.cpp
   project/outputjobsdialog/graphicsoutputjobwidget.h
   project/outputjobsdialog/graphicsoutputjobwidget.ui
+  project/outputjobsdialog/interactivehtmlbomoutputjobwidget.cpp
+  project/outputjobsdialog/interactivehtmlbomoutputjobwidget.h
+  project/outputjobsdialog/interactivehtmlbomoutputjobwidget.ui
   project/outputjobsdialog/lppzoutputjobwidget.cpp
   project/outputjobsdialog/lppzoutputjobwidget.h
   project/outputjobsdialog/lppzoutputjobwidget.ui

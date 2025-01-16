@@ -221,6 +221,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "interactive-html-bom"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "af6052b5a2a4890369de5dfb7418ae29af390e3fcc059d7e4fcde478c2b44a83"
+dependencies = [
+ "jzon",
+ "lz-str",
+]
+
+[[package]]
 name = "is_terminal_polyfill"
 version = "1.70.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -233,6 +243,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d75a2a4b1b190afb6f5425f10f6a8f959d2ea0b9c2b1d79553551850539e4674"
 
 [[package]]
+name = "jzon"
+version = "0.12.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "17ab85f84ca42c5ec520e6f3c9966ba1fd62909ce260f8837e248857d2560509"
+
+[[package]]
 name = "libc"
 version = "0.2.167"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -243,6 +259,7 @@ name = "librepcb-rust-core"
 version = "0.1.0"
 dependencies = [
  "cbindgen",
+ "interactive-html-bom",
  "parameterized_test",
  "regex",
  "zip",
@@ -259,6 +276,12 @@ name = "log"
 version = "0.4.22"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a7a70ba024b9dc04c27ea2f0c0548feb474ec5c54bba33a7f72f873a39d07b24"
+
+[[package]]
+name = "lz-str"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "39f3d72d77227090eed75ea331285a53726e78374a1f357ff5757702c23c70cc"
 
 [[package]]
 name = "memchr"

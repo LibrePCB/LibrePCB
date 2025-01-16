@@ -121,6 +121,8 @@ add_library(
   export/graphicsexportsettings.h
   export/graphicspainter.cpp
   export/graphicspainter.h
+  export/interactivehtmlbom.cpp
+  export/interactivehtmlbom.h
   export/pickplacecsvwriter.cpp
   export/pickplacecsvwriter.h
   export/pickplacedata.cpp
@@ -200,6 +202,8 @@ add_library(
   job/gerberx3outputjob.h
   job/graphicsoutputjob.cpp
   job/graphicsoutputjob.h
+  job/interactivehtmlbomoutputjob.cpp
+  job/interactivehtmlbomoutputjob.h
   job/lppzoutputjob.cpp
   job/lppzoutputjob.h
   job/netlistoutputjob.cpp
@@ -315,6 +319,8 @@ add_library(
   project/board/boardgerberexport.h
   project/board/boardholedata.cpp
   project/board/boardholedata.h
+  project/board/boardinteractivehtmlbomgenerator.cpp
+  project/board/boardinteractivehtmlbomgenerator.h
   project/board/boardnetsegmentsplitter.cpp
   project/board/boardnetsegmentsplitter.h
   project/board/boardpainter.cpp

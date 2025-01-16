@@ -107,6 +107,8 @@ public:
   ZoneList& getZones() noexcept { return mZones; }
   const HoleList& getHoles() const noexcept { return mHoles; }
   HoleList& getHoles() noexcept { return mHoles; }
+  std::pair<Point, Point> calculateBoundingRect(
+      bool withCourtyard) const noexcept;
 
   // Setters: General
   bool setModelPosition(const Point3D& position) noexcept;

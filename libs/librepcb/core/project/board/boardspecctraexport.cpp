@@ -387,17 +387,14 @@ std::unique_ptr<SExpression> BoardSpecctraExport::genLibraryPadStack(
   // Determine pad shape.
   typedef std::pair<const Layer*, QList<PadGeometry>> LayerGeometry;
   QList<LayerGeometry> geometries;
+  const Layer& solderLayer = pad.getSolderLayer();
   if (pad.getLibPad().isTht()) {
     // Always use full THT pad annular rings because automatic annulars depend
     // on whether a trace is connected or not. But connections might be made
     // in an external software, so we don't know which pads will be connected.
     // It's not a nice solution, but safer than exporting too small annular
     // rings. Probably this could be improved with 'reduced_shape_descriptor'?
-    const Layer* solderLayer =
-        (pad.getComponentSide() == FootprintPad::ComponentSide::Top)
-        ? &Layer::botCopper()
-        : &Layer::topCopper();
-    const QList<PadGeometry> shapes = pad.getGeometries().value(solderLayer);
+    const QList<PadGeometry> shapes = pad.getGeometries().value(&solderLayer);
     for (const Layer* layer : mBoard.getCopperLayers()) {
       geometries.append(std::make_pair(layer, shapes));
     }
@@ -407,9 +404,8 @@ std::unique_ptr<SExpression> BoardSpecctraExport::genLibraryPadStack(
                 return a.first->getCopperNumber() < b.first->getCopperNumber();
               });
   } else {
-    const Layer& layer = pad.getSmtLayer();
-    const QList<PadGeometry> shapes = pad.getGeometries().value(&layer);
-    geometries.append(std::make_pair(&transform.map(layer), shapes));
+    const QList<PadGeometry> shapes = pad.getGeometries().value(&solderLayer);
+    geometries.append(std::make_pair(&transform.map(solderLayer), shapes));
   }
 
   // Convert pad geometries to Specctra.

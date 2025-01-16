@@ -130,6 +130,10 @@ Files:
 Copyright: Font Awesome
 License: CC-BY-4.0
 
+Files: img/actions/generate_ibom.png
+Copyright: InteractiveHtmlBom
+License: MIT
+
 Files: img/logo/ngi0.png
 Copyright: Next Generation Internet
 License: CC-BY-SA-4.0

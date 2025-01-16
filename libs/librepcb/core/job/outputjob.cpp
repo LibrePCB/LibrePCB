@@ -29,6 +29,7 @@
 #include "gerberexcellonoutputjob.h"
 #include "gerberx3outputjob.h"
 #include "graphicsoutputjob.h"
+#include "interactivehtmlbomoutputjob.h"
 #include "lppzoutputjob.h"
 #include "netlistoutputjob.h"
 #include "pickplaceoutputjob.h"
@@ -64,6 +65,8 @@ OutputJobList deserialize(const SExpression& node) {
       result.append(std::make_shared<NetlistOutputJob>(*child));
     } else if (type == BomOutputJob::getTypeName()) {
       result.append(std::make_shared<BomOutputJob>(*child));
+    } else if (type == InteractiveHtmlBomOutputJob::getTypeName()) {
+      result.append(std::make_shared<InteractiveHtmlBomOutputJob>(*child));
     } else if (type == Board3DOutputJob::getTypeName()) {
       result.append(std::make_shared<Board3DOutputJob>(*child));
     } else if (type == ProjectJsonOutputJob::getTypeName()) {
