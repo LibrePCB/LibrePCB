@@ -69,6 +69,7 @@ add_executable(
   core/project/board/boarddesignrulestest.cpp
   core/project/board/boardfabricationoutputsettingstest.cpp
   core/project/board/boardgerberexporttest.cpp
+  core/project/board/boardinteractivehtmlbomgeneratortest.cpp
   core/project/board/boardpickplacegeneratortest.cpp
   core/project/board/boardplanefragmentsbuildertest.cpp
   core/project/board/boardspecctraexporttest.cpp

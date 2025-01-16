@@ -317,6 +317,8 @@ add_library(
   project/board/boardgerberexport.h
   project/board/boardholedata.cpp
   project/board/boardholedata.h
+  project/board/boardinteractivehtmlbomgenerator.cpp
+  project/board/boardinteractivehtmlbomgenerator.h
   project/board/boardnetsegmentsplitter.cpp
   project/board/boardnetsegmentsplitter.h
   project/board/boardpainter.cpp
