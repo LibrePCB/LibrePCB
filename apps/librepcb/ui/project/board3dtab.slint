@@ -1,5 +1,6 @@
-import { Globals, WindowSection, Tab, Board3dTabData } from "../globals.slint";
+import { WindowSection, Tab, Board3dTabData } from "../types.slint";
 import { SceneButton } from "../scenebutton.slint";
+import { Callbacks } from "../callbacks.slint";
 
 export component Board3dTab inherits Image {
     in property <int> section-index;
@@ -8,15 +9,15 @@ export component Board3dTab inherits Image {
 
     image-fit: ImageFit.preserve;
     image-rendering: ImageRendering.pixelated;
-    source: Globals.render-scene(section-index, root.width, root.height, section.frame);
+    source: Callbacks.render-scene(section-index, root.width, root.height, section.frame);
 
     TouchArea {
         pointer-event(e) => {
-            return Globals.scene-pointer-event(section-index, self.mouse-x, self.mouse-y, self.absolute-position, e);
+            return Callbacks.scene-pointer-event(section-index, self.mouse-x, self.mouse-y, self.absolute-position, e);
         }
 
         scroll-event(e) => {
-            return Globals.scene-scrolled(section-index, self.mouse-x, self.mouse-y, e);
+            return Callbacks.scene-scrolled(section-index, self.mouse-x, self.mouse-y, e);
         }
     }
 
@@ -31,7 +32,7 @@ export component Board3dTab inherits Image {
             bg-color: tabs[section.current-tab-index].background-color;
             fg-color: tabs[section.current-tab-index].overlay-color;
             clicked => {
-                Globals.scene-zoom-fit-clicked(section-index, root.width, root.height);
+                Callbacks.scene-zoom-fit-clicked(section-index, root.width, root.height);
             }
         }
 
@@ -40,7 +41,7 @@ export component Board3dTab inherits Image {
             bg-color: tabs[section.current-tab-index].background-color;
             fg-color: tabs[section.current-tab-index].overlay-color;
             clicked => {
-                Globals.scene-zoom-in-clicked(section-index, root.width, root.height);
+                Callbacks.scene-zoom-in-clicked(section-index, root.width, root.height);
             }
         }
 
@@ -49,7 +50,7 @@ export component Board3dTab inherits Image {
             bg-color: tabs[section.current-tab-index].background-color;
             fg-color: tabs[section.current-tab-index].overlay-color;
             clicked => {
-                Globals.scene-zoom-out-clicked(section-index, root.width, root.height);
+                Callbacks.scene-zoom-out-clicked(section-index, root.width, root.height);
             }
         }
     }

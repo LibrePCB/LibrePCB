@@ -1,0 +1,169 @@
+export enum MainPage {
+    home,
+    libraries,
+    project,
+    drc,
+    output-jobs,
+    order,
+    search,
+    help,
+    preferences,
+}
+
+export enum ActionId {
+    // Window
+    window-new,
+
+    // Library panel
+    library-panel-ensure-populated,
+    library-panel-install,
+
+    // Window section
+    section-split,
+    section-close,
+    section-ok,
+    section-cancel,
+
+    // Create library tab
+    create-library-tab-open,
+
+    // Download library tab
+    download-library-tab-open,
+
+    // 2D board viewer tab
+    board-2d-tab-open-3d
+}
+
+export enum LibraryType {
+    local,
+    remote,
+    online,
+}
+
+export enum LibraryState {
+    unknown,
+    up-to-date,
+    outdated,
+}
+
+export struct Library {
+    id: string,
+    name: string,
+    description: string,
+    version: string,
+    icon: image,
+    recommended: bool,
+    type: LibraryType,
+    state: LibraryState,
+    progress: int, // [%], 0 if not installing
+    checked: bool,
+}
+
+export struct FolderTreeItem {
+    level: int,
+    icon: image,
+    name: string,
+    path: string,
+    is-folder: bool,
+}
+
+export struct Project {
+    path: string,
+    name: string,
+}
+
+export struct ProjectData {
+    valid: bool,
+    name: string,
+    schematics: [string],
+    boards: [string],
+}
+
+export enum TabType {
+    create-library,
+    download-library,
+    schematic,
+    board-2d,
+    board-3d,
+}
+
+export struct Tab {
+    type: TabType,
+    title: string,
+}
+
+export struct CreateLibraryTabData {
+    name: string,
+    name-error: string,
+    description: string,
+    author: string,
+    author-default: string,
+    version: string,
+    version-default: string,
+    version-error: string,
+    url: string,
+    url-error: string,
+    cc0: bool,
+    directory: string,
+    directory-default: string,
+    directory-error: string,
+    valid: bool,
+    creation-error: string,
+}
+
+export struct DownloadLibraryTabData {
+    url: string,
+    url-error: string,
+    url-suggestion: string,
+    directory: string,
+    directory-default: string,
+    directory-error: string,
+    valid: bool,
+    download-running: bool,
+    download-progress: int,
+    download-error: string,
+}
+
+export enum SchematicTool {
+    select,
+    draw-wire,
+    add-netlabel,
+    draw-polygon,
+    add-text,
+    add-component,
+    measure,
+}
+
+export struct SchematicTabData {
+    background-color: brush,
+    overlay-color: brush,
+    show-pin-numbers: bool,
+    active-tool: SchematicTool,
+}
+
+export struct Board2dTabData {
+    background-color: brush,
+    overlay-color: brush,
+}
+
+export struct Board3dTabData {
+    background-color: brush,
+    overlay-color: brush,
+}
+
+export struct WindowSection {
+    tabs: [Tab], // Tabs in this section
+    create-library-tabs: [CreateLibraryTabData],
+    download-library-tabs: [DownloadLibraryTabData],
+    schematic-tabs: [SchematicTabData],
+    board-2d-tabs: [Board2dTabData],
+    board-3d-tabs: [Board3dTabData],
+    current-tab-index: int,  // Currently opened tab in this section
+    frame: int, // Frame index to trigger repainting
+}
+
+export struct EditParseResult {
+    valid: bool,
+    evaluated-value: string,
+    evaluated-unit: string,
+}
