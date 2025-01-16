@@ -97,10 +97,10 @@ public:
   void deactivate() noexcept override;
   slint::Image renderScene(float width, float height) noexcept override;
   bool processScenePointerEvent(
-      float x, float y, float width, float height,
+      const QPointF& pos, const QPointF& globalPos,
       slint::private_api::PointerEvent e) noexcept override;
   bool processSceneScrolled(
-      float x, float y, float width, float height,
+      float x, float y,
       slint::private_api::PointerScrollEvent e) noexcept override;
   void zoomFit(float width, float height) noexcept override;
   void zoomIn(float width, float height) noexcept override;
@@ -110,7 +110,7 @@ public:
   Board3dTab& operator=(const Board3dTab& rhs) = delete;
 
 private:
-  bool zoom(const QPointF& center, const QSizeF& size, qreal factor) noexcept;
+  bool zoom(const QPointF& center, qreal factor) noexcept;
   void smoothTo(const Projection& projection) noexcept;
   bool applyProjection(const Projection& projection) noexcept;
 

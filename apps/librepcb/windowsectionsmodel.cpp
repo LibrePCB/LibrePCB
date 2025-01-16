@@ -147,18 +147,8 @@ slint::Image WindowSectionsModel::renderScene(int sectionIndex, float width,
   return slint::Image();
 }
 
-void WindowSectionsModel::processSceneDoubleClicked(int sectionIndex, float x,
-                                                    float y, float width,
-                                                    float height) noexcept {
-  if (std::shared_ptr<WindowSection> s = mItems.value(sectionIndex)) {
-    if (s->processSceneDoubleClicked(x, y, width, height)) {
-      row_changed(sectionIndex);
-    }
-  }
-}
-
 slint::private_api::EventResult WindowSectionsModel::processScenePointerEvent(
-    int sectionIndex, float x, float y, float width, float height,
+    int sectionIndex, const QPointF& pos, const QPointF& globalPos,
     slint::private_api::PointerEvent e) noexcept {
   if (std::shared_ptr<WindowSection> s = mItems.value(sectionIndex)) {
     if ((e.kind == slint::private_api::PointerEventKind::Down) &&
@@ -168,7 +158,7 @@ slint::private_api::EventResult WindowSectionsModel::processScenePointerEvent(
       emit currentProjectChanged(s->getCurrentProject());
     }
 
-    if (s->processScenePointerEvent(x, y, width, height, e)) {
+    if (s->processScenePointerEvent(pos, globalPos, e)) {
       row_changed(sectionIndex);
     }
   }
@@ -176,10 +166,10 @@ slint::private_api::EventResult WindowSectionsModel::processScenePointerEvent(
 }
 
 slint::private_api::EventResult WindowSectionsModel::processSceneScrolled(
-    int sectionIndex, float x, float y, float width, float height,
+    int sectionIndex, float x, float y,
     slint::private_api::PointerScrollEvent e) noexcept {
   if (std::shared_ptr<WindowSection> s = mItems.value(sectionIndex)) {
-    if (s->processSceneScrolled(x, y, width, height, e)) {
+    if (s->processSceneScrolled(x, y, e)) {
       row_changed(sectionIndex);
     }
   }

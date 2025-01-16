@@ -11,7 +11,7 @@ export component SceneButton inherits Rectangle {
 
     width: 25px;
     height: 25px;
-    background: checked ? fg-color : ((checkable && ta.has-hover) ? fg-color.with-alpha(0.2) : bg-color);
+    background: checked ? fg-color : ((checkable && ta.has-hover) ? fg-color : bg-color).with-alpha(0.2);
     border-radius: self.height / 2;
     border-color: fg-color;
     border-width: (checkable && (!checked)) ? 1px : 0;

@@ -128,6 +128,8 @@ void GuiApplication::createNewWindow() noexcept {
         }
         return res;
       });
+  globals.on_open_library(std::bind(&LibrariesModel::openLibrary,
+                                    mLibraries.get(), std::placeholders::_1));
   globals.on_uninstall_library(std::bind(&LibrariesModel::uninstallLibrary,
                                          mLibraries.get(),
                                          std::placeholders::_1));

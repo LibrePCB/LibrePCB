@@ -15,10 +15,11 @@ export component EmptyTab inherits Rectangle {
 
     TouchArea {
         pointer-event(e) => {
-            return Globals.scene-pointer-event(section-index, self.mouse-x, self.mouse-y, root.width, root.height, e);
+            return Globals.scene-pointer-event(section-index, self.mouse-x, self.mouse-y, self.absolute-position, e);
         }
+
         scroll-event(e) => {
-            return Globals.scene-scrolled(section-index, self.mouse-x, self.mouse-y, root.width, root.height, e);
+            return Globals.scene-scrolled(section-index, self.mouse-x, self.mouse-y, e);
         }
     }
 }

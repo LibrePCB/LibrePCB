@@ -71,11 +71,9 @@ public:
   void setCurrentTab(int index) noexcept;
   bool actionTriggered(ui::ActionId id) noexcept;
   slint::Image renderScene(float width, float height) noexcept;
-  bool processSceneDoubleClicked(float x, float y, float width,
-                                 float height) noexcept;
-  bool processScenePointerEvent(float x, float y, float width, float height,
+  bool processScenePointerEvent(const QPointF& pos, const QPointF& globalPos,
                                 slint::private_api::PointerEvent e) noexcept;
-  bool processSceneScrolled(float x, float y, float width, float height,
+  bool processSceneScrolled(float x, float y,
                             slint::private_api::PointerScrollEvent e) noexcept;
   void zoomFit(float width, float height) noexcept;
   void zoomIn(float width, float height) noexcept;
