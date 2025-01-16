@@ -1,6 +1,7 @@
 import { Button, CheckBox, ProgressIndicator } from "std-widgets.slint";
 import { LineEdit } from "../lineedit.slint";
-import { Globals, WindowSection, DownloadLibraryTabData, ActionId } from "../globals.slint";
+import { WindowSection, DownloadLibraryTabData, ActionId } from "../types.slint";
+import { Callbacks } from "../callbacks.slint";
 
 export component DownloadLibraryTab inherits Rectangle {
     in property <int> section-index;
@@ -139,7 +140,7 @@ export component DownloadLibraryTab inherits Rectangle {
                     text: @tr("Download Library");
 
                     clicked => {
-                        Globals.action-triggered(ActionId.section-ok, section-index);
+                        Callbacks.action-triggered(ActionId.section-ok, section-index);
                     }
                 }
 
@@ -147,7 +148,7 @@ export component DownloadLibraryTab inherits Rectangle {
                     text: @tr("Cancel");
 
                     clicked => {
-                        Globals.action-triggered(ActionId.section-cancel, section-index);
+                        Callbacks.action-triggered(ActionId.section-cancel, section-index);
                     }
                 }
             }

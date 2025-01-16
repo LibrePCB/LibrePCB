@@ -1,5 +1,5 @@
 import { ComboBox, CheckBox } from "std-widgets.slint";
-import { Globals, WindowSection, Tab, SchematicTabData, SchematicTool } from "../../globals.slint";
+import { WindowSection, Tab, SchematicTabData, SchematicTool } from "../../types.slint";
 import { SceneButton } from "../../scenebutton.slint";
 import { ToolButton } from "../../toolbutton.slint";
 import { LengthEdit } from "../../lengthedit.slint";
@@ -7,6 +7,8 @@ import { DrawWireToolBar } from "./drawwiretoolbar.slint";
 import { DrawPolygonToolBar } from "./drawpolygontoolbar.slint";
 import { AddTextToolBar } from "./addtexttoolbar.slint";
 import { AddComponentToolBar } from "./addcomponenttoolbar.slint";
+import { Callbacks } from "../../callbacks.slint";
+import { Data } from "../../data.slint";
 
 export component SchematicTab inherits Image {
     in property <int> section-index;
@@ -15,19 +17,19 @@ export component SchematicTab inherits Image {
 
     image-fit: ImageFit.preserve;
     image-rendering: ImageRendering.pixelated;
-    source: Globals.render-scene(section-index, root.width, root.height, section.frame);
+    source: Callbacks.render-scene(section-index, root.width, root.height, section.frame);
 
-    if Globals.preview-mode: Rectangle {
+    if Data.preview-mode: Rectangle {
         background: white;
     }
 
     TouchArea {
         pointer-event(e) => {
-            return Globals.scene-pointer-event(section-index, self.mouse-x, self.mouse-y, self.absolute-position, e);
+            return Callbacks.scene-pointer-event(section-index, self.mouse-x, self.mouse-y, self.absolute-position, e);
         }
 
         scroll-event(e) => {
-            return Globals.scene-scrolled(section-index, self.mouse-x, self.mouse-y, e);
+            return Callbacks.scene-scrolled(section-index, self.mouse-x, self.mouse-y, e);
         }
     }
 
@@ -67,7 +69,7 @@ export component SchematicTab inherits Image {
             checked: tabs[section.current-tab-index].active-tool == SchematicTool.select;
 
             clicked => {
-                //if Globals.preview-mode {
+                //if Callbacks.preview-mode {
                     tabs[section.current-tab-index].active-tool = SchematicTool.select;
                 //}
             }
@@ -78,7 +80,7 @@ export component SchematicTab inherits Image {
             checked: tabs[section.current-tab-index].active-tool == SchematicTool.draw-wire;
 
             clicked => {
-                //if Globals.preview-mode {
+                //if Callbacks.preview-mode {
                     tabs[section.current-tab-index].active-tool = SchematicTool.draw-wire;
                 //}
             }
@@ -89,7 +91,7 @@ export component SchematicTab inherits Image {
             checked: tabs[section.current-tab-index].active-tool == SchematicTool.add-netlabel;
 
             clicked => {
-                //if Globals.preview-mode {
+                //if Callbacks.preview-mode {
                     tabs[section.current-tab-index].active-tool = SchematicTool.add-netlabel;
                 //}
             }
@@ -100,7 +102,7 @@ export component SchematicTab inherits Image {
             checked: tabs[section.current-tab-index].active-tool == SchematicTool.draw-polygon;
 
             clicked => {
-                //if Globals.preview-mode {
+                //if Callbacks.preview-mode {
                     tabs[section.current-tab-index].active-tool = SchematicTool.draw-polygon;
                 //}
             }
@@ -111,7 +113,7 @@ export component SchematicTab inherits Image {
             checked: tabs[section.current-tab-index].active-tool == SchematicTool.add-text;
 
             clicked => {
-                //if Globals.preview-mode {
+                //if Callbacks.preview-mode {
                     tabs[section.current-tab-index].active-tool = SchematicTool.add-text;
                 //}
             }
@@ -122,7 +124,7 @@ export component SchematicTab inherits Image {
             checked: tabs[section.current-tab-index].active-tool == SchematicTool.add-component;
 
             clicked => {
-                //if Globals.preview-mode {
+                //if Callbacks.preview-mode {
                     tabs[section.current-tab-index].active-tool = SchematicTool.add-component;
                 //}
             }
@@ -133,7 +135,7 @@ export component SchematicTab inherits Image {
             checked: tabs[section.current-tab-index].active-tool == SchematicTool.measure;
 
             clicked => {
-                //if Globals.preview-mode {
+                //if Callbacks.preview-mode {
                     tabs[section.current-tab-index].active-tool = SchematicTool.measure;
                 //}
             }
@@ -151,7 +153,7 @@ export component SchematicTab inherits Image {
             bg-color: tabs[section.current-tab-index].background-color;
             fg-color: tabs[section.current-tab-index].overlay-color;
             clicked => {
-                Globals.scene-zoom-fit-clicked(section-index, root.width, root.height);
+                Callbacks.scene-zoom-fit-clicked(section-index, root.width, root.height);
             }
         }
 
@@ -160,7 +162,7 @@ export component SchematicTab inherits Image {
             bg-color: tabs[section.current-tab-index].background-color;
             fg-color: tabs[section.current-tab-index].overlay-color;
             clicked => {
-                Globals.scene-zoom-in-clicked(section-index, root.width, root.height);
+                Callbacks.scene-zoom-in-clicked(section-index, root.width, root.height);
             }
         }
 
@@ -169,7 +171,7 @@ export component SchematicTab inherits Image {
             bg-color: tabs[section.current-tab-index].background-color;
             fg-color: tabs[section.current-tab-index].overlay-color;
             clicked => {
-                Globals.scene-zoom-out-clicked(section-index, root.width, root.height);
+                Callbacks.scene-zoom-out-clicked(section-index, root.width, root.height);
             }
         }
 

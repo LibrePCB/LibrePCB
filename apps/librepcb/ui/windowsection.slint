@@ -1,10 +1,12 @@
-import { Globals, Tab, TabType, WindowSection, ActionId } from "./globals.slint";
+import { Tab, TabType, WindowSection, ActionId } from "./types.slint";
 import { EmptyTab } from "./emptytab.slint";
 import { SchematicTab } from "./project/schematic/schematictab.slint";
 import { Board2dTab } from "./project/board2dtab.slint";
 import { Board3dTab } from "./project/board3dtab.slint";
 import { CreateLibraryTab } from "./library/createlibrarytab.slint";
 import { DownloadLibraryTab } from "./library/downloadlibrarytab.slint";
+import { Callbacks } from "./callbacks.slint";
+import { Data } from "./data.slint";
 
 component TabItem inherits Rectangle {
     in property <Tab> tab;
@@ -63,7 +65,7 @@ component TabItem inherits Rectangle {
 export component WindowSection inherits Rectangle {
     in-out property <int> section-index;
     in-out property <WindowSection> section;
-    property <bool> is-current-section: (section-index == Globals.current-section-index);
+    property <bool> is-current-section: (section-index == Data.current-section-index);
     property <bool> tab-open: (section.current-tab-index >= 0) && (section.current-tab-index < section.tabs.length);
     property <TabType> tab-type: section.tabs[section.current-tab-index].type;
 
@@ -89,15 +91,15 @@ export component WindowSection inherits Rectangle {
                     is-current-tab: (index == section.current-tab-index);
 
                     clicked => {
-                        if Globals.preview-mode {
+                        if Data.preview-mode {
                             section.current-tab-index = index;
                         } else {
-                            Globals.tab-clicked(section-index, index);
+                            Callbacks.tab-clicked(section-index, index);
                         }
                     }
 
                     close-clicked => {
-                        Globals.tab-close-clicked(section-index, index);
+                        Callbacks.tab-close-clicked(section-index, index);
                     }
                 }
             }
@@ -121,12 +123,12 @@ export component WindowSection inherits Rectangle {
 
                 ta-section-split := TouchArea {
                     clicked => {
-                        Globals.action-triggered(ActionId.section-split, section-index);
+                        Callbacks.action-triggered(ActionId.section-split, section-index);
                     }
                 }
             }
 
-            if (Globals.sections.length > 1) && (section.tabs.length == 0): Rectangle {
+            if (Data.sections.length > 1) && (section.tabs.length == 0): Rectangle {
                 width: self.height;
                 background: ta-section-close.has-hover ? #454545 : transparent;
                 border-radius: 3px;
@@ -139,7 +141,7 @@ export component WindowSection inherits Rectangle {
 
                 ta-section-close := TouchArea {
                     clicked => {
-                        Globals.action-triggered(ActionId.section-close, section-index);
+                        Callbacks.action-triggered(ActionId.section-close, section-index);
                     }
                 }
             }
