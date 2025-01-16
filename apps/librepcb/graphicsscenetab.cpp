@@ -99,10 +99,9 @@ slint::Image GraphicsSceneTab::renderScene(float width, float height) noexcept {
 }
 
 bool GraphicsSceneTab::processScenePointerEvent(
-    float x, float y, float width, float height,
+    const QPointF& pos, const QPointF& globalPos,
     slint::private_api::PointerEvent e) noexcept {
-  Q_UNUSED(width);
-  Q_UNUSED(height);
+  Q_UNUSED(globalPos);
 
   if (!mScene) {
     return false;
@@ -113,19 +112,19 @@ bool GraphicsSceneTab::processScenePointerEvent(
   QTransform tf;
   tf.translate(mProjection.offset.x(), mProjection.offset.y());
   tf.scale(1 / mProjection.scale, 1 / mProjection.scale);
-  QPointF scenePosPx = tf.map(QPointF(x, y));
+  QPointF scenePosPx = tf.map(pos);
 
   if ((e.button == slint::private_api::PointerEventButton::Middle) ||
       (e.button == slint::private_api::PointerEventButton::Right)) {
     if ((!mPanning) && e.kind == slint::private_api::PointerEventKind::Down) {
-      mStartScreenPos = QPointF(x, y);
+      mStartScreenPos = pos;
       mStartScenePos = scenePosPx;
       mPanning = true;
       eventConsumed = true;
     } else if (mPanning &&
                (e.kind == slint::private_api::PointerEventKind::Up)) {
       mPanning = false;
-      eventConsumed = (QPointF(x, y) != mStartScreenPos);  // TODO: Not so nice.
+      eventConsumed = (pos != mStartScreenPos);  // TODO: Not so nice.
     }
   } else if (e.kind == slint::private_api::PointerEventKind::Move) {
     if (mPanning) {
@@ -144,10 +143,9 @@ bool GraphicsSceneTab::processScenePointerEvent(
 }
 
 bool GraphicsSceneTab::processSceneScrolled(
-    float x, float y, float width, float height,
-    slint::private_api::PointerScrollEvent e) noexcept {
+    float x, float y, slint::private_api::PointerScrollEvent e) noexcept {
   const qreal factor = qPow(1.3, e.delta_y / qreal(120));
-  return zoom(QPointF(x, y), QSizeF(width, height), factor);
+  return zoom(QPointF(x, y), factor);
 }
 
 void GraphicsSceneTab::zoomFit(float width, float height) noexcept {
@@ -164,20 +162,18 @@ void GraphicsSceneTab::zoomFit(float width, float height) noexcept {
 }
 
 void GraphicsSceneTab::zoomIn(float width, float height) noexcept {
-  zoom(QPointF(width / 2, height / 2), QSizeF(width, height), 1.3);
+  zoom(QPointF(width / 2, height / 2), 1.3);
 }
 
 void GraphicsSceneTab::zoomOut(float width, float height) noexcept {
-  zoom(QPointF(width / 2, height / 2), QSizeF(width, height), 1 / 1.3);
+  zoom(QPointF(width / 2, height / 2), 1 / 1.3);
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
-bool GraphicsSceneTab::zoom(const QPointF& center, const QSizeF& size,
-                            qreal factor) noexcept {
-  Q_UNUSED(size);
+bool GraphicsSceneTab::zoom(const QPointF& center, qreal factor) noexcept {
   Projection projection = mProjection;
   if (mScene) {
     QTransform tf;

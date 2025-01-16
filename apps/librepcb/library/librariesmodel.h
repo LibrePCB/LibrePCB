@@ -71,6 +71,7 @@ public:
     return !mApiEndpointsInProgress.isEmpty();
   }
   void installCheckedLibraries() noexcept;
+  void openLibrary(const slint::SharedString& id) noexcept;
   void uninstallLibrary(const slint::SharedString& id) noexcept;
   void toggleAll(bool checked) noexcept;
 

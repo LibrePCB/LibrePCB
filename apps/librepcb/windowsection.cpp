@@ -145,28 +145,19 @@ slint::Image WindowSection::renderScene(float width, float height) noexcept {
   return slint::Image();
 }
 
-bool WindowSection::processSceneDoubleClicked(float x, float y, float width,
-                                              float height) noexcept {
-  if (std::shared_ptr<WindowTab> t = getTab(mUiData.current_tab_index)) {
-    return t->processSceneDoubleClicked(x, y, width, height);
-  }
-  return false;
-}
-
 bool WindowSection::processScenePointerEvent(
-    float x, float y, float width, float height,
+    const QPointF& pos, const QPointF& globalPos,
     slint::private_api::PointerEvent e) noexcept {
   if (std::shared_ptr<WindowTab> t = getTab(mUiData.current_tab_index)) {
-    return t->processScenePointerEvent(x, y, width, height, e);
+    return t->processScenePointerEvent(pos, globalPos, e);
   }
   return false;
 }
 
 bool WindowSection::processSceneScrolled(
-    float x, float y, float width, float height,
-    slint::private_api::PointerScrollEvent e) noexcept {
+    float x, float y, slint::private_api::PointerScrollEvent e) noexcept {
   if (std::shared_ptr<WindowTab> t = getTab(mUiData.current_tab_index)) {
-    return t->processSceneScrolled(x, y, width, height, e);
+    return t->processSceneScrolled(x, y, e);
   }
   return false;
 }

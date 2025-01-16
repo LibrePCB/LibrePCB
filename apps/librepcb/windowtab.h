@@ -78,31 +78,18 @@ public:
     Q_UNUSED(height);
     return slint::Image();
   }
-  virtual bool processSceneDoubleClicked(float x, float y, float width,
-                                         float height) noexcept {
-    Q_UNUSED(x);
-    Q_UNUSED(y);
-    Q_UNUSED(width);
-    Q_UNUSED(height);
-    return false;
-  }
   virtual bool processScenePointerEvent(
-      float x, float y, float width, float height,
+      const QPointF& pos, const QPointF& globalPos,
       slint::private_api::PointerEvent e) noexcept {
-    Q_UNUSED(x);
-    Q_UNUSED(y);
-    Q_UNUSED(width);
-    Q_UNUSED(height);
+    Q_UNUSED(pos);
+    Q_UNUSED(globalPos);
     Q_UNUSED(e);
     return false;
   }
   virtual bool processSceneScrolled(
-      float x, float y, float width, float height,
-      slint::private_api::PointerScrollEvent e) noexcept {
+      float x, float y, slint::private_api::PointerScrollEvent e) noexcept {
     Q_UNUSED(x);
     Q_UNUSED(y);
-    Q_UNUSED(width);
-    Q_UNUSED(height);
     Q_UNUSED(e);
     return false;
   }

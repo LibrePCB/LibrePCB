@@ -123,21 +123,20 @@ slint::Image Board3dTab::renderScene(float width, float height) noexcept {
 }
 
 bool Board3dTab::processScenePointerEvent(
-    float x, float y, float width, float height,
+    const QPointF& pos, const QPointF& globalPos,
     slint::private_api::PointerEvent e) noexcept {
-  Q_UNUSED(width);
-  Q_UNUSED(height);
+  Q_UNUSED(globalPos);
   Projection projection = mProjection;
   if (mOpenGlView) {
     if (e.kind == slint::private_api::PointerEventKind::Down) {
-      mMousePressPosition = QPoint(x, y);
+      mMousePressPosition = pos;
       mMousePressTransform = projection.transform;
       mMousePressCenter = projection.center;
       buttons.insert(e.button);
     } else if (e.kind == slint::private_api::PointerEventKind::Up) {
       buttons.remove(e.button);
     } else if (e.kind == slint::private_api::PointerEventKind::Move) {
-      const QPointF posNorm = mOpenGlView->toNormalizedPos(QPointF(x, y));
+      const QPointF posNorm = mOpenGlView->toNormalizedPos(pos);
       const QPointF mMousePressPosNorm =
           mOpenGlView->toNormalizedPos(mMousePressPosition);
 
@@ -178,10 +177,9 @@ bool Board3dTab::processScenePointerEvent(
 }
 
 bool Board3dTab::processSceneScrolled(
-    float x, float y, float width, float height,
-    slint::private_api::PointerScrollEvent e) noexcept {
+    float x, float y, slint::private_api::PointerScrollEvent e) noexcept {
   const qreal factor = qPow(1.3, e.delta_y / qreal(120));
-  return zoom(QPointF(x, y), QSizeF(width, height), factor);
+  return zoom(QPointF(x, y), factor);
 }
 
 void Board3dTab::zoomFit(float width, float height) noexcept {
@@ -197,20 +195,18 @@ void Board3dTab::zoomFit(float width, float height) noexcept {
 }
 
 void Board3dTab::zoomIn(float width, float height) noexcept {
-  zoom(QPointF(width / 2, height / 2), QSizeF(width, height), 1.3);
+  zoom(QPointF(width / 2, height / 2), 1.3);
 }
 
 void Board3dTab::zoomOut(float width, float height) noexcept {
-  zoom(QPointF(width / 2, height / 2), QSizeF(width, height), 1 / 1.3);
+  zoom(QPointF(width / 2, height / 2), 1 / 1.3);
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
-bool Board3dTab::zoom(const QPointF& center, const QSizeF& size,
-                      qreal factor) noexcept {
-  Q_UNUSED(size);
+bool Board3dTab::zoom(const QPointF& center, qreal factor) noexcept {
   Projection projection = mProjection;
   if (mOpenGlView) {
     const QPointF centerNormalized = mOpenGlView->toNormalizedPos(center);

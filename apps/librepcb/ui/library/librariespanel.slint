@@ -1,4 +1,4 @@
-import { CheckBox, Button, ListView, ProgressIndicator, Spinner, HorizontalBox, VerticalBox, StandardButton } from "std-widgets.slint";
+import { CheckBox, ListView, ProgressIndicator, Spinner, HorizontalBox, VerticalBox, StandardButton } from "std-widgets.slint";
 import { PanelHeader } from "../panelheader.slint";
 import { Globals, Library, LibraryType, LibraryState, ActionId } from "../globals.slint";
 import { ToolTip } from "../tooltip.slint";
@@ -32,6 +32,10 @@ component LibraryList inherits ListView {
                     current-index = index;
                 }
 
+                double-clicked => {
+                    Globals.open-library(lib.id);
+                }
+
                 HorizontalLayout {
                     padding: 2px;
                     padding-right: 10px;
@@ -44,6 +48,7 @@ component LibraryList inherits ListView {
 
                     VerticalLayout {
                         padding: 3px;
+                        alignment: space-between;
 
                         HorizontalLayout {
                             vertical-stretch: 0;
@@ -88,15 +93,22 @@ component LibraryList inherits ListView {
                                 progress: lib.progress / 100;
                             }
 
-                            Button {
-                                y: (parent.height - self.height) / 2;
-                                width: self.visible ? self.preferred-width : 0px;
-                                height: 24px;
-                                icon: @image-url("../img/delete.svg");
-                                // TODO: https://github.com/slint-ui/slint/issues/6426
+                            Rectangle {
+                                width: 22px;
+                                height: self.width;
+                                border-radius: self.height / 2;
+                                background: ta-uninstall.has-hover ? #606060 : transparent;
                                 visible: buttons-visible && (lib.type != LibraryType.online);
-                                clicked => {
-                                    p-uninstall.show();
+
+                                if self.visible: Image {
+                                    source: @image-url("../img/delete.svg");
+                                    visible: buttons-visible && (lib.type != LibraryType.online);
+                                }
+
+                                ta-uninstall := TouchArea {
+                                    clicked => {
+                                        p-uninstall.show();
+                                    }
                                 }
                             }
 

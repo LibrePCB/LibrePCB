@@ -30,6 +30,7 @@
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <librepcb/core/workspace/workspacesettings.h>
+#include <librepcb/editor/library/libraryeditor.h>
 
 #include <QtCore>
 
@@ -127,6 +128,15 @@ void LibrariesModel::installCheckedLibraries() noexcept {
         Qt::QueuedConnection);
     mDownloadsInProgress.append(dl);
     dl->start();
+  }
+}
+
+void LibrariesModel::openLibrary(const slint::SharedString& id) noexcept {
+  try {
+    auto libEditor = new LibraryEditor(mWorkspace, FilePath(s2q(id)), false);
+    libEditor->show();
+  } catch (const Exception& e) {
+    // TODO
   }
 }
 
