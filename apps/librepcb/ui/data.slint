@@ -14,7 +14,13 @@ import {
 export global Data {
     in property <bool> preview-mode: true;
 
-    in-out property <MainPage> current-page: MainPage.libraries;
+    in property <string> window-title: "LibrePCB";
+
+    in property <string> workspace-path: "/path/to/workspace";
+
+    in property <string> cursor-coordinates: "123.456, 123.456 mm";
+
+    in-out property <MainPage> current-page: MainPage.home;
 
     in property <[FolderTreeItem]> workspace-folder: [
         {

@@ -1,7 +1,7 @@
 import { ListView } from "std-widgets.slint";
 import { PanelHeader } from "./panelheader.slint";
 import { FolderTreeItem } from "./types.slint";
-import { Callbacks } from "./callbacks.slint";
+import { Backend } from "./backend.slint";
 import { Data } from "./data.slint";
 
 component FolderTree inherits ListView {
@@ -51,7 +51,7 @@ component FolderTree inherits ListView {
                 current-index = index;
             }
             double-clicked => {
-                Callbacks.project-item-doubleclicked(item.path);
+                Backend.project-item-doubleclicked(item.path);
             }
         }
     }

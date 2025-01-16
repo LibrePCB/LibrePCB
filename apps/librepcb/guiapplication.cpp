@@ -95,16 +95,36 @@ void GuiApplication::exec() {
 void GuiApplication::createNewWindow() noexcept {
   // Create Slint window.
   auto win = ui::AppWindow::create();
-  win->set_window_title(
-      QString("LibrePCB %1").arg(Application::getVersion()).toUtf8().data());
-  win->set_workspace_path(mWorkspace.getPath().toNative().toUtf8().data());
 
-  // Set static data.
-  const ui::Globals& globals = win->global<ui::Globals>();
-  globals.set_preview_mode(false);
+  // Set global data.
+  const ui::Data& d = win->global<ui::Data>();
+  d.set_preview_mode(false);
+  d.set_window_title(
+      QString("LibrePCB %1").arg(Application::getVersion()).toUtf8().data());
+  d.set_workspace_path(mWorkspace.getPath().toNative().toUtf8().data());
+  d.set_workspace_folder(std::make_shared<FileSystemModel>(
+      mWorkspace, mWorkspace.getProjectsPath(), this));
+  d.set_recent_projects(mRecentProjects);
+  d.set_favorite_projects(mFavoriteProjects);
+  d.set_libraries(mLibraries);
+  d.set_open_projects(mProjects);
+
+  // Bind global data to signals.
+  bind(this, d, &ui::Data::set_status_bar_progress, &mWorkspace.getLibraryDb(),
+       &WorkspaceLibraryDb::scanProgressUpdate, 0);
+  bind(this, d, &ui::Data::set_outdated_libraries, mLibraries.get(),
+       &LibrariesModel::outdatedLibrariesChanged,
+       mLibraries->getOutdatedLibraries());
+  bind(this, d, &ui::Data::set_checked_libraries, mLibraries.get(),
+       &LibrariesModel::checkedLibrariesChanged,
+       mLibraries->getCheckedLibraries());
+  bind(this, d, &ui::Data::set_refreshing_available_libraries, mLibraries.get(),
+       &LibrariesModel::fetchingRemoteLibrariesChanged,
+       mLibraries->isFetchingRemoteLibraries());
 
   // Register global callbacks.
-  globals.on_parse_length_input(
+  const ui::Backend& b = win->global<ui::Backend>();
+  b.on_parse_length_input(
       [](slint::SharedString text, slint::SharedString unit) {
         ui::EditParseResult res{false, text, unit};
         try {
@@ -128,34 +148,12 @@ void GuiApplication::createNewWindow() noexcept {
         }
         return res;
       });
-  globals.on_open_library(std::bind(&LibrariesModel::openLibrary,
-                                    mLibraries.get(), std::placeholders::_1));
-  globals.on_uninstall_library(std::bind(&LibrariesModel::uninstallLibrary,
-                                         mLibraries.get(),
-                                         std::placeholders::_1));
-  globals.on_toggle_libraries_checked(std::bind(
+  b.on_open_library(std::bind(&LibrariesModel::openLibrary, mLibraries.get(),
+                              std::placeholders::_1));
+  b.on_uninstall_library(std::bind(&LibrariesModel::uninstallLibrary,
+                                   mLibraries.get(), std::placeholders::_1));
+  b.on_toggle_libraries_checked(std::bind(
       &LibrariesModel::toggleAll, mLibraries.get(), std::placeholders::_1));
-
-  // Set models.
-  globals.set_workspace_folder(std::make_shared<FileSystemModel>(
-      mWorkspace, mWorkspace.getProjectsPath(), this));
-  globals.set_recent_projects(mRecentProjects);
-  globals.set_favorite_projects(mFavoriteProjects);
-  globals.set_libraries(mLibraries);
-  globals.set_open_projects(mProjects);
-
-  // Bind global properties.
-  bind(this, globals, &ui::Globals::set_status_bar_progress,
-       &mWorkspace.getLibraryDb(), &WorkspaceLibraryDb::scanProgressUpdate, 0);
-  bind(this, globals, &ui::Globals::set_outdated_libraries, mLibraries.get(),
-       &LibrariesModel::outdatedLibrariesChanged,
-       mLibraries->getOutdatedLibraries());
-  bind(this, globals, &ui::Globals::set_checked_libraries, mLibraries.get(),
-       &LibrariesModel::checkedLibrariesChanged,
-       mLibraries->getCheckedLibraries());
-  bind(this, globals, &ui::Globals::set_refreshing_available_libraries,
-       mLibraries.get(), &LibrariesModel::fetchingRemoteLibrariesChanged,
-       mLibraries->isFetchingRemoteLibraries());
 
   // Build wrapper.
   mWindows.append(

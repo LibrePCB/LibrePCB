@@ -2,7 +2,7 @@ import { CheckBox, ListView, ProgressIndicator, Spinner, HorizontalBox, Vertical
 import { PanelHeader } from "../panelheader.slint";
 import { Library, LibraryType, LibraryState, ActionId } from "../types.slint";
 import { ToolTip } from "../tooltip.slint";
-import { Callbacks } from "../callbacks.slint";
+import { Backend } from "../backend.slint";
 import { Data } from "../data.slint";
 
 component LibraryList inherits ListView {
@@ -35,7 +35,7 @@ component LibraryList inherits ListView {
                 }
 
                 double-clicked => {
-                    Callbacks.open-library(lib.id);
+                    Backend.open-library(lib.id);
                 }
 
                 HorizontalLayout {
@@ -153,7 +153,7 @@ component LibraryList inherits ListView {
                                 StandardButton {
                                     kind: yes;
                                     clicked => {
-                                        Callbacks.uninstall-library(lib.id);
+                                        Backend.uninstall-library(lib.id);
                                     }
                                 }
 
@@ -184,7 +184,7 @@ export component LibrariesPanel inherits Rectangle {
     background: #2a2a2a;
 
     init => {
-        Callbacks.action-triggered(ActionId.library-panel-ensure-populated, -1);
+        Backend.action-triggered(ActionId.library-panel-ensure-populated, -1);
     }
 
     VerticalLayout {
@@ -226,7 +226,7 @@ export component LibrariesPanel inherits Rectangle {
                     }
 
                     clicked => {
-                        Callbacks.action-triggered(ActionId.download-library-tab-open, -1);
+                        Backend.action-triggered(ActionId.download-library-tab-open, -1);
                     }
                 }
             }
@@ -253,7 +253,7 @@ export component LibrariesPanel inherits Rectangle {
                     }
 
                     clicked => {
-                        Callbacks.action-triggered(ActionId.create-library-tab-open, -1);
+                        Backend.action-triggered(ActionId.create-library-tab-open, -1);
                     }
                 }
             }
@@ -292,7 +292,7 @@ export component LibrariesPanel inherits Rectangle {
 
         ta-install := TouchArea {
             clicked => {
-                Callbacks.action-triggered(ActionId.library-panel-install, -1);
+                Backend.action-triggered(ActionId.library-panel-install, -1);
             }
         }
     }
@@ -303,7 +303,7 @@ export component LibrariesPanel inherits Rectangle {
         height: btn-install.height;
 
         toggled => {
-            Callbacks.toggle-libraries-checked(self.checked);
+            Backend.toggle-libraries-checked(self.checked);
         }
     }
 }

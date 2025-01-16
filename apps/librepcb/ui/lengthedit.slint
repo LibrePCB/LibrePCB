@@ -1,6 +1,6 @@
 import { LineEdit, VerticalBox } from "std-widgets.slint";
 import { EditParseResult } from "./types.slint";
-import { Callbacks } from "./callbacks.slint";
+import { Backend } from "./backend.slint";
 
 export component UpDownButton inherits Rectangle {
     in property <string> text <=> t-title.text;
@@ -57,7 +57,7 @@ export component LengthEdit inherits Rectangle {
         }
 
         edited(s) => {
-            parse-result = Callbacks.parse-length-input(s, unit);
+            parse-result = Backend.parse-length-input(s, unit);
             if (parse-result.valid) {
                 value = parse-result.evaluated-value;
                 unit = parse-result.evaluated-unit;
