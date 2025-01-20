@@ -35,6 +35,8 @@ Files:
  .gitmodules
  .rustfmt.toml
  .tx/*
+ apps/librepcb/ui/img/grid-dots.svg
+ apps/librepcb/ui/img/grid-none.svg
  AUTHORS.md
  ci/*
  CONTRIBUTING.md
@@ -124,15 +126,17 @@ Copyright: LibrePCB Developers, see AUTHORS.md
 License: CC0-1.0
 
 Files:
+ apps/librepcb/ui/img/3d.svg
+ apps/librepcb/ui/img/actions/lock-closed.svg
+ apps/librepcb/ui/img/actions/lock-open.svg
  apps/librepcb/ui/img/draw-wire.svg
+ apps/librepcb/ui/img/grid-lines.svg
  apps/librepcb/ui/img/netlabel.svg
  apps/librepcb/ui/img/output-jobs.svg
- apps/librepcb/ui/img/plus.svg
- apps/librepcb/ui/img/save.svg
- apps/librepcb/ui/img/print.svg
  apps/librepcb/ui/img/pdf.svg
- apps/librepcb/ui/img/3d.svg
- apps/librepcb/ui/img/grid-lines.svg
+ apps/librepcb/ui/img/plus.svg
+ apps/librepcb/ui/img/print.svg
+ apps/librepcb/ui/img/save.svg
  apps/librepcb/ui/img/shopping-cart.svg
 Copyright: The Bootstrap Authors
 License: MIT
@@ -141,12 +145,12 @@ Files:
  apps/librepcb/ui/img/cursor.svg
  apps/librepcb/ui/img/draw-polygon.svg
  apps/librepcb/ui/img/draw-text.svg
+ apps/librepcb/ui/img/redo.svg
  apps/librepcb/ui/img/ruler.svg
+ apps/librepcb/ui/img/undo.svg
  img/actions/align_horizontally.svg
  img/actions/align_vertically.svg
  img/actions/donate_white.svg
- img/actions/redo.svg
- img/actions/undo.svg
 Copyright: Font Awesome
 License: CC-BY-4.0
 

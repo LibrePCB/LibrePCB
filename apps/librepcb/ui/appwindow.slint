@@ -6,7 +6,7 @@ import { ProjectPanel } from "./projectpanel.slint";
 import { HomePanel } from "./homepanel.slint";
 import { MenuBar } from "./menubar.slint";
 import { WindowSection } from "./windowsection.slint";
-import { MainPage } from "./types.slint";
+import { MainPage, GridStyle } from "./types.slint";
 import { Backend } from "./backend.slint";
 import { Data } from "./data.slint";
 
@@ -214,6 +214,50 @@ export component AppWindow inherits Window {
                                 text: "mils";
                             }
                         }
+                    }
+                }
+            }
+
+            Rectangle {
+                width: self.height;
+                background: t-grid-style.has-hover ? #505050 : #404040;
+
+                t-grid-style := TouchArea {
+                    Image {
+                        width: self.height * 0.7;
+                        height: 100%;
+                        image-fit: contain;
+                        source: (Data.grid-style == GridStyle.lines) ? @image-url("img/grid-lines.svg") : ((Data.grid-style == GridStyle.dots) ? @image-url("img/grid-dots.svg") : @image-url("img/grid-none.svg"));
+                        colorize: Palette.foreground;
+                    }
+
+                    clicked => {
+                        if (Data.grid-style == GridStyle.none) {
+                            Data.grid-style = GridStyle.dots;
+                        } else if (Data.grid-style == GridStyle.dots) {
+                            Data.grid-style = GridStyle.lines;
+                        } else {
+                            Data.grid-style = GridStyle.none;
+                        }
+                    }
+                }
+            }
+
+            Rectangle {
+                width: self.height;
+                background: (!Data.locked) ? #900000 : (t-lock.has-hover ? #505050 : #404040);
+
+                t-lock := TouchArea {
+                    Image {
+                        width: self.height * 0.7;
+                        height: 100%;
+                        image-fit: contain;
+                        source: Data.locked ? @image-url("img/lock-closed.svg") : @image-url("img/lock-open.svg");
+                        colorize: (!Data.locked) ? white : Palette.foreground;
+                    }
+
+                    clicked => {
+                        Data.locked = !Data.locked;
                     }
                 }
             }

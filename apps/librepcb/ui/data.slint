@@ -8,7 +8,8 @@ import {
     ProjectData,
     SchematicTool,
     TabType,
-    WindowSection
+    WindowSection,
+    GridStyle
 } from "./types.slint";
 
 export global Data {
@@ -23,6 +24,10 @@ export global Data {
     in property <string> grid-interval: "2.54";
 
     in property <string> unit: "mm";
+
+    in-out property <GridStyle> grid-style: GridStyle.lines;
+
+    in-out property <bool> locked: true;
 
     in-out property <MainPage> current-page: MainPage.home;
 
