@@ -22,7 +22,19 @@ if(EXISTS "${SLINT_SUBMODULE_BASEPATH}"
   endif()
 
   # Suppress compiler warning (https://github.com/slint-ui/slint/issues/7358)
-  target_compile_options(Slint INTERFACE -Wno-maybe-uninitialized)
+  if(CMAKE_CXX_COMPILER_ID STREQUAL GNU AND CMAKE_CXX_COMPILER_VERSION
+                                            VERSION_LESS 14
+  )
+    target_compile_options(Slint INTERFACE -Wno-maybe-uninitialized)
+  endif()
+
+  # Suppress compiler warning
+  # (maybe https://gcc.gnu.org/bugzilla/show_bug.cgi?id=98646)
+  if(CMAKE_CXX_COMPILER_ID STREQUAL GNU AND CMAKE_CXX_COMPILER_VERSION
+                                            VERSION_LESS 12
+  )
+    target_compile_options(Slint INTERFACE -Wno-nonnull)
+  endif()
 
   # Stop here, we're done
   return()

@@ -18,7 +18,11 @@ export global Data {
 
     in property <string> workspace-path: "/path/to/workspace";
 
-    in property <string> cursor-coordinates: "123.456, 123.456 mm";
+    in property <string> cursor-coordinates: "X: 123.456 Y: 123.456";
+
+    in property <string> grid-interval: "2.54";
+
+    in property <string> unit: "mm";
 
     in-out property <MainPage> current-page: MainPage.home;
 
@@ -124,18 +128,22 @@ export global Data {
                 {
                     type: TabType.create-library,
                     title: "Create Lib",
+                    icon: @image-url("img/plus.svg"),
                 },
                 {
                     type: TabType.download-library,
                     title: "Download Lib",
+                    icon: @image-url("img/download.svg"),
                 },
                 {
                     type: TabType.schematic,
                     title: "Schematic",
+                    icon: @image-url("img/image.svg"),
                 },
                 {
                     type: TabType.board-2d,
                     title: "Board",
+                    icon: @image-url("img/projects.png"),
                 },
             ],
             create-library-tabs: [
@@ -199,6 +207,7 @@ export global Data {
                 {
                     type: TabType.board-3d,
                     title: "3D",
+                    icon: @image-url("img/projects.png"),
                 },
             ],
             board-2d-tabs: [

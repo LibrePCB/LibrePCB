@@ -49,8 +49,8 @@ namespace app {
 
 CreateLibraryTab::CreateLibraryTab(GuiApplication& app,
                                    QObject* parent) noexcept
-  : WindowTab(app, ui::TabType::CreateLibrary, nullptr, -1, tr("New Library"),
-              parent),
+  : WindowTab(app, ui::TabType::CreateLibrary, QPixmap(":/plus.svg"), nullptr,
+              -1, tr("New Library"), parent),
     mUiData{
         q2s(tr("My Library")),  // Name
         slint::SharedString(),  // Name error

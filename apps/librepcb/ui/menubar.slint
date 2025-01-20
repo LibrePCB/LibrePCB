@@ -1,5 +1,7 @@
 import { ActionId } from "./types.slint";
+import { Data } from "./data.slint";
 import { MenuItemData, Menu } from "./menu.slint";
+import { Palette, LineEdit } from "std-widgets.slint";
 
 struct MainMenuItemData {
     text: string,
@@ -28,6 +30,18 @@ component MainMenuItem inherits Rectangle {
         x: 0;
         y: 22px;
         items: items;
+    }
+}
+
+component MenuBarButton inherits TouchArea {
+    in property icon <=> i.source;
+
+    width: self.height;
+
+    i := Image {
+        width: root.pressed ? 90% : 100%;
+        image-fit: contain;
+        colorize: (!root.enabled) ? #606060 : (root.has-hover ? white : Palette.foreground);
     }
 }
 
@@ -80,54 +94,78 @@ export component MenuBar inherits Rectangle {
         },
     ];
 
-    background: #353535;
+    background: #252525;
+
+    public function focus-search() {
+        le-search.focus();
+    }
 
     HorizontalLayout {
+        padding-right: 2px;
+
         for item in items: MainMenuItem {
             text: item.text;
             items: item.items;
         }
 
         Rectangle {
-            width: 10px;
+            width: 3px;
+        }
+
+        Rectangle {
+            y: 4px;
+            width: 1px;
+            height: parent.height - 2 * self.y;
+            background: #606060;
         }
 
         HorizontalLayout {
             padding-top: 5px;
             padding-bottom: 5px;
-            spacing: 3px;
+            padding-left: 8px;
+            padding-right: 5px;
+            spacing: 5px;
 
-            TouchArea {
-                width: 20px;
-
-                Image {
-                    width: parent.height;
-                    image-fit: contain;
-                    source: @image-url("img/save.svg");
-                    colorize: parent.has-hover ? white : #d0d0d0;
-                }
+            MenuBarButton {
+                enabled: Data.current-project.valid;
+                icon: @image-url("img/save.svg");
             }
 
-            TouchArea {
-                width: 20px;
-
-                Image {
-                    width: parent.height;
-                    image-fit: contain;
-                    source: @image-url("img/undo.svg");
-                    colorize: parent.has-hover ? white : #d0d0d0;
-                }
+            MenuBarButton {
+                enabled: Data.current-project.valid;
+                icon: @image-url("img/pdf.svg");
             }
 
-            TouchArea {
-                width: 20px;
+            MenuBarButton {
+                enabled: Data.current-project.valid;
+                icon: @image-url("img/print.svg");
+            }
 
-                Image {
-                    width: parent.height;
-                    image-fit: contain;
-                    source: @image-url("img/redo.svg");
-                    colorize: parent.has-hover ? white : #d0d0d0;
+            MenuBarButton {
+                enabled: Data.current-project.valid;
+                icon: @image-url("img/undo.svg");
+            }
+
+            MenuBarButton {
+                enabled: Data.current-project.valid;
+                icon: @image-url("img/redo.svg");
+            }
+        }
+
+        Rectangle { }
+
+        le-search := LineEdit {
+            y: 2px;
+            height: parent.height - 2 * self.y;
+            horizontal-stretch: 0;
+            placeholder-text: @tr("Quick Find (Ctrl+F)");
+
+            key-pressed(event) => {
+                if (event.text == Key.Escape) {
+                    self.clear-focus();
+                    return accept;
                 }
+                return reject;
             }
         }
     }

@@ -129,6 +129,10 @@ Files:
  apps/librepcb/ui/img/output-jobs.svg
  apps/librepcb/ui/img/plus.svg
  apps/librepcb/ui/img/save.svg
+ apps/librepcb/ui/img/print.svg
+ apps/librepcb/ui/img/pdf.svg
+ apps/librepcb/ui/img/3d.svg
+ apps/librepcb/ui/img/grid-lines.svg
  apps/librepcb/ui/img/shopping-cart.svg
 Copyright: The Bootstrap Authors
 License: MIT
@@ -141,8 +145,8 @@ Files:
  img/actions/align_horizontally.svg
  img/actions/align_vertically.svg
  img/actions/donate_white.svg
- img/actions/undo.svg
  img/actions/redo.svg
+ img/actions/undo.svg
 Copyright: Font Awesome
 License: CC-BY-4.0
 
