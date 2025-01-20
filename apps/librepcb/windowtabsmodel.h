@@ -24,7 +24,9 @@
  *  Includes
  ******************************************************************************/
 #include "appwindow.h"
+
 #include <librepcb/core/types/point.h>
+
 #include <QtCore>
 #include <QtGui>
 

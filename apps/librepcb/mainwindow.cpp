@@ -71,17 +71,21 @@ MainWindow::MainWindow(GuiApplication& app,
           this, [&d](int index) { d.set_current_section_index(index); });
   connect(mSections.get(), &WindowSectionsModel::currentProjectChanged, this,
           &MainWindow::setCurrentProject);
-  connect(mSections.get(), &WindowSectionsModel::cursorCoordinatesChanged, this,
-          [&d](const Point& pos) {
-            d.set_cursor_coordinates(q2s(QString("X: %1 Y: %2").arg(pos.getX().toMm(), 7, 'f', 3).arg(pos.getY().toMm(), 7, 'f', 3)));
-          });
+  connect(
+      mSections.get(), &WindowSectionsModel::cursorCoordinatesChanged, this,
+      [&d](const Point& pos) {
+        d.set_cursor_coordinates(q2s(QString("X: %1 Y: %2")
+                                         .arg(pos.getX().toMm(), 7, 'f', 3)
+                                         .arg(pos.getY().toMm(), 7, 'f', 3)));
+      });
 
   // Register global callbacks.
   const ui::Backend& b = mWindow->global<ui::Backend>();
   b.on_action_triggered(std::bind(&MainWindow::actionTriggered, this,
                                   std::placeholders::_1,
                                   std::placeholders::_2));
-  b.on_key_pressed(std::bind(&MainWindow::keyPressed, this, std::placeholders::_1));
+  b.on_key_pressed(
+      std::bind(&MainWindow::keyPressed, this, std::placeholders::_1));
   b.on_project_item_doubleclicked(std::bind(
       &MainWindow::projectItemDoubleClicked, this, std::placeholders::_1));
   b.on_schematic_clicked([this](int index) {
@@ -150,7 +154,8 @@ bool MainWindow::actionTriggered(ui::ActionId id, int sectionIndex) noexcept {
   return false;
 }
 
-slint::private_api::EventResult MainWindow::keyPressed(const slint::private_api::KeyEvent& e) noexcept {
+slint::private_api::EventResult MainWindow::keyPressed(
+    const slint::private_api::KeyEvent& e) noexcept {
   if ((std::string_view(e.text) == "f") && (e.modifiers.control)) {
     mWindow->invoke_focus_search();
     return slint::private_api::EventResult::Accept;

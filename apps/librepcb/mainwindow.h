@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "appwindow.h"
+
 #include <QtCore>
 #include <QtGui>
 
@@ -64,7 +65,8 @@ public:
 
 private:
   bool actionTriggered(ui::ActionId id, int sectionIndex) noexcept;
-  slint::private_api::EventResult keyPressed(const slint::private_api::KeyEvent& e) noexcept;
+  slint::private_api::EventResult keyPressed(
+      const slint::private_api::KeyEvent& e) noexcept;
   void projectItemDoubleClicked(const slint::SharedString& path) noexcept;
   void setCurrentProject(std::shared_ptr<ProjectEditor> prj) noexcept;
 
