@@ -46,11 +46,12 @@ namespace app {
  ******************************************************************************/
 
 GraphicsSceneTab::GraphicsSceneTab(GuiApplication& app, ui::TabType type,
+                                   const QPixmap& icon,
                                    std::shared_ptr<ProjectEditor> prj,
                                    int objIndex, const QString& title,
                                    const QColor& bgColor,
                                    QObject* parent) noexcept
-  : WindowTab(app, type, prj, objIndex, title, parent),
+  : WindowTab(app, type, icon, prj, objIndex, title, parent),
     mBackgroundColor(bgColor),
     mLayerProvider(new DefaultGraphicsLayerProvider(
         app.getWorkspace().getSettings().themes.getActive())),
@@ -135,8 +136,7 @@ bool GraphicsSceneTab::processScenePointerEvent(
     }
 
     const Point scenePos = Point::fromPx(scenePosPx);
-    emit cursorCoordinatesChanged(scenePos.getX().toMm(),
-                                  scenePos.getY().toMm());
+    emit cursorCoordinatesChanged(scenePos);
   }
 
   return eventConsumed;

@@ -63,8 +63,9 @@ static QString getTitle(std::shared_ptr<ProjectEditor> prj,
 SchematicTab::SchematicTab(GuiApplication& app,
                            std::shared_ptr<ProjectEditor> prj,
                            int schematicIndex, QObject* parent) noexcept
-  : GraphicsSceneTab(app, ui::TabType::Schematic, prj, schematicIndex,
-                     getTitle(prj, schematicIndex), Qt::white, parent),
+  : GraphicsSceneTab(app, ui::TabType::Schematic, QPixmap(":/image.svg"), prj,
+                     schematicIndex, getTitle(prj, schematicIndex), Qt::white,
+                     parent),
     mUiData{
         q2s(mBackgroundColor),  // Background color
         q2s(Qt::black),  // Overlay color

@@ -24,7 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "appwindow.h"
-
+#include <librepcb/core/types/point.h>
 #include <QtCore>
 #include <QtGui>
 
@@ -58,7 +58,7 @@ public:
   // Constructors / Destructor
   WindowTab() = delete;
   WindowTab(const WindowTab& other) = delete;
-  explicit WindowTab(GuiApplication& app, ui::TabType type,
+  explicit WindowTab(GuiApplication& app, ui::TabType type, const QPixmap& icon,
                      std::shared_ptr<ProjectEditor> prj, int objIndex,
                      const QString& title, QObject* parent = nullptr) noexcept;
   virtual ~WindowTab() noexcept;
@@ -110,7 +110,7 @@ public:
   WindowTab& operator=(const WindowTab& rhs) = delete;
 
 signals:
-  void cursorCoordinatesChanged(qreal x, qreal y);
+  void cursorCoordinatesChanged(const Point& pos);
   void requestClose();
   void requestRepaint();
   void uiDataChanged();

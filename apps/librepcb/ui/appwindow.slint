@@ -1,4 +1,4 @@
-import { Button, ProgressIndicator, StandardButton } from "std-widgets.slint";
+import { Button, ProgressIndicator, StandardButton, Palette, VerticalBox } from "std-widgets.slint";
 import { SideBar } from "./sidebar.slint";
 import { LengthEdit } from "./lengthedit.slint";
 import { LibrariesPanel } from "./library/librariespanel.slint";
@@ -20,6 +20,17 @@ export component AppWindow inherits Window {
     icon: @image-url("img/librepcb.png");
     preferred-width: 1024px;
     preferred-height: 768px;
+
+    public function focus-search() {
+        menubar.focus-search();
+    }
+
+    forward-focus: fs;
+    fs := FocusScope {
+        key-pressed(event) => {
+            return Backend.key-pressed(event);
+        }
+    }
 
     menubar := MenuBar {
         x: 0;
@@ -101,23 +112,114 @@ export component AppWindow inherits Window {
         background: sidebar.background;
 
         HorizontalLayout {
-            padding: 5px;
-            spacing: 20px;
+            padding-left: 10px;
+            padding-right: 10px;
 
             Text {
-                color: white;
+                horizontal-stretch: 1;
                 text: Data.workspace-path;
             }
 
             Rectangle {
-                HorizontalLayout {
-                    spacing: 5px;
-                    alignment: LayoutAlignment.center;
+                width: 10px;
+            }
 
+            Text {
+                vertical-alignment: center;
+                font-family: "Noto Sans Mono";
+                font-size: 11px;
+                color: white;
+                text: Data.cursor-coordinates;
+            }
+
+            Rectangle {
+                width: 10px;
+            }
+
+            Rectangle {
+                width: t-grid-interval.preferred-width + self.height - t-grid-interval.preferred-height;
+                background: t-grid-interval.has-hover ? #505050 : #404040;
+
+                t-grid-interval := TouchArea {
                     Text {
-                        text: Data.cursor-coordinates;
+                        vertical-alignment: center;
+                        font-family: "Noto Sans Mono";
+                        font-size: 11px;
+                        text: Data.grid-interval;
+                    }
+
+                    clicked => {
+                        pw-grid-interval.show();
                     }
                 }
+
+                pw-grid-interval := PopupWindow {
+                    x: -(self.preferred-width - parent.width) / 2;
+                    y: -self.preferred-height;
+                    close-policy: close-on-click-outside;
+
+                    LengthEdit { }
+                }
+            }
+
+            Rectangle {
+                width: t-unit.preferred-width + self.height - t-unit.preferred-height;
+                background: t-unit.has-hover ? #505050 : #404040;
+
+                t-unit := TouchArea {
+                    Text {
+                        vertical-alignment: center;
+                        font-size: 11px;
+                        text: Data.unit;
+                    }
+
+                    clicked => {
+                        pw-unit.show();
+                    }
+                }
+
+                pw-unit := PopupWindow {
+                    x: -(self.preferred-width - parent.width) / 2;
+                    y: -self.preferred-height;
+
+                    Rectangle {
+                        background: #404040;
+
+                        VerticalBox {
+                            padding-left: 5px;
+                            padding-right: 5px;
+
+                            Text {
+                                color: #cccccc;
+                                text: "mm";
+                            }
+
+                            Text {
+                                color: #cccccc;
+                                text: "μm";
+                            }
+
+                            Text {
+                                color: #cccccc;
+                                text: "nm";
+                            }
+
+                            Text {
+                                color: #cccccc;
+                                text: "″";
+                            }
+
+                            Text {
+                                color: #cccccc;
+                                text: "mils";
+                            }
+                        }
+                    }
+                }
+            }
+
+            Rectangle {
+                width: 10px;
             }
 
             Rectangle {

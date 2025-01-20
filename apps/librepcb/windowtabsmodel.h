@@ -24,7 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "appwindow.h"
-
+#include <librepcb/core/types/point.h>
 #include <QtCore>
 #include <QtGui>
 
@@ -75,7 +75,7 @@ public:
   WindowTabsModel& operator=(const WindowTabsModel& rhs) = delete;
 
 signals:
-  void cursorCoordinatesChanged(qreal x, qreal y);
+  void cursorCoordinatesChanged(const Point& pos);
   void requestRepaint();
   void uiDataChanged(std::size_t index);
 
