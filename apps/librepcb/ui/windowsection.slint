@@ -28,7 +28,8 @@ component TabItem inherits Rectangle {
 
         Image {
             width: 16px;
-            source: (tab.type == TabType.schematic) ? @image-url("img/image.svg") : @image-url("img/projects.png");
+            source: tab.icon;
+            colorize: t-tab.color;
         }
 
         t-tab := Text {

@@ -50,8 +50,8 @@ namespace app {
 
 DownloadLibraryTab::DownloadLibraryTab(GuiApplication& app,
                                        QObject* parent) noexcept
-  : WindowTab(app, ui::TabType::DownloadLibrary, nullptr, -1,
-              tr("Download Library"), parent),
+  : WindowTab(app, ui::TabType::DownloadLibrary, QPixmap(":/download.svg"),
+              nullptr, -1, tr("Download Library"), parent),
     mUiData{
         slint::SharedString(),  // URL
         slint::SharedString(),  // URL error

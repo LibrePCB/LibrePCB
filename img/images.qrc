@@ -1,4 +1,11 @@
 <RCC>
+    <qresource>
+        <file alias="download.svg">../apps/librepcb/ui/img/download.svg</file>
+        <file alias="image.svg">../apps/librepcb/ui/img/image.svg</file>
+        <file alias="plus.svg">../apps/librepcb/ui/img/plus.svg</file>
+        <file alias="projects.png">../apps/librepcb/ui/img/projects.png</file>
+        <file alias="3d.svg">../apps/librepcb/ui/img/3d.svg</file>
+    </qresource>
     <qresource prefix="/img">
         <file>actions/add.png</file>
         <file>actions/add_component.png</file>

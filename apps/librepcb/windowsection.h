@@ -24,7 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "appwindow.h"
-
+#include <librepcb/core/types/point.h>
 #include <QtCore>
 #include <QtGui>
 
@@ -85,7 +85,7 @@ public:
 signals:
   void uiDataChanged();
   void currentProjectChanged(std::shared_ptr<ProjectEditor> prj);
-  void cursorCoordinatesChanged(qreal x, qreal y);
+  void cursorCoordinatesChanged(const Point& pos);
 
 private:
   std::shared_ptr<WindowTabsModel> mTabsModel;

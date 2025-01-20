@@ -7,19 +7,22 @@ export global Backend {
     // - Section index (pass -1 for things outside a window section)
     pure callback action-triggered(ActionId, int);
 
+    // A key has been pressed
+    pure callback key-pressed(KeyEvent) -> EventResult;
+
     pure callback parse-length-input(string, string) -> EditParseResult;
 
-    // An item in a project tree view has been double-clicked.
+    // An item in a project tree view has been double-clicked
     //
     // - File path (see FolderTreeItem::path)
     pure callback project-item-doubleclicked(string);
 
-    // A schematic in the projects panel has been clicked.
+    // A schematic in the projects panel has been clicked
     //
     // - Schematic index
     pure callback schematic-clicked(int);
 
-    // A board in the projects panel has been clicked.
+    // A board in the projects panel has been clicked
     //
     // - Board index
     pure callback board-clicked(int);

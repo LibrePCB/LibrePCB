@@ -72,8 +72,8 @@ MainWindow::MainWindow(GuiApplication& app,
   connect(mSections.get(), &WindowSectionsModel::currentProjectChanged, this,
           &MainWindow::setCurrentProject);
   connect(mSections.get(), &WindowSectionsModel::cursorCoordinatesChanged, this,
-          [&d](qreal x, qreal y) {
-            d.set_cursor_coordinates(q2s(QString("%1, %2 mm").arg(x).arg(y)));
+          [&d](const Point& pos) {
+            d.set_cursor_coordinates(q2s(QString("X: %1 Y: %2").arg(pos.getX().toMm(), 7, 'f', 3).arg(pos.getY().toMm(), 7, 'f', 3)));
           });
 
   // Register global callbacks.
@@ -81,6 +81,7 @@ MainWindow::MainWindow(GuiApplication& app,
   b.on_action_triggered(std::bind(&MainWindow::actionTriggered, this,
                                   std::placeholders::_1,
                                   std::placeholders::_2));
+  b.on_key_pressed(std::bind(&MainWindow::keyPressed, this, std::placeholders::_1));
   b.on_project_item_doubleclicked(std::bind(
       &MainWindow::projectItemDoubleClicked, this, std::placeholders::_1));
   b.on_schematic_clicked([this](int index) {
@@ -145,8 +146,18 @@ bool MainWindow::actionTriggered(ui::ActionId id, int sectionIndex) noexcept {
     return true;
   }
 
-  qWarning() << "Unhandled action triggered:" << static_cast<int>(id);
+  qWarning() << "Unhandled UI action:" << static_cast<int>(id);
   return false;
+}
+
+slint::private_api::EventResult MainWindow::keyPressed(const slint::private_api::KeyEvent& e) noexcept {
+  if ((std::string_view(e.text) == "f") && (e.modifiers.control)) {
+    mWindow->invoke_focus_search();
+    return slint::private_api::EventResult::Accept;
+  }
+
+  qDebug() << "Unhandled UI key event:" << e.text.data();
+  return slint::private_api::EventResult::Reject;
 }
 
 void MainWindow::projectItemDoubleClicked(
