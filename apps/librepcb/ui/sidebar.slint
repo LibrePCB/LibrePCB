@@ -83,20 +83,20 @@ export component SideBar inherits Rectangle {
         }
 
         SideBarButton {
-            icon: @image-url("img/help.svg");
-            tooltip: "Help";
-            checked: Data.current-page == MainPage.help;
-            clicked => {
-                Data.current-page = MainPage.help;
-            }
-        }
-
-        SideBarButton {
             icon: @image-url("img/settings.svg");
             tooltip: "Preferences";
             checked: Data.current-page == MainPage.preferences;
             clicked => {
                 Data.current-page = MainPage.preferences;
+            }
+        }
+
+        SideBarButton {
+            icon: @image-url("img/help.svg");
+            tooltip: "Help";
+            checked: Data.current-page == MainPage.help;
+            clicked => {
+                Data.current-page = MainPage.help;
             }
         }
     }

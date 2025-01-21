@@ -9,6 +9,7 @@ import { WindowSection } from "./windowsection.slint";
 import { MainPage, GridStyle } from "./types.slint";
 import { Backend } from "./backend.slint";
 import { Data } from "./data.slint";
+import { HelpPanel } from "./helppanel.slint";
 
 export { Backend, Data }
 
@@ -64,6 +65,13 @@ export component AppWindow inherits Window {
     }
 
     if Data.current-page == MainPage.project: ProjectPanel {
+        x: sidebar.width;
+        y: sidebar.y;
+        width: panel-width;
+        height: sidebar.height;
+    }
+
+    if Data.current-page == MainPage.help: HelpPanel {
         x: sidebar.width;
         y: sidebar.y;
         width: panel-width;
@@ -274,6 +282,15 @@ export component AppWindow inherits Window {
                     width: 100%;
                     visible: self.progress > 0 && self.progress < 1;
                     progress: Data.status-bar-progress / 100;
+                }
+            }
+
+            Rectangle {
+                width: self.preferred-width + 20px;
+                background: #dc3545;
+
+                Text {
+                    text: @tr("Support LibrePCB");
                 }
             }
         }
