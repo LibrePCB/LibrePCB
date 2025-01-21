@@ -1,7 +1,7 @@
 import { ActionId } from "./types.slint";
 import { Data } from "./data.slint";
 import { MenuItemData, Menu } from "./menu.slint";
-import { Palette, LineEdit } from "std-widgets.slint";
+import { Palette, LineEdit, TabWidget } from "std-widgets.slint";
 
 struct MainMenuItemData {
     text: string,
@@ -46,6 +46,8 @@ component MenuBarButton inherits TouchArea {
 }
 
 export component MenuBar inherits Rectangle {
+    in property <length> sections-start-x;
+
     property <[MainMenuItemData]> items: [
         {
             text: @tr("File"),
@@ -123,7 +125,7 @@ export component MenuBar inherits Rectangle {
             padding-top: 5px;
             padding-bottom: 5px;
             padding-left: 8px;
-            padding-right: 5px;
+            padding-right: 20px;
             spacing: 5px;
 
             MenuBarButton {
@@ -152,7 +154,86 @@ export component MenuBar inherits Rectangle {
             }
         }
 
-        Rectangle { }
+        Rectangle {
+            horizontal-stretch: 1;
+
+            if Data.sections[Data.current-section-index].tabs.length > 0: HorizontalLayout {
+                property <length> total-space: root.width - sections-start-x;
+                property <length> section-width: total-space / Data.sections.length;
+                property <length> offset: sections-start-x - parent.x - (self.width / 2);
+
+                x: max(min(section-width * (0.5 + Data.current-section-index) + offset, parent.width - self.width - 10px), 0);
+                width: self.preferred-width;
+                padding-top: 5px;
+                padding-bottom: 5px;
+                spacing: 5px;
+
+                MenuBarButton {
+                    enabled: Data.current-project.valid;
+                    icon: @image-url("img/cut.svg");
+                }
+
+                MenuBarButton {
+                    enabled: Data.current-project.valid;
+                    icon: @image-url("img/copy.svg");
+                }
+
+                MenuBarButton {
+                    enabled: Data.current-project.valid;
+                    icon: @image-url("img/paste.svg");
+                }
+
+                MenuBarButton {
+                    enabled: Data.current-project.valid;
+                    icon: @image-url("img/delete.svg");
+                }
+
+                MenuBarButton {
+                    enabled: Data.current-project.valid;
+                    icon: @image-url("img/rotate-ccw.svg");
+                }
+
+                MenuBarButton {
+                    enabled: Data.current-project.valid;
+                    icon: @image-url("img/rotate-cw.svg");
+                }
+
+                MenuBarButton {
+                    enabled: Data.current-project.valid;
+                    icon: @image-url("img/mirror-horizontal.svg");
+                }
+
+                MenuBarButton {
+                    enabled: Data.current-project.valid;
+                    icon: @image-url("img/mirror-vertical.svg");
+                }
+
+                MenuBarButton {
+                    enabled: Data.current-project.valid;
+                    icon: @image-url("img/move.svg");
+                }
+
+                MenuBarButton {
+                    enabled: Data.current-project.valid;
+                    icon: @image-url("img/grid-dots.svg");
+                }
+
+                MenuBarButton {
+                    enabled: Data.current-project.valid;
+                    icon: @image-url("img/reset.svg");
+                }
+
+                MenuBarButton {
+                    enabled: Data.current-project.valid;
+                    icon: @image-url("img/lock-open.svg");
+                }
+
+                MenuBarButton {
+                    enabled: Data.current-project.valid;
+                    icon: @image-url("img/edit.svg");
+                }
+            }
+        }
 
         le-search := LineEdit {
             y: 2px;
