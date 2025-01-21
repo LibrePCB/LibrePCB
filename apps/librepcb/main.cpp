@@ -52,6 +52,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <libintl.h>
+#include <locale>
 #include <slint.h>
 
 /*******************************************************************************
@@ -96,6 +98,12 @@ int main(int argc, char* argv[]) {
   // Configure the application settings format and location used by QSettings
   configureApplicationSettings();
 
+  // Configure gettext.
+  bindtextdomain(
+      "librepcb",
+      qPrintable(Application::getResourcesDir().getPathTo("i18n").toStr()));
+  qputenv("LANGUAGE", "de");
+
   // Write some information about the application instance to the log.
   writeLogHeader();
 
@@ -108,22 +116,35 @@ int main(int argc, char* argv[]) {
   // automatically. Let's do it in a thread to avoid delaying application start.
   std::ignore = QtConcurrent::run(&Application::cleanTemporaryDirectory);
 
-  // This is to remove the ugly frames around widgets in all status bars...
-  // (from http://www.qtcentre.org/threads/1904)
-  app.setStyleSheet("QStatusBar::item { border: 0px solid black; }");
-
-  // Use Fusion style on Windows with dark theme to enable dark theme also for
-  // LibrePCB (see https://github.com/LibrePCB/LibrePCB/issues/1390).
-  // Note: As a fallback solution if the dark theme causes troubles or users
-  // don't like it, the environment variable LIBREPCB_DISABLE_DARK_THEME=1
-  // could be set. We may remove this fallback if nobody asks for it.
-#if defined(Q_OS_WIN) && (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
-  if ((app.styleHints()->colorScheme() == Qt::ColorScheme::Dark) &&
-      (qgetenv("LIBREPCB_DISABLE_DARK_THEME") != "1")) {
-    qDebug() << "Switching to Fusion style because of dark system theme.";
-    app.setStyle(QStyleFactory::create("Fusion"));
+  // Use Fusion style with dark theme to make the legacy Qt dialogs appear at
+  // least in a similar color scheme as the new Slint UI. Can be removed as
+  // soon as no Qt widgets are used anymore.
+  {
+    const QColor darkGray(53, 53, 53);
+    const QColor gray(128, 128, 128);
+    const QColor black(25, 25, 25);
+    const QColor blue(42, 130, 218);
+    QPalette darkPalette;
+    darkPalette.setColor(QPalette::Window, darkGray);
+    darkPalette.setColor(QPalette::WindowText, Qt::white);
+    darkPalette.setColor(QPalette::Base, black);
+    darkPalette.setColor(QPalette::AlternateBase, darkGray);
+    darkPalette.setColor(QPalette::ToolTipBase, blue);
+    darkPalette.setColor(QPalette::ToolTipText, Qt::white);
+    darkPalette.setColor(QPalette::Text, Qt::white);
+    darkPalette.setColor(QPalette::Button, darkGray);
+    darkPalette.setColor(QPalette::ButtonText, Qt::white);
+    darkPalette.setColor(QPalette::Link, blue);
+    darkPalette.setColor(QPalette::Highlight, blue);
+    darkPalette.setColor(QPalette::HighlightedText, Qt::black);
+    darkPalette.setColor(QPalette::Active, QPalette::Button, gray.darker());
+    darkPalette.setColor(QPalette::Disabled, QPalette::ButtonText, gray);
+    darkPalette.setColor(QPalette::Disabled, QPalette::WindowText, gray);
+    darkPalette.setColor(QPalette::Disabled, QPalette::Text, gray);
+    darkPalette.setColor(QPalette::Disabled, QPalette::Light, darkGray);
+    app.setStyle("fusion");
+    app.setPalette(darkPalette);
   }
-#endif
 
   // Start network access manager thread with HTTP cache to avoid extensive
   // requests (e.g. downloading library pictures each time opening the manager).

@@ -103,7 +103,7 @@ export component MenuBar inherits Rectangle {
     }
 
     HorizontalLayout {
-        padding-right: 2px;
+        padding-right: 4px;
 
         for item in items: MainMenuItem {
             text: item.text;
@@ -239,6 +239,7 @@ export component MenuBar inherits Rectangle {
             y: 2px;
             height: parent.height - 2 * self.y;
             horizontal-stretch: 0;
+            font-size: 11px;
             placeholder-text: @tr("Quick Find (Ctrl+F)");
 
             key-pressed(event) => {

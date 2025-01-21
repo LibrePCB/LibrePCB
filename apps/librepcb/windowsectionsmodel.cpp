@@ -232,8 +232,9 @@ void WindowSectionsModel::splitSection(int sectionIndex) noexcept {
   const int newIndex = qBound(0, sectionIndex + 1, mItems.count());
   std::shared_ptr<WindowSection> s =
       std::make_shared<WindowSection>(mApp, this);
-  connect(s.get(), &WindowSection::uiDataChanged, this,
-          [this, getSectionIndex]() { row_changed(getSectionIndex(sender())); });
+  connect(
+      s.get(), &WindowSection::uiDataChanged, this,
+      [this, getSectionIndex]() { row_changed(getSectionIndex(sender())); });
   connect(s.get(), &WindowSection::currentProjectChanged, this,
           &WindowSectionsModel::currentProjectChanged);
   connect(s.get(), &WindowSection::cursorCoordinatesChanged, this,
