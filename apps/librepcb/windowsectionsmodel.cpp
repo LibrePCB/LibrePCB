@@ -219,11 +219,21 @@ std::optional<ui::WindowSection> WindowSectionsModel::row_data(
  ******************************************************************************/
 
 void WindowSectionsModel::splitSection(int sectionIndex) noexcept {
+  auto getSectionIndex = [this](QObject* obj) {
+    const WindowSection* s = static_cast<WindowSection*>(obj);
+    for (int i = 0; i < mItems.count(); ++i) {
+      if (mItems.at(i).get() == s) {
+        return i;
+      }
+    }
+    return -1;
+  };
+
   const int newIndex = qBound(0, sectionIndex + 1, mItems.count());
   std::shared_ptr<WindowSection> s =
       std::make_shared<WindowSection>(mApp, this);
   connect(s.get(), &WindowSection::uiDataChanged, this,
-          [this, newIndex]() { row_changed(newIndex); });
+          [this, getSectionIndex]() { row_changed(getSectionIndex(sender())); });
   connect(s.get(), &WindowSection::currentProjectChanged, this,
           &WindowSectionsModel::currentProjectChanged);
   connect(s.get(), &WindowSection::cursorCoordinatesChanged, this,

@@ -1,0 +1,87 @@
+import { PanelHeader } from "./panelheader.slint";
+import { Data } from "./data.slint";
+import { Backend } from "./backend.slint";
+import { Button } from "std-widgets.slint";
+
+export component HelpPanel inherits Rectangle {
+    background: #2a2a2a;
+
+    VerticalLayout {
+        HorizontalLayout {
+            padding: 5px;
+
+            Text {
+                font-size: 23px;
+                vertical-alignment: center;
+                overflow: elide;
+                text: Data.window-title;
+            }
+
+            Image {
+                width: 40px;
+                height: self.width;
+                source: @image-url("../../../img/app/librepcb.svg");
+            }
+        }
+
+        Rectangle {
+            height: 1px;
+            background: #555555;
+        }
+
+        VerticalLayout {
+            padding: 5px;
+            spacing: 10px;
+
+            Text {
+                wrap: word-wrap;
+                text: @tr("LibrePCB is a free & open source schematic/layout-editor. It is mainly developed by Urban Bruhin, with the support of many other contributors.");
+            }
+
+            Text {
+                wrap: word-wrap;
+                font-italic: true;
+                text: @tr("This is free software, released under the GNU General Public License (GPL) version 3 or later. You can find the full license text in our source code.");
+            }
+        }
+
+        VerticalLayout {
+            padding: 5px;
+            spacing: 5px;
+
+            Button {
+                text: @tr("Website");
+            }
+
+            Button {
+                text: @tr("User Manual & Tutorials");
+            }
+
+            Button {
+                text: @tr("Source Code on GitHub");
+            }
+
+            Button {
+                text: @tr("Keyboard Shortcuts Reference");
+            }
+        }
+
+        Rectangle { }
+
+        PanelHeader {
+            title: @tr("Details");
+        }
+
+        VerticalLayout {
+            padding: 5px;
+
+            TextInput {
+                wrap: word-wrap;
+                font-family: "Noto Sans Mono";
+                font-size: 11px;
+                read-only: true;
+                text: Data.about-librepcb-details;
+            }
+        }
+    }
+}
