@@ -8,6 +8,7 @@ if(EXISTS "${SLINT_SUBMODULE_BASEPATH}"
   # Set compile options
   set(SLINT_FEATURE_BACKEND_QT ON)
   set(SLINT_FEATURE_BACKEND_WINIT OFF)
+  set(SLINT_FEATURE_GETTEXT ON)
 
   # Include local submodule
   set(BUILD_SHARED_LIBS ON)

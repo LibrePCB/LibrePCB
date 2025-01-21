@@ -1,0 +1,83 @@
+import { PanelHeader } from "../panelheader.slint";
+import { Data } from "../data.slint";
+import { Backend } from "../backend.slint";
+import { Button, CheckBox, ProgressIndicator, Spinner } from "std-widgets.slint";
+
+export component OrderPanel inherits Rectangle {
+    background: #2a2a2a;
+
+    VerticalLayout {
+        PanelHeader {
+            title: @tr("Order PCB");
+        }
+
+        VerticalLayout {
+            padding: 10px;
+            spacing: 10px;
+
+            Text {
+                wrap: word-wrap;
+                text: @tr("Order your currently opened board by one of our fabrication partners in a flash - just click the button to get started!");
+            }
+
+            CheckBox {
+                text: @tr("Open web browser after upload");
+            }
+
+            Button {
+                primary: true;
+                text: @tr("Upload Project");
+            }
+
+            ProgressIndicator {
+                progress: 0.5;
+            }
+
+            HorizontalLayout {
+                alignment: start;
+                spacing: 5px;
+
+                Spinner {
+                    width: self.height;
+                    height: t-check-availability.preferred-height;
+                    indeterminate: true;
+                }
+
+                t-check-availability := Text {
+                    font-italic: true;
+                    text: @tr("Checking availability") + "...";
+                }
+            }
+        }
+
+        Rectangle { }
+
+        PanelHeader {
+            title: @tr("Details");
+        }
+
+        VerticalLayout {
+            padding: 10px;
+            spacing: 10px;
+
+            Text {
+                wrap: word-wrap;
+                text: @tr("This tool helps you to quickly and easily get your designed PCB manufactured. The project directory will be exported to a *.lppz archive and uploaded it to the API server configured in your workspace settings. Afterwards you can continue the order process in the web browser, e.g. to choose the preferred manufacturing partner. Just try it!");
+            }
+        }
+
+        PanelHeader {
+            title: @tr("Privacy Policy");
+        }
+
+        VerticalLayout {
+            padding: 10px;
+            spacing: 10px;
+
+            Text {
+                wrap: word-wrap;
+                text: @tr("For more information about how the uploaded project gets processed, see %1.");
+            }
+        }
+    }
+}

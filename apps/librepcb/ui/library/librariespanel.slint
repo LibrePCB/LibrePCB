@@ -99,10 +99,12 @@ component LibraryList inherits ListView {
                                 width: 22px;
                                 height: self.width;
                                 border-radius: self.height / 2;
-                                background: ta-uninstall.has-hover ? #606060 : transparent;
                                 visible: buttons-visible && (lib.type != LibraryType.online);
 
                                 if self.visible: Image {
+                                    width: self.height;
+                                    height: 80%;
+                                    colorize: ta-uninstall.has-hover ? white : #d0d0d0;
                                     source: @image-url("../img/delete.svg");
                                     visible: buttons-visible && (lib.type != LibraryType.online);
                                 }

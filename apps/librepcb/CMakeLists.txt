@@ -77,6 +77,13 @@ target_link_libraries(
           ${QT}::Widgets
 )
 
+# Setup gettext
+find_package(Intl)
+target_link_libraries(
+  librepcb
+  PRIVATE Intl::Intl
+)
+
 # Install target
 install(
   TARGETS librepcb

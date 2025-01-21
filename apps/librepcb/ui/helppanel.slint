@@ -1,7 +1,8 @@
 import { PanelHeader } from "./panelheader.slint";
 import { Data } from "./data.slint";
 import { Backend } from "./backend.slint";
-import { Button } from "std-widgets.slint";
+import { Button, Palette } from "std-widgets.slint";
+import { ToolTip } from "./tooltip.slint";
 
 export component HelpPanel inherits Rectangle {
     background: #2a2a2a;
@@ -9,18 +10,19 @@ export component HelpPanel inherits Rectangle {
     VerticalLayout {
         HorizontalLayout {
             padding: 5px;
+            spacing: 10px;
+
+            Image {
+                width: 35px;
+                height: self.width;
+                source: @image-url("../../../img/app/librepcb.svg");
+            }
 
             Text {
                 font-size: 23px;
                 vertical-alignment: center;
                 overflow: elide;
                 text: Data.window-title;
-            }
-
-            Image {
-                width: 40px;
-                height: self.width;
-                source: @image-url("../../../img/app/librepcb.svg");
             }
         }
 
@@ -50,18 +52,30 @@ export component HelpPanel inherits Rectangle {
             spacing: 5px;
 
             Button {
+                width: self.preferred-width;
+                colorize-icon: true;
+                icon: @image-url("img/webbrowser.svg");
                 text: @tr("Website");
             }
 
             Button {
+                width: self.preferred-width;
+                colorize-icon: true;
+                icon: @image-url("img/documentation.svg");
                 text: @tr("User Manual & Tutorials");
             }
 
             Button {
+                width: self.preferred-width;
+                colorize-icon: true;
+                icon: @image-url("img/github.svg");
                 text: @tr("Source Code on GitHub");
             }
 
             Button {
+                width: self.preferred-width;
+                colorize-icon: true;
+                icon: @image-url("img/keyboard-shortcuts.svg");
                 text: @tr("Keyboard Shortcuts Reference");
             }
         }
@@ -70,6 +84,37 @@ export component HelpPanel inherits Rectangle {
 
         PanelHeader {
             title: @tr("Details");
+
+            Rectangle {
+                horizontal-stretch: 1;
+            }
+
+            Rectangle {
+                width: parent.content-height;
+                height: parent.content-height;
+                background: ta-copy.has-hover ? #454545 : transparent;
+                border-radius: 3px;
+
+                ta-copy := TouchArea {
+                    Image {
+                        y: 3px;
+                        width: self.height;
+                        height: parent.height - self.y * 2;
+                        source: @image-url("img/copy.svg");
+                        colorize: parent.has-hover ? white : Palette.foreground;
+                    }
+
+                    if self.has-hover: ToolTip {
+                        x: (parent.width / 2) - (self.width / 2);
+                        y: parent.height + 5px;
+                        text: @tr("Copy to Clipboard");
+                    }
+
+                    //clicked => {
+                    //    Backend.action-triggered(ActionId.download-library-tab-open, -1);
+                    //}
+                }
+            }
         }
 
         VerticalLayout {
