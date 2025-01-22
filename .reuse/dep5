@@ -154,6 +154,7 @@ Files:
  apps/librepcb/ui/img/draw-text.svg
  apps/librepcb/ui/img/edit.svg
  apps/librepcb/ui/img/github.svg
+ apps/librepcb/ui/img/check.svg
  apps/librepcb/ui/img/heart.svg
  apps/librepcb/ui/img/keyboard-shortcuts.svg
  apps/librepcb/ui/img/move.svg
