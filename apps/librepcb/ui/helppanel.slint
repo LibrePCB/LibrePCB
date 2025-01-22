@@ -85,8 +85,13 @@ export component HelpPanel inherits Rectangle {
         PanelHeader {
             title: @tr("Details");
 
-            Rectangle {
+            Text {
                 horizontal-stretch: 1;
+                font-size: 11px;
+                font-italic: true;
+                vertical-alignment: center;
+                overflow: elide;
+                text: @tr("(please copy this into bug reports)");
             }
 
             Rectangle {
@@ -96,23 +101,45 @@ export component HelpPanel inherits Rectangle {
                 border-radius: 3px;
 
                 ta-copy := TouchArea {
-                    Image {
-                        y: 3px;
+                    t-copy := Timer {
+                        interval: 1s;
+                        running: false;
+
+                        triggered => {
+                            i-copy.visible = true;
+                            i-copy-check.visible = false;
+                            self.running = false;
+                        }
+                    }
+
+                    i-copy := Image {
+                        y: parent.pressed ? 4px : 3px;
                         width: self.height;
                         height: parent.height - self.y * 2;
                         source: @image-url("img/copy.svg");
                         colorize: parent.has-hover ? white : Palette.foreground;
                     }
 
+                    i-copy-check := Image {
+                        y: 3px;
+                        width: self.height;
+                        height: parent.height - self.y * 2;
+                        source: @image-url("img/check.svg");
+                        colorize: lime;
+                        visible: false;
+                    }
+
                     if self.has-hover: ToolTip {
                         x: (parent.width / 2) - (self.width / 2);
                         y: parent.height + 5px;
-                        text: @tr("Copy to Clipboard");
+                        text: i-copy-check.visible ? @tr("Copied!") : @tr("Copy to Clipboard");
                     }
 
-                    //clicked => {
-                    //    Backend.action-triggered(ActionId.download-library-tab-open, -1);
-                    //}
+                    clicked => {
+                        i-copy.visible = false;
+                        i-copy-check.visible = true;
+                        t-copy.running = true;
+                    }
                 }
             }
         }
@@ -121,10 +148,11 @@ export component HelpPanel inherits Rectangle {
             padding: 5px;
 
             TextInput {
-                wrap: word-wrap;
                 font-family: "Noto Sans Mono";
                 font-size: 11px;
                 read-only: true;
+                single-line: false;
+                wrap: no-wrap;
                 text: Data.about-librepcb-details;
             }
         }

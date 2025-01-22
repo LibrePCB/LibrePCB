@@ -6,6 +6,34 @@ import { Button, CheckBox, ProgressIndicator, Spinner } from "std-widgets.slint"
 export component OrderPanel inherits Rectangle {
     background: #2a2a2a;
 
+    property <bool> initializing: true;
+    t-init := Timer {
+        interval: 2s;
+        running: true;
+
+        triggered => {
+            initializing = false;
+            btn-upload.enabled = true;
+            self.running = false;
+        }
+    }
+
+    t-upload := Timer {
+        interval: 20ms;
+        running: false;
+
+        triggered => {
+            if (pi-upload.progress < 1) {
+                pi-upload.progress += 0.01;
+            } else {
+                btn-upload.enabled = true;
+                pi-upload.visible = false;
+                t-status.text = "";
+                self.running = false;
+            }
+        }
+    }
+
     VerticalLayout {
         PanelHeader {
             title: @tr("Order PCB");
@@ -22,30 +50,41 @@ export component OrderPanel inherits Rectangle {
 
             CheckBox {
                 text: @tr("Open web browser after upload");
+                checked: true;
             }
 
-            Button {
+            btn-upload := Button {
                 primary: true;
+                enabled: false;
                 text: @tr("Upload Project");
+
+                clicked => {
+                    self.enabled = false;
+                    pi-upload.progress = 0;
+                    pi-upload.visible = true;
+                    t-upload.running = true;
+                    t-status.text = @tr("Uploading...");
+                }
             }
 
-            ProgressIndicator {
-                progress: 0.5;
+            pi-upload := ProgressIndicator {
+                visible: false;
             }
 
             HorizontalLayout {
                 alignment: start;
                 spacing: 5px;
 
-                Spinner {
+                if initializing: Spinner {
                     width: self.height;
-                    height: t-check-availability.preferred-height;
+                    height: t-status.preferred-height;
                     indeterminate: true;
                 }
 
-                t-check-availability := Text {
+                t-status := Text {
                     font-italic: true;
                     text: @tr("Checking availability") + "...";
+                    visible: initializing || pi-upload.visible;
                 }
             }
         }

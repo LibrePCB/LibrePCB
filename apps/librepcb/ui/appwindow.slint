@@ -60,7 +60,7 @@ export component AppWindow inherits Window {
     if Data.current-page == MainPage.libraries: LibrariesPanel {
         x: sidebar.width;
         y: sidebar.y;
-        z: 90;
+        z: 90; // For the tooltips.
         width: panel-width;
         height: sidebar.height;
     }
@@ -82,6 +82,7 @@ export component AppWindow inherits Window {
     if Data.current-page == MainPage.help: HelpPanel {
         x: sidebar.width;
         y: sidebar.y;
+        z: 90; // For the tooltips.
         width: panel-width;
         height: sidebar.height;
     }
