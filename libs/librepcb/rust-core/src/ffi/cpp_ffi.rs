@@ -162,3 +162,27 @@ pub fn from_qstring(obj: &QString) -> String {
 pub fn qstring_set(obj: &mut QString, s: &str) {
   unsafe { ffi_qstring_set(obj, s.as_ptr().cast(), s.len()) }
 }
+
+/// cbindgen:no-export
+#[doc(hidden)]
+pub struct QStringList;
+
+#[allow(improper_ctypes)]
+extern "C" {
+  fn ffi_qstringlist_len(obj: &QStringList) -> usize;
+  fn ffi_qstringlist_at(obj: &QStringList, index: usize) -> *const QString;
+}
+
+/// Convert `QStringList` to [`Vec<String>`]
+#[allow(dead_code)]
+pub fn from_qstringlist(obj: &QStringList) -> Vec<String> {
+  let mut vec = Vec::new();
+  unsafe {
+    for i in 0..ffi_qstringlist_len(obj) {
+      let s = ffi_qstringlist_at(obj, i);
+      assert!(!s.is_null());
+      vec.push(from_qstring(&*s));
+    }
+  }
+  vec
+}

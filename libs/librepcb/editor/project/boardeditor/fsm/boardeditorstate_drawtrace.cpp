@@ -425,9 +425,9 @@ bool BoardEditorState_DrawTrace::startPositioning(
         mCurrentNetSegment = segment;
       }
       if ((!fixedPad->isOnLayer(*layer)) &&
-          board.getCopperLayers().contains(&fixedPad->getSmtLayer())) {
+          board.getCopperLayers().contains(&fixedPad->getSolderLayer())) {
         Q_ASSERT(!fixedPad->getLibPad().isTht());
-        layer = &fixedPad->getSmtLayer();
+        layer = &fixedPad->getSolderLayer();
       }
       netsignal = fixedPad->getCompSigInstNetSignal();
       if (!netsignal) {
@@ -464,7 +464,7 @@ bool BoardEditorState_DrawTrace::startPositioning(
         throwPadNotConnectedException();
       }
       if (!pad->getPad().getLibPad().isTht()) {
-        layer = &pad->getPad().getSmtLayer();
+        layer = &pad->getPad().getSolderLayer();
       }
     } else if (auto netline = std::dynamic_pointer_cast<BGI_NetLine>(item)) {
       // split netline

@@ -115,17 +115,23 @@ FootprintPad::ComponentSide BI_FootprintPad::getComponentSide() const noexcept {
   }
 }
 
-const Layer& BI_FootprintPad::getSmtLayer() const noexcept {
-  return (getComponentSide() == FootprintPad::ComponentSide::Bottom)
-      ? Layer::botCopper()
-      : Layer::topCopper();
+const Layer& BI_FootprintPad::getSolderLayer() const noexcept {
+  if (mFootprintPad->isTht()) {
+    return (getComponentSide() == FootprintPad::ComponentSide::Bottom)
+        ? Layer::topCopper()
+        : Layer::botCopper();
+  } else {
+    return (getComponentSide() == FootprintPad::ComponentSide::Bottom)
+        ? Layer::botCopper()
+        : Layer::topCopper();
+  }
 }
 
 bool BI_FootprintPad::isOnLayer(const Layer& layer) const noexcept {
   if (mFootprintPad->isTht()) {
     return layer.isCopper();
   } else {
-    return layer == getSmtLayer();
+    return layer == getSolderLayer();
   }
 }
 
@@ -192,7 +198,7 @@ void BI_FootprintPad::registerNetLine(BI_NetLine& netline) {
                 "of device \"%3\" (%4) since it is on layer \"%5\".")
             .arg(netline.getLayer().getNameTr(), getPadNameOrUuid(),
                  getComponentInstanceName(), getLibraryDeviceName(),
-                 getSmtLayer().getNameTr()));
+                 getSolderLayer().getNameTr()));
   }
   foreach (const BI_NetLine* l, mRegisteredNetLines) {
     if (&l->getNetSegment() != &netline.getNetSegment()) {
@@ -341,7 +347,7 @@ void BI_FootprintPad::invalidatePlanes() noexcept {
   if (mFootprintPad->isTht()) {
     mBoard.invalidatePlanes();
   } else {
-    mBoard.invalidatePlanes(&getSmtLayer());
+    mBoard.invalidatePlanes(&getSolderLayer());
   }
 }
 

@@ -45,6 +45,7 @@ class CopyOutputJob;
 class GerberExcellonOutputJob;
 class GerberX3OutputJob;
 class GraphicsOutputJob;
+class InteractiveHtmlBomOutputJob;
 class LppzOutputJob;
 class NetlistOutputJob;
 class OutputDirectoryWriter;
@@ -102,6 +103,7 @@ private:  // Methods
   void runImpl(const GerberX3OutputJob& job);
   void runImpl(const NetlistOutputJob& job);
   void runImpl(const BomOutputJob& job);
+  void runImpl(const InteractiveHtmlBomOutputJob& job);
   void runImpl(const Board3DOutputJob& job);
   void runImpl(const ProjectJsonOutputJob& job);
   void runImpl(const LppzOutputJob& job);

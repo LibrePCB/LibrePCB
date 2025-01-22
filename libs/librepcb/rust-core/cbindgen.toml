@@ -10,5 +10,9 @@ sys_includes = ["QtCore"]
 trailer = "// clang-format on"
 usize_is_size_t = true
 
+[parse]
+parse_deps = true
+include = ["interactive-html-bom"]
+
 [ptr]
 non_null_attribute = " NONNULL"

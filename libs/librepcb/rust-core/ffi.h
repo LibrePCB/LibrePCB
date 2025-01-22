@@ -16,6 +16,194 @@ namespace librepcb {
 namespace rs {
 
 /**
+ * Wrapper for [DrawingKind]
+ */
+enum class InteractiveHtmlBomDrawingKind {
+  /**
+   * Polygon
+   */
+  Polygon,
+  /**
+   * Component reference designator text
+   */
+  ReferenceText,
+  /**
+   * Component value text
+   */
+  ValueText,
+};
+
+/**
+ * Wrapper for [DrawingLayer]
+ */
+enum class InteractiveHtmlBomDrawingLayer {
+  /**
+   * PCB edge
+   */
+  Edge,
+  /**
+   * Silkscreen front
+   */
+  SilkscreenFront,
+  /**
+   * Silkscreen back
+   */
+  SilkscreenBack,
+  /**
+   * Fabrication front
+   */
+  FabricationFront,
+  /**
+   * Fabrication back
+   */
+  FabricationBack,
+};
+
+/**
+ * Wrapper for [HighlightPin1Mode]
+ */
+enum class InteractiveHtmlBomHighlightPin1Mode {
+  /**
+   * No pins
+   */
+  None,
+  /**
+   * Selected pins
+   */
+  Selected,
+  /**
+   * All pins
+   */
+  All,
+};
+
+/**
+ * Wrapper for [Layer]
+ */
+enum class InteractiveHtmlBomLayer {
+  /**
+   * Front layer
+   */
+  Front,
+  /**
+   * Back layer
+   */
+  Back,
+};
+
+/**
+ * Enum to define board side(s)
+ */
+enum class InteractiveHtmlBomSides {
+  /**
+   * Front
+   */
+  Front,
+  /**
+   * Back
+   */
+  Back,
+  /**
+   * Front + Back
+   */
+  Both,
+};
+
+/**
+ * Wrapper for [ViewMode]
+ */
+enum class InteractiveHtmlBomViewMode {
+  /**
+   * BOM only
+   */
+  BomOnly,
+  /**
+   * BOM left, drawings right
+   */
+  LeftRight,
+  /**
+   * BOM top, drawings bottom
+   */
+  TopBottom,
+};
+
+/**
+ * Interactive HTML BOM structure
+ *
+ * The top-level structure to build & generate a HTML BOM.
+ *
+ * <div class="warning">
+ * Please note that this struct is not completely fool-proof as it does not
+ * validate lots of the added data. So make sure you add only valid BOM data.
+ * Only the most important things are validated to avoid generating completely
+ * broken HTML pages: Footprint IDs in BOM rows, and number of fields in
+ * footprints.
+ * </div>
+ *
+ * # Examples
+ *
+ * ```
+ * use interactive_html_bom::*;
+ *
+ * let mut ibom = InteractiveHtmlBom::new(
+ *   "My Project",   // Title
+ *   "My Company",   // Company
+ *   "Rev. 1",       // Revision
+ *   "1970-01-01",   // Date
+ *   (0.0, 0.0),     // Bottom left
+ *   (100.0, 80.0),  // Top right
+ * );
+ *
+ * // Set configuration.
+ * ibom.fields = vec!["Value".into(), "Footprint".into()];
+ *
+ * // Draw PCB.
+ * ibom.drawings.push(Drawing::new(
+ *   DrawingKind::Polygon,             // Kind of drawing
+ *   DrawingLayer::Edge,               // Layer
+ *   "M 0 0 H 100 V 80 H -100 V -80",  // SVG path
+ *   0.1,                              // Line width
+ *   false,                            // Filled
+ * ));
+ * ibom.drawings.push(Drawing::new(
+ *   DrawingKind::ReferenceText,
+ *   DrawingLayer::SilkscreenFront,
+ *   "M 10 10 H 80 V 60 H -80 V -60",
+ *   0.1,
+ *   false,
+ * ));
+ *
+ * // Add footprints.
+ * let id = ibom.add_footprint(
+ *   Footprint::new(
+ *     Layer::Front,                       // Layer
+ *     (50.0, 40.0),                       // Position
+ *     45.0,                               // Rotation
+ *     (-2.0, -1.0),                       // Bottom left
+ *     (2.0, 1.0),                         // Top right
+ *     &["100R".into(), "0603".into()],    // Fields
+ *     &[Pad::new(
+ *         &[Layer::Front],                // Pad layers
+ *         (-2.0, 0.0),                    // Pad position
+ *         0.0,                            // Pad rotation
+ *         "M -1 -1 H 2 V 2 H -2 V -2",    // Pad shape (SVG)
+ *         None,                           // Pad drill
+ *         None,                           // Pad net
+ *         true,                           // Pin 1
+ *       ),
+ *       // [...]
+ *     ],
+ *     true,                               // Mount or not
+ *   ),
+ * );
+ *
+ * // Add BOM rows (designators and their footprint IDs).
+ * ibom.bom_front.push(vec![RefMap::new("R1", id)]);
+ * ```
+ */
+struct InteractiveHtmlBom;
+
+/**
  * Wrapper type for [Archive]
  */
 struct ZipArchive;
@@ -24,6 +212,70 @@ struct ZipArchive;
  * Wrapper type for [Writer]
  */
 struct ZipWriter;
+
+/**
+ * Wrapper for [Pad]
+ */
+struct InteractiveHtmlBomPad {
+  /**
+   * Visible on front side
+   */
+  bool front;
+  /**
+   * Visible on back side
+   */
+  bool back;
+  /**
+   * Position X
+   */
+  float pos_x;
+  /**
+   * Position Y
+   */
+  float pos_y;
+  /**
+   * Rotation angle
+   */
+  float angle;
+  /**
+   * SVG path
+   */
+  const QString *svgpath;
+  /**
+   * Has drill
+   */
+  bool has_drill;
+  /**
+   * Drill width
+   */
+  float drillsize_x;
+  /**
+   * Drill height
+   */
+  float drillsize_y;
+  /**
+   * Net name (optional)
+   */
+  const QString *net;
+  /**
+   * Pin-1 or not
+   */
+  bool pin1;
+};
+
+/**
+ * Wrapper for [RefMap]
+ */
+struct InteractiveHtmlBomRefMap {
+  /**
+   * Part reference
+   */
+  const QString *reference;
+  /**
+   * Footprint ID
+   */
+  size_t id;
+};
 
 extern "C" {
 
@@ -42,6 +294,147 @@ extern size_t ffi_qstring_len(const QString * NONNULL obj);
 extern const uint16_t *ffi_qstring_utf16(const QString * NONNULL obj);
 
 extern void ffi_qstring_set(QString * NONNULL obj, const char *s, size_t len);
+
+extern size_t ffi_qstringlist_len(const QStringList * NONNULL obj);
+
+extern const QString *ffi_qstringlist_at(const QStringList * NONNULL obj,
+                                         size_t index);
+
+/**
+ * Create a new [InteractiveHtmlBom] object
+ */
+InteractiveHtmlBom *ffi_ibom_new(const QString * NONNULL title,
+                                 const QString * NONNULL company,
+                                 const QString * NONNULL revision,
+                                 const QString * NONNULL date,
+                                 float bottom_left_x,
+                                 float bottom_left_y,
+                                 float top_right_x,
+                                 float top_right_y);
+
+/**
+ * Delete [InteractiveHtmlBom] object
+ */
+void ffi_ibom_delete(InteractiveHtmlBom *obj);
+
+/**
+ * Wrapper to set [InteractiveHtmlBom::view_mode],
+ * [InteractiveHtmlBom::dark_mode] and [InteractiveHtmlBom::highlight_pin1]
+ */
+void ffi_ibom_set_view_config(InteractiveHtmlBom * NONNULL obj,
+                              InteractiveHtmlBomViewMode mode,
+                              InteractiveHtmlBomHighlightPin1Mode highlight_pin1,
+                              bool dark);
+
+/**
+ * Wrapper to set [InteractiveHtmlBom::board_rotation] and
+ * [InteractiveHtmlBom::offset_back_rotation]
+ */
+void ffi_ibom_set_rotation(InteractiveHtmlBom * NONNULL obj,
+                           float angle,
+                           bool offset_back);
+
+/**
+ * Wrapper to set [InteractiveHtmlBom::show_silkscreen]
+ */
+void ffi_ibom_set_show_silkscreen(InteractiveHtmlBom * NONNULL obj, bool show);
+
+/**
+ * Wrapper to set [InteractiveHtmlBom::show_fabrication]
+ */
+void ffi_ibom_set_show_fabrication(InteractiveHtmlBom * NONNULL obj, bool show);
+
+/**
+ * Wrapper to set [InteractiveHtmlBom::show_pads]
+ */
+void ffi_ibom_set_show_pads(InteractiveHtmlBom * NONNULL obj, bool show);
+
+/**
+ * Wrapper to set [InteractiveHtmlBom::checkboxes]
+ */
+void ffi_ibom_set_checkboxes(InteractiveHtmlBom * NONNULL obj,
+                             const QStringList * NONNULL checkboxes);
+
+/**
+ * Wrapper to set [InteractiveHtmlBom::fields]
+ */
+void ffi_ibom_set_fields(InteractiveHtmlBom * NONNULL obj,
+                         const QStringList * NONNULL fields);
+
+/**
+ * Wrapper for adding a drawing to [InteractiveHtmlBom::drawings]
+ */
+void ffi_ibom_add_drawing(InteractiveHtmlBom * NONNULL obj,
+                          InteractiveHtmlBomDrawingKind kind,
+                          InteractiveHtmlBomDrawingLayer layer,
+                          const QString * NONNULL svgpath,
+                          float width,
+                          bool filled);
+
+/**
+ * Wrapper for [InteractiveHtmlBom::add_footprint]
+ */
+size_t ffi_ibom_add_footprint(InteractiveHtmlBom * NONNULL obj,
+                              InteractiveHtmlBomLayer layer,
+                              float pos_x,
+                              float pos_y,
+                              float angle,
+                              float bottom_left_x,
+                              float bottom_left_y,
+                              float top_right_x,
+                              float top_right_y,
+                              bool mount,
+                              const QStringList * NONNULL fields,
+                              const InteractiveHtmlBomPad *pads_array,
+                              size_t pads_size);
+
+/**
+ * Wrapper to add BOM lines to [InteractiveHtmlBom::bom_front],
+ * [InteractiveHtmlBom::bom_back] or [InteractiveHtmlBom::bom_both]
+ */
+void ffi_ibom_add_bom_line(InteractiveHtmlBom * NONNULL obj,
+                           InteractiveHtmlBomSides sides,
+                           const InteractiveHtmlBomRefMap *parts_array,
+                           size_t parts_size);
+
+/**
+ * Wrapper for adding a track to [InteractiveHtmlBom::tracks]
+ */
+void ffi_ibom_add_track(InteractiveHtmlBom * NONNULL obj,
+                        InteractiveHtmlBomLayer layer,
+                        float start_x,
+                        float start_y,
+                        float end_x,
+                        float end_y,
+                        float width,
+                        const QString *net_name);
+
+/**
+ * Wrapper for adding a via to [InteractiveHtmlBom::vias]
+ */
+void ffi_ibom_add_via(InteractiveHtmlBom * NONNULL obj,
+                      const InteractiveHtmlBomLayer *layers_array,
+                      size_t layers_size,
+                      float pos_x,
+                      float pos_y,
+                      float diameter,
+                      float drill_diameter,
+                      const QString *net_name);
+
+/**
+ * Wrapper for adding a zone to [InteractiveHtmlBom::zones]
+ */
+void ffi_ibom_add_zone(InteractiveHtmlBom * NONNULL obj,
+                       InteractiveHtmlBomLayer layer,
+                       const QString * NONNULL svgpath,
+                       const QString *net_name);
+
+/**
+ * Wrapper for [InteractiveHtmlBom::generate_html]
+ */
+bool ffi_ibom_generate_html(const InteractiveHtmlBom * NONNULL obj,
+                            QString * NONNULL out,
+                            QString * NONNULL err);
 
 /**
  * Wrapper for [increment_number_in_string]

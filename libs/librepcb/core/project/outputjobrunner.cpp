@@ -28,6 +28,7 @@
 #include "../export/bomcsvwriter.h"
 #include "../export/graphicsexport.h"
 #include "../export/graphicsexportsettings.h"
+#include "../export/interactivehtmlbom.h"
 #include "../export/pickplacecsvwriter.h"
 #include "../fileio/csvfile.h"
 #include "../fileio/fileutils.h"
@@ -40,6 +41,7 @@
 #include "../job/gerberexcellonoutputjob.h"
 #include "../job/gerberx3outputjob.h"
 #include "../job/graphicsoutputjob.h"
+#include "../job/interactivehtmlbomoutputjob.h"
 #include "../job/lppzoutputjob.h"
 #include "../job/netlistoutputjob.h"
 #include "../job/pickplaceoutputjob.h"
@@ -49,6 +51,7 @@
 #include "board/boardd356netlistexport.h"
 #include "board/boardfabricationoutputsettings.h"
 #include "board/boardgerberexport.h"
+#include "board/boardinteractivehtmlbomgenerator.h"
 #include "board/boardpainter.h"
 #include "board/boardpickplacegenerator.h"
 #include "board/realisticboardpainter.h"
@@ -219,9 +222,7 @@ GraphicsExport::Pages OutputJobRunner::buildPages(
 
 void OutputJobRunner::run(const OutputJob& job) {
   const int countBefore = mWriter->getWrittenFiles().count(job.getUuid());
-  if (auto ptr = dynamic_cast<const BomOutputJob*>(&job)) {
-    runImpl(*ptr);
-  } else if (auto ptr = dynamic_cast<const GraphicsOutputJob*>(&job)) {
+  if (auto ptr = dynamic_cast<const GraphicsOutputJob*>(&job)) {
     runImpl(*ptr);
   } else if (auto ptr = dynamic_cast<const GerberExcellonOutputJob*>(&job)) {
     runImpl(*ptr);
@@ -230,6 +231,11 @@ void OutputJobRunner::run(const OutputJob& job) {
   } else if (auto ptr = dynamic_cast<const GerberX3OutputJob*>(&job)) {
     runImpl(*ptr);
   } else if (auto ptr = dynamic_cast<const NetlistOutputJob*>(&job)) {
+    runImpl(*ptr);
+  } else if (auto ptr = dynamic_cast<const BomOutputJob*>(&job)) {
+    runImpl(*ptr);
+  } else if (auto ptr =
+                 dynamic_cast<const InteractiveHtmlBomOutputJob*>(&job)) {
     runImpl(*ptr);
   } else if (auto ptr = dynamic_cast<const Board3DOutputJob*>(&job)) {
     runImpl(*ptr);
@@ -507,6 +513,51 @@ void OutputJobRunner::runImpl(const BomOutputJob& job) {
         throw RuntimeError(
             __FILE__, __LINE__,
             QString("Unsupported BOM format: '%1'").arg(fp.getSuffix()));
+      }
+    }
+  }
+}
+
+void OutputJobRunner::runImpl(const InteractiveHtmlBomOutputJob& job) {
+  const QList<Board*> boards = getBoards(job.getBoards());
+  const QVector<std::shared_ptr<AssemblyVariant>> assemblyVariants =
+      getAssemblyVariants(job.getAssemblyVariants());
+
+  foreach (const Board* board, boards) {
+    foreach (const std::shared_ptr<AssemblyVariant>& av, assemblyVariants) {
+      const ProjectAttributeLookup lookup = board
+          ? ProjectAttributeLookup(*board, av)
+          : ProjectAttributeLookup(mProject, av);
+      const FilePath fp = mWriter->beginWritingFile(
+          job.getUuid(),
+          AttributeSubstitutor::substitute(
+              job.getOutputPath(), lookup, [&](const QString& str) {
+                return FilePath::cleanFileName(
+                    str, FilePath::ReplaceSpaces | FilePath::KeepCase);
+              }));  // can throw
+
+      if ((fp.getSuffix().toLower() == "html") ||
+          (fp.getSuffix().toLower() == "htm") ||
+          (fp.getSuffix().toLower() == "xhtml")) {
+        BoardInteractiveHtmlBomGenerator gen(*board, av);
+        gen.setCustomAttributes(job.getCustomAttributes());
+        gen.setComponentOrder(job.getComponentOrder());
+        std::shared_ptr<InteractiveHtmlBom> ibom =
+            gen.generate(QDateTime::currentDateTime());  // can throw
+        ibom->setViewConfig(job.getViewMode(), job.getHighlightPin1(),
+                            job.getDarkMode());
+        ibom->setBoardRotation(job.getBoardRotation(),
+                               job.getOffsetBackRotation());
+        ibom->setShowSilkscreen(job.getShowSilkscreen());
+        ibom->setShowFabrication(job.getShowFabrication());
+        ibom->setShowPads(job.getShowPads());
+        ibom->setCheckBoxes(job.getCheckBoxes());
+        const QString html = ibom->generateHtml();  // can throw
+        FileUtils::writeFile(fp, html.toUtf8());  // can throw
+      } else {
+        throw RuntimeError(__FILE__, __LINE__,
+                           QString("Unsupported interactive BOM format: '%1'")
+                               .arg(fp.getSuffix()));
       }
     }
   }

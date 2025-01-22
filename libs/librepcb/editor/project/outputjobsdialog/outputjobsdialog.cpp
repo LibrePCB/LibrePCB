@@ -33,6 +33,7 @@
 #include "gerberexcellonoutputjobwidget.h"
 #include "gerberx3outputjobwidget.h"
 #include "graphicsoutputjobwidget.h"
+#include "interactivehtmlbomoutputjobwidget.h"
 #include "lppzoutputjobwidget.h"
 #include "netlistoutputjobwidget.h"
 #include "outputjobhomewidget.h"
@@ -51,6 +52,7 @@
 #include <librepcb/core/job/gerberexcellonoutputjob.h>
 #include <librepcb/core/job/gerberx3outputjob.h>
 #include <librepcb/core/job/graphicsoutputjob.h>
+#include <librepcb/core/job/interactivehtmlbomoutputjob.h>
 #include <librepcb/core/job/lppzoutputjob.h>
 #include <librepcb/core/job/netlistoutputjob.h>
 #include <librepcb/core/job/pickplaceoutputjob.h>
@@ -248,6 +250,10 @@ void OutputJobsDialog::addClicked() noexcept {
   menu.addAction(QIcon(":/img/actions/generate_bom.png"),
                  escape(BomOutputJob::getTypeTrStatic()),
                  [&]() { add(std::make_shared<BomOutputJob>()); });
+  menu.addAction(QIcon(":/img/actions/generate_ibom.png"),
+                 escape(InteractiveHtmlBomOutputJob::getTypeTrStatic()), [&]() {
+                   add(std::make_shared<InteractiveHtmlBomOutputJob>());
+                 });
   menu.addAction(QIcon(":/img/actions/export_step.png"),
                  escape(Board3DOutputJob::getTypeTrStatic()),
                  [&]() { add(std::make_shared<Board3DOutputJob>()); });
@@ -514,6 +520,11 @@ void OutputJobsDialog::currentItemChanged(QListWidgetItem* current,
         mUi->scrollArea->setWidget(new NetlistOutputJobWidget(mProject, j));
       } else if (auto j = std::dynamic_pointer_cast<BomOutputJob>(job)) {
         mUi->scrollArea->setWidget(new BomOutputJobWidget(mProject, j));
+      } else if (auto j =
+                     std::dynamic_pointer_cast<InteractiveHtmlBomOutputJob>(
+                         job)) {
+        mUi->scrollArea->setWidget(
+            new InteractiveHtmlBomOutputJobWidget(mProject, j));
       } else if (auto j = std::dynamic_pointer_cast<Board3DOutputJob>(job)) {
         mUi->scrollArea->setWidget(new Board3DOutputJobWidget(mProject, j));
       } else if (auto j =

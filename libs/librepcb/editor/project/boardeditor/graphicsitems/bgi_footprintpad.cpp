@@ -149,7 +149,7 @@ void BGI_FootprintPad::updateLayer() noexcept {
   if (mPad.getLibPad().isTht()) {
     setZValue(BoardGraphicsScene::ZValue_FootprintPadsTop);
     mGraphicsItem->setLayer(Theme::Color::sBoardPads);
-  } else if (mPad.getSmtLayer() == Layer::topCopper()) {
+  } else if (mPad.getSolderLayer() == Layer::topCopper()) {
     setZValue(BoardGraphicsScene::ZValue_FootprintPadsTop);
     mGraphicsItem->setLayer(Theme::Color::sBoardCopperTop);
   } else {
