@@ -154,6 +154,7 @@ component LibraryList inherits ListView {
 
                                 StandardButton {
                                     kind: yes;
+
                                     clicked => {
                                         Backend.uninstall-library(lib.id);
                                     }

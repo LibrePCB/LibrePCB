@@ -31,7 +31,7 @@ export global Data {
 
     in-out property <bool> locked: true;
 
-    in-out property <MainPage> current-page: MainPage.order;
+    in-out property <MainPage> current-page: MainPage.libraries;
 
     in property <[FolderTreeItem]> workspace-folder: [
         {
@@ -90,6 +90,154 @@ export global Data {
     in property <int> checked-libraries: 3;
 
     in property <[Library]> libraries: [
+        {
+            name: "My Library",
+            description: "My own local library.",
+            version: "v1.0",
+            icon: @image-url("img/library.png"),
+            type: LibraryType.local,
+            state: LibraryState.unknown,
+        },
+        {
+            name: "LibrePCB Base",
+            description: "Official LibrePCB Base Library",
+            version: "v1.2.3",
+            icon: @image-url("img/librepcb.png"),
+            type: LibraryType.remote,
+            state: LibraryState.up-to-date,
+        },
+        {
+            name: "Microchip Technology / Atmel",
+            description: "Integrated circuits and more (unofficial).",
+            version: "v0.5",
+            icon: @image-url("img/microchip.png"),
+            type: LibraryType.remote,
+            state: LibraryState.outdated,
+        },
+        {
+            name: "LibrePCB Integrated Circuits",
+            description: "Official LibrePCB Integrated Circuits Library",
+            icon: @image-url("img/librepcb.png"),
+            type: LibraryType.online,
+        },
+        {
+            name: "Microchip Technology / Atmel",
+            description: "Integrated circuits and more (unofficial).",
+            icon: @image-url("img/microchip.png"),
+            type: LibraryType.online,
+            progress: 42,
+        },
+        {
+            name: "My Library",
+            description: "My own local library.",
+            version: "v1.0",
+            icon: @image-url("img/library.png"),
+            type: LibraryType.local,
+            state: LibraryState.unknown,
+        },
+        {
+            name: "LibrePCB Base",
+            description: "Official LibrePCB Base Library",
+            version: "v1.2.3",
+            icon: @image-url("img/librepcb.png"),
+            type: LibraryType.remote,
+            state: LibraryState.up-to-date,
+        },
+        {
+            name: "Microchip Technology / Atmel",
+            description: "Integrated circuits and more (unofficial).",
+            version: "v0.5",
+            icon: @image-url("img/microchip.png"),
+            type: LibraryType.remote,
+            state: LibraryState.outdated,
+        },
+        {
+            name: "LibrePCB Integrated Circuits",
+            description: "Official LibrePCB Integrated Circuits Library",
+            icon: @image-url("img/librepcb.png"),
+            type: LibraryType.online,
+        },
+        {
+            name: "Microchip Technology / Atmel",
+            description: "Integrated circuits and more (unofficial).",
+            icon: @image-url("img/microchip.png"),
+            type: LibraryType.online,
+            progress: 42,
+        },
+        {
+            name: "My Library",
+            description: "My own local library.",
+            version: "v1.0",
+            icon: @image-url("img/library.png"),
+            type: LibraryType.local,
+            state: LibraryState.unknown,
+        },
+        {
+            name: "LibrePCB Base",
+            description: "Official LibrePCB Base Library",
+            version: "v1.2.3",
+            icon: @image-url("img/librepcb.png"),
+            type: LibraryType.remote,
+            state: LibraryState.up-to-date,
+        },
+        {
+            name: "Microchip Technology / Atmel",
+            description: "Integrated circuits and more (unofficial).",
+            version: "v0.5",
+            icon: @image-url("img/microchip.png"),
+            type: LibraryType.remote,
+            state: LibraryState.outdated,
+        },
+        {
+            name: "LibrePCB Integrated Circuits",
+            description: "Official LibrePCB Integrated Circuits Library",
+            icon: @image-url("img/librepcb.png"),
+            type: LibraryType.online,
+        },
+        {
+            name: "Microchip Technology / Atmel",
+            description: "Integrated circuits and more (unofficial).",
+            icon: @image-url("img/microchip.png"),
+            type: LibraryType.online,
+            progress: 42,
+        },
+        {
+            name: "My Library",
+            description: "My own local library.",
+            version: "v1.0",
+            icon: @image-url("img/library.png"),
+            type: LibraryType.local,
+            state: LibraryState.unknown,
+        },
+        {
+            name: "LibrePCB Base",
+            description: "Official LibrePCB Base Library",
+            version: "v1.2.3",
+            icon: @image-url("img/librepcb.png"),
+            type: LibraryType.remote,
+            state: LibraryState.up-to-date,
+        },
+        {
+            name: "Microchip Technology / Atmel",
+            description: "Integrated circuits and more (unofficial).",
+            version: "v0.5",
+            icon: @image-url("img/microchip.png"),
+            type: LibraryType.remote,
+            state: LibraryState.outdated,
+        },
+        {
+            name: "LibrePCB Integrated Circuits",
+            description: "Official LibrePCB Integrated Circuits Library",
+            icon: @image-url("img/librepcb.png"),
+            type: LibraryType.online,
+        },
+        {
+            name: "Microchip Technology / Atmel",
+            description: "Integrated circuits and more (unofficial).",
+            icon: @image-url("img/microchip.png"),
+            type: LibraryType.online,
+            progress: 42,
+        },
         {
             name: "My Library",
             description: "My own local library.",
