@@ -1,9 +1,9 @@
 import { Button, LineEdit, CheckBox } from "std-widgets.slint";
-import { LineEdit } from "../lineedit.slint";
-import { Data } from "../data.slint";
-import { Backend } from "../backend.slint";
-import { ToolTip } from "../tooltip.slint";
-import { WindowSection, CreateLibraryTabData, ActionId } from "../types.slint";
+import { LineEdit } from "../common/lineedit.slint";
+import { Data } from "../api/data.slint";
+import { Backend } from "../api/backend.slint";
+import { ToolTip } from "../common/tooltip.slint";
+import { WindowSection, CreateLibraryTabData, ActionId } from "../api/types.slint";
 
 export component CreateLibraryTab inherits Rectangle {
     in property <int> section-index;

@@ -1,8 +1,8 @@
 import { ListView } from "std-widgets.slint";
-import { PanelHeader } from "./panelheader.slint";
-import { FolderTreeItem } from "./types.slint";
-import { Backend } from "./backend.slint";
-import { Data } from "./data.slint";
+import { PanelHeader } from "./common/panelheader.slint";
+import { FolderTreeItem } from "./api/types.slint";
+import { Backend } from "./api/backend.slint";
+import { Data } from "./api/data.slint";
 
 component FolderTree inherits ListView {
     property <int> current-index: -1;

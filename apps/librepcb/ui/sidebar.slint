@@ -1,6 +1,8 @@
 import { SideBarButton } from "./sidebarbutton.slint";
-import { MainPage } from "./types.slint";
-import { Data } from "./data.slint";
+import { MainPage } from "./api/types.slint";
+import { Data } from "./api/data.slint";
+import { ActionId } from "./api/types.slint";
+import { Backend } from "./api/backend.slint";
 
 export component SideBar inherits Rectangle {
     background: #353535;
@@ -85,9 +87,9 @@ export component SideBar inherits Rectangle {
         SideBarButton {
             icon: @image-url("img/settings.svg");
             tooltip: "Preferences";
-            checked: Data.current-page == MainPage.preferences;
+            checked: false;
             clicked => {
-                Data.current-page = MainPage.preferences;
+                Backend.action-triggered(ActionId.open-workspace-settings, -1);
             }
         }
 

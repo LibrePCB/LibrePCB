@@ -1,6 +1,6 @@
-import { PanelHeader } from "./panelheader.slint";
-import { Data } from "./data.slint";
-import { Backend } from "./backend.slint";
+import { PanelHeader } from "../common/panelheader.slint";
+import { Data } from "../api/data.slint";
+import { Backend } from "../api/backend.slint";
 
 component ProjectItem inherits Rectangle {
     in property <string> text <=> t-title.text;

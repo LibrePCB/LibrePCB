@@ -1,6 +1,6 @@
 import { LineEdit, VerticalBox } from "std-widgets.slint";
-import { EditParseResult } from "./types.slint";
-import { Backend } from "./backend.slint";
+import { EditParseResult } from "../api/types.slint";
+import { Backend } from "../api/backend.slint";
 
 export component UpDownButton inherits Rectangle {
     in property <string> text <=> t-title.text;

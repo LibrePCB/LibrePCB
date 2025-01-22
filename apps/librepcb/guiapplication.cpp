@@ -35,8 +35,10 @@
 #include <librepcb/core/types/lengthunit.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
+#include <librepcb/editor/workspace/workspacesettingsdialog.h>
 
 #include <QtCore>
+#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace
@@ -71,7 +73,11 @@ bool GuiApplication::actionTriggered(ui::ActionId id,
                                      int sectionIndex) noexcept {
   Q_UNUSED(sectionIndex);
 
-  if (id == ui::ActionId::WindowNew) {
+  if (id == ui::ActionId::OpenWorkspaceSettings) {
+    WorkspaceSettingsDialog dlg(mWorkspace, qApp->activeWindow());
+    dlg.exec();
+    return true;
+  } else if (id == ui::ActionId::WindowNew) {
     createNewWindow();
     return true;
   } else if (id == ui::ActionId::LibraryPanelEnsurePopulated) {
@@ -81,6 +87,7 @@ bool GuiApplication::actionTriggered(ui::ActionId id,
     mLibraries->installCheckedLibraries();
     return true;
   }
+
   return false;
 }
 

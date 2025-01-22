@@ -1,7 +1,7 @@
 import { Button, CheckBox, ProgressIndicator } from "std-widgets.slint";
-import { LineEdit } from "../lineedit.slint";
-import { WindowSection, DownloadLibraryTabData, ActionId } from "../types.slint";
-import { Backend } from "../backend.slint";
+import { LineEdit } from "../common/lineedit.slint";
+import { WindowSection, DownloadLibraryTabData, ActionId } from "../api/types.slint";
+import { Backend } from "../api/backend.slint";
 
 export component DownloadLibraryTab inherits Rectangle {
     in property <int> section-index;

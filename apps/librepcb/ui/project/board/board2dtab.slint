@@ -1,18 +1,25 @@
-import { WindowSection, Tab, Board3dTabData } from "../types.slint";
-import { SceneButton } from "../scenebutton.slint";
-import { Backend } from "../backend.slint";
+import { WindowSection, Tab, ActionId, Board2dTabData } from "../../api/types.slint";
+import { SceneButton } from "../../common/scenebutton.slint";
+import { Backend } from "../../api/backend.slint";
 
-export component Board3dTab inherits Image {
+export component Board2dTab inherits Image {
     in property <int> section-index;
     in-out property <WindowSection> section;
-    property <[Board3dTabData]> tabs: section.board-3d-tabs;
+    property <[Board2dTabData]> tabs: section.board-2d-tabs;
 
     image-fit: ImageFit.preserve;
     image-rendering: ImageRendering.pixelated;
     source: Backend.render-scene(section-index, root.width, root.height, section.frame);
 
+    fs := FocusScope {
+        enabled: false;
+    }
+
     TouchArea {
         pointer-event(e) => {
+            if (e.kind == PointerEventKind.down) {
+                fs.focus();
+            }
             return Backend.scene-pointer-event(section-index, self.mouse-x, self.mouse-y, self.absolute-position, e);
         }
 
@@ -28,7 +35,7 @@ export component Board3dTab inherits Image {
         spacing: 5px;
 
         SceneButton {
-            image: @image-url("../img/zoom-fit.svg");
+            image: @image-url("../../img/zoom-fit.svg");
             bg-color: tabs[section.current-tab-index].background-color;
             fg-color: tabs[section.current-tab-index].overlay-color;
             clicked => {
@@ -37,7 +44,7 @@ export component Board3dTab inherits Image {
         }
 
         SceneButton {
-            image: @image-url("../img/zoom-in.svg");
+            image: @image-url("../../img/zoom-in.svg");
             bg-color: tabs[section.current-tab-index].background-color;
             fg-color: tabs[section.current-tab-index].overlay-color;
             clicked => {
@@ -46,11 +53,20 @@ export component Board3dTab inherits Image {
         }
 
         SceneButton {
-            image: @image-url("../img/zoom-out.svg");
+            image: @image-url("../../img/zoom-out.svg");
             bg-color: tabs[section.current-tab-index].background-color;
             fg-color: tabs[section.current-tab-index].overlay-color;
             clicked => {
                 Backend.scene-zoom-out-clicked(section-index, root.width, root.height);
+            }
+        }
+
+        SceneButton {
+            text: "3D";
+            bg-color: tabs[section.current-tab-index].background-color;
+            fg-color: tabs[section.current-tab-index].overlay-color;
+            clicked => {
+                Backend.action-triggered(ActionId.board-2d-tab-open-3d, section-index);
             }
         }
     }

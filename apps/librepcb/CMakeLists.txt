@@ -78,11 +78,11 @@ target_link_libraries(
 )
 
 # Setup gettext
-find_package(Intl)
-target_link_libraries(
-  librepcb
-  PRIVATE Intl::Intl
-)
+# find_package(Intl)
+# target_link_libraries(
+#   librepcb
+#   PRIVATE Intl::Intl
+# )
 
 # Install target
 install(
