@@ -52,8 +52,7 @@
 #include <QtCore>
 #include <QtWidgets>
 
-#include <libintl.h>
-#include <locale>
+// #include <libintl.h>
 #include <slint.h>
 
 /*******************************************************************************
@@ -99,10 +98,10 @@ int main(int argc, char* argv[]) {
   configureApplicationSettings();
 
   // Configure gettext.
-  bindtextdomain(
-      "librepcb",
-      qPrintable(Application::getResourcesDir().getPathTo("i18n").toStr()));
-  qputenv("LANGUAGE", "de");
+  // bindtextdomain(
+  //     "librepcb",
+  //     qPrintable(Application::getResourcesDir().getPathTo("i18n").toStr()));
+  // qputenv("LANGUAGE", "de");
 
   // Write some information about the application instance to the log.
   writeLogHeader();
@@ -116,34 +115,30 @@ int main(int argc, char* argv[]) {
   // automatically. Let's do it in a thread to avoid delaying application start.
   std::ignore = QtConcurrent::run(&Application::cleanTemporaryDirectory);
 
-  // Use Fusion style with dark theme to make the legacy Qt dialogs appear at
-  // least in a similar color scheme as the new Slint UI. Can be removed as
-  // soon as no Qt widgets are used anymore.
+  // Use Fusion style with custom palette to make the legacy Qt dialogs looking
+  // similar to the new Slint UI. Can be removed as soon as no Qt widgets are
+  // used anymore.
   {
-    const QColor darkGray(53, 53, 53);
-    const QColor gray(128, 128, 128);
-    const QColor black(25, 25, 25);
-    const QColor blue(42, 130, 218);
-    QPalette darkPalette;
-    darkPalette.setColor(QPalette::Window, darkGray);
-    darkPalette.setColor(QPalette::WindowText, Qt::white);
-    darkPalette.setColor(QPalette::Base, black);
-    darkPalette.setColor(QPalette::AlternateBase, darkGray);
-    darkPalette.setColor(QPalette::ToolTipBase, blue);
-    darkPalette.setColor(QPalette::ToolTipText, Qt::white);
-    darkPalette.setColor(QPalette::Text, Qt::white);
-    darkPalette.setColor(QPalette::Button, darkGray);
-    darkPalette.setColor(QPalette::ButtonText, Qt::white);
-    darkPalette.setColor(QPalette::Link, blue);
-    darkPalette.setColor(QPalette::Highlight, blue);
-    darkPalette.setColor(QPalette::HighlightedText, Qt::black);
-    darkPalette.setColor(QPalette::Active, QPalette::Button, gray.darker());
-    darkPalette.setColor(QPalette::Disabled, QPalette::ButtonText, gray);
-    darkPalette.setColor(QPalette::Disabled, QPalette::WindowText, gray);
-    darkPalette.setColor(QPalette::Disabled, QPalette::Text, gray);
-    darkPalette.setColor(QPalette::Disabled, QPalette::Light, darkGray);
+    QPalette palette;
+    palette.setColor(QPalette::Window, "#1B1B1B");
+    palette.setColor(QPalette::WindowText, "#C4C4C4");
+    palette.setColor(QPalette::Base, "#262626");
+    palette.setColor(QPalette::AlternateBase, "#2E2E2E");
+    palette.setColor(QPalette::ToolTipBase, "#2E2E2E");
+    palette.setColor(QPalette::ToolTipText, "#DEDEDE");
+    palette.setColor(QPalette::Text, "#C4C4C4");
+    palette.setColor(QPalette::Button, "#202020");
+    palette.setColor(QPalette::ButtonText, "#C4C4C4");
+    palette.setColor(QPalette::Link, "#63D0DF");
+    palette.setColor(QPalette::Highlight, "#63D0DF");
+    palette.setColor(QPalette::HighlightedText, "#161616");
+    palette.setColor(QPalette::Disabled, QPalette::Button, "#1a1a1a");
+    palette.setColor(QPalette::Disabled, QPalette::ButtonText, "#707070");
+    palette.setColor(QPalette::Disabled, QPalette::WindowText, "#707070");
+    palette.setColor(QPalette::Disabled, QPalette::Text, "#707070");
+    palette.setColor(QPalette::Disabled, QPalette::Light, "#707070");
     app.setStyle("fusion");
-    app.setPalette(darkPalette);
+    app.setPalette(palette);
   }
 
   // Start network access manager thread with HTTP cache to avoid extensive

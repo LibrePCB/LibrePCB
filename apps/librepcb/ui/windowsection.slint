@@ -1,12 +1,12 @@
-import { Tab, TabType, WindowSection, ActionId } from "./types.slint";
+import { Tab, TabType, WindowSection, ActionId } from "./api/types.slint";
 import { EmptyTab } from "./emptytab.slint";
 import { SchematicTab } from "./project/schematic/schematictab.slint";
-import { Board2dTab } from "./project/board2dtab.slint";
-import { Board3dTab } from "./project/board3dtab.slint";
+import { Board2dTab } from "./project/board/board2dtab.slint";
+import { Board3dTab } from "./project/board/board3dtab.slint";
 import { CreateLibraryTab } from "./library/createlibrarytab.slint";
 import { DownloadLibraryTab } from "./library/downloadlibrarytab.slint";
-import { Backend } from "./backend.slint";
-import { Data } from "./data.slint";
+import { Backend } from "./api/backend.slint";
+import { Data } from "./api/data.slint";
 
 component TabItem inherits Rectangle {
     in property <Tab> tab;

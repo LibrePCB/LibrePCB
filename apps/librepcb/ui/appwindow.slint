@@ -1,14 +1,14 @@
 import { Button, ProgressIndicator, StandardButton, Palette, VerticalBox } from "std-widgets.slint";
 import { SideBar } from "./sidebar.slint";
-import { LengthEdit } from "./lengthedit.slint";
+import { LengthEdit } from "./common/lengthedit.slint";
 import { LibrariesPanel } from "./library/librariespanel.slint";
-import { ProjectPanel } from "./projectpanel.slint";
+import { ProjectPanel } from "./project/projectpanel.slint";
 import { HomePanel } from "./homepanel.slint";
 import { MenuBar } from "./menubar.slint";
 import { WindowSection } from "./windowsection.slint";
-import { MainPage, GridStyle } from "./types.slint";
-import { Backend } from "./backend.slint";
-import { Data } from "./data.slint";
+import { MainPage, GridStyle } from "./api/types.slint";
+import { Backend } from "./api/backend.slint";
+import { Data } from "./api/data.slint";
 import { HelpPanel } from "./helppanel.slint";
 import { OrderPanel } from "./project/orderpanel.slint";
 
@@ -110,16 +110,6 @@ export component AppWindow inherits Window {
                 background: #555555;
             }
         }
-    }
-
-    if Data.current-page == MainPage.preferences: LengthEdit {
-        x: 100px;
-        y: 50px;
-    }
-
-    if Data.current-page == MainPage.preferences: LengthEdit {
-        x: 100px;
-        y: 100px;
     }
 
     statusbar := Rectangle {

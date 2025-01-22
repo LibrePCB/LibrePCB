@@ -1,14 +1,14 @@
 import { ComboBox, CheckBox } from "std-widgets.slint";
-import { WindowSection, Tab, SchematicTabData, SchematicTool } from "../../types.slint";
-import { SceneButton } from "../../scenebutton.slint";
-import { ToolButton } from "../../toolbutton.slint";
-import { LengthEdit } from "../../lengthedit.slint";
+import { WindowSection, Tab, SchematicTabData, SchematicTool } from "../../api/types.slint";
+import { SceneButton } from "../../common/scenebutton.slint";
+import { ToolButton } from "../../common/toolbutton.slint";
+import { LengthEdit } from "../../common/lengthedit.slint";
 import { DrawWireToolBar } from "./drawwiretoolbar.slint";
 import { DrawPolygonToolBar } from "./drawpolygontoolbar.slint";
 import { AddTextToolBar } from "./addtexttoolbar.slint";
 import { AddComponentToolBar } from "./addcomponenttoolbar.slint";
-import { Backend } from "../../backend.slint";
-import { Data } from "../../data.slint";
+import { Backend } from "../../api/backend.slint";
+import { Data } from "../../api/data.slint";
 import { EditToolBar } from "../../edittoolbar.slint";
 
 export component SchematicTab inherits Image {
@@ -22,6 +22,10 @@ export component SchematicTab inherits Image {
 
     if Data.preview-mode: Rectangle {
         background: white;
+    }
+
+    fs := FocusScope {
+        enabled: false;
     }
 
     ta := TouchArea {
@@ -178,6 +182,9 @@ export component SchematicTab inherits Image {
         }
 
         pointer-event(e) => {
+            if (e.kind == PointerEventKind.down) {
+                fs.focus();
+            }
             return Backend.scene-pointer-event(section-index, self.mouse-x, self.mouse-y, self.absolute-position, e);
         }
 

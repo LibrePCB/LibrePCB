@@ -1,9 +1,9 @@
 import { CheckBox, ListView, ProgressIndicator, Spinner, HorizontalBox, VerticalBox, StandardButton } from "std-widgets.slint";
-import { PanelHeader } from "../panelheader.slint";
-import { Library, LibraryType, LibraryState, ActionId } from "../types.slint";
-import { ToolTip } from "../tooltip.slint";
-import { Backend } from "../backend.slint";
-import { Data } from "../data.slint";
+import { PanelHeader } from "../common/panelheader.slint";
+import { Library, LibraryType, LibraryState, ActionId } from "../api/types.slint";
+import { ToolTip } from "../common/tooltip.slint";
+import { Backend } from "../api/backend.slint";
+import { Data } from "../api/data.slint";
 
 component LibraryList inherits ListView {
     in property <length> bottom-padding: 50px;
