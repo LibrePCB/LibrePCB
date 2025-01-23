@@ -1,6 +1,6 @@
-import { ActionId, ProjectData, MainPage } from "./api/types.slint";
+import { ActionId, ProjectData, MainPage, WindowSection, TabData, TabType } from "./api/types.slint";
 import { Data } from "./api/data.slint";
-import { Menu, MenuItem } from "./common/menu.slint";
+import { Menu, MenuItem, MenuSeparator } from "./common/menu.slint";
 import { Palette, LineEdit, TabWidget } from "std-widgets.slint";
 import { Backend } from "./api/backend.slint";
 
@@ -35,11 +35,21 @@ component MenuBarButton inherits TouchArea {
 export component MenuBar inherits Rectangle {
     in property <length> sections-start-x;
     property <ProjectData> project: Data.projects[Data.current-project-index];
+    property <WindowSection> current-section: Data.sections[Data.current-section-index];
+    property <TabData> current-tab: current-section.tabs[current-section.current-tab-index];
 
     background: #252525;
 
     public function focus-search() {
         le-search.focus();
+    }
+
+    function is-2d-graphics-tab() -> bool {
+        return (current-tab.type == TabType.schematic) || (current-tab.type == TabType.board-2d);
+    }
+
+    function is-graphics-tab() -> bool {
+        return (current-tab.type == TabType.schematic) || (current-tab.type == TabType.board-2d) || (current-tab.type == TabType.board-3d);
     }
 
     HorizontalLayout {
@@ -57,7 +67,82 @@ export component MenuBar inherits Rectangle {
                 y: parent.height;
 
                 MenuItem {
-                    text: @tr("Save Project");
+                    text: @tr("New Project") + "...";
+                    icon: @image-url("img/file-circle-plus.svg");
+                    status-tip: @tr("Create a new project");
+
+                    clicked => {
+                        Backend.action-triggered(ActionId.project-new, -1);
+                    }
+                }
+
+                MenuItem {
+                    text: @tr("Open Project") + "...";
+                    icon: @image-url("img/folder-open.svg");
+                    status-tip: @tr("Open an existing project");
+
+                    clicked => {
+                        Backend.action-triggered(ActionId.project-open, -1);
+                    }
+                }
+
+                MenuItem {
+                    text: @tr("Import EAGLE Project") + "...";
+                    status-tip: @tr("Import schematic/board from EAGLE *.sch/*.brd files");
+
+                    clicked => {
+                        Backend.action-triggered(ActionId.project-import-eagle, -1);
+                    }
+                }
+
+                MenuItem {
+                    text: @tr("Add Example Projects") + "...";
+                    status-tip: @tr("Add some example projects to the workspace");
+
+                    clicked => {
+                        Backend.action-triggered(ActionId.project-import-examples, -1);
+                    }
+                }
+
+                MenuSeparator { }
+
+                MenuItem {
+                    text: @tr("New Library") + "...";
+                    icon: @image-url("img/plus.svg");
+                    status-tip: @tr("Create a new local workspace library");
+
+                    clicked => {
+                        Backend.action-triggered(ActionId.create-library-tab-open, -1);
+                    }
+                }
+
+                MenuItem {
+                    text: @tr("Download Library") + "...";
+                    icon: @image-url("img/download.svg");
+                    status-tip: @tr("Manually download an existing library from the Internet");
+
+                    clicked => {
+                        Backend.action-triggered(ActionId.download-library-tab-open, -1);
+                    }
+                }
+
+                MenuSeparator { }
+
+                MenuItem {
+                    text: @tr("Switch Workspace") + "...";
+                    status-tip: @tr("Choose another workspace to open");
+                }
+
+                MenuSeparator { }
+
+                MenuItem {
+                    text: @tr("Quit");
+                    icon: @image-url("img/box-arrow-left.svg");
+                    status-tip: @tr("Close all windows & quit the application");
+
+                    clicked => {
+                        Backend.action-triggered(ActionId.quit, -1);
+                    }
                 }
             }
         }
@@ -89,6 +174,100 @@ export component MenuBar inherits Rectangle {
             menu-view := Menu {
                 x: 0;
                 y: parent.height;
+
+                MenuItem {
+                    text: @tr("Grid Properties");
+                    icon: @image-url("img/grid-lines.svg");
+                    status-tip: @tr("View/modify the grid properties");
+                    enabled: is-2d-graphics-tab();
+                }
+
+                MenuItem {
+                    text: @tr("Increase Grid Interval");
+                    status-tip: @tr("Increase the grid interval");
+                    enabled: is-2d-graphics-tab();
+                }
+
+                MenuItem {
+                    text: @tr("Decrease Grid Interval");
+                    status-tip: @tr("Decrease the grid interval");
+                    enabled: is-2d-graphics-tab();
+                }
+
+                MenuSeparator { }
+
+                MenuItem {
+                    text: @tr("Show Pin Numbers");
+                    status-tip: @tr("Show or hide symbol pin numbers");
+                    enabled: current-tab.type == TabType.schematic;
+                    checked: current-section.schematic-tabs[current-section.current-tab-index].show-pin-numbers;
+
+                    clicked => {
+                        current-section.schematic-tabs[current-section.current-tab-index].show-pin-numbers = !current-section.schematic-tabs[current-section.current-tab-index].show-pin-numbers;
+                    }
+                }
+
+                MenuItem {
+                    text: @tr("Hide All Planes");
+                    status-tip: @tr("Make the filled areas of all planes invisible");
+                    enabled: current-tab.type == TabType.board-2d;
+                }
+
+                MenuItem {
+                    text: @tr("Show All Planes");
+                    status-tip: @tr("Make the filled areas of all planes visible");
+                    enabled: current-tab.type == TabType.board-2d;
+                }
+
+                MenuSeparator { }
+
+                MenuItem {
+                    text: @tr("Toggle 2D/3D Mode");
+                    icon: @image-url("img/3d.svg");
+                    status-tip: @tr("Switch between the 2D and 3D viewer mode");
+                    enabled: (current-tab.type == TabType.board-2d) || (current-tab.type == TabType.board-3d);
+
+                    clicked => {
+                        Backend.action-triggered(ActionId.board-2d-tab-open-3d, Data.current-section-index);
+                    }
+                }
+
+                MenuSeparator { }
+
+                MenuItem {
+                    text: @tr("Zoom In");
+                    icon: @image-url("img/zoom-in.svg");
+                    status-tip: @tr("Increase the zoom level");
+                    enabled: is-graphics-tab();
+                }
+
+                MenuItem {
+                    text: @tr("Zoom Out");
+                    icon: @image-url("img/zoom-out.svg");
+                    status-tip: @tr("Decrease the zoom level");
+                    enabled: is-graphics-tab();
+                }
+
+                MenuItem {
+                    text: @tr("Zoom to Fit Contents");
+                    icon: @image-url("img/zoom-fit.svg");
+                    status-tip: @tr("Set the zoom level to fit the whole content");
+                    enabled: is-graphics-tab();
+                }
+
+                MenuSeparator { }
+
+                MenuItem {
+                    text: @tr("Ignore Placement Locks");
+                    icon: @image-url("img/lock-closed.svg");
+                    status-tip: @tr("Allow dragging locked objects");
+                    enabled: current-tab.type == TabType.board-2d;
+                    checked: Data.ignore-placement-locks;
+
+                    clicked => {
+                        Data.ignore-placement-locks = !Data.ignore-placement-locks;
+                    }
+                }
             }
         }
 
@@ -112,6 +291,8 @@ export component MenuBar inherits Rectangle {
                         Backend.action-triggered(ActionId.rescan-workspace-libraries, -1);
                     }
                 }
+
+                MenuSeparator { }
 
                 MenuItem {
                     text: @tr("Preferences") + "...";
@@ -155,6 +336,8 @@ export component MenuBar inherits Rectangle {
                         Backend.action-triggered(ActionId.window-close, -1);
                     }
                 }
+
+                MenuSeparator { }
 
                 MenuItem {
                     text: @tr("Split Section");
@@ -208,6 +391,8 @@ export component MenuBar inherits Rectangle {
                         Backend.action-triggered(ActionId.open-website, -1);
                     }
                 }
+
+                MenuSeparator { }
 
                 MenuItem {
                     text: @tr("About LibrePCB");
