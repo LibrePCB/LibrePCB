@@ -35,6 +35,7 @@
 #include <librepcb/core/types/lengthunit.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
+#include <librepcb/editor/utils/standardeditorcommandhandler.h>
 #include <librepcb/editor/workspace/workspacesettingsdialog.h>
 
 #include <QtCore>
@@ -76,6 +77,24 @@ bool GuiApplication::actionTriggered(ui::ActionId id,
   if (id == ui::ActionId::OpenWorkspaceSettings) {
     WorkspaceSettingsDialog dlg(mWorkspace, qApp->activeWindow());
     dlg.exec();
+    return true;
+  } else if (id == ui::ActionId::OpenKeyboardShortcutsReference) {
+    StandardEditorCommandHandler handler(mWorkspace.getSettings(),
+                                         qApp->activeWindow());
+    handler.shortcutsReference();
+    return true;
+  } else if (id == ui::ActionId::OpenUserManual) {
+    StandardEditorCommandHandler handler(mWorkspace.getSettings(),
+                                         qApp->activeWindow());
+    handler.onlineDocumentation();
+    return true;
+  } else if (id == ui::ActionId::OpenWebsite) {
+    StandardEditorCommandHandler handler(mWorkspace.getSettings(),
+                                         qApp->activeWindow());
+    handler.website();
+    return true;
+  } else if (id == ui::ActionId::RescanWorkspaceLibraries) {
+    mWorkspace.getLibraryDb().startLibraryRescan();
     return true;
   } else if (id == ui::ActionId::WindowNew) {
     createNewWindow();
@@ -164,8 +183,8 @@ void GuiApplication::createNewWindow() noexcept {
       &LibrariesModel::toggleAll, mLibraries.get(), std::placeholders::_1));
 
   // Build wrapper.
-  mWindows.append(
-      std::make_shared<MainWindow>(*this, win, mWindows.count(), this));
+  auto mw = std::make_shared<MainWindow>(*this, win, mWindows.count(), this);
+  mWindows.append(mw);
 }
 
 /*******************************************************************************

@@ -1,4 +1,7 @@
+import { Data } from "../api/data.slint";
+
 export component ToolButton inherits Rectangle {
+    in property <string> status-tip;
     in property <bool> checked: false;
     in property <image> image;
 
@@ -17,5 +20,15 @@ export component ToolButton inherits Rectangle {
         source: image;
     }
 
-    ta := TouchArea { }
+    ta := TouchArea {
+        changed has-hover => {
+            if (root.status-tip != "") {
+                if (self.has-hover) {
+                    Data.hovered-status-tip = root.status-tip;
+                } else {
+                    Data.hovered-status-tip = "";
+                }
+            }
+        }
+    }
 }

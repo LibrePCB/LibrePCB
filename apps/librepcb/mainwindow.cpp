@@ -148,6 +148,9 @@ MainWindow::~MainWindow() noexcept {
 bool MainWindow::actionTriggered(ui::ActionId id, int sectionIndex) noexcept {
   if (mSections->actionTriggered(id, sectionIndex)) {
     return true;
+  } else if (id == ui::ActionId::WindowClose) {
+    mWindow->hide();  // TODO: Remove from GuiApplication
+    return true;
   } else if (mApp.actionTriggered(id, sectionIndex)) {
     return true;
   }
@@ -185,8 +188,10 @@ void MainWindow::projectItemDoubleClicked(
 
 void MainWindow::setCurrentProject(
     std::shared_ptr<ProjectEditor> prj) noexcept {
-  mWindow->global<ui::Data>().set_current_project_index(
-      mApp.getProjects().getIndexOf(prj));
+  if (prj) {
+    mWindow->global<ui::Data>().set_current_project_index(
+        mApp.getProjects().getIndexOf(prj));
+  }
 }
 
 std::shared_ptr<ProjectEditor> MainWindow::getCurrentProject() noexcept {

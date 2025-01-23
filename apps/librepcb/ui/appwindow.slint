@@ -123,9 +123,23 @@ export component AppWindow inherits Window {
             padding-left: 10px;
             padding-right: 10px;
 
-            Text {
+            Rectangle {
                 horizontal-stretch: 1;
-                text: Data.workspace-path;
+
+                Text {
+                    width: 100%;
+                    height: 100%;
+                    vertical-alignment: center;
+                    color: white;
+                    text: Data.hovered-status-tip;
+                }
+
+                if Data.hovered-status-tip == "": Text {
+                    width: 100%;
+                    height: 100%;
+                    vertical-alignment: center;
+                    text: Data.workspace-path;
+                }
             }
 
             Rectangle {

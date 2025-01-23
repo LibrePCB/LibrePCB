@@ -16,9 +16,11 @@ export global Data {
 
     in property <string> window-title: "LibrePCB 1.2.0-unstable";
 
-    in property <string> workspace-path: "/path/to/workspace";
-
     in property <string> about-librepcb-details: "LibrePCB Version: 1.2.0\nGit Revision:     f079fa97b\nBuild Date:       2024-12-02T19:12:08\nQt Version:       6.2.4 (built against 6.2.4)\nCPU Architecture: x86_64\nOperating System: Ubuntu Core 22\nPlatform Plugin:  xcb\nTLS Library:      OpenSSL 3.0.2 15 Mar 2022\nOCC Library:      OCCT 7.7.2\nRuntime:          Snap";
+
+    in property <string> hovered-status-tip;
+
+    in property <string> workspace-path: "/path/to/workspace";
 
     in property <string> cursor-coordinates: "X: 123.456 Y: 123.456";
 
@@ -64,12 +66,14 @@ export global Data {
 
     in property <[ProjectData]> projects: [
         {
+            valid: true,
             path: "/path/to/project-1.lpp",
             name: "Project 1",
             schematics: ["Power", "Logic"],
             boards: ["Default", "Experiment"],
         },
         {
+            valid: true,
             path: "/path/to/project-2.lpp",
             name: "Project 2",
             schematics: ["Power", "Logic"],
