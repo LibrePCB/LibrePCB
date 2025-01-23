@@ -48,7 +48,7 @@ class ProjectEditor;
 /**
  * @brief The ProjectsModel class
  */
-class ProjectsModel : public QObject, public slint::Model<ui::Project> {
+class ProjectsModel : public QObject, public slint::Model<ui::ProjectData> {
   Q_OBJECT
 
 public:
@@ -59,11 +59,13 @@ public:
   virtual ~ProjectsModel() noexcept;
 
   // General Methods
+  int getIndexOf(std::shared_ptr<ProjectEditor> prj) noexcept;
+  std::shared_ptr<ProjectEditor> getProject(int index) noexcept;
   std::shared_ptr<ProjectEditor> openProject(const FilePath& fp);
 
   // Implementations
   std::size_t row_count() const override;
-  std::optional<ui::Project> row_data(std::size_t i) const override;
+  std::optional<ui::ProjectData> row_data(std::size_t i) const override;
 
   // Operator Overloadings
   ProjectsModel& operator=(const ProjectsModel& rhs) = delete;
@@ -81,8 +83,8 @@ private:
    */
   static bool askForRestoringBackup(const FilePath& dir);
 
-  QMap<QString, std::shared_ptr<ProjectEditor>> mEditors;
-  std::vector<ui::Project> mItems;
+  QList<std::shared_ptr<ProjectEditor>> mEditors;
+  std::vector<ui::ProjectData> mItems;
 };
 
 /*******************************************************************************

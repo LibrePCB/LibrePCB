@@ -69,11 +69,11 @@ private:
       const slint::private_api::KeyEvent& e) noexcept;
   void projectItemDoubleClicked(const slint::SharedString& path) noexcept;
   void setCurrentProject(std::shared_ptr<ProjectEditor> prj) noexcept;
+  std::shared_ptr<ProjectEditor> getCurrentProject() noexcept;
 
   const int mIndex;
   GuiApplication& mApp;
   std::shared_ptr<WindowSectionsModel> mSections;
-  std::shared_ptr<ProjectEditor> mCurrentProject;
   slint::ComponentHandle<ui::AppWindow> mWindow;
 };
 

@@ -77,13 +77,8 @@ export struct FolderTreeItem {
     is-folder: bool,
 }
 
-export struct Project {
-    path: string,
-    name: string,
-}
-
 export struct ProjectData {
-    valid: bool,
+    path: string,
     name: string,
     schematics: [string],
     boards: [string],
@@ -97,10 +92,11 @@ export enum TabType {
     board-3d,
 }
 
-export struct Tab {
+export struct TabData {
     type: TabType,
     title: string,
     icon: image,
+    project-index: int,
 }
 
 export struct CreateLibraryTabData {
@@ -163,7 +159,7 @@ export struct Board3dTabData {
 }
 
 export struct WindowSection {
-    tabs: [Tab], // Tabs in this section
+    tabs: [TabData], // Tabs in this section
     create-library-tabs: [CreateLibraryTabData],
     download-library-tabs: [DownloadLibraryTabData],
     schematic-tabs: [SchematicTabData],

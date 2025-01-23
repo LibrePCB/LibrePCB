@@ -114,7 +114,8 @@ void GuiApplication::createNewWindow() noexcept {
   d.set_recent_projects(mRecentProjects);
   d.set_favorite_projects(mFavoriteProjects);
   d.set_libraries(mLibraries);
-  d.set_open_projects(mProjects);
+  d.set_projects(mProjects);
+  d.set_current_project_index(-1);
 
   // Bind global data to signals.
   bind(this, d, &ui::Data::set_status_bar_progress, &mWorkspace.getLibraryDb(),

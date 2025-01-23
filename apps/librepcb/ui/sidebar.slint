@@ -1,10 +1,13 @@
 import { SideBarButton } from "./sidebarbutton.slint";
 import { MainPage } from "./api/types.slint";
 import { Data } from "./api/data.slint";
-import { ActionId } from "./api/types.slint";
+import { ActionId, ProjectData } from "./api/types.slint";
 import { Backend } from "./api/backend.slint";
 
 export component SideBar inherits Rectangle {
+    property <ProjectData> project: Data.projects[Data.current-project-index];
+    property <bool> project-open: project.path != "";
+
     background: #353535;
 
     VerticalLayout {
@@ -34,7 +37,7 @@ export component SideBar inherits Rectangle {
         SideBarButton {
             icon: @image-url("img/projects.png");
             tooltip: "Project";
-            enabled: Data.current-project.valid;
+            enabled: project-open;
             checked: Data.current-page == MainPage.project;
             clicked => {
                 Data.current-page = MainPage.project;
@@ -44,8 +47,8 @@ export component SideBar inherits Rectangle {
         SideBarButton {
             icon: @image-url("img/drc.svg");
             tooltip: "Design Rule Check";
+            enabled: project-open;
             checked: Data.current-page == MainPage.drc;
-            enabled: Data.current-project.valid;
             clicked => {
                 Data.current-page = MainPage.drc;
             }
@@ -54,7 +57,7 @@ export component SideBar inherits Rectangle {
         SideBarButton {
             icon: @image-url("img/output-jobs.svg");
             tooltip: "Output Jobs";
-            enabled: Data.current-project.valid;
+            enabled: project-open;
             checked: Data.current-page == MainPage.output-jobs;
             clicked => {
                 Data.current-page = MainPage.output-jobs;
@@ -64,7 +67,7 @@ export component SideBar inherits Rectangle {
         SideBarButton {
             icon: @image-url("img/shopping-cart.svg");
             tooltip: "Order PCB";
-            enabled: Data.current-project.valid;
+            enabled: project-open;
             checked: Data.current-page == MainPage.order;
             clicked => {
                 Data.current-page = MainPage.order;

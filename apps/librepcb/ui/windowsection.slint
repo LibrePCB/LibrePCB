@@ -1,4 +1,4 @@
-import { Tab, TabType, WindowSection, ActionId } from "./api/types.slint";
+import { TabType, TabData, WindowSection, ActionId } from "./api/types.slint";
 import { EmptyTab } from "./emptytab.slint";
 import { SchematicTab } from "./project/schematic/schematictab.slint";
 import { Board2dTab } from "./project/board/board2dtab.slint";
@@ -8,8 +8,8 @@ import { DownloadLibraryTab } from "./library/downloadlibrarytab.slint";
 import { Backend } from "./api/backend.slint";
 import { Data } from "./api/data.slint";
 
-component TabItem inherits Rectangle {
-    in property <Tab> tab;
+component Tab inherits Rectangle {
+    in property <TabData> tab;
     in property <int> index;
     in property <bool> is-current-section: false;
     in property <bool> is-current-tab: false;
@@ -85,7 +85,7 @@ export component WindowSection inherits Rectangle {
                 alignment: LayoutAlignment.start;
                 width: 100%;
 
-                for tab[index] in section.tabs: TabItem {
+                for tab[index] in section.tabs: Tab {
                     tab: tab;
                     index: index;
                     is-current-section: is-current-section;
