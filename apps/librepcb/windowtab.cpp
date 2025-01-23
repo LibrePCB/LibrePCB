@@ -23,6 +23,8 @@
 #include "windowtab.h"
 
 #include "apptoolbox.h"
+#include "guiapplication.h"
+#include "project/projectsmodel.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -43,7 +45,7 @@ WindowTab::WindowTab(GuiApplication& app, ui::TabType type, const QPixmap& icon,
                      const QString& title, QObject* parent) noexcept
   : QObject(parent),
     mApp(app),
-    mUiData{type, q2s(title), q2s(icon)},
+    mUiData{type, q2s(title), q2s(icon), app.getProjects().getIndexOf(prj)},
     mProject(prj),
     mObjIndex(objIndex) {
 }

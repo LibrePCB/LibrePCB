@@ -66,7 +66,7 @@ public:
   virtual ~WindowTab() noexcept;
 
   // General Methods
-  const ui::Tab& getUiData() const noexcept { return mUiData; }
+  const ui::TabData& getUiData() const noexcept { return mUiData; }
   std::shared_ptr<ProjectEditor> getProject() noexcept { return mProject; }
   int getObjIndex() const noexcept { return mObjIndex; }
   virtual void activate() noexcept {}
@@ -119,7 +119,7 @@ signals:
 
 protected:
   GuiApplication& mApp;
-  ui::Tab mUiData;
+  ui::TabData mUiData;
   std::shared_ptr<ProjectEditor> mProject;
   int mObjIndex = -1;
 };

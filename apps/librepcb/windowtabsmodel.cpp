@@ -99,7 +99,7 @@ std::size_t WindowTabsModel::row_count() const {
   return mItems.size();
 }
 
-std::optional<ui::Tab> WindowTabsModel::row_data(std::size_t i) const {
+std::optional<ui::TabData> WindowTabsModel::row_data(std::size_t i) const {
   if (std::shared_ptr<WindowTab> s = mItems.value(i)) {
     return s->getUiData();
   } else {

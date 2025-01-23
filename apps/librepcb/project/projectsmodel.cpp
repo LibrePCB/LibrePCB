@@ -26,8 +26,10 @@
 #include "projecteditor.h"
 
 #include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectloader.h>
+#include <librepcb/core/project/schematic/schematic.h>
 #include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/editor/dialogs/directorylockhandlerdialog.h>
 
@@ -55,9 +57,17 @@ ProjectsModel::~ProjectsModel() noexcept {
  *  General Methods
  ******************************************************************************/
 
+int ProjectsModel::getIndexOf(std::shared_ptr<ProjectEditor> prj) noexcept {
+  return mEditors.indexOf(prj);
+}
+
+std::shared_ptr<ProjectEditor> ProjectsModel::getProject(int index) noexcept {
+  return mEditors.value(index);
+}
+
 std::shared_ptr<ProjectEditor> ProjectsModel::openProject(const FilePath& fp) {
   const QString uniqueFp = fp.toUnique().toStr();
-  if (mEditors.contains(uniqueFp)) return mEditors.value(uniqueFp);
+  // if (mEditors.contains(uniqueFp)) return mEditors.value(uniqueFp);
 
   // Opening the project can take some time, use wait cursor to provide
   // immediate UI feedback.
@@ -91,15 +101,28 @@ std::shared_ptr<ProjectEditor> ProjectsModel::openProject(const FilePath& fp) {
       std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(fs)),
       projectFileName);  // can throw
 
+  // TODO
+  auto schematics = std::make_shared<slint::VectorModel<slint::SharedString>>();
+  auto boards = std::make_shared<slint::VectorModel<slint::SharedString>>();
+  for (auto sch : project->getSchematics()) {
+    schematics->push_back(q2s(*sch->getName()));
+  }
+  for (auto brd : project->getBoards()) {
+    boards->push_back(q2s(*brd->getName()));
+  }
+
   // Open editor.
   auto editor = std::make_shared<ProjectEditor>(std::move(project), this);
 
   // Keep handle.
-  mEditors.insert(uniqueFp, editor);
-  mItems.push_back(ui::Project{
+  mEditors.append(editor);
+  mItems.push_back(ui::ProjectData{
       q2s(uniqueFp),
       q2s(*editor->getProject().getName()),
+      schematics,
+      boards,
   });
+  row_added(mItems.size() - 1, 1);
   return editor;
 }
 
@@ -111,7 +134,7 @@ std::size_t ProjectsModel::row_count() const {
   return mItems.size();
 }
 
-std::optional<ui::Project> ProjectsModel::row_data(std::size_t i) const {
+std::optional<ui::ProjectData> ProjectsModel::row_data(std::size_t i) const {
   return (i < mItems.size()) ? std::optional(mItems.at(i)) : std::nullopt;
 }
 

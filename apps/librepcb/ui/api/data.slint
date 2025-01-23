@@ -4,7 +4,6 @@ import {
     LibraryState,
     LibraryType,
     MainPage,
-    Project,
     ProjectData,
     SchematicTool,
     TabType,
@@ -63,23 +62,22 @@ export global Data {
 
     in property <[FolderTreeItem]> favorite-projects: recent-projects;
 
-    in property <[Project]> open-projects: [
+    in property <[ProjectData]> projects: [
         {
             path: "/path/to/project-1.lpp",
             name: "Project 1",
+            schematics: ["Power", "Logic"],
+            boards: ["Default", "Experiment"],
         },
         {
             path: "/path/to/project-2.lpp",
             name: "Project 2",
+            schematics: ["Power", "Logic"],
+            boards: ["Default", "Experiment"],
         },
     ];
 
-    in property <ProjectData> current-project: {
-        valid: true,
-        name: "Project 1",
-        schematics: ["Power", "Logic"],
-        boards: ["Default", "Experiment"],
-    };
+    in property <int> current-project-index: 0;
 
     in property <int> status-bar-progress: 50;
 
@@ -136,21 +134,25 @@ export global Data {
                     type: TabType.create-library,
                     title: "Create Lib",
                     icon: @image-url("../img/plus.svg"),
+                    project-index: -1,
                 },
                 {
                     type: TabType.download-library,
                     title: "Download Lib",
                     icon: @image-url("../img/download.svg"),
+                    project-index: -1,
                 },
                 {
                     type: TabType.schematic,
                     title: "Schematic",
                     icon: @image-url("../img/image.svg"),
+                    project-index: 0,
                 },
                 {
                     type: TabType.board-2d,
                     title: "Board",
                     icon: @image-url("../img/projects.png"),
+                    project-index: 0,
                 },
             ],
             create-library-tabs: [
@@ -215,6 +217,7 @@ export global Data {
                     type: TabType.board-3d,
                     title: "3D",
                     icon: @image-url("../img/projects.png"),
+                    project-index: 1,
                 },
             ],
             board-2d-tabs: [

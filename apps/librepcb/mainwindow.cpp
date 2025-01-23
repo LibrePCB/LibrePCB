@@ -57,12 +57,10 @@ MainWindow::MainWindow(GuiApplication& app,
     mIndex(index),
     mApp(app),
     mSections(new WindowSectionsModel(app, this)),
-    mCurrentProject(),
     mWindow(win) {
   // Set global data.
   const ui::Data& d = mWindow->global<ui::Data>();
   d.set_current_page(ui::MainPage::Home);
-  d.set_current_project(ui::ProjectData{});
   d.set_sections(mSections);
   d.set_cursor_coordinates(slint::SharedString());
 
@@ -89,10 +87,14 @@ MainWindow::MainWindow(GuiApplication& app,
   b.on_project_item_doubleclicked(std::bind(
       &MainWindow::projectItemDoubleClicked, this, std::placeholders::_1));
   b.on_schematic_clicked([this](int index) {
-    if (mCurrentProject) mSections->openSchematic(mCurrentProject, index);
+    if (auto prj = getCurrentProject()) {
+      mSections->openSchematic(prj, index);
+    }
   });
   b.on_board_clicked([this](int index) {
-    if (mCurrentProject) mSections->openBoard(mCurrentProject, index);
+    if (auto prj = getCurrentProject()) {
+      mSections->openBoard(prj, index);
+    }
   });
   b.on_tab_clicked(std::bind(&WindowSectionsModel::setCurrentTab,
                              mSections.get(), std::placeholders::_1,
@@ -183,33 +185,13 @@ void MainWindow::projectItemDoubleClicked(
 
 void MainWindow::setCurrentProject(
     std::shared_ptr<ProjectEditor> prj) noexcept {
-  if (!prj) {
-    return;  // Temporary workaround for disappearing schematics/boards.
-  }
+  mWindow->global<ui::Data>().set_current_project_index(
+      mApp.getProjects().getIndexOf(prj));
+}
 
-  if (prj != mCurrentProject) {
-    mCurrentProject = prj;
-
-    auto schematics =
-        std::make_shared<slint::VectorModel<slint::SharedString>>();
-    auto boards = std::make_shared<slint::VectorModel<slint::SharedString>>();
-    if (mCurrentProject) {
-      for (auto sch : mCurrentProject->getProject().getSchematics()) {
-        schematics->push_back(q2s(*sch->getName()));
-      }
-      for (auto brd : mCurrentProject->getProject().getBoards()) {
-        boards->push_back(q2s(*brd->getName()));
-      }
-    }
-
-    mWindow->global<ui::Data>().set_current_project(ui::ProjectData{
-        mCurrentProject ? true : false,
-        mCurrentProject ? q2s(*mCurrentProject->getProject().getName())
-                        : slint::SharedString(),
-        schematics,
-        boards,
-    });
-  }
+std::shared_ptr<ProjectEditor> MainWindow::getCurrentProject() noexcept {
+  return mApp.getProjects().getProject(
+      mWindow->global<ui::Data>().get_current_project_index());
 }
 
 /*******************************************************************************
