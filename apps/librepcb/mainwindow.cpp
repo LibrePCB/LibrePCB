@@ -21,13 +21,13 @@
  *  Includes
  ******************************************************************************/
 #include "mainwindow.h"
-
+#include <librepcb/core/utils/scopeguard.h>
 #include "apptoolbox.h"
 #include "guiapplication.h"
 #include "project/projecteditor.h"
 #include "project/projectsmodel.h"
 #include "windowsectionsmodel.h"
-
+#include <librepcb/editor/project/newprojectwizard/newprojectwizard.h>
 #include <librepcb/core/fileio/filepath.h>
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/project.h>
@@ -35,9 +35,12 @@
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 #include <librepcb/editor/workspace/desktopservices.h>
+#include <librepcb/editor/workspace/initializeworkspacewizard/initializeworkspacewizard.h>
 
 #include <QtCore>
 #include <QtWidgets>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/fileio/transactionaldirectory.h>
 
 /*******************************************************************************
  *  Namespace
@@ -63,6 +66,7 @@ MainWindow::MainWindow(GuiApplication& app,
   d.set_current_page(ui::MainPage::Home);
   d.set_sections(mSections);
   d.set_cursor_coordinates(slint::SharedString());
+  d.set_ignore_placement_locks(false);
 
   // Bind global data to signals.
   connect(mSections.get(), &WindowSectionsModel::currentSectionIndexChanged,
@@ -148,6 +152,32 @@ MainWindow::~MainWindow() noexcept {
 bool MainWindow::actionTriggered(ui::ActionId id, int sectionIndex) noexcept {
   if (mSections->actionTriggered(id, sectionIndex)) {
     return true;
+  } else if (id == ui::ActionId::ProjectNew) {
+    newProject();
+    return true;
+  } else if (id == ui::ActionId::ProjectOpen) {
+    setCurrentProject(mApp.getProjects().openProject());
+    return true;
+  } else if (id == ui::ActionId::ProjectImportExamples) {
+    const QString msg =
+        tr("This downloads some example projects from the internet and copies "
+           "them into the workspace to help you evaluating LibrePCB with real "
+           "projects.") %
+        "\n\n" %
+        tr("Once you don't need them anymore, just delete the examples "
+           "directory to get rid of them.");
+    const int ret = QMessageBox::information(
+        qApp->activeWindow(), tr("Add Example Projects"), msg,
+        QMessageBox::Ok | QMessageBox::Cancel);
+    if (ret == QMessageBox::Ok) {
+      InitializeWorkspaceWizardContext ctx(this);
+      ctx.setWorkspacePath(mApp.getWorkspace().getPath());
+      ctx.installExampleProjects();
+    }
+    return true;
+  } else if (id == ui::ActionId::ProjectImportEagle) {
+    newProject(true);
+    return true;
   } else if (id == ui::ActionId::WindowClose) {
     mWindow->hide();  // TODO: Remove from GuiApplication
     return true;
@@ -197,6 +227,27 @@ void MainWindow::setCurrentProject(
 std::shared_ptr<ProjectEditor> MainWindow::getCurrentProject() noexcept {
   return mApp.getProjects().getProject(
       mWindow->global<ui::Data>().get_current_project_index());
+}
+
+void MainWindow::newProject(bool eagleImport,
+                                        const FilePath& parentDir) noexcept {
+  const NewProjectWizard::Mode mode = eagleImport
+      ? NewProjectWizard::Mode::EagleImport
+      : NewProjectWizard::Mode::NewProject;
+  NewProjectWizard wizard(mApp.getWorkspace(), mode, qApp->activeWindow());
+  if (parentDir.isValid()) {
+    wizard.setLocationOverride(parentDir);
+  }
+  if (wizard.exec() == QWizard::Accepted) {
+    try {
+      std::unique_ptr<Project> project = wizard.createProject();  // can throw
+      const FilePath fp = project->getFilepath();
+      project.reset();  // Release lock.
+      setCurrentProject(mApp.getProjects().openProject(fp));
+    } catch (const Exception& e) {
+      QMessageBox::critical(qApp->activeWindow(), tr("Could not create project"), e.getMsg());
+    }
+  }
 }
 
 /*******************************************************************************

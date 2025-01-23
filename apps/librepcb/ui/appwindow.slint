@@ -267,19 +267,19 @@ export component AppWindow inherits Window {
 
             Rectangle {
                 width: self.height;
-                background: (!Data.locked) ? #900000 : (t-lock.has-hover ? #505050 : #404040);
+                background: Data.ignore-placement-locks ? #900000 : (t-lock.has-hover ? #505050 : #404040);
 
                 t-lock := TouchArea {
                     Image {
                         width: self.height * 0.7;
                         height: 100%;
                         image-fit: contain;
-                        source: Data.locked ? @image-url("img/lock-closed.svg") : @image-url("img/lock-open.svg");
-                        colorize: (!Data.locked) ? white : Palette.foreground;
+                        source: Data.ignore-placement-locks ? @image-url("img/lock-open.svg") : @image-url("img/lock-closed.svg");
+                        colorize: Data.ignore-placement-locks ? white : Palette.foreground;
                     }
 
                     clicked => {
-                        Data.locked = !Data.locked;
+                        Data.ignore-placement-locks = !Data.ignore-placement-locks;
                     }
                 }
             }

@@ -24,7 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "appwindow.h"
-
+#include <librepcb/core/fileio/filepath.h>
 #include <QtCore>
 #include <QtGui>
 
@@ -70,6 +70,8 @@ private:
   void projectItemDoubleClicked(const slint::SharedString& path) noexcept;
   void setCurrentProject(std::shared_ptr<ProjectEditor> prj) noexcept;
   std::shared_ptr<ProjectEditor> getCurrentProject() noexcept;
+  void newProject(bool eagleImport = false,
+                            const FilePath& parentDir = FilePath()) noexcept;
 
   const int mIndex;
   GuiApplication& mApp;

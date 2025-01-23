@@ -26,7 +26,7 @@
 #include "appwindow.h"
 
 #include <QtCore>
-
+#include <librepcb/core/fileio/filepath.h>
 #include <vector>
 
 /*******************************************************************************
@@ -34,7 +34,7 @@
  ******************************************************************************/
 namespace librepcb {
 
-class FilePath;
+class Workspace;
 
 namespace editor {
 namespace app {
@@ -55,13 +55,14 @@ public:
   // Constructors / Destructor
   ProjectsModel() = delete;
   ProjectsModel(const ProjectsModel& other) = delete;
-  explicit ProjectsModel(QObject* parent = nullptr) noexcept;
+  explicit ProjectsModel(Workspace& ws,
+                         QObject* parent = nullptr) noexcept;
   virtual ~ProjectsModel() noexcept;
 
   // General Methods
   int getIndexOf(std::shared_ptr<ProjectEditor> prj) noexcept;
   std::shared_ptr<ProjectEditor> getProject(int index) noexcept;
-  std::shared_ptr<ProjectEditor> openProject(const FilePath& fp);
+  std::shared_ptr<ProjectEditor> openProject(FilePath fp = FilePath());
 
   // Implementations
   std::size_t row_count() const override;
@@ -83,6 +84,7 @@ private:
    */
   static bool askForRestoringBackup(const FilePath& dir);
 
+  Workspace& mWorkspace;
   QList<std::shared_ptr<ProjectEditor>> mEditors;
   std::vector<ui::ProjectData> mItems;
 };

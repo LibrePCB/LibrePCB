@@ -58,7 +58,7 @@ GuiApplication::GuiApplication(Workspace& ws, QObject* parent) noexcept
     mRecentProjects(new RecentProjectsModel(ws, this)),
     mFavoriteProjects(new FavoriteProjectsModel(ws, this)),
     mLibraries(new LibrariesModel(ws, this)),
-    mProjects(new ProjectsModel(this)) {
+    mProjects(new ProjectsModel(ws, this)) {
   mWorkspace.getLibraryDb().startLibraryRescan();
   createNewWindow();
 }
@@ -98,6 +98,9 @@ bool GuiApplication::actionTriggered(ui::ActionId id,
     return true;
   } else if (id == ui::ActionId::WindowNew) {
     createNewWindow();
+    return true;
+  } else if (id == ui::ActionId::Quit) {
+    slint::quit_event_loop();
     return true;
   } else if (id == ui::ActionId::LibraryPanelEnsurePopulated) {
     mLibraries->ensurePopulated();
