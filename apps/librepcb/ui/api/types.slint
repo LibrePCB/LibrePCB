@@ -12,9 +12,14 @@ export enum MainPage {
 export enum ActionId {
     // General
     open-workspace-settings,
+    open-keyboard-shortcuts-reference,
+    open-user-manual,
+    open-website,
+    rescan-workspace-libraries,
 
     // Window
     window-new,
+    window-close,
 
     // Library panel
     library-panel-ensure-populated,
@@ -78,6 +83,7 @@ export struct FolderTreeItem {
 }
 
 export struct ProjectData {
+    valid: bool,
     path: string,
     name: string,
     schematics: [string],

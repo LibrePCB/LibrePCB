@@ -117,6 +117,7 @@ std::shared_ptr<ProjectEditor> ProjectsModel::openProject(const FilePath& fp) {
   // Keep handle.
   mEditors.append(editor);
   mItems.push_back(ui::ProjectData{
+      true,
       q2s(uniqueFp),
       q2s(*editor->getProject().getName()),
       schematics,

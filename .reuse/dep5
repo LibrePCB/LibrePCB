@@ -141,6 +141,9 @@ Files:
  apps/librepcb/ui/img/reset.svg
  apps/librepcb/ui/img/save.svg
  apps/librepcb/ui/img/shopping-cart.svg
+ apps/librepcb/ui/img/window-plus.svg
+ apps/librepcb/ui/img/window-split.svg
+ apps/librepcb/ui/img/window-x.svg
 Copyright: The Bootstrap Authors
 License: MIT
 
@@ -160,6 +163,7 @@ Files:
  apps/librepcb/ui/img/move.svg
  apps/librepcb/ui/img/paste.svg
  apps/librepcb/ui/img/redo.svg
+ apps/librepcb/ui/img/refresh.svg
  apps/librepcb/ui/img/rotate-ccw.svg
  apps/librepcb/ui/img/rotate-cw.svg
  apps/librepcb/ui/img/ruler.svg

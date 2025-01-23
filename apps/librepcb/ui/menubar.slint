@@ -1,36 +1,23 @@
-import { ActionId } from "./api/types.slint";
+import { ActionId, ProjectData, MainPage } from "./api/types.slint";
 import { Data } from "./api/data.slint";
-import { MenuItemData, Menu } from "./common/menu.slint";
+import { Menu, MenuItem } from "./common/menu.slint";
 import { Palette, LineEdit, TabWidget } from "std-widgets.slint";
-
-struct MainMenuItemData {
-    text: string,
-    items: [MenuItemData],
-}
+import { Backend } from "./api/backend.slint";
 
 component MainMenuItem inherits Rectangle {
     in property <string> text <=> t-title.text;
-    in property <[MenuItemData]> items;
+
+    callback clicked <=> ta.clicked;
 
     width: t-title.preferred-width + 10px;
     background: ta.has-hover ? #505050 : #252525;
 
     t-title := Text {
         x: 5px;
-        font-size: 14px;
+        font-size: 15px;
     }
 
-    ta := TouchArea {
-        clicked => {
-            menu.show();
-        }
-    }
-
-    menu := Menu {
-        x: 0;
-        y: 22px;
-        items: items;
-    }
+    ta := TouchArea { }
 }
 
 component MenuBarButton inherits TouchArea {
@@ -47,54 +34,7 @@ component MenuBarButton inherits TouchArea {
 
 export component MenuBar inherits Rectangle {
     in property <length> sections-start-x;
-
-    property <[MainMenuItemData]> items: [
-        {
-            text: @tr("File"),
-            items: [
-                {
-                    id: ActionId.todo,
-                    text: @tr("Save Project"),
-                    handle-in-backend: true,
-                },
-                {
-                    id: ActionId.window-new,
-                    text: @tr("New Window"),
-                    handle-in-backend: true,
-                },
-            ],
-        },
-        {
-            text: @tr("Edit"),
-            items: [
-                {
-                    id: ActionId.todo,
-                    text: @tr("New Window"),
-                    handle-in-backend: true,
-                },
-            ],
-        },
-        {
-            text: @tr("View"),
-            items: [
-                {
-                    id: ActionId.todo,
-                    text: @tr("New Window"),
-                    handle-in-backend: true,
-                },
-            ],
-        },
-        {
-            text: @tr("Help"),
-            items: [
-                {
-                    id: ActionId.todo,
-                    text: @tr("New Window"),
-                    handle-in-backend: true,
-                },
-            ],
-        },
-    ];
+    property <ProjectData> project: Data.projects[Data.current-project-index];
 
     background: #252525;
 
@@ -105,9 +45,180 @@ export component MenuBar inherits Rectangle {
     HorizontalLayout {
         padding-right: 4px;
 
-        for item in items: MainMenuItem {
-            text: item.text;
-            items: item.items;
+        MainMenuItem {
+            text: @tr("File");
+
+            clicked => {
+                menu-file.show();
+            }
+
+            menu-file := Menu {
+                x: 0;
+                y: parent.height;
+
+                MenuItem {
+                    text: @tr("Save Project");
+                }
+            }
+        }
+
+        MainMenuItem {
+            text: @tr("Edit");
+
+            clicked => {
+                menu-edit.show();
+            }
+
+            menu-edit := Menu {
+                x: 0;
+                y: parent.height;
+
+                MenuItem {
+                    text: @tr("Save Project");
+                }
+            }
+        }
+
+        MainMenuItem {
+            text: @tr("View");
+
+            clicked => {
+                menu-view.show();
+            }
+
+            menu-view := Menu {
+                x: 0;
+                y: parent.height;
+            }
+        }
+
+        MainMenuItem {
+            text: @tr("Extras");
+
+            clicked => {
+                menu-extras.show();
+            }
+
+            menu-extras := Menu {
+                x: 0;
+                y: parent.height;
+
+                MenuItem {
+                    text: @tr("Rescan Workspace Libraries");
+                    icon: @image-url("img/refresh.svg");
+                    status-tip: @tr("Scan all workspace libraries to update the cache");
+
+                    clicked => {
+                        Backend.action-triggered(ActionId.rescan-workspace-libraries, -1);
+                    }
+                }
+
+                MenuItem {
+                    text: @tr("Preferences") + "...";
+                    icon: @image-url("img/settings.svg");
+                    status-tip: @tr("Open the workspace settings dialog");
+
+                    clicked => {
+                        Backend.action-triggered(ActionId.open-workspace-settings, -1);
+                    }
+                }
+            }
+        }
+
+        MainMenuItem {
+            text: @tr("Window");
+
+            clicked => {
+                menu-window.show();
+            }
+
+            menu-window := Menu {
+                x: 0;
+                y: parent.height;
+
+                MenuItem {
+                    text: @tr("New Window");
+                    icon: @image-url("img/window-plus.svg");
+                    status-tip: @tr("Open a new window");
+
+                    clicked => {
+                        Backend.action-triggered(ActionId.window-new, -1);
+                    }
+                }
+
+                MenuItem {
+                    text: @tr("Close Window");
+                    icon: @image-url("img/window-x.svg");
+                    status-tip: @tr("Close this window");
+
+                    clicked => {
+                        Backend.action-triggered(ActionId.window-close, -1);
+                    }
+                }
+
+                MenuItem {
+                    text: @tr("Split Section");
+                    icon: @image-url("img/window-split.svg");
+                    status-tip: @tr("Split the current window section");
+
+                    clicked => {
+                        Backend.action-triggered(ActionId.section-split, Data.current-section-index);
+                    }
+                }
+            }
+        }
+
+        MainMenuItem {
+            text: @tr("Help");
+
+            clicked => {
+                menu-help.show();
+            }
+
+            menu-help := Menu {
+                x: 0;
+                y: parent.height;
+
+                MenuItem {
+                    text: @tr("Keyboard Shortcuts Reference") + "...";
+                    icon: @image-url("img/keyboard-shortcuts.svg");
+                    status-tip: @tr("Open a quick reference about the keyboard shortcuts");
+
+                    clicked => {
+                        Backend.action-triggered(ActionId.open-keyboard-shortcuts-reference, -1);
+                    }
+                }
+
+                MenuItem {
+                    text: @tr("User Manual & Tutorials") + "...";
+                    icon: @image-url("img/documentation.svg");
+                    status-tip: @tr("Open the user manual in the web browser");
+
+                    clicked => {
+                        Backend.action-triggered(ActionId.open-user-manual, -1);
+                    }
+                }
+
+                MenuItem {
+                    text: @tr("Website") + "...";
+                    icon: @image-url("img/webbrowser.svg");
+                    status-tip: @tr("Open the LibrePCB website in the web browser");
+
+                    clicked => {
+                        Backend.action-triggered(ActionId.open-website, -1);
+                    }
+                }
+
+                MenuItem {
+                    text: @tr("About LibrePCB");
+                    icon: @image-url("img/help.svg");
+                    status-tip: @tr("Show information about this application");
+
+                    clicked => {
+                        Data.current-page = MainPage.help;
+                    }
+                }
+            }
         }
 
         Rectangle {
@@ -128,30 +239,30 @@ export component MenuBar inherits Rectangle {
             padding-right: 20px;
             spacing: 5px;
 
-            /*MenuBarButton {
-                enabled: Data.current-project.valid;
+            MenuBarButton {
+                enabled: project.valid;
                 icon: @image-url("img/save.svg");
             }
 
             MenuBarButton {
-                enabled: Data.current-project.valid;
+                enabled: project.valid;
                 icon: @image-url("img/pdf.svg");
             }
 
             MenuBarButton {
-                enabled: Data.current-project.valid;
+                enabled: project.valid;
                 icon: @image-url("img/print.svg");
             }
 
             MenuBarButton {
-                enabled: Data.current-project.valid;
+                enabled: project.valid;
                 icon: @image-url("img/undo.svg");
             }
 
             MenuBarButton {
-                enabled: Data.current-project.valid;
+                enabled: project.valid;
                 icon: @image-url("img/redo.svg");
-            }*/
+            }
         }
 
         Rectangle {
@@ -168,70 +279,70 @@ export component MenuBar inherits Rectangle {
                 padding-bottom: 5px;
                 spacing: 5px;
 
-                /*MenuBarButton {
-                    enabled: Data.current-project.valid;
+                MenuBarButton {
+                    enabled: project.valid;
                     icon: @image-url("img/cut.svg");
                 }
 
                 MenuBarButton {
-                    enabled: Data.current-project.valid;
+                    enabled: project.valid;
                     icon: @image-url("img/copy.svg");
                 }
 
                 MenuBarButton {
-                    enabled: Data.current-project.valid;
+                    enabled: project.valid;
                     icon: @image-url("img/paste.svg");
                 }
 
                 MenuBarButton {
-                    enabled: Data.current-project.valid;
+                    enabled: project.valid;
                     icon: @image-url("img/delete.svg");
                 }
 
                 MenuBarButton {
-                    enabled: Data.current-project.valid;
+                    enabled: project.valid;
                     icon: @image-url("img/rotate-ccw.svg");
                 }
 
                 MenuBarButton {
-                    enabled: Data.current-project.valid;
+                    enabled: project.valid;
                     icon: @image-url("img/rotate-cw.svg");
                 }
 
                 MenuBarButton {
-                    enabled: Data.current-project.valid;
+                    enabled: project.valid;
                     icon: @image-url("img/mirror-horizontal.svg");
                 }
 
                 MenuBarButton {
-                    enabled: Data.current-project.valid;
+                    enabled: project.valid;
                     icon: @image-url("img/mirror-vertical.svg");
                 }
 
                 MenuBarButton {
-                    enabled: Data.current-project.valid;
+                    enabled: project.valid;
                     icon: @image-url("img/move.svg");
                 }
 
                 MenuBarButton {
-                    enabled: Data.current-project.valid;
+                    enabled: project.valid;
                     icon: @image-url("img/grid-dots.svg");
                 }
 
                 MenuBarButton {
-                    enabled: Data.current-project.valid;
+                    enabled: project.valid;
                     icon: @image-url("img/reset.svg");
                 }
 
                 MenuBarButton {
-                    enabled: Data.current-project.valid;
+                    enabled: project.valid;
                     icon: @image-url("img/lock-open.svg");
                 }
 
                 MenuBarButton {
-                    enabled: Data.current-project.valid;
+                    enabled: project.valid;
                     icon: @image-url("img/edit.svg");
-                }*/
+                }
             }
         }
 
