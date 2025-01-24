@@ -24,15 +24,17 @@
 
 #include "../apptoolbox.h"
 #include "projecteditor.h"
-#include <librepcb/editor/dialogs/filedialog.h>
+
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectloader.h>
 #include <librepcb/core/project/schematic/schematic.h>
 #include <librepcb/core/utils/scopeguard.h>
-#include <librepcb/editor/dialogs/directorylockhandlerdialog.h>
 #include <librepcb/core/workspace/workspace.h>
+#include <librepcb/editor/dialogs/directorylockhandlerdialog.h>
+#include <librepcb/editor/dialogs/filedialog.h>
+
 #include <QtCore>
 #include <QtWidgets>
 
@@ -47,7 +49,8 @@ namespace app {
  *  Constructors / Destructor
  ******************************************************************************/
 
-ProjectsModel::ProjectsModel(Workspace& ws, QObject* parent) noexcept : QObject(parent), mWorkspace(ws) {
+ProjectsModel::ProjectsModel(Workspace& ws, QObject* parent) noexcept
+  : QObject(parent), mWorkspace(ws) {
 }
 
 ProjectsModel::~ProjectsModel() noexcept {
@@ -68,10 +71,9 @@ std::shared_ptr<ProjectEditor> ProjectsModel::getProject(int index) noexcept {
 std::shared_ptr<ProjectEditor> ProjectsModel::openProject(FilePath fp) {
   if (!fp.isValid()) {
     QSettings cs;  // client settings
-    QString lastOpenedFile = cs
-                                 .value("controlpanel/last_open_project",
-                                        mWorkspace.getPath().toStr())
-                                 .toString();
+    QString lastOpenedFile =
+        cs.value("controlpanel/last_open_project", mWorkspace.getPath().toStr())
+            .toString();
 
     fp = FilePath(FileDialog::getOpenFileName(
         qApp->activeWindow(), tr("Open Project"), lastOpenedFile,
@@ -80,7 +82,6 @@ std::shared_ptr<ProjectEditor> ProjectsModel::openProject(FilePath fp) {
 
     cs.setValue("controlpanel/last_open_project", fp.toNative());
   }
-
 
   const QString uniqueFp = fp.toUnique().toStr();
   // if (mEditors.contains(uniqueFp)) return mEditors.value(uniqueFp);

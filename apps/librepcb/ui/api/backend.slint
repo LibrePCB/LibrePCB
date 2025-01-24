@@ -5,7 +5,10 @@ export global Backend {
     //
     // - Action ID
     // - Section index (pass -1 for things outside a window section)
-    pure callback action-triggered(ActionId, int);
+    pure callback action-triggered(ActionId, int) -> bool;
+    action-triggered(action, section) => {
+        return true;
+    }
 
     // A key has been pressed
     pure callback key-pressed(KeyEvent) -> EventResult;

@@ -75,6 +75,7 @@ public:
 
 private:
   void createNewWindow() noexcept;
+  QString buildAppVersionDetails() const noexcept;
 
   Workspace& mWorkspace;
   std::shared_ptr<RecentProjectsModel> mRecentProjects;

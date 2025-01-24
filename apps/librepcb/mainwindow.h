@@ -24,7 +24,9 @@
  *  Includes
  ******************************************************************************/
 #include "appwindow.h"
+
 #include <librepcb/core/fileio/filepath.h>
+
 #include <QtCore>
 #include <QtGui>
 
@@ -64,6 +66,7 @@ public:
   MainWindow& operator=(const MainWindow& rhs) = delete;
 
 private:
+  slint::CloseRequestResponse closeRequested() noexcept;
   bool actionTriggered(ui::ActionId id, int sectionIndex) noexcept;
   slint::private_api::EventResult keyPressed(
       const slint::private_api::KeyEvent& e) noexcept;
@@ -71,12 +74,14 @@ private:
   void setCurrentProject(std::shared_ptr<ProjectEditor> prj) noexcept;
   std::shared_ptr<ProjectEditor> getCurrentProject() noexcept;
   void newProject(bool eagleImport = false,
-                            const FilePath& parentDir = FilePath()) noexcept;
+                  const FilePath& parentDir = FilePath()) noexcept;
 
   const int mIndex;
+  const QString mSettingsPrefix;
   GuiApplication& mApp;
   std::shared_ptr<WindowSectionsModel> mSections;
   slint::ComponentHandle<ui::AppWindow> mWindow;
+  QWidget* mWidget;
 };
 
 /*******************************************************************************

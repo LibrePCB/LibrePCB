@@ -31,7 +31,9 @@
 #include "workspace/filesystemmodel.h"
 #include "workspace/recentprojectsmodel.h"
 
+#include <librepcb/core/3d/occmodel.h>
 #include <librepcb/core/application.h>
+#include <librepcb/core/systeminfo.h>
 #include <librepcb/core/types/lengthunit.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
@@ -39,6 +41,7 @@
 #include <librepcb/editor/workspace/workspacesettingsdialog.h>
 
 #include <QtCore>
+#include <QtNetwork>
 #include <QtWidgets>
 
 /*******************************************************************************
@@ -74,24 +77,30 @@ bool GuiApplication::actionTriggered(ui::ActionId id,
                                      int sectionIndex) noexcept {
   Q_UNUSED(sectionIndex);
 
+  StandardEditorCommandHandler stdHandler(mWorkspace.getSettings(),
+                                          qApp->activeWindow());
+
   if (id == ui::ActionId::OpenWorkspaceSettings) {
     WorkspaceSettingsDialog dlg(mWorkspace, qApp->activeWindow());
     dlg.exec();
     return true;
   } else if (id == ui::ActionId::OpenKeyboardShortcutsReference) {
-    StandardEditorCommandHandler handler(mWorkspace.getSettings(),
-                                         qApp->activeWindow());
-    handler.shortcutsReference();
+    stdHandler.shortcutsReference();
     return true;
   } else if (id == ui::ActionId::OpenUserManual) {
-    StandardEditorCommandHandler handler(mWorkspace.getSettings(),
-                                         qApp->activeWindow());
-    handler.onlineDocumentation();
+    stdHandler.onlineDocumentation();
+    return true;
+  } else if (id == ui::ActionId::OpenSupport) {
+    stdHandler.onlineSupport();
+    return true;
+  } else if (id == ui::ActionId::OpenDonate) {
+    stdHandler.onlineDonate();
     return true;
   } else if (id == ui::ActionId::OpenWebsite) {
-    StandardEditorCommandHandler handler(mWorkspace.getSettings(),
-                                         qApp->activeWindow());
-    handler.website();
+    stdHandler.website();
+    return true;
+  } else if (id == ui::ActionId::OpenSourceCode) {
+    stdHandler.onlineSourceCode();
     return true;
   } else if (id == ui::ActionId::RescanWorkspaceLibraries) {
     mWorkspace.getLibraryDb().startLibraryRescan();
@@ -130,6 +139,7 @@ void GuiApplication::createNewWindow() noexcept {
   d.set_preview_mode(false);
   d.set_window_title(
       QString("LibrePCB %1").arg(Application::getVersion()).toUtf8().data());
+  d.set_about_librepcb_details(q2s(buildAppVersionDetails()));
   d.set_workspace_path(mWorkspace.getPath().toNative().toUtf8().data());
   d.set_workspace_folder(std::make_shared<FileSystemModel>(
       mWorkspace, mWorkspace.getProjectsPath(), this));
@@ -188,6 +198,29 @@ void GuiApplication::createNewWindow() noexcept {
   // Build wrapper.
   auto mw = std::make_shared<MainWindow>(*this, win, mWindows.count(), this);
   mWindows.append(mw);
+}
+
+QString GuiApplication::buildAppVersionDetails() const noexcept {
+  // Always English, not translatable!
+  QStringList details;
+  const QString date = Application::getBuildDate().toString(Qt::ISODate);
+  QString qt = QString(qVersion()) + " (built against " + QT_VERSION_STR + ")";
+  details << "LibrePCB Version: " + Application::getVersion();
+  details << "Git Revision:     " + Application::getGitRevision();
+  details << "Build Date:       " + date;
+  if (!Application::getBuildAuthor().isEmpty()) {
+    details << "Build Author:     " + Application::getBuildAuthor();
+  }
+  details << "Qt Version:       " + qt;
+  details << "CPU Architecture: " + QSysInfo::currentCpuArchitecture();
+  details << "Operating System: " + QSysInfo::prettyProductName();
+  details << "Platform Plugin:  " + qApp->platformName();
+  details << "TLS Library:      " + QSslSocket::sslLibraryVersionString();
+  details << "OCC Library:      " + OccModel::getOccVersionString();
+  if (!SystemInfo::detectRuntime().isEmpty()) {
+    details << "Runtime:          " + SystemInfo::detectRuntime();
+  }
+  return details.join("\n");
 }
 
 /*******************************************************************************

@@ -150,6 +150,7 @@ License: MIT
 
 Files:
  apps/librepcb/ui/img/check.svg
+ apps/librepcb/ui/img/comments.svg
  apps/librepcb/ui/img/copy.svg
  apps/librepcb/ui/img/cursor.svg
  apps/librepcb/ui/img/cut.svg
@@ -158,14 +159,14 @@ Files:
  apps/librepcb/ui/img/draw-polygon.svg
  apps/librepcb/ui/img/draw-text.svg
  apps/librepcb/ui/img/edit.svg
+ apps/librepcb/ui/img/file-circle-plus.svg
+ apps/librepcb/ui/img/folder-open.svg
  apps/librepcb/ui/img/github.svg
  apps/librepcb/ui/img/heart.svg
  apps/librepcb/ui/img/keyboard-shortcuts.svg
  apps/librepcb/ui/img/move.svg
  apps/librepcb/ui/img/paste.svg
  apps/librepcb/ui/img/redo.svg
- apps/librepcb/ui/img/file-circle-plus.svg
- apps/librepcb/ui/img/folder-open.svg
  apps/librepcb/ui/img/refresh.svg
  apps/librepcb/ui/img/rotate-ccw.svg
  apps/librepcb/ui/img/rotate-cw.svg
@@ -182,7 +183,9 @@ Files: img/actions/generate_ibom.png
 Copyright: InteractiveHtmlBom
 License: MIT
 
-Files: img/logo/ngi0.png
+Files:
+ apps/librepcb/ui/img/ngi0-commons.svg
+ img/logo/ngi0.png
 Copyright: Next Generation Internet
 License: CC-BY-SA-4.0
 
