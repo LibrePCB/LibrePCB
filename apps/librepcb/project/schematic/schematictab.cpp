@@ -71,6 +71,7 @@ SchematicTab::SchematicTab(GuiApplication& app,
         q2s(mBackgroundColor),  // Background color
         q2s(Qt::black),  // Overlay color
         ui::GridStyle::None,  // Grid style
+        ui::LengthUnit::Millimeters,  // Length unit
         true,  // Show pin numbers
         ui::SchematicTool::Select,  // Active tool
     },

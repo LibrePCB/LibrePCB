@@ -54,6 +54,14 @@ export enum ActionId {
     todo,
 }
 
+export enum LengthUnit {
+    millimeters,
+    micrometers,
+    nanometers,
+    inches,
+    mils,
+}
+
 export enum GridStyle {
     none,
     dots,
@@ -162,6 +170,7 @@ export struct SchematicTabData {
     background-color: brush,
     overlay-color: brush,
     grid-style: GridStyle,
+    unit: LengthUnit,
     show-pin-numbers: bool,
     active-tool: SchematicTool,
 }
@@ -170,6 +179,7 @@ export struct Board2dTabData {
     background-color: brush,
     overlay-color: brush,
     grid-style: GridStyle,
+    unit: LengthUnit,
 }
 
 export struct Board3dTabData {

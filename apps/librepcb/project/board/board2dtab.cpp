@@ -64,6 +64,7 @@ Board2dTab::Board2dTab(GuiApplication& app, std::shared_ptr<ProjectEditor> prj,
         q2s(mBackgroundColor),  // Background color
         q2s(Qt::white),  // Overlay color
         ui::GridStyle::None,  // Grid style
+        ui::LengthUnit::Millimeters,  // Length unit
     } {
   // Apply theme.
   const Theme& theme = mApp.getWorkspace().getSettings().themes.getActive();

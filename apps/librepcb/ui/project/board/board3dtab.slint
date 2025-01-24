@@ -1,6 +1,7 @@
 import { WindowSection, Board3dTabData } from "../../api/types.slint";
 import { SceneButton } from "../../common/scenebutton.slint";
 import { Backend } from "../../api/backend.slint";
+import { Data } from "../../api/data.slint";
 
 export component Board3dTab inherits Image {
     in property <int> section-index;
@@ -18,7 +19,12 @@ export component Board3dTab inherits Image {
     TouchArea {
         pointer-event(e) => {
             if (e.kind == PointerEventKind.down) {
-                fs.focus();
+                if (Data.current-section-index != section-index) {
+                    Data.current-section-index = section-index;
+                }
+                if (!fs.has-focus) {
+                    fs.focus();
+                }
             }
             return Backend.scene-pointer-event(section-index, self.mouse-x, self.mouse-y, self.absolute-position, e);
         }

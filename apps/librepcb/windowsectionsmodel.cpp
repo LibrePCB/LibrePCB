@@ -151,13 +151,6 @@ slint::private_api::EventResult WindowSectionsModel::processScenePointerEvent(
     int sectionIndex, const QPointF& pos, const QPointF& globalPos,
     slint::private_api::PointerEvent e) noexcept {
   if (std::shared_ptr<WindowSection> s = mItems.value(sectionIndex)) {
-    if ((e.kind == slint::private_api::PointerEventKind::Down) &&
-        (sectionIndex != mCurrentSectionIndex)) {
-      mCurrentSectionIndex = sectionIndex;
-      emit currentSectionIndexChanged(mCurrentSectionIndex);
-      emit currentProjectChanged(s->getCurrentProject());
-    }
-
     if (s->processScenePointerEvent(pos, globalPos, e)) {
       row_changed(sectionIndex);
     }

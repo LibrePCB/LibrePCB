@@ -1,7 +1,12 @@
 import { Backend } from "./api/backend.slint";
+import { Data } from "./api/data.slint";
 
 export component EmptyTab inherits Rectangle {
     in property <int> section-index;
+
+    fs := FocusScope {
+        enabled: false;
+    }
 
     Text {
         width: 90%;
@@ -15,6 +20,14 @@ export component EmptyTab inherits Rectangle {
 
     TouchArea {
         pointer-event(e) => {
+            if (e.kind == PointerEventKind.down) {
+                if (Data.current-section-index != section-index) {
+                    Data.current-section-index = section-index;
+                }
+                if (!fs.has-focus) {
+                    fs.focus();
+                }
+            }
             return Backend.scene-pointer-event(section-index, self.mouse-x, self.mouse-y, self.absolute-position, e);
         }
 

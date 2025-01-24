@@ -93,7 +93,8 @@ export component WindowSection inherits Rectangle {
 
                     clicked => {
                         if Data.preview-mode {
-                            section.current-tab-index = index;
+                            Data.current-section-index = section-index;
+                            Data.sections[section-index].current-tab-index = index;
                         } else {
                             Backend.tab-clicked(section-index, index);
                         }
