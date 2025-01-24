@@ -54,8 +54,9 @@ namespace app {
  ******************************************************************************/
 
 WindowSectionsModel::WindowSectionsModel(GuiApplication& app,
+                                         const ui::Data& uiData,
                                          QObject* parent) noexcept
-  : QObject(parent), mApp(app), mItems(), mCurrentSectionIndex(0) {
+  : QObject(parent), mApp(app), mUiData(uiData), mItems() {
   splitSection(0);
 }
 
@@ -77,11 +78,10 @@ bool WindowSectionsModel::actionTriggered(ui::ActionId id,
         s->closeTab(i);
       }
       mItems.remove(sectionIndex);
-      mCurrentSectionIndex =
-          qBound(-1, mCurrentSectionIndex, mItems.count() - 1);
+      mUiData.set_current_section_index(
+          qBound(-1, mUiData.get_current_section_index(), mItems.count() - 1));
       row_removed(sectionIndex, 1);
-      emit currentSectionIndexChanged(mCurrentSectionIndex);
-      if (auto sNew = mItems.value(mCurrentSectionIndex)) {
+      if (auto sNew = mItems.value(mUiData.get_current_section_index())) {
         emit currentProjectChanged(sNew->getCurrentProject());
       }
       return true;
@@ -120,12 +120,7 @@ void WindowSectionsModel::openBoard(std::shared_ptr<ProjectEditor> prj,
 void WindowSectionsModel::setCurrentTab(int sectionIndex,
                                         int tabIndex) noexcept {
   if (std::shared_ptr<WindowSection> s = mItems.value(sectionIndex)) {
-    if (sectionIndex != mCurrentSectionIndex) {
-      mCurrentSectionIndex = sectionIndex;
-      emit currentSectionIndexChanged(mCurrentSectionIndex);
-      emit currentProjectChanged(s->getCurrentProject());
-    }
-
+    mUiData.set_current_section_index(sectionIndex);
     s->setCurrentTab(tabIndex);
     row_changed(sectionIndex);  // TODO: signal
   }
@@ -237,7 +232,8 @@ void WindowSectionsModel::splitSection(int sectionIndex) noexcept {
 }
 
 void WindowSectionsModel::addTab(std::shared_ptr<WindowTab> tab) noexcept {
-  const int sectionIndex = qBound(0, mCurrentSectionIndex, mItems.count() - 1);
+  const int sectionIndex =
+      qBound(0, mUiData.get_current_section_index(), mItems.count() - 1);
   if (std::shared_ptr<WindowSection> s = mItems.value(sectionIndex)) {
     s->addTab(tab);
     setCurrentTab(sectionIndex, s->getTabCount() - 1);
