@@ -9,7 +9,7 @@ import { ProjectPanel } from "./project/projectpanel.slint";
 import { HomePanel } from "./homepanel.slint";
 import { MenuBar } from "./menubar.slint";
 import { WindowSection } from "./windowsection.slint";
-import { MainPage, GridStyle } from "./api/types.slint";
+import { MainPage, GridStyle, TabType } from "./api/types.slint";
 import { Backend } from "./api/backend.slint";
 import { Data } from "./api/data.slint";
 import { HelpPanel } from "./helppanel.slint";
@@ -156,6 +156,7 @@ export component AppWindow inherits Window {
                 font-size: 11px;
                 color: white;
                 text: Data.cursor-coordinates;
+                visible: Data.current-tab-is-2d;
             }
 
             Rectangle {
@@ -171,6 +172,7 @@ export component AppWindow inherits Window {
                         vertical-alignment: center;
                         font-family: "Noto Sans Mono";
                         font-size: 11px;
+                        color: (!Data.current-tab-is-2d) ? #707070 : white;
                         text: Data.grid-interval;
                     }
 
@@ -189,14 +191,17 @@ export component AppWindow inherits Window {
             }
 
             Rectangle {
-                width: t-unit.preferred-width + self.height - t-unit.preferred-height;
+                width: max(t-unit.preferred-width + self.height - t-unit.preferred-height, 38px);
                 background: t-unit.has-hover ? #505050 : #404040;
 
                 t-unit := TouchArea {
+                    enabled: Data.current-tab-is-2d;
+
                     Text {
                         vertical-alignment: center;
                         font-size: 11px;
-                        text: Data.unit;
+                        color: (!Data.current-tab-is-2d) ? #707070 : white;
+                        text: Data.get-unit-short-str(Data.current-unit);
                     }
 
                     clicked => {
@@ -208,36 +213,24 @@ export component AppWindow inherits Window {
                     x: -(self.preferred-width - parent.width) / 2;
                     y: -self.preferred-height;
 
-                    Rectangle {
-                        background: #404040;
+                    VerticalLayout {
+                        for unit in Data.all-length-units: TouchArea {
+                            Rectangle {
+                                background: parent.has-hover ? #505050 : #404040;
 
-                        VerticalBox {
-                            padding-left: 5px;
-                            padding-right: 5px;
+                                HorizontalLayout {
+                                    padding: 5px;
 
-                            Text {
-                                color: #cccccc;
-                                text: "mm";
+                                    Text {
+                                        color: #cccccc;
+                                        horizontal-alignment: center;
+                                        text: Data.get-unit-short-str(unit);
+                                    }
+                                }
                             }
 
-                            Text {
-                                color: #cccccc;
-                                text: "μm";
-                            }
-
-                            Text {
-                                color: #cccccc;
-                                text: "nm";
-                            }
-
-                            Text {
-                                color: #cccccc;
-                                text: "″";
-                            }
-
-                            Text {
-                                color: #cccccc;
-                                text: "mils";
+                            clicked => {
+                                Data.set-current-unit(unit);
                             }
                         }
                     }
@@ -273,15 +266,17 @@ export component AppWindow inherits Window {
 
             Rectangle {
                 width: self.height;
-                background: Data.ignore-placement-locks ? #900000 : (t-lock.has-hover ? #505050 : #404040);
+                background: (t-lock.enabled && Data.ignore-placement-locks) ? #900000 : (t-lock.has-hover ? #505050 : #404040);
 
                 t-lock := TouchArea {
+                    enabled: Data.current-tab.type == TabType.board-2d;
+
                     Image {
                         width: self.height * 0.7;
                         height: 100%;
                         image-fit: contain;
                         source: Data.ignore-placement-locks ? @image-url("img/lock-open.svg") : @image-url("img/lock-closed.svg");
-                        colorize: Data.ignore-placement-locks ? white : Palette.foreground;
+                        colorize: (!t-lock.enabled) ? #707070 : (Data.ignore-placement-locks ? white : Palette.foreground);
                     }
 
                     clicked => {

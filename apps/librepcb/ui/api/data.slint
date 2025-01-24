@@ -11,7 +11,8 @@ import {
     GridStyle,
     TabData,
     SchematicTabData,
-    Board2dTabData
+    Board2dTabData,
+    LengthUnit
 } from "./types.slint";
 
 export global Data {
@@ -28,8 +29,6 @@ export global Data {
     in property <string> cursor-coordinates: "X: 123.456 Y: 123.456";
 
     in property <string> grid-interval: "2.54";
-
-    in property <string> unit: "mm";
 
     in-out property <bool> ignore-placement-locks: true;
 
@@ -202,6 +201,7 @@ export global Data {
                     background-color: Colors.white,
                     overlay-color: Colors.black,
                     grid-style: GridStyle.none,
+                    unit: LengthUnit.millimeters,
                     show-pin-numbers: false,
                     active-tool: SchematicTool.draw-polygon,
                 },
@@ -214,6 +214,7 @@ export global Data {
                     background-color: Colors.black,
                     overlay-color: Colors.white,
                     grid-style: GridStyle.none,
+                    unit: LengthUnit.millimeters,
                 },
             ],
             current-tab-index: 2,
@@ -227,34 +228,66 @@ export global Data {
                     project-index: 1,
                 },
             ],
-            board-2d-tabs: [
-                {
-                    background-color: Colors.white,
-                    overlay-color: Colors.gray,
-                    grid-style: GridStyle.none,
-                },
-            ],
             current-tab-index: 0,
         },
     ];
 
     in property <int> current-section-index: 0;
 
-    // Auto-calculated data.
-    in-out property <ProjectData> current-project: Data.projects[Data.current-project-index];
-    in-out property <WindowSection> current-section: Data.sections[Data.current-section-index];
+    // Constant
+    out property <[LengthUnit]> all-length-units: [
+        LengthUnit.millimeters,
+        LengthUnit.micrometers,
+        LengthUnit.nanometers,
+        LengthUnit.inches,
+        LengthUnit.mils,
+    ];
+
+    // Auto-calculated
+    in-out property <ProjectData> current-project: projects[current-project-index];
+    in-out property <WindowSection> current-section: sections[current-section-index];
     in-out property <TabData> current-tab: current-section.tabs[current-section.current-tab-index];
-    out property <bool> current-tab-is-2d: (Data.current-tab.type == TabType.schematic) || (Data.current-tab.type == TabType.board-2d);
-    out property <bool> current-tab-is-2d-or-3d: (Data.current-tab.type == TabType.schematic) || (Data.current-tab.type == TabType.board-2d) || (Data.current-tab.type == TabType.board-3d);
+    out property <bool> current-tab-is-2d: (current-tab.type == TabType.schematic) || (current-tab.type == TabType.board-2d);
+    out property <bool> current-tab-is-2d-or-3d: (current-tab.type == TabType.schematic) || (current-tab.type == TabType.board-2d) || (current-tab.type == TabType.board-3d);
     in-out property <SchematicTabData> current-schematic-tab: current-section.schematic-tabs[current-section.current-tab-index];
     in-out property <Board2dTabData> current-board-2d-tab: current-section.board-2d-tabs[current-section.current-tab-index];
     out property <GridStyle> current-grid-style: (current-tab.type == TabType.schematic) ? current-schematic-tab.grid-style : current-board-2d-tab.grid-style;
+    out property <LengthUnit> current-unit: (current-tab.type == TabType.schematic) ? current-schematic-tab.unit : current-board-2d-tab.unit;
 
     public function set-current-grid-style(gs: GridStyle) {
         if (current-tab.type == TabType.schematic) {
             current-section.schematic-tabs[current-section.current-tab-index].grid-style = gs;
-        } else {
+        } else if (current-tab.type == TabType.board-2d) {
             current-section.board-2d-tabs[current-section.current-tab-index].grid-style = gs;
+        } else {
+            debug("Unhandled case in set-current-grid-style().");
+        }
+    }
+
+    public function set-current-unit(u: LengthUnit) {
+        if (current-tab.type == TabType.schematic) {
+            current-section.schematic-tabs[current-section.current-tab-index].unit = u;
+        } else if (current-tab.type == TabType.board-2d) {
+            current-section.board-2d-tabs[current-section.current-tab-index].unit = u;
+        } else {
+            debug("Unhandled case in set-current-unit().");
+        }
+    }
+
+    pure public function get-unit-short-str(u: LengthUnit) -> string {
+        if (u == LengthUnit.millimeters) {
+            return "mm";
+        } else if (u == LengthUnit.micrometers) {
+            return "μm";
+        } else if (u == LengthUnit.nanometers) {
+            return "nm";
+        } else if (u == LengthUnit.inches) {
+            return "inch";
+        } else if (u == LengthUnit.mils) {
+            return "mils";
+        } else {
+            debug("Unhandled case in get-unit-short-str().");
+            return "";
         }
     }
 }

@@ -190,7 +190,12 @@ export component SchematicTab inherits Image {
 
         pointer-event(e) => {
             if (e.kind == PointerEventKind.down) {
-                fs.focus();
+                if (Data.current-section-index != section-index) {
+                    Data.current-section-index = section-index;
+                }
+                if (!fs.has-focus) {
+                    fs.focus();
+                }
             }
             return Backend.scene-pointer-event(section-index, self.mouse-x, self.mouse-y, self.absolute-position, e);
         }
