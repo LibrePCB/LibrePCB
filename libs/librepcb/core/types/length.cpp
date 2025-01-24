@@ -121,6 +121,12 @@ Length Length::fromPx(qreal pixels, const Length& gridInterval) {
   return l.mapToGrid(gridInterval);
 }
 
+std::optional<Length> Length::tryFromPx(qreal pixels) noexcept {
+  Length l;
+  const bool valid = l.setLengthFromFloat(pixels * sNmPerPixel, false);
+  return valid ? std::make_optional(l) : std::nullopt;
+}
+
 Length Length::min() noexcept {
   return Length(std::numeric_limits<LengthBase_t>::min());
 }
@@ -133,11 +139,12 @@ Length Length::max() noexcept {
  *  Private Methods
  ******************************************************************************/
 
-void Length::setLengthFromFloat(qreal nanometers) {
-  checkRange(nanometers, true);  // Throws on range error.
+bool Length::setLengthFromFloat(qreal nanometers, bool doThrow) {
+  const bool valid = checkRange(nanometers, doThrow);
   // Note: Don't use qRound() because in Qt5 it is implemented strange.
   mNanometers = (nanometers >= 0.0) ? qint64(nanometers + qreal(0.5))
                                     : qint64(nanometers - qreal(0.5));
+  return valid;
 }
 
 /*******************************************************************************

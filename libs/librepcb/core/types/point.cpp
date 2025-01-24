@@ -184,6 +184,16 @@ Point Point::fromPx(const QPointF& pixels) {
   return fromPx(pixels.x(), pixels.y());
 }
 
+std::optional<Point> Point::tryFromPx(const QPointF& pixels) noexcept {
+  const auto x = Length::tryFromPx(pixels.x());
+  const auto y = Length::tryFromPx(-pixels.y());  // invert Y!
+  if (x && y) {
+    return Point(*x, *y);
+  } else {
+    return std::nullopt;
+  }
+}
+
 // Non-Member Functions
 
 QDataStream& operator<<(QDataStream& stream, const Point& point) {

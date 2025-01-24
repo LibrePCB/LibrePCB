@@ -22,13 +22,17 @@
  ******************************************************************************/
 #include "board2dtab.h"
 
-#include "apptoolbox.h"
-#include "guiapplication.h"
-#include "project/projecteditor.h"
+#include "../../apptoolbox.h"
+#include "../../guiapplication.h"
+#include "../../uitypes.h"
+#include "../projecteditor.h"
 
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boardplanefragmentsbuilder.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/workspace/theme.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 #include <librepcb/editor/project/boardeditor/boardgraphicsscene.h>
 
 #include <QtCore>
@@ -55,8 +59,23 @@ static QString getTitle(std::shared_ptr<ProjectEditor> prj, int boardIndex) {
 Board2dTab::Board2dTab(GuiApplication& app, std::shared_ptr<ProjectEditor> prj,
                        int boardIndex, QObject* parent) noexcept
   : GraphicsSceneTab(app, ui::TabType::Board2d, QPixmap(":/projects.png"), prj,
-                     boardIndex, getTitle(prj, boardIndex), Qt::black, parent),
-    mUiData{q2s(mBackgroundColor), q2s(Qt::white)} {
+                     boardIndex, getTitle(prj, boardIndex), parent),
+    mUiData{
+        q2s(mBackgroundColor),  // Background color
+        q2s(Qt::white),  // Overlay color
+        ui::GridStyle::None,  // Grid style
+    } {
+  // Apply theme.
+  const Theme& theme = mApp.getWorkspace().getSettings().themes.getActive();
+  mBackgroundColor =
+      theme.getColor(Theme::Color::sBoardBackground).getPrimaryColor();
+  mGridColor =
+      theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor();
+  mGridStyle = theme.getBoardGridStyle();
+  mUiData.grid_style = l2s(mGridStyle);
+  if (auto brd = mProject->getProject().getBoardByIndex(mObjIndex)) {
+    mGridInterval = brd->getGridInterval();
+  }
 }
 
 Board2dTab::~Board2dTab() noexcept {
@@ -68,6 +87,10 @@ Board2dTab::~Board2dTab() noexcept {
 
 void Board2dTab::setUiData(const ui::Board2dTabData& data) noexcept {
   mUiData = data;
+
+  mGridStyle = s2l(mUiData.grid_style);
+
+  invalidateBackground();
 }
 
 void Board2dTab::activate() noexcept {

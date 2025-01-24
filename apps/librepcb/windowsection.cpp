@@ -71,10 +71,13 @@ WindowSection::WindowSection(GuiApplication& app, QObject* parent) noexcept
         0} {
   connect(mTabsModel.get(), &WindowTabsModel::cursorCoordinatesChanged, this,
           &WindowSection::cursorCoordinatesChanged);
-  connect(mTabsModel.get(), &WindowTabsModel::requestRepaint, this, [this]() {
-    mUiData.frame++;
-    uiDataChanged();
-  });
+  connect(
+      mTabsModel.get(), &WindowTabsModel::requestRepaint, this,
+      [this]() {
+        mUiData.frame++;
+        uiDataChanged();
+      },
+      Qt::QueuedConnection);
   connect(mTabsModel.get(), &WindowTabsModel::uiDataChanged, this,
           &WindowSection::uiDataChanged);
 }

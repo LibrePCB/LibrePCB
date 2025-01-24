@@ -22,22 +22,20 @@ component ProjectItem inherits Rectangle {
 }
 
 export component ProjectPanel inherits Rectangle {
-    property <ProjectData> project: Data.projects[Data.current-project-index];
-
     background: #2a2a2a;
 
     VerticalLayout {
         alignment: LayoutAlignment.start;
 
         PanelHeader {
-            title: project.name;
+            title: Data.current-project.name;
         }
 
         PanelHeader {
             title: @tr("SCHEMATICS");
         }
 
-        for schematic[index] in project.schematics: ProjectItem {
+        for schematic[index] in Data.current-project.schematics: ProjectItem {
             text: schematic;
 
             clicked => {
@@ -49,7 +47,7 @@ export component ProjectPanel inherits Rectangle {
             title: @tr("BOARDS");
         }
 
-        for board[index] in project.boards: ProjectItem {
+        for board[index] in Data.current-project.boards: ProjectItem {
             text: board;
 
             clicked => {

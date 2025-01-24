@@ -22,14 +22,16 @@
  ******************************************************************************/
 #include "schematictab.h"
 
+#include "../../apptoolbox.h"
+#include "../../guiapplication.h"
+#include "../../uitypes.h"
 #include "../projecteditor.h"
-#include "apptoolbox.h"
-#include "guiapplication.h"
-#include "project/projecteditor.h"
 
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/schematic/schematic.h>
 #include <librepcb/core/workspace/theme.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 #include <librepcb/editor/graphics/graphicslayer.h>
 #include <librepcb/editor/project/projecteditor.h>
 #include <librepcb/editor/project/schematiceditor/fsm/schematiceditorfsm.h>
@@ -64,15 +66,27 @@ SchematicTab::SchematicTab(GuiApplication& app,
                            std::shared_ptr<ProjectEditor> prj,
                            int schematicIndex, QObject* parent) noexcept
   : GraphicsSceneTab(app, ui::TabType::Schematic, QPixmap(":/image.svg"), prj,
-                     schematicIndex, getTitle(prj, schematicIndex), Qt::white,
-                     parent),
+                     schematicIndex, getTitle(prj, schematicIndex), parent),
     mUiData{
         q2s(mBackgroundColor),  // Background color
         q2s(Qt::black),  // Overlay color
+        ui::GridStyle::None,  // Grid style
         true,  // Show pin numbers
         ui::SchematicTool::Select,  // Active tool
     },
     mFsm() {
+  // Apply theme.
+  const Theme& theme = mApp.getWorkspace().getSettings().themes.getActive();
+  mBackgroundColor =
+      theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor();
+  mGridColor =
+      theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor();
+  mGridStyle = theme.getSchematicGridStyle();
+  mUiData.grid_style = l2s(mGridStyle);
+  if (auto sch = mProject->getProject().getSchematicByIndex(mObjIndex)) {
+    mGridInterval = sch->getGridInterval();
+  }
+
   // Build the whole schematic editor finite state machine.
   auto editor = new editor::ProjectEditor(mApp.getWorkspace(),
                                           mProject->getProject(), std::nullopt);
@@ -106,10 +120,12 @@ SchematicTab::~SchematicTab() noexcept {
 void SchematicTab::setUiData(const ui::SchematicTabData& data) noexcept {
   mUiData = data;
 
+  mGridStyle = s2l(mUiData.grid_style);
   if (auto l = mLayerProvider->getLayer(Theme::Color::sSchematicPinNumbers)) {
     l->setVisible(mUiData.show_pin_numbers);
   }
 
+  invalidateBackground();
   emit requestRepaint();
 }
 

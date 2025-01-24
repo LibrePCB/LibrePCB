@@ -25,6 +25,8 @@
  ******************************************************************************/
 #include "windowtab.h"
 
+#include <librepcb/core/workspace/theme.h>
+
 #include <QtCore>
 #include <QtGui>
 
@@ -84,7 +86,7 @@ public:
   explicit GraphicsSceneTab(GuiApplication& app, ui::TabType type,
                             const QPixmap& icon,
                             std::shared_ptr<ProjectEditor> prj, int objIndex,
-                            const QString& title, const QColor& bgColor,
+                            const QString& title,
                             QObject* parent = nullptr) noexcept;
   virtual ~GraphicsSceneTab() noexcept;
 
@@ -103,13 +105,21 @@ public:
   // Operator Overloadings
   GraphicsSceneTab& operator=(const GraphicsSceneTab& rhs) = delete;
 
+protected:
+  void invalidateBackground() noexcept;
+
 private:
   virtual bool zoom(const QPointF& center, qreal factor) noexcept;
   virtual void smoothTo(const Projection& projection) noexcept;
   virtual bool applyProjection(const Projection& projection) noexcept;
 
 protected:
-  const QColor mBackgroundColor;
+  QColor mBackgroundColor;
+  QColor mGridColor;
+  Theme::GridStyle mGridStyle;
+  PositiveLength mGridInterval;
+
+  QPixmap mCachedBackground;
   std::unique_ptr<IF_GraphicsLayerProvider> mLayerProvider;
   std::shared_ptr<GraphicsScene> mScene;
 

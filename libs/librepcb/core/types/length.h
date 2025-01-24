@@ -29,6 +29,8 @@
 
 #include <QtCore>
 
+#include <optional>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -480,6 +482,15 @@ public:
   static Length fromPx(qreal pixels, const Length& gridInterval = Length(0));
 
   /**
+   * @brief Same as #fromPx(), but does not throw on invalid input
+   *
+   * @param pixels        See setLengthPx()
+   * @param gridInterval  See mapToGrid()
+   * @return Length if input was valid, std::nullopt otherwise
+   */
+  static std::optional<Length> tryFromPx(qreal pixels) noexcept;
+
+  /**
    * @brief Get the smallest possible length value
    *
    * @return Smallest possible length
@@ -582,6 +593,7 @@ private:
    * This is a helper method for the setLength*() methods.
    *
    * @param nanometers    A floating point number in nanometers.
+   * @param doThrow       Throw on invalid input.
    *
    * @note The parameter is NOT an integer although we don't use numbers smaller
    * than one nanometer. This way, the range of this parameter is much greater
@@ -589,7 +601,7 @@ private:
    * outside the range of an integer, we will throw an exception. If we would
    * pass the length as an integer, we couldn't detect such under-/overflows!
    */
-  void setLengthFromFloat(qreal nanometers);
+  bool setLengthFromFloat(qreal nanometers, bool doThrow = true);
 
   // Private Static Functions
 

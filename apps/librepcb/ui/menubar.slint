@@ -34,22 +34,11 @@ component MenuBarButton inherits TouchArea {
 
 export component MenuBar inherits Rectangle {
     in property <length> sections-start-x;
-    property <ProjectData> project: Data.projects[Data.current-project-index];
-    property <WindowSection> current-section: Data.sections[Data.current-section-index];
-    property <TabData> current-tab: current-section.tabs[current-section.current-tab-index];
 
     background: #252525;
 
     public function focus-search() {
         le-search.focus();
-    }
-
-    function is-2d-graphics-tab() -> bool {
-        return (current-tab.type == TabType.schematic) || (current-tab.type == TabType.board-2d);
-    }
-
-    function is-graphics-tab() -> bool {
-        return (current-tab.type == TabType.schematic) || (current-tab.type == TabType.board-2d) || (current-tab.type == TabType.board-3d);
     }
 
     HorizontalLayout {
@@ -183,21 +172,21 @@ export component MenuBar inherits Rectangle {
                     icon: @image-url("img/grid-lines.svg");
                     status-tip: @tr("View/modify the grid properties");
                     shortcuts: "F4";
-                    enabled: is-2d-graphics-tab();
+                    enabled: Data.current-tab-is-2d;
                 }
 
                 MenuItem {
                     text: @tr("Increase Grid Interval");
                     status-tip: @tr("Increase the grid interval");
                     shortcuts: "Ctrl+Shift++";
-                    enabled: is-2d-graphics-tab();
+                    enabled: Data.current-tab-is-2d;
                 }
 
                 MenuItem {
                     text: @tr("Decrease Grid Interval");
                     status-tip: @tr("Decrease the grid interval");
                     shortcuts: "Ctrl+Shift+-";
-                    enabled: is-2d-graphics-tab();
+                    enabled: Data.current-tab-is-2d;
                 }
 
                 MenuSeparator { }
@@ -205,24 +194,24 @@ export component MenuBar inherits Rectangle {
                 MenuItem {
                     text: @tr("Show Pin Numbers");
                     status-tip: @tr("Show or hide symbol pin numbers");
-                    enabled: current-tab.type == TabType.schematic;
-                    checked: current-section.schematic-tabs[current-section.current-tab-index].show-pin-numbers;
+                    enabled: Data.current-tab.type == TabType.schematic;
+                    checked: Data.current-section.schematic-tabs[Data.current-section.current-tab-index].show-pin-numbers;
 
                     clicked => {
-                        current-section.schematic-tabs[current-section.current-tab-index].show-pin-numbers = !current-section.schematic-tabs[current-section.current-tab-index].show-pin-numbers;
+                        Data.current-section.schematic-tabs[Data.current-section.current-tab-index].show-pin-numbers = !Data.current-section.schematic-tabs[Data.current-section.current-tab-index].show-pin-numbers;
                     }
                 }
 
                 MenuItem {
                     text: @tr("Hide All Planes");
                     status-tip: @tr("Make the filled areas of all planes invisible");
-                    enabled: current-tab.type == TabType.board-2d;
+                    enabled: Data.current-tab.type == TabType.board-2d;
                 }
 
                 MenuItem {
                     text: @tr("Show All Planes");
                     status-tip: @tr("Make the filled areas of all planes visible");
-                    enabled: current-tab.type == TabType.board-2d;
+                    enabled: Data.current-tab.type == TabType.board-2d;
                 }
 
                 MenuSeparator { }
@@ -232,7 +221,7 @@ export component MenuBar inherits Rectangle {
                     icon: @image-url("img/3d.svg");
                     status-tip: @tr("Switch between the 2D and 3D viewer mode");
                     shortcuts: "Ctrl+3";
-                    enabled: (current-tab.type == TabType.board-2d) || (current-tab.type == TabType.board-3d);
+                    enabled: (Data.current-tab.type == TabType.board-2d) || (Data.current-tab.type == TabType.board-3d);
 
                     clicked => {
                         Backend.action-triggered(ActionId.board-2d-tab-open-3d, Data.current-section-index);
@@ -246,7 +235,7 @@ export component MenuBar inherits Rectangle {
                     icon: @image-url("img/zoom-in.svg");
                     status-tip: @tr("Increase the zoom level");
                     shortcuts: "Ctrl++";
-                    enabled: is-graphics-tab();
+                    enabled: Data.current-tab-is-2d-or-3d;
                 }
 
                 MenuItem {
@@ -254,7 +243,7 @@ export component MenuBar inherits Rectangle {
                     icon: @image-url("img/zoom-out.svg");
                     status-tip: @tr("Decrease the zoom level");
                     shortcuts: "Ctrl+-";
-                    enabled: is-graphics-tab();
+                    enabled: Data.current-tab-is-2d-or-3d;
                 }
 
                 MenuItem {
@@ -262,7 +251,7 @@ export component MenuBar inherits Rectangle {
                     icon: @image-url("img/zoom-fit.svg");
                     status-tip: @tr("Set the zoom level to fit the whole content");
                     shortcuts: "Ctrl+Home";
-                    enabled: is-graphics-tab();
+                    enabled: Data.current-tab-is-2d-or-3d;
                 }
 
                 MenuSeparator { }
@@ -272,7 +261,7 @@ export component MenuBar inherits Rectangle {
                     icon: @image-url("img/lock-closed.svg");
                     status-tip: @tr("Allow dragging locked objects");
                     shortcuts: "Ctrl+Shift+L";
-                    enabled: current-tab.type == TabType.board-2d;
+                    enabled: Data.current-tab.type == TabType.board-2d;
                     checked: Data.ignore-placement-locks;
 
                     clicked => {
@@ -451,27 +440,27 @@ export component MenuBar inherits Rectangle {
             spacing: 5px;
 
             MenuBarButton {
-                enabled: project.valid;
+                enabled: Data.current-project.valid;
                 icon: @image-url("img/save.svg");
             }
 
             MenuBarButton {
-                enabled: project.valid;
+                enabled: Data.current-project.valid;
                 icon: @image-url("img/pdf.svg");
             }
 
             MenuBarButton {
-                enabled: project.valid;
+                enabled: Data.current-project.valid;
                 icon: @image-url("img/print.svg");
             }
 
             MenuBarButton {
-                enabled: project.valid;
+                enabled: Data.current-project.valid;
                 icon: @image-url("img/undo.svg");
             }
 
             MenuBarButton {
-                enabled: project.valid;
+                enabled: Data.current-project.valid;
                 icon: @image-url("img/redo.svg");
             }
         }
@@ -491,67 +480,67 @@ export component MenuBar inherits Rectangle {
                 spacing: 5px;
 
                 MenuBarButton {
-                    enabled: project.valid;
+                    enabled: Data.current-project.valid;
                     icon: @image-url("img/cut.svg");
                 }
 
                 MenuBarButton {
-                    enabled: project.valid;
+                    enabled: Data.current-project.valid;
                     icon: @image-url("img/copy.svg");
                 }
 
                 MenuBarButton {
-                    enabled: project.valid;
+                    enabled: Data.current-project.valid;
                     icon: @image-url("img/paste.svg");
                 }
 
                 MenuBarButton {
-                    enabled: project.valid;
+                    enabled: Data.current-project.valid;
                     icon: @image-url("img/delete.svg");
                 }
 
                 MenuBarButton {
-                    enabled: project.valid;
+                    enabled: Data.current-project.valid;
                     icon: @image-url("img/rotate-ccw.svg");
                 }
 
                 MenuBarButton {
-                    enabled: project.valid;
+                    enabled: Data.current-project.valid;
                     icon: @image-url("img/rotate-cw.svg");
                 }
 
                 MenuBarButton {
-                    enabled: project.valid;
+                    enabled: Data.current-project.valid;
                     icon: @image-url("img/mirror-horizontal.svg");
                 }
 
                 MenuBarButton {
-                    enabled: project.valid;
+                    enabled: Data.current-project.valid;
                     icon: @image-url("img/mirror-vertical.svg");
                 }
 
                 MenuBarButton {
-                    enabled: project.valid;
+                    enabled: Data.current-project.valid;
                     icon: @image-url("img/move.svg");
                 }
 
                 MenuBarButton {
-                    enabled: project.valid;
+                    enabled: Data.current-project.valid;
                     icon: @image-url("img/grid-dots.svg");
                 }
 
                 MenuBarButton {
-                    enabled: project.valid;
+                    enabled: Data.current-project.valid;
                     icon: @image-url("img/reset.svg");
                 }
 
                 MenuBarButton {
-                    enabled: project.valid;
+                    enabled: Data.current-project.valid;
                     icon: @image-url("img/lock-open.svg");
                 }
 
                 MenuBarButton {
-                    enabled: project.valid;
+                    enabled: Data.current-project.valid;
                     icon: @image-url("img/edit.svg");
                 }
             }

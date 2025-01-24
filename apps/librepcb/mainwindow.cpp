@@ -156,11 +156,6 @@ MainWindow::MainWindow(GuiApplication& app,
   QSettings cs;
   mWidget->restoreGeometry(
       cs.value(mSettingsPrefix % "/geometry").toByteArray());
-
-  QAction* a = new QAction();
-  a->setShortcut(QKeySequence(Qt::Key_F4));
-  connect(a, &QAction::triggered, this, [](){qDebug() << "F4";});
-  mWidget->addAction(a);
 }
 
 MainWindow::~MainWindow() noexcept {
