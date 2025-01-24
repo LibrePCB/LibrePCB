@@ -8,7 +8,10 @@ import {
     SchematicTool,
     TabType,
     WindowSection,
-    GridStyle
+    GridStyle,
+    TabData,
+    SchematicTabData,
+    Board2dTabData
 } from "./types.slint";
 
 export global Data {
@@ -28,11 +31,9 @@ export global Data {
 
     in property <string> unit: "mm";
 
-    in-out property <GridStyle> grid-style: GridStyle.lines;
-
     in-out property <bool> ignore-placement-locks: true;
 
-    in-out property <MainPage> current-page: MainPage.help;
+    in-out property <MainPage> current-page: MainPage.home;
 
     in property <[FolderTreeItem]> workspace-folder: [
         {
@@ -200,6 +201,7 @@ export global Data {
                 {
                     background-color: Colors.white,
                     overlay-color: Colors.black,
+                    grid-style: GridStyle.none,
                     show-pin-numbers: false,
                     active-tool: SchematicTool.draw-polygon,
                 },
@@ -211,6 +213,7 @@ export global Data {
                 {
                     background-color: Colors.black,
                     overlay-color: Colors.white,
+                    grid-style: GridStyle.none,
                 },
             ],
             current-tab-index: 2,
@@ -228,6 +231,7 @@ export global Data {
                 {
                     background-color: Colors.white,
                     overlay-color: Colors.gray,
+                    grid-style: GridStyle.none,
                 },
             ],
             current-tab-index: 0,
@@ -235,4 +239,22 @@ export global Data {
     ];
 
     in property <int> current-section-index: 0;
+
+    // Auto-calculated data.
+    in-out property <ProjectData> current-project: Data.projects[Data.current-project-index];
+    in-out property <WindowSection> current-section: Data.sections[Data.current-section-index];
+    in-out property <TabData> current-tab: current-section.tabs[current-section.current-tab-index];
+    out property <bool> current-tab-is-2d: (Data.current-tab.type == TabType.schematic) || (Data.current-tab.type == TabType.board-2d);
+    out property <bool> current-tab-is-2d-or-3d: (Data.current-tab.type == TabType.schematic) || (Data.current-tab.type == TabType.board-2d) || (Data.current-tab.type == TabType.board-3d);
+    in-out property <SchematicTabData> current-schematic-tab: current-section.schematic-tabs[current-section.current-tab-index];
+    in-out property <Board2dTabData> current-board-2d-tab: current-section.board-2d-tabs[current-section.current-tab-index];
+    out property <GridStyle> current-grid-style: (current-tab.type == TabType.schematic) ? current-schematic-tab.grid-style : current-board-2d-tab.grid-style;
+
+    public function set-current-grid-style(gs: GridStyle) {
+        if (current-tab.type == TabType.schematic) {
+            current-section.schematic-tabs[current-section.current-tab-index].grid-style = gs;
+        } else {
+            current-section.board-2d-tabs[current-section.current-tab-index].grid-style = gs;
+        }
+    }
 }

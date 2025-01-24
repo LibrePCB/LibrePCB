@@ -38,6 +38,7 @@ add_executable(
   project/projectsmodel.h
   project/schematic/schematictab.cpp
   project/schematic/schematictab.h
+  uitypes.h
   windowsection.cpp
   windowsection.h
   windowsectionsmodel.cpp

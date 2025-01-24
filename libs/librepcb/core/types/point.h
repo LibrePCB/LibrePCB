@@ -27,6 +27,8 @@
 
 #include <QtCore>
 
+#include <optional>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -422,6 +424,7 @@ public:
   ///       For this purpose, these methods will invert the Y-coordinate.
   static Point fromPx(qreal pixelsX, qreal pixelsY);
   static Point fromPx(const QPointF& pixels);
+  static std::optional<Point> tryFromPx(const QPointF& pixels) noexcept;
 
   // Operators
   Point& operator=(const Point& rhs) {

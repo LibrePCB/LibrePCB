@@ -26,6 +26,7 @@
 #include <librepcb/core/types/elementname.h>
 #include <librepcb/core/types/fileproofname.h>
 #include <librepcb/core/types/version.h>
+#include <librepcb/core/workspace/theme.h>
 
 #include <QtCore>
 #include <QtGui>
