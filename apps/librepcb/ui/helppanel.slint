@@ -1,10 +1,15 @@
 import { PanelHeader } from "./common/panelheader.slint";
 import { Data } from "./api/data.slint";
+import { ActionId } from "./api/types.slint";
 import { Backend } from "./api/backend.slint";
 import { Button, Palette } from "std-widgets.slint";
 import { ToolTip } from "./common/tooltip.slint";
 
 export component HelpPanel inherits Rectangle {
+    // Adjust the offset at the end after adding/removing panel content.
+    // Attention: The preview layout differs from the compiled application.
+    property <length> available-space: self.height - ti-details.height - 160px;
+
     background: #2a2a2a;
 
     VerticalLayout {
@@ -32,30 +37,41 @@ export component HelpPanel inherits Rectangle {
         }
 
         VerticalLayout {
-            padding: 5px;
-            spacing: 10px;
-
-            Text {
-                wrap: word-wrap;
-                text: @tr("LibrePCB is a free & open source schematic/layout-editor. It is mainly developed by Urban Bruhin, with the support of many other contributors.");
-            }
-
-            Text {
-                wrap: word-wrap;
-                font-italic: true;
-                text: @tr("This is free software, released under the GNU General Public License (GPL) version 3 or later. You can find the full license text in our source code.");
-            }
-        }
-
-        VerticalLayout {
-            padding: 5px;
+            vertical-stretch: 0;
+            padding: 8px;
             spacing: 5px;
+
+            if available-space > 390px: Rectangle {
+                height: t-description.preferred-height + 2 * t-description.y;
+                background: #404040;
+                border-width: 1px;
+                border-color: #c0c0c0;
+                border-radius: 8px;
+
+                t-description := Text {
+                    x: 8px;
+                    y: self.x;
+                    width: parent.width - 2 * self.x;
+                    wrap: word-wrap;
+                    color: #e0e0e0;
+                    font-size: 11.5px;
+                    text: @tr("LibrePCB is a free & open source software. It is mainly developed by {}, with the support of many other contributors. Please consider supporting our hard work with a donation ‒ thank you.", "Urban Bruhin");
+                }
+            }
+
+            Rectangle {
+                height: 5px;
+            }
 
             Button {
                 width: self.preferred-width;
                 colorize-icon: true;
                 icon: @image-url("img/webbrowser.svg");
                 text: @tr("Website");
+
+                clicked => {
+                    Backend.action-triggered(ActionId.open-website, -1);
+                }
             }
 
             Button {
@@ -63,13 +79,32 @@ export component HelpPanel inherits Rectangle {
                 colorize-icon: true;
                 icon: @image-url("img/documentation.svg");
                 text: @tr("User Manual & Tutorials");
+
+                clicked => {
+                    Backend.action-triggered(ActionId.open-user-manual, -1);
+                }
+            }
+
+            Button {
+                width: self.preferred-width;
+                colorize-icon: true;
+                icon: @image-url("img/comments.svg");
+                text: @tr("Give Feedback & Get Support");
+
+                clicked => {
+                    Backend.action-triggered(ActionId.open-support, -1);
+                }
             }
 
             Button {
                 width: self.preferred-width;
                 colorize-icon: true;
                 icon: @image-url("img/github.svg");
-                text: @tr("Source Code on GitHub");
+                text: @tr("View Source Code (GitHub)");
+
+                clicked => {
+                    Backend.action-triggered(ActionId.open-source-code, -1);
+                }
             }
 
             Button {
@@ -77,6 +112,22 @@ export component HelpPanel inherits Rectangle {
                 colorize-icon: true;
                 icon: @image-url("img/keyboard-shortcuts.svg");
                 text: @tr("Keyboard Shortcuts Reference");
+
+                clicked => {
+                    Backend.action-triggered(ActionId.open-keyboard-shortcuts-reference, -1);
+                }
+            }
+
+            Button {
+                width: self.preferred-width;
+                colorize-icon: true;
+                primary: true;
+                icon: @image-url("img/heart.svg");
+                text: @tr("Support the LibrePCB Project");
+
+                clicked => {
+                    Backend.action-triggered(ActionId.open-donate, -1);
+                }
             }
         }
 
@@ -113,7 +164,7 @@ export component HelpPanel inherits Rectangle {
                     }
 
                     i-copy := Image {
-                        y: parent.pressed ? 4px : 3px;
+                        y: parent.pressed ? 7px : 6px;
                         width: self.height;
                         height: parent.height - self.y * 2;
                         source: @image-url("img/copy.svg");
@@ -121,7 +172,7 @@ export component HelpPanel inherits Rectangle {
                     }
 
                     i-copy-check := Image {
-                        y: 3px;
+                        y: 6px;
                         width: self.height;
                         height: parent.height - self.y * 2;
                         source: @image-url("img/check.svg");
@@ -136,24 +187,56 @@ export component HelpPanel inherits Rectangle {
                     }
 
                     clicked => {
-                        i-copy.visible = false;
-                        i-copy-check.visible = true;
-                        t-copy.running = true;
+                        if (Backend.action-triggered(ActionId.copy-application-details-into-clipboard, -1)) {
+                            i-copy.visible = false;
+                            i-copy-check.visible = true;
+                            t-copy.running = true;
+                        }
                     }
                 }
             }
         }
 
         VerticalLayout {
-            padding: 5px;
+            padding: 8px;
 
-            TextInput {
+            ti-details := TextInput {
+                height: self.preferred-height;
                 font-family: "Noto Sans Mono";
                 font-size: 11px;
                 read-only: true;
                 single-line: false;
                 wrap: no-wrap;
                 text: Data.about-librepcb-details;
+            }
+        }
+
+        PanelHeader {
+            title: @tr("License & Credits");
+        }
+
+        VerticalLayout {
+            padding: 8px;
+            spacing: 10px;
+
+            Text {
+                wrap: word-wrap;
+                font-italic: true;
+                font-size: 11px;
+                text: @tr("This is free software, released under the GNU General Public License (GPL) version 3 or later. You can find the full license text in our source code.");
+            }
+
+            if available-space > 520px: Image {
+                width: 100%;
+                height: 35px;
+                source: @image-url("img/ngi0-commons.svg");
+            }
+
+            if available-space > 480px: Text {
+                wrap: word-wrap;
+                font-italic: true;
+                font-size: 11px;
+                text: @tr("This project is funded through the NGI0 Commons Fund, a fund established by NLnet with financial support from the European Commission’s Next Generation Internet programme, under the aegis of DG Communications Networks, Content and Technology under grant agreement No 101135429.");
             }
         }
     }

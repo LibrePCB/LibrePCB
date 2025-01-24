@@ -21,26 +21,28 @@
  *  Includes
  ******************************************************************************/
 #include "mainwindow.h"
-#include <librepcb/core/utils/scopeguard.h>
+
 #include "apptoolbox.h"
 #include "guiapplication.h"
 #include "project/projecteditor.h"
 #include "project/projectsmodel.h"
 #include "windowsectionsmodel.h"
-#include <librepcb/editor/project/newprojectwizard/newprojectwizard.h>
+
 #include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/fileio/transactionaldirectory.h>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/schematic/schematic.h>
+#include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
+#include <librepcb/editor/project/newprojectwizard/newprojectwizard.h>
 #include <librepcb/editor/workspace/desktopservices.h>
 #include <librepcb/editor/workspace/initializeworkspacewizard/initializeworkspacewizard.h>
 
 #include <QtCore>
 #include <QtWidgets>
-#include <librepcb/core/fileio/transactionalfilesystem.h>
-#include <librepcb/core/fileio/transactionaldirectory.h>
 
 /*******************************************************************************
  *  Namespace
@@ -58,9 +60,18 @@ MainWindow::MainWindow(GuiApplication& app,
                        QObject* parent) noexcept
   : QObject(parent),
     mIndex(index),
+    mSettingsPrefix(QString("window_%1").arg(index + 1)),
     mApp(app),
     mSections(new WindowSectionsModel(app, this)),
-    mWindow(win) {
+    mWindow(win),
+    mWidget(static_cast<QWidget*>(slint::cbindgen_private::slint_qt_get_widget(
+        &mWindow->window().window_handle()))) {
+  Q_ASSERT(mWidget);
+
+  // Register Slint callbacks.
+  mWindow->window().on_close_requested(
+      std::bind(&MainWindow::closeRequested, this));
+
   // Set global data.
   const ui::Data& d = mWindow->global<ui::Data>();
   d.set_current_page(ui::MainPage::Home);
@@ -140,6 +151,16 @@ MainWindow::MainWindow(GuiApplication& app,
 
   // Show window.
   mWindow->show();
+
+  // Load window state.
+  QSettings cs;
+  mWidget->restoreGeometry(
+      cs.value(mSettingsPrefix % "/geometry").toByteArray());
+
+  QAction* a = new QAction();
+  a->setShortcut(QKeySequence(Qt::Key_F4));
+  connect(a, &QAction::triggered, this, [](){qDebug() << "F4";});
+  mWidget->addAction(a);
 }
 
 MainWindow::~MainWindow() noexcept {
@@ -148,6 +169,14 @@ MainWindow::~MainWindow() noexcept {
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+slint::CloseRequestResponse MainWindow::closeRequested() noexcept {
+  // Save window state.
+  QSettings cs;
+  cs.setValue(mSettingsPrefix % "/geometry", mWidget->saveGeometry());
+
+  return slint::CloseRequestResponse::HideWindow;
+}
 
 bool MainWindow::actionTriggered(ui::ActionId id, int sectionIndex) noexcept {
   if (mSections->actionTriggered(id, sectionIndex)) {
@@ -180,6 +209,10 @@ bool MainWindow::actionTriggered(ui::ActionId id, int sectionIndex) noexcept {
     return true;
   } else if (id == ui::ActionId::WindowClose) {
     mWindow->hide();  // TODO: Remove from GuiApplication
+    return true;
+  } else if (id == ui::ActionId::CopyApplicationDetailsIntoClipboard) {
+    QApplication::clipboard()->setText(
+        s2q(mWindow->global<ui::Data>().get_about_librepcb_details()));
     return true;
   } else if (mApp.actionTriggered(id, sectionIndex)) {
     return true;
@@ -230,7 +263,7 @@ std::shared_ptr<ProjectEditor> MainWindow::getCurrentProject() noexcept {
 }
 
 void MainWindow::newProject(bool eagleImport,
-                                        const FilePath& parentDir) noexcept {
+                            const FilePath& parentDir) noexcept {
   const NewProjectWizard::Mode mode = eagleImport
       ? NewProjectWizard::Mode::EagleImport
       : NewProjectWizard::Mode::NewProject;
@@ -245,7 +278,8 @@ void MainWindow::newProject(bool eagleImport,
       project.reset();  // Release lock.
       setCurrentProject(mApp.getProjects().openProject(fp));
     } catch (const Exception& e) {
-      QMessageBox::critical(qApp->activeWindow(), tr("Could not create project"), e.getMsg());
+      QMessageBox::critical(qApp->activeWindow(),
+                            tr("Could not create project"), e.getMsg());
     }
   }
 }

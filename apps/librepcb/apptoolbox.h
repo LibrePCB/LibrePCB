@@ -43,10 +43,14 @@ namespace app {
  *  Non-Member Functions
  ******************************************************************************/
 
+slint::PhysicalPosition q2s(const QPoint& p) noexcept;
+slint::PhysicalSize q2s(const QSize& s) noexcept;
 slint::SharedString q2s(const QString& s) noexcept;
 slint::Image q2s(const QPixmap& p) noexcept;
 slint::Color q2s(const QColor& c) noexcept;
 
+QPoint s2q(const slint::PhysicalPosition& p) noexcept;
+QSize s2q(const slint::PhysicalSize& s) noexcept;
 QString s2q(const slint::SharedString& s) noexcept;
 bool operator==(const QString& s1, const slint::SharedString& s2) noexcept;
 bool operator!=(const QString& s1, const slint::SharedString& s2) noexcept;

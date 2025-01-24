@@ -36,6 +36,15 @@ namespace app {
  *  Non-Member Functions
  ******************************************************************************/
 
+slint::PhysicalPosition q2s(const QPoint& p) noexcept {
+  return slint::PhysicalPosition({p.x(), p.y()});
+}
+
+slint::PhysicalSize q2s(const QSize& s) noexcept {
+  return slint::PhysicalSize({static_cast<uint32_t>(std::max(s.width(), 0)),
+                              static_cast<uint32_t>(std::max(s.height(), 0))});
+}
+
 slint::SharedString q2s(const QString& s) noexcept {
   return slint::SharedString(s.toUtf8().data());
 }
@@ -54,6 +63,14 @@ slint::Image q2s(const QPixmap& p) noexcept {
 
 slint::Color q2s(const QColor& c) noexcept {
   return slint::Color::from_argb_uint8(c.alpha(), c.red(), c.green(), c.blue());
+}
+
+QPoint s2q(const slint::PhysicalPosition& p) noexcept {
+  return QPoint(p.x, p.y);
+}
+
+QSize s2q(const slint::PhysicalSize& s) noexcept {
+  return QSize(s.width, s.height);
 }
 
 QString s2q(const slint::SharedString& s) noexcept {

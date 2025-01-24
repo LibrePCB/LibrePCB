@@ -5,6 +5,7 @@ import { Palette } from "std-widgets.slint";
 
 export component MenuSeparator inherits Rectangle {
     height: 10px;
+    background: #404040;
 
     Rectangle {
         y: parent.height / 2;
@@ -15,6 +16,7 @@ export component MenuSeparator inherits Rectangle {
 
 export component MenuItem inherits Rectangle {
     in property <string> text <=> t-title.text;
+    in property <string> shortcuts <=> t-shortcuts.text;
     in property <string> status-tip;
     in property <image> icon;
     in property <bool> enabled: true;
@@ -53,6 +55,14 @@ export component MenuItem inherits Rectangle {
             vertical-alignment: center;
             font-size: 15px;
             color: enabled ? #d0d0d0 : #808080;
+        }
+
+        t-shortcuts := Text {
+            width: max(self.preferred-width, 80px);
+            horizontal-alignment: right;
+            vertical-alignment: center;
+            font-size: 13px;
+            color: enabled ? #b0b0b0 : #707070;
         }
     }
 

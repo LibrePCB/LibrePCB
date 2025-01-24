@@ -70,6 +70,7 @@ export component MenuBar inherits Rectangle {
                     text: @tr("New Project") + "...";
                     icon: @image-url("img/file-circle-plus.svg");
                     status-tip: @tr("Create a new project");
+                    shortcuts: "Ctrl+N";
 
                     clicked => {
                         Backend.action-triggered(ActionId.project-new, -1);
@@ -80,6 +81,7 @@ export component MenuBar inherits Rectangle {
                     text: @tr("Open Project") + "...";
                     icon: @image-url("img/folder-open.svg");
                     status-tip: @tr("Open an existing project");
+                    shortcuts: "Ctrl+O";
 
                     clicked => {
                         Backend.action-triggered(ActionId.project-open, -1);
@@ -139,6 +141,7 @@ export component MenuBar inherits Rectangle {
                     text: @tr("Quit");
                     icon: @image-url("img/box-arrow-left.svg");
                     status-tip: @tr("Close all windows & quit the application");
+                    shortcuts: "Ctrl+Q";
 
                     clicked => {
                         Backend.action-triggered(ActionId.quit, -1);
@@ -179,18 +182,21 @@ export component MenuBar inherits Rectangle {
                     text: @tr("Grid Properties");
                     icon: @image-url("img/grid-lines.svg");
                     status-tip: @tr("View/modify the grid properties");
+                    shortcuts: "F4";
                     enabled: is-2d-graphics-tab();
                 }
 
                 MenuItem {
                     text: @tr("Increase Grid Interval");
                     status-tip: @tr("Increase the grid interval");
+                    shortcuts: "Ctrl+Shift++";
                     enabled: is-2d-graphics-tab();
                 }
 
                 MenuItem {
                     text: @tr("Decrease Grid Interval");
                     status-tip: @tr("Decrease the grid interval");
+                    shortcuts: "Ctrl+Shift+-";
                     enabled: is-2d-graphics-tab();
                 }
 
@@ -225,6 +231,7 @@ export component MenuBar inherits Rectangle {
                     text: @tr("Toggle 2D/3D Mode");
                     icon: @image-url("img/3d.svg");
                     status-tip: @tr("Switch between the 2D and 3D viewer mode");
+                    shortcuts: "Ctrl+3";
                     enabled: (current-tab.type == TabType.board-2d) || (current-tab.type == TabType.board-3d);
 
                     clicked => {
@@ -238,6 +245,7 @@ export component MenuBar inherits Rectangle {
                     text: @tr("Zoom In");
                     icon: @image-url("img/zoom-in.svg");
                     status-tip: @tr("Increase the zoom level");
+                    shortcuts: "Ctrl++";
                     enabled: is-graphics-tab();
                 }
 
@@ -245,6 +253,7 @@ export component MenuBar inherits Rectangle {
                     text: @tr("Zoom Out");
                     icon: @image-url("img/zoom-out.svg");
                     status-tip: @tr("Decrease the zoom level");
+                    shortcuts: "Ctrl+-";
                     enabled: is-graphics-tab();
                 }
 
@@ -252,6 +261,7 @@ export component MenuBar inherits Rectangle {
                     text: @tr("Zoom to Fit Contents");
                     icon: @image-url("img/zoom-fit.svg");
                     status-tip: @tr("Set the zoom level to fit the whole content");
+                    shortcuts: "Ctrl+Home";
                     enabled: is-graphics-tab();
                 }
 
@@ -261,6 +271,7 @@ export component MenuBar inherits Rectangle {
                     text: @tr("Ignore Placement Locks");
                     icon: @image-url("img/lock-closed.svg");
                     status-tip: @tr("Allow dragging locked objects");
+                    shortcuts: "Ctrl+Shift+L";
                     enabled: current-tab.type == TabType.board-2d;
                     checked: Data.ignore-placement-locks;
 
@@ -286,6 +297,7 @@ export component MenuBar inherits Rectangle {
                     text: @tr("Rescan Workspace Libraries");
                     icon: @image-url("img/refresh.svg");
                     status-tip: @tr("Scan all workspace libraries to update the cache");
+                    shortcuts: "F5";
 
                     clicked => {
                         Backend.action-triggered(ActionId.rescan-workspace-libraries, -1);
@@ -298,6 +310,7 @@ export component MenuBar inherits Rectangle {
                     text: @tr("Preferences") + "...";
                     icon: @image-url("img/settings.svg");
                     status-tip: @tr("Open the workspace settings dialog");
+                    shortcuts: "Ctrl+,";
 
                     clicked => {
                         Backend.action-triggered(ActionId.open-workspace-settings, -1);
@@ -331,6 +344,7 @@ export component MenuBar inherits Rectangle {
                     text: @tr("Close Window");
                     icon: @image-url("img/window-x.svg");
                     status-tip: @tr("Close this window");
+                    shortcuts: "Alt+F4";
 
                     clicked => {
                         Backend.action-triggered(ActionId.window-close, -1);
@@ -366,6 +380,7 @@ export component MenuBar inherits Rectangle {
                     text: @tr("Keyboard Shortcuts Reference") + "...";
                     icon: @image-url("img/keyboard-shortcuts.svg");
                     status-tip: @tr("Open a quick reference about the keyboard shortcuts");
+                    shortcuts: "Ctrl+F1";
 
                     clicked => {
                         Backend.action-triggered(ActionId.open-keyboard-shortcuts-reference, -1);
@@ -376,6 +391,7 @@ export component MenuBar inherits Rectangle {
                     text: @tr("User Manual & Tutorials") + "...";
                     icon: @image-url("img/documentation.svg");
                     status-tip: @tr("Open the user manual in the web browser");
+                    shortcuts: "F1";
 
                     clicked => {
                         Backend.action-triggered(ActionId.open-user-manual, -1);
@@ -383,7 +399,17 @@ export component MenuBar inherits Rectangle {
                 }
 
                 MenuItem {
-                    text: @tr("Website") + "...";
+                    text: @tr("Give Feedback & Get Support") + "...";
+                    icon: @image-url("img/comments.svg");
+                    status-tip: @tr("Open the support page in the web browser");
+
+                    clicked => {
+                        Backend.action-triggered(ActionId.open-support, -1);
+                    }
+                }
+
+                MenuItem {
+                    text: @tr("LibrePCB Website") + "...";
                     icon: @image-url("img/webbrowser.svg");
                     status-tip: @tr("Open the LibrePCB website in the web browser");
 

@@ -64,7 +64,22 @@ void StandardEditorCommandHandler::aboutLibrePcb() const noexcept {
 
 void StandardEditorCommandHandler::onlineDocumentation() const noexcept {
   DesktopServices ds(mSettings);
-  ds.openWebUrl(QUrl("https://docs.librepcb.org"));
+  ds.openWebUrl(QUrl("https://librepcb.org/docs/"));
+}
+
+void StandardEditorCommandHandler::onlineSupport() const noexcept {
+  DesktopServices ds(mSettings);
+  ds.openWebUrl(QUrl("https://librepcb.org/help/"));
+}
+
+void StandardEditorCommandHandler::onlineDonate() const noexcept {
+  DesktopServices ds(mSettings);
+  ds.openWebUrl(QUrl("https://librepcb.org/donate/"));
+}
+
+void StandardEditorCommandHandler::onlineSourceCode() const noexcept {
+  DesktopServices ds(mSettings);
+  ds.openWebUrl(QUrl("https://github.com/LibrePCB/LibrePCB"));
 }
 
 void StandardEditorCommandHandler::website() const noexcept {

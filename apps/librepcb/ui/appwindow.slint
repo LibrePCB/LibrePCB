@@ -1,3 +1,6 @@
+import "../../../share/librepcb/fonts/NotoSans-Regular.ttf";
+import "../../../share/librepcb/fonts/NotoSansMono-Regular.ttf";
+
 import { Button, ProgressIndicator, StandardButton, Palette, VerticalBox } from "std-widgets.slint";
 import { SideBar } from "./sidebar.slint";
 import { LengthEdit } from "./common/lengthedit.slint";
@@ -20,6 +23,7 @@ export component AppWindow inherits Window {
     title: Data.window-title;
     background: #2a2a2a;
     icon: @image-url("img/librepcb.png");
+    default-font-family: "Noto Sans";
     preferred-width: 1024px;
     preferred-height: 768px;
 

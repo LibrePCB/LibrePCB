@@ -25,8 +25,10 @@
  ******************************************************************************/
 #include "appwindow.h"
 
-#include <QtCore>
 #include <librepcb/core/fileio/filepath.h>
+
+#include <QtCore>
+
 #include <vector>
 
 /*******************************************************************************
@@ -55,8 +57,7 @@ public:
   // Constructors / Destructor
   ProjectsModel() = delete;
   ProjectsModel(const ProjectsModel& other) = delete;
-  explicit ProjectsModel(Workspace& ws,
-                         QObject* parent = nullptr) noexcept;
+  explicit ProjectsModel(Workspace& ws, QObject* parent = nullptr) noexcept;
   virtual ~ProjectsModel() noexcept;
 
   // General Methods
