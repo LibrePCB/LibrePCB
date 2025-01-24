@@ -105,9 +105,6 @@ bool GuiApplication::actionTriggered(ui::ActionId id,
   } else if (id == ui::ActionId::RescanWorkspaceLibraries) {
     mWorkspace.getLibraryDb().startLibraryRescan();
     return true;
-  } else if (id == ui::ActionId::WindowNew) {
-    createNewWindow();
-    return true;
   } else if (id == ui::ActionId::Quit) {
     slint::quit_event_loop();
     return true;
@@ -122,15 +119,7 @@ bool GuiApplication::actionTriggered(ui::ActionId id,
   return false;
 }
 
-void GuiApplication::exec() {
-  slint::run_event_loop();
-}
-
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
-
-void GuiApplication::createNewWindow() noexcept {
+void GuiApplication::createNewWindow(int projectIndex) noexcept {
   // Create Slint window.
   auto win = ui::AppWindow::create();
 
@@ -147,7 +136,7 @@ void GuiApplication::createNewWindow() noexcept {
   d.set_favorite_projects(mFavoriteProjects);
   d.set_libraries(mLibraries);
   d.set_projects(mProjects);
-  d.set_current_project_index(-1);
+  d.set_current_project_index(projectIndex);
 
   // Bind global data to signals.
   bind(this, d, &ui::Data::set_status_bar_progress, &mWorkspace.getLibraryDb(),
@@ -199,6 +188,14 @@ void GuiApplication::createNewWindow() noexcept {
   auto mw = std::make_shared<MainWindow>(*this, win, mWindows.count(), this);
   mWindows.append(mw);
 }
+
+void GuiApplication::exec() {
+  slint::run_event_loop();
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
 
 QString GuiApplication::buildAppVersionDetails() const noexcept {
   // Always English, not translatable!

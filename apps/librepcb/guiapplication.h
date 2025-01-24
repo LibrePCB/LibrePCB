@@ -68,13 +68,13 @@ public:
 
   // General Methods
   bool actionTriggered(ui::ActionId id, int sectionIndex) noexcept;
+  void createNewWindow(int projectIndex = -1) noexcept;
   void exec();
 
   // Operator Overloadings
   GuiApplication& operator=(const GuiApplication& rhs) = delete;
 
 private:
-  void createNewWindow() noexcept;
   QString buildAppVersionDetails() const noexcept;
 
   Workspace& mWorkspace;

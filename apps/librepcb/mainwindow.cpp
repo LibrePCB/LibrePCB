@@ -62,7 +62,7 @@ MainWindow::MainWindow(GuiApplication& app,
     mIndex(index),
     mSettingsPrefix(QString("window_%1").arg(index + 1)),
     mApp(app),
-    mSections(new WindowSectionsModel(app, this)),
+    mSections(new WindowSectionsModel(app, win->global<ui::Data>(), this)),
     mWindow(win),
     mWidget(static_cast<QWidget*>(slint::cbindgen_private::slint_qt_get_widget(
         &mWindow->window().window_handle()))) {
@@ -76,12 +76,11 @@ MainWindow::MainWindow(GuiApplication& app,
   const ui::Data& d = mWindow->global<ui::Data>();
   d.set_current_page(ui::MainPage::Home);
   d.set_sections(mSections);
+  d.set_current_section_index(0);
   d.set_cursor_coordinates(slint::SharedString());
   d.set_ignore_placement_locks(false);
 
   // Bind global data to signals.
-  connect(mSections.get(), &WindowSectionsModel::currentSectionIndexChanged,
-          this, [&d](int index) { d.set_current_section_index(index); });
   connect(mSections.get(), &WindowSectionsModel::currentProjectChanged, this,
           &MainWindow::setCurrentProject);
   connect(
@@ -201,6 +200,9 @@ bool MainWindow::actionTriggered(ui::ActionId id, int sectionIndex) noexcept {
     return true;
   } else if (id == ui::ActionId::ProjectImportEagle) {
     newProject(true);
+    return true;
+  } else if (id == ui::ActionId::WindowNew) {
+    mApp.createNewWindow(mWindow->global<ui::Data>().get_current_project_index());
     return true;
   } else if (id == ui::ActionId::WindowClose) {
     mWindow->hide();  // TODO: Remove from GuiApplication

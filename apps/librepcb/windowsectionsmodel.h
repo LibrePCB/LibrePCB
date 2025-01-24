@@ -59,7 +59,7 @@ public:
   // Constructors / Destructor
   WindowSectionsModel() = delete;
   WindowSectionsModel(const WindowSectionsModel& other) = delete;
-  explicit WindowSectionsModel(GuiApplication& app,
+  explicit WindowSectionsModel(GuiApplication& app, const ui::Data& uiData,
                                QObject* parent = nullptr) noexcept;
   virtual ~WindowSectionsModel() noexcept;
 
@@ -89,7 +89,6 @@ public:
   WindowSectionsModel& operator=(const WindowSectionsModel& rhs) = delete;
 
 signals:
-  void currentSectionIndexChanged(int index);
   void currentProjectChanged(std::shared_ptr<ProjectEditor> prj);
   void cursorCoordinatesChanged(const Point& pos);
 
@@ -98,8 +97,8 @@ private:
   void addTab(std::shared_ptr<WindowTab> tab) noexcept;
 
   GuiApplication& mApp;
+  const ui::Data& mUiData;
   QList<std::shared_ptr<WindowSection>> mItems;
-  int mCurrentSectionIndex;
 };
 
 /*******************************************************************************
