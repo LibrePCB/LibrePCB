@@ -17,81 +17,68 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_WINDOWSECTION_H
-#define LIBREPCB_WINDOWSECTION_H
+#ifndef LIBREPCB_NOTIFICATIONSMODEL_H
+#define LIBREPCB_NOTIFICATIONSMODEL_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include "appwindow.h"
 
-#include <librepcb/core/types/point.h>
+#include <librepcb/core/fileio/filepath.h>
 
 #include <QtCore>
-#include <QtGui>
 
-#include <memory>
+#include <vector>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Workspace;
+
 namespace editor {
 namespace app {
 
-class GuiApplication;
 class ProjectEditor;
-class WindowTab;
-class WindowTabsModel;
 
 /*******************************************************************************
- *  Class WindowSection
+ *  Class NotificationsModel
  ******************************************************************************/
 
 /**
- * @brief The WindowSection class
+ * @brief The NotificationsModel class
  */
-class WindowSection : public QObject {
+class NotificationsModel : public QObject,
+                           public slint::Model<ui::NotificationData> {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  WindowSection() = delete;
-  WindowSection(const WindowSection& other) = delete;
-  explicit WindowSection(GuiApplication& app,
-                         QObject* parent = nullptr) noexcept;
-  virtual ~WindowSection() noexcept;
+  NotificationsModel() = delete;
+  NotificationsModel(const NotificationsModel& other) = delete;
+  explicit NotificationsModel(Workspace& ws,
+                              QObject* parent = nullptr) noexcept;
+  virtual ~NotificationsModel() noexcept;
 
   // General Methods
-  const ui::WindowSectionData& getUiData() const noexcept { return mUiData; }
-  std::size_t getTabCount() const noexcept;
-  std::shared_ptr<WindowTab> getTab(int index) noexcept;
-  std::shared_ptr<WindowTab> getCurrentTab() noexcept;
-  std::shared_ptr<ProjectEditor> getCurrentProject() noexcept;
-  void addTab(std::shared_ptr<WindowTab> tab) noexcept;
-  void closeTab(int index) noexcept;
-  void setCurrentTab(int index) noexcept;
-  bool actionTriggered(ui::ActionId id) noexcept;
-  slint::Image renderScene(float width, float height) noexcept;
-  bool processScenePointerEvent(const QPointF& pos, const QPointF& globalPos,
-                                slint::private_api::PointerEvent e) noexcept;
-  bool processSceneScrolled(float x, float y,
-                            slint::private_api::PointerScrollEvent e) noexcept;
-  void zoomFit(float width, float height) noexcept;
-  void zoomIn(float width, float height) noexcept;
-  void zoomOut(float width, float height) noexcept;
+  void add(ui::NotificationType type, const QString& title,
+           const QString& description, const QString& buttonText,
+           bool supportsDontShowAgain) noexcept;
+
+  // Implementations
+  std::size_t row_count() const override;
+  std::optional<ui::NotificationData> row_data(std::size_t i) const override;
+  void set_row_data(std::size_t i,
+                    const ui::NotificationData& obj) noexcept override;
 
   // Operator Overloadings
-  WindowSection& operator=(const WindowSection& rhs) = delete;
-
-signals:
-  void uiDataChanged();
-  void currentProjectChanged(std::shared_ptr<ProjectEditor> prj);
-  void cursorCoordinatesChanged(const Point& pos);
+  NotificationsModel& operator=(const NotificationsModel& rhs) = delete;
 
 private:
-  std::shared_ptr<WindowTabsModel> mTabsModel;
-  ui::WindowSectionData mUiData;
+  Workspace& mWorkspace;
+  std::vector<ui::NotificationData> mItems;
 };
 
 /*******************************************************************************

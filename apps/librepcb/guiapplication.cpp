@@ -25,6 +25,7 @@
 #include "apptoolbox.h"
 #include "library/librariesmodel.h"
 #include "mainwindow.h"
+#include "notificationsmodel.h"
 #include "project/projecteditor.h"
 #include "project/projectsmodel.h"
 #include "workspace/favoriteprojectsmodel.h"
@@ -58,12 +59,33 @@ namespace app {
 GuiApplication::GuiApplication(Workspace& ws, QObject* parent) noexcept
   : QObject(parent),
     mWorkspace(ws),
+    mNotifications(new NotificationsModel(ws, this)),
     mRecentProjects(new RecentProjectsModel(ws, this)),
     mFavoriteProjects(new FavoriteProjectsModel(ws, this)),
     mLibraries(new LibrariesModel(ws, this)),
     mProjects(new ProjectsModel(ws, this)) {
   mWorkspace.getLibraryDb().startLibraryRescan();
   createNewWindow();
+
+  // TODO: Implement proper evaluation.
+  mNotifications->add(
+      ui::NotificationType::Warning, tr("Older Application Version"),
+      tr("This workspace was already used with a newer version of LibrePCB. "
+         "All changes in libraries and workspace settings will not be "
+         "available in newer versions of LibrePCB."),
+      QString(), true);
+  mNotifications->add(
+      ui::NotificationType::Tip, tr("No Libraries Installed"),
+      tr("This workspace does not contain any libraries, which are essential "
+         "to create and modify projects. You should open the libraries panel "
+         "to add some libraries."),
+      tr("Install Libraries"), true);
+  mNotifications->add(
+      ui::NotificationType::Tip, tr("Install Desktop Integration"),
+      tr("This application executable does not seem to be integrated into your "
+         "desktop environment. If desired, install it now to allow opening "
+         "LibrePCB projects through the file manager."),
+      tr("Install..."), true);
 }
 
 GuiApplication::~GuiApplication() noexcept {
@@ -132,6 +154,7 @@ void GuiApplication::createNewWindow(int projectIndex) noexcept {
   d.set_workspace_path(mWorkspace.getPath().toNative().toUtf8().data());
   d.set_workspace_folder(std::make_shared<FileSystemModel>(
       mWorkspace, mWorkspace.getProjectsPath(), this));
+  d.set_notifications(mNotifications);
   d.set_recent_projects(mRecentProjects);
   d.set_favorite_projects(mFavoriteProjects);
   d.set_libraries(mLibraries);

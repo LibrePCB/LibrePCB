@@ -149,7 +149,11 @@ Copyright: The Bootstrap Authors
 License: MIT
 
 Files:
+ apps/librepcb/ui/img/bell-solid.svg
+ apps/librepcb/ui/img/bell.svg
  apps/librepcb/ui/img/check.svg
+ apps/librepcb/ui/img/circle-info.svg
+ apps/librepcb/ui/img/circle-xmark.svg
  apps/librepcb/ui/img/comments.svg
  apps/librepcb/ui/img/copy.svg
  apps/librepcb/ui/img/cursor.svg
@@ -164,6 +168,7 @@ Files:
  apps/librepcb/ui/img/github.svg
  apps/librepcb/ui/img/heart.svg
  apps/librepcb/ui/img/keyboard-shortcuts.svg
+ apps/librepcb/ui/img/lightbulb.svg
  apps/librepcb/ui/img/move.svg
  apps/librepcb/ui/img/paste.svg
  apps/librepcb/ui/img/redo.svg
@@ -171,6 +176,7 @@ Files:
  apps/librepcb/ui/img/rotate-ccw.svg
  apps/librepcb/ui/img/rotate-cw.svg
  apps/librepcb/ui/img/ruler.svg
+ apps/librepcb/ui/img/triangle-exclamation.svg
  apps/librepcb/ui/img/undo.svg
  apps/librepcb/ui/img/webbrowser.svg
  img/actions/align_horizontally.svg

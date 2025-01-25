@@ -3,11 +3,11 @@ import { LineEdit } from "../common/lineedit.slint";
 import { Data } from "../api/data.slint";
 import { Backend } from "../api/backend.slint";
 import { ToolTip } from "../common/tooltip.slint";
-import { WindowSection, CreateLibraryTabData, ActionId } from "../api/types.slint";
+import { WindowSectionData, CreateLibraryTabData, ActionId } from "../api/types.slint";
 
 export component CreateLibraryTab inherits Rectangle {
     in property <int> section-index;
-    in-out property <WindowSection> section;
+    in-out property <WindowSectionData> section;
     property <[CreateLibraryTabData]> tabs: section.create-library-tabs;
 
     GridLayout {

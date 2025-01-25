@@ -20,17 +20,12 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "filesystemmodel.h"
+#include "notificationsmodel.h"
 
-#include "../apptoolbox.h"
-
-#include <librepcb/core/exceptions.h>
-#include <librepcb/core/fileio/fileutils.h>
-#include <librepcb/core/serialization/sexpression.h>
-#include <librepcb/core/workspace/workspace.h>
-#include <librepcb/editor/workspace/controlpanel/fileiconprovider.h>
+#include "apptoolbox.h"
 
 #include <QtCore>
+#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace
@@ -43,57 +38,65 @@ namespace app {
  *  Constructors / Destructor
  ******************************************************************************/
 
-FileSystemModel::FileSystemModel(const Workspace& ws, const FilePath& root,
-                                 QObject* parent) noexcept
-  : QObject(parent), mWorkspace(ws), mRoot(root) {
-  refresh();
+NotificationsModel::NotificationsModel(Workspace& ws, QObject* parent) noexcept
+  : QObject(parent), mWorkspace(ws) {
 }
 
-FileSystemModel::~FileSystemModel() noexcept {
+NotificationsModel::~NotificationsModel() noexcept {
+}
+
+/*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+void NotificationsModel::add(ui::NotificationType type, const QString& title,
+                             const QString& description,
+                             const QString& buttonText,
+                             bool supportsDontShowAgain) noexcept {
+  mItems.push_back(ui::NotificationData{
+      type,  // Type
+      q2s(title),  // Title
+      q2s(description),  // Description
+      q2s(buttonText),  // Button text
+      0,  // Progress
+      supportsDontShowAgain,  // Supports "don't show again"
+      true,  // Unread
+      false,  // Displayed
+      false,  // Button clicked
+      false,  // Dismissed
+      false,  // Don't show again clicked
+  });
+  row_added(mItems.size() - 1, 1);
 }
 
 /*******************************************************************************
  *  Implementations
  ******************************************************************************/
 
-std::size_t FileSystemModel::row_count() const {
+std::size_t NotificationsModel::row_count() const {
   return mItems.size();
 }
 
-std::optional<ui::FolderTreeItemData> FileSystemModel::row_data(
+std::optional<ui::NotificationData> NotificationsModel::row_data(
     std::size_t i) const {
   return (i < mItems.size()) ? std::optional(mItems.at(i)) : std::nullopt;
+}
+
+void NotificationsModel::set_row_data(
+    std::size_t i, const ui::NotificationData& obj) noexcept {
+  if ((i >= 0) && (i < mItems.size())) {
+    mItems[i] = obj;
+
+    if (obj.dismissed) {
+      mItems.erase(mItems.begin() + i);
+      row_removed(i, 1);
+    }
+  }
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
-
-void FileSystemModel::refresh() noexcept {
-  mItems.clear();
-  FileIconProvider ip;
-  scanDir(mRoot.toStr(), 0, ip);
-  reset();
-}
-
-void FileSystemModel::scanDir(const QString& fp, int level,
-                              const FileIconProvider& ip) noexcept {
-  QDir dir(fp);
-  dir.setFilter(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot);
-  dir.setSorting(QDir::Name | QDir::DirsFirst);
-  foreach (const QFileInfo& info, dir.entryInfoList()) {
-    mItems.push_back(ui::FolderTreeItemData{
-        level,
-        q2s(ip.icon(info).pixmap(48)),
-        q2s(info.fileName()),
-        q2s(info.filePath()),
-        info.isDir(),
-    });
-    if (info.isDir() && (level < 1)) {
-      scanDir(info.filePath(), level + 1, ip);
-    }
-  }
-}
 
 /*******************************************************************************
  *  End of File

@@ -1,17 +1,19 @@
 import {
-    FolderTreeItem,
-    Library,
+    FolderTreeItemData,
+    LibraryData,
     LibraryState,
     LibraryType,
     MainPage,
     ProjectData,
     SchematicTool,
     TabType,
-    WindowSection,
+    WindowSectionData,
     GridStyle,
     TabData,
     SchematicTabData,
     Board2dTabData,
+    NotificationData,
+    NotificationType,
     LengthUnit
 } from "./types.slint";
 
@@ -34,7 +36,40 @@ export global Data {
 
     in-out property <MainPage> current-page: MainPage.home;
 
-    in property <[FolderTreeItem]> workspace-folder: [
+    in-out property <[NotificationData]> notifications: [
+        {
+            type: NotificationType.tip,
+            title: "Tip",
+            description: "This is a tip notification",
+            button-text: "Do something",
+            supports-dont-show-again: true,
+            unread: true,
+        },
+        {
+            type: NotificationType.info,
+            title: "Info",
+            description: "This is an info notification",
+            unread: true,
+        },
+        {
+            type: NotificationType.warning,
+            title: "Warning",
+            description: "This is a warning notification",
+        },
+        {
+            type: NotificationType.critical,
+            title: "Critical",
+            description: "This is a critical notification",
+        },
+        {
+            type: NotificationType.progress,
+            title: "Progress",
+            description: "This is a progress notification",
+            progress: 50,
+        },
+    ];
+
+    in property <[FolderTreeItemData]> workspace-folder: [
         {
             icon: @image-url("../img/library.png"),
             name: "project-1",
@@ -49,7 +84,7 @@ export global Data {
         },
     ];
 
-    in property <[FolderTreeItem]> recent-projects: [
+    in property <[FolderTreeItemData]> recent-projects: [
         {
             icon: @image-url("../img/library.png"),
             name: "project-1.lpp",
@@ -62,7 +97,7 @@ export global Data {
         },
     ];
 
-    in property <[FolderTreeItem]> favorite-projects: recent-projects;
+    in property <[FolderTreeItemData]> favorite-projects: recent-projects;
 
     in property <[ProjectData]> projects: [
         {
@@ -91,7 +126,7 @@ export global Data {
 
     in property <int> checked-libraries: 3;
 
-    in property <[Library]> libraries: [
+    in property <[LibraryData]> libraries: [
         {
             name: "My Library",
             description: "My own local library.",
@@ -131,7 +166,7 @@ export global Data {
         },
     ];
 
-    in property <[WindowSection]> sections: [
+    in property <[WindowSectionData]> sections: [
         {
             tabs: [
                 {
@@ -245,7 +280,7 @@ export global Data {
 
     // Auto-calculated
     in-out property <ProjectData> current-project: projects[current-project-index];
-    in-out property <WindowSection> current-section: sections[current-section-index];
+    in-out property <WindowSectionData> current-section: sections[current-section-index];
     in-out property <TabData> current-tab: current-section.tabs[current-section.current-tab-index];
     out property <bool> current-tab-is-2d: (current-tab.type == TabType.schematic) || (current-tab.type == TabType.board-2d);
     out property <bool> current-tab-is-2d-or-3d: (current-tab.type == TabType.schematic) || (current-tab.type == TabType.board-2d) || (current-tab.type == TabType.board-3d);
@@ -288,6 +323,40 @@ export global Data {
         } else {
             debug("Unhandled case in get-unit-short-str().");
             return "";
+        }
+    }
+
+    pure public function get-icon-for-notification-type(nt: NotificationType) -> image {
+        if (nt == NotificationType.tip) {
+            return @image-url("../img/lightbulb.svg");
+        } else if (nt == NotificationType.info) {
+            return @image-url("../img/circle-info.svg");
+        } else if (nt == NotificationType.warning) {
+            return @image-url("../img/triangle-exclamation.svg");
+        } else if (nt == NotificationType.critical) {
+            return @image-url("../img/circle-xmark.svg");
+        } else if (nt == NotificationType.progress) {
+            return @image-url("../img/refresh.svg");
+        } else {
+            debug("Unhandled case in get-icon-for-notification-type().");
+            return @image-url("");
+        }
+    }
+
+    pure public function get-color-for-notification-type(nt: NotificationType) -> color {
+        if (nt == NotificationType.tip) {
+            return #00e1ff;
+        } else if (nt == NotificationType.info) {
+            return white;
+        } else if (nt == NotificationType.warning) {
+            return yellow;
+        } else if (nt == NotificationType.critical) {
+            return red;
+        } else if (nt == NotificationType.progress) {
+            return white;
+        } else {
+            debug("Unhandled case in get-color-for-notification-type().");
+            return white;
         }
     }
 }

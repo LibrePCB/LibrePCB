@@ -42,6 +42,7 @@ namespace app {
 class FavoriteProjectsModel;
 class LibrariesModel;
 class MainWindow;
+class NotificationsModel;
 class ProjectsModel;
 class RecentProjectsModel;
 
@@ -78,6 +79,7 @@ private:
   QString buildAppVersionDetails() const noexcept;
 
   Workspace& mWorkspace;
+  std::shared_ptr<NotificationsModel> mNotifications;
   std::shared_ptr<RecentProjectsModel> mRecentProjects;
   std::shared_ptr<FavoriteProjectsModel> mFavoriteProjects;
   std::shared_ptr<LibrariesModel> mLibraries;

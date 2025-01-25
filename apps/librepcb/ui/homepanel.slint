@@ -1,13 +1,13 @@
 import { ListView } from "std-widgets.slint";
 import { PanelHeader } from "./common/panelheader.slint";
-import { FolderTreeItem } from "./api/types.slint";
+import { FolderTreeItemData } from "./api/types.slint";
 import { Backend } from "./api/backend.slint";
 import { Data } from "./api/data.slint";
 
 component FolderTree inherits ListView {
     property <int> current-index: -1;
     property <length> item-height: 20px;
-    in-out property <[FolderTreeItem]> model;
+    in-out property <[FolderTreeItemData]> model;
 
     preferred-height: model.length * item-height;
 
