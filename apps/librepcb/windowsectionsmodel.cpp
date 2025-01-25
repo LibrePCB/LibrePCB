@@ -193,7 +193,7 @@ std::size_t WindowSectionsModel::row_count() const {
   return mItems.size();
 }
 
-std::optional<ui::WindowSection> WindowSectionsModel::row_data(
+std::optional<ui::WindowSectionData> WindowSectionsModel::row_data(
     std::size_t i) const {
   if (std::shared_ptr<WindowSection> s = mItems.value(i)) {
     return s->getUiData();

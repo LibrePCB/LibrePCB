@@ -52,7 +52,7 @@ class WindowTab;
  * @brief The WindowSectionsModel class
  */
 class WindowSectionsModel : public QObject,
-                            public slint::Model<ui::WindowSection> {
+                            public slint::Model<ui::WindowSectionData> {
   Q_OBJECT
 
 public:
@@ -83,7 +83,7 @@ public:
 
   // Implementations
   std::size_t row_count() const override;
-  std::optional<ui::WindowSection> row_data(std::size_t i) const override;
+  std::optional<ui::WindowSectionData> row_data(std::size_t i) const override;
 
   // Operator Overloadings
   WindowSectionsModel& operator=(const WindowSectionsModel& rhs) = delete;

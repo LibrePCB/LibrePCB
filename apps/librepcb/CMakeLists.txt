@@ -28,6 +28,8 @@ add_executable(
   main.cpp
   mainwindow.cpp
   mainwindow.h
+  notificationsmodel.cpp
+  notificationsmodel.h
   project/board/board2dtab.cpp
   project/board/board2dtab.h
   project/board/board3dtab.cpp

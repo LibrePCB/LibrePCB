@@ -1,0 +1,235 @@
+import { ProgressIndicator, Palette } from "std-widgets.slint";
+import { LengthEdit } from "./common/lengthedit.slint";
+import { NotificationsPopup } from "./notificationspopup.slint";
+import { MainPage, GridStyle, TabType } from "./api/types.slint";
+import { Data } from "./api/data.slint";
+
+export component StatusBar inherits Rectangle {
+    height: 25px;
+    background: #353535;
+
+    public function open-notifications-popup() {
+        popup-notifications.show();
+    }
+
+    HorizontalLayout {
+        padding-left: 10px;
+
+        Rectangle {
+            horizontal-stretch: 1;
+
+            Text {
+                width: 100%;
+                height: 100%;
+                vertical-alignment: center;
+                color: white;
+                text: Data.hovered-status-tip;
+            }
+
+            if Data.hovered-status-tip == "": Text {
+                width: 100%;
+                height: 100%;
+                vertical-alignment: center;
+                text: Data.workspace-path;
+            }
+        }
+
+        Rectangle {
+            width: 10px;
+        }
+
+        Text {
+            vertical-alignment: center;
+            font-family: "Noto Sans Mono";
+            font-size: 11px;
+            color: white;
+            text: Data.cursor-coordinates;
+            visible: Data.current-tab-is-2d;
+        }
+
+        Rectangle {
+            width: 10px;
+        }
+
+        Rectangle {
+            width: t-grid-interval.preferred-width + self.height - t-grid-interval.preferred-height;
+            background: t-grid-interval.has-hover ? #505050 : #404040;
+
+            t-grid-interval := TouchArea {
+                Text {
+                    vertical-alignment: center;
+                    font-family: "Noto Sans Mono";
+                    font-size: 11px;
+                    color: (!Data.current-tab-is-2d) ? #707070 : white;
+                    text: Data.grid-interval;
+                }
+
+                clicked => {
+                    pw-grid-interval.show();
+                }
+            }
+
+            pw-grid-interval := PopupWindow {
+                x: -(self.preferred-width - parent.width) / 2;
+                y: -self.preferred-height;
+                close-policy: close-on-click-outside;
+
+                LengthEdit { }
+            }
+        }
+
+        Rectangle {
+            width: max(t-unit.preferred-width + self.height - t-unit.preferred-height, 38px);
+            background: t-unit.has-hover ? #505050 : #404040;
+
+            t-unit := TouchArea {
+                enabled: Data.current-tab-is-2d;
+
+                Text {
+                    vertical-alignment: center;
+                    font-size: 11px;
+                    color: (!Data.current-tab-is-2d) ? #707070 : white;
+                    text: Data.get-unit-short-str(Data.current-unit);
+                }
+
+                clicked => {
+                    pw-unit.show();
+                }
+            }
+
+            pw-unit := PopupWindow {
+                x: -(self.preferred-width - parent.width) / 2;
+                y: -self.preferred-height;
+
+                VerticalLayout {
+                    for unit in Data.all-length-units: TouchArea {
+                        Rectangle {
+                            background: parent.has-hover ? #505050 : #404040;
+
+                            HorizontalLayout {
+                                padding: 5px;
+
+                                Text {
+                                    color: #cccccc;
+                                    horizontal-alignment: center;
+                                    text: Data.get-unit-short-str(unit);
+                                }
+                            }
+                        }
+
+                        clicked => {
+                            Data.set-current-unit(unit);
+                        }
+                    }
+                }
+            }
+        }
+
+        Rectangle {
+            width: self.height;
+            background: t-grid-style.has-hover ? #505050 : #404040;
+
+            t-grid-style := TouchArea {
+                enabled: Data.current-tab-is-2d;
+
+                Image {
+                    width: self.height * 0.7;
+                    height: 100%;
+                    image-fit: contain;
+                    source: (Data.current-grid-style == GridStyle.lines) ? @image-url("img/grid-lines.svg") : ((Data.current-grid-style == GridStyle.dots) ? @image-url("img/grid-dots.svg") : @image-url("img/grid-none.svg"));
+                    colorize: (!Data.current-tab-is-2d) ? #707070 : Palette.foreground;
+                }
+
+                clicked => {
+                    if (Data.current-grid-style == GridStyle.none) {
+                        Data.set-current-grid-style(GridStyle.dots);
+                    } else if (Data.current-grid-style == GridStyle.dots) {
+                        Data.set-current-grid-style(GridStyle.lines);
+                    } else {
+                        Data.set-current-grid-style(GridStyle.none);
+                    }
+                }
+            }
+        }
+
+        Rectangle {
+            width: self.height;
+            background: (ta-lock.enabled && Data.ignore-placement-locks) ? #900000 : (ta-lock.has-hover ? #505050 : #404040);
+
+            ta-lock := TouchArea {
+                enabled: Data.current-tab.type == TabType.board-2d;
+
+                Image {
+                    width: self.height * 0.7;
+                    height: 100%;
+                    image-fit: contain;
+                    source: Data.ignore-placement-locks ? @image-url("img/lock-open.svg") : @image-url("img/lock-closed.svg");
+                    colorize: (!ta-lock.enabled) ? #707070 : (Data.ignore-placement-locks ? white : Palette.foreground);
+                }
+
+                clicked => {
+                    Data.ignore-placement-locks = !Data.ignore-placement-locks;
+                }
+            }
+        }
+
+        Rectangle {
+            width: 10px;
+        }
+
+        Rectangle {
+            max-width: 150px;
+
+            ProgressIndicator {
+                width: 100%;
+                visible: self.progress > 0 && self.progress < 1;
+                progress: Data.status-bar-progress / 100;
+            }
+        }
+
+        Rectangle {
+            width: 10px;
+        }
+
+        Rectangle {
+            property <bool> enabled: Data.notifications.length > 0;
+
+            width: self.height;
+            background: ta-notifications.has-hover ? #505050 : transparent;
+
+            ta-notifications := TouchArea {
+                enabled: true;
+
+                Image {
+                    width: self.height * 0.7;
+                    height: 100%;
+                    image-fit: contain;
+                    source: enabled ? @image-url("img/bell-solid.svg") : @image-url("img/bell.svg");
+                    colorize: enabled ? white : #707070;
+                }
+
+                clicked => {
+                    popup-notifications.show();
+                }
+            }
+
+            popup-notifications := NotificationsPopup {
+                x: parent.width - self.width;
+                y: -self.height;
+                width: min(max(self.preferred-width, 300px), root.width * 0.5, 700px);
+            }
+
+            // Just for the preview, auto-open the notifications popup.
+            if Data.preview-mode: Rectangle {
+                Timer {
+                    interval: 1ms;
+
+                    triggered => {
+                        popup-notifications.show();
+                        self.running = false;
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,11 +1,11 @@
 import { Button, CheckBox, ProgressIndicator } from "std-widgets.slint";
 import { LineEdit } from "../common/lineedit.slint";
-import { WindowSection, DownloadLibraryTabData, ActionId } from "../api/types.slint";
+import { WindowSectionData, DownloadLibraryTabData, ActionId } from "../api/types.slint";
 import { Backend } from "../api/backend.slint";
 
 export component DownloadLibraryTab inherits Rectangle {
     in property <int> section-index;
-    in-out property <WindowSection> section;
+    in-out property <WindowSectionData> section;
     property <[DownloadLibraryTabData]> tabs: section.download-library-tabs;
     property <bool> read-only: tabs[section.current-tab-index].download-running;
 

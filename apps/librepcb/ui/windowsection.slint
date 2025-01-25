@@ -1,4 +1,4 @@
-import { TabType, TabData, WindowSection, ActionId } from "./api/types.slint";
+import { TabType, TabData, WindowSectionData, ActionId } from "./api/types.slint";
 import { EmptyTab } from "./emptytab.slint";
 import { SchematicTab } from "./project/schematic/schematictab.slint";
 import { Board2dTab } from "./project/board/board2dtab.slint";
@@ -63,9 +63,9 @@ component Tab inherits Rectangle {
     }
 }
 
-export component WindowSection inherits Rectangle {
+export component WindowSectionData inherits Rectangle {
     in-out property <int> section-index;
-    in-out property <WindowSection> section;
+    in-out property <WindowSectionData> section;
     property <bool> is-current-section: (section-index == Data.current-section-index);
     property <bool> tab-open: (section.current-tab-index >= 0) && (section.current-tab-index < section.tabs.length);
     property <TabType> tab-type: section.tabs[section.current-tab-index].type;

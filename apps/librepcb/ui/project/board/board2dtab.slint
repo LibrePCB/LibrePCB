@@ -1,11 +1,11 @@
-import { WindowSection, ActionId, Board2dTabData } from "../../api/types.slint";
+import { WindowSectionData, ActionId, Board2dTabData } from "../../api/types.slint";
 import { SceneButton } from "../../common/scenebutton.slint";
 import { Backend } from "../../api/backend.slint";
 import { Data } from "../../api/data.slint";
 
 export component Board2dTab inherits Image {
     in property <int> section-index;
-    in-out property <WindowSection> section;
+    in-out property <WindowSectionData> section;
     property <[Board2dTabData]> tabs: section.board-2d-tabs;
 
     image-fit: ImageFit.preserve;

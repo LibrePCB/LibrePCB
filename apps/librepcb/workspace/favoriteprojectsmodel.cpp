@@ -81,7 +81,7 @@ std::size_t FavoriteProjectsModel::row_count() const {
   return mItems.size();
 }
 
-std::optional<ui::FolderTreeItem> FavoriteProjectsModel::row_data(
+std::optional<ui::FolderTreeItemData> FavoriteProjectsModel::row_data(
     std::size_t i) const {
   return (i < mItems.size()) ? std::optional(mItems.at(i)) : std::nullopt;
 }
@@ -125,7 +125,7 @@ void FavoriteProjectsModel::refreshItems() noexcept {
   QSet<FilePath> set;
   for (const FilePath& fp : mPaths) {
     if ((!set.contains(fp)) && fp.isExistingFile()) {
-      mItems.push_back(ui::FolderTreeItem{
+      mItems.push_back(ui::FolderTreeItemData{
           0,
           q2s(QPixmap(":/img/logo/48x48.png")),
           q2s(fp.getFilename()),

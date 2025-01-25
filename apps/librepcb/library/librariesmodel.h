@@ -53,7 +53,7 @@ namespace app {
 /**
  * @brief The LibrariesModel class
  */
-class LibrariesModel : public QObject, public slint::Model<ui::Library> {
+class LibrariesModel : public QObject, public slint::Model<ui::LibraryData> {
   Q_OBJECT
 
 public:
@@ -77,8 +77,9 @@ public:
 
   // Implementations
   std::size_t row_count() const override;
-  std::optional<ui::Library> row_data(std::size_t i) const override;
-  void set_row_data(std::size_t i, const ui::Library& obj) noexcept override;
+  std::optional<ui::LibraryData> row_data(std::size_t i) const override;
+  void set_row_data(std::size_t i,
+                    const ui::LibraryData& obj) noexcept override;
 
   // Operator Overloadings
   LibrariesModel& operator=(const LibrariesModel& rhs) = delete;
@@ -99,10 +100,10 @@ private:
   Workspace& mWorkspace;
   QList<std::shared_ptr<ApiEndpoint>> mApiEndpointsInProgress;
   QList<std::shared_ptr<LibraryDownload>> mDownloadsInProgress;
-  QHash<Uuid, ui::Library> mLocalLibs;
+  QHash<Uuid, ui::LibraryData> mLocalLibs;
   QHash<Uuid, ApiEndpoint::Library> mRemoteLibs;
   QHash<Uuid, QPixmap> mRemoteIcons;
-  std::vector<ui::Library> mMergedLibs;
+  std::vector<ui::LibraryData> mMergedLibs;
 };
 
 /*******************************************************************************

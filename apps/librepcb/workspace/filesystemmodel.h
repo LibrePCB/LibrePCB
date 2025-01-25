@@ -50,7 +50,7 @@ namespace app {
  * @brief The FileSystemModel class
  */
 class FileSystemModel : public QObject,
-                        public slint::Model<ui::FolderTreeItem> {
+                        public slint::Model<ui::FolderTreeItemData> {
   Q_OBJECT
 
 public:
@@ -63,7 +63,7 @@ public:
 
   // Implementations
   std::size_t row_count() const override;
-  std::optional<ui::FolderTreeItem> row_data(std::size_t i) const override;
+  std::optional<ui::FolderTreeItemData> row_data(std::size_t i) const override;
 
   // Operator Overloadings
   FileSystemModel& operator=(const FileSystemModel& rhs) = delete;
@@ -75,7 +75,7 @@ private:
 
   const Workspace& mWorkspace;
   const FilePath mRoot;
-  std::vector<ui::FolderTreeItem> mItems;
+  std::vector<ui::FolderTreeItemData> mItems;
 };
 
 /*******************************************************************************

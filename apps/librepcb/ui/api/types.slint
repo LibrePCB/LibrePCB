@@ -68,6 +68,35 @@ export enum GridStyle {
     lines,
 }
 
+export enum NotificationType {
+    tip,
+    info,
+    warning,
+    critical,
+    progress,
+}
+
+export struct NotificationData {
+    // Data from backend:
+    type: NotificationType,
+    title: string,
+    description: string,
+    button-text: string, // Optional
+    progress: int,  // [%]
+
+    // Features:
+    supports-dont-show-again: bool,
+
+    // Status:
+    unread: bool,
+    displayed: bool,
+
+    // Special function members:
+    button-clicked: bool,  // If set by UI, backend shall handle it.
+    dismissed: bool,  // If set by UI, backend shall delete notification.
+    dont-show-again: bool,  // If set by UI, backend shall delete notification.
+}
+
 export enum LibraryType {
     local,
     remote,
@@ -80,7 +109,7 @@ export enum LibraryState {
     outdated,
 }
 
-export struct Library {
+export struct LibraryData {
     id: string,
     name: string,
     description: string,
@@ -93,7 +122,7 @@ export struct Library {
     checked: bool,
 }
 
-export struct FolderTreeItem {
+export struct FolderTreeItemData {
     level: int,
     icon: image,
     name: string,
@@ -187,7 +216,7 @@ export struct Board3dTabData {
     overlay-color: brush,
 }
 
-export struct WindowSection {
+export struct WindowSectionData {
     tabs: [TabData], // Tabs in this section
     create-library-tabs: [CreateLibraryTabData],
     download-library-tabs: [DownloadLibraryTabData],

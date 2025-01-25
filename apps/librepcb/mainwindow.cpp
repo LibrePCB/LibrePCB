@@ -202,7 +202,8 @@ bool MainWindow::actionTriggered(ui::ActionId id, int sectionIndex) noexcept {
     newProject(true);
     return true;
   } else if (id == ui::ActionId::WindowNew) {
-    mApp.createNewWindow(mWindow->global<ui::Data>().get_current_project_index());
+    mApp.createNewWindow(
+        mWindow->global<ui::Data>().get_current_project_index());
     return true;
   } else if (id == ui::ActionId::WindowClose) {
     mWindow->hide();  // TODO: Remove from GuiApplication

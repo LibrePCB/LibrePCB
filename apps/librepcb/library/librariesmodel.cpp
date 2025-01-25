@@ -164,13 +164,13 @@ std::size_t LibrariesModel::row_count() const {
   return mMergedLibs.size();
 }
 
-std::optional<ui::Library> LibrariesModel::row_data(std::size_t i) const {
+std::optional<ui::LibraryData> LibrariesModel::row_data(std::size_t i) const {
   return (i < mMergedLibs.size()) ? std::optional(mMergedLibs.at(i))
                                   : std::nullopt;
 }
 
 void LibrariesModel::set_row_data(std::size_t i,
-                                  const ui::Library& obj) noexcept {
+                                  const ui::LibraryData& obj) noexcept {
   if (i < mMergedLibs.size()) {
     mMergedLibs.at(i) = obj;
     row_changed(i);
@@ -205,7 +205,7 @@ void LibrariesModel::refreshLocalLibraries() noexcept {
 
       mLocalLibs.insert(
           uuid,
-          ui::Library{
+          ui::LibraryData{
               q2s(libDir.toStr()),
               q2s(name),
               q2s(description),
@@ -288,7 +288,7 @@ void LibrariesModel::refreshMergedLibs() noexcept {
           : ui::LibraryState::Outdated;
       it->checked = (it->state == ui::LibraryState::Outdated);
     } else {
-      mMergedLibs.push_back(ui::Library{
+      mMergedLibs.push_back(ui::LibraryData{
           q2s(lib.uuid.toStr()),
           q2s(lib.name),
           q2s(lib.description),
@@ -306,7 +306,7 @@ void LibrariesModel::refreshMergedLibs() noexcept {
     mMergedLibs.push_back(lib);
   }
   std::sort(mMergedLibs.begin(), mMergedLibs.end(),
-            [](const ui::Library& a, const ui::Library& b) {
+            [](const ui::LibraryData& a, const ui::LibraryData& b) {
               if ((a.state == ui::LibraryState::Outdated) !=
                   (b.state == ui::LibraryState::Outdated)) {
                 return a.state == ui::LibraryState::Outdated;

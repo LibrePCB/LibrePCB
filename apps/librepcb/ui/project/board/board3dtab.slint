@@ -1,11 +1,11 @@
-import { WindowSection, Board3dTabData } from "../../api/types.slint";
+import { WindowSectionData, Board3dTabData } from "../../api/types.slint";
 import { SceneButton } from "../../common/scenebutton.slint";
 import { Backend } from "../../api/backend.slint";
 import { Data } from "../../api/data.slint";
 
 export component Board3dTab inherits Image {
     in property <int> section-index;
-    in-out property <WindowSection> section;
+    in-out property <WindowSectionData> section;
     property <[Board3dTabData]> tabs: section.board-3d-tabs;
 
     image-fit: ImageFit.preserve;
