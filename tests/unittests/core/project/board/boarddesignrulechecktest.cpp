@@ -54,6 +54,7 @@ TEST(BoardDesignRuleCheckTest, testMessages) {
       {"missing_device", {"checkForUnplacedComponents"}},
       {"missing_connection", {"checkForMissingConnections"}},
       {"unused_layer", {"checkUsedLayers"}},
+      {"antennae_via", {"checkVias", "checkVias2", "checkVias3"}},
   };
 
   // Open project from test data directory.
@@ -67,6 +68,7 @@ TEST(BoardDesignRuleCheckTest, testMessages) {
                   projectFp.getFilename());  // can throw
 
   // Run DRC for each board.
+  QStringList summary;
   foreach (Board* board, project->getBoards()) {
     std::cout << "- Run DRC for board '" << board->getName()->toStdString()
               << "':\n";
@@ -115,11 +117,23 @@ TEST(BoardDesignRuleCheckTest, testMessages) {
     expected->ensureLineBreak();
 
     // Compare.
-    std::cout << "  * Emitted " << approvals.count() << " messages, "
-              << board->getDrcMessageApprovals().count() << " approved\n";
+    const QString msg = QString("Emitted %1 messages, %2 approved")
+                            .arg(approvals.count())
+                            .arg(board->getDrcMessageApprovals().count());
+    std::cout << "  * " << qPrintable(msg) << "\n";
+    summary.append(QString(" * %1: %2").arg(*board->getName()).arg(msg));
     EXPECT_EQ(expected->toByteArray().toStdString(),
               actual->toByteArray().toStdString());
     EXPECT_EQ(board->getDrcMessageApprovals().count(), approvals.count());
+  }
+
+  // The output in case of failures can be very verbose, so we print a more
+  // readable summary at the end.
+  if (::testing::Test::HasFailure()) {
+    std::cout << "Summary:\n";
+    for (const QString& s : summary) {
+      std::cout << qPrintable(s) << "\n";
+    }
   }
 }
 
