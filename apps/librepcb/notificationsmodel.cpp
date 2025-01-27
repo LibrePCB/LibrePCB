@@ -22,7 +22,10 @@
  ******************************************************************************/
 #include "notificationsmodel.h"
 
-#include "apptoolbox.h"
+#include "notification.h"
+
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -39,7 +42,16 @@ namespace app {
  ******************************************************************************/
 
 NotificationsModel::NotificationsModel(Workspace& ws, QObject* parent) noexcept
-  : QObject(parent), mWorkspace(ws) {
+  : QObject(parent), mWorkspace(ws), mUnreadNotifications(0) {
+  connect(
+      &mWorkspace.getSettings().dismissedMessages,
+      &WorkspaceSettingsItem::edited, this,
+      [this]() {
+        reset();
+        updateUnreadNotificationsCount();
+      },
+      Qt::QueuedConnection);
+  updateUnreadNotificationsCount();
 }
 
 NotificationsModel::~NotificationsModel() noexcept {
@@ -49,24 +61,26 @@ NotificationsModel::~NotificationsModel() noexcept {
  *  General Methods
  ******************************************************************************/
 
-void NotificationsModel::add(ui::NotificationType type, const QString& title,
-                             const QString& description,
-                             const QString& buttonText,
-                             bool supportsDontShowAgain) noexcept {
-  mItems.push_back(ui::NotificationData{
-      type,  // Type
-      q2s(title),  // Title
-      q2s(description),  // Description
-      q2s(buttonText),  // Button text
-      0,  // Progress
-      supportsDontShowAgain,  // Supports "don't show again"
-      true,  // Unread
-      false,  // Displayed
-      false,  // Button clicked
-      false,  // Dismissed
-      false,  // Don't show again clicked
-  });
-  row_added(mItems.size() - 1, 1);
+void NotificationsModel::add(
+    std::shared_ptr<Notification> notification) noexcept {
+  if (std::find(mItems.begin(), mItems.end(), notification) != mItems.end()) {
+    return;  // Already added.
+  }
+
+  notification->resetState();
+  connect(notification.get(), &Notification::changed, this,
+          &NotificationsModel::itemChanged);
+  mItems.insert(mItems.begin(), notification);
+
+  const QString dismissKey = notification->getDismissKey();
+  if (dismissKey.isEmpty() ||
+      (!mWorkspace.getSettings().dismissedMessages.contains(dismissKey))) {
+    row_added(0, 1);
+    updateUnreadNotificationsCount();
+    if (notification->getAutoPopUp()) {
+      emit autoPopUpRequested();
+    }
+  }
 }
 
 /*******************************************************************************
@@ -74,29 +88,118 @@ void NotificationsModel::add(ui::NotificationType type, const QString& title,
  ******************************************************************************/
 
 std::size_t NotificationsModel::row_count() const {
-  return mItems.size();
+  std::size_t count = 0;
+  for (const auto& item : mItems) {
+    const QString dismissKey = item->getDismissKey();
+    if (dismissKey.isEmpty() ||
+        (!mWorkspace.getSettings().dismissedMessages.contains(dismissKey))) {
+      ++count;
+    }
+  }
+  return count;
 }
 
 std::optional<ui::NotificationData> NotificationsModel::row_data(
     std::size_t i) const {
-  return (i < mItems.size()) ? std::optional(mItems.at(i)) : std::nullopt;
+  const int itemIndex = mapIndex(i);
+  if ((itemIndex >= 0) && (itemIndex < static_cast<int>(mItems.size()))) {
+    return mItems.at(itemIndex)->getUiData();
+  } else {
+    return std::nullopt;
+  }
 }
 
 void NotificationsModel::set_row_data(
     std::size_t i, const ui::NotificationData& obj) noexcept {
-  if ((i >= 0) && (i < mItems.size())) {
-    mItems[i] = obj;
+  const int itemIndex = mapIndex(i);
+  if ((itemIndex >= 0) && (itemIndex < static_cast<int>(mItems.size()))) {
+    mItems[itemIndex]->setUiData(obj);
+    row_changed(i);
 
-    if (obj.dismissed) {
-      mItems.erase(mItems.begin() + i);
-      row_removed(i, 1);
+    // Handle "don't show again".
+    const QString dismissKey = mItems[itemIndex]->getDismissKey();
+    if (obj.dont_show_again && (!dismissKey.isEmpty())) {
+      try {
+        mWorkspace.getSettings().dismissedMessages.add(dismissKey);
+        mWorkspace.saveSettings();  // can throw
+      } catch (const Exception& e) {
+        qCritical().noquote() << "Failed to dismiss message:" << e.getMsg();
+      }
     }
+
+    // Handle "dismiss".
+    if (obj.dismissed) {
+      removeItem(i, itemIndex);
+    }
+
+    updateUnreadNotificationsCount();
   }
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+int NotificationsModel::mapIndex(int i) const noexcept {
+  int logicalIndex = 0;
+  for (int itemIndex = 0; itemIndex < static_cast<int>(mItems.size());
+       ++itemIndex) {
+    const QString dismissKey = mItems.at(itemIndex)->getDismissKey();
+    if (dismissKey.isEmpty() ||
+        (!mWorkspace.getSettings().dismissedMessages.contains(dismissKey))) {
+      if (logicalIndex == i) {
+        return itemIndex;
+      } else {
+        ++logicalIndex;
+      }
+    }
+  }
+  return -1;
+}
+
+void NotificationsModel::itemChanged(bool dismissed) noexcept {
+  const Notification* notification = static_cast<const Notification*>(sender());
+  std::size_t logicalIndex = 0;
+  for (std::size_t i = 0; i < mItems.size(); ++i) {
+    if (mItems.at(i).get() == notification) {
+      if (dismissed) {
+        removeItem(logicalIndex, i);
+      } else {
+        row_changed(logicalIndex);
+      }
+      return;
+    }
+    const QString dismissKey = mItems.at(i)->getDismissKey();
+    if (dismissKey.isEmpty() ||
+        (!mWorkspace.getSettings().dismissedMessages.contains(dismissKey))) {
+      ++logicalIndex;
+    }
+  }
+}
+
+void NotificationsModel::removeItem(std::size_t i, int itemIndex) noexcept {
+  disconnect(mItems[itemIndex].get(), &Notification::changed, this,
+             &NotificationsModel::itemChanged);
+  mItems.erase(mItems.begin() + itemIndex);
+  row_removed(i, 1);
+}
+
+void NotificationsModel::updateUnreadNotificationsCount() noexcept {
+  int count = 0;
+  for (const auto& item : mItems) {
+    const QString dismissKey = item->getDismissKey();
+    if ((dismissKey.isEmpty() ||
+         (!mWorkspace.getSettings().dismissedMessages.contains(dismissKey))) &&
+        (item->getUiData().type != ui::NotificationType::Progress) &&
+        (item->getUiData().unread)) {
+      ++count;
+    }
+  }
+  if (count != mUnreadNotifications) {
+    mUnreadNotifications = count;
+    emit unreadNotificationsCountChanged(mUnreadNotifications);
+  }
+}
 
 /*******************************************************************************
  *  End of File

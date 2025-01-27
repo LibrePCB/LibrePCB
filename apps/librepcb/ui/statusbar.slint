@@ -196,16 +196,27 @@ export component StatusBar inherits Rectangle {
 
             width: self.height;
             background: ta-notifications.has-hover ? #505050 : transparent;
+            border-width: (Data.unread-notifications-count > 0) ? 1px : 0px;
+            border-color: #29d682;
 
             ta-notifications := TouchArea {
-                enabled: true;
+                enabled: enabled;
 
                 Image {
                     width: self.height * 0.7;
                     height: 100%;
                     image-fit: contain;
-                    source: enabled ? @image-url("img/bell-solid.svg") : @image-url("img/bell.svg");
+                    source: (Data.unread-notifications-count > 0) ? @image-url("img/bell-solid.svg") : @image-url("img/bell.svg");
                     colorize: enabled ? white : #707070;
+                }
+
+                if Data.unread-notifications-count > 0: Text {
+                    color: root.background;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                    font-size: 12px;
+                    font-weight: 900;
+                    text: Data.unread-notifications-count;
                 }
 
                 clicked => {
@@ -217,6 +228,7 @@ export component StatusBar inherits Rectangle {
                 x: parent.width - self.width;
                 y: -self.height;
                 width: min(max(self.preferred-width, 300px), root.width * 0.5, 700px);
+                visible: Data.notifications.length > 0;
             }
 
             // Just for the preview, auto-open the notifications popup.

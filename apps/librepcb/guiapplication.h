@@ -42,6 +42,7 @@ namespace app {
 class FavoriteProjectsModel;
 class LibrariesModel;
 class MainWindow;
+class Notification;
 class NotificationsModel;
 class ProjectsModel;
 class RecentProjectsModel;
@@ -60,11 +61,13 @@ public:
   // Constructors / Destructor
   GuiApplication() = delete;
   GuiApplication(const GuiApplication& other) = delete;
-  explicit GuiApplication(Workspace& ws, QObject* parent = nullptr) noexcept;
+  explicit GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
+                          QObject* parent = nullptr) noexcept;
   virtual ~GuiApplication() noexcept;
 
   // Getters
   Workspace& getWorkspace() noexcept { return mWorkspace; }
+  NotificationsModel& getNotifications() noexcept { return *mNotifications; }
   ProjectsModel& getProjects() noexcept { return *mProjects; }
 
   // General Methods
@@ -77,9 +80,14 @@ public:
 
 private:
   QString buildAppVersionDetails() const noexcept;
+  std::shared_ptr<MainWindow> getCurrentWindow() noexcept;
+  void updateNoLibrariesInstalledNotification() noexcept;
+  void updateDesktopIntegrationNotification() noexcept;
 
   Workspace& mWorkspace;
   std::shared_ptr<NotificationsModel> mNotifications;
+  std::shared_ptr<Notification> mNotificationNoLibrariesInstalled;
+  std::shared_ptr<Notification> mNotificationDesktopIntegration;
   std::shared_ptr<RecentProjectsModel> mRecentProjects;
   std::shared_ptr<FavoriteProjectsModel> mFavoriteProjects;
   std::shared_ptr<LibrariesModel> mLibraries;
