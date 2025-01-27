@@ -38,7 +38,7 @@ export global Data {
 
     in-out property <MainPage> current-page: MainPage.order;
 
-    in-out property <[NotificationData]> notifications: [
+    in property <[NotificationData]> notifications: [
         {
             type: NotificationType.tip,
             title: "Tip",
@@ -71,7 +71,9 @@ export global Data {
         },
     ];
 
-    in-out property <int> unread-notifications-count: 2;
+    in property <int> unread-notifications-count: 2;
+
+    in property <int> current-progress-notification-index: 4;
 
     in property <[FolderTreeItemData]> workspace-folder: [
         {
@@ -121,8 +123,6 @@ export global Data {
     ];
 
     in property <int> current-project-index: 0;
-
-    in property <int> status-bar-progress: 50;
 
     in property <bool> refreshing-available-libraries: true;
 

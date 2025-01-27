@@ -30,7 +30,6 @@
 #include "../../project/cmd/cmdschematicedit.h"
 #include "../../project/cmd/cmdschematicremove.h"
 #include "../../undostack.h"
-#include "../../utils/editortoolbox.h"
 #include "../../utils/exclusiveactiongroup.h"
 #include "../../utils/menubuilder.h"
 #include "../../utils/standardeditorcommandhandler.h"
@@ -1166,9 +1165,7 @@ void SchematicEditor::updateEmptySchematicMessage() noexcept {
 
 void SchematicEditor::updateComponentToolbarIcons() noexcept {
   QString suffix = useIeee315Symbols() ? "us" : "eu";
-  if (EditorToolbox::isWindowBackgroundDark()) {
-    suffix += "_dark";
-  }
+  suffix += "_dark";
   mActionComponentResistor->setIcon(
       QIcon(":/img/library/resistor_" % suffix % ".png"));
   mActionComponentInductor->setIcon(

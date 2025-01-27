@@ -22,7 +22,6 @@
  ******************************************************************************/
 #include "kicadlibraryimportwizardpage_parse.h"
 
-#include "../../utils/editortoolbox.h"
 #include "kicadlibraryimportwizardcontext.h"
 #include "ui_kicadlibraryimportwizardpage_parse.h"
 
@@ -79,13 +78,10 @@ void KiCadLibraryImportWizardPage_Parse::initializePage() {
   mUi->progressBar->show();
 
   std::shared_ptr<MessageLogger> log = std::make_shared<MessageLogger>(false);
-  const MessageLogger::ColorTheme msgColors =
-      EditorToolbox::isWindowBackgroundDark()
-      ? MessageLogger::ColorTheme::Dark
-      : MessageLogger::ColorTheme::Light;
   connect(log.get(), &MessageLogger::msgEmitted, this,
-          [this, msgColors](const MessageLogger::Message& msg) {
-            mUi->txtMessages->append(msg.toRichText(msgColors));
+          [this](const MessageLogger::Message& msg) {
+            mUi->txtMessages->append(
+                msg.toRichText(MessageLogger::ColorTheme::Dark));
             mUi->txtMessages->verticalScrollBar()->setValue(
                 mUi->txtMessages->verticalScrollBar()->maximum());
           });

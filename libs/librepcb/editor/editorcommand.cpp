@@ -22,8 +22,6 @@
  ******************************************************************************/
 #include "editorcommand.h"
 
-#include "utils/editortoolbox.h"
-
 #include <QtCore>
 #include <QtWidgets>
 
@@ -43,7 +41,7 @@ static bool enableDarkIcons() noexcept {
     } else if (override == "0") {
       return false;
     } else {
-      return EditorToolbox::isWindowBackgroundDark();
+      return true;
     }
   };
   static bool value = detect();

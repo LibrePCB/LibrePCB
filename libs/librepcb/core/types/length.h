@@ -485,7 +485,6 @@ public:
    * @brief Same as #fromPx(), but does not throw on invalid input
    *
    * @param pixels        See setLengthPx()
-   * @param gridInterval  See mapToGrid()
    * @return Length if input was valid, std::nullopt otherwise
    */
   static std::optional<Length> tryFromPx(qreal pixels) noexcept;

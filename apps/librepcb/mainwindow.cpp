@@ -82,12 +82,20 @@ MainWindow::MainWindow(GuiApplication& app,
   d.set_ignore_placement_locks(false);
   d.set_unread_notifications_count(
       mApp.getNotifications().getUnreadNotificationsCount());
+  d.set_current_progress_notification_index(
+      mApp.getNotifications().getCurrentProgressIndex());
 
   // Bind global data to signals.
   connect(&mApp.getNotifications(),
           &NotificationsModel::unreadNotificationsCountChanged, this,
           [this](int count) {
             mWindow->global<ui::Data>().set_unread_notifications_count(count);
+          });
+  connect(&mApp.getNotifications(),
+          &NotificationsModel::currentProgressIndexChanged, this,
+          [this](int index) {
+            mWindow->global<ui::Data>().set_current_progress_notification_index(
+                index);
           });
   connect(mSections.get(), &WindowSectionsModel::currentProjectChanged, this,
           &MainWindow::setCurrentProject);
