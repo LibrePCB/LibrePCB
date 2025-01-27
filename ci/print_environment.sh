@@ -30,11 +30,11 @@ clang --version
 echo
 
 echo "=== Cargo ==="
-ls -la /root
-ls -la /root/.cargo
-ls -la /root/.cargo/bin
-/root/.cargo/bin/ccache --version
+ls -la /
+ls -la /.cargo
+ls -la /.cargo/bin
 cargo --version
+/.cargo/bin/cargo --version
 echo "CARGO_HOME=$CARGO_HOME"
 echo
 
