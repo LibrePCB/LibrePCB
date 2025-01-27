@@ -48,3 +48,4 @@ yourself by creating a pull request (see [CONTRIBUTING.md](CONTRIBUTING.md)).
 - David Lamparter ([@eqvinox](https://github.com/eqvinox))
 - Allan Nordhøy ([@comradekingu](https://github.com/comradekingu))
 - Alexander Wilms
+- Connor Slade ([@connorslade](https://github.com/connorslade))
