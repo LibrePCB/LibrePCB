@@ -99,6 +99,11 @@ endif()
 # interest, so let's suppress them.
 target_compile_options(common INTERFACE -Wno-noexcept-type)
 
+# TODO: This needs to be investigated (pops up on macOS CI).
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  target_compile_options(common INTERFACE -Wno-nullability-completeness)
+endif()
+
 # Avoid "file too big" error for debug builds on Windows.
 if(WIN32)
   target_compile_options(common INTERFACE $<$<CONFIG:Debug>:-Wa,-mbig-obj>)

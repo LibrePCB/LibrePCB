@@ -37,11 +37,6 @@ if(EXISTS "${SLINT_SUBMODULE_BASEPATH}"
     target_compile_options(Slint INTERFACE -Wno-nonnull)
   endif()
 
-  # TODO: This needs to be investigated (pops up on macOS CI).
-  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    target_compile_options(Slint INTERFACE -Wno-nullability-completeness)
-  endif()
-
   # Stop here, we're done
   return()
 endif()
