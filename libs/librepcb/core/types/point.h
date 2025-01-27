@@ -418,12 +418,13 @@ public:
   static Point fromMil(qreal milsX, qreal milsY);
   static Point fromMil(const QPointF& mils);
 
-  /// @see Length::fromPx()
+  /// @see ::librepcb::Length::Length::fromPx()
   /// @note These methods are useful to read the position of a QGraphics*
-  /// object.
-  ///       For this purpose, these methods will invert the Y-coordinate.
+  ///       object. Therefore, these methods will invert the Y-coordinate.
   static Point fromPx(qreal pixelsX, qreal pixelsY);
   static Point fromPx(const QPointF& pixels);
+
+  /// @see ::librepcb::Length::tryFromPx()
   static std::optional<Point> tryFromPx(const QPointF& pixels) noexcept;
 
   // Operators

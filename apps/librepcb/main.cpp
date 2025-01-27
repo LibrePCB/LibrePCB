@@ -239,7 +239,6 @@ static int runApplication() noexcept {
   // Get the path of the workspace to open. By default, open the recently used
   // workspace stored in the user settings.
   FilePath path = Workspace::getMostRecentlyUsedWorkspacePath();
-  path = FilePath("/home/urban/tmp/LibrePCB-Workspace/");
   qDebug() << "Recently used workspace:" << path.toNative();
 
   // If the workspace path is specified by environment variable, use this one.

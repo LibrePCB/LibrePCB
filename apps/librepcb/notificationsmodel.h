@@ -67,6 +67,7 @@ public:
   int getUnreadNotificationsCount() const noexcept {
     return mUnreadNotifications;
   }
+  int getCurrentProgressIndex() const noexcept { return mCurrentProgressIndex; }
 
   // Implementations
   std::size_t row_count() const override;
@@ -80,17 +81,20 @@ public:
 signals:
   void autoPopUpRequested();
   void unreadNotificationsCountChanged(int count);
+  void currentProgressIndexChanged(int index);
 
 private:
   int mapIndex(int i) const noexcept;
   void itemChanged(bool dismissed) noexcept;
   void removeItem(std::size_t i, int itemIndex) noexcept;
   void updateUnreadNotificationsCount() noexcept;
+  void updateCurrentProgressIndex() noexcept;
 
 private:
   Workspace& mWorkspace;
   std::vector<std::shared_ptr<Notification>> mItems;
   int mUnreadNotifications;
+  int mCurrentProgressIndex;
 };
 
 /*******************************************************************************

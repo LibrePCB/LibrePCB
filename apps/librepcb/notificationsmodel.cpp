@@ -42,16 +42,21 @@ namespace app {
  ******************************************************************************/
 
 NotificationsModel::NotificationsModel(Workspace& ws, QObject* parent) noexcept
-  : QObject(parent), mWorkspace(ws), mUnreadNotifications(0) {
+  : QObject(parent),
+    mWorkspace(ws),
+    mUnreadNotifications(0),
+    mCurrentProgressIndex(-1) {
   connect(
       &mWorkspace.getSettings().dismissedMessages,
       &WorkspaceSettingsItem::edited, this,
       [this]() {
         reset();
         updateUnreadNotificationsCount();
+        updateCurrentProgressIndex();
       },
       Qt::QueuedConnection);
   updateUnreadNotificationsCount();
+  updateCurrentProgressIndex();
 }
 
 NotificationsModel::~NotificationsModel() noexcept {
@@ -77,6 +82,7 @@ void NotificationsModel::add(
       (!mWorkspace.getSettings().dismissedMessages.contains(dismissKey))) {
     row_added(0, 1);
     updateUnreadNotificationsCount();
+    updateCurrentProgressIndex();
     if (notification->getAutoPopUp()) {
       emit autoPopUpRequested();
     }
@@ -133,6 +139,7 @@ void NotificationsModel::set_row_data(
     }
 
     updateUnreadNotificationsCount();
+    updateCurrentProgressIndex();
   }
 }
 
@@ -198,6 +205,28 @@ void NotificationsModel::updateUnreadNotificationsCount() noexcept {
   if (count != mUnreadNotifications) {
     mUnreadNotifications = count;
     emit unreadNotificationsCountChanged(mUnreadNotifications);
+  }
+}
+
+void NotificationsModel::updateCurrentProgressIndex() noexcept {
+  int index = -1;
+
+  int logicalIndex = 0;
+  for (const auto& item : mItems) {
+    const QString dismissKey = item->getDismissKey();
+    if (dismissKey.isEmpty() ||
+        (!mWorkspace.getSettings().dismissedMessages.contains(dismissKey))) {
+      if (item->getUiData().type == ui::NotificationType::Progress) {
+        index = logicalIndex;
+        break;
+      }
+      ++logicalIndex;
+    }
+  }
+
+  if (index != mCurrentProgressIndex) {
+    mCurrentProgressIndex = index;
+    emit currentProgressIndexChanged(mCurrentProgressIndex);
   }
 }
 

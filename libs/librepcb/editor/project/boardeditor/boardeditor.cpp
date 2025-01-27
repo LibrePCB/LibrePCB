@@ -31,7 +31,6 @@
 #include "../../project/cmd/cmdboardadd.h"
 #include "../../project/cmd/cmdboardremove.h"
 #include "../../undostack.h"
-#include "../../utils/editortoolbox.h"
 #include "../../utils/exclusiveactiongroup.h"
 #include "../../utils/menubuilder.h"
 #include "../../utils/standardeditorcommandhandler.h"
@@ -1906,9 +1905,7 @@ void BoardEditor::execSpecctraImportDialog() noexcept {
   txtBrowser->setReadOnly(true);
   txtBrowser->setWordWrapMode(QTextOption::WordWrap);
   txtBrowser->setText(
-      logger->getMessagesRichText(EditorToolbox::isWindowBackgroundDark()
-                                      ? MessageLogger::ColorTheme::Dark
-                                      : MessageLogger::ColorTheme::Light));
+      logger->getMessagesRichText(MessageLogger::ColorTheme::Dark));
   txtBrowser->verticalScrollBar()->setValue(
       txtBrowser->verticalScrollBar()->maximum());
   layout->addWidget(txtBrowser);

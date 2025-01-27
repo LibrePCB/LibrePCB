@@ -76,12 +76,11 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
       mNotifications.get(), &NotificationsModel::autoPopUpRequested, this,
       [this, startupTime]() {
         if (auto w = getCurrentWindow()) {
-          // It looks ugly if the notifications pop up immediately when
-          // the whole window is just opened, so we delay it a bit. Not
-          // the best implementation, probably this could be improved
-          // somehow...
+          // It looks ugly if the notifications pop up immediately when the
+          // whole window is just opened, so we delay it a bit. Not the best
+          // implementation, probably this could be improved somehow...
           const qint64 delay =
-              std::max(startupTime + 1000 - QDateTime::currentMSecsSinceEpoch(),
+              std::max(startupTime + 500 - QDateTime::currentMSecsSinceEpoch(),
                        qint64(0));
           QTimer::singleShot(delay, w.get(), &MainWindow::popUpNotifications);
         }
@@ -252,8 +251,6 @@ void GuiApplication::createNewWindow(int projectIndex) noexcept {
   d.set_current_project_index(projectIndex);
 
   // Bind global data to signals.
-  bind(this, d, &ui::Data::set_status_bar_progress, &mWorkspace.getLibraryDb(),
-       &WorkspaceLibraryDb::scanProgressUpdate, 0);
   bind(this, d, &ui::Data::set_outdated_libraries, mLibraries.get(),
        &LibrariesModel::outdatedLibrariesChanged,
        mLibraries->getOutdatedLibraries());

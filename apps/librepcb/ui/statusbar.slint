@@ -1,7 +1,7 @@
 import { ProgressIndicator, Palette } from "std-widgets.slint";
 import { LengthEdit } from "./common/lengthedit.slint";
 import { NotificationsPopup } from "./notificationspopup.slint";
-import { MainPage, GridStyle, TabType } from "./api/types.slint";
+import { MainPage, GridStyle, TabType, NotificationType } from "./api/types.slint";
 import { Data } from "./api/data.slint";
 
 export component StatusBar inherits Rectangle {
@@ -182,8 +182,8 @@ export component StatusBar inherits Rectangle {
 
             ProgressIndicator {
                 width: 100%;
-                visible: self.progress > 0 && self.progress < 1;
-                progress: Data.status-bar-progress / 100;
+                visible: Data.notifications[Data.current-progress-notification-index].type == NotificationType.progress;
+                progress: Data.notifications[Data.current-progress-notification-index].progress / 100;
             }
         }
 
