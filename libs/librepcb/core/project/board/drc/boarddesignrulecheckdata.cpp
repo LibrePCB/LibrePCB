@@ -24,11 +24,12 @@
 
 #include "../../../geometry/hole.h"
 #include "../../../geometry/stroketext.h"
+#include "../../../geometry/via.h"
 #include "../../../library/cmp/component.h"
-#include "../../../library/dev/device.h"
 #include "../../../library/pkg/footprint.h"
 #include "../../../library/pkg/footprintpad.h"
 #include "../../../library/pkg/packagepad.h"
+#include "../../../utils/clipperhelpers.h"
 #include "../../circuit/circuit.h"
 #include "../../circuit/componentinstance.h"
 #include "../../circuit/netsignal.h"
@@ -86,14 +87,25 @@ BoardDesignRuleCheckData::BoardDesignRuleCheckData(
                               nl->getEndPoint().getPosition(), nl->getWidth(),
                               &nl->getLayer()});
     }
-    foreach (const BI_Via* via, ns->getVias()) {
+    foreach (const BI_Via* biVia, ns->getVias()) {
+      QSet<const Layer*> connectedLayers;
+
+      // Add all the layers of traces directly connected to the current via to
+      // the connectedLayers set. The via may be connected to more layers
+      // through other mechanisms like planes, but identifying those connections
+      // can be expensive, so it's not done here.
+      foreach (const BI_NetLine* nl, biVia->getNetLines()) {
+        connectedLayers.insert(&nl->getLayer());
+      }
+
+      const librepcb::Via& via = biVia->getVia();
       nsd.vias.insert(
-          via->getUuid(),
-          Via{via->getUuid(), via->getPosition(), via->getSize(),
-              via->getDrillDiameter(), &via->getVia().getStartLayer(),
-              &via->getVia().getEndLayer(), via->getDrillLayerSpan(),
-              via->getVia().isBuried(), via->getVia().isBlind(),
-              via->getStopMaskDiameterTop(), via->getStopMaskDiameterBottom()});
+          biVia->getUuid(),
+          Via{biVia->getUuid(), biVia->getPosition(), biVia->getSize(),
+              biVia->getDrillDiameter(), connectedLayers, &via.getStartLayer(),
+              &via.getEndLayer(), biVia->getDrillLayerSpan(), via.isBuried(),
+              via.isBlind(), biVia->getStopMaskDiameterTop(),
+              biVia->getStopMaskDiameterBottom()});
     }
     segments.insert(ns->getUuid(), nsd);
   }

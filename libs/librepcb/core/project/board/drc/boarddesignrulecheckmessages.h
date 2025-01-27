@@ -921,6 +921,28 @@ private:
 };
 
 /*******************************************************************************
+ *  Class DrcMsgInvalidVia
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgInvalidVia class
+ */
+class DrcMsgInvalidVia final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgInvalidVia)
+
+public:
+  using Data = BoardDesignRuleCheckData;
+
+  // Constructors / Destructor
+  DrcMsgInvalidVia() = delete;
+  DrcMsgInvalidVia(const Data::Segment& ns, const Data::Via& via,
+                   const QVector<Path>& locations) noexcept;
+  DrcMsgInvalidVia(const DrcMsgInvalidVia& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~DrcMsgInvalidVia() noexcept {}
+};
+
+/*******************************************************************************
  *  Class DrcMsgSilkscreenClearanceViolation
  ******************************************************************************/
 

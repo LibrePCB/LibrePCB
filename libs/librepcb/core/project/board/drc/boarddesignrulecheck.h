@@ -146,6 +146,8 @@ private:  // Methods
                                                  const Layer& layer);
   static QVector<Path> getDeviceLocation(const Data::Device& device);
   static QVector<Path> getViaLocation(const Data::Via& via) noexcept;
+  static bool isViaUseless(const Data& data, const Data::Segment& ns,
+                           const Data::Via& via) noexcept;
   static QVector<Path> getTraceLocation(const Data::Trace& trace) noexcept;
   static QVector<Path> getHoleLocation(
       const Data::Hole& hole,

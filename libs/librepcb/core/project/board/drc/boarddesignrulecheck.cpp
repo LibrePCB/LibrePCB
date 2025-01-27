@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "boarddesignrulecheck.h"
 
+#include "../../../geometry/padgeometry.h"
 #include "../../../geometry/via.h"
 #include "../../../types/layer.h"
 #include "../../../utils/clipperhelpers.h"
@@ -29,6 +30,7 @@
 #include "../boardplanefragmentsbuilder.h"
 #include "boardclipperpathgenerator.h"
 #include "boarddesignrulecheckmessages.h"
+#include "polyclipping/clipper.hpp"
 
 #include <QtConcurrent>
 #include <QtCore>
@@ -245,6 +247,7 @@ BoardDesignRuleCheck::Result BoardDesignRuleCheck::run(
         },
         3);
   }
+
   addToStage2(&BoardDesignRuleCheck::checkCopperHoleClearances, 3);
   if (!data->quick) {
     addToStage2(&BoardDesignRuleCheck::checkMinimumPthAnnularRing, 2);
@@ -259,10 +262,10 @@ BoardDesignRuleCheck::Result BoardDesignRuleCheck::run(
     addIndependent(&BoardDesignRuleCheck::checkInvalidPadConnections, 2);
     addIndependent(&BoardDesignRuleCheck::checkDeviceClearances, 2);
     addIndependent(&BoardDesignRuleCheck::checkBoardOutline, 1);
+    addIndependent(&BoardDesignRuleCheck::checkVias, 1);
   }
   addSequential(&BoardDesignRuleCheck::checkMinimumCopperWidth);
   if (!data->quick) {
-    addSequential(&BoardDesignRuleCheck::checkVias);
     addSequential(&BoardDesignRuleCheck::checkAllowedNpthSlots);
     addSequential(&BoardDesignRuleCheck::checkAllowedPthSlots);
     addSequential(&BoardDesignRuleCheck::checkUsedLayers);
@@ -1637,18 +1640,32 @@ RuleCheckMessageList BoardDesignRuleCheck::checkZones(const Data& data) {
 RuleCheckMessageList BoardDesignRuleCheck::checkVias(const Data& data) {
   RuleCheckMessageList messages;
   emitStatus(tr("Check for useless or disallowed vias..."));
+
   for (const Data::Segment& ns : data.segments) {
     for (const Data::Via& via : ns.vias) {
-      if (!via.drillLayerSpan) {
-        messages.append(
-            std::make_shared<DrcMsgUselessVia>(ns, via, getViaLocation(via)));
-      } else if ((via.isBlind && (!data.settings.getBlindViasAllowed())) ||
-                 (via.isBuried && (!data.settings.getBuriedViasAllowed()))) {
+      if ((via.isBlind && (!data.settings.getBlindViasAllowed())) ||
+          (via.isBuried && (!data.settings.getBuriedViasAllowed()))) {
         messages.append(
             std::make_shared<DrcMsgForbiddenVia>(ns, via, getViaLocation(via)));
       }
+
+      // If the via has no drill layer span, emit an InvalidVia warning
+      if (!via.drillLayerSpan) {
+        messages.append(
+            std::make_shared<DrcMsgInvalidVia>(ns, via, getViaLocation(via)));
+        continue;
+      }
+
+      // If the total number of layers connected to the via is less than two,
+      // add a 'useless via' warning. Connections can be made by traces, planes,
+      // or pads.
+      if (isViaUseless(data, ns, via)) {
+        messages.append(
+            std::make_shared<DrcMsgUselessVia>(ns, via, getViaLocation(via)));
+      }
     }
   }
+
   return messages;
 }
 
@@ -2282,6 +2299,78 @@ QVector<Path> BoardDesignRuleCheck::getDeviceLocation(
 QVector<Path> BoardDesignRuleCheck::getViaLocation(
     const Data::Via& via) noexcept {
   return {Path::circle(via.size).translated(via.position)};
+}
+
+bool BoardDesignRuleCheck::isViaUseless(const Data& data,
+                                        const Data::Segment& ns,
+                                        const Data::Via& via) noexcept {
+  // The layers of the traces directly connected to the via have already been
+  // added, so if there are two or more connected layers, the via is not
+  // useless and we can skip all the other checks.
+  if (via.connectedLayers.count() >= 2) {
+    return false;
+  }
+
+  QSet<const Layer*> connectedLayers(via.connectedLayers);
+  const ClipperLib::IntPoint viaPosition =
+      ClipperHelpers::convert(via.position);
+
+  // A via is considered to be connected to a plane if it contains
+  // the layer the plane is on, both of them are part of a net, they are in
+  // the same net, and the via is physically within the plane
+  for (const Data::Plane& plane : data.planes) {
+    const int copperNumber = plane.layer->getCopperNumber();
+    if (((via.startLayer->getCopperNumber() > copperNumber) ||
+         (via.endLayer->getCopperNumber() < copperNumber)) ||
+        ((!plane.net) || (!ns.net) || (plane.net != ns.net)) ||
+        connectedLayers.contains(plane.layer)) {
+      continue;
+    }
+
+    const ClipperLib::Path clipperPlanePath =
+        ClipperHelpers::convert(plane.outline, maxArcTolerance());
+    if (ClipperLib::PointInPolygon(viaPosition, clipperPlanePath)) {
+      connectedLayers.insert(plane.layer);
+      if (connectedLayers.count() >= 2) {
+        return false;
+      }
+    }
+  }
+
+  // For each pad geometry that shares a layer with the current via, check if
+  // the center of the via is in the outline of the pad.
+  for (const Data::Device& device : data.devices) {
+    for (const Data::Pad& pad : device.pads) {
+      const Transform transform(pad.position, pad.rotation, pad.mirror);
+
+      for (auto it = pad.geometries.begin(); it != pad.geometries.end(); it++) {
+        const int copperNumber = it.key()->getCopperNumber();
+        if ((!it.key()->isCopper()) ||
+            ((via.startLayer->getCopperNumber() > copperNumber) ||
+             (via.endLayer->getCopperNumber() < copperNumber)) ||
+            connectedLayers.contains(it.key())) {
+          continue;
+        }
+
+        for (const PadGeometry& geom : it.value()) {
+          for (const Path& outline : geom.toOutlines()) {
+            const ClipperLib::Path clipperPadPath = ClipperHelpers::convert(
+                transform.map(outline), maxArcTolerance());
+            if (ClipperLib::PointInPolygon(viaPosition, clipperPadPath)) {
+              connectedLayers.insert(it.key());
+              if (connectedLayers.count() >= 2) {
+                return false;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // If we get here, connectedLayers must have a size of zero or one, so the via
+  // is probably useless.
+  return true;
 }
 
 QVector<Path> BoardDesignRuleCheck::getTraceLocation(
