@@ -41,7 +41,7 @@ class Workspace;
 namespace editor {
 namespace app {
 
-class ProjectEditor;
+class Notification;
 
 /*******************************************************************************
  *  Class NotificationsModel
@@ -63,9 +63,10 @@ public:
   virtual ~NotificationsModel() noexcept;
 
   // General Methods
-  void add(ui::NotificationType type, const QString& title,
-           const QString& description, const QString& buttonText,
-           bool supportsDontShowAgain) noexcept;
+  void add(std::shared_ptr<Notification> notification) noexcept;
+  int getUnreadNotificationsCount() const noexcept {
+    return mUnreadNotifications;
+  }
 
   // Implementations
   std::size_t row_count() const override;
@@ -76,9 +77,20 @@ public:
   // Operator Overloadings
   NotificationsModel& operator=(const NotificationsModel& rhs) = delete;
 
+signals:
+  void autoPopUpRequested();
+  void unreadNotificationsCountChanged(int count);
+
+private:
+  int mapIndex(int i) const noexcept;
+  void itemChanged(bool dismissed) noexcept;
+  void removeItem(std::size_t i, int itemIndex) noexcept;
+  void updateUnreadNotificationsCount() noexcept;
+
 private:
   Workspace& mWorkspace;
-  std::vector<ui::NotificationData> mItems;
+  std::vector<std::shared_ptr<Notification>> mItems;
+  int mUnreadNotifications;
 };
 
 /*******************************************************************************

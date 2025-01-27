@@ -24,6 +24,7 @@
 
 #include "apptoolbox.h"
 #include "guiapplication.h"
+#include "notificationsmodel.h"
 #include "project/projecteditor.h"
 #include "project/projectsmodel.h"
 #include "windowsectionsmodel.h"
@@ -79,8 +80,15 @@ MainWindow::MainWindow(GuiApplication& app,
   d.set_current_section_index(0);
   d.set_cursor_coordinates(slint::SharedString());
   d.set_ignore_placement_locks(false);
+  d.set_unread_notifications_count(
+      mApp.getNotifications().getUnreadNotificationsCount());
 
   // Bind global data to signals.
+  connect(&mApp.getNotifications(),
+          &NotificationsModel::unreadNotificationsCountChanged, this,
+          [this](int count) {
+            mWindow->global<ui::Data>().set_unread_notifications_count(count);
+          });
   connect(mSections.get(), &WindowSectionsModel::currentProjectChanged, this,
           &MainWindow::setCurrentProject);
   connect(
@@ -158,6 +166,22 @@ MainWindow::MainWindow(GuiApplication& app,
 }
 
 MainWindow::~MainWindow() noexcept {
+}
+
+/*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+bool MainWindow::isCurrentWindow() const noexcept {
+  return mWidget->isActiveWindow();
+}
+
+void MainWindow::setCurrentPage(ui::MainPage page) noexcept {
+  mWindow->global<ui::Data>().set_current_page(page);
+}
+
+void MainWindow::popUpNotifications() noexcept {
+  mWindow->fn_open_notifications_popup();
 }
 
 /*******************************************************************************

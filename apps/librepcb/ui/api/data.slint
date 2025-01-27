@@ -20,11 +20,13 @@ import {
 export global Data {
     in property <bool> preview-mode: true;
 
+    in property <string> hovered-status-tip;
+
     in property <string> window-title: "LibrePCB 1.2.0-unstable";
 
     in property <string> about-librepcb-details: "LibrePCB Version: 1.2.0\nGit Revision:     f079fa97b\nBuild Date:       2024-12-02T19:12:08\nQt Version:       6.2.4 (built against 6.2.4)\nCPU Architecture: x86_64\nOperating System: Ubuntu Core 22\nPlatform Plugin:  xcb\nTLS Library:      OpenSSL 3.0.2 15 Mar 2022\nOCC Library:      OCCT 7.7.2\nRuntime:          Snap";
 
-    in property <string> hovered-status-tip;
+    in property <string> order-info-url: "https://fab.librepcb.org/todo";
 
     in property <string> workspace-path: "/path/to/workspace";
 
@@ -34,7 +36,7 @@ export global Data {
 
     in-out property <bool> ignore-placement-locks: true;
 
-    in-out property <MainPage> current-page: MainPage.home;
+    in-out property <MainPage> current-page: MainPage.order;
 
     in-out property <[NotificationData]> notifications: [
         {
@@ -68,6 +70,8 @@ export global Data {
             progress: 50,
         },
     ];
+
+    in-out property <int> unread-notifications-count: 2;
 
     in property <[FolderTreeItemData]> workspace-folder: [
         {
@@ -269,7 +273,7 @@ export global Data {
 
     in property <int> current-section-index: 0;
 
-    // Constant
+    // Constant data
     out property <[LengthUnit]> all-length-units: [
         LengthUnit.millimeters,
         LengthUnit.micrometers,
@@ -278,7 +282,7 @@ export global Data {
         LengthUnit.mils,
     ];
 
-    // Auto-calculated
+    // Auto-calculated data
     in-out property <ProjectData> current-project: projects[current-project-index];
     in-out property <WindowSectionData> current-section: sections[current-section-index];
     in-out property <TabData> current-tab: current-section.tabs[current-section.current-tab-index];

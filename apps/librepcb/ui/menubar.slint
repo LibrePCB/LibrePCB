@@ -120,6 +120,15 @@ export component MenuBar inherits Rectangle {
                 MenuSeparator { }
 
                 MenuItem {
+                    text: @tr("Open Workspace Folder");
+                    status-tip: @tr("Open the workspace directory in the file manager");
+
+                    clicked => {
+                        Backend.action-triggered(ActionId.open-workspace-folder, -1);
+                    }
+                }
+
+                MenuItem {
                     text: @tr("Switch Workspace") + "...";
                     status-tip: @tr("Choose another workspace to open");
                 }

@@ -415,7 +415,7 @@ static int openWorkspace(FilePath& path) {
   win->show();*/
 
   // Run the application.
-  GuiApplication app(ws);
+  GuiApplication app(ws, wizard.getWorkspaceContainsNewerFileFormats());
   app.exec();
   return 0;
 }

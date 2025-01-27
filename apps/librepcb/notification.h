@@ -17,18 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_MAINWINDOW_H
-#define LIBREPCB_MAINWINDOW_H
+#ifndef LIBREPCB_NOTIFICATION_H
+#define LIBREPCB_NOTIFICATION_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include "appwindow.h"
 
-#include <librepcb/core/fileio/filepath.h>
-
 #include <QtCore>
 #include <QtGui>
+
+#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -37,56 +37,47 @@ namespace librepcb {
 namespace editor {
 namespace app {
 
-class CreateLibraryTabsModel;
-class GuiApplication;
-class LibraryCreator;
-class ProjectEditor;
-class WindowSectionsModel;
-
 /*******************************************************************************
- *  Class MainWindow
+ *  Class Notification
  ******************************************************************************/
 
 /**
- * @brief The MainWindow class
+ * @brief The Notification class
  */
-class MainWindow : public QObject {
+class Notification : public QObject {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  MainWindow() = delete;
-  MainWindow(const MainWindow& other) = delete;
-  explicit MainWindow(GuiApplication& app,
-                      slint::ComponentHandle<ui::AppWindow> win, int index,
-                      QObject* parent = nullptr) noexcept;
-  virtual ~MainWindow() noexcept;
+  Notification() = delete;
+  Notification(const Notification& other) = delete;
+  explicit Notification(ui::NotificationType type, const QString& title,
+                        const QString& description, const QString& buttonText,
+                        const QString& dismissKey, bool autoPopUp,
+                        QObject* parent = nullptr) noexcept;
+  virtual ~Notification() noexcept;
 
   // General Methods
-  bool isCurrentWindow() const noexcept;
-  void setCurrentPage(ui::MainPage page) noexcept;
-  void popUpNotifications() noexcept;
+  const QString& getDismissKey() const noexcept { return mDismissKey; }
+  bool getAutoPopUp() const noexcept { return mAutoPopUp; }
+  const ui::NotificationData& getUiData() const noexcept { return mUiData; }
+  void setUiData(const ui::NotificationData& data) noexcept;
+  void resetState() noexcept;
+  void setDescription(const QString& description) noexcept;
+  void setProgress(int progress) noexcept;
+  void dismiss() noexcept;
 
   // Operator Overloadings
-  MainWindow& operator=(const MainWindow& rhs) = delete;
+  Notification& operator=(const Notification& rhs) = delete;
+
+signals:
+  void changed(bool dismissed);
+  void buttonClicked();
 
 private:
-  slint::CloseRequestResponse closeRequested() noexcept;
-  bool actionTriggered(ui::ActionId id, int sectionIndex) noexcept;
-  slint::private_api::EventResult keyPressed(
-      const slint::private_api::KeyEvent& e) noexcept;
-  void projectItemDoubleClicked(const slint::SharedString& path) noexcept;
-  void setCurrentProject(std::shared_ptr<ProjectEditor> prj) noexcept;
-  std::shared_ptr<ProjectEditor> getCurrentProject() noexcept;
-  void newProject(bool eagleImport = false,
-                  const FilePath& parentDir = FilePath()) noexcept;
-
-  const int mIndex;
-  const QString mSettingsPrefix;
-  GuiApplication& mApp;
-  std::shared_ptr<WindowSectionsModel> mSections;
-  slint::ComponentHandle<ui::AppWindow> mWindow;
-  QWidget* mWidget;
+  const QString mDismissKey;
+  const bool mAutoPopUp;
+  ui::NotificationData mUiData;
 };
 
 /*******************************************************************************

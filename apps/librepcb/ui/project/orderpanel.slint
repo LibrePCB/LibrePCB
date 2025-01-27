@@ -100,22 +100,26 @@ export component OrderPanel inherits Rectangle {
             spacing: 10px;
 
             Text {
+                font-size: 11.5px;
+                font-italic: true;
                 wrap: word-wrap;
                 text: @tr("This tool helps you to quickly and easily get your designed PCB manufactured. The project directory will be exported to a *.lppz archive and uploaded it to the API server configured in your workspace settings. Afterwards you can continue the order process in the web browser, e.g. to choose the preferred manufacturing partner. Just try it!");
             }
         }
 
-        PanelHeader {
+        if Data.order-info-url != "": PanelHeader {
             title: @tr("Privacy Policy");
         }
 
-        VerticalLayout {
+        if Data.order-info-url != "": VerticalLayout {
             padding: 10px;
             spacing: 10px;
 
             Text {
+                font-size: 11.5px;
+                font-italic: true;
                 wrap: word-wrap;
-                text: @tr("For more information about how the uploaded project gets processed, see %1.");
+                text: @tr("For more information about how the uploaded project gets processed, see {}.", Data.order-info-url);
             }
         }
     }
