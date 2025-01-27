@@ -71,6 +71,7 @@ SchematicTab::SchematicTab(GuiApplication& app,
         q2s(mBackgroundColor),  // Background color
         q2s(Qt::black),  // Overlay color
         ui::GridStyle::None,  // Grid style
+      slint::SharedString(), // Grid interval
         ui::LengthUnit::Millimeters,  // Length unit
         true,  // Show pin numbers
         ui::SchematicTool::Select,  // Active tool
@@ -87,6 +88,9 @@ SchematicTab::SchematicTab(GuiApplication& app,
   if (auto sch = mProject->getProject().getSchematicByIndex(mObjIndex)) {
     mGridInterval = sch->getGridInterval();
   }
+
+  // Update UI data.
+  mUiData.grid_interval = q2s(mGridInterval->toMmString());
 
   // Build the whole schematic editor finite state machine.
   auto editor = new editor::ProjectEditor(mApp.getWorkspace(),
@@ -142,6 +146,24 @@ void SchematicTab::activate() noexcept {
 
 void SchematicTab::deactivate() noexcept {
   mScene.reset();
+}
+
+bool SchematicTab::actionTriggered(ui::ActionId id) noexcept {
+  if (id == ui::ActionId::SectionGridIntervalIncrease) {
+    mGridInterval = PositiveLength(mGridInterval * 2);
+    mUiData.grid_interval = q2s(mGridInterval->toMmString());
+    invalidateBackground();
+    emit uiDataChanged();
+    return true;
+  } else   if ((id == ui::ActionId::SectionGridIntervalDecrease) && ((*mGridInterval % 2) == 0)) {
+    mGridInterval = PositiveLength(mGridInterval / 2);
+    mUiData.grid_interval = q2s(mGridInterval->toMmString());
+    invalidateBackground();
+    emit uiDataChanged();
+    return true;
+  }
+
+  return GraphicsSceneTab::actionTriggered(id);
 }
 
 bool SchematicTab::processScenePointerEvent(

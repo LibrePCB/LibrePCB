@@ -42,6 +42,8 @@ export enum ActionId {
     section-close,
     section-ok,
     section-cancel,
+    section-grid-interval-increase,
+    section-grid-interval-decrease,
 
     // Create library tab
     create-library-tab-open,
@@ -200,6 +202,7 @@ export struct SchematicTabData {
     background-color: brush,
     overlay-color: brush,
     grid-style: GridStyle,
+    grid-interval: string,
     unit: LengthUnit,
     show-pin-numbers: bool,
     active-tool: SchematicTool,
@@ -209,6 +212,7 @@ export struct Board2dTabData {
     background-color: brush,
     overlay-color: brush,
     grid-style: GridStyle,
+    grid-interval: string,
     unit: LengthUnit,
 }
 
