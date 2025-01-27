@@ -66,6 +66,7 @@ public:
   void setUiData(const ui::SchematicTabData& data) noexcept;
   void activate() noexcept override;
   void deactivate() noexcept override;
+  bool actionTriggered(ui::ActionId id) noexcept override;
   bool processScenePointerEvent(
       const QPointF& pos, const QPointF& globalPos,
       slint::private_api::PointerEvent e) noexcept override;

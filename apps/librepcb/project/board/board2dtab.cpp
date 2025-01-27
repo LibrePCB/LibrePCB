@@ -64,6 +64,7 @@ Board2dTab::Board2dTab(GuiApplication& app, std::shared_ptr<ProjectEditor> prj,
         q2s(mBackgroundColor),  // Background color
         q2s(Qt::white),  // Overlay color
         ui::GridStyle::None,  // Grid style
+      slint::SharedString(), // Grid interval
         ui::LengthUnit::Millimeters,  // Length unit
     } {
   // Apply theme.
@@ -77,6 +78,9 @@ Board2dTab::Board2dTab(GuiApplication& app, std::shared_ptr<ProjectEditor> prj,
   if (auto brd = mProject->getProject().getBoardByIndex(mObjIndex)) {
     mGridInterval = brd->getGridInterval();
   }
+
+  // Update UI data.
+  mUiData.grid_interval = q2s(mGridInterval->toMmString());
 }
 
 Board2dTab::~Board2dTab() noexcept {
@@ -115,6 +119,24 @@ void Board2dTab::activate() noexcept {
 void Board2dTab::deactivate() noexcept {
   mPlaneBuilder.reset();
   mScene.reset();
+}
+
+bool Board2dTab::actionTriggered(ui::ActionId id) noexcept {
+  if (id == ui::ActionId::SectionGridIntervalIncrease) {
+    mGridInterval = PositiveLength(mGridInterval * 2);
+    mUiData.grid_interval = q2s(mGridInterval->toMmString());
+    invalidateBackground();
+    emit uiDataChanged();
+    return true;
+  } else   if ((id == ui::ActionId::SectionGridIntervalDecrease) && ((*mGridInterval % 2) == 0)) {
+    mGridInterval = PositiveLength(mGridInterval / 2);
+    mUiData.grid_interval = q2s(mGridInterval->toMmString());
+    invalidateBackground();
+    emit uiDataChanged();
+    return true;
+  }
+
+  return GraphicsSceneTab::actionTriggered(id);
 }
 
 /*******************************************************************************

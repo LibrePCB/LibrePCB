@@ -68,6 +68,7 @@ public:
   void setUiData(const ui::Board2dTabData& data) noexcept;
   void activate() noexcept override;
   void deactivate() noexcept override;
+  bool actionTriggered(ui::ActionId id) noexcept override;
 
   // Operator Overloadings
   Board2dTab& operator=(const Board2dTab& rhs) = delete;
