@@ -35,6 +35,9 @@ namespace librepcb {
 class Project;
 
 namespace editor {
+
+class UndoStack;
+
 namespace app {
 
 /*******************************************************************************
@@ -57,12 +60,14 @@ public:
 
   // Getters
   Project& getProject() noexcept { return *mProject; }
+  UndoStack& getUndoStack() noexcept { return *mUndoStack; }
 
   // Operator Overloadings
   ProjectEditor& operator=(const ProjectEditor& rhs) = delete;
 
 private:
   std::unique_ptr<Project> mProject;
+  std::unique_ptr<UndoStack> mUndoStack;
 };
 
 /*******************************************************************************

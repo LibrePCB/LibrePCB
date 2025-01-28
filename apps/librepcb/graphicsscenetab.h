@@ -34,14 +34,7 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class BoardPlaneFragmentsBuilder;
-
 namespace editor {
-
-class OpenGlSceneBuilder;
-class OpenGlView;
-
 namespace app {
 
 class GuiApplication;

@@ -64,7 +64,7 @@ Board2dTab::Board2dTab(GuiApplication& app, std::shared_ptr<ProjectEditor> prj,
         q2s(mBackgroundColor),  // Background color
         q2s(Qt::white),  // Overlay color
         ui::GridStyle::None,  // Grid style
-      slint::SharedString(), // Grid interval
+        slint::SharedString(),  // Grid interval
         ui::LengthUnit::Millimeters,  // Length unit
     } {
   // Apply theme.
@@ -77,10 +77,10 @@ Board2dTab::Board2dTab(GuiApplication& app, std::shared_ptr<ProjectEditor> prj,
   mUiData.grid_style = l2s(mGridStyle);
   if (auto brd = mProject->getProject().getBoardByIndex(mObjIndex)) {
     mGridInterval = brd->getGridInterval();
+    mUiData.unit = l2s(brd->getGridUnit());
   }
 
-  // Update UI data.
-  mUiData.grid_interval = q2s(mGridInterval->toMmString());
+  updateGridIntervalUiStr();
 }
 
 Board2dTab::~Board2dTab() noexcept {
@@ -94,8 +94,12 @@ void Board2dTab::setUiData(const ui::Board2dTabData& data) noexcept {
   mUiData = data;
 
   mGridStyle = s2l(mUiData.grid_style);
+  if (auto brd = mProject->getProject().getBoardByIndex(mObjIndex)) {
+    brd->setGridUnit(s2l(mUiData.unit));
+  }
 
   invalidateBackground();
+  updateGridIntervalUiStr();
 }
 
 void Board2dTab::activate() noexcept {
@@ -124,19 +128,30 @@ void Board2dTab::deactivate() noexcept {
 bool Board2dTab::actionTriggered(ui::ActionId id) noexcept {
   if (id == ui::ActionId::SectionGridIntervalIncrease) {
     mGridInterval = PositiveLength(mGridInterval * 2);
-    mUiData.grid_interval = q2s(mGridInterval->toMmString());
     invalidateBackground();
-    emit uiDataChanged();
+    updateGridIntervalUiStr();
     return true;
-  } else   if ((id == ui::ActionId::SectionGridIntervalDecrease) && ((*mGridInterval % 2) == 0)) {
+  } else if ((id == ui::ActionId::SectionGridIntervalDecrease) &&
+             ((*mGridInterval % 2) == 0)) {
     mGridInterval = PositiveLength(mGridInterval / 2);
-    mUiData.grid_interval = q2s(mGridInterval->toMmString());
     invalidateBackground();
-    emit uiDataChanged();
+    updateGridIntervalUiStr();
     return true;
   }
 
   return GraphicsSceneTab::actionTriggered(id);
+}
+
+void Board2dTab::updateGridIntervalUiStr() noexcept {
+  if (auto brd = mProject->getProject().getBoardByIndex(mObjIndex)) {
+    const LengthUnit& unit = brd->getGridUnit();
+    const slint::SharedString str = q2s(Toolbox::floatToString(
+        unit.convertToUnit(*mGridInterval), 10, QLocale()));
+    if (mUiData.grid_interval != str) {
+      mUiData.grid_interval = str;
+      emit uiDataChanged();
+    }
+  }
 }
 
 /*******************************************************************************

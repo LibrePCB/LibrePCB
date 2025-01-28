@@ -39,6 +39,7 @@
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 #include <librepcb/editor/project/newprojectwizard/newprojectwizard.h>
+#include <librepcb/editor/project/outputjobsdialog/outputjobsdialog.h>
 #include <librepcb/editor/workspace/desktopservices.h>
 #include <librepcb/editor/workspace/initializeworkspacewizard/initializeworkspacewizard.h>
 
@@ -233,6 +234,15 @@ bool MainWindow::actionTriggered(ui::ActionId id, int sectionIndex) noexcept {
   } else if (id == ui::ActionId::ProjectImportEagle) {
     newProject(true);
     return true;
+  } else if (id == ui::ActionId::ProjectOpenOutputJobs) {
+    if (std::shared_ptr<ProjectEditor> editor =
+            mApp.getProjects().getProject(sectionIndex)) {
+      OutputJobsDialog dlg(mApp.getWorkspace().getSettings(),
+                           editor->getProject(), editor->getUndoStack(),
+                           mSettingsPrefix % "/output_jobs_dialog", mWidget);
+      dlg.exec();
+      return true;
+    }
   } else if (id == ui::ActionId::WindowNew) {
     mApp.createNewWindow(
         mWindow->global<ui::Data>().get_current_project_index());

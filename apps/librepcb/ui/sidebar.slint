@@ -14,8 +14,9 @@ export component SideBar inherits Rectangle {
 
         SideBarButton {
             icon: @image-url("img/home.svg");
-            tooltip: "Home";
+            tooltip: @tr("Home");
             checked: Data.current-page == MainPage.home;
+
             clicked => {
                 Data.current-page = MainPage.home;
             }
@@ -23,11 +24,12 @@ export component SideBar inherits Rectangle {
 
         SideBarButton {
             icon: @image-url("img/libraries.png");
-            tooltip: "Libraries";
+            tooltip: @tr("Libraries");
             status-background: #d4d400;
             status-color: black;
             status-text: (Data.outdated-libraries > 0) ? Data.outdated-libraries : "";
             checked: Data.current-page == MainPage.libraries;
+
             clicked => {
                 Data.current-page = MainPage.libraries;
             }
@@ -35,9 +37,10 @@ export component SideBar inherits Rectangle {
 
         SideBarButton {
             icon: @image-url("img/projects.png");
-            tooltip: "Project";
+            tooltip: @tr("Project");
             enabled: project.valid;
             checked: Data.current-page == MainPage.project;
+
             clicked => {
                 Data.current-page = MainPage.project;
             }
@@ -45,9 +48,10 @@ export component SideBar inherits Rectangle {
 
         SideBarButton {
             icon: @image-url("img/drc.svg");
-            tooltip: "Design Rule Check";
+            tooltip: @tr("Design Rule Check");
             enabled: project.valid;
             checked: Data.current-page == MainPage.drc;
+
             clicked => {
                 Data.current-page = MainPage.drc;
             }
@@ -55,19 +59,20 @@ export component SideBar inherits Rectangle {
 
         SideBarButton {
             icon: @image-url("img/output-jobs.svg");
-            tooltip: "Output Jobs";
+            tooltip: @tr("Output Jobs");
             enabled: project.valid;
-            checked: Data.current-page == MainPage.output-jobs;
+
             clicked => {
-                Data.current-page = MainPage.output-jobs;
+                Backend.action-triggered(ActionId.project-open-output-jobs, Data.current-project-index);
             }
         }
 
         SideBarButton {
             icon: @image-url("img/shopping-cart.svg");
-            tooltip: "Order PCB";
+            tooltip: @tr("Order PCB");
             enabled: project.valid;
             checked: Data.current-page == MainPage.order;
+
             clicked => {
                 Data.current-page = MainPage.order;
             }
@@ -75,8 +80,9 @@ export component SideBar inherits Rectangle {
 
         SideBarButton {
             icon: @image-url("img/search.svg");
-            tooltip: "Search";
+            tooltip: @tr("Search");
             checked: Data.current-page == MainPage.search;
+
             clicked => {
                 Data.current-page = MainPage.search;
             }
@@ -88,8 +94,9 @@ export component SideBar inherits Rectangle {
 
         SideBarButton {
             icon: @image-url("img/settings.svg");
-            tooltip: "Preferences";
+            tooltip: @tr("Preferences");
             checked: false;
+
             clicked => {
                 Backend.action-triggered(ActionId.open-workspace-settings, -1);
             }
@@ -97,8 +104,9 @@ export component SideBar inherits Rectangle {
 
         SideBarButton {
             icon: @image-url("img/help.svg");
-            tooltip: "Help";
+            tooltip: @tr("Help / About");
             checked: Data.current-page == MainPage.help;
+
             clicked => {
                 Data.current-page = MainPage.help;
             }
