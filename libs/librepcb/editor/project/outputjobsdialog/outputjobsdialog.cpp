@@ -489,7 +489,16 @@ void OutputJobsDialog::runJob(std::shared_ptr<OutputJob> job,
 
 void OutputJobsDialog::currentItemChanged(QListWidgetItem* current,
                                           QListWidgetItem* previous) noexcept {
-  Q_UNUSED(previous);
+  // Update item selection state to ensure proper theme-aware text color.
+  if (OutputJobListWidgetItem* w = qobject_cast<OutputJobListWidgetItem*>(
+          mUi->lstJobs->itemWidget(previous))) {
+    w->setSelected(false);
+  }
+  if (OutputJobListWidgetItem* w = qobject_cast<OutputJobListWidgetItem*>(
+          mUi->lstJobs->itemWidget(current))) {
+    w->setSelected(true);
+  }
+
   if (!current) {
     return;
   }

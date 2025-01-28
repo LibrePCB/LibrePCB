@@ -148,7 +148,16 @@ void RuleCheckListWidget::updateList() noexcept {
 
 void RuleCheckListWidget::currentItemChanged(
     QListWidgetItem* current, QListWidgetItem* previous) noexcept {
-  Q_UNUSED(previous);
+  // Update item selection state to ensure proper theme-aware text color.
+  if (RuleCheckListItemWidget* w = qobject_cast<RuleCheckListItemWidget*>(
+          mListWidget->itemWidget(previous))) {
+    w->setSelected(false);
+  }
+  if (RuleCheckListItemWidget* w = qobject_cast<RuleCheckListItemWidget*>(
+          mListWidget->itemWidget(current))) {
+    w->setSelected(true);
+  }
+
   std::shared_ptr<const RuleCheckMessage> msg =
       mDisplayedMessages.value(mListWidget->row(current));
   if (msg && mHandler) {

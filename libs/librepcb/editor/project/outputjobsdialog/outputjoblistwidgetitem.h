@@ -65,6 +65,7 @@ public:
   std::shared_ptr<OutputJob> getJob() noexcept { return mJob; }
 
   // General Methods
+  void setSelected(bool selected) noexcept;
   void updateJobInfo() noexcept;
   void setStatusColor(const QColor& color) noexcept;
 
