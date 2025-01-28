@@ -49,8 +49,7 @@ namespace app {
 
 CreateLibraryTab::CreateLibraryTab(GuiApplication& app,
                                    QObject* parent) noexcept
-  : WindowTab(app, ui::TabType::CreateLibrary, QPixmap(":/plus.svg"), nullptr,
-              -1, tr("New Library"), parent),
+  : WindowTab(app, nullptr, -1, parent),
     mUiData{
         q2s(tr("My Library")),  // Name
         slint::SharedString(),  // Name error
@@ -78,6 +77,24 @@ CreateLibraryTab::~CreateLibraryTab() noexcept {
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
+
+ui::TabData CreateLibraryTab::getBaseUiData() const noexcept {
+  return ui::TabData{
+      ui::TabType::CreateLibrary,  // Type
+      q2s(tr("New Library")),  // Title
+      q2s(QPixmap(":/plus.svg")),  // Icon
+      -1,  // Project index
+      false,  // Can save
+      false,  // Can export graphics
+      false,  // Can undo
+      false,  // Can redo
+      false,  // Can cut/copy
+      false,  // Can paste
+      false,  // Can remove
+      false,  // Can rotate
+      false,  // Can mirror
+  };
+}
 
 void CreateLibraryTab::setUiData(
     const ui::CreateLibraryTabData& data) noexcept {

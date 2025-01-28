@@ -65,6 +65,7 @@ public:
   virtual ~DownloadLibraryTab() noexcept;
 
   // General Methods
+  ui::TabData getBaseUiData() const noexcept override;
   const ui::DownloadLibraryTabData& getUiData() const noexcept {
     return mUiData;
   }

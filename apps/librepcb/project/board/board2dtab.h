@@ -64,6 +64,7 @@ public:
   virtual ~Board2dTab() noexcept;
 
   // General Methods
+  ui::TabData getBaseUiData() const noexcept override;
   const ui::Board2dTabData& getUiData() const noexcept { return mUiData; }
   void setUiData(const ui::Board2dTabData& data) noexcept;
   void activate() noexcept override;
@@ -77,6 +78,7 @@ private:
   void updateGridIntervalUiStr() noexcept;
 
 private:
+  std::shared_ptr<ProjectEditor> mEditor;
   ui::Board2dTabData mUiData;
   std::unique_ptr<BoardPlaneFragmentsBuilder> mPlaneBuilder;
 };

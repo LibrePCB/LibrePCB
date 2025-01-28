@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "board3dtab.h"
 
+#include "../projectsmodel.h"
 #include "apptoolbox.h"
 #include "guiapplication.h"
 #include "project/projecteditor.h"
@@ -31,6 +32,7 @@
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/editor/3d/openglscenebuilder.h>
+#include <librepcb/editor/undostack.h>
 #include <librepcb/editor/widgets/openglview.h>
 
 #include <QtCore>
@@ -47,17 +49,10 @@ namespace app {
  *  Constructors / Destructor
  ******************************************************************************/
 
-static QString getTitle(std::shared_ptr<ProjectEditor> prj, int boardIndex) {
-  if (auto b = prj->getProject().getBoardByIndex(boardIndex)) {
-    return *b->getName();
-  }
-  return QString();
-}
-
 Board3dTab::Board3dTab(GuiApplication& app, std::shared_ptr<ProjectEditor> prj,
                        int boardIndex, QObject* parent) noexcept
-  : WindowTab(app, ui::TabType::Board3d, QPixmap(":/3d.svg"), prj, boardIndex,
-              getTitle(prj, boardIndex), parent),
+  : WindowTab(app, prj, boardIndex, parent),
+    mEditor(prj),
     mUiData{q2s(Qt::white), q2s(Qt::black)},
     mAnimation(new QVariantAnimation(this)) {
   mAnimation->setDuration(500);
@@ -67,6 +62,10 @@ Board3dTab::Board3dTab(GuiApplication& app, std::shared_ptr<ProjectEditor> prj,
             applyProjection(mAnimationDataStart.interpolated(
                 mAnimationDataDelta, value.toReal()));
           });
+
+  // Connect undo stack.
+  connect(&prj->getUndoStack(), &UndoStack::stateModified, this,
+          &Board3dTab::uiDataChanged);
 }
 
 Board3dTab::~Board3dTab() noexcept {
@@ -75,6 +74,26 @@ Board3dTab::~Board3dTab() noexcept {
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
+
+ui::TabData Board3dTab::getBaseUiData() const noexcept {
+  auto brd = mProject->getProject().getBoardByIndex(mObjIndex);
+
+  return ui::TabData{
+      ui::TabType::Board3d,  // Type
+      q2s(brd ? *brd->getName() : QString()),  // Title
+      q2s(QPixmap(":/3d.svg")),  // Icon
+      mApp.getProjects().getIndexOf(mEditor),  // Project index
+      true,  // Can save
+      false,  // Can export graphics
+      mProject->getUndoStack().canUndo(),  // Can undo
+      mProject->getUndoStack().canRedo(),  // Can redo
+      false,  // Can cut/copy
+      false,  // Can paste
+      false,  // Can remove
+      false,  // Can rotate
+      false,  // Can mirror
+  };
+}
 
 void Board3dTab::setUiData(const ui::Board3dTabData& data) noexcept {
   mUiData = data;

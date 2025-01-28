@@ -76,10 +76,8 @@ public:
   // Constructors / Destructor
   GraphicsSceneTab() = delete;
   GraphicsSceneTab(const GraphicsSceneTab& other) = delete;
-  explicit GraphicsSceneTab(GuiApplication& app, ui::TabType type,
-                            const QPixmap& icon,
+  explicit GraphicsSceneTab(GuiApplication& app,
                             std::shared_ptr<ProjectEditor> prj, int objIndex,
-                            const QString& title,
                             QObject* parent = nullptr) noexcept;
   virtual ~GraphicsSceneTab() noexcept;
 

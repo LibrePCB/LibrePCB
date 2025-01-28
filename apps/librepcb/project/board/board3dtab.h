@@ -91,6 +91,7 @@ public:
   virtual ~Board3dTab() noexcept;
 
   // General Methods
+  ui::TabData getBaseUiData() const noexcept override;
   const ui::Board3dTabData& getUiData() const noexcept { return mUiData; }
   void setUiData(const ui::Board3dTabData& data) noexcept;
   void activate() noexcept override;
@@ -114,6 +115,7 @@ private:
   void smoothTo(const Projection& projection) noexcept;
   bool applyProjection(const Projection& projection) noexcept;
 
+  std::shared_ptr<ProjectEditor> mEditor;
   ui::Board3dTabData mUiData;
 
   std::unique_ptr<BoardPlaneFragmentsBuilder> mPlaneBuilder;

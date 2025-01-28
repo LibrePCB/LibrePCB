@@ -60,13 +60,12 @@ public:
   // Constructors / Destructor
   WindowTab() = delete;
   WindowTab(const WindowTab& other) = delete;
-  explicit WindowTab(GuiApplication& app, ui::TabType type, const QPixmap& icon,
-                     std::shared_ptr<ProjectEditor> prj, int objIndex,
-                     const QString& title, QObject* parent = nullptr) noexcept;
+  explicit WindowTab(GuiApplication& app, std::shared_ptr<ProjectEditor> prj,
+                     int objIndex, QObject* parent = nullptr) noexcept;
   virtual ~WindowTab() noexcept;
 
   // General Methods
-  const ui::TabData& getBaseUiData() const noexcept { return mBaseUiData; }
+  virtual ui::TabData getBaseUiData() const noexcept = 0;
   std::shared_ptr<ProjectEditor> getProject() noexcept { return mProject; }
   int getObjIndex() const noexcept { return mObjIndex; }
   virtual void activate() noexcept {}
@@ -119,7 +118,6 @@ signals:
 
 protected:
   GuiApplication& mApp;
-  ui::TabData mBaseUiData;
   std::shared_ptr<ProjectEditor> mProject;
   int mObjIndex = -1;
 };
