@@ -62,7 +62,7 @@ public:
   virtual ~SchematicTab() noexcept;
 
   // General Methods
-  const ui::SchematicTabData& getUiData() const noexcept { return mUiData; }
+  ui::SchematicTabData getUiData() const noexcept;
   void setUiData(const ui::SchematicTabData& data) noexcept;
   void activate() noexcept override;
   void deactivate() noexcept override;
@@ -75,10 +75,6 @@ public:
   SchematicTab& operator=(const SchematicTab& rhs) = delete;
 
 private:
-  void updateGridIntervalUiStr() noexcept;
-
-private:
-  ui::SchematicTabData mUiData;
   QScopedPointer<SchematicEditorFsm> mFsm;
 };
 

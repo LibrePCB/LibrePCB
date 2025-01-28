@@ -69,15 +69,6 @@ SchematicTab::SchematicTab(GuiApplication& app,
                            int schematicIndex, QObject* parent) noexcept
   : GraphicsSceneTab(app, ui::TabType::Schematic, QPixmap(":/image.svg"), prj,
                      schematicIndex, getTitle(prj, schematicIndex), parent),
-    mUiData{
-        q2s(mBackgroundColor),  // Background color
-        q2s(Qt::black),  // Overlay color
-        ui::GridStyle::None,  // Grid style
-        slint::SharedString(),  // Grid interval
-        ui::LengthUnit::Millimeters,  // Length unit
-        true,  // Show pin numbers
-        ui::SchematicTool::Select,  // Active tool
-    },
     mFsm() {
   // Apply theme.
   const Theme& theme = mApp.getWorkspace().getSettings().themes.getActive();
@@ -86,10 +77,8 @@ SchematicTab::SchematicTab(GuiApplication& app,
   mGridColor =
       theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor();
   mGridStyle = theme.getSchematicGridStyle();
-  mUiData.grid_style = l2s(mGridStyle);
   if (auto sch = mProject->getProject().getSchematicByIndex(mObjIndex)) {
     mGridInterval = sch->getGridInterval();
-    mUiData.unit = l2s(sch->getGridUnit());
   }
 
   // Build the whole schematic editor finite state machine.
@@ -103,7 +92,7 @@ SchematicTab::SchematicTab(GuiApplication& app,
       mScene,
       *new GraphicsView(),
       *new ToolBarProxy(),
-      editor->getUndoStack()};
+      prj->getUndoStack()};
   mFsm.reset(new SchematicEditorFsm(fsmContext));
   // connect(mFsm.data(), &SchematicEditorFsm::statusBarMessageChanged, this,
   //         [this](const QString& message, int timeoutMs) {
@@ -113,8 +102,6 @@ SchematicTab::SchematicTab(GuiApplication& app,
   //             mUi->statusbar->showMessage(message, timeoutMs);
   //           }
   //         });
-
-  updateGridIntervalUiStr();
 }
 
 SchematicTab::~SchematicTab() noexcept {
@@ -124,19 +111,42 @@ SchematicTab::~SchematicTab() noexcept {
  *  General Methods
  ******************************************************************************/
 
-void SchematicTab::setUiData(const ui::SchematicTabData& data) noexcept {
-  mUiData = data;
+ui::SchematicTabData SchematicTab::getUiData() const noexcept {
+  const Theme& theme = mApp.getWorkspace().getSettings().themes.getActive();
+  auto sch = mProject->getProject().getSchematicByIndex(mObjIndex);
+  auto pinNumbersLayer =
+      mLayerProvider->getLayer(Theme::Color::sSchematicPinNumbers);
 
-  mGridStyle = s2l(mUiData.grid_style);
+  QString gridIntervalStr;
+  if (sch) {
+    const LengthUnit& unit = sch->getGridUnit();
+    gridIntervalStr = Toolbox::floatToString(unit.convertToUnit(*mGridInterval),
+                                             10, QLocale());
+  }
+
+  return ui::SchematicTabData{
+      q2s(mBackgroundColor),  // Background color
+      q2s(theme.getColor(Theme::Color::sSchematicBackground)
+              .getSecondaryColor()),  // Overlay color
+      l2s(mGridStyle),  // Grid style
+      q2s(gridIntervalStr),  // Grid interval
+      sch ? l2s(sch->getGridUnit())
+          : ui::LengthUnit::Millimeters,  // Length unit
+      pinNumbersLayer && pinNumbersLayer->isVisible(),  // Show pin numbers
+      ui::SchematicTool::Select,  // Active tool
+  };
+}
+
+void SchematicTab::setUiData(const ui::SchematicTabData& data) noexcept {
+  mGridStyle = s2l(data.grid_style);
   if (auto sch = mProject->getProject().getSchematicByIndex(mObjIndex)) {
-    sch->setGridUnit(s2l(mUiData.unit));
+    sch->setGridUnit(s2l(data.unit));
   }
   if (auto l = mLayerProvider->getLayer(Theme::Color::sSchematicPinNumbers)) {
-    l->setVisible(mUiData.show_pin_numbers);
+    l->setVisible(data.show_pin_numbers);
   }
 
   invalidateBackground();
-  updateGridIntervalUiStr();
   emit requestRepaint();
 }
 
@@ -145,7 +155,6 @@ void SchematicTab::activate() noexcept {
     mScene.reset(new SchematicGraphicsScene(
         *sch, *mLayerProvider, std::make_shared<QSet<const NetSignal*>>(),
         this));
-    mUiData.overlay_color = q2s(Qt::black);
     emit requestRepaint();
   }
 }
@@ -158,13 +167,11 @@ bool SchematicTab::actionTriggered(ui::ActionId id) noexcept {
   if (id == ui::ActionId::SectionGridIntervalIncrease) {
     mGridInterval = PositiveLength(mGridInterval * 2);
     invalidateBackground();
-    updateGridIntervalUiStr();
     return true;
   } else if ((id == ui::ActionId::SectionGridIntervalDecrease) &&
              ((*mGridInterval % 2) == 0)) {
     mGridInterval = PositiveLength(mGridInterval / 2);
     invalidateBackground();
-    updateGridIntervalUiStr();
     return true;
   }
 
@@ -224,18 +231,6 @@ bool SchematicTab::processScenePointerEvent(
   }
 
   return handled;
-}
-
-void SchematicTab::updateGridIntervalUiStr() noexcept {
-  if (auto sch = mProject->getProject().getSchematicByIndex(mObjIndex)) {
-    const LengthUnit& unit = sch->getGridUnit();
-    const slint::SharedString str = q2s(Toolbox::floatToString(
-        unit.convertToUnit(*mGridInterval), 10, QLocale()));
-    if (mUiData.grid_interval != str) {
-      mUiData.grid_interval = str;
-      emit uiDataChanged();
-    }
-  }
 }
 
 /*******************************************************************************

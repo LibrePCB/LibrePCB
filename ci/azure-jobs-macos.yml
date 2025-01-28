@@ -10,7 +10,7 @@ jobs:
     HOMEBREW_NO_INSTALL_CLEANUP: 1 # Might speed up homebrew commands(?)
     CMAKE_CXX_COMPILER_LAUNCHER: ccache
     # TODO: This needs to be investigated.
-    CMAKE_OPTIONS: -DCMAKE_CXX_FLAGS="-Wno-nullability-completeness -Wno-nonnull"
+    CMAKE_OPTIONS: '-DCMAKE_CXX_FLAGS="-Wno-nullability-completeness -Wno-nonnull"'
   steps:
   - checkout: self
     clean: true

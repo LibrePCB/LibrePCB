@@ -160,7 +160,130 @@ export component MenuBar inherits Rectangle {
                 y: parent.height;
 
                 MenuItem {
-                    text: @tr("Save Project");
+                    text: @tr("Undo");
+                    icon: @image-url("img/undo.svg");
+                    status-tip: @tr("Revert the last modification");
+                    shortcuts: "Ctrl+Z";
+
+                    clicked => {
+                        Backend.action-triggered(ActionId.undo, Data.current-section-index);
+                    }
+                }
+
+                MenuItem {
+                    text: @tr("Redo");
+                    icon: @image-url("img/redo.svg");
+                    status-tip: @tr("Re-apply the last reverted modification");
+                    shortcuts: "Ctrl+Y";
+
+                    clicked => {
+                        Backend.action-triggered(ActionId.undo, Data.current-section-index);
+                    }
+                }
+
+                MenuSeparator { }
+
+                MenuItem {
+                    text: @tr("Select All");
+                    status-tip: @tr("Select all visible objects");
+                    shortcuts: "Ctrl+A";
+                }
+
+                MenuSeparator { }
+
+                MenuItem {
+                    text: @tr("Cut");
+                    icon: @image-url("img/cut.svg");
+                    status-tip: @tr("Cut the selected object(s) to clipboard");
+                    shortcuts: "Ctrl+X";
+                }
+
+                MenuItem {
+                    text: @tr("Copy");
+                    icon: @image-url("img/copy.svg");
+                    status-tip: @tr("Copy the selected object(s) to clipboard");
+                    shortcuts: "Ctrl+C";
+                }
+
+                MenuItem {
+                    text: @tr("Paste");
+                    icon: @image-url("img/paste.svg");
+                    status-tip: @tr("Paste object(s) from the clipboard");
+                    shortcuts: "Ctrl+V";
+                }
+
+                MenuItem {
+                    text: @tr("Remove");
+                    icon: @image-url("img/delete.svg");
+                    status-tip: @tr("Remove the selected object(s)");
+                    shortcuts: "Del";
+                }
+
+                MenuSeparator { }
+
+                MenuItem {
+                    text: @tr("Rotate Counterclockwise");
+                    icon: @image-url("img/rotate-ccw.svg");
+                    status-tip: @tr("Rotate the selected object(s) counterclockwise");
+                    shortcuts: "R";
+                }
+
+                MenuItem {
+                    text: @tr("Rotate Clockwise");
+                    icon: @image-url("img/rotate-cw.svg");
+                    status-tip: @tr("otate the selected object(s) clockwise");
+                    shortcuts: "Shift+R";
+                }
+
+                MenuItem {
+                    text: @tr("Mirror Horizontally");
+                    icon: @image-url("img/mirror-horizontal.svg");
+                    status-tip: @tr("Mirror the selected object(s) horizontally");
+                    shortcuts: "M";
+                }
+
+                MenuItem {
+                    text: @tr("Mirror Vertically");
+                    icon: @image-url("img/mirror-vertical.svg");
+                    status-tip: @tr("Mirror the selected object(s) vertically");
+                    shortcuts: "Shift+M";
+                }
+
+                MenuItem {
+                    text: @tr("Reset All Texts");
+                    icon: @image-url("img/reset.svg");
+                    status-tip: @tr("Reset all texts of the selected object(s) to their initial state");
+                    shortcuts: "";
+                }
+
+                MenuSeparator { }
+
+                MenuItem {
+                    text: @tr("Find");
+                    icon: @image-url("img/search.svg");
+                    status-tip: @tr("Find or filter objects");
+                    shortcuts: "Ctrl+F";
+                }
+
+                MenuItem {
+                    text: @tr("Find Next");
+                    status-tip: @tr("Go to the next found object");
+                    shortcuts: "F3";
+                }
+
+                MenuItem {
+                    text: @tr("Find Previous");
+                    status-tip: @tr("Go to the previous found object");
+                    shortcuts: "Shift+F3";
+                }
+
+                MenuSeparator { }
+
+                MenuItem {
+                    text: @tr("Properties");
+                    icon: @image-url("img/edit.svg");
+                    status-tip: @tr("View/modify the object properties");
+                    shortcuts: "E";
                 }
             }
         }
@@ -459,26 +582,46 @@ export component MenuBar inherits Rectangle {
             MenuBarButton {
                 enabled: Data.current-project.valid;
                 icon: @image-url("img/save.svg");
+
+                clicked => {
+                    Backend.action-triggered(ActionId.save, Data.current-section-index);
+                }
             }
 
             MenuBarButton {
                 enabled: Data.current-project.valid;
                 icon: @image-url("img/pdf.svg");
+
+                clicked => {
+                    Backend.action-triggered(ActionId.export-pdf, Data.current-section-index);
+                }
             }
 
             MenuBarButton {
                 enabled: Data.current-project.valid;
                 icon: @image-url("img/print.svg");
+
+                clicked => {
+                    Backend.action-triggered(ActionId.print, Data.current-section-index);
+                }
             }
 
             MenuBarButton {
                 enabled: Data.current-project.valid;
                 icon: @image-url("img/undo.svg");
+
+                clicked => {
+                    Backend.action-triggered(ActionId.undo, Data.current-section-index);
+                }
             }
 
             MenuBarButton {
                 enabled: Data.current-project.valid;
                 icon: @image-url("img/redo.svg");
+
+                clicked => {
+                    Backend.action-triggered(ActionId.redo, Data.current-section-index);
+                }
             }
         }
 
