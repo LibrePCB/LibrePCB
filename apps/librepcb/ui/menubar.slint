@@ -580,7 +580,7 @@ export component MenuBar inherits Rectangle {
             spacing: 5px;
 
             MenuBarButton {
-                enabled: Data.current-project.valid;
+                enabled: Data.current-tab.can-save;
                 icon: @image-url("img/save.svg");
 
                 clicked => {
@@ -589,7 +589,7 @@ export component MenuBar inherits Rectangle {
             }
 
             MenuBarButton {
-                enabled: Data.current-project.valid;
+                enabled: Data.current-tab.can-export-graphics;
                 icon: @image-url("img/pdf.svg");
 
                 clicked => {
@@ -598,7 +598,7 @@ export component MenuBar inherits Rectangle {
             }
 
             MenuBarButton {
-                enabled: Data.current-project.valid;
+                enabled: Data.current-tab.can-export-graphics;
                 icon: @image-url("img/print.svg");
 
                 clicked => {
@@ -607,7 +607,7 @@ export component MenuBar inherits Rectangle {
             }
 
             MenuBarButton {
-                enabled: Data.current-project.valid;
+                enabled: Data.current-tab.can-undo;
                 icon: @image-url("img/undo.svg");
 
                 clicked => {
@@ -616,7 +616,7 @@ export component MenuBar inherits Rectangle {
             }
 
             MenuBarButton {
-                enabled: Data.current-project.valid;
+                enabled: Data.current-tab.can-redo;
                 icon: @image-url("img/redo.svg");
 
                 clicked => {
@@ -639,68 +639,55 @@ export component MenuBar inherits Rectangle {
                 padding-bottom: 5px;
                 spacing: 5px;
 
-                MenuBarButton {
-                    enabled: Data.current-project.valid;
+                if Data.current-tab.can-cut-copy: MenuBarButton {
                     icon: @image-url("img/cut.svg");
                 }
 
-                MenuBarButton {
-                    enabled: Data.current-project.valid;
+                if Data.current-tab.can-cut-copy: MenuBarButton {
                     icon: @image-url("img/copy.svg");
                 }
 
-                MenuBarButton {
-                    enabled: Data.current-project.valid;
+                if Data.current-tab.can-paste: MenuBarButton {
                     icon: @image-url("img/paste.svg");
                 }
 
-                MenuBarButton {
-                    enabled: Data.current-project.valid;
+                if Data.current-tab.can-remove: MenuBarButton {
                     icon: @image-url("img/delete.svg");
                 }
 
-                MenuBarButton {
-                    enabled: Data.current-project.valid;
+                if Data.current-tab.can-rotate: MenuBarButton {
                     icon: @image-url("img/rotate-ccw.svg");
                 }
 
-                MenuBarButton {
-                    enabled: Data.current-project.valid;
+                if Data.current-tab.can-rotate: MenuBarButton {
                     icon: @image-url("img/rotate-cw.svg");
                 }
 
-                MenuBarButton {
-                    enabled: Data.current-project.valid;
+                if Data.current-tab.can-mirror: MenuBarButton {
                     icon: @image-url("img/mirror-horizontal.svg");
                 }
 
-                MenuBarButton {
-                    enabled: Data.current-project.valid;
+                if Data.current-tab.can-mirror: MenuBarButton {
                     icon: @image-url("img/mirror-vertical.svg");
                 }
 
-                MenuBarButton {
-                    enabled: Data.current-project.valid;
+                if Data.current-project.valid: MenuBarButton {
                     icon: @image-url("img/move.svg");
                 }
 
-                MenuBarButton {
-                    enabled: Data.current-project.valid;
+                if Data.current-project.valid: MenuBarButton {
                     icon: @image-url("img/grid-dots.svg");
                 }
 
-                MenuBarButton {
-                    enabled: Data.current-project.valid;
+                if Data.current-project.valid: MenuBarButton {
                     icon: @image-url("img/reset.svg");
                 }
 
-                MenuBarButton {
-                    enabled: Data.current-project.valid;
+                if Data.current-project.valid: MenuBarButton {
                     icon: @image-url("img/lock-open.svg");
                 }
 
-                MenuBarButton {
-                    enabled: Data.current-project.valid;
+                if Data.current-project.valid: MenuBarButton {
                     icon: @image-url("img/edit.svg");
                 }
             }

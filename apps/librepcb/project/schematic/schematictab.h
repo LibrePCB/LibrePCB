@@ -25,6 +25,8 @@
  ******************************************************************************/
 #include "graphicsscenetab.h"
 
+#include <librepcb/editor/dialogs/graphicsexportdialog.h>
+
 #include <QtCore>
 #include <QtGui>
 
@@ -62,6 +64,7 @@ public:
   virtual ~SchematicTab() noexcept;
 
   // General Methods
+  ui::TabData getBaseUiData() const noexcept override;
   ui::SchematicTabData getUiData() const noexcept;
   void setUiData(const ui::SchematicTabData& data) noexcept;
   void activate() noexcept override;
@@ -75,6 +78,11 @@ public:
   SchematicTab& operator=(const SchematicTab& rhs) = delete;
 
 private:
+  void execGraphicsExportDialog(GraphicsExportDialog::Output output,
+                                const QString& settingsKey) noexcept;
+
+private:
+  std::shared_ptr<ProjectEditor> mEditor;
   QScopedPointer<SchematicEditorFsm> mFsm;
 };
 

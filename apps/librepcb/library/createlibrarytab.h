@@ -62,6 +62,7 @@ public:
   virtual ~CreateLibraryTab() noexcept;
 
   // General Methods
+  ui::TabData getBaseUiData() const noexcept override;
   const ui::CreateLibraryTabData& getUiData() const noexcept { return mUiData; }
   void setUiData(const ui::CreateLibraryTabData& data) noexcept;
   void activate() noexcept override;

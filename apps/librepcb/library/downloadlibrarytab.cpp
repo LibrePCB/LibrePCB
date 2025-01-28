@@ -50,8 +50,7 @@ namespace app {
 
 DownloadLibraryTab::DownloadLibraryTab(GuiApplication& app,
                                        QObject* parent) noexcept
-  : WindowTab(app, ui::TabType::DownloadLibrary, QPixmap(":/download.svg"),
-              nullptr, -1, tr("Download Library"), parent),
+  : WindowTab(app, nullptr, -1, parent),
     mUiData{
         slint::SharedString(),  // URL
         slint::SharedString(),  // URL error
@@ -73,6 +72,24 @@ DownloadLibraryTab::~DownloadLibraryTab() noexcept {
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
+
+ui::TabData DownloadLibraryTab::getBaseUiData() const noexcept {
+  return ui::TabData{
+      ui::TabType::DownloadLibrary,  // Type
+      q2s(tr("Download Library")),  // Title
+      q2s(QPixmap(":/download.svg")),  // Icon
+      -1,  // Project index
+      false,  // Can save
+      false,  // Can export graphics
+      false,  // Can undo
+      false,  // Can redo
+      false,  // Can cut/copy
+      false,  // Can paste
+      false,  // Can remove
+      false,  // Can rotate
+      false,  // Can mirror
+  };
+}
 
 void DownloadLibraryTab::activate() noexcept {
 }

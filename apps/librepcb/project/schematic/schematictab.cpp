@@ -26,9 +26,11 @@
 #include "../../guiapplication.h"
 #include "../../uitypes.h"
 #include "../projecteditor.h"
+#include "../projectsmodel.h"
 
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/schematic/schematic.h>
+#include <librepcb/core/project/schematic/schematicpainter.h>
 #include <librepcb/core/types/lengthunit.h>
 #include <librepcb/core/utils/toolbox.h>
 #include <librepcb/core/workspace/theme.h>
@@ -39,8 +41,10 @@
 #include <librepcb/editor/project/schematiceditor/fsm/schematiceditorfsm.h>
 #include <librepcb/editor/project/schematiceditor/schematiceditor.h>
 #include <librepcb/editor/project/schematiceditor/schematicgraphicsscene.h>
+#include <librepcb/editor/undostack.h>
 #include <librepcb/editor/utils/toolbarproxy.h>
 #include <librepcb/editor/widgets/graphicsview.h>
+#include <librepcb/editor/workspace/desktopservices.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -56,20 +60,10 @@ namespace app {
  *  Constructors / Destructor
  ******************************************************************************/
 
-static QString getTitle(std::shared_ptr<ProjectEditor> prj,
-                        int schematicIndex) {
-  if (auto s = prj->getProject().getSchematicByIndex(schematicIndex)) {
-    return *s->getName();
-  }
-  return QString();
-}
-
 SchematicTab::SchematicTab(GuiApplication& app,
                            std::shared_ptr<ProjectEditor> prj,
                            int schematicIndex, QObject* parent) noexcept
-  : GraphicsSceneTab(app, ui::TabType::Schematic, QPixmap(":/image.svg"), prj,
-                     schematicIndex, getTitle(prj, schematicIndex), parent),
-    mFsm() {
+  : GraphicsSceneTab(app, prj, schematicIndex, parent), mEditor(prj), mFsm() {
   // Apply theme.
   const Theme& theme = mApp.getWorkspace().getSettings().themes.getActive();
   mBackgroundColor =
@@ -80,6 +74,10 @@ SchematicTab::SchematicTab(GuiApplication& app,
   if (auto sch = mProject->getProject().getSchematicByIndex(mObjIndex)) {
     mGridInterval = sch->getGridInterval();
   }
+
+  // Connect undo stack.
+  connect(&prj->getUndoStack(), &UndoStack::stateModified, this,
+          &SchematicTab::requestRepaint);
 
   // Build the whole schematic editor finite state machine.
   auto editor = new editor::ProjectEditor(mApp.getWorkspace(),
@@ -110,6 +108,26 @@ SchematicTab::~SchematicTab() noexcept {
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
+
+ui::TabData SchematicTab::getBaseUiData() const noexcept {
+  auto sch = mProject->getProject().getSchematicByIndex(mObjIndex);
+
+  return ui::TabData{
+      ui::TabType::Schematic,  // Type
+      q2s(sch ? *sch->getName() : QString()),  // Title
+      q2s(QPixmap(":/image.svg")),  // Icon
+      mApp.getProjects().getIndexOf(mEditor),  // Project index
+      true,  // Can save
+      true,  // Can export graphics
+      mProject->getUndoStack().canUndo(),  // Can undo
+      mProject->getUndoStack().canRedo(),  // Can redo
+      true,  // Can cut/copy
+      true,  // Can paste
+      true,  // Can remove
+      true,  // Can rotate
+      true,  // Can mirror
+  };
+}
 
 ui::SchematicTabData SchematicTab::getUiData() const noexcept {
   const Theme& theme = mApp.getWorkspace().getSettings().themes.getActive();
@@ -173,6 +191,10 @@ bool SchematicTab::actionTriggered(ui::ActionId id) noexcept {
     mGridInterval = PositiveLength(mGridInterval / 2);
     invalidateBackground();
     return true;
+  } else if (id == ui::ActionId::ExportPdf) {
+    execGraphicsExportDialog(GraphicsExportDialog::Output::Pdf, "pdf_export");
+  } else if (id == ui::ActionId::Print) {
+    execGraphicsExportDialog(GraphicsExportDialog::Output::Print, "print");
   }
 
   return GraphicsSceneTab::actionTriggered(id);
@@ -231,6 +253,55 @@ bool SchematicTab::processScenePointerEvent(
   }
 
   return handled;
+}
+
+void SchematicTab::execGraphicsExportDialog(
+    GraphicsExportDialog::Output output, const QString& settingsKey) noexcept {
+  try {
+    // Determine default file path.
+    const QString projectName =
+        FilePath::cleanFileName(*mEditor->getProject().getName(),
+                                FilePath::ReplaceSpaces | FilePath::KeepCase);
+    const QString projectVersion =
+        FilePath::cleanFileName(*mEditor->getProject().getVersion(),
+                                FilePath::ReplaceSpaces | FilePath::KeepCase);
+    const QString relativePath =
+        QString("output/%1/%2_Schematics").arg(projectVersion, projectName);
+    const FilePath defaultFilePath =
+        mEditor->getProject().getPath().getPathTo(relativePath);
+
+    // Copy all schematic pages to allow processing them in worker threads.
+    const int count = mEditor->getProject().getSchematics().count();
+    QProgressDialog progress(tr("Preparing schematics..."), tr("Cancel"), 0,
+                             count, qApp->activeWindow());
+    progress.setWindowModality(Qt::WindowModal);
+    progress.setMinimumDuration(100);
+    QList<std::shared_ptr<GraphicsPagePainter>> pages;
+    for (int i = 0; i < count; ++i) {
+      pages.append(std::make_shared<SchematicPainter>(
+          *mEditor->getProject().getSchematicByIndex(i)));
+      progress.setValue(i + 1);
+      if (progress.wasCanceled()) {
+        return;
+      }
+    }
+
+    // Show dialog, which will do all the work.
+    GraphicsExportDialog dialog(
+        GraphicsExportDialog::Mode::Schematic, output, pages, mObjIndex,
+        *mEditor->getProject().getName(), 0, defaultFilePath,
+        mApp.getWorkspace().getSettings().defaultLengthUnit.get(),
+        mApp.getWorkspace().getSettings().themes.getActive(),
+        "schematic_editor/" % settingsKey, qApp->activeWindow());
+    connect(&dialog, &GraphicsExportDialog::requestOpenFile, this,
+            [this](const FilePath& fp) {
+              DesktopServices ds(mApp.getWorkspace().getSettings());
+              ds.openLocalPath(fp);
+            });
+    dialog.exec();
+  } catch (const Exception& e) {
+    QMessageBox::warning(qApp->activeWindow(), tr("Error"), e.getMsg());
+  }
 }
 
 /*******************************************************************************

@@ -45,12 +45,10 @@ namespace app {
  *  Constructors / Destructor
  ******************************************************************************/
 
-GraphicsSceneTab::GraphicsSceneTab(GuiApplication& app, ui::TabType type,
-                                   const QPixmap& icon,
+GraphicsSceneTab::GraphicsSceneTab(GuiApplication& app,
                                    std::shared_ptr<ProjectEditor> prj,
-                                   int objIndex, const QString& title,
-                                   QObject* parent) noexcept
-  : WindowTab(app, type, icon, prj, objIndex, title, parent),
+                                   int objIndex, QObject* parent) noexcept
+  : WindowTab(app, prj, objIndex, parent),
     mBackgroundColor(Qt::white),
     mGridColor(Qt::gray),
     mGridStyle(Theme::GridStyle::None),

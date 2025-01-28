@@ -40,14 +40,9 @@ namespace app {
  *  Constructors / Destructor
  ******************************************************************************/
 
-WindowTab::WindowTab(GuiApplication& app, ui::TabType type, const QPixmap& icon,
-                     std::shared_ptr<ProjectEditor> prj, int objIndex,
-                     const QString& title, QObject* parent) noexcept
-  : QObject(parent),
-    mApp(app),
-    mBaseUiData{type, q2s(title), q2s(icon), app.getProjects().getIndexOf(prj)},
-    mProject(prj),
-    mObjIndex(objIndex) {
+WindowTab::WindowTab(GuiApplication& app, std::shared_ptr<ProjectEditor> prj,
+                     int objIndex, QObject* parent) noexcept
+  : QObject(parent), mApp(app), mProject(prj), mObjIndex(objIndex) {
 }
 
 WindowTab::~WindowTab() noexcept {

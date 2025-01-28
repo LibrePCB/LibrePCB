@@ -26,6 +26,7 @@
 #include "../../guiapplication.h"
 #include "../../uitypes.h"
 #include "../projecteditor.h"
+#include "../projectsmodel.h"
 
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boardplanefragmentsbuilder.h>
@@ -34,6 +35,7 @@
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 #include <librepcb/editor/project/boardeditor/boardgraphicsscene.h>
+#include <librepcb/editor/undostack.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -49,17 +51,10 @@ namespace app {
  *  Constructors / Destructor
  ******************************************************************************/
 
-static QString getTitle(std::shared_ptr<ProjectEditor> prj, int boardIndex) {
-  if (auto b = prj->getProject().getBoardByIndex(boardIndex)) {
-    return *b->getName();
-  }
-  return QString();
-}
-
 Board2dTab::Board2dTab(GuiApplication& app, std::shared_ptr<ProjectEditor> prj,
                        int boardIndex, QObject* parent) noexcept
-  : GraphicsSceneTab(app, ui::TabType::Board2d, QPixmap(":/projects.png"), prj,
-                     boardIndex, getTitle(prj, boardIndex), parent),
+  : GraphicsSceneTab(app, prj, boardIndex, parent),
+    mEditor(prj),
     mUiData{
         q2s(mBackgroundColor),  // Background color
         q2s(Qt::white),  // Overlay color
@@ -80,6 +75,10 @@ Board2dTab::Board2dTab(GuiApplication& app, std::shared_ptr<ProjectEditor> prj,
     mUiData.unit = l2s(brd->getGridUnit());
   }
 
+  // Connect undo stack.
+  connect(&prj->getUndoStack(), &UndoStack::stateModified, this,
+          &Board2dTab::requestRepaint);
+
   updateGridIntervalUiStr();
 }
 
@@ -89,6 +88,26 @@ Board2dTab::~Board2dTab() noexcept {
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
+
+ui::TabData Board2dTab::getBaseUiData() const noexcept {
+  auto brd = mProject->getProject().getBoardByIndex(mObjIndex);
+
+  return ui::TabData{
+      ui::TabType::Board2d,  // Type
+      q2s(brd ? *brd->getName() : QString()),  // Title
+      q2s(QPixmap(":/projects.png")),  // Icon
+      mApp.getProjects().getIndexOf(mEditor),  // Project index
+      true,  // Can save
+      true,  // Can export graphics
+      mProject->getUndoStack().canUndo(),  // Can undo
+      mProject->getUndoStack().canRedo(),  // Can redo
+      true,  // Can cut/copy
+      true,  // Can paste
+      true,  // Can remove
+      true,  // Can rotate
+      true,  // Can mirror
+  };
+}
 
 void Board2dTab::setUiData(const ui::Board2dTabData& data) noexcept {
   mUiData = data;
