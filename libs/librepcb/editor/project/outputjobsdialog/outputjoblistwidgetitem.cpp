@@ -89,6 +89,15 @@ QString OutputJobListWidgetItem::getTitle() const noexcept {
  *  General Methods
  ******************************************************************************/
 
+void OutputJobListWidgetItem::setSelected(bool selected) noexcept {
+  QString stylesheet;
+  if (selected) {
+    stylesheet = "color: palette(highlighted-text);";
+  }
+  mUi->lblName->setStyleSheet(stylesheet);
+  mUi->lblType->setStyleSheet(stylesheet);
+}
+
 void OutputJobListWidgetItem::updateJobInfo() noexcept {
   if (mJob) {
     mUi->lblIcon->setPixmap(mJob->getTypeIcon().pixmap(mUi->lblIcon->size()));
