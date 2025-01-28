@@ -60,6 +60,7 @@ public:
   WindowSectionsModel() = delete;
   WindowSectionsModel(const WindowSectionsModel& other) = delete;
   explicit WindowSectionsModel(GuiApplication& app, const ui::Data& uiData,
+                               const QString& settingsPrefix,
                                QObject* parent = nullptr) noexcept;
   virtual ~WindowSectionsModel() noexcept;
 
@@ -98,6 +99,7 @@ private:
 
   GuiApplication& mApp;
   const ui::Data& mUiData;
+  const QString mSettingsPrefix;
   QList<std::shared_ptr<WindowSection>> mItems;
 };
 

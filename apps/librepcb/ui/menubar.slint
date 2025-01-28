@@ -120,6 +120,17 @@ export component MenuBar inherits Rectangle {
                 MenuSeparator { }
 
                 MenuItem {
+                    text: @tr("Rescan Workspace Libraries");
+                    icon: @image-url("img/refresh.svg");
+                    status-tip: @tr("Scan all workspace libraries to update the cache");
+                    shortcuts: "F5";
+
+                    clicked => {
+                        Backend.action-triggered(ActionId.rescan-workspace-libraries, -1);
+                    }
+                }
+
+                MenuItem {
                     text: @tr("Open Workspace Folder");
                     status-tip: @tr("Open the workspace directory in the file manager");
 
@@ -131,6 +142,17 @@ export component MenuBar inherits Rectangle {
                 MenuItem {
                     text: @tr("Switch Workspace") + "...";
                     status-tip: @tr("Choose another workspace to open");
+                }
+
+                MenuItem {
+                    text: @tr("Preferences") + "...";
+                    icon: @image-url("img/settings.svg");
+                    status-tip: @tr("Open the workspace settings dialog");
+                    shortcuts: "Ctrl+,";
+
+                    clicked => {
+                        Backend.action-triggered(ActionId.open-workspace-settings, -1);
+                    }
                 }
 
                 MenuSeparator { }
@@ -300,6 +322,39 @@ export component MenuBar inherits Rectangle {
                 y: parent.height;
 
                 MenuItem {
+                    text: @tr("New Window");
+                    icon: @image-url("img/window-plus.svg");
+                    status-tip: @tr("Open a new window");
+
+                    clicked => {
+                        Backend.action-triggered(ActionId.window-new, -1);
+                    }
+                }
+
+                MenuItem {
+                    text: @tr("Close Window");
+                    icon: @image-url("img/window-x.svg");
+                    status-tip: @tr("Close this window");
+                    shortcuts: "Alt+F4";
+
+                    clicked => {
+                        Backend.action-triggered(ActionId.window-close, -1);
+                    }
+                }
+
+                MenuItem {
+                    text: @tr("Split Window");
+                    icon: @image-url("img/window-split.svg");
+                    status-tip: @tr("Split the current window into one more section");
+
+                    clicked => {
+                        Backend.action-triggered(ActionId.section-split, Data.current-section-index);
+                    }
+                }
+
+                MenuSeparator { }
+
+                MenuItem {
                     text: @tr("Grid Properties");
                     icon: @image-url("img/grid-lines.svg");
                     status-tip: @tr("View/modify the grid properties");
@@ -354,6 +409,25 @@ export component MenuBar inherits Rectangle {
                     enabled: Data.current-tab.type == TabType.board-2d;
                 }
 
+                MenuItem {
+                    text: @tr("Rebuild all Planes");
+                    status-tip: @tr("Re-calculate the filled area of all planes");
+                    shortcuts: "Ctrl+Shift+R";
+                }
+
+                MenuItem {
+                    text: @tr("Ignore Placement Locks");
+                    icon: @image-url("img/lock-closed.svg");
+                    status-tip: @tr("Allow dragging locked objects");
+                    shortcuts: "Ctrl+Shift+L";
+                    enabled: Data.current-tab.type == TabType.board-2d;
+                    checked: Data.ignore-placement-locks;
+
+                    clicked => {
+                        Data.ignore-placement-locks = !Data.ignore-placement-locks;
+                    }
+                }
+
                 MenuSeparator { }
 
                 MenuItem {
@@ -393,26 +467,11 @@ export component MenuBar inherits Rectangle {
                     shortcuts: "Ctrl+Home";
                     enabled: Data.current-tab-is-2d-or-3d;
                 }
-
-                MenuSeparator { }
-
-                MenuItem {
-                    text: @tr("Ignore Placement Locks");
-                    icon: @image-url("img/lock-closed.svg");
-                    status-tip: @tr("Allow dragging locked objects");
-                    shortcuts: "Ctrl+Shift+L";
-                    enabled: Data.current-tab.type == TabType.board-2d;
-                    checked: Data.ignore-placement-locks;
-
-                    clicked => {
-                        Data.ignore-placement-locks = !Data.ignore-placement-locks;
-                    }
-                }
             }
         }
 
         MainMenuItem {
-            text: @tr("Extras");
+            text: @tr("Project");
 
             clicked => {
                 menu-extras.show();
@@ -423,73 +482,75 @@ export component MenuBar inherits Rectangle {
                 y: parent.height;
 
                 MenuItem {
-                    text: @tr("Rescan Workspace Libraries");
-                    icon: @image-url("img/refresh.svg");
-                    status-tip: @tr("Scan all workspace libraries to update the cache");
-                    shortcuts: "F5";
+                    text: @tr("New Sheet") + "...";
+                    status-tip: @tr("Add a new schematic sheet to the project");
+                    shortcuts: "Ctrl+N";
+                }
 
-                    clicked => {
-                        Backend.action-triggered(ActionId.rescan-workspace-libraries, -1);
-                    }
+                MenuItem {
+                    text: @tr("Rename Sheet") + "...";
+                    status-tip: @tr("Rename the current schematic sheet");
+                    shortcuts: "Ctrl+F2";
+                }
+
+                MenuItem {
+                    text: @tr("Remove Sheet") + "...";
+                    status-tip: @tr("Remove the current schematic sheet from the project");
+                    shortcuts: "Ctrl+Del";
                 }
 
                 MenuSeparator { }
 
                 MenuItem {
-                    text: @tr("Preferences") + "...";
-                    icon: @image-url("img/settings.svg");
-                    status-tip: @tr("Open the workspace settings dialog");
-                    shortcuts: "Ctrl+,";
-
-                    clicked => {
-                        Backend.action-triggered(ActionId.open-workspace-settings, -1);
-                    }
-                }
-            }
-        }
-
-        MainMenuItem {
-            text: @tr("Window");
-
-            clicked => {
-                menu-window.show();
-            }
-
-            menu-window := Menu {
-                x: 0;
-                y: parent.height;
-
-                MenuItem {
-                    text: @tr("New Window");
-                    icon: @image-url("img/window-plus.svg");
-                    status-tip: @tr("Open a new window");
-
-                    clicked => {
-                        Backend.action-triggered(ActionId.window-new, -1);
-                    }
+                    text: @tr("New Board") + "...";
+                    status-tip: @tr("Add a new board to the project");
+                    shortcuts: "Ctrl+N";
                 }
 
                 MenuItem {
-                    text: @tr("Close Window");
-                    icon: @image-url("img/window-x.svg");
-                    status-tip: @tr("Close this window");
-                    shortcuts: "Alt+F4";
+                    text: @tr("Copy Board") + "...";
+                    status-tip: @tr("Add a copy of the current board to the project");
+                    shortcuts: "Ctrl+D";
+                }
 
-                    clicked => {
-                        Backend.action-triggered(ActionId.window-close, -1);
-                    }
+                MenuItem {
+                    text: @tr("Remove Board") + "...";
+                    status-tip: @tr("Remove the current board from the project");
+                    shortcuts: "Ctrl+Del";
                 }
 
                 MenuSeparator { }
 
                 MenuItem {
-                    text: @tr("Split Section");
-                    icon: @image-url("img/window-split.svg");
-                    status-tip: @tr("Split the current window section");
+                    text: @tr("Run Quick Check");
+                    status-tip: @tr("Run only the most important copper checks from the DRC");
+                    shortcuts: "Shift+F8";
+                }
 
-                    clicked => {
-                        Backend.action-triggered(ActionId.section-split, Data.current-section-index);
-                    }
+                MenuItem {
+                    text: @tr("Run Design Rule Check");
+                    status-tip: @tr("Run the design rule check (DRC)");
+                    shortcuts: "F8";
+                }
+
+                MenuItem {
+                    text: @tr("Board Setup") + "...";
+                    status-tip: @tr("View/modify the board setup");
+                    shortcuts: "F7";
+                }
+
+                MenuSeparator { }
+
+                MenuItem {
+                    text: @tr("Update Project Library") + "...";
+                    status-tip: @tr("Update the project's library elements from workspace libraries");
+                    shortcuts: "Ctrl+F5";
+                }
+
+                MenuItem {
+                    text: @tr("Project Setup") + "...";
+                    status-tip: @tr("View/modify the project setup");
+                    shortcuts: "F6";
                 }
             }
         }
