@@ -55,12 +55,31 @@ namespace app {
 
 WindowSectionsModel::WindowSectionsModel(GuiApplication& app,
                                          const ui::Data& uiData,
+                                         const QString& settingsPrefix,
                                          QObject* parent) noexcept
-  : QObject(parent), mApp(app), mUiData(uiData), mItems() {
-  splitSection(0);
+  : QObject(parent),
+    mApp(app),
+    mUiData(uiData),
+    mSettingsPrefix(settingsPrefix),
+    mItems() {
+  // Load window state.
+  QSettings cs;
+  const int sectionCount = cs.beginReadArray(mSettingsPrefix % "/sections");
+  for (int i = 0; i < sectionCount; ++i) {
+    splitSection(mItems.count());
+  }
+  cs.endArray();
+
+  if (mItems.isEmpty()) {
+    splitSection(0);
+  }
 }
 
 WindowSectionsModel::~WindowSectionsModel() noexcept {
+  // Save window state.
+  QSettings cs;
+  cs.beginWriteArray(mSettingsPrefix % "/sections", mItems.count());
+  cs.endArray();
 }
 
 /*******************************************************************************

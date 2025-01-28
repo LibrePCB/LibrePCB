@@ -8,7 +8,7 @@ if(EXISTS "${SLINT_SUBMODULE_BASEPATH}"
   # Set compile options
   set(SLINT_FEATURE_BACKEND_QT ON)
   set(SLINT_FEATURE_BACKEND_WINIT OFF)
-  set(SLINT_FEATURE_GETTEXT ON)
+  set(SLINT_FEATURE_GETTEXT OFF)  # TODO: Causes compiler warning on macOS CI
 
   # Include local submodule
   set(BUILD_SHARED_LIBS ON)
@@ -36,6 +36,9 @@ if(EXISTS "${SLINT_SUBMODULE_BASEPATH}"
   )
     target_compile_options(Slint INTERFACE -Wno-nonnull)
   endif()
+
+  # Suppress compiler warning on generated Slint code
+  target_compile_options(Slint INTERFACE -Wno-misleading-indentation)
 
   # Stop here, we're done
   return()

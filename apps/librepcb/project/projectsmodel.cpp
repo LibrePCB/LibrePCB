@@ -34,6 +34,7 @@
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/editor/dialogs/directorylockhandlerdialog.h>
 #include <librepcb/editor/dialogs/filedialog.h>
+#include <librepcb/editor/workspace/controlpanel/markdownconverter.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -85,6 +86,10 @@ std::shared_ptr<ProjectEditor> ProjectsModel::openProject(FilePath fp) {
 
   const QString uniqueFp = fp.toUnique().toStr();
   // if (mEditors.contains(uniqueFp)) return mEditors.value(uniqueFp);
+
+  // QPixmap p =
+  // MarkdownConverter::convertMarkdownToPixmap(fp.getParentDir().getPathTo("README.md"),
+  // 500); p.save(fp.getParentDir().getPathTo("README.png").toStr());
 
   // Opening the project can take some time, use wait cursor to provide
   // immediate UI feedback.

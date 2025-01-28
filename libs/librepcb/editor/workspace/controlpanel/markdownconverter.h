@@ -25,6 +25,7 @@
 #include <librepcb/core/fileio/filepath.h>
 
 #include <QtCore>
+#include <QtGui>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -44,6 +45,8 @@ public:
   // Static Methods
   static QString convertMarkdownToHtml(const FilePath& markdownFile) noexcept;
   static QString convertMarkdownToHtml(const QString& markdown) noexcept;
+  static QPixmap convertMarkdownToPixmap(const FilePath& fp,
+                                         int width) noexcept;
 
 private:
   // Constructors / Destructor

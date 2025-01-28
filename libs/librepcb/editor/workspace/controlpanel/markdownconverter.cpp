@@ -58,6 +58,32 @@ QString MarkdownConverter::convertMarkdownToHtml(
   return document.toHtml();
 }
 
+QPixmap MarkdownConverter::convertMarkdownToPixmap(const FilePath& fp,
+                                                   int width) noexcept {
+  QFile file(fp.toStr());
+  if (file.open(QFile::ReadOnly)) {
+    QTextDocument document;
+    document.setDefaultStyleSheet("color: red;");
+    document.setBaseUrl(fp.toQUrl());
+    document.setMarkdown(file.readAll(), QTextDocument::MarkdownDialectGitHub);
+    document.setTextWidth(width);
+
+    QAbstractTextDocumentLayout::PaintContext ctx;
+    ctx.palette.setColor(QPalette::Text, Qt::red);
+
+    QPixmap pixmap(document.size().toSize());
+    pixmap.fill(Qt::white);
+    {
+      QPainter painter(&pixmap);
+      // document.drawContents(&painter, QRectF());
+      document.documentLayout()->draw(&painter, ctx);
+    }
+    return pixmap;
+  } else {
+    return QPixmap();
+  }
+}
+
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
