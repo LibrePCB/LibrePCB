@@ -74,6 +74,9 @@ public:
   Board2dTab& operator=(const Board2dTab& rhs) = delete;
 
 private:
+  void updateGridIntervalUiStr() noexcept;
+
+private:
   ui::Board2dTabData mUiData;
   std::unique_ptr<BoardPlaneFragmentsBuilder> mPlaneBuilder;
 };

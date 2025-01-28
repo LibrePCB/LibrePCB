@@ -189,6 +189,10 @@ export component MenuBar inherits Rectangle {
                     status-tip: @tr("Increase the grid interval");
                     shortcuts: "Ctrl+Shift++";
                     enabled: Data.current-tab-is-2d;
+
+                    clicked => {
+                        Backend.action-triggered(ActionId.section-grid-interval-increase, Data.current-section-index);
+                    }
                 }
 
                 MenuItem {
@@ -196,6 +200,10 @@ export component MenuBar inherits Rectangle {
                     status-tip: @tr("Decrease the grid interval");
                     shortcuts: "Ctrl+Shift+-";
                     enabled: Data.current-tab-is-2d;
+
+                    clicked => {
+                        Backend.action-triggered(ActionId.section-grid-interval-decrease, Data.current-section-index);
+                    }
                 }
 
                 MenuSeparator { }

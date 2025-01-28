@@ -75,6 +75,9 @@ public:
   SchematicTab& operator=(const SchematicTab& rhs) = delete;
 
 private:
+  void updateGridIntervalUiStr() noexcept;
+
+private:
   ui::SchematicTabData mUiData;
   QScopedPointer<SchematicEditorFsm> mFsm;
 };

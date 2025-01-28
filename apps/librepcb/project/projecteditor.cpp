@@ -23,6 +23,7 @@
 #include "projecteditor.h"
 
 #include <librepcb/core/project/project.h>
+#include <librepcb/editor/undostack.h>
 
 #include <QtCore>
 
@@ -39,7 +40,7 @@ namespace app {
 
 ProjectEditor::ProjectEditor(std::unique_ptr<Project> project,
                              QObject* parent) noexcept
-  : QObject(parent), mProject(std::move(project)) {
+  : QObject(parent), mProject(std::move(project)), mUndoStack(new UndoStack()) {
 }
 
 ProjectEditor::~ProjectEditor() noexcept {

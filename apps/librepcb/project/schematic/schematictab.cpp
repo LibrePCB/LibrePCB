@@ -29,6 +29,8 @@
 
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/schematic/schematic.h>
+#include <librepcb/core/types/lengthunit.h>
+#include <librepcb/core/utils/toolbox.h>
 #include <librepcb/core/workspace/theme.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
@@ -71,7 +73,7 @@ SchematicTab::SchematicTab(GuiApplication& app,
         q2s(mBackgroundColor),  // Background color
         q2s(Qt::black),  // Overlay color
         ui::GridStyle::None,  // Grid style
-      slint::SharedString(), // Grid interval
+        slint::SharedString(),  // Grid interval
         ui::LengthUnit::Millimeters,  // Length unit
         true,  // Show pin numbers
         ui::SchematicTool::Select,  // Active tool
@@ -87,10 +89,8 @@ SchematicTab::SchematicTab(GuiApplication& app,
   mUiData.grid_style = l2s(mGridStyle);
   if (auto sch = mProject->getProject().getSchematicByIndex(mObjIndex)) {
     mGridInterval = sch->getGridInterval();
+    mUiData.unit = l2s(sch->getGridUnit());
   }
-
-  // Update UI data.
-  mUiData.grid_interval = q2s(mGridInterval->toMmString());
 
   // Build the whole schematic editor finite state machine.
   auto editor = new editor::ProjectEditor(mApp.getWorkspace(),
@@ -113,6 +113,8 @@ SchematicTab::SchematicTab(GuiApplication& app,
   //             mUi->statusbar->showMessage(message, timeoutMs);
   //           }
   //         });
+
+  updateGridIntervalUiStr();
 }
 
 SchematicTab::~SchematicTab() noexcept {
@@ -126,11 +128,15 @@ void SchematicTab::setUiData(const ui::SchematicTabData& data) noexcept {
   mUiData = data;
 
   mGridStyle = s2l(mUiData.grid_style);
+  if (auto sch = mProject->getProject().getSchematicByIndex(mObjIndex)) {
+    sch->setGridUnit(s2l(mUiData.unit));
+  }
   if (auto l = mLayerProvider->getLayer(Theme::Color::sSchematicPinNumbers)) {
     l->setVisible(mUiData.show_pin_numbers);
   }
 
   invalidateBackground();
+  updateGridIntervalUiStr();
   emit requestRepaint();
 }
 
@@ -151,15 +157,14 @@ void SchematicTab::deactivate() noexcept {
 bool SchematicTab::actionTriggered(ui::ActionId id) noexcept {
   if (id == ui::ActionId::SectionGridIntervalIncrease) {
     mGridInterval = PositiveLength(mGridInterval * 2);
-    mUiData.grid_interval = q2s(mGridInterval->toMmString());
     invalidateBackground();
-    emit uiDataChanged();
+    updateGridIntervalUiStr();
     return true;
-  } else   if ((id == ui::ActionId::SectionGridIntervalDecrease) && ((*mGridInterval % 2) == 0)) {
+  } else if ((id == ui::ActionId::SectionGridIntervalDecrease) &&
+             ((*mGridInterval % 2) == 0)) {
     mGridInterval = PositiveLength(mGridInterval / 2);
-    mUiData.grid_interval = q2s(mGridInterval->toMmString());
     invalidateBackground();
-    emit uiDataChanged();
+    updateGridIntervalUiStr();
     return true;
   }
 
@@ -219,6 +224,18 @@ bool SchematicTab::processScenePointerEvent(
   }
 
   return handled;
+}
+
+void SchematicTab::updateGridIntervalUiStr() noexcept {
+  if (auto sch = mProject->getProject().getSchematicByIndex(mObjIndex)) {
+    const LengthUnit& unit = sch->getGridUnit();
+    const slint::SharedString str = q2s(Toolbox::floatToString(
+        unit.convertToUnit(*mGridInterval), 10, QLocale()));
+    if (mUiData.grid_interval != str) {
+      mUiData.grid_interval = str;
+      emit uiDataChanged();
+    }
+  }
 }
 
 /*******************************************************************************

@@ -81,13 +81,10 @@ export component StatusBar inherits Rectangle {
             }
         }
 
-        Rectangle {
+        VerticalLayout {
             width: self.height * 0.7;
 
             ta-grid-interval-increase := TouchArea {
-                y: 0;
-                width: 100%;
-                height: 50%;
                 enabled: Data.current-tab-is-2d;
 
                 Rectangle {
@@ -108,9 +105,6 @@ export component StatusBar inherits Rectangle {
             }
 
             ta-grid-interval-decrease := TouchArea {
-                y: parent.height / 2;
-                width: 100%;
-                height: 50%;
                 enabled: Data.current-tab-is-2d;
 
                 Rectangle {

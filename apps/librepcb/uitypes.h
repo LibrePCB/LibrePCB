@@ -25,6 +25,7 @@
  ******************************************************************************/
 #include "appwindow.h"
 
+#include <librepcb/core/types/lengthunit.h>
 #include <librepcb/core/workspace/theme.h>
 
 /*******************************************************************************
@@ -38,23 +39,57 @@ namespace app {
  *  Non-Member Functions
  ******************************************************************************/
 
-inline Theme::GridStyle s2l(ui::GridStyle gs) noexcept {
-  if (gs == ui::GridStyle::Lines) {
+inline Theme::GridStyle s2l(ui::GridStyle v) noexcept {
+  if (v == ui::GridStyle::Lines) {
     return Theme::GridStyle::Lines;
-  } else if (gs == ui::GridStyle::Dots) {
+  } else if (v == ui::GridStyle::Dots) {
     return Theme::GridStyle::Dots;
   } else {
     return Theme::GridStyle::None;
   }
 }
 
-inline ui::GridStyle l2s(Theme::GridStyle gs) noexcept {
-  if (gs == Theme::GridStyle::Lines) {
+inline ui::GridStyle l2s(Theme::GridStyle v) noexcept {
+  if (v == Theme::GridStyle::Lines) {
     return ui::GridStyle::Lines;
-  } else if (gs == Theme::GridStyle::Dots) {
+  } else if (v == Theme::GridStyle::Dots) {
     return ui::GridStyle::Dots;
   } else {
     return ui::GridStyle::None;
+  }
+}
+
+inline LengthUnit s2l(ui::LengthUnit v) noexcept {
+  if (v == ui::LengthUnit::Millimeters) {
+    return LengthUnit::millimeters();
+  } else if (v == ui::LengthUnit::Micrometers) {
+    return LengthUnit::micrometers();
+  } else if (v == ui::LengthUnit::Nanometers) {
+    return LengthUnit::nanometers();
+  } else if (v == ui::LengthUnit::Inches) {
+    return LengthUnit::inches();
+  } else if (v == ui::LengthUnit::Mils) {
+    return LengthUnit::mils();
+  } else {
+    qCritical() << "Unhandled value in LengthUnit conversion.";
+    return LengthUnit::millimeters();
+  }
+}
+
+inline ui::LengthUnit l2s(const LengthUnit& v) noexcept {
+  if (v == LengthUnit::millimeters()) {
+    return ui::LengthUnit::Millimeters;
+  } else if (v == LengthUnit::micrometers()) {
+    return ui::LengthUnit::Micrometers;
+  } else if (v == LengthUnit::nanometers()) {
+    return ui::LengthUnit::Nanometers;
+  } else if (v == LengthUnit::inches()) {
+    return ui::LengthUnit::Inches;
+  } else if (v == LengthUnit::mils()) {
+    return ui::LengthUnit::Mils;
+  } else {
+    qCritical() << "Unhandled value in LengthUnit conversion.";
+    return ui::LengthUnit::Millimeters;
   }
 }
 
