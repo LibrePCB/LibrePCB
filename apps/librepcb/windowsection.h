@@ -90,6 +90,9 @@ signals:
   void cursorCoordinatesChanged(const Point& pos);
 
 private:
+  void requestRepaint() noexcept;
+
+private:
   std::shared_ptr<WindowTabsModel> mTabsModel;
   ui::WindowSectionData mUiData;
 };

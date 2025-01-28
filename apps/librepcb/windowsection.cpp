@@ -28,10 +28,13 @@
 #include "library/downloadlibrarytab.h"
 #include "project/board/board2dtab.h"
 #include "project/board/board3dtab.h"
+#include "project/projecteditor.h"
 #include "project/schematic/schematictab.h"
 #include "windowtab.h"
 #include "windowtabsmodel.h"
 #include "windowtabsmodeladapter.h"
+
+#include <librepcb/editor/undostack.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -71,13 +74,8 @@ WindowSection::WindowSection(GuiApplication& app, QObject* parent) noexcept
         0} {
   connect(mTabsModel.get(), &WindowTabsModel::cursorCoordinatesChanged, this,
           &WindowSection::cursorCoordinatesChanged);
-  connect(
-      mTabsModel.get(), &WindowTabsModel::requestRepaint, this,
-      [this]() {
-        mUiData.frame++;
-        uiDataChanged();
-      },
-      Qt::QueuedConnection);
+  connect(mTabsModel.get(), &WindowTabsModel::requestRepaint, this,
+          &WindowSection::requestRepaint, Qt::QueuedConnection);
   connect(mTabsModel.get(), &WindowTabsModel::uiDataChanged, this,
           &WindowSection::uiDataChanged);
 }
@@ -135,6 +133,16 @@ bool WindowSection::actionTriggered(ui::ActionId id) noexcept {
   if (std::shared_ptr<WindowTab> t = getCurrentTab()) {
     if (t->actionTriggered(id)) {
       return true;
+    } else if (std::shared_ptr<ProjectEditor> editor = t->getProject()) {
+      if (id == ui::ActionId::Undo) {
+        editor->getUndoStack().undo();  // TODO: Exception handling!
+        requestRepaint();
+        return true;
+      } else if (id == ui::ActionId::Redo) {
+        editor->getUndoStack().redo();  // TODO: Exception handling!
+        requestRepaint();
+        return true;
+      }
     }
   }
 
@@ -181,6 +189,11 @@ void WindowSection::zoomOut(float width, float height) noexcept {
   if (std::shared_ptr<WindowTab> t = getTab(mUiData.current_tab_index)) {
     return t->zoomOut(width, height);
   }
+}
+
+void WindowSection::requestRepaint() noexcept {
+  mUiData.frame++;
+  uiDataChanged();
 }
 
 /*******************************************************************************
