@@ -64,6 +64,8 @@ public:
   struct Result {
     RuleCheckMessageList messages;
     QStringList errors;  // Empty on success.
+    bool quick = false;
+    qint64 elapsedTimeMs = 0;
   };
 
   // Constructors / Destructor
@@ -101,7 +103,8 @@ private:  // Methods
       const Data&);
 
   Result tryRunJob(JobFunc function, int weight) noexcept;
-  Result run(std::shared_ptr<const Data> data) noexcept;
+  Result run(std::shared_ptr<const Data> data,
+             std::shared_ptr<QElapsedTimer> timer) noexcept;
   void prepareCopperPaths(const Data& data, CalculatedJobData& calcData,
                           const Layer& layer);
   RuleCheckMessageList checkCopperCopperClearances(const Data& data);

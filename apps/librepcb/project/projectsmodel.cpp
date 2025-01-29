@@ -134,7 +134,7 @@ std::shared_ptr<ProjectEditor> ProjectsModel::openProject(FilePath fp) {
   }
 
   // Open editor.
-  auto editor = std::make_shared<ProjectEditor>(std::move(project), this);
+  auto editor = std::make_shared<ProjectEditor>(std::move(project));
 
   // Keep handle.
   mEditors.append(editor);

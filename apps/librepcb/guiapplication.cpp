@@ -61,10 +61,10 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
                                QObject* parent) noexcept
   : QObject(parent),
     mWorkspace(ws),
-    mNotifications(new NotificationsModel(ws, this)),
-    mQuickAccessModel(new QuickAccessModel(ws, this)),
-    mLibraries(new LibrariesModel(ws, this)),
-    mProjects(new ProjectsModel(ws, this)) {
+    mNotifications(new NotificationsModel(ws)),
+    mQuickAccessModel(new QuickAccessModel(ws)),
+    mLibraries(new LibrariesModel(ws)),
+    mProjects(new ProjectsModel(ws)) {
   mWorkspace.getLibraryDb().startLibraryRescan();
   createNewWindow();
 
@@ -96,7 +96,7 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
         QString(),
         QString("WORKSPACE_V%1_OPENED_WITH_NEWER_VERSION")
             .arg(Application::getFileFormatVersion().toStr()),
-        true, this));
+        true));
   }
 
   // Setup warning about missing libraries, and update visibility each time the
@@ -109,7 +109,7 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
       tr("Open Libraries Panel"),
       QString("WORKSPACE_V%1_HAS_NO_LIBRARIES")
           .arg(Application::getFileFormatVersion().toStr()),
-      true, this));
+      true));
   connect(mNotificationNoLibrariesInstalled.get(), &Notification::buttonClicked,
           this, [this]() {
             if (auto win = getCurrentWindow()) {
@@ -129,7 +129,7 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
          "LibrePCB projects through the file manager. Click the button for "
          "details, or do it from the preferences dialog at any time."),
       tr("Install Desktop Integration") % "...",
-      "DESKTOP_INTEGRATION_NOT_INSTALLED", true, this));
+      "DESKTOP_INTEGRATION_NOT_INSTALLED", true));
   connect(mNotificationDesktopIntegration.get(), &Notification::buttonClicked,
           this, [this]() {
             DesktopIntegration::execDialog(DesktopIntegration::Mode::Install,
@@ -147,7 +147,7 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
             tr("The internal libraries database is beeing updated. This may "
                "take a few minutes and in the mean time you might see outdated "
                "information about libraries."),
-            QString(), QString(), false, this);
+            QString(), QString(), false);
         connect(&mWorkspace.getLibraryDb(),
                 &WorkspaceLibraryDb::scanProgressUpdate, n.get(),
                 &Notification::setProgress);
@@ -161,7 +161,7 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
           [this](const QString& err) {
             std::shared_ptr<Notification> n = std::make_shared<Notification>(
                 ui::NotificationType::Critical, tr("Scanning Libraries Failed"),
-                err, QString(), QString(), true, this);
+                err, QString(), QString(), true);
             connect(&mWorkspace.getLibraryDb(),
                     &WorkspaceLibraryDb::scanStarted, n.get(),
                     &Notification::dismiss);
@@ -240,7 +240,7 @@ void GuiApplication::createNewWindow(int projectIndex) noexcept {
   d.set_order_info_url(slint::SharedString());
   d.set_workspace_path(mWorkspace.getPath().toNative().toUtf8().data());
   d.set_workspace_folder(std::make_shared<FileSystemModel>(
-      mWorkspace, mWorkspace.getProjectsPath(), this));
+      mWorkspace, mWorkspace.getProjectsPath()));
   d.set_notifications(mNotifications);
   d.set_quick_access_items(mQuickAccessModel);
   d.set_libraries(mLibraries);
@@ -292,7 +292,7 @@ void GuiApplication::createNewWindow(int projectIndex) noexcept {
       &LibrariesModel::toggleAll, mLibraries.get(), std::placeholders::_1));
 
   // Build wrapper.
-  auto mw = std::make_shared<MainWindow>(*this, win, mWindows.count(), this);
+  auto mw = std::make_shared<MainWindow>(*this, win, mWindows.count());
   mWindows.append(mw);
 }
 

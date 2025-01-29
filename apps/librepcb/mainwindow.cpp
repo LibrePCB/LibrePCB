@@ -64,8 +64,8 @@ MainWindow::MainWindow(GuiApplication& app,
     mIndex(index),
     mSettingsPrefix(QString("window_%1").arg(index + 1)),
     mApp(app),
-    mSections(new WindowSectionsModel(app, win->global<ui::Data>(),
-                                      mSettingsPrefix, this)),
+    mSections(
+        new WindowSectionsModel(app, win->global<ui::Data>(), mSettingsPrefix)),
     mWindow(win),
     mWidget(static_cast<QWidget*>(slint::cbindgen_private::slint_qt_get_widget(
         &mWindow->window().window_handle()))) {

@@ -52,24 +52,22 @@ namespace app {
 
 WindowSection::WindowSection(GuiApplication& app, QObject* parent) noexcept
   : QObject(parent),
-    mTabsModel(new WindowTabsModel(app, this)),
+    mTabsModel(new WindowTabsModel(app)),
     mUiData{
         mTabsModel,
         std::make_shared<
             WindowTabsModelAdapter<CreateLibraryTab, ui::CreateLibraryTabData>>(
-            mTabsModel, this),
+            mTabsModel),
         std::make_shared<WindowTabsModelAdapter<DownloadLibraryTab,
                                                 ui::DownloadLibraryTabData>>(
-            mTabsModel, this),
+            mTabsModel),
         std::make_shared<
             WindowTabsModelAdapter<SchematicTab, ui::SchematicTabData>>(
-            mTabsModel, this),
+            mTabsModel),
         std::make_shared<
-            WindowTabsModelAdapter<Board2dTab, ui::Board2dTabData>>(mTabsModel,
-                                                                    this),
+            WindowTabsModelAdapter<Board2dTab, ui::Board2dTabData>>(mTabsModel),
         std::make_shared<
-            WindowTabsModelAdapter<Board3dTab, ui::Board3dTabData>>(mTabsModel,
-                                                                    this),
+            WindowTabsModelAdapter<Board3dTab, ui::Board3dTabData>>(mTabsModel),
         0,
         false,  // Highlight
         0,

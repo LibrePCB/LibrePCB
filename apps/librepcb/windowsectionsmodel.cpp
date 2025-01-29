@@ -107,12 +107,12 @@ bool WindowSectionsModel::actionTriggered(ui::ActionId id,
     }
   } else if (id == ui::ActionId::CreateLibraryTabOpen) {
     if (!switchToOpenTab<CreateLibraryTab>(nullptr, -1)) {
-      addTab(std::make_shared<CreateLibraryTab>(mApp, this));
+      addTab(std::make_shared<CreateLibraryTab>(mApp));
     }
     return true;
   } else if (id == ui::ActionId::DownloadLibraryTabOpen) {
     if (!switchToOpenTab<DownloadLibraryTab>(nullptr, -1)) {
-      addTab(std::make_shared<DownloadLibraryTab>(mApp, this));
+      addTab(std::make_shared<DownloadLibraryTab>(mApp));
     }
     return true;
   } else if (id == ui::ActionId::Board2dTabOpen3d) {
@@ -120,8 +120,7 @@ bool WindowSectionsModel::actionTriggered(ui::ActionId id,
       if (auto t = s->getCurrentTab()) {
         if (auto prj = t->getProject()) {
           if (!switchToOpenTab<Board3dTab>(prj, t->getObjIndex())) {
-            addTab(std::make_shared<Board3dTab>(mApp, prj, t->getObjIndex(),
-                                                this));
+            addTab(std::make_shared<Board3dTab>(mApp, prj, t->getObjIndex()));
           }
         }
       }
@@ -135,14 +134,14 @@ bool WindowSectionsModel::actionTriggered(ui::ActionId id,
 void WindowSectionsModel::openSchematic(std::shared_ptr<ProjectEditor> prj,
                                         int index) noexcept {
   if (!switchToOpenTab<SchematicTab>(prj, index)) {
-    addTab(std::make_shared<SchematicTab>(mApp, prj, index, this));
+    addTab(std::make_shared<SchematicTab>(mApp, prj, index));
   }
 }
 
 void WindowSectionsModel::openBoard(std::shared_ptr<ProjectEditor> prj,
                                     int index) noexcept {
   if (!switchToOpenTab<Board2dTab>(prj, index)) {
-    addTab(std::make_shared<Board2dTab>(mApp, prj, index, this));
+    addTab(std::make_shared<Board2dTab>(mApp, prj, index));
   }
 }
 
@@ -247,8 +246,7 @@ void WindowSectionsModel::splitSection(int sectionIndex) noexcept {
   };
 
   const int newIndex = qBound(0, sectionIndex + 1, mItems.count());
-  std::shared_ptr<WindowSection> s =
-      std::make_shared<WindowSection>(mApp, this);
+  std::shared_ptr<WindowSection> s = std::make_shared<WindowSection>(mApp);
   connect(
       s.get(), &WindowSection::uiDataChanged, this,
       [this, getSectionIndex]() { row_changed(getSectionIndex(sender())); });

@@ -1,13 +1,14 @@
-import { ListView, TabWidget } from "std-widgets.slint";
-import { PanelHeader } from "./common/panelheader.slint";
+import { ListView, TabWidget, Palette } from "std-widgets.slint";
+import { PanelHeader, PanelHeaderButton } from "./common/panelheader.slint";
 import { Data } from "./api/data.slint";
 import { Backend } from "./api/backend.slint";
-import { RuleCheckMessageData } from "./api/types.slint";
+import { RuleCheckState, RuleCheckMessageData, TabType, ActionId } from "./api/types.slint";
 import { ListViewItemButton } from "./common/listviewitembutton.slint";
 
 component Item inherits Rectangle {
     in-out property <RuleCheckMessageData> msg;
     in property <bool> is-selected: false;
+    in property <bool> enabled <=> ta.enabled;
 
     callback clicked <=> ta.clicked;
 
@@ -29,24 +30,28 @@ component Item inherits Rectangle {
                     width: self.height;
                     height: parent.height - 2 * self.x;
                     source: Data.get-icon-for-notification-type(msg.severity);
-                    colorize: msg.approved ? t-title.color : Data.get-color-for-notification-type(msg.severity);
+                    colorize: (msg.approved || (!root.enabled)) ? t-title.color : Data.get-color-for-notification-type(msg.severity);
                 }
             }
 
             t-title := Text {
                 vertical-alignment: center;
                 font-italic: msg.approved;
+                overflow: elide;
+                color: root.enabled ? Palette.foreground : #707070;
                 text: msg.message;
             }
 
             if is-selected || ta.has-hover: ListViewItemButton {
                 icon: @image-url("img/wand-magic-sparkles-solid.svg");
                 tooltip: @tr("Apply Automatic Fix");
+                enabled: root.enabled;
             }
 
             if is-selected || ta.has-hover || msg.approved: ListViewItemButton {
                 icon: msg.approved ? @image-url("img/eye-slash-fill.svg") : @image-url("img/eye-fill.svg");
                 tooltip: msg.approved ? @tr("Remove Approval") : @tr("Approve");
+                enabled: root.enabled;
 
                 clicked => {
                     msg.approved = !msg.approved;
@@ -54,11 +59,12 @@ component Item inherits Rectangle {
             }
         }
 
+        // Strikethrough
         if msg.approved: Rectangle {
             x: t-title.x;
             y: t-title.y + (t-title.height / 2);
             height: 1px;
-            width: t-title.preferred-width;
+            width: min(t-title.preferred-width, t-title.width);
             background: t-title.color;
         }
     }
@@ -76,6 +82,38 @@ export component RuleCheckPanel inherits Rectangle {
         header := PanelHeader {
             z: 10;  // For the tooltip.
             title: title.is-empty ? @tr("Rule Check Messages") : title;
+            show-spinner: Data.current-tab.rule-check-state == RuleCheckState.running;
+
+            if Data.current-tab.rule-check-state == RuleCheckState.outdated: PanelHeaderButton {
+                icon: @image-url("img/triangle-exclamation.svg");
+                icon-scale: 0.7;
+                tooltip: @tr("Possibly Outdated Data");
+                colorize: self.enabled ? yellow : transparent;
+                read-only: true;
+                enabled: Data.current-tab.rule-check-state != RuleCheckState.running;
+            }
+
+            if Data.current-tab.type == TabType.board-2d: PanelHeaderButton {
+                icon: @image-url("img/output-jobs.svg");
+                icon-scale: 0.7;
+                tooltip: @tr("Run Quick Check");
+                enabled: Data.current-tab.rule-check-state != RuleCheckState.running;
+
+                clicked => {
+                    Backend.action-triggered(ActionId.run-quick-check, Data.current-section-index);
+                }
+            }
+
+            if Data.current-tab.type == TabType.board-2d: PanelHeaderButton {
+                icon: @image-url("img/refresh.svg");
+                icon-scale: 0.7;
+                tooltip: @tr("Run Design Rule Check");
+                enabled: Data.current-tab.rule-check-state != RuleCheckState.running;
+
+                clicked => {
+                    Backend.action-triggered(ActionId.run-drc, Data.current-section-index);
+                }
+            }
         }
 
         if Data.current-tab.rule-check-messages.length > 0: ListView {
@@ -83,6 +121,7 @@ export component RuleCheckPanel inherits Rectangle {
 
             for msg[index] in Data.current-tab.rule-check-messages: Item {
                 msg: msg;
+                enabled: Data.current-tab.rule-check-state != RuleCheckState.running;
                 is-selected: (index == selected-index);
 
                 clicked => {
@@ -98,7 +137,7 @@ export component RuleCheckPanel inherits Rectangle {
                 width: 100%;
                 font-italic: true;
                 wrap: word-wrap;
-                text: title.is-empty ? @tr("Not available for the current tab.") : @tr("No messages.");
+                text: title.is-empty ? @tr("Not available for the current tab.") : ((Data.current-tab.rule-check-state == RuleCheckState.not-run-yet) ? @tr("Please trigger the checks with one of the buttons above.") : @tr("No messages."));
             }
         }
 

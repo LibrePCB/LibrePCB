@@ -1,4 +1,4 @@
-import { Palette } from "std-widgets.slint";
+import { Spinner, Palette } from "std-widgets.slint";
 import { ToolTip } from "./tooltip.slint";
 
 export component PanelHeaderButton inherits Rectangle {
@@ -6,9 +6,11 @@ export component PanelHeaderButton inherits Rectangle {
     in property <float> icon-scale: 0.8;
     in property <string> tooltip;
     in property <color> colorize: transparent;
+    in property <bool> enabled <=> ta.enabled;
+    in property <bool> read-only: false;
 
     width: self.height;
-    background: ta.has-hover ? #454545 : transparent;
+    background: ((!read-only) && ta.has-hover) ? #454545 : transparent;
 
     callback clicked <=> ta.clicked;
 
@@ -20,7 +22,7 @@ export component PanelHeaderButton inherits Rectangle {
             height: parent.height * icon-scale * (ta.pressed ? 0.85 : 1.0);
             image-fit: contain;
             source: icon;
-            colorize: (colorize != transparent) ? colorize : (ta.has-hover ? white : Palette.foreground);
+            colorize: (colorize != transparent) ? colorize : (((!read-only) && ta.has-hover) ? white : (enabled ? Palette.foreground : #707070));
         }
 
         if self.has-hover && (!tooltip.is-empty): ToolTip {
@@ -35,6 +37,7 @@ export component PanelHeader inherits Rectangle {
     in property <length> spacing-top <=> vl-root.padding-top;
     in property <string> title <=> t-title.text;
     in property <string> note;
+    in property <bool> show-spinner: false;
     out property <length> content-height: t-title.height;
 
     height: spacing-top + t-title.height + 1px;
@@ -51,6 +54,7 @@ export component PanelHeader inherits Rectangle {
                 y: 2px;
                 height: self.preferred-height + 4px;
                 font-weight: 700;
+                overflow: elide;
             }
 
             if !note.is-empty: Text {
@@ -60,6 +64,12 @@ export component PanelHeader inherits Rectangle {
                 vertical-alignment: center;
                 overflow: elide;
                 text: note;
+            }
+
+            if show-spinner: Spinner {
+                indeterminate: true;
+                width: content-height - 8px;
+                height: content-height;
             }
 
             @children
