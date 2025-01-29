@@ -77,6 +77,9 @@ public:
   // Operator Overloadings
   SchematicTab& operator=(const SchematicTab& rhs) = delete;
 
+protected:
+  const LengthUnit* getCurrentUnit() const noexcept override;
+
 private:
   void execGraphicsExportDialog(GraphicsExportDialog::Output output,
                                 const QString& settingsKey) noexcept;

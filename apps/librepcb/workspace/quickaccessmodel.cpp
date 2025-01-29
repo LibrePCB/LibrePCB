@@ -20,7 +20,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "recentprojectsmodel.h"
+#include "quickaccessmodel.h"
 
 #include "../apptoolbox.h"
 
@@ -42,93 +42,145 @@ namespace app {
  *  Constructors / Destructor
  ******************************************************************************/
 
-RecentProjectsModel::RecentProjectsModel(Workspace& ws,
-                                         QObject* parent) noexcept
+QuickAccessModel::QuickAccessModel(Workspace& ws, QObject* parent) noexcept
   : QObject(parent),
     mWorkspace(ws),
-    mFilePath(ws.getDataPath().getPathTo("recent_projects.lp")) {
+    mRecentProjectsFp(ws.getDataPath().getPathTo("recent_projects.lp")),
+    mFavoriteProjectsFp(ws.getDataPath().getPathTo("favorite_projects.lp")) {
   load();
   refreshItems();
 }
 
-RecentProjectsModel::~RecentProjectsModel() noexcept {
+QuickAccessModel::~QuickAccessModel() noexcept {
 }
 
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
 
-void RecentProjectsModel::push(const FilePath& fp) noexcept {
-  if ((mPaths.count() > 0) && (mPaths.first() == fp)) {
+void QuickAccessModel::pushRecentProject(const FilePath& fp) noexcept {
+  if ((mRecentProjects.count() > 0) && (mRecentProjects.first() == fp)) {
     // The filename is already on top of the list, so nothing to do here...
     return;
   }
 
   // First remove it from the list, then add it to the top of the list.
-  mPaths.removeAll(fp);
-  mPaths.prepend(fp);
+  mRecentProjects.removeAll(fp);
+  mRecentProjects.prepend(fp);
   refreshItems();
-  save();
+  saveRecentProjects();
+}
+
+void QuickAccessModel::setFavoriteProject(const FilePath& fp,
+                                          bool favorite) noexcept {
+  if ((favorite) && (!mFavoriteProjects.contains(fp))) {
+    mFavoriteProjects.append(fp);
+    refreshItems();
+    saveFavoriteProjects();
+  } else if ((!favorite) && (mFavoriteProjects.removeAll(fp) > 0)) {
+    refreshItems();
+    saveFavoriteProjects();
+  }
 }
 
 /*******************************************************************************
  *  Implementations
  ******************************************************************************/
 
-std::size_t RecentProjectsModel::row_count() const {
+std::size_t QuickAccessModel::row_count() const {
   return mItems.size();
 }
 
-std::optional<ui::FolderTreeItemData> RecentProjectsModel::row_data(
+std::optional<ui::QuickAccessItemData> QuickAccessModel::row_data(
     std::size_t i) const {
   return (i < mItems.size()) ? std::optional(mItems.at(i)) : std::nullopt;
+}
+
+void QuickAccessModel::set_row_data(
+    std::size_t i, const ui::QuickAccessItemData& data) noexcept {
+  Q_UNUSED(i);
+  const FilePath fp(s2q(data.path));
+  if (fp.isValid()) {
+    setFavoriteProject(fp, data.pinned);
+  }
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
-void RecentProjectsModel::load() noexcept {
+void QuickAccessModel::load() noexcept {
   try {
-    if (mFilePath.isExistingFile()) {
-      const std::unique_ptr<const SExpression> root =
-          SExpression::parse(FileUtils::readFile(mFilePath), mFilePath);
+    if (mRecentProjectsFp.isExistingFile()) {
+      const std::unique_ptr<const SExpression> root = SExpression::parse(
+          FileUtils::readFile(mRecentProjectsFp), mRecentProjectsFp);
       foreach (const SExpression* child, root->getChildren("project")) {
         const QString relPath = child->getChild("@0").getValue();
-        mPaths.append(FilePath::fromRelative(mWorkspace.getPath(), relPath));
+        mRecentProjects.append(
+            FilePath::fromRelative(mWorkspace.getPath(), relPath));
       }
     }
   } catch (const Exception& e) {
     qWarning() << "Failed to read recent projects file:" << e.getMsg();
   }
+
+  try {
+    if (mFavoriteProjectsFp.isExistingFile()) {
+      const std::unique_ptr<const SExpression> root = SExpression::parse(
+          FileUtils::readFile(mFavoriteProjectsFp), mFavoriteProjectsFp);
+      foreach (const SExpression* child, root->getChildren("project")) {
+        const QString relPath = child->getChild("@0").getValue();
+        mFavoriteProjects.append(
+            FilePath::fromRelative(mWorkspace.getPath(), relPath));
+      }
+    }
+  } catch (const Exception& e) {
+    qWarning() << "Failed to read favorite projects file:" << e.getMsg();
+  }
 }
 
-void RecentProjectsModel::save() noexcept {
+void QuickAccessModel::saveRecentProjects() noexcept {
   try {
     std::unique_ptr<SExpression> root =
         SExpression::createList("librepcb_recent_projects");
-    foreach (const FilePath& filepath, mPaths) {
+    foreach (const FilePath& filepath, mRecentProjects) {
       root->ensureLineBreak();
       root->appendChild("project", filepath.toRelative(mWorkspace.getPath()));
     }
     root->ensureLineBreak();
-    FileUtils::writeFile(mFilePath, root->toByteArray());  // can throw
+    FileUtils::writeFile(mRecentProjectsFp, root->toByteArray());  // can throw
   } catch (const Exception& e) {
     qWarning() << "Failed to save recent projects file:" << e.getMsg();
   }
 }
 
-void RecentProjectsModel::refreshItems() noexcept {
+void QuickAccessModel::saveFavoriteProjects() noexcept {
+  try {
+    std::unique_ptr<SExpression> root =
+        SExpression::createList("librepcb_favorite_projects");
+    foreach (const FilePath& filepath, mFavoriteProjects) {
+      root->ensureLineBreak();
+      root->appendChild("project", filepath.toRelative(mWorkspace.getPath()));
+    }
+    root->ensureLineBreak();
+    FileUtils::writeFile(mFavoriteProjectsFp,
+                         root->toByteArray());  // can throw
+  } catch (const Exception& e) {
+    qWarning() << "Failed to save favorite projects file:" << e.getMsg();
+  }
+}
+
+void QuickAccessModel::refreshItems() noexcept {
   mItems.clear();
   QSet<FilePath> set;
-  for (const FilePath& fp : mPaths) {
-    if ((set.count() < 5) && (!set.contains(fp)) && fp.isExistingFile()) {
-      mItems.push_back(ui::FolderTreeItemData{
-          0,
-          q2s(QPixmap(":/img/logo/48x48.png")),
+  for (const FilePath& fp : mRecentProjects + mFavoriteProjects) {
+    const bool favorite = mFavoriteProjects.contains(fp);
+    if (((set.count() < 5) || (favorite)) && (!set.contains(fp)) &&
+        fp.isExistingFile()) {
+      mItems.push_back(ui::QuickAccessItemData{
           q2s(fp.getFilename()),
           q2s(fp.toStr()),
-          false,
+          favorite,
       });
       set.insert(fp);
     }

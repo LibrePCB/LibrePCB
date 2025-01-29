@@ -7,13 +7,14 @@ import { LibrariesPanel } from "./library/librariespanel.slint";
 import { ProjectPanel } from "./project/projectpanel.slint";
 import { HomePanel } from "./homepanel.slint";
 import { MenuBar } from "./menubar.slint";
-import { WindowSectionData } from "./windowsection.slint";
+import { WindowSection } from "./windowsection.slint";
 import { MainPage } from "./api/types.slint";
 import { Backend } from "./api/backend.slint";
 import { Data } from "./api/data.slint";
 import { HelpPanel } from "./helppanel.slint";
 import { OrderPanel } from "./project/orderpanel.slint";
 import { StatusBar } from "./statusbar.slint";
+import { RuleCheckPanel } from "./rulecheckpanel.slint";
 
 export { Backend, Data }
 
@@ -76,6 +77,15 @@ export component AppWindow inherits Window {
     if Data.current-page == MainPage.project: ProjectPanel {
         x: sidebar.width;
         y: sidebar.y;
+        z: 90; // For the tooltips.
+        width: panel-width;
+        height: sidebar.height;
+    }
+
+    if Data.current-page == MainPage.rule-check: RuleCheckPanel {
+        x: sidebar.width;
+        y: sidebar.y;
+        z: 90; // For the tooltips.
         width: panel-width;
         height: sidebar.height;
     }
@@ -83,6 +93,7 @@ export component AppWindow inherits Window {
     if Data.current-page == MainPage.order: OrderPanel {
         x: sidebar.width;
         y: sidebar.y;
+        z: 90; // For the tooltips.
         width: panel-width;
         height: sidebar.height;
     }
@@ -107,7 +118,7 @@ export component AppWindow inherits Window {
         }
 
         for section[i] in Data.sections: HorizontalLayout {
-            WindowSectionData {
+            WindowSection {
                 section-index: i;
                 section: section;
             }

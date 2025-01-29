@@ -23,6 +23,10 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "appwindow.h"
+
+#include <librepcb/core/serialization/sexpression.h>
+
 #include <QtCore>
 
 #include <memory>
@@ -61,13 +65,22 @@ public:
   // Getters
   Project& getProject() noexcept { return *mProject; }
   UndoStack& getUndoStack() noexcept { return *mUndoStack; }
+  auto getErcMessages() noexcept { return mErcMessages; }
 
   // Operator Overloadings
   ProjectEditor& operator=(const ProjectEditor& rhs) = delete;
 
 private:
+  void runErc() noexcept;
+  void saveErcMessageApprovals(const QSet<SExpression>& approvals) noexcept;
+
+private:
   std::unique_ptr<Project> mProject;
   std::unique_ptr<UndoStack> mUndoStack;
+
+  QSet<SExpression> mSupportedErcApprovals;
+  QSet<SExpression> mDisappearedErcApprovals;
+  std::shared_ptr<slint::VectorModel<ui::RuleCheckMessageData>> mErcMessages;
 };
 
 /*******************************************************************************

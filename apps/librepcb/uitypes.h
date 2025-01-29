@@ -25,6 +25,7 @@
  ******************************************************************************/
 #include "appwindow.h"
 
+#include <librepcb/core/rulecheck/rulecheckmessage.h>
 #include <librepcb/core/types/lengthunit.h>
 #include <librepcb/core/workspace/theme.h>
 
@@ -90,6 +91,19 @@ inline ui::LengthUnit l2s(const LengthUnit& v) noexcept {
   } else {
     qCritical() << "Unhandled value in LengthUnit conversion.";
     return ui::LengthUnit::Millimeters;
+  }
+}
+
+inline ui::NotificationType l2s(RuleCheckMessage::Severity v) noexcept {
+  if (v == RuleCheckMessage::Severity::Hint) {
+    return ui::NotificationType::Info;
+  } else if (v == RuleCheckMessage::Severity::Warning) {
+    return ui::NotificationType::Warning;
+  } else if (v == RuleCheckMessage::Severity::Error) {
+    return ui::NotificationType::Critical;
+  } else {
+    qCritical() << "Unhandled value in RuleCheckMessage::Severity conversion.";
+    return ui::NotificationType::Critical;
   }
 }
 

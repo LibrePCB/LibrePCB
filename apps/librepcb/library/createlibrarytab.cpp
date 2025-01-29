@@ -84,6 +84,7 @@ ui::TabData CreateLibraryTab::getBaseUiData() const noexcept {
       q2s(tr("New Library")),  // Title
       q2s(QPixmap(":/plus.svg")),  // Icon
       -1,  // Project index
+      nullptr,  // Rule check messages
       false,  // Can save
       false,  // Can export graphics
       false,  // Can undo

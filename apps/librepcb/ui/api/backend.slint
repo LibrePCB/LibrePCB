@@ -22,13 +22,15 @@ export global Backend {
 
     // A schematic in the projects panel has been clicked
     //
+    // - Project index
     // - Schematic index
-    pure callback schematic-clicked(int);
+    pure callback schematic-clicked(int, int);
 
     // A board in the projects panel has been clicked
     //
+    // - Project index
     // - Board index
-    pure callback board-clicked(int);
+    pure callback board-clicked(int, int);
 
     // Requested to switch to a particular tab
     //

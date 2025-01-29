@@ -36,6 +36,9 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class LengthUnit;
+
 namespace editor {
 namespace app {
 
@@ -80,6 +83,7 @@ public:
   void zoomFit(float width, float height) noexcept;
   void zoomIn(float width, float height) noexcept;
   void zoomOut(float width, float height) noexcept;
+  void highlight() noexcept;
 
   // Operator Overloadings
   WindowSection& operator=(const WindowSection& rhs) = delete;
@@ -87,7 +91,7 @@ public:
 signals:
   void uiDataChanged();
   void currentProjectChanged(std::shared_ptr<ProjectEditor> prj);
-  void cursorCoordinatesChanged(const Point& pos);
+  void cursorCoordinatesChanged(const Point& pos, const LengthUnit& unit);
 
 private:
   void requestRepaint() noexcept;

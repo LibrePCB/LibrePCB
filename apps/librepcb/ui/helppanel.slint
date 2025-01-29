@@ -1,4 +1,4 @@
-import { PanelHeader } from "./common/panelheader.slint";
+import { PanelHeader, PanelHeaderButton } from "./common/panelheader.slint";
 import { Data } from "./api/data.slint";
 import { ActionId } from "./api/types.slint";
 import { Backend } from "./api/backend.slint";
@@ -135,63 +135,26 @@ export component HelpPanel inherits Rectangle {
 
         PanelHeader {
             title: @tr("Details");
+            note: @tr("(please copy this into bug reports)");
 
-            Text {
-                horizontal-stretch: 1;
-                font-size: 11px;
-                font-italic: true;
-                vertical-alignment: center;
-                overflow: elide;
-                text: @tr("(please copy this into bug reports)");
-            }
+            PanelHeaderButton {
+                icon: t-copy-countdown.running ? @image-url("img/check.svg") : @image-url("img/copy.svg");
+                icon-scale: 0.5;
+                tooltip: t-copy-countdown.running ? @tr("Copied!") : @tr("Copy to Clipboard");
+                colorize: t-copy-countdown.running ? lime : transparent;
 
-            Rectangle {
-                width: parent.content-height;
-                height: parent.content-height;
-                background: ta-copy.has-hover ? #454545 : transparent;
-                border-radius: 3px;
-
-                ta-copy := TouchArea {
-                    t-copy := Timer {
-                        interval: 1s;
-                        running: false;
-
-                        triggered => {
-                            i-copy.visible = true;
-                            i-copy-check.visible = false;
-                            self.running = false;
-                        }
+                clicked => {
+                    if (Backend.action-triggered(ActionId.copy-application-details-into-clipboard, -1)) {
+                        t-copy-countdown.running = true;
                     }
+                }
 
-                    i-copy := Image {
-                        y: parent.pressed ? 7px : 6px;
-                        width: self.height;
-                        height: parent.height - self.y * 2;
-                        source: @image-url("img/copy.svg");
-                        colorize: parent.has-hover ? white : Palette.foreground;
-                    }
+                t-copy-countdown := Timer {
+                    interval: 1s;
+                    running: false;
 
-                    i-copy-check := Image {
-                        y: 6px;
-                        width: self.height;
-                        height: parent.height - self.y * 2;
-                        source: @image-url("img/check.svg");
-                        colorize: lime;
-                        visible: false;
-                    }
-
-                    if self.has-hover: ToolTip {
-                        x: (parent.width / 2) - (self.width / 2);
-                        y: parent.height + 5px;
-                        text: i-copy-check.visible ? @tr("Copied!") : @tr("Copy to Clipboard");
-                    }
-
-                    clicked => {
-                        if (Backend.action-triggered(ActionId.copy-application-details-into-clipboard, -1)) {
-                            i-copy.visible = false;
-                            i-copy-check.visible = true;
-                            t-copy.running = true;
-                        }
+                    triggered => {
+                        self.running = false;
                     }
                 }
             }

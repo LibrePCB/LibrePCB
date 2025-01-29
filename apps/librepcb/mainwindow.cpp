@@ -101,13 +101,15 @@ MainWindow::MainWindow(GuiApplication& app,
           });
   connect(mSections.get(), &WindowSectionsModel::currentProjectChanged, this,
           &MainWindow::setCurrentProject);
-  connect(
-      mSections.get(), &WindowSectionsModel::cursorCoordinatesChanged, this,
-      [&d](const Point& pos) {
-        d.set_cursor_coordinates(q2s(QString("X: %1 Y: %2")
-                                         .arg(pos.getX().toMm(), 7, 'f', 3)
-                                         .arg(pos.getY().toMm(), 7, 'f', 3)));
-      });
+  connect(mSections.get(), &WindowSectionsModel::cursorCoordinatesChanged, this,
+          [&d](const Point& pos, const LengthUnit& unit) {
+            d.set_cursor_coordinates(
+                q2s(QString("X: %1 Y: %2")
+                        .arg(unit.convertToUnit(pos.getX()), 10, 'f',
+                             unit.getReasonableNumberOfDecimals())
+                        .arg(unit.convertToUnit(pos.getY()), 10, 'f',
+                             unit.getReasonableNumberOfDecimals())));
+          });
 
   // Register global callbacks.
   const ui::Backend& b = mWindow->global<ui::Backend>();
@@ -118,13 +120,13 @@ MainWindow::MainWindow(GuiApplication& app,
       std::bind(&MainWindow::keyPressed, this, std::placeholders::_1));
   b.on_project_item_doubleclicked(std::bind(
       &MainWindow::projectItemDoubleClicked, this, std::placeholders::_1));
-  b.on_schematic_clicked([this](int index) {
-    if (auto prj = getCurrentProject()) {
+  b.on_schematic_clicked([this](int projectIndex, int index) {
+    if (auto prj = mApp.getProjects().getProject(projectIndex)) {
       mSections->openSchematic(prj, index);
     }
   });
-  b.on_board_clicked([this](int index) {
-    if (auto prj = getCurrentProject()) {
+  b.on_board_clicked([this](int projectIndex, int index) {
+    if (auto prj = mApp.getProjects().getProject(projectIndex)) {
       mSections->openBoard(prj, index);
     }
   });

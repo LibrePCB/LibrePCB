@@ -1,0 +1,119 @@
+import { ListView, TabWidget } from "std-widgets.slint";
+import { PanelHeader } from "./common/panelheader.slint";
+import { Data } from "./api/data.slint";
+import { Backend } from "./api/backend.slint";
+import { RuleCheckMessageData } from "./api/types.slint";
+import { ListViewItemButton } from "./common/listviewitembutton.slint";
+
+component Item inherits Rectangle {
+    in-out property <RuleCheckMessageData> msg;
+    in property <bool> is-selected: false;
+
+    callback clicked <=> ta.clicked;
+
+    background: ta.has-hover ? #404040 : (is-selected ? #353535 : transparent);
+
+    ta := TouchArea {
+        HorizontalLayout {
+            padding: 3px;
+            padding-left: 5px;
+            padding-right: 5px;
+            spacing: 5px;
+
+            Rectangle {
+                width: self.height;
+
+                i-icon := Image {
+                    x: 2px;
+                    y: self.x;
+                    width: self.height;
+                    height: parent.height - 2 * self.x;
+                    source: Data.get-icon-for-notification-type(msg.severity);
+                    colorize: msg.approved ? t-title.color : Data.get-color-for-notification-type(msg.severity);
+                }
+            }
+
+            t-title := Text {
+                vertical-alignment: center;
+                font-italic: msg.approved;
+                text: msg.message;
+            }
+
+            if is-selected || ta.has-hover: ListViewItemButton {
+                icon: @image-url("img/wand-magic-sparkles-solid.svg");
+                tooltip: @tr("Apply Automatic Fix");
+            }
+
+            if is-selected || ta.has-hover || msg.approved: ListViewItemButton {
+                icon: msg.approved ? @image-url("img/eye-slash-fill.svg") : @image-url("img/eye-fill.svg");
+                tooltip: msg.approved ? @tr("Remove Approval") : @tr("Approve");
+
+                clicked => {
+                    msg.approved = !msg.approved;
+                }
+            }
+        }
+
+        if msg.approved: Rectangle {
+            x: t-title.x;
+            y: t-title.y + (t-title.height / 2);
+            height: 1px;
+            width: t-title.preferred-width;
+            background: t-title.color;
+        }
+    }
+}
+
+export component RuleCheckPanel inherits Rectangle {
+    property <int> selected-index: -1;
+    property <RuleCheckMessageData> selected-message: Data.current-tab.rule-check-messages[selected-index];
+    property <bool> item-selected: (selected-index >= 0) && (selected-index < Data.current-tab.rule-check-messages.length);
+    property <string> title: Data.get-rule-check-title-for-tab-type(Data.current-tab.type);
+
+    background: #2a2a2a;
+
+    VerticalLayout {
+        header := PanelHeader {
+            z: 10;  // For the tooltip.
+            title: title.is-empty ? @tr("Rule Check Messages") : title;
+        }
+
+        if Data.current-tab.rule-check-messages.length > 0: ListView {
+            vertical-stretch: 1;
+
+            for msg[index] in Data.current-tab.rule-check-messages: Item {
+                msg: msg;
+                is-selected: (index == selected-index);
+
+                clicked => {
+                    selected-index = index;
+                }
+            }
+        }
+
+        if Data.current-tab.rule-check-messages.length == 0: VerticalLayout {
+            padding: 8px;
+
+            Text {
+                width: 100%;
+                font-italic: true;
+                wrap: word-wrap;
+                text: title.is-empty ? @tr("Not available for the current tab.") : @tr("No messages.");
+            }
+        }
+
+        if item-selected: PanelHeader {
+            title: selected-message.message;
+        }
+
+        if item-selected: VerticalLayout {
+            padding: 8px;
+
+            Text {
+                width: 100%;
+                wrap: word-wrap;
+                text: selected-message.description;
+            }
+        }
+    }
+}

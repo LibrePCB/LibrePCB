@@ -97,6 +97,7 @@ ui::TabData Board2dTab::getBaseUiData() const noexcept {
       q2s(brd ? *brd->getName() : QString()),  // Title
       q2s(QPixmap(":/projects.png")),  // Icon
       mApp.getProjects().getIndexOf(mEditor),  // Project index
+      nullptr,  // Rule check messages
       true,  // Can save
       true,  // Can export graphics
       mProject->getUndoStack().canUndo(),  // Can undo
@@ -170,6 +171,14 @@ void Board2dTab::updateGridIntervalUiStr() noexcept {
       mUiData.grid_interval = str;
       emit uiDataChanged();
     }
+  }
+}
+
+const LengthUnit* Board2dTab::getCurrentUnit() const noexcept {
+  if (auto brd = mProject->getProject().getBoardByIndex(mObjIndex)) {
+    return &brd->getGridUnit();
+  } else {
+    return nullptr;
   }
 }
 

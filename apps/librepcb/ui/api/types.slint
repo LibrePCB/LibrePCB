@@ -2,7 +2,7 @@ export enum MainPage {
     home,
     libraries,
     project,
-    drc,
+    rule-check,
     order,
     search,
     help,
@@ -105,6 +105,19 @@ export struct NotificationData {
     dont-show-again: bool,  // If set by UI, backend shall delete notification.
 }
 
+//export enum RuleCheckMessageSeverity {
+//    hint,
+//    warning,
+//    error,
+//}
+
+export struct RuleCheckMessageData {
+    severity: NotificationType,
+    message: string,
+    description: string,
+    approved: bool,
+}
+
 export enum LibraryType {
     local,
     remote,
@@ -138,6 +151,12 @@ export struct FolderTreeItemData {
     is-folder: bool,
 }
 
+export struct QuickAccessItemData {
+    name: string,
+    path: string,
+    pinned: bool,
+}
+
 export struct ProjectData {
     valid: bool,
     path: string,
@@ -155,10 +174,14 @@ export enum TabType {
 }
 
 export struct TabData {
+    // Meta
     type: TabType,
     title: string,
     icon: image,
     project-index: int,
+
+    // Rule check
+    rule-check-messages: [RuleCheckMessageData],
 
     // Features
     can-save: bool,
@@ -245,6 +268,7 @@ export struct WindowSectionData {
     board-2d-tabs: [Board2dTabData],
     board-3d-tabs: [Board3dTabData],
     current-tab-index: int,  // Currently opened tab in this section
+    highlight: bool,
     frame: int, // Frame index to trigger repainting
 }
 

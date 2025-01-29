@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_WORKSPACE_RECENTPROJECTSMODEL_H
-#define LIBREPCB_WORKSPACE_RECENTPROJECTSMODEL_H
+#ifndef LIBREPCB_WORKSPACE_QUICKACCESSMODEL_H
+#define LIBREPCB_WORKSPACE_QUICKACCESSMODEL_H
 
 /*******************************************************************************
  *  Includes
@@ -40,43 +40,48 @@ namespace editor {
 namespace app {
 
 /*******************************************************************************
- *  Class RecentProjectsModel
+ *  Class QuickAccessModel
  ******************************************************************************/
 
 /**
- * @brief The RecentProjectsModel class
+ * @brief The QuickAccessModel class
  */
-class RecentProjectsModel : public QObject,
-                            public slint::Model<ui::FolderTreeItemData> {
+class QuickAccessModel : public QObject,
+                         public slint::Model<ui::QuickAccessItemData> {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  RecentProjectsModel() = delete;
-  RecentProjectsModel(const RecentProjectsModel& other) = delete;
-  explicit RecentProjectsModel(Workspace& ws,
-                               QObject* parent = nullptr) noexcept;
-  virtual ~RecentProjectsModel() noexcept;
+  QuickAccessModel() = delete;
+  QuickAccessModel(const QuickAccessModel& other) = delete;
+  explicit QuickAccessModel(Workspace& ws, QObject* parent = nullptr) noexcept;
+  virtual ~QuickAccessModel() noexcept;
 
   // General Methods
-  void push(const FilePath& fp) noexcept;
+  void pushRecentProject(const FilePath& fp) noexcept;
+  void setFavoriteProject(const FilePath& fp, bool favorite) noexcept;
 
   // Implementations
   std::size_t row_count() const override;
-  std::optional<ui::FolderTreeItemData> row_data(std::size_t i) const override;
+  std::optional<ui::QuickAccessItemData> row_data(std::size_t i) const override;
+  void set_row_data(std::size_t i,
+                    const ui::QuickAccessItemData& data) noexcept override;
 
   // Operator Overloadings
-  RecentProjectsModel& operator=(const RecentProjectsModel& rhs) = delete;
+  QuickAccessModel& operator=(const QuickAccessModel& rhs) = delete;
 
 private:
   void load() noexcept;
-  void save() noexcept;
+  void saveRecentProjects() noexcept;
+  void saveFavoriteProjects() noexcept;
   void refreshItems() noexcept;
 
   const Workspace& mWorkspace;
-  const FilePath mFilePath;
-  QList<FilePath> mPaths;
-  std::vector<ui::FolderTreeItemData> mItems;
+  const FilePath mRecentProjectsFp;
+  const FilePath mFavoriteProjectsFp;
+  QList<FilePath> mRecentProjects;
+  QList<FilePath> mFavoriteProjects;
+  std::vector<ui::QuickAccessItemData> mItems;
 };
 
 /*******************************************************************************
