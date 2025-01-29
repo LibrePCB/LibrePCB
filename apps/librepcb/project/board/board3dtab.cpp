@@ -83,6 +83,7 @@ ui::TabData Board3dTab::getBaseUiData() const noexcept {
       q2s(brd ? *brd->getName() : QString()),  // Title
       q2s(QPixmap(":/3d.svg")),  // Icon
       mApp.getProjects().getIndexOf(mEditor),  // Project index
+      nullptr,  // Rule check messages
       true,  // Can save
       false,  // Can export graphics
       mProject->getUndoStack().canUndo(),  // Can undo

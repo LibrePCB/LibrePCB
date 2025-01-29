@@ -74,6 +74,9 @@ public:
   // Operator Overloadings
   Board2dTab& operator=(const Board2dTab& rhs) = delete;
 
+protected:
+  const LengthUnit* getCurrentUnit() const noexcept override;
+
 private:
   void updateGridIntervalUiStr() noexcept;
 

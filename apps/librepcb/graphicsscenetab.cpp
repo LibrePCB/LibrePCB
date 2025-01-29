@@ -204,7 +204,9 @@ bool GraphicsSceneTab::processScenePointerEvent(
     }
 
     const Point scenePos = Point::fromPx(scenePosPx);
-    emit cursorCoordinatesChanged(scenePos);
+    if (auto unit = getCurrentUnit()) {
+      emit cursorCoordinatesChanged(scenePos, *unit);
+    }
   }
 
   return eventConsumed;

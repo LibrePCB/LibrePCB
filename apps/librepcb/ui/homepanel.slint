@@ -1,8 +1,64 @@
 import { ListView } from "std-widgets.slint";
 import { PanelHeader } from "./common/panelheader.slint";
-import { FolderTreeItemData } from "./api/types.slint";
+import { FolderTreeItemData, QuickAccessItemData } from "./api/types.slint";
 import { Backend } from "./api/backend.slint";
 import { Data } from "./api/data.slint";
+import { ListViewItemButton } from "./common/listviewitembutton.slint";
+
+component QuickAccessList inherits ListView {
+    property <int> current-index: -1;
+    property <length> item-height: 20px;
+    in-out property <[QuickAccessItemData]> model: Data.quick-access-items;
+
+    preferred-height: model.length * item-height;
+
+    for item[index] in model: Rectangle {
+        width: parent.width;
+        height: item-height;
+        background: (current-index == index) ? #454545 : (ta.has-hover ? #383838 : transparent);
+
+        ta := TouchArea {
+            HorizontalLayout {
+                spacing: 5px;
+                padding-left: 5px;
+                padding-right: 5px;
+
+                Image {
+                    y: 1px;
+                    width: parent.height - 2px;
+                    height: parent.height - 2px;
+                    source: @image-url("img/library.png");
+                }
+
+                Text {
+                    horizontal-stretch: 1;
+                    color: #dddddd;
+                    font-size: 14px;
+                    font-weight: 400;
+                    overflow: TextOverflow.elide;
+                    text: item.name;
+                }
+
+                if item.pinned || ta.has-hover || (current-index == index): ListViewItemButton {
+                    icon: item.pinned ? @image-url("img/pin-angle-fill.svg") : @image-url("img/pin-angle.svg");
+                    tooltip: item.pinned ? @tr("Unpin") : @tr("Pin");
+
+                    clicked => {
+                        item.pinned = !item.pinned;
+                    }
+                }
+            }
+
+            clicked => {
+                current-index = index;
+            }
+
+            double-clicked => {
+                Backend.project-item-doubleclicked(item.path);
+            }
+        }
+    }
+}
 
 component FolderTree inherits ListView {
     property <int> current-index: -1;
@@ -61,27 +117,19 @@ export component HomePanel inherits Rectangle {
     background: #2a2a2a;
 
     VerticalLayout {
-        PanelHeader {
-            title: @tr("RECENTLY OPENED");
+        if Data.quick-access-items.length > 0: PanelHeader {
+            title: @tr("QUICK ACCESS");
         }
 
-        FolderTree {
+        if Data.quick-access-items.length > 0: QuickAccessList {
             vertical-stretch: 0;
-            model: Data.recent-projects;
+        }
+
+        if Data.quick-access-items.length > 0: Rectangle {
+            height: 15px;
         }
 
         PanelHeader {
-            spacing-top: 15px;
-            title: @tr("FAVORITES");
-        }
-
-        FolderTree {
-            vertical-stretch: 0;
-            model: Data.favorite-projects;
-        }
-
-        PanelHeader {
-            spacing-top: 15px;
             title: @tr("WORKSPACE");
         }
 

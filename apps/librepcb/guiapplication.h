@@ -39,13 +39,12 @@ class Workspace;
 namespace editor {
 namespace app {
 
-class FavoriteProjectsModel;
 class LibrariesModel;
 class MainWindow;
 class Notification;
 class NotificationsModel;
 class ProjectsModel;
-class RecentProjectsModel;
+class QuickAccessModel;
 
 /*******************************************************************************
  *  Class GuiApplication
@@ -88,8 +87,7 @@ private:
   std::shared_ptr<NotificationsModel> mNotifications;
   std::shared_ptr<Notification> mNotificationNoLibrariesInstalled;
   std::shared_ptr<Notification> mNotificationDesktopIntegration;
-  std::shared_ptr<RecentProjectsModel> mRecentProjects;
-  std::shared_ptr<FavoriteProjectsModel> mFavoriteProjects;
+  std::shared_ptr<QuickAccessModel> mQuickAccessModel;
   std::shared_ptr<LibrariesModel> mLibraries;
   std::shared_ptr<ProjectsModel> mProjects;
   QList<std::shared_ptr<MainWindow>> mWindows;

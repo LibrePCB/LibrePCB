@@ -1,5 +1,6 @@
 import {
     FolderTreeItemData,
+    QuickAccessItemData,
     LibraryData,
     LibraryState,
     LibraryType,
@@ -8,6 +9,7 @@ import {
     SchematicTool,
     TabType,
     WindowSectionData,
+    RuleCheckMessageData,
     GridStyle,
     TabData,
     SchematicTabData,
@@ -88,20 +90,23 @@ export global Data {
         },
     ];
 
-    in property <[FolderTreeItemData]> recent-projects: [
+    in property <[QuickAccessItemData]> quick-access-items: [
         {
-            icon: @image-url("../img/library.png"),
             name: "project-1.lpp",
             path: "/path/to/project-1.lpp",
+            pinned: false,
         },
         {
-            icon: @image-url("../img/library.png"),
             name: "project-2.lpp",
             path: "/path/to/project-2.lpp",
+            pinned: false,
+        },
+        {
+            name: "project-3.lpp",
+            path: "/path/to/project-3.lpp",
+            pinned: true,
         },
     ];
-
-    in property <[FolderTreeItemData]> favorite-projects: recent-projects;
 
     in property <[ProjectData]> projects: [
         {
@@ -120,7 +125,7 @@ export global Data {
         },
     ];
 
-    in property <int> current-project-index: 0;
+    in-out property <int> current-project-index: 0;
 
     in property <bool> refreshing-available-libraries: true;
 
@@ -188,6 +193,26 @@ export global Data {
                     title: "Schematic",
                     icon: @image-url("../img/image.svg"),
                     project-index: 0,
+                    rule-check-messages: [
+                        {
+                            severity: NotificationType.info,
+                            message: "Hint message",
+                            description: "Hint description.",
+                            approved: false,
+                        },
+                        {
+                            severity: NotificationType.warning,
+                            message: "Warning message",
+                            description: "Warning description.",
+                            approved: true,
+                        },
+                        {
+                            severity: NotificationType.critical,
+                            message: "Error message",
+                            description: "Error description.",
+                            approved: false,
+                        },
+                    ],
                     can-save: true,
                     can-export-graphics: true,
                     can-undo: true,
@@ -275,6 +300,7 @@ export global Data {
                 },
             ],
             current-tab-index: 2,
+            highlight: true,
         },
         {
             tabs: [
@@ -292,7 +318,7 @@ export global Data {
         },
     ];
 
-    in property <int> current-section-index: 0;
+    in-out property <int> current-section-index: 0;
 
     // Constant data
     out property <[LengthUnit]> all-length-units: [
@@ -383,6 +409,25 @@ export global Data {
         } else {
             debug("Unhandled case in get-color-for-notification-type().");
             return white;
+        }
+    }
+
+    public function section-clicked(index: int) {
+        if (current-section-index != index) {
+            current-section-index = index;
+            if ((current-tab.project-index >= 0) && (current-tab.project-index < Data.projects.length)) {
+                current-project-index = current-tab.project-index;
+            }
+        }
+    }
+
+    pure public function get-rule-check-title-for-tab-type(type: TabType) -> string {
+        if (type == TabType.schematic) {
+            return @tr("Electrical Rule Check (ERC)");
+        } else if (type == TabType.board-2d) {
+            return @tr("Design Rule Check (DRC)");
+        } else {
+            return "";
         }
     }
 }

@@ -36,6 +36,9 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class LengthUnit;
+
 namespace editor {
 
 class GraphicsScene;
@@ -111,7 +114,7 @@ public:
   WindowTab& operator=(const WindowTab& rhs) = delete;
 
 signals:
-  void cursorCoordinatesChanged(const Point& pos);
+  void cursorCoordinatesChanged(const Point& pos, const LengthUnit& unit);
   void requestClose();
   void requestRepaint();
   void uiDataChanged();

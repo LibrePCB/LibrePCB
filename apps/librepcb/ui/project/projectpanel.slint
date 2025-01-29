@@ -1,24 +1,80 @@
-import { PanelHeader } from "../common/panelheader.slint";
+import { PanelHeader, PanelHeaderButton } from "../common/panelheader.slint";
 import { Data } from "../api/data.slint";
 import { Backend } from "../api/backend.slint";
 import { ProjectData } from "../api/types.slint";
+import { ToolTip } from "../common/tooltip.slint";
 
 component ProjectItem inherits Rectangle {
     in property <string> text <=> t-title.text;
+    in property <image> icon <=> i-icon.source;
 
     callback clicked <=> ta.clicked;
 
     background: ta.has-hover ? #404040 : transparent;
 
     HorizontalLayout {
-        padding: 2px;
-        padding-left: 12px;
+        padding: 3px;
+        padding-left: 5px;
         padding-right: 5px;
+        spacing: 5px;
 
-        t-title := Text { }
+        Rectangle {
+            width: self.height;
+
+            i-icon := Image {
+                x: 2px;
+                y: self.x;
+                width: self.height;
+                height: parent.height - 2 * self.x;
+                colorize: t-title.color;
+            }
+        }
+
+        t-title := Text {
+            vertical-alignment: center;
+        }
     }
 
     ta := TouchArea { }
+}
+
+component Project inherits VerticalLayout {
+    in property <ProjectData> project;
+    in property <int> project-index;
+
+    vertical-stretch: 0;
+
+    header := PanelHeader {
+        z: 10;  // For the tooltip.
+        title: project.name;
+
+        Rectangle {
+            horizontal-stretch: 1;
+        }
+
+        PanelHeaderButton {
+            icon: @image-url("../img/close.svg");
+            tooltip: @tr("Close Project");
+        }
+    }
+
+    for schematic[index] in project.schematics: ProjectItem {
+        text: schematic;
+        icon: @image-url("../img/image.svg");
+
+        clicked => {
+            Backend.schematic-clicked(project-index, index);
+        }
+    }
+
+    for board[index] in project.boards: ProjectItem {
+        text: board;
+        icon: @image-url("../img/projects.png");
+
+        clicked => {
+            Backend.board-clicked(project-index, index);
+        }
+    }
 }
 
 export component ProjectPanel inherits Rectangle {
@@ -27,31 +83,18 @@ export component ProjectPanel inherits Rectangle {
     VerticalLayout {
         alignment: LayoutAlignment.start;
 
-        PanelHeader {
-            title: Data.current-project.name;
-        }
-
-        PanelHeader {
-            title: @tr("SCHEMATICS");
-        }
-
-        for schematic[index] in Data.current-project.schematics: ProjectItem {
-            text: schematic;
-
-            clicked => {
-                Backend.schematic-clicked(index);
+        for project[project-index] in Data.projects: Rectangle {
+            Project {
+                project: project;
+                project-index: project-index;
             }
-        }
 
-        PanelHeader {
-            title: @tr("BOARDS");
-        }
-
-        for board[index] in Data.current-project.boards: ProjectItem {
-            text: board;
-
-            clicked => {
-                Backend.board-clicked(index);
+            if project-index == Data.current-project-index: Rectangle {
+                x: 0;
+                y: 8px;
+                width: 1px;
+                height: parent.height - self.y - 4px;
+                background: #29d682;
             }
         }
     }

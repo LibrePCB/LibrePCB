@@ -36,6 +36,9 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class LengthUnit;
+
 namespace editor {
 namespace app {
 
@@ -91,11 +94,14 @@ public:
 
 signals:
   void currentProjectChanged(std::shared_ptr<ProjectEditor> prj);
-  void cursorCoordinatesChanged(const Point& pos);
+  void cursorCoordinatesChanged(const Point& pos, const LengthUnit& unit);
 
 private:
   void splitSection(int sectionIndex) noexcept;
   void addTab(std::shared_ptr<WindowTab> tab) noexcept;
+  template <typename T>
+  bool switchToOpenTab(std::shared_ptr<ProjectEditor> prj,
+                       int objIndex) noexcept;
 
   GuiApplication& mApp;
   const ui::Data& mUiData;

@@ -63,7 +63,7 @@ component Tab inherits Rectangle {
     }
 }
 
-export component WindowSectionData inherits Rectangle {
+export component WindowSection inherits Rectangle {
     in-out property <int> section-index;
     in-out property <WindowSectionData> section;
     property <bool> is-current-section: (section-index == Data.current-section-index);
@@ -195,6 +195,15 @@ export component WindowSectionData inherits Rectangle {
             height: 100%;
             section-index: section-index;
             section: section;
+        }
+
+        // Highlight rectangle
+        property <float> highlight-percentage:section.highlight ? 1.2 : 0;
+        animate highlight-percentage { duration: 700ms; }
+        if (highlight-percentage > 0): Rectangle {
+            border-color: #29d682;
+            border-width: 3px;
+            opacity: (!section.highlight) ? 0 : (1.2 - highlight-percentage);
         }
     }
 }

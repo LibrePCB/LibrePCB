@@ -21,9 +21,7 @@ export component EmptyTab inherits Rectangle {
     TouchArea {
         pointer-event(e) => {
             if (e.kind == PointerEventKind.down) {
-                if (Data.current-section-index != section-index) {
-                    Data.current-section-index = section-index;
-                }
+                Data.section-clicked(section-index);
                 if (!fs.has-focus) {
                     fs.focus();
                 }

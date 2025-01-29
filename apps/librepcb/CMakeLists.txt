@@ -52,12 +52,10 @@ add_executable(
   windowtabsmodel.cpp
   windowtabsmodel.h
   windowtabsmodeladapter.h
-  workspace/favoriteprojectsmodel.cpp
-  workspace/favoriteprojectsmodel.h
   workspace/filesystemmodel.cpp
   workspace/filesystemmodel.h
-  workspace/recentprojectsmodel.cpp
-  workspace/recentprojectsmodel.h
+  workspace/quickaccessmodel.cpp
+  workspace/quickaccessmodel.h
 )
 slint_target_sources(
   librepcb ui/appwindow.slint

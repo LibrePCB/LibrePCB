@@ -106,17 +106,23 @@ bool WindowSectionsModel::actionTriggered(ui::ActionId id,
       return true;
     }
   } else if (id == ui::ActionId::CreateLibraryTabOpen) {
-    addTab(std::make_shared<CreateLibraryTab>(mApp, this));
+    if (!switchToOpenTab<CreateLibraryTab>(nullptr, -1)) {
+      addTab(std::make_shared<CreateLibraryTab>(mApp, this));
+    }
     return true;
   } else if (id == ui::ActionId::DownloadLibraryTabOpen) {
-    addTab(std::make_shared<DownloadLibraryTab>(mApp, this));
+    if (!switchToOpenTab<DownloadLibraryTab>(nullptr, -1)) {
+      addTab(std::make_shared<DownloadLibraryTab>(mApp, this));
+    }
     return true;
   } else if (id == ui::ActionId::Board2dTabOpen3d) {
     if (std::shared_ptr<WindowSection> s = mItems.value(sectionIndex)) {
       if (auto t = s->getCurrentTab()) {
         if (auto prj = t->getProject()) {
-          addTab(
-              std::make_shared<Board3dTab>(mApp, prj, t->getObjIndex(), this));
+          if (!switchToOpenTab<Board3dTab>(prj, t->getObjIndex())) {
+            addTab(std::make_shared<Board3dTab>(mApp, prj, t->getObjIndex(),
+                                                this));
+          }
         }
       }
     }
@@ -128,12 +134,16 @@ bool WindowSectionsModel::actionTriggered(ui::ActionId id,
 
 void WindowSectionsModel::openSchematic(std::shared_ptr<ProjectEditor> prj,
                                         int index) noexcept {
-  addTab(std::make_shared<SchematicTab>(mApp, prj, index, this));
+  if (!switchToOpenTab<SchematicTab>(prj, index)) {
+    addTab(std::make_shared<SchematicTab>(mApp, prj, index, this));
+  }
 }
 
 void WindowSectionsModel::openBoard(std::shared_ptr<ProjectEditor> prj,
                                     int index) noexcept {
-  addTab(std::make_shared<Board2dTab>(mApp, prj, index, this));
+  if (!switchToOpenTab<Board2dTab>(prj, index)) {
+    addTab(std::make_shared<Board2dTab>(mApp, prj, index, this));
+  }
 }
 
 void WindowSectionsModel::setCurrentTab(int sectionIndex,
@@ -257,6 +267,25 @@ void WindowSectionsModel::addTab(std::shared_ptr<WindowTab> tab) noexcept {
     s->addTab(tab);
     setCurrentTab(sectionIndex, s->getTabCount() - 1);
   }
+}
+
+template <typename T>
+bool WindowSectionsModel::switchToOpenTab(std::shared_ptr<ProjectEditor> prj,
+                                          int objIndex) noexcept {
+  for (int i = 0; i < mItems.count(); ++i) {
+    auto section = mItems.at(i);
+    for (std::size_t k = 0; k < section->getTabCount(); ++k) {
+      if (auto tab = std::dynamic_pointer_cast<T>(section->getTab(k))) {
+        if ((tab->getProject() == prj) && (tab->getObjIndex() == objIndex)) {
+          setCurrentTab(i, k);
+          section->highlight();
+          return true;
+        }
+      }
+    }
+  }
+
+  return false;
 }
 
 /*******************************************************************************

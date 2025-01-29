@@ -98,6 +98,7 @@ public:
 
 protected:
   void invalidateBackground() noexcept;
+  virtual const LengthUnit* getCurrentUnit() const noexcept = 0;
 
 private:
   virtual bool zoom(const QPointF& center, qreal factor) noexcept;

@@ -117,6 +117,7 @@ ui::TabData SchematicTab::getBaseUiData() const noexcept {
       q2s(sch ? *sch->getName() : QString()),  // Title
       q2s(QPixmap(":/image.svg")),  // Icon
       mApp.getProjects().getIndexOf(mEditor),  // Project index
+      mProject->getErcMessages(),  // Rule check messages
       true,  // Can save
       true,  // Can export graphics
       mProject->getUndoStack().canUndo(),  // Can undo
@@ -253,6 +254,14 @@ bool SchematicTab::processScenePointerEvent(
   }
 
   return handled;
+}
+
+const LengthUnit* SchematicTab::getCurrentUnit() const noexcept {
+  if (auto sch = mProject->getProject().getSchematicByIndex(mObjIndex)) {
+    return &sch->getGridUnit();
+  } else {
+    return nullptr;
+  }
 }
 
 void SchematicTab::execGraphicsExportDialog(

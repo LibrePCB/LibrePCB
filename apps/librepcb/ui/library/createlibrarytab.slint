@@ -19,7 +19,7 @@ export component CreateLibraryTab inherits Rectangle {
                 colspan: 2;
                 height: self.preferred-height + 10px;
                 font-size: 14px;
-                font-weight: 600;
+                font-weight: 900;
                 wrap: TextWrap.word-wrap;
                 text: @tr("Create a new local library");
             }
@@ -69,12 +69,14 @@ export component CreateLibraryTab inherits Rectangle {
                     spacing: 8px;
 
                     Text {
+                        font-size: 11px;
                         text: @tr("Examples:");
                     }
 
                     for text[i] in ["My Library", "KiCad Import", "Eagle Import"]: Text {
                         color: white;
                         overflow: elide;
+                        font-size: 11px;
                         text: text;
 
                         TouchArea {
@@ -232,6 +234,7 @@ export component CreateLibraryTab inherits Rectangle {
 
             HorizontalLayout {
                 horizontal-stretch: 1;
+                padding-top: 5px;
                 alignment: start;
 
                 Button {

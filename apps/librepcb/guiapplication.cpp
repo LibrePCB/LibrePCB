@@ -29,9 +29,8 @@
 #include "notificationsmodel.h"
 #include "project/projecteditor.h"
 #include "project/projectsmodel.h"
-#include "workspace/favoriteprojectsmodel.h"
 #include "workspace/filesystemmodel.h"
-#include "workspace/recentprojectsmodel.h"
+#include "workspace/quickaccessmodel.h"
 
 #include <librepcb/core/3d/occmodel.h>
 #include <librepcb/core/application.h>
@@ -63,8 +62,7 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
   : QObject(parent),
     mWorkspace(ws),
     mNotifications(new NotificationsModel(ws, this)),
-    mRecentProjects(new RecentProjectsModel(ws, this)),
-    mFavoriteProjects(new FavoriteProjectsModel(ws, this)),
+    mQuickAccessModel(new QuickAccessModel(ws, this)),
     mLibraries(new LibrariesModel(ws, this)),
     mProjects(new ProjectsModel(ws, this)) {
   mWorkspace.getLibraryDb().startLibraryRescan();
@@ -244,8 +242,7 @@ void GuiApplication::createNewWindow(int projectIndex) noexcept {
   d.set_workspace_folder(std::make_shared<FileSystemModel>(
       mWorkspace, mWorkspace.getProjectsPath(), this));
   d.set_notifications(mNotifications);
-  d.set_recent_projects(mRecentProjects);
-  d.set_favorite_projects(mFavoriteProjects);
+  d.set_quick_access_items(mQuickAccessModel);
   d.set_libraries(mLibraries);
   d.set_projects(mProjects);
   d.set_current_project_index(projectIndex);

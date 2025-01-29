@@ -131,12 +131,17 @@ Files:
  apps/librepcb/ui/img/actions/lock-open.svg
  apps/librepcb/ui/img/box-arrow-left.svg
  apps/librepcb/ui/img/draw-wire.svg
+ apps/librepcb/ui/img/eye-fill.svg
+ apps/librepcb/ui/img/eye-slash-fill.svg
+ apps/librepcb/ui/img/files.svg
  apps/librepcb/ui/img/grid-lines.svg
  apps/librepcb/ui/img/mirror-horizontal.svg
  apps/librepcb/ui/img/mirror-vertical.svg
  apps/librepcb/ui/img/netlabel.svg
  apps/librepcb/ui/img/output-jobs.svg
  apps/librepcb/ui/img/pdf.svg
+ apps/librepcb/ui/img/pin-angle-fill.svg
+ apps/librepcb/ui/img/pin-angle.svg
  apps/librepcb/ui/img/plus.svg
  apps/librepcb/ui/img/print.svg
  apps/librepcb/ui/img/reset.svg
@@ -178,8 +183,11 @@ Files:
  apps/librepcb/ui/img/rotate-ccw.svg
  apps/librepcb/ui/img/rotate-cw.svg
  apps/librepcb/ui/img/ruler.svg
+ apps/librepcb/ui/img/star-solid.svg
+ apps/librepcb/ui/img/star.svg
  apps/librepcb/ui/img/triangle-exclamation.svg
  apps/librepcb/ui/img/undo.svg
+ apps/librepcb/ui/img/wand-magic-sparkles-solid.svg
  apps/librepcb/ui/img/webbrowser.svg
  img/actions/align_horizontally.svg
  img/actions/align_vertically.svg

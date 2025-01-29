@@ -71,7 +71,9 @@ WindowSection::WindowSection(GuiApplication& app, QObject* parent) noexcept
             WindowTabsModelAdapter<Board3dTab, ui::Board3dTabData>>(mTabsModel,
                                                                     this),
         0,
-        0} {
+        false,  // Highlight
+        0,
+    } {
   connect(mTabsModel.get(), &WindowTabsModel::cursorCoordinatesChanged, this,
           &WindowSection::cursorCoordinatesChanged);
   connect(mTabsModel.get(), &WindowTabsModel::requestRepaint, this,
@@ -191,9 +193,19 @@ void WindowSection::zoomOut(float width, float height) noexcept {
   }
 }
 
+void WindowSection::highlight() noexcept {
+  mUiData.highlight = true;
+  emit uiDataChanged();
+
+  QTimer::singleShot(1000, this, [this]() {
+    mUiData.highlight = false;
+    emit uiDataChanged();
+  });
+}
+
 void WindowSection::requestRepaint() noexcept {
   mUiData.frame++;
-  uiDataChanged();
+  emit uiDataChanged();
 }
 
 /*******************************************************************************

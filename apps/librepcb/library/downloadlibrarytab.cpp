@@ -79,6 +79,7 @@ ui::TabData DownloadLibraryTab::getBaseUiData() const noexcept {
       q2s(tr("Download Library")),  // Title
       q2s(QPixmap(":/download.svg")),  // Icon
       -1,  // Project index
+      nullptr,  // Rule check messages
       false,  // Can save
       false,  // Can export graphics
       false,  // Can undo
