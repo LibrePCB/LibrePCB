@@ -63,6 +63,7 @@ public:
   const ui::NotificationData& getUiData() const noexcept { return mUiData; }
   void setUiData(const ui::NotificationData& data) noexcept;
   void resetState() noexcept;
+  void setTitle(const QString& title) noexcept;
   void setDescription(const QString& description) noexcept;
   void setProgress(int progress) noexcept;
   void dismiss() noexcept;

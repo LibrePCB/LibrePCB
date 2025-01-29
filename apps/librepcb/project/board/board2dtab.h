@@ -25,6 +25,8 @@
  ******************************************************************************/
 #include "graphicsscenetab.h"
 
+#include <librepcb/core/project/board/drc/boarddesignrulecheck.h>
+
 #include <QtCore>
 #include <QtGui>
 
@@ -43,6 +45,7 @@ class IF_GraphicsLayerProvider;
 namespace app {
 
 class GuiApplication;
+class Notification;
 class ProjectEditor;
 
 /*******************************************************************************
@@ -78,10 +81,16 @@ protected:
   const LengthUnit* getCurrentUnit() const noexcept override;
 
 private:
+  void startDrc(bool quick) noexcept;
+  void setDrcResult(const BoardDesignRuleCheck::Result& result) noexcept;
   void updateGridIntervalUiStr() noexcept;
 
 private:
   std::shared_ptr<ProjectEditor> mEditor;
+  std::unique_ptr<BoardDesignRuleCheck> mDrc;
+  std::shared_ptr<Notification> mDrcNotification;
+  ui::RuleCheckState mDrcState;
+  std::shared_ptr<slint::VectorModel<ui::RuleCheckMessageData>> mDrcMessages;
   ui::Board2dTabData mUiData;
   std::unique_ptr<BoardPlaneFragmentsBuilder> mPlaneBuilder;
 };

@@ -80,15 +80,7 @@ void ProjectEditor::runErc() noexcept {
     saveErcMessageApprovals(approvals);
 
     // Update UI.
-    mErcMessages->clear();
-    for (const auto& msg : messages) {
-      mErcMessages->push_back(ui::RuleCheckMessageData{
-          l2s(msg->getSeverity()),  // Severity
-          q2s(msg->getMessage()),  // Message
-          q2s(msg->getDescription()),  // Description
-          approvals.contains(msg->getApproval()),  // Approved
-      });
-    }
+    l2s(messages, approvals, *mErcMessages);
 
     qDebug() << "ERC succeeded after" << timer.elapsed() << "ms.";
   } catch (const Exception& e) {

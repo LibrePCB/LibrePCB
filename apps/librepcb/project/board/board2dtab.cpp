@@ -24,6 +24,8 @@
 
 #include "../../apptoolbox.h"
 #include "../../guiapplication.h"
+#include "../../notification.h"
+#include "../../notificationsmodel.h"
 #include "../../uitypes.h"
 #include "../projecteditor.h"
 #include "../projectsmodel.h"
@@ -31,6 +33,7 @@
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boardplanefragmentsbuilder.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/workspace/theme.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
@@ -55,6 +58,11 @@ Board2dTab::Board2dTab(GuiApplication& app, std::shared_ptr<ProjectEditor> prj,
                        int boardIndex, QObject* parent) noexcept
   : GraphicsSceneTab(app, prj, boardIndex, parent),
     mEditor(prj),
+    mDrc(new BoardDesignRuleCheck(this)),
+    mDrcNotification(new Notification(ui::NotificationType::Progress, QString(),
+                                      QString(), QString(), QString(), true)),
+    mDrcState(ui::RuleCheckState::NotRunYet),
+    mDrcMessages(new slint::VectorModel<ui::RuleCheckMessageData>()),
     mUiData{
         q2s(mBackgroundColor),  // Background color
         q2s(Qt::white),  // Overlay color
@@ -75,7 +83,19 @@ Board2dTab::Board2dTab(GuiApplication& app, std::shared_ptr<ProjectEditor> prj,
     mUiData.unit = l2s(brd->getGridUnit());
   }
 
+  // Connect DRC.
+  connect(mDrc.get(), &BoardDesignRuleCheck::progressPercent,
+          mDrcNotification.get(), &Notification::setProgress);
+  connect(mDrc.get(), &BoardDesignRuleCheck::progressStatus,
+          mDrcNotification.get(), &Notification::setDescription);
+  connect(mDrc.get(), &BoardDesignRuleCheck::finished, this,
+          &Board2dTab::setDrcResult);
+
   // Connect undo stack.
+  connect(&prj->getUndoStack(), &UndoStack::stateModified, this, [this]() {
+    mDrcState = ui::RuleCheckState::Outdated;
+    emit uiDataChanged();
+  });
   connect(&prj->getUndoStack(), &UndoStack::stateModified, this,
           &Board2dTab::requestRepaint);
 
@@ -97,7 +117,8 @@ ui::TabData Board2dTab::getBaseUiData() const noexcept {
       q2s(brd ? *brd->getName() : QString()),  // Title
       q2s(QPixmap(":/projects.png")),  // Icon
       mApp.getProjects().getIndexOf(mEditor),  // Project index
-      nullptr,  // Rule check messages
+      mDrcState,  // Rule check state
+      mDrcMessages,  // Rule check messages
       true,  // Can save
       true,  // Can export graphics
       mProject->getUndoStack().canUndo(),  // Can undo
@@ -157,9 +178,68 @@ bool Board2dTab::actionTriggered(ui::ActionId id) noexcept {
     invalidateBackground();
     updateGridIntervalUiStr();
     return true;
+  } else if (id == ui::ActionId::RunQuickCheck) {
+    startDrc(true);
+    return true;
+  } else if (id == ui::ActionId::RunDrc) {
+    startDrc(false);
+    return true;
   }
 
   return GraphicsSceneTab::actionTriggered(id);
+}
+
+const LengthUnit* Board2dTab::getCurrentUnit() const noexcept {
+  if (auto brd = mProject->getProject().getBoardByIndex(mObjIndex)) {
+    return &brd->getGridUnit();
+  } else {
+    return nullptr;
+  }
+}
+
+void Board2dTab::startDrc(bool quick) noexcept {
+  auto board = mProject->getProject().getBoardByIndex(mObjIndex);
+  if (!board) return;
+
+  // Abort any ongoing run.
+  mDrc->cancel();
+
+  // Show progress notification during the run.
+  mDrcNotification->setTitle(
+      (quick ? tr("Running Quick Check") : tr("Running Design Rule Check")) %
+      "...");
+  mApp.getNotifications().add(mDrcNotification);
+
+  // Set UI into busy state during the checks.
+  mDrcState = ui::RuleCheckState::Running;
+  emit uiDataChanged();
+
+  // Run the DRC.
+  mDrc->start(*board, board->getDrcSettings(), quick);  // can throw
+}
+
+void Board2dTab::setDrcResult(
+    const BoardDesignRuleCheck::Result& result) noexcept {
+  // TODO: Handle errors.
+
+  auto board = mProject->getProject().getBoardByIndex(mObjIndex);
+
+  // Detect & remove disappeared messages.
+  const QSet<SExpression> approvals =
+      RuleCheckMessage::getAllApprovals(result.messages);
+  if (board && board->updateDrcMessageApprovals(approvals, result.quick)) {
+    // mProjectEditor.setManualModificationsMade();
+  }
+
+  // Update UI.
+  l2s(result.messages,
+      board ? board->getDrcMessageApprovals() : QSet<SExpression>{},
+      *mDrcMessages);
+  mDrcNotification->dismiss();
+  if (mDrcState == ui::RuleCheckState::Running) {
+    mDrcState = ui::RuleCheckState::UpToDate;
+  }
+  emit uiDataChanged();
 }
 
 void Board2dTab::updateGridIntervalUiStr() noexcept {
@@ -171,14 +251,6 @@ void Board2dTab::updateGridIntervalUiStr() noexcept {
       mUiData.grid_interval = str;
       emit uiDataChanged();
     }
-  }
-}
-
-const LengthUnit* Board2dTab::getCurrentUnit() const noexcept {
-  if (auto brd = mProject->getProject().getBoardByIndex(mObjIndex)) {
-    return &brd->getGridUnit();
-  } else {
-    return nullptr;
   }
 }
 

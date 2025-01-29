@@ -1,4 +1,4 @@
-import { CheckBox, ListView, ProgressIndicator, Spinner, HorizontalBox, VerticalBox, StandardButton } from "std-widgets.slint";
+import { CheckBox, ListView, ProgressIndicator, HorizontalBox, VerticalBox, StandardButton } from "std-widgets.slint";
 import { PanelHeader, PanelHeaderButton } from "../common/panelheader.slint";
 import { LibraryData, LibraryType, LibraryState, ActionId } from "../api/types.slint";
 import { ToolTip } from "../common/tooltip.slint";
@@ -196,16 +196,7 @@ export component LibrariesPanel inherits Rectangle {
         header := PanelHeader {
             z: 10;  // For the tooltip.
             title: @tr("LIBRARIES");
-
-            Rectangle {
-                horizontal-stretch: 1;
-            }
-
-            if Data.refreshing-available-libraries: Spinner {
-                indeterminate: true;
-                width: header.content-height - 4px;
-                height: header.content-height;
-            }
+            show-spinner: Data.refreshing-available-libraries;
 
             PanelHeaderButton {
                 icon: @image-url("../img/download.svg");

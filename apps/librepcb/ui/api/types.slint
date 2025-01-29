@@ -25,6 +25,8 @@ export enum ActionId {
     redo,
     print,
     export-pdf,
+    run-quick-check,
+    run-drc,
     quit,
 
     // Window
@@ -173,6 +175,14 @@ export enum TabType {
     board-3d,
 }
 
+export enum RuleCheckState {
+    not-available,
+    not-run-yet,
+    running,
+    outdated,
+    up-to-date,
+}
+
 export struct TabData {
     // Meta
     type: TabType,
@@ -181,6 +191,7 @@ export struct TabData {
     project-index: int,
 
     // Rule check
+    rule-check-state: RuleCheckState,
     rule-check-messages: [RuleCheckMessageData],
 
     // Features

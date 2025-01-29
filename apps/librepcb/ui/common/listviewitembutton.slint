@@ -17,7 +17,7 @@ export component ListViewItemButton inherits TouchArea {
         height: parent.height * icon-scale * (root.pressed ? 0.85 : 1.0);
         image-fit: contain;
         source: icon;
-        colorize: (colorize != transparent) ? colorize : (root.has-hover ? white : Palette.foreground);
+        colorize: (colorize != transparent) ? colorize : (root.has-hover ? white : (root.enabled ? Palette.foreground : #707070));
     }
 
     if self.has-hover && (!tooltip.is-empty): ToolTip {

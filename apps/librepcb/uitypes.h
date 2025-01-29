@@ -107,6 +107,20 @@ inline ui::NotificationType l2s(RuleCheckMessage::Severity v) noexcept {
   }
 }
 
+inline void l2s(const RuleCheckMessageList& messages,
+                const QSet<SExpression>& approvals,
+                slint::VectorModel<ui::RuleCheckMessageData>& out) noexcept {
+  out.clear();
+  for (const auto& msg : messages) {
+    out.push_back(ui::RuleCheckMessageData{
+        l2s(msg->getSeverity()),  // Severity
+        q2s(msg->getMessage()),  // Message
+        q2s(msg->getDescription()),  // Description
+        approvals.contains(msg->getApproval()),  // Approved
+    });
+  }
+}
+
 /*******************************************************************************
  *  End of File
  ******************************************************************************/

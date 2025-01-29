@@ -117,6 +117,7 @@ ui::TabData SchematicTab::getBaseUiData() const noexcept {
       q2s(sch ? *sch->getName() : QString()),  // Title
       q2s(QPixmap(":/image.svg")),  // Icon
       mApp.getProjects().getIndexOf(mEditor),  // Project index
+      ui::RuleCheckState::UpToDate,  // Rule check state
       mProject->getErcMessages(),  // Rule check messages
       true,  // Can save
       true,  // Can export graphics
@@ -131,7 +132,7 @@ ui::TabData SchematicTab::getBaseUiData() const noexcept {
 }
 
 ui::SchematicTabData SchematicTab::getUiData() const noexcept {
-  const Theme& theme = mApp.getWorkspace().getSettings().themes.getActive();
+  // const Theme& theme = mApp.getWorkspace().getSettings().themes.getActive();
   auto sch = mProject->getProject().getSchematicByIndex(mObjIndex);
   auto pinNumbersLayer =
       mLayerProvider->getLayer(Theme::Color::sSchematicPinNumbers);
@@ -145,8 +146,9 @@ ui::SchematicTabData SchematicTab::getUiData() const noexcept {
 
   return ui::SchematicTabData{
       q2s(mBackgroundColor),  // Background color
-      q2s(theme.getColor(Theme::Color::sSchematicBackground)
-              .getSecondaryColor()),  // Overlay color
+      q2s(/*theme.getColor(Theme::Color::sSchematicBackground)
+              .getSecondaryColor()*/
+          Qt::black),  // Overlay color (TODO)
       l2s(mGridStyle),  // Grid style
       q2s(gridIntervalStr),  // Grid interval
       sch ? l2s(sch->getGridUnit())

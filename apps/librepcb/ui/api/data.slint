@@ -9,7 +9,7 @@ import {
     SchematicTool,
     TabType,
     WindowSectionData,
-    RuleCheckMessageData,
+    RuleCheckState,
     GridStyle,
     TabData,
     SchematicTabData,
@@ -36,7 +36,7 @@ export global Data {
 
     in-out property <bool> ignore-placement-locks: true;
 
-    in-out property <MainPage> current-page: MainPage.home;
+    in-out property <MainPage> current-page: MainPage.libraries;
 
     in property <[NotificationData]> notifications: [
         {
@@ -193,6 +193,7 @@ export global Data {
                     title: "Schematic",
                     icon: @image-url("../img/image.svg"),
                     project-index: 0,
+                    rule-check-state: RuleCheckState.outdated,
                     rule-check-messages: [
                         {
                             severity: NotificationType.info,

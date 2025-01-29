@@ -90,6 +90,11 @@ void Notification::resetState() noexcept {
   mUiData.dont_show_again = false;
 }
 
+void Notification::setTitle(const QString& title) noexcept {
+  mUiData.title = q2s(title);
+  emit changed(false);
+}
+
 void Notification::setDescription(const QString& description) noexcept {
   mUiData.description = q2s(description);
   emit changed(false);
