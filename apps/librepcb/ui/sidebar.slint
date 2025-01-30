@@ -1,7 +1,7 @@
 import { SideBarButton } from "./sidebarbutton.slint";
 import { MainPage } from "./api/types.slint";
 import { Data } from "./api/data.slint";
-import { ActionId, ProjectData } from "./api/types.slint";
+import { ActionId, ProjectData, RuleCheckState } from "./api/types.slint";
 import { Backend } from "./api/backend.slint";
 
 export component SideBar inherits Rectangle {
@@ -47,14 +47,38 @@ export component SideBar inherits Rectangle {
         }
 
         SideBarButton {
+            property <RuleCheckState> state: Data.current-tab.rule-check-state;
+            property <int> messages: Data.current-tab.rule-check-messages.length;
             property <string> title: Data.get-rule-check-title-for-tab-type(Data.current-tab.type);
 
             icon: @image-url("img/drc.svg");
             tooltip: title;
-            status-background: #d4d400;
-            status-color: black;
-            status-text: (Data.current-tab.rule-check-messages.length > 0) ? Data.current-tab.rule-check-messages.length : "";
-            enabled: !title.is-empty;
+            status-background: {
+                if (state == RuleCheckState.running) {
+                    return #d4d400;
+                } else if (state == RuleCheckState.up-to-date) {
+                    return (messages == 0) ? #00ff00 : #ff0000;
+                } else {
+                    return #d4d4d4;
+                }
+            };
+            status-color: {
+                if ((state == RuleCheckState.up-to-date) && (messages != 0)) {
+                    return white;
+                } else {
+                    return black;
+                }
+            };
+            status-text: {
+                if (state == RuleCheckState.running) {
+                    return "...";
+                } else if ((state == RuleCheckState.up-to-date) || (state == RuleCheckState.outdated)) {
+                    return (messages == 0) ? "ok" : messages;
+                } else {
+                    return "";
+                }
+            };
+            enabled: state != RuleCheckState.not-available;
             checked: Data.current-page == MainPage.rule-check;
 
             clicked => {

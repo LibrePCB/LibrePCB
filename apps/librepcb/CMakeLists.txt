@@ -19,6 +19,8 @@ add_executable(
   graphicsscenetab.h
   guiapplication.cpp
   guiapplication.h
+  hometab.cpp
+  hometab.h
   library/createlibrarytab.cpp
   library/createlibrarytab.h
   library/downloadlibrarytab.cpp

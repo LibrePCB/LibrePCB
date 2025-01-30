@@ -159,9 +159,13 @@ ui::SchematicTabData SchematicTab::getUiData() const noexcept {
 }
 
 void SchematicTab::setUiData(const ui::SchematicTabData& data) noexcept {
+  auto sch = mProject->getProject().getSchematicByIndex(mObjIndex);
+
   mGridStyle = s2l(data.grid_style);
-  if (auto sch = mProject->getProject().getSchematicByIndex(mObjIndex)) {
-    sch->setGridUnit(s2l(data.unit));
+  const LengthUnit unit = s2l(data.unit);
+  if (sch && (unit != sch->getGridUnit())) {
+    sch->setGridUnit(unit);
+    mEditor->setManualModificationsMade();
   }
   if (auto l = mLayerProvider->getLayer(Theme::Color::sSchematicPinNumbers)) {
     l->setVisible(data.show_pin_numbers);

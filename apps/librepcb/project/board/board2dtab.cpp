@@ -93,8 +93,10 @@ Board2dTab::Board2dTab(GuiApplication& app, std::shared_ptr<ProjectEditor> prj,
 
   // Connect undo stack.
   connect(&prj->getUndoStack(), &UndoStack::stateModified, this, [this]() {
-    mDrcState = ui::RuleCheckState::Outdated;
-    emit uiDataChanged();
+    if (mDrcState == ui::RuleCheckState::UpToDate) {
+      mDrcState = ui::RuleCheckState::Outdated;
+      emit uiDataChanged();
+    }
   });
   connect(&prj->getUndoStack(), &UndoStack::stateModified, this,
           &Board2dTab::requestRepaint);
@@ -132,11 +134,15 @@ ui::TabData Board2dTab::getBaseUiData() const noexcept {
 }
 
 void Board2dTab::setUiData(const ui::Board2dTabData& data) noexcept {
+  auto brd = mProject->getProject().getBoardByIndex(mObjIndex);
+
   mUiData = data;
 
   mGridStyle = s2l(mUiData.grid_style);
-  if (auto brd = mProject->getProject().getBoardByIndex(mObjIndex)) {
-    brd->setGridUnit(s2l(mUiData.unit));
+  const LengthUnit unit = s2l(mUiData.unit);
+  if (brd && (unit != brd->getGridUnit())) {
+    brd->setGridUnit(unit);
+    mEditor->setManualModificationsMade();
   }
 
   invalidateBackground();
@@ -228,7 +234,7 @@ void Board2dTab::setDrcResult(
   const QSet<SExpression> approvals =
       RuleCheckMessage::getAllApprovals(result.messages);
   if (board && board->updateDrcMessageApprovals(approvals, result.quick)) {
-    // mProjectEditor.setManualModificationsMade();
+    mEditor->setManualModificationsMade();
   }
 
   // Update UI.

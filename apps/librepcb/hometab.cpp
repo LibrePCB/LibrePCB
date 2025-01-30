@@ -17,78 +17,57 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_PROJECTSMODEL_H
-#define LIBREPCB_PROJECT_PROJECTSMODEL_H
-
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "appwindow.h"
+#include "hometab.h"
 
-#include <librepcb/core/fileio/filepath.h>
+#include "apptoolbox.h"
 
 #include <QtCore>
-
-#include <vector>
+#include <QtWidgets>
 
 /*******************************************************************************
- *  Namespace / Forward Declarations
+ *  Namespace
  ******************************************************************************/
 namespace librepcb {
-
-class Workspace;
-
 namespace editor {
 namespace app {
 
-class ProjectEditor;
-
 /*******************************************************************************
- *  Class ProjectsModel
+ *  Constructors / Destructor
  ******************************************************************************/
 
-/**
- * @brief The ProjectsModel class
- */
-class ProjectsModel : public QObject, public slint::Model<ui::ProjectData> {
-  Q_OBJECT
+HomeTab::HomeTab(GuiApplication& app, QObject* parent) noexcept
+  : WindowTab(app, nullptr, -1, parent) {
+}
 
-public:
-  // Constructors / Destructor
-  ProjectsModel() = delete;
-  ProjectsModel(const ProjectsModel& other) = delete;
-  explicit ProjectsModel(Workspace& ws, QObject* parent = nullptr) noexcept;
-  virtual ~ProjectsModel() noexcept;
+HomeTab::~HomeTab() noexcept {
+}
 
-  // General Methods
-  int getIndexOf(std::shared_ptr<ProjectEditor> prj) noexcept;
-  std::shared_ptr<ProjectEditor> getProject(int index) noexcept;
-  std::shared_ptr<ProjectEditor> openProject(FilePath fp = FilePath()) noexcept;
+/*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
 
-  // Implementations
-  std::size_t row_count() const override;
-  std::optional<ui::ProjectData> row_data(std::size_t i) const override;
-
-  // Operator Overloadings
-  ProjectsModel& operator=(const ProjectsModel& rhs) = delete;
-
-private:
-  /**
-   * @brief Ask the user whether to restore a backup of a project
-   *
-   * @param dir   The project directory to be restored.
-   *
-   * @retval true   Restore backup.
-   * @retval false  Do not restore backup.
-   *
-   * @throw Exception to abort opening the project.
-   */
-  static bool askForRestoringBackup(const FilePath& dir);
-
-  Workspace& mWorkspace;
-  QList<std::shared_ptr<ProjectEditor>> mEditors;
-  std::vector<ui::ProjectData> mItems;
-};
+ui::TabData HomeTab::getBaseUiData() const noexcept {
+  return ui::TabData{
+      ui::TabType::Home,  // Type
+      slint::SharedString(),  // Title
+      q2s(QPixmap(":/home.svg")),  // Icon
+      -1,  // Project index
+      ui::RuleCheckState::NotAvailable,  // Rule check state
+      nullptr,  // Rule check messages
+      false,  // Can save
+      false,  // Can export graphics
+      false,  // Can undo
+      false,  // Can redo
+      false,  // Can cut/copy
+      false,  // Can paste
+      false,  // Can remove
+      false,  // Can rotate
+      false,  // Can mirror
+  };
+}
 
 /*******************************************************************************
  *  End of File
@@ -97,5 +76,3 @@ private:
 }  // namespace app
 }  // namespace editor
 }  // namespace librepcb
-
-#endif
