@@ -1,5 +1,6 @@
 import { TabType, TabData, WindowSectionData, ActionId } from "./api/types.slint";
 import { EmptyTab } from "./emptytab.slint";
+import { HomeTab } from "./hometab.slint";
 import { SchematicTab } from "./project/schematic/schematictab.slint";
 import { Board2dTab } from "./project/board/board2dtab.slint";
 import { Board3dTab } from "./project/board/board3dtab.slint";
@@ -15,7 +16,7 @@ component Tab inherits Rectangle {
     in property <bool> is-current-tab: false;
 
     callback clicked <=> ta-tab.clicked;
-    callback close-clicked <=> ta-tab-close.clicked;
+    callback close-clicked;
 
     background: is-current-tab ? #505050 : (ta-tab.has-hover ? #404040 : #303030);
 
@@ -38,7 +39,7 @@ component Tab inherits Rectangle {
             text: tab.title;
         }
 
-        Rectangle {
+        if tab.type != TabType.home: Rectangle {
             y: (parent.height - self.height) / 2;
             width: i-tab-close.width;
             height: i-tab-close.height;
@@ -50,7 +51,11 @@ component Tab inherits Rectangle {
                 colorize: t-tab.color;
             }
 
-            ta-tab-close := TouchArea { }
+            ta-tab-close := TouchArea {
+                clicked => {
+                    close-clicked();
+                }
+            }
         }
     }
 
@@ -67,7 +72,8 @@ export component WindowSection inherits Rectangle {
     in-out property <int> section-index;
     in-out property <WindowSectionData> section;
     property <bool> is-current-section: (section-index == Data.current-section-index);
-    property <bool> tab-open: (section.current-tab-index >= 0) && (section.current-tab-index < section.tabs.length);
+    property <int> first-tab-index: (section-index == 0) ? 0 : 1;
+    property <bool> tab-open: (section.current-tab-index >= first-tab-index) && (section.current-tab-index < section.tabs.length);
     property <TabType> tab-type: section.tabs[section.current-tab-index].type;
 
     tab-bar := Rectangle {
@@ -90,6 +96,8 @@ export component WindowSection inherits Rectangle {
                     index: index;
                     is-current-section: is-current-section;
                     is-current-tab: (index == section.current-tab-index);
+                    visible: index >= first-tab-index;
+                    width: self.visible ? self.preferred-width : 0;
 
                     clicked => {
                         if Data.preview-mode {
@@ -130,7 +138,7 @@ export component WindowSection inherits Rectangle {
                 }
             }
 
-            if (Data.sections.length > 1) && (section.tabs.length == 0): Rectangle {
+            if (Data.sections.length > 1) && (section.tabs.length <= 1): Rectangle {
                 width: self.height;
                 background: ta-section-close.has-hover ? #454545 : transparent;
                 border-radius: 3px;
@@ -157,6 +165,12 @@ export component WindowSection inherits Rectangle {
         height: parent.height - self.y;
 
         if (!tab-open): EmptyTab {
+            width: 100%;
+            height: 100%;
+            section-index: section-index;
+        }
+
+        if (tab-open) && (tab-type == TabType.home): HomeTab {
             width: 100%;
             height: 100%;
             section-index: section-index;

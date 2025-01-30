@@ -19,7 +19,7 @@ export component PanelHeaderButton inherits Rectangle {
             x: (parent.width - self.width) / 2;
             y: self.x;
             width: self.height;
-            height: parent.height * icon-scale * (ta.pressed ? 0.85 : 1.0);
+            height: parent.height * icon-scale * (((!read-only) && ta.pressed) ? 0.85 : 1.0);
             image-fit: contain;
             source: icon;
             colorize: (colorize != transparent) ? colorize : (((!read-only) && ta.has-hover) ? white : (enabled ? Palette.foreground : #707070));

@@ -1,5 +1,5 @@
 import { ListView } from "std-widgets.slint";
-import { PanelHeader } from "./common/panelheader.slint";
+import { PanelHeader, PanelHeaderButton } from "./common/panelheader.slint";
 import { FolderTreeItemData, QuickAccessItemData } from "./api/types.slint";
 import { Backend } from "./api/backend.slint";
 import { Data } from "./api/data.slint";
@@ -51,6 +51,7 @@ component QuickAccessList inherits ListView {
 
             clicked => {
                 current-index = index;
+                Data.current-project-preview-path = item.path;
             }
 
             double-clicked => {
@@ -66,6 +67,8 @@ component FolderTree inherits ListView {
     in-out property <[FolderTreeItemData]> model;
 
     preferred-height: model.length * item-height;
+
+    callback item-selected(string);
 
     for item[index] in model: Rectangle {
         width: parent.width;
@@ -105,7 +108,9 @@ component FolderTree inherits ListView {
         ta := TouchArea {
             clicked => {
                 current-index = index;
+                item-selected(item.path);
             }
+
             double-clicked => {
                 Backend.project-item-doubleclicked(item.path);
             }
@@ -119,6 +124,14 @@ export component HomePanel inherits Rectangle {
     VerticalLayout {
         if Data.quick-access-items.length > 0: PanelHeader {
             title: @tr("QUICK ACCESS");
+
+            PanelHeaderButton {
+                icon: @image-url("img/file-circle-plus.svg");
+            }
+
+            PanelHeaderButton {
+                icon: @image-url("img/folder-open.svg");
+            }
         }
 
         if Data.quick-access-items.length > 0: QuickAccessList {
@@ -136,6 +149,10 @@ export component HomePanel inherits Rectangle {
         FolderTree {
             vertical-stretch: 2;
             model: Data.workspace-folder;
+
+            item-selected(path) => {
+                Data.current-project-preview-path = path;
+            }
         }
 
         Rectangle { }

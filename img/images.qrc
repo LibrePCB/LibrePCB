@@ -2,6 +2,7 @@
     <qresource>
         <file alias="3d.svg">../apps/librepcb/ui/img/3d.svg</file>
         <file alias="download.svg">../apps/librepcb/ui/img/download.svg</file>
+        <file alias="home.svg">../apps/librepcb/ui/img/home.svg</file>
         <file alias="image.svg">../apps/librepcb/ui/img/image.svg</file>
         <file alias="plus.svg">../apps/librepcb/ui/img/plus.svg</file>
         <file alias="projects.png">../apps/librepcb/ui/img/projects.png</file>

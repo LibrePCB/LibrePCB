@@ -47,7 +47,8 @@ ProjectEditor::ProjectEditor(std::unique_ptr<Project> project,
   : QObject(parent),
     mProject(std::move(project)),
     mUndoStack(new UndoStack()),
-    mErcMessages(new slint::VectorModel<ui::RuleCheckMessageData>()) {
+    mErcMessages(new slint::VectorModel<ui::RuleCheckMessageData>()),
+    mManualModificationsMade(false) {
   // Run the ERC after opening and after every modification.
   QTimer::singleShot(200, this, &ProjectEditor::runErc);
   connect(mUndoStack.get(), &UndoStack::stateModified, this,

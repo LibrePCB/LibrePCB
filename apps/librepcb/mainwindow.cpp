@@ -40,9 +40,11 @@
 #include <librepcb/core/workspace/workspacesettings.h>
 #include <librepcb/editor/project/newprojectwizard/newprojectwizard.h>
 #include <librepcb/editor/project/outputjobsdialog/outputjobsdialog.h>
+#include <librepcb/editor/workspace/controlpanel/markdownconverter.h>
 #include <librepcb/editor/workspace/desktopservices.h>
 #include <librepcb/editor/workspace/initializeworkspacewizard/initializeworkspacewizard.h>
 
+#include <QtConcurrent>
 #include <QtCore>
 #include <QtWidgets>
 
@@ -86,6 +88,7 @@ MainWindow::MainWindow(GuiApplication& app,
       mApp.getNotifications().getUnreadNotificationsCount());
   d.set_current_progress_notification_index(
       mApp.getNotifications().getCurrentProgressIndex());
+  d.set_current_project_preview_image_rendering(false);
 
   // Bind global data to signals.
   connect(&mApp.getNotifications(),
@@ -110,6 +113,9 @@ MainWindow::MainWindow(GuiApplication& app,
                         .arg(unit.convertToUnit(pos.getY()), 10, 'f',
                              unit.getReasonableNumberOfDecimals())));
           });
+  connect(&mProjectPreviewRenderFutureWatcher,
+          &QFutureWatcher<QPixmap>::finished, this,
+          &MainWindow::applyProjectReadmeRenderingResult);
 
   // Register global callbacks.
   const ui::Backend& b = mWindow->global<ui::Backend>();
@@ -167,6 +173,9 @@ MainWindow::MainWindow(GuiApplication& app,
     DesktopServices ds(mApp.getWorkspace().getSettings());
     ds.openUrl(QUrl(s2q(url)));
   });
+  b.on_request_project_preview(
+      std::bind(&MainWindow::startProjectReadmeRenderingAsync, this,
+                std::placeholders::_1, std::placeholders::_2));
 
   // Show window.
   mWindow->show();
@@ -325,6 +334,38 @@ void MainWindow::newProject(bool eagleImport,
                             tr("Could not create project"), e.getMsg());
     }
   }
+}
+
+bool MainWindow::startProjectReadmeRenderingAsync(
+    const slint::SharedString& path, qreal width) noexcept {
+  // Abort current watching.
+  mProjectPreviewRenderFutureWatcher.cancel();
+
+  // Check if README.md exists.
+  FilePath fp(s2q(path));
+  if (fp.getSuffix() == "lpp") {
+    fp = fp.getParentDir().getPathTo("README.md");
+  } else if (fp.isExistingDir()) {
+    fp = fp.getPathTo("README.md");
+  } else if (fp.getSuffix() != "md") {
+    return false;
+  }
+  mWindow->global<ui::Data>().set_current_project_preview_image_rendering(
+      fp.isExistingFile());
+  if (!fp.isExistingFile()) return false;
+
+  // Start rendering in thread.
+  mProjectPreviewRenderFutureWatcher.setFuture(
+      QtConcurrent::run(&MarkdownConverter::convertMarkdownToPixmap, fp,
+                        static_cast<int>(width)));
+  return true;
+}
+
+void MainWindow::applyProjectReadmeRenderingResult() noexcept {
+  mWindow->global<ui::Data>().set_current_project_preview_image(
+      q2s(mProjectPreviewRenderFutureWatcher.result()));
+  mWindow->global<ui::Data>().set_current_project_preview_image_rendering(
+      false);
 }
 
 /*******************************************************************************

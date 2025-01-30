@@ -26,11 +26,7 @@ export component EmptyTab inherits Rectangle {
                     fs.focus();
                 }
             }
-            return Backend.scene-pointer-event(section-index, self.mouse-x, self.mouse-y, self.absolute-position, e);
-        }
-
-        scroll-event(e) => {
-            return Backend.scene-scrolled(section-index, self.mouse-x, self.mouse-y, e);
+            return EventResult.accept;
         }
     }
 }

@@ -24,6 +24,7 @@
 
 #include "apptoolbox.h"
 #include "guiapplication.h"
+#include "hometab.h"
 #include "library/createlibrarytab.h"
 #include "library/downloadlibrarytab.h"
 #include "project/board/board2dtab.h"
@@ -78,6 +79,8 @@ WindowSection::WindowSection(GuiApplication& app, QObject* parent) noexcept
           &WindowSection::requestRepaint, Qt::QueuedConnection);
   connect(mTabsModel.get(), &WindowTabsModel::uiDataChanged, this,
           &WindowSection::uiDataChanged);
+
+  addTab(std::make_shared<HomeTab>(app));
 }
 
 WindowSection::~WindowSection() noexcept {

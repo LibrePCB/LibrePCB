@@ -69,7 +69,8 @@ std::shared_ptr<ProjectEditor> ProjectsModel::getProject(int index) noexcept {
   return mEditors.value(index);
 }
 
-std::shared_ptr<ProjectEditor> ProjectsModel::openProject(FilePath fp) {
+std::shared_ptr<ProjectEditor> ProjectsModel::openProject(
+    FilePath fp) noexcept {
   if (!fp.isValid()) {
     QSettings cs;  // client settings
     QString lastOpenedFile =
@@ -97,56 +98,61 @@ std::shared_ptr<ProjectEditor> ProjectsModel::openProject(FilePath fp) {
   auto cursorScopeGuard =
       scopeGuard([]() { QApplication::restoreOverrideCursor(); });
 
-  // Open file system.
-  std::shared_ptr<TransactionalFileSystem> fs;
-  QString projectFileName = fp.getFilename();
-  if (fp.getSuffix() == "lppz") {
-    fs = TransactionalFileSystem::openRO(
-        FilePath::getRandomTempPath(),
-        &TransactionalFileSystem::RestoreMode::no);
-    fs->removeDirRecursively();  // 1) Get a clean initial state.
-    fs->loadFromZip(fp);  // 2) Load files from ZIP.
-    foreach (const QString& fn, fs->getFiles()) {
-      if (fn.endsWith(".lpp")) {
-        projectFileName = fn;
+  try {
+    // Open file system.
+    std::shared_ptr<TransactionalFileSystem> fs;
+    QString projectFileName = fp.getFilename();
+    if (fp.getSuffix() == "lppz") {
+      fs = TransactionalFileSystem::openRO(
+          FilePath::getRandomTempPath(),
+          &TransactionalFileSystem::RestoreMode::no);
+      fs->removeDirRecursively();  // 1) Get a clean initial state.
+      fs->loadFromZip(fp);  // 2) Load files from ZIP.
+      foreach (const QString& fn, fs->getFiles()) {
+        if (fn.endsWith(".lpp")) {
+          projectFileName = fn;
+        }
       }
+    } else {
+      fs = TransactionalFileSystem::openRW(
+          fp.getParentDir(), &askForRestoringBackup,
+          DirectoryLockHandlerDialog::createDirectoryLockCallback());
     }
-  } else {
-    fs = TransactionalFileSystem::openRW(
-        fp.getParentDir(), &askForRestoringBackup,
-        DirectoryLockHandlerDialog::createDirectoryLockCallback());
+
+    // Open project.
+    ProjectLoader loader;
+    std::unique_ptr<Project> project = loader.open(
+        std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(fs)),
+        projectFileName);  // can throw
+
+    // TODO
+    auto schematics =
+        std::make_shared<slint::VectorModel<slint::SharedString>>();
+    auto boards = std::make_shared<slint::VectorModel<slint::SharedString>>();
+    for (auto sch : project->getSchematics()) {
+      schematics->push_back(q2s(*sch->getName()));
+    }
+    for (auto brd : project->getBoards()) {
+      boards->push_back(q2s(*brd->getName()));
+    }
+
+    // Open editor.
+    auto editor = std::make_shared<ProjectEditor>(std::move(project));
+
+    // Keep handle.
+    mEditors.append(editor);
+    mItems.push_back(ui::ProjectData{
+        true,
+        q2s(uniqueFp),
+        q2s(*editor->getProject().getName()),
+        schematics,
+        boards,
+    });
+    row_added(mItems.size() - 1, 1);
+    return editor;
+  } catch (const Exception& e) {
+    return nullptr;
   }
-
-  // Open project.
-  ProjectLoader loader;
-  std::unique_ptr<Project> project = loader.open(
-      std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(fs)),
-      projectFileName);  // can throw
-
-  // TODO
-  auto schematics = std::make_shared<slint::VectorModel<slint::SharedString>>();
-  auto boards = std::make_shared<slint::VectorModel<slint::SharedString>>();
-  for (auto sch : project->getSchematics()) {
-    schematics->push_back(q2s(*sch->getName()));
-  }
-  for (auto brd : project->getBoards()) {
-    boards->push_back(q2s(*brd->getName()));
-  }
-
-  // Open editor.
-  auto editor = std::make_shared<ProjectEditor>(std::move(project));
-
-  // Keep handle.
-  mEditors.append(editor);
-  mItems.push_back(ui::ProjectData{
-      true,
-      q2s(uniqueFp),
-      q2s(*editor->getProject().getName()),
-      schematics,
-      boards,
-  });
-  row_added(mItems.size() - 1, 1);
-  return editor;
 }
 
 /*******************************************************************************

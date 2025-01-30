@@ -36,7 +36,11 @@ export global Data {
 
     in-out property <bool> ignore-placement-locks: true;
 
-    in-out property <MainPage> current-page: MainPage.libraries;
+    in-out property <MainPage> current-page: MainPage.home;
+
+    in-out property <string> current-project-preview-path;
+    in property <image> current-project-preview-image;
+    in property <bool> current-project-preview-image-rendering: true;
 
     in property <[NotificationData]> notifications: [
         {
@@ -177,6 +181,11 @@ export global Data {
         {
             tabs: [
                 {
+                    type: TabType.home,
+                    icon: @image-url("../img/home.svg"),
+                    project-index: -1,
+                },
+                {
                     type: TabType.create-library,
                     title: "Create Lib",
                     icon: @image-url("../img/plus.svg"),
@@ -241,6 +250,7 @@ export global Data {
                 },
             ],
             create-library-tabs: [
+                { },
                 {
                     name: "My Library",
                     name-error: "Name error",
@@ -262,6 +272,7 @@ export global Data {
             ],
             download-library-tabs: [
                 { },
+                { },
                 {
                     url: "",
                     url-error: "URL error",
@@ -278,6 +289,7 @@ export global Data {
             schematic-tabs: [
                 { },
                 { },
+                { },
                 {
                     background-color: Colors.white,
                     overlay-color: Colors.black,
@@ -292,6 +304,7 @@ export global Data {
                 { },
                 { },
                 { },
+                { },
                 {
                     background-color: Colors.black,
                     overlay-color: Colors.white,
@@ -300,11 +313,16 @@ export global Data {
                     unit: LengthUnit.millimeters,
                 },
             ],
-            current-tab-index: 2,
+            current-tab-index: 0,
             highlight: true,
         },
         {
             tabs: [
+                {
+                    type: TabType.home,
+                    icon: @image-url("../img/home.svg"),
+                    project-index: -1,
+                },
                 {
                     type: TabType.board-3d,
                     title: "3D",
@@ -315,7 +333,7 @@ export global Data {
                     can-redo: true,
                 },
             ],
-            current-tab-index: 0,
+            current-tab-index: 1,
         },
     ];
 

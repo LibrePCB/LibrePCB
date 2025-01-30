@@ -67,6 +67,13 @@ public:
   UndoStack& getUndoStack() noexcept { return *mUndoStack; }
   auto getErcMessages() noexcept { return mErcMessages; }
 
+  /**
+   * @brief Set the flag that manual modifications (no undo stack) are made
+   */
+  void setManualModificationsMade() noexcept {
+    mManualModificationsMade = true;
+  }
+
   // Operator Overloadings
   ProjectEditor& operator=(const ProjectEditor& rhs) = delete;
 
@@ -81,6 +88,9 @@ private:
   QSet<SExpression> mSupportedErcApprovals;
   QSet<SExpression> mDisappearedErcApprovals;
   std::shared_ptr<slint::VectorModel<ui::RuleCheckMessageData>> mErcMessages;
+
+  /// Modifications bypassing the undo stack
+  bool mManualModificationsMade;
 };
 
 /*******************************************************************************
