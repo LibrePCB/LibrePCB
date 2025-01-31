@@ -26,9 +26,7 @@ cp -v "`qmake -query QT_INSTALL_PREFIX`"/bin/lib*.dll ./build/install/opt/bin/
 cp -v ./build/install/opt/lib/slint_cpp.dll ./build/install/opt/bin/
 
 # Copy Qt DLLs
-windeployqt --compiler-runtime --force \
-    --qmldir=./build/install/opt/share/librepcb/qml \
-    ./build/install/opt/bin/librepcb.exe
+windeployqt --compiler-runtime --force ./build/install/opt/bin/librepcb.exe
 windeployqt --compiler-runtime --force ./build/install/opt/bin/librepcb-cli.exe
 
 # Test if the bundles are working (hopefully catching deployment issues).

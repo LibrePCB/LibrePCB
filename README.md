@@ -78,7 +78,7 @@ actually used for CI, but are also useful to build LibrePCB locally.
 ```bash
 sudo apt-get install build-essential git cmake openssl zlib1g zlib1g-dev \
      qt6-base-dev qt6-tools-dev qt6-tools-dev-tools qt6-l10n-tools \
-     libqt6core5compat6-dev qt6-declarative-dev libqt6opengl6-dev libqt6svg6-dev \
+     libqt6core5compat6-dev libqt6opengl6-dev libqt6svg6-dev \
      qt6-image-formats-plugins libglu1-mesa-dev libtbb-dev libxi-dev \
      occt-misc libocct-*-dev rustc cargo
 sudo apt-get install qtcreator # optional
@@ -88,9 +88,9 @@ sudo apt-get install qtcreator # optional
 
 ```bash
 sudo apt-get install build-essential git cmake openssl zlib1g zlib1g-dev \
-     qt5-default qtdeclarative5-dev qttools5-dev-tools qttools5-dev \
-     qtquickcontrols2-5-dev libqt5opengl5-dev libqt5svg5-dev \
-     qt5-image-formats-plugins libglu1-mesa-dev liboce-*-dev rustc cargo
+     qt5-default qttools5-dev-tools qttools5-dev libqt5opengl5-dev \
+     libqt5svg5-dev qt5-image-formats-plugins libglu1-mesa-dev \
+     liboce-*-dev rustc cargo
 sudo apt-get install qt5-doc qtcreator # optional
 ```
 
@@ -98,7 +98,7 @@ sudo apt-get install qt5-doc qtcreator # optional
 
 ```bash
 sudo pacman -S base-devel git cmake openssl zlib desktop-file-utils \
-     shared-mime-info qt6-base qt6-5compat qt6-declarative qt6-svg qt6-tools \
+     shared-mime-info qt6-base qt6-5compat qt6-svg qt6-tools \
      qt6-imageformats opencascade rust
 sudo pacman -S qt6-doc qtcreator # optional
 ```
