@@ -22,10 +22,6 @@
  ******************************************************************************/
 #include "markdownconverter.h"
 
-#include <librepcb/core/exceptions.h>
-#include <librepcb/core/fileio/fileutils.h>
-#include <librepcb/core/utils/scopeguard.h>
-
 #include <QtCore>
 
 #include <qtextdocument.h>
@@ -60,57 +56,6 @@ QString MarkdownConverter::convertMarkdownToHtml(
   QTextDocument document;
   document.setMarkdown(markdown, QTextDocument::MarkdownDialectGitHub);
   return document.toHtml();
-}
-
-QPixmap MarkdownConverter::convertMarkdownToPixmap(const FilePath& fp,
-                                                   int width) noexcept {
-  try {
-    // Create temporary directory.
-    const FilePath tmpDir = FilePath::getRandomTempPath();
-    auto sg =
-        scopeGuard([tmpDir]() { QDir(tmpDir.toStr()).removeRecursively(); });
-
-    // Parse Markdown.
-    QTextDocument document;
-    document.setBaseUrl(tmpDir.getPathTo(fp.getFilename()).toQUrl());
-    document.setTextWidth(width);
-    document.setMarkdown(FileUtils::readFile(fp),
-                         QTextDocument::MarkdownDialectGitHub);
-
-    // Copy referenced images to temporary directory, and shrink them to page
-    // width.
-    QTextBlock b = document.begin();
-    while (b.isValid()) {
-      for (QTextBlock::iterator i = b.begin(); !i.atEnd(); ++i) {
-        QTextCharFormat format = i.fragment().charFormat();
-        QTextImageFormat imageFormat = format.toImageFormat();
-        if (imageFormat.isValid()) {
-          const FilePath oldFp =
-              fp.getParentDir().getPathTo(imageFormat.name());
-          const FilePath newFp = tmpDir.getPathTo(imageFormat.name());
-          QImage img(oldFp.toStr());
-          if (img.width() > width) {
-            img = img.scaledToWidth(width, Qt::SmoothTransformation);
-          }
-          FileUtils::makePath(newFp.getParentDir());
-          img.save(newFp.toStr());
-        }
-      }
-      b = b.next();
-    }
-
-    // Render document.
-    QPixmap pixmap(document.size().toSize());
-    pixmap.fill(Qt::transparent);
-    {
-      QPainter painter(&pixmap);
-      document.drawContents(&painter);
-    }
-    return pixmap;
-  } catch (const Exception& e) {
-    qWarning() << "Failed to render Markdown:" << e.getMsg();
-    return QPixmap();
-  }
 }
 
 /*******************************************************************************

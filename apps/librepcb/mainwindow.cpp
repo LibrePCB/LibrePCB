@@ -26,21 +26,19 @@
 #include "guiapplication.h"
 #include "notificationsmodel.h"
 #include "project/projecteditor.h"
+#include "project/projectreadmerenderer.h"
 #include "project/projectsmodel.h"
 #include "windowsectionsmodel.h"
 
-#include <librepcb/core/fileio/filepath.h>
 #include <librepcb/core/fileio/transactionaldirectory.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/schematic/schematic.h>
-#include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 #include <librepcb/editor/project/newprojectwizard/newprojectwizard.h>
 #include <librepcb/editor/project/outputjobsdialog/outputjobsdialog.h>
-#include <librepcb/editor/workspace/controlpanel/markdownconverter.h>
 #include <librepcb/editor/workspace/desktopservices.h>
 #include <librepcb/editor/workspace/initializeworkspacewizard/initializeworkspacewizard.h>
 
@@ -70,7 +68,8 @@ MainWindow::MainWindow(GuiApplication& app,
         new WindowSectionsModel(app, win->global<ui::Data>(), mSettingsPrefix)),
     mWindow(win),
     mWidget(static_cast<QWidget*>(slint::cbindgen_private::slint_qt_get_widget(
-        &mWindow->window().window_handle()))) {
+        &mWindow->window().window_handle()))),
+    mProjectPreviewRenderer(new ProjectReadmeRenderer(this)) {
   Q_ASSERT(mWidget);
 
   // Register Slint callbacks.
@@ -113,9 +112,17 @@ MainWindow::MainWindow(GuiApplication& app,
                         .arg(unit.convertToUnit(pos.getY()), 10, 'f',
                              unit.getReasonableNumberOfDecimals())));
           });
-  connect(&mProjectPreviewRenderFutureWatcher,
-          &QFutureWatcher<QPixmap>::finished, this,
-          &MainWindow::applyProjectReadmeRenderingResult);
+  connect(
+      mProjectPreviewRenderer.get(), &ProjectReadmeRenderer::runningChanged,
+      this, [this](bool running) {
+        mWindow->global<ui::Data>().set_current_project_preview_image_rendering(
+            running);
+      });
+  connect(mProjectPreviewRenderer.get(), &ProjectReadmeRenderer::finished, this,
+          [this](const QPixmap& result) {
+            mWindow->global<ui::Data>().set_current_project_preview_image(
+                q2s(result));
+          });
 
   // Register global callbacks.
   const ui::Backend& b = mWindow->global<ui::Backend>();
@@ -174,8 +181,11 @@ MainWindow::MainWindow(GuiApplication& app,
     ds.openUrl(QUrl(s2q(url)));
   });
   b.on_request_project_preview(
-      std::bind(&MainWindow::startProjectReadmeRenderingAsync, this,
-                std::placeholders::_1, std::placeholders::_2));
+      [this](const slint::SharedString& fp, float width) {
+        mProjectPreviewRenderer->request(FilePath(s2q(fp)),
+                                         static_cast<int>(width));
+        return true;
+      });
 
   // Show window.
   mWindow->show();
@@ -334,38 +344,6 @@ void MainWindow::newProject(bool eagleImport,
                             tr("Could not create project"), e.getMsg());
     }
   }
-}
-
-bool MainWindow::startProjectReadmeRenderingAsync(
-    const slint::SharedString& path, qreal width) noexcept {
-  // Abort current watching.
-  mProjectPreviewRenderFutureWatcher.cancel();
-
-  // Check if README.md exists.
-  FilePath fp(s2q(path));
-  if (fp.getSuffix() == "lpp") {
-    fp = fp.getParentDir().getPathTo("README.md");
-  } else if (fp.isExistingDir()) {
-    fp = fp.getPathTo("README.md");
-  } else if (fp.getSuffix() != "md") {
-    return false;
-  }
-  mWindow->global<ui::Data>().set_current_project_preview_image_rendering(
-      fp.isExistingFile());
-  if (!fp.isExistingFile()) return false;
-
-  // Start rendering in thread.
-  mProjectPreviewRenderFutureWatcher.setFuture(
-      QtConcurrent::run(&MarkdownConverter::convertMarkdownToPixmap, fp,
-                        static_cast<int>(width)));
-  return true;
-}
-
-void MainWindow::applyProjectReadmeRenderingResult() noexcept {
-  mWindow->global<ui::Data>().set_current_project_preview_image(
-      q2s(mProjectPreviewRenderFutureWatcher.result()));
-  mWindow->global<ui::Data>().set_current_project_preview_image_rendering(
-      false);
 }
 
 /*******************************************************************************

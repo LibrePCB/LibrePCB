@@ -128,6 +128,12 @@ export component HomeTab inherits Rectangle {
                 viewport-width: self.width;
                 viewport-height: i-readme.height;
 
+                // If the image was getting smaller, the scroll position might
+                // end up in nirvana, so we clip it manually.
+                changed viewport-height => {
+                    self.viewport-y = max(self.viewport-y, -max(self.viewport-height - self.height, 0));
+                }
+
                 i-readme := Image {
                     image-fit: ImageFit.preserve;
                     horizontal-alignment: left;

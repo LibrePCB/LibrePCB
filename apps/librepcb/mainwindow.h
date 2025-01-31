@@ -41,6 +41,7 @@ class CreateLibraryTabsModel;
 class GuiApplication;
 class LibraryCreator;
 class ProjectEditor;
+class ProjectReadmeRenderer;
 class WindowSectionsModel;
 
 /*******************************************************************************
@@ -80,9 +81,6 @@ private:
   std::shared_ptr<ProjectEditor> getCurrentProject() noexcept;
   void newProject(bool eagleImport = false,
                   const FilePath& parentDir = FilePath()) noexcept;
-  bool startProjectReadmeRenderingAsync(const slint::SharedString& path,
-                                        qreal width) noexcept;
-  void applyProjectReadmeRenderingResult() noexcept;
 
   const int mIndex;
   const QString mSettingsPrefix;
@@ -90,7 +88,7 @@ private:
   std::shared_ptr<WindowSectionsModel> mSections;
   slint::ComponentHandle<ui::AppWindow> mWindow;
   QWidget* mWidget;
-  QFutureWatcher<QPixmap> mProjectPreviewRenderFutureWatcher;
+  std::unique_ptr<ProjectReadmeRenderer> mProjectPreviewRenderer;
 };
 
 /*******************************************************************************

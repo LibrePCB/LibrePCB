@@ -16,8 +16,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef LIBREPCB_EDITOR_MARKDOWNCONVERTER_H
-#define LIBREPCB_EDITOR_MARKDOWNCONVERTER_H
+
+#ifndef LIBREPCB_PROJECT_PROJECTREADMERENDERER_H
+#define LIBREPCB_PROJECT_PROJECTREADMERENDERER_H
 
 /*******************************************************************************
  *  Includes
@@ -32,33 +33,51 @@
  ******************************************************************************/
 namespace librepcb {
 namespace editor {
+namespace app {
 
 /*******************************************************************************
- *  Class MarkdownConverter
+ *  Class ProjectReadmeRenderer
  ******************************************************************************/
 
 /**
- * @brief The MarkdownConverter class
- *
- * @deprecated Now implemented in ::librepcb::editor::app::MainWindow.
+ * @brief The ProjectReadmeRenderer class
  */
-class MarkdownConverter final {
+class ProjectReadmeRenderer : public QObject {
+  Q_OBJECT
+
 public:
-  // Static Methods
-  static QString convertMarkdownToHtml(const FilePath& markdownFile) noexcept;
-  static QString convertMarkdownToHtml(const QString& markdown) noexcept;
+  // Constructors / Destructor
+  ProjectReadmeRenderer() = delete;
+  ProjectReadmeRenderer(const ProjectReadmeRenderer& other) = delete;
+  explicit ProjectReadmeRenderer(QObject* parent = nullptr) noexcept;
+  virtual ~ProjectReadmeRenderer() noexcept;
+
+  // General Methods
+  void request(const FilePath& fp, int width) noexcept;
+
+  // Operator Overloadings
+  ProjectReadmeRenderer& operator=(const ProjectReadmeRenderer& rhs) = delete;
+
+signals:
+  void runningChanged(bool running);
+  void finished(const QPixmap& result);
 
 private:
-  // Constructors / Destructor
-  MarkdownConverter() = delete;
-  MarkdownConverter(const MarkdownConverter& other) = delete;
-  ~MarkdownConverter() = delete;
+  void start() noexcept;
+  static QPixmap render(const FilePath& fp, int width) noexcept;
+
+private:
+  FilePath mPath;
+  int mWidth;
+  QTimer mDelayTimer;
+  std::unique_ptr<QFutureWatcher<QPixmap>> mWatcher;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace app
 }  // namespace editor
 }  // namespace librepcb
 
