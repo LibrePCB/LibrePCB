@@ -182,10 +182,11 @@ export component MenuBar inherits Rectangle {
                 y: parent.height;
 
                 MenuItem {
-                    text: @tr("Undo");
+                    text: Data.current-tab.undo-text.is-empty ? @tr("Undo") : @tr("Undo: {}", Data.current-tab.undo-text);
                     icon: @image-url("img/undo.svg");
                     status-tip: @tr("Revert the last modification");
                     shortcuts: "Ctrl+Z";
+                    enabled: Data.current-tab.can-undo;
 
                     clicked => {
                         Backend.action-triggered(ActionId.undo, Data.current-section-index);
@@ -193,13 +194,14 @@ export component MenuBar inherits Rectangle {
                 }
 
                 MenuItem {
-                    text: @tr("Redo");
+                    text: Data.current-tab.redo-text.is-empty ? @tr("Redo") : @tr("Redo: {}", Data.current-tab.redo-text);
                     icon: @image-url("img/redo.svg");
                     status-tip: @tr("Re-apply the last reverted modification");
                     shortcuts: "Ctrl+Y";
+                    enabled: Data.current-tab.can-redo;
 
                     clicked => {
-                        Backend.action-triggered(ActionId.undo, Data.current-section-index);
+                        Backend.action-triggered(ActionId.redo, Data.current-section-index);
                     }
                 }
 
@@ -480,6 +482,20 @@ export component MenuBar inherits Rectangle {
             menu-extras := Menu {
                 x: 0;
                 y: parent.height;
+
+                MenuItem {
+                    text: @tr("Save Project");
+                    icon: @image-url("img/save.svg");
+                    status-tip: @tr("Save all project modifications to disk, from all schematics & boards");
+                    shortcuts: "Ctrl+S";
+                    enabled: Data.projects[Data.current-tab.project-index].valid && Data.current-tab.can-save;
+
+                    clicked => {
+                        Backend.action-triggered(ActionId.save, Data.current-section-index);
+                    }
+                }
+
+                MenuSeparator { }
 
                 MenuItem {
                     text: @tr("New Sheet") + "...";

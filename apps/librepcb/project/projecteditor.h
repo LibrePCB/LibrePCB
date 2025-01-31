@@ -37,6 +37,7 @@
 namespace librepcb {
 
 class Project;
+class Workspace;
 
 namespace editor {
 
@@ -58,7 +59,7 @@ public:
   // Constructors / Destructor
   ProjectEditor() = delete;
   ProjectEditor(const ProjectEditor& other) = delete;
-  explicit ProjectEditor(std::unique_ptr<Project> project,
+  explicit ProjectEditor(Workspace& ws, std::unique_ptr<Project> project,
                          QObject* parent = nullptr) noexcept;
   virtual ~ProjectEditor() noexcept;
 
@@ -67,21 +68,45 @@ public:
   UndoStack& getUndoStack() noexcept { return *mUndoStack; }
   auto getErcMessages() noexcept { return mErcMessages; }
 
+  bool canSave() const noexcept;
+
+  /**
+   * @brief Save the whole project to the harddisc
+   *
+   * @note The whole save procedere is described in @ref doc_project_save.
+   *
+   * @return true on success, false on failure
+   */
+  bool saveProject() noexcept;
+
+  /**
+   * @brief Make a automatic backup of the project (save to temporary files)
+   *
+   * @note The whole save procedere is described in @ref doc_project_save.
+   *
+   * @return true on success, false on failure
+   */
+  bool autosaveProject() noexcept;
+
   /**
    * @brief Set the flag that manual modifications (no undo stack) are made
    */
-  void setManualModificationsMade() noexcept {
-    mManualModificationsMade = true;
-  }
+  void setManualModificationsMade() noexcept;
 
   // Operator Overloadings
   ProjectEditor& operator=(const ProjectEditor& rhs) = delete;
+
+signals:
+  void manualModificationsMade();
+  void projectAboutToBeSaved();
+  void projectSavedToDisk();
 
 private:
   void runErc() noexcept;
   void saveErcMessageApprovals(const QSet<SExpression>& approvals) noexcept;
 
 private:
+  Workspace& mWorkspace;
   std::unique_ptr<Project> mProject;
   std::unique_ptr<UndoStack> mUndoStack;
 
@@ -91,6 +116,13 @@ private:
 
   /// Modifications bypassing the undo stack
   bool mManualModificationsMade;
+
+  /// The UndoStack state ID of the last successful project (auto)save
+  uint mLastAutosaveStateId;
+
+  /// The timer for the periodically automatic saving
+  /// functionality (see also @ref doc_project_save)
+  QTimer mAutoSaveTimer;
 };
 
 /*******************************************************************************

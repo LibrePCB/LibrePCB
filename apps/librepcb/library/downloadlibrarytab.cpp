@@ -84,7 +84,9 @@ ui::TabData DownloadLibraryTab::getBaseUiData() const noexcept {
       false,  // Can save
       false,  // Can export graphics
       false,  // Can undo
+      slint::SharedString(),  // Undo text
       false,  // Can redo
+      slint::SharedString(),  // Redo text
       false,  // Can cut/copy
       false,  // Can paste
       false,  // Can remove

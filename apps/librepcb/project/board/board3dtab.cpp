@@ -64,7 +64,9 @@ Board3dTab::Board3dTab(GuiApplication& app, std::shared_ptr<ProjectEditor> prj,
           });
 
   // Connect undo stack.
-  connect(&prj->getUndoStack(), &UndoStack::stateModified, this,
+  connect(&mEditor->getUndoStack(), &UndoStack::stateModified, this,
+          &Board3dTab::uiDataChanged);
+  connect(mEditor.get(), &ProjectEditor::manualModificationsMade, this,
           &Board3dTab::uiDataChanged);
 }
 
@@ -85,10 +87,12 @@ ui::TabData Board3dTab::getBaseUiData() const noexcept {
       mApp.getProjects().getIndexOf(mEditor),  // Project index
       ui::RuleCheckState::NotAvailable,  // Rule check state
       nullptr,  // Rule check messages
-      true,  // Can save
+      mEditor->canSave(),  // Can save
       false,  // Can export graphics
       mProject->getUndoStack().canUndo(),  // Can undo
+      q2s(mProject->getUndoStack().getUndoCmdText()),  // Undo text
       mProject->getUndoStack().canRedo(),  // Can redo
+      q2s(mProject->getUndoStack().getRedoCmdText()),  // Redo text
       false,  // Can cut/copy
       false,  // Can paste
       false,  // Can remove
@@ -133,6 +137,15 @@ void Board3dTab::deactivate() noexcept {
   mPlaneBuilder.reset();
   mOpenGlView.reset();
   mOpenGlSceneBuilder.reset();
+}
+
+bool Board3dTab::actionTriggered(ui::ActionId id) noexcept {
+  if (id == ui::ActionId::Save) {
+    mEditor->saveProject();
+    return true;
+  }
+
+  return WindowTab::actionTriggered(id);
 }
 
 slint::Image Board3dTab::renderScene(float width, float height) noexcept {

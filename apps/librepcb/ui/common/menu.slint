@@ -67,6 +67,8 @@ export component MenuItem inherits Rectangle {
     }
 
     ta := TouchArea {
+        enabled: enabled;
+
         changed has-hover => {
             if (root.status-tip != "") {
                 if (self.has-hover) {

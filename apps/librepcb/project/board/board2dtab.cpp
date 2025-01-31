@@ -100,6 +100,8 @@ Board2dTab::Board2dTab(GuiApplication& app, std::shared_ptr<ProjectEditor> prj,
   });
   connect(&prj->getUndoStack(), &UndoStack::stateModified, this,
           &Board2dTab::requestRepaint);
+  connect(mEditor.get(), &ProjectEditor::manualModificationsMade, this,
+          &Board2dTab::uiDataChanged);
 
   updateGridIntervalUiStr();
 }
@@ -121,10 +123,12 @@ ui::TabData Board2dTab::getBaseUiData() const noexcept {
       mApp.getProjects().getIndexOf(mEditor),  // Project index
       mDrcState,  // Rule check state
       mDrcMessages,  // Rule check messages
-      true,  // Can save
+      mEditor->canSave(),  // Can save
       true,  // Can export graphics
       mProject->getUndoStack().canUndo(),  // Can undo
+      q2s(mProject->getUndoStack().getUndoCmdText()),  // Undo text
       mProject->getUndoStack().canRedo(),  // Can redo
+      q2s(mProject->getUndoStack().getRedoCmdText()),  // Redo text
       true,  // Can cut/copy
       true,  // Can paste
       true,  // Can remove
@@ -173,7 +177,10 @@ void Board2dTab::deactivate() noexcept {
 }
 
 bool Board2dTab::actionTriggered(ui::ActionId id) noexcept {
-  if (id == ui::ActionId::SectionGridIntervalIncrease) {
+  if (id == ui::ActionId::Save) {
+    mEditor->saveProject();
+    return true;
+  } else if (id == ui::ActionId::SectionGridIntervalIncrease) {
     mGridInterval = PositiveLength(mGridInterval * 2);
     invalidateBackground();
     updateGridIntervalUiStr();
