@@ -98,6 +98,10 @@ void BoardDesignRuleCheck::start(Board& board,
   mFuture = QtConcurrent::run(&BoardDesignRuleCheck::run, this, data, timer);
 }
 
+bool BoardDesignRuleCheck::isRunning() const noexcept {
+  return mFuture.isRunning();
+}
+
 BoardDesignRuleCheck::Result BoardDesignRuleCheck::waitForFinished()
     const noexcept {
   const auto result = mFuture.result();

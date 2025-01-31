@@ -77,10 +77,16 @@ void QuickAccessModel::setFavoriteProject(const FilePath& fp,
     mFavoriteProjects.append(fp);
     refreshItems();
     saveFavoriteProjects();
+    emit favoriteProjectChanged(fp, favorite);
   } else if ((!favorite) && (mFavoriteProjects.removeAll(fp) > 0)) {
     refreshItems();
     saveFavoriteProjects();
+    emit favoriteProjectChanged(fp, favorite);
   }
+}
+
+bool QuickAccessModel::isFavoriteProject(const FilePath& fp) const noexcept {
+  return mFavoriteProjects.contains(fp);
 }
 
 /*******************************************************************************

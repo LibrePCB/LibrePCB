@@ -87,12 +87,13 @@ std::shared_ptr<ProjectEditor> ProjectsModel::openProject(
     cs.setValue("controlpanel/last_open_project", fp.toNative());
   }
 
-  const QString uniqueFp = fp.toUnique().toStr();
-  // if (mEditors.contains(uniqueFp)) return mEditors.value(uniqueFp);
-
-  // QPixmap p =
-  // MarkdownConverter::convertMarkdownToPixmap(fp.getParentDir().getPathTo("README.md"),
-  // 500); p.save(fp.getParentDir().getPathTo("README.png").toStr());
+  // If the same project is already open, just return it.
+  const FilePath uniqueFp = fp.toUnique();
+  for (auto prj : mEditors) {
+    if (prj->getProject().getFilepath().toUnique() == uniqueFp) {
+      return prj;
+    }
+  }
 
   // Opening the project can take some time, use wait cursor to provide
   // immediate UI feedback.
@@ -146,7 +147,7 @@ std::shared_ptr<ProjectEditor> ProjectsModel::openProject(
     mEditors.append(editor);
     mItems.push_back(ui::ProjectData{
         true,
-        q2s(uniqueFp),
+        q2s(fp.toNative()),
         q2s(*editor->getProject().getName()),
         schematics,
         boards,
@@ -162,6 +163,14 @@ std::shared_ptr<ProjectEditor> ProjectsModel::openProject(
     return editor;
   } catch (const Exception& e) {
     return nullptr;
+  }
+}
+
+void ProjectsModel::closeProject(int index) noexcept {
+  if ((index >= 0) && (index < mEditors.count())) {
+    mEditors.removeAt(index);
+    mItems.erase(mItems.begin() + index);
+    row_removed(index, 1);
   }
 }
 

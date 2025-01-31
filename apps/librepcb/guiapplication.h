@@ -72,7 +72,8 @@ public:
 
   // General Methods
   bool actionTriggered(ui::ActionId id, int sectionIndex) noexcept;
-  void createNewWindow(int projectIndex = -1) noexcept;
+  void createNewWindow(int id = -1, int projectIndex = -1) noexcept;
+  bool requestClosingWindow() noexcept;
   void exec();
 
   // Operator Overloadings
@@ -92,6 +93,7 @@ private:
   std::shared_ptr<LibrariesModel> mLibraries;
   std::shared_ptr<ProjectsModel> mProjects;
   QList<std::shared_ptr<MainWindow>> mWindows;
+  QTimer mSaveOpenedWindowsCountdown;
 };
 
 /*******************************************************************************

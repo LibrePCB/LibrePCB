@@ -61,8 +61,8 @@ Board2dTab::Board2dTab(GuiApplication& app, std::shared_ptr<ProjectEditor> prj,
     mDrc(new BoardDesignRuleCheck(this)),
     mDrcNotification(new Notification(ui::NotificationType::Progress, QString(),
                                       QString(), QString(), QString(), true)),
-    mDrcState(ui::RuleCheckState::NotRunYet),
-    mDrcMessages(new slint::VectorModel<ui::RuleCheckMessageData>()) {
+    mDrcUndoStackState(mEditor->getUndoStack().getUniqueStateId()),
+    mDrcMessages() {
   // Apply settings from board.
   if (auto brd = mProject->getProject().getBoardByIndex(mObjIndex)) {
     mGridInterval = brd->getGridInterval();
@@ -78,8 +78,7 @@ Board2dTab::Board2dTab(GuiApplication& app, std::shared_ptr<ProjectEditor> prj,
 
   // Connect undo stack.
   connect(&prj->getUndoStack(), &UndoStack::stateModified, this, [this]() {
-    if (mDrcState == ui::RuleCheckState::UpToDate) {
-      mDrcState = ui::RuleCheckState::Outdated;
+    if (mDrcMessages) {
       emit uiDataChanged();
     }
   });
@@ -105,12 +104,23 @@ Board2dTab::~Board2dTab() noexcept {
 ui::TabData Board2dTab::getBaseUiData() const noexcept {
   auto brd = mProject->getProject().getBoardByIndex(mObjIndex);
 
+  ui::RuleCheckState drcState;
+  if (mDrc->isRunning()) {
+    drcState = ui::RuleCheckState::Running;
+  } else if (!mDrcMessages) {
+    drcState = ui::RuleCheckState::NotRunYet;
+  } else if (mDrcUndoStackState == mEditor->getUndoStack().getUniqueStateId()) {
+    drcState = ui::RuleCheckState::UpToDate;
+  } else {
+    drcState = ui::RuleCheckState::Outdated;
+  }
+
   return ui::TabData{
       ui::TabType::Board2d,  // Type
       q2s(brd ? *brd->getName() : QString()),  // Title
       q2s(QPixmap(":/projects.png")),  // Icon
       mApp.getProjects().getIndexOf(mEditor),  // Project index
-      mDrcState,  // Rule check state
+      drcState,  // Rule check state
       mDrcMessages,  // Rule check messages
       mEditor->canSave(),  // Can save
       true,  // Can export graphics
@@ -229,12 +239,10 @@ void Board2dTab::startDrc(bool quick) noexcept {
       "...");
   mApp.getNotifications().add(mDrcNotification);
 
-  // Set UI into busy state during the checks.
-  mDrcState = ui::RuleCheckState::Running;
-  emit uiDataChanged();
-
   // Run the DRC.
+  mDrcUndoStackState = mEditor->getUndoStack().getUniqueStateId();
   mDrc->start(*board, board->getDrcSettings(), quick);  // can throw
+  emit uiDataChanged();
 }
 
 void Board2dTab::setDrcResult(
@@ -251,13 +259,13 @@ void Board2dTab::setDrcResult(
   }
 
   // Update UI.
+  if (!mDrcMessages) {
+    mDrcMessages.reset(new slint::VectorModel<ui::RuleCheckMessageData>());
+  }
   l2s(result.messages,
       board ? board->getDrcMessageApprovals() : QSet<SExpression>{},
       *mDrcMessages);
   mDrcNotification->dismiss();
-  if (mDrcState == ui::RuleCheckState::Running) {
-    mDrcState = ui::RuleCheckState::UpToDate;
-  }
   emit uiDataChanged();
 }
 

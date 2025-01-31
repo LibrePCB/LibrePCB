@@ -277,18 +277,6 @@ export component StatusBar inherits Rectangle {
                 width: min(max(self.preferred-width, 300px), root.width * 0.5, 700px);
                 visible: Data.notifications.length > 0;
             }
-
-            // Just for the preview, auto-open the notifications popup.
-            if Data.preview-mode: Rectangle {
-                Timer {
-                    interval: 1ms;
-
-                    triggered => {
-                        popup-notifications.show();
-                        self.running = false;
-                    }
-                }
-            }
         }
     }
 }

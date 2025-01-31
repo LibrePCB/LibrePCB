@@ -1,7 +1,7 @@
 import { PanelHeader, PanelHeaderButton } from "../common/panelheader.slint";
 import { Data } from "../api/data.slint";
 import { Backend } from "../api/backend.slint";
-import { ProjectData } from "../api/types.slint";
+import { ProjectData, ActionId } from "../api/types.slint";
 import { ToolTip } from "../common/tooltip.slint";
 
 component ProjectItem inherits Rectangle {
@@ -55,6 +55,10 @@ component Project inherits VerticalLayout {
         PanelHeaderButton {
             icon: @image-url("../img/close.svg");
             tooltip: @tr("Close Project");
+
+            clicked => {
+                Backend.action-triggered(ActionId.project-close, project-index);
+            }
         }
     }
 

@@ -154,6 +154,7 @@ Copyright: The Bootstrap Authors
 License: MIT
 
 Files:
+ apps/librepcb/ui/img/angle-right-solid.svg
  apps/librepcb/ui/img/bell-solid.svg
  apps/librepcb/ui/img/bell.svg
  apps/librepcb/ui/img/caret-down.svg

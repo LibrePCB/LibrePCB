@@ -69,9 +69,10 @@ ProjectEditor::ProjectEditor(
   if (upgradeMessages) {
     mUpgradeMessages = *upgradeMessages;
     QString msg =
-        tr("This project has been upgraded to a new file format. "
+        tr("The project '%1' has been upgraded to a new file format. "
            "After saving, it will not be possible anymore to open it with an "
-           "older LibrePCB version!");
+           "older LibrePCB version!")
+            .arg(*mProject->getName() % " " % mProject->getVersion());
     if (!upgradeMessages->isEmpty()) {
       msg += "\n\n" %
           tr("The upgrade produced %n message(s), please review before "
@@ -186,6 +187,29 @@ void ProjectEditor::showUpgradeMessages() noexcept {
   connect(buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::close);
   layout->addWidget(buttonBox);
   dialog.exec();
+}
+
+bool ProjectEditor::requestClose() noexcept {
+  if ((mUndoStack->isClean() && (!mManualModificationsMade)) ||
+      (!mProject->getDirectory().isWritable())) {
+    // No unsaved changes or opened in read-only mode or don't save.
+    return true;
+  }
+
+  const QMessageBox::StandardButton choice = QMessageBox::question(
+      qApp->activeWindow(), tr("Save Project?"),
+      tr("The project '%1' contains unsaved changes.\n"
+         "Do you want to save them before closing the project?")
+          .arg(*mProject->getName()),
+      QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+      QMessageBox::Yes);
+  if (choice == QMessageBox::Yes) {
+    return saveProject();
+  } else if (choice == QMessageBox::No) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 bool ProjectEditor::canSave() const noexcept {

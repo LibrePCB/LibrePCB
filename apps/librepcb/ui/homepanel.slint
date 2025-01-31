@@ -1,4 +1,4 @@
-import { ListView } from "std-widgets.slint";
+import { ListView, Palette } from "std-widgets.slint";
 import { PanelHeader, PanelHeaderButton } from "./common/panelheader.slint";
 import { FolderTreeItemData, QuickAccessItemData, ActionId } from "./api/types.slint";
 import { Backend } from "./api/backend.slint";
@@ -75,37 +75,62 @@ component FolderTree inherits ListView {
         height: item-height;
         background: (current-index == index) ? #454545 : (ta.has-hover ? #383838 : transparent);
 
-        HorizontalLayout {
-            spacing: 5px;
-            padding-left: 5px + item.level * i-icon.width;
-
-            if (item.is-folder) || (item.level > 0): Text {
-                color: #dddddd;
-                font-size: 14px;
-                font-weight: 700;
-                overflow: TextOverflow.elide;
-                visible: item.is-folder;
-                text: "▸";
-            }
-
-            i-icon := Image {
-                y: 1px;
-                width: parent.height - 2px;
-                height: parent.height - 2px;
-                source: item.icon;
-            }
-
-            Text {
-                horizontal-stretch: 1;
-                color: #dddddd;
-                font-size: 14px;
-                font-weight: 400;
-                overflow: TextOverflow.elide;
-                text: item.name;
-            }
-        }
-
         ta := TouchArea {
+            HorizontalLayout {
+                spacing: 5px;
+                padding-left: 5px;
+                padding-right: 5px;
+
+                ta-expand := TouchArea {
+                    mouse-cursor: pointer;
+                    enabled: item.has-children;
+                    width: self.height + item.level * 10px - 3px;
+
+                    i-expand := Image {
+                        y: 3px;
+                        x: parent.width - self.width;
+                        width: self.height;
+                        height: parent.height - 2 * self.y;
+                        image-fit: contain;
+                        source: @image-url("img/angle-right-solid.svg");
+                        colorize: Palette.foreground;
+                        rotation-angle: item.expanded ? 90deg : 0;
+                        visible: item.has-children;
+
+                        animate rotation-angle { duration: 100ms; }
+                    }
+
+                    clicked => {
+                        item.expanded = !item.expanded;
+                    }
+                }
+
+                i-icon := Image {
+                    y: 1px;
+                    width: parent.height - 2px;
+                    height: parent.height - 2px;
+                    source: item.icon;
+                }
+
+                Text {
+                    horizontal-stretch: 1;
+                    color: #dddddd;
+                    font-size: 14px;
+                    font-weight: 400;
+                    overflow: TextOverflow.elide;
+                    text: item.name;
+                }
+
+                if item.supports-pinning && (item.pinned || ta.has-hover || (current-index == index)): ListViewItemButton {
+                    icon: item.pinned ? @image-url("img/pin-angle-fill.svg") : @image-url("img/pin-angle.svg");
+                    tooltip: item.pinned ? @tr("Unpin") : @tr("Pin");
+
+                    clicked => {
+                        item.pinned = !item.pinned;
+                    }
+                }
+            }
+
             clicked => {
                 current-index = index;
                 item-selected(item.path);
@@ -151,7 +176,7 @@ export component HomePanel inherits Rectangle {
         }
 
         PanelHeader {
-            title: @tr("WORKSPACE");
+            title: @tr("WORKSPACE PROJECTS");
         }
 
         FolderTree {

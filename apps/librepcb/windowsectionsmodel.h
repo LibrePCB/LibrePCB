@@ -71,6 +71,7 @@ public:
   bool actionTriggered(ui::ActionId id, int sectionIndex) noexcept;
   void openSchematic(std::shared_ptr<ProjectEditor> prj, int index) noexcept;
   void openBoard(std::shared_ptr<ProjectEditor> prj, int index) noexcept;
+  void closeProjectTabs(std::shared_ptr<ProjectEditor> prj) noexcept;
   void setCurrentTab(int sectionIndex, int tabIndex) noexcept;
   void closeTab(int sectionIndex, int tabIndex) noexcept;
   slint::Image renderScene(int sectionIndex, float width, float height,

@@ -8,7 +8,17 @@ export component EmptyTab inherits Rectangle {
         enabled: false;
     }
 
+    i-background := Image {
+        x: (parent.width - self.width) / 2;
+        y: (parent.height - self.height) / 2;
+        width: min(root.width * 0.25, 200px);
+        height: self.width;
+        source: @image-url("img/librepcb-monochrome.svg");
+        colorize: #404040;
+    }
+
     Text {
+        y: (i-background.y - self.height) / 2;
         width: 90%;
         color: gray;
         horizontal-alignment: center;

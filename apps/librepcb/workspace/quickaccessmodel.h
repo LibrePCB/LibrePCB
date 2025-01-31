@@ -60,6 +60,7 @@ public:
   // General Methods
   void pushRecentProject(const FilePath& fp) noexcept;
   void setFavoriteProject(const FilePath& fp, bool favorite) noexcept;
+  bool isFavoriteProject(const FilePath& fp) const noexcept;
 
   // Implementations
   std::size_t row_count() const override;
@@ -69,6 +70,9 @@ public:
 
   // Operator Overloadings
   QuickAccessModel& operator=(const QuickAccessModel& rhs) = delete;
+
+signals:
+  void favoriteProjectChanged(const FilePath& fp, bool favorite);
 
 private:
   void load() noexcept;
