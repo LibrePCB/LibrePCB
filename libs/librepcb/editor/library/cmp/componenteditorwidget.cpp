@@ -144,6 +144,12 @@ ComponentEditorWidget::ComponentEditorWidget(const Context& context,
 }
 
 ComponentEditorWidget::~ComponentEditorWidget() noexcept {
+  // Delete all command objects in the undo stack. This mmust be done before
+  // other important objects are deleted, as undo command objects can hold
+  // pointers/references to them!
+  mUndoStack->clear();
+
+  // Disconnect UI from library element to avoid dangling pointers.
   mUi->attributesEditorWidget->setReferences(nullptr, nullptr);
   mUi->signalEditorWidget->setReferences(nullptr, nullptr);
   mUi->symbolVariantsEditorWidget->setReferences(nullptr, nullptr, nullptr);
