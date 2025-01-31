@@ -78,6 +78,8 @@ SchematicTab::SchematicTab(GuiApplication& app,
   // Connect undo stack.
   connect(&prj->getUndoStack(), &UndoStack::stateModified, this,
           &SchematicTab::requestRepaint);
+  connect(mEditor.get(), &ProjectEditor::manualModificationsMade, this,
+          &SchematicTab::uiDataChanged);
 
   // Build the whole schematic editor finite state machine.
   auto editor = new editor::ProjectEditor(mApp.getWorkspace(),
@@ -119,10 +121,12 @@ ui::TabData SchematicTab::getBaseUiData() const noexcept {
       mApp.getProjects().getIndexOf(mEditor),  // Project index
       ui::RuleCheckState::UpToDate,  // Rule check state
       mProject->getErcMessages(),  // Rule check messages
-      true,  // Can save
+      mEditor->canSave(),  // Can save
       true,  // Can export graphics
       mProject->getUndoStack().canUndo(),  // Can undo
+      q2s(mProject->getUndoStack().getUndoCmdText()),  // Undo text
       mProject->getUndoStack().canRedo(),  // Can redo
+      q2s(mProject->getUndoStack().getRedoCmdText()),  // Redo text
       true,  // Can cut/copy
       true,  // Can paste
       true,  // Can remove
@@ -189,7 +193,10 @@ void SchematicTab::deactivate() noexcept {
 }
 
 bool SchematicTab::actionTriggered(ui::ActionId id) noexcept {
-  if (id == ui::ActionId::SectionGridIntervalIncrease) {
+  if (id == ui::ActionId::Save) {
+    mEditor->saveProject();
+    return true;
+  } else if (id == ui::ActionId::SectionGridIntervalIncrease) {
     mGridInterval = PositiveLength(mGridInterval * 2);
     invalidateBackground();
     return true;

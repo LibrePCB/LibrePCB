@@ -27,7 +27,21 @@ export component SideBar inherits Rectangle {
             tooltip: @tr("Libraries");
             status-background: #d4d400;
             status-color: black;
-            status-text: (Data.outdated-libraries > 0) ? Data.outdated-libraries : "";
+            status-text: {
+                if Data.refreshing-available-libraries {
+                    if (mod(animation-tick(), 1000ms) >= 666ms) {
+                        return "...";
+                    } else if (mod(animation-tick(), 1000ms) >= 333ms) {
+                        return "..";
+                    } else {
+                        return ".";
+                    }
+                } else if Data.outdated-libraries > 0 {
+                    return Data.outdated-libraries;
+                } else {
+                    return "";
+                }
+            };
             checked: Data.current-page == MainPage.libraries;
 
             clicked => {
@@ -71,7 +85,13 @@ export component SideBar inherits Rectangle {
             };
             status-text: {
                 if (state == RuleCheckState.running) {
-                    return "...";
+                    if (mod(animation-tick(), 1000ms) >= 666ms) {
+                        return "...";
+                    } else if (mod(animation-tick(), 1000ms) >= 333ms) {
+                        return "..";
+                    } else {
+                        return ".";
+                    }
                 } else if ((state == RuleCheckState.up-to-date) || (state == RuleCheckState.outdated)) {
                     return (messages == 0) ? "ok" : messages;
                 } else {

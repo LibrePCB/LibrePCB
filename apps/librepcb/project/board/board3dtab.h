@@ -96,6 +96,7 @@ public:
   void setUiData(const ui::Board3dTabData& data) noexcept;
   void activate() noexcept override;
   void deactivate() noexcept override;
+  bool actionTriggered(ui::ActionId id) noexcept override;
   slint::Image renderScene(float width, float height) noexcept override;
   bool processScenePointerEvent(
       const QPointF& pos, const QPointF& globalPos,
