@@ -139,7 +139,7 @@ set(QT_COMPONENTS
 if(APPLE)
   # Deployment of the bundle fails if we have no dependency to QtQuick, so this
   # is a very ugly hack to work around this problem.
-  list(APPEND QT_COMPONENTS Quick)
+  list(APPEND QT_COMPONENTS Quick QuickControls2)
 endif()
 if(BUILD_TESTS)
   list(APPEND QT_COMPONENTS Test)

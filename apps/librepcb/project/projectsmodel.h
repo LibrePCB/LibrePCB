@@ -41,6 +41,7 @@ class Workspace;
 namespace editor {
 namespace app {
 
+class GuiApplication;
 class ProjectEditor;
 
 /*******************************************************************************
@@ -57,7 +58,8 @@ public:
   // Constructors / Destructor
   ProjectsModel() = delete;
   ProjectsModel(const ProjectsModel& other) = delete;
-  explicit ProjectsModel(Workspace& ws, QObject* parent = nullptr) noexcept;
+  explicit ProjectsModel(GuiApplication& app,
+                         QObject* parent = nullptr) noexcept;
   virtual ~ProjectsModel() noexcept;
 
   // General Methods
@@ -85,7 +87,7 @@ private:
    */
   static bool askForRestoringBackup(const FilePath& dir);
 
-  Workspace& mWorkspace;
+  GuiApplication& mApp;
   QList<std::shared_ptr<ProjectEditor>> mEditors;
   std::vector<ui::ProjectData> mItems;
 };

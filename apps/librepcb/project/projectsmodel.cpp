@@ -23,6 +23,8 @@
 #include "projectsmodel.h"
 
 #include "../apptoolbox.h"
+#include "../guiapplication.h"
+#include "../workspace/quickaccessmodel.h"
 #include "projecteditor.h"
 
 #include <librepcb/core/fileio/transactionalfilesystem.h>
@@ -50,8 +52,8 @@ namespace app {
  *  Constructors / Destructor
  ******************************************************************************/
 
-ProjectsModel::ProjectsModel(Workspace& ws, QObject* parent) noexcept
-  : QObject(parent), mWorkspace(ws) {
+ProjectsModel::ProjectsModel(GuiApplication& app, QObject* parent) noexcept
+  : QObject(parent), mApp(app) {
 }
 
 ProjectsModel::~ProjectsModel() noexcept {
@@ -73,9 +75,9 @@ std::shared_ptr<ProjectEditor> ProjectsModel::openProject(
     FilePath fp) noexcept {
   if (!fp.isValid()) {
     QSettings cs;  // client settings
-    QString lastOpenedFile =
-        cs.value("controlpanel/last_open_project", mWorkspace.getPath().toStr())
-            .toString();
+    QString lastOpenedFile = cs.value("controlpanel/last_open_project",
+                                      mApp.getWorkspace().getPath().toStr())
+                                 .toString();
 
     fp = FilePath(FileDialog::getOpenFileName(
         qApp->activeWindow(), tr("Open Project"), lastOpenedFile,
@@ -137,8 +139,8 @@ std::shared_ptr<ProjectEditor> ProjectsModel::openProject(
     }
 
     // Open editor.
-    auto editor =
-        std::make_shared<ProjectEditor>(mWorkspace, std::move(project));
+    auto editor = std::make_shared<ProjectEditor>(mApp, std::move(project),
+                                                  loader.getUpgradeMessages());
 
     // Keep handle.
     mEditors.append(editor);
@@ -150,6 +152,13 @@ std::shared_ptr<ProjectEditor> ProjectsModel::openProject(
         boards,
     });
     row_added(mItems.size() - 1, 1);
+
+    // Delay updating the last opened project to avoid an issue when
+    // double-clicking: https://github.com/LibrePCB/LibrePCB/issues/293
+    QTimer::singleShot(500, this, [this, fp]() {
+      mApp.getQuickAccess().pushRecentProject(fp);
+    });
+
     return editor;
   } catch (const Exception& e) {
     return nullptr;

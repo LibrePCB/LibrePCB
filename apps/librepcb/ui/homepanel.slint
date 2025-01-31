@@ -1,6 +1,6 @@
 import { ListView } from "std-widgets.slint";
 import { PanelHeader, PanelHeaderButton } from "./common/panelheader.slint";
-import { FolderTreeItemData, QuickAccessItemData } from "./api/types.slint";
+import { FolderTreeItemData, QuickAccessItemData, ActionId } from "./api/types.slint";
 import { Backend } from "./api/backend.slint";
 import { Data } from "./api/data.slint";
 import { ListViewItemButton } from "./common/listviewitembutton.slint";
@@ -127,10 +127,18 @@ export component HomePanel inherits Rectangle {
 
             PanelHeaderButton {
                 icon: @image-url("img/file-circle-plus.svg");
+
+                clicked => {
+                    Backend.action-triggered(ActionId.project-new, -1);
+                }
             }
 
             PanelHeaderButton {
                 icon: @image-url("img/folder-open.svg");
+
+                clicked => {
+                    Backend.action-triggered(ActionId.project-open, -1);
+                }
             }
         }
 

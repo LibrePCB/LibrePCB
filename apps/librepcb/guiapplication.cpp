@@ -64,7 +64,7 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
     mNotifications(new NotificationsModel(ws)),
     mQuickAccessModel(new QuickAccessModel(ws)),
     mLibraries(new LibrariesModel(ws)),
-    mProjects(new ProjectsModel(ws)) {
+    mProjects(new ProjectsModel(*this)) {
   mWorkspace.getLibraryDb().startLibraryRescan();
   createNewWindow();
 

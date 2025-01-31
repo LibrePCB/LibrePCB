@@ -64,13 +64,7 @@ SchematicTab::SchematicTab(GuiApplication& app,
                            std::shared_ptr<ProjectEditor> prj,
                            int schematicIndex, QObject* parent) noexcept
   : GraphicsSceneTab(app, prj, schematicIndex, parent), mEditor(prj), mFsm() {
-  // Apply theme.
-  const Theme& theme = mApp.getWorkspace().getSettings().themes.getActive();
-  mBackgroundColor =
-      theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor();
-  mGridColor =
-      theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor();
-  mGridStyle = theme.getSchematicGridStyle();
+  // Apply settings from schematic.
   if (auto sch = mProject->getProject().getSchematicByIndex(mObjIndex)) {
     mGridInterval = sch->getGridInterval();
   }
@@ -102,6 +96,12 @@ SchematicTab::SchematicTab(GuiApplication& app,
   //             mUi->statusbar->showMessage(message, timeoutMs);
   //           }
   //         });
+
+  // Apply theme whenever it has been modified.
+  connect(&mApp.getWorkspace().getSettings().themes,
+          &WorkspaceSettingsItem_Themes::edited, this,
+          &SchematicTab::updateTheme);
+  updateTheme();
 }
 
 SchematicTab::~SchematicTab() noexcept {
@@ -324,6 +324,19 @@ void SchematicTab::execGraphicsExportDialog(
   } catch (const Exception& e) {
     QMessageBox::warning(qApp->activeWindow(), tr("Error"), e.getMsg());
   }
+}
+
+void SchematicTab::updateTheme() noexcept {
+  const Theme& theme = mApp.getWorkspace().getSettings().themes.getActive();
+
+  mBackgroundColor =
+      theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor();
+  mGridColor =
+      theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor();
+  mGridStyle = theme.getSchematicGridStyle();
+
+  invalidateBackground();
+  emit uiDataChanged();
 }
 
 /*******************************************************************************

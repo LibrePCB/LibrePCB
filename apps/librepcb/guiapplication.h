@@ -68,6 +68,7 @@ public:
   Workspace& getWorkspace() noexcept { return mWorkspace; }
   NotificationsModel& getNotifications() noexcept { return *mNotifications; }
   ProjectsModel& getProjects() noexcept { return *mProjects; }
+  QuickAccessModel& getQuickAccess() noexcept { return *mQuickAccessModel; }
 
   // General Methods
   bool actionTriggered(ui::ActionId id, int sectionIndex) noexcept;

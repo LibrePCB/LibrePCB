@@ -68,7 +68,7 @@ public:
 
   // General Methods
   ui::TabData getBaseUiData() const noexcept override;
-  const ui::Board2dTabData& getUiData() const noexcept { return mUiData; }
+  ui::Board2dTabData getUiData() const noexcept;
   void setUiData(const ui::Board2dTabData& data) noexcept;
   void activate() noexcept override;
   void deactivate() noexcept override;
@@ -83,7 +83,7 @@ protected:
 private:
   void startDrc(bool quick) noexcept;
   void setDrcResult(const BoardDesignRuleCheck::Result& result) noexcept;
-  void updateGridIntervalUiStr() noexcept;
+  void updateTheme() noexcept;
 
 private:
   std::shared_ptr<ProjectEditor> mEditor;
@@ -91,7 +91,6 @@ private:
   std::shared_ptr<Notification> mDrcNotification;
   ui::RuleCheckState mDrcState;
   std::shared_ptr<slint::VectorModel<ui::RuleCheckMessageData>> mDrcMessages;
-  ui::Board2dTabData mUiData;
   std::unique_ptr<BoardPlaneFragmentsBuilder> mPlaneBuilder;
 };
 
