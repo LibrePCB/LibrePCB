@@ -89,7 +89,8 @@ private:
   std::shared_ptr<ProjectEditor> mEditor;
   std::unique_ptr<BoardDesignRuleCheck> mDrc;
   std::shared_ptr<Notification> mDrcNotification;
-  ui::RuleCheckState mDrcState;
+  uint mDrcUndoStackState;
+  // ui::RuleCheckState mDrcState;
   std::shared_ptr<slint::VectorModel<ui::RuleCheckMessageData>> mDrcMessages;
   std::unique_ptr<BoardPlaneFragmentsBuilder> mPlaneBuilder;
 };

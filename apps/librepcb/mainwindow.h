@@ -59,17 +59,22 @@ public:
   MainWindow() = delete;
   MainWindow(const MainWindow& other) = delete;
   explicit MainWindow(GuiApplication& app,
-                      slint::ComponentHandle<ui::AppWindow> win, int index,
+                      slint::ComponentHandle<ui::AppWindow> win, int id,
                       QObject* parent = nullptr) noexcept;
   virtual ~MainWindow() noexcept;
 
   // General Methods
+  int getId() const noexcept { return mId; }
   bool isCurrentWindow() const noexcept;
   void setCurrentPage(ui::MainPage page) noexcept;
   void popUpNotifications() noexcept;
+  void closeProject(int index, std::shared_ptr<ProjectEditor> prj) noexcept;
 
   // Operator Overloadings
   MainWindow& operator=(const MainWindow& rhs) = delete;
+
+signals:
+  void aboutToClose();
 
 private:
   slint::CloseRequestResponse closeRequested() noexcept;
@@ -82,7 +87,7 @@ private:
   void newProject(bool eagleImport = false,
                   const FilePath& parentDir = FilePath()) noexcept;
 
-  const int mIndex;
+  const int mId;
   const QString mSettingsPrefix;
   GuiApplication& mApp;
   std::shared_ptr<WindowSectionsModel> mSections;

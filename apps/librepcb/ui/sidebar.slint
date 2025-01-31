@@ -52,11 +52,17 @@ export component SideBar inherits Rectangle {
         SideBarButton {
             icon: @image-url("img/files.svg");
             tooltip: @tr("Open Documents");
-            enabled: project.valid;
+            enabled: Data.projects.length > 0;
             checked: Data.current-page == MainPage.project;
 
             clicked => {
                 Data.current-page = MainPage.project;
+            }
+
+            changed enabled => {
+                if (self.checked && (!self.enabled)) {
+                    Data.current-page = MainPage.home;
+                }
             }
         }
 

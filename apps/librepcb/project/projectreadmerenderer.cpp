@@ -75,7 +75,10 @@ void ProjectReadmeRenderer::request(const FilePath& fp, int width) noexcept {
 
 void ProjectReadmeRenderer::start() noexcept {
   // Do not start if input is invalid.
-  if ((!mPath.isValid()) || (mWidth <= 0)) return;
+  if ((!mPath.isValid()) || (mWidth <= 0)) {
+    emit finished(QPixmap());
+    return;
+  }
 
   // Check if README.md exists.
   if (mPath.getSuffix() == "lpp") {
@@ -84,9 +87,13 @@ void ProjectReadmeRenderer::start() noexcept {
     mPath = mPath.getPathTo("README.md");
   } else if ((mPath.getSuffix() != "lppz") && (mPath.getSuffix() != "md") &&
              (mPath.getSuffix() != "txt")) {
+    emit finished(QPixmap());
     return;
   }
-  if (!mPath.isExistingFile()) return;
+  if (!mPath.isExistingFile()) {
+    emit finished(QPixmap());
+    return;
+  }
 
   // Start rendering in thread.
   emit runningChanged(true);

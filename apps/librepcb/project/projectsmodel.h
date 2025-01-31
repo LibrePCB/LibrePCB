@@ -66,6 +66,7 @@ public:
   int getIndexOf(std::shared_ptr<ProjectEditor> prj) noexcept;
   std::shared_ptr<ProjectEditor> getProject(int index) noexcept;
   std::shared_ptr<ProjectEditor> openProject(FilePath fp = FilePath()) noexcept;
+  void closeProject(int index) noexcept;
 
   // Implementations
   std::size_t row_count() const override;

@@ -73,12 +73,14 @@ public:
   UndoStack& getUndoStack() noexcept { return *mUndoStack; }
   auto getErcMessages() noexcept { return mErcMessages; }
 
+  bool canSave() const noexcept;
+
   /**
    * @brief Show a dialog with all project file format upgrade messages
    */
   void showUpgradeMessages() noexcept;
 
-  bool canSave() const noexcept;
+  bool requestClose() noexcept;
 
   /**
    * @brief Save the whole project to the harddisc

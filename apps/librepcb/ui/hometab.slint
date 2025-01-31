@@ -10,6 +10,15 @@ export component HomeTab inherits Rectangle {
         enabled: false;
     }
 
+    if i-readme.source.width == 0: Image {
+        x: (parent.width - self.width) / 2;
+        y: (parent.height - self.height) / 2;
+        width: min(root.width * 0.25, 200px);
+        height: self.width;
+        source: @image-url("img/librepcb-monochrome.svg");
+        colorize: #404040;
+    }
+
     TouchArea {
         VerticalLayout {
             padding: 10px;
@@ -51,13 +60,17 @@ export component HomeTab inherits Rectangle {
                         colorize-icon: true;
                         icon: @image-url("img/youtube-brands-solid.svg");
                         text: @tr("Video Tutorials");
+
+                        clicked => {
+                            Backend.action-triggered(ActionId.open-video-tutorials, -1);
+                        }
                     }
 
                     Button {
                         width: self.preferred-width;
                         colorize-icon: true;
                         icon: @image-url("img/documentation.svg");
-                        text: @tr("User Manual & Tutorial");
+                        text: @tr("User Manual & Getting Started Guide");
 
                         clicked => {
                             Backend.action-triggered(ActionId.open-user-manual, -1);
@@ -92,6 +105,7 @@ export component HomeTab inherits Rectangle {
                 border-color: Palette.foreground;
                 border-width: 1px;
                 border-radius: 10px;
+                background: #2a2a2a;
 
                 HorizontalLayout {
                     padding: 8px;
@@ -127,6 +141,7 @@ export component HomeTab inherits Rectangle {
                 width: 100%;
                 viewport-width: self.width;
                 viewport-height: i-readme.height;
+                interactive: i-readme.source.width > 0;
 
                 // If the image was getting smaller, the scroll position might
                 // end up in nirvana, so we clip it manually.

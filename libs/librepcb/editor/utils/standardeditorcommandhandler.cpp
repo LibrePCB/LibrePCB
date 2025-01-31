@@ -62,6 +62,11 @@ void StandardEditorCommandHandler::aboutLibrePcb() const noexcept {
   aboutDialog.exec();
 }
 
+void StandardEditorCommandHandler::onlineVideoTutorials() const noexcept {
+  DesktopServices ds(mSettings);
+  ds.openWebUrl(QUrl("https://www.youtube.com/@LibrePCB"));
+}
+
 void StandardEditorCommandHandler::onlineDocumentation() const noexcept {
   DesktopServices ds(mSettings);
   ds.openWebUrl(QUrl("https://librepcb.org/docs/"));

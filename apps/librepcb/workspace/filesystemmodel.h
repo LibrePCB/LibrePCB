@@ -42,6 +42,8 @@ class FileIconProvider;
 
 namespace app {
 
+class QuickAccessModel;
+
 /*******************************************************************************
  *  Class FileSystemModel
  ******************************************************************************/
@@ -58,24 +60,34 @@ public:
   FileSystemModel() = delete;
   FileSystemModel(const FileSystemModel& other) = delete;
   explicit FileSystemModel(const Workspace& ws, const FilePath& root,
+                           const QString& settingsPrefix,
+                           QuickAccessModel* quickAccessModel = nullptr,
                            QObject* parent = nullptr) noexcept;
   virtual ~FileSystemModel() noexcept;
 
   // Implementations
   std::size_t row_count() const override;
   std::optional<ui::FolderTreeItemData> row_data(std::size_t i) const override;
+  void set_row_data(std::size_t i,
+                    const ui::FolderTreeItemData& data) noexcept override;
 
   // Operator Overloadings
   FileSystemModel& operator=(const FileSystemModel& rhs) = delete;
 
 private:
-  void refresh() noexcept;
-  void scanDir(const QString& fp, int level,
-               const FileIconProvider& ip) noexcept;
+  void expandDir(const FilePath& fp, std::size_t index, int level) noexcept;
+  void collapseDir(const FilePath& fp, std::size_t index, int level) noexcept;
+  void directoryChanged(const QString& dir) noexcept;
+  void favoriteProjectChanged(const FilePath& fp, bool favorite) noexcept;
 
   const Workspace& mWorkspace;
   const FilePath mRoot;
+  const QString mSettingsPrefix;
+  QPointer<QuickAccessModel> mQuickAccess;
+  std::unique_ptr<FileIconProvider> mIconProvider;
   std::vector<ui::FolderTreeItemData> mItems;
+  QFileSystemWatcher mWatcher;
+  QSet<FilePath> mExpandedDirs;
 };
 
 /*******************************************************************************

@@ -82,15 +82,33 @@ export global Data {
     in property <[FolderTreeItemData]> workspace-folder: [
         {
             icon: @image-url("../img/library.png"),
-            name: "project-1",
+            name: "folder-1",
             path: "/path/to",
-            is-folder: true,
+            has-children: true,
+            expanded: false,
+        },
+        {
+            icon: @image-url("../img/library.png"),
+            name: "folder-2",
+            path: "/path/to",
+            has-children: true,
+            expanded: true,
+        },
+        {
+            level: 1,
+            icon: @image-url("../img/library.png"),
+            name: "project-1.lpp",
+            path: "/path/to/project-1.lpp",
+            supports-pinning: true,
+            pinned: true,
         },
         {
             level: 1,
             icon: @image-url("../img/library.png"),
             name: "project-2.lpp",
             path: "/path/to/project-2.lpp",
+            supports-pinning: true,
+            pinned: false,
         },
     ];
 

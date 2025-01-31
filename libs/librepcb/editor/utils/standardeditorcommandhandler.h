@@ -59,6 +59,7 @@ public:
 
   // Action Handlers
   void aboutLibrePcb() const noexcept;
+  void onlineVideoTutorials() const noexcept;
   void onlineDocumentation() const noexcept;
   void onlineSupport() const noexcept;
   void onlineDonate() const noexcept;

@@ -13,6 +13,7 @@ export enum ActionId {
     open-workspace-folder,
     open-workspace-settings,
     open-keyboard-shortcuts-reference,
+    open-video-tutorials,
     open-user-manual,
     open-support,
     open-donate,
@@ -36,6 +37,7 @@ export enum ActionId {
     // Project
     project-new,
     project-open,
+    project-close,
     project-import-examples,
     project-import-eagle,
     project-open-output-jobs,
@@ -146,11 +148,14 @@ export struct LibraryData {
 }
 
 export struct FolderTreeItemData {
-    level: int,
+    level: int, // 0 = top level items
     icon: image,
     name: string,
     path: string,
-    is-folder: bool,
+    has-children: bool,
+    expanded: bool,
+    supports-pinning: bool,
+    pinned: bool,
 }
 
 export struct QuickAccessItemData {

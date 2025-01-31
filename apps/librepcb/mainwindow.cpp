@@ -29,6 +29,7 @@
 #include "project/projectreadmerenderer.h"
 #include "project/projectsmodel.h"
 #include "windowsectionsmodel.h"
+#include "workspace/filesystemmodel.h"
 
 #include <librepcb/core/fileio/transactionaldirectory.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
@@ -58,11 +59,11 @@ namespace app {
  ******************************************************************************/
 
 MainWindow::MainWindow(GuiApplication& app,
-                       slint::ComponentHandle<ui::AppWindow> win, int index,
+                       slint::ComponentHandle<ui::AppWindow> win, int id,
                        QObject* parent) noexcept
   : QObject(parent),
-    mIndex(index),
-    mSettingsPrefix(QString("window_%1").arg(index + 1)),
+    mId(id),
+    mSettingsPrefix(QString("window_%1").arg(mId)),
     mApp(app),
     mSections(
         new WindowSectionsModel(app, win->global<ui::Data>(), mSettingsPrefix)),
@@ -83,6 +84,9 @@ MainWindow::MainWindow(GuiApplication& app,
   d.set_current_section_index(0);
   d.set_cursor_coordinates(slint::SharedString());
   d.set_ignore_placement_locks(false);
+  d.set_workspace_folder(std::make_shared<FileSystemModel>(
+      mApp.getWorkspace(), mApp.getWorkspace().getProjectsPath(),
+      mSettingsPrefix % "/workspace_tree", &mApp.getQuickAccess()));
   d.set_unread_notifications_count(
       mApp.getNotifications().getUnreadNotificationsCount());
   d.set_current_progress_notification_index(
@@ -215,15 +219,30 @@ void MainWindow::popUpNotifications() noexcept {
   mWindow->fn_open_notifications_popup();
 }
 
+void MainWindow::closeProject(int index,
+                              std::shared_ptr<ProjectEditor> prj) noexcept {
+  const ui::Data& d = mWindow->global<ui::Data>();
+  if (d.get_current_project_index() >= index) {
+    d.set_current_project_index(
+        std::min(index, static_cast<int>(mApp.getProjects().row_count()) - 2));
+  }
+  mSections->closeProjectTabs(prj);
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
 slint::CloseRequestResponse MainWindow::closeRequested() noexcept {
+  if (!mApp.requestClosingWindow()) {
+    return slint::CloseRequestResponse::KeepWindowShown;
+  }
+
   // Save window state.
   QSettings cs;
   cs.setValue(mSettingsPrefix % "/geometry", mWidget->saveGeometry());
 
+  emit aboutToClose();
   return slint::CloseRequestResponse::HideWindow;
 }
 

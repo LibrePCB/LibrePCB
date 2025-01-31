@@ -29,7 +29,6 @@
 #include "notificationsmodel.h"
 #include "project/projecteditor.h"
 #include "project/projectsmodel.h"
-#include "workspace/filesystemmodel.h"
 #include "workspace/quickaccessmodel.h"
 
 #include <librepcb/core/3d/occmodel.h>
@@ -45,6 +44,8 @@
 #include <QtCore>
 #include <QtNetwork>
 #include <QtWidgets>
+
+#include <algorithm>
 
 /*******************************************************************************
  *  Namespace
@@ -65,8 +66,16 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
     mQuickAccessModel(new QuickAccessModel(ws)),
     mLibraries(new LibrariesModel(ws)),
     mProjects(new ProjectsModel(*this)) {
-  mWorkspace.getLibraryDb().startLibraryRescan();
-  createNewWindow();
+  // Open windows.
+  QSettings cs;
+  for (const QString& idStr : cs.value("global/windows").toStringList()) {
+    if (int id = idStr.toInt()) {
+      createNewWindow(id);
+    }
+  }
+  if (mWindows.isEmpty()) {
+    createNewWindow();
+  }
 
   // Connect notification signals.
   const qint64 startupTime = QDateTime::currentMSecsSinceEpoch();
@@ -167,6 +176,23 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
                     &Notification::dismiss);
             mNotifications->add(n);
           });
+
+  // Configure window saving countdown timer.
+  mSaveOpenedWindowsCountdown.setSingleShot(true);
+  connect(&mSaveOpenedWindowsCountdown, &QTimer::timeout, this, [this]() {
+    QStringList ids;
+    for (const auto& win : mWindows) {
+      ids.append(QString::number(win->getId()));
+    }
+    std::sort(ids.begin(), ids.end());
+
+    QSettings cs;
+    cs.setValue("global/windows", ids);
+    qDebug().noquote() << "Saved opened window IDs:" << ids.join(", ");
+  });
+
+  // Start library rescan.
+  mWorkspace.getLibraryDb().startLibraryRescan();
 }
 
 GuiApplication::~GuiApplication() noexcept {
@@ -195,6 +221,9 @@ bool GuiApplication::actionTriggered(ui::ActionId id,
   } else if (id == ui::ActionId::OpenKeyboardShortcutsReference) {
     stdHandler.shortcutsReference();
     return true;
+  } else if (id == ui::ActionId::OpenVideoTutorials) {
+    stdHandler.onlineVideoTutorials();
+    return true;
   } else if (id == ui::ActionId::OpenUserManual) {
     stdHandler.onlineDocumentation();
     return true;
@@ -222,12 +251,22 @@ bool GuiApplication::actionTriggered(ui::ActionId id,
   } else if (id == ui::ActionId::LibraryPanelInstall) {
     mLibraries->installCheckedLibraries();
     return true;
+  } else if (id == ui::ActionId::ProjectClose) {
+    if (auto prj = mProjects->getProject(sectionIndex)) {
+      if (prj->requestClose()) {
+        for (auto win : mWindows) {
+          win->closeProject(sectionIndex, prj);
+        }
+        mProjects->closeProject(sectionIndex);
+      }
+    }
+    return true;
   }
 
   return false;
 }
 
-void GuiApplication::createNewWindow(int projectIndex) noexcept {
+void GuiApplication::createNewWindow(int id, int projectIndex) noexcept {
   // Create Slint window.
   auto win = ui::AppWindow::create();
 
@@ -239,8 +278,6 @@ void GuiApplication::createNewWindow(int projectIndex) noexcept {
   d.set_about_librepcb_details(q2s(buildAppVersionDetails()));
   d.set_order_info_url(slint::SharedString());
   d.set_workspace_path(mWorkspace.getPath().toNative().toUtf8().data());
-  d.set_workspace_folder(std::make_shared<FileSystemModel>(
-      mWorkspace, mWorkspace.getProjectsPath()));
   d.set_notifications(mNotifications);
   d.set_quick_access_items(mQuickAccessModel);
   d.set_libraries(mLibraries);
@@ -291,9 +328,50 @@ void GuiApplication::createNewWindow(int projectIndex) noexcept {
   b.on_toggle_libraries_checked(std::bind(
       &LibrariesModel::toggleAll, mLibraries.get(), std::placeholders::_1));
 
+  // Reuse next free window ID.
+  if (id < 1) {
+    id = 1;
+    while (std::any_of(mWindows.begin(), mWindows.end(),
+                       [id](const std::shared_ptr<MainWindow>& w) {
+                         return w->getId() == id;
+                       })) {
+      ++id;
+    }
+  }
+
   // Build wrapper.
-  auto mw = std::make_shared<MainWindow>(*this, win, mWindows.count());
+  auto mw = std::make_shared<MainWindow>(*this, win, id);
+  connect(
+      mw.get(), &MainWindow::aboutToClose, this,
+      [this, mw]() {
+        mWindows.removeAll(mw);
+        qDebug().nospace() << "Closed window with ID " << mw->getId() << ".";
+
+        // Schedule saving number of opened windows.
+        mSaveOpenedWindowsCountdown.start(10000);
+      },
+      Qt::QueuedConnection);
   mWindows.append(mw);
+  qDebug().nospace() << "Opened new window with ID " << id << ".";
+
+  // Schedule saving number of opened windows.
+  mSaveOpenedWindowsCountdown.start(10000);
+}
+
+bool GuiApplication::requestClosingWindow() noexcept {
+  if (mWindows.count() >= 2) {
+    return true;
+  }
+
+  for (std::size_t i = 0; i < mProjects->row_count(); ++i) {
+    if (auto prj = mProjects->getProject(i)) {
+      if (!prj->requestClose()) {
+        return false;
+      }
+    }
+  }
+
+  return true;
 }
 
 void GuiApplication::exec() {

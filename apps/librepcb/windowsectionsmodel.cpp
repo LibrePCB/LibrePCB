@@ -145,6 +145,19 @@ void WindowSectionsModel::openBoard(std::shared_ptr<ProjectEditor> prj,
   }
 }
 
+void WindowSectionsModel::closeProjectTabs(
+    std::shared_ptr<ProjectEditor> prj) noexcept {
+  for (auto section : mItems) {
+    for (int i = section->getTabCount() - 1; i >= 0; --i) {
+      if (auto tab = section->getTab(i)) {
+        if (tab->getProject() == prj) {
+          section->closeTab(i);
+        }
+      }
+    }
+  }
+}
+
 void WindowSectionsModel::setCurrentTab(int sectionIndex,
                                         int tabIndex) noexcept {
   if (std::shared_ptr<WindowSection> s = mItems.value(sectionIndex)) {

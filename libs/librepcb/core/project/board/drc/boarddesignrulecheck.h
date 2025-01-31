@@ -76,6 +76,8 @@ public:
   void start(Board& board, const BoardDesignRuleCheckSettings& settings,
              bool quick) noexcept;
 
+  bool isRunning() const noexcept;
+
   /**
    * @brief Wait until the asynchronous operation is finished
    *
