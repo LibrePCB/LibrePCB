@@ -40,6 +40,8 @@ add_executable(
   project/board/board3dtab.h
   project/projecteditor.cpp
   project/projecteditor.h
+  project/projectreadmerenderer.cpp
+  project/projectreadmerenderer.h
   project/projectsmodel.cpp
   project/projectsmodel.h
   project/schematic/schematictab.cpp

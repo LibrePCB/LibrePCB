@@ -47,7 +47,8 @@ then
   macdeployqt "LibrePCB.app" -always-overwrite \
     -executable="./LibrePCB.app/Contents/MacOS/librepcb" \
     -executable="./LibrePCB.app/Contents/MacOS/librepcb-cli" \
-    -executable="./LibrePCB.app/Contents/Frameworks/libslint_cpp.dylib"
+    -executable="./LibrePCB.app/Contents/Frameworks/libslint_cpp.dylib" \
+    -qmldir="./LibrePCB.app/Contents/share/librepcb/qml"
   codesign --force --deep -s - ./LibrePCB.app/Contents/MacOS/librepcb
   codesign --force --deep -s - ./LibrePCB.app/Contents/MacOS/librepcb-cli
   create-dmg --skip-jenkins --volname "LibrePCB" \
@@ -62,7 +63,8 @@ else
       macdeployqt "LibrePCB.app" -dmg -always-overwrite \
         -executable="./LibrePCB.app/Contents/MacOS/librepcb" \
         -executable="./LibrePCB.app/Contents/MacOS/librepcb-cli" \
-        -executable="./LibrePCB.app/Contents/Frameworks/libslint_cpp.dylib"
+        -executable="./LibrePCB.app/Contents/Frameworks/libslint_cpp.dylib" \
+        -qmldir="./LibrePCB.app/Contents/share/librepcb/qml"
       sleep 5
     fi
   done

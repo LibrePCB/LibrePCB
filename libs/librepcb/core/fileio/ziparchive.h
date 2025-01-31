@@ -102,6 +102,15 @@ public:
   QByteArray readFile(std::size_t index);
 
   /**
+   * @brief Convenience method to find a file by name and read its content
+   *
+   * @param fileName  Relative file name to read.
+   *
+   * @return The file content if file was found, `std::nullopt` otherwise.
+   */
+  std::optional<QByteArray> tryReadFile(const QString& fileName);
+
+  /**
    * @brief Extract whole Zip to a directory (overwriting)
    *
    * @param dir   Target directory
