@@ -25,6 +25,7 @@
  ******************************************************************************/
 #include "appwindow.h"
 
+#include <librepcb/core/serialization/fileformatmigration.h>
 #include <librepcb/core/serialization/sexpression.h>
 
 #include <QtCore>
@@ -45,6 +46,8 @@ class UndoStack;
 
 namespace app {
 
+class GuiApplication;
+
 /*******************************************************************************
  *  Class ProjectEditor
  ******************************************************************************/
@@ -59,14 +62,21 @@ public:
   // Constructors / Destructor
   ProjectEditor() = delete;
   ProjectEditor(const ProjectEditor& other) = delete;
-  explicit ProjectEditor(Workspace& ws, std::unique_ptr<Project> project,
-                         QObject* parent = nullptr) noexcept;
+  explicit ProjectEditor(
+      GuiApplication& app, std::unique_ptr<Project> project,
+      const std::optional<QList<FileFormatMigration::Message>>& upgradeMessages,
+      QObject* parent = nullptr) noexcept;
   virtual ~ProjectEditor() noexcept;
 
   // Getters
   Project& getProject() noexcept { return *mProject; }
   UndoStack& getUndoStack() noexcept { return *mUndoStack; }
   auto getErcMessages() noexcept { return mErcMessages; }
+
+  /**
+   * @brief Show a dialog with all project file format upgrade messages
+   */
+  void showUpgradeMessages() noexcept;
 
   bool canSave() const noexcept;
 
@@ -106,8 +116,10 @@ private:
   void saveErcMessageApprovals(const QSet<SExpression>& approvals) noexcept;
 
 private:
+  GuiApplication& mApp;
   Workspace& mWorkspace;
   std::unique_ptr<Project> mProject;
+  QList<FileFormatMigration::Message> mUpgradeMessages;
   std::unique_ptr<UndoStack> mUndoStack;
 
   QSet<SExpression> mSupportedErcApprovals;

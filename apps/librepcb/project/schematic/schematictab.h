@@ -83,6 +83,7 @@ protected:
 private:
   void execGraphicsExportDialog(GraphicsExportDialog::Output output,
                                 const QString& settingsKey) noexcept;
+  void updateTheme() noexcept;
 
 private:
   std::shared_ptr<ProjectEditor> mEditor;

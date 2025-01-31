@@ -1026,7 +1026,9 @@ target_link_libraries(
 if(APPLE)
   # Deployment of the bundle fails if we have no dependency to QtQuick, so this
   # is a very ugly hack to work around this problem.
-  target_link_libraries(librepcb_editor PUBLIC ${QT}::Quick)
+  target_link_libraries(
+    librepcb_editor PUBLIC ${QT}::Quick ${QT}::QuickControls2
+  )
 endif()
 
 # Alias to namespaced variant

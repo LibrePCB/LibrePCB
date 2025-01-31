@@ -62,25 +62,10 @@ Board2dTab::Board2dTab(GuiApplication& app, std::shared_ptr<ProjectEditor> prj,
     mDrcNotification(new Notification(ui::NotificationType::Progress, QString(),
                                       QString(), QString(), QString(), true)),
     mDrcState(ui::RuleCheckState::NotRunYet),
-    mDrcMessages(new slint::VectorModel<ui::RuleCheckMessageData>()),
-    mUiData{
-        q2s(mBackgroundColor),  // Background color
-        q2s(Qt::white),  // Overlay color
-        ui::GridStyle::None,  // Grid style
-        slint::SharedString(),  // Grid interval
-        ui::LengthUnit::Millimeters,  // Length unit
-    } {
-  // Apply theme.
-  const Theme& theme = mApp.getWorkspace().getSettings().themes.getActive();
-  mBackgroundColor =
-      theme.getColor(Theme::Color::sBoardBackground).getPrimaryColor();
-  mGridColor =
-      theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor();
-  mGridStyle = theme.getBoardGridStyle();
-  mUiData.grid_style = l2s(mGridStyle);
+    mDrcMessages(new slint::VectorModel<ui::RuleCheckMessageData>()) {
+  // Apply settings from board.
   if (auto brd = mProject->getProject().getBoardByIndex(mObjIndex)) {
     mGridInterval = brd->getGridInterval();
-    mUiData.unit = l2s(brd->getGridUnit());
   }
 
   // Connect DRC.
@@ -103,7 +88,11 @@ Board2dTab::Board2dTab(GuiApplication& app, std::shared_ptr<ProjectEditor> prj,
   connect(mEditor.get(), &ProjectEditor::manualModificationsMade, this,
           &Board2dTab::uiDataChanged);
 
-  updateGridIntervalUiStr();
+  // Apply theme whenever it has been modified.
+  connect(&mApp.getWorkspace().getSettings().themes,
+          &WorkspaceSettingsItem_Themes::edited, this,
+          &Board2dTab::updateTheme);
+  updateTheme();
 }
 
 Board2dTab::~Board2dTab() noexcept {
@@ -137,20 +126,40 @@ ui::TabData Board2dTab::getBaseUiData() const noexcept {
   };
 }
 
+ui::Board2dTabData Board2dTab::getUiData() const noexcept {
+  const Theme& theme = mApp.getWorkspace().getSettings().themes.getActive();
+  auto brd = mProject->getProject().getBoardByIndex(mObjIndex);
+
+  QString gridIntervalStr;
+  if (brd) {
+    const LengthUnit& unit = brd->getGridUnit();
+    gridIntervalStr = Toolbox::floatToString(unit.convertToUnit(*mGridInterval),
+                                             10, QLocale());
+  }
+
+  return ui::Board2dTabData{
+      q2s(mBackgroundColor),  // Background color
+      q2s(theme.getColor(Theme::Color::sBoardOverlays)
+              .getSecondaryColor()),  // Overlay color
+      l2s(mGridStyle),  // Grid style
+      q2s(gridIntervalStr),  // Grid interval
+      brd ? l2s(brd->getGridUnit())
+          : ui::LengthUnit::Millimeters,  // Length unit
+  };
+}
+
 void Board2dTab::setUiData(const ui::Board2dTabData& data) noexcept {
   auto brd = mProject->getProject().getBoardByIndex(mObjIndex);
 
-  mUiData = data;
-
-  mGridStyle = s2l(mUiData.grid_style);
-  const LengthUnit unit = s2l(mUiData.unit);
+  mGridStyle = s2l(data.grid_style);
+  const LengthUnit unit = s2l(data.unit);
   if (brd && (unit != brd->getGridUnit())) {
     brd->setGridUnit(unit);
     mEditor->setManualModificationsMade();
   }
 
   invalidateBackground();
-  updateGridIntervalUiStr();
+  emit requestRepaint();
 }
 
 void Board2dTab::activate() noexcept {
@@ -166,7 +175,6 @@ void Board2dTab::activate() noexcept {
     mScene.reset(new BoardGraphicsScene(
         *brd, *mLayerProvider, std::make_shared<QSet<const NetSignal*>>(),
         this));
-    mUiData.overlay_color = q2s(Qt::white);
     emit requestRepaint();
   }
 }
@@ -183,13 +191,11 @@ bool Board2dTab::actionTriggered(ui::ActionId id) noexcept {
   } else if (id == ui::ActionId::SectionGridIntervalIncrease) {
     mGridInterval = PositiveLength(mGridInterval * 2);
     invalidateBackground();
-    updateGridIntervalUiStr();
     return true;
   } else if ((id == ui::ActionId::SectionGridIntervalDecrease) &&
              ((*mGridInterval % 2) == 0)) {
     mGridInterval = PositiveLength(mGridInterval / 2);
     invalidateBackground();
-    updateGridIntervalUiStr();
     return true;
   } else if (id == ui::ActionId::RunQuickCheck) {
     startDrc(true);
@@ -255,16 +261,17 @@ void Board2dTab::setDrcResult(
   emit uiDataChanged();
 }
 
-void Board2dTab::updateGridIntervalUiStr() noexcept {
-  if (auto brd = mProject->getProject().getBoardByIndex(mObjIndex)) {
-    const LengthUnit& unit = brd->getGridUnit();
-    const slint::SharedString str = q2s(Toolbox::floatToString(
-        unit.convertToUnit(*mGridInterval), 10, QLocale()));
-    if (mUiData.grid_interval != str) {
-      mUiData.grid_interval = str;
-      emit uiDataChanged();
-    }
-  }
+void Board2dTab::updateTheme() noexcept {
+  const Theme& theme = mApp.getWorkspace().getSettings().themes.getActive();
+
+  mBackgroundColor =
+      theme.getColor(Theme::Color::sBoardBackground).getPrimaryColor();
+  mGridColor =
+      theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor();
+  mGridStyle = theme.getBoardGridStyle();
+
+  invalidateBackground();
+  emit uiDataChanged();
 }
 
 /*******************************************************************************

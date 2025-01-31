@@ -23,6 +23,9 @@
 #include "projecteditor.h"
 
 #include "../apptoolbox.h"
+#include "../guiapplication.h"
+#include "../notification.h"
+#include "../notificationsmodel.h"
 #include "../uitypes.h"
 
 #include <librepcb/core/fileio/transactionaldirectory.h>
@@ -48,16 +51,45 @@ namespace app {
  *  Constructors / Destructor
  ******************************************************************************/
 
-ProjectEditor::ProjectEditor(Workspace& ws, std::unique_ptr<Project> project,
-                             QObject* parent) noexcept
+ProjectEditor::ProjectEditor(
+    GuiApplication& app, std::unique_ptr<Project> project,
+    const std::optional<QList<FileFormatMigration::Message> >& upgradeMessages,
+    QObject* parent) noexcept
   : QObject(parent),
-    mWorkspace(ws),
+    mApp(app),
+    mWorkspace(app.getWorkspace()),
     mProject(std::move(project)),
+    mUpgradeMessages(),
     mUndoStack(new UndoStack()),
     mErcMessages(new slint::VectorModel<ui::RuleCheckMessageData>()),
     mManualModificationsMade(false),
     mLastAutosaveStateId(mUndoStack->getUniqueStateId()),
     mAutoSaveTimer() {
+  // Show notification if file format has been upgraded.
+  if (upgradeMessages) {
+    mUpgradeMessages = *upgradeMessages;
+    QString msg =
+        tr("This project has been upgraded to a new file format. "
+           "After saving, it will not be possible anymore to open it with an "
+           "older LibrePCB version!");
+    if (!upgradeMessages->isEmpty()) {
+      msg += "\n\n" %
+          tr("The upgrade produced %n message(s), please review before "
+             "proceeding.",
+             nullptr, upgradeMessages->count());
+    }
+    auto notification = std::make_shared<Notification>(
+        ui::NotificationType::Warning,
+        tr("ATTENTION: Project File Format Upgraded"), msg,
+        (!upgradeMessages->isEmpty()) ? tr("Show Messages") : QString(),
+        QString(), true);
+    connect(notification.get(), &Notification::buttonClicked, this,
+            &ProjectEditor::showUpgradeMessages);
+    connect(this, &ProjectEditor::projectSavedToDisk, notification.get(),
+            &Notification::dismiss);
+    mApp.getNotifications().add(notification);
+  }
+
   // Run the ERC after opening and after every modification.
   QTimer::singleShot(200, this, &ProjectEditor::runErc);
   connect(mUndoStack.get(), &UndoStack::stateModified, this,
@@ -96,6 +128,65 @@ ProjectEditor::~ProjectEditor() noexcept {
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
+
+void ProjectEditor::showUpgradeMessages() noexcept {
+  std::sort(mUpgradeMessages.begin(), mUpgradeMessages.end(),
+            [](const FileFormatMigration::Message& a,
+               const FileFormatMigration::Message& b) {
+              if (a.severity > b.severity) return true;
+              if (a.toVersion < b.toVersion) return true;
+              if (a.message < b.message) return true;
+              return false;
+            });
+
+  QDialog dialog(qApp->activeWindow());
+  dialog.setWindowTitle(tr("File Format Upgrade Messages"));
+  dialog.resize(800, 400);
+  QVBoxLayout* layout = new QVBoxLayout(&dialog);
+  QTableWidget* table = new QTableWidget(mUpgradeMessages.count(), 4, &dialog);
+  table->setHorizontalHeaderLabels(
+      {tr("Severity"), tr("Version"), tr("Occurrences"), tr("Message")});
+  table->horizontalHeader()->setSectionResizeMode(
+      0, QHeaderView::ResizeToContents);
+  table->horizontalHeader()->setSectionResizeMode(
+      1, QHeaderView::ResizeToContents);
+  table->horizontalHeader()->setSectionResizeMode(
+      2, QHeaderView::ResizeToContents);
+  table->horizontalHeader()->setStretchLastSection(true);
+  table->horizontalHeaderItem(3)->setTextAlignment(Qt::AlignLeft);
+  table->setEditTriggers(QAbstractItemView::NoEditTriggers);
+  table->setSelectionBehavior(QAbstractItemView::SelectRows);
+  table->setWordWrap(true);
+  for (int i = 0; i < mUpgradeMessages.count(); ++i) {
+    const FileFormatMigration::Message m = mUpgradeMessages.at(i);
+    QTableWidgetItem* item = new QTableWidgetItem(m.getSeverityStrTr());
+    item->setTextAlignment(Qt::AlignCenter);
+    table->setItem(i, 0, item);
+
+    item = new QTableWidgetItem(m.fromVersion.toStr() % " → " %
+                                m.toVersion.toStr());
+    item->setTextAlignment(Qt::AlignCenter);
+    table->setItem(i, 1, item);
+
+    item = new QTableWidgetItem(
+        (m.affectedItems > 0) ? QString::number(m.affectedItems) : QString());
+    item->setTextAlignment(Qt::AlignCenter);
+    table->setItem(i, 2, item);
+
+    item = new QTableWidgetItem(m.message);
+    item->setTextAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    table->setItem(i, 3, item);
+  }
+  layout->addWidget(table);
+  QTimer::singleShot(10, table, &QTableWidget::resizeRowsToContents);
+  connect(table->horizontalHeader(), &QHeaderView::sectionResized, table,
+          &QTableWidget::resizeRowsToContents);
+  QDialogButtonBox* buttonBox =
+      new QDialogButtonBox(QDialogButtonBox::Close, &dialog);
+  connect(buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::close);
+  layout->addWidget(buttonBox);
+  dialog.exec();
+}
 
 bool ProjectEditor::canSave() const noexcept {
   return (mManualModificationsMade || (!mUndoStack->isClean())) &&
