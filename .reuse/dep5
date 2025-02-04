@@ -172,6 +172,7 @@ Files:
  apps/librepcb/ui/img/draw-text.svg
  apps/librepcb/ui/img/edit.svg
  apps/librepcb/ui/img/file-circle-plus.svg
+ apps/librepcb/ui/img/filter-solid.svg
  apps/librepcb/ui/img/folder-open.svg
  apps/librepcb/ui/img/github.svg
  apps/librepcb/ui/img/heart.svg

@@ -44,6 +44,7 @@ namespace app {
  *  Non-Member Functions
  ******************************************************************************/
 
+int q2s(int i) noexcept;
 slint::PhysicalPosition q2s(const QPoint& p) noexcept;
 slint::PhysicalSize q2s(const QSize& s) noexcept;
 slint::SharedString q2s(const QString& s) noexcept;
@@ -59,13 +60,18 @@ bool operator==(const slint::SharedString& s1, const QString& s2) noexcept;
 bool operator!=(const slint::SharedString& s1, const QString& s2) noexcept;
 
 template <typename TTarget, typename TSlint, typename TClass, typename TQt>
-static void bind(QObject* context, const TTarget& target,
-                 void (TTarget::*setter)(const TSlint&) const, TClass* source,
-                 void (TClass::*signal)(TQt),
-                 const TSlint& defaultValue) noexcept {
+static void bind(
+    QObject* context, const TTarget& target,
+    void (TTarget::*setter)(const TSlint&) const, TClass* source,
+    void (TClass::*signal)(TQt), const TQt& defaultValue,
+    std::function<TSlint(const TQt&)> convert = [](const TQt& value) {
+      return q2s(value);
+    }) noexcept {
   QObject::connect(source, signal, context,
-                   std::bind(setter, &target, std::placeholders::_1));
-  (target.*setter)(defaultValue);
+                   [&target, setter, convert](const TQt& value) {
+                     (target.*setter)(convert(value));
+                   });
+  (target.*setter)(convert(defaultValue));
 }
 
 std::optional<ElementName> validateElementName(

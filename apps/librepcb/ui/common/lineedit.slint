@@ -4,13 +4,19 @@ export component LineEdit inherits Rectangle {
     in-out property <string> text <=> le.text;
     in-out property <string> placeholder-text <=> le.placeholder-text;
     in-out property <string> validation-error;
+    in-out property <bool> enabled <=> le.enabled;
     in-out property <bool> read-only <=> le.read-only;
+    in-out property <length> font-size <=> le.font-size;
+
+    callback key-pressed <=> le.key-pressed;
 
     height: le.preferred-height + 16px;
     horizontal-stretch: 1;
     forward-focus: le;
 
     ta := TouchArea {
+        enabled: enabled;
+
         le := LineEdit {
             width: 100%;
             height: 100%;

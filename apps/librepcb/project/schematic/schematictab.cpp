@@ -152,7 +152,7 @@ ui::SchematicTabData SchematicTab::getUiData() const noexcept {
       q2s(mBackgroundColor),  // Background color
       q2s(/*theme.getColor(Theme::Color::sSchematicBackground)
               .getSecondaryColor()*/
-          Qt::black),  // Overlay color (TODO)
+          QColor(Qt::black)),  // Overlay color (TODO)
       l2s(mGridStyle),  // Grid style
       q2s(gridIntervalStr),  // Grid interval
       sch ? l2s(sch->getGridUnit())

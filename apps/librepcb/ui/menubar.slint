@@ -495,78 +495,95 @@ export component MenuBar inherits Rectangle {
                     }
                 }
 
+                MenuItem {
+                    text: @tr("Update Project Library") + "...";
+                    icon: @image-url("img/refresh.svg");
+                    status-tip: @tr("Update the project's library elements from workspace libraries");
+                    shortcuts: "Ctrl+F5";
+                    enabled: Data.projects[Data.current-tab.project-index].valid;
+                }
+
+                MenuItem {
+                    text: @tr("Project Setup") + "...";
+                    icon: @image-url("img/settings.svg");
+                    status-tip: @tr("View/modify the project setup");
+                    shortcuts: "F6";
+                    enabled: Data.projects[Data.current-tab.project-index].valid;
+                }
+
                 MenuSeparator { }
 
                 MenuItem {
                     text: @tr("New Sheet") + "...";
+                    icon: @image-url("img/file-circle-plus.svg");
                     status-tip: @tr("Add a new schematic sheet to the project");
                     shortcuts: "Ctrl+N";
+                    enabled: Data.projects[Data.current-tab.project-index].valid;
                 }
 
                 MenuItem {
                     text: @tr("Rename Sheet") + "...";
                     status-tip: @tr("Rename the current schematic sheet");
                     shortcuts: "Ctrl+F2";
+                    enabled: Data.current-tab.type == TabType.schematic;
                 }
 
                 MenuItem {
                     text: @tr("Remove Sheet") + "...";
+                    icon: @image-url("img/delete.svg");
                     status-tip: @tr("Remove the current schematic sheet from the project");
                     shortcuts: "Ctrl+Del";
+                    enabled: Data.current-tab.type == TabType.schematic;
                 }
 
                 MenuSeparator { }
 
                 MenuItem {
                     text: @tr("New Board") + "...";
+                    icon: @image-url("img/file-circle-plus.svg");
                     status-tip: @tr("Add a new board to the project");
                     shortcuts: "Ctrl+N";
+                    enabled: Data.projects[Data.current-tab.project-index].valid;
                 }
 
                 MenuItem {
                     text: @tr("Copy Board") + "...";
+                    icon: @image-url("img/copy.svg");
                     status-tip: @tr("Add a copy of the current board to the project");
                     shortcuts: "Ctrl+D";
+                    enabled: (Data.current-tab.type == TabType.board-2d) || (Data.current-tab.type == TabType.board-3d);
                 }
 
                 MenuItem {
                     text: @tr("Remove Board") + "...";
+                    icon: @image-url("img/delete.svg");
                     status-tip: @tr("Remove the current board from the project");
                     shortcuts: "Ctrl+Del";
+                    enabled: (Data.current-tab.type == TabType.board-2d) || (Data.current-tab.type == TabType.board-3d);
                 }
-
-                MenuSeparator { }
 
                 MenuItem {
                     text: @tr("Run Quick Check");
+                    icon: @image-url("img/output-jobs.svg");
                     status-tip: @tr("Run only the most important copper checks from the DRC");
                     shortcuts: "Shift+F8";
+                    enabled: (Data.current-tab.type == TabType.board-2d) || (Data.current-tab.type == TabType.board-3d);
                 }
 
                 MenuItem {
                     text: @tr("Run Design Rule Check");
+                    icon: @image-url("img/drc.svg");
                     status-tip: @tr("Run the design rule check (DRC)");
                     shortcuts: "F8";
+                    enabled: (Data.current-tab.type == TabType.board-2d) || (Data.current-tab.type == TabType.board-3d);
                 }
 
                 MenuItem {
                     text: @tr("Board Setup") + "...";
+                    icon: @image-url("img/settings.svg");
                     status-tip: @tr("View/modify the board setup");
                     shortcuts: "F7";
-                }
-
-                MenuSeparator { }
-
-                MenuItem {
-                    text: @tr("Update Project Library") + "...";
-                    status-tip: @tr("Update the project's library elements from workspace libraries");
-                    shortcuts: "Ctrl+F5";
-                }
-
-                MenuItem {
-                    text: @tr("Project Setup") + "...";
-                    status-tip: @tr("View/modify the project setup");
-                    shortcuts: "F6";
+                    enabled: (Data.current-tab.type == TabType.board-2d) || (Data.current-tab.type == TabType.board-3d);
                 }
             }
         }
