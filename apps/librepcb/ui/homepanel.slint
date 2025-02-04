@@ -152,6 +152,7 @@ export component HomePanel inherits Rectangle {
 
             PanelHeaderButton {
                 icon: @image-url("img/file-circle-plus.svg");
+                icon-scale: 0.6;
 
                 clicked => {
                     Backend.action-triggered(ActionId.project-new, -1);
@@ -160,6 +161,7 @@ export component HomePanel inherits Rectangle {
 
             PanelHeaderButton {
                 icon: @image-url("img/folder-open.svg");
+                icon-scale: 0.6;
 
                 clicked => {
                     Backend.action-triggered(ActionId.project-open, -1);

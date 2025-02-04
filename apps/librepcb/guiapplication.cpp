@@ -65,6 +65,8 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
     mNotifications(new NotificationsModel(ws)),
     mQuickAccessModel(new QuickAccessModel(ws)),
     mLibraries(new LibrariesModel(ws)),
+    mLibrariesFiltered(new slint::FilterModel<ui::LibraryData>(mLibraries,
+                                                               [](const ui::LibraryData& lib){return !lib.filtered_out;})),
     mProjects(new ProjectsModel(*this)) {
   // Open windows.
   QSettings cs;
@@ -280,7 +282,7 @@ void GuiApplication::createNewWindow(int id, int projectIndex) noexcept {
   d.set_workspace_path(mWorkspace.getPath().toNative().toUtf8().data());
   d.set_notifications(mNotifications);
   d.set_quick_access_items(mQuickAccessModel);
-  d.set_libraries(mLibraries);
+  d.set_libraries(mLibrariesFiltered);
   d.set_projects(mProjects);
   d.set_current_project_index(projectIndex);
 
@@ -294,6 +296,12 @@ void GuiApplication::createNewWindow(int id, int projectIndex) noexcept {
   bind(this, d, &ui::Data::set_refreshing_available_libraries, mLibraries.get(),
        &LibrariesModel::fetchingRemoteLibrariesChanged,
        mLibraries->isFetchingRemoteLibraries());
+  bind<ui::Data, slint::SharedString, LibrariesModel, QStringList>(
+      this, d, &ui::Data::set_libraries_fetching_error, mLibraries.get(),
+      &LibrariesModel::errorsChanged, mLibraries->getErrors(),
+      [](const QStringList& errors) { return q2s(errors.join("\n\n")); });
+  bind(this, d, &ui::Data::set_libraries_filter, mLibraries.get(),
+       &LibrariesModel::filterTermChanged, mLibraries->getFilterTerm());
 
   // Register global callbacks.
   const ui::Backend& b = win->global<ui::Backend>();
@@ -327,6 +335,10 @@ void GuiApplication::createNewWindow(int id, int projectIndex) noexcept {
                                    mLibraries.get(), std::placeholders::_1));
   b.on_toggle_libraries_checked(std::bind(
       &LibrariesModel::toggleAll, mLibraries.get(), std::placeholders::_1));
+  b.on_libraries_clear_filter(
+      std::bind(&LibrariesModel::clearFilter, mLibraries.get()));
+  b.on_libraries_key_event(std::bind(&LibrariesModel::keyEvent,
+                                     mLibraries.get(), std::placeholders::_1));
 
   // Reuse next free window ID.
   if (id < 1) {

@@ -91,6 +91,7 @@ private:
   std::shared_ptr<Notification> mNotificationDesktopIntegration;
   std::shared_ptr<QuickAccessModel> mQuickAccessModel;
   std::shared_ptr<LibrariesModel> mLibraries;
+  std::shared_ptr<slint::FilterModel<ui::LibraryData>> mLibrariesFiltered;
   std::shared_ptr<ProjectsModel> mProjects;
   QList<std::shared_ptr<MainWindow>> mWindows;
   QTimer mSaveOpenedWindowsCountdown;

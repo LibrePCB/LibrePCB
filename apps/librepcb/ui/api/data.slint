@@ -36,7 +36,7 @@ export global Data {
 
     in-out property <bool> ignore-placement-locks: true;
 
-    in-out property <MainPage> current-page: MainPage.home;
+    in-out property <MainPage> current-page: MainPage.libraries;
 
     in-out property <string> current-project-preview-path;
     in property <image> current-project-preview-image;
@@ -150,6 +150,10 @@ export global Data {
     in-out property <int> current-project-index: 0;
 
     in property <bool> refreshing-available-libraries: true;
+
+    in property <string> libraries-fetching-error: "Some error occurred.\nFoo bar...";
+
+    in property <string> libraries-filter: "Foo";
 
     in property <int> outdated-libraries: 2;
 

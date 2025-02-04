@@ -59,6 +59,14 @@ export global Backend {
     // - Check state
     pure callback toggle-libraries-checked(bool);
 
+    // Clear libraries list filter term
+    pure callback libraries-clear-filter();
+
+    // Key event on the libraries list
+    //
+    // - Key event
+    pure callback libraries-key-event(KeyEvent) -> EventResult;
+
     // Render a graphics scene image
     //
     // - Section index

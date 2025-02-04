@@ -70,10 +70,17 @@ public:
   bool isFetchingRemoteLibraries() const noexcept {
     return !mApiEndpointsInProgress.isEmpty();
   }
+  QStringList getErrors() const noexcept {
+    return mLocalLibsErrors + mRemoteLibsErrors;
+  }
+  const QString& getFilterTerm() const noexcept { return mFilterTerm; }
   void installCheckedLibraries() noexcept;
   void openLibrary(const slint::SharedString& id) noexcept;
   void uninstallLibrary(const slint::SharedString& id) noexcept;
   void toggleAll(bool checked) noexcept;
+  void clearFilter() noexcept;
+  slint::private_api::EventResult keyEvent(
+      const slint::private_api::KeyEvent& e) noexcept;
 
   // Implementations
   std::size_t row_count() const override;
@@ -88,22 +95,30 @@ signals:
   void outdatedLibrariesChanged(int count);
   void checkedLibrariesChanged(int count);
   void fetchingRemoteLibrariesChanged(bool fetching);
+  void errorsChanged(QStringList errors);
+  void filterTermChanged(QString term);
 
 private:
   void refreshLocalLibraries() noexcept;
   void refreshRemoteLibraries() noexcept;
   void onlineLibraryListReceived(QList<ApiEndpoint::Library> libs) noexcept;
   void errorWhileFetchingLibraryList(QString errorMsg) noexcept;
+  void apiEndpointOperationFinished() noexcept;
   void refreshMergedLibs() noexcept;
+  void applyFilter() noexcept;
+  bool filterOut(const slint::SharedString& name) const noexcept;
   std::optional<std::size_t> findLib(const QString& id) noexcept;
 
   Workspace& mWorkspace;
   QList<std::shared_ptr<ApiEndpoint>> mApiEndpointsInProgress;
   QList<std::shared_ptr<LibraryDownload>> mDownloadsInProgress;
+  QStringList mLocalLibsErrors;
+  QStringList mRemoteLibsErrors;
   QHash<Uuid, ui::LibraryData> mLocalLibs;
   QHash<Uuid, ApiEndpoint::Library> mRemoteLibs;
   QHash<Uuid, QPixmap> mRemoteIcons;
   std::vector<ui::LibraryData> mMergedLibs;
+  QString mFilterTerm;
 };
 
 /*******************************************************************************

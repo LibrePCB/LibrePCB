@@ -67,7 +67,7 @@ void LibrariesModel::ensurePopulated() noexcept {
 int LibrariesModel::getOutdatedLibraries() const noexcept {
   int count = 0;
   for (const auto& lib : mMergedLibs) {
-    if (lib.state == ui::LibraryState::Outdated) ++count;
+    if (lib.state == ui::LibraryState::Outdated) {++count;}
   }
   return count;
 }
@@ -75,14 +75,14 @@ int LibrariesModel::getOutdatedLibraries() const noexcept {
 int LibrariesModel::getCheckedLibraries() const noexcept {
   int count = 0;
   for (const auto& lib : mMergedLibs) {
-    if (lib.checked) ++count;
+    if (lib.checked && (!lib.filtered_out)) {++count;}
   }
   return count;
 }
 
 void LibrariesModel::installCheckedLibraries() noexcept {
   for (auto& lib : mMergedLibs) {
-    if (!lib.checked) continue;
+    if ((!lib.checked) || (lib.filtered_out)) continue;
 
     auto uuid = Uuid::tryFromString(s2q(lib.id));
     if (!uuid) continue;
@@ -156,6 +156,46 @@ void LibrariesModel::toggleAll(bool checked) noexcept {
   }
 }
 
+void LibrariesModel::clearFilter() noexcept {
+  if (!mFilterTerm.isEmpty()) {
+    mFilterTerm.clear();
+    emit filterTermChanged(mFilterTerm);
+    applyFilter();
+  }
+}
+
+slint::private_api::EventResult LibrariesModel::keyEvent(
+    const slint::private_api::KeyEvent& e) noexcept {
+  if (e.event_type != slint::private_api::KeyEventType::KeyPressed) {
+    return slint::private_api::EventResult::Reject;
+  }
+
+  const QString text(s2q(e.text));
+  if (text.size() != 1) {
+    return slint::private_api::EventResult::Reject;
+  }
+  const QChar c = text.front();
+
+  if ((c == '\x1b') && (mFilterTerm.size() > 0)) {
+    mFilterTerm.clear();
+    emit filterTermChanged(mFilterTerm);
+    applyFilter();
+    return slint::private_api::EventResult::Accept;
+  } else if ((c == '\b') && (mFilterTerm.size() > 0)) {
+    mFilterTerm.chop(1);
+    emit filterTermChanged(mFilterTerm);
+    applyFilter();
+    return slint::private_api::EventResult::Accept;
+  } else if (c.isPrint()) {
+    mFilterTerm += c;
+    emit filterTermChanged(mFilterTerm);
+    applyFilter();
+    return slint::private_api::EventResult::Accept;
+  } else {
+    return slint::private_api::EventResult::Reject;
+  }
+}
+
 /*******************************************************************************
  *  Implementations
  ******************************************************************************/
@@ -184,6 +224,7 @@ void LibrariesModel::set_row_data(std::size_t i,
 
 void LibrariesModel::refreshLocalLibraries() noexcept {
   mLocalLibs.clear();
+  mLocalLibsErrors.clear();
 
   try {
     QMultiMap<Version, FilePath> libraries =
@@ -203,11 +244,12 @@ void LibrariesModel::refreshLocalLibraries() noexcept {
       const bool isRemote =
           libDir.isLocatedInDir(mWorkspace.getRemoteLibrariesPath());
 
+      const auto sName = q2s(name);
       mLocalLibs.insert(
           uuid,
           ui::LibraryData{
               q2s(libDir.toStr()),
-              q2s(name),
+              sName,
               q2s(description),
               q2s(version.toStr()),
               q2s(icon),
@@ -216,18 +258,23 @@ void LibrariesModel::refreshLocalLibraries() noexcept {
               ui::LibraryState::Unknown,
               0,
               false,
+              filterOut(sName),
           });
     }
   } catch (const Exception& e) {
     qCritical() << "Failed to update library list:" << e.getMsg();
+    mLocalLibsErrors.append(e.getMsg());
   }
 
   refreshMergedLibs();
+
+  emit errorsChanged(getErrors());
 }
 
 void LibrariesModel::refreshRemoteLibraries() noexcept {
   mApiEndpointsInProgress.clear();  // disconnects all signal/slot connections
   mRemoteLibs.clear();
+  mRemoteLibsErrors.clear();
   foreach (const QUrl& url, mWorkspace.getSettings().apiEndpoints.get()) {
     std::shared_ptr<ApiEndpoint> repo = std::make_shared<ApiEndpoint>(url);
     connect(repo.get(), &ApiEndpoint::libraryListReceived, this,
@@ -268,11 +315,26 @@ void LibrariesModel::onlineLibraryListReceived(
     }
   }
   refreshMergedLibs();
-  fetchingRemoteLibrariesChanged(false);
+
+  apiEndpointOperationFinished();
 }
 
 void LibrariesModel::errorWhileFetchingLibraryList(QString errorMsg) noexcept {
-  Q_UNUSED(errorMsg);
+  const ApiEndpoint* endpoint = qobject_cast<ApiEndpoint*>(sender());
+  mRemoteLibsErrors.append(
+      tr("Error while fetching libraries from '%1': %2")
+          .arg(endpoint ? endpoint->getUrl().toString() : QString())
+          .arg(errorMsg));
+  emit errorsChanged(getErrors());
+
+  apiEndpointOperationFinished();
+}
+
+void LibrariesModel::apiEndpointOperationFinished() noexcept {
+  const ApiEndpoint* endpoint = qobject_cast<ApiEndpoint*>(sender());
+  mApiEndpointsInProgress.removeIf([endpoint](std::shared_ptr<ApiEndpoint> ep) {
+    return ep.get() == endpoint;
+  });
   if (mApiEndpointsInProgress.isEmpty()) {
     fetchingRemoteLibrariesChanged(false);
   }
@@ -288,9 +350,10 @@ void LibrariesModel::refreshMergedLibs() noexcept {
           : ui::LibraryState::Outdated;
       it->checked = (it->state == ui::LibraryState::Outdated);
     } else {
+      auto name = q2s(lib.name);
       mMergedLibs.push_back(ui::LibraryData{
           q2s(lib.uuid.toStr()),
-          q2s(lib.name),
+          name,
           q2s(lib.description),
           q2s(lib.version.toStr()),
           q2s(mRemoteIcons.value(lib.uuid)),
@@ -299,6 +362,7 @@ void LibrariesModel::refreshMergedLibs() noexcept {
           ui::LibraryState::Unknown,
           0,
           lib.recommended,
+          filterOut(name),
       });
     }
   }
@@ -321,6 +385,27 @@ void LibrariesModel::refreshMergedLibs() noexcept {
   reset();
   emit outdatedLibrariesChanged(getOutdatedLibraries());
   emit checkedLibrariesChanged(getCheckedLibraries());
+}
+
+void LibrariesModel::applyFilter() noexcept {
+  bool modified = false;
+  for (std::size_t i = 0; i < mMergedLibs.size(); ++i) {
+    const bool filteredOut = filterOut(mMergedLibs.at(i).name);
+    if (mMergedLibs.at(i).filtered_out != filteredOut) {
+      mMergedLibs.at(i).filtered_out = filteredOut;
+      row_changed(i);
+      modified = true;
+    }
+  }
+
+  if (modified) {
+    emit checkedLibrariesChanged(getCheckedLibraries());
+  }
+}
+
+bool LibrariesModel::filterOut(const slint::SharedString& name) const noexcept {
+  return (!mFilterTerm.isEmpty()) &&
+      !s2q(name).toLower().contains(mFilterTerm.toLower());
 }
 
 std::optional<std::size_t> LibrariesModel::findLib(const QString& id) noexcept {

@@ -25,8 +25,20 @@ export component SideBar inherits Rectangle {
         SideBarButton {
             icon: @image-url("img/libraries.png");
             tooltip: @tr("Libraries");
-            status-background: #d4d400;
-            status-color: black;
+            status-background: {
+                if (!Data.refreshing-available-libraries) && (!Data.libraries-fetching-error.is-empty) {
+                    return red;
+                } else {
+                    return #d4d400;
+                }
+            };
+            status-color: {
+                if (!Data.refreshing-available-libraries) && (!Data.libraries-fetching-error.is-empty) {
+                    return white;
+                } else {
+                    return black;
+                }
+            };
             status-text: {
                 if Data.refreshing-available-libraries {
                     if (mod(animation-tick(), 1000ms) >= 666ms) {
@@ -36,6 +48,8 @@ export component SideBar inherits Rectangle {
                     } else {
                         return ".";
                     }
+                } else if !Data.libraries-fetching-error.is-empty {
+                    return "err";
                 } else if Data.outdated-libraries > 0 {
                     return Data.outdated-libraries;
                 } else {

@@ -53,7 +53,7 @@ Board3dTab::Board3dTab(GuiApplication& app, std::shared_ptr<ProjectEditor> prj,
                        int boardIndex, QObject* parent) noexcept
   : WindowTab(app, prj, boardIndex, parent),
     mEditor(prj),
-    mUiData{q2s(Qt::white), q2s(Qt::black)},
+    mUiData{q2s(QColor(Qt::white)), q2s(QColor(Qt::black))},
     mAnimation(new QVariantAnimation(this)) {
   mAnimation->setDuration(500);
   mAnimation->setEasingCurve(QEasingCurve::InOutCubic);
@@ -128,7 +128,7 @@ void Board3dTab::activate() noexcept {
         mProject->getProject().getCircuit().getAssemblyVariants().value(0);
     mOpenGlSceneBuilder->start(brd->buildScene3D(
         av ? std::make_optional(av->getUuid()) : std::nullopt));
-    mUiData.overlay_color = q2s(Qt::black);
+    mUiData.overlay_color = q2s(QColor(Qt::black));
     emit requestRepaint();
   }
 }

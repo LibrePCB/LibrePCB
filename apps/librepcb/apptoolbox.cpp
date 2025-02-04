@@ -36,6 +36,10 @@ namespace app {
  *  Non-Member Functions
  ******************************************************************************/
 
+int q2s(int i) noexcept {
+  return i;
+}
+
 slint::PhysicalPosition q2s(const QPoint& p) noexcept {
   return slint::PhysicalPosition({p.x(), p.y()});
 }
