@@ -31,6 +31,9 @@ component ProjectItem inherits Rectangle {
         }
 
         t-title := Text {
+            // Set minimum to compiled value, due to wrong preview:
+            // https://github.com/slint-ui/slint/pull/7011
+            min-height: 21px;
             vertical-alignment: center;
         }
     }

@@ -101,7 +101,20 @@ export component HomeTab inherits Rectangle {
                 }
             }
 
-            Rectangle {
+            property <bool> small-donation-button: parent.width < 350px;
+
+            if small-donation-button: Button {
+                colorize-icon: true;
+                primary: true;
+                icon: @image-url("img/heart.svg");
+                text: @tr("Donate");
+
+                clicked => {
+                    Backend.action-triggered(ActionId.open-donate, -1);
+                }
+            }
+
+            if !small-donation-button: Rectangle {
                 border-color: Palette.foreground;
                 border-width: 1px;
                 border-radius: 10px;
