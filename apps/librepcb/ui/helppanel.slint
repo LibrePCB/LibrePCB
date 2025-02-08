@@ -2,7 +2,7 @@ import { PanelHeader, PanelHeaderButton } from "./common/panelheader.slint";
 import { Data } from "./api/data.slint";
 import { ActionId } from "./api/types.slint";
 import { Backend } from "./api/backend.slint";
-import { Button, Palette } from "std-widgets.slint";
+import { Button, Palette, AboutSlint } from "std-widgets.slint";
 import { ToolTip } from "./common/tooltip.slint";
 
 export component HelpPanel inherits Rectangle {
@@ -180,7 +180,7 @@ export component HelpPanel inherits Rectangle {
 
         VerticalLayout {
             padding: 8px;
-            spacing: 10px;
+            spacing: 3px;
 
             Text {
                 wrap: word-wrap;
@@ -189,10 +189,16 @@ export component HelpPanel inherits Rectangle {
                 text: @tr("This is free software, released under the GNU General Public License (GPL) version 3 or later. You can find the full license text in our source code.");
             }
 
-            if available-space > 520px: Image {
-                width: 100%;
-                height: 35px;
-                source: @image-url("img/ngi0-commons.svg");
+            if available-space > 530px: HorizontalLayout {
+                spacing: 15px;
+
+                AboutSlint { }
+
+                Image {
+                    y: (parent.height - self.height) / 2;
+                    height: 35px;
+                    source: @image-url("img/ngi0-commons.svg");
+                }
             }
 
             if available-space > 480px: Text {
