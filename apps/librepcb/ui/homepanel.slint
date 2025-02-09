@@ -62,18 +62,26 @@ component QuickAccessList inherits ListView {
 }
 
 component FolderTree inherits ListView {
+    in-out property <[FolderTreeItemData]> model;
+    in property <bool> animate-expand: false;
     property <int> current-index: -1;
     property <length> item-height: 20px;
-    in-out property <[FolderTreeItemData]> model;
 
     preferred-height: model.length * item-height;
 
     callback item-selected(string);
 
     for item[index] in model: Rectangle {
+        property <length> animated-height: 0;
         width: parent.width;
-        height: item-height;
+        height: animate-expand ? animated-height : item-height;
         background: (current-index == index) ? #454545 : (ta.has-hover ? #383838 : transparent);
+
+        init => {
+            self.animated-height = item-height;
+        }
+
+        animate animated-height { duration: 100ms; }
 
         ta := TouchArea {
             HorizontalLayout {
@@ -84,12 +92,12 @@ component FolderTree inherits ListView {
                 ta-expand := TouchArea {
                     mouse-cursor: pointer;
                     enabled: item.has-children;
-                    width: self.height + item.level * 10px - 3px;
+                    width: item-height + item.level * 10px - 3px;
 
                     i-expand := Image {
                         y: 3px;
                         x: parent.width - self.width;
-                        width: self.height;
+                        width: item-height - 2 * self.y;
                         height: parent.height - 2 * self.y;
                         image-fit: contain;
                         source: @image-url("img/angle-right-solid.svg");
@@ -107,8 +115,9 @@ component FolderTree inherits ListView {
 
                 i-icon := Image {
                     y: 1px;
-                    width: parent.height - 2px;
+                    width: item-height - 2px;
                     height: parent.height - 2px;
+                    image-fit: fill;
                     source: item.icon;
                 }
 
@@ -187,6 +196,16 @@ export component HomePanel inherits Rectangle {
 
             item-selected(path) => {
                 Data.current-project-preview-path = path;
+            }
+
+            // Workaround as a ListView cannot have this child element.
+            Timer {
+                interval: 200ms;
+
+                triggered => {
+                    parent.animate-expand = true;
+                    self.running = false;
+                }
             }
         }
 

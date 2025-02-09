@@ -1,4 +1,4 @@
-import { Button, LineEdit, CheckBox } from "std-widgets.slint";
+import { Button, LineEdit, CheckBox, Palette } from "std-widgets.slint";
 import { LineEdit } from "../common/lineedit.slint";
 import { Data } from "../api/data.slint";
 import { Backend } from "../api/backend.slint";
@@ -66,20 +66,20 @@ export component CreateLibraryTab inherits Rectangle {
 
                 hl-examples := HorizontalLayout {
                     alignment: start;
-                    spacing: 8px;
+                    spacing: 4px;
 
-                    Text {
+                    t-examples := Text {
                         font-size: 11px;
                         text: @tr("Examples:");
                     }
 
-                    for text[i] in ["My Library", "KiCad Import", "Eagle Import"]: Text {
-                        color: white;
+                    for text[i] in ["My Library", "•", "KiCad Import", "•", "Eagle Import"]: Text {
+                        color: text.character-count > 1 ? white : t-examples.color;
                         overflow: elide;
                         font-size: 11px;
                         text: text;
 
-                        TouchArea {
+                        if text.character-count > 1: TouchArea {
                             mouse-cursor: pointer;
 
                             clicked => {

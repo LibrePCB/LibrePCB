@@ -36,6 +36,7 @@ component Item inherits Rectangle {
 
             t-title := Text {
                 vertical-alignment: center;
+                font-size: 12px;
                 font-italic: msg.approved;
                 overflow: elide;
                 color: root.enabled ? Palette.foreground : #707070;
@@ -135,23 +136,35 @@ export component RuleCheckPanel inherits Rectangle {
 
             Text {
                 width: 100%;
+                font-size: 12px;
                 font-italic: true;
                 wrap: word-wrap;
-                text: title.is-empty ? @tr("Not available for the current tab.") : ((Data.current-tab.rule-check-state == RuleCheckState.not-run-yet) ? @tr("Please trigger the checks with one of the buttons above.") : @tr("No messages."));
+                text: {
+                    if Data.current-tab.rule-check-state == RuleCheckState.not-available {
+                        return @tr("Not available for the current tab.");
+                    } else if Data.current-tab.rule-check-state == RuleCheckState.not-run-yet {
+                        return @tr("No checks run yet. Trigger them with one of the buttons above.");
+                    } else if Data.current-tab.rule-check-state == RuleCheckState.running {
+                        return @tr("Running, hang on...");
+                    } else {
+                        return @tr("No messages.");
+                    }
+                }
             }
-        }
 
-        if item-selected: PanelHeader {
-            title: selected-message.message;
-        }
+            if item-selected: PanelHeader {
+                title: selected-message.message;
+            }
 
-        if item-selected: VerticalLayout {
-            padding: 8px;
+            if item-selected: VerticalLayout {
+                padding: 8px;
 
-            Text {
-                width: 100%;
-                wrap: word-wrap;
-                text: selected-message.description;
+                Text {
+                    width: 100%;
+                    font-size: 12px;
+                    wrap: word-wrap;
+                    text: selected-message.description;
+                }
             }
         }
     }
