@@ -224,7 +224,7 @@ export component LibrariesPanel inherits Rectangle {
             PanelHeaderButton {
                 icon: @image-url("../img/download.svg");
                 icon-scale: 0.7;
-                tooltip: @tr("Download a Library") + "...";
+                tooltip: @tr("Download a Library by URL") + "...";
 
                 clicked => {
                     Backend.action-triggered(ActionId.download-library-tab-open, -1);

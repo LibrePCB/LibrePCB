@@ -5,6 +5,7 @@ import { Button, Palette, ScrollView, Spinner } from "std-widgets.slint";
 
 export component HomeTab inherits Rectangle {
     in property <int> section-index;
+    property <bool> compact-layout: self.width < 350px;
 
     fs := FocusScope {
         enabled: false;
@@ -27,6 +28,7 @@ export component HomeTab inherits Rectangle {
             Text {
                 font-size: 20px;
                 font-weight: 700;
+                wrap: word-wrap;
                 text: @tr("Get Started With LibrePCB");
             }
 
@@ -101,9 +103,7 @@ export component HomeTab inherits Rectangle {
                 }
             }
 
-            property <bool> small-donation-button: parent.width < 350px;
-
-            if small-donation-button: Button {
+            if compact-layout: Button {
                 colorize-icon: true;
                 primary: true;
                 icon: @image-url("img/heart.svg");
@@ -114,7 +114,7 @@ export component HomeTab inherits Rectangle {
                 }
             }
 
-            if !small-donation-button: Rectangle {
+            if !compact-layout: Rectangle {
                 border-color: Palette.foreground;
                 border-width: 1px;
                 border-radius: 10px;
