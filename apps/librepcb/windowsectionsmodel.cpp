@@ -267,6 +267,8 @@ void WindowSectionsModel::splitSection(int sectionIndex) noexcept {
           &WindowSectionsModel::currentProjectChanged);
   connect(s.get(), &WindowSection::cursorCoordinatesChanged, this,
           &WindowSectionsModel::cursorCoordinatesChanged);
+  connect(s.get(), &WindowSection::statusBarMessageChanged, this,
+          &WindowSectionsModel::statusBarMessageChanged);
   mItems.insert(newIndex, s);
   row_added(newIndex, 1);
 }

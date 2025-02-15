@@ -115,6 +115,7 @@ public:
 
 signals:
   void cursorCoordinatesChanged(const Point& pos, const LengthUnit& unit);
+  void statusBarMessageChanged(const QString& message, int timeoutMs);
   void requestClose();
   void requestRepaint();
   void uiDataChanged();

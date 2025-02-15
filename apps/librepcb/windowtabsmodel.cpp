@@ -62,6 +62,8 @@ void WindowTabsModel::addTab(std::shared_ptr<WindowTab> tab) noexcept {
 
   connect(tab.get(), &WindowTab::cursorCoordinatesChanged, this,
           &WindowTabsModel::cursorCoordinatesChanged);
+  connect(tab.get(), &WindowTab::statusBarMessageChanged, this,
+          &WindowTabsModel::statusBarMessageChanged);
   connect(
       tab.get(), &WindowTab::requestClose, this,
       [this, getTabIndex]() { closeTab(getTabIndex(sender())); },

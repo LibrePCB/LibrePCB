@@ -81,6 +81,7 @@ public:
 
 signals:
   void cursorCoordinatesChanged(const Point& pos, const LengthUnit& unit);
+  void statusBarMessageChanged(const QString& message, int timeoutMs);
   void requestRepaint();
   void uiDataChanged(std::size_t index);
 

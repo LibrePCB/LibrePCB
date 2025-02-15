@@ -75,6 +75,8 @@ WindowSection::WindowSection(GuiApplication& app, QObject* parent) noexcept
     } {
   connect(mTabsModel.get(), &WindowTabsModel::cursorCoordinatesChanged, this,
           &WindowSection::cursorCoordinatesChanged);
+  connect(mTabsModel.get(), &WindowTabsModel::statusBarMessageChanged, this,
+          &WindowSection::statusBarMessageChanged);
   connect(mTabsModel.get(), &WindowTabsModel::requestRepaint, this,
           &WindowSection::requestRepaint, Qt::QueuedConnection);
   connect(mTabsModel.get(), &WindowTabsModel::uiDataChanged, this,
