@@ -193,6 +193,16 @@ bool Project::setErcMessageApprovals(
   }
 }
 
+void Project::setErcMessageApproved(const SExpression& approval,
+                                    bool approved) noexcept {
+  if (approved) {
+    mErcMessageApprovals.insert(approval);
+  } else {
+    mErcMessageApprovals.remove(approval);
+  }
+  emit ercMessageApprovalsChanged(mErcMessageApprovals);
+}
+
 /*******************************************************************************
  *  Schematic Methods
  ******************************************************************************/

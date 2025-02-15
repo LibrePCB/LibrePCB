@@ -24,6 +24,7 @@
 
 #include "../../apptoolbox.h"
 #include "../../guiapplication.h"
+#include "../../rulecheck/rulecheckmessagesmodel.h"
 #include "../../uitypes.h"
 #include "../projecteditor.h"
 #include "../projectsmodel.h"
@@ -75,6 +76,10 @@ SchematicTab::SchematicTab(GuiApplication& app,
   connect(mEditor.get(), &ProjectEditor::manualModificationsMade, this,
           &SchematicTab::uiDataChanged);
 
+  // Refresh UI when ERC is completed to update execution error.
+  connect(mEditor.get(), &ProjectEditor::ercFinished, this,
+          &SchematicTab::uiDataChanged);
+
   // Build the whole schematic editor finite state machine.
   auto editor = new editor::ProjectEditor(mApp.getWorkspace(),
                                           mProject->getProject(), std::nullopt);
@@ -114,13 +119,21 @@ SchematicTab::~SchematicTab() noexcept {
 ui::TabData SchematicTab::getBaseUiData() const noexcept {
   auto sch = mProject->getProject().getSchematicByIndex(mObjIndex);
 
+  ui::RuleCheckState ercState;
+  if (!mProject->getErcMessages()) {
+    ercState = ui::RuleCheckState::NotRunYet;
+  } else {
+    ercState = ui::RuleCheckState::UpToDate;
+  }
+
   return ui::TabData{
       ui::TabType::Schematic,  // Type
       q2s(sch ? *sch->getName() : QString()),  // Title
       q2s(QPixmap(":/image.svg")),  // Icon
       mApp.getProjects().getIndexOf(mEditor),  // Project index
-      ui::RuleCheckState::UpToDate,  // Rule check state
+      ercState,  // Rule check state
       mProject->getErcMessages(),  // Rule check messages
+      q2s(mEditor->getErcExecutionError()),  // Rule check execution error
       mEditor->canSave(),  // Can save
       true,  // Can export graphics
       mProject->getUndoStack().canUndo(),  // Can undo

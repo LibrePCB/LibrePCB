@@ -55,7 +55,7 @@ component QuickAccessList inherits ListView {
             }
 
             double-clicked => {
-                Backend.project-item-doubleclicked(item.path);
+                Backend.file-item-doubleclicked(item.path);
             }
         }
     }
@@ -146,7 +146,11 @@ component FolderTree inherits ListView {
             }
 
             double-clicked => {
-                Backend.project-item-doubleclicked(item.path);
+                if item.has-children {
+                    item.expanded = !item.expanded;
+                } else {
+                    Backend.file-item-doubleclicked(item.path);
+                }
             }
         }
     }

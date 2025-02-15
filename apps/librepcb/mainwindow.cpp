@@ -135,8 +135,8 @@ MainWindow::MainWindow(GuiApplication& app,
                                   std::placeholders::_2));
   b.on_key_pressed(
       std::bind(&MainWindow::keyPressed, this, std::placeholders::_1));
-  b.on_project_item_doubleclicked(std::bind(
-      &MainWindow::projectItemDoubleClicked, this, std::placeholders::_1));
+  b.on_file_item_doubleclicked(std::bind(&MainWindow::projectItemDoubleClicked,
+                                         this, std::placeholders::_1));
   b.on_schematic_clicked([this](int projectIndex, int index) {
     if (auto prj = mApp.getProjects().getProject(projectIndex)) {
       mSections->openSchematic(prj, index);

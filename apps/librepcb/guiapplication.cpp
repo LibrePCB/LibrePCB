@@ -65,8 +65,9 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
     mNotifications(new NotificationsModel(ws)),
     mQuickAccessModel(new QuickAccessModel(ws)),
     mLibraries(new LibrariesModel(ws)),
-    mLibrariesFiltered(new slint::FilterModel<ui::LibraryData>(mLibraries,
-                                                               [](const ui::LibraryData& lib){return !lib.filtered_out;})),
+    mLibrariesFiltered(new slint::FilterModel<ui::LibraryData>(
+        mLibraries,
+        [](const ui::LibraryData& lib) { return !lib.filtered_out; })),
     mProjects(new ProjectsModel(*this)) {
   // Open windows.
   QSettings cs;

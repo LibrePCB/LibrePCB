@@ -67,7 +67,9 @@ void LibrariesModel::ensurePopulated() noexcept {
 int LibrariesModel::getOutdatedLibraries() const noexcept {
   int count = 0;
   for (const auto& lib : mMergedLibs) {
-    if (lib.state == ui::LibraryState::Outdated) {++count;}
+    if (lib.state == ui::LibraryState::Outdated) {
+      ++count;
+    }
   }
   return count;
 }
@@ -75,7 +77,9 @@ int LibrariesModel::getOutdatedLibraries() const noexcept {
 int LibrariesModel::getCheckedLibraries() const noexcept {
   int count = 0;
   for (const auto& lib : mMergedLibs) {
-    if (lib.checked && (!lib.filtered_out)) {++count;}
+    if (lib.checked && (!lib.filtered_out)) {
+      ++count;
+    }
   }
   return count;
 }

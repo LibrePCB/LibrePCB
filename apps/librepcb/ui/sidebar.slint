@@ -83,43 +83,56 @@ export component SideBar inherits Rectangle {
         SideBarButton {
             property <RuleCheckState> state: Data.current-tab.rule-check-state;
             property <int> messages: Data.current-tab.rule-check-messages.length;
+            property <string> error: Data.current-tab.rule-check-execution-error;
             property <string> title: Data.get-rule-check-title-for-tab-type(Data.current-tab.type);
+
+            function get-progress-dots() -> string {
+                if (mod(animation-tick(), 1000ms) >= 666ms) {
+                    return "...";
+                } else if (mod(animation-tick(), 1000ms) >= 333ms) {
+                    return "..";
+                } else {
+                    return ".";
+                }
+            }
 
             icon: @image-url("img/drc.svg");
             tooltip: title;
-            status-background: {
-                if (state == RuleCheckState.running) {
-                    return #d4d400;
-                } else if (state == RuleCheckState.up-to-date) {
-                    return (messages == 0) ? #00ff00 : #ff0000;
-                } else {
-                    return #d4d4d4;
-                }
-            };
-            status-color: {
-                if ((state == RuleCheckState.up-to-date) && (messages != 0)) {
-                    return white;
-                } else {
-                    return black;
-                }
-            };
-            status-text: {
-                if (state == RuleCheckState.running) {
-                    if (mod(animation-tick(), 1000ms) >= 666ms) {
-                        return "...";
-                    } else if (mod(animation-tick(), 1000ms) >= 333ms) {
-                        return "..";
-                    } else {
-                        return ".";
-                    }
-                } else if ((state == RuleCheckState.up-to-date) || (state == RuleCheckState.outdated)) {
-                    return (messages == 0) ? "ok" : messages;
-                } else {
-                    return "";
-                }
-            };
             enabled: state != RuleCheckState.not-available;
             checked: Data.current-page == MainPage.rule-check;
+
+            states [
+                running when state == RuleCheckState.running: {
+                    status-background: #d4d400;
+                    status-color: black;
+                    status-text: get-progress-dots();
+                }
+                failed when !error.is-empty: {
+                    status-background: #ff0000;
+                    status-color: white;
+                    status-text: "E";
+                }
+                not-available when state == RuleCheckState.not-available: {
+                    status-background: #d4d4d4;
+                    status-color: black;
+                    status-text: "";
+                }
+                not-run-yet when state == RuleCheckState.not-run-yet: {
+                    status-background: #d4d4d4;
+                    status-color: black;
+                    status-text: "";
+                }
+                outdated when state == RuleCheckState.outdated: {
+                    status-background: #d4d4d4;
+                    status-color: black;
+                    status-text: (messages == 0) ? "ok" : messages;
+                }
+                up-to-date when state == RuleCheckState.up-to-date: {
+                    status-background: (messages == 0) ? #00ff00 : #ff0000;
+                    status-color: (messages == 0) ? black : white;
+                    status-text: (messages == 0) ? "ok" : messages;
+                }
+            ]
 
             clicked => {
                 Data.current-page = MainPage.rule-check;
