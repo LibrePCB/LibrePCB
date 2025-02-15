@@ -632,7 +632,7 @@ void GraphicsView::drawForeground(QPainter* painter, const QRectF& rect) {
     const CursorOptions options = mSceneCursor->second;
 
     if (options.testFlag(CursorOption::Cross)) {
-      painter->setPen(QPen(foregroundBrush(), 0));
+      painter->setPen(QPen(mOverlayContentColor, 0));
       painter->drawLine(pos + QPointF(0, -r), pos + QPointF(0, r));
       painter->drawLine(pos + QPointF(-r, 0), pos + QPointF(r, 0));
     }
