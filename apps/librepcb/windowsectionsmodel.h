@@ -96,6 +96,7 @@ public:
 signals:
   void currentProjectChanged(std::shared_ptr<ProjectEditor> prj);
   void cursorCoordinatesChanged(const Point& pos, const LengthUnit& unit);
+  void statusBarMessageChanged(const QString& message, int timeoutMs);
 
 private:
   void splitSection(int sectionIndex) noexcept;

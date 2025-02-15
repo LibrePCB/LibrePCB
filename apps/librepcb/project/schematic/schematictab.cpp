@@ -93,14 +93,8 @@ SchematicTab::SchematicTab(GuiApplication& app,
       *new ToolBarProxy(),
       prj->getUndoStack()};
   mFsm.reset(new SchematicEditorFsm(fsmContext));
-  // connect(mFsm.data(), &SchematicEditorFsm::statusBarMessageChanged, this,
-  //         [this](const QString& message, int timeoutMs) {
-  //           if (timeoutMs < 0) {
-  //             mUi->statusbar->setPermanentMessage(message);
-  //           } else {
-  //             mUi->statusbar->showMessage(message, timeoutMs);
-  //           }
-  //         });
+  connect(mFsm.data(), &SchematicEditorFsm::statusBarMessageChanged, this,
+          &SchematicTab::statusBarMessageChanged);
 
   // Apply theme whenever it has been modified.
   connect(&mApp.getWorkspace().getSettings().themes,

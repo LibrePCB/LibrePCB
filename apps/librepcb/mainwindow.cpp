@@ -116,6 +116,17 @@ MainWindow::MainWindow(GuiApplication& app,
                         .arg(unit.convertToUnit(pos.getY()), 10, 'f',
                              unit.getReasonableNumberOfDecimals())));
           });
+  connect(mSections.get(), &WindowSectionsModel::statusBarMessageChanged, this,
+          [this, &d](const QString& message, int timeoutMs) {
+            d.set_status_bar_message(q2s(message));
+            if (timeoutMs > 0) {
+              QTimer::singleShot(timeoutMs, this, [&d, message]() {
+                if (s2q(d.get_status_bar_message()) == message) {
+                  d.set_status_bar_message(slint::SharedString());
+                }
+              });
+            }
+          });
   connect(
       mProjectPreviewRenderer.get(), &ProjectReadmeRenderer::runningChanged,
       this, [this](bool running) {

@@ -24,9 +24,9 @@ export component ToolButton inherits Rectangle {
         changed has-hover => {
             if (root.status-tip != "") {
                 if (self.has-hover) {
-                    Data.hovered-status-tip = root.status-tip;
+                    Data.status-bar-message = root.status-tip;
                 } else {
-                    Data.hovered-status-tip = "";
+                    Data.status-bar-message = "";
                 }
             }
         }
