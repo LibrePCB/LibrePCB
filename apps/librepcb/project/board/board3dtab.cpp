@@ -87,6 +87,7 @@ ui::TabData Board3dTab::getBaseUiData() const noexcept {
       mApp.getProjects().getIndexOf(mEditor),  // Project index
       ui::RuleCheckState::NotAvailable,  // Rule check state
       nullptr,  // Rule check messages
+      slint::SharedString(),  // Rule check execution error
       mEditor->canSave(),  // Can save
       false,  // Can export graphics
       mProject->getUndoStack().canUndo(),  // Can undo

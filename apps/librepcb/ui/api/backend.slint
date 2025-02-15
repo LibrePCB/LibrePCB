@@ -15,10 +15,10 @@ export global Backend {
 
     pure callback parse-length-input(string, string) -> EditParseResult;
 
-    // An item in a project tree view has been double-clicked
+    // An item in a file tree view has been double-clicked
     //
     // - File path (see FolderTreeItem::path)
-    pure callback project-item-doubleclicked(string);
+    pure callback file-item-doubleclicked(string);
 
     // A schematic in the projects panel has been clicked
     //

@@ -26,6 +26,7 @@
 #include "../guiapplication.h"
 #include "../notification.h"
 #include "../notificationsmodel.h"
+#include "../rulecheck/rulecheckmessagesmodel.h"
 #include "../uitypes.h"
 
 #include <librepcb/core/fileio/transactionaldirectory.h>
@@ -61,7 +62,8 @@ ProjectEditor::ProjectEditor(
     mProject(std::move(project)),
     mUpgradeMessages(),
     mUndoStack(new UndoStack()),
-    mErcMessages(new slint::VectorModel<ui::RuleCheckMessageData>()),
+    mErcMessages(),
+    mErcExecutionError(),
     mManualModificationsMade(false),
     mLastAutosaveStateId(mUndoStack->getUniqueStateId()),
     mAutoSaveTimer() {
@@ -309,22 +311,28 @@ void ProjectEditor::runErc() noexcept {
     mSupportedErcApprovals |= approvals;
     mDisappearedErcApprovals = mSupportedErcApprovals - approvals;
     approvals = mProject->getErcMessageApprovals() - mDisappearedErcApprovals;
-    saveErcMessageApprovals(approvals);
+    if (mProject->setErcMessageApprovals(approvals)) {
+      setManualModificationsMade();
+    }
 
     // Update UI.
-    l2s(messages, approvals, *mErcMessages);
+    if (!mErcMessages) {
+      mErcMessages.reset(new RuleCheckMessagesModel());
+      connect(mErcMessages.get(), &RuleCheckMessagesModel::approvalChanged,
+              mProject.get(), &Project::setErcMessageApproved);
+      connect(mErcMessages.get(), &RuleCheckMessagesModel::approvalChanged,
+              this, &ProjectEditor::setManualModificationsMade);
+    }
+    mErcMessages->setMessages(messages, approvals);
+    mErcExecutionError.clear();
 
     qDebug() << "ERC succeeded after" << timer.elapsed() << "ms.";
   } catch (const Exception& e) {
+    mErcExecutionError = e.getMsg();
     qCritical() << "ERC failed:" << e.getMsg();
   }
-}
 
-void ProjectEditor::saveErcMessageApprovals(
-    const QSet<SExpression>& approvals) noexcept {
-  if (mProject->setErcMessageApprovals(approvals)) {
-    // setManualModificationsMade(); TODO
-  }
+  emit ercFinished();
 }
 
 /*******************************************************************************

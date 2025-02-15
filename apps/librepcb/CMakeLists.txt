@@ -46,6 +46,8 @@ add_executable(
   project/projectsmodel.h
   project/schematic/schematictab.cpp
   project/schematic/schematictab.h
+  rulecheck/rulecheckmessagesmodel.cpp
+  rulecheck/rulecheckmessagesmodel.h
   uitypes.h
   windowsection.cpp
   windowsection.h

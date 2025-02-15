@@ -86,6 +86,7 @@ ui::TabData CreateLibraryTab::getBaseUiData() const noexcept {
       -1,  // Project index
       ui::RuleCheckState::NotAvailable,  // Rule check state
       nullptr,  // Rule check messages
+      slint::SharedString(),  // Rule check execution error
       false,  // Can save
       false,  // Can export graphics
       false,  // Can undo

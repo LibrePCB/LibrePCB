@@ -47,6 +47,7 @@ namespace app {
 class GuiApplication;
 class Notification;
 class ProjectEditor;
+class RuleCheckMessagesModel;
 
 /*******************************************************************************
  *  Class Board2dTab
@@ -90,8 +91,8 @@ private:
   std::unique_ptr<BoardDesignRuleCheck> mDrc;
   std::shared_ptr<Notification> mDrcNotification;
   uint mDrcUndoStackState;
-  // ui::RuleCheckState mDrcState;
-  std::shared_ptr<slint::VectorModel<ui::RuleCheckMessageData>> mDrcMessages;
+  std::shared_ptr<RuleCheckMessagesModel> mDrcMessages;
+  QString mDrcExecutionError;
   std::unique_ptr<BoardPlaneFragmentsBuilder> mPlaneBuilder;
 };
 

@@ -352,6 +352,15 @@ public:
    */
   bool setErcMessageApprovals(const QSet<SExpression>& approvals) noexcept;
 
+  /**
+   * @brief Set a single ERC message as approved or not
+   *
+   * @param approval    ERC message approval
+   * @param approved    Approval state
+   */
+  void setErcMessageApproved(const SExpression& approval,
+                             bool approved) noexcept;
+
   // Schematic Methods
 
   /**

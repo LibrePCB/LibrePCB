@@ -47,6 +47,7 @@ class UndoStack;
 namespace app {
 
 class GuiApplication;
+class RuleCheckMessagesModel;
 
 /*******************************************************************************
  *  Class ProjectEditor
@@ -72,6 +73,7 @@ public:
   Project& getProject() noexcept { return *mProject; }
   UndoStack& getUndoStack() noexcept { return *mUndoStack; }
   auto getErcMessages() noexcept { return mErcMessages; }
+  const QString& getErcExecutionError() noexcept { return mErcExecutionError; }
 
   bool canSave() const noexcept;
 
@@ -112,10 +114,10 @@ signals:
   void manualModificationsMade();
   void projectAboutToBeSaved();
   void projectSavedToDisk();
+  void ercFinished();
 
 private:
   void runErc() noexcept;
-  void saveErcMessageApprovals(const QSet<SExpression>& approvals) noexcept;
 
 private:
   GuiApplication& mApp;
@@ -126,7 +128,8 @@ private:
 
   QSet<SExpression> mSupportedErcApprovals;
   QSet<SExpression> mDisappearedErcApprovals;
-  std::shared_ptr<slint::VectorModel<ui::RuleCheckMessageData>> mErcMessages;
+  std::shared_ptr<RuleCheckMessagesModel> mErcMessages;
+  QString mErcExecutionError;
 
   /// Modifications bypassing the undo stack
   bool mManualModificationsMade;

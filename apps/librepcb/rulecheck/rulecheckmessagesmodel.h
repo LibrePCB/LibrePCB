@@ -17,60 +17,64 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBREPCB_RULECHECK_RULECHECKMESSAGESMODEL_H
+#define LIBREPCB_RULECHECK_RULECHECKMESSAGESMODEL_H
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "hometab.h"
+#include "appwindow.h"
 
-#include "apptoolbox.h"
+#include <librepcb/core/rulecheck/rulecheckmessage.h>
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 namespace editor {
 namespace app {
 
 /*******************************************************************************
- *  Constructors / Destructor
+ *  Class RuleCheckMessagesModel
  ******************************************************************************/
 
-HomeTab::HomeTab(GuiApplication& app, QObject* parent) noexcept
-  : WindowTab(app, nullptr, -1, parent) {
-}
+/**
+ * @brief The RuleCheckMessagesModel class
+ */
+class RuleCheckMessagesModel : public QObject,
+                               public slint::Model<ui::RuleCheckMessageData> {
+  Q_OBJECT
 
-HomeTab::~HomeTab() noexcept {
-}
+public:
+  // Constructors / Destructor
+  RuleCheckMessagesModel(const RuleCheckMessagesModel& other) = delete;
+  explicit RuleCheckMessagesModel(QObject* parent = nullptr) noexcept;
+  virtual ~RuleCheckMessagesModel() noexcept;
 
-/*******************************************************************************
- *  General Methods
- ******************************************************************************/
+  // General Methods
+  void setMessages(const RuleCheckMessageList& messages,
+                   const QSet<SExpression>& approvals) noexcept;
 
-ui::TabData HomeTab::getBaseUiData() const noexcept {
-  return ui::TabData{
-      ui::TabType::Home,  // Type
-      slint::SharedString(),  // Title
-      q2s(QPixmap(":/home.svg")),  // Icon
-      -1,  // Project index
-      ui::RuleCheckState::NotAvailable,  // Rule check state
-      nullptr,  // Rule check messages
-      slint::SharedString(),  // Rule check execution error
-      false,  // Can save
-      false,  // Can export graphics
-      false,  // Can undo
-      slint::SharedString(),  // Undo text
-      false,  // Can redo
-      slint::SharedString(),  // Redo text
-      false,  // Can cut/copy
-      false,  // Can paste
-      false,  // Can remove
-      false,  // Can rotate
-      false,  // Can mirror
-  };
-}
+  // Implementations
+  std::size_t row_count() const override;
+  std::optional<ui::RuleCheckMessageData> row_data(
+      std::size_t i) const override;
+  void set_row_data(std::size_t i,
+                    const ui::RuleCheckMessageData& data) noexcept override;
+
+  // Operator Overloadings
+  RuleCheckMessagesModel& operator=(const RuleCheckMessagesModel& rhs) = delete;
+
+signals:
+  void approvalChanged(const SExpression& approval, bool approved);
+  void autofixRequested(std::shared_ptr<const RuleCheckMessage> msg);
+
+private:
+  RuleCheckMessageList mMessages;
+  QSet<SExpression> mApprovals;
+};
 
 /*******************************************************************************
  *  End of File
@@ -79,3 +83,5 @@ ui::TabData HomeTab::getBaseUiData() const noexcept {
 }  // namespace app
 }  // namespace editor
 }  // namespace librepcb
+
+#endif

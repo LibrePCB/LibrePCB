@@ -20,12 +20,12 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "hometab.h"
+#include "rulecheckmessagesmodel.h"
 
-#include "apptoolbox.h"
+#include "../apptoolbox.h"
+#include "../uitypes.h"
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace
@@ -38,38 +38,64 @@ namespace app {
  *  Constructors / Destructor
  ******************************************************************************/
 
-HomeTab::HomeTab(GuiApplication& app, QObject* parent) noexcept
-  : WindowTab(app, nullptr, -1, parent) {
+RuleCheckMessagesModel::RuleCheckMessagesModel(QObject* parent) noexcept
+  : QObject(parent) {
 }
 
-HomeTab::~HomeTab() noexcept {
+RuleCheckMessagesModel::~RuleCheckMessagesModel() noexcept {
 }
 
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
 
-ui::TabData HomeTab::getBaseUiData() const noexcept {
-  return ui::TabData{
-      ui::TabType::Home,  // Type
-      slint::SharedString(),  // Title
-      q2s(QPixmap(":/home.svg")),  // Icon
-      -1,  // Project index
-      ui::RuleCheckState::NotAvailable,  // Rule check state
-      nullptr,  // Rule check messages
-      slint::SharedString(),  // Rule check execution error
-      false,  // Can save
-      false,  // Can export graphics
-      false,  // Can undo
-      slint::SharedString(),  // Undo text
-      false,  // Can redo
-      slint::SharedString(),  // Redo text
-      false,  // Can cut/copy
-      false,  // Can paste
-      false,  // Can remove
-      false,  // Can rotate
-      false,  // Can mirror
-  };
+void RuleCheckMessagesModel::setMessages(
+    const RuleCheckMessageList& messages,
+    const QSet<SExpression>& approvals) noexcept {
+  mMessages = messages;
+  mApprovals = approvals;
+  reset();
+}
+
+/*******************************************************************************
+ *  Implementations
+ ******************************************************************************/
+
+std::size_t RuleCheckMessagesModel::row_count() const {
+  return mMessages.size();
+}
+
+std::optional<ui::RuleCheckMessageData> RuleCheckMessagesModel::row_data(
+    std::size_t i) const {
+  if (auto msg = mMessages.value(i)) {
+    return ui::RuleCheckMessageData{
+        l2s(msg->getSeverity()),  // Severity
+        q2s(msg->getMessage()),  // Message
+        q2s(msg->getDescription()),  // Description
+        mApprovals.contains(msg->getApproval()),  // Approved
+        true,  // TODO: Supports autofix
+        false,  // Autofix requested
+    };
+  } else {
+    return std::nullopt;
+  }
+}
+
+void RuleCheckMessagesModel::set_row_data(
+    std::size_t i, const ui::RuleCheckMessageData& data) noexcept {
+  if (auto msg = mMessages.value(i)) {
+    if (data.approved && (!mApprovals.contains(msg->getApproval()))) {
+      mApprovals.insert(msg->getApproval());
+      emit approvalChanged(msg->getApproval(), true);
+      row_changed(i);
+    } else if ((!data.approved) && mApprovals.contains(msg->getApproval())) {
+      mApprovals.remove(msg->getApproval());
+      emit approvalChanged(msg->getApproval(), false);
+      row_changed(i);
+    } else if (data.autofix_requested) {
+      emit autofixRequested(msg);
+    }
+  }
 }
 
 /*******************************************************************************

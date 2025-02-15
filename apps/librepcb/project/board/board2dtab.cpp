@@ -26,6 +26,7 @@
 #include "../../guiapplication.h"
 #include "../../notification.h"
 #include "../../notificationsmodel.h"
+#include "../../rulecheck/rulecheckmessagesmodel.h"
 #include "../../uitypes.h"
 #include "../projecteditor.h"
 #include "../projectsmodel.h"
@@ -62,7 +63,9 @@ Board2dTab::Board2dTab(GuiApplication& app, std::shared_ptr<ProjectEditor> prj,
     mDrcNotification(new Notification(ui::NotificationType::Progress, QString(),
                                       QString(), QString(), QString(), true)),
     mDrcUndoStackState(mEditor->getUndoStack().getUniqueStateId()),
-    mDrcMessages() {
+    mDrcMessages(),
+    mDrcExecutionError(),
+    mPlaneBuilder() {
   // Apply settings from board.
   if (auto brd = mProject->getProject().getBoardByIndex(mObjIndex)) {
     mGridInterval = brd->getGridInterval();
@@ -122,6 +125,7 @@ ui::TabData Board2dTab::getBaseUiData() const noexcept {
       mApp.getProjects().getIndexOf(mEditor),  // Project index
       drcState,  // Rule check state
       mDrcMessages,  // Rule check messages
+      q2s(mDrcExecutionError),  // Rule check execution error
       mEditor->canSave(),  // Can save
       true,  // Can export graphics
       mProject->getUndoStack().canUndo(),  // Can undo
@@ -247,9 +251,8 @@ void Board2dTab::startDrc(bool quick) noexcept {
 
 void Board2dTab::setDrcResult(
     const BoardDesignRuleCheck::Result& result) noexcept {
-  // TODO: Handle errors.
-
   auto board = mProject->getProject().getBoardByIndex(mObjIndex);
+  if (!board) return;
 
   // Detect & remove disappeared messages.
   const QSet<SExpression> approvals =
@@ -260,11 +263,14 @@ void Board2dTab::setDrcResult(
 
   // Update UI.
   if (!mDrcMessages) {
-    mDrcMessages.reset(new slint::VectorModel<ui::RuleCheckMessageData>());
+    mDrcMessages.reset(new RuleCheckMessagesModel());
+    connect(mDrcMessages.get(), &RuleCheckMessagesModel::approvalChanged, board,
+            &Board::setDrcMessageApproved);
+    connect(mDrcMessages.get(), &RuleCheckMessagesModel::approvalChanged,
+            mEditor.get(), &ProjectEditor::setManualModificationsMade);
   }
-  l2s(result.messages,
-      board ? board->getDrcMessageApprovals() : QSet<SExpression>{},
-      *mDrcMessages);
+  mDrcMessages->setMessages(result.messages, board->getDrcMessageApprovals());
+  mDrcExecutionError = result.errors.join("\n\n");
   mDrcNotification->dismiss();
   emit uiDataChanged();
 }

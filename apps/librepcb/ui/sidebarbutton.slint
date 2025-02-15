@@ -43,6 +43,8 @@ export component SideBarButton inherits Rectangle {
         background: status-background;
 
         t-status := Text {
+            x: (parent.width - self.width) / 2;
+            y: (parent.height - self.height) / 2;
             font-size: 10px;
             font-weight: 700;
             color: status-color;

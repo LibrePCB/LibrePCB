@@ -120,6 +120,8 @@ export struct RuleCheckMessageData {
     message: string,
     description: string,
     approved: bool,
+    supports-autofix: bool,
+    autofix-requested: bool,  // Flag set by UI, reset by backend.
 }
 
 export enum LibraryType {
@@ -200,6 +202,7 @@ export struct TabData {
     // Rule check
     rule-check-state: RuleCheckState,
     rule-check-messages: [RuleCheckMessageData],
+    rule-check-execution-error: string,  // Empty if no error
 
     // Features
     can-save: bool,

@@ -36,7 +36,7 @@ export global Data {
 
     in-out property <bool> ignore-placement-locks: true;
 
-    in-out property <MainPage> current-page: MainPage.rule-check;
+    in-out property <MainPage> current-page: MainPage.home;
 
     in-out property <string> current-project-preview-path;
     in property <image> current-project-preview-image;
@@ -149,7 +149,7 @@ export global Data {
 
     in-out property <int> current-project-index: 0;
 
-    in property <bool> refreshing-available-libraries: true;
+    in property <bool> refreshing-available-libraries: false;
 
     in property <string> libraries-fetching-error: "Some error occurred.\nFoo bar...";
 
@@ -224,27 +224,31 @@ export global Data {
                     title: "Schematic",
                     icon: @image-url("../img/image.svg"),
                     project-index: 0,
-                    rule-check-state: RuleCheckState.running,
+                    rule-check-state: RuleCheckState.outdated,
                     rule-check-messages: [
                         {
                             severity: NotificationType.info,
                             message: "Hint message",
                             description: "Hint description.",
                             approved: false,
+                            supports-autofix: true,
                         },
                         {
                             severity: NotificationType.warning,
                             message: "Warning message",
                             description: "Warning description.",
                             approved: true,
+                            supports-autofix: false,
                         },
                         {
                             severity: NotificationType.critical,
                             message: "Error message",
                             description: "Error description.",
                             approved: false,
+                            supports-autofix: true,
                         },
                     ],
+                    rule-check-execution-error: "",
                     can-save: true,
                     can-export-graphics: true,
                     can-undo: true,
