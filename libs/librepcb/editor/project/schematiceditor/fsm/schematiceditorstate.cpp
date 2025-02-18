@@ -83,7 +83,11 @@ SchematicGraphicsScene*
 }
 
 PositiveLength SchematicEditorState::getGridInterval() const noexcept {
-  return mContext.editorGraphicsView.getGridInterval();
+  if (const Schematic* sch = mContext.editor.getActiveSchematic()) {
+    return sch->getGridInterval();
+  } else {
+    return PositiveLength(Length(2540000));
+  }
 }
 
 const LengthUnit& SchematicEditorState::getLengthUnit() const noexcept {
@@ -131,10 +135,8 @@ QList<std::shared_ptr<QGraphicsItem>> SchematicEditorState::findItemsAtPos(
   }
 
   const QPointF posExact = pos.toPxQPointF();
-  const QPainterPath posArea =
-      mContext.editorGraphicsView.calcPosWithTolerance(pos);
-  const QPainterPath posAreaLarge =
-      mContext.editorGraphicsView.calcPosWithTolerance(pos, 2);
+  const QPainterPath posArea = mContext.calcPosWithTolerance(pos, 1);
+  const QPainterPath posAreaLarge = mContext.calcPosWithTolerance(pos, 2);
 
   QPainterPath posAreaInGrid;
   const Point posOnGrid = pos.mappedToGrid(getGridInterval());

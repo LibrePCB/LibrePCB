@@ -66,7 +66,9 @@ GraphicsView::GraphicsView(QWidget* parent,
     mOriginCrossVisible(true),
     mUseOpenGl(false),
     mGrayOut(false),
-    mSceneCursor(),
+    mSceneCursorPos(),
+    mSceneCursorCross(false),
+    mSceneCursorCircle(false),
     mRulerGauges({
         {1, LengthUnit::millimeters(), " ", Length(100), Length(0)},
         {-1, LengthUnit::inches(), "", Length(254), Length(0)},
@@ -203,9 +205,11 @@ void GraphicsView::setSceneRectMarker(const QRectF& rect) noexcept {
   setForegroundBrush(foregroundBrush());  // this will repaint the foreground
 }
 
-void GraphicsView::setSceneCursor(
-    const std::optional<std::pair<Point, CursorOptions>>& cursor) noexcept {
-  mSceneCursor = cursor;
+void GraphicsView::setSceneCursor(const Point& pos, bool cross,
+                                  bool circle) noexcept {
+  mSceneCursorPos = pos;
+  mSceneCursorCross = cross;
+  mSceneCursorCircle = circle;
   setForegroundBrush(foregroundBrush());  // this will repaint the foreground
 }
 
@@ -624,20 +628,19 @@ void GraphicsView::drawForeground(QPainter* painter, const QRectF& rect) {
   }
 
   // If enabled, draw a cursor at a specific position.
-  if (mSceneCursor) {
+  if (mSceneCursorCross || mSceneCursorCircle) {
     const qreal scaleFactor =
         QStyleOptionGraphicsItem::levelOfDetailFromTransform(transform());
     const qreal r = 20 / scaleFactor;
-    const QPointF pos = mSceneCursor->first.toPxQPointF();
-    const CursorOptions options = mSceneCursor->second;
+    const QPointF pos = mSceneCursorPos.toPxQPointF();
 
-    if (options.testFlag(CursorOption::Cross)) {
+    if (mSceneCursorCross) {
       painter->setPen(QPen(mOverlayContentColor, 0));
       painter->drawLine(pos + QPointF(0, -r), pos + QPointF(0, r));
       painter->drawLine(pos + QPointF(-r, 0), pos + QPointF(r, 0));
     }
 
-    if (options.testFlag(CursorOption::Circle)) {
+    if (mSceneCursorCircle) {
       painter->setPen(QPen(Qt::green, 2 / scaleFactor));
       painter->setBrush(Qt::NoBrush);
       painter->drawEllipse(pos, r / 2, r / 2);

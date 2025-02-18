@@ -85,9 +85,19 @@ public:
     ProjectEditor& projectEditor;
     SchematicEditor& editor;
     std::shared_ptr<GraphicsScene>& graphicsScene;
-    GraphicsView& editorGraphicsView;
     ToolBarProxy& commandToolBar;
     UndoStack& undoStack;
+
+    std::function<void(const std::optional<Qt::CursorShape>&)> setViewCursor;
+    std::function<void(bool)> setViewGrayOut;
+    std::function<void(const QString&)> setViewInfoBoxText;
+    std::function<void(const std::optional<std::pair<Point, Point>>&)>
+        setViewRuler;
+    std::function<void(const Point& pos, bool, bool)> setSceneCursor;
+    std::function<void(const QPainterPath&)> setSceneSelectionArea;
+
+    std::function<QPainterPath(const Point&, qreal)> calcPosWithTolerance;
+    std::function<Point(const QPoint&, bool, bool)> mapGlobalPosToScenePos;
   };
 
   // Constructors / Destructor

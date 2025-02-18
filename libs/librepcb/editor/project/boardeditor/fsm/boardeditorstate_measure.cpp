@@ -22,7 +22,9 @@
  ******************************************************************************/
 #include "boardeditorstate_measure.h"
 
+#include "../../../graphics/graphicsscene.h"
 #include "../../../utils/measuretool.h"
+#include "../../../widgets/graphicsview.h"
 
 #include <librepcb/core/project/project.h>
 
@@ -42,7 +44,15 @@ namespace editor {
 BoardEditorState_Measure::BoardEditorState_Measure(
     const Context& context) noexcept
   : BoardEditorState(context),
-    mTool(new MeasureTool(mContext.editorGraphicsView, getLengthUnit())) {
+    mTool(new MeasureTool(
+        getLengthUnit(),
+        std::bind(&BoardEditorState_Measure::getGridInterval, this))) {
+  connect(mTool.data(), &MeasureTool::infoBoxTextChanged,
+          &mContext.editorGraphicsView, &GraphicsView::setInfoBoxText);
+  connect(mTool.data(), &MeasureTool::sceneCursorChanged,
+          &mContext.editorGraphicsView, &GraphicsView::setSceneCursor);
+  connect(mTool.data(), &MeasureTool::rulerPositionsChanged,
+          &mContext.editorGraphicsView, &GraphicsView::setRulerPositions);
   connect(mTool.data(), &MeasureTool::statusBarMessageChanged, this,
           &BoardEditorState_Measure::statusBarMessageChanged);
 }
@@ -55,13 +65,21 @@ BoardEditorState_Measure::~BoardEditorState_Measure() noexcept {
  ******************************************************************************/
 
 bool BoardEditorState_Measure::entry() noexcept {
+  if (GraphicsScene* scene = mContext.editorGraphicsView.getScene()) {
+    scene->setSelectionArea(QPainterPath());
+  }
+  mContext.editorGraphicsView.setGrayOut(true);
+  mContext.editorGraphicsView.setCursor(Qt::CrossCursor);
   mTool->setBoard(getActiveBoard());
-  mTool->enter();
+  mTool->enter(mContext.editorGraphicsView.mapGlobalPosToScenePos(
+      QCursor::pos(), true, true));
   return true;
 }
 
 bool BoardEditorState_Measure::exit() noexcept {
   mTool->leave();
+  mContext.editorGraphicsView.setGrayOut(false);
+  mContext.editorGraphicsView.unsetCursor();
   return true;
 }
 

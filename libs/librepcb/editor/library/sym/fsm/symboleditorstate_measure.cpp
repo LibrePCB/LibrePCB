@@ -22,7 +22,9 @@
  ******************************************************************************/
 #include "symboleditorstate_measure.h"
 
+#include "../../../graphics/graphicsscene.h"
 #include "../../../utils/measuretool.h"
+#include "../../../widgets/graphicsview.h"
 
 #include <QtCore>
 
@@ -39,7 +41,15 @@ namespace editor {
 SymbolEditorState_Measure::SymbolEditorState_Measure(
     const Context& context) noexcept
   : SymbolEditorState(context),
-    mTool(new MeasureTool(mContext.graphicsView, getLengthUnit())) {
+    mTool(new MeasureTool(
+        getLengthUnit(),
+        std::bind(&SymbolEditorState_Measure::getGridInterval, this))) {
+  connect(mTool.data(), &MeasureTool::infoBoxTextChanged,
+          &mContext.graphicsView, &GraphicsView::setInfoBoxText);
+  connect(mTool.data(), &MeasureTool::sceneCursorChanged,
+          &mContext.graphicsView, &GraphicsView::setSceneCursor);
+  connect(mTool.data(), &MeasureTool::rulerPositionsChanged,
+          &mContext.graphicsView, &GraphicsView::setRulerPositions);
   connect(mTool.data(), &MeasureTool::statusBarMessageChanged, this,
           &SymbolEditorState_Measure::statusBarMessageChanged);
 }
@@ -52,13 +62,19 @@ SymbolEditorState_Measure::~SymbolEditorState_Measure() noexcept {
  ******************************************************************************/
 
 bool SymbolEditorState_Measure::entry() noexcept {
+  mContext.graphicsScene.setSelectionArea(QPainterPath());
+  mContext.graphicsView.setGrayOut(true);
+  mContext.graphicsView.setCursor(Qt::CrossCursor);
   mTool->setSymbol(&mContext.symbol);
-  mTool->enter();
+  mTool->enter(
+      mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos(), true, true));
   return true;
 }
 
 bool SymbolEditorState_Measure::exit() noexcept {
   mTool->leave();
+  mContext.graphicsView.setGrayOut(false);
+  mContext.graphicsView.unsetCursor();
   return true;
 }
 

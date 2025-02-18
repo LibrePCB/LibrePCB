@@ -23,6 +23,7 @@
 #include "schematiceditorstate_measure.h"
 
 #include "../../../utils/measuretool.h"
+#include "../../../widgets/graphicsview.h"
 
 #include <librepcb/core/project/project.h>
 
@@ -42,7 +43,19 @@ namespace editor {
 SchematicEditorState_Measure::SchematicEditorState_Measure(
     const Context& context) noexcept
   : SchematicEditorState(context),
-    mTool(new MeasureTool(mContext.editorGraphicsView, getLengthUnit())) {
+    mTool(new MeasureTool(
+        getLengthUnit(),
+        std::bind(&SchematicEditorState_Measure::getGridInterval, this))) {
+  connect(mTool.data(), &MeasureTool::infoBoxTextChanged, this,
+          [this](const QString& t) { mContext.setViewInfoBoxText(t); });
+  connect(mTool.data(), &MeasureTool::sceneCursorChanged, this,
+          [this](const Point& pos, bool cross, bool circle) {
+            mContext.setSceneCursor(pos, cross, circle);
+          });
+  connect(mTool.data(), &MeasureTool::rulerPositionsChanged, this,
+          [this](const std::optional<std::pair<Point, Point>>& r) {
+            mContext.setViewRuler(r);
+          });
   connect(mTool.data(), &MeasureTool::statusBarMessageChanged, this,
           &SchematicEditorState_Measure::statusBarMessageChanged);
 }
@@ -55,13 +68,18 @@ SchematicEditorState_Measure::~SchematicEditorState_Measure() noexcept {
  ******************************************************************************/
 
 bool SchematicEditorState_Measure::entry() noexcept {
+  mContext.setSceneSelectionArea(QPainterPath());
+  mContext.setViewGrayOut(true);
+  mContext.setViewCursor(Qt::CrossCursor);
   mTool->setSchematic(getActiveSchematic());
-  mTool->enter();
+  mTool->enter(mContext.mapGlobalPosToScenePos(QCursor::pos(), true, true));
   return true;
 }
 
 bool SchematicEditorState_Measure::exit() noexcept {
   mTool->leave();
+  mContext.setViewGrayOut(false);
+  mContext.setViewCursor(std::nullopt);
   return true;
 }
 

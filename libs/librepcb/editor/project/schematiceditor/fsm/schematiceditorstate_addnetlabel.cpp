@@ -66,7 +66,7 @@ SchematicEditorState_AddNetLabel::~SchematicEditorState_AddNetLabel() noexcept {
 bool SchematicEditorState_AddNetLabel::entry() noexcept {
   Q_ASSERT(mUndoCmdActive == false);
 
-  mContext.editorGraphicsView.setCursor(Qt::CrossCursor);
+  mContext.setViewCursor(Qt::CrossCursor);
   return true;
 }
 
@@ -75,7 +75,7 @@ bool SchematicEditorState_AddNetLabel::exit() noexcept {
     return false;
   }
 
-  mContext.editorGraphicsView.unsetCursor();
+  mContext.setViewCursor(std::nullopt);
   return true;
 }
 

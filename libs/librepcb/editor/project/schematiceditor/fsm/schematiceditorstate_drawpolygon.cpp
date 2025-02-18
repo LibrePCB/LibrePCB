@@ -112,7 +112,7 @@ bool SchematicEditorState_DrawPolygon::entry() noexcept {
           &SchematicEditorState_DrawPolygon::filledCheckBoxCheckedChanged);
   mContext.commandToolBar.addWidget(std::move(fillCheckBox));
 
-  mContext.editorGraphicsView.setCursor(Qt::CrossCursor);
+  mContext.setViewCursor(Qt::CrossCursor);
   return true;
 }
 
@@ -123,7 +123,7 @@ bool SchematicEditorState_DrawPolygon::exit() noexcept {
   // Remove actions / widgets from the "command" toolbar
   mContext.commandToolBar.clear();
 
-  mContext.editorGraphicsView.unsetCursor();
+  mContext.setViewCursor(std::nullopt);
   return true;
 }
 

@@ -53,13 +53,6 @@ class GraphicsView final : public QGraphicsView {
   Q_OBJECT
 
 public:
-  // Types
-  enum class CursorOption {
-    Cross = (1 << 0),
-    Circle = (1 << 1),
-  };
-  Q_DECLARE_FLAGS(CursorOptions, CursorOption)
-
   // Constructors / Destructor
   GraphicsView(const GraphicsView& other) = delete;
   explicit GraphicsView(
@@ -101,8 +94,7 @@ public:
    * @param rect    The rect to mark. Pass an empty rect to clear the marker.
    */
   void setSceneRectMarker(const QRectF& rect) noexcept;
-  void setSceneCursor(
-      const std::optional<std::pair<Point, CursorOptions>>& cursor) noexcept;
+  void setSceneCursor(const Point& pos, bool cross, bool circle) noexcept;
   void setRulerPositions(
       const std::optional<std::pair<Point, Point>>& pos) noexcept;
   void setInfoBoxText(const QString& text) noexcept;
@@ -167,8 +159,10 @@ private:
   bool mUseOpenGl;
   bool mGrayOut;
 
-  /// If not nullopt, a cursor will be shown at the given position
-  std::optional<std::pair<Point, CursorOptions>> mSceneCursor;
+  // Overlay scene cursor
+  Point mSceneCursorPos;
+  bool mSceneCursorCross;
+  bool mSceneCursorCircle;
 
   // Configuration for the ruler overlay
   struct RulerGauge {

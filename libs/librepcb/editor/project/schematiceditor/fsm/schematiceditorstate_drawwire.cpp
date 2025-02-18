@@ -123,7 +123,7 @@ bool SchematicEditorState_DrawWire::entry() noexcept {
       std::unique_ptr<QActionGroup>(mWireModeActionGroup));
   mContext.commandToolBar.addSeparator();
 
-  mContext.editorGraphicsView.setCursor(Qt::CrossCursor);
+  mContext.setViewCursor(Qt::CrossCursor);
   return true;
 }
 
@@ -136,7 +136,7 @@ bool SchematicEditorState_DrawWire::exit() noexcept {
   // Remove actions / widgets from the "command" toolbar
   mContext.commandToolBar.clear();
 
-  mContext.editorGraphicsView.unsetCursor();
+  mContext.setViewCursor(std::nullopt);
   return true;
 }
 

@@ -64,7 +64,10 @@ namespace app {
 SchematicTab::SchematicTab(GuiApplication& app,
                            std::shared_ptr<ProjectEditor> prj,
                            int schematicIndex, QObject* parent) noexcept
-  : GraphicsSceneTab(app, prj, schematicIndex, parent), mEditor(prj), mFsm() {
+  : GraphicsSceneTab(app, prj, schematicIndex, parent),
+    mEditor(prj),
+    mFsm(),
+    mCursorShape(Qt::ArrowCursor) {
   // Apply settings from schematic.
   if (auto sch = mProject->getProject().getSchematicByIndex(mObjIndex)) {
     mGridInterval = sch->getGridInterval();
@@ -89,9 +92,40 @@ SchematicTab::SchematicTab(GuiApplication& app,
       *editor,
       *new editor::SchematicEditor(*editor, mProject->getProject()),
       mScene,
-      *new GraphicsView(),
       *new ToolBarProxy(),
-      prj->getUndoStack()};
+      prj->getUndoStack(),
+      // setViewCursor()
+      [this](const std::optional<Qt::CursorShape>& s) {
+        if (s) {
+          mCursorShape = *s;
+        } else {
+          mCursorShape = Qt::ArrowCursor;
+        }
+        emit uiDataChanged();
+      },
+      // setViewGrayOut()
+      [this](bool grayOut) { /* TODO */ },
+      // setViewInfoBoxText()
+      [this](const QString& t) { /* TODO */ },
+      // setViewRuler()
+      [this](const std::optional<std::pair<Point, Point>>& r) {
+        /* TODO */
+      },
+      // setSceneCursor()
+      [this](const Point& pos, bool cross, bool circle) {
+        /* TODO */
+      },
+      // setSceneSelectionArea()
+      [this](const QPainterPath& a) { mScene->setSelectionArea(a); },
+      // calcPosWithTolerance()
+      [this](const Point& p, qreal multiplier) {
+        return calcPosWithTolerance(p, multiplier);
+      },
+      // mapGlobalPosToScenePos()
+      [this](const QPoint& pos, bool boundToView, bool mapToGrid) {
+        return mapGlobalPosToScenePos(pos, boundToView, mapToGrid);
+      },
+  };
   mFsm.reset(new SchematicEditorFsm(fsmContext));
   connect(mFsm.data(), &SchematicEditorFsm::statusBarMessageChanged, this,
           &SchematicTab::statusBarMessageChanged);
@@ -166,6 +200,7 @@ ui::SchematicTabData SchematicTab::getUiData() const noexcept {
           : ui::LengthUnit::Millimeters,  // Length unit
       pinNumbersLayer && pinNumbersLayer->isVisible(),  // Show pin numbers
       ui::SchematicTool::Select,  // Active tool
+      q2s(mCursorShape),  // Cursor
   };
 }
 
