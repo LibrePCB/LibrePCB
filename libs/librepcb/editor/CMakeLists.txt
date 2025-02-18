@@ -790,6 +790,7 @@ add_library(
   project/projectsetupdialog.ui
   project/schematiceditor/fsm/schematiceditorfsm.cpp
   project/schematiceditor/fsm/schematiceditorfsm.h
+  project/schematiceditor/fsm/schematiceditorfsmhandler.h
   project/schematiceditor/fsm/schematiceditorstate.cpp
   project/schematiceditor/fsm/schematiceditorstate.h
   project/schematiceditor/fsm/schematiceditorstate_addcomponent.cpp

@@ -168,7 +168,7 @@ bool PackageEditorState_DrawPolygonBase::exit() noexcept {
   mContext.commandToolBar.clear();
 
   mContext.graphicsView.unsetCursor();
-  mContext.graphicsView.setSceneCursor(std::nullopt);
+  mContext.graphicsView.setSceneCursor(Point(), false, false);
   mContext.graphicsView.setInfoBoxText(QString());
   emit statusBarMessageChanged(QString());
   return true;
@@ -379,8 +379,7 @@ void PackageEditorState_DrawPolygonBase::updateCursorPosition(
   if (!modifiers.testFlag(Qt::ShiftModifier)) {
     mCursorPos.mapToGrid(getGridInterval());
   }
-  mContext.graphicsView.setSceneCursor(
-      std::make_pair(mCursorPos, GraphicsView::CursorOption::Cross));
+  mContext.graphicsView.setSceneCursor(mCursorPos, true, false);
 
   if (mCurrentPolygon && mEditCmd) {
     updatePolygonPath();

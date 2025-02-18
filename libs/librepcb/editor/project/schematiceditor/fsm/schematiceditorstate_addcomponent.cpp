@@ -124,7 +124,7 @@ bool SchematicEditorState_AddComponent::entry() noexcept {
   connect(mAttributeUnitComboBox, &AttributeUnitComboBox::currentItemChanged,
           this, &SchematicEditorState_AddComponent::attributeChanged);
 
-  mContext.editorGraphicsView.setCursor(Qt::CrossCursor);
+  mContext.setViewCursor(Qt::CrossCursor);
   return true;
 }
 
@@ -136,7 +136,7 @@ bool SchematicEditorState_AddComponent::exit() noexcept {
   // Remove actions / widgets from the "command" toolbar
   mContext.commandToolBar.clear();
 
-  mContext.editorGraphicsView.unsetCursor();
+  mContext.setViewCursor(std::nullopt);
   return true;
 }
 
@@ -420,6 +420,7 @@ void SchematicEditorState_AddComponent::startAddingComponent(
     // create the first symbol instance and add it to the schematic
     mCurrentSymbVarItemIndex = 0;
     const ComponentSymbolVariantItem* currentSymbVarItem =
+
         mCurrentComponent->getSymbolVariant()
             .getSymbolItems()
             .value(mCurrentSymbVarItemIndex)
@@ -430,8 +431,7 @@ void SchematicEditorState_AddComponent::startAddingComponent(
                             "not have any symbol.")
                              .arg(mCurrentComponent->getUuid().toStr()));
     }
-    Point pos = mContext.editorGraphicsView.mapGlobalPosToScenePos(
-        QCursor::pos(), true, true);
+    Point pos = mContext.mapGlobalPosToScenePos(QCursor::pos(), true, true);
     CmdAddSymbolToSchematic* cmd2 = new CmdAddSymbolToSchematic(
         mContext.workspace, *schematic, *mCurrentComponent,
         currentSymbVarItem->getUuid(), pos);

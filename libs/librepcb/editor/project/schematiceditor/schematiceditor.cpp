@@ -132,14 +132,46 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
   addLayers(theme);
 
   // Build the whole schematic editor finite state machine.
-  SchematicEditorFsm::Context fsmContext{mProjectEditor.getWorkspace(),
-                                         mProject,
-                                         mProjectEditor,
-                                         *this,
-                                         *new std::shared_ptr<GraphicsScene>(),
-                                         *mUi->graphicsView,
-                                         *mCommandToolBarProxy,
-                                         mProjectEditor.getUndoStack()};
+  SchematicEditorFsm::Context fsmContext{
+      mProjectEditor.getWorkspace(),
+      mProject,
+      mProjectEditor,
+      *this,
+      *new std::shared_ptr<GraphicsScene>(),
+      *mCommandToolBarProxy,
+      mProjectEditor.getUndoStack(),
+      // setViewCursor()
+      [this](const std::optional<Qt::CursorShape>& s) {
+        if (s) {
+          mUi->graphicsView->setCursor(*s);
+        } else {
+          mUi->graphicsView->unsetCursor();
+        }
+      },
+      // setViewGrayOut()
+      [this](bool grayOut) { mUi->graphicsView->setGrayOut(grayOut); },
+      // setViewInfoBoxText()
+      [this](const QString& t) { mUi->graphicsView->setInfoBoxText(t); },
+      // setViewRuler()
+      [this](const std::optional<std::pair<Point, Point>>& r) {
+        mUi->graphicsView->setRulerPositions(r);
+      },
+      // setSceneCursor()
+      [this](const Point& pos, bool cross, bool circle) {
+        mUi->graphicsView->setSceneCursor(pos, cross, circle);
+      },
+      // setSceneSelectionArea()
+      [this](const QPainterPath& a) { mGraphicsScene->setSelectionArea(a); },
+      // calcPosWithTolerance()
+      [this](const Point& p, qreal factor) {
+        return mUi->graphicsView->calcPosWithTolerance(p, factor);
+      },
+      // mapGlobalPosToScenePos()
+      [this](const QPoint& pos, bool boundToView, bool mapToGrid) {
+        return mUi->graphicsView->mapGlobalPosToScenePos(pos, boundToView,
+                                                         mapToGrid);
+      },
+  };
   mFsm.reset(new SchematicEditorFsm(fsmContext));
   connect(mFsm.data(), &SchematicEditorFsm::statusBarMessageChanged, this,
           [this](const QString& message, int timeoutMs) {

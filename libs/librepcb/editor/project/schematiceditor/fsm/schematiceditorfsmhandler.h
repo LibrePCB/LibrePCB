@@ -17,18 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_PROJECT_SCHEMATICTAB_H
-#define LIBREPCB_PROJECT_SCHEMATICTAB_H
+#ifndef LIBREPCB_EDITOR_SCHEMATICEDITORFSMHANDLER_H
+#define LIBREPCB_EDITOR_SCHEMATICEDITORFSMHANDLER_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "graphicsscenetab.h"
-
-#include <librepcb/editor/dialogs/graphicsexportdialog.h>
-
 #include <QtCore>
-#include <QtGui>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -36,66 +31,25 @@
 namespace librepcb {
 namespace editor {
 
-class GraphicsScene;
-class IF_GraphicsLayerProvider;
-class SchematicEditorFsm;
-
-namespace app {
-
-class GuiApplication;
-class ProjectEditor;
-
 /*******************************************************************************
- *  Class SchematicTab
+ *  Class SchematicEditorFsmHandler
  ******************************************************************************/
 
 /**
- * @brief The SchematicTab class
+ * @brief Interface for the integration of the schematic editor FSM
  */
-class SchematicTab final : public GraphicsSceneTab {
-  Q_OBJECT
-
+class SchematicEditorFsmHandler final {
 public:
   // Constructors / Destructor
-  SchematicTab() = delete;
-  SchematicTab(const SchematicTab& other) = delete;
-  explicit SchematicTab(GuiApplication& app, std::shared_ptr<ProjectEditor> prj,
-                        int schematicIndex, QObject* parent = nullptr) noexcept;
-  virtual ~SchematicTab() noexcept;
-
-  // General Methods
-  ui::TabData getBaseUiData() const noexcept override;
-  ui::SchematicTabData getUiData() const noexcept;
-  void setUiData(const ui::SchematicTabData& data) noexcept;
-  void activate() noexcept override;
-  void deactivate() noexcept override;
-  bool actionTriggered(ui::ActionId id) noexcept override;
-  bool processScenePointerEvent(
-      const QPointF& pos, const QPointF& globalPos,
-      slint::private_api::PointerEvent e) noexcept override;
-
-  // Operator Overloadings
-  SchematicTab& operator=(const SchematicTab& rhs) = delete;
-
-protected:
-  const LengthUnit* getCurrentUnit() const noexcept override;
-
-private:
-  void execGraphicsExportDialog(GraphicsExportDialog::Output output,
-                                const QString& settingsKey) noexcept;
-  void updateTheme() noexcept;
-
-private:
-  std::shared_ptr<ProjectEditor> mEditor;
-  QScopedPointer<SchematicEditorFsm> mFsm;
-  Qt::CursorShape mCursorShape;
+  SchematicEditorFsmHandler() = delete;
+  SchematicEditorFsmHandler(const SchematicEditorFsmHandler& other) = delete;
+  ~SchematicEditorFsmHandler() = delete;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace app
 }  // namespace editor
 }  // namespace librepcb
 

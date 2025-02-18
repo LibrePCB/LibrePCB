@@ -78,8 +78,7 @@ bool SchematicEditorState_AddText::entry() noexcept {
   EditorCommandSet& cmd = EditorCommandSet::instance();
 
   // Add a new stroke text
-  Point pos = mContext.editorGraphicsView.mapGlobalPosToScenePos(QCursor::pos(),
-                                                                 true, true);
+  Point pos = mContext.mapGlobalPosToScenePos(QCursor::pos(), true, true);
   if (!addText(pos)) return false;
 
   // Add the layers combobox to the toolbar
@@ -126,7 +125,7 @@ bool SchematicEditorState_AddText::entry() noexcept {
           &SchematicEditorState_AddText::heightEditValueChanged);
   mContext.commandToolBar.addWidget(std::move(heightEdit));
 
-  mContext.editorGraphicsView.setCursor(Qt::CrossCursor);
+  mContext.setViewCursor(Qt::CrossCursor);
   return true;
 }
 
@@ -137,7 +136,7 @@ bool SchematicEditorState_AddText::exit() noexcept {
   // Remove actions / widgets from the "command" toolbar
   mContext.commandToolBar.clear();
 
-  mContext.editorGraphicsView.unsetCursor();
+  mContext.setViewCursor(std::nullopt);
   return true;
 }
 

@@ -69,6 +69,21 @@ slint::Color q2s(const QColor& c) noexcept {
   return slint::Color::from_argb_uint8(c.alpha(), c.red(), c.green(), c.blue());
 }
 
+slint::cbindgen_private::MouseCursor q2s(Qt::CursorShape s) noexcept {
+  switch (s) {
+    case Qt::ArrowCursor:
+      return slint::cbindgen_private::MouseCursor::Default;
+    case Qt::PointingHandCursor:
+      return slint::cbindgen_private::MouseCursor::Pointer;
+    case Qt::CrossCursor:
+      return slint::cbindgen_private::MouseCursor::Crosshair;
+    default: {
+      qWarning() << "Unsupported cursor shape:" << s;
+      return slint::cbindgen_private::MouseCursor::Default;
+    }
+  }
+}
+
 QPoint s2q(const slint::PhysicalPosition& p) noexcept {
   return QPoint(p.x, p.y);
 }

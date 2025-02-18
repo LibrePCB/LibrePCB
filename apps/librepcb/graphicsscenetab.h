@@ -97,6 +97,10 @@ public:
   GraphicsSceneTab& operator=(const GraphicsSceneTab& rhs) = delete;
 
 protected:
+  QPainterPath calcPosWithTolerance(const Point& pos,
+                                    qreal multiplier) const noexcept;
+  Point mapGlobalPosToScenePos(const QPoint& pos, bool boundToView,
+                               bool mapToGrid) const noexcept;
   void invalidateBackground() noexcept;
   virtual const LengthUnit* getCurrentUnit() const noexcept = 0;
 

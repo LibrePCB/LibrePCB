@@ -45,8 +45,6 @@ class Transform;
 
 namespace editor {
 
-class GraphicsView;
-
 /*******************************************************************************
  *  Class MeasureTool
  ******************************************************************************/
@@ -61,7 +59,8 @@ public:
   // Constructors / Destructor
   MeasureTool() = delete;
   MeasureTool(const MeasureTool& other) = delete;
-  explicit MeasureTool(GraphicsView& view, const LengthUnit& unit,
+  explicit MeasureTool(const LengthUnit& unit,
+                       std::function<PositiveLength()> getGridInterval,
                        QObject* parent = nullptr) noexcept;
   ~MeasureTool() noexcept;
 
@@ -70,7 +69,7 @@ public:
   void setFootprint(const Footprint* footprint) noexcept;
   void setSchematic(const Schematic* schematic) noexcept;
   void setBoard(const Board* board) noexcept;
-  void enter() noexcept;
+  void enter(const Point& cursorPos) noexcept;
   void leave() noexcept;
 
   // Event Handlers
@@ -87,6 +86,9 @@ public:
   MeasureTool& operator=(const MeasureTool& rhs) = delete;
 
 signals:
+  void infoBoxTextChanged(const QString& text);
+  void sceneCursorChanged(const Point& pos, bool cross, bool circle);
+  void rulerPositionsChanged(const std::optional<std::pair<Point, Point>>& pos);
   void statusBarMessageChanged(const QString& message, int timeoutMs = -1);
 
 private:  // Methods
@@ -102,8 +104,8 @@ private:  // Methods
   void updateStatusBarMessage() noexcept;
 
 private:  // Data
-  QPointer<GraphicsView> mView;
   LengthUnit mUnit;
+  std::function<PositiveLength()> mGetGridInterval;  // Not null
   QSet<Point> mSnapCandidates;
   Point mLastScenePos;
   Point mCursorPos;

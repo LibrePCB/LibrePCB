@@ -50,6 +50,7 @@ slint::PhysicalSize q2s(const QSize& s) noexcept;
 slint::SharedString q2s(const QString& s) noexcept;
 slint::Image q2s(const QPixmap& p) noexcept;
 slint::Color q2s(const QColor& c) noexcept;
+slint::cbindgen_private::MouseCursor q2s(Qt::CursorShape s) noexcept;
 
 QPoint s2q(const slint::PhysicalPosition& p) noexcept;
 QSize s2q(const slint::PhysicalSize& s) noexcept;

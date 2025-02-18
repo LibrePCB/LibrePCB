@@ -243,6 +243,22 @@ void GraphicsSceneTab::zoomOut(float width, float height) noexcept {
  *  Protected Methods
  ******************************************************************************/
 
+QPainterPath GraphicsSceneTab::calcPosWithTolerance(
+    const Point& pos, qreal multiplier) const noexcept {
+  qreal tolerance = 5 * multiplier;  // Screen pixel tolerance.
+  tolerance /= mProjection.scale;  // Scene pixel tolerance.
+
+  QPainterPath path;
+  path.addEllipse(pos.toPxQPointF(), tolerance, tolerance);
+  return path;
+}
+
+Point GraphicsSceneTab::mapGlobalPosToScenePos(const QPoint& pos,
+                                               bool boundToView,
+                                               bool mapToGrid) const noexcept {
+  return Point();  // TODO
+}
+
 void GraphicsSceneTab::invalidateBackground() noexcept {
   mCachedBackground = QPixmap();
   emit requestRepaint();
