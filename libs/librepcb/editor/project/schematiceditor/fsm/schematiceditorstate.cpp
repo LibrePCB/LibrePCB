@@ -74,16 +74,16 @@ SchematicEditorState::~SchematicEditorState() noexcept {
  ******************************************************************************/
 
 Schematic* SchematicEditorState::getActiveSchematic() noexcept {
-  return mContext.editor.getActiveSchematic();
+  return mContext.getActiveSchematic();
 }
 
 SchematicGraphicsScene*
     SchematicEditorState::getActiveSchematicScene() noexcept {
-  return dynamic_cast<SchematicGraphicsScene*>(mContext.graphicsScene.get());
+  return mContext.getGraphicsScene();
 }
 
 PositiveLength SchematicEditorState::getGridInterval() const noexcept {
-  if (const Schematic* sch = mContext.editor.getActiveSchematic()) {
+  if (const Schematic* sch = mContext.getActiveSchematic()) {
     return sch->getGridInterval();
   } else {
     return PositiveLength(Length(2540000));
@@ -115,7 +115,7 @@ const QSet<const Layer*>&
 }
 
 void SchematicEditorState::abortBlockingToolsInOtherEditors() noexcept {
-  mContext.editor.abortBlockingToolsInOtherEditors();
+  mContext.abortBlockingToolsInOtherEditors();
 }
 
 bool SchematicEditorState::execCmd(UndoCommand* cmd) {
@@ -123,7 +123,7 @@ bool SchematicEditorState::execCmd(UndoCommand* cmd) {
 }
 
 QWidget* SchematicEditorState::parentWidget() noexcept {
-  return &mContext.editor;
+  return mContext.parentWidget;
 }
 
 QList<std::shared_ptr<QGraphicsItem>> SchematicEditorState::findItemsAtPos(

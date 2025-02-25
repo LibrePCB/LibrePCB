@@ -38,9 +38,7 @@
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 #include <librepcb/editor/graphics/graphicslayer.h>
-#include <librepcb/editor/project/projecteditor.h>
 #include <librepcb/editor/project/schematiceditor/fsm/schematiceditorfsm.h>
-#include <librepcb/editor/project/schematiceditor/schematiceditor.h>
 #include <librepcb/editor/project/schematiceditor/schematicgraphicsscene.h>
 #include <librepcb/editor/undostack.h>
 #include <librepcb/editor/utils/toolbarproxy.h>
@@ -84,16 +82,18 @@ SchematicTab::SchematicTab(GuiApplication& app,
           &SchematicTab::uiDataChanged);
 
   // Build the whole schematic editor finite state machine.
-  auto editor = new editor::ProjectEditor(mApp.getWorkspace(),
-                                          mProject->getProject(), std::nullopt);
   SchematicEditorFsm::Context fsmContext{
       mApp.getWorkspace(),
       mProject->getProject(),
-      *editor,
-      *new editor::SchematicEditor(*editor, mProject->getProject()),
-      mScene,
       *new ToolBarProxy(),
       prj->getUndoStack(),
+      qApp->activeWindow(),
+      // getActiveSchematic()
+      [this]() {
+        return mProject->getProject().getSchematicByIndex(mObjIndex);
+      },
+      // getGraphicsScene()
+      [this]() { return qobject_cast<SchematicGraphicsScene*>(mScene.get()); },
       // setViewCursor()
       [this](const std::optional<Qt::CursorShape>& s) {
         if (s) {
@@ -124,6 +124,14 @@ SchematicTab::SchematicTab(GuiApplication& app,
       // mapGlobalPosToScenePos()
       [this](const QPoint& pos, bool boundToView, bool mapToGrid) {
         return mapGlobalPosToScenePos(pos, boundToView, mapToGrid);
+      },
+      // setHighlightedNetSignals()
+      [this](const QSet<const NetSignal*>& sig) {
+        /* TODO */
+      },
+      // abortBlockingToolsInOtherEditors()
+      [this]() {
+        /* TODO */
       },
   };
   mFsm.reset(new SchematicEditorFsm(fsmContext));

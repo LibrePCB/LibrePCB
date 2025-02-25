@@ -32,18 +32,18 @@
 namespace librepcb {
 
 class Angle;
+class NetSignal;
 class Point;
 class Project;
+class Schematic;
 class Uuid;
 class Workspace;
 
 namespace editor {
 
-class GraphicsScene;
 class GraphicsView;
-class ProjectEditor;
-class SchematicEditor;
 class SchematicEditorState;
+class SchematicGraphicsScene;
 class ToolBarProxy;
 class UndoStack;
 
@@ -82,12 +82,12 @@ public:
   struct Context {
     Workspace& workspace;
     Project& project;
-    ProjectEditor& projectEditor;
-    SchematicEditor& editor;
-    std::shared_ptr<GraphicsScene>& graphicsScene;
     ToolBarProxy& commandToolBar;
     UndoStack& undoStack;
+    QPointer<QWidget> parentWidget;
 
+    std::function<Schematic*()> getActiveSchematic;
+    std::function<SchematicGraphicsScene*()> getGraphicsScene;
     std::function<void(const std::optional<Qt::CursorShape>&)> setViewCursor;
     std::function<void(bool)> setViewGrayOut;
     std::function<void(const QString&)> setViewInfoBoxText;
@@ -98,6 +98,8 @@ public:
 
     std::function<QPainterPath(const Point&, qreal)> calcPosWithTolerance;
     std::function<Point(const QPoint&, bool, bool)> mapGlobalPosToScenePos;
+    std::function<void(const QSet<const NetSignal*>&)> setHighlightedNetSignals;
+    std::function<void()> abortBlockingToolsInOtherEditors;
   };
 
   // Constructors / Destructor

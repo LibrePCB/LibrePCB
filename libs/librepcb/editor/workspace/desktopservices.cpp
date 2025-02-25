@@ -122,13 +122,13 @@ void DesktopServices::downloadAndOpenResourceAsync(
   const FilePath dst = dstDir.getPathTo(fileName);
 
   // Helper to open the local file.
-  auto openCachedFile = [&settings, parent, dst]() {
+  auto openCachedFile = [&settings, dst]() {
     DesktopServices ds(settings);
     ds.openLocalPath(dst);
   };
 
   // Helper to open the URL in web browser.
-  auto openInBrowser = [&settings, parent, url]() {
+  auto openInBrowser = [&settings, url]() {
     DesktopServices ds(settings);
     ds.openWebUrl(url);
   };

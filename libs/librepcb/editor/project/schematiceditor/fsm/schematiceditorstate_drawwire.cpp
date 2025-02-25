@@ -414,8 +414,7 @@ bool SchematicEditorState_DrawWire::startPositioning(
     updateNetpointPositions(snap);
 
     // Highlight all elements of the current netsignal.
-    mContext.projectEditor.setHighlightedNetSignals(
-        {&netsegment->getNetSignal()});
+    mContext.setHighlightedNetSignals({&netsegment->getNetSignal()});
 
     return true;
   } catch (const Exception& e) {
@@ -630,7 +629,7 @@ bool SchematicEditorState_DrawWire::addNextNetPoint(
 bool SchematicEditorState_DrawWire::abortPositioning(
     bool showErrMsgBox) noexcept {
   try {
-    mContext.projectEditor.clearHighlightedNetSignals();
+    mContext.setHighlightedNetSignals({});
     mSubState = SubState::IDLE;
     mFixedStartAnchor = nullptr;
     mPositioningNetLine1 = nullptr;

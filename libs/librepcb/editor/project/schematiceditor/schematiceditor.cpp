@@ -135,11 +135,16 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
   SchematicEditorFsm::Context fsmContext{
       mProjectEditor.getWorkspace(),
       mProject,
-      mProjectEditor,
-      *this,
-      *new std::shared_ptr<GraphicsScene>(),
       *mCommandToolBarProxy,
       mProjectEditor.getUndoStack(),
+      this,
+      // getActiveSchematic()
+      [this]() { return getActiveSchematic(); },
+      // getGraphicsScene()
+      [this]() {
+        return qobject_cast<SchematicGraphicsScene*>(
+            mUi->graphicsView->getScene());
+      },
       // setViewCursor()
       [this](const std::optional<Qt::CursorShape>& s) {
         if (s) {
@@ -171,6 +176,12 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
         return mUi->graphicsView->mapGlobalPosToScenePos(pos, boundToView,
                                                          mapToGrid);
       },
+      // setHighlightedNetSignals()
+      [this](const QSet<const NetSignal*>& sig) {
+        mProjectEditor.setHighlightedNetSignals(sig);
+      },
+      // abortBlockingToolsInOtherEditors()
+      [this]() { abortBlockingToolsInOtherEditors(); },
   };
   mFsm.reset(new SchematicEditorFsm(fsmContext));
   connect(mFsm.data(), &SchematicEditorFsm::statusBarMessageChanged, this,

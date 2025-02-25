@@ -190,8 +190,7 @@ bool SchematicEditorState_AddNetLabel::addLabel(const Point& pos) noexcept {
     mEditCmd = new CmdSchematicNetLabelEdit(*mCurrentNetLabel);
 
     // Highlight all elements of the current netsignal.
-    mContext.projectEditor.setHighlightedNetSignals(
-        {&netsegment.getNetSignal()});
+    mContext.setHighlightedNetSignals({&netsegment.getNetSignal()});
 
     return true;
   } catch (const Exception& e) {
@@ -218,7 +217,7 @@ bool SchematicEditorState_AddNetLabel::fixLabel(const Point& pos) noexcept {
     mContext.undoStack.appendToCmdGroup(mEditCmd);
     mContext.undoStack.commitCmdGroup();
     mUndoCmdActive = false;
-    mContext.projectEditor.clearHighlightedNetSignals();
+    mContext.setHighlightedNetSignals({});
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -230,7 +229,7 @@ bool SchematicEditorState_AddNetLabel::fixLabel(const Point& pos) noexcept {
 bool SchematicEditorState_AddNetLabel::abortCommand(
     bool showErrMsgBox) noexcept {
   try {
-    mContext.projectEditor.clearHighlightedNetSignals();
+    mContext.setHighlightedNetSignals({});
     if (mUndoCmdActive) {
       mContext.undoStack.abortCmdGroup();  // can throw
       mUndoCmdActive = false;

@@ -23,14 +23,26 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/core/library/resource.h>
+#include <librepcb/core/types/uuid.h>
+
 #include <QtCore>
 #include <QtWidgets>
+
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class ComponentInstance;
+class Workspace;
+class WorkspaceLibraryDb;
+
 namespace editor {
+
+class MenuBuilder;
 
 /*******************************************************************************
  *  Class EditorToolbox
@@ -89,6 +101,16 @@ public:
   static bool startToolBarTabFocusCycle(QToolBar& toolBar,
                                         QWidget& returnFocusToWidget) noexcept;
 
+  static ResourceList getComponentResources(
+      const WorkspaceLibraryDb& db, const ComponentInstance& cmp,
+      const std::optional<Uuid>& filterDev = std::nullopt) noexcept;
+
+  static void addResourcesToMenu(const Workspace& ws, MenuBuilder& mb,
+                                 const ComponentInstance& cmp,
+                                 const std::optional<Uuid>& filterDev,
+                                 QPointer<QWidget> editor,
+                                 QMenu* root) noexcept;
+
 private:
   /**
    * @brief Helper for #removeFormLayoutRow(QLabel&)
@@ -107,6 +129,10 @@ private:
    * @param item  The item to hide.
    */
   static void hideLayoutItem(QLayoutItem& item) noexcept;
+
+  static void searchAndOpenDatasheet(const Workspace& ws, const QString& mpn,
+                                     const QString& manufacturer,
+                                     QPointer<QWidget> parent) noexcept;
 };
 
 /*******************************************************************************

@@ -31,6 +31,7 @@
 #include "../../../graphics/polygongraphicsitem.h"
 #include "../../../library/pkg/footprintclipboarddata.h"
 #include "../../../undostack.h"
+#include "../../../utils/editortoolbox.h"
 #include "../../../utils/menubuilder.h"
 #include "../../../widgets/graphicsview.h"
 #include "../../../widgets/unsignedlengthedit.h"
@@ -866,8 +867,8 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
       }
       modMenu->setEnabled(!modMenu->isEmpty());
 
-      mContext.editor.getProjectEditor().addResourcesToMenu(
-          mb, device->getDevice().getComponentInstance(),
+      EditorToolbox::addResourcesToMenu(
+          mContext.workspace, mb, device->getDevice().getComponentInstance(),
           device->getDevice().getLibDevice().getUuid(), &mContext.editor,
           &menu);
     } else if (auto netline =
