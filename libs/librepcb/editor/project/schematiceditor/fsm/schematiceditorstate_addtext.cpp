@@ -78,11 +78,13 @@ bool SchematicEditorState_AddText::entry() noexcept {
   EditorCommandSet& cmd = EditorCommandSet::instance();
 
   // Add a new stroke text
-  Point pos = mContext.mapGlobalPosToScenePos(QCursor::pos(), true, true);
+  Point pos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos(), true, true);
   if (!addText(pos)) return false;
 
+  mAdapter.fsmSetTool(SchematicEditorFsmAdapter::Tool::Text, this);
+
   // Add the layers combobox to the toolbar
-  mContext.commandToolBar.addLabel(tr("Layer:"), 10);
+  /*mContext.commandToolBar.addLabel(tr("Layer:"), 10);
   std::unique_ptr<LayerComboBox> layerComboBox(new LayerComboBox());
   layerComboBox->setLayers(getAllowedGeometryLayers());
   layerComboBox->setCurrentLayer(mLastTextProperties.getLayer());
@@ -123,9 +125,9 @@ bool SchematicEditorState_AddText::entry() noexcept {
       heightEdit.get(), heightEdit.get(), &PositiveLengthEdit::stepDown));
   connect(heightEdit.get(), &PositiveLengthEdit::valueChanged, this,
           &SchematicEditorState_AddText::heightEditValueChanged);
-  mContext.commandToolBar.addWidget(std::move(heightEdit));
+  mContext.commandToolBar.addWidget(std::move(heightEdit));*/
 
-  mContext.setViewCursor(Qt::CrossCursor);
+  mAdapter.fsmSetViewCursor(Qt::CrossCursor);
   return true;
 }
 
@@ -133,10 +135,8 @@ bool SchematicEditorState_AddText::exit() noexcept {
   // Abort the currently active command
   if (!abortCommand(true)) return false;
 
-  // Remove actions / widgets from the "command" toolbar
-  mContext.commandToolBar.clear();
-
-  mContext.setViewCursor(std::nullopt);
+  mAdapter.fsmSetViewCursor(std::nullopt);
+  mAdapter.fsmSetTool(SchematicEditorFsmAdapter::Tool::None, this);
   return true;
 }
 

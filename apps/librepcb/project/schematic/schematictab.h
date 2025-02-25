@@ -26,6 +26,7 @@
 #include "graphicsscenetab.h"
 
 #include <librepcb/editor/dialogs/graphicsexportdialog.h>
+#include <librepcb/editor/project/schematiceditor/fsm/schematiceditorfsmadapter.h>
 
 #include <QtCore>
 #include <QtGui>
@@ -52,7 +53,8 @@ class ProjectEditor;
 /**
  * @brief The SchematicTab class
  */
-class SchematicTab final : public GraphicsSceneTab {
+class SchematicTab final : public GraphicsSceneTab,
+                           public SchematicEditorFsmAdapter {
   Q_OBJECT
 
 public:
@@ -73,6 +75,28 @@ public:
   bool processScenePointerEvent(
       const QPointF& pos, const QPointF& globalPos,
       slint::private_api::PointerEvent e) noexcept override;
+
+  // SchematicEditorFsmAdapter
+  Schematic* fsmGetActiveSchematic() noexcept override;
+  SchematicGraphicsScene* fsmGetGraphicsScene() noexcept override;
+  void fsmSetViewCursor(
+      const std::optional<Qt::CursorShape>& shape) noexcept override;
+  void fsmSetViewGrayOut(bool grayOut) noexcept override;
+  void fsmSetViewInfoBoxText(const QString& text) noexcept override;
+  void fsmSetViewRuler(
+      const std::optional<std::pair<Point, Point>>& pos) noexcept override;
+  void fsmSetSceneCursor(const Point& pos, bool cross,
+                         bool circle) noexcept override;
+  QPainterPath fsmCalcPosWithTolerance(
+      const Point& pos, qreal multiplier) const noexcept override;
+  Point fsmMapGlobalPosToScenePos(const QPoint& pos, bool boundToView,
+                                  bool mapToGrid) const noexcept override;
+  void fsmSetHighlightedNetSignals(
+      const QSet<const NetSignal*>& sigs) noexcept override;
+  void fsmAbortBlockingToolsInOtherEditors() noexcept override;
+  void fsmSetStatusBarMessage(const QString& message,
+                              int timeoutMs = -1) noexcept override;
+  void fsmSetTool(Tool tool, SchematicEditorState* state) noexcept override;
 
   // Operator Overloadings
   SchematicTab& operator=(const SchematicTab& rhs) = delete;

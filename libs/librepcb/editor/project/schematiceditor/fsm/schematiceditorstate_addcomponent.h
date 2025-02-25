@@ -89,9 +89,16 @@ public:
   virtual bool processGraphicsSceneRightMouseButtonReleased(
       QGraphicsSceneMouseEvent& e) noexcept override;
 
+  // UI Input
+  void setCurrentValue(const QString& value) noexcept;
+
   // Operator Overloadings
   SchematicEditorState_AddComponent& operator=(
       const SchematicEditorState_AddComponent& rhs) = delete;
+
+signals:
+  void currentValueChanged(const QString& value);
+  void currentValueSuggestionsChanged(const QStringList& suggestions);
 
 private:  // Methods
   void startAddingComponent(
@@ -101,33 +108,26 @@ private:  // Methods
           std::nullopt,
       const QString& searchTerm = QString(), bool keepValue = false);
   bool abortCommand(bool showErrMsgBox) noexcept;
-  std::shared_ptr<const Attribute> getToolbarAttribute() const noexcept;
-  void valueChanged(QString text) noexcept;
-  void attributeChanged() noexcept;
-  void updateValueToolbar() noexcept;
-  void updateAttributeToolbar() noexcept;
-  static QString toSingleLine(const QString& text) noexcept;
-  static QString toMultiLine(const QString& text) noexcept;
+  // std::shared_ptr<const Attribute> getToolbarAttribute() const noexcept;
+  // static QString toSingleLine(const QString& text) noexcept;
+  // static QString toMultiLine(const QString& text) noexcept;
 
 private:  // Data
   bool mIsUndoCmdActive;
   bool mUseAddComponentDialog;
   QScopedPointer<AddComponentDialog> mAddComponentDialog;
-  Angle mLastAngle;
-  bool mLastMirrored;
 
-  // information about the current component/symbol to place
+  // Current tool settings
+  Angle mCurrentAngle;
+  bool mCurrentMirrored;
+  QString mCurrentValue;
+  QStringList mCurrentValueSuggestions;
+
+  // Information about the current component/symbol to place
   ComponentInstance* mCurrentComponent;
   int mCurrentSymbVarItemIndex;
   SI_Symbol* mCurrentSymbolToPlace;
   CmdSymbolInstanceEditAll* mCurrentSymbolEditCommand;
-
-  // Widgets for the command toolbar
-  QPointer<QComboBox> mValueComboBox;
-  QPointer<QLineEdit> mAttributeValueEdit;
-  QPointer<QAction> mAttributeValueEditAction;
-  QPointer<AttributeUnitComboBox> mAttributeUnitComboBox;
-  QPointer<QAction> mAttributeUnitComboBoxAction;
 };
 
 /*******************************************************************************

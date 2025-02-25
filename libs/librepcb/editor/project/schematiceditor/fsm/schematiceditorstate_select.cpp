@@ -84,6 +84,7 @@ SchematicEditorState_Select::~SchematicEditorState_Select() noexcept {
 
 bool SchematicEditorState_Select::entry() noexcept {
   Q_ASSERT(mSubState == SubState::IDLE);
+  mAdapter.fsmSetTool(SchematicEditorFsmAdapter::Tool::Select, this);
   return true;
 }
 
@@ -106,6 +107,7 @@ bool SchematicEditorState_Select::exit() noexcept {
     scene->clearSelection();
   }
 
+  mAdapter.fsmSetTool(SchematicEditorFsmAdapter::Tool::None, this);
   return true;
 }
 
@@ -796,11 +798,11 @@ bool SchematicEditorState_Select::copySelectedItemsToClipboard() noexcept {
 
   try {
     Point cursorPos =
-        mContext.mapGlobalPosToScenePos(QCursor::pos(), true, false);
+        mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos(), true, false);
     SchematicClipboardDataBuilder builder(*scene);
     std::unique_ptr<SchematicClipboardData> data = builder.generate(cursorPos);
     qApp->clipboard()->setMimeData(data->toMimeData().release());
-    emit statusBarMessageChanged(tr("Copied to clipboard!"), 2000);
+    mAdapter.fsmSetStatusBarMessage(tr("Copied to clipboard!"), 2000);
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
@@ -821,7 +823,7 @@ bool SchematicEditorState_Select::pasteFromClipboard() noexcept {
     }
 
     // update cursor position
-    mStartPos = mContext.mapGlobalPosToScenePos(QCursor::pos(), true, false);
+    mStartPos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos(), true, false);
 
     // start undo command group
     scene->clearSelection();

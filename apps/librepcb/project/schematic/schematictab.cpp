@@ -41,8 +41,6 @@
 #include <librepcb/editor/project/schematiceditor/fsm/schematiceditorfsm.h>
 #include <librepcb/editor/project/schematiceditor/schematicgraphicsscene.h>
 #include <librepcb/editor/undostack.h>
-#include <librepcb/editor/utils/toolbarproxy.h>
-#include <librepcb/editor/widgets/graphicsview.h>
 #include <librepcb/editor/workspace/desktopservices.h>
 
 #include <QtCore>
@@ -85,58 +83,11 @@ SchematicTab::SchematicTab(GuiApplication& app,
   SchematicEditorFsm::Context fsmContext{
       mApp.getWorkspace(),
       mProject->getProject(),
-      *new ToolBarProxy(),
       prj->getUndoStack(),
       qApp->activeWindow(),
-      // getActiveSchematic()
-      [this]() {
-        return mProject->getProject().getSchematicByIndex(mObjIndex);
-      },
-      // getGraphicsScene()
-      [this]() { return qobject_cast<SchematicGraphicsScene*>(mScene.get()); },
-      // setViewCursor()
-      [this](const std::optional<Qt::CursorShape>& s) {
-        if (s) {
-          mCursorShape = *s;
-        } else {
-          mCursorShape = Qt::ArrowCursor;
-        }
-        emit uiDataChanged();
-      },
-      // setViewGrayOut()
-      [this](bool grayOut) { /* TODO */ },
-      // setViewInfoBoxText()
-      [this](const QString& t) { /* TODO */ },
-      // setViewRuler()
-      [this](const std::optional<std::pair<Point, Point>>& r) {
-        /* TODO */
-      },
-      // setSceneCursor()
-      [this](const Point& pos, bool cross, bool circle) {
-        /* TODO */
-      },
-      // setSceneSelectionArea()
-      [this](const QPainterPath& a) { mScene->setSelectionArea(a); },
-      // calcPosWithTolerance()
-      [this](const Point& p, qreal multiplier) {
-        return calcPosWithTolerance(p, multiplier);
-      },
-      // mapGlobalPosToScenePos()
-      [this](const QPoint& pos, bool boundToView, bool mapToGrid) {
-        return mapGlobalPosToScenePos(pos, boundToView, mapToGrid);
-      },
-      // setHighlightedNetSignals()
-      [this](const QSet<const NetSignal*>& sig) {
-        /* TODO */
-      },
-      // abortBlockingToolsInOtherEditors()
-      [this]() {
-        /* TODO */
-      },
+      *this,
   };
   mFsm.reset(new SchematicEditorFsm(fsmContext));
-  connect(mFsm.data(), &SchematicEditorFsm::statusBarMessageChanged, this,
-          &SchematicTab::statusBarMessageChanged);
 
   // Apply theme whenever it has been modified.
   connect(&mApp.getWorkspace().getSettings().themes,
@@ -319,6 +270,79 @@ bool SchematicTab::processScenePointerEvent(
   return handled;
 }
 
+/*******************************************************************************
+ *  SchematicEditorFsmAdapter Methods
+ ******************************************************************************/
+
+Schematic* SchematicTab::fsmGetActiveSchematic() noexcept {
+  return mProject->getProject().getSchematicByIndex(mObjIndex);
+}
+
+SchematicGraphicsScene* SchematicTab::fsmGetGraphicsScene() noexcept {
+  return qobject_cast<SchematicGraphicsScene*>(mScene.get());
+}
+
+void SchematicTab::fsmSetViewCursor(
+    const std::optional<Qt::CursorShape>& shape) noexcept {
+  if (shape) {
+    mCursorShape = *shape;
+  } else {
+    mCursorShape = Qt::ArrowCursor;
+  }
+  emit uiDataChanged();
+}
+
+void SchematicTab::fsmSetViewGrayOut(bool grayOut) noexcept {
+  /* TODO */
+}
+
+void SchematicTab::fsmSetViewInfoBoxText(const QString& text) noexcept {
+  /* TODO */
+}
+
+void SchematicTab::fsmSetViewRuler(
+    const std::optional<std::pair<Point, Point>>& pos) noexcept {
+  /* TODO */
+}
+
+void SchematicTab::fsmSetSceneCursor(const Point& pos, bool cross,
+                                     bool circle) noexcept {
+  /* TODO */
+}
+
+QPainterPath SchematicTab::fsmCalcPosWithTolerance(
+    const Point& pos, qreal multiplier) const noexcept {
+  return calcPosWithTolerance(pos, multiplier);
+}
+
+Point SchematicTab::fsmMapGlobalPosToScenePos(const QPoint& pos,
+                                              bool boundToView,
+                                              bool mapToGrid) const noexcept {
+  return mapGlobalPosToScenePos(pos, boundToView, mapToGrid);
+}
+
+void SchematicTab::fsmSetHighlightedNetSignals(
+    const QSet<const NetSignal*>& sigs) noexcept {
+  /* TODO */
+}
+
+void SchematicTab::fsmAbortBlockingToolsInOtherEditors() noexcept {
+  /* TODO */
+}
+
+void SchematicTab::fsmSetStatusBarMessage(const QString& message,
+                                          int timeoutMs) noexcept {
+  emit statusBarMessageChanged(message, timeoutMs);
+}
+
+void SchematicTab::fsmSetTool(Tool tool, SchematicEditorState* state) noexcept {
+  /* TODO */
+}
+
+/*******************************************************************************
+ *  Protected Methods
+ ******************************************************************************/
+
 const LengthUnit* SchematicTab::getCurrentUnit() const noexcept {
   if (auto sch = mProject->getProject().getSchematicByIndex(mObjIndex)) {
     return &sch->getGridUnit();
@@ -326,6 +350,10 @@ const LengthUnit* SchematicTab::getCurrentUnit() const noexcept {
     return nullptr;
   }
 }
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
 
 void SchematicTab::execGraphicsExportDialog(
     GraphicsExportDialog::Output output, const QString& settingsKey) noexcept {

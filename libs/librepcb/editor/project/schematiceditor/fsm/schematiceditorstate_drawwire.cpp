@@ -88,8 +88,10 @@ SchematicEditorState_DrawWire::~SchematicEditorState_DrawWire() noexcept {
 bool SchematicEditorState_DrawWire::entry() noexcept {
   Q_ASSERT(mSubState == SubState::IDLE);
 
+  mAdapter.fsmSetTool(SchematicEditorFsmAdapter::Tool::Wire, this);
+
   // Add wire mode actions to the "command" toolbar
-  EditorCommandSet& cmd = EditorCommandSet::instance();
+  /*EditorCommandSet& cmd = EditorCommandSet::instance();
   mWireModeActionGroup = new QActionGroup(&mContext.commandToolBar);
   QAction* aWireModeHV = cmd.wireModeHV.createAction(
       mWireModeActionGroup, this, [this]() { wireModeChanged(WireMode::HV); });
@@ -121,9 +123,9 @@ bool SchematicEditorState_DrawWire::entry() noexcept {
   aWireModeStraight->setActionGroup(mWireModeActionGroup);
   mContext.commandToolBar.addActionGroup(
       std::unique_ptr<QActionGroup>(mWireModeActionGroup));
-  mContext.commandToolBar.addSeparator();
+  mContext.commandToolBar.addSeparator();*/
 
-  mContext.setViewCursor(Qt::CrossCursor);
+  mAdapter.fsmSetViewCursor(Qt::CrossCursor);
   return true;
 }
 
@@ -133,10 +135,8 @@ bool SchematicEditorState_DrawWire::exit() noexcept {
     abortPositioning(true);
   }
 
-  // Remove actions / widgets from the "command" toolbar
-  mContext.commandToolBar.clear();
-
-  mContext.setViewCursor(std::nullopt);
+  mAdapter.fsmSetViewCursor(std::nullopt);
+  mAdapter.fsmSetTool(SchematicEditorFsmAdapter::Tool::None, this);
   return true;
 }
 
@@ -414,7 +414,7 @@ bool SchematicEditorState_DrawWire::startPositioning(
     updateNetpointPositions(snap);
 
     // Highlight all elements of the current netsignal.
-    mContext.setHighlightedNetSignals({&netsegment->getNetSignal()});
+    mAdapter.fsmSetHighlightedNetSignals({&netsegment->getNetSignal()});
 
     return true;
   } catch (const Exception& e) {
@@ -629,7 +629,7 @@ bool SchematicEditorState_DrawWire::addNextNetPoint(
 bool SchematicEditorState_DrawWire::abortPositioning(
     bool showErrMsgBox) noexcept {
   try {
-    mContext.setHighlightedNetSignals({});
+    mAdapter.fsmSetHighlightedNetSignals({});
     mSubState = SubState::IDLE;
     mFixedStartAnchor = nullptr;
     mPositioningNetLine1 = nullptr;

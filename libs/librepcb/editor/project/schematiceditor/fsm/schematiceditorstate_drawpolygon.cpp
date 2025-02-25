@@ -75,10 +75,12 @@ SchematicEditorState_DrawPolygon::~SchematicEditorState_DrawPolygon() noexcept {
 bool SchematicEditorState_DrawPolygon::entry() noexcept {
   Q_ASSERT(mIsUndoCmdActive == false);
 
+  mAdapter.fsmSetTool(SchematicEditorFsmAdapter::Tool::Polygon, this);
+
   EditorCommandSet& cmd = EditorCommandSet::instance();
 
   // Add the layers combobox to the toolbar
-  mContext.commandToolBar.addLabel(tr("Layer:"), 10);
+  /*mContext.commandToolBar.addLabel(tr("Layer:"), 10);
   std::unique_ptr<LayerComboBox> layerComboBox(new LayerComboBox());
   layerComboBox->setLayers(getAllowedGeometryLayers());
   layerComboBox->setCurrentLayer(mLastPolygonProperties.getLayer());
@@ -110,9 +112,9 @@ bool SchematicEditorState_DrawPolygon::entry() noexcept {
       fillCheckBox.get(), fillCheckBox.get(), &QCheckBox::toggle));
   connect(fillCheckBox.get(), &QCheckBox::toggled, this,
           &SchematicEditorState_DrawPolygon::filledCheckBoxCheckedChanged);
-  mContext.commandToolBar.addWidget(std::move(fillCheckBox));
+  mContext.commandToolBar.addWidget(std::move(fillCheckBox));*/
 
-  mContext.setViewCursor(Qt::CrossCursor);
+  mAdapter.fsmSetViewCursor(Qt::CrossCursor);
   return true;
 }
 
@@ -120,10 +122,8 @@ bool SchematicEditorState_DrawPolygon::exit() noexcept {
   // Abort the currently active command
   if (!abortCommand(true)) return false;
 
-  // Remove actions / widgets from the "command" toolbar
-  mContext.commandToolBar.clear();
-
-  mContext.setViewCursor(std::nullopt);
+  mAdapter.fsmSetViewCursor(std::nullopt);
+  mAdapter.fsmSetTool(SchematicEditorFsmAdapter::Tool::None, this);
   return true;
 }
 

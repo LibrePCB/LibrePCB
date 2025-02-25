@@ -42,9 +42,9 @@ class Workspace;
 namespace editor {
 
 class GraphicsView;
+class SchematicEditorFsmAdapter;
 class SchematicEditorState;
 class SchematicGraphicsScene;
-class ToolBarProxy;
 class UndoStack;
 
 /*******************************************************************************
@@ -57,7 +57,6 @@ class UndoStack;
 class SchematicEditorFsm final : public QObject {
   Q_OBJECT
 
-public:
   /// FSM States
   enum State {
     /// no state active
@@ -78,28 +77,14 @@ public:
     MEASURE,
   };
 
+public:
   /// FSM Context
   struct Context {
     Workspace& workspace;
     Project& project;
-    ToolBarProxy& commandToolBar;
     UndoStack& undoStack;
     QPointer<QWidget> parentWidget;
-
-    std::function<Schematic*()> getActiveSchematic;
-    std::function<SchematicGraphicsScene*()> getGraphicsScene;
-    std::function<void(const std::optional<Qt::CursorShape>&)> setViewCursor;
-    std::function<void(bool)> setViewGrayOut;
-    std::function<void(const QString&)> setViewInfoBoxText;
-    std::function<void(const std::optional<std::pair<Point, Point>>&)>
-        setViewRuler;
-    std::function<void(const Point& pos, bool, bool)> setSceneCursor;
-    std::function<void(const QPainterPath&)> setSceneSelectionArea;
-
-    std::function<QPainterPath(const Point&, qreal)> calcPosWithTolerance;
-    std::function<Point(const QPoint&, bool, bool)> mapGlobalPosToScenePos;
-    std::function<void(const QSet<const NetSignal*>&)> setHighlightedNetSignals;
-    std::function<void()> abortBlockingToolsInOtherEditors;
+    SchematicEditorFsmAdapter& adapter;
   };
 
   // Constructors / Destructor
@@ -108,9 +93,6 @@ public:
   explicit SchematicEditorFsm(const Context& context,
                               QObject* parent = nullptr) noexcept;
   virtual ~SchematicEditorFsm() noexcept;
-
-  // Getters
-  State getCurrentState() const noexcept { return mCurrentState; }
 
   // Event Handlers
   bool processSelect() noexcept;
@@ -165,10 +147,6 @@ public:
   // Operator Overloadings
   SchematicEditorFsm& operator=(const SchematicEditorFsm& rhs) = delete;
 
-signals:
-  void stateChanged(State newState);
-  void statusBarMessageChanged(const QString& message, int timeoutMs = -1);
-
 private:
   SchematicEditorState* getCurrentStateObj() const noexcept;
   bool setNextState(State state) noexcept;
@@ -188,7 +166,5 @@ private:  // Data
 
 }  // namespace editor
 }  // namespace librepcb
-
-Q_DECLARE_METATYPE(librepcb::editor::SchematicEditorFsm::State)
 
 #endif

@@ -66,7 +66,8 @@ SchematicEditorState_AddNetLabel::~SchematicEditorState_AddNetLabel() noexcept {
 bool SchematicEditorState_AddNetLabel::entry() noexcept {
   Q_ASSERT(mUndoCmdActive == false);
 
-  mContext.setViewCursor(Qt::CrossCursor);
+  mAdapter.fsmSetTool(SchematicEditorFsmAdapter::Tool::NetLabel, this);
+  mAdapter.fsmSetViewCursor(Qt::CrossCursor);
   return true;
 }
 
@@ -75,7 +76,8 @@ bool SchematicEditorState_AddNetLabel::exit() noexcept {
     return false;
   }
 
-  mContext.setViewCursor(std::nullopt);
+  mAdapter.fsmSetViewCursor(std::nullopt);
+  mAdapter.fsmSetTool(SchematicEditorFsmAdapter::Tool::None, this);
   return true;
 }
 
@@ -190,7 +192,7 @@ bool SchematicEditorState_AddNetLabel::addLabel(const Point& pos) noexcept {
     mEditCmd = new CmdSchematicNetLabelEdit(*mCurrentNetLabel);
 
     // Highlight all elements of the current netsignal.
-    mContext.setHighlightedNetSignals({&netsegment.getNetSignal()});
+    mAdapter.fsmSetHighlightedNetSignals({&netsegment.getNetSignal()});
 
     return true;
   } catch (const Exception& e) {
@@ -217,7 +219,7 @@ bool SchematicEditorState_AddNetLabel::fixLabel(const Point& pos) noexcept {
     mContext.undoStack.appendToCmdGroup(mEditCmd);
     mContext.undoStack.commitCmdGroup();
     mUndoCmdActive = false;
-    mContext.setHighlightedNetSignals({});
+    mAdapter.fsmSetHighlightedNetSignals({});
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -229,7 +231,7 @@ bool SchematicEditorState_AddNetLabel::fixLabel(const Point& pos) noexcept {
 bool SchematicEditorState_AddNetLabel::abortCommand(
     bool showErrMsgBox) noexcept {
   try {
-    mContext.setHighlightedNetSignals({});
+    mAdapter.fsmSetHighlightedNetSignals({});
     if (mUndoCmdActive) {
       mContext.undoStack.abortCmdGroup();  // can throw
       mUndoCmdActive = false;

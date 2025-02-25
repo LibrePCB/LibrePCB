@@ -24,6 +24,7 @@
 
 #include "../../../utils/measuretool.h"
 #include "../../../widgets/graphicsview.h"
+#include "../schematicgraphicsscene.h"
 
 #include <librepcb/core/project/project.h>
 
@@ -47,17 +48,19 @@ SchematicEditorState_Measure::SchematicEditorState_Measure(
         getLengthUnit(),
         std::bind(&SchematicEditorState_Measure::getGridInterval, this))) {
   connect(mTool.data(), &MeasureTool::infoBoxTextChanged, this,
-          [this](const QString& t) { mContext.setViewInfoBoxText(t); });
+          [this](const QString& t) { mAdapter.fsmSetViewInfoBoxText(t); });
   connect(mTool.data(), &MeasureTool::sceneCursorChanged, this,
           [this](const Point& pos, bool cross, bool circle) {
-            mContext.setSceneCursor(pos, cross, circle);
+            mAdapter.fsmSetSceneCursor(pos, cross, circle);
           });
   connect(mTool.data(), &MeasureTool::rulerPositionsChanged, this,
           [this](const std::optional<std::pair<Point, Point>>& r) {
-            mContext.setViewRuler(r);
+            mAdapter.fsmSetViewRuler(r);
           });
   connect(mTool.data(), &MeasureTool::statusBarMessageChanged, this,
-          &SchematicEditorState_Measure::statusBarMessageChanged);
+          [this](const QString& message, int timeoutMs) {
+            mAdapter.fsmSetStatusBarMessage(message, timeoutMs);
+          });
 }
 
 SchematicEditorState_Measure::~SchematicEditorState_Measure() noexcept {
@@ -68,18 +71,22 @@ SchematicEditorState_Measure::~SchematicEditorState_Measure() noexcept {
  ******************************************************************************/
 
 bool SchematicEditorState_Measure::entry() noexcept {
-  mContext.setSceneSelectionArea(QPainterPath());
-  mContext.setViewGrayOut(true);
-  mContext.setViewCursor(Qt::CrossCursor);
+  mAdapter.fsmSetTool(SchematicEditorFsmAdapter::Tool::Measure, this);
+  if (auto scene = mAdapter.fsmGetGraphicsScene()) {
+    scene->setSelectionArea(QPainterPath());
+  }
+  mAdapter.fsmSetViewGrayOut(true);
+  mAdapter.fsmSetViewCursor(Qt::CrossCursor);
   mTool->setSchematic(getActiveSchematic());
-  mTool->enter(mContext.mapGlobalPosToScenePos(QCursor::pos(), true, true));
+  mTool->enter(mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos(), true, true));
   return true;
 }
 
 bool SchematicEditorState_Measure::exit() noexcept {
   mTool->leave();
-  mContext.setViewGrayOut(false);
-  mContext.setViewCursor(std::nullopt);
+  mAdapter.fsmSetViewGrayOut(false);
+  mAdapter.fsmSetViewCursor(std::nullopt);
+  mAdapter.fsmSetTool(SchematicEditorFsmAdapter::Tool::None, this);
   return true;
 }
 

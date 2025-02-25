@@ -17,33 +17,72 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_SCHEMATICEDITORFSMHANDLER_H
-#define LIBREPCB_EDITOR_SCHEMATICEDITORFSMHANDLER_H
+#ifndef LIBREPCB_EDITOR_SCHEMATICEDITORFSMADAPTER_H
+#define LIBREPCB_EDITOR_SCHEMATICEDITORFSMADAPTER_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/core/types/point.h>
+
 #include <QtCore>
+#include <QtGui>
+
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class NetSignal;
+class Schematic;
+
 namespace editor {
 
+class SchematicEditorState;
+class SchematicGraphicsScene;
+
 /*******************************************************************************
- *  Class SchematicEditorFsmHandler
+ *  Class SchematicEditorFsmAdapter
  ******************************************************************************/
 
 /**
  * @brief Interface for the integration of the schematic editor FSM
  */
-class SchematicEditorFsmHandler final {
+class SchematicEditorFsmAdapter {
 public:
-  // Constructors / Destructor
-  SchematicEditorFsmHandler() = delete;
-  SchematicEditorFsmHandler(const SchematicEditorFsmHandler& other) = delete;
-  ~SchematicEditorFsmHandler() = delete;
+  virtual Schematic* fsmGetActiveSchematic() noexcept = 0;
+  virtual SchematicGraphicsScene* fsmGetGraphicsScene() noexcept = 0;
+  virtual void fsmSetViewCursor(
+      const std::optional<Qt::CursorShape>& shape) noexcept = 0;
+  virtual void fsmSetViewGrayOut(bool grayOut) noexcept = 0;
+  virtual void fsmSetViewInfoBoxText(const QString& text) noexcept = 0;
+  virtual void fsmSetViewRuler(
+      const std::optional<std::pair<Point, Point>>& pos) noexcept = 0;
+  virtual void fsmSetSceneCursor(const Point& pos, bool cross,
+                                 bool circle) noexcept = 0;
+  virtual QPainterPath fsmCalcPosWithTolerance(
+      const Point& pos, qreal multiplier) const noexcept = 0;
+  virtual Point fsmMapGlobalPosToScenePos(const QPoint& pos, bool boundToView,
+                                          bool mapToGrid) const noexcept = 0;
+  virtual void fsmSetHighlightedNetSignals(
+      const QSet<const NetSignal*>& sigs) noexcept = 0;
+  virtual void fsmAbortBlockingToolsInOtherEditors() noexcept = 0;
+  virtual void fsmSetStatusBarMessage(const QString& message,
+                                      int timeoutMs = -1) noexcept = 0;
+
+  enum class Tool {
+    None,
+    Select,
+    Wire,
+    NetLabel,
+    Polygon,
+    Text,
+    Component,
+    Measure,
+  };
+  virtual void fsmSetTool(Tool tool, SchematicEditorState* state) noexcept = 0;
 };
 
 /*******************************************************************************
