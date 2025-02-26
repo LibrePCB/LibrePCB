@@ -7,7 +7,10 @@ export component ToolTip inherits Rectangle {
     border-radius: 5px;
     opacity: 0;
 
-    animate opacity { duration: 150ms; }
+    animate opacity {
+        delay: 600ms;
+        duration: 150ms;
+    }
 
     t := Text {
         x: 5px;

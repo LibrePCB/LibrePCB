@@ -399,12 +399,11 @@ void SchematicEditor::fsmSetTool(Tool tool,
     // Make sure the start of the value is visible, even if the value is long.
     cbxValue->lineEdit()->setCursorPosition(0);
     connect(cbxValue.get(), &QComboBox::currentTextChanged, s,
-            &SchematicEditorState_AddComponent::setCurrentValue);
-    connect(s, &SchematicEditorState_AddComponent::currentValueChanged,
-            cbxValue.get(), &QComboBox::setCurrentText);
+            &SchematicEditorState_AddComponent::setValue);
+    connect(s, &SchematicEditorState_AddComponent::valueChanged, cbxValue.get(),
+            &QComboBox::setCurrentText);
     QPointer<QComboBox> cbxValuePtr = cbxValue.get();
-    connect(s,
-            &SchematicEditorState_AddComponent::currentValueSuggestionsChanged,
+    connect(s, &SchematicEditorState_AddComponent::valueSuggestionsChanged,
             cbxValue.get(), [cbxValuePtr](const QStringList& items) {
               QSignalBlocker block(cbxValuePtr);
               const QString text = cbxValuePtr->currentText();

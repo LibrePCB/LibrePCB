@@ -9,6 +9,7 @@ import { AddTextToolBar } from "./addtexttoolbar.slint";
 import { AddComponentToolBar } from "./addcomponenttoolbar.slint";
 import { Backend } from "../../api/backend.slint";
 import { Data } from "../../api/data.slint";
+import { ActionId } from "../../api/types.slint";
 import { EditToolBar } from "../../edittoolbar.slint";
 
 export component SchematicTab inherits Image {
@@ -29,6 +30,8 @@ export component SchematicTab inherits Image {
     }
 
     ta := TouchArea {
+        mouse-cursor: tabs[section.current-tab-index].cursor;
+
         top-bar := Rectangle {
             y: 0;
             width: self.preferred-width;
@@ -47,13 +50,16 @@ export component SchematicTab inherits Image {
                 padding-top: 2px;
                 padding-bottom: 5px;
 
-                if tabs[section.current-tab-index].active-tool == SchematicTool.draw-wire: DrawWireToolBar { }
+                if tabs[section.current-tab-index].active-tool == SchematicTool.wire: DrawWireToolBar {
+                    section-index: section-index;
+                    section: section;
+                }
 
-                if tabs[section.current-tab-index].active-tool == SchematicTool.draw-polygon: DrawPolygonToolBar { }
+                if tabs[section.current-tab-index].active-tool == SchematicTool.polygon: DrawPolygonToolBar { }
 
-                if tabs[section.current-tab-index].active-tool == SchematicTool.add-text: AddTextToolBar { }
+                if tabs[section.current-tab-index].active-tool == SchematicTool.text: AddTextToolBar { }
 
-                if tabs[section.current-tab-index].active-tool == SchematicTool.add-component: AddComponentToolBar { }
+                if tabs[section.current-tab-index].active-tool == SchematicTool.component: AddComponentToolBar { }
             }
         }
 
@@ -72,71 +78,113 @@ export component SchematicTab inherits Image {
 
             ToolButton {
                 image: @image-url("../../img/cursor.svg");
+                tooltip: @tr("Select");
                 status-tip: @tr("Select & modify existing objects");
                 checked: tabs[section.current-tab-index].active-tool == SchematicTool.select;
 
                 clicked => {
-                    tabs[section.current-tab-index].active-tool = SchematicTool.select;
+                    if Data.preview-mode {
+                        tabs[section.current-tab-index].active-tool = SchematicTool.select;
+                        return true; // Workaround for warning in generated header
+                    } else {
+                        Backend.action-triggered(ActionId.tool-select, section-index);
+                    }
                 }
             }
 
             ToolButton {
                 image: @image-url("../../img/draw-wire.svg");
+                tooltip: @tr("Draw Wires");
                 status-tip: @tr("Draw wires to create electrical connections between symbol pins");
-                checked: tabs[section.current-tab-index].active-tool == SchematicTool.draw-wire;
+                checked: tabs[section.current-tab-index].active-tool == SchematicTool.wire;
 
                 clicked => {
-                    tabs[section.current-tab-index].active-tool = SchematicTool.draw-wire;
+                    if Data.preview-mode {
+                        tabs[section.current-tab-index].active-tool = SchematicTool.wire;
+                        return true; // Workaround for warning in generated header
+                    } else {
+                        Backend.action-triggered(ActionId.tool-wire, section-index);
+                    }
                 }
             }
 
             ToolButton {
                 image: @image-url("../../img/netlabel.svg");
+                tooltip: @tr("Add Net Labels");
                 status-tip: @tr("Add net labels to explicitly specify the net of wires");
-                checked: tabs[section.current-tab-index].active-tool == SchematicTool.add-netlabel;
+                checked: tabs[section.current-tab-index].active-tool == SchematicTool.netlabel;
 
                 clicked => {
-                    tabs[section.current-tab-index].active-tool = SchematicTool.add-netlabel;
+                    if Data.preview-mode {
+                        tabs[section.current-tab-index].active-tool = SchematicTool.netlabel;
+                        return true; // Workaround for warning in generated header
+                    } else {
+                        Backend.action-triggered(ActionId.tool-netlabel, section-index);
+                    }
                 }
             }
 
             ToolButton {
                 image: @image-url("../../img/draw-polygon.svg");
-                status-tip: @tr("Draw graphical polygons");
-                checked: tabs[section.current-tab-index].active-tool == SchematicTool.draw-polygon;
+                tooltip: @tr("Draw Polygons");
+                status-tip: @tr("Draw graphical (i.e. non-functional) polygons");
+                checked: tabs[section.current-tab-index].active-tool == SchematicTool.polygon;
 
                 clicked => {
-                    tabs[section.current-tab-index].active-tool = SchematicTool.draw-polygon;
+                    if Data.preview-mode {
+                        tabs[section.current-tab-index].active-tool = SchematicTool.polygon;
+                        return true; // Workaround for warning in generated header
+                    } else {
+                        Backend.action-triggered(ActionId.tool-polygon, section-index);
+                    }
                 }
             }
 
             ToolButton {
                 image: @image-url("../../img/draw-text.svg");
-                status-tip: @tr("Add graphical text labels");
-                checked: tabs[section.current-tab-index].active-tool == SchematicTool.add-text;
+                tooltip: @tr("Add Text Labels");
+                status-tip: @tr("Add graphical (i.e. non-functional) text labels");
+                checked: tabs[section.current-tab-index].active-tool == SchematicTool.text;
 
                 clicked => {
-                    tabs[section.current-tab-index].active-tool = SchematicTool.add-text;
+                    if Data.preview-mode {
+                        tabs[section.current-tab-index].active-tool = SchematicTool.text;
+                        return true; // Workaround for warning in generated header
+                    } else {
+                        Backend.action-triggered(ActionId.tool-text, section-index);
+                    }
                 }
             }
 
             ToolButton {
                 image: @image-url("../../img/plus.svg");
+                tooltip: @tr("Place Components");
                 status-tip: @tr("Insert components from the workspace libraries");
-                checked: tabs[section.current-tab-index].active-tool == SchematicTool.add-component;
+                checked: tabs[section.current-tab-index].active-tool == SchematicTool.component;
 
                 clicked => {
-                    tabs[section.current-tab-index].active-tool = SchematicTool.add-component;
+                    if Data.preview-mode {
+                        tabs[section.current-tab-index].active-tool = SchematicTool.component;
+                        return true; // Workaround for warning in generated header
+                    } else {
+                        Backend.action-triggered(ActionId.tool-component, section-index);
+                    }
                 }
             }
 
             ToolButton {
                 image: @image-url("../../img/ruler.svg");
+                tooltip: @tr("Measure");
                 status-tip: @tr("Measure the distance between two points");
                 checked: tabs[section.current-tab-index].active-tool == SchematicTool.measure;
 
                 clicked => {
-                    tabs[section.current-tab-index].active-tool = SchematicTool.measure;
+                    if Data.preview-mode {
+                        tabs[section.current-tab-index].active-tool = SchematicTool.measure;
+                        return true; // Workaround for warning in generated header
+                    } else {
+                        Backend.action-triggered(ActionId.tool-measure, section-index);
+                    }
                 }
             }
         }

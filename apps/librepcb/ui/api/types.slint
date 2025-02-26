@@ -63,6 +63,15 @@ export enum ActionId {
     // 2D board viewer tab
     board-2d-tab-open-3d,
 
+    // Tools
+    tool-select,
+    tool-wire,
+    tool-netlabel,
+    tool-polygon,
+    tool-text,
+    tool-component,
+    tool-measure,
+
     todo,
 }
 
@@ -252,12 +261,20 @@ export struct DownloadLibraryTabData {
 
 export enum SchematicTool {
     select,
-    draw-wire,
-    add-netlabel,
-    draw-polygon,
-    add-text,
-    add-component,
+    wire,
+    netlabel,
+    polygon,
+    text,
+    component,
     measure,
+}
+
+export enum WireMode {
+    h-v,
+    v-h,
+    deg90-45,
+    deg45-90,
+    straight,
 }
 
 export struct SchematicTabData {
@@ -268,6 +285,7 @@ export struct SchematicTabData {
     unit: LengthUnit,
     show-pin-numbers: bool,
     active-tool: SchematicTool,
+    wire-mode: WireMode,
     cursor: MouseCursor,
 }
 

@@ -55,6 +55,8 @@ slint::cbindgen_private::MouseCursor q2s(Qt::CursorShape s) noexcept;
 QPoint s2q(const slint::PhysicalPosition& p) noexcept;
 QSize s2q(const slint::PhysicalSize& s) noexcept;
 QString s2q(const slint::SharedString& s) noexcept;
+Qt::MouseButton s2q(const slint::private_api::PointerEventButton& b) noexcept;
+
 bool operator==(const QString& s1, const slint::SharedString& s2) noexcept;
 bool operator!=(const QString& s1, const slint::SharedString& s2) noexcept;
 bool operator==(const slint::SharedString& s1, const QString& s2) noexcept;

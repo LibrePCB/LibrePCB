@@ -59,6 +59,7 @@ class SchematicEditorState_DrawWire final : public SchematicEditorState {
     POSITIONING_NETPOINT  ///< in this state, an undo command is active!
   };
 
+public:
   /**
    * @brief All available wire modes
    */
@@ -68,9 +69,9 @@ class SchematicEditorState_DrawWire final : public SchematicEditorState {
     Deg9045,  ///< 90° - 45°
     Deg4590,  ///< 45° - 90°
     Straight,  ///< straight
+    _COUNT,
   };
 
-public:
   // Constructors / Destructor
   SchematicEditorState_DrawWire() = delete;
   SchematicEditorState_DrawWire(const SchematicEditorState_DrawWire& other) =
@@ -96,9 +97,16 @@ public:
       QGraphicsSceneMouseEvent& e) noexcept override;
   virtual bool processSwitchToSchematicPage(int index) noexcept override;
 
+  // Connection to UI
+  WireMode getWireMode() const noexcept { return mCurrentWireMode; }
+  void setWireMode(WireMode mode) noexcept;
+
   // Operator Overloadings
   SchematicEditorState_DrawWire& operator=(
       const SchematicEditorState_DrawWire& rhs) = delete;
+
+signals:
+  void wireModeChanged(WireMode mode);
 
 private:  //  Methods
   bool startPositioning(SchematicGraphicsScene& scene, bool snap,
@@ -109,7 +117,6 @@ private:  //  Methods
       const Point& pos,
       const QVector<std::shared_ptr<QGraphicsItem>>& except = {}) noexcept;
   Point updateNetpointPositions(bool snap) noexcept;
-  void wireModeChanged(WireMode mode) noexcept;
   Point calcMiddlePointPos(const Point& p1, const Point p2,
                            WireMode mode) const noexcept;
 
@@ -124,9 +131,6 @@ private:  // Data
   SI_NetPoint* mPositioningNetPoint1;  ///< the first netpoint to place
   SI_NetLine* mPositioningNetLine2;  ///< line between p1 and p2
   SI_NetPoint* mPositioningNetPoint2;  ///< the second netpoint to place
-
-  // Widgets for the command toolbar
-  QPointer<QActionGroup> mWireModeActionGroup;
 };
 
 /*******************************************************************************

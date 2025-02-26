@@ -19,7 +19,7 @@ import { RuleCheckPanel } from "./rulecheckpanel.slint";
 export { Backend, Data }
 
 export component AppWindow inherits Window {
-    property <length> panel-width: (self.width <= 800px) ? 250px : 350px;
+    property <length> panel-width: (self.width <= 1200px) ? 250px : 350px;
 
     title: Data.window-title;
     background: #2a2a2a;
@@ -55,7 +55,7 @@ export component AppWindow inherits Window {
         x: 0px;
         y: menubar.height;
         z: 100;
-        width: (root.width <= 800px) ? 40px : 50px;
+        width: (root.width <= 1200px) ? 40px : 45px;
         height: parent.height - self.y - statusbar.height - 1px;
     }
 

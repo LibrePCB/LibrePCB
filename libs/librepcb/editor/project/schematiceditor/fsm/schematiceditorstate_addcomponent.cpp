@@ -85,11 +85,11 @@ SchematicEditorState_AddComponent::
 bool SchematicEditorState_AddComponent::entry() noexcept {
   Q_ASSERT(mIsUndoCmdActive == false);
 
-  mAdapter.fsmSetTool(SchematicEditorFsmAdapter::Tool::Component, this);
   mCurrentAngle = Angle::deg0();
   mCurrentMirrored = false;
-  setCurrentValue(QString());
+  setValue(QString());
 
+  mAdapter.fsmSetTool(SchematicEditorFsmAdapter::Tool::Component, this);
   mAdapter.fsmSetViewCursor(Qt::CrossCursor);
   return true;
 }
@@ -115,7 +115,7 @@ bool SchematicEditorState_AddComponent::processAddComponent(
     if (!abortCommand(true)) return false;
     mCurrentAngle = Angle::deg0();
     mCurrentMirrored = false;
-    setCurrentValue(QString());
+    setValue(QString());
     mUseAddComponentDialog = true;
     startAddingComponent(std::nullopt, std::nullopt, std::nullopt, searchTerm);
     return true;
@@ -134,7 +134,7 @@ bool SchematicEditorState_AddComponent::processAddComponent(
     if (!abortCommand(true)) return false;
     mCurrentAngle = Angle::deg0();
     mCurrentMirrored = false;
-    setCurrentValue(QString());
+    setValue(QString());
     mUseAddComponentDialog = false;
     startAddingComponent(cmp, symbVar, std::nullopt);
     return true;
@@ -180,7 +180,7 @@ bool SchematicEditorState_AddComponent::processAbortCommand() noexcept {
         mAddComponentDialog->getAutoOpenAgain()) {
       mCurrentAngle = Angle::deg0();
       mCurrentMirrored = false;
-      setCurrentValue(QString());
+      setValue(QString());
       startAddingComponent();
       return true;
     }
@@ -299,10 +299,10 @@ bool SchematicEditorState_AddComponent::
 }
 
 /*******************************************************************************
- *  UI Input
+ *  Connection to UI
  ******************************************************************************/
 
-void SchematicEditorState_AddComponent::setCurrentValue(
+void SchematicEditorState_AddComponent::setValue(
     const QString& value) noexcept {
   if (mCurrentComponent) {
     mCurrentComponent->setValue(value);
@@ -310,7 +310,7 @@ void SchematicEditorState_AddComponent::setCurrentValue(
 
   if (mCurrentValue != value) {
     mCurrentValue = value;
-    emit currentValueChanged(mCurrentValue);
+    emit valueChanged(mCurrentValue);
   }
 
   QStringList suggestions;
@@ -321,7 +321,7 @@ void SchematicEditorState_AddComponent::setCurrentValue(
   }
   if (mCurrentValueSuggestions != suggestions) {
     mCurrentValueSuggestions = suggestions;
-    emit currentValueSuggestionsChanged(mCurrentValueSuggestions);
+    emit valueSuggestionsChanged(mCurrentValueSuggestions);
   }
 
   // updateAttributeToolbar();
@@ -409,7 +409,7 @@ void SchematicEditorState_AddComponent::startAddingComponent(
       mCurrentComponent->setValue(mCurrentValue);
       // attributeChanged();  // sets the attribute on the component
     } else {
-      setCurrentValue(mCurrentComponent->getValue());
+      setValue(mCurrentComponent->getValue());
       // updateAttributeToolbar();
     }
 

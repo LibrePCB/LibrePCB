@@ -27,6 +27,7 @@
 
 #include <librepcb/editor/dialogs/graphicsexportdialog.h>
 #include <librepcb/editor/project/schematiceditor/fsm/schematiceditorfsmadapter.h>
+#include <librepcb/editor/project/schematiceditor/fsm/schematiceditorstate_drawwire.h>
 
 #include <QtCore>
 #include <QtGui>
@@ -101,6 +102,9 @@ public:
   // Operator Overloadings
   SchematicTab& operator=(const SchematicTab& rhs) = delete;
 
+signals:
+  void wireModeRequested(SchematicEditorState_DrawWire::WireMode mode);
+
 protected:
   const LengthUnit* getCurrentUnit() const noexcept override;
 
@@ -112,7 +116,14 @@ private:
 private:
   std::shared_ptr<ProjectEditor> mEditor;
   QScopedPointer<SchematicEditorFsm> mFsm;
+  Tool mTool;
+  SchematicEditorState_DrawWire::WireMode mWireMode;
   Qt::CursorShape mCursorShape;
+
+  QHash<Qt::MouseButton, QPointF> mMouseButtonDownScenePos;
+  QHash<Qt::MouseButton, QPoint> mMouseButtonDownScreenPos;
+
+  QVector<QMetaObject::Connection> mFsmStateConnections;
 };
 
 /*******************************************************************************

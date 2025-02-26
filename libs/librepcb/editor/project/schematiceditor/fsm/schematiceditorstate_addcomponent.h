@@ -89,16 +89,20 @@ public:
   virtual bool processGraphicsSceneRightMouseButtonReleased(
       QGraphicsSceneMouseEvent& e) noexcept override;
 
-  // UI Input
-  void setCurrentValue(const QString& value) noexcept;
+  // Connection to UI
+  const QString& getValue() const noexcept { return mCurrentValue; }
+  void setValue(const QString& value) noexcept;
+  const QStringList& getValueSuggestions() const noexcept {
+    return mCurrentValueSuggestions;
+  }
 
   // Operator Overloadings
   SchematicEditorState_AddComponent& operator=(
       const SchematicEditorState_AddComponent& rhs) = delete;
 
 signals:
-  void currentValueChanged(const QString& value);
-  void currentValueSuggestionsChanged(const QStringList& suggestions);
+  void valueChanged(const QString& value);
+  void valueSuggestionsChanged(const QStringList& suggestions);
 
 private:  // Methods
   void startAddingComponent(

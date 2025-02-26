@@ -53,6 +53,56 @@ namespace librepcb {
 namespace editor {
 namespace app {
 
+static ui::SchematicTool l2s(SchematicEditorFsmAdapter::Tool v) noexcept {
+  if (v == SchematicEditorFsmAdapter::Tool::Wire) {
+    return ui::SchematicTool::Wire;
+  } else if (v == SchematicEditorFsmAdapter::Tool::NetLabel) {
+    return ui::SchematicTool::Netlabel;
+  } else if (v == SchematicEditorFsmAdapter::Tool::Polygon) {
+    return ui::SchematicTool::Polygon;
+  } else if (v == SchematicEditorFsmAdapter::Tool::Text) {
+    return ui::SchematicTool::Text;
+  } else if (v == SchematicEditorFsmAdapter::Tool::Component) {
+    return ui::SchematicTool::Component;
+  } else if (v == SchematicEditorFsmAdapter::Tool::Measure) {
+    return ui::SchematicTool::Measure;
+  } else {
+    return ui::SchematicTool::Select;
+  }
+}
+
+static ui::WireMode l2s(SchematicEditorState_DrawWire::WireMode v) noexcept {
+  if (v == SchematicEditorState_DrawWire::WireMode::HV) {
+    return ui::WireMode::HV;
+  } else if (v == SchematicEditorState_DrawWire::WireMode::VH) {
+    return ui::WireMode::VH;
+  } else if (v == SchematicEditorState_DrawWire::WireMode::Deg9045) {
+    return ui::WireMode::Deg9045;
+  } else if (v == SchematicEditorState_DrawWire::WireMode::Deg4590) {
+    return ui::WireMode::Deg4590;
+  } else if (v == SchematicEditorState_DrawWire::WireMode::Straight) {
+    return ui::WireMode::Straight;
+  } else {
+    return ui::WireMode::HV;
+  }
+}
+
+static SchematicEditorState_DrawWire::WireMode s2l(ui::WireMode v) noexcept {
+  if (v == ui::WireMode::HV) {
+    return SchematicEditorState_DrawWire::WireMode::HV;
+  } else if (v == ui::WireMode::VH) {
+    return SchematicEditorState_DrawWire::WireMode::VH;
+  } else if (v == ui::WireMode::Deg9045) {
+    return SchematicEditorState_DrawWire::WireMode::Deg9045;
+  } else if (v == ui::WireMode::Deg4590) {
+    return SchematicEditorState_DrawWire::WireMode::Deg4590;
+  } else if (v == ui::WireMode::Straight) {
+    return SchematicEditorState_DrawWire::WireMode::Straight;
+  } else {
+    return SchematicEditorState_DrawWire::WireMode::HV;
+  }
+}
+
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
@@ -63,6 +113,8 @@ SchematicTab::SchematicTab(GuiApplication& app,
   : GraphicsSceneTab(app, prj, schematicIndex, parent),
     mEditor(prj),
     mFsm(),
+    mTool(Tool::None),
+    mWireMode(SchematicEditorState_DrawWire::WireMode::HV),
     mCursorShape(Qt::ArrowCursor) {
   // Apply settings from schematic.
   if (auto sch = mProject->getProject().getSchematicByIndex(mObjIndex)) {
@@ -158,7 +210,8 @@ ui::SchematicTabData SchematicTab::getUiData() const noexcept {
       sch ? l2s(sch->getGridUnit())
           : ui::LengthUnit::Millimeters,  // Length unit
       pinNumbersLayer && pinNumbersLayer->isVisible(),  // Show pin numbers
-      ui::SchematicTool::Select,  // Active tool
+      l2s(mTool),  // Active tool
+      l2s(mWireMode),  // Wire mode
       q2s(mCursorShape),  // Cursor
   };
 }
@@ -175,6 +228,7 @@ void SchematicTab::setUiData(const ui::SchematicTabData& data) noexcept {
   if (auto l = mLayerProvider->getLayer(Theme::Color::sSchematicPinNumbers)) {
     l->setVisible(data.show_pin_numbers);
   }
+  emit wireModeRequested(s2l(data.wire_mode));
 
   invalidateBackground();
   emit requestRepaint();
@@ -208,8 +262,24 @@ bool SchematicTab::actionTriggered(ui::ActionId id) noexcept {
     return true;
   } else if (id == ui::ActionId::ExportPdf) {
     execGraphicsExportDialog(GraphicsExportDialog::Output::Pdf, "pdf_export");
+    return true;
   } else if (id == ui::ActionId::Print) {
     execGraphicsExportDialog(GraphicsExportDialog::Output::Print, "print");
+    return true;
+  } else if (id == ui::ActionId::ToolSelect) {
+    return mFsm->processSelect();
+  } else if (id == ui::ActionId::ToolWire) {
+    return mFsm->processDrawWire();
+  } else if (id == ui::ActionId::ToolNetlabel) {
+    return mFsm->processAddNetLabel();
+  } else if (id == ui::ActionId::ToolPolygon) {
+    return mFsm->processDrawPolygon();
+  } else if (id == ui::ActionId::ToolText) {
+    return mFsm->processAddText();
+  } else if (id == ui::ActionId::ToolComponent) {
+    return mFsm->processAddComponent();
+  } else if (id == ui::ActionId::ToolMeasure) {
+    return mFsm->processMeasure();
   }
 
   return GraphicsSceneTab::actionTriggered(id);
@@ -220,18 +290,28 @@ bool SchematicTab::processScenePointerEvent(
     slint::private_api::PointerEvent e) noexcept {
   static qint64 lastClickTime = 0;
 
-  if (GraphicsSceneTab::processScenePointerEvent(pos, globalPos, e)) {
-    return true;
-  }
-
   QTransform tf;
   tf.translate(mProjection.offset.x(), mProjection.offset.y());
   tf.scale(1 / mProjection.scale, 1 / mProjection.scale);
   const QPointF scenePosPx = tf.map(pos);
 
   QGraphicsSceneMouseEvent qe;
+  qe.setButton(s2q(e.button));
   qe.setScenePos(scenePosPx);
   qe.setScreenPos(globalPos.toPoint());
+
+  if (e.kind == slint::private_api::PointerEventKind::Down) {
+    mMouseButtonDownScenePos[qe.button()] = scenePosPx;
+    mMouseButtonDownScreenPos[qe.button()] = globalPos.toPoint();
+  }
+
+  qe.setButtonDownScenePos(qe.button(), mMouseButtonDownScenePos[qe.button()]);
+  qe.setButtonDownScreenPos(qe.button(),
+                            mMouseButtonDownScreenPos[qe.button()]);
+
+  if (GraphicsSceneTab::processScenePointerEvent(pos, globalPos, e)) {
+    return true;
+  }
 
   bool isDoubleClick = false;
   if (e.kind == slint::private_api::PointerEventKind::Down) {
@@ -245,19 +325,15 @@ bool SchematicTab::processScenePointerEvent(
   bool handled = false;
   if (isDoubleClick &&
       (e.button == slint::private_api::PointerEventButton::Left)) {
-    qe.setButton(Qt::LeftButton);
     handled = mFsm->processGraphicsSceneLeftMouseButtonDoubleClicked(qe);
   } else if ((e.button == slint::private_api::PointerEventButton::Left) &&
              (e.kind == slint::private_api::PointerEventKind::Down)) {
-    qe.setButton(Qt::LeftButton);
     handled = mFsm->processGraphicsSceneLeftMouseButtonPressed(qe);
   } else if ((e.button == slint::private_api::PointerEventButton::Left) &&
              (e.kind == slint::private_api::PointerEventKind::Up)) {
-    qe.setButton(Qt::LeftButton);
     handled = mFsm->processGraphicsSceneLeftMouseButtonReleased(qe);
   } else if ((e.button == slint::private_api::PointerEventButton::Right) &&
              (e.kind == slint::private_api::PointerEventKind::Up)) {
-    qe.setButton(Qt::RightButton);
     handled = mFsm->processGraphicsSceneRightMouseButtonReleased(qe);
   } else if (e.kind == slint::private_api::PointerEventKind::Move) {
     handled = mFsm->processGraphicsSceneMouseMoved(qe);
@@ -336,7 +412,28 @@ void SchematicTab::fsmSetStatusBarMessage(const QString& message,
 }
 
 void SchematicTab::fsmSetTool(Tool tool, SchematicEditorState* state) noexcept {
-  /* TODO */
+  mTool = tool;
+
+  while (!mFsmStateConnections.isEmpty()) {
+    disconnect(mFsmStateConnections.takeLast());
+  }
+
+  if (tool == Tool::Wire) {
+    SchematicEditorState_DrawWire* s =
+        static_cast<SchematicEditorState_DrawWire*>(state);
+    mWireMode = s->getWireMode();
+    mFsmStateConnections.append(
+        connect(s, &SchematicEditorState_DrawWire::wireModeChanged, this,
+                [this](SchematicEditorState_DrawWire::WireMode m) {
+                  mWireMode = m;
+                  emit uiDataChanged();
+                }));
+    mFsmStateConnections.append(
+        connect(this, &SchematicTab::wireModeRequested,
+                s, &SchematicEditorState_DrawWire::setWireMode));
+  }
+
+  emit uiDataChanged();
 }
 
 /*******************************************************************************

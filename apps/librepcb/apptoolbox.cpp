@@ -97,6 +97,23 @@ QString s2q(const slint::SharedString& s) noexcept {
   return QString::fromUtf8(view.data(), view.size());
 }
 
+Qt::MouseButton s2q(const slint::private_api::PointerEventButton& b) noexcept {
+  switch (b) {
+    case slint::private_api::PointerEventButton::Left:
+      return Qt::LeftButton;
+    case slint::private_api::PointerEventButton::Right:
+      return Qt::RightButton;
+    case slint::private_api::PointerEventButton::Middle:
+      return Qt::MiddleButton;
+    case slint::private_api::PointerEventButton::Back:
+      return Qt::BackButton;
+    case slint::private_api::PointerEventButton::Forward:
+      return Qt::ForwardButton;
+    default:
+      return Qt::NoButton;
+  }
+}
+
 bool operator==(const QString& s1, const slint::SharedString& s2) noexcept {
   return s1.toUtf8().data() == std::string_view(s2);
 }

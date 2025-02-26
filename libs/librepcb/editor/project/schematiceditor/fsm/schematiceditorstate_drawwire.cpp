@@ -252,14 +252,10 @@ bool SchematicEditorState_DrawWire::
 
   if (mSubState == SubState::POSITIONING_NETPOINT) {
     // Only switch to next wire mode if cursor was not moved during click.
-    if ((mWireModeActionGroup) &&
-        (e.screenPos() == e.buttonDownScreenPos(Qt::RightButton))) {
-      int index = mWireModeActionGroup->actions().indexOf(
-          mWireModeActionGroup->checkedAction());
-      index = (index + 1) % mWireModeActionGroup->actions().count();
-      QAction* newAction = mWireModeActionGroup->actions().value(index);
-      Q_ASSERT(newAction);
-      newAction->trigger();
+    if ((e.screenPos() == e.buttonDownScreenPos(Qt::RightButton))) {
+      setWireMode(
+          static_cast<WireMode>((static_cast<int>(mCurrentWireMode) + 1) %
+                                static_cast<int>(WireMode::_COUNT)));
     }
 
     // Always accept the event if we are drawing a wire! When ignoring the
@@ -274,6 +270,21 @@ bool SchematicEditorState_DrawWire::processSwitchToSchematicPage(
     int index) noexcept {
   Q_UNUSED(index);
   return mSubState == SubState::IDLE;
+}
+
+/*******************************************************************************
+ *  Connection to UI
+ ******************************************************************************/
+
+void SchematicEditorState_DrawWire::setWireMode(WireMode mode) noexcept {
+  if (mode != mCurrentWireMode) {
+    mCurrentWireMode = mode;
+    emit wireModeChanged(mCurrentWireMode);
+  }
+
+  if (mSubState == SubState::POSITIONING_NETPOINT) {
+    updateNetpointPositions(true);
+  }
 }
 
 /*******************************************************************************
@@ -688,13 +699,6 @@ Point SchematicEditorState_DrawWire::updateNetpointPositions(
       mFixedStartAnchor->getPosition(), pos, mCurrentWireMode));
   mPositioningNetPoint2->setPosition(pos);
   return pos;
-}
-
-void SchematicEditorState_DrawWire::wireModeChanged(WireMode mode) noexcept {
-  mCurrentWireMode = mode;
-  if (mSubState == SubState::POSITIONING_NETPOINT) {
-    updateNetpointPositions(true);
-  }
 }
 
 Point SchematicEditorState_DrawWire::calcMiddlePointPos(

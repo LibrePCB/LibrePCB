@@ -1,6 +1,8 @@
+import { ToolTip } from "./tooltip.slint";
 import { Data } from "../api/data.slint";
 
 export component ToolButton inherits Rectangle {
+    in property <string> tooltip;
     in property <string> status-tip;
     in property <bool> checked: false;
     in property <image> image;
@@ -30,5 +32,11 @@ export component ToolButton inherits Rectangle {
                 }
             }
         }
+    }
+
+    if ta.has-hover: ToolTip {
+        x: parent.width + 5px;
+        y: (parent.height - self.height) / 2;
+        text: tooltip;
     }
 }
