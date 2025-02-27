@@ -1,7 +1,13 @@
 import { ComboBox, CheckBox } from "std-widgets.slint";
 import { LengthEdit } from "../../common/lengthedit.slint";
+import { WireMode, WindowSectionData, SchematicTabData } from "../../api/types.slint";
+import { Data } from "../../api/data.slint";
 
 export component DrawPolygonToolBar inherits HorizontalLayout {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    property <[SchematicTabData]> tabs: section.schematic-tabs;
+
     spacing: 5px;
 
     Text {
@@ -18,9 +24,25 @@ export component DrawPolygonToolBar inherits HorizontalLayout {
         text: @tr("Width:");
     }
 
-    LengthEdit { }
+    LengthEdit {
+        value: tabs[section.current-tab-index].line-width;
+        unit: tabs[section.current-tab-index].line-width-unit;
+
+        changed value => {
+            tabs[section.current-tab-index].line-width = self.value;
+        }
+
+        changed unit => {
+            tabs[section.current-tab-index].line-width-unit = self.unit;
+        }
+    }
 
     CheckBox {
         text: @tr("Fill");
+        checked: tabs[section.current-tab-index].filled;
+
+        toggled => {
+            tabs[section.current-tab-index].filled = self.checked;
+        }
     }
 }

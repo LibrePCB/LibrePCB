@@ -29,6 +29,7 @@
 #include "notificationsmodel.h"
 #include "project/projecteditor.h"
 #include "project/projectsmodel.h"
+#include "uitypes.h"
 #include "workspace/quickaccessmodel.h"
 
 #include <librepcb/core/3d/occmodel.h>
@@ -306,30 +307,31 @@ void GuiApplication::createNewWindow(int id, int projectIndex) noexcept {
 
   // Register global callbacks.
   const ui::Backend& b = win->global<ui::Backend>();
-  b.on_parse_length_input(
-      [](slint::SharedString text, slint::SharedString unit) {
-        ui::EditParseResult res{false, text, unit};
-        try {
-          QString value = text.begin();
-          foreach (const LengthUnit& unit, LengthUnit::getAllUnits()) {
-            foreach (const QString& suffix, unit.getUserInputSuffixes()) {
-              if (value.endsWith(suffix)) {
-                value.chop(suffix.length());
-                res.evaluated_unit = unit.toShortStringTr().toStdString();
-              }
-            }
+  b.on_parse_length_input([](slint::SharedString text, ui::LengthUnit unit) {
+    ui::EditParseResult res{false, ui::Int64{0, 0}, unit};
+    try {
+      QString value = s2q(text);
+      foreach (const LengthUnit& u, LengthUnit::getAllUnits()) {
+        foreach (const QString& suffix, u.getUserInputSuffixes()) {
+          if (value.endsWith(suffix)) {
+            value.chop(suffix.length());
+            res.evaluated_unit = l2s(u);
           }
-          Length l = Length::fromMm(value);
-          value = l.toMmString();
-          if (value.endsWith(".0")) {
-            value.chop(2);
-          }
-          res.evaluated_value = value.toStdString();
-          res.valid = true;
-        } catch (const Exception& e) {
         }
-        return res;
-      });
+      }
+      const LengthUnit lpUnit = s2l(res.evaluated_unit);
+      res.evaluated_value =
+          l2s(lpUnit.convertFromUnit(value.toDouble(&res.valid)));
+    } catch (const Exception& e) {
+    }
+    return res;
+  });
+  b.on_format_length([](const ui::Int64& value, ui::LengthUnit unit) {
+    const LengthUnit lpUnit = s2l(unit);
+    return q2s(Toolbox::floatToString(lpUnit.convertToUnit(s2l(value)),
+                                      lpUnit.getReasonableNumberOfDecimals(),
+                                      QLocale()));
+  });
   b.on_open_library(std::bind(&LibrariesModel::openLibrary, mLibraries.get(),
                               std::placeholders::_1));
   b.on_uninstall_library(std::bind(&LibrariesModel::uninstallLibrary,

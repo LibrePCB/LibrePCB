@@ -79,9 +79,26 @@ public:
       QGraphicsSceneMouseEvent& e) noexcept override;
   virtual bool processSwitchToSchematicPage(int index) noexcept override;
 
+  // Connection to UI
+  const Layer& getLayer() const noexcept {
+    return mCurrentProperties.getLayer();
+  }
+  void setLayer(const Layer& layer) noexcept;
+  const UnsignedLength& getLineWidth() const noexcept {
+    return mCurrentProperties.getLineWidth();
+  }
+  void setLineWidth(const UnsignedLength& width) noexcept;
+  bool getFilled() const noexcept { return mCurrentProperties.isFilled(); }
+  void setFilled(bool filled) noexcept;
+
   // Operator Overloadings
   SchematicEditorState_DrawPolygon& operator=(
       const SchematicEditorState_DrawPolygon& rhs) = delete;
+
+signals:
+  void layerChanged(const Layer& layer);
+  void lineWidthChanged(const UnsignedLength& width);
+  void filledChanged(bool filled);
 
 private:  // Methods
   bool startAddPolygon(const Point& pos) noexcept;
@@ -95,8 +112,10 @@ private:  // Methods
 private:  // Data
   // State
   bool mIsUndoCmdActive;
-  Polygon mLastPolygonProperties;
   Point mLastSegmentPos;
+
+  // Current tool settings
+  Polygon mCurrentProperties;
 
   // Information about the current polygon to place. Only valid if
   // mIsUndoCmdActive == true.

@@ -1,6 +1,7 @@
 import { LineEdit, VerticalBox } from "std-widgets.slint";
-import { EditParseResult } from "../api/types.slint";
+import { Int64, EditParseResult, LengthUnit } from "../api/types.slint";
 import { Backend } from "../api/backend.slint";
+import { Data } from "../api/data.slint";
 
 export component UpDownButton inherits Rectangle {
     in property <string> text <=> t-title.text;
@@ -19,13 +20,14 @@ export component UpDownButton inherits Rectangle {
 }
 
 export component UnitMenuItem {
-    in property <string> unit <=> t-title.text;
+    in property <LengthUnit> unit;
 
     callback clicked <=> ta.clicked;
 
     t-title := Text {
         font-size: 12px;
         color: ta.has-hover ? white : #cccccc;
+        text: Data.get-unit-short-str(unit);
     }
 
     ta := TouchArea {
@@ -34,14 +36,12 @@ export component UnitMenuItem {
 }
 
 export component LengthEdit inherits Rectangle {
-    in-out property <string> value: "0";
-    in-out property <string> unit: "mm";
+    in-out property <Int64> value;
+    in-out property <LengthUnit> unit: LengthUnit.millimeters;
     property <EditParseResult> parse-result;
 
-    preferred-width: le-text.preferred-width + btn-up.width + r-unit.width;
+    width: 145px;
     preferred-height: 27px;
-    width: self.preferred-width;
-    height: self.preferred-height;
     forward-focus: le-text;
 
     le-text := LineEdit {
@@ -52,7 +52,7 @@ export component LengthEdit inherits Rectangle {
         font-size: 13px;
 
         init => {
-            self.text = root.value;
+            self.text = Backend.format-length(root.value, root.unit);
             parse-result.valid = true;
         }
 
@@ -65,7 +65,7 @@ export component LengthEdit inherits Rectangle {
         }
 
         accepted(s) => {
-            self.text = value;
+            self.text = Backend.format-length(root.value, root.unit);
             parse-result.evaluated-value = value;
             parse-result.evaluated-unit = unit;
             parse-result.valid = true;
@@ -99,7 +99,7 @@ export component LengthEdit inherits Rectangle {
         lblText := Text {
             vertical-alignment: TextVerticalAlignment.center;
             color: touch.has-hover ? white : #cccccc;
-            text: root.unit;
+            text: Data.get-unit-short-str(root.unit);
         }
 
         popup := PopupWindow {
@@ -113,35 +113,35 @@ export component LengthEdit inherits Rectangle {
                     padding-left: 5px;
                     padding-right: 5px;
                     UnitMenuItem {
-                        unit: "mm";
+                        unit: LengthUnit.millimeters;
                         clicked(v) => {
                             root.unit = self.unit;
                         }
                     }
 
                     UnitMenuItem {
-                        unit: "μm";
+                        unit: LengthUnit.micrometers;
                         clicked(v) => {
                             root.unit = self.unit;
                         }
                     }
 
                     UnitMenuItem {
-                        unit: "nm";
+                        unit: LengthUnit.nanometers;
                         clicked(v) => {
                             root.unit = self.unit;
                         }
                     }
 
                     UnitMenuItem {
-                        unit: "″";
+                        unit: LengthUnit.inches;
                         clicked(v) => {
                             root.unit = self.unit;
                         }
                     }
 
                     UnitMenuItem {
-                        unit: "mils";
+                        unit: LengthUnit.mils;
                         clicked(v) => {
                             root.unit = self.unit;
                         }

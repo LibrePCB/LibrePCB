@@ -55,7 +55,10 @@ export component SchematicTab inherits Image {
                     section: section;
                 }
 
-                if tabs[section.current-tab-index].active-tool == SchematicTool.polygon: DrawPolygonToolBar { }
+                if tabs[section.current-tab-index].active-tool == SchematicTool.polygon: DrawPolygonToolBar {
+                    section-index: section-index;
+                    section: section;
+                }
 
                 if tabs[section.current-tab-index].active-tool == SchematicTool.text: AddTextToolBar { }
 

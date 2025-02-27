@@ -75,6 +75,11 @@ export enum ActionId {
     todo,
 }
 
+export struct Int64 {
+    msb: int,
+    lsb: int,
+}
+
 export enum LengthUnit {
     millimeters,
     micrometers,
@@ -286,6 +291,9 @@ export struct SchematicTabData {
     show-pin-numbers: bool,
     active-tool: SchematicTool,
     wire-mode: WireMode,
+    line-width: Int64,
+    line-width-unit: LengthUnit,
+    filled: bool,
     cursor: MouseCursor,
 }
 
@@ -316,6 +324,6 @@ export struct WindowSectionData {
 
 export struct EditParseResult {
     valid: bool,
-    evaluated-value: string,
-    evaluated-unit: string,
+    evaluated-value: Int64,
+    evaluated-unit: LengthUnit,
 }

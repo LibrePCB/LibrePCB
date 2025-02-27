@@ -39,6 +39,7 @@ namespace librepcb {
 
 class Project;
 class Workspace;
+class NetSignal;
 
 namespace editor {
 
@@ -107,6 +108,13 @@ public:
    */
   void setManualModificationsMade() noexcept;
 
+  std::shared_ptr<const QSet<const NetSignal*>> getHighlightedNetSignals()
+      const noexcept {
+    return mHighlightedNetSignals;
+  }
+  void setHighlightedNetSignals(
+      const QSet<const NetSignal*>& netSignals) noexcept;
+
   // Operator Overloadings
   ProjectEditor& operator=(const ProjectEditor& rhs) = delete;
 
@@ -115,6 +123,7 @@ signals:
   void projectAboutToBeSaved();
   void projectSavedToDisk();
   void ercFinished();
+  void highlightedNetSignalsChanged();
 
 private:
   void runErc() noexcept;
@@ -140,6 +149,8 @@ private:
   /// The timer for the periodically automatic saving
   /// functionality (see also @ref doc_project_save)
   QTimer mAutoSaveTimer;
+
+  std::shared_ptr<QSet<const NetSignal*>> mHighlightedNetSignals;
 };
 
 /*******************************************************************************

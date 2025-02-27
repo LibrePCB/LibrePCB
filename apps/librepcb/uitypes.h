@@ -26,8 +26,11 @@
 #include "appwindow.h"
 
 #include <librepcb/core/rulecheck/rulecheckmessage.h>
+#include <librepcb/core/types/length.h>
 #include <librepcb/core/types/lengthunit.h>
 #include <librepcb/core/workspace/theme.h>
+
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -39,6 +42,34 @@ namespace app {
 /*******************************************************************************
  *  Non-Member Functions
  ******************************************************************************/
+
+static_assert(sizeof(ui::Int64) == 8);
+static_assert(sizeof(LengthBase_t) == 8);
+
+inline qint64 s2l(const ui::Int64& v) noexcept {
+  return (static_cast<int64_t>(v.msb) << 32) | static_cast<uint32_t>(v.lsb);
+}
+
+inline Length s2length(const ui::Int64& v) noexcept {
+  return Length(s2l(v));
+}
+
+inline std::optional<UnsignedLength> s2ulength(const ui::Int64& v) noexcept {
+  const Length l = s2length(v);
+  return (l >= 0) ? std::make_optional(UnsignedLength(l)) : std::nullopt;
+}
+
+inline std::optional<PositiveLength> s2plength(const ui::Int64& v) noexcept {
+  const Length l = s2length(v);
+  return (l > 0) ? std::make_optional(PositiveLength(l)) : std::nullopt;
+}
+
+inline ui::Int64 l2s(const Length& v) noexcept {
+  return ui::Int64{
+      static_cast<int>((v.toNm() >> 32) & 0xFFFFFFFF),
+      static_cast<int>(v.toNm() & 0xFFFFFFFF),
+  };
+}
 
 inline Theme::GridStyle s2l(ui::GridStyle v) noexcept {
   if (v == ui::GridStyle::Lines) {

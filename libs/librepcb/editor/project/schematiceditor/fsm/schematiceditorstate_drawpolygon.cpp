@@ -53,14 +53,14 @@ SchematicEditorState_DrawPolygon::SchematicEditorState_DrawPolygon(
     const Context& context) noexcept
   : SchematicEditorState(context),
     mIsUndoCmdActive(false),
-    mLastPolygonProperties(Uuid::createRandom(),  // UUID is not relevant here
-                           Layer::schematicGuide(),  // Layer
-                           UnsignedLength(300000),  // Line width
-                           false,  // Is filled
-                           false,  // Is grab area
-                           Path()  // Path is not relevant here
-                           ),
     mLastSegmentPos(),
+    mCurrentProperties(Uuid::createRandom(),  // UUID is not relevant here
+                       Layer::schematicGuide(),  // Layer
+                       UnsignedLength(300000),  // Line width
+                       false,  // Is filled
+                       false,  // Is grab area
+                       Path()  // Path is not relevant here
+                       ),
     mCurrentPolygon(nullptr),
     mCurrentPolygonEditCmd(nullptr) {
 }
@@ -172,6 +172,46 @@ bool SchematicEditorState_DrawPolygon::processSwitchToSchematicPage(
 }
 
 /*******************************************************************************
+ *  Connection to UI
+ ******************************************************************************/
+
+void SchematicEditorState_DrawPolygon::setLayer(const Layer& layer) noexcept {
+  if (layer != mCurrentProperties.getLayer()) {
+    mCurrentProperties.setLayer(layer);
+    emit layerChanged(mCurrentProperties.getLayer());
+  }
+
+  if (mCurrentPolygonEditCmd) {
+    mCurrentPolygonEditCmd->setLayer(mCurrentProperties.getLayer(), true);
+  }
+}
+
+void SchematicEditorState_DrawPolygon::setLineWidth(
+    const UnsignedLength& width) noexcept {
+  if (width != mCurrentProperties.getLineWidth()) {
+    mCurrentProperties.setLineWidth(width);
+    emit lineWidthChanged(mCurrentProperties.getLineWidth());
+  }
+
+  if (mCurrentPolygonEditCmd) {
+    mCurrentPolygonEditCmd->setLineWidth(mCurrentProperties.getLineWidth(),
+                                         true);
+  }
+}
+
+void SchematicEditorState_DrawPolygon::setFilled(bool filled) noexcept {
+  if (filled != mCurrentProperties.isFilled()) {
+    mCurrentProperties.setIsFilled(filled);
+    emit filledChanged(mCurrentProperties.isFilled());
+  }
+
+  if (mCurrentPolygonEditCmd) {
+    mCurrentPolygonEditCmd->setIsFilled(mCurrentProperties.isFilled(), true);
+    mCurrentPolygonEditCmd->setIsGrabArea(mCurrentProperties.isFilled(), true);
+  }
+}
+
+/*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
@@ -190,9 +230,9 @@ bool SchematicEditorState_DrawPolygon::startAddPolygon(
     mIsUndoCmdActive = true;
 
     // Add polygon with two vertices
-    mLastPolygonProperties.setPath(Path({Vertex(pos), Vertex(pos)}));
+    mCurrentProperties.setPath(Path({Vertex(pos), Vertex(pos)}));
     mCurrentPolygon = new SI_Polygon(
-        *schematic, Polygon(Uuid::createRandom(), mLastPolygonProperties));
+        *schematic, Polygon(Uuid::createRandom(), mCurrentProperties));
     mContext.undoStack.appendToCmdGroup(
         new CmdSchematicPolygonAdd(*mCurrentPolygon));
 
@@ -282,34 +322,6 @@ bool SchematicEditorState_DrawPolygon::abortCommand(
       QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     }
     return false;
-  }
-}
-
-void SchematicEditorState_DrawPolygon::layerComboBoxLayerChanged(
-    const Layer& layer) noexcept {
-  mLastPolygonProperties.setLayer(layer);
-  if (mCurrentPolygonEditCmd) {
-    mCurrentPolygonEditCmd->setLayer(mLastPolygonProperties.getLayer(), true);
-  }
-}
-
-void SchematicEditorState_DrawPolygon::widthEditValueChanged(
-    const UnsignedLength& value) noexcept {
-  mLastPolygonProperties.setLineWidth(value);
-  if (mCurrentPolygonEditCmd) {
-    mCurrentPolygonEditCmd->setLineWidth(mLastPolygonProperties.getLineWidth(),
-                                         true);
-  }
-}
-
-void SchematicEditorState_DrawPolygon::filledCheckBoxCheckedChanged(
-    bool checked) noexcept {
-  mLastPolygonProperties.setIsFilled(checked);
-  if (mCurrentPolygonEditCmd) {
-    mCurrentPolygonEditCmd->setIsFilled(mLastPolygonProperties.isFilled(),
-                                        true);
-    mCurrentPolygonEditCmd->setIsGrabArea(mLastPolygonProperties.isFilled(),
-                                          true);
   }
 }
 

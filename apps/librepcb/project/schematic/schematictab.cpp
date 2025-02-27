@@ -39,6 +39,7 @@
 #include <librepcb/core/workspace/workspacesettings.h>
 #include <librepcb/editor/graphics/graphicslayer.h>
 #include <librepcb/editor/project/schematiceditor/fsm/schematiceditorfsm.h>
+#include <librepcb/editor/project/schematiceditor/fsm/schematiceditorstate_drawpolygon.h>
 #include <librepcb/editor/project/schematiceditor/schematicgraphicsscene.h>
 #include <librepcb/editor/undostack.h>
 #include <librepcb/editor/workspace/desktopservices.h>
@@ -115,6 +116,9 @@ SchematicTab::SchematicTab(GuiApplication& app,
     mFsm(),
     mTool(Tool::None),
     mWireMode(SchematicEditorState_DrawWire::WireMode::HV),
+    mLineWidth(0),
+    mLineWidthUnit(app.getWorkspace().getSettings().defaultLengthUnit.get()),
+    mFilled(false),
     mCursorShape(Qt::ArrowCursor) {
   // Apply settings from schematic.
   if (auto sch = mProject->getProject().getSchematicByIndex(mObjIndex)) {
@@ -212,6 +216,9 @@ ui::SchematicTabData SchematicTab::getUiData() const noexcept {
       pinNumbersLayer && pinNumbersLayer->isVisible(),  // Show pin numbers
       l2s(mTool),  // Active tool
       l2s(mWireMode),  // Wire mode
+      l2s(*mLineWidth),  // Line width
+      l2s(mLineWidthUnit),  // Line width unit
+      mFilled,  // Filled
       q2s(mCursorShape),  // Cursor
   };
 }
@@ -229,6 +236,11 @@ void SchematicTab::setUiData(const ui::SchematicTabData& data) noexcept {
     l->setVisible(data.show_pin_numbers);
   }
   emit wireModeRequested(s2l(data.wire_mode));
+  emit filledRequested(data.filled);
+  mLineWidthUnit = s2l(data.line_width_unit);
+  if (auto l = s2ulength(data.line_width)) {
+    emit lineWidthRequested(*l);
+  }
 
   invalidateBackground();
   emit requestRepaint();
@@ -399,7 +411,7 @@ Point SchematicTab::fsmMapGlobalPosToScenePos(const QPoint& pos,
 
 void SchematicTab::fsmSetHighlightedNetSignals(
     const QSet<const NetSignal*>& sigs) noexcept {
-  /* TODO */
+  mEditor->setHighlightedNetSignals(sigs);
 }
 
 void SchematicTab::fsmAbortBlockingToolsInOtherEditors() noexcept {
@@ -429,8 +441,33 @@ void SchematicTab::fsmSetTool(Tool tool, SchematicEditorState* state) noexcept {
                   emit uiDataChanged();
                 }));
     mFsmStateConnections.append(
-        connect(this, &SchematicTab::wireModeRequested,
-                s, &SchematicEditorState_DrawWire::setWireMode));
+        connect(this, &SchematicTab::wireModeRequested, s,
+                &SchematicEditorState_DrawWire::setWireMode));
+  } else if (tool == Tool::Polygon) {
+    SchematicEditorState_DrawPolygon* s =
+        static_cast<SchematicEditorState_DrawPolygon*>(state);
+
+    mLineWidth = s->getLineWidth();
+    mFsmStateConnections.append(
+        connect(s, &SchematicEditorState_DrawPolygon::lineWidthChanged, this,
+                [this](const UnsignedLength& w) {
+                  mLineWidth = w;
+                  emit uiDataChanged();
+                }));
+    mFsmStateConnections.append(
+        connect(this, &SchematicTab::lineWidthRequested, s,
+                &SchematicEditorState_DrawPolygon::setLineWidth));
+
+    mFilled = s->getFilled();
+    mFsmStateConnections.append(
+        connect(s, &SchematicEditorState_DrawPolygon::filledChanged, this,
+                [this](bool f) {
+                  mFilled = f;
+                  emit uiDataChanged();
+                }));
+    mFsmStateConnections.append(
+        connect(this, &SchematicTab::filledRequested, s,
+                &SchematicEditorState_DrawPolygon::setFilled));
   }
 
   emit uiDataChanged();

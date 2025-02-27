@@ -25,6 +25,7 @@
  ******************************************************************************/
 #include "graphicsscenetab.h"
 
+#include <librepcb/core/types/lengthunit.h>
 #include <librepcb/editor/dialogs/graphicsexportdialog.h>
 #include <librepcb/editor/project/schematiceditor/fsm/schematiceditorfsmadapter.h>
 #include <librepcb/editor/project/schematiceditor/fsm/schematiceditorstate_drawwire.h>
@@ -104,6 +105,8 @@ public:
 
 signals:
   void wireModeRequested(SchematicEditorState_DrawWire::WireMode mode);
+  void lineWidthRequested(const UnsignedLength& width);
+  void filledRequested(bool filled);
 
 protected:
   const LengthUnit* getCurrentUnit() const noexcept override;
@@ -117,7 +120,10 @@ private:
   std::shared_ptr<ProjectEditor> mEditor;
   QScopedPointer<SchematicEditorFsm> mFsm;
   Tool mTool;
-  SchematicEditorState_DrawWire::WireMode mWireMode;
+  SchematicEditorState_DrawWire::WireMode mWireMode;  // Command toolbar
+  UnsignedLength mLineWidth;  // Command toolbar
+  LengthUnit mLineWidthUnit;  // Command toolbar
+  bool mFilled;  // Command toolbar
   Qt::CursorShape mCursorShape;
 
   QHash<Qt::MouseButton, QPointF> mMouseButtonDownScenePos;

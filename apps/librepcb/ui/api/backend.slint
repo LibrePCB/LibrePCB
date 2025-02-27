@@ -1,4 +1,4 @@
-import { ActionId, EditParseResult } from "./types.slint";
+import { ActionId, Int64, EditParseResult, LengthUnit } from "./types.slint";
 
 export global Backend {
     // Some action has been triggered
@@ -13,7 +13,12 @@ export global Backend {
     // A key has been pressed
     pure callback key-pressed(KeyEvent) -> EventResult;
 
-    pure callback parse-length-input(string, string) -> EditParseResult;
+    pure callback parse-length-input(string, LengthUnit) -> EditParseResult;
+
+    pure callback format-length(Int64, LengthUnit) -> string;
+    format-length => {
+        return "123.456789";
+    }
 
     // An item in a file tree view has been double-clicked
     //

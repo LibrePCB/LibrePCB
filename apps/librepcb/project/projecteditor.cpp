@@ -66,7 +66,8 @@ ProjectEditor::ProjectEditor(
     mErcExecutionError(),
     mManualModificationsMade(false),
     mLastAutosaveStateId(mUndoStack->getUniqueStateId()),
-    mAutoSaveTimer() {
+    mAutoSaveTimer(),
+    mHighlightedNetSignals(new QSet<const NetSignal*>()){
   // Show notification if file format has been upgraded.
   if (upgradeMessages) {
     mUpgradeMessages = *upgradeMessages;
@@ -292,6 +293,14 @@ void ProjectEditor::setManualModificationsMade() noexcept {
   mManualModificationsMade = true;
   if (!oldState) {
     emit manualModificationsMade();
+  }
+}
+
+void ProjectEditor::setHighlightedNetSignals(
+    const QSet<const NetSignal*>& netSignals) noexcept {
+  if (netSignals != *mHighlightedNetSignals) {
+    *mHighlightedNetSignals = netSignals;
+    emit highlightedNetSignalsChanged();
   }
 }
 
