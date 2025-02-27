@@ -37,9 +37,9 @@
  ******************************************************************************/
 namespace librepcb {
 
+class NetSignal;
 class Project;
 class Workspace;
-class NetSignal;
 
 namespace editor {
 

@@ -1,5 +1,5 @@
 import { ComboBox, CheckBox } from "std-widgets.slint";
-import { WindowSectionData, SchematicTabData, SchematicTool } from "../../api/types.slint";
+import { WindowSectionData, SchematicTabData, EditorTool } from "../../api/types.slint";
 import { SceneButton } from "../../common/scenebutton.slint";
 import { ToolButton } from "../../common/toolbutton.slint";
 import { LengthEdit } from "../../common/lengthedit.slint";
@@ -19,7 +19,7 @@ export component SchematicTab inherits Image {
 
     image-fit: ImageFit.preserve;
     image-rendering: ImageRendering.pixelated;
-    source: Backend.render-scene(section-index, root.width, root.height, section.frame);
+    source: Backend.render-scene(section-index, root.width, root.height, tabs[section.current-tab-index].frame);
 
     if Data.preview-mode: Rectangle {
         background: white;
@@ -30,18 +30,16 @@ export component SchematicTab inherits Image {
     }
 
     ta := TouchArea {
-        mouse-cursor: tabs[section.current-tab-index].cursor;
+        mouse-cursor: tabs[section.current-tab-index].tool-cursor;
 
-        top-bar := Rectangle {
+        Rectangle {
             y: 0;
             width: self.preferred-width;
             height: self.preferred-height;
             background: #505050;
             border-bottom-left-radius: self.height / 2;
             border-bottom-right-radius: self.height / 2;
-            //opacity: (ta.has-hover || ta.pressed) ? 1 : 0.2;
-
-            //animate opacity { duration: 100ms; }
+            visible: self.width > 30px;
 
             HorizontalLayout {
                 alignment: center;
@@ -50,28 +48,30 @@ export component SchematicTab inherits Image {
                 padding-top: 2px;
                 padding-bottom: 5px;
 
-                if tabs[section.current-tab-index].active-tool == SchematicTool.wire: DrawWireToolBar {
+                DrawWireToolBar {
                     section-index: section-index;
                     section: section;
+                    visible: tabs[section.current-tab-index].tool == EditorTool.wire;
+                    width: self.visible ? self.preferred-width : 0;
                 }
 
-                if tabs[section.current-tab-index].active-tool == SchematicTool.polygon: DrawPolygonToolBar {
+                DrawPolygonToolBar {
                     section-index: section-index;
                     section: section;
+                    visible: tabs[section.current-tab-index].tool == EditorTool.polygon;
+                    width: self.visible ? self.preferred-width : 0;
                 }
 
-                if tabs[section.current-tab-index].active-tool == SchematicTool.text: AddTextToolBar { }
+                AddTextToolBar {
+                    section-index: section-index;
+                    section: section;
+                    visible: tabs[section.current-tab-index].tool == EditorTool.text;
+                    width: self.visible ? self.preferred-width : 0;
+                }
 
-                if tabs[section.current-tab-index].active-tool == SchematicTool.component: AddComponentToolBar { }
+                if tabs[section.current-tab-index].tool == EditorTool.component: AddComponentToolBar { }
             }
         }
-
-        /*EditToolBar {
-            y: top-bar.y + top-bar.height + 10px;
-            opacity: (ta.has-hover || ta.pressed) ? 1 : 0.2;
-
-            animate opacity { duration: 100ms; }
-        }*/
 
         VerticalLayout {
             x: 7px;
@@ -83,11 +83,11 @@ export component SchematicTab inherits Image {
                 image: @image-url("../../img/cursor.svg");
                 tooltip: @tr("Select");
                 status-tip: @tr("Select & modify existing objects");
-                checked: tabs[section.current-tab-index].active-tool == SchematicTool.select;
+                checked: tabs[section.current-tab-index].tool == EditorTool.select;
 
                 clicked => {
                     if Data.preview-mode {
-                        tabs[section.current-tab-index].active-tool = SchematicTool.select;
+                        tabs[section.current-tab-index].tool = EditorTool.select;
                         return true; // Workaround for warning in generated header
                     } else {
                         Backend.action-triggered(ActionId.tool-select, section-index);
@@ -99,11 +99,11 @@ export component SchematicTab inherits Image {
                 image: @image-url("../../img/draw-wire.svg");
                 tooltip: @tr("Draw Wires");
                 status-tip: @tr("Draw wires to create electrical connections between symbol pins");
-                checked: tabs[section.current-tab-index].active-tool == SchematicTool.wire;
+                checked: tabs[section.current-tab-index].tool == EditorTool.wire;
 
                 clicked => {
                     if Data.preview-mode {
-                        tabs[section.current-tab-index].active-tool = SchematicTool.wire;
+                        tabs[section.current-tab-index].tool = EditorTool.wire;
                         return true; // Workaround for warning in generated header
                     } else {
                         Backend.action-triggered(ActionId.tool-wire, section-index);
@@ -115,11 +115,11 @@ export component SchematicTab inherits Image {
                 image: @image-url("../../img/netlabel.svg");
                 tooltip: @tr("Add Net Labels");
                 status-tip: @tr("Add net labels to explicitly specify the net of wires");
-                checked: tabs[section.current-tab-index].active-tool == SchematicTool.netlabel;
+                checked: tabs[section.current-tab-index].tool == EditorTool.netlabel;
 
                 clicked => {
                     if Data.preview-mode {
-                        tabs[section.current-tab-index].active-tool = SchematicTool.netlabel;
+                        tabs[section.current-tab-index].tool = EditorTool.netlabel;
                         return true; // Workaround for warning in generated header
                     } else {
                         Backend.action-triggered(ActionId.tool-netlabel, section-index);
@@ -131,11 +131,11 @@ export component SchematicTab inherits Image {
                 image: @image-url("../../img/draw-polygon.svg");
                 tooltip: @tr("Draw Polygons");
                 status-tip: @tr("Draw graphical (i.e. non-functional) polygons");
-                checked: tabs[section.current-tab-index].active-tool == SchematicTool.polygon;
+                checked: tabs[section.current-tab-index].tool == EditorTool.polygon;
 
                 clicked => {
                     if Data.preview-mode {
-                        tabs[section.current-tab-index].active-tool = SchematicTool.polygon;
+                        tabs[section.current-tab-index].tool = EditorTool.polygon;
                         return true; // Workaround for warning in generated header
                     } else {
                         Backend.action-triggered(ActionId.tool-polygon, section-index);
@@ -147,11 +147,11 @@ export component SchematicTab inherits Image {
                 image: @image-url("../../img/draw-text.svg");
                 tooltip: @tr("Add Text Labels");
                 status-tip: @tr("Add graphical (i.e. non-functional) text labels");
-                checked: tabs[section.current-tab-index].active-tool == SchematicTool.text;
+                checked: tabs[section.current-tab-index].tool == EditorTool.text;
 
                 clicked => {
                     if Data.preview-mode {
-                        tabs[section.current-tab-index].active-tool = SchematicTool.text;
+                        tabs[section.current-tab-index].tool = EditorTool.text;
                         return true; // Workaround for warning in generated header
                     } else {
                         Backend.action-triggered(ActionId.tool-text, section-index);
@@ -163,11 +163,11 @@ export component SchematicTab inherits Image {
                 image: @image-url("../../img/plus.svg");
                 tooltip: @tr("Place Components");
                 status-tip: @tr("Insert components from the workspace libraries");
-                checked: tabs[section.current-tab-index].active-tool == SchematicTool.component;
+                checked: tabs[section.current-tab-index].tool == EditorTool.component;
 
                 clicked => {
                     if Data.preview-mode {
-                        tabs[section.current-tab-index].active-tool = SchematicTool.component;
+                        tabs[section.current-tab-index].tool = EditorTool.component;
                         return true; // Workaround for warning in generated header
                     } else {
                         Backend.action-triggered(ActionId.tool-component, section-index);
@@ -179,11 +179,11 @@ export component SchematicTab inherits Image {
                 image: @image-url("../../img/ruler.svg");
                 tooltip: @tr("Measure");
                 status-tip: @tr("Measure the distance between two points");
-                checked: tabs[section.current-tab-index].active-tool == SchematicTool.measure;
+                checked: tabs[section.current-tab-index].tool == EditorTool.measure;
 
                 clicked => {
                     if Data.preview-mode {
-                        tabs[section.current-tab-index].active-tool = SchematicTool.measure;
+                        tabs[section.current-tab-index].tool = EditorTool.measure;
                         return true; // Workaround for warning in generated header
                     } else {
                         Backend.action-triggered(ActionId.tool-measure, section-index);

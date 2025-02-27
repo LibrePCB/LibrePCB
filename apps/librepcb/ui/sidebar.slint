@@ -26,14 +26,14 @@ export component SideBar inherits Rectangle {
             icon: @image-url("img/libraries.png");
             tooltip: @tr("Libraries");
             status-background: {
-                if (!Data.refreshing-available-libraries) && (!Data.libraries-fetching-error.is-empty) {
+                if (!Data.refreshing-available-libraries) && (Data.libraries-fetching-error != "") {
                     return red;
                 } else {
                     return #d4d400;
                 }
             };
             status-color: {
-                if (!Data.refreshing-available-libraries) && (!Data.libraries-fetching-error.is-empty) {
+                if (!Data.refreshing-available-libraries) && (Data.libraries-fetching-error != "") {
                     return white;
                 } else {
                     return black;
@@ -48,7 +48,7 @@ export component SideBar inherits Rectangle {
                     } else {
                         return ".";
                     }
-                } else if !Data.libraries-fetching-error.is-empty {
+                } else if Data.libraries-fetching-error != "" {
                     return "err";
                 } else if Data.outdated-libraries > 0 {
                     return Data.outdated-libraries;
@@ -107,7 +107,7 @@ export component SideBar inherits Rectangle {
                     status-color: black;
                     status-text: get-progress-dots();
                 }
-                failed when !error.is-empty: {
+                failed when error != "": {
                     status-background: #ff0000;
                     status-color: white;
                     status-text: "E";

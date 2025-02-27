@@ -16,7 +16,7 @@ component LibraryList inherits ListView {
     preferred-height: model.length * item-height + bottom-padding;
 
     changed item-count => {
-        if !Data.libraries-filter.is-empty {
+        if Data.libraries-filter != "" {
             self.viewport-y = 0;
             self.current-index = (item-count > 0) ? 0 : -1;
         }
@@ -213,7 +213,7 @@ export component LibrariesPanel inherits Rectangle {
             title: @tr("LIBRARIES");
             show-spinner: Data.refreshing-available-libraries;
 
-            if !Data.libraries-fetching-error.is-empty: PanelHeaderButton {
+            if Data.libraries-fetching-error != "": PanelHeaderButton {
                 icon: Data.get-icon-for-notification-type(NotificationType.warning);
                 icon-scale: 0.7;
                 colorize: Data.get-color-for-notification-type(NotificationType.warning);
@@ -243,7 +243,7 @@ export component LibrariesPanel inherits Rectangle {
         }
 
         HorizontalLayout {
-            height: Data.libraries-filter.is-empty ? 0 : 38px;
+            height: (Data.libraries-filter == "") ? 0 : 38px;
             padding: 5px;
 
             animate height { duration: 100ms; }
@@ -292,7 +292,7 @@ export component LibrariesPanel inherits Rectangle {
             }
         }
 
-        if (!Data.libraries-filter.is-empty) && (Data.libraries.length == 0): HorizontalLayout {
+        if (Data.libraries-filter != "") && (Data.libraries.length == 0): HorizontalLayout {
             padding: 8px;
 
             Text {

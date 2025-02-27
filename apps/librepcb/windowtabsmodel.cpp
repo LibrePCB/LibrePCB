@@ -68,8 +68,6 @@ void WindowTabsModel::addTab(std::shared_ptr<WindowTab> tab) noexcept {
       tab.get(), &WindowTab::requestClose, this,
       [this, getTabIndex]() { closeTab(getTabIndex(sender())); },
       Qt::QueuedConnection);
-  connect(tab.get(), &WindowTab::requestRepaint, this,
-          &WindowTabsModel::requestRepaint);
   connect(tab.get(), &WindowTab::uiDataChanged, this,
           [this, getTabIndex]() { emit uiDataChanged(getTabIndex(sender())); });
   mItems.append(tab);

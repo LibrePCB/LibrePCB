@@ -74,12 +74,12 @@ export component CreateLibraryTab inherits Rectangle {
                     }
 
                     for text[i] in ["My Library", "•", "KiCad Import", "•", "Eagle Import"]: Text {
-                        color: text.character-count > 1 ? white : t-examples.color;
+                        color: (text != "•") ? white : t-examples.color;
                         overflow: elide;
                         font-size: 11px;
                         text: text;
 
-                        if text.character-count > 1: TouchArea {
+                        if text != "•": TouchArea {
                             mouse-cursor: pointer;
 
                             clicked => {

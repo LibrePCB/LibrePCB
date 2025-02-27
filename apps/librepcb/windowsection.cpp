@@ -71,16 +71,13 @@ WindowSection::WindowSection(GuiApplication& app, QObject* parent) noexcept
             WindowTabsModelAdapter<Board3dTab, ui::Board3dTabData>>(mTabsModel),
         0,
         false,  // Highlight
-        0,
     } {
   connect(mTabsModel.get(), &WindowTabsModel::cursorCoordinatesChanged, this,
           &WindowSection::cursorCoordinatesChanged);
   connect(mTabsModel.get(), &WindowTabsModel::statusBarMessageChanged, this,
           &WindowSection::statusBarMessageChanged);
-  connect(mTabsModel.get(), &WindowTabsModel::requestRepaint, this,
-          &WindowSection::requestRepaint, Qt::QueuedConnection);
-  connect(mTabsModel.get(), &WindowTabsModel::uiDataChanged, this,
-          &WindowSection::uiDataChanged);
+  // connect(mTabsModel.get(), &WindowTabsModel::uiDataChanged, this,
+  //         &WindowSection::uiDataChanged);
 
   addTab(std::make_shared<HomeTab>(app));
 }
@@ -141,11 +138,9 @@ bool WindowSection::actionTriggered(ui::ActionId id) noexcept {
     } else if (std::shared_ptr<ProjectEditor> editor = t->getProject()) {
       if (id == ui::ActionId::Undo) {
         editor->getUndoStack().undo();  // TODO: Exception handling!
-        requestRepaint();
         return true;
       } else if (id == ui::ActionId::Redo) {
         editor->getUndoStack().redo();  // TODO: Exception handling!
-        requestRepaint();
         return true;
       }
     }
@@ -204,11 +199,6 @@ void WindowSection::highlight() noexcept {
     mUiData.highlight = false;
     emit uiDataChanged();
   });
-}
-
-void WindowSection::requestRepaint() noexcept {
-  mUiData.frame++;
-  emit uiDataChanged();
 }
 
 /*******************************************************************************

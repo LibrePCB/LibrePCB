@@ -80,6 +80,7 @@ public:
   virtual bool processSwitchToSchematicPage(int index) noexcept override;
 
   // Connection to UI
+  QVector<const Layer*> getLayers() const noexcept;
   const Layer& getLayer() const noexcept {
     return mCurrentProperties.getLayer();
   }
@@ -105,9 +106,6 @@ private:  // Methods
   bool addSegment(const Point& pos) noexcept;
   bool updateLastVertexPosition(const Point& pos) noexcept;
   bool abortCommand(bool showErrMsgBox) noexcept;
-  void layerComboBoxLayerChanged(const Layer& layer) noexcept;
-  void widthEditValueChanged(const UnsignedLength& value) noexcept;
-  void filledCheckBoxCheckedChanged(bool checked) noexcept;
 
 private:  // Data
   // State

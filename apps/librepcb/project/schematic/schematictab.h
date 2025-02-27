@@ -105,11 +105,15 @@ public:
 
 signals:
   void wireModeRequested(SchematicEditorState_DrawWire::WireMode mode);
+  void layerRequested(const Layer& layer);
   void lineWidthRequested(const UnsignedLength& width);
+  void heightRequested(const PositiveLength& height);
   void filledRequested(bool filled);
+  void valueRequested(const QString& value);
 
 protected:
   const LengthUnit* getCurrentUnit() const noexcept override;
+  void requestRepaint() noexcept override;
 
 private:
   void execGraphicsExportDialog(GraphicsExportDialog::Output output,
@@ -119,17 +123,27 @@ private:
 private:
   std::shared_ptr<ProjectEditor> mEditor;
   QScopedPointer<SchematicEditorFsm> mFsm;
+
+  // Current tool
   Tool mTool;
-  SchematicEditorState_DrawWire::WireMode mWireMode;  // Command toolbar
-  UnsignedLength mLineWidth;  // Command toolbar
-  LengthUnit mLineWidthUnit;  // Command toolbar
-  bool mFilled;  // Command toolbar
-  Qt::CursorShape mCursorShape;
+  Qt::CursorShape mToolCursorShape;
+  SchematicEditorState_DrawWire::WireMode mToolWireMode;
+  QVector<const Layer*> mToolLayersQt;
+  std::shared_ptr<slint::VectorModel<slint::SharedString>> mToolLayers;
+  const Layer* mToolLayer;
+  UnsignedLength mToolLineWidth;
+  LengthUnit mToolLineWidthUnit;
+  PositiveLength mToolHeight;
+  LengthUnit mToolHeightUnit;
+  bool mToolFilled;
+  QString mToolValue;
 
   QHash<Qt::MouseButton, QPointF> mMouseButtonDownScenePos;
   QHash<Qt::MouseButton, QPoint> mMouseButtonDownScreenPos;
 
   QVector<QMetaObject::Connection> mFsmStateConnections;
+
+  int mFrameIndex;
 };
 
 /*******************************************************************************

@@ -80,6 +80,7 @@ public:
 
 protected:
   const LengthUnit* getCurrentUnit() const noexcept override;
+  void requestRepaint() noexcept override;
 
 private:
   void startDrc(bool quick) noexcept;
@@ -94,6 +95,8 @@ private:
   std::shared_ptr<RuleCheckMessagesModel> mDrcMessages;
   QString mDrcExecutionError;
   std::unique_ptr<BoardPlaneFragmentsBuilder> mPlaneBuilder;
+
+  int mFrameIndex;
 };
 
 /*******************************************************************************

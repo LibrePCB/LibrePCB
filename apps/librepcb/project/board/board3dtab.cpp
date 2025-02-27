@@ -53,7 +53,7 @@ Board3dTab::Board3dTab(GuiApplication& app, std::shared_ptr<ProjectEditor> prj,
                        int boardIndex, QObject* parent) noexcept
   : WindowTab(app, prj, boardIndex, parent),
     mEditor(prj),
-    mUiData{q2s(QColor(Qt::white)), q2s(QColor(Qt::black))},
+    mUiData{q2s(QColor(Qt::white)), q2s(QColor(Qt::black)), 0},
     mAnimation(new QVariantAnimation(this)) {
   mAnimation->setDuration(500);
   mAnimation->setEasingCurve(QEasingCurve::InOutCubic);
@@ -112,7 +112,7 @@ void Board3dTab::activate() noexcept {
     connect(mPlaneBuilder.get(), &BoardPlaneFragmentsBuilder::finished, this,
             [this](BoardPlaneFragmentsBuilder::Result result) {
               if (result.applyToBoard()) {
-                emit requestRepaint();
+                requestRepaint();
               }
             });
     mPlaneBuilder->start(*brd);
@@ -122,15 +122,14 @@ void Board3dTab::activate() noexcept {
     mOpenGlSceneBuilder.reset(new OpenGlSceneBuilder(this));
     connect(mOpenGlSceneBuilder.get(), &OpenGlSceneBuilder::objectAdded,
             mOpenGlView.get(), &OpenGlView::addObject);
-    connect(
-        mOpenGlSceneBuilder.get(), &OpenGlSceneBuilder::objectAdded, this,
-        [this]() { emit requestRepaint(); }, Qt::QueuedConnection);
+    connect(mOpenGlSceneBuilder.get(), &OpenGlSceneBuilder::objectAdded, this,
+            &Board3dTab::requestRepaint, Qt::QueuedConnection);
     auto av =
         mProject->getProject().getCircuit().getAssemblyVariants().value(0);
     mOpenGlSceneBuilder->start(brd->buildScene3D(
         av ? std::make_optional(av->getUuid()) : std::nullopt));
     mUiData.overlay_color = q2s(QColor(Qt::black));
-    emit requestRepaint();
+    requestRepaint();
   }
 }
 
@@ -273,12 +272,15 @@ bool Board3dTab::applyProjection(const Projection& projection) noexcept {
       mOpenGlView->setTransform(projection.transform, projection.fov,
                                 projection.center);
     }
-    // mUiData.frame++;
-    // emit uiDataChanged(mUiData.index);
-    emit requestRepaint();
+    requestRepaint();
     return true;
   }
   return false;
+}
+
+void Board3dTab::requestRepaint() noexcept {
+  ++mUiData.frame;
+  emit uiDataChanged();
 }
 
 /*******************************************************************************

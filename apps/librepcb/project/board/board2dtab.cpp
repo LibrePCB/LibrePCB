@@ -65,7 +65,8 @@ Board2dTab::Board2dTab(GuiApplication& app, std::shared_ptr<ProjectEditor> prj,
     mDrcUndoStackState(mEditor->getUndoStack().getUniqueStateId()),
     mDrcMessages(),
     mDrcExecutionError(),
-    mPlaneBuilder() {
+    mPlaneBuilder(),
+    mFrameIndex(0) {
   // Apply settings from board.
   if (auto brd = mProject->getProject().getBoardByIndex(mObjIndex)) {
     mGridInterval = brd->getGridInterval();
@@ -159,6 +160,7 @@ ui::Board2dTabData Board2dTab::getUiData() const noexcept {
       q2s(gridIntervalStr),  // Grid interval
       brd ? l2s(brd->getGridUnit())
           : ui::LengthUnit::Millimeters,  // Length unit
+      mFrameIndex,  // Frame index
   };
 }
 
@@ -173,7 +175,7 @@ void Board2dTab::setUiData(const ui::Board2dTabData& data) noexcept {
   }
 
   invalidateBackground();
-  emit requestRepaint();
+  requestRepaint();
 }
 
 void Board2dTab::activate() noexcept {
@@ -182,14 +184,14 @@ void Board2dTab::activate() noexcept {
     connect(mPlaneBuilder.get(), &BoardPlaneFragmentsBuilder::finished, this,
             [this](BoardPlaneFragmentsBuilder::Result result) {
               if (result.applyToBoard()) {
-                emit requestRepaint();
+                requestRepaint();
               }
             });
     mPlaneBuilder->start(*brd);
     mScene.reset(new BoardGraphicsScene(
         *brd, *mLayerProvider, std::make_shared<QSet<const NetSignal*>>(),
         this));
-    emit requestRepaint();
+    requestRepaint();
   }
 }
 
@@ -228,6 +230,11 @@ const LengthUnit* Board2dTab::getCurrentUnit() const noexcept {
   } else {
     return nullptr;
   }
+}
+
+void Board2dTab::requestRepaint() noexcept {
+  ++mFrameIndex;
+  emit uiDataChanged();
 }
 
 void Board2dTab::startDrc(bool quick) noexcept {

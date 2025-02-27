@@ -95,9 +95,6 @@ signals:
   void statusBarMessageChanged(const QString& message, int timeoutMs);
 
 private:
-  void requestRepaint() noexcept;
-
-private:
   std::shared_ptr<WindowTabsModel> mTabsModel;
   ui::WindowSectionData mUiData;
 };

@@ -1,7 +1,12 @@
 import { ComboBox, LineEdit } from "std-widgets.slint";
 import { LengthEdit } from "../../common/lengthedit.slint";
+import { WindowSectionData, SchematicTabData, Int64 } from "../../api/types.slint";
 
 export component AddTextToolBar inherits HorizontalLayout {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    property <[SchematicTabData]> tabs: section.schematic-tabs;
+
     spacing: 5px;
 
     Text {
@@ -10,7 +15,14 @@ export component AddTextToolBar inherits HorizontalLayout {
     }
 
     ComboBox {
-        model: ["Guide", "Schematic Frame"];
+        model: tabs[section.current-tab-index].tool-layers;
+        current-index: tabs[section.current-tab-index].tool-layer-index;
+
+        changed current-index => {
+            if (tabs[section.current-tab-index].tool-layer-index != self.current-index) {
+                tabs[section.current-tab-index].tool-layer-index = self.current-index;
+            }
+        }
     }
 
     Text {
@@ -19,7 +31,30 @@ export component AddTextToolBar inherits HorizontalLayout {
     }
 
     LineEdit {
-        text: "{{PROJECT}}";
+        property <string> tool-value: tabs[section.current-tab-index].tool-value;
+        property <bool> disable-update: false;
+
+        changed tool-value => {
+            if !disable-update {
+                self.text = tool-value;
+            }
+        }
+
+        changed has-focus => {
+            if !self.has-focus {
+                disable-update = false;
+                self.text = tool-value;
+            }
+        }
+
+        init => {
+            self.text = tool-value;
+        }
+
+        edited(text) => {
+            disable-update = true;
+            tabs[section.current-tab-index].tool-value = text;
+        }
     }
 
     Text {
@@ -27,5 +62,25 @@ export component AddTextToolBar inherits HorizontalLayout {
         text: @tr("Height:");
     }
 
-    LengthEdit { }
+    LengthEdit {
+        value: tabs[section.current-tab-index].tool-height;
+        unit: tabs[section.current-tab-index].tool-height-unit;
+        can-decrease: tabs[section.current-tab-index].tool-height-can-decrease;
+
+        value-entered(v) => {
+            tabs[section.current-tab-index].tool-height = v;
+        }
+
+        unit-entered(u) => {
+            tabs[section.current-tab-index].tool-height-unit = u;
+        }
+
+        increase-triggered => {
+            tabs[section.current-tab-index].tool-height-increase = true;
+        }
+
+        decrease-triggered => {
+            tabs[section.current-tab-index].tool-height-decrease = true;
+        }
+    }
 }

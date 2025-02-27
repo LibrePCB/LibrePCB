@@ -16,7 +16,14 @@ export component DrawPolygonToolBar inherits HorizontalLayout {
     }
 
     ComboBox {
-        model: ["Guide", "Schematic Frame"];
+        model: tabs[section.current-tab-index].tool-layers;
+        current-index: tabs[section.current-tab-index].tool-layer-index;
+
+        changed current-index => {
+            if (tabs[section.current-tab-index].tool-layer-index != self.current-index) {
+                tabs[section.current-tab-index].tool-layer-index = self.current-index;
+            }
+        }
     }
 
     Text {
@@ -25,24 +32,33 @@ export component DrawPolygonToolBar inherits HorizontalLayout {
     }
 
     LengthEdit {
-        value: tabs[section.current-tab-index].line-width;
-        unit: tabs[section.current-tab-index].line-width-unit;
+        value: tabs[section.current-tab-index].tool-line-width;
+        unit: tabs[section.current-tab-index].tool-line-width-unit;
+        can-decrease: tabs[section.current-tab-index].tool-line-width-can-decrease;
 
-        changed value => {
-            tabs[section.current-tab-index].line-width = self.value;
+        value-entered(v) => {
+            tabs[section.current-tab-index].tool-line-width = v;
         }
 
-        changed unit => {
-            tabs[section.current-tab-index].line-width-unit = self.unit;
+        unit-entered(u) => {
+            tabs[section.current-tab-index].tool-line-width-unit = u;
+        }
+
+        increase-triggered => {
+            tabs[section.current-tab-index].tool-line-width-increase = true;
+        }
+
+        decrease-triggered => {
+            tabs[section.current-tab-index].tool-line-width-decrease = true;
         }
     }
 
     CheckBox {
         text: @tr("Fill");
-        checked: tabs[section.current-tab-index].filled;
+        checked: tabs[section.current-tab-index].tool-filled;
 
         toggled => {
-            tabs[section.current-tab-index].filled = self.checked;
+            tabs[section.current-tab-index].tool-filled = self.checked;
         }
     }
 }

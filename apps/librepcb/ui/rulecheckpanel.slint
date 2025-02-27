@@ -89,10 +89,10 @@ export component RuleCheckPanel inherits Rectangle {
         VerticalLayout {
             header := PanelHeader {
                 z: 10;  // For the tooltip.
-            title: title.is-empty ? @tr("Rule Check Messages") : title;
+                title: (title == "") ? @tr("Rule Check Messages") : title;
                 show-spinner: Data.current-tab.rule-check-state == RuleCheckState.running;
 
-                if !Data.current-tab.rule-check-execution-error.is-empty: PanelHeaderButton {
+                if Data.current-tab.rule-check-execution-error != "": PanelHeaderButton {
                     icon: @image-url("img/circle-xmark.svg");
                     icon-scale: 0.7;
                     tooltip: Data.current-tab.rule-check-execution-error;
@@ -137,7 +137,7 @@ export component RuleCheckPanel inherits Rectangle {
                 for msg[index] in Data.current-tab.rule-check-messages: Item {
                     messages: Data.current-tab.rule-check-messages;
                     msg-index: index;
-                    enabled: Data.current-tab.rule-check-execution-error.is-empty && (Data.current-tab.rule-check-state != RuleCheckState.running);
+                    enabled: (Data.current-tab.rule-check-execution-error == "") && (Data.current-tab.rule-check-state != RuleCheckState.running);
                     is-selected: (index == selected-index);
 
                     clicked => {

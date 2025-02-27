@@ -115,6 +115,7 @@ private:
   bool zoom(const QPointF& center, qreal factor) noexcept;
   void smoothTo(const Projection& projection) noexcept;
   bool applyProjection(const Projection& projection) noexcept;
+  void requestRepaint() noexcept;
 
   std::shared_ptr<ProjectEditor> mEditor;
   ui::Board3dTabData mUiData;

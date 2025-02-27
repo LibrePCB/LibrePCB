@@ -155,7 +155,7 @@ slint::Image GraphicsSceneTab::renderScene(float width, float height) noexcept {
 
         // Unfortunately the background we just calculated above is invalid in
         // this case. This is an ugly hack to get it redrawn...
-        invalidateBackground();
+        QTimer::singleShot(1, this, &GraphicsSceneTab::invalidateBackground);
       }
       sceneRect =
           QRectF(0, 0, width / mProjection.scale, height / mProjection.scale);
@@ -261,8 +261,7 @@ Point GraphicsSceneTab::mapGlobalPosToScenePos(const QPoint& pos,
 
 void GraphicsSceneTab::invalidateBackground() noexcept {
   mCachedBackground = QPixmap();
-  emit requestRepaint();
-  ;
+  requestRepaint();
 }
 
 /*******************************************************************************

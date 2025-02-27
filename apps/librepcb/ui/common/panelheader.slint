@@ -25,7 +25,7 @@ export component PanelHeaderButton inherits Rectangle {
             colorize: (colorize != transparent) ? colorize : (((!read-only) && ta.has-hover) ? white : (enabled ? Palette.foreground : #707070));
         }
 
-        if self.has-hover && (!tooltip.is-empty): ToolTip {
+        if self.has-hover && (tooltip != ""): ToolTip {
             x: max((parent.width / 2) - (self.width / 2), -root.x);
             y: parent.height + 5px;
             text: tooltip;
@@ -59,7 +59,7 @@ export component PanelHeader inherits Rectangle {
                 vertical-alignment: center;
             }
 
-            if !note.is-empty: Text {
+            if note != "": Text {
                 y: 2px;
                 horizontal-stretch: 1;
                 font-size: 11px;

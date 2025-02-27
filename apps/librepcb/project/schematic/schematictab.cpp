@@ -39,6 +39,7 @@
 #include <librepcb/core/workspace/workspacesettings.h>
 #include <librepcb/editor/graphics/graphicslayer.h>
 #include <librepcb/editor/project/schematiceditor/fsm/schematiceditorfsm.h>
+#include <librepcb/editor/project/schematiceditor/fsm/schematiceditorstate_addtext.h>
 #include <librepcb/editor/project/schematiceditor/fsm/schematiceditorstate_drawpolygon.h>
 #include <librepcb/editor/project/schematiceditor/schematicgraphicsscene.h>
 #include <librepcb/editor/undostack.h>
@@ -54,21 +55,21 @@ namespace librepcb {
 namespace editor {
 namespace app {
 
-static ui::SchematicTool l2s(SchematicEditorFsmAdapter::Tool v) noexcept {
+static ui::EditorTool l2s(SchematicEditorFsmAdapter::Tool v) noexcept {
   if (v == SchematicEditorFsmAdapter::Tool::Wire) {
-    return ui::SchematicTool::Wire;
+    return ui::EditorTool::Wire;
   } else if (v == SchematicEditorFsmAdapter::Tool::NetLabel) {
-    return ui::SchematicTool::Netlabel;
+    return ui::EditorTool::Netlabel;
   } else if (v == SchematicEditorFsmAdapter::Tool::Polygon) {
-    return ui::SchematicTool::Polygon;
+    return ui::EditorTool::Polygon;
   } else if (v == SchematicEditorFsmAdapter::Tool::Text) {
-    return ui::SchematicTool::Text;
+    return ui::EditorTool::Text;
   } else if (v == SchematicEditorFsmAdapter::Tool::Component) {
-    return ui::SchematicTool::Component;
+    return ui::EditorTool::Component;
   } else if (v == SchematicEditorFsmAdapter::Tool::Measure) {
-    return ui::SchematicTool::Measure;
+    return ui::EditorTool::Measure;
   } else {
-    return ui::SchematicTool::Select;
+    return ui::EditorTool::Select;
   }
 }
 
@@ -115,11 +116,19 @@ SchematicTab::SchematicTab(GuiApplication& app,
     mEditor(prj),
     mFsm(),
     mTool(Tool::None),
-    mWireMode(SchematicEditorState_DrawWire::WireMode::HV),
-    mLineWidth(0),
-    mLineWidthUnit(app.getWorkspace().getSettings().defaultLengthUnit.get()),
-    mFilled(false),
-    mCursorShape(Qt::ArrowCursor) {
+    mToolCursorShape(Qt::ArrowCursor),
+    mToolWireMode(SchematicEditorState_DrawWire::WireMode::HV),
+    mToolLayersQt(),
+    mToolLayers(std::make_shared<slint::VectorModel<slint::SharedString>>()),
+    mToolLayer(nullptr),
+    mToolLineWidth(0),
+    mToolLineWidthUnit(
+        app.getWorkspace().getSettings().defaultLengthUnit.get()),
+    mToolHeight(1),
+    mToolHeightUnit(app.getWorkspace().getSettings().defaultLengthUnit.get()),
+    mToolFilled(false),
+    mToolValue(),
+    mFrameIndex(0) {
   // Apply settings from schematic.
   if (auto sch = mProject->getProject().getSchematicByIndex(mObjIndex)) {
     mGridInterval = sch->getGridInterval();
@@ -214,12 +223,24 @@ ui::SchematicTabData SchematicTab::getUiData() const noexcept {
       sch ? l2s(sch->getGridUnit())
           : ui::LengthUnit::Millimeters,  // Length unit
       pinNumbersLayer && pinNumbersLayer->isVisible(),  // Show pin numbers
-      l2s(mTool),  // Active tool
-      l2s(mWireMode),  // Wire mode
-      l2s(*mLineWidth),  // Line width
-      l2s(mLineWidthUnit),  // Line width unit
-      mFilled,  // Filled
-      q2s(mCursorShape),  // Cursor
+      l2s(mTool),  // Tool
+      q2s(mToolCursorShape),  // Tool cursor
+      l2s(mToolWireMode),  // Tool wire mode
+      mToolLayers,  // Tool layers
+      static_cast<int>(mToolLayersQt.indexOf(mToolLayer)),  // Tool layer index
+      l2s(*mToolLineWidth),  // Tool line width
+      l2s(mToolLineWidthUnit),  // Tool line width unit
+      *mToolLineWidth % 2 == 0,  // Tool line width can decrease
+      false,  // Tool line width increase
+      false,  // Tool line width decrease
+      l2s(*mToolHeight),  // Tool height
+      l2s(mToolHeightUnit),  // Tool height unit
+      *mToolHeight % 2 == 0,  // Tool height can decrease
+      false,  // Tool height increase
+      false,  // Tool height decrease
+      mToolFilled,  // Tool filled
+      q2s(mToolValue),  // Tool value
+      mFrameIndex,  // Frame index
   };
 }
 
@@ -235,15 +256,35 @@ void SchematicTab::setUiData(const ui::SchematicTabData& data) noexcept {
   if (auto l = mLayerProvider->getLayer(Theme::Color::sSchematicPinNumbers)) {
     l->setVisible(data.show_pin_numbers);
   }
-  emit wireModeRequested(s2l(data.wire_mode));
-  emit filledRequested(data.filled);
-  mLineWidthUnit = s2l(data.line_width_unit);
-  if (auto l = s2ulength(data.line_width)) {
+
+  if (const Layer* layer = mToolLayersQt.value(data.tool_layer_index)) {
+    emit layerRequested(*layer);
+  }
+  emit wireModeRequested(s2l(data.tool_wire_mode));
+  emit filledRequested(data.tool_filled);
+  mToolLineWidthUnit = s2l(data.tool_line_width_unit);
+  if (auto l = s2ulength(data.tool_line_width)) {
     emit lineWidthRequested(*l);
   }
+  if (data.tool_line_width_increase) {
+    emit lineWidthRequested(UnsignedLength(mToolLineWidth * 2));
+  } else if (data.tool_line_width_decrease && (*mToolLineWidth % 2 == 0)) {
+    emit lineWidthRequested(UnsignedLength(mToolLineWidth / 2));
+  }
+  mToolHeightUnit = s2l(data.tool_height_unit);
+  if (auto h = s2plength(data.tool_height)) {
+    emit heightRequested(*h);
+  }
+  if (data.tool_height_increase) {
+    emit heightRequested(PositiveLength(mToolHeight * 2));
+  } else if (data.tool_height_decrease && (mToolHeight > 1) &&
+             (*mToolHeight % 2 == 0)) {
+    emit heightRequested(PositiveLength(mToolHeight / 2));
+  }
+  emit valueRequested(s2q(data.tool_value));
 
   invalidateBackground();
-  emit requestRepaint();
+  requestRepaint();
 }
 
 void SchematicTab::activate() noexcept {
@@ -251,7 +292,7 @@ void SchematicTab::activate() noexcept {
     mScene.reset(new SchematicGraphicsScene(
         *sch, *mLayerProvider, std::make_shared<QSet<const NetSignal*>>(),
         this));
-    emit requestRepaint();
+    requestRepaint();
   }
 }
 
@@ -352,7 +393,7 @@ bool SchematicTab::processScenePointerEvent(
   }
 
   if (handled) {
-    emit requestRepaint();
+    requestRepaint();
   }
 
   return handled;
@@ -373,9 +414,9 @@ SchematicGraphicsScene* SchematicTab::fsmGetGraphicsScene() noexcept {
 void SchematicTab::fsmSetViewCursor(
     const std::optional<Qt::CursorShape>& shape) noexcept {
   if (shape) {
-    mCursorShape = *shape;
+    mToolCursorShape = *shape;
   } else {
-    mCursorShape = Qt::ArrowCursor;
+    mToolCursorShape = Qt::ArrowCursor;
   }
   emit uiDataChanged();
 }
@@ -433,11 +474,11 @@ void SchematicTab::fsmSetTool(Tool tool, SchematicEditorState* state) noexcept {
   if (tool == Tool::Wire) {
     SchematicEditorState_DrawWire* s =
         static_cast<SchematicEditorState_DrawWire*>(state);
-    mWireMode = s->getWireMode();
+    mToolWireMode = s->getWireMode();
     mFsmStateConnections.append(
         connect(s, &SchematicEditorState_DrawWire::wireModeChanged, this,
                 [this](SchematicEditorState_DrawWire::WireMode m) {
-                  mWireMode = m;
+                  mToolWireMode = m;
                   emit uiDataChanged();
                 }));
     mFsmStateConnections.append(
@@ -447,27 +488,86 @@ void SchematicTab::fsmSetTool(Tool tool, SchematicEditorState* state) noexcept {
     SchematicEditorState_DrawPolygon* s =
         static_cast<SchematicEditorState_DrawPolygon*>(state);
 
-    mLineWidth = s->getLineWidth();
+    mToolLayersQt = s->getLayers();
+    mToolLayers->clear();
+    for (const Layer* layer : mToolLayersQt) {
+      mToolLayers->push_back(q2s(layer->getNameTr()));
+    }
+
+    mToolLayer = &s->getLayer();
+    mFsmStateConnections.append(
+        connect(s, &SchematicEditorState_DrawPolygon::layerChanged, this,
+                [this](const Layer& l) {
+                  mToolLayer = &l;
+                  emit uiDataChanged();
+                }));
+    mFsmStateConnections.append(
+        connect(this, &SchematicTab::layerRequested, s,
+                &SchematicEditorState_DrawPolygon::setLayer));
+
+    mToolLineWidth = s->getLineWidth();
     mFsmStateConnections.append(
         connect(s, &SchematicEditorState_DrawPolygon::lineWidthChanged, this,
                 [this](const UnsignedLength& w) {
-                  mLineWidth = w;
+                  mToolLineWidth = w;
                   emit uiDataChanged();
                 }));
     mFsmStateConnections.append(
         connect(this, &SchematicTab::lineWidthRequested, s,
                 &SchematicEditorState_DrawPolygon::setLineWidth));
 
-    mFilled = s->getFilled();
+    mToolFilled = s->getFilled();
     mFsmStateConnections.append(
         connect(s, &SchematicEditorState_DrawPolygon::filledChanged, this,
                 [this](bool f) {
-                  mFilled = f;
+                  mToolFilled = f;
                   emit uiDataChanged();
                 }));
     mFsmStateConnections.append(
         connect(this, &SchematicTab::filledRequested, s,
                 &SchematicEditorState_DrawPolygon::setFilled));
+  } else if (tool == Tool::Text) {
+    SchematicEditorState_AddText* s =
+        static_cast<SchematicEditorState_AddText*>(state);
+
+    mToolLayersQt = s->getLayers();
+    mToolLayers->clear();
+    for (const Layer* layer : mToolLayersQt) {
+      mToolLayers->push_back(q2s(layer->getNameTr()));
+    }
+
+    mToolLayer = &s->getLayer();
+    mFsmStateConnections.append(
+        connect(s, &SchematicEditorState_AddText::layerChanged, this,
+                [this](const Layer& l) {
+                  mToolLayer = &l;
+                  emit uiDataChanged();
+                }));
+    mFsmStateConnections.append(
+        connect(this, &SchematicTab::layerRequested, s,
+                &SchematicEditorState_AddText::setLayer));
+
+    mToolHeight = s->getHeight();
+    mFsmStateConnections.append(
+        connect(s, &SchematicEditorState_AddText::heightChanged, this,
+                [this](const PositiveLength& h) {
+                  mToolHeight = h;
+                  emit uiDataChanged();
+                }));
+    mFsmStateConnections.append(
+        connect(this, &SchematicTab::heightRequested, s,
+                &SchematicEditorState_AddText::setHeight));
+
+    mToolValue = s->getText();
+    mFsmStateConnections.append(
+        connect(s, &SchematicEditorState_AddText::textChanged, this,
+                [this](const QString& t) {
+                  mToolValue = t;
+                  emit uiDataChanged();
+                }));
+    mFsmStateConnections.append(
+        connect(this, &SchematicTab::valueRequested, s,
+                &SchematicEditorState_AddText::setText));
   }
 
   emit uiDataChanged();
@@ -483,6 +583,11 @@ const LengthUnit* SchematicTab::getCurrentUnit() const noexcept {
   } else {
     return nullptr;
   }
+}
+
+void SchematicTab::requestRepaint() noexcept {
+  ++mFrameIndex;
+  emit uiDataChanged();
 }
 
 /*******************************************************************************

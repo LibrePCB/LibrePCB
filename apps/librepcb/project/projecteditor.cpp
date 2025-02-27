@@ -67,7 +67,7 @@ ProjectEditor::ProjectEditor(
     mManualModificationsMade(false),
     mLastAutosaveStateId(mUndoStack->getUniqueStateId()),
     mAutoSaveTimer(),
-    mHighlightedNetSignals(new QSet<const NetSignal*>()){
+    mHighlightedNetSignals(new QSet<const NetSignal*>()) {
   // Show notification if file format has been upgraded.
   if (upgradeMessages) {
     mUpgradeMessages = *upgradeMessages;

@@ -29,46 +29,46 @@ export component DrawWireToolBar inherits HorizontalLayout {
 
     WireModeButton {
         icon: @image-url("../../img/wire_h_v.png");
-        checked: tabs[section.current-tab-index].wire-mode == WireMode.h-v;
+        checked: tabs[section.current-tab-index].tool-wire-mode == WireMode.h-v;
 
         clicked => {
-            tabs[section.current-tab-index].wire-mode = WireMode.h-v;
+            tabs[section.current-tab-index].tool-wire-mode = WireMode.h-v;
         }
     }
 
     WireModeButton {
         icon: @image-url("../../img/wire_v_h.png");
-        checked: tabs[section.current-tab-index].wire-mode == WireMode.v-h;
+        checked: tabs[section.current-tab-index].tool-wire-mode == WireMode.v-h;
 
         clicked => {
-            tabs[section.current-tab-index].wire-mode = WireMode.v-h;
+            tabs[section.current-tab-index].tool-wire-mode = WireMode.v-h;
         }
     }
 
     WireModeButton {
         icon: @image-url("../../img/wire_90_45.png");
-        checked: tabs[section.current-tab-index].wire-mode == WireMode.deg90-45;
+        checked: tabs[section.current-tab-index].tool-wire-mode == WireMode.deg90-45;
 
         clicked => {
-            tabs[section.current-tab-index].wire-mode = WireMode.deg90-45;
+            tabs[section.current-tab-index].tool-wire-mode = WireMode.deg90-45;
         }
     }
 
     WireModeButton {
         icon: @image-url("../../img/wire_45_90.png");
-        checked: tabs[section.current-tab-index].wire-mode == WireMode.deg45-90;
+        checked: tabs[section.current-tab-index].tool-wire-mode == WireMode.deg45-90;
 
         clicked => {
-            tabs[section.current-tab-index].wire-mode = WireMode.deg45-90;
+            tabs[section.current-tab-index].tool-wire-mode = WireMode.deg45-90;
         }
     }
 
     WireModeButton {
         icon: @image-url("../../img/wire_straight.png");
-        checked: tabs[section.current-tab-index].wire-mode == WireMode.straight;
+        checked: tabs[section.current-tab-index].tool-wire-mode == WireMode.straight;
 
         clicked => {
-            tabs[section.current-tab-index].wire-mode = WireMode.straight;
+            tabs[section.current-tab-index].tool-wire-mode = WireMode.straight;
         }
     }
 }

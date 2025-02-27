@@ -10,7 +10,7 @@ export component Board3dTab inherits Image {
 
     image-fit: ImageFit.preserve;
     image-rendering: ImageRendering.pixelated;
-    source: Backend.render-scene(section-index, root.width, root.height, section.frame);
+    source: Backend.render-scene(section-index, root.width, root.height, tabs[section.current-tab-index].frame);
 
     fs := FocusScope {
         enabled: false;

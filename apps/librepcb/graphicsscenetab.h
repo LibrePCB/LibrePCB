@@ -102,6 +102,7 @@ protected:
   Point mapGlobalPosToScenePos(const QPoint& pos, bool boundToView,
                                bool mapToGrid) const noexcept;
   void invalidateBackground() noexcept;
+  virtual void requestRepaint() noexcept = 0;
   virtual const LengthUnit* getCurrentUnit() const noexcept = 0;
 
 private:

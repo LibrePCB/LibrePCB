@@ -80,6 +80,11 @@ export struct Int64 {
     lsb: int,
 }
 
+export struct Layer {
+    id: string,
+    name: string,
+}
+
 export enum LengthUnit {
     millimeters,
     micrometers,
@@ -206,6 +211,16 @@ export enum RuleCheckState {
     up-to-date,
 }
 
+export enum EditorTool {
+    select,
+    wire,
+    netlabel,
+    polygon,
+    text,
+    component,
+    measure,
+}
+
 export struct TabData {
     // Meta
     type: TabType,
@@ -264,16 +279,6 @@ export struct DownloadLibraryTabData {
     download-error: string,
 }
 
-export enum SchematicTool {
-    select,
-    wire,
-    netlabel,
-    polygon,
-    text,
-    component,
-    measure,
-}
-
 export enum WireMode {
     h-v,
     v-h,
@@ -289,12 +294,27 @@ export struct SchematicTabData {
     grid-interval: string,
     unit: LengthUnit,
     show-pin-numbers: bool,
-    active-tool: SchematicTool,
-    wire-mode: WireMode,
-    line-width: Int64,
-    line-width-unit: LengthUnit,
-    filled: bool,
-    cursor: MouseCursor,
+
+    // Data about the currently active tool.
+    tool: EditorTool,
+    tool-cursor: MouseCursor,
+    tool-wire-mode: WireMode,
+    tool-layers: [string],
+    tool-layer-index: int,
+    tool-line-width: Int64,
+    tool-line-width-unit: LengthUnit,
+    tool-line-width-can-decrease: bool,
+    tool-line-width-increase: bool,  // Set by UI, reset by backend.
+    tool-line-width-decrease: bool,  // Set by UI, reset by backend.
+    tool-height: Int64,
+    tool-height-unit: LengthUnit,
+    tool-height-can-decrease: bool,
+    tool-height-increase: bool,  // Set by UI, reset by backend.
+    tool-height-decrease: bool,  // Set by UI, reset by backend.
+    tool-filled: bool,
+    tool-value: string,
+
+    frame: int, // Frame index to trigger repainting
 }
 
 export struct Board2dTabData {
@@ -303,11 +323,15 @@ export struct Board2dTabData {
     grid-style: GridStyle,
     grid-interval: string,
     unit: LengthUnit,
+
+    frame: int, // Frame index to trigger repainting
 }
 
 export struct Board3dTabData {
     background-color: brush,
     overlay-color: brush,
+
+    frame: int, // Frame index to trigger repainting
 }
 
 export struct WindowSectionData {
@@ -319,7 +343,6 @@ export struct WindowSectionData {
     board-3d-tabs: [Board3dTabData],
     current-tab-index: int,  // Currently opened tab in this section
     highlight: bool,
-    frame: int, // Frame index to trigger repainting
 }
 
 export struct EditParseResult {

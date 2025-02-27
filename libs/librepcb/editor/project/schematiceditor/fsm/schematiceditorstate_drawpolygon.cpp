@@ -175,6 +175,11 @@ bool SchematicEditorState_DrawPolygon::processSwitchToSchematicPage(
  *  Connection to UI
  ******************************************************************************/
 
+QVector<const Layer*> SchematicEditorState_DrawPolygon::getLayers()
+    const noexcept {
+  return Toolbox::sortedQSet(getAllowedGeometryLayers());
+}
+
 void SchematicEditorState_DrawPolygon::setLayer(const Layer& layer) noexcept {
   if (layer != mCurrentProperties.getLayer()) {
     mCurrentProperties.setLayer(layer);

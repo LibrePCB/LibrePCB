@@ -182,7 +182,7 @@ export component MenuBar inherits Rectangle {
                 y: parent.height;
 
                 MenuItem {
-                    text: Data.current-tab.undo-text.is-empty ? @tr("Undo") : @tr("Undo: {}", Data.current-tab.undo-text);
+                    text: (Data.current-tab.undo-text == "") ? @tr("Undo") : @tr("Undo: {}", Data.current-tab.undo-text);
                     icon: @image-url("img/undo.svg");
                     status-tip: @tr("Revert the last modification");
                     shortcuts: "Ctrl+Z";
@@ -194,7 +194,7 @@ export component MenuBar inherits Rectangle {
                 }
 
                 MenuItem {
-                    text: Data.current-tab.redo-text.is-empty ? @tr("Redo") : @tr("Redo: {}", Data.current-tab.redo-text);
+                    text: (Data.current-tab.redo-text == "") ? @tr("Redo") : @tr("Redo: {}", Data.current-tab.redo-text);
                     icon: @image-url("img/redo.svg");
                     status-tip: @tr("Re-apply the last reverted modification");
                     shortcuts: "Ctrl+Y";
