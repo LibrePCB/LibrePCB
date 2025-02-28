@@ -45,8 +45,7 @@ then
   fix_macdeployqt "/opt/homebrew/lib"
   macdeployqt "LibrePCB.app" -always-overwrite \
     -executable="./LibrePCB.app/Contents/MacOS/librepcb" \
-    -executable="./LibrePCB.app/Contents/MacOS/librepcb-cli" \
-    -qmldir="./LibrePCB.app/Contents/share/librepcb/qml"
+    -executable="./LibrePCB.app/Contents/MacOS/librepcb-cli"
   codesign --force --deep -s - ./LibrePCB.app/Contents/MacOS/librepcb
   codesign --force --deep -s - ./LibrePCB.app/Contents/MacOS/librepcb-cli
   create-dmg --skip-jenkins --volname "LibrePCB" \
@@ -60,8 +59,7 @@ else
     if [ ! -f ./LibrePCB.dmg ]; then
       macdeployqt "LibrePCB.app" -dmg -always-overwrite \
         -executable="./LibrePCB.app/Contents/MacOS/librepcb" \
-        -executable="./LibrePCB.app/Contents/MacOS/librepcb-cli" \
-        -qmldir="./LibrePCB.app/Contents/share/librepcb/qml"
+        -executable="./LibrePCB.app/Contents/MacOS/librepcb-cli"
       sleep 5
     fi
   done
