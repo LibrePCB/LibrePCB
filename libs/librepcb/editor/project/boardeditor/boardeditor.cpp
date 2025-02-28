@@ -1298,8 +1298,6 @@ void BoardEditor::runDrc(bool quick) noexcept {
     });
 
     // Run the DRC.
-    QElapsedTimer timer;
-    timer.start();
     BoardDesignRuleCheck drc;
     connect(&drc, &BoardDesignRuleCheck::progressPercent, mDockDrc.data(),
             &RuleCheckDock::setProgressPercent);
@@ -1320,10 +1318,6 @@ void BoardEditor::runDrc(bool quick) noexcept {
       mDockDrc->setApprovals(board->getDrcMessageApprovals());
       mProjectEditor.setManualModificationsMade();
     }
-
-    // Print how long it took.
-    qDebug() << (quick ? "Quick check" : "DRC") << "succeeded after"
-             << timer.elapsed() << "ms.";
   } catch (const Exception& e) {
     QMessageBox::critical(this, tr("Error"), e.getMsg());
   }

@@ -65,6 +65,10 @@ void BoardDesignRuleCheck::start(Board& board,
   emit started();
   emitProgress(1);
 
+  // Start time measurement.
+  auto timer = std::make_shared<QElapsedTimer>();
+  timer->start();
+
   // Force rebuilding planes. Not parallelized with DRC check yet because
   // it's very tricky. Planes haven an impact on air wires which we have
   // to collect right now as the board cannot be accessed later from a thread.
@@ -91,7 +95,11 @@ void BoardDesignRuleCheck::start(Board& board,
   emitProgress(12);
 
   // Pass data to new thread.
-  mFuture = QtConcurrent::run(&BoardDesignRuleCheck::run, this, data);
+  mFuture = QtConcurrent::run(&BoardDesignRuleCheck::run, this, data, timer);
+}
+
+bool BoardDesignRuleCheck::isRunning() const noexcept {
+  return mFuture.isRunning();
 }
 
 BoardDesignRuleCheck::Result BoardDesignRuleCheck::waitForFinished()
@@ -139,7 +147,8 @@ BoardDesignRuleCheck::Result BoardDesignRuleCheck::tryRunJob(
 }
 
 BoardDesignRuleCheck::Result BoardDesignRuleCheck::run(
-    std::shared_ptr<const Data> data) noexcept {
+    std::shared_ptr<const Data> data,
+    std::shared_ptr<QElapsedTimer> timer) noexcept {
   emitProgress(15);
 
   // Prepare calculated job data.
@@ -299,6 +308,7 @@ BoardDesignRuleCheck::Result BoardDesignRuleCheck::run(
 
   // Collect results of stage 1 jobs.
   Result result;
+  result.quick = data->quick;
   for (Job& job : jobs) {
     if (job.stage == Stage::Stage1) {
       job.fetchResult(result);  // Blocks until finished.
@@ -326,6 +336,11 @@ BoardDesignRuleCheck::Result BoardDesignRuleCheck::run(
     }
   }
 
+  // Finished!
+  result.elapsedTimeMs = timer->elapsed();
+  qDebug() << (data->quick ? "Quick check" : "DRC")
+           << (result.errors.isEmpty() ? "succeeded" : "failed") << "after"
+           << result.elapsedTimeMs << "ms.";
   emitStatus(tr("Finished with %1 message(s)!", "Count of messages",
                 result.messages.count())
                  .arg(result.messages.count()));
