@@ -77,7 +77,8 @@ bool SchematicEditorState_AddText::entry() noexcept {
   EditorCommandSet& cmd = EditorCommandSet::instance();
 
   // Add a new stroke text
-  Point pos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos(), true, true);
+  const Point pos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos())
+                        .mappedToGrid(getGridInterval());
   if (!addText(pos)) return false;
 
   mAdapter.fsmSetTool(SchematicEditorFsmAdapter::Tool::Text, this);
@@ -225,6 +226,13 @@ void SchematicEditorState_AddText::setHeight(
   if (mCurrentTextEditCmd) {
     mCurrentTextEditCmd->setHeight(mCurrentProperties.getHeight(), true);
   }
+}
+
+QStringList SchematicEditorState_AddText::getTextSuggestions() const noexcept {
+  return {
+      "{{SHEET}}",   "{{PAGE_X_OF_Y}}", "{{PROJECT}}", "{{AUTHOR}}",
+      "{{VERSION}}", "{{DATE}}",        "{{TIME}}",
+  };
 }
 
 void SchematicEditorState_AddText::setText(const QString& text) noexcept {

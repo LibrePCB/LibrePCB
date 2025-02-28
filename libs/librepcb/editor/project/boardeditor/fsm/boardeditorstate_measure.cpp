@@ -49,10 +49,6 @@ BoardEditorState_Measure::BoardEditorState_Measure(
         std::bind(&BoardEditorState_Measure::getGridInterval, this))) {
   connect(mTool.data(), &MeasureTool::infoBoxTextChanged,
           &mContext.editorGraphicsView, &GraphicsView::setInfoBoxText);
-  connect(mTool.data(), &MeasureTool::sceneCursorChanged,
-          &mContext.editorGraphicsView, &GraphicsView::setSceneCursor);
-  connect(mTool.data(), &MeasureTool::rulerPositionsChanged,
-          &mContext.editorGraphicsView, &GraphicsView::setRulerPositions);
   connect(mTool.data(), &MeasureTool::statusBarMessageChanged, this,
           &BoardEditorState_Measure::statusBarMessageChanged);
 }
@@ -67,18 +63,29 @@ BoardEditorState_Measure::~BoardEditorState_Measure() noexcept {
 bool BoardEditorState_Measure::entry() noexcept {
   if (GraphicsScene* scene = mContext.editorGraphicsView.getScene()) {
     scene->setSelectionArea(QPainterPath());
+    scene->setGrayOut(true);
+    mConnections.append(connect(mTool.data(), &MeasureTool::sceneCursorChanged,
+                                scene, &GraphicsScene::setSceneCursor));
+    mConnections.append(connect(mTool.data(),
+                                &MeasureTool::rulerPositionsChanged, scene,
+                                &GraphicsScene::setRulerPositions));
   }
-  mContext.editorGraphicsView.setGrayOut(true);
   mContext.editorGraphicsView.setCursor(Qt::CrossCursor);
   mTool->setBoard(getActiveBoard());
-  mTool->enter(mContext.editorGraphicsView.mapGlobalPosToScenePos(
-      QCursor::pos(), true, true));
+  mTool->enter(
+      mContext.editorGraphicsView.mapGlobalPosToScenePos(QCursor::pos())
+          .mappedToGrid(getGridInterval()));
   return true;
 }
 
 bool BoardEditorState_Measure::exit() noexcept {
+  while (!mConnections.isEmpty()) {
+    disconnect(mConnections.takeLast());
+  }
+  if (GraphicsScene* scene = mContext.editorGraphicsView.getScene()) {
+    scene->setGrayOut(false);
+  }
   mTool->leave();
-  mContext.editorGraphicsView.setGrayOut(false);
   mContext.editorGraphicsView.unsetCursor();
   return true;
 }
@@ -118,7 +125,9 @@ bool BoardEditorState_Measure::processGraphicsSceneLeftMouseButtonPressed(
 }
 
 bool BoardEditorState_Measure::processSwitchToBoard(int index) noexcept {
+  exit();
   mTool->setBoard(mContext.project.getBoardByIndex(index));
+  entry();
   return true;
 }
 

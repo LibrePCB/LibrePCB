@@ -115,8 +115,10 @@ SchematicTab::SchematicTab(GuiApplication& app,
   : GraphicsSceneTab(app, prj, schematicIndex, parent),
     mEditor(prj),
     mFsm(),
+    mGridStyle(Theme::GridStyle::None),
     mTool(Tool::None),
     mToolCursorShape(Qt::ArrowCursor),
+    mToolOverlayText(),
     mToolWireMode(SchematicEditorState_DrawWire::WireMode::HV),
     mToolLayersQt(),
     mToolLayers(std::make_shared<slint::VectorModel<slint::SharedString>>()),
@@ -128,12 +130,9 @@ SchematicTab::SchematicTab(GuiApplication& app,
     mToolHeightUnit(app.getWorkspace().getSettings().defaultLengthUnit.get()),
     mToolFilled(false),
     mToolValue(),
+    mToolValueSuggestions(
+        std::make_shared<slint::VectorModel<slint::SharedString>>()),
     mFrameIndex(0) {
-  // Apply settings from schematic.
-  if (auto sch = mProject->getProject().getSchematicByIndex(mObjIndex)) {
-    mGridInterval = sch->getGridInterval();
-  }
-
   // Connect undo stack.
   connect(&prj->getUndoStack(), &UndoStack::stateModified, this,
           &SchematicTab::requestRepaint);
@@ -157,8 +156,8 @@ SchematicTab::SchematicTab(GuiApplication& app,
   // Apply theme whenever it has been modified.
   connect(&mApp.getWorkspace().getSettings().themes,
           &WorkspaceSettingsItem_Themes::edited, this,
-          &SchematicTab::updateTheme);
-  updateTheme();
+          &SchematicTab::applyTheme);
+  applyTheme();
 }
 
 SchematicTab::~SchematicTab() noexcept {
@@ -201,7 +200,7 @@ ui::TabData SchematicTab::getBaseUiData() const noexcept {
 }
 
 ui::SchematicTabData SchematicTab::getUiData() const noexcept {
-  // const Theme& theme = mApp.getWorkspace().getSettings().themes.getActive();
+  const Theme& theme = mApp.getWorkspace().getSettings().themes.getActive();
   auto sch = mProject->getProject().getSchematicByIndex(mObjIndex);
   auto pinNumbersLayer =
       mLayerProvider->getLayer(Theme::Color::sSchematicPinNumbers);
@@ -209,15 +208,17 @@ ui::SchematicTabData SchematicTab::getUiData() const noexcept {
   QString gridIntervalStr;
   if (sch) {
     const LengthUnit& unit = sch->getGridUnit();
-    gridIntervalStr = Toolbox::floatToString(unit.convertToUnit(*mGridInterval),
-                                             10, QLocale());
+    gridIntervalStr = Toolbox::floatToString(
+        unit.convertToUnit(*sch->getGridInterval()), 10, QLocale());
   }
 
   return ui::SchematicTabData{
-      q2s(mBackgroundColor),  // Background color
-      q2s(/*theme.getColor(Theme::Color::sSchematicBackground)
-              .getSecondaryColor()*/
-          QColor(Qt::black)),  // Overlay color (TODO)
+      q2s(theme.getColor(Theme::Color::sSchematicBackground)
+              .getPrimaryColor()),  // Background color
+      q2s(theme.getColor(Theme::Color::sSchematicInfoBox)
+              .getPrimaryColor()),  // Overlay color
+      q2s(theme.getColor(Theme::Color::sSchematicInfoBox)
+              .getSecondaryColor()),  // Overlay text color
       l2s(mGridStyle),  // Grid style
       q2s(gridIntervalStr),  // Grid interval
       sch ? l2s(sch->getGridUnit())
@@ -225,6 +226,7 @@ ui::SchematicTabData SchematicTab::getUiData() const noexcept {
       pinNumbersLayer && pinNumbersLayer->isVisible(),  // Show pin numbers
       l2s(mTool),  // Tool
       q2s(mToolCursorShape),  // Tool cursor
+      q2s(mToolOverlayText),  // Tool overlay text
       l2s(mToolWireMode),  // Tool wire mode
       mToolLayers,  // Tool layers
       static_cast<int>(mToolLayersQt.indexOf(mToolLayer)),  // Tool layer index
@@ -240,6 +242,7 @@ ui::SchematicTabData SchematicTab::getUiData() const noexcept {
       false,  // Tool height decrease
       mToolFilled,  // Tool filled
       q2s(mToolValue),  // Tool value
+      mToolValueSuggestions,  // Tool value suggestions
       mFrameIndex,  // Frame index
   };
 }
@@ -248,6 +251,9 @@ void SchematicTab::setUiData(const ui::SchematicTabData& data) noexcept {
   auto sch = mProject->getProject().getSchematicByIndex(mObjIndex);
 
   mGridStyle = s2l(data.grid_style);
+  if (mScene) {
+    mScene->setGridStyle(mGridStyle);
+  }
   const LengthUnit unit = s2l(data.unit);
   if (sch && (unit != sch->getGridUnit())) {
     sch->setGridUnit(unit);
@@ -283,7 +289,6 @@ void SchematicTab::setUiData(const ui::SchematicTabData& data) noexcept {
   }
   emit valueRequested(s2q(data.tool_value));
 
-  invalidateBackground();
   requestRepaint();
 }
 
@@ -292,6 +297,8 @@ void SchematicTab::activate() noexcept {
     mScene.reset(new SchematicGraphicsScene(
         *sch, *mLayerProvider, std::make_shared<QSet<const NetSignal*>>(),
         this));
+    mScene->setGridInterval(sch->getGridInterval());
+    applyTheme();
     requestRepaint();
   }
 }
@@ -305,13 +312,24 @@ bool SchematicTab::actionTriggered(ui::ActionId id) noexcept {
     mEditor->saveProject();
     return true;
   } else if (id == ui::ActionId::SectionGridIntervalIncrease) {
-    mGridInterval = PositiveLength(mGridInterval * 2);
-    invalidateBackground();
+    if (auto sch = mProject->getProject().getSchematicByIndex(mObjIndex)) {
+      sch->setGridInterval(PositiveLength(sch->getGridInterval() * 2));
+      if (mScene) {
+        mScene->setGridInterval(sch->getGridInterval());
+        requestRepaint();
+      }
+    }
     return true;
-  } else if ((id == ui::ActionId::SectionGridIntervalDecrease) &&
-             ((*mGridInterval % 2) == 0)) {
-    mGridInterval = PositiveLength(mGridInterval / 2);
-    invalidateBackground();
+  } else if (id == ui::ActionId::SectionGridIntervalDecrease) {
+    if (auto sch = mProject->getProject().getSchematicByIndex(mObjIndex)) {
+      if ((*sch->getGridInterval() % 2) == 0) {
+        sch->setGridInterval(PositiveLength(sch->getGridInterval() / 2));
+        if (mScene) {
+          mScene->setGridInterval(sch->getGridInterval());
+          requestRepaint();
+        }
+      }
+    }
     return true;
   } else if (id == ui::ActionId::ExportPdf) {
     execGraphicsExportDialog(GraphicsExportDialog::Output::Pdf, "pdf_export");
@@ -422,21 +440,36 @@ void SchematicTab::fsmSetViewCursor(
 }
 
 void SchematicTab::fsmSetViewGrayOut(bool grayOut) noexcept {
-  /* TODO */
+  if (mScene) {
+    mScene->setGrayOut(grayOut);
+  }
 }
 
 void SchematicTab::fsmSetViewInfoBoxText(const QString& text) noexcept {
-  /* TODO */
+  QString t = text;
+  t.replace("&nbsp;", " ");
+  t.replace("<br>", "\n");
+  t.replace("<b>", "");
+  t.replace("</b>", "");
+
+  if (t != mToolOverlayText) {
+    mToolOverlayText = t;
+    emit uiDataChanged();
+  }
 }
 
 void SchematicTab::fsmSetViewRuler(
     const std::optional<std::pair<Point, Point>>& pos) noexcept {
-  /* TODO */
+  if (mScene) {
+    mScene->setRulerPositions(pos);
+  }
 }
 
 void SchematicTab::fsmSetSceneCursor(const Point& pos, bool cross,
                                      bool circle) noexcept {
-  /* TODO */
+  if (mScene) {
+    mScene->setSceneCursor(pos, cross, circle);
+  }
 }
 
 QPainterPath SchematicTab::fsmCalcPosWithTolerance(
@@ -444,10 +477,9 @@ QPainterPath SchematicTab::fsmCalcPosWithTolerance(
   return calcPosWithTolerance(pos, multiplier);
 }
 
-Point SchematicTab::fsmMapGlobalPosToScenePos(const QPoint& pos,
-                                              bool boundToView,
-                                              bool mapToGrid) const noexcept {
-  return mapGlobalPosToScenePos(pos, boundToView, mapToGrid);
+Point SchematicTab::fsmMapGlobalPosToScenePos(
+    const QPoint& pos) const noexcept {
+  return mapGlobalPosToScenePos(pos);
 }
 
 void SchematicTab::fsmSetHighlightedNetSignals(
@@ -568,6 +600,11 @@ void SchematicTab::fsmSetTool(Tool tool, SchematicEditorState* state) noexcept {
     mFsmStateConnections.append(
         connect(this, &SchematicTab::valueRequested, s,
                 &SchematicEditorState_AddText::setText));
+
+    mToolValueSuggestions->clear();
+    for (const QString& v : s->getTextSuggestions()) {
+      mToolValueSuggestions->push_back(q2s(v));
+    }
   }
 
   emit uiDataChanged();
@@ -643,16 +680,23 @@ void SchematicTab::execGraphicsExportDialog(
   }
 }
 
-void SchematicTab::updateTheme() noexcept {
+void SchematicTab::applyTheme() noexcept {
   const Theme& theme = mApp.getWorkspace().getSettings().themes.getActive();
-
-  mBackgroundColor =
-      theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor();
-  mGridColor =
-      theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor();
   mGridStyle = theme.getSchematicGridStyle();
 
-  invalidateBackground();
+  if (mScene) {
+    mScene->setBackgroundColors(
+        theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor(),
+        theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
+    mScene->setOverlayColors(
+        theme.getColor(Theme::Color::sSchematicOverlays).getPrimaryColor(),
+        theme.getColor(Theme::Color::sSchematicOverlays).getSecondaryColor());
+    mScene->setSelectionRectColors(
+        theme.getColor(Theme::Color::sSchematicSelection).getPrimaryColor(),
+        theme.getColor(Theme::Color::sSchematicSelection).getSecondaryColor());
+    mScene->setGridStyle(mGridStyle);
+  }
+
   emit uiDataChanged();
 }
 

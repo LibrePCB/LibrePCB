@@ -78,7 +78,8 @@ bool SchematicEditorState_Measure::entry() noexcept {
   mAdapter.fsmSetViewGrayOut(true);
   mAdapter.fsmSetViewCursor(Qt::CrossCursor);
   mTool->setSchematic(getActiveSchematic());
-  mTool->enter(mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos(), true, true));
+  mTool->enter(mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos())
+                   .mappedToGrid(getGridInterval()));
   return true;
 }
 

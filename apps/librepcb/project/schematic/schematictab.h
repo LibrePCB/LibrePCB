@@ -91,8 +91,7 @@ public:
                          bool circle) noexcept override;
   QPainterPath fsmCalcPosWithTolerance(
       const Point& pos, qreal multiplier) const noexcept override;
-  Point fsmMapGlobalPosToScenePos(const QPoint& pos, bool boundToView,
-                                  bool mapToGrid) const noexcept override;
+  Point fsmMapGlobalPosToScenePos(const QPoint& pos) const noexcept override;
   void fsmSetHighlightedNetSignals(
       const QSet<const NetSignal*>& sigs) noexcept override;
   void fsmAbortBlockingToolsInOtherEditors() noexcept override;
@@ -118,15 +117,18 @@ protected:
 private:
   void execGraphicsExportDialog(GraphicsExportDialog::Output output,
                                 const QString& settingsKey) noexcept;
-  void updateTheme() noexcept;
+  void applyTheme() noexcept;
 
 private:
   std::shared_ptr<ProjectEditor> mEditor;
   QScopedPointer<SchematicEditorFsm> mFsm;
 
+  Theme::GridStyle mGridStyle;
+
   // Current tool
   Tool mTool;
   Qt::CursorShape mToolCursorShape;
+  QString mToolOverlayText;
   SchematicEditorState_DrawWire::WireMode mToolWireMode;
   QVector<const Layer*> mToolLayersQt;
   std::shared_ptr<slint::VectorModel<slint::SharedString>> mToolLayers;
@@ -137,6 +139,8 @@ private:
   LengthUnit mToolHeightUnit;
   bool mToolFilled;
   QString mToolValue;
+  std::shared_ptr<slint::VectorModel<slint::SharedString>>
+      mToolValueSuggestions;
 
   QHash<Qt::MouseButton, QPointF> mMouseButtonDownScenePos;
   QHash<Qt::MouseButton, QPoint> mMouseButtonDownScreenPos;

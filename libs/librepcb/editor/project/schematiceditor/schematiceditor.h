@@ -127,8 +127,7 @@ public:
                          bool circle) noexcept override;
   QPainterPath fsmCalcPosWithTolerance(
       const Point& pos, qreal multiplier) const noexcept override;
-  Point fsmMapGlobalPosToScenePos(const QPoint& pos, bool clip,
-                                  bool mapToGrid) const noexcept override;
+  Point fsmMapGlobalPosToScenePos(const QPoint& pos) const noexcept override;
   void fsmSetHighlightedNetSignals(
       const QSet<const NetSignal*>& sigs) noexcept override;
   void fsmAbortBlockingToolsInOtherEditors() noexcept override;

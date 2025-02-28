@@ -85,10 +85,13 @@ protected:
 private:
   void startDrc(bool quick) noexcept;
   void setDrcResult(const BoardDesignRuleCheck::Result& result) noexcept;
-  void updateTheme() noexcept;
+  void applyTheme() noexcept;
 
 private:
   std::shared_ptr<ProjectEditor> mEditor;
+
+  Theme::GridStyle mGridStyle;
+
   std::unique_ptr<BoardDesignRuleCheck> mDrc;
   std::shared_ptr<Notification> mDrcNotification;
   uint mDrcUndoStackState;

@@ -290,6 +290,7 @@ export enum WireMode {
 export struct SchematicTabData {
     background-color: brush,
     overlay-color: brush,
+    overlay-text-color: brush,
     grid-style: GridStyle,
     grid-interval: string,
     unit: LengthUnit,
@@ -298,6 +299,7 @@ export struct SchematicTabData {
     // Data about the currently active tool.
     tool: EditorTool,
     tool-cursor: MouseCursor,
+    tool-overlay-text: string,
     tool-wire-mode: WireMode,
     tool-layers: [string],
     tool-layer-index: int,
@@ -313,6 +315,7 @@ export struct SchematicTabData {
     tool-height-decrease: bool,  // Set by UI, reset by backend.
     tool-filled: bool,
     tool-value: string,
+    tool-value-suggestions: [string],
 
     frame: int, // Frame index to trigger repainting
 }

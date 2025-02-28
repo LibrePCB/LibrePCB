@@ -95,6 +95,7 @@ public:
   const QString& getText() const noexcept {
     return mCurrentProperties.getText();
   }
+  QStringList getTextSuggestions() const noexcept;
   void setText(const QString& text) noexcept;
 
   // Operator Overloadings

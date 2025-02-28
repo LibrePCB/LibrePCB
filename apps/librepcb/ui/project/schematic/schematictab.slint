@@ -1,4 +1,4 @@
-import { ComboBox, CheckBox } from "std-widgets.slint";
+import { ComboBox, CheckBox, Palette } from "std-widgets.slint";
 import { WindowSectionData, SchematicTabData, EditorTool } from "../../api/types.slint";
 import { SceneButton } from "../../common/scenebutton.slint";
 import { ToolButton } from "../../common/toolbutton.slint";
@@ -23,6 +23,28 @@ export component SchematicTab inherits Image {
 
     if Data.preview-mode: Rectangle {
         background: white;
+    }
+
+    // Show overlay, if text is not empty.
+    if tabs[section.current-tab-index].tool-overlay-text != "": Rectangle {
+        x: 2 * vl-toolbuttons.x + vl-toolbuttons.width;
+        y: vl-toolbuttons.y;
+        width: t-overlay.preferred-width + 2 * t-overlay.x;
+        height: t-overlay.preferred-height + 2 * t-overlay.y;
+        background: tabs[section.current-tab-index].overlay-color;
+        border-radius: 10px;
+        border-width: 1px;
+        border-color: tabs[section.current-tab-index].overlay-text-color;
+
+        t-overlay := Text {
+            x: 8px;
+            y: 8px;
+            horizontal-alignment: left;
+            vertical-alignment: top;
+            font-family: "Noto Sans Mono";
+            color: tabs[section.current-tab-index].overlay-text-color;
+            text: tabs[section.current-tab-index].tool-overlay-text;
+        }
     }
 
     fs := FocusScope {
@@ -73,7 +95,7 @@ export component SchematicTab inherits Image {
             }
         }
 
-        VerticalLayout {
+        vl-toolbuttons := VerticalLayout {
             x: 7px;
             y: 7px;
             width: self.preferred-width;

@@ -1,4 +1,4 @@
-import { ComboBox, LineEdit } from "std-widgets.slint";
+import { ComboBox, LineEdit, Palette } from "std-widgets.slint";
 import { LengthEdit } from "../../common/lengthedit.slint";
 import { WindowSectionData, SchematicTabData, Int64 } from "../../api/types.slint";
 
@@ -54,6 +54,45 @@ export component AddTextToolBar inherits HorizontalLayout {
         edited(text) => {
             disable-update = true;
             tabs[section.current-tab-index].tool-value = text;
+        }
+    }
+
+    TouchArea {
+        width: 10px;
+
+        Text {
+            font-size: parent.has-hover ? 10px : 8px;
+            color: parent.has-hover ? white : #cccccc;
+            text: "▼";
+        }
+
+        popup-suggestions := PopupWindow {
+            x: 0;
+            y: root.height;
+
+            VerticalLayout {
+                for text in tabs[section.current-tab-index].tool-value-suggestions: TouchArea {
+                    Rectangle {
+                        background: parent.has-hover ? #505050 : Palette.background;
+
+                        VerticalLayout {
+                            padding: 6px;
+
+                            Text {
+                                text: text;
+                            }
+                        }
+                    }
+
+                    clicked => {
+                        tabs[section.current-tab-index].tool-value = text;
+                    }
+                }
+            }
+        }
+
+        clicked => {
+            popup-suggestions.show();
         }
     }
 

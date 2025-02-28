@@ -427,7 +427,8 @@ void SchematicEditorState_AddComponent::startAddingComponent(
                             "not have any symbol.")
                              .arg(mCurrentComponent->getUuid().toStr()));
     }
-    Point pos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos(), true, true);
+    const Point pos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos())
+                          .mappedToGrid(getGridInterval());
     CmdAddSymbolToSchematic* cmd2 = new CmdAddSymbolToSchematic(
         mContext.workspace, *schematic, *mCurrentComponent,
         currentSymbVarItem->getUuid(), pos);

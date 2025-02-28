@@ -47,9 +47,9 @@ PackageEditorState_Measure::PackageEditorState_Measure(
   connect(mTool.data(), &MeasureTool::infoBoxTextChanged,
           &mContext.graphicsView, &GraphicsView::setInfoBoxText);
   connect(mTool.data(), &MeasureTool::sceneCursorChanged,
-          &mContext.graphicsView, &GraphicsView::setSceneCursor);
+          &mContext.graphicsScene, &GraphicsScene::setSceneCursor);
   connect(mTool.data(), &MeasureTool::rulerPositionsChanged,
-          &mContext.graphicsView, &GraphicsView::setRulerPositions);
+          &mContext.graphicsScene, &GraphicsScene::setRulerPositions);
   connect(mTool.data(), &MeasureTool::statusBarMessageChanged, this,
           &PackageEditorState_Measure::statusBarMessageChanged);
 }
@@ -63,17 +63,17 @@ PackageEditorState_Measure::~PackageEditorState_Measure() noexcept {
 
 bool PackageEditorState_Measure::entry() noexcept {
   mContext.graphicsScene.setSelectionArea(QPainterPath());
-  mContext.graphicsView.setGrayOut(true);
+  mContext.graphicsScene.setGrayOut(true);
   mContext.graphicsView.setCursor(Qt::CrossCursor);
   mTool->setFootprint(mContext.currentFootprint.get());
-  mTool->enter(
-      mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos(), true, true));
+  mTool->enter(mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos())
+                   .mappedToGrid(mContext.graphicsScene.getGridInterval()));
   return true;
 }
 
 bool PackageEditorState_Measure::exit() noexcept {
   mTool->leave();
-  mContext.graphicsView.setGrayOut(false);
+  mContext.graphicsScene.setGrayOut(false);
   mContext.graphicsView.unsetCursor();
   return true;
 }

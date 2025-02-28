@@ -49,10 +49,6 @@ GraphicsSceneTab::GraphicsSceneTab(GuiApplication& app,
                                    std::shared_ptr<ProjectEditor> prj,
                                    int objIndex, QObject* parent) noexcept
   : WindowTab(app, prj, objIndex, parent),
-    mBackgroundColor(Qt::white),
-    mGridColor(Qt::gray),
-    mGridStyle(Theme::GridStyle::None),
-    mGridInterval(2540000),
     mLayerProvider(new DefaultGraphicsLayerProvider(
         app.getWorkspace().getSettings().themes.getActive())),
     mAnimation(new QVariantAnimation(this)) {
@@ -74,72 +70,7 @@ GraphicsSceneTab::~GraphicsSceneTab() noexcept {
 
 slint::Image GraphicsSceneTab::renderScene(float width, float height) noexcept {
   if (mScene) {
-    // Redraw background if needed.
-    if (mCachedBackground.size() != QSize(width, height)) {
-      mCachedBackground = QPixmap(width, height);
-      mCachedBackground.fill(mBackgroundColor);
-
-      // Draw grid.
-      if (mGridStyle != Theme::GridStyle::None) {
-        QTransform tf;
-        tf.translate(mProjection.offset.x(), mProjection.offset.y());
-        tf.scale(1 / mProjection.scale, 1 / mProjection.scale);
-        const QTransform tfi = tf.inverted();
-
-        const std::optional<Point> topLeft =
-            Point::tryFromPx(tf.map(QPointF(0, 0)));
-        const std::optional<Point> bottomRight =
-            Point::tryFromPx(tf.map(QPointF(width, height)));
-
-        if (topLeft && bottomRight) {
-          const Point topLeftGrid((topLeft->getX() + (mGridInterval / 2))
-                                      .mappedToGrid(*mGridInterval),
-                                  (topLeft->getY() - (mGridInterval / 2))
-                                      .mappedToGrid(*mGridInterval));
-          const QPointF topLeftGridPx = tfi.map(topLeftGrid.toPxQPointF());
-          const QPointF deltaPx =
-              tfi.map(Point(*mGridInterval, -mGridInterval).toPxQPointF()) -
-              tfi.map(Point(0, 0).toPxQPointF());
-          if (std::min(deltaPx.x(), deltaPx.y()) > 5) {
-            QPen gridPen(mGridColor);
-            gridPen.setWidth((mGridStyle == Theme::GridStyle::Dots) ? 2 : 1);
-            QPainter painter(&mCachedBackground);
-            painter.setPen(gridPen);
-            painter.setBrush(Qt::NoBrush);
-
-            if (mGridStyle == Theme::GridStyle::Lines) {
-              QVarLengthArray<QLineF, 500> lines;
-              for (int i = 0; i <= static_cast<int>((width / deltaPx.x()));
-                   ++i) {
-                const qreal x = topLeftGridPx.x() + i * deltaPx.x();
-                lines.append(QLineF(x, 0, x, height));
-              }
-              for (int i = 0; i <= static_cast<int>((height / deltaPx.y()));
-                   ++i) {
-                const qreal y = topLeftGridPx.y() + i * deltaPx.y();
-                lines.append(QLineF(0, y, width, y));
-              }
-              painter.setOpacity(0.5);
-              painter.drawLines(lines.data(), lines.size());
-            } else if (mGridStyle == Theme::GridStyle::Dots) {
-              QVarLengthArray<QPointF, 2000> dots;
-              for (int i = 0; i <= static_cast<int>((width / deltaPx.x()));
-                   ++i) {
-                for (int k = 0; k <= static_cast<int>((height / deltaPx.y()));
-                     ++k) {
-                  const qreal x = topLeftGridPx.x() + i * deltaPx.x();
-                  const qreal y = topLeftGridPx.y() + k * deltaPx.y();
-                  dots.append(QPointF(x, y));
-                }
-              }
-              painter.drawPoints(dots.data(), dots.size());
-            }
-          }
-        }
-      }
-    }
-
-    QPixmap pixmap = mCachedBackground;
+    QPixmap pixmap(width, height);
     {
       QPainter painter(&pixmap);
       painter.setRenderHints(QPainter::Antialiasing |
@@ -152,10 +83,6 @@ slint::Image GraphicsSceneTab::renderScene(float width, float height) noexcept {
                                      targetRect.height() / sceneRect.height());
         mProjection.offset =
             sceneRect.center() - targetRect.center() / mProjection.scale;
-
-        // Unfortunately the background we just calculated above is invalid in
-        // this case. This is an ugly hack to get it redrawn...
-        QTimer::singleShot(1, this, &GraphicsSceneTab::invalidateBackground);
       }
       sceneRect =
           QRectF(0, 0, width / mProjection.scale, height / mProjection.scale);
@@ -253,15 +180,9 @@ QPainterPath GraphicsSceneTab::calcPosWithTolerance(
   return path;
 }
 
-Point GraphicsSceneTab::mapGlobalPosToScenePos(const QPoint& pos,
-                                               bool boundToView,
-                                               bool mapToGrid) const noexcept {
+Point GraphicsSceneTab::mapGlobalPosToScenePos(
+    const QPoint& pos) const noexcept {
   return Point();  // TODO
-}
-
-void GraphicsSceneTab::invalidateBackground() noexcept {
-  mCachedBackground = QPixmap();
-  requestRepaint();
 }
 
 /*******************************************************************************
@@ -301,7 +222,6 @@ void GraphicsSceneTab::smoothTo(const Projection& projection) noexcept {
 bool GraphicsSceneTab::applyProjection(const Projection& projection) noexcept {
   if (projection != mProjection) {
     mProjection = projection;
-    mCachedBackground = QPixmap();
     emit requestRepaint();
     return true;
   }

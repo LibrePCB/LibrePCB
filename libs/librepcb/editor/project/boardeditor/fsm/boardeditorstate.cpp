@@ -92,7 +92,12 @@ bool BoardEditorState::getIgnoreLocks() const noexcept {
 }
 
 PositiveLength BoardEditorState::getGridInterval() const noexcept {
-  return mContext.editorGraphicsView.getGridInterval();
+  if (const Board* board =
+          const_cast<BoardEditorState*>(this)->getActiveBoard()) {
+    return board->getGridInterval();
+  } else {
+    return PositiveLength(2540000);
+  }
 }
 
 const LengthUnit& BoardEditorState::getLengthUnit() const noexcept {

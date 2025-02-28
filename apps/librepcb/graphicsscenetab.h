@@ -99,9 +99,7 @@ public:
 protected:
   QPainterPath calcPosWithTolerance(const Point& pos,
                                     qreal multiplier) const noexcept;
-  Point mapGlobalPosToScenePos(const QPoint& pos, bool boundToView,
-                               bool mapToGrid) const noexcept;
-  void invalidateBackground() noexcept;
+  Point mapGlobalPosToScenePos(const QPoint& pos) const noexcept;
   virtual void requestRepaint() noexcept = 0;
   virtual const LengthUnit* getCurrentUnit() const noexcept = 0;
 
@@ -111,12 +109,6 @@ private:
   virtual bool applyProjection(const Projection& projection) noexcept;
 
 protected:
-  QColor mBackgroundColor;
-  QColor mGridColor;
-  Theme::GridStyle mGridStyle;
-  PositiveLength mGridInterval;
-
-  QPixmap mCachedBackground;
   std::unique_ptr<IF_GraphicsLayerProvider> mLayerProvider;
   std::shared_ptr<GraphicsScene> mScene;
 

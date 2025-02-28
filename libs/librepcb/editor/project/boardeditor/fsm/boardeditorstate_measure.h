@@ -75,6 +75,7 @@ public:
 
 private:  // Data
   QScopedPointer<MeasureTool> mTool;
+  QVector<QMetaObject::Connection> mConnections;
 };
 
 /*******************************************************************************

@@ -64,8 +64,7 @@ public:
                                  bool circle) noexcept = 0;
   virtual QPainterPath fsmCalcPosWithTolerance(
       const Point& pos, qreal multiplier) const noexcept = 0;
-  virtual Point fsmMapGlobalPosToScenePos(const QPoint& pos, bool boundToView,
-                                          bool mapToGrid) const noexcept = 0;
+  virtual Point fsmMapGlobalPosToScenePos(const QPoint& pos) const noexcept = 0;
   virtual void fsmSetHighlightedNetSignals(
       const QSet<const NetSignal*>& sigs) noexcept = 0;
   virtual void fsmAbortBlockingToolsInOtherEditors() noexcept = 0;

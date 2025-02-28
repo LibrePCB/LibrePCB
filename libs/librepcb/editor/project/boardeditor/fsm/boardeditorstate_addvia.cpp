@@ -96,8 +96,8 @@ bool BoardEditorState_AddVia::entry() noexcept {
   Q_ASSERT(mIsUndoCmdActive == false);
 
   // Add a new via
-  Point pos = mContext.editorGraphicsView.mapGlobalPosToScenePos(QCursor::pos(),
-                                                                 true, true);
+  Point pos = mContext.editorGraphicsView.mapGlobalPosToScenePos(QCursor::pos())
+                  .mappedToGrid(getGridInterval());
   if (!addVia(pos)) return false;
 
   EditorCommandSet& cmd = EditorCommandSet::instance();
