@@ -76,8 +76,9 @@ bool BoardEditorState_AddStrokeText::entry() noexcept {
   makeLayerVisible(mLastLayer->getThemeColor());
 
   // Add a new stroke text
-  Point pos = mContext.editorGraphicsView.mapGlobalPosToScenePos(QCursor::pos(),
-                                                                 true, true);
+  const Point pos =
+      mContext.editorGraphicsView.mapGlobalPosToScenePos(QCursor::pos())
+          .mappedToGrid(getGridInterval());
   if (!addText(pos)) return false;
 
   EditorCommandSet& cmd = EditorCommandSet::instance();

@@ -103,8 +103,14 @@ bool SchematicEditorState_Measure::processGraphicsSceneLeftMouseButtonPressed(
 
 bool SchematicEditorState_Measure::processSwitchToSchematicPage(
     int index) noexcept {
-  mTool->setSchematic(mContext.project.getSchematicByIndex(index));
+  Q_UNUSED(index);
   return true;
+}
+
+void SchematicEditorState_Measure::processSwitchedSchematicPage() noexcept {
+  mTool->leave();
+  mTool->setSchematic(getActiveSchematic());
+  mTool->enter();
 }
 
 /*******************************************************************************

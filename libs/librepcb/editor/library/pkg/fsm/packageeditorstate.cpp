@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "packageeditorstate.h"
 
-#include "../../../widgets/graphicsview.h"
+#include "../../../graphics/graphicsscene.h"
 
 #include <librepcb/core/types/layer.h>
 
@@ -50,7 +50,7 @@ PackageEditorState::~PackageEditorState() noexcept {
  ******************************************************************************/
 
 const PositiveLength& PackageEditorState::getGridInterval() const noexcept {
-  return mContext.graphicsView.getGridInterval();
+  return mContext.graphicsScene.getGridInterval();
 }
 
 const LengthUnit& PackageEditorState::getLengthUnit() const noexcept {

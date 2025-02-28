@@ -180,19 +180,23 @@ AddComponentDialog::AddComponentDialog(const WorkspaceLibraryDb& db,
 
   // Setup symbol graphics view.
   const Theme& theme = mSettings.themes.getActive();
-  mUi->viewComponent->setBackgroundColors(
+  mComponentPreviewScene->setBackgroundColors(
       theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor(),
       theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
-  mUi->viewComponent->setGridStyle(theme.getBoardGridStyle());
-  mUi->viewComponent->setOriginCrossVisible(false);
+  mComponentPreviewScene->setGridStyle(theme.getBoardGridStyle());
+  mComponentPreviewScene->setOriginCrossVisible(false);
+  mUi->viewComponent->setSpinnerColor(
+      theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
   mUi->viewComponent->setScene(mComponentPreviewScene.data());
 
   // Setup package graphics view.
-  mUi->viewDevice->setBackgroundColors(
+  mDevicePreviewScene->setBackgroundColors(
       theme.getColor(Theme::Color::sBoardBackground).getPrimaryColor(),
       theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor());
-  mUi->viewDevice->setGridStyle(theme.getBoardGridStyle());
-  mUi->viewDevice->setOriginCrossVisible(false);
+  mDevicePreviewScene->setGridStyle(theme.getBoardGridStyle());
+  mDevicePreviewScene->setOriginCrossVisible(false);
+  mUi->viewDevice->setSpinnerColor(
+      theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor());
   mUi->viewDevice->setScene(mDevicePreviewScene.data());
 
   mUi->treeCategories->setModel(mCategoryTreeModel.data());

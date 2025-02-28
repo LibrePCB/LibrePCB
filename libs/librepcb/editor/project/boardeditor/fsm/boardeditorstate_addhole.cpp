@@ -67,8 +67,9 @@ bool BoardEditorState_AddHole::entry() noexcept {
   makeLayerVisible(Theme::Color::sBoardHoles);
 
   // Add a new hole
-  Point pos = mContext.editorGraphicsView.mapGlobalPosToScenePos(QCursor::pos(),
-                                                                 true, true);
+  const Point pos =
+      mContext.editorGraphicsView.mapGlobalPosToScenePos(QCursor::pos())
+          .mappedToGrid(getGridInterval());
   if (!addHole(pos)) return false;
 
   EditorCommandSet& cmd = EditorCommandSet::instance();
