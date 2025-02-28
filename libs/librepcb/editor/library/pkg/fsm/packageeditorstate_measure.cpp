@@ -23,6 +23,7 @@
 #include "packageeditorstate_measure.h"
 
 #include "../../../utils/measuretool.h"
+#include "../../../widgets/graphicsview.h"
 
 #include <QtCore>
 
@@ -38,8 +39,9 @@ namespace editor {
 
 PackageEditorState_Measure::PackageEditorState_Measure(
     Context& context) noexcept
-  : PackageEditorState(context),
-    mTool(new MeasureTool(mContext.graphicsView, getLengthUnit())) {
+  : PackageEditorState(context), mTool(new MeasureTool()) {
+  connect(mTool.data(), &MeasureTool::infoBoxTextChanged,
+          &mContext.graphicsView, &GraphicsView::setInfoBoxText);
   connect(mTool.data(), &MeasureTool::statusBarMessageChanged, this,
           &PackageEditorState_Measure::statusBarMessageChanged);
 }
@@ -53,12 +55,15 @@ PackageEditorState_Measure::~PackageEditorState_Measure() noexcept {
 
 bool PackageEditorState_Measure::entry() noexcept {
   mTool->setFootprint(mContext.currentFootprint.get());
-  mTool->enter();
+  mTool->enter(mContext.graphicsScene, getLengthUnit(),
+               mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos()));
+  mContext.graphicsView.setCursor(Qt::CrossCursor);
   return true;
 }
 
 bool PackageEditorState_Measure::exit() noexcept {
   mTool->leave();
+  mContext.graphicsView.unsetCursor();
   return true;
 }
 

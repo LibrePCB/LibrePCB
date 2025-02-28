@@ -60,11 +60,10 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-MeasureTool::MeasureTool(GraphicsView& view, const LengthUnit& unit,
-                         QObject* parent) noexcept
+MeasureTool::MeasureTool(QObject* parent) noexcept
   : QObject(parent),
-    mView(&view),
-    mUnit(unit),
+    mScene(),
+    mUnit(LengthUnit::millimeters()),
     mSnapCandidates(),
     mLastScenePos(),
     mCursorPos(),
@@ -166,15 +165,15 @@ void MeasureTool::setBoard(const Board* board) noexcept {
   }
 }
 
-void MeasureTool::enter() noexcept {
-  if (mView) {
-    if (GraphicsScene* scene = mView->getScene()) {
-      scene->setSelectionArea(QPainterPath());  // clear selection
-      scene->setGrayOut(true);
-    }
-    mView->setCursor(Qt::CrossCursor);
-    mLastScenePos = mView->mapGlobalPosToScenePos(QCursor::pos());
-  }
+void MeasureTool::enter(GraphicsScene& scene, const LengthUnit& unit,
+                        const Point& pos) noexcept {
+  mScene = &scene;
+  mUnit = unit;
+  mLastScenePos = pos;
+
+  mScene->setSelectionArea(QPainterPath());  // clear selection
+  mScene->setGrayOut(true);
+
   updateCursorPosition(Qt::KeyboardModifier::NoModifier);
   updateRulerPositions();
   updateStatusBarMessage();
@@ -186,16 +185,13 @@ void MeasureTool::leave() noexcept {
   // later. This might be useful in some cases to avoid needing to measure the
   // same distance again.
 
-  if (mView) {
-    mView->unsetCursor();
-    mView->setInfoBoxText(QString());
-    if (GraphicsScene* scene = mView->getScene()) {
-      scene->setSceneCursor(Point(), false, false);
-      scene->setRulerPositions(std::nullopt);
-      scene->setGrayOut(false);
-    }
+  if (mScene) {
+    mScene->setSceneCursor(Point(), false, false);
+    mScene->setRulerPositions(std::nullopt);
+    mScene->setGrayOut(false);
   }
 
+  emit infoBoxTextChanged(QString());
   emit statusBarMessageChanged(QString());
 }
 
@@ -248,7 +244,7 @@ bool MeasureTool::processGraphicsSceneLeftMouseButtonPressed(
 }
 
 bool MeasureTool::processCopy() noexcept {
-  if (mView && mStartPos && mEndPos) {
+  if (mStartPos && mEndPos) {
     const Point diff = (*mEndPos) - (*mStartPos);
     const qreal value = mUnit.convertToUnit(*diff.getLength());
     const QString str = Toolbox::floatToString(value, 12, QLocale());
@@ -378,11 +374,7 @@ QSet<Point> MeasureTool::snapCandidatesFromCircle(
 
 void MeasureTool::updateCursorPosition(
     Qt::KeyboardModifiers modifiers) noexcept {
-  if (!mView) {
-    return;
-  }
-  GraphicsScene* scene = mView->getScene();
-  if (!scene) {
+  if (!mScene) {
     return;
   }
 
@@ -399,7 +391,7 @@ void MeasureTool::updateCursorPosition(
       }
     }
 
-    const Point posOnGrid = mCursorPos.mappedToGrid(scene->getGridInterval());
+    const Point posOnGrid = mCursorPos.mappedToGrid(mScene->getGridInterval());
     const Length gridDistance = *(mCursorPos - posOnGrid).getLength();
     if ((nearestDistance >= 0) && (nearestDistance <= gridDistance)) {
       mCursorPos = nearestCandidate;
@@ -412,22 +404,18 @@ void MeasureTool::updateCursorPosition(
 }
 
 void MeasureTool::updateRulerPositions() noexcept {
-  if (!mView) {
-    return;
-  }
-  GraphicsScene* scene = mView->getScene();
-  if (!scene) {
+  if (!mScene) {
     return;
   }
 
-  scene->setSceneCursor(mCursorPos, (!mStartPos) || mEndPos, mCursorSnapped);
+  mScene->setSceneCursor(mCursorPos, (!mStartPos) || mEndPos, mCursorSnapped);
 
   const Point startPos = mStartPos ? *mStartPos : mCursorPos;
   const Point endPos = mEndPos ? *mEndPos : mCursorPos;
   if (mStartPos) {
-    scene->setRulerPositions(std::make_pair(startPos, endPos));
+    mScene->setRulerPositions(std::make_pair(startPos, endPos));
   } else {
-    scene->setRulerPositions(std::nullopt);
+    mScene->setRulerPositions(std::nullopt);
   }
 
   const Point diff = endPos - startPos;
@@ -462,7 +450,7 @@ void MeasureTool::updateRulerPositions() noexcept {
               .arg(mUnit.toShortStringTr());
   text += QString("<b>∠: %1°</b>").arg(angle.toDeg(), 14 - decimals, 'f', 3);
   text.replace(" ", "&nbsp;");
-  mView->setInfoBoxText(text);
+  emit infoBoxTextChanged(text);
 }
 
 void MeasureTool::updateStatusBarMessage() noexcept {

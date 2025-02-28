@@ -23,8 +23,8 @@
 #include "schematiceditorstate_measure.h"
 
 #include "../../../utils/measuretool.h"
-
-#include <librepcb/core/project/project.h>
+#include "../../../widgets/graphicsview.h"
+#include "../schematicgraphicsscene.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -41,8 +41,9 @@ namespace editor {
 
 SchematicEditorState_Measure::SchematicEditorState_Measure(
     const Context& context) noexcept
-  : SchematicEditorState(context),
-    mTool(new MeasureTool(mContext.editorGraphicsView, getLengthUnit())) {
+  : SchematicEditorState(context), mTool(new MeasureTool()) {
+  connect(mTool.data(), &MeasureTool::infoBoxTextChanged,
+          &mContext.editorGraphicsView, &GraphicsView::setInfoBoxText);
   connect(mTool.data(), &MeasureTool::statusBarMessageChanged, this,
           &SchematicEditorState_Measure::statusBarMessageChanged);
 }
@@ -55,13 +56,20 @@ SchematicEditorState_Measure::~SchematicEditorState_Measure() noexcept {
  ******************************************************************************/
 
 bool SchematicEditorState_Measure::entry() noexcept {
+  GraphicsScene* scene = getActiveSchematicScene();
+  if (!scene) return false;
+
   mTool->setSchematic(getActiveSchematic());
-  mTool->enter();
+  mTool->enter(
+      *scene, getLengthUnit(),
+      mContext.editorGraphicsView.mapGlobalPosToScenePos(QCursor::pos()));
+  mContext.editorGraphicsView.setCursor(Qt::CrossCursor);
   return true;
 }
 
 bool SchematicEditorState_Measure::exit() noexcept {
   mTool->leave();
+  mContext.editorGraphicsView.unsetCursor();
   return true;
 }
 
@@ -110,7 +118,11 @@ bool SchematicEditorState_Measure::processSwitchToSchematicPage(
 void SchematicEditorState_Measure::processSwitchedSchematicPage() noexcept {
   mTool->leave();
   mTool->setSchematic(getActiveSchematic());
-  mTool->enter();
+  if (GraphicsScene* scene = getActiveSchematicScene()) {
+    mTool->enter(
+        *scene, getLengthUnit(),
+        mContext.editorGraphicsView.mapGlobalPosToScenePos(QCursor::pos()));
+  }
 }
 
 /*******************************************************************************
