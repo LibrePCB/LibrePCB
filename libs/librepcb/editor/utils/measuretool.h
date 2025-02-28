@@ -45,7 +45,7 @@ class Transform;
 
 namespace editor {
 
-class GraphicsView;
+class GraphicsScene;
 
 /*******************************************************************************
  *  Class MeasureTool
@@ -59,10 +59,8 @@ class MeasureTool final : public QObject {
 
 public:
   // Constructors / Destructor
-  MeasureTool() = delete;
   MeasureTool(const MeasureTool& other) = delete;
-  explicit MeasureTool(GraphicsView& view, const LengthUnit& unit,
-                       QObject* parent = nullptr) noexcept;
+  explicit MeasureTool(QObject* parent = nullptr) noexcept;
   ~MeasureTool() noexcept;
 
   // General Methods
@@ -70,7 +68,8 @@ public:
   void setFootprint(const Footprint* footprint) noexcept;
   void setSchematic(const Schematic* schematic) noexcept;
   void setBoard(const Board* board) noexcept;
-  void enter() noexcept;
+  void enter(GraphicsScene& scene, const LengthUnit& unit,
+             const Point& pos) noexcept;
   void leave() noexcept;
 
   // Event Handlers
@@ -87,6 +86,7 @@ public:
   MeasureTool& operator=(const MeasureTool& rhs) = delete;
 
 signals:
+  void infoBoxTextChanged(const QString& text);
   void statusBarMessageChanged(const QString& message, int timeoutMs = -1);
 
 private:  // Methods
@@ -102,7 +102,7 @@ private:  // Methods
   void updateStatusBarMessage() noexcept;
 
 private:  // Data
-  QPointer<GraphicsView> mView;
+  QPointer<GraphicsScene> mScene;
   LengthUnit mUnit;
   QSet<Point> mSnapCandidates;
   Point mLastScenePos;
