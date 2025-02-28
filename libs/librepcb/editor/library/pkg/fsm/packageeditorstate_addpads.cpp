@@ -23,6 +23,7 @@
 #include "packageeditorstate_addpads.h"
 
 #include "../../../editorcommandset.h"
+#include "../../../graphics/graphicsscene.h"
 #include "../../../widgets/graphicsview.h"
 #include "../../../widgets/positivelengthedit.h"
 #include "../../../widgets/unsignedlengthedit.h"
@@ -349,8 +350,8 @@ bool PackageEditorState_AddPads::entry() noexcept {
     mContext.commandToolBar.addWidget(std::move(cbxPressFit), 10);
   }
 
-  Point pos =
-      mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos(), true, true);
+  const Point pos = mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos())
+                        .mappedToGrid(mContext.graphicsScene.getGridInterval());
   if (!startAddPad(pos)) {
     return false;
   }

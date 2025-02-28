@@ -100,8 +100,14 @@ bool BoardEditorState_Measure::processGraphicsSceneLeftMouseButtonPressed(
 }
 
 bool BoardEditorState_Measure::processSwitchToBoard(int index) noexcept {
-  mTool->setBoard(mContext.project.getBoardByIndex(index));
+  Q_UNUSED(index);
   return true;
+}
+
+void BoardEditorState_Measure::processSwitchedBoard() noexcept {
+  mTool->leave();
+  mTool->setBoard(getActiveBoard());
+  mTool->enter();
 }
 
 /*******************************************************************************
