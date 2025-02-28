@@ -78,8 +78,9 @@ bool SchematicEditorState_AddText::entry() noexcept {
   EditorCommandSet& cmd = EditorCommandSet::instance();
 
   // Add a new stroke text
-  Point pos = mContext.editorGraphicsView.mapGlobalPosToScenePos(QCursor::pos(),
-                                                                 true, true);
+  const Point pos =
+      mContext.editorGraphicsView.mapGlobalPosToScenePos(QCursor::pos())
+          .mappedToGrid(getGridInterval());
   if (!addText(pos)) return false;
 
   // Add the layers combobox to the toolbar
