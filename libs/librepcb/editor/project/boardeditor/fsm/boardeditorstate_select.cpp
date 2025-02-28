@@ -1561,8 +1561,8 @@ bool BoardEditorState_Select::copySelectedItemsToClipboard() noexcept {
   if (!scene) return false;
 
   try {
-    Point cursorPos = mContext.editorGraphicsView.mapGlobalPosToScenePos(
-        QCursor::pos(), true, false);
+    const Point cursorPos =
+        mContext.editorGraphicsView.mapGlobalPosToScenePos(QCursor::pos());
     BoardClipboardDataBuilder builder(*scene);
     std::unique_ptr<BoardClipboardData> data = builder.generate(cursorPos);
     qApp->clipboard()->setMimeData(data->toMimeData().release());
@@ -1584,8 +1584,8 @@ bool BoardEditorState_Select::startPaste(
   mIsUndoCmdActive = true;
 
   // Paste items.
-  Point startPos = mContext.editorGraphicsView.mapGlobalPosToScenePos(
-      QCursor::pos(), true, false);
+  const Point startPos =
+      mContext.editorGraphicsView.mapGlobalPosToScenePos(QCursor::pos());
   Point offset = fixedPosition
       ? (*fixedPosition)
       : (startPos - data->getCursorPos()).mappedToGrid(getGridInterval());

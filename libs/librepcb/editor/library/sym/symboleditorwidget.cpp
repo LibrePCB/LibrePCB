@@ -74,20 +74,27 @@ SymbolEditorWidget::SymbolEditorWidget(const Context& context,
   mUi->edtVersion->setReadOnly(mContext.readOnly);
   mUi->cbxDeprecated->setCheckable(!mContext.readOnly);
   setupErrorNotificationWidget(*mUi->errorNotificationWidget);
+  setWindowIcon(QIcon(":/img/library/symbol.png"));
+
+  // Setup graphics scene.
   const Theme& theme = mContext.workspace.getSettings().themes.getActive();
-  mUi->graphicsView->setBackgroundColors(
+  mGraphicsScene->setBackgroundColors(
       theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor(),
       theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
-  mUi->graphicsView->setOverlayColors(
+  mGraphicsScene->setOverlayColors(
       theme.getColor(Theme::Color::sSchematicOverlays).getPrimaryColor(),
       theme.getColor(Theme::Color::sSchematicOverlays).getSecondaryColor());
-  mUi->graphicsView->setInfoBoxColors(
-      theme.getColor(Theme::Color::sSchematicInfoBox).getPrimaryColor(),
-      theme.getColor(Theme::Color::sSchematicInfoBox).getSecondaryColor());
   mGraphicsScene->setSelectionRectColors(
       theme.getColor(Theme::Color::sSchematicSelection).getPrimaryColor(),
       theme.getColor(Theme::Color::sSchematicSelection).getSecondaryColor());
-  mUi->graphicsView->setGridStyle(theme.getBoardGridStyle());
+  mGraphicsScene->setGridStyle(theme.getBoardGridStyle());
+
+  // Setup graphics view.
+  mUi->graphicsView->setSpinnerColor(
+      theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
+  mUi->graphicsView->setInfoBoxColors(
+      theme.getColor(Theme::Color::sSchematicInfoBox).getPrimaryColor(),
+      theme.getColor(Theme::Color::sSchematicInfoBox).getSecondaryColor());
   mUi->graphicsView->setUseOpenGl(
       mContext.workspace.getSettings().useOpenGl.get());
   mUi->graphicsView->setScene(mGraphicsScene.data());
@@ -98,7 +105,6 @@ SymbolEditorWidget::SymbolEditorWidget(const Context& context,
             mCommandToolBarProxy->startTabFocusCycle(*mUi->graphicsView);
           },
           EditorCommand::ActionFlag::WidgetShortcut));
-  setWindowIcon(QIcon(":/img/library/symbol.png"));
 
   // Apply grid properties unit from workspace settings
   setGridProperties(PositiveLength(2540000),
@@ -295,19 +301,19 @@ bool SymbolEditorWidget::move(Qt::ArrowType direction) noexcept {
   Point delta;
   switch (direction) {
     case Qt::LeftArrow: {
-      delta.setX(-mUi->graphicsView->getGridInterval());
+      delta.setX(-mGraphicsScene->getGridInterval());
       break;
     }
     case Qt::RightArrow: {
-      delta.setX(*mUi->graphicsView->getGridInterval());
+      delta.setX(*mGraphicsScene->getGridInterval());
       break;
     }
     case Qt::UpArrow: {
-      delta.setY(*mUi->graphicsView->getGridInterval());
+      delta.setY(*mGraphicsScene->getGridInterval());
       break;
     }
     case Qt::DownArrow: {
-      delta.setY(-mUi->graphicsView->getGridInterval());
+      delta.setY(-mGraphicsScene->getGridInterval());
       break;
     }
     default: {
@@ -363,8 +369,8 @@ bool SymbolEditorWidget::importDxf() noexcept {
 }
 
 bool SymbolEditorWidget::editGridProperties() noexcept {
-  GridSettingsDialog dialog(mUi->graphicsView->getGridInterval(), mLengthUnit,
-                            mUi->graphicsView->getGridStyle(), this);
+  GridSettingsDialog dialog(mGraphicsScene->getGridInterval(), mLengthUnit,
+                            mGraphicsScene->getGridStyle(), this);
   connect(&dialog, &GridSettingsDialog::gridPropertiesChanged, this,
           &SymbolEditorWidget::setGridProperties);
   dialog.exec();
@@ -372,17 +378,17 @@ bool SymbolEditorWidget::editGridProperties() noexcept {
 }
 
 bool SymbolEditorWidget::increaseGridInterval() noexcept {
-  const Length interval = mUi->graphicsView->getGridInterval() * 2;
+  const Length interval = mGraphicsScene->getGridInterval() * 2;
   setGridProperties(PositiveLength(interval), mLengthUnit,
-                    mUi->graphicsView->getGridStyle());
+                    mGraphicsScene->getGridStyle());
   return true;
 }
 
 bool SymbolEditorWidget::decreaseGridInterval() noexcept {
-  const Length interval = *mUi->graphicsView->getGridInterval();
+  const Length interval = *mGraphicsScene->getGridInterval();
   if ((interval % 2) == 0) {
     setGridProperties(PositiveLength(interval / 2), mLengthUnit,
-                      mUi->graphicsView->getGridStyle());
+                      mGraphicsScene->getGridStyle());
   }
   return true;
 }
@@ -602,7 +608,7 @@ void SymbolEditorWidget::fixMsg(const MsgSymbolOriginNotInCenter& msg) {
   mFsm->processAbortCommand();
   mFsm->processSelectAll();
   mFsm->processMove(
-      -msg.getCenter().mappedToGrid(mUi->graphicsView->getGridInterval()));
+      -msg.getCenter().mappedToGrid(mGraphicsScene->getGridInterval()));
   mFsm->processAbortCommand();  // Clear selection.
 }
 
@@ -675,8 +681,8 @@ bool SymbolEditorWidget::execGraphicsExportDialog(
 void SymbolEditorWidget::setGridProperties(const PositiveLength& interval,
                                            const LengthUnit& unit,
                                            Theme::GridStyle style) noexcept {
-  mUi->graphicsView->setGridInterval(interval);
-  mUi->graphicsView->setGridStyle(style);
+  mGraphicsScene->setGridInterval(interval);
+  mGraphicsScene->setGridStyle(style);
   mLengthUnit = unit;
   if (mStatusBar) {
     mStatusBar->setLengthUnit(unit);
