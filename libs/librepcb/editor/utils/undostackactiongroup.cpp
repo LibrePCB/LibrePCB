@@ -52,11 +52,11 @@ UndoStackActionGroup::UndoStackActionGroup(QAction& undo, QAction& redo,
           &UndoStackActionGroup::undoTriggered);
   connect(&mRedo, &QAction::triggered, this,
           &UndoStackActionGroup::redoTriggered);
-  registerToStack(stack);
+  setUndoStack(stack);
 }
 
 UndoStackActionGroup::~UndoStackActionGroup() noexcept {
-  unregisterFromStack();
+  setUndoStack(nullptr);
 }
 
 /*******************************************************************************
@@ -65,9 +65,17 @@ UndoStackActionGroup::~UndoStackActionGroup() noexcept {
 
 void UndoStackActionGroup::setUndoStack(UndoStack* stack) noexcept {
   if (stack != mStack) {
-    unregisterFromStack();
-    registerToStack(stack);
+    if (mStack) {
+      disconnect(mStack, &UndoStack::stateModified, this,
+                 &UndoStackActionGroup::updateState);
+    }
+    mStack = stack;
+    if (mStack) {
+      connect(mStack, &UndoStack::stateModified, this,
+              &UndoStackActionGroup::updateState);
+    }
   }
+  updateState();
 }
 
 /*******************************************************************************
@@ -90,44 +98,20 @@ void UndoStackActionGroup::redoTriggered() noexcept {
   }
 }
 
-void UndoStackActionGroup::unregisterFromStack() noexcept {
-  while (mConnections.count() > 0) {
-    disconnect(mConnections.takeLast());
+void UndoStackActionGroup::updateState() noexcept {
+  const bool canUndo = mStack && mStack->canUndo();
+  mUndo.setText(canUndo ? tr("Undo: %1").arg(mStack->getUndoCmdText())
+                        : tr("Undo"));
+  mUndo.setEnabled(canUndo);
+
+  const bool canRedo = mStack && mStack->canRedo();
+  mRedo.setText(canRedo ? tr("Redo: %1").arg(mStack->getRedoCmdText())
+                        : tr("Redo"));
+  mRedo.setEnabled(canRedo);
+
+  if (mSave) {
+    mSave->setEnabled(mStack && (!mStack->isClean()));
   }
-  mUndo.setText(QString());
-  mUndo.setEnabled(false);
-  mRedo.setText(QString());
-  mRedo.setEnabled(false);
-  if (mSave) mSave->setEnabled(false);
-  mStack = nullptr;
-}
-
-void UndoStackActionGroup::registerToStack(UndoStack* stack) noexcept {
-  Q_ASSERT(!mStack);
-  if (stack) {
-    mConnections.append(
-        connect(stack, &UndoStack::undoTextChanged, &mUndo, &QAction::setText));
-    mUndo.setText(stack->getUndoText());
-
-    mConnections.append(connect(stack, &UndoStack::canUndoChanged, &mUndo,
-                                &QAction::setEnabled));
-    mUndo.setEnabled(stack->canUndo());
-
-    mConnections.append(
-        connect(stack, &UndoStack::redoTextChanged, &mRedo, &QAction::setText));
-    mRedo.setText(stack->getRedoText());
-
-    mConnections.append(connect(stack, &UndoStack::canRedoChanged, &mRedo,
-                                &QAction::setEnabled));
-    mRedo.setEnabled(stack->canRedo());
-
-    if (mSave) {
-      mConnections.append(connect(stack, &UndoStack::cleanChanged, mSave,
-                                  &QAction::setDisabled));
-      mSave->setDisabled(stack->isClean());
-    }
-  }
-  mStack = stack;
 }
 
 /*******************************************************************************
