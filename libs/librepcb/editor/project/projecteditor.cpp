@@ -419,13 +419,9 @@ bool ProjectEditor::closeAndDestroy(bool askForSave,
 
 void ProjectEditor::setErcMessageApproved(const RuleCheckMessage& msg,
                                           bool approve) noexcept {
-  QSet<SExpression> approvals = mProject.getErcMessageApprovals();
-  if (approve) {
-    approvals.insert(msg.getApproval());
-  } else {
-    approvals.remove(msg.getApproval());
+  if (mProject.setErcMessageApproved(msg.getApproval(), approve)) {
+    setManualModificationsMade();
   }
-  saveErcMessageApprovals(approvals);
 }
 
 void ProjectEditor::setHighlightedNetSignals(
@@ -457,19 +453,14 @@ void ProjectEditor::runErc() noexcept {
     mSupportedErcApprovals |= approvals;
     mDisappearedErcApprovals = mSupportedErcApprovals - approvals;
     approvals = mProject.getErcMessageApprovals() - mDisappearedErcApprovals;
-    saveErcMessageApprovals(approvals);
+    if (mProject.setErcMessageApprovals(approvals)) {
+      setManualModificationsMade();
+    }
 
     emit ercFinished(mErcMessages);
     qDebug() << "ERC succeeded after" << timer.elapsed() << "ms.";
   } catch (const Exception& e) {
     qCritical() << "ERC failed:" << e.getMsg();
-  }
-}
-
-void ProjectEditor::saveErcMessageApprovals(
-    const QSet<SExpression>& approvals) noexcept {
-  if (mProject.setErcMessageApprovals(approvals)) {
-    setManualModificationsMade();
   }
 }
 
