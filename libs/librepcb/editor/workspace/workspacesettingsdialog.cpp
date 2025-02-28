@@ -383,11 +383,13 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
   // Now load all current settings
   loadSettings();
 
-  // Load the window geometry
-  QSettings clientSettings;
-  restoreGeometry(
-      clientSettings.value("workspace_settings_dialog/window_geometry")
-          .toByteArray());
+  // Load client settings.
+  QSettings cs;
+  const QSize windowSize =
+      cs.value("workspace_settings_dialog/window_size").toSize();
+  if (!windowSize.isEmpty()) {
+    resize(windowSize);
+  }
 
   // Just in case that the wrong tab is selected in the UI designer:
   mUi->tabWidget->setCurrentIndex(0);
@@ -398,10 +400,8 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
 }
 
 WorkspaceSettingsDialog::~WorkspaceSettingsDialog() {
-  // Save the window geometry
-  QSettings clientSettings;
-  clientSettings.setValue("workspace_settings_dialog/window_geometry",
-                          saveGeometry());
+  QSettings cs;
+  cs.setValue("workspace_settings_dialog/window_size", size());
 }
 
 /*******************************************************************************
