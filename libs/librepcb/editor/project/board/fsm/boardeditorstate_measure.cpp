@@ -23,8 +23,8 @@
 #include "boardeditorstate_measure.h"
 
 #include "../../../utils/measuretool.h"
-
-#include <librepcb/core/project/project.h>
+#include "../../../widgets/graphicsview.h"
+#include "../boardgraphicsscene.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -41,8 +41,9 @@ namespace editor {
 
 BoardEditorState_Measure::BoardEditorState_Measure(
     const Context& context) noexcept
-  : BoardEditorState(context),
-    mTool(new MeasureTool(mContext.editorGraphicsView, getLengthUnit())) {
+  : BoardEditorState(context), mTool(new MeasureTool()) {
+  connect(mTool.data(), &MeasureTool::infoBoxTextChanged,
+          &mContext.editorGraphicsView, &GraphicsView::setInfoBoxText);
   connect(mTool.data(), &MeasureTool::statusBarMessageChanged, this,
           &BoardEditorState_Measure::statusBarMessageChanged);
 }
@@ -55,13 +56,20 @@ BoardEditorState_Measure::~BoardEditorState_Measure() noexcept {
  ******************************************************************************/
 
 bool BoardEditorState_Measure::entry() noexcept {
+  GraphicsScene* scene = getActiveBoardScene();
+  if (!scene) return false;
+
   mTool->setBoard(getActiveBoard());
-  mTool->enter();
+  mTool->enter(
+      *scene, getLengthUnit(),
+      mContext.editorGraphicsView.mapGlobalPosToScenePos(QCursor::pos()));
+  mContext.editorGraphicsView.setCursor(Qt::CrossCursor);
   return true;
 }
 
 bool BoardEditorState_Measure::exit() noexcept {
   mTool->leave();
+  mContext.editorGraphicsView.unsetCursor();
   return true;
 }
 
@@ -107,7 +115,11 @@ bool BoardEditorState_Measure::processSwitchToBoard(int index) noexcept {
 void BoardEditorState_Measure::processSwitchedBoard() noexcept {
   mTool->leave();
   mTool->setBoard(getActiveBoard());
-  mTool->enter();
+  if (GraphicsScene* scene = getActiveBoardScene()) {
+    mTool->enter(
+        *scene, getLengthUnit(),
+        mContext.editorGraphicsView.mapGlobalPosToScenePos(QCursor::pos()));
+  }
 }
 
 /*******************************************************************************
