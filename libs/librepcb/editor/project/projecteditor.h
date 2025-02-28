@@ -262,7 +262,6 @@ signals:
 
 private:  // Methods
   void runErc() noexcept;
-  void saveErcMessageApprovals(const QSet<SExpression>& approvals) noexcept;
   int getCountOfVisibleEditorWindows() const noexcept;
 
 private:  // Data
