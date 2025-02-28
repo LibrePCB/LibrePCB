@@ -45,10 +45,10 @@ namespace editor {
  ******************************************************************************/
 
 OnlineLibraryListWidgetItem::OnlineLibraryListWidgetItem(
-    Workspace& ws, const QJsonObject& obj) noexcept
+    Workspace& ws, const ApiEndpoint::Library& lib) noexcept
   : QWidget(nullptr),
     mWorkspace(ws),
-    mJsonObject(obj),
+    mLib(lib),
     mUi(new Ui::OnlineLibraryListWidgetItem),
     mAutoCheck(true) {
   mUi->setupUi(this);
@@ -59,31 +59,12 @@ OnlineLibraryListWidgetItem::OnlineLibraryListWidgetItem(
   connect(mUi->cbxDownload, &QCheckBox::clicked, this,
           [this]() { mAutoCheck = false; });
 
-  mUuid = Uuid::tryFromString(mJsonObject.value("uuid").toString());
-  mVersion = Version::tryFromString(mJsonObject.value("version").toString());
-  mIsRecommended = mJsonObject.value("recommended").toBool();
-  mName = mJsonObject.value("name").toObject().value("default").toString();
-  QString desc =
-      mJsonObject.value("description").toObject().value("default").toString();
-  QString author = mJsonObject.value("author").toString();
-  QUrl iconUrl = QUrl(mJsonObject.value("icon_url").toString());
-  const auto dependenciesArray = mJsonObject.value("dependencies").toArray();
-  for (const QJsonValue& value : dependenciesArray) {
-    std::optional<Uuid> uuid = Uuid::tryFromString(value.toString());
-    if (uuid) {
-      mDependencies.insert(*uuid);
-    } else {
-      qWarning() << "Invalid library dependency UUID:" << value.toString();
-    }
-  }
-
-  mUi->lblName->setText(
-      QString("%1 v%2").arg(mName, mVersion ? mVersion->toStr() : QString()));
+  mUi->lblName->setText(QString("%1 v%2").arg(mLib.name, mLib.version.toStr()));
   // Only show the first line to avoid breaking the UI layout.
-  mUi->lblDescription->setText(desc.split("\n").first());
-  mUi->lblAuthor->setText(QString("Author: %1").arg(author));
+  mUi->lblDescription->setText(mLib.description.split("\n").first());
+  mUi->lblAuthor->setText(QString("Author: %1").arg(mLib.author));
 
-  NetworkRequest* request = new NetworkRequest(iconUrl);
+  NetworkRequest* request = new NetworkRequest(mLib.iconUrl);
   request->setMinimumCacheTime(24 * 3600);  // 1 day
   connect(request, &NetworkRequest::dataReceived, this,
           &OnlineLibraryListWidgetItem::iconReceived, Qt::QueuedConnection);
@@ -121,30 +102,24 @@ void OnlineLibraryListWidgetItem::setChecked(bool checked) noexcept {
  ******************************************************************************/
 
 void OnlineLibraryListWidgetItem::startDownloadIfSelected() noexcept {
-  if (mUuid && mUi->cbxDownload->isVisible() && mUi->cbxDownload->isChecked() &&
+  if (mUi->cbxDownload->isVisible() && mUi->cbxDownload->isChecked() &&
       (!mLibraryDownload)) {
     mUi->cbxDownload->setVisible(false);
     mUi->prgProgress->setVisible(true);
 
-    // read ZIP metadata from JSON
-    QUrl url = QUrl(mJsonObject.value("download_url").toString());
-    qint64 zipSize = mJsonObject.value("download_size").toInt(-1);
-    QByteArray zipSha256 =
-        mJsonObject.value("download_sha256").toString().toUtf8();
-
     // determine destination directory
-    QString libDirName = mUuid->toStr() % ".lplib";
-    FilePath destDir =
+    const QString libDirName = mLib.uuid.toStr() % ".lplib";
+    const FilePath destDir =
         mWorkspace.getLibrariesPath().getPathTo("remote/" % libDirName);
 
     // start download
-    mLibraryDownload.reset(new LibraryDownload(url, destDir));
-    if (zipSize > 0) {
-      mLibraryDownload->setExpectedZipFileSize(zipSize);
+    mLibraryDownload.reset(new LibraryDownload(mLib.downloadUrl, destDir));
+    if (mLib.downloadSize > 0) {
+      mLibraryDownload->setExpectedZipFileSize(mLib.downloadSize);
     }
-    if (!zipSha256.isEmpty()) {
-      mLibraryDownload->setExpectedChecksum(QCryptographicHash::Sha256,
-                                            QByteArray::fromHex(zipSha256));
+    if (!mLib.downloadSha256.isEmpty()) {
+      mLibraryDownload->setExpectedChecksum(
+          QCryptographicHash::Sha256, QByteArray::fromHex(mLib.downloadSha256));
     }
     connect(mLibraryDownload.data(), &LibraryDownload::progressPercent,
             mUi->prgProgress, &QProgressBar::setValue, Qt::QueuedConnection);
@@ -194,54 +169,48 @@ void OnlineLibraryListWidgetItem::updateInstalledStatus() noexcept {
     return;
   }
 
-  if (mUuid) {
-    std::optional<Version> installedVersion;
-    try {
-      FilePath fp =
-          mWorkspace.getLibraryDb().getLatest<Library>(*mUuid);  // can throw
-      if (fp.isValid()) {
-        Version v = Version::fromString("0.1");  // only for initialization
-        mWorkspace.getLibraryDb().getMetadata<Library>(fp, nullptr,
-                                                       &v);  // can throw
-        installedVersion = v;
-      }
-    } catch (const Exception& e) {
-      qCritical() << "Failed to determine if library is installed: "
-                  << e.getMsg();
+  std::optional<Version> installedVersion;
+  try {
+    FilePath fp =
+        mWorkspace.getLibraryDb().getLatest<Library>(mLib.uuid);  // can throw
+    if (fp.isValid()) {
+      Version v = Version::fromString("0.1");  // only for initialization
+      mWorkspace.getLibraryDb().getMetadata<Library>(fp, nullptr,
+                                                     &v);  // can throw
+      installedVersion = v;
     }
-    if (installedVersion) {
-      if (installedVersion < mVersion) {
-        mUi->lblInstalledVersion->setText(
-            tr("v%1").arg(installedVersion->toStr()));
-        mUi->lblInstalledVersion->setStyleSheet("QLabel {color: red;}");
-        mUi->cbxDownload->setText(tr("Update") % ":");
-        mUi->cbxDownload->setVisible(true);
-      } else {
-        mUi->lblInstalledVersion->setText(tr("Installed"));
-        mUi->lblInstalledVersion->setStyleSheet("QLabel {color: green;}");
-        mUi->cbxDownload->setVisible(false);
-      }
+  } catch (const Exception& e) {
+    qCritical() << "Failed to determine if library is installed: "
+                << e.getMsg();
+  }
+  if (installedVersion) {
+    if (installedVersion < mLib.version) {
+      mUi->lblInstalledVersion->setText(
+          tr("v%1").arg(installedVersion->toStr()));
+      mUi->lblInstalledVersion->setStyleSheet("QLabel {color: red;}");
+      mUi->cbxDownload->setText(tr("Update") % ":");
+      mUi->cbxDownload->setVisible(true);
+    } else {
+      mUi->lblInstalledVersion->setText(tr("Installed"));
+      mUi->lblInstalledVersion->setStyleSheet("QLabel {color: green;}");
+      mUi->cbxDownload->setVisible(false);
+    }
+    mUi->lblInstalledVersion->setVisible(true);
+  } else {
+    if (mLib.recommended) {
+      mUi->lblInstalledVersion->setText(tr("Recommended"));
+      mUi->lblInstalledVersion->setStyleSheet("QLabel {color: blue;}");
       mUi->lblInstalledVersion->setVisible(true);
     } else {
-      if (mIsRecommended) {
-        mUi->lblInstalledVersion->setText(tr("Recommended"));
-        mUi->lblInstalledVersion->setStyleSheet("QLabel {color: blue;}");
-        mUi->lblInstalledVersion->setVisible(true);
-      } else {
-        mUi->lblInstalledVersion->setVisible(false);
-      }
-      mUi->cbxDownload->setText(tr("Install") % ":");
-      mUi->cbxDownload->setVisible(true);
+      mUi->lblInstalledVersion->setVisible(false);
     }
-    if (mAutoCheck) {
-      mUi->cbxDownload->setChecked(
-          installedVersion ? (installedVersion < mVersion) : mIsRecommended);
-    }
-  } else {
-    mUi->lblInstalledVersion->setText(tr("Error: Invalid UUID"));
-    mUi->lblInstalledVersion->setStyleSheet("QLabel {color: red;}");
-    mUi->lblInstalledVersion->setVisible(true);
-    mUi->cbxDownload->setVisible(false);
+    mUi->cbxDownload->setText(tr("Install") % ":");
+    mUi->cbxDownload->setVisible(true);
+  }
+  if (mAutoCheck) {
+    mUi->cbxDownload->setChecked(installedVersion
+                                     ? (installedVersion < mLib.version)
+                                     : mLib.recommended);
   }
 }
 
