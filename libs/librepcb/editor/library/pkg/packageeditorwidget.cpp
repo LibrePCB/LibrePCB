@@ -365,7 +365,12 @@ PackageEditorWidget::~PackageEditorWidget() noexcept {
   mFsm->processAbortCommand();
   mFsm.reset();
 
-  // Disconnect UI from package to avoid dangling pointers.
+  // Delete all command objects in the undo stack. This mmust be done before
+  // other important objects are deleted, as undo command objects can hold
+  // pointers/references to them!
+  mUndoStack->clear();
+
+  // Disconnect UI from library element to avoid dangling pointers.
   mUi->modelListEditorWidget->setReferences(nullptr, nullptr);
   mUi->footprintEditorWidget->setReferences(nullptr, nullptr);
   mUi->padListEditorWidget->setReferences(nullptr, nullptr);

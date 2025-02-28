@@ -178,6 +178,12 @@ DeviceEditorWidget::DeviceEditorWidget(const Context& context,
 }
 
 DeviceEditorWidget::~DeviceEditorWidget() noexcept {
+  // Delete all command objects in the undo stack. This mmust be done before
+  // other important objects are deleted, as undo command objects can hold
+  // pointers/references to them!
+  mUndoStack->clear();
+
+  // Disconnect UI from library element to avoid dangling pointers.
   mUi->padSignalMapEditorWidget->setReferences(nullptr, nullptr);
   mUi->partsEditorWidget->setReferences(nullptr, nullptr);
   mUi->attributesEditorWidget->setReferences(nullptr, nullptr);
