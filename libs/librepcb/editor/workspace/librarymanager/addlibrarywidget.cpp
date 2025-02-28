@@ -68,7 +68,7 @@ AddLibraryWidget::AddLibraryWidget(Workspace& ws) noexcept
           &AddLibraryWidget::downloadOnlineLibrariesButtonClicked);
   connect(mUi->lblLicenseLink, &QLabel::linkActivated, this,
           [this](const QString& url) {
-            DesktopServices ds(mWorkspace.getSettings(), this);
+            DesktopServices ds(mWorkspace.getSettings());
             ds.openWebUrl(QUrl(url));
           });
   mUi->lblImportNote->setText(

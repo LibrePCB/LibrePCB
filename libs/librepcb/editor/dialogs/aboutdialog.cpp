@@ -202,7 +202,7 @@ AboutDialog::~AboutDialog() noexcept {
  ******************************************************************************/
 
 void AboutDialog::openExternalLink(const QString& url) noexcept {
-  DesktopServices ds(mSettings, this);
+  DesktopServices ds(mSettings);
   ds.openWebUrl(QUrl(url));
 }
 

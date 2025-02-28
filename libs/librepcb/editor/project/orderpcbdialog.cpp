@@ -59,12 +59,12 @@ OrderPcbDialog::OrderPcbDialog(const WorkspaceSettings& settings,
           &OrderPcbDialog::uploadButtonClicked);
   connect(mUi->lblMoreInformation, &QLabel::linkActivated, this,
           [this](const QString& url) {
-            DesktopServices ds(mSettings, this);
+            DesktopServices ds(mSettings);
             ds.openWebUrl(QUrl(url));
           });
   connect(mUi->lblStatus, &QLabel::linkActivated, this,
           [this](const QString& url) {
-            DesktopServices ds(mSettings, this);
+            DesktopServices ds(mSettings);
             ds.openWebUrl(QUrl(url));
           });
 
@@ -74,7 +74,7 @@ OrderPcbDialog::OrderPcbDialog(const WorkspaceSettings& settings,
   mUi->lblNote->setText(mUi->lblNote->text().arg(forumLink));
   connect(mUi->lblNote, &QLabel::linkActivated, this,
           [this](const QString& url) {
-            DesktopServices ds(mSettings, this);
+            DesktopServices ds(mSettings);
             ds.openWebUrl(QUrl(url));
           });
 
@@ -203,7 +203,7 @@ void OrderPcbDialog::uploadSucceeded(const QUrl& redirectUrl) noexcept {
                "Placeholder is an URL with hyperlink.")
                 .arg(hyperlink));
   if (mUi->cbxOpenBrowser->isChecked()) {
-    DesktopServices ds(mSettings, this);
+    DesktopServices ds(mSettings);
     if (ds.openWebUrl(redirectUrl)) {
       // The web browser might need a few seconds to open. Let's keep the dialog
       // open during this time - if the dialog closes immediately but no browser

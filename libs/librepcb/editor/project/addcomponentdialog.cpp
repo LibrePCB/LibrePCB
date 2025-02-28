@@ -418,7 +418,7 @@ void AddComponentDialog::treeComponents_itemDoubleClicked(QTreeWidgetItem* item,
     const auto data =
         item->data(2, Qt::UserRole).value<PartInformationDelegate::Data>();
     if (data.info && data.info->pricingUrl.isValid()) {
-      DesktopServices ds(mSettings, this);
+      DesktopServices ds(mSettings);
       ds.openWebUrl(data.info->pricingUrl);
     }
   } else if (item) {
@@ -465,14 +465,14 @@ void AddComponentDialog::customComponentsContextMenuRequested(
   if (partInfo && partInfo->productUrl.isValid()) {
     menu.addAction(
         cmd.openProductWebsite.createAction(this, this, [this, partInfo]() {
-          DesktopServices ds(mSettings, this);
+          DesktopServices ds(mSettings);
           ds.openWebUrl(partInfo->productUrl);
         }));
   }
   if (partInfo && partInfo->pricingUrl.isValid()) {
     menu.addAction(
         cmd.openPricingWebsite.createAction(this, this, [this, partInfo]() {
-          DesktopServices ds(mSettings, this);
+          DesktopServices ds(mSettings);
           ds.openWebUrl(partInfo->pricingUrl);
         }));
   }
@@ -481,7 +481,7 @@ void AddComponentDialog::customComponentsContextMenuRequested(
         new QAction(QIcon(":/img/actions/pdf.png"),
                     partInfo->resources.first().name + "...", &menu);
     connect(action, &QAction::triggered, this, [this, partInfo]() {
-      DesktopServices ds(mSettings, this);
+      DesktopServices ds(mSettings);
       ds.openWebUrl(partInfo->resources.first().url);
     });
     menu.addAction(action);

@@ -1247,9 +1247,8 @@ void SchematicEditor::execGraphicsExportDialog(
         "schematic_editor/" % settingsKey, this);
     connect(&dialog, &GraphicsExportDialog::requestOpenFile, this,
             [this](const FilePath& fp) {
-              DesktopServices services(
-                  mProjectEditor.getWorkspace().getSettings(), this);
-              services.openLocalPath(fp);
+              DesktopServices ds(mProjectEditor.getWorkspace().getSettings());
+              ds.openLocalPath(fp);
             });
     dialog.exec();
   } catch (const Exception& e) {

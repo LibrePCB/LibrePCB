@@ -165,11 +165,11 @@ ControlPanel::ControlPanel(Workspace& workspace, bool fileFormatIsOutdated)
             if (url.isRelative() && (!searchPaths.isEmpty())) {
               url.setPath(searchPaths.first() % "/" % url.path());
             }
-            DesktopServices ds(mWorkspace.getSettings(), this);
+            DesktopServices ds(mWorkspace.getSettings());
             ds.openWebUrl(url);
           });
   connect(mUi->btnDonate, &QPushButton::clicked, this, [this]() {
-    DesktopServices ds(mWorkspace.getSettings(), this);
+    DesktopServices ds(mWorkspace.getSettings());
     ds.openWebUrl(QUrl("https://librepcb.org/donate/"));
   });
 
@@ -788,7 +788,7 @@ void ControlPanel::on_projectTreeView_doubleClicked(const QModelIndex& index) {
   } else if ((fp.getSuffix() == "lpp") || (fp.getSuffix() == "lppz")) {
     openProject(fp);
   } else {
-    DesktopServices ds(mWorkspace.getSettings(), this);
+    DesktopServices ds(mWorkspace.getSettings());
     ds.openLocalPath(fp);
   }
 }
@@ -837,7 +837,7 @@ void ControlPanel::on_projectTreeView_customContextMenuRequested(
     mb.addAction(cmd.itemOpen.createAction(
                      &menu, this,
                      [this, fp]() {
-                       DesktopServices ds(mWorkspace.getSettings(), this);
+                       DesktopServices ds(mWorkspace.getSettings());
                        ds.openLocalPath(fp);
                      },
                      EditorCommand::ActionFlag::NoShortcuts),

@@ -98,7 +98,7 @@ DeviceInstancePropertiesDialog::DeviceInstancePropertiesDialog(
           .trimmed());
   connect(mUi->lblLibDeviceName, &QLabel::linkActivated, this,
           [this](const QString& url) {
-            DesktopServices ds(mWorkspace.getSettings(), this);
+            DesktopServices ds(mWorkspace.getSettings());
             ds.openLocalPath(FilePath(url));
           });
 
@@ -114,7 +114,7 @@ DeviceInstancePropertiesDialog::DeviceInstancePropertiesDialog(
           .trimmed());
   connect(mUi->lblLibPackageName, &QLabel::linkActivated, this,
           [this](const QString& url) {
-            DesktopServices ds(mWorkspace.getSettings(), this);
+            DesktopServices ds(mWorkspace.getSettings());
             ds.openLocalPath(FilePath(url));
           });
 

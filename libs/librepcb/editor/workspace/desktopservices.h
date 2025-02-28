@@ -55,8 +55,7 @@ public:
   // Constructors / Destructor
   DesktopServices() = delete;
   DesktopServices(const DesktopServices& other) = delete;
-  explicit DesktopServices(const WorkspaceSettings& settings,
-                           QWidget* parent) noexcept;
+  explicit DesktopServices(const WorkspaceSettings& settings) noexcept;
   ~DesktopServices() noexcept;
 
   // General Methods
@@ -83,7 +82,6 @@ private:  // Methods
 
 private:  // Data
   const WorkspaceSettings& mSettings;
-  QPointer<QWidget> mParent;
 };
 
 /*******************************************************************************
