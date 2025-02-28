@@ -124,16 +124,18 @@ public:
   // Getters
 
   /**
-   * @brief Get the text for the undo action
-   * @return The text in the user's language ("Undo" if undo is not possible)
+   * @brief Get the text of the undo command
+   *
+   * @return Undo command text (empty if N/A)
    */
-  QString getUndoText() const noexcept;
+  QString getUndoCmdText() const noexcept;
 
   /**
-   * @brief Get the text for the redo action
-   * @return The text in the user's language ("Redo" if redo is not possible)
+   * @brief Get the text of the redo command
+   *
+   * @return Redo command text (empty if N/A)
    */
-  QString getRedoText() const noexcept;
+  QString getRedoCmdText() const noexcept;
 
   /**
    * @brief Check if undo is possible
@@ -291,13 +293,7 @@ public:
   void clear() noexcept;
 
 signals:
-  void undoTextChanged(const QString& text);
-  void redoTextChanged(const QString& text);
-  void canUndoChanged(bool canUndo);
-  void canRedoChanged(bool canRedo);
   void cleanChanged(bool clean);
-  void commandGroupEnded();
-  void commandGroupAborted();
   void stateModified();
 
 private:
