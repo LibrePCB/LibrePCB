@@ -161,6 +161,11 @@ public:
    */
   bool processSwitchToBoard(int index) noexcept;
 
+  /**
+   * @brief Notification about a switched board
+   */
+  void processSwitchedBoard() noexcept;
+
   // Operator Overloadings
   BoardEditorFsm& operator=(const BoardEditorFsm& rhs) = delete;
 

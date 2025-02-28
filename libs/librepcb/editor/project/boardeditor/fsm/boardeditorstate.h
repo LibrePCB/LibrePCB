@@ -173,6 +173,7 @@ public:
     Q_UNUSED(index);
     return false;  // Do NOT allow switching board by default
   }
+  virtual void processSwitchedBoard() noexcept {}
 
   // Operator Overloadings
   BoardEditorState& operator=(const BoardEditorState& rhs) = delete;

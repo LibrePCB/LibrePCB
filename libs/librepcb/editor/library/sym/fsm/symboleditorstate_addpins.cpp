@@ -24,6 +24,7 @@
 
 #include "../../../dialogs/circuitidentifierimportdialog.h"
 #include "../../../editorcommandset.h"
+#include "../../../graphics/graphicsscene.h"
 #include "../../../widgets/graphicsview.h"
 #include "../../../widgets/unsignedlengthedit.h"
 #include "../../cmd/cmdsymbolpinedit.h"
@@ -99,8 +100,8 @@ bool SymbolEditorState_AddPins::entry() noexcept {
           &SymbolEditorState_AddPins::execMassImport);
   mContext.commandToolBar.addWidget(std::move(toolButtonImport));
 
-  Point pos =
-      mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos(), true, true);
+  const Point pos = mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos())
+                        .mappedToGrid(mContext.graphicsScene.getGridInterval());
   if (!addNextPin(pos)) {
     return false;
   }
