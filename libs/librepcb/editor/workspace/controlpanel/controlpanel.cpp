@@ -162,10 +162,8 @@ ControlPanel::ControlPanel(Workspace& workspace, bool fileFormatIsOutdated)
             DesktopServices ds(mWorkspace.getSettings());
             ds.openWebUrl(url);
           });
-  connect(mUi->btnDonate, &QPushButton::clicked, this, [this]() {
-    DesktopServices ds(mWorkspace.getSettings());
-    ds.openWebUrl(QUrl("https://librepcb.org/donate/"));
-  });
+  connect(mUi->btnDonate, &QPushButton::clicked, mStandardCommandHandler.get(),
+          &StandardEditorCommandHandler::onlineDonate);
 
   // load project models
   mRecentProjectsModel.reset(new RecentProjectsModel(mWorkspace));
