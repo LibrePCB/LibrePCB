@@ -182,6 +182,11 @@ SymbolEditorWidget::~SymbolEditorWidget() noexcept {
   mFsm->processAbortCommand();
   mFsm->processAbortCommand();
   mFsm.reset();
+
+  // Delete all command objects in the undo stack. This mmust be done before
+  // other important objects are deleted, as undo command objects can hold
+  // pointers/references to them!
+  mUndoStack->clear();
 }
 
 /*******************************************************************************
