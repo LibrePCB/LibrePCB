@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/network/apiendpoint.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -73,7 +74,7 @@ signals:
   void libraryAdded(const FilePath& libDir);
 
 private:  // Methods
-  void onlineLibraryListReceived(const QJsonArray& libs) noexcept;
+  void onlineLibraryListReceived(QList<ApiEndpoint::Library> libs) noexcept;
   void errorWhileFetchingLibraryList(const QString& errorMsg) noexcept;
   void clearOnlineLibraryList() noexcept;
   void repoLibraryDownloadCheckedChanged(bool checked) noexcept;
