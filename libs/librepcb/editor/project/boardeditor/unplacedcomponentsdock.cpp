@@ -99,14 +99,18 @@ UnplacedComponentsDock::UnplacedComponentsDock(ProjectEditor& editor,
             ds.openWebUrl(QUrl(url));
           });
 
-  // Setup graphics view.
+  // Setup graphics scene.
   const Theme& theme =
       mProjectEditor.getWorkspace().getSettings().themes.getActive();
-  mUi->graphicsView->setBackgroundColors(
+  mPreviewGraphicsScene->setBackgroundColors(
       theme.getColor(Theme::Color::sBoardBackground).getPrimaryColor(),
       theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor());
-  mUi->graphicsView->setGridStyle(theme.getBoardGridStyle());
-  mUi->graphicsView->setOriginCrossVisible(false);
+  mPreviewGraphicsScene->setGridStyle(theme.getBoardGridStyle());
+  mPreviewGraphicsScene->setOriginCrossVisible(false);
+
+  // Setup graphics view.
+  mUi->graphicsView->setSpinnerColor(
+      theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor());
   mUi->graphicsView->setScene(mPreviewGraphicsScene.data());
 
   // Restore UI settings.

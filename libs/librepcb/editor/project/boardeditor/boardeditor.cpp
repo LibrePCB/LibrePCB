@@ -135,16 +135,11 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
   // Setup graphics view.
   const Theme& theme =
       mProjectEditor.getWorkspace().getSettings().themes.getActive();
-  mUi->graphicsView->setBackgroundColors(
-      theme.getColor(Theme::Color::sBoardBackground).getPrimaryColor(),
+  mUi->graphicsView->setSpinnerColor(
       theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor());
-  mUi->graphicsView->setOverlayColors(
-      theme.getColor(Theme::Color::sBoardOverlays).getPrimaryColor(),
-      theme.getColor(Theme::Color::sBoardOverlays).getSecondaryColor());
   mUi->graphicsView->setInfoBoxColors(
       theme.getColor(Theme::Color::sBoardInfoBox).getPrimaryColor(),
       theme.getColor(Theme::Color::sBoardInfoBox).getSecondaryColor());
-  mUi->graphicsView->setGridStyle(theme.getBoardGridStyle());
   mUi->graphicsView->setUseOpenGl(
       mProjectEditor.getWorkspace().getSettings().useOpenGl.get());
   mUi->graphicsView->setEventHandlerObject(this);
@@ -329,22 +324,29 @@ bool BoardEditor::setActiveBoardIndex(int index) noexcept {
       updateEnabledCopperLayers();
       loadLayersVisibility();
       // show scene, restore view scene rect, set grid properties
-      mGraphicsScene.reset(new BoardGraphicsScene(
-          *mActiveBoard, *this, mProjectEditor.getHighlightedNetSignals()));
-      connect(&mProjectEditor, &ProjectEditor::highlightedNetSignalsChanged,
-              mGraphicsScene.data(),
-              &BoardGraphicsScene::updateHighlightedNetSignals);
       const Theme& theme =
           mProjectEditor.getWorkspace().getSettings().themes.getActive();
+      mGraphicsScene.reset(new BoardGraphicsScene(
+          *mActiveBoard, *this, mProjectEditor.getHighlightedNetSignals()));
+      mGraphicsScene->setBackgroundColors(
+          theme.getColor(Theme::Color::sBoardBackground).getPrimaryColor(),
+          theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor());
+      mGraphicsScene->setOverlayColors(
+          theme.getColor(Theme::Color::sBoardOverlays).getPrimaryColor(),
+          theme.getColor(Theme::Color::sBoardOverlays).getSecondaryColor());
       mGraphicsScene->setSelectionRectColors(
           theme.getColor(Theme::Color::sBoardSelection).getPrimaryColor(),
           theme.getColor(Theme::Color::sBoardSelection).getSecondaryColor());
+      mGraphicsScene->setGridStyle(theme.getBoardGridStyle());
+      mGraphicsScene->setGridInterval(mActiveBoard->getGridInterval());
+      connect(&mProjectEditor, &ProjectEditor::highlightedNetSignalsChanged,
+              mGraphicsScene.data(),
+              &BoardGraphicsScene::updateHighlightedNetSignals);
       mUi->graphicsView->setScene(mGraphicsScene.data());
       const QRectF sceneRect = mVisibleSceneRect.value(mActiveBoard->getUuid());
       if (!sceneRect.isEmpty()) {
         mUi->graphicsView->setVisibleSceneRect(sceneRect);
       }
-      mUi->graphicsView->setGridInterval(mActiveBoard->getGridInterval());
       mUi->statusbar->setLengthUnit(mActiveBoard->getGridUnit());
       // force airwire rebuild immediately and on every project modification
       mActiveBoard->triggerAirWiresRebuild();
@@ -372,6 +374,7 @@ bool BoardEditor::setActiveBoardIndex(int index) noexcept {
   }
 
   // update GUI
+  mFsm->processSwitchedBoard();
   mUi->tabBar->setCurrentIndex(index);
   if (QAction* action = mBoardActionGroup->actions().value(index)) {
     action->setChecked(true);
@@ -682,18 +685,20 @@ void BoardEditor::createActions() noexcept {
   mActionGridProperties.reset(cmd.gridProperties.createAction(
       this, this, &BoardEditor::execGridPropertiesDialog));
   mActionGridIncrease.reset(cmd.gridIncrease.createAction(this, this, [this]() {
-    if (const Board* board = getActiveBoard()) {
+    const Board* board = getActiveBoard();
+    if (board && mGraphicsScene) {
       const Length interval = board->getGridInterval() * 2;
       setGridProperties(PositiveLength(interval), board->getGridUnit(),
-                        mUi->graphicsView->getGridStyle(), true);
+                        mGraphicsScene->getGridStyle(), true);
     }
   }));
   mActionGridDecrease.reset(cmd.gridDecrease.createAction(this, this, [this]() {
-    if (const Board* board = getActiveBoard()) {
+    const Board* board = getActiveBoard();
+    if (board && mGraphicsScene) {
       const Length interval = *board->getGridInterval();
       if ((interval % 2) == 0) {
         setGridProperties(PositiveLength(interval / 2), board->getGridUnit(),
-                          mUi->graphicsView->getGridStyle(), true);
+                          mGraphicsScene->getGridStyle(), true);
       }
     }
   }));
@@ -735,34 +740,42 @@ void BoardEditor::createActions() noexcept {
   mActionPaste.reset(cmd.clipboardPaste.createAction(
       this, mFsm.data(), &BoardEditorFsm::processPaste));
   mActionMoveLeft.reset(cmd.moveLeft.createAction(this, this, [this]() {
-    if (!mFsm->processMove(Point(-mUi->graphicsView->getGridInterval(), 0))) {
-      // Workaround for consumed keyboard shortcuts for scrolling.
-      mUi->graphicsView->horizontalScrollBar()->triggerAction(
-          QScrollBar::SliderSingleStepSub);
+    if (const Board* board = getActiveBoard()) {
+      if (!mFsm->processMove(Point(-board->getGridInterval(), 0))) {
+        // Workaround for consumed keyboard shortcuts for scrolling.
+        mUi->graphicsView->horizontalScrollBar()->triggerAction(
+            QScrollBar::SliderSingleStepSub);
+      }
     }
   }));
   addAction(mActionMoveLeft.data());
   mActionMoveRight.reset(cmd.moveRight.createAction(this, this, [this]() {
-    if (!mFsm->processMove(Point(*mUi->graphicsView->getGridInterval(), 0))) {
-      // Workaround for consumed keyboard shortcuts for scrolling.
-      mUi->graphicsView->horizontalScrollBar()->triggerAction(
-          QScrollBar::SliderSingleStepAdd);
+    if (const Board* board = getActiveBoard()) {
+      if (!mFsm->processMove(Point(*board->getGridInterval(), 0))) {
+        // Workaround for consumed keyboard shortcuts for scrolling.
+        mUi->graphicsView->horizontalScrollBar()->triggerAction(
+            QScrollBar::SliderSingleStepAdd);
+      }
     }
   }));
   addAction(mActionMoveRight.data());
   mActionMoveUp.reset(cmd.moveUp.createAction(this, this, [this]() {
-    if (!mFsm->processMove(Point(0, *mUi->graphicsView->getGridInterval()))) {
-      // Workaround for consumed keyboard shortcuts for scrolling.
-      mUi->graphicsView->verticalScrollBar()->triggerAction(
-          QScrollBar::SliderSingleStepSub);
+    if (const Board* board = getActiveBoard()) {
+      if (!mFsm->processMove(Point(0, *board->getGridInterval()))) {
+        // Workaround for consumed keyboard shortcuts for scrolling.
+        mUi->graphicsView->verticalScrollBar()->triggerAction(
+            QScrollBar::SliderSingleStepSub);
+      }
     }
   }));
   addAction(mActionMoveUp.data());
   mActionMoveDown.reset(cmd.moveDown.createAction(this, this, [this]() {
-    if (!mFsm->processMove(Point(0, -mUi->graphicsView->getGridInterval()))) {
-      // Workaround for consumed keyboard shortcuts for scrolling.
-      mUi->graphicsView->verticalScrollBar()->triggerAction(
-          QScrollBar::SliderSingleStepAdd);
+    if (const Board* board = getActiveBoard()) {
+      if (!mFsm->processMove(Point(0, -board->getGridInterval()))) {
+        // Workaround for consumed keyboard shortcuts for scrolling.
+        mUi->graphicsView->verticalScrollBar()->triggerAction(
+            QScrollBar::SliderSingleStepAdd);
+      }
     }
   }));
   addAction(mActionMoveDown.data());
@@ -1382,7 +1395,7 @@ void BoardEditor::highlightDrcMessage(const RuleCheckMessage& msg,
   if (msg.getLocations().isEmpty()) {
     // Position on board not known.
     clearDrcMarker();
-  } else if (QGraphicsScene* scene = mUi->graphicsView->scene()) {
+  } else if (mGraphicsScene) {
     const ThemeColor& color =
         mProjectEditor.getWorkspace().getSettings().themes.getActive().getColor(
             Theme::Color::sBoardOverlays);
@@ -1392,12 +1405,12 @@ void BoardEditor::highlightDrcMessage(const RuleCheckMessage& msg,
     mDrcLocationGraphicsItem->setPen(QPen(color.getPrimaryColor(), 0));
     mDrcLocationGraphicsItem->setBrush(color.getSecondaryColor());
     mDrcLocationGraphicsItem->setPath(path);
-    scene->addItem(mDrcLocationGraphicsItem.data());
+    mGraphicsScene->addItem(*mDrcLocationGraphicsItem.data());
 
     qreal margin = Length(1000000).toPx();
     QRectF rect = path.boundingRect();
     rect.adjust(-margin, -margin, margin, margin);
-    mUi->graphicsView->setSceneRectMarker(rect);
+    mGraphicsScene->setSceneRectMarker(rect);
     if (zoomTo) {
       mUi->graphicsView->zoomToRect(rect);
     }
@@ -1415,7 +1428,9 @@ void BoardEditor::setDrcMessageApproved(const RuleCheckMessage& msg,
 
 void BoardEditor::clearDrcMarker() noexcept {
   mDrcLocationGraphicsItem.reset();
-  mUi->graphicsView->setSceneRectMarker(QRectF());
+  if (mGraphicsScene) {
+    mGraphicsScene->setSceneRectMarker(QRectF());
+  }
 }
 
 QList<BI_Device*> BoardEditor::getSearchCandidates() noexcept {
@@ -1633,8 +1648,11 @@ void BoardEditor::setGridProperties(const PositiveLength& interval,
                                     const LengthUnit& unit,
                                     Theme::GridStyle style,
                                     bool applyToBoard) noexcept {
-  mUi->graphicsView->setGridInterval(interval);
-  mUi->graphicsView->setGridStyle(style);
+  if (mGraphicsScene) {
+    mGraphicsScene->setGridInterval(interval);
+    mGraphicsScene->setGridStyle(style);
+  }
+
   mUi->statusbar->setLengthUnit(unit);
 
   // In contrast to schematics, apply the grid only on the currently active
@@ -1647,9 +1665,10 @@ void BoardEditor::setGridProperties(const PositiveLength& interval,
 }
 
 void BoardEditor::execGridPropertiesDialog() noexcept {
-  if (Board* board = getActiveBoard()) {
+  Board* board = getActiveBoard();
+  if (board && mGraphicsScene) {
     GridSettingsDialog dialog(board->getGridInterval(), board->getGridUnit(),
-                              mUi->graphicsView->getGridStyle(), this);
+                              mGraphicsScene->getGridStyle(), this);
     connect(&dialog, &GridSettingsDialog::gridPropertiesChanged,
             [this](const PositiveLength& interval, const LengthUnit& unit,
                    Theme::GridStyle style) {

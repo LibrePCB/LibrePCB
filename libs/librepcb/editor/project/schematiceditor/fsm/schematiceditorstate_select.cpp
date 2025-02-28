@@ -795,8 +795,8 @@ bool SchematicEditorState_Select::copySelectedItemsToClipboard() noexcept {
   if (!scene) return false;
 
   try {
-    Point cursorPos = mContext.editorGraphicsView.mapGlobalPosToScenePos(
-        QCursor::pos(), true, false);
+    const Point cursorPos =
+        mContext.editorGraphicsView.mapGlobalPosToScenePos(QCursor::pos());
     SchematicClipboardDataBuilder builder(*scene);
     std::unique_ptr<SchematicClipboardData> data = builder.generate(cursorPos);
     qApp->clipboard()->setMimeData(data->toMimeData().release());
@@ -821,8 +821,8 @@ bool SchematicEditorState_Select::pasteFromClipboard() noexcept {
     }
 
     // update cursor position
-    mStartPos = mContext.editorGraphicsView.mapGlobalPosToScenePos(
-        QCursor::pos(), true, false);
+    mStartPos =
+        mContext.editorGraphicsView.mapGlobalPosToScenePos(QCursor::pos());
 
     // start undo command group
     scene->clearSelection();
