@@ -39,7 +39,6 @@ class Workspace;
 
 namespace editor {
 
-class GraphicsView;
 class ProjectEditor;
 class SchematicEditor;
 class SchematicEditorState;
