@@ -142,6 +142,10 @@ public:
   RuleCheckListItemWidget(const RuleCheckListItemWidget& other) = delete;
   ~RuleCheckListItemWidget() noexcept {}
 
+  void setSelected(bool selected) noexcept {
+    setStyleSheet(selected ? "QLabel{color: palette(highlighted-text);}" : "");
+  }
+
   // Operator Overloadings
   RuleCheckListItemWidget& operator=(const RuleCheckListItemWidget& rhs) =
       delete;
