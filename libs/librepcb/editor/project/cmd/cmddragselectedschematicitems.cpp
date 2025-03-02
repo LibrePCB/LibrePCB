@@ -28,8 +28,8 @@
 #include "../../project/cmd/cmdschematicnetpointedit.h"
 #include "../../project/cmd/cmdsymbolinstanceedit.h"
 #include "../../project/cmd/cmdsymbolinstancetextsreset.h"
-#include "../schematiceditor/schematicgraphicsscene.h"
-#include "../schematiceditor/schematicselectionquery.h"
+#include "../schematic/schematicgraphicsscene.h"
+#include "../schematic/schematicselectionquery.h"
 
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/schematic/items/si_netlabel.h>

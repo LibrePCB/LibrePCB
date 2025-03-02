@@ -24,9 +24,9 @@
 
 #include "../dialogs/filedialog.h"
 #include "../undostack.h"
-#include "boardeditor/boardeditor.h"
+#include "board/boardeditor.h"
 #include "orderpcbdialog.h"
-#include "schematiceditor/schematiceditor.h"
+#include "schematic/schematiceditor.h"
 
 #include <librepcb/core/application.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
