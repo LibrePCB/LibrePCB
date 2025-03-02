@@ -24,7 +24,7 @@
 #include <librepcb/core/attribute/attrtypestring.h>
 #include <librepcb/core/attribute/attrtypevoltage.h>
 #include <librepcb/core/types/layer.h>
-#include <librepcb/editor/project/schematiceditor/schematicclipboarddata.h>
+#include <librepcb/editor/project/schematic/schematicclipboarddata.h>
 
 #include <QtCore>
 
