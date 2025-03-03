@@ -26,7 +26,7 @@
 #include "../../dialogs/graphicsexportdialog.h"
 #include "../../graphics/graphicslayer.h"
 #include "../../widgets/if_graphicsvieweventhandler.h"
-#include "ui_schematiceditor.h"
+#include "fsm/schematiceditorfsmadapter.h"
 
 #include <librepcb/core/serialization/fileformatmigration.h>
 #include <librepcb/core/workspace/theme.h>
@@ -70,6 +70,7 @@ class SchematicEditor;
  * @brief The SchematicEditor class
  */
 class SchematicEditor final : public QMainWindow,
+                              public SchematicEditorFsmAdapter,
                               public IF_GraphicsLayerProvider,
                               public IF_GraphicsViewEventHandler {
   Q_OBJECT
@@ -112,6 +113,34 @@ public:
   // General Methods
   void abortAllCommands() noexcept;
   void abortBlockingToolsInOtherEditors() noexcept;
+
+  // SchematicEditorFsmAdapter
+  Schematic* fsmGetActiveSchematic() noexcept override;
+  SchematicGraphicsScene* fsmGetGraphicsScene() noexcept override;
+  void fsmSetViewCursor(
+      const std::optional<Qt::CursorShape>& shape) noexcept override;
+  void fsmSetViewGrayOut(bool grayOut) noexcept override;
+  void fsmSetViewInfoBoxText(const QString& text) noexcept override;
+  void fsmSetViewRuler(
+      const std::optional<std::pair<Point, Point>>& pos) noexcept override;
+  void fsmSetSceneCursor(const Point& pos, bool cross,
+                         bool circle) noexcept override;
+  QPainterPath fsmCalcPosWithTolerance(
+      const Point& pos, qreal multiplier) const noexcept override;
+  Point fsmMapGlobalPosToScenePos(const QPoint& pos) const noexcept override;
+  void fsmSetHighlightedNetSignals(
+      const QSet<const NetSignal*>& sigs) noexcept override;
+  void fsmAbortBlockingToolsInOtherEditors() noexcept override;
+  void fsmSetStatusBarMessage(const QString& message,
+                              int timeoutMs = -1) noexcept override;
+  void fsmToolLeave() noexcept override;
+  void fsmToolEnter(SchematicEditorState_Select& state) noexcept override;
+  void fsmToolEnter(SchematicEditorState_DrawWire& state) noexcept override;
+  void fsmToolEnter(SchematicEditorState_AddNetLabel& state) noexcept override;
+  void fsmToolEnter(SchematicEditorState_AddComponent& state) noexcept override;
+  void fsmToolEnter(SchematicEditorState_DrawPolygon& state) noexcept override;
+  void fsmToolEnter(SchematicEditorState_AddText& state) noexcept override;
+  void fsmToolEnter(SchematicEditorState_Measure& state) noexcept override;
 
   // Operator Overloadings
   SchematicEditor& operator=(const SchematicEditor& rhs) = delete;

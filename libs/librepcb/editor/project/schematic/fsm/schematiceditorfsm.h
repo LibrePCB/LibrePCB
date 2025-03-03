@@ -32,18 +32,19 @@
 namespace librepcb {
 
 class Angle;
+class NetSignal;
 class Point;
 class Project;
+class Schematic;
 class Uuid;
 class Workspace;
 
 namespace editor {
 
 class GraphicsView;
-class ProjectEditor;
-class SchematicEditor;
+class SchematicEditorFsmAdapter;
 class SchematicEditorState;
-class ToolBarProxy;
+class SchematicGraphicsScene;
 class UndoStack;
 
 /*******************************************************************************
@@ -57,6 +58,15 @@ class SchematicEditorFsm final : public QObject {
   Q_OBJECT
 
 public:
+  /// FSM Context
+  struct Context {
+    Workspace& workspace;
+    Project& project;
+    UndoStack& undoStack;
+    QWidget& parentWidget;
+    SchematicEditorFsmAdapter& adapter;
+  };
+
   /// FSM States
   enum State {
     /// no state active
@@ -77,26 +87,12 @@ public:
     MEASURE,
   };
 
-  /// FSM Context
-  struct Context {
-    Workspace& workspace;
-    Project& project;
-    ProjectEditor& projectEditor;
-    SchematicEditor& editor;
-    GraphicsView& editorGraphicsView;
-    ToolBarProxy& commandToolBar;
-    UndoStack& undoStack;
-  };
-
   // Constructors / Destructor
   SchematicEditorFsm() = delete;
   SchematicEditorFsm(const SchematicEditorFsm& other) = delete;
   explicit SchematicEditorFsm(const Context& context,
                               QObject* parent = nullptr) noexcept;
   virtual ~SchematicEditorFsm() noexcept;
-
-  // Getters
-  State getCurrentState() const noexcept { return mCurrentState; }
 
   // Event Handlers
   bool processSelect() noexcept;
@@ -156,10 +152,6 @@ public:
   // Operator Overloadings
   SchematicEditorFsm& operator=(const SchematicEditorFsm& rhs) = delete;
 
-signals:
-  void stateChanged(State newState);
-  void statusBarMessageChanged(const QString& message, int timeoutMs = -1);
-
 private:
   SchematicEditorState* getCurrentStateObj() const noexcept;
   bool setNextState(State state) noexcept;
@@ -179,7 +171,5 @@ private:  // Data
 
 }  // namespace editor
 }  // namespace librepcb
-
-Q_DECLARE_METATYPE(librepcb::editor::SchematicEditorFsm::State)
 
 #endif

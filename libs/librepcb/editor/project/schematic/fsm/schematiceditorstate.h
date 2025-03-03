@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "schematiceditorfsm.h"
+#include "schematiceditorfsmadapter.h"
 
 #include <librepcb/core/types/length.h>
 
@@ -167,9 +168,6 @@ public:
   // Operator Overloadings
   SchematicEditorState& operator=(const SchematicEditorState& rhs) = delete;
 
-signals:
-  void statusBarMessageChanged(const QString& message, int timeoutMs = -1);
-
 protected:  // Methods
   Schematic* getActiveSchematic() noexcept;
   SchematicGraphicsScene* getActiveSchematicScene() noexcept;
@@ -199,6 +197,7 @@ protected:  // Methods
 
 protected:  // Data
   Context mContext;
+  SchematicEditorFsmAdapter& mAdapter;
 };
 
 }  // namespace editor
