@@ -1,0 +1,28 @@
+import { Palette } from "std-widgets.slint";
+import { ToolTip } from "./tooltip.slint";
+
+export component ListViewItemButton inherits TouchArea {
+    in property <image> icon;
+    in property <float> icon-scale: 0.8;
+    in property <string> tooltip;
+    in property <color> colorize: transparent;
+
+    width: self.height;
+    mouse-cursor: pointer;
+
+    Image {
+        x: (parent.width - self.width) / 2;
+        y: self.x;
+        width: self.height;
+        height: parent.height * icon-scale * (root.pressed ? 0.85 : 1.0);
+        image-fit: contain;
+        source: icon;
+        colorize: (colorize != transparent) ? colorize : (root.has-hover ? white : (root.enabled ? Palette.foreground : #707070));
+    }
+
+    if self.has-hover && (!tooltip.is-empty): ToolTip {
+        x: -self.width - 5px;
+        y: (parent.height - self.height) / 2;
+        text: tooltip;
+    }
+}

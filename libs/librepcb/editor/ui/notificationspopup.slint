@@ -1,0 +1,197 @@
+import { Palette, ProgressIndicator, Button } from "std-widgets.slint";
+import { NotificationData, NotificationType } from "./api/types.slint";
+import { Data } from "./api/data.slint";
+
+component Item inherits TouchArea {
+    in property <int> index;
+    in property <NotificationData> notification;
+    in property <bool> popup-shown: false;
+    property <bool> highlight: notification.unread;
+
+    callback button-clicked();
+
+    changed popup-shown => {
+        if !popup-shown {
+            Data.notifications[index].unread = false;
+        }
+    }
+
+    Rectangle {
+        background: parent.has-hover ? #3a3a3a : Palette.background;
+        border-color: highlight ? #29d682 : transparent;
+        border-width: 1px;
+
+        animate border-color { duration: 100ms; }
+
+        HorizontalLayout {
+            padding-left: 10px;
+            padding-right: 20px;
+            spacing: 10px;
+
+            Image {
+                y: (t-title.y + t-title.height / 2) - (self.height / 2);
+                width: self.height;
+                height: t-title.preferred-height;
+                source: Data.get-icon-for-notification-type(notification.type);
+                colorize: Data.get-color-for-notification-type(notification.type);
+            }
+
+            VerticalLayout {
+                padding-top: 10px;
+                padding-bottom: 10px;
+                spacing: 5px;
+
+                t-title := Text {
+                    font-size: 16px;
+                    font-weight: highlight ? 700 : 400;
+                    color: highlight ? white : Palette.foreground;
+                    text: notification.title;
+
+                    animate color { duration: 500ms; }
+                }
+
+                Text {
+                    font-size: 12px;
+                    color: highlight ? white : Palette.foreground;
+                    wrap: word-wrap;
+                    text: notification.description;
+
+                    animate color { duration: 500ms; }
+                }
+
+                if notification.type == NotificationType.progress: ProgressIndicator {
+                    progress: notification.progress / 100;
+                }
+
+                if !notification.button-text.is-empty: HorizontalLayout {
+                    alignment: start;
+
+                    Button {
+                        enabled: !notification.button-clicked;
+                        text: notification.button-text;
+
+                        clicked => {
+                            Data.notifications[index].button-clicked = true;
+                            button-clicked();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if self.has-hover && notification.supports-dont-show-again: Text {
+        x: i-close.x - self.width - self.y;
+        y: (i-close.y + i-close.height / 2) - (self.height / 2);
+        color: ta-dont-show-again.has-hover ? white : #909090;
+        font-size: 10px;
+        text: @tr("Don't show again");
+        visible: !notification.dont-show-again;  // Just for the preview.
+
+        ta-dont-show-again := TouchArea {
+            mouse-cursor: pointer;
+
+            clicked => {
+                Data.notifications[index].dont-show-again = true;
+            }
+        }
+    }
+
+    i-close := Image {
+        x: parent.width - self.width - self.y;
+        y: 8px;
+        width: self.height;
+        height: 20px;
+        source: @image-url("../../../../img/close.svg");
+        colorize: ta-close.has-hover ? white : #909090;
+        visible: !notification.dismissed;  // Just for the preview.
+
+        ta-close := TouchArea {
+            mouse-cursor: pointer;
+
+            clicked => {
+                Data.notifications[index].dismissed = true;
+            }
+        }
+    }
+}
+
+export component NotificationsPopup inherits Rectangle {
+    in property <bool> popup-shown: false;
+    property <int> max-items: 8;
+    property <int> hidden-items: max(Data.notifications.length - max-items, 0);
+
+    callback close-requested();
+
+    VerticalLayout {
+        Rectangle {
+            background: black;
+
+            HorizontalLayout {
+                padding: 5px;
+                padding-right: 8px;
+
+                Text {
+                    font-weight: 600;
+                    vertical-alignment: center;
+                    text: @tr("Notifications");
+                }
+
+                TouchArea {
+                    width: 11px;
+                    height: self.width;
+
+                    Image {
+                        y: 2px;
+                        width: 100%;
+                        height: 100%;
+                        image-fit: ImageFit.cover;
+                        source: @image-url("../../../../img/angle-right-solid.svg");
+                        colorize: parent.has-hover ? white : Palette.foreground;
+                        rotation-angle: 90deg;
+                    }
+
+                    clicked => {
+                        close-requested();
+                    }
+                }
+            }
+        }
+
+        for notification[i] in Data.notifications: VerticalLayout {
+            if i > 0: Rectangle {
+                x: 0;
+                width: 100%;
+                height: 3px;
+                background: Palette.background;
+
+                Rectangle {
+                    x: 0;
+                    y: parent.height / 2;
+                    width: 100%;
+                    height: 1px;
+                    background: #505050;
+                }
+            }
+
+            Item {
+                index: i;
+                notification: notification;
+                popup-shown <=> popup-shown;
+            }
+        }
+
+        if (Data.preview-mode || (hidden-items > 0)): Rectangle {
+            width: 100%;
+            height: t-hidden-messages.preferred-height + 2 * t-hidden-messages.y;
+            background: Palette.background;
+
+            t-hidden-messages := Text {
+                x: 8px;
+                y: 8px;
+                width: parent.width - 2 * self.x;
+                text: @tr("Too many notifications to display ({} hidden).", hidden-items);
+            }
+        }
+    }
+}

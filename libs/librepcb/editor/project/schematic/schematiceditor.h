@@ -141,6 +141,7 @@ public:
   void fsmToolEnter(SchematicEditorState_DrawPolygon& state) noexcept override;
   void fsmToolEnter(SchematicEditorState_AddText& state) noexcept override;
   void fsmToolEnter(SchematicEditorState_Measure& state) noexcept override;
+  void fsmSetFeatures(Features features) noexcept override;
 
   // Operator Overloadings
   SchematicEditor& operator=(const SchematicEditor& rhs) = delete;

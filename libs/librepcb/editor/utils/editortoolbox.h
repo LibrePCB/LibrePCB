@@ -24,12 +24,18 @@
  *  Includes
  ******************************************************************************/
 #include <librepcb/core/library/resource.h>
+#include <librepcb/core/types/elementname.h>
+#include <librepcb/core/types/fileproofname.h>
 #include <librepcb/core/types/uuid.h>
+#include <librepcb/core/types/version.h>
+#include <librepcb/core/workspace/theme.h>
 
 #include <QtCore>
+#include <QtGui>
 #include <QtWidgets>
 
 #include <optional>
+#include <slint.h>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -43,6 +49,59 @@ class WorkspaceLibraryDb;
 namespace editor {
 
 class MenuBuilder;
+
+/*******************************************************************************
+ *  Non-Member Functions
+ ******************************************************************************/
+
+int q2s(int i) noexcept;
+slint::LogicalPosition q2s(const QPointF& p) noexcept;
+slint::PhysicalPosition q2s(const QPoint& p) noexcept;
+slint::PhysicalSize q2s(const QSize& s) noexcept;
+slint::SharedString q2s(const QString& s) noexcept;
+slint::Image q2s(const QPixmap& p) noexcept;
+slint::Color q2s(const QColor& c) noexcept;
+slint::cbindgen_private::MouseCursor q2s(Qt::CursorShape s) noexcept;
+
+QPointF s2q(const slint::LogicalPosition& p) noexcept;
+QPoint s2q(const slint::PhysicalPosition& p) noexcept;
+QSize s2q(const slint::PhysicalSize& s) noexcept;
+QString s2q(const slint::SharedString& s) noexcept;
+Qt::MouseButton s2q(const slint::private_api::PointerEventButton& b) noexcept;
+
+bool operator==(const QString& s1, const slint::SharedString& s2) noexcept;
+bool operator!=(const QString& s1, const slint::SharedString& s2) noexcept;
+bool operator==(const slint::SharedString& s1, const QString& s2) noexcept;
+bool operator!=(const slint::SharedString& s1, const QString& s2) noexcept;
+
+template <typename TTarget, typename TSlint, typename TClass, typename TQt>
+static void bind(
+    QObject* context, const TTarget& target,
+    void (TTarget::*setter)(const TSlint&) const, TClass* source,
+    void (TClass::*signal)(TQt), const TQt& defaultValue,
+    std::function<TSlint(const TQt&)> convert = [](const TQt& value) {
+      return q2s(value);
+    }) noexcept {
+  QObject::connect(source, signal, context,
+                   [&target, setter, convert](const TQt& value) {
+                     (target.*setter)(convert(value));
+                   });
+  (target.*setter)(convert(defaultValue));
+}
+
+std::optional<ElementName> validateElementName(
+    const QString& input, slint::SharedString& error) noexcept;
+
+std::optional<Version> validateVersion(const QString& input,
+                                       slint::SharedString& error) noexcept;
+
+std::optional<FileProofName> validateFileProofName(
+    const QString& input, slint::SharedString& error,
+    const QString& requiredSuffix = QString()) noexcept;
+
+std::optional<QUrl> validateUrl(const QString& input,
+                                slint::SharedString& error,
+                                bool allowEmpty = false) noexcept;
 
 /*******************************************************************************
  *  Class EditorToolbox

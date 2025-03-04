@@ -1,22 +1,26 @@
 # Images
 
-This directory contains all images which are required in the LibrePCB
-application or other tools.
+## Sources
 
-- Most images are from the
-  [Open Icon Library](http://openiconlibrary.sourceforge.net/)
-- Some images are from https://fontawesome.com/ (only Free icons!)
-- Some images are from https://www.iconfinder.com/
-- Some images are from https://icons8.com/ (we may use those icons under the
-  free license since we attribute icons8 in the about dialog)
+Preferred sources of images (best at top):
 
-## Adding New Images
+1. https://icons.getbootstrap.com/
+2. https://fontawesome.com/icons (only the free icons!)
 
-- Only use icons licensed under a *really* free license! Don't use Icons8
-  anymore as the license is not really free.
-- For toolbar icons, use 64x64 (preferred) or 48x48 PNGs.
-- Reduce PNG size with this command:
+Alternatively, they can also be self-drawn. Create SVGs which are as small
+as possible in file size.
 
-      pngquant --verbose --skip-if-larger --force --ext .png --strip <FILE>
+## Rules
 
-- List all new icons with their license in [`.reuse/dep5`](../.reuse/dep5).
+- Use monochrome icons with white color only. Downloaded SVGs can either be
+  changed to white directly on the corresponding website, or by manually
+  adjusting/adding the `fill` XML attribute in a text editor afterwards.
+- Line thickness of the icons should look consistent with the rest of the UI.
+  Many icons are available from different sources, but with different line
+  widths (e.g. Bootstrap Icons are often thinner than Font Awesome). Choose
+  the one which looks best, disregarding the priority of the image sources
+  listed above.
+- List all icons in `.reuse/dep5`
+
+
+## TODO: Revert the requirement for white icons, use black instead?

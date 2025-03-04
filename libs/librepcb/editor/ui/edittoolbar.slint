@@ -1,0 +1,78 @@
+import { Palette } from "std-widgets.slint";
+
+component Button inherits TouchArea {
+    in property <image> icon;
+
+    preferred-width: self.height;
+
+    Image {
+        width: self.height;
+        height: root.height * 0.6;
+        source: icon;
+        colorize: root.has-hover ? white : Palette.foreground;
+    }
+}
+
+export component EditToolBar inherits Rectangle {
+    width: self.preferred-width;
+    height: 28px;
+    border-radius: self.height / 2;
+    background: #252525;
+
+    HorizontalLayout {
+        padding-left: parent.border-radius * 0.7;
+        padding-right: parent.border-radius * 0.7;
+
+        Button {
+            icon: @image-url("../../../../img/cut.svg");
+        }
+
+        Button {
+            icon: @image-url("../../../../img/copy.svg");
+        }
+
+        Button {
+            icon: @image-url("../../../../img/paste.svg");
+        }
+
+        Button {
+            icon: @image-url("../../../../img/delete.svg");
+        }
+
+        Button {
+            icon: @image-url("../../../../img/rotate-ccw.svg");
+        }
+
+        Button {
+            icon: @image-url("../../../../img/rotate-cw.svg");
+        }
+
+        Button {
+            icon: @image-url("../../../../img/mirror-horizontal.svg");
+        }
+
+        Button {
+            icon: @image-url("../../../../img/mirror-vertical.svg");
+        }
+
+        Button {
+            icon: @image-url("../../../../img/move.svg");
+        }
+
+        Button {
+            icon: @image-url("../../../../img/grid-dots.svg");
+        }
+
+        Button {
+            icon: @image-url("../../../../img/reset.svg");
+        }
+
+        Button {
+            icon: @image-url("../../../../img/lock-open.svg");
+        }
+
+        Button {
+            icon: @image-url("../../../../img/edit.svg");
+        }
+    }
+}

@@ -1,0 +1,187 @@
+import { SideBarButton } from "./sidebarbutton.slint";
+import { MainPage } from "./api/types.slint";
+import { Data } from "./api/data.slint";
+import { ActionId, ProjectData, RuleCheckState } from "./api/types.slint";
+import { Backend } from "./api/backend.slint";
+
+export component SideBar inherits Rectangle {
+    property <ProjectData> project: Data.projects[Data.current-project-index];
+
+    background: #353535;
+
+    VerticalLayout {
+        spacing: 0px;
+
+        SideBarButton {
+            icon: @image-url("../../../../img/home.svg");
+            tooltip: @tr("Home");
+            checked: Data.current-page == MainPage.home;
+
+            clicked => {
+                Data.current-page = MainPage.home;
+            }
+        }
+
+        SideBarButton {
+            icon: @image-url("../../../../img/libraries.png");
+            tooltip: @tr("Libraries");
+            status-background: {
+                if (!Data.refreshing-available-libraries) && (!Data.libraries-fetching-error.is-empty) {
+                    return red;
+                } else {
+                    return #d4d400;
+                }
+            };
+            status-color: {
+                if (!Data.refreshing-available-libraries) && (!Data.libraries-fetching-error.is-empty) {
+                    return white;
+                } else {
+                    return black;
+                }
+            };
+            status-text: {
+                if Data.refreshing-available-libraries {
+                    if (mod(animation-tick(), 1000ms) >= 666ms) {
+                        return "...";
+                    } else if (mod(animation-tick(), 1000ms) >= 333ms) {
+                        return "..";
+                    } else {
+                        return ".";
+                    }
+                } else if !Data.libraries-fetching-error.is-empty {
+                    return "err";
+                } else if Data.outdated-libraries > 0 {
+                    return Data.outdated-libraries;
+                } else {
+                    return "";
+                }
+            };
+            checked: Data.current-page == MainPage.libraries;
+
+            clicked => {
+                Data.current-page = MainPage.libraries;
+            }
+        }
+
+        SideBarButton {
+            icon: @image-url("../../../../img/files.svg");
+            tooltip: @tr("Open Documents");
+            enabled: Data.projects.length > 0;
+            checked: Data.current-page == MainPage.project;
+
+            clicked => {
+                Data.current-page = MainPage.project;
+            }
+
+            changed enabled => {
+                if (self.checked && (!self.enabled)) {
+                    Data.current-page = MainPage.home;
+                }
+            }
+        }
+
+        SideBarButton {
+            property <RuleCheckState> state: Data.current-tab.rule-check-state;
+            property <int> messages: Data.current-tab.rule-check-messages.length;
+            property <string> error: Data.current-tab.rule-check-execution-error;
+            property <string> title: Data.get-rule-check-title-for-tab-type(Data.current-tab.type);
+
+            function get-progress-dots() -> string {
+                if (mod(animation-tick(), 1000ms) >= 666ms) {
+                    return "...";
+                } else if (mod(animation-tick(), 1000ms) >= 333ms) {
+                    return "..";
+                } else {
+                    return ".";
+                }
+            }
+
+            icon: @image-url("../../../../img/drc.svg");
+            tooltip: title;
+            enabled: state != RuleCheckState.not-available;
+            checked: Data.current-page == MainPage.rule-check;
+
+            states [
+                running when state == RuleCheckState.running: {
+                    status-background: #d4d400;
+                    status-color: black;
+                    status-text: get-progress-dots();
+                }
+                failed when !error.is-empty: {
+                    status-background: #ff0000;
+                    status-color: white;
+                    status-text: "E";
+                }
+                not-available when state == RuleCheckState.not-available: {
+                    status-background: #d4d4d4;
+                    status-color: black;
+                    status-text: "";
+                }
+                not-run-yet when state == RuleCheckState.not-run-yet: {
+                    status-background: #d4d4d4;
+                    status-color: black;
+                    status-text: "";
+                }
+                outdated when state == RuleCheckState.outdated: {
+                    status-background: #d4d4d4;
+                    status-color: black;
+                    status-text: (messages == 0) ? "ok" : messages;
+                }
+                up-to-date when state == RuleCheckState.up-to-date: {
+                    status-background: (messages == 0) ? #00ff00 : #ff0000;
+                    status-color: (messages == 0) ? black : white;
+                    status-text: (messages == 0) ? "ok" : messages;
+                }
+            ]
+
+            clicked => {
+                Data.current-page = MainPage.rule-check;
+            }
+        }
+
+        SideBarButton {
+            icon: @image-url("../../../../img/output-jobs.svg");
+            tooltip: @tr("Output Jobs");
+            enabled: project.valid;
+
+            clicked => {
+                Backend.action-triggered(ActionId.project-open-output-jobs, Data.current-project-index);
+            }
+        }
+
+        SideBarButton {
+            icon: @image-url("../../../../img/shopping-cart.svg");
+            tooltip: @tr("Order PCB");
+            enabled: project.valid;
+            checked: Data.current-page == MainPage.order;
+
+            clicked => {
+                Data.current-page = MainPage.order;
+            }
+        }
+
+        Rectangle {
+            vertical-stretch: 1;
+        }
+
+        SideBarButton {
+            icon: @image-url("../../../../img/settings.svg");
+            tooltip: @tr("Preferences");
+            checked: false;
+
+            clicked => {
+                Backend.action-triggered(ActionId.open-workspace-settings, -1);
+            }
+        }
+
+        SideBarButton {
+            icon: @image-url("../../../../img/help.svg");
+            tooltip: @tr("Help / About");
+            checked: Data.current-page == MainPage.help;
+
+            clicked => {
+                Data.current-page = MainPage.help;
+            }
+        }
+    }
+}

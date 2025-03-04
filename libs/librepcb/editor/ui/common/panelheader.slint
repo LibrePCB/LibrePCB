@@ -1,0 +1,86 @@
+import { Spinner, Palette } from "std-widgets.slint";
+import { ToolTip } from "./tooltip.slint";
+
+export component PanelHeaderButton inherits Rectangle {
+    in property <image> icon;
+    in property <float> icon-scale: 0.8;
+    in property <string> tooltip;
+    in property <color> colorize: transparent;
+    in property <bool> enabled <=> ta.enabled;
+    in property <bool> read-only: false;
+
+    width: self.height;
+    background: ((!read-only) && ta.has-hover) ? #454545 : transparent;
+
+    callback clicked <=> ta.clicked;
+
+    ta := TouchArea {
+        Image {
+            x: (parent.width - self.width) / 2;
+            y: self.x;
+            width: self.height;
+            height: parent.height * icon-scale * (((!read-only) && ta.pressed) ? 0.85 : 1.0);
+            image-fit: contain;
+            source: icon;
+            colorize: (colorize != transparent) ? colorize : (((!read-only) && ta.has-hover) ? white : (enabled ? Palette.foreground : #707070));
+        }
+
+        if self.has-hover && (!tooltip.is-empty): ToolTip {
+            x: max((parent.width / 2) - (self.width / 2), -root.x);
+            y: parent.height + 5px;
+            text: tooltip;
+        }
+    }
+}
+
+export component PanelHeader inherits Rectangle {
+    in property <length> spacing-top <=> vl-root.padding-top;
+    in property <string> title <=> t-title.text;
+    in property <string> note;
+    in property <bool> show-spinner: false;
+    // Set minimum to compiled value, due to wrong preview:
+    // https://github.com/slint-ui/slint/pull/7011
+    out property <length> content-height: max(t-title.preferred-height + 4px, 25px);
+
+    height: spacing-top + content-height + 1px;
+
+    vl-root := VerticalLayout {
+        padding-top: 5px;
+
+        HorizontalLayout {
+            padding-left: 5px;
+            padding-right: 1px;
+            spacing: 3px;
+
+            t-title := Text {
+                y: 2px;
+                font-weight: 700;
+                overflow: elide;
+                vertical-alignment: center;
+            }
+
+            if !note.is-empty: Text {
+                y: 2px;
+                horizontal-stretch: 1;
+                font-size: 11px;
+                font-italic: true;
+                vertical-alignment: center;
+                overflow: elide;
+                text: note;
+            }
+
+            if show-spinner: Spinner {
+                indeterminate: true;
+                width: content-height - 8px;
+                height: content-height;
+            }
+
+            @children
+        }
+
+        Rectangle {
+            height: 1px;
+            background: #555555;
+        }
+    }
+}

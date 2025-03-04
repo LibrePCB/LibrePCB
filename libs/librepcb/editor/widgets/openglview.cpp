@@ -152,6 +152,13 @@ void OpenGlView::stopSpinning(QString errorMsg) noexcept {
   }
 }
 
+void OpenGlView::setTransform(const QMatrix4x4& transform, qreal fov,
+                              const QPointF& center) noexcept {
+  mTransform = transform;
+  mProjectionFov = fov;
+  mProjectionCenter = center;
+}
+
 /*******************************************************************************
  *  Protected Methods
  ******************************************************************************/

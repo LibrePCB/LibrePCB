@@ -1,0 +1,48 @@
+export component SceneButton inherits Rectangle {
+    in property <string> text;
+    in property <image> image;
+    in property <brush> bg-color;
+    in property <brush> fg-color: black;
+    in property <length> font-size: 14px;
+    in property <bool> checkable: false;
+    in-out property <bool> checked: false;
+
+    callback clicked <=> ta.clicked;
+
+    width: 25px;
+    height: 25px;
+    background: checked ? fg-color : ((checkable && ta.has-hover) ? fg-color : bg-color).with-alpha(0.2);
+    border-radius: self.height / 2;
+    border-color: fg-color;
+    border-width: (checkable && (!checked)) ? 1px : 0;
+
+    if !text.is-empty: t-text := Text {
+        height: self.width;
+        vertical-alignment: TextVerticalAlignment.center;
+        horizontal-alignment: TextHorizontalAlignment.center;
+        color: (checkable && checked) ? bg-color : fg-color;
+        font-size: font-size * (((!checkable) && ta.has-hover) ? 1.35 : 1);
+        text: text;
+
+        animate font-size { duration: 75ms; }
+    }
+
+    if text.is-empty: i-icon := Image {
+        width: parent.width * (checkable ? 0.8 : (ta.has-hover ? 1.0 : 0.8));
+        image-fit: ImageFit.fill;
+        source: image;
+        colorize: (checkable && checked) ? bg-color : fg-color;
+
+        animate width { duration: 75ms; }
+    }
+
+    ta := TouchArea {
+        mouse-cursor: checkable ? default : pointer;
+
+        clicked => {
+            if (checkable) {
+                checked = !checked;
+            }
+        }
+    }
+}

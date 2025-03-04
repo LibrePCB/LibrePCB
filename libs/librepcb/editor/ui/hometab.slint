@@ -1,0 +1,215 @@
+import { Backend } from "./api/backend.slint";
+import { Data } from "./api/data.slint";
+import { ActionId } from "./api/types.slint";
+import { Button, Palette, ScrollView, Spinner } from "std-widgets.slint";
+
+export component HomeTab inherits Rectangle {
+    in property <int> section-index;
+    property <bool> compact-layout: self.width < 350px;
+
+    fs := FocusScope {
+        enabled: false;
+    }
+
+    if i-readme.source.width == 0: Image {
+        x: (parent.width - self.width) / 2;
+        y: (parent.height - self.height) / 2;
+        width: min(root.width * 0.25, 200px);
+        height: self.width;
+        source: @image-url("../../../../img/librepcb-monochrome.svg");
+        colorize: #404040;
+    }
+
+    TouchArea {
+        VerticalLayout {
+            padding: 10px;
+            spacing: 10px;
+
+            Text {
+                font-size: 20px;
+                font-weight: 700;
+                wrap: word-wrap;
+                text: @tr("Get Started With LibrePCB");
+            }
+
+            HorizontalLayout {
+                spacing: 10px;
+
+                property <image> image: @image-url("../../../../img/video-tutorial.png");
+                property <length> image-width-available: parent.width - vl-buttons.preferred-width - 2 * parent.padding;
+
+                if image-width-available > 180px: Rectangle {
+                    y: (vl-buttons.height - self.height) / 2;
+                    width: min(vl-buttons.preferred-height * image.width / image.height, image-width-available);
+                    height: self.width * image.height / image.width;
+                    border-radius: 15px;
+                    clip: true;
+
+                    Image {
+                        width: 100%;
+                        height: 100%;
+                        image-fit: contain;
+                        source: image;
+                    }
+                }
+
+                vl-buttons := VerticalLayout {
+                    alignment: start;
+                    spacing: 10px;
+
+                    Button {
+                        width: self.preferred-width;
+                        colorize-icon: true;
+                        icon: @image-url("../../../../img/youtube-brands-solid.svg");
+                        text: @tr("Video Tutorials");
+
+                        clicked => {
+                            Backend.action-triggered(ActionId.open-video-tutorials, -1);
+                        }
+                    }
+
+                    Button {
+                        width: self.preferred-width;
+                        colorize-icon: true;
+                        icon: @image-url("../../../../img/documentation.svg");
+                        text: @tr("User Manual & Getting Started Guide");
+
+                        clicked => {
+                            Backend.action-triggered(ActionId.open-user-manual, -1);
+                        }
+                    }
+
+                    Button {
+                        width: self.preferred-width;
+                        colorize-icon: true;
+                        icon: @image-url("../../../../img/comments.svg");
+                        text: @tr("Give Feedback & Get Support");
+
+                        clicked => {
+                            Backend.action-triggered(ActionId.open-support, -1);
+                        }
+                    }
+
+                    Button {
+                        width: self.preferred-width;
+                        colorize-icon: true;
+                        icon: @image-url("../../../../img/keyboard-shortcuts.svg");
+                        text: @tr("Keyboard Shortcuts Reference");
+
+                        clicked => {
+                            Backend.action-triggered(ActionId.open-keyboard-shortcuts-reference, -1);
+                        }
+                    }
+                }
+            }
+
+            if compact-layout: Button {
+                colorize-icon: true;
+                primary: true;
+                icon: @image-url("../../../../img/heart.svg");
+                text: @tr("Donate");
+
+                clicked => {
+                    Backend.action-triggered(ActionId.open-donate, -1);
+                }
+            }
+
+            if !compact-layout: Rectangle {
+                border-color: Palette.foreground;
+                border-width: 1px;
+                border-radius: 10px;
+                background: #2a2a2a;
+
+                HorizontalLayout {
+                    padding: 8px;
+                    spacing: 10px;
+
+                    Text {
+                        vertical-alignment: center;
+                        font-size: 14px;
+                        font-italic: true;
+                        wrap: word-wrap;
+                        text: @tr("Support the LibrePCB project with a donation to keep the development and maintenance ongoing ‒ Thank you!");
+                    }
+
+                    Rectangle {
+                        width: self.preferred-width;
+
+                        Button {
+                            colorize-icon: true;
+                            primary: true;
+                            icon: @image-url("../../../../img/heart.svg");
+                            text: @tr("Donate");
+
+                            clicked => {
+                                Backend.action-triggered(ActionId.open-donate, -1);
+                            }
+                        }
+                    }
+                }
+            }
+
+            f-preview := Flickable {
+                vertical-stretch: 1;
+                width: 100%;
+                viewport-width: self.width;
+                viewport-height: i-readme.height;
+                interactive: i-readme.source.width > 0;
+
+                // If the image was getting smaller, the scroll position might
+                // end up in nirvana, so we clip it manually.
+                changed viewport-height => {
+                    self.viewport-y = max(self.viewport-y, -max(self.viewport-height - self.height, 0));
+                }
+
+                i-readme := Image {
+                    image-fit: ImageFit.preserve;
+                    horizontal-alignment: left;
+                    vertical-alignment: top;
+                    source: Data.current-project-preview-image;
+                    visible: Backend.request-project-preview(Data.current-project-preview-path, parent.width);
+                    opacity: Data.current-project-preview-image-rendering ? 0.5 : 1;
+
+                    TouchArea {
+                        x: 0;
+                        y: 0;
+                        width: 100%;
+                        height: max(parent.height, f-preview.height);
+
+                        pointer-event(e) => {
+                            if (e.kind == PointerEventKind.down) {
+                                Data.section-clicked(section-index);
+                                if (!fs.has-focus) {
+                                    fs.focus();
+                                }
+                            }
+                            return EventResult.accept;
+                        }
+                    }
+                }
+            }
+        }
+
+        if Data.current-project-preview-image-rendering: Spinner {
+            x: f-preview.x + (f-preview.width - self.width) / 2;
+            y: f-preview.y + (f-preview.height - self.height) / 2;
+            width: 30px;
+            height: self.width;
+            indeterminate: true;
+        }
+
+        pointer-event(e) => {
+            if (e.kind == PointerEventKind.down) {
+                Data.section-clicked(section-index);
+                if (!fs.has-focus) {
+                    fs.focus();
+                }
+            }
+            return Backend.scene-pointer-event(section-index, self.mouse-x, self.mouse-y, self.absolute-position, e);
+        }
+
+        scroll-event(e) => {
+            return Backend.scene-scrolled(section-index, self.mouse-x, self.mouse-y, e);
+        }
+    }
+}

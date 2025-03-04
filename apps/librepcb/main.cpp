@@ -20,15 +20,30 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/core/3d/scenedata3d.h>
 #include <librepcb/core/application.h>
 #include <librepcb/core/debug.h>
 #include <librepcb/core/exceptions.h>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/network/networkaccessmanager.h>
+#include <librepcb/core/project/board/board.h>
+#include <librepcb/core/project/board/boardplanefragmentsbuilder.h>
+#include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectloader.h>
+#include <librepcb/core/types/length.h>
 #include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <librepcb/core/workspace/workspacesettings.h>
+#include <librepcb/editor/3d/openglscenebuilder.h>
 #include <librepcb/editor/dialogs/directorylockhandlerdialog.h>
 #include <librepcb/editor/editorcommandset.h>
+#include <librepcb/editor/graphics/defaultgraphicslayerprovider.h>
+#include <librepcb/editor/guiapplication.h>
+#include <librepcb/editor/project/board/boardgraphicsscene.h>
 #include <librepcb/editor/project/partinformationprovider.h>
+#include <librepcb/editor/project/schematic/schematicgraphicsscene.h>
+#include <librepcb/editor/widgets/graphicsview.h>
+#include <librepcb/editor/widgets/openglview.h>
 #include <librepcb/editor/workspace/controlpanel/controlpanel.h>
 #include <librepcb/editor/workspace/initializeworkspacewizard/initializeworkspacewizard.h>
 
@@ -36,11 +51,15 @@
 #include <QtCore>
 #include <QtWidgets>
 
+// #include <libintl.h>
+#include <slint.h>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 using namespace librepcb;
 using namespace librepcb::editor;
+using namespace librepcb::editor::app;
 
 /*******************************************************************************
  *  Function Prototypes
@@ -52,13 +71,13 @@ static void writeLogHeader() noexcept;
 static int runApplication() noexcept;
 static bool isFileFormatStableOrAcceptUnstable() noexcept;
 static int openWorkspace(FilePath& path);
-static int appExec() noexcept;
 
 /*******************************************************************************
  *  main()
  ******************************************************************************/
 
 int main(int argc, char* argv[]) {
+  QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
   QApplication app(argc, argv);
 
   // Give the main thread a higher priority than most other threads as GUI
@@ -76,6 +95,12 @@ int main(int argc, char* argv[]) {
 
   // Configure the application settings format and location used by QSettings
   configureApplicationSettings();
+
+  // Configure gettext.
+  // bindtextdomain(
+  //     "librepcb",
+  //     qPrintable(Application::getResourcesDir().getPathTo("i18n").toStr()));
+  // qputenv("LANGUAGE", "de");
 
   // Write some information about the application instance to the log.
   writeLogHeader();
@@ -343,30 +368,58 @@ static int openWorkspace(FilePath& path) {
                    &WorkspaceSettingsItem::edited,
                    &ws.getSettings().keyboardShortcuts, applyKeyboardShortcuts);
 
-  // Open the control panel.
-  ControlPanel p(ws, wizard.getWorkspaceContainsNewerFileFormats());
-  p.show();
+  /*QWidget* widget =
+      static_cast<QWidget*>(slint::cbindgen_private::slint_qt_get_widget(
+          &win->window().window_handle()));
 
-  return appExec();
-}
+  class EventFilter : public QObject {
+  public:
+    slint::ComponentHandle<ui::MainWindow> win;
+    GraphicsScene* scene;
+    OpenGlView* view3d = nullptr;
+    QTransform oldTransform;
+    QTransform transform;
 
-/*******************************************************************************
- *  appExec()
- ******************************************************************************/
+    EventFilter(slint::ComponentHandle<ui::MainWindow> win,
+                GraphicsScene* scene)
+      : QObject(), win(win), scene(scene) {
+      if (scene) {
+        auto center = scene->itemsBoundingRect().center();
+        transform.translate(center.x(), center.y());
+      }
+      oldTransform = transform;
+    }
 
-static int appExec() noexcept {
-  // please note that we shouldn't show a dialog or message box in the catch()
-  // blocks! from http://qt-project.org/doc/qt-5/exceptionsafety.html:
-  //      "After an exception is thrown, the connection to the windowing server
-  //      might already be closed. It is not safe to call a GUI related function
-  //      after catching an exception."
-  try {
-    return QApplication::exec();
-  } catch (std::exception& e) {
-    qFatal("UNCAUGHT EXCEPTION: %s --- PROGRAM EXITED", e.what());
-  } catch (...) {
-    qFatal("UNCAUGHT EXCEPTION --- PROGRAM EXITED");
-  }
+    virtual bool eventFilter(QObject* watched, QEvent* event) override {
+      if ((event->type() == QEvent::Paint) && (win->get_scene_visible())) {
+        QWidget* w = static_cast<QWidget*>(watched);
+        // QPaintEvent* e = static_cast<QPaintEvent*>(event);
+        QPainter p(w);
+        p.setRenderHints(QPainter::Antialiasing |
+                         QPainter::SmoothPixmapTransform);
+        QRectF targetRect(win->get_scene_x(), win->get_scene_y(),
+                          win->get_scene_width(), win->get_scene_height());
+        if (scene) {
+          p.fillRect(targetRect, scene->backgroundBrush());
+          QRectF sourceRect = transform.mapRect(targetRect);
+          scene->render(&p, targetRect, sourceRect);
+        } else if (view3d) {
+          view3d->resize(win->get_scene_width(), win->get_scene_height());
+          view3d->render(&p, QPoint(win->get_scene_x(), win->get_scene_y()));
+        } else {
+          p.fillRect(targetRect, Qt::red);
+        }
+      }
+      return QObject::eventFilter(watched, event);
+    }
+  };
 
-  return -1;
+  EventFilter* filter = new EventFilter(win, schScene);
+  widget->installEventFilter(filter);
+  win->show();*/
+
+  // Run the application.
+  GuiApplication app(ws, wizard.getWorkspaceContainsNewerFileFormats());
+  app.exec();
+  return 0;
 }

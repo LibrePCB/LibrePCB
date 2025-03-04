@@ -1,0 +1,517 @@
+import {
+    FolderTreeItemData,
+    QuickAccessItemData,
+    LibraryData,
+    LibraryState,
+    LibraryType,
+    MainPage,
+    ProjectData,
+    EditorTool,
+    TabType,
+    WindowSectionData,
+    RuleCheckState,
+    GridStyle,
+    TabData,
+    SchematicTabData,
+    Board2dTabData,
+    NotificationData,
+    NotificationType,
+    LengthUnit
+} from "./types.slint";
+
+export global Data {
+    in property <bool> preview-mode: true;
+
+    in property <string> status-bar-message;
+
+    in property <string> current-status-tip;
+
+    in property <string> window-title: "LibrePCB 1.2.0-unstable";
+
+    in property <string> about-librepcb-details: "LibrePCB Version: 1.2.0\nGit Revision:     f079fa97b\nBuild Date:       2024-12-02T19:12:08\nQt Version:       6.2.4 (built against 6.2.4)\nCPU Architecture: x86_64\nOperating System: Ubuntu Core 22\nPlatform Plugin:  xcb\nTLS Library:      OpenSSL 3.0.2 15 Mar 2022\nOCC Library:      OCCT 7.7.2\nRuntime:          Snap";
+
+    in property <string> order-info-url: "https://fab.librepcb.org/todo";
+
+    in property <string> workspace-path: "/path/to/workspace";
+
+    in property <string> cursor-coordinates: "X: 123.456 Y: 123.456";
+
+    in-out property <bool> ignore-placement-locks: true;
+
+    in-out property <MainPage> current-page: MainPage.home;
+
+    in-out property <string> current-project-preview-path;
+    in property <image> current-project-preview-image;
+    in property <bool> current-project-preview-image-rendering: false;
+
+    in property <[NotificationData]> notifications: [
+        {
+            type: NotificationType.tip,
+            title: "Tip",
+            description: "This is a tip notification",
+            button-text: "Do Something",
+            supports-dont-show-again: true,
+            unread: true,
+        },
+        {
+            type: NotificationType.info,
+            title: "Info",
+            description: "This is an info notification",
+            unread: true,
+        },
+        {
+            type: NotificationType.warning,
+            title: "Warning",
+            description: "This is a warning notification",
+        },
+        {
+            type: NotificationType.critical,
+            title: "Critical",
+            description: "This is a critical notification",
+        },
+        {
+            type: NotificationType.progress,
+            title: "Progress",
+            description: "This is a progress notification",
+            progress: 50,
+        },
+    ];
+
+    in property <int> unread-notifications-count: 2;
+
+    in property <int> current-progress-notification-index: 4;
+
+    in property <bool> notifications-shown: true;
+
+    in property <[FolderTreeItemData]> workspace-folder: [
+        {
+            icon: @image-url("../../../../../img/library.png"),
+            name: "folder-1",
+            path: "/path/to",
+            has-children: true,
+            expanded: false,
+        },
+        {
+            icon: @image-url("../../../../../img/library.png"),
+            name: "folder-2",
+            path: "/path/to",
+            has-children: true,
+            expanded: true,
+        },
+        {
+            level: 1,
+            icon: @image-url("../../../../../img/library.png"),
+            name: "project-1.lpp",
+            path: "/path/to/project-1.lpp",
+            supports-pinning: true,
+            pinned: true,
+        },
+        {
+            level: 1,
+            icon: @image-url("../../../../../img/library.png"),
+            name: "project-2.lpp",
+            path: "/path/to/project-2.lpp",
+            supports-pinning: true,
+            pinned: false,
+        },
+    ];
+
+    in property <[QuickAccessItemData]> quick-access-items: [
+        {
+            name: "project-1.lpp",
+            path: "/path/to/project-1.lpp",
+            pinned: false,
+        },
+        {
+            name: "project-2.lpp",
+            path: "/path/to/project-2.lpp",
+            pinned: false,
+        },
+        {
+            name: "project-3.lpp",
+            path: "/path/to/project-3.lpp",
+            pinned: true,
+        },
+    ];
+
+    in property <[ProjectData]> projects: [
+        {
+            valid: true,
+            path: "/path/to/project-1.lpp",
+            name: "Project 1",
+            schematics: ["Power", "Logic"],
+            boards: ["Default", "Experiment"],
+        },
+        {
+            valid: true,
+            path: "/path/to/project-2.lpp",
+            name: "Project 2",
+            schematics: ["Power", "Logic"],
+            boards: ["Default", "Experiment"],
+        },
+    ];
+
+    in-out property <int> current-project-index: 0;
+
+    in property <bool> refreshing-available-libraries: false;
+
+    in property <string> libraries-fetching-error: "Some error occurred.\nFoo bar...";
+
+    in property <string> libraries-filter: "Foo";
+
+    in property <int> outdated-libraries: 2;
+
+    in property <int> checked-libraries: 3;
+
+    in property <[LibraryData]> libraries: [
+        {
+            name: "My Library",
+            description: "My own local library.",
+            version: "v1.0",
+            icon: @image-url("../../../../../img/library.png"),
+            type: LibraryType.local,
+            state: LibraryState.unknown,
+        },
+        {
+            name: "LibrePCB Base",
+            description: "Official LibrePCB Base Library",
+            version: "v1.2.3",
+            icon: @image-url("../../../../../img/librepcb.png"),
+            type: LibraryType.remote,
+            state: LibraryState.up-to-date,
+        },
+        {
+            name: "Microchip Technology / Atmel",
+            description: "Integrated circuits and more (unofficial).",
+            version: "v0.5",
+            icon: @image-url("../../../../../img/microchip.png"),
+            type: LibraryType.remote,
+            state: LibraryState.outdated,
+        },
+        {
+            name: "LibrePCB Integrated Circuits",
+            description: "Official LibrePCB Integrated Circuits Library",
+            icon: @image-url("../../../../../img/librepcb.png"),
+            type: LibraryType.online,
+        },
+        {
+            name: "Microchip Technology / Atmel",
+            description: "Integrated circuits and more (unofficial).",
+            icon: @image-url("../../../../../img/microchip.png"),
+            type: LibraryType.online,
+            progress: 42,
+        },
+    ];
+
+    in property <[WindowSectionData]> sections: [
+        {
+            tabs: [
+                {
+                    type: TabType.home,
+                    project-index: -1,
+                },
+                {
+                    type: TabType.create-library,
+                    title: "Create Lib",
+                    project-index: -1,
+                },
+                {
+                    type: TabType.download-library,
+                    title: "Download Lib",
+                    project-index: -1,
+                },
+                {
+                    type: TabType.schematic,
+                    title: "Schematic",
+                    project-index: 0,
+                    rule-check-state: RuleCheckState.outdated,
+                    rule-check-messages: [
+                        {
+                            severity: NotificationType.info,
+                            message: "Hint message",
+                            description: "Hint description.",
+                            approved: false,
+                            supports-autofix: true,
+                        },
+                        {
+                            severity: NotificationType.warning,
+                            message: "Warning message",
+                            description: "Warning description.",
+                            approved: true,
+                            supports-autofix: false,
+                        },
+                        {
+                            severity: NotificationType.critical,
+                            message: "Error message",
+                            description: "Error description.",
+                            approved: false,
+                            supports-autofix: true,
+                        },
+                    ],
+                    rule-check-execution-error: "",
+                    can-save: true,
+                    can-export-graphics: true,
+                    can-undo: true,
+                    can-redo: true,
+                    can-cut: true,
+                    can-copy: true,
+                    can-paste: true,
+                    can-remove: true,
+                    can-rotate: true,
+                    can-mirror: true,
+                    can-move-align: true,
+                    can-snap-to-grid: true,
+                    can-reset-texts: true,
+                    can-lock-placement: true,
+                    can-edit-properties: true,
+                },
+                {
+                    type: TabType.board-2d,
+                    title: "Board",
+                    project-index: 0,
+                    can-save: true,
+                    can-export-graphics: true,
+                    can-undo: true,
+                    can-redo: true,
+                    can-cut: true,
+                    can-copy: true,
+                    can-paste: true,
+                    can-remove: true,
+                    can-rotate: true,
+                    can-mirror: true,
+                    can-move-align: true,
+                    can-snap-to-grid: true,
+                    can-reset-texts: true,
+                    can-lock-placement: true,
+                    can-edit-properties: true,
+                },
+            ],
+            create-library-tabs: [
+                { },
+                {
+                    name: "My Library",
+                    name-error: "Name error",
+                    description: "",
+                    author: "",
+                    author-default: "Me",
+                    version: "",
+                    version-default: "0.1",
+                    version-error: "Version error",
+                    url: "",
+                    url-error: "URL error",
+                    cc0: false,
+                    directory: "",
+                    directory-default: "My_Library.lplib",
+                    directory-error: "Directory error",
+                    valid: true,
+                    creation-error: "Creation error",
+                },
+            ],
+            download-library-tabs: [
+                { },
+                { },
+                {
+                    url: "",
+                    url-error: "URL error",
+                    url-suggestion: "https://example.com/library.zip",
+                    directory: "",
+                    directory-default: "My_Library.lplib",
+                    directory-error: "Directory error",
+                    valid: true,
+                    download-running: true,
+                    download-progress: 42,
+                    download-error: "Download error",
+                },
+            ],
+            schematic-tabs: [
+                { },
+                { },
+                { },
+                {
+                    background-color: Colors.white,
+                    overlay-color: #00000078,
+                    overlay-text-color: Colors.white,
+                    grid-style: GridStyle.none,
+                    grid-interval: "2.54",
+                    unit: LengthUnit.millimeters,
+                    show-pin-numbers: false,
+                    tool: EditorTool.polygon,
+                    tool-overlay-text: "X0:   123.4567 mm\nY0:   123.4567 mm\nX1:   123.4567 mm\nY1:   123.4567 mm\n\ndX:   123.4567 mm\ndY:   123.4567 mm\n\nL:    123.4567 mm\na:     90.0000 °",
+                    tool-layers: ["Layer 1", "Layer 2", "Layer 3"],
+                    tool-layer-index: 1,
+                    tool-value: "{{PROJECT}}",
+                    tool-value-suggestions: ["{{Foo}}", "{{Bar}}"],
+                    tool-attribute-value: "42",
+                    tool-attribute-value-placeholder: "CAPACITANCE",
+                    tool-attribute-value-enabled: true,
+                    tool-attribute-units: ["mV", "V", "kV"],
+                    tool-attribute-unit-index: 1,
+                },
+            ],
+            board-2d-tabs: [
+                { },
+                { },
+                { },
+                { },
+                {
+                    background-color: Colors.black,
+                    overlay-color: Colors.white,
+                    grid-style: GridStyle.none,
+                    grid-interval: "0.635",
+                    unit: LengthUnit.millimeters,
+                },
+            ],
+            current-tab-index: 3,
+            highlight: true,
+        },
+        {
+            tabs: [
+                {
+                    type: TabType.home,
+                    project-index: -1,
+                },
+                {
+                    type: TabType.board-3d,
+                    title: "3D",
+                    project-index: 1,
+                    can-save: true,
+                    can-undo: true,
+                    can-redo: true,
+                },
+            ],
+            current-tab-index: 1,
+        },
+    ];
+
+    in-out property <int> current-section-index: 0;
+
+    // Constant data
+    out property <[LengthUnit]> all-length-units: [
+        LengthUnit.millimeters,
+        LengthUnit.micrometers,
+        LengthUnit.nanometers,
+        LengthUnit.inches,
+        LengthUnit.mils,
+    ];
+
+    // Auto-calculated data
+    in-out property <ProjectData> current-project: projects[current-project-index];
+    in-out property <WindowSectionData> current-section: sections[current-section-index];
+    in-out property <TabData> current-tab: current-section.tabs[current-section.current-tab-index];
+    out property <bool> current-tab-is-2d: (current-tab.type == TabType.schematic) || (current-tab.type == TabType.board-2d);
+    out property <bool> current-tab-is-2d-or-3d: (current-tab.type == TabType.schematic) || (current-tab.type == TabType.board-2d) || (current-tab.type == TabType.board-3d);
+    in-out property <SchematicTabData> current-schematic-tab: current-section.schematic-tabs[current-section.current-tab-index];
+    in-out property <Board2dTabData> current-board-2d-tab: current-section.board-2d-tabs[current-section.current-tab-index];
+    out property <GridStyle> current-grid-style: (current-tab.type == TabType.schematic) ? current-schematic-tab.grid-style : current-board-2d-tab.grid-style;
+    out property <string> current-grid-interval: (current-tab.type == TabType.schematic) ? current-schematic-tab.grid-interval : current-board-2d-tab.grid-interval;
+    out property <LengthUnit> current-unit: (current-tab.type == TabType.schematic) ? current-schematic-tab.unit : current-board-2d-tab.unit;
+
+    public function set-current-grid-style(gs: GridStyle) {
+        if (current-tab.type == TabType.schematic) {
+            current-section.schematic-tabs[current-section.current-tab-index].grid-style = gs;
+        } else if (current-tab.type == TabType.board-2d) {
+            current-section.board-2d-tabs[current-section.current-tab-index].grid-style = gs;
+        } else {
+            debug("Unhandled case in set-current-grid-style().");
+        }
+    }
+
+    public function set-current-unit(u: LengthUnit) {
+        if (current-tab.type == TabType.schematic) {
+            current-section.schematic-tabs[current-section.current-tab-index].unit = u;
+        } else if (current-tab.type == TabType.board-2d) {
+            current-section.board-2d-tabs[current-section.current-tab-index].unit = u;
+        } else {
+            debug("Unhandled case in set-current-unit().");
+        }
+    }
+
+    pure public function get-unit-short-str(u: LengthUnit) -> string {
+        if (u == LengthUnit.millimeters) {
+            return "mm";
+        } else if (u == LengthUnit.micrometers) {
+            return "μm";
+        } else if (u == LengthUnit.nanometers) {
+            return "nm";
+        } else if (u == LengthUnit.inches) {
+            return "inch";
+        } else if (u == LengthUnit.mils) {
+            return "mils";
+        } else {
+            debug("Unhandled case in get-unit-short-str().");
+            return "";
+        }
+    }
+
+    pure public function get-icon-for-tab-type(t: TabType) -> image {
+        if (t == TabType.home) {
+            return @image-url("../../../../../img/home.svg");
+        } else if (t == TabType.create-library) {
+            return @image-url("../../../../../img/plus.svg");
+        } else if (t == TabType.download-library) {
+            return @image-url("../../../../../img/download.svg");
+        } else if (t == TabType.schematic) {
+            return @image-url("../../../../../img/image.svg");
+        } else if (t == TabType.board-2d) {
+            return @image-url("../../../../../img/projects.png");
+        } else if (t == TabType.board-3d) {
+            return @image-url("../../../../../img/3d.svg");
+        } else {
+            debug("Unhandled case in get-icon-for-tab-type().");
+            return @image-url("");
+        }
+    }
+
+    pure public function get-icon-for-notification-type(nt: NotificationType) -> image {
+        if (nt == NotificationType.tip) {
+            return @image-url("../../../../../img/lightbulb.svg");
+        } else if (nt == NotificationType.info) {
+            return @image-url("../../../../../img/circle-info.svg");
+        } else if (nt == NotificationType.warning) {
+            return @image-url("../../../../../img/triangle-exclamation.svg");
+        } else if (nt == NotificationType.critical) {
+            return @image-url("../../../../../img/circle-xmark.svg");
+        } else if (nt == NotificationType.progress) {
+            return @image-url("../../../../../img/refresh.svg");
+        } else {
+            debug("Unhandled case in get-icon-for-notification-type().");
+            return @image-url("");
+        }
+    }
+
+    pure public function get-color-for-notification-type(nt: NotificationType) -> color {
+        if (nt == NotificationType.tip) {
+            return #00e1ff;
+        } else if (nt == NotificationType.info) {
+            return white;
+        } else if (nt == NotificationType.warning) {
+            return yellow;
+        } else if (nt == NotificationType.critical) {
+            return red;
+        } else if (nt == NotificationType.progress) {
+            return white;
+        } else {
+            debug("Unhandled case in get-color-for-notification-type().");
+            return white;
+        }
+    }
+
+    public function section-clicked(index: int) {
+        if (current-section-index != index) {
+            current-section-index = index;
+            if ((current-tab.project-index >= 0) && (current-tab.project-index < Data.projects.length)) {
+                current-project-index = current-tab.project-index;
+            }
+        }
+    }
+
+    pure public function get-rule-check-title-for-tab-type(type: TabType) -> string {
+        if (type == TabType.schematic) {
+            return @tr("Electrical Rule Check (ERC)");
+        } else if (type == TabType.board-2d) {
+            return @tr("Design Rule Check (DRC)");
+        } else {
+            return "";
+        }
+    }
+}

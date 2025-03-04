@@ -1,0 +1,77 @@
+import { WindowSectionData, ActionId, Board2dTabData } from "../../api/types.slint";
+import { SceneButton } from "../../common/scenebutton.slint";
+import { Backend } from "../../api/backend.slint";
+import { Data } from "../../api/data.slint";
+
+export component Board2dTab inherits Image {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    property <[Board2dTabData]> tabs: section.board-2d-tabs;
+
+    image-fit: ImageFit.preserve;
+    image-rendering: ImageRendering.pixelated;
+    source: Backend.render-scene(section-index, root.width, root.height, tabs[section.current-tab-index].frame);
+
+    fs := FocusScope {
+        enabled: false;
+    }
+
+    TouchArea {
+        pointer-event(e) => {
+            if (e.kind == PointerEventKind.down) {
+                Data.section-clicked(section-index);
+                if (!fs.has-focus) {
+                    fs.focus();
+                }
+            }
+            return Backend.scene-pointer-event(section-index, self.mouse-x, self.mouse-y, self.absolute-position, e);
+        }
+
+        scroll-event(e) => {
+            return Backend.scene-scrolled(section-index, self.mouse-x, self.mouse-y, e);
+        }
+    }
+
+    VerticalLayout {
+        x: parent.width - self.preferred-width - 10px;
+        y: 10px;
+        width: self.preferred-width;
+        spacing: 5px;
+
+        SceneButton {
+            image: @image-url("../../../../../../img/zoom-fit.svg");
+            bg-color: tabs[section.current-tab-index].background-color;
+            fg-color: tabs[section.current-tab-index].overlay-color;
+            clicked => {
+                Backend.scene-zoom-fit-clicked(section-index, root.width, root.height);
+            }
+        }
+
+        SceneButton {
+            image: @image-url("../../../../../../img/zoom-in.svg");
+            bg-color: tabs[section.current-tab-index].background-color;
+            fg-color: tabs[section.current-tab-index].overlay-color;
+            clicked => {
+                Backend.scene-zoom-in-clicked(section-index, root.width, root.height);
+            }
+        }
+
+        SceneButton {
+            image: @image-url("../../../../../../img/zoom-out.svg");
+            bg-color: tabs[section.current-tab-index].background-color;
+            fg-color: tabs[section.current-tab-index].overlay-color;
+            clicked => {
+                Backend.scene-zoom-out-clicked(section-index, root.width, root.height);
+            }
+        }
+
+        SceneButton {
+            text: "3D";
+            bg-color: tabs[section.current-tab-index].background-color;
+            fg-color: tabs[section.current-tab-index].overlay-color;
+            clicked => {
+                Backend.action-triggered(ActionId.board-2d-tab-open-3d, section-index);
+            }
+        }
+    }
+}

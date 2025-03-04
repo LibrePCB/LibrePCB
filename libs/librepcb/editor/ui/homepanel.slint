@@ -1,0 +1,218 @@
+import { ListView, Palette } from "std-widgets.slint";
+import { PanelHeader, PanelHeaderButton } from "./common/panelheader.slint";
+import { FolderTreeItemData, QuickAccessItemData, ActionId } from "./api/types.slint";
+import { Backend } from "./api/backend.slint";
+import { Data } from "./api/data.slint";
+import { ListViewItemButton } from "./common/listviewitembutton.slint";
+
+component QuickAccessList inherits ListView {
+    property <int> current-index: -1;
+    property <length> item-height: 20px;
+    in-out property <[QuickAccessItemData]> model: Data.quick-access-items;
+
+    preferred-height: model.length * item-height;
+
+    for item[index] in model: Rectangle {
+        width: parent.width;
+        height: item-height;
+        background: (current-index == index) ? #454545 : (ta.has-hover ? #383838 : transparent);
+
+        ta := TouchArea {
+            HorizontalLayout {
+                spacing: 5px;
+                padding-left: 5px;
+                padding-right: 5px;
+
+                Image {
+                    y: 1px;
+                    width: parent.height - 2px;
+                    height: parent.height - 2px;
+                    source: @image-url("../../../../img/library.png");
+                }
+
+                Text {
+                    horizontal-stretch: 1;
+                    color: #dddddd;
+                    font-size: 14px;
+                    font-weight: 400;
+                    overflow: TextOverflow.elide;
+                    text: item.name;
+                }
+
+                if item.pinned || ta.has-hover || (current-index == index): ListViewItemButton {
+                    icon: item.pinned ? @image-url("../../../../img/pin-angle-fill.svg") : @image-url("../../../../img/pin-angle.svg");
+                    tooltip: item.pinned ? @tr("Unpin") : @tr("Pin");
+
+                    clicked => {
+                        item.pinned = !item.pinned;
+                    }
+                }
+            }
+
+            clicked => {
+                current-index = index;
+                Data.current-project-preview-path = item.path;
+            }
+
+            double-clicked => {
+                Backend.file-item-doubleclicked(item.path);
+            }
+        }
+    }
+}
+
+component FolderTree inherits ListView {
+    in-out property <[FolderTreeItemData]> model;
+    in property <bool> animate-expand: false;
+    property <int> current-index: -1;
+    property <length> item-height: 20px;
+
+    preferred-height: model.length * item-height;
+
+    callback item-selected(string);
+
+    for item[index] in model: Rectangle {
+        property <length> animated-height: 0;
+        width: parent.width;
+        height: animate-expand ? animated-height : item-height;
+        background: (current-index == index) ? #454545 : (ta.has-hover ? #383838 : transparent);
+
+        init => {
+            self.animated-height = item-height;
+        }
+
+        animate animated-height { duration: 100ms; }
+
+        ta := TouchArea {
+            HorizontalLayout {
+                spacing: 5px;
+                padding-left: 5px;
+                padding-right: 5px;
+
+                ta-expand := TouchArea {
+                    mouse-cursor: pointer;
+                    enabled: item.has-children;
+                    width: item-height + item.level * 10px - 3px;
+
+                    i-expand := Image {
+                        y: 3px;
+                        x: parent.width - self.width;
+                        width: item-height - 2 * self.y;
+                        height: parent.height - 2 * self.y;
+                        image-fit: contain;
+                        source: @image-url("../../../../img/angle-right-solid.svg");
+                        colorize: Palette.foreground;
+                        rotation-angle: item.expanded ? 90deg : 0;
+                        visible: item.has-children;
+
+                        animate rotation-angle { duration: 100ms; }
+                    }
+
+                    clicked => {
+                        item.expanded = !item.expanded;
+                    }
+                }
+
+                i-icon := Image {
+                    y: 1px;
+                    width: item-height - 2px;
+                    height: parent.height - 2px;
+                    image-fit: fill;
+                    source: item.icon;
+                }
+
+                Text {
+                    horizontal-stretch: 1;
+                    color: #dddddd;
+                    font-size: 14px;
+                    font-weight: 400;
+                    overflow: TextOverflow.elide;
+                    text: item.name;
+                }
+
+                if item.supports-pinning && (item.pinned || ta.has-hover || (current-index == index)): ListViewItemButton {
+                    icon: item.pinned ? @image-url("../../../../img/pin-angle-fill.svg") : @image-url("../../../../img/pin-angle.svg");
+                    tooltip: item.pinned ? @tr("Unpin") : @tr("Pin");
+
+                    clicked => {
+                        item.pinned = !item.pinned;
+                    }
+                }
+            }
+
+            clicked => {
+                current-index = index;
+                item-selected(item.path);
+            }
+
+            double-clicked => {
+                if item.has-children {
+                    item.expanded = !item.expanded;
+                } else {
+                    Backend.file-item-doubleclicked(item.path);
+                }
+            }
+        }
+    }
+}
+
+export component HomePanel inherits Rectangle {
+    background: #2a2a2a;
+
+    VerticalLayout {
+        if Data.quick-access-items.length > 0: PanelHeader {
+            title: @tr("QUICK ACCESS");
+
+            PanelHeaderButton {
+                icon: @image-url("../../../../img/file-circle-plus.svg");
+                icon-scale: 0.6;
+
+                clicked => {
+                    Backend.action-triggered(ActionId.project-new, -1);
+                }
+            }
+
+            PanelHeaderButton {
+                icon: @image-url("../../../../img/folder-open.svg");
+                icon-scale: 0.6;
+
+                clicked => {
+                    Backend.action-triggered(ActionId.project-open, -1);
+                }
+            }
+        }
+
+        if Data.quick-access-items.length > 0: QuickAccessList {
+            vertical-stretch: 0;
+        }
+
+        if Data.quick-access-items.length > 0: Rectangle {
+            height: 15px;
+        }
+
+        PanelHeader {
+            title: @tr("WORKSPACE PROJECTS");
+        }
+
+        FolderTree {
+            vertical-stretch: 2;
+            model: Data.workspace-folder;
+
+            item-selected(path) => {
+                Data.current-project-preview-path = path;
+            }
+
+            // Workaround as a ListView cannot have this child element.
+            Timer {
+                interval: 200ms;
+
+                triggered => {
+                    parent.animate-expand = true;
+                    self.running = false;
+                }
+            }
+        }
+
+        Rectangle { }
+    }
+}

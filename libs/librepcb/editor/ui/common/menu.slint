@@ -1,0 +1,99 @@
+import { ActionId } from "../api/types.slint";
+import { Backend } from "../api/backend.slint";
+import { Data } from "../api/data.slint";
+import { Palette } from "std-widgets.slint";
+
+export component MenuSeparator inherits Rectangle {
+    height: 10px;
+    background: #404040;
+
+    Rectangle {
+        y: parent.height / 2;
+        height: 1px;
+        background: #707070;
+    }
+}
+
+export component MenuItem inherits Rectangle {
+    in property <string> text <=> t-title.text;
+    in property <string> shortcuts <=> t-shortcuts.text;
+    in property <string> status-tip;
+    in property <image> icon;
+    in property <bool> enabled: true;
+    in property <bool> checked: false;
+
+    callback clicked;
+
+    background: ta.has-hover ? #505050 : #404040;
+
+    if checked: Rectangle {
+        x: i-icon.x - 4px;
+        y: i-icon.y - 4px;
+        width: i-icon.width + 8px;
+        height: i-icon.height + 8px;
+        background: #303030;
+        border-radius: 5px;
+        border-width: 1px;
+        border-color: #909090;
+    }
+
+    HorizontalLayout {
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-top: 5px;
+        padding-bottom: 5px;
+        spacing: 7px;
+
+        i-icon := Image {
+            width: self.height;
+            height: t-title.preferred-height;
+            colorize: t-title.color;
+            source: (icon.width > 0) ? icon : (checked ? @image-url("../../../../../img/check.svg") : @image-url(""));
+        }
+
+        t-title := Text {
+            vertical-alignment: center;
+            font-size: 15px;
+            color: enabled ? #d0d0d0 : #808080;
+        }
+
+        t-shortcuts := Text {
+            width: max(self.preferred-width, 80px);
+            horizontal-alignment: right;
+            vertical-alignment: center;
+            font-size: 13px;
+            color: enabled ? #b0b0b0 : #707070;
+        }
+    }
+
+    ta := TouchArea {
+        enabled: enabled;
+
+        changed has-hover => {
+            if !root.status-tip.is-empty {
+                if self.has-hover {
+                    Data.current-status-tip = root.status-tip;
+                } else {
+                    Data.current-status-tip = "";
+                }
+            }
+        }
+
+        clicked => {
+            if !root.status-tip.is-empty {
+                Data.current-status-tip = "";
+            }
+            root.clicked();
+        }
+    }
+}
+
+export component Menu inherits PopupWindow {
+    Rectangle {
+        background: #353535;
+
+        VerticalLayout {
+            @children
+        }
+    }
+}

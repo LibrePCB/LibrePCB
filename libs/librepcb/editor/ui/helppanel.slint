@@ -1,0 +1,212 @@
+import { PanelHeader, PanelHeaderButton } from "./common/panelheader.slint";
+import { Data } from "./api/data.slint";
+import { ActionId } from "./api/types.slint";
+import { Backend } from "./api/backend.slint";
+import { Button, Palette, AboutSlint } from "std-widgets.slint";
+import { ToolTip } from "./common/tooltip.slint";
+
+export component HelpPanel inherits Rectangle {
+    // Adjust the offset at the end after adding/removing panel content.
+    // Attention: The preview layout differs from the compiled application.
+    property <length> available-space: self.height - ti-details.height - 160px;
+
+    background: #2a2a2a;
+
+    VerticalLayout {
+        HorizontalLayout {
+            padding: 5px;
+            spacing: 10px;
+
+            Image {
+                width: 35px;
+                height: self.width;
+                source: @image-url("../../../../img/app/librepcb.svg");
+            }
+
+            Text {
+                font-size: 23px;
+                vertical-alignment: center;
+                overflow: elide;
+                text: Data.window-title;
+            }
+        }
+
+        Rectangle {
+            height: 1px;
+            background: #555555;
+        }
+
+        VerticalLayout {
+            vertical-stretch: 0;
+            padding: 8px;
+            spacing: 5px;
+
+            if available-space > 390px: Rectangle {
+                height: t-description.preferred-height + 2 * t-description.y;
+                background: #404040;
+                border-width: 1px;
+                border-color: #c0c0c0;
+                border-radius: 8px;
+
+                t-description := Text {
+                    x: 8px;
+                    y: self.x;
+                    width: parent.width - 2 * self.x;
+                    wrap: word-wrap;
+                    color: #e0e0e0;
+                    font-size: 11.5px;
+                    text: @tr("LibrePCB is a free & open source software. It is mainly developed by {}, with the support of many other contributors. Please consider supporting our hard work with a donation ‒ thank you.", "Urban Bruhin");
+                }
+            }
+
+            Rectangle {
+                height: 5px;
+            }
+
+            Button {
+                width: self.preferred-width;
+                colorize-icon: true;
+                icon: @image-url("../../../../img/webbrowser.svg");
+                text: @tr("Website");
+
+                clicked => {
+                    Backend.action-triggered(ActionId.open-website, -1);
+                }
+            }
+
+            Button {
+                width: self.preferred-width;
+                colorize-icon: true;
+                icon: @image-url("../../../../img/documentation.svg");
+                text: @tr("User Manual & Tutorials");
+
+                clicked => {
+                    Backend.action-triggered(ActionId.open-user-manual, -1);
+                }
+            }
+
+            Button {
+                width: self.preferred-width;
+                colorize-icon: true;
+                icon: @image-url("../../../../img/comments.svg");
+                text: @tr("Give Feedback & Get Support");
+
+                clicked => {
+                    Backend.action-triggered(ActionId.open-support, -1);
+                }
+            }
+
+            Button {
+                width: self.preferred-width;
+                colorize-icon: true;
+                icon: @image-url("../../../../img/github.svg");
+                text: @tr("View Source Code (GitHub)");
+
+                clicked => {
+                    Backend.action-triggered(ActionId.open-source-code, -1);
+                }
+            }
+
+            Button {
+                width: self.preferred-width;
+                colorize-icon: true;
+                icon: @image-url("../../../../img/keyboard-shortcuts.svg");
+                text: @tr("Keyboard Shortcuts Reference");
+
+                clicked => {
+                    Backend.action-triggered(ActionId.open-keyboard-shortcuts-reference, -1);
+                }
+            }
+
+            Button {
+                width: self.preferred-width;
+                colorize-icon: true;
+                primary: true;
+                icon: @image-url("../../../../img/heart.svg");
+                text: @tr("Support the LibrePCB Project");
+
+                clicked => {
+                    Backend.action-triggered(ActionId.open-donate, -1);
+                }
+            }
+        }
+
+        Rectangle { }
+
+        PanelHeader {
+            title: @tr("Details");
+            note: @tr("(please copy this into bug reports)");
+
+            PanelHeaderButton {
+                icon: t-copy-countdown.running ? @image-url("../../../../img/check.svg") : @image-url("../../../../img/copy.svg");
+                icon-scale: 0.5;
+                tooltip: t-copy-countdown.running ? @tr("Copied!") : @tr("Copy to Clipboard");
+                colorize: t-copy-countdown.running ? lime : transparent;
+
+                clicked => {
+                    if (Backend.action-triggered(ActionId.copy-application-details-into-clipboard, -1)) {
+                        t-copy-countdown.running = true;
+                    }
+                }
+
+                t-copy-countdown := Timer {
+                    interval: 1s;
+                    running: false;
+
+                    triggered => {
+                        self.running = false;
+                    }
+                }
+            }
+        }
+
+        VerticalLayout {
+            padding: 8px;
+
+            ti-details := TextInput {
+                height: self.preferred-height;
+                font-family: "Noto Sans Mono";
+                font-size: 11px;
+                read-only: true;
+                single-line: false;
+                wrap: no-wrap;
+                text: Data.about-librepcb-details;
+            }
+        }
+
+        PanelHeader {
+            title: @tr("License & Credits");
+        }
+
+        VerticalLayout {
+            padding: 8px;
+            spacing: 3px;
+
+            Text {
+                wrap: word-wrap;
+                font-italic: true;
+                font-size: 11px;
+                text: @tr("This is free software, released under the GNU General Public License (GPL) version 3 or later. You can find the full license text in our source code.");
+            }
+
+            if available-space > 530px: HorizontalLayout {
+                spacing: 15px;
+
+                AboutSlint { }
+
+                Image {
+                    y: (parent.height - self.height) / 2;
+                    height: 35px;
+                    source: @image-url("../../../../img/ngi0-commons.svg");
+                }
+            }
+
+            if available-space > 480px: Text {
+                wrap: word-wrap;
+                font-italic: true;
+                font-size: 11px;
+                text: @tr("This project is funded through the NGI0 Commons Fund, a fund established by NLnet with financial support from the European Commission’s Next Generation Internet programme, under the aegis of DG Communications Networks, Content and Technology under grant agreement No 101135429.");
+            }
+        }
+    }
+}

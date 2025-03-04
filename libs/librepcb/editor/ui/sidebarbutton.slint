@@ -1,0 +1,60 @@
+import { Button, VerticalBox } from "std-widgets.slint";
+import { ToolTip } from "./common/tooltip.slint";
+
+export component SideBarButton inherits Rectangle {
+    in property <image> icon <=> i-icon.source;
+    in property <string> tooltip;
+    in property <color> status-background;
+    in property <color> status-color;
+    in property <string> status-text;
+    in-out property <bool> enabled: true;
+    in-out property <bool> checked: false;
+
+    callback clicked;
+
+    background: self.checked ? #1c1c1c : (ta.pressed ? #555555 : (ta.has-hover ? #424242 : #353535));
+    height: self.width;
+
+    if checked: Rectangle {
+        x: 0px;
+        width: 3px;
+        background: #29d682;
+    }
+
+    ta := TouchArea {
+        enabled: enabled;
+        clicked => {
+            root.clicked();
+        }
+    }
+
+    i-icon := Image {
+        width: 70%;
+        height: 70%;
+        colorize: enabled ? white : gray;
+    }
+
+    if !status-text.is-empty: Rectangle {
+        x: parent.width - self.width - 2px;
+        y: parent.height - self.height - 2px;
+        width: max(t-status.preferred-width + 8px, self.height * 1.5);
+        height: t-status.preferred-height + 2px;
+        border-radius: self.height / 2;
+        background: status-background;
+
+        t-status := Text {
+            x: (parent.width - self.width) / 2;
+            y: (parent.height - self.height) / 2;
+            font-size: 10px;
+            font-weight: 700;
+            color: status-color;
+            text: status-text;
+        }
+    }
+
+    if ta.has-hover: ToolTip {
+        x: root.width + 5px;
+        y: (root.height / 2) - (self.height / 2);
+        text: tooltip;
+    }
+}

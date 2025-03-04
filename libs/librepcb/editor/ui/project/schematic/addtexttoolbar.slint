@@ -1,0 +1,125 @@
+import { ComboBox, LineEdit, Palette } from "std-widgets.slint";
+import { LengthEdit } from "../../common/lengthedit.slint";
+import { WindowSectionData, SchematicTabData, Int64 } from "../../api/types.slint";
+
+export component AddTextToolBar inherits HorizontalLayout {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    property <[SchematicTabData]> tabs: section.schematic-tabs;
+
+    spacing: 5px;
+
+    Text {
+        vertical-alignment: center;
+        text: @tr("Layer:");
+    }
+
+    ComboBox {
+        model: tabs[section.current-tab-index].tool-layers;
+        current-index: tabs[section.current-tab-index].tool-layer-index;
+
+        changed current-index => {
+            if (tabs[section.current-tab-index].tool-layer-index != self.current-index) {
+                tabs[section.current-tab-index].tool-layer-index = self.current-index;
+            }
+        }
+    }
+
+    Text {
+        vertical-alignment: center;
+        text: @tr("Text:");
+    }
+
+    LineEdit {
+        property <string> tool-value: tabs[section.current-tab-index].tool-value;
+        property <bool> disable-update: false;
+
+        changed tool-value => {
+            if !disable-update {
+                self.text = tool-value;
+            }
+        }
+
+        changed has-focus => {
+            if !self.has-focus {
+                disable-update = false;
+                self.text = tool-value;
+            }
+        }
+
+        init => {
+            self.text = tool-value;
+        }
+
+        edited(text) => {
+            disable-update = true;
+            tabs[section.current-tab-index].tool-value = text;
+        }
+    }
+
+    TouchArea {
+        width: 10px;
+
+        Text {
+            font-size: parent.has-hover ? 10px : 8px;
+            color: parent.has-hover ? white : #cccccc;
+            text: "▼";
+        }
+
+        popup-suggestions := PopupWindow {
+            x: 0;
+            y: root.height;
+
+            VerticalLayout {
+                for text in tabs[section.current-tab-index].tool-value-suggestions: TouchArea {
+                    Rectangle {
+                        background: parent.has-hover ? #505050 : Palette.background;
+
+                        VerticalLayout {
+                            padding: 6px;
+
+                            Text {
+                                text: text;
+                            }
+                        }
+                    }
+
+                    clicked => {
+                        tabs[section.current-tab-index].tool-value = text;
+                    }
+                }
+            }
+        }
+
+        clicked => {
+            popup-suggestions.show();
+        }
+    }
+
+    Text {
+        vertical-alignment: center;
+        text: @tr("Height:");
+    }
+
+    LengthEdit {
+        value: tabs[section.current-tab-index].tool-height;
+        unit: tabs[section.current-tab-index].tool-height-unit;
+        can-decrease: tabs[section.current-tab-index].tool-height-can-decrease;
+
+        value-entered(v) => {
+            tabs[section.current-tab-index].tool-height = v;
+        }
+
+        unit-entered(u) => {
+            tabs[section.current-tab-index].tool-height-unit = u;
+        }
+
+        increase-triggered => {
+            tabs[section.current-tab-index].tool-height-increase = true;
+        }
+
+        decrease-triggered => {
+            tabs[section.current-tab-index].tool-height-decrease = true;
+        }
+    }
+}

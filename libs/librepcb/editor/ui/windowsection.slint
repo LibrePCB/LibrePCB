@@ -1,0 +1,223 @@
+import { TabType, TabData, WindowSectionData, ActionId } from "./api/types.slint";
+import { EmptyTab } from "./emptytab.slint";
+import { HomeTab } from "./hometab.slint";
+import { SchematicTab } from "./project/schematic/schematictab.slint";
+import { Board2dTab } from "./project/board/board2dtab.slint";
+import { Board3dTab } from "./project/board/board3dtab.slint";
+import { CreateLibraryTab } from "./library/createlibrarytab.slint";
+import { DownloadLibraryTab } from "./library/downloadlibrarytab.slint";
+import { Backend } from "./api/backend.slint";
+import { Data } from "./api/data.slint";
+
+component Tab inherits Rectangle {
+    in property <TabData> tab;
+    in property <int> index;
+    in property <bool> is-current-section: false;
+    in property <bool> is-current-tab: false;
+
+    callback clicked <=> ta-tab.clicked;
+    callback close-clicked;
+
+    background: is-current-tab ? #505050 : (ta-tab.has-hover ? #454545 : #3a3a3a);
+
+    ta-tab := TouchArea { }
+
+    HorizontalLayout {
+        padding-left: 4px;
+        padding-right: 2px;
+        spacing: 3px;
+
+        Image {
+            width: 16px;
+            source: Data.get-icon-for-tab-type(tab.type);
+            colorize: t-tab.color;
+        }
+
+        t-tab := Text {
+            vertical-alignment: TextVerticalAlignment.center;
+            color: is-current-tab ? white : #a0a0a0;
+            text: tab.title;
+        }
+
+        if tab.type != TabType.home: Rectangle {
+            y: (parent.height - self.height) / 2;
+            width: i-tab-close.width;
+            height: i-tab-close.height;
+            background: ta-tab-close.has-hover ? #454545 : transparent;
+            border-radius: 3px;
+
+            i-tab-close := Image {
+                source: @image-url("../../../../img/close.svg");
+                colorize: t-tab.color;
+            }
+
+            ta-tab-close := TouchArea {
+                clicked => {
+                    close-clicked();
+                }
+            }
+        }
+    }
+
+    if (is-current-section) && (is-current-tab): Rectangle {
+        x: 0;
+        y: 0;
+        width: 100%;
+        height: 1px;
+        background: #29d682;
+    }
+}
+
+export component WindowSection inherits Rectangle {
+    in-out property <int> section-index;
+    in-out property <WindowSectionData> section;
+    property <bool> is-current-section: (section-index == Data.current-section-index);
+    property <int> first-tab-index: (section-index == 0) ? 0 : 1;
+    property <bool> tab-open: (section.current-tab-index >= first-tab-index) && (section.current-tab-index < section.tabs.length);
+    property <TabType> tab-type: section.tabs[section.current-tab-index].type;
+
+    tab-bar := Rectangle {
+        x: 0;
+        y: 0;
+        height: 30px;
+        background: #2c2c2c;
+
+        Rectangle {
+            x: 0;
+            width: controls.x;
+            clip: true;
+
+            HorizontalLayout {
+                alignment: LayoutAlignment.start;
+                width: 100%;
+
+                for tab[index] in section.tabs: Tab {
+                    tab: tab;
+                    index: index;
+                    is-current-section: is-current-section;
+                    is-current-tab: (index == section.current-tab-index);
+                    visible: index >= first-tab-index;
+                    width: self.visible ? self.preferred-width : 0;
+
+                    clicked => {
+                        if Data.preview-mode {
+                            Data.current-section-index = section-index;
+                            Data.sections[section-index].current-tab-index = index;
+                        } else {
+                            Backend.tab-clicked(section-index, index);
+                        }
+                    }
+
+                    close-clicked => {
+                        Backend.tab-close-clicked(section-index, index);
+                    }
+                }
+            }
+        }
+
+        controls := HorizontalLayout {
+            x: parent.width - self.width;
+            width: self.preferred-width;
+            padding: 3px;
+
+            Rectangle {
+                width: self.height;
+                background: ta-section-split.has-hover ? #454545 : transparent;
+                border-radius: 3px;
+
+                Image {
+                    height: parent.height - 10px;
+                    source: @image-url("../../../../img/layout-split.svg");
+                    colorize: #d3d3d3;
+                }
+
+                ta-section-split := TouchArea {
+                    clicked => {
+                        Backend.action-triggered(ActionId.section-split, section-index);
+                    }
+                }
+            }
+
+            if (Data.sections.length > 1) && (section.tabs.length <= 1): Rectangle {
+                width: self.height;
+                background: ta-section-close.has-hover ? #454545 : transparent;
+                border-radius: 3px;
+
+                Image {
+                    height: parent.height - 4px;
+                    source: @image-url("../../../../img/close.svg");
+                    colorize: #d3d3d3;
+                }
+
+                ta-section-close := TouchArea {
+                    clicked => {
+                        Backend.action-triggered(ActionId.section-close, section-index);
+                    }
+                }
+            }
+        }
+    }
+
+    Rectangle {
+        x: 0;
+        y: tab-bar.height;
+        width: root.width;
+        height: parent.height - self.y;
+
+        if (!tab-open): EmptyTab {
+            width: 100%;
+            height: 100%;
+            section-index: section-index;
+        }
+
+        if (tab-open) && (tab-type == TabType.home): HomeTab {
+            width: 100%;
+            height: 100%;
+            section-index: section-index;
+        }
+
+        if (tab-open) && (tab-type == TabType.create-library): CreateLibraryTab {
+            width: 100%;
+            height: 100%;
+            section-index: section-index;
+            section: section;
+        }
+
+        if (tab-open) && (tab-type == TabType.download-library): DownloadLibraryTab {
+            width: 100%;
+            height: 100%;
+            section-index: section-index;
+            section: section;
+        }
+
+        if (tab-open) && (tab-type == TabType.schematic): SchematicTab {
+            width: 100%;
+            height: 100%;
+            section-index: section-index;
+            section: section;
+        }
+
+        if (tab-open) && (tab-type == TabType.board-2d): Board2dTab {
+            width: 100%;
+            height: 100%;
+            section-index: section-index;
+            section: section;
+        }
+
+        if (tab-open) && (tab-type == TabType.board-3d): Board3dTab {
+            width: 100%;
+            height: 100%;
+            section-index: section-index;
+            section: section;
+        }
+
+        // Highlight rectangle
+        property <float> highlight-percentage:section.highlight ? 1.2 : 0;
+        animate highlight-percentage { duration: 700ms; }
+        if (highlight-percentage > 0): Rectangle {
+            border-color: #29d682;
+            border-width: 3px;
+            opacity: (!section.highlight) ? 0 : (1.2 - highlight-percentage);
+        }
+    }
+}

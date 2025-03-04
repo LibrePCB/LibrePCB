@@ -35,6 +35,8 @@ Files:
  .gitmodules
  .rustfmt.toml
  .tx/*
+ apps/librepcb/ui/img/grid-dots.svg
+ apps/librepcb/ui/img/grid-none.svg
  AUTHORS.md
  ci/*
  CONTRIBUTING.md
@@ -99,6 +101,73 @@ Copyright: LibrePCB Developers, see AUTHORS.md
 License: CC0-1.0
 
 Files:
+ apps/librepcb/ui/img/3d.svg
+ apps/librepcb/ui/img/actions/lock-closed.svg
+ apps/librepcb/ui/img/actions/lock-open.svg
+ apps/librepcb/ui/img/box-arrow-left.svg
+ apps/librepcb/ui/img/draw-wire.svg
+ apps/librepcb/ui/img/eye-fill.svg
+ apps/librepcb/ui/img/eye-slash-fill.svg
+ apps/librepcb/ui/img/files.svg
+ apps/librepcb/ui/img/grid-lines.svg
+ apps/librepcb/ui/img/mirror-horizontal.svg
+ apps/librepcb/ui/img/mirror-vertical.svg
+ apps/librepcb/ui/img/output-jobs.svg
+ apps/librepcb/ui/img/pdf.svg
+ apps/librepcb/ui/img/pin-angle-fill.svg
+ apps/librepcb/ui/img/pin-angle.svg
+ apps/librepcb/ui/img/plus.svg
+ apps/librepcb/ui/img/print.svg
+ apps/librepcb/ui/img/reset.svg
+ apps/librepcb/ui/img/save.svg
+ apps/librepcb/ui/img/shopping-cart.svg
+ apps/librepcb/ui/img/window-plus.svg
+ apps/librepcb/ui/img/window-split.svg
+ apps/librepcb/ui/img/window-x.svg
+Copyright: The Bootstrap Authors
+License: MIT
+
+Files:
+ apps/librepcb/ui/img/angle-right-solid.svg
+ apps/librepcb/ui/img/bell-solid.svg
+ apps/librepcb/ui/img/bell.svg
+ apps/librepcb/ui/img/caret-down.svg
+ apps/librepcb/ui/img/caret-up.svg
+ apps/librepcb/ui/img/check.svg
+ apps/librepcb/ui/img/circle-info.svg
+ apps/librepcb/ui/img/circle-xmark.svg
+ apps/librepcb/ui/img/comments.svg
+ apps/librepcb/ui/img/copy.svg
+ apps/librepcb/ui/img/cursor.svg
+ apps/librepcb/ui/img/cut.svg
+ apps/librepcb/ui/img/delete.svg
+ apps/librepcb/ui/img/documentation.svg
+ apps/librepcb/ui/img/draw-polygon.svg
+ apps/librepcb/ui/img/draw-text.svg
+ apps/librepcb/ui/img/edit.svg
+ apps/librepcb/ui/img/file-circle-plus.svg
+ apps/librepcb/ui/img/filter-solid.svg
+ apps/librepcb/ui/img/folder-open.svg
+ apps/librepcb/ui/img/github.svg
+ apps/librepcb/ui/img/heart.svg
+ apps/librepcb/ui/img/keyboard-shortcuts.svg
+ apps/librepcb/ui/img/lightbulb.svg
+ apps/librepcb/ui/img/microchip-solid.svg
+ apps/librepcb/ui/img/move.svg
+ apps/librepcb/ui/img/paste.svg
+ apps/librepcb/ui/img/redo.svg
+ apps/librepcb/ui/img/refresh.svg
+ apps/librepcb/ui/img/rotate-ccw.svg
+ apps/librepcb/ui/img/rotate-cw.svg
+ apps/librepcb/ui/img/ruler.svg
+ apps/librepcb/ui/img/star-solid.svg
+ apps/librepcb/ui/img/star.svg
+ apps/librepcb/ui/img/tag-solid.svg
+ apps/librepcb/ui/img/triangle-exclamation.svg
+ apps/librepcb/ui/img/undo.svg
+ apps/librepcb/ui/img/wand-magic-sparkles-solid.svg
+ apps/librepcb/ui/img/webbrowser.svg
+ apps/librepcb/ui/img/youtube-brands-solid.svg
  img/actions/align_horizontally.svg
  img/actions/align_vertically.svg
  img/actions/donate_white.svg
@@ -109,7 +178,9 @@ Files: img/actions/generate_ibom.png
 Copyright: InteractiveHtmlBom
 License: MIT
 
-Files: img/logo/ngi0.png
+Files:
+ apps/librepcb/ui/img/ngi0-commons.svg
+ img/logo/ngi0.png
 Copyright: Next Generation Internet
 License: CC-BY-SA-4.0
 

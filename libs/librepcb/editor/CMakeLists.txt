@@ -110,6 +110,12 @@ add_library(
   graphics/textgraphicsitem.h
   graphics/zonegraphicsitem.cpp
   graphics/zonegraphicsitem.h
+  graphicsscenetab.cpp
+  graphicsscenetab.h
+  guiapplication.cpp
+  guiapplication.h
+  hometab.cpp
+  hometab.h
   library/cat/categorychooserdialog.cpp
   library/cat/categorychooserdialog.h
   library/cat/categorychooserdialog.ui
@@ -206,6 +212,8 @@ add_library(
   library/cmp/compsymbvarpinsignalmapeditorwidget.cpp
   library/cmp/compsymbvarpinsignalmapeditorwidget.h
   library/cmp/if_componentsymbolvarianteditorprovider.h
+  library/createlibrarytab.cpp
+  library/createlibrarytab.h
   library/dev/deviceeditorwidget.cpp
   library/dev/deviceeditorwidget.h
   library/dev/deviceeditorwidget.ui
@@ -217,6 +225,8 @@ add_library(
   library/dev/partlisteditorwidget.h
   library/dev/partlistmodel.cpp
   library/dev/partlistmodel.h
+  library/downloadlibrarytab.cpp
+  library/downloadlibrarytab.h
   library/eaglelibraryimportwizard/eaglelibraryimportwizard.cpp
   library/eaglelibraryimportwizard/eaglelibraryimportwizard.h
   library/eaglelibraryimportwizard/eaglelibraryimportwizard.ui
@@ -268,6 +278,8 @@ add_library(
   library/lib/libraryoverviewwidget.cpp
   library/lib/libraryoverviewwidget.h
   library/lib/libraryoverviewwidget.ui
+  library/librariesmodel.cpp
+  library/librariesmodel.h
   library/libraryeditor.cpp
   library/libraryeditor.h
   library/libraryeditor.ui
@@ -417,6 +429,8 @@ add_library(
   library/sym/symbolpinpropertiesdialog.cpp
   library/sym/symbolpinpropertiesdialog.h
   library/sym/symbolpinpropertiesdialog.ui
+  mainwindow.cpp
+  mainwindow.h
   modelview/angledelegate.cpp
   modelview/angledelegate.h
   modelview/attributelistmodel.cpp
@@ -438,6 +452,10 @@ add_library(
   modelview/pathmodel.h
   modelview/sortfilterproxymodel.cpp
   modelview/sortfilterproxymodel.h
+  notification.cpp
+  notification.h
+  notificationsmodel.cpp
+  notificationsmodel.h
   project/addcomponentdialog.cpp
   project/addcomponentdialog.h
   project/addcomponentdialog.ui
@@ -445,6 +463,10 @@ add_library(
   project/assemblyvariantlisteditorwidget.h
   project/assemblyvariantlistmodel.cpp
   project/assemblyvariantlistmodel.h
+  project/board/board2dtab.cpp
+  project/board/board2dtab.h
+  project/board/board3dtab.cpp
+  project/board/board3dtab.h
   project/board/boardclipboarddata.cpp
   project/board/boardclipboarddata.h
   project/board/boardclipboarddatabuilder.cpp
@@ -785,11 +807,18 @@ add_library(
   project/partinformationtooltip.ui
   project/projecteditor.cpp
   project/projecteditor.h
+  project/projecteditor2.cpp
+  project/projecteditor2.h
+  project/projectreadmerenderer.cpp
+  project/projectreadmerenderer.h
   project/projectsetupdialog.cpp
   project/projectsetupdialog.h
   project/projectsetupdialog.ui
+  project/projectsmodel.cpp
+  project/projectsmodel.h
   project/schematic/fsm/schematiceditorfsm.cpp
   project/schematic/fsm/schematiceditorfsm.h
+  project/schematic/fsm/schematiceditorfsmadapter.h
   project/schematic/fsm/schematiceditorstate.cpp
   project/schematic/fsm/schematiceditorstate.h
   project/schematic/fsm/schematiceditorstate_addcomponent.cpp
@@ -835,9 +864,14 @@ add_library(
   project/schematic/schematicpagesdock.ui
   project/schematic/schematicselectionquery.cpp
   project/schematic/schematicselectionquery.h
+  project/schematic/schematictab.cpp
+  project/schematic/schematictab.h
   project/schematic/symbolinstancepropertiesdialog.cpp
   project/schematic/symbolinstancepropertiesdialog.h
   project/schematic/symbolinstancepropertiesdialog.ui
+  rulecheck/rulecheckmessagesmodel.cpp
+  rulecheck/rulecheckmessagesmodel.h
+  uitypes.h
   undocommand.cpp
   undocommand.h
   undocommandgroup.cpp
@@ -934,6 +968,15 @@ add_library(
   widgets/unsignedratioedit.h
   widgets/waitingspinnerwidget.cpp
   widgets/waitingspinnerwidget.h
+  windowsection.cpp
+  windowsection.h
+  windowsectionsmodel.cpp
+  windowsectionsmodel.h
+  windowtab.cpp
+  windowtab.h
+  windowtabsmodel.cpp
+  windowtabsmodel.h
+  windowtabsmodeladapter.h
   workspace/categorytreemodel.cpp
   workspace/categorytreemodel.h
   workspace/controlpanel/controlpanel.cpp
@@ -953,6 +996,8 @@ add_library(
   workspace/desktopintegration.h
   workspace/desktopservices.cpp
   workspace/desktopservices.h
+  workspace/filesystemmodel.cpp
+  workspace/filesystemmodel.h
   workspace/initializeworkspacewizard/initializeworkspacewizard.cpp
   workspace/initializeworkspacewizard/initializeworkspacewizard.h
   workspace/initializeworkspacewizard/initializeworkspacewizard.ui
@@ -990,9 +1035,16 @@ add_library(
   workspace/projectlibraryupdater/projectlibraryupdater.cpp
   workspace/projectlibraryupdater/projectlibraryupdater.h
   workspace/projectlibraryupdater/projectlibraryupdater.ui
+  workspace/quickaccessmodel.cpp
+  workspace/quickaccessmodel.h
   workspace/workspacesettingsdialog.cpp
   workspace/workspacesettingsdialog.h
   workspace/workspacesettingsdialog.ui
+)
+slint_target_sources(
+  librepcb_editor ui/appwindow.slint
+  NAMESPACE ui
+  COMPILATION_UNITS 12
 )
 target_include_directories(
   librepcb_editor
@@ -1012,6 +1064,7 @@ target_link_libraries(
   PUBLIC # LibrePCB
          LibrePCB::Core
          # Third party
+         Slint::Slint
          TypeSafe::TypeSafe
          # Qt
          ${QT}::Core
@@ -1028,6 +1081,13 @@ if(APPLE)
   # is a very ugly hack to work around this problem.
   target_link_libraries(librepcb_editor PUBLIC ${QT}::Quick)
 endif()
+
+# Setup gettext
+# find_package(Intl)
+# target_link_libraries(
+#   librepcb
+#   PRIVATE Intl::Intl
+# )
 
 # Alias to namespaced variant
 add_library(LibrePCB::Editor ALIAS librepcb_editor)
