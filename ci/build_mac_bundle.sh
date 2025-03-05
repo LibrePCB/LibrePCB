@@ -34,6 +34,7 @@ pushd "./build/install/opt/"  # Avoid having path in DMG name
 dylibbundler -ns -od -b \
   -x LibrePCB.app/Contents/MacOS/librepcb \
   -x LibrePCB.app/Contents/MacOS/librepcb-cli \
+  -x lib/libslint_cpp.dylib \
   -d LibrePCB.app/Contents/Frameworks/ \
   -p @executable_path/../Frameworks/
 if [ "$ARCH" = "arm64" ]
@@ -45,7 +46,8 @@ then
   fix_macdeployqt "/opt/homebrew/lib"
   macdeployqt "LibrePCB.app" -always-overwrite \
     -executable="./LibrePCB.app/Contents/MacOS/librepcb" \
-    -executable="./LibrePCB.app/Contents/MacOS/librepcb-cli"
+    -executable="./LibrePCB.app/Contents/MacOS/librepcb-cli" \
+    -executable="./LibrePCB.app/Contents/Frameworks/libslint_cpp.dylib"
   codesign --force --deep -s - ./LibrePCB.app/Contents/MacOS/librepcb
   codesign --force --deep -s - ./LibrePCB.app/Contents/MacOS/librepcb-cli
   create-dmg --skip-jenkins --volname "LibrePCB" \
@@ -59,7 +61,8 @@ else
     if [ ! -f ./LibrePCB.dmg ]; then
       macdeployqt "LibrePCB.app" -dmg -always-overwrite \
         -executable="./LibrePCB.app/Contents/MacOS/librepcb" \
-        -executable="./LibrePCB.app/Contents/MacOS/librepcb-cli"
+        -executable="./LibrePCB.app/Contents/MacOS/librepcb-cli" \
+        -executable="./LibrePCB.app/Contents/Frameworks/libslint_cpp.dylib"
       sleep 5
     fi
   done

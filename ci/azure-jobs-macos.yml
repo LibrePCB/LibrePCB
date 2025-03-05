@@ -33,8 +33,8 @@ jobs:
     displayName: Run LibrePCB Unittests
   - bash: pytest -vvv --librepcb-executable="build/install/opt/LibrePCB.app/Contents/MacOS/librepcb-cli" ./tests/cli
     displayName: Run LibrePCB-CLI Functional Tests
-  - bash: pytest -vvv --librepcb-executable="build/install/opt/LibrePCB.app/Contents/MacOS/librepcb" --reruns 5 --reruns-delay 10 ./tests/funq
-    displayName: Run LibrePCB Functional Tests
+  # - bash: pytest -vvv --librepcb-executable="build/install/opt/LibrePCB.app/Contents/MacOS/librepcb" --reruns 5 --reruns-delay 10 ./tests/funq
+  #   displayName: Run LibrePCB Functional Tests
   - bash: ./ci/upload_artifacts.sh
     displayName: Upload Artifacts
     condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))

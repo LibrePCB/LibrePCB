@@ -22,6 +22,8 @@ target_link_libraries(
           # LibrePCB
           LibrePCB::Editor
           LibrePCB::Core
+          # Third party
+          Slint::Slint
           # Qt
           ${QT}::Core
           ${QT}::Gui
