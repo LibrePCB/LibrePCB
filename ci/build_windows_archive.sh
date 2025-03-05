@@ -24,6 +24,7 @@ cp -v "`qmake -query QT_INSTALL_PREFIX`"/bin/lib*.dll ./build/install/opt/bin/
 
 # Copy Slint DLL
 cp -v ./build/install/opt/lib/slint_cpp.dll ./build/install/opt/bin/
+cp -v ./build/install/opt/lib/slint_cpp.dll ./build/tests/unittests/
 
 # Copy Qt DLLs
 windeployqt --compiler-runtime --force ./build/install/opt/bin/librepcb.exe
