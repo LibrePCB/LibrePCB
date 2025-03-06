@@ -23,10 +23,10 @@ cp -r "./build/install/opt/share" "./build/install/opt/LibrePCB.app/Contents/"
 # https://github.com/orgs/Homebrew/discussions/2823.
 # Note: The last 3 symlinks are required for QtQuick.
 fix_macdeployqt () {
-  ln -s $1 ./lib  # https://github.com/orgs/Homebrew/discussions/2823
-  ln -s $1 ../lib
-  rm -rf ../../lib && ln -s $1 ../../lib  # Directory already exists.
-  ln -s $1 ../../../lib
+  ln -s -f $1 ./lib  # https://github.com/orgs/Homebrew/discussions/2823
+  ln -s -f $1 ../lib
+  rm -rf ../../lib && ln -s -f $1 ../../lib  # Directory already exists.
+  ln -s -f $1 ../../../lib
 }
 
 # Build bundle
