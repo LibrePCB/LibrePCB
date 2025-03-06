@@ -1013,6 +1013,7 @@ target_link_libraries(
   PUBLIC # LibrePCB
          LibrePCB::Core
          # Third party
+         Slint::Slint
          TypeSafe::TypeSafe
          # Qt
          ${QT}::Core
@@ -1024,6 +1025,13 @@ target_link_libraries(
          ${QT}::Network
          ${QT}::Widgets
 )
+
+# Setup gettext
+# find_package(Intl)
+# target_link_libraries(
+#   librepcb
+#   PRIVATE Intl::Intl
+# )
 
 # Alias to namespaced variant
 add_library(LibrePCB::Editor ALIAS librepcb_editor)
