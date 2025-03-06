@@ -48,7 +48,6 @@ option(BUILD_TESTS "Build unit tests." ON)
 option(BUILD_DISALLOW_WARNINGS
        "Disallow compiler warnings during build (build with -Werror)." OFF
 )
-option(BUILD_QTQUICK_TEST "Build the QML test window." ON)
 option(UNBUNDLE_DXFLIB "Don't use vendored dxflib library." OFF)
 option(UNBUNDLE_FONTOBENE_QT "Don't use vendored FontoBeneQt library." OFF)
 option(UNBUNDLE_GTEST "Don't use vendored GoogleTest library." OFF)
@@ -140,9 +139,6 @@ set(QT_COMPONENTS
     Svg
     Widgets
 )
-if(BUILD_QTQUICK_TEST)
-  list(APPEND QT_COMPONENTS Quick QuickControls2)
-endif()
 if(BUILD_TESTS)
   list(APPEND QT_COMPONENTS Test)
 endif()
