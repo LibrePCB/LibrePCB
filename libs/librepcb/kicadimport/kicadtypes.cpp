@@ -208,9 +208,10 @@ static kicadimport::KiCadPinStyle deserializePinStyle(const SExpression& node,
 
 static kicadimport::KiCadFootprintFillType deserializeFootprintFillType(
     const SExpression& node, MessageLogger& log) {
-  if (node.getValue() == "none") {
+  // Just yes/no since KiCad v9.
+  if ((node.getValue() == "no") || (node.getValue() == "none")) {
     return kicadimport::KiCadFootprintFillType::None;
-  } else if (node.getValue() == "solid") {
+  } else if ((node.getValue() == "yes") || (node.getValue() == "solid")) {
     return kicadimport::KiCadFootprintFillType::Solid;
   } else {
     log.warning("Unknown footprint fill type: " + node.getValue());
@@ -740,6 +741,8 @@ KiCadSymbol KiCadSymbol::parse(const SExpression& node, MessageLogger& log) {
       obj.properties.append(KiCadProperty::parse(*child, log));
     } else if (child->getName() == "symbol") {
       obj.gates.append(KiCadSymbolGate::parse(*child, log));
+    } else if (child->getName() == "embedded_fonts") {
+      // New in KiCad v9, ignoring for now.
     } else {
       log.warning(tr("Unsupported symbol child: '%1'").arg(child->getName()));
     }
@@ -1157,6 +1160,8 @@ KiCadFootprint KiCadFootprint::parse(const SExpression& node,
       obj.pads.append(KiCadFootprintPad::parse(*child, log));
     } else if (child->getName() == "group") {
       // Ignore.
+    } else if (child->getName() == "embedded_fonts") {
+      // New in KiCad v9, ignoring for now.
     } else if (child->getName() == "model") {
       obj.models.append(KiCadFootprintModel::parse(*child, log));
     } else {
