@@ -106,7 +106,7 @@ public:
                                        const QList<KiCadSymbolGate>& kiGates,
                                        const QString& generatedBy,
                                        const QString& cmpGeneratedBy,
-                                       const QString& pkgGeneratedBy,
+                                       QString pkgGeneratedBy,
                                        MessageLogger& log);
 
   // Operator Overloadings
@@ -114,10 +114,10 @@ public:
 
 private:  // Methods
   void loadAlreadyImportedSymbol(const QString& generatedBy);
-  void loadAlreadyImportedPackage(const QString& generatedBy);
+  QString loadAlreadyImportedPackage(const QStringList& generatedBy);
   void loadAlreadyImportedComponent(const QString& generatedBy);
   template <typename T>
-  FilePath getAlreadyImportedFp(const QString& generatedBy) const;
+  FilePath getAlreadyImportedFp(const QStringList& generatedBy) const;
   void tryOrLogError(std::function<void()> func, MessageLogger& log);
 
 private:  // Data
