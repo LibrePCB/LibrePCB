@@ -52,6 +52,30 @@ protected:
   virtual ~KiCadLibraryImportTest() {
     QDir(mWsDir.toStr()).removeRecursively();
   }
+
+  int getTotalSymbolsCount(const KiCadLibraryImport::Result& result) const {
+    int count = 0;
+    for (const KiCadLibraryImport::SymbolLibrary& lib : result.symbolLibs) {
+      count += lib.symbols.count();
+    }
+    return count;
+  }
+
+  int getTotalFootprintFilesCount(const KiCadLibraryImport::Result& result) const {
+    int count = 0;
+    for (const KiCadLibraryImport::FootprintLibrary& lib : result.footprintLibs) {
+      count += lib.files.count();
+    }
+    return count;
+  }
+
+  int getTotalFootprintsCount(const KiCadLibraryImport::Result& result) const {
+    int count = 0;
+    for (const KiCadLibraryImport::FootprintLibrary& lib : result.footprintLibs) {
+      count += lib.footprints.count();
+    }
+    return count;
+  }
 };
 
 /*******************************************************************************
@@ -80,11 +104,11 @@ TEST_F(KiCadLibraryImportTest, testImport) {
   std::shared_ptr<KiCadLibraryImport::Result> result = import.getResult();
   EXPECT_EQ(1, signalFinished);
   EXPECT_GE(log->getMessages().count(), 1);
-  ASSERT_EQ(1, result->symbolLibs.count());
-  ASSERT_EQ(0, result->symbolLibs.first().symbols.count());
-  ASSERT_EQ(1, result->footprintLibs.count());
-  ASSERT_EQ(1, result->footprintLibs.first().files.count());
-  ASSERT_EQ(0, result->footprintLibs.first().footprints.count());
+  EXPECT_EQ(3, result->symbolLibs.count());
+  EXPECT_EQ(0, getTotalSymbolsCount(*result));
+  EXPECT_EQ(2, result->footprintLibs.count());
+  EXPECT_EQ(3, getTotalFootprintFilesCount(*result));
+  EXPECT_EQ(0, getTotalFootprintsCount(*result));
   log->clear();
   signalFinished = 0;
 
@@ -94,15 +118,15 @@ TEST_F(KiCadLibraryImportTest, testImport) {
   result = import.getResult();
   EXPECT_EQ(1, signalFinished);
   EXPECT_GE(log->getMessages().count(), 1);
-  ASSERT_EQ(1, result->symbolLibs.count());
-  ASSERT_EQ(1, result->symbolLibs.first().symbols.count());
-  ASSERT_EQ(1, result->footprintLibs.count());
-  ASSERT_EQ(1, result->footprintLibs.first().files.count());
-  ASSERT_EQ(1, result->footprintLibs.first().footprints.count());
+  EXPECT_EQ(3, result->symbolLibs.count());
+  EXPECT_EQ(3, getTotalSymbolsCount(*result));
+  EXPECT_EQ(2, result->footprintLibs.count());
+  EXPECT_EQ(3, getTotalFootprintFilesCount(*result));
+  EXPECT_EQ(3, getTotalFootprintsCount(*result));
   log->clear();
   signalFinished = 0;
 
-  // Verify nothing is exported yet.
+  // Verify nothing is imported yet.
   EXPECT_FALSE(dst.isExistingDir());
 
   // Import.
@@ -117,7 +141,7 @@ TEST_F(KiCadLibraryImportTest, testImport) {
   // Verify that files have been written (2 files per element).
   const QList<FilePath> dstFiles =
       FileUtils::getFilesInDirectory(dst, QStringList(), true, false);
-  EXPECT_EQ(6, dstFiles.count());
+  EXPECT_EQ(22, dstFiles.count());
 }
 
 /*******************************************************************************

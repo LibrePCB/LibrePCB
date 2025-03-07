@@ -395,7 +395,11 @@ KiCadProperty KiCadProperty::parse(const SExpression& node,
   obj.value = node.getChild(1).getValue();
   obj.position = deserialize<QPointF>(node.getChild("at"));
   if (const SExpression* child = node.tryGetChild("at/@2")) {
-    obj.rotation = deserialize<qreal>(*child);
+    if (child->getValue() == "unlocked") {
+      obj.unlocked = true;  // KiCad v6 compatibility.
+    } else {
+      obj.rotation = deserialize<qreal>(*child);
+    }
   }
   if (const SExpression* child = node.tryGetChild("layer/@0")) {
     obj.layer = child->getValue();
@@ -536,8 +540,14 @@ KiCadSymbolArc KiCadSymbolArc::parse(const SExpression& node,
   obj.start = deserialize<QPointF>(node.getChild("start"));
   obj.mid = deserialize<QPointF>(node.getChild("mid"));
   obj.end = deserialize<QPointF>(node.getChild("end"));
-  obj.strokeWidth = deserialize<qreal>(node.getChild("stroke/width/@0"));
-  obj.strokeType = deserializeStrokeType(node.getChild("stroke/type/@0"), log);
+  if (const SExpression* child = node.tryGetChild("width/@0")) {
+    obj.strokeWidth = deserialize<qreal>(*child);  // KiCad v6 compatibility.
+  } else {
+    obj.strokeWidth = deserialize<qreal>(node.getChild("stroke/width/@0"));
+  }
+  if (const SExpression* child = node.tryGetChild("stroke/type/@0")) {
+    obj.strokeType = deserializeStrokeType(*child, log);
+  }
   obj.fillType = deserializeSymbolFillType(node.getChild("fill/type/@0"), log);
   return obj;
 }
@@ -551,8 +561,14 @@ KiCadSymbolCircle KiCadSymbolCircle::parse(const SExpression& node,
   KiCadSymbolCircle obj;
   obj.center = deserialize<QPointF>(node.getChild("center"));
   obj.radius = deserialize<qreal>(node.getChild("radius/@0"));
-  obj.strokeWidth = deserialize<qreal>(node.getChild("stroke/width/@0"));
-  obj.strokeType = deserializeStrokeType(node.getChild("stroke/type/@0"), log);
+  if (const SExpression* child = node.tryGetChild("width/@0")) {
+    obj.strokeWidth = deserialize<qreal>(*child);  // KiCad v6 compatibility.
+  } else {
+    obj.strokeWidth = deserialize<qreal>(node.getChild("stroke/width/@0"));
+  }
+  if (const SExpression* child = node.tryGetChild("stroke/type/@0")) {
+    obj.strokeType = deserializeStrokeType(*child, log);
+  }
   obj.fillType = deserializeSymbolFillType(node.getChild("fill/type/@0"), log);
   return obj;
 }
@@ -566,8 +582,14 @@ KiCadSymbolRectangle KiCadSymbolRectangle::parse(const SExpression& node,
   KiCadSymbolRectangle obj;
   obj.start = deserialize<QPointF>(node.getChild("start"));
   obj.end = deserialize<QPointF>(node.getChild("end"));
-  obj.strokeWidth = deserialize<qreal>(node.getChild("stroke/width/@0"));
-  obj.strokeType = deserializeStrokeType(node.getChild("stroke/type/@0"), log);
+  if (const SExpression* child = node.tryGetChild("width/@0")) {
+    obj.strokeWidth = deserialize<qreal>(*child);  // KiCad v6 compatibility.
+  } else {
+    obj.strokeWidth = deserialize<qreal>(node.getChild("stroke/width/@0"));
+  }
+  if (const SExpression* child = node.tryGetChild("stroke/type/@0")) {
+    obj.strokeType = deserializeStrokeType(*child, log);
+  }
   obj.fillType = deserializeSymbolFillType(node.getChild("fill/type/@0"), log);
   return obj;
 }
@@ -582,8 +604,14 @@ KiCadSymbolPolyline KiCadSymbolPolyline::parse(const SExpression& node,
   foreach (const SExpression* child, node.getChild("pts").getChildren("xy")) {
     obj.coordinates.append(deserialize<QPointF>(*child));
   }
-  obj.strokeWidth = deserialize<qreal>(node.getChild("stroke/width/@0"));
-  obj.strokeType = deserializeStrokeType(node.getChild("stroke/type/@0"), log);
+  if (const SExpression* child = node.tryGetChild("width/@0")) {
+    obj.strokeWidth = deserialize<qreal>(*child);  // KiCad v6 compatibility.
+  } else {
+    obj.strokeWidth = deserialize<qreal>(node.getChild("stroke/width/@0"));
+  }
+  if (const SExpression* child = node.tryGetChild("stroke/type/@0")) {
+    obj.strokeType = deserializeStrokeType(*child, log);
+  }
   obj.fillType = deserializeSymbolFillType(node.getChild("fill/type/@0"), log);
   return obj;
 }
@@ -756,8 +784,14 @@ KiCadFootprintLine KiCadFootprintLine::parse(const SExpression& node,
   KiCadFootprintLine obj;
   obj.start = deserialize<QPointF>(node.getChild("start"));
   obj.end = deserialize<QPointF>(node.getChild("end"));
-  obj.strokeWidth = deserialize<qreal>(node.getChild("stroke/width/@0"));
-  obj.strokeType = deserializeStrokeType(node.getChild("stroke/type/@0"), log);
+  if (const SExpression* child = node.tryGetChild("width/@0")) {
+    obj.strokeWidth = deserialize<qreal>(*child);  // KiCad v6 compatibility.
+  } else {
+    obj.strokeWidth = deserialize<qreal>(node.getChild("stroke/width/@0"));
+  }
+  if (const SExpression* child = node.tryGetChild("stroke/type/@0")) {
+    obj.strokeType = deserializeStrokeType(*child, log);
+  }
   obj.layer = deserializeLayer(node.getChild("layer/@0"), log);
   return obj;
 }
@@ -772,8 +806,14 @@ KiCadFootprintArc KiCadFootprintArc::parse(const SExpression& node,
   obj.start = deserialize<QPointF>(node.getChild("start"));
   obj.mid = deserialize<QPointF>(node.getChild("mid"));
   obj.end = deserialize<QPointF>(node.getChild("end"));
-  obj.strokeWidth = deserialize<qreal>(node.getChild("stroke/width/@0"));
-  obj.strokeType = deserializeStrokeType(node.getChild("stroke/type/@0"), log);
+  if (const SExpression* child = node.tryGetChild("width/@0")) {
+    obj.strokeWidth = deserialize<qreal>(*child);  // KiCad v6 compatibility.
+  } else {
+    obj.strokeWidth = deserialize<qreal>(node.getChild("stroke/width/@0"));
+  }
+  if (const SExpression* child = node.tryGetChild("stroke/type/@0")) {
+    obj.strokeType = deserializeStrokeType(*child, log);
+  }
   obj.layer = deserializeLayer(node.getChild("layer/@0"), log);
   return obj;
 }
@@ -788,8 +828,14 @@ KiCadFootprintCircle KiCadFootprintCircle::parse(const SExpression& node,
   obj.center = deserialize<QPointF>(node.getChild("center"));
   obj.end = deserialize<QPointF>(node.getChild("end"));
   obj.layer = deserializeLayer(node.getChild("layer/@0"), log);
-  obj.strokeWidth = deserialize<qreal>(node.getChild("stroke/width/@0"));
-  obj.strokeType = deserializeStrokeType(node.getChild("stroke/type/@0"), log);
+  if (const SExpression* child = node.tryGetChild("width/@0")) {
+    obj.strokeWidth = deserialize<qreal>(*child);  // KiCad v6 compatibility.
+  } else {
+    obj.strokeWidth = deserialize<qreal>(node.getChild("stroke/width/@0"));
+  }
+  if (const SExpression* child = node.tryGetChild("stroke/type/@0")) {
+    obj.strokeType = deserializeStrokeType(*child, log);
+  }
   if (const SExpression* child = node.tryGetChild("fill/@0")) {
     obj.fillType = deserializeFootprintFillType(*child, log);
   }
@@ -806,8 +852,14 @@ KiCadFootprintRectangle KiCadFootprintRectangle::parse(const SExpression& node,
   obj.start = deserialize<QPointF>(node.getChild("start"));
   obj.end = deserialize<QPointF>(node.getChild("end"));
   obj.layer = deserializeLayer(node.getChild("layer/@0"), log);
-  obj.strokeWidth = deserialize<qreal>(node.getChild("stroke/width/@0"));
-  obj.strokeType = deserializeStrokeType(node.getChild("stroke/type/@0"), log);
+  if (const SExpression* child = node.tryGetChild("width/@0")) {
+    obj.strokeWidth = deserialize<qreal>(*child);  // KiCad v6 compatibility.
+  } else {
+    obj.strokeWidth = deserialize<qreal>(node.getChild("stroke/width/@0"));
+  }
+  if (const SExpression* child = node.tryGetChild("stroke/type/@0")) {
+    obj.strokeType = deserializeStrokeType(*child, log);
+  }
   if (const SExpression* child = node.tryGetChild("fill/@0")) {
     obj.fillType = deserializeFootprintFillType(*child, log);
   }
@@ -825,8 +877,14 @@ KiCadFootprintPolygon KiCadFootprintPolygon::parse(const SExpression& node,
     obj.coordinates.append(deserialize<QPointF>(*child));
   }
   obj.layer = deserializeLayer(node.getChild("layer/@0"), log);
-  obj.strokeWidth = deserialize<qreal>(node.getChild("stroke/width/@0"));
-  obj.strokeType = deserializeStrokeType(node.getChild("stroke/type/@0"), log);
+  if (const SExpression* child = node.tryGetChild("width/@0")) {
+    obj.strokeWidth = deserialize<qreal>(*child);  // KiCad v6 compatibility.
+  } else {
+    obj.strokeWidth = deserialize<qreal>(node.getChild("stroke/width/@0"));
+  }
+  if (const SExpression* child = node.tryGetChild("stroke/type/@0")) {
+    obj.strokeType = deserializeStrokeType(*child, log);
+  }
   if (const SExpression* child = node.tryGetChild("fill/@0")) {
     obj.fillType = deserializeFootprintFillType(*child, log);
   }
@@ -844,7 +902,11 @@ KiCadFootprintText KiCadFootprintText::parse(const SExpression& node,
   obj.text = node.getChild("@1").getValue();
   obj.position = deserialize<QPointF>(node.getChild("at"));
   if (const SExpression* child = node.tryGetChild("at/@2")) {
-    obj.rotation = deserialize<qreal>(*child);
+    if (child->getValue() == "unlocked") {  // KiCad v6 compatibility.
+      obj.unlocked = true;
+    } else {
+      obj.rotation = deserialize<qreal>(*child);
+    }
   }
   obj.layer = deserializeLayer(node.getChild("layer/@0"), log);
   if (const SExpression* child = node.tryGetChild("effects/font/size")) {
@@ -905,8 +967,11 @@ KiCadFootprintPad KiCadFootprintPad::parse(const SExpression& node,
         obj.offset = deserialize<QPointF>(*offset);
       }
     } else if (child->getName() == "layers") {
+      // KiCad v6 seems to had no quotes in some cases, thus we also need to
+      // take tokens into account.
       foreach (const SExpression* layer,
-               child->getChildren(SExpression::Type::String)) {
+               child->getChildren(SExpression::Type::String) +
+                   child->getChildren(SExpression::Type::Token)) {
         obj.layers.append(deserializeLayer(*layer, log));
       }
     } else if (child->getName() == "property") {
