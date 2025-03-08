@@ -90,6 +90,14 @@ if(BUILD_DISALLOW_WARNINGS)
   target_compile_options(common INTERFACE -Werror)
 endif()
 
+# GCC 13.x emits a false-positive (?) warning.
+if(CMAKE_CXX_COMPILER_ID STREQUAL GNU
+   AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 13.0
+   AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 14.0
+)
+  target_compile_options(common INTERFACE -Wno-maybe-uninitialized)
+endif()
+
 # The TypeSafe library causes some compiler warnings which are not of
 # interest, so let's suppress them.
 target_compile_options(common INTERFACE -Wno-noexcept-type)
