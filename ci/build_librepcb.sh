@@ -19,6 +19,7 @@ echo "Using CC=$CC"
 mkdir -p build && pushd build
 cmake \
   -G Ninja \
+  -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
   -DCMAKE_INSTALL_PREFIX=$(pwd)/install/opt \
   -DBUILD_DISALLOW_WARNINGS=1 \
   -DLIBREPCB_ENABLE_DESKTOP_INTEGRATION=1 \
