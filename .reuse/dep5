@@ -100,6 +100,22 @@ Files:
 Copyright: Font Awesome
 License: CC-BY-4.0
 
+Files: libs/font-awesome/*
+Copyright: Font Awesome
+License: MIT
+
+Files:
+ libs/font-awesome/js/*
+ libs/font-awesome/svgs/*
+Copyright: Font Awesome
+License: CC-BY-4.0
+
+Files:
+ libs/font-awesome/otfs/*
+ libs/font-awesome/webfonts/*
+Copyright: Font Awesome
+License: OFL-1.1
+
 Files: img/actions/generate_ibom.png
 Copyright: InteractiveHtmlBom
 License: MIT
