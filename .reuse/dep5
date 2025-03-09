@@ -116,6 +116,10 @@ Files:
 Copyright: Font Awesome
 License: OFL-1.1
 
+Files: libs/bootstrap-icons/*
+Copyright: The Bootstrap Authors
+License: MIT
+
 Files: img/actions/generate_ibom.png
 Copyright: InteractiveHtmlBom
 License: MIT

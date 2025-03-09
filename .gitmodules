@@ -40,3 +40,6 @@
 [submodule "libs/font-awesome"]
     path = libs/font-awesome
     url = https://github.com/FortAwesome/Font-Awesome.git
+[submodule "libs/bootstrap-icons"]
+    path = libs/bootstrap-icons
+    url = https://github.com/twbs/icons.git
