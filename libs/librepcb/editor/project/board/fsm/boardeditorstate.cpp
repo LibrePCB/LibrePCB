@@ -69,7 +69,7 @@ namespace editor {
 
 BoardEditorState::BoardEditorState(const Context& context,
                                    QObject* parent) noexcept
-  : QObject(parent), mContext(context) {
+  : QObject(parent), mContext(context), mAdapter(context.adapter) {
 }
 
 BoardEditorState::~BoardEditorState() noexcept {
@@ -80,19 +80,19 @@ BoardEditorState::~BoardEditorState() noexcept {
  ******************************************************************************/
 
 Board* BoardEditorState::getActiveBoard() noexcept {
-  return mContext.editor.getActiveBoard();
+  return mAdapter.fsmGetActiveBoard();
 }
 
 BoardGraphicsScene* BoardEditorState::getActiveBoardScene() noexcept {
-  return mContext.editor.getActiveBoardScene();
+  return mAdapter.fsmGetGraphicsScene();
 }
 
 bool BoardEditorState::getIgnoreLocks() const noexcept {
-  return mContext.editor.getIgnoreLocks();
+  return mAdapter.fsmGetIgnoreLocks();
 }
 
 PositiveLength BoardEditorState::getGridInterval() const noexcept {
-  if (const Board* board = mContext.editor.getActiveBoard()) {
+  if (const Board* board = mAdapter.fsmGetActiveBoard()) {
     return board->getGridInterval();
   } else {
     return PositiveLength(2540000);
@@ -100,7 +100,7 @@ PositiveLength BoardEditorState::getGridInterval() const noexcept {
 }
 
 const LengthUnit& BoardEditorState::getLengthUnit() const noexcept {
-  if (const Board* board = mContext.editor.getActiveBoard()) {
+  if (const Board* board = mAdapter.fsmGetActiveBoard()) {
     return board->getGridUnit();
   } else {
     return mContext.workspace.getSettings().defaultLengthUnit.get();
@@ -149,7 +149,8 @@ QSet<const Layer*> BoardEditorState::getAllowedGeometryLayers() noexcept {
 }
 
 void BoardEditorState::makeLayerVisible(const QString& layer) noexcept {
-  if (std::shared_ptr<GraphicsLayer> l = mContext.editor.getLayer(layer)) {
+  if (std::shared_ptr<GraphicsLayer> l =
+          mContext.layerProvider.getLayer(layer)) {
     if (l->isEnabled()) {
       l->setVisible(true);
     }
@@ -157,7 +158,7 @@ void BoardEditorState::makeLayerVisible(const QString& layer) noexcept {
 }
 
 void BoardEditorState::abortBlockingToolsInOtherEditors() noexcept {
-  mContext.editor.abortBlockingToolsInOtherEditors();
+  mAdapter.fsmAbortBlockingToolsInOtherEditors();
 }
 
 bool BoardEditorState::execCmd(UndoCommand* cmd) {
@@ -165,7 +166,7 @@ bool BoardEditorState::execCmd(UndoCommand* cmd) {
 }
 
 QWidget* BoardEditorState::parentWidget() noexcept {
-  return &mContext.editor;
+  return &mContext.parentWidget;
 }
 
 QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
@@ -179,10 +180,8 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
 
   const QPointF posExact = pos.toPxQPointF();
   const QPointF posOnGrid = pos.mappedToGrid(getGridInterval()).toPxQPointF();
-  const QPainterPath posArea =
-      mContext.editorGraphicsView.calcPosWithTolerance(pos);
-  const QPainterPath posAreaLarge =
-      mContext.editorGraphicsView.calcPosWithTolerance(pos, 1.5);
+  const QPainterPath posArea = mAdapter.fsmCalcPosWithTolerance(pos, 1);
+  const QPainterPath posAreaLarge = mAdapter.fsmCalcPosWithTolerance(pos, 1.5);
 
   // Note: The order of adding the items is very important (the top most item
   // must appear as the first item in the list)! For that, we work with

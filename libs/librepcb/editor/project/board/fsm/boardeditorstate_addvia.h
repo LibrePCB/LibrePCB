@@ -43,7 +43,6 @@ namespace editor {
 
 class BoardGraphicsScene;
 class CmdBoardViaEdit;
-class PositiveLengthEdit;
 
 /*******************************************************************************
  *  Class BoardEditorState_AddVia
@@ -74,9 +73,28 @@ public:
   virtual bool processGraphicsSceneLeftMouseButtonDoubleClicked(
       const GraphicsSceneMouseEvent& e) noexcept override;
 
+  // Connection to UI
+  const PositiveLength& getSize() const noexcept {
+    return mCurrentProperties.getSize();
+  }
+  void setSize(const PositiveLength& size) noexcept;
+  const PositiveLength& getDrillDiameter() const noexcept {
+    return mCurrentProperties.getDrillDiameter();
+  }
+  void setDrillDiameter(const PositiveLength& diameter) noexcept;
+  QVector<std::pair<Uuid, QString>> getAvailableNets() const noexcept;
+  bool getUseAutoNet() const noexcept { return mUseAutoNetSignal; }
+  std::optional<Uuid> getNet() const noexcept { return mCurrentNetSignal; }
+  void setNet(bool autoNet, const std::optional<Uuid>& net) noexcept;
+
   // Operator Overloadings
   BoardEditorState_AddVia& operator=(const BoardEditorState_AddVia& rhs) =
       delete;
+
+signals:
+  void sizeChanged(const PositiveLength& size);
+  void drillDiameterChanged(const PositiveLength& diameter);
+  void netChanged(bool autoNet, const std::optional<Uuid>& net);
 
 private:  // Methods
   bool addVia(const Point& pos) noexcept;
@@ -84,8 +102,6 @@ private:  // Methods
   void setNetSignal(NetSignal* netsignal) noexcept;
   bool fixPosition(const Point& pos) noexcept;
   bool abortCommand(bool showErrMsgBox) noexcept;
-  void sizeEditValueChanged(const PositiveLength& value) noexcept;
-  void drillDiameterEditValueChanged(const PositiveLength& value) noexcept;
   void applySelectedNetSignal() noexcept;
   void updateClosestNetSignal(BoardGraphicsScene& scene,
                               const Point& pos) noexcept;
@@ -94,7 +110,9 @@ private:  // Methods
 private:  // Data
   // State
   bool mIsUndoCmdActive;
-  Via mLastViaProperties;
+
+  // Current tool settings
+  Via mCurrentProperties;
 
   /// Whether the net signal is determined automatically or not
   bool mUseAutoNetSignal;
@@ -109,9 +127,6 @@ private:  // Data
   // mIsUndoCmdActive == true.
   BI_Via* mCurrentViaToPlace;
   std::unique_ptr<CmdBoardViaEdit> mCurrentViaEditCmd;
-
-  // Widgets for the command toolbar
-  QPointer<QComboBox> mNetSignalComboBox;
 };
 
 /*******************************************************************************
