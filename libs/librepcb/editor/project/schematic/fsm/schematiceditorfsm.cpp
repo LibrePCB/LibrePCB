@@ -60,11 +60,6 @@ SchematicEditorFsm::SchematicEditorFsm(const Context& context,
   mStates.insert(State::ADD_TEXT, new SchematicEditorState_AddText(context));
   mStates.insert(State::MEASURE, new SchematicEditorState_Measure(context));
 
-  foreach (SchematicEditorState* state, mStates) {
-    connect(state, &SchematicEditorState::statusBarMessageChanged, this,
-            &SchematicEditorFsm::statusBarMessageChanged);
-  }
-
   enterNextState(State::SELECT);
 }
 
@@ -361,7 +356,6 @@ bool SchematicEditorFsm::leaveCurrentState() noexcept {
   }
 
   mCurrentState = State::IDLE;
-  emit stateChanged(mCurrentState);
   return true;
 }
 
@@ -372,7 +366,6 @@ bool SchematicEditorFsm::enterNextState(State state) noexcept {
     return false;
   }
   mCurrentState = state;
-  emit stateChanged(mCurrentState);
   return true;
 }
 
