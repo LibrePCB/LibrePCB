@@ -40,11 +40,9 @@ class Workspace;
 
 namespace editor {
 
-class BoardEditor;
+class BoardEditorFsmAdapter;
 class BoardEditorState;
-class GraphicsView;
-class ProjectEditor;
-class ToolBarProxy;
+class IF_GraphicsLayerProvider;
 class UndoStack;
 struct GraphicsSceneKeyEvent;
 struct GraphicsSceneMouseEvent;
@@ -90,11 +88,10 @@ public:
   struct Context {
     Workspace& workspace;
     Project& project;
-    ProjectEditor& projectEditor;
-    BoardEditor& editor;
-    GraphicsView& editorGraphicsView;
-    ToolBarProxy& commandToolBar;
     UndoStack& undoStack;
+    QWidget& parentWidget;
+    IF_GraphicsLayerProvider& layerProvider;
+    BoardEditorFsmAdapter& adapter;
   };
 
   // Constructors / Destructor

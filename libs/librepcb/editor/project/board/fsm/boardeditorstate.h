@@ -25,6 +25,7 @@
  ******************************************************************************/
 #include "../../../graphics/graphicsscene.h"
 #include "boardeditorfsm.h"
+#include "boardeditorfsmadapter.h"
 
 #include <librepcb/core/types/length.h>
 
@@ -223,6 +224,7 @@ protected:  // Methods
 
 protected:  // Data
   Context mContext;
+  BoardEditorFsmAdapter& mAdapter;
 };
 
 }  // namespace editor
