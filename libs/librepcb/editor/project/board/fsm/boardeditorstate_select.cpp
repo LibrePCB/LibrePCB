@@ -131,6 +131,7 @@ bool BoardEditorState_Select::entry() noexcept {
   Q_ASSERT(!mCmdPolygonEdit);
   Q_ASSERT(!mCmdPlaneEdit);
   Q_ASSERT(!mCmdZoneEdit);
+  mAdapter.fsmToolEnter(*this);
   return true;
 }
 
@@ -144,6 +145,7 @@ bool BoardEditorState_Select::exit() noexcept {
     scene->clearSelection();
   }
 
+  mAdapter.fsmToolLeave();
   return true;
 }
 
@@ -859,7 +861,8 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
 
       EditorToolbox::addResourcesToMenu(
           mContext.workspace, mb, device->getDevice().getComponentInstance(),
-          device->getDevice().getLibDevice().getUuid(), mContext.editor, menu);
+          device->getDevice().getLibDevice().getUuid(), mContext.parentWidget,
+          menu);
     } else if (auto netline =
                    std::dynamic_pointer_cast<BGI_NetLine>(selectedItem)) {
       mb.addAction(cmd.setLineWidth.createAction(
@@ -1350,7 +1353,7 @@ bool BoardEditorState_Select::changeWidthOfSelectedItems(int step) noexcept {
       // Else: Show the dialog to enter a custom value.
     }
     if (!width) {
-      QDialog dlg(&mContext.editor);
+      QDialog dlg(parentWidget());
       dlg.setWindowTitle(tr("Set Width"));
       QVBoxLayout* vLayout = new QVBoxLayout(&dlg);
       UnsignedLengthEdit* edtWidth = new UnsignedLengthEdit(&dlg);
@@ -1376,7 +1379,7 @@ bool BoardEditorState_Select::changeWidthOfSelectedItems(int step) noexcept {
     mContext.undoStack.execCmd(cmd.release());
     emit statusBarMessageChanged(
         mContext.workspace.getSettings().defaultLengthUnit.get().format(
-            **width, mContext.editor.locale()),
+            **width, mContext.parentWidget.locale()),
         5000);
     return true;
   } catch (const Exception& e) {
@@ -1551,8 +1554,7 @@ bool BoardEditorState_Select::copySelectedItemsToClipboard() noexcept {
   if (!scene) return false;
 
   try {
-    const Point cursorPos =
-        mContext.editorGraphicsView.mapGlobalPosToScenePos(QCursor::pos());
+    const Point cursorPos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos());
     BoardClipboardDataBuilder builder(*scene);
     std::unique_ptr<BoardClipboardData> data = builder.generate(cursorPos);
     qApp->clipboard()->setMimeData(data->toMimeData().release());
@@ -1574,8 +1576,7 @@ bool BoardEditorState_Select::startPaste(
   mIsUndoCmdActive = true;
 
   // Paste items.
-  const Point startPos =
-      mContext.editorGraphicsView.mapGlobalPosToScenePos(QCursor::pos());
+  const Point startPos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos());
   Point offset = fixedPosition
       ? (*fixedPosition)
       : (startPos - data->getCursorPos()).mappedToGrid(getGridInterval());
@@ -1845,7 +1846,7 @@ void BoardEditorState_Select::openPlanePropertiesDialog(
 
 void BoardEditorState_Select::openZonePropertiesDialog(BI_Zone& zone) noexcept {
   ZonePropertiesDialog dialog(
-      zone, mContext.undoStack, getLengthUnit(), mContext.editor,
+      zone, mContext.undoStack, getLengthUnit(), mContext.layerProvider,
       "board_editor/zone_properties_dialog", parentWidget());
   dialog.exec();
 }

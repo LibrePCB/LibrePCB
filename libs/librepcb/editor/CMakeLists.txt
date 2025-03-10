@@ -495,6 +495,7 @@ add_library(
   project/board/fabricationoutputdialog.ui
   project/board/fsm/boardeditorfsm.cpp
   project/board/fsm/boardeditorfsm.h
+  project/board/fsm/boardeditorfsmadapter.h
   project/board/fsm/boardeditorstate.cpp
   project/board/fsm/boardeditorstate.h
   project/board/fsm/boardeditorstate_adddevice.cpp
