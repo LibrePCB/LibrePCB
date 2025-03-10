@@ -26,6 +26,7 @@
 #include "../../dialogs/graphicsexportdialog.h"
 #include "../../graphics/graphicslayer.h"
 #include "../../widgets/if_graphicsvieweventhandler.h"
+#include "fsm/boardeditorfsmadapter.h"
 #include "ui_boardeditor.h"
 
 #include <librepcb/core/project/board/board.h>
@@ -76,7 +77,8 @@ class BoardEditor;
  */
 class BoardEditor final : public QMainWindow,
                           public IF_GraphicsLayerProvider,
-                          public IF_GraphicsViewEventHandler {
+                          public IF_GraphicsViewEventHandler,
+                          public BoardEditorFsmAdapter {
   Q_OBJECT
 
 public:
@@ -93,7 +95,6 @@ public:
   BoardGraphicsScene* getActiveBoardScene() noexcept {
     return mGraphicsScene.data();
   }
-  bool getIgnoreLocks() const noexcept;
 
   /// @copydoc ::librepcb::editor::IF_GraphicsLayerProvider::getLayer()
   virtual std::shared_ptr<GraphicsLayer> getLayer(
@@ -116,6 +117,38 @@ public:
   // General Methods
   void abortAllCommands() noexcept;
   void abortBlockingToolsInOtherEditors() noexcept;
+
+  // BoardEditorFsmAdapter
+  Board* fsmGetActiveBoard() noexcept override;
+  BoardGraphicsScene* fsmGetGraphicsScene() noexcept override;
+  bool fsmGetIgnoreLocks() const noexcept override;
+  void fsmSetViewCursor(
+      const std::optional<Qt::CursorShape>& shape) noexcept override;
+  void fsmSetViewGrayOut(bool grayOut) noexcept override;
+  void fsmSetViewInfoBoxText(const QString& text) noexcept override;
+  void fsmSetViewRuler(
+      const std::optional<std::pair<Point, Point>>& pos) noexcept override;
+  void fsmSetSceneCursor(const Point& pos, bool cross,
+                         bool circle) noexcept override;
+  QPainterPath fsmCalcPosWithTolerance(
+      const Point& pos, qreal multiplier) const noexcept override;
+  Point fsmMapGlobalPosToScenePos(const QPoint& pos) const noexcept override;
+  void fsmSetHighlightedNetSignals(
+      const QSet<const NetSignal*>& sigs) noexcept override;
+  void fsmAbortBlockingToolsInOtherEditors() noexcept override;
+  void fsmSetStatusBarMessage(const QString& message,
+                              int timeoutMs = -1) noexcept override;
+  void fsmToolLeave() noexcept override;
+  void fsmToolEnter(BoardEditorState_Select& state) noexcept override;
+  void fsmToolEnter(BoardEditorState_DrawTrace& state) noexcept override;
+  void fsmToolEnter(BoardEditorState_AddVia& state) noexcept override;
+  void fsmToolEnter(BoardEditorState_DrawPolygon& state) noexcept override;
+  void fsmToolEnter(BoardEditorState_AddStrokeText& state) noexcept override;
+  void fsmToolEnter(BoardEditorState_DrawPlane& state) noexcept override;
+  void fsmToolEnter(BoardEditorState_DrawZone& state) noexcept override;
+  void fsmToolEnter(BoardEditorState_AddHole& state) noexcept override;
+  void fsmToolEnter(BoardEditorState_AddDevice& state) noexcept override;
+  void fsmToolEnter(BoardEditorState_Measure& state) noexcept override;
 
   // Operator Overloadings
   BoardEditor& operator=(const BoardEditor& rhs) = delete;

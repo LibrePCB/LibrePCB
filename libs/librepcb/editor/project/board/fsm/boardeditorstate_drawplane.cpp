@@ -22,14 +22,9 @@
  ******************************************************************************/
 #include "boardeditorstate_drawplane.h"
 
-#include "../../../editorcommandset.h"
 #include "../../../undostack.h"
-#include "../../../utils/toolbarproxy.h"
-#include "../../../widgets/graphicsview.h"
-#include "../../../widgets/layercombobox.h"
 #include "../../cmd/cmdboardplaneadd.h"
 #include "../../cmd/cmdboardplaneedit.h"
-#include "../boardeditor.h"
 
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/items/bi_plane.h>
@@ -56,9 +51,9 @@ BoardEditorState_DrawPlane::BoardEditorState_DrawPlane(
   : BoardEditorState(context),
     mIsUndoCmdActive(false),
     mAutoNetSignal(true),
-    mLastNetSignal(nullptr),
-    mLastLayer(&Layer::topCopper()),
     mLastVertexPos(),
+    mCurrentNetSignal(nullptr),
+    mCurrentLayer(&Layer::topCopper()),
     mCurrentPlane(nullptr) {
 }
 
@@ -72,62 +67,16 @@ BoardEditorState_DrawPlane::~BoardEditorState_DrawPlane() noexcept {
 bool BoardEditorState_DrawPlane::entry() noexcept {
   Q_ASSERT(mIsUndoCmdActive == false);
 
-  // Get most used net signal if not manually chosen yet.
+  // Get most used net signal
   if (mAutoNetSignal ||
-      (mLastNetSignal && (!mLastNetSignal->isAddedToCircuit()))) {
-    mLastNetSignal =
+      (mCurrentNetSignal && (!mCurrentNetSignal->isAddedToCircuit()))) {
+    mCurrentNetSignal =
         mContext.project.getCircuit().getNetSignalWithMostElements();
     mAutoNetSignal = true;
   }
 
-  EditorCommandSet& cmd = EditorCommandSet::instance();
-
-  // Add the netsignals combobox to the toolbar
-  mContext.commandToolBar.addLabel(tr("Net:"), 10);
-  std::unique_ptr<QComboBox> netSignalComboBox(new QComboBox());
-  netSignalComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-  netSignalComboBox->setInsertPolicy(QComboBox::NoInsert);
-  netSignalComboBox->setEditable(false);
-  QList<NetSignal*> netSignals =
-      mContext.project.getCircuit().getNetSignals().values();
-  Toolbox::sortNumeric(
-      netSignals,
-      [](const QCollator& cmp, const NetSignal* lhs, const NetSignal* rhs) {
-        return cmp(*lhs->getName(), *rhs->getName());
-      },
-      Qt::CaseInsensitive, false);
-  netSignalComboBox->addItem("[" % tr("None") % "]", QString());
-  foreach (const NetSignal* netsignal, netSignals) {
-    netSignalComboBox->addItem(*netsignal->getName(),
-                               netsignal->getUuid().toStr());
-  }
-  netSignalComboBox->setCurrentText(mLastNetSignal ? *mLastNetSignal->getName()
-                                                   : "");
-  connect(
-      netSignalComboBox.get(), &QComboBox::currentTextChanged,
-      [this](const QString& value) {
-        setNetSignal(mContext.project.getCircuit().getNetSignalByName(value));
-      });
-  mContext.commandToolBar.addWidget(std::move(netSignalComboBox));
-
-  // Add the layers combobox to the toolbar
-  mContext.commandToolBar.addLabel(tr("Layer:"), 10);
-  std::unique_ptr<LayerComboBox> layerComboBox(new LayerComboBox());
-  QSet<const Layer*> layers;
-  if (Board* board = getActiveBoard()) {
-    layers = board->getCopperLayers();
-  }
-  layerComboBox->setLayers(layers);
-  layerComboBox->setCurrentLayer(*mLastLayer);
-  layerComboBox->addAction(cmd.layerUp.createAction(
-      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepDown));
-  layerComboBox->addAction(cmd.layerDown.createAction(
-      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepUp));
-  connect(layerComboBox.get(), &LayerComboBox::currentLayerChanged, this,
-          &BoardEditorState_DrawPlane::layerComboBoxLayerChanged);
-  mContext.commandToolBar.addWidget(std::move(layerComboBox));
-
-  mContext.editorGraphicsView.setCursor(Qt::CrossCursor);
+  mAdapter.fsmToolEnter(*this);
+  mAdapter.fsmSetViewCursor(Qt::CrossCursor);
   return true;
 }
 
@@ -135,10 +84,8 @@ bool BoardEditorState_DrawPlane::exit() noexcept {
   // Abort the currently active command
   if (!abortCommand(true)) return false;
 
-  // Remove actions / widgets from the "command" toolbar
-  mContext.commandToolBar.clear();
-
-  mContext.editorGraphicsView.unsetCursor();
+  mAdapter.fsmSetViewCursor(std::nullopt);
+  mAdapter.fsmToolLeave();
   return true;
 }
 
@@ -185,6 +132,67 @@ bool BoardEditorState_DrawPlane::processSwitchToBoard(int index) noexcept {
 }
 
 /*******************************************************************************
+ *  Connection to UI
+ ******************************************************************************/
+
+QVector<std::pair<Uuid, QString>> BoardEditorState_DrawPlane::getAvailableNets()
+    const noexcept {
+  QVector<std::pair<Uuid, QString>> nets;
+  for (const NetSignal* net :
+       mContext.project.getCircuit().getNetSignals().values()) {
+    nets.append(std::make_pair(net->getUuid(), *net->getName()));
+  }
+  Toolbox::sortNumeric(
+      nets,
+      [](const QCollator& cmp, const std::pair<Uuid, QString>& lhs,
+         const std::pair<Uuid, QString>& rhs) {
+        return cmp(lhs.second, rhs.second);
+      },
+      Qt::CaseInsensitive, false);
+  return nets;
+}
+
+std::optional<Uuid> BoardEditorState_DrawPlane::getNet() const noexcept {
+  return mCurrentNetSignal ? std::make_optional(mCurrentNetSignal->getUuid())
+                           : std::nullopt;
+}
+
+void BoardEditorState_DrawPlane::setNet(
+    const std::optional<Uuid>& net) noexcept {
+  if (net != getNet()) {
+    mCurrentNetSignal = net
+        ? mContext.project.getCircuit().getNetSignals().value(*net)
+        : nullptr;
+    mAutoNetSignal = false;
+    emit netChanged(getNet());
+  }
+
+  if (mCurrentPlaneEditCmd) {
+    mCurrentPlaneEditCmd->setNetSignal(mCurrentNetSignal);
+  }
+}
+
+QSet<const Layer*> BoardEditorState_DrawPlane::getAvailableLayers() noexcept {
+  if (Board* board = getActiveBoard()) {
+    return board->getCopperLayers();
+  } else {
+    return {};
+  }
+}
+
+void BoardEditorState_DrawPlane::setLayer(const Layer& layer) noexcept {
+  if (&layer != mCurrentLayer) {
+    mCurrentLayer = &layer;
+    emit layerChanged(*mCurrentLayer);
+  }
+
+  if (mCurrentPlaneEditCmd) {
+    mCurrentPlaneEditCmd->setLayer(*mCurrentLayer, true);
+    makeLayerVisible(mCurrentLayer->getThemeColor());
+  }
+}
+
+/*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
@@ -203,15 +211,15 @@ bool BoardEditorState_DrawPlane::startAddPlane(const Point& pos) noexcept {
 
     // Add plane with two vertices
     Path path({Vertex(pos), Vertex(pos)});
-    mCurrentPlane = new BI_Plane(*board, Uuid::createRandom(), *mLastLayer,
-                                 mLastNetSignal, path);
+    mCurrentPlane = new BI_Plane(*board, Uuid::createRandom(), *mCurrentLayer,
+                                 mCurrentNetSignal, path);
     mCurrentPlane->setConnectStyle(BI_Plane::ConnectStyle::ThermalRelief);
     mContext.undoStack.appendToCmdGroup(new CmdBoardPlaneAdd(*mCurrentPlane));
 
     // Start undo command
     mCurrentPlaneEditCmd.reset(new CmdBoardPlaneEdit(*mCurrentPlane));
     mLastVertexPos = pos;
-    makeLayerVisible(mLastLayer->getThemeColor());
+    makeLayerVisible(mCurrentLayer->getThemeColor());
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -271,16 +279,6 @@ bool BoardEditorState_DrawPlane::updateLastVertexPosition(
   }
 }
 
-void BoardEditorState_DrawPlane::setNetSignal(NetSignal* netsignal) noexcept {
-  if (netsignal != mLastNetSignal) {
-    mAutoNetSignal = false;
-  }
-  mLastNetSignal = netsignal;
-  if (mCurrentPlaneEditCmd) {
-    mCurrentPlaneEditCmd->setNetSignal(mLastNetSignal);
-  }
-}
-
 bool BoardEditorState_DrawPlane::abortCommand(bool showErrMsgBox) noexcept {
   try {
     // Delete the current edit command
@@ -300,15 +298,6 @@ bool BoardEditorState_DrawPlane::abortCommand(bool showErrMsgBox) noexcept {
       QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     }
     return false;
-  }
-}
-
-void BoardEditorState_DrawPlane::layerComboBoxLayerChanged(
-    const Layer& layer) noexcept {
-  mLastLayer = &layer;
-  if (mCurrentPlaneEditCmd) {
-    mCurrentPlaneEditCmd->setLayer(*mLastLayer, true);
-    makeLayerVisible(mLastLayer->getThemeColor());
   }
 }
 

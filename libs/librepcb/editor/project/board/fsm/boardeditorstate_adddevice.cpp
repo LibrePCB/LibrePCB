@@ -23,10 +23,8 @@
 #include "boardeditorstate_adddevice.h"
 
 #include "../../../undostack.h"
-#include "../../../widgets/graphicsview.h"
 #include "../../cmd/cmdadddevicetoboard.h"
 #include "../../cmd/cmddeviceinstanceeditall.h"
-#include "../boardeditor.h"
 
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/items/bi_device.h>
@@ -60,12 +58,18 @@ BoardEditorState_AddDevice::~BoardEditorState_AddDevice() noexcept {
 
 bool BoardEditorState_AddDevice::entry() noexcept {
   Q_ASSERT(mIsUndoCmdActive == false);
+
+  mAdapter.fsmToolEnter(*this);
   return true;
 }
 
 bool BoardEditorState_AddDevice::exit() noexcept {
   // Abort the currently active command
-  return abortCommand(true);
+  if (!abortCommand(true)) return false;
+  Q_ASSERT(mIsUndoCmdActive == false);
+
+  mAdapter.fsmToolLeave();
+  return true;
 }
 
 /*******************************************************************************
@@ -168,9 +172,8 @@ bool BoardEditorState_AddDevice::addDevice(ComponentInstance& cmp,
     mIsUndoCmdActive = true;
 
     // add selected device to board
-    const Point pos =
-        mContext.editorGraphicsView.mapGlobalPosToScenePos(QCursor::pos())
-            .mappedToGrid(getGridInterval());
+    const Point pos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos())
+                          .mappedToGrid(getGridInterval());
     CmdAddDeviceToBoard* cmd = new CmdAddDeviceToBoard(
         mContext.workspace, *board, cmp, dev, fpt, std::nullopt, pos);
     mContext.undoStack.appendToCmdGroup(cmd);
