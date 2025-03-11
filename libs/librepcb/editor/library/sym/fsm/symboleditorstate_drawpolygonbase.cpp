@@ -184,9 +184,9 @@ QSet<EditorWidgetBase::Feature>
  ******************************************************************************/
 
 bool SymbolEditorState_DrawPolygonBase::processKeyPressed(
-    const QKeyEvent& e) noexcept {
-  if (e.key() == Qt::Key_Shift) {
-    updateCursorPosition(e.modifiers());
+    const GraphicsSceneKeyEvent& e) noexcept {
+  if (e.key == Qt::Key_Shift) {
+    updateCursorPosition(e.modifiers);
     return true;
   }
 
@@ -194,9 +194,9 @@ bool SymbolEditorState_DrawPolygonBase::processKeyPressed(
 }
 
 bool SymbolEditorState_DrawPolygonBase::processKeyReleased(
-    const QKeyEvent& e) noexcept {
-  if (e.key() == Qt::Key_Shift) {
-    updateCursorPosition(e.modifiers());
+    const GraphicsSceneKeyEvent& e) noexcept {
+  if (e.key == Qt::Key_Shift) {
+    updateCursorPosition(e.modifiers);
     return true;
   }
 
@@ -204,16 +204,16 @@ bool SymbolEditorState_DrawPolygonBase::processKeyReleased(
 }
 
 bool SymbolEditorState_DrawPolygonBase::processGraphicsSceneMouseMoved(
-    QGraphicsSceneMouseEvent& e) noexcept {
-  mLastScenePos = Point::fromPx(e.scenePos());
-  updateCursorPosition(e.modifiers());
+    const GraphicsSceneMouseEvent& e) noexcept {
+  mLastScenePos = e.scenePos;
+  updateCursorPosition(e.modifiers);
   return true;
 }
 
 bool SymbolEditorState_DrawPolygonBase::
     processGraphicsSceneLeftMouseButtonPressed(
-        QGraphicsSceneMouseEvent& e) noexcept {
-  mLastScenePos = Point::fromPx(e.scenePos());
+        const GraphicsSceneMouseEvent& e) noexcept {
+  mLastScenePos = e.scenePos;
   if (mIsUndoCmdActive) {
     return addNextSegment();
   } else {
@@ -223,7 +223,7 @@ bool SymbolEditorState_DrawPolygonBase::
 
 bool SymbolEditorState_DrawPolygonBase::
     processGraphicsSceneLeftMouseButtonDoubleClicked(
-        QGraphicsSceneMouseEvent& e) noexcept {
+        const GraphicsSceneMouseEvent& e) noexcept {
   // Handle like a single click.
   return processGraphicsSceneLeftMouseButtonPressed(e);
 }

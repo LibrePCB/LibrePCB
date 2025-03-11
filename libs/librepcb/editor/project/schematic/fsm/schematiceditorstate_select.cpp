@@ -274,22 +274,21 @@ bool SchematicEditorState_Select::processAbortCommand() noexcept {
 }
 
 bool SchematicEditorState_Select::processGraphicsSceneMouseMoved(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   SchematicGraphicsScene* scene = getActiveSchematicScene();
   if (!scene) return false;
 
   switch (mSubState) {
     case SubState::SELECTING: {
       // Update selection rectangle.
-      scene->selectItemsInRect(mStartPos, Point::fromPx(e.scenePos()));
+      scene->selectItemsInRect(mStartPos, e.scenePos);
       return true;
     }
 
     case SubState::MOVING:
     case SubState::PASTING: {
       Q_ASSERT(mSelectedItemsDragCommand);
-      Point pos = Point::fromPx(e.scenePos());
-      mSelectedItemsDragCommand->setCurrentPosition(pos);
+      mSelectedItemsDragCommand->setCurrentPosition(e.scenePos);
       return true;
     }
 
@@ -299,8 +298,7 @@ bool SchematicEditorState_Select::processGraphicsSceneMouseMoved(
           mSelectedPolygon->getPolygon().getPath().getVertices();
       foreach (int i, mSelectedPolygonVertices) {
         if ((i >= 0) && (i < vertices.count())) {
-          vertices[i].setPos(
-              Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval()));
+          vertices[i].setPos(e.scenePos.mappedToGrid(getGridInterval()));
         }
       }
       mCmdPolygonEdit->setPath(Path(vertices), true);
@@ -315,7 +313,7 @@ bool SchematicEditorState_Select::processGraphicsSceneMouseMoved(
 }
 
 bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
-    QGraphicsSceneMouseEvent& mouseEvent) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
@@ -323,20 +321,19 @@ bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
   if (!scene) return false;
 
   if (mSubState == SubState::IDLE) {
-    if (findPolygonVerticesAtPosition(Point::fromPx(mouseEvent.scenePos()))) {
+    if (findPolygonVerticesAtPosition(e.scenePos)) {
       // start moving polygon vertex
       mCmdPolygonEdit.reset(new CmdPolygonEdit(mSelectedPolygon->getPolygon()));
       mSubState = SubState::MOVING_POLYGON_VERTICES;
       return true;
     } else {
       // handle items selection
-      Point pos = Point::fromPx(mouseEvent.scenePos());
       const QList<std::shared_ptr<QGraphicsItem>> items =
-          findItemsAtPos(pos, FindFlag::All | FindFlag::AcceptNearMatch);
+          findItemsAtPos(e.scenePos, FindFlag::All | FindFlag::AcceptNearMatch);
       if (items.isEmpty()) {
         // no items under mouse --> start drawing a selection rectangle
         scene->clearSelection();
-        mStartPos = pos;
+        mStartPos = e.scenePos;
         mSubState = SubState::SELECTING;
         return true;
       }
@@ -358,11 +355,11 @@ bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
           selectedItem = item;
         }
       }
-      if (mouseEvent.modifiers() & Qt::ControlModifier) {
+      if (e.modifiers & Qt::ControlModifier) {
         // Toggle selection when CTRL is pressed.
         auto item = selectedItem ? selectedItem : items.first();
         item->setSelected(!item->isSelected());
-      } else if (mouseEvent.modifiers() & Qt::ShiftModifier) {
+      } else if (e.modifiers & Qt::ShiftModifier) {
         // Cycle Selection, when holding shift.
         const int nextSelectionIndex =
             (items.indexOf(selectedItem) + 1) % items.count();
@@ -377,16 +374,14 @@ bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
         items.first()->setSelected(true);
       }
 
-      if (startMovingSelectedItems(*scene,
-                                   Point::fromPx(mouseEvent.scenePos()))) {
+      if (startMovingSelectedItems(*scene, e.scenePos)) {
         return true;
       }
     }
   } else if (mSubState == SubState::PASTING) {
     // stop moving items (set position of all selected elements permanent)
     Q_ASSERT(mSelectedItemsDragCommand);
-    Point pos = Point::fromPx(mouseEvent.scenePos());
-    mSelectedItemsDragCommand->setCurrentPosition(pos);
+    mSelectedItemsDragCommand->setCurrentPosition(e.scenePos);
     try {
       mContext.undoStack.appendToCmdGroup(
           mSelectedItemsDragCommand.release());  // can throw
@@ -402,7 +397,7 @@ bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
 }
 
 bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
@@ -417,11 +412,10 @@ bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
   } else if (mSubState == SubState::MOVING) {
     // stop moving items (set position of all selected elements permanent)
     Q_ASSERT(mSelectedItemsDragCommand);
-    Point pos = Point::fromPx(e.scenePos());
-    mSelectedItemsDragCommand->setCurrentPosition(pos);
+    mSelectedItemsDragCommand->setCurrentPosition(e.scenePos);
     try {
       execCmd(mSelectedItemsDragCommand.release());  // can throw
-    } catch (Exception& e) {
+    } catch (const Exception& e) {
       QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     }
     mSelectedItemsDragCommand.reset();
@@ -443,10 +437,10 @@ bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
 
 bool SchematicEditorState_Select::
     processGraphicsSceneLeftMouseButtonDoubleClicked(
-        QGraphicsSceneMouseEvent& e) noexcept {
+        const GraphicsSceneMouseEvent& e) noexcept {
   // If SHIFT or CTRL is pressed, the user is modifying items selection, not
   // double-clicking.
-  if (e.modifiers() & (Qt::ShiftModifier | Qt::ControlModifier)) {
+  if (e.modifiers & (Qt::ShiftModifier | Qt::ControlModifier)) {
     return processGraphicsSceneLeftMouseButtonPressed(e);
   }
 
@@ -455,8 +449,8 @@ bool SchematicEditorState_Select::
 
   if (mSubState == SubState::IDLE) {
     // Open the properties editor dialog of the selected item, if any.
-    const QList<std::shared_ptr<QGraphicsItem>> items = findItemsAtPos(
-        Point::fromPx(e.scenePos()), FindFlag::All | FindFlag::AcceptNearMatch);
+    const QList<std::shared_ptr<QGraphicsItem>> items =
+        findItemsAtPos(e.scenePos, FindFlag::All | FindFlag::AcceptNearMatch);
     foreach (auto item, items) {
       if (item->isSelected() && openPropertiesDialog(item)) {
         return true;
@@ -468,7 +462,7 @@ bool SchematicEditorState_Select::
 }
 
 bool SchematicEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
@@ -481,9 +475,8 @@ bool SchematicEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
   if (mSubState != SubState::IDLE) return false;
 
   // handle item selection
-  Point pos = Point::fromPx(e.scenePos());
   QList<std::shared_ptr<QGraphicsItem>> items =
-      findItemsAtPos(pos, FindFlag::All | FindFlag::AcceptNearMatch);
+      findItemsAtPos(e.scenePos, FindFlag::All | FindFlag::AcceptNearMatch);
   if (items.isEmpty()) return false;
   std::shared_ptr<QGraphicsItem> selectedItem;
   foreach (auto item, items) {
@@ -558,8 +551,8 @@ bool SchematicEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
         scene->getSchematic().getPolygons().value(item->getObj().getUuid());
     if (!polygon) return false;
 
-    int lineIndex = item->getLineIndexAtPosition(pos);
-    QVector<int> vertices = item->getVertexIndicesAtPosition(pos);
+    int lineIndex = item->getLineIndexAtPosition(e.scenePos);
+    QVector<int> vertices = item->getVertexIndicesAtPosition(e.scenePos);
 
     mb.addAction(
         cmd.properties.createAction(
@@ -580,8 +573,8 @@ bool SchematicEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
     }
     if (lineIndex >= 0) {
       mb.addAction(cmd.vertexAdd.createAction(
-          &menu, this, [this, polygon, lineIndex, pos]() {
-            startAddingPolygonVertex(*polygon, lineIndex, pos);
+          &menu, this, [this, polygon, lineIndex, e]() {
+            startAddingPolygonVertex(*polygon, lineIndex, e.scenePos);
           }));
     }
     if ((lineIndex >= 0) || (!vertices.isEmpty())) {
@@ -633,7 +626,7 @@ bool SchematicEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
   }
 
   // execute the context menu
-  menu.exec(e.screenPos());
+  menu.exec(QCursor::pos());
   return true;
 }
 

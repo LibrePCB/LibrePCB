@@ -301,8 +301,14 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
         mPanningButton = e->button();
         mCursorBeforePanning = cursor();
         setCursor(Qt::ClosedHandCursor);
-      } else if (mEventHandlerObject) {
-        mEventHandlerObject->graphicsViewEventHandler(event);
+      } else if (mEventHandlerObject && (e->button() == Qt::LeftButton)) {
+        const GraphicsSceneMouseEvent gsme{
+            Point::fromPx(e->scenePos()),
+            Point::fromPx(e->buttonDownScenePos(Qt::LeftButton)),
+            e->buttons(),
+            e->modifiers(),
+        };
+        mEventHandlerObject->graphicsSceneLeftMouseButtonPressed(gsme);
       }
       mPressedMouseButtons = e->buttons();
       return true;
@@ -320,7 +326,17 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
         setCursor(mCursorBeforePanning);
       }
       if ((!wasPanning) && mEventHandlerObject) {
-        mEventHandlerObject->graphicsViewEventHandler(event);
+        const GraphicsSceneMouseEvent gsme{
+            Point::fromPx(e->scenePos()),
+            Point::fromPx(e->buttonDownScenePos(e->button())),
+            e->buttons(),
+            e->modifiers(),
+        };
+        if (e->button() == Qt::LeftButton) {
+          mEventHandlerObject->graphicsSceneLeftMouseButtonReleased(gsme);
+        } else if (e->button() == Qt::RightButton) {
+          mEventHandlerObject->graphicsSceneRightMouseButtonReleased(gsme);
+        }
       }
       mPressedMouseButtons = e->buttons();
       return true;
@@ -340,27 +356,60 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
       }
       emit cursorScenePositionChanged(Point::fromPx(e->scenePos()));
       mPressedMouseButtons = e->buttons();
+      if (mEventHandlerObject) {
+        const GraphicsSceneMouseEvent gsme{
+            Point::fromPx(e->scenePos()),
+            Point::fromPx(e->buttonDownScenePos(Qt::LeftButton)),
+            e->buttons(),
+            e->modifiers(),
+        };
+        mEventHandlerObject->graphicsSceneMouseMoved(gsme);
+      }
+      return true;
     }
-      // fall through
-    case QEvent::GraphicsSceneMouseDoubleClick:
-    case QEvent::GraphicsSceneContextMenu:
-    case QEvent::KeyRelease:
+    case QEvent::GraphicsSceneMouseDoubleClick: {
+      QGraphicsSceneMouseEvent* e =
+          dynamic_cast<QGraphicsSceneMouseEvent*>(event);
+      Q_ASSERT(e);
+      if (mEventHandlerObject && (e->button() == Qt::LeftButton)) {
+        const GraphicsSceneMouseEvent gsme{
+            Point::fromPx(e->scenePos()),
+            Point::fromPx(e->buttonDownScenePos(Qt::LeftButton)),
+            e->buttons(),
+            e->modifiers(),
+        };
+        return mEventHandlerObject->graphicsSceneLeftMouseButtonDoubleClicked(
+            gsme);
+      }
+      break;
+    }
     case QEvent::KeyPress: {
-      if (mEventHandlerObject &&
-          mEventHandlerObject->graphicsViewEventHandler(event)) {
-        return true;
+      if (mEventHandlerObject) {
+        QKeyEvent* e = dynamic_cast<QKeyEvent*>(event);
+        Q_ASSERT(e);
+        const GraphicsSceneKeyEvent gske{
+            e->key(),
+            e->modifiers(),
+        };
+        return mEventHandlerObject->graphicsSceneKeyPressed(gske);
+      }
+      break;
+    }
+    case QEvent::KeyRelease: {
+      if (mEventHandlerObject) {
+        QKeyEvent* e = dynamic_cast<QKeyEvent*>(event);
+        Q_ASSERT(e);
+        const GraphicsSceneKeyEvent gske{
+            e->key(),
+            e->modifiers(),
+        };
+        return mEventHandlerObject->graphicsSceneKeyReleased(gske);
       }
       break;
     }
     case QEvent::GraphicsSceneWheel: {
       if (!underMouse()) break;
-      if (mEventHandlerObject) {
-        if (!mEventHandlerObject->graphicsViewEventHandler(event)) {
-          handleMouseWheelEvent(dynamic_cast<QGraphicsSceneWheelEvent*>(event));
-        }
-      } else {
-        handleMouseWheelEvent(dynamic_cast<QGraphicsSceneWheelEvent*>(event));
-      }
+      handleMouseWheelEvent(dynamic_cast<QGraphicsSceneWheelEvent*>(event));
       return true;
     }
     default:

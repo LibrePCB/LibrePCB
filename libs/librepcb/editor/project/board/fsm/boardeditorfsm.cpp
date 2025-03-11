@@ -280,7 +280,8 @@ bool BoardEditorFsm::processEditProperties() noexcept {
   return false;
 }
 
-bool BoardEditorFsm::processKeyPressed(const QKeyEvent& e) noexcept {
+bool BoardEditorFsm::processKeyPressed(
+    const GraphicsSceneKeyEvent& e) noexcept {
   if (BoardEditorState* state = getCurrentStateObj()) {
     if (state->processKeyPressed(e)) {
       return true;
@@ -289,7 +290,8 @@ bool BoardEditorFsm::processKeyPressed(const QKeyEvent& e) noexcept {
   return false;
 }
 
-bool BoardEditorFsm::processKeyReleased(const QKeyEvent& e) noexcept {
+bool BoardEditorFsm::processKeyReleased(
+    const GraphicsSceneKeyEvent& e) noexcept {
   if (BoardEditorState* state = getCurrentStateObj()) {
     if (state->processKeyReleased(e)) {
       return true;
@@ -299,7 +301,7 @@ bool BoardEditorFsm::processKeyReleased(const QKeyEvent& e) noexcept {
 }
 
 bool BoardEditorFsm::processGraphicsSceneMouseMoved(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   if (BoardEditorState* state = getCurrentStateObj()) {
     if (state->processGraphicsSceneMouseMoved(e)) {
       return true;
@@ -309,7 +311,7 @@ bool BoardEditorFsm::processGraphicsSceneMouseMoved(
 }
 
 bool BoardEditorFsm::processGraphicsSceneLeftMouseButtonPressed(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   if (BoardEditorState* state = getCurrentStateObj()) {
     if (state->processGraphicsSceneLeftMouseButtonPressed(e)) {
       return true;
@@ -319,7 +321,7 @@ bool BoardEditorFsm::processGraphicsSceneLeftMouseButtonPressed(
 }
 
 bool BoardEditorFsm::processGraphicsSceneLeftMouseButtonReleased(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   if (BoardEditorState* state = getCurrentStateObj()) {
     if (state->processGraphicsSceneLeftMouseButtonReleased(e)) {
       return true;
@@ -329,7 +331,7 @@ bool BoardEditorFsm::processGraphicsSceneLeftMouseButtonReleased(
 }
 
 bool BoardEditorFsm::processGraphicsSceneLeftMouseButtonDoubleClicked(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   if (BoardEditorState* state = getCurrentStateObj()) {
     if (state->processGraphicsSceneLeftMouseButtonDoubleClicked(e)) {
       return true;
@@ -339,7 +341,7 @@ bool BoardEditorFsm::processGraphicsSceneLeftMouseButtonDoubleClicked(
 }
 
 bool BoardEditorFsm::processGraphicsSceneRightMouseButtonReleased(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   if (BoardEditorState* state = getCurrentStateObj()) {
     if (state->processGraphicsSceneRightMouseButtonReleased(e)) {
       return true;
