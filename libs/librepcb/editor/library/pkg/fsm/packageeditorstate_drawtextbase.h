@@ -81,11 +81,11 @@ public:
 
   // Event Handlers
   bool processGraphicsSceneMouseMoved(
-      QGraphicsSceneMouseEvent& e) noexcept override;
+      const GraphicsSceneMouseEvent& e) noexcept override;
   bool processGraphicsSceneLeftMouseButtonPressed(
-      QGraphicsSceneMouseEvent& e) noexcept override;
+      const GraphicsSceneMouseEvent& e) noexcept override;
   bool processGraphicsSceneRightMouseButtonReleased(
-      QGraphicsSceneMouseEvent& e) noexcept override;
+      const GraphicsSceneMouseEvent& e) noexcept override;
   bool processRotate(const Angle& rotation) noexcept override;
   bool processMirror(Qt::Orientation orientation) noexcept override;
   bool processFlip(Qt::Orientation orientation) noexcept override;

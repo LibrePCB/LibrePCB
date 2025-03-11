@@ -142,15 +142,15 @@ bool SchematicEditorState_DrawPolygon::processAbortCommand() noexcept {
 }
 
 bool SchematicEditorState_DrawPolygon::processGraphicsSceneMouseMoved(
-    QGraphicsSceneMouseEvent& e) noexcept {
-  Point pos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
+    const GraphicsSceneMouseEvent& e) noexcept {
+  const Point pos = e.scenePos.mappedToGrid(getGridInterval());
   return updateLastVertexPosition(pos);
 }
 
 bool SchematicEditorState_DrawPolygon::
     processGraphicsSceneLeftMouseButtonPressed(
-        QGraphicsSceneMouseEvent& e) noexcept {
-  Point pos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
+        const GraphicsSceneMouseEvent& e) noexcept {
+  const Point pos = e.scenePos.mappedToGrid(getGridInterval());
   if (mIsUndoCmdActive) {
     addSegment(pos);
   } else {
@@ -161,7 +161,7 @@ bool SchematicEditorState_DrawPolygon::
 
 bool SchematicEditorState_DrawPolygon::
     processGraphicsSceneLeftMouseButtonDoubleClicked(
-        QGraphicsSceneMouseEvent& e) noexcept {
+        const GraphicsSceneMouseEvent& e) noexcept {
   return processGraphicsSceneLeftMouseButtonPressed(e);
 }
 

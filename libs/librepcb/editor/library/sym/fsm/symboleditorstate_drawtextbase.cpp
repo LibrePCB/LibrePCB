@@ -180,10 +180,9 @@ QSet<EditorWidgetBase::Feature>
  ******************************************************************************/
 
 bool SymbolEditorState_DrawTextBase::processGraphicsSceneMouseMoved(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   if (mCurrentText) {
-    Point currentPos =
-        Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
+    Point currentPos = e.scenePos.mappedToGrid(getGridInterval());
     mEditCmd->setPosition(currentPos, true);
     return true;
   } else {
@@ -192,9 +191,8 @@ bool SymbolEditorState_DrawTextBase::processGraphicsSceneMouseMoved(
 }
 
 bool SymbolEditorState_DrawTextBase::processGraphicsSceneLeftMouseButtonPressed(
-    QGraphicsSceneMouseEvent& e) noexcept {
-  Point currentPos =
-      Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
+    const GraphicsSceneMouseEvent& e) noexcept {
+  Point currentPos = e.scenePos.mappedToGrid(getGridInterval());
   if (mCurrentText) {
     finishAddText(currentPos);
   }
@@ -203,7 +201,7 @@ bool SymbolEditorState_DrawTextBase::processGraphicsSceneLeftMouseButtonPressed(
 
 bool SymbolEditorState_DrawTextBase::
     processGraphicsSceneRightMouseButtonReleased(
-        QGraphicsSceneMouseEvent& e) noexcept {
+        const GraphicsSceneMouseEvent& e) noexcept {
   Q_UNUSED(e);
   return processRotate(Angle::deg90());
 }

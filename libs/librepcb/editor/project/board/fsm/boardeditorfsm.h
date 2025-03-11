@@ -46,6 +46,8 @@ class GraphicsView;
 class ProjectEditor;
 class ToolBarProxy;
 class UndoStack;
+struct GraphicsSceneKeyEvent;
+struct GraphicsSceneMouseEvent;
 
 /*******************************************************************************
  *  Class BoardEditorFsm
@@ -132,17 +134,18 @@ public:
   bool processResetAllTexts() noexcept;
   bool processRemove() noexcept;
   bool processEditProperties() noexcept;
-  bool processKeyPressed(const QKeyEvent& e) noexcept;
-  bool processKeyReleased(const QKeyEvent& e) noexcept;
-  bool processGraphicsSceneMouseMoved(QGraphicsSceneMouseEvent& e) noexcept;
+  bool processKeyPressed(const GraphicsSceneKeyEvent& e) noexcept;
+  bool processKeyReleased(const GraphicsSceneKeyEvent& e) noexcept;
+  bool processGraphicsSceneMouseMoved(
+      const GraphicsSceneMouseEvent& e) noexcept;
   bool processGraphicsSceneLeftMouseButtonPressed(
-      QGraphicsSceneMouseEvent& e) noexcept;
+      const GraphicsSceneMouseEvent& e) noexcept;
   bool processGraphicsSceneLeftMouseButtonReleased(
-      QGraphicsSceneMouseEvent& e) noexcept;
+      const GraphicsSceneMouseEvent& e) noexcept;
   bool processGraphicsSceneLeftMouseButtonDoubleClicked(
-      QGraphicsSceneMouseEvent& e) noexcept;
+      const GraphicsSceneMouseEvent& e) noexcept;
   bool processGraphicsSceneRightMouseButtonReleased(
-      QGraphicsSceneMouseEvent& e) noexcept;
+      const GraphicsSceneMouseEvent& e) noexcept;
 
   /**
    * Switch to another board
