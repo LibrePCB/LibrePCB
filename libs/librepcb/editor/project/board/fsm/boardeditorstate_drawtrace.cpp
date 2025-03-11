@@ -272,8 +272,8 @@ bool BoardEditorState_DrawTrace::processAbortCommand() noexcept {
 }
 
 bool BoardEditorState_DrawTrace::processKeyPressed(
-    const QKeyEvent& e) noexcept {
-  switch (e.key()) {
+    const GraphicsSceneKeyEvent& e) noexcept {
+  switch (e.key) {
     case Qt::Key_Shift:
       if (mSubState == SubState_PositioningNetPoint) {
         mCurrentSnapActive = false;
@@ -289,8 +289,8 @@ bool BoardEditorState_DrawTrace::processKeyPressed(
 }
 
 bool BoardEditorState_DrawTrace::processKeyReleased(
-    const QKeyEvent& e) noexcept {
-  switch (e.key()) {
+    const GraphicsSceneKeyEvent& e) noexcept {
+  switch (e.key) {
     case Qt::Key_Shift:
       if (mSubState == SubState_PositioningNetPoint) {
         mCurrentSnapActive = true;
@@ -306,9 +306,9 @@ bool BoardEditorState_DrawTrace::processKeyReleased(
 }
 
 bool BoardEditorState_DrawTrace::processGraphicsSceneMouseMoved(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   if (mSubState == SubState_PositioningNetPoint) {
-    mCursorPos = Point::fromPx(e.scenePos());
+    mCursorPos = e.scenePos;
     updateNetpointPositions();
     return true;
   }
@@ -317,7 +317,7 @@ bool BoardEditorState_DrawTrace::processGraphicsSceneMouseMoved(
 }
 
 bool BoardEditorState_DrawTrace::processGraphicsSceneLeftMouseButtonPressed(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   BoardGraphicsScene* scene = getActiveBoardScene();
   if (!scene) return false;
 
@@ -327,7 +327,7 @@ bool BoardEditorState_DrawTrace::processGraphicsSceneLeftMouseButtonPressed(
     return true;
   } else if (mSubState == SubState_Idle) {
     // Start adding netpoints/netlines
-    Point pos = Point::fromPx(e.scenePos());
+    Point pos = e.scenePos;
     mCursorPos = pos;
     startPositioning(scene->getBoard(), pos);
     return true;
@@ -338,24 +338,20 @@ bool BoardEditorState_DrawTrace::processGraphicsSceneLeftMouseButtonPressed(
 
 bool BoardEditorState_DrawTrace::
     processGraphicsSceneLeftMouseButtonDoubleClicked(
-        QGraphicsSceneMouseEvent& e) noexcept {
+        const GraphicsSceneMouseEvent& e) noexcept {
   return processGraphicsSceneLeftMouseButtonPressed(e);
 }
 
 bool BoardEditorState_DrawTrace::processGraphicsSceneRightMouseButtonReleased(
-    QGraphicsSceneMouseEvent& e) noexcept {
-  if (mSubState == SubState_PositioningNetPoint) {
-    // Only switch to next wire mode if cursor was not moved during click.
-    if ((mWireModeActionGroup) &&
-        (e.screenPos() == e.buttonDownScreenPos(Qt::RightButton))) {
-      int index = mWireModeActionGroup->actions().indexOf(
-          mWireModeActionGroup->checkedAction());
-      index = (index + 1) % mWireModeActionGroup->actions().count();
-      QAction* newAction = mWireModeActionGroup->actions().value(index);
-      Q_ASSERT(newAction);
-      newAction->trigger();
-      mCursorPos = Point::fromPx(e.scenePos());
-    }
+    const GraphicsSceneMouseEvent& e) noexcept {
+  if ((mSubState == SubState_PositioningNetPoint) && mWireModeActionGroup) {
+    int index = mWireModeActionGroup->actions().indexOf(
+        mWireModeActionGroup->checkedAction());
+    index = (index + 1) % mWireModeActionGroup->actions().count();
+    QAction* newAction = mWireModeActionGroup->actions().value(index);
+    Q_ASSERT(newAction);
+    newAction->trigger();
+    mCursorPos = e.scenePos;
 
     // Always accept the event if we are drawing a trace! When ignoring the
     // event, the state machine will abort the tool by a right click!

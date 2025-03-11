@@ -43,6 +43,8 @@ namespace editor {
 
 class FootprintGraphicsItem;
 class GraphicsScene;
+class GraphicsSceneKeyEvent;
+class GraphicsSceneMouseEvent;
 class GraphicsView;
 class PackageEditorState;
 class PackageEditorWidget;
@@ -120,17 +122,18 @@ public:
   // Event Handlers
   bool processChangeCurrentFootprint(
       const std::shared_ptr<Footprint>& fpt) noexcept;
-  bool processKeyPressed(const QKeyEvent& e) noexcept;
-  bool processKeyReleased(const QKeyEvent& e) noexcept;
-  bool processGraphicsSceneMouseMoved(QGraphicsSceneMouseEvent& e) noexcept;
+  bool processKeyPressed(const GraphicsSceneKeyEvent& e) noexcept;
+  bool processKeyReleased(const GraphicsSceneKeyEvent& e) noexcept;
+  bool processGraphicsSceneMouseMoved(
+      const GraphicsSceneMouseEvent& e) noexcept;
   bool processGraphicsSceneLeftMouseButtonPressed(
-      QGraphicsSceneMouseEvent& e) noexcept;
+      const GraphicsSceneMouseEvent& e) noexcept;
   bool processGraphicsSceneLeftMouseButtonReleased(
-      QGraphicsSceneMouseEvent& e) noexcept;
+      const GraphicsSceneMouseEvent& e) noexcept;
   bool processGraphicsSceneLeftMouseButtonDoubleClicked(
-      QGraphicsSceneMouseEvent& e) noexcept;
+      const GraphicsSceneMouseEvent& e) noexcept;
   bool processGraphicsSceneRightMouseButtonReleased(
-      QGraphicsSceneMouseEvent& e) noexcept;
+      const GraphicsSceneMouseEvent& e) noexcept;
   bool processSelectAll() noexcept;
   bool processCut() noexcept;
   bool processCopy() noexcept;

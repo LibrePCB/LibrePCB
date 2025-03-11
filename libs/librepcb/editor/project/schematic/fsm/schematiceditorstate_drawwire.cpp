@@ -153,8 +153,8 @@ bool SchematicEditorState_DrawWire::processAbortCommand() noexcept {
 }
 
 bool SchematicEditorState_DrawWire::processKeyPressed(
-    const QKeyEvent& e) noexcept {
-  switch (e.key()) {
+    const GraphicsSceneKeyEvent& e) noexcept {
+  switch (e.key) {
     case Qt::Key_Shift: {
       if (mSubState == SubState::POSITIONING_NETPOINT) {
         updateNetpointPositions(false);
@@ -172,8 +172,8 @@ bool SchematicEditorState_DrawWire::processKeyPressed(
 }
 
 bool SchematicEditorState_DrawWire::processKeyReleased(
-    const QKeyEvent& e) noexcept {
-  switch (e.key()) {
+    const GraphicsSceneKeyEvent& e) noexcept {
+  switch (e.key) {
     case Qt::Key_Shift: {
       if (mSubState == SubState::POSITIONING_NETPOINT) {
         updateNetpointPositions(true);
@@ -191,11 +191,11 @@ bool SchematicEditorState_DrawWire::processKeyReleased(
 }
 
 bool SchematicEditorState_DrawWire::processGraphicsSceneMouseMoved(
-    QGraphicsSceneMouseEvent& e) noexcept {
-  mCursorPos = Point::fromPx(e.scenePos());
+    const GraphicsSceneMouseEvent& e) noexcept {
+  mCursorPos = e.scenePos;
 
   if (mSubState == SubState::POSITIONING_NETPOINT) {
-    bool snap = !e.modifiers().testFlag(Qt::ShiftModifier);
+    const bool snap = !e.modifiers.testFlag(Qt::ShiftModifier);
     updateNetpointPositions(snap);
     return true;
   }
@@ -204,15 +204,15 @@ bool SchematicEditorState_DrawWire::processGraphicsSceneMouseMoved(
 }
 
 bool SchematicEditorState_DrawWire::processGraphicsSceneLeftMouseButtonPressed(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
   SchematicGraphicsScene* scene = getActiveSchematicScene();
   if (!scene) return false;
 
-  mCursorPos = Point::fromPx(e.scenePos());
-  bool snap = !e.modifiers().testFlag(Qt::ShiftModifier);
+  mCursorPos = e.scenePos;
+  const bool snap = !e.modifiers.testFlag(Qt::ShiftModifier);
 
   if (mSubState == SubState::IDLE) {
     // start adding netpoints/netlines
@@ -227,12 +227,12 @@ bool SchematicEditorState_DrawWire::processGraphicsSceneLeftMouseButtonPressed(
 
 bool SchematicEditorState_DrawWire::
     processGraphicsSceneLeftMouseButtonDoubleClicked(
-        QGraphicsSceneMouseEvent& e) noexcept {
+        const GraphicsSceneMouseEvent& e) noexcept {
   SchematicGraphicsScene* scene = getActiveSchematicScene();
   if (!scene) return false;
 
-  mCursorPos = Point::fromPx(e.scenePos());
-  bool snap = !e.modifiers().testFlag(Qt::ShiftModifier);
+  mCursorPos = e.scenePos;
+  const bool snap = !e.modifiers.testFlag(Qt::ShiftModifier);
 
   if (mSubState == SubState::POSITIONING_NETPOINT) {
     // fix the current point and add a new point + line
@@ -244,23 +244,19 @@ bool SchematicEditorState_DrawWire::
 
 bool SchematicEditorState_DrawWire::
     processGraphicsSceneRightMouseButtonReleased(
-        QGraphicsSceneMouseEvent& e) noexcept {
+        const GraphicsSceneMouseEvent& e) noexcept {
   Schematic* schematic = getActiveSchematic();
   if (!schematic) return false;
 
-  mCursorPos = Point::fromPx(e.scenePos());
+  mCursorPos = e.scenePos;
 
-  if (mSubState == SubState::POSITIONING_NETPOINT) {
-    // Only switch to next wire mode if cursor was not moved during click.
-    if ((mWireModeActionGroup) &&
-        (e.screenPos() == e.buttonDownScreenPos(Qt::RightButton))) {
-      int index = mWireModeActionGroup->actions().indexOf(
-          mWireModeActionGroup->checkedAction());
-      index = (index + 1) % mWireModeActionGroup->actions().count();
-      QAction* newAction = mWireModeActionGroup->actions().value(index);
-      Q_ASSERT(newAction);
-      newAction->trigger();
-    }
+  if ((mSubState == SubState::POSITIONING_NETPOINT) && mWireModeActionGroup) {
+    int index = mWireModeActionGroup->actions().indexOf(
+        mWireModeActionGroup->checkedAction());
+    index = (index + 1) % mWireModeActionGroup->actions().count();
+    QAction* newAction = mWireModeActionGroup->actions().value(index);
+    Q_ASSERT(newAction);
+    newAction->trigger();
 
     // Always accept the event if we are drawing a wire! When ignoring the
     // event, the state machine will abort the tool by a right click!
