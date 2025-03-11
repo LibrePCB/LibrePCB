@@ -84,7 +84,12 @@ public:
 
 private:
   void keyPressEvent(QKeyEvent* event) noexcept override;
-  bool graphicsViewEventHandler(QEvent* event) noexcept override;
+  bool graphicsSceneMouseMoved(
+      const GraphicsSceneMouseEvent& e) noexcept override;
+  bool graphicsSceneLeftMouseButtonPressed(
+      const GraphicsSceneMouseEvent& e) noexcept override;
+  bool graphicsSceneLeftMouseButtonReleased(
+      const GraphicsSceneMouseEvent& e) noexcept override;
   void startScreenshot() noexcept;
   void screenshotCountdownTick() noexcept;
   void takeScreenshot() noexcept;

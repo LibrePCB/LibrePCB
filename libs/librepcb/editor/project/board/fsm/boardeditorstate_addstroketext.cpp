@@ -165,14 +165,14 @@ bool BoardEditorState_AddStrokeText::processFlip(
 }
 
 bool BoardEditorState_AddStrokeText::processGraphicsSceneMouseMoved(
-    QGraphicsSceneMouseEvent& e) noexcept {
-  Point pos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
+    const GraphicsSceneMouseEvent& e) noexcept {
+  const Point pos = e.scenePos.mappedToGrid(getGridInterval());
   return updatePosition(pos);
 }
 
 bool BoardEditorState_AddStrokeText::processGraphicsSceneLeftMouseButtonPressed(
-    QGraphicsSceneMouseEvent& e) noexcept {
-  Point pos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
+    const GraphicsSceneMouseEvent& e) noexcept {
+  const Point pos = e.scenePos.mappedToGrid(getGridInterval());
   fixPosition(pos);
   addText(pos);
   return true;
@@ -180,17 +180,16 @@ bool BoardEditorState_AddStrokeText::processGraphicsSceneLeftMouseButtonPressed(
 
 bool BoardEditorState_AddStrokeText::
     processGraphicsSceneLeftMouseButtonDoubleClicked(
-        QGraphicsSceneMouseEvent& e) noexcept {
+        const GraphicsSceneMouseEvent& e) noexcept {
   return processGraphicsSceneLeftMouseButtonPressed(e);
 }
 
 bool BoardEditorState_AddStrokeText::
     processGraphicsSceneRightMouseButtonReleased(
-        QGraphicsSceneMouseEvent& e) noexcept {
-  // Only rotate if cursor was not moved during click
-  if (e.screenPos() == e.buttonDownScreenPos(Qt::RightButton)) {
-    rotateText(Angle::deg90());
-  }
+        const GraphicsSceneMouseEvent& e) noexcept {
+  Q_UNUSED(e);
+
+  rotateText(Angle::deg90());
 
   // Always accept the event if we are placing a text! When ignoring the
   // event, the state machine will abort the tool by a right click!

@@ -115,11 +115,10 @@ QSet<EditorWidgetBase::Feature>
  ******************************************************************************/
 
 bool PackageEditorState_AddHoles::processGraphicsSceneMouseMoved(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   if (mCurrentHole) {
-    Point currentPos =
-        Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
-    mEditCmd->setPath(makeNonEmptyPath(currentPos), true);
+    const Point pos = e.scenePos.mappedToGrid(getGridInterval());
+    mEditCmd->setPath(makeNonEmptyPath(pos), true);
     return true;
   } else {
     return false;
@@ -127,13 +126,12 @@ bool PackageEditorState_AddHoles::processGraphicsSceneMouseMoved(
 }
 
 bool PackageEditorState_AddHoles::processGraphicsSceneLeftMouseButtonPressed(
-    QGraphicsSceneMouseEvent& e) noexcept {
-  Point currentPos =
-      Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
+    const GraphicsSceneMouseEvent& e) noexcept {
+  const Point pos = e.scenePos.mappedToGrid(getGridInterval());
   if (mCurrentHole) {
-    finishAddHole(currentPos);
+    finishAddHole(pos);
   }
-  return startAddHole(currentPos);
+  return startAddHole(pos);
 }
 
 /*******************************************************************************

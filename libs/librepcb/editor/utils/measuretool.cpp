@@ -199,18 +199,20 @@ void MeasureTool::leave() noexcept {
  *  Event Handlers
  ******************************************************************************/
 
-bool MeasureTool::processKeyPressed(const QKeyEvent& e) noexcept {
-  if (e.key() == Qt::Key_Shift) {
-    updateCursorPosition(e.modifiers());
+bool MeasureTool::processKeyPressed(int key,
+                                    Qt::KeyboardModifiers modifiers) noexcept {
+  if (key == Qt::Key_Shift) {
+    updateCursorPosition(modifiers);
     return true;
   }
 
   return false;
 }
 
-bool MeasureTool::processKeyReleased(const QKeyEvent& e) noexcept {
-  if (e.key() == Qt::Key_Shift) {
-    updateCursorPosition(e.modifiers());
+bool MeasureTool::processKeyReleased(int key,
+                                     Qt::KeyboardModifiers modifiers) noexcept {
+  if (key == Qt::Key_Shift) {
+    updateCursorPosition(modifiers);
     return true;
   }
 
@@ -218,16 +220,13 @@ bool MeasureTool::processKeyReleased(const QKeyEvent& e) noexcept {
 }
 
 bool MeasureTool::processGraphicsSceneMouseMoved(
-    QGraphicsSceneMouseEvent& e) noexcept {
-  mLastScenePos = Point::fromPx(e.scenePos());
-  updateCursorPosition(e.modifiers());
+    const Point& pos, Qt::KeyboardModifiers modifiers) noexcept {
+  mLastScenePos = pos;
+  updateCursorPosition(modifiers);
   return true;
 }
 
-bool MeasureTool::processGraphicsSceneLeftMouseButtonPressed(
-    QGraphicsSceneMouseEvent& e) noexcept {
-  Q_UNUSED(e);
-
+bool MeasureTool::processGraphicsSceneLeftMouseButtonPressed() noexcept {
   if ((!mStartPos) || mEndPos) {
     // Set first point.
     mStartPos = mCursorPos;

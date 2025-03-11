@@ -69,8 +69,8 @@ public:
   virtual ~SymbolEditorState_DrawPolygonBase() noexcept;
 
   // General Methods
-  bool processKeyPressed(const QKeyEvent& e) noexcept override;
-  bool processKeyReleased(const QKeyEvent& e) noexcept override;
+  bool processKeyPressed(const GraphicsSceneKeyEvent& e) noexcept override;
+  bool processKeyReleased(const GraphicsSceneKeyEvent& e) noexcept override;
   bool entry() noexcept override;
   bool exit() noexcept override;
   QSet<EditorWidgetBase::Feature> getAvailableFeatures()
@@ -78,11 +78,11 @@ public:
 
   // Event Handlers
   bool processGraphicsSceneMouseMoved(
-      QGraphicsSceneMouseEvent& e) noexcept override;
+      const GraphicsSceneMouseEvent& e) noexcept override;
   bool processGraphicsSceneLeftMouseButtonPressed(
-      QGraphicsSceneMouseEvent& e) noexcept override;
+      const GraphicsSceneMouseEvent& e) noexcept override;
   bool processGraphicsSceneLeftMouseButtonDoubleClicked(
-      QGraphicsSceneMouseEvent& e) noexcept override;
+      const GraphicsSceneMouseEvent& e) noexcept override;
   bool processAbortCommand() noexcept override;
 
   // Operator Overloadings

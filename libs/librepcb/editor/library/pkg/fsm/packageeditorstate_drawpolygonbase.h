@@ -75,14 +75,14 @@ public:
       const noexcept override;
 
   // Event Handlers
-  bool processKeyPressed(const QKeyEvent& e) noexcept override;
-  bool processKeyReleased(const QKeyEvent& e) noexcept override;
+  bool processKeyPressed(const GraphicsSceneKeyEvent& e) noexcept override;
+  bool processKeyReleased(const GraphicsSceneKeyEvent& e) noexcept override;
   bool processGraphicsSceneMouseMoved(
-      QGraphicsSceneMouseEvent& e) noexcept override;
+      const GraphicsSceneMouseEvent& e) noexcept override;
   bool processGraphicsSceneLeftMouseButtonPressed(
-      QGraphicsSceneMouseEvent& e) noexcept override;
+      const GraphicsSceneMouseEvent& e) noexcept override;
   bool processGraphicsSceneLeftMouseButtonDoubleClicked(
-      QGraphicsSceneMouseEvent& e) noexcept override;
+      const GraphicsSceneMouseEvent& e) noexcept override;
   bool processAbortCommand() noexcept override;
 
   // Operator Overloadings
