@@ -106,21 +106,21 @@ bool BoardEditorState_AddHole::exit() noexcept {
  ******************************************************************************/
 
 bool BoardEditorState_AddHole::processGraphicsSceneMouseMoved(
-    QGraphicsSceneMouseEvent& e) noexcept {
-  Point pos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
+    const GraphicsSceneMouseEvent& e) noexcept {
+  Point pos = e.scenePos.mappedToGrid(getGridInterval());
   return updatePosition(pos);
 }
 
 bool BoardEditorState_AddHole::processGraphicsSceneLeftMouseButtonPressed(
-    QGraphicsSceneMouseEvent& e) noexcept {
-  Point pos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
+    const GraphicsSceneMouseEvent& e) noexcept {
+  Point pos = e.scenePos.mappedToGrid(getGridInterval());
   fixPosition(pos);
   addHole(pos);
   return true;
 }
 
 bool BoardEditorState_AddHole::processGraphicsSceneLeftMouseButtonDoubleClicked(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   return processGraphicsSceneLeftMouseButtonPressed(e);
 }
 

@@ -140,14 +140,14 @@ bool BoardEditorState_DrawPolygon::processAbortCommand() noexcept {
 }
 
 bool BoardEditorState_DrawPolygon::processGraphicsSceneMouseMoved(
-    QGraphicsSceneMouseEvent& e) noexcept {
-  Point pos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
+    const GraphicsSceneMouseEvent& e) noexcept {
+  Point pos = e.scenePos.mappedToGrid(getGridInterval());
   return updateLastVertexPosition(pos);
 }
 
 bool BoardEditorState_DrawPolygon::processGraphicsSceneLeftMouseButtonPressed(
-    QGraphicsSceneMouseEvent& e) noexcept {
-  Point pos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
+    const GraphicsSceneMouseEvent& e) noexcept {
+  Point pos = e.scenePos.mappedToGrid(getGridInterval());
   if (mIsUndoCmdActive) {
     addSegment(pos);
   } else {
@@ -158,7 +158,7 @@ bool BoardEditorState_DrawPolygon::processGraphicsSceneLeftMouseButtonPressed(
 
 bool BoardEditorState_DrawPolygon::
     processGraphicsSceneLeftMouseButtonDoubleClicked(
-        QGraphicsSceneMouseEvent& e) noexcept {
+        const GraphicsSceneMouseEvent& e) noexcept {
   return processGraphicsSceneLeftMouseButtonPressed(e);
 }
 
