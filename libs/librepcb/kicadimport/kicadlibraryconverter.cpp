@@ -444,8 +444,7 @@ std::unique_ptr<Component> KiCadLibraryConverter::createComponent(
 std::unique_ptr<Device> KiCadLibraryConverter::createDevice(
     const FilePath& libFp, const KiCadSymbol& kiSym,
     const QList<KiCadSymbolGate>& kiGates, const QString& generatedBy,
-    const QString& cmpGeneratedBy, const QString& pkgGeneratedBy,
-    MessageLogger& log) {
+    const QString& cmpGeneratedBy, QString pkgGeneratedBy, MessageLogger& log) {
   Q_UNUSED(log);
   if (!mComponentMap.contains(cmpGeneratedBy)) {
     loadAlreadyImportedComponent(cmpGeneratedBy);  // can throw
@@ -455,7 +454,16 @@ std::unique_ptr<Device> KiCadLibraryConverter::createDevice(
     throw LogicError(__FILE__, __LINE__);
   }
   if (!mPackageMap.contains(pkgGeneratedBy)) {
-    loadAlreadyImportedPackage(pkgGeneratedBy);  // can throw
+    // Compatibility with Ultra Librarian which stores footprints in
+    // footprints.pretty but references them without that namespace.
+    QString pkgGeneratedByAlias = pkgGeneratedBy;
+    pkgGeneratedByAlias.replace("KiCadImport::", "KiCadImport::footprints::");
+    if (mPackageMap.contains(pkgGeneratedByAlias)) {
+      pkgGeneratedBy = pkgGeneratedByAlias;
+    } else {
+      pkgGeneratedBy = loadAlreadyImportedPackage(
+          {pkgGeneratedBy, pkgGeneratedByAlias});  // can throw
+    }
   }
   const std::optional<Uuid> packageUuid = mPackageMap.value(pkgGeneratedBy);
   if (!packageUuid) {
@@ -514,7 +522,7 @@ std::unique_ptr<Device> KiCadLibraryConverter::createDevice(
 
 void KiCadLibraryConverter::loadAlreadyImportedSymbol(
     const QString& generatedBy) {
-  const FilePath fp = getAlreadyImportedFp<Symbol>(generatedBy);  // can throw
+  const FilePath fp = getAlreadyImportedFp<Symbol>({generatedBy});  // can throw
   std::unique_ptr<Symbol> symbol = Symbol::open(
       std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
           std::make_shared<TransactionalFileSystem>(fp))));  // can throw
@@ -525,22 +533,23 @@ void KiCadLibraryConverter::loadAlreadyImportedSymbol(
   mSymbolMap[generatedBy] = symbol->getUuid();
 }
 
-void KiCadLibraryConverter::loadAlreadyImportedPackage(
-    const QString& generatedBy) {
+QString KiCadLibraryConverter::loadAlreadyImportedPackage(
+    const QStringList& generatedBy) {
   const FilePath fp = getAlreadyImportedFp<Package>(generatedBy);  // can throw
   std::unique_ptr<Package> package = Package::open(
       std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
           std::make_shared<TransactionalFileSystem>(fp))));  // can throw
   for (const PackagePad& pad : package->getPads()) {
-    mPackagePadMap[generatedBy][*pad.getName()] = pad.getUuid();
+    mPackagePadMap[package->getGeneratedBy()][*pad.getName()] = pad.getUuid();
   }
-  mPackageMap[generatedBy] = package->getUuid();
+  mPackageMap[package->getGeneratedBy()] = package->getUuid();
+  return package->getGeneratedBy();
 }
 
 void KiCadLibraryConverter::loadAlreadyImportedComponent(
     const QString& generatedBy) {
   const FilePath fp =
-      getAlreadyImportedFp<Component>(generatedBy);  // can throw
+      getAlreadyImportedFp<Component>({generatedBy});  // can throw
   std::unique_ptr<Component> component = Component::open(
       std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
           std::make_shared<TransactionalFileSystem>(fp))));  // can throw
@@ -553,14 +562,16 @@ void KiCadLibraryConverter::loadAlreadyImportedComponent(
 
 template <typename T>
 FilePath KiCadLibraryConverter::getAlreadyImportedFp(
-    const QString& generatedBy) const {
-  QSet<Uuid> uuids = mLibraryDb.getGenerated<T>(generatedBy);
-  for (const Uuid& uuid : uuids) {
-    const FilePath fp = mLibraryDb.getLatest<T>(uuid);
-    if (fp.isValid()) return fp;
+    const QStringList& generatedBy) const {
+  for (const QString& genBy : generatedBy) {
+    QSet<Uuid> uuids = mLibraryDb.getGenerated<T>(genBy);
+    for (const Uuid& uuid : uuids) {
+      const FilePath fp = mLibraryDb.getLatest<T>(uuid);
+      if (fp.isValid()) return fp;
+    }
   }
   const QString ref =
-      QString(generatedBy).replace("KiCadImport::", "").replace("::", ":");
+      generatedBy.value(0).replace("KiCadImport::", "").replace("::", ":");
   throw RuntimeError(__FILE__, __LINE__,
                      QString("Dependent %1 '%2' not found.")
                          .arg(T::getLongElementName())
