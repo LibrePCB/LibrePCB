@@ -480,13 +480,13 @@ bool BoardEditorState_Select::processAbortCommand() noexcept {
 }
 
 bool BoardEditorState_Select::processGraphicsSceneMouseMoved(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   BoardGraphicsScene* scene = getActiveBoardScene();
   if (!scene) return false;
 
   if (mSelectedItemsDragCommand) {
     // Move selected elements to cursor position
-    Point pos = Point::fromPx(e.scenePos());
+    Point pos = e.scenePos;
     mSelectedItemsDragCommand->setCurrentPosition(pos);
     return true;
   } else if (mSelectedPolygon && mCmdPolygonEdit) {
@@ -495,8 +495,7 @@ bool BoardEditorState_Select::processGraphicsSceneMouseMoved(
         mSelectedPolygon->getData().getPath().getVertices();
     foreach (int i, mSelectedPolygonVertices) {
       if ((i >= 0) && (i < vertices.count())) {
-        vertices[i].setPos(
-            Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval()));
+        vertices[i].setPos(e.scenePos.mappedToGrid(getGridInterval()));
       }
     }
     mCmdPolygonEdit->setPath(Path(vertices), true);
@@ -506,8 +505,7 @@ bool BoardEditorState_Select::processGraphicsSceneMouseMoved(
     QVector<Vertex> vertices = mSelectedPlane->getOutline().getVertices();
     foreach (int i, mSelectedPlaneVertices) {
       if ((i >= 0) && (i < vertices.count())) {
-        vertices[i].setPos(
-            Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval()));
+        vertices[i].setPos(e.scenePos.mappedToGrid(getGridInterval()));
       }
     }
     mCmdPlaneEdit->setOutline(Path(vertices), true);
@@ -518,17 +516,14 @@ bool BoardEditorState_Select::processGraphicsSceneMouseMoved(
         mSelectedZone->getData().getOutline().getVertices();
     foreach (int i, mSelectedZoneVertices) {
       if ((i >= 0) && (i < vertices.count())) {
-        vertices[i].setPos(
-            Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval()));
+        vertices[i].setPos(e.scenePos.mappedToGrid(getGridInterval()));
       }
     }
     mCmdZoneEdit->setOutline(Path(vertices), true);
     return true;
-  } else if (e.buttons().testFlag(Qt::LeftButton)) {
+  } else if (e.buttons.testFlag(Qt::LeftButton)) {
     // Draw selection rectangle
-    Point p1 = Point::fromPx(e.buttonDownScenePos(Qt::LeftButton));
-    Point p2 = Point::fromPx(e.scenePos());
-    scene->selectItemsInRect(p1, p2);
+    scene->selectItemsInRect(e.downPos, e.scenePos);
     return true;
   }
 
@@ -536,7 +531,7 @@ bool BoardEditorState_Select::processGraphicsSceneMouseMoved(
 }
 
 bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
@@ -547,8 +542,7 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
     // Place pasted items
     try {
       if (mSelectedItemsDragCommand) {
-        mSelectedItemsDragCommand->setCurrentPosition(
-            Point::fromPx(e.scenePos()));
+        mSelectedItemsDragCommand->setCurrentPosition(e.scenePos);
         mContext.undoStack.appendToCmdGroup(
             mSelectedItemsDragCommand.release());  // can throw
       }
@@ -561,23 +555,22 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
     return true;
   } else if ((!mSelectedItemsDragCommand) && (!mCmdPolygonEdit) &&
              (!mCmdPlaneEdit) && (!mCmdZoneEdit)) {
-    if (findPolygonVerticesAtPosition(Point::fromPx(e.scenePos()))) {
+    if (findPolygonVerticesAtPosition(e.scenePos)) {
       // start moving polygon vertex
       mCmdPolygonEdit.reset(new CmdBoardPolygonEdit(*mSelectedPolygon));
       return true;
-    } else if (findPlaneVerticesAtPosition(Point::fromPx(e.scenePos()))) {
+    } else if (findPlaneVerticesAtPosition(e.scenePos)) {
       // start moving plane vertex
       mCmdPlaneEdit.reset(new CmdBoardPlaneEdit(*mSelectedPlane));
       return true;
-    } else if (findZoneVerticesAtPosition(Point::fromPx(e.scenePos()))) {
+    } else if (findZoneVerticesAtPosition(e.scenePos)) {
       // start moving zone vertex
       mCmdZoneEdit.reset(new CmdBoardZoneEdit(*mSelectedZone));
       return true;
     } else {
       // handle items selection
       QList<std::shared_ptr<QGraphicsItem>> items =
-          findItemsAtPos(Point::fromPx(e.scenePos()),
-                         FindFlag::All | FindFlag::AcceptNearMatch);
+          findItemsAtPos(e.scenePos, FindFlag::All | FindFlag::AcceptNearMatch);
       if (items.isEmpty()) {
         // no items under mouse --> start drawing a selection rectangle
         scene->clearSelection();
@@ -592,11 +585,11 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
           break;
         }
       }
-      if ((e.modifiers() & Qt::ControlModifier)) {
+      if ((e.modifiers & Qt::ControlModifier)) {
         // Toggle selection when CTRL is pressed.
         auto item = selectedItem ? selectedItem : items.first();
         item->setSelected(!item->isSelected());
-      } else if ((e.modifiers() & Qt::ShiftModifier)) {
+      } else if ((e.modifiers & Qt::ShiftModifier)) {
         // Cycle Selection, when holding shift.
         int nextSelectionIndex = 0;
         for (int i = 0; i < items.count(); ++i) {
@@ -616,7 +609,7 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
         items.first()->setSelected(true);
       }
 
-      if (startMovingSelectedItems(*scene, Point::fromPx(e.scenePos()))) {
+      if (startMovingSelectedItems(*scene, e.scenePos)) {
         return true;
       }
     }
@@ -626,15 +619,14 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
 }
 
 bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   BoardGraphicsScene* scene = getActiveBoardScene();
   if (!scene) return false;
 
   if ((!mIsUndoCmdActive) && mSelectedItemsDragCommand) {
     // Stop moving items (set position of all selected elements permanent)
     try {
-      mSelectedItemsDragCommand->setCurrentPosition(
-          Point::fromPx(e.scenePos()));
+      mSelectedItemsDragCommand->setCurrentPosition(e.scenePos);
       mContext.undoStack.execCmd(
           mSelectedItemsDragCommand.release());  // can throw
     } catch (const Exception& e) {
@@ -679,10 +671,10 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
 }
 
 bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonDoubleClicked(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   // If SHIFT or CTRL is pressed, the user is modifying items selection, not
   // double-clicking.
-  if (e.modifiers() & (Qt::ShiftModifier | Qt::ControlModifier)) {
+  if (e.modifiers & (Qt::ShiftModifier | Qt::ControlModifier)) {
     return processGraphicsSceneLeftMouseButtonPressed(e);
   }
 
@@ -692,8 +684,8 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonDoubleClicked(
   if ((!mSelectedItemsDragCommand) && (!mCmdPolygonEdit) && (!mCmdPlaneEdit) &&
       (!mCmdZoneEdit)) {
     // Open the properties editor dialog of the selected item, if any.
-    const QList<std::shared_ptr<QGraphicsItem>> items = findItemsAtPos(
-        Point::fromPx(e.scenePos()), FindFlag::All | FindFlag::AcceptNearMatch);
+    const QList<std::shared_ptr<QGraphicsItem>> items =
+        findItemsAtPos(e.scenePos, FindFlag::All | FindFlag::AcceptNearMatch);
     foreach (auto item, items) {
       if (item->isSelected() && openPropertiesDialog(item)) {
         return true;
@@ -705,7 +697,7 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonDoubleClicked(
 }
 
 bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
@@ -713,12 +705,10 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
   if (!scene) return false;
 
   if (mSelectedItemsDragCommand) {
-    if (e.screenPos() == e.buttonDownScreenPos(Qt::RightButton)) {
-      return rotateSelectedItems(Angle::deg90());
-    }
+    return rotateSelectedItems(Angle::deg90());
   } else if ((!mCmdPolygonEdit) && (!mCmdPlaneEdit) && (!mCmdZoneEdit)) {
     // handle item selection
-    Point pos = Point::fromPx(e.scenePos());
+    Point pos = e.scenePos;
     QList<std::shared_ptr<QGraphicsItem>> items =
         findItemsAtPos(pos, FindFlag::All | FindFlag::AcceptNearMatch);
     if (items.isEmpty()) return false;
@@ -1197,7 +1187,7 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
     }
 
     // execute the context menu
-    menu.exec(e.screenPos());
+    menu.exec(QCursor::pos());
     return true;
   }
 

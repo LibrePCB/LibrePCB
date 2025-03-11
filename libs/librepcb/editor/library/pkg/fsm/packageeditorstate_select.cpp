@@ -142,8 +142,8 @@ QSet<EditorWidgetBase::Feature>
  ******************************************************************************/
 
 bool PackageEditorState_Select::processGraphicsSceneMouseMoved(
-    QGraphicsSceneMouseEvent& e) noexcept {
-  Point currentPos = Point::fromPx(e.scenePos());
+    const GraphicsSceneMouseEvent& e) noexcept {
+  Point currentPos = e.scenePos;
 
   switch (mState) {
     case SubState::SELECTING: {
@@ -203,11 +203,11 @@ bool PackageEditorState_Select::processGraphicsSceneMouseMoved(
 }
 
 bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   switch (mState) {
     case SubState::IDLE: {
       // update start position of selection or movement
-      mStartPos = Point::fromPx(e.scenePos());
+      mStartPos = e.scenePos;
       // get items under cursor
       QList<std::shared_ptr<QGraphicsItem>> items =
           findItemsAtPosition(mStartPos);
@@ -230,7 +230,7 @@ bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
             break;
           }
         }
-        if (e.modifiers().testFlag(Qt::ControlModifier)) {
+        if (e.modifiers.testFlag(Qt::ControlModifier)) {
           // Toggle selection when CTRL is pressed.
           auto item = selectedItem ? selectedItem : items.first();
           if (auto i =
@@ -240,7 +240,7 @@ bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
           } else {
             item->setSelected(!item->isSelected());
           }
-        } else if (e.modifiers().testFlag(Qt::ShiftModifier)) {
+        } else if (e.modifiers.testFlag(Qt::ShiftModifier)) {
           // Cycle Selection, when holding shift.
           int nextSelectionIndex = 0;
           for (int i = 0; i < items.count(); ++i) {
@@ -301,7 +301,7 @@ bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
 }
 
 bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   Q_UNUSED(e);
   switch (mState) {
     case SubState::SELECTING: {
@@ -353,25 +353,25 @@ bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
 
 bool PackageEditorState_Select::
     processGraphicsSceneLeftMouseButtonDoubleClicked(
-        QGraphicsSceneMouseEvent& e) noexcept {
+        const GraphicsSceneMouseEvent& e) noexcept {
   // If SHIFT or CTRL is pressed, the user is modifying items selection, not
   // double-clicking.
-  if (e.modifiers() & (Qt::ShiftModifier | Qt::ControlModifier)) {
+  if (e.modifiers & (Qt::ShiftModifier | Qt::ControlModifier)) {
     return processGraphicsSceneLeftMouseButtonPressed(e);
   }
 
   if (mState == SubState::IDLE) {
-    return openPropertiesDialogOfItemAtPos(Point::fromPx(e.scenePos()));
+    return openPropertiesDialogOfItemAtPos(e.scenePos);
   } else {
     return false;
   }
 }
 
 bool PackageEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   switch (mState) {
     case SubState::IDLE: {
-      return openContextMenuAtPos(Point::fromPx(e.scenePos()));
+      return openContextMenuAtPos(e.scenePos);
     }
     case SubState::MOVING:
     case SubState::PASTING: {

@@ -73,11 +73,11 @@ public:
   void leave() noexcept;
 
   // Event Handlers
-  bool processKeyPressed(const QKeyEvent& e) noexcept;
-  bool processKeyReleased(const QKeyEvent& e) noexcept;
-  bool processGraphicsSceneMouseMoved(QGraphicsSceneMouseEvent& e) noexcept;
-  bool processGraphicsSceneLeftMouseButtonPressed(
-      QGraphicsSceneMouseEvent& e) noexcept;
+  bool processKeyPressed(int key, Qt::KeyboardModifiers modifiers) noexcept;
+  bool processKeyReleased(int key, Qt::KeyboardModifiers modifiers) noexcept;
+  bool processGraphicsSceneMouseMoved(const Point& pos,
+                                      Qt::KeyboardModifiers modifiers) noexcept;
+  bool processGraphicsSceneLeftMouseButtonPressed() noexcept;
   bool processCopy() noexcept;
   bool processRemove() noexcept;
   bool processAbortCommand() noexcept;

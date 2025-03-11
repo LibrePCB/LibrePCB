@@ -157,14 +157,14 @@ bool BoardEditorState_DrawPlane::processAbortCommand() noexcept {
 }
 
 bool BoardEditorState_DrawPlane::processGraphicsSceneMouseMoved(
-    QGraphicsSceneMouseEvent& e) noexcept {
-  Point pos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
+    const GraphicsSceneMouseEvent& e) noexcept {
+  Point pos = e.scenePos.mappedToGrid(getGridInterval());
   return updateLastVertexPosition(pos);
 }
 
 bool BoardEditorState_DrawPlane::processGraphicsSceneLeftMouseButtonPressed(
-    QGraphicsSceneMouseEvent& e) noexcept {
-  Point pos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
+    const GraphicsSceneMouseEvent& e) noexcept {
+  Point pos = e.scenePos.mappedToGrid(getGridInterval());
   if (mIsUndoCmdActive) {
     addSegment(pos);
   } else {
@@ -175,7 +175,7 @@ bool BoardEditorState_DrawPlane::processGraphicsSceneLeftMouseButtonPressed(
 
 bool BoardEditorState_DrawPlane::
     processGraphicsSceneLeftMouseButtonDoubleClicked(
-        QGraphicsSceneMouseEvent& e) noexcept {
+        const GraphicsSceneMouseEvent& e) noexcept {
   return processGraphicsSceneLeftMouseButtonPressed(e);
 }
 

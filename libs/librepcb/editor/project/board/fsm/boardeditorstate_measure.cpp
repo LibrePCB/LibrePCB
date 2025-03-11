@@ -89,22 +89,25 @@ bool BoardEditorState_Measure::processAbortCommand() noexcept {
   return mTool->processAbortCommand();
 }
 
-bool BoardEditorState_Measure::processKeyPressed(const QKeyEvent& e) noexcept {
-  return mTool->processKeyPressed(e);
+bool BoardEditorState_Measure::processKeyPressed(
+    const GraphicsSceneKeyEvent& e) noexcept {
+  return mTool->processKeyPressed(e.key, e.modifiers);
 }
 
-bool BoardEditorState_Measure::processKeyReleased(const QKeyEvent& e) noexcept {
-  return mTool->processKeyReleased(e);
+bool BoardEditorState_Measure::processKeyReleased(
+    const GraphicsSceneKeyEvent& e) noexcept {
+  return mTool->processKeyReleased(e.key, e.modifiers);
 }
 
 bool BoardEditorState_Measure::processGraphicsSceneMouseMoved(
-    QGraphicsSceneMouseEvent& e) noexcept {
-  return mTool->processGraphicsSceneMouseMoved(e);
+    const GraphicsSceneMouseEvent& e) noexcept {
+  return mTool->processGraphicsSceneMouseMoved(e.scenePos, e.modifiers);
 }
 
 bool BoardEditorState_Measure::processGraphicsSceneLeftMouseButtonPressed(
-    QGraphicsSceneMouseEvent& e) noexcept {
-  return mTool->processGraphicsSceneLeftMouseButtonPressed(e);
+    const GraphicsSceneMouseEvent& e) noexcept {
+  Q_UNUSED(e);
+  return mTool->processGraphicsSceneLeftMouseButtonPressed();
 }
 
 bool BoardEditorState_Measure::processSwitchToBoard(int index) noexcept {

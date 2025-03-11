@@ -890,102 +890,39 @@ void SchematicEditor::createMenus() noexcept {
   mb.addAction(mActionAboutQt);
 }
 
-bool SchematicEditor::graphicsViewEventHandler(QEvent* event) {
-  Q_ASSERT(event);
-  switch (event->type()) {
-    case QEvent::GraphicsSceneMouseMove: {
-      auto* e = dynamic_cast<QGraphicsSceneMouseEvent*>(event);
-      Q_ASSERT(e);
-      mFsm->processGraphicsSceneMouseMoved(*e);
-      break;
-    }
+bool SchematicEditor::graphicsSceneKeyPressed(
+    const GraphicsSceneKeyEvent& e) noexcept {
+  return mFsm->processKeyPressed(e);
+}
 
-    case QEvent::GraphicsSceneMousePress: {
-      auto* e = dynamic_cast<QGraphicsSceneMouseEvent*>(event);
-      Q_ASSERT(e);
-      switch (e->button()) {
-        case Qt::LeftButton: {
-          mFsm->processGraphicsSceneLeftMouseButtonPressed(*e);
-          break;
-        }
-        default: {
-          break;
-        }
-      }
-      break;
-    }
+bool SchematicEditor::graphicsSceneKeyReleased(
+    const GraphicsSceneKeyEvent& e) noexcept {
+  return mFsm->processKeyReleased(e);
+}
 
-    case QEvent::GraphicsSceneMouseRelease: {
-      auto* e = dynamic_cast<QGraphicsSceneMouseEvent*>(event);
-      Q_ASSERT(e);
-      switch (e->button()) {
-        case Qt::LeftButton: {
-          mFsm->processGraphicsSceneLeftMouseButtonReleased(*e);
-          break;
-        }
-        case Qt::RightButton: {
-          mFsm->processGraphicsSceneRightMouseButtonReleased(*e);
-          break;
-        }
-        default: {
-          break;
-        }
-      }
-      break;
-    }
+bool SchematicEditor::graphicsSceneMouseMoved(
+    const GraphicsSceneMouseEvent& e) noexcept {
+  return mFsm->processGraphicsSceneMouseMoved(e);
+}
 
-    case QEvent::GraphicsSceneMouseDoubleClick: {
-      auto* e = dynamic_cast<QGraphicsSceneMouseEvent*>(event);
-      Q_ASSERT(e);
-      switch (e->button()) {
-        case Qt::LeftButton: {
-          mFsm->processGraphicsSceneLeftMouseButtonDoubleClicked(*e);
-          break;
-        }
-        default: {
-          break;
-        }
-      }
-      break;
-    }
+bool SchematicEditor::graphicsSceneLeftMouseButtonPressed(
+    const GraphicsSceneMouseEvent& e) noexcept {
+  return mFsm->processGraphicsSceneLeftMouseButtonPressed(e);
+}
 
-    case QEvent::KeyPress: {
-      auto* e = dynamic_cast<QKeyEvent*>(event);
-      Q_ASSERT(e);
-      if (mFsm->processKeyPressed(*e)) {
-        return true;
-      }
-      switch (e->key()) {
-        case Qt::Key_Left:
-        case Qt::Key_Right:
-        case Qt::Key_Up:
-        case Qt::Key_Down:
-          // Allow handling these keys by the graphics view for scrolling.
-          return false;
-        default:
-          break;
-      }
-      break;
-    }
+bool SchematicEditor::graphicsSceneLeftMouseButtonReleased(
+    const GraphicsSceneMouseEvent& e) noexcept {
+  return mFsm->processGraphicsSceneLeftMouseButtonReleased(e);
+}
 
-    case QEvent::KeyRelease: {
-      auto* e = dynamic_cast<QKeyEvent*>(event);
-      Q_ASSERT(e);
-      mFsm->processKeyReleased(*e);
-      break;
-    }
+bool SchematicEditor::graphicsSceneLeftMouseButtonDoubleClicked(
+    const GraphicsSceneMouseEvent& e) noexcept {
+  return mFsm->processGraphicsSceneLeftMouseButtonDoubleClicked(e);
+}
 
-    default: {
-      break;
-    }
-  }
-
-  // Always accept graphics scene events, even if we do not react on some of
-  // the events! This will give us the full control over the graphics scene.
-  // Otherwise, the graphics scene can react on some events and disturb our
-  // state machine. Only the wheel event is ignored because otherwise the
-  // view will not allow to zoom with the mouse wheel.
-  return (event->type() != QEvent::GraphicsSceneWheel);
+bool SchematicEditor::graphicsSceneRightMouseButtonReleased(
+    const GraphicsSceneMouseEvent& e) noexcept {
+  return mFsm->processGraphicsSceneRightMouseButtonReleased(e);
 }
 
 void SchematicEditor::toolRequested(const QVariant& newTool) noexcept {

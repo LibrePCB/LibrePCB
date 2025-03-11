@@ -52,7 +52,6 @@ class BoardGraphicsScene;
 class BoardLayersDock;
 class ExclusiveActionGroup;
 class GraphicsLayerList;
-class GraphicsView;
 class OpenGlSceneBuilder;
 class OpenGlSceneBuilder;
 class OpenGlView;
@@ -130,7 +129,20 @@ private:
   void createDockWidgets() noexcept;
   void createMenus() noexcept;
   void updateBoardActionGroup() noexcept;
-  virtual bool graphicsViewEventHandler(QEvent* event) override;
+  bool graphicsSceneKeyPressed(
+      const GraphicsSceneKeyEvent& e) noexcept override;
+  bool graphicsSceneKeyReleased(
+      const GraphicsSceneKeyEvent& e) noexcept override;
+  bool graphicsSceneMouseMoved(
+      const GraphicsSceneMouseEvent& e) noexcept override;
+  bool graphicsSceneLeftMouseButtonPressed(
+      const GraphicsSceneMouseEvent& e) noexcept override;
+  bool graphicsSceneLeftMouseButtonReleased(
+      const GraphicsSceneMouseEvent& e) noexcept override;
+  bool graphicsSceneLeftMouseButtonDoubleClicked(
+      const GraphicsSceneMouseEvent& e) noexcept override;
+  bool graphicsSceneRightMouseButtonReleased(
+      const GraphicsSceneMouseEvent& e) noexcept override;
   void toolRequested(const QVariant& newTool) noexcept;
   void unplacedComponentsCountChanged(int count) noexcept;
   void runDrc(bool quick) noexcept;

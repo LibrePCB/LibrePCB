@@ -139,10 +139,9 @@ QSet<EditorWidgetBase::Feature>
  ******************************************************************************/
 
 bool SymbolEditorState_DrawCircle::processGraphicsSceneMouseMoved(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   if (mCurrentCircle) {
-    Point currentPos =
-        Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
+    Point currentPos = e.scenePos.mappedToGrid(getGridInterval());
     return updateCircleDiameter(currentPos);
   } else {
     return true;
@@ -150,9 +149,8 @@ bool SymbolEditorState_DrawCircle::processGraphicsSceneMouseMoved(
 }
 
 bool SymbolEditorState_DrawCircle::processGraphicsSceneLeftMouseButtonPressed(
-    QGraphicsSceneMouseEvent& e) noexcept {
-  Point currentPos =
-      Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
+    const GraphicsSceneMouseEvent& e) noexcept {
+  Point currentPos = e.scenePos.mappedToGrid(getGridInterval());
   if (mCurrentCircle) {
     return finishAddCircle(currentPos);
   } else {

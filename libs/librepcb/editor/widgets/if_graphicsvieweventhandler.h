@@ -24,12 +24,16 @@
  *  Includes
  ******************************************************************************/
 #include <QtCore>
+#include <QtGui>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 namespace editor {
+
+struct GraphicsSceneKeyEvent;
+struct GraphicsSceneMouseEvent;
 
 /*******************************************************************************
  *  Interface IF_GraphicsViewEventHandler
@@ -44,8 +48,41 @@ public:
   explicit IF_GraphicsViewEventHandler() noexcept {}
   virtual ~IF_GraphicsViewEventHandler() noexcept {}
 
-  /// The event handler method
-  virtual bool graphicsViewEventHandler(QEvent* event) = 0;
+  virtual bool graphicsSceneKeyPressed(
+      const GraphicsSceneKeyEvent& e) noexcept {
+    Q_UNUSED(e);
+    return false;
+  }
+  virtual bool graphicsSceneKeyReleased(
+      const GraphicsSceneKeyEvent& e) noexcept {
+    Q_UNUSED(e);
+    return false;
+  }
+  virtual bool graphicsSceneMouseMoved(
+      const GraphicsSceneMouseEvent& e) noexcept {
+    Q_UNUSED(e);
+    return false;
+  }
+  virtual bool graphicsSceneLeftMouseButtonPressed(
+      const GraphicsSceneMouseEvent& e) noexcept {
+    Q_UNUSED(e);
+    return false;
+  }
+  virtual bool graphicsSceneLeftMouseButtonReleased(
+      const GraphicsSceneMouseEvent& e) noexcept {
+    Q_UNUSED(e);
+    return false;
+  }
+  virtual bool graphicsSceneLeftMouseButtonDoubleClicked(
+      const GraphicsSceneMouseEvent& e) noexcept {
+    Q_UNUSED(e);
+    return false;
+  }
+  virtual bool graphicsSceneRightMouseButtonReleased(
+      const GraphicsSceneMouseEvent& e) noexcept {
+    Q_UNUSED(e);
+    return false;
+  }
 };
 
 /*******************************************************************************

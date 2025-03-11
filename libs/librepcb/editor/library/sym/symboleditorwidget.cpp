@@ -441,60 +441,39 @@ QString SymbolEditorWidget::commitMetadata() noexcept {
   return QString();
 }
 
-bool SymbolEditorWidget::graphicsViewEventHandler(QEvent* event) noexcept {
-  Q_ASSERT(event);
-  switch (event->type()) {
-    case QEvent::GraphicsSceneMouseMove: {
-      auto* e = dynamic_cast<QGraphicsSceneMouseEvent*>(event);
-      Q_ASSERT(e);
-      return mFsm->processGraphicsSceneMouseMoved(*e);
-    }
-    case QEvent::GraphicsSceneMousePress: {
-      auto* e = dynamic_cast<QGraphicsSceneMouseEvent*>(event);
-      Q_ASSERT(e);
-      switch (e->button()) {
-        case Qt::LeftButton:
-          return mFsm->processGraphicsSceneLeftMouseButtonPressed(*e);
-        default:
-          return false;
-      }
-    }
-    case QEvent::GraphicsSceneMouseRelease: {
-      auto* e = dynamic_cast<QGraphicsSceneMouseEvent*>(event);
-      Q_ASSERT(e);
-      switch (e->button()) {
-        case Qt::LeftButton:
-          return mFsm->processGraphicsSceneLeftMouseButtonReleased(*e);
-        case Qt::RightButton:
-          return mFsm->processGraphicsSceneRightMouseButtonReleased(*e);
-        default:
-          return false;
-      }
-    }
-    case QEvent::GraphicsSceneMouseDoubleClick: {
-      auto* e = dynamic_cast<QGraphicsSceneMouseEvent*>(event);
-      Q_ASSERT(e);
-      switch (e->button()) {
-        case Qt::LeftButton:
-          return mFsm->processGraphicsSceneLeftMouseButtonDoubleClicked(*e);
-        default:
-          return false;
-      }
-    }
-    case QEvent::KeyPress: {
-      auto* e = dynamic_cast<QKeyEvent*>(event);
-      Q_ASSERT(e);
-      return mFsm->processKeyPressed(*e);
-    }
-    case QEvent::KeyRelease: {
-      auto* e = dynamic_cast<QKeyEvent*>(event);
-      Q_ASSERT(e);
-      return mFsm->processKeyReleased(*e);
-    }
-    default: {
-      return false;
-    }
-  }
+bool SymbolEditorWidget::graphicsSceneKeyPressed(
+    const GraphicsSceneKeyEvent& e) noexcept {
+  return mFsm->processKeyPressed(e);
+}
+
+bool SymbolEditorWidget::graphicsSceneKeyReleased(
+    const GraphicsSceneKeyEvent& e) noexcept {
+  return mFsm->processKeyReleased(e);
+}
+
+bool SymbolEditorWidget::graphicsSceneMouseMoved(
+    const GraphicsSceneMouseEvent& e) noexcept {
+  return mFsm->processGraphicsSceneMouseMoved(e);
+}
+
+bool SymbolEditorWidget::graphicsSceneLeftMouseButtonPressed(
+    const GraphicsSceneMouseEvent& e) noexcept {
+  return mFsm->processGraphicsSceneLeftMouseButtonPressed(e);
+}
+
+bool SymbolEditorWidget::graphicsSceneLeftMouseButtonReleased(
+    const GraphicsSceneMouseEvent& e) noexcept {
+  return mFsm->processGraphicsSceneLeftMouseButtonReleased(e);
+}
+
+bool SymbolEditorWidget::graphicsSceneLeftMouseButtonDoubleClicked(
+    const GraphicsSceneMouseEvent& e) noexcept {
+  return mFsm->processGraphicsSceneLeftMouseButtonDoubleClicked(e);
+}
+
+bool SymbolEditorWidget::graphicsSceneRightMouseButtonReleased(
+    const GraphicsSceneMouseEvent& e) noexcept {
+  return mFsm->processGraphicsSceneRightMouseButtonReleased(e);
 }
 
 bool SymbolEditorWidget::toolChangeRequested(Tool newTool,

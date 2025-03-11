@@ -228,10 +228,10 @@ bool SchematicEditorState_AddComponent::processAbortCommand() noexcept {
 }
 
 bool SchematicEditorState_AddComponent::processGraphicsSceneMouseMoved(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   if (mIsUndoCmdActive && mCurrentSymbolEditCommand) {
     // set temporary position of the current symbol
-    const Point p = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
+    const Point p = e.scenePos.mappedToGrid(getGridInterval());
     mCurrentSymbolEditCommand->setPosition(p, true);
     return true;
   }
@@ -241,7 +241,7 @@ bool SchematicEditorState_AddComponent::processGraphicsSceneMouseMoved(
 
 bool SchematicEditorState_AddComponent::
     processGraphicsSceneLeftMouseButtonPressed(
-        QGraphicsSceneMouseEvent& e) noexcept {
+        const GraphicsSceneMouseEvent& e) noexcept {
   // NOTE: This method is also called by the doubleclick event!
   Schematic* schematic = getActiveSchematic();
   if (!schematic) return false;
@@ -252,7 +252,7 @@ bool SchematicEditorState_AddComponent::
 
   try {
     // place the current symbol finally
-    Point pos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
+    const Point pos = e.scenePos.mappedToGrid(getGridInterval());
     mCurrentSymbolEditCommand->setPosition(pos, false);
     mContext.undoStack.appendToCmdGroup(mCurrentSymbolEditCommand);
     mCurrentSymbolEditCommand = nullptr;
@@ -309,21 +309,20 @@ bool SchematicEditorState_AddComponent::
 
 bool SchematicEditorState_AddComponent::
     processGraphicsSceneLeftMouseButtonDoubleClicked(
-        QGraphicsSceneMouseEvent& e) noexcept {
+        const GraphicsSceneMouseEvent& e) noexcept {
   // Handle the same way as single click
   return processGraphicsSceneLeftMouseButtonPressed(e);
 }
 
 bool SchematicEditorState_AddComponent::
     processGraphicsSceneRightMouseButtonReleased(
-        QGraphicsSceneMouseEvent& e) noexcept {
+        const GraphicsSceneMouseEvent& e) noexcept {
+  Q_UNUSED(e);
+
   if (mIsUndoCmdActive && mCurrentSymbolEditCommand) {
-    // Only rotate symbol if cursor was not moved during click
-    if (e.screenPos() == e.buttonDownScreenPos(Qt::RightButton)) {
-      mCurrentSymbolEditCommand->rotate(
-          Angle::deg90(), mCurrentSymbolToPlace->getPosition(), true);
-      mLastAngle = mCurrentSymbolToPlace->getRotation();
-    }
+    mCurrentSymbolEditCommand->rotate(
+        Angle::deg90(), mCurrentSymbolToPlace->getPosition(), true);
+    mLastAngle = mCurrentSymbolToPlace->getRotation();
 
     // Always accept the event if we are placing a symbol! When ignoring the
     // event, the state machine will abort the tool by a right click!

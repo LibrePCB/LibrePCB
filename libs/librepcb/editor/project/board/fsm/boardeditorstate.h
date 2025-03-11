@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../graphics/graphicsscene.h"
 #include "boardeditorfsm.h"
 
 #include <librepcb/core/types/length.h>
@@ -136,36 +137,36 @@ public:
   virtual bool processRemove() noexcept { return false; }
   virtual bool processEditProperties() noexcept { return false; }
   virtual bool processAbortCommand() noexcept { return false; }
-  virtual bool processKeyPressed(const QKeyEvent& e) noexcept {
+  virtual bool processKeyPressed(const GraphicsSceneKeyEvent& e) noexcept {
     Q_UNUSED(e);
     return false;
   }
-  virtual bool processKeyReleased(const QKeyEvent& e) noexcept {
+  virtual bool processKeyReleased(const GraphicsSceneKeyEvent& e) noexcept {
     Q_UNUSED(e);
     return false;
   }
   virtual bool processGraphicsSceneMouseMoved(
-      QGraphicsSceneMouseEvent& e) noexcept {
+      const GraphicsSceneMouseEvent& e) noexcept {
     Q_UNUSED(e);
     return false;
   }
   virtual bool processGraphicsSceneLeftMouseButtonPressed(
-      QGraphicsSceneMouseEvent& e) noexcept {
+      const GraphicsSceneMouseEvent& e) noexcept {
     Q_UNUSED(e);
     return false;
   }
   virtual bool processGraphicsSceneLeftMouseButtonReleased(
-      QGraphicsSceneMouseEvent& e) noexcept {
+      const GraphicsSceneMouseEvent& e) noexcept {
     Q_UNUSED(e);
     return false;
   }
   virtual bool processGraphicsSceneLeftMouseButtonDoubleClicked(
-      QGraphicsSceneMouseEvent& e) noexcept {
+      const GraphicsSceneMouseEvent& e) noexcept {
     Q_UNUSED(e);
     return false;
   }
   virtual bool processGraphicsSceneRightMouseButtonReleased(
-      QGraphicsSceneMouseEvent& e) noexcept {
+      const GraphicsSceneMouseEvent& e) noexcept {
     Q_UNUSED(e);
     return false;
   }

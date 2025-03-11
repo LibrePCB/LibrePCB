@@ -36,10 +36,23 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class Point;
-
 namespace editor {
+
+/*******************************************************************************
+ *  Event Data Structs
+ ******************************************************************************/
+
+struct GraphicsSceneMouseEvent {
+  Point scenePos;
+  Point downPos;
+  Qt::MouseButtons buttons = Qt::MouseButtons();
+  Qt::KeyboardModifiers modifiers = Qt::KeyboardModifiers();
+};
+
+struct GraphicsSceneKeyEvent {
+  int key = 0;
+  Qt::KeyboardModifiers modifiers = Qt::KeyboardModifiers();
+};
 
 /*******************************************************************************
  *  Class GraphicsScene

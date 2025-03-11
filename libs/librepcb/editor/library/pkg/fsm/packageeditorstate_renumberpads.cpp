@@ -127,12 +127,12 @@ QSet<EditorWidgetBase::Feature>
  ******************************************************************************/
 
 bool PackageEditorState_ReNumberPads::processKeyPressed(
-    const QKeyEvent& e) noexcept {
-  if (e.key() == Qt::Key_Return) {
+    const GraphicsSceneKeyEvent& e) noexcept {
+  if (e.key == Qt::Key_Return) {
     finish();
     return true;
-  } else if (mCurrentModifiers != e.modifiers()) {
-    mCurrentModifiers = e.modifiers();
+  } else if (mCurrentModifiers != e.modifiers) {
+    mCurrentModifiers = e.modifiers;
     updateCurrentPad(true);
     return true;
   }
@@ -141,25 +141,25 @@ bool PackageEditorState_ReNumberPads::processKeyPressed(
 }
 
 bool PackageEditorState_ReNumberPads::processKeyReleased(
-    const QKeyEvent& e) noexcept {
+    const GraphicsSceneKeyEvent& e) noexcept {
   return processKeyPressed(e);
 }
 
 bool PackageEditorState_ReNumberPads::processGraphicsSceneMouseMoved(
-    QGraphicsSceneMouseEvent& e) noexcept {
-  mCurrentPos = Point::fromPx(e.scenePos());
-  const bool force = (mCurrentModifiers != e.modifiers());
-  mCurrentModifiers = e.modifiers();
+    const GraphicsSceneMouseEvent& e) noexcept {
+  mCurrentPos = e.scenePos;
+  const bool force = (mCurrentModifiers != e.modifiers);
+  mCurrentModifiers = e.modifiers;
   updateCurrentPad(force);
   return true;
 }
 
 bool PackageEditorState_ReNumberPads::
     processGraphicsSceneLeftMouseButtonPressed(
-        QGraphicsSceneMouseEvent& e) noexcept {
-  mCurrentPos = Point::fromPx(e.scenePos());
-  const bool force = (mCurrentModifiers != e.modifiers());
-  mCurrentModifiers = e.modifiers();
+        const GraphicsSceneMouseEvent& e) noexcept {
+  mCurrentPos = e.scenePos;
+  const bool force = (mCurrentModifiers != e.modifiers);
+  mCurrentModifiers = e.modifiers;
 
   commitCurrentPad();
   if (mContext.currentFootprint &&

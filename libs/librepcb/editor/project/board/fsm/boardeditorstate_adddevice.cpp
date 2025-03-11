@@ -90,13 +90,13 @@ bool BoardEditorState_AddDevice::processFlip(
 }
 
 bool BoardEditorState_AddDevice::processGraphicsSceneMouseMoved(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   Board* board = getActiveBoard();
   if (!board) return false;
   if (!mIsUndoCmdActive) return false;
   if (!mCurrentDeviceEditCmd) return false;
 
-  Point pos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
+  Point pos = e.scenePos.mappedToGrid(getGridInterval());
   // set temporary position of the current device
   mCurrentDeviceEditCmd->setPosition(pos, true);
   board->triggerAirWiresRebuild();
@@ -104,10 +104,10 @@ bool BoardEditorState_AddDevice::processGraphicsSceneMouseMoved(
 }
 
 bool BoardEditorState_AddDevice::processGraphicsSceneLeftMouseButtonPressed(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   if (!mIsUndoCmdActive) return false;
 
-  Point pos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
+  Point pos = e.scenePos.mappedToGrid(getGridInterval());
   try {
     // place the current device finally
     if (mCurrentDeviceEditCmd) {
@@ -129,16 +129,15 @@ bool BoardEditorState_AddDevice::processGraphicsSceneLeftMouseButtonPressed(
 
 bool BoardEditorState_AddDevice::
     processGraphicsSceneLeftMouseButtonDoubleClicked(
-        QGraphicsSceneMouseEvent& e) noexcept {
+        const GraphicsSceneMouseEvent& e) noexcept {
   return processGraphicsSceneLeftMouseButtonPressed(e);
 }
 
 bool BoardEditorState_AddDevice::processGraphicsSceneRightMouseButtonReleased(
-    QGraphicsSceneMouseEvent& e) noexcept {
-  // Only rotate if cursor was not moved during click
-  if (e.screenPos() == e.buttonDownScreenPos(Qt::RightButton)) {
-    rotateDevice(Angle::deg90());
-  }
+    const GraphicsSceneMouseEvent& e) noexcept {
+  Q_UNUSED(e);
+
+  rotateDevice(Angle::deg90());
 
   // Always accept the event if we are placing a device! When ignoring the
   // event, the state machine will abort the tool by a right click!

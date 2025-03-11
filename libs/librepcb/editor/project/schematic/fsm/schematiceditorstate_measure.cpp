@@ -90,23 +90,24 @@ bool SchematicEditorState_Measure::processAbortCommand() noexcept {
 }
 
 bool SchematicEditorState_Measure::processKeyPressed(
-    const QKeyEvent& e) noexcept {
-  return mTool->processKeyPressed(e);
+    const GraphicsSceneKeyEvent& e) noexcept {
+  return mTool->processKeyPressed(e.key, e.modifiers);
 }
 
 bool SchematicEditorState_Measure::processKeyReleased(
-    const QKeyEvent& e) noexcept {
-  return mTool->processKeyReleased(e);
+    const GraphicsSceneKeyEvent& e) noexcept {
+  return mTool->processKeyReleased(e.key, e.modifiers);
 }
 
 bool SchematicEditorState_Measure::processGraphicsSceneMouseMoved(
-    QGraphicsSceneMouseEvent& e) noexcept {
-  return mTool->processGraphicsSceneMouseMoved(e);
+    const GraphicsSceneMouseEvent& e) noexcept {
+  return mTool->processGraphicsSceneMouseMoved(e.scenePos, e.modifiers);
 }
 
 bool SchematicEditorState_Measure::processGraphicsSceneLeftMouseButtonPressed(
-    QGraphicsSceneMouseEvent& e) noexcept {
-  return mTool->processGraphicsSceneLeftMouseButtonPressed(e);
+    const GraphicsSceneMouseEvent& e) noexcept {
+  Q_UNUSED(e);
+  return mTool->processGraphicsSceneLeftMouseButtonPressed();
 }
 
 bool SchematicEditorState_Measure::processSwitchToSchematicPage(

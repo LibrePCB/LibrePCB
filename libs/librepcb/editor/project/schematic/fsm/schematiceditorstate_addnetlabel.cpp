@@ -84,45 +84,40 @@ bool SchematicEditorState_AddNetLabel::exit() noexcept {
  ******************************************************************************/
 
 bool SchematicEditorState_AddNetLabel::processGraphicsSceneMouseMoved(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   Schematic* schematic = getActiveSchematic();
   if (!schematic) return false;
 
-  return updateLabel(Point::fromPx(e.scenePos()));
+  return updateLabel(e.scenePos);
 }
 
 bool SchematicEditorState_AddNetLabel::
     processGraphicsSceneLeftMouseButtonPressed(
-        QGraphicsSceneMouseEvent& e) noexcept {
-  Point pos = Point::fromPx(e.scenePos());
-
+        const GraphicsSceneMouseEvent& e) noexcept {
   if (mUndoCmdActive) {
-    return fixLabel(pos);
+    return fixLabel(e.scenePos);
   } else {
-    return addLabel(pos);
+    return addLabel(e.scenePos);
   }
 }
 
 bool SchematicEditorState_AddNetLabel::
     processGraphicsSceneLeftMouseButtonDoubleClicked(
-        QGraphicsSceneMouseEvent& e) noexcept {
-  Point pos = Point::fromPx(e.scenePos());
-
+        const GraphicsSceneMouseEvent& e) noexcept {
   if (mUndoCmdActive) {
-    return fixLabel(pos);
+    return fixLabel(e.scenePos);
   } else {
-    return addLabel(pos);
+    return addLabel(e.scenePos);
   }
 }
 
 bool SchematicEditorState_AddNetLabel::
     processGraphicsSceneRightMouseButtonReleased(
-        QGraphicsSceneMouseEvent& e) noexcept {
+        const GraphicsSceneMouseEvent& e) noexcept {
+  Q_UNUSED(e);
+
   if (mUndoCmdActive && mCurrentNetLabel && mEditCmd) {
-    // Only rotate net label if cursor was not moved during click
-    if (e.screenPos() == e.buttonDownScreenPos(Qt::RightButton)) {
-      mEditCmd->rotate(Angle::deg90(), mCurrentNetLabel->getPosition(), true);
-    }
+    mEditCmd->rotate(Angle::deg90(), mCurrentNetLabel->getPosition(), true);
 
     // Always accept the event if we are placing a net label! When ignoring the
     // event, the state machine will abort the tool by a right click!

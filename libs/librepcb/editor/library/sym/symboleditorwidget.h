@@ -108,8 +108,20 @@ public slots:
 private:  // Methods
   void updateMetadata() noexcept;
   QString commitMetadata() noexcept;
-  /// @see ::librepcb::editor::IF_GraphicsViewEventHandler
-  bool graphicsViewEventHandler(QEvent* event) noexcept override;
+  bool graphicsSceneKeyPressed(
+      const GraphicsSceneKeyEvent& e) noexcept override;
+  bool graphicsSceneKeyReleased(
+      const GraphicsSceneKeyEvent& e) noexcept override;
+  bool graphicsSceneMouseMoved(
+      const GraphicsSceneMouseEvent& e) noexcept override;
+  bool graphicsSceneLeftMouseButtonPressed(
+      const GraphicsSceneMouseEvent& e) noexcept override;
+  bool graphicsSceneLeftMouseButtonReleased(
+      const GraphicsSceneMouseEvent& e) noexcept override;
+  bool graphicsSceneLeftMouseButtonDoubleClicked(
+      const GraphicsSceneMouseEvent& e) noexcept override;
+  bool graphicsSceneRightMouseButtonReleased(
+      const GraphicsSceneMouseEvent& e) noexcept override;
   bool toolChangeRequested(Tool newTool,
                            const QVariant& mode) noexcept override;
   bool isInterfaceBroken() const noexcept override;

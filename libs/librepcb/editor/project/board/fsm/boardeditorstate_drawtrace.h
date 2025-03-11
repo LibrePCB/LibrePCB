@@ -72,16 +72,18 @@ public:
 
   // Event Handlers
   virtual bool processAbortCommand() noexcept override;
-  virtual bool processKeyPressed(const QKeyEvent& e) noexcept override;
-  virtual bool processKeyReleased(const QKeyEvent& e) noexcept override;
+  virtual bool processKeyPressed(
+      const GraphicsSceneKeyEvent& e) noexcept override;
+  virtual bool processKeyReleased(
+      const GraphicsSceneKeyEvent& e) noexcept override;
   virtual bool processGraphicsSceneMouseMoved(
-      QGraphicsSceneMouseEvent& e) noexcept override;
+      const GraphicsSceneMouseEvent& e) noexcept override;
   virtual bool processGraphicsSceneLeftMouseButtonPressed(
-      QGraphicsSceneMouseEvent& e) noexcept override;
+      const GraphicsSceneMouseEvent& e) noexcept override;
   virtual bool processGraphicsSceneLeftMouseButtonDoubleClicked(
-      QGraphicsSceneMouseEvent& e) noexcept override;
+      const GraphicsSceneMouseEvent& e) noexcept override;
   virtual bool processGraphicsSceneRightMouseButtonReleased(
-      QGraphicsSceneMouseEvent& e) noexcept override;
+      const GraphicsSceneMouseEvent& e) noexcept override;
   virtual bool processSwitchToBoard(int index) noexcept override;
 
   // Operator Overloadings

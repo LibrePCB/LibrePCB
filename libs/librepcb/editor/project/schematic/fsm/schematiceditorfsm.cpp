@@ -247,7 +247,8 @@ bool SchematicEditorFsm::processEditProperties() noexcept {
   return false;
 }
 
-bool SchematicEditorFsm::processKeyPressed(const QKeyEvent& e) noexcept {
+bool SchematicEditorFsm::processKeyPressed(
+    const GraphicsSceneKeyEvent& e) noexcept {
   if (SchematicEditorState* state = getCurrentStateObj()) {
     if (state->processKeyPressed(e)) {
       return true;
@@ -256,7 +257,8 @@ bool SchematicEditorFsm::processKeyPressed(const QKeyEvent& e) noexcept {
   return false;
 }
 
-bool SchematicEditorFsm::processKeyReleased(const QKeyEvent& e) noexcept {
+bool SchematicEditorFsm::processKeyReleased(
+    const GraphicsSceneKeyEvent& e) noexcept {
   if (SchematicEditorState* state = getCurrentStateObj()) {
     if (state->processKeyReleased(e)) {
       return true;
@@ -266,7 +268,7 @@ bool SchematicEditorFsm::processKeyReleased(const QKeyEvent& e) noexcept {
 }
 
 bool SchematicEditorFsm::processGraphicsSceneMouseMoved(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   if (SchematicEditorState* state = getCurrentStateObj()) {
     if (state->processGraphicsSceneMouseMoved(e)) {
       return true;
@@ -276,7 +278,7 @@ bool SchematicEditorFsm::processGraphicsSceneMouseMoved(
 }
 
 bool SchematicEditorFsm::processGraphicsSceneLeftMouseButtonPressed(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   if (SchematicEditorState* state = getCurrentStateObj()) {
     if (state->processGraphicsSceneLeftMouseButtonPressed(e)) {
       return true;
@@ -286,7 +288,7 @@ bool SchematicEditorFsm::processGraphicsSceneLeftMouseButtonPressed(
 }
 
 bool SchematicEditorFsm::processGraphicsSceneLeftMouseButtonReleased(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   if (SchematicEditorState* state = getCurrentStateObj()) {
     if (state->processGraphicsSceneLeftMouseButtonReleased(e)) {
       return true;
@@ -296,7 +298,7 @@ bool SchematicEditorFsm::processGraphicsSceneLeftMouseButtonReleased(
 }
 
 bool SchematicEditorFsm::processGraphicsSceneLeftMouseButtonDoubleClicked(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   if (SchematicEditorState* state = getCurrentStateObj()) {
     if (state->processGraphicsSceneLeftMouseButtonDoubleClicked(e)) {
       return true;
@@ -306,7 +308,7 @@ bool SchematicEditorFsm::processGraphicsSceneLeftMouseButtonDoubleClicked(
 }
 
 bool SchematicEditorFsm::processGraphicsSceneRightMouseButtonReleased(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   if (SchematicEditorState* state = getCurrentStateObj()) {
     if (state->processGraphicsSceneRightMouseButtonReleased(e)) {
       return true;

@@ -200,24 +200,24 @@ bool BoardEditorState_AddVia::exit() noexcept {
  ******************************************************************************/
 
 bool BoardEditorState_AddVia::processGraphicsSceneMouseMoved(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   BoardGraphicsScene* scene = getActiveBoardScene();
   if (!scene) return false;
 
-  Point pos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
+  Point pos = e.scenePos.mappedToGrid(getGridInterval());
   return updatePosition(*scene, pos);
 }
 
 bool BoardEditorState_AddVia::processGraphicsSceneLeftMouseButtonPressed(
-    QGraphicsSceneMouseEvent& e) noexcept {
-  const Point pos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
+    const GraphicsSceneMouseEvent& e) noexcept {
+  const Point pos = e.scenePos.mappedToGrid(getGridInterval());
   fixPosition(pos);
   addVia(pos);
   return true;
 }
 
 bool BoardEditorState_AddVia::processGraphicsSceneLeftMouseButtonDoubleClicked(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   return processGraphicsSceneLeftMouseButtonPressed(e);
 }
 

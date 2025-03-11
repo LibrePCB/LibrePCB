@@ -47,7 +47,6 @@ namespace editor {
 
 class ExclusiveActionGroup;
 class GraphicsLayerList;
-class GraphicsView;
 class ProjectEditor;
 class RuleCheckDock;
 class SchematicEditorFsm;
@@ -111,7 +110,20 @@ private:
   void createToolBars() noexcept;
   void createDockWidgets() noexcept;
   void createMenus() noexcept;
-  virtual bool graphicsViewEventHandler(QEvent* event) override;
+  bool graphicsSceneKeyPressed(
+      const GraphicsSceneKeyEvent& e) noexcept override;
+  bool graphicsSceneKeyReleased(
+      const GraphicsSceneKeyEvent& e) noexcept override;
+  bool graphicsSceneMouseMoved(
+      const GraphicsSceneMouseEvent& e) noexcept override;
+  bool graphicsSceneLeftMouseButtonPressed(
+      const GraphicsSceneMouseEvent& e) noexcept override;
+  bool graphicsSceneLeftMouseButtonReleased(
+      const GraphicsSceneMouseEvent& e) noexcept override;
+  bool graphicsSceneLeftMouseButtonDoubleClicked(
+      const GraphicsSceneMouseEvent& e) noexcept override;
+  bool graphicsSceneRightMouseButtonReleased(
+      const GraphicsSceneMouseEvent& e) noexcept override;
   void toolRequested(const QVariant& newTool) noexcept;
   void addSchematic() noexcept;
   void removeSchematic(int index) noexcept;
