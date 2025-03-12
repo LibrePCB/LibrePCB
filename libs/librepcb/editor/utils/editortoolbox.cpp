@@ -35,24 +35,6 @@ namespace editor {
  *  Static Methods
  ******************************************************************************/
 
-bool EditorToolbox::isWindowBackgroundDark() noexcept {
-  auto detect = []() {
-    QImage image(10, 10, QImage::Format_ARGB32);
-    image.fill(qApp->palette().color(QPalette::Window));  // Fallback
-    QWidget widget;
-    widget.resize(image.size());
-    widget.render(&image);
-    const QColor bgColor = image.pixelColor(image.rect().center());
-    const bool dark = (bgColor.alphaF() > 0.2) && (bgColor.blackF() > 0.5);
-    qDebug().nospace().noquote()
-        << "Detected " << (dark ? "dark" : "light")
-        << " theme based on window background color " << bgColor.name() << ".";
-    return dark;
-  };
-  static bool value = detect();
-  return value;
-}
-
 void EditorToolbox::removeFormLayoutRow(QLabel& label) noexcept {
   if (auto layout = label.parentWidget()->layout()) {
     if (removeFormLayoutRow(*layout, label)) {
