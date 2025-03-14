@@ -22,6 +22,12 @@ for f in $(git ls-files -- '**Cargo.toml'); do
   (cargo clippy --manifest-path="$f" --features="fail-on-warnings") || exit 1
 done
 
+# check slint code formatting
+for f in $(git ls-files -- '*.slint'); do
+  slint-lsp format -i "$f"
+done
+(git diff --exit-code -- "*.slint") || exit 1
+
 # run python style checks
 (flake8 --ignore=E501 dev tests) || exit 1
 
