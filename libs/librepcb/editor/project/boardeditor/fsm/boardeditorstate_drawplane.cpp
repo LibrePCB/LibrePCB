@@ -55,6 +55,7 @@ BoardEditorState_DrawPlane::BoardEditorState_DrawPlane(
     const Context& context) noexcept
   : BoardEditorState(context),
     mIsUndoCmdActive(false),
+    mAutoNetSignal(true),
     mLastNetSignal(nullptr),
     mLastLayer(&Layer::topCopper()),
     mLastVertexPos(),
@@ -71,16 +72,12 @@ BoardEditorState_DrawPlane::~BoardEditorState_DrawPlane() noexcept {
 bool BoardEditorState_DrawPlane::entry() noexcept {
   Q_ASSERT(mIsUndoCmdActive == false);
 
-  // Get most used net signal
-  if ((!mLastNetSignal) || (!mLastNetSignal->isAddedToCircuit())) {
+  // Get most used net signal if not manually chosen yet.
+  if (mAutoNetSignal ||
+      (mLastNetSignal && (!mLastNetSignal->isAddedToCircuit()))) {
     mLastNetSignal =
         mContext.project.getCircuit().getNetSignalWithMostElements();
-  }
-  if (!mLastNetSignal) {
-    QMessageBox::warning(&mContext.editor, tr("No net available"),
-                         tr("Your circuit doesn't contain any net, please add "
-                            "one in the schematic editor first."));
-    return false;
+    mAutoNetSignal = true;
   }
 
   EditorCommandSet& cmd = EditorCommandSet::instance();
@@ -275,6 +272,9 @@ bool BoardEditorState_DrawPlane::updateLastVertexPosition(
 }
 
 void BoardEditorState_DrawPlane::setNetSignal(NetSignal* netsignal) noexcept {
+  if (netsignal != mLastNetSignal) {
+    mAutoNetSignal = false;
+  }
   mLastNetSignal = netsignal;
   if (mCurrentPlaneEditCmd) {
     mCurrentPlaneEditCmd->setNetSignal(mLastNetSignal);

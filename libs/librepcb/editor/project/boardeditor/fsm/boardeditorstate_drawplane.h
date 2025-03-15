@@ -92,6 +92,7 @@ private:  // Methods
 private:  // Data
   // State
   bool mIsUndoCmdActive;
+  bool mAutoNetSignal;
   NetSignal* mLastNetSignal;
   const Layer* mLastLayer;
   Point mLastVertexPos;
