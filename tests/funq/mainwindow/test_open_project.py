@@ -2,20 +2,20 @@
 # -*- coding: utf-8 -*-
 
 """
-Test opening projects from within control panel
+Test opening projects from within main window
 """
 
 
 def test_open_dialog(librepcb, helpers):
     """
-    Open project by open dialog in control panel
+    Open project by open dialog in main window
     """
     librepcb.add_project('Empty Project')
     with librepcb.open() as app:
         path = librepcb.abspath('Empty Project/Empty Project.lpp')
-        app.widget('controlPanelOpenProjectButton').click()
-        app.widget('controlPanelOpenProjectDialogFileNameEdit').set_property('text', path)
-        app.widget('controlPanelOpenProjectDialogOkButton').click()
+        app.action('mainWindowActionOpenProject').trigger(blocking=False)
+        app.widget('mainWindowOpenProjectDialogFileNameEdit').set_property('text', path)
+        app.widget('mainWindowOpenProjectDialogOkButton').click()
 
         # Check if both editors were opened
         assert app.widget('schematicEditor').properties()['visible'] is True

@@ -10,19 +10,19 @@ import os
 
 def test_new_project_wizard(librepcb):
     """
-    Create project using the wizard from the control panel
+    Create project using the wizard from the main window
     """
     with librepcb.open() as app:
         # Open new project wizard
-        app.widget('controlPanelNewProjectButton').click()
-        assert app.widget('controlPanelNewProjectWizard').properties()['visible'] is True
+        app.action('mainWindowActionNewProject').trigger(blocking=False)
+        assert app.widget('mainWindowNewProjectWizard').properties()['visible'] is True
         # Enter metadata
         name = 'New Project'
-        app.widget('controlPanelNewProjectWizardMetadataNameEdit').set_property('text', name)
-        path = app.widget('controlPanelNewProjectWizardMetadataPathEdit').properties()['text']
-        app.widget('controlPanelNewProjectWizardNextButton').click()
+        app.widget('mainWindowNewProjectWizardMetadataNameEdit').set_property('text', name)
+        path = app.widget('mainWindowNewProjectWizardMetadataPathEdit').properties()['text']
+        app.widget('mainWindowNewProjectWizardNextButton').click()
         # Setup schematic/board
-        app.widget('controlPanelNewProjectWizardFinishButton').click()
+        app.widget('mainWindowNewProjectWizardFinishButton').click()
         # Verify if editors are opened and project file exists
         assert app.widget('schematicEditor').properties()['visible'] is True
         assert app.widget('boardEditor').properties()['visible'] is True

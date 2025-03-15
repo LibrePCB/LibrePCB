@@ -47,6 +47,123 @@ namespace librepcb {
 namespace editor {
 
 /*******************************************************************************
+ *  Non-Member Functions
+ ******************************************************************************/
+
+int q2s(int i) noexcept {
+  return i;
+}
+
+slint::LogicalPosition q2s(const QPointF& p) noexcept {
+  return slint::LogicalPosition(
+      {static_cast<float>(p.x()), static_cast<float>(p.y())});
+}
+
+slint::PhysicalPosition q2s(const QPoint& p) noexcept {
+  return slint::PhysicalPosition({p.x(), p.y()});
+}
+
+slint::PhysicalSize q2s(const QSize& s) noexcept {
+  return slint::PhysicalSize({static_cast<uint32_t>(std::max(s.width(), 0)),
+                              static_cast<uint32_t>(std::max(s.height(), 0))});
+}
+
+slint::SharedString q2s(const QString& s) noexcept {
+  return slint::SharedString(s.toUtf8().data());
+}
+
+slint::Image q2s(const QPixmap& p) noexcept {
+  if (p.isNull()) {
+    return slint::Image();
+  }
+
+  QImage img = p.toImage();
+  img.convertTo(QImage::Format_RGBA8888);
+  return slint::Image(slint::SharedPixelBuffer<slint::Rgba8Pixel>(
+      img.width(), img.height(),
+      reinterpret_cast<const slint::Rgba8Pixel*>(img.bits())));
+}
+
+slint::Color q2s(const QColor& c) noexcept {
+  return slint::Color::from_argb_uint8(c.alpha(), c.red(), c.green(), c.blue());
+}
+
+slint::private_api::MouseCursor q2s(Qt::CursorShape s) noexcept {
+  switch (s) {
+    case Qt::ArrowCursor:
+      return slint::private_api::MouseCursor::Default;
+    case Qt::PointingHandCursor:
+      return slint::private_api::MouseCursor::Pointer;
+    case Qt::CrossCursor:
+      return slint::private_api::MouseCursor::Crosshair;
+    default: {
+      qWarning() << "Unsupported cursor shape:" << s;
+      return slint::private_api::MouseCursor::Default;
+    }
+  }
+}
+
+QPointF s2q(const slint::LogicalPosition& p) noexcept {
+  return QPointF(p.x, p.y);
+}
+
+QPoint s2q(const slint::PhysicalPosition& p) noexcept {
+  return QPoint(p.x, p.y);
+}
+
+QSize s2q(const slint::PhysicalSize& s) noexcept {
+  return QSize(s.width, s.height);
+}
+
+QString s2q(const slint::SharedString& s) noexcept {
+  std::string_view view(s);
+  return QString::fromUtf8(view.data(), view.size());
+}
+
+Qt::MouseButton s2q(const slint::private_api::PointerEventButton& b) noexcept {
+  switch (b) {
+    case slint::private_api::PointerEventButton::Left:
+      return Qt::LeftButton;
+    case slint::private_api::PointerEventButton::Right:
+      return Qt::RightButton;
+    case slint::private_api::PointerEventButton::Middle:
+      return Qt::MiddleButton;
+    case slint::private_api::PointerEventButton::Back:
+      return Qt::BackButton;
+    case slint::private_api::PointerEventButton::Forward:
+      return Qt::ForwardButton;
+    default:
+      return Qt::NoButton;
+  }
+}
+
+Qt::KeyboardModifiers s2q(
+    const slint::private_api::KeyboardModifiers& m) noexcept {
+  Qt::KeyboardModifiers ret;
+  ret.setFlag(Qt::ShiftModifier, m.shift);
+  ret.setFlag(Qt::ControlModifier, m.control);
+  ret.setFlag(Qt::AltModifier, m.alt);
+  ret.setFlag(Qt::MetaModifier, m.meta);
+  return ret;
+}
+
+bool operator==(const QString& s1, const slint::SharedString& s2) noexcept {
+  return s1.toUtf8().data() == std::string_view(s2);
+}
+
+bool operator!=(const QString& s1, const slint::SharedString& s2) noexcept {
+  return s1.toUtf8().data() != std::string_view(s2);
+}
+
+bool operator==(const slint::SharedString& s1, const QString& s2) noexcept {
+  return std::string_view(s1) == s2.toUtf8().data();
+}
+
+bool operator!=(const slint::SharedString& s1, const QString& s2) noexcept {
+  return std::string_view(s1) != s2.toUtf8().data();
+}
+
+/*******************************************************************************
  *  Static Methods
  ******************************************************************************/
 

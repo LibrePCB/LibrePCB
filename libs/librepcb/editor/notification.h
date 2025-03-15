@@ -17,14 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_FILEICONPROVIDER_H
-#define LIBREPCB_EDITOR_FILEICONPROVIDER_H
+#ifndef LIBREPCB_EDITOR_NOTIFICATION_H
+#define LIBREPCB_EDITOR_NOTIFICATION_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "appwindow.h"
+
 #include <QtCore>
-#include <QtWidgets>
+#include <QtGui>
+
+#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -33,19 +37,47 @@ namespace librepcb {
 namespace editor {
 
 /*******************************************************************************
- *  Class FileIconProvider
+ *  Class Notification
  ******************************************************************************/
 
 /**
- * @brief The FileIconProvider class
+ * @brief The Notification class
  */
-class FileIconProvider final : public QFileIconProvider {
-public:
-  FileIconProvider() noexcept;
-  ~FileIconProvider() noexcept;
+class Notification final : public QObject {
+  Q_OBJECT
 
-  // Inherited Methods
-  virtual QIcon icon(const QFileInfo& info) const noexcept override;
+public:
+  // Constructors / Destructor
+  Notification() = delete;
+  Notification(const Notification& other) = delete;
+  explicit Notification(ui::NotificationType type, const QString& title,
+                        const QString& description, const QString& buttonText,
+                        const QString& dismissKey, bool autoPopUp,
+                        QObject* parent = nullptr) noexcept;
+  ~Notification() noexcept;
+
+  // General Methods
+  const QString& getDismissKey() const noexcept { return mDismissKey; }
+  bool getAutoPopUp() const noexcept { return mAutoPopUp; }
+  const ui::NotificationData& getUiData() const noexcept { return mUiData; }
+  void setUiData(const ui::NotificationData& data) noexcept;
+  void resetState() noexcept;
+  void setTitle(const QString& title) noexcept;
+  void setDescription(const QString& description) noexcept;
+  void setProgress(int progress) noexcept;
+  void dismiss() noexcept;
+
+  // Operator Overloadings
+  Notification& operator=(const Notification& rhs) = delete;
+
+signals:
+  void changed(bool dismissed);
+  void buttonClicked();
+
+private:
+  const QString mDismissKey;
+  const bool mAutoPopUp;
+  ui::NotificationData mUiData;
 };
 
 /*******************************************************************************

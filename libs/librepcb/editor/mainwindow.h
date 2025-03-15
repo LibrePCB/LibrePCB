@@ -17,49 +17,72 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_PROJECTTREEMODEL_H
-#define LIBREPCB_EDITOR_PROJECTTREEMODEL_H
+#ifndef LIBREPCB_EDITOR_MAINWINDOW_H
+#define LIBREPCB_EDITOR_MAINWINDOW_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "appwindow.h"
+
+#include <librepcb/core/fileio/filepath.h>
+
 #include <QtCore>
-#include <QtWidgets>
+#include <QtGui>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class Workspace;
-
 namespace editor {
 
+class GuiApplication;
+class MainWindowTestAdapter;
+class ProjectReadmeRenderer;
+
 /*******************************************************************************
- *  Class ProjectTreeModel
+ *  Class MainWindow
  ******************************************************************************/
 
 /**
- * @brief The ProjectTreeModel class
+ * @brief The MainWindow class
  */
-class ProjectTreeModel : public QFileSystemModel {
+class MainWindow final : public QObject {
+  Q_OBJECT
+
 public:
   // Constructors / Destructor
-  ProjectTreeModel() = delete;
-  ProjectTreeModel(const ProjectTreeModel& other) = delete;
-  explicit ProjectTreeModel(const Workspace& workspace,
-                            QObject* parent = nullptr) noexcept;
-  ~ProjectTreeModel() noexcept;
+  MainWindow() = delete;
+  MainWindow(const MainWindow& other) = delete;
+  explicit MainWindow(GuiApplication& app,
+                      slint::ComponentHandle<ui::AppWindow> win, int id,
+                      QObject* parent = nullptr) noexcept;
+  ~MainWindow() noexcept;
 
-  // General methods
-  QModelIndexList getPersistentIndexList() const {
-    return persistentIndexList();
-  }
-  QVariant headerData(int section, Qt::Orientation orientation,
-                      int role) const override;
+  // General Methods
+  int getId() const noexcept { return mId; }
+  bool isCurrentWindow() const noexcept;
+  void makeCurrentWindow() noexcept;
+  void showPanelPage(ui::PanelPage page) noexcept;
+  void popUpNotifications() noexcept;
 
   // Operator Overloadings
-  ProjectTreeModel& operator=(const ProjectTreeModel& rhs) = delete;
+  MainWindow& operator=(const MainWindow& rhs) = delete;
+
+signals:
+  void aboutToClose();
+
+private:
+  slint::CloseRequestResponse closeRequested() noexcept;
+  bool trigger(ui::Action a) noexcept;
+
+  const int mId;
+  const QString mSettingsPrefix;
+  GuiApplication& mApp;
+  slint::ComponentHandle<ui::AppWindow> mWindow;
+  QWidget* mWidget;
+  std::unique_ptr<ProjectReadmeRenderer> mProjectPreviewRenderer;
+  std::unique_ptr<MainWindowTestAdapter> mTestAdapter;
 };
 
 /*******************************************************************************

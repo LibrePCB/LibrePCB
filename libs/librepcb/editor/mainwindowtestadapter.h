@@ -17,46 +17,53 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBREPCB_EDITOR_MAINWINDOWTESTADAPTER_H
+#define LIBREPCB_EDITOR_MAINWINDOWTESTADAPTER_H
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "markdownconverter.h"
-
 #include <QtCore>
-
-#include <qtextdocument.h>
+#include <QtWidgets>
 
 /*******************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 namespace editor {
 
+class GuiApplication;
+
 /*******************************************************************************
- *  Static Methods
+ *  Class MainWindowTestAdapter
  ******************************************************************************/
 
-QString MarkdownConverter::convertMarkdownToHtml(
-    const FilePath& markdownFile) noexcept {
-  QFile file(markdownFile.toStr());
-  if (file.open(QFile::ReadOnly)) {
-    return convertMarkdownToHtml(file.readAll());
-  } else {
-    return QString();
-  }
-}
+/**
+ * @brief Adapter class for automated GUI tests
+ */
+class MainWindowTestAdapter final : public QWidget {
+  Q_OBJECT
 
-QString MarkdownConverter::convertMarkdownToHtml(
-    const QString& markdown) noexcept {
-  // Use a temporary QTextDocument to convert markdown to HTML.
-  // This is not terribly efficient (we could return a QTextDocument instead),
-  // but since this method is only used in non-performance-sensitive code right
-  // now (rendering README files in the project manager) this is fine, because
-  // it makes the API simpler (QString in, QString out).
-  QTextDocument document;
-  document.setMarkdown(markdown, QTextDocument::MarkdownDialectGitHub);
-  return document.toHtml();
-}
+public:
+  // Constructors / Destructor
+  MainWindowTestAdapter() = delete;
+  MainWindowTestAdapter(const MainWindowTestAdapter& other) = delete;
+  explicit MainWindowTestAdapter(GuiApplication& app,
+                                 QWidget* parent = nullptr) noexcept;
+  ~MainWindowTestAdapter() noexcept;
+
+  // Operator Overloadings
+  MainWindowTestAdapter& operator=(const MainWindowTestAdapter& rhs) = delete;
+
+public slots:
+  QVariant isLibraryScanFinished(QVariant) const noexcept {
+    return mLibraryScanFinished;
+  }
+
+private:
+  GuiApplication& mApp;
+  bool mLibraryScanFinished = false;
+};
 
 /*******************************************************************************
  *  End of File
@@ -64,3 +71,5 @@ QString MarkdownConverter::convertMarkdownToHtml(
 
 }  // namespace editor
 }  // namespace librepcb
+
+#endif

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_RECENTPROJECTSMODEL_H
-#define LIBREPCB_EDITOR_RECENTPROJECTSMODEL_H
+#ifndef LIBREPCB_EDITOR_PROJECTREADMERENDERER_H
+#define LIBREPCB_EDITOR_PROJECTREADMERENDERER_H
 
 /*******************************************************************************
  *  Includes
@@ -26,51 +26,50 @@
 #include <librepcb/core/fileio/filepath.h>
 
 #include <QtCore>
+#include <QtGui>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class Version;
-class Workspace;
-
 namespace editor {
 
 /*******************************************************************************
- *  Class RecentProjectsModel
+ *  Class ProjectReadmeRenderer
  ******************************************************************************/
 
 /**
- * @brief The RecentProjectsModel class
+ * @brief Renders a README.md or other file types as a QPixmap
  */
-class RecentProjectsModel : public QAbstractListModel {
+class ProjectReadmeRenderer : public QObject {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  RecentProjectsModel() = delete;
-  RecentProjectsModel(const RecentProjectsModel& other) = delete;
-  explicit RecentProjectsModel(const Workspace& workspace) noexcept;
-  ~RecentProjectsModel() noexcept;
+  ProjectReadmeRenderer() = delete;
+  ProjectReadmeRenderer(const ProjectReadmeRenderer& other) = delete;
+  explicit ProjectReadmeRenderer(QObject* parent = nullptr) noexcept;
+  virtual ~ProjectReadmeRenderer() noexcept;
 
   // General Methods
-  void setLastRecentProject(const FilePath& filepath) noexcept;
-  void updateVisibleProjects() noexcept;
+  void request(const FilePath& fp, int width) noexcept;
 
   // Operator Overloadings
-  RecentProjectsModel& operator=(const RecentProjectsModel& rhs) = delete;
+  ProjectReadmeRenderer& operator=(const ProjectReadmeRenderer& rhs) = delete;
+
+signals:
+  void runningChanged(bool running);
+  void finished(const QPixmap& result);
 
 private:
-  void save() noexcept;
-  int rowCount(const QModelIndex& parent = QModelIndex()) const;
-  QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
+  void start() noexcept;
+  static QPixmap render(const FilePath& fp, int width) noexcept;
 
-  // Attributes
-  const Workspace& mWorkspace;
-  FilePath mFilePath;
-  QList<FilePath> mAllProjects;
-  QList<FilePath> mVisibleProjects;
+private:
+  FilePath mPath;
+  int mWidth;
+  QTimer mDelayTimer;
+  std::unique_ptr<QFutureWatcher<QPixmap>> mWatcher;
 };
 
 /*******************************************************************************

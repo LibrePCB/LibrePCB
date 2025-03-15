@@ -17,74 +17,81 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_PROJECTLIBRARYUPDATER_H
-#define LIBREPCB_EDITOR_PROJECTLIBRARYUPDATER_H
+#ifndef LIBREPCB_EDITOR_NOTIFICATIONSMODEL_H
+#define LIBREPCB_EDITOR_NOTIFICATIONSMODEL_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/fileio/filepath.h>
-#include <librepcb/core/types/uuid.h>
+#include "appwindow.h"
 
 #include <QtCore>
-#include <QtWidgets>
 
-#include <memory>
+#include <vector>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
-class TransactionalFileSystem;
 class Workspace;
-class WorkspaceLibraryDb;
 
 namespace editor {
 
-namespace Ui {
-class ProjectLibraryUpdater;
-}
+class Notification;
 
 /*******************************************************************************
- *  Class ProjectLibraryUpdater
+ *  Class NotificationsModel
  ******************************************************************************/
 
 /**
- * @brief The ProjectLibraryUpdater class
- *
- * @note This updater is currently an ugly hack with very limited functionality.
- * The whole project library update concept needs to be refactored some time to
- * provide an updater with much more functionality and higher reliability.
+ * @brief The NotificationsModel class
  */
-class ProjectLibraryUpdater : public QDialog {
+class NotificationsModel final : public QObject,
+                                 public slint::Model<ui::NotificationData> {
   Q_OBJECT
 
 public:
-  typedef std::function<bool(const FilePath&)> CloseCallback;
+  // Constructors / Destructor
+  NotificationsModel() = delete;
+  NotificationsModel(const NotificationsModel& other) = delete;
+  explicit NotificationsModel(Workspace& ws,
+                              QObject* parent = nullptr) noexcept;
+  ~NotificationsModel() noexcept;
 
-  explicit ProjectLibraryUpdater(Workspace& ws, const FilePath& project,
-                                 CloseCallback cb) noexcept;
-  ~ProjectLibraryUpdater();
+  // General Methods
+  void push(std::shared_ptr<Notification> notification) noexcept;
+  int getUnreadNotificationsCount() const noexcept {
+    return mUnreadNotifications;
+  }
+  int getCurrentProgressIndex() const noexcept { return mCurrentProgressIndex; }
 
-private slots:
-  void btnUpdateClicked();
+  // Implementations
+  std::size_t row_count() const override;
+  std::optional<ui::NotificationData> row_data(std::size_t i) const override;
+  void set_row_data(std::size_t i,
+                    const ui::NotificationData& obj) noexcept override;
+
+  // Operator Overloadings
+  NotificationsModel& operator=(const NotificationsModel& rhs) = delete;
 
 signals:
-  void finished(const FilePath& fp);
+  void autoPopUpRequested();
+  void unreadNotificationsCountChanged(int count);
+  void currentProgressIndexChanged(int index);
 
 private:
-  void log(const QString& msg) noexcept;
-  QString prettyPath(const FilePath& fp) const noexcept;
-  template <typename T>
-  void updateElements(std::shared_ptr<TransactionalFileSystem> fs,
-                      const QString& type);
+  int mapIndex(int i) const noexcept;
+  void itemChanged(bool dismissed) noexcept;
+  void removeItem(std::size_t i, int itemIndex) noexcept;
+  void updateUnreadNotificationsCount() noexcept;
+  void updateCurrentProgressIndex() noexcept;
 
 private:
   Workspace& mWorkspace;
-  const FilePath mProjectFilePath;
-  const CloseCallback mCloseCallback;
-  QScopedPointer<Ui::ProjectLibraryUpdater> mUi;
+  std::vector<std::shared_ptr<Notification>> mItems;
+  int mUnreadNotifications;
+  int mCurrentProgressIndex;
 };
 
 /*******************************************************************************

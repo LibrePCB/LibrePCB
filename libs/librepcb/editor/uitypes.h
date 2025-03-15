@@ -17,50 +17,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBREPCB_EDITOR_UITYPES_H
+#define LIBREPCB_EDITOR_UITYPES_H
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "projecttreemodel.h"
-
-#include "fileiconprovider.h"
-
-#include <librepcb/core/workspace/workspace.h>
-
-#include <QtCore>
-#include <QtWidgets>
+#include "appwindow.h"
+#include "editorcommand.h"
+#include "utils/editortoolbox.h"
 
 /*******************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 namespace editor {
 
 /*******************************************************************************
- *  Constructors / Destructor
+ *  Non-Member Functions
  ******************************************************************************/
 
-ProjectTreeModel::ProjectTreeModel(const Workspace& workspace,
-                                   QObject* parent) noexcept
-  : QFileSystemModel(parent) {
-  setIconProvider(new FileIconProvider());
-  setRootPath(workspace.getProjectsPath().toStr());
-}
-
-ProjectTreeModel::~ProjectTreeModel() noexcept {
-}
-
-/*******************************************************************************
- *  Inherited Methods
- ******************************************************************************/
-
-QVariant ProjectTreeModel::headerData(int section, Qt::Orientation orientation,
-                                      int role) const {
-  if ((role == Qt::DisplayRole) && (orientation == Qt::Horizontal) &&
-      (section == 0)) {
-    return QString("Workspace Projects");
-  } else {
-    return QFileSystemModel::headerData(section, orientation, role);
+inline ui::EditorCommand l2s(const EditorCommand& cmd,
+                             ui::EditorCommand in) noexcept {
+  QString text = cmd.getDisplayText();
+  if (cmd.getFlags().testFlag(EditorCommand::Flag::OpensPopup)) {
+    text += "...";
   }
+  in.text = q2s(text);
+  in.status_tip = q2s(cmd.getDescription());
+  in.shortcut = q2s(cmd.getKeySequences().value(0).toString());
+  return in;
 }
 
 /*******************************************************************************
@@ -69,3 +55,5 @@ QVariant ProjectTreeModel::headerData(int section, Qt::Orientation orientation,
 
 }  // namespace editor
 }  // namespace librepcb
+
+#endif

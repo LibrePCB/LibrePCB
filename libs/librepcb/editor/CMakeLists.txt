@@ -76,6 +76,7 @@ add_library(
   editorcommand.h
   editorcommandcategory.h
   editorcommandset.h
+  editorcommandsetupdater.h
   graphics/circlegraphicsitem.cpp
   graphics/circlegraphicsitem.h
   graphics/defaultgraphicslayerprovider.cpp
@@ -110,6 +111,8 @@ add_library(
   graphics/textgraphicsitem.h
   graphics/zonegraphicsitem.cpp
   graphics/zonegraphicsitem.h
+  guiapplication.cpp
+  guiapplication.h
   library/cat/categorychooserdialog.cpp
   library/cat/categorychooserdialog.h
   library/cat/categorychooserdialog.ui
@@ -417,6 +420,10 @@ add_library(
   library/sym/symbolpinpropertiesdialog.cpp
   library/sym/symbolpinpropertiesdialog.h
   library/sym/symbolpinpropertiesdialog.ui
+  mainwindow.cpp
+  mainwindow.h
+  mainwindowtestadapter.cpp
+  mainwindowtestadapter.h
   modelview/angledelegate.cpp
   modelview/angledelegate.h
   modelview/attributelistmodel.cpp
@@ -438,6 +445,10 @@ add_library(
   modelview/pathmodel.h
   modelview/sortfilterproxymodel.cpp
   modelview/sortfilterproxymodel.h
+  notification.cpp
+  notification.h
+  notificationsmodel.cpp
+  notificationsmodel.h
   project/addcomponentdialog.cpp
   project/addcomponentdialog.h
   project/addcomponentdialog.ui
@@ -786,6 +797,8 @@ add_library(
   project/partinformationtooltip.ui
   project/projecteditor.cpp
   project/projecteditor.h
+  project/projectreadmerenderer.cpp
+  project/projectreadmerenderer.h
   project/projectsetupdialog.cpp
   project/projectsetupdialog.h
   project/projectsetupdialog.ui
@@ -839,6 +852,7 @@ add_library(
   project/schematic/symbolinstancepropertiesdialog.cpp
   project/schematic/symbolinstancepropertiesdialog.h
   project/schematic/symbolinstancepropertiesdialog.ui
+  uitypes.h
   undocommand.cpp
   undocommand.h
   undocommandgroup.cpp
@@ -937,23 +951,12 @@ add_library(
   widgets/waitingspinnerwidget.h
   workspace/categorytreemodel.cpp
   workspace/categorytreemodel.h
-  workspace/controlpanel/controlpanel.cpp
-  workspace/controlpanel/controlpanel.h
-  workspace/controlpanel/controlpanel.ui
-  workspace/controlpanel/favoriteprojectsmodel.cpp
-  workspace/controlpanel/favoriteprojectsmodel.h
-  workspace/controlpanel/fileiconprovider.cpp
-  workspace/controlpanel/fileiconprovider.h
-  workspace/controlpanel/markdownconverter.cpp
-  workspace/controlpanel/markdownconverter.h
-  workspace/controlpanel/projecttreemodel.cpp
-  workspace/controlpanel/projecttreemodel.h
-  workspace/controlpanel/recentprojectsmodel.cpp
-  workspace/controlpanel/recentprojectsmodel.h
   workspace/desktopintegration.cpp
   workspace/desktopintegration.h
   workspace/desktopservices.cpp
   workspace/desktopservices.h
+  workspace/filesystemmodel.cpp
+  workspace/filesystemmodel.h
   workspace/initializeworkspacewizard/initializeworkspacewizard.cpp
   workspace/initializeworkspacewizard/initializeworkspacewizard.h
   workspace/initializeworkspacewizard/initializeworkspacewizard.ui
@@ -991,9 +994,16 @@ add_library(
   workspace/projectlibraryupdater/projectlibraryupdater.cpp
   workspace/projectlibraryupdater/projectlibraryupdater.h
   workspace/projectlibraryupdater/projectlibraryupdater.ui
+  workspace/quickaccessmodel.cpp
+  workspace/quickaccessmodel.h
   workspace/workspacesettingsdialog.cpp
   workspace/workspacesettingsdialog.h
   workspace/workspacesettingsdialog.ui
+)
+slint_target_sources(
+  librepcb_editor ui/appwindow.slint
+  NAMESPACE ui
+  COMPILATION_UNITS 12
 )
 target_include_directories(
   librepcb_editor

@@ -1,0 +1,71 @@
+import "../../../../share/librepcb/fonts/NotoSans-Regular.ttf";
+import "../../../../share/librepcb/fonts/NotoSansMono-Regular.ttf";
+
+import { PanelPage } from "./api/types.slint";
+import { Backend } from "./api/backend.slint";
+import { Data } from "./api/data.slint";
+import { EditorCommandSet } from "./api/editorcommandset.slint";
+import { MainMenuBar } from "./mainmenubar.slint";
+import { SideBar } from "./sidebar.slint";
+import { HomePanel } from "./homepanel.slint";
+import { HomeTab } from "./hometab.slint";
+import { StatusBar } from "./statusbar.slint";
+
+export { Backend, Data, EditorCommandSet }
+
+export component AppWindow inherits Window {
+    property <length> panel-width: min(self.width * 0.3, 350px);
+
+    title: Data.window-title;
+    background: #2a2a2a;
+    icon: @image-url("../../../../img/app/librepcb.svg");
+    default-font-family: "Noto Sans";
+    preferred-width: 1024px;
+    preferred-height: 768px;
+
+    menubar := MainMenuBar {
+        x: 0;
+        y: 0;
+        z: 100; // For the tooltips.
+        width: 100%;
+        height: 26px;
+    }
+
+    sidebar := SideBar {
+        x: 0px;
+        y: menubar.height;
+        z: 90; // For the tooltips
+        width: ((root.width <= 1200px) || (root.height <= 600px)) ? 35px : 45px;
+        height: parent.height - self.y - statusbar.height - 1px;
+    }
+
+    if Data.panel-page == PanelPage.home: home-panel := HomePanel {
+        x: sidebar.width;
+        y: sidebar.y;
+        z: 80; // For the tooltips
+        width: panel-width;
+        height: sidebar.height;
+    }
+
+    HorizontalLayout {
+        x: sidebar.width + panel-width;
+        y: sidebar.y + 1px;
+        width: parent.width - self.x;
+        height: sidebar.height - 1px;
+
+        Rectangle {
+            background: #555555;
+            width: 1px;
+        }
+
+        home-tab := HomeTab {
+            width: parent.width - 1px;
+        }
+    }
+
+    statusbar := StatusBar {
+        x: 0;
+        y: parent.height - self.height;
+        width: parent.width;
+    }
+}

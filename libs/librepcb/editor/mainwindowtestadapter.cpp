@@ -20,11 +20,15 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "fileiconprovider.h"
+#include "mainwindowtestadapter.h"
 
-#include <librepcb/core/project/project.h>
+#include "guiapplication.h"
+
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacelibrarydb.h>
 
 #include <QtCore>
+#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace
@@ -36,34 +40,19 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-FileIconProvider::FileIconProvider() noexcept : QFileIconProvider() {
+MainWindowTestAdapter::MainWindowTestAdapter(GuiApplication& app,
+                                             QWidget* parent) noexcept
+  : QWidget(parent), mApp(app) {
+  setObjectName("testAdapter");
+
+  connect(&mApp.getWorkspace().getLibraryDb(), &WorkspaceLibraryDb::scanStarted,
+          this, [this]() { mLibraryScanFinished = false; });
+  connect(&mApp.getWorkspace().getLibraryDb(),
+          &WorkspaceLibraryDb::scanFinished, this,
+          [this]() { mLibraryScanFinished = true; });
 }
 
-FileIconProvider::~FileIconProvider() noexcept {
-}
-
-/*******************************************************************************
- *  Inherited Methods
- ******************************************************************************/
-
-QIcon FileIconProvider::icon(const QFileInfo& info) const noexcept {
-  if (info.isFile()) {
-    if (info.suffix() == "lpp") {
-      return QIcon(":/img/app/librepcb.png");
-    } else if (info.suffix() == "lppz") {
-      return QIcon(":/img/app/librepcb.png");  // TODO: Use zipped project icon.
-    } else {
-      return QIcon(":/img/places/file.png");
-    }
-  } else if (info.isDir()) {
-    if (Project::isProjectDirectory(FilePath(info.absoluteFilePath()))) {
-      return QIcon(":/img/places/project_folder.png");
-    } else if (info.isDir()) {
-      return QIcon(":/img/places/folder.png");
-    }
-  }
-
-  return QFileIconProvider::icon(info);
+MainWindowTestAdapter::~MainWindowTestAdapter() noexcept {
 }
 
 /*******************************************************************************

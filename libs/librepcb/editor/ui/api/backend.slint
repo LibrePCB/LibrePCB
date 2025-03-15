@@ -1,0 +1,59 @@
+import { Action } from "./types.slint";
+import { Data } from "./data.slint";
+
+// Note: The callback implementations are just for the live preview, they will
+// be overridden by the backend in the real use-case.
+export global Backend {
+    // Trigger some action
+    //
+    // Parameters:
+    //  1. Action to trigger
+    //
+    // Return value:
+    //  Whether the action was handled or not
+    pure callback trigger(Action) -> bool;
+    trigger(action) => {
+        debug("Trigger action:", action);
+        true
+    }
+
+    // Request generating the preview of a project (e.g. its README.md)
+    //
+    // Lets the backend building the preview asynchronously, and updating the
+    // following data members accordingly:
+    //  - Data.project-preview-rendering
+    //  - Data.project-preview-image
+    //
+    // Parameters:
+    //  1. Absolute project file path (e.g. from TreeViewItemData::user-data)
+    //  2. Width of the preview component
+    //
+    // Return value:
+    //  Dummy (discarded), just to allow declarative, automatic re-evaluation
+    pure callback request-project-preview(string, length) -> bool;
+    request-project-preview(path, width) => {
+        debug("Request project preview:", path, width);
+        true
+    }
+
+    // Convert a string to uppercase
+    //
+    // Parameters:
+    //  1. Input string
+    //
+    // Return value:
+    //  Uppercase string
+    pure callback to-upper(string) -> string;
+    to-upper(s) => {
+        // Just for the preview, convert the untranslated source strings.
+        if !Data.preview-mode {
+            "⚠"
+        } else if s == "Quick Access" {
+            "QUICK ACCESS"
+        } else if s == "Workspace Projects" {
+            "WORKSPACE PROJECTS"
+        } else {
+            s
+        }
+    }
+}
