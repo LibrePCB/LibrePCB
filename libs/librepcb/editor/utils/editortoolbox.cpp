@@ -26,6 +26,8 @@
 #include "../workspace/desktopservices.h"
 #include "menubuilder.h"
 
+#include <librepcb/core/3d/occmodel.h>
+#include <librepcb/core/application.h>
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/dev/device.h>
 #include <librepcb/core/project/board/items/bi_device.h>
@@ -33,11 +35,13 @@
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectlibrary.h>
+#include <librepcb/core/systeminfo.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
+#include <QtNetwork>
 #include <QtWidgets>
 
 /*******************************************************************************
@@ -161,6 +165,69 @@ bool operator==(const slint::SharedString& s1, const QString& s2) noexcept {
 
 bool operator!=(const slint::SharedString& s1, const QString& s2) noexcept {
   return std::string_view(s1) != s2.toUtf8().data();
+}
+
+static slint::SharedString getError(const QString& input) {
+  if (input.trimmed().isEmpty()) {
+    return q2s(QCoreApplication::translate("AppToolbox", "Required"));
+  } else {
+    return q2s(QCoreApplication::translate("AppToolbox", "Invalid"));
+  }
+}
+
+std::optional<ElementName> validateElementName(
+    const QString& input, slint::SharedString& error) noexcept {
+  const std::optional<ElementName> ret =
+      parseElementName(cleanElementName(input));
+  if (!ret) {
+    error = getError(input);
+  } else {
+    error = slint::SharedString();
+  }
+  return ret;
+}
+
+std::optional<Version> validateVersion(const QString& input,
+                                       slint::SharedString& error) noexcept {
+  const std::optional<Version> ret = Version::tryFromString(input.trimmed());
+  if (!ret) {
+    error = getError(input);
+  } else {
+    error = slint::SharedString();
+  }
+  return ret;
+}
+
+std::optional<FileProofName> validateFileProofName(
+    const QString& input, slint::SharedString& error,
+    const QString& requiredSuffix) noexcept {
+  std::optional<FileProofName> ret =
+      parseFileProofName(cleanFileProofName(input));
+  if (!ret) {
+    error = getError(input);
+  } else if ((!requiredSuffix.isEmpty()) &&
+             (!input.trimmed().endsWith(requiredSuffix))) {
+    ret = std::nullopt;
+    error = q2s(QCoreApplication::translate("AppToolbox", "Suffix '%1' missing")
+                    .arg(requiredSuffix));
+  } else {
+    error = slint::SharedString();
+  }
+  return ret;
+}
+
+std::optional<QUrl> validateUrl(const QString& input,
+                                slint::SharedString& error,
+                                bool allowEmpty) noexcept {
+  const QUrl url = QUrl::fromUserInput(input.trimmed());
+  const std::optional<QUrl> ret =
+      url.isValid() ? std::make_optional(url) : std::nullopt;
+  if ((!ret) && ((!input.isEmpty()) || (!allowEmpty))) {
+    error = getError(input);
+  } else {
+    error = slint::SharedString();
+  }
+  return ret;
 }
 
 /*******************************************************************************
@@ -363,6 +430,29 @@ void EditorToolbox::addResourcesToMenu(const Workspace& ws, MenuBuilder& mb,
       smb.addAction(actions.at(i));
     }
   }
+}
+
+QString EditorToolbox::buildAppVersionDetails() noexcept {
+  // Always English, not translatable!
+  QStringList details;
+  const QString date = Application::getBuildDate().toString(Qt::ISODate);
+  QString qt = QString(qVersion()) + " (built against " + QT_VERSION_STR + ")";
+  details << "LibrePCB Version: " + Application::getVersion();
+  details << "Git Revision:     " + Application::getGitRevision();
+  details << "Build Date:       " + date;
+  if (!Application::getBuildAuthor().isEmpty()) {
+    details << "Build Author:     " + Application::getBuildAuthor();
+  }
+  details << "Qt Version:       " + qt;
+  details << "CPU Architecture: " + QSysInfo::currentCpuArchitecture();
+  details << "Operating System: " + QSysInfo::prettyProductName();
+  details << "Platform Plugin:  " + qApp->platformName();
+  details << "TLS Library:      " + QSslSocket::sslLibraryVersionString();
+  details << "OCC Library:      " + OccModel::getOccVersionString();
+  if (!SystemInfo::detectRuntime().isEmpty()) {
+    details << "Runtime:          " + SystemInfo::detectRuntime();
+  }
+  return details.join("\n");
 }
 
 /*******************************************************************************

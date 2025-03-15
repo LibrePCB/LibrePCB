@@ -185,7 +185,7 @@ export component HomePanel inherits Rectangle {
                 status-tip: Cmd.project-new.status-tip;
 
                 clicked => {
-                    Backend.trigger(Action.project-new);
+                    Backend.trigger(Action.project-new, -1);
                 }
             }
 
@@ -196,7 +196,7 @@ export component HomePanel inherits Rectangle {
                 status-tip: Cmd.project-open.status-tip;
 
                 clicked => {
-                    Backend.trigger(Action.project-open);
+                    Backend.trigger(Action.project-open, -1);
                 }
             }
         }

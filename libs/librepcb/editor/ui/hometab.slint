@@ -10,14 +10,16 @@ component DonateButton inherits Button {
     text: @tr("Donate");
 
     clicked => {
-        Backend.trigger(Action.donate);
+        Backend.trigger(Action.donate, -1);
     }
 }
 
 export component HomeTab inherits Rectangle {
+    in property <int> section-index;
     property <bool> compact-layout: self.width < 350px;
 
     function handle-pointer-event(e: PointerEvent) -> EventResult {
+        Data.section-clicked(section-index);
         if (e.kind == PointerEventKind.down) {
             if (!focus-scope.has-focus) {
                 focus-scope.focus();
@@ -82,7 +84,7 @@ export component HomeTab inherits Rectangle {
                         text: @tr("Video Tutorials");
 
                         clicked => {
-                            Backend.trigger(Action.video-tutorials);
+                            Backend.trigger(Action.video-tutorials, -1);
                         }
                     }
 
@@ -93,7 +95,7 @@ export component HomeTab inherits Rectangle {
                         text: @tr("User Manual & Getting Started Guide");
 
                         clicked => {
-                            Backend.trigger(Action.user-manual);
+                            Backend.trigger(Action.user-manual, -1);
                         }
                     }
 
@@ -104,7 +106,7 @@ export component HomeTab inherits Rectangle {
                         text: @tr("Give Feedback & Get Support");
 
                         clicked => {
-                            Backend.trigger(Action.support);
+                            Backend.trigger(Action.support, -1);
                         }
                     }
 
@@ -115,7 +117,7 @@ export component HomeTab inherits Rectangle {
                         text: @tr("Keyboard Shortcuts Reference");
 
                         clicked => {
-                            Backend.trigger(Action.keyboard-shortcuts-reference);
+                            Backend.trigger(Action.keyboard-shortcuts-reference, -1);
                         }
                     }
                 }

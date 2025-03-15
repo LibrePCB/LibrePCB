@@ -66,6 +66,7 @@ DefaultGraphicsLayerProvider::DefaultGraphicsLayerProvider(
   addLayer(theme, Theme::Color::sBoardHoles);
   addLayer(theme, Theme::Color::sBoardVias);
   addLayer(theme, Theme::Color::sBoardPads);
+  addLayer(theme, Theme::Color::sBoardZones);
   addLayer(theme, Theme::Color::sBoardAirWires);
 
   // copper layers

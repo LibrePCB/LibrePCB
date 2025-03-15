@@ -25,13 +25,22 @@
 #include "editorcommandset.h"
 #include "editorcommandsetupdater.h"
 #include "guiapplication.h"
+#include "library/librariesmodel.h"
 #include "mainwindowtestadapter.h"
 #include "notificationsmodel.h"
+#include "project/newprojectwizard/newprojectwizard.h"
+#include "project/outputjobsdialog/outputjobsdialog.h"
+#include "project/projecteditor2.h"
 #include "project/projectreadmerenderer.h"
+#include "project/projectsmodel.h"
 #include "utils/editortoolbox.h"
 #include "utils/standardeditorcommandhandler.h"
+#include "windowsectionsmodel.h"
+#include "workspace/desktopservices.h"
 #include "workspace/filesystemmodel.h"
+#include "workspace/initializeworkspacewizard/initializeworkspacewizard.h"
 
+#include <librepcb/core/project/project.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <librepcb/core/workspace/workspacesettings.h>
@@ -59,6 +68,8 @@ MainWindow::MainWindow(GuiApplication& app,
     mWindow(win),
     mWidget(static_cast<QWidget*>(slint::cbindgen_private::slint_qt_get_widget(
         &mWindow->window().window_handle()))),
+    mSections(
+        new WindowSectionsModel(app, win->global<ui::Data>(), mSettingsPrefix)),
     mProjectPreviewRenderer(new ProjectReadmeRenderer(this)),
     mTestAdapter(new MainWindowTestAdapter(app, mWidget)) {
   Q_ASSERT(mWidget);
@@ -82,6 +93,10 @@ MainWindow::MainWindow(GuiApplication& app,
   // Set global data.
   const ui::Data& d = mWindow->global<ui::Data>();
   d.set_panel_page(ui::PanelPage::Home);
+  d.set_sections(mSections);
+  d.set_current_section_index(0);
+  d.set_cursor_coordinates(slint::SharedString());
+  d.set_ignore_placement_locks(false);
   d.set_workspace_folder_tree(fileSystemModel);
   d.set_notifications_unread(
       mApp.getNotifications().getUnreadNotificationsCount());
@@ -105,6 +120,32 @@ MainWindow::MainWindow(GuiApplication& app,
           this, [this](bool running) {
             mWindow->global<ui::Data>().set_project_preview_rendering(running);
           });
+  connect(mSections.get(), &WindowSectionsModel::currentProjectChanged, this,
+          &MainWindow::setCurrentProject);
+  connect(mSections.get(), &WindowSectionsModel::cursorCoordinatesChanged, this,
+          [&d](const Point& pos, const LengthUnit& unit) {
+            d.set_cursor_coordinates(
+                q2s(QString("X: %1 Y: %2")
+                        .arg(unit.convertToUnit(pos.getX()), 10, 'f',
+                             unit.getReasonableNumberOfDecimals())
+                        .arg(unit.convertToUnit(pos.getY()), 10, 'f',
+                             unit.getReasonableNumberOfDecimals())));
+          });
+  connect(mSections.get(), &WindowSectionsModel::statusBarMessageChanged, this,
+          [this, &d](const QString& message, int timeoutMs) {
+            d.set_status_bar_message(q2s(message));
+            if (timeoutMs > 0) {
+              QTimer::singleShot(timeoutMs, this, [&d, message]() {
+                if (s2q(d.get_status_bar_message()) == message) {
+                  d.set_status_bar_message(slint::SharedString());
+                }
+              });
+            }
+          });
+  connect(mProjectPreviewRenderer.get(), &ProjectReadmeRenderer::runningChanged,
+          this, [this](bool running) {
+            mWindow->global<ui::Data>().set_project_preview_rendering(running);
+          });
   connect(mProjectPreviewRenderer.get(), &ProjectReadmeRenderer::finished, this,
           [this](const QPixmap& result) {
             mWindow->global<ui::Data>().set_project_preview_image(q2s(result));
@@ -112,7 +153,63 @@ MainWindow::MainWindow(GuiApplication& app,
 
   // Register global callbacks.
   const ui::Backend& b = mWindow->global<ui::Backend>();
-  b.on_trigger(std::bind(&MainWindow::trigger, this, std::placeholders::_1));
+  b.on_trigger(std::bind(&MainWindow::trigger, this, std::placeholders::_1,
+                         std::placeholders::_2));
+  b.on_key_pressed(
+      std::bind(&MainWindow::keyPressed, this, std::placeholders::_1));
+  b.on_schematic_clicked([this](int projectIndex, int index) {
+    if (auto prj = mApp.getProjects().getProject(projectIndex)) {
+      mSections->openSchematic(prj, index);
+    }
+  });
+  b.on_board_clicked([this](int projectIndex, int index) {
+    if (auto prj = mApp.getProjects().getProject(projectIndex)) {
+      mSections->openBoard(prj, index);
+    }
+  });
+  b.on_tab_clicked(std::bind(&WindowSectionsModel::setCurrentTab,
+                             mSections.get(), std::placeholders::_1,
+                             std::placeholders::_2));
+  b.on_tab_close_clicked(std::bind(&WindowSectionsModel::closeTab,
+                                   mSections.get(), std::placeholders::_1,
+                                   std::placeholders::_2));
+  b.on_render_scene(std::bind(
+      &WindowSectionsModel::renderScene, mSections.get(), std::placeholders::_1,
+      std::placeholders::_2, std::placeholders::_3, std::placeholders::_4));
+  b.on_scene_pointer_event([this](int sectionIndex, float x, float y,
+                                  const slint::Point<float>& scenePos,
+                                  slint::private_api::PointerEvent e) {
+    // const auto winPos = mWindow->window().position(); NOT WORKING
+    QPointF globalPos(scenePos.x + x, scenePos.y + y);
+    if (QWidget* win = qApp->activeWindow()) {
+      globalPos = win->mapToGlobal(globalPos);
+    }
+    return mSections->processScenePointerEvent(sectionIndex, QPointF(x, y),
+                                               globalPos, e);
+  });
+  b.on_scene_scrolled(std::bind(&WindowSectionsModel::processSceneScrolled,
+                                mSections.get(), std::placeholders::_1,
+                                std::placeholders::_2, std::placeholders::_3,
+                                std::placeholders::_4));
+  b.on_scene_key_pressed(std::bind(&WindowSectionsModel::processSceneKeyPressed,
+                                   mSections.get(), std::placeholders::_1,
+                                   std::placeholders::_2));
+  b.on_scene_key_released(
+      std::bind(&WindowSectionsModel::processSceneKeyReleased, mSections.get(),
+                std::placeholders::_1, std::placeholders::_2));
+  b.on_scene_zoom_fit_clicked(std::bind(
+      &WindowSectionsModel::zoomFit, mSections.get(), std::placeholders::_1,
+      std::placeholders::_2, std::placeholders::_3));
+  b.on_scene_zoom_in_clicked(std::bind(
+      &WindowSectionsModel::zoomIn, mSections.get(), std::placeholders::_1,
+      std::placeholders::_2, std::placeholders::_3));
+  b.on_scene_zoom_out_clicked(std::bind(
+      &WindowSectionsModel::zoomOut, mSections.get(), std::placeholders::_1,
+      std::placeholders::_2, std::placeholders::_3));
+  b.on_open_url([this](const slint::SharedString& url) {
+    DesktopServices ds(mApp.getWorkspace().getSettings());
+    ds.openUrl(QUrl(s2q(url)));
+  });
   b.on_request_project_preview(
       [this](const slint::SharedString& fp, float width) {
         mProjectPreviewRenderer->request(FilePath(s2q(fp)),
@@ -132,13 +229,14 @@ MainWindow::MainWindow(GuiApplication& app,
   EditorCommandSet& cmd = EditorCommandSet::instance();
   auto bind = [this](const EditorCommand& c, ui::Action a) {
     mWidget->addAction(
-        c.createAction(mWidget, this, [this, a]() { trigger(a); }));
+        c.createAction(mWidget, this, [this, a]() { trigger(a, -1); }));
   };
   bind(cmd.fileManager, ui::Action::WorkspaceOpenFolder);
   bind(cmd.workspaceSwitch, ui::Action::WorkspaceSwitch);
   bind(cmd.workspaceSettings, ui::Action::WorkspaceSettings);
   bind(cmd.workspaceLibrariesRescan, ui::Action::WorkspaceLibrariesRescan);
-  bind(cmd.libraryManager, ui::Action::LibraryManager);
+  mWidget->addAction(cmd.libraryManager.createAction(
+      mWidget, this, [this]() { showPanelPage(ui::PanelPage::Libraries); }));
   bind(cmd.projectNew, ui::Action::ProjectNew);
   bind(cmd.projectOpen, ui::Action::ProjectOpen);
   bind(cmd.addExampleProjects, ui::Action::ProjectImportExamples);
@@ -192,6 +290,16 @@ void MainWindow::popUpNotifications() noexcept {
   }
 }
 
+void MainWindow::closeProject(int index,
+                              std::shared_ptr<ProjectEditor2> prj) noexcept {
+  const ui::Data& d = mWindow->global<ui::Data>();
+  if (d.get_current_project_index() >= index) {
+    d.set_current_project_index(
+        std::min(index, static_cast<int>(mApp.getProjects().row_count()) - 2));
+  }
+  mSections->closeProjectTabs(prj);
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
@@ -209,16 +317,16 @@ slint::CloseRequestResponse MainWindow::closeRequested() noexcept {
   return slint::CloseRequestResponse::HideWindow;
 }
 
-bool MainWindow::trigger(ui::Action a) noexcept {
+bool MainWindow::trigger(ui::Action a, int sectionIndex) noexcept {
+  if (mSections->trigger(a, sectionIndex)) {
+    return true;
+  }
+
   StandardEditorCommandHandler stdHandler(mApp.getWorkspace().getSettings(),
                                           mWidget);
 
   switch (a) {
     // General
-    case ui::Action::LibraryManager: {
-      mApp.openLibraryManager();
-      return true;
-    }
     case ui::Action::KeyboardShortcutsReference: {
       stdHandler.shortcutsReference();
       return true;
@@ -245,6 +353,11 @@ bool MainWindow::trigger(ui::Action a) noexcept {
     }
     case ui::Action::SourceCode: {
       stdHandler.onlineSourceCode();
+      return true;
+    }
+    case ui::Action::CopyApplicationDetailsIntoClipboard: {
+      QApplication::clipboard()->setText(
+          s2q(mWindow->global<ui::Data>().get_about_librepcb_details()));
       return true;
     }
     case ui::Action::Quit: {
@@ -286,15 +399,25 @@ bool MainWindow::trigger(ui::Action a) noexcept {
 
     // Project
     case ui::Action::ProjectImportEagle: {
-      mApp.createProject(FilePath(), true, mWidget);
+      newProject(true);
       return true;
     }
     case ui::Action::ProjectNew: {
-      mApp.createProject(FilePath(), false, mWidget);
+      newProject();
       return true;
     }
     case ui::Action::ProjectOpen: {
-      mApp.openProject(FilePath(), mWidget);
+      setCurrentProject(mApp.getProjects().openProject());
+      return true;
+    }
+
+    // Library panel
+    case ui::Action::LibraryPanelEnsurePopulated: {
+      mApp.getLibraries().ensurePopulated();
+      return true;
+    }
+    case ui::Action::LibraryPanelInstall: {
+      mApp.getLibraries().installCheckedLibraries();
       return true;
     }
 
@@ -302,8 +425,79 @@ bool MainWindow::trigger(ui::Action a) noexcept {
       break;
   }
 
+  if (a == ui::Action::ProjectOpenOutputJobs) {
+    if (std::shared_ptr<ProjectEditor2> editor =
+            mApp.getProjects().getProject(sectionIndex)) {
+      OutputJobsDialog dlg(mApp.getWorkspace().getSettings(),
+                           editor->getProject(), editor->getUndoStack(),
+                           mSettingsPrefix % "/output_jobs_dialog", mWidget);
+      dlg.exec();
+      return true;
+    }
+  } else if (a == ui::Action::CopyApplicationDetailsIntoClipboard) {
+    QApplication::clipboard()->setText(
+        s2q(mWindow->global<ui::Data>().get_about_librepcb_details()));
+    return true;
+  }
+
   qWarning() << "Unhandled UI action:" << static_cast<int>(a);
   return false;
+}
+
+slint::private_api::EventResult MainWindow::keyPressed(
+    const slint::private_api::KeyEvent& e) noexcept {
+  if ((std::string_view(e.text) == "f") && (e.modifiers.control)) {
+    mWindow->invoke_focus_search();
+    return slint::private_api::EventResult::Accept;
+  }
+
+  qDebug() << "Unhandled UI key event:" << e.text.data();
+  return slint::private_api::EventResult::Reject;
+}
+
+void MainWindow::openFile(const FilePath& fp) noexcept {
+  if ((fp.getSuffix() == "lpp") || (fp.getSuffix() == "lppz")) {
+    setCurrentProject(mApp.getProjects().openProject(fp));
+    showPanelPage(ui::PanelPage::Project);
+  } else if (fp.isValid()) {
+    DesktopServices ds(mApp.getWorkspace().getSettings());
+    ds.openLocalPath(fp);
+  }
+}
+
+void MainWindow::setCurrentProject(
+    std::shared_ptr<ProjectEditor2> prj) noexcept {
+  if (prj) {
+    mWindow->global<ui::Data>().set_current_project_index(
+        mApp.getProjects().getIndexOf(prj));
+  }
+}
+
+std::shared_ptr<ProjectEditor2> MainWindow::getCurrentProjectEditor() noexcept {
+  return mApp.getProjects().getProject(
+      mWindow->global<ui::Data>().get_current_project_index());
+}
+
+void MainWindow::newProject(bool eagleImport,
+                            const FilePath& parentDir) noexcept {
+  const NewProjectWizard::Mode mode = eagleImport
+      ? NewProjectWizard::Mode::EagleImport
+      : NewProjectWizard::Mode::NewProject;
+  NewProjectWizard wizard(mApp.getWorkspace(), mode, qApp->activeWindow());
+  if (parentDir.isValid()) {
+    wizard.setLocationOverride(parentDir);
+  }
+  if (wizard.exec() == QWizard::Accepted) {
+    try {
+      std::unique_ptr<Project> project = wizard.createProject();  // can throw
+      const FilePath fp = project->getFilepath();
+      project.reset();  // Release lock.
+      setCurrentProject(mApp.getProjects().openProject(fp));
+    } catch (const Exception& e) {
+      QMessageBox::critical(qApp->activeWindow(),
+                            tr("Could not create project"), e.getMsg());
+    }
+  }
 }
 
 /*******************************************************************************

@@ -42,10 +42,10 @@ namespace editor {
 
 class BoardEditorFsmAdapter;
 class BoardEditorState;
-class GraphicsSceneKeyEvent;
-class GraphicsSceneMouseEvent;
 class IF_GraphicsLayerProvider;
 class UndoStack;
+struct GraphicsSceneKeyEvent;
+struct GraphicsSceneMouseEvent;
 
 /*******************************************************************************
  *  Class BoardEditorFsm

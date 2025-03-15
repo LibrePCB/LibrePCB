@@ -1,0 +1,54 @@
+import { ToolTip } from "./tooltip.slint";
+import { Data } from "../api/data.slint";
+
+export component ToolButton inherits Rectangle {
+    in property <string> tooltip;
+    in property <string> status-tip;
+    in property <bool> checked: false;
+    in property <image> image;
+    out property <bool> pressed <=> ta.pressed;
+
+    callback clicked <=> ta.clicked;
+
+    width: 30px;
+    height: 30px;
+    background: (checked || ta.pressed) ? blue : (ta.has-hover ? #606060 : #303030);
+    border-radius: 3px;
+
+    // Accessibility
+    accessible-role: button;
+    accessible-checkable: true;
+    accessible-checked: checked;
+    accessible-description: status-tip;
+    accessible-label: tooltip;
+    accessible-action-default => {
+        ta.clicked();
+    }
+
+    Image {
+        width: parent.width * 0.7;
+        height: self.width;
+        image-fit: contain;
+        colorize: white;
+        source: image;
+        accessible-role: none;
+    }
+
+    ta := TouchArea {
+        changed has-hover => {
+            if !root.status-tip.is-empty {
+                if self.has-hover {
+                    Data.status-tip = root.status-tip;
+                } else {
+                    Data.status-tip = "";
+                }
+            }
+        }
+    }
+
+    if ta.has-hover && (!ta.pressed): ToolTip {
+        x: parent.width + 5px;
+        y: (parent.height - self.height) / 2;
+        text: tooltip;
+    }
+}

@@ -1,4 +1,4 @@
-import { Action } from "./types.slint";
+import { Action, Int64, EditParseResult, LengthUnit } from "./types.slint";
 import { Data } from "./data.slint";
 
 // Note: The callback implementations are just for the live preview, they will
@@ -8,14 +8,134 @@ export global Backend {
     //
     // Parameters:
     //  1. Action to trigger
+    //  2. Section index (pass -1 for things outside a window section)
     //
     // Return value:
     //  Whether the action was handled or not
-    pure callback trigger(Action) -> bool;
-    trigger(action) => {
-        debug("Trigger action:", action);
-        true
+    pure callback trigger(Action, int) -> bool;
+    trigger(action, section) => {
+        return true;
     }
+
+    // A key has been pressed
+    pure callback key-pressed(KeyEvent) -> EventResult;
+
+    pure callback parse-length-input(string, LengthUnit) -> EditParseResult;
+
+    pure callback format-length(Int64, LengthUnit) -> string;
+    format-length => {
+        return "123.456789";
+    }
+
+    // Generic callback to open an URL
+    //
+    // - URL
+    pure callback open-url(string);
+
+    // A schematic in the projects panel has been clicked
+    //
+    // - Project index
+    // - Schematic index
+    pure callback schematic-clicked(int, int);
+
+    // A board in the projects panel has been clicked
+    //
+    // - Project index
+    // - Board index
+    pure callback board-clicked(int, int);
+
+    // Requested to switch to a particular tab
+    //
+    // - Section index
+    // - Tab index
+    pure callback tab-clicked(int, int);
+
+    // Requested to close a particular tab
+    //
+    // - Section index
+    // - Tab index
+    pure callback tab-close-clicked(int, int);
+
+    // Open a library
+    //
+    // - Library ID (see Library::id)
+    pure callback open-library(string);
+
+    // Uninstall a library
+    //
+    // - Library ID (see Library::id)
+    pure callback uninstall-library(string);
+
+    // Toggle checked state of all libraries
+    //
+    // - Check state
+    pure callback toggle-libraries-checked(bool);
+
+    // Clear libraries list filter term
+    pure callback libraries-clear-filter();
+
+    // Key event on the libraries list
+    //
+    // - Key event
+    pure callback libraries-key-event(KeyEvent) -> EventResult;
+
+    // Render a graphics scene image
+    //
+    // - Section index
+    // - Scene width
+    // - Scene height
+    // - Frame number (to be ignored)
+    pure callback render-scene(int, length, length, int) -> image;
+
+    // Scene pointer event
+    //
+    // - Section index
+    // - Cursor position X (relative to scene)
+    // - Cursor position Y (relative to scene)
+    // - Scene location within window
+    // - Pointer event
+    pure callback scene-pointer-event(int, length, length, Point, PointerEvent) -> EventResult;
+
+    // Scene scrolled event
+    //
+    // - Section index
+    // - Cursor position X (relative to scene)
+    // - Cursor position Y (relative to scene)
+    // - Scroll event
+    pure callback scene-scrolled(int, length, length, PointerScrollEvent) -> EventResult;
+
+    // Scene key pressed event
+    //
+    // - Section index
+    // - Key event
+    pure callback scene-key-pressed(int, KeyEvent) -> EventResult;
+
+    // Scene key released event
+    //
+    // - Section index
+    // - Key event
+    pure callback scene-key-released(int, KeyEvent) -> EventResult;
+
+    // Scene button "zoom to fit content" clicked
+    //
+    // - Section index
+    // - Scene width
+    // - Scene height
+    pure callback scene-zoom-fit-clicked(int, length, length);
+
+    // Scene button "zoom in" clicked
+    //
+    // - Section index
+    // - Scene width
+    // - Scene height
+    pure callback scene-zoom-in-clicked(int, length, length);
+
+    // Scene button "zoom out" clicked
+    //
+    // - Section index
+    // - Scene width
+    // - Scene height
+    pure callback scene-zoom-out-clicked(int, length, length);
 
     // Request generating the preview of a project (e.g. its README.md)
     //

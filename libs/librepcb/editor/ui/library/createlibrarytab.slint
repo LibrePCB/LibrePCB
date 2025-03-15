@@ -1,0 +1,281 @@
+import { Button, LineEdit, CheckBox, Palette } from "std-widgets.slint";
+import { LineEdit } from "../common/lineedit.slint";
+import { Data } from "../api/data.slint";
+import { Backend } from "../api/backend.slint";
+import { ToolTip } from "../common/tooltip.slint";
+import { WindowSectionData, CreateLibraryTabData, Action } from "../api/types.slint";
+
+export component CreateLibraryTab inherits Rectangle {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    property <[CreateLibraryTabData]> tabs: section.create-library-tabs;
+
+    GridLayout {
+        padding: 10px;
+        spacing: 5px;
+
+        Row {
+            Text {
+                colspan: 2;
+                height: self.preferred-height + 10px;
+                font-size: 14px;
+                font-weight: 900;
+                wrap: TextWrap.word-wrap;
+                text: @tr("Create a new local library");
+            }
+        }
+
+        Row {
+            Text {
+                colspan: 2;
+                wrap: TextWrap.word-wrap;
+                text: @tr("To import KiCad or Eagle libraries, create a new library called e.g. 'KiCad Import' or 'Eagle Import'. Then open the new library and start the import wizard via 'File -> Import'.");
+            }
+        }
+
+        Row {
+            Rectangle {
+                colspan: 2;
+                height: 1px;
+                background: gray;
+            }
+        }
+
+        Row {
+            Text {
+                text: @tr("Name:");
+                vertical-alignment: center;
+            }
+
+            le-name := LineEdit {
+                text: tabs[section.current-tab-index].name;
+                validation-error: tabs[section.current-tab-index].name-error;
+
+                changed text => {
+                    tabs[section.current-tab-index].name = self.text;
+                }
+            }
+        }
+
+        Row {
+            Rectangle { }
+
+            Flickable {
+                viewport-width: hl-examples.preferred-width;
+                height: hl-examples.preferred-height;
+
+                hl-examples := HorizontalLayout {
+                    alignment: start;
+                    spacing: 4px;
+
+                    t-examples := Text {
+                        font-size: 11px;
+                        text: @tr("Examples:");
+                    }
+
+                    for text[i] in ["My Library", "•", "KiCad Import", "•", "Eagle Import"]: Text {
+                        color: (text != "•") ? white : t-examples.color;
+                        overflow: elide;
+                        font-size: 11px;
+                        text: text;
+
+                        if text != "•": TouchArea {
+                            mouse-cursor: pointer;
+
+                            clicked => {
+                                le-name.text = text;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Row {
+            Text {
+                text: @tr("Description:");
+                vertical-alignment: center;
+            }
+
+            le-description := LineEdit {
+                text: tabs[section.current-tab-index].description;
+
+                changed text => {
+                    tabs[section.current-tab-index].description = self.text;
+                }
+            }
+        }
+
+        Row {
+            Text {
+                text: @tr("Author:");
+                vertical-alignment: center;
+            }
+
+            le-author := LineEdit {
+                text: tabs[section.current-tab-index].author;
+                placeholder-text: tabs[section.current-tab-index].author-default;
+
+                changed text => {
+                    tabs[section.current-tab-index].author = self.text;
+                }
+            }
+        }
+
+        Row {
+            Text {
+                text: @tr("Version:");
+                vertical-alignment: center;
+            }
+
+            le-version := LineEdit {
+                text: tabs[section.current-tab-index].version;
+                placeholder-text: tabs[section.current-tab-index].version-default;
+                validation-error: tabs[section.current-tab-index].version-error;
+
+                changed text => {
+                    tabs[section.current-tab-index].version = self.text;
+                }
+            }
+        }
+
+        Row {
+            Text {
+                text: @tr("URL:");
+                vertical-alignment: center;
+            }
+
+            le-url := LineEdit {
+                text: tabs[section.current-tab-index].url;
+                placeholder-text: @tr("e.g. URL to the Git repository (optional)");
+                validation-error: tabs[section.current-tab-index].url-error;
+
+                changed text => {
+                    tabs[section.current-tab-index].url = self.text;
+                }
+            }
+        }
+
+        Row {
+            Text {
+                text: @tr("License:");
+                vertical-alignment: center;
+            }
+
+            HorizontalLayout {
+                z: 100;  // For the tooltip.
+                spacing: 8px;
+
+                cbx-cc0 := CheckBox {
+                    horizontal-stretch: 1;
+                    checked: tabs[section.current-tab-index].cc0;
+
+                    changed checked => {
+                        tabs[section.current-tab-index].cc0 = self.checked;
+                    }
+                }
+
+                Text {
+                    wrap: word-wrap;
+                    text: @tr("Put library under the Public Domain License CC0-1.0\n(mandatory to publish it on librepcb.org)");
+
+                    TouchArea {
+                        clicked => {
+                            cbx-cc0.checked = !cbx-cc0.checked;
+                        }
+                    }
+                }
+
+                Image {
+                    property <string> url: "https://en.wikipedia.org/wiki/Creative_Commons_license";
+
+                    y: (parent.height - self.height) / 2;
+                    width: 16px;
+                    height: self.width;
+                    image-fit: contain;
+                    source: @image-url("../../../../bootstrap-icons/icons/info-circle.svg");
+                    colorize: ta-license-info.has-hover ? white : #c0c0c0;
+
+                    ta-license-info := TouchArea {
+                        mouse-cursor: pointer;
+
+                        clicked => {
+                            Backend.open-url(url);
+                        }
+                    }
+
+                    if ta-license-info.has-hover: ToolTip {
+                        x: -5px - self.width;
+                        y: (parent.height - self.height) / 2;
+                        delayed: false;
+                        text: url;
+                    }
+                }
+            }
+        }
+
+        Row {
+            Text {
+                text: @tr("Directory:");
+                vertical-alignment: center;
+            }
+
+            le-directory := LineEdit {
+                text: tabs[section.current-tab-index].directory;
+                placeholder-text: tabs[section.current-tab-index].directory-default;
+                validation-error: tabs[section.current-tab-index].directory-error;
+
+                changed text => {
+                    tabs[section.current-tab-index].directory = self.text;
+                }
+            }
+        }
+
+        Row {
+            Rectangle { }
+
+            HorizontalLayout {
+                horizontal-stretch: 1;
+                padding-top: 5px;
+                alignment: start;
+
+                Button {
+                    primary: true;
+                    enabled: tabs[section.current-tab-index].valid;
+                    text: @tr("Create Library");
+
+                    clicked => {
+                        Backend.trigger(Action.section-ok, section-index);
+                    }
+                }
+
+                Button {
+                    text: @tr("Cancel");
+
+                    clicked => {
+                        Backend.tab-close-clicked(section-index, section.current-tab-index);
+                    }
+                }
+            }
+        }
+
+        Row {
+            Rectangle { }
+
+            TextInput {
+                horizontal-stretch: 1;
+                height: (!self.text.is-empty) ? self.preferred-height : 0;
+                color: red;
+                read-only: true;
+                wrap: word-wrap;
+                text: tabs[section.current-tab-index].creation-error;
+            }
+        }
+
+        Row {
+            Rectangle {
+                vertical-stretch: 1;
+            }
+        }
+    }
+}

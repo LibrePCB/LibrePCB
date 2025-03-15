@@ -1,0 +1,64 @@
+import { ComboBox, CheckBox } from "std-widgets.slint";
+import { WindowSectionData, Board2dTabData } from "../../api/types.slint";
+import { Data } from "../../api/data.slint";
+
+export component DrawZoneToolBar inherits HorizontalLayout {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    property <[Board2dTabData]> tabs: section.board-2d-tabs;
+
+    spacing: 5px;
+    height: 25px;
+
+    Text {
+        vertical-alignment: center;
+        text: @tr("Layer:");
+    }
+
+    ComboBox {
+        model: tabs[section.current-tab-index].tool-layer.items;
+        current-index: tabs[section.current-tab-index].tool-layer.current-index;
+
+        changed current-index => {
+            if (tabs[section.current-tab-index].tool-layer.current-index != self.current-index) {
+                tabs[section.current-tab-index].tool-layer.current-index = self.current-index;
+            }
+        }
+    }
+
+    CheckBox {
+        text: @tr("No Copper");
+        checked: tabs[section.current-tab-index].tool-no-copper;
+
+        toggled => {
+            tabs[section.current-tab-index].tool-no-copper = self.checked;
+        }
+    }
+
+    CheckBox {
+        text: @tr("No Planes");
+        checked: tabs[section.current-tab-index].tool-no-planes;
+
+        toggled => {
+            tabs[section.current-tab-index].tool-no-planes = self.checked;
+        }
+    }
+
+    CheckBox {
+        text: @tr("No Exposures");
+        checked: tabs[section.current-tab-index].tool-no-exposures;
+
+        toggled => {
+            tabs[section.current-tab-index].tool-no-exposures = self.checked;
+        }
+    }
+
+    CheckBox {
+        text: @tr("No Devices");
+        checked: tabs[section.current-tab-index].tool-no-devices;
+
+        toggled => {
+            tabs[section.current-tab-index].tool-no-devices = self.checked;
+        }
+    }
+}

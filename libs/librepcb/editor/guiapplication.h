@@ -40,13 +40,13 @@ class Workspace;
 
 namespace editor {
 
+class LibrariesModel;
 class LibraryEditor;
-class LibraryManager;
 class MainWindow;
 class Notification;
 class NotificationsModel;
-class ProjectEditor;
 class ProjectLibraryUpdater;
+class ProjectsModel;
 class QuickAccessModel;
 
 /*******************************************************************************
@@ -70,28 +70,18 @@ public:
   // Getters
   Workspace& getWorkspace() noexcept { return mWorkspace; }
   NotificationsModel& getNotifications() noexcept { return *mNotifications; }
+  ProjectsModel& getProjects() noexcept { return *mProjects; }
   QuickAccessModel& getQuickAccess() noexcept { return *mQuickAccessModel; }
+  LibrariesModel& getLibraries() noexcept { return *mLibraries; }
 
   // General Methods
   void openFile(const FilePath& fp, QWidget* parent) noexcept;
   void switchWorkspace(QWidget* parent) noexcept;
   void execWorkspaceSettingsDialog(QWidget* parent) noexcept;
-  void openLibraryManager() noexcept;
   void addExampleProjects(QWidget* parent) noexcept;
   void createProject(const FilePath& parentDir, bool eagleImport,
                      QWidget* parent) noexcept;
-  /**
-   * @brief Open a project with the editor (or bring an already opened editor to
-   * front)
-   *
-   * @param filepath  The filepath to the *.lpp project file to open. If
-   *                  invalid, a file dialog will be shown to select it.
-   * @param parent    Parent widget for dialogs.
-   *
-   * @return The pointer to the opened project editor (nullptr on error)
-   */
-  ProjectEditor* openProject(FilePath filepath, QWidget* parent) noexcept;
-  void createNewWindow(int id = -1) noexcept;
+  void createNewWindow(int id = -1, int projectIndex = -1) noexcept;
   bool requestClosingWindow(QWidget* parent) noexcept;
   void exec();
   void quit(QPointer<QWidget> parent) noexcept;
@@ -105,43 +95,6 @@ protected:
 private:
   void openProjectsPassedByCommandLine() noexcept;
   void openProjectPassedByOs(const QString& file, bool silent = false) noexcept;
-
-  /**
-   * @brief Get the pointer to an already open project editor by its project
-   * filepath
-   *
-   * This method can also be used to check whether a project (by its filepath)
-   * is already open or not.
-   *
-   * @param filepath  The filepath to a *.lpp project file
-   *
-   * @return The pointer to the open project editor, or nullptr if the project
-   * is not open
-   */
-  ProjectEditor* getOpenProject(const FilePath& filepath) const noexcept;
-
-  /**
-   * @brief Ask the user whether to restore a backup of a project
-   *
-   * @param dir   The project directory to be restored.
-   *
-   * @retval true   Restore backup.
-   * @retval false  Do not restore backup.
-   *
-   * @throw Exception to abort opening the project.
-   */
-  static bool askForRestoringBackup(const FilePath& dir);
-
-  /**
-   * @brief Close all open project editors
-   *
-   * @param askForSave    If true, the user will be asked to save all modified
-   *                      projects
-   * @param parent        Parent for message boxes
-   *
-   * @retval  true if all projects successfully closed, false otherwise
-   */
-  bool closeAllProjects(bool askForSave, QWidget* parent) noexcept;
 
   void projectEditorClosed() noexcept;
   void openProjectLibraryUpdater(const FilePath& project) noexcept;
@@ -162,14 +115,16 @@ private:
   std::shared_ptr<MainWindow> getCurrentWindow() noexcept;
   void updateNoLibrariesInstalledNotification() noexcept;
   void updateDesktopIntegrationNotification() noexcept;
+  bool requestClosingAllProjects() noexcept;
 
   Workspace& mWorkspace;
   std::shared_ptr<NotificationsModel> mNotifications;
   std::shared_ptr<Notification> mNotificationNoLibrariesInstalled;
   std::shared_ptr<Notification> mNotificationDesktopIntegration;
   std::shared_ptr<QuickAccessModel> mQuickAccessModel;
-  QScopedPointer<LibraryManager> mLibraryManager;
-  QHash<QString, ProjectEditor*> mOpenProjectEditors;
+  std::shared_ptr<LibrariesModel> mLibraries;
+  std::shared_ptr<slint::FilterModel<ui::LibraryData>> mLibrariesFiltered;
+  std::shared_ptr<ProjectsModel> mProjects;
   QHash<FilePath, LibraryEditor*> mOpenLibraryEditors;
   std::unique_ptr<ProjectLibraryUpdater> mProjectLibraryUpdater;
   QList<std::shared_ptr<MainWindow>> mWindows;

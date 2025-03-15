@@ -1,0 +1,271 @@
+import { LineEdit, VerticalBox } from "std-widgets.slint";
+import { Int64, EditParseResult, LengthUnit } from "../api/types.slint";
+import { Backend } from "../api/backend.slint";
+import { Data } from "../api/data.slint";
+
+enum ButtonType {
+    up,
+    down,
+}
+
+export component UpDownButton inherits Rectangle {
+    in property <ButtonType> type;
+    in property <bool> enabled: true;
+
+    callback clicked <=> ta.clicked;
+
+    width: 15px;
+    background: black;
+
+    // Accessibility
+    accessible-role: button;
+    accessible-enabled: enabled;
+    accessible-label: (type == ButtonType.up) ? "up" : "down";
+    accessible-action-default => {
+        ta.clicked();
+    }
+
+    t-title := Text {
+        font-size: ta.has-hover ? 12px : 8px;
+        color: ta.has-hover ? white : (enabled ? #cccccc : #808080);
+        text: (type == ButtonType.up) ? "▲" : "▼";
+        accessible-role: none;
+    }
+
+    ta := TouchArea {
+        enabled: enabled;
+        mouse-cursor: pointer;
+    }
+}
+
+export component UnitMenuItem {
+    in property <LengthUnit> unit;
+
+    // Accessibility
+    accessible-role: button;
+    accessible-label: Data.get-unit-accessibility-label(unit);
+    accessible-action-default => {
+        ta.clicked();
+    }
+
+    callback clicked <=> ta.clicked;
+
+    t-title := Text {
+        font-size: 12px;
+        color: ta.has-hover ? white : #cccccc;
+        text: Data.get-unit-short-str(unit);
+        accessible-role: none;
+    }
+
+    ta := TouchArea {
+        mouse-cursor: pointer;
+    }
+}
+
+export component LengthEdit inherits Rectangle {
+    in-out property <Int64> value;
+    in-out property <LengthUnit> unit: LengthUnit.millimeters;
+    in property <bool> can-increase <=> btn-up.enabled;
+    in property <bool> can-decrease <=> btn-down.enabled;
+    property <EditParseResult> parse-result;
+    property <bool> disable-update: false;
+
+    // Accessibility
+    accessible-role: spinbox;
+    accessible-enabled: le-text.enabled;
+    accessible-value: le-text.text;
+    accessible-action-increment => {
+        btn-up.clicked();
+    }
+    accessible-action-decrement => {
+        btn-down.clicked();
+    }
+    accessible-action-set-value(s) => {
+        le-text.edited(s);
+    }
+
+    callback value-entered(Int64);
+    callback unit-entered(LengthUnit);
+    callback increase-triggered;
+    callback decrease-triggered;
+
+    function update-text-from-value() {
+        le-text.text = Backend.format-length(root.value, root.unit);
+        parse-result.valid = true;
+    }
+
+    changed value => {
+        if !disable-update {
+            update-text-from-value();
+        }
+    }
+
+    changed unit => {
+        update-text-from-value();
+    }
+
+    preferred-width: 145px;
+    preferred-height: 27px;
+    forward-focus: le-text;
+
+    le-text := LineEdit {
+        x: 0;
+        y: 0;
+        width: parent.width;
+        height: parent.height;
+        font-size: 13px;
+        accessible-role: none;
+
+        changed has-focus => {
+            if !self.has-focus {
+                disable-update = false;
+                update-text-from-value();
+            }
+        }
+
+        init => {
+            update-text-from-value();
+        }
+
+        edited(s) => {
+            disable-update = true;
+            parse-result = Backend.parse-length-input(s, unit);
+            if (parse-result.valid) {
+                if (parse-result.evaluated-value != value) {
+                    value-entered(parse-result.evaluated-value);
+                }
+                if (parse-result.evaluated-unit != unit) {
+                    unit-entered(parse-result.evaluated-unit);
+                }
+            }
+        }
+
+        accepted(s) => {
+            self.clear-focus();
+        }
+    }
+
+    btn-up := UpDownButton {
+        x: r-unit.x - self.width;
+        y: 1px;
+        height: (parent.height - 2px) / 2;
+        type: ButtonType.up;
+
+        clicked => {
+            disable-update = false;
+            increase-triggered();
+        }
+    }
+
+    btn-down := UpDownButton {
+        x: r-unit.x - self.width;
+        y: parent.height / 2;
+        height: (parent.height - 2px) / 2;
+        type: ButtonType.down;
+
+        clicked => {
+            disable-update = false;
+            decrease-triggered();
+        }
+    }
+
+    r-unit := Rectangle {
+        x: parent.width - self.width;
+        y: 1px;
+        width: t-unit.preferred-width + 10px;
+        height: parent.height - 2px;
+        background: black;
+        border-top-right-radius: 8px;
+        border-bottom-right-radius: 8px;
+
+        // Accessibility
+        accessible-role: text;
+        accessible-description: "unit";
+        accessible-label: Data.get-unit-accessibility-label(unit);
+        accessible-expandable: true;
+        accessible-action-expand => {
+            ta-unit.clicked();
+        }
+
+        t-unit := Text {
+            vertical-alignment: center;
+            color: ta-unit.has-hover ? white : #cccccc;
+            text: Data.get-unit-short-str(root.unit);
+            accessible-role: none;
+        }
+
+        unit-popup := PopupWindow {
+            x: 0;
+            y: parent.height + 2px;
+            width: r-unit.width;
+
+            Rectangle {
+                background: black;
+                border-radius: 8px;
+                VerticalBox {
+                    padding-left: 5px;
+                    padding-right: 5px;
+                    UnitMenuItem {
+                        unit: LengthUnit.millimeters;
+                        clicked => {
+                            unit-entered(self.unit);
+                        }
+                    }
+
+                    UnitMenuItem {
+                        unit: LengthUnit.micrometers;
+                        clicked => {
+                            unit-entered(self.unit);
+                        }
+                    }
+
+                    UnitMenuItem {
+                        unit: LengthUnit.nanometers;
+                        clicked => {
+                            unit-entered(self.unit);
+                        }
+                    }
+
+                    UnitMenuItem {
+                        unit: LengthUnit.inches;
+                        clicked => {
+                            unit-entered(self.unit);
+                        }
+                    }
+
+                    UnitMenuItem {
+                        unit: LengthUnit.mils;
+                        clicked => {
+                            unit-entered(self.unit);
+                        }
+                    }
+                }
+            }
+        }
+
+        ta-unit := TouchArea {
+            mouse-cursor: MouseCursor.pointer;
+            clicked => {
+                unit-popup.show();
+            }
+        }
+    }
+
+    Rectangle {
+        x: r-unit.x;
+        y: 6px;
+        width: 1px;
+        height: parent.height - 12px;
+        background: gray;
+    }
+
+    if !parse-result.valid: Rectangle {
+        x: -1px;
+        y: -1px;
+        width: parent.width + 2px;
+        height: parent.height + 2px;
+        border-width: 1px;
+        border-radius: 10px;
+        border-color: #ff0000;
+    }
+}

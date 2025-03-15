@@ -67,6 +67,11 @@ public:
   void zoomAll() noexcept;
   void startSpinning() noexcept;
   void stopSpinning(QString errorMsg) noexcept;
+  void setTransform(const QMatrix4x4& transform, qreal fov,
+                    const QPointF& center) noexcept;
+
+  QPointF toNormalizedPos(const QPointF& pos) const noexcept;
+  QPointF toModelPos(const QPointF& pos) const noexcept;
 
   // Operator Overloadings
   OpenGlView& operator=(const OpenGlView& rhs) = delete;
@@ -83,8 +88,6 @@ protected:
 
 private:
   void zoom(const QPointF& center, qreal factor) noexcept;
-  QPointF toNormalizedPos(const QPointF& pos) const noexcept;
-  QPointF toModelPos(const QPointF& pos) const noexcept;
 
 private:
   QScopedPointer<QVBoxLayout> mLayout;

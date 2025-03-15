@@ -24,17 +24,19 @@
 
 #include "dialogs/directorylockhandlerdialog.h"
 #include "dialogs/filedialog.h"
+#include "library/librariesmodel.h"
 #include "library/libraryeditor.h"
 #include "mainwindow.h"
 #include "notification.h"
 #include "notificationsmodel.h"
 #include "project/newprojectwizard/newprojectwizard.h"
-#include "project/projecteditor.h"
+#include "project/projecteditor2.h"
+#include "project/projectsmodel.h"
+#include "uitypes.h"
 #include "utils/editortoolbox.h"
 #include "workspace/desktopintegration.h"
 #include "workspace/desktopservices.h"
 #include "workspace/initializeworkspacewizard/initializeworkspacewizard.h"
-#include "workspace/librarymanager/librarymanager.h"
 #include "workspace/projectlibraryupdater/projectlibraryupdater.h"
 #include "workspace/quickaccessmodel.h"
 #include "workspace/workspacesettingsdialog.h"
@@ -48,7 +50,6 @@
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 
 #include <QtCore>
-#include <QtNetwork>
 #include <QtWidgets>
 
 #include <algorithm>
@@ -69,7 +70,11 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
     mWorkspace(ws),
     mNotifications(new NotificationsModel(ws)),
     mQuickAccessModel(new QuickAccessModel(ws)),
-    mLibraryManager(new LibraryManager(ws)) {
+    mLibraries(new LibrariesModel(ws)),
+    mLibrariesFiltered(new slint::FilterModel<ui::LibraryData>(
+        mLibraries,
+        [](const ui::LibraryData& lib) { return !lib.filtered_out; })),
+    mProjects(new ProjectsModel(*this)) {
   // Open windows.
   QSettings cs;
   for (const QString& idStr : cs.value("global/windows").toStringList()) {
@@ -84,10 +89,6 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
   // Setup quick access.
   connect(mQuickAccessModel.get(), &QuickAccessModel::openFileTriggered, this,
           [this](const FilePath& fp) { openFile(fp, qApp->activeWindow()); });
-
-  // Setup library manager.
-  connect(mLibraryManager.data(), &LibraryManager::openLibraryEditorTriggered,
-          this, &GuiApplication::openLibraryEditor);
 
   // Connect notification signals.
   const qint64 startupTime = QDateTime::currentMSecsSinceEpoch();
@@ -132,7 +133,11 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
           .arg(Application::getFileFormatVersion().toStr()),
       true));
   connect(mNotificationNoLibrariesInstalled.get(), &Notification::buttonClicked,
-          this, &GuiApplication::openLibraryManager);
+          this, [this]() {
+            if (auto win = getCurrentWindow()) {
+              win->showPanelPage(ui::PanelPage::Libraries);
+            }
+          });
   connect(&mWorkspace.getLibraryDb(),
           &WorkspaceLibraryDb::scanLibraryListUpdated, this,
           &GuiApplication::updateNoLibrariesInstalledNotification);
@@ -214,8 +219,6 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
 GuiApplication::~GuiApplication() noexcept {
   mProjectLibraryUpdater.reset();
   closeAllLibraryEditors(false);
-  closeAllProjects(false, nullptr);
-  mLibraryManager.reset();
 }
 
 /*******************************************************************************
@@ -223,8 +226,9 @@ GuiApplication::~GuiApplication() noexcept {
  ******************************************************************************/
 
 void GuiApplication::openFile(const FilePath& fp, QWidget* parent) noexcept {
+  Q_UNUSED(parent);
   if ((fp.getSuffix() == "lpp") || (fp.getSuffix() == "lppz")) {
-    openProject(fp, parent);
+    mProjects->openProject(fp);
   } else if (fp.isValid()) {
     DesktopServices ds(mWorkspace.getSettings());
     ds.openLocalPath(fp);
@@ -253,13 +257,6 @@ void GuiApplication::execWorkspaceSettingsDialog(QWidget* parent) noexcept {
   connect(&dlg, &WorkspaceSettingsDialog::desktopIntegrationStatusChanged, this,
           &GuiApplication::updateDesktopIntegrationNotification);
   dlg.exec();
-}
-
-void GuiApplication::openLibraryManager() noexcept {
-  mLibraryManager->show();
-  mLibraryManager->raise();
-  mLibraryManager->activateWindow();
-  mLibraryManager->updateOnlineLibraryList();
 }
 
 void GuiApplication::addExampleProjects(QWidget* parent) noexcept {
@@ -295,98 +292,14 @@ void GuiApplication::createProject(const FilePath& parentDir, bool eagleImport,
       std::unique_ptr<Project> project = wizard.createProject();  // can throw
       const FilePath fp = project->getFilepath();
       project.reset();  // Release lock.
-      openProject(fp, parent);
+      mProjects->openProject(fp);
     } catch (const Exception& e) {
       QMessageBox::critical(parent, tr("Could not create project"), e.getMsg());
     }
   }
 }
 
-ProjectEditor* GuiApplication::openProject(FilePath filepath,
-                                           QWidget* parent) noexcept {
-  if (!filepath.isValid()) {
-    QSettings settings;  // client settings
-    QString lastOpenedFile = settings
-                                 .value("controlpanel/last_open_project",
-                                        mWorkspace.getPath().toStr())
-                                 .toString();
-
-    filepath = FilePath(FileDialog::getOpenFileName(
-        parent, tr("Open Project"), lastOpenedFile,
-        tr("LibrePCB project files (%1)").arg("*.lpp *.lppz")));
-    if (!filepath.isValid()) return nullptr;
-
-    settings.setValue("controlpanel/last_open_project", filepath.toNative());
-  }
-
-  try {
-    ProjectEditor* editor = getOpenProject(filepath);
-    if (!editor) {
-      // Opening the project can take some time, use wait cursor to provide
-      // immediate UI feedback.
-      QGuiApplication::setOverrideCursor(Qt::WaitCursor);
-      auto tmpCursor = scopeGuard(&QGuiApplication::restoreOverrideCursor);
-
-      std::shared_ptr<TransactionalFileSystem> fs;
-      QString projectFileName = filepath.getFilename();
-      if (filepath.getSuffix() == "lppz") {
-        fs = TransactionalFileSystem::openRO(
-            FilePath::getRandomTempPath(),
-            &TransactionalFileSystem::RestoreMode::no);
-        fs->removeDirRecursively();  // 1) Get a clean initial state.
-        fs->loadFromZip(filepath);  // 2) Load files from ZIP.
-        foreach (const QString& fn, fs->getFiles()) {
-          if (fn.endsWith(".lpp")) {
-            projectFileName = fn;
-          }
-        }
-      } else {
-        fs = TransactionalFileSystem::openRW(
-            filepath.getParentDir(), &askForRestoringBackup,
-            DirectoryLockHandlerDialog::createDirectoryLockCallback());
-      }
-      ProjectLoader loader;
-      std::unique_ptr<Project> project =
-          loader.open(std::unique_ptr<TransactionalDirectory>(
-                          new TransactionalDirectory(fs)),
-                      projectFileName);  // can throw
-      editor = new ProjectEditor(mWorkspace, *project.release(),
-                                 loader.getUpgradeMessages());
-      connect(editor, &ProjectEditor::projectEditorClosed, this,
-              &GuiApplication::projectEditorClosed);
-      connect(editor, &ProjectEditor::showControlPanelClicked, this, [this]() {
-        if (auto win = mWindows.value(0)) {
-          win->makeCurrentWindow();
-        }
-      });
-      connect(editor, &ProjectEditor::aboutLibrePcbRequested, this, [this]() {
-        if (auto win = mWindows.value(0)) {
-          win->showPanelPage(ui::PanelPage::About);
-          win->makeCurrentWindow();
-        }
-      });
-      connect(editor, &ProjectEditor::openProjectLibraryUpdaterClicked, this,
-              &GuiApplication::openProjectLibraryUpdater);
-      mOpenProjectEditors.insert(filepath.toUnique().toStr(), editor);
-
-      // Delay updating the last opened project to avoid an issue when
-      // double-clicking: https://github.com/LibrePCB/LibrePCB/issues/293
-      QTimer::singleShot(500, this, [this, filepath]() {
-        mQuickAccessModel->pushRecentProject(filepath);
-      });
-    }
-    editor->showAllRequiredEditors();
-    return editor;
-  } catch (const UserCanceled& e) {
-    // do nothing
-    return nullptr;
-  } catch (const Exception& e) {
-    QMessageBox::critical(parent, tr("Could not open project"), e.getMsg());
-    return nullptr;
-  }
-}
-
-void GuiApplication::createNewWindow(int id) noexcept {
+void GuiApplication::createNewWindow(int id, int projectIndex) noexcept {
   // Create Slint window.
   auto win = ui::AppWindow::create();
 
@@ -395,12 +308,69 @@ void GuiApplication::createNewWindow(int id) noexcept {
   d.set_preview_mode(false);
   d.set_window_title(
       QString("LibrePCB %1").arg(Application::getVersion()).toUtf8().data());
+  d.set_about_librepcb_details(q2s(EditorToolbox::buildAppVersionDetails()));
+  d.set_order_info_url(slint::SharedString());
   d.set_workspace_path(mWorkspace.getPath().toNative().toUtf8().data());
   d.set_notifications(mNotifications);
   d.set_quick_access_items(mQuickAccessModel);
+  d.set_libraries(mLibrariesFiltered);
+  d.set_projects(mProjects);
+  d.set_current_project_index(projectIndex);
+
+  // Bind global data to signals.
+  bind(this, d, &ui::Data::set_outdated_libraries, mLibraries.get(),
+       &LibrariesModel::outdatedLibrariesChanged,
+       mLibraries->getOutdatedLibraries());
+  bind(this, d, &ui::Data::set_checked_libraries, mLibraries.get(),
+       &LibrariesModel::checkedLibrariesChanged,
+       mLibraries->getCheckedLibraries());
+  bind(this, d, &ui::Data::set_refreshing_available_libraries, mLibraries.get(),
+       &LibrariesModel::fetchingRemoteLibrariesChanged,
+       mLibraries->isFetchingRemoteLibraries());
+  bind<ui::Data, slint::SharedString, LibrariesModel, QStringList>(
+      this, d, &ui::Data::set_libraries_fetching_error, mLibraries.get(),
+      &LibrariesModel::errorsChanged, mLibraries->getErrors(),
+      [](const QStringList& errors) { return q2s(errors.join("\n\n")); });
+  bind(this, d, &ui::Data::set_libraries_filter, mLibraries.get(),
+       &LibrariesModel::filterTermChanged, mLibraries->getFilterTerm());
 
   // Register global callbacks.
   const ui::Backend& b = win->global<ui::Backend>();
+  b.on_parse_length_input([](slint::SharedString text, ui::LengthUnit unit) {
+    ui::EditParseResult res{false, ui::Int64{0, 0}, unit};
+    try {
+      QString value = s2q(text);
+      foreach (const LengthUnit& u, LengthUnit::getAllUnits()) {
+        foreach (const QString& suffix, u.getUserInputSuffixes()) {
+          if (value.endsWith(suffix)) {
+            value.chop(suffix.length());
+            res.evaluated_unit = l2s(u);
+          }
+        }
+      }
+      const LengthUnit lpUnit = s2l(res.evaluated_unit);
+      res.evaluated_value =
+          l2s(lpUnit.convertFromUnit(value.toDouble(&res.valid)));
+    } catch (const Exception& e) {
+    }
+    return res;
+  });
+  b.on_format_length([](const ui::Int64& value, ui::LengthUnit unit) {
+    const LengthUnit lpUnit = s2l(unit);
+    return q2s(Toolbox::floatToString(lpUnit.convertToUnit(s2l(value)),
+                                      lpUnit.getReasonableNumberOfDecimals(),
+                                      QLocale()));
+  });
+  b.on_open_library(std::bind(&LibrariesModel::openLibrary, mLibraries.get(),
+                              std::placeholders::_1));
+  b.on_uninstall_library(std::bind(&LibrariesModel::uninstallLibrary,
+                                   mLibraries.get(), std::placeholders::_1));
+  b.on_toggle_libraries_checked(std::bind(
+      &LibrariesModel::toggleAll, mLibraries.get(), std::placeholders::_1));
+  b.on_libraries_clear_filter(
+      std::bind(&LibrariesModel::clearFilter, mLibraries.get()));
+  b.on_libraries_key_event(std::bind(&LibrariesModel::keyEvent,
+                                     mLibraries.get(), std::placeholders::_1));
   b.on_copy_to_clipboard([](const slint::SharedString& s) {
     QApplication::clipboard()->setText(s2q(s));
     return true;
@@ -440,11 +410,13 @@ void GuiApplication::createNewWindow(int id) noexcept {
 }
 
 bool GuiApplication::requestClosingWindow(QWidget* parent) noexcept {
+  Q_UNUSED(parent);
+
   if (mWindows.count() >= 2) {
     return true;
   }
 
-  return closeAllLibraryEditors(true) && closeAllProjects(true, parent);
+  return closeAllLibraryEditors(true) && requestClosingAllProjects();
 }
 
 void GuiApplication::exec() {
@@ -457,7 +429,7 @@ void GuiApplication::quit(QPointer<QWidget> parent) noexcept {
   QMetaObject::invokeMethod(
       this,
       [this, parent]() {
-        if (closeAllLibraryEditors(true) && closeAllProjects(true, parent)) {
+        if (closeAllLibraryEditors(true) && requestClosingAllProjects()) {
           mWindows.clear();
           slint::quit_event_loop();
         }
@@ -498,79 +470,21 @@ void GuiApplication::openProjectPassedByOs(const QString& file,
   FilePath filepath(file);
   if ((filepath.isExistingFile()) &&
       ((filepath.getSuffix() == "lpp") || (filepath.getSuffix() == "lppz"))) {
-    openProject(filepath, nullptr);
+    // openProject(filepath);
   } else if (!silent) {
     qWarning() << "Ignore invalid request to open project:" << file;
   }
 }
 
-ProjectEditor* GuiApplication::getOpenProject(
-    const FilePath& filepath) const noexcept {
-  if (mOpenProjectEditors.contains(filepath.toUnique().toStr()))
-    return mOpenProjectEditors.value(filepath.toUnique().toStr());
-  else
-    return nullptr;
-}
-
-bool GuiApplication::askForRestoringBackup(const FilePath& dir) {
-  Q_UNUSED(dir);
-  QMessageBox::StandardButton btn = QMessageBox::question(
-      qApp->activeWindow(), tr("Restore autosave backup?"),
-      tr("It seems that the application crashed the last time you opened this "
-         "project. Do you want to restore the last autosave backup?"),
-      QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-      QMessageBox::Cancel);
-  switch (btn) {
-    case QMessageBox::Yes:
-      return true;
-    case QMessageBox::No:
-      return false;
-    default:
-      throw UserCanceled(__FILE__, __LINE__);
-  }
-}
-
-bool GuiApplication::closeAllProjects(bool askForSave,
-                                      QWidget* parent) noexcept {
-  bool success = true;
-  foreach (ProjectEditor* editor, mOpenProjectEditors) {
-    if (editor->closeAndDestroy(askForSave, parent)) {
-      delete editor;
-    } else {
-      success = false;
-    }
-  }
-  return success;
-}
-
-void GuiApplication::projectEditorClosed() noexcept {
-  ProjectEditor* editor = dynamic_cast<ProjectEditor*>(QObject::sender());
-  Q_ASSERT(editor);
-  if (!editor) return;
-
-  const QString fp = mOpenProjectEditors.key(editor);
-  Q_ASSERT(mOpenProjectEditors.contains(fp));
-  mOpenProjectEditors.remove(fp);
-
-  Project* project = &editor->getProject();
-  delete project;
-}
-
 void GuiApplication::openProjectLibraryUpdater(
     const FilePath& project) noexcept {
-  QPointer<ProjectEditor> editor = getOpenProject(project);
-  const bool wasOpen = !editor.isNull();
+  std::shared_ptr<ProjectEditor2> editor = mProjects->getProject(project);
+  const bool wasOpen = !editor;
   mProjectLibraryUpdater.reset(
-      new ProjectLibraryUpdater(mWorkspace, project, [editor](const FilePath&) {
-        if (editor) {
-          return editor->closeAndDestroy(true);
-        } else {
-          return true;
-        }
-      }));
+      new ProjectLibraryUpdater(mWorkspace, project, nullptr));
   if (wasOpen) {
     connect(mProjectLibraryUpdater.get(), &ProjectLibraryUpdater::finished,
-            this, [this](const FilePath& fp) { openProject(fp, nullptr); });
+            mProjects.get(), &ProjectsModel::openProject);
   }
   mProjectLibraryUpdater->show();
 }
@@ -664,6 +578,18 @@ void GuiApplication::updateDesktopIntegrationNotification() noexcept {
   } else {
     mNotificationDesktopIntegration->dismiss();
   }
+}
+
+bool GuiApplication::requestClosingAllProjects() noexcept {
+  for (std::size_t i = 0; i < mProjects->row_count(); ++i) {
+    if (auto prj = mProjects->getProject(i)) {
+      if (!prj->requestClose()) {
+        return false;
+      }
+    }
+  }
+
+  return true;
 }
 
 /*******************************************************************************

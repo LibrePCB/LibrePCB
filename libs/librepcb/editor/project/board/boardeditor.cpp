@@ -943,6 +943,10 @@ void BoardEditor::fsmToolEnter(BoardEditorState_Measure& state) noexcept {
   mToolsActionGroup->setCurrentAction(BoardEditorFsm::State::MEASURE);
 }
 
+void BoardEditor::fsmSetFeatures(Features features) noexcept {
+  Q_UNUSED(features);
+}
+
 /*******************************************************************************
  *  Inherited Methods
  ******************************************************************************/

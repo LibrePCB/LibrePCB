@@ -692,6 +692,10 @@ void SchematicEditor::fsmToolEnter(
   mToolsActionGroup->setCurrentAction(SchematicEditorFsm::State::MEASURE);
 }
 
+void SchematicEditor::fsmSetFeatures(Features features) noexcept {
+  Q_UNUSED(features);
+}
+
 /*******************************************************************************
  *  Inherited Methods
  ******************************************************************************/

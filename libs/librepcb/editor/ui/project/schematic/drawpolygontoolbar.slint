@@ -1,0 +1,68 @@
+import { ComboBox, Switch } from "std-widgets.slint";
+import { LengthEdit } from "../../common/lengthedit.slint";
+import { WireMode, WindowSectionData, SchematicTabData } from "../../api/types.slint";
+import { Data } from "../../api/data.slint";
+
+export component DrawPolygonToolBar inherits HorizontalLayout {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    property <[SchematicTabData]> tabs: section.schematic-tabs;
+
+    spacing: 5px;
+
+    Text {
+        vertical-alignment: center;
+        text: @tr("Layer:");
+    }
+
+    ComboBox {
+        model: tabs[section.current-tab-index].tool-layer.items;
+        current-index: tabs[section.current-tab-index].tool-layer.current-index;
+
+        changed current-index => {
+            if (tabs[section.current-tab-index].tool-layer.current-index != self.current-index) {
+                tabs[section.current-tab-index].tool-layer.current-index = self.current-index;
+            }
+        }
+    }
+
+    Text {
+        vertical-alignment: center;
+        text: @tr("Width:");
+    }
+
+    LengthEdit {
+        value: tabs[section.current-tab-index].tool-line-width.value;
+        unit: tabs[section.current-tab-index].tool-line-width.unit;
+        can-decrease: tabs[section.current-tab-index].tool-line-width.can-decrease;
+
+        value-entered(v) => {
+            tabs[section.current-tab-index].tool-line-width.value = v;
+        }
+
+        unit-entered(u) => {
+            tabs[section.current-tab-index].tool-line-width.unit = u;
+        }
+
+        increase-triggered => {
+            tabs[section.current-tab-index].tool-line-width.increase = true;
+        }
+
+        decrease-triggered => {
+            tabs[section.current-tab-index].tool-line-width.decrease = true;
+        }
+    }
+
+    Text {
+        vertical-alignment: center;
+        text: @tr("Fill:");
+    }
+
+    Switch {
+        checked: tabs[section.current-tab-index].tool-filled;
+
+        toggled => {
+            tabs[section.current-tab-index].tool-filled = self.checked;
+        }
+    }
+}

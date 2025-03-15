@@ -59,6 +59,22 @@ class SchematicGraphicsScene;
  */
 class SchematicEditorFsmAdapter {
 public:
+  enum class Feature : quint32 {
+    Cut = (1 << 0),
+    Copy = (1 << 1),
+    Paste = (1 << 2),
+    Remove = (1 << 3),
+    ResetTexts = (1 << 4),  // TODO
+    Rotate = (1 << 5),
+    Mirror = (1 << 6),
+    Flip = (1 << 7),
+    MoveAlign = (1 << 8),
+    SnapToGrid = (1 << 9),
+    Properties = (1 << 10),
+    LockPlacement = (1 << 11),
+  };
+  Q_DECLARE_FLAGS(Features, Feature)
+
   virtual Schematic* fsmGetActiveSchematic() noexcept = 0;
   virtual SchematicGraphicsScene* fsmGetGraphicsScene() noexcept = 0;
   virtual void fsmSetViewCursor(
@@ -89,6 +105,8 @@ public:
       SchematicEditorState_DrawPolygon& state) noexcept = 0;
   virtual void fsmToolEnter(SchematicEditorState_AddText& state) noexcept = 0;
   virtual void fsmToolEnter(SchematicEditorState_Measure& state) noexcept = 0;
+
+  virtual void fsmSetFeatures(Features features) noexcept = 0;
 };
 
 /*******************************************************************************
@@ -97,5 +115,9 @@ public:
 
 }  // namespace editor
 }  // namespace librepcb
+
+Q_DECLARE_METATYPE(librepcb::editor::SchematicEditorFsmAdapter::Feature)
+Q_DECLARE_OPERATORS_FOR_FLAGS(
+    librepcb::editor::SchematicEditorFsmAdapter::Features)
 
 #endif

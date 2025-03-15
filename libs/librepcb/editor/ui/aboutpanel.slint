@@ -78,7 +78,7 @@ export component AboutPanel inherits Rectangle {
                     text: @tr("Website");
 
                     clicked => {
-                        Backend.trigger(Action.website);
+                        Backend.trigger(Action.website, -1);
                     }
                 }
 
@@ -89,7 +89,7 @@ export component AboutPanel inherits Rectangle {
                     text: @tr("User Manual & Tutorials");
 
                     clicked => {
-                        Backend.trigger(Action.user-manual);
+                        Backend.trigger(Action.user-manual, -1);
                     }
                 }
 
@@ -100,7 +100,7 @@ export component AboutPanel inherits Rectangle {
                     text: @tr("Give Feedback & Get Support");
 
                     clicked => {
-                        Backend.trigger(Action.support);
+                        Backend.trigger(Action.support, -1);
                     }
                 }
 
@@ -111,7 +111,7 @@ export component AboutPanel inherits Rectangle {
                     text: @tr("View Source Code (GitHub)");
 
                     clicked => {
-                        Backend.trigger(Action.source-code);
+                        Backend.trigger(Action.source-code, -1);
                     }
                 }
 
@@ -122,7 +122,7 @@ export component AboutPanel inherits Rectangle {
                     text: @tr("Keyboard Shortcuts Reference");
 
                     clicked => {
-                        Backend.trigger(Action.keyboard-shortcuts-reference);
+                        Backend.trigger(Action.keyboard-shortcuts-reference, -1);
                     }
                 }
 
@@ -134,7 +134,7 @@ export component AboutPanel inherits Rectangle {
                     text: @tr("Support the LibrePCB Project");
 
                     clicked => {
-                        Backend.trigger(Action.donate);
+                        Backend.trigger(Action.donate, -1);
                     }
                 }
             }

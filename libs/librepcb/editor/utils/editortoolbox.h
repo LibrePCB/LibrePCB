@@ -24,7 +24,10 @@
  *  Includes
  ******************************************************************************/
 #include <librepcb/core/library/resource.h>
+#include <librepcb/core/types/elementname.h>
+#include <librepcb/core/types/fileproofname.h>
 #include <librepcb/core/types/uuid.h>
+#include <librepcb/core/types/version.h>
 #include <librepcb/core/workspace/theme.h>
 
 #include <QtCore>
@@ -87,6 +90,20 @@ static void bind(
                    });
   (target.*setter)(convert(defaultValue));
 }
+
+std::optional<ElementName> validateElementName(
+    const QString& input, slint::SharedString& error) noexcept;
+
+std::optional<Version> validateVersion(const QString& input,
+                                       slint::SharedString& error) noexcept;
+
+std::optional<FileProofName> validateFileProofName(
+    const QString& input, slint::SharedString& error,
+    const QString& requiredSuffix = QString()) noexcept;
+
+std::optional<QUrl> validateUrl(const QString& input,
+                                slint::SharedString& error,
+                                bool allowEmpty = false) noexcept;
 
 /*******************************************************************************
  *  Class EditorToolbox
@@ -179,6 +196,16 @@ public:
                                  const ComponentInstance& cmp,
                                  const std::optional<Uuid>& filterDev,
                                  QWidget& editor, QMenu& root) noexcept;
+
+  /**
+   * @brief Build a copyable text with all the version numbers etc.
+   *
+   * Contains application version, dependency versions, host architecture,
+   * runtime environment etc.
+   *
+   * @return Text intended to be formatted as monospace
+   */
+  static QString buildAppVersionDetails() noexcept;
 
 private:
   /**

@@ -8,8 +8,12 @@ import { EditorCommandSet } from "./api/editorcommandset.slint";
 import { MainMenuBar } from "./mainmenubar.slint";
 import { SideBar } from "./sidebar.slint";
 import { HomePanel } from "./homepanel.slint";
+import { LibrariesPanel } from "./library/librariespanel.slint";
+import { ProjectPanel } from "./project/projectpanel.slint";
+import { RuleCheckPanel } from "./rulecheckpanel.slint";
+import { OrderPanel } from "./project/orderpanel.slint";
 import { AboutPanel } from "./aboutpanel.slint";
-import { HomeTab } from "./hometab.slint";
+import { WindowSection } from "./windowsection.slint";
 import { StatusBar } from "./statusbar.slint";
 
 export { Backend, Data, EditorCommandSet }
@@ -24,12 +28,24 @@ export component AppWindow inherits Window {
     preferred-width: 1024px;
     preferred-height: 768px;
 
+    public function focus-search() {
+        menubar.focus-search();
+    }
+
+    forward-focus: fs;
+    fs := FocusScope {
+        key-pressed(event) => {
+            return Backend.key-pressed(event);
+        }
+    }
+
     menubar := MainMenuBar {
         x: 0;
         y: 0;
         z: 100; // For the tooltips.
         width: 100%;
         height: 26px;
+        sections-start-x: sidebar.width + panel-width;
     }
 
     sidebar := SideBar {
@@ -44,6 +60,38 @@ export component AppWindow inherits Window {
         x: sidebar.width;
         y: sidebar.y;
         z: 80; // For the tooltips
+        width: panel-width;
+        height: sidebar.height;
+    }
+
+    if Data.panel-page == PanelPage.libraries: LibrariesPanel {
+        x: sidebar.width;
+        y: sidebar.y;
+        z: 90; // For the tooltips.
+        width: panel-width;
+        height: sidebar.height;
+    }
+
+    if Data.panel-page == PanelPage.project: ProjectPanel {
+        x: sidebar.width;
+        y: sidebar.y;
+        z: 90; // For the tooltips.
+        width: panel-width;
+        height: sidebar.height;
+    }
+
+    if Data.panel-page == PanelPage.rule-check: RuleCheckPanel {
+        x: sidebar.width;
+        y: sidebar.y;
+        z: 90; // For the tooltips.
+        width: panel-width;
+        height: sidebar.height;
+    }
+
+    if Data.panel-page == PanelPage.order: OrderPanel {
+        x: sidebar.width;
+        y: sidebar.y;
+        z: 90; // For the tooltips.
         width: panel-width;
         height: sidebar.height;
     }
@@ -67,8 +115,17 @@ export component AppWindow inherits Window {
             width: 1px;
         }
 
-        home-tab := HomeTab {
-            width: parent.width - 1px;
+        for section[i] in Data.sections: HorizontalLayout {
+            window-section := WindowSection {
+                section-index: i;
+                section: section;
+            }
+
+            if i < (Data.sections.length - 1): Rectangle {
+                width: 1px;
+                horizontal-stretch: 0;
+                background: #555555;
+            }
         }
     }
 

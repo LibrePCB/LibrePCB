@@ -83,6 +83,9 @@ bool BoardEditorState_AddStrokeText::entry() noexcept {
   if (!addText(pos)) return false;
 
   mAdapter.fsmToolEnter(*this);
+  mAdapter.fsmSetFeatures(
+      BoardEditorFsmAdapter::Features(BoardEditorFsmAdapter::Feature::Rotate |
+                                      BoardEditorFsmAdapter::Feature::Flip));
   mAdapter.fsmSetViewCursor(Qt::CrossCursor);
   return true;
 }
@@ -92,6 +95,7 @@ bool BoardEditorState_AddStrokeText::exit() noexcept {
   if (!abortCommand(true)) return false;
 
   mAdapter.fsmSetViewCursor(std::nullopt);
+  mAdapter.fsmSetFeatures(BoardEditorFsmAdapter::Features());
   mAdapter.fsmToolLeave();
   return true;
 }

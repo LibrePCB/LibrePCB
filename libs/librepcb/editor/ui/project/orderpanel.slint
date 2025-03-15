@@ -1,0 +1,126 @@
+import { PanelHeader } from "../common/panelheader.slint";
+import { Data } from "../api/data.slint";
+import { Backend } from "../api/backend.slint";
+import { Button, CheckBox, ProgressIndicator, Spinner } from "std-widgets.slint";
+
+export component OrderPanel inherits Rectangle {
+    background: #2a2a2a;
+
+    property <bool> initializing: true;
+    t-init := Timer {
+        interval: 2s;
+        running: true;
+
+        triggered => {
+            initializing = false;
+            btn-upload.enabled = true;
+            self.running = false;
+        }
+    }
+
+    t-upload := Timer {
+        interval: 20ms;
+        running: false;
+
+        triggered => {
+            if (pi-upload.progress < 1) {
+                pi-upload.progress += 0.01;
+            } else {
+                btn-upload.enabled = true;
+                pi-upload.visible = false;
+                t-status.text = "";
+                self.running = false;
+            }
+        }
+    }
+
+    VerticalLayout {
+        PanelHeader {
+            title: @tr("Order PCB");
+        }
+
+        VerticalLayout {
+            padding: 10px;
+            spacing: 10px;
+
+            Text {
+                wrap: word-wrap;
+                text: @tr("Order your currently opened board by one of our fabrication partners in a flash - just click the button to get started!");
+            }
+
+            CheckBox {
+                text: @tr("Open web browser after upload");
+                checked: true;
+            }
+
+            btn-upload := Button {
+                primary: true;
+                enabled: false;
+                text: @tr("Upload Project");
+
+                clicked => {
+                    self.enabled = false;
+                    pi-upload.progress = 0;
+                    pi-upload.visible = true;
+                    t-upload.running = true;
+                    t-status.text = @tr("Uploading...");
+                }
+            }
+
+            pi-upload := ProgressIndicator {
+                visible: false;
+            }
+
+            HorizontalLayout {
+                alignment: start;
+                spacing: 5px;
+
+                if initializing: Spinner {
+                    width: self.height;
+                    height: t-status.preferred-height;
+                    indeterminate: true;
+                }
+
+                t-status := Text {
+                    font-italic: true;
+                    text: @tr("Checking availability") + "...";
+                    visible: initializing || pi-upload.visible;
+                }
+            }
+        }
+
+        Rectangle { }
+
+        PanelHeader {
+            title: @tr("Details");
+        }
+
+        VerticalLayout {
+            padding: 10px;
+            spacing: 10px;
+
+            Text {
+                font-size: 11.5px;
+                font-italic: true;
+                wrap: word-wrap;
+                text: @tr("This tool helps you to quickly and easily get your designed PCB manufactured. The project directory will be exported to a *.lppz archive and uploaded it to the API server configured in your workspace settings. Afterwards you can continue the order process in the web browser, e.g. to choose the preferred manufacturing partner. Just try it!");
+            }
+        }
+
+        if !Data.order-info-url.is-empty: PanelHeader {
+            title: @tr("Privacy Policy");
+        }
+
+        if !Data.order-info-url.is-empty: VerticalLayout {
+            padding: 10px;
+            spacing: 10px;
+
+            Text {
+                font-size: 11.5px;
+                font-italic: true;
+                wrap: word-wrap;
+                text: @tr("For more information about how the uploaded project gets processed, see {}.", Data.order-info-url);
+            }
+        }
+    }
+}
