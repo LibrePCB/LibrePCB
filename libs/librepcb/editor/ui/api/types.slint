@@ -3,14 +3,34 @@ export enum Action {
     // Special
     none,  // No action triggered (used in models)
     default,  // Default action, depending on context
+    focus-lost,
 
     // General
-    library-manager,
     keyboard-shortcuts-reference,
+    copy-application-details-into-clipboard,
+    save,
+    print,
+    export-pdf,
+    run-quick-check,
+    run-drc,
     quit,
 
     // Modify
+    undo,
+    redo,
+    cut,
+    copy,
+    paste,
     delete,
+    rotate-ccw,
+    rotate-cw,
+    mirror-horizontally,
+    mirror-vertically,
+    move-align,
+    snap-to-grid,
+    reset-texts,
+    lock-unlock-placement,
+    edit-properties,
 
     // File system
     folder-new,
@@ -28,14 +48,78 @@ export enum Action {
     // Project
     project-new,
     project-open,
+    project-close,
     project-import-examples,
     project-import-eagle,
+    project-open-output-jobs,
+
+    // Library panel
+    library-panel-ensure-populated,
+    library-panel-install,
+
+    // Window section
+    section-split,
+    section-close,
+    section-ok,
+    section-cancel,
+    section-grid-interval-increase,
+    section-grid-interval-decrease,
+
+    // Create library tab
+    create-library-tab-open,
+
+    // Download library tab
+    download-library-tab-open,
+
+    // 2D board viewer tab
+    board-2d-tab-open-3d,
+
+    // Tools
+    tool-select,
+    tool-wire,
+    tool-netlabel,
+    tool-polygon,
+    tool-text,
+    tool-via,
+    tool-plane,
+    tool-zone,
+    tool-hole,
+    tool-component,
+    tool-measure,
 }
 
 // Pages which can be shown in the side panel
 export enum PanelPage {
     home,
+    libraries,
+    project,
+    rule-check,
+    order,
     about,
+}
+
+export struct Int64 {
+    msb: int,
+    lsb: int,
+}
+
+export struct Layer {
+    id: string,
+    name: string,
+}
+
+export enum LengthUnit {
+    millimeters,
+    micrometers,
+    nanometers,
+    inches,
+    mils,
+}
+
+export enum GridStyle {
+    none,
+    dots,
+    lines,
 }
 
 // Notification types
@@ -71,6 +155,41 @@ export struct NotificationData {
     dont-show-again: bool,  // Set by UI, handled in backend
 }
 
+export struct RuleCheckMessageData {
+    severity: NotificationType,
+    message: string,
+    description: string,
+    approved: bool,
+    supports-autofix: bool,
+    autofix-requested: bool,  // Flag set by UI, reset by backend.
+}
+
+export enum LibraryType {
+    local,
+    remote,
+    online,
+}
+
+export enum LibraryState {
+    unknown,
+    up-to-date,
+    outdated,
+}
+
+export struct LibraryData {
+    id: string,
+    name: string,
+    description: string,
+    version: string,
+    icon: image,
+    recommended: bool,
+    type: LibraryType,
+    state: LibraryState,
+    progress: int, // [%], 0 if not installing
+    checked: bool,
+    filtered-out: bool,
+}
+
 // Generic tree view item data structure
 export struct TreeViewItemData {
     level: int,  // 0 = top level items
@@ -84,4 +203,213 @@ export struct TreeViewItemData {
     supports-pinning: bool,
     pinned: bool,
     action: Action,  // Set by UI, handled in backend
+}
+
+export struct ProjectData {
+    valid: bool,
+    path: string,
+    name: string,
+    schematics: [string],
+    boards: [string],
+}
+
+export enum TabType {
+    home,
+    create-library,
+    download-library,
+    schematic,
+    board-2d,
+    board-3d,
+}
+
+export enum RuleCheckState {
+    not-available,
+    not-run-yet,
+    running,
+    outdated,
+    up-to-date,
+}
+
+export enum EditorTool {
+    select,
+    wire,
+    netlabel,
+    polygon,
+    text,
+    via,
+    plane,
+    zone,
+    hole,
+    component,
+    measure,
+}
+
+export struct LineEditData {
+    enabled: bool,
+    text: string,
+    placeholder: string,
+    suggestions: [string],
+}
+
+export struct ComboBoxData {
+    items: [string],
+    current-index: int,
+}
+
+export struct LengthEditData {
+    value: Int64,
+    unit: LengthUnit,
+    can-decrease: bool,
+    increase: bool,  // Set by UI, reset by backend.
+    decrease: bool,  // Set by UI, reset by backend.
+}
+
+export struct TabData {
+    // Meta
+    type: TabType,
+    title: string,
+    project-index: int,
+
+    // Rule check
+    rule-check-state: RuleCheckState,
+    rule-check-messages: [RuleCheckMessageData],
+    rule-check-unapproved-messages: int,
+    rule-check-execution-error: string,  // Empty if no error
+
+    // Features
+    can-save: bool,
+    can-export-graphics: bool,
+    can-undo: bool,
+    undo-text: string,
+    can-redo: bool,
+    redo-text: string,
+    can-cut: bool,
+    can-copy: bool,
+    can-paste: bool,
+    can-remove: bool,
+    can-rotate: bool,
+    can-mirror: bool,
+    can-move-align: bool,
+    can-snap-to-grid: bool,
+    can-reset-texts: bool,
+    can-lock-placement: bool,
+    can-edit-properties: bool,
+}
+
+export struct CreateLibraryTabData {
+    name: string,
+    name-error: string,
+    description: string,
+    author: string,
+    author-default: string,
+    version: string,
+    version-default: string,
+    version-error: string,
+    url: string,
+    url-error: string,
+    cc0: bool,
+    directory: string,
+    directory-default: string,
+    directory-error: string,
+    valid: bool,
+    creation-error: string,
+}
+
+export struct DownloadLibraryTabData {
+    url: string,
+    url-error: string,
+    url-suggestion: string,
+    directory: string,
+    directory-default: string,
+    directory-error: string,
+    valid: bool,
+    download-running: bool,
+    download-progress: int,
+    download-error: string,
+}
+
+export enum WireMode {
+    h-v,
+    v-h,
+    deg90-45,
+    deg45-90,
+    straight,
+}
+
+export struct SchematicTabData {
+    overlay-color: brush,
+    overlay-text-color: brush,
+    grid-style: GridStyle,
+    grid-interval: string,
+    unit: LengthUnit,
+    show-pin-numbers: bool,
+
+    // Data about the currently active tool.
+    tool: EditorTool,
+    tool-cursor: MouseCursor,
+    tool-overlay-text: string,
+    tool-wire-mode: WireMode,
+    tool-layer: ComboBoxData,
+    tool-line-width: LengthEditData,
+    tool-size: LengthEditData,
+    tool-filled: bool,
+    tool-value: LineEditData,
+    tool-attribute-value: LineEditData,
+    tool-attribute-unit: ComboBoxData,
+
+    scene-image-pos: Point,
+    frame: int, // Frame index to trigger repainting.
+}
+
+export struct Board2dTabData {
+    overlay-color: brush,
+    overlay-text-color: brush,
+    grid-style: GridStyle,
+    grid-interval: string,
+    unit: LengthUnit,
+
+    // Data about the currently active tool.
+    tool: EditorTool,
+    tool-cursor: MouseCursor,
+    tool-overlay-text: string,
+    tool-wire-mode: WireMode,
+    tool-net: ComboBoxData,
+    tool-layer: ComboBoxData,
+    tool-line-width: LengthEditData,
+    tool-size: LengthEditData,
+    tool-drill: LengthEditData,
+    tool-filled: bool,
+    tool-mirrored: bool,
+    tool-value: LineEditData,
+    tool-no-copper: bool,
+    tool-no-planes: bool,
+    tool-no-exposures: bool,
+    tool-no-devices: bool,
+
+    scene-image-pos: Point,
+    frame: int, // Frame index to trigger repainting
+}
+
+export struct Board3dTabData {
+    overlay-color: brush,
+    overlay-text-color: brush,
+
+    frame: int, // Frame index to trigger repainting
+}
+
+export struct WindowSectionData {
+    tabs: [TabData], // Tabs in this section
+    create-library-tabs: [CreateLibraryTabData],
+    download-library-tabs: [DownloadLibraryTabData],
+    schematic-tabs: [SchematicTabData],
+    board-2d-tabs: [Board2dTabData],
+    board-3d-tabs: [Board3dTabData],
+    current-tab-index: int,  // Currently opened tab in this section
+    highlight: bool,
+}
+
+export struct EditParseResult {
+    valid: bool,
+    evaluated-value: Int64,
+    evaluated-unit: LengthUnit,
 }

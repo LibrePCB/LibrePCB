@@ -185,6 +185,11 @@ bool SchematicEditorState_AddNetLabel::addLabel(const Point& pos) noexcept {
     mCurrentNetLabel = netLabel;
     mEditCmd = new CmdSchematicNetLabelEdit(*mCurrentNetLabel);
 
+    // Allow some actions.
+    mAdapter.fsmSetFeatures(SchematicEditorFsmAdapter::Features(
+        SchematicEditorFsmAdapter::Feature::Rotate |
+        SchematicEditorFsmAdapter::Feature::Mirror));
+
     // Highlight all elements of the current netsignal.
     mAdapter.fsmSetHighlightedNetSignals({&netsegment.getNetSignal()});
 
@@ -213,6 +218,7 @@ bool SchematicEditorState_AddNetLabel::fixLabel(const Point& pos) noexcept {
     mContext.undoStack.appendToCmdGroup(mEditCmd);
     mContext.undoStack.commitCmdGroup();
     mUndoCmdActive = false;
+    mAdapter.fsmSetFeatures(SchematicEditorFsmAdapter::Features());
     mAdapter.fsmSetHighlightedNetSignals({});
     return true;
   } catch (const Exception& e) {
@@ -225,6 +231,7 @@ bool SchematicEditorState_AddNetLabel::fixLabel(const Point& pos) noexcept {
 bool SchematicEditorState_AddNetLabel::abortCommand(
     bool showErrMsgBox) noexcept {
   try {
+    mAdapter.fsmSetFeatures(SchematicEditorFsmAdapter::Features());
     mAdapter.fsmSetHighlightedNetSignals({});
     if (mUndoCmdActive) {
       mContext.undoStack.abortCmdGroup();  // can throw

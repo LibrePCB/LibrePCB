@@ -1,0 +1,199 @@
+import { ListView, TabWidget, Palette } from "std-widgets.slint";
+import { PanelHeader, PanelHeaderButton, ListViewItemButton } from "widgets.slint";
+import { Data } from "./api/data.slint";
+import { Backend } from "./api/backend.slint";
+import { Helpers } from "./api/helpers.slint";
+import { RuleCheckState, RuleCheckMessageData, TabType, Action } from "./api/types.slint";
+
+component Item inherits Rectangle {
+    in-out property <[RuleCheckMessageData]> messages;
+    in property <int> msg-index;
+    in property <bool> enabled <=> ta.enabled;
+    in property <bool> is-selected: false;
+    property <RuleCheckMessageData> msg: messages[msg-index];
+
+    callback clicked <=> ta.clicked;
+
+    background: ta.has-hover ? #404040 : (is-selected ? #353535 : transparent);
+
+    // Strikethrough
+    if msg.approved: Rectangle {
+        x: t-title.x;
+        y: t-title.y + (t-title.height / 2);
+        height: 1px;
+        width: min(t-title.preferred-width, t-title.width);
+        background: t-title.color;
+    }
+
+    ta := TouchArea {
+        HorizontalLayout {
+            padding: 3px;
+            padding-left: 5px;
+            padding-right: 5px;
+            spacing: 5px;
+
+            Rectangle {
+                width: self.height;
+
+                i-icon := Image {
+                    x: 2px;
+                    y: self.x;
+                    width: self.height;
+                    height: parent.height - 2 * self.x;
+                    source: Helpers.get-icon-for-notification-type(msg.severity);
+                    colorize: (msg.approved || (!root.enabled)) ? t-title.color : Helpers.get-color-for-notification-type(msg.severity);
+                }
+            }
+
+            t-title := Text {
+                vertical-alignment: center;
+                font-size: 12px;
+                font-italic: msg.approved;
+                overflow: elide;
+                color: root.enabled ? Palette.foreground : #707070;
+                text: msg.message;
+            }
+
+            if msg.supports-autofix && (is-selected || ta.has-hover): ListViewItemButton {
+                icon: @image-url("../../../font-awesome/svgs/solid/wand-magic-sparkles.svg");
+                tooltip: @tr("Apply Automatic Fix");
+                enabled: root.enabled && (!msg.autofix-requested);
+
+                clicked => {
+                    messages[msg-index].autofix-requested = true;
+                }
+            }
+
+            if is-selected || ta.has-hover || msg.approved: ListViewItemButton {
+                icon: msg.approved ? @image-url("../../../bootstrap-icons/icons/eye-slash-fill.svg") : @image-url("../../../bootstrap-icons/icons/eye-fill.svg");
+                tooltip: msg.approved ? @tr("Remove Approval") : @tr("Approve");
+                enabled: root.enabled;
+
+                clicked => {
+                    messages[msg-index].approved = !msg.approved;
+                }
+            }
+        }
+    }
+}
+
+export component RuleCheckPanel inherits Rectangle {
+    property <int> selected-index: -1;
+    property <RuleCheckMessageData> selected-message: Data.current-tab.rule-check-messages[selected-index];
+    property <bool> item-selected: (selected-index >= 0) && (selected-index < Data.current-tab.rule-check-messages.length);
+    property <string> title: Data.get-rule-check-title-for-tab-type(Data.current-tab.type);
+
+    background: #2a2a2a;
+
+    fs := FocusScope {
+        VerticalLayout {
+            header := PanelHeader {
+                z: 10;  // For the tooltip.
+                title: title.is-empty ? @tr("Rule Check Messages") : title;
+                show-spinner: Data.current-tab.rule-check-state == RuleCheckState.running;
+
+                if !Data.current-tab.rule-check-execution-error.is-empty: PanelHeaderButton {
+                    icon: @image-url("../../../font-awesome/svgs/solid/circle-xmark.svg");
+                    icon-scale: 0.7;
+                    tooltip: Data.current-tab.rule-check-execution-error;
+                    colorize: self.enabled ? red : transparent;
+                    read-only: true;
+                }
+
+                if Data.current-tab.rule-check-state == RuleCheckState.outdated: PanelHeaderButton {
+                    icon: @image-url("../../../font-awesome/svgs/solid/triangle-exclamation.svg");
+                    icon-scale: 0.7;
+                    tooltip: @tr("Possibly Outdated Data") + "\n\n" + @tr("Trigger the checks again to refresh the messages.");
+                    colorize: self.enabled ? yellow : transparent;
+                    read-only: true;
+                }
+
+                if Data.current-tab.type == TabType.board-2d: PanelHeaderButton {
+                    icon: @image-url("../../../bootstrap-icons/icons/lightning-fill.svg");
+                    icon-scale: 0.7;
+                    tooltip: @tr("Run Quick Check");
+                    enabled: Data.current-tab.rule-check-state != RuleCheckState.running;
+
+                    clicked => {
+                        Backend.trigger(Action.run-quick-check, Data.current-section-index);
+                    }
+                }
+
+                if Data.current-tab.type == TabType.board-2d: PanelHeaderButton {
+                    icon: @image-url("../../../font-awesome/svgs/solid/arrows-rotate.svg");
+                    icon-scale: 0.7;
+                    tooltip: @tr("Run Design Rule Check");
+                    enabled: Data.current-tab.rule-check-state != RuleCheckState.running;
+
+                    clicked => {
+                        Backend.trigger(Action.run-drc, Data.current-section-index);
+                    }
+                }
+            }
+
+            if Data.current-tab.rule-check-messages.length > 0: ListView {
+                vertical-stretch: 1;
+
+                for msg[index] in Data.current-tab.rule-check-messages: Item {
+                    messages: Data.current-tab.rule-check-messages;
+                    msg-index: index;
+                    enabled: Data.current-tab.rule-check-execution-error.is-empty && (Data.current-tab.rule-check-state != RuleCheckState.running);
+                    is-selected: (index == selected-index);
+
+                    clicked => {
+                        selected-index = index;
+                        fs.focus();
+                    }
+                }
+            }
+
+            if Data.current-tab.rule-check-messages.length == 0: VerticalLayout {
+                padding: 8px;
+
+                Text {
+                    width: 100%;
+                    font-size: 12px;
+                    font-italic: true;
+                    wrap: word-wrap;
+                    text: {
+                        if Data.current-tab.rule-check-state == RuleCheckState.not-available {
+                            return @tr("Not available for the current tab.");
+                        } else if Data.current-tab.rule-check-state == RuleCheckState.not-run-yet {
+                            return @tr("No checks run yet. Trigger them with one of the buttons above.");
+                        } else if Data.current-tab.rule-check-state == RuleCheckState.running {
+                            return @tr("Running, hang on...");
+                        } else {
+                            return @tr("No messages.");
+                        }
+                    }
+                }
+            }
+
+            if item-selected: PanelHeader {
+                title: selected-message.message;
+            }
+
+            if item-selected: VerticalLayout {
+                padding: 8px;
+
+                Text {
+                    width: 100%;
+                    font-size: 12px;
+                    wrap: word-wrap;
+                    text: selected-message.description;
+                }
+            }
+        }
+
+        key-pressed(event) => {
+            if (event.text == Key.DownArrow) && (selected-index < Data.current-tab.rule-check-messages.length - 1) {
+                selected-index = selected-index + 1;
+                return accept;
+            } else if (event.text == Key.UpArrow) && (selected-index > 0) {
+                selected-index = selected-index - 1;
+                return accept;
+            }
+            return reject;
+        }
+    }
+}

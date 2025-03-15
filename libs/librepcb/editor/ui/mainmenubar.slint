@@ -1,11 +1,12 @@
-import { MenuPopup, MenuItem, MenuSeparator } from "widgets.slint";
+import { MenuPopup, MenuItem, MenuSeparator, ToolTip, LineEdit, Palette } from "widgets.slint";
 import {
     Action,
     Backend,
     Constants,
     Data,
     EditorCommandSet as Cmd,
-    PanelPage
+    PanelPage,
+    TabType
 } from "api.slint";
 
 component MainMenuItem inherits Rectangle {
@@ -32,8 +33,46 @@ component MainMenuItem inherits Rectangle {
     ta := TouchArea { }
 }
 
+component MenuBarButton inherits TouchArea {
+    in property <image> icon;
+    in property <string> tooltip;
+
+    width: self.height;
+
+    // Accessibility
+    accessible-role: button;
+    accessible-enabled: self.enabled;
+    accessible-label: tooltip;
+    accessible-action-default => {
+        self.clicked();
+    }
+
+    Image {
+        x: (parent.width - self.width) / 2;
+        y: (parent.height - self.height) / 2;
+        width: root.pressed ? 90% : 100%;
+        height: self.width;
+        image-fit: contain;
+        colorize: (!root.enabled) ? #606060 : (root.has-hover ? white : Palette.foreground);
+        source: icon;
+        accessible-role: none;
+    }
+
+    if self.has-hover && (!self.pressed): ToolTip {
+        x: (parent.width - self.width) / 2;
+        y: parent.height + 5px;
+        text: tooltip;
+    }
+}
+
 export component MainMenuBar inherits Rectangle {
+    in property <length> sections-start-x;
+
     background: #252525;
+
+    public function focus-search() {
+        //le-search.focus();
+    }
 
     HorizontalLayout {
         padding-right: 4px;
@@ -54,7 +93,7 @@ export component MainMenuBar inherits Rectangle {
                     icon: @image-url("../../../font-awesome/svgs/solid/file-circle-plus.svg");
 
                     clicked => {
-                        Backend.trigger(Action.project-new);
+                        Backend.trigger(Action.project-new, -1);
                     }
                 }
 
@@ -63,7 +102,7 @@ export component MainMenuBar inherits Rectangle {
                     icon: @image-url("../../../font-awesome/svgs/solid/folder-open.svg");
 
                     clicked => {
-                        Backend.trigger(Action.project-open);
+                        Backend.trigger(Action.project-open, -1);
                     }
                 }
 
@@ -71,7 +110,7 @@ export component MainMenuBar inherits Rectangle {
                     cmd: Cmd.import-eagle-project;
 
                     clicked => {
-                        Backend.trigger(Action.project-import-eagle);
+                        Backend.trigger(Action.project-import-eagle, -1);
                     }
                 }
 
@@ -79,27 +118,40 @@ export component MainMenuBar inherits Rectangle {
                     cmd: Cmd.add-example-projects;
 
                     clicked => {
-                        Backend.trigger(Action.project-import-examples);
+                        Backend.trigger(Action.project-import-examples, -1);
                     }
                 }
 
                 MenuSeparator { }
 
                 library-manager-item := MenuItem {
-                    cmd: Cmd.library-manager;
-                    icon: @image-url("../../../bootstrap-icons/icons/database.svg");
+                    text: @tr("New Library") + "...";
+                    icon: @image-url("../../../bootstrap-icons/icons/database-add.svg");
+                    status-tip: @tr("Create a new local workspace library");
 
                     clicked => {
-                        Backend.trigger(Action.library-manager);
+                        Backend.trigger(Action.create-library-tab-open, -1);
                     }
                 }
+
+                download-library-item := MenuItem {
+                    text: @tr("Download Library") + "...";
+                    icon: @image-url("../../../bootstrap-icons/icons/cloud-arrow-down-fill.svg");
+                    status-tip: @tr("Manually download an existing library from the Internet");
+
+                    clicked => {
+                        Backend.trigger(Action.download-library-tab-open, -1);
+                    }
+                }
+
+                MenuSeparator { }
 
                 rescan-libraries-item := MenuItem {
                     cmd: Cmd.workspace-libraries-rescan;
                     icon: @image-url("../../../font-awesome/svgs/solid/arrows-rotate.svg");
 
                     clicked => {
-                        Backend.trigger(Action.workspace-libraries-rescan);
+                        Backend.trigger(Action.workspace-libraries-rescan, -1);
                     }
                 }
 
@@ -109,7 +161,7 @@ export component MainMenuBar inherits Rectangle {
                     status-tip: "Open the workspace directory in the file manager";  // More specific.
 
                     clicked => {
-                        Backend.trigger(Action.workspace-open-folder);
+                        Backend.trigger(Action.workspace-open-folder, -1);
                     }
                 }
 
@@ -117,7 +169,7 @@ export component MainMenuBar inherits Rectangle {
                     cmd: Cmd.workspace-switch;
 
                     clicked => {
-                        Backend.trigger(Action.workspace-switch);
+                        Backend.trigger(Action.workspace-switch, -1);
                     }
                 }
 
@@ -126,7 +178,7 @@ export component MainMenuBar inherits Rectangle {
                     icon: @image-url("../../../font-awesome/svgs/solid/sliders.svg");
 
                     clicked => {
-                        Backend.trigger(Action.workspace-settings);
+                        Backend.trigger(Action.workspace-settings, -1);
                     }
                 }
 
@@ -137,13 +189,155 @@ export component MainMenuBar inherits Rectangle {
                     icon: @image-url("../../../bootstrap-icons/icons/box-arrow-left.svg");
 
                     clicked => {
-                        Backend.trigger(Action.quit);
+                        Backend.trigger(Action.quit, -1);
                     }
                 }
             }
         }
 
-        view-menu-item := MainMenuItem {
+        MainMenuItem {
+            text: @tr("Edit");
+
+            clicked => {
+                menu-edit.show();
+            }
+
+            menu-edit := MenuPopup {
+                x: 0;
+                y: parent.height;
+
+                MenuItem {
+                    text: Data.current-tab.undo-text.is-empty ? @tr("Undo") : @tr("Undo: {}", Data.current-tab.undo-text);
+                    icon: @image-url("../../../font-awesome/svgs/solid/rotate-left.svg");
+                    status-tip: @tr("Revert the last modification");
+                    shortcuts: "Ctrl+Z";
+                    enabled: Data.current-tab.can-undo;
+
+                    clicked => {
+                        Backend.trigger(Action.undo, Data.current-section-index);
+                    }
+                }
+
+                MenuItem {
+                    text: Data.current-tab.redo-text.is-empty ? @tr("Redo") : @tr("Redo: {}", Data.current-tab.redo-text);
+                    icon: @image-url("../../../font-awesome/svgs/solid/rotate-right.svg");
+                    status-tip: @tr("Re-apply the last reverted modification");
+                    shortcuts: "Ctrl+Y";
+                    enabled: Data.current-tab.can-redo;
+
+                    clicked => {
+                        Backend.trigger(Action.redo, Data.current-section-index);
+                    }
+                }
+
+                MenuSeparator { }
+
+                MenuItem {
+                    text: @tr("Select All");
+                    status-tip: @tr("Select all visible objects");
+                    shortcuts: "Ctrl+A";
+                }
+
+                MenuSeparator { }
+
+                MenuItem {
+                    text: @tr("Cut");
+                    icon: @image-url("../../../font-awesome/svgs/solid/scissors.svg");
+                    status-tip: @tr("Cut the selected object(s) to clipboard");
+                    shortcuts: "Ctrl+X";
+                }
+
+                MenuItem {
+                    text: @tr("Copy");
+                    icon: @image-url("../../../font-awesome/svgs/regular/copy.svg");
+                    status-tip: @tr("Copy the selected object(s) to clipboard");
+                    shortcuts: "Ctrl+C";
+                }
+
+                MenuItem {
+                    text: @tr("Paste");
+                    icon: @image-url("../../../font-awesome/svgs/solid/paste.svg");
+                    status-tip: @tr("Paste object(s) from the clipboard");
+                    shortcuts: "Ctrl+V";
+                }
+
+                MenuItem {
+                    text: @tr("Remove");
+                    icon: @image-url("../../../font-awesome/svgs/solid/trash-can.svg");
+                    status-tip: @tr("Remove the selected object(s)");
+                    shortcuts: "Del";
+                }
+
+                MenuSeparator { }
+
+                MenuItem {
+                    text: @tr("Rotate Counterclockwise");
+                    icon: @image-url("../../../font-awesome/svgs/solid/rotate-left.svg");
+                    status-tip: @tr("Rotate the selected object(s) counterclockwise");
+                    shortcuts: "R";
+                }
+
+                MenuItem {
+                    text: @tr("Rotate Clockwise");
+                    icon: @image-url("../../../font-awesome/svgs/solid/rotate-right.svg");
+                    status-tip: @tr("otate the selected object(s) clockwise");
+                    shortcuts: "Shift+R";
+                }
+
+                MenuItem {
+                    text: @tr("Mirror Horizontally");
+                    icon: @image-url("../../../bootstrap-icons/icons/symmetry-horizontal.svg");
+                    status-tip: @tr("Mirror the selected object(s) horizontally");
+                    shortcuts: "M";
+                }
+
+                MenuItem {
+                    text: @tr("Mirror Vertically");
+                    icon: @image-url("../../../bootstrap-icons/icons/symmetry-vertical.svg");
+                    status-tip: @tr("Mirror the selected object(s) vertically");
+                    shortcuts: "Shift+M";
+                }
+
+                MenuItem {
+                    text: @tr("Reset All Texts");
+                    icon: @image-url("../../../bootstrap-icons/icons/bootstrap-reboot.svg");
+                    status-tip: @tr("Reset all texts of the selected object(s) to their initial state");
+                    shortcuts: "";
+                }
+
+                MenuSeparator { }
+
+                MenuItem {
+                    text: @tr("Find");
+                    icon: @image-url("../../../font-awesome/svgs/solid/magnifying-glass.svg");
+                    status-tip: @tr("Find or filter objects");
+                    shortcuts: "Ctrl+F";
+                }
+
+                MenuItem {
+                    text: @tr("Find Next");
+                    status-tip: @tr("Go to the next found object");
+                    shortcuts: "F3";
+                }
+
+                MenuItem {
+                    text: @tr("Find Previous");
+                    status-tip: @tr("Go to the previous found object");
+                    shortcuts: "Shift+F3";
+                }
+
+                MenuSeparator { }
+
+                MenuItem {
+                    text: @tr("Properties");
+                    icon: @image-url("../../../font-awesome/svgs/solid/pen-to-square.svg");
+                    status-tip: @tr("View/modify the object properties");
+                    shortcuts: "E";
+                }
+            }
+        }
+
+        MainMenuItem {
             text: @tr("View");
 
             clicked => {
@@ -158,7 +352,7 @@ export component MainMenuBar inherits Rectangle {
                     cmd: Cmd.window-new;
 
                     clicked => {
-                        Backend.trigger(Action.window-new);
+                        Backend.trigger(Action.window-new, -1);
                     }
                 }
 
@@ -166,8 +360,250 @@ export component MainMenuBar inherits Rectangle {
                     cmd: Cmd.window-close;
 
                     clicked => {
-                        Backend.trigger(Action.window-close);
+                        Backend.trigger(Action.window-close, -1);
                     }
+                }
+
+                MenuItem {
+                    text: @tr("Split Window");
+                    icon: @image-url("../../../bootstrap-icons/icons/window-split.svg");
+                    status-tip: @tr("Split the current window into one more section");
+
+                    clicked => {
+                        Backend.trigger(Action.section-split, Data.current-section-index);
+                    }
+                }
+
+                MenuSeparator { }
+
+                MenuItem {
+                    text: @tr("Grid Properties");
+                    icon: @image-url("../../../bootstrap-icons/icons/grid-3x3.svg");
+                    status-tip: @tr("View/modify the grid properties");
+                    shortcuts: "F4";
+                    enabled: Data.current-tab-is-2d;
+                }
+
+                MenuItem {
+                    text: @tr("Increase Grid Interval");
+                    status-tip: @tr("Increase the grid interval");
+                    shortcuts: "Ctrl+Shift++";
+                    enabled: Data.current-tab-is-2d;
+
+                    clicked => {
+                        Backend.trigger(Action.section-grid-interval-increase, Data.current-section-index);
+                    }
+                }
+
+                MenuItem {
+                    text: @tr("Decrease Grid Interval");
+                    status-tip: @tr("Decrease the grid interval");
+                    shortcuts: "Ctrl+Shift+-";
+                    enabled: Data.current-tab-is-2d;
+
+                    clicked => {
+                        Backend.trigger(Action.section-grid-interval-decrease, Data.current-section-index);
+                    }
+                }
+
+                MenuSeparator { }
+
+                MenuItem {
+                    text: @tr("Show Pin Numbers");
+                    status-tip: @tr("Show or hide symbol pin numbers");
+                    enabled: Data.current-tab.type == TabType.schematic;
+                    checked: Data.current-section.schematic-tabs[Data.current-section.current-tab-index].show-pin-numbers;
+
+                    clicked => {
+                        Data.current-section.schematic-tabs[Data.current-section.current-tab-index].show-pin-numbers = !Data.current-section.schematic-tabs[Data.current-section.current-tab-index].show-pin-numbers;
+                    }
+                }
+
+                MenuItem {
+                    text: @tr("Hide All Planes");
+                    status-tip: @tr("Make the filled areas of all planes invisible");
+                    enabled: Data.current-tab.type == TabType.board-2d;
+                }
+
+                MenuItem {
+                    text: @tr("Show All Planes");
+                    status-tip: @tr("Make the filled areas of all planes visible");
+                    enabled: Data.current-tab.type == TabType.board-2d;
+                }
+
+                MenuItem {
+                    text: @tr("Rebuild all Planes");
+                    status-tip: @tr("Re-calculate the filled area of all planes");
+                    shortcuts: "Ctrl+Shift+R";
+                }
+
+                MenuItem {
+                    text: @tr("Ignore Placement Locks");
+                    icon: @image-url("../../../font-awesome/svgs/solid/lock.svg");
+                    status-tip: @tr("Allow dragging locked objects");
+                    shortcuts: "Ctrl+Shift+L";
+                    enabled: Data.current-tab.type == TabType.board-2d;
+                    checked: Data.ignore-placement-locks;
+
+                    clicked => {
+                        Data.ignore-placement-locks = !Data.ignore-placement-locks;
+                    }
+                }
+
+                MenuSeparator { }
+
+                MenuItem {
+                    text: @tr("Toggle 2D/3D Mode");
+                    icon: @image-url("../../../bootstrap-icons/icons/badge-3d.svg");
+                    status-tip: @tr("Switch between the 2D and 3D viewer mode");
+                    shortcuts: "Ctrl+3";
+                    enabled: (Data.current-tab.type == TabType.board-2d) || (Data.current-tab.type == TabType.board-3d);
+
+                    clicked => {
+                        Backend.trigger(Action.board-2d-tab-open-3d, Data.current-section-index);
+                    }
+                }
+
+                MenuSeparator { }
+
+                MenuItem {
+                    text: @tr("Zoom In");
+                    icon: @image-url("../../../bootstrap-icons/icons/zoom-in.svg");
+                    status-tip: @tr("Increase the zoom level");
+                    shortcuts: "Ctrl++";
+                    enabled: Data.current-tab-is-2d-or-3d;
+                }
+
+                MenuItem {
+                    text: @tr("Zoom Out");
+                    icon: @image-url("../../../bootstrap-icons/icons/zoom-out.svg");
+                    status-tip: @tr("Decrease the zoom level");
+                    shortcuts: "Ctrl+-";
+                    enabled: Data.current-tab-is-2d-or-3d;
+                }
+
+                MenuItem {
+                    text: @tr("Zoom to Fit Contents");
+                    icon: @image-url("../../../font-awesome/svgs/solid/expand.svg");
+                    status-tip: @tr("Set the zoom level to fit the whole content");
+                    shortcuts: "Ctrl+Home";
+                    enabled: Data.current-tab-is-2d-or-3d;
+                }
+            }
+        }
+
+        MainMenuItem {
+            text: @tr("Project");
+
+            clicked => {
+                menu-project.show();
+            }
+
+            menu-project := MenuPopup {
+                x: 0;
+                y: parent.height;
+
+                MenuItem {
+                    text: @tr("Save Project");
+                    icon: @image-url("../../../bootstrap-icons/icons/floppy-fill.svg");
+                    status-tip: @tr("Save all project modifications to disk, from all schematics & boards");
+                    shortcuts: "Ctrl+S";
+                    enabled: Data.projects[Data.current-tab.project-index].valid && Data.current-tab.can-save;
+
+                    clicked => {
+                        Backend.trigger(Action.save, Data.current-section-index);
+                    }
+                }
+
+                MenuItem {
+                    text: @tr("Update Project Library") + "...";
+                    icon: @image-url("../../../font-awesome/svgs/solid/arrows-rotate.svg");
+                    status-tip: @tr("Update the project's library elements from workspace libraries");
+                    shortcuts: "Ctrl+F5";
+                    enabled: Data.projects[Data.current-tab.project-index].valid;
+                }
+
+                MenuItem {
+                    text: @tr("Project Setup") + "...";
+                    icon: @image-url("../../../bootstrap-icons/icons/sliders.svg");
+                    status-tip: @tr("View/modify the project setup");
+                    shortcuts: "F6";
+                    enabled: Data.projects[Data.current-tab.project-index].valid;
+                }
+
+                MenuSeparator { }
+
+                MenuItem {
+                    text: @tr("New Sheet") + "...";
+                    icon: @image-url("../../../font-awesome/svgs/solid/file-circle-plus.svg");
+                    status-tip: @tr("Add a new schematic sheet to the project");
+                    shortcuts: "Ctrl+N";
+                    enabled: Data.projects[Data.current-tab.project-index].valid;
+                }
+
+                MenuItem {
+                    text: @tr("Rename Sheet") + "...";
+                    status-tip: @tr("Rename the current schematic sheet");
+                    shortcuts: "Ctrl+F2";
+                    enabled: Data.current-tab.type == TabType.schematic;
+                }
+
+                MenuItem {
+                    text: @tr("Remove Sheet") + "...";
+                    icon: @image-url("../../../font-awesome/svgs/solid/trash-can.svg");
+                    status-tip: @tr("Remove the current schematic sheet from the project");
+                    shortcuts: "Ctrl+Del";
+                    enabled: Data.current-tab.type == TabType.schematic;
+                }
+
+                MenuSeparator { }
+
+                MenuItem {
+                    text: @tr("New Board") + "...";
+                    icon: @image-url("../../../font-awesome/svgs/solid/file-circle-plus.svg");
+                    status-tip: @tr("Add a new board to the project");
+                    shortcuts: "Ctrl+N";
+                    enabled: Data.projects[Data.current-tab.project-index].valid;
+                }
+
+                MenuItem {
+                    text: @tr("Copy Board") + "...";
+                    icon: @image-url("../../../font-awesome/svgs/regular/copy.svg");
+                    status-tip: @tr("Add a copy of the current board to the project");
+                    shortcuts: "Ctrl+D";
+                    enabled: (Data.current-tab.type == TabType.board-2d) || (Data.current-tab.type == TabType.board-3d);
+                }
+
+                MenuItem {
+                    text: @tr("Remove Board") + "...";
+                    icon: @image-url("../../../font-awesome/svgs/solid/trash-can.svg");
+                    status-tip: @tr("Remove the current board from the project");
+                    shortcuts: "Ctrl+Del";
+                    enabled: (Data.current-tab.type == TabType.board-2d) || (Data.current-tab.type == TabType.board-3d);
+                }
+
+                MenuItem {
+                    text: @tr("Run Quick Check");
+                    icon: @image-url("../../../bootstrap-icons/icons/lightning-fill.svg");
+                    status-tip: @tr("Run only the most important copper checks from the DRC");
+                    shortcuts: "Shift+F8";
+                    enabled: (Data.current-tab.type == TabType.board-2d) || (Data.current-tab.type == TabType.board-3d);
+                }
+
+                MenuItem {
+                    text: @tr("Run Design Rule Check");
+                    icon: @image-url("../../../font-awesome/svgs/solid/list-check.svg");
+                    status-tip: @tr("Run the design rule check (DRC)");
+                    shortcuts: "F8";
+                    enabled: (Data.current-tab.type == TabType.board-2d) || (Data.current-tab.type == TabType.board-3d);
+                }
+
+                MenuItem {
+                    text: @tr("Board Setup") + "...";
+                    icon: @image-url("../../../bootstrap-icons/icons/sliders.svg");
+                    status-tip: @tr("View/modify the board setup");
+                    shortcuts: "F7";
+                    enabled: (Data.current-tab.type == TabType.board-2d) || (Data.current-tab.type == TabType.board-3d);
                 }
             }
         }
@@ -187,7 +623,7 @@ export component MainMenuBar inherits Rectangle {
                     cmd: Cmd.keyboard-shortcuts-reference;
 
                     clicked => {
-                        Backend.trigger(Action.keyboard-shortcuts-reference);
+                        Backend.trigger(Action.keyboard-shortcuts-reference, -1);
                     }
                 }
 
@@ -236,6 +672,224 @@ export component MainMenuBar inherits Rectangle {
                         Data.panel-page = PanelPage.about;
                     }
                 }
+            }
+        }
+
+        Rectangle {
+            width: 3px;
+        }
+
+        Rectangle {
+            y: 4px;
+            width: 1px;
+            height: parent.height - 2 * self.y;
+            background: #606060;
+        }
+
+        HorizontalLayout {
+            padding-top: 5px;
+            padding-bottom: 5px;
+            padding-left: 8px;
+            padding-right: 20px;
+            spacing: 5px;
+
+            MenuBarButton {
+                enabled: Data.current-tab.can-save;
+                icon: @image-url("../../../bootstrap-icons/icons/floppy-fill.svg");
+                tooltip: @tr("Save");
+
+                clicked => {
+                    Backend.trigger(Action.save, Data.current-section-index);
+                }
+            }
+
+            MenuBarButton {
+                enabled: Data.current-tab.can-export-graphics;
+                icon: @image-url("../../../font-awesome/svgs/solid/file-pdf.svg");
+                tooltip: @tr("Export PDF");
+
+                clicked => {
+                    Backend.trigger(Action.export-pdf, Data.current-section-index);
+                }
+            }
+
+            MenuBarButton {
+                enabled: Data.current-tab.can-export-graphics;
+                icon: @image-url("../../../bootstrap-icons/icons/printer-fill.svg");
+                tooltip: @tr("Print");
+
+                clicked => {
+                    Backend.trigger(Action.print, Data.current-section-index);
+                }
+            }
+
+            MenuBarButton {
+                enabled: Data.current-tab.can-undo;
+                icon: @image-url("../../../font-awesome/svgs/solid/rotate-left.svg");
+                tooltip: @tr("Undo");
+
+                clicked => {
+                    Backend.trigger(Action.undo, Data.current-section-index);
+                }
+            }
+
+            MenuBarButton {
+                enabled: Data.current-tab.can-redo;
+                icon: @image-url("../../../font-awesome/svgs/solid/rotate-right.svg");
+                tooltip: @tr("Redo");
+
+                clicked => {
+                    Backend.trigger(Action.redo, Data.current-section-index);
+                }
+            }
+        }
+
+        Rectangle {
+            horizontal-stretch: 1;
+
+            if Data.sections[Data.current-section-index].tabs.length > 0: HorizontalLayout {
+                property <length> total-space: root.width - sections-start-x;
+                property <length> section-width: total-space / Data.sections.length;
+                property <length> offset: sections-start-x - parent.x - (self.width / 2);
+
+                x: max(min(section-width * (0.5 + Data.current-section-index) + offset, parent.width - self.width - 10px), 0);
+                width: self.preferred-width;
+                padding-top: 5px;
+                padding-bottom: 5px;
+                spacing: 5px;
+
+                if Data.current-tab.can-cut: MenuBarButton {
+                    icon: @image-url("../../../font-awesome/svgs/solid/scissors.svg");
+                    tooltip: @tr("Cut");
+
+                    clicked => {
+                        Backend.trigger(Action.cut, Data.current-section-index);
+                    }
+                }
+
+                if Data.current-tab.can-copy: MenuBarButton {
+                    icon: @image-url("../../../font-awesome/svgs/regular/copy.svg");
+                    tooltip: @tr("Copy");
+
+                    clicked => {
+                        Backend.trigger(Action.copy, Data.current-section-index);
+                    }
+                }
+
+                if Data.current-tab.can-paste: MenuBarButton {
+                    icon: @image-url("../../../font-awesome/svgs/solid/paste.svg");
+                    tooltip: @tr("Paste");
+
+                    clicked => {
+                        Backend.trigger(Action.paste, Data.current-section-index);
+                    }
+                }
+
+                if Data.current-tab.can-remove: MenuBarButton {
+                    icon: @image-url("../../../font-awesome/svgs/solid/trash-can.svg");
+                    tooltip: @tr("Delete");
+
+                    clicked => {
+                        Backend.trigger(Action.delete, Data.current-section-index);
+                    }
+                }
+
+                if Data.current-tab.can-rotate: MenuBarButton {
+                    icon: @image-url("../../../font-awesome/svgs/solid/rotate-left.svg");
+                    tooltip: @tr("Rotate Counter-Clockwise");
+
+                    clicked => {
+                        Backend.trigger(Action.rotate-ccw, Data.current-section-index);
+                    }
+                }
+
+                if Data.current-tab.can-rotate: MenuBarButton {
+                    icon: @image-url("../../../font-awesome/svgs/solid/rotate-right.svg");
+                    tooltip: @tr("Rotate Clockwise");
+
+                    clicked => {
+                        Backend.trigger(Action.rotate-cw, Data.current-section-index);
+                    }
+                }
+
+                if Data.current-tab.can-mirror: MenuBarButton {
+                    icon: @image-url("../../../bootstrap-icons/icons/symmetry-horizontal.svg");
+                    tooltip: @tr("Mirror Horizontally");
+
+                    clicked => {
+                        Backend.trigger(Action.mirror-horizontally, Data.current-section-index);
+                    }
+                }
+
+                if Data.current-tab.can-mirror: MenuBarButton {
+                    icon: @image-url("../../../bootstrap-icons/icons/symmetry-vertical.svg");
+                    tooltip: @tr("Mirror Vertically");
+
+                    clicked => {
+                        Backend.trigger(Action.mirror-vertically, Data.current-section-index);
+                    }
+                }
+
+                if Data.current-tab.can-move-align: MenuBarButton {
+                    icon: @image-url("../../../font-awesome/svgs/solid/up-down-left-right.svg");
+                    tooltip: @tr("Move/Align");
+
+                    clicked => {
+                        Backend.trigger(Action.move-align, Data.current-section-index);
+                    }
+                }
+
+                if Data.current-tab.can-snap-to-grid: MenuBarButton {
+                    icon: @image-url("../../../../img/grid-dots.svg");
+                    tooltip: @tr("Snap to Grid");
+
+                    clicked => {
+                        Backend.trigger(Action.snap-to-grid, Data.current-section-index);
+                    }
+                }
+
+                if Data.current-tab.can-reset-texts: MenuBarButton {
+                    icon: @image-url("../../../bootstrap-icons/icons/bootstrap-reboot.svg");
+                    tooltip: @tr("Reset all Texts");
+
+                    clicked => {
+                        Backend.trigger(Action.reset-texts, Data.current-section-index);
+                    }
+                }
+
+                if Data.current-tab.can-lock-placement: MenuBarButton {
+                    icon: @image-url("../../../font-awesome/svgs/solid/lock-open.svg");
+                    tooltip: @tr("Lock/Unlock Placement");
+
+                    clicked => {
+                        Backend.trigger(Action.lock-unlock-placement, Data.current-section-index);
+                    }
+                }
+
+                if Data.current-tab.can-edit-properties: MenuBarButton {
+                    icon: @image-url("../../../font-awesome/svgs/solid/pen-to-square.svg");
+                    tooltip: @tr("Properties");
+
+                    clicked => {
+                        Backend.trigger(Action.edit-properties, Data.current-section-index);
+                    }
+                }
+            }
+        }
+
+        le-search := LineEdit {
+            y: 2px;
+            height: parent.height - 2 * self.y;
+            horizontal-stretch: 0;
+            font-size: 11px;
+            placeholder-text: @tr("Quick Find (Ctrl+F)");
+
+            key-pressed(event) => {
+                if (event.text == Key.Escape) {
+                    self.clear-focus();
+                    return accept;
+                }
+                return reject;
             }
         }
     }

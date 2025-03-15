@@ -1,0 +1,93 @@
+import { LineEdit, HorizontalBox } from "std-widgets.slint";
+
+export component LineEdit inherits Rectangle {
+    in-out property <string> text <=> le.text;
+    in-out property <string> placeholder-text <=> le.placeholder-text;
+    in-out property <string> validation-error;
+    in-out property <bool> enabled <=> le.enabled;
+    in-out property <bool> read-only <=> le.read-only;
+    in-out property <length> font-size <=> le.font-size;
+
+    callback key-pressed <=> le.key-pressed;
+
+    height: le.preferred-height + 16px;
+    horizontal-stretch: 1;
+    forward-focus: le;
+
+    // Accessibility
+    accessible-role: text-input;
+    accessible-enabled: enabled;
+    accessible-value: text;
+    accessible-placeholder-text: placeholder-text;
+    accessible-read-only: read-only;
+    accessible-action-set-value(t) => {
+        le.text = t;
+    }
+
+    ta := TouchArea {
+        enabled: enabled;
+
+        le := LineEdit {
+            width: 100%;
+            height: 100%;
+            font-size: 13px;
+            accessible-role: none;
+        }
+
+        if ta.has-hover && (!le.text.is-empty): Rectangle {
+            x: root.width - self.width - (root.height - self.height) / 2;
+            y: (root.height - self.height) / 2;
+            width: 20px;
+            height: self.width;
+            background: #303030;
+            border-radius: self.height / 3;
+
+            Image {
+                width: 12px;
+                height: self.width;
+                image-fit: contain;
+                source: @image-url("../../../../font-awesome/svgs/solid/xmark.svg");
+                colorize: ta-clear.has-hover ? #ffffff : #b0b0b0;
+                accessible-role: none;
+
+                ta-clear := TouchArea {
+                    clicked => {
+                        le.text = "";
+                    }
+                }
+            }
+        }
+    }
+
+    if !validation-error.is-empty: Rectangle {
+        x: -1px;
+        y: -1px;
+        width: parent.width + 2px;
+        height: parent.height + 2px;
+        border-width: 1px;
+        border-radius: 10px;
+        border-color: #ff0000;
+    }
+
+    if !validation-error.is-empty: Rectangle {
+        x: root.width - self.width - 20px;
+        y: -8px;
+        width: min(t-validation-error.preferred-width + 10px, root.width * 0.8);
+        height: t-validation-error.preferred-height + 4px;
+        background: black;
+        border-width: 1px;
+        border-radius: self.height / 2;
+        border-color: #ff0000;
+
+        t-validation-error := Text {
+            x: 5px;
+            width: parent.width - 10px;
+            vertical-alignment: center;
+            font-size: 11px;
+            overflow: elide;
+            color: #ff0000;
+            text: validation-error;
+            accessible-description: "validation error";
+        }
+    }
+}

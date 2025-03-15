@@ -4,8 +4,12 @@ import "../../../../share/librepcb/fonts/NotoSansMono-Regular.ttf";
 import { MainMenuBar } from "mainmenubar.slint";
 import { SideBar } from "sidebar.slint";
 import { HomePanel } from "homepanel.slint";
+import { LibrariesPanel } from "library/librariespanel.slint";
+import { ProjectPanel } from "project/projectpanel.slint";
+import { RuleCheckPanel } from "rulecheckpanel.slint";
+import { OrderPanel } from "project/orderpanel.slint";
 import { AboutPanel } from "aboutpanel.slint";
-import { HomeTab } from "hometab.slint";
+import { WindowSection } from "windowsection.slint";
 import { StatusBar } from "statusbar.slint";
 import {
     Action,
@@ -30,6 +34,10 @@ export component AppWindow inherits Window {
     preferred-height: 768px;
     forward-focus: fs;
 
+    public function focus-search() {
+        menubar.focus-search();
+    }
+
     fs := FocusScope {
         // This is an ugly hack to not make any undesired element having the
         // focus after application startup. The preview-mode is true at the
@@ -40,29 +48,29 @@ export component AppWindow inherits Window {
 
         key-pressed(event) => {
             if Helpers.is-shortcut(event, Cmd.file-manager) {
-                Backend.trigger(Action.workspace-open-folder);
+                Backend.trigger(Action.workspace-open-folder, -1);
             } else if Helpers.is-shortcut(event, Cmd.workspace-switch) {
-                Backend.trigger(Action.workspace-switch);
+                Backend.trigger(Action.workspace-switch, -1);
             } else if Helpers.is-shortcut(event, Cmd.workspace-settings) {
-                Backend.trigger(Action.workspace-settings);
+                Backend.trigger(Action.workspace-settings, -1);
             } else if Helpers.is-shortcut(event, Cmd.workspace-libraries-rescan) {
-                Backend.trigger(Action.workspace-libraries-rescan);
+                Backend.trigger(Action.workspace-libraries-rescan, -1);
             } else if Helpers.is-shortcut(event, Cmd.library-manager) {
-                Backend.trigger(Action.library-manager);
+                Data.panel-page = PanelPage.libraries;
             } else if Helpers.is-shortcut(event, Cmd.project-new) {
-                Backend.trigger(Action.project-new);
+                Backend.trigger(Action.project-new, -1);
             } else if Helpers.is-shortcut(event, Cmd.project-open) {
-                Backend.trigger(Action.project-open);
+                Backend.trigger(Action.project-open, -1);
             } else if Helpers.is-shortcut(event, Cmd.add-example-projects) {
-                Backend.trigger(Action.project-import-examples);
+                Backend.trigger(Action.project-import-examples, -1);
             } else if Helpers.is-shortcut(event, Cmd.import-eagle-project) {
-                Backend.trigger(Action.project-import-eagle);
+                Backend.trigger(Action.project-import-eagle, -1);
             } else if Helpers.is-shortcut(event, Cmd.window-new) {
-                Backend.trigger(Action.window-new);
+                Backend.trigger(Action.window-new, -1);
             } else if Helpers.is-shortcut(event, Cmd.window-close) {
-                Backend.trigger(Action.window-close);
+                Backend.trigger(Action.window-close, -1);
             } else if Helpers.is-shortcut(event, Cmd.application-quit) {
-                Backend.trigger(Action.quit);
+                Backend.trigger(Action.quit, -1);
             } else if Helpers.is-shortcut(event, Cmd.about-librepcb) {
                 Data.panel-page = PanelPage.about;
             } else if Helpers.is-shortcut(event, Cmd.website) {
@@ -78,7 +86,7 @@ export component AppWindow inherits Window {
                 Backend.open-url(Constants.donate-url);
                 return accept;  // https://github.com/slint-ui/slint/issues/7864
             } else if Helpers.is-shortcut(event, Cmd.keyboard-shortcuts-reference) {
-                Backend.trigger(Action.keyboard-shortcuts-reference);
+                Backend.trigger(Action.keyboard-shortcuts-reference, -1);
             } else {
                 return reject;
             }
@@ -92,6 +100,7 @@ export component AppWindow inherits Window {
             z: 100; // For the tooltips.
             width: 100%;
             height: 26px;
+            sections-start-x: sidebar.width + panel-width;
         }
 
         sidebar := SideBar {
@@ -106,6 +115,38 @@ export component AppWindow inherits Window {
             x: sidebar.width;
             y: sidebar.y;
             z: 80; // For the tooltips
+            width: panel-width;
+            height: sidebar.height;
+        }
+
+        if Data.panel-page == PanelPage.libraries: LibrariesPanel {
+            x: sidebar.width;
+            y: sidebar.y;
+            z: 90; // For the tooltips.
+            width: panel-width;
+            height: sidebar.height;
+        }
+
+        if Data.panel-page == PanelPage.project: ProjectPanel {
+            x: sidebar.width;
+            y: sidebar.y;
+            z: 90; // For the tooltips.
+            width: panel-width;
+            height: sidebar.height;
+        }
+
+        if Data.panel-page == PanelPage.rule-check: RuleCheckPanel {
+            x: sidebar.width;
+            y: sidebar.y;
+            z: 90; // For the tooltips.
+            width: panel-width;
+            height: sidebar.height;
+        }
+
+        if Data.panel-page == PanelPage.order: OrderPanel {
+            x: sidebar.width;
+            y: sidebar.y;
+            z: 90; // For the tooltips.
             width: panel-width;
             height: sidebar.height;
         }
@@ -129,8 +170,17 @@ export component AppWindow inherits Window {
                 width: 1px;
             }
 
-            home-tab := HomeTab {
-                width: parent.width - 1px;
+            for section[i] in Data.sections: HorizontalLayout {
+                window-section := WindowSection {
+                    section-index: i;
+                    section: section;
+                }
+
+                if i < (Data.sections.length - 1): Rectangle {
+                    width: 1px;
+                    horizontal-stretch: 0;
+                    background: #555555;
+                }
             }
         }
 

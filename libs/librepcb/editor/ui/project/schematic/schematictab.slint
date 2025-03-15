@@ -1,0 +1,295 @@
+import { ComboBox, CheckBox, Palette } from "std-widgets.slint";
+import { WindowSectionData, SchematicTabData, EditorTool } from "../../api/types.slint";
+import { SceneButton } from "../../widgets.slint";
+import { ToolButton } from "../../widgets.slint";
+import { LengthEdit } from "../../widgets.slint";
+import { DrawWireToolBar } from "./drawwiretoolbar.slint";
+import { DrawPolygonToolBar } from "./drawpolygontoolbar.slint";
+import { AddTextToolBar } from "./addtexttoolbar.slint";
+import { AddComponentToolBar } from "./addcomponenttoolbar.slint";
+import { Backend } from "../../api/backend.slint";
+import { Data } from "../../api/data.slint";
+import { Action } from "../../api/types.slint";
+
+export component SchematicTab inherits Image {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    property <[SchematicTabData]> tabs: section.schematic-tabs;
+
+    image-fit: ImageFit.preserve;
+    image-rendering: ImageRendering.pixelated;
+    source: Backend.render-scene(section-index, root.width, root.height, tabs[section.current-tab-index].frame);
+
+    init => {
+        section.schematic-tabs[section.current-tab-index].scene-image-pos = self.absolute-position;
+    }
+
+    changed absolute-position => {
+        section.schematic-tabs[section.current-tab-index].scene-image-pos = self.absolute-position;
+    }
+
+    if Data.preview-mode: Rectangle {
+        background: white;
+    }
+
+    // Show overlay, if text is not empty.
+    if !tabs[section.current-tab-index].tool-overlay-text.is-empty: Rectangle {
+        x: 2 * vl-toolbuttons.x + vl-toolbuttons.width;
+        y: vl-toolbuttons.y;
+        width: t-overlay.preferred-width + 2 * t-overlay.x;
+        height: t-overlay.preferred-height + 2 * t-overlay.y;
+        background: tabs[section.current-tab-index].overlay-color;
+        border-radius: 10px;
+        border-width: 1px;
+        border-color: tabs[section.current-tab-index].overlay-text-color;
+
+        t-overlay := Text {
+            x: 8px;
+            y: 8px;
+            horizontal-alignment: left;
+            vertical-alignment: top;
+            font-family: "Noto Sans Mono";
+            color: tabs[section.current-tab-index].overlay-text-color;
+            text: tabs[section.current-tab-index].tool-overlay-text;
+        }
+    }
+
+    fs := FocusScope {
+        changed has-focus => {
+            if !self.has-focus {
+                Backend.trigger(Action.focus-lost, section-index);
+            }
+        }
+
+        key-pressed(event) => {
+            Backend.scene-key-pressed(section-index, event)
+        }
+
+        key-released(event) => {
+            Backend.scene-key-released(section-index, event)
+        }
+    }
+
+    ta := TouchArea {
+        mouse-cursor: tabs[section.current-tab-index].tool-cursor;
+
+        Rectangle {
+            y: 0;
+            width: self.preferred-width;
+            height: self.preferred-height;
+            background: #505050;
+            border-bottom-left-radius: self.height / 2;
+            border-bottom-right-radius: self.height / 2;
+            visible: self.width > 30px;
+
+            HorizontalLayout {
+                alignment: center;
+                padding-left: 15px;
+                padding-right: 15px;
+                padding-top: 2px;
+                padding-bottom: 5px;
+
+                DrawWireToolBar {
+                    section-index: section-index;
+                    section: section;
+                    visible: tabs[section.current-tab-index].tool == EditorTool.wire;
+                    width: self.visible ? self.preferred-width : 0;
+                }
+
+                DrawPolygonToolBar {
+                    section-index: section-index;
+                    section: section;
+                    visible: tabs[section.current-tab-index].tool == EditorTool.polygon;
+                    width: self.visible ? self.preferred-width : 0;
+                }
+
+                AddTextToolBar {
+                    section-index: section-index;
+                    section: section;
+                    visible: tabs[section.current-tab-index].tool == EditorTool.text;
+                    width: self.visible ? self.preferred-width : 0;
+                }
+
+                AddComponentToolBar {
+                    section-index: section-index;
+                    section: section;
+                    visible: tabs[section.current-tab-index].tool == EditorTool.component;
+                    width: self.visible ? self.preferred-width : 0;
+                }
+            }
+        }
+
+        vl-toolbuttons := VerticalLayout {
+            x: 7px;
+            y: 7px;
+            width: self.preferred-width;
+            spacing: 5px;
+
+            ToolButton {
+                image: @image-url("../../../../../font-awesome/svgs/solid/arrow-pointer.svg");
+                tooltip: @tr("Select");
+                status-tip: @tr("Select & modify existing objects");
+                checked: tabs[section.current-tab-index].tool == EditorTool.select;
+
+                clicked => {
+                    if Data.preview-mode {
+                        tabs[section.current-tab-index].tool = EditorTool.select;
+                    } else {
+                        Backend.trigger(Action.tool-select, section-index);
+                    }
+                }
+            }
+
+            ToolButton {
+                image: @image-url("../../../../../../img/actions/draw_wire.png");
+                tooltip: @tr("Draw Wires");
+                status-tip: @tr("Draw wires to create electrical connections between symbol pins");
+                checked: tabs[section.current-tab-index].tool == EditorTool.wire;
+
+                clicked => {
+                    if Data.preview-mode {
+                        tabs[section.current-tab-index].tool = EditorTool.wire;
+                    } else {
+                        Backend.trigger(Action.tool-wire, section-index);
+                    }
+                }
+            }
+
+            ToolButton {
+                image: @image-url("../../../../../font-awesome/svgs/solid/tag.svg");
+                tooltip: @tr("Add Net Labels");
+                status-tip: @tr("Add net labels to explicitly specify the net of wires");
+                checked: tabs[section.current-tab-index].tool == EditorTool.netlabel;
+
+                clicked => {
+                    if Data.preview-mode {
+                        tabs[section.current-tab-index].tool = EditorTool.netlabel;
+                    } else {
+                        Backend.trigger(Action.tool-netlabel, section-index);
+                    }
+                }
+            }
+
+            ToolButton {
+                image: @image-url("../../../../../font-awesome/svgs/solid/draw-polygon.svg");
+                tooltip: @tr("Draw Polygons");
+                status-tip: @tr("Draw graphical (i.e. non-functional) polygons");
+                checked: tabs[section.current-tab-index].tool == EditorTool.polygon;
+
+                clicked => {
+                    if Data.preview-mode {
+                        tabs[section.current-tab-index].tool = EditorTool.polygon;
+                    } else {
+                        Backend.trigger(Action.tool-polygon, section-index);
+                    }
+                }
+            }
+
+            ToolButton {
+                image: @image-url("../../../../../font-awesome/svgs/solid/font.svg");
+                tooltip: @tr("Add Text Labels");
+                status-tip: @tr("Add graphical (i.e. non-functional) text labels");
+                checked: tabs[section.current-tab-index].tool == EditorTool.text;
+
+                clicked => {
+                    if Data.preview-mode {
+                        tabs[section.current-tab-index].tool = EditorTool.text;
+                    } else {
+                        Backend.trigger(Action.tool-text, section-index);
+                    }
+                }
+            }
+
+            ToolButton {
+                image: @image-url("../../../../../font-awesome/svgs/solid/microchip.svg");
+                tooltip: @tr("Place Components");
+                status-tip: @tr("Add components from the workspace libraries");
+                checked: tabs[section.current-tab-index].tool == EditorTool.component;
+
+                clicked => {
+                    if Data.preview-mode {
+                        tabs[section.current-tab-index].tool = EditorTool.component;
+                    } else {
+                        Backend.trigger(Action.tool-component, section-index);
+                    }
+                }
+            }
+
+            ToolButton {
+                image: @image-url("../../../../../font-awesome/svgs/solid/ruler.svg");
+                tooltip: @tr("Measure");
+                status-tip: @tr("Measure the distance between two points");
+                checked: tabs[section.current-tab-index].tool == EditorTool.measure;
+
+                clicked => {
+                    if Data.preview-mode {
+                        tabs[section.current-tab-index].tool = EditorTool.measure;
+                    } else {
+                        Backend.trigger(Action.tool-measure, section-index);
+                    }
+                }
+            }
+        }
+
+        VerticalLayout {
+            x: parent.width - self.preferred-width - 7px;
+            y: 7px;
+            width: self.preferred-width;
+            spacing: 5px;
+
+            SceneButton {
+                image: @image-url("../../../../../font-awesome/svgs/solid/expand.svg");
+                bg-color: tabs[section.current-tab-index].overlay-color;
+                fg-color: tabs[section.current-tab-index].overlay-text-color;
+                clicked => {
+                    Backend.scene-zoom-fit-clicked(section-index, root.width, root.height);
+                }
+            }
+
+            SceneButton {
+                image: @image-url("../../../../../bootstrap-icons/icons/zoom-in.svg");
+                bg-color: tabs[section.current-tab-index].overlay-color;
+                fg-color: tabs[section.current-tab-index].overlay-text-color;
+                clicked => {
+                    Backend.scene-zoom-in-clicked(section-index, root.width, root.height);
+                }
+            }
+
+            SceneButton {
+                image: @image-url("../../../../../bootstrap-icons/icons/zoom-out.svg");
+                bg-color: tabs[section.current-tab-index].overlay-color;
+                fg-color: tabs[section.current-tab-index].overlay-text-color;
+                clicked => {
+                    Backend.scene-zoom-out-clicked(section-index, root.width, root.height);
+                }
+            }
+
+            SceneButton {
+                text: "pins";
+                font-size: 10px;
+                bg-color: tabs[section.current-tab-index].overlay-color;
+                fg-color: tabs[section.current-tab-index].overlay-text-color;
+                checkable: true;
+                checked: tabs[section.current-tab-index].show-pin-numbers;
+
+                changed checked => {
+                    tabs[section.current-tab-index].show-pin-numbers = self.checked;
+                }
+            }
+        }
+
+        pointer-event(e) => {
+            if (e.kind == PointerEventKind.down) {
+                Data.section-clicked(section-index);
+                if (!fs.has-focus) {
+                    fs.focus();
+                }
+            }
+            return Backend.scene-pointer-event(section-index, self.mouse-x, self.mouse-y, self.absolute-position, e);
+        }
+
+        scroll-event(e) => {
+            return Backend.scene-scrolled(section-index, self.mouse-x, self.mouse-y, e);
+        }
+    }
+}

@@ -25,6 +25,16 @@
  ******************************************************************************/
 #include "appwindow.h"
 
+#include <librepcb/core/rulecheck/rulecheckmessage.h>
+#include <librepcb/core/types/elementname.h>
+#include <librepcb/core/types/fileproofname.h>
+#include <librepcb/core/types/length.h>
+#include <librepcb/core/types/lengthunit.h>
+#include <librepcb/core/types/version.h>
+#include <librepcb/core/workspace/theme.h>
+
+#include <optional>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -40,7 +50,131 @@ class EditorCommand;
  *  Non-Member Functions
  ******************************************************************************/
 
+static_assert(sizeof(ui::Int64) == 8);
+static_assert(sizeof(LengthBase_t) == 8);
+
+inline qint64 s2l(const ui::Int64& v) noexcept {
+  return (static_cast<int64_t>(v.msb) << 32) | static_cast<uint32_t>(v.lsb);
+}
+
+inline Length s2length(const ui::Int64& v) noexcept {
+  return Length(s2l(v));
+}
+
+inline std::optional<UnsignedLength> s2ulength(const ui::Int64& v) noexcept {
+  const Length l = s2length(v);
+  return (l >= 0) ? std::make_optional(UnsignedLength(l)) : std::nullopt;
+}
+
+inline std::optional<PositiveLength> s2plength(const ui::Int64& v) noexcept {
+  const Length l = s2length(v);
+  return (l > 0) ? std::make_optional(PositiveLength(l)) : std::nullopt;
+}
+
+inline ui::Int64 l2s(const Length& v) noexcept {
+  return ui::Int64{
+      static_cast<int>((v.toNm() >> 32) & 0xFFFFFFFF),
+      static_cast<int>(v.toNm() & 0xFFFFFFFF),
+  };
+}
+
+inline Theme::GridStyle s2l(ui::GridStyle v) noexcept {
+  if (v == ui::GridStyle::Lines) {
+    return Theme::GridStyle::Lines;
+  } else if (v == ui::GridStyle::Dots) {
+    return Theme::GridStyle::Dots;
+  } else {
+    return Theme::GridStyle::None;
+  }
+}
+
+inline ui::GridStyle l2s(Theme::GridStyle v) noexcept {
+  if (v == Theme::GridStyle::Lines) {
+    return ui::GridStyle::Lines;
+  } else if (v == Theme::GridStyle::Dots) {
+    return ui::GridStyle::Dots;
+  } else {
+    return ui::GridStyle::None;
+  }
+}
+
+inline LengthUnit s2l(ui::LengthUnit v) noexcept {
+  if (v == ui::LengthUnit::Millimeters) {
+    return LengthUnit::millimeters();
+  } else if (v == ui::LengthUnit::Micrometers) {
+    return LengthUnit::micrometers();
+  } else if (v == ui::LengthUnit::Nanometers) {
+    return LengthUnit::nanometers();
+  } else if (v == ui::LengthUnit::Inches) {
+    return LengthUnit::inches();
+  } else if (v == ui::LengthUnit::Mils) {
+    return LengthUnit::mils();
+  } else {
+    qCritical() << "Unhandled value in LengthUnit conversion.";
+    return LengthUnit::millimeters();
+  }
+}
+
+inline ui::LengthUnit l2s(const LengthUnit& v) noexcept {
+  if (v == LengthUnit::millimeters()) {
+    return ui::LengthUnit::Millimeters;
+  } else if (v == LengthUnit::micrometers()) {
+    return ui::LengthUnit::Micrometers;
+  } else if (v == LengthUnit::nanometers()) {
+    return ui::LengthUnit::Nanometers;
+  } else if (v == LengthUnit::inches()) {
+    return ui::LengthUnit::Inches;
+  } else if (v == LengthUnit::mils()) {
+    return ui::LengthUnit::Mils;
+  } else {
+    qCritical() << "Unhandled value in LengthUnit conversion.";
+    return ui::LengthUnit::Millimeters;
+  }
+}
+
+inline ui::NotificationType l2s(RuleCheckMessage::Severity v) noexcept {
+  if (v == RuleCheckMessage::Severity::Hint) {
+    return ui::NotificationType::Info;
+  } else if (v == RuleCheckMessage::Severity::Warning) {
+    return ui::NotificationType::Warning;
+  } else if (v == RuleCheckMessage::Severity::Error) {
+    return ui::NotificationType::Critical;
+  } else {
+    qCritical() << "Unhandled value in RuleCheckMessage::Severity conversion.";
+    return ui::NotificationType::Critical;
+  }
+}
+
 ui::EditorCommand l2s(const EditorCommand& cmd, ui::EditorCommand in) noexcept;
+
+template <typename TTarget, typename TSlint, typename TClass, typename TQt>
+static void bind(
+    QObject* context, const TTarget& target,
+    void (TTarget::*setter)(const TSlint&) const, TClass* source,
+    void (TClass::*signal)(TQt), const TQt& defaultValue,
+    std::function<TSlint(const TQt&)> convert = [](const TQt& value) {
+      return q2s(value);
+    }) noexcept {
+  QObject::connect(source, signal, context,
+                   [&target, setter, convert](const TQt& value) {
+                     (target.*setter)(convert(value));
+                   });
+  (target.*setter)(convert(defaultValue));
+}
+
+std::optional<ElementName> validateElementName(
+    const QString& input, slint::SharedString& error) noexcept;
+
+std::optional<Version> validateVersion(const QString& input,
+                                       slint::SharedString& error) noexcept;
+
+std::optional<FileProofName> validateFileProofName(
+    const QString& input, slint::SharedString& error,
+    const QString& requiredSuffix = QString()) noexcept;
+
+std::optional<QUrl> validateUrl(const QString& input,
+                                slint::SharedString& error,
+                                bool allowEmpty = false) noexcept;
 
 /*******************************************************************************
  *  End of File

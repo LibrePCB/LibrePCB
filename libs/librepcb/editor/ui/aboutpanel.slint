@@ -130,7 +130,7 @@ export component AboutPanel inherits Rectangle {
                     icon: @image-url("../../../font-awesome/svgs/solid/keyboard.svg");
 
                     clicked => {
-                        Backend.trigger(Action.keyboard-shortcuts-reference);
+                        Backend.trigger(Action.keyboard-shortcuts-reference, -1);
                     }
                 }
 
