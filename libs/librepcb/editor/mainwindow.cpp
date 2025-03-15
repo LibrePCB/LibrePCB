@@ -22,7 +22,6 @@
  ******************************************************************************/
 #include "mainwindow.h"
 
-#include "dialogs/aboutdialog.h"
 #include "editorcommandset.h"
 #include "editorcommandsetupdater.h"
 #include "guiapplication.h"
@@ -147,7 +146,8 @@ MainWindow::MainWindow(GuiApplication& app,
   bind(cmd.windowNew, ui::Action::WindowNew);
   bind(cmd.windowClose, ui::Action::WindowClose);
   bind(cmd.applicationQuit, ui::Action::Quit);
-  bind(cmd.aboutLibrePcb, ui::Action::AboutDialog);
+  mWidget->addAction(cmd.aboutLibrePcb.createAction(
+      mWidget, this, [this]() { showPanelPage(ui::PanelPage::About); }));
   bind(cmd.website, ui::Action::Website);
   bind(cmd.documentationOnline, ui::Action::UserManual);
   bind(cmd.support, ui::Action::Support);
@@ -215,11 +215,6 @@ bool MainWindow::trigger(ui::Action a) noexcept {
 
   switch (a) {
     // General
-    case ui::Action::AboutDialog: {
-      AboutDialog dlg(mApp.getWorkspace().getSettings(), mWidget);
-      dlg.exec();
-      return true;
-    }
     case ui::Action::LibraryManager: {
       mApp.openLibraryManager();
       return true;

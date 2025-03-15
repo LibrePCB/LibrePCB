@@ -8,6 +8,7 @@ import { EditorCommandSet } from "./api/editorcommandset.slint";
 import { MainMenuBar } from "./mainmenubar.slint";
 import { SideBar } from "./sidebar.slint";
 import { HomePanel } from "./homepanel.slint";
+import { AboutPanel } from "./aboutpanel.slint";
 import { HomeTab } from "./hometab.slint";
 import { StatusBar } from "./statusbar.slint";
 
@@ -43,6 +44,14 @@ export component AppWindow inherits Window {
         x: sidebar.width;
         y: sidebar.y;
         z: 80; // For the tooltips
+        width: panel-width;
+        height: sidebar.height;
+    }
+
+    if Data.panel-page == PanelPage.about: AboutPanel {
+        x: sidebar.width;
+        y: sidebar.y;
+        z: 90; // For the tooltips.
         width: panel-width;
         height: sidebar.height;
     }

@@ -359,6 +359,12 @@ ProjectEditor* GuiApplication::openProject(FilePath filepath,
           win->makeCurrentWindow();
         }
       });
+      connect(editor, &ProjectEditor::aboutLibrePcbRequested, this, [this]() {
+        if (auto win = mWindows.value(0)) {
+          win->showPanelPage(ui::PanelPage::About);
+          win->makeCurrentWindow();
+        }
+      });
       connect(editor, &ProjectEditor::openProjectLibraryUpdaterClicked, this,
               &GuiApplication::openProjectLibraryUpdater);
       mOpenProjectEditors.insert(filepath.toUnique().toStr(), editor);
@@ -395,6 +401,10 @@ void GuiApplication::createNewWindow(int id) noexcept {
 
   // Register global callbacks.
   const ui::Backend& b = win->global<ui::Backend>();
+  b.on_copy_to_clipboard([](const slint::SharedString& s) {
+    QApplication::clipboard()->setText(s2q(s));
+    return true;
+  });
   b.on_to_upper([](const slint::SharedString& s) { return s.to_uppercase(); });
 
   // Reuse next free window ID.
@@ -571,6 +581,12 @@ void GuiApplication::openLibraryEditor(const FilePath& libDir) noexcept {
     try {
       bool remote = libDir.isLocatedInDir(mWorkspace.getRemoteLibrariesPath());
       editor = new LibraryEditor(mWorkspace, libDir, remote);
+      connect(editor, &LibraryEditor::aboutLibrePcbRequested, this, [this]() {
+        if (auto win = mWindows.value(0)) {
+          win->showPanelPage(ui::PanelPage::About);
+          win->makeCurrentWindow();
+        }
+      });
       connect(editor, &LibraryEditor::destroyed, this,
               &GuiApplication::libraryEditorDestroyed);
       mOpenLibraryEditors.insert(libDir, editor);
