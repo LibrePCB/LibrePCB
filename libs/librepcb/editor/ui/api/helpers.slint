@@ -1,7 +1,8 @@
 import {
     Action,
     EditorCommand,
-    NotificationType
+    NotificationType,
+    LengthUnit
 } from "types.slint";
 import { Backend } from "backend.slint";
 
@@ -41,6 +42,40 @@ export global Helpers {
         } else {
             debug("Unhandled case in get-color-for-notification-type().");
             return white;
+        }
+    }
+
+    pure public function get-unit-short-str(u: LengthUnit) -> string {
+        if (u == LengthUnit.millimeters) {
+            return "mm";
+        } else if (u == LengthUnit.micrometers) {
+            return "μm";
+        } else if (u == LengthUnit.nanometers) {
+            return "nm";
+        } else if (u == LengthUnit.inches) {
+            return "inch";
+        } else if (u == LengthUnit.mils) {
+            return "mils";
+        } else {
+            debug("Unhandled case in get-unit-short-str().");
+            return "";
+        }
+    }
+
+    pure public function get-unit-accessibility-label(u: LengthUnit) -> string {
+        if (u == LengthUnit.millimeters) {
+            return "millimeters";
+        } else if (u == LengthUnit.micrometers) {
+            return "micrometers";
+        } else if (u == LengthUnit.nanometers) {
+            return "nanometers";
+        } else if (u == LengthUnit.inches) {
+            return "inches";
+        } else if (u == LengthUnit.mils) {
+            return "mils";
+        } else {
+            debug("Unhandled case in get-unit-accessibility-label().");
+            return "";
         }
     }
 }

@@ -65,6 +65,7 @@ public slots:
 
 signals:
   void actionTriggered(ui::Action a);
+  void panelPageTriggered(ui::PanelPage p);
 
 private:
   GuiApplication& mApp;

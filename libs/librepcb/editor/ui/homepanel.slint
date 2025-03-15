@@ -189,45 +189,40 @@ export component HomePanel inherits Rectangle {
     background: #2a2a2a;
 
     VerticalLayout {
-        if Data.quick-access-items.length > 0: VerticalLayout {
+        if Data.quick-access-items.length > 0: PanelHeader {
+            title: Backend.to-upper(@tr("Quick Access"));
+            z: 100; // For the tooltips.
+
+            new-project-btn := PanelHeaderButton {
+                icon: @image-url("../../../font-awesome/svgs/solid/file-circle-plus.svg");
+                icon-scale: 0.6;
+                tooltip: Cmd.project-new.text;
+                status-tip: Cmd.project-new.status-tip;
+
+                clicked => {
+                    Backend.trigger(Action.project-new, -1);
+                }
+            }
+
+            open-project-btn := PanelHeaderButton {
+                icon: @image-url("../../../font-awesome/svgs/solid/folder-open.svg");
+                icon-scale: 0.6;
+                tooltip: Cmd.project-open.text;
+                status-tip: Cmd.project-open.status-tip;
+
+                clicked => {
+                    Backend.trigger(Action.project-open, -1);
+                }
+            }
+        }
+
+        if Data.quick-access-items.length > 0: quick-access-view := QuickAccessListView {
             vertical-stretch: 0;
+            max-height: parent.height / 3;
+        }
 
-            PanelHeader {
-                title: Backend.to-upper(@tr("Quick Access"));
-                highlight: quick-access-view.has-focus;
-                z: 100; // For the tooltips.
-
-                new-project-btn := PanelHeaderButton {
-                    icon: @image-url("../../../font-awesome/svgs/solid/file-circle-plus.svg");
-                    icon-scale: 0.6;
-                    tooltip: Cmd.project-new.text;
-                    status-tip: Cmd.project-new.status-tip;
-
-                    clicked => {
-                        Backend.trigger(Action.project-new);
-                    }
-                }
-
-                open-project-btn := PanelHeaderButton {
-                    icon: @image-url("../../../font-awesome/svgs/solid/folder-open.svg");
-                    icon-scale: 0.6;
-                    tooltip: Cmd.project-open.text;
-                    status-tip: Cmd.project-open.status-tip;
-
-                    clicked => {
-                        Backend.trigger(Action.project-open);
-                    }
-                }
-            }
-
-            quick-access-view := QuickAccessListView {
-                vertical-stretch: 0;
-                max-height: root.height / 3;
-            }
-
-            Rectangle {
-                height: 15px;
-            }
+        if Data.quick-access-items.length > 0: Rectangle {
+            height: 15px;
         }
 
         PanelHeader {

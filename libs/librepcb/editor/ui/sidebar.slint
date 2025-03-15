@@ -5,7 +5,9 @@ import {
     Constants,
     Data,
     EditorCommandSet as Cmd,
-    PanelPage
+    PanelPage,
+    ProjectData,
+    RuleCheckState
 } from "api.slint";
 
 enum Emblem {
@@ -126,6 +128,8 @@ component SideBarButton inherits Rectangle {
 }
 
 export component SideBar inherits Rectangle {
+    property <ProjectData> project: Data.projects[Data.current-project-index];
+
     background: #353535;
 
     VerticalLayout {
@@ -143,12 +147,114 @@ export component SideBar inherits Rectangle {
 
         library-manager-btn := SideBarButton {
             icon: @image-url("../../../bootstrap-icons/icons/database.svg");
-            tooltip: Cmd.library-manager.text;
+            tooltip: @tr("Libraries");
             shortcut: Cmd.library-manager.shortcut;
-            checked: false;
+            checked: Data.panel-page == PanelPage.libraries;
+
+            states [
+                running when Data.refreshing-available-libraries: {
+                    emblem: Emblem.running;
+                }
+                error when !Data.libraries-fetching-error.is-empty: {
+                    emblem: Emblem.warning;
+                }
+                updates-available when Data.outdated-libraries > 0: {
+                    emblem: Emblem.none;
+                    status: Data.outdated-libraries;
+                    status-color: black;
+                    status-background: #d4d400;
+                }
+                up-to-date when Data.outdated-libraries == 0: {
+                    emblem: Emblem.none;
+                    status: "";
+                }
+            ]
 
             clicked => {
-                Backend.trigger(Action.library-manager);
+                Data.panel-page = PanelPage.libraries;
+            }
+        }
+
+        SideBarButton {
+            icon: @image-url("../../../bootstrap-icons/icons/files.svg");
+            tooltip: @tr("Open Documents");
+            enabled: Data.projects.length > 0;
+            checked: Data.panel-page == PanelPage.project;
+
+            clicked => {
+                Data.panel-page = PanelPage.project;
+            }
+
+            changed enabled => {
+                if (self.checked && (!self.enabled)) {
+                    Data.panel-page = PanelPage.home;
+                }
+            }
+        }
+
+        SideBarButton {
+            property <RuleCheckState> state: Data.current-tab.rule-check-state;
+            property <int> messages: Data.current-tab.rule-check-unapproved-messages;
+            property <string> error: Data.current-tab.rule-check-execution-error;
+            property <string> title: Data.get-rule-check-title-for-tab-type(Data.current-tab.type);
+
+            icon: @image-url("../../../bootstrap-icons/icons/list-check.svg");
+            tooltip: title;
+            enabled: state != RuleCheckState.not-available;
+            checked: Data.panel-page == PanelPage.rule-check;
+
+            states [
+                running when state == RuleCheckState.running: {
+                    emblem: Emblem.running;
+                }
+                failed when !error.is-empty: {
+                    emblem: Emblem.warning;
+                }
+                not-available when state == RuleCheckState.not-available: {
+                    emblem: Emblem.none;
+                    status: "";
+                }
+                not-run-yet when state == RuleCheckState.not-run-yet: {
+                    emblem: Emblem.none;
+                    status: "";
+                }
+                outdated when state == RuleCheckState.outdated: {
+                    emblem: Emblem.none;
+                    status: (messages == 0) ? "ok" : messages;
+                    status-color: black;
+                    status-background: #d4d4d4;
+                }
+                up-to-date when state == RuleCheckState.up-to-date: {
+                    emblem: Emblem.none;
+                    status: (messages == 0) ? "ok" : messages;
+                    status-color: (messages == 0) ? black : white;
+                    status-background: (messages == 0) ? #00ff00 : #ff0000;
+                }
+            ]
+
+            clicked => {
+                Data.panel-page = PanelPage.rule-check;
+            }
+        }
+
+        SideBarButton {
+            icon: @image-url("../../../bootstrap-icons/icons/lightning.svg");
+            tooltip: @tr("Output Jobs");
+            enabled: project.valid;
+
+            clicked => {
+                Backend.trigger(Action.project-open-output-jobs, Data.current-project-index);
+            }
+        }
+
+        SideBarButton {
+            icon: @image-url("../../../bootstrap-icons/icons/cart3.svg");
+            tooltip: @tr("Order PCB");
+            enabled: project.valid;
+            checked: Data.panel-page == PanelPage.order;
+
+            clicked => {
+                Data.panel-page = PanelPage.order;
             }
         }
 
@@ -163,7 +269,7 @@ export component SideBar inherits Rectangle {
             checked: false;
 
             clicked => {
-                Backend.trigger(Action.workspace-settings);
+                Backend.trigger(Action.workspace-settings, -1);
             }
         }
 

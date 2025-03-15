@@ -39,13 +39,13 @@ class Symbol;
 namespace editor {
 
 class GraphicsScene;
-class GraphicsSceneKeyEvent;
-class GraphicsSceneMouseEvent;
 class GraphicsView;
 class SymbolEditorState;
 class SymbolEditorWidget;
 class SymbolGraphicsItem;
 class UndoStack;
+struct GraphicsSceneKeyEvent;
+struct GraphicsSceneMouseEvent;
 
 /*******************************************************************************
  *  Class SymbolEditorFsm

@@ -59,6 +59,70 @@ ui::EditorCommand l2s(const EditorCommand& cmd, ui::EditorCommand in) noexcept {
   return in;
 }
 
+static slint::SharedString getError(const QString& input) {
+  if (input.trimmed().isEmpty()) {
+    return q2s(QCoreApplication::translate("AppToolbox", "Required"));
+  } else {
+    return q2s(QCoreApplication::translate("AppToolbox", "Invalid"));
+  }
+}
+
+std::optional<ElementName> validateElementName(
+    const QString& input, slint::SharedString& error) noexcept {
+  const std::optional<ElementName> ret =
+      parseElementName(cleanElementName(input));
+  if (!ret) {
+    error = getError(input);
+  } else {
+    error = slint::SharedString();
+  }
+  return ret;
+}
+
+std::optional<Version> validateVersion(const QString& input,
+                                       slint::SharedString& error) noexcept {
+  const std::optional<Version> ret = Version::tryFromString(input.trimmed());
+  if (!ret) {
+    error = getError(input);
+  } else {
+    error = slint::SharedString();
+  }
+  return ret;
+}
+
+std::optional<FileProofName> validateFileProofName(
+    const QString& input, slint::SharedString& error,
+    const QString& requiredSuffix) noexcept {
+  std::optional<FileProofName> ret =
+      parseFileProofName(cleanFileProofName(input));
+  if (!ret) {
+    error = getError(input);
+  } else if ((!requiredSuffix.isEmpty()) &&
+             (!input.trimmed().endsWith(requiredSuffix))) {
+    ret = std::nullopt;
+    error =
+        q2s(QCoreApplication::translate("FileProofName", "Suffix '%1' missing")
+                .arg(requiredSuffix));
+  } else {
+    error = slint::SharedString();
+  }
+  return ret;
+}
+
+std::optional<QUrl> validateUrl(const QString& input,
+                                slint::SharedString& error,
+                                bool allowEmpty) noexcept {
+  const QUrl url = QUrl::fromUserInput(input.trimmed());
+  const std::optional<QUrl> ret =
+      url.isValid() ? std::make_optional(url) : std::nullopt;
+  if ((!ret) && ((!input.isEmpty()) || (!allowEmpty))) {
+    error = getError(input);
+  } else {
+    error = slint::SharedString();
+  }
+  return ret;
+}
+
 /*******************************************************************************
  *  End of File
  ******************************************************************************/

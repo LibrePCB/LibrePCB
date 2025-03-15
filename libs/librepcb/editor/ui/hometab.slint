@@ -20,7 +20,20 @@ component DonateButton inherits Button {
 }
 
 export component HomeTab inherits Rectangle {
+    in property <int> section-index;
     property <bool> compact-layout: self.width < 350px;
+
+    function handle-pointer-event(e: PointerEvent) -> EventResult {
+        Data.section-clicked(section-index);
+        if (e.kind == PointerEventKind.down) {
+            if (!focus-scope.has-focus) {
+                focus-scope.focus();
+            }
+        }
+        return EventResult.reject;
+    }
+
+    focus-scope := FocusScope { }
 
     if project-preview-img.source.width == 0: Image {
         x: (parent.width - self.width) / 2;
@@ -109,7 +122,7 @@ export component HomeTab inherits Rectangle {
                     icon: @image-url("../../../font-awesome/svgs/solid/keyboard.svg");
 
                     clicked => {
-                        Backend.trigger(Action.keyboard-shortcuts-reference);
+                        Backend.trigger(Action.keyboard-shortcuts-reference, -1);
                     }
                 }
             }

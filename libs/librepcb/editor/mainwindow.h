@@ -36,9 +36,13 @@
 namespace librepcb {
 namespace editor {
 
+class CreateLibraryTabsModel;
 class GuiApplication;
+class LibraryCreator;
 class MainWindowTestAdapter;
+class ProjectEditor2;
 class ProjectReadmeRenderer;
+class WindowSectionsModel;
 
 /*******************************************************************************
  *  Class MainWindow
@@ -65,6 +69,7 @@ public:
   void makeCurrentWindow() noexcept;
   void showPanelPage(ui::PanelPage page) noexcept;
   void popUpNotifications() noexcept;
+  void closeProject(int index, std::shared_ptr<ProjectEditor2> prj) noexcept;
 
   // Operator Overloadings
   MainWindow& operator=(const MainWindow& rhs) = delete;
@@ -74,14 +79,20 @@ signals:
 
 private:
   slint::CloseRequestResponse closeRequested() noexcept;
-  void triggerAsync(ui::Action a) noexcept;
-  bool trigger(ui::Action a) noexcept;
+  void triggerAsync(ui::Action a, int sectionIndex) noexcept;
+  bool trigger(ui::Action a, int sectionIndex) noexcept;
+  void openFile(const FilePath& fp) noexcept;
+  void setCurrentProject(std::shared_ptr<ProjectEditor2> prj) noexcept;
+  std::shared_ptr<ProjectEditor2> getCurrentProjectEditor() noexcept;
+  void newProject(bool eagleImport = false,
+                  const FilePath& parentDir = FilePath()) noexcept;
 
   const int mId;
   const QString mSettingsPrefix;
   GuiApplication& mApp;
   slint::ComponentHandle<ui::AppWindow> mWindow;
   QWidget* mWidget;
+  std::shared_ptr<WindowSectionsModel> mSections;
   std::unique_ptr<ProjectReadmeRenderer> mProjectPreviewRenderer;
   std::unique_ptr<MainWindowTestAdapter> mTestAdapter;
 };
