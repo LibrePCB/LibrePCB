@@ -58,7 +58,6 @@ public:
   ~StandardEditorCommandHandler() noexcept;
 
   // Action Handlers
-  void aboutLibrePcb() const noexcept;
   void onlineDocumentation() const noexcept;
   void website() const noexcept;
   void fileManager(const FilePath& fp) const noexcept;
