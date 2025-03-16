@@ -23,6 +23,18 @@ export global Backend {
         true
     }
 
+    // Copy a string into the clipboard
+    //
+    // Parameters:
+    //  1. String to copy
+    //
+    // Return value:
+    //  True on success, false on failure
+    pure callback copy-to-clipboard(string) -> bool;
+    copy-to-clipboard(s) => {
+        Data.preview-mode  // Make it fail if callback not bound in backend.
+    }
+
     // Request generating the preview of a project (e.g. its README.md)
     //
     // Lets the backend building the preview asynchronously, and updating the

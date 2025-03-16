@@ -89,6 +89,16 @@ public:
   static bool startToolBarTabFocusCycle(QToolBar& toolBar,
                                         QWidget& returnFocusToWidget) noexcept;
 
+  /**
+   * @brief Build a copyable text with all the version numbers etc.
+   *
+   * Contains application version, dependency versions, host architecture,
+   * runtime environment etc.
+   *
+   * @return Text intended to be formatted as monospace
+   */
+  static QString buildAppVersionDetails() noexcept;
+
 private:
   /**
    * @brief Helper for #removeFormLayoutRow(QLabel&)
