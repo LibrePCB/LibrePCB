@@ -22,13 +22,17 @@
  ******************************************************************************/
 #include "application.h"
 
+#include "3d/occmodel.h"
+#include "application.h"
 #include "fileio/filepath.h"
 #include "fileio/transactionalfilesystem.h"
 #include "font/strokefontpool.h"
 #include "librepcb_build_env.h"
+#include "systeminfo.h"
 #include "types/version.h"
 
 #include <QtCore>
+#include <QtNetwork>
 
 #include <tuple>
 
@@ -70,6 +74,29 @@ const Version& Application::getFileFormatVersion() noexcept {
 
 bool Application::isFileFormatStable() noexcept {
   return LIBREPCB_FILE_FORMAT_STABLE;
+}
+
+QString Application::buildFullVersionDetails() noexcept {
+  // Always English, not translatable!
+  QStringList details;
+  const QString date = getBuildDate().toString(Qt::ISODate);
+  QString qt = QString(qVersion()) + " (built against " + QT_VERSION_STR + ")";
+  details << "LibrePCB Version: " + getVersion();
+  details << "Git Revision:     " + getGitRevision();
+  details << "Build Date:       " + date;
+  if (!getBuildAuthor().isEmpty()) {
+    details << "Build Author:     " + getBuildAuthor();
+  }
+  details << "Qt Version:       " + qt;
+  details << "CPU Architecture: " + QSysInfo::currentCpuArchitecture();
+  details << "Operating System: " + QSysInfo::prettyProductName();
+  details << "Platform Plugin:  " + qApp->platformName();
+  details << "TLS Library:      " + QSslSocket::sslLibraryVersionString();
+  details << "OCC Library:      " + OccModel::getOccVersionString();
+  if (!SystemInfo::detectRuntime().isEmpty()) {
+    details << "Runtime:          " + SystemInfo::detectRuntime();
+  }
+  return details.join("\n");
 }
 
 FilePath Application::getCacheDir() noexcept {

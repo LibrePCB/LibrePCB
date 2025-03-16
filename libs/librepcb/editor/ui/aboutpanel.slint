@@ -1,0 +1,281 @@
+import { ScrollView } from "std-widgets.slint";
+import {
+    Button,
+    IconButton,
+    PanelHeader
+} from "widgets.slint";
+import {
+    Action,
+    Backend,
+    Constants,
+    Data,
+    EditorCommandSet as Cmd
+} from "api.slint";
+
+export component AboutPanel inherits Rectangle {
+    // Adjust the offset at the end after adding/removing panel content.
+    // Attention: The preview layout differs from the compiled application.
+    property <length> available-space: self.height - details-edt.height - 140px;
+    property <bool> is-wide: self.width > 250px;
+
+    background: #2a2a2a;
+    forward-focus: website-btn;
+
+    VerticalLayout {
+        HorizontalLayout {
+            padding: 5px;
+            spacing: 10px;
+
+            Image {
+                width: 32px;
+                height: self.width;
+                source: @image-url("../../../../img/app/librepcb.svg");
+                accessible-role: none;
+            }
+
+            header-txt := Text {
+                font-size: 20px;
+                font-weight: 600;
+                vertical-alignment: center;
+                overflow: elide;
+                text: Data.window-title;
+            }
+        }
+
+        Rectangle {
+            height: 1px;
+            background: #555555;
+        }
+
+        Rectangle {
+            vertical-stretch: 0;
+            clip: true;
+
+            VerticalLayout {
+                padding: 8px;
+                spacing: 5px;
+
+                if available-space > 390px: Rectangle {
+                    height: description-txt.preferred-height + 2 * description-txt.y;
+                    background: #404040;
+                    border-width: 1px;
+                    border-color: #c0c0c0;
+                    border-radius: 8px;
+
+                    description-txt := Text {
+                        property <string> text1: @tr("LibrePCB is a free & open source community project. It is operated by {} with the support of many other contributors.", "Urban Bruhin");
+                        property <string> text2: @tr("Please consider supporting our hard work with a donation ‒ thank you.");
+
+                        x: 8px;
+                        y: self.x;
+                        width: parent.width - 2 * self.x;
+                        wrap: word-wrap;
+                        color: #e0e0e0;
+                        font-size: 11.5px;
+                        text: text1 + " " + text2;
+                    }
+                }
+
+                Rectangle {
+                    height: 5px;
+                }
+
+                website-btn := Button {
+                    width: self.preferred-width;
+                    text: Cmd.website.text;
+                    status-tip: Cmd.website.status-tip;
+                    icon: @image-url("../../../font-awesome/svgs/solid/globe.svg");
+
+                    clicked => {
+                        Backend.open-url(Constants.website-url);
+                    }
+                }
+
+                user-manual-btn := Button {
+                    width: self.preferred-width;
+                    text: Cmd.documentation-online.text;
+                    status-tip: Cmd.documentation-online.status-tip;
+                    icon: @image-url("../../../font-awesome/svgs/solid/book.svg");
+
+                    clicked => {
+                        Backend.open-url(Constants.user-manual-url);
+                    }
+                }
+
+                if available-space > 235px: support-btn := Button {
+                    width: self.preferred-width;
+                    text: Cmd.support.text;
+                    status-tip: Cmd.support.status-tip;
+                    icon: @image-url("../../../font-awesome/svgs/regular/comments.svg");
+
+                    clicked => {
+                        Backend.open-url(Constants.support-url);
+                    }
+                }
+
+                if available-space > 270px: source-code-btn := Button {
+                    width: self.preferred-width;
+                    text: @tr("View Source Code") + " (GitHub)";
+                    status-tip: @tr("Open the source code in the web browser");
+                    icon: @image-url("../../../font-awesome/svgs/brands/github.svg");
+
+                    clicked => {
+                        Backend.open-url(Constants.sources-url);
+                    }
+                }
+
+                if available-space > 200px: shortcuts-reference-btn := Button {
+                    width: self.preferred-width;
+                    text: Cmd.keyboard-shortcuts-reference.text;
+                    status-tip: Cmd.keyboard-shortcuts-reference.status-tip;
+                    icon: @image-url("../../../font-awesome/svgs/solid/keyboard.svg");
+
+                    clicked => {
+                        Backend.trigger(Action.keyboard-shortcuts-reference);
+                    }
+                }
+
+                donate-btn := Button {
+                    width: self.preferred-width;
+                    primary: true;
+                    text: Cmd.donate.text;
+                    status-tip: Cmd.donate.status-tip;
+                    icon: @image-url("../../../font-awesome/svgs/solid/heart.svg");
+
+                    clicked => {
+                        Backend.open-url(Constants.donate-url);
+                    }
+                }
+            }
+        }
+
+        Rectangle { }
+
+        PanelHeader {
+            title: @tr("Details");
+            note: @tr("(please copy this into bug reports)");
+            z: 100;  // For the tooltips.
+
+            details-copy-btn := IconButton {
+                icon: details-copy-timer.running ? @image-url("../../../font-awesome/svgs/solid/check.svg") : @image-url("../../../font-awesome/svgs/regular/copy.svg");
+                icon-scale: 0.5;
+                colorize: details-copy-timer.running ? lime : transparent;
+                tooltip: details-copy-timer.running ? @tr("Copied!") : @tr("Copy to Clipboard");
+                tooltip-delayed: false;
+
+                clicked => {
+                    if (Backend.copy-to-clipboard(Data.about-librepcb-details)) {
+                        details-copy-timer.running = true;
+                    }
+                }
+
+                details-copy-timer := Timer {
+                    interval: 1s;
+                    running: false;
+
+                    triggered => {
+                        self.running = false;
+                    }
+                }
+            }
+        }
+
+        VerticalLayout {
+            padding: 8px;
+
+            ScrollView {
+                height: (self.width < self.viewport-width) ? (details-edt.height + 10px) : details-edt.height;
+                viewport-width: details-edt.preferred-width;
+
+                details-edt := TextInput {
+                    x: 0;
+                    y: 0;
+                    height: self.preferred-height;
+                    font-family: "Noto Sans Mono";
+                    font-size: 11px;
+                    read-only: true;
+                    single-line: false;
+                    wrap: no-wrap;
+                    text: Data.about-librepcb-details;
+                }
+            }
+        }
+
+        if available-space > 450px: PanelHeader {
+            title: @tr("Credits");
+        }
+
+        if available-space > 450px: VerticalLayout {
+            padding: 8px;
+            spacing: 5px;
+
+            Text {
+                property <string> text1: @tr("LibrePCB relies on many contributors, sponsors, open-source software components and artwork.");
+                property <string> text2: @tr("Many thanks to all the people supporting LibrePCB either directly or indirectly!");
+
+                wrap: word-wrap;
+                font-italic: true;
+                font-size: 11px;
+                text: text1 + " " + text2 + " ♥";
+            }
+
+            if is-wide && (available-space > 470px): Text {
+                wrap: word-wrap;
+                font-italic: true;
+                font-size: 11px;
+                text: @tr("For the list of current sponsors, see {}.", "librepcb.org/sponsors");
+            }
+
+            if available-space > 530px: HorizontalLayout {
+                padding: 5px;
+                alignment: LayoutAlignment.space-around;
+
+                Image {
+                    y: (parent.height - self.height) / 2;
+                    width: 30%;
+                    height: self.width * self.source.height / self.source.width;
+                    source: @image-url("../../../../img/madewithslint.svg");
+                    accessible-role: none;
+                }
+
+                Image {
+                    y: (parent.height - self.height) / 2;
+                    width: 50%;
+                    height: self.width * self.source.height / self.source.width;
+                    source: @image-url("../../../../img/ngi0-commons.svg");
+                    accessible-role: none;
+                }
+            }
+
+            if is-wide && (available-space > 660px): Text {
+                wrap: word-wrap;
+                font-italic: true;
+                font-size: 11px;
+                text: "This project is funded through the NGI0 Commons Fund, a fund established by NLnet with financial support from the European Commission’s Next Generation Internet programme, under the aegis of DG Communications Networks, Content and Technology under grant agreement No 101135429.";
+            }
+
+            if is-wide && (available-space > 570px): Text {
+                wrap: word-wrap;
+                font-italic: true;
+                font-size: 11px;
+                text: "Some of the icons used in LibrePCB are provided by icons8.com, thank you!";
+            }
+        }
+
+        PanelHeader {
+            title: @tr("License");
+        }
+
+        VerticalLayout {
+            padding: 8px;
+            spacing: 3px;
+
+            Text {
+                wrap: word-wrap;
+                font-italic: true;
+                font-size: 11px;
+                text: @tr("This is free software, released under the GNU General Public License (GPL) version 3 or later. You can find the full license text in our source code.");
+            }
+        }
+    }
+}

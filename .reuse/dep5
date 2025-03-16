@@ -125,9 +125,13 @@ Files: img/actions/generate_ibom.png
 Copyright: InteractiveHtmlBom
 License: MIT
 
-Files: img/logo/ngi0.png
+Files: img/ngi0-commons.svg
 Copyright: Next Generation Internet
 License: CC-BY-SA-4.0
+
+Files: img/madewithslint.svg
+Copyright: SixtyFPS GmbH
+License: CC-BY-ND-4.0
 
 Files: img/actions/export_gerber.png
 Copyright: Ucamco

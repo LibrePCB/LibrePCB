@@ -28,9 +28,6 @@ add_library(
   cmd/cmdtextedit.h
   cmd/cmdzoneedit.cpp
   cmd/cmdzoneedit.h
-  dialogs/aboutdialog.cpp
-  dialogs/aboutdialog.h
-  dialogs/aboutdialog.ui
   dialogs/backgroundimagesetupdialog.cpp
   dialogs/backgroundimagesetupdialog.h
   dialogs/backgroundimagesetupdialog.ui

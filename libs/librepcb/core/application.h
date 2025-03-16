@@ -107,6 +107,16 @@ public:
   static bool isFileFormatStable() noexcept;
 
   /**
+   * @brief Build a copyable text with all the version numbers etc.
+   *
+   * Contains application version, dependency versions, host architecture,
+   * runtime environment etc.
+   *
+   * @return Text intended to be formatted as monospace
+   */
+  static QString buildFullVersionDetails() noexcept;
+
+  /**
    * @brief Get the path to the cache directory
    *
    * @note This function is thread-safe.

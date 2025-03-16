@@ -357,6 +357,12 @@ ProjectEditor* GuiApplication::openProject(FilePath filepath,
           win->makeCurrentWindow();
         }
       });
+      connect(editor, &ProjectEditor::aboutLibrePcbRequested, this, [this]() {
+        if (auto win = mWindows.value(0)) {
+          win->showPanelPage(ui::PanelPage::About);
+          win->makeCurrentWindow();
+        }
+      });
       connect(editor, &ProjectEditor::openProjectLibraryUpdaterClicked, this,
               &GuiApplication::openProjectLibraryUpdater);
       mOpenProjectEditors.insert(filepath.toUnique().toStr(), editor);
@@ -387,6 +393,7 @@ void GuiApplication::createNewWindow(int id) noexcept {
   d.set_preview_mode(false);
   d.set_window_title(
       QString("LibrePCB %1").arg(Application::getVersion()).toUtf8().data());
+  d.set_about_librepcb_details(q2s(Application::buildFullVersionDetails()));
   d.set_workspace_path(mWorkspace.getPath().toNative().toUtf8().data());
   d.set_notifications(mNotifications);
   d.set_quick_access_items(mQuickAccessModel);
@@ -396,6 +403,10 @@ void GuiApplication::createNewWindow(int id) noexcept {
   b.on_open_url([this](const slint::SharedString& url) {
     DesktopServices ds(mWorkspace.getSettings());
     return ds.openUrl(QUrl(s2q(url)));
+  });
+  b.on_copy_to_clipboard([](const slint::SharedString& s) {
+    QApplication::clipboard()->setText(s2q(s));
+    return true;
   });
 
   // Reuse next free window ID.
@@ -577,6 +588,12 @@ void GuiApplication::openLibraryEditor(const FilePath& libDir) noexcept {
     try {
       bool remote = libDir.isLocatedInDir(mWorkspace.getRemoteLibrariesPath());
       editor = new LibraryEditor(mWorkspace, libDir, remote);
+      connect(editor, &LibraryEditor::aboutLibrePcbRequested, this, [this]() {
+        if (auto win = mWindows.value(0)) {
+          win->showPanelPage(ui::PanelPage::About);
+          win->makeCurrentWindow();
+        }
+      });
       connect(editor, &LibraryEditor::destroyed, this,
               &GuiApplication::libraryEditorDestroyed);
       mOpenLibraryEditors.insert(libDir, editor);

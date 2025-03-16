@@ -121,6 +121,9 @@ public:
   // Operator Overloadings
   LibraryEditor& operator=(const LibraryEditor& rhs) = delete;
 
+signals:
+  void aboutLibrePcbRequested();
+
 private:  // GUI Event Handlers
   void newComponentCategoryTriggered() noexcept;
   void newPackageCategoryTriggered() noexcept;
