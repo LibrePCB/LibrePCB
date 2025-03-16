@@ -4,6 +4,7 @@ import "../../../../share/librepcb/fonts/NotoSansMono-Regular.ttf";
 import { MainMenuBar } from "mainmenubar.slint";
 import { SideBar } from "sidebar.slint";
 import { HomePanel } from "homepanel.slint";
+import { AboutPanel } from "aboutpanel.slint";
 import { HomeTab } from "hometab.slint";
 import { StatusBar } from "statusbar.slint";
 import {
@@ -63,7 +64,7 @@ export component AppWindow inherits Window {
             } else if Helpers.is-shortcut(event, Cmd.application-quit) {
                 Backend.trigger(Action.quit);
             } else if Helpers.is-shortcut(event, Cmd.about-librepcb) {
-                Backend.trigger(Action.about-dialog);
+                Data.panel-page = PanelPage.about;
             } else if Helpers.is-shortcut(event, Cmd.website) {
                 Backend.open-url(Constants.website-url);
             } else if Helpers.is-shortcut(event, Cmd.documentation-online) {
@@ -98,6 +99,14 @@ export component AppWindow inherits Window {
         }
 
         if Data.panel-page == PanelPage.home: home-panel := HomePanel {
+            x: sidebar.width;
+            y: sidebar.y;
+            z: 80; // For the tooltips.
+            width: panel-width;
+            height: sidebar.height;
+        }
+
+        if Data.panel-page == PanelPage.about: AboutPanel {
             x: sidebar.width;
             y: sidebar.y;
             z: 80; // For the tooltips.

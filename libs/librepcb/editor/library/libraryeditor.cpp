@@ -477,8 +477,7 @@ void LibraryEditor::createActions() noexcept {
   const EditorCommandSet& cmd = EditorCommandSet::instance();
 
   mActionAboutLibrePcb.reset(cmd.aboutLibrePcb.createAction(
-      this, mStandardCommandHandler.data(),
-      &StandardEditorCommandHandler::aboutLibrePcb));
+      this, this, &LibraryEditor::aboutLibrePcbRequested));
   mActionAboutQt.reset(
       cmd.aboutQt.createAction(this, qApp, &QApplication::aboutQt));
   mActionOnlineDocumentation.reset(cmd.documentationOnline.createAction(

@@ -22,7 +22,6 @@
  ******************************************************************************/
 #include "standardeditorcommandhandler.h"
 
-#include "../dialogs/aboutdialog.h"
 #include "../editorcommandset.h"
 #include "../workspace/desktopservices.h"
 #include "shortcutsreferencegenerator.h"
@@ -56,11 +55,6 @@ StandardEditorCommandHandler::~StandardEditorCommandHandler() noexcept {
 /*******************************************************************************
  *  Action Handlers
  ******************************************************************************/
-
-void StandardEditorCommandHandler::aboutLibrePcb() const noexcept {
-  AboutDialog aboutDialog(mSettings, mParent);
-  aboutDialog.exec();
-}
 
 void StandardEditorCommandHandler::onlineDocumentation() const noexcept {
   DesktopServices ds(mSettings);

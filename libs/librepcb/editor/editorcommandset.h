@@ -1648,7 +1648,7 @@ public:
       QT_TR_NOOP("About LibrePCB"),
       QT_TR_NOOP("Show information about the application"),
       ":/img/logo/48x48.png",
-      EditorCommand::Flag::OpensPopup | EditorCommand::Flag::AboutRole,
+      EditorCommand::Flag::AboutRole,
       {},
       &categoryHelp,
   };

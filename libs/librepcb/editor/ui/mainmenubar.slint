@@ -3,7 +3,9 @@ import {
     Action,
     Backend,
     Constants,
-    EditorCommandSet as Cmd
+    Data,
+    EditorCommandSet as Cmd,
+    PanelPage
 } from "api.slint";
 
 component MainMenuItem inherits Rectangle {
@@ -231,7 +233,7 @@ export component MainMenuBar inherits Rectangle {
                     icon: @image-url("../../../bootstrap-icons/icons/question-circle.svg");
 
                     clicked => {
-                        Backend.trigger(Action.about-dialog);
+                        Data.panel-page = PanelPage.about;
                     }
                 }
             }

@@ -167,12 +167,12 @@ export component SideBar inherits Rectangle {
 
         about-btn := SideBarButton {
             icon: @image-url("../../../bootstrap-icons/icons/question-circle.svg");
-            tooltip: Cmd.about-librepcb.text;
+            tooltip: @tr("Help / About");
             shortcut: Cmd.about-librepcb.shortcut;
-            checked: false;
+            checked: Data.panel-page == PanelPage.about;
 
             clicked => {
-                Backend.trigger(Action.about-dialog);
+                Data.panel-page = PanelPage.about;
             }
         }
     }
