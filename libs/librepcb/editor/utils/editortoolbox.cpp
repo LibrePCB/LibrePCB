@@ -22,7 +22,12 @@
  ******************************************************************************/
 #include "editortoolbox.h"
 
+#include <librepcb/core/3d/occmodel.h>
+#include <librepcb/core/application.h>
+#include <librepcb/core/systeminfo.h>
+
 #include <QtCore>
+#include <QtNetwork>
 #include <QtWidgets>
 
 /*******************************************************************************
@@ -79,6 +84,29 @@ bool EditorToolbox::startToolBarTabFocusCycle(
   } else {
     return false;
   }
+}
+
+QString EditorToolbox::buildAppVersionDetails() noexcept {
+  // Always English, not translatable!
+  QStringList details;
+  const QString date = Application::getBuildDate().toString(Qt::ISODate);
+  QString qt = QString(qVersion()) + " (built against " + QT_VERSION_STR + ")";
+  details << "LibrePCB Version: " + Application::getVersion();
+  details << "Git Revision:     " + Application::getGitRevision();
+  details << "Build Date:       " + date;
+  if (!Application::getBuildAuthor().isEmpty()) {
+    details << "Build Author:     " + Application::getBuildAuthor();
+  }
+  details << "Qt Version:       " + qt;
+  details << "CPU Architecture: " + QSysInfo::currentCpuArchitecture();
+  details << "Operating System: " + QSysInfo::prettyProductName();
+  details << "Platform Plugin:  " + qApp->platformName();
+  details << "TLS Library:      " + QSslSocket::sslLibraryVersionString();
+  details << "OCC Library:      " + OccModel::getOccVersionString();
+  if (!SystemInfo::detectRuntime().isEmpty()) {
+    details << "Runtime:          " + SystemInfo::detectRuntime();
+  }
+  return details.join("\n");
 }
 
 /*******************************************************************************

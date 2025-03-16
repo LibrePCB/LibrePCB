@@ -265,6 +265,7 @@ signals:
   void projectSavedToDisk();
   void showControlPanelClicked();
   void openProjectLibraryUpdaterClicked(const FilePath& fp);
+  void aboutLibrePcbRequested();
   void projectEditorClosed();
   void showTemporaryStatusBarMessage(const QString& message, int timeoutMs);
 
