@@ -42,12 +42,7 @@ namespace editor {
 
 bool DesktopIntegration::isSupported() noexcept {
 #if LIBREPCB_ENABLE_DESKTOP_INTEGRATION && defined(Q_OS_LINUX)
-  // Only enable this feature if the desktop integration is not already
-  // managed by our installer.
-  const FilePath appFp(qApp->applicationFilePath());
-  const QString mimeFp =
-      "../../registerfileextensions/mime/librepcb-from-installer.xml";
-  return !appFp.getPathTo(mimeFp).isExistingFile();
+  return true;
 #else
   return false;
 #endif

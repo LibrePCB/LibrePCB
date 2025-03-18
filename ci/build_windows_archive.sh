@@ -7,11 +7,8 @@ set -euv -o pipefail
 cp -v C:/Windows/System32/vc*140.dll ./build/install/opt/bin/
 cp -v C:/Windows/System32/msvcp140*.dll ./build/install/opt/bin/
 
-# ZLib DLL (for Qt5, it is bundled already)
-if [ "$ARCH" = "x86_64" ]
-then
-  cp -v $ZLIB_ROOT/bin/libzlib.dll ./build/install/opt/bin/
-fi
+# ZLib DLL
+cp -v $ZLIB_ROOT/bin/libzlib.dll ./build/install/opt/bin/
 
 # Copy OpenSSL DLLs (required to get HTTPS working)
 cp -v $OPENSSL_ROOT/bin/lib*.dll ./build/install/opt/bin/
