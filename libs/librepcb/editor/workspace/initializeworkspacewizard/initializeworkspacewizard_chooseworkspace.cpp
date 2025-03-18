@@ -131,9 +131,9 @@ void InitializeWorkspaceWizard_ChooseWorkspace::updateWorkspacePath() noexcept {
   }
 
   if (mContext.getWorkspaceExists()) {
-    mUi->lblStatus->setText("<font color=\"green\">✔ " % message % "</font>");
+    mUi->lblStatus->setText("<font color=\"#62de70\">✔ " % message % "</font>");
   } else if (mContext.isWorkspacePathValid()) {
-    mUi->lblStatus->setText("<font color=\"blue\">➤ " % message % "</font>");
+    mUi->lblStatus->setText("<font color=\"#63d0df\">➤ " % message % "</font>");
   } else {
     mUi->lblStatus->setText("<font color=\"red\">⚠ " % message % "</font>");
   }

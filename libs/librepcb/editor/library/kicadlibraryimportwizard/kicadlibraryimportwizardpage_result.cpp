@@ -22,7 +22,6 @@
  ******************************************************************************/
 #include "kicadlibraryimportwizardpage_result.h"
 
-#include "../../utils/editortoolbox.h"
 #include "../../workspace/desktopservices.h"
 #include "kicadlibraryimportwizardcontext.h"
 #include "ui_kicadlibraryimportwizardpage_result.h"
@@ -99,10 +98,6 @@ void KiCadLibraryImportWizardPage_Result::initializePage() {
     wiz->setOption(QWizard::NoCancelButtonOnLastPage, false);
   }
 
-  const MessageLogger::ColorTheme msgColors =
-      EditorToolbox::isWindowBackgroundDark()
-      ? MessageLogger::ColorTheme::Dark
-      : MessageLogger::ColorTheme::Light;
   auto log = std::make_shared<MessageLogger>();
   connect(&mContext->getImport(), &KiCadLibraryImport::importFinished, this,
           [log]() {
@@ -118,8 +113,8 @@ void KiCadLibraryImportWizardPage_Result::initializePage() {
                       tr("Fix remaining warnings shown in the library editor"));
           });
   connect(log.get(), &MessageLogger::msgEmitted, this,
-          [this, msgColors](const MessageLogger::Message& msg) {
-            mUi->txtMessages->append(msg.toRichText(msgColors));
+          [this](const MessageLogger::Message& msg) {
+            mUi->txtMessages->append(msg.toRichText());
             mUi->txtMessages->verticalScrollBar()->setValue(
                 mUi->txtMessages->verticalScrollBar()->maximum());
           });
