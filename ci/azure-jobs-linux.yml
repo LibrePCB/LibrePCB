@@ -9,15 +9,15 @@ jobs:
   strategy:
     matrix:
       Ubuntu_2004_Qt_6_6_GCC:
-        IMAGE: librepcb/librepcb-dev:ubuntu-20.04-qt6.6-2
+        IMAGE: librepcb/librepcb-dev:ubuntu-20.04-qt6.6-3
         DEPLOY: true
         NO_HOEDOWN: true
       Ubuntu_2204_Clang:
-        IMAGE: librepcb/librepcb-dev:ubuntu-22.04-3
+        IMAGE: librepcb/librepcb-dev:ubuntu-22.04-4
         CC: clang
         CXX: clang++
       Ubuntu_2404_Unbundled:
-        IMAGE: librepcb/librepcb-dev:ubuntu-24.04-1
+        IMAGE: librepcb/librepcb-dev:ubuntu-24.04-2
         UNBUNDLE_DXFLIB: true
         UNBUNDLE_GTEST: true
         UNBUNDLE_MUPARSER: true
