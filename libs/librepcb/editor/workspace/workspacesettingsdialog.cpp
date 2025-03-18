@@ -618,7 +618,7 @@ void WorkspaceSettingsDialog::updateDesktopIntegrationStatus() noexcept {
   switch (status) {
     case DesktopIntegration::Status::InstalledThis:
       mUi->lblDesktopIntegrationStatus->setText(
-          QString("<font color=\"green\">✔ %1</font>").arg(tr("Installed")));
+          QString("<font color=\"#62de70\">✔ %1</font>").arg(tr("Installed")));
       break;
     case DesktopIntegration::Status::InstalledOther:
       mUi->lblDesktopIntegrationStatus->setText(

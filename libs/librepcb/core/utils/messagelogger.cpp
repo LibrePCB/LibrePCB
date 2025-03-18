@@ -31,26 +31,24 @@ namespace librepcb {
  *  Class MessageLogger::Message
  ******************************************************************************/
 
-QString MessageLogger::Message::toRichText(ColorTheme theme,
+QString MessageLogger::Message::toRichText(bool colorized,
                                            bool bulletPoint) const noexcept {
-  static const QHash<QtMsgType, std::pair<QString, QString>> colorMap = {
-      {QtDebugMsg, {"blue", "gray"}},
-      {QtInfoMsg, {"darkblue", "white"}},
-      {QtWarningMsg, {"orangered", "yellow"}},
-      {QtCriticalMsg, {"red", "red"}},
+  static const QHash<QtMsgType, QString> colorMap = {
+      {QtDebugMsg, "gray"},
+      {QtInfoMsg, "white"},
+      {QtWarningMsg, "yellow"},
+      {QtCriticalMsg, "red"},
   };
 
   QString s;
-  if ((theme != ColorTheme::None) && colorMap.contains(type)) {
-    s += QString("<font color=\"%1\">")
-             .arg((theme == ColorTheme::Dark) ? colorMap[type].second
-                                              : colorMap[type].first);
+  if (colorized && colorMap.contains(type)) {
+    s += QString("<font color=\"%1\">").arg(colorMap[type]);
   }
   if (bulletPoint) {
     s += "&#x2022; ";
   }
   s += QString(message).replace("\n", "<br>");
-  if ((theme != ColorTheme::None) && colorMap.contains(type)) {
+  if (colorized && colorMap.contains(type)) {
     s += "</font>";
   }
   return s;
@@ -101,10 +99,10 @@ QStringList MessageLogger::getMessagesPlain() const noexcept {
   return l;
 }
 
-QString MessageLogger::getMessagesRichText(ColorTheme theme) const noexcept {
+QString MessageLogger::getMessagesRichText(bool colorized) const noexcept {
   QStringList l;
   foreach (const Message& msg, getMessages()) {
-    l.append(msg.toRichText(theme));
+    l.append(msg.toRichText(colorized));
   }
   return l.join("<br>");
 }
