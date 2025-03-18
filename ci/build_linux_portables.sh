@@ -30,8 +30,8 @@ patch_appimage () {
 
 # Copy OpenSSL libraries manually since these runtime dependencies cannot
 # be detected by linuxdeployqt.
-LIBSSL=(/usr/lib/libssl.so.*)
-LIBCRYPTO=(/usr/lib/libcrypto.so.*)
+LIBSSL="/opt/openssl/lib/libssl.so.3"
+LIBCRYPTO="/opt/openssl/lib/libcrypto.so.3"
 mkdir -p "./build/install/opt/lib"
 cp -fv "$LIBSSL" "./build/install/opt/lib/"
 cp -fv "$LIBCRYPTO" "./build/install/opt/lib/"
