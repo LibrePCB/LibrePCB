@@ -29,5 +29,10 @@ ninja
 ninja install
 popd
 
+# Remove unnecessary installed files
+rm -fv ./build/install/opt/bin/slint*
+rm -rfv ./build/install/opt/include
+rm -rfv ./build/install/opt/lib/cmake
+
 # Prepare artifacts directory
 mkdir -p ./artifacts/nightly_builds

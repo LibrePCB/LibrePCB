@@ -40,6 +40,14 @@ with section("parse"):
         },
       },
     },
+    # Support Slint commands
+    'slint_target_sources': {
+      'pargs': '*',
+      'kwargs': {
+        'NAMESPACE': 1,
+        'COMPILATION_UNITS': 1,
+      },
+    },
   }
 
   # Override configurations per-command where available
