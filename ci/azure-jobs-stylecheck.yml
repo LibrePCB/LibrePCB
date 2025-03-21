@@ -2,7 +2,7 @@ jobs:
 - job: Stylecheck
   pool:
     vmImage: 'ubuntu-22.04'
-  container: librepcb/librepcb-dev:devtools-4
+  container: librepcb/librepcb-dev:devtools-5
   steps:
   - bash: ./ci/print_environment.sh
     displayName: Print Environment

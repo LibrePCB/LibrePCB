@@ -8,11 +8,11 @@ export LANG="C.UTF-8"
 
 # Remove unneeded SQL plugins to fix deployment issue:
 # https://forum.qt.io/topic/151452/what-qt-specific-files-exactly-do-i-need-to-add-when-deploying
-if command -v qmake6 &> /dev/null
-then
-  rm -f $QTDIR/plugins/sqldrivers/libqsqlmimer.so
-  rm -f $QTDIR/plugins/sqldrivers/libqsqlmysql.so
-fi
+# Also this removes the OpenSSL 1.x dependency which we don't want to deploy.
+rm -f $QTDIR/plugins/sqldrivers/libqsqlmimer.so
+rm -f $QTDIR/plugins/sqldrivers/libqsqlmysql.so
+rm -f $QTDIR/plugins/sqldrivers/libqsqlodbc.so
+rm -f $QTDIR/plugins/sqldrivers/libqsqlpsql.so
 
 # Helper to extract and rebuild AppImages with appimagetool to get the static
 # runtime which doesn't need libfuse2 and thus also runs on Ubuntu 22.04, see
@@ -30,8 +30,8 @@ patch_appimage () {
 
 # Copy OpenSSL libraries manually since these runtime dependencies cannot
 # be detected by linuxdeployqt.
-LIBSSL=(/usr/lib/libssl.so.*)
-LIBCRYPTO=(/usr/lib/libcrypto.so.*)
+LIBSSL="/opt/openssl/lib/libssl.so.3"
+LIBCRYPTO="/opt/openssl/lib/libcrypto.so.3"
 mkdir -p "./build/install/opt/lib"
 cp -fv "$LIBSSL" "./build/install/opt/lib/"
 cp -fv "$LIBCRYPTO" "./build/install/opt/lib/"
@@ -39,7 +39,7 @@ cp -fv "$LIBCRYPTO" "./build/install/opt/lib/"
 # Determine common linuxdeployqt flags
 LINUXDEPLOYQT_FLAGS="-executable=./build/install/opt/lib/$(basename $LIBSSL)"
 LINUXDEPLOYQT_FLAGS+=" -executable=./build/install/opt/lib/$(basename $LIBCRYPTO)"
-LINUXDEPLOYQT_FLAGS+=" -bundle-non-qt-libs"
+LINUXDEPLOYQT_FLAGS+=" -bundle-non-qt-libs -no-copy-copyright-files"
 
 # Build AppImage.
 cp -r "./build/install" "./build/appimage"
