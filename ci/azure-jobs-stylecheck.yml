@@ -8,3 +8,7 @@ jobs:
     displayName: Print Environment
   - bash: ./ci/stylecheck.sh
     displayName: Run Stylecheck
+  - bash: |
+      git submodule update --init i18n
+      python3 ./dev/i18n.py --update --translate
+    displayName: Run dev/i18n.py

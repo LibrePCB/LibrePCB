@@ -3,7 +3,7 @@ host = https://www.transifex.com
 
 [o:librepcb:p:librepcb-application:r:librepcb]
 file_filter  = i18n/librepcb_<lang>.ts
-source_file  = i18n/librepcb.ts
+source_file  = .tx/librepcb.ts
 source_lang  = en
 type         = QT
 minimum_perc = 0
