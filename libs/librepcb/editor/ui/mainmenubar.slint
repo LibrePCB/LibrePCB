@@ -1,0 +1,240 @@
+import { MenuPopup, MenuItem, MenuSeparator } from "widgets.slint";
+import {
+    Action,
+    Backend,
+    Constants,
+    EditorCommandSet as Cmd
+} from "api.slint";
+
+component MainMenuItem inherits Rectangle {
+    in property <string> text;
+
+    callback clicked <=> ta.clicked;
+
+    width: txt.preferred-width + 10px;
+    background: ta.has-hover ? #505050 : #252525;
+
+    // Accessibility
+    accessible-role: button;
+    accessible-label: text;
+    accessible-action-default => {
+        ta.clicked();
+    }
+
+    txt := Text {
+        x: 5px;
+        font-size: 15px;
+        text: text;
+    }
+
+    ta := TouchArea { }
+}
+
+export component MainMenuBar inherits Rectangle {
+    background: #252525;
+
+    HorizontalLayout {
+        padding-right: 4px;
+
+        file-menu-item := MainMenuItem {
+            text: @tr("File");
+
+            clicked => {
+                file-menu-popup.show();
+            }
+
+            file-menu-popup := MenuPopup {
+                x: 0;
+                y: parent.height;
+
+                new-project-item := MenuItem {
+                    cmd: Cmd.project-new;
+                    icon: @image-url("../../../font-awesome/svgs/solid/file-circle-plus.svg");
+
+                    clicked => {
+                        Backend.trigger(Action.project-new);
+                    }
+                }
+
+                open-project-item := MenuItem {
+                    cmd: Cmd.project-open;
+                    icon: @image-url("../../../font-awesome/svgs/solid/folder-open.svg");
+
+                    clicked => {
+                        Backend.trigger(Action.project-open);
+                    }
+                }
+
+                import-eagle-project-item := MenuItem {
+                    cmd: Cmd.import-eagle-project;
+
+                    clicked => {
+                        Backend.trigger(Action.project-import-eagle);
+                    }
+                }
+
+                add-example-projects-item := MenuItem {
+                    cmd: Cmd.add-example-projects;
+
+                    clicked => {
+                        Backend.trigger(Action.project-import-examples);
+                    }
+                }
+
+                MenuSeparator { }
+
+                library-manager-item := MenuItem {
+                    cmd: Cmd.library-manager;
+                    icon: @image-url("../../../bootstrap-icons/icons/database.svg");
+
+                    clicked => {
+                        Backend.trigger(Action.library-manager);
+                    }
+                }
+
+                rescan-libraries-item := MenuItem {
+                    cmd: Cmd.workspace-libraries-rescan;
+                    icon: @image-url("../../../font-awesome/svgs/solid/arrows-rotate.svg");
+
+                    clicked => {
+                        Backend.trigger(Action.workspace-libraries-rescan);
+                    }
+                }
+
+                open-workspace-folder-item := MenuItem {
+                    cmd: Cmd.file-manager;
+                    text: @tr("Open Workspace Folder");  // More specific.
+                    status-tip: "Open the workspace directory in the file manager";  // More specific.
+
+                    clicked => {
+                        Backend.trigger(Action.workspace-open-folder);
+                    }
+                }
+
+                switch-workspace-item := MenuItem {
+                    cmd: Cmd.workspace-switch;
+
+                    clicked => {
+                        Backend.trigger(Action.workspace-switch);
+                    }
+                }
+
+                workspace-settings-item := MenuItem {
+                    cmd: Cmd.workspace-settings;
+                    icon: @image-url("../../../font-awesome/svgs/solid/sliders.svg");
+
+                    clicked => {
+                        Backend.trigger(Action.workspace-settings);
+                    }
+                }
+
+                MenuSeparator { }
+
+                quit-application-item := MenuItem {
+                    cmd: Cmd.application-quit;
+                    icon: @image-url("../../../bootstrap-icons/icons/box-arrow-left.svg");
+
+                    clicked => {
+                        Backend.trigger(Action.quit);
+                    }
+                }
+            }
+        }
+
+        view-menu-item := MainMenuItem {
+            text: @tr("View");
+
+            clicked => {
+                view-menu-popup.show();
+            }
+
+            view-menu-popup := MenuPopup {
+                x: 0;
+                y: parent.height;
+
+                new-window-item := MenuItem {
+                    cmd: Cmd.window-new;
+
+                    clicked => {
+                        Backend.trigger(Action.window-new);
+                    }
+                }
+
+                close-window-item := MenuItem {
+                    cmd: Cmd.window-close;
+
+                    clicked => {
+                        Backend.trigger(Action.window-close);
+                    }
+                }
+            }
+        }
+
+        help-menu-item := MainMenuItem {
+            text: @tr("Help");
+
+            clicked => {
+                help-menu-popup.show();
+            }
+
+            help-menu-popup := MenuPopup {
+                x: 0;
+                y: parent.height;
+
+                shortcuts-reference-item := MenuItem {
+                    cmd: Cmd.keyboard-shortcuts-reference;
+
+                    clicked => {
+                        Backend.trigger(Action.keyboard-shortcuts-reference);
+                    }
+                }
+
+                user-manual-item := MenuItem {
+                    cmd: Cmd.documentation-online;
+                    icon: @image-url("../../../font-awesome/svgs/solid/book.svg");
+
+                    clicked => {
+                        Backend.open-url(Constants.user-manual-url);
+                    }
+                }
+
+                support-item := MenuItem {
+                    cmd: Cmd.support;
+                    icon: @image-url("../../../font-awesome/svgs/regular/comments.svg");
+
+                    clicked => {
+                        Backend.open-url(Constants.support-url);
+                    }
+                }
+
+                donate-item := MenuItem {
+                    cmd: Cmd.donate;
+
+                    clicked => {
+                        Backend.open-url(Constants.donate-url);
+                    }
+                }
+
+                website-item := MenuItem {
+                    cmd: Cmd.website;
+                    icon: @image-url("../../../font-awesome/svgs/solid/globe.svg");
+
+                    clicked => {
+                        Backend.open-url(Constants.website-url);
+                    }
+                }
+
+                MenuSeparator { }
+
+                about-librepcb-item := MenuItem {
+                    cmd: Cmd.about-librepcb;
+                    icon: @image-url("../../../bootstrap-icons/icons/question-circle.svg");
+
+                    clicked => {
+                        Backend.trigger(Action.about-dialog);
+                    }
+                }
+            }
+        }
+    }
+}
