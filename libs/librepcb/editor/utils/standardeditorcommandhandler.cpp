@@ -64,7 +64,7 @@ void StandardEditorCommandHandler::aboutLibrePcb() const noexcept {
 
 void StandardEditorCommandHandler::onlineDocumentation() const noexcept {
   DesktopServices ds(mSettings);
-  ds.openWebUrl(QUrl("https://docs.librepcb.org"));
+  ds.openWebUrl(QUrl("https://librepcb.org/docs/"));
 }
 
 void StandardEditorCommandHandler::website() const noexcept {
