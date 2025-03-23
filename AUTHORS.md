@@ -46,6 +46,6 @@ yourself by creating a pull request (see [CONTRIBUTING.md](CONTRIBUTING.md)).
 - Josua Schmid ([@schmijos](https://github.com/schmijos))
 - Ilia Sharin ([@alfishe](https://github.com/alfishe))
 - David Lamparter ([@eqvinox](https://github.com/eqvinox))
+- Connor Slade ([@connorslade](https://github.com/connorslade))
 - Allan Nordhøy ([@comradekingu](https://github.com/comradekingu))
 - Alexander Wilms
-- Connor Slade ([@connorslade](https://github.com/connorslade))
