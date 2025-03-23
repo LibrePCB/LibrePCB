@@ -46,6 +46,12 @@ RuleCheckListWidget::RuleCheckListWidget(QWidget* parent) noexcept
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->setContentsMargins(0, 0, 0, 0);
   layout->addWidget(mListWidget.data());
+  mListWidget->setStyleSheet(QString("QListWidget::item:selected{"
+                                     "  background-color: %1;"
+                                     "}")
+                                 .arg(mListWidget->palette()
+                                          .color(QPalette::Highlight)
+                                          .name(QColor::HexArgb)));
   connect(mListWidget.data(), &QListWidget::currentItemChanged, this,
           &RuleCheckListWidget::currentItemChanged);
   connect(mListWidget.data(), &QListWidget::itemDoubleClicked, this,

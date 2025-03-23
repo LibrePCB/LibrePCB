@@ -143,11 +143,16 @@ OutputJobsDialog::OutputJobsDialog(const WorkspaceSettings& settings,
   // Populate jobs list.
   // Hide text in list widget since text is displayed with custom item
   // widgets, but list item texts are still set for keyboard navigation.
-  mUi->lstJobs->setStyleSheet(
-      "QListWidget::item{"
-      "  color: transparent;"
-      "  selection-color: transparent;"
-      "}");
+  mUi->lstJobs->setStyleSheet(QString("QListWidget::item{"
+                                      "  color: transparent;"
+                                      "  selection-color: transparent;"
+                                      "}"
+                                      "QListWidget::item:selected{"
+                                      "  background-color: %1;"
+                                      "}")
+                                  .arg(mUi->lstJobs->palette()
+                                           .color(QPalette::Highlight)
+                                           .name(QColor::HexArgb)));
   updateJobsList();
   connect(mUi->lstJobs, &QListWidget::currentItemChanged, this,
           &OutputJobsDialog::currentItemChanged);
