@@ -46,6 +46,10 @@ then
   echo "Installing dylibbundler..."
   brew install --force-bottle dylibbundler
 
+  # Install Ninja
+  echo "Installing ninja..."
+  brew install --force-bottle ninja
+
   # Install Rust toolchain
   echo "Installing Rust toolchain..."
   brew install --force-bottle rust
@@ -73,5 +77,7 @@ fi
 
 # Install Python packages
 export PIP_BREAK_SYSTEM_PACKAGES=1
+export CMAKE_GENERATOR=Ninja
+export FUNQ_MAKE_PATH=ninja
 pip install $PIP_USER_INSTALL -r "$DIR/../tests/cli/requirements.txt"
 pip install $PIP_USER_INSTALL -r "$DIR/../tests/funq/requirements.txt"

@@ -7,9 +7,6 @@ jobs:
     variables:
       OS: 'windows'
       ARCH: 'x86_64'
-      CMAKE_CXX_COMPILER_LAUNCHER: ccache
-      CMAKE_GENERATOR: 'Ninja'
-      FUNQ_MAKE_PATH: 'ninja'
       DEPLOY: true
     steps:
     - checkout: self

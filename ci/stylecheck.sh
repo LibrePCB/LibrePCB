@@ -31,3 +31,6 @@ done
 # check formatting of .reuse/dep5
 (debian-copyright-sorter --iml -s casefold -o ".reuse/dep5" ".reuse/dep5") || exit 1
 (git diff --exit-code -- ".reuse/dep5") || exit 1
+
+# validate AppStream files
+appstream-util validate share/metainfo/org.librepcb.LibrePCB.metainfo.xml

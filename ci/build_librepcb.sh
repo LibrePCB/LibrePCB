@@ -3,14 +3,6 @@
 # set shell settings (see https://sipb.mit.edu/doc/safe-shell/)
 set -euv -o pipefail
 
-# use Ninja on Windows
-if [ "$OS" = "windows" ]
-then
-  MAKE="ninja"
-else
-  MAKE="make -j8"
-fi
-
 # default compiler
 if [ -z "${CC-}" ]; then CC="gcc"; fi
 if [ -z "${CXX-}" ]; then CXX="g++"; fi
@@ -25,14 +17,16 @@ git -C ./i18n checkout master && git -C ./i18n pull origin master
 echo "Using CXX=$CXX"
 echo "Using CC=$CC"
 mkdir -p build && pushd build
-cmake .. \
+cmake \
+  -G Ninja \
+  -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
   -DCMAKE_INSTALL_PREFIX=$(pwd)/install/opt \
   -DBUILD_DISALLOW_WARNINGS=1 \
   -DLIBREPCB_ENABLE_DESKTOP_INTEGRATION=1 \
   -DLIBREPCB_BUILD_AUTHOR="$LIBREPCB_BUILD_AUTHOR" \
-  ${CMAKE_OPTIONS-}
-VERBOSE=1 $MAKE
-$MAKE install
+  ..
+ninja
+ninja install
 popd
 
 # Prepare artifacts directory
