@@ -80,8 +80,8 @@ extern "C" fn ffi_zipwriter_write_file(
     return false;
   }
   let write_res = match &mut obj.0 {
-    Writer::File(zip) => zip.write(qbytearray_to_slice(data)),
-    Writer::Mem(zip) => zip.write(qbytearray_to_slice(data)),
+    Writer::File(zip) => zip.write_all(qbytearray_to_slice(data)),
+    Writer::Mem(zip) => zip.write_all(qbytearray_to_slice(data)),
   };
   if let Err(e) = write_res {
     qstring_set(err, e.to_string().as_str());
