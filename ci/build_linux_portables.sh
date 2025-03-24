@@ -48,15 +48,13 @@ cp "./build/appimage/opt/share/icons/hicolor/scalable/apps/org.librepcb.LibrePCB
 linuxdeployqt "./build/appimage/opt/share/applications/org.librepcb.LibrePCB.desktop" \
   -executable="./build/appimage/opt/bin/librepcb" \
   -executable="./build/appimage/opt/bin/librepcb-cli" \
-  -qmldir="./build/appimage/opt/share/librepcb/qml" \
   $LINUXDEPLOYQT_FLAGS -appimage
 patch_appimage
 mv ./LibrePCB-*-x86_64.AppImage ./artifacts/nightly_builds/librepcb-nightly-linux-$ARCH.AppImage
 
 # Run linuxdeployqt to bundle all libraries into the portable packages.
 linuxdeployqt "./build/install/opt/bin/librepcb-cli" $LINUXDEPLOYQT_FLAGS -always-overwrite
-linuxdeployqt "./build/install/opt/bin/librepcb" $LINUXDEPLOYQT_FLAGS -always-overwrite \
-  -qmldir="./build/install/opt/share/librepcb/qml"
+linuxdeployqt "./build/install/opt/bin/librepcb" $LINUXDEPLOYQT_FLAGS -always-overwrite
 
 # Test if the bundles are working (hopefully catching deployment issues).
 # Doesn't work for AppImages unfortunately because of missing fuse on CI.
