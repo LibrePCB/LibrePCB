@@ -39,6 +39,7 @@ add_executable(
   core/fileio/transactionaldirectorytest.cpp
   core/fileio/transactionalfilesystemtest.cpp
   core/fileio/versionfiletest.cpp
+  core/fileio/zipwriterziparchivetest.cpp
   core/geometry/holetest.cpp
   core/geometry/pathtest.cpp
   core/geometry/polygontest.cpp
