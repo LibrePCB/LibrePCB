@@ -2,6 +2,7 @@
 //! [`zip::ZipWriter`](https://docs.rs/zip/0.6.6/zip/write/struct.ZipWriter.html)
 
 use super::cpp_ffi::*;
+use std::fs;
 use std::fs::File;
 use std::io::Write;
 
@@ -23,7 +24,14 @@ extern "C" fn ffi_zipwriter_new_to_file(
   path: &QString,
   err: &mut QString,
 ) -> *mut ZipWriter {
-  let file = match File::create(std::path::Path::new(&from_qstring(path))) {
+  let path_str = from_qstring(path);
+  let fp = std::path::Path::new(&path_str);
+  if let Some(parent) = fp.parent() {
+    if !parent.exists() {
+      _ = fs::create_dir_all(parent);
+    }
+  }
+  let file = match File::create(fp) {
     Ok(file) => file,
     Err(e) => {
       qstring_set(err, e.to_string().as_str());
