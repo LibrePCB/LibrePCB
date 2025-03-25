@@ -25,7 +25,10 @@ dev/doxygen/output/
 build/
 
 # Translation Files
-i18n/*.qm
+/.tx/librepcb.ts
+/.tx/sources.txt
+/i18n/*.qm
+*.desktop.i18n
 
 # draw.io
 *.bkp
