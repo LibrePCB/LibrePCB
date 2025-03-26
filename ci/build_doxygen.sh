@@ -16,8 +16,5 @@ for f in $(git ls-files -- '**Cargo.toml'); do
   rm -rf ./dev/doxygen/output/rust
 done
 
-# Remove Qt helpfile to heavily reduce the upload file size.
-rm ./dev/doxygen/output/*.qch
-
 mkdir -p ./artifacts
 cp -r ./dev/doxygen/output/. ./artifacts/doxygen/
