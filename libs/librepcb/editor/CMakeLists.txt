@@ -1023,11 +1023,6 @@ target_link_libraries(
          ${QT}::Network
          ${QT}::Widgets
 )
-if(BUILD_QTQUICK_TEST)
-  target_link_libraries(
-    librepcb_editor PUBLIC ${QT}::Quick ${QT}::QuickControls2
-  )
-endif()
 
 # Alias to namespaced variant
 add_library(LibrePCB::Editor ALIAS librepcb_editor)

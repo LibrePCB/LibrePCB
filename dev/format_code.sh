@@ -209,30 +209,6 @@ for file in $(search_files "**.qrc"); do
   xmlsort -r "RCC/qresource/file" -i -s "$file" | tr "'" '"' | update_file "$file" || xmlsort_failed
 done
 
-# Format qml source files with qmlformat.
-qml_format_failed() {
-  echo "" >&2
-  echo "ERROR: qmlformat failed!" >&2
-  echo "  On Linux, you can also run this script in a docker" >&2
-  echo "  container by using the '--docker' argument." >&2
-  exit 7
-}
-QMLFORMAT=$(which qmlformat || true)
-if [ -z "${QMLFORMAT}" -o ! -x ${QMLFORMAT} ]; then
-  QMLFORMAT="/usr/lib/qt5/bin/qmlformat"  # For qtdeclarative5-dev-tools package
-fi
-if [ -x ${QMLFORMAT} ]; then
-  echo "Formatting QML sources with qmlformat..."
-  for file in $(search_files "**.qml"); do
-    ${QMLFORMAT} "$file" | update_file "$file" || qml_format_failed
-  done
-else
-  echo "Formatting QML sources with qmlformat DISABLED ..."
-  echo "  Make sure that qmlformat (qtdeclarative5-dev-tools) are installed."
-  echo "  On Linux, you can also run this script in a docker"
-  echo "  container by using the '--docker' argument."
-fi
-
 # Format .reuse/dep5 files with debian-copyright-sorter.
 dcs_failed() {
   echo "" >&2

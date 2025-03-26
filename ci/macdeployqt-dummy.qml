@@ -1,4 +1,7 @@
-// Note: These dependencies require at least Qt 5.7 to run.
+// Dummy QML because macdeployqt fails to bundle QtDBus if the application
+// doesn't depend on QtQuick. Crap!!! And the following workaround doesn't work:
+// https://stackoverflow.com/questions/73108273/building-and-distributing-a-macos-application-using-cmake/73126397
+
 import QtQuick 2.7
 import QtQuick.Controls 2.0
 import QtQuick.Layouts 1.2

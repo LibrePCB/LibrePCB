@@ -229,7 +229,6 @@ private:
   QScopedPointer<QAction> mActionOnlineDocumentation;
   QScopedPointer<QAction> mActionKeyboardShortcutsReference;
   QScopedPointer<QAction> mActionWebsite;
-  QScopedPointer<QAction> mActionQtQuickTest;
   QScopedPointer<QAction> mActionQuit;
 };
 
