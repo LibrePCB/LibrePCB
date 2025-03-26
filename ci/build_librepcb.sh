@@ -20,7 +20,7 @@ mkdir -p build && pushd build
 cmake \
   -G Ninja \
   -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-  -DCMAKE_INSTALL_PREFIX=$(pwd)/install/opt \
+  -DCMAKE_INSTALL_PREFIX=$(pwd)/install \
   -DBUILD_DISALLOW_WARNINGS=1 \
   -DLIBREPCB_ENABLE_DESKTOP_INTEGRATION=1 \
   -DLIBREPCB_BUILD_AUTHOR="$LIBREPCB_BUILD_AUTHOR" \
