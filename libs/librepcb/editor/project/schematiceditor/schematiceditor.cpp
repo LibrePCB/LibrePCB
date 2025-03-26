@@ -30,7 +30,6 @@
 #include "../../project/cmd/cmdschematicedit.h"
 #include "../../project/cmd/cmdschematicremove.h"
 #include "../../undostack.h"
-#include "../../utils/editortoolbox.h"
 #include "../../utils/exclusiveactiongroup.h"
 #include "../../utils/menubuilder.h"
 #include "../../utils/standardeditorcommandhandler.h"
@@ -1163,18 +1162,13 @@ void SchematicEditor::updateEmptySchematicMessage() noexcept {
 }
 
 void SchematicEditor::updateComponentToolbarIcons() noexcept {
-  QString suffix = useIeee315Symbols() ? "us" : "eu";
-  if (EditorToolbox::isWindowBackgroundDark()) {
-    suffix += "_dark";
-  }
-  mActionComponentResistor->setIcon(
-      QIcon(":/img/library/resistor_" % suffix % ".png"));
-  mActionComponentInductor->setIcon(
-      QIcon(":/img/library/inductor_" % suffix % ".png"));
+  const QString suffix = useIeee315Symbols() ? "us.png" : "eu.png";
+  mActionComponentResistor->setIcon(QIcon(":/img/library/resistor_" % suffix));
+  mActionComponentInductor->setIcon(QIcon(":/img/library/inductor_" % suffix));
   mActionComponentCapacitorBipolar->setIcon(
-      QIcon(":/img/library/bipolar_capacitor_" % suffix % ".png"));
+      QIcon(":/img/library/bipolar_capacitor_" % suffix));
   mActionComponentCapacitorUnipolar->setIcon(
-      QIcon(":/img/library/unipolar_capacitor_" % suffix % ".png"));
+      QIcon(":/img/library/unipolar_capacitor_" % suffix));
 }
 
 void SchematicEditor::setGridProperties(const PositiveLength& interval,

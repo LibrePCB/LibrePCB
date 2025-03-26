@@ -54,7 +54,7 @@ if __name__ == '__main__':
                  ':/img/**.jpeg'],
                 cwd=REPO_DIR).decode("utf-8").splitlines()
     for file in files:
-        if file in WHITELIST or '_dark' in file:
+        if file in WHITELIST:
             continue
         if not os.path.isfile(os.path.join(REPO_DIR, file)):
             continue

@@ -24,7 +24,6 @@
 
 #include "../../dialogs/filedialog.h"
 #include "../../editorcommandset.h"
-#include "../../utils/editortoolbox.h"
 #include "../../widgets/waitingspinnerwidget.h"
 #include "../../workspace/desktopservices.h"
 #include "ui_newprojectwizardpage_eagleimport.h"
@@ -149,12 +148,9 @@ void NewProjectWizardPage_EagleImport::import(Project& project) {
     DesktopServices ds(ws->getSettings());
     ds.openUrl(url);
   });
-  const auto msgColors = EditorToolbox::isWindowBackgroundDark()
-      ? MessageLogger::ColorTheme::Dark
-      : MessageLogger::ColorTheme::Light;
   connect(mImport->getLogger().get(), &MessageLogger::msgEmitted, browser,
-          [browser, msgColors](const MessageLogger::Message& msg) {
-            browser->append(msg.toRichText(msgColors, true));
+          [browser](const MessageLogger::Message& msg) {
+            browser->append(msg.toRichText(true, true));
             browser->verticalScrollBar()->setValue(
                 browser->verticalScrollBar()->maximum());
             qApp->processEvents();
@@ -201,7 +197,7 @@ void NewProjectWizardPage_EagleImport::updateStatus() noexcept {
       mUi->lblMessages->hide();
     } else if (schFp.isValid() && (brdFp.isValid() || brd.isEmpty())) {
       mWaitingSpinner->show();
-      mUi->lblMessages->setText("<font color=\"blue\">" %
+      mUi->lblMessages->setText("<font color=\"#63d0df\">" %
                                 tr("Parsing project...") % "</font>");
       mUi->lblMessages->show();
       mFuture = QtConcurrent::run(
@@ -235,14 +231,14 @@ NewProjectWizardPage_EagleImport::ParserResult
     result.import = import;
     const QStringList warnings = result.import->open(schFp, brdFp);
     foreach (const QString& warning, warnings) {
-      result.messages.append("<font color=\"blue\">➤ " % warning % "</font>");
+      result.messages.append("<font color=\"yellow\">➤ " % warning % "</font>");
     }
     const QString msg = result.import->hasBoard()
         ? tr("Ready to import %n sheet(s) and a board.", nullptr,
              result.import->getSheetCount())
         : tr("Ready to import %n sheet(s) without board.", nullptr,
              result.import->getSheetCount());
-    result.messages.append("<font color=\"green\">✔ " % msg % "</font>");
+    result.messages.append("<font color=\"#62de70\">✔ " % msg % "</font>");
   } catch (const Exception& e) {
     result.messages.append("<font color=\"red\">⚠ " % tr("ERROR:") % " " %
                            e.getMsg() % "</font>");

@@ -1905,10 +1905,7 @@ void BoardEditor::execSpecctraImportDialog() noexcept {
   QTextBrowser* txtBrowser = new QTextBrowser(&dlg);
   txtBrowser->setReadOnly(true);
   txtBrowser->setWordWrapMode(QTextOption::WordWrap);
-  txtBrowser->setText(
-      logger->getMessagesRichText(EditorToolbox::isWindowBackgroundDark()
-                                      ? MessageLogger::ColorTheme::Dark
-                                      : MessageLogger::ColorTheme::Light));
+  txtBrowser->setText(logger->getMessagesRichText());
   txtBrowser->verticalScrollBar()->setValue(
       txtBrowser->verticalScrollBar()->maximum());
   layout->addWidget(txtBrowser);

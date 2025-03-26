@@ -100,7 +100,7 @@ LibraryInfoWidget::LibraryInfoWidget(Workspace& ws, const FilePath& libDir)
       QString name;
       ws.getLibraryDb().getTranslations<Library>(fp, localeOrder,
                                                  &name);  // can throw
-      line += QString(" <font color=\"green\">%1 ✔</font>").arg(name);
+      line += QString(" <font color=\"#62de70\">%1 ✔</font>").arg(name);
     } else {
       line += QString(" <font color=\"red\">%1 ✖</font>").arg(uuid.toStr());
     }
