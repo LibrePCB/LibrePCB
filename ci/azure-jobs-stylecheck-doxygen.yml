@@ -1,11 +1,20 @@
 jobs:
-- job: Doxygen
+- job: Stylecheck_Doxygen
   pool:
     vmImage: 'ubuntu-22.04'
   container: librepcb/librepcb-dev:devtools-5
   steps:
+  - checkout: self
+    clean: true
+    submodules: recursive
   - bash: ./ci/print_environment.sh
     displayName: Print Environment
+  - bash: ./ci/stylecheck.sh
+    displayName: Run Stylecheck
+  - bash: python3 ./dev/i18n.py --update --translate
+    displayName: Build translations
+  - bash: python3 ./dev/find_unused_code.py
+    displayName: Find unused code
   - bash: ./ci/build_doxygen.sh
     displayName: Build Doxygen Documentation
   - bash: ./ci/upload_artifacts.sh
