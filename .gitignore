@@ -25,6 +25,7 @@ dev/doxygen/output/
 build/
 
 # Translation Files
+/.tx/librepcb_ui.po
 /.tx/librepcb.ts
 /.tx/sources.txt
 /i18n/*.qm
