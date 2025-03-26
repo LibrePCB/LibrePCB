@@ -4,11 +4,14 @@ jobs:
     vmImage: 'ubuntu-22.04'
   container: librepcb/librepcb-dev:devtools-5
   steps:
+  - checkout: self
+    clean: true
+    submodules: recursive
   - bash: ./ci/print_environment.sh
     displayName: Print Environment
   - bash: ./ci/stylecheck.sh
     displayName: Run Stylecheck
-  - bash: |
-      git submodule update --init i18n
-      python3 ./dev/i18n.py --update --translate
+  - bash: python3 ./dev/i18n.py --update --translate
     displayName: Run dev/i18n.py
+  - bash: python3 ./dev/find_unused_code.py
+    displayName: Run ./dev/find_unused_code.py
