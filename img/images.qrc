@@ -20,7 +20,6 @@
         <file>actions/board_editor.png</file>
         <file>actions/bookmark.png</file>
         <file>actions/bookmark_gray.png</file>
-        <file>actions/cam_export.png</file>
         <file>actions/cancel.png</file>
         <file>actions/clean.png</file>
         <file>actions/clone.png</file>
@@ -61,15 +60,12 @@
         <file>actions/hide_planes.png</file>
         <file>actions/home.png</file>
         <file>actions/import.png</file>
-        <file>actions/info.png</file>
-        <file>actions/layers.png</file>
         <file>actions/minus.png</file>
         <file>actions/mirror_horizontal.png</file>
         <file>actions/mirror_vertical.png</file>
         <file>actions/move.png</file>
         <file>actions/move_to.png</file>
         <file>actions/new.png</file>
-        <file>actions/new_2.png</file>
         <file>actions/new_folder.png</file>
         <file>actions/open.png</file>
         <file>actions/open_browser.png</file>
@@ -77,10 +73,8 @@
         <file>actions/output_jobs.png</file>
         <file>actions/paste.png</file>
         <file>actions/pdf.png</file>
-        <file>actions/plus.png</file>
         <file>actions/plus_2.png</file>
         <file>actions/print.png</file>
-        <file>actions/print_preview.png</file>
         <file>actions/quick_check.png</file>
         <file>actions/quit.png</file>
         <file>actions/rebuild_plane.png</file>
@@ -97,7 +91,6 @@
         <file>actions/search.png</file>
         <file>actions/select.png</file>
         <file>actions/select_all.png</file>
-        <file>actions/select_rect.png</file>
         <file>actions/settings.png</file>
         <file>actions/show_pin_numbers.png</file>
         <file>actions/show_pin_numbers_dark.png</file>
@@ -107,7 +100,6 @@
         <file>actions/up.png</file>
         <file>actions/view_3d.png</file>
         <file>actions/wizard.png</file>
-        <file>actions/working.png</file>
         <file>actions/zoom_all.png</file>
         <file>actions/zoom_in.png</file>
         <file>actions/zoom_out.png</file>
@@ -118,17 +110,12 @@
         <file>command_toolbars/align_vertical_bottom.png</file>
         <file>command_toolbars/align_vertical_center.png</file>
         <file>command_toolbars/align_vertical_top.png</file>
-        <file>command_toolbars/cancel.png</file>
         <file>command_toolbars/pad_bottom.png</file>
-        <file>command_toolbars/pad_tht.png</file>
         <file>command_toolbars/pad_top.png</file>
         <file>command_toolbars/shape_octagon.png</file>
         <file>command_toolbars/shape_rect.png</file>
         <file>command_toolbars/shape_round.png</file>
         <file>command_toolbars/shape_rounded_rect.png</file>
-        <file>command_toolbars/via_octagon.png</file>
-        <file>command_toolbars/via_round.png</file>
-        <file>command_toolbars/via_square.png</file>
         <file>command_toolbars/wire_45_90.png</file>
         <file>command_toolbars/wire_45_90_dark.png</file>
         <file>command_toolbars/wire_90_45.png</file>
@@ -177,17 +164,12 @@
         <file>norm/ieee_315_dark.png</file>
         <file>places/file.png</file>
         <file>places/folder.png</file>
-        <file>places/folder_gray.png</file>
         <file>places/folder_green.png</file>
-        <file>places/folder_open.png</file>
-        <file>places/folder_open_gray.png</file>
-        <file>places/folder_open_green.png</file>
         <file>places/project_folder.png</file>
         <file>status/dialog_error.png</file>
         <file>status/dialog_warning.png</file>
         <file>status/info.png</file>
         <file>status/locked.png</file>
-        <file>status/success.png</file>
         <file>status/unlocked.png</file>
         <file>wizards/eagle_watermark.png</file>
         <file>wizards/kicad_watermark.png</file>

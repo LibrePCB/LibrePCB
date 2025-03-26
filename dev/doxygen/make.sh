@@ -10,6 +10,3 @@ if [[ $* == *-Werror* ]]; then
   DOXYFILE=$(sed "s/WARN_AS_ERROR\\s*=\\s*NO/WARN_AS_ERROR = YES/g" <<< "$DOXYFILE")
 fi
 echo "$DOXYFILE" | doxygen -
-
-# generate Qt helpfile
-qhelpgenerator ./output/html/index.qhp -o ./output/qt_helpfile.qch
