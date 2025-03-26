@@ -178,8 +178,6 @@ add_library(
   library/cmd/cmdremoveselectedsymbolitems.h
   library/cmd/cmdsymbolpinedit.cpp
   library/cmd/cmdsymbolpinedit.h
-  library/cmp/cmpsigpindisplaytypecombobox.cpp
-  library/cmp/cmpsigpindisplaytypecombobox.h
   library/cmp/componentchooserdialog.cpp
   library/cmp/componentchooserdialog.h
   library/cmp/componentchooserdialog.ui
@@ -675,8 +673,6 @@ add_library(
   project/cmd/cmdschematicnetlabeladd.h
   project/cmd/cmdschematicnetlabeledit.cpp
   project/cmd/cmdschematicnetlabeledit.h
-  project/cmd/cmdschematicnetlabelremove.cpp
-  project/cmd/cmdschematicnetlabelremove.h
   project/cmd/cmdschematicnetpointedit.cpp
   project/cmd/cmdschematicnetpointedit.h
   project/cmd/cmdschematicnetsegmentadd.cpp
@@ -727,9 +723,6 @@ add_library(
   project/newprojectwizard/newprojectwizardpage_metadata.cpp
   project/newprojectwizard/newprojectwizardpage_metadata.h
   project/newprojectwizard/newprojectwizardpage_metadata.ui
-  project/newprojectwizard/newprojectwizardpage_versioncontrol.cpp
-  project/newprojectwizard/newprojectwizardpage_versioncontrol.h
-  project/newprojectwizard/newprojectwizardpage_versioncontrol.ui
   project/orderpcbdialog.cpp
   project/orderpcbdialog.h
   project/orderpcbdialog.ui
@@ -871,12 +864,8 @@ add_library(
   widgets/angleedit.h
   widgets/attributelisteditorwidget.cpp
   widgets/attributelisteditorwidget.h
-  widgets/attributetypecombobox.cpp
-  widgets/attributetypecombobox.h
   widgets/attributeunitcombobox.cpp
   widgets/attributeunitcombobox.h
-  widgets/centeredcheckbox.cpp
-  widgets/centeredcheckbox.h
   widgets/checkableitemseditorwidget.cpp
   widgets/checkableitemseditorwidget.h
   widgets/doublespinbox.cpp
