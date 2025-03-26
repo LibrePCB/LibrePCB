@@ -93,18 +93,33 @@ int main(int argc, char* argv[]) {
   // (from http://www.qtcentre.org/threads/1904)
   app.setStyleSheet("QStatusBar::item { border: 0px solid black; }");
 
-  // Use Fusion style on Windows with dark theme to enable dark theme also for
-  // LibrePCB (see https://github.com/LibrePCB/LibrePCB/issues/1390).
-  // Note: As a fallback solution if the dark theme causes troubles or users
-  // don't like it, the environment variable LIBREPCB_DISABLE_DARK_THEME=1
-  // could be set. We may remove this fallback if nobody asks for it.
-#if defined(Q_OS_WIN) && (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
-  if ((app.styleHints()->colorScheme() == Qt::ColorScheme::Dark) &&
-      (qgetenv("LIBREPCB_DISABLE_DARK_THEME") != "1")) {
-    qDebug() << "Switching to Fusion style because of dark system theme.";
-    app.setStyle(QStyleFactory::create("Fusion"));
+  // Use Fusion style with custom palette to make the legacy Qt dialogs looking
+  // similar to the new Slint UI. Can be removed as soon as no Qt widgets are
+  // used anymore.
+  {
+    QPalette palette;
+    palette.setColor(QPalette::Window, "#2a2a2a");
+    palette.setColor(QPalette::WindowText, "#c4c4c4");
+    palette.setColor(QPalette::Base, "#262626");
+    palette.setColor(QPalette::AlternateBase, "#2e2e2e");
+    palette.setColor(QPalette::ToolTipBase, "#2e2e2e");
+    palette.setColor(QPalette::ToolTipText, "#dedede");
+    palette.setColor(QPalette::Text, "#c4c4c4");
+    palette.setColor(QPalette::PlaceholderText, "#959595");
+    palette.setColor(QPalette::Button, "#202020");
+    palette.setColor(QPalette::ButtonText, "#c4c4c4");
+    palette.setColor(QPalette::Link, "#29d682");
+    palette.setColor(QPalette::LinkVisited, "#29d682");
+    palette.setColor(QPalette::Highlight, "#29d682");
+    palette.setColor(QPalette::HighlightedText, "#161616");
+    palette.setColor(QPalette::Disabled, QPalette::Button, "#1a1a1a");
+    palette.setColor(QPalette::Disabled, QPalette::ButtonText, "#707070");
+    palette.setColor(QPalette::Disabled, QPalette::WindowText, "#707070");
+    palette.setColor(QPalette::Disabled, QPalette::Text, "#707070");
+    palette.setColor(QPalette::Disabled, QPalette::Light, "#707070");
+    app.setStyle("fusion");
+    app.setPalette(palette);
   }
-#endif
 
   // Start network access manager thread with HTTP cache to avoid extensive
   // requests (e.g. downloading library pictures each time opening the manager).

@@ -4,15 +4,12 @@
         <file>actions/add_component.png</file>
         <file>actions/add_hole.png</file>
         <file>actions/add_name.png</file>
-        <file>actions/add_name_dark.png</file>
         <file>actions/add_plane.png</file>
         <file>actions/add_smt_pad.png</file>
         <file>actions/add_symbol_pin.png</file>
         <file>actions/add_text.png</file>
-        <file>actions/add_text_dark.png</file>
         <file>actions/add_tht_pad.png</file>
         <file>actions/add_value.png</file>
-        <file>actions/add_value_dark.png</file>
         <file>actions/add_via.png</file>
         <file>actions/align_horizontally.svg</file>
         <file>actions/align_vertically.svg</file>
@@ -33,13 +30,10 @@
         <file>actions/draw_arc.png</file>
         <file>actions/draw_circle.png</file>
         <file>actions/draw_line.png</file>
-        <file>actions/draw_line_dark.png</file>
         <file>actions/draw_netlabel.png</file>
-        <file>actions/draw_netlabel_dark.png</file>
         <file>actions/draw_polygon.png</file>
         <file>actions/draw_rectangle.png</file>
         <file>actions/draw_wire.png</file>
-        <file>actions/draw_wire_dark.png</file>
         <file>actions/draw_zone.png</file>
         <file>actions/drc.png</file>
         <file>actions/edit.png</file>
@@ -55,7 +49,6 @@
         <file>actions/generate_bom.png</file>
         <file>actions/generate_ibom.png</file>
         <file>actions/grid.png</file>
-        <file>actions/grid_dark.png</file>
         <file>actions/help.png</file>
         <file>actions/hide_planes.png</file>
         <file>actions/home.png</file>
@@ -93,7 +86,6 @@
         <file>actions/select_all.png</file>
         <file>actions/settings.png</file>
         <file>actions/show_pin_numbers.png</file>
-        <file>actions/show_pin_numbers_dark.png</file>
         <file>actions/show_planes.png</file>
         <file>actions/stop.png</file>
         <file>actions/undo.png</file>
@@ -117,51 +109,34 @@
         <file>command_toolbars/shape_round.png</file>
         <file>command_toolbars/shape_rounded_rect.png</file>
         <file>command_toolbars/wire_45_90.png</file>
-        <file>command_toolbars/wire_45_90_dark.png</file>
         <file>command_toolbars/wire_90_45.png</file>
-        <file>command_toolbars/wire_90_45_dark.png</file>
         <file>command_toolbars/wire_h_v.png</file>
-        <file>command_toolbars/wire_h_v_dark.png</file>
         <file>command_toolbars/wire_straight.png</file>
-        <file>command_toolbars/wire_straight_dark.png</file>
         <file>command_toolbars/wire_v_h.png</file>
-        <file>command_toolbars/wire_v_h_dark.png</file>
         <file>empty.png</file>
         <file>library/3d_model.png</file>
         <file>library/bipolar_capacitor_eu.png</file>
-        <file>library/bipolar_capacitor_eu_dark.png</file>
         <file>library/bipolar_capacitor_us.png</file>
-        <file>library/bipolar_capacitor_us_dark.png</file>
         <file>library/component.png</file>
         <file>library/device.png</file>
         <file>library/footprint.png</file>
         <file>library/gnd.png</file>
-        <file>library/gnd_dark.png</file>
         <file>library/inductor_eu.png</file>
-        <file>library/inductor_eu_dark.png</file>
         <file>library/inductor_us.png</file>
-        <file>library/inductor_us_dark.png</file>
         <file>library/package.png</file>
         <file>library/part.png</file>
         <file>library/resistor_eu.png</file>
-        <file>library/resistor_eu_dark.png</file>
         <file>library/resistor_us.png</file>
-        <file>library/resistor_us_dark.png</file>
         <file>library/symbol.png</file>
         <file>library/unipolar_capacitor_eu.png</file>
-        <file>library/unipolar_capacitor_eu_dark.png</file>
         <file>library/unipolar_capacitor_us.png</file>
-        <file>library/unipolar_capacitor_us_dark.png</file>
         <file>library/vcc.png</file>
-        <file>library/vcc_dark.png</file>
         <file>logo/32x32.png</file>
         <file>logo/48x48.png</file>
         <file>logo/64x64.png</file>
         <file>logo/ngi0.png</file>
         <file>norm/iec_60617.png</file>
-        <file>norm/iec_60617_dark.png</file>
         <file>norm/ieee_315.png</file>
-        <file>norm/ieee_315_dark.png</file>
         <file>places/file.png</file>
         <file>places/folder.png</file>
         <file>places/folder_green.png</file>

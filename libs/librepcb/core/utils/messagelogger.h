@@ -44,13 +44,11 @@ class MessageLogger final : public QObject {
   Q_OBJECT
 
 public:
-  enum class ColorTheme { None, Light, Dark };
-
   struct Message {
     QtMsgType type;
     QString message;
 
-    QString toRichText(ColorTheme theme,
+    QString toRichText(bool colorized = true,
                        bool bulletPoint = false) const noexcept;
   };
 
@@ -83,7 +81,7 @@ public:
   bool hasMessages() const noexcept;
   QList<Message> getMessages() const noexcept;
   QStringList getMessagesPlain() const noexcept;
-  QString getMessagesRichText(ColorTheme theme) const noexcept;
+  QString getMessagesRichText(bool colorized = true) const noexcept;
 
   // General Methods
   void clear() noexcept;
