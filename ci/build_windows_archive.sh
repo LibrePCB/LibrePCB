@@ -19,6 +19,11 @@ cp -v C:/OpenCascade/win64/gcc/bin/libTK*.dll ./build/install/bin/
 # Copy MinGW DLLs
 cp -v "`qmake -query QT_INSTALL_PREFIX`"/bin/lib*.dll ./build/install/bin/
 
+# Copy/move Slint DLL
+cp -v ./build/install/lib/slint_cpp.dll ./build/tests/unittests/
+mv ./build/install/lib/slint_cpp.dll ./build/install/bin/
+rm ./build/install/lib
+
 # Copy Qt DLLs
 windeployqt --compiler-runtime --force ./build/install/bin/librepcb.exe
 windeployqt --compiler-runtime --force ./build/install/bin/librepcb-cli.exe
