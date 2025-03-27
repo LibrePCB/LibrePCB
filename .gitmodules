@@ -34,3 +34,6 @@
 [submodule "libs/corrosion"]
     path = libs/corrosion
     url = https://github.com/LibrePCB/corrosion.git
+[submodule "libs/slint"]
+    path = libs/slint
+    url = https://github.com/LibrePCB/slint.git
