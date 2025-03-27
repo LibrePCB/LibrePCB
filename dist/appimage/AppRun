@@ -10,7 +10,7 @@ HERE="$(dirname "$(readlink -f "${0}")")"
 BINARY_NAME=$(basename "$ARGV0")
 
 case $BINARY_NAME in
-  *cli*) exec "$HERE/opt/bin/librepcb-cli" "$@";;
-  *CLI*) exec "$HERE/opt/bin/librepcb-cli" "$@";;
-  *) exec "$HERE/opt/bin/librepcb" "$@";;
+  *cli*) exec "$HERE/usr/bin/librepcb-cli" "$@";;
+  *CLI*) exec "$HERE/usr/bin/librepcb-cli" "$@";;
+  *) exec "$HERE/usr/bin/librepcb" "$@";;
 esac

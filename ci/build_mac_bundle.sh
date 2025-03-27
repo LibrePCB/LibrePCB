@@ -12,12 +12,12 @@ then
 fi
 
 # Merge GUI application and CLI (https://github.com/LibrePCB/LibrePCB/issues/1358)
-cp "./build/install/opt/bin/librepcb-cli.app/Contents/MacOS/librepcb-cli" \
-   "./build/install/opt/bin/librepcb.app/Contents/MacOS/"
+cp "./build/install/bin/librepcb-cli.app/Contents/MacOS/librepcb-cli" \
+   "./build/install/bin/librepcb.app/Contents/MacOS/"
 
 # Replace "bin" and "share" directories with the single *.app directory
-cp -r "./build/install/opt/bin/librepcb.app" "./build/install/opt/LibrePCB.app"
-cp -r "./build/install/opt/share" "./build/install/opt/LibrePCB.app/Contents/"
+cp -r "./build/install/bin/librepcb.app" "./build/install/LibrePCB.app"
+cp -r "./build/install/share" "./build/install/LibrePCB.app/Contents/"
 
 # Fix failure of macdeployqt according to
 # https://github.com/orgs/Homebrew/discussions/2823.
@@ -30,7 +30,7 @@ fix_macdeployqt () {
 }
 
 # Build bundle
-pushd "./build/install/opt/"  # Avoid having path in DMG name
+pushd "./build/install/"  # Avoid having path in DMG name
 dylibbundler -ns -od -b \
   -x LibrePCB.app/Contents/MacOS/librepcb \
   -x LibrePCB.app/Contents/MacOS/librepcb-cli \
@@ -46,7 +46,7 @@ then
   macdeployqt "LibrePCB.app" -always-overwrite \
     -executable="./LibrePCB.app/Contents/MacOS/librepcb" \
     -executable="./LibrePCB.app/Contents/MacOS/librepcb-cli" \
-    -qmldir="../../../ci"
+    -qmldir="../../ci"
   codesign --force --deep -s - ./LibrePCB.app/Contents/MacOS/librepcb
   codesign --force --deep -s - ./LibrePCB.app/Contents/MacOS/librepcb-cli
   create-dmg --skip-jenkins --volname "LibrePCB" \
@@ -61,7 +61,7 @@ else
       macdeployqt "LibrePCB.app" -dmg -always-overwrite \
         -executable="./LibrePCB.app/Contents/MacOS/librepcb" \
         -executable="./LibrePCB.app/Contents/MacOS/librepcb-cli" \
-        -qmldir="../../../ci"
+        -qmldir="../../ci"
       sleep 5
     fi
   done
@@ -69,8 +69,8 @@ fi
 popd
 
 # Test if the bundles are working (hopefully catching deployment issues).
-./build/install/opt/LibrePCB.app/Contents/MacOS/librepcb-cli --version
-./build/install/opt/LibrePCB.app/Contents/MacOS/librepcb --exit-after-startup
+./build/install/LibrePCB.app/Contents/MacOS/librepcb-cli --version
+./build/install/LibrePCB.app/Contents/MacOS/librepcb --exit-after-startup
 
 # Move bundles to artifacts directory
-mv ./build/install/opt/LibrePCB.dmg ./artifacts/nightly_builds/librepcb-nightly-mac-$ARCH.dmg
+mv ./build/install/LibrePCB.dmg ./artifacts/nightly_builds/librepcb-nightly-mac-$ARCH.dmg

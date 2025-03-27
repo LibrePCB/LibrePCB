@@ -4,28 +4,28 @@
 set -euv -o pipefail
 
 # Copy VC Runtime DLLs (no idea what I'm doing here, but it seems to work...)
-cp -v C:/Windows/System32/vc*140.dll ./build/install/opt/bin/
-cp -v C:/Windows/System32/msvcp140*.dll ./build/install/opt/bin/
+cp -v C:/Windows/System32/vc*140.dll ./build/install/bin/
+cp -v C:/Windows/System32/msvcp140*.dll ./build/install/bin/
 
 # ZLib DLL
-cp -v $ZLIB_ROOT/bin/libzlib.dll ./build/install/opt/bin/
+cp -v $ZLIB_ROOT/bin/libzlib.dll ./build/install/bin/
 
 # Copy OpenSSL DLLs (required to get HTTPS working)
-cp -v $OPENSSL_ROOT/bin/lib*.dll ./build/install/opt/bin/
+cp -v $OPENSSL_ROOT/bin/lib*.dll ./build/install/bin/
 
 # Copy OpenCascade DLLs
-cp -v C:/OpenCascade/win64/gcc/bin/libTK*.dll ./build/install/opt/bin/
+cp -v C:/OpenCascade/win64/gcc/bin/libTK*.dll ./build/install/bin/
 
 # Copy MinGW DLLs
-cp -v "`qmake -query QT_INSTALL_PREFIX`"/bin/lib*.dll ./build/install/opt/bin/
+cp -v "`qmake -query QT_INSTALL_PREFIX`"/bin/lib*.dll ./build/install/bin/
 
 # Copy Qt DLLs
-windeployqt --compiler-runtime --force ./build/install/opt/bin/librepcb.exe
-windeployqt --compiler-runtime --force ./build/install/opt/bin/librepcb-cli.exe
+windeployqt --compiler-runtime --force ./build/install/bin/librepcb.exe
+windeployqt --compiler-runtime --force ./build/install/bin/librepcb-cli.exe
 
 # Test if the bundles are working (hopefully catching deployment issues).
-./build/install/opt/bin/librepcb-cli.exe --version
-./build/install/opt/bin/librepcb.exe --exit-after-startup
+./build/install/bin/librepcb-cli.exe --version
+./build/install/bin/librepcb.exe --exit-after-startup
 
 # Copy everything to artifacts directory for deployment
-cp -r ./build/install/opt/. ./artifacts/nightly_builds/librepcb-nightly-windows-$ARCH/
+cp -r ./build/install/. ./artifacts/nightly_builds/librepcb-nightly-windows-$ARCH/

@@ -11,7 +11,7 @@ export PATH="/usr/bin:$PATH"
 TARGET="$OS-$ARCH"
 
 cp -r ./dist/innosetup/* ./build/dist/innosetup/
-cp -r ./build/install/opt/. ./build/dist/innosetup/files
+cp -r ./build/install/. ./build/dist/innosetup/files
 iscc ./build/dist/innosetup/installer.iss \
   //O".\\artifacts\\nightly_builds" \
   //F"librepcb-installer-nightly-$TARGET"

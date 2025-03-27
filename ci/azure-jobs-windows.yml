@@ -31,9 +31,9 @@ jobs:
       displayName: Run rust-core tests
     - script: build\\tests\\unittests\\librepcb-unittests.exe
       displayName: Run LibrePCB Unittests
-    - script: pytest -vvv --librepcb-executable="build/install/opt/bin/librepcb-cli.exe" ./tests/cli
+    - script: pytest -vvv --librepcb-executable="build/install/bin/librepcb-cli.exe" ./tests/cli
       displayName: Run LibrePCB-CLI Functional Tests
-    - script: pytest -vvv --librepcb-executable="build/install/opt/bin/librepcb.exe" --reruns 5 --reruns-delay 10 ./tests/funq
+    - script: pytest -vvv --librepcb-executable="build/install/bin/librepcb.exe" --reruns 5 --reruns-delay 10 ./tests/funq
       displayName: Run LibrePCB Functional Tests
     - bash: ./ci/upload_artifacts.sh
       displayName: Upload Artifacts
