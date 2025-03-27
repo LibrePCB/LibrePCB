@@ -1,0 +1,87 @@
+// Triggerable actions
+export enum Action {
+    // Special
+    none,  // No action triggered (used in models)
+    default,  // Default action, depending on context
+
+    // General
+    about-dialog,
+    library-manager,
+    keyboard-shortcuts-reference,
+    quit,
+
+    // Modify
+    delete,
+
+    // File system
+    folder-new,
+
+    // Window
+    window-new,
+    window-close,
+
+    // Workspace
+    workspace-open-folder,
+    workspace-switch,
+    workspace-settings,
+    workspace-libraries-rescan,
+
+    // Project
+    project-new,
+    project-open,
+    project-import-examples,
+    project-import-eagle,
+}
+
+// Pages which can be shown in the side panel
+export enum PanelPage {
+    home,
+}
+
+// Notification types
+export enum NotificationType {
+    tip,
+    info,
+    warning,
+    critical,
+    progress,
+}
+
+// Dynamic information about editor commands, e.g. used in menus
+export struct EditorCommand {
+    icon: image,
+    text: string,
+    status-tip: string,
+    shortcut: string,
+    modifiers: KeyboardModifiers,
+    key: string,
+}
+
+// Notification data structure
+export struct NotificationData {
+    type: NotificationType,
+    title: string,
+    description: string,
+    button-text: string,  // Optional (empty = no button)
+    progress: int,  // [%], ignored if type is not NotificationType.progress
+    supports-dont-show-again: bool,
+    unread: bool,
+    button-clicked: bool,  // Set by UI, handled in backend
+    dismissed: bool,  // Set by UI, handled in backend
+    dont-show-again: bool,  // Set by UI, handled in backend
+}
+
+// Generic tree view item data structure
+export struct TreeViewItemData {
+    level: int,  // 0 = top level items
+    icon: image,
+    text: string,
+    hint: string,
+    user-data: string,  // User data to uniquely reference this item
+    is-project-file-or-folder: bool,
+    has-children: bool,
+    expanded: bool,
+    supports-pinning: bool,
+    pinned: bool,
+    action: Action,  // Set by UI, handled in backend
+}
