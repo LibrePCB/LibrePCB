@@ -48,8 +48,9 @@ if __name__ == '__main__':
 
     # Images which are not used anywhere.
     print("Check for unused images...")
-    files = run(['git', 'ls-files', '--cached', '--others', '--',
-                 ':/img/**.png', ':/img/**.svg', ':/img/**.jpg',
+    files = run(['git', 'ls-files',
+                 '--cached', '--others', '--exclude-standard',
+                 '--', ':/img/**.png', ':/img/**.svg', ':/img/**.jpg',
                  ':/img/**.jpeg'],
                 cwd=REPO_DIR).decode("utf-8").splitlines()
     for file in files:
@@ -67,7 +68,8 @@ if __name__ == '__main__':
 
     # Headed files not included anywhere.
     print("Check for unused header files...")
-    files = run(['git', 'ls-files', '--cached', '--others', '--', '*.h'],
+    files = run(['git', 'ls-files', '--cached', '--others',
+                 '--exclude-standard', '--', '*.h'],
                 cwd=REPO_DIR).decode("utf-8").splitlines()
     for file in files:
         if file in WHITELIST:
