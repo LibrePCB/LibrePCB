@@ -1001,6 +1001,7 @@ target_link_libraries(
   PUBLIC # LibrePCB
          LibrePCB::Core
          # Third party
+         Slint::Slint
          TypeSafe::TypeSafe
          # Qt
          ${QT}::Core
