@@ -28,8 +28,8 @@
 #include <librepcb/core/workspace/workspacesettings.h>
 #include <librepcb/editor/dialogs/directorylockhandlerdialog.h>
 #include <librepcb/editor/editorcommandset.h>
+#include <librepcb/editor/guiapplication.h>
 #include <librepcb/editor/project/partinformationprovider.h>
-#include <librepcb/editor/workspace/controlpanel/controlpanel.h>
 #include <librepcb/editor/workspace/initializeworkspacewizard/initializeworkspacewizard.h>
 
 #include <QtConcurrent>
@@ -52,7 +52,6 @@ static void writeLogHeader() noexcept;
 static int runApplication() noexcept;
 static bool isFileFormatStableOrAcceptUnstable() noexcept;
 static int openWorkspace(FilePath& path);
-static int appExec() noexcept;
 
 /*******************************************************************************
  *  main()
@@ -343,30 +342,8 @@ static int openWorkspace(FilePath& path) {
                    &WorkspaceSettingsItem::edited,
                    &ws.getSettings().keyboardShortcuts, applyKeyboardShortcuts);
 
-  // Open the control panel.
-  ControlPanel p(ws, wizard.getWorkspaceContainsNewerFileFormats());
-  p.show();
-
-  return appExec();
-}
-
-/*******************************************************************************
- *  appExec()
- ******************************************************************************/
-
-static int appExec() noexcept {
-  // please note that we shouldn't show a dialog or message box in the catch()
-  // blocks! from http://qt-project.org/doc/qt-5/exceptionsafety.html:
-  //      "After an exception is thrown, the connection to the windowing server
-  //      might already be closed. It is not safe to call a GUI related function
-  //      after catching an exception."
-  try {
-    return QApplication::exec();
-  } catch (std::exception& e) {
-    qFatal("UNCAUGHT EXCEPTION: %s --- PROGRAM EXITED", e.what());
-  } catch (...) {
-    qFatal("UNCAUGHT EXCEPTION --- PROGRAM EXITED");
-  }
-
-  return -1;
+  // Run the application.
+  GuiApplication app(ws, wizard.getWorkspaceContainsNewerFileFormats());
+  app.exec();
+  return 0;
 }

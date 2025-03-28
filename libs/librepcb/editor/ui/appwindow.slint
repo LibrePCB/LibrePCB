@@ -1,0 +1,130 @@
+import "../../../../share/librepcb/fonts/NotoSans-Regular.ttf";
+import "../../../../share/librepcb/fonts/NotoSansMono-Regular.ttf";
+
+import { MainMenuBar } from "mainmenubar.slint";
+import { SideBar } from "sidebar.slint";
+import { HomePanel } from "homepanel.slint";
+import { HomeTab } from "hometab.slint";
+import { StatusBar } from "statusbar.slint";
+import {
+    Action,
+    Backend,
+    Constants,
+    Data,
+    EditorCommandSet as Cmd,
+    Helpers,
+    PanelPage
+} from "api.slint";
+
+export { Backend, Data, Cmd as EditorCommandSet }
+
+export component AppWindow inherits Window {
+    property <length> panel-width: min(self.width * 0.3, 350px);
+
+    title: Data.window-title;
+    background: #2a2a2a;
+    icon: @image-url("../../../../img/app/librepcb.svg");
+    default-font-family: "Noto Sans";
+    preferred-width: 1024px;
+    preferred-height: 768px;
+    forward-focus: fs;
+
+    fs := FocusScope {
+        // This is an ugly hack to not make any undesired element having the
+        // focus after application startup. The preview-mode is true at the
+        // beginning, so this focus scope will be focused initially. But the
+        // property changes to false during application startup which seems
+        // to keep the focus here.
+        enabled: Data.preview-mode;
+
+        key-pressed(event) => {
+            if Helpers.is-shortcut(event, Cmd.file-manager) {
+                Backend.trigger(Action.workspace-open-folder);
+            } else if Helpers.is-shortcut(event, Cmd.workspace-switch) {
+                Backend.trigger(Action.workspace-switch);
+            } else if Helpers.is-shortcut(event, Cmd.workspace-settings) {
+                Backend.trigger(Action.workspace-settings);
+            } else if Helpers.is-shortcut(event, Cmd.workspace-libraries-rescan) {
+                Backend.trigger(Action.workspace-libraries-rescan);
+            } else if Helpers.is-shortcut(event, Cmd.library-manager) {
+                Backend.trigger(Action.library-manager);
+            } else if Helpers.is-shortcut(event, Cmd.project-new) {
+                Backend.trigger(Action.project-new);
+            } else if Helpers.is-shortcut(event, Cmd.project-open) {
+                Backend.trigger(Action.project-open);
+            } else if Helpers.is-shortcut(event, Cmd.add-example-projects) {
+                Backend.trigger(Action.project-import-examples);
+            } else if Helpers.is-shortcut(event, Cmd.import-eagle-project) {
+                Backend.trigger(Action.project-import-eagle);
+            } else if Helpers.is-shortcut(event, Cmd.window-new) {
+                Backend.trigger(Action.window-new);
+            } else if Helpers.is-shortcut(event, Cmd.window-close) {
+                Backend.trigger(Action.window-close);
+            } else if Helpers.is-shortcut(event, Cmd.application-quit) {
+                Backend.trigger(Action.quit);
+            } else if Helpers.is-shortcut(event, Cmd.about-librepcb) {
+                Backend.trigger(Action.about-dialog);
+            } else if Helpers.is-shortcut(event, Cmd.website) {
+                Backend.open-url(Constants.website-url);
+            } else if Helpers.is-shortcut(event, Cmd.documentation-online) {
+                Backend.open-url(Constants.user-manual-url);
+            } else if Helpers.is-shortcut(event, Cmd.support) {
+                Backend.open-url(Constants.support-url);
+            } else if Helpers.is-shortcut(event, Cmd.donate) {
+                Backend.open-url(Constants.donate-url);
+            } else if Helpers.is-shortcut(event, Cmd.keyboard-shortcuts-reference) {
+                Backend.trigger(Action.keyboard-shortcuts-reference);
+            } else {
+                return reject;
+            }
+
+            accept
+        }
+
+        menubar := MainMenuBar {
+            x: 0;
+            y: 0;
+            z: 100; // For the tooltips.
+            width: 100%;
+            height: 26px;
+        }
+
+        sidebar := SideBar {
+            x: 0px;
+            y: menubar.height;
+            z: 90; // For the tooltips.
+            width: ((root.width <= 1200px) || (root.height <= 600px)) ? 35px : 45px;
+            height: parent.height - self.y - statusbar.height - 1px;
+        }
+
+        if Data.panel-page == PanelPage.home: home-panel := HomePanel {
+            x: sidebar.width;
+            y: sidebar.y;
+            z: 80; // For the tooltips.
+            width: panel-width;
+            height: sidebar.height;
+        }
+
+        HorizontalLayout {
+            x: sidebar.width + panel-width;
+            y: sidebar.y + 1px;
+            width: parent.width - self.x;
+            height: sidebar.height - 1px;
+
+            Rectangle {
+                background: #555555;
+                width: 1px;
+            }
+
+            home-tab := HomeTab {
+                width: parent.width - 1px;
+            }
+        }
+
+        statusbar := StatusBar {
+            x: 0;
+            y: parent.height - self.height;
+            width: parent.width;
+        }
+    }
+}

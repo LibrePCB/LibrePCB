@@ -1,0 +1,131 @@
+import { ProgressBar } from "widgets.slint";
+import { NotificationsPopup } from "notificationspopup.slint";
+import {
+    Constants,
+    Data,
+    NotificationType
+} from "api.slint";
+
+export component StatusBar inherits Rectangle {
+    height: 25px;
+    background: #353535;
+
+    HorizontalLayout {
+        padding-left: 10px;
+
+        Rectangle {
+            horizontal-stretch: 1;
+
+            status-txt := Text {
+                width: 100%;
+                height: 100%;
+                vertical-alignment: center;
+                accessible-description: "status text";
+
+                states [
+                    status-tip when !Data.status-tip.is-empty: {
+                        text: Data.status-tip;
+                        color: white;
+                    }
+                    message when !Data.status-bar-message.is-empty: {
+                        text: Data.status-bar-message;
+                        color: white;
+                    }
+                    default when true: {
+                        text: Data.workspace-path;
+                    }
+                ]
+            }
+        }
+
+        Rectangle {
+            width: 10px;
+        }
+
+        Rectangle {
+            max-width: 150px;
+
+            progress-bar := ProgressBar {
+                width: 100%;
+                visible: Data.notifications[Data.notifications-progress-index].type == NotificationType.progress;
+                progress: Data.notifications[Data.notifications-progress-index].progress / 100;
+            }
+        }
+
+        Rectangle {
+            width: 10px;
+        }
+
+        Rectangle {
+            property <bool> enabled: Data.notifications.length > 0;
+            property <int> item-count: Data.notifications.length;
+
+            changed item-count => {
+                if item-count == 0 {
+                    Data.notifications-shown = false;
+                }
+            }
+
+            width: self.height;
+            background: notifications-ta.has-hover ? #505050 : transparent;
+            border-width: (Data.notifications-unread > 0) ? 1px : 0px;
+            border-color: Constants.librepcb-color;
+
+            notifications-ta := TouchArea {
+                enabled: enabled;
+
+                Image {
+                    width: self.height * 0.7;
+                    height: 100%;
+                    image-fit: contain;
+                    colorize: enabled ? white : #707070;
+                    source: {
+                        if Data.notifications-unread > 0 {
+                            @image-url("../../../font-awesome/svgs/solid/bell.svg")
+                        } else {
+                            @image-url("../../../font-awesome/svgs/regular/bell.svg")
+                        }
+                    };
+
+                    // Accessibility
+                    accessible-role: button;
+                    accessible-enabled: enabled;
+                    accessible-expandable: true;
+                    accessible-expanded: Data.notifications-shown;
+                    accessible-label: "\{Data.notifications-unread} Notifications";
+                    accessible-action-default => {
+                        parent.clicked();
+                    }
+                    accessible-action-expand => {
+                        parent.clicked();
+                    }
+                }
+
+                if Data.notifications-unread > 0: notifications-unread-txt := Text {
+                    y: (parent.height - self.height) / 2 - 2px;
+                    color: root.background;
+                    horizontal-alignment: center;
+                    font-size: 12px;
+                    font-weight: 900;
+                    text: Data.notifications-unread;
+                    accessible-role: none;
+                }
+
+                clicked => {
+                    Data.notifications-shown = !Data.notifications-shown;
+                }
+            }
+
+            notifications-popup := NotificationsPopup {
+                x: parent.width - self.width;
+                y: -self.height;
+                width: min(max(self.preferred-width, 300px), root.width * 0.5, 700px);
+                height: Data.notifications-shown ? self.preferred-height : 0;
+                visible: self.height > 0;
+                clip: true;
+
+                animate height { duration: 100ms; }
+            }
+        }
+    }
+}
