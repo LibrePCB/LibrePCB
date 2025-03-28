@@ -1,0 +1,13 @@
+export component Tab inherits Rectangle {
+    in property <bool> show-watermark: false;
+
+    if show-watermark: Image {
+        width: min(root.width * 0.25, 200px);
+        height: self.width;
+        image-fit: contain;
+        colorize: #353535;
+        source: @image-url("../../../../img/app/librepcb-monochrome.svg");
+    }
+
+    @children
+}

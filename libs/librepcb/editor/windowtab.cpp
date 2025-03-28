@@ -20,15 +20,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "mainwindowtestadapter.h"
-
-#include "guiapplication.h"
-
-#include <librepcb/core/workspace/workspace.h>
-#include <librepcb/core/workspace/workspacelibrarydb.h>
+#include "windowtab.h"
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace
@@ -40,41 +34,43 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-MainWindowTestAdapter::MainWindowTestAdapter(GuiApplication& app,
-                                             QWidget* parent) noexcept
-  : QWidget(parent), mApp(app) {
-  setObjectName("testAdapter");
-
-  connect(&mApp.getWorkspace().getLibraryDb(), &WorkspaceLibraryDb::scanStarted,
-          this, [this]() { mLibraryScanFinished = false; });
-  connect(&mApp.getWorkspace().getLibraryDb(),
-          &WorkspaceLibraryDb::scanFinished, this,
-          [this]() { mLibraryScanFinished = true; });
+WindowTab::WindowTab(GuiApplication& app, QObject* parent) noexcept
+  : QObject(parent), onUiDataChanged(*this), mApp(app) {
 }
 
-MainWindowTestAdapter::~MainWindowTestAdapter() noexcept {
+WindowTab::~WindowTab() noexcept {
 }
 
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
 
-QVariant MainWindowTestAdapter::trigger(QVariant action) noexcept {
-  if (action == "library-manager") {
-    emit panelPageTriggered(ui::PanelPage::Libraries);
-  } else if (action == "workspace-switch") {
-    emit actionTriggered(ui::Action::WorkspaceSwitch);
-  } else if (action == "workspace-settings") {
-    emit actionTriggered(ui::Action::WorkspaceSettings);
-  } else if (action == "project-new") {
-    emit actionTriggered(ui::Action::ProjectNew);
-  } else if (action == "project-open") {
-    emit actionTriggered(ui::Action::ProjectOpen);
-  } else {
-    qCritical() << "Unknown action triggered:" << action;
+void WindowTab::setUiData(const ui::TabData& data) noexcept {
+  if (data.action != ui::Action::None) {
+    // if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0): Remove lambda.
+    const auto a = data.action;
+    QMetaObject::invokeMethod(
+        this, [this, a]() { trigger(a); }, Qt::QueuedConnection);
   }
+}
 
-  return QVariant();
+/*******************************************************************************
+ *  Protected Methods
+ ******************************************************************************/
+
+void WindowTab::trigger(ui::Action a) noexcept {
+  switch (a) {
+    case ui::Action::TabActivate: {
+      emit activateRequested();
+      break;
+    }
+    case ui::Action::TabClose: {
+      emit closeRequested();
+      break;
+    }
+    default:
+      break;
+  }
 }
 
 /*******************************************************************************

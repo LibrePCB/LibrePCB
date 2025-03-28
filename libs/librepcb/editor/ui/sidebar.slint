@@ -143,10 +143,29 @@ export component SideBar inherits Rectangle {
             icon: @image-url("../../../bootstrap-icons/icons/database.svg");
             tooltip: Cmd.library-manager.text;
             shortcut: Cmd.library-manager.shortcut;
-            checked: false;
+            checked: Data.panel-page == PanelPage.libraries;
+
+            states [
+                running when Data.refreshing-available-libraries: {
+                    emblem: Emblem.running;
+                }
+                error when !Data.libraries-fetching-error.is-empty: {
+                    emblem: Emblem.warning;
+                }
+                outdated when Data.outdated-libraries > 0: {
+                    emblem: Emblem.none;
+                    status: Data.outdated-libraries;
+                    status-color: black;
+                    status-background: #d4d400;
+                }
+                up-to-date when Data.outdated-libraries == 0: {
+                    emblem: Emblem.none;
+                    status: "";
+                }
+            ]
 
             clicked => {
-                Backend.trigger(Action.library-manager);
+                Data.panel-page = PanelPage.libraries;
             }
         }
 

@@ -1,0 +1,81 @@
+import { Constants } from "../api.slint";
+
+export component Switch inherits Rectangle {
+    in-out property <bool> checked: false;
+    in-out property <bool> enabled: true;
+    in-out property <string> text;
+    out property has-focus <=> fs.has-focus;
+
+    preferred-width: l.preferred-width;
+    preferred-height: l.preferred-height;
+    forward-focus: fs;
+
+    // Accessibility
+    accessible-role: switch;
+    accessible-checkable: true;
+    accessible-checked: checked;
+    accessible-enabled: enabled;
+    accessible-label: text;
+    accessible-action-default => {
+        checked = !checked;
+    }
+
+    fs := FocusScope {
+        enabled: enabled;
+
+        key-pressed(event) => {
+            if (event.text == Key.Return) || (event.text == Key.Space) {
+                checked = !checked;
+                return accept;
+            }
+            reject
+        }
+    }
+
+    l := HorizontalLayout {
+        spacing: 8px;
+
+        Rectangle {
+            property <float> darkness: {
+                if !enabled {
+                    0.5
+                } else if ta.pressed {
+                    0.3
+                } else {
+                    0
+                }
+            };
+
+            y: (parent.height - self.height) / 2;
+            width: 45px;
+            height: 25px;
+            background: (checked ? Constants.librepcb-color : #606060).darker(darkness);
+            border-radius: self.height / 2;
+            border-color: checked ? white : Constants.librepcb-color;
+            border-width: has-focus ? 1px : 0;
+
+            Rectangle {
+                x: checked ? (parent.width - self.width - self.padding) : self.padding;
+                width: self.height;
+                height: parent.height - 2 * self.padding;
+                padding: 3px;
+                background: ta.has-hover ? #303030 : #101010;
+                border-radius: self.height / 2;
+            }
+        }
+
+        Text {
+            text: text;
+            wrap: word-wrap;
+            accessible-role: none;
+        }
+    }
+
+    ta := TouchArea {
+        enabled: enabled;
+
+        clicked => {
+            checked = !checked;
+        }
+    }
+}

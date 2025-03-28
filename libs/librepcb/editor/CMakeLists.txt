@@ -847,6 +847,7 @@ add_library(
   undocommandgroup.h
   undostack.cpp
   undostack.h
+  utils/deriveduiobjectlistview.h
   utils/editortoolbox.cpp
   utils/editortoolbox.h
   utils/exclusiveactiongroup.cpp
@@ -867,6 +868,7 @@ add_library(
   utils/toolbarproxy.h
   utils/uihelpers.cpp
   utils/uihelpers.h
+  utils/uiobjectlist.h
   utils/undostackactiongroup.cpp
   utils/undostackactiongroup.h
   utils/valignactiongroup.cpp

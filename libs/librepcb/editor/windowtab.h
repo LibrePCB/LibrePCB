@@ -17,16 +17,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_MAINWINDOWTESTADAPTER_H
-#define LIBREPCB_EDITOR_MAINWINDOWTESTADAPTER_H
+#ifndef LIBREPCB_EDITOR_WINDOWTAB_H
+#define LIBREPCB_EDITOR_WINDOWTAB_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include "appwindow.h"
 
+#include <librepcb/core/utils/signalslot.h>
+
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -37,39 +38,43 @@ namespace editor {
 class GuiApplication;
 
 /*******************************************************************************
- *  Class MainWindowTestAdapter
+ *  Class WindowTab
  ******************************************************************************/
 
 /**
- * @brief Adapter class for automated GUI tests
+ * @brief The WindowTab class
  */
-class MainWindowTestAdapter final : public QWidget {
+class WindowTab : public QObject {
   Q_OBJECT
 
 public:
+  // Signals
+  Signal<WindowTab> onUiDataChanged;
+
   // Constructors / Destructor
-  MainWindowTestAdapter() = delete;
-  MainWindowTestAdapter(const MainWindowTestAdapter& other) = delete;
-  explicit MainWindowTestAdapter(GuiApplication& app,
-                                 QWidget* parent = nullptr) noexcept;
-  ~MainWindowTestAdapter() noexcept;
+  WindowTab() = delete;
+  WindowTab(const WindowTab& other) = delete;
+  explicit WindowTab(GuiApplication& app, QObject* parent = nullptr) noexcept;
+  virtual ~WindowTab() noexcept;
+
+  // General Methods
+  virtual ui::TabData getUiData() const noexcept = 0;
+  virtual void setUiData(const ui::TabData& data) noexcept;
+  virtual void activate() noexcept {}
+  virtual void deactivate() noexcept {}
 
   // Operator Overloadings
-  MainWindowTestAdapter& operator=(const MainWindowTestAdapter& rhs) = delete;
-
-public slots:
-  QVariant trigger(QVariant action) noexcept;
-  QVariant isLibraryScanFinished(QVariant) const noexcept {
-    return mLibraryScanFinished;
-  }
+  WindowTab& operator=(const WindowTab& rhs) = delete;
 
 signals:
-  void actionTriggered(ui::Action a);
-  void panelPageTriggered(ui::PanelPage p);
+  void activateRequested();
+  void closeRequested();
+  void statusBarMessageChanged(const QString& message, int timeoutMs);
 
-private:
+protected:
+  virtual void trigger(ui::Action a) noexcept;
+
   GuiApplication& mApp;
-  bool mLibraryScanFinished = false;
 };
 
 /*******************************************************************************
