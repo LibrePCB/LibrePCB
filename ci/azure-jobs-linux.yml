@@ -11,17 +11,18 @@ jobs:
       Ubuntu_2004_Qt_6_6_GCC:
         IMAGE: librepcb/librepcb-dev:ubuntu-20.04-qt6.6-3
         DEPLOY: true
-        NO_HOEDOWN: true
       Ubuntu_2204_Clang:
         IMAGE: librepcb/librepcb-dev:ubuntu-22.04-4
         CC: clang
         CXX: clang++
+        CMAKE_OPTIONS: '-DCMAKE_CXX_FLAGS="-DQT_FORCE_ASSERTS=1"'
       Ubuntu_2404_Unbundled:
         IMAGE: librepcb/librepcb-dev:ubuntu-24.04-2
         UNBUNDLE_DXFLIB: true
         UNBUNDLE_GTEST: true
         UNBUNDLE_MUPARSER: true
         UNBUNDLE_POLYCLIPPING: true
+        CMAKE_OPTIONS: '-DCMAKE_CXX_FLAGS="-DQT_FORCE_ASSERTS=1"'
         LD_LIBRARY_PATH: $(Build.Repository.LocalPath)/build/install/lib
   container:
     image: $[ variables['IMAGE'] ]
