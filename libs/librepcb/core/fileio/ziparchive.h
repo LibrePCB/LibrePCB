@@ -27,6 +27,8 @@
 
 #include <QtCore>
 
+#include <optional>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -100,6 +102,17 @@ public:
    * @throws On invalid index or I/O errors.
    */
   QByteArray readFile(std::size_t index);
+
+  /**
+   * @brief Convenience method to find a file by name and read its content
+   *
+   * @param fileName  Relative file name to read.
+   *
+   * @return The file content if file was found, `std::nullopt` otherwise.
+   *
+   * @throws On I/O errors.
+   */
+  std::optional<QByteArray> tryReadFile(const QString& fileName);
 
   /**
    * @brief Extract whole Zip to a directory (overwriting)

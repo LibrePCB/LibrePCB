@@ -13,7 +13,7 @@ def test(librepcb, helpers):
     with librepcb.open() as app:
 
         # Open library manager
-        app.widget('controlPanelOpenLibraryManagerButton').click()
+        app.widget('mainWindowTestAdapter').call_slot('trigger', 'library-manager')
         assert app.widget('libraryManager').properties()['visible'] is True
 
         # Make sure there is only one entry ("New Library") in the libraries list

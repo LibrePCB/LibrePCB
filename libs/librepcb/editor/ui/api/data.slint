@@ -1,0 +1,143 @@
+import {
+    NotificationData,
+    NotificationType,
+    PanelPage,
+    TreeViewItemData
+} from "types.slint";
+
+export global Data {
+    // Preview mode: True for preview, set to false by the backend
+    in property <bool> preview-mode: true;
+
+    // Window title
+    in property <string> window-title: "LibrePCB 1.2.0-unstable";
+
+    // Current side panel page
+    in property <PanelPage> panel-page: PanelPage.home;
+
+    // Static status bar message
+    in property <string> status-bar-message;
+
+    // Temporary status tip when hovering interactive UI elements
+    in property <string> status-tip;
+
+    // Workspace: Folder path
+    in property <string> workspace-path: "/path/to/workspace";
+
+    // Workspace: Folder tree
+    in property <[TreeViewItemData]> workspace-folder-tree: [
+        {
+            icon: @image-url("../../../../../img/places/project_folder.png"),
+            text: "folder-1",
+            user-data: "folder-1",
+            has-children: true,
+            expanded: false,
+        },
+        {
+            icon: @image-url("../../../../../img/places/project_folder.png"),
+            text: "folder-2",
+            user-data: "folder-2",
+            is-project-file-or-folder: true,
+            has-children: true,
+            expanded: true,
+        },
+        {
+            level: 1,
+            icon: @image-url("../../../../../img/app/librepcb.svg"),
+            text: "project-1.lpp",
+            user-data: "project-1.lpp",
+            is-project-file-or-folder: true,
+            supports-pinning: true,
+            pinned: true,
+        },
+        {
+            level: 1,
+            icon: @image-url("../../../../../img/app/librepcb.svg"),
+            text: "project-2.lpp",
+            user-data: "project-2.lpp",
+            is-project-file-or-folder: true,
+            supports-pinning: true,
+            pinned: false,
+        },
+    ];
+
+    // Quick access items
+    in property <[TreeViewItemData]> quick-access-items: [
+        {
+            icon: @image-url("../../../../../img/app/librepcb.svg"),
+            text: "project-1.lpp",
+            hint: "foo/bar/project-1.lpp",
+            user-data: "foo/bar/project-1.lpp",
+            supports-pinning: true,
+            pinned: false,
+        },
+        {
+            icon: @image-url("../../../../../img/app/librepcb.svg"),
+            text: "project-2.lpp",
+            hint: "fooooooooooo/baaaaaaaaaaaaaaaaaaaaaaaar/project-2.lpp",
+            user-data: "fooooooooooo/baaaaaaaaaaaaaaaaaaaaaaaar/project-2.lpp",
+            supports-pinning: true,
+            pinned: false,
+        },
+        {
+            icon: @image-url("../../../../../img/app/librepcb.svg"),
+            text: "project-3.lpp",
+            hint: "foo/bar/project-3.lpp",
+            user-data: "foo/bar/project-3.lpp",
+            supports-pinning: true,
+            pinned: true,
+        },
+    ];
+
+    // Project preview: Project file path
+    in property <string> project-preview-path;
+
+    // Project preview: Rendering in progress
+    in property <bool> project-preview-rendering: false;
+
+    // Project preview: Preview image result
+    in property <image> project-preview-image;
+
+    // Notifications: Data model
+    in property <[NotificationData]> notifications: [
+        {
+            type: NotificationType.tip,
+            title: "Tip",
+            description: "This is a tip notification",
+            button-text: "Do Something",
+            supports-dont-show-again: true,
+            unread: true,
+        },
+        {
+            type: NotificationType.info,
+            title: "Info",
+            description: "This is an info notification",
+            unread: true,
+        },
+        {
+            type: NotificationType.warning,
+            title: "Warning",
+            description: "This is a warning notification",
+        },
+        {
+            type: NotificationType.critical,
+            title: "Critical",
+            description: "This is a critical notification",
+        },
+        {
+            type: NotificationType.progress,
+            title: "Progress",
+            description: "This is a progress notification",
+            progress: 50,
+        },
+    ];
+
+    // Notifications: Unread messages count
+    in property <int> notifications-unread: 2;
+
+    // Notifications: Index of current progress notification (-1 if none)
+    in property <int> notifications-progress-index: 4;
+
+    // Notifications: Popup shown status
+    in property <bool> notifications-shown: true;
+}

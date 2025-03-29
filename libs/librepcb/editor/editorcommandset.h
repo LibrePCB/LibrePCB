@@ -1594,11 +1594,20 @@ public:
       {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_W)},
       &categoryWindowManagement,
   };
+  EditorCommand windowNew{
+      "window_new",  // clang-format break
+      QT_TR_NOOP("New Window"),
+      QT_TR_NOOP("Open a new window"),
+      ":/bi/window-plus.svg",
+      EditorCommand::Flags(),
+      {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_N)},
+      &categoryWindowManagement,
+  };
   EditorCommand windowClose{
       "window_close",  // clang-format break
       QT_TR_NOOP("Close Window"),
       QT_TR_NOOP("Close this window"),
-      QString(),
+      ":/bi/window-x.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::ALT | Qt::Key_F4)},
       &categoryWindowManagement,
@@ -1612,14 +1621,15 @@ public:
       {QKeySequence(Qt::CTRL | Qt::Key_F4)},
       &categoryWindowManagement,
   };
-  EditorCommand projectCloseAll{
+  // Not used anymore, just kept here to not loose the translations.
+  EditorCommand _projectCloseAll{
       "project_close_all",  // clang-format break
       QT_TR_NOOP("Close All Projects"),
       QT_TR_NOOP("Close all currently opened projects"),
       ":/img/actions/close.png",
       EditorCommand::Flags(),
       {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_F4)},
-      &categoryWindowManagement,
+      nullptr,  // &categoryWindowManagement,
   };
   EditorCommand applicationQuit{
       "application_quit",  // clang-format break
@@ -1662,18 +1672,36 @@ public:
   };
   EditorCommand documentationOnline{
       "documentation_online",  // clang-format break
-      QT_TR_NOOP("Online Documentation"),
-      QT_TR_NOOP("Open the documentation in the web browser"),
+      QT_TR_NOOP("User Manual && Tutorials"),
+      QT_TR_NOOP("Open the online user manual in the web browser"),
       ":/img/actions/help.png",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_F1)},
+      &categoryHelp,
+  };
+  EditorCommand support{
+      "support",  // clang-format break
+      QT_TR_NOOP("Give Feedback && Get Support"),
+      QT_TR_NOOP("Open the support page in the web browser"),
+      ":/fa/regular/comments.svg",
+      EditorCommand::Flags(),
+      {},
+      &categoryHelp,
+  };
+  EditorCommand donate{
+      "donate",  // clang-format break
+      QT_TR_NOOP("Support the LibrePCB Project"),
+      QT_TR_NOOP("Open the donation page in the web browser"),
+      ":/fa/solid/heart.svg",
+      EditorCommand::Flags(),
+      {},
       &categoryHelp,
   };
   EditorCommand keyboardShortcutsReference{
       "keyboard_shortcuts_reference",  // clang-format break
       QT_TR_NOOP("Keyboard Shortcuts Reference"),
       QT_TR_NOOP("Open a quick reference about the keyboard shortcuts"),
-      QString(),
+      ":/fa/solid/keyboard.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::CTRL | Qt::Key_F1)},
       &categoryHelp,
@@ -1681,32 +1709,35 @@ public:
 
   EditorCommandCategory categoryContextMenu{
       "categoryContextMenu", QT_TR_NOOP("Context Menu"), false, &categoryRoot};
-  EditorCommand folderNew{
+  // Not used anymore, just kept here to not loose the translations.
+  EditorCommand _folderNew{
       "folder_new",  // clang-format break
       QT_TR_NOOP("New Folder"),
       QT_TR_NOOP("Create a new folder"),
       ":/img/actions/new_folder.png",
       EditorCommand::Flags(),
       {},
-      &categoryContextMenu,
+      nullptr,  // &categoryContextMenu,
   };
-  EditorCommand favoriteAdd{
+  // Not used anymore, just kept here to not loose the translations.
+  EditorCommand _favoriteAdd{
       "favorite_add",  // clang-format break
       QT_TR_NOOP("Add To Favorites"),
       QT_TR_NOOP("Add project to favorites"),
       ":/img/actions/bookmark_gray.png",
       EditorCommand::Flags(),
       {},
-      &categoryContextMenu,
+      nullptr,  // &categoryContextMenu,
   };
-  EditorCommand favoriteRemove{
+  // Not used anymore, just kept here to not loose the translations.
+  EditorCommand _favoriteRemove{
       "favorite_remove",  // clang-format break
       QT_TR_NOOP("Remove From Favorites"),
       QT_TR_NOOP("Remove project from favorites"),
       ":/img/actions/bookmark.png",
       EditorCommand::Flags(),
       {},
-      &categoryContextMenu,
+      nullptr,  // &categoryContextMenu,
   };
   EditorCommand vertexAdd{
       "vertex_add",  // clang-format break

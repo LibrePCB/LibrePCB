@@ -1,0 +1,1680 @@
+// GENERATED FILE! DO NOT MODIFY!
+// Run dev/generate_editorcommandset.py to re-generate.
+
+import { EditorCommand } from "types.slint";
+
+export global EditorCommandSet {
+    in property <EditorCommand> item-new: {
+        icon: @image-url(""),
+        text: "New...",
+        status-tip: "Add a new item",
+        shortcut: "Ctrl+N",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: "n",
+    };
+
+    in property <EditorCommand> item-open: {
+        icon: @image-url(""),
+        text: "Open",
+        status-tip: "Open the selected item(s)",
+        shortcut: "Return",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: Key.Return,
+    };
+
+    in property <EditorCommand> save: {
+        icon: @image-url(""),
+        text: "Save",
+        status-tip: "Save changes to filesystem",
+        shortcut: "Ctrl+S",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: "s",
+    };
+
+    in property <EditorCommand> save-all: {
+        icon: @image-url(""),
+        text: "Save All",
+        status-tip: "Save all elements to filesystem",
+        shortcut: "Ctrl+Shift+S",
+        modifiers: { alt: false, control: true, shift: true, meta: false },
+        key: "s",
+    };
+
+    in property <EditorCommand> select-all: {
+        icon: @image-url(""),
+        text: "Select All",
+        status-tip: "Select all visible objects",
+        shortcut: "Ctrl+A",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: "a",
+    };
+
+    in property <EditorCommand> find: {
+        icon: @image-url(""),
+        text: "Find...",
+        status-tip: "Find or filter objects",
+        shortcut: "Ctrl+F",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: "f",
+    };
+
+    in property <EditorCommand> find-next: {
+        icon: @image-url(""),
+        text: "Find Next",
+        status-tip: "Go to the next found object",
+        shortcut: "F3",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: Key.F3,
+    };
+
+    in property <EditorCommand> find-previous: {
+        icon: @image-url(""),
+        text: "Find Previous",
+        status-tip: "Go to the previous found object",
+        shortcut: "Shift+F3",
+        modifiers: { alt: false, control: false, shift: true, meta: false },
+        key: Key.F3,
+    };
+
+    in property <EditorCommand> file-manager: {
+        icon: @image-url(""),
+        text: "Show in File Manager",
+        status-tip: "Open the directory in the file manager",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> control-panel: {
+        icon: @image-url(""),
+        text: "Control Panel",
+        status-tip: "Bring the control panel window to front",
+        shortcut: "Ctrl+Alt+Home",
+        modifiers: { alt: true, control: true, shift: false, meta: false },
+        key: Key.Home,
+    };
+
+    in property <EditorCommand> workspace-switch: {
+        icon: @image-url(""),
+        text: "Switch Workspace...",
+        status-tip: "Choose another workspace to open",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> workspace-settings: {
+        icon: @image-url(""),
+        text: "Workspace Settings...",
+        status-tip: "Open the workspace settings dialog",
+        shortcut: "Ctrl+,",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: ",",
+    };
+
+    in property <EditorCommand> workspace-libraries-rescan: {
+        icon: @image-url(""),
+        text: "Rescan Libraries",
+        status-tip: "Scan all workspace libraries to update the cache",
+        shortcut: "F5",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: Key.F5,
+    };
+
+    in property <EditorCommand> library-manager: {
+        icon: @image-url(""),
+        text: "Library Manager...",
+        status-tip: "Open the library manager window",
+        shortcut: "Ctrl+Alt+M",
+        modifiers: { alt: true, control: true, shift: false, meta: false },
+        key: "m",
+    };
+
+    in property <EditorCommand> library-element-new: {
+        icon: @image-url(""),
+        text: "New Library Element...",
+        status-tip: "Create a new library element",
+        shortcut: "Ctrl+N",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: "n",
+    };
+
+    in property <EditorCommand> library-element-duplicate: {
+        icon: @image-url(""),
+        text: "Duplicate",
+        status-tip: "Create a new element by duplicating this one",
+        shortcut: "Ctrl+D",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: "d",
+    };
+
+    in property <EditorCommand> project-new: {
+        icon: @image-url(""),
+        text: "New Project...",
+        status-tip: "Create a new project",
+        shortcut: "Ctrl+N",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: "n",
+    };
+
+    in property <EditorCommand> project-open: {
+        icon: @image-url(""),
+        text: "Open Project...",
+        status-tip: "Open an existing project",
+        shortcut: "Ctrl+O",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: "o",
+    };
+
+    in property <EditorCommand> project-save: {
+        icon: @image-url(""),
+        text: "Save Project",
+        status-tip: "Save the currently opened project",
+        shortcut: "Ctrl+S",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: "s",
+    };
+
+    in property <EditorCommand> project-setup: {
+        icon: @image-url(""),
+        text: "Project Setup...",
+        status-tip: "View/modify the project setup",
+        shortcut: "F6",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: Key.F6,
+    };
+
+    in property <EditorCommand> grid-properties: {
+        icon: @image-url(""),
+        text: "Grid Properties...",
+        status-tip: "View/modify the grid properties",
+        shortcut: "F4",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: Key.F4,
+    };
+
+    in property <EditorCommand> board-setup: {
+        icon: @image-url(""),
+        text: "Board Setup...",
+        status-tip: "View/modify the board setup",
+        shortcut: "F7",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: Key.F7,
+    };
+
+    in property <EditorCommand> run-quick-check: {
+        icon: @image-url(""),
+        text: "Run Quick Check",
+        status-tip: "Run only the most important copper checks from the DRC",
+        shortcut: "Shift+F8",
+        modifiers: { alt: false, control: false, shift: true, meta: false },
+        key: Key.F8,
+    };
+
+    in property <EditorCommand> run-design-rule-check: {
+        icon: @image-url(""),
+        text: "Run Design Rule Check",
+        status-tip: "Run the design rule check (DRC)",
+        shortcut: "F8",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: Key.F8,
+    };
+
+    in property <EditorCommand> project-library-update: {
+        icon: @image-url(""),
+        text: "Update Project Library...",
+        status-tip: "Update the project's library elements from workspace libraries",
+        shortcut: "Ctrl+F5",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: Key.F5,
+    };
+
+    in property <EditorCommand> schematic-editor: {
+        icon: @image-url(""),
+        text: "Schematic Editor",
+        status-tip: "Bring the schematic editor window to front",
+        shortcut: "Ctrl+Alt+S",
+        modifiers: { alt: true, control: true, shift: false, meta: false },
+        key: "s",
+    };
+
+    in property <EditorCommand> sheet-new: {
+        icon: @image-url(""),
+        text: "New Sheet...",
+        status-tip: "Add a new schematic sheet to the project",
+        shortcut: "Ctrl+N",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: "n",
+    };
+
+    in property <EditorCommand> sheet-rename: {
+        icon: @image-url(""),
+        text: "Rename Sheet...",
+        status-tip: "Rename the current schematic sheet",
+        shortcut: "Ctrl+F2",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: Key.F2,
+    };
+
+    in property <EditorCommand> sheet-remove: {
+        icon: @image-url(""),
+        text: "Remove Sheet",
+        status-tip: "Remove the current schematic sheet from the project",
+        shortcut: "Ctrl+Delete",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: Key.Delete,
+    };
+
+    in property <EditorCommand> board-editor: {
+        icon: @image-url(""),
+        text: "Board Editor",
+        status-tip: "Bring the board editor window to front",
+        shortcut: "Ctrl+Alt+B",
+        modifiers: { alt: true, control: true, shift: false, meta: false },
+        key: "b",
+    };
+
+    in property <EditorCommand> board-new: {
+        icon: @image-url(""),
+        text: "New Board...",
+        status-tip: "Add a new board to the project",
+        shortcut: "Ctrl+N",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: "n",
+    };
+
+    in property <EditorCommand> board-copy: {
+        icon: @image-url(""),
+        text: "Copy Board...",
+        status-tip: "Add a copy of the current board to the project",
+        shortcut: "Ctrl+D",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: "d",
+    };
+
+    in property <EditorCommand> board-remove: {
+        icon: @image-url(""),
+        text: "Remove Board",
+        status-tip: "Remove the current board from the project",
+        shortcut: "Ctrl+Delete",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: Key.Delete,
+    };
+
+    in property <EditorCommand> plane-show-all: {
+        icon: @image-url(""),
+        text: "Show All Planes",
+        status-tip: "Make the filled areas of all planes visible",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> plane-hide-all: {
+        icon: @image-url(""),
+        text: "Hide All Planes",
+        status-tip: "Make the filled areas of all planes invisible",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> plane-rebuild-all: {
+        icon: @image-url(""),
+        text: "Rebuild All Planes",
+        status-tip: "Re-calculate the filled areas of all planes",
+        shortcut: "Ctrl+Shift+R",
+        modifiers: { alt: false, control: true, shift: true, meta: false },
+        key: "r",
+    };
+
+    in property <EditorCommand> input-browse: {
+        icon: @image-url(""),
+        text: "Browse...",
+        status-tip: "Open file or directory browser",
+        shortcut: "Ctrl+B",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: "b",
+    };
+
+    in property <EditorCommand> input-unit-change: {
+        icon: @image-url(""),
+        text: "Change Unit...",
+        status-tip: "Change the measurement unit of the text input",
+        shortcut: "Ctrl+M",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: "m",
+    };
+
+    in property <EditorCommand> input-remove: {
+        icon: @image-url(""),
+        text: "Remove",
+        status-tip: "Remove this item",
+        shortcut: "Ctrl+Delete",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: Key.Delete,
+    };
+
+    in property <EditorCommand> input-accept-add: {
+        icon: @image-url(""),
+        text: "Add",
+        status-tip: "Add this item",
+        shortcut: "Return",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: Key.Return,
+    };
+
+    in property <EditorCommand> add-example-projects: {
+        icon: @image-url(""),
+        text: "Add Example Projects...",
+        status-tip: "Add some example projects to the workspace",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> import-dxf: {
+        icon: @image-url(""),
+        text: "Import DXF...",
+        status-tip: "Import a 2D mechanical drawing",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> import-eagle-library: {
+        icon: @image-url(""),
+        text: "Import EAGLE Library...",
+        status-tip: "Import library elements from an EAGLE *.lbr file",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> import-eagle-project: {
+        icon: @image-url(""),
+        text: "Import EAGLE Project...",
+        status-tip: "Import schematic/board from EAGLE *.sch/*.brd files",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> import-kicad-library: {
+        icon: @image-url(""),
+        text: "Import KiCad Library...",
+        status-tip: "Import symbols and footprints from KiCad libraries",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> import-specctra-ses: {
+        icon: @image-url(""),
+        text: "Import Specctra SES...",
+        status-tip: "Import a Specctra session, e.g. from external autorouters",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> export-lppz: {
+        icon: @image-url(""),
+        text: "Export *.lppz Archive...",
+        status-tip: "Export the project as a self-contained *.lppz archive",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> export-image: {
+        icon: @image-url(""),
+        text: "Export Image...",
+        status-tip: "Export graphics as a pixmap",
+        shortcut: "Ctrl+Shift+I",
+        modifiers: { alt: false, control: true, shift: true, meta: false },
+        key: "i",
+    };
+
+    in property <EditorCommand> export-pdf: {
+        icon: @image-url(""),
+        text: "Export PDF...",
+        status-tip: "Export graphics as a PDF",
+        shortcut: "Ctrl+Shift+P",
+        modifiers: { alt: false, control: true, shift: true, meta: false },
+        key: "p",
+    };
+
+    in property <EditorCommand> export-specctra-dsn: {
+        icon: @image-url(""),
+        text: "Export Specctra DSN...",
+        status-tip: "Export PCB to Specctra format for external autorouters etc.",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> export-step: {
+        icon: @image-url(""),
+        text: "Export STEP Model...",
+        status-tip: "Export PCB as a STEP file for loading it into MCAD software",
+        shortcut: "Ctrl+Shift+T",
+        modifiers: { alt: false, control: true, shift: true, meta: false },
+        key: "t",
+    };
+
+    in property <EditorCommand> print: {
+        icon: @image-url(""),
+        text: "Print...",
+        status-tip: "Send graphics to a printer",
+        shortcut: "Ctrl+P",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: "p",
+    };
+
+    in property <EditorCommand> generate-bom: {
+        icon: @image-url(""),
+        text: "Generate Bill Of Materials...",
+        status-tip: "Generate bill of materials (BOM) file",
+        shortcut: "F9",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: Key.F9,
+    };
+
+    in property <EditorCommand> generate-fabrication-data: {
+        icon: @image-url(""),
+        text: "Generate Fabrication Data...",
+        status-tip: "Generate Gerber/Excellon files for PCB fabrication",
+        shortcut: "F10",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: Key.F10,
+    };
+
+    in property <EditorCommand> generate-pick-place: {
+        icon: @image-url(""),
+        text: "Generate Pick&Place Files...",
+        status-tip: "Generate pick&place files for automated PCB assembly",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> generate-d356-netlist: {
+        icon: @image-url(""),
+        text: "Generate IPC-D-356A Netlist...",
+        status-tip: "Generate netlist file for automated PCB testing",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> output-jobs: {
+        icon: @image-url(""),
+        text: "Output Jobs...",
+        status-tip: "Modify or run output jobs",
+        shortcut: "F11",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: Key.F11,
+    };
+
+    in property <EditorCommand> order-pcb: {
+        icon: @image-url(""),
+        text: "Order PCB...",
+        status-tip: "Start ordering the PCB online",
+        shortcut: "F12",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: Key.F12,
+    };
+
+    in property <EditorCommand> undo: {
+        icon: @image-url(""),
+        text: "Undo",
+        status-tip: "Revert the last modification",
+        shortcut: "Ctrl+Z",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: "z",
+    };
+
+    in property <EditorCommand> redo: {
+        icon: @image-url(""),
+        text: "Redo",
+        status-tip: "Re-apply the last reverted modification",
+        shortcut: "Ctrl+Y",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: "y",
+    };
+
+    in property <EditorCommand> clipboard-cut: {
+        icon: @image-url(""),
+        text: "Cut",
+        status-tip: "Cut the selected object(s) to clipboard",
+        shortcut: "Ctrl+X",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: "x",
+    };
+
+    in property <EditorCommand> clipboard-copy: {
+        icon: @image-url(""),
+        text: "Copy",
+        status-tip: "Copy the selected object(s) to clipboard",
+        shortcut: "Ctrl+C",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: "c",
+    };
+
+    in property <EditorCommand> clipboard-paste: {
+        icon: @image-url(""),
+        text: "Paste",
+        status-tip: "Paste object(s) from the clipboard",
+        shortcut: "Ctrl+V",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: "v",
+    };
+
+    in property <EditorCommand> move-left: {
+        icon: @image-url(""),
+        text: "Move Left",
+        status-tip: "Move the selected object(s) to the left",
+        shortcut: "Left",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: Key.LeftArrow,
+    };
+
+    in property <EditorCommand> move-right: {
+        icon: @image-url(""),
+        text: "Move Right",
+        status-tip: "Move the selected object(s) to the right",
+        shortcut: "Right",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: Key.RightArrow,
+    };
+
+    in property <EditorCommand> move-up: {
+        icon: @image-url(""),
+        text: "Move Up",
+        status-tip: "Move the selected object(s) up",
+        shortcut: "Up",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: Key.UpArrow,
+    };
+
+    in property <EditorCommand> move-down: {
+        icon: @image-url(""),
+        text: "Move Down",
+        status-tip: "Move the selected object(s) down",
+        shortcut: "Down",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: Key.DownArrow,
+    };
+
+    in property <EditorCommand> rotate-ccw: {
+        icon: @image-url(""),
+        text: "Rotate Counterclockwise",
+        status-tip: "Rotate the selected object(s) counterclockwise",
+        shortcut: "R",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "r",
+    };
+
+    in property <EditorCommand> rotate-cw: {
+        icon: @image-url(""),
+        text: "Rotate Clockwise",
+        status-tip: "Rotate the selected object(s) clockwise",
+        shortcut: "Shift+R",
+        modifiers: { alt: false, control: false, shift: true, meta: false },
+        key: "r",
+    };
+
+    in property <EditorCommand> mirror-horizontal: {
+        icon: @image-url(""),
+        text: "Mirror Horizontally",
+        status-tip: "Mirror the selected object(s) horizontally",
+        shortcut: "M",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "m",
+    };
+
+    in property <EditorCommand> mirror-vertical: {
+        icon: @image-url(""),
+        text: "Mirror Vertically",
+        status-tip: "Mirror the selected object(s) vertically",
+        shortcut: "Shift+M",
+        modifiers: { alt: false, control: false, shift: true, meta: false },
+        key: "m",
+    };
+
+    in property <EditorCommand> flip-horizontal: {
+        icon: @image-url(""),
+        text: "Flip Horizontally",
+        status-tip: "Flip the selected object(s) horizontally to the other board side",
+        shortcut: "F",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "f",
+    };
+
+    in property <EditorCommand> flip-vertical: {
+        icon: @image-url(""),
+        text: "Flip Vertically",
+        status-tip: "Flip the selected object(s) vertically to the other board side",
+        shortcut: "Shift+F",
+        modifiers: { alt: false, control: false, shift: true, meta: false },
+        key: "f",
+    };
+
+    in property <EditorCommand> move-align: {
+        icon: @image-url(""),
+        text: "Move/Align Objects",
+        status-tip: "Move and/or align the selected object(s) vertically or ",
+        shortcut: "A",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "a",
+    };
+
+    in property <EditorCommand> snap-to-grid: {
+        icon: @image-url(""),
+        text: "Snap to Grid",
+        status-tip: "Move the selected object(s) to snap the grid",
+        shortcut: "S",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "s",
+    };
+
+    in property <EditorCommand> lock: {
+        icon: @image-url(""),
+        text: "Lock Placement",
+        status-tip: "Lock the placement of the selected object(s)",
+        shortcut: "Ctrl+L",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: "l",
+    };
+
+    in property <EditorCommand> unlock: {
+        icon: @image-url(""),
+        text: "Unlock Placement",
+        status-tip: "Unlock the placement of the selected object(s)",
+        shortcut: "Ctrl+U",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: "u",
+    };
+
+    in property <EditorCommand> line-width-set: {
+        icon: @image-url(""),
+        text: "Set Line Width...",
+        status-tip: "Change the line/trace/stroke width of the selected object(s)",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> device-reset-text-all: {
+        icon: @image-url(""),
+        text: "Reset All Texts",
+        status-tip: "Reset all texts of the footprint to their initial state",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> properties: {
+        icon: @image-url(""),
+        text: "Properties...",
+        status-tip: "View/modify the object properties",
+        shortcut: "E",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "e",
+    };
+
+    in property <EditorCommand> rename: {
+        icon: @image-url(""),
+        text: "Rename",
+        status-tip: "Rename the selected object",
+        shortcut: "F2",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: Key.F2,
+    };
+
+    in property <EditorCommand> remove: {
+        icon: @image-url(""),
+        text: "Remove",
+        status-tip: "Delete the selected object(s)",
+        shortcut: "Delete",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: Key.Delete,
+    };
+
+    in property <EditorCommand> zoom-fit-content: {
+        icon: @image-url(""),
+        text: "Zoom to Fit Contents",
+        status-tip: "Set the zoom level to fit the whole content",
+        shortcut: "Ctrl+Home",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: Key.Home,
+    };
+
+    in property <EditorCommand> zoom-in: {
+        icon: @image-url(""),
+        text: "Zoom In",
+        status-tip: "Increase the zoom level",
+        shortcut: "Ctrl++",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: "+",
+    };
+
+    in property <EditorCommand> zoom-out: {
+        icon: @image-url(""),
+        text: "Zoom Out",
+        status-tip: "Decrease the zoom level",
+        shortcut: "Ctrl+-",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: "-",
+    };
+
+    in property <EditorCommand> grid-increase: {
+        icon: @image-url(""),
+        text: "Increase Grid Interval",
+        status-tip: "Increase the grid interval",
+        shortcut: "Ctrl+Shift++",
+        modifiers: { alt: false, control: true, shift: true, meta: false },
+        key: "+",
+    };
+
+    in property <EditorCommand> grid-decrease: {
+        icon: @image-url(""),
+        text: "Decrease Grid Interval",
+        status-tip: "Decrease the grid interval",
+        shortcut: "Ctrl+Shift+-",
+        modifiers: { alt: false, control: true, shift: true, meta: false },
+        key: "-",
+    };
+
+    in property <EditorCommand> show-pin-numbers: {
+        icon: @image-url(""),
+        text: "Show Pin Numbers",
+        status-tip: "Show or hide symbol pin numbers",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> ignore-locks: {
+        icon: @image-url(""),
+        text: "Ignore Placement Locks",
+        status-tip: "Allow dragging locked items",
+        shortcut: "Ctrl+Shift+L",
+        modifiers: { alt: false, control: true, shift: true, meta: false },
+        key: "l",
+    };
+
+    in property <EditorCommand> toggle-background-image: {
+        icon: @image-url(""),
+        text: "Set/Unset Background Image...",
+        status-tip: "Use a datasheet drawing as the background for verification",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> toggle-3d: {
+        icon: @image-url(""),
+        text: "Toggle 2D/3D Mode",
+        status-tip: "Switch between 2D and 3D viewer mode",
+        shortcut: "Ctrl+3",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: "3",
+    };
+
+    in property <EditorCommand> tool-select: {
+        icon: @image-url(""),
+        text: "Select",
+        status-tip: "Select & modify existing objects",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> tool-line: {
+        icon: @image-url(""),
+        text: "Draw Line",
+        status-tip: "Draw graphical lines",
+        shortcut: "L",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "l",
+    };
+
+    in property <EditorCommand> tool-rect: {
+        icon: @image-url(""),
+        text: "Draw Rectangle",
+        status-tip: "Draw graphical rectangles",
+        shortcut: "G",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "g",
+    };
+
+    in property <EditorCommand> tool-polygon: {
+        icon: @image-url(""),
+        text: "Draw Polygon",
+        status-tip: "Draw graphical polygons",
+        shortcut: "P",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "p",
+    };
+
+    in property <EditorCommand> tool-circle: {
+        icon: @image-url(""),
+        text: "Draw Circle",
+        status-tip: "Draw graphical circles",
+        shortcut: "C",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "c",
+    };
+
+    in property <EditorCommand> tool-arc: {
+        icon: @image-url(""),
+        text: "Draw Arc",
+        status-tip: "Draw graphical arcs",
+        shortcut: "Shift+C",
+        modifiers: { alt: false, control: false, shift: true, meta: false },
+        key: "c",
+    };
+
+    in property <EditorCommand> tool-text: {
+        icon: @image-url(""),
+        text: "Add Text",
+        status-tip: "Add graphical text objects",
+        shortcut: "T",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "t",
+    };
+
+    in property <EditorCommand> tool-name: {
+        icon: @image-url(""),
+        text: "Add Name",
+        status-tip: "Add graphical text objects for '{{NAME}}'",
+        shortcut: "N",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "n",
+    };
+
+    in property <EditorCommand> tool-value: {
+        icon: @image-url(""),
+        text: "Add Value",
+        status-tip: "Add graphical text objects for '{{VALUE}}'",
+        shortcut: "V",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "v",
+    };
+
+    in property <EditorCommand> tool-pin: {
+        icon: @image-url(""),
+        text: "Add Pin",
+        status-tip: "Add symbol pins (electrical connections for schematics)",
+        shortcut: "I",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "i",
+    };
+
+    in property <EditorCommand> tool-pad-tht: {
+        icon: @image-url(""),
+        text: "Add THT Pad",
+        status-tip: "Add plated through-hole copper pads",
+        shortcut: "H",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "h",
+    };
+
+    in property <EditorCommand> tool-pad-smt: {
+        icon: @image-url(""),
+        text: "Add SMT Pad",
+        status-tip: "Add surface mounted (single layer) copper pads",
+        shortcut: "D",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "d",
+    };
+
+    in property <EditorCommand> tool-pad-thermal: {
+        icon: @image-url(""),
+        text: "Add Thermal Pad",
+        status-tip: "Add special SMT pads used as heat sink",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> tool-pad-bga: {
+        icon: @image-url(""),
+        text: "Add BGA Pad",
+        status-tip: "Add special SMT pads used for ball grid arrays",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> tool-pad-edge-connector: {
+        icon: @image-url(""),
+        text: "Add Edge Connector Pad",
+        status-tip: "Add special SMT pads used as edge connector",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> tool-pad-test-point: {
+        icon: @image-url(""),
+        text: "Add Test Pad",
+        status-tip: "Add special SMT pads used as test points",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> tool-pad-local-fiducial: {
+        icon: @image-url(""),
+        text: "Add Local Fiducial Pad",
+        status-tip: "Add special SMT pads used as local fiducials",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> tool-pad-global-fiducial: {
+        icon: @image-url(""),
+        text: "Add Global Fiducial Pad",
+        status-tip: "Add special SMT pads used as global fiducials",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> tool-zone: {
+        icon: @image-url(""),
+        text: "Draw Keepout Zone",
+        status-tip: "Draw keep-out zones",
+        shortcut: "Z",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "z",
+    };
+
+    in property <EditorCommand> tool-hole: {
+        icon: @image-url(""),
+        text: "Add Hole",
+        status-tip: "Add non-plated holes (NPTH drills)",
+        shortcut: "O",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "o",
+    };
+
+    in property <EditorCommand> tool-wire: {
+        icon: @image-url(""),
+        text: "Draw Wire",
+        status-tip: "Draw wires to create electrical connections between symbol pins",
+        shortcut: "W",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "w",
+    };
+
+    in property <EditorCommand> tool-netlabel: {
+        icon: @image-url(""),
+        text: "Add Net Label",
+        status-tip: "Add net labels to explicitly specify the net of wires",
+        shortcut: "N",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "n",
+    };
+
+    in property <EditorCommand> tool-component: {
+        icon: @image-url(""),
+        text: "Add Component...",
+        status-tip: "Insert components from the workspace libraries",
+        shortcut: "A",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "a",
+    };
+
+    in property <EditorCommand> tool-trace: {
+        icon: @image-url(""),
+        text: "Draw Trace",
+        status-tip: "Draw copper traces to interconnect devices",
+        shortcut: "W",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "w",
+    };
+
+    in property <EditorCommand> tool-via: {
+        icon: @image-url(""),
+        text: "Add Via",
+        status-tip: "Add plated through-hole vias",
+        shortcut: "V",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "v",
+    };
+
+    in property <EditorCommand> tool-plane: {
+        icon: @image-url(""),
+        text: "Draw Plane",
+        status-tip: "Draw auto-filled copper areas to interconnect pads and vias",
+        shortcut: "N",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "n",
+    };
+
+    in property <EditorCommand> tool-generate-outline: {
+        icon: @image-url(""),
+        text: "Generate Outline",
+        status-tip: "Automatically generate the outline polygon",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> tool-generate-courtyard: {
+        icon: @image-url(""),
+        text: "Generate Courtyard...",
+        status-tip: "Automatically generate the courtyard polygon",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> tool-renumber-pads: {
+        icon: @image-url(""),
+        text: "Re-Number Pads...",
+        status-tip: "Helper tool to interactively change pad numbers",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> tool-measure: {
+        icon: @image-url(""),
+        text: "Measure Distance",
+        status-tip: "Measure the distance between two points",
+        shortcut: "Ctrl+M",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: "m",
+    };
+
+    in property <EditorCommand> command-toolbar-focus: {
+        icon: @image-url(""),
+        text: "Go To Command Toolbar",
+        status-tip: "Move the focus into the command toolbar",
+        shortcut: "Tab",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: Key.Tab,
+    };
+
+    in property <EditorCommand> abort: {
+        icon: @image-url(""),
+        text: "Abort Command",
+        status-tip: "Abort the currently active command",
+        shortcut: "Escape",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: Key.Escape,
+    };
+
+    in property <EditorCommand> layer-up: {
+        icon: @image-url(""),
+        text: "Layer Up",
+        status-tip: "Switch to the next higher layer (bottom->top)",
+        shortcut: "PageUp",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: Key.PageUp,
+    };
+
+    in property <EditorCommand> layer-down: {
+        icon: @image-url(""),
+        text: "Layer Down",
+        status-tip: "Switch to the next lower layer (top->bottom)",
+        shortcut: "PageDown",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: Key.PageDown,
+    };
+
+    in property <EditorCommand> line-width-increase: {
+        icon: @image-url(""),
+        text: "Increase Line Width",
+        status-tip: "Increase the line/trace/stroke/pad width",
+        shortcut: "+",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "+",
+    };
+
+    in property <EditorCommand> line-width-decrease: {
+        icon: @image-url(""),
+        text: "Decrease Line Width",
+        status-tip: "Decrease the line/trace/stroke/pad width",
+        shortcut: "-",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "-",
+    };
+
+    in property <EditorCommand> size-increase: {
+        icon: @image-url(""),
+        text: "Increase Size",
+        status-tip: "Increase the via/pad/pin/text size",
+        shortcut: "Asterisk",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "*",
+    };
+
+    in property <EditorCommand> size-decrease: {
+        icon: @image-url(""),
+        text: "Decrease Size",
+        status-tip: "Decrease the via/pad/pin/text size",
+        shortcut: "Slash",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "/",
+    };
+
+    in property <EditorCommand> drill-increase: {
+        icon: @image-url(""),
+        text: "Increase Drill",
+        status-tip: "Increase the via/pad/hole drill diameter",
+        shortcut: "Home",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: Key.Home,
+    };
+
+    in property <EditorCommand> drill-decrease: {
+        icon: @image-url(""),
+        text: "Decrease Drill",
+        status-tip: "Decrease the via/pad/hole drill diameter",
+        shortcut: "End",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: Key.End,
+    };
+
+    in property <EditorCommand> width-auto-toggle: {
+        icon: @image-url(""),
+        text: "Toggle Auto-Width",
+        status-tip: "Toggle the auto-width property state",
+        shortcut: "Period",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: ".",
+    };
+
+    in property <EditorCommand> fill-toggle: {
+        icon: @image-url(""),
+        text: "Toggle Fill",
+        status-tip: "Toggle the fill property state",
+        shortcut: "F",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "f",
+    };
+
+    in property <EditorCommand> grab-area-toggle: {
+        icon: @image-url(""),
+        text: "Toggle Grab Area",
+        status-tip: "Toggle the grab area property state",
+        shortcut: ",",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: ",",
+    };
+
+    in property <EditorCommand> align-horizontal-left: {
+        icon: @image-url(""),
+        text: "Align Left",
+        status-tip: "Horizontal alignment: Left",
+        shortcut: "1",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "1",
+    };
+
+    in property <EditorCommand> align-horizontal-center: {
+        icon: @image-url(""),
+        text: "Align Center",
+        status-tip: "Horizontal alignment: Center",
+        shortcut: "2",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "2",
+    };
+
+    in property <EditorCommand> align-horizontal-right: {
+        icon: @image-url(""),
+        text: "Align Right",
+        status-tip: "Horizontal alignment: Right",
+        shortcut: "3",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "3",
+    };
+
+    in property <EditorCommand> align-vertical-bottom: {
+        icon: @image-url(""),
+        text: "Align Bottom",
+        status-tip: "Vertical alignment: Bottom",
+        shortcut: "4",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "4",
+    };
+
+    in property <EditorCommand> align-vertical-center: {
+        icon: @image-url(""),
+        text: "Align Center",
+        status-tip: "Vertical alignment: Center",
+        shortcut: "5",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "5",
+    };
+
+    in property <EditorCommand> align-vertical-top: {
+        icon: @image-url(""),
+        text: "Align Top",
+        status-tip: "Vertical alignment: Top",
+        shortcut: "6",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "6",
+    };
+
+    in property <EditorCommand> wire-mode-h-v: {
+        icon: @image-url(""),
+        text: "Horizontal - Vertical",
+        status-tip: "Wire mode: First segment horizontal, second segment vertical",
+        shortcut: "1",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "1",
+    };
+
+    in property <EditorCommand> wire-mode-v-h: {
+        icon: @image-url(""),
+        text: "Vertical - Horizontal",
+        status-tip: "Wire mode: First segment vertical, second segment horizontal",
+        shortcut: "2",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "2",
+    };
+
+    in property <EditorCommand> wire-mode-90-45: {
+        icon: @image-url(""),
+        text: "90° - 45°",
+        status-tip: "Wire mode: First segment 90°, second segment 45°",
+        shortcut: "3",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "3",
+    };
+
+    in property <EditorCommand> wire-mode-45-90: {
+        icon: @image-url(""),
+        text: "45° - 90°",
+        status-tip: "Wire mode: First segment 45°, second segment 90°",
+        shortcut: "4",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "4",
+    };
+
+    in property <EditorCommand> wire-mode-straight: {
+        icon: @image-url(""),
+        text: "Straight",
+        status-tip: "Wire mode: Straight line",
+        shortcut: "5",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "5",
+    };
+
+    in property <EditorCommand> shape-round: {
+        icon: @image-url(""),
+        text: "Round",
+        status-tip: "Shape: Round",
+        shortcut: "1",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "1",
+    };
+
+    in property <EditorCommand> shape-rounded-rect: {
+        icon: @image-url(""),
+        text: "Rounded Rectangle",
+        status-tip: "Shape: Rounded Rectangle",
+        shortcut: "2",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "2",
+    };
+
+    in property <EditorCommand> shape-rect: {
+        icon: @image-url(""),
+        text: "Rectangle",
+        status-tip: "Shape: Rectangle",
+        shortcut: "3",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "3",
+    };
+
+    in property <EditorCommand> shape-octagon: {
+        icon: @image-url(""),
+        text: "Octagon",
+        status-tip: "Shape: Octagon",
+        shortcut: "4",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "4",
+    };
+
+    in property <EditorCommand> component-resistor: {
+        icon: @image-url(""),
+        text: "Resistor",
+        status-tip: "Add standard component: Resistor",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> component-inductor: {
+        icon: @image-url(""),
+        text: "Inductor",
+        status-tip: "Add standard component: Inductor",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> component-capacitor-bipolar: {
+        icon: @image-url(""),
+        text: "Bipolar Capacitor",
+        status-tip: "Add standard component: Bipolar capacitor",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> component-capacitor-unipolar: {
+        icon: @image-url(""),
+        text: "Unipolar Capacitor",
+        status-tip: "Add standard component: Unipolar capacitor",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> component-gnd: {
+        icon: @image-url(""),
+        text: "GND Supply",
+        status-tip: "Add standard component: GND supply",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> component-vcc: {
+        icon: @image-url(""),
+        text: "VCC Supply",
+        status-tip: "Add standard component: VCC supply",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> dock-pages: {
+        icon: @image-url(""),
+        text: "Pages",
+        status-tip: "Go to the pages dock",
+        shortcut: "Ctrl+Alt+G",
+        modifiers: { alt: true, control: true, shift: false, meta: false },
+        key: "g",
+    };
+
+    in property <EditorCommand> dock-erc: {
+        icon: @image-url(""),
+        text: "Electrical Rule Check (ERC)",
+        status-tip: "Go to the ERC messages dock",
+        shortcut: "Ctrl+Alt+E",
+        modifiers: { alt: true, control: true, shift: false, meta: false },
+        key: "e",
+    };
+
+    in property <EditorCommand> dock-drc: {
+        icon: @image-url(""),
+        text: "Design Rule Check (DRC)",
+        status-tip: "Go to the DRC messages dock",
+        shortcut: "Ctrl+Alt+D",
+        modifiers: { alt: true, control: true, shift: false, meta: false },
+        key: "d",
+    };
+
+    in property <EditorCommand> dock-layers: {
+        icon: @image-url(""),
+        text: "Layers",
+        status-tip: "Go to the layers dock",
+        shortcut: "Ctrl+Alt+L",
+        modifiers: { alt: true, control: true, shift: false, meta: false },
+        key: "l",
+    };
+
+    in property <EditorCommand> dock-place-devices: {
+        icon: @image-url(""),
+        text: "Place Devices",
+        status-tip: "Go to the dock for placing devices",
+        shortcut: "Ctrl+Alt+P",
+        modifiers: { alt: true, control: true, shift: false, meta: false },
+        key: "p",
+    };
+
+    in property <EditorCommand> page-next: {
+        icon: @image-url(""),
+        text: "Next Tab/Page",
+        status-tip: "Navigate to the next tab or page",
+        shortcut: "Ctrl+Tab",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: Key.Tab,
+    };
+
+    in property <EditorCommand> page-previous: {
+        icon: @image-url(""),
+        text: "Previous Tab/Page",
+        status-tip: "Navigate to the previous tab or page",
+        shortcut: "Ctrl+Shift+Tab",
+        modifiers: { alt: false, control: true, shift: true, meta: false },
+        key: Key.Tab,
+    };
+
+    in property <EditorCommand> tab-close: {
+        icon: @image-url(""),
+        text: "Close Tab",
+        status-tip: "Close the currently opened tab",
+        shortcut: "Ctrl+W",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: "w",
+    };
+
+    in property <EditorCommand> tab-close-all: {
+        icon: @image-url(""),
+        text: "Close All Tabs",
+        status-tip: "Close all currently opened tabs",
+        shortcut: "Ctrl+Shift+W",
+        modifiers: { alt: false, control: true, shift: true, meta: false },
+        key: "w",
+    };
+
+    in property <EditorCommand> window-new: {
+        icon: @image-url("../../../../bootstrap-icons/icons/window-plus.svg"),
+        text: "New Window",
+        status-tip: "Open a new window",
+        shortcut: "Ctrl+Shift+N",
+        modifiers: { alt: false, control: true, shift: true, meta: false },
+        key: "n",
+    };
+
+    in property <EditorCommand> window-close: {
+        icon: @image-url("../../../../bootstrap-icons/icons/window-x.svg"),
+        text: "Close Window",
+        status-tip: "Close this window",
+        shortcut: "Alt+F4",
+        modifiers: { alt: true, control: false, shift: false, meta: false },
+        key: Key.F4,
+    };
+
+    in property <EditorCommand> project-close: {
+        icon: @image-url(""),
+        text: "Close Project",
+        status-tip: "Close the currently opened project",
+        shortcut: "Ctrl+F4",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: Key.F4,
+    };
+
+    in property <EditorCommand> application-quit: {
+        icon: @image-url(""),
+        text: "Quit",
+        status-tip: "Close the whole application",
+        shortcut: "Ctrl+Q",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: "q",
+    };
+
+    in property <EditorCommand> about-librepcb: {
+        icon: @image-url(""),
+        text: "About LibrePCB...",
+        status-tip: "Show information about the application",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> about-qt: {
+        icon: @image-url(""),
+        text: "About Qt...",
+        status-tip: "Show information about Qt",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> website: {
+        icon: @image-url(""),
+        text: "LibrePCB Website",
+        status-tip: "Open the LibrePCB website in the web browser",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> documentation-online: {
+        icon: @image-url(""),
+        text: "User Manual & Tutorials",
+        status-tip: "Open the online user manual in the web browser",
+        shortcut: "F1",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: Key.F1,
+    };
+
+    in property <EditorCommand> support: {
+        icon: @image-url("../../../../font-awesome/svgs/regular/comments.svg"),
+        text: "Give Feedback & Get Support",
+        status-tip: "Open the support page in the web browser",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> donate: {
+        icon: @image-url("../../../../font-awesome/svgs/solid/heart.svg"),
+        text: "Support the LibrePCB Project",
+        status-tip: "Open the donation page in the web browser",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> keyboard-shortcuts-reference: {
+        icon: @image-url("../../../../font-awesome/svgs/solid/keyboard.svg"),
+        text: "Keyboard Shortcuts Reference",
+        status-tip: "Open a quick reference about the keyboard shortcuts",
+        shortcut: "Ctrl+F1",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: Key.F1,
+    };
+
+    in property <EditorCommand> vertex-add: {
+        icon: @image-url(""),
+        text: "Add Vertex",
+        status-tip: "Insert a new vertex into the selected polygon edge",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> vertex-remove: {
+        icon: @image-url(""),
+        text: "Remove Vertex",
+        status-tip: "Remove the selected vertex from the polygon",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> trace-select-whole: {
+        icon: @image-url(""),
+        text: "Select Whole Trace",
+        status-tip: "Select the whole trace",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> trace-measure-length: {
+        icon: @image-url(""),
+        text: "Measure Selected Segments Length",
+        status-tip: "Measure the total length of all selected trace segments",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> trace-remove-whole: {
+        icon: @image-url(""),
+        text: "Remove Whole Trace",
+        status-tip: "Remove the whole trace",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> locked: {
+        icon: @image-url(""),
+        text: "Lock Placement",
+        status-tip: "Toggle placement lock",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> visible: {
+        icon: @image-url(""),
+        text: "Visible",
+        status-tip: "Toggle visibility",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> copy-mpn-to-clipboard: {
+        icon: @image-url(""),
+        text: "Copy MPN to Clipboard",
+        status-tip: "Copy this MPN into the clipboard",
+        shortcut: "Ctrl+C",
+        modifiers: { alt: false, control: true, shift: false, meta: false },
+        key: "c",
+    };
+
+    in property <EditorCommand> open-product-website: {
+        icon: @image-url(""),
+        text: "Open Product Website...",
+        status-tip: "Open product details about this part in the web browser",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> open-pricing-website: {
+        icon: @image-url(""),
+        text: "Open Pricing Website...",
+        status-tip: "Open pricing details about this part in the web browser",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
+    in property <EditorCommand> helper-tools: {
+        icon: @image-url(""),
+        text: "Generate Content...",
+        status-tip: "Various helper tools to generate or modify objects",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+}

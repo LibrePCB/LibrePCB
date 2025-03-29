@@ -1,0 +1,95 @@
+import { Palette } from "std-widgets.slint";
+import { ToolTip } from "tooltip.slint";
+import { Data } from "../api.slint";
+
+export enum ToolTipPosition {
+    bottom,
+    bottom-left,
+}
+
+export component IconButton inherits Rectangle {
+    in property <image> icon;
+    in property <float> icon-scale: hyperlink-style ? 1 : 0.8;
+    in property <length> icon-size: min(root.width, root.height) * icon-scale;
+    in property <angle> icon-rotation: 0deg;
+    in property <color> colorize: transparent;
+    in property <string> tooltip;
+    in property <bool> tooltip-delayed: true;
+    in property <ToolTipPosition> tooltip-position: bottom;
+    in property <string> status-tip;
+    in property <bool> hyperlink-style: false;
+    in property <bool> enabled: true;
+    in property <bool> read-only: false;
+    out property has-hover <=> ta.has-hover;
+    out property pressed <=> ta.pressed;
+
+    callback clicked;
+
+    preferred-width: self.height;
+    preferred-height: 20px;
+    background: {
+        if (!hyperlink-style) && enabled && (!read-only) && ta.has-hover {
+            #454545
+        } else {
+            transparent
+        }
+    }
+
+    // Accessibility
+    accessible-role: button;
+    accessible-description: status-tip;
+    accessible-enabled: enabled;
+    accessible-label: tooltip;
+    accessible-read-only: read-only;
+    accessible-action-default => {
+        ta.clicked();
+    }
+
+    ta := TouchArea {
+        enabled: enabled;
+        mouse-cursor: hyperlink-style ? pointer : default;
+
+        Image {
+            width: icon-size * (((!read-only) && ta.pressed) ? 0.85 : 1.0);
+            height: self.width;
+            image-fit: contain;
+            colorize: (colorize != transparent) ? colorize : (((!read-only) && ta.has-hover) ? white : (enabled ? Palette.foreground : #707070));
+            rotation-angle: icon-rotation;
+            source: icon;
+            accessible-role: none;
+        }
+
+        if self.has-hover && (!self.pressed) && (!tooltip.is-empty): tt := ToolTip {
+            x: {
+                if tooltip-position == ToolTipPosition.bottom-left {
+                    parent.width - self.width
+                } else {
+                    (parent.width - self.width) / 2
+                }
+            };
+            y: parent.height + 5px;
+            text: tooltip;
+            delayed: tooltip-delayed;
+        }
+
+        changed has-hover => {
+            if !root.status-tip.is-empty {
+                if self.has-hover {
+                    Data.status-tip = root.status-tip;
+                } else {
+                    Data.status-tip = "";
+                }
+            }
+        }
+
+        clicked => {
+            // The click may destroy this element without calling the
+            // has-hover handler anymore, so we clear the status tip
+            // manually to be on the safe side.
+            if !root.status-tip.is-empty {
+                Data.status-tip = "";
+            }
+            root.clicked();
+        }
+    }
+}

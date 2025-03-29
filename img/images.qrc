@@ -1,4 +1,11 @@
 <RCC>
+    <qresource>
+        <file alias="/bi/window-plus.svg">../libs/bootstrap-icons/icons/window-plus.svg</file>
+        <file alias="/bi/window-x.svg">../libs/bootstrap-icons/icons/window-x.svg</file>
+        <file alias="/fa/regular/comments.svg">../libs/font-awesome/svgs/regular/comments.svg</file>
+        <file alias="/fa/solid/heart.svg">../libs/font-awesome/svgs/solid/heart.svg</file>
+        <file alias="/fa/solid/keyboard.svg">../libs/font-awesome/svgs/solid/keyboard.svg</file>
+    </qresource>
     <qresource prefix="/img">
         <file>actions/add.png</file>
         <file>actions/add_component.png</file>
@@ -16,7 +23,6 @@
         <file>actions/apply.png</file>
         <file>actions/board_editor.png</file>
         <file>actions/bookmark.png</file>
-        <file>actions/bookmark_gray.png</file>
         <file>actions/cancel.png</file>
         <file>actions/clean.png</file>
         <file>actions/clone.png</file>
@@ -24,7 +30,6 @@
         <file>actions/copy.png</file>
         <file>actions/cut.png</file>
         <file>actions/delete.png</file>
-        <file>actions/donate_white.svg</file>
         <file>actions/down.png</file>
         <file>actions/download.png</file>
         <file>actions/draw_arc.png</file>
@@ -59,7 +64,6 @@
         <file>actions/move.png</file>
         <file>actions/move_to.png</file>
         <file>actions/new.png</file>
-        <file>actions/new_folder.png</file>
         <file>actions/open.png</file>
         <file>actions/open_browser.png</file>
         <file>actions/order_pcb.png</file>
@@ -71,7 +75,6 @@
         <file>actions/quick_check.png</file>
         <file>actions/quit.png</file>
         <file>actions/rebuild_plane.png</file>
-        <file>actions/recent.png</file>
         <file>actions/redo.png</file>
         <file>actions/refresh.png</file>
         <file>actions/rotate_left.png</file>
@@ -96,6 +99,7 @@
         <file>actions/zoom_in.png</file>
         <file>actions/zoom_out.png</file>
         <file>app/librepcb.png</file>
+        <file>app/librepcb.svg</file>
         <file>command_toolbars/align_horizontal_center.png</file>
         <file>command_toolbars/align_horizontal_left.png</file>
         <file>command_toolbars/align_horizontal_right.png</file>

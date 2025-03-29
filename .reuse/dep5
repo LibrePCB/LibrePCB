@@ -9,6 +9,7 @@ Files:
  dev/*
  dist/*
  i18n/*
+ img/app/librepcb-monochrome.svg
  img/app/librepcb.icns
  img/app/librepcb.ico
  img/app/librepcb.png
@@ -86,6 +87,7 @@ Files:
  img/norm/iec_60617.png
  img/norm/ieee_315.png
  img/README.md
+ img/video-tutorial.png
  img/wizards/watermark.jpg
  libs/README.md
  README.md
@@ -96,7 +98,6 @@ License: CC0-1.0
 Files:
  img/actions/align_horizontally.svg
  img/actions/align_vertically.svg
- img/actions/donate_white.svg
 Copyright: Font Awesome
 License: CC-BY-4.0
 
@@ -145,7 +146,6 @@ Copyright: publicdomainvectors.org
 License: CC0-1.0
 
 Files:
- img/actions/new_folder.png
  img/places/folder.png
  img/places/folder_green.png
  img/places/project_folder.png
@@ -162,9 +162,7 @@ Files:
 Copyright: Part-DB Developers
 License: GPL-2.0-only
 
-Files:
- img/actions/add_component.png
- img/actions/bookmark_gray.png
+Files: img/actions/add_component.png
 Copyright: Open Icon Library and LibrePCB Developers
 License: LGPL-2.1-only
 
@@ -209,7 +207,6 @@ Files:
  img/actions/output_jobs.png
  img/actions/paste.png
  img/actions/quit.png
- img/actions/recent.png
  img/actions/redo.png
  img/actions/save.png
  img/actions/stop.png

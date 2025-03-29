@@ -13,6 +13,8 @@ jobs:
     displayName: Run Stylecheck
   - bash: python3 ./dev/i18n.py --update --translate
     displayName: Build translations
+  - bash: python3 ./dev/generate_editorcommandset.py --check
+    displayName: Check EditorCommandSet
   - bash: python3 ./dev/find_unused_code.py
     displayName: Find unused code
   - bash: ./ci/build_doxygen.sh

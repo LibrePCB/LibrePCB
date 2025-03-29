@@ -1,0 +1,177 @@
+import { Button, Palette, Spinner } from "widgets.slint";
+import {
+    Action,
+    Backend,
+    Constants,
+    Data,
+    EditorCommandSet as Cmd
+} from "api.slint";
+
+component DonateButton inherits Button {
+    text: @tr("Donate");
+    status-tip: Cmd.donate.status-tip;
+    icon: @image-url("../../../font-awesome/svgs/solid/heart.svg");
+    primary: true;
+
+    clicked => {
+        Backend.open-url(Constants.donate-url);
+    }
+}
+
+export component HomeTab inherits Rectangle {
+    property <bool> compact-layout: self.width < 350px;
+
+    if project-preview-img.source.width == 0: Image {
+        x: (parent.width - self.width) / 2;
+        y: (parent.height - self.height) / 2;
+        width: min(root.width * 0.25, 200px);
+        height: self.width;
+        colorize: #353535;
+        source: @image-url("../../../../img/app/librepcb-monochrome.svg");
+        accessible-role: none;
+    }
+
+    l := VerticalLayout {
+        padding: 10px;
+        spacing: 10px;
+
+        Text {
+            font-size: 20px;
+            font-weight: 700;
+            wrap: word-wrap;
+            text: @tr("Get Started With LibrePCB");
+        }
+
+        HorizontalLayout {
+            property <image> image: @image-url("../../../../img/video-tutorial.png");
+            property <length> image-width-available: parent.width - buttons-l.preferred-width - 2 * parent.padding;
+
+            spacing: 10px;
+
+            if image-width-available > 180px: Rectangle {
+                y: (buttons-l.height - self.height) / 2;
+                width: min(buttons-l.preferred-height * image.width / image.height, image-width-available);
+                height: self.width * image.height / image.width;
+                border-radius: 15px;
+                clip: true;
+
+                Image {
+                    width: 100%;
+                    height: 100%;
+                    image-fit: contain;
+                    source: image;
+                }
+            }
+
+            buttons-l := VerticalLayout {
+                alignment: start;
+                spacing: 10px;
+
+                video-tutorials-btn := Button {
+                    width: compact-layout ? (root.width - 2 * l.padding) : self.preferred-width;
+                    horizontal-stretch: 1;
+                    text: @tr("Video Tutorials");
+                    status-tip: @tr("Open video tutorials in the web browser");
+                    icon: @image-url("../../../font-awesome/svgs/brands/youtube.svg");
+
+                    clicked => {
+                        Backend.open-url(Constants.video-tutorials-url);
+                    }
+                }
+
+                user-manual-btn := Button {
+                    width: compact-layout ? (root.width - 2 * l.padding) : self.preferred-width;
+                    text: @tr("User Manual & Getting Started Guide");
+                    status-tip: Cmd.documentation-online.status-tip;
+                    icon: @image-url("../../../font-awesome/svgs/solid/book.svg");
+
+                    clicked => {
+                        Backend.open-url(Constants.user-manual-url);
+                    }
+                }
+
+                support-btn := Button {
+                    width: compact-layout ? (root.width - 2 * l.padding) : self.preferred-width;
+                    text: Cmd.support.text;
+                    status-tip: Cmd.support.status-tip;
+                    icon: @image-url("../../../font-awesome/svgs/regular/comments.svg");
+
+                    clicked => {
+                        Backend.open-url(Constants.support-url);
+                    }
+                }
+
+                shortcuts-btn := Button {
+                    width: compact-layout ? (root.width - 2 * l.padding) : self.preferred-width;
+                    text: Cmd.keyboard-shortcuts-reference.text;
+                    status-tip: Cmd.keyboard-shortcuts-reference.status-tip;
+                    icon: @image-url("../../../font-awesome/svgs/solid/keyboard.svg");
+
+                    clicked => {
+                        Backend.trigger(Action.keyboard-shortcuts-reference);
+                    }
+                }
+            }
+        }
+
+        if compact-layout: donate-btn-1 := DonateButton { }
+
+        if !compact-layout: Rectangle {
+            border-color: Palette.foreground;
+            border-width: 1px;
+            border-radius: 10px;
+            background: #2a2a2ac0;
+
+            HorizontalLayout {
+                padding: 8px;
+                spacing: 10px;
+
+                Text {
+                    vertical-alignment: center;
+                    font-size: 14px;
+                    font-italic: true;
+                    wrap: word-wrap;
+                    text: @tr("Support the LibrePCB project with a donation to keep the development and maintenance ongoing ‒ Thank you!");
+                }
+
+                Rectangle {
+                    width: self.preferred-width;
+
+                    donate-btn-2 := DonateButton { }
+                }
+            }
+        }
+
+        preview-flickable := Flickable {
+            vertical-stretch: 1;
+            width: 100%;
+            viewport-width: self.width;
+            viewport-height: project-preview-img.height;
+            interactive: project-preview-img.source.width > 0;
+
+            // If the image was getting smaller, the scroll position might
+            // end up in nirvana, so we clip it manually.
+            changed viewport-height => {
+                self.viewport-y = max(self.viewport-y, -max(self.viewport-height - self.height, 0));
+            }
+
+            project-preview-img := Image {
+                image-fit: ImageFit.preserve;
+                horizontal-alignment: left;
+                vertical-alignment: top;
+                source: Data.project-preview-image;
+                visible: Backend.request-project-preview(Data.project-preview-path, parent.width);
+                opacity: Data.project-preview-rendering ? 0.5 : 1;
+                accessible-label: "Rendered project preview";
+            }
+        }
+    }
+
+    if Data.project-preview-rendering: project-preview-spinner := Spinner {
+        x: preview-flickable.x + (preview-flickable.width - self.width) / 2;
+        y: preview-flickable.y + (preview-flickable.height - self.height) / 2;
+        width: 30px;
+        height: self.width;
+        indeterminate: true;
+    }
+}

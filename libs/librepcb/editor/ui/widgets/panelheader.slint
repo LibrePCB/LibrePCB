@@ -1,0 +1,70 @@
+import { Palette } from "std-widgets.slint";
+import { Spinner } from "spinner.slint";
+import { ToolTip } from "tooltip.slint";
+import { Constants, Data } from "../api.slint";
+
+export component PanelHeader inherits Rectangle {
+    in property <length> spacing-top;
+    in property <string> title;
+    in property <string> note;
+    in property <bool> show-spinner: false;
+    in property <bool> highlight: false;
+    property <length> content-height: 25px;
+
+    height: spacing-top + content-height + 1px;
+
+    // Accessibility
+    accessible-role: text;
+    accessible-label: title;
+
+    VerticalLayout {
+        padding-top: spacing-top;
+
+        HorizontalLayout {
+            height: content-height;
+            padding-left: 5px;
+            padding-right: 1px;
+            spacing: 3px;
+
+            title-txt := Text {
+                y: 2px;
+                font-weight: 700;
+                overflow: elide;
+                vertical-alignment: center;
+                text: title;
+                accessible-role: none;
+            }
+
+            if !note.is-empty: note-txt := Text {
+                y: 2px;
+                horizontal-stretch: 1;
+                font-size: 11px;
+                font-italic: true;
+                vertical-alignment: center;
+                overflow: elide;
+                text: note;
+            }
+
+            HorizontalLayout {
+                if show-spinner: spinner := Spinner {
+                    indeterminate: true;
+                    width: content-height - 8px;
+                    height: content-height;
+                }
+
+                @children
+            }
+        }
+
+        Rectangle {
+            height: 1px;
+            background: {
+                if highlight {
+                    @linear-gradient(90deg, Constants.librepcb-color 0%, #555555 100%)
+                } else {
+                    #555555
+                }
+            };
+        }
+    }
+}

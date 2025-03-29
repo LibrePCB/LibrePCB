@@ -24,6 +24,7 @@ WHITELIST = [
     'libs/librepcb/core/serialization/fileformatmigrationv1.h',
     'libs/librepcb/core/workspace/workspacesettingsitem_genericvalue.h',
     'libs/librepcb/editor/editorcommandcategory.h',
+    'libs/librepcb/editor/editorcommandsetupdater.h',
     'tests/unittests/core/serialization/serializableobjectmock.h',
     'tests/unittests/editor/widgets/editabletablewidgetreceiver.h',
 ]

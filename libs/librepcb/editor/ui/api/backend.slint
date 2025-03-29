@@ -1,0 +1,40 @@
+import { Action } from "types.slint";
+import { Data } from "data.slint";
+
+// Note: The callback implementations are just for the live preview, they will
+// be overridden by the backend in the real use-case.
+export global Backend {
+    // Trigger some action
+    //
+    // Note: This callback is executed asynchronously in the backend to
+    // guarantee there are no side effects changing the UI from within the
+    // callback. Otherwise we couldn't declare it as 'pure'.
+    pure callback trigger(action: Action);
+    trigger(action) => {
+        debug("Trigger action:", action);
+    }
+
+    // Open an URL by an external application (usually the web browser)
+    //
+    // The return value indicates whether the operation was successful or not.
+    pure callback open-url(url: string) -> bool;
+    open-url(url) => {
+        debug("Open URL:", url);
+        true
+    }
+
+    // Request generating the preview of a project (e.g. its README.md)
+    //
+    // Lets the backend building the preview asynchronously, and updating the
+    // following data members accordingly:
+    //  - Data.project-preview-rendering
+    //  - Data.project-preview-image
+    //
+    // The return value is a dummy and must always be `true` to allow
+    // declarative, automatic re-evaluation.
+    pure callback request-project-preview(path: string, width: length) -> bool;
+    request-project-preview(path, width) => {
+        debug("Request project preview:", path, width);
+        true
+    }
+}

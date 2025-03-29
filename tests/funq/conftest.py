@@ -30,6 +30,9 @@ def pytest_addoption(parser):
     parser.addoption("--librepcb-executable",
                      action="store",
                      help="Path to librepcb executable to test")
+    parser.addoption("--dump-widgets",
+                     action="store_true",
+                     help="At the end of the test, update widgets_list.json")
 
 
 class GlobalOptions:
@@ -41,8 +44,9 @@ class GlobalOptions:
 
 
 class Application(object):
-    def __init__(self, executable, env=None, args=()):
+    def __init__(self, executable, dump_widgets, env=None, args=()):
         super(Application, self).__init__()
+        self.dump_widgets = dump_widgets
         cfg = ApplicationConfig(executable=executable, args=args, cwd=os.getcwd(), env=env,
                                 aliases=os.path.join(FUNQ_DIR, 'aliases'), global_options=GlobalOptions())
         self._context = ApplicationContext(cfg)
@@ -51,6 +55,8 @@ class Application(object):
         return self._context.funq
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        if self.dump_widgets:
+            self._context.funq.dump_widgets_list('widgets_list.json', with_properties=True)
         del self._context
 
 
@@ -61,6 +67,7 @@ class LibrePcbFixture(object):
         if not os.path.exists(self.executable):
             raise Exception("Executable '{}' not found. Please pass it with "
                             "'--librepcb-executable'.".format(self.executable))
+        self.dump_widgets = config.getoption('--dump-widgets')
         self.tmpdir = tmpdir
         # Copy test data to temporary directory to avoid modifications in original data
         shutil.copytree(_long_path(os.path.join(DATA_DIR, 'workspaces', 'Empty Workspace')),
@@ -122,7 +129,7 @@ class LibrePcbFixture(object):
 
     def open(self):
         self._create_application_config_file()
-        return Application(self.executable, env=self.env, args=self._args())
+        return Application(self.executable, self.dump_widgets, env=self.env, args=self._args())
 
     def _create_application_config_file(self):
         org_dir = 'LibrePCB.org' if platform.system() == 'Darwin' else 'LibrePCB'
@@ -162,15 +169,12 @@ class Helpers(object):
 
     @staticmethod
     def wait_for_library_scan_complete(app, timeout=10.0):
-        progress_bar = app.widget('controlPanelStatusBarProgressBar', wait_active=False)
-        # wait until scan has started (progress > 10%)
+        adapter = app.widget('mainWindowTestAdapter', wait_active=True)
         for i in range(0, 100):
-            percent = progress_bar.properties()['value']
-            if percent > 10:
-                break
+            if adapter.call_slot('isLibraryScanFinished') is True:
+                return
             time.sleep(timeout / 100.0)
-        # Wait until scan has finished (progressbar hidden)
-        Helpers.wait_until_widget_hidden(progress_bar, timeout=timeout)
+        raise Exception('Failed to wait for library scan finished!')
 
     @staticmethod
     def wait_until_widget_hidden(widget, timeout=5.0):
