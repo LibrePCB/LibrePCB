@@ -24,6 +24,7 @@ WHITELIST = [
     'libs/librepcb/core/serialization/fileformatmigrationv1.h',
     'libs/librepcb/core/workspace/workspacesettingsitem_genericvalue.h',
     'libs/librepcb/editor/editorcommandcategory.h',
+    'libs/librepcb/editor/editorcommandsetupdater.h',
     'tests/unittests/core/serialization/serializableobjectmock.h',
     'tests/unittests/editor/widgets/editabletablewidgetreceiver.h',
 ]
@@ -54,7 +55,7 @@ if __name__ == '__main__':
                  ':/img/**.jpeg'],
                 cwd=REPO_DIR).decode("utf-8").splitlines()
     for file in files:
-        if file in WHITELIST or '_dark' in file:
+        if file in WHITELIST:
             continue
         if not os.path.isfile(os.path.join(REPO_DIR, file)):
             continue

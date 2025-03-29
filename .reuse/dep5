@@ -9,6 +9,7 @@ Files:
  dev/*
  dist/*
  i18n/*
+ img/app/librepcb-monochrome.svg
  img/app/librepcb.icns
  img/app/librepcb.ico
  img/app/librepcb.png
@@ -40,32 +41,24 @@ Files:
  CONTRIBUTING.md
  img/actions/add_hole.png
  img/actions/add_name.png
- img/actions/add_name_dark.png
  img/actions/add_plane.png
  img/actions/add_smt_pad.png
  img/actions/add_symbol_pin.png
  img/actions/add_text.png
- img/actions/add_text_dark.png
  img/actions/add_tht_pad.png
  img/actions/add_value.png
- img/actions/add_value_dark.png
  img/actions/add_via.png
  img/actions/board_editor.png
  img/actions/draw_line.png
- img/actions/draw_line_dark.png
  img/actions/draw_netlabel.png
- img/actions/draw_netlabel_dark.png
  img/actions/draw_wire.png
- img/actions/draw_wire_dark.png
  img/actions/draw_zone.png
  img/actions/export_pick_place_file.png
  img/actions/grid.png
- img/actions/grid_dark.png
  img/actions/hide_planes.png
  img/actions/rebuild_plane.png
  img/actions/schematic.png
  img/actions/show_pin_numbers.png
- img/actions/show_pin_numbers_dark.png
  img/actions/show_planes.png
  img/command_toolbars/pad_bottom.png
  img/command_toolbars/pad_top.png
@@ -74,43 +67,27 @@ Files:
  img/command_toolbars/shape_round.png
  img/command_toolbars/shape_rounded_rect.png
  img/command_toolbars/wire_45_90.png
- img/command_toolbars/wire_45_90_dark.png
  img/command_toolbars/wire_90_45.png
- img/command_toolbars/wire_90_45_dark.png
  img/command_toolbars/wire_h_v.png
- img/command_toolbars/wire_h_v_dark.png
  img/command_toolbars/wire_straight.png
- img/command_toolbars/wire_straight_dark.png
  img/command_toolbars/wire_v_h.png
- img/command_toolbars/wire_v_h_dark.png
  img/empty.png
  img/library/bipolar_capacitor_eu.png
- img/library/bipolar_capacitor_eu_dark.png
  img/library/bipolar_capacitor_us.png
- img/library/bipolar_capacitor_us_dark.png
  img/library/footprint.png
  img/library/gnd.png
- img/library/gnd_dark.png
  img/library/inductor_eu.png
- img/library/inductor_eu_dark.png
  img/library/inductor_us.png
- img/library/inductor_us_dark.png
  img/library/resistor_eu.png
- img/library/resistor_eu_dark.png
  img/library/resistor_us.png
- img/library/resistor_us_dark.png
  img/library/symbol.png
  img/library/unipolar_capacitor_eu.png
- img/library/unipolar_capacitor_eu_dark.png
  img/library/unipolar_capacitor_us.png
- img/library/unipolar_capacitor_us_dark.png
  img/library/vcc.png
- img/library/vcc_dark.png
  img/norm/iec_60617.png
- img/norm/iec_60617_dark.png
  img/norm/ieee_315.png
- img/norm/ieee_315_dark.png
  img/README.md
+ img/video-tutorial.png
  img/wizards/watermark.jpg
  libs/README.md
  README.md
@@ -121,9 +98,28 @@ License: CC0-1.0
 Files:
  img/actions/align_horizontally.svg
  img/actions/align_vertically.svg
- img/actions/donate_white.svg
 Copyright: Font Awesome
 License: CC-BY-4.0
+
+Files: libs/font-awesome/*
+Copyright: Font Awesome
+License: MIT
+
+Files:
+ libs/font-awesome/js/*
+ libs/font-awesome/svgs/*
+Copyright: Font Awesome
+License: CC-BY-4.0
+
+Files:
+ libs/font-awesome/otfs/*
+ libs/font-awesome/webfonts/*
+Copyright: Font Awesome
+License: OFL-1.1
+
+Files: libs/bootstrap-icons/*
+Copyright: The Bootstrap Authors
+License: MIT
 
 Files: img/actions/generate_ibom.png
 Copyright: InteractiveHtmlBom
@@ -150,7 +146,6 @@ Copyright: publicdomainvectors.org
 License: CC0-1.0
 
 Files:
- img/actions/new_folder.png
  img/places/folder.png
  img/places/folder_green.png
  img/places/project_folder.png
@@ -167,9 +162,7 @@ Files:
 Copyright: Part-DB Developers
 License: GPL-2.0-only
 
-Files:
- img/actions/add_component.png
- img/actions/bookmark_gray.png
+Files: img/actions/add_component.png
 Copyright: Open Icon Library and LibrePCB Developers
 License: LGPL-2.1-only
 
@@ -214,7 +207,6 @@ Files:
  img/actions/output_jobs.png
  img/actions/paste.png
  img/actions/quit.png
- img/actions/recent.png
  img/actions/redo.png
  img/actions/save.png
  img/actions/stop.png

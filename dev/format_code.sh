@@ -14,7 +14,8 @@ set -eufo pipefail
 #     then be created and used so you don't have to install any dependencies.
 #   - To run docker with sudo, use the "--sudo" parameter.
 #   - Without docker, make sure the executables "git", "clang-format",
-#     "cmake-format", "rustfmt", "python3" and "xmlsort" are available in PATH.
+#     "cmake-format", "rustfmt", "slint-lsp", "python3" and "xmlsort" are
+#     available in PATH.
 #   - To format all files (instead of only modified ones), add the "--all"
 #     parameter. This is intended only for LibrePCB maintainers, usually you
 #     should not use this!
@@ -27,7 +28,7 @@ set -eufo pipefail
 
 DOCKER=""
 DOCKER_CMD="docker"
-DOCKER_IMAGE="librepcb/librepcb-dev:devtools-4"
+DOCKER_IMAGE="librepcb/librepcb-dev:devtools-5"
 CLANGFORMAT=${CLANGFORMAT:-clang-format}
 RUSTFMT=${RUSTFMT:-rustfmt}
 BASE="master"
@@ -163,6 +164,22 @@ rustfmt_process() {
 echo "Formatting Rust sources with $RUSTFMT..."
 for file in $(search_files "*.rs"); do
   $RUSTFMT -q -l $CHECK "$file" | rustfmt_process "$file" || rustfmt_failed
+done
+
+# Format slint files with slint-lsp.
+slintlsp_failed() {
+  echo "" >&2
+  echo "ERROR: slint-lsp failed!" >&2
+  echo "  Make sure that slint-lsp is installed." >&2
+  echo "  On Linux, you can also run this script in a docker" >&2
+  echo "  container by using the '--docker' argument." >&2
+  exit 7
+}
+echo "Formatting Slint sources with slint-lsp..."
+for dir in apps/ libs/librepcb/; do
+  for file in $(search_files "${dir}**.slint"); do
+    slint-lsp format "$file" | update_file "$file" || slintlsp_failed
+  done
 done
 
 # Format *.ui files with Python 3.

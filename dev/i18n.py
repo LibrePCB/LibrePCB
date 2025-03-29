@@ -19,10 +19,12 @@ import os
 import sys
 from defusedxml import ElementTree
 from subprocess import check_output as run
+from xml.sax.saxutils import escape as escape_xml
 
 REPO_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 I18N_DIR = os.path.join(REPO_DIR, 'i18n')
 SOURCES_FILE = '.tx/sources.txt'
+UI_PO_FILE = '.tx/librepcb_ui.po'
 TS_FILE = '.tx/librepcb.ts'
 
 
@@ -82,6 +84,72 @@ def update():
                  cwd=REPO_DIR)
     for line in output.decode("utf-8").splitlines():
         print(' lupdate: ' + line)
+
+    # Create *.po file for Slint sources
+    sources = run(['git', 'ls-files', '--', '*.slint'],
+                  cwd=REPO_DIR).decode("utf-8").splitlines()
+    print("Collected {} Slint files, exporting translations to {}..."
+          .format(len(sources), UI_PO_FILE))
+    output = run(['slint-tr-extractor', '-o', UI_PO_FILE] + sources,
+                 cwd=REPO_DIR)
+    for line in output.decode("utf-8").splitlines():
+        print(' slint-tr-extractor: ' + line)
+
+    # Parse Slint strings
+    slint_strings = dict()
+    with open(os.path.join(REPO_DIR, UI_PO_FILE), 'r') as f:
+        source = None
+        key = None
+        values = dict()
+        for line in f.readlines():
+            line = line.strip()
+            if line.startswith('#: '):
+                source = line.replace('#: ', '')
+                values = dict()
+            elif line.startswith('msgctxt "'):
+                key = 'msgctxt'
+                values[key] = line.replace('msgctxt "', '')[:-1]
+            elif line.startswith('msgid "'):
+                key = 'msgid'
+                values[key] = line.replace('msgid "', '')[:-1]
+            elif line.startswith('"') and key is not None:
+                values[key] += line[1:-1]
+            elif source and key and values:
+                msgctxt = values['msgctxt']
+                msgid = values['msgid']
+                if msgctxt not in slint_strings:
+                    slint_strings[msgctxt] = list()
+                slint_strings[msgctxt].append((source, msgid))
+                source = None
+                key = None
+                values = dict()
+    total_count = sum([len(ctx) for ctx in slint_strings])
+    print("Found {} translations in {} Slint sources".format(
+        total_count, len(slint_strings)))
+    assert total_count > 0
+
+    # Append Slint strings to librepcb.ts
+    print("Merging Slint translations into {}...".format(TS_FILE))
+    with open(os.path.join(REPO_DIR, TS_FILE), 'r') as f:
+        ts = f.readlines()
+    assert ts[-1] == '</TS>\n'
+    for context, strings in sorted(slint_strings.items()):
+        ts.insert(-1, '<context>\n')
+        ts.insert(-1, '    <name>ui::{}</name>\n'.format(context))
+        for source, string in sorted(strings):
+            ts.insert(-1, '    <message>\n')
+            ts.insert(-1, '        <location filename="{}" line="{}"/>\n'
+                          .format(*source.split(':')))
+            ts.insert(-1, '        <source>{}</source>\n'
+                          .format(escape_xml(po_str_to_qs(string))))
+            ts.insert(-1, '        <translation type="{}"></translation>\n'
+                          .format('unfinished'))
+            ts.insert(-1, '    </message>\n')
+        ts.insert(-1, '</context>\n')
+    with open(os.path.join(REPO_DIR, TS_FILE), 'w') as f:
+        f.write(''.join(ts)
+                .replace('filename="../', 'filename="')
+                .replace('\r', ''))
 
     # Check validity of *.ts file
     print("Validating {}...".format(TS_FILE))

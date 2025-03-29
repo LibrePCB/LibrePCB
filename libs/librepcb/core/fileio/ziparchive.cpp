@@ -88,6 +88,15 @@ QByteArray ZipArchive::readFile(std::size_t index) {
   return buf;
 }
 
+std::optional<QByteArray> ZipArchive::tryReadFile(const QString& fileName) {
+  for (std::size_t i = 0; i < getEntriesCount(); ++i) {
+    if (getFileName(i) == fileName) {
+      return readFile(i);
+    }
+  }
+  return std::nullopt;
+}
+
 void ZipArchive::extractTo(const FilePath& dir) {
   const QString path = dir.toStr();
   if (!rs::ffi_ziparchive_extract(*mHandle, &path)) {

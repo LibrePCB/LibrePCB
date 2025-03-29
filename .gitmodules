@@ -34,3 +34,12 @@
 [submodule "libs/corrosion"]
     path = libs/corrosion
     url = https://github.com/LibrePCB/corrosion.git
+[submodule "libs/slint"]
+    path = libs/slint
+    url = https://github.com/LibrePCB/slint.git
+[submodule "libs/font-awesome"]
+    path = libs/font-awesome
+    url = https://github.com/FortAwesome/Font-Awesome.git
+[submodule "libs/bootstrap-icons"]
+    path = libs/bootstrap-icons
+    url = https://github.com/twbs/icons.git

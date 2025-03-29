@@ -34,6 +34,7 @@ pushd "./build/install/"  # Avoid having path in DMG name
 dylibbundler -ns -od -b \
   -x LibrePCB.app/Contents/MacOS/librepcb \
   -x LibrePCB.app/Contents/MacOS/librepcb-cli \
+  -x lib/liblibrepcbslint.dylib \
   -d LibrePCB.app/Contents/Frameworks/ \
   -p @executable_path/../Frameworks/
 if [ "$ARCH" = "arm64" ]
@@ -46,6 +47,7 @@ then
   macdeployqt "LibrePCB.app" -always-overwrite \
     -executable="./LibrePCB.app/Contents/MacOS/librepcb" \
     -executable="./LibrePCB.app/Contents/MacOS/librepcb-cli" \
+    -executable="./LibrePCB.app/Contents/Frameworks/liblibrepcbslint.dylib" \
     -qmldir="../../ci"
   codesign --force --deep -s - ./LibrePCB.app/Contents/MacOS/librepcb
   codesign --force --deep -s - ./LibrePCB.app/Contents/MacOS/librepcb-cli
@@ -61,6 +63,7 @@ else
       macdeployqt "LibrePCB.app" -dmg -always-overwrite \
         -executable="./LibrePCB.app/Contents/MacOS/librepcb" \
         -executable="./LibrePCB.app/Contents/MacOS/librepcb-cli" \
+        -executable="./LibrePCB.app/Contents/Frameworks/liblibrepcbslint.dylib" \
         -qmldir="../../ci"
       sleep 5
     fi

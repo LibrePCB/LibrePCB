@@ -34,12 +34,12 @@ def test_upgrade_v01(librepcb, helpers):
         helpers.wait_until_widget_hidden(wizard)
         assert os.path.exists(os.path.join(data_path, '.librepcb-data'))
 
-        # Verify that the control panel is now opened.
-        app.widget('controlPanel').properties()['visible'] is True
+        # Verify that the main window is now opened.
+        app.widget('mainWindow').properties()['visible'] is True
 
     # Open LibrePCB again to see if the workspace is automatically opened.
     with librepcb.open() as app:
-        app.widget('controlPanel').properties()['visible'] is True
+        app.widget('mainWindow').properties()['visible'] is True
 
 
 @pytest.mark.xfail(sys.platform == 'darwin', raises=AssertionError,
@@ -67,12 +67,12 @@ def test_upgrade_data(librepcb, helpers):
         assert os.path.exists(v01_path)
         assert os.path.exists(os.path.join(data_path, '.librepcb-data'))
 
-        # Verify that the control panel is now opened.
-        app.widget('controlPanel').properties()['visible'] is True
+        # Verify that the main window is now opened.
+        app.widget('mainWindow').properties()['visible'] is True
 
     # Open LibrePCB again to see if the workspace is automatically opened.
     with librepcb.open() as app:
-        app.widget('controlPanel').properties()['visible'] is True
+        app.widget('mainWindow').properties()['visible'] is True
 
 
 def test_downgrade(librepcb, helpers):
@@ -97,9 +97,9 @@ def test_downgrade(librepcb, helpers):
         helpers.wait_until_widget_hidden(wizard)
         assert os.path.exists(os.path.join(v02_path, '.librepcb-data'))
 
-        # Verify that the control panel is now opened.
-        app.widget('controlPanel').properties()['visible'] is True
+        # Verify that the main window is now opened.
+        app.widget('mainWindow').properties()['visible'] is True
 
     # Open LibrePCB again to see if the workspace is automatically opened.
     with librepcb.open() as app:
-        app.widget('controlPanel').properties()['visible'] is True
+        app.widget('mainWindow').properties()['visible'] is True

@@ -59,15 +59,15 @@ def test_create_new_workspace(librepcb, helpers):
         assert os.path.exists(os.path.join(test_workspace_path,
                                            '.librepcb-workspace'))
 
-        # Verify that the control panel is now opened.
-        app.widget('controlPanel').properties()['visible'] is True
+        # Verify that the main window is now opened.
+        app.widget('mainWindow').properties()['visible'] is True
 
     # Open LibrePCB again to see if the workspace is automatically opened
     # and the settings are applied.
     with librepcb.open() as app:
-        app.widget('controlPanel').properties()['visible'] is True
-        app.action('controlPanelActionOpenWorkspaceSettings').trigger(blocking=False)
-        user_edit = app.widget('controlPanelWorkspaceSettingsDialogGeneralUserNameEdit')
+        app.widget('mainWindow').properties()['visible'] is True
+        app.widget('mainWindowTestAdapter').call_slot('trigger', 'workspace-settings')
+        user_edit = app.widget('mainWindowWorkspaceSettingsDialogGeneralUserNameEdit')
         assert user_edit.properties()['text'] == 'foobar 42'
 
 
@@ -90,12 +90,12 @@ def test_open_compatible_workspace(librepcb):
         assert 'contains a valid workspace' in status_label.properties()['text']
         app.widget('initWorkspaceWizardFinishButton').click()
 
-        # Verify that the control panel is now opened.
-        app.widget('controlPanel').properties()['visible'] is True
+        # Verify that the main window is now opened.
+        app.widget('mainWindow').properties()['visible'] is True
 
     # Open LibrePCB again to see if the workspace is automatically opened.
     with librepcb.open() as app:
-        app.widget('controlPanel').properties()['visible'] is True
+        app.widget('mainWindow').properties()['visible'] is True
 
 
 def test_open_workspace_upgrade_v01(librepcb, helpers):
@@ -133,12 +133,12 @@ def test_open_workspace_upgrade_v01(librepcb, helpers):
         helpers.wait_until_widget_hidden(wizard)
         assert os.path.exists(os.path.join(data_path, '.librepcb-data'))
 
-        # Verify that the control panel is now opened.
-        app.widget('controlPanel').properties()['visible'] is True
+        # Verify that the main window is now opened.
+        app.widget('mainWindow').properties()['visible'] is True
 
     # Open LibrePCB again to see if the workspace is automatically opened.
     with librepcb.open() as app:
-        app.widget('controlPanel').properties()['visible'] is True
+        app.widget('mainWindow').properties()['visible'] is True
 
 
 def test_open_workspace_upgrade_data(librepcb, helpers):
@@ -179,12 +179,12 @@ def test_open_workspace_upgrade_data(librepcb, helpers):
         assert os.path.exists(v01_path)
         assert os.path.exists(os.path.join(data_path, '.librepcb-data'))
 
-        # Verify that the control panel is now opened.
-        app.widget('controlPanel').properties()['visible'] is True
+        # Verify that the main window is now opened.
+        app.widget('mainWindow').properties()['visible'] is True
 
     # Open LibrePCB again to see if the workspace is automatically opened.
     with librepcb.open() as app:
-        app.widget('controlPanel').properties()['visible'] is True
+        app.widget('mainWindow').properties()['visible'] is True
 
 
 def test_open_workspace_downgrade(librepcb, helpers):
@@ -223,9 +223,9 @@ def test_open_workspace_downgrade(librepcb, helpers):
         helpers.wait_until_widget_hidden(wizard)
         assert os.path.exists(os.path.join(v02_path, '.librepcb-data'))
 
-        # Verify that the control panel is now opened.
-        app.widget('controlPanel').properties()['visible'] is True
+        # Verify that the main window is now opened.
+        app.widget('mainWindow').properties()['visible'] is True
 
     # Open LibrePCB again to see if the workspace is automatically opened.
     with librepcb.open() as app:
-        app.widget('controlPanel').properties()['visible'] is True
+        app.widget('mainWindow').properties()['visible'] is True

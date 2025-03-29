@@ -16,6 +16,7 @@ jobs:
         CC: clang
         CXX: clang++
         CMAKE_OPTIONS: '-DCMAKE_CXX_FLAGS="-DQT_FORCE_ASSERTS=1"'
+        LD_LIBRARY_PATH: $(Build.Repository.LocalPath)/build/install/lib
       Ubuntu_2404_Unbundled:
         IMAGE: librepcb/librepcb-dev:ubuntu-24.04-2
         UNBUNDLE_DXFLIB: true

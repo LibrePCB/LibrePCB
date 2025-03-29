@@ -28,8 +28,8 @@
 #include <librepcb/core/workspace/workspacesettings.h>
 #include <librepcb/editor/dialogs/directorylockhandlerdialog.h>
 #include <librepcb/editor/editorcommandset.h>
+#include <librepcb/editor/guiapplication.h>
 #include <librepcb/editor/project/partinformationprovider.h>
-#include <librepcb/editor/workspace/controlpanel/controlpanel.h>
 #include <librepcb/editor/workspace/initializeworkspacewizard/initializeworkspacewizard.h>
 
 #include <QtConcurrent>
@@ -52,7 +52,6 @@ static void writeLogHeader() noexcept;
 static int runApplication() noexcept;
 static bool isFileFormatStableOrAcceptUnstable() noexcept;
 static int openWorkspace(FilePath& path);
-static int appExec() noexcept;
 
 /*******************************************************************************
  *  main()
@@ -93,18 +92,33 @@ int main(int argc, char* argv[]) {
   // (from http://www.qtcentre.org/threads/1904)
   app.setStyleSheet("QStatusBar::item { border: 0px solid black; }");
 
-  // Use Fusion style on Windows with dark theme to enable dark theme also for
-  // LibrePCB (see https://github.com/LibrePCB/LibrePCB/issues/1390).
-  // Note: As a fallback solution if the dark theme causes troubles or users
-  // don't like it, the environment variable LIBREPCB_DISABLE_DARK_THEME=1
-  // could be set. We may remove this fallback if nobody asks for it.
-#if defined(Q_OS_WIN) && (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
-  if ((app.styleHints()->colorScheme() == Qt::ColorScheme::Dark) &&
-      (qgetenv("LIBREPCB_DISABLE_DARK_THEME") != "1")) {
-    qDebug() << "Switching to Fusion style because of dark system theme.";
-    app.setStyle(QStyleFactory::create("Fusion"));
+  // Use Fusion style with custom palette to make the legacy Qt dialogs looking
+  // similar to the new Slint UI. Can be removed as soon as no Qt widgets are
+  // used anymore.
+  {
+    QPalette palette;
+    palette.setColor(QPalette::Window, "#2a2a2a");
+    palette.setColor(QPalette::WindowText, "#c4c4c4");
+    palette.setColor(QPalette::Base, "#262626");
+    palette.setColor(QPalette::AlternateBase, "#2e2e2e");
+    palette.setColor(QPalette::ToolTipBase, "#2e2e2e");
+    palette.setColor(QPalette::ToolTipText, "#dedede");
+    palette.setColor(QPalette::Text, "#c4c4c4");
+    palette.setColor(QPalette::PlaceholderText, "#959595");
+    palette.setColor(QPalette::Button, "#202020");
+    palette.setColor(QPalette::ButtonText, "#c4c4c4");
+    palette.setColor(QPalette::Link, "#29d682");
+    palette.setColor(QPalette::LinkVisited, "#29d682");
+    palette.setColor(QPalette::Highlight, "#29d682");
+    palette.setColor(QPalette::HighlightedText, "#161616");
+    palette.setColor(QPalette::Disabled, QPalette::Button, "#1a1a1a");
+    palette.setColor(QPalette::Disabled, QPalette::ButtonText, "#707070");
+    palette.setColor(QPalette::Disabled, QPalette::WindowText, "#707070");
+    palette.setColor(QPalette::Disabled, QPalette::Text, "#707070");
+    palette.setColor(QPalette::Disabled, QPalette::Light, "#707070");
+    app.setStyle("fusion");
+    app.setPalette(palette);
   }
-#endif
 
   // Start network access manager thread with HTTP cache to avoid extensive
   // requests (e.g. downloading library pictures each time opening the manager).
@@ -328,30 +342,8 @@ static int openWorkspace(FilePath& path) {
                    &WorkspaceSettingsItem::edited,
                    &ws.getSettings().keyboardShortcuts, applyKeyboardShortcuts);
 
-  // Open the control panel.
-  ControlPanel p(ws, wizard.getWorkspaceContainsNewerFileFormats());
-  p.show();
-
-  return appExec();
-}
-
-/*******************************************************************************
- *  appExec()
- ******************************************************************************/
-
-static int appExec() noexcept {
-  // please note that we shouldn't show a dialog or message box in the catch()
-  // blocks! from http://qt-project.org/doc/qt-5/exceptionsafety.html:
-  //      "After an exception is thrown, the connection to the windowing server
-  //      might already be closed. It is not safe to call a GUI related function
-  //      after catching an exception."
-  try {
-    return QApplication::exec();
-  } catch (std::exception& e) {
-    qFatal("UNCAUGHT EXCEPTION: %s --- PROGRAM EXITED", e.what());
-  } catch (...) {
-    qFatal("UNCAUGHT EXCEPTION --- PROGRAM EXITED");
-  }
-
-  return -1;
+  // Run the application.
+  GuiApplication app(ws, wizard.getWorkspaceContainsNewerFileFormats());
+  app.exec();
+  return 0;
 }
