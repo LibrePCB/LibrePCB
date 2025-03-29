@@ -1,0 +1,140 @@
+import { Data, EditorCommand } from "../api.slint";
+
+export component MenuSeparator inherits Rectangle {
+    height: 10px;
+    background: #404040;
+
+    Rectangle {
+        y: parent.height / 2;
+        height: 1px;
+        background: #707070;
+    }
+}
+
+export component MenuItem inherits Rectangle {
+    in property <EditorCommand> cmd;
+    in property <string> text: cmd.text;
+    in property <string> shortcuts: cmd.shortcut;
+    in property <string> status-tip: cmd.status-tip;
+    in property <image> icon: cmd.icon;
+    in property <image> icon-checked: @image-url("../../../../font-awesome/svgs/regular/square-check.svg");
+    in property <image> icon-unchecked: @image-url("../../../../font-awesome/svgs/regular/square.svg");
+    in property <bool> enabled: true;
+    in property <bool> checkable: false;
+    in property <bool> checked: false;
+    in property <bool> default: false;
+    property <color> text-color: enabled ? #d0d0d0 : #808080;
+
+    callback clicked;
+
+    height: 30px;
+    background: ta.has-hover ? #505050 : #404040;
+
+    // Accessibility
+    accessible-role: button;
+    accessible-checkable: checkable;
+    accessible-checked: checked;
+    accessible-description: status-tip;
+    accessible-enabled: enabled;
+    accessible-label: text;
+    accessible-action-default => {
+        ta.clicked();
+    }
+
+    HorizontalLayout {
+        padding-left: 5px;
+        padding-right: 10px;
+        padding-top: 2px;
+        padding-bottom: 2px;
+        spacing: 3px;
+
+        Rectangle {
+            property <bool> checkable-custom-icon: checkable && (icon.width > 0);
+
+            width: self.height;
+            background: checkable-custom-icon ? #303030 : transparent;
+            border-radius: 5px;
+            border-width: checkable-custom-icon ? 1px : 0;
+            border-color: #909090;
+
+            Image {
+                x: 4px;
+                y: self.x;
+                width: parent.width - 2 * self.x;
+                height: self.width;
+                colorize: text-color;
+                image-fit: contain;
+                vertical-alignment: center;
+                horizontal-alignment: center;
+                source: {
+                    if icon.width > 0 {
+                        icon
+                    } else if checked {
+                        icon-checked
+                    } else if checkable {
+                        icon-unchecked
+                    } else {
+                        @image-url("")
+                    }
+                };
+                accessible-role: none;
+            }
+        }
+
+        text-txt := Text {
+            vertical-alignment: center;
+            font-size: 15px;
+            font-weight: default ? 600 : 400;
+            color: text-color;
+            text: text;
+            accessible-role: none;
+        }
+
+        shortcuts-txt := Text {
+            width: max(self.preferred-width, 80px);
+            horizontal-alignment: right;
+            vertical-alignment: center;
+            font-size: 13px;
+            color: enabled ? #b0b0b0 : #707070;
+            text: shortcuts;
+            accessible-role: none;
+        }
+    }
+
+    ta := TouchArea {
+        enabled: enabled;
+
+        changed has-hover => {
+            if !root.status-tip.is-empty {
+                if self.has-hover {
+                    Data.status-tip = root.status-tip;
+                } else {
+                    Data.status-tip = "";
+                }
+            }
+        }
+
+        clicked => {
+            // The click may destroy this element without calling the
+            // has-hover handler anymore, so we clear the status tip
+            // manually to be on the safe side.
+            if !root.status-tip.is-empty {
+                Data.status-tip = "";
+            }
+            root.clicked();
+        }
+    }
+}
+
+export component MenuPopup inherits PopupWindow {
+    width: self.preferred-width;
+    height: self.preferred-height;
+
+    Rectangle {
+        background: #353535;
+
+        VerticalLayout {
+            @children
+        }
+    }
+}

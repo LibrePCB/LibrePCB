@@ -55,14 +55,6 @@ public:
   // Static Methods
 
   /**
-   * @brief Detect if the default (theme dependent) window background is dark
-   *
-   * @retval true   Background is considered dark
-   * @retval false  Background is considered light or could not be determined
-   */
-  static bool isWindowBackgroundDark() noexcept;
-
-  /**
    * @brief Remove (hide) a whole row in a QFormLayout
    *
    * @param label   The label of the row to remove.

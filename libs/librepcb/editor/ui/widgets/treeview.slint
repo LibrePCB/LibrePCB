@@ -1,0 +1,197 @@
+import { ListView, Palette } from "std-widgets.slint";
+import { ListViewItemButton } from "listviewitembutton.slint";
+import {
+    Action,
+    Backend,
+    Constants,
+    EditorCommandSet as Cmd,
+    Helpers,
+    TreeViewItemData
+} from "../api.slint";
+
+export component TreeView inherits Rectangle {
+    in-out property <[TreeViewItemData]> model;
+    in property <bool> supports-expand: true;
+    out property <bool> has-focus <=> fs.has-focus;
+    property <length> item-height: 22px;
+    property <length> icon-size: 18px;
+    property <length> pin-size: 14px;
+    property <int> current-index: -1;
+    property <length> scrollbar-width: (self.height < self.preferred-height) ? 7px : 0;
+
+    callback key-pressed(index: int, item: TreeViewItemData, event: KeyEvent) -> EventResult;
+    callback item-hovered(index: int, item: TreeViewItemData);
+    callback item-selected(index: int, item: TreeViewItemData);
+    callback item-triggered(index: int, item: TreeViewItemData) -> bool;
+    callback item-right-clicked(index: int, item: TreeViewItemData, x: length, y: length);
+    callback item-deleted(index: int, item: TreeViewItemData) -> bool;
+
+    preferred-height: model.length * item-height;
+    forward-focus: fs;
+
+    // Accessibility
+    accessible-role: list;
+    accessible-item-count: model.length;
+
+    function set-current-index(index: int) {
+        current-index = index;
+        item-selected(index, model[index]);
+    }
+
+    fs := FocusScope {
+        key-pressed(event) => {
+            if event.text == Key.DownArrow {
+                set-current-index(min(current-index + 1, model.length - 1));
+                return accept;
+            } else if event.text == Key.UpArrow {
+                set-current-index(max(current-index - 1, 0));
+                return accept;
+            } else if (current-index >= 0) && (current-index < model.length) {
+                if event.text == Key.Return {
+                    if !item-triggered(current-index, model[current-index]) {
+                        model[current-index].action = Action.default;
+                    }
+                    return accept;
+                } else if (event.text == Key.Space) && (model[current-index].has-children) {
+                    model[current-index].expanded = !model[current-index].expanded;
+                    return accept;
+                } else if event.text == Key.Delete {
+                    if !item-deleted(current-index, model[current-index]) {
+                        model[current-index].action = Action.delete;
+                    }
+                    return accept;
+                } else if event.text == Key.Menu {
+                    item-right-clicked(current-index, model[current-index], 0, item-height * (current-index + 1) + view.viewport-y);
+                    return accept;
+                }
+            }
+            root.key-pressed(current-index, model[current-index], event)
+        }
+    }
+
+    view := ListView {
+        for item[index] in model: item-ta := TouchArea {
+            property <bool> is-enabled: item.action == Action.none;
+            property <bool> show-pin: item.supports-pinning && (item.pinned || self.has-hover || (current-index == index));
+
+            width: parent.width;
+            height: item-height;
+            enabled: is-enabled;
+
+            // Accessibility
+            accessible-role: list-item;
+            accessible-description: item.hint;
+            accessible-enabled: self.enabled;
+            accessible-expandable: item.has-children;
+            accessible-expanded: item.expanded;
+            accessible-label: item.text;
+            accessible-item-selectable: true;
+            accessible-item-selected: (current-index == index);
+            accessible-item-index: index;
+            accessible-action-expand => {
+                item.expanded = !item.expanded;
+            }
+
+            changed has-hover => {
+                if self.has-hover {
+                    item-hovered(index, item);
+                } else {
+                    item-hovered(-1, { });
+                }
+            }
+
+            Rectangle {
+                background: (current-index == index) ? #454545 : (parent.has-hover ? #383838 : transparent);
+
+                HorizontalLayout {
+                    spacing: 5px;
+                    padding-left: 5px;
+                    padding-right: 5px + scrollbar-width;
+
+                    if supports-expand: expand-ta := TouchArea {
+                        mouse-cursor: pointer;
+                        enabled: item.has-children;
+                        width: item.level * 10px + item-height / 2 + 2px;
+
+                        Image {
+                            y: 4px;
+                            x: parent.width - self.width;
+                            width: item-height - 2 * self.y;
+                            height: parent.height - 2 * self.y;
+                            image-fit: contain;
+                            source: @image-url("../../../../font-awesome/svgs/solid/angle-right.svg");
+                            colorize: Palette.foreground;
+                            rotation-angle: item.expanded ? 90deg : 0;
+                            visible: item.has-children;
+                            accessible-role: none;
+
+                            animate rotation-angle { duration: 100ms; }
+                        }
+
+                        clicked => {
+                            item.expanded = !item.expanded;
+                        }
+                    }
+
+                    Image {
+                        y: (parent.height - self.height) / 2;
+                        width: icon-size;
+                        height: icon-size;
+                        image-fit: fill;
+                        source: item.icon;
+                        accessible-role: none;
+                    }
+
+                    item-text-txt := Text {
+                        horizontal-stretch: 1;
+                        color: is-enabled ? #dddddd : #a0a0a0;
+                        font-size: 14px;
+                        font-weight: 400;
+                        overflow: TextOverflow.elide;
+                        text: item.text;
+                        accessible-role: none;
+                    }
+
+                    if show-pin: item-pin-btn := ListViewItemButton {
+                        icon: {
+                            if item.pinned {
+                                @image-url("../../../../bootstrap-icons/icons/pin-angle-fill.svg")
+                            } else {
+                                @image-url("../../../../bootstrap-icons/icons/pin-angle.svg")
+                            }
+                        };
+                        icon-size: pin-size;
+                        tooltip: item.pinned ? @tr("Unpin") : @tr("Pin");
+
+                        clicked => {
+                            item.pinned = !item.pinned;
+                        }
+                    }
+                }
+            }
+
+            clicked => {
+                fs.focus();
+                set-current-index(index);
+            }
+
+            double-clicked => {
+                if item.has-children {
+                    item.expanded = !item.expanded;
+                } else if !item-triggered(index, item) {
+                    model[index].action = Action.default;
+                }
+            }
+
+            pointer-event(event) => {
+                if (event.button == PointerEventButton.right) && (event.kind == PointerEventKind.up) {
+                    self.clicked(); // Handle focus & selection
+                    item-right-clicked(index, item, self.absolute-position.x - root.absolute-position.x + self.mouse-x, self.absolute-position.y - root.absolute-position.y + self.mouse-y);
+                    EventResult.accept
+                } else {
+                    EventResult.reject
+                }
+            }
+        }
+    }
+}

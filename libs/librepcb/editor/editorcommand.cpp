@@ -22,8 +22,7 @@
  ******************************************************************************/
 #include "editorcommand.h"
 
-#include "utils/editortoolbox.h"
-
+#include <QSvgRenderer>
 #include <QtCore>
 #include <QtWidgets>
 
@@ -33,21 +32,65 @@
 namespace librepcb {
 namespace editor {
 
-static bool enableDarkIcons() noexcept {
-  auto detect = []() {
-    // This environment variable should not actively be promoted, it is only
-    // here as a last resort if the auto-detection doesn't work for some users.
-    const QString override = qgetenv("LIBREPCB_DARK_ICONS");
-    if (override == "1") {
-      return true;
-    } else if (override == "0") {
-      return false;
-    } else {
-      return EditorToolbox::isWindowBackgroundDark();
+/*******************************************************************************
+ *  Class MonochromeSvgIconEngine
+ ******************************************************************************/
+
+// Custom icon engine to change the color of monochrome SVG icons on-thy-fly
+// to the theme's text color. Works with Bootstrap Icons and Font Awesome.
+class MonochromeSvgIconEngine : public QIconEngine {
+  QString mFilePath;
+  QByteArray mSvgContent;
+
+public:
+  explicit MonochromeSvgIconEngine(const QString& fp) : mFilePath(fp) {}
+  void paint(QPainter* painter, const QRect& rect, QIcon::Mode mode,
+             QIcon::State state) override {
+    Q_UNUSED(state);
+
+    if (mSvgContent.isNull() && (!mFilePath.isEmpty())) {
+      QFile file(mFilePath);
+      if (file.open(QFile::ReadOnly)) {
+        mSvgContent = file.readAll();
+        mSvgContent.replace("fill=\"currentColor\"", "");  // Bootstrap Icons
+        mSvgContent.replace("<svg ", "<svg fill=\"#C4C4C4\" ");  // Font Awesome
+      }
+      mFilePath.clear();
     }
-  };
-  static bool value = detect();
-  return value;
+
+    QByteArray content = mSvgContent;
+    if ((mode == QIcon::Mode::Active) || (mode == QIcon::Mode::Selected)) {
+      content.replace("<svg fill=\"#C4C4C4\" ", "<svg fill=\"#303030\" ");
+    } else if (mode == QIcon::Mode::Disabled) {
+      content.replace("<svg fill=\"#C4C4C4\" ", "<svg fill=\"#707070\" ");
+    }
+
+    QSvgRenderer renderer(content);
+    renderer.render(painter, rect);
+  }
+  QPixmap pixmap(const QSize& size, QIcon::Mode mode,
+                 QIcon::State state) override {
+    QImage img(size, QImage::Format_ARGB32);
+    img.fill(Qt::transparent);
+    QPixmap pix = QPixmap::fromImage(img, Qt::NoFormatConversion);
+    {
+      QPainter painter(&pix);
+      const QRect rext(QPoint(0, 0), size);
+      this->paint(&painter, rext, mode, state);
+    }
+    return pix;
+  }
+  QIconEngine* clone() const override {
+    return new MonochromeSvgIconEngine(*this);
+  }
+};
+
+static QIcon loadIcon(const QString& fp) noexcept {
+  if (fp.endsWith(".svg")) {
+    return QIcon(new MonochromeSvgIconEngine(fp));
+  } else {
+    return QIcon(fp);
+  }
 }
 
 /*******************************************************************************
@@ -65,19 +108,11 @@ EditorCommand::EditorCommand(const QString& identifier, const char* text,
     mText(text),
     mDescriptionNoTr(description),
     mDescription(description),
-    mIcon(),
+    mIcon(loadIcon(iconFp)),
     mFlags(flags),
     mDefaultKeySequences(defaultKeySequences),
     mKeySequences(defaultKeySequences) {
   updateTranslations();
-
-  const QStringList splitFp = iconFp.split('.');
-  const QString darkIconFp = splitFp.first() % "_dark." % splitFp.last();
-  if (enableDarkIcons() && QFileInfo::exists(darkIconFp)) {
-    mIcon = QIcon(darkIconFp);
-  } else {
-    mIcon = QIcon(iconFp);
-  }
 }
 
 EditorCommand::~EditorCommand() noexcept {

@@ -1,0 +1,46 @@
+import {
+    Action,
+    EditorCommand,
+    NotificationType
+} from "types.slint";
+import { Backend } from "backend.slint";
+
+export global Helpers {
+    pure public function is-shortcut(event: KeyEvent, command: EditorCommand) -> bool {
+        (event.text == command.key) && (event.modifiers == command.modifiers)
+    }
+
+    pure public function get-icon-for-notification-type(nt: NotificationType) -> image {
+        if (nt == NotificationType.tip) {
+            return @image-url("../../../../font-awesome/svgs/solid/lightbulb.svg");
+        } else if (nt == NotificationType.info) {
+            return @image-url("../../../../font-awesome/svgs/solid/circle-info.svg");
+        } else if (nt == NotificationType.warning) {
+            return @image-url("../../../../font-awesome/svgs/solid/triangle-exclamation.svg");
+        } else if (nt == NotificationType.critical) {
+            return @image-url("../../../../font-awesome/svgs/solid/circle-xmark.svg");
+        } else if (nt == NotificationType.progress) {
+            return @image-url("../../../../font-awesome/svgs/solid/arrows-rotate.svg");
+        } else {
+            debug("Unhandled case in get-icon-for-notification-type().");
+            return @image-url("");
+        }
+    }
+
+    pure public function get-color-for-notification-type(nt: NotificationType) -> color {
+        if (nt == NotificationType.tip) {
+            return #00e1ff;
+        } else if (nt == NotificationType.info) {
+            return white;
+        } else if (nt == NotificationType.warning) {
+            return yellow;
+        } else if (nt == NotificationType.critical) {
+            return red;
+        } else if (nt == NotificationType.progress) {
+            return white;
+        } else {
+            debug("Unhandled case in get-color-for-notification-type().");
+            return white;
+        }
+    }
+}

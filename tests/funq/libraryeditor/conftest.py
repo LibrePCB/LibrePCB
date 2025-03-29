@@ -17,7 +17,7 @@ def library_editor(librepcb, helpers):
         helpers.wait_for_library_scan_complete(app)
 
         # Open library manager
-        app.widget('controlPanelOpenLibraryManagerButton').click()
+        app.widget('mainWindowTestAdapter').call_slot('trigger', 'library-manager')
         assert app.widget('libraryManager').properties()['visible'] is True
 
         # Select the empty library in library list

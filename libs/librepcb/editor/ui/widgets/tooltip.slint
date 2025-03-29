@@ -1,0 +1,36 @@
+export component ToolTip inherits Rectangle {
+    in property <string> text;
+    in property <string> shortcut;
+    in property <length> font-size: 14px;
+    in property <bool> delayed: true;
+
+    width: min(text-txt.preferred-width + (font-size / 2), 800px);
+    height: text-txt.height + (font-size / 2);
+    background: #101010;
+    border-radius: 5px;
+    opacity: 0;
+
+    animate opacity {
+        delay: delayed ? 600ms : 0;
+        duration: delayed ? 150ms : 0;
+    }
+
+    text-txt := Text {
+        x: (font-size / 4);
+        y: (parent.height - self.height) / 2;
+        width: parent.width - 2 * self.x;
+        color: #eeeeee;
+        horizontal-alignment: left;
+        vertical-alignment: center;
+        wrap: word-wrap;
+        font-size: font-size;
+        text: {
+            shortcut.is-empty ? text : (text + " (" + shortcut + ")")
+        };
+        accessible-role: none;
+    }
+
+    init => {
+        self.opacity = 1;
+    }
+}

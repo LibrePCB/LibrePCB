@@ -22,8 +22,6 @@
  ******************************************************************************/
 #include "projectlibraryupdater.h"
 
-#include "../../project/projecteditor.h"
-#include "../controlpanel/controlpanel.h"
 #include "ui_projectlibraryupdater.h"
 
 #include <librepcb/core/application.h>
@@ -55,11 +53,11 @@ namespace editor {
 
 ProjectLibraryUpdater::ProjectLibraryUpdater(Workspace& ws,
                                              const FilePath& project,
-                                             ControlPanel& cp) noexcept
+                                             CloseCallback cb) noexcept
   : QDialog(nullptr),
     mWorkspace(ws),
     mProjectFilePath(project),
-    mControlPanel(cp),
+    mCloseCallback(cb),
     mUi(new Ui::ProjectLibraryUpdater) {
   mUi->setupUi(this);
   mUi->btnUpdate->setText(
@@ -81,14 +79,9 @@ void ProjectLibraryUpdater::btnUpdateClicked() {
 
   // close project if it is currently open
   bool abort = false;
-  ProjectEditor* editor = mControlPanel.getOpenProject(mProjectFilePath);
-  if (editor) {
+  if (mCloseCallback) {
     log(tr("Ask to close project (confirm message box!)"));
-    bool close = editor->closeAndDestroy(true, this);
-    if (close) {
-      delete editor;  // delete editor to make sure the lock is released
-                      // immediately
-    } else {
+    if (!mCloseCallback(mProjectFilePath)) {
       abort = true;
       log(tr("Abort."));
     }
@@ -151,13 +144,12 @@ void ProjectLibraryUpdater::btnUpdateClicked() {
     }
 
     // re-open project if it was previously open
-    if (editor) {
-      mControlPanel.openProject(mProjectFilePath);
-      // bring this window to front again (with some delay to make it working
-      // properly)
-      QTimer::singleShot(500, this, &QDialog::raise);
-      QTimer::singleShot(500, this, &QDialog::activateWindow);
-    }
+    emit finished(mProjectFilePath);
+
+    // bring this window to front again (with some delay to make it working
+    // properly)
+    QTimer::singleShot(500, this, &QDialog::raise);
+    QTimer::singleShot(500, this, &QDialog::activateWindow);
   }
 
   setEnabled(true);
