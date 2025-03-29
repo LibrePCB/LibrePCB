@@ -1,0 +1,362 @@
+import { CheckBox, ListView, ProgressIndicator, HorizontalBox, VerticalBox, StandardButton, Palette } from "std-widgets.slint";
+import { PanelHeader, PanelHeaderButton, LineEdit } from "../widgets.slint";
+import { LibraryData, LibraryType, LibraryState, Action, NotificationType } from "../api/types.slint";
+import { Backend } from "../api/backend.slint";
+import { Data } from "../api/data.slint";
+import { Helpers } from "../api/helpers.slint";
+
+component LibraryList inherits ListView {
+    in-out property <[LibraryData]> model;
+    in property <length> bottom-padding: 50px;
+    property <int> current-index: -1;
+    property <length> item-height: 50px;
+    property <int> item-count: model.length;
+
+    preferred-height: model.length * item-height + bottom-padding;
+
+    changed item-count => {
+        if !Data.libraries-filter.is-empty {
+            self.viewport-y = 0;
+            self.current-index = (item-count > 0) ? 0 : -1;
+        }
+    }
+
+    for lib[index] in model: Rectangle {
+        property <bool> add-separator: (index > 0) && (model[index - 1].type != lib.type);
+        property <bool> last-item: index == (model.length - 1);
+
+        width: parent.width;
+        height: item-height + (last-item ? bottom-padding : 0);
+
+        Rectangle {
+            y: 0;
+            height: item-height;
+            background: (current-index == index) ? #454545 : (ta-lib.has-hover ? #383838 : transparent);
+
+            ta-lib := TouchArea {
+                property <bool> buttons-visible: self.has-hover || (current-index == index);
+                property <bool> installable: (lib.type == LibraryType.online);
+                property <bool> updatable: (lib.type == LibraryType.remote) && (lib.state == LibraryState.outdated);
+
+                clicked => {
+                    current-index = index;
+                }
+
+                double-clicked => {
+                    Backend.open-library(lib.id);
+                }
+
+                HorizontalLayout {
+                    padding: 2px;
+                    padding-right: 10px;
+
+                    Image {
+                        width: item-height - 6px;
+                        height: item-height - 6px;
+                        source: lib.icon;
+                    }
+
+                    VerticalLayout {
+                        padding: 3px;
+                        alignment: space-between;
+
+                        HorizontalLayout {
+                            vertical-stretch: 0;
+
+                            Text {
+                                color: #dddddd;
+                                font-size: 13px;
+                                font-weight: 700;
+                                overflow: TextOverflow.elide;
+                                text: lib.name;
+                            }
+
+                            if lib.type != LibraryType.online: Rectangle {
+                                width: t-version.preferred-width + 10px;
+                                height: t-version.preferred-height + 2px;
+                                background: (lib.state == LibraryState.up-to-date) ? #006600 : ((lib.state == LibraryState.outdated) ? #aa0000 : #505050);
+                                border-radius: self.height / 2;
+                                t-version := Text {
+                                    color: white;
+                                    font-size: 10px;
+                                    text: lib.version + ((lib.type == LibraryType.local) ? " | local" : " | remote");
+                                }
+                            }
+                        }
+
+                        HorizontalLayout {
+                            spacing: 5px;
+
+                            if lib.progress == 0: Text {
+                                vertical-alignment: TextVerticalAlignment.center;
+                                color: #dddddd;
+                                font-size: 10px;
+                                font-weight: 200;
+                                overflow: TextOverflow.elide;
+                                text: lib.description;
+                                wrap: TextWrap.word-wrap;
+                            }
+
+                            if lib.progress > 0: ProgressIndicator {
+                                y: (parent.height - self.height) / 2;
+                                height: 8px;
+                                progress: lib.progress / 100;
+                            }
+
+                            Rectangle {
+                                width: 22px;
+                                height: self.width;
+                                border-radius: self.height / 2;
+                                visible: buttons-visible && (lib.type != LibraryType.online);
+
+                                if self.visible: Image {
+                                    width: self.height;
+                                    height: 70%;
+                                    colorize: ta-uninstall.has-hover ? white : #d0d0d0;
+                                    image-fit: contain;
+                                    source: @image-url("../../../../font-awesome/svgs/solid/trash-can.svg");
+                                    visible: buttons-visible && (lib.type != LibraryType.online);
+                                }
+
+                                ta-uninstall := TouchArea {
+                                    clicked => {
+                                        p-uninstall.show();
+                                    }
+                                }
+                            }
+
+                            if updatable || installable: CheckBox {
+                                checked: lib.checked;
+                                toggled => {
+                                    lib.checked = self.checked;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                p-uninstall := PopupWindow {
+                    x: root.width;
+                    y: item-height / 2 - self.height / 2;
+
+                    Rectangle {
+                        background: #790000;
+
+                        VerticalBox {
+                            Text {
+                                font-size: 14px;
+                                font-weight: 900;
+                                text: @tr("Attention! This will remove the whole library directory and is not reversible:");
+                            }
+
+                            Text {
+                                font-family: "monospace";
+                                text: lib.id;
+                            }
+
+                            Text {
+                                text: @tr("Are you really sure to remove '{0}'?", lib.name);
+                            }
+
+                            HorizontalBox {
+                                alignment: LayoutAlignment.center;
+
+                                StandardButton {
+                                    kind: yes;
+
+                                    clicked => {
+                                        Backend.uninstall-library(lib.id);
+                                    }
+                                }
+
+                                StandardButton {
+                                    kind: cancel;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if add-separator: Rectangle {
+            y: 0;
+            height: 1px;
+            background: #555555;
+        }
+
+        if last-item: Rectangle {
+            y: item-height;
+            height: bottom-padding;
+        }
+    }
+}
+
+export component LibrariesPanel inherits Rectangle {
+    background: #2a2a2a;
+
+    init => {
+        Backend.trigger(Action.library-panel-ensure-populated);
+    }
+
+    FocusScope {
+        key-pressed(event) => {
+            return Backend.libraries-key-event(event);
+        }
+    }
+
+    VerticalLayout {
+        alignment: LayoutAlignment.start;
+
+        header := PanelHeader {
+            z: 10;  // For the tooltip.
+            title: @tr("LIBRARIES");
+            show-spinner: Data.refreshing-available-libraries;
+
+            if !Data.libraries-fetching-error.is-empty: PanelHeaderButton {
+                icon: Helpers.get-icon-for-notification-type(NotificationType.warning);
+                icon-scale: 0.7;
+                colorize: Helpers.get-color-for-notification-type(NotificationType.warning);
+                tooltip: Data.libraries-fetching-error;
+                tooltip-delayed: false;
+                read-only: true;
+            }
+
+            PanelHeaderButton {
+                icon: @image-url("../../../../bootstrap-icons/icons/cloud-arrow-down-fill.svg");
+                icon-scale: 0.7;
+                tooltip: @tr("Download a Library by URL") + "...";
+
+                clicked => {
+                    Backend.trigger(Action.download-library-tab-open);
+                }
+            }
+
+            PanelHeaderButton {
+                icon: @image-url("../../../../font-awesome/svgs/solid/plus.svg");
+                tooltip: @tr("Create a New Library") + "...";
+
+                clicked => {
+                    Backend.trigger(Action.create-library-tab-open);
+                }
+            }
+        }
+
+        HorizontalLayout {
+            height: Data.libraries-filter.is-empty ? 0 : 38px;
+            padding: 5px;
+
+            animate height { duration: 100ms; }
+
+            Rectangle {
+                background: #505050;
+                border-radius: self.height / 2;
+
+                HorizontalLayout {
+                    padding-left: 10px;
+                    padding-right: 3px;
+                    spacing: 5px;
+
+                    Text {
+                        vertical-alignment: center;
+                        font-size: 13px;
+                        text: @tr("Filter:");
+                    }
+
+                    Text {
+                        vertical-alignment: center;
+                        font-size: 13px;
+                        color: white;
+                        text: Data.libraries-filter;
+                    }
+
+                    Rectangle { }
+
+                    TouchArea {
+                        width: self.height;
+
+                        i-search-term-clear := Image {
+                            x: parent.pressed ? 8px : 7px;
+                            y: self.x;
+                            width: parent.width - self.x * 2;
+                            height: self.width;
+                            image-fit: contain;
+                            colorize: parent.has-hover ? white : Palette.foreground;
+                            source: @image-url("../../../../font-awesome/svgs/solid/xmark.svg");
+                        }
+
+                        clicked => {
+                            Backend.libraries-clear-filter();
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!Data.libraries-filter.is-empty) && (Data.libraries.length == 0): HorizontalLayout {
+            padding: 8px;
+
+            Text {
+                width: 100%;
+                height: self.preferred-height;
+                font-italic: true;
+                wrap: word-wrap;
+                text: @tr("No libraries matching the filter.");
+            }
+        }
+
+        LibraryList {
+            model: Data.libraries;
+            bottom-padding: btn-install.height + 5px;
+            vertical-stretch: 0;
+        }
+    }
+
+    btn-install := Rectangle {
+        x: (r-all.x - self.width) / 2;
+        y: parent.height - self.height - 5px;
+        width: self.preferred-width;
+        height: self.preferred-height;
+        background: #ff5100;
+        border-radius: self.height / 2;
+        visible: Data.checked-libraries > 0;
+
+        HorizontalBox {
+            Image {
+                width: t-install.preferred-height;
+                height: t-install.preferred-height;
+                image-fit: contain;
+                source: @image-url("../../../../bootstrap-icons/icons/cloud-arrow-down-fill.svg");
+                colorize: t-install.color;
+            }
+
+            t-install := Text {
+                color: ta-install.has-hover ? white : black;
+                font-size: 14px;
+                text: @tr("Install/update {n} library" | "Install/update {n} libraries" % Data.checked-libraries);
+            }
+        }
+
+        ta-install := TouchArea {
+            clicked => {
+                Backend.trigger(Action.library-panel-install);
+            }
+        }
+    }
+
+    r-all := Rectangle {
+        x: parent.width - self.width - 15px;
+        y: btn-install.y;
+        width: self.height;
+        height: btn-install.height;
+        border-radius: self.height / 2;
+        background: #404040;
+        visible: Data.checked-libraries > 0;
+
+        CheckBox {
+            toggled => {
+                Backend.toggle-libraries-checked(self.checked);
+            }
+        }
+    }
+}

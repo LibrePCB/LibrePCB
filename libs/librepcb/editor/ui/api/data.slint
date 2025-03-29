@@ -1,8 +1,14 @@
 import {
     TreeViewItemData,
-    PanelPage,
+    LibraryData,
+    LibraryState,
+    LibraryType,
     NotificationData,
-    NotificationType
+    NotificationType,
+    PanelPage,
+    TabData,
+    TabType,
+    WindowSectionData
 } from "types.slint";
 
 export global Data {
@@ -143,4 +149,121 @@ export global Data {
 
     // Notifications: Popup shown status
     in property <bool> notifications-shown: true;
+
+    in property <bool> refreshing-available-libraries: false;
+
+    in property <string> libraries-fetching-error: "Some error occurred.\nFoo bar...";
+
+    in property <string> libraries-filter: "Foo";
+
+    in property <int> outdated-libraries: 2;
+
+    in property <int> checked-libraries: 3;
+
+    in property <[LibraryData]> libraries: [
+        {
+            name: "My Library",
+            description: "My own local library.",
+            version: "v1.0",
+            icon: @image-url("../../../../../img/app/librepcb.svg"),
+            type: LibraryType.local,
+            state: LibraryState.unknown,
+        },
+        {
+            name: "LibrePCB Base",
+            description: "Official LibrePCB Base Library",
+            version: "v1.2.3",
+            icon: @image-url("../../../../../img/app/librepcb.svg"),
+            type: LibraryType.remote,
+            state: LibraryState.up-to-date,
+        },
+        {
+            name: "Microchip Technology / Atmel",
+            description: "Integrated circuits and more (unofficial).",
+            version: "v0.5",
+            icon: @image-url("../../../../../img/app/librepcb.svg"),
+            type: LibraryType.remote,
+            state: LibraryState.outdated,
+        },
+        {
+            name: "LibrePCB Integrated Circuits",
+            description: "Official LibrePCB Integrated Circuits Library",
+            icon: @image-url("../../../../../img/app/librepcb.svg"),
+            type: LibraryType.online,
+        },
+        {
+            name: "Microchip Technology / Atmel",
+            description: "Integrated circuits and more (unofficial).",
+            icon: @image-url("../../../../../img/app/librepcb.svg"),
+            type: LibraryType.online,
+            progress: 42,
+        },
+    ];
+
+    in property <[WindowSectionData]> sections: [
+        {
+            tabs: [
+                {
+                    type: TabType.home,
+                },
+                {
+                    type: TabType.create-library,
+                    title: "Create Lib",
+                },
+                {
+                    type: TabType.download-library,
+                    title: "Download Lib",
+                },
+            ],
+            create-library-tabs: [
+                { },
+                {
+                    name: "My Library",
+                    name-error: "Name error",
+                    description: "",
+                    author: "",
+                    author-default: "Me",
+                    version: "",
+                    version-default: "0.1",
+                    version-error: "Version error",
+                    url: "",
+                    url-error: "URL error",
+                    cc0: false,
+                    directory: "",
+                    directory-default: "My_Library.lplib",
+                    directory-error: "Directory error",
+                    valid: true,
+                    creation-error: "Creation error",
+                },
+            ],
+            download-library-tabs: [
+                { },
+                { },
+                {
+                    url: "",
+                    url-error: "URL error",
+                    url-suggestion: "https://example.com/library.zip",
+                    directory: "",
+                    directory-default: "My_Library.lplib",
+                    directory-error: "Directory error",
+                    valid: true,
+                    download-running: true,
+                    download-progress: 42,
+                    download-error: "Download error",
+                },
+            ],
+            current-tab-index: 1,
+            highlight: true,
+        },
+        {
+            tabs: [
+                {
+                    type: TabType.home,
+                },
+            ],
+            current-tab-index: 0,
+        },
+    ];
+
+    in-out property <int> current-section-index: 0;
 }

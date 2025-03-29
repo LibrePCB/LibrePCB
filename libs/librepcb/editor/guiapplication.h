@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "appwindow.h"
+
 #include <librepcb/core/fileio/filepath.h>
 
 #include <QtCore>
@@ -38,8 +40,8 @@ class Workspace;
 
 namespace editor {
 
+class LibrariesModel;
 class LibraryEditor;
-class LibraryManager;
 class MainWindow;
 class Notification;
 class NotificationsModel;
@@ -69,12 +71,12 @@ public:
   Workspace& getWorkspace() noexcept { return mWorkspace; }
   NotificationsModel& getNotifications() noexcept { return *mNotifications; }
   QuickAccessModel& getQuickAccess() noexcept { return *mQuickAccessModel; }
+  LibrariesModel& getLibraries() noexcept { return *mLibraries; }
 
   // General Methods
   void openFile(const FilePath& fp, QWidget* parent) noexcept;
   void switchWorkspace(QWidget* parent) noexcept;
   void execWorkspaceSettingsDialog(QWidget* parent) noexcept;
-  void openLibraryManager() noexcept;
   void addExampleProjects(QWidget* parent) noexcept;
   void createProject(const FilePath& parentDir, bool eagleImport,
                      QWidget* parent) noexcept;
@@ -166,7 +168,8 @@ private:
   std::shared_ptr<Notification> mNotificationNoLibrariesInstalled;
   std::shared_ptr<Notification> mNotificationDesktopIntegration;
   std::shared_ptr<QuickAccessModel> mQuickAccessModel;
-  QScopedPointer<LibraryManager> mLibraryManager;
+  std::shared_ptr<LibrariesModel> mLibraries;
+  std::shared_ptr<slint::FilterModel<ui::LibraryData>> mLibrariesFiltered;
   QHash<QString, ProjectEditor*> mOpenProjectEditors;
   QHash<FilePath, LibraryEditor*> mOpenLibraryEditors;
   std::unique_ptr<ProjectLibraryUpdater> mProjectLibraryUpdater;

@@ -24,11 +24,16 @@
 
 #include "editorcommandsetupdater.h"
 #include "guiapplication.h"
+#include "library/createlibrarytab.h"
+#include "library/downloadlibrarytab.h"
+#include "library/librariesmodel.h"
 #include "mainwindowtestadapter.h"
 #include "notificationsmodel.h"
 #include "project/projectreadmerenderer.h"
 #include "utils/slinthelpers.h"
 #include "utils/standardeditorcommandhandler.h"
+#include "windowsection.h"
+#include "windowtab.h"
 #include "workspace/filesystemmodel.h"
 
 #include <librepcb/core/workspace/workspace.h>
@@ -57,6 +62,7 @@ MainWindow::MainWindow(GuiApplication& app,
     mWindow(win),
     mWidget(static_cast<QWidget*>(slint::cbindgen_private::slint_qt_get_widget(
         &mWindow->window().window_handle()))),
+    mSections(new UiObjectList<WindowSection, ui::WindowSectionData>()),
     mProjectPreviewRenderer(new ProjectReadmeRenderer(this)),
     mTestAdapter(new MainWindowTestAdapter(app, mWidget)) {
   Q_ASSERT(mWidget);
@@ -80,6 +86,8 @@ MainWindow::MainWindow(GuiApplication& app,
   // Set global data.
   const ui::Data& d = mWindow->global<ui::Data>();
   d.set_panel_page(ui::PanelPage::Home);
+  d.set_sections(mSections);
+  d.set_current_section_index(0);
   d.set_workspace_folder_tree(fileSystemModel);
   d.set_notifications_unread(
       mApp.getNotifications().getUnreadNotificationsCount());
@@ -98,6 +106,10 @@ MainWindow::MainWindow(GuiApplication& app,
           &NotificationsModel::currentProgressIndexChanged, this,
           [this](int index) {
             mWindow->global<ui::Data>().set_notifications_progress_index(index);
+          });
+  connect(mProjectPreviewRenderer.get(), &ProjectReadmeRenderer::runningChanged,
+          this, [this](bool running) {
+            mWindow->global<ui::Data>().set_project_preview_rendering(running);
           });
   connect(mProjectPreviewRenderer.get(), &ProjectReadmeRenderer::runningChanged,
           this, [this](bool running) {
@@ -128,8 +140,12 @@ MainWindow::MainWindow(GuiApplication& app,
           });
 
   // Setup test adapter.
-  connect(mTestAdapter.get(), &MainWindowTestAdapter::actionTriggered, this,
-          &MainWindow::triggerAsync);
+  connect(
+      mTestAdapter.get(), &MainWindowTestAdapter::actionTriggered, this,
+      [this](ui::Action a) { trigger(a); }, Qt::QueuedConnection);
+  connect(
+      mTestAdapter.get(), &MainWindowTestAdapter::panelPageTriggered, this,
+      [this](ui::PanelPage p) { showPanelPage(p); }, Qt::QueuedConnection);
 
   // Show window.
   mWindow->show();
@@ -138,6 +154,15 @@ MainWindow::MainWindow(GuiApplication& app,
   QSettings cs;
   mWidget->restoreGeometry(
       cs.value(mSettingsPrefix % "/geometry").toByteArray());
+  const int sectionCount = cs.beginReadArray(mSettingsPrefix % "/sections");
+  for (int i = 0; i < sectionCount; ++i) {
+    splitSection(mSections->count());
+  }
+  cs.endArray();
+
+  if (mSections->isEmpty()) {
+    splitSection(0);
+  }
 }
 
 MainWindow::~MainWindow() noexcept {
@@ -182,23 +207,37 @@ slint::CloseRequestResponse MainWindow::closeRequested() noexcept {
   // Save window state.
   QSettings cs;
   cs.setValue(mSettingsPrefix % "/geometry", mWidget->saveGeometry());
+  cs.beginWriteArray(mSettingsPrefix % "/sections", mSections->count());
+  cs.endArray();
 
   emit aboutToClose();
   return slint::CloseRequestResponse::HideWindow;
 }
 
 void MainWindow::triggerAsync(ui::Action a) noexcept {
+  // if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0): Remove lambda.
   QMetaObject::invokeMethod(
       this, [this, a]() { trigger(a); }, Qt::QueuedConnection);
 }
 
 bool MainWindow::trigger(ui::Action a) noexcept {
+  if (a == ui::Action::SectionSplit) {
+    splitSection(mWindow->global<ui::Data>().get_current_section_index());
+    return true;
+  } else if (a == ui::Action::CreateLibraryTabOpen) {
+    if (!switchToTab<CreateLibraryTab>()) {
+      addTab(std::make_shared<CreateLibraryTab>(mApp));
+    }
+    return true;
+  } else if (a == ui::Action::DownloadLibraryTabOpen) {
+    if (!switchToTab<DownloadLibraryTab>()) {
+      addTab(std::make_shared<DownloadLibraryTab>(mApp));
+    }
+    return true;
+  }
+
   switch (a) {
     // General
-    case ui::Action::LibraryManager: {
-      mApp.openLibraryManager();
-      return true;
-    }
     case ui::Action::KeyboardShortcutsReference: {
       StandardEditorCommandHandler handler(mApp.getWorkspace().getSettings(),
                                            mWidget);
@@ -258,11 +297,75 @@ bool MainWindow::trigger(ui::Action a) noexcept {
       return true;
     }
 
+    // Library panel
+    case ui::Action::LibraryPanelEnsurePopulated: {
+      mApp.getLibraries().ensurePopulated();
+      return true;
+    }
+    case ui::Action::LibraryPanelInstall: {
+      mApp.getLibraries().installCheckedLibraries();
+      return true;
+    }
+
     default:
       break;
   }
 
   qWarning() << "Unhandled UI action:" << static_cast<int>(a);
+  return false;
+}
+
+void MainWindow::splitSection(int index) noexcept {
+  const int newIndex = qBound(0, index + 1, mSections->count());
+  std::shared_ptr<WindowSection> s = std::make_shared<WindowSection>(mApp);
+  connect(s.get(), &WindowSection::splitRequested, this, [this]() {
+    if (auto index =
+            mSections->indexOf(static_cast<const WindowSection*>(sender()))) {
+      splitSection(*index);
+    }
+  });
+  connect(s.get(), &WindowSection::closeRequested, this, [this]() {
+    if (mSections->count() > 1) {
+      if (std::shared_ptr<WindowSection> s =
+              mSections->take(static_cast<const WindowSection*>(sender()))) {
+        const ui::Data& d = mWindow->global<ui::Data>();
+        d.set_current_section_index(
+            qBound(-1, d.get_current_section_index(), mSections->count() - 1));
+      }
+    }
+  });
+  connect(s.get(), &WindowSection::statusBarMessageChanged, this,
+          [this](const QString& message, int timeoutMs) {
+            const ui::Data& d = mWindow->global<ui::Data>();
+            d.set_status_bar_message(q2s(message));
+            if (timeoutMs > 0) {
+              QTimer::singleShot(timeoutMs, this, [&d, message]() {
+                if (s2q(d.get_status_bar_message()) == message) {
+                  d.set_status_bar_message(slint::SharedString());
+                }
+              });
+            }
+          });
+  mSections->insert(newIndex, s);
+}
+
+void MainWindow::addTab(std::shared_ptr<WindowTab> tab) noexcept {
+  const ui::Data& d = mWindow->global<ui::Data>();
+  const int sectionIndex =
+      qBound(0, d.get_current_section_index(), mSections->count() - 1);
+  if (std::shared_ptr<WindowSection> s = mSections->value(sectionIndex)) {
+    s->addTab(tab);
+  }
+}
+
+template <typename T>
+bool MainWindow::switchToTab() noexcept {
+  for (auto section : *mSections) {
+    if (section->switchToTab<T>()) {
+      return true;
+    }
+  }
+
   return false;
 }
 

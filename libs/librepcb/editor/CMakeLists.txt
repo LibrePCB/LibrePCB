@@ -110,6 +110,8 @@ add_library(
   graphics/zonegraphicsitem.h
   guiapplication.cpp
   guiapplication.h
+  hometab.cpp
+  hometab.h
   library/cat/categorychooserdialog.cpp
   library/cat/categorychooserdialog.h
   library/cat/categorychooserdialog.ui
@@ -204,6 +206,8 @@ add_library(
   library/cmp/compsymbvarpinsignalmapeditorwidget.cpp
   library/cmp/compsymbvarpinsignalmapeditorwidget.h
   library/cmp/if_componentsymbolvarianteditorprovider.h
+  library/createlibrarytab.cpp
+  library/createlibrarytab.h
   library/dev/deviceeditorwidget.cpp
   library/dev/deviceeditorwidget.h
   library/dev/deviceeditorwidget.ui
@@ -215,6 +219,8 @@ add_library(
   library/dev/partlisteditorwidget.h
   library/dev/partlistmodel.cpp
   library/dev/partlistmodel.h
+  library/downloadlibrarytab.cpp
+  library/downloadlibrarytab.h
   library/eaglelibraryimportwizard/eaglelibraryimportwizard.cpp
   library/eaglelibraryimportwizard/eaglelibraryimportwizard.h
   library/eaglelibraryimportwizard/eaglelibraryimportwizard.ui
@@ -266,6 +272,8 @@ add_library(
   library/lib/libraryoverviewwidget.cpp
   library/lib/libraryoverviewwidget.h
   library/lib/libraryoverviewwidget.ui
+  library/librariesmodel.cpp
+  library/librariesmodel.h
   library/libraryeditor.cpp
   library/libraryeditor.h
   library/libraryeditor.ui
@@ -939,6 +947,10 @@ add_library(
   widgets/unsignedratioedit.h
   widgets/waitingspinnerwidget.cpp
   widgets/waitingspinnerwidget.h
+  windowsection.cpp
+  windowsection.h
+  windowtab.cpp
+  windowtab.h
   workspace/categorytreemodel.cpp
   workspace/categorytreemodel.h
   workspace/desktopintegration.cpp

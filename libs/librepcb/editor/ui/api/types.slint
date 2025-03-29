@@ -5,7 +5,6 @@ export enum Action {
     default,  // Default action, depending on context
 
     // General
-    library-manager,
     keyboard-shortcuts-reference,
     quit,
 
@@ -30,12 +29,40 @@ export enum Action {
     project-open,
     project-import-examples,
     project-import-eagle,
+
+    // Library panel
+    library-panel-ensure-populated,
+    library-panel-install,
+
+    // Window section
+    section-split,
+    section-close,
+
+    // Window tab
+    tab-activate,
+    tab-close,
+    tab-cancel,
+    tab-ok,
+
+    // Create library tab
+    create-library-tab-open,
+
+    // Download library tab
+    download-library-tab-open,
 }
 
 // Pages which can be shown in the side panel
 export enum PanelPage {
     home,
+    libraries,
     about,
+}
+
+// All the different kinds of window tabs
+export enum TabType {
+    home,
+    create-library,
+    download-library,
 }
 
 // Notification types
@@ -45,6 +72,20 @@ export enum NotificationType {
     warning,
     critical,
     progress,
+}
+
+// Workspace library types
+export enum LibraryType {
+    local,
+    remote,
+    online,
+}
+
+// Workspace library states
+export enum LibraryState {
+    unknown,
+    up-to-date,
+    outdated,
 }
 
 // Dynamic information about editor commands, e.g. used in menus
@@ -83,5 +124,74 @@ export struct TreeViewItemData {
     expanded: bool,
     supports-pinning: bool,
     pinned: bool,
+    action: Action,  // Set by UI, handled in backend
+}
+
+// Workspace library data structure
+export struct LibraryData {
+    id: string,
+    name: string,
+    description: string,
+    version: string,
+    icon: image,
+    recommended: bool,
+    type: LibraryType,
+    state: LibraryState,
+    progress: int,  // [%], 0 if not installing
+    checked: bool,
+    filtered-out: bool,
+}
+
+// Window tab base data
+//
+// For various kinds of tabs, an additional "derived" data structure is
+// defined, see below.
+export struct TabData {
+    type: TabType,
+    title: string,
+    action: Action,  // Set by UI, handled in backend
+}
+
+// Additional data for "create library" tabs
+export struct CreateLibraryTabData {
+    name: string,
+    name-error: string,
+    description: string,
+    author: string,
+    author-default: string,
+    version: string,
+    version-default: string,
+    version-error: string,
+    url: string,
+    url-error: string,
+    cc0: bool,
+    directory: string,
+    directory-default: string,
+    directory-error: string,
+    valid: bool,
+    creation-error: string,
+}
+
+// Additional data for "download library" tabs
+export struct DownloadLibraryTabData {
+    url: string,
+    url-error: string,
+    url-suggestion: string,
+    directory: string,
+    directory-default: string,
+    directory-error: string,
+    valid: bool,
+    download-running: bool,
+    download-progress: int,
+    download-error: string,
+}
+
+// Window section data structure
+export struct WindowSectionData {
+    tabs: [TabData],
+    create-library-tabs: [CreateLibraryTabData],  // Proxy view for `tabs`
+    download-library-tabs: [DownloadLibraryTabData],  // Proxy view for `tabs`
+    current-tab-index: int,
+    highlight: bool,
     action: Action,  // Set by UI, handled in backend
 }

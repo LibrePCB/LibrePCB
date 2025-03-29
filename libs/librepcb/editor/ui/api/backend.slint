@@ -31,6 +31,29 @@ export global Backend {
         Data.preview-mode  // Make it fail if callback not bound in backend.
     }
 
+    // Open a library
+    //
+    // - Library ID (see Library::id)
+    pure callback open-library(string);
+
+    // Uninstall a library
+    //
+    // - Library ID (see Library::id)
+    pure callback uninstall-library(string);
+
+    // Toggle checked state of all libraries
+    //
+    // - Check state
+    pure callback toggle-libraries-checked(bool);
+
+    // Clear libraries list filter term
+    pure callback libraries-clear-filter();
+
+    // Key event on the libraries list
+    //
+    // - Key event
+    pure callback libraries-key-event(KeyEvent) -> EventResult;
+
     // Request generating the preview of a project (e.g. its README.md)
     //
     // Lets the backend building the preview asynchronously, and updating the

@@ -1,0 +1,177 @@
+import { Button, CheckBox, ProgressIndicator } from "std-widgets.slint";
+import { LineEdit } from "../widgets.slint";
+import { WindowSectionData, DownloadLibraryTabData, Action } from "../api/types.slint";
+import { Backend } from "../api/backend.slint";
+
+export component DownloadLibraryTab inherits Rectangle {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    property <[DownloadLibraryTabData]> tabs: section.download-library-tabs;
+    property <bool> read-only: tabs[section.current-tab-index].download-running;
+
+    GridLayout {
+        width: root.width;
+        padding: 10px;
+        spacing: 5px;
+
+        Row {
+            Text {
+                colspan: 2;
+                height: self.preferred-height + 10px;
+                font-size: 14px;
+                font-weight: 900;
+                wrap: TextWrap.word-wrap;
+                text: @tr("Download & install a library by URL");
+            }
+        }
+
+        Row {
+            Text {
+                colspan: 2;
+                wrap: TextWrap.word-wrap;
+                text: @tr("Please note that this is not the preferred way to install libraries as they won't be kept up to date. For our official libraries, it's recommended to install them from the libraries panel instead, which allows to keep libraries up to date.");
+            }
+        }
+
+        Row {
+            Rectangle {
+                colspan: 2;
+                height: 1px;
+                background: gray;
+            }
+        }
+
+        Row {
+            Text {
+                text: @tr("URL:");
+                vertical-alignment: center;
+            }
+
+            le-url := LineEdit {
+                text: tabs[section.current-tab-index].url;
+                placeholder-text: @tr("URL to a zipped library (*.zip)");
+                validation-error: tabs[section.current-tab-index].url-error;
+                read-only: read-only;
+
+                changed text => {
+                    tabs[section.current-tab-index].url = self.text;
+                }
+            }
+        }
+
+        Row {
+            Rectangle {
+                vertical-stretch: 0;
+            }
+
+            Rectangle {
+                property <bool> has-suggestion: !tabs[section.current-tab-index].url-suggestion.is-empty;
+
+                height: has-suggestion ? self.preferred-height : 0;
+                visible: has-suggestion;
+                horizontal-stretch: 1;
+
+                VerticalLayout {
+                    spacing: 5px;
+
+                    Text {
+                        horizontal-stretch: 0;
+                        font-size: 11px;
+                        wrap: word-wrap;
+                        text: @tr("URL does not seem to point to a ZIP file. Consider using this URL instead:");
+                    }
+
+                    Text {
+                        horizontal-stretch: 0;
+                        color: white;
+                        overflow: elide;
+                        font-size: 10px;
+                        text: tabs[section.current-tab-index].url-suggestion;
+
+                        TouchArea {
+                            mouse-cursor: pointer;
+
+                            clicked => {
+                                le-url.text = tabs[section.current-tab-index].url-suggestion;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Row {
+            Text {
+                text: @tr("Directory:");
+                vertical-alignment: center;
+            }
+
+            le-directory := LineEdit {
+                text: tabs[section.current-tab-index].directory;
+                placeholder-text: tabs[section.current-tab-index].directory-default;
+                validation-error: tabs[section.current-tab-index].directory-error;
+                read-only: read-only;
+
+                changed text => {
+                    tabs[section.current-tab-index].directory = self.text;
+                }
+            }
+        }
+
+        Row {
+            Rectangle { }
+
+            ProgressIndicator {
+                visible: tabs[section.current-tab-index].download-running;
+                progress: tabs[section.current-tab-index].download-progress / 100;
+            }
+        }
+
+        Row {
+            Rectangle { }
+
+            HorizontalLayout {
+                horizontal-stretch: 1;
+                spacing: 8px;
+                alignment: start;
+
+                Button {
+                    primary: true;
+                    enabled: (!read-only) && tabs[section.current-tab-index].valid;
+                    text: @tr("Download Library");
+
+                    clicked => {
+                        section.tabs[section.current-tab-index].action = Action.tab-ok;
+                    }
+                }
+
+                Button {
+                    text: @tr("Cancel");
+
+                    clicked => {
+                        section.tabs[section.current-tab-index].action = Action.tab-cancel;
+                    }
+                }
+            }
+        }
+
+        Row {
+            Rectangle { }
+
+            TextInput {
+                horizontal-stretch: 1;
+                height: (!self.text.is-empty) ? self.preferred-height : 0;
+                color: red;
+                read-only: true;
+                wrap: word-wrap;
+                text: tabs[section.current-tab-index].download-error;
+            }
+        }
+
+        Row {
+            Rectangle {
+                vertical-stretch: 1;
+            }
+        }
+    }
+}

@@ -17,18 +17,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_MAINWINDOW_H
-#define LIBREPCB_EDITOR_MAINWINDOW_H
+#ifndef LIBREPCB_EDITOR_CREATELIBRARYTAB_H
+#define LIBREPCB_EDITOR_CREATELIBRARYTAB_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "appwindow.h"
-#include "utils/uiobjectlist.h"
+#include "windowtab.h"
+
+#include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/types/elementname.h>
+#include <librepcb/core/types/version.h>
 
 #include <QtCore>
+#include <QtGui>
 
-#include <memory>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -37,60 +41,49 @@ namespace librepcb {
 namespace editor {
 
 class GuiApplication;
-class MainWindowTestAdapter;
-class ProjectReadmeRenderer;
-class WindowSection;
-class WindowTab;
 
 /*******************************************************************************
- *  Class MainWindow
+ *  Class CreateLibraryTab
  ******************************************************************************/
 
 /**
- * @brief The MainWindow class
+ * @brief The CreateLibraryTab class
  */
-class MainWindow final : public QObject {
+class CreateLibraryTab final : public WindowTab {
   Q_OBJECT
 
 public:
+  // Signals
+  Signal<CreateLibraryTab> onDerivedUiDataChanged;
+
   // Constructors / Destructor
-  MainWindow() = delete;
-  MainWindow(const MainWindow& other) = delete;
-  explicit MainWindow(GuiApplication& app,
-                      slint::ComponentHandle<ui::AppWindow> win, int id,
-                      QObject* parent = nullptr) noexcept;
-  ~MainWindow() noexcept;
+  CreateLibraryTab() = delete;
+  CreateLibraryTab(const CreateLibraryTab& other) = delete;
+  explicit CreateLibraryTab(GuiApplication& app,
+                            QObject* parent = nullptr) noexcept;
+  virtual ~CreateLibraryTab() noexcept;
 
   // General Methods
-  int getId() const noexcept { return mId; }
-  bool isCurrentWindow() const noexcept;
-  void makeCurrentWindow() noexcept;
-  void showPanelPage(ui::PanelPage page) noexcept;
-  void popUpNotifications() noexcept;
+  ui::TabData getUiData() const noexcept override;
+  const ui::CreateLibraryTabData& getDerivedUiData() const noexcept {
+    return mUiData;
+  }
+  void setDerivedUiData(const ui::CreateLibraryTabData& data) noexcept;
 
   // Operator Overloadings
-  MainWindow& operator=(const MainWindow& rhs) = delete;
+  CreateLibraryTab& operator=(const CreateLibraryTab& rhs) = delete;
 
-signals:
-  void aboutToClose();
+protected:
+  void trigger(ui::Action a) noexcept override;
 
 private:
-  slint::CloseRequestResponse closeRequested() noexcept;
-  void triggerAsync(ui::Action a) noexcept;
-  bool trigger(ui::Action a) noexcept;
-  void splitSection(int index) noexcept;
-  void addTab(std::shared_ptr<WindowTab> tab) noexcept;
-  template <typename T>
-  bool switchToTab() noexcept;
+  void validate() noexcept;
 
-  const int mId;
-  const QString mSettingsPrefix;
-  GuiApplication& mApp;
-  slint::ComponentHandle<ui::AppWindow> mWindow;
-  QWidget* mWidget;
-  std::shared_ptr<UiObjectList<WindowSection, ui::WindowSectionData>> mSections;
-  std::unique_ptr<ProjectReadmeRenderer> mProjectPreviewRenderer;
-  std::unique_ptr<MainWindowTestAdapter> mTestAdapter;
+  ui::CreateLibraryTabData mUiData;
+  std::optional<ElementName> mName;
+  std::optional<Version> mVersion;
+  std::optional<QUrl> mUrl;
+  FilePath mDirectory;
 };
 
 /*******************************************************************************
