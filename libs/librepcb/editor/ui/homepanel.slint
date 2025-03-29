@@ -1,0 +1,262 @@
+import {
+    IconButton,
+    ListViewItemButton,
+    MenuItem,
+    MenuPopup,
+    Palette,
+    PanelHeader,
+    TreeView
+} from "widgets.slint";
+import {
+    Action,
+    Backend,
+    Constants,
+    Data,
+    EditorCommandSet as Cmd,
+    Helpers,
+    TreeViewItemData
+} from "api.slint";
+
+component QuickAccessListView inherits TreeView {
+    supports-expand: false;
+    model: Data.quick-access-items;
+
+    // Accessibility
+    accessible-label: "Quick Access";
+
+    key-pressed(index, item, event) => {
+        if (event.text == Key.Space) && item.supports-pinning {
+            self.model[index].pinned = !self.model[index].pinned;
+            return accept;
+        }
+        reject
+    }
+
+    item-hovered(index, item) => {
+        Data.status-tip = item.hint;
+    }
+
+    item-selected(index, item) => {
+        Data.project-preview-path = item.user-data;
+    }
+
+    item-right-clicked(index, item, x, y) => {
+        context-menu-item-index = index;
+        context-menu-item = item;
+        context-menu-x = x;
+        context-menu-y = y;
+        context-menu-popup.show();
+    }
+
+    property <length> context-menu-x;
+    property <length> context-menu-y;
+    property <int> context-menu-item-index;
+    property <TreeViewItemData> context-menu-item;
+    context-menu-popup := MenuPopup {
+        x: context-menu-x;
+        y: context-menu-y;
+
+        open-item := MenuItem {
+            cmd: Cmd.item-open;
+            icon: @image-url("../../../font-awesome/svgs/solid/folder-open.svg");
+            status-tip: @tr("Open the project");  // More specific.
+            shortcuts: "⏎";  // Hardcoded in the UI.
+            default: true;
+
+            clicked => {
+                root.model[context-menu-item-index].action = Action.default;
+            }
+        }
+
+        pinned-item := MenuItem {
+            text: context-menu-item.pinned ? @tr("Unpin from Quick Access") : @tr("Pin to Quick Access");
+            icon-checked: @image-url("../../../bootstrap-icons/icons/pin-angle-fill.svg");
+            icon-unchecked: @image-url("../../../bootstrap-icons/icons/pin-angle.svg");
+            status-tip: @tr("Pin/unpin the project to the quick access");
+            shortcuts: "␣";  // Hardcoded in the UI.
+            checkable: true;
+            checked: context-menu-item.pinned;
+
+            clicked => {
+                root.model[context-menu-item-index].pinned = !context-menu-item.pinned;
+            }
+        }
+
+        remove-item := MenuItem {
+            text: @tr("Remove From Quick Access");
+            icon: @image-url("../../../font-awesome/svgs/solid/trash-can.svg");
+            status-tip: @tr("Remove the project from the quick access list");
+            shortcuts: "Del";  // Hardcoded in the UI.
+
+            clicked => {
+                root.model[context-menu-item-index].action = Action.delete;
+            }
+        }
+    }
+}
+
+component WorkspaceFolderTreeView inherits TreeView {
+    model: Data.workspace-folder-tree;
+
+    // Accessibility
+    accessible-label: "Workspace Projects";
+
+    key-pressed(index, item, event) => {
+        if (event.text == Key.Space) && item.supports-pinning {
+            root.model[index].pinned = !root.model[index].pinned;
+            return accept;
+        } else if (!item.is-project-file-or-folder) && Helpers.is-shortcut(event, Cmd.project-new) {
+            root.model[index].action = Action.project-new;
+            return accept;
+        }
+        reject
+    }
+
+    item-selected(index, item) => {
+        Data.project-preview-path = item.user-data;
+    }
+
+    item-right-clicked(index, item, x, y) => {
+        context-menu-item-index = index;
+        context-menu-item = item;
+        context-menu-x = x;
+        context-menu-y = y;
+        context-menu-supports-pinning = item.supports-pinning;
+        context-menu-popup.show();
+    }
+
+    property <length> context-menu-x;
+    property <length> context-menu-y;
+    property <int> context-menu-item-index;
+    property <TreeViewItemData> context-menu-item;
+    property <bool> context-menu-supports-pinning: false;
+    context-menu-popup := MenuPopup {
+        x: context-menu-x;
+        y: context-menu-y;
+
+        open-item := MenuItem {
+            cmd: Cmd.item-open;
+            icon: @image-url("../../../font-awesome/svgs/solid/folder-open.svg");
+            status-tip: @tr("Open the file or project");  // More specific.
+            shortcuts: "⏎";  // Hardcoded in the UI.
+            default: true;
+
+            clicked => {
+                root.model[context-menu-item-index].action = Action.default;
+            }
+        }
+
+        if !context-menu-item.is-project-file-or-folder: new-folder-item := MenuItem {
+            text: @tr("New Folder") + "...";
+            icon: @image-url("../../../font-awesome/svgs/solid/folder-plus.svg");
+            status-tip: @tr("Create a new folder");
+            // shortcuts: "Ctrl+N";  // Conflicts with "new project".
+
+            clicked => {
+                root.model[context-menu-item-index].action = Action.folder-new;
+            }
+        }
+
+        if !context-menu-item.is-project-file-or-folder: new-project-item := MenuItem {
+            cmd: Cmd.project-new;
+            icon: @image-url("../../../font-awesome/svgs/solid/file-circle-plus.svg");
+
+            clicked => {
+                root.model[context-menu-item-index].action = Action.project-new;
+            }
+        }
+
+        // Note: Needs to be an indirect property as Slint crashes in
+        // the clicked callback if the conditional is constantly
+        // re-evaluated.
+        if context-menu-item.supports-pinning: pinned-item := MenuItem {
+            text: context-menu-item.pinned ? @tr("Unpin from Quick Access") : @tr("Pin to Quick Access");
+            icon-checked: @image-url("../../../bootstrap-icons/icons/pin-angle-fill.svg");
+            icon-unchecked: @image-url("../../../bootstrap-icons/icons/pin-angle.svg");
+            status-tip: @tr("Pin/unpin the project to the quick access");
+            shortcuts: "␣";  // Hardcoded in the UI.
+            checkable: true;
+            checked: context-menu-item.pinned;
+
+            clicked => {
+                root.model[context-menu-item-index].pinned = !context-menu-item.pinned;
+            }
+        }
+
+        remove-item := MenuItem {
+            cmd: Cmd.remove;
+            icon: @image-url("../../../font-awesome/svgs/solid/trash-can.svg");
+            status-tip: @tr("Remove the file or directory from the file system");
+            shortcuts: "Del";  // Hardcoded in the UI.
+
+            clicked => {
+                root.model[context-menu-item-index].action = Action.delete;
+            }
+        }
+    }
+}
+
+component NewProjectButton inherits IconButton {
+    width: self.height;
+    icon: @image-url("../../../font-awesome/svgs/solid/file-circle-plus.svg");
+    icon-scale: 0.6;
+    tooltip: Cmd.project-new.text;
+    status-tip: Cmd.project-new.status-tip;
+
+    clicked => {
+        Backend.trigger(Action.project-new);
+    }
+}
+
+component OpenProjectButton inherits IconButton {
+    width: self.height;
+    icon: @image-url("../../../font-awesome/svgs/solid/folder-open.svg");
+    icon-scale: 0.6;
+    tooltip: Cmd.project-open.text;
+    status-tip: Cmd.project-open.status-tip;
+
+    clicked => {
+        Backend.trigger(Action.project-open);
+    }
+}
+
+export component HomePanel inherits Rectangle {
+    background: #2a2a2a;
+
+    VerticalLayout {
+        if Data.quick-access-items.length > 0: VerticalLayout {
+            vertical-stretch: 0;
+
+            PanelHeader {
+                title: @tr("Quick Access").to-uppercase();
+                highlight: quick-access-view.has-focus;
+                z: 100; // For the tooltips.
+
+                new-project-btn-1 := NewProjectButton { }
+
+                open-project-btn-1 := OpenProjectButton { }
+            }
+
+            quick-access-view := QuickAccessListView {
+                vertical-stretch: 0;
+                max-height: root.height / 3;
+            }
+
+            Rectangle {
+                height: 15px;
+            }
+        }
+
+        PanelHeader {
+            title: @tr("Workspace Projects").to-uppercase();
+            highlight: workspace-projects-view.has-focus;
+            z: 100; // For the tooltips.
+
+            if Data.quick-access-items.length == 0: new-project-btn-2 := NewProjectButton { }
+
+            if Data.quick-access-items.length == 0: open-project-btn-2 := OpenProjectButton { }
+        }
+
+        workspace-projects-view := WorkspaceFolderTreeView { }
+    }
+}

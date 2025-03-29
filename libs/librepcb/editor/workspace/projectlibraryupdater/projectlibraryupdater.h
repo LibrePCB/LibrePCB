@@ -42,8 +42,6 @@ class WorkspaceLibraryDb;
 
 namespace editor {
 
-class ControlPanel;
-
 namespace Ui {
 class ProjectLibraryUpdater;
 }
@@ -63,12 +61,17 @@ class ProjectLibraryUpdater : public QDialog {
   Q_OBJECT
 
 public:
+  typedef std::function<bool(const FilePath&)> CloseCallback;
+
   explicit ProjectLibraryUpdater(Workspace& ws, const FilePath& project,
-                                 ControlPanel& cp) noexcept;
+                                 CloseCallback cb) noexcept;
   ~ProjectLibraryUpdater();
 
 private slots:
   void btnUpdateClicked();
+
+signals:
+  void finished(const FilePath& fp);
 
 private:
   void log(const QString& msg) noexcept;
@@ -79,8 +82,8 @@ private:
 
 private:
   Workspace& mWorkspace;
-  FilePath mProjectFilePath;
-  ControlPanel& mControlPanel;
+  const FilePath mProjectFilePath;
+  const CloseCallback mCloseCallback;
   QScopedPointer<Ui::ProjectLibraryUpdater> mUi;
 };
 

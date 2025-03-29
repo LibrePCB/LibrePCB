@@ -1,0 +1,127 @@
+import { Palette } from "std-widgets.slint";
+import { Data, Constants } from "../api.slint";
+
+export component Button inherits Rectangle {
+    in property <string> text;
+    in property <string> status-tip;
+    in property <image> icon;
+    in property <bool> enabled: true;
+    in property <bool> primary: false;
+    out property has-focus <=> fs.has-focus;
+    out property has-hover <=> ta.has-hover;
+    out property pressed <=> ta.pressed;
+    property <color> text-color: {
+        if root.primary {
+            fs.has-focus ? white : #202020
+        } else if ta.pressed {
+            #909090
+        } else if !enabled {
+            Palette.foreground.darker(0.5)
+        } else {
+            Palette.foreground
+        }
+    };
+
+    callback clicked;
+
+    height: self.preferred-height;
+    min-width: fs.min-width;
+    background: {
+        if root.primary {
+            if ta.pressed {
+                Constants.librepcb-color.darker(0.5)
+            } else if ta.has-hover {
+                Constants.librepcb-color.darker(0.2)
+            } else if !enabled {
+                Constants.librepcb-color.darker(1)
+            } else {
+                Constants.librepcb-color
+            }
+        } else if ta.has-hover {
+            #404040
+        } else {
+            #202020
+        }
+    }
+    border-color: Constants.librepcb-color;
+    border-width: fs.has-focus ? 1px : 0;
+    border-radius: self.height / 2;
+    forward-focus: fs;
+
+    // Accessibility
+    accessible-role: button;
+    accessible-description: status-tip;
+    accessible-enabled: enabled;
+    accessible-label: text;
+    accessible-action-default => {
+        ta.clicked();
+    }
+
+    fs := FocusScope {
+        enabled: enabled;
+
+        ta := TouchArea {
+            enabled: enabled;
+
+            HorizontalLayout {
+                padding-top: 4px;
+                padding-bottom: 4px;
+                padding-left: 10px;
+                padding-right: self.padding-left;
+                spacing: 7px;
+                alignment: center;
+
+                if icon.width > 0: Rectangle {
+                    y: (parent.height - self.height) / 2;
+                    width: self.height;
+                    height: 20px;
+
+                    Image {
+                        width: 100%;
+                        height: 100%;
+                        image-fit: contain;
+                        colorize: text-color;
+                        source: icon;
+                        accessible-role: none;
+                    }
+                }
+
+                Text {
+                    font-size: 13px;
+                    vertical-alignment: center;
+                    color: text-color;
+                    text: text;
+                    accessible-role: none;
+                }
+            }
+
+            changed has-hover => {
+                if !root.status-tip.is-empty {
+                    if self.has-hover {
+                        Data.status-tip = root.status-tip;
+                    } else {
+                        Data.status-tip = "";
+                    }
+                }
+            }
+
+            clicked => {
+                // The click may destroy this element without calling the
+                // has-hover handler anymore, so we clear the status tip
+                // manually to be on the safe side.
+                if !root.status-tip.is-empty {
+                    Data.status-tip = "";
+                }
+                root.clicked();
+            }
+        }
+
+        key-pressed(event) => {
+            if (event.text == Key.Return) || (event.text == Key.Space) {
+                root.clicked();
+                return accept;
+            }
+            reject
+        }
+    }
+}

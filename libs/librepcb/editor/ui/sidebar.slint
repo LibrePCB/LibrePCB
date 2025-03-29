@@ -1,0 +1,179 @@
+import { ToolTip } from "widgets.slint";
+import {
+    Action,
+    Backend,
+    Constants,
+    Data,
+    EditorCommandSet as Cmd,
+    PanelPage
+} from "api.slint";
+
+enum Emblem {
+    none,
+    warning,
+    running,
+}
+
+component SideBarButton inherits Rectangle {
+    in property <image> icon;
+    in property <string> tooltip;
+    in property <string> shortcut;
+    in property <Emblem> emblem: Emblem.none;
+    in property <string> status;
+    in property <color> status-color;
+    in property <color> status-background;
+    in property <bool> enabled: true;
+    in property <bool> checked: false;
+
+    callback clicked <=> ta.clicked;
+
+    background: {
+        if self.checked {
+            #1c1c1c
+        } else if ta.pressed {
+            #555555
+        } else if ta.has-hover {
+            #424242
+        } else {
+            #353535
+        }
+    };
+    height: self.width;
+
+    // Accessibility
+    accessible-role: button;
+    accessible-enabled: enabled;
+    accessible-label: tooltip;
+    accessible-action-default => {
+        ta.clicked();
+    }
+
+    if checked: Rectangle {
+        x: 0px;
+        width: 3px;
+        background: Constants.librepcb-color;
+    }
+
+    ta := TouchArea {
+        enabled: enabled;
+    }
+
+    Image {
+        width: 70%;
+        height: 70%;
+        colorize: enabled ? white : gray;
+        source: icon;
+        accessible-role: none;
+    }
+
+    if emblem == Emblem.warning: Rectangle {
+        x: parent.width - self.width - 5px;
+        y: parent.height - self.height - 5px;
+        width: 40%;
+        height: self.width;
+
+        Path {
+            commands: "M 50 0 L 100 100 L 0 100 Z";
+            fill: root.background;
+        }
+
+        Image {
+            width: 100%;
+            height: 100%;
+            image-fit: contain;
+            colorize: yellow;
+            source: @image-url("../../../font-awesome/svgs/solid/triangle-exclamation.svg");
+        }
+    }
+
+    if (emblem == Emblem.running) || ((emblem == Emblem.none) && (!status.is-empty)): Rectangle {
+        x: parent.width - self.width - 2px;
+        y: parent.height - self.height - 2px;
+        width: (emblem == Emblem.running) ? self.height : max(status-txt.preferred-width + 8px, self.height);
+        height: status-txt.preferred-height + 2px;
+        border-radius: self.height / 2;
+        background: (emblem == Emblem.running) ? yellow : status-background;
+
+        status-txt := Text {
+            function get-progress-dots() -> string {
+                if (mod(animation-tick(), 1000ms) >= 666ms) {
+                    return "•••";
+                } else if (mod(animation-tick(), 1000ms) >= 333ms) {
+                    return "••";
+                } else {
+                    return "•";
+                }
+            }
+
+            x: (parent.width - self.width) / 2;
+            y: (parent.height - self.height) / 2;
+            font-size: (root.width < 40px) ? 8px : 10px;
+            font-weight: 700;
+            color: (emblem == Emblem.running) ? gray : status-color;
+            text: (emblem == Emblem.running) ? get-progress-dots() : status;
+            accessible-role: none;
+        }
+    }
+
+    if ta.has-hover && (!ta.pressed): tt := ToolTip {
+        x: root.width + 5px;
+        y: (root.height / 2) - (self.height / 2);
+        text: tooltip;
+        shortcut: shortcut;
+    }
+}
+
+export component SideBar inherits Rectangle {
+    background: #353535;
+
+    VerticalLayout {
+        spacing: 0px;
+
+        home-btn := SideBarButton {
+            icon: @image-url("../../../bootstrap-icons/icons/house-fill.svg");
+            tooltip: @tr("Home");
+            checked: Data.panel-page == PanelPage.home;
+
+            clicked => {
+                Data.panel-page = PanelPage.home;
+            }
+        }
+
+        library-manager-btn := SideBarButton {
+            icon: @image-url("../../../bootstrap-icons/icons/database.svg");
+            tooltip: Cmd.library-manager.text;
+            shortcut: Cmd.library-manager.shortcut;
+            checked: false;
+
+            clicked => {
+                Backend.trigger(Action.library-manager);
+            }
+        }
+
+        Rectangle {
+            vertical-stretch: 1;
+        }
+
+        workspace-settings-btn := SideBarButton {
+            icon: @image-url("../../../bootstrap-icons/icons/sliders.svg");
+            tooltip: Cmd.workspace-settings.text;
+            shortcut: Cmd.workspace-settings.shortcut;
+            checked: false;
+
+            clicked => {
+                Backend.trigger(Action.workspace-settings);
+            }
+        }
+
+        about-btn := SideBarButton {
+            icon: @image-url("../../../bootstrap-icons/icons/question-circle.svg");
+            tooltip: Cmd.about-librepcb.text;
+            shortcut: Cmd.about-librepcb.shortcut;
+            checked: false;
+
+            clicked => {
+                Backend.trigger(Action.about-dialog);
+            }
+        }
+    }
+}
