@@ -50,6 +50,8 @@ export global Helpers {
             return @image-url("../../../../bootstrap-icons/icons/house-fill.svg");
         } else if (t == TabType.create-library) {
             return @image-url("../../../../bootstrap-icons/icons/database-add.svg");
+        } else if (t == TabType.download-library) {
+            return @image-url("../../../../bootstrap-icons/icons/cloud-arrow-down-fill.svg");
         } else {
             debug("Unhandled case in get-icon-for-tab-type().");
             return @image-url("");

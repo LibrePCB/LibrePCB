@@ -17,73 +17,71 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_ADDLIBRARYWIDGET_H
-#define LIBREPCB_EDITOR_ADDLIBRARYWIDGET_H
+#ifndef LIBREPCB_EDITOR_DOWNLOADLIBRARYTAB_H
+#define LIBREPCB_EDITOR_DOWNLOADLIBRARYTAB_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "windowtab.h"
+
 #include <librepcb/core/fileio/filepath.h>
 
 #include <QtCore>
-#include <QtWidgets>
 
-#include <memory>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class ApiEndpoint;
-class Workspace;
-
 namespace editor {
 
+class GuiApplication;
 class LibraryDownload;
 
-namespace Ui {
-class AddLibraryWidget;
-}
-
 /*******************************************************************************
- *  Class AddLibraryWidget
+ *  Class DownloadLibraryTab
  ******************************************************************************/
 
 /**
- * @brief The AddLibraryWidget class
+ * @brief The DownloadLibraryTab class
  */
-class AddLibraryWidget final : public QWidget {
+class DownloadLibraryTab final : public WindowTab {
   Q_OBJECT
 
 public:
+  // Signals
+  Signal<DownloadLibraryTab> onDerivedUiDataChanged;
+
   // Constructors / Destructor
-  AddLibraryWidget() = delete;
-  AddLibraryWidget(const AddLibraryWidget& other) = delete;
-  explicit AddLibraryWidget(Workspace& ws) noexcept;
-  ~AddLibraryWidget() noexcept;
+  DownloadLibraryTab() = delete;
+  DownloadLibraryTab(const DownloadLibraryTab& other) = delete;
+  explicit DownloadLibraryTab(GuiApplication& app,
+                              QObject* parent = nullptr) noexcept;
+  ~DownloadLibraryTab() noexcept;
 
   // General Methods
-  void updateOnlineLibraryList() noexcept;
+  ui::TabData getUiData() const noexcept override;
+  const ui::DownloadLibraryTabData& getDerivedUiData() const noexcept {
+    return mUiData;
+  }
+  void setDerivedUiData(const ui::DownloadLibraryTabData& data) noexcept;
 
   // Operator Overloadings
-  AddLibraryWidget& operator=(const AddLibraryWidget& rhs) = delete;
+  DownloadLibraryTab& operator=(const DownloadLibraryTab& rhs) = delete;
 
-signals:
-  void libraryAdded(const FilePath& libDir);
+protected:
+  void triggerAsync(ui::Action a) noexcept override;
 
-private:  // Methods
-  void onlineLibraryListReceived(const QJsonArray& libs) noexcept;
-  void errorWhileFetchingLibraryList(const QString& errorMsg) noexcept;
-  void clearOnlineLibraryList() noexcept;
-  void repoLibraryDownloadCheckedChanged(bool checked) noexcept;
-  void downloadOnlineLibrariesButtonClicked() noexcept;
+private:
+  void validate() noexcept;
+  void downloadFinished(bool success, const QString& errMsg) noexcept;
 
-private:  // Data
-  Workspace& mWorkspace;
-  QScopedPointer<Ui::AddLibraryWidget> mUi;
-  QList<std::shared_ptr<ApiEndpoint>> mApiEndpoints;
-  bool mManualCheckStateForAllRemoteLibraries;
+  ui::DownloadLibraryTabData mUiData;
+  std::optional<QUrl> mUrl;
+  FilePath mDirectory;
+  std::unique_ptr<LibraryDownload> mDownload;
 };
 
 /*******************************************************************************
