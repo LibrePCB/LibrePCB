@@ -1,4 +1,5 @@
 import { Button, Palette, Spinner } from "widgets.slint";
+import { Tab } from "tab.slint";
 import {
     Action,
     Backend,
@@ -18,18 +19,11 @@ component DonateButton inherits Button {
     }
 }
 
-export component HomeTab inherits Rectangle {
+export component HomeTab inherits Tab {
+    in property <int> section-index;
     property <bool> compact-layout: self.width < 350px;
 
-    if project-preview-img.source.width == 0: Image {
-        x: (parent.width - self.width) / 2;
-        y: (parent.height - self.height) / 2;
-        width: min(root.width * 0.25, 200px);
-        height: self.width;
-        colorize: #353535;
-        source: @image-url("../../../../img/app/librepcb-monochrome.svg");
-        accessible-role: none;
-    }
+    show-watermark: project-preview-img.source.width == 0;
 
     l := VerticalLayout {
         padding: 10px;
@@ -163,6 +157,22 @@ export component HomeTab inherits Rectangle {
                 visible: Backend.request-project-preview(Data.project-preview-path, parent.width);
                 opacity: Data.project-preview-rendering ? 0.5 : 1;
                 accessible-label: "Rendered project preview";
+            }
+
+            project-preview-ta := TouchArea {
+                x: project-preview-img.x;
+                y: project-preview-img.y;
+                width: project-preview-img.width;
+                height: project-preview-img.height;
+
+                // The Flickable consumes click events so we have to catch them to
+                // update the current section (Data.current-section-index) on a click.
+                pointer-event(event) => {
+                    if event.kind == PointerEventKind.down {
+                        Data.current-section-index = section-index;
+                    }
+                    EventResult.reject
+                }
             }
         }
     }

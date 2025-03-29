@@ -1,0 +1,16 @@
+export component Tab inherits FocusScope {
+    in property <bool> show-watermark: false;
+
+    // Focus scope is only required for the key-pressed() event.
+    enabled: false;
+
+    if show-watermark: Image {
+        width: min(root.width * 0.25, 200px);
+        height: self.width;
+        image-fit: contain;
+        colorize: #353535;
+        source: @image-url("../../../../img/app/librepcb-monochrome.svg");
+    }
+
+    @children
+}

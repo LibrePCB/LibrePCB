@@ -19,6 +19,13 @@ export enum Action {
     window-new,
     window-close,
 
+    // Window section
+    section-split,
+    section-close,
+
+    // Window tab
+    tab-close,
+
     // Workspace
     workspace-open-folder,
     workspace-switch,
@@ -38,6 +45,11 @@ export enum PanelPage {
     about,
 }
 
+// All the different kinds of window tabs
+export enum TabType {
+    home,
+}
+
 // Notification types
 export enum NotificationType {
     tip,
@@ -55,6 +67,24 @@ export struct EditorCommand {
     shortcut: string,
     modifiers: KeyboardModifiers,
     key: string,
+}
+
+// Window tab base data
+//
+// For various kinds of tabs, an additional "derived" data structure is
+// defined, see below.
+export struct TabData {
+    type: TabType,
+    title: string,
+    action: Action,  // Set by UI, handled in backend
+}
+
+// Window section data structure
+export struct WindowSectionData {
+    tabs: [TabData],
+    current-tab-index: int,
+    highlight: bool,
+    action: Action,  // Set by UI, handled in backend
 }
 
 // Notification data structure
