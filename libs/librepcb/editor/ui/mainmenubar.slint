@@ -94,6 +94,16 @@ export component MainMenuBar inherits Rectangle {
                     }
                 }
 
+                create-library-item := MenuItem {
+                    text: @tr("New Library") + "...";
+                    icon: @image-url("../../../bootstrap-icons/icons/database-add.svg");
+                    status-tip: @tr("Create a new local workspace library");
+
+                    clicked => {
+                        Backend.trigger(Action.library-create);
+                    }
+                }
+
                 rescan-libraries-item := MenuItem {
                     cmd: Cmd.workspace-libraries-rescan;
                     icon: @image-url("../../../font-awesome/svgs/solid/arrows-rotate.svg");
@@ -102,6 +112,8 @@ export component MainMenuBar inherits Rectangle {
                         Backend.trigger(Action.workspace-libraries-rescan);
                     }
                 }
+
+                MenuSeparator { }
 
                 open-workspace-folder-item := MenuItem {
                     cmd: Cmd.file-manager;

@@ -23,16 +23,11 @@
 #include "addlibrarywidget.h"
 
 #include "../../widgets/waitingspinnerwidget.h"
-#include "../desktopservices.h"
 #include "librarydownload.h"
 #include "onlinelibrarylistwidgetitem.h"
 #include "ui_addlibrarywidget.h"
 
-#include <librepcb/core/application.h>
 #include <librepcb/core/exceptions.h>
-#include <librepcb/core/fileio/fileutils.h>
-#include <librepcb/core/fileio/transactionalfilesystem.h>
-#include <librepcb/core/library/library.h>
 #include <librepcb/core/network/apiendpoint.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
@@ -58,23 +53,10 @@ AddLibraryWidget::AddLibraryWidget(Workspace& ws) noexcept
   mUi->setupUi(this);
   connect(mUi->btnDownloadZip, &QPushButton::clicked, this,
           &AddLibraryWidget::downloadZippedLibraryButtonClicked);
-  connect(mUi->btnLocalCreate, &QPushButton::clicked, this,
-          &AddLibraryWidget::createLocalLibraryButtonClicked);
-  connect(mUi->edtLocalName, &QLineEdit::textChanged, this,
-          &AddLibraryWidget::localLibraryNameLineEditTextChanged);
   connect(mUi->edtDownloadZipUrl, &QLineEdit::textChanged, this,
           &AddLibraryWidget::downloadZipUrlLineEditTextChanged);
   connect(mUi->btnOnlineLibrariesDownload, &QPushButton::clicked, this,
           &AddLibraryWidget::downloadOnlineLibrariesButtonClicked);
-  connect(mUi->lblLicenseLink, &QLabel::linkActivated, this,
-          [this](const QString& url) {
-            DesktopServices ds(mWorkspace.getSettings());
-            ds.openWebUrl(QUrl(url));
-          });
-  mUi->lblImportNote->setText(
-      mUi->lblImportNote->text().arg("KiCad Import").arg("Eagle Import"));
-  connect(mUi->lblImportNote, &QLabel::linkActivated, mUi->edtLocalName,
-          &QLineEdit::setText);
   connect(mUi->cbxOnlineLibrariesSelectAll, &QCheckBox::clicked, this,
           [this]() { mManualCheckStateForAllRemoteLibraries = true; });
 
@@ -85,15 +67,6 @@ AddLibraryWidget::AddLibraryWidget(Workspace& ws) noexcept
       "  color: transparent;"
       "  selection-color: transparent;"
       "}");
-
-  // tab "create local library": set placeholder texts
-  mUi->edtLocalName->setPlaceholderText("My Library");
-  mUi->edtLocalAuthor->setPlaceholderText(
-      mWorkspace.getSettings().userName.get());
-  mUi->edtLocalVersion->setPlaceholderText("0.1");
-  mUi->edtLocalUrl->setPlaceholderText(
-      tr("e.g. the URL to the Git repository (optional)"));
-  localLibraryNameLineEditTextChanged(mUi->edtLocalName->text());
 
   // tab "download ZIP": set placeholder texts and hide widgets
   mUi->edtDownloadZipUrl->setPlaceholderText(
@@ -143,15 +116,6 @@ void AddLibraryWidget::updateOnlineLibraryList() noexcept {
  *  Private Methods
  ******************************************************************************/
 
-void AddLibraryWidget::localLibraryNameLineEditTextChanged(
-    QString name) noexcept {
-  if (name.isEmpty()) name = mUi->edtLocalName->placeholderText();
-  QString dirname = FilePath::cleanFileName(
-      name, FilePath::ReplaceSpaces | FilePath::KeepCase);
-  if (!dirname.endsWith(".lplib")) dirname.append(".lplib");
-  mUi->edtLocalDirectory->setPlaceholderText(dirname);
-}
-
 void AddLibraryWidget::downloadZipUrlLineEditTextChanged(
     QString urlStr) noexcept {
   QString left = urlStr.left(urlStr.indexOf(".lplib", Qt::CaseInsensitive));
@@ -168,142 +132,6 @@ void AddLibraryWidget::downloadZipUrlLineEditTextChanged(
     dirname.append(".lplib");
   }
   mUi->edtDownloadZipDirectory->setPlaceholderText(dirname);
-}
-
-void AddLibraryWidget::createLocalLibraryButtonClicked() noexcept {
-  // get attributes
-  QString name = getTextOrPlaceholderFromQLineEdit(mUi->edtLocalName, false);
-  QString desc =
-      getTextOrPlaceholderFromQLineEdit(mUi->edtLocalDescription, false);
-  QString author =
-      getTextOrPlaceholderFromQLineEdit(mUi->edtLocalAuthor, false);
-  QString versionStr =
-      getTextOrPlaceholderFromQLineEdit(mUi->edtLocalVersion, false);
-  std::optional<Version> version = Version::tryFromString(versionStr);
-  QString urlStr = mUi->edtLocalUrl->text().trimmed();
-  QUrl url = QUrl::fromUserInput(urlStr);
-  bool useCc0License = mUi->cbxLocalCc0License->isChecked();
-  QString directoryStr =
-      getTextOrPlaceholderFromQLineEdit(mUi->edtLocalDirectory, true);
-  if ((!directoryStr.isEmpty()) && (!directoryStr.endsWith(".lplib"))) {
-    directoryStr.append(".lplib");
-  }
-  FilePath directory =
-      mWorkspace.getLibrariesPath().getPathTo("local/" % directoryStr);
-
-  // check attributes validity
-  if (name.isEmpty()) {
-    QMessageBox::critical(this, tr("Invalid Input"),
-                          tr("Please enter a name."));
-    return;
-  }
-  if (author.isEmpty()) {
-    QMessageBox::critical(this, tr("Invalid Input"),
-                          tr("Please enter an author."));
-    return;
-  }
-  if (!version) {
-    QMessageBox::critical(this, tr("Invalid Input"),
-                          tr("The specified version number is not valid."));
-    return;
-  }
-  if (!url.isValid() && !urlStr.isEmpty()) {
-    QMessageBox::critical(this, tr("Invalid Input"),
-                          tr("The specified URL is not valid."));
-    return;
-  }
-  if (directoryStr.isEmpty()) {
-    QMessageBox::critical(this, tr("Invalid Input"),
-                          tr("Please enter a directory name."));
-    return;
-  }
-  if (directory.isExistingFile() || directory.isExistingDir()) {
-    QMessageBox::critical(this, tr("Invalid Input"),
-                          tr("The specified directory exists already."));
-    return;
-  }
-
-  try {
-    // create transactional file system
-    std::shared_ptr<TransactionalFileSystem> fs =
-        TransactionalFileSystem::openRW(directory);
-    TransactionalDirectory dir(fs);
-
-    // create the new library
-    QScopedPointer<Library> lib(new Library(Uuid::createRandom(), *version,
-                                            author, ElementName(name), desc,
-                                            QString("")));  // can throw
-    lib->setUrl(url);
-    try {
-      lib->setIcon(FileUtils::readFile(Application::getResourcesDir().getPathTo(
-          "library/default_image.png")));
-    } catch (const Exception& e) {
-      qCritical() << "Could not open the library image:" << e.getMsg();
-    }
-    lib->moveTo(dir);  // can throw
-
-    // copy license file
-    if (useCc0License) {
-      try {
-        FilePath source =
-            Application::getResourcesDir().getPathTo("licenses/cc0-1.0.txt");
-        fs->write("LICENSE.txt", FileUtils::readFile(source));  // can throw
-      } catch (Exception& e) {
-        qCritical() << "Could not copy the license file:" << e.getMsg();
-      }
-    }
-
-    // copy readme file
-    try {
-      FilePath source =
-          Application::getResourcesDir().getPathTo("library/readme_template");
-      QByteArray content = FileUtils::readFile(source);  // can throw
-      content.replace("{LIBRARY_NAME}", name.toUtf8());
-      if (useCc0License) {
-        content.replace("{LICENSE_TEXT}",
-                        "Creative Commons (CC0-1.0). For the "
-                        "license text, see [LICENSE.txt](LICENSE.txt).");
-      } else {
-        content.replace("{LICENSE_TEXT}", "No license set.");
-      }
-      fs->write("README.md", content);  // can throw
-    } catch (Exception& e) {
-      qCritical() << "Could not copy the readme file:" << e.getMsg();
-    }
-
-    // copy .gitignore
-    try {
-      FilePath source = Application::getResourcesDir().getPathTo(
-          "library/gitignore_template");
-      fs->write(".gitignore", FileUtils::readFile(source));  // can throw
-    } catch (Exception& e) {
-      qCritical() << "Could not copy the .gitignore file:" << e.getMsg();
-    }
-
-    // copy .gitattributes
-    try {
-      FilePath source = Application::getResourcesDir().getPathTo(
-          "library/gitattributes_template");
-      fs->write(".gitattributes", FileUtils::readFile(source));  // can throw
-    } catch (Exception& e) {
-      qCritical() << "Could not copy the .gitattributes file:" << e.getMsg();
-    }
-
-    // save file system
-    fs->save();  // can throw
-
-    // library successfully added! reset input fields and emit signal
-    mUi->edtLocalName->clear();
-    mUi->edtLocalDescription->clear();
-    mUi->edtLocalAuthor->clear();
-    mUi->edtLocalVersion->clear();
-    mUi->edtLocalUrl->clear();
-    mUi->cbxLocalCc0License->setChecked(false);
-    mUi->edtLocalDirectory->clear();
-    emit libraryAdded(directory);
-  } catch (Exception& e) {
-    QMessageBox::critical(this, tr("Error"), e.getMsg());
-  }
 }
 
 void AddLibraryWidget::downloadZippedLibraryButtonClicked() noexcept {

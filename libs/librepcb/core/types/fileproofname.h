@@ -31,6 +31,8 @@
 
 #include <QtCore>
 
+#include <optional>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -39,12 +41,6 @@ namespace librepcb {
 /*******************************************************************************
  *  Class FileProofName
  ******************************************************************************/
-
-inline static QString cleanFileProofName(const QString& userInput) noexcept {
-  return Toolbox::cleanUserInputString(userInput,
-                                       QRegularExpression("[^-a-zA-Z0-9_+().]"),
-                                       true, false, false, "-", 20);
-}
 
 struct FileProofNameVerifier {
   template <typename Value, typename Predicate>
@@ -135,6 +131,18 @@ inline QDebug operator<<(QDebug stream, const FileProofName& obj) {
 inline std::size_t qHash(const FileProofName& key,
                          std::size_t seed = 0) noexcept {
   return ::qHash(*key, seed);
+}
+
+inline static QString cleanFileProofName(const QString& userInput) noexcept {
+  return Toolbox::cleanUserInputString(userInput,
+                                       QRegularExpression("[^-a-zA-Z0-9_+().]"),
+                                       true, false, false, "-", 20);
+}
+
+inline static std::optional<FileProofName> parseFileProofName(
+    const QString& name) noexcept {
+  return FileProofNameConstraint()(name) ? FileProofName(name)
+                                         : std::optional<FileProofName>();
 }
 
 /*******************************************************************************

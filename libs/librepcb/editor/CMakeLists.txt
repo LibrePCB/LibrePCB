@@ -206,6 +206,8 @@ add_library(
   library/cmp/compsymbvarpinsignalmapeditorwidget.cpp
   library/cmp/compsymbvarpinsignalmapeditorwidget.h
   library/cmp/if_componentsymbolvarianteditorprovider.h
+  library/createlibrarytab.cpp
+  library/createlibrarytab.h
   library/dev/deviceeditorwidget.cpp
   library/dev/deviceeditorwidget.h
   library/dev/deviceeditorwidget.ui

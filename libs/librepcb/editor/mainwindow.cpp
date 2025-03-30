@@ -24,6 +24,7 @@
 
 #include "editorcommandsetupdater.h"
 #include "guiapplication.h"
+#include "library/createlibrarytab.h"
 #include "mainwindowtestadapter.h"
 #include "notificationsmodel.h"
 #include "project/projectreadmerenderer.h"
@@ -264,6 +265,14 @@ bool MainWindow::trigger(ui::Action a) noexcept {
     }
     case ui::Action::ProjectImportExamples: {
       mApp.addExampleProjects(mWidget);
+      return true;
+    }
+
+    // Library
+    case ui::Action::LibraryCreate: {
+      if (!switchToTab<CreateLibraryTab>()) {
+        addTab(std::make_shared<CreateLibraryTab>(mApp));
+      }
       return true;
     }
 
