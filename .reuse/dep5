@@ -288,10 +288,6 @@ Copyright: 2005-2020, Google Inc and various contributors
            2018-2019, Google LLC
 License: BSD-3-Clause
 
-Files: libs/googletest/googlemock/scripts/generator/*
-Copyright: Google and various contributors
-License: Apache-2.0
-
 Files: libs/muparser/*
 Copyright: 2004-2020, Ingo Berg
 License: BSD-2-Clause
