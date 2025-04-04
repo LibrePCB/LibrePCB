@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "appwindow.h"
+
 #include <librepcb/core/fileio/filepath.h>
 
 #include <QtCore>
@@ -38,14 +40,15 @@ class Workspace;
 
 namespace editor {
 
+class LibrariesModel;
 class LibraryEditor;
-class LibraryManager;
 class MainWindow;
 class Notification;
 class NotificationsModel;
 class ProjectEditor;
 class ProjectLibraryUpdater;
 class QuickAccessModel;
+class SlintKeyEventTextBuilder;
 
 /*******************************************************************************
  *  Class GuiApplication
@@ -69,12 +72,13 @@ public:
   Workspace& getWorkspace() noexcept { return mWorkspace; }
   NotificationsModel& getNotifications() noexcept { return *mNotifications; }
   QuickAccessModel& getQuickAccess() noexcept { return *mQuickAccessModel; }
+  LibrariesModel& getLocalLibraries() noexcept { return *mLocalLibraries; }
+  LibrariesModel& getRemoteLibraries() noexcept { return *mRemoteLibraries; }
 
   // General Methods
   void openFile(const FilePath& fp, QWidget* parent) noexcept;
   void switchWorkspace(QWidget* parent) noexcept;
   void execWorkspaceSettingsDialog(QWidget* parent) noexcept;
-  void openLibraryManager() noexcept;
   void addExampleProjects(QWidget* parent) noexcept;
   void createProject(const FilePath& parentDir, bool eagleImport,
                      QWidget* parent) noexcept;
@@ -166,7 +170,9 @@ private:
   std::shared_ptr<Notification> mNotificationNoLibrariesInstalled;
   std::shared_ptr<Notification> mNotificationDesktopIntegration;
   std::shared_ptr<QuickAccessModel> mQuickAccessModel;
-  QScopedPointer<LibraryManager> mLibraryManager;
+  std::shared_ptr<LibrariesModel> mLocalLibraries;
+  std::shared_ptr<LibrariesModel> mRemoteLibraries;
+  std::unique_ptr<SlintKeyEventTextBuilder> mLibrariesFilter;
   QHash<QString, ProjectEditor*> mOpenProjectEditors;
   QHash<FilePath, LibraryEditor*> mOpenLibraryEditors;
   std::unique_ptr<ProjectLibraryUpdater> mProjectLibraryUpdater;

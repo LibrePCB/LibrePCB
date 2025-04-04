@@ -23,6 +23,7 @@
 #include "downloadlibrarytab.h"
 
 #include "guiapplication.h"
+#include "librariesmodel.h"
 #include "utils/slinthelpers.h"
 
 #include <librepcb/core/workspace/workspace.h>
@@ -207,6 +208,10 @@ void DownloadLibraryTab::downloadFinished(bool success,
   mDownload.reset();
 
   if (success) {
+    // Highlight the new library in the libraries tab.
+    emit panelPageRequested(ui::PanelPage::Libraries);
+    mApp.getLocalLibraries().highlightLibraryOnNextRescan(mDirectory);
+
     // Force rescan to index the new library.
     mApp.getWorkspace().getLibraryDb().startLibraryRescan();
     emit closeRequested();

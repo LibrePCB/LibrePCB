@@ -17,65 +17,64 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_WINDOWTAB_H
-#define LIBREPCB_EDITOR_WINDOWTAB_H
-
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "appwindow.h"
+#include "slintkeyeventtextbuilder.h"
 
-#include <librepcb/core/utils/signalslot.h>
+#include "slinthelpers.h"
 
 #include <QtCore>
 
 /*******************************************************************************
- *  Namespace / Forward Declarations
+ *  Namespace
  ******************************************************************************/
 namespace librepcb {
 namespace editor {
 
-class GuiApplication;
-
 /*******************************************************************************
- *  Class WindowTab
+ *  Constructors / Destructor
  ******************************************************************************/
 
-/**
- * @brief The WindowTab class
- */
-class WindowTab : public QObject {
-  Q_OBJECT
+SlintKeyEventTextBuilder::SlintKeyEventTextBuilder(QObject* parent) noexcept
+  : QObject(parent), mText() {
+}
 
-public:
-  // Signals
-  Signal<WindowTab> onUiDataChanged;
+SlintKeyEventTextBuilder::~SlintKeyEventTextBuilder() noexcept {
+}
 
-  // Constructors / Destructor
-  WindowTab() = delete;
-  WindowTab(const WindowTab& other) = delete;
-  explicit WindowTab(GuiApplication& app, QObject* parent = nullptr) noexcept;
-  virtual ~WindowTab() noexcept;
+/*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
 
-  // General Methods
-  virtual ui::TabData getUiData() const noexcept = 0;
-  virtual void setUiData(const ui::TabData& data) noexcept;
-  virtual void activate() noexcept {}
-  virtual void deactivate() noexcept {}
+slint::private_api::EventResult SlintKeyEventTextBuilder::process(
+    const slint::private_api::KeyEvent& e) noexcept {
+  if (e.event_type != slint::private_api::KeyEventType::KeyPressed) {
+    return slint::private_api::EventResult::Reject;
+  }
 
-  // Operator Overloadings
-  WindowTab& operator=(const WindowTab& rhs) = delete;
+  const QString text(s2q(e.text));
+  if (text.size() != 1) {
+    return slint::private_api::EventResult::Reject;
+  }
+  const QChar c = text.front();
 
-signals:
-  void panelPageRequested(ui::PanelPage p);
-  void closeRequested();
-  void statusBarMessageChanged(const QString& message, int timeoutMs);
-
-protected:
-  virtual void triggerAsync(ui::Action a) noexcept;
-
-  GuiApplication& mApp;
-};
+  if ((c == '\x1b') && (mText.size() > 0)) {
+    mText.clear();
+    emit textChanged(mText);
+    return slint::private_api::EventResult::Accept;
+  } else if ((c == '\b') && (mText.size() > 0)) {
+    mText.chop(1);
+    emit textChanged(mText);
+    return slint::private_api::EventResult::Accept;
+  } else if (c.isPrint()) {
+    mText += c;
+    emit textChanged(mText);
+    return slint::private_api::EventResult::Accept;
+  } else {
+    return slint::private_api::EventResult::Reject;
+  }
+}
 
 /*******************************************************************************
  *  End of File
@@ -83,5 +82,3 @@ protected:
 
 }  // namespace editor
 }  // namespace librepcb
-
-#endif

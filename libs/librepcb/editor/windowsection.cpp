@@ -90,6 +90,8 @@ void WindowSection::addTab(std::shared_ptr<WindowTab> tab) noexcept {
         }
       },
       Qt::QueuedConnection);
+  connect(tab.get(), &WindowTab::panelPageRequested, this,
+          &WindowSection::panelPageRequested);
   connect(tab.get(), &WindowTab::statusBarMessageChanged, this,
           &WindowSection::statusBarMessageChanged);
   mTabs->append(tab);

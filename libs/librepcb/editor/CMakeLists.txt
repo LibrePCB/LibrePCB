@@ -272,6 +272,8 @@ add_library(
   library/lib/libraryoverviewwidget.cpp
   library/lib/libraryoverviewwidget.h
   library/lib/libraryoverviewwidget.ui
+  library/librariesmodel.cpp
+  library/librariesmodel.h
   library/libraryeditor.cpp
   library/libraryeditor.h
   library/libraryeditor.ui
@@ -868,6 +870,8 @@ add_library(
   utils/shortcutsreferencegenerator.h
   utils/slinthelpers.cpp
   utils/slinthelpers.h
+  utils/slintkeyeventtextbuilder.cpp
+  utils/slintkeyeventtextbuilder.h
   utils/standardeditorcommandhandler.cpp
   utils/standardeditorcommandhandler.h
   utils/toolbarproxy.cpp

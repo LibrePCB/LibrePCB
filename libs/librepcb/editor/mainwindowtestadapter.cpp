@@ -60,9 +60,7 @@ MainWindowTestAdapter::~MainWindowTestAdapter() noexcept {
  ******************************************************************************/
 
 QVariant MainWindowTestAdapter::trigger(QVariant action) noexcept {
-  if (action == "library-manager") {
-    emit actionTriggered(ui::Action::LibraryManager);
-  } else if (action == "workspace-switch") {
+  if (action == "workspace-switch") {
     emit actionTriggered(ui::Action::WorkspaceSwitch);
   } else if (action == "workspace-settings") {
     emit actionTriggered(ui::Action::WorkspaceSettings);

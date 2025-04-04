@@ -83,6 +83,7 @@ public:
   WindowSection& operator=(const WindowSection& rhs) = delete;
 
 signals:
+  void panelPageRequested(ui::PanelPage p);
   void splitRequested();
   void closeRequested();
   void derivedUiDataChanged(std::size_t index);

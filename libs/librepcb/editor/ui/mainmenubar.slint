@@ -85,15 +85,6 @@ export component MainMenuBar inherits Rectangle {
 
                 MenuSeparator { }
 
-                library-manager-item := MenuItem {
-                    cmd: Cmd.library-manager;
-                    icon: @image-url("../../../bootstrap-icons/icons/database.svg");
-
-                    clicked => {
-                        Backend.trigger(Action.library-manager);
-                    }
-                }
-
                 create-library-item := MenuItem {
                     text: @tr("New Library") + "...";
                     icon: @image-url("../../../bootstrap-icons/icons/database-add.svg");

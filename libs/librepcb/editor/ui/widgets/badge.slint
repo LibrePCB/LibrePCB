@@ -1,0 +1,19 @@
+export component Badge inherits Rectangle {
+    in property <string> text;
+    in property <color> text-color: white;
+    in property <length> font-size: 10px;
+    in property <int> font-weight: 400;
+
+    width: txt.preferred-width + 10px;
+    height: txt.preferred-height + 2px;
+    border-color: text-color;
+    border-width: 1px;
+    border-radius: self.height / 2;
+
+    txt := Text {
+        color: text-color;
+        font-size: font-size;
+        font-weight: font-weight;
+        text: text;
+    }
+}

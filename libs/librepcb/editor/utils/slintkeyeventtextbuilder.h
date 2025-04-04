@@ -17,17 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_WINDOWTAB_H
-#define LIBREPCB_EDITOR_WINDOWTAB_H
+#ifndef LIBREPCB_EDITOR_SLINTKEYEVENTTEXTBUILDER_H
+#define LIBREPCB_EDITOR_SLINTKEYEVENTTEXTBUILDER_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "appwindow.h"
-
-#include <librepcb/core/utils/signalslot.h>
-
 #include <QtCore>
+
+#include <slint.h>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -35,46 +33,36 @@
 namespace librepcb {
 namespace editor {
 
-class GuiApplication;
-
 /*******************************************************************************
- *  Class WindowTab
+ *  Class SlintKeyEventTextBuilder
  ******************************************************************************/
 
 /**
- * @brief The WindowTab class
+ * @brief The SlintKeyEventTextBuilder class
  */
-class WindowTab : public QObject {
+class SlintKeyEventTextBuilder final : public QObject {
   Q_OBJECT
 
 public:
-  // Signals
-  Signal<WindowTab> onUiDataChanged;
-
   // Constructors / Destructor
-  WindowTab() = delete;
-  WindowTab(const WindowTab& other) = delete;
-  explicit WindowTab(GuiApplication& app, QObject* parent = nullptr) noexcept;
-  virtual ~WindowTab() noexcept;
+  SlintKeyEventTextBuilder(const SlintKeyEventTextBuilder& other) = delete;
+  explicit SlintKeyEventTextBuilder(QObject* parent = nullptr) noexcept;
+  ~SlintKeyEventTextBuilder() noexcept;
 
   // General Methods
-  virtual ui::TabData getUiData() const noexcept = 0;
-  virtual void setUiData(const ui::TabData& data) noexcept;
-  virtual void activate() noexcept {}
-  virtual void deactivate() noexcept {}
+  const QString& getText() const noexcept { return mText; }
+  slint::private_api::EventResult process(
+      const slint::private_api::KeyEvent& e) noexcept;
 
   // Operator Overloadings
-  WindowTab& operator=(const WindowTab& rhs) = delete;
+  SlintKeyEventTextBuilder& operator=(const SlintKeyEventTextBuilder& rhs) =
+      delete;
 
 signals:
-  void panelPageRequested(ui::PanelPage p);
-  void closeRequested();
-  void statusBarMessageChanged(const QString& message, int timeoutMs);
+  void textChanged(QString text);
 
-protected:
-  virtual void triggerAsync(ui::Action a) noexcept;
-
-  GuiApplication& mApp;
+private:
+  QString mText;
 };
 
 /*******************************************************************************

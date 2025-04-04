@@ -139,14 +139,36 @@ export component SideBar inherits Rectangle {
             }
         }
 
-        library-manager-btn := SideBarButton {
+        libraries-btn := SideBarButton {
             icon: @image-url("../../../bootstrap-icons/icons/database.svg");
             tooltip: Cmd.library-manager.text;
             shortcut: Cmd.library-manager.shortcut;
-            checked: false;
+            checked: Data.panel-page == PanelPage.libraries;
+
+            states [
+                running when Data.remote-libraries-data.refreshing: {
+                    emblem: Emblem.running;
+                }
+                local-error when !Data.local-libraries-data.refreshing-error.is-empty: {
+                    emblem: Emblem.warning;
+                }
+                remote-error when !Data.remote-libraries-data.refreshing-error.is-empty: {
+                    emblem: Emblem.warning;
+                }
+                outdated when Data.remote-libraries-data.outdated > 0: {
+                    emblem: Emblem.none;
+                    status: Data.remote-libraries-data.outdated;
+                    status-color: black;
+                    status-background: #d4d400;
+                }
+                up-to-date when Data.remote-libraries-data.outdated == 0: {
+                    emblem: Emblem.none;
+                    status: "";
+                }
+            ]
 
             clicked => {
-                Backend.trigger(Action.library-manager);
+                Data.panel-page = PanelPage.libraries;
             }
         }
 

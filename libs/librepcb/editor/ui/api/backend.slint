@@ -31,6 +31,19 @@ export global Backend {
         Data.preview-mode  // Make it fail if callback not bound in backend.
     }
 
+    // Key event on the libraries list
+    //
+    // Used for the filtering feature in the libraries panel.
+    callback libraries-key-event(event: KeyEvent) -> EventResult;
+    libraries-key-event(event) => {
+        if event.text == Key.Escape {
+            Data.libraries-filter = "";
+        } else {
+            Data.libraries-filter += event.text;
+        }
+        reject
+    }
+
     // Request generating the preview of a project (e.g. its README.md)
     //
     // Lets the backend building the preview asynchronously, and updating the

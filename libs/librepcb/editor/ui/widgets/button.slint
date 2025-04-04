@@ -86,12 +86,13 @@ export component Button inherits Rectangle {
                     }
                 }
 
-                Text {
+                text-txt := Text {
                     font-size: 13px;
                     vertical-alignment: center;
                     color: text-color;
                     text: text;
                     accessible-role: none;
+                    overflow: elide;
                 }
             }
 
