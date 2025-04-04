@@ -22,7 +22,6 @@
  ******************************************************************************/
 #include "mainwindow.h"
 
-#include "dialogs/aboutdialog.h"
 #include "editorcommandsetupdater.h"
 #include "guiapplication.h"
 #include "mainwindowtestadapter.h"
@@ -197,11 +196,6 @@ void MainWindow::triggerAsync(ui::Action a) noexcept {
 bool MainWindow::trigger(ui::Action a) noexcept {
   switch (a) {
     // General
-    case ui::Action::AboutDialog: {
-      AboutDialog dlg(mApp.getWorkspace().getSettings(), mWidget);
-      dlg.exec();
-      return true;
-    }
     case ui::Action::LibraryManager: {
       mApp.openLibraryManager();
       return true;

@@ -52,6 +52,12 @@ TEST(ApplicationTest, testGetFileFormatVersion) {
   EXPECT_GE(Application::getFileFormatVersion(), Version::fromString("0.1"));
 }
 
+TEST(ApplicationTest, testBuildFullVersionDetails) {
+  const QString s = Application::buildFullVersionDetails();
+  EXPECT_FALSE(s.trimmed().isEmpty());
+  EXPECT_GE(s.split("\n").count(), 5);
+}
+
 TEST(ApplicationTest, testGetCacheDir) {
   // Check if the resources directory is valid and writable.
   EXPECT_TRUE(Application::getCacheDir().isValid());
