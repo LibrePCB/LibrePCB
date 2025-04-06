@@ -1,0 +1,109 @@
+import { Constants } from "../api.slint";
+
+export enum TextSide {
+    left,
+    right,
+}
+
+export component Switch inherits Rectangle {
+    in-out property <bool> checked: false;
+    in property <bool> enabled: true;
+    in property <string> text;
+    in property <TextSide> text-side: right;
+    in property <length> size: 25px;
+    in property <length> font-size: 12px;
+    in property <color> checked-color: Constants.librepcb-color;
+    in property <color> unchecked-color: #606060;
+    in property <bool> focusable: true;
+    out property has-focus <=> fs.has-focus;
+
+    preferred-width: l.preferred-width;
+    preferred-height: l.preferred-height;
+    max-width: text.is-empty ? l.preferred-width : l.max-width;
+    forward-focus: fs;
+
+    // Accessibility
+    accessible-role: switch;
+    accessible-checkable: true;
+    accessible-checked: checked;
+    accessible-enabled: enabled;
+    accessible-label: text;
+    accessible-action-default => {
+        ta.clicked();
+    }
+
+    callback toggled(checked: bool);
+
+    fs := FocusScope {
+        enabled: enabled && focusable;
+
+        key-pressed(event) => {
+            if (event.text == Key.Return) || (event.text == Key.Space) {
+                checked = !checked;
+                return accept;
+            }
+            reject
+        }
+    }
+
+    l := HorizontalLayout {
+        spacing: 8px;
+
+        if text-side == TextSide.left: Text {
+            text: text;
+            wrap: word-wrap;
+            horizontal-alignment: right;
+            vertical-alignment: center;
+            font-size: font-size;
+            accessible-role: none;
+        }
+
+        Rectangle {
+            property <float> darkness: {
+                if !enabled {
+                    0.5
+                } else if ta.pressed {
+                    0.3
+                } else {
+                    0
+                }
+            };
+
+            y: (parent.height - self.height) / 2;
+            width: size * 1.8;
+            height: size;
+            background: (checked ? checked-color : unchecked-color).darker(darkness);
+            border-radius: self.height / 2;
+            border-color: checked ? white : Constants.librepcb-color;
+            border-width: has-focus ? 1px : 0;
+
+            Rectangle {
+                x: checked ? (parent.width - self.width - self.padding) : self.padding;
+                width: self.height;
+                height: parent.height - 2 * self.padding;
+                padding: 3px;
+                background: ta.has-hover ? #303030 : #101010;
+                border-radius: self.height / 2;
+
+                animate x { duration: 50ms; }
+            }
+        }
+
+        if text-side == TextSide.right: Text {
+            text: text;
+            wrap: word-wrap;
+            vertical-alignment: center;
+            font-size: font-size;
+            accessible-role: none;
+        }
+    }
+
+    ta := TouchArea {
+        enabled: enabled;
+
+        clicked => {
+            checked = !checked;
+            toggled(checked);
+        }
+    }
+}

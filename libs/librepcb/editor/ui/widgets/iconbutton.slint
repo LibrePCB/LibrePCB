@@ -13,6 +13,7 @@ export component IconButton inherits Rectangle {
     in property <length> icon-size: min(root.width, root.height) * icon-scale;
     in property <angle> icon-rotation: 0deg;
     in property <color> colorize: transparent;
+    in property <color> background-color: transparent;
     in property <string> tooltip;
     in property <bool> tooltip-delayed: true;
     in property <ToolTipPosition> tooltip-position: bottom;
@@ -31,7 +32,7 @@ export component IconButton inherits Rectangle {
         if (!hyperlink-style) && enabled && (!read-only) && ta.has-hover {
             #454545
         } else {
-            transparent
+            background-color
         }
     }
 

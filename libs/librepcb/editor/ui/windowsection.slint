@@ -1,6 +1,7 @@
 import { IconButton } from "widgets.slint";
 import { Tab } from "tab.slint";
 import { HomeTab } from "hometab.slint";
+import { CreateLibraryTab } from "library/createlibrarytab.slint";
 import {
     Action,
     Backend,
@@ -174,6 +175,13 @@ export component WindowSection inherits Rectangle {
                 width: 100%;
                 height: 100%;
                 section-index: section-index;
+            }
+
+            if tab-open && (tab-type == TabType.create-library): create-library-tab := CreateLibraryTab {
+                width: 100%;
+                height: 100%;
+                section-index: section-index;
+                section: section;
             }
 
             // Highlight rectangle

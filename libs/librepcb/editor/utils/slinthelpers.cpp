@@ -270,6 +270,70 @@ slint::SharedString q2s(Qt::Key k) noexcept {
   }
 }
 
+static slint::SharedString getInputError(const QString& input) {
+  if (input.trimmed().isEmpty()) {
+    return q2s(QCoreApplication::translate("SlintHelpers", "Required"));
+  } else {
+    return q2s(QCoreApplication::translate("SlintHelpers", "Invalid"));
+  }
+}
+
+std::optional<ElementName> validateElementName(
+    const QString& input, slint::SharedString& error) noexcept {
+  if (auto val = parseElementName(cleanElementName(input))) {
+    error = slint::SharedString();
+    return val;
+  } else {
+    error = getInputError(input);
+    return std::nullopt;
+  }
+}
+
+std::optional<Version> validateVersion(const QString& input,
+                                       slint::SharedString& error) noexcept {
+  if (auto val = Version::tryFromString(input.trimmed())) {
+    error = slint::SharedString();
+    return val;
+  } else {
+    error = getInputError(input);
+    return std::nullopt;
+  }
+}
+
+std::optional<FileProofName> validateFileProofName(
+    const QString& input, slint::SharedString& error,
+    const QString& requiredSuffix) noexcept {
+  if (auto val = parseFileProofName(cleanFileProofName(input))) {
+    if (requiredSuffix.isEmpty() || input.trimmed().endsWith(requiredSuffix)) {
+      error = slint::SharedString();
+      return val;
+    } else {
+      error = q2s(
+          QCoreApplication::translate("FileProofName", "Suffix '%1' missing")
+              .arg(requiredSuffix));
+      return std::nullopt;
+    }
+  } else {
+    error = getInputError(input);
+    return std::nullopt;
+  }
+}
+
+std::optional<QUrl> validateUrl(const QString& input,
+                                slint::SharedString& error,
+                                bool allowEmpty) noexcept {
+  const QUrl url = QUrl::fromUserInput(input.trimmed());
+  const std::optional<QUrl> val =
+      url.isValid() ? std::make_optional(url) : std::nullopt;
+  if (val || (allowEmpty && input.trimmed().isEmpty())) {
+    error = slint::SharedString();
+    return val;
+  } else {
+    error = getInputError(input);
+    return std::nullopt;
+  }
+}
+
 /*******************************************************************************
  *  End of File
  ******************************************************************************/

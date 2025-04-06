@@ -1,0 +1,327 @@
+import {
+    Button,
+    IconButton,
+    LineEdit,
+    LinkText,
+    Switch
+} from "../widgets.slint";
+import { Tab } from "../tab.slint";
+import {
+    Action,
+    Backend,
+    CreateLibraryTabData,
+    WindowSectionData
+} from "../api.slint";
+
+export component CreateLibraryTab inherits Tab {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    property <[CreateLibraryTabData]> tabs: section.create-library-tabs;
+
+    init => {
+        name-edt.select-all();
+        name-edt.focus();
+    }
+
+    key-pressed(event) => {
+        if event.text == Key.Escape {
+            section.tabs[section.current-tab-index].action = Action.tab-cancel;
+            return accept;
+        }
+        reject
+    }
+
+    function edit-key-pressed(event: KeyEvent) -> EventResult {
+        if event.text == Key.Return {
+            section.tabs[section.current-tab-index].action = Action.tab-ok;
+            return accept;
+        }
+        reject
+    }
+
+    GridLayout {
+        padding: 10px;
+        spacing: 5px;
+
+        Row {
+            Text {
+                colspan: 2;
+                height: self.preferred-height + 10px;
+                font-size: 14px;
+                font-weight: 900;
+                wrap: TextWrap.word-wrap;
+                text: @tr("Create a new local library");
+            }
+        }
+
+        Row {
+            Text {
+                colspan: 2;
+                height: self.preferred-height;
+                font-italic: true;
+                wrap: TextWrap.word-wrap;
+                text: @tr("To import KiCad or Eagle libraries, create a new library called e.g. 'KiCad Import' or 'Eagle Import'. Then open the new library and start the import wizard via 'File -> Import'.");
+            }
+        }
+
+        Row {
+            Rectangle {
+                colspan: 2;
+                height: 1px;
+                background: gray;
+            }
+        }
+
+        Row {
+            name-txt := Text {
+                text: @tr("Name:");
+                vertical-alignment: center;
+                accessible-role: none;
+            }
+
+            name-edt := LineEdit {
+                text: tabs[section.current-tab-index].name;
+                validation-error: tabs[section.current-tab-index].name-error;
+                accessible-label: name-txt.text;
+
+                changed text => {
+                    tabs[section.current-tab-index].name = self.text;
+                }
+
+                key-pressed(event) => {
+                    edit-key-pressed(event)
+                }
+            }
+        }
+
+        Row {
+            Rectangle { }
+
+            Flickable {
+                viewport-width: examples-l.preferred-width;
+                height: examples-l.preferred-height;
+
+                examples-l := HorizontalLayout {
+                    alignment: start;
+                    spacing: 4px;
+
+                    examples-txt := Text {
+                        font-size: 11px;
+                        text: @tr("Examples:");
+                        accessible-role: none;
+                    }
+
+                    // Note: Names not translated by intention for valid and
+                    // consistent library names for all users.
+                    for text[i] in ["My Library", "•", "KiCad Import", "•", "Eagle Import"]: LinkText {
+                        overflow: elide;
+                        font-size: 11px;
+                        text: text;
+                        enabled: text != "•";
+                        accessible-role: none;
+
+                        clicked => {
+                            name-edt.text = text;
+                        }
+                    }
+                }
+            }
+        }
+
+        Row {
+            description-txt := Text {
+                text: @tr("Description:");
+                vertical-alignment: center;
+                accessible-role: none;
+            }
+
+            description-edt := LineEdit {
+                text: tabs[section.current-tab-index].description;
+                accessible-label: description-txt.text;
+
+                changed text => {
+                    tabs[section.current-tab-index].description = self.text;
+                }
+
+                key-pressed(event) => {
+                    edit-key-pressed(event)
+                }
+            }
+        }
+
+        Row {
+            author-txt := Text {
+                text: @tr("Author:");
+                vertical-alignment: center;
+                accessible-role: none;
+            }
+
+            author-edt := LineEdit {
+                text: tabs[section.current-tab-index].author;
+                accessible-label: author-txt.text;
+
+                changed text => {
+                    tabs[section.current-tab-index].author = self.text;
+                }
+
+                key-pressed(event) => {
+                    edit-key-pressed(event)
+                }
+            }
+        }
+
+        Row {
+            version-txt := Text {
+                text: @tr("Version:");
+                vertical-alignment: center;
+                accessible-role: none;
+            }
+
+            version-edt := LineEdit {
+                text: tabs[section.current-tab-index].version;
+                placeholder-text: tabs[section.current-tab-index].version-default;
+                validation-error: tabs[section.current-tab-index].version-error;
+                accessible-label: version-txt.text;
+
+                changed text => {
+                    tabs[section.current-tab-index].version = self.text;
+                }
+
+                key-pressed(event) => {
+                    edit-key-pressed(event)
+                }
+            }
+        }
+
+        Row {
+            url-txt := Text {
+                text: @tr("URL:");
+                vertical-alignment: center;
+                accessible-role: none;
+            }
+
+            url-edt := LineEdit {
+                text: tabs[section.current-tab-index].url;
+                placeholder-text: @tr("e.g. URL to the Git repository (optional)");
+                validation-error: tabs[section.current-tab-index].url-error;
+                accessible-label: url-txt.text;
+
+                changed text => {
+                    tabs[section.current-tab-index].url = self.text;
+                }
+
+                key-pressed(event) => {
+                    edit-key-pressed(event)
+                }
+            }
+        }
+
+        Row {
+            license-txt := Text {
+                text: @tr("License:");
+                vertical-alignment: center;
+                accessible-role: none;
+            }
+
+            HorizontalLayout {
+                spacing: 8px;
+
+                cc0-sw := Switch {
+                    horizontal-stretch: 1;
+                    text: @tr("Put library under the Public Domain License CC0-1.0\n(mandatory to publish it on librepcb.org)");
+                    checked: tabs[section.current-tab-index].cc0;
+                    accessible-description: self.text;
+                    accessible-label: license-txt.text;
+
+                    changed checked => {
+                        tabs[section.current-tab-index].cc0 = self.checked;
+                    }
+                }
+
+                cc0-info-btn := IconButton {
+                    property <string> url: "https://en.wikipedia.org/wiki/Creative_Commons_license";
+
+                    y: (parent.height - self.height) / 2;
+                    width: 16px;
+                    height: self.width;
+                    icon: @image-url("../../../../bootstrap-icons/icons/info-circle.svg");
+                    status-tip: url;
+                    hyperlink-style: true;
+                    accessible-label: "more information";
+
+                    clicked => {
+                        Backend.open-url(url);
+                    }
+                }
+            }
+        }
+
+        Row {
+            directory-txt := Text {
+                text: @tr("Directory:");
+                vertical-alignment: center;
+                accessible-role: none;
+            }
+
+            directory-edt := LineEdit {
+                text: tabs[section.current-tab-index].directory;
+                placeholder-text: tabs[section.current-tab-index].directory-default;
+                validation-error: tabs[section.current-tab-index].directory-error;
+                accessible-label: directory-txt.text;
+
+                changed text => {
+                    tabs[section.current-tab-index].directory = self.text;
+                }
+
+                key-pressed(event) => {
+                    edit-key-pressed(event)
+                }
+            }
+        }
+
+        Row {
+            Rectangle { }
+
+            HorizontalLayout {
+                horizontal-stretch: 1;
+                padding-top: 5px;
+                spacing: 8px;
+                alignment: start;
+
+                create-btn := Button {
+                    primary: true;
+                    enabled: tabs[section.current-tab-index].valid;
+                    text: @tr("Create Library");
+
+                    clicked => {
+                        section.tabs[section.current-tab-index].action = Action.tab-ok;
+                    }
+                }
+
+                cancel-btn := Button {
+                    text: @tr("Cancel");
+
+                    clicked => {
+                        section.tabs[section.current-tab-index].action = Action.tab-cancel;
+                    }
+                }
+            }
+        }
+
+        Row {
+            Rectangle { }
+
+            creation-error-edt := TextInput {
+                horizontal-stretch: 1;
+                height: self.visible ? self.preferred-height : 0;
+                color: red;
+                read-only: true;
+                wrap: word-wrap;
+                text: tabs[section.current-tab-index].creation-error;
+                visible: !self.text.is-empty;
+                accessible-label: "error message";
+                accessible-description: self.text;
+            }
+        }
+    }
+}

@@ -23,9 +23,14 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/core/types/elementname.h>
+#include <librepcb/core/types/fileproofname.h>
+#include <librepcb/core/types/version.h>
+
 #include <QtCore>
 #include <QtGui>
 
+#include <optional>
 #include <slint.h>
 
 /*******************************************************************************
@@ -72,6 +77,20 @@ Qt::KeyboardModifiers s2q(
     const slint::private_api::KeyboardModifiers& m) noexcept;
 
 slint::SharedString q2s(Qt::Key k) noexcept;
+
+std::optional<ElementName> validateElementName(
+    const QString& input, slint::SharedString& error) noexcept;
+
+std::optional<Version> validateVersion(const QString& input,
+                                       slint::SharedString& error) noexcept;
+
+std::optional<FileProofName> validateFileProofName(
+    const QString& input, slint::SharedString& error,
+    const QString& requiredSuffix = QString()) noexcept;
+
+std::optional<QUrl> validateUrl(const QString& input,
+                                slint::SharedString& error,
+                                bool allowEmpty = false) noexcept;
 
 /*******************************************************************************
  *  End of File

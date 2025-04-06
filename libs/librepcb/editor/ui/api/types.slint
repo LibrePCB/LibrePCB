@@ -25,12 +25,17 @@ export enum Action {
 
     // Window tab
     tab-close,
+    tab-cancel,
+    tab-ok,
 
     // Workspace
     workspace-open-folder,
     workspace-switch,
     workspace-settings,
     workspace-libraries-rescan,
+
+    // Library
+    library-create,
 
     // Project
     project-new,
@@ -67,6 +72,7 @@ export struct EditorCommand {
 // All the different kinds of window tabs
 export enum TabType {
     home,
+    create-library,
 }
 
 // Window tab base data
@@ -79,9 +85,29 @@ export struct TabData {
     action: Action,  // Set by UI, handled in backend
 }
 
+// Additional data for "create library" tabs
+export struct CreateLibraryTabData {
+    name: string,
+    name-error: string,
+    description: string,
+    author: string,
+    version: string,
+    version-default: string,
+    version-error: string,
+    url: string,
+    url-error: string,
+    cc0: bool,
+    directory: string,
+    directory-default: string,
+    directory-error: string,
+    valid: bool,
+    creation-error: string,
+}
+
 // Window section data structure
 export struct WindowSectionData {
     tabs: [TabData],
+    create-library-tabs: [CreateLibraryTabData],  // Proxy view for `tabs`
     current-tab-index: int,
     highlight: bool,
     action: Action,  // Set by UI, handled in backend
