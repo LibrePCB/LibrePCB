@@ -5,7 +5,6 @@ export enum Action {
     default,  // Default action, depending on context
 
     // General
-    library-manager,
     keyboard-shortcuts-reference,
     quit,
 
@@ -37,6 +36,11 @@ export enum Action {
     // Library
     library-create,
     library-download,
+    library-open,
+    library-uninstall,
+    library-panel-ensure-populated,
+    library-panel-apply,
+    library-panel-cancel,
 
     // Project
     project-new,
@@ -48,6 +52,7 @@ export enum Action {
 // Pages which can be shown in the side panel
 export enum PanelPage {
     home,
+    libraries,
     about,
 }
 
@@ -157,4 +162,37 @@ export struct TreeViewItemData {
     supports-pinning: bool,
     pinned: bool,
     action: Action,  // Set by UI, handled in backend
+}
+
+// Workspace library data structure
+export struct LibraryData {
+    uuid: string,
+    path: string,  // Empty if not installed
+    icon: image,
+    name: string,
+    description: string,
+    installed-version: string,  // Empty if not installed
+    online-version: string,  // Empty if not a remote library
+    outdated: bool,  // Only for outdated remote libraries
+    recommended: bool,
+    progress: int,  // [%], 0 if not installing
+    checked: bool,
+    highlight: bool,
+    action: Action,  // Set by UI, handled in backend
+}
+
+// Metadata for a list of LibraryData
+export struct LibraryListData {
+    refreshing: bool,  // Only for remote libraries (async operation)
+    refreshing-error: string,
+    count: int,  // Count before filtering
+    installed: int,  // Only for remote libraries
+    outdated: int,  // Only for remote libraries
+    all-up-to-date: bool,  // Only for remote libraries
+    pending-installs: int,  // Only for remote libraries
+    pending-updates: int,  // Only for remote libraries
+    pending-uninstalls: int,  // // Only for remote libraries
+    pending-oneway-uninstalls: int,  // Only for remote libraries
+    operation-in-progress: bool,
+    operation-error: string,
 }

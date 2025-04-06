@@ -1,0 +1,41 @@
+import { IconButton } from "iconbutton.slint";
+
+export component FilterTermEdit inherits Rectangle {
+    in property <string> term;
+
+    preferred-height: 28px;
+    background: #505050;
+    border-radius: self.height / 2;
+
+    callback clear-clicked <=> clear-btn.clicked;
+
+    HorizontalLayout {
+        padding-left: 10px;
+        padding-right: 7px;
+        spacing: 5px;
+
+        Text {
+            vertical-alignment: center;
+            font-size: 13px;
+            text: @tr("Filter:");
+        }
+
+        Text {
+            vertical-alignment: center;
+            font-size: 13px;
+            color: white;
+            text: term;
+        }
+
+        Rectangle { }
+
+        clear-btn := IconButton {
+            y: (parent.height - self.height) / 2;
+            width: self.height;
+            height: min(16px, parent.height);
+            hyperlink-style: true;
+            icon: @image-url("../../../../font-awesome/svgs/solid/xmark.svg");
+            accessible-label: "clear filter term";
+        }
+    }
+}

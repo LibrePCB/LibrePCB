@@ -24,7 +24,7 @@
 #include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/network/networkaccessmanager.h>
-#include <librepcb/editor/workspace/librarymanager/librarydownload.h>
+#include <librepcb/editor/library/librarydownload.h>
 
 #include <QSignalSpy>
 #include <QtCore>

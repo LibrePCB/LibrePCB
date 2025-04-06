@@ -62,6 +62,7 @@ public slots:
   QVariant isLibraryScanFinished(QVariant) const noexcept {
     return mLibraryScanFinished;
   }
+  QVariant openLibraryEditor(QVariant path) noexcept;
 
 signals:
   void actionTriggered(ui::Action a);

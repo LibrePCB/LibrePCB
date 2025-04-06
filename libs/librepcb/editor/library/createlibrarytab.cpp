@@ -23,6 +23,7 @@
 #include "createlibrarytab.h"
 
 #include "guiapplication.h"
+#include "librariesmodel.h"
 #include "utils/slinthelpers.h"
 
 #include <librepcb/core/application.h>
@@ -164,6 +165,10 @@ void CreateLibraryTab::triggerAsync(ui::Action a) noexcept {
 
         // Save file system.
         fs->save();  // can throw
+
+        // Highlight the new library in the libraries tab.
+        emit panelPageRequested(ui::PanelPage::Libraries);
+        mApp.getLocalLibraries().highlightLibraryOnNextRescan(mDirectory);
 
         // Force rescan to index the new library.
         mApp.getWorkspace().getLibraryDb().startLibraryRescan();

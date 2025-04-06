@@ -200,10 +200,10 @@ public:
   };
   EditorCommand libraryManager{
       "library_manager",  // clang-format break
-      QT_TR_NOOP("Library Manager"),
-      QT_TR_NOOP("Open the library manager window"),
+      QT_TR_NOOP("Libraries"),
+      QT_TR_NOOP("Manage installed part libraries"),
       ":/img/library/package.png",
-      EditorCommand::Flag::OpensPopup,
+      EditorCommand::Flags(),
       {QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_M)},
       &categoryEditor,
   };

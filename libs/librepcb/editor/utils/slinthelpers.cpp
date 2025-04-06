@@ -35,10 +35,6 @@ namespace editor {
  *  Non-Member Functions
  ******************************************************************************/
 
-int q2s(int i) noexcept {
-  return i;
-}
-
 slint::LogicalPosition q2s(const QPointF& p) noexcept {
   return slint::LogicalPosition(
       {static_cast<float>(p.x()), static_cast<float>(p.y())});

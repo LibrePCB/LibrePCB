@@ -64,54 +64,6 @@ mainWindowInitWorkspaceWizardChooseSettingsUserNameEdit = {mainWindowInitWorkspa
 
 
 ################################################################################
-# Library Manager
-################################################################################
-
-# Main window
-libraryManager = librepcb__editor__LibraryManager
-libraryManagerWidget = {libraryManager}::centralwidget
-
-# Installed libraries list
-libraryManagerInstalledLibrariesList = {libraryManagerWidget}::lstLibraries
-libraryManagerInstalledLibrariesListViewport = {libraryManagerInstalledLibrariesList}::qt_scrollarea_viewport
-
-# Add library widget
-libraryManagerAddLibraryWidget = {libraryManagerWidget}::librepcb__editor__AddLibraryWidget
-libraryManagerAddLibraryTabWidget = {libraryManagerAddLibraryWidget}::tabWidget
-libraryManagerAddLibraryTabBar = {libraryManagerAddLibraryTabWidget}::qt_tabwidget_tabbar
-libraryManagerAddLibraryStackedWidget = {libraryManagerAddLibraryTabWidget}::qt_tabwidget_stackedwidget
-
-# Remote libraries tab
-libraryManagerInstallLibrariesTab = {libraryManagerAddLibraryStackedWidget}::tabInstallLibraries
-libraryManagerInstallLibrariesLibraryList = {libraryManagerInstallLibrariesTab}::lstOnlineLibraries
-libraryManagerInstallLibrariesLibraryListViewport = {libraryManagerInstallLibrariesLibraryList}::qt_scrollarea_viewport
-libraryManagerInstallLibrariesLibraryListItem = {libraryManagerInstallLibrariesLibraryListViewport}::librepcb__editor__OnlineLibraryListWidgetItem
-libraryManagerInstallLibrariesSelectAllCheckBox = {libraryManagerInstallLibrariesTab}::cbxOnlineLibrariesSelectAll
-libraryManagerInstallLibrariesDownloadButton = {libraryManagerInstallLibrariesTab}::btnOnlineLibrariesDownload
-
-# Create local library tab
-libraryManagerCreateLocalLibraryTab = {libraryManagerAddLibraryStackedWidget}::tabCreateLocal
-libraryManagerCreateLocalLibraryNameEdit = {libraryManagerCreateLocalLibraryTab}::edtLocalName
-libraryManagerCreateLocalLibraryDescriptionEdit = {libraryManagerCreateLocalLibraryTab}::edtLocalDescription
-libraryManagerCreateLocalLibraryAuthorEdit = {libraryManagerCreateLocalLibraryTab}::edtLocalAuthor
-libraryManagerCreateLocalLibraryUrlEdit = {libraryManagerCreateLocalLibraryTab}::edtLocalUrl
-libraryManagerCreateLocalLibraryVersionEdit = {libraryManagerCreateLocalLibraryTab}::edtLocalVersion
-libraryManagerCreateLocalLibraryCc0LicenseCheckbox = {libraryManagerCreateLocalLibraryTab}::cbxLocalCc0License
-libraryManagerCreateLocalLibraryDirectoryEdit = {libraryManagerCreateLocalLibraryTab}::edtLocalDirectory
-libraryManagerCreateLocalLibraryCreateButton = {libraryManagerCreateLocalLibraryTab}::btnLocalCreate
-
-# Download library tab
-libraryManagerDownloadManuallyTab = {libraryManagerAddLibraryStackedWidget}::tabDownloadManually
-libraryManagerDownloadManuallyUrlEdit = {libraryManagerDownloadManuallyTab}::edtDownloadZipUrl
-libraryManagerDownloadManuallyDirectoryEdit = {libraryManagerDownloadManuallyTab}::edtDownloadZipDirectory
-libraryManagerDownloadManuallyDownloadButton = {libraryManagerDownloadManuallyTab}::btnDownloadZip
-
-# Library info widget
-libraryManagerLibraryInfoWidget = {libraryManagerWidget}::librepcb__editor__LibraryInfoWidget
-libraryManagerLibraryInfoWidgetOpenEditorButton = {libraryManagerLibraryInfoWidget}::btnOpenLibraryEditor
-
-
-################################################################################
 # Library Editor
 ################################################################################
 

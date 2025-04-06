@@ -17,77 +17,52 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_LIBRARYMANAGER_H
-#define LIBREPCB_EDITOR_LIBRARYMANAGER_H
+#ifndef LIBREPCB_EDITOR_SLINTKEYEVENTTEXTBUILDER_H
+#define LIBREPCB_EDITOR_SLINTKEYEVENTTEXTBUILDER_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/fileio/filepath.h>
-
 #include <QtCore>
-#include <QtWidgets>
+
+#include <slint.h>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class Library;
-class Workspace;
-
 namespace editor {
 
-class AddLibraryWidget;
-class LibraryListWidgetItem;
-
-namespace Ui {
-class LibraryManager;
-}
-
 /*******************************************************************************
- *  Class LibraryManager
+ *  Class SlintKeyEventTextBuilder
  ******************************************************************************/
 
 /**
- * @brief The LibraryManager class
+ * @brief The SlintKeyEventTextBuilder class
  */
-class LibraryManager final : public QMainWindow {
+class SlintKeyEventTextBuilder final : public QObject {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  LibraryManager() = delete;
-  LibraryManager(const LibraryManager& other) = delete;
-  LibraryManager(Workspace& ws, QWidget* parent = nullptr) noexcept;
-  ~LibraryManager() noexcept;
+  SlintKeyEventTextBuilder(const SlintKeyEventTextBuilder& other) = delete;
+  explicit SlintKeyEventTextBuilder(QObject* parent = nullptr) noexcept;
+  ~SlintKeyEventTextBuilder() noexcept;
 
   // General Methods
-  void updateOnlineLibraryList() noexcept;
+  const QString& getText() const noexcept { return mText; }
+  slint::private_api::EventResult process(
+      const slint::private_api::KeyEvent& e) noexcept;
 
   // Operator Overloadings
-  LibraryManager& operator=(const LibraryManager& rhs) = delete;
-
-private:  // Methods
-  void closeEvent(QCloseEvent* event) noexcept override;
-  void clearLibraryList() noexcept;
-  void updateLibraryList() noexcept;
-  void currentListItemChanged(QListWidgetItem* current,
-                              QListWidgetItem* previous) noexcept;
-  void libraryAddedSlot(const FilePath& libDir) noexcept;
-
-  static bool widgetsLessThan(const LibraryListWidgetItem* a,
-                              const LibraryListWidgetItem* b) noexcept;
+  SlintKeyEventTextBuilder& operator=(const SlintKeyEventTextBuilder& rhs) =
+      delete;
 
 signals:
-  void openLibraryEditorTriggered(const FilePath& libDir);
+  void textChanged(QString text);
 
-private:  // Data
-  Workspace& mWorkspace;
-  QScopedPointer<Ui::LibraryManager> mUi;
-  QScopedPointer<AddLibraryWidget> mAddLibraryWidget;
-  QWidget* mCurrentWidget;
-  FilePath mSelectedLibrary;
+private:
+  QString mText;
 };
 
 /*******************************************************************************

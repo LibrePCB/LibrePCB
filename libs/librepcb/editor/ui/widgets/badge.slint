@@ -1,0 +1,28 @@
+import { Palette } from "std-widgets.slint";
+
+export component Badge inherits Rectangle {
+    in property <string> text;
+    in property <color> text-color: Palette.foreground;
+    in property <length> font-size: 10px;
+    in property <int> font-weight: 400;
+
+    height: txt.preferred-height + 2px;
+    preferred-width: txt.preferred-width + 10px;
+    min-width: (self.preferred-width > 50px) ? 10px : self.preferred-width;
+    max-width: self.preferred-width;
+    border-color: text-color;
+    border-width: 1px;
+    border-radius: self.height / 2;
+
+    txt := Text {
+        width: parent.width - 10px;
+        height: parent.height;
+        horizontal-alignment: center;
+        vertical-alignment: center;
+        color: text-color;
+        font-size: font-size;
+        font-weight: font-weight;
+        overflow: elide;
+        text: text;
+    }
+}

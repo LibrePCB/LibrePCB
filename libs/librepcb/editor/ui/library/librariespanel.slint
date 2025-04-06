@@ -1,0 +1,647 @@
+import { ListView } from "std-widgets.slint";
+import {
+    Badge,
+    Button,
+    FilterTermEdit,
+    IconButton,
+    LinkText,
+    MessagePopup,
+    PanelHeader,
+    ProgressBar,
+    Switch
+} from "../widgets.slint";
+import {
+    Action,
+    Backend,
+    Constants,
+    Data,
+    LibraryData,
+    LibraryListData
+} from "../api.slint";
+
+component LibraryUninstallPopup inherits MessagePopup {
+    in-out property <[LibraryData]> model;
+    in property <int> index;
+
+    title: @tr("Uninstall {}", model[index].name);
+    background: #700000;
+    arrow: left;
+    has-ok: false;
+    has-yes: true;
+    has-cancel: true;
+
+    Text {
+        font-weight: 900;
+        text: @tr("Attention").to-uppercase() + ": " + @tr("This will remove the whole library directory and is not reversible:");
+    }
+
+    Text {
+        font-family: "monospace";
+        wrap: word-wrap;
+        text: model[index].path;
+    }
+
+    Text {
+        text: @tr("Are you really sure to remove '{}'?", model[index].name);
+    }
+
+    accepted => {
+        model[index].action = Action.library-uninstall;
+        self.close();
+    }
+}
+
+component LibraryListViewItem inherits Rectangle {
+    in-out property <[LibraryData]> model;
+    in property <int> index;
+    in property <bool> remote: false;
+    in property <bool> check-all: false;
+    in property <bool> is-current: false;
+    in property <bool> enabled: true;
+    in property <length> scrollbar-width: 0;
+    property <LibraryData> lib: model[index];
+    property <bool> has-switch: remote && (!lib.uuid.is-empty);
+    property <bool> version-as-badge: (!lib.installed-version.is-empty) && (remote || (!lib.online-version.is-empty));
+    property <bool> buttons-visible: ta.has-hover || is-current;
+
+    property <string> status-text;
+    property <color> status-color;
+    property <image> status-icon;
+    states [
+        outdated when lib.outdated: {
+            status-text: @tr("Outdated:") + " v" + lib.installed-version + " ⪪ v" + lib.online-version;
+            status-color: red;
+            status-icon: @image-url("../../../../font-awesome/svgs/solid/angles-up.svg");
+        }
+        up-to-date when (!lib.installed-version.is-empty) && (!lib.online-version.is-empty): {
+            status-text: @tr("Up-to-date:") + " v" + lib.installed-version;
+            status-color: lime;
+            status-icon: @image-url("../../../../font-awesome/svgs/solid/check.svg");
+        }
+    ]
+
+    background: {
+        if !enabled {
+            transparent
+        } else if remote && lib.installed-version.is-empty {
+            is-current ? #222222 : (ta.has-hover ? #111111 : #000000)
+        } else {
+            is-current ? #454545 : (ta.has-hover ? #383838 : transparent)
+        }
+    };
+    border-color: Constants.librepcb-color;
+    border-width: lib.highlight ? 1px : 0;
+
+    // Accessibility
+    accessible-role: list-item;
+    accessible-description: lib.description;
+    accessible-enabled: self.enabled;
+    accessible-label: lib.name;
+    accessible-item-selectable: true;
+    accessible-item-selected: is-current;
+    accessible-item-index: index;
+    accessible-action-default => {
+        ta.double-clicked();
+    }
+
+    callback clicked <=> ta.clicked;
+    callback uninstall-clicked(index: int);
+
+    changed check-all => {
+        model[index].checked = check-all;
+    }
+
+    init => {
+        if lib.highlight {
+            clicked();  // Make sure the library is visible in the view.
+        }
+    }
+
+    ta := TouchArea {
+        enabled: root.enabled;
+
+        HorizontalLayout {
+            padding: 2px;
+            padding-right: scrollbar-width + (has-switch ? 0 : 6px);
+            spacing: 3px;
+
+            img := Image {
+                width: root.height - 6px;
+                height: root.height - 6px;
+                image-fit: contain;
+                source: lib.icon;
+                accessible-role: none;
+            }
+
+            VerticalLayout {
+                z: 100;  // For the tooltips.
+                horizontal-stretch: 1;
+                padding: 3px;
+
+                HorizontalLayout {
+                    z: 100;  // For the tooltips.
+                    vertical-stretch: 0;
+                    spacing: 5px;
+                    alignment: start;
+
+                    name-txt := Text {
+                        horizontal-stretch: 0;
+                        color: ((!enabled) || lib.installed-version.is-empty) ? #909090 : #dddddd;
+                        font-size: 13px;
+                        font-weight: 700;
+                        vertical-alignment: bottom;
+                        overflow: elide;
+                        text: lib.name;
+                        accessible-role: none;
+                    }
+
+                    if !status-text.is-empty: status-btn := IconButton {
+                        height: 18px;
+                        width: self.height;
+                        icon: status-icon;
+                        tooltip: status-text;
+                        tooltip-delayed: false;
+                        colorize: status-color.darker(enabled ? 0 : 0.5);
+                        read-only: true;
+                        enabled: enabled;
+                    }
+
+                    if status-text.is-empty: version-txt := Text {
+                        horizontal-stretch: 0;
+                        color: name-txt.color.darker(0.2);
+                        font-size: 10px;
+                        font-weight: 400;
+                        vertical-alignment: bottom;
+                        overflow: elide;
+                        text: "v" + (lib.installed-version.is-empty ? lib.online-version : lib.installed-version);
+                        accessible-role: none;
+                    }
+                }
+
+                if lib.progress == 0: description-txt := Text {
+                    vertical-stretch: 1;
+                    vertical-alignment: center;
+                    color: name-txt.color;
+                    font-size: 10px;
+                    font-weight: 400;
+                    overflow: TextOverflow.elide;
+                    wrap: word-wrap;
+                    text: lib.description;
+                    accessible-role: none;
+                }
+
+                if lib.progress > 0: Rectangle {
+                    progress-bar := ProgressBar {
+                        progress: lib.progress / 100;
+                        accessible-role: none;
+                    }
+                }
+            }
+
+            if remote && lib.recommended && lib.installed-version.is-empty: recommended-btn := IconButton {
+                z: 100;
+                width: 22px;
+                icon: @image-url("../../../../font-awesome/svgs/solid/star.svg");
+                tooltip: @tr("Recommended");
+                tooltip-position: left;
+                tooltip-delayed: false;
+                colorize: yellow.darker(enabled ? 0 : 0.5);
+                read-only: true;
+                enabled: enabled;
+                accessible-role: none;
+            }
+
+            if !has-switch: uninstall-btn := IconButton {
+                width: 18px;
+                hyperlink-style: true;
+                icon: @image-url("../../../../font-awesome/svgs/solid/trash-can.svg");
+                tooltip: @tr("Uninstall");
+                tooltip-position: left;
+                enabled: enabled;
+                visible: buttons-visible;  // Only hide to avoid layout changes on hover.
+
+                clicked => {
+                    root.clicked();
+                    uninstall-clicked(index);
+                }
+            }
+
+            if has-switch: checked-sw := Switch {
+                // Avoid disconnecting from model when toggling.
+                property <bool> lib-checked: lib.checked;
+                changed lib-checked => {
+                    self.checked = lib-checked;
+                }
+
+                horizontal-stretch: 0;
+                checked: lib-checked;
+                enabled: enabled;
+                focusable: false;
+                accessible-label: "use library";
+
+                states [
+                    install when lib.installed-version.is-empty && lib.checked: {
+                        checked-color: lime;
+                    }
+                    update when (!lib.installed-version.is-empty) && lib.outdated && lib.checked: {
+                        checked-color: yellow;
+                        unchecked-color: red;
+                    }
+                    uninstall when (!lib.installed-version.is-empty) && (!lib.checked): {
+                        unchecked-color: red;
+                    }
+                ]
+
+                toggled(checked) => {
+                    model[index].checked = checked;
+                }
+            }
+        }
+
+        double-clicked => {
+            if !lib.path.is-empty {
+                model[index].action = Action.library-open;
+            }
+        }
+    }
+}
+
+component LibrariesPanelSection inherits FocusScope {
+    in property <string> title;
+    in property <string> title-count;
+    in-out property <[LibraryData]> libraries;
+    in property <LibraryListData> data;
+    in property <bool> remote;
+    in property <int> min-items-height: 1;
+    property <bool> check-all: false;
+    property <int> current-index: -1;
+    property <length> item-height: 50px;
+
+    min-height: l.min-height + max(min(libraries.length, min-items-height) - 1, 0) * item-height;
+
+    function set-current-index(index: int) {
+        if (index + 1) * item-height > view.height - view.viewport-y {
+            view.viewport-y = -(index + 1) * item-height + view.height;
+        } else if index * item-height < -(view.viewport-y) {
+            view.viewport-y = -(index * item-height);
+        }
+        current-index = index;
+    }
+
+    function uninstall-library(index: int) {
+        set-current-index(index);  // Update current-index & scroll to item.
+        uninstall-popup.show();
+    }
+
+    l := VerticalLayout {
+        alignment: start;
+
+        header := PanelHeader {
+            z: 10;  // For the tooltip.
+            title: title + " (" + title-count + ")";
+            highlight: root.has-focus;
+            show-spinner: data.refreshing;
+
+            if !remote: IconButton {
+                width: self.height;
+                icon: @image-url("../../../../bootstrap-icons/icons/cloud-arrow-down-fill.svg");
+                icon-scale: 0.7;
+                tooltip: @tr("Download a Library by URL") + "...";
+                enabled: root.enabled;
+
+                clicked => {
+                    Backend.trigger(Action.library-download);
+                }
+            }
+
+            if !remote: IconButton {
+                width: self.height;
+                icon: @image-url("../../../../font-awesome/svgs/solid/plus.svg");
+                tooltip: @tr("Create a New Library") + "...";
+                enabled: root.enabled;
+
+                clicked => {
+                    Backend.trigger(Action.library-create);
+                }
+            }
+
+            if remote: LinkText {
+                width: self.preferred-width + view.scrollbar-width + 2px;
+                horizontal-alignment: left;
+                vertical-alignment: center;
+                font-size: 10px;
+                text-color: #c0c0c0;
+                text: @tr("Toggle All");
+                enabled: root.enabled;
+
+                clicked => {
+                    check-all = !check-all;
+                }
+            }
+
+            if remote: Rectangle {
+                width: 5px;
+            }
+
+            if !data.refreshing-error.is-empty: IconButton {
+                width: self.height;
+                icon: @image-url("../../../../font-awesome/svgs/solid/triangle-exclamation.svg");
+                icon-scale: 0.7;
+                colorize: yellow.darker(root.enabled ? 0 : 1);
+                tooltip: data.refreshing-error;
+                tooltip-delayed: false;
+                read-only: true;
+                enabled: root.enabled;
+            }
+        }
+
+        if remote && (data.installed == 0) && (data.count > 0): HorizontalLayout {
+            padding: 8px;
+
+            Rectangle {
+                height: no-remote-libs-installed-txt.height;
+                border-color: yellow;
+                border-width: 1px;
+                border-radius: 8px;
+
+                no-remote-libs-installed-txt := Text {
+                    x: 6px;
+                    width: parent.width - (2 * self.x);
+                    height: self.preferred-height + (2 * self.x);
+                    font-italic: true;
+                    wrap: word-wrap;
+                    color: parent.border-color;
+                    vertical-alignment: center;
+                    text: @tr("No remote part libraries are currently installed. To get parts like resistors, LEDs, microcontrollers etc., choose some libraries to be downloaded from the internet.");
+                }
+            }
+        }
+
+        if (!remote) && (data.count == 0): HorizontalLayout {
+            padding: 8px;
+
+            no-local-libs-installed-txt := Text {
+                font-italic: true;
+                wrap: word-wrap;
+                text: @tr("No local libraries exist in this workspace. In order to create your own parts, add a new local library first with the button above.");
+            }
+        }
+
+        if (!Data.libraries-filter.is-empty) && (libraries.length == 0) && (data.installed > 0): HorizontalLayout {
+            padding: 8px;
+
+            no-libs-matching-filter-txt := Text {
+                font-italic: true;
+                wrap: word-wrap;
+                text: @tr("No libraries matching the filter.");
+            }
+        }
+
+        view := ListView {
+            property <int> item-count: libraries.length;
+            property <length> scrollbar-width: (view.height < view.preferred-height) ? 8px : 0;
+
+            vertical-stretch: 0;
+            preferred-height: libraries.length * item-height;
+            enabled: root.enabled;
+
+            // Accessibility
+            accessible-role: list;
+            accessible-item-count: libraries.length;
+
+            changed item-count => {
+                if !Data.libraries-filter.is-empty {
+                    self.viewport-y = 0;
+                    current-index = (item-count > 0) ? 0 : -1;
+                }
+            }
+
+            for lib[index] in libraries: LibraryListViewItem {
+                width: parent.width;
+                height: item-height;
+                model: libraries;
+                index: index;
+                remote: remote;
+                scrollbar-width: scrollbar-width;
+                is-current: index == current-index;
+                check-all: root.check-all;
+                enabled: root.enabled;
+
+                clicked => {
+                    set-current-index(index);
+                    root.focus();
+                }
+
+                uninstall-clicked(index) => {
+                    uninstall-library(index);
+                }
+            }
+        }
+    }
+
+    key-pressed(event) => {
+        if event.text == Key.DownArrow {
+            set-current-index(min(current-index + 1, libraries.length - 1));
+            return accept;
+        } else if event.text == Key.UpArrow {
+            set-current-index(max(current-index - 1, 0));
+            return accept;
+        } else if event.modifiers.control && (event.text == "a") {
+            check-all = !check-all;
+            return accept;
+        } else if (event.text == Key.Escape) && remote && (Data.remote-libraries-pending-operations > 0) {
+            Backend.trigger(Action.library-panel-cancel);
+            return accept;
+        } else if event.modifiers.control && (event.text == Key.Return) && remote && (Data.remote-libraries-pending-operations > 0) {
+            Backend.trigger(Action.library-panel-apply);
+            return accept;
+        } else if (current-index >= 0) && (current-index < libraries.length) {
+            if (event.text == Key.Return) && (!libraries[current-index].path.is-empty) {
+                libraries[current-index].action = Action.library-open;
+                return accept;
+            } else if event.text == Key.Delete {
+                uninstall-library(current-index);
+            } else if (event.text == Key.Space) && remote && (!libraries[current-index].uuid.is-empty) {
+                libraries[current-index].checked = !libraries[current-index].checked;
+                return accept;
+            } else if (event.text == Key.Delete) && remote && (!libraries[current-index].uuid.is-empty) {
+                libraries[current-index].checked = false;
+                return accept;
+            }
+        }
+        Backend.libraries-key-event(event)
+    }
+
+    uninstall-popup := LibraryUninstallPopup {
+        x: root.width;
+        y: view.y + (current-index * item-height) + (item-height / 2) - (self.height / 2) + view.viewport-y;
+        model: libraries;
+        index: current-index;
+    }
+}
+
+export component LibrariesPanel inherits Rectangle {
+    background: #2a2a2a;
+    forward-focus: local-libs;
+
+    init => {
+        Backend.trigger(Action.library-panel-ensure-populated);
+        local-libs.focus();
+    }
+
+    VerticalLayout {
+        local-libs := LibrariesPanelSection {
+            property <length> max-height-impl: (root.height * self.preferred-height) / (self.preferred-height + remote-libs.preferred-height);
+
+            vertical-stretch: 0;
+            max-height: (self.preferred-height > max-height-impl) ? max-height-impl : self.preferred-height;
+            title: @tr("Local Libraries").to-uppercase();
+            title-count: Data.local-libraries-data.count;
+            libraries: Data.local-libraries;
+            data: Data.local-libraries-data;
+            remote: false;
+            min-items-height: (root.height >= 500px) ? 3 : 1;
+            enabled: !Data.libraries-operation-in-progress;
+        }
+
+        Rectangle {
+            height: 20px;
+        }
+
+        remote-libs := LibrariesPanelSection {
+            vertical-stretch: 1;
+            title: @tr("Remote Libraries").to-uppercase();
+            title-count: Data.remote-libraries-data.installed + "/" + Data.remote-libraries-data.count;
+            libraries: Data.remote-libraries;
+            data: Data.remote-libraries-data;
+            remote: true;
+            enabled: (!Data.libraries-operation-in-progress) && (!Data.remote-libraries-data.refreshing);
+        }
+
+        Rectangle {
+            property <bool> show: Data.preview-mode ? Data.remote-libraries[0].checked : (Data.remote-libraries-pending-operations > 0);
+
+            height: show ? self.preferred-height : 0;
+            background: black;
+            border-color: Constants.librepcb-color;
+            border-width: 1px;
+
+            // Clip for the slide-in/out effect, but do not clip in steady
+            // state for the tooltips.
+            clip: self.height != self.preferred-height;
+
+            animate height { duration: 150ms; }
+
+            VerticalLayout {
+                spacing: 8px;
+                padding-bottom: 8px;
+
+                PanelHeader {
+                    z: 10;  // For the tooltips.
+                    title: @tr("Pending Operations").to-uppercase();
+
+                    HorizontalLayout {
+                        padding-top: 5px;
+                        padding-right: 3px;
+                        spacing: 3px;
+
+                        if Data.remote-libraries-data.pending-installs > 0: pending-installs-badge := Badge {
+                            font-weight: 600;
+                            font-size: 12px;
+                            border-width: 1.3px;
+                            text-color: (Data.remote-libraries-data.pending-installs > 0) ? lime : #707070;
+                            text: "+" + Data.remote-libraries-data.pending-installs;
+                        }
+
+                        if Data.remote-libraries-data.pending-updates > 0: pending-updates-badge := Badge {
+                            font-weight: 600;
+                            font-size: 12px;
+                            border-width: 1.3px;
+                            text-color: (Data.remote-libraries-data.pending-updates > 0) ? yellow : #707070;
+                            text: "↑" + Data.remote-libraries-data.pending-updates;
+                        }
+
+                        if Data.remote-libraries-data.pending-uninstalls > 0: pending-uninstalls-badge := Badge {
+                            font-weight: 600;
+                            font-size: 12px;
+                            border-width: 1.3px;
+                            text-color: (Data.remote-libraries-data.pending-uninstalls > 0) ? red : #707070;
+                            text: "–" + Data.remote-libraries-data.pending-uninstalls;
+                        }
+                    }
+                }
+
+                VerticalLayout {
+                    padding-left: 8px;
+                    padding-right: 8px;
+                    spacing: 8px;
+
+                    if Data.remote-libraries-data.pending-oneway-uninstalls > 0: Rectangle {
+                        height: nonreversible-warning-txt.preferred-height + 8px;
+                        border-color: red;
+                        border-width: 1px;
+                        border-radius: 5px;
+                        background: black;
+
+                        nonreversible-warning-txt := Text {
+                            width: parent.width - 8px;
+                            color: parent.border-color;
+                            font-weight: 600;
+                            horizontal-alignment: left;
+                            wrap: word-wrap;
+                            text: @tr("Warning").to-uppercase() + ": " + @tr("Some libraries marked for uninstallation are currently not available for installation, thus their deletion will be non-reversible!");
+                        }
+                    }
+
+                    HorizontalLayout {
+                        spacing: 6px;
+
+                        apply-btn := Button {
+                            horizontal-stretch: 1;
+                            icon: {
+                                if Data.remote-libraries-data.pending-oneway-uninstalls > 0 {
+                                    @image-url("../../../../font-awesome/svgs/solid/triangle-exclamation.svg");
+                                } else {
+                                    @image-url("../../../../font-awesome/svgs/solid/check.svg");
+                                }
+                            };
+                            text: (root.width > 300px) ? @tr("Apply {n} Modification" | "Apply {n} Modifications" % Data.remote-libraries-pending-operations) : @tr("Apply");
+                            primary: Data.remote-libraries-data.pending-oneway-uninstalls == 0;
+                            border-color: (self.has-focus ? Constants.librepcb-color : red).darker(self.enabled ? 0 : 0.5);
+                            border-width: (self.has-focus || (Data.remote-libraries-data.pending-oneway-uninstalls > 0)) ? 1px : 0;
+                            enabled: !Data.libraries-operation-in-progress;
+
+                            clicked => {
+                                Backend.trigger(Action.library-panel-apply);
+                            }
+                        }
+
+                        cancel-btn := Button {
+                            horizontal-stretch: 0;
+                            text: @tr("Cancel");
+
+                            clicked => {
+                                Backend.trigger(Action.library-panel-cancel);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        HorizontalLayout {
+            padding: min(5px, filter-edt.height);
+
+            filter-edt := FilterTermEdit {
+                height: Data.libraries-filter.is-empty ? 0 : self.preferred-height;
+                term: Data.libraries-filter;
+
+                animate height { duration: 100ms; }
+
+                clear-clicked => {
+                    Backend.libraries-key-event({ text: Key.Escape })
+                }
+            }
+        }
+    }
+}

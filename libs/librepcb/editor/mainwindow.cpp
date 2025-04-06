@@ -26,6 +26,7 @@
 #include "guiapplication.h"
 #include "library/createlibrarytab.h"
 #include "library/downloadlibrarytab.h"
+#include "library/librariesmodel.h"
 #include "mainwindowtestadapter.h"
 #include "notificationsmodel.h"
 #include "project/projectreadmerenderer.h"
@@ -135,8 +136,9 @@ MainWindow::MainWindow(GuiApplication& app,
           });
 
   // Setup test adapter.
-  connect(mTestAdapter.get(), &MainWindowTestAdapter::actionTriggered, this,
-          &MainWindow::triggerAsync);
+  connect(
+      mTestAdapter.get(), &MainWindowTestAdapter::actionTriggered, this,
+      [this](ui::Action a) { trigger(a); }, Qt::QueuedConnection);
 
   // Show window.
   mWindow->show();
@@ -214,10 +216,6 @@ void MainWindow::triggerAsync(ui::Action a) noexcept {
 bool MainWindow::trigger(ui::Action a) noexcept {
   switch (a) {
     // General
-    case ui::Action::LibraryManager: {
-      mApp.openLibraryManager();
-      return true;
-    }
     case ui::Action::KeyboardShortcutsReference: {
       StandardEditorCommandHandler handler(mApp.getWorkspace().getSettings(),
                                            mWidget);
@@ -282,6 +280,19 @@ bool MainWindow::trigger(ui::Action a) noexcept {
       }
       return true;
     }
+    case ui::Action::LibraryPanelEnsurePopulated: {
+      mApp.getLocalLibraries().ensurePopulated(true);
+      mApp.getRemoteLibraries().ensurePopulated(true);
+      return true;
+    }
+    case ui::Action::LibraryPanelApply: {
+      mApp.getRemoteLibraries().applyChanges();
+      return true;
+    }
+    case ui::Action::LibraryPanelCancel: {
+      mApp.getRemoteLibraries().cancel();
+      return true;
+    }
 
     // Project
     case ui::Action::ProjectImportEagle: {
@@ -308,6 +319,8 @@ bool MainWindow::trigger(ui::Action a) noexcept {
 void MainWindow::splitSection(int index) noexcept {
   const int newIndex = qBound(0, index + 1, mSections->count());
   std::shared_ptr<WindowSection> s = std::make_shared<WindowSection>(mApp);
+  connect(s.get(), &WindowSection::panelPageRequested, this,
+          &MainWindow::showPanelPage);
   connect(s.get(), &WindowSection::splitRequested, this, [this]() {
     if (auto index =
             mSections->indexOf(static_cast<const WindowSection*>(sender()))) {

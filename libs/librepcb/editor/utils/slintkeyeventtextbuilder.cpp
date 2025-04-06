@@ -17,75 +17,64 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_ADDLIBRARYWIDGET_H
-#define LIBREPCB_EDITOR_ADDLIBRARYWIDGET_H
-
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/fileio/filepath.h>
-#include <librepcb/core/network/apiendpoint.h>
+#include "slintkeyeventtextbuilder.h"
+
+#include "slinthelpers.h"
 
 #include <QtCore>
-#include <QtWidgets>
-
-#include <memory>
 
 /*******************************************************************************
- *  Namespace / Forward Declarations
+ *  Namespace
  ******************************************************************************/
 namespace librepcb {
-
-class ApiEndpoint;
-class Workspace;
-
 namespace editor {
 
-class LibraryDownload;
+/*******************************************************************************
+ *  Constructors / Destructor
+ ******************************************************************************/
 
-namespace Ui {
-class AddLibraryWidget;
+SlintKeyEventTextBuilder::SlintKeyEventTextBuilder(QObject* parent) noexcept
+  : QObject(parent), mText() {
+}
+
+SlintKeyEventTextBuilder::~SlintKeyEventTextBuilder() noexcept {
 }
 
 /*******************************************************************************
- *  Class AddLibraryWidget
+ *  General Methods
  ******************************************************************************/
 
-/**
- * @brief The AddLibraryWidget class
- */
-class AddLibraryWidget final : public QWidget {
-  Q_OBJECT
+slint::private_api::EventResult SlintKeyEventTextBuilder::process(
+    const slint::private_api::KeyEvent& e) noexcept {
+  if (e.event_type != slint::private_api::KeyEventType::KeyPressed) {
+    return slint::private_api::EventResult::Reject;
+  }
 
-public:
-  // Constructors / Destructor
-  AddLibraryWidget() = delete;
-  AddLibraryWidget(const AddLibraryWidget& other) = delete;
-  explicit AddLibraryWidget(Workspace& ws) noexcept;
-  ~AddLibraryWidget() noexcept;
+  const QString text(s2q(e.text));
+  if (text.size() != 1) {
+    return slint::private_api::EventResult::Reject;
+  }
+  const QChar c = text.front();
 
-  // General Methods
-  void updateOnlineLibraryList() noexcept;
-
-  // Operator Overloadings
-  AddLibraryWidget& operator=(const AddLibraryWidget& rhs) = delete;
-
-signals:
-  void libraryAdded(const FilePath& libDir);
-
-private:  // Methods
-  void onlineLibraryListReceived(QList<ApiEndpoint::Library> libs) noexcept;
-  void errorWhileFetchingLibraryList(const QString& errorMsg) noexcept;
-  void clearOnlineLibraryList() noexcept;
-  void repoLibraryDownloadCheckedChanged(bool checked) noexcept;
-  void downloadOnlineLibrariesButtonClicked() noexcept;
-
-private:  // Data
-  Workspace& mWorkspace;
-  QScopedPointer<Ui::AddLibraryWidget> mUi;
-  QList<std::shared_ptr<ApiEndpoint>> mApiEndpoints;
-  bool mManualCheckStateForAllRemoteLibraries;
-};
+  if ((c == '\x1b') && (mText.size() > 0)) {
+    mText.clear();
+    emit textChanged(mText);
+    return slint::private_api::EventResult::Accept;
+  } else if ((c == '\b') && (mText.size() > 0)) {
+    mText.chop(1);
+    emit textChanged(mText);
+    return slint::private_api::EventResult::Accept;
+  } else if (c.isPrint()) {
+    mText += c;
+    emit textChanged(mText);
+    return slint::private_api::EventResult::Accept;
+  } else {
+    return slint::private_api::EventResult::Reject;
+  }
+}
 
 /*******************************************************************************
  *  End of File
@@ -93,5 +82,3 @@ private:  // Data
 
 }  // namespace editor
 }  // namespace librepcb
-
-#endif

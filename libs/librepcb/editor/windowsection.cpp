@@ -91,6 +91,8 @@ void WindowSection::addTab(std::shared_ptr<WindowTab> tab, int index) noexcept {
   // calls while the tab object is getting destroyed.
   connect(tab.get(), &WindowTab::closeRequested, this,
           &WindowSection::tabCloseRequested, Qt::QueuedConnection);
+  connect(tab.get(), &WindowTab::panelPageRequested, this,
+          &WindowSection::panelPageRequested);
   connect(tab.get(), &WindowTab::statusBarMessageChanged, this,
           &WindowSection::statusBarMessageChanged);
   if (index < 0) {
@@ -111,6 +113,8 @@ std::shared_ptr<WindowTab> WindowSection::removeTab(int index) noexcept {
     setCurrentTab(std::min(currentIndex, mTabs->count() - 1));
     disconnect(tab.get(), &WindowTab::closeRequested, this,
                &WindowSection::tabCloseRequested);
+    disconnect(tab.get(), &WindowTab::panelPageRequested, this,
+               &WindowSection::panelPageRequested);
     disconnect(tab.get(), &WindowTab::statusBarMessageChanged, this,
                &WindowSection::statusBarMessageChanged);
     return tab;

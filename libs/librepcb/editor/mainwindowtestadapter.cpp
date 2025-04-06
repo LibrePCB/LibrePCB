@@ -23,6 +23,7 @@
 #include "mainwindowtestadapter.h"
 
 #include "guiapplication.h"
+#include "library/libraryeditor.h"
 
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
@@ -60,9 +61,7 @@ MainWindowTestAdapter::~MainWindowTestAdapter() noexcept {
  ******************************************************************************/
 
 QVariant MainWindowTestAdapter::trigger(QVariant action) noexcept {
-  if (action == "library-manager") {
-    emit actionTriggered(ui::Action::LibraryManager);
-  } else if (action == "workspace-switch") {
+  if (action == "workspace-switch") {
     emit actionTriggered(ui::Action::WorkspaceSwitch);
   } else if (action == "workspace-settings") {
     emit actionTriggered(ui::Action::WorkspaceSettings);
@@ -75,6 +74,18 @@ QVariant MainWindowTestAdapter::trigger(QVariant action) noexcept {
   }
 
   return QVariant();
+}
+
+QVariant MainWindowTestAdapter::openLibraryEditor(QVariant path) noexcept {
+  try {
+    const FilePath fp =
+        mApp.getWorkspace().getLibrariesPath().getPathTo(path.toString());
+    auto editor = new LibraryEditor(mApp.getWorkspace(), fp, false);
+    editor->show();
+    return QVariant();
+  } catch (const Exception& e) {
+    return e.getMsg();
+  }
 }
 
 /*******************************************************************************

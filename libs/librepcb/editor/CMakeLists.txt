@@ -272,6 +272,10 @@ add_library(
   library/lib/libraryoverviewwidget.cpp
   library/lib/libraryoverviewwidget.h
   library/lib/libraryoverviewwidget.ui
+  library/librariesmodel.cpp
+  library/librariesmodel.h
+  library/librarydownload.cpp
+  library/librarydownload.h
   library/libraryeditor.cpp
   library/libraryeditor.h
   library/libraryeditor.ui
@@ -868,6 +872,8 @@ add_library(
   utils/shortcutsreferencegenerator.h
   utils/slinthelpers.cpp
   utils/slinthelpers.h
+  utils/slintkeyeventtextbuilder.cpp
+  utils/slintkeyeventtextbuilder.h
   utils/standardeditorcommandhandler.cpp
   utils/standardeditorcommandhandler.h
   utils/toolbarproxy.cpp
@@ -974,23 +980,6 @@ add_library(
   workspace/initializeworkspacewizard/initializeworkspacewizard_welcome.ui
   workspace/initializeworkspacewizard/initializeworkspacewizardcontext.cpp
   workspace/initializeworkspacewizard/initializeworkspacewizardcontext.h
-  workspace/librarymanager/addlibrarywidget.cpp
-  workspace/librarymanager/addlibrarywidget.h
-  workspace/librarymanager/addlibrarywidget.ui
-  workspace/librarymanager/librarydownload.cpp
-  workspace/librarymanager/librarydownload.h
-  workspace/librarymanager/libraryinfowidget.cpp
-  workspace/librarymanager/libraryinfowidget.h
-  workspace/librarymanager/libraryinfowidget.ui
-  workspace/librarymanager/librarylistwidgetitem.cpp
-  workspace/librarymanager/librarylistwidgetitem.h
-  workspace/librarymanager/librarylistwidgetitem.ui
-  workspace/librarymanager/librarymanager.cpp
-  workspace/librarymanager/librarymanager.h
-  workspace/librarymanager/librarymanager.ui
-  workspace/librarymanager/onlinelibrarylistwidgetitem.cpp
-  workspace/librarymanager/onlinelibrarylistwidgetitem.h
-  workspace/librarymanager/onlinelibrarylistwidgetitem.ui
   workspace/projectlibraryupdater/projectlibraryupdater.cpp
   workspace/projectlibraryupdater/projectlibraryupdater.h
   workspace/projectlibraryupdater/projectlibraryupdater.ui
