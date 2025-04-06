@@ -60,6 +60,7 @@ protected:  // Methods
   void checkMissingDefaultValue(MsgList& msgs) const;
   void checkDuplicateSignalNames(MsgList& msgs) const;
   void checkSignalNamesInversionSign(MsgList& msgs) const;
+  void checkSuspiciousForcedNets(MsgList& msgs) const;
   void checkMissingSymbolVariants(MsgList& msgs) const;
   void checkMissingSymbolVariantItems(MsgList& msgs) const;
   void checkNoPinsConnected(MsgList& msgs) const;

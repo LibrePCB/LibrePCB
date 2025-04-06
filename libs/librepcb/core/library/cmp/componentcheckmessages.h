@@ -197,6 +197,24 @@ private:
 };
 
 /*******************************************************************************
+ *  Class MsgSuspiciousForcedNets
+ ******************************************************************************/
+
+/**
+ * @brief The MsgSuspiciousForcedNets class
+ */
+class MsgSuspiciousForcedNets final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgSuspiciousForcedNets)
+
+public:
+  // Constructors / Destructor
+  MsgSuspiciousForcedNets() noexcept;
+  MsgSuspiciousForcedNets(const MsgSuspiciousForcedNets& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~MsgSuspiciousForcedNets() noexcept {}
+};
+
+/*******************************************************************************
  *  End of File
  ******************************************************************************/
 
