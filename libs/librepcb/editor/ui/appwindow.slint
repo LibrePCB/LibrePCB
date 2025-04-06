@@ -5,7 +5,7 @@ import { MainMenuBar } from "mainmenubar.slint";
 import { SideBar } from "sidebar.slint";
 import { HomePanel } from "homepanel.slint";
 import { AboutPanel } from "aboutpanel.slint";
-import { HomeTab } from "hometab.slint";
+import { WindowSection } from "windowsection.slint";
 import { StatusBar } from "statusbar.slint";
 import {
     Action,
@@ -125,8 +125,17 @@ export component AppWindow inherits Window {
                 width: 1px;
             }
 
-            home-tab := HomeTab {
-                width: parent.width - 1px;
+            for section[i] in Data.sections: HorizontalLayout {
+                window-section := WindowSection {
+                    section-index: i;
+                    section: section;
+                }
+
+                if i < (Data.sections.length - 1): Rectangle {
+                    width: 1px;
+                    horizontal-stretch: 0;
+                    background: #555555;
+                }
             }
         }
 

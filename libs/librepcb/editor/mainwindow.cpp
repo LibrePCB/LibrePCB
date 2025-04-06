@@ -29,6 +29,8 @@
 #include "project/projectreadmerenderer.h"
 #include "utils/slinthelpers.h"
 #include "utils/standardeditorcommandhandler.h"
+#include "windowsection.h"
+#include "windowtab.h"
 #include "workspace/filesystemmodel.h"
 
 #include <librepcb/core/workspace/workspace.h>
@@ -57,6 +59,7 @@ MainWindow::MainWindow(GuiApplication& app,
     mWindow(win),
     mWidget(static_cast<QWidget*>(slint::cbindgen_private::slint_qt_get_widget(
         &mWindow->window().window_handle()))),
+    mSections(new UiObjectList<WindowSection, ui::WindowSectionData>()),
     mProjectPreviewRenderer(new ProjectReadmeRenderer(this)),
     mTestAdapter(new MainWindowTestAdapter(app, mWidget)) {
   Q_ASSERT(mWidget);
@@ -80,6 +83,8 @@ MainWindow::MainWindow(GuiApplication& app,
   // Set global data.
   const ui::Data& d = mWindow->global<ui::Data>();
   d.set_panel_page(ui::PanelPage::Home);
+  d.set_sections(mSections);
+  d.set_current_section_index(0);
   d.set_workspace_folder_tree(fileSystemModel);
   d.set_notifications_unread(
       mApp.getNotifications().getUnreadNotificationsCount());
@@ -138,6 +143,15 @@ MainWindow::MainWindow(GuiApplication& app,
   QSettings cs;
   mWidget->restoreGeometry(
       cs.value(mSettingsPrefix % "/geometry").toByteArray());
+  const int sectionCount = cs.beginReadArray(mSettingsPrefix % "/sections");
+  for (int i = 0; i < sectionCount; ++i) {
+    splitSection(mSections->count());
+  }
+  cs.endArray();
+
+  if (mSections->isEmpty()) {
+    splitSection(0);
+  }
 }
 
 MainWindow::~MainWindow() noexcept {
@@ -182,6 +196,8 @@ slint::CloseRequestResponse MainWindow::closeRequested() noexcept {
   // Save window state.
   QSettings cs;
   cs.setValue(mSettingsPrefix % "/geometry", mWidget->saveGeometry());
+  cs.beginWriteArray(mSettingsPrefix % "/sections", mSections->count());
+  cs.endArray();
 
   emit aboutToClose();
   return slint::CloseRequestResponse::HideWindow;
@@ -218,6 +234,12 @@ bool MainWindow::trigger(ui::Action a) noexcept {
     }
     case ui::Action::WindowClose: {
       closeRequested();
+      return true;
+    }
+
+    // Window section
+    case ui::Action::SectionSplit: {
+      splitSection(mSections->count() - 1);
       return true;
     }
 
@@ -264,6 +286,68 @@ bool MainWindow::trigger(ui::Action a) noexcept {
   }
 
   qWarning() << "Unhandled UI action:" << static_cast<int>(a);
+  return false;
+}
+
+void MainWindow::splitSection(int index) noexcept {
+  const int newIndex = qBound(0, index + 1, mSections->count());
+  std::shared_ptr<WindowSection> s = std::make_shared<WindowSection>(mApp);
+  connect(s.get(), &WindowSection::splitRequested, this, [this]() {
+    if (auto index =
+            mSections->indexOf(static_cast<const WindowSection*>(sender()))) {
+      splitSection(*index);
+    }
+  });
+  connect(s.get(), &WindowSection::closeRequested, this, [this]() {
+    if (mSections->count() > 1) {
+      if (std::shared_ptr<WindowSection> s =
+              mSections->take(static_cast<const WindowSection*>(sender()))) {
+        const ui::Data& d = mWindow->global<ui::Data>();
+        d.set_current_section_index(
+            qBound(-1, d.get_current_section_index(), mSections->count() - 1));
+        updateHomeTabSection();
+      }
+    }
+  });
+  connect(s.get(), &WindowSection::statusBarMessageChanged, this,
+          [this](const QString& message, int timeoutMs) {
+            const ui::Data& d = mWindow->global<ui::Data>();
+            d.set_status_bar_message(q2s(message));
+            if (timeoutMs > 0) {
+              QTimer::singleShot(timeoutMs, this, [&d, message]() {
+                if (s2q(d.get_status_bar_message()) == message) {
+                  d.set_status_bar_message(slint::SharedString());
+                }
+              });
+            }
+          });
+  mSections->insert(newIndex, s);
+  updateHomeTabSection();
+}
+
+void MainWindow::updateHomeTabSection() noexcept {
+  for (int i = 0; i < mSections->count(); ++i) {
+    mSections->at(i)->setHomeTabVisible(i == 0);
+  }
+}
+
+void MainWindow::addTab(std::shared_ptr<WindowTab> tab) noexcept {
+  const ui::Data& d = mWindow->global<ui::Data>();
+  const int sectionIndex =
+      qBound(0, d.get_current_section_index(), mSections->count() - 1);
+  if (std::shared_ptr<WindowSection> s = mSections->value(sectionIndex)) {
+    s->addTab(tab);
+  }
+}
+
+template <typename T>
+bool MainWindow::switchToTab() noexcept {
+  for (auto section : *mSections) {
+    if (section->switchToTab<T>()) {
+      return true;
+    }
+  }
+
   return false;
 }
 

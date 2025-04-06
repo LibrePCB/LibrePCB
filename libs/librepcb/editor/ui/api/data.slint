@@ -2,7 +2,10 @@ import {
     NotificationData,
     NotificationType,
     PanelPage,
-    TreeViewItemData
+    TabData,
+    TabType,
+    TreeViewItemData,
+    WindowSectionData
 } from "types.slint";
 
 export global Data {
@@ -17,6 +20,25 @@ export global Data {
 
     // Current side panel page
     in property <PanelPage> panel-page: PanelPage.home;
+
+    // Window sections
+    in property <[WindowSectionData]> sections: [
+        {
+            tabs: [
+                {
+                    type: TabType.home,
+                },
+            ],
+            current-tab-index: 0,
+        },
+        {
+            tabs: [],
+            current-tab-index: 0,
+        },
+    ];
+
+    // Which section currently has focus
+    in property <int> current-section-index: 0;
 
     // Static status bar message
     in property <string> status-bar-message;

@@ -1,0 +1,196 @@
+import { IconButton } from "widgets.slint";
+import { Tab } from "tab.slint";
+import { HomeTab } from "hometab.slint";
+import {
+    Action,
+    Backend,
+    Data,
+    Helpers,
+    TabData,
+    TabType,
+    WindowSectionData
+} from "api.slint";
+
+component TabButton inherits Rectangle {
+    in property <TabData> tab;
+    in property <bool> is-current-section: false;
+    in property <bool> is-current-tab: false;
+
+    callback clicked <=> ta.clicked;
+    callback close-clicked;
+
+    background: is-current-tab ? #505050 : (ta.has-hover ? #454545 : #3a3a3a);
+
+    // Accessibility
+    accessible-role: AccessibleRole.tab;
+    accessible-label: (tab.type == TabType.home) ? "home" : tab.title;
+    accessible-action-default => {
+        ta.clicked();
+    }
+
+    ta := TouchArea {
+        pointer-event(event) => {
+            if (event.button == PointerEventButton.middle) && (event.kind == PointerEventKind.down) {
+                close-clicked();
+                return EventResult.accept;
+            }
+            EventResult.reject
+        }
+    }
+
+    HorizontalLayout {
+        padding-left: 4px;
+        padding-right: 2px;
+        spacing: 3px;
+
+        Image {
+            width: 16px;
+            source: Helpers.get-icon-for-tab-type(tab.type);
+            colorize: txt.color;
+            accessible-role: none;
+        }
+
+        txt := Text {
+            vertical-alignment: TextVerticalAlignment.center;
+            color: is-current-tab ? white : #a0a0a0;
+            text: tab.title;
+            accessible-role: none;
+        }
+
+        if tab.type != TabType.home: close-btn := IconButton {
+            y: (parent.height - self.height) / 2;
+            width: parent.height * 0.6;
+            height: self.width;
+            icon-scale: 0.7;
+            colorize: txt.color;
+            border-radius: 3px;
+            icon: @image-url("../../../font-awesome/svgs/solid/xmark.svg");
+            accessible-label: "close tab";
+
+            clicked => {
+                close-clicked();
+            }
+        }
+    }
+
+    if is-current-section && is-current-tab: Rectangle {
+        x: 0;
+        y: 0;
+        width: 100%;
+        height: 1px;
+        background: #29d682;
+    }
+}
+
+export component WindowSection inherits Rectangle {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    property <bool> is-current-section: (section-index == Data.current-section-index);
+    property <bool> tab-open: (section.current-tab-index >= 0) && (section.current-tab-index < section.tabs.length);
+    property <TabType> tab-type: section.tabs[section.current-tab-index].type;
+
+    ta := TouchArea {
+        tab-bar := Rectangle {
+            x: 0;
+            y: 0;
+            height: 30px;
+            background: #2c2c2c;
+
+            // Accessibility
+            accessible-role: tab-list;
+
+            Rectangle {
+                x: 0;
+                width: controls-l.x;
+                clip: true;
+
+                HorizontalLayout {
+                    alignment: start;
+                    width: 100%;
+
+                    for tab[index] in section.tabs: tab-btn := TabButton {
+                        tab: tab;
+                        is-current-section: is-current-section;
+                        is-current-tab: index == section.current-tab-index;
+
+                        clicked => {
+                            Data.current-section-index = section-index;
+                            Data.sections[section-index].current-tab-index = index;
+                        }
+
+                        close-clicked => {
+                            section.tabs[section.current-tab-index].action = Action.tab-close;
+                        }
+                    }
+                }
+            }
+
+            controls-l := HorizontalLayout {
+                x: parent.width - self.width;
+                width: self.preferred-width;
+                padding: 3px;
+
+                split-btn := IconButton {
+                    width: self.height;
+                    icon-scale: 0.6;
+                    icon: @image-url("../../../bootstrap-icons/icons/layout-split.svg");
+                    tooltip: @tr("Split Section");
+                    tooltip-position: bottom-left;
+
+                    clicked => {
+                        Data.sections[section-index].action = Action.section-split;
+                    }
+                }
+
+                property <bool> can-close: (Data.sections.length > 1) && ((section.tabs.length == 0) || ((section.tabs.length == 1) && (section.tabs[0].type == TabType.home)));
+                if can-close: close-btn := IconButton {
+                    width: self.height;
+                    icon-scale: 0.6;
+                    icon: @image-url("../../../font-awesome/svgs/solid/xmark.svg");
+                    tooltip: @tr("Close Section");
+                    tooltip-position: bottom-left;
+
+                    clicked => {
+                        Data.sections[section-index].action = Action.section-close;
+                    }
+                }
+            }
+        }
+
+        Rectangle {
+            x: 0;
+            y: tab-bar.height;
+            width: root.width;
+            height: parent.height - self.y;
+
+            // Accessibility
+            accessible-role: tab-panel;
+
+            if !tab-open: empty-tab := Tab {
+                show-watermark: true;
+            }
+
+            if tab-open && (tab-type == TabType.home): home-tab := HomeTab {
+                width: 100%;
+                height: 100%;
+                section-index: section-index;
+            }
+
+            // Highlight rectangle
+            property <float> highlight-percentage: section.highlight ? 1.2 : 0;
+            animate highlight-percentage { duration: 700ms; }
+            if highlight-percentage > 0: Rectangle {
+                border-color: #29d682;
+                border-width: 3px;
+                opacity: section.highlight ? (1.2 - highlight-percentage) : 0;
+            }
+        }
+
+        pointer-event(event) => {
+            if event.kind == PointerEventKind.down {
+                Data.current-section-index = section-index;
+            }
+            EventResult.reject
+        }
+    }
+}

@@ -17,18 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_MAINWINDOW_H
-#define LIBREPCB_EDITOR_MAINWINDOW_H
+#ifndef LIBREPCB_EDITOR_HOMETAB_H
+#define LIBREPCB_EDITOR_HOMETAB_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "appwindow.h"
-#include "utils/uiobjectlist.h"
+#include "windowtab.h"
 
 #include <QtCore>
-
-#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -37,61 +34,29 @@ namespace librepcb {
 namespace editor {
 
 class GuiApplication;
-class MainWindowTestAdapter;
-class ProjectReadmeRenderer;
-class WindowSection;
-class WindowTab;
 
 /*******************************************************************************
- *  Class MainWindow
+ *  Class HomeTab
  ******************************************************************************/
 
 /**
- * @brief The MainWindow class
+ * @brief The HomeTab class
  */
-class MainWindow final : public QObject {
+class HomeTab final : public WindowTab {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  MainWindow() = delete;
-  MainWindow(const MainWindow& other) = delete;
-  explicit MainWindow(GuiApplication& app,
-                      slint::ComponentHandle<ui::AppWindow> win, int id,
-                      QObject* parent = nullptr) noexcept;
-  ~MainWindow() noexcept;
+  HomeTab() = delete;
+  HomeTab(const HomeTab& other) = delete;
+  explicit HomeTab(GuiApplication& app, QObject* parent = nullptr) noexcept;
+  ~HomeTab() noexcept;
 
   // General Methods
-  int getId() const noexcept { return mId; }
-  bool isCurrentWindow() const noexcept;
-  void makeCurrentWindow() noexcept;
-  void showPanelPage(ui::PanelPage page) noexcept;
-  void popUpNotifications() noexcept;
+  ui::TabData getUiData() const noexcept override;
 
   // Operator Overloadings
-  MainWindow& operator=(const MainWindow& rhs) = delete;
-
-signals:
-  void aboutToClose();
-
-private:
-  slint::CloseRequestResponse closeRequested() noexcept;
-  void triggerAsync(ui::Action a) noexcept;
-  bool trigger(ui::Action a) noexcept;
-  void splitSection(int index) noexcept;
-  void updateHomeTabSection() noexcept;
-  void addTab(std::shared_ptr<WindowTab> tab) noexcept;
-  template <typename T>
-  bool switchToTab() noexcept;
-
-  const int mId;
-  const QString mSettingsPrefix;
-  GuiApplication& mApp;
-  slint::ComponentHandle<ui::AppWindow> mWindow;
-  QWidget* mWidget;
-  std::shared_ptr<UiObjectList<WindowSection, ui::WindowSectionData>> mSections;
-  std::unique_ptr<ProjectReadmeRenderer> mProjectPreviewRenderer;
-  std::unique_ptr<MainWindowTestAdapter> mTestAdapter;
+  HomeTab& operator=(const HomeTab& rhs) = delete;
 };
 
 /*******************************************************************************

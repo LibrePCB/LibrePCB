@@ -169,6 +169,16 @@ export component MainMenuBar inherits Rectangle {
                         Backend.trigger(Action.window-close);
                     }
                 }
+
+                split-window-item := MenuItem {
+                    text: @tr("Split Window");
+                    icon: @image-url("../../../bootstrap-icons/icons/window-split.svg");
+                    status-tip: @tr("Split the current window into one more section");
+
+                    clicked => {
+                        Backend.trigger(Action.section-split);
+                    }
+                }
             }
         }
 

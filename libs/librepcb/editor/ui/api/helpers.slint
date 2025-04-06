@@ -1,7 +1,8 @@
 import {
     Action,
     EditorCommand,
-    NotificationType
+    NotificationType,
+    TabType
 } from "types.slint";
 import { Backend } from "backend.slint";
 
@@ -41,6 +42,15 @@ export global Helpers {
         } else {
             debug("Unhandled case in get-color-for-notification-type().");
             return white;
+        }
+    }
+
+    pure public function get-icon-for-tab-type(t: TabType) -> image {
+        if (t == TabType.home) {
+            return @image-url("../../../../bootstrap-icons/icons/house-fill.svg");
+        } else {
+            debug("Unhandled case in get-icon-for-tab-type().");
+            return @image-url("");
         }
     }
 }
