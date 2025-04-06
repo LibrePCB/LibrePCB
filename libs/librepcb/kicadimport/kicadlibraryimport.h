@@ -115,6 +115,8 @@ public:
     int fileCount = 0;
   };
 
+  static constexpr const char* COMPATIBLE_KICAD_VERSION = "9.x";
+
   // Constructors / Destructor
   KiCadLibraryImport(const KiCadLibraryImport& other) = delete;
   KiCadLibraryImport(WorkspaceLibraryDb& db, const FilePath& dstLibFp,

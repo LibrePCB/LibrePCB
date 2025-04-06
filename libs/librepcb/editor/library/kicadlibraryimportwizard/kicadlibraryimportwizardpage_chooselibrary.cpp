@@ -52,7 +52,8 @@ KiCadLibraryImportWizardPage_ChooseLibrary::
     mContext(context),
     mLogger(new MessageLogger(false)) {
   mUi->setupUi(this);
-  mUi->lblKiCadVersion->setText(mUi->lblKiCadVersion->text().arg("8.x"));
+  mUi->lblKiCadVersion->setText(mUi->lblKiCadVersion->text().arg(
+      kicadimport::KiCadLibraryImport::COMPATIBLE_KICAD_VERSION));
   mUi->edtDirPath->setText("-");  // Workaround to force initial library load.
 
   connect(mLogger.get(), &MessageLogger::msgEmitted, this,
