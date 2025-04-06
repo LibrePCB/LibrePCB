@@ -53,6 +53,7 @@ RuleCheckMessageList ComponentCheck::runChecks() const {
   checkMissingDefaultValue(msgs);
   checkDuplicateSignalNames(msgs);
   checkSignalNamesInversionSign(msgs);
+  checkSuspiciousForcedNets(msgs);
   checkMissingSymbolVariants(msgs);
   checkMissingSymbolVariantItems(msgs);
   checkNoPinsConnected(msgs);
@@ -95,6 +96,20 @@ void ComponentCheck::checkSignalNamesInversionSign(MsgList& msgs) const {
       msgs.append(
           std::make_shared<MsgNonFunctionalComponentSignalInversionSign>(
               it.ptr()));
+    }
+  }
+}
+
+void ComponentCheck::checkSuspiciousForcedNets(MsgList& msgs) const {
+  // Do not emit "suspicious forced net" for single-signal components like
+  // supply symbols (GND, VCC, ...).
+  if (mComponent.getSignals().count() > 1) {
+    for (auto it = mComponent.getSignals().begin();
+         it != mComponent.getSignals().end(); ++it) {
+      if (!it->getForcedNetName().isEmpty()) {
+        msgs.append(std::make_shared<MsgSuspiciousForcedNets>());
+        break;
+      }
     }
   }
 }
