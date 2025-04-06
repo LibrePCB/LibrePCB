@@ -219,6 +219,8 @@ add_library(
   library/dev/partlisteditorwidget.h
   library/dev/partlistmodel.cpp
   library/dev/partlistmodel.h
+  library/downloadlibrarytab.cpp
+  library/downloadlibrarytab.h
   library/eaglelibraryimportwizard/eaglelibraryimportwizard.cpp
   library/eaglelibraryimportwizard/eaglelibraryimportwizard.h
   library/eaglelibraryimportwizard/eaglelibraryimportwizard.ui

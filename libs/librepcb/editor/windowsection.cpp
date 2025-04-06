@@ -24,6 +24,7 @@
 
 #include "hometab.h"
 #include "library/createlibrarytab.h"
+#include "library/downloadlibrarytab.h"
 #include "utils/deriveduiobjectlistview.h"
 #include "windowtab.h"
 
@@ -48,6 +49,9 @@ WindowSection::WindowSection(GuiApplication& app, QObject* parent) noexcept
         mTabs,  // Tabs
         std::make_shared<DerivedUiObjectList<TabList, CreateLibraryTab,
                                              ui::CreateLibraryTabData>>(mTabs),
+        std::make_shared<DerivedUiObjectList<TabList, DownloadLibraryTab,
+                                             ui::DownloadLibraryTabData>>(
+            mTabs),
         -1,  // Current tab index
         false,  // Highlight
         ui::Action::None,  // Action

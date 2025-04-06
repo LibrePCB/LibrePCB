@@ -36,6 +36,7 @@ export enum Action {
 
     // Library
     library-create,
+    library-download,
 
     // Project
     project-new,
@@ -73,6 +74,7 @@ export struct EditorCommand {
 export enum TabType {
     home,
     create-library,
+    download-library,
 }
 
 // Window tab base data
@@ -104,10 +106,25 @@ export struct CreateLibraryTabData {
     creation-error: string,
 }
 
+// Additional data for "download library" tabs
+export struct DownloadLibraryTabData {
+    url: string,
+    url-error: string,
+    url-suggestion: string,
+    directory: string,
+    directory-default: string,
+    directory-error: string,
+    valid: bool,
+    download-running: bool,
+    download-progress: int,
+    download-status: string,  // Status or error
+}
+
 // Window section data structure
 export struct WindowSectionData {
     tabs: [TabData],
     create-library-tabs: [CreateLibraryTabData],  // Proxy view for `tabs`
+    download-library-tabs: [DownloadLibraryTabData],  // Proxy view for `tabs`
     current-tab-index: int,
     highlight: bool,
     action: Action,  // Set by UI, handled in backend

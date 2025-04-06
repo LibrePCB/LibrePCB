@@ -104,6 +104,16 @@ export component MainMenuBar inherits Rectangle {
                     }
                 }
 
+                download-library-item := MenuItem {
+                    text: @tr("Download Library") + "...";
+                    icon: @image-url("../../../bootstrap-icons/icons/cloud-arrow-down-fill.svg");
+                    status-tip: @tr("Manually download an existing library from the Internet");
+
+                    clicked => {
+                        Backend.trigger(Action.library-download);
+                    }
+                }
+
                 rescan-libraries-item := MenuItem {
                     cmd: Cmd.workspace-libraries-rescan;
                     icon: @image-url("../../../font-awesome/svgs/solid/arrows-rotate.svg");

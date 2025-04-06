@@ -32,6 +32,10 @@ export global Data {
                     type: TabType.create-library,
                     title: "New Lib",
                 },
+                {
+                    type: TabType.download-library,
+                    title: "Download Lib",
+                },
             ],
             create-library-tabs: [
                 { },
@@ -52,6 +56,22 @@ export global Data {
                     directory-error: "Directory error",
                     valid: true,
                     creation-error: "Creation error",
+                },
+            ],
+            download-library-tabs: [
+                { },
+                { },
+                {
+                    url: "",
+                    url-error: "URL error",
+                    url-suggestion: "https://example.com/library.zip",
+                    directory: "",
+                    directory-default: "My_Library.lplib",
+                    directory-error: "Directory error",
+                    valid: true,
+                    download-running: true,
+                    download-progress: 42,
+                    download-status: "Download status",
                 },
             ],
             current-tab-index: 1,

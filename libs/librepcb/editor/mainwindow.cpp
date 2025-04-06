@@ -25,6 +25,7 @@
 #include "editorcommandsetupdater.h"
 #include "guiapplication.h"
 #include "library/createlibrarytab.h"
+#include "library/downloadlibrarytab.h"
 #include "mainwindowtestadapter.h"
 #include "notificationsmodel.h"
 #include "project/projectreadmerenderer.h"
@@ -272,6 +273,12 @@ bool MainWindow::trigger(ui::Action a) noexcept {
     case ui::Action::LibraryCreate: {
       if (!switchToTab<CreateLibraryTab>()) {
         addTab(std::make_shared<CreateLibraryTab>(mApp));
+      }
+      return true;
+    }
+    case ui::Action::LibraryDownload: {
+      if (!switchToTab<DownloadLibraryTab>()) {
+        addTab(std::make_shared<DownloadLibraryTab>(mApp));
       }
       return true;
     }

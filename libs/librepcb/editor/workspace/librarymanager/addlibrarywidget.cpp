@@ -23,7 +23,6 @@
 #include "addlibrarywidget.h"
 
 #include "../../widgets/waitingspinnerwidget.h"
-#include "librarydownload.h"
 #include "onlinelibrarylistwidgetitem.h"
 #include "ui_addlibrarywidget.h"
 
@@ -51,10 +50,6 @@ AddLibraryWidget::AddLibraryWidget(Workspace& ws) noexcept
     mUi(new Ui::AddLibraryWidget),
     mManualCheckStateForAllRemoteLibraries(false) {
   mUi->setupUi(this);
-  connect(mUi->btnDownloadZip, &QPushButton::clicked, this,
-          &AddLibraryWidget::downloadZippedLibraryButtonClicked);
-  connect(mUi->edtDownloadZipUrl, &QLineEdit::textChanged, this,
-          &AddLibraryWidget::downloadZipUrlLineEditTextChanged);
   connect(mUi->btnOnlineLibrariesDownload, &QPushButton::clicked, this,
           &AddLibraryWidget::downloadOnlineLibrariesButtonClicked);
   connect(mUi->cbxOnlineLibrariesSelectAll, &QCheckBox::clicked, this,
@@ -67,15 +62,6 @@ AddLibraryWidget::AddLibraryWidget(Workspace& ws) noexcept
       "  color: transparent;"
       "  selection-color: transparent;"
       "}");
-
-  // tab "download ZIP": set placeholder texts and hide widgets
-  mUi->edtDownloadZipUrl->setPlaceholderText(
-      tr("e.g. "
-         "https://github.com/LibrePCB-Libraries/LibrePCB_Base.lplib/archive/"
-         "master.zip"));
-  mUi->prgDownloadZipProgress->setVisible(false);
-  mUi->btnDownloadZipAbort->setVisible(false);
-  mUi->lblDownloadZipStatusMsg->setText("");
 
   // select the default tab
   mUi->tabWidget->setCurrentIndex(0);
@@ -115,101 +101,6 @@ void AddLibraryWidget::updateOnlineLibraryList() noexcept {
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
-
-void AddLibraryWidget::downloadZipUrlLineEditTextChanged(
-    QString urlStr) noexcept {
-  QString left = urlStr.left(urlStr.indexOf(".lplib", Qt::CaseInsensitive));
-  QString libName = left.right(left.length() - left.lastIndexOf("/"));
-  if (libName == urlStr) {
-    libName = QUrl(urlStr).fileName();
-  }
-  QString dirname = FilePath::cleanFileName(
-      libName, FilePath::ReplaceSpaces | FilePath::KeepCase);
-  if (dirname.contains(".zip")) {
-    dirname.remove(".zip");
-  }
-  if (!dirname.isEmpty()) {
-    dirname.append(".lplib");
-  }
-  mUi->edtDownloadZipDirectory->setPlaceholderText(dirname);
-}
-
-void AddLibraryWidget::downloadZippedLibraryButtonClicked() noexcept {
-  if (mManualLibraryDownload) {
-    QMessageBox::critical(this, tr("Busy"),
-                          tr("A download is already running."));
-    return;
-  }
-
-  // get attributes
-  QUrl url = QUrl::fromUserInput(mUi->edtDownloadZipUrl->text().trimmed());
-  QString dirStr =
-      getTextOrPlaceholderFromQLineEdit(mUi->edtDownloadZipDirectory, true);
-  if ((!dirStr.isEmpty()) && (!dirStr.endsWith(".lplib"))) {
-    dirStr.append(".lplib");
-  }
-  FilePath extractToDir =
-      mWorkspace.getLibrariesPath().getPathTo("local/" % dirStr);
-
-  // check attributes validity
-  if (!url.isValid()) {
-    QMessageBox::critical(this, tr("Invalid Input"),
-                          tr("Please enter a valid URL."));
-    return;
-  }
-  if ((dirStr.isEmpty()) || (!extractToDir.isValid())) {
-    QMessageBox::critical(this, tr("Invalid Input"),
-                          tr("Please enter a valid directory."));
-    return;
-  }
-  if (extractToDir.isExistingFile() || extractToDir.isExistingDir()) {
-    QMessageBox::critical(this, tr("Directory exists already"),
-                          tr("The directory \"%1\" exists already.")
-                              .arg(extractToDir.toNative()));
-    return;
-  }
-
-  // update widgets
-  mUi->btnDownloadZip->setEnabled(false);
-  mUi->btnDownloadZipAbort->setVisible(true);
-  mUi->prgDownloadZipProgress->setVisible(true);
-  mUi->prgDownloadZipProgress->setValue(0);
-  mUi->lblDownloadZipStatusMsg->setText("");
-  mUi->lblDownloadZipStatusMsg->setStyleSheet("");
-
-  // download library
-  mManualLibraryDownload.reset(new LibraryDownload(url, extractToDir));
-  connect(mManualLibraryDownload.data(), &LibraryDownload::progressState,
-          mUi->lblDownloadZipStatusMsg, &QLabel::setText);
-  connect(mManualLibraryDownload.data(), &LibraryDownload::progressPercent,
-          mUi->prgDownloadZipProgress, &QProgressBar::setValue);
-  connect(mManualLibraryDownload.data(), &LibraryDownload::finished, this,
-          &AddLibraryWidget::downloadZipFinished);
-  connect(mUi->btnDownloadZipAbort, &QPushButton::clicked,
-          mManualLibraryDownload.data(), &LibraryDownload::abort);
-  mManualLibraryDownload->start();
-}
-
-void AddLibraryWidget::downloadZipFinished(bool success,
-                                           const QString& errMsg) noexcept {
-  Q_ASSERT(mManualLibraryDownload);
-
-  if (success) {
-    mUi->lblDownloadZipStatusMsg->setText("");
-    emit libraryAdded(mManualLibraryDownload->getDestinationDir());
-  } else {
-    mUi->lblDownloadZipStatusMsg->setText(errMsg);
-  }
-
-  // update widgets
-  mUi->btnDownloadZip->setEnabled(true);
-  mUi->btnDownloadZipAbort->setVisible(false);
-  mUi->prgDownloadZipProgress->setVisible(false);
-  mUi->lblDownloadZipStatusMsg->setStyleSheet("QLabel {color: red;}");
-
-  // delete download helper
-  mManualLibraryDownload.reset();
-}
 
 void AddLibraryWidget::onlineLibraryListReceived(
     const QJsonArray& libs) noexcept {
@@ -311,27 +202,6 @@ void AddLibraryWidget::downloadOnlineLibrariesButtonClicked() noexcept {
     } else {
       qWarning() << "Invalid item widget detected in library manager.";
     }
-  }
-}
-
-/*******************************************************************************
- *  Private Static Methods
- ******************************************************************************/
-
-QString AddLibraryWidget::getTextOrPlaceholderFromQLineEdit(
-    QLineEdit* edit, bool isFilename) noexcept {
-  if (edit) {
-    QString text = edit->text().trimmed();
-    QString placeholder = edit->placeholderText().trimmed();
-    QString retval = (text.length() > 0) ? text : placeholder;
-    if (isFilename) {
-      return FilePath::cleanFileName(
-          retval, FilePath::ReplaceSpaces | FilePath::KeepCase);
-    } else {
-      return retval;
-    }
-  } else {
-    return QString("");
   }
 }
 
