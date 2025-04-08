@@ -1,6 +1,7 @@
 import {
     Action,
     EditorCommand,
+    LengthUnit,
     NotificationType,
     TabType
 } from "types.slint";
@@ -52,9 +53,49 @@ export global Helpers {
             return @image-url("../../../../bootstrap-icons/icons/database-add.svg");
         } else if (t == TabType.download-library) {
             return @image-url("../../../../bootstrap-icons/icons/cloud-arrow-down-fill.svg");
+        } else if (t == TabType.schematic) {
+            return @image-url("../../../../font-awesome/svgs/regular/image.svg");
+        } else if (t == TabType.board-2d) {
+            return @image-url("../../../../bootstrap-icons/icons/motherboard.svg");
+        } else if (t == TabType.board-3d) {
+            return @image-url("../../../../bootstrap-icons/icons/badge-3d.svg");
         } else {
             debug("Unhandled case in get-icon-for-tab-type().");
             return @image-url("");
+        }
+    }
+
+    pure public function get-unit-short-str(u: LengthUnit) -> string {
+        if (u == LengthUnit.millimeters) {
+            return "mm";
+        } else if (u == LengthUnit.micrometers) {
+            return "μm";
+        } else if (u == LengthUnit.nanometers) {
+            return "nm";
+        } else if (u == LengthUnit.inches) {
+            return "inch";
+        } else if (u == LengthUnit.mils) {
+            return "mils";
+        } else {
+            debug("Unhandled case in get-unit-short-str().");
+            return "";
+        }
+    }
+
+    pure public function get-unit-accessibility-label(u: LengthUnit) -> string {
+        if (u == LengthUnit.millimeters) {
+            return "millimeters";
+        } else if (u == LengthUnit.micrometers) {
+            return "micrometers";
+        } else if (u == LengthUnit.nanometers) {
+            return "nanometers";
+        } else if (u == LengthUnit.inches) {
+            return "inches";
+        } else if (u == LengthUnit.mils) {
+            return "mils";
+        } else {
+            debug("Unhandled case in get-unit-accessibility-label().");
+            return "";
         }
     }
 }

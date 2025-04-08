@@ -3,6 +3,9 @@ import { Tab } from "tab.slint";
 import { HomeTab } from "hometab.slint";
 import { CreateLibraryTab } from "library/createlibrarytab.slint";
 import { DownloadLibraryTab } from "library/downloadlibrarytab.slint";
+import { SchematicTab } from "./project/schematic/schematictab.slint";
+import { Board2dTab } from "./project/board/board2dtab.slint";
+import { Board3dTab } from "./project/board/board3dtab.slint";
 import {
     Action,
     Backend,
@@ -186,6 +189,27 @@ export component WindowSection inherits Rectangle {
             }
 
             if tab-open && (tab-type == TabType.download-library): download-library-tab := DownloadLibraryTab {
+                width: 100%;
+                height: 100%;
+                section-index: section-index;
+                section: section;
+            }
+
+            if tab-open && (tab-type == TabType.schematic): schematic-tab := SchematicTab {
+                width: 100%;
+                height: 100%;
+                section-index: section-index;
+                section: section;
+            }
+
+            if tab-open && (tab-type == TabType.board-2d): board-2d-tab := Board2dTab {
+                width: 100%;
+                height: 100%;
+                section-index: section-index;
+                section: section;
+            }
+
+            if tab-open && (tab-type == TabType.board-3d): board-3d-tab := Board3dTab {
                 width: 100%;
                 height: 100%;
                 section-index: section-index;

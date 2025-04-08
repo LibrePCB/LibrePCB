@@ -1,0 +1,129 @@
+import { LineEdit, ComboBox, Palette } from "std-widgets.slint";
+import { WindowSectionData, SchematicTabData } from "../../api/types.slint";
+
+export component AddComponentToolBar inherits HorizontalLayout {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    property <[SchematicTabData]> tabs: section.schematic-tabs;
+
+    spacing: 5px;
+
+    Text {
+        vertical-alignment: center;
+        text: @tr("Value:");
+    }
+
+    LineEdit {
+        property <string> value: tabs[section.current-tab-index].tool-value.text;
+        property <bool> disable-update: false;
+
+        changed value => {
+            if !disable-update {
+                self.text = value;
+            }
+        }
+
+        changed has-focus => {
+            if !self.has-focus {
+                disable-update = false;
+                self.text = value;
+            }
+        }
+
+        init => {
+            self.text = value;
+        }
+
+        edited(text) => {
+            disable-update = true;
+            tabs[section.current-tab-index].tool-value.text = text;
+        }
+    }
+
+    if tabs[section.current-tab-index].tool-value.suggestions.length > 0: TouchArea {
+        width: 10px;
+
+        Text {
+            font-size: parent.has-hover ? 10px : 8px;
+            color: parent.has-hover ? white : #cccccc;
+            text: "▼";
+        }
+
+        popup-suggestions := PopupWindow {
+            x: 0;
+            y: root.height;
+
+            VerticalLayout {
+                for text in tabs[section.current-tab-index].tool-value.suggestions: TouchArea {
+                    Rectangle {
+                        background: parent.has-hover ? #505050 : Palette.background;
+
+                        VerticalLayout {
+                            padding: 6px;
+
+                            Text {
+                                text: text;
+                            }
+                        }
+                    }
+
+                    clicked => {
+                        tabs[section.current-tab-index].tool-value.text = text;
+                    }
+                }
+            }
+        }
+
+        clicked => {
+            popup-suggestions.show();
+        }
+    }
+
+    if tabs[section.current-tab-index].tool-attribute-value.enabled: LineEdit {
+        property <string> value: tabs[section.current-tab-index].tool-attribute-value.text;
+        property <bool> disable-update: false;
+
+        width: 150px;
+        placeholder-text: tabs[section.current-tab-index].tool-attribute-value.placeholder;
+
+        changed value => {
+            if !disable-update {
+                self.text = value;
+            }
+        }
+
+        changed has-focus => {
+            if !self.has-focus {
+                disable-update = false;
+                self.text = value;
+            }
+        }
+
+        init => {
+            self.text = value;
+        }
+
+        edited(text) => {
+            disable-update = true;
+            tabs[section.current-tab-index].tool-attribute-value.text = text;
+        }
+    }
+
+    if tabs[section.current-tab-index].tool-attribute-unit.items.length > 0: ComboBox {
+        property <int> data-index: tabs[section.current-tab-index].tool-attribute-unit.current-index;
+
+        width: 100px;
+        model: tabs[section.current-tab-index].tool-attribute-unit.items;
+        current-index: data-index;
+
+        changed data-index => {
+            self.current-index = data-index;
+        }
+
+        changed current-index => {
+            if (tabs[section.current-tab-index].tool-attribute-unit.current-index != self.current-index) {
+                tabs[section.current-tab-index].tool-attribute-unit.current-index = self.current-index;
+            }
+        }
+    }
+}
