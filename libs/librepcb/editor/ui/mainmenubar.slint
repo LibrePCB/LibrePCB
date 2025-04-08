@@ -85,12 +85,23 @@ export component MainMenuBar inherits Rectangle {
 
                 MenuSeparator { }
 
-                library-manager-item := MenuItem {
-                    cmd: Cmd.library-manager;
-                    icon: @image-url("../../../bootstrap-icons/icons/database.svg");
+                create-library-item := MenuItem {
+                    text: @tr("New Library") + "...";
+                    icon: @image-url("../../../bootstrap-icons/icons/database-add.svg");
+                    status-tip: @tr("Create a new local workspace library");
 
                     clicked => {
-                        Backend.trigger(Action.library-manager);
+                        Backend.trigger(Action.library-create);
+                    }
+                }
+
+                download-library-item := MenuItem {
+                    text: @tr("Download Library") + "...";
+                    icon: @image-url("../../../bootstrap-icons/icons/cloud-arrow-down-fill.svg");
+                    status-tip: @tr("Manually download an existing library from the Internet");
+
+                    clicked => {
+                        Backend.trigger(Action.library-download);
                     }
                 }
 
@@ -102,6 +113,8 @@ export component MainMenuBar inherits Rectangle {
                         Backend.trigger(Action.workspace-libraries-rescan);
                     }
                 }
+
+                MenuSeparator { }
 
                 open-workspace-folder-item := MenuItem {
                     cmd: Cmd.file-manager;
@@ -167,6 +180,16 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Backend.trigger(Action.window-close);
+                    }
+                }
+
+                split-window-item := MenuItem {
+                    text: @tr("Split Window");
+                    icon: @image-url("../../../bootstrap-icons/icons/window-split.svg");
+                    status-tip: @tr("Split the current window into one more section");
+
+                    clicked => {
+                        Backend.trigger(Action.section-split);
                     }
                 }
             }

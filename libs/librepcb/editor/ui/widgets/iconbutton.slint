@@ -5,6 +5,7 @@ import { Data } from "../api.slint";
 export enum ToolTipPosition {
     bottom,
     bottom-left,
+    left,
 }
 
 export component IconButton inherits Rectangle {
@@ -13,6 +14,7 @@ export component IconButton inherits Rectangle {
     in property <length> icon-size: min(root.width, root.height) * icon-scale;
     in property <angle> icon-rotation: 0deg;
     in property <color> colorize: transparent;
+    in property <color> background-color: transparent;
     in property <string> tooltip;
     in property <bool> tooltip-delayed: true;
     in property <ToolTipPosition> tooltip-position: bottom;
@@ -31,7 +33,7 @@ export component IconButton inherits Rectangle {
         if (!hyperlink-style) && enabled && (!read-only) && ta.has-hover {
             #454545
         } else {
-            transparent
+            background-color
         }
     }
 
@@ -61,13 +63,21 @@ export component IconButton inherits Rectangle {
 
         if self.has-hover && (!self.pressed) && (!tooltip.is-empty): tt := ToolTip {
             x: {
-                if tooltip-position == ToolTipPosition.bottom-left {
+                if tooltip-position == ToolTipPosition.left {
+                    -5px - self.width;
+                } else if tooltip-position == ToolTipPosition.bottom-left {
                     parent.width - self.width
                 } else {
                     (parent.width - self.width) / 2
                 }
             };
-            y: parent.height + 5px;
+            y: {
+                if tooltip-position == ToolTipPosition.left {
+                    (parent.height - self.height) / 2
+                } else {
+                    parent.height + 5px
+                }
+            };
             text: tooltip;
             delayed: tooltip-delayed;
         }

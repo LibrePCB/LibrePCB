@@ -1,8 +1,13 @@
 import {
+    LibraryData,
+    LibraryListData,
     NotificationData,
     NotificationType,
     PanelPage,
-    TreeViewItemData
+    TabData,
+    TabType,
+    TreeViewItemData,
+    WindowSectionData
 } from "types.slint";
 
 export global Data {
@@ -17,6 +22,70 @@ export global Data {
 
     // Current side panel page
     in property <PanelPage> panel-page: PanelPage.home;
+
+    // Window sections
+    in property <[WindowSectionData]> sections: [
+        {
+            tabs: [
+                {
+                    type: TabType.home,
+                },
+                {
+                    type: TabType.create-library,
+                    title: "New Lib",
+                },
+                {
+                    type: TabType.download-library,
+                    title: "Download Lib",
+                },
+            ],
+            create-library-tabs: [
+                { },
+                {
+                    name: "My Library",
+                    name-error: "Name error",
+                    description: "",
+                    author: "",
+                    author-default: "Me",
+                    version: "",
+                    version-default: "0.1",
+                    version-error: "Version error",
+                    url: "",
+                    url-error: "URL error",
+                    cc0: false,
+                    directory: "",
+                    directory-default: "My_Library.lplib",
+                    directory-error: "Directory error",
+                    valid: true,
+                    creation-error: "Creation error",
+                },
+            ],
+            download-library-tabs: [
+                { },
+                { },
+                {
+                    url: "",
+                    url-error: "URL error",
+                    url-suggestion: "https://example.com/library.zip",
+                    directory: "",
+                    directory-default: "My_Library.lplib",
+                    directory-error: "Directory error",
+                    valid: true,
+                    download-running: true,
+                    download-progress: 42,
+                    download-status: "Download status",
+                },
+            ],
+            current-tab-index: 1,
+        },
+        {
+            tabs: [],
+            current-tab-index: 0,
+        },
+    ];
+
+    // Which section currently has focus
+    in property <int> current-section-index: 0;
 
     // Static status bar message
     in property <string> status-bar-message;
@@ -143,4 +212,114 @@ export global Data {
 
     // Notifications: Popup shown status
     in property <bool> notifications-shown: true;
+
+    // Locally installed libraries (may be filtered)
+    in property <[LibraryData]> local-libraries: [
+        {
+            path: "/foo/bar",
+            icon: @image-url("../../../../../img/app/librepcb.svg"),
+            name: "My Library",
+            installed-version: "1.0",
+            highlight: true,
+        },
+        {
+            path: "/foo/bar",
+            icon: @image-url("../../../../../img/app/librepcb.svg"),
+            name: "LibrePCB Base",
+            description: "Official LibrePCB Base Library.",
+            installed-version: "1.0",
+            online-version: "1.1",
+            outdated: true,
+        },
+        {
+            path: "/foo/bar",
+            icon: @image-url("../../../../../img/app/librepcb.svg"),
+            name: "LibrePCB Base",
+            description: "Official LibrePCB Base Library.",
+            installed-version: "1.1",
+            online-version: "1.1",
+        },
+    ];
+
+    // Metadata about local-libraries
+    in property <LibraryListData> local-libraries-data: {
+        refreshing-error: "Local error!",
+        count: 3,
+    };
+
+    // Remote libraries, either installed or not (may be filtered)
+    in property <[LibraryData]> remote-libraries: [
+        {
+            uuid: "x",
+            icon: @image-url("../../../../../img/app/librepcb.svg"),
+            name: "Microchip Technology / Atmel",
+            description: "Integrated circuits and more (unofficial).",
+            installed-version: "0.5",
+            online-version: "0.7",
+            outdated: true,
+            checked: true,
+        },
+        {
+            uuid: "x",
+            icon: @image-url("../../../../../img/app/librepcb.svg"),
+            name: "LibrePCB Base",
+            description: "Official LibrePCB Base Library.",
+            installed-version: "1.2.3",
+            online-version: "1.2.3",
+            checked: false,
+        },
+        {
+            uuid: "x",
+            icon: @image-url("../../../../../img/app/librepcb.svg"),
+            name: "LibrePCB Connectors",
+            description: "Official LibrePCB Connectors Library.",
+            installed-version: "1.2.3",
+            online-version: "1.2.3",
+            checked: true,
+        },
+        {
+            icon: @image-url("../../../../../img/app/librepcb.svg"),
+            name: "LibrePCB Connectors",
+            description: "Official LibrePCB Connectors Library.",
+            installed-version: "1.2.3",
+            online-version: "1.2.3",
+        },
+        {
+            uuid: "x",
+            icon: @image-url("../../../../../img/app/librepcb.svg"),
+            name: "LibrePCB Integrated Circuits",
+            description: "Official LibrePCB Integrated Circuits Library",
+            online-version: "0.7",
+            checked: true,
+        },
+        {
+            uuid: "x",
+            icon: @image-url("../../../../../img/app/librepcb.svg"),
+            name: "Microchip Technology / Atmel",
+            description: "Integrated circuits and more (unofficial).",
+            online-version: "0.8",
+            recommended: true,
+            progress: 42,
+        },
+    ];
+
+    // Metadata about remote-libraries
+    in property <LibraryListData> remote-libraries-data: {
+        refreshing-error: "Some error occurred.\nFoo bar...",
+        count: 5,
+        installed: 3,
+        outdated: 2,
+        pending-installs: 1,
+        pending-updates: 2,
+        pending-uninstalls: 3,
+        pending-oneway-uninstalls: 1,
+        operation-in-progress: false,
+    };
+
+    // CALCULATED, DO NET SET IN BACKEND
+    in property <int> remote-libraries-pending-operations: remote-libraries-data.pending-installs + remote-libraries-data.pending-updates + remote-libraries-data.pending-uninstalls;
+    in property <bool> libraries-operation-in-progress: local-libraries-data.operation-in-progress || remote-libraries-data.operation-in-progress;
+
+    // Filter applied to both local libraries and remote libraries
+    in property <string> libraries-filter: "Foo";
 }

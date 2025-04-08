@@ -20,16 +20,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "mainwindowtestadapter.h"
-
-#include "guiapplication.h"
-#include "library/libraryeditor.h"
-
-#include <librepcb/core/workspace/workspace.h>
-#include <librepcb/core/workspace/workspacelibrarydb.h>
+#include "hometab.h"
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace
@@ -41,51 +34,23 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-MainWindowTestAdapter::MainWindowTestAdapter(GuiApplication& app,
-                                             QWidget* parent) noexcept
-  : QWidget(parent), mApp(app) {
-  setObjectName("testAdapter");
-
-  connect(&mApp.getWorkspace().getLibraryDb(), &WorkspaceLibraryDb::scanStarted,
-          this, [this]() { mLibraryScanFinished = false; });
-  connect(&mApp.getWorkspace().getLibraryDb(),
-          &WorkspaceLibraryDb::scanFinished, this,
-          [this]() { mLibraryScanFinished = true; });
+HomeTab::HomeTab(GuiApplication& app, QObject* parent) noexcept
+  : WindowTab(app, parent) {
 }
 
-MainWindowTestAdapter::~MainWindowTestAdapter() noexcept {
+HomeTab::~HomeTab() noexcept {
 }
 
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
 
-QVariant MainWindowTestAdapter::trigger(QVariant action) noexcept {
-  if (action == "workspace-switch") {
-    emit actionTriggered(ui::Action::WorkspaceSwitch);
-  } else if (action == "workspace-settings") {
-    emit actionTriggered(ui::Action::WorkspaceSettings);
-  } else if (action == "project-new") {
-    emit actionTriggered(ui::Action::ProjectNew);
-  } else if (action == "project-open") {
-    emit actionTriggered(ui::Action::ProjectOpen);
-  } else {
-    qCritical() << "Unknown action triggered:" << action;
-  }
-
-  return QVariant();
-}
-
-QVariant MainWindowTestAdapter::openLibraryEditor(QVariant path) noexcept {
-  try {
-    const FilePath fp =
-        mApp.getWorkspace().getLibrariesPath().getPathTo(path.toString());
-    auto editor = new LibraryEditor(mApp.getWorkspace(), fp, false);
-    editor->show();
-    return QVariant();
-  } catch (const Exception& e) {
-    return e.getMsg();
-  }
+ui::TabData HomeTab::getUiData() const noexcept {
+  return ui::TabData{
+      ui::TabType::Home,  // Type
+      slint::SharedString(),  // Title
+      ui::Action::None,  // Action
+  };
 }
 
 /*******************************************************************************

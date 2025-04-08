@@ -17,16 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_MAINWINDOWTESTADAPTER_H
-#define LIBREPCB_EDITOR_MAINWINDOWTESTADAPTER_H
+#ifndef LIBREPCB_EDITOR_HOMETAB_H
+#define LIBREPCB_EDITOR_HOMETAB_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "appwindow.h"
+#include "windowtab.h"
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -37,39 +36,27 @@ namespace editor {
 class GuiApplication;
 
 /*******************************************************************************
- *  Class MainWindowTestAdapter
+ *  Class HomeTab
  ******************************************************************************/
 
 /**
- * @brief Adapter class for automated GUI tests
+ * @brief The HomeTab class
  */
-class MainWindowTestAdapter final : public QWidget {
+class HomeTab final : public WindowTab {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  MainWindowTestAdapter() = delete;
-  MainWindowTestAdapter(const MainWindowTestAdapter& other) = delete;
-  explicit MainWindowTestAdapter(GuiApplication& app,
-                                 QWidget* parent = nullptr) noexcept;
-  ~MainWindowTestAdapter() noexcept;
+  HomeTab() = delete;
+  HomeTab(const HomeTab& other) = delete;
+  explicit HomeTab(GuiApplication& app, QObject* parent = nullptr) noexcept;
+  ~HomeTab() noexcept;
+
+  // General Methods
+  ui::TabData getUiData() const noexcept override;
 
   // Operator Overloadings
-  MainWindowTestAdapter& operator=(const MainWindowTestAdapter& rhs) = delete;
-
-public slots:
-  QVariant trigger(QVariant action) noexcept;
-  QVariant isLibraryScanFinished(QVariant) const noexcept {
-    return mLibraryScanFinished;
-  }
-  QVariant openLibraryEditor(QVariant path) noexcept;
-
-signals:
-  void actionTriggered(ui::Action a);
-
-private:
-  GuiApplication& mApp;
-  bool mLibraryScanFinished = false;
+  HomeTab& operator=(const HomeTab& rhs) = delete;
 };
 
 /*******************************************************************************

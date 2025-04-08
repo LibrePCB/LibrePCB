@@ -10,6 +10,7 @@ import {
 
 enum Emblem {
     none,
+    ok,
     warning,
     running,
 }
@@ -64,6 +65,23 @@ component SideBarButton inherits Rectangle {
         colorize: enabled ? white : gray;
         source: icon;
         accessible-role: none;
+    }
+
+    if emblem == Emblem.ok: Rectangle {
+        x: parent.width - self.width - 6px;
+        y: parent.height - self.height - 5px;
+        width: 10px;
+        height: self.width;
+        background: root.background;
+        border-radius: self.height / 2;
+
+        Image {
+            width: 100%;
+            height: 100%;
+            image-fit: contain;
+            colorize: lime;
+            source: @image-url("../../../font-awesome/svgs/solid/check.svg");
+        }
     }
 
     if emblem == Emblem.warning: Rectangle {
@@ -139,14 +157,43 @@ export component SideBar inherits Rectangle {
             }
         }
 
-        library-manager-btn := SideBarButton {
+        libraries-btn := SideBarButton {
             icon: @image-url("../../../bootstrap-icons/icons/database.svg");
             tooltip: Cmd.library-manager.text;
             shortcut: Cmd.library-manager.shortcut;
-            checked: false;
+            checked: Data.panel-page == PanelPage.libraries;
+
+            states [
+                // Note: Do not display the "refreshing" state as it is usually
+                // very short would would look like a flicker.
+                busy when Data.libraries-operation-in-progress: {
+                    emblem: Emblem.running;
+                }
+                local-error when !Data.local-libraries-data.refreshing-error.is-empty: {
+                    emblem: Emblem.warning;
+                }
+                remote-error when !Data.remote-libraries-data.refreshing-error.is-empty: {
+                    emblem: Emblem.warning;
+                }
+                outdated when Data.remote-libraries-data.outdated > 0: {
+                    emblem: Emblem.none;
+                    status: Data.remote-libraries-data.outdated;
+                    status-color: black;
+                    status-background: #d4d400;
+                }
+                no-libraries when (Data.local-libraries-data.count == 0) && (Data.remote-libraries-data.installed == 0): {
+                    emblem: Emblem.none;
+                    status: "0";
+                    status-color: black;
+                    status-background: #d4d400;
+                }
+                up-to-date when Data.remote-libraries-data.all-up-to-date: {
+                    emblem: Emblem.ok;
+                }
+            ]
 
             clicked => {
-                Backend.trigger(Action.library-manager);
+                Data.panel-page = PanelPage.libraries;
             }
         }
 

@@ -17,82 +17,52 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_ADDLIBRARYWIDGET_H
-#define LIBREPCB_EDITOR_ADDLIBRARYWIDGET_H
+#ifndef LIBREPCB_EDITOR_SLINTKEYEVENTTEXTBUILDER_H
+#define LIBREPCB_EDITOR_SLINTKEYEVENTTEXTBUILDER_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/fileio/filepath.h>
-
 #include <QtCore>
-#include <QtWidgets>
 
-#include <memory>
+#include <slint.h>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class ApiEndpoint;
-class Workspace;
-
 namespace editor {
 
-class LibraryDownload;
-
-namespace Ui {
-class AddLibraryWidget;
-}
-
 /*******************************************************************************
- *  Class AddLibraryWidget
+ *  Class SlintKeyEventTextBuilder
  ******************************************************************************/
 
 /**
- * @brief The AddLibraryWidget class
+ * @brief The SlintKeyEventTextBuilder class
  */
-class AddLibraryWidget final : public QWidget {
+class SlintKeyEventTextBuilder final : public QObject {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  AddLibraryWidget() = delete;
-  AddLibraryWidget(const AddLibraryWidget& other) = delete;
-  explicit AddLibraryWidget(Workspace& ws) noexcept;
-  ~AddLibraryWidget() noexcept;
+  SlintKeyEventTextBuilder(const SlintKeyEventTextBuilder& other) = delete;
+  explicit SlintKeyEventTextBuilder(QObject* parent = nullptr) noexcept;
+  ~SlintKeyEventTextBuilder() noexcept;
 
   // General Methods
-  void updateOnlineLibraryList() noexcept;
+  const QString& getText() const noexcept { return mText; }
+  slint::private_api::EventResult process(
+      const slint::private_api::KeyEvent& e) noexcept;
 
   // Operator Overloadings
-  AddLibraryWidget& operator=(const AddLibraryWidget& rhs) = delete;
+  SlintKeyEventTextBuilder& operator=(const SlintKeyEventTextBuilder& rhs) =
+      delete;
 
 signals:
-  void libraryAdded(const FilePath& libDir);
+  void textChanged(QString text);
 
-private:  // Methods
-  void localLibraryNameLineEditTextChanged(QString name) noexcept;
-  void downloadZipUrlLineEditTextChanged(QString urlStr) noexcept;
-  void createLocalLibraryButtonClicked() noexcept;
-  void downloadZippedLibraryButtonClicked() noexcept;
-  void downloadZipFinished(bool success, const QString& errMsg) noexcept;
-  void onlineLibraryListReceived(const QJsonArray& libs) noexcept;
-  void errorWhileFetchingLibraryList(const QString& errorMsg) noexcept;
-  void clearOnlineLibraryList() noexcept;
-  void repoLibraryDownloadCheckedChanged(bool checked) noexcept;
-  void downloadOnlineLibrariesButtonClicked() noexcept;
-
-  static QString getTextOrPlaceholderFromQLineEdit(QLineEdit* edit,
-                                                   bool isFilename) noexcept;
-
-private:  // Data
-  Workspace& mWorkspace;
-  QScopedPointer<Ui::AddLibraryWidget> mUi;
-  QScopedPointer<LibraryDownload> mManualLibraryDownload;
-  QList<std::shared_ptr<ApiEndpoint>> mApiEndpoints;
-  bool mManualCheckStateForAllRemoteLibraries;
+private:
+  QString mText;
 };
 
 /*******************************************************************************

@@ -155,6 +155,12 @@ inline static QString cleanElementName(const QString& userInput) noexcept {
   return ret;
 }
 
+inline static std::optional<ElementName> parseElementName(
+    const QString& name) noexcept {
+  return ElementNameConstraint()(name) ? ElementName(name)
+                                       : std::optional<ElementName>();
+}
+
 inline static ElementName elementNameFromTr(const char* context,
                                             const char* textNoTr) noexcept {
   Q_ASSERT(ElementNameConstraint()(textNoTr));  // textNoTr must be valid!!!

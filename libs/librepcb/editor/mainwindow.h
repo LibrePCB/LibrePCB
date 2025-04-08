@@ -24,8 +24,11 @@
  *  Includes
  ******************************************************************************/
 #include "appwindow.h"
+#include "utils/uiobjectlist.h"
 
 #include <QtCore>
+
+#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -36,6 +39,8 @@ namespace editor {
 class GuiApplication;
 class MainWindowTestAdapter;
 class ProjectReadmeRenderer;
+class WindowSection;
+class WindowTab;
 
 /*******************************************************************************
  *  Class MainWindow
@@ -73,12 +78,18 @@ private:
   slint::CloseRequestResponse closeRequested() noexcept;
   void triggerAsync(ui::Action a) noexcept;
   bool trigger(ui::Action a) noexcept;
+  void splitSection(int index) noexcept;
+  void updateHomeTabSection() noexcept;
+  void addTab(std::shared_ptr<WindowTab> tab) noexcept;
+  template <typename T>
+  bool switchToTab() noexcept;
 
   const int mId;
   const QString mSettingsPrefix;
   GuiApplication& mApp;
   slint::ComponentHandle<ui::AppWindow> mWindow;
   QWidget* mWidget;
+  std::shared_ptr<UiObjectList<WindowSection, ui::WindowSectionData>> mSections;
   std::unique_ptr<ProjectReadmeRenderer> mProjectPreviewRenderer;
   std::unique_ptr<MainWindowTestAdapter> mTestAdapter;
 };

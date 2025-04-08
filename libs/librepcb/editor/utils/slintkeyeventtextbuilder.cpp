@@ -20,16 +20,11 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "mainwindowtestadapter.h"
+#include "slintkeyeventtextbuilder.h"
 
-#include "guiapplication.h"
-#include "library/libraryeditor.h"
-
-#include <librepcb/core/workspace/workspace.h>
-#include <librepcb/core/workspace/workspacelibrarydb.h>
+#include "slinthelpers.h"
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace
@@ -41,50 +36,43 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-MainWindowTestAdapter::MainWindowTestAdapter(GuiApplication& app,
-                                             QWidget* parent) noexcept
-  : QWidget(parent), mApp(app) {
-  setObjectName("testAdapter");
-
-  connect(&mApp.getWorkspace().getLibraryDb(), &WorkspaceLibraryDb::scanStarted,
-          this, [this]() { mLibraryScanFinished = false; });
-  connect(&mApp.getWorkspace().getLibraryDb(),
-          &WorkspaceLibraryDb::scanFinished, this,
-          [this]() { mLibraryScanFinished = true; });
+SlintKeyEventTextBuilder::SlintKeyEventTextBuilder(QObject* parent) noexcept
+  : QObject(parent), mText() {
 }
 
-MainWindowTestAdapter::~MainWindowTestAdapter() noexcept {
+SlintKeyEventTextBuilder::~SlintKeyEventTextBuilder() noexcept {
 }
 
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
 
-QVariant MainWindowTestAdapter::trigger(QVariant action) noexcept {
-  if (action == "workspace-switch") {
-    emit actionTriggered(ui::Action::WorkspaceSwitch);
-  } else if (action == "workspace-settings") {
-    emit actionTriggered(ui::Action::WorkspaceSettings);
-  } else if (action == "project-new") {
-    emit actionTriggered(ui::Action::ProjectNew);
-  } else if (action == "project-open") {
-    emit actionTriggered(ui::Action::ProjectOpen);
-  } else {
-    qCritical() << "Unknown action triggered:" << action;
+slint::private_api::EventResult SlintKeyEventTextBuilder::process(
+    const slint::private_api::KeyEvent& e) noexcept {
+  if (e.event_type != slint::private_api::KeyEventType::KeyPressed) {
+    return slint::private_api::EventResult::Reject;
   }
 
-  return QVariant();
-}
+  const QString text(s2q(e.text));
+  if (text.size() != 1) {
+    return slint::private_api::EventResult::Reject;
+  }
+  const QChar c = text.front();
 
-QVariant MainWindowTestAdapter::openLibraryEditor(QVariant path) noexcept {
-  try {
-    const FilePath fp =
-        mApp.getWorkspace().getLibrariesPath().getPathTo(path.toString());
-    auto editor = new LibraryEditor(mApp.getWorkspace(), fp, false);
-    editor->show();
-    return QVariant();
-  } catch (const Exception& e) {
-    return e.getMsg();
+  if ((c == '\x1b') && (mText.size() > 0)) {
+    mText.clear();
+    emit textChanged(mText);
+    return slint::private_api::EventResult::Accept;
+  } else if ((c == '\b') && (mText.size() > 0)) {
+    mText.chop(1);
+    emit textChanged(mText);
+    return slint::private_api::EventResult::Accept;
+  } else if (c.isPrint()) {
+    mText += c;
+    emit textChanged(mText);
+    return slint::private_api::EventResult::Accept;
+  } else {
+    return slint::private_api::EventResult::Reject;
   }
 }
 

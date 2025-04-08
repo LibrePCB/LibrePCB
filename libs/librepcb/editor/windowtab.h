@@ -17,66 +17,64 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_LIBRARYINFOWIDGET_H
-#define LIBREPCB_EDITOR_LIBRARYINFOWIDGET_H
+#ifndef LIBREPCB_EDITOR_WINDOWTAB_H
+#define LIBREPCB_EDITOR_WINDOWTAB_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/fileio/filepath.h>
+#include "appwindow.h"
+
+#include <librepcb/core/utils/signalslot.h>
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class Library;
-class Workspace;
-
 namespace editor {
 
-namespace Ui {
-class LibraryInfoWidget;
-}
+class GuiApplication;
 
 /*******************************************************************************
- *  Class LibraryInfoWidget
+ *  Class WindowTab
  ******************************************************************************/
 
 /**
- * @brief The LibraryInfoWidget class
+ * @brief The WindowTab class
  */
-class LibraryInfoWidget final : public QWidget {
+class WindowTab : public QObject {
   Q_OBJECT
 
 public:
-  // Constructors / Destructor
-  LibraryInfoWidget() = delete;
-  LibraryInfoWidget(const LibraryInfoWidget& other) = delete;
-  LibraryInfoWidget(Workspace& ws, const FilePath& libDir);
-  ~LibraryInfoWidget() noexcept;
+  // Signals
+  Signal<WindowTab> onUiDataChanged;
 
-  // Getters
-  QString getName() const noexcept;
+  // Constructors / Destructor
+  WindowTab() = delete;
+  WindowTab(const WindowTab& other) = delete;
+  explicit WindowTab(GuiApplication& app, QObject* parent = nullptr) noexcept;
+  virtual ~WindowTab() noexcept;
+
+  // General Methods
+  virtual ui::TabData getUiData() const noexcept = 0;
+  virtual void setUiData(const ui::TabData& data) noexcept;
+  virtual void activate() noexcept {}
+  virtual void deactivate() noexcept {}
 
   // Operator Overloadings
-  LibraryInfoWidget& operator=(const LibraryInfoWidget& rhs) = delete;
+  WindowTab& operator=(const WindowTab& rhs) = delete;
 
 signals:
-  void openLibraryEditorTriggered(const FilePath& libDir);
+  void panelPageRequested(ui::PanelPage p);
+  void closeRequested();
+  void statusBarMessageChanged(const QString& message, int timeoutMs);
 
-private:  // Methods
-  void btnOpenLibraryEditorClicked() noexcept;
-  void btnRemoveLibraryClicked() noexcept;
-  bool isRemoteLibrary() const noexcept;
+protected:
+  virtual void triggerAsync(ui::Action a) noexcept;
 
-private:  // Data
-  QScopedPointer<Ui::LibraryInfoWidget> mUi;
-  Workspace& mWorkspace;
-  FilePath mLibDir;
+  GuiApplication& mApp;
 };
 
 /*******************************************************************************

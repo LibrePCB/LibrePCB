@@ -4,8 +4,9 @@ import "../../../../share/librepcb/fonts/NotoSansMono-Regular.ttf";
 import { MainMenuBar } from "mainmenubar.slint";
 import { SideBar } from "sidebar.slint";
 import { HomePanel } from "homepanel.slint";
+import { LibrariesPanel } from "library/librariespanel.slint";
 import { AboutPanel } from "aboutpanel.slint";
-import { HomeTab } from "hometab.slint";
+import { WindowSection } from "windowsection.slint";
 import { StatusBar } from "statusbar.slint";
 import {
     Action,
@@ -20,7 +21,8 @@ import {
 export { Backend, Data, Cmd as EditorCommandSet }
 
 export component AppWindow inherits Window {
-    property <length> panel-width: min(self.width * 0.3, 350px);
+    property <float> panel-width-factor: (Data.sections.length > 1) ? 0.25 : 0.3;
+    property <length> panel-width: min(self.width * panel-width-factor, 350px);
 
     title: Data.window-title;
     background: #2a2a2a;
@@ -48,7 +50,7 @@ export component AppWindow inherits Window {
             } else if Helpers.is-shortcut(event, Cmd.workspace-libraries-rescan) {
                 Backend.trigger(Action.workspace-libraries-rescan);
             } else if Helpers.is-shortcut(event, Cmd.library-manager) {
-                Backend.trigger(Action.library-manager);
+                Data.panel-page = PanelPage.libraries;
             } else if Helpers.is-shortcut(event, Cmd.project-new) {
                 Backend.trigger(Action.project-new);
             } else if Helpers.is-shortcut(event, Cmd.project-open) {
@@ -106,6 +108,14 @@ export component AppWindow inherits Window {
             height: sidebar.height;
         }
 
+        if Data.panel-page == PanelPage.libraries: LibrariesPanel {
+            x: sidebar.width;
+            y: sidebar.y;
+            z: 80; // For the tooltips.
+            width: panel-width;
+            height: sidebar.height;
+        }
+
         if Data.panel-page == PanelPage.about: AboutPanel {
             x: sidebar.width;
             y: sidebar.y;
@@ -125,8 +135,17 @@ export component AppWindow inherits Window {
                 width: 1px;
             }
 
-            home-tab := HomeTab {
-                width: parent.width - 1px;
+            for section[i] in Data.sections: HorizontalLayout {
+                window-section := WindowSection {
+                    section-index: i;
+                    section: section;
+                }
+
+                if i < (Data.sections.length - 1): Rectangle {
+                    width: 1px;
+                    horizontal-stretch: 0;
+                    background: #555555;
+                }
             }
         }
 

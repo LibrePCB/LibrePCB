@@ -110,6 +110,7 @@ add_executable(
   editor/dialogs/dxfimportdialogtest.cpp
   editor/dialogs/graphicsexportdialogtest.cpp
   editor/library/cat/categorytreebuildertest.cpp
+  editor/library/librarydownloadtest.cpp
   editor/library/pkg/footprintclipboarddatatest.cpp
   editor/library/sym/symbolclipboarddatatest.cpp
   editor/modelview/pathmodeltest.cpp
@@ -125,7 +126,6 @@ add_executable(
   editor/widgets/positivelengthedittest.cpp
   editor/widgets/unsignedlengthedittest.cpp
   editor/workspace/categorytreemodeltest.cpp
-  editor/workspace/librarymanager/librarydownloadtest.cpp
   kicadimport/kicadlibraryimporttest.cpp
   main.cpp
   testhelpers.cpp

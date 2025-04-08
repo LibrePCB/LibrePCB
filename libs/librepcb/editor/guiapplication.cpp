@@ -24,6 +24,7 @@
 
 #include "dialogs/directorylockhandlerdialog.h"
 #include "dialogs/filedialog.h"
+#include "library/librariesmodel.h"
 #include "library/libraryeditor.h"
 #include "mainwindow.h"
 #include "notification.h"
@@ -31,10 +32,10 @@
 #include "project/newprojectwizard/newprojectwizard.h"
 #include "project/projecteditor.h"
 #include "utils/slinthelpers.h"
+#include "utils/slintkeyeventtextbuilder.h"
 #include "workspace/desktopintegration.h"
 #include "workspace/desktopservices.h"
 #include "workspace/initializeworkspacewizard/initializeworkspacewizard.h"
-#include "workspace/librarymanager/librarymanager.h"
 #include "workspace/projectlibraryupdater/projectlibraryupdater.h"
 #include "workspace/quickaccessmodel.h"
 #include "workspace/workspacesettingsdialog.h"
@@ -67,7 +68,9 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
     mWorkspace(ws),
     mNotifications(new NotificationsModel(ws)),
     mQuickAccessModel(new QuickAccessModel(ws)),
-    mLibraryManager(new LibraryManager(ws)) {
+    mLocalLibraries(new LibrariesModel(ws, LibrariesModel::Mode::LocalLibs)),
+    mRemoteLibraries(new LibrariesModel(ws, LibrariesModel::Mode::RemoteLibs)),
+    mLibrariesFilter(new SlintKeyEventTextBuilder()) {
   // Open windows.
   QSettings cs;
   for (const QString& idStr : cs.value("global/windows").toStringList()) {
@@ -82,10 +85,6 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
   // Setup quick access.
   connect(mQuickAccessModel.get(), &QuickAccessModel::openFileTriggered, this,
           [this](const FilePath& fp) { openFile(fp, qApp->activeWindow()); });
-
-  // Setup library manager.
-  connect(mLibraryManager.data(), &LibraryManager::openLibraryEditorTriggered,
-          this, &GuiApplication::openLibraryEditor);
 
   // Connect notification signals.
   const qint64 startupTime = QDateTime::currentMSecsSinceEpoch();
@@ -130,7 +129,11 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
           .arg(Application::getFileFormatVersion().toStr()),
       true));
   connect(mNotificationNoLibrariesInstalled.get(), &Notification::buttonClicked,
-          this, &GuiApplication::openLibraryManager);
+          this, [this]() {
+            if (auto win = getCurrentWindow()) {
+              win->showPanelPage(ui::PanelPage::Libraries);
+            }
+          });
   connect(&mWorkspace.getLibraryDb(),
           &WorkspaceLibraryDb::scanLibraryListUpdated, this,
           &GuiApplication::updateNoLibrariesInstalledNotification);
@@ -183,6 +186,10 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
             mNotifications->push(n);
           });
 
+  // Setup library models & filter.
+  connect(mRemoteLibraries.get(), &LibrariesModel::onlineVersionsAvailable,
+          mLocalLibraries.get(), &LibrariesModel::setOnlineVersions);
+
   // Configure window saving countdown timer.
   mSaveOpenedWindowsCountdown.setSingleShot(true);
   connect(&mSaveOpenedWindowsCountdown, &QTimer::timeout, this, [this]() {
@@ -213,7 +220,6 @@ GuiApplication::~GuiApplication() noexcept {
   mProjectLibraryUpdater.reset();
   closeAllLibraryEditors(false);
   closeAllProjects(false, nullptr);
-  mLibraryManager.reset();
 }
 
 /*******************************************************************************
@@ -251,13 +257,6 @@ void GuiApplication::execWorkspaceSettingsDialog(QWidget* parent) noexcept {
   connect(&dlg, &WorkspaceSettingsDialog::desktopIntegrationStatusChanged, this,
           &GuiApplication::updateDesktopIntegrationNotification);
   dlg.exec();
-}
-
-void GuiApplication::openLibraryManager() noexcept {
-  mLibraryManager->show();
-  mLibraryManager->raise();
-  mLibraryManager->activateWindow();
-  mLibraryManager->updateOnlineLibraryList();
 }
 
 void GuiApplication::addExampleProjects(QWidget* parent) noexcept {
@@ -388,6 +387,36 @@ void GuiApplication::createNewWindow(int id) noexcept {
   // Create Slint window.
   auto win = ui::AppWindow::create();
 
+  // Helper to create filtered, sorted library models.
+  auto filteredLibs = [this](const std::shared_ptr<LibrariesModel>& model) {
+    auto filterModel = std::make_shared<slint::FilterModel<ui::LibraryData>>(
+        model, [this](const ui::LibraryData& lib) {
+          auto s = mLibrariesFilter->getText().trimmed().toLower();
+          return s.isEmpty() || s2q(lib.name).toLower().contains(s);
+        });
+    connect(mLibrariesFilter.get(), &SlintKeyEventTextBuilder::textChanged,
+            this, [filterModel](const QString&) { filterModel->reset(); });
+    return filterModel;
+  };
+  auto sortedLibs =
+      [](const std::shared_ptr<slint::Model<ui::LibraryData>>& model) {
+        return std::make_shared<slint::SortModel<ui::LibraryData>>(
+            model, [](const ui::LibraryData& a, const ui::LibraryData& b) {
+              if ((a.progress > 0) != (b.progress > 0)) {
+                return a.progress > 0;
+              } else if (a.outdated != b.outdated) {
+                return a.outdated;
+              } else if (a.installed_version.empty() !=
+                         b.installed_version.empty()) {
+                return b.installed_version.empty();
+              } else if (a.recommended != b.recommended) {
+                return a.recommended;
+              } else {
+                return a.name < b.name;
+              }
+            });
+      };
+
   // Set global data.
   const ui::Data& d = win->global<ui::Data>();
   d.set_preview_mode(false);
@@ -397,6 +426,16 @@ void GuiApplication::createNewWindow(int id) noexcept {
   d.set_workspace_path(mWorkspace.getPath().toNative().toUtf8().data());
   d.set_notifications(mNotifications);
   d.set_quick_access_items(mQuickAccessModel);
+  d.set_local_libraries(filteredLibs(mLocalLibraries));
+  d.set_remote_libraries(sortedLibs(filteredLibs(mRemoteLibraries)));
+
+  // Bind global data to signals.
+  bind(this, d, &ui::Data::set_local_libraries_data, mLocalLibraries.get(),
+       &LibrariesModel::uiDataChanged, mLocalLibraries->getUiData());
+  bind(this, d, &ui::Data::set_remote_libraries_data, mRemoteLibraries.get(),
+       &LibrariesModel::uiDataChanged, mRemoteLibraries->getUiData());
+  bind(this, d, &ui::Data::set_libraries_filter, mLibrariesFilter.get(),
+       &SlintKeyEventTextBuilder::textChanged, mLibrariesFilter->getText());
 
   // Register global callbacks.
   const ui::Backend& b = win->global<ui::Backend>();
@@ -404,6 +443,9 @@ void GuiApplication::createNewWindow(int id) noexcept {
     DesktopServices ds(mWorkspace.getSettings());
     return ds.openUrl(QUrl(s2q(url)));
   });
+  b.on_libraries_key_event(std::bind(&SlintKeyEventTextBuilder::process,
+                                     mLibrariesFilter.get(),
+                                     std::placeholders::_1));
   b.on_copy_to_clipboard([](const slint::SharedString& s) {
     QApplication::clipboard()->setText(s2q(s));
     return true;

@@ -25,6 +25,7 @@ WHITELIST = [
     'libs/librepcb/core/workspace/workspacesettingsitem_genericvalue.h',
     'libs/librepcb/editor/editorcommandcategory.h',
     'libs/librepcb/editor/editorcommandsetupdater.h',
+    'libs/librepcb/editor/utils/deriveduiobjectlistview.h',
     'tests/unittests/core/serialization/serializableobjectmock.h',
     'tests/unittests/editor/widgets/editabletablewidgetreceiver.h',
 ]

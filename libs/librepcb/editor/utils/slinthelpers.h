@@ -23,9 +23,14 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/core/types/elementname.h>
+#include <librepcb/core/types/fileproofname.h>
+#include <librepcb/core/types/version.h>
+
 #include <QtCore>
 #include <QtGui>
 
+#include <optional>
 #include <slint.h>
 
 /*******************************************************************************
@@ -40,8 +45,6 @@ namespace editor {
 /*******************************************************************************
  *  Non-Member Functions
  ******************************************************************************/
-
-int q2s(int i) noexcept;
 
 slint::LogicalPosition q2s(const QPointF& p) noexcept;
 QPointF s2q(const slint::LogicalPosition& p) noexcept;
@@ -72,6 +75,47 @@ Qt::KeyboardModifiers s2q(
     const slint::private_api::KeyboardModifiers& m) noexcept;
 
 slint::SharedString q2s(Qt::Key k) noexcept;
+
+// Bind property without type conversion
+template <typename TTarget, typename TClass, typename T>
+inline void bind(QObject* context, const TTarget& target,
+                 void (TTarget::*setter)(const T&) const, TClass* source,
+                 void (TClass::*signal)(T), const T& defaultValue) noexcept {
+  QObject::connect(source, signal, context, [&target, setter](const T& value) {
+    (target.*setter)(value);
+  });
+  (target.*setter)(defaultValue);
+}
+
+// Bind property with type conversion
+template <typename TTarget, typename TSlint, typename TClass, typename TQt>
+inline void bind(
+    QObject* context, const TTarget& target,
+    void (TTarget::*setter)(const TSlint&) const, TClass* source,
+    void (TClass::*signal)(TQt), const TQt& defaultValue,
+    std::function<TSlint(const TQt&)> convert = [](const TQt& value) {
+      return q2s(value);
+    }) noexcept {
+  QObject::connect(source, signal, context,
+                   [&target, setter, convert](const TQt& value) {
+                     (target.*setter)(convert(value));
+                   });
+  (target.*setter)(convert(defaultValue));
+}
+
+std::optional<ElementName> validateElementName(
+    const QString& input, slint::SharedString& error) noexcept;
+
+std::optional<Version> validateVersion(const QString& input,
+                                       slint::SharedString& error) noexcept;
+
+std::optional<FileProofName> validateFileProofName(
+    const QString& input, slint::SharedString& error,
+    const QString& requiredSuffix = QString()) noexcept;
+
+std::optional<QUrl> validateUrl(const QString& input,
+                                slint::SharedString& error,
+                                bool allowEmpty = false) noexcept;
 
 /*******************************************************************************
  *  End of File

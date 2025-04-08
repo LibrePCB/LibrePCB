@@ -17,68 +17,70 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_LIBRARYLISTWIDGETITEM_H
-#define LIBREPCB_EDITOR_LIBRARYLISTWIDGETITEM_H
+#ifndef LIBREPCB_EDITOR_CREATELIBRARYTAB_H
+#define LIBREPCB_EDITOR_CREATELIBRARYTAB_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "windowtab.h"
+
 #include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/types/elementname.h>
+#include <librepcb/core/types/version.h>
 
 #include <QtCore>
-#include <QtWidgets>
+
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class Workspace;
-
 namespace editor {
 
-namespace Ui {
-class LibraryListWidgetItem;
-}
-
 /*******************************************************************************
- *  Class LibraryListWidgetItem
+ *  Class CreateLibraryTab
  ******************************************************************************/
 
 /**
- * @brief The LibraryListWidgetItem class
+ * @brief The CreateLibraryTab class
  */
-class LibraryListWidgetItem final : public QWidget {
+class CreateLibraryTab final : public WindowTab {
   Q_OBJECT
 
 public:
-  // Constructors / Destructor
-  LibraryListWidgetItem() = delete;
-  LibraryListWidgetItem(const LibraryListWidgetItem& other) = delete;
-  LibraryListWidgetItem(Workspace& ws, const FilePath& libDir,
-                        const QString& name = "",
-                        const QString& description = "",
-                        const QPixmap& icon = QPixmap()) noexcept;
-  ~LibraryListWidgetItem() noexcept;
+  // Signals
+  Signal<CreateLibraryTab> onDerivedUiDataChanged;
 
-  // Getters
-  const FilePath& getLibraryFilePath() const noexcept { return mLibDir; }
-  QString getName() const noexcept;
-  bool isRemoteLibrary() const noexcept { return mIsRemoteLibrary; }
+  // Constructors / Destructor
+  CreateLibraryTab() = delete;
+  CreateLibraryTab(const CreateLibraryTab& other) = delete;
+  explicit CreateLibraryTab(GuiApplication& app,
+                            QObject* parent = nullptr) noexcept;
+  ~CreateLibraryTab() noexcept;
+
+  // General Methods
+  ui::TabData getUiData() const noexcept override;
+  const ui::CreateLibraryTabData& getDerivedUiData() const noexcept {
+    return mUiData;
+  }
+  void setDerivedUiData(const ui::CreateLibraryTabData& data) noexcept;
 
   // Operator Overloadings
-  LibraryListWidgetItem& operator=(const LibraryListWidgetItem& rhs) = delete;
+  CreateLibraryTab& operator=(const CreateLibraryTab& rhs) = delete;
 
-protected:  // Methods
-  void mouseDoubleClickEvent(QMouseEvent* e) noexcept override;
+protected:
+  void triggerAsync(ui::Action a) noexcept override;
 
-signals:
-  void openLibraryEditorTriggered(const FilePath& libDir);
+private:
+  void validate() noexcept;
 
-private:  // Data
-  QScopedPointer<Ui::LibraryListWidgetItem> mUi;
-  FilePath mLibDir;
-  bool mIsRemoteLibrary;
+  ui::CreateLibraryTabData mUiData;
+  std::optional<ElementName> mName;
+  std::optional<Version> mVersion;
+  std::optional<QUrl> mUrl;
+  FilePath mDirectory;
 };
 
 /*******************************************************************************

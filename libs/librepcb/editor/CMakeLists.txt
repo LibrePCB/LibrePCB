@@ -110,6 +110,8 @@ add_library(
   graphics/zonegraphicsitem.h
   guiapplication.cpp
   guiapplication.h
+  hometab.cpp
+  hometab.h
   library/cat/categorychooserdialog.cpp
   library/cat/categorychooserdialog.h
   library/cat/categorychooserdialog.ui
@@ -204,6 +206,8 @@ add_library(
   library/cmp/compsymbvarpinsignalmapeditorwidget.cpp
   library/cmp/compsymbvarpinsignalmapeditorwidget.h
   library/cmp/if_componentsymbolvarianteditorprovider.h
+  library/createlibrarytab.cpp
+  library/createlibrarytab.h
   library/dev/deviceeditorwidget.cpp
   library/dev/deviceeditorwidget.h
   library/dev/deviceeditorwidget.ui
@@ -215,6 +219,8 @@ add_library(
   library/dev/partlisteditorwidget.h
   library/dev/partlistmodel.cpp
   library/dev/partlistmodel.h
+  library/downloadlibrarytab.cpp
+  library/downloadlibrarytab.h
   library/eaglelibraryimportwizard/eaglelibraryimportwizard.cpp
   library/eaglelibraryimportwizard/eaglelibraryimportwizard.h
   library/eaglelibraryimportwizard/eaglelibraryimportwizard.ui
@@ -266,6 +272,10 @@ add_library(
   library/lib/libraryoverviewwidget.cpp
   library/lib/libraryoverviewwidget.h
   library/lib/libraryoverviewwidget.ui
+  library/librariesmodel.cpp
+  library/librariesmodel.h
+  library/librarydownload.cpp
+  library/librarydownload.h
   library/libraryeditor.cpp
   library/libraryeditor.h
   library/libraryeditor.ui
@@ -847,6 +857,7 @@ add_library(
   undocommandgroup.h
   undostack.cpp
   undostack.h
+  utils/deriveduiobjectlistview.h
   utils/editortoolbox.cpp
   utils/editortoolbox.h
   utils/exclusiveactiongroup.cpp
@@ -861,12 +872,15 @@ add_library(
   utils/shortcutsreferencegenerator.h
   utils/slinthelpers.cpp
   utils/slinthelpers.h
+  utils/slintkeyeventtextbuilder.cpp
+  utils/slintkeyeventtextbuilder.h
   utils/standardeditorcommandhandler.cpp
   utils/standardeditorcommandhandler.h
   utils/toolbarproxy.cpp
   utils/toolbarproxy.h
   utils/uihelpers.cpp
   utils/uihelpers.h
+  utils/uiobjectlist.h
   utils/undostackactiongroup.cpp
   utils/undostackactiongroup.h
   utils/valignactiongroup.cpp
@@ -937,6 +951,10 @@ add_library(
   widgets/unsignedratioedit.h
   widgets/waitingspinnerwidget.cpp
   widgets/waitingspinnerwidget.h
+  windowsection.cpp
+  windowsection.h
+  windowtab.cpp
+  windowtab.h
   workspace/categorytreemodel.cpp
   workspace/categorytreemodel.h
   workspace/desktopintegration.cpp
@@ -962,23 +980,6 @@ add_library(
   workspace/initializeworkspacewizard/initializeworkspacewizard_welcome.ui
   workspace/initializeworkspacewizard/initializeworkspacewizardcontext.cpp
   workspace/initializeworkspacewizard/initializeworkspacewizardcontext.h
-  workspace/librarymanager/addlibrarywidget.cpp
-  workspace/librarymanager/addlibrarywidget.h
-  workspace/librarymanager/addlibrarywidget.ui
-  workspace/librarymanager/librarydownload.cpp
-  workspace/librarymanager/librarydownload.h
-  workspace/librarymanager/libraryinfowidget.cpp
-  workspace/librarymanager/libraryinfowidget.h
-  workspace/librarymanager/libraryinfowidget.ui
-  workspace/librarymanager/librarylistwidgetitem.cpp
-  workspace/librarymanager/librarylistwidgetitem.h
-  workspace/librarymanager/librarylistwidgetitem.ui
-  workspace/librarymanager/librarymanager.cpp
-  workspace/librarymanager/librarymanager.h
-  workspace/librarymanager/librarymanager.ui
-  workspace/librarymanager/onlinelibrarylistwidgetitem.cpp
-  workspace/librarymanager/onlinelibrarylistwidgetitem.h
-  workspace/librarymanager/onlinelibrarylistwidgetitem.ui
   workspace/projectlibraryupdater/projectlibraryupdater.cpp
   workspace/projectlibraryupdater/projectlibraryupdater.h
   workspace/projectlibraryupdater/projectlibraryupdater.ui
