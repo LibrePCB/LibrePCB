@@ -32,8 +32,8 @@
 namespace librepcb {
 namespace editor {
 
-class GraphicsSceneKeyEvent;
-class GraphicsSceneMouseEvent;
+struct GraphicsSceneKeyEvent;
+struct GraphicsSceneMouseEvent;
 
 /*******************************************************************************
  *  Interface IF_GraphicsViewEventHandler

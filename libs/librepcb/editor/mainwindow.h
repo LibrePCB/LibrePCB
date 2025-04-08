@@ -26,6 +26,8 @@
 #include "appwindow.h"
 #include "utils/uiobjectlist.h"
 
+#include <librepcb/core/fileio/filepath.h>
+
 #include <QtCore>
 
 #include <memory>
@@ -36,8 +38,11 @@
 namespace librepcb {
 namespace editor {
 
+class CreateLibraryTabsModel;
 class GuiApplication;
+class LibraryCreator;
 class MainWindowTestAdapter;
+class ProjectEditor2;
 class ProjectReadmeRenderer;
 class WindowSection;
 class WindowTab;
@@ -67,6 +72,7 @@ public:
   void makeCurrentWindow() noexcept;
   void showPanelPage(ui::PanelPage page) noexcept;
   void popUpNotifications() noexcept;
+  void closeProject(int index, std::shared_ptr<ProjectEditor2> prj) noexcept;
 
   // Operator Overloadings
   MainWindow& operator=(const MainWindow& rhs) = delete;
@@ -83,6 +89,10 @@ private:
   void addTab(std::shared_ptr<WindowTab> tab) noexcept;
   template <typename T>
   bool switchToTab() noexcept;
+  void setCurrentProject(std::shared_ptr<ProjectEditor2> prj) noexcept;
+  std::shared_ptr<ProjectEditor2> getCurrentProjectEditor() noexcept;
+  void newProject(bool eagleImport = false,
+                  const FilePath& parentDir = FilePath()) noexcept;
 
   const int mId;
   const QString mSettingsPrefix;

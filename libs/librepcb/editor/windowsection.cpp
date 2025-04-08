@@ -22,11 +22,18 @@
  ******************************************************************************/
 #include "windowsection.h"
 
+#include "guiapplication.h"
 #include "hometab.h"
 #include "library/createlibrarytab.h"
 #include "library/downloadlibrarytab.h"
+#include "project/board/board2dtab.h"
+#include "project/board/board3dtab.h"
+#include "project/projecteditor2.h"
+#include "project/schematic/schematictab.h"
 #include "utils/deriveduiobjectlistview.h"
 #include "windowtab.h"
+
+#include <librepcb/editor/undostack.h>
 
 #include <QtCore>
 
@@ -51,6 +58,15 @@ WindowSection::WindowSection(GuiApplication& app, QObject* parent) noexcept
                                              ui::CreateLibraryTabData>>(mTabs),
         std::make_shared<DerivedUiObjectList<TabList, DownloadLibraryTab,
                                              ui::DownloadLibraryTabData>>(
+            mTabs),
+        std::make_shared<
+            DerivedUiObjectList<TabList, SchematicTab, ui::SchematicTabData>>(
+            mTabs),
+        std::make_shared<
+            DerivedUiObjectList<TabList, Board2dTab, ui::Board2dTabData>>(
+            mTabs),
+        std::make_shared<
+            DerivedUiObjectList<TabList, Board3dTab, ui::Board3dTabData>>(
             mTabs),
         -1,  // Current tab index
         false,  // Highlight
@@ -143,6 +159,10 @@ void WindowSection::setCurrentTab(int index) noexcept {
   onUiDataChanged.notify();
 }
 
+std::shared_ptr<WindowTab> WindowSection::getCurrentTab() noexcept {
+  return mTabs->value(mUiData.current_tab_index);
+}
+
 void WindowSection::trigger(ui::Action a) noexcept {
   switch (a) {
     case ui::Action::SectionSplit: {
@@ -155,6 +175,64 @@ void WindowSection::trigger(ui::Action a) noexcept {
     }
     default:
       break;
+  }
+}
+
+slint::Image WindowSection::renderScene(float width, float height) noexcept {
+  if (std::shared_ptr<WindowTab> t = getCurrentTab()) {
+    return t->renderScene(width, height);
+  }
+  return slint::Image();
+}
+
+bool WindowSection::processScenePointerEvent(
+    const QPointF& pos, const QPointF& globalPos,
+    slint::private_api::PointerEvent e) noexcept {
+  if (std::shared_ptr<WindowTab> t = getCurrentTab()) {
+    return t->processScenePointerEvent(pos, globalPos, e);
+  }
+  return false;
+}
+
+bool WindowSection::processSceneScrolled(
+    float x, float y, slint::private_api::PointerScrollEvent e) noexcept {
+  if (std::shared_ptr<WindowTab> t = getCurrentTab()) {
+    return t->processSceneScrolled(x, y, e);
+  }
+  return false;
+}
+
+bool WindowSection::processSceneKeyPressed(
+    const slint::private_api::KeyEvent& e) noexcept {
+  if (std::shared_ptr<WindowTab> t = getCurrentTab()) {
+    return t->processSceneKeyPressed(e);
+  }
+  return false;
+}
+
+bool WindowSection::processSceneKeyReleased(
+    const slint::private_api::KeyEvent& e) noexcept {
+  if (std::shared_ptr<WindowTab> t = getCurrentTab()) {
+    return t->processSceneKeyReleased(e);
+  }
+  return false;
+}
+
+void WindowSection::zoomFit(float width, float height) noexcept {
+  if (std::shared_ptr<WindowTab> t = getCurrentTab()) {
+    return t->zoomFit(width, height);
+  }
+}
+
+void WindowSection::zoomIn(float width, float height) noexcept {
+  if (std::shared_ptr<WindowTab> t = getCurrentTab()) {
+    return t->zoomIn(width, height);
+  }
+}
+
+void WindowSection::zoomOut(float width, float height) noexcept {
+  if (std::shared_ptr<WindowTab> t = getCurrentTab()) {
+    return t->zoomOut(width, height);
   }
 }
 

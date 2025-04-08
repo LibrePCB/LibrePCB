@@ -72,6 +72,28 @@ ui::TabData DownloadLibraryTab::getUiData() const noexcept {
   return ui::TabData{
       ui::TabType::DownloadLibrary,  // Type
       q2s(tr("Download Library")),  // Title
+      -1,  // Project index
+      ui::RuleCheckState::NotAvailable,  // Rule check state
+      nullptr,  // Rule check messages
+      0,  // Rule check unapproved messages
+      slint::SharedString(),  // Rule check execution error
+      false,  // Can save
+      false,  // Can export graphics
+      false,  // Can undo
+      slint::SharedString(),  // Undo text
+      false,  // Can redo
+      slint::SharedString(),  // Redo text
+      false,  // Can cut
+      false,  // Can copy
+      false,  // Can paste
+      false,  // Can remove
+      false,  // Can rotate
+      false,  // Can mirror
+      false,  // Can move/align
+      false,  // Can snap to grid
+      false,  // Can reset texts
+      false,  // Can lock placement
+      false,  // Can edit properties
       ui::Action::None,  // Action
   };
 }

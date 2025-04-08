@@ -88,6 +88,9 @@ bool SchematicEditorState_AddComponent::entry() noexcept {
   setValue(QString());
 
   mAdapter.fsmToolEnter(*this);
+  mAdapter.fsmSetFeatures(SchematicEditorFsmAdapter::Features(
+      SchematicEditorFsmAdapter::Feature::Rotate |
+      SchematicEditorFsmAdapter::Feature::Mirror));
   mAdapter.fsmSetViewCursor(Qt::CrossCursor);
   return true;
 }
@@ -98,6 +101,7 @@ bool SchematicEditorState_AddComponent::exit() noexcept {
   Q_ASSERT(mIsUndoCmdActive == false);
 
   mAdapter.fsmSetViewCursor(std::nullopt);
+  mAdapter.fsmSetFeatures(SchematicEditorFsmAdapter::Features());
   mAdapter.fsmToolLeave();
   return true;
 }

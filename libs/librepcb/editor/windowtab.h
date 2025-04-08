@@ -33,9 +33,14 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class LengthUnit;
+class Point;
+
 namespace editor {
 
 class GuiApplication;
+class ProjectEditor2;
 
 /*******************************************************************************
  *  Class WindowTab
@@ -62,6 +67,48 @@ public:
   virtual void setUiData(const ui::TabData& data) noexcept;
   virtual void activate() noexcept {}
   virtual void deactivate() noexcept {}
+  virtual slint::Image renderScene(float width, float height) noexcept {
+    Q_UNUSED(width);
+    Q_UNUSED(height);
+    return slint::Image();
+  }
+  virtual bool processScenePointerEvent(
+      const QPointF& pos, const QPointF& globalPos,
+      slint::private_api::PointerEvent e) noexcept {
+    Q_UNUSED(pos);
+    Q_UNUSED(globalPos);
+    Q_UNUSED(e);
+    return false;
+  }
+  virtual bool processSceneScrolled(
+      float x, float y, slint::private_api::PointerScrollEvent e) noexcept {
+    Q_UNUSED(x);
+    Q_UNUSED(y);
+    Q_UNUSED(e);
+    return false;
+  }
+  virtual bool processSceneKeyPressed(
+      const slint::private_api::KeyEvent& e) noexcept {
+    Q_UNUSED(e);
+    return false;
+  }
+  virtual bool processSceneKeyReleased(
+      const slint::private_api::KeyEvent& e) noexcept {
+    Q_UNUSED(e);
+    return false;
+  }
+  virtual void zoomFit(float width, float height) noexcept {
+    Q_UNUSED(width);
+    Q_UNUSED(height);
+  }
+  virtual void zoomIn(float width, float height) noexcept {
+    Q_UNUSED(width);
+    Q_UNUSED(height);
+  }
+  virtual void zoomOut(float width, float height) noexcept {
+    Q_UNUSED(width);
+    Q_UNUSED(height);
+  }
 
   // Operator Overloadings
   WindowTab& operator=(const WindowTab& rhs) = delete;
@@ -69,6 +116,7 @@ public:
 signals:
   void panelPageRequested(ui::PanelPage p);
   void closeRequested();
+  void cursorCoordinatesChanged(const Point& pos, const LengthUnit& unit);
   void statusBarMessageChanged(const QString& message, int timeoutMs);
 
 protected:

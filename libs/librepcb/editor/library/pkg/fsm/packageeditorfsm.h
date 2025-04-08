@@ -43,13 +43,13 @@ namespace editor {
 
 class FootprintGraphicsItem;
 class GraphicsScene;
-class GraphicsSceneKeyEvent;
-class GraphicsSceneMouseEvent;
 class GraphicsView;
 class PackageEditorState;
 class PackageEditorWidget;
 class PrimitiveTextGraphicsItem;
 class UndoStack;
+struct GraphicsSceneKeyEvent;
+struct GraphicsSceneMouseEvent;
 
 /*******************************************************************************
  *  Class PackageEditorFsm

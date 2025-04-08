@@ -108,6 +108,8 @@ add_library(
   graphics/textgraphicsitem.h
   graphics/zonegraphicsitem.cpp
   graphics/zonegraphicsitem.h
+  graphicsscenetab.cpp
+  graphicsscenetab.h
   guiapplication.cpp
   guiapplication.h
   hometab.cpp
@@ -461,6 +463,10 @@ add_library(
   project/assemblyvariantlisteditorwidget.h
   project/assemblyvariantlistmodel.cpp
   project/assemblyvariantlistmodel.h
+  project/board/board2dtab.cpp
+  project/board/board2dtab.h
+  project/board/board3dtab.cpp
+  project/board/board3dtab.h
   project/board/boardclipboarddata.cpp
   project/board/boardclipboarddata.h
   project/board/boardclipboarddatabuilder.cpp
@@ -797,13 +803,18 @@ add_library(
   project/partinformationtooltip.ui
   project/projecteditor.cpp
   project/projecteditor.h
+  project/projecteditor2.cpp
+  project/projecteditor2.h
   project/projectreadmerenderer.cpp
   project/projectreadmerenderer.h
   project/projectsetupdialog.cpp
   project/projectsetupdialog.h
   project/projectsetupdialog.ui
+  project/projectsmodel.cpp
+  project/projectsmodel.h
   project/schematic/fsm/schematiceditorfsm.cpp
   project/schematic/fsm/schematiceditorfsm.h
+  project/schematic/fsm/schematiceditorfsmadapter.h
   project/schematic/fsm/schematiceditorstate.cpp
   project/schematic/fsm/schematiceditorstate.h
   project/schematic/fsm/schematiceditorstate_addcomponent.cpp
@@ -849,9 +860,13 @@ add_library(
   project/schematic/schematicpagesdock.ui
   project/schematic/schematicselectionquery.cpp
   project/schematic/schematicselectionquery.h
+  project/schematic/schematictab.cpp
+  project/schematic/schematictab.h
   project/schematic/symbolinstancepropertiesdialog.cpp
   project/schematic/symbolinstancepropertiesdialog.h
   project/schematic/symbolinstancepropertiesdialog.ui
+  rulecheck/rulecheckmessagesmodel.cpp
+  rulecheck/rulecheckmessagesmodel.h
   undocommand.cpp
   undocommand.h
   undocommandgroup.cpp

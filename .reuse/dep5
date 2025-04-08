@@ -72,6 +72,9 @@ Files:
  img/command_toolbars/wire_straight.png
  img/command_toolbars/wire_v_h.png
  img/empty.png
+ img/grid-dots.svg
+ img/grid-none.svg
+ img/library.png
  img/library/bipolar_capacitor_eu.png
  img/library/bipolar_capacitor_us.png
  img/library/footprint.png

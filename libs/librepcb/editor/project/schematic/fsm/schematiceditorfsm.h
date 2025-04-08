@@ -41,8 +41,6 @@ class Workspace;
 
 namespace editor {
 
-class GraphicsSceneKeyEvent;
-class GraphicsSceneMouseEvent;
 class GraphicsView;
 class ProjectEditor;
 class SchematicEditor;
@@ -51,6 +49,8 @@ class SchematicEditorState;
 class SchematicGraphicsScene;
 class ToolBarProxy;
 class UndoStack;
+struct GraphicsSceneKeyEvent;
+struct GraphicsSceneMouseEvent;
 
 /*******************************************************************************
  *  Class SchematicEditorFsm
