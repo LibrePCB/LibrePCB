@@ -1,0 +1,108 @@
+import { PanelHeader, IconButton } from "../widgets.slint";
+import { Data } from "../api/data.slint";
+import { Backend } from "../api/backend.slint";
+import { ProjectData, Action } from "../api/types.slint";
+
+component ProjectItem inherits Rectangle {
+    in property <string> text <=> t-title.text;
+    in property <image> icon <=> i-icon.source;
+
+    callback clicked <=> ta.clicked;
+
+    background: ta.has-hover ? #404040 : transparent;
+
+    HorizontalLayout {
+        padding: 3px;
+        padding-left: 5px;
+        padding-right: 5px;
+        spacing: 5px;
+
+        Rectangle {
+            width: self.height;
+
+            i-icon := Image {
+                x: 2px;
+                y: self.x;
+                width: self.height;
+                height: parent.height - 2 * self.x;
+                colorize: t-title.color;
+            }
+        }
+
+        t-title := Text {
+            // Set minimum to compiled value, due to wrong preview:
+            // https://github.com/slint-ui/slint/pull/7011
+            min-height: 21px;
+            vertical-alignment: center;
+        }
+    }
+
+    ta := TouchArea { }
+}
+
+component Project inherits VerticalLayout {
+    in property <ProjectData> project;
+    in property <int> project-index;
+
+    vertical-stretch: 0;
+
+    header := PanelHeader {
+        z: 10;  // For the tooltip.
+        title: project.name;
+
+        Rectangle {
+            horizontal-stretch: 1;
+        }
+
+        IconButton {
+            icon: @image-url("../../../../font-awesome/svgs/solid/xmark.svg");
+            icon-scale: 60%;
+            tooltip: @tr("Close Project");
+
+            clicked => {
+                Backend.trigger(Action.project-close);
+            }
+        }
+    }
+
+    for schematic[index] in project.schematics: ProjectItem {
+        text: schematic;
+        icon: @image-url("../../../../font-awesome/svgs/regular/image.svg");
+
+        clicked => {
+            Backend.schematic-clicked(project-index, index);
+        }
+    }
+
+    for board[index] in project.boards: ProjectItem {
+        text: board;
+        icon: @image-url("../../../../bootstrap-icons/icons/motherboard.svg");
+
+        clicked => {
+            Backend.board-clicked(project-index, index);
+        }
+    }
+}
+
+export component ProjectPanel inherits Rectangle {
+    background: #2a2a2a;
+
+    VerticalLayout {
+        alignment: LayoutAlignment.start;
+
+        for project[project-index] in Data.projects: Rectangle {
+            Project {
+                project: project;
+                project-index: project-index;
+            }
+
+            if project-index == Data.current-project-index: Rectangle {
+                x: 0;
+                y: 8px;
+                width: 1px;
+                height: parent.height - self.y - 4px;
+                background: #29d682;
+            }
+        }
+    }
+}

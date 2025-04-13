@@ -1,9 +1,17 @@
 import {
+    Board2dTabData,
+    EditorTool,
+    TreeViewItemData,
+    GridStyle,
+    LengthUnit,
     LibraryData,
     LibraryListData,
     NotificationData,
     NotificationType,
     PanelPage,
+    ProjectData,
+    RuleCheckState,
+    SchematicTabData,
     TabData,
     TabType,
     TreeViewItemData,
@@ -37,6 +45,70 @@ export global Data {
                 {
                     type: TabType.download-library,
                     title: "Download Lib",
+                },
+                {
+                    type: TabType.schematic,
+                    title: "Schematic",
+                    rule-check-state: RuleCheckState.outdated,
+                    rule-check-messages: [
+                        {
+                            severity: NotificationType.info,
+                            message: "Hint message",
+                            description: "Hint description.",
+                            approved: false,
+                            supports-autofix: true,
+                        },
+                        {
+                            severity: NotificationType.warning,
+                            message: "Warning message",
+                            description: "Warning description.",
+                            approved: true,
+                            supports-autofix: false,
+                        },
+                        {
+                            severity: NotificationType.critical,
+                            message: "Error message",
+                            description: "Error description.",
+                            approved: false,
+                            supports-autofix: true,
+                        },
+                    ],
+                    rule-check-unapproved-messages: 42,
+                    rule-check-execution-error: "",
+                    can-save: true,
+                    can-export-graphics: true,
+                    can-undo: true,
+                    can-redo: true,
+                    can-cut: true,
+                    can-copy: true,
+                    can-paste: true,
+                    can-remove: true,
+                    can-rotate: true,
+                    can-mirror: true,
+                    can-move-align: true,
+                    can-snap-to-grid: true,
+                    can-reset-texts: true,
+                    can-lock-placement: true,
+                    can-edit-properties: true,
+                },
+                {
+                    type: TabType.board-2d,
+                    title: "Board",
+                    can-save: true,
+                    can-export-graphics: true,
+                    can-undo: true,
+                    can-redo: true,
+                    can-cut: true,
+                    can-copy: true,
+                    can-paste: true,
+                    can-remove: true,
+                    can-rotate: true,
+                    can-mirror: true,
+                    can-move-align: true,
+                    can-snap-to-grid: true,
+                    can-reset-texts: true,
+                    can-lock-placement: true,
+                    can-edit-properties: true,
                 },
             ],
             create-library-tabs: [
@@ -76,16 +148,85 @@ export global Data {
                     download-status: "Download status",
                 },
             ],
-            current-tab-index: 1,
+            schematic-tabs: [
+                { },
+                { },
+                { },
+                {
+                    project-index: 0,
+                    overlay-color: #dddddd78,
+                    overlay-text-color: Colors.black,
+                    grid-style: GridStyle.none,
+                    grid-interval: "2.54",
+                    unit: LengthUnit.millimeters,
+                    show-pin-numbers: false,
+                    tool: EditorTool.polygon,
+                    tool-overlay-text: "X0:   123.4567 mm\nY0:   123.4567 mm\nX1:   123.4567 mm\nY1:   123.4567 mm\n\ndX:   123.4567 mm\ndY:   123.4567 mm\n\nL:    123.4567 mm\na:     90.0000 °",
+                    tool-layer: {
+                        items: ["Layer 1", "Layer 2", "Layer 3"],
+                        current-index: 1,
+                    },
+                    tool-value: {
+                        text: "{{PROJECT}}",
+                        suggestions: ["{{Foo}}", "{{Bar}}"],
+                    },
+                    tool-attribute-value: {
+                        enabled: true,
+                        text: "42",
+                        placeholder: "CAPACITANCE",
+                    },
+                    tool-attribute-unit: {
+                        items: ["mV", "V", "kV"],
+                        current-index: 1,
+                    },
+                },
+            ],
+            board-2d-tabs: [
+                { },
+                { },
+                { },
+                { },
+                {
+                    project-index: 0,
+                    overlay-color: Colors.gray,
+                    overlay-text-color: Colors.white,
+                    grid-style: GridStyle.none,
+                    grid-interval: "0.635",
+                    unit: LengthUnit.millimeters,
+                    tool: EditorTool.wire,
+                    tool-overlay-text: "X0:   123.4567 mm\nY0:   123.4567 mm\nX1:   123.4567 mm\nY1:   123.4567 mm\n\ndX:   123.4567 mm\ndY:   123.4567 mm\n\nL:    123.4567 mm\na:     90.0000 °",
+                    tool-net: {
+                        items: ["Net 1", "Net 2", "Net 3"],
+                        current-index: 1,
+                    },
+                    tool-layer: {
+                        items: ["Layer 1", "Layer 2", "Layer 3"],
+                        current-index: 1,
+                    },
+                    tool-value: {
+                        text: "{{PROJECT}}",
+                        suggestions: ["{{Foo}}", "{{Bar}}"],
+                    },
+                },
+            ],
+            current-tab-index: 4,
         },
         {
-            tabs: [],
+            tabs: [
+                {
+                    type: TabType.board-3d,
+                    title: "3D",
+                    can-save: true,
+                    can-undo: true,
+                    can-redo: true,
+                },
+            ],
             current-tab-index: 0,
         },
     ];
 
     // Which section currently has focus
-    in property <int> current-section-index: 0;
+    in-out property <int> current-section-index: 0;
 
     // Static status bar message
     in property <string> status-bar-message;
@@ -322,4 +463,93 @@ export global Data {
 
     // Filter applied to both local libraries and remote libraries
     in property <string> libraries-filter: "Foo";
+
+    in property <string> order-info-url: "https://fab.librepcb.org/todo";
+
+    in-out property <bool> ignore-placement-locks: true;
+
+    in property <string> cursor-coordinates: "X: 123.456 Y: 123.456";
+
+    in property <[ProjectData]> projects: [
+        {
+            valid: true,
+            path: "/path/to/project-1.lpp",
+            name: "Project 1",
+            schematics: ["Power", "Logic"],
+            boards: ["Default", "Experiment"],
+        },
+        {
+            valid: true,
+            path: "/path/to/project-2.lpp",
+            name: "Project 2",
+            schematics: ["Power", "Logic"],
+            boards: ["Default", "Experiment"],
+        },
+    ];
+
+    in-out property <int> current-project-index: 0;
+
+    // Auto-calculated data
+    in-out property <ProjectData> current-project: projects[current-project-index];
+    in-out property <WindowSectionData> current-section: sections[current-section-index];
+    in-out property <TabData> current-tab: current-section.tabs[current-section.current-tab-index];
+    out property <bool> current-tab-is-2d: (current-tab.type == TabType.schematic) || (current-tab.type == TabType.board-2d);
+    out property <bool> current-tab-is-2d-or-3d: (current-tab.type == TabType.schematic) || (current-tab.type == TabType.board-2d) || (current-tab.type == TabType.board-3d);
+    in-out property <SchematicTabData> current-schematic-tab: current-section.schematic-tabs[current-section.current-tab-index];
+    in-out property <Board2dTabData> current-board-2d-tab: current-section.board-2d-tabs[current-section.current-tab-index];
+    out property <GridStyle> current-grid-style: (current-tab.type == TabType.schematic) ? current-schematic-tab.grid-style : current-board-2d-tab.grid-style;
+    out property <string> current-grid-interval: (current-tab.type == TabType.schematic) ? current-schematic-tab.grid-interval : current-board-2d-tab.grid-interval;
+    out property <LengthUnit> current-unit: (current-tab.type == TabType.schematic) ? current-schematic-tab.unit : current-board-2d-tab.unit;
+
+    public function set-current-grid-style(gs: GridStyle) {
+        if (current-tab.type == TabType.schematic) {
+            current-section.schematic-tabs[current-section.current-tab-index].grid-style = gs;
+        } else if (current-tab.type == TabType.board-2d) {
+            current-section.board-2d-tabs[current-section.current-tab-index].grid-style = gs;
+        } else {
+            debug("Unhandled case in set-current-grid-style().");
+        }
+    }
+
+    public function set-current-unit(u: LengthUnit) {
+        if (current-tab.type == TabType.schematic) {
+            current-section.schematic-tabs[current-section.current-tab-index].unit = u;
+        } else if (current-tab.type == TabType.board-2d) {
+            current-section.board-2d-tabs[current-section.current-tab-index].unit = u;
+        } else {
+            debug("Unhandled case in set-current-unit().");
+        }
+    }
+
+    public function section-clicked(index: int) {
+        if (current-section-index != index) {
+            current-section-index = index;
+            if current-tab.type == TabType.schematic {
+                current-project-index = current-section.schematic-tabs[current-section.current-tab-index].project-index;
+            } else if current-tab.type == TabType.board-2d {
+                current-project-index = current-section.board-2d-tabs[current-section.current-tab-index].project-index;
+            } else if current-tab.type == TabType.board-3d {
+                current-project-index = current-section.board-3d-tabs[current-section.current-tab-index].project-index;
+            }
+        }
+    }
+
+    pure public function get-rule-check-title-for-tab-type(type: TabType) -> string {
+        if (type == TabType.schematic) {
+            return @tr("Electrical Rule Check (ERC)");
+        } else if (type == TabType.board-2d) {
+            return @tr("Design Rule Check (DRC)");
+        } else {
+            return "";
+        }
+    }
+
+    // Constant data
+    out property <[LengthUnit]> all-length-units: [
+        LengthUnit.millimeters,
+        LengthUnit.micrometers,
+        LengthUnit.nanometers,
+        LengthUnit.inches,
+        LengthUnit.mils,
+    ];
 }

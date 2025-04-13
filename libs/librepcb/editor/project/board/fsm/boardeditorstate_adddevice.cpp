@@ -60,6 +60,9 @@ bool BoardEditorState_AddDevice::entry() noexcept {
   Q_ASSERT(mIsUndoCmdActive == false);
 
   mAdapter.fsmToolEnter(*this);
+  mAdapter.fsmSetFeatures(
+      BoardEditorFsmAdapter::Features(BoardEditorFsmAdapter::Feature::Rotate |
+                                      BoardEditorFsmAdapter::Feature::Flip));
   return true;
 }
 
@@ -68,6 +71,7 @@ bool BoardEditorState_AddDevice::exit() noexcept {
   if (!abortCommand(true)) return false;
   Q_ASSERT(mIsUndoCmdActive == false);
 
+  mAdapter.fsmSetFeatures(BoardEditorFsmAdapter::Features());
   mAdapter.fsmToolLeave();
   return true;
 }

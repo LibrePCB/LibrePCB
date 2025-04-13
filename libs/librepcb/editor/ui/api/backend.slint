@@ -1,4 +1,9 @@
-import { Action } from "types.slint";
+import {
+    Action,
+    EditParseResult,
+    Int64,
+    LengthUnit
+} from "types.slint";
 import { Data } from "data.slint";
 
 // Note: The callback implementations are just for the live preview, they will
@@ -13,6 +18,25 @@ export global Backend {
     trigger(action) => {
         debug("Trigger action:", action);
     }
+
+    pure callback parse-length-input(string, LengthUnit) -> EditParseResult;
+
+    pure callback format-length(Int64, LengthUnit) -> string;
+    format-length => {
+        return "123.456789";
+    }
+
+    // A schematic in the projects panel has been clicked
+    //
+    // - Project index
+    // - Schematic index
+    pure callback schematic-clicked(int, int);
+
+    // A board in the projects panel has been clicked
+    //
+    // - Project index
+    // - Board index
+    pure callback board-clicked(int, int);
 
     // Open an URL by an external application (usually the web browser)
     //
@@ -43,6 +67,43 @@ export global Backend {
         }
         reject
     }
+
+    // Render a graphics scene image
+    //
+    // - Section index
+    // - Scene width
+    // - Scene height
+    // - Frame number (to be ignored)
+    pure callback render-scene(int, length, length, int) -> image;
+
+    // Scene pointer event
+    //
+    // - Section index
+    // - Cursor position X (relative to scene)
+    // - Cursor position Y (relative to scene)
+    // - Scene location within window
+    // - Pointer event
+    pure callback scene-pointer-event(int, length, length, Point, PointerEvent) -> EventResult;
+
+    // Scene scrolled event
+    //
+    // - Section index
+    // - Cursor position X (relative to scene)
+    // - Cursor position Y (relative to scene)
+    // - Scroll event
+    pure callback scene-scrolled(int, length, length, PointerScrollEvent) -> EventResult;
+
+    // Scene key pressed event
+    //
+    // - Section index
+    // - Key event
+    pure callback scene-key-pressed(int, KeyEvent) -> EventResult;
+
+    // Scene key released event
+    //
+    // - Section index
+    // - Key event
+    pure callback scene-key-released(int, KeyEvent) -> EventResult;
 
     // Request generating the preview of a project (e.g. its README.md)
     //

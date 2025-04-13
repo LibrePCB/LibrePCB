@@ -26,6 +26,7 @@
 #include "appwindow.h"
 #include "utils/uiobjectlist.h"
 
+#include <librepcb/core/types/point.h>
 #include <librepcb/core/utils/signalslot.h>
 
 #include <QtCore>
@@ -36,9 +37,13 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class LengthUnit;
+
 namespace editor {
 
 class GuiApplication;
+class ProjectEditor2;
 class WindowTab;
 
 /*******************************************************************************
@@ -81,6 +86,14 @@ public:
     return false;
   }
 
+  slint::Image renderScene(float width, float height) noexcept;
+  bool processScenePointerEvent(const QPointF& pos, const QPointF& globalPos,
+                                slint::private_api::PointerEvent e) noexcept;
+  bool processSceneScrolled(float x, float y,
+                            slint::private_api::PointerScrollEvent e) noexcept;
+  bool processSceneKeyPressed(const slint::private_api::KeyEvent& e) noexcept;
+  bool processSceneKeyReleased(const slint::private_api::KeyEvent& e) noexcept;
+
   // Operator Overloadings
   WindowSection& operator=(const WindowSection& rhs) = delete;
 
@@ -89,10 +102,12 @@ signals:
   void splitRequested();
   void closeRequested();
   void derivedUiDataChanged(std::size_t index);
+  void cursorCoordinatesChanged(const Point& pos, const LengthUnit& unit);
   void statusBarMessageChanged(const QString& message, int timeoutMs);
 
 private:
   void setCurrentTab(int index) noexcept;
+  std::shared_ptr<WindowTab> getCurrentTab() noexcept;
   void trigger(ui::Action a) noexcept;
   void highlight() noexcept;
   void tabCloseRequested() noexcept;

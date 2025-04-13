@@ -1,9 +1,14 @@
-import { ProgressBar } from "widgets.slint";
+import { ProgressBar, LengthEdit, Palette } from "widgets.slint";
 import { NotificationsPopup } from "notificationspopup.slint";
 import {
     Constants,
     Data,
-    NotificationType
+    NotificationType,
+    Backend,
+    Action,
+    Helpers,
+    GridStyle,
+    TabType
 } from "api.slint";
 
 export component StatusBar inherits Rectangle {
@@ -35,6 +40,194 @@ export component StatusBar inherits Rectangle {
                         text: Data.workspace-path;
                     }
                 ]
+            }
+        }
+
+        Rectangle {
+            width: 10px;
+        }
+
+        Text {
+            vertical-alignment: center;
+            font-family: "Noto Sans Mono";
+            font-size: 11px;
+            color: white;
+            text: Data.cursor-coordinates;
+            visible: Data.current-tab-is-2d;
+        }
+
+        Rectangle {
+            width: 15px;
+        }
+
+        Rectangle {
+            width: t-grid-interval.preferred-width + self.height - t-grid-interval.preferred-height;
+            background: t-grid-interval.has-hover ? #505050 : #404040;
+
+            t-grid-interval := TouchArea {
+                enabled: Data.current-tab-is-2d;
+
+                Text {
+                    vertical-alignment: center;
+                    font-family: "Noto Sans Mono";
+                    font-size: 11px;
+                    color: (!Data.current-tab-is-2d) ? #707070 : white;
+                    text: Data.current-grid-interval;
+                }
+
+                clicked => {
+                    pw-grid-interval.show();
+                }
+            }
+
+            pw-grid-interval := PopupWindow {
+                x: -(self.width - parent.width) / 2;
+                y: -self.height;
+                width: le-grid-interval.preferred-width;
+                height: le-grid-interval.preferred-height;
+                close-policy: close-on-click-outside;
+                forward-focus: le-grid-interval;
+
+                le-grid-interval := LengthEdit { }
+            }
+        }
+
+        VerticalLayout {
+            width: self.height * 0.7;
+
+            ta-grid-interval-increase := TouchArea {
+                enabled: Data.current-tab-is-2d;
+
+                Rectangle {
+                    background: parent.has-hover ? #505050 : #404040;
+
+                    Image {
+                        width: 100%;
+                        height: ta-grid-interval-increase.pressed ? 80% : 100%;
+                        image-fit: contain;
+                        source: @image-url("../../../font-awesome/svgs/solid/caret-up.svg");
+                        colorize: (!Data.current-tab-is-2d) ? #707070 : white;
+                    }
+                }
+
+                clicked => {
+                    Backend.trigger(Action.section-grid-interval-increase);
+                }
+            }
+
+            ta-grid-interval-decrease := TouchArea {
+                enabled: Data.current-tab-is-2d;
+
+                Rectangle {
+                    background: parent.has-hover ? #505050 : #404040;
+
+                    Image {
+                        width: 100%;
+                        height: ta-grid-interval-decrease.pressed ? 80% : 100%;
+                        image-fit: contain;
+                        source: @image-url("../../../font-awesome/svgs/solid/caret-down.svg");
+                        colorize: (!Data.current-tab-is-2d) ? #707070 : white;
+                    }
+                }
+
+                clicked => {
+                    Backend.trigger(Action.section-grid-interval-decrease);
+                }
+            }
+        }
+
+        Rectangle {
+            width: max(t-unit.preferred-width + self.height - t-unit.preferred-height, 38px);
+            background: t-unit.has-hover ? #505050 : #404040;
+
+            t-unit := TouchArea {
+                enabled: Data.current-tab-is-2d;
+
+                Text {
+                    vertical-alignment: center;
+                    font-size: 11px;
+                    color: (!Data.current-tab-is-2d) ? #707070 : white;
+                    text: Helpers.get-unit-short-str(Data.current-unit);
+                }
+
+                clicked => {
+                    pw-unit.show();
+                }
+            }
+
+            pw-unit := PopupWindow {
+                x: -(self.preferred-width - parent.width) / 2;
+                y: -self.preferred-height;
+
+                VerticalLayout {
+                    for unit in Data.all-length-units: TouchArea {
+                        Rectangle {
+                            background: parent.has-hover ? #505050 : #404040;
+
+                            HorizontalLayout {
+                                padding: 5px;
+
+                                Text {
+                                    color: #cccccc;
+                                    horizontal-alignment: center;
+                                    text: Helpers.get-unit-short-str(unit);
+                                }
+                            }
+                        }
+
+                        clicked => {
+                            Data.set-current-unit(unit);
+                        }
+                    }
+                }
+            }
+        }
+
+        Rectangle {
+            width: self.height;
+            background: t-grid-style.has-hover ? #505050 : #404040;
+
+            t-grid-style := TouchArea {
+                enabled: Data.current-tab-is-2d;
+
+                Image {
+                    width: self.height * 0.7;
+                    height: 100%;
+                    image-fit: contain;
+                    source: (Data.current-grid-style == GridStyle.lines) ? @image-url("../../../bootstrap-icons/icons/grid-3x3.svg") : ((Data.current-grid-style == GridStyle.dots) ? @image-url("../../../../img/grid-dots.svg") : @image-url("../../../../img/grid-none.svg"));
+                    colorize: (!Data.current-tab-is-2d) ? #707070 : Palette.foreground;
+                }
+
+                clicked => {
+                    if (Data.current-grid-style == GridStyle.none) {
+                        Data.set-current-grid-style(GridStyle.dots);
+                    } else if (Data.current-grid-style == GridStyle.dots) {
+                        Data.set-current-grid-style(GridStyle.lines);
+                    } else {
+                        Data.set-current-grid-style(GridStyle.none);
+                    }
+                }
+            }
+        }
+
+        Rectangle {
+            width: self.height;
+            background: (ta-lock.enabled && Data.ignore-placement-locks) ? #900000 : (ta-lock.has-hover ? #505050 : #404040);
+
+            ta-lock := TouchArea {
+                enabled: Data.current-tab.type == TabType.board-2d;
+
+                Image {
+                    width: self.height * 0.7;
+                    height: 100%;
+                    image-fit: contain;
+                    source: Data.ignore-placement-locks ? @image-url("../../../font-awesome/svgs/solid/lock-open.svg") : @image-url("../../../font-awesome/svgs/solid/lock.svg");
+                    colorize: (!ta-lock.enabled) ? #707070 : (Data.ignore-placement-locks ? white : Palette.foreground);
+                }
+
+                clicked => {
+                    Data.ignore-placement-locks = !Data.ignore-placement-locks;
+                }
             }
         }
 

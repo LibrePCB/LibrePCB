@@ -5,6 +5,9 @@ import { MainMenuBar } from "mainmenubar.slint";
 import { SideBar } from "sidebar.slint";
 import { HomePanel } from "homepanel.slint";
 import { LibrariesPanel } from "library/librariespanel.slint";
+import { ProjectPanel } from "project/projectpanel.slint";
+import { RuleCheckPanel } from "rulecheckpanel.slint";
+import { OrderPanel } from "project/orderpanel.slint";
 import { AboutPanel } from "aboutpanel.slint";
 import { WindowSection } from "windowsection.slint";
 import { StatusBar } from "statusbar.slint";
@@ -31,6 +34,10 @@ export component AppWindow inherits Window {
     preferred-width: 1024px;
     preferred-height: 768px;
     forward-focus: fs;
+
+    public function focus-search() {
+        menubar.focus-search();
+    }
 
     fs := FocusScope {
         // This is an ugly hack to not make any undesired element having the
@@ -90,6 +97,7 @@ export component AppWindow inherits Window {
             z: 100; // For the tooltips.
             width: 100%;
             height: 26px;
+            sections-start-x: sidebar.width + panel-width;
         }
 
         sidebar := SideBar {
@@ -112,6 +120,30 @@ export component AppWindow inherits Window {
             x: sidebar.width;
             y: sidebar.y;
             z: 80; // For the tooltips.
+            width: panel-width;
+            height: sidebar.height;
+        }
+
+        if Data.panel-page == PanelPage.project: ProjectPanel {
+            x: sidebar.width;
+            y: sidebar.y;
+            z: 90; // For the tooltips.
+            width: panel-width;
+            height: sidebar.height;
+        }
+
+        if Data.panel-page == PanelPage.rule-check: RuleCheckPanel {
+            x: sidebar.width;
+            y: sidebar.y;
+            z: 90; // For the tooltips.
+            width: panel-width;
+            height: sidebar.height;
+        }
+
+        if Data.panel-page == PanelPage.order: OrderPanel {
+            x: sidebar.width;
+            y: sidebar.y;
+            z: 90; // For the tooltips.
             width: panel-width;
             height: sidebar.height;
         }

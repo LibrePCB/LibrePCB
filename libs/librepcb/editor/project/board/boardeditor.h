@@ -149,6 +149,7 @@ public:
   void fsmToolEnter(BoardEditorState_AddHole& state) noexcept override;
   void fsmToolEnter(BoardEditorState_AddDevice& state) noexcept override;
   void fsmToolEnter(BoardEditorState_Measure& state) noexcept override;
+  void fsmSetFeatures(Features features) noexcept override;
 
   // Operator Overloadings
   BoardEditor& operator=(const BoardEditor& rhs) = delete;

@@ -76,6 +76,9 @@ bool SchematicEditorState_AddText::entry() noexcept {
   if (!addText(pos)) return false;
 
   mAdapter.fsmToolEnter(*this);
+  mAdapter.fsmSetFeatures(SchematicEditorFsmAdapter::Features(
+      SchematicEditorFsmAdapter::Feature::Rotate |
+      SchematicEditorFsmAdapter::Feature::Mirror));
   mAdapter.fsmSetViewCursor(Qt::CrossCursor);
   return true;
 }
@@ -85,6 +88,7 @@ bool SchematicEditorState_AddText::exit() noexcept {
   if (!abortCommand(true)) return false;
 
   mAdapter.fsmSetViewCursor(std::nullopt);
+  mAdapter.fsmSetFeatures(SchematicEditorFsmAdapter::Features());
   mAdapter.fsmToolLeave();
   return true;
 }
