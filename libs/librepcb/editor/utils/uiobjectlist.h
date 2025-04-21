@@ -85,7 +85,7 @@ public:
     Q_ASSERT(obj);
     index = qBound(0, index, mObjects.count() + 1);
     mObjects.insert(index, obj);
-    slint::Model<TUiData>::row_added(index, 1);
+    slint::Model<TUiData>::notify_row_added(index, 1);
     obj->onUiDataChanged.attach(mOnUiDataChangedSlot);
     onEdited.notify(index, obj, Event::ElementAdded);
   }
@@ -99,7 +99,7 @@ public:
   }
   std::shared_ptr<TObj> takeAt(int index) noexcept {
     if (auto obj = mObjects.takeAt(index)) {
-      slint::Model<TUiData>::row_removed(index, 1);
+      slint::Model<TUiData>::notify_row_removed(index, 1);
       obj->onUiDataChanged.detach(mOnUiDataChangedSlot);
       onEdited.notify(index, obj, Event::ElementRemoved);
       return obj;
@@ -140,7 +140,7 @@ public:
 private:
   void elementUiDataChangedHandler(const TObj& obj) noexcept {
     if (auto index = indexOf(&obj)) {
-      slint::Model<TUiData>::row_changed(*index);
+      slint::Model<TUiData>::notify_row_changed(*index);
       onEdited.notify(*index, at(*index), Event::ElementUiDataChanged);
     }
   }

@@ -114,7 +114,7 @@ void LibrariesModel::setOnlineVersions(
         mMergedLibs.at(i).online_version = versionStr;
         mMergedLibs.at(i).outdated = Version::fromString(s2q(versionStr)) >
             Version::fromString(s2q(mMergedLibs.at(i).installed_version));
-        row_changed(i);
+        notify_row_changed(i);
       }
     }
   }
@@ -178,7 +178,7 @@ void LibrariesModel::applyChanges() noexcept {
           [this, uuid](int percent) {
             if (auto i = indexOf(*uuid)) {
               mMergedLibs.at(*i).progress = percent;
-              row_changed(*i);
+              notify_row_changed(*i);
             }
           },
           Qt::QueuedConnection);
@@ -425,7 +425,7 @@ void LibrariesModel::onlineIconReceived(const Uuid& uuid,
   for (std::size_t i = 0; i < mMergedLibs.size(); ++i) {
     if (mMergedLibs.at(i).uuid == uuid.toStr()) {
       mMergedLibs.at(i).icon = q2s(pixmap);
-      row_changed(i);
+      notify_row_changed(i);
     }
   }
 }
@@ -493,7 +493,7 @@ void LibrariesModel::updateMergedLibraries() noexcept {
   checkMissingDependenciesOfLibs();
   updateCheckStates(false);
 
-  reset();
+  notify_reset();
 
   emit uiDataChanged(getUiData());
 }
@@ -505,7 +505,7 @@ void LibrariesModel::updateCheckStates(bool notify) noexcept {
     if (lib.checked != checked) {
       lib.checked = checked;
       if (notify) {
-        row_changed(i);
+        notify_row_changed(i);
       }
     }
   }

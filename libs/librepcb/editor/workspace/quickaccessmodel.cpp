@@ -231,14 +231,14 @@ void QuickAccessModel::refreshItems() noexcept {
 
   const std::size_t oldCount = mItems.size();
   if (items.size() < oldCount) {
-    row_removed(items.size(), oldCount - items.size());
+    notify_row_removed(items.size(), oldCount - items.size());
   }
   mItems = items;
   if (items.size() > oldCount) {
-    row_added(oldCount, items.size() - oldCount);
+    notify_row_added(oldCount, items.size() - oldCount);
   }
   for (std::size_t i = 0; i < std::min(items.size(), oldCount); ++i) {
-    row_changed(i);
+    notify_row_changed(i);
   }
 }
 

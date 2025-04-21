@@ -89,7 +89,7 @@ private:
     Q_UNUSED(obj);
     switch (event) {
       case TList::Event::ElementAdded: {
-        slint::Model<TDerivedUiData>::row_added(index, 1);
+        slint::Model<TDerivedUiData>::notify_row_added(index, 1);
         if (auto o = std::dynamic_pointer_cast<TDerived>(mList->value(index))) {
           Q_ASSERT(o == obj);
           o->onDerivedUiDataChanged.attach(mOnDerivedUiDataChangedSlot);
@@ -97,7 +97,7 @@ private:
         break;
       }
       case TList::Event::ElementRemoved: {
-        slint::Model<TDerivedUiData>::row_removed(index, 1);
+        slint::Model<TDerivedUiData>::notify_row_removed(index, 1);
         if (auto o = std::dynamic_pointer_cast<TDerived>(mList->value(index))) {
           Q_ASSERT(o == obj);
           o->onDerivedUiDataChanged.detach(mOnDerivedUiDataChangedSlot);
@@ -112,7 +112,7 @@ private:
   void elementDerivedUiDataChangedHandler(const TDerived& obj) noexcept {
     if (auto index =
             mList->indexOf(static_cast<const typename TList::Element*>(&obj))) {
-      slint::Model<TDerivedUiData>::row_changed(*index);
+      slint::Model<TDerivedUiData>::notify_row_changed(*index);
     }
   }
 
