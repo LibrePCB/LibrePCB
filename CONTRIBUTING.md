@@ -13,13 +13,15 @@ there are many other ways how to contribute to the LibrePCB project, see
   (e.g. changes affecting the file format) at any time, see details in our
   [development workflow documentation](https://developers.librepcb.org/da/dbc/doc_release_workflow.html#doc_release_workflow_branches).
 - Please search issues and pull requests before adding something new to avoid duplicating efforts and conversations.
-- Issues which are considered to be easy to solve are marked with the label `easy`:
-  [Browse all easy issues](https://github.com/LibrePCB/LibrePCB/labels/easy).
+- We use some labels to mark issues as suitable for contributors, check those
+  out to find something to work on:
+  - [`help wanted`](https://github.com/LibrePCB/LibrePCB/labels/help%20wanted)
+  - [`easy`](https://github.com/LibrePCB/LibrePCB/labels/easy)
 - To contact us use one of the following options:
   - Our [discussion platform](https://librepcb.discourse.group/) (preferred)
   - GitHub issues
   - [Telegram](https://telegram.me/LibrePCB_dev) or
-    [Libera.Chat](https://web.libera.chat/?channels=#librepcb)
+    [Matrix](https://matrix.to/#/#librepcb-dev:matrix.coredump.ch)
     (they are automatically synchronized)
 
 ## Getting Started
