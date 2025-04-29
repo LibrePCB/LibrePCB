@@ -6,6 +6,7 @@ import {
     Data,
     EditorCommandSet as Cmd,
     PanelPage,
+    WindowSectionAction,
 } from "api.slint";
 
 component MainMenuItem inherits Rectangle {
@@ -189,7 +190,7 @@ export component MainMenuBar inherits Rectangle {
                     status-tip: @tr("Split the current window into one more section");
 
                     clicked => {
-                        Backend.trigger(Action.section-split);
+                        Backend.trigger-section(Data.sections.length - 1, WindowSectionAction.split);
                     }
                 }
             }

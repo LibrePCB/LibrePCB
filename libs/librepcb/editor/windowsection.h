@@ -68,6 +68,7 @@ public:
   void setHomeTabVisible(bool visible) noexcept;
   void addTab(std::shared_ptr<WindowTab> tab, int index = -1) noexcept;
   std::shared_ptr<WindowTab> removeTab(int index) noexcept;
+  void triggerTab(int index, ui::TabAction a) noexcept;
 
   template <typename T>
   bool switchToTab() noexcept {
@@ -86,14 +87,11 @@ public:
 
 signals:
   void panelPageRequested(ui::PanelPage p);
-  void splitRequested();
-  void closeRequested();
   void derivedUiDataChanged(std::size_t index);
   void statusBarMessageChanged(const QString& message, int timeoutMs);
 
 private:
   void setCurrentTab(int index) noexcept;
-  void trigger(ui::Action a) noexcept;
   void highlight() noexcept;
   void tabCloseRequested() noexcept;
 

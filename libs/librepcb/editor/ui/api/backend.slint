@@ -1,4 +1,8 @@
-import { Action } from "types.slint";
+import {
+    Action,
+    TabAction,
+    WindowSectionAction,
+} from "types.slint";
 import { Data } from "data.slint";
 
 // Note: The callback implementations are just for the live preview, they will
@@ -12,6 +16,26 @@ export global Backend {
     pure callback trigger(action: Action);
     trigger(action) => {
         debug("Trigger action:", action);
+    }
+
+    // Trigger some window section action
+    //
+    // Note: This callback is executed asynchronously in the backend to
+    // guarantee there are no side effects changing the UI from within the
+    // callback. Otherwise we couldn't declare it as 'pure'.
+    pure callback trigger-section(section: int, action: WindowSectionAction);
+    trigger-section(section, action) => {
+        debug("Trigger section action:", section, action);
+    }
+
+    // Trigger some window tab action
+    //
+    // Note: This callback is executed asynchronously in the backend to
+    // guarantee there are no side effects changing the UI from within the
+    // callback. Otherwise we couldn't declare it as 'pure'.
+    pure callback trigger-tab(section: int, tab: int, action: TabAction);
+    trigger-tab(section, tab, action) => {
+        debug("Trigger tab action:", section, tab, action);
     }
 
     // Open an URL by an external application (usually the web browser)

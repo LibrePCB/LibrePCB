@@ -81,7 +81,6 @@ ui::TabData CreateLibraryTab::getUiData() const noexcept {
   return ui::TabData{
       ui::TabType::CreateLibrary,  // Type
       q2s(tr("New Library")),  // Title
-      ui::Action::None,  // Action
   };
 }
 
@@ -91,18 +90,14 @@ void CreateLibraryTab::setDerivedUiData(
   validate();
 }
 
-/*******************************************************************************
- *  Protected Methods
- ******************************************************************************/
-
-void CreateLibraryTab::triggerAsync(ui::Action a) noexcept {
+void CreateLibraryTab::trigger(ui::TabAction a) noexcept {
   switch (a) {
-    case ui::Action::TabCancel: {
+    case ui::TabAction::Cancel: {
       emit closeRequested();
       break;
     }
 
-    case ui::Action::TabOk: {
+    case ui::TabAction::Accept: {
       try {
         if ((!mName) || (!mVersion) || (!mDirectory.isValid())) {
           throw LogicError(__FILE__, __LINE__);
@@ -183,7 +178,7 @@ void CreateLibraryTab::triggerAsync(ui::Action a) noexcept {
     }
 
     default: {
-      WindowTab::triggerAsync(a);
+      WindowTab::trigger(a);
       break;
     }
   }

@@ -55,11 +55,10 @@ public:
     ElementRemoved,
     ElementUiDataChanged,
   };
-  Signal<UiObjectList<TObj, TUiData>, int, const std::shared_ptr<const TObj>&,
-         Event>
+  Signal<UiObjectList<TObj, TUiData>, int, const std::shared_ptr<TObj>&, Event>
       onEdited;
-  typedef Slot<UiObjectList<TObj, TUiData>, int,
-               const std::shared_ptr<const TObj>&, Event>
+  typedef Slot<UiObjectList<TObj, TUiData>, int, const std::shared_ptr<TObj>&,
+               Event>
       OnEditedSlot;
 
   // Constructors / Destructor

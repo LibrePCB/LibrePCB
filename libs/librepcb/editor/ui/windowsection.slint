@@ -8,8 +8,10 @@ import {
     Backend,
     Data,
     Helpers,
+    TabAction,
     TabData,
     TabType,
+    WindowSectionAction,
     WindowSectionData,
 } from "api.slint";
 
@@ -119,7 +121,7 @@ export component WindowSection inherits Rectangle {
                         }
 
                         close-clicked => {
-                            section.tabs[section.current-tab-index].action = Action.tab-close;
+                            Backend.trigger-tab(section-index, index, TabAction.close);
                         }
                     }
                 }
@@ -138,7 +140,7 @@ export component WindowSection inherits Rectangle {
                     tooltip-position: bottom-left;
 
                     clicked => {
-                        Data.sections[section-index].action = Action.section-split;
+                        Backend.trigger-section(section-index, WindowSectionAction.split);
                     }
                 }
 
@@ -151,7 +153,7 @@ export component WindowSection inherits Rectangle {
                     tooltip-position: bottom-left;
 
                     clicked => {
-                        Data.sections[section-index].action = Action.section-close;
+                        Backend.trigger-section(section-index, WindowSectionAction.close);
                     }
                 }
             }

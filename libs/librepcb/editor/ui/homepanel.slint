@@ -14,6 +14,7 @@ import {
     Data,
     EditorCommandSet as Cmd,
     Helpers,
+    TreeViewItemAction,
     TreeViewItemData,
 } from "api.slint";
 
@@ -64,7 +65,7 @@ component QuickAccessListView inherits TreeView {
             default: true;
 
             clicked => {
-                root.model[context-menu-item-index].action = Action.default;
+                root.model[context-menu-item-index].action = TreeViewItemAction.open;
             }
         }
 
@@ -89,7 +90,7 @@ component QuickAccessListView inherits TreeView {
             shortcuts: "Del";  // Hardcoded in the UI.
 
             clicked => {
-                root.model[context-menu-item-index].action = Action.delete;
+                root.model[context-menu-item-index].action = TreeViewItemAction.delete;
             }
         }
     }
@@ -106,7 +107,7 @@ component WorkspaceFolderTreeView inherits TreeView {
             root.model[index].pinned = !root.model[index].pinned;
             return accept;
         } else if (!item.is-project-file-or-folder) && Helpers.is-shortcut(event, Cmd.project-new) {
-            root.model[index].action = Action.project-new;
+            root.model[index].action = TreeViewItemAction.new-project;
             return accept;
         }
         reject
@@ -142,7 +143,7 @@ component WorkspaceFolderTreeView inherits TreeView {
             default: true;
 
             clicked => {
-                root.model[context-menu-item-index].action = Action.default;
+                root.model[context-menu-item-index].action = TreeViewItemAction.open;
             }
         }
 
@@ -153,7 +154,7 @@ component WorkspaceFolderTreeView inherits TreeView {
             // shortcuts: "Ctrl+N";  // Conflicts with "new project".
 
             clicked => {
-                root.model[context-menu-item-index].action = Action.folder-new;
+                root.model[context-menu-item-index].action = TreeViewItemAction.new-folder;
             }
         }
 
@@ -162,7 +163,7 @@ component WorkspaceFolderTreeView inherits TreeView {
             icon: @image-url("../../../font-awesome/svgs/solid/file-circle-plus.svg");
 
             clicked => {
-                root.model[context-menu-item-index].action = Action.project-new;
+                root.model[context-menu-item-index].action = TreeViewItemAction.new-project;
             }
         }
 
@@ -190,7 +191,7 @@ component WorkspaceFolderTreeView inherits TreeView {
             shortcuts: "Del";  // Hardcoded in the UI.
 
             clicked => {
-                root.model[context-menu-item-index].action = Action.delete;
+                root.model[context-menu-item-index].action = TreeViewItemAction.delete;
             }
         }
     }

@@ -15,6 +15,7 @@ import {
     Backend,
     Constants,
     Data,
+    LibraryAction,
     LibraryData,
     LibraryListData,
 } from "../api.slint";
@@ -46,7 +47,7 @@ component LibraryUninstallPopup inherits MessagePopup {
     }
 
     accepted => {
-        model[index].action = Action.library-uninstall;
+        model[index].action = LibraryAction.uninstall;
         self.close();
     }
 }
@@ -260,7 +261,7 @@ component LibraryListViewItem inherits Rectangle {
 
         double-clicked => {
             if !lib.path.is-empty {
-                model[index].action = Action.library-open;
+                model[index].action = LibraryAction.open;
             }
         }
     }
@@ -457,7 +458,7 @@ component LibrariesPanelSection inherits FocusScope {
             return accept;
         } else if (current-index >= 0) && (current-index < libraries.length) {
             if (event.text == Key.Return) && (!libraries[current-index].path.is-empty) {
-                libraries[current-index].action = Action.library-open;
+                libraries[current-index].action = LibraryAction.open;
                 return accept;
             } else if event.text == Key.Delete {
                 uninstall-library(current-index);

@@ -54,7 +54,6 @@ WindowSection::WindowSection(GuiApplication& app, QObject* parent) noexcept
             mTabs),
         -1,  // Current tab index
         false,  // Highlight
-        ui::Action::None,  // Action
     } {
 }
 
@@ -66,13 +65,6 @@ WindowSection::~WindowSection() noexcept {
  ******************************************************************************/
 
 void WindowSection::setUiData(const ui::WindowSectionData& data) noexcept {
-  if (data.action != ui::Action::None) {
-    // if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0): Remove lambda.
-    const auto a = data.action;
-    QMetaObject::invokeMethod(
-        this, [this, a]() { trigger(a); }, Qt::QueuedConnection);
-  }
-
   setCurrentTab(data.current_tab_index);
 }
 
@@ -123,6 +115,12 @@ std::shared_ptr<WindowTab> WindowSection::removeTab(int index) noexcept {
   }
 }
 
+void WindowSection::triggerTab(int index, ui::TabAction a) noexcept {
+  if (auto t = mTabs->value(index)) {
+    t->trigger(a);
+  }
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
@@ -143,21 +141,6 @@ void WindowSection::setCurrentTab(int index) noexcept {
   onUiDataChanged.notify();
 }
 
-void WindowSection::trigger(ui::Action a) noexcept {
-  switch (a) {
-    case ui::Action::SectionSplit: {
-      emit splitRequested();
-      break;
-    }
-    case ui::Action::SectionClose: {
-      emit closeRequested();
-      break;
-    }
-    default:
-      break;
-  }
-}
-
 void WindowSection::highlight() noexcept {
   mUiData.highlight = true;
   onUiDataChanged.notify();
@@ -169,8 +152,9 @@ void WindowSection::highlight() noexcept {
 }
 
 void WindowSection::tabCloseRequested() noexcept {
-  if (auto index = mTabs->indexOf(static_cast<const WindowTab*>(sender()))) {
-    if (*index > 0) {  // Do not allow closing the home tab.
+  const WindowTab* tab = static_cast<const WindowTab*>(sender());
+  if (auto index = mTabs->indexOf(tab)) {
+    if (!dynamic_cast<const HomeTab*>(tab)) {
       removeTab(*index);
     }
   }

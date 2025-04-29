@@ -62,6 +62,7 @@ public:
   virtual void setUiData(const ui::TabData& data) noexcept;
   virtual void activate() noexcept {}
   virtual void deactivate() noexcept {}
+  virtual void trigger(ui::TabAction a) noexcept;
 
   // Operator Overloadings
   WindowTab& operator=(const WindowTab& rhs) = delete;
@@ -72,8 +73,6 @@ signals:
   void statusBarMessageChanged(const QString& message, int timeoutMs);
 
 protected:
-  virtual void triggerAsync(ui::Action a) noexcept;
-
   GuiApplication& mApp;
 };
 

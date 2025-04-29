@@ -49,7 +49,6 @@ ui::TabData HomeTab::getUiData() const noexcept {
   return ui::TabData{
       ui::TabType::Home,  // Type
       slint::SharedString(),  // Title
-      ui::Action::None,  // Action
   };
 }
 

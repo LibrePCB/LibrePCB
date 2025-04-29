@@ -118,8 +118,23 @@ MainWindow::MainWindow(GuiApplication& app,
 
   // Register global callbacks.
   const ui::Backend& b = mWindow->global<ui::Backend>();
-  b.on_trigger(
-      std::bind(&MainWindow::triggerAsync, this, std::placeholders::_1));
+  b.on_trigger([this](ui::Action a) {
+    // if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0): Remove lambda.
+    QMetaObject::invokeMethod(
+        this, [this, a]() { trigger(a); }, Qt::QueuedConnection);
+  });
+  b.on_trigger_section([this](int section, ui::WindowSectionAction a) {
+    // if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0): Remove lambda.
+    QMetaObject::invokeMethod(
+        this, [this, section, a]() { triggerSection(section, a); },
+        Qt::QueuedConnection);
+  });
+  b.on_trigger_tab([this](int section, int tab, ui::TabAction a) {
+    // if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0): Remove lambda.
+    QMetaObject::invokeMethod(
+        this, [this, section, tab, a]() { triggerTab(section, tab, a); },
+        Qt::QueuedConnection);
+  });
   b.on_request_project_preview(
       [this](const slint::SharedString& fp, float width) {
         mProjectPreviewRenderer->request(FilePath(s2q(fp)),
@@ -149,12 +164,12 @@ MainWindow::MainWindow(GuiApplication& app,
       cs.value(mSettingsPrefix % "/geometry").toByteArray());
   const int sectionCount = cs.beginReadArray(mSettingsPrefix % "/sections");
   for (int i = 0; i < sectionCount; ++i) {
-    splitSection(mSections->count());
+    splitSection(mSections->count(), false);
   }
   cs.endArray();
 
   if (mSections->isEmpty()) {
-    splitSection(0);
+    splitSection(0, true);
   }
 }
 
@@ -207,40 +222,28 @@ slint::CloseRequestResponse MainWindow::closeRequested() noexcept {
   return slint::CloseRequestResponse::HideWindow;
 }
 
-void MainWindow::triggerAsync(ui::Action a) noexcept {
-  // if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0): Remove lambda.
-  QMetaObject::invokeMethod(
-      this, [this, a]() { trigger(a); }, Qt::QueuedConnection);
-}
-
-bool MainWindow::trigger(ui::Action a) noexcept {
+void MainWindow::trigger(ui::Action a) noexcept {
   switch (a) {
     // General
     case ui::Action::KeyboardShortcutsReference: {
       StandardEditorCommandHandler handler(mApp.getWorkspace().getSettings(),
                                            mWidget);
       handler.shortcutsReference();
-      return true;
+      break;
     }
     case ui::Action::Quit: {
       mApp.quit(mWidget);
-      return true;
+      break;
     }
 
     // Window
     case ui::Action::WindowNew: {
       mApp.createNewWindow();
-      return true;
+      break;
     }
     case ui::Action::WindowClose: {
       closeRequested();
-      return true;
-    }
-
-    // Window section
-    case ui::Action::SectionSplit: {
-      splitSection(mSections->count() - 1);
-      return true;
+      break;
     }
 
     // Workspace
@@ -248,23 +251,23 @@ bool MainWindow::trigger(ui::Action a) noexcept {
       StandardEditorCommandHandler handler(mApp.getWorkspace().getSettings(),
                                            mWidget);
       handler.fileManager(mApp.getWorkspace().getPath());
-      return true;
+      break;
     }
     case ui::Action::WorkspaceSwitch: {
       mApp.switchWorkspace(mWidget);
-      return true;
+      break;
     }
     case ui::Action::WorkspaceSettings: {
       mApp.execWorkspaceSettingsDialog(mWidget);
-      return true;
+      break;
     }
     case ui::Action::WorkspaceLibrariesRescan: {
       mApp.getWorkspace().getLibraryDb().startLibraryRescan();
-      return true;
+      break;
     }
     case ui::Action::ProjectImportExamples: {
       mApp.addExampleProjects(mWidget);
-      return true;
+      break;
     }
 
     // Library
@@ -272,72 +275,85 @@ bool MainWindow::trigger(ui::Action a) noexcept {
       if (!switchToTab<CreateLibraryTab>()) {
         addTab(std::make_shared<CreateLibraryTab>(mApp));
       }
-      return true;
+      break;
     }
     case ui::Action::LibraryDownload: {
       if (!switchToTab<DownloadLibraryTab>()) {
         addTab(std::make_shared<DownloadLibraryTab>(mApp));
       }
-      return true;
+      break;
     }
     case ui::Action::LibraryPanelEnsurePopulated: {
       mApp.getLocalLibraries().ensurePopulated(true);
       mApp.getRemoteLibraries().ensurePopulated(true);
-      return true;
+      break;
     }
     case ui::Action::LibraryPanelApply: {
       mApp.getRemoteLibraries().applyChanges();
-      return true;
+      break;
     }
     case ui::Action::LibraryPanelCancel: {
       mApp.getRemoteLibraries().cancel();
-      return true;
+      break;
     }
 
     // Project
     case ui::Action::ProjectImportEagle: {
       mApp.createProject(FilePath(), true, mWidget);
-      return true;
+      break;
     }
     case ui::Action::ProjectNew: {
       mApp.createProject(FilePath(), false, mWidget);
-      return true;
+      break;
     }
     case ui::Action::ProjectOpen: {
       mApp.openProject(FilePath(), mWidget);
-      return true;
+      break;
     }
 
-    default:
+    default: {
+      qWarning() << "Unhandled UI action:" << static_cast<int>(a);
       break;
+    }
   }
-
-  qWarning() << "Unhandled UI action:" << static_cast<int>(a);
-  return false;
 }
 
-void MainWindow::splitSection(int index) noexcept {
+void MainWindow::triggerSection(int section,
+                                ui::WindowSectionAction a) noexcept {
+  switch (a) {
+    case ui::WindowSectionAction::Split: {
+      splitSection(section, true);
+      break;
+    }
+    case ui::WindowSectionAction::Close: {
+      if (mSections->count() > 1) {
+        if (std::shared_ptr<WindowSection> s = mSections->takeAt(section)) {
+          const ui::Data& d = mWindow->global<ui::Data>();
+          d.set_current_section_index(qBound(-1, d.get_current_section_index(),
+                                             mSections->count() - 1));
+          updateHomeTabSection();
+        }
+      }
+      break;
+    }
+    default: {
+      qWarning() << "Unhandled section action:" << static_cast<int>(a);
+      break;
+    }
+  }
+}
+
+void MainWindow::triggerTab(int section, int tab, ui::TabAction a) noexcept {
+  if (auto s = mSections->value(section)) {
+    s->triggerTab(tab, a);
+  }
+}
+
+void MainWindow::splitSection(int index, bool makeCurrent) noexcept {
   const int newIndex = qBound(0, index + 1, mSections->count());
   std::shared_ptr<WindowSection> s = std::make_shared<WindowSection>(mApp);
   connect(s.get(), &WindowSection::panelPageRequested, this,
           &MainWindow::showPanelPage);
-  connect(s.get(), &WindowSection::splitRequested, this, [this]() {
-    if (auto index =
-            mSections->indexOf(static_cast<const WindowSection*>(sender()))) {
-      splitSection(*index);
-    }
-  });
-  connect(s.get(), &WindowSection::closeRequested, this, [this]() {
-    if (mSections->count() > 1) {
-      if (std::shared_ptr<WindowSection> s =
-              mSections->take(static_cast<const WindowSection*>(sender()))) {
-        const ui::Data& d = mWindow->global<ui::Data>();
-        d.set_current_section_index(
-            qBound(-1, d.get_current_section_index(), mSections->count() - 1));
-        updateHomeTabSection();
-      }
-    }
-  });
   connect(s.get(), &WindowSection::statusBarMessageChanged, this,
           [this](const QString& message, int timeoutMs) {
             const ui::Data& d = mWindow->global<ui::Data>();
@@ -351,6 +367,12 @@ void MainWindow::splitSection(int index) noexcept {
             }
           });
   mSections->insert(newIndex, s);
+
+  if (makeCurrent || (mSections->count() == 1)) {
+    const ui::Data& d = mWindow->global<ui::Data>();
+    d.set_current_section_index(newIndex);
+  }
+
   updateHomeTabSection();
 }
 

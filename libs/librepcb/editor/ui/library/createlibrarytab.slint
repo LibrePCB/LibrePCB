@@ -7,9 +7,9 @@ import {
 } from "../widgets.slint";
 import { Tab } from "../tab.slint";
 import {
-    Action,
     Backend,
     CreateLibraryTabData,
+    TabAction,
     WindowSectionData,
 } from "../api.slint";
 
@@ -25,7 +25,7 @@ export component CreateLibraryTab inherits Tab {
 
     key-pressed(event) => {
         if event.text == Key.Escape {
-            section.tabs[section.current-tab-index].action = Action.tab-cancel;
+            Backend.trigger-tab(section-index, section.current-tab-index, TabAction.cancel);
             return accept;
         }
         reject
@@ -33,7 +33,7 @@ export component CreateLibraryTab inherits Tab {
 
     function edit-key-pressed(event: KeyEvent) -> EventResult {
         if event.text == Key.Return {
-            section.tabs[section.current-tab-index].action = Action.tab-ok;
+            Backend.trigger-tab(section-index, section.current-tab-index, TabAction.accept);
             return accept;
         }
         reject
@@ -294,7 +294,7 @@ export component CreateLibraryTab inherits Tab {
                     text: @tr("Create Library");
 
                     clicked => {
-                        section.tabs[section.current-tab-index].action = Action.tab-ok;
+                        Backend.trigger-tab(section-index, section.current-tab-index, TabAction.accept);
                     }
                 }
 
@@ -302,7 +302,7 @@ export component CreateLibraryTab inherits Tab {
                     text: @tr("Cancel");
 
                     clicked => {
-                        section.tabs[section.current-tab-index].action = Action.tab-cancel;
+                        Backend.trigger-tab(section-index, section.current-tab-index, TabAction.cancel);
                     }
                 }
             }

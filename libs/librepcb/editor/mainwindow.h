@@ -76,9 +76,10 @@ signals:
 
 private:
   slint::CloseRequestResponse closeRequested() noexcept;
-  void triggerAsync(ui::Action a) noexcept;
-  bool trigger(ui::Action a) noexcept;
-  void splitSection(int index) noexcept;
+  void trigger(ui::Action a) noexcept;
+  void triggerSection(int section, ui::WindowSectionAction a) noexcept;
+  void triggerTab(int section, int tab, ui::TabAction a) noexcept;
+  void splitSection(int index, bool makeCurrent) noexcept;
   void updateHomeTabSection() noexcept;
   void addTab(std::shared_ptr<WindowTab> tab) noexcept;
   template <typename T>

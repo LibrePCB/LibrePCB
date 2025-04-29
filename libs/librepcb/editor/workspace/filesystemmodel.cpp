@@ -54,17 +54,11 @@ FileSystemModel::FileSystemModel(const Workspace& ws, const FilePath& root,
     mSettingsPrefix(settingsPrefix),
     mQuickAccess(quickAccessModel) {
   if (mQuickAccess) {
-    connect(this, &FileSystemModel::pinningRequested, mQuickAccess,
-            &QuickAccessModel::setFavoriteProject, Qt::QueuedConnection);
     connect(mQuickAccess, &QuickAccessModel::favoriteProjectChanged, this,
             &FileSystemModel::favoriteProjectChanged, Qt::QueuedConnection);
   }
   connect(&mWatcher, &QFileSystemWatcher::directoryChanged, this,
           &FileSystemModel::directoryChanged);
-
-  // Run actions asynchronously to avoid complex nested function calls.
-  connect(this, &FileSystemModel::actionTriggered, this,
-          &FileSystemModel::handleAction, Qt::QueuedConnection);
 
   // Restore expanded directories.
   QSettings cs;
@@ -121,14 +115,26 @@ void FileSystemModel::set_row_data(std::size_t i,
     } else if (mItems.at(i).expanded && (!data.expanded)) {
       collapseDir(fp, i + 1, data.level + 1);
     }
-    if (mItems.at(i).supports_pinning && (mItems.at(i).pinned != data.pinned)) {
-      emit pinningRequested(fp, data.pinned);
+    if (mItems.at(i).supports_pinning && (mItems.at(i).pinned != data.pinned) &&
+        mQuickAccess) {
+      // if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0): Remove lambda.
+      const bool pinned = data.pinned;
+      QMetaObject::invokeMethod(
+          this,
+          [this, fp, pinned]() {
+            if (mQuickAccess) mQuickAccess->setFavoriteProject(fp, pinned);
+          },
+          Qt::QueuedConnection);
     }
-    if (data.action != ui::Action::None) {
-      emit actionTriggered(fp, data.action);
+    if (data.action != ui::TreeViewItemAction::None) {
+      // Run actions asynchronously to avoid complex nested function calls.
+      // if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0): Remove lambda.
+      const auto a = data.action;
+      QMetaObject::invokeMethod(
+          this, [this, fp, a]() { trigger(fp, a); }, Qt::QueuedConnection);
     }
     mItems.at(i) = data;
-    mItems.at(i).action = ui::Action::None;
+    mItems.at(i).action = ui::TreeViewItemAction::None;
     notify_row_changed(i);
   }
 }
@@ -183,7 +189,7 @@ void FileSystemModel::expandDir(const FilePath& fp, std::size_t index,
             expand,  // Expanded
             isPinnable,  // Supports pinning
             isPinnable && mQuickAccess->isFavoriteProject(itemFp),  // Pinned
-            ui::Action::None,  // Action
+            ui::TreeViewItemAction::None,  // Action
         });
     notify_row_added(index, 1);
     ++index;
@@ -261,19 +267,20 @@ void FileSystemModel::favoriteProjectChanged(const FilePath& fp,
   }
 }
 
-void FileSystemModel::handleAction(const FilePath& fp, ui::Action a) noexcept {
-  if (a == ui::Action::Default) {
+void FileSystemModel::trigger(const FilePath& fp,
+                              ui::TreeViewItemAction a) noexcept {
+  if (a == ui::TreeViewItemAction::Open) {
     emit openFileTriggered(fp);
-  } else if (a == ui::Action::FolderNew) {
+  } else if (a == ui::TreeViewItemAction::NewFolder) {
     QString n = QInputDialog::getText(qApp->activeWindow(), tr("New Folder"),
                                       tr("Name:"));
     n = FilePath::cleanFileName(n, FilePath::CleanFileNameOption::Default);
     if (!n.isEmpty()) {
       QDir(fp.toStr()).mkdir(n);
     }
-  } else if (a == ui::Action::ProjectNew) {
+  } else if (a == ui::TreeViewItemAction::NewProject) {
     emit newProjectTriggered(fp);
-  } else if (a == ui::Action::Delete) {
+  } else if (a == ui::TreeViewItemAction::Delete) {
     removeFileOrDirectory(fp);
   } else {
     qWarning() << "Unhandled action in FileSystemModel:" << static_cast<int>(a);

@@ -46,26 +46,20 @@ WindowTab::~WindowTab() noexcept {
  ******************************************************************************/
 
 void WindowTab::setUiData(const ui::TabData& data) noexcept {
-  if (data.action != ui::Action::None) {
-    // if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0): Remove lambda.
-    const auto a = data.action;
-    QMetaObject::invokeMethod(
-        this, [this, a]() { triggerAsync(a); }, Qt::QueuedConnection);
-  }
+  Q_UNUSED(data);
 }
 
-/*******************************************************************************
- *  Protected Methods
- ******************************************************************************/
-
-void WindowTab::triggerAsync(ui::Action a) noexcept {
+void WindowTab::trigger(ui::TabAction a) noexcept {
   switch (a) {
-    case ui::Action::TabClose: {
+    case ui::TabAction::Close: {
       emit closeRequested();
       break;
     }
-    default:
+
+    default: {
+      qWarning() << "Unhandled tab action:" << static_cast<int>(a);
       break;
+    }
   }
 }
 

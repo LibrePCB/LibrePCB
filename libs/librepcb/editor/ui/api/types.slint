@@ -1,31 +1,12 @@
 // Triggerable actions
 export enum Action {
-    // Special
-    none,  // No action triggered (used in models)
-    default,  // Default action, depending on context
-
-    // General
+    // Application
     keyboard-shortcuts-reference,
     quit,
-
-    // Modify
-    delete,
-
-    // File system
-    folder-new,
 
     // Window
     window-new,
     window-close,
-
-    // Window section
-    section-split,
-    section-close,
-
-    // Window tab
-    tab-close,
-    tab-cancel,
-    tab-ok,
 
     // Workspace
     workspace-open-folder,
@@ -36,8 +17,6 @@ export enum Action {
     // Library
     library-create,
     library-download,
-    library-open,
-    library-uninstall,
     library-panel-ensure-populated,
     library-panel-apply,
     library-panel-cancel,
@@ -82,6 +61,13 @@ export enum TabType {
     download-library,
 }
 
+// Tab actions
+export enum TabAction {
+    close,
+    cancel,
+    accept,
+}
+
 // Window tab base data
 //
 // For various kinds of tabs, an additional "derived" data structure is
@@ -89,7 +75,6 @@ export enum TabType {
 export struct TabData {
     type: TabType,
     title: string,
-    action: Action,  // Set by UI, handled in backend
 }
 
 // Additional data for "create library" tabs
@@ -125,6 +110,12 @@ export struct DownloadLibraryTabData {
     download-status: string,  // Status or error
 }
 
+// Window section actions
+export enum WindowSectionAction {
+    split,
+    close,
+}
+
 // Window section data structure
 export struct WindowSectionData {
     tabs: [TabData],
@@ -132,7 +123,6 @@ export struct WindowSectionData {
     download-library-tabs: [DownloadLibraryTabData],  // Proxy view for `tabs`
     current-tab-index: int,
     highlight: bool,
-    action: Action,  // Set by UI, handled in backend
 }
 
 // Notification data structure
@@ -149,6 +139,15 @@ export struct NotificationData {
     dont-show-again: bool,  // Set by UI, handled in backend
 }
 
+// Tree view item actions
+export enum TreeViewItemAction {
+    none,
+    open,
+    delete,
+    new-folder,
+    new-project,
+}
+
 // Generic tree view item data structure
 export struct TreeViewItemData {
     level: int,  // 0 = top level items
@@ -161,7 +160,14 @@ export struct TreeViewItemData {
     expanded: bool,
     supports-pinning: bool,
     pinned: bool,
-    action: Action,  // Set by UI, handled in backend
+    action: TreeViewItemAction,  // Set by UI, handled in backend
+}
+
+// Library actions
+export enum LibraryAction {
+    none,
+    open,
+    uninstall,
 }
 
 // Workspace library data structure
@@ -178,7 +184,7 @@ export struct LibraryData {
     progress: int,  // [%], 0 if not installing
     checked: bool,
     highlight: bool,
-    action: Action,  // Set by UI, handled in backend
+    action: LibraryAction,  // Set by UI, handled in backend
 }
 
 // Metadata for a list of LibraryData
