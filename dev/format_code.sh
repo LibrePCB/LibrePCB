@@ -28,7 +28,7 @@ set -eufo pipefail
 
 DOCKER=""
 DOCKER_CMD="docker"
-DOCKER_IMAGE="librepcb/librepcb-dev:devtools-5"
+DOCKER_IMAGE="librepcb/librepcb-dev:devtools-6"
 CLANGFORMAT=${CLANGFORMAT:-clang-format}
 RUSTFMT=${RUSTFMT:-rustfmt}
 BASE="master"
@@ -178,7 +178,7 @@ slintlsp_failed() {
 echo "Formatting Slint sources with slint-lsp..."
 for dir in apps/ libs/librepcb/; do
   for file in $(search_files "${dir}**.slint"); do
-    slint-lsp format "$file" | update_file "$file" || slintlsp_failed
+    slint-lsp format "$file" | "$REPO_ROOT/dev/format_code_helper.py" "$file" | update_file "$file" || slintlsp_failed
   done
 done
 
