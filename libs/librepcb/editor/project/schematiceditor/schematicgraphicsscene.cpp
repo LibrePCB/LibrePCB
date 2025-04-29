@@ -401,6 +401,7 @@ void SchematicGraphicsScene::addPolygon(SI_Polygon& polygon) noexcept {
   std::shared_ptr<PolygonGraphicsItem> item =
       std::make_shared<PolygonGraphicsItem>(polygon.getPolygon(),
                                             mLayerProvider);
+  item->setEditable(true);
   addItem(*item);
   mPolygons.insert(&polygon, item);
 }
