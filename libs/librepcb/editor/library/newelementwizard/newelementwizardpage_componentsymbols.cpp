@@ -97,7 +97,7 @@ void NewElementWizardPage_ComponentSymbols::initializePage() noexcept {
                                                  ElementName("default"), ""));
   }
   mUi->symbolListEditorWidget->setReferences(
-      mContext.getWorkspace(), mContext.getLayerProvider(),
+      mContext.getWorkspace(), mContext.getLayers(),
       mContext.mComponentSymbolVariants.value(0)->getSymbolItems(),
       std::make_shared<LibraryElementCache>(
           mContext.getWorkspace().getLibraryDb()),

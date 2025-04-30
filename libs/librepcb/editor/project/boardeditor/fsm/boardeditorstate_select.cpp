@@ -1855,7 +1855,7 @@ void BoardEditorState_Select::openPlanePropertiesDialog(
 
 void BoardEditorState_Select::openZonePropertiesDialog(BI_Zone& zone) noexcept {
   ZonePropertiesDialog dialog(
-      zone, mContext.undoStack, getLengthUnit(), mContext.editor,
+      zone, mContext.undoStack, getLengthUnit(), mContext.editor.getLayers(),
       "board_editor/zone_properties_dialog", parentWidget());
   dialog.exec();
 }

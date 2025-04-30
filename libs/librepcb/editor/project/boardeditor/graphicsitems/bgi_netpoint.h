@@ -36,6 +36,8 @@
 namespace librepcb {
 namespace editor {
 
+class GraphicsLayerList;
+
 /*******************************************************************************
  *  Class BGI_NetPoint
  ******************************************************************************/
@@ -48,8 +50,7 @@ public:
   // Constructors / Destructor
   BGI_NetPoint() = delete;
   BGI_NetPoint(const BGI_NetPoint& other) = delete;
-  BGI_NetPoint(BI_NetPoint& netpoint,
-               const IF_GraphicsLayerProvider& lp) noexcept;
+  BGI_NetPoint(BI_NetPoint& netpoint, const GraphicsLayerList& layers) noexcept;
   virtual ~BGI_NetPoint() noexcept;
 
   // General Methods
@@ -78,8 +79,8 @@ private:  // Methods
 private:  // Data
   // General Attributes
   BI_NetPoint& mNetPoint;
-  const IF_GraphicsLayerProvider& mLayerProvider;
-  std::shared_ptr<GraphicsLayer> mLayer;
+  const GraphicsLayerList& mLayers;
+  std::shared_ptr<const GraphicsLayer> mLayer;
 
   // Cached Attributes
   QRectF mBoundingRect;

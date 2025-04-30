@@ -46,7 +46,7 @@ class Workspace;
 namespace editor {
 
 class ExclusiveActionGroup;
-class IF_GraphicsLayerProvider;
+class GraphicsLayerList;
 class StatusBar;
 class ToolBarProxy;
 class UndoStackActionGroup;
@@ -66,7 +66,7 @@ public:
 
   struct Context {
     Workspace& workspace;
-    const IF_GraphicsLayerProvider& layerProvider;
+    const GraphicsLayerList& layers;
     bool elementIsNewlyCreated;
     bool readOnly;
     const Library* library;

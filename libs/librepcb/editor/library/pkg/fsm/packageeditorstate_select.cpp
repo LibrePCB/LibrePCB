@@ -36,6 +36,7 @@
 #include "../../../dialogs/zonepropertiesdialog.h"
 #include "../../../editorcommandset.h"
 #include "../../../graphics/circlegraphicsitem.h"
+#include "../../../graphics/graphicslayerlist.h"
 #include "../../../graphics/graphicsscene.h"
 #include "../../../graphics/holegraphicsitem.h"
 #include "../../../graphics/polygongraphicsitem.h"
@@ -677,11 +678,10 @@ bool PackageEditorState_Select::processImportDxf() noexcept {
 
     // Sanity check that the chosen layer is really visible, but this should
     // always be the case anyway.
-    std::shared_ptr<GraphicsLayer> polygonLayer =
-        mContext.editorContext.layerProvider.getLayer(dialog.getLayer());
-    std::shared_ptr<GraphicsLayer> holeLayer =
-        mContext.editorContext.layerProvider.getLayer(
-            Theme::Color::sBoardHoles);
+    std::shared_ptr<const GraphicsLayer> polygonLayer =
+        mContext.editorContext.layers.get(dialog.getLayer());
+    std::shared_ptr<const GraphicsLayer> holeLayer =
+        mContext.editorContext.layers.get(Theme::Color::sBoardHoles);
     if ((!polygonLayer) || (!polygonLayer->isVisible()) || (!holeLayer) ||
         (!holeLayer->isVisible())) {
       throw LogicError(__FILE__, __LINE__, "Layer is not visible!");  // no tr()
@@ -962,10 +962,10 @@ bool PackageEditorState_Select::openPropertiesDialogOfItem(
     dialog.exec();
     return true;
   } else if (auto i = std::dynamic_pointer_cast<ZoneGraphicsItem>(item)) {
-    ZonePropertiesDialog dialog(
-        i->getObj(), mContext.undoStack, getLengthUnit(),
-        mContext.editorContext.layerProvider,
-        "package_editor/zone_properties_dialog", &mContext.editorWidget);
+    ZonePropertiesDialog dialog(i->getObj(), mContext.undoStack,
+                                getLengthUnit(), mContext.editorContext.layers,
+                                "package_editor/zone_properties_dialog",
+                                &mContext.editorWidget);
     dialog.setReadOnly(mContext.editorContext.readOnly);
     dialog.exec();
     return true;
@@ -1037,7 +1037,7 @@ bool PackageEditorState_Select::copySelectedItemsToClipboard() noexcept {
     }
     if (data.getItemCount() > 0) {
       qApp->clipboard()->setMimeData(
-          data.toMimeData(mContext.editorContext.layerProvider).release());
+          data.toMimeData(mContext.editorContext.layers).release());
       emit statusBarMessageChanged(tr("Copied to clipboard!"), 2000);
     }
   } catch (const Exception& e) {

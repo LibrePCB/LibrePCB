@@ -23,6 +23,7 @@
 #include "polygongraphicsitem.h"
 
 #include "graphicslayer.h"
+#include "graphicslayerlist.h"
 
 #include <librepcb/core/utils/toolbox.h>
 
@@ -40,17 +41,17 @@ namespace editor {
  ******************************************************************************/
 
 PolygonGraphicsItem::PolygonGraphicsItem(Polygon& polygon,
-                                         const IF_GraphicsLayerProvider& lp,
+                                         const GraphicsLayerList& layers,
                                          QGraphicsItem* parent) noexcept
   : PrimitivePathGraphicsItem(parent),
     mPolygon(polygon),
-    mLayerProvider(lp),
+    mLayers(layers),
     mEditable(false),
     mVertexHandleRadiusPx(0),
     mVertexHandles(),
     mOnEditedSlot(*this, &PolygonGraphicsItem::polygonEdited) {
   setLineWidth(mPolygon.getLineWidth());
-  setLineLayer(mLayerProvider.getLayer(mPolygon.getLayer()));
+  setLineLayer(mLayers.get(mPolygon.getLayer()));
   updatePath();
   updateFillLayer();
   updateZValue();
@@ -166,7 +167,7 @@ void PolygonGraphicsItem::polygonEdited(const Polygon& polygon,
                                         Polygon::Event event) noexcept {
   switch (event) {
     case Polygon::Event::LayerChanged:
-      setLineLayer(mLayerProvider.getLayer(polygon.getLayer()));
+      setLineLayer(mLayers.get(polygon.getLayer()));
       updateFillLayer();  // required if the area is filled with the line layer
       updatePath();  // Implicitly closed might have changed.
       break;
@@ -193,9 +194,9 @@ void PolygonGraphicsItem::polygonEdited(const Polygon& polygon,
 void PolygonGraphicsItem::updateFillLayer() noexcept {
   // Don't fill if path is not closed (for consistency with Gerber export)!
   if (mPolygon.isFilled() && mPolygon.getPath().isClosed()) {
-    setFillLayer(mLayerProvider.getLayer(mPolygon.getLayer()));
+    setFillLayer(mLayers.get(mPolygon.getLayer()));
   } else if (mPolygon.isGrabArea()) {
-    setFillLayer(mLayerProvider.getGrabAreaLayer(mPolygon.getLayer()));
+    setFillLayer(mLayers.grabArea(mPolygon.getLayer()));
   } else {
     setFillLayer(nullptr);
   }

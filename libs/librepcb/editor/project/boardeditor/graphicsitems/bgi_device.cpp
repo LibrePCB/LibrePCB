@@ -23,6 +23,7 @@
 #include "bgi_device.h"
 
 #include "../../../graphics/graphicslayer.h"
+#include "../../../graphics/graphicslayerlist.h"
 #include "../../../graphics/origincrossgraphicsitem.h"
 #include "../../../graphics/primitivecirclegraphicsitem.h"
 #include "../../../graphics/primitiveholegraphicsitem.h"
@@ -51,11 +52,11 @@ namespace editor {
  ******************************************************************************/
 
 BGI_Device::BGI_Device(BI_Device& device,
-                       const IF_GraphicsLayerProvider& lp) noexcept
+                       const GraphicsLayerList& layers) noexcept
   : QGraphicsItemGroup(),
     onEdited(*this),
     mDevice(device),
-    mLayerProvider(lp),
+    mLayers(layers),
     mGrabAreaLayer(nullptr),
     mOnEditedSlot(*this, &BGI_Device::deviceEdited),
     mOnLayerEditedSlot(*this, &BGI_Device::layerEdited) {
@@ -94,7 +95,7 @@ BGI_Device::BGI_Device(BI_Device& device,
   }
 
   for (auto& obj : mDevice.getLibFootprint().getZones()) {
-    auto i = std::make_shared<PrimitiveZoneGraphicsItem>(mLayerProvider, this);
+    auto i = std::make_shared<PrimitiveZoneGraphicsItem>(mLayers, this);
     i->setOutline(obj.getOutline());
     i->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
     mZoneGraphicsItems.append(i);
@@ -102,8 +103,7 @@ BGI_Device::BGI_Device(BI_Device& device,
 
   for (auto& obj : mDevice.getLibFootprint().getHoles()) {
     Q_UNUSED(obj);
-    auto i = std::make_shared<PrimitiveHoleGraphicsItem>(mLayerProvider, false,
-                                                         this);
+    auto i = std::make_shared<PrimitiveHoleGraphicsItem>(mLayers, false, this);
     i->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
     mHoleGraphicsItems.append(i);
   }
@@ -223,9 +223,9 @@ void BGI_Device::updateBoardSide() noexcept {
   }
 
   // Update grab area layer.
-  std::shared_ptr<GraphicsLayer> grabAreaLayer =
-      mLayerProvider.getLayer(top ? Theme::Color::sBoardGrabAreasTop
-                                  : Theme::Color::sBoardGrabAreasBot);
+  std::shared_ptr<const GraphicsLayer> grabAreaLayer =
+      mLayers.get(top ? Theme::Color::sBoardGrabAreasTop
+                      : Theme::Color::sBoardGrabAreasBot);
   if (grabAreaLayer != mGrabAreaLayer) {
     if (mGrabAreaLayer) {
       mGrabAreaLayer->onEdited.detach(mOnLayerEditedSlot);
@@ -239,8 +239,8 @@ void BGI_Device::updateBoardSide() noexcept {
 
   // Update origin cross layer.
   mOriginCrossGraphicsItem->setLayer(
-      mLayerProvider.getLayer(top ? Theme::Color::sBoardReferencesTop
-                                  : Theme::Color::sBoardReferencesBot));
+      mLayers.get(top ? Theme::Color::sBoardReferencesTop
+                      : Theme::Color::sBoardReferencesBot));
 
   // Update circle layers.
   const CircleList& circles = mDevice.getLibFootprint().getCircles();
@@ -314,11 +314,10 @@ void BGI_Device::updateZoneLayers() noexcept {
   }
 }
 
-std::shared_ptr<GraphicsLayer> BGI_Device::getLayer(
+std::shared_ptr<const GraphicsLayer> BGI_Device::getLayer(
     const Layer& layer) const noexcept {
-  return mLayerProvider.getLayer(mDevice.getMirrored()
-                                     ? layer.mirrored().getThemeColor()
-                                     : layer.getThemeColor());
+  return mLayers.get(mDevice.getMirrored() ? layer.mirrored().getThemeColor()
+                                           : layer.getThemeColor());
 }
 
 /*******************************************************************************

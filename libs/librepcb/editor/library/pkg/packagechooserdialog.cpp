@@ -48,12 +48,12 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-PackageChooserDialog::PackageChooserDialog(
-    const Workspace& ws, const IF_GraphicsLayerProvider* layerProvider,
-    QWidget* parent) noexcept
+PackageChooserDialog::PackageChooserDialog(const Workspace& ws,
+                                           const GraphicsLayerList* layers,
+                                           QWidget* parent) noexcept
   : QDialog(parent),
     mWorkspace(ws),
-    mLayerProvider(layerProvider),
+    mLayers(layers),
     mUi(new Ui::PackageChooserDialog),
     mCategorySelected(false),
     mGraphicsScene(new GraphicsScene()) {
@@ -232,14 +232,14 @@ void PackageChooserDialog::updatePreview(const FilePath& fp) noexcept {
   mGraphicsItem.reset();
   mPackage.reset();
 
-  if (fp.isValid() && mLayerProvider) {
+  if (fp.isValid() && mLayers) {
     try {
       mPackage = Package::open(
           std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
               TransactionalFileSystem::openRO(fp))));  // can throw
       if (mPackage->getFootprints().count() > 0) {
         mGraphicsItem.reset(new FootprintGraphicsItem(
-            mPackage->getFootprints().first(), *mLayerProvider,
+            mPackage->getFootprints().first(), *mLayers,
             Application::getDefaultStrokeFont(), &mPackage->getPads(), nullptr,
             localeOrder()));
         mGraphicsScene->addItem(*mGraphicsItem);

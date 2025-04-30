@@ -34,6 +34,8 @@
 namespace librepcb {
 namespace editor {
 
+class GraphicsLayerList;
+
 namespace Ui {
 class BoardLayersDock;
 }
@@ -52,7 +54,7 @@ public:
   // Constructors / Destructor
   BoardLayersDock() = delete;
   BoardLayersDock(const BoardLayersDock& other) = delete;
-  explicit BoardLayersDock(const IF_GraphicsLayerProvider& lp) noexcept;
+  explicit BoardLayersDock(GraphicsLayerList& layers) noexcept;
   ~BoardLayersDock() noexcept;
 
   // Operator Overloadings
@@ -81,7 +83,7 @@ private:
   QList<QString> getAllLayers() const noexcept;
 
   // General
-  const IF_GraphicsLayerProvider& mLayerProvider;
+  GraphicsLayerList& mLayers;
   QScopedPointer<Ui::BoardLayersDock> mUi;
   bool mUpdateScheduled;
 

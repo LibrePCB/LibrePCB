@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "deviceeditorwidget.h"
 
-#include "../../graphics/defaultgraphicslayerprovider.h"
+#include "../../graphics/graphicslayerlist.h"
 #include "../../graphics/graphicsscene.h"
 #include "../../library/cmd/cmdlibraryelementedit.h"
 #include "../../undocommandgroup.h"
@@ -116,7 +116,7 @@ DeviceEditorWidget::DeviceEditorWidget(const Context& context,
       theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor());
   mUi->viewComponent->setScene(mComponentGraphicsScene.data());
   mUi->viewPackage->setScene(mPackageGraphicsScene.data());
-  mGraphicsLayerProvider.reset(new DefaultGraphicsLayerProvider(theme));
+  mLayers = GraphicsLayerList::previewLayers(&mContext.workspace.getSettings());
 
   // Insert category list editor widget.
   mCategoriesEditorWidget.reset(new CategoryListEditorWidget(
@@ -327,8 +327,7 @@ QString DeviceEditorWidget::commitMetadata() noexcept {
 }
 
 void DeviceEditorWidget::btnChooseComponentClicked() noexcept {
-  ComponentChooserDialog dialog(mContext.workspace,
-                                mGraphicsLayerProvider.data(), this);
+  ComponentChooserDialog dialog(mContext.workspace, mLayers.get(), this);
   if (dialog.exec() == QDialog::Accepted) {
     std::optional<Uuid> cmpUuid = dialog.getSelectedComponentUuid();
     if (cmpUuid && (*cmpUuid != mDevice->getComponentUuid())) {
@@ -367,8 +366,7 @@ void DeviceEditorWidget::btnChooseComponentClicked() noexcept {
 }
 
 void DeviceEditorWidget::btnChoosePackageClicked() noexcept {
-  PackageChooserDialog dialog(mContext.workspace, mGraphicsLayerProvider.data(),
-                              this);
+  PackageChooserDialog dialog(mContext.workspace, mLayers.get(), this);
   if (dialog.exec() == QDialog::Accepted) {
     std::optional<Uuid> pkgUuid = dialog.getSelectedPackageUuid();
     if (pkgUuid && (*pkgUuid != mDevice->getPackageUuid())) {
@@ -457,7 +455,7 @@ void DeviceEditorWidget::updateComponentPreview() noexcept {
 
         std::shared_ptr<SymbolGraphicsItem> graphicsItem =
             std::make_shared<SymbolGraphicsItem>(
-                *sym, *mGraphicsLayerProvider, mComponent,
+                *sym, *mLayers, mComponent,
                 symbVar.getSymbolItems().get(item.getUuid()),
                 getLibLocaleOrder());
         graphicsItem->setPosition(item.getSymbolPosition());
@@ -502,7 +500,7 @@ void DeviceEditorWidget::updateDevicePackageUuid(const Uuid& uuid) noexcept {
 void DeviceEditorWidget::updatePackagePreview() noexcept {
   if (mPackage && mPackage->getFootprints().count() > 0) {
     mFootprintGraphicsItem.reset(new FootprintGraphicsItem(
-        mPackage->getFootprints().first(), *mGraphicsLayerProvider,
+        mPackage->getFootprints().first(), *mLayers,
         Application::getDefaultStrokeFont(), &mPackage->getPads(),
         mComponent.get(), getLibLocaleOrder()));
     mPackageGraphicsScene->addItem(*mFootprintGraphicsItem);

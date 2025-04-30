@@ -52,8 +52,8 @@ class WorkspaceSettings;
 
 namespace editor {
 
-class DefaultGraphicsLayerProvider;
 class FootprintGraphicsItem;
+class GraphicsLayerList;
 class GraphicsScene;
 class PartInformationProvider;
 class PartInformationToolTip;
@@ -186,7 +186,7 @@ private:
   QScopedPointer<Ui::AddComponentDialog> mUi;
   QScopedPointer<GraphicsScene> mComponentPreviewScene;
   QScopedPointer<GraphicsScene> mDevicePreviewScene;
-  QScopedPointer<DefaultGraphicsLayerProvider> mGraphicsLayerProvider;
+  std::unique_ptr<GraphicsLayerList> mLayers;
   QScopedPointer<CategoryTreeModel> mCategoryTreeModel;
   QScopedPointer<PartInformationToolTip> mPartToolTip;
   uint mPartInfoProgress;

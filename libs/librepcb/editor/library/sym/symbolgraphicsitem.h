@@ -41,7 +41,7 @@ class Component;
 namespace editor {
 
 class CircleGraphicsItem;
-class IF_GraphicsLayerProvider;
+class GraphicsLayerList;
 class PolygonGraphicsItem;
 class SymbolPinGraphicsItem;
 class TextGraphicsItem;
@@ -72,7 +72,7 @@ public:
   SymbolGraphicsItem() = delete;
   SymbolGraphicsItem(const SymbolGraphicsItem& other) = delete;
   SymbolGraphicsItem(
-      Symbol& symbol, const IF_GraphicsLayerProvider& lp,
+      Symbol& symbol, const GraphicsLayerList& layers,
       std::shared_ptr<const Component> cmp = nullptr,
       std::shared_ptr<const ComponentSymbolVariantItem> cmpItem = nullptr,
       const QStringList& localeOrder = {}) noexcept;
@@ -124,7 +124,7 @@ private:  // Methods
 
 private:  // Data
   Symbol& mSymbol;
-  const IF_GraphicsLayerProvider& mLayerProvider;
+  const GraphicsLayerList& mLayers;
   std::shared_ptr<const Component> mComponent;  // Can be nullptr.
   std::shared_ptr<const ComponentSymbolVariantItem> mItem;  // Can be nullptr.
   QStringList mLocaleOrder;

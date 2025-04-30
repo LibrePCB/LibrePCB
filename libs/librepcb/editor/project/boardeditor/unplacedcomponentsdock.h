@@ -43,8 +43,8 @@ class Project;
 
 namespace editor {
 
-class DefaultGraphicsLayerProvider;
 class FootprintGraphicsItem;
+class GraphicsLayerList;
 class GraphicsScene;
 class ProjectEditor;
 
@@ -153,7 +153,7 @@ private:  // Data
   std::optional<Uuid> mSelectedFootprintUuid;
 
   // Preview graphics scene
-  QScopedPointer<DefaultGraphicsLayerProvider> mGraphicsLayerProvider;
+  std::unique_ptr<GraphicsLayerList> mLayers;
   QScopedPointer<GraphicsScene> mPreviewGraphicsScene;
   QScopedPointer<FootprintGraphicsItem> mPreviewGraphicsItem;
 };

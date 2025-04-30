@@ -37,7 +37,7 @@ namespace librepcb {
 namespace editor {
 
 class GraphicsLayer;
-class IF_GraphicsLayerProvider;
+class GraphicsLayerList;
 
 /*******************************************************************************
  *  Class SGI_NetLine
@@ -51,7 +51,7 @@ public:
   // Constructors / Destructor
   SGI_NetLine() = delete;
   SGI_NetLine(const SGI_NetLine& other) = delete;
-  SGI_NetLine(SI_NetLine& netline, const IF_GraphicsLayerProvider& lp,
+  SGI_NetLine(SI_NetLine& netline, const GraphicsLayerList& layers,
               std::shared_ptr<const QSet<const NetSignal*>>
                   highlightedNetSignals) noexcept;
   virtual ~SGI_NetLine() noexcept;
@@ -77,7 +77,7 @@ private:  // Methods
 private:  // Data
   SI_NetLine& mNetLine;
   std::shared_ptr<const QSet<const NetSignal*>> mHighlightedNetSignals;
-  std::shared_ptr<GraphicsLayer> mLayer;
+  std::shared_ptr<const GraphicsLayer> mLayer;
 
   // Cached Attributes
   QLineF mLineF;

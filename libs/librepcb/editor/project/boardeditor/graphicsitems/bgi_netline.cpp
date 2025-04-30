@@ -23,6 +23,7 @@
 #include "bgi_netline.h"
 
 #include "../../../graphics/graphicslayer.h"
+#include "../../../graphics/graphicslayerlist.h"
 #include "../boardgraphicsscene.h"
 
 #include <librepcb/core/project/board/items/bi_netline.h>
@@ -42,13 +43,12 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BGI_NetLine::BGI_NetLine(BI_NetLine& netline,
-                         const IF_GraphicsLayerProvider& lp,
+BGI_NetLine::BGI_NetLine(BI_NetLine& netline, const GraphicsLayerList& layers,
                          std::shared_ptr<const QSet<const NetSignal*>>
                              highlightedNetSignals) noexcept
   : QGraphicsItem(),
     mNetLine(netline),
-    mLayerProvider(lp),
+    mLayers(layers),
     mHighlightedNetSignals(highlightedNetSignals),
     mLayer(nullptr),
     mOnNetLineEditedSlot(*this, &BGI_NetLine::netLineEdited),
@@ -166,7 +166,7 @@ void BGI_NetLine::updateLayer() noexcept {
   if (mLayer) {
     mLayer->onEdited.detach(mOnLayerEditedSlot);
   }
-  mLayer = mLayerProvider.getLayer(mNetLine.getLayer());
+  mLayer = mLayers.get(mNetLine.getLayer());
   if (mLayer) {
     mLayer->onEdited.attach(mOnLayerEditedSlot);
   }

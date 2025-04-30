@@ -38,7 +38,7 @@ class Point;
 namespace editor {
 
 class CircleGraphicsItem;
-class IF_GraphicsLayerProvider;
+class GraphicsLayerList;
 class OriginCrossGraphicsItem;
 class PolygonGraphicsItem;
 
@@ -62,7 +62,7 @@ public:
   // Constructors / Destructor
   SGI_Symbol() = delete;
   SGI_Symbol(const SGI_Symbol& other) = delete;
-  SGI_Symbol(SI_Symbol& symbol, const IF_GraphicsLayerProvider& lp) noexcept;
+  SGI_Symbol(SI_Symbol& symbol, const GraphicsLayerList& layers) noexcept;
   virtual ~SGI_Symbol() noexcept;
 
   // General Methods

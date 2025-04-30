@@ -41,6 +41,8 @@ class NetSignal;
 
 namespace editor {
 
+class GraphicsLayerList;
+
 /*******************************************************************************
  *  Class BGI_NetLine
  ******************************************************************************/
@@ -53,7 +55,7 @@ public:
   // Constructors / Destructor
   BGI_NetLine() = delete;
   BGI_NetLine(const BGI_NetLine& other) = delete;
-  BGI_NetLine(BI_NetLine& netline, const IF_GraphicsLayerProvider& lp,
+  BGI_NetLine(BI_NetLine& netline, const GraphicsLayerList& layers,
               std::shared_ptr<const QSet<const NetSignal*>>
                   highlightedNetSignals) noexcept;
   virtual ~BGI_NetLine() noexcept;
@@ -82,9 +84,9 @@ private:  // Methods
 private:  // Data
   // Attributes
   BI_NetLine& mNetLine;
-  const IF_GraphicsLayerProvider& mLayerProvider;
+  const GraphicsLayerList& mLayers;
   std::shared_ptr<const QSet<const NetSignal*>> mHighlightedNetSignals;
-  std::shared_ptr<GraphicsLayer> mLayer;
+  std::shared_ptr<const GraphicsLayer> mLayer;
 
   // Cached Attributes
   QLineF mLineF;

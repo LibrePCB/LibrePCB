@@ -26,6 +26,7 @@
 #include "../../dialogs/filedialog.h"
 #include "../../dialogs/gridsettingsdialog.h"
 #include "../../editorcommandset.h"
+#include "../../graphics/graphicslayerlist.h"
 #include "../../graphics/graphicsscene.h"
 #include "../../graphics/primitivepathgraphicsitem.h"
 #include "../../project/cmd/cmdboardadd.h"
@@ -113,6 +114,8 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
     mStandardCommandHandler(new StandardEditorCommandHandler(
         mProjectEditor.getWorkspace().getSettings(), this)),
     mActiveBoard(nullptr),
+    mLayers(GraphicsLayerList::boardLayers(
+        &projectEditor.getWorkspace().getSettings())),
     mGraphicsScene(),
     mOpenGlSceneBuilder(),
     mOpenGlSceneBuildScheduled(false),
@@ -177,8 +180,9 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
   }
   setWindowTitle(tr("%1 - LibrePCB Board Editor").arg(filenameStr));
 
-  // Add all required layers.
-  addLayers(theme);
+  // Store layers visibility on save.
+  connect(&mProjectEditor, &ProjectEditor::projectAboutToBeSaved, this,
+          &BoardEditor::storeLayersVisibility);
 
   // Build the whole board editor finite state machine.
   BoardEditorFsm::Context fsmContext{mProjectEditor.getWorkspace(),
@@ -326,8 +330,9 @@ bool BoardEditor::setActiveBoardIndex(int index) noexcept {
       // show scene, restore view scene rect, set grid properties
       const Theme& theme =
           mProjectEditor.getWorkspace().getSettings().themes.getActive();
-      mGraphicsScene.reset(new BoardGraphicsScene(
-          *mActiveBoard, *this, mProjectEditor.getHighlightedNetSignals()));
+      mGraphicsScene.reset(
+          new BoardGraphicsScene(*mActiveBoard, *mLayers.get(),
+                                 mProjectEditor.getHighlightedNetSignals()));
       mGraphicsScene->setBackgroundColors(
           theme.getColor(Theme::Color::sBoardBackground).getPrimaryColor(),
           theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor());
@@ -448,76 +453,10 @@ void BoardEditor::on_lblUnplacedComponentsNote_linkActivated() {
  *  Private Methods
  ******************************************************************************/
 
-void BoardEditor::addLayers(const Theme& theme) noexcept {
-  auto addLayer = [this, &theme](const QString& name, bool visible) {
-    const ThemeColor& color = theme.getColor(name);
-    auto layer = std::make_shared<GraphicsLayer>(name, color.getNameTr(),
-                                                 color.getPrimaryColor(),
-                                                 color.getSecondaryColor());
-    layer->setVisible(visible);
-    mLayers.append(layer);
-  };
-
-  // asymmetric board layers
-  addLayer(Theme::Color::sBoardFrames, true);
-  addLayer(Theme::Color::sBoardOutlines, true);
-  addLayer(Theme::Color::sBoardPlatedCutouts, true);
-  addLayer(Theme::Color::sBoardHoles, true);
-  addLayer(Theme::Color::sBoardVias, true);
-  addLayer(Theme::Color::sBoardPads, true);
-  addLayer(Theme::Color::sBoardZones, true);
-  addLayer(Theme::Color::sBoardAirWires, true);
-
-  // copper layers
-  addLayer(Theme::Color::sBoardCopperTop, true);
-  for (int i = 1; i <= Layer::innerCopperCount(); ++i) {
-    addLayer(QString(Theme::Color::sBoardCopperInner).arg(i), true);
-  }
-  addLayer(Theme::Color::sBoardCopperBot, true);
-
-  // symmetric board layers
-  addLayer(Theme::Color::sBoardReferencesTop, true);
-  addLayer(Theme::Color::sBoardReferencesBot, true);
-  addLayer(Theme::Color::sBoardGrabAreasTop, false);
-  addLayer(Theme::Color::sBoardGrabAreasBot, false);
-  // addLayer(Theme::Color::sBoardHiddenGrabAreasTop, true); Not needed!
-  // addLayer(Theme::Color::sBoardHiddenGrabAreasBot, true); Not needed!
-  addLayer(Theme::Color::sBoardNamesTop, true);
-  addLayer(Theme::Color::sBoardNamesBot, true);
-  addLayer(Theme::Color::sBoardValuesTop, true);
-  addLayer(Theme::Color::sBoardValuesBot, true);
-  addLayer(Theme::Color::sBoardLegendTop, true);
-  addLayer(Theme::Color::sBoardLegendBot, true);
-  addLayer(Theme::Color::sBoardDocumentationTop, true);
-  addLayer(Theme::Color::sBoardDocumentationBot, true);
-  addLayer(Theme::Color::sBoardPackageOutlinesTop, false);
-  addLayer(Theme::Color::sBoardPackageOutlinesBot, false);
-  addLayer(Theme::Color::sBoardCourtyardTop, false);
-  addLayer(Theme::Color::sBoardCourtyardBot, false);
-  addLayer(Theme::Color::sBoardStopMaskTop, true);
-  addLayer(Theme::Color::sBoardStopMaskBot, true);
-  addLayer(Theme::Color::sBoardSolderPasteTop, false);
-  addLayer(Theme::Color::sBoardSolderPasteBot, false);
-  addLayer(Theme::Color::sBoardGlueTop, false);
-  addLayer(Theme::Color::sBoardGlueBot, false);
-
-  // other asymmetric board layers
-  addLayer(Theme::Color::sBoardMeasures, true);
-  addLayer(Theme::Color::sBoardAlignment, true);
-  addLayer(Theme::Color::sBoardDocumentation, true);
-  addLayer(Theme::Color::sBoardComments, true);
-  addLayer(Theme::Color::sBoardGuide, true);
-
-  // Store layers visibility on save.
-  connect(&mProjectEditor, &ProjectEditor::projectAboutToBeSaved, this,
-          &BoardEditor::storeLayersVisibility);
-}
-
 void BoardEditor::updateEnabledCopperLayers() noexcept {
   if (Board* board = getActiveBoard()) {
     foreach (const Layer* layer, Layer::innerCopper()) {
-      if (std::shared_ptr<GraphicsLayer> gLayer =
-              IF_GraphicsLayerProvider::getLayer(*layer)) {
+      if (std::shared_ptr<GraphicsLayer> gLayer = mLayers->get(*layer)) {
         gLayer->setEnabled(board->getCopperLayers().contains(layer));
       }
     }
@@ -526,7 +465,7 @@ void BoardEditor::updateEnabledCopperLayers() noexcept {
 
 void BoardEditor::loadLayersVisibility() noexcept {
   if (Board* board = getActiveBoard()) {
-    foreach (std::shared_ptr<GraphicsLayer> layer, mLayers) {
+    foreach (std::shared_ptr<GraphicsLayer> layer, mLayers->all()) {
       if (board->getLayersVisibility().contains(layer->getName())) {
         layer->setVisible(board->getLayersVisibility().value(layer->getName()));
       }
@@ -537,7 +476,7 @@ void BoardEditor::loadLayersVisibility() noexcept {
 void BoardEditor::storeLayersVisibility() noexcept {
   if (Board* board = getActiveBoard()) {
     QMap<QString, bool> visibility;
-    foreach (std::shared_ptr<GraphicsLayer> layer, mLayers) {
+    foreach (std::shared_ptr<GraphicsLayer> layer, mLayers->all()) {
       if (layer->isEnabled()) {
         visibility[layer->getName()] = layer->isVisible();
       }
@@ -996,7 +935,7 @@ void BoardEditor::createDockWidgets() noexcept {
                 Qt::Vertical);
 
   // Layers.
-  mDockLayers.reset(new BoardLayersDock(*this));
+  mDockLayers.reset(new BoardLayersDock(*mLayers));
   addDockWidget(Qt::RightDockWidgetArea, mDockLayers.data(), Qt::Vertical);
   tabifyDockWidget(mDockUnplacedComponents.data(), mDockLayers.data());
 
@@ -1543,7 +1482,7 @@ void BoardEditor::startPlaneRebuild(bool full) noexcept {
       // 3D view is open, all planes on outer layers are visible!
       QSet<const Layer*> layers;
       foreach (const Layer* layer, board->getCopperLayers()) {
-        if (auto graphicsLayer = IF_GraphicsLayerProvider::getLayer(*layer)) {
+        if (auto graphicsLayer = mLayers->get(*layer)) {
           if (graphicsLayer->isVisible() ||
               (mOpenGlView && (layer->isTop() || layer->isBottom()))) {
             layers.insert(layer);

@@ -76,10 +76,10 @@ add_library(
   editorcommandsetupdater.h
   graphics/circlegraphicsitem.cpp
   graphics/circlegraphicsitem.h
-  graphics/defaultgraphicslayerprovider.cpp
-  graphics/defaultgraphicslayerprovider.h
   graphics/graphicslayer.cpp
   graphics/graphicslayer.h
+  graphics/graphicslayerlist.cpp
+  graphics/graphicslayerlist.h
   graphics/graphicsscene.cpp
   graphics/graphicsscene.h
   graphics/holegraphicsitem.cpp

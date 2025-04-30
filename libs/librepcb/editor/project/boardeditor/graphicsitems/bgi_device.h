@@ -41,6 +41,7 @@ class Layer;
 
 namespace editor {
 
+class GraphicsLayerList;
 class OriginCrossGraphicsItem;
 class PrimitiveCircleGraphicsItem;
 class PrimitiveHoleGraphicsItem;
@@ -67,7 +68,7 @@ public:
   // Constructors / Destructor
   BGI_Device() = delete;
   BGI_Device(const BGI_Device& other) = delete;
-  BGI_Device(BI_Device& device, const IF_GraphicsLayerProvider& lp) noexcept;
+  BGI_Device(BI_Device& device, const GraphicsLayerList& layers) noexcept;
   virtual ~BGI_Device() noexcept;
 
   // General Methods
@@ -90,12 +91,13 @@ private:  // Methods
   void updateBoardSide() noexcept;
   void updateHoleStopMaskOffsets() noexcept;
   void updateZoneLayers() noexcept;
-  std::shared_ptr<GraphicsLayer> getLayer(const Layer& layer) const noexcept;
+  std::shared_ptr<const GraphicsLayer> getLayer(
+      const Layer& layer) const noexcept;
 
 private:  // Data
   BI_Device& mDevice;
-  const IF_GraphicsLayerProvider& mLayerProvider;
-  std::shared_ptr<GraphicsLayer> mGrabAreaLayer;
+  const GraphicsLayerList& mLayers;
+  std::shared_ptr<const GraphicsLayer> mGrabAreaLayer;
   std::shared_ptr<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
   QVector<std::shared_ptr<PrimitiveCircleGraphicsItem>> mCircleGraphicsItems;
   QVector<std::shared_ptr<PrimitivePathGraphicsItem>> mPolygonGraphicsItems;

@@ -23,6 +23,7 @@
 #include "bgi_airwire.h"
 
 #include "../../../graphics/graphicslayer.h"
+#include "../../../graphics/graphicslayerlist.h"
 #include "../boardgraphicsscene.h"
 
 #include <librepcb/core/project/board/items/bi_airwire.h>
@@ -42,14 +43,13 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BGI_AirWire::BGI_AirWire(BI_AirWire& airwire,
-                         const IF_GraphicsLayerProvider& lp,
+BGI_AirWire::BGI_AirWire(BI_AirWire& airwire, const GraphicsLayerList& layers,
                          std::shared_ptr<const QSet<const NetSignal*>>
                              highlightedNetSignals) noexcept
   : QGraphicsItem(),
     mAirWire(airwire),
     mHighlightedNetSignals(highlightedNetSignals),
-    mLayer(lp.getLayer(Theme::Color::sBoardAirWires)),
+    mLayer(layers.get(Theme::Color::sBoardAirWires)),
     mOnLayerEditedSlot(*this, &BGI_AirWire::layerEdited) {
   setZValue(BoardGraphicsScene::ZValue_AirWires);
 

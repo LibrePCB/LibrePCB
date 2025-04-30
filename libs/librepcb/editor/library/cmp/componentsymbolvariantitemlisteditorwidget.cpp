@@ -45,7 +45,7 @@ ComponentSymbolVariantItemListEditorWidget::
     mModel(new ComponentSymbolVariantItemListModel(this)),
     mView(new EditableTableWidget(this)),
     mWorkspace(nullptr),
-    mLayerProvider(nullptr),
+    mLayers(nullptr),
     mOnItemListEditedSlot(
         *this, &ComponentSymbolVariantItemListEditorWidget::itemListEdited),
     mOnItemEditedSlot(*this,
@@ -104,7 +104,7 @@ void ComponentSymbolVariantItemListEditorWidget::setReadOnly(
 }
 
 void ComponentSymbolVariantItemListEditorWidget::setReferences(
-    const Workspace& ws, const IF_GraphicsLayerProvider& layerProvider,
+    const Workspace& ws, const GraphicsLayerList& layers,
     ComponentSymbolVariantItemList& items,
     const std::shared_ptr<const LibraryElementCache>& symbolCache,
     UndoStack* undoStack) noexcept {
@@ -112,7 +112,7 @@ void ComponentSymbolVariantItemListEditorWidget::setReferences(
   mOnItemEditedSlot.detachAll();
 
   mWorkspace = &ws;
-  mLayerProvider = &layerProvider;
+  mLayers = &layers;
   mModel->setSymbolsCache(symbolCache);
   mModel->setItemList(&items);
   mModel->setUndoStack(undoStack);
@@ -128,7 +128,7 @@ void ComponentSymbolVariantItemListEditorWidget::resetReferences() noexcept {
   mModel->setItemList(nullptr);
   mModel->setUndoStack(nullptr);
   mModel->setSymbolsCache(nullptr);
-  mLayerProvider = nullptr;
+  mLayers = nullptr;
   mWorkspace = nullptr;
 }
 
@@ -178,7 +178,7 @@ void ComponentSymbolVariantItemListEditorWidget::itemEdited(
 
 void ComponentSymbolVariantItemListEditorWidget::btnSymbolBrowseClicked(
     const QPersistentModelIndex& itemIndex) noexcept {
-  SymbolChooserDialog dialog(*mWorkspace, *mLayerProvider, this);
+  SymbolChooserDialog dialog(*mWorkspace, *mLayers, this);
   if ((dialog.exec() == QDialog::Accepted) && dialog.getSelectedSymbolUuid()) {
     mModel->browse(itemIndex, *dialog.getSelectedSymbolUuid());
   }

@@ -37,10 +37,9 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-ZoneGraphicsItem::ZoneGraphicsItem(Zone& zone,
-                                   const IF_GraphicsLayerProvider& lp,
+ZoneGraphicsItem::ZoneGraphicsItem(Zone& zone, const GraphicsLayerList& layers,
                                    QGraphicsItem* parent) noexcept
-  : PrimitiveZoneGraphicsItem(lp, parent),
+  : PrimitiveZoneGraphicsItem(layers, parent),
     mZone(zone),
     mOnEditedSlot(*this, &ZoneGraphicsItem::zoneEdited) {
   setOutline(mZone.getOutline());

@@ -93,7 +93,7 @@ void PrimitivePathGraphicsItem::setLineWidth(
 }
 
 void PrimitivePathGraphicsItem::setLineLayer(
-    const std::shared_ptr<GraphicsLayer>& layer) noexcept {
+    const std::shared_ptr<const GraphicsLayer>& layer) noexcept {
   if (mLineLayer) {
     mLineLayer->onEdited.detach(mOnLayerEditedSlot);
   }
@@ -107,7 +107,7 @@ void PrimitivePathGraphicsItem::setLineLayer(
 }
 
 void PrimitivePathGraphicsItem::setFillLayer(
-    const std::shared_ptr<GraphicsLayer>& layer) noexcept {
+    const std::shared_ptr<const GraphicsLayer>& layer) noexcept {
   if (mFillLayer) {
     mFillLayer->onEdited.detach(mOnLayerEditedSlot);
   }

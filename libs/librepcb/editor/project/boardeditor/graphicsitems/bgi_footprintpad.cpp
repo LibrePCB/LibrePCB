@@ -49,14 +49,14 @@ namespace editor {
 
 BGI_FootprintPad::BGI_FootprintPad(BI_FootprintPad& pad,
                                    std::weak_ptr<BGI_Device> deviceItem,
-                                   const IF_GraphicsLayerProvider& lp,
+                                   const GraphicsLayerList& layers,
                                    std::shared_ptr<const QSet<const NetSignal*>>
                                        highlightedNetSignals) noexcept
   : QGraphicsItemGroup(),
     mPad(pad),
     mDeviceGraphicsItem(deviceItem),
     mHighlightedNetSignals(highlightedNetSignals),
-    mGraphicsItem(new PrimitiveFootprintPadGraphicsItem(lp, false, this)),
+    mGraphicsItem(new PrimitiveFootprintPadGraphicsItem(layers, false, this)),
     mOnPadEditedSlot(*this, &BGI_FootprintPad::padEdited),
     mOnDeviceEditedSlot(*this, &BGI_FootprintPad::deviceGraphicsItemEdited) {
   setFlag(QGraphicsItem::ItemHasNoContents, true);

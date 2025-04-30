@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "unplacedcomponentsdock.h"
 
-#include "../../graphics/defaultgraphicslayerprovider.h"
+#include "../../graphics/graphicslayerlist.h"
 #include "../../graphics/graphicsscene.h"
 #include "../../library/pkg/footprintgraphicsitem.h"
 #include "../../project/cmd/cmdcomponentinstanceedit.h"
@@ -82,8 +82,8 @@ UnplacedComponentsDock::UnplacedComponentsDock(ProjectEditor& editor,
     mSelectedPackage(nullptr),
     mSelectedPackageOwned(false),
     mSelectedFootprintUuid(),
-    mGraphicsLayerProvider(new DefaultGraphicsLayerProvider(
-        mProjectEditor.getWorkspace().getSettings().themes.getActive())),
+    mLayers(GraphicsLayerList::previewLayers(
+        &mProjectEditor.getWorkspace().getSettings())),
     mPreviewGraphicsScene(new GraphicsScene()),
     mPreviewGraphicsItem(nullptr) {
   mUi->setupUi(this);
@@ -405,9 +405,9 @@ void UnplacedComponentsDock::setSelectedFootprintUuid(
     if (std::shared_ptr<Footprint> footprint =
             mSelectedPackage->getFootprints().find(*mSelectedFootprintUuid)) {
       mPreviewGraphicsItem.reset(new FootprintGraphicsItem(
-          footprint, *mGraphicsLayerProvider.data(),
-          Application::getDefaultStrokeFont(), &mSelectedPackage->getPads(),
-          &mSelectedComponent->getLibComponent(), mProject.getLocaleOrder()));
+          footprint, *mLayers, Application::getDefaultStrokeFont(),
+          &mSelectedPackage->getPads(), &mSelectedComponent->getLibComponent(),
+          mProject.getLocaleOrder()));
       mPreviewGraphicsScene->addItem(*mPreviewGraphicsItem);
       mUi->graphicsView->zoomAll();
       mUi->btnAdd->setEnabled(true);

@@ -23,6 +23,7 @@
 #include "sgi_netpoint.h"
 
 #include "../../../graphics/graphicslayer.h"
+#include "../../../graphics/graphicslayerlist.h"
 #include "../schematicgraphicsscene.h"
 
 #include <librepcb/core/project/circuit/netsignal.h>
@@ -45,13 +46,13 @@ QRectF SGI_NetPoint::sBoundingRect;
  ******************************************************************************/
 
 SGI_NetPoint::SGI_NetPoint(SI_NetPoint& netpoint,
-                           const IF_GraphicsLayerProvider& lp,
+                           const GraphicsLayerList& layers,
                            std::shared_ptr<const QSet<const NetSignal*>>
                                highlightedNetSignals) noexcept
   : QGraphicsItem(),
     mNetPoint(netpoint),
     mHighlightedNetSignals(highlightedNetSignals),
-    mLayer(lp.getLayer(Theme::Color::sSchematicWires)),
+    mLayer(layers.get(Theme::Color::sSchematicWires)),
     mOnEditedSlot(*this, &SGI_NetPoint::netPointEdited) {
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setZValue(SchematicGraphicsScene::ZValue_VisibleNetPoints);

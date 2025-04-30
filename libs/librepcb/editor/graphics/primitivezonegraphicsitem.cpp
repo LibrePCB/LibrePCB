@@ -23,6 +23,7 @@
 #include "primitivezonegraphicsitem.h"
 
 #include "graphicslayer.h"
+#include "graphicslayerlist.h"
 
 #include <librepcb/core/geometry/path.h>
 #include <librepcb/core/utils/toolbox.h>
@@ -42,12 +43,12 @@ namespace editor {
  ******************************************************************************/
 
 PrimitiveZoneGraphicsItem::PrimitiveZoneGraphicsItem(
-    const IF_GraphicsLayerProvider& lp, QGraphicsItem* parent) noexcept
+    const GraphicsLayerList& layers, QGraphicsItem* parent) noexcept
   : QGraphicsItem(parent),
-    mLayerProvider(lp),
+    mLayers(layers),
     mOutline(),
     mEditable(false),
-    mLayer(lp.getLayer(Theme::Color::sBoardZones)),
+    mLayer(layers.get(Theme::Color::sBoardZones)),
     mBoundingRectMarginPx(0),
     mVertexHandleRadiusPx(0),
     mVertexHandles(),
@@ -137,7 +138,7 @@ void PrimitiveZoneGraphicsItem::setAllLayers(
   }
   mAllGraphicsLayers.clear();
   foreach (const Layer* layer, layers) {
-    if (auto graphicsLayer = mLayerProvider.getLayer(*layer)) {
+    if (auto graphicsLayer = mLayers.get(*layer)) {
       mAllGraphicsLayers.append(graphicsLayer);
       graphicsLayer->onEdited.attach(mOnLayerEditedSlot);
     }
@@ -148,9 +149,9 @@ void PrimitiveZoneGraphicsItem::setAllLayers(
 
 void PrimitiveZoneGraphicsItem::setEnabledLayers(
     const QSet<const Layer*>& layers) noexcept {
-  QVector<std::shared_ptr<GraphicsLayer>> graphicsLayers;
+  QVector<std::shared_ptr<const GraphicsLayer>> graphicsLayers;
   foreach (const Layer* layer, layers) {
-    if (auto graphicsLayer = mLayerProvider.getLayer(*layer)) {
+    if (auto graphicsLayer = mLayers.get(*layer)) {
       graphicsLayers.append(graphicsLayer);
     } else if (!layer) {
       graphicsLayers.append(nullptr);

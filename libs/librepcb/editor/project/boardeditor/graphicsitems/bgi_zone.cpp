@@ -41,10 +41,10 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BGI_Zone::BGI_Zone(BI_Zone& zone, const IF_GraphicsLayerProvider& lp) noexcept
+BGI_Zone::BGI_Zone(BI_Zone& zone, const GraphicsLayerList& layers) noexcept
   : QGraphicsItemGroup(),
     mZone(zone),
-    mGraphicsItem(new PrimitiveZoneGraphicsItem(lp, this)),
+    mGraphicsItem(new PrimitiveZoneGraphicsItem(layers, this)),
     mOnEditedSlot(*this, &BGI_Zone::zoneEdited) {
   setFlag(QGraphicsItem::ItemHasNoContents, true);
   setFlag(QGraphicsItem::ItemIsSelectable, true);

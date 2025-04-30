@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../../dialogs/graphicsexportdialog.h"
-#include "../../graphics/graphicslayer.h"
 #include "../../widgets/if_graphicsvieweventhandler.h"
 #include "ui_boardeditor.h"
 
@@ -52,6 +51,7 @@ class BoardEditorFsm;
 class BoardGraphicsScene;
 class BoardLayersDock;
 class ExclusiveActionGroup;
+class GraphicsLayerList;
 class GraphicsView;
 class OpenGlSceneBuilder;
 class OpenGlSceneBuilder;
@@ -76,7 +76,6 @@ class BoardEditor;
  * @brief The BoardEditor class
  */
 class BoardEditor final : public QMainWindow,
-                          public IF_GraphicsLayerProvider,
                           public IF_GraphicsViewEventHandler {
   Q_OBJECT
 
@@ -90,26 +89,12 @@ public:
   // Getters
   ProjectEditor& getProjectEditor() const noexcept { return mProjectEditor; }
   Project& getProject() const noexcept { return mProject; }
+  GraphicsLayerList& getLayers() const noexcept { return *mLayers; }
   Board* getActiveBoard() const noexcept { return mActiveBoard.data(); }
   BoardGraphicsScene* getActiveBoardScene() noexcept {
     return mGraphicsScene.data();
   }
   bool getIgnoreLocks() const noexcept;
-
-  /// @copydoc ::librepcb::editor::IF_GraphicsLayerProvider::getLayer()
-  virtual std::shared_ptr<GraphicsLayer> getLayer(
-      const QString& name) const noexcept override {
-    foreach (const std::shared_ptr<GraphicsLayer>& layer, mLayers) {
-      if (layer->getName() == name) {
-        return layer;
-      }
-    }
-    return nullptr;
-  }
-
-  QList<std::shared_ptr<GraphicsLayer>> getAllLayers() const noexcept override {
-    return mLayers;
-  }
 
   // Setters
   bool setActiveBoardIndex(int index) noexcept;
@@ -137,7 +122,6 @@ private slots:
 
 private:
   // Private Methods
-  void addLayers(const Theme& theme) noexcept;
   void updateEnabledCopperLayers() noexcept;
   void loadLayersVisibility() noexcept;
   void storeLayersVisibility() noexcept;
@@ -187,7 +171,7 @@ private:
 
   // Misc
   QPointer<Board> mActiveBoard;
-  QList<std::shared_ptr<GraphicsLayer>> mLayers;
+  std::unique_ptr<GraphicsLayerList> mLayers;
   QScopedPointer<BoardGraphicsScene> mGraphicsScene;
   QScopedPointer<OpenGlSceneBuilder> mOpenGlSceneBuilder;
   bool mOpenGlSceneBuildScheduled;

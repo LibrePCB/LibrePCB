@@ -41,7 +41,7 @@ class NetSignal;
 
 namespace editor {
 
-class IF_GraphicsLayerProvider;
+class GraphicsLayerList;
 class PrimitiveFootprintPadGraphicsItem;
 
 /*******************************************************************************
@@ -59,7 +59,7 @@ public:
   BGI_FootprintPad() = delete;
   BGI_FootprintPad(const BGI_FootprintPad& other) = delete;
   BGI_FootprintPad(BI_FootprintPad& pad, std::weak_ptr<BGI_Device> deviceItem,
-                   const IF_GraphicsLayerProvider& lp,
+                   const GraphicsLayerList& layers,
                    std::shared_ptr<const QSet<const NetSignal*>>
                        highlightedNetSignals) noexcept;
   virtual ~BGI_FootprintPad() noexcept;

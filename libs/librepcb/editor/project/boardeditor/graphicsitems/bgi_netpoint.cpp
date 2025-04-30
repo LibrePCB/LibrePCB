@@ -23,6 +23,7 @@
 #include "bgi_netpoint.h"
 
 #include "../../../graphics/graphicslayer.h"
+#include "../../../graphics/graphicslayerlist.h"
 #include "../boardgraphicsscene.h"
 
 #include <librepcb/core/project/board/items/bi_netpoint.h>
@@ -42,10 +43,10 @@ namespace editor {
  ******************************************************************************/
 
 BGI_NetPoint::BGI_NetPoint(BI_NetPoint& netpoint,
-                           const IF_GraphicsLayerProvider& lp) noexcept
+                           const GraphicsLayerList& layers) noexcept
   : QGraphicsItem(),
     mNetPoint(netpoint),
-    mLayerProvider(lp),
+    mLayers(layers),
     mLayer(nullptr),
     mOnEditedSlot(*this, &BGI_NetPoint::netPointEdited),
     mOnLayerEditedSlot(*this, &BGI_NetPoint::layerEdited) {
@@ -136,7 +137,7 @@ void BGI_NetPoint::updateLayer() noexcept {
   if (mLayer) {
     mLayer->onEdited.detach(mOnLayerEditedSlot);
   }
-  mLayer = layer ? mLayerProvider.getLayer(*layer) : nullptr;
+  mLayer = layer ? mLayers.get(*layer) : nullptr;
   if (mLayer) {
     mLayer->onEdited.attach(mOnLayerEditedSlot);
   }

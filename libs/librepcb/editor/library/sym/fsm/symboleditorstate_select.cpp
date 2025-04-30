@@ -29,6 +29,7 @@
 #include "../../../dialogs/textpropertiesdialog.h"
 #include "../../../editorcommandset.h"
 #include "../../../graphics/circlegraphicsitem.h"
+#include "../../../graphics/graphicslayerlist.h"
 #include "../../../graphics/graphicsscene.h"
 #include "../../../graphics/polygongraphicsitem.h"
 #include "../../../graphics/textgraphicsitem.h"
@@ -544,8 +545,8 @@ bool SymbolEditorState_Select::processImportDxf() noexcept {
 
     // Sanity check that the chosen layer is really visible, but this should
     // always be the case anyway.
-    std::shared_ptr<GraphicsLayer> layer =
-        mContext.editorContext.layerProvider.getLayer(dialog.getLayer());
+    std::shared_ptr<const GraphicsLayer> layer =
+        mContext.editorContext.layers.get(dialog.getLayer());
     if ((!layer) || (!layer->isVisible())) {
       throw LogicError(__FILE__, __LINE__, "Layer is not visible!");  // no tr()
     }
@@ -786,7 +787,7 @@ bool SymbolEditorState_Select::copySelectedItemsToClipboard() noexcept {
     }
     if (data.getItemCount() > 0) {
       qApp->clipboard()->setMimeData(
-          data.toMimeData(mContext.editorContext.layerProvider).release());
+          data.toMimeData(mContext.editorContext.layers).release());
       emit statusBarMessageChanged(tr("Copied to clipboard!"), 2000);
     }
   } catch (const Exception& e) {

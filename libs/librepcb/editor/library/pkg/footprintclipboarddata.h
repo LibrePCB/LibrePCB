@@ -43,7 +43,7 @@
 namespace librepcb {
 namespace editor {
 
-class IF_GraphicsLayerProvider;
+class GraphicsLayerList;
 
 /*******************************************************************************
  *  Class FootprintClipboardData
@@ -88,7 +88,7 @@ public:
   const HoleList& getHoles() const noexcept { return mHoles; }
 
   // General Methods
-  std::unique_ptr<QMimeData> toMimeData(const IF_GraphicsLayerProvider& lp);
+  std::unique_ptr<QMimeData> toMimeData(const GraphicsLayerList& layers);
   static std::unique_ptr<FootprintClipboardData> fromMimeData(
       const QMimeData* mime);
 
@@ -96,7 +96,7 @@ public:
   FootprintClipboardData& operator=(const FootprintClipboardData& rhs) = delete;
 
 private:  // Methods
-  QPixmap generatePixmap(const IF_GraphicsLayerProvider& lp) noexcept;
+  QPixmap generatePixmap(const GraphicsLayerList& layers) noexcept;
   static QString getMimeType() noexcept;
 
 private:  // Data

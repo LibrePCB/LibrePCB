@@ -41,7 +41,7 @@ class NetSignal;
 namespace editor {
 
 class GraphicsLayer;
-class IF_GraphicsLayerProvider;
+class GraphicsLayerList;
 
 /*******************************************************************************
  *  Class BGI_AirWire
@@ -55,7 +55,7 @@ public:
   // Constructors / Destructor
   BGI_AirWire() = delete;
   BGI_AirWire(const BGI_AirWire& other) = delete;
-  BGI_AirWire(BI_AirWire& airwire, const IF_GraphicsLayerProvider& lp,
+  BGI_AirWire(BI_AirWire& airwire, const GraphicsLayerList& layers,
               std::shared_ptr<const QSet<const NetSignal*>>
                   highlightedNetSignals) noexcept;
   virtual ~BGI_AirWire() noexcept;
@@ -78,7 +78,7 @@ private:  // Methods
 private:  // Data
   BI_AirWire& mAirWire;
   std::shared_ptr<const QSet<const NetSignal*>> mHighlightedNetSignals;
-  std::shared_ptr<GraphicsLayer> mLayer;
+  std::shared_ptr<const GraphicsLayer> mLayer;
 
   // Cached Attributes
   QVector<QLineF> mLines;

@@ -73,7 +73,7 @@ FootprintClipboardData::~FootprintClipboardData() noexcept {
  ******************************************************************************/
 
 std::unique_ptr<QMimeData> FootprintClipboardData::toMimeData(
-    const IF_GraphicsLayerProvider& lp) {
+    const GraphicsLayerList& layers) {
   std::unique_ptr<SExpression> root =
       SExpression::createList("librepcb_clipboard_footprint");
   root->ensureLineBreak();
@@ -101,7 +101,7 @@ std::unique_ptr<QMimeData> FootprintClipboardData::toMimeData(
 
   const QByteArray sexpr = root->toByteArray();
   std::unique_ptr<QMimeData> data(new QMimeData());
-  data->setImageData(generatePixmap(lp));
+  data->setImageData(generatePixmap(layers));
   data->setData(getMimeType(), sexpr);
   // Note: At least on one system the clipboard didn't work if no text was
   // set, so let's also copy the SExpression as text as a workaround. This
@@ -128,28 +128,28 @@ std::unique_ptr<FootprintClipboardData> FootprintClipboardData::fromMimeData(
  ******************************************************************************/
 
 QPixmap FootprintClipboardData::generatePixmap(
-    const IF_GraphicsLayerProvider& lp) noexcept {
+    const GraphicsLayerList& layers) noexcept {
   GraphicsScene scene;
   QVector<std::shared_ptr<QGraphicsItem>> items;
   for (auto it = mFootprintPads.begin(); it != mFootprintPads.end(); ++it) {
-    items.append(std::make_shared<FootprintPadGraphicsItem>(it.ptr(), lp,
+    items.append(std::make_shared<FootprintPadGraphicsItem>(it.ptr(), layers,
                                                             &mPackagePads));
   }
   for (Polygon& polygon : mPolygons) {
-    items.append(std::make_shared<PolygonGraphicsItem>(polygon, lp));
+    items.append(std::make_shared<PolygonGraphicsItem>(polygon, layers));
   }
   for (Circle& circle : mCircles) {
-    items.append(std::make_shared<CircleGraphicsItem>(circle, lp));
+    items.append(std::make_shared<CircleGraphicsItem>(circle, layers));
   }
   for (StrokeText& text : mStrokeTexts) {
     items.append(std::make_shared<StrokeTextGraphicsItem>(
-        text, lp, Application::getDefaultStrokeFont()));
+        text, layers, Application::getDefaultStrokeFont()));
   }
   for (Zone& zone : mZones) {
-    items.append(std::make_shared<ZoneGraphicsItem>(zone, lp));
+    items.append(std::make_shared<ZoneGraphicsItem>(zone, layers));
   }
   for (Hole& hole : mHoles) {
-    items.append(std::make_shared<HoleGraphicsItem>(hole, lp, false));
+    items.append(std::make_shared<HoleGraphicsItem>(hole, layers, false));
   }
   foreach (const auto& item, items) {
     scene.addItem(*item);

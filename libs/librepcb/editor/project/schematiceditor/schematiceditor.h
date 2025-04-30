@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../../dialogs/graphicsexportdialog.h"
-#include "../../graphics/graphicslayer.h"
 #include "../../widgets/if_graphicsvieweventhandler.h"
 #include "ui_schematiceditor.h"
 
@@ -47,6 +46,7 @@ class Theme;
 namespace editor {
 
 class ExclusiveActionGroup;
+class GraphicsLayerList;
 class GraphicsView;
 class ProjectEditor;
 class RuleCheckDock;
@@ -70,7 +70,6 @@ class SchematicEditor;
  * @brief The SchematicEditor class
  */
 class SchematicEditor final : public QMainWindow,
-                              public IF_GraphicsLayerProvider,
                               public IF_GraphicsViewEventHandler {
   Q_OBJECT
 
@@ -88,22 +87,6 @@ public:
   Schematic* getActiveSchematic() const noexcept;
   SchematicGraphicsScene* getActiveSchematicScene() noexcept {
     return mGraphicsScene.data();
-  }
-
-  /// @copydoc ::librepcb::editor::IF_GraphicsLayerProvider::getLayer()
-  virtual std::shared_ptr<GraphicsLayer> getLayer(
-      const QString& name) const noexcept override {
-    foreach (std::shared_ptr<GraphicsLayer> layer, mLayers) {
-      if (layer->getName() == name) {
-        return layer;
-      }
-    }
-    return nullptr;
-  }
-
-  virtual QList<std::shared_ptr<GraphicsLayer>> getAllLayers()
-      const noexcept override {
-    return mLayers;
   }
 
   // Setters
@@ -124,7 +107,6 @@ signals:
 
 private:
   // Private Methods
-  void addLayers(const Theme& theme) noexcept;
   void createActions() noexcept;
   void createToolBars() noexcept;
   void createDockWidgets() noexcept;
@@ -154,7 +136,7 @@ private:
   QScopedPointer<ToolBarProxy> mCommandToolBarProxy;
   QScopedPointer<StandardEditorCommandHandler> mStandardCommandHandler;
   int mActiveSchematicIndex;
-  QList<std::shared_ptr<GraphicsLayer>> mLayers;
+  std::unique_ptr<GraphicsLayerList> mLayers;
   QScopedPointer<SchematicGraphicsScene> mGraphicsScene;
   QHash<Uuid, QRectF> mVisibleSceneRect;
   QScopedPointer<SchematicEditorFsm> mFsm;

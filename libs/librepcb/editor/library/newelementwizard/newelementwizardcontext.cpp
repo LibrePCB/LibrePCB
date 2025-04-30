@@ -45,12 +45,12 @@ namespace editor {
  ******************************************************************************/
 
 NewElementWizardContext::NewElementWizardContext(
-    const Workspace& ws, Library& lib, const IF_GraphicsLayerProvider& lp,
+    const Workspace& ws, Library& lib, const GraphicsLayerList& layers,
     QObject* parent) noexcept
   : QObject(parent),
     mWorkspace(ws),
     mLibrary(lib),
-    mLayerProvider(lp),
+    mLayers(layers),
     mElementType(ElementType::None),
     mPackageAssemblyType(Package::AssemblyType::Auto),
     mComponentPrefixes(ComponentPrefix("")) {

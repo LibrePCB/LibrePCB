@@ -47,12 +47,12 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SymbolChooserDialog::SymbolChooserDialog(
-    const Workspace& ws, const IF_GraphicsLayerProvider& layerProvider,
-    QWidget* parent) noexcept
+SymbolChooserDialog::SymbolChooserDialog(const Workspace& ws,
+                                         const GraphicsLayerList& layers,
+                                         QWidget* parent) noexcept
   : QDialog(parent),
     mWorkspace(ws),
-    mLayerProvider(layerProvider),
+    mLayers(layers),
     mUi(new Ui::SymbolChooserDialog),
     mPreviewScene(new GraphicsScene()),
     mCategorySelected(false) {
@@ -244,8 +244,7 @@ void SymbolChooserDialog::setSelectedSymbol(const FilePath& fp) noexcept {
           *mSelectedSymbol->getNames().value(localeOrder()));
       mUi->lblSymbolDescription->setText(
           mSelectedSymbol->getDescriptions().value(localeOrder()));
-      mGraphicsItem.reset(
-          new SymbolGraphicsItem(*mSelectedSymbol, mLayerProvider));
+      mGraphicsItem.reset(new SymbolGraphicsItem(*mSelectedSymbol, mLayers));
       mPreviewScene->addItem(*mGraphicsItem);
       mUi->graphicsView->zoomAll();
     } catch (const Exception& e) {

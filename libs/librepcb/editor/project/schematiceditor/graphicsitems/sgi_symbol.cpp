@@ -24,6 +24,7 @@
 
 #include "../../../graphics/circlegraphicsitem.h"
 #include "../../../graphics/graphicslayer.h"
+#include "../../../graphics/graphicslayerlist.h"
 #include "../../../graphics/origincrossgraphicsitem.h"
 #include "../../../graphics/polygongraphicsitem.h"
 #include "../schematicgraphicsscene.h"
@@ -48,7 +49,7 @@ namespace editor {
  ******************************************************************************/
 
 SGI_Symbol::SGI_Symbol(SI_Symbol& symbol,
-                       const IF_GraphicsLayerProvider& lp) noexcept
+                       const GraphicsLayerList& layers) noexcept
   : QGraphicsItemGroup(),
     onEdited(*this),
     mSymbol(symbol),
@@ -60,12 +61,12 @@ SGI_Symbol::SGI_Symbol(SI_Symbol& symbol,
   mOriginCrossGraphicsItem = std::make_shared<OriginCrossGraphicsItem>(this);
   mOriginCrossGraphicsItem->setSize(UnsignedLength(1400000));
   mOriginCrossGraphicsItem->setLayer(
-      lp.getLayer(Theme::Color::sSchematicReferences));
+      layers.get(Theme::Color::sSchematicReferences));
   mShape.addRect(mOriginCrossGraphicsItem->boundingRect());
 
   for (const auto& obj : mSymbol.getLibSymbol().getCircles()) {
-    auto i = std::make_shared<CircleGraphicsItem>(const_cast<Circle&>(obj), lp,
-                                                  this);
+    auto i = std::make_shared<CircleGraphicsItem>(const_cast<Circle&>(obj),
+                                                  layers, this);
     i->setFlag(QGraphicsItem::ItemIsSelectable, true);
     i->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
     if (obj.isGrabArea()) {
@@ -79,7 +80,7 @@ SGI_Symbol::SGI_Symbol(SI_Symbol& symbol,
 
   for (const auto& obj : mSymbol.getLibSymbol().getPolygons()) {
     auto i = std::make_shared<PolygonGraphicsItem>(const_cast<Polygon&>(obj),
-                                                   lp, this);
+                                                   layers, this);
     i->setFlag(QGraphicsItem::ItemIsSelectable, true);
     i->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
     if (obj.isGrabArea()) {

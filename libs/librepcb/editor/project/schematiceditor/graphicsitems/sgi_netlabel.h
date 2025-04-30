@@ -37,7 +37,7 @@ namespace librepcb {
 namespace editor {
 
 class GraphicsLayer;
-class IF_GraphicsLayerProvider;
+class GraphicsLayerList;
 class LineGraphicsItem;
 
 /*******************************************************************************
@@ -52,7 +52,7 @@ public:
   // Constructors / Destructor
   SGI_NetLabel() = delete;
   SGI_NetLabel(const SGI_NetLabel& other) = delete;
-  SGI_NetLabel(SI_NetLabel& netlabel, const IF_GraphicsLayerProvider& lp,
+  SGI_NetLabel(SI_NetLabel& netlabel, const GraphicsLayerList& layers,
                std::shared_ptr<const QSet<const NetSignal*>>
                    highlightedNetSignals) noexcept;
   virtual ~SGI_NetLabel() noexcept;
@@ -81,8 +81,8 @@ private:  // Methods
 private:  // Data
   SI_NetLabel& mNetLabel;
   std::shared_ptr<const QSet<const NetSignal*>> mHighlightedNetSignals;
-  std::shared_ptr<GraphicsLayer> mOriginCrossLayer;
-  std::shared_ptr<GraphicsLayer> mNetLabelLayer;
+  std::shared_ptr<const GraphicsLayer> mOriginCrossLayer;
+  std::shared_ptr<const GraphicsLayer> mNetLabelLayer;
   QScopedPointer<LineGraphicsItem> mAnchorGraphicsItem;
 
   // Cached Attributes

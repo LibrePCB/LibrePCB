@@ -43,6 +43,7 @@ class Point;
 
 namespace editor {
 
+class GraphicsLayerList;
 class OriginCrossGraphicsItem;
 class PrimitivePathGraphicsItem;
 
@@ -59,7 +60,7 @@ public:
   PrimitiveFootprintPadGraphicsItem() = delete;
   PrimitiveFootprintPadGraphicsItem(
       const PrimitiveFootprintPadGraphicsItem& other) = delete;
-  PrimitiveFootprintPadGraphicsItem(const IF_GraphicsLayerProvider& lp,
+  PrimitiveFootprintPadGraphicsItem(const GraphicsLayerList& layers,
                                     bool originCrossVisible,
                                     QGraphicsItem* parent = nullptr) noexcept;
   ~PrimitiveFootprintPadGraphicsItem() noexcept;
@@ -91,19 +92,19 @@ private:  // Methods
   void updateRegisteredLayers() noexcept;
 
 private:  // Data
-  const IF_GraphicsLayerProvider& mLayerProvider;
+  const GraphicsLayerList& mLayers;
   bool mMirror;
-  std::shared_ptr<GraphicsLayer> mCopperLayer;
+  std::shared_ptr<const GraphicsLayer> mCopperLayer;
   QScopedPointer<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
   QScopedPointer<PrimitivePathGraphicsItem> mTextGraphicsItem;
   struct PathItem {
-    std::shared_ptr<GraphicsLayer> layer;
+    std::shared_ptr<const GraphicsLayer> layer;
     bool isCopper;
     bool isClearance;
     std::shared_ptr<PrimitivePathGraphicsItem> item;
   };
   QVector<PathItem> mPathGraphicsItems;
-  QMap<std::shared_ptr<GraphicsLayer>, QPainterPath> mShapes;
+  QMap<std::shared_ptr<const GraphicsLayer>, QPainterPath> mShapes;
   QRectF mShapesBoundingRect;
 
   // Slots

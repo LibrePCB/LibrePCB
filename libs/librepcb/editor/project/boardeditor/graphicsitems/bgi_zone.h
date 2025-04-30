@@ -35,7 +35,7 @@
 namespace librepcb {
 namespace editor {
 
-class IF_GraphicsLayerProvider;
+class GraphicsLayerList;
 class PrimitiveZoneGraphicsItem;
 
 /*******************************************************************************
@@ -50,7 +50,7 @@ public:
   // Constructors / Destructor
   BGI_Zone() = delete;
   BGI_Zone(const BGI_Zone& other) = delete;
-  BGI_Zone(BI_Zone& zone, const IF_GraphicsLayerProvider& lp) noexcept;
+  BGI_Zone(BI_Zone& zone, const GraphicsLayerList& layers) noexcept;
   virtual ~BGI_Zone() noexcept;
 
   // General Methods

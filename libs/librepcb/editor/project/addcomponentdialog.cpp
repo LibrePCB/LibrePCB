@@ -23,7 +23,7 @@
 #include "addcomponentdialog.h"
 
 #include "../editorcommandset.h"
-#include "../graphics/defaultgraphicslayerprovider.h"
+#include "../graphics/graphicslayerlist.h"
 #include "../graphics/graphicsscene.h"
 #include "../library/pkg/footprintgraphicsitem.h"
 #include "../library/sym/symbolgraphicsitem.h"
@@ -74,8 +74,7 @@ AddComponentDialog::AddComponentDialog(const WorkspaceLibraryDb& db,
     mUi(new Ui::AddComponentDialog),
     mComponentPreviewScene(new GraphicsScene()),
     mDevicePreviewScene(new GraphicsScene()),
-    mGraphicsLayerProvider(
-        new DefaultGraphicsLayerProvider(mSettings.themes.getActive())),
+    mLayers(GraphicsLayerList::previewLayers(&mSettings)),
     mCategoryTreeModel(new CategoryTreeModel(
         mDb, mLocaleOrder, CategoryTreeModel::Filter::CmpCatWithComponents)),
     mPartToolTip(new PartInformationToolTip(mSettings, this)),
@@ -838,7 +837,7 @@ void AddComponentDialog::setSelectedSymbVar(
       mPreviewSymbols.append(symbol);
 
       auto graphicsItem = std::make_shared<SymbolGraphicsItem>(
-          *symbol, *mGraphicsLayerProvider, mSelectedComponent,
+          *symbol, *mLayers, mSelectedComponent,
           mSelectedSymbVar->getSymbolItems().get(item.getUuid()), mLocaleOrder);
       graphicsItem->setPosition(item.getSymbolPosition());
       graphicsItem->setRotation(item.getSymbolRotation());
@@ -873,7 +872,7 @@ void AddComponentDialog::setSelectedDevice(std::shared_ptr<const Device> dev) {
       }
       if (mSelectedPackage->getFootprints().count() > 0) {
         mPreviewFootprintGraphicsItem.reset(new FootprintGraphicsItem(
-            mSelectedPackage->getFootprints().first(), *mGraphicsLayerProvider,
+            mSelectedPackage->getFootprints().first(), *mLayers,
             Application::getDefaultStrokeFont(), &mSelectedPackage->getPads(),
             mSelectedComponent.get(), mLocaleOrder));
         mDevicePreviewScene->addItem(*mPreviewFootprintGraphicsItem);

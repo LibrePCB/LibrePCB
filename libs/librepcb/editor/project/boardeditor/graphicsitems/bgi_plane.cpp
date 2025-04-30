@@ -23,6 +23,7 @@
 #include "bgi_plane.h"
 
 #include "../../../graphics/graphicslayer.h"
+#include "../../../graphics/graphicslayerlist.h"
 #include "../../../graphics/primitivepathgraphicsitem.h"
 #include "../boardgraphicsscene.h"
 
@@ -43,12 +44,12 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BGI_Plane::BGI_Plane(BI_Plane& plane, const IF_GraphicsLayerProvider& lp,
+BGI_Plane::BGI_Plane(BI_Plane& plane, const GraphicsLayerList& layers,
                      std::shared_ptr<const QSet<const NetSignal*>>
                          highlightedNetSignals) noexcept
   : QGraphicsItem(),
     mPlane(plane),
-    mLayerProvider(lp),
+    mLayers(layers),
     mHighlightedNetSignals(highlightedNetSignals),
     mLayer(nullptr),
     mBoundingRectMarginPx(0),
@@ -284,7 +285,7 @@ void BGI_Plane::updateLayer() noexcept {
   if (mLayer) {
     mLayer->onEdited.detach(mOnLayerEditedSlot);
   }
-  mLayer = mLayerProvider.getLayer(mPlane.getLayer());
+  mLayer = mLayers.get(mPlane.getLayer());
   if (mLayer) {
     mLayer->onEdited.attach(mOnLayerEditedSlot);
   }

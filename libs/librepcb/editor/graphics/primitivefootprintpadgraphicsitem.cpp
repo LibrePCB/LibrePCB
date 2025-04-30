@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "primitivefootprintpadgraphicsitem.h"
 
+#include "graphicslayerlist.h"
 #include "origincrossgraphicsitem.h"
 #include "primitivepathgraphicsitem.h"
 
@@ -50,10 +51,10 @@ namespace editor {
  ******************************************************************************/
 
 PrimitiveFootprintPadGraphicsItem::PrimitiveFootprintPadGraphicsItem(
-    const IF_GraphicsLayerProvider& lp, bool originCrossVisible,
+    const GraphicsLayerList& layers, bool originCrossVisible,
     QGraphicsItem* parent) noexcept
   : QGraphicsItemGroup(parent),
-    mLayerProvider(lp),
+    mLayers(layers),
     mMirror(false),
     mCopperLayer(nullptr),
     mOriginCrossGraphicsItem(new OriginCrossGraphicsItem(this)),
@@ -69,7 +70,7 @@ PrimitiveFootprintPadGraphicsItem::PrimitiveFootprintPadGraphicsItem(
   mOriginCrossGraphicsItem->setSize(UnsignedLength(250000));
   if (originCrossVisible) {
     mOriginCrossGraphicsItem->setLayer(
-        mLayerProvider.getLayer(Theme::Color::sBoardReferencesTop));
+        mLayers.get(Theme::Color::sBoardReferencesTop));
   }
   mOriginCrossGraphicsItem->setZValue(1000);
 
@@ -129,7 +130,7 @@ void PrimitiveFootprintPadGraphicsItem::setToolTipText(
 
 void PrimitiveFootprintPadGraphicsItem::setLayer(
     const QString& layerName) noexcept {
-  auto layer = mLayerProvider.getLayer(layerName);
+  auto layer = mLayers.get(layerName);
   if (layer != mCopperLayer) {
     mCopperLayer = layer;
     mTextGraphicsItem->setLineLayer(mCopperLayer);
@@ -155,7 +156,7 @@ void PrimitiveFootprintPadGraphicsItem::setGeometries(
   mShapesBoundingRect = QRectF();
   mPathGraphicsItems.clear();
   for (auto it = geometries.begin(); it != geometries.end(); it++) {
-    if (auto layer = mLayerProvider.getLayer(it.key()->getThemeColor())) {
+    if (auto layer = mLayers.get(it.key()->getThemeColor())) {
       const bool isCopperLayer =
           (layer == mCopperLayer) || (it.key()->isCopper());
       QPainterPath shape;
@@ -252,7 +253,7 @@ void PrimitiveFootprintPadGraphicsItem::layerEdited(
 
 void PrimitiveFootprintPadGraphicsItem::updatePathLayers() noexcept {
   foreach (auto& item, mPathGraphicsItems) {
-    std::shared_ptr<GraphicsLayer> layer =
+    std::shared_ptr<const GraphicsLayer> layer =
         item.isCopper ? mCopperLayer : item.layer;
     if ((!item.isClearance) && item.layer->isVisible()) {
       item.item->setFillLayer(layer);

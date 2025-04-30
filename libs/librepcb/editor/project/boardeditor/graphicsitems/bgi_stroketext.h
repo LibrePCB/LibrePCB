@@ -36,7 +36,7 @@
 namespace librepcb {
 namespace editor {
 
-class IF_GraphicsLayerProvider;
+class GraphicsLayerList;
 class LineGraphicsItem;
 class OriginCrossGraphicsItem;
 class PrimitivePathGraphicsItem;
@@ -54,7 +54,7 @@ public:
   BGI_StrokeText() = delete;
   BGI_StrokeText(const BGI_StrokeText& other) = delete;
   BGI_StrokeText(BI_StrokeText& text, std::weak_ptr<BGI_Device> deviceItem,
-                 const IF_GraphicsLayerProvider& lp) noexcept;
+                 const GraphicsLayerList& layers) noexcept;
   virtual ~BGI_StrokeText() noexcept;
 
   // General Methods
@@ -87,7 +87,7 @@ private:  // Methods
 private:  // Data
   BI_StrokeText& mText;
   std::weak_ptr<BGI_Device> mDeviceGraphicsItem;
-  const IF_GraphicsLayerProvider& mLayerProvider;
+  const GraphicsLayerList& mLayers;
   QScopedPointer<PrimitivePathGraphicsItem> mPathGraphicsItem;
   QScopedPointer<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
   QScopedPointer<LineGraphicsItem> mAnchorGraphicsItem;

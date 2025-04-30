@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "sgi_text.h"
 
+#include "../../../graphics/graphicslayerlist.h"
 #include "../../../graphics/linegraphicsitem.h"
 #include "../../../graphics/textgraphicsitem.h"
 #include "../schematicgraphicsscene.h"
@@ -40,12 +41,12 @@ namespace editor {
  ******************************************************************************/
 
 SGI_Text::SGI_Text(SI_Text& text, std::weak_ptr<SGI_Symbol> symbolItem,
-                   const IF_GraphicsLayerProvider& lp) noexcept
+                   const GraphicsLayerList& layers) noexcept
   : QGraphicsItemGroup(),
     mText(text),
     mSymbolGraphicsItem(symbolItem),
-    mLayerProvider(lp),
-    mTextGraphicsItem(new TextGraphicsItem(mText.getTextObj(), lp, this)),
+    mLayers(layers),
+    mTextGraphicsItem(new TextGraphicsItem(mText.getTextObj(), layers, this)),
     mAnchorGraphicsItem(new LineGraphicsItem()),
     mOnEditedSlot(*this, &SGI_Text::textEdited),
     mOnSymbolEditedSlot(*this, &SGI_Text::symbolGraphicsItemEdited) {
@@ -143,8 +144,7 @@ void SGI_Text::updateText() noexcept {
 void SGI_Text::updateAnchorLayer() noexcept {
   Q_ASSERT(mAnchorGraphicsItem);
   if (mText.getSymbol() && isSelected()) {
-    mAnchorGraphicsItem->setLayer(
-        mLayerProvider.getLayer(mText.getTextObj().getLayer()));
+    mAnchorGraphicsItem->setLayer(mLayers.get(mText.getTextObj().getLayer()));
   } else {
     mAnchorGraphicsItem->setLayer(nullptr);
   }

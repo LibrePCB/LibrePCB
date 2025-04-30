@@ -39,13 +39,13 @@ namespace editor {
  ******************************************************************************/
 
 BGI_Polygon::BGI_Polygon(BI_Polygon& polygon,
-                         const IF_GraphicsLayerProvider& lp) noexcept
+                         const GraphicsLayerList& layers) noexcept
   : QGraphicsItemGroup(),
     mPolygon(polygon),
     mPolygonObj(polygon.getData().getUuid(), polygon.getData().getLayer(),
                 polygon.getData().getLineWidth(), polygon.getData().isFilled(),
                 polygon.getData().isGrabArea(), polygon.getData().getPath()),
-    mGraphicsItem(new PolygonGraphicsItem(mPolygonObj, lp, this)),
+    mGraphicsItem(new PolygonGraphicsItem(mPolygonObj, layers, this)),
     mOnEditedSlot(*this, &BGI_Polygon::polygonEdited) {
   setFlag(QGraphicsItem::ItemHasNoContents, true);
   setFlag(QGraphicsItem::ItemIsSelectable, true);

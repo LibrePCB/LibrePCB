@@ -23,6 +23,7 @@
 #include "boardeditorstate.h"
 
 #include "../../../graphics/graphicslayer.h"
+#include "../../../graphics/graphicslayerlist.h"
 #include "../../../undostack.h"
 #include "../../../widgets/graphicsview.h"
 #include "../boardeditor.h"
@@ -149,7 +150,8 @@ QSet<const Layer*> BoardEditorState::getAllowedGeometryLayers() noexcept {
 }
 
 void BoardEditorState::makeLayerVisible(const QString& layer) noexcept {
-  if (std::shared_ptr<GraphicsLayer> l = mContext.editor.getLayer(layer)) {
+  if (std::shared_ptr<GraphicsLayer> l =
+          mContext.editor.getLayers().get(layer)) {
     if (l->isEnabled()) {
       l->setVisible(true);
     }

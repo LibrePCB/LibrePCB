@@ -35,7 +35,7 @@
 namespace librepcb {
 namespace editor {
 
-class IF_GraphicsLayerProvider;
+class GraphicsLayerList;
 class PolygonGraphicsItem;
 
 /*******************************************************************************
@@ -50,7 +50,7 @@ public:
   // Constructors / Destructor
   BGI_Polygon() = delete;
   BGI_Polygon(const BGI_Polygon& other) = delete;
-  BGI_Polygon(BI_Polygon& polygon, const IF_GraphicsLayerProvider& lp) noexcept;
+  BGI_Polygon(BI_Polygon& polygon, const GraphicsLayerList& layers) noexcept;
   virtual ~BGI_Polygon() noexcept;
 
   // General Methods

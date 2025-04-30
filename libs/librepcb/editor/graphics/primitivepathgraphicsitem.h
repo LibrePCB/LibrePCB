@@ -76,8 +76,8 @@ public:
   void setMirrored(bool mirrored) noexcept;
   void setPath(const QPainterPath& path) noexcept;
   void setLineWidth(const UnsignedLength& width) noexcept;
-  void setLineLayer(const std::shared_ptr<GraphicsLayer>& layer) noexcept;
-  void setFillLayer(const std::shared_ptr<GraphicsLayer>& layer) noexcept;
+  void setLineLayer(const std::shared_ptr<const GraphicsLayer>& layer) noexcept;
+  void setFillLayer(const std::shared_ptr<const GraphicsLayer>& layer) noexcept;
   void setLighterColors(bool lighter) noexcept;
   void setShapeMode(ShapeMode mode) noexcept;
 
@@ -105,8 +105,8 @@ private:  // Methods
 
 protected:  // Data
   bool mMirror;
-  std::shared_ptr<GraphicsLayer> mLineLayer;
-  std::shared_ptr<GraphicsLayer> mFillLayer;
+  std::shared_ptr<const GraphicsLayer> mLineLayer;
+  std::shared_ptr<const GraphicsLayer> mFillLayer;
   bool mLighterColors;
   ShapeMode mShapeMode;
   QPen mPen;

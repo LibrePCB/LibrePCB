@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "bgi_stroketext.h"
 
+#include "../../../graphics/graphicslayerlist.h"
 #include "../../../graphics/linegraphicsitem.h"
 #include "../../../graphics/origincrossgraphicsitem.h"
 #include "../../../graphics/primitivepathgraphicsitem.h"
@@ -45,11 +46,11 @@ namespace editor {
 
 BGI_StrokeText::BGI_StrokeText(BI_StrokeText& text,
                                std::weak_ptr<BGI_Device> deviceItem,
-                               const IF_GraphicsLayerProvider& lp) noexcept
+                               const GraphicsLayerList& layers) noexcept
   : QGraphicsItemGroup(),
     mText(text),
     mDeviceGraphicsItem(deviceItem),
-    mLayerProvider(lp),
+    mLayers(layers),
     mPathGraphicsItem(new PrimitivePathGraphicsItem(this)),
     mOriginCrossGraphicsItem(new OriginCrossGraphicsItem(this)),
     mAnchorGraphicsItem(new LineGraphicsItem()),
@@ -182,8 +183,8 @@ void BGI_StrokeText::updateLayer() noexcept {
   setZValue(static_cast<qreal>(zValue));
   mAnchorGraphicsItem->setZValue(static_cast<qreal>(zValue));
 
-  std::shared_ptr<GraphicsLayer> layer =
-      mLayerProvider.getLayer(mText.getData().getLayer());
+  std::shared_ptr<const GraphicsLayer> layer =
+      mLayers.get(mText.getData().getLayer());
   mPathGraphicsItem->setLineLayer(layer);
   mOriginCrossGraphicsItem->setLayer(layer);
 }
@@ -200,8 +201,7 @@ void BGI_StrokeText::updatePaths() noexcept {
 void BGI_StrokeText::updateAnchorLayer() noexcept {
   Q_ASSERT(mAnchorGraphicsItem);
   if (mText.getDevice() && isSelected()) {
-    mAnchorGraphicsItem->setLayer(
-        mLayerProvider.getLayer(mText.getData().getLayer()));
+    mAnchorGraphicsItem->setLayer(mLayers.get(mText.getData().getLayer()));
   } else {
     mAnchorGraphicsItem->setLayer(nullptr);
   }

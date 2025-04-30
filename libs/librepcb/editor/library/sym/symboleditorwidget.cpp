@@ -153,7 +153,7 @@ SymbolEditorWidget::SymbolEditorWidget(const Context& context,
           this, &SymbolEditorWidget::commitMetadata);
 
   // Load graphics items recursively.
-  mGraphicsItem.reset(new SymbolGraphicsItem(*mSymbol, mContext.layerProvider));
+  mGraphicsItem.reset(new SymbolGraphicsItem(*mSymbol, mContext.layers));
   mGraphicsScene->addItem(*mGraphicsItem);
   mUi->graphicsView->zoomAll();
 

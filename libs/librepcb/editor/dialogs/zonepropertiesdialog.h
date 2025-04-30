@@ -38,7 +38,7 @@ class Zone;
 
 namespace editor {
 
-class IF_GraphicsLayerProvider;
+class GraphicsLayerList;
 class UndoStack;
 
 namespace Ui {
@@ -61,12 +61,12 @@ public:
   ZonePropertiesDialog(const ZonePropertiesDialog& other) = delete;
   ZonePropertiesDialog(Zone& zone, UndoStack& undoStack,
                        const LengthUnit& lengthUnit,
-                       const IF_GraphicsLayerProvider& lp,
+                       const GraphicsLayerList& layers,
                        const QString& settingsPrefix,
                        QWidget* parent = nullptr) noexcept;
   ZonePropertiesDialog(BI_Zone& zone, UndoStack& undoStack,
                        const LengthUnit& lengthUnit,
-                       const IF_GraphicsLayerProvider& lp,
+                       const GraphicsLayerList& layers,
                        const QString& settingsPrefix,
                        QWidget* parent = nullptr) noexcept;
   ~ZonePropertiesDialog() noexcept;
@@ -81,7 +81,7 @@ private:  // Methods
   ZonePropertiesDialog(Zone* libZone, BI_Zone* boardZone,
                        const QList<const Layer*> allLayers,
                        UndoStack& undoStack, const LengthUnit& lengthUnit,
-                       const IF_GraphicsLayerProvider& lp,
+                       const GraphicsLayerList& layers,
                        const QString& settingsPrefix,
                        QWidget* parent = nullptr) noexcept;
   template <typename T>

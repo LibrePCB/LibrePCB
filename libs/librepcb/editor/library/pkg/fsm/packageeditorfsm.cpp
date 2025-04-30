@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "packageeditorfsm.h"
 
+#include "../../../graphics/graphicslayerlist.h"
 #include "../../../graphics/graphicsscene.h"
 #include "../../../graphics/primitivetextgraphicsitem.h"
 #include "../../../widgets/graphicsview.h"
@@ -213,7 +214,7 @@ bool PackageEditorFsm::processChangeCurrentFootprint(
   if (mContext.currentFootprint) {
     // load graphics items recursively
     mContext.currentGraphicsItem.reset(new FootprintGraphicsItem(
-        mContext.currentFootprint, mContext.editorContext.layerProvider,
+        mContext.currentFootprint, mContext.editorContext.layers,
         Application::getDefaultStrokeFont(), &mContext.package.getPads()));
     mContext.graphicsScene.addItem(*mContext.currentGraphicsItem);
     mSelectFootprintGraphicsItem.reset();
@@ -228,8 +229,7 @@ bool PackageEditorFsm::processChangeCurrentFootprint(
     mSelectFootprintGraphicsItem->setHeight(PositiveLength(Length::fromMm(5)));
     mSelectFootprintGraphicsItem->setText(tr("Please select a footprint."));
     mSelectFootprintGraphicsItem->setLayer(
-        mContext.editorContext.layerProvider.getLayer(
-            Theme::Color::sBoardOutlines));
+        mContext.editorContext.layers.get(Theme::Color::sBoardOutlines));
     mContext.graphicsScene.addItem(*mSelectFootprintGraphicsItem);
     mContext.graphicsView.setEnabled(false);
     mContext.graphicsView.zoomAll();

@@ -23,6 +23,7 @@
 #include "bgi_via.h"
 
 #include "../../../graphics/graphicslayer.h"
+#include "../../../graphics/graphicslayerlist.h"
 #include "../../../graphics/primitivepathgraphicsitem.h"
 #include "../boardgraphicsscene.h"
 
@@ -50,16 +51,16 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BGI_Via::BGI_Via(BI_Via& via, const IF_GraphicsLayerProvider& lp,
+BGI_Via::BGI_Via(BI_Via& via, const GraphicsLayerList& layers,
                  std::shared_ptr<const QSet<const NetSignal*>>
                      highlightedNetSignals) noexcept
   : QGraphicsItem(),
     mVia(via),
-    mLayerProvider(lp),
+    mLayers(layers),
     mHighlightedNetSignals(highlightedNetSignals),
-    mViaLayer(lp.getLayer(Theme::Color::sBoardVias)),
-    mTopStopMaskLayer(lp.getLayer(Theme::Color::sBoardStopMaskTop)),
-    mBottomStopMaskLayer(lp.getLayer(Theme::Color::sBoardStopMaskBot)),
+    mViaLayer(layers.get(Theme::Color::sBoardVias)),
+    mTopStopMaskLayer(layers.get(Theme::Color::sBoardStopMaskTop)),
+    mBottomStopMaskLayer(layers.get(Theme::Color::sBoardStopMaskBot)),
     mTextGraphicsItem(new PrimitivePathGraphicsItem(this)),
     mOnEditedSlot(*this, &BGI_Via::viaEdited),
     mOnLayerEditedSlot(*this, &BGI_Via::layerEdited) {
@@ -308,7 +309,7 @@ void BGI_Via::attachToCopperLayers() noexcept {
   if (!mVia.getVia().isThrough()) {
     foreach (const Layer* layer, mVia.getBoard().getCopperLayers()) {
       if (mVia.getVia().isOnLayer(*layer)) {
-        if (auto graphicsLayer = mLayerProvider.getLayer(*layer)) {
+        if (auto graphicsLayer = mLayers.get(*layer)) {
           graphicsLayer->onEdited.attach(mOnLayerEditedSlot);
           mBlindBuriedCopperLayers.append(graphicsLayer);
         }

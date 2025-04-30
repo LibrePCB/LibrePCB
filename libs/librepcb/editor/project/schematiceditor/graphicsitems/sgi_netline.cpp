@@ -23,6 +23,7 @@
 #include "sgi_netline.h"
 
 #include "../../../graphics/graphicslayer.h"
+#include "../../../graphics/graphicslayerlist.h"
 #include "../schematicgraphicsscene.h"
 
 #include <librepcb/core/project/circuit/netsignal.h>
@@ -44,14 +45,13 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SGI_NetLine::SGI_NetLine(SI_NetLine& netline,
-                         const IF_GraphicsLayerProvider& lp,
+SGI_NetLine::SGI_NetLine(SI_NetLine& netline, const GraphicsLayerList& layers,
                          std::shared_ptr<const QSet<const NetSignal*>>
                              highlightedNetSignals) noexcept
   : QGraphicsItem(),
     mNetLine(netline),
     mHighlightedNetSignals(highlightedNetSignals),
-    mLayer(lp.getLayer(Theme::Color::sSchematicWires)),
+    mLayer(layers.get(Theme::Color::sSchematicWires)),
     mOnNetLineEditedSlot(*this, &SGI_NetLine::netLineEdited) {
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setZValue(SchematicGraphicsScene::ZValue_NetLines);

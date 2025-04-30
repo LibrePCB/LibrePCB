@@ -41,6 +41,7 @@ class NetSignal;
 
 namespace editor {
 
+class GraphicsLayerList;
 class PrimitivePathGraphicsItem;
 
 /*******************************************************************************
@@ -57,7 +58,7 @@ public:
   // Constructors / Destructor
   BGI_Via() = delete;
   BGI_Via(const BGI_Via& other) = delete;
-  BGI_Via(BI_Via& via, const IF_GraphicsLayerProvider& lp,
+  BGI_Via(BI_Via& via, const GraphicsLayerList& layers,
           std::shared_ptr<const QSet<const NetSignal*>>
               highlightedNetSignals) noexcept;
   virtual ~BGI_Via() noexcept;
@@ -91,15 +92,15 @@ private:  // Methods
 private:  // Data
   // General Attributes
   BI_Via& mVia;
-  const IF_GraphicsLayerProvider& mLayerProvider;
+  const GraphicsLayerList& mLayers;
   std::shared_ptr<const QSet<const NetSignal*>> mHighlightedNetSignals;
-  std::shared_ptr<GraphicsLayer> mViaLayer;
-  std::shared_ptr<GraphicsLayer> mTopStopMaskLayer;
-  std::shared_ptr<GraphicsLayer> mBottomStopMaskLayer;
+  std::shared_ptr<const GraphicsLayer> mViaLayer;
+  std::shared_ptr<const GraphicsLayer> mTopStopMaskLayer;
+  std::shared_ptr<const GraphicsLayer> mBottomStopMaskLayer;
   QScopedPointer<PrimitivePathGraphicsItem> mTextGraphicsItem;
 
   /// Copper layers for blind- and buried vias (empty for through-hole vias)
-  QVector<std::shared_ptr<GraphicsLayer>> mBlindBuriedCopperLayers;
+  QVector<std::shared_ptr<const GraphicsLayer>> mBlindBuriedCopperLayers;
 
   // Cached Attributes
   QPainterPath mShape;

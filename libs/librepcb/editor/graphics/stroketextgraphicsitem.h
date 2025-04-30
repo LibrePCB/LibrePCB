@@ -34,7 +34,7 @@
 namespace librepcb {
 namespace editor {
 
-class IF_GraphicsLayerProvider;
+class GraphicsLayerList;
 class OriginCrossGraphicsItem;
 class PrimitivePathGraphicsItem;
 
@@ -51,7 +51,7 @@ public:
   // Constructors / Destructor
   StrokeTextGraphicsItem() = delete;
   StrokeTextGraphicsItem(const StrokeTextGraphicsItem& other) = delete;
-  StrokeTextGraphicsItem(StrokeText& text, const IF_GraphicsLayerProvider& lp,
+  StrokeTextGraphicsItem(StrokeText& text, const GraphicsLayerList& layers,
                          const StrokeFont& font,
                          QGraphicsItem* parent = nullptr) noexcept;
   virtual ~StrokeTextGraphicsItem() noexcept;
@@ -79,7 +79,7 @@ private:  // Methods
 
 private:  // Data
   StrokeText& mText;
-  const IF_GraphicsLayerProvider& mLayerProvider;
+  const GraphicsLayerList& mLayers;
   const StrokeFont& mFont;
   std::optional<QString> mTextOverride;
   QScopedPointer<PrimitivePathGraphicsItem> mPathGraphicsItem;

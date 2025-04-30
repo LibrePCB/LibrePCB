@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "sgi_symbolpin.h"
 
+#include "../../../graphics/graphicslayerlist.h"
 #include "../../../graphics/linegraphicsitem.h"
 #include "../../../graphics/primitivecirclegraphicsitem.h"
 #include "../../../graphics/primitivetextgraphicsitem.h"
@@ -50,13 +51,13 @@ namespace editor {
 
 SGI_SymbolPin::SGI_SymbolPin(SI_SymbolPin& pin,
                              std::weak_ptr<SGI_Symbol> symbolItem,
-                             const IF_GraphicsLayerProvider& lp,
+                             const GraphicsLayerList& layers,
                              std::shared_ptr<const QSet<const NetSignal*>>
                                  highlightedNetSignals) noexcept
   : QGraphicsItemGroup(),
     mPin(pin),
     mSymbolGraphicsItem(symbolItem),
-    mLayerProvider(lp),
+    mLayers(layers),
     mHighlightedNetSignals(highlightedNetSignals),
     mCircleGraphicsItem(new PrimitiveCircleGraphicsItem(this)),
     mLineGraphicsItem(new LineGraphicsItem(this)),
@@ -80,16 +81,14 @@ SGI_SymbolPin::SGI_SymbolPin(SI_SymbolPin& pin,
   mLineGraphicsItem->setLine(Point(0, 0),
                              Point(*mPin.getLibPin().getLength(), 0));
   mLineGraphicsItem->setLineWidth(UnsignedLength(158750));
-  mLineGraphicsItem->setLayer(
-      mLayerProvider.getLayer(Theme::Color::sSchematicPinLines));
+  mLineGraphicsItem->setLayer(mLayers.get(Theme::Color::sSchematicPinLines));
   mLineGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
   mLineGraphicsItem->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
 
   // Setup name text.
   mNameGraphicsItem->setFont(PrimitiveTextGraphicsItem::Font::SansSerif);
   mNameGraphicsItem->setHeight(mPin.getLibPin().getNameHeight());
-  mNameGraphicsItem->setLayer(
-      mLayerProvider.getLayer(Theme::Color::sSchematicPinNames));
+  mNameGraphicsItem->setLayer(mLayers.get(Theme::Color::sSchematicPinNames));
   mNameGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
   mNameGraphicsItem->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
 
@@ -97,7 +96,7 @@ SGI_SymbolPin::SGI_SymbolPin(SI_SymbolPin& pin,
   mNumbersGraphicsItem->setFont(PrimitiveTextGraphicsItem::Font::SansSerif);
   mNumbersGraphicsItem->setHeight(PositiveLength(1500000));
   mNumbersGraphicsItem->setLayer(
-      mLayerProvider.getLayer(Theme::Color::sSchematicPinNumbers));
+      mLayers.get(Theme::Color::sSchematicPinNumbers));
   mNumbersGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
   mNumbersGraphicsItem->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
 
@@ -231,14 +230,14 @@ void SGI_SymbolPin::updateJunction() noexcept {
   Q_ASSERT(mCircleGraphicsItem);
 
   bool isConnected = mPin.getCompSigInstNetSignal();
-  std::shared_ptr<GraphicsLayer> lineLayer = nullptr;
-  std::shared_ptr<GraphicsLayer> fillLayer = nullptr;
+  std::shared_ptr<const GraphicsLayer> lineLayer = nullptr;
+  std::shared_ptr<const GraphicsLayer> fillLayer = nullptr;
   if (mPin.isVisibleJunction()) {
-    fillLayer = mLayerProvider.getLayer(Theme::Color::sSchematicWires);
+    fillLayer = mLayers.get(Theme::Color::sSchematicWires);
   } else if ((!isConnected) && mPin.isRequired()) {
-    lineLayer = mLayerProvider.getLayer(Theme::Color::sSchematicRequiredPins);
+    lineLayer = mLayers.get(Theme::Color::sSchematicRequiredPins);
   } else if (!isConnected) {
-    lineLayer = mLayerProvider.getLayer(Theme::Color::sSchematicOptionalPins);
+    lineLayer = mLayers.get(Theme::Color::sSchematicOptionalPins);
   }
   mCircleGraphicsItem->setLineLayer(lineLayer);
   mCircleGraphicsItem->setFillLayer(fillLayer);

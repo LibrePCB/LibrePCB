@@ -23,6 +23,7 @@
 #include "circlegraphicsitem.h"
 
 #include "graphicslayer.h"
+#include "graphicslayerlist.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -38,16 +39,16 @@ namespace editor {
  ******************************************************************************/
 
 CircleGraphicsItem::CircleGraphicsItem(Circle& circle,
-                                       const IF_GraphicsLayerProvider& lp,
+                                       const GraphicsLayerList& layers,
                                        QGraphicsItem* parent) noexcept
   : PrimitiveCircleGraphicsItem(parent),
     mCircle(circle),
-    mLayerProvider(lp),
+    mLayers(layers),
     mEditedSlot(*this, &CircleGraphicsItem::circleEdited) {
   setPosition(mCircle.getCenter());
   setDiameter(positiveToUnsigned(mCircle.getDiameter()));
   setLineWidth(mCircle.getLineWidth());
-  setLineLayer(mLayerProvider.getLayer(mCircle.getLayer()));
+  setLineLayer(mLayers.get(mCircle.getLayer()));
   updateFillLayer();
   updateZValue();
   setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -67,7 +68,7 @@ void CircleGraphicsItem::circleEdited(const Circle& circle,
                                       Circle::Event event) noexcept {
   switch (event) {
     case Circle::Event::LayerChanged:
-      setLineLayer(mLayerProvider.getLayer(circle.getLayer()));
+      setLineLayer(mLayers.get(circle.getLayer()));
       updateFillLayer();  // required if the area is filled with the line layer
       break;
     case Circle::Event::LineWidthChanged:
@@ -94,9 +95,9 @@ void CircleGraphicsItem::circleEdited(const Circle& circle,
 
 void CircleGraphicsItem::updateFillLayer() noexcept {
   if (mCircle.isFilled()) {
-    setFillLayer(mLayerProvider.getLayer(mCircle.getLayer()));
+    setFillLayer(mLayers.get(mCircle.getLayer()));
   } else if (mCircle.isGrabArea()) {
-    setFillLayer(mLayerProvider.getGrabAreaLayer(mCircle.getLayer()));
+    setFillLayer(mLayers.grabArea(mCircle.getLayer()));
   } else {
     setFillLayer(nullptr);
   }

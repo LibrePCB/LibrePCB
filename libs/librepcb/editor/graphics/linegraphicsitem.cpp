@@ -78,7 +78,7 @@ void LineGraphicsItem::setLineWidth(const UnsignedLength& width) noexcept {
 }
 
 void LineGraphicsItem::setLayer(
-    const std::shared_ptr<GraphicsLayer>& layer) noexcept {
+    const std::shared_ptr<const GraphicsLayer>& layer) noexcept {
   if (mLayer) {
     mLayer->onEdited.detach(mOnLayerEditedSlot);
   }

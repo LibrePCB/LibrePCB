@@ -23,6 +23,7 @@
 #include "sgi_netlabel.h"
 
 #include "../../../graphics/graphicslayer.h"
+#include "../../../graphics/graphicslayerlist.h"
 #include "../../../graphics/linegraphicsitem.h"
 #include "../schematicgraphicsscene.h"
 
@@ -51,14 +52,14 @@ QVector<QLineF> SGI_NetLabel::sOriginCrossLines;
  ******************************************************************************/
 
 SGI_NetLabel::SGI_NetLabel(SI_NetLabel& netlabel,
-                           const IF_GraphicsLayerProvider& lp,
+                           const GraphicsLayerList& layers,
                            std::shared_ptr<const QSet<const NetSignal*>>
                                highlightedNetSignals) noexcept
   : QGraphicsItem(),
     mNetLabel(netlabel),
     mHighlightedNetSignals(highlightedNetSignals),
-    mOriginCrossLayer(lp.getLayer(Theme::Color::sSchematicReferences)),
-    mNetLabelLayer(lp.getLayer(Theme::Color::sSchematicNetLabels)),
+    mOriginCrossLayer(layers.get(Theme::Color::sSchematicReferences)),
+    mNetLabelLayer(layers.get(Theme::Color::sSchematicNetLabels)),
     mOnEditedSlot(*this, &SGI_NetLabel::netLabelEdited) {
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setZValue(SchematicGraphicsScene::ZValue_NetLabels);
@@ -79,7 +80,7 @@ SGI_NetLabel::SGI_NetLabel(SI_NetLabel& netlabel,
   mAnchorGraphicsItem.reset(new LineGraphicsItem());
   mAnchorGraphicsItem->setZValue(SchematicGraphicsScene::ZValue_NetLabels);
   mAnchorGraphicsItem->setLayer(
-      lp.getLayer(Theme::Color::sSchematicNetLabelAnchors));
+      layers.get(Theme::Color::sSchematicNetLabelAnchors));
 
   updatePosition();
   updateRotation();

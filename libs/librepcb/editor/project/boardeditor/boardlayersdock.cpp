@@ -23,6 +23,7 @@
 #include "boardlayersdock.h"
 
 #include "../../graphics/graphicslayer.h"
+#include "../../graphics/graphicslayerlist.h"
 #include "ui_boardlayersdock.h"
 
 #include <librepcb/core/workspace/theme.h>
@@ -40,15 +41,15 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BoardLayersDock::BoardLayersDock(const IF_GraphicsLayerProvider& lp) noexcept
+BoardLayersDock::BoardLayersDock(GraphicsLayerList& layers) noexcept
   : QDockWidget(nullptr),
-    mLayerProvider(lp),
+    mLayers(layers),
     mUi(new Ui::BoardLayersDock),
     mUpdateScheduled(true),
     mOnLayerEditedSlot(*this, &BoardLayersDock::layerEdited) {
   mUi->setupUi(this);
 
-  foreach (auto& layer, mLayerProvider.getAllLayers()) {
+  foreach (auto& layer, mLayers.all()) {
     layer->onEdited.attach(mOnLayerEditedSlot);
   }
 
@@ -64,7 +65,7 @@ BoardLayersDock::~BoardLayersDock() noexcept {
 
 void BoardLayersDock::on_listWidget_itemChanged(QListWidgetItem* item) {
   const QString name = item->data(Qt::UserRole).toString();
-  if (std::shared_ptr<GraphicsLayer> layer = mLayerProvider.getLayer(name)) {
+  if (std::shared_ptr<GraphicsLayer> layer = mLayers.get(name)) {
     layer->setVisible(item->checkState() == Qt::Checked);
   }
 }
@@ -136,7 +137,7 @@ void BoardLayersDock::updateListWidget() noexcept {
   }
   for (int i = 0; i < layerNames.count(); i++) {
     QString layerName = layerNames.at(i);
-    std::shared_ptr<GraphicsLayer> layer = mLayerProvider.getLayer(layerName);
+    std::shared_ptr<GraphicsLayer> layer = mLayers.get(layerName);
     Q_ASSERT(layer);
     QListWidgetItem* item = nullptr;
     if (simpleUpdate) {
@@ -164,7 +165,7 @@ void BoardLayersDock::updateListWidget() noexcept {
 }
 
 void BoardLayersDock::setVisibleLayers(const QList<QString>& layers) noexcept {
-  foreach (auto& layer, mLayerProvider.getAllLayers()) {
+  foreach (auto& layer, mLayers.all()) {
     layer->setVisible(layers.contains(layer->getName()));
   }
 }
@@ -212,7 +213,7 @@ QList<QString> BoardLayersDock::getBottomLayers() const noexcept {
 
 QList<QString> BoardLayersDock::getAllLayers() const noexcept {
   QList<QString> layers;
-  foreach (auto& layer, mLayerProvider.getAllLayers()) {
+  foreach (auto& layer, mLayers.all()) {
     if (layer->isEnabled()) {
       layers.append(layer->getName());
     }

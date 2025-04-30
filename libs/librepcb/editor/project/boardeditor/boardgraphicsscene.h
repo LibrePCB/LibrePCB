@@ -65,7 +65,7 @@ class BGI_Polygon;
 class BGI_StrokeText;
 class BGI_Via;
 class BGI_Zone;
-class IF_GraphicsLayerProvider;
+class GraphicsLayerList;
 
 /*******************************************************************************
  *  Class BoardGraphicsScene
@@ -116,7 +116,7 @@ public:
   BoardGraphicsScene() = delete;
   BoardGraphicsScene(const BoardGraphicsScene& other) = delete;
   explicit BoardGraphicsScene(
-      Board& board, const IF_GraphicsLayerProvider& lp,
+      Board& board, const GraphicsLayerList& layers,
       std::shared_ptr<const QSet<const NetSignal*>> highlightedNetSignals,
       QObject* parent = nullptr) noexcept;
   virtual ~BoardGraphicsScene() noexcept;
@@ -209,7 +209,7 @@ private:  // Methods
 
 private:  // Data
   Board& mBoard;
-  const IF_GraphicsLayerProvider& mLayerProvider;
+  const GraphicsLayerList& mLayers;
   std::shared_ptr<const QSet<const NetSignal*>> mHighlightedNetSignals;
   QHash<BI_Device*, std::shared_ptr<BGI_Device>> mDevices;
   QHash<BI_FootprintPad*, std::shared_ptr<BGI_FootprintPad>> mFootprintPads;

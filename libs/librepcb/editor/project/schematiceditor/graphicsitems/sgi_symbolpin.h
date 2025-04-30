@@ -38,7 +38,7 @@
 namespace librepcb {
 namespace editor {
 
-class IF_GraphicsLayerProvider;
+class GraphicsLayerList;
 class LineGraphicsItem;
 class PrimitiveCircleGraphicsItem;
 class PrimitiveTextGraphicsItem;
@@ -58,7 +58,7 @@ public:
   SGI_SymbolPin() = delete;
   SGI_SymbolPin(const SGI_SymbolPin& other) = delete;
   SGI_SymbolPin(SI_SymbolPin& pin, std::weak_ptr<SGI_Symbol> symbolItem,
-                const IF_GraphicsLayerProvider& lp,
+                const GraphicsLayerList& layers,
                 std::shared_ptr<const QSet<const NetSignal*>>
                     highlightedNetSignals) noexcept;
   virtual ~SGI_SymbolPin() noexcept;
@@ -94,7 +94,7 @@ private:  // Methods
 private:  // Data
   SI_SymbolPin& mPin;
   std::weak_ptr<SGI_Symbol> mSymbolGraphicsItem;
-  const IF_GraphicsLayerProvider& mLayerProvider;
+  const GraphicsLayerList& mLayers;
   std::shared_ptr<const QSet<const NetSignal*>> mHighlightedNetSignals;
   QScopedPointer<PrimitiveCircleGraphicsItem> mCircleGraphicsItem;
   QScopedPointer<LineGraphicsItem> mLineGraphicsItem;

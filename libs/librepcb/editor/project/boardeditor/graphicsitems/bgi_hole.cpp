@@ -38,10 +38,10 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BGI_Hole::BGI_Hole(BI_Hole& hole, const IF_GraphicsLayerProvider& lp) noexcept
+BGI_Hole::BGI_Hole(BI_Hole& hole, const GraphicsLayerList& layers) noexcept
   : QGraphicsItemGroup(),
     mHole(hole),
-    mGraphicsItem(new PrimitiveHoleGraphicsItem(lp, true, this)),
+    mGraphicsItem(new PrimitiveHoleGraphicsItem(layers, true, this)),
     mOnEditedSlot(*this, &BGI_Hole::holeEdited) {
   setFlag(QGraphicsItem::ItemHasNoContents, true);
   setFlag(QGraphicsItem::ItemIsSelectable, true);

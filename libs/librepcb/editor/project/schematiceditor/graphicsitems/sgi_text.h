@@ -36,7 +36,7 @@
 namespace librepcb {
 namespace editor {
 
-class IF_GraphicsLayerProvider;
+class GraphicsLayerList;
 class LineGraphicsItem;
 class TextGraphicsItem;
 
@@ -53,7 +53,7 @@ public:
   SGI_Text() = delete;
   SGI_Text(const SGI_Text& other) = delete;
   SGI_Text(SI_Text& text, std::weak_ptr<SGI_Symbol> symbolItem,
-           const IF_GraphicsLayerProvider& lp) noexcept;
+           const GraphicsLayerList& layers) noexcept;
   virtual ~SGI_Text() noexcept;
 
   // General Methods
@@ -81,7 +81,7 @@ private:  // Methods
 private:  // Data
   SI_Text& mText;
   std::weak_ptr<SGI_Symbol> mSymbolGraphicsItem;
-  const IF_GraphicsLayerProvider& mLayerProvider;
+  const GraphicsLayerList& mLayers;
   QScopedPointer<TextGraphicsItem> mTextGraphicsItem;
   QScopedPointer<LineGraphicsItem> mAnchorGraphicsItem;
 

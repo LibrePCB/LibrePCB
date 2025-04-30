@@ -44,6 +44,8 @@ class Polygon;
 
 namespace editor {
 
+class GraphicsLayerList;
+
 /*******************************************************************************
  *  Class BGI_Plane
  ******************************************************************************/
@@ -56,7 +58,7 @@ public:
   // Constructors / Destructor
   BGI_Plane() = delete;
   BGI_Plane(const BGI_Plane& other) = delete;
-  BGI_Plane(BI_Plane& plane, const IF_GraphicsLayerProvider& lp,
+  BGI_Plane(BI_Plane& plane, const GraphicsLayerList& layers,
             std::shared_ptr<const QSet<const NetSignal*>>
                 highlightedNetSignals) noexcept;
   virtual ~BGI_Plane() noexcept;
@@ -108,11 +110,11 @@ private:  // Methods
 private:  // Data
   // General Attributes
   BI_Plane& mPlane;
-  const IF_GraphicsLayerProvider& mLayerProvider;
+  const GraphicsLayerList& mLayers;
   std::shared_ptr<const QSet<const NetSignal*>> mHighlightedNetSignals;
 
   // Cached Attributes
-  std::shared_ptr<GraphicsLayer> mLayer;
+  std::shared_ptr<const GraphicsLayer> mLayer;
   QRectF mBoundingRect;
   qreal mBoundingRectMarginPx;
   QPainterPath mShape;
