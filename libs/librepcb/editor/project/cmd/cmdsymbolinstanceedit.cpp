@@ -73,6 +73,11 @@ void CmdSymbolInstanceEdit::translate(const Point& deltaPos,
   if (immediate) mSymbol.setPosition(mNewPos);
 }
 
+void CmdSymbolInstanceEdit::snapToGrid(const PositiveLength& gridInterval,
+                                       bool immediate) noexcept {
+  setPosition(mNewPos.mappedToGrid(gridInterval), immediate);
+}
+
 void CmdSymbolInstanceEdit::setRotation(const Angle& angle,
                                         bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());

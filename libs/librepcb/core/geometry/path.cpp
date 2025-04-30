@@ -83,6 +83,15 @@ bool Path::isZeroLength() const noexcept {
   return true;
 }
 
+bool Path::isOnGrid(const PositiveLength& gridInterval) const noexcept {
+  for (const auto& v : mVertices) {
+    if (!v.getPos().isOnGrid(gridInterval)) {
+      return false;
+    }
+  }
+  return true;
+}
+
 UnsignedLength Path::getTotalStraightLength() const noexcept {
   UnsignedLength length(0);
   if (mVertices.count() >= 2) {

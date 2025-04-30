@@ -70,6 +70,7 @@ public:
   bool isClosed() const noexcept;
   bool isCurved() const noexcept;
   bool isZeroLength() const noexcept;
+  bool isOnGrid(const PositiveLength& gridInterval) const noexcept;
   QVector<Vertex>& getVertices() noexcept {
     invalidatePainterPath();
     return mVertices;

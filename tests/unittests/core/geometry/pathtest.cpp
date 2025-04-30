@@ -116,6 +116,26 @@ TEST_F(PathTest, testIsZeroLengthFalse) {
                    .isZeroLength());
 }
 
+TEST_F(PathTest, testIsOnGrid) {
+  const PositiveLength grid(1000000);
+  EXPECT_TRUE(Path().isOnGrid(grid));  // Usually this is the good case.
+  EXPECT_TRUE(Path({
+                       Vertex(Point(0, 0), Angle::deg90()),
+                       Vertex(Point(1000000, 2000000)),
+                   })
+                  .isOnGrid(grid));
+  EXPECT_FALSE(Path({
+                        Vertex(Point(1, 0), Angle::deg90()),
+                        Vertex(Point(1000000, 2000000)),
+                    })
+                   .isOnGrid(grid));
+  EXPECT_FALSE(Path({
+                        Vertex(Point(0, 0), Angle::deg90()),
+                        Vertex(Point(1000000, 2000001)),
+                    })
+                   .isOnGrid(grid));
+}
+
 TEST_F(PathTest, testGetTotalStraightLength) {
   QVector<Vertex> vertices;
   EXPECT_EQ(UnsignedLength(0), Path(vertices).getTotalStraightLength());

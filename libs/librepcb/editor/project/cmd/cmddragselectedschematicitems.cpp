@@ -62,6 +62,7 @@ CmdDragSelectedSchematicItems::CmdDragSelectedSchematicItems(
     mDeltaPos(0, 0),
     mCenterPos(0, 0),
     mDeltaAngle(0),
+    mSnappedToGrid(false),
     mMirrored(false),
     mTextsReset(false) {
   // get all selected items
@@ -127,6 +128,26 @@ CmdDragSelectedSchematicItems::~CmdDragSelectedSchematicItems() noexcept {
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
+
+void CmdDragSelectedSchematicItems::snapToGrid() noexcept {
+  const PositiveLength grid = mScene.getSchematic().getGridInterval();
+  foreach (CmdSymbolInstanceEdit* cmd, mSymbolEditCmds) {
+    cmd->snapToGrid(grid, true);
+  }
+  foreach (CmdSchematicNetPointEdit* cmd, mNetPointEditCmds) {
+    cmd->snapToGrid(grid, true);
+  }
+  foreach (CmdSchematicNetLabelEdit* cmd, mNetLabelEditCmds) {
+    cmd->snapToGrid(grid, true);
+  }
+  foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) {
+    cmd->snapToGrid(grid, true);
+  }
+  foreach (CmdTextEdit* cmd, mTextEditCmds) {
+    cmd->snapToGrid(grid, true);
+  }
+  mSnappedToGrid = true;
+}
 
 void CmdDragSelectedSchematicItems::resetAllTexts() noexcept {
   mTextsReset = true;
@@ -215,8 +236,8 @@ void CmdDragSelectedSchematicItems::mirror(
  ******************************************************************************/
 
 bool CmdDragSelectedSchematicItems::performExecute() {
-  if (mDeltaPos.isOrigin() && (mDeltaAngle == Angle::deg0()) && (!mMirrored) &&
-      (!mTextsReset)) {
+  if (mDeltaPos.isOrigin() && (mDeltaAngle == Angle::deg0()) &&
+      (!mSnappedToGrid) && (!mMirrored) && (!mTextsReset)) {
     // no movement required --> discard all move commands
     qDeleteAll(mSymbolEditCmds);
     mSymbolEditCmds.clear();

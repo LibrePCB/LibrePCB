@@ -59,6 +59,7 @@ public:
   ~CmdDragSelectedSchematicItems() noexcept;
 
   // General Methods
+  void snapToGrid() noexcept;
   void resetAllTexts() noexcept;
   void setCurrentPosition(const Point& pos) noexcept;
   void rotate(const Angle& angle, bool aroundCurrentPosition) noexcept;
@@ -80,6 +81,7 @@ private:
   Point mDeltaPos;
   Point mCenterPos;
   Angle mDeltaAngle;
+  bool mSnappedToGrid;
   bool mMirrored;
   bool mTextsReset;
 

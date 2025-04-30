@@ -67,6 +67,11 @@ void CmdSchematicNetPointEdit::translate(const Point& deltaPos,
   if (immediate) mNetPoint.setPosition(mNewPos);
 }
 
+void CmdSchematicNetPointEdit::snapToGrid(const PositiveLength& gridInterval,
+                                          bool immediate) noexcept {
+  setPosition(mNewPos.mappedToGrid(gridInterval), immediate);
+}
+
 void CmdSchematicNetPointEdit::rotate(const Angle& angle, const Point& center,
                                       bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());

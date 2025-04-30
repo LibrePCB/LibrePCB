@@ -75,6 +75,11 @@ void CmdSchematicNetLabelEdit::translate(const Point& deltaPos,
   if (immediate) mNetLabel.setPosition(mNewPos);
 }
 
+void CmdSchematicNetLabelEdit::snapToGrid(const PositiveLength& gridInterval,
+                                          bool immediate) noexcept {
+  setPosition(mNewPos.mappedToGrid(gridInterval), immediate);
+}
+
 void CmdSchematicNetLabelEdit::setRotation(const Angle& angle,
                                            bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
