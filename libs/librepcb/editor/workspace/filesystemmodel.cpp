@@ -129,7 +129,7 @@ void FileSystemModel::set_row_data(std::size_t i,
     }
     mItems.at(i) = data;
     mItems.at(i).action = ui::Action::None;
-    row_changed(i);
+    notify_row_changed(i);
   }
 }
 
@@ -185,7 +185,7 @@ void FileSystemModel::expandDir(const FilePath& fp, std::size_t index,
             isPinnable && mQuickAccess->isFavoriteProject(itemFp),  // Pinned
             ui::Action::None,  // Action
         });
-    row_added(index, 1);
+    notify_row_added(index, 1);
     ++index;
   }
   if (!mWatcher.addPath(fp.toStr())) {
@@ -221,7 +221,7 @@ void FileSystemModel::collapseDir(const FilePath& fp, std::size_t index,
   }
   if (childCount > 0) {
     mItems.erase(mItems.begin() + index, mItems.begin() + index + childCount);
-    row_removed(index, childCount);
+    notify_row_removed(index, childCount);
   }
   if (fp != mRoot) {
     mExpandedDirs.remove(fp);
@@ -255,7 +255,7 @@ void FileSystemModel::favoriteProjectChanged(const FilePath& fp,
         (FilePath(s2q(mItems.at(i).user_data)) == fp) &&
         (mItems.at(i).pinned != favorite)) {
       mItems.at(i).pinned = favorite;
-      row_changed(i);
+      notify_row_changed(i);
       break;
     }
   }

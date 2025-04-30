@@ -48,7 +48,7 @@ NotificationsModel::NotificationsModel(Workspace& ws, QObject* parent) noexcept
       &mWorkspace.getSettings().dismissedMessages,
       &WorkspaceSettingsItem::edited, this,
       [this]() {
-        reset();
+        notify_reset();
         updateUnreadNotificationsCount();
         updateCurrentProgressIndex();
       },
@@ -78,7 +78,7 @@ void NotificationsModel::push(
   const QString dismissKey = notification->getDismissKey();
   if (dismissKey.isEmpty() ||
       (!mWorkspace.getSettings().dismissedMessages.contains(dismissKey))) {
-    row_added(0, 1);
+    notify_row_added(0, 1);
     updateUnreadNotificationsCount();
     updateCurrentProgressIndex();
     if (notification->getAutoPopUp()) {
@@ -118,7 +118,7 @@ void NotificationsModel::set_row_data(
   const int itemIndex = mapIndex(i);
   if ((itemIndex >= 0) && (itemIndex < static_cast<int>(mItems.size()))) {
     mItems[itemIndex]->setUiData(obj);
-    row_changed(i);
+    notify_row_changed(i);
 
     // Handle "don't show again".
     const QString dismissKey = mItems[itemIndex]->getDismissKey();
@@ -170,7 +170,7 @@ void NotificationsModel::itemChanged(bool dismissed) noexcept {
       if (dismissed) {
         removeItem(logicalIndex, i);
       } else {
-        row_changed(logicalIndex);
+        notify_row_changed(logicalIndex);
       }
       return;
     }
@@ -186,7 +186,7 @@ void NotificationsModel::removeItem(std::size_t i, int itemIndex) noexcept {
   disconnect(mItems[itemIndex].get(), &Notification::changed, this,
              &NotificationsModel::itemChanged);
   mItems.erase(mItems.begin() + itemIndex);
-  row_removed(i, 1);
+  notify_row_removed(i, 1);
 }
 
 void NotificationsModel::updateUnreadNotificationsCount() noexcept {

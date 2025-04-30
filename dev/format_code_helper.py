@@ -58,6 +58,18 @@ def format_ui(content):
     return content
 
 
+def format_slint(content):
+    # Sort import statements
+    matches = list(re.finditer(r'(import|export) \{\n([^\}]*)', content, re.MULTILINE))
+    matches.reverse()
+    for m in matches:
+        imports = [s.strip() for s in m.group(2).split(',') if s.strip()]
+        sorted_imports = sorted(list(set(imports)))
+        new_content = ',\n'.join(['    ' + s for s in sorted_imports]) + ',\n'
+        content = content[:m.start(2)] + new_content + content[m.end(2):]
+    return content
+
+
 if __name__ == '__main__':
     # Get relative file path.
     path = sys.argv[1]
@@ -71,6 +83,8 @@ if __name__ == '__main__':
         content = format_cxx(path, extension, content)
     elif extension == 'ui':
         content = format_ui(content)
+    elif extension == 'slint':
+        content = format_slint(content)
 
     # Write file content to stdout.
     sys.stdout.write(content)
