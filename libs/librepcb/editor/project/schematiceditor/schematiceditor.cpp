@@ -372,8 +372,7 @@ void SchematicEditor::createActions() noexcept {
       this, &mProjectEditor, &ProjectEditor::showControlPanelClicked));
   mActionProjectSetup.reset(cmd.projectSetup.createAction(this, this, [this]() {
     abortBlockingToolsInOtherEditors();  // Release undo stack.
-    ProjectSetupDialog dialog(mProject, mProjectEditor.getUndoStack(),
-                              "schematic_editor", this);
+    ProjectSetupDialog dialog(mProject, mProjectEditor.getUndoStack(), this);
     dialog.exec();
   }));
   mActionUpdateLibrary.reset(
@@ -406,8 +405,7 @@ void SchematicEditor::createActions() noexcept {
   }));
   mActionOutputJobs.reset(cmd.outputJobs.createAction(this, this, [this]() {
     OutputJobsDialog dialog(mProjectEditor.getWorkspace().getSettings(),
-                            mProject, mProjectEditor.getUndoStack(),
-                            "schematic_editor", this);
+                            mProject, mProjectEditor.getUndoStack(), this);
     connect(&dialog, &OutputJobsDialog::orderPcbDialogTriggered, this,
             [this, &dialog]() { mProjectEditor.execOrderPcbDialog(&dialog); });
     dialog.exec();

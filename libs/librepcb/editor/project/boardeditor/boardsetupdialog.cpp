@@ -40,8 +40,7 @@
 namespace librepcb {
 namespace editor {
 
-const QString BoardSetupDialog::sSettingsPrefix =
-    "board_editor/board_setup_dialog";
+const QString BoardSetupDialog::sSettingsPrefix = "board_setup_dialog";
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -234,19 +233,20 @@ BoardSetupDialog::BoardSetupDialog(Board& board, UndoStack& undoStack,
   // Load all s.
   load();
 
-  // Load the window geometry.
-  QSettings clientSettings;
-  restoreGeometry(
-      clientSettings.value(sSettingsPrefix % "/window_geometry").toByteArray());
+  // Load client settings.
+  QSettings cs;
+  const QSize windowSize = cs.value(sSettingsPrefix % "/window_size").toSize();
+  if (!windowSize.isEmpty()) {
+    resize(windowSize);
+  }
 
   // Always open first tab.
   mUi->tabWidget->setCurrentIndex(0);
 }
 
 BoardSetupDialog::~BoardSetupDialog() {
-  // Save the window geometry.
-  QSettings clientSettings;
-  clientSettings.setValue(sSettingsPrefix % "/window_geometry", saveGeometry());
+  QSettings cs;
+  cs.setValue(sSettingsPrefix % "/window_size", size());
 }
 
 /*******************************************************************************

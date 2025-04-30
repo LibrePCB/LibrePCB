@@ -128,18 +128,19 @@ FabricationOutputDialog::FabricationOutputDialog(
   mUi->cbxSolderPasteTop->setChecked(s.getEnableSolderPasteTop());
   mUi->cbxSolderPasteBot->setChecked(s.getEnableSolderPasteBot());
 
-  // Load window geometry.
-  QSettings clientSettings;
-  restoreGeometry(
-      clientSettings.value("fabrication_export_dialog/window_geometry")
-          .toByteArray());
+  // Load client settings.
+  QSettings cs;
+  const QSize windowSize =
+      cs.value("fabrication_export_dialog/window_size").toSize();
+  if (!windowSize.isEmpty()) {
+    resize(windowSize);
+  }
 }
 
 FabricationOutputDialog::~FabricationOutputDialog() {
-  // Save window geometry.
-  QSettings clientSettings;
-  clientSettings.setValue("fabrication_export_dialog/window_geometry",
-                          saveGeometry());
+  // Save client settings.
+  QSettings cs;
+  cs.setValue("fabrication_export_dialog/window_size", size());
 }
 
 /*******************************************************************************

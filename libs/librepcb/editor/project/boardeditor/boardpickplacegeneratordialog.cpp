@@ -109,18 +109,20 @@ BoardPickPlaceGeneratorDialog::BoardPickPlaceGeneratorDialog(
       static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
       this, &BoardPickPlaceGeneratorDialog::updateData);
 
-  // Load window geometry.
-  QSettings clientSettings;
-  restoreGeometry(
-      clientSettings.value("pnp_export_dialog/window_geometry").toByteArray());
+  // Load client settings.
+  QSettings cs;
+  const QSize windowSize = cs.value("pnp_export_dialog/window_size").toSize();
+  if (!windowSize.isEmpty()) {
+    resize(windowSize);
+  }
 
   updateData();
 }
 
 BoardPickPlaceGeneratorDialog::~BoardPickPlaceGeneratorDialog() {
-  // Save window geometry.
-  QSettings clientSettings;
-  clientSettings.setValue("pnp_export_dialog/window_geometry", saveGeometry());
+  // Save client settings.
+  QSettings cs;
+  cs.setValue("pnp_export_dialog/window_size", size());
 }
 
 /*******************************************************************************
