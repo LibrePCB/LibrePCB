@@ -68,6 +68,7 @@ public:
   virtual bool processGraphicsSceneLeftMouseButtonPressed(
       QGraphicsSceneMouseEvent& e) noexcept override;
   virtual bool processSwitchToBoard(int index) noexcept override;
+  virtual void processSwitchedBoard() noexcept override;
 
   // Operator Overloadings
   BoardEditorState_Measure& operator=(const BoardEditorState_Measure& rhs) =

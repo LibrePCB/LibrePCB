@@ -149,6 +149,11 @@ public:
    */
   bool processSwitchToSchematicPage(int index) noexcept;
 
+  /**
+   * @brief Notification about a switched schematic page
+   */
+  void processSwitchedSchematicPage() noexcept;
+
   // Operator Overloadings
   SchematicEditorFsm& operator=(const SchematicEditorFsm& rhs) = delete;
 

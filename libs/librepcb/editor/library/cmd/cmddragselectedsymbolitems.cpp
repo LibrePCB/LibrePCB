@@ -26,9 +26,9 @@
 #include "../../cmd/cmdpolygonedit.h"
 #include "../../cmd/cmdtextedit.h"
 #include "../../graphics/circlegraphicsitem.h"
+#include "../../graphics/graphicsscene.h"
 #include "../../graphics/polygongraphicsitem.h"
 #include "../../graphics/textgraphicsitem.h"
-#include "../../widgets/graphicsview.h"
 #include "../cmd/cmdsymbolpinedit.h"
 #include "../sym/symbolgraphicsitem.h"
 #include "../sym/symbolpingraphicsitem.h"
@@ -56,7 +56,7 @@ CmdDragSelectedSymbolItems::CmdDragSelectedSymbolItems(
     mSnappedToGrid(false),
     mHasOffTheGridElements(false) {
   int count = 0;
-  PositiveLength grid = mContext.graphicsView.getGridInterval();
+  PositiveLength grid = mContext.graphicsScene.getGridInterval();
 
   QList<std::shared_ptr<SymbolPinGraphicsItem>> pins =
       context.symbolGraphicsItem.getSelectedPins();
@@ -133,7 +133,7 @@ int CmdDragSelectedSymbolItems::getSelectedItemsCount() const noexcept {
  ******************************************************************************/
 
 void CmdDragSelectedSymbolItems::snapToGrid() noexcept {
-  PositiveLength grid = mContext.graphicsView.getGridInterval();
+  PositiveLength grid = mContext.graphicsScene.getGridInterval();
   foreach (CmdSymbolPinEdit* cmd, mPinEditCmds) {
     cmd->snapToGrid(grid, true);
   }

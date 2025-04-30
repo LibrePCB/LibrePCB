@@ -170,12 +170,13 @@ void MeasureTool::enter() noexcept {
   if (mView) {
     if (GraphicsScene* scene = mView->getScene()) {
       scene->setSelectionArea(QPainterPath());  // clear selection
+      scene->setGrayOut(true);
     }
-    mView->setGrayOut(true);
     mView->setCursor(Qt::CrossCursor);
-    mLastScenePos = mView->mapGlobalPosToScenePos(QCursor::pos(), true, true);
+    mLastScenePos = mView->mapGlobalPosToScenePos(QCursor::pos());
   }
   updateCursorPosition(Qt::KeyboardModifier::NoModifier);
+  updateRulerPositions();
   updateStatusBarMessage();
 }
 
@@ -188,9 +189,11 @@ void MeasureTool::leave() noexcept {
   if (mView) {
     mView->unsetCursor();
     mView->setInfoBoxText(QString());
-    mView->setSceneCursor(std::nullopt);
-    mView->setRulerPositions(std::nullopt);
-    mView->setGrayOut(false);
+    if (GraphicsScene* scene = mView->getScene()) {
+      scene->setSceneCursor(Point(), false, false);
+      scene->setRulerPositions(std::nullopt);
+      scene->setGrayOut(false);
+    }
   }
 
   emit statusBarMessageChanged(QString());
@@ -378,6 +381,10 @@ void MeasureTool::updateCursorPosition(
   if (!mView) {
     return;
   }
+  GraphicsScene* scene = mView->getScene();
+  if (!scene) {
+    return;
+  }
 
   mCursorPos = mLastScenePos;
   mCursorSnapped = false;
@@ -392,7 +399,7 @@ void MeasureTool::updateCursorPosition(
       }
     }
 
-    const Point posOnGrid = mCursorPos.mappedToGrid(mView->getGridInterval());
+    const Point posOnGrid = mCursorPos.mappedToGrid(scene->getGridInterval());
     const Length gridDistance = *(mCursorPos - posOnGrid).getLength();
     if ((nearestDistance >= 0) && (nearestDistance <= gridDistance)) {
       mCursorPos = nearestCandidate;
@@ -408,22 +415,19 @@ void MeasureTool::updateRulerPositions() noexcept {
   if (!mView) {
     return;
   }
+  GraphicsScene* scene = mView->getScene();
+  if (!scene) {
+    return;
+  }
 
-  GraphicsView::CursorOptions cursorOptions(0);
-  if ((!mStartPos) || mEndPos) {
-    cursorOptions |= GraphicsView::CursorOption::Cross;
-  }
-  if (mCursorSnapped) {
-    cursorOptions |= GraphicsView::CursorOption::Circle;
-  }
-  mView->setSceneCursor(std::make_pair(mCursorPos, cursorOptions));
+  scene->setSceneCursor(mCursorPos, (!mStartPos) || mEndPos, mCursorSnapped);
 
   const Point startPos = mStartPos ? *mStartPos : mCursorPos;
   const Point endPos = mEndPos ? *mEndPos : mCursorPos;
   if (mStartPos) {
-    mView->setRulerPositions(std::make_pair(startPos, endPos));
+    scene->setRulerPositions(std::make_pair(startPos, endPos));
   } else {
-    mView->setRulerPositions(std::nullopt);
+    scene->setRulerPositions(std::nullopt);
   }
 
   const Point diff = endPos - startPos;

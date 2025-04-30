@@ -83,12 +83,15 @@ SchematicGraphicsScene*
 }
 
 PositiveLength SchematicEditorState::getGridInterval() const noexcept {
-  return mContext.editorGraphicsView.getGridInterval();
+  if (const Schematic* sch = mContext.editor.getActiveSchematic()) {
+    return sch->getGridInterval();
+  } else {
+    return PositiveLength(Length(2540000));
+  }
 }
 
 const LengthUnit& SchematicEditorState::getLengthUnit() const noexcept {
-  if (const Schematic* schematic =
-          const_cast<SchematicEditorState*>(this)->getActiveSchematic()) {
+  if (const Schematic* schematic = mContext.editor.getActiveSchematic()) {
     return schematic->getGridUnit();
   } else {
     return mContext.workspace.getSettings().defaultLengthUnit.get();

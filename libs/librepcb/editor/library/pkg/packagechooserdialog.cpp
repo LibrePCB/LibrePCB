@@ -55,13 +55,15 @@ PackageChooserDialog::PackageChooserDialog(
     mWorkspace(ws),
     mLayerProvider(layerProvider),
     mUi(new Ui::PackageChooserDialog),
-    mCategorySelected(false) {
+    mCategorySelected(false),
+    mGraphicsScene(new GraphicsScene()) {
   mUi->setupUi(this);
 
-  mGraphicsScene.reset(new GraphicsScene());
   const Theme& theme = mWorkspace.getSettings().themes.getActive();
-  mUi->graphicsView->setBackgroundColors(
+  mGraphicsScene->setBackgroundColors(
       theme.getColor(Theme::Color::sBoardBackground).getPrimaryColor(),
+      theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor());
+  mUi->graphicsView->setSpinnerColor(
       theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor());
   mUi->graphicsView->setScene(mGraphicsScene.data());
 

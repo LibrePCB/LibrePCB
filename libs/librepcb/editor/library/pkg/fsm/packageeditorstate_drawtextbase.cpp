@@ -24,6 +24,7 @@
 
 #include "../../../cmd/cmdstroketextedit.h"
 #include "../../../editorcommandset.h"
+#include "../../../graphics/graphicsscene.h"
 #include "../../../graphics/stroketextgraphicsitem.h"
 #include "../../../utils/halignactiongroup.h"
 #include "../../../utils/valignactiongroup.h"
@@ -164,8 +165,8 @@ bool PackageEditorState_DrawTextBase::entry() noexcept {
           &PackageEditorState_DrawTextBase::vAlignActionGroupValueChanged);
   mContext.commandToolBar.addActionGroup(std::move(vAlignActionGroup));
 
-  Point pos =
-      mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos(), true, true);
+  const Point pos = mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos())
+                        .mappedToGrid(mContext.graphicsScene.getGridInterval());
   if (!startAddText(pos)) {
     return false;
   }

@@ -163,6 +163,7 @@ public:
     Q_UNUSED(index);
     return false;  // Do NOT allow switching page by default
   }
+  virtual void processSwitchedSchematicPage() noexcept {}
 
   // Operator Overloadings
   SchematicEditorState& operator=(const SchematicEditorState& rhs) = delete;

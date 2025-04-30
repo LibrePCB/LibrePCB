@@ -29,6 +29,7 @@
 #include "ui_schematiceditor.h"
 
 #include <librepcb/core/serialization/fileformatmigration.h>
+#include <librepcb/core/workspace/theme.h>
 
 #include <QtCore>
 #include <QtWidgets>

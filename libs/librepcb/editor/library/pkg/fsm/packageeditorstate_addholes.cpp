@@ -25,6 +25,7 @@
 #include "../../../cmd/cmdholeedit.h"
 #include "../../../editorcommandset.h"
 #include "../../../graphics/graphicslayer.h"
+#include "../../../graphics/graphicsscene.h"
 #include "../../../graphics/holegraphicsitem.h"
 #include "../../../widgets/graphicsview.h"
 #include "../../../widgets/positivelengthedit.h"
@@ -81,8 +82,8 @@ bool PackageEditorState_AddHoles::entry() noexcept {
           &PackageEditorState_AddHoles::diameterEditValueChanged);
   mContext.commandToolBar.addWidget(std::move(edtDiameter));
 
-  Point pos =
-      mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos(), true, true);
+  const Point pos = mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos())
+                        .mappedToGrid(mContext.graphicsScene.getGridInterval());
   if (!startAddHole(pos)) {
     return false;
   }

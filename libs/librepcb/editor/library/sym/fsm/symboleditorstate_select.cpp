@@ -761,8 +761,8 @@ bool SymbolEditorState_Select::openPropertiesDialogOfItemAtPos(
 
 bool SymbolEditorState_Select::copySelectedItemsToClipboard() noexcept {
   try {
-    Point cursorPos = mContext.graphicsView.mapGlobalPosToScenePos(
-        QCursor::pos(), true, false);
+    const Point cursorPos =
+        mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos());
     SymbolClipboardData data(mContext.symbol.getUuid(), cursorPos);
     foreach (const std::shared_ptr<SymbolPinGraphicsItem>& pin,
              mContext.symbolGraphicsItem.getSelectedPins()) {
@@ -806,8 +806,7 @@ bool SymbolEditorState_Select::startPaste(
   setState(SubState::PASTING);
 
   // Paste items.
-  mStartPos =
-      mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos(), true, false);
+  mStartPos = mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos());
   Point offset = fixedPosition
       ? (*fixedPosition)
       : (mStartPos - data->getCursorPos()).mappedToGrid(getGridInterval());

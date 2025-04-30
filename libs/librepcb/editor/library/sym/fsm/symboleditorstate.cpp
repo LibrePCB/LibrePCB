@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "symboleditorstate.h"
 
-#include "../../../widgets/graphicsview.h"
+#include "../../../graphics/graphicsscene.h"
 #include "../../editorwidgetbase.h"
 #include "../symbolclipboarddata.h"
 
@@ -67,7 +67,7 @@ void SymbolEditorState::requestPaste(
 }
 
 const PositiveLength& SymbolEditorState::getGridInterval() const noexcept {
-  return mContext.graphicsView.getGridInterval();
+  return mContext.graphicsScene.getGridInterval();
 }
 
 const LengthUnit& SymbolEditorState::getLengthUnit() const noexcept {

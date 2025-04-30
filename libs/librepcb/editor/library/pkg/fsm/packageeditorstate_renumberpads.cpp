@@ -198,8 +198,7 @@ bool PackageEditorState_ReNumberPads::start() noexcept {
     mPreviousPad.reset();
     mCurrentPad.reset();
     mTmpCmd.reset();
-    mCurrentPos = mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos(),
-                                                               true, false);
+    mCurrentPos = mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos());
     mCurrentModifiers = Qt::KeyboardModifiers();
 
     // Start undo command group.

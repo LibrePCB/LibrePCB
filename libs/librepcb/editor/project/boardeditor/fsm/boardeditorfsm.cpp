@@ -363,6 +363,12 @@ bool BoardEditorFsm::processSwitchToBoard(int index) noexcept {
   return false;
 }
 
+void BoardEditorFsm::processSwitchedBoard() noexcept {
+  if (BoardEditorState* state = getCurrentStateObj()) {
+    state->processSwitchedBoard();
+  }
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/

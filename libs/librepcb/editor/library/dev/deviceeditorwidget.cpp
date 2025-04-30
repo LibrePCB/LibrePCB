@@ -98,16 +98,22 @@ DeviceEditorWidget::DeviceEditorWidget(const Context& context,
   setupErrorNotificationWidget(*mUi->errorNotificationWidget);
   setWindowIcon(QIcon(":/img/library/device.png"));
 
-  // Setup graphics view.
+  // Setup graphics scenes.
   const Theme& theme = mContext.workspace.getSettings().themes.getActive();
-  mUi->viewComponent->setBackgroundColors(
-      theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor(),
-      theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
-  mUi->viewPackage->setBackgroundColors(
-      theme.getColor(Theme::Color::sBoardBackground).getPrimaryColor(),
-      theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor());
   mComponentGraphicsScene.reset(new GraphicsScene());
   mPackageGraphicsScene.reset(new GraphicsScene());
+  mComponentGraphicsScene->setBackgroundColors(
+      theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor(),
+      theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
+  mPackageGraphicsScene->setBackgroundColors(
+      theme.getColor(Theme::Color::sBoardBackground).getPrimaryColor(),
+      theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor());
+
+  // Setup graphics views.
+  mUi->viewComponent->setSpinnerColor(
+      theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
+  mUi->viewPackage->setSpinnerColor(
+      theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor());
   mUi->viewComponent->setScene(mComponentGraphicsScene.data());
   mUi->viewPackage->setScene(mPackageGraphicsScene.data());
   mGraphicsLayerProvider.reset(new DefaultGraphicsLayerProvider(theme));

@@ -118,9 +118,12 @@ BackgroundImageSetupDialog::BackgroundImageSetupDialog(
     mCursorGraphicsItem(createCrossGraphicsItem(true)),
     mCropGraphicsItem(new QGraphicsPathItem()) {
   mUi->setupUi(this);
-  mUi->graphicsView->setOriginCrossVisible(false);
-  mUi->graphicsView->setBackgroundColors(Qt::transparent, Qt::transparent);
-  mUi->graphicsView->setScene(new GraphicsScene(this));
+
+  GraphicsScene* scene = new GraphicsScene(this);
+  scene->setBackgroundColors(Qt::transparent, Qt::transparent);
+  scene->setOriginCrossVisible(false);
+  mUi->graphicsView->setSpinnerColor(Qt::transparent);
+  mUi->graphicsView->setScene(scene);
   mUi->graphicsView->setEventHandlerObject(this);
   mUi->graphicsView->scene()->addItem(mImageGraphicsItem.get());
   mUi->graphicsView->scene()->addItem(mCursorGraphicsItem.get());

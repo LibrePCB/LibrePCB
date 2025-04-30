@@ -330,6 +330,12 @@ bool SchematicEditorFsm::processSwitchToSchematicPage(int index) noexcept {
   return false;
 }
 
+void SchematicEditorFsm::processSwitchedSchematicPage() noexcept {
+  if (SchematicEditorState* state = getCurrentStateObj()) {
+    state->processSwitchedSchematicPage();
+  }
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
