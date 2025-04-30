@@ -28,6 +28,7 @@
 #include "../../../editorcommandset.h"
 #include "../../../graphics/polygongraphicsitem.h"
 #include "../../../undostack.h"
+#include "../../../utils/editortoolbox.h"
 #include "../../../utils/menubuilder.h"
 #include "../../../widgets/graphicsview.h"
 #include "../../cmd/cmddragselectedschematicitems.h"
@@ -545,10 +546,9 @@ bool SchematicEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
     mb.addAction(cmd.deviceResetTextAll.createAction(
         &menu, this,
         &SchematicEditorState_Select::resetAllTextsOfSelectedItems));
-    mContext.editor.getProjectEditor().addResourcesToMenu(
-        mb, sym->getSymbol().getComponentInstance(), std::nullopt,
-        &mContext.editor, &menu);
-
+    EditorToolbox::addResourcesToMenu(mContext.workspace, mb,
+                                      sym->getSymbol().getComponentInstance(),
+                                      std::nullopt, &mContext.editor, menu);
   } else if (auto item =
                  std::dynamic_pointer_cast<SGI_NetLabel>(selectedItem)) {
     mb.addAction(

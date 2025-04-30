@@ -23,14 +23,26 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/core/library/resource.h>
+#include <librepcb/core/types/uuid.h>
+
 #include <QtCore>
 #include <QtWidgets>
+
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class ComponentInstance;
+class Workspace;
+class WorkspaceLibraryDb;
+
 namespace editor {
+
+class MenuBuilder;
 
 /*******************************************************************************
  *  Class EditorToolbox
@@ -89,6 +101,42 @@ public:
   static bool startToolBarTabFocusCycle(QToolBar& toolBar,
                                         QWidget& returnFocusToWidget) noexcept;
 
+  /**
+   * @brief Collect all relevant resources for a given component instance
+   *
+   * Resources will be collected from both the workspace library and the
+   * project library.
+   *
+   * @param db          Workspace library database.
+   * @param cmp         Component instance
+   * @param filterDev   If provided, only get resources for these devices.
+   *                    Otherwise, resources for all devices are returned.
+   * @return List of all relevant resources.
+   */
+  static ResourceList getComponentResources(
+      const WorkspaceLibraryDb& db, const ComponentInstance& cmp,
+      const std::optional<Uuid>& filterDev = std::nullopt) noexcept;
+
+  /**
+   * @brief Add relevant resources of a component instance to a context menu
+   *
+   * This calls #getComponentResources() and then adds the results to a
+   * context menu.
+   *
+   * @param ws          Workspace.
+   * @param mb          Menu builder to add the new menu items.
+   * @param cmp         See #getComponentResources().
+   * @param filterDev   See #getComponentResources().
+   * @param editor      Parent widget, used for asynchronously opening
+   *                    resources when a menu item is triggered.
+   * @param root        Root menu (for ownership).
+   */
+  static void addResourcesToMenu(const Workspace& ws, MenuBuilder& mb,
+                                 const ComponentInstance& cmp,
+                                 const std::optional<Uuid>& filterDev,
+                                 QPointer<QWidget> editor,
+                                 QMenu& root) noexcept;
+
 private:
   /**
    * @brief Helper for #removeFormLayoutRow(QLabel&)
@@ -107,6 +155,18 @@ private:
    * @param item  The item to hide.
    */
   static void hideLayoutItem(QLayoutItem& item) noexcept;
+
+  /**
+   * @brief Helper for #addResourcesToMenu()
+   *
+   * @param ws            Workspace.
+   * @param mpn           Part MPN.
+   * @param manufacturer  Part manufacturer name.
+   * @param parent        Parent widget.
+   */
+  static void searchAndOpenDatasheet(const Workspace& ws, const QString& mpn,
+                                     const QString& manufacturer,
+                                     QPointer<QWidget> parent) noexcept;
 };
 
 /*******************************************************************************
