@@ -184,6 +184,16 @@ bool SchematicEditorState_Select::processMirror(
   return false;
 }
 
+bool SchematicEditorState_Select::processSnapToGrid() noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
+  if (!mCmdPolygonEdit) {
+    return snapSelectedItemsToGrid();
+  }
+  return false;
+}
+
 bool SchematicEditorState_Select::processResetAllTexts() noexcept {
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
@@ -527,6 +537,11 @@ bool SchematicEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
     mb.addAction(cmd.mirrorVertical.createAction(
         &menu, this, [this]() { mirrorSelectedItems(Qt::Vertical); }));
     mb.addSeparator();
+    QAction* aSnap = cmd.snapToGrid.createAction(
+        &menu, this, [this]() { snapSelectedItemsToGrid(); });
+    aSnap->setEnabled(
+        !sym->getSymbol().getPosition().isOnGrid(getGridInterval()));
+    mb.addAction(aSnap);
     mb.addAction(cmd.deviceResetTextAll.createAction(
         &menu, this,
         &SchematicEditorState_Select::resetAllTextsOfSelectedItems));
@@ -534,7 +549,8 @@ bool SchematicEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
         mb, sym->getSymbol().getComponentInstance(), std::nullopt,
         &mContext.editor, &menu);
 
-  } else if (std::dynamic_pointer_cast<SGI_NetLabel>(selectedItem)) {
+  } else if (auto item =
+                 std::dynamic_pointer_cast<SGI_NetLabel>(selectedItem)) {
     mb.addAction(
         cmd.properties.createAction(
             &menu, this,
@@ -552,6 +568,11 @@ bool SchematicEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
         &menu, this, [this]() { mirrorSelectedItems(Qt::Horizontal); }));
     mb.addAction(cmd.mirrorVertical.createAction(
         &menu, this, [this]() { mirrorSelectedItems(Qt::Vertical); }));
+    QAction* aSnap = cmd.snapToGrid.createAction(
+        &menu, this, [this]() { snapSelectedItemsToGrid(); });
+    aSnap->setEnabled(
+        !item->getNetLabel().getPosition().isOnGrid(getGridInterval()));
+    mb.addAction(aSnap);
   } else if (auto item =
                  std::dynamic_pointer_cast<PolygonGraphicsItem>(selectedItem)) {
     SI_Polygon* polygon =
@@ -604,7 +625,12 @@ bool SchematicEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
         &menu, this, [this]() { mirrorSelectedItems(Qt::Horizontal); }));
     mb.addAction(cmd.mirrorVertical.createAction(
         &menu, this, [this]() { mirrorSelectedItems(Qt::Vertical); }));
-  } else if (std::dynamic_pointer_cast<SGI_Text>(selectedItem)) {
+    QAction* aSnap = cmd.snapToGrid.createAction(
+        &menu, this, [this]() { snapSelectedItemsToGrid(); });
+    aSnap->setEnabled(
+        !polygon->getPolygon().getPath().isOnGrid(getGridInterval()));
+    mb.addAction(aSnap);
+  } else if (auto item = std::dynamic_pointer_cast<SGI_Text>(selectedItem)) {
     mb.addAction(
         cmd.properties.createAction(
             &menu, this,
@@ -628,6 +654,11 @@ bool SchematicEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
         &menu, this, [this]() { mirrorSelectedItems(Qt::Horizontal); }));
     mb.addAction(cmd.mirrorVertical.createAction(
         &menu, this, [this]() { mirrorSelectedItems(Qt::Vertical); }));
+    QAction* aSnap = cmd.snapToGrid.createAction(
+        &menu, this, [this]() { snapSelectedItemsToGrid(); });
+    aSnap->setEnabled(
+        !item->getText().getPosition().isOnGrid(getGridInterval()));
+    mb.addAction(aSnap);
   } else {
     return false;
   }
@@ -705,6 +736,26 @@ bool SchematicEditorState_Select::mirrorSelectedItems(
       std::unique_ptr<CmdDragSelectedSchematicItems> cmd(
           new CmdDragSelectedSchematicItems(*scene));
       cmd->mirror(orientation, false);
+      execCmd(cmd.release());
+    }
+    return true;
+  } catch (const Exception& e) {
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+    return false;
+  }
+}
+
+bool SchematicEditorState_Select::snapSelectedItemsToGrid() noexcept {
+  SchematicGraphicsScene* scene = getActiveSchematicScene();
+  if (!scene) return false;
+
+  try {
+    if (mSelectedItemsDragCommand) {
+      mSelectedItemsDragCommand->snapToGrid();
+    } else {
+      std::unique_ptr<CmdDragSelectedSchematicItems> cmd(
+          new CmdDragSelectedSchematicItems(*scene));
+      cmd->snapToGrid();
       execCmd(cmd.release());
     }
     return true;
