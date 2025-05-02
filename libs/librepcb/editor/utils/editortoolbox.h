@@ -67,6 +67,15 @@ public:
   // Static Methods
 
   /**
+   * @brief Load a SVG QIcon which is properly colorized
+   *
+   * @param file  Resource file path (e.g. ":/fa/solid/globe.svg")
+   *
+   * @return A QIcon with the colorized SVG
+   */
+  static QIcon svgIcon(const QString& file) noexcept;
+
+  /**
    * @brief Remove (hide) a whole row in a QFormLayout
    *
    * @param label   The label of the row to remove.
