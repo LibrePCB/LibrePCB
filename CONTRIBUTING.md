@@ -17,12 +17,7 @@ there are many other ways how to contribute to the LibrePCB project, see
   out to find something to work on:
   - [`help wanted`](https://github.com/LibrePCB/LibrePCB/labels/help%20wanted)
   - [`easy`](https://github.com/LibrePCB/LibrePCB/labels/easy)
-- To contact us use one of the following options:
-  - Our [discussion platform](https://librepcb.discourse.group/) (preferred)
-  - GitHub issues
-  - [Telegram](https://telegram.me/LibrePCB_dev) or
-    [Matrix](https://matrix.to/#/#librepcb-dev:matrix.coredump.ch)
-    (they are automatically synchronized)
+- To contact us, use one of the options listed at https://librepcb.org/help/.
 
 ## Getting Started
 
