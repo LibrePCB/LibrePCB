@@ -187,9 +187,6 @@ export component TreeView inherits Rectangle {
                 if (event.button == PointerEventButton.right) && (event.kind == PointerEventKind.up) {
                     self.clicked(); // Handle focus & selection
                     item-right-clicked(index, item, self.absolute-position.x - root.absolute-position.x + self.mouse-x, self.absolute-position.y - root.absolute-position.y + self.mouse-y);
-                    EventResult.accept
-                } else {
-                    EventResult.reject
                 }
             }
         }

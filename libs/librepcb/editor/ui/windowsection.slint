@@ -34,9 +34,7 @@ component TabButton inherits Rectangle {
         pointer-event(event) => {
             if (event.button == PointerEventButton.middle) && (event.kind == PointerEventKind.down) {
                 close-clicked();
-                return EventResult.accept;
             }
-            EventResult.reject
         }
     }
 
@@ -206,7 +204,6 @@ export component WindowSection inherits Rectangle {
             if event.kind == PointerEventKind.down {
                 Data.current-section-index = section-index;
             }
-            EventResult.reject
         }
     }
 }
