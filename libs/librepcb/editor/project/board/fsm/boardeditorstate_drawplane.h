@@ -28,7 +28,6 @@
 #include <librepcb/core/types/point.h>
 
 #include <QtCore>
-#include <QtWidgets>
 
 #include <memory>
 
@@ -44,7 +43,6 @@ class NetSignal;
 namespace editor {
 
 class CmdBoardPlaneEdit;
-class LayerComboBox;
 
 /*******************************************************************************
  *  Class BoardEditorState_DrawPlane
@@ -77,25 +75,39 @@ public:
       const GraphicsSceneMouseEvent& e) noexcept override;
   virtual bool processSwitchToBoard(int index) noexcept override;
 
+  // Connection to UI
+  QVector<std::pair<Uuid, QString>> getAvailableNets() const noexcept;
+  std::optional<Uuid> getNet() const noexcept;
+  void setNet(const std::optional<Uuid>& net) noexcept;
+  QSet<const Layer*> getAvailableLayers() noexcept;
+  const Layer& getLayer() const noexcept { return *mCurrentLayer; }
+  void setLayer(const Layer& layer) noexcept;
+
   // Operator Overloadings
   BoardEditorState_DrawPlane& operator=(const BoardEditorState_DrawPlane& rhs) =
       delete;
+
+signals:
+  void netChanged(const std::optional<Uuid>& net);
 
 private:  // Methods
   bool startAddPlane(const Point& pos) noexcept;
   bool addSegment(const Point& pos) noexcept;
   bool updateLastVertexPosition(const Point& pos) noexcept;
-  void setNetSignal(NetSignal* netsignal) noexcept;
   bool abortCommand(bool showErrMsgBox) noexcept;
-  void layerComboBoxLayerChanged(const Layer& layer) noexcept;
+
+signals:
+  void layerChanged(const Layer& layer);
 
 private:  // Data
   // State
   bool mIsUndoCmdActive;
   bool mAutoNetSignal;
-  NetSignal* mLastNetSignal;
-  const Layer* mLastLayer;
   Point mLastVertexPos;
+
+  // Current tool settings
+  QPointer<NetSignal> mCurrentNetSignal;
+  const Layer* mCurrentLayer;
 
   // Information about the current text to place. Only valid if
   // mIsUndoCmdActive == true.

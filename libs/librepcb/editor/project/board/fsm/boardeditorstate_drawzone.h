@@ -26,10 +26,10 @@
 #include "boardeditorstate.h"
 
 #include <librepcb/core/geometry/zone.h>
+#include <librepcb/core/project/board/boardzonedata.h>
 #include <librepcb/core/types/point.h>
 
 #include <QtCore>
-#include <QtWidgets>
 
 #include <memory>
 
@@ -76,9 +76,24 @@ public:
       const GraphicsSceneMouseEvent& e) noexcept override;
   virtual bool processSwitchToBoard(int index) noexcept override;
 
+  // Connection to UI
+  QSet<const Layer*> getAvailableLayers() noexcept;
+  QSet<const Layer*> getLayers() const noexcept {
+    return mCurrentProperties.getLayers();
+  }
+  void setLayers(const QSet<const Layer*>& layers) noexcept;
+  Zone::Rules getRules() const noexcept {
+    return mCurrentProperties.getRules();
+  }
+  void setRule(Zone::Rule rule, bool enable) noexcept;
+
   // Operator Overloadings
   BoardEditorState_DrawZone& operator=(const BoardEditorState_DrawZone& rhs) =
       delete;
+
+signals:
+  void layersChanged(const QSet<const Layer*>& layers);
+  void rulesChanged(Zone::Rules rules);
 
 private:  // Methods
   bool startAddZone(const Point& pos) noexcept;
@@ -89,9 +104,10 @@ private:  // Methods
 private:  // Data
   // State
   bool mIsUndoCmdActive;
-  const Layer* mLastLayer;
-  Zone::Rules mLastRules;
   Point mLastVertexPos;
+
+  // Current tool settings
+  BoardZoneData mCurrentProperties;
 
   // Information about the current zone to place. Only valid if
   // mIsUndoCmdActive == true.

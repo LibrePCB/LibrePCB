@@ -22,20 +22,13 @@
  ******************************************************************************/
 #include "boardeditorstate_drawtrace.h"
 
-#include "../../../editorcommandset.h"
 #include "../../../undostack.h"
-#include "../../../utils/toolbarproxy.h"
-#include "../../../widgets/graphicsview.h"
-#include "../../../widgets/layercombobox.h"
-#include "../../../widgets/positivelengthedit.h"
 #include "../../cmd/cmdboardnetsegmentadd.h"
 #include "../../cmd/cmdboardnetsegmentaddelements.h"
 #include "../../cmd/cmdboardnetsegmentremoveelements.h"
 #include "../../cmd/cmdboardsplitnetline.h"
 #include "../../cmd/cmdboardviaedit.h"
 #include "../../cmd/cmdcombineboardnetsegments.h"
-#include "../../projecteditor.h"
-#include "../boardeditor.h"
 #include "../boardgraphicsscene.h"
 #include "../graphicsitems/bgi_footprintpad.h"
 #include "../graphicsitems/bgi_netline.h"
@@ -105,143 +98,8 @@ BoardEditorState_DrawTrace::~BoardEditorState_DrawTrace() noexcept {
 bool BoardEditorState_DrawTrace::entry() noexcept {
   Q_ASSERT(mSubState == SubState_Idle);
 
-  EditorCommandSet& cmd = EditorCommandSet::instance();
-
-  // Add wire mode actions to the "command" toolbar
-  mWireModeActionGroup = new QActionGroup(&mContext.commandToolBar);
-  QAction* aWireModeHV = cmd.wireModeHV.createAction(
-      mWireModeActionGroup, this, [this]() { wireModeChanged(WireMode::HV); });
-  aWireModeHV->setCheckable(true);
-  aWireModeHV->setChecked(mCurrentWireMode == WireMode::HV);
-  aWireModeHV->setActionGroup(mWireModeActionGroup);
-  QAction* aWireModeVH = cmd.wireModeVH.createAction(
-      mWireModeActionGroup, this, [this]() { wireModeChanged(WireMode::VH); });
-  aWireModeVH->setCheckable(true);
-  aWireModeVH->setChecked(mCurrentWireMode == WireMode::VH);
-  aWireModeVH->setActionGroup(mWireModeActionGroup);
-  QAction* aWireMode9045 = cmd.wireMode9045.createAction(
-      mWireModeActionGroup, this,
-      [this]() { wireModeChanged(WireMode::Deg9045); });
-  aWireMode9045->setCheckable(true);
-  aWireMode9045->setChecked(mCurrentWireMode == WireMode::Deg9045);
-  aWireMode9045->setActionGroup(mWireModeActionGroup);
-  QAction* aWireMode4590 = cmd.wireMode4590.createAction(
-      mWireModeActionGroup, this,
-      [this]() { wireModeChanged(WireMode::Deg4590); });
-  aWireMode4590->setCheckable(true);
-  aWireMode4590->setChecked(mCurrentWireMode == WireMode::Deg4590);
-  aWireMode4590->setActionGroup(mWireModeActionGroup);
-  QAction* aWireModeStraight = cmd.wireModeStraight.createAction(
-      mWireModeActionGroup, this,
-      [this]() { wireModeChanged(WireMode::Straight); });
-  aWireModeStraight->setCheckable(true);
-  aWireModeStraight->setChecked(mCurrentWireMode == WireMode::Straight);
-  aWireModeStraight->setActionGroup(mWireModeActionGroup);
-  mContext.commandToolBar.addActionGroup(
-      std::unique_ptr<QActionGroup>(mWireModeActionGroup));
-  mContext.commandToolBar.addSeparator();
-
-  // Add the widths combobox to the toolbar
-  mContext.commandToolBar.addLabel(tr("Width:"), 10);
-  mWidthEdit = new PositiveLengthEdit();
-  mWidthEdit->setValue(mCurrentWidth);
-  mWidthEdit->addAction(cmd.lineWidthIncrease.createAction(
-      mWidthEdit, mWidthEdit.data(), &PositiveLengthEdit::stepUp));
-  mWidthEdit->addAction(cmd.lineWidthDecrease.createAction(
-      mWidthEdit, mWidthEdit.data(), &PositiveLengthEdit::stepDown));
-  connect(mWidthEdit.data(), &PositiveLengthEdit::valueChanged, this,
-          &BoardEditorState_DrawTrace::wireWidthEditValueChanged);
-  mContext.commandToolBar.addWidget(
-      std::unique_ptr<PositiveLengthEdit>(mWidthEdit));
-
-  // Add the auto width checkbox to the toolbar
-  std::unique_ptr<QCheckBox> autoWidthCheckBox(new QCheckBox(tr("Auto")));
-  autoWidthCheckBox->setChecked(mCurrentAutoWidth);
-  autoWidthCheckBox->addAction(cmd.widthAutoToggle.createAction(
-      autoWidthCheckBox.get(), autoWidthCheckBox.get(), &QCheckBox::toggle));
-  connect(autoWidthCheckBox.get(), &QCheckBox::toggled, this,
-          &BoardEditorState_DrawTrace::wireAutoWidthEditToggled);
-  mContext.commandToolBar.addWidget(std::move(autoWidthCheckBox));
-  mContext.commandToolBar.addSeparator();
-
-  // Add the layers combobox to the toolbar
-  mContext.commandToolBar.addLabel(tr("Layer:"), 10);
-  mLayerComboBox = new LayerComboBox();
-  QSet<const Layer*> layers;
-  if (Board* board = getActiveBoard()) {
-    layers = board->getCopperLayers();
-  }
-  mLayerComboBox->setLayers(layers);
-  mLayerComboBox->setCurrentLayer(*mCurrentLayer);
-  mLayerComboBox->addAction(cmd.layerUp.createAction(
-      mLayerComboBox, mLayerComboBox.data(), &LayerComboBox::stepDown));
-  mLayerComboBox->addAction(cmd.layerDown.createAction(
-      mLayerComboBox, mLayerComboBox.data(), &LayerComboBox::stepUp));
-  connect(mLayerComboBox, &LayerComboBox::currentLayerChanged, this,
-          &BoardEditorState_DrawTrace::layerChanged);
-  mContext.commandToolBar.addWidget(
-      std::unique_ptr<LayerComboBox>(mLayerComboBox));
-
-  // Add the size edit to the toolbar
-  mContext.commandToolBar.addLabel(tr("Size:"), 10);
-  mSizeEdit = new PositiveLengthEdit();
-  mSizeEdit->setValue(mCurrentViaProperties.getSize());
-  mSizeEdit->addAction(cmd.sizeIncrease.createAction(
-      mSizeEdit, mSizeEdit.data(), &PositiveLengthEdit::stepUp));
-  mSizeEdit->addAction(cmd.sizeDecrease.createAction(
-      mSizeEdit, mSizeEdit.data(), &PositiveLengthEdit::stepDown));
-  connect(mSizeEdit.data(), &PositiveLengthEdit::valueChanged, this,
-          &BoardEditorState_DrawTrace::sizeEditValueChanged);
-  mContext.commandToolBar.addWidget(
-      std::unique_ptr<PositiveLengthEdit>(mSizeEdit));
-
-  // Add the drill edit to the toolbar
-  mContext.commandToolBar.addLabel(tr("Drill:"), 10);
-  mDrillEdit = new PositiveLengthEdit();
-  mDrillEdit->setValue(mCurrentViaProperties.getDrillDiameter());
-  mDrillEdit->addAction(cmd.drillIncrease.createAction(
-      mDrillEdit, mDrillEdit.data(), &PositiveLengthEdit::stepUp));
-  mDrillEdit->addAction(cmd.drillDecrease.createAction(
-      mDrillEdit, mDrillEdit.data(), &PositiveLengthEdit::stepDown));
-  connect(mDrillEdit.data(), &PositiveLengthEdit::valueChanged, this,
-          &BoardEditorState_DrawTrace::drillDiameterEditValueChanged);
-  mContext.commandToolBar.addWidget(
-      std::unique_ptr<PositiveLengthEdit>(mDrillEdit));
-  mContext.commandToolBar.addSeparator();
-
-  // Avoid creating vias with a drill diameter larger than its size!
-  // See https://github.com/LibrePCB/LibrePCB/issues/946.
-  QPointer<PositiveLengthEdit> sizeEditPtr = mSizeEdit;
-  QPointer<PositiveLengthEdit> drillEditPtr = mDrillEdit;
-  connect(sizeEditPtr, &PositiveLengthEdit::valueChanged, drillEditPtr,
-          [drillEditPtr](const PositiveLength& value) {
-            if ((drillEditPtr) && (value < drillEditPtr->getValue())) {
-              drillEditPtr->setValue(value);
-            }
-          });
-  connect(drillEditPtr, &PositiveLengthEdit::valueChanged, sizeEditPtr,
-          [sizeEditPtr](const PositiveLength& value) {
-            if ((sizeEditPtr) && (value > sizeEditPtr->getValue())) {
-              sizeEditPtr->setValue(value);
-            }
-          });
-
-  // Avoid creating vias with a drill diameter larger than its size!
-  // See https://github.com/LibrePCB/LibrePCB/issues/946.
-  connect(mSizeEdit.data(), &PositiveLengthEdit::valueChanged, this,
-          [this](const PositiveLength& value) {
-            if (value < mDrillEdit->getValue()) {
-              mDrillEdit->setValue(value);
-            }
-          });
-  connect(mDrillEdit.data(), &PositiveLengthEdit::valueChanged, this,
-          [this](const PositiveLength& value) {
-            if (value > mSizeEdit->getValue()) {
-              mSizeEdit->setValue(value);
-            }
-          });
-
-  mContext.editorGraphicsView.setCursor(Qt::CrossCursor);
+  mAdapter.fsmToolEnter(*this);
+  mAdapter.fsmSetViewCursor(Qt::CrossCursor);
   return true;
 }
 
@@ -249,10 +107,8 @@ bool BoardEditorState_DrawTrace::exit() noexcept {
   // Abort the currently active command
   if (!abortPositioning(true)) return false;
 
-  // Remove actions / widgets from the "command" toolbar
-  mContext.commandToolBar.clear();
-
-  mContext.editorGraphicsView.unsetCursor();
+  mAdapter.fsmSetViewCursor(std::nullopt);
+  mAdapter.fsmToolLeave();
   return true;
 }
 
@@ -344,14 +200,11 @@ bool BoardEditorState_DrawTrace::
 
 bool BoardEditorState_DrawTrace::processGraphicsSceneRightMouseButtonReleased(
     const GraphicsSceneMouseEvent& e) noexcept {
-  if ((mSubState == SubState_PositioningNetPoint) && mWireModeActionGroup) {
-    int index = mWireModeActionGroup->actions().indexOf(
-        mWireModeActionGroup->checkedAction());
-    index = (index + 1) % mWireModeActionGroup->actions().count();
-    QAction* newAction = mWireModeActionGroup->actions().value(index);
-    Q_ASSERT(newAction);
-    newAction->trigger();
-    mCursorPos = e.scenePos;
+  mCursorPos = e.scenePos;
+
+  if (mSubState == SubState_PositioningNetPoint) {
+    setWireMode(static_cast<WireMode>((static_cast<int>(mCurrentWireMode) + 1) %
+                                      static_cast<int>(WireMode::_COUNT)));
 
     // Always accept the event if we are drawing a trace! When ignoring the
     // event, the state machine will abort the tool by a right click!
@@ -364,6 +217,100 @@ bool BoardEditorState_DrawTrace::processGraphicsSceneRightMouseButtonReleased(
 bool BoardEditorState_DrawTrace::processSwitchToBoard(int index) noexcept {
   // Allow switching to an existing board if no command is active.
   return (mSubState == SubState_Idle) && (index >= 0);
+}
+
+/*******************************************************************************
+ *  Connection to UI
+ ******************************************************************************/
+
+void BoardEditorState_DrawTrace::setWireMode(WireMode mode) noexcept {
+  if (mode != mCurrentWireMode) {
+    mCurrentWireMode = mode;
+    emit wireModeChanged(mCurrentWireMode);
+  }
+
+  if (mSubState == SubState_PositioningNetPoint) {
+    updateNetpointPositions();
+  }
+}
+
+QSet<const Layer*> BoardEditorState_DrawTrace::getAvailableLayers() noexcept {
+  if (Board* board = getActiveBoard()) {
+    return board->getCopperLayers();
+  } else {
+    return QSet<const Layer*>{};
+  }
+}
+
+void BoardEditorState_DrawTrace::setLayer(const Layer& layer) noexcept {
+  Board* board = getActiveBoard();
+  if (!board) return;
+  if (!board->getCopperLayers().contains(&layer)) return;
+  makeLayerVisible(layer.getThemeColor());
+
+  if ((mSubState == SubState_PositioningNetPoint) &&
+      (&layer != mCurrentLayer)) {
+    // If the start anchor is a via or THT pad, delete current trace segment
+    // and start a new one on the selected layer. Otherwise, just add a via
+    // at the current position, i.e. at the end of the current trace segment.
+    Point startPos = mFixedStartAnchor->getPosition();
+    BI_Via* via = dynamic_cast<BI_Via*>(mFixedStartAnchor);
+    BI_FootprintPad* pad = dynamic_cast<BI_FootprintPad*>(mFixedStartAnchor);
+    if (pad && (!pad->getLibPad().isTht())) {
+      pad = nullptr;
+    }
+    if (via || pad) {
+      abortPositioning(false);
+      mCurrentLayer = &layer;
+      startPositioning(*board, startPos, nullptr, via, pad);
+      updateNetpointPositions();
+    } else {
+      mAddVia = true;
+      showVia(true);
+      mViaLayer = &layer;
+    }
+  } else {
+    mAddVia = false;
+    showVia(false);
+    mCurrentLayer = &layer;
+  }
+  emit layerChanged(layer);
+}
+
+void BoardEditorState_DrawTrace::setAutoWidth(bool autoWidth) noexcept {
+  if (autoWidth != mCurrentAutoWidth) {
+    mCurrentAutoWidth = autoWidth;
+    emit autoWidthChanged(mCurrentAutoWidth);
+  }
+}
+
+void BoardEditorState_DrawTrace::setWidth(
+    const PositiveLength& width) noexcept {
+  if (width != mCurrentWidth) {
+    mCurrentWidth = width;
+    emit widthChanged(mCurrentWidth);
+  }
+
+  if (mSubState != SubState::SubState_PositioningNetPoint) return;
+  updateNetpointPositions();
+}
+
+void BoardEditorState_DrawTrace::setViaSize(
+    const PositiveLength& size) noexcept {
+  if (mCurrentViaProperties.setSize(size)) {
+    emit viaSizeChanged(mCurrentViaProperties.getSize());
+  }
+
+  updateNetpointPositions();
+}
+
+void BoardEditorState_DrawTrace::setViaDrillDiameter(
+    const PositiveLength& diameter) noexcept {
+  if (mCurrentViaProperties.setDrillDiameter(diameter)) {
+    emit viaDrillDiameterChanged(mCurrentViaProperties.getDrillDiameter());
+  }
+
+  updateNetpointPositions();
 }
 
 /*******************************************************************************
@@ -497,12 +444,12 @@ bool BoardEditorState_DrawTrace::startPositioning(
     Q_ASSERT(board.getCopperLayers().contains(layer));
     makeLayerVisible(layer->getThemeColor());
     mCurrentLayer = layer;
-    mLayerComboBox->setCurrentLayer(*mCurrentLayer);
+    emit layerChanged(*mCurrentLayer);
 
     // update line width
     if (mCurrentAutoWidth && mFixedStartAnchor->getMaxLineWidth() > 0) {
       mCurrentWidth = PositiveLength(*mFixedStartAnchor->getMedianLineWidth());
-      mWidthEdit->setValue(mCurrentWidth);
+      emit widthChanged(mCurrentWidth);
     }
 
     // add the new netpoints & netlines
@@ -524,8 +471,7 @@ bool BoardEditorState_DrawTrace::startPositioning(
     updateNetpointPositions();
 
     // Highlight all elements of the current netsignal.
-    mContext.projectEditor.setHighlightedNetSignals(
-        {mCurrentNetSegment->getNetSignal()});
+    mAdapter.fsmSetHighlightedNetSignals({mCurrentNetSegment->getNetSignal()});
 
     return true;
   } catch (const Exception& e) {
@@ -726,7 +672,7 @@ bool BoardEditorState_DrawTrace::addNextNetPoint(
 
 bool BoardEditorState_DrawTrace::abortPositioning(bool showErrMsgBox) noexcept {
   try {
-    mContext.projectEditor.clearHighlightedNetSignals();
+    mAdapter.fsmSetHighlightedNetSignals({});
     mFixedStartAnchor = nullptr;
     mCurrentNetSegment = nullptr;
     mPositioningNetLine1 = nullptr;
@@ -885,68 +831,6 @@ BI_NetLineAnchor* BoardEditorState_DrawTrace::combineAnchors(
   mContext.undoStack.appendToCmdGroup(cmdRemove.release());  // can throw
 
   return otherAnchor;
-}
-
-void BoardEditorState_DrawTrace::wireModeChanged(WireMode mode) noexcept {
-  mCurrentWireMode = mode;
-  updateNetpointPositions();
-}
-
-void BoardEditorState_DrawTrace::layerChanged(const Layer& layer) noexcept {
-  Board* board = getActiveBoard();
-  if (!board) return;
-  if (!board->getCopperLayers().contains(&layer)) return;
-  makeLayerVisible(layer.getThemeColor());
-  if ((mSubState == SubState_PositioningNetPoint) &&
-      (&layer != mCurrentLayer)) {
-    // If the start anchor is a via or THT pad, delete current trace segment
-    // and start a new one on the selected layer. Otherwise, just add a via
-    // at the current position, i.e. at the end of the current trace segment.
-    Point startPos = mFixedStartAnchor->getPosition();
-    BI_Via* via = dynamic_cast<BI_Via*>(mFixedStartAnchor);
-    BI_FootprintPad* pad = dynamic_cast<BI_FootprintPad*>(mFixedStartAnchor);
-    if (pad && (!pad->getLibPad().isTht())) {
-      pad = nullptr;
-    }
-    if (via || pad) {
-      abortPositioning(false);
-      mCurrentLayer = &layer;
-      startPositioning(*board, startPos, nullptr, via, pad);
-      updateNetpointPositions();
-    } else {
-      mAddVia = true;
-      showVia(true);
-      mViaLayer = &layer;
-    }
-  } else {
-    mAddVia = false;
-    showVia(false);
-    mCurrentLayer = &layer;
-  }
-}
-
-void BoardEditorState_DrawTrace::sizeEditValueChanged(
-    const PositiveLength& value) noexcept {
-  mCurrentViaProperties.setSize(value);
-  updateNetpointPositions();
-}
-
-void BoardEditorState_DrawTrace::drillDiameterEditValueChanged(
-    const PositiveLength& value) noexcept {
-  mCurrentViaProperties.setDrillDiameter(value);
-  updateNetpointPositions();
-}
-
-void BoardEditorState_DrawTrace::wireWidthEditValueChanged(
-    const PositiveLength& value) noexcept {
-  mCurrentWidth = value;
-  if (mSubState != SubState::SubState_PositioningNetPoint) return;
-  updateNetpointPositions();
-}
-
-void BoardEditorState_DrawTrace::wireAutoWidthEditToggled(
-    const bool checked) noexcept {
-  mCurrentAutoWidth = checked;
 }
 
 Point BoardEditorState_DrawTrace::calcMiddlePointPos(

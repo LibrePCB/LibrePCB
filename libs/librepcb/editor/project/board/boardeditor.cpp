@@ -39,9 +39,12 @@
 #include "../../utils/toolbarproxy.h"
 #include "../../utils/undostackactiongroup.h"
 #include "../../widgets/graphicsview.h"
+#include "../../widgets/layercombobox.h"
 #include "../../widgets/openglview.h"
+#include "../../widgets/positivelengthedit.h"
 #include "../../widgets/rulecheckdock.h"
 #include "../../widgets/searchtoolbar.h"
+#include "../../widgets/unsignedlengthedit.h"
 #include "../../workspace/desktopservices.h"
 #include "../bomgeneratordialog.h"
 #include "../cmd/cmdboardspecctraimport.h"
@@ -54,6 +57,13 @@
 #include "boardsetupdialog.h"
 #include "fabricationoutputdialog.h"
 #include "fsm/boardeditorfsm.h"
+#include "fsm/boardeditorstate_addhole.h"
+#include "fsm/boardeditorstate_addstroketext.h"
+#include "fsm/boardeditorstate_addvia.h"
+#include "fsm/boardeditorstate_drawplane.h"
+#include "fsm/boardeditorstate_drawpolygon.h"
+#include "fsm/boardeditorstate_drawtrace.h"
+#include "fsm/boardeditorstate_drawzone.h"
 #include "graphicsitems/bgi_device.h"
 #include "unplacedcomponentsdock.h"
 
@@ -185,22 +195,15 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
           &BoardEditor::storeLayersVisibility);
 
   // Build the whole board editor finite state machine.
-  BoardEditorFsm::Context fsmContext{mProjectEditor.getWorkspace(),
-                                     mProject,
-                                     mProjectEditor,
-                                     *this,
-                                     *mUi->graphicsView,
-                                     *mCommandToolBarProxy,
-                                     mProjectEditor.getUndoStack()};
+  BoardEditorFsm::Context fsmContext{
+      mProjectEditor.getWorkspace(),
+      mProject,
+      mProjectEditor.getUndoStack(),
+      *mLayers,
+      *this,
+      *this,
+  };
   mFsm.reset(new BoardEditorFsm(fsmContext));
-  connect(mFsm.data(), &BoardEditorFsm::statusBarMessageChanged, this,
-          [this](const QString& message, int timeoutMs) {
-            if (timeoutMs < 0) {
-              mUi->statusbar->setPermanentMessage(message);
-            } else {
-              mUi->statusbar->showMessage(message, timeoutMs);
-            }
-          });
 
   // Setup plane rebuilder.
   connect(mPlaneFragmentsBuilder.data(), &BoardPlaneFragmentsBuilder::finished,
@@ -280,14 +283,6 @@ BoardEditor::~BoardEditor() {
   mCommandToolBarProxy->setToolBar(nullptr);
 
   mFsm.reset();
-}
-
-/*******************************************************************************
- *  Setters
- ******************************************************************************/
-
-bool BoardEditor::getIgnoreLocks() const noexcept {
-  return mActionIgnoreLocks && mActionIgnoreLocks->isChecked();
 }
 
 /*******************************************************************************
@@ -401,6 +396,548 @@ void BoardEditor::abortAllCommands() noexcept {
 
 void BoardEditor::abortBlockingToolsInOtherEditors() noexcept {
   mProjectEditor.abortBlockingToolsInOtherEditors(this);
+}
+
+/*******************************************************************************
+ *  BoardEditorFsmAdapter Methods
+ ******************************************************************************/
+
+Board* BoardEditor::fsmGetActiveBoard() noexcept {
+  return getActiveBoard();
+}
+
+BoardGraphicsScene* BoardEditor::fsmGetGraphicsScene() noexcept {
+  return qobject_cast<BoardGraphicsScene*>(mUi->graphicsView->getScene());
+}
+
+bool BoardEditor::fsmGetIgnoreLocks() const noexcept {
+  return mActionIgnoreLocks && mActionIgnoreLocks->isChecked();
+}
+
+void BoardEditor::fsmSetViewCursor(
+    const std::optional<Qt::CursorShape>& shape) noexcept {
+  if (shape) {
+    mUi->graphicsView->setCursor(*shape);
+  } else {
+    mUi->graphicsView->unsetCursor();
+  }
+}
+
+void BoardEditor::fsmSetViewGrayOut(bool grayOut) noexcept {
+  if (mGraphicsScene) {
+    mGraphicsScene->setGrayOut(grayOut);
+  }
+}
+
+void BoardEditor::fsmSetViewInfoBoxText(const QString& text) noexcept {
+  mUi->graphicsView->setInfoBoxText(text);
+}
+
+void BoardEditor::fsmSetViewRuler(
+    const std::optional<std::pair<Point, Point>>& pos) noexcept {
+  if (mGraphicsScene) {
+    mGraphicsScene->setRulerPositions(pos);
+  }
+}
+
+void BoardEditor::fsmSetSceneCursor(const Point& pos, bool cross,
+                                    bool circle) noexcept {
+  if (mGraphicsScene) {
+    mGraphicsScene->setSceneCursor(pos, cross, circle);
+  }
+}
+
+QPainterPath BoardEditor::fsmCalcPosWithTolerance(
+    const Point& pos, qreal multiplier) const noexcept {
+  return mUi->graphicsView->calcPosWithTolerance(pos, multiplier);
+}
+
+Point BoardEditor::fsmMapGlobalPosToScenePos(const QPoint& pos) const noexcept {
+  return mUi->graphicsView->mapGlobalPosToScenePos(pos);
+}
+
+void BoardEditor::fsmSetHighlightedNetSignals(
+    const QSet<const NetSignal*>& sigs) noexcept {
+  mProjectEditor.setHighlightedNetSignals(sigs);
+}
+
+void BoardEditor::fsmAbortBlockingToolsInOtherEditors() noexcept {
+  abortBlockingToolsInOtherEditors();
+}
+
+void BoardEditor::fsmSetStatusBarMessage(const QString& message,
+                                         int timeoutMs) noexcept {
+  if (timeoutMs < 0) {
+    mUi->statusbar->setPermanentMessage(message);
+  } else {
+    mUi->statusbar->showMessage(message, timeoutMs);
+  }
+}
+
+void BoardEditor::fsmToolLeave() noexcept {
+  mCommandToolBarProxy->clear();
+  mToolsActionGroup->setCurrentAction(BoardEditorFsm::State::IDLE);
+}
+
+void BoardEditor::fsmToolEnter(BoardEditorState_Select& state) noexcept {
+  Q_UNUSED(state);
+  if (mToolsActionGroup) {
+    mToolsActionGroup->setCurrentAction(BoardEditorFsm::State::SELECT);
+  }
+}
+
+void BoardEditor::fsmToolEnter(BoardEditorState_DrawTrace& state) noexcept {
+  mToolsActionGroup->setCurrentAction(BoardEditorFsm::State::DRAW_TRACE);
+
+  EditorCommandSet& cmd = EditorCommandSet::instance();
+
+  // Add wire mode actions to the "command" toolbar
+  std::unique_ptr<QActionGroup> wireModeActionGroup(
+      new QActionGroup(mCommandToolBarProxy.get()));
+  QAction* aWireModeHV = cmd.wireModeHV.createAction(
+      wireModeActionGroup.get(), &state, [&state]() {
+        state.setWireMode(BoardEditorState_DrawTrace::WireMode::HV);
+      });
+  aWireModeHV->setCheckable(true);
+  aWireModeHV->setActionGroup(wireModeActionGroup.get());
+  QAction* aWireModeVH = cmd.wireModeVH.createAction(
+      wireModeActionGroup.get(), &state, [&state]() {
+        state.setWireMode(BoardEditorState_DrawTrace::WireMode::VH);
+      });
+  aWireModeVH->setCheckable(true);
+  aWireModeVH->setActionGroup(wireModeActionGroup.get());
+  QAction* aWireMode9045 = cmd.wireMode9045.createAction(
+      wireModeActionGroup.get(), &state, [&state]() {
+        state.setWireMode(BoardEditorState_DrawTrace::WireMode::Deg9045);
+      });
+  aWireMode9045->setCheckable(true);
+  aWireMode9045->setActionGroup(wireModeActionGroup.get());
+  QAction* aWireMode4590 = cmd.wireMode4590.createAction(
+      wireModeActionGroup.get(), &state, [&state]() {
+        state.setWireMode(BoardEditorState_DrawTrace::WireMode::Deg4590);
+      });
+  aWireMode4590->setCheckable(true);
+  aWireMode4590->setActionGroup(wireModeActionGroup.get());
+  QAction* aWireModeStraight = cmd.wireModeStraight.createAction(
+      wireModeActionGroup.get(), &state, [&state]() {
+        state.setWireMode(BoardEditorState_DrawTrace::WireMode::Straight);
+      });
+  aWireModeStraight->setCheckable(true);
+  aWireModeStraight->setActionGroup(wireModeActionGroup.get());
+  QHash<BoardEditorState_DrawTrace::WireMode, QPointer<QAction>>
+      wireModeActions = {
+          {BoardEditorState_DrawTrace::WireMode::HV, aWireModeHV},
+          {BoardEditorState_DrawTrace::WireMode::VH, aWireModeVH},
+          {BoardEditorState_DrawTrace::WireMode::Deg9045, aWireMode9045},
+          {BoardEditorState_DrawTrace::WireMode::Deg4590, aWireMode4590},
+          {BoardEditorState_DrawTrace::WireMode::Straight, aWireModeStraight},
+      };
+  auto setWireMode =
+      [wireModeActions](BoardEditorState_DrawTrace::WireMode wm) {
+        if (auto a = wireModeActions.value(wm)) {
+          a->setChecked(true);
+        }
+      };
+  setWireMode(state.getWireMode());
+  connect(&state, &BoardEditorState_DrawTrace::wireModeChanged,
+          wireModeActionGroup.get(), setWireMode);
+  mCommandToolBarProxy->addActionGroup(std::move(wireModeActionGroup));
+  mCommandToolBarProxy->addSeparator();
+
+  // Add the width edit to the toolbar
+  mCommandToolBarProxy->addLabel(tr("Width:"), 10);
+  std::unique_ptr<PositiveLengthEdit> widthEdit(new PositiveLengthEdit());
+  widthEdit->setValue(state.getWidth());
+  widthEdit->addAction(cmd.lineWidthIncrease.createAction(
+      widthEdit.get(), widthEdit.get(), &PositiveLengthEdit::stepUp));
+  widthEdit->addAction(cmd.lineWidthDecrease.createAction(
+      widthEdit.get(), widthEdit.get(), &PositiveLengthEdit::stepDown));
+  connect(widthEdit.get(), &PositiveLengthEdit::valueChanged, &state,
+          &BoardEditorState_DrawTrace::setWidth);
+  mCommandToolBarProxy->addWidget(std::move(widthEdit));
+
+  // Add the auto width checkbox to the toolbar
+  std::unique_ptr<QCheckBox> autoWidthCheckBox(new QCheckBox(tr("Auto")));
+  autoWidthCheckBox->setChecked(state.getAutoWidth());
+  autoWidthCheckBox->addAction(cmd.fillToggle.createAction(
+      autoWidthCheckBox.get(), autoWidthCheckBox.get(), &QCheckBox::toggle));
+  connect(autoWidthCheckBox.get(), &QCheckBox::toggled, &state,
+          &BoardEditorState_DrawTrace::setAutoWidth);
+  mCommandToolBarProxy->addWidget(std::move(autoWidthCheckBox));
+  mCommandToolBarProxy->addSeparator();
+
+  // Add the layers combobox to the toolbar
+  mCommandToolBarProxy->addLabel(tr("Layer:"), 10);
+  std::unique_ptr<LayerComboBox> layerComboBox(new LayerComboBox());
+  layerComboBox->setLayers(state.getAvailableLayers());
+  layerComboBox->setCurrentLayer(state.getLayer());
+  layerComboBox->addAction(cmd.layerUp.createAction(
+      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepDown));
+  layerComboBox->addAction(cmd.layerDown.createAction(
+      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepUp));
+  connect(layerComboBox.get(), &LayerComboBox::currentLayerChanged, &state,
+          &BoardEditorState_DrawTrace::setLayer);
+  mCommandToolBarProxy->addWidget(std::move(layerComboBox));
+  mCommandToolBarProxy->addSeparator();
+
+  // Add the size edit to the toolbar
+  mCommandToolBarProxy->addLabel(tr("Via Size:"), 10);
+  std::unique_ptr<PositiveLengthEdit> viaSizeEdit(new PositiveLengthEdit());
+  QPointer<PositiveLengthEdit> sizeEditPtr = viaSizeEdit.get();
+  viaSizeEdit->setValue(state.getViaSize());
+  viaSizeEdit->addAction(cmd.lineWidthIncrease.createAction(
+      viaSizeEdit.get(), viaSizeEdit.get(), &PositiveLengthEdit::stepUp));
+  viaSizeEdit->addAction(cmd.lineWidthDecrease.createAction(
+      viaSizeEdit.get(), viaSizeEdit.get(), &PositiveLengthEdit::stepDown));
+  connect(viaSizeEdit.get(), &PositiveLengthEdit::valueChanged, &state,
+          &BoardEditorState_DrawTrace::setViaSize);
+  mCommandToolBarProxy->addWidget(std::move(viaSizeEdit));
+
+  // Add the drill edit to the toolbar
+  mCommandToolBarProxy->addLabel(tr("Via Drill:"), 10);
+  std::unique_ptr<PositiveLengthEdit> viaDrillEdit(new PositiveLengthEdit());
+  QPointer<PositiveLengthEdit> drillEditPtr = viaDrillEdit.get();
+  viaDrillEdit->setValue(state.getViaDrillDiameter());
+  viaDrillEdit->addAction(cmd.lineWidthIncrease.createAction(
+      viaDrillEdit.get(), viaDrillEdit.get(), &PositiveLengthEdit::stepUp));
+  viaDrillEdit->addAction(cmd.lineWidthDecrease.createAction(
+      viaDrillEdit.get(), viaDrillEdit.get(), &PositiveLengthEdit::stepDown));
+  connect(viaDrillEdit.get(), &PositiveLengthEdit::valueChanged, &state,
+          &BoardEditorState_DrawTrace::setViaDrillDiameter);
+  mCommandToolBarProxy->addWidget(std::move(viaDrillEdit));
+
+  // Avoid creating vias with a drill diameter larger than its size!
+  // See https://github.com/LibrePCB/LibrePCB/issues/946.
+  connect(sizeEditPtr, &PositiveLengthEdit::valueChanged, drillEditPtr,
+          [drillEditPtr](const PositiveLength& value) {
+            if ((drillEditPtr) && (value < drillEditPtr->getValue())) {
+              drillEditPtr->setValue(value);
+            }
+          });
+  connect(drillEditPtr, &PositiveLengthEdit::valueChanged, sizeEditPtr,
+          [sizeEditPtr](const PositiveLength& value) {
+            if ((sizeEditPtr) && (value > sizeEditPtr->getValue())) {
+              sizeEditPtr->setValue(value);
+            }
+          });
+}
+
+void BoardEditor::fsmToolEnter(BoardEditorState_AddVia& state) noexcept {
+  mToolsActionGroup->setCurrentAction(BoardEditorFsm::State::ADD_VIA);
+
+  EditorCommandSet& cmd = EditorCommandSet::instance();
+
+  // Add the size edit to the toolbar
+  mCommandToolBarProxy->addLabel(tr("Size:"), 10);
+  std::unique_ptr<PositiveLengthEdit> viaSizeEdit(new PositiveLengthEdit());
+  QPointer<PositiveLengthEdit> sizeEditPtr = viaSizeEdit.get();
+  viaSizeEdit->setValue(state.getSize());
+  viaSizeEdit->addAction(cmd.lineWidthIncrease.createAction(
+      viaSizeEdit.get(), viaSizeEdit.get(), &PositiveLengthEdit::stepUp));
+  viaSizeEdit->addAction(cmd.lineWidthDecrease.createAction(
+      viaSizeEdit.get(), viaSizeEdit.get(), &PositiveLengthEdit::stepDown));
+  connect(viaSizeEdit.get(), &PositiveLengthEdit::valueChanged, &state,
+          &BoardEditorState_AddVia::setSize);
+  mCommandToolBarProxy->addWidget(std::move(viaSizeEdit));
+
+  // Add the drill edit to the toolbar
+  mCommandToolBarProxy->addLabel(tr("Drill:"), 10);
+  std::unique_ptr<PositiveLengthEdit> viaDrillEdit(new PositiveLengthEdit());
+  QPointer<PositiveLengthEdit> drillEditPtr = viaDrillEdit.get();
+  viaDrillEdit->setValue(state.getDrillDiameter());
+  viaDrillEdit->addAction(cmd.lineWidthIncrease.createAction(
+      viaDrillEdit.get(), viaDrillEdit.get(), &PositiveLengthEdit::stepUp));
+  viaDrillEdit->addAction(cmd.lineWidthDecrease.createAction(
+      viaDrillEdit.get(), viaDrillEdit.get(), &PositiveLengthEdit::stepDown));
+  connect(viaDrillEdit.get(), &PositiveLengthEdit::valueChanged, &state,
+          &BoardEditorState_AddVia::setDrillDiameter);
+  mCommandToolBarProxy->addWidget(std::move(viaDrillEdit));
+  mCommandToolBarProxy->addSeparator();
+
+  // Avoid creating vias with a drill diameter larger than its size!
+  // See https://github.com/LibrePCB/LibrePCB/issues/946.
+  connect(sizeEditPtr, &PositiveLengthEdit::valueChanged, drillEditPtr,
+          [drillEditPtr](const PositiveLength& value) {
+            if ((drillEditPtr) && (value < drillEditPtr->getValue())) {
+              drillEditPtr->setValue(value);
+            }
+          });
+  connect(drillEditPtr, &PositiveLengthEdit::valueChanged, sizeEditPtr,
+          [sizeEditPtr](const PositiveLength& value) {
+            if ((sizeEditPtr) && (value > sizeEditPtr->getValue())) {
+              sizeEditPtr->setValue(value);
+            }
+          });
+
+  // Add the netsignals combobox to the toolbar
+  mCommandToolBarProxy->addLabel(tr("Net:"), 10);
+  std::unique_ptr<QComboBox> netComboBox(new QComboBox());
+  QPointer<QComboBox> netComboBoxPtr = netComboBox.get();
+  netComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+  netComboBox->setInsertPolicy(QComboBox::NoInsert);
+  netComboBox->setEditable(false);
+  netComboBox->insertItem(0, "[" % tr("Auto") % "]", "auto");
+  netComboBox->insertItem(1, "[" % tr("None") % "]", "none");
+  netComboBox->insertSeparator(2);
+  for (const auto& net : state.getAvailableNets()) {
+    netComboBox->addItem(net.second, net.first.toStr());
+  }
+  if (state.getUseAutoNet()) {
+    netComboBox->setCurrentIndex(0);  // Auto
+  } else {
+    int index = -1;
+    if (auto net = state.getNet()) {
+      index = netComboBox->findData(net->toStr());
+    }
+    if (index < 0) {
+      index = 1;  // No net
+    }
+    netComboBox->setCurrentIndex(index);
+  }
+  connect(
+      netComboBoxPtr,
+      static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+      &state,
+      [&state, netComboBoxPtr](int index) {
+        if (netComboBoxPtr) {
+          const QString data = netComboBoxPtr->itemData(index).toString();
+          if (data == "none") {
+            state.setNet(false, std::nullopt);
+          } else if (auto uuid = Uuid::tryFromString(data)) {
+            state.setNet(false, uuid);
+          } else {
+            state.setNet(true, std::nullopt);
+          }
+        }
+      },
+      Qt::QueuedConnection);
+  mCommandToolBarProxy->addWidget(std::move(netComboBox));
+}
+
+void BoardEditor::fsmToolEnter(BoardEditorState_DrawPolygon& state) noexcept {
+  mToolsActionGroup->setCurrentAction(BoardEditorFsm::State::DRAW_POLYGON);
+
+  EditorCommandSet& cmd = EditorCommandSet::instance();
+
+  // Add the layers combobox to the toolbar
+  mCommandToolBarProxy->addLabel(tr("Layer:"), 10);
+  std::unique_ptr<LayerComboBox> layerComboBox(new LayerComboBox());
+  layerComboBox->setLayers(state.getAvailableLayers());
+  layerComboBox->setCurrentLayer(state.getLayer());
+  layerComboBox->addAction(cmd.layerUp.createAction(
+      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepDown));
+  layerComboBox->addAction(cmd.layerDown.createAction(
+      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepUp));
+  connect(layerComboBox.get(), &LayerComboBox::currentLayerChanged, &state,
+          &BoardEditorState_DrawPolygon::setLayer);
+  mCommandToolBarProxy->addWidget(std::move(layerComboBox));
+
+  // Add the width edit to the toolbar
+  mCommandToolBarProxy->addLabel(tr("Width:"), 10);
+  std::unique_ptr<UnsignedLengthEdit> widthEdit(new UnsignedLengthEdit());
+  widthEdit->setValue(state.getLineWidth());
+  widthEdit->addAction(cmd.lineWidthIncrease.createAction(
+      widthEdit.get(), widthEdit.get(), &UnsignedLengthEdit::stepUp));
+  widthEdit->addAction(cmd.lineWidthDecrease.createAction(
+      widthEdit.get(), widthEdit.get(), &UnsignedLengthEdit::stepDown));
+  connect(widthEdit.get(), &UnsignedLengthEdit::valueChanged, &state,
+          &BoardEditorState_DrawPolygon::setLineWidth);
+  mCommandToolBarProxy->addWidget(std::move(widthEdit));
+
+  // Add the filled checkbox to the toolbar
+  mCommandToolBarProxy->addLabel(tr("Filled:"), 10);
+  std::unique_ptr<QCheckBox> fillCheckBox(new QCheckBox());
+  fillCheckBox->setChecked(state.getFilled());
+  fillCheckBox->addAction(cmd.fillToggle.createAction(
+      fillCheckBox.get(), fillCheckBox.get(), &QCheckBox::toggle));
+  connect(fillCheckBox.get(), &QCheckBox::toggled, &state,
+          &BoardEditorState_DrawPolygon::setFilled);
+  mCommandToolBarProxy->addWidget(std::move(fillCheckBox));
+}
+
+void BoardEditor::fsmToolEnter(BoardEditorState_AddStrokeText& state) noexcept {
+  mToolsActionGroup->setCurrentAction(BoardEditorFsm::State::ADD_STROKE_TEXT);
+
+  EditorCommandSet& cmd = EditorCommandSet::instance();
+
+  // Add the layers combobox to the toolbar
+  mCommandToolBarProxy->addLabel(tr("Layer:"), 10);
+  std::unique_ptr<LayerComboBox> layerComboBox(new LayerComboBox());
+  layerComboBox->setLayers(state.getAvailableLayers());
+  layerComboBox->setCurrentLayer(state.getLayer());
+  layerComboBox->addAction(cmd.layerUp.createAction(
+      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepDown));
+  layerComboBox->addAction(cmd.layerDown.createAction(
+      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepUp));
+  connect(layerComboBox.get(), &LayerComboBox::currentLayerChanged, &state,
+          &BoardEditorState_AddStrokeText::setLayer);
+  mCommandToolBarProxy->addWidget(std::move(layerComboBox));
+
+  // Add the text combobox to the toolbar
+  mCommandToolBarProxy->addLabel(tr("Text:"), 10);
+  std::unique_ptr<QComboBox> textComboBox(new QComboBox());
+  textComboBox->setEditable(true);
+  textComboBox->setMinimumContentsLength(20);
+  textComboBox->addItems(state.getTextSuggestions());
+  textComboBox->setCurrentIndex(textComboBox->findText(state.getText()));
+  textComboBox->setCurrentText(state.getText());
+  connect(textComboBox.get(), &QComboBox::currentTextChanged, &state,
+          &BoardEditorState_AddStrokeText::setText);
+  mCommandToolBarProxy->addWidget(std::move(textComboBox));
+
+  // Add the height spinbox to the toolbar
+  mCommandToolBarProxy->addLabel(tr("Height:"), 10);
+  std::unique_ptr<PositiveLengthEdit> heightEdit(new PositiveLengthEdit());
+  heightEdit->setValue(state.getHeight());
+  heightEdit->addAction(cmd.sizeIncrease.createAction(
+      heightEdit.get(), heightEdit.get(), &PositiveLengthEdit::stepUp));
+  heightEdit->addAction(cmd.sizeDecrease.createAction(
+      heightEdit.get(), heightEdit.get(), &PositiveLengthEdit::stepDown));
+  connect(heightEdit.get(), &PositiveLengthEdit::valueChanged, &state,
+          &BoardEditorState_AddStrokeText::setHeight);
+  mCommandToolBarProxy->addWidget(std::move(heightEdit));
+
+  // Add the mirror checkbox to the toolbar
+  mCommandToolBarProxy->addLabel(tr("Mirror:"), 10);
+  std::unique_ptr<QCheckBox> mirrorCheckBox(new QCheckBox());
+  mirrorCheckBox->setChecked(state.getMirrored());
+  mirrorCheckBox->addAction(cmd.fillToggle.createAction(
+      mirrorCheckBox.get(), mirrorCheckBox.get(), &QCheckBox::toggle));
+  connect(mirrorCheckBox.get(), &QCheckBox::toggled, &state,
+          &BoardEditorState_AddStrokeText::setMirrored);
+  mCommandToolBarProxy->addWidget(std::move(mirrorCheckBox));
+}
+
+void BoardEditor::fsmToolEnter(BoardEditorState_DrawPlane& state) noexcept {
+  mToolsActionGroup->setCurrentAction(BoardEditorFsm::State::DRAW_PLANE);
+
+  EditorCommandSet& cmd = EditorCommandSet::instance();
+
+  // Add the netsignals combobox to the toolbar
+  mCommandToolBarProxy->addLabel(tr("Net:"), 10);
+  std::unique_ptr<QComboBox> netComboBox(new QComboBox());
+  QPointer<QComboBox> netComboBoxPtr = netComboBox.get();
+  netComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+  netComboBox->setInsertPolicy(QComboBox::NoInsert);
+  netComboBox->setEditable(false);
+  netComboBox->insertItem(1, "[" % tr("None") % "]", "none");
+  netComboBox->insertSeparator(1);
+  for (const auto& net : state.getAvailableNets()) {
+    netComboBox->addItem(net.second, net.first.toStr());
+  }
+  netComboBox->setCurrentIndex(
+      std::max(netComboBox->findData(state.getNet() ? state.getNet()->toStr()
+                                                    : QString()),
+               0));
+  connect(
+      netComboBoxPtr,
+      static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+      &state,
+      [&state, netComboBoxPtr](int index) {
+        if (netComboBoxPtr) {
+          const QString data = netComboBoxPtr->itemData(index).toString();
+          state.setNet(Uuid::tryFromString(data));
+        }
+      },
+      Qt::QueuedConnection);
+  mCommandToolBarProxy->addWidget(std::move(netComboBox));
+
+  // Add the layers combobox to the toolbar
+  mCommandToolBarProxy->addLabel(tr("Layer:"), 10);
+  std::unique_ptr<LayerComboBox> layerComboBox(new LayerComboBox());
+  layerComboBox->setLayers(state.getAvailableLayers());
+  layerComboBox->setCurrentLayer(state.getLayer());
+  layerComboBox->addAction(cmd.layerUp.createAction(
+      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepDown));
+  layerComboBox->addAction(cmd.layerDown.createAction(
+      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepUp));
+  connect(layerComboBox.get(), &LayerComboBox::currentLayerChanged, &state,
+          &BoardEditorState_DrawPlane::setLayer);
+  mCommandToolBarProxy->addWidget(std::move(layerComboBox));
+}
+
+void BoardEditor::fsmToolEnter(BoardEditorState_DrawZone& state) noexcept {
+  mToolsActionGroup->setCurrentAction(BoardEditorFsm::State::DRAW_ZONE);
+
+  EditorCommandSet& cmd = EditorCommandSet::instance();
+
+  // Add the layers combobox to the toolbar
+  mCommandToolBarProxy->addLabel(tr("Layer:"), 10);
+  std::unique_ptr<LayerComboBox> layerComboBox(new LayerComboBox());
+  layerComboBox->setLayers(state.getAvailableLayers());
+  if (const Layer* layer = state.getLayers().values().value(0)) {
+    layerComboBox->setCurrentLayer(*layer);
+  }
+  layerComboBox->addAction(cmd.layerUp.createAction(
+      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepDown));
+  layerComboBox->addAction(cmd.layerDown.createAction(
+      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepUp));
+  connect(layerComboBox.get(), &LayerComboBox::currentLayerChanged, &state,
+          [&state](const Layer& layer) { state.setLayers({&layer}); });
+  mCommandToolBarProxy->addWidget(std::move(layerComboBox));
+  mCommandToolBarProxy->addSeparator();
+
+  // Add the "no copper" checkbox to the toolbar.
+  std::unique_ptr<QCheckBox> cbxNoCopper(new QCheckBox(tr("No Copper")));
+  cbxNoCopper->setChecked(state.getRules().testFlag(Zone::Rule::NoCopper));
+  connect(
+      cbxNoCopper.get(), &QCheckBox::toggled, &state,
+      [&state](bool checked) { state.setRule(Zone::Rule::NoCopper, checked); });
+  mCommandToolBarProxy->addWidget(std::move(cbxNoCopper));
+
+  // Add the "no planes" checkbox to the toolbar.
+  std::unique_ptr<QCheckBox> cbxNoPlanes(new QCheckBox(tr("No Planes")));
+  cbxNoPlanes->setChecked(state.getRules().testFlag(Zone::Rule::NoPlanes));
+  connect(
+      cbxNoPlanes.get(), &QCheckBox::toggled, &state,
+      [&state](bool checked) { state.setRule(Zone::Rule::NoPlanes, checked); });
+  mCommandToolBarProxy->addWidget(std::move(cbxNoPlanes));
+
+  // Add the "no exposure" checkbox to the toolbar.
+  std::unique_ptr<QCheckBox> cbxNoExposure(new QCheckBox(tr("No Exposure")));
+  cbxNoExposure->setChecked(state.getRules().testFlag(Zone::Rule::NoExposure));
+  connect(cbxNoExposure.get(), &QCheckBox::toggled, &state,
+          [&state](bool checked) {
+            state.setRule(Zone::Rule::NoExposure, checked);
+          });
+  mCommandToolBarProxy->addWidget(std::move(cbxNoExposure));
+
+  // Add the "no devices" checkbox to the toolbar.
+  std::unique_ptr<QCheckBox> cbxNoDevices(new QCheckBox(tr("No Devices")));
+  cbxNoDevices->setChecked(state.getRules().testFlag(Zone::Rule::NoDevices));
+  connect(cbxNoDevices.get(), &QCheckBox::toggled, &state,
+          [&state](bool checked) {
+            state.setRule(Zone::Rule::NoDevices, checked);
+          });
+  mCommandToolBarProxy->addWidget(std::move(cbxNoDevices));
+}
+
+void BoardEditor::fsmToolEnter(BoardEditorState_AddHole& state) noexcept {
+  mToolsActionGroup->setCurrentAction(BoardEditorFsm::State::ADD_HOLE);
+
+  EditorCommandSet& cmd = EditorCommandSet::instance();
+
+  // Add the drill edit to the toolbar
+  mCommandToolBarProxy->addLabel(tr("Drill:"), 10);
+  std::unique_ptr<PositiveLengthEdit> drillEdit(new PositiveLengthEdit());
+  drillEdit->setValue(state.getDiameter());
+  drillEdit->addAction(cmd.drillIncrease.createAction(
+      drillEdit.get(), drillEdit.get(), &PositiveLengthEdit::stepUp));
+  drillEdit->addAction(cmd.drillDecrease.createAction(
+      drillEdit.get(), drillEdit.get(), &PositiveLengthEdit::stepDown));
+  connect(drillEdit.get(), &PositiveLengthEdit::valueChanged, &state,
+          &BoardEditorState_AddHole::setDiameter);
+  mCommandToolBarProxy->addWidget(std::move(drillEdit));
+}
+
+void BoardEditor::fsmToolEnter(BoardEditorState_AddDevice& state) noexcept {
+  Q_UNUSED(state);
+  mToolsActionGroup->setCurrentAction(BoardEditorFsm::State::ADD_DEVICE);
+}
+
+void BoardEditor::fsmToolEnter(BoardEditorState_Measure& state) noexcept {
+  Q_UNUSED(state);
+  mToolsActionGroup->setCurrentAction(BoardEditorFsm::State::MEASURE);
 }
 
 /*******************************************************************************
@@ -827,8 +1364,6 @@ void BoardEditor::createActions() noexcept {
   mToolsActionGroup->addAction(mActionToolMeasure.data(),
                                BoardEditorFsm::State::MEASURE);
   mToolsActionGroup->setCurrentAction(mFsm->getCurrentState());
-  connect(mFsm.data(), &BoardEditorFsm::stateChanged, mToolsActionGroup.data(),
-          &ExclusiveActionGroup::setCurrentAction);
   connect(mToolsActionGroup.data(), &ExclusiveActionGroup::actionTriggered,
           this, &BoardEditor::toolRequested);
 }

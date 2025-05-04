@@ -25,11 +25,11 @@
  ******************************************************************************/
 #include "../../../graphics/graphicsscene.h"
 #include "boardeditorfsm.h"
+#include "boardeditorfsmadapter.h"
 
 #include <librepcb/core/types/length.h>
 
 #include <QtCore>
-#include <QtWidgets>
 
 #include <memory>
 #include <optional>
@@ -187,7 +187,6 @@ signals:
    * the current state and entering the select tool.
    */
   void requestLeavingState();
-  void statusBarMessageChanged(const QString& message, int timeoutMs = -1);
 
 protected:  // Methods
   Board* getActiveBoard() noexcept;
@@ -223,6 +222,7 @@ protected:  // Methods
 
 protected:  // Data
   Context mContext;
+  BoardEditorFsmAdapter& mAdapter;
 };
 
 }  // namespace editor

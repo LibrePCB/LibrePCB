@@ -28,7 +28,6 @@
 #include <librepcb/core/geometry/via.h>
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -46,9 +45,6 @@ class NetSignal;
 
 namespace editor {
 
-class LayerComboBox;
-class PositiveLengthEdit;
-
 /*******************************************************************************
  *  Class BoardEditorState_DrawTrace
  ******************************************************************************/
@@ -60,6 +56,18 @@ class BoardEditorState_DrawTrace final : public BoardEditorState {
   Q_OBJECT
 
 public:
+  /**
+   * @brief All available wire modes
+   */
+  enum class WireMode {
+    HV,  ///< horizontal - vertical [default]
+    VH,  ///< vertical - horizontal
+    Deg9045,  ///< 90° - 45°
+    Deg4590,  ///< 45° - 90°
+    Straight,  ///< straight
+    _COUNT,
+  };
+
   // Constructors / Destructor
   BoardEditorState_DrawTrace() = delete;
   BoardEditorState_DrawTrace(const BoardEditorState_DrawTrace& other) = delete;
@@ -86,9 +94,36 @@ public:
       const GraphicsSceneMouseEvent& e) noexcept override;
   virtual bool processSwitchToBoard(int index) noexcept override;
 
+  // Connection to UI
+  WireMode getWireMode() const noexcept { return mCurrentWireMode; }
+  void setWireMode(WireMode mode) noexcept;
+  QSet<const Layer*> getAvailableLayers() noexcept;
+  const Layer& getLayer() const noexcept { return *mCurrentLayer; }
+  void setLayer(const Layer& layer) noexcept;
+  bool getAutoWidth() const noexcept { return mCurrentAutoWidth; }
+  void setAutoWidth(bool autoWidth) noexcept;
+  const PositiveLength& getWidth() const noexcept { return mCurrentWidth; }
+  void setWidth(const PositiveLength& width) noexcept;
+  const PositiveLength& getViaSize() const noexcept {
+    return mCurrentViaProperties.getSize();
+  }
+  void setViaSize(const PositiveLength& size) noexcept;
+  const PositiveLength& getViaDrillDiameter() const noexcept {
+    return mCurrentViaProperties.getDrillDiameter();
+  }
+  void setViaDrillDiameter(const PositiveLength& diameter) noexcept;
+
   // Operator Overloadings
   BoardEditorState_DrawTrace& operator=(const BoardEditorState_DrawTrace& rhs) =
       delete;
+
+signals:
+  void wireModeChanged(WireMode mode);
+  void layerChanged(const Layer& layer);
+  void autoWidthChanged(bool autoWidth);
+  void widthChanged(const PositiveLength& width);
+  void viaSizeChanged(const PositiveLength& size);
+  void viaDrillDiameterChanged(const PositiveLength& diameter);
 
 private:
   /// Internal FSM States (substates)
@@ -96,17 +131,6 @@ private:
     SubState_Idle,  ///< idle state [initial state]
     SubState_Initializing,  ///< beginning to start
     SubState_PositioningNetPoint  ///< in this state, an undo command is active!
-  };
-
-  /**
-   * @brief All available wire modes
-   */
-  enum class WireMode {
-    HV,  ///< horizontal - vertical [default]
-    VH,  ///< vertical - horizontal
-    Deg9045,  ///< 90° - 45°
-    Deg4590,  ///< 45° - 90°
-    Straight,  ///< straight
   };
 
   /**
@@ -172,14 +196,6 @@ private:
 
   BI_NetLineAnchor* combineAnchors(BI_NetLineAnchor& a, BI_NetLineAnchor& b);
 
-  // Callback Functions for the Gui elements
-  void wireModeChanged(WireMode mode) noexcept;
-  void layerChanged(const Layer& layer) noexcept;
-  void sizeEditValueChanged(const PositiveLength& value) noexcept;
-  void drillDiameterEditValueChanged(const PositiveLength& value) noexcept;
-  void wireWidthEditValueChanged(const PositiveLength& value) noexcept;
-  void wireAutoWidthEditToggled(const bool checked) noexcept;
-
   /**
    * @brief Calculate the 'middle point' of two point,
    * according to the chosen WireMode.
@@ -215,13 +231,6 @@ private:
   BI_NetPoint* mPositioningNetPoint1;  ///< the first netpoint to place
   BI_NetLine* mPositioningNetLine2;  ///< line between p1 and p2
   BI_NetPoint* mPositioningNetPoint2;  ///< the second netpoint to place
-
-  // Widgets for the command toolbar
-  QPointer<LayerComboBox> mLayerComboBox;
-  QPointer<PositiveLengthEdit> mSizeEdit;
-  QPointer<PositiveLengthEdit> mDrillEdit;
-  QPointer<PositiveLengthEdit> mWidthEdit;
-  QPointer<QActionGroup> mWireModeActionGroup;
 };
 
 /*******************************************************************************

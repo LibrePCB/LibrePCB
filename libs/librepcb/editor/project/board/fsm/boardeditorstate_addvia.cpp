@@ -22,11 +22,7 @@
  ******************************************************************************/
 #include "boardeditorstate_addvia.h"
 
-#include "../../../editorcommandset.h"
 #include "../../../undostack.h"
-#include "../../../utils/toolbarproxy.h"
-#include "../../../widgets/graphicsview.h"
-#include "../../../widgets/positivelengthedit.h"
 #include "../../cmd/cmdboardnetsegmentadd.h"
 #include "../../cmd/cmdboardnetsegmentaddelements.h"
 #include "../../cmd/cmdboardnetsegmentedit.h"
@@ -35,8 +31,6 @@
 #include "../../cmd/cmdboardsplitnetline.h"
 #include "../../cmd/cmdboardviaedit.h"
 #include "../../cmd/cmdcombineboardnetsegments.h"
-#include "../../projecteditor.h"
-#include "../boardeditor.h"
 #include "../boardgraphicsscene.h"
 #include "../graphicsitems/bgi_footprintpad.h"
 #include "../graphicsitems/bgi_netline.h"
@@ -71,7 +65,7 @@ BoardEditorState_AddVia::BoardEditorState_AddVia(
     const Context& context) noexcept
   : BoardEditorState(context),
     mIsUndoCmdActive(false),
-    mLastViaProperties(Uuid::createRandom(),  // UUID is not relevant here
+    mCurrentProperties(Uuid::createRandom(),  // UUID is not relevant here
                        Layer::topCopper(),  // Start layer
                        Layer::botCopper(),  // End layer
                        Point(),  // Position is not relevant here
@@ -96,91 +90,12 @@ bool BoardEditorState_AddVia::entry() noexcept {
   Q_ASSERT(mIsUndoCmdActive == false);
 
   // Add a new via
-  const Point pos =
-      mContext.editorGraphicsView.mapGlobalPosToScenePos(QCursor::pos())
-          .mappedToGrid(getGridInterval());
+  const Point pos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos())
+                        .mappedToGrid(getGridInterval());
   if (!addVia(pos)) return false;
 
-  EditorCommandSet& cmd = EditorCommandSet::instance();
-
-  // Add the size edit to the toolbar
-  mContext.commandToolBar.addLabel(tr("Size:"), 10);
-  std::unique_ptr<PositiveLengthEdit> sizeEdit(new PositiveLengthEdit());
-  QPointer<PositiveLengthEdit> sizeEditPtr = sizeEdit.get();
-  sizeEdit->setValue(mLastViaProperties.getSize());
-  sizeEdit->addAction(cmd.sizeIncrease.createAction(
-      sizeEdit.get(), sizeEdit.get(), &PositiveLengthEdit::stepUp));
-  sizeEdit->addAction(cmd.sizeDecrease.createAction(
-      sizeEdit.get(), sizeEdit.get(), &PositiveLengthEdit::stepDown));
-  connect(sizeEdit.get(), &PositiveLengthEdit::valueChanged, this,
-          &BoardEditorState_AddVia::sizeEditValueChanged);
-  mContext.commandToolBar.addWidget(std::move(sizeEdit));
-
-  // Add the drill edit to the toolbar
-  mContext.commandToolBar.addLabel(tr("Drill:"), 10);
-  std::unique_ptr<PositiveLengthEdit> drillEdit(new PositiveLengthEdit());
-  QPointer<PositiveLengthEdit> drillEditPtr = drillEdit.get();
-  drillEdit->setValue(mLastViaProperties.getDrillDiameter());
-  drillEdit->addAction(cmd.drillIncrease.createAction(
-      drillEdit.get(), drillEdit.get(), &PositiveLengthEdit::stepUp));
-  drillEdit->addAction(cmd.drillDecrease.createAction(
-      drillEdit.get(), drillEdit.get(), &PositiveLengthEdit::stepDown));
-  connect(drillEdit.get(), &PositiveLengthEdit::valueChanged, this,
-          &BoardEditorState_AddVia::drillDiameterEditValueChanged);
-  mContext.commandToolBar.addWidget(std::move(drillEdit));
-
-  // Add the netsignals combobox to the toolbar
-  mContext.commandToolBar.addLabel(tr("Net:"), 10);
-  mNetSignalComboBox = new QComboBox();
-  mNetSignalComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-  mNetSignalComboBox->setInsertPolicy(QComboBox::NoInsert);
-  mNetSignalComboBox->setEditable(false);
-  QList<NetSignal*> netSignals =
-      mContext.project.getCircuit().getNetSignals().values();
-  Toolbox::sortNumeric(
-      netSignals,
-      [](const QCollator& cmp, const NetSignal* lhs, const NetSignal* rhs) {
-        return cmp(*lhs->getName(), *rhs->getName());
-      },
-      Qt::CaseInsensitive, false);
-  foreach (NetSignal* netsignal, netSignals) {
-    mNetSignalComboBox->addItem(*netsignal->getName(),
-                                netsignal->getUuid().toStr());
-  }
-  mNetSignalComboBox->insertItem(0, "[" % tr("Auto") % "]", "auto");
-  mNetSignalComboBox->insertItem(1, "[" % tr("None") % "]", "none");
-  mNetSignalComboBox->insertSeparator(2);
-  if (mUseAutoNetSignal) {
-    mNetSignalComboBox->setCurrentIndex(0);  // Auto
-  } else if (const NetSignal* netsignal = getCurrentNetSignal()) {
-    mNetSignalComboBox->setCurrentText(*netsignal->getName());  // Existing net
-  } else {
-    mNetSignalComboBox->setCurrentIndex(1);  // No net
-  }
-  connect(
-      mNetSignalComboBox.data(),
-      static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-      this, &BoardEditorState_AddVia::applySelectedNetSignal,
-      Qt::QueuedConnection);
-  mContext.commandToolBar.addWidget(
-      std::unique_ptr<QComboBox>(mNetSignalComboBox));
-
-  // Avoid creating vias with a drill diameter larger than its size!
-  // See https://github.com/LibrePCB/LibrePCB/issues/946.
-  connect(sizeEditPtr, &PositiveLengthEdit::valueChanged, drillEditPtr,
-          [drillEditPtr](const PositiveLength& value) {
-            if ((drillEditPtr) && (value < drillEditPtr->getValue())) {
-              drillEditPtr->setValue(value);
-            }
-          });
-  connect(drillEditPtr, &PositiveLengthEdit::valueChanged, sizeEditPtr,
-          [sizeEditPtr](const PositiveLength& value) {
-            if ((sizeEditPtr) && (value > sizeEditPtr->getValue())) {
-              sizeEditPtr->setValue(value);
-            }
-          });
-
-  mContext.editorGraphicsView.setCursor(Qt::CrossCursor);
+  mAdapter.fsmToolEnter(*this);
+  mAdapter.fsmSetViewCursor(Qt::CrossCursor);
   return true;
 }
 
@@ -188,10 +103,8 @@ bool BoardEditorState_AddVia::exit() noexcept {
   // Abort the currently active command
   if (!abortCommand(true)) return false;
 
-  // Remove actions / widgets from the "command" toolbar
-  mContext.commandToolBar.clear();
-
-  mContext.editorGraphicsView.unsetCursor();
+  mAdapter.fsmSetViewCursor(std::nullopt);
+  mAdapter.fsmToolLeave();
   return true;
 }
 
@@ -222,6 +135,65 @@ bool BoardEditorState_AddVia::processGraphicsSceneLeftMouseButtonDoubleClicked(
 }
 
 /*******************************************************************************
+ *  Connection to UI
+ ******************************************************************************/
+
+void BoardEditorState_AddVia::setSize(const PositiveLength& size) noexcept {
+  if (mCurrentProperties.setSize(size)) {
+    emit sizeChanged(mCurrentProperties.getSize());
+  }
+
+  if (mCurrentViaEditCmd) {
+    mCurrentViaEditCmd->setSize(mCurrentProperties.getSize(), true);
+  }
+}
+
+void BoardEditorState_AddVia::setDrillDiameter(
+    const PositiveLength& diameter) noexcept {
+  if (mCurrentProperties.setDrillDiameter(diameter)) {
+    emit drillDiameterChanged(mCurrentProperties.getDrillDiameter());
+  }
+
+  if (mCurrentViaEditCmd) {
+    mCurrentViaEditCmd->setDrillDiameter(mCurrentProperties.getDrillDiameter(),
+                                         true);
+  }
+}
+
+QVector<std::pair<Uuid, QString>> BoardEditorState_AddVia::getAvailableNets()
+    const noexcept {
+  QVector<std::pair<Uuid, QString>> nets;
+  for (const NetSignal* net :
+       mContext.project.getCircuit().getNetSignals().values()) {
+    nets.append(std::make_pair(net->getUuid(), *net->getName()));
+  }
+  Toolbox::sortNumeric(
+      nets,
+      [](const QCollator& cmp, const std::pair<Uuid, QString>& lhs,
+         const std::pair<Uuid, QString>& rhs) {
+        return cmp(lhs.second, rhs.second);
+      },
+      Qt::CaseInsensitive, false);
+  return nets;
+}
+
+void BoardEditorState_AddVia::setNet(bool autoNet,
+                                     const std::optional<Uuid>& net) noexcept {
+  if (autoNet != mUseAutoNetSignal) {
+    mUseAutoNetSignal = autoNet;
+    emit netChanged(mUseAutoNetSignal, mCurrentNetSignal);
+  }
+
+  if ((!autoNet) && (net != mCurrentNetSignal)) {
+    mCurrentNetSignal = net;
+    emit netChanged(mUseAutoNetSignal, mCurrentNetSignal);
+  }
+
+  mClosestNetSignalIsUpToDate = false;
+  applySelectedNetSignal();
+}
+
+/*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
@@ -241,18 +213,17 @@ bool BoardEditorState_AddVia::addVia(const Point& pos) noexcept {
     mContext.undoStack.appendToCmdGroup(cmdAddSeg);
     BI_NetSegment* netsegment = cmdAddSeg->getNetSegment();
     Q_ASSERT(netsegment);
-    mLastViaProperties.setPosition(pos);
+    mCurrentProperties.setPosition(pos);
     std::unique_ptr<CmdBoardNetSegmentAddElements> cmdAddVia(
         new CmdBoardNetSegmentAddElements(*netsegment));
     mCurrentViaToPlace =
-        cmdAddVia->addVia(Via(Uuid::createRandom(), mLastViaProperties));
+        cmdAddVia->addVia(Via(Uuid::createRandom(), mCurrentProperties));
     Q_ASSERT(mCurrentViaToPlace);
     mContext.undoStack.appendToCmdGroup(cmdAddVia.release());
     mCurrentViaEditCmd.reset(new CmdBoardViaEdit(*mCurrentViaToPlace));
 
     // Highlight all elements of the current netsignal.
-    mContext.projectEditor.setHighlightedNetSignals(
-        {netsegment->getNetSignal()});
+    mAdapter.fsmSetHighlightedNetSignals({netsegment->getNetSignal()});
 
     return true;
   } catch (const Exception& e) {
@@ -377,7 +348,7 @@ bool BoardEditorState_AddVia::fixPosition(const Point& pos) noexcept {
 bool BoardEditorState_AddVia::abortCommand(bool showErrMsgBox) noexcept {
   try {
     // Clear highlighted net signal.
-    mContext.projectEditor.clearHighlightedNetSignals();
+    mAdapter.fsmSetHighlightedNetSignals({});
 
     // Delete the current edit command
     mCurrentViaEditCmd.reset();
@@ -399,31 +370,7 @@ bool BoardEditorState_AddVia::abortCommand(bool showErrMsgBox) noexcept {
   }
 }
 
-void BoardEditorState_AddVia::sizeEditValueChanged(
-    const PositiveLength& value) noexcept {
-  mLastViaProperties.setSize(value);
-  if (mCurrentViaEditCmd) {
-    mCurrentViaEditCmd->setSize(mLastViaProperties.getSize(), true);
-  }
-}
-
-void BoardEditorState_AddVia::drillDiameterEditValueChanged(
-    const PositiveLength& value) noexcept {
-  mLastViaProperties.setDrillDiameter(value);
-  if (mCurrentViaEditCmd) {
-    mCurrentViaEditCmd->setDrillDiameter(mLastViaProperties.getDrillDiameter(),
-                                         true);
-  }
-}
-
 void BoardEditorState_AddVia::applySelectedNetSignal() noexcept {
-  QString data = mNetSignalComboBox->currentData().toString();
-  mUseAutoNetSignal = (data == "auto");
-  if (!mUseAutoNetSignal) {
-    mCurrentNetSignal = Uuid::tryFromString(data);
-    mClosestNetSignalIsUpToDate = false;
-  }
-
   NetSignal* netsignal = getCurrentNetSignal();
   if ((mIsUndoCmdActive) && (mCurrentViaToPlace) &&
       (netsignal != mCurrentViaToPlace->getNetSegment().getNetSignal())) {
@@ -442,7 +389,7 @@ void BoardEditorState_AddVia::applySelectedNetSignal() noexcept {
   }
 
   // Highlight all elements of the current netsignal.
-  mContext.projectEditor.setHighlightedNetSignals({netsignal});
+  mAdapter.fsmSetHighlightedNetSignals({netsignal});
 }
 
 void BoardEditorState_AddVia::updateClosestNetSignal(
@@ -469,8 +416,12 @@ void BoardEditorState_AddVia::updateClosestNetSignal(
       // like "GND" where you need many vias.
       netsignal = mContext.project.getCircuit().getNetSignalWithMostElements();
     }
-    mCurrentNetSignal =
+    const auto netUuid =
         netsignal ? netsignal->getUuid() : std::optional<Uuid>();
+    if (netUuid != mCurrentNetSignal) {
+      mCurrentNetSignal = netUuid;
+      emit netChanged(mUseAutoNetSignal, mCurrentNetSignal);
+    }
     mClosestNetSignalIsUpToDate = true;
     QTimer* timer = new QTimer(this);
     connect(timer, &QTimer::timeout, [this, timer]() {

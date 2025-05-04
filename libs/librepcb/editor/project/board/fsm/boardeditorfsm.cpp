@@ -34,7 +34,6 @@
 #include "boardeditorstate_select.h"
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace
@@ -63,11 +62,6 @@ BoardEditorFsm::BoardEditorFsm(const Context& context, QObject* parent) noexcept
   mStates.insert(State::DRAW_ZONE, new BoardEditorState_DrawZone(context));
   mStates.insert(State::DRAW_TRACE, new BoardEditorState_DrawTrace(context));
   mStates.insert(State::MEASURE, new BoardEditorState_Measure(context));
-
-  foreach (BoardEditorState* state, mStates) {
-    connect(state, &BoardEditorState::statusBarMessageChanged, this,
-            &BoardEditorFsm::statusBarMessageChanged);
-  }
 
   enterNextState(State::SELECT);
 
@@ -409,7 +403,6 @@ bool BoardEditorFsm::leaveCurrentState() noexcept {
   }
 
   mCurrentState = State::IDLE;
-  emit stateChanged(mCurrentState);
   return true;
 }
 
@@ -420,7 +413,6 @@ bool BoardEditorFsm::enterNextState(State state) noexcept {
     return false;
   }
   mCurrentState = state;
-  emit stateChanged(mCurrentState);
   return true;
 }
 

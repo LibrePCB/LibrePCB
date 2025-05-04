@@ -40,11 +40,9 @@ class Workspace;
 
 namespace editor {
 
-class BoardEditor;
+class BoardEditorFsmAdapter;
 class BoardEditorState;
-class GraphicsView;
-class ProjectEditor;
-class ToolBarProxy;
+class GraphicsLayerList;
 class UndoStack;
 struct GraphicsSceneKeyEvent;
 struct GraphicsSceneMouseEvent;
@@ -90,11 +88,10 @@ public:
   struct Context {
     Workspace& workspace;
     Project& project;
-    ProjectEditor& projectEditor;
-    BoardEditor& editor;
-    GraphicsView& editorGraphicsView;
-    ToolBarProxy& commandToolBar;
     UndoStack& undoStack;
+    GraphicsLayerList& layers;
+    BoardEditorFsmAdapter& adapter;
+    QWidget& parentWidget;
   };
 
   // Constructors / Destructor
@@ -171,10 +168,6 @@ public:
 
   // Operator Overloadings
   BoardEditorFsm& operator=(const BoardEditorFsm& rhs) = delete;
-
-signals:
-  void stateChanged(State newState);
-  void statusBarMessageChanged(const QString& message, int timeoutMs = -1);
 
 private:
   BoardEditorState* getCurrentStateObj() const noexcept;

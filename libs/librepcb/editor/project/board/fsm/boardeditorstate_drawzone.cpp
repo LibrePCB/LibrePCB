@@ -22,20 +22,16 @@
  ******************************************************************************/
 #include "boardeditorstate_drawzone.h"
 
-#include "../../../editorcommandset.h"
 #include "../../../undostack.h"
-#include "../../../utils/toolbarproxy.h"
-#include "../../../widgets/graphicsview.h"
-#include "../../../widgets/layercombobox.h"
 #include "../../cmd/cmdboardzoneadd.h"
 #include "../../cmd/cmdboardzoneedit.h"
-#include "../boardeditor.h"
 
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/items/bi_zone.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/types/layer.h>
 #include <librepcb/core/utils/toolbox.h>
+#include <librepcb/core/workspace/theme.h>
 
 #include <QtCore>
 
@@ -53,9 +49,13 @@ BoardEditorState_DrawZone::BoardEditorState_DrawZone(
     const Context& context) noexcept
   : BoardEditorState(context),
     mIsUndoCmdActive(false),
-    mLastLayer(&Layer::topCopper()),
-    mLastRules(Zone::Rule::All),
     mLastVertexPos(),
+    mCurrentProperties(Uuid::createRandom(),  // UUID is not relevant here
+                       {&Layer::topCopper()},  // Layers
+                       Zone::Rule::All,  // Rules
+                       Path(),  // Path will be set later
+                       false  // Locked
+                       ),
     mCurrentZone(nullptr) {
 }
 
@@ -69,76 +69,8 @@ BoardEditorState_DrawZone::~BoardEditorState_DrawZone() noexcept {
 bool BoardEditorState_DrawZone::entry() noexcept {
   Q_ASSERT(mIsUndoCmdActive == false);
 
-  Board* board = getActiveBoard();
-  EditorCommandSet& cmd = EditorCommandSet::instance();
-
-  // Add the layer combobox to the toolbar.
-  mContext.commandToolBar.addLabel(tr("Layer:"), 10);
-  std::unique_ptr<LayerComboBox> layerComboBox(new LayerComboBox());
-  if (board) {
-    layerComboBox->setLayers(board->getCopperLayers());
-  }
-  layerComboBox->setCurrentLayer(*mLastLayer);
-  layerComboBox->addAction(cmd.layerUp.createAction(
-      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepDown));
-  layerComboBox->addAction(cmd.layerDown.createAction(
-      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepUp));
-  connect(layerComboBox.get(), &LayerComboBox::currentLayerChanged, this,
-          [this](const Layer& layer) {
-            mLastLayer = &layer;
-            if (mCurrentZoneEditCmd) {
-              mCurrentZoneEditCmd->setLayers({mLastLayer}, true);
-            }
-            makeLayerVisible(layer.getThemeColor());
-          });
-  mContext.commandToolBar.addWidget(std::move(layerComboBox));
-  mContext.commandToolBar.addSeparator();
-
-  // Add the "no copper" checkbox to the toolbar.
-  std::unique_ptr<QCheckBox> cbxNoCopper(new QCheckBox(tr("No Copper")));
-  cbxNoCopper->setChecked(mLastRules.testFlag(Zone::Rule::NoCopper));
-  connect(cbxNoCopper.get(), &QCheckBox::toggled, this, [this](bool checked) {
-    mLastRules.setFlag(Zone::Rule::NoCopper, checked);
-    if (mCurrentZoneEditCmd) {
-      mCurrentZoneEditCmd->setRules(mLastRules, true);
-    }
-  });
-  mContext.commandToolBar.addWidget(std::move(cbxNoCopper));
-
-  // Add the "no planes" checkbox to the toolbar.
-  std::unique_ptr<QCheckBox> cbxNoPlanes(new QCheckBox(tr("No Planes")));
-  cbxNoPlanes->setChecked(mLastRules.testFlag(Zone::Rule::NoPlanes));
-  connect(cbxNoPlanes.get(), &QCheckBox::toggled, this, [this](bool checked) {
-    mLastRules.setFlag(Zone::Rule::NoPlanes, checked);
-    if (mCurrentZoneEditCmd) {
-      mCurrentZoneEditCmd->setRules(mLastRules, true);
-    }
-  });
-  mContext.commandToolBar.addWidget(std::move(cbxNoPlanes));
-
-  // Add the "no exposure" checkbox to the toolbar.
-  std::unique_ptr<QCheckBox> cbxNoExposure(new QCheckBox(tr("No Exposure")));
-  cbxNoExposure->setChecked(mLastRules.testFlag(Zone::Rule::NoExposure));
-  connect(cbxNoExposure.get(), &QCheckBox::toggled, this, [this](bool checked) {
-    mLastRules.setFlag(Zone::Rule::NoExposure, checked);
-    if (mCurrentZoneEditCmd) {
-      mCurrentZoneEditCmd->setRules(mLastRules, true);
-    }
-  });
-  mContext.commandToolBar.addWidget(std::move(cbxNoExposure));
-
-  // Add the "no devices" checkbox to the toolbar.
-  std::unique_ptr<QCheckBox> cbxNoDevices(new QCheckBox(tr("No Devices")));
-  cbxNoDevices->setChecked(mLastRules.testFlag(Zone::Rule::NoDevices));
-  connect(cbxNoDevices.get(), &QCheckBox::toggled, this, [this](bool checked) {
-    mLastRules.setFlag(Zone::Rule::NoDevices, checked);
-    if (mCurrentZoneEditCmd) {
-      mCurrentZoneEditCmd->setRules(mLastRules, true);
-    }
-  });
-  mContext.commandToolBar.addWidget(std::move(cbxNoDevices));
-
-  mContext.editorGraphicsView.setCursor(Qt::CrossCursor);
+  mAdapter.fsmToolEnter(*this);
+  mAdapter.fsmSetViewCursor(Qt::CrossCursor);
   return true;
 }
 
@@ -146,10 +78,8 @@ bool BoardEditorState_DrawZone::exit() noexcept {
   // Abort the currently active command
   if (!abortCommand(true)) return false;
 
-  // Remove actions / widgets from the "command" toolbar
-  mContext.commandToolBar.clear();
-
-  mContext.editorGraphicsView.unsetCursor();
+  mAdapter.fsmSetViewCursor(std::nullopt);
+  mAdapter.fsmToolLeave();
   return true;
 }
 
@@ -196,6 +126,42 @@ bool BoardEditorState_DrawZone::processSwitchToBoard(int index) noexcept {
 }
 
 /*******************************************************************************
+ *  Connection to UI
+ ******************************************************************************/
+
+QSet<const Layer*> BoardEditorState_DrawZone::getAvailableLayers() noexcept {
+  if (Board* board = getActiveBoard()) {
+    return board->getCopperLayers();
+  } else {
+    return {};
+  }
+}
+
+void BoardEditorState_DrawZone::setLayers(
+    const QSet<const Layer*>& layers) noexcept {
+  if (mCurrentProperties.setLayers(layers)) {
+    emit layersChanged(mCurrentProperties.getLayers());
+  }
+
+  if (mCurrentZoneEditCmd) {
+    mCurrentZoneEditCmd->setLayers(mCurrentProperties.getLayers(), true);
+  }
+}
+
+void BoardEditorState_DrawZone::setRule(Zone::Rule rule, bool enable) noexcept {
+  Zone::Rules rules = mCurrentProperties.getRules();
+  rules.setFlag(rule, enable);
+
+  if (mCurrentProperties.setRules(rules)) {
+    emit rulesChanged(mCurrentProperties.getRules());
+  }
+
+  if (mCurrentZoneEditCmd) {
+    mCurrentZoneEditCmd->setRules(mCurrentProperties.getRules(), true);
+  }
+}
+
+/*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
@@ -213,17 +179,18 @@ bool BoardEditorState_DrawZone::startAddZone(const Point& pos) noexcept {
     mIsUndoCmdActive = true;
 
     // Add zone with two vertices
-    Path path({Vertex(pos), Vertex(pos)});
-    mCurrentZone = new BI_Zone(*board,
-                               BoardZoneData(Uuid::createRandom(), {mLastLayer},
-                                             mLastRules, path, false));
+    mCurrentProperties.setOutline(Path({Vertex(pos), Vertex(pos)}));
+    mCurrentZone = new BI_Zone(
+        *board, BoardZoneData(Uuid::createRandom(), mCurrentProperties));
     mContext.undoStack.appendToCmdGroup(new CmdBoardZoneAdd(*mCurrentZone));
 
     // Start undo command
     mCurrentZoneEditCmd.reset(new CmdBoardZoneEdit(*mCurrentZone));
     mLastVertexPos = pos;
     makeLayerVisible(Theme::Color::sBoardZones);
-    makeLayerVisible(mLastLayer->getThemeColor());
+    for (auto layer : mCurrentProperties.getLayers()) {
+      makeLayerVisible(layer->getThemeColor());
+    }
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());

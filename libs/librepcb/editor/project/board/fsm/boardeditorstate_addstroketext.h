@@ -37,13 +37,10 @@
 namespace librepcb {
 
 class Board;
-class Layer;
 
 namespace editor {
 
 class CmdBoardStrokeTextEdit;
-class LayerComboBox;
-class PositiveLengthEdit;
 
 /*******************************************************************************
  *  Class BoardEditorState_AddStrokeText
@@ -79,9 +76,33 @@ public:
   virtual bool processGraphicsSceneRightMouseButtonReleased(
       const GraphicsSceneMouseEvent& e) noexcept override;
 
+  // Connection to UI
+  QSet<const Layer*> getAvailableLayers() noexcept;
+  const Layer& getLayer() const noexcept {
+    return mCurrentProperties.getLayer();
+  }
+  void setLayer(const Layer& layer) noexcept;
+  const PositiveLength& getHeight() const noexcept {
+    return mCurrentProperties.getHeight();
+  }
+  void setHeight(const PositiveLength& height) noexcept;
+  const QString& getText() const noexcept {
+    return mCurrentProperties.getText();
+  }
+  QStringList getTextSuggestions() const noexcept;
+  void setText(const QString& text) noexcept;
+  bool getMirrored() const noexcept { return mCurrentProperties.getMirrored(); }
+  void setMirrored(bool mirrored) noexcept;
+
   // Operator Overloadings
   BoardEditorState_AddStrokeText& operator=(
       const BoardEditorState_AddStrokeText& rhs) = delete;
+
+signals:
+  void layerChanged(const Layer& layer);
+  void heightChanged(const PositiveLength& height);
+  void textChanged(const QString& text);
+  void mirroredChanged(bool mirrored);
 
 private:  // Methods
   bool addText(const Point& pos) noexcept;
@@ -90,32 +111,18 @@ private:  // Methods
   bool updatePosition(const Point& pos) noexcept;
   bool fixPosition(const Point& pos) noexcept;
   bool abortCommand(bool showErrMsgBox) noexcept;
-  void layerComboBoxLayerChanged(const Layer& layer) noexcept;
-  void textComboBoxValueChanged(const QString& value) noexcept;
-  void heightEditValueChanged(const PositiveLength& value) noexcept;
-  void mirrorCheckBoxToggled(bool checked) noexcept;
 
 private:  // Data
   // State
   bool mIsUndoCmdActive;
 
-  // Parameter memory
-  const Layer* mLastLayer;
-  Angle mLastRotation;
-  PositiveLength mLastHeight;
-  UnsignedLength mLastStrokeWidth;
-  Alignment mLastAlignment;
-  QString mLastText;
-  bool mLastMirrored;
+  // Current tool settings
+  BoardStrokeTextData mCurrentProperties;
 
   // Information about the current text to place. Only valid if
   // mIsUndoCmdActive == true.
   BI_StrokeText* mCurrentTextToPlace;
   std::unique_ptr<CmdBoardStrokeTextEdit> mCurrentTextEditCmd;
-
-  // Widgets for the command toolbar
-  QPointer<LayerComboBox> mLayerComboBox;
-  QPointer<QCheckBox> mMirrorCheckBox;
 };
 
 /*******************************************************************************

@@ -22,14 +22,9 @@
  ******************************************************************************/
 #include "boardeditorstate_addhole.h"
 
-#include "../../../editorcommandset.h"
 #include "../../../undostack.h"
-#include "../../../utils/toolbarproxy.h"
-#include "../../../widgets/graphicsview.h"
-#include "../../../widgets/positivelengthedit.h"
 #include "../../cmd/cmdboardholeadd.h"
 #include "../../cmd/cmdboardholeedit.h"
-#include "../boardeditor.h"
 
 #include <librepcb/core/geometry/hole.h>
 #include <librepcb/core/project/board/board.h>
@@ -50,7 +45,7 @@ BoardEditorState_AddHole::BoardEditorState_AddHole(
     const Context& context) noexcept
   : BoardEditorState(context),
     mIsUndoCmdActive(false),
-    mLastDiameter(1000000),
+    mCurrentDiameter(1000000),
     mCurrentHoleToPlace(nullptr) {
 }
 
@@ -67,26 +62,12 @@ bool BoardEditorState_AddHole::entry() noexcept {
   makeLayerVisible(Theme::Color::sBoardHoles);
 
   // Add a new hole
-  const Point pos =
-      mContext.editorGraphicsView.mapGlobalPosToScenePos(QCursor::pos())
-          .mappedToGrid(getGridInterval());
+  const Point pos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos())
+                        .mappedToGrid(getGridInterval());
   if (!addHole(pos)) return false;
 
-  EditorCommandSet& cmd = EditorCommandSet::instance();
-
-  // Add the diameter spinbox to the toolbar
-  mContext.commandToolBar.addLabel(tr("Diameter:"), 10);
-  std::unique_ptr<PositiveLengthEdit> diameterEdit(new PositiveLengthEdit());
-  diameterEdit->setValue(mLastDiameter);
-  diameterEdit->addAction(cmd.drillIncrease.createAction(
-      diameterEdit.get(), diameterEdit.get(), &PositiveLengthEdit::stepUp));
-  diameterEdit->addAction(cmd.drillDecrease.createAction(
-      diameterEdit.get(), diameterEdit.get(), &PositiveLengthEdit::stepDown));
-  connect(diameterEdit.get(), &PositiveLengthEdit::valueChanged, this,
-          &BoardEditorState_AddHole::diameterEditValueChanged);
-  mContext.commandToolBar.addWidget(std::move(diameterEdit));
-
-  mContext.editorGraphicsView.setCursor(Qt::CrossCursor);
+  mAdapter.fsmToolEnter(*this);
+  mAdapter.fsmSetViewCursor(Qt::CrossCursor);
   return true;
 }
 
@@ -94,10 +75,8 @@ bool BoardEditorState_AddHole::exit() noexcept {
   // Abort the currently active command
   if (!abortCommand(true)) return false;
 
-  // Remove actions / widgets from the "command" toolbar
-  mContext.commandToolBar.clear();
-
-  mContext.editorGraphicsView.unsetCursor();
+  mAdapter.fsmSetViewCursor(std::nullopt);
+  mAdapter.fsmToolLeave();
   return true;
 }
 
@@ -125,6 +104,22 @@ bool BoardEditorState_AddHole::processGraphicsSceneLeftMouseButtonDoubleClicked(
 }
 
 /*******************************************************************************
+ *  Connection to UI
+ ******************************************************************************/
+
+void BoardEditorState_AddHole::setDiameter(
+    const PositiveLength& diameter) noexcept {
+  if (diameter != mCurrentDiameter) {
+    mCurrentDiameter = diameter;
+    emit diameterChanged(mCurrentDiameter);
+  }
+
+  if (mCurrentHoleEditCmd) {
+    mCurrentHoleEditCmd->setDiameter(mCurrentDiameter, true);
+  }
+}
+
+/*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
@@ -141,7 +136,7 @@ bool BoardEditorState_AddHole::addHole(const Point& pos) noexcept {
     mIsUndoCmdActive = true;
     mCurrentHoleToPlace = new BI_Hole(
         *board,
-        BoardHoleData(Uuid::createRandom(), mLastDiameter,
+        BoardHoleData(Uuid::createRandom(), mCurrentDiameter,
                       makeNonEmptyPath(pos), MaskConfig::automatic(), false));
     std::unique_ptr<CmdBoardHoleAdd> cmdAdd(
         new CmdBoardHoleAdd(*mCurrentHoleToPlace));
@@ -202,14 +197,6 @@ bool BoardEditorState_AddHole::abortCommand(bool showErrMsgBox) noexcept {
       QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     }
     return false;
-  }
-}
-
-void BoardEditorState_AddHole::diameterEditValueChanged(
-    const PositiveLength& value) noexcept {
-  mLastDiameter = value;
-  if (mCurrentHoleEditCmd) {
-    mCurrentHoleEditCmd->setDiameter(mLastDiameter, true);
   }
 }
 

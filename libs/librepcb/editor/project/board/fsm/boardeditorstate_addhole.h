@@ -41,7 +41,6 @@ class Board;
 namespace editor {
 
 class CmdBoardHoleEdit;
-class PositiveLengthEdit;
 
 /*******************************************************************************
  *  Class BoardEditorState_AddHole
@@ -72,21 +71,29 @@ public:
   virtual bool processGraphicsSceneLeftMouseButtonDoubleClicked(
       const GraphicsSceneMouseEvent& e) noexcept override;
 
+  // Connection to UI
+  const PositiveLength& getDiameter() const noexcept {
+    return mCurrentDiameter;
+  }
+  void setDiameter(const PositiveLength& diameter) noexcept;
+
   // Operator Overloadings
   BoardEditorState_AddHole& operator=(const BoardEditorState_AddHole& rhs) =
       delete;
+
+signals:
+  void diameterChanged(const PositiveLength& diameter);
 
 private:  // Methods
   bool addHole(const Point& pos) noexcept;
   bool updatePosition(const Point& pos) noexcept;
   bool fixPosition(const Point& pos) noexcept;
   bool abortCommand(bool showErrMsgBox) noexcept;
-  void diameterEditValueChanged(const PositiveLength& value) noexcept;
 
 private:  // Data
   // State
   bool mIsUndoCmdActive;
-  PositiveLength mLastDiameter;
+  PositiveLength mCurrentDiameter;
 
   // Information about the current hole to place. Only valid if
   // mIsUndoCmdActive == true.
