@@ -66,7 +66,7 @@ public:
   void zoomOut() noexcept;
   void zoomAll() noexcept;
   void startSpinning() noexcept;
-  void stopSpinning(QString errorMsg) noexcept;
+  void stopSpinning(QStringList errors) noexcept;
 
   // Operator Overloadings
   OpenGlView& operator=(const OpenGlView& rhs) = delete;

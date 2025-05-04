@@ -142,12 +142,12 @@ void OpenGlView::startSpinning() noexcept {
   mWaitingSpinner->show();
 }
 
-void OpenGlView::stopSpinning(QString errorMsg) noexcept {
+void OpenGlView::stopSpinning(QStringList errors) noexcept {
   mWaitingSpinner->hide();
-  if (errorMsg.isEmpty()) {
+  if (errors.isEmpty()) {
     mErrorLabel->hide();
   } else {
-    mErrorLabel->setText(errorMsg);
+    mErrorLabel->setText(errors.join("\n\n"));
     mErrorLabel->show();
   }
 }
