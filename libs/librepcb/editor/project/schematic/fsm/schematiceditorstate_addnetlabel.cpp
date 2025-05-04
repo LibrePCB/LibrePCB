@@ -23,10 +23,8 @@
 #include "schematiceditorstate_addnetlabel.h"
 
 #include "../../../undostack.h"
-#include "../../../widgets/graphicsview.h"
 #include "../../cmd/cmdschematicnetlabeladd.h"
 #include "../../cmd/cmdschematicnetlabeledit.h"
-#include "../../projecteditor.h"
 #include "../graphicsitems/sgi_netline.h"
 
 #include <librepcb/core/project/schematic/items/si_netlabel.h>
@@ -66,7 +64,8 @@ SchematicEditorState_AddNetLabel::~SchematicEditorState_AddNetLabel() noexcept {
 bool SchematicEditorState_AddNetLabel::entry() noexcept {
   Q_ASSERT(mUndoCmdActive == false);
 
-  mContext.editorGraphicsView.setCursor(Qt::CrossCursor);
+  mAdapter.fsmToolEnter(*this);
+  mAdapter.fsmSetViewCursor(Qt::CrossCursor);
   return true;
 }
 
@@ -75,7 +74,8 @@ bool SchematicEditorState_AddNetLabel::exit() noexcept {
     return false;
   }
 
-  mContext.editorGraphicsView.unsetCursor();
+  mAdapter.fsmSetViewCursor(std::nullopt);
+  mAdapter.fsmToolLeave();
   return true;
 }
 
@@ -185,8 +185,7 @@ bool SchematicEditorState_AddNetLabel::addLabel(const Point& pos) noexcept {
     mEditCmd = new CmdSchematicNetLabelEdit(*mCurrentNetLabel);
 
     // Highlight all elements of the current netsignal.
-    mContext.projectEditor.setHighlightedNetSignals(
-        {&netsegment.getNetSignal()});
+    mAdapter.fsmSetHighlightedNetSignals({&netsegment.getNetSignal()});
 
     return true;
   } catch (const Exception& e) {
@@ -213,7 +212,7 @@ bool SchematicEditorState_AddNetLabel::fixLabel(const Point& pos) noexcept {
     mContext.undoStack.appendToCmdGroup(mEditCmd);
     mContext.undoStack.commitCmdGroup();
     mUndoCmdActive = false;
-    mContext.projectEditor.clearHighlightedNetSignals();
+    mAdapter.fsmSetHighlightedNetSignals({});
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -225,7 +224,7 @@ bool SchematicEditorState_AddNetLabel::fixLabel(const Point& pos) noexcept {
 bool SchematicEditorState_AddNetLabel::abortCommand(
     bool showErrMsgBox) noexcept {
   try {
-    mContext.projectEditor.clearHighlightedNetSignals();
+    mAdapter.fsmSetHighlightedNetSignals({});
     if (mUndoCmdActive) {
       mContext.undoStack.abortCmdGroup();  // can throw
       mUndoCmdActive = false;

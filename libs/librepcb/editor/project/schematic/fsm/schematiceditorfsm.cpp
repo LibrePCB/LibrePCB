@@ -31,7 +31,6 @@
 #include "schematiceditorstate_select.h"
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace
@@ -66,8 +65,6 @@ SchematicEditorFsm::SchematicEditorFsm(const Context& context,
   foreach (SchematicEditorState* state, mStates) {
     connect(state, &SchematicEditorState::requestLeavingState, this,
             &SchematicEditorFsm::processSelect, Qt::QueuedConnection);
-    connect(state, &SchematicEditorState::statusBarMessageChanged, this,
-            &SchematicEditorFsm::statusBarMessageChanged);
   }
 
   enterNextState(State::SELECT);
@@ -375,7 +372,6 @@ bool SchematicEditorFsm::leaveCurrentState() noexcept {
   }
 
   mCurrentState = State::IDLE;
-  emit stateChanged(mCurrentState);
   return true;
 }
 
@@ -386,7 +382,6 @@ bool SchematicEditorFsm::enterNextState(State state) noexcept {
     return false;
   }
   mCurrentState = state;
-  emit stateChanged(mCurrentState);
   return true;
 }
 

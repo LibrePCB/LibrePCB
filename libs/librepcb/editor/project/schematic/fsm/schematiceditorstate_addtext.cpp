@@ -25,12 +25,7 @@
 #include "../../../cmd/cmdtextedit.h"
 #include "../../../editorcommandset.h"
 #include "../../../undostack.h"
-#include "../../../utils/toolbarproxy.h"
-#include "../../../widgets/graphicsview.h"
-#include "../../../widgets/layercombobox.h"
-#include "../../../widgets/positivelengthedit.h"
 #include "../../cmd/cmdschematictextadd.h"
-#include "../schematiceditor.h"
 
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/schematic/items/si_text.h>
@@ -53,15 +48,14 @@ SchematicEditorState_AddText::SchematicEditorState_AddText(
     const Context& context) noexcept
   : SchematicEditorState(context),
     mIsUndoCmdActive(false),
-    mLastTextProperties(
-        Uuid::createRandom(),  // UUID is not relevant here
-        Layer::schematicComments(),  // Layer
-        "{{PROJECT}}",  // Text
-        Point(),  // Position is not relevant here
-        Angle::deg0(),  // Rotation
-        PositiveLength(1500000),  // Height
-        Alignment(HAlign::left(), VAlign::bottom())  // Alignment
-        ),
+    mCurrentProperties(Uuid::createRandom(),  // UUID is not relevant here
+                       Layer::schematicComments(),  // Layer
+                       "{{PROJECT}}",  // Text
+                       Point(),  // Position is not relevant here
+                       Angle::deg0(),  // Rotation
+                       PositiveLength(1500000),  // Height
+                       Alignment(HAlign::left(), VAlign::bottom())  // Alignment
+                       ),
     mCurrentTextToPlace(nullptr) {
 }
 
@@ -75,59 +69,13 @@ SchematicEditorState_AddText::~SchematicEditorState_AddText() noexcept {
 bool SchematicEditorState_AddText::entry() noexcept {
   Q_ASSERT(mIsUndoCmdActive == false);
 
-  EditorCommandSet& cmd = EditorCommandSet::instance();
-
   // Add a new stroke text
-  const Point pos =
-      mContext.editorGraphicsView.mapGlobalPosToScenePos(QCursor::pos())
-          .mappedToGrid(getGridInterval());
+  const Point pos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos())
+                        .mappedToGrid(getGridInterval());
   if (!addText(pos)) return false;
 
-  // Add the layers combobox to the toolbar
-  mContext.commandToolBar.addLabel(tr("Layer:"), 10);
-  std::unique_ptr<LayerComboBox> layerComboBox(new LayerComboBox());
-  layerComboBox->setLayers(getAllowedGeometryLayers());
-  layerComboBox->setCurrentLayer(mLastTextProperties.getLayer());
-  layerComboBox->addAction(cmd.layerUp.createAction(
-      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepDown));
-  layerComboBox->addAction(cmd.layerDown.createAction(
-      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepUp));
-  connect(layerComboBox.get(), &LayerComboBox::currentLayerChanged, this,
-          &SchematicEditorState_AddText::layerComboBoxLayerChanged);
-  mContext.commandToolBar.addWidget(std::move(layerComboBox));
-
-  // Add the text combobox to the toolbar
-  mContext.commandToolBar.addLabel(tr("Text:"), 10);
-  std::unique_ptr<QComboBox> textComboBox(new QComboBox());
-  textComboBox->setEditable(true);
-  textComboBox->setMinimumContentsLength(20);
-  textComboBox->addItem("{{SHEET}}");
-  textComboBox->addItem("{{PAGE_X_OF_Y}}");
-  textComboBox->addItem("{{PROJECT}}");
-  textComboBox->addItem("{{AUTHOR}}");
-  textComboBox->addItem("{{VERSION}}");
-  textComboBox->addItem("{{DATE}}");
-  textComboBox->addItem("{{TIME}}");
-  textComboBox->setCurrentIndex(
-      textComboBox->findText(mLastTextProperties.getText()));
-  textComboBox->setCurrentText(mLastTextProperties.getText());
-  connect(textComboBox.get(), &QComboBox::currentTextChanged, this,
-          &SchematicEditorState_AddText::textComboBoxValueChanged);
-  mContext.commandToolBar.addWidget(std::move(textComboBox));
-
-  // Add the height spinbox to the toolbar
-  mContext.commandToolBar.addLabel(tr("Height:"), 10);
-  std::unique_ptr<PositiveLengthEdit> heightEdit(new PositiveLengthEdit());
-  heightEdit->setValue(mLastTextProperties.getHeight());
-  heightEdit->addAction(cmd.sizeIncrease.createAction(
-      heightEdit.get(), heightEdit.get(), &PositiveLengthEdit::stepUp));
-  heightEdit->addAction(cmd.sizeDecrease.createAction(
-      heightEdit.get(), heightEdit.get(), &PositiveLengthEdit::stepDown));
-  connect(heightEdit.get(), &PositiveLengthEdit::valueChanged, this,
-          &SchematicEditorState_AddText::heightEditValueChanged);
-  mContext.commandToolBar.addWidget(std::move(heightEdit));
-
-  mContext.editorGraphicsView.setCursor(Qt::CrossCursor);
+  mAdapter.fsmToolEnter(*this);
+  mAdapter.fsmSetViewCursor(Qt::CrossCursor);
   return true;
 }
 
@@ -135,10 +83,8 @@ bool SchematicEditorState_AddText::exit() noexcept {
   // Abort the currently active command
   if (!abortCommand(true)) return false;
 
-  // Remove actions / widgets from the "command" toolbar
-  mContext.commandToolBar.clear();
-
-  mContext.editorGraphicsView.unsetCursor();
+  mAdapter.fsmSetViewCursor(std::nullopt);
+  mAdapter.fsmToolLeave();
   return true;
 }
 
@@ -157,7 +103,7 @@ bool SchematicEditorState_AddText::processMirror(
 
   mCurrentTextEditCmd->mirror(orientation, mCurrentTextToPlace->getPosition(),
                               true);
-  mLastTextProperties = mCurrentTextToPlace->getTextObj();
+  mCurrentProperties = mCurrentTextToPlace->getTextObj();
   return true;
 }
 
@@ -199,6 +145,58 @@ bool SchematicEditorState_AddText::processSwitchToSchematicPage(
 }
 
 /*******************************************************************************
+ *  Connection to UI
+ ******************************************************************************/
+
+QSet<const Layer*> SchematicEditorState_AddText::getAvailableLayers()
+    const noexcept {
+  return getAllowedGeometryLayers();
+}
+
+void SchematicEditorState_AddText::setLayer(const Layer& layer) noexcept {
+  if (mCurrentProperties.setLayer(layer)) {
+    emit layerChanged(mCurrentProperties.getLayer());
+  }
+
+  if (mCurrentTextEditCmd) {
+    mCurrentTextEditCmd->setLayer(mCurrentProperties.getLayer(), true);
+  }
+}
+
+void SchematicEditorState_AddText::setHeight(
+    const PositiveLength& height) noexcept {
+  if (mCurrentProperties.setHeight(height)) {
+    emit heightChanged(mCurrentProperties.getHeight());
+  }
+
+  if (mCurrentTextEditCmd) {
+    mCurrentTextEditCmd->setHeight(mCurrentProperties.getHeight(), true);
+  }
+}
+
+QStringList SchematicEditorState_AddText::getTextSuggestions() const noexcept {
+  return {
+      "{{SHEET}}",  //
+      "{{PAGE_X_OF_Y}}",  //
+      "{{PROJECT}}",  //
+      "{{AUTHOR}}",  //
+      "{{VERSION}}",  //
+      "{{DATE}}",  //
+      "{{TIME}}",  //
+  };
+}
+
+void SchematicEditorState_AddText::setText(const QString& text) noexcept {
+  if (mCurrentProperties.setText(text)) {
+    emit textChanged(mCurrentProperties.getText());
+  }
+
+  if (mCurrentTextEditCmd) {
+    mCurrentTextEditCmd->setText(mCurrentProperties.getText(), true);
+  }
+}
+
+/*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
@@ -213,9 +211,9 @@ bool SchematicEditorState_AddText::addText(const Point& pos) noexcept {
   try {
     mContext.undoStack.beginCmdGroup(tr("Add text to schematic"));
     mIsUndoCmdActive = true;
-    mLastTextProperties.setPosition(pos);
-    mCurrentTextToPlace = new SI_Text(
-        *schematic, Text(Uuid::createRandom(), mLastTextProperties));
+    mCurrentProperties.setPosition(pos);
+    mCurrentTextToPlace =
+        new SI_Text(*schematic, Text(Uuid::createRandom(), mCurrentProperties));
     std::unique_ptr<CmdSchematicTextAdd> cmdAdd(
         new CmdSchematicTextAdd(*mCurrentTextToPlace));
     mContext.undoStack.appendToCmdGroup(cmdAdd.release());
@@ -233,7 +231,7 @@ bool SchematicEditorState_AddText::rotateText(const Angle& angle) noexcept {
   if ((!mCurrentTextEditCmd) || (!mCurrentTextToPlace)) return false;
 
   mCurrentTextEditCmd->rotate(angle, mCurrentTextToPlace->getPosition(), true);
-  mLastTextProperties = mCurrentTextToPlace->getTextObj();
+  mCurrentProperties = mCurrentTextToPlace->getTextObj();
 
   return true;  // Event handled
 }
@@ -285,30 +283,6 @@ bool SchematicEditorState_AddText::abortCommand(bool showErrMsgBox) noexcept {
       QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     }
     return false;
-  }
-}
-
-void SchematicEditorState_AddText::layerComboBoxLayerChanged(
-    const Layer& layer) noexcept {
-  mLastTextProperties.setLayer(layer);
-  if (mCurrentTextEditCmd) {
-    mCurrentTextEditCmd->setLayer(mLastTextProperties.getLayer(), true);
-  }
-}
-
-void SchematicEditorState_AddText::textComboBoxValueChanged(
-    const QString& value) noexcept {
-  mLastTextProperties.setText(value.trimmed());
-  if (mCurrentTextEditCmd) {
-    mCurrentTextEditCmd->setText(mLastTextProperties.getText(), true);
-  }
-}
-
-void SchematicEditorState_AddText::heightEditValueChanged(
-    const PositiveLength& value) noexcept {
-  mLastTextProperties.setHeight(value);
-  if (mCurrentTextEditCmd) {
-    mCurrentTextEditCmd->setHeight(mLastTextProperties.getHeight(), true);
   }
 }
 

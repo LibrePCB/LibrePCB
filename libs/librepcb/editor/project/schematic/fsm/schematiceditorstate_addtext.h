@@ -28,7 +28,6 @@
 #include <librepcb/core/geometry/text.h>
 
 #include <QtCore>
-#include <QtWidgets>
 
 #include <memory>
 
@@ -82,9 +81,30 @@ public:
       const GraphicsSceneMouseEvent& e) noexcept override;
   virtual bool processSwitchToSchematicPage(int index) noexcept override;
 
+  // Connection to UI
+  QSet<const Layer*> getAvailableLayers() const noexcept;
+  const Layer& getLayer() const noexcept {
+    return mCurrentProperties.getLayer();
+  }
+  void setLayer(const Layer& layer) noexcept;
+  const PositiveLength& getHeight() const noexcept {
+    return mCurrentProperties.getHeight();
+  }
+  void setHeight(const PositiveLength& height) noexcept;
+  const QString& getText() const noexcept {
+    return mCurrentProperties.getText();
+  }
+  QStringList getTextSuggestions() const noexcept;
+  void setText(const QString& text) noexcept;
+
   // Operator Overloadings
   SchematicEditorState_AddText& operator=(
       const SchematicEditorState_AddText& rhs) = delete;
+
+signals:
+  void layerChanged(const Layer& layer);
+  void heightChanged(const PositiveLength& height);
+  void textChanged(const QString& text);
 
 private:  // Methods
   bool addText(const Point& pos) noexcept;
@@ -99,7 +119,9 @@ private:  // Methods
 private:  // Data
   // State
   bool mIsUndoCmdActive;
-  Text mLastTextProperties;
+
+  // Current tool settings
+  Text mCurrentProperties;
 
   // Information about the current text to place. Only valid if
   // mIsUndoCmdActive == true.

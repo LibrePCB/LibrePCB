@@ -30,17 +30,14 @@
 #include "../../../undostack.h"
 #include "../../../utils/editortoolbox.h"
 #include "../../../utils/menubuilder.h"
-#include "../../../widgets/graphicsview.h"
 #include "../../cmd/cmddragselectedschematicitems.h"
 #include "../../cmd/cmdpasteschematicitems.h"
 #include "../../cmd/cmdremoveselectedschematicitems.h"
-#include "../../projecteditor.h"
 #include "../graphicsitems/sgi_netlabel.h"
 #include "../graphicsitems/sgi_symbol.h"
 #include "../graphicsitems/sgi_text.h"
 #include "../renamenetsegmentdialog.h"
 #include "../schematicclipboarddatabuilder.h"
-#include "../schematiceditor.h"
 #include "../schematicgraphicsscene.h"
 #include "../schematicselectionquery.h"
 #include "../symbolinstancepropertiesdialog.h"
@@ -84,6 +81,7 @@ SchematicEditorState_Select::~SchematicEditorState_Select() noexcept {
 
 bool SchematicEditorState_Select::entry() noexcept {
   Q_ASSERT(mSubState == SubState::IDLE);
+  mAdapter.fsmToolEnter(*this);
   return true;
 }
 
@@ -106,6 +104,7 @@ bool SchematicEditorState_Select::exit() noexcept {
     scene->clearSelection();
   }
 
+  mAdapter.fsmToolLeave();
   return true;
 }
 
@@ -277,7 +276,7 @@ bool SchematicEditorState_Select::processAbortCommand() noexcept {
         break;
       }
     }
-  } catch (Exception& e) {
+  } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
   return false;
@@ -539,9 +538,9 @@ bool SchematicEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
     mb.addAction(cmd.deviceResetTextAll.createAction(
         &menu, this,
         &SchematicEditorState_Select::resetAllTextsOfSelectedItems));
-    EditorToolbox::addResourcesToMenu(mContext.workspace, mb,
-                                      sym->getSymbol().getComponentInstance(),
-                                      std::nullopt, &mContext.editor, menu);
+    EditorToolbox::addResourcesToMenu(
+        mContext.workspace, mb, sym->getSymbol().getComponentInstance(),
+        std::nullopt, &mContext.parentWidget, menu);
   } else if (auto item =
                  std::dynamic_pointer_cast<SGI_NetLabel>(selectedItem)) {
     mb.addAction(
@@ -839,12 +838,11 @@ bool SchematicEditorState_Select::copySelectedItemsToClipboard() noexcept {
   if (!scene) return false;
 
   try {
-    const Point cursorPos =
-        mContext.editorGraphicsView.mapGlobalPosToScenePos(QCursor::pos());
+    const Point cursorPos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos());
     SchematicClipboardDataBuilder builder(*scene);
     std::unique_ptr<SchematicClipboardData> data = builder.generate(cursorPos);
     qApp->clipboard()->setMimeData(data->toMimeData().release());
-    emit statusBarMessageChanged(tr("Copied to clipboard!"), 2000);
+    mAdapter.fsmSetStatusBarMessage(tr("Copied to clipboard!"), 2000);
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
@@ -865,8 +863,7 @@ bool SchematicEditorState_Select::pasteFromClipboard() noexcept {
     }
 
     // update cursor position
-    mStartPos =
-        mContext.editorGraphicsView.mapGlobalPosToScenePos(QCursor::pos());
+    mStartPos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos());
 
     // start undo command group
     scene->clearSelection();

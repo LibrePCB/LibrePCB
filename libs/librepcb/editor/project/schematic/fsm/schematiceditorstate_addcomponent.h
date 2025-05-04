@@ -30,7 +30,6 @@
 #include <librepcb/core/types/uuid.h>
 
 #include <QtCore>
-#include <QtWidgets>
 
 #include <memory>
 #include <optional>
@@ -47,7 +46,6 @@ class SI_Symbol;
 namespace editor {
 
 class AddComponentDialog;
-class AttributeUnitComboBox;
 class CmdSymbolInstanceEditAll;
 
 /*******************************************************************************
@@ -89,9 +87,43 @@ public:
   virtual bool processGraphicsSceneRightMouseButtonReleased(
       const GraphicsSceneMouseEvent& e) noexcept override;
 
+  // Connection to UI
+  const QString& getValue() const noexcept { return mCurrentValue; }
+  void setValue(const QString& value) noexcept;
+  const QStringList& getValueSuggestions() const noexcept {
+    return mCurrentValueSuggestions;
+  }
+  std::optional<AttributeKey> getValueAttributeKey() const noexcept {
+    return mCurrentValueAttribute
+        ? std::make_optional(mCurrentValueAttribute->getKey())
+        : std::nullopt;
+  }
+  const AttributeType* getValueAttributeType() const noexcept {
+    return mCurrentValueAttribute ? &mCurrentValueAttribute->getType()
+                                  : nullptr;
+  }
+  std::optional<QString> getValueAttributeValue() const noexcept {
+    return mCurrentValueAttribute
+        ? std::make_optional(mCurrentValueAttribute->getValue())
+        : std::nullopt;
+  }
+  void setValueAttributeValue(const QString& value) noexcept;
+  const AttributeUnit* getValueAttributeUnit() const noexcept {
+    return mCurrentValueAttribute ? mCurrentValueAttribute->getUnit() : nullptr;
+  }
+  void setValueAttributeUnit(const AttributeUnit* unit) noexcept;
+
   // Operator Overloadings
   SchematicEditorState_AddComponent& operator=(
       const SchematicEditorState_AddComponent& rhs) = delete;
+
+signals:
+  void valueChanged(const QString& value);
+  void valueSuggestionsChanged(const QStringList& suggestions);
+  void valueAttributeKeyChanged(const std::optional<AttributeKey>& key);
+  void valueAttributeTypeChanged(const AttributeType* type);
+  void valueAttributeValueChanged(const std::optional<QString>& value);
+  void valueAttributeUnitChanged(const AttributeUnit* unit);
 
 private:  // Methods
   void startAddingComponent(
@@ -101,33 +133,25 @@ private:  // Methods
           std::nullopt,
       const QString& searchTerm = QString(), bool keepValue = false);
   bool abortCommand(bool showErrMsgBox) noexcept;
-  std::shared_ptr<const Attribute> getToolbarAttribute() const noexcept;
-  void valueChanged(QString text) noexcept;
-  void attributeChanged() noexcept;
-  void updateValueToolbar() noexcept;
-  void updateAttributeToolbar() noexcept;
-  static QString toSingleLine(const QString& text) noexcept;
-  static QString toMultiLine(const QString& text) noexcept;
+  void applyValueAndAttributeToComponent() noexcept;
 
 private:  // Data
   bool mIsUndoCmdActive;
   bool mUseAddComponentDialog;
   QScopedPointer<AddComponentDialog> mAddComponentDialog;
-  Angle mLastAngle;
-  bool mLastMirrored;
 
-  // information about the current component/symbol to place
+  // Current tool settings
+  Angle mCurrentAngle;
+  bool mCurrentMirrored;
+  QString mCurrentValue;
+  QStringList mCurrentValueSuggestions;
+  std::optional<Attribute> mCurrentValueAttribute;
+
+  // Information about the current component/symbol to place
   ComponentInstance* mCurrentComponent;
   int mCurrentSymbVarItemIndex;
   SI_Symbol* mCurrentSymbolToPlace;
   CmdSymbolInstanceEditAll* mCurrentSymbolEditCommand;
-
-  // Widgets for the command toolbar
-  QPointer<QComboBox> mValueComboBox;
-  QPointer<QLineEdit> mAttributeValueEdit;
-  QPointer<QAction> mAttributeValueEditAction;
-  QPointer<AttributeUnitComboBox> mAttributeUnitComboBox;
-  QPointer<QAction> mAttributeUnitComboBoxAction;
 };
 
 /*******************************************************************************

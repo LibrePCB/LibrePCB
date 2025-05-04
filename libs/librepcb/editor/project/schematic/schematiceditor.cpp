@@ -37,19 +37,29 @@
 #include "../../utils/standardeditorcommandhandler.h"
 #include "../../utils/toolbarproxy.h"
 #include "../../utils/undostackactiongroup.h"
+#include "../../widgets/attributeunitcombobox.h"
+#include "../../widgets/layercombobox.h"
+#include "../../widgets/positivelengthedit.h"
 #include "../../widgets/rulecheckdock.h"
 #include "../../widgets/searchtoolbar.h"
+#include "../../widgets/unsignedlengthedit.h"
 #include "../../workspace/desktopservices.h"
 #include "../bomgeneratordialog.h"
 #include "../outputjobsdialog/outputjobsdialog.h"
 #include "../projecteditor.h"
 #include "../projectsetupdialog.h"
 #include "fsm/schematiceditorfsm.h"
+#include "fsm/schematiceditorstate_addcomponent.h"
+#include "fsm/schematiceditorstate_addtext.h"
+#include "fsm/schematiceditorstate_drawpolygon.h"
+#include "fsm/schematiceditorstate_drawwire.h"
 #include "graphicsitems/sgi_symbol.h"
 #include "schematicgraphicsscene.h"
 #include "schematicpagesdock.h"
+#include "ui_schematiceditor.h"
 
 #include <librepcb/core/application.h>
+#include <librepcb/core/attribute/attributeunit.h>
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/project.h>
@@ -127,22 +137,14 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
   setWindowTitle(tr("%1 - LibrePCB Schematic Editor").arg(filenameStr));
 
   // Build the whole schematic editor finite state machine.
-  SchematicEditorFsm::Context fsmContext{mProjectEditor.getWorkspace(),
-                                         mProject,
-                                         mProjectEditor,
-                                         *this,
-                                         *mUi->graphicsView,
-                                         *mCommandToolBarProxy,
-                                         mProjectEditor.getUndoStack()};
+  SchematicEditorFsm::Context fsmContext{
+      mProjectEditor.getWorkspace(),
+      mProject,
+      mProjectEditor.getUndoStack(),
+      *this,
+      *this,
+  };
   mFsm.reset(new SchematicEditorFsm(fsmContext));
-  connect(mFsm.data(), &SchematicEditorFsm::statusBarMessageChanged, this,
-          [this](const QString& message, int timeoutMs) {
-            if (timeoutMs < 0) {
-              mUi->statusbar->setPermanentMessage(message);
-            } else {
-              mUi->statusbar->showMessage(message, timeoutMs);
-            }
-          });
 
   // Create all actions, window menus, toolbars and dock widgets.
   createActions();
@@ -214,6 +216,9 @@ SchematicEditor::~SchematicEditor() {
   clientSettings.setValue("schematic_editor/window_state_v2", saveState());
   clientSettings.setValue("schematic_editor/show_pin_numbers",
                           mActionShowPinNumbers->isChecked());
+
+  // Delete FSM as it may trigger some other methods during destruction.
+  mFsm.reset();
 
   // Important: Release command toolbar proxy since otherwise the actions will
   // be deleted first.
@@ -319,6 +324,377 @@ void SchematicEditor::abortAllCommands() noexcept {
 
 void SchematicEditor::abortBlockingToolsInOtherEditors() noexcept {
   mProjectEditor.abortBlockingToolsInOtherEditors(this);
+}
+
+/*******************************************************************************
+ *  SchematicEditorFsmAdapter Methods
+ ******************************************************************************/
+
+Schematic* SchematicEditor::fsmGetActiveSchematic() noexcept {
+  return getActiveSchematic();
+}
+
+SchematicGraphicsScene* SchematicEditor::fsmGetGraphicsScene() noexcept {
+  return qobject_cast<SchematicGraphicsScene*>(mUi->graphicsView->getScene());
+}
+
+void SchematicEditor::fsmSetViewCursor(
+    const std::optional<Qt::CursorShape>& shape) noexcept {
+  if (shape) {
+    mUi->graphicsView->setCursor(*shape);
+  } else {
+    mUi->graphicsView->unsetCursor();
+  }
+}
+
+void SchematicEditor::fsmSetViewGrayOut(bool grayOut) noexcept {
+  if (mGraphicsScene) {
+    mGraphicsScene->setGrayOut(grayOut);
+  }
+}
+
+void SchematicEditor::fsmSetViewInfoBoxText(const QString& text) noexcept {
+  mUi->graphicsView->setInfoBoxText(text);
+}
+
+void SchematicEditor::fsmSetViewRuler(
+    const std::optional<std::pair<Point, Point>>& pos) noexcept {
+  if (mGraphicsScene) {
+    mGraphicsScene->setRulerPositions(pos);
+  }
+}
+
+void SchematicEditor::fsmSetSceneCursor(const Point& pos, bool cross,
+                                        bool circle) noexcept {
+  if (mGraphicsScene) {
+    mGraphicsScene->setSceneCursor(pos, cross, circle);
+  }
+}
+
+QPainterPath SchematicEditor::fsmCalcPosWithTolerance(
+    const Point& pos, qreal multiplier) const noexcept {
+  return mUi->graphicsView->calcPosWithTolerance(pos, multiplier);
+}
+
+Point SchematicEditor::fsmMapGlobalPosToScenePos(
+    const QPoint& pos) const noexcept {
+  return mUi->graphicsView->mapGlobalPosToScenePos(pos);
+}
+
+void SchematicEditor::fsmZoomToSceneRect(const QRectF& r) noexcept {
+  mUi->graphicsView->zoomToRect(r);
+}
+
+void SchematicEditor::fsmSetHighlightedNetSignals(
+    const QSet<const NetSignal*>& sigs) noexcept {
+  mProjectEditor.setHighlightedNetSignals(sigs);
+}
+
+void SchematicEditor::fsmAbortBlockingToolsInOtherEditors() noexcept {
+  abortBlockingToolsInOtherEditors();
+}
+
+void SchematicEditor::fsmSetStatusBarMessage(const QString& message,
+                                             int timeoutMs) noexcept {
+  if (timeoutMs < 0) {
+    mUi->statusbar->setPermanentMessage(message);
+  } else {
+    mUi->statusbar->showMessage(message, timeoutMs);
+  }
+}
+
+void SchematicEditor::fsmToolLeave() noexcept {
+  mCommandToolBarProxy->clear();
+  mToolsActionGroup->setCurrentAction(SchematicEditorFsm::State::IDLE);
+}
+
+void SchematicEditor::fsmToolEnter(
+    SchematicEditorState_Select& state) noexcept {
+  Q_UNUSED(state);
+  if (mToolsActionGroup) {
+    mToolsActionGroup->setCurrentAction(SchematicEditorFsm::State::SELECT);
+  }
+}
+
+void SchematicEditor::fsmToolEnter(
+    SchematicEditorState_DrawWire& state) noexcept {
+  mToolsActionGroup->setCurrentAction(SchematicEditorFsm::State::DRAW_WIRE);
+
+  EditorCommandSet& cmd = EditorCommandSet::instance();
+
+  // Add wire mode actions to the "command" toolbar
+  std::unique_ptr<QActionGroup> wireModeActionGroup(
+      new QActionGroup(mCommandToolBarProxy.get()));
+  QAction* aWireModeHV = cmd.wireModeHV.createAction(
+      wireModeActionGroup.get(), &state, [&state]() {
+        state.setWireMode(SchematicEditorState_DrawWire::WireMode::HV);
+      });
+  aWireModeHV->setCheckable(true);
+  aWireModeHV->setActionGroup(wireModeActionGroup.get());
+  QAction* aWireModeVH = cmd.wireModeVH.createAction(
+      wireModeActionGroup.get(), &state, [&state]() {
+        state.setWireMode(SchematicEditorState_DrawWire::WireMode::VH);
+      });
+  aWireModeVH->setCheckable(true);
+  aWireModeVH->setActionGroup(wireModeActionGroup.get());
+  QAction* aWireMode9045 = cmd.wireMode9045.createAction(
+      wireModeActionGroup.get(), &state, [&state]() {
+        state.setWireMode(SchematicEditorState_DrawWire::WireMode::Deg9045);
+      });
+  aWireMode9045->setCheckable(true);
+  aWireMode9045->setActionGroup(wireModeActionGroup.get());
+  QAction* aWireMode4590 = cmd.wireMode4590.createAction(
+      wireModeActionGroup.get(), &state, [&state]() {
+        state.setWireMode(SchematicEditorState_DrawWire::WireMode::Deg4590);
+      });
+  aWireMode4590->setCheckable(true);
+  aWireMode4590->setActionGroup(wireModeActionGroup.get());
+  QAction* aWireModeStraight = cmd.wireModeStraight.createAction(
+      wireModeActionGroup.get(), &state, [&state]() {
+        state.setWireMode(SchematicEditorState_DrawWire::WireMode::Straight);
+      });
+  aWireModeStraight->setCheckable(true);
+  aWireModeStraight->setActionGroup(wireModeActionGroup.get());
+  QHash<SchematicEditorState_DrawWire::WireMode, QPointer<QAction>>
+      wireModeActions = {
+          {SchematicEditorState_DrawWire::WireMode::HV, aWireModeHV},
+          {SchematicEditorState_DrawWire::WireMode::VH, aWireModeVH},
+          {SchematicEditorState_DrawWire::WireMode::Deg9045, aWireMode9045},
+          {SchematicEditorState_DrawWire::WireMode::Deg4590, aWireMode4590},
+          {SchematicEditorState_DrawWire::WireMode::Straight,
+           aWireModeStraight},
+      };
+  auto setWireMode =
+      [wireModeActions](SchematicEditorState_DrawWire::WireMode wm) {
+        if (auto a = wireModeActions.value(wm)) {
+          a->setChecked(true);
+        }
+      };
+  setWireMode(state.getWireMode());
+  connect(&state, &SchematicEditorState_DrawWire::wireModeChanged,
+          wireModeActionGroup.get(), setWireMode);
+  mCommandToolBarProxy->addActionGroup(std::move(wireModeActionGroup));
+}
+
+void SchematicEditor::fsmToolEnter(
+    SchematicEditorState_AddNetLabel& state) noexcept {
+  Q_UNUSED(state);
+  mToolsActionGroup->setCurrentAction(SchematicEditorFsm::State::ADD_NETLABEL);
+}
+
+void SchematicEditor::fsmToolEnter(
+    SchematicEditorState_AddComponent& state) noexcept {
+  mToolsActionGroup->setCurrentAction(SchematicEditorFsm::State::ADD_COMPONENT);
+
+  auto toSingleLine = [](const QString& s) {
+    return QString(s).replace("\n", "\\n");
+  };
+  auto toMultiLine = [](const QString& s) {
+    return s.trimmed().replace("\\n", "\n");
+  };
+
+  // Component value.
+  mCommandToolBarProxy->addLabel(tr("Value:"), 10);
+  std::unique_ptr<QComboBox> cbxValue(new QComboBox());
+  QPointer<QComboBox> cbxValuePtr = cbxValue.get();
+  cbxValue->setEditable(true);
+  cbxValue->setFixedHeight(QLineEdit().sizeHint().height());
+  cbxValue->setMinimumWidth(200);
+  cbxValue->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+  auto setValue = [cbxValuePtr, toSingleLine](const QString& value) {
+    if (cbxValuePtr) {
+      cbxValuePtr->setCurrentText(toSingleLine(value));
+    }
+  };
+  setValue(state.getValue());
+  connect(&state, &SchematicEditorState_AddComponent::valueChanged,
+          cbxValue.get(), setValue);
+  connect(cbxValue.get(), &QComboBox::currentTextChanged, &state,
+          [&state, toMultiLine](const QString& text) {
+            state.setValue(toMultiLine(text));
+          });
+  auto setValueSuggestions = [cbxValuePtr](const QStringList& suggestions) {
+    if (cbxValuePtr) {
+      QSignalBlocker block(cbxValuePtr);
+      const QString text = cbxValuePtr->currentText();
+      cbxValuePtr->clear();
+      cbxValuePtr->addItems(suggestions);
+      cbxValuePtr->setCurrentText(text);
+    }
+  };
+  setValueSuggestions(state.getValueSuggestions());
+  connect(&state, &SchematicEditorState_AddComponent::valueSuggestionsChanged,
+          cbxValue.get(), setValueSuggestions);
+  // Make sure the start of the value is visible, even if the value is long.
+  cbxValue->lineEdit()->setCursorPosition(0);
+  mCommandToolBarProxy->addWidget(std::move(cbxValue));
+
+  // Attribute value.
+  std::unique_ptr<QLineEdit> edtAttributeValue(new QLineEdit());
+  QPointer<QLineEdit> edtAttributeValuePtr = edtAttributeValue.get();
+  edtAttributeValue->setClearButtonEnabled(true);
+  edtAttributeValue->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+  QPointer<QAction> aAttributeValue =
+      mCommandToolBarProxy->addWidget(std::move(edtAttributeValue));
+  auto setAttributeKey =
+      [edtAttributeValuePtr](const std::optional<AttributeKey>& key) {
+        if (edtAttributeValuePtr) {
+          edtAttributeValuePtr->setPlaceholderText(key ? **key : QString());
+        }
+      };
+  setAttributeKey(state.getValueAttributeKey());
+  connect(&state, &SchematicEditorState_AddComponent::valueAttributeKeyChanged,
+          aAttributeValue, setAttributeKey);
+  auto setAttributeValue = [edtAttributeValuePtr, aAttributeValue,
+                            toSingleLine](const std::optional<QString>& value) {
+    if (edtAttributeValuePtr && value) {
+      edtAttributeValuePtr->setText(toSingleLine(*value));
+    }
+    if (aAttributeValue) {
+      aAttributeValue->setVisible(value.has_value());
+    }
+  };
+  setAttributeValue(state.getValueAttributeValue());
+  connect(&state,
+          &SchematicEditorState_AddComponent::valueAttributeValueChanged,
+          aAttributeValue, setAttributeValue);
+  connect(edtAttributeValuePtr, &QLineEdit::textEdited, &state,
+          [&state, toMultiLine](const QString& text) {
+            if (const AttributeType* type = state.getValueAttributeType()) {
+              QString value = toMultiLine(text);
+              if (const AttributeUnit* unit =
+                      type->tryExtractUnitFromValue(value)) {
+                state.setValueAttributeUnit(unit);
+              }
+              state.setValueAttributeValue(value);
+            }
+          });
+
+  // Attribute unit.
+  std::unique_ptr<AttributeUnitComboBox> cbxAttributeUnit(
+      new AttributeUnitComboBox());
+  QPointer<AttributeUnitComboBox> cbxAttributeUnitPtr = cbxAttributeUnit.get();
+  cbxAttributeUnit->setFixedHeight(QLineEdit().sizeHint().height());
+  QPointer<QAction> aAttributeUnit =
+      mCommandToolBarProxy->addWidget(std::move(cbxAttributeUnit));
+  auto setAttributeType = [cbxAttributeUnitPtr, aAttributeUnit,
+                           edtAttributeValuePtr](const AttributeType* type) {
+    if (cbxAttributeUnitPtr && type) {
+      cbxAttributeUnitPtr->setAttributeType(*type);
+    }
+    const bool hasUnits = type && (!type->getAvailableUnits().isEmpty());
+    if (aAttributeUnit) {
+      aAttributeUnit->setVisible(hasUnits);
+    }
+    if (edtAttributeValuePtr) {
+      edtAttributeValuePtr->setMinimumWidth(hasUnits ? 50 : 200);
+    }
+  };
+  setAttributeType(state.getValueAttributeType());
+  connect(&state, &SchematicEditorState_AddComponent::valueAttributeTypeChanged,
+          aAttributeUnit, setAttributeType);
+  auto setAttributeUnit = [cbxAttributeUnitPtr](const AttributeUnit* unit) {
+    if (cbxAttributeUnitPtr) {
+      cbxAttributeUnitPtr->setCurrentItem(unit);
+    }
+  };
+  setAttributeUnit(state.getValueAttributeUnit());
+  connect(&state, &SchematicEditorState_AddComponent::valueAttributeUnitChanged,
+          aAttributeUnit, setAttributeUnit);
+  connect(cbxAttributeUnitPtr, &AttributeUnitComboBox::currentItemChanged,
+          &state, &SchematicEditorState_AddComponent::setValueAttributeUnit);
+}
+
+void SchematicEditor::fsmToolEnter(
+    SchematicEditorState_DrawPolygon& state) noexcept {
+  mToolsActionGroup->setCurrentAction(SchematicEditorFsm::State::DRAW_POLYGON);
+
+  EditorCommandSet& cmd = EditorCommandSet::instance();
+
+  // Add the layers combobox to the toolbar
+  mCommandToolBarProxy->addLabel(tr("Layer:"), 10);
+  std::unique_ptr<LayerComboBox> layerComboBox(new LayerComboBox());
+  layerComboBox->setLayers(state.getAvailableLayers());
+  layerComboBox->setCurrentLayer(state.getLayer());
+  layerComboBox->addAction(cmd.layerUp.createAction(
+      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepDown));
+  layerComboBox->addAction(cmd.layerDown.createAction(
+      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepUp));
+  connect(layerComboBox.get(), &LayerComboBox::currentLayerChanged, &state,
+          &SchematicEditorState_DrawPolygon::setLayer);
+  mCommandToolBarProxy->addWidget(std::move(layerComboBox));
+
+  // Add the width edit to the toolbar
+  mCommandToolBarProxy->addLabel(tr("Width:"), 10);
+  std::unique_ptr<UnsignedLengthEdit> widthEdit(new UnsignedLengthEdit());
+  widthEdit->setValue(state.getLineWidth());
+  widthEdit->addAction(cmd.lineWidthIncrease.createAction(
+      widthEdit.get(), widthEdit.get(), &UnsignedLengthEdit::stepUp));
+  widthEdit->addAction(cmd.lineWidthDecrease.createAction(
+      widthEdit.get(), widthEdit.get(), &UnsignedLengthEdit::stepDown));
+  connect(widthEdit.get(), &UnsignedLengthEdit::valueChanged, &state,
+          &SchematicEditorState_DrawPolygon::setLineWidth);
+  mCommandToolBarProxy->addWidget(std::move(widthEdit));
+
+  // Add the filled checkbox to the toolbar
+  mCommandToolBarProxy->addLabel(tr("Filled:"), 10);
+  std::unique_ptr<QCheckBox> fillCheckBox(new QCheckBox());
+  fillCheckBox->setChecked(state.getFilled());
+  fillCheckBox->addAction(cmd.fillToggle.createAction(
+      fillCheckBox.get(), fillCheckBox.get(), &QCheckBox::toggle));
+  connect(fillCheckBox.get(), &QCheckBox::toggled, &state,
+          &SchematicEditorState_DrawPolygon::setFilled);
+  mCommandToolBarProxy->addWidget(std::move(fillCheckBox));
+}
+
+void SchematicEditor::fsmToolEnter(
+    SchematicEditorState_AddText& state) noexcept {
+  mToolsActionGroup->setCurrentAction(SchematicEditorFsm::State::ADD_TEXT);
+
+  EditorCommandSet& cmd = EditorCommandSet::instance();
+
+  // Add the layers combobox to the toolbar
+  mCommandToolBarProxy->addLabel(tr("Layer:"), 10);
+  std::unique_ptr<LayerComboBox> layerComboBox(new LayerComboBox());
+  layerComboBox->setLayers(state.getAvailableLayers());
+  layerComboBox->setCurrentLayer(state.getLayer());
+  layerComboBox->addAction(cmd.layerUp.createAction(
+      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepDown));
+  layerComboBox->addAction(cmd.layerDown.createAction(
+      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepUp));
+  connect(layerComboBox.get(), &LayerComboBox::currentLayerChanged, &state,
+          &SchematicEditorState_AddText::setLayer);
+  mCommandToolBarProxy->addWidget(std::move(layerComboBox));
+
+  // Add the text combobox to the toolbar
+  mCommandToolBarProxy->addLabel(tr("Text:"), 10);
+  std::unique_ptr<QComboBox> textComboBox(new QComboBox());
+  textComboBox->setEditable(true);
+  textComboBox->setMinimumContentsLength(20);
+  textComboBox->addItems(state.getTextSuggestions());
+  textComboBox->setCurrentIndex(textComboBox->findText(state.getText()));
+  textComboBox->setCurrentText(state.getText());
+  connect(textComboBox.get(), &QComboBox::currentTextChanged, &state,
+          &SchematicEditorState_AddText::setText);
+  mCommandToolBarProxy->addWidget(std::move(textComboBox));
+
+  // Add the height spinbox to the toolbar
+  mCommandToolBarProxy->addLabel(tr("Height:"), 10);
+  std::unique_ptr<PositiveLengthEdit> heightEdit(new PositiveLengthEdit());
+  heightEdit->setValue(state.getHeight());
+  heightEdit->addAction(cmd.sizeIncrease.createAction(
+      heightEdit.get(), heightEdit.get(), &PositiveLengthEdit::stepUp));
+  heightEdit->addAction(cmd.sizeDecrease.createAction(
+      heightEdit.get(), heightEdit.get(), &PositiveLengthEdit::stepDown));
+  connect(heightEdit.get(), &PositiveLengthEdit::valueChanged, &state,
+          &SchematicEditorState_AddText::setHeight);
+  mCommandToolBarProxy->addWidget(std::move(heightEdit));
+}
+
+void SchematicEditor::fsmToolEnter(
+    SchematicEditorState_Measure& state) noexcept {
+  Q_UNUSED(state);
+  mToolsActionGroup->setCurrentAction(SchematicEditorFsm::State::MEASURE);
 }
 
 /*******************************************************************************
@@ -635,9 +1011,7 @@ void SchematicEditor::createActions() noexcept {
                                SchematicEditorFsm::State::ADD_COMPONENT);
   mToolsActionGroup->addAction(mActionToolMeasure.data(),
                                SchematicEditorFsm::State::MEASURE);
-  mToolsActionGroup->setCurrentAction(mFsm->getCurrentState());
-  connect(mFsm.data(), &SchematicEditorFsm::stateChanged,
-          mToolsActionGroup.data(), &ExclusiveActionGroup::setCurrentAction);
+  mToolsActionGroup->setCurrentAction(SchematicEditorFsm::State::SELECT);
   connect(mToolsActionGroup.data(), &ExclusiveActionGroup::actionTriggered,
           this, &SchematicEditor::toolRequested);
 }
@@ -926,8 +1300,8 @@ bool SchematicEditor::graphicsSceneRightMouseButtonReleased(
 }
 
 void SchematicEditor::toolRequested(const QVariant& newTool) noexcept {
-  // Note: Converting the QVariant to SchematicEditorFsm::State doesn't work
-  // with some Qt versions, thus we convert to int instead. Fixed in:
+  // Note: Converting the QVariant to SchematicEditorFsmAdapter::Tool doesn't
+  // work with some Qt versions, thus we convert to int instead. Fixed in:
   // https://codereview.qt-project.org/c/qt/qtbase/+/159277/
   switch (newTool.value<int>()) {
     case SchematicEditorFsm::State::SELECT:
@@ -953,7 +1327,7 @@ void SchematicEditor::toolRequested(const QVariant& newTool) noexcept {
       break;
     default:
       qCritical() << "Unhandled switch-case in "
-                     "SchematicEditor::toolActionGroupChangeTriggered():"
+                     "SchematicEditor::toolRequested():"
                   << newTool;
       break;
   }

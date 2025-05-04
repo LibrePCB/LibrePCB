@@ -25,11 +25,11 @@
  ******************************************************************************/
 #include "../../../graphics/graphicsscene.h"
 #include "schematiceditorfsm.h"
+#include "schematiceditorfsmadapter.h"
 
 #include <librepcb/core/types/length.h>
 
 #include <QtCore>
-#include <QtWidgets>
 
 #include <memory>
 
@@ -177,7 +177,6 @@ signals:
    * the current state and entering the select tool.
    */
   void requestLeavingState();
-  void statusBarMessageChanged(const QString& message, int timeoutMs = -1);
 
 protected:  // Methods
   Schematic* getActiveSchematic() noexcept;
@@ -208,6 +207,7 @@ protected:  // Methods
 
 protected:  // Data
   Context mContext;
+  SchematicEditorFsmAdapter& mAdapter;
 };
 
 }  // namespace editor

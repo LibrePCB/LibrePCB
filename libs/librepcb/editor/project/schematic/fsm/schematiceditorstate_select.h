@@ -28,7 +28,6 @@
 #include <librepcb/core/types/point.h>
 
 #include <QtCore>
-#include <QtWidgets>
 
 #include <memory>
 

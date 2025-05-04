@@ -23,14 +23,10 @@
 #include "schematiceditorstate_addcomponent.h"
 
 #include "../../../undostack.h"
-#include "../../../utils/toolbarproxy.h"
-#include "../../../widgets/attributeunitcombobox.h"
-#include "../../../widgets/graphicsview.h"
 #include "../../addcomponentdialog.h"
 #include "../../cmd/cmdaddcomponenttocircuit.h"
 #include "../../cmd/cmdaddsymboltoschematic.h"
 #include "../../cmd/cmdsymbolinstanceeditall.h"
-#include "../schematiceditor.h"
 #include "../schematicgraphicsscene.h"
 
 #include <librepcb/core/attribute/attributetype.h>
@@ -66,18 +62,15 @@ SchematicEditorState_AddComponent::SchematicEditorState_AddComponent(
     mIsUndoCmdActive(false),
     mUseAddComponentDialog(true),
     mAddComponentDialog(nullptr),
-    mLastAngle(0),
-    mLastMirrored(false),
+    mCurrentAngle(0),
+    mCurrentMirrored(false),
+    mCurrentValue(),
+    mCurrentValueSuggestions(),
+    mCurrentValueAttribute(),
     mCurrentComponent(nullptr),
     mCurrentSymbVarItemIndex(-1),
     mCurrentSymbolToPlace(nullptr),
-    mCurrentSymbolEditCommand(nullptr),
-    // command toolbar actions / widgets:
-    mValueComboBox(nullptr),
-    mAttributeValueEdit(nullptr),
-    mAttributeValueEditAction(nullptr),
-    mAttributeUnitComboBox(nullptr),
-    mAttributeUnitComboBoxAction(nullptr) {
+    mCurrentSymbolEditCommand(nullptr) {
 }
 
 SchematicEditorState_AddComponent::
@@ -90,43 +83,13 @@ SchematicEditorState_AddComponent::
 
 bool SchematicEditorState_AddComponent::entry() noexcept {
   Q_ASSERT(mIsUndoCmdActive == false);
-  mLastAngle.setAngleMicroDeg(0);
-  mLastMirrored = false;
 
-  // add the value text edit to the toolbar
-  mContext.commandToolBar.addLabel(tr("Value:"), 10);
-  mValueComboBox = new QComboBox();
-  mValueComboBox->setEditable(true);
-  mValueComboBox->setFixedHeight(QLineEdit().sizeHint().height());
-  mValueComboBox->setMinimumWidth(200);
-  mValueComboBox->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-  mContext.commandToolBar.addWidget(std::unique_ptr<QWidget>(mValueComboBox));
+  mCurrentAngle = Angle::deg0();
+  mCurrentMirrored = false;
+  setValue(QString());
 
-  // add the attribute text edit to the toolbar
-  mAttributeValueEdit = new QLineEdit();
-  mAttributeValueEdit->setClearButtonEnabled(true);
-  mAttributeValueEdit->setSizePolicy(QSizePolicy::Preferred,
-                                     QSizePolicy::Fixed);
-  mAttributeValueEditAction = mContext.commandToolBar.addWidget(
-      std::unique_ptr<QWidget>(mAttributeValueEdit));
-
-  // add the attribute unit combobox to the toolbar
-  mAttributeUnitComboBox = new AttributeUnitComboBox();
-  mAttributeUnitComboBox->setFixedHeight(QLineEdit().sizeHint().height());
-  mAttributeUnitComboBoxAction = mContext.commandToolBar.addWidget(
-      std::unique_ptr<QWidget>(mAttributeUnitComboBox));
-
-  // Update attribute toolbar widgets and start watching for modifications
-  updateValueToolbar();
-  updateAttributeToolbar();
-  connect(mValueComboBox, &QComboBox::currentTextChanged, this,
-          &SchematicEditorState_AddComponent::valueChanged);
-  connect(mAttributeValueEdit, &QLineEdit::textChanged, this,
-          &SchematicEditorState_AddComponent::attributeChanged);
-  connect(mAttributeUnitComboBox, &AttributeUnitComboBox::currentItemChanged,
-          this, &SchematicEditorState_AddComponent::attributeChanged);
-
-  mContext.editorGraphicsView.setCursor(Qt::CrossCursor);
+  mAdapter.fsmToolEnter(*this);
+  mAdapter.fsmSetViewCursor(Qt::CrossCursor);
   return true;
 }
 
@@ -135,10 +98,8 @@ bool SchematicEditorState_AddComponent::exit() noexcept {
   if (!abortCommand(true)) return false;
   Q_ASSERT(mIsUndoCmdActive == false);
 
-  // Remove actions / widgets from the "command" toolbar
-  mContext.commandToolBar.clear();
-
-  mContext.editorGraphicsView.unsetCursor();
+  mAdapter.fsmSetViewCursor(std::nullopt);
+  mAdapter.fsmToolLeave();
   return true;
 }
 
@@ -151,8 +112,9 @@ bool SchematicEditorState_AddComponent::processAddComponent(
   try {
     // start adding (another) component
     if (!abortCommand(true)) return false;
-    mLastAngle.setAngleMicroDeg(0);  // reset the angle
-    mLastMirrored = false;
+    mCurrentAngle = Angle::deg0();
+    mCurrentMirrored = false;
+    setValue(QString());
     mUseAddComponentDialog = true;
     startAddingComponent(std::nullopt, std::nullopt, std::nullopt, searchTerm);
     return true;
@@ -169,8 +131,9 @@ bool SchematicEditorState_AddComponent::processAddComponent(
   try {
     // start adding (another) component
     if (!abortCommand(true)) return false;
-    mLastAngle.setAngleMicroDeg(0);  // reset the angle
-    mLastMirrored = false;
+    mCurrentAngle = Angle::deg0();
+    mCurrentMirrored = false;
+    setValue(QString());
     mUseAddComponentDialog = false;
     startAddingComponent(cmp, symbVar, std::nullopt);
     return true;
@@ -187,7 +150,7 @@ bool SchematicEditorState_AddComponent::processRotate(
   if (mIsUndoCmdActive && mCurrentSymbolToPlace && mCurrentSymbolEditCommand) {
     mCurrentSymbolEditCommand->rotate(
         rotation, mCurrentSymbolToPlace->getPosition(), true);
-    mLastAngle = mCurrentSymbolToPlace->getRotation();
+    mCurrentAngle = mCurrentSymbolToPlace->getRotation();
     return true;
   }
 
@@ -199,8 +162,8 @@ bool SchematicEditorState_AddComponent::processMirror(
   if (mIsUndoCmdActive && mCurrentSymbolToPlace && mCurrentSymbolEditCommand) {
     mCurrentSymbolEditCommand->mirror(mCurrentSymbolToPlace->getPosition(),
                                       orientation, true);
-    mLastAngle = mCurrentSymbolToPlace->getRotation();
-    mLastMirrored = mCurrentSymbolToPlace->getMirrored();
+    mCurrentAngle = mCurrentSymbolToPlace->getRotation();
+    mCurrentMirrored = mCurrentSymbolToPlace->getMirrored();
     return true;
   }
 
@@ -214,8 +177,9 @@ bool SchematicEditorState_AddComponent::processAbortCommand() noexcept {
     }
     if (mUseAddComponentDialog && mAddComponentDialog &&
         mAddComponentDialog->getAutoOpenAgain()) {
-      mLastAngle.setAngleMicroDeg(0);  // reset the angle
-      mLastMirrored = false;
+      mCurrentAngle = Angle::deg0();
+      mCurrentMirrored = false;
+      setValue(QString());
       startAddingComponent();
       return true;
     }
@@ -283,8 +247,8 @@ bool SchematicEditorState_AddComponent::
       Q_ASSERT(mCurrentSymbolEditCommand == nullptr);
       mCurrentSymbolEditCommand =
           new CmdSymbolInstanceEditAll(*mCurrentSymbolToPlace);
-      mCurrentSymbolEditCommand->setRotation(mLastAngle, true);
-      mCurrentSymbolEditCommand->setMirrored(mLastMirrored, true);
+      mCurrentSymbolEditCommand->setRotation(mCurrentAngle, true);
+      mCurrentSymbolEditCommand->setMirrored(mCurrentMirrored, true);
     } else {
       // all symbols placed, start adding the next component
       Uuid componentUuid = mCurrentComponent->getLibComponent().getUuid();
@@ -322,7 +286,7 @@ bool SchematicEditorState_AddComponent::
   if (mIsUndoCmdActive && mCurrentSymbolEditCommand) {
     mCurrentSymbolEditCommand->rotate(
         Angle::deg90(), mCurrentSymbolToPlace->getPosition(), true);
-    mLastAngle = mCurrentSymbolToPlace->getRotation();
+    mCurrentAngle = mCurrentSymbolToPlace->getRotation();
 
     // Always accept the event if we are placing a symbol! When ignoring the
     // event, the state machine will abort the tool by a right click!
@@ -330,6 +294,85 @@ bool SchematicEditorState_AddComponent::
   }
 
   return false;
+}
+
+/*******************************************************************************
+ *  Connection to UI
+ ******************************************************************************/
+
+void SchematicEditorState_AddComponent::setValue(
+    const QString& value) noexcept {
+  if (mCurrentValue != value) {
+    mCurrentValue = value;
+    emit valueChanged(mCurrentValue);
+  }
+
+  QStringList suggestions;
+  if (mCurrentComponent) {
+    for (const Attribute& attribute : mCurrentComponent->getAttributes()) {
+      suggestions.append("{{" + *attribute.getKey() + "}}");
+    }
+  }
+  if (mCurrentValueSuggestions != suggestions) {
+    mCurrentValueSuggestions = suggestions;
+    emit valueSuggestionsChanged(mCurrentValueSuggestions);
+  }
+
+  const std::optional<AttributeKey> oldAttrKey = getValueAttributeKey();
+  const AttributeType* oldAttrType = getValueAttributeType();
+  const std::optional<QString> oldAttrValue = getValueAttributeValue();
+  const AttributeUnit* oldAttrUnit = getValueAttributeUnit();
+  mCurrentValueAttribute = std::nullopt;
+  if (mCurrentComponent) {
+    // Only take the first line into account to avoid the problem described at
+    // https://github.com/LibrePCB-Libraries/LibrePCB_Base.lplib/pull/138.
+    const QString value = mCurrentValue.split("\n").value(0);
+    const QString key = QString(value).remove("{{").remove("}}").trimmed();
+    auto attr = mCurrentComponent->getAttributes().find(key);
+    if (attr && value.startsWith("{{") && value.endsWith("}}")) {
+      mCurrentValueAttribute = *attr;
+    }
+  }
+  if (getValueAttributeKey() != oldAttrKey) {
+    emit valueAttributeKeyChanged(getValueAttributeKey());
+  }
+  if (getValueAttributeType() != oldAttrType) {
+    emit valueAttributeTypeChanged(getValueAttributeType());
+  }
+  if (getValueAttributeValue() != oldAttrValue) {
+    emit valueAttributeValueChanged(getValueAttributeValue());
+  }
+  if (getValueAttributeUnit() != oldAttrUnit) {
+    emit valueAttributeUnitChanged(getValueAttributeUnit());
+  }
+
+  applyValueAndAttributeToComponent();
+}
+
+void SchematicEditorState_AddComponent::setValueAttributeValue(
+    const QString& value) noexcept {
+  if (mCurrentValueAttribute && (mCurrentValueAttribute->getValue() != value) &&
+      mCurrentValueAttribute->getType().isValueValid(value)) {
+    mCurrentValueAttribute->setTypeValueUnit(mCurrentValueAttribute->getType(),
+                                             value,
+                                             mCurrentValueAttribute->getUnit());
+    emit valueAttributeValueChanged(value);
+  }
+
+  applyValueAndAttributeToComponent();
+}
+
+void SchematicEditorState_AddComponent::setValueAttributeUnit(
+    const AttributeUnit* unit) noexcept {
+  if (mCurrentValueAttribute && (mCurrentValueAttribute->getUnit() != unit) &&
+      mCurrentValueAttribute->getType().isUnitAvailable(unit)) {
+    mCurrentValueAttribute->setTypeValueUnit(mCurrentValueAttribute->getType(),
+                                             mCurrentValueAttribute->getValue(),
+                                             unit);
+    emit valueAttributeUnitChanged(unit);
+  }
+
+  applyValueAndAttributeToComponent();
 }
 
 /*******************************************************************************
@@ -410,12 +453,10 @@ void SchematicEditorState_AddComponent::startAddingComponent(
     }
 
     // set value
-    if (keepValue && mValueComboBox) {
-      mCurrentComponent->setValue(toMultiLine(mValueComboBox->currentText()));
-      attributeChanged();  // sets the attribute on the component
-    } else if (mValueComboBox) {
-      updateValueToolbar();
-      updateAttributeToolbar();
+    if (keepValue) {
+      applyValueAndAttributeToComponent();
+    } else {
+      setValue(mCurrentComponent->getValue());
     }
 
     // create the first symbol instance and add it to the schematic
@@ -431,9 +472,8 @@ void SchematicEditorState_AddComponent::startAddingComponent(
                             "not have any symbol.")
                              .arg(mCurrentComponent->getUuid().toStr()));
     }
-    const Point pos =
-        mContext.editorGraphicsView.mapGlobalPosToScenePos(QCursor::pos())
-            .mappedToGrid(getGridInterval());
+    const Point pos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos())
+                          .mappedToGrid(getGridInterval());
     CmdAddSymbolToSchematic* cmd2 = new CmdAddSymbolToSchematic(
         mContext.workspace, *schematic, *mCurrentComponent,
         currentSymbVarItem->getUuid(), pos);
@@ -445,8 +485,8 @@ void SchematicEditorState_AddComponent::startAddingComponent(
     Q_ASSERT(mCurrentSymbolEditCommand == nullptr);
     mCurrentSymbolEditCommand =
         new CmdSymbolInstanceEditAll(*mCurrentSymbolToPlace);
-    mCurrentSymbolEditCommand->setRotation(mLastAngle, true);
-    mCurrentSymbolEditCommand->setMirrored(mLastMirrored, true);
+    mCurrentSymbolEditCommand->setRotation(mCurrentAngle, true);
+    mCurrentSymbolEditCommand->setMirrored(mCurrentMirrored, true);
 
     // If a schematic frame was added as the first symbol in the schematic,
     // place it at (0, 0) and exit this tool for convenience and to ensure
@@ -464,11 +504,11 @@ void SchematicEditorState_AddComponent::startAddingComponent(
       mIsUndoCmdActive = false;
       abortCommand(false);  // reset attributes
       if (auto scene = getActiveSchematicScene()) {
-        mContext.editorGraphicsView.zoomToRect(scene->itemsBoundingRect());
+        mAdapter.fsmZoomToSceneRect(scene->itemsBoundingRect());
       }
       emit requestLeavingState();
     }
-  } catch (Exception& e) {
+  } catch (const Exception& e) {
     if (mIsUndoCmdActive) {
       try {
         mContext.undoStack.abortCmdGroup();
@@ -498,110 +538,25 @@ bool SchematicEditorState_AddComponent::abortCommand(
     mCurrentSymbVarItemIndex = -1;
     mCurrentSymbolToPlace = nullptr;
     return true;
-  } catch (Exception& e) {
+  } catch (const Exception& e) {
     if (showErrMsgBox)
       QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     return false;
   }
 }
 
-std::shared_ptr<const Attribute>
-    SchematicEditorState_AddComponent::getToolbarAttribute() const noexcept {
+void SchematicEditorState_AddComponent::
+    applyValueAndAttributeToComponent() noexcept {
   if (mCurrentComponent) {
-    // Only take the first line into account to avoid the problem described at
-    // https://github.com/LibrePCB-Libraries/LibrePCB_Base.lplib/pull/138.
-    QString value = mCurrentComponent->getValue().split("\n").value(0);
-    QString key = QString(value).remove("{{").remove("}}").trimmed();
-    auto attr = mCurrentComponent->getAttributes().find(key);
-    if (attr && value.startsWith("{{") && value.endsWith("}}")) {
-      return attr;
+    mCurrentComponent->setValue(mCurrentValue);
+    if (mCurrentValueAttribute) {
+      AttributeList attrs = mCurrentComponent->getAttributes();
+      if (auto attr = attrs.find(*mCurrentValueAttribute->getKey())) {
+        *attr = *mCurrentValueAttribute;
+        mCurrentComponent->setAttributes(attrs);
+      }
     }
   }
-  return std::shared_ptr<Attribute>();
-}
-
-void SchematicEditorState_AddComponent::valueChanged(QString text) noexcept {
-  if (!mCurrentComponent) return;
-
-  mCurrentComponent->setValue(toMultiLine(text));
-  updateAttributeToolbar();
-}
-
-void SchematicEditorState_AddComponent::attributeChanged() noexcept {
-  if (!mCurrentComponent) return;
-
-  std::shared_ptr<const Attribute> selected = getToolbarAttribute();
-  if (!selected) return;
-  AttributeList attributes = mCurrentComponent->getAttributes();
-  std::shared_ptr<Attribute> attribute = attributes.find(*selected->getKey());
-  if (!attribute) return;
-  const AttributeType& type = attribute->getType();
-  QString value = toMultiLine(mAttributeValueEdit->text());
-  if (const AttributeUnit* unit = type.tryExtractUnitFromValue(value)) {
-    // avoid recursion by blocking signals from combobox
-    const bool wasBlocked = mAttributeUnitComboBox->blockSignals(true);
-    mAttributeUnitComboBox->setCurrentItem(unit);
-    mAttributeUnitComboBox->blockSignals(wasBlocked);
-    mAttributeUnitComboBox->setEnabled(false);
-  } else {
-    mAttributeUnitComboBox->setEnabled(true);
-  }
-  const AttributeUnit* unit = mAttributeUnitComboBox->getCurrentItem();
-  if (type.isValueValid(value) && type.isUnitAvailable(unit)) {
-    attribute->setTypeValueUnit(attribute->getType(), value, unit);
-    mCurrentComponent->setAttributes(attributes);
-  }
-}
-
-void SchematicEditorState_AddComponent::updateValueToolbar() noexcept {
-  if (!mCurrentComponent) return;
-
-  mValueComboBox->blockSignals(true);
-  mValueComboBox->clear();
-  for (const Attribute& attribute : mCurrentComponent->getAttributes()) {
-    mValueComboBox->addItem("{{" + *attribute.getKey() + "}}");
-  }
-  mValueComboBox->setCurrentText(toSingleLine(mCurrentComponent->getValue()));
-  // Make sure the start of the value is visible, even if the value is long.
-  mValueComboBox->lineEdit()->setCursorPosition(0);
-  mValueComboBox->blockSignals(false);
-}
-
-void SchematicEditorState_AddComponent::updateAttributeToolbar() noexcept {
-  if (!mCurrentComponent) return;
-
-  std::shared_ptr<const Attribute> attribute = getToolbarAttribute();
-  if (attribute) {
-    mAttributeValueEdit->blockSignals(true);
-    mAttributeUnitComboBox->blockSignals(true);
-    mAttributeValueEdit->setText(toSingleLine(attribute->getValue()));
-    mAttributeValueEdit->setPlaceholderText(*attribute->getKey());
-    mAttributeValueEditAction->setVisible(true);
-    mAttributeUnitComboBox->setAttributeType(attribute->getType());
-    mAttributeUnitComboBox->setCurrentItem(attribute->getUnit());
-    if (attribute->getType().getAvailableUnits().count() > 0) {
-      mAttributeValueEdit->setMinimumWidth(50);
-      mAttributeUnitComboBoxAction->setVisible(true);
-    } else {
-      mAttributeValueEdit->setMinimumWidth(200);
-      mAttributeUnitComboBoxAction->setVisible(false);
-    }
-    mAttributeValueEdit->blockSignals(false);
-    mAttributeUnitComboBox->blockSignals(false);
-  } else {
-    mAttributeValueEditAction->setVisible(false);
-    mAttributeUnitComboBoxAction->setVisible(false);
-  }
-}
-
-QString SchematicEditorState_AddComponent::toSingleLine(
-    const QString& text) noexcept {
-  return QString(text).replace("\n", "\\n");
-}
-
-QString SchematicEditorState_AddComponent::toMultiLine(
-    const QString& text) noexcept {
-  return text.trimmed().replace("\\n", "\n");
 }
 
 /*******************************************************************************

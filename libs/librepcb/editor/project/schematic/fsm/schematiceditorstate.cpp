@@ -31,8 +31,8 @@
 #include "../graphicsitems/sgi_symbol.h"
 #include "../graphicsitems/sgi_symbolpin.h"
 #include "../graphicsitems/sgi_text.h"
-#include "../schematiceditor.h"
 #include "../schematicgraphicsscene.h"
+#include "schematiceditorfsmadapter.h"
 
 #include <librepcb/core/geometry/polygon.h>
 #include <librepcb/core/project/project.h>
@@ -63,7 +63,7 @@ namespace editor {
 
 SchematicEditorState::SchematicEditorState(const Context& context,
                                            QObject* parent) noexcept
-  : QObject(parent), mContext(context) {
+  : QObject(parent), mContext(context), mAdapter(context.adapter) {
 }
 
 SchematicEditorState::~SchematicEditorState() noexcept {
@@ -74,16 +74,16 @@ SchematicEditorState::~SchematicEditorState() noexcept {
  ******************************************************************************/
 
 Schematic* SchematicEditorState::getActiveSchematic() noexcept {
-  return mContext.editor.getActiveSchematic();
+  return mAdapter.fsmGetActiveSchematic();
 }
 
 SchematicGraphicsScene*
     SchematicEditorState::getActiveSchematicScene() noexcept {
-  return mContext.editor.getActiveSchematicScene();
+  return mAdapter.fsmGetGraphicsScene();
 }
 
 PositiveLength SchematicEditorState::getGridInterval() const noexcept {
-  if (const Schematic* sch = mContext.editor.getActiveSchematic()) {
+  if (const Schematic* sch = mAdapter.fsmGetActiveSchematic()) {
     return sch->getGridInterval();
   } else {
     return PositiveLength(Length(2540000));
@@ -91,7 +91,7 @@ PositiveLength SchematicEditorState::getGridInterval() const noexcept {
 }
 
 const LengthUnit& SchematicEditorState::getLengthUnit() const noexcept {
-  if (const Schematic* schematic = mContext.editor.getActiveSchematic()) {
+  if (const Schematic* schematic = mAdapter.fsmGetActiveSchematic()) {
     return schematic->getGridUnit();
   } else {
     return mContext.workspace.getSettings().defaultLengthUnit.get();
@@ -114,7 +114,7 @@ const QSet<const Layer*>&
 }
 
 void SchematicEditorState::abortBlockingToolsInOtherEditors() noexcept {
-  mContext.editor.abortBlockingToolsInOtherEditors();
+  mAdapter.fsmAbortBlockingToolsInOtherEditors();
 }
 
 bool SchematicEditorState::execCmd(UndoCommand* cmd) {
@@ -122,7 +122,7 @@ bool SchematicEditorState::execCmd(UndoCommand* cmd) {
 }
 
 QWidget* SchematicEditorState::parentWidget() noexcept {
-  return &mContext.editor;
+  return &mContext.parentWidget;
 }
 
 QList<std::shared_ptr<QGraphicsItem>> SchematicEditorState::findItemsAtPos(
@@ -134,10 +134,8 @@ QList<std::shared_ptr<QGraphicsItem>> SchematicEditorState::findItemsAtPos(
   }
 
   const QPointF posExact = pos.toPxQPointF();
-  const QPainterPath posArea =
-      mContext.editorGraphicsView.calcPosWithTolerance(pos);
-  const QPainterPath posAreaLarge =
-      mContext.editorGraphicsView.calcPosWithTolerance(pos, 2);
+  const QPainterPath posArea = mAdapter.fsmCalcPosWithTolerance(pos, 1);
+  const QPainterPath posAreaLarge = mAdapter.fsmCalcPosWithTolerance(pos, 2);
 
   QPainterPath posAreaInGrid;
   const Point posOnGrid = pos.mappedToGrid(getGridInterval());
