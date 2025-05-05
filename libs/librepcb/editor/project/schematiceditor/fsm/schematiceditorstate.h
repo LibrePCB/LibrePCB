@@ -168,6 +168,13 @@ public:
   SchematicEditorState& operator=(const SchematicEditorState& rhs) = delete;
 
 signals:
+  /**
+   * @brief Signal to indicate that the current tool should be exited
+   *
+   * This signal can be emitted by each state to signalize the FSM to leave
+   * the current state and entering the select tool.
+   */
+  void requestLeavingState();
   void statusBarMessageChanged(const QString& message, int timeoutMs = -1);
 
 protected:  // Methods

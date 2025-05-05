@@ -60,7 +60,12 @@ SchematicEditorFsm::SchematicEditorFsm(const Context& context,
   mStates.insert(State::ADD_TEXT, new SchematicEditorState_AddText(context));
   mStates.insert(State::MEASURE, new SchematicEditorState_Measure(context));
 
+  // Connect the requestLeavingState() signal of all states to the
+  // processSelect() method to leave the state. Using a queued connection to
+  // avoid complex nested call stacks of two different states at the same time.
   foreach (SchematicEditorState* state, mStates) {
+    connect(state, &SchematicEditorState::requestLeavingState, this,
+            &SchematicEditorFsm::processSelect, Qt::QueuedConnection);
     connect(state, &SchematicEditorState::statusBarMessageChanged, this,
             &SchematicEditorFsm::statusBarMessageChanged);
   }

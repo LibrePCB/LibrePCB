@@ -31,6 +31,7 @@
 #include "../../cmd/cmdaddsymboltoschematic.h"
 #include "../../cmd/cmdsymbolinstanceeditall.h"
 #include "../schematiceditor.h"
+#include "../schematicgraphicsscene.h"
 
 #include <librepcb/core/attribute/attributetype.h>
 #include <librepcb/core/attribute/attributeunit.h>
@@ -42,6 +43,7 @@
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/schematic/items/si_symbol.h>
+#include <librepcb/core/project/schematic/schematic.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
@@ -445,6 +447,27 @@ void SchematicEditorState_AddComponent::startAddingComponent(
         new CmdSymbolInstanceEditAll(*mCurrentSymbolToPlace);
     mCurrentSymbolEditCommand->setRotation(mLastAngle, true);
     mCurrentSymbolEditCommand->setMirrored(mLastMirrored, true);
+
+    // If a schematic frame was added as the first symbol in the schematic,
+    // place it at (0, 0) and exit this tool for convenience and to ensure
+    // a consistent schematic coordinate system across all LibrePCB projects.
+    const Component& libCmp = mCurrentComponent->getLibComponent();
+    if ((schematic->getSymbols().count() == 1) && libCmp.isSchematicOnly() &&
+        (libCmp.getNames().getDefaultValue()->toLower().contains("frame")) &&
+        (mCurrentComponent->getSymbolVariant().getSymbolItems().count() == 1)) {
+      mCurrentSymbolEditCommand->setPosition(Point(0, 0), true);
+      mCurrentSymbolEditCommand->setRotation(Angle::deg0(), true);
+      mCurrentSymbolEditCommand->setMirrored(false, true);
+      mContext.undoStack.appendToCmdGroup(mCurrentSymbolEditCommand);
+      mCurrentSymbolEditCommand = nullptr;
+      mContext.undoStack.commitCmdGroup();
+      mIsUndoCmdActive = false;
+      abortCommand(false);  // reset attributes
+      if (auto scene = getActiveSchematicScene()) {
+        mContext.editorGraphicsView.zoomToRect(scene->itemsBoundingRect());
+      }
+      emit requestLeavingState();
+    }
   } catch (Exception& e) {
     if (mIsUndoCmdActive) {
       try {
