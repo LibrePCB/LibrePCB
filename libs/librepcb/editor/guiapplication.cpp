@@ -429,14 +429,6 @@ void GuiApplication::createNewWindow(int id) noexcept {
   d.set_local_libraries(filteredLibs(mLocalLibraries));
   d.set_remote_libraries(sortedLibs(filteredLibs(mRemoteLibraries)));
 
-  // Bind global data to signals.
-  bind(this, d, &ui::Data::set_local_libraries_data, mLocalLibraries.get(),
-       &LibrariesModel::uiDataChanged, mLocalLibraries->getUiData());
-  bind(this, d, &ui::Data::set_remote_libraries_data, mRemoteLibraries.get(),
-       &LibrariesModel::uiDataChanged, mRemoteLibraries->getUiData());
-  bind(this, d, &ui::Data::set_libraries_filter, mLibrariesFilter.get(),
-       &SlintKeyEventTextBuilder::textChanged, mLibrariesFilter->getText());
-
   // Register global callbacks.
   const ui::Backend& b = win->global<ui::Backend>();
   b.on_open_url([this](const slint::SharedString& url) {
@@ -464,6 +456,13 @@ void GuiApplication::createNewWindow(int id) noexcept {
 
   // Build wrapper.
   auto mw = std::make_shared<MainWindow>(*this, win, id);
+  bind(mw.get(), d, &ui::Data::set_local_libraries_data, mLocalLibraries.get(),
+       &LibrariesModel::uiDataChanged, mLocalLibraries->getUiData());
+  bind(mw.get(), d, &ui::Data::set_remote_libraries_data,
+       mRemoteLibraries.get(), &LibrariesModel::uiDataChanged,
+       mRemoteLibraries->getUiData());
+  bind(mw.get(), d, &ui::Data::set_libraries_filter, mLibrariesFilter.get(),
+       &SlintKeyEventTextBuilder::textChanged, mLibrariesFilter->getText());
   connect(
       mw.get(), &MainWindow::aboutToClose, this,
       [this]() {
