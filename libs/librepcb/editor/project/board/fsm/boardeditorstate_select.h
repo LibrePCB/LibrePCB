@@ -111,7 +111,6 @@ public:
       const GraphicsSceneMouseEvent& e) noexcept override;
   virtual bool processGraphicsSceneRightMouseButtonReleased(
       const GraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processSwitchToBoard(int index) noexcept override;
 
   // Operator Overloadings
   BoardEditorState_Select& operator=(const BoardEditorState_Select& rhs) =
@@ -188,6 +187,8 @@ private:  // Methods
   void openHolePropertiesDialog(BI_Hole& hole) noexcept;
   QList<DeviceMenuItem> getDeviceMenuItems(
       const ComponentInstance& cmpInst) const noexcept;
+  void scheduleUpdateAvailableFeatures() noexcept;
+  void updateAvailableFeatures() noexcept;
 
 private:  // Data
   /// An undo command will be active while dragging pasted items
@@ -216,6 +217,12 @@ private:  // Data
   QVector<int> mSelectedZoneVertices;
   /// The zone edit command (nullptr if not editing)
   std::unique_ptr<CmdBoardZoneEdit> mCmdZoneEdit;
+
+  /// Signal/slot connections only when in this state
+  QList<QMetaObject::Connection> mConnections;
+
+  /// Delay timer for #updateAvailableFeatures(), only when in this state
+  std::unique_ptr<QTimer> mUpdateAvailableFeaturesTimer;
 };
 
 /*******************************************************************************

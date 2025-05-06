@@ -25,6 +25,13 @@
  ******************************************************************************/
 #include "appwindow.h"
 
+#include <librepcb/core/rulecheck/rulecheckmessage.h>
+#include <librepcb/core/types/length.h>
+#include <librepcb/core/types/lengthunit.h>
+#include <librepcb/core/workspace/theme.h>
+
+#include <optional>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -39,6 +46,24 @@ class EditorCommand;
 /*******************************************************************************
  *  Non-Member Functions
  ******************************************************************************/
+
+static_assert(sizeof(ui::Int64) == 8);
+static_assert(sizeof(LengthBase_t) == 8);
+
+qint64 s2l(const ui::Int64& v) noexcept;
+
+ui::Int64 l2s(const Length& v) noexcept;
+Length s2length(const ui::Int64& v) noexcept;
+std::optional<UnsignedLength> s2ulength(const ui::Int64& v) noexcept;
+std::optional<PositiveLength> s2plength(const ui::Int64& v) noexcept;
+
+ui::GridStyle l2s(Theme::GridStyle v) noexcept;
+Theme::GridStyle s2l(ui::GridStyle v) noexcept;
+
+ui::LengthUnit l2s(const LengthUnit& v) noexcept;
+LengthUnit s2l(ui::LengthUnit v) noexcept;
+
+ui::NotificationType l2s(RuleCheckMessage::Severity v) noexcept;
 
 ui::EditorCommand l2s(const EditorCommand& cmd, ui::EditorCommand in) noexcept;
 

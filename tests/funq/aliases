@@ -1,66 +1,9 @@
 ################################################################################
-# Initialize Workspace Wizard
-################################################################################
-
-initWorkspaceWizard = librepcb__editor__InitializeWorkspaceWizard
-initWorkspaceWizardWidget = {initWorkspaceWizard}::QWidget
-initWorkspaceWizardNextButton = {initWorkspaceWizardWidget}::__qt__passive_wizardbutton1
-initWorkspaceWizardFinishButton = {initWorkspaceWizardWidget}::qt_wizard_finish
-initWorkspaceWizardFrame = {initWorkspaceWizardWidget}::QFrame
-initWorkspaceWizardChooseWorkspacePage = {initWorkspaceWizardFrame}::librepcb__editor__InitializeWorkspaceWizard_ChooseWorkspace
-initWorkspaceWizardChooseWorkspacePathEdit = {initWorkspaceWizardChooseWorkspacePage}::edtPath
-initWorkspaceWizardChooseWorkspaceStatusLabel = {initWorkspaceWizardChooseWorkspacePage}::lblStatus
-initWorkspaceWizardUpgradePage = {initWorkspaceWizardFrame}::librepcb__editor__InitializeWorkspaceWizard_Upgrade
-initWorkspaceWizardUpgradeSourceLabel = {initWorkspaceWizardUpgradePage}::lblSource
-initWorkspaceWizardUpgradeDestinationLabel = {initWorkspaceWizardUpgradePage}::lblDestination
-initWorkspaceWizardChooseSettingsPage = {initWorkspaceWizardFrame}::librepcb__editor__InitializeWorkspaceWizard_ChooseSettings
-initWorkspaceWizardChooseSettingsUserNameEdit = {initWorkspaceWizardChooseSettingsPage}::edtUserName
-
-
-################################################################################
 # Main Window
 ################################################################################
 
-# Main window
 mainWindow = mainWindow
 mainWindowTestAdapter = {mainWindow}::testAdapter
-
-# Open project dialog
-mainWindowOpenProjectDialog = {mainWindow}::{QT_FILE_DIALOG}
-mainWindowOpenProjectDialogFileNameEdit = {mainWindow}::{QT_FILE_DIALOG_LINE_EDIT}
-mainWindowOpenProjectDialogOkButton = {mainWindow}::{QT_FILE_DIALOG_BTN_OK}
-
-# New project wizard
-mainWindowNewProjectWizard = {mainWindow}::librepcb__editor__NewProjectWizard
-mainWindowNewProjectWizardWidget = {mainWindowNewProjectWizard}::QWidget
-mainWindowNewProjectWizardNextButton = {mainWindowNewProjectWizardWidget}::__qt__passive_wizardbutton1
-mainWindowNewProjectWizardFinishButton = {mainWindowNewProjectWizardWidget}::qt_wizard_finish
-mainWindowNewProjectWizardFrame = {mainWindowNewProjectWizardWidget}::QFrame
-mainWindowNewProjectWizardMetadataPage = {mainWindowNewProjectWizardFrame}::librepcb__editor__NewProjectWizardPage_Metadata
-mainWindowNewProjectWizardMetadataNameEdit = {mainWindowNewProjectWizardMetadataPage}::edtName
-mainWindowNewProjectWizardMetadataPathEdit = {mainWindowNewProjectWizardMetadataPage}::edtPath
-
-# Workspace settings dialog
-mainWindowWorkspaceSettingsDialog = librepcb__editor__WorkspaceSettingsDialog
-mainWindowWorkspaceSettingsDialogButtonBox = {mainWindowWorkspaceSettingsDialog}::buttonBox
-mainWindowWorkspaceSettingsDialogButtonAccept = {mainWindowWorkspaceSettingsDialogButtonBox}::QPushButton
-mainWindowWorkspaceSettingsDialogButtonCancel = {mainWindowWorkspaceSettingsDialogButtonBox}::QPushButton-1
-mainWindowWorkspaceSettingsDialogTabWidget = {mainWindowWorkspaceSettingsDialog}::tabWidget
-mainWindowWorkspaceSettingsDialogStackedWidget = {mainWindowWorkspaceSettingsDialogTabWidget}::qt_tabwidget_stackedwidget
-mainWindowWorkspaceSettingsDialogGeneralTab = {mainWindowWorkspaceSettingsDialogStackedWidget}::generalTab
-mainWindowWorkspaceSettingsDialogGeneralUserNameEdit = {mainWindowWorkspaceSettingsDialogGeneralTab}::edtUserName
-
-# Switch workspace dialog
-mainWindowInitWorkspaceWizard = {mainWindow}::librepcb__editor__InitializeWorkspaceWizard
-mainWindowInitWorkspaceWizardWidget = {mainWindowInitWorkspaceWizard}::QWidget
-mainWindowInitWorkspaceWizardNextButton = {mainWindowInitWorkspaceWizardWidget}::__qt__passive_wizardbutton1
-mainWindowInitWorkspaceWizardFinishButton = {mainWindowInitWorkspaceWizardWidget}::qt_wizard_finish
-mainWindowInitWorkspaceWizardFrame = {mainWindowInitWorkspaceWizardWidget}::QFrame
-mainWindowInitWorkspaceWizardChooseWorkspacePage = {mainWindowInitWorkspaceWizardFrame}::librepcb__editor__InitializeWorkspaceWizard_ChooseWorkspace
-mainWindowInitWorkspaceWizardChooseWorkspacePathEdit = {mainWindowInitWorkspaceWizardChooseWorkspacePage}::edtPath
-mainWindowInitWorkspaceWizardChooseWorkspaceStatusLabel = {mainWindowInitWorkspaceWizardChooseWorkspacePage}::lblStatus
-mainWindowInitWorkspaceWizardChooseSettingsPage = {mainWindowInitWorkspaceWizardFrame}::librepcb__editor__InitializeWorkspaceWizard_ChooseSettings
-mainWindowInitWorkspaceWizardChooseSettingsUserNameEdit = {mainWindowInitWorkspaceWizardChooseSettingsPage}::edtUserName
 
 
 ################################################################################
@@ -245,86 +188,78 @@ libraryEditorGraphicsExportSaveFileDialogOkButton = {libraryEditorGraphicsExport
 
 
 ################################################################################
-# Schematic Editor
+# Dialogs
 ################################################################################
 
-# Main window
-schematicEditor = librepcb__editor__SchematicEditor
-schematicEditorWidget = {schematicEditor}::centralWidget
+# Initialize workspace wizard
+initWorkspaceWizard = librepcb__editor__InitializeWorkspaceWizard
+initWorkspaceWizardWidget = {initWorkspaceWizard}::QWidget
+initWorkspaceWizardNextButton = {initWorkspaceWizardWidget}::__qt__passive_wizardbutton1
+initWorkspaceWizardFinishButton = {initWorkspaceWizardWidget}::qt_wizard_finish
+initWorkspaceWizardFrame = {initWorkspaceWizardWidget}::QFrame
+initWorkspaceWizardChooseWorkspacePage = {initWorkspaceWizardFrame}::librepcb__editor__InitializeWorkspaceWizard_ChooseWorkspace
+initWorkspaceWizardChooseWorkspacePathEdit = {initWorkspaceWizardChooseWorkspacePage}::edtPath
+initWorkspaceWizardChooseWorkspaceStatusLabel = {initWorkspaceWizardChooseWorkspacePage}::lblStatus
+initWorkspaceWizardUpgradePage = {initWorkspaceWizardFrame}::librepcb__editor__InitializeWorkspaceWizard_Upgrade
+initWorkspaceWizardUpgradeSourceLabel = {initWorkspaceWizardUpgradePage}::lblSource
+initWorkspaceWizardUpgradeDestinationLabel = {initWorkspaceWizardUpgradePage}::lblDestination
+initWorkspaceWizardChooseSettingsPage = {initWorkspaceWizardFrame}::librepcb__editor__InitializeWorkspaceWizard_ChooseSettings
+initWorkspaceWizardChooseSettingsUserNameEdit = {initWorkspaceWizardChooseSettingsPage}::edtUserName
 
-# Toolbars
-schematicEditorToolbarFile = {schematicEditor}::toolBarFile
-schematicEditorDockErcMsg = {schematicEditor}::dockErc
+# Open project dialog
+openProjectDialog = {QT_FILE_DIALOG}
+openProjectDialogFileNameEdit = {QT_FILE_DIALOG_LINE_EDIT}
+openProjectDialogOkButton = {QT_FILE_DIALOG_BTN_OK}
 
-# Actions
-schematicEditorActionCloseProject = {schematicEditor}::actionProjectClose
-schematicEditorActionAddComponent = {schematicEditor}::actionToolComponent
-schematicEditorActionExportImage = {schematicEditor}::actionExportImage
-schematicEditorActionExportPdf = {schematicEditor}::actionExportPdf
+# New project wizard
+newProjectWizard = librepcb__editor__NewProjectWizard
+newProjectWizardWidget = {newProjectWizard}::QWidget
+newProjectWizardNextButton = {newProjectWizardWidget}::__qt__passive_wizardbutton1
+newProjectWizardFinishButton = {newProjectWizardWidget}::qt_wizard_finish
+newProjectWizardFrame = {newProjectWizardWidget}::QFrame
+newProjectWizardMetadataPage = {newProjectWizardFrame}::librepcb__editor__NewProjectWizardPage_Metadata
+newProjectWizardMetadataNameEdit = {newProjectWizardMetadataPage}::edtName
+newProjectWizardMetadataPathEdit = {newProjectWizardMetadataPage}::edtPath
 
-# Graphics view
-schematicEditorGraphicsView = {schematicEditor}::librepcb:_:GraphicsView
-schematicEditorGraphicsViewWidget = {schematicEditorGraphicsView}::QWidget
+# Workspace settings dialog
+workspaceSettingsDialog = librepcb__editor__WorkspaceSettingsDialog
+workspaceSettingsDialogButtonBox = {workspaceSettingsDialog}::buttonBox
+workspaceSettingsDialogButtonAccept = {workspaceSettingsDialogButtonBox}::QPushButton
+workspaceSettingsDialogButtonCancel = {workspaceSettingsDialogButtonBox}::QPushButton-1
+workspaceSettingsDialogTabWidget = {workspaceSettingsDialog}::tabWidget
+workspaceSettingsDialogStackedWidget = {workspaceSettingsDialogTabWidget}::qt_tabwidget_stackedwidget
+workspaceSettingsDialogGeneralTab = {workspaceSettingsDialogStackedWidget}::generalTab
+workspaceSettingsDialogGeneralUserNameEdit = {workspaceSettingsDialogGeneralTab}::edtUserName
 
 # Add Component Dialog
-schematicEditorAddComponentDialog = {schematicEditor}::librepcb__editor__AddComponentDialog
-schematicEditorAddComponentDialogButtonBox = {schematicEditorAddComponentDialog}::buttonBox
-schematicEditorAddComponentDialogButtonAccept = {schematicEditorAddComponentDialogButtonBox}::QPushButton
-schematicEditorAddComponentDialogButtonCancel = {schematicEditorAddComponentDialogButtonBox}::QPushButton-1
-schematicEditorAddComponentDialogSearchEdit = {schematicEditorAddComponentDialog}::edtSearch
-schematicEditorAddComponentDialogCategoryTree = {schematicEditorAddComponentDialog}::treeCategories
-schematicEditorAddComponentDialogComponentTree = {schematicEditorAddComponentDialog}::treeComponents
-schematicEditorAddComponentDialogSymVarCombobox = {schematicEditorAddComponentDialog}::cbxSymbVar
-schematicEditorAddComponentDialogComponentNameLabel = {schematicEditorAddComponentDialog}::lblCompName
-schematicEditorAddComponentDialogComponentDescriptionLabel = {schematicEditorAddComponentDialog}::lblCompDescription
-schematicEditorAddComponentDialogDeviceNameLabel = {schematicEditorAddComponentDialog}::lblDeviceName
+addComponentDialog = librepcb__editor__AddComponentDialog
+addComponentDialogButtonBox = {addComponentDialog}::buttonBox
+addComponentDialogButtonAccept = {addComponentDialogButtonBox}::QPushButton
+addComponentDialogButtonCancel = {addComponentDialogButtonBox}::QPushButton-1
+addComponentDialogSearchEdit = {addComponentDialog}::edtSearch
+addComponentDialogCategoryTree = {addComponentDialog}::treeCategories
+addComponentDialogComponentTree = {addComponentDialog}::treeComponents
+addComponentDialogSymVarCombobox = {addComponentDialog}::cbxSymbVar
+addComponentDialogComponentNameLabel = {addComponentDialog}::lblCompName
+addComponentDialogComponentDescriptionLabel = {addComponentDialog}::lblCompDescription
+addComponentDialogDeviceNameLabel = {addComponentDialog}::lblDeviceName
 
 # Graphics export dialog
-schematicEditorGraphicsExportDialog = {schematicEditor}::librepcb__editor__GraphicsExportDialog
-schematicEditorGraphicsExportDialogButtonBox = {schematicEditorGraphicsExportDialog}::buttonBox
-schematicEditorGraphicsExportDialogButtonBoxLeft = {schematicEditorGraphicsExportDialog}::buttonBoxLeft
-schematicEditorGraphicsExportDialogButtonRestoreDefaults = {schematicEditorGraphicsExportDialogButtonBoxLeft}::QPushButton
-schematicEditorGraphicsExportDialogButtonAccept = {schematicEditorGraphicsExportDialogButtonBox}::QPushButton
-schematicEditorGraphicsExportDialogButtonCancel = {schematicEditorGraphicsExportDialogButtonBox}::QPushButton-1
-schematicEditorGraphicsExportDialogButtonCopyToClipboard = {schematicEditorGraphicsExportDialogButtonBox}::btnCopyToClipboard
-schematicEditorGraphicsExportDialogOpenFileCheckbox = {schematicEditorGraphicsExportDialog}::cbxOpenExportedFiles
-schematicEditorGraphicsExportDialogTabWidget = {schematicEditorGraphicsExportDialog}::tabWidget
-schematicEditorGraphicsExportDialogTabBar = {schematicEditorGraphicsExportDialogTabWidget}::qt_tabwidget_tabbar
-schematicEditorGraphicsExportDialogStackedWidget = {schematicEditorGraphicsExportDialogTabWidget}::qt_tabwidget_stackedwidget
-schematicEditorGraphicsExportDialogTabGeneral = {schematicEditorGraphicsExportDialogStackedWidget}::tabGeneral
-schematicEditorGraphicsExportDialogPageSizeComboBox = {schematicEditorGraphicsExportDialogTabGeneral}::cbxPageSize
+graphicsExportDialog = librepcb__editor__GraphicsExportDialog
+graphicsExportDialogButtonBox = {graphicsExportDialog}::buttonBox
+graphicsExportDialogButtonBoxLeft = {graphicsExportDialog}::buttonBoxLeft
+graphicsExportDialogButtonRestoreDefaults = {graphicsExportDialogButtonBoxLeft}::QPushButton
+graphicsExportDialogButtonAccept = {graphicsExportDialogButtonBox}::QPushButton
+graphicsExportDialogButtonCancel = {graphicsExportDialogButtonBox}::QPushButton-1
+graphicsExportDialogButtonCopyToClipboard = {graphicsExportDialogButtonBox}::btnCopyToClipboard
+graphicsExportDialogOpenFileCheckbox = {graphicsExportDialog}::cbxOpenExportedFiles
+graphicsExportDialogTabWidget = {graphicsExportDialog}::tabWidget
+graphicsExportDialogTabBar = {graphicsExportDialogTabWidget}::qt_tabwidget_tabbar
+graphicsExportDialogStackedWidget = {graphicsExportDialogTabWidget}::qt_tabwidget_stackedwidget
+graphicsExportDialogTabGeneral = {graphicsExportDialogStackedWidget}::tabGeneral
+graphicsExportDialogPageSizeComboBox = {graphicsExportDialogTabGeneral}::cbxPageSize
 
 # Graphics export save file dialog
-schematicEditorGraphicsExportSaveFileDialog = {schematicEditorGraphicsExportDialog}::{QT_FILE_DIALOG}
-schematicEditorGraphicsExportSaveFileDialogFileNameEdit = {schematicEditorGraphicsExportDialog}::{QT_FILE_DIALOG_LINE_EDIT}
-schematicEditorGraphicsExportSaveFileDialogOkButton = {schematicEditorGraphicsExportDialog}::{QT_FILE_DIALOG_BTN_OK}
-
-
-################################################################################
-# Board Editor
-################################################################################
-
-# Main window
-boardEditor = librepcb__editor__BoardEditor
-boardEditorWidget = {boardEditor}::centralWidget
-
-# Toolbars
-boardEditorToolbarFile = {boardEditor}::toolBarFile
-boardEditorDockErcMsg = {boardEditor}::dockErc
-
-# Actions
-boardEditorActionCloseProject = {boardEditor}::actionProjectClose
-boardEditorActionExportImage = {boardEditor}::actionExportImage
-boardEditorActionExportPdf = {boardEditor}::actionExportPdf
-
-# Graphics export dialog
-boardEditorGraphicsExportDialog = {boardEditor}::librepcb__editor__GraphicsExportDialog
-boardEditorGraphicsExportDialogButtonBox = {boardEditorGraphicsExportDialog}::buttonBox
-boardEditorGraphicsExportDialogButtonAccept = {boardEditorGraphicsExportDialogButtonBox}::QPushButton
-boardEditorGraphicsExportDialogButtonCancel = {boardEditorGraphicsExportDialogButtonBox}::QPushButton-1
-boardEditorGraphicsExportDialogOpenFileCheckbox = {boardEditorGraphicsExportDialog}::cbxOpenExportedFiles
-
-# Graphics export save file dialog
-boardEditorGraphicsExportSaveFileDialog = {boardEditorGraphicsExportDialog}::{QT_FILE_DIALOG}
-boardEditorGraphicsExportSaveFileDialogFileNameEdit = {boardEditorGraphicsExportDialog}::{QT_FILE_DIALOG_LINE_EDIT}
-boardEditorGraphicsExportSaveFileDialogOkButton = {boardEditorGraphicsExportDialog}::{QT_FILE_DIALOG_BTN_OK}
+graphicsExportSaveFileDialog = {graphicsExportDialog}::{QT_FILE_DIALOG}
+graphicsExportSaveFileDialogFileNameEdit = {graphicsExportDialog}::{QT_FILE_DIALOG_LINE_EDIT}
+graphicsExportSaveFileDialogOkButton = {graphicsExportDialog}::{QT_FILE_DIALOG_BTN_OK}

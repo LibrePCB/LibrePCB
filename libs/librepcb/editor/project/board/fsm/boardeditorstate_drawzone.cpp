@@ -120,21 +120,12 @@ bool BoardEditorState_DrawZone::
   return processGraphicsSceneLeftMouseButtonPressed(e);
 }
 
-bool BoardEditorState_DrawZone::processSwitchToBoard(int index) noexcept {
-  // Allow switching to an existing board if no command is active.
-  return (!mIsUndoCmdActive) && (index >= 0);
-}
-
 /*******************************************************************************
  *  Connection to UI
  ******************************************************************************/
 
 QSet<const Layer*> BoardEditorState_DrawZone::getAvailableLayers() noexcept {
-  if (Board* board = getActiveBoard()) {
-    return board->getCopperLayers();
-  } else {
-    return {};
-  }
+  return mContext.board.getCopperLayers();
 }
 
 void BoardEditorState_DrawZone::setLayers(
@@ -170,8 +161,6 @@ bool BoardEditorState_DrawZone::startAddZone(const Point& pos) noexcept {
   abortBlockingToolsInOtherEditors();
 
   Q_ASSERT(mIsUndoCmdActive == false);
-  Board* board = getActiveBoard();
-  if (!board) return false;
 
   try {
     // Start a new undo command
@@ -180,8 +169,9 @@ bool BoardEditorState_DrawZone::startAddZone(const Point& pos) noexcept {
 
     // Add zone with two vertices
     mCurrentProperties.setOutline(Path({Vertex(pos), Vertex(pos)}));
-    mCurrentZone = new BI_Zone(
-        *board, BoardZoneData(Uuid::createRandom(), mCurrentProperties));
+    mCurrentZone =
+        new BI_Zone(mContext.board,
+                    BoardZoneData(Uuid::createRandom(), mCurrentProperties));
     mContext.undoStack.appendToCmdGroup(new CmdBoardZoneAdd(*mCurrentZone));
 
     // Start undo command

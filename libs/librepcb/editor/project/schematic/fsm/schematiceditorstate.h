@@ -160,11 +160,6 @@ public:
     Q_UNUSED(e);
     return false;
   }
-  virtual bool processSwitchToSchematicPage(int index) noexcept {
-    Q_UNUSED(index);
-    return false;  // Do NOT allow switching page by default
-  }
-  virtual void processSwitchedSchematicPage() noexcept {}
 
   // Operator Overloadings
   SchematicEditorState& operator=(const SchematicEditorState& rhs) = delete;
@@ -179,7 +174,6 @@ signals:
   void requestLeavingState();
 
 protected:  // Methods
-  Schematic* getActiveSchematic() noexcept;
   SchematicGraphicsScene* getActiveSchematicScene() noexcept;
   PositiveLength getGridInterval() const noexcept;
   const LengthUnit& getLengthUnit() const noexcept;

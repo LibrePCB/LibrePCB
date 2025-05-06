@@ -79,10 +79,6 @@ BoardEditorState::~BoardEditorState() noexcept {
  *  Protected Methods
  ******************************************************************************/
 
-Board* BoardEditorState::getActiveBoard() noexcept {
-  return mAdapter.fsmGetActiveBoard();
-}
-
 BoardGraphicsScene* BoardEditorState::getActiveBoardScene() noexcept {
   return mAdapter.fsmGetGraphicsScene();
 }
@@ -92,19 +88,11 @@ bool BoardEditorState::getIgnoreLocks() const noexcept {
 }
 
 PositiveLength BoardEditorState::getGridInterval() const noexcept {
-  if (const Board* board = mAdapter.fsmGetActiveBoard()) {
-    return board->getGridInterval();
-  } else {
-    return PositiveLength(2540000);
-  }
+  return mContext.board.getGridInterval();
 }
 
 const LengthUnit& BoardEditorState::getLengthUnit() const noexcept {
-  if (const Board* board = mAdapter.fsmGetActiveBoard()) {
-    return board->getGridUnit();
-  } else {
-    return mContext.workspace.getSettings().defaultLengthUnit.get();
-  }
+  return mContext.board.getGridUnit();
 }
 
 QSet<const Layer*> BoardEditorState::getAllowedGeometryLayers() noexcept {
@@ -141,11 +129,7 @@ QSet<const Layer*> BoardEditorState::getAllowedGeometryLayers() noexcept {
       &Layer::botSolderPaste(),
       &Layer::botStopMask(),
   };
-  QSet<const Layer*> layers = commonLayers;
-  if (const Board* board = getActiveBoard()) {
-    layers |= board->getCopperLayers();
-  }
-  return layers;
+  return commonLayers | mContext.board.getCopperLayers();
 }
 
 void BoardEditorState::makeLayerVisible(const QString& layer) noexcept {
@@ -165,7 +149,7 @@ bool BoardEditorState::execCmd(UndoCommand* cmd) {
 }
 
 QWidget* BoardEditorState::parentWidget() noexcept {
-  return &mContext.parentWidget;
+  return qApp->activeWindow();
 }
 
 QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(

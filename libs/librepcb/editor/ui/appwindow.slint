@@ -4,6 +4,10 @@ import "../../../../share/librepcb/fonts/NotoSansMono-Regular.ttf";
 import { MainMenuBar } from "mainmenubar.slint";
 import { SideBar } from "sidebar.slint";
 import { HomePanel } from "homepanel.slint";
+import { DocumentsPanel } from "documentspanel.slint";
+import { GraphicsLayersPanel } from "graphicslayerspanel.slint";
+import { PlaceDevicesPanel } from "project/placedevicespanel.slint";
+import { RuleCheckPanel } from "rulecheckpanel.slint";
 import { LibrariesPanel } from "library/librariespanel.slint";
 import { AboutPanel } from "aboutpanel.slint";
 import { WindowSection } from "windowsection.slint";
@@ -16,6 +20,7 @@ import {
     EditorCommandSet as Cmd,
     Helpers,
     PanelPage,
+    TabType,
 } from "api.slint";
 
 export { Backend, Data, Cmd as EditorCommandSet }
@@ -41,7 +46,9 @@ export component AppWindow inherits Window {
         enabled: Data.preview-mode;
 
         key-pressed(event) => {
-            if Helpers.is-shortcut(event, Cmd.file-manager) {
+            if Helpers.is-shortcut(event, Cmd.find) {
+                menubar.focus-search();
+            } else if Helpers.is-shortcut(event, Cmd.file-manager) {
                 Backend.trigger(Action.workspace-open-folder);
             } else if Helpers.is-shortcut(event, Cmd.workspace-switch) {
                 Backend.trigger(Action.workspace-switch);
@@ -59,6 +66,14 @@ export component AppWindow inherits Window {
                 Backend.trigger(Action.project-import-examples);
             } else if Helpers.is-shortcut(event, Cmd.import-eagle-project) {
                 Backend.trigger(Action.project-import-eagle);
+            } else if Helpers.is-shortcut(event, Cmd.dock-erc) && Data.current-tab.type == TabType.schematic {
+                Data.panel-page = PanelPage.rule-check;
+            } else if Helpers.is-shortcut(event, Cmd.dock-drc) && Data.current-tab.type == TabType.board-2d {
+                Data.panel-page = PanelPage.rule-check;
+            } else if Helpers.is-shortcut(event, Cmd.dock-layers) && (Data.current-tab.layers.length > 0) {
+                Data.panel-page = PanelPage.layers;
+            } else if Helpers.is-shortcut(event, Cmd.dock-place-devices) && (Data.current-tab.type == TabType.board-2d) {
+                Data.panel-page = PanelPage.place-devices;
             } else if Helpers.is-shortcut(event, Cmd.window-new) {
                 Backend.trigger(Action.window-new);
             } else if Helpers.is-shortcut(event, Cmd.window-close) {
@@ -77,6 +92,10 @@ export component AppWindow inherits Window {
                 Backend.open-url(Constants.donate-url);
             } else if Helpers.is-shortcut(event, Cmd.keyboard-shortcuts-reference) {
                 Backend.trigger(Action.keyboard-shortcuts-reference);
+            } else if Data.current-project.valid && Helpers.process-project-shortcuts(Data.current-project-index, event) {
+                // Handled
+            } else if Data.current-tab-is-2d && Helpers.is-shortcut(event, Cmd.grid-properties) {
+                statusbar.focus-grid-interval();
             } else {
                 return reject;
             }
@@ -90,6 +109,11 @@ export component AppWindow inherits Window {
             z: 100; // For the tooltips.
             width: 100%;
             height: 26px;
+            sections-start-x: sidebar.width + panel-width;
+
+            focus-grid-interval => {
+                statusbar.focus-grid-interval();
+            }
         }
 
         sidebar := SideBar {
@@ -101,6 +125,38 @@ export component AppWindow inherits Window {
         }
 
         if Data.panel-page == PanelPage.home: home-panel := HomePanel {
+            x: sidebar.width;
+            y: sidebar.y;
+            z: 80; // For the tooltips.
+            width: panel-width;
+            height: sidebar.height;
+        }
+
+        if Data.panel-page == PanelPage.documents: DocumentsPanel {
+            x: sidebar.width;
+            y: sidebar.y;
+            z: 80; // For the tooltips.
+            width: panel-width;
+            height: sidebar.height;
+        }
+
+        if Data.panel-page == PanelPage.layers: GraphicsLayersPanel {
+            x: sidebar.width;
+            y: sidebar.y;
+            z: 80; // For the tooltips.
+            width: panel-width;
+            height: sidebar.height;
+        }
+
+        if Data.panel-page == PanelPage.place-devices: PlaceDevicesPanel {
+            x: sidebar.width;
+            y: sidebar.y;
+            z: 80; // For the tooltips.
+            width: panel-width;
+            height: sidebar.height;
+        }
+
+        if Data.panel-page == PanelPage.rule-check: RuleCheckPanel {
             x: sidebar.width;
             y: sidebar.y;
             z: 80; // For the tooltips.

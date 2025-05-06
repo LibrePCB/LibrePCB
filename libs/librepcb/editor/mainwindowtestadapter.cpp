@@ -24,7 +24,10 @@
 
 #include "guiapplication.h"
 #include "library/libraryeditor.h"
+#include "mainwindow.h"
+#include "project/projecteditor.h"
 
+#include <librepcb/core/project/project.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 
@@ -42,8 +45,9 @@ namespace editor {
  ******************************************************************************/
 
 MainWindowTestAdapter::MainWindowTestAdapter(GuiApplication& app,
+                                             MainWindow& win,
                                              QWidget* parent) noexcept
-  : QWidget(parent), mApp(app) {
+  : QWidget(parent), mApp(app), mWindow(win) {
   setObjectName("testAdapter");
 
   connect(&mApp.getWorkspace().getLibraryDb(), &WorkspaceLibraryDb::scanStarted,
@@ -69,6 +73,46 @@ QVariant MainWindowTestAdapter::trigger(QVariant action) noexcept {
     emit actionTriggered(ui::Action::ProjectNew);
   } else if (action == "project-open") {
     emit actionTriggered(ui::Action::ProjectOpen);
+  } else if (action == "schematic-add-component-dialog") {
+    QMetaObject::invokeMethod(
+        this,
+        [this]() {
+          mWindow.triggerSchematic(0, 0, ui::SchematicAction::Open);
+          mWindow.triggerTab(0, 1, ui::TabAction::ToolComponent);
+        },
+        Qt::QueuedConnection);
+  } else if (action == "schematic-export-image-dialog") {
+    QMetaObject::invokeMethod(
+        this,
+        [this]() {
+          mWindow.triggerSchematic(0, 0, ui::SchematicAction::Open);
+          mWindow.triggerTab(0, 1, ui::TabAction::ExportImage);
+        },
+        Qt::QueuedConnection);
+  } else if (action == "schematic-export-pdf-dialog") {
+    QMetaObject::invokeMethod(
+        this,
+        [this]() {
+          mWindow.triggerSchematic(0, 0, ui::SchematicAction::Open);
+          mWindow.triggerTab(0, 1, ui::TabAction::ExportPdf);
+        },
+        Qt::QueuedConnection);
+  } else if (action == "board-export-image-dialog") {
+    QMetaObject::invokeMethod(
+        this,
+        [this]() {
+          mWindow.triggerBoard(0, 0, ui::BoardAction::Open2d);
+          mWindow.triggerTab(0, 1, ui::TabAction::ExportImage);
+        },
+        Qt::QueuedConnection);
+  } else if (action == "board-export-pdf-dialog") {
+    QMetaObject::invokeMethod(
+        this,
+        [this]() {
+          mWindow.triggerBoard(0, 0, ui::BoardAction::Open2d);
+          mWindow.triggerTab(0, 1, ui::TabAction::ExportPdf);
+        },
+        Qt::QueuedConnection);
   } else {
     qCritical() << "Unknown action triggered:" << action;
   }
@@ -86,6 +130,17 @@ QVariant MainWindowTestAdapter::openLibraryEditor(QVariant path) noexcept {
   } catch (const Exception& e) {
     return e.getMsg();
   }
+}
+
+QVariant MainWindowTestAdapter::getOpenProjects(QVariant) const noexcept {
+  QVariantList root;
+  for (auto prjEditor : mApp.getProjects()) {
+    QVariantMap prjObj;
+    prjObj["name"] = *prjEditor->getProject().getName();
+    prjObj["path"] = prjEditor->getProject().getFilepath().toStr();
+    root.append(prjObj);
+  }
+  return root;
 }
 
 /*******************************************************************************

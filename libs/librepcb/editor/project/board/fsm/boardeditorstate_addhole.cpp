@@ -128,14 +128,12 @@ bool BoardEditorState_AddHole::addHole(const Point& pos) noexcept {
   abortBlockingToolsInOtherEditors();
 
   Q_ASSERT(mIsUndoCmdActive == false);
-  Board* board = getActiveBoard();
-  if (!board) return false;
 
   try {
     mContext.undoStack.beginCmdGroup(tr("Add hole to board"));
     mIsUndoCmdActive = true;
     mCurrentHoleToPlace = new BI_Hole(
-        *board,
+        mContext.board,
         BoardHoleData(Uuid::createRandom(), mCurrentDiameter,
                       makeNonEmptyPath(pos), MaskConfig::automatic(), false));
     std::unique_ptr<CmdBoardHoleAdd> cmdAdd(

@@ -157,13 +157,13 @@ component LibraryListViewItem inherits Rectangle {
                     }
 
                     if !status-text.is-empty: status-btn := IconButton {
-                        height: 18px;
+                        height: 14px;
                         width: self.height;
+                        style: read-only;
                         icon: status-icon;
                         tooltip: status-text;
-                        tooltip-delayed: false;
-                        colorize: status-color.darker(enabled ? 0 : 0.5);
-                        read-only: true;
+                        color-disabled: status-color.darker(0.5);
+                        color-enabled: status-color;
                         enabled: enabled;
                     }
 
@@ -201,20 +201,20 @@ component LibraryListViewItem inherits Rectangle {
 
             if remote && lib.recommended && lib.installed-version.is-empty: recommended-btn := IconButton {
                 z: 100;
-                width: 22px;
+                width: 16px;
+                style: read-only;
                 icon: @image-url("../../../../font-awesome/svgs/solid/star.svg");
                 tooltip: @tr("Recommended");
                 tooltip-position: left;
-                tooltip-delayed: false;
-                colorize: yellow.darker(enabled ? 0 : 0.5);
-                read-only: true;
+                color-disabled: yellow.darker(0.5);
+                color-enabled: yellow;
                 enabled: enabled;
                 accessible-role: none;
             }
 
             if !has-switch: uninstall-btn := IconButton {
                 width: 18px;
-                hyperlink-style: true;
+                style: hyperlink;
                 icon: @image-url("../../../../font-awesome/svgs/solid/trash-can.svg");
                 tooltip: @tr("Uninstall");
                 tooltip-position: left;
@@ -346,12 +346,12 @@ component LibrariesPanelSection inherits FocusScope {
 
             if !data.refreshing-error.is-empty: IconButton {
                 width: self.height;
+                style: read-only;
                 icon: @image-url("../../../../font-awesome/svgs/solid/triangle-exclamation.svg");
                 icon-scale: 0.7;
-                colorize: yellow.darker(root.enabled ? 0 : 1);
+                color-disabled: yellow.darker(1);
+                color-enabled: yellow;
                 tooltip: data.refreshing-error;
-                tooltip-delayed: false;
-                read-only: true;
                 enabled: root.enabled;
             }
         }

@@ -68,6 +68,14 @@ SchematicEditorFsm::SchematicEditorFsm(const Context& context,
   }
 
   enterNextState(State::SELECT);
+
+  // Connect the requestLeavingState() signal of all states to the
+  // processSelect() method to leave the state. Using a queued connection to
+  // avoid complex nested call stacks of two different states at the same time.
+  foreach (SchematicEditorState* state, mStates) {
+    connect(state, &SchematicEditorState::requestLeavingState, this,
+            &SchematicEditorFsm::processSelect, Qt::QueuedConnection);
+  }
 }
 
 SchematicEditorFsm::~SchematicEditorFsm() noexcept {
@@ -318,21 +326,6 @@ bool SchematicEditorFsm::processGraphicsSceneRightMouseButtonReleased(
     }
   }
   return false;
-}
-
-bool SchematicEditorFsm::processSwitchToSchematicPage(int index) noexcept {
-  if (SchematicEditorState* state = getCurrentStateObj()) {
-    if (state->processSwitchToSchematicPage(index)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-void SchematicEditorFsm::processSwitchedSchematicPage() noexcept {
-  if (SchematicEditorState* state = getCurrentStateObj()) {
-    state->processSwitchedSchematicPage();
-  }
 }
 
 /*******************************************************************************

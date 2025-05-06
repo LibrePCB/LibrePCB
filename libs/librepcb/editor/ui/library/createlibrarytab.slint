@@ -242,11 +242,10 @@ export component CreateLibraryTab inherits Tab {
                     property <string> url: "https://en.wikipedia.org/wiki/Creative_Commons_license";
 
                     y: (parent.height - self.height) / 2;
-                    width: 16px;
-                    height: self.width;
+                    height: 16px;
                     icon: @image-url("../../../../bootstrap-icons/icons/info-circle.svg");
                     status-tip: url;
-                    hyperlink-style: true;
+                    style: hyperlink;
                     accessible-label: "more information";
 
                     clicked => {
@@ -322,6 +321,10 @@ export component CreateLibraryTab inherits Tab {
                 accessible-label: "error message";
                 accessible-description: self.text;
             }
+        }
+
+        Row {
+            Rectangle { }
         }
     }
 }

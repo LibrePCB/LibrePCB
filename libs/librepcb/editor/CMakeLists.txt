@@ -11,6 +11,8 @@ add_library(
   3d/openglscenebuilder.h
   3d/opengltriangleobject.cpp
   3d/opengltriangleobject.h
+  3d/slintopenglview.cpp
+  3d/slintopenglview.h
   cmd/cmdattributeedit.cpp
   cmd/cmdattributeedit.h
   cmd/cmdcircleedit.cpp
@@ -80,6 +82,8 @@ add_library(
   graphics/graphicslayer.h
   graphics/graphicslayerlist.cpp
   graphics/graphicslayerlist.h
+  graphics/graphicslayersmodel.cpp
+  graphics/graphicslayersmodel.h
   graphics/graphicsscene.cpp
   graphics/graphicsscene.h
   graphics/holegraphicsitem.cpp
@@ -102,6 +106,8 @@ add_library(
   graphics/primitivetextgraphicsitem.h
   graphics/primitivezonegraphicsitem.cpp
   graphics/primitivezonegraphicsitem.h
+  graphics/slintgraphicsview.cpp
+  graphics/slintgraphicsview.h
   graphics/stroketextgraphicsitem.cpp
   graphics/stroketextgraphicsitem.h
   graphics/textgraphicsitem.cpp
@@ -461,18 +467,18 @@ add_library(
   project/assemblyvariantlisteditorwidget.h
   project/assemblyvariantlistmodel.cpp
   project/assemblyvariantlistmodel.h
+  project/board/board2dtab.cpp
+  project/board/board2dtab.h
+  project/board/board3dtab.cpp
+  project/board/board3dtab.h
   project/board/boardclipboarddata.cpp
   project/board/boardclipboarddata.h
   project/board/boardclipboarddatabuilder.cpp
   project/board/boardclipboarddatabuilder.h
   project/board/boardeditor.cpp
   project/board/boardeditor.h
-  project/board/boardeditor.ui
   project/board/boardgraphicsscene.cpp
   project/board/boardgraphicsscene.h
-  project/board/boardlayersdock.cpp
-  project/board/boardlayersdock.h
-  project/board/boardlayersdock.ui
   project/board/boardpickplacegeneratordialog.cpp
   project/board/boardpickplacegeneratordialog.h
   project/board/boardpickplacegeneratordialog.ui
@@ -540,9 +546,6 @@ add_library(
   project/board/graphicsitems/bgi_via.h
   project/board/graphicsitems/bgi_zone.cpp
   project/board/graphicsitems/bgi_zone.h
-  project/board/unplacedcomponentsdock.cpp
-  project/board/unplacedcomponentsdock.h
-  project/board/unplacedcomponentsdock.ui
   project/bomgeneratordialog.cpp
   project/bomgeneratordialog.h
   project/bomgeneratordialog.ui
@@ -804,6 +807,7 @@ add_library(
   project/projectsetupdialog.ui
   project/schematic/fsm/schematiceditorfsm.cpp
   project/schematic/fsm/schematiceditorfsm.h
+  project/schematic/fsm/schematiceditorfsmadapter.h
   project/schematic/fsm/schematiceditorstate.cpp
   project/schematic/fsm/schematiceditorstate.h
   project/schematic/fsm/schematiceditorstate_addcomponent.cpp
@@ -841,17 +845,17 @@ add_library(
   project/schematic/schematicclipboarddatabuilder.h
   project/schematic/schematiceditor.cpp
   project/schematic/schematiceditor.h
-  project/schematic/schematiceditor.ui
   project/schematic/schematicgraphicsscene.cpp
   project/schematic/schematicgraphicsscene.h
-  project/schematic/schematicpagesdock.cpp
-  project/schematic/schematicpagesdock.h
-  project/schematic/schematicpagesdock.ui
   project/schematic/schematicselectionquery.cpp
   project/schematic/schematicselectionquery.h
+  project/schematic/schematictab.cpp
+  project/schematic/schematictab.h
   project/schematic/symbolinstancepropertiesdialog.cpp
   project/schematic/symbolinstancepropertiesdialog.h
   project/schematic/symbolinstancepropertiesdialog.ui
+  rulecheck/rulecheckmessagesmodel.cpp
+  rulecheck/rulecheckmessagesmodel.h
   undocommand.cpp
   undocommand.h
   undocommandgroup.cpp
@@ -859,16 +863,22 @@ add_library(
   undostack.cpp
   undostack.h
   utils/deriveduiobjectlistview.h
+  utils/dismissablemessagecontext.cpp
+  utils/dismissablemessagecontext.h
   utils/editortoolbox.cpp
   utils/editortoolbox.h
   utils/exclusiveactiongroup.cpp
   utils/exclusiveactiongroup.h
   utils/halignactiongroup.cpp
   utils/halignactiongroup.h
+  utils/lengtheditcontext.cpp
+  utils/lengtheditcontext.h
   utils/measuretool.cpp
   utils/measuretool.h
   utils/menubuilder.cpp
   utils/menubuilder.h
+  utils/searchcontext.cpp
+  utils/searchcontext.h
   utils/shortcutsreferencegenerator.cpp
   utils/shortcutsreferencegenerator.h
   utils/slinthelpers.cpp
@@ -893,8 +903,6 @@ add_library(
   widgets/angleedit.h
   widgets/attributelisteditorwidget.cpp
   widgets/attributelisteditorwidget.h
-  widgets/attributeunitcombobox.cpp
-  widgets/attributeunitcombobox.h
   widgets/checkableitemseditorwidget.cpp
   widgets/checkableitemseditorwidget.h
   widgets/doublespinbox.cpp
@@ -931,9 +939,6 @@ add_library(
   widgets/positivelengthedit.h
   widgets/ratioedit.cpp
   widgets/ratioedit.h
-  widgets/rulecheckdock.cpp
-  widgets/rulecheckdock.h
-  widgets/rulecheckdock.ui
   widgets/rulechecklistwidget.cpp
   widgets/rulechecklistwidget.h
   widgets/searchtoolbar.cpp

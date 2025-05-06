@@ -38,7 +38,9 @@ export component Switch inherits Rectangle {
         enabled: enabled && focusable;
 
         key-pressed(event) => {
-            if (event.text == Key.Return) || (event.text == Key.Space) {
+            // Only consume Space, but not Return as the Return key is often
+            // used to confirm a dialog or something like that.
+            if event.text == Key.Space {
                 checked = !checked;
                 return accept;
             }
@@ -49,7 +51,7 @@ export component Switch inherits Rectangle {
     l := HorizontalLayout {
         spacing: 8px;
 
-        if text-side == TextSide.left: Text {
+        if (!text.is-empty) && (text-side == TextSide.left): Text {
             text: text;
             wrap: word-wrap;
             horizontal-alignment: right;
@@ -89,7 +91,7 @@ export component Switch inherits Rectangle {
             }
         }
 
-        if text-side == TextSide.right: Text {
+        if (!text.is-empty) && (text-side == TextSide.right): Text {
             text: text;
             wrap: word-wrap;
             vertical-alignment: center;

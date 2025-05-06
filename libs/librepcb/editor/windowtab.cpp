@@ -63,6 +63,34 @@ void WindowTab::trigger(ui::TabAction a) noexcept {
   }
 }
 
+slint::Image WindowTab::renderScene(float width, float height,
+                                    int scene) noexcept {
+  Q_UNUSED(width);
+  Q_UNUSED(height);
+  Q_UNUSED(scene);
+  return slint::Image();
+}
+
+bool WindowTab::processScenePointerEvent(
+    const QPointF& pos, slint::private_api::PointerEvent e) noexcept {
+  Q_UNUSED(pos);
+  Q_UNUSED(e);
+  return false;
+}
+
+bool WindowTab::processSceneScrolled(
+    const QPointF& pos, slint::private_api::PointerScrollEvent e) noexcept {
+  Q_UNUSED(pos);
+  Q_UNUSED(e);
+  return false;
+}
+
+bool WindowTab::processSceneKeyEvent(
+    const slint::private_api::KeyEvent& e) noexcept {
+  Q_UNUSED(e);
+  return false;
+}
+
 /*******************************************************************************
  *  End of File
  ******************************************************************************/

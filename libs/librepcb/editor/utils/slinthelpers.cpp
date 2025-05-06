@@ -110,6 +110,8 @@ slint::private_api::MouseCursor q2s(Qt::CursorShape s) noexcept {
       return slint::private_api::MouseCursor::Pointer;
     case Qt::CrossCursor:
       return slint::private_api::MouseCursor::Crosshair;
+    case Qt::ClosedHandCursor:
+      return slint::private_api::MouseCursor::Grabbing;
     default: {
       qWarning() << "Unsupported cursor shape:" << s;
       return slint::private_api::MouseCursor::Default;

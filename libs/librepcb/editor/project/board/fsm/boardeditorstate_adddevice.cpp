@@ -60,6 +60,9 @@ bool BoardEditorState_AddDevice::entry() noexcept {
   Q_ASSERT(mIsUndoCmdActive == false);
 
   mAdapter.fsmToolEnter(*this);
+  mAdapter.fsmSetFeatures(
+      BoardEditorFsmAdapter::Features(BoardEditorFsmAdapter::Feature::Rotate |
+                                      BoardEditorFsmAdapter::Feature::Flip));
   return true;
 }
 
@@ -68,6 +71,7 @@ bool BoardEditorState_AddDevice::exit() noexcept {
   if (!abortCommand(true)) return false;
   Q_ASSERT(mIsUndoCmdActive == false);
 
+  mAdapter.fsmSetFeatures(BoardEditorFsmAdapter::Features());
   mAdapter.fsmToolLeave();
   return true;
 }
@@ -95,15 +99,13 @@ bool BoardEditorState_AddDevice::processFlip(
 
 bool BoardEditorState_AddDevice::processGraphicsSceneMouseMoved(
     const GraphicsSceneMouseEvent& e) noexcept {
-  Board* board = getActiveBoard();
-  if (!board) return false;
   if (!mIsUndoCmdActive) return false;
   if (!mCurrentDeviceEditCmd) return false;
 
   Point pos = e.scenePos.mappedToGrid(getGridInterval());
   // set temporary position of the current device
   mCurrentDeviceEditCmd->setPosition(pos, true);
-  board->triggerAirWiresRebuild();
+  mContext.board.triggerAirWiresRebuild();
   return true;
 }
 
@@ -162,8 +164,7 @@ bool BoardEditorState_AddDevice::addDevice(ComponentInstance& cmp,
 
   // Discarding temporary changes could have deleted the component, so let's
   // check it again.
-  Board* board = getActiveBoard();
-  if ((!board) || (!cmpPtr) || (!cmp.isAddedToCircuit())) return false;
+  if ((!cmpPtr) || (!cmp.isAddedToCircuit())) return false;
 
   try {
     // start a new command
@@ -175,7 +176,7 @@ bool BoardEditorState_AddDevice::addDevice(ComponentInstance& cmp,
     const Point pos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos())
                           .mappedToGrid(getGridInterval());
     CmdAddDeviceToBoard* cmd = new CmdAddDeviceToBoard(
-        mContext.workspace, *board, cmp, dev, fpt, std::nullopt, pos);
+        mContext.workspace, mContext.board, cmp, dev, fpt, std::nullopt, pos);
     mContext.undoStack.appendToCmdGroup(cmd);
     mCurrentDeviceToPlace = cmd->getDeviceInstance();
     Q_ASSERT(mCurrentDeviceToPlace);

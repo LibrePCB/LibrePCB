@@ -256,6 +256,7 @@ public:
   std::unique_ptr<QMimeData> toMimeData() const;
   static std::unique_ptr<SchematicClipboardData> fromMimeData(
       const QMimeData* mime);
+  static bool isValid(const QMimeData* mime) noexcept;
 
   // Operator Overloadings
   SchematicClipboardData& operator=(const SchematicClipboardData& rhs) = delete;

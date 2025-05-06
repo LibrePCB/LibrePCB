@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -32,6 +31,7 @@
 namespace librepcb {
 
 class Angle;
+class Board;
 class ComponentInstance;
 class Point;
 class Project;
@@ -88,10 +88,10 @@ public:
   struct Context {
     Workspace& workspace;
     Project& project;
+    Board& board;
     UndoStack& undoStack;
     GraphicsLayerList& layers;
     BoardEditorFsmAdapter& adapter;
-    QWidget& parentWidget;
   };
 
   // Constructors / Destructor
@@ -143,28 +143,6 @@ public:
       const GraphicsSceneMouseEvent& e) noexcept;
   bool processGraphicsSceneRightMouseButtonReleased(
       const GraphicsSceneMouseEvent& e) noexcept;
-
-  /**
-   * Switch to another board
-   *
-   * If someone (the user or the application) wants to switch to another board
-   * in the board editor, this is not allowed at any time (for example, while
-   * drawing a trace in the active board, you cannot switch to another board).
-   * So this kind of event must be processed by the FSM. The FSM then will only
-   * decide whether changing the board is allowed (event accepted) or not
-   * (event rejected). If the event was accepted, the board editor then is
-   * allowed to switch to the requested board.
-   *
-   * @param index   The new board index
-   * @retval true   If switching is allowed
-   * @retval false  If switching is rejected
-   */
-  bool processSwitchToBoard(int index) noexcept;
-
-  /**
-   * @brief Notification about a switched board
-   */
-  void processSwitchedBoard() noexcept;
 
   // Operator Overloadings
   BoardEditorFsm& operator=(const BoardEditorFsm& rhs) = delete;

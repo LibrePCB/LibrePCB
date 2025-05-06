@@ -63,7 +63,7 @@ bool SchematicEditorState_Measure::entry() noexcept {
 
   mAdapter.fsmToolEnter(*this);
   mAdapter.fsmSetViewCursor(Qt::CrossCursor);
-  mTool->setSchematic(getActiveSchematic());
+  mTool->setSchematic(&mContext.schematic);
   mTool->enter(*scene, getLengthUnit(),
                mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos()));
   return true;
@@ -111,21 +111,6 @@ bool SchematicEditorState_Measure::processGraphicsSceneLeftMouseButtonPressed(
     const GraphicsSceneMouseEvent& e) noexcept {
   Q_UNUSED(e);
   return mTool->processGraphicsSceneLeftMouseButtonPressed();
-}
-
-bool SchematicEditorState_Measure::processSwitchToSchematicPage(
-    int index) noexcept {
-  Q_UNUSED(index);
-  return true;
-}
-
-void SchematicEditorState_Measure::processSwitchedSchematicPage() noexcept {
-  mTool->leave();
-  mTool->setSchematic(getActiveSchematic());
-  if (GraphicsScene* scene = getActiveSchematicScene()) {
-    mTool->enter(*scene, getLengthUnit(),
-                 mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos()));
-  }
 }
 
 /*******************************************************************************

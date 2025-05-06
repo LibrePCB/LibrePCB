@@ -1,0 +1,660 @@
+import { DrawTraceToolBar } from "drawtracetoolbar.slint";
+import { AddViaToolBar } from "addviatoolbar.slint";
+import { DrawPolygonToolBar } from "drawpolygontoolbar.slint";
+import { AddStrokeTextToolBar } from "addstroketexttoolbar.slint";
+import { DrawPlaneToolBar } from "drawplanetoolbar.slint";
+import { DrawZoneToolBar } from "drawzonetoolbar.slint";
+import { AddHoleToolBar } from "addholetoolbar.slint";
+import { Tab } from "../../tab.slint";
+import {
+    Button,
+    LinkText,
+    MessageBox,
+    SceneButton,
+    Spinner,
+    ToolButton,
+} from "../../widgets.slint";
+import {
+    Backend,
+    Board2dTabData,
+    BoardAction,
+    Constants,
+    Data,
+    DismissableMessageAction,
+    EditorCommandSet as Cmd,
+    EditorTool,
+    Helpers,
+    PanelPage,
+    TabAction,
+    WindowSectionData,
+    WireMode,
+} from "../../api.slint";
+
+export component Board2dTab inherits Tab {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    property <[Board2dTabData]> tabs: section.board-2d-tabs;
+    property <int> index: section.current-tab-index;
+    property <length> toolbar-space: view-buttons-l.x - toolbuttons-l.x - toolbuttons-l.width - 10px;
+    property <length> toolbutton-offset-y: (toolbar-r.width > toolbar-space) ? toolbar-r.height : 0;
+
+    function tool-triggered(tool: EditorTool, action: TabAction) {
+        Data.tab-clicked(section-index, index);
+        if Data.preview-mode {
+            tabs[index].tool = tool;
+        } else {
+            Backend.trigger-tab(section-index, index, action);
+        }
+        root.focus();
+    }
+
+    enabled: true;
+
+    changed absolute-position => {
+        section.board-2d-tabs[index].scene-image-pos = self.absolute-position;
+    }
+
+    // Move focus from devices panel to scene when started to place a device.
+    property <EditorTool> editor-tool: tabs[index].tool;
+    changed editor-tool => {
+        if editor-tool == EditorTool.component {
+            root.focus();
+        }
+    }
+
+    init => {
+        section.board-2d-tabs[index].scene-image-pos = self.absolute-position;
+    }
+
+    if Data.preview-mode: Rectangle {
+        background: black;
+    }
+
+    img := Image {
+        image-fit: preserve;
+        image-rendering: pixelated;
+        source: Backend.render-scene(section-index, root.width, root.height, 0, tabs[index].frame);
+        accessible-role: none;
+    }
+
+    // Show overlay, if text is not empty.
+    if !tabs[index].tool-overlay-text.is-empty: Rectangle {
+        x: 2 * toolbuttons-l.x + toolbuttons-l.width;
+        y: toolbuttons-l.y;
+        width: overlay-txt.preferred-width + 2 * overlay-txt.x;
+        height: overlay-txt.preferred-height + 2 * overlay-txt.y;
+        background: tabs[index].overlay-color;
+        border-radius: 10px;
+        border-width: 1px;
+        border-color: tabs[index].overlay-text-color;
+
+        overlay-txt := Text {
+            x: 8px;
+            y: 8px;
+            horizontal-alignment: left;
+            vertical-alignment: top;
+            font-family: "Noto Sans Mono";
+            color: tabs[index].overlay-text-color;
+            text: tabs[index].tool-overlay-text;
+        }
+    }
+
+    ta := TouchArea {
+        mouse-cursor: tabs[index].tool-cursor;
+
+        toolbar-r := Rectangle {
+            y: 0;
+            width: min(self.preferred-width, root.width - 10px);
+            height: 34px;
+            background: #505050;
+            border-bottom-left-radius: 11px;
+            border-bottom-right-radius: 11px;
+            visible: self.width > 30px;
+
+            HorizontalLayout {
+                alignment: center;
+                padding: 3px;
+
+                if tabs[index].tool == EditorTool.wire: trace-toolbar := DrawTraceToolBar {
+                    section-index: section-index;
+                    section: section;
+                }
+
+                if tabs[index].tool == EditorTool.via: via-toolbar := AddViaToolBar {
+                    section-index: section-index;
+                    section: section;
+                }
+
+                if tabs[index].tool == EditorTool.polygon: polygon-toolbar := DrawPolygonToolBar {
+                    section-index: section-index;
+                    section: section;
+                }
+
+                if tabs[index].tool == EditorTool.text: text-toolbar := AddStrokeTextToolBar {
+                    section-index: section-index;
+                    section: section;
+                }
+
+                if tabs[index].tool == EditorTool.plane: plane-toolbar := DrawPlaneToolBar {
+                    section-index: section-index;
+                    section: section;
+                }
+
+                if tabs[index].tool == EditorTool.zone: zone-toolbar := DrawZoneToolBar {
+                    section-index: section-index;
+                    section: section;
+                }
+
+                if tabs[index].tool == EditorTool.hole: hole-toolbar := AddHoleToolBar {
+                    section-index: section-index;
+                    section: section;
+                }
+            }
+        }
+
+        if tabs[index].tool == EditorTool.select: VerticalLayout {
+            width: min(self.preferred-width, 0.7 * parent.width);
+            padding: 20px;
+            spacing: 10px;
+
+            if tabs[index].empty-schematics-msg.visible: empty-schematics-msg := MessageBox {
+                title: @tr("Empty Schematic");
+                supports-dont-show-again: tabs[index].empty-schematics-msg.supports-dont-show-again;
+
+                Text {
+                    wrap: word-wrap;
+                    color: parent.text-color;
+                    text: @tr("Only components existing in the schematics can be added to a board, but the schematics of this project are currently empty. Please draw the schematics first before starting with the board design.");
+                }
+
+                HorizontalLayout {
+                    alignment: start;
+
+                    empty-schematics-help-btn := LinkText {
+                        text-color: empty-schematics-msg.text-color;
+                        text-color-hovered: empty-schematics-msg.hover-color;
+                        wrap: word-wrap;
+                        text: "▸ " + @tr("Learn how to create schematics");
+                        status-tip: Constants.user-manual-create-schematics-url;
+
+                        clicked => {
+                            Backend.open-url(self.status-tip);
+                        }
+                    }
+                }
+
+                dismiss-clicked => {
+                    tabs[index].empty-schematics-msg.action = DismissableMessageAction.dismiss;
+                }
+
+                dont-show-again-clicked => {
+                    tabs[index].empty-schematics-msg.action = DismissableMessageAction.dont-show-again;
+                }
+            }
+
+            if tabs[index].place-devices-msg.visible: place-devices-msg := MessageBox {
+                title: @tr("Get Started");
+                supports-dont-show-again: tabs[index].place-devices-msg.supports-dont-show-again;
+
+                Text {
+                    wrap: word-wrap;
+                    color: parent.text-color;
+                    text: @tr("Start designing the board by placing all devices which are part of the schematics.");
+                }
+
+                if Data.panel-page != PanelPage.place-devices: place-devices-btn := Button {
+                    primary: true;
+                    text: @tr("Place Devices");
+
+                    clicked => {
+                        Data.panel-page = PanelPage.place-devices;
+                    }
+                }
+
+                HorizontalLayout {
+                    alignment: start;
+
+                    place-devices-help-btn := LinkText {
+                        text-color: place-devices-msg.text-color;
+                        text-color-hovered: place-devices-msg.hover-color;
+                        wrap: word-wrap;
+                        text: "▸ " + @tr("Learn how to create boards");
+                        status-tip: Constants.user-manual-create-board-url;
+
+                        clicked => {
+                            Backend.open-url(self.status-tip);
+                        }
+                    }
+                }
+
+                dismiss-clicked => {
+                    tabs[index].place-devices-msg.action = DismissableMessageAction.dismiss;
+                }
+
+                dont-show-again-clicked => {
+                    tabs[index].place-devices-msg.action = DismissableMessageAction.dont-show-again;
+                }
+            }
+        }
+
+        toolbuttons-l := VerticalLayout {
+            x: 7px;
+            y: 7px + toolbutton-offset-y;
+            width: self.preferred-width;
+            height: parent.height - 2 * self.y;
+            spacing: 5px;
+
+            tool-select-btn := ToolButton {
+                cmd: Cmd.tool-select;
+                icon: @image-url("../../../../../font-awesome/svgs/solid/arrow-pointer.svg");
+                checked: tabs[index].tool == EditorTool.select;
+
+                clicked => {
+                    tool-triggered(EditorTool.select, TabAction.tool-select);
+                }
+            }
+
+            tool-trace-btn := ToolButton {
+                cmd: Cmd.tool-trace;
+                icon: @image-url("../../../../../../img/actions/draw_wire.png");
+                checked: tabs[index].tool == EditorTool.wire;
+
+                clicked => {
+                    tool-triggered(EditorTool.wire, TabAction.tool-wire);
+                }
+            }
+
+            tool-via-btn := ToolButton {
+                cmd: Cmd.tool-via;
+                checked: tabs[index].tool == EditorTool.via;
+
+                clicked => {
+                    tool-triggered(EditorTool.via, TabAction.tool-via);
+                }
+            }
+
+            tool-polygon-btn := ToolButton {
+                cmd: Cmd.tool-polygon;
+                icon: @image-url("../../../../../font-awesome/svgs/solid/draw-polygon.svg");
+                checked: tabs[index].tool == EditorTool.polygon;
+
+                clicked => {
+                    tool-triggered(EditorTool.polygon, TabAction.tool-polygon);
+                }
+            }
+
+            tool-text-btn := ToolButton {
+                cmd: Cmd.tool-text;
+                icon: @image-url("../../../../../font-awesome/svgs/solid/font.svg");
+                checked: tabs[index].tool == EditorTool.text;
+
+                clicked => {
+                    tool-triggered(EditorTool.text, TabAction.tool-text);
+                }
+            }
+
+            tool-plane-btn := ToolButton {
+                cmd: Cmd.tool-plane;
+                checked: tabs[index].tool == EditorTool.plane;
+
+                clicked => {
+                    tool-triggered(EditorTool.plane, TabAction.tool-plane);
+                }
+            }
+
+            tool-zone-btn := ToolButton {
+                cmd: Cmd.tool-zone;
+                icon: @image-url("../../../../../bootstrap-icons/icons/sign-stop.svg");
+                checked: tabs[index].tool == EditorTool.zone;
+
+                clicked => {
+                    tool-triggered(EditorTool.zone, TabAction.tool-zone);
+                }
+            }
+
+            tool-hole-btn := ToolButton {
+                cmd: Cmd.tool-hole;
+                icon: @image-url("../../../../../font-awesome/svgs/solid/bore-hole.svg");
+                checked: tabs[index].tool == EditorTool.hole;
+
+                clicked => {
+                    tool-triggered(EditorTool.hole, TabAction.tool-hole);
+                }
+            }
+
+            tool-measure-btn := ToolButton {
+                cmd: Cmd.tool-measure;
+                icon: @image-url("../../../../../font-awesome/svgs/solid/ruler.svg");
+                checked: tabs[index].tool == EditorTool.measure;
+
+                clicked => {
+                    tool-triggered(EditorTool.measure, TabAction.tool-measure);
+                }
+            }
+        }
+
+        view-buttons-l := VerticalLayout {
+            x: parent.width - self.preferred-width - 7px;
+            y: toolbutton-offset-y + 7px;
+            width: self.preferred-width;
+
+            zoom-fit-btn := SceneButton {
+                icon: @image-url("../../../../../font-awesome/svgs/solid/expand.svg");
+                icon-scale: 0.9;
+                bg-color: tabs[index].background-color;
+                fg-color: tabs[index].foreground-color;
+
+                clicked => {
+                    Backend.trigger-tab(section-index, index, TabAction.zoom-fit);
+                }
+            }
+
+            zoom-in-btn := SceneButton {
+                icon: @image-url("../../../../../bootstrap-icons/icons/zoom-in.svg");
+                bg-color: tabs[index].background-color;
+                fg-color: tabs[index].foreground-color;
+
+                clicked => {
+                    Backend.trigger-tab(section-index, index, TabAction.zoom-in);
+                }
+            }
+
+            zoom-out-btn := SceneButton {
+                icon: @image-url("../../../../../bootstrap-icons/icons/zoom-out.svg");
+                bg-color: tabs[index].background-color;
+                fg-color: tabs[index].foreground-color;
+
+                clicked => {
+                    Backend.trigger-tab(section-index, index, TabAction.zoom-out);
+                }
+            }
+
+            toggle-3d-btn := SceneButton {
+                text: "3D";
+                bg-color: tabs[index].background-color;
+                fg-color: tabs[index].foreground-color;
+
+                clicked => {
+                    Backend.trigger-board(tabs[index].project-index, tabs[index].board-index, BoardAction.open-3d);
+                }
+            }
+
+            Rectangle {
+                height: 5px;
+            }
+
+            if tabs[index].refreshing: spinner := Spinner {
+                x: (parent.width - self.width) / 2;
+                width: 20px;
+                height: self.width;
+                foreground-color: tabs[index].foreground-color;
+                indeterminate: true;
+            }
+        }
+
+        VerticalLayout {
+            x: 5px;
+            y: parent.height - self.height - self.x;
+            width: self.preferred-width;
+            height: self.preferred-height;
+
+            if section.tabs[index].rule-check-unapproved-messages > 0: unapproved-messages-btn := LinkText {
+                text-color: tabs[index].foreground-color.with-alpha(0.7);
+                text-color-hovered: tabs[index].foreground-color;
+                text: @tr("DRC Messages: {}", section.tabs[index].rule-check-unapproved-messages);
+                accessible-role: none;
+
+                clicked => {
+                    Data.panel-page = PanelPage.rule-check;
+                }
+            }
+
+            if tabs[index].unplaced-components.length > 0: unplaced-devices-btn := LinkText {
+                text-color: tabs[index].foreground-color.with-alpha(0.7);
+                text-color-hovered: tabs[index].foreground-color;
+                text: @tr("Unplaced: {}", tabs[index].unplaced-components.length);
+                accessible-role: none;
+
+                clicked => {
+                    Data.panel-page = PanelPage.place-devices;
+                }
+            }
+        }
+
+        pointer-event(event) => {
+            if event.kind == PointerEventKind.down {
+                Data.tab-clicked(section-index, index);
+                if !root.has-focus {
+                    root.focus();
+                }
+            }
+            Backend.scene-pointer-event(section-index, self.mouse-x, self.mouse-y, event);
+        }
+
+        scroll-event(event) => {
+            Backend.scene-scrolled(section-index, self.mouse-x, self.mouse-y, event)
+        }
+    }
+
+    key-pressed(event) => {
+        Data.tab-clicked(section-index, index);
+
+        // If the focus is in the command toolbar, make the Escape key moving
+        // the focus back to the graphics scene without triggering any action.
+        if (event.text == Key.Escape) && (!root.has-focus) {
+            root.focus();
+            return accept;
+        }
+
+        // Tool-specific shortcuts
+        if tabs[index].tool == EditorTool.wire {
+            if Helpers.is-shortcut(event, Cmd.layer-up) && (tabs[index].tool-layer.current-index > 0) {
+                tabs[index].tool-layer.current-index -= 1;
+                return accept;
+            } else if Helpers.is-shortcut(event, Cmd.layer-down) && (tabs[index].tool-layer.current-index < (tabs[index].tool-layer.items.length - 1)) {
+                tabs[index].tool-layer.current-index += 1;
+                return accept;
+            } else if Helpers.is-shortcut(event, Cmd.line-width-increase) {
+                tabs[index].tool-line-width.increase = true;
+                return accept;
+            } else if Helpers.is-shortcut(event, Cmd.line-width-decrease) && tabs[index].tool-line-width.can-decrease {
+                tabs[index].tool-line-width.decrease = true;
+                return accept;
+            } else if Helpers.is-shortcut(event, Cmd.width-auto-toggle) {
+                tabs[index].tool-filled = !tabs[index].tool-filled;
+                return accept;
+            } else if Helpers.is-shortcut(event, Cmd.size-increase) {
+                tabs[index].tool-size.increase = true;
+                return accept;
+            } else if Helpers.is-shortcut(event, Cmd.size-decrease) && tabs[index].tool-size.can-decrease {
+                tabs[index].tool-size.decrease = true;
+                return accept;
+            } else if Helpers.is-shortcut(event, Cmd.drill-increase) {
+                tabs[index].tool-drill.increase = true;
+                return accept;
+            } else if Helpers.is-shortcut(event, Cmd.drill-decrease) && tabs[index].tool-drill.can-decrease {
+                tabs[index].tool-drill.decrease = true;
+                return accept;
+            } else if Helpers.is-shortcut(event, Cmd.wire-mode-h-v) {
+                tabs[index].tool-wire-mode = WireMode.h-v;
+                return accept;
+            } else if Helpers.is-shortcut(event, Cmd.wire-mode-v-h) {
+                tabs[index].tool-wire-mode = WireMode.v-h;
+                return accept;
+            } else if Helpers.is-shortcut(event, Cmd.wire-mode-90-45) {
+                tabs[index].tool-wire-mode = WireMode.deg90-45;
+                return accept;
+            } else if Helpers.is-shortcut(event, Cmd.wire-mode-45-90) {
+                tabs[index].tool-wire-mode = WireMode.deg45-90;
+                return accept;
+            } else if Helpers.is-shortcut(event, Cmd.wire-mode-straight) {
+                tabs[index].tool-wire-mode = WireMode.straight;
+                return accept;
+            }
+        } else if tabs[index].tool == EditorTool.via {
+            if Helpers.is-shortcut(event, Cmd.size-increase) {
+                tabs[index].tool-size.increase = true;
+                return accept;
+            } else if Helpers.is-shortcut(event, Cmd.size-decrease) && tabs[index].tool-size.can-decrease {
+                tabs[index].tool-size.decrease = true;
+                return accept;
+            } else if Helpers.is-shortcut(event, Cmd.drill-increase) {
+                tabs[index].tool-drill.increase = true;
+                return accept;
+            } else if Helpers.is-shortcut(event, Cmd.drill-decrease) && tabs[index].tool-drill.can-decrease {
+                tabs[index].tool-drill.decrease = true;
+                return accept;
+            }
+        } else if tabs[index].tool == EditorTool.polygon {
+            if Helpers.is-shortcut(event, Cmd.layer-up) && (tabs[index].tool-layer.current-index > 0) {
+                tabs[index].tool-layer.current-index -= 1;
+                return accept;
+            } else if Helpers.is-shortcut(event, Cmd.layer-down) && (tabs[index].tool-layer.current-index < (tabs[index].tool-layer.items.length - 1)) {
+                tabs[index].tool-layer.current-index += 1;
+                return accept;
+            } else if Helpers.is-shortcut(event, Cmd.line-width-increase) {
+                tabs[index].tool-line-width.increase = true;
+                return accept;
+            } else if Helpers.is-shortcut(event, Cmd.line-width-decrease) && tabs[index].tool-line-width.can-decrease {
+                tabs[index].tool-line-width.decrease = true;
+                return accept;
+            } else if Helpers.is-shortcut(event, Cmd.fill-toggle) {
+                tabs[index].tool-filled = !tabs[index].tool-filled;
+                return accept;
+            }
+        } else if tabs[index].tool == EditorTool.text {
+            if Helpers.is-shortcut(event, Cmd.layer-up) && (tabs[index].tool-layer.current-index > 0) {
+                tabs[index].tool-layer.current-index -= 1;
+                return accept;
+            } else if Helpers.is-shortcut(event, Cmd.layer-down) && (tabs[index].tool-layer.current-index < (tabs[index].tool-layer.items.length - 1)) {
+                tabs[index].tool-layer.current-index += 1;
+                return accept;
+            } else if Helpers.is-shortcut(event, Cmd.size-increase) {
+                tabs[index].tool-size.increase = true;
+                return accept;
+            } else if Helpers.is-shortcut(event, Cmd.size-decrease) && tabs[index].tool-size.can-decrease {
+                tabs[index].tool-size.decrease = true;
+                return accept;
+            }
+        } else if tabs[index].tool == EditorTool.plane {
+            if Helpers.is-shortcut(event, Cmd.layer-up) && (tabs[index].tool-layer.current-index > 0) {
+                tabs[index].tool-layer.current-index -= 1;
+                return accept;
+            } else if Helpers.is-shortcut(event, Cmd.layer-down) && (tabs[index].tool-layer.current-index < (tabs[index].tool-layer.items.length - 1)) {
+                tabs[index].tool-layer.current-index += 1;
+                return accept;
+            }
+        } else if tabs[index].tool == EditorTool.zone {
+            if Helpers.is-shortcut(event, Cmd.layer-up) && (tabs[index].tool-layer.current-index > 0) {
+                tabs[index].tool-layer.current-index -= 1;
+                return accept;
+            } else if Helpers.is-shortcut(event, Cmd.layer-down) && (tabs[index].tool-layer.current-index < (tabs[index].tool-layer.items.length - 1)) {
+                tabs[index].tool-layer.current-index += 1;
+                return accept;
+            }
+        } else if tabs[index].tool == EditorTool.hole {
+            if Helpers.is-shortcut(event, Cmd.drill-increase) {
+                tabs[index].tool-drill.increase = true;
+                return accept;
+            } else if Helpers.is-shortcut(event, Cmd.drill-decrease) && tabs[index].tool-drill.can-decrease {
+                tabs[index].tool-drill.decrease = true;
+                return accept;
+            }
+        }
+
+        // Common shortcuts
+        if Helpers.is-shortcut(event, Cmd.plane-hide-all) {
+            Backend.trigger-tab(section-index, index, TabAction.planes-hide);
+            return accept;
+        } else if Helpers.is-shortcut(event, Cmd.plane-show-all) {
+            Backend.trigger-tab(section-index, index, TabAction.planes-show);
+            return accept;
+        } else if Helpers.is-shortcut(event, Cmd.plane-rebuild-all) {
+            Backend.trigger-tab(section-index, index, TabAction.planes-rebuild);
+            return accept;
+        } else if Helpers.is-shortcut(event, Cmd.generate-fabrication-data) {
+            Backend.trigger-tab(section-index, index, TabAction.export-fabrication-data);
+            return accept;
+        } else if Helpers.is-shortcut(event, Cmd.generate-pick-place) {
+            Backend.trigger-tab(section-index, index, TabAction.export-pick-place);
+            return accept;
+        } else if Helpers.is-shortcut(event, Cmd.generate-d356-netlist) {
+            Backend.trigger-tab(section-index, index, TabAction.export-d356-netlist);
+            return accept;
+        } else if Helpers.is-shortcut(event, Cmd.export-specctra-dsn) {
+            Backend.trigger-tab(section-index, index, TabAction.export-specctra);
+            return accept;
+        } else if Helpers.is-shortcut(event, Cmd.import-specctra-ses) {
+            Backend.trigger-tab(section-index, index, TabAction.import-specctra);
+            return accept;
+        } else if Helpers.is-shortcut(event, Cmd.import-dxf) {
+            Backend.trigger-tab(section-index, index, TabAction.import-dxf);
+            return accept;
+        } else if Helpers.is-shortcut(event, Cmd.run-quick-check) {
+            Backend.trigger-tab(section-index, index, TabAction.run-quick-check);
+            return accept;
+        } else if Helpers.is-shortcut(event, Cmd.run-design-rule-check) {
+            Backend.trigger-tab(section-index, index, TabAction.run-drc);
+            return accept;
+        } else if Helpers.is-shortcut(event, Cmd.ignore-locks) {
+            tabs[index].ignore-placement-locks = !tabs[index].ignore-placement-locks;
+            return accept;
+        } else if Helpers.is-shortcut(event, Cmd.toggle-3d) {
+            Backend.trigger-board(tabs[index].project-index, tabs[index].board-index, BoardAction.open-3d);
+            return accept;
+        } else if Helpers.is-shortcut(event, Cmd.tool-select) {
+            tool-triggered(EditorTool.select, TabAction.tool-select);
+            return accept;
+        } else if Helpers.is-shortcut(event, Cmd.tool-wire) {
+            tool-triggered(EditorTool.wire, TabAction.tool-wire);
+            return accept;
+        } else if Helpers.is-shortcut(event, Cmd.tool-via) {
+            tool-triggered(EditorTool.polygon, TabAction.tool-via);
+            return accept;
+        } else if Helpers.is-shortcut(event, Cmd.tool-polygon) {
+            tool-triggered(EditorTool.polygon, TabAction.tool-polygon);
+            return accept;
+        } else if Helpers.is-shortcut(event, Cmd.tool-text) {
+            tool-triggered(EditorTool.text, TabAction.tool-text);
+            return accept;
+        } else if Helpers.is-shortcut(event, Cmd.tool-plane) {
+            tool-triggered(EditorTool.polygon, TabAction.tool-plane);
+            return accept;
+        } else if Helpers.is-shortcut(event, Cmd.tool-zone) {
+            tool-triggered(EditorTool.netlabel, TabAction.tool-zone);
+            return accept;
+        } else if Helpers.is-shortcut(event, Cmd.tool-hole) {
+            tool-triggered(EditorTool.component, TabAction.tool-hole);
+            return accept;
+        } else if Helpers.is-shortcut(event, Cmd.tool-measure) {
+            tool-triggered(EditorTool.measure, TabAction.tool-measure);
+            return accept;
+        } else if Helpers.is-shortcut(event, Cmd.command-toolbar-focus) {
+            // Even works out of the box with tabulator(?)
+        } else if Helpers.is-shortcut(event, Cmd.abort) {
+            Backend.trigger-tab(section-index, index, TabAction.abort);
+            return accept;
+        } else if Helpers.process-tab-shortcuts(section-index, index, event) {
+            return accept;
+        } else if Helpers.process-board-shortcuts(tabs[index].project-index, tabs[index].board-index, event) {
+            return accept;
+        } else if Helpers.process-project-shortcuts(tabs[index].project-index, event) {
+            return accept;
+        }
+
+        // In preview, handle escape key here instead of by the backend.
+        if Data.preview-mode {
+            if Helpers.is-shortcut(event, Cmd.abort) {
+                tool-triggered(EditorTool.select, TabAction.tool-select);
+                return accept;
+            }
+        }
+
+        // Let the backend handle the event.
+        return Backend.scene-key-event(section-index, event);
+    }
+
+    key-released(event) => {
+        Backend.scene-key-event(section-index, event)
+    }
+}

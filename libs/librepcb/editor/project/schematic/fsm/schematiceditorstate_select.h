@@ -95,7 +95,6 @@ public:
       const GraphicsSceneMouseEvent& e) noexcept override;
   virtual bool processGraphicsSceneRightMouseButtonReleased(
       const GraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processSwitchToSchematicPage(int index) noexcept override;
 
   // Operator Overloadings
   SchematicEditorState_Select& operator=(
@@ -122,6 +121,8 @@ private:  // Methods
   void openNetLabelPropertiesDialog(SI_NetLabel& netlabel) noexcept;
   void openPolygonPropertiesDialog(Polygon& polygon) noexcept;
   void openTextPropertiesDialog(Text& text) noexcept;
+  void scheduleUpdateAvailableFeatures() noexcept;
+  void updateAvailableFeatures() noexcept;
 
 private:  // Data
   /// enum for all possible substates
@@ -143,6 +144,12 @@ private:  // Data
   QVector<int> mSelectedPolygonVertices;
   /// The polygon edit command (nullptr if not editing)
   std::unique_ptr<CmdPolygonEdit> mCmdPolygonEdit;
+
+  /// Signal/slot connections only when in this state
+  QList<QMetaObject::Connection> mConnections;
+
+  /// Delay timer for #updateAvailableFeatures(), only when in this state
+  std::unique_ptr<QTimer> mUpdateAvailableFeaturesTimer;
 };
 
 /*******************************************************************************

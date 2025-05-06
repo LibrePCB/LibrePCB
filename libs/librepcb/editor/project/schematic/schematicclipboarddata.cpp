@@ -138,6 +138,10 @@ std::unique_ptr<SchematicClipboardData> SchematicClipboardData::fromMimeData(
   }
 }
 
+bool SchematicClipboardData::isValid(const QMimeData* mime) noexcept {
+  return mime && (!mime->data(getMimeType()).isNull());
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/

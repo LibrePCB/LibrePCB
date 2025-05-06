@@ -2,6 +2,7 @@ import { ScrollView } from "std-widgets.slint";
 import {
     Button,
     IconButton,
+    Palette,
     PanelHeader,
 } from "widgets.slint";
 import {
@@ -159,7 +160,8 @@ export component AboutPanel inherits Rectangle {
             details-copy-btn := IconButton {
                 icon: details-copy-timer.running ? @image-url("../../../font-awesome/svgs/solid/check.svg") : @image-url("../../../font-awesome/svgs/regular/copy.svg");
                 icon-scale: 0.5;
-                colorize: details-copy-timer.running ? lime : transparent;
+                color-enabled: details-copy-timer.running ? lime : Palette.foreground;
+                color-hovered: details-copy-timer.running ? lime : white;
                 tooltip: details-copy-timer.running ? @tr("Copied!") : @tr("Copy to Clipboard");
                 tooltip-delayed: false;
 

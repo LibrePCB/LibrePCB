@@ -205,9 +205,6 @@ bool SchematicEditorState_DrawWire::
 bool SchematicEditorState_DrawWire::
     processGraphicsSceneRightMouseButtonReleased(
         const GraphicsSceneMouseEvent& e) noexcept {
-  Schematic* schematic = getActiveSchematic();
-  if (!schematic) return false;
-
   mCursorPos = e.scenePos;
 
   if (mSubState == SubState::POSITIONING_NETPOINT) {
@@ -220,12 +217,6 @@ bool SchematicEditorState_DrawWire::
   }
 
   return false;
-}
-
-bool SchematicEditorState_DrawWire::processSwitchToSchematicPage(
-    int index) noexcept {
-  Q_UNUSED(index);
-  return mSubState == SubState::IDLE;
 }
 
 /*******************************************************************************

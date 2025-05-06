@@ -121,11 +121,6 @@ bool BoardEditorState_DrawPolygon::
   return processGraphicsSceneLeftMouseButtonPressed(e);
 }
 
-bool BoardEditorState_DrawPolygon::processSwitchToBoard(int index) noexcept {
-  // Allow switching to an existing board if no command is active.
-  return (!mIsUndoCmdActive) && (index >= 0);
-}
-
 /*******************************************************************************
  *  Connection to UI
  ******************************************************************************/
@@ -177,8 +172,6 @@ bool BoardEditorState_DrawPolygon::startAddPolygon(const Point& pos) noexcept {
   abortBlockingToolsInOtherEditors();
 
   Q_ASSERT(mIsUndoCmdActive == false);
-  Board* board = getActiveBoard();
-  if (!board) return false;
 
   try {
     // Start a new undo command
@@ -188,7 +181,8 @@ bool BoardEditorState_DrawPolygon::startAddPolygon(const Point& pos) noexcept {
     // Add polygon with two vertices
     mCurrentProperties.setPath(Path({Vertex(pos), Vertex(pos)}));
     mCurrentPolygon = new BI_Polygon(
-        *board, BoardPolygonData(Uuid::createRandom(), mCurrentProperties));
+        mContext.board,
+        BoardPolygonData(Uuid::createRandom(), mCurrentProperties));
     mContext.undoStack.appendToCmdGroup(
         new CmdBoardPolygonAdd(*mCurrentPolygon));
 

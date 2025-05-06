@@ -75,6 +75,9 @@ bool SchematicEditorState_AddText::entry() noexcept {
   if (!addText(pos)) return false;
 
   mAdapter.fsmToolEnter(*this);
+  mAdapter.fsmSetFeatures(SchematicEditorFsmAdapter::Features(
+      SchematicEditorFsmAdapter::Feature::Rotate |
+      SchematicEditorFsmAdapter::Feature::Mirror));
   mAdapter.fsmSetViewCursor(Qt::CrossCursor);
   return true;
 }
@@ -84,6 +87,7 @@ bool SchematicEditorState_AddText::exit() noexcept {
   if (!abortCommand(true)) return false;
 
   mAdapter.fsmSetViewCursor(std::nullopt);
+  mAdapter.fsmSetFeatures(SchematicEditorFsmAdapter::Features());
   mAdapter.fsmToolLeave();
   return true;
 }
@@ -136,12 +140,6 @@ bool SchematicEditorState_AddText::processGraphicsSceneRightMouseButtonReleased(
   // Always accept the event if we are placing a text! When ignoring the
   // event, the state machine will abort the tool by a right click!
   return mIsUndoCmdActive;
-}
-
-bool SchematicEditorState_AddText::processSwitchToSchematicPage(
-    int index) noexcept {
-  Q_UNUSED(index);
-  return !mIsUndoCmdActive;
 }
 
 /*******************************************************************************
@@ -205,15 +203,13 @@ bool SchematicEditorState_AddText::addText(const Point& pos) noexcept {
   abortBlockingToolsInOtherEditors();
 
   Q_ASSERT(mIsUndoCmdActive == false);
-  Schematic* schematic = getActiveSchematic();
-  if (!schematic) return false;
 
   try {
     mContext.undoStack.beginCmdGroup(tr("Add text to schematic"));
     mIsUndoCmdActive = true;
     mCurrentProperties.setPosition(pos);
-    mCurrentTextToPlace =
-        new SI_Text(*schematic, Text(Uuid::createRandom(), mCurrentProperties));
+    mCurrentTextToPlace = new SI_Text(
+        mContext.schematic, Text(Uuid::createRandom(), mCurrentProperties));
     std::unique_ptr<CmdSchematicTextAdd> cmdAdd(
         new CmdSchematicTextAdd(*mCurrentTextToPlace));
     mContext.undoStack.appendToCmdGroup(cmdAdd.release());

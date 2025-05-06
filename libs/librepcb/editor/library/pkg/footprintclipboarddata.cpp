@@ -123,6 +123,10 @@ std::unique_ptr<FootprintClipboardData> FootprintClipboardData::fromMimeData(
   }
 }
 
+bool FootprintClipboardData::isValid(const QMimeData* mime) noexcept {
+  return mime && (!mime->data(getMimeType()).isNull());
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
