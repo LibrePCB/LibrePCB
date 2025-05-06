@@ -84,7 +84,12 @@ public:
     }
 
     QSvgRenderer renderer(content);
-    renderer.render(painter, rect);
+    const QSize svgSize = renderer.defaultSize().scaled(
+        rect.width(), rect.height(), Qt::KeepAspectRatio);
+    const QRectF targetRect(rect.x() + (rect.width() - svgSize.width()) / 2,
+                            rect.y() + (rect.height() - svgSize.height()) / 2,
+                            svgSize.width(), svgSize.height());
+    renderer.render(painter, targetRect);
   }
   QPixmap pixmap(const QSize& size, QIcon::Mode mode,
                  QIcon::State state) override {
@@ -93,6 +98,7 @@ public:
     QPixmap pix = QPixmap::fromImage(img, Qt::NoFormatConversion);
     {
       QPainter painter(&pix);
+      painter.setRenderHint(QPainter::Antialiasing);
       const QRect rext(QPoint(0, 0), size);
       this->paint(&painter, rext, mode, state);
     }

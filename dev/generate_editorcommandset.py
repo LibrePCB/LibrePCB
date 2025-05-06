@@ -105,6 +105,7 @@ class EditorCommand:
             return ''
         s = s.replace(':/fa/', '../../../../font-awesome/svgs/')
         s = s.replace(':/bi/', '../../../../bootstrap-icons/icons/')
+        s = s.replace(':/img/', '../../../../../img/')
         return s
 
     def text(self):
