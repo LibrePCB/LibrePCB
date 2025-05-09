@@ -46,27 +46,49 @@ WindowTab::~WindowTab() noexcept {
  ******************************************************************************/
 
 void WindowTab::setUiData(const ui::TabData& data) noexcept {
-  if (data.action != ui::Action::None) {
-    // if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0): Remove lambda.
-    const auto a = data.action;
-    QMetaObject::invokeMethod(
-        this, [this, a]() { triggerAsync(a); }, Qt::QueuedConnection);
-  }
+  Q_UNUSED(data);
 }
 
-/*******************************************************************************
- *  Protected Methods
- ******************************************************************************/
-
-void WindowTab::triggerAsync(ui::Action a) noexcept {
+void WindowTab::trigger(ui::TabAction a) noexcept {
   switch (a) {
-    case ui::Action::TabClose: {
+    case ui::TabAction::Close: {
       emit closeRequested();
       break;
     }
-    default:
+
+    default: {
+      qWarning() << "Unhandled tab action:" << static_cast<int>(a);
       break;
+    }
   }
+}
+
+slint::Image WindowTab::renderScene(float width, float height,
+                                    int scene) noexcept {
+  Q_UNUSED(width);
+  Q_UNUSED(height);
+  Q_UNUSED(scene);
+  return slint::Image();
+}
+
+bool WindowTab::processScenePointerEvent(
+    const QPointF& pos, slint::private_api::PointerEvent e) noexcept {
+  Q_UNUSED(pos);
+  Q_UNUSED(e);
+  return false;
+}
+
+bool WindowTab::processSceneScrolled(
+    const QPointF& pos, slint::private_api::PointerScrollEvent e) noexcept {
+  Q_UNUSED(pos);
+  Q_UNUSED(e);
+  return false;
+}
+
+bool WindowTab::processSceneKeyEvent(
+    const slint::private_api::KeyEvent& e) noexcept {
+  Q_UNUSED(e);
+  return false;
 }
 
 /*******************************************************************************

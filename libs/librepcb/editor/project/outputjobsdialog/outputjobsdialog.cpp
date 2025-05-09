@@ -77,13 +77,11 @@ namespace editor {
 
 OutputJobsDialog::OutputJobsDialog(const WorkspaceSettings& settings,
                                    Project& project, UndoStack& undoStack,
-                                   const QString& settingsPrefix,
                                    QWidget* parent) noexcept
   : QDialog(parent),
     mSettings(settings),
     mProject(project),
     mUndoStack(undoStack),
-    mSettingsPrefix(settingsPrefix % "/output_jobs_dialog"),
     mJobs(mProject.getOutputJobs()),
     mUi(new Ui::OutputJobsDialog),
     mOnJobsEditedSlot(*this, &OutputJobsDialog::jobListEdited) {
@@ -186,13 +184,16 @@ OutputJobsDialog::OutputJobsDialog(const WorkspaceSettings& settings,
 
   // Load client settings.
   QSettings cs;
-  restoreGeometry(cs.value(mSettingsPrefix % "/window_geometry").toByteArray());
+  const QSize windowSize = cs.value("output_jobs_dialog/window_size").toSize();
+  if (!windowSize.isEmpty()) {
+    resize(windowSize);
+  }
 }
 
 OutputJobsDialog::~OutputJobsDialog() noexcept {
   // Save client settings.
   QSettings cs;
-  cs.setValue(mSettingsPrefix % "/window_geometry", saveGeometry());
+  cs.setValue("output_jobs_dialog/window_size", size());
 }
 
 /*******************************************************************************
@@ -514,7 +515,8 @@ void OutputJobsDialog::currentItemChanged(QListWidgetItem* current,
     if (job) {
       if (auto j = std::dynamic_pointer_cast<GraphicsOutputJob>(job)) {
         mUi->scrollArea->setWidget(new GraphicsOutputJobWidget(
-            mProject, j, mSettings.defaultLengthUnit.get(), mSettingsPrefix));
+            mProject, j, mSettings.defaultLengthUnit.get(),
+            "output_jobs_dialog"));
       } else if (auto j =
                      std::dynamic_pointer_cast<GerberExcellonOutputJob>(job)) {
         auto widget = new GerberExcellonOutputJobWidget(mProject, j);

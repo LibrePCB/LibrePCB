@@ -8,28 +8,27 @@ Test creating projects
 import os
 
 
-def test_new_project_wizard(librepcb):
+def test_new_project_wizard(librepcb, helpers):
     """
     Create project using the wizard from the main window
     """
     with librepcb.open() as app:
+        adapter = app.widget('mainWindowTestAdapter', wait_active=True)
         # Open new project wizard
-        app.widget('mainWindowTestAdapter').call_slot('trigger', 'project-new')
-        assert app.widget('mainWindowNewProjectWizard').properties()['visible'] is True
+        adapter.call_slot('trigger', 'project-new')
+        assert app.widget('newProjectWizard').properties()['visible'] is True
         # Enter metadata
         name = 'New Project'
-        app.widget('mainWindowNewProjectWizardMetadataNameEdit').set_property('text', name)
-        path = app.widget('mainWindowNewProjectWizardMetadataPathEdit').properties()['text']
-        app.widget('mainWindowNewProjectWizardNextButton').click()
+        app.widget('newProjectWizardMetadataNameEdit').set_property('text', name)
+        path = app.widget('newProjectWizardMetadataPathEdit').properties()['text']
+        app.widget('newProjectWizardNextButton').click()
         # Setup schematic/board
-        app.widget('mainWindowNewProjectWizardFinishButton').click()
-        # Verify if editors are opened and project file exists
-        assert app.widget('schematicEditor').properties()['visible'] is True
-        assert app.widget('boardEditor').properties()['visible'] is True
+        app.widget('newProjectWizardFinishButton').click()
+        # Verify that the project was opened
+        helpers.wait_for_project(app, 'New Project')
         assert os.path.exists(path)
 
     # Open project again to see if it was saved properly
     librepcb.set_project(path)
     with librepcb.open() as app:
-        assert app.widget('schematicEditor').properties()['visible'] is True
-        assert app.widget('boardEditor').properties()['visible'] is True
+        helpers.wait_for_project(app, 'New Project')

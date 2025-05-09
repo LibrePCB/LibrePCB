@@ -48,12 +48,12 @@ namespace editor {
  ******************************************************************************/
 
 FootprintGraphicsItem::FootprintGraphicsItem(
-    std::shared_ptr<Footprint> footprint, const IF_GraphicsLayerProvider& lp,
+    std::shared_ptr<Footprint> footprint, const GraphicsLayerList& layers,
     const StrokeFont& font, const PackagePadList* packagePadList,
     const Component* component, const QStringList& localeOrder) noexcept
   : QGraphicsItemGroup(nullptr),
     mFootprint(footprint),
-    mLayerProvider(lp),
+    mLayers(layers),
     mFont(font),
     mPackagePadList(packagePadList),
     mComponent(component),
@@ -343,7 +343,7 @@ void FootprintGraphicsItem::syncPads() noexcept {
        it != mFootprint->getPads().end(); ++it) {
     if (!mPadGraphicsItems.contains(it.ptr())) {
       auto i = std::make_shared<FootprintPadGraphicsItem>(
-          it.ptr(), mLayerProvider, mPackagePadList, this);
+          it.ptr(), mLayers, mPackagePadList, this);
       mPadGraphicsItems.insert(it.ptr(), i);
     }
   }
@@ -366,7 +366,7 @@ void FootprintGraphicsItem::syncCircles() noexcept {
   for (auto& obj : mFootprint->getCircles().values()) {
     if (!mCircleGraphicsItems.contains(obj)) {
       Q_ASSERT(obj);
-      auto i = std::make_shared<CircleGraphicsItem>(*obj, mLayerProvider, this);
+      auto i = std::make_shared<CircleGraphicsItem>(*obj, mLayers, this);
       mCircleGraphicsItems.insert(obj, i);
     }
   }
@@ -389,8 +389,7 @@ void FootprintGraphicsItem::syncPolygons() noexcept {
   for (auto& obj : mFootprint->getPolygons().values()) {
     if (!mPolygonGraphicsItems.contains(obj)) {
       Q_ASSERT(obj);
-      auto i =
-          std::make_shared<PolygonGraphicsItem>(*obj, mLayerProvider, this);
+      auto i = std::make_shared<PolygonGraphicsItem>(*obj, mLayers, this);
       i->setEditable(true);
       mPolygonGraphicsItems.insert(obj, i);
     }
@@ -414,8 +413,8 @@ void FootprintGraphicsItem::syncStrokeTexts() noexcept {
   for (auto& obj : mFootprint->getStrokeTexts().values()) {
     if (!mStrokeTextGraphicsItems.contains(obj)) {
       Q_ASSERT(obj);
-      auto i = std::make_shared<StrokeTextGraphicsItem>(*obj, mLayerProvider,
-                                                        mFont, this);
+      auto i =
+          std::make_shared<StrokeTextGraphicsItem>(*obj, mLayers, mFont, this);
       substituteText(*i);
       mStrokeTextGraphicsItems.insert(obj, i);
     }
@@ -438,7 +437,7 @@ void FootprintGraphicsItem::syncZones() noexcept {
   for (auto& obj : mFootprint->getZones().values()) {
     if (!mZoneGraphicsItems.contains(obj)) {
       Q_ASSERT(obj);
-      auto i = std::make_shared<ZoneGraphicsItem>(*obj, mLayerProvider, this);
+      auto i = std::make_shared<ZoneGraphicsItem>(*obj, mLayers, this);
       i->setEditable(true);
       mZoneGraphicsItems.insert(obj, i);
     }
@@ -461,8 +460,7 @@ void FootprintGraphicsItem::syncHoles() noexcept {
   for (auto& obj : mFootprint->getHoles().values()) {
     if (!mHoleGraphicsItems.contains(obj)) {
       Q_ASSERT(obj);
-      auto i =
-          std::make_shared<HoleGraphicsItem>(*obj, mLayerProvider, true, this);
+      auto i = std::make_shared<HoleGraphicsItem>(*obj, mLayers, true, this);
       mHoleGraphicsItems.insert(obj, i);
     }
   }

@@ -67,7 +67,7 @@ public:
   void setHeight(const PositiveLength& height) noexcept;
   void setAlignment(const Alignment& align) noexcept;
   void setFont(Font font) noexcept;
-  void setLayer(const std::shared_ptr<GraphicsLayer>& layer) noexcept;
+  void setLayer(const std::shared_ptr<const GraphicsLayer>& layer) noexcept;
   void setShapeEnabled(bool enabled) noexcept { mShapeEnabled = enabled; }
 
   // Inherited from QGraphicsItem
@@ -86,7 +86,7 @@ private:  // Methods
   void updateBoundingRectAndShape() noexcept;
 
 private:  // Data
-  std::shared_ptr<GraphicsLayer> mLayer;
+  std::shared_ptr<const GraphicsLayer> mLayer;
   QString mText;
   QString mDisplayText;
   bool mParseOverlines;

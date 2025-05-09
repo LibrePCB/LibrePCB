@@ -262,7 +262,11 @@ void LibrariesModel::set_row_data(std::size_t i,
   }
 
   switch (data.action) {
-    case ui::Action::LibraryOpen: {
+    case ui::LibraryAction::None: {
+      break;
+    }
+
+    case ui::LibraryAction::Open: {
       try {
         const FilePath fp(s2q(data.path));
         const bool readOnly =
@@ -276,7 +280,7 @@ void LibrariesModel::set_row_data(std::size_t i,
       break;
     }
 
-    case ui::Action::LibraryUninstall: {
+    case ui::LibraryAction::Uninstall: {
       try {
         FileUtils::removeDirRecursively(FilePath(s2q(data.path)));  // can throw
       } catch (const Exception& e) {
@@ -288,6 +292,8 @@ void LibrariesModel::set_row_data(std::size_t i,
     }
 
     default:
+      qWarning() << "Unhandled action in LibrariesModel:"
+                 << static_cast<int>(data.action);
       break;
   }
 }
@@ -344,7 +350,7 @@ void LibrariesModel::updateLibraries(bool resetHighlight) noexcept {
           0,  // Progress [%]
           true,  // Checked
           mHighlightedLib == libDir,  // Highlight
-          ui::Action::None,  // Action
+          ui::LibraryAction::None,  // Action
       });
       uuids.insert(uuid);
     }
@@ -485,7 +491,7 @@ void LibrariesModel::updateMergedLibraries() noexcept {
           0,  // Progress
           false,  // Checked
           false,  // Highlight
-          ui::Action::None,  // Action
+          ui::LibraryAction::None,  // Action
       });
     }
   }

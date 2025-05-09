@@ -65,7 +65,7 @@ SymbolClipboardData::~SymbolClipboardData() noexcept {
  ******************************************************************************/
 
 std::unique_ptr<QMimeData> SymbolClipboardData::toMimeData(
-    const IF_GraphicsLayerProvider& lp) {
+    const GraphicsLayerList& layers) {
   std::unique_ptr<SExpression> root =
       SExpression::createList("librepcb_clipboard_symbol");
   root->ensureLineBreak();
@@ -84,7 +84,7 @@ std::unique_ptr<QMimeData> SymbolClipboardData::toMimeData(
 
   const QByteArray sexpr = root->toByteArray();
   std::unique_ptr<QMimeData> data(new QMimeData());
-  data->setImageData(generatePixmap(lp));
+  data->setImageData(generatePixmap(layers));
   data->setData(getMimeType(), sexpr);
   // Note: At least on one system the clipboard didn't work if no text was
   // set, so let's also copy the SExpression as text as a workaround. This
@@ -111,20 +111,20 @@ std::unique_ptr<SymbolClipboardData> SymbolClipboardData::fromMimeData(
  ******************************************************************************/
 
 QPixmap SymbolClipboardData::generatePixmap(
-    const IF_GraphicsLayerProvider& lp) noexcept {
+    const GraphicsLayerList& layers) noexcept {
   GraphicsScene scene;
   QVector<std::shared_ptr<QGraphicsItem>> items;
   for (auto ptr : mPins.values()) {
-    items.append(std::make_shared<SymbolPinGraphicsItem>(ptr, lp));
+    items.append(std::make_shared<SymbolPinGraphicsItem>(ptr, layers));
   }
   for (Polygon& polygon : mPolygons) {
-    items.append(std::make_shared<PolygonGraphicsItem>(polygon, lp));
+    items.append(std::make_shared<PolygonGraphicsItem>(polygon, layers));
   }
   for (Circle& circle : mCircles) {
-    items.append(std::make_shared<CircleGraphicsItem>(circle, lp));
+    items.append(std::make_shared<CircleGraphicsItem>(circle, layers));
   }
   for (Text& text : mTexts) {
-    items.append(std::make_shared<TextGraphicsItem>(text, lp));
+    items.append(std::make_shared<TextGraphicsItem>(text, layers));
   }
   foreach (const auto& item, items) {
     scene.addItem(*item);

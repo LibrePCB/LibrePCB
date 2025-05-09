@@ -37,7 +37,7 @@
 namespace librepcb {
 namespace editor {
 
-class IF_GraphicsLayerProvider;
+class GraphicsLayerList;
 class PrimitiveFootprintPadGraphicsItem;
 
 /*******************************************************************************
@@ -53,7 +53,7 @@ public:
   FootprintPadGraphicsItem() = delete;
   FootprintPadGraphicsItem(const FootprintPadGraphicsItem& other) = delete;
   FootprintPadGraphicsItem(std::shared_ptr<FootprintPad> pad,
-                           const IF_GraphicsLayerProvider& lp,
+                           const GraphicsLayerList& layers,
                            const PackagePadList* packagePadList,
                            QGraphicsItem* parent = nullptr) noexcept;
   ~FootprintPadGraphicsItem() noexcept;

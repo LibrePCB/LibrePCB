@@ -127,7 +127,7 @@ void PrimitiveTextGraphicsItem::setFont(Font font) noexcept {
 }
 
 void PrimitiveTextGraphicsItem::setLayer(
-    const std::shared_ptr<GraphicsLayer>& layer) noexcept {
+    const std::shared_ptr<const GraphicsLayer>& layer) noexcept {
   if (mLayer) {
     mLayer->onEdited.detach(mOnLayerEditedSlot);
   }

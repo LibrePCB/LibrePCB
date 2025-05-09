@@ -1,14 +1,327 @@
 import {
-    Action,
+    BoardAction,
     EditorCommand,
+    FeatureState,
+    LengthUnit,
     NotificationType,
+    ProjectAction,
+    SchematicAction,
+    TabAction,
     TabType,
+    WireMode,
 } from "types.slint";
+import { Data } from "data.slint";
 import { Backend } from "backend.slint";
+import { EditorCommandSet as Cmd } from "editorcommandset.slint";
 
 export global Helpers {
+    out property <[LengthUnit]> all-length-units: [
+        LengthUnit.millimeters,
+        LengthUnit.micrometers,
+        LengthUnit.nanometers,
+        LengthUnit.inches,
+        LengthUnit.mils,
+    ];
+
+    pure public function get-previous-unit(u: LengthUnit) -> LengthUnit {
+        if u == mils {
+            return inches;
+        } else if u == inches {
+            return nanometers;
+        } else if u == nanometers {
+            return micrometers;
+        } else {
+            return millimeters;
+        }
+    }
+
+    pure public function get-next-unit(u: LengthUnit) -> LengthUnit {
+        if u == millimeters {
+            return micrometers;
+        } else if u == micrometers {
+            return nanometers;
+        } else if u == nanometers {
+            return inches;
+        } else {
+            return mils;
+        }
+    }
+
+    pure public function get-unit-short-str(u: LengthUnit) -> string {
+        if (u == LengthUnit.millimeters) {
+            return "mm";
+        } else if (u == LengthUnit.micrometers) {
+            return "μm";
+        } else if (u == LengthUnit.nanometers) {
+            return "nm";
+        } else if (u == LengthUnit.inches) {
+            return "inch";
+        } else if (u == LengthUnit.mils) {
+            return "mils";
+        } else {
+            debug("Unhandled case in get-unit-short-str().");
+            return "";
+        }
+    }
+
+    pure public function get-unit-accessibility-label(u: LengthUnit) -> string {
+        if (u == LengthUnit.millimeters) {
+            return "millimeters";
+        } else if (u == LengthUnit.micrometers) {
+            return "micrometers";
+        } else if (u == LengthUnit.nanometers) {
+            return "nanometers";
+        } else if (u == LengthUnit.inches) {
+            return "inches";
+        } else if (u == LengthUnit.mils) {
+            return "mils";
+        } else {
+            debug("Unhandled case in get-unit-accessibility-label().");
+            return "";
+        }
+    }
+
+    out property <[WireMode]> all-wire-modes: [
+        WireMode.h-v,
+        WireMode.v-h,
+        WireMode.deg90-45,
+        WireMode.deg45-90,
+        WireMode.straight,
+    ];
+
+    pure public function get-previous-wire-mode(m: WireMode) -> WireMode {
+        if m == straight {
+            return deg45-90;
+        } else if m == deg45-90 {
+            return deg90-45;
+        } else if m == deg90-45 {
+            return v-h;
+        } else {
+            return h-v;
+        }
+    }
+
+    pure public function get-next-wire-mode(m: WireMode) -> WireMode {
+        if m == h-v {
+            return v-h;
+        } else if m == v-h {
+            return deg90-45;
+        } else if m == deg90-45 {
+            return deg45-90;
+        } else {
+            return straight;
+        }
+    }
+
+    public function trigger-current-tab-action(a: TabAction) {
+        Backend.trigger-tab(Data.current-section-index, Data.current-section.current-tab-index, a);
+    }
+
+    public function trigger-current-project-action(a: ProjectAction) {
+        Backend.trigger-project(Data.current-project-index, a);
+    }
+
+    public function trigger-current-schematic-action(a: SchematicAction) {
+        if Data.current-tab.type == TabType.schematic {
+            Backend.trigger-schematic(Data.current-schematic-tab.project-index, Data.current-schematic-tab.schematic-index, a);
+        }
+    }
+
+    public function trigger-current-board-action(a: BoardAction) {
+        if Data.current-tab.type == TabType.board-2d {
+            Backend.trigger-board(Data.current-board-2d-tab.project-index, Data.current-board-2d-tab.board-index, a);
+        } else if Data.current-tab.type == TabType.board-3d {
+            Backend.trigger-board(Data.current-board-3d-tab.project-index, Data.current-board-3d-tab.board-index, a);
+        }
+    }
+
     pure public function is-shortcut(event: KeyEvent, command: EditorCommand) -> bool {
         (event.text == command.key) && (event.modifiers == command.modifiers)
+    }
+
+    public function process-project-shortcuts(project: int, event: KeyEvent) -> bool {
+        if is-shortcut(event, Cmd.file-manager) {
+            Backend.trigger-project(project, ProjectAction.open-folder);
+            return true;
+        } else if is-shortcut(event, Cmd.project-save) && Data.projects[project].writable {
+            Backend.trigger-project(project, ProjectAction.save);
+            return true;
+        } else if is-shortcut(event, Cmd.project-setup) {
+            Backend.trigger-project(project, ProjectAction.open-setup-dialog);
+            return true;
+        } else if is-shortcut(event, Cmd.project-library-update) {
+            Backend.trigger-project(project, ProjectAction.update-library);
+            return true;
+        } else if is-shortcut(event, Cmd.sheet-new) {
+            Backend.trigger-project(project, ProjectAction.new-sheet);
+            return true;
+        } else if is-shortcut(event, Cmd.board-new) {
+            Backend.trigger-project(project, ProjectAction.new-board);
+            return true;
+        } else if is-shortcut(event, Cmd.export-lppz) {
+            Backend.trigger-project(project, ProjectAction.export-lppz);
+            return true;
+        } else if is-shortcut(event, Cmd.generate-bom) {
+            Backend.trigger-project(project, ProjectAction.export-bom);
+            return true;
+        } else if is-shortcut(event, Cmd.output-jobs) {
+            Backend.trigger-project(project, ProjectAction.open-output-jobs);
+            return true;
+        } else if is-shortcut(event, Cmd.order-pcb) {
+            Backend.trigger-project(project, ProjectAction.order);
+            return true;
+        } else if Helpers.is-shortcut(event, Cmd.undo) {
+            Backend.trigger-project(project, ProjectAction.undo);
+            return true;
+        } else if Helpers.is-shortcut(event, Cmd.redo) {
+            Backend.trigger-project(project, ProjectAction.redo);
+            return true;
+        } else if is-shortcut(event, Cmd.project-close) {
+            Backend.trigger-project(project, ProjectAction.close);
+            return true;
+        }
+        false
+    }
+
+    public function process-schematic-shortcuts(project: int, schematic: int, event: KeyEvent) -> bool {
+        if Helpers.is-shortcut(event, Cmd.sheet-new) {
+            Backend.trigger-project(project, ProjectAction.new-sheet);
+            return true;
+        } else if Helpers.is-shortcut(event, Cmd.sheet-rename) {
+            Backend.trigger-schematic(project, schematic, SchematicAction.rename);
+            return true;
+        } else if Helpers.is-shortcut(event, Cmd.sheet-remove) {
+            Backend.trigger-schematic(project, schematic, SchematicAction.delete);
+            return true;
+        }
+        false
+    }
+
+    public function process-board-shortcuts(project: int, board: int, event: KeyEvent) -> bool {
+        if Helpers.is-shortcut(event, Cmd.board-new) {
+            Backend.trigger-project(project, ProjectAction.new-board);
+            return true;
+        } else if Helpers.is-shortcut(event, Cmd.board-copy) {
+            Backend.trigger-board(project, board, BoardAction.copy);
+            return true;
+        } else if Helpers.is-shortcut(event, Cmd.board-remove) {
+            Backend.trigger-board(project, board, BoardAction.delete);
+            return true;
+        } else if Helpers.is-shortcut(event, Cmd.board-setup) {
+            Backend.trigger-board(project, board, BoardAction.open-setup-dialog);
+            return true;
+        } else if Helpers.is-shortcut(event, Cmd.export-step) {
+            Backend.trigger-board(project, board, BoardAction.export-step);
+            return true;
+        }
+        false
+    }
+
+    public function process-tab-shortcuts(section: int, tab: int, event: KeyEvent) -> bool {
+        if Helpers.is-shortcut(event, Cmd.select-all) && (Data.sections[section].tabs[tab].features.select == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.select-all);
+            return true;
+        } else if Helpers.is-shortcut(event, Cmd.find-next) && (Data.sections[section].tabs[tab].features.find == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.find-next);
+            return true;
+        } else if Helpers.is-shortcut(event, Cmd.find-previous) && (Data.sections[section].tabs[tab].features.find == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.find-previous);
+            return true;
+        } else if Helpers.is-shortcut(event, Cmd.export-image) {
+            Backend.trigger-tab(section, tab, TabAction.export-image);
+            return true;
+        } else if Helpers.is-shortcut(event, Cmd.export-pdf) {
+            Backend.trigger-tab(section, tab, TabAction.export-pdf);
+            return true;
+        } else if Helpers.is-shortcut(event, Cmd.print) {
+            Backend.trigger-tab(section, tab, TabAction.print);
+            return true;
+        } else if Helpers.is-shortcut(event, Cmd.clipboard-cut) && (Data.sections[section].tabs[tab].features.cut == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.cut);
+            return true;
+        } else if Helpers.is-shortcut(event, Cmd.clipboard-copy) && (Data.sections[section].tabs[tab].features.copy == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.copy);
+            return true;
+        } else if Helpers.is-shortcut(event, Cmd.clipboard-paste) && (Data.sections[section].tabs[tab].features.paste == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.paste);
+            return true;
+        } else if Helpers.is-shortcut(event, Cmd.move-left) {
+            Backend.trigger-tab(section, tab, TabAction.move-left);
+            return true;
+        } else if Helpers.is-shortcut(event, Cmd.move-right) {
+            Backend.trigger-tab(section, tab, TabAction.move-right);
+            return true;
+        } else if Helpers.is-shortcut(event, Cmd.move-up) {
+            Backend.trigger-tab(section, tab, TabAction.move-up);
+            return true;
+        } else if Helpers.is-shortcut(event, Cmd.move-down) {
+            Backend.trigger-tab(section, tab, TabAction.move-down);
+            return true;
+        } else if Helpers.is-shortcut(event, Cmd.rotate-ccw) && (Data.sections[section].tabs[tab].features.rotate == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.rotate-ccw);
+            return true;
+        } else if Helpers.is-shortcut(event, Cmd.rotate-cw) && (Data.sections[section].tabs[tab].features.rotate == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.rotate-cw);
+            return true;
+        } else if Helpers.is-shortcut(event, Cmd.mirror-horizontal) && (Data.sections[section].tabs[tab].features.mirror == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.mirror-horizontally);
+            return true;
+        } else if Helpers.is-shortcut(event, Cmd.mirror-vertical) && (Data.sections[section].tabs[tab].features.mirror == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.mirror-vertically);
+            return true;
+        } else if Helpers.is-shortcut(event, Cmd.flip-horizontal) && (Data.sections[section].tabs[tab].features.flip == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.flip-horizontally);
+            return true;
+        } else if Helpers.is-shortcut(event, Cmd.flip-vertical) && (Data.sections[section].tabs[tab].features.flip == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.flip-vertically);
+            return true;
+        } else if Helpers.is-shortcut(event, Cmd.snap-to-grid) && (Data.sections[section].tabs[tab].features.snap-to-grid == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.snap-to-grid);
+            return true;
+        } else if Helpers.is-shortcut(event, Cmd.lock) && (Data.sections[section].tabs[tab].features.lock == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.lock);
+            return true;
+        } else if Helpers.is-shortcut(event, Cmd.unlock) && (Data.sections[section].tabs[tab].features.unlock == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.unlock);
+            return true;
+        } else if Helpers.is-shortcut(event, Cmd.line-width-increase) && (Data.sections[section].tabs[tab].features.modify-line-width == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.line-width-increase);
+            return true;
+        } else if Helpers.is-shortcut(event, Cmd.line-width-decrease) && (Data.sections[section].tabs[tab].features.modify-line-width == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.line-width-decrease);
+            return true;
+        } else if Helpers.is-shortcut(event, Cmd.line-width-set) && (Data.sections[section].tabs[tab].features.modify-line-width == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.line-width-set);
+            return true;
+        } else if Helpers.is-shortcut(event, Cmd.device-reset-text-all) && (Data.sections[section].tabs[tab].features.reset-texts == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.reset-texts);
+            return true;
+        } else if Helpers.is-shortcut(event, Cmd.properties) && (Data.sections[section].tabs[tab].features.edit-properties == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.edit-properties);
+            return true;
+        } else if Helpers.is-shortcut(event, Cmd.remove) && (Data.sections[section].tabs[tab].features.remove == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.delete);
+            return true;
+        } else if Helpers.is-shortcut(event, Cmd.zoom-fit-content) {
+            Backend.trigger-tab(section, tab, TabAction.zoom-fit);
+            return true;
+        } else if Helpers.is-shortcut(event, Cmd.zoom-in) {
+            Backend.trigger-tab(section, tab, TabAction.zoom-in);
+            return true;
+        } else if Helpers.is-shortcut(event, Cmd.zoom-out) {
+            Backend.trigger-tab(section, tab, TabAction.zoom-out);
+            return true;
+        } else if Helpers.is-shortcut(event, Cmd.grid-increase) {
+            Backend.trigger-tab(section, tab, TabAction.grid-interval-increase);
+            return true;
+        } else if Helpers.is-shortcut(event, Cmd.grid-decrease) {
+            Backend.trigger-tab(section, tab, TabAction.grid-interval-decrease);
+            return true;
+        } else if Helpers.is-shortcut(event, Cmd.abort) {
+            Backend.trigger-tab(section, tab, TabAction.abort);
+            return true;
+        }
+        false
     }
 
     pure public function get-icon-for-notification-type(nt: NotificationType) -> image {
@@ -52,9 +365,25 @@ export global Helpers {
             return @image-url("../../../../bootstrap-icons/icons/database-add.svg");
         } else if (t == TabType.download-library) {
             return @image-url("../../../../bootstrap-icons/icons/cloud-arrow-down-fill.svg");
+        } else if (t == TabType.schematic) {
+            return @image-url("../../../../font-awesome/svgs/regular/image.svg");
+        } else if (t == TabType.board-2d) {
+            return @image-url("../../../../bootstrap-icons/icons/motherboard.svg");
+        } else if (t == TabType.board-3d) {
+            return @image-url("../../../../bootstrap-icons/icons/badge-3d.svg");
         } else {
             debug("Unhandled case in get-icon-for-tab-type().");
             return @image-url("");
+        }
+    }
+
+    pure public function get-rule-check-title-for-tab-type(type: TabType) -> string {
+        if (type == TabType.schematic) {
+            return @tr("Electrical Rule Check (ERC)");
+        } else if (type == TabType.board-2d) {
+            return @tr("Design Rule Check (DRC)");
+        } else {
+            return "";
         }
     }
 }

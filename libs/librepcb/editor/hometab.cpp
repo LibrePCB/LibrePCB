@@ -49,7 +49,14 @@ ui::TabData HomeTab::getUiData() const noexcept {
   return ui::TabData{
       ui::TabType::Home,  // Type
       slint::SharedString(),  // Title
-      ui::Action::None,  // Action
+      ui::TabFeatures{},  // Features
+      slint::SharedString(),  // Find term
+      nullptr,  // Find suggestions
+      nullptr,  // Layers
+      ui::RuleCheckState::NotAvailable,  // Rule check state
+      nullptr,  // Rule check messages
+      0,  // Rule check unapproved messages
+      slint::SharedString(),  // Rule check execution error
   };
 }
 

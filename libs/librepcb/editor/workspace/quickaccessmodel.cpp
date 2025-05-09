@@ -50,10 +50,6 @@ QuickAccessModel::QuickAccessModel(Workspace& ws, QObject* parent) noexcept
   load();
   refreshItems();
 
-  // Run actions asynchronously to avoid complex nested function calls.
-  connect(this, &QuickAccessModel::actionTriggered, this,
-          &QuickAccessModel::handleAction, Qt::QueuedConnection);
-
   // Refresh items when any directory of favorite/recent projects has been
   // modified. However, delay the update a bit to avoid unnecessary operations
   // when there are many file system changes within a short time period.
@@ -133,8 +129,12 @@ void QuickAccessModel::set_row_data(std::size_t i,
   const FilePath fp(s2q(data.user_data));
   if (fp.isValid()) {
     setFavoriteProject(fp, data.pinned);
-    if (data.action != ui::Action::None) {
-      emit actionTriggered(fp, data.action);
+    if (data.action != ui::TreeViewItemAction::None) {
+      // Run actions asynchronously to avoid complex nested function calls.
+      // if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0): Remove lambda.
+      const auto a = data.action;
+      QMetaObject::invokeMethod(
+          this, [this, fp, a]() { trigger(fp, a); }, Qt::QueuedConnection);
     }
   }
 }
@@ -222,7 +222,7 @@ void QuickAccessModel::refreshItems() noexcept {
           false,  // Expanded
           true,  // Supports pinning
           favorite,  // Pinned
-          ui::Action::None,  // Action
+          ui::TreeViewItemAction::None,  // Action
       });
       listedPaths.insert(fp);
     }
@@ -274,10 +274,11 @@ void QuickAccessModel::setWatchedProjects(
   }
 }
 
-void QuickAccessModel::handleAction(const FilePath& fp, ui::Action a) noexcept {
-  if (a == ui::Action::Default) {
+void QuickAccessModel::trigger(const FilePath& fp,
+                               ui::TreeViewItemAction a) noexcept {
+  if (a == ui::TreeViewItemAction::Open) {
     emit openFileTriggered(fp);
-  } else if (a == ui::Action::Delete) {
+  } else if (a == ui::TreeViewItemAction::Delete) {
     setFavoriteProject(fp, false);
     discardRecentProject(fp);
   } else {

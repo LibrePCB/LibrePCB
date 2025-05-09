@@ -33,6 +33,10 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class LengthUnit;
+class Point;
+
 namespace editor {
 
 class GuiApplication;
@@ -62,6 +66,15 @@ public:
   virtual void setUiData(const ui::TabData& data) noexcept;
   virtual void activate() noexcept {}
   virtual void deactivate() noexcept {}
+  virtual void trigger(ui::TabAction a) noexcept;
+  virtual slint::Image renderScene(float width, float height,
+                                   int scene) noexcept;
+  virtual bool processScenePointerEvent(
+      const QPointF& pos, slint::private_api::PointerEvent e) noexcept;
+  virtual bool processSceneScrolled(
+      const QPointF& pos, slint::private_api::PointerScrollEvent e) noexcept;
+  virtual bool processSceneKeyEvent(
+      const slint::private_api::KeyEvent& e) noexcept;
 
   // Operator Overloadings
   WindowTab& operator=(const WindowTab& rhs) = delete;
@@ -69,11 +82,11 @@ public:
 signals:
   void panelPageRequested(ui::PanelPage p);
   void closeRequested();
+  void closeEnforced();
   void statusBarMessageChanged(const QString& message, int timeoutMs);
+  void cursorCoordinatesChanged(const Point& pos, const LengthUnit& unit);
 
 protected:
-  virtual void triggerAsync(ui::Action a) noexcept;
-
   GuiApplication& mApp;
 };
 

@@ -1,37 +1,56 @@
 import { Palette } from "std-widgets.slint";
 import { ToolTip } from "tooltip.slint";
-import { Data } from "../api.slint";
+import { Data, EditorCommand } from "../api.slint";
+
+export enum IconButtonStyle {
+    standard,  // Background filled, arrow cursor, smaller icon
+    hyperlink,  // Background transparent, hand pointer
+    checkable-hyperlink,  // Like hyperlink, but different colors
+    read-only,  // Static image, no hover effect, immediate tooltip
+}
 
 export enum ToolTipPosition {
     bottom,
     bottom-left,
     left,
+    top,
 }
 
 export component IconButton inherits Rectangle {
-    in property <image> icon;
-    in property <float> icon-scale: hyperlink-style ? 1 : 0.8;
+    in property <EditorCommand> cmd;
+    in property <image> icon: cmd.icon;
+    in property <float> icon-scale: (style == IconButtonStyle.standard) ? 0.8 : 1;
     in property <length> icon-size: min(root.width, root.height) * icon-scale;
+    in property <length> icon-offset-y: 0;
     in property <angle> icon-rotation: 0deg;
-    in property <color> colorize: transparent;
+    in property <color> color-disabled: #707070;
+    in property <color> color-enabled: (style == IconButtonStyle.checkable-hyperlink) ? #909090 : Palette.foreground;
+    in property <color> color-checked: (style == IconButtonStyle.checkable-hyperlink) ? #e0e0e0 : color-enabled;
+    in property <color> color-hovered: (style == IconButtonStyle.checkable-hyperlink) ? self.color-checked : white;
     in property <color> background-color: transparent;
-    in property <string> tooltip;
-    in property <bool> tooltip-delayed: true;
+    in property <color> background-color-hovered: (style == IconButtonStyle.standard) ? #454545 : background-color;
+    in property <color> background-color-checked: ((style == IconButtonStyle.standard) || (style == IconButtonStyle.read-only)) ? #101010 : background-color;
+    in property <string> tooltip: cmd.text;
+    in property <bool> tooltip-delayed: style != IconButtonStyle.read-only;
     in property <ToolTipPosition> tooltip-position: bottom;
-    in property <string> status-tip;
-    in property <bool> hyperlink-style: false;
+    in property <string> status-tip: cmd.status-tip;
+    in property <IconButtonStyle> style: standard;
+    in property <bool> checked: false;
     in property <bool> enabled: true;
-    in property <bool> read-only: false;
     out property has-hover <=> ta.has-hover;
     out property pressed <=> ta.pressed;
+    property <bool> read-only: style == IconButtonStyle.read-only;
 
     callback clicked;
 
+    width: self.preferred-width;
     preferred-width: self.height;
     preferred-height: 20px;
     background: {
-        if (!hyperlink-style) && enabled && (!read-only) && ta.has-hover {
-            #454545
+        if checked {
+            background-color-checked
+        } else if enabled && ta.has-hover {
+            background-color-hovered
         } else {
             background-color
         }
@@ -40,22 +59,23 @@ export component IconButton inherits Rectangle {
     // Accessibility
     accessible-role: button;
     accessible-description: status-tip;
-    accessible-enabled: enabled;
+    accessible-enabled: enabled && (!read-only);
     accessible-label: tooltip;
-    accessible-read-only: read-only;
+    //accessible-read-only: read-only;  Causing compiler warning :-/
     accessible-action-default => {
         ta.clicked();
     }
 
     ta := TouchArea {
         enabled: enabled;
-        mouse-cursor: hyperlink-style ? pointer : default;
+        mouse-cursor: ((style == IconButtonStyle.hyperlink) || (style == IconButtonStyle.checkable-hyperlink)) ? pointer : default;
 
         Image {
+            y: ((parent.height - self.height) / 2) + icon-offset-y;
             width: icon-size * (((!read-only) && ta.pressed) ? 0.85 : 1.0);
             height: self.width;
             image-fit: contain;
-            colorize: (colorize != transparent) ? colorize : (((!read-only) && ta.has-hover) ? white : (enabled ? Palette.foreground : #707070));
+            colorize: ((!read-only) && ta.has-hover) ? color-hovered : (checked ? color-checked : (enabled ? color-enabled : color-disabled));
             rotation-angle: icon-rotation;
             source: icon;
             accessible-role: none;
@@ -74,6 +94,8 @@ export component IconButton inherits Rectangle {
             y: {
                 if tooltip-position == ToolTipPosition.left {
                     (parent.height - self.height) / 2
+                } else if tooltip-position == ToolTipPosition.top {
+                    -self.height - 5px
                 } else {
                     parent.height + 5px
                 }

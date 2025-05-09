@@ -72,7 +72,14 @@ ui::TabData DownloadLibraryTab::getUiData() const noexcept {
   return ui::TabData{
       ui::TabType::DownloadLibrary,  // Type
       q2s(tr("Download Library")),  // Title
-      ui::Action::None,  // Action
+      ui::TabFeatures{},  // Features
+      slint::SharedString(),  // Find term
+      nullptr,  // Find suggestions
+      nullptr,  // Layers
+      ui::RuleCheckState::NotAvailable,  // Rule check state
+      nullptr,  // Rule check messages
+      0,  // Rule check unapproved messages
+      slint::SharedString(),  // Rule check execution error
   };
 }
 
@@ -82,13 +89,9 @@ void DownloadLibraryTab::setDerivedUiData(
   validate();
 }
 
-/*******************************************************************************
- *  Protected Methods
- ******************************************************************************/
-
-void DownloadLibraryTab::triggerAsync(ui::Action a) noexcept {
+void DownloadLibraryTab::trigger(ui::TabAction a) noexcept {
   switch (a) {
-    case ui::Action::TabCancel: {
+    case ui::TabAction::Cancel: {
       if (mDownload) {
         mDownload.reset();
         mUiData.download_running = false;
@@ -101,7 +104,7 @@ void DownloadLibraryTab::triggerAsync(ui::Action a) noexcept {
       break;
     }
 
-    case ui::Action::TabOk: {
+    case ui::TabAction::Accept: {
       try {
         if ((!mUrl) || (!mDirectory.isValid()) || mDownload) {
           throw LogicError(__FILE__, __LINE__);
@@ -133,7 +136,7 @@ void DownloadLibraryTab::triggerAsync(ui::Action a) noexcept {
     }
 
     default: {
-      WindowTab::triggerAsync(a);
+      WindowTab::trigger(a);
       break;
     }
   }

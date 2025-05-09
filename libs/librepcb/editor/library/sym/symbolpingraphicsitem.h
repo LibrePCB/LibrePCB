@@ -38,7 +38,7 @@ class ComponentSymbolVariantItem;
 
 namespace editor {
 
-class IF_GraphicsLayerProvider;
+class GraphicsLayerList;
 class LineGraphicsItem;
 class PrimitiveCircleGraphicsItem;
 class PrimitiveTextGraphicsItem;
@@ -56,7 +56,7 @@ public:
   SymbolPinGraphicsItem() = delete;
   SymbolPinGraphicsItem(const SymbolPinGraphicsItem& other) = delete;
   SymbolPinGraphicsItem(
-      std::shared_ptr<SymbolPin> pin, const IF_GraphicsLayerProvider& lp,
+      std::shared_ptr<SymbolPin> pin, const GraphicsLayerList& layers,
       std::shared_ptr<const Component> cmp = nullptr,
       std::shared_ptr<const ComponentSymbolVariantItem> cmpItem = nullptr,
       QGraphicsItem* parent = nullptr) noexcept;
@@ -85,7 +85,7 @@ private:  // Methods
 
 private:  // Data
   std::shared_ptr<SymbolPin> mPin;
-  const IF_GraphicsLayerProvider& mLayerProvider;
+  const GraphicsLayerList& mLayers;
   std::shared_ptr<const Component> mComponent;  // Can be nullptr.
   std::shared_ptr<const ComponentSymbolVariantItem> mItem;  // Can be nullptr.
   QScopedPointer<PrimitiveCircleGraphicsItem> mCircleGraphicsItem;

@@ -42,8 +42,8 @@ class Workspace;
 namespace editor {
 
 class FootprintGraphicsItem;
+class GraphicsLayerList;
 class GraphicsScene;
-class IF_GraphicsLayerProvider;
 
 namespace Ui {
 class PackageChooserDialog;
@@ -63,8 +63,7 @@ public:
   // Constructors / Destructor
   PackageChooserDialog() = delete;
   PackageChooserDialog(const PackageChooserDialog& other) = delete;
-  PackageChooserDialog(const Workspace& ws,
-                       const IF_GraphicsLayerProvider* layerProvider,
+  PackageChooserDialog(const Workspace& ws, const GraphicsLayerList* layers,
                        QWidget* parent = nullptr) noexcept;
   ~PackageChooserDialog() noexcept;
 
@@ -92,7 +91,7 @@ private:  // Methods
 
 private:  // Data
   const Workspace& mWorkspace;
-  const IF_GraphicsLayerProvider* mLayerProvider;
+  const GraphicsLayerList* mLayers;
   QScopedPointer<Ui::PackageChooserDialog> mUi;
   QScopedPointer<QAbstractItemModel> mCategoryTreeModel;
   bool mCategorySelected;

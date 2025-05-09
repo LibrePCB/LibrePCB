@@ -23,6 +23,7 @@
 #include "packageeditorstate_drawzone.h"
 
 #include "../../../cmd/cmdzoneedit.h"
+#include "../../../graphics/graphicsscene.h"
 #include "../../../graphics/zonegraphicsitem.h"
 #include "../../../widgets/angleedit.h"
 #include "../../../widgets/graphicsview.h"
@@ -144,8 +145,8 @@ bool PackageEditorState_DrawZone::entry() noexcept {
           &PackageEditorState_DrawZone::angleEditValueChanged);
   mContext.commandToolBar.addWidget(std::move(edtAngle));
 
-  mLastScenePos =
-      mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos(), true, true);
+  mLastScenePos = mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos())
+                      .mappedToGrid(mContext.graphicsScene.getGridInterval());
   updateCursorPosition(Qt::KeyboardModifier::NoModifier);
   updateStatusBarMessage();
 
@@ -162,7 +163,7 @@ bool PackageEditorState_DrawZone::exit() noexcept {
   mContext.commandToolBar.clear();
 
   mContext.graphicsView.unsetCursor();
-  mContext.graphicsView.setSceneCursor(std::nullopt);
+  mContext.graphicsScene.setSceneCursor(Point(), false, false);
   mContext.graphicsView.setInfoBoxText(QString());
   emit statusBarMessageChanged(QString());
   return true;
@@ -180,9 +181,9 @@ QSet<EditorWidgetBase::Feature>
  ******************************************************************************/
 
 bool PackageEditorState_DrawZone::processKeyPressed(
-    const QKeyEvent& e) noexcept {
-  if (e.key() == Qt::Key_Shift) {
-    updateCursorPosition(e.modifiers());
+    const GraphicsSceneKeyEvent& e) noexcept {
+  if (e.key == Qt::Key_Shift) {
+    updateCursorPosition(e.modifiers);
     return true;
   }
 
@@ -190,9 +191,9 @@ bool PackageEditorState_DrawZone::processKeyPressed(
 }
 
 bool PackageEditorState_DrawZone::processKeyReleased(
-    const QKeyEvent& e) noexcept {
-  if (e.key() == Qt::Key_Shift) {
-    updateCursorPosition(e.modifiers());
+    const GraphicsSceneKeyEvent& e) noexcept {
+  if (e.key == Qt::Key_Shift) {
+    updateCursorPosition(e.modifiers);
     return true;
   }
 
@@ -200,15 +201,15 @@ bool PackageEditorState_DrawZone::processKeyReleased(
 }
 
 bool PackageEditorState_DrawZone::processGraphicsSceneMouseMoved(
-    QGraphicsSceneMouseEvent& e) noexcept {
-  mLastScenePos = Point::fromPx(e.scenePos());
-  updateCursorPosition(e.modifiers());
+    const GraphicsSceneMouseEvent& e) noexcept {
+  mLastScenePos = e.scenePos;
+  updateCursorPosition(e.modifiers);
   return true;
 }
 
 bool PackageEditorState_DrawZone::processGraphicsSceneLeftMouseButtonPressed(
-    QGraphicsSceneMouseEvent& e) noexcept {
-  mLastScenePos = Point::fromPx(e.scenePos());
+    const GraphicsSceneMouseEvent& e) noexcept {
+  mLastScenePos = e.scenePos;
   if (mIsUndoCmdActive) {
     return addNextSegment();
   } else {
@@ -218,7 +219,7 @@ bool PackageEditorState_DrawZone::processGraphicsSceneLeftMouseButtonPressed(
 
 bool PackageEditorState_DrawZone::
     processGraphicsSceneLeftMouseButtonDoubleClicked(
-        QGraphicsSceneMouseEvent& e) noexcept {
+        const GraphicsSceneMouseEvent& e) noexcept {
   // Handle like a single click.
   return processGraphicsSceneLeftMouseButtonPressed(e);
 }
@@ -337,8 +338,7 @@ void PackageEditorState_DrawZone::updateCursorPosition(
   if (!modifiers.testFlag(Qt::ShiftModifier)) {
     mCursorPos.mapToGrid(getGridInterval());
   }
-  mContext.graphicsView.setSceneCursor(
-      std::make_pair(mCursorPos, GraphicsView::CursorOption::Cross));
+  mContext.graphicsScene.setSceneCursor(mCursorPos, true, false);
 
   if (mCurrentZone && mEditCmd) {
     updateOutline();

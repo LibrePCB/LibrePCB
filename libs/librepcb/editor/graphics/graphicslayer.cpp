@@ -97,20 +97,6 @@ void GraphicsLayer::setEnabled(bool enable) noexcept {
 }
 
 /*******************************************************************************
- *  Class IF_GraphicsLayerProvider
- ******************************************************************************/
-
-std::shared_ptr<GraphicsLayer> IF_GraphicsLayerProvider::getLayer(
-    const Layer& layer) const noexcept {
-  return getLayer(layer.getThemeColor());
-}
-
-std::shared_ptr<GraphicsLayer> IF_GraphicsLayerProvider::getGrabAreaLayer(
-    const Layer& outlineLayer) const noexcept {
-  return getLayer(Theme::getGrabAreaColorName(outlineLayer.getThemeColor()));
-}
-
-/*******************************************************************************
  *  End of File
  ******************************************************************************/
 

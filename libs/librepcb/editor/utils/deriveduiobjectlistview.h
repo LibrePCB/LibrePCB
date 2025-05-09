@@ -81,26 +81,24 @@ public:
   DerivedUiObjectList& operator=(const DerivedUiObjectList& rhs) = delete;
 
 private:
-  void listEditedHandler(
-      const TList& list, int index,
-      const std::shared_ptr<const typename TList::Element>& obj,
-      typename TList::Event event) noexcept {
+  void listEditedHandler(const TList& list, int index,
+                         const std::shared_ptr<typename TList::Element>& obj,
+                         typename TList::Event event) noexcept {
     Q_UNUSED(list);
-    Q_UNUSED(obj);
     switch (event) {
       case TList::Event::ElementAdded: {
         slint::Model<TDerivedUiData>::notify_row_added(index, 1);
-        if (auto o = std::dynamic_pointer_cast<TDerived>(mList->value(index))) {
-          Q_ASSERT(o == obj);
-          o->onDerivedUiDataChanged.attach(mOnDerivedUiDataChangedSlot);
+        if (auto derivedObj = std::dynamic_pointer_cast<TDerived>(obj)) {
+          derivedObj->onDerivedUiDataChanged.attach(
+              mOnDerivedUiDataChangedSlot);
         }
         break;
       }
       case TList::Event::ElementRemoved: {
         slint::Model<TDerivedUiData>::notify_row_removed(index, 1);
-        if (auto o = std::dynamic_pointer_cast<TDerived>(mList->value(index))) {
-          Q_ASSERT(o == obj);
-          o->onDerivedUiDataChanged.detach(mOnDerivedUiDataChangedSlot);
+        if (auto derivedObj = std::dynamic_pointer_cast<TDerived>(obj)) {
+          derivedObj->onDerivedUiDataChanged.detach(
+              mOnDerivedUiDataChangedSlot);
         }
         break;
       }

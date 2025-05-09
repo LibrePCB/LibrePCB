@@ -1,0 +1,158 @@
+import { Palette, ScrollView } from "std-widgets.slint";
+import { DropDownPopup } from "dropdownpopup.slint";
+import { Constants } from "../api.slint";
+
+export component ComboBox inherits Rectangle {
+    in property <[string]> model;
+    in property <bool> enabled: true;
+    in-out property <int> current-index: -1;
+    in-out property <int> default-index: -1;
+    out property has-focus <=> fs.has-focus;
+
+    callback current-index-changed(int);
+    current-index-changed(index) => {
+        self.current-index = index;
+    }
+
+    function increment() {
+        if current-index < (model.length - 1) {
+            current-index-changed(current-index + 1);
+        }
+    }
+
+    function decrement() {
+        if current-index > 0 {
+            current-index-changed(current-index - 1);
+        }
+    }
+
+    preferred-width: ta.preferred-width;
+    preferred-height: ta.preferred-height;
+    background: ta.has-hover ? #303030 : #202020;
+    border-color: {
+        if !enabled {
+            transparent
+        } else if has-focus {
+            Constants.librepcb-color
+        } else {
+            #505050
+        }
+    }
+    border-width: 1px;
+    border-radius: 10px;
+    forward-focus: fs;
+
+    // Accessibility
+    accessible-role: combobox;
+    accessible-enabled: enabled;
+    accessible-expandable: true;
+    accessible-value: txt.text;
+    accessible-action-default => {
+        ta.clicked();
+    }
+    accessible-action-expand => {
+        ta.clicked();
+    }
+    accessible-action-increment => {
+        increment();
+    }
+    accessible-action-decrement => {
+        decrement();
+    }
+
+    fs := FocusScope {
+        enabled: enabled;
+
+        key-pressed(event) => {
+            if event.text == Key.UpArrow {
+                decrement();
+                return accept;
+            } else if event.text == Key.DownArrow {
+                increment();
+                return accept;
+            // Note: Do not handle the Return key as in some context it is used
+            // to confirm something. Space is enough for expanding a combobox.
+            } else if event.text == Key.Space {
+                popup.show();
+                return accept;
+            }
+            reject
+        }
+    }
+
+    ta := TouchArea {
+        enabled: enabled;
+
+        HorizontalLayout {
+            padding-top: 4px;
+            padding-bottom: self.padding-top;
+            padding-left: 8px;
+            padding-right: 5px;
+            spacing: 5px;
+
+            VerticalLayout {
+                txt := Text {
+                    color: enabled ? Palette.foreground : #a0a0a0;
+                    font-size: 13px;
+                    overflow: elide;
+                    vertical-alignment: center;
+                    text: model[current-index];
+                    accessible-role: none;
+                }
+
+                // Workaround to adjust the width to the *longest* model item.
+                for item[index] in model: Text {
+                    height: 0;
+                    font-size: 13px;
+                    overflow: elide;
+                    text: item;
+                    visible: false;
+                    accessible-role: none;
+                }
+            }
+
+            Rectangle {
+                width: 13px;  // Same size as in LengthEdit.
+
+                Image {
+                    width: parent.width;
+                    height: self.width;
+                    image-fit: contain;
+                    colorize: txt.color;
+                    source: @image-url("../../../../font-awesome/svgs/solid/caret-down.svg");
+                    accessible-role: none;
+                }
+            }
+        }
+
+        clicked => {
+            fs.focus();
+            popup.show();
+        }
+
+        scroll-event(event) => {
+            if event.delta-y > 0 {
+                decrement();
+                return accept;
+            } else if event.delta-y < 0 {
+                increment();
+                return accept;
+            }
+            reject
+        }
+    }
+
+    popup := DropDownPopup {
+        x: 0;
+        y: root.height + 2px;
+        width: root.width;
+        model: root.model;
+        current-index: current-index;
+        default-index: default-index;
+        item-height: root.preferred-height;
+
+        accepted(index) => {
+            current-index-changed(index);
+        }
+    }
+}

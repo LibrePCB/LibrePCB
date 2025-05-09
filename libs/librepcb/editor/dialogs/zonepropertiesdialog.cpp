@@ -24,6 +24,7 @@
 
 #include "../cmd/cmdzoneedit.h"
 #include "../graphics/graphicslayer.h"
+#include "../graphics/graphicslayerlist.h"
 #include "../project/cmd/cmdboardzoneedit.h"
 #include "../undostack.h"
 #include "ui_zonepropertiesdialog.h"
@@ -48,7 +49,7 @@ ZonePropertiesDialog::ZonePropertiesDialog(Zone* libZone, BI_Zone* boardZone,
                                            const QList<const Layer*> allLayers,
                                            UndoStack& undoStack,
                                            const LengthUnit& lengthUnit,
-                                           const IF_GraphicsLayerProvider& lp,
+                                           const GraphicsLayerList& layers,
                                            const QString& settingsPrefix,
                                            QWidget* parent) noexcept
   : QDialog(parent),
@@ -76,7 +77,7 @@ ZonePropertiesDialog::ZonePropertiesDialog(Zone* libZone, BI_Zone* boardZone,
     QListWidgetItem* item = new QListWidgetItem(text, mUi->lstLayers);
     const Layer* colorLayer = layer ? layer : Layer::innerCopper(1);
     Q_ASSERT(colorLayer);
-    if (auto graphicsLayer = lp.getLayer(*colorLayer)) {
+    if (auto graphicsLayer = layers.get(*colorLayer)) {
       item->setData(Qt::DecorationRole, graphicsLayer->getColor());
     }
     item->setData(Qt::UserRole, QVariant::fromValue(layer));
@@ -88,35 +89,36 @@ ZonePropertiesDialog::ZonePropertiesDialog(Zone* libZone, BI_Zone* boardZone,
 
 ZonePropertiesDialog::ZonePropertiesDialog(Zone& zone, UndoStack& undoStack,
                                            const LengthUnit& lengthUnit,
-                                           const IF_GraphicsLayerProvider& lp,
+                                           const GraphicsLayerList& layers,
                                            const QString& settingsPrefix,
                                            QWidget* parent) noexcept
-  : ZonePropertiesDialog(&zone, nullptr,
-                         {&Layer::topCopper(), nullptr, &Layer::botCopper()},
-                         undoStack, lengthUnit, lp, settingsPrefix, parent) {
-  QSet<const Layer*> layers;
+  : ZonePropertiesDialog(
+        &zone, nullptr, {&Layer::topCopper(), nullptr, &Layer::botCopper()},
+        undoStack, lengthUnit, layers, settingsPrefix, parent) {
+  QSet<const Layer*> zoneLayers;
   if (zone.getLayers().testFlag(Zone::Layer::Top)) {
-    layers.insert(&Layer::topCopper());
+    zoneLayers.insert(&Layer::topCopper());
   }
   if (zone.getLayers().testFlag(Zone::Layer::Inner)) {
-    layers.insert(nullptr);
+    zoneLayers.insert(nullptr);
   }
   if (zone.getLayers().testFlag(Zone::Layer::Bottom)) {
-    layers.insert(&Layer::botCopper());
+    zoneLayers.insert(&Layer::botCopper());
   }
-  load(zone, layers);
+  load(zone, zoneLayers);
   mUi->gbxOptions->hide();
 }
 
 ZonePropertiesDialog::ZonePropertiesDialog(BI_Zone& zone, UndoStack& undoStack,
                                            const LengthUnit& lengthUnit,
-                                           const IF_GraphicsLayerProvider& lp,
+                                           const GraphicsLayerList& layers,
                                            const QString& settingsPrefix,
                                            QWidget* parent) noexcept
   : ZonePropertiesDialog(nullptr, &zone,
                          Toolbox::sortedQSet(zone.getBoard().getCopperLayers(),
                                              &Layer::lessThan),
-                         undoStack, lengthUnit, lp, settingsPrefix, parent) {
+                         undoStack, lengthUnit, layers, settingsPrefix,
+                         parent) {
   load(zone.getData(), zone.getData().getLayers());
   mUi->cbxLock->setChecked(zone.getData().isLocked());
 }

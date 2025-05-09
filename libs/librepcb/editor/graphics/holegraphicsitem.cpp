@@ -37,14 +37,13 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-HoleGraphicsItem::HoleGraphicsItem(Hole& hole,
-                                   const IF_GraphicsLayerProvider& lp,
+HoleGraphicsItem::HoleGraphicsItem(Hole& hole, const GraphicsLayerList& layers,
                                    bool originCrossesVisible,
                                    QGraphicsItem* parent) noexcept
   : QGraphicsItemGroup(parent),
     mHole(hole),
     mGraphicsItem(
-        new PrimitiveHoleGraphicsItem(lp, originCrossesVisible, this)),
+        new PrimitiveHoleGraphicsItem(layers, originCrossesVisible, this)),
     mOnEditedSlot(*this, &HoleGraphicsItem::holeEdited) {
   setFlag(QGraphicsItem::ItemHasNoContents, true);
   setFlag(QGraphicsItem::ItemIsSelectable, true);

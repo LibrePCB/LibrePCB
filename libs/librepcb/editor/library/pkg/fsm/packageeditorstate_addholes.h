@@ -68,9 +68,9 @@ public:
 
   // Event Handlers
   bool processGraphicsSceneMouseMoved(
-      QGraphicsSceneMouseEvent& e) noexcept override;
+      const GraphicsSceneMouseEvent& e) noexcept override;
   bool processGraphicsSceneLeftMouseButtonPressed(
-      QGraphicsSceneMouseEvent& e) noexcept override;
+      const GraphicsSceneMouseEvent& e) noexcept override;
 
   // Operator Overloadings
   PackageEditorState_AddHoles& operator=(

@@ -25,7 +25,6 @@ public:
     out.set_find_next(l2s(cmd.findNext, out.get_find_next()));
     out.set_find_previous(l2s(cmd.findPrevious, out.get_find_previous()));
     out.set_file_manager(l2s(cmd.fileManager, out.get_file_manager()));
-    out.set_control_panel(l2s(cmd.controlPanel, out.get_control_panel()));
     out.set_workspace_switch(l2s(cmd.workspaceSwitch, out.get_workspace_switch()));
     out.set_workspace_settings(l2s(cmd.workspaceSettings, out.get_workspace_settings()));
     out.set_workspace_libraries_rescan(l2s(cmd.workspaceLibrariesRescan, out.get_workspace_libraries_rescan()));
@@ -41,11 +40,9 @@ public:
     out.set_run_quick_check(l2s(cmd.runQuickCheck, out.get_run_quick_check()));
     out.set_run_design_rule_check(l2s(cmd.runDesignRuleCheck, out.get_run_design_rule_check()));
     out.set_project_library_update(l2s(cmd.projectLibraryUpdate, out.get_project_library_update()));
-    out.set_schematic_editor(l2s(cmd.schematicEditor, out.get_schematic_editor()));
     out.set_sheet_new(l2s(cmd.sheetNew, out.get_sheet_new()));
     out.set_sheet_rename(l2s(cmd.sheetRename, out.get_sheet_rename()));
     out.set_sheet_remove(l2s(cmd.sheetRemove, out.get_sheet_remove()));
-    out.set_board_editor(l2s(cmd.boardEditor, out.get_board_editor()));
     out.set_board_new(l2s(cmd.boardNew, out.get_board_new()));
     out.set_board_copy(l2s(cmd.boardCopy, out.get_board_copy()));
     out.set_board_remove(l2s(cmd.boardRemove, out.get_board_remove()));
@@ -171,7 +168,6 @@ public:
     out.set_component_capacitor_unipolar(l2s(cmd.componentCapacitorUnipolar, out.get_component_capacitor_unipolar()));
     out.set_component_gnd(l2s(cmd.componentGnd, out.get_component_gnd()));
     out.set_component_vcc(l2s(cmd.componentVcc, out.get_component_vcc()));
-    out.set_dock_pages(l2s(cmd.dockPages, out.get_dock_pages()));
     out.set_dock_erc(l2s(cmd.dockErc, out.get_dock_erc()));
     out.set_dock_drc(l2s(cmd.dockDrc, out.get_dock_drc()));
     out.set_dock_layers(l2s(cmd.dockLayers, out.get_dock_layers()));

@@ -36,7 +36,7 @@
 namespace librepcb {
 namespace editor {
 
-class IF_GraphicsLayerProvider;
+class GraphicsLayerList;
 
 /*******************************************************************************
  *  Class ZoneGraphicsItem
@@ -50,7 +50,7 @@ public:
   // Constructors / Destructor
   ZoneGraphicsItem() = delete;
   ZoneGraphicsItem(const ZoneGraphicsItem& other) = delete;
-  ZoneGraphicsItem(Zone& zone, const IF_GraphicsLayerProvider& lp,
+  ZoneGraphicsItem(Zone& zone, const GraphicsLayerList& layers,
                    QGraphicsItem* parent = nullptr) noexcept;
   virtual ~ZoneGraphicsItem() noexcept;
 

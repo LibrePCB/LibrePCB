@@ -23,11 +23,12 @@
 #include "addcomponentdialog.h"
 
 #include "../editorcommandset.h"
-#include "../graphics/defaultgraphicslayerprovider.h"
+#include "../graphics/graphicslayerlist.h"
 #include "../graphics/graphicsscene.h"
 #include "../library/pkg/footprintgraphicsitem.h"
 #include "../library/sym/symbolgraphicsitem.h"
 #include "../modelview/partinformationdelegate.h"
+#include "../utils/editortoolbox.h"
 #include "../widgets/graphicsview.h"
 #include "../widgets/waitingspinnerwidget.h"
 #include "../workspace/categorytreemodel.h"
@@ -74,8 +75,7 @@ AddComponentDialog::AddComponentDialog(const WorkspaceLibraryDb& db,
     mUi(new Ui::AddComponentDialog),
     mComponentPreviewScene(new GraphicsScene()),
     mDevicePreviewScene(new GraphicsScene()),
-    mGraphicsLayerProvider(
-        new DefaultGraphicsLayerProvider(mSettings.themes.getActive())),
+    mLayers(GraphicsLayerList::previewLayers(&mSettings)),
     mCategoryTreeModel(new CategoryTreeModel(
         mDb, mLocaleOrder, CategoryTreeModel::Filter::CmpCatWithComponents)),
     mPartToolTip(new PartInformationToolTip(mSettings, this)),
@@ -180,19 +180,23 @@ AddComponentDialog::AddComponentDialog(const WorkspaceLibraryDb& db,
 
   // Setup symbol graphics view.
   const Theme& theme = mSettings.themes.getActive();
-  mUi->viewComponent->setBackgroundColors(
+  mComponentPreviewScene->setBackgroundColors(
       theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor(),
       theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
-  mUi->viewComponent->setGridStyle(theme.getBoardGridStyle());
-  mUi->viewComponent->setOriginCrossVisible(false);
+  mComponentPreviewScene->setGridStyle(theme.getBoardGridStyle());
+  mComponentPreviewScene->setOriginCrossVisible(false);
+  mUi->viewComponent->setSpinnerColor(
+      theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
   mUi->viewComponent->setScene(mComponentPreviewScene.data());
 
   // Setup package graphics view.
-  mUi->viewDevice->setBackgroundColors(
+  mDevicePreviewScene->setBackgroundColors(
       theme.getColor(Theme::Color::sBoardBackground).getPrimaryColor(),
       theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor());
-  mUi->viewDevice->setGridStyle(theme.getBoardGridStyle());
-  mUi->viewDevice->setOriginCrossVisible(false);
+  mDevicePreviewScene->setGridStyle(theme.getBoardGridStyle());
+  mDevicePreviewScene->setOriginCrossVisible(false);
+  mUi->viewDevice->setSpinnerColor(
+      theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor());
   mUi->viewDevice->setScene(mDevicePreviewScene.data());
 
   mUi->treeCategories->setModel(mCategoryTreeModel.data());
@@ -478,7 +482,7 @@ void AddComponentDialog::customComponentsContextMenuRequested(
   }
   if (partInfo && (!partInfo->resources.isEmpty())) {
     QAction* action =
-        new QAction(QIcon(":/img/actions/pdf.png"),
+        new QAction(EditorToolbox::svgIcon(":/fa/solid/file-pdf.svg"),
                     partInfo->resources.first().name + "...", &menu);
     connect(action, &QAction::triggered, this, [this, partInfo]() {
       DesktopServices ds(mSettings);
@@ -834,7 +838,7 @@ void AddComponentDialog::setSelectedSymbVar(
       mPreviewSymbols.append(symbol);
 
       auto graphicsItem = std::make_shared<SymbolGraphicsItem>(
-          *symbol, *mGraphicsLayerProvider, mSelectedComponent,
+          *symbol, *mLayers, mSelectedComponent,
           mSelectedSymbVar->getSymbolItems().get(item.getUuid()), mLocaleOrder);
       graphicsItem->setPosition(item.getSymbolPosition());
       graphicsItem->setRotation(item.getSymbolRotation());
@@ -869,7 +873,7 @@ void AddComponentDialog::setSelectedDevice(std::shared_ptr<const Device> dev) {
       }
       if (mSelectedPackage->getFootprints().count() > 0) {
         mPreviewFootprintGraphicsItem.reset(new FootprintGraphicsItem(
-            mSelectedPackage->getFootprints().first(), *mGraphicsLayerProvider,
+            mSelectedPackage->getFootprints().first(), *mLayers,
             Application::getDefaultStrokeFont(), &mSelectedPackage->getPads(),
             mSelectedComponent.get(), mLocaleOrder));
         mDevicePreviewScene->addItem(*mPreviewFootprintGraphicsItem);

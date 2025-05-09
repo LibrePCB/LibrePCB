@@ -40,7 +40,7 @@
 namespace librepcb {
 namespace editor {
 
-class IF_GraphicsLayerProvider;
+class GraphicsLayerList;
 
 /*******************************************************************************
  *  Class SymbolClipboardData
@@ -75,7 +75,7 @@ public:
   const TextList& getTexts() const noexcept { return mTexts; }
 
   // General Methods
-  std::unique_ptr<QMimeData> toMimeData(const IF_GraphicsLayerProvider& lp);
+  std::unique_ptr<QMimeData> toMimeData(const GraphicsLayerList& layers);
   static std::unique_ptr<SymbolClipboardData> fromMimeData(
       const QMimeData* mime);
 
@@ -83,7 +83,7 @@ public:
   SymbolClipboardData& operator=(const SymbolClipboardData& rhs) = delete;
 
 private:  // Methods
-  QPixmap generatePixmap(const IF_GraphicsLayerProvider& lp) noexcept;
+  QPixmap generatePixmap(const GraphicsLayerList& layers) noexcept;
   static QString getMimeType() noexcept;
 
 private:  // Data

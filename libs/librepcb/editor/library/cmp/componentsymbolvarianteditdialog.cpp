@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "componentsymbolvarianteditdialog.h"
 
-#include "../../graphics/defaultgraphicslayerprovider.h"
+#include "../../graphics/graphicslayerlist.h"
 #include "../../graphics/graphicsscene.h"
 #include "../../library/libraryelementcache.h"
 #include "../sym/symbolgraphicsitem.h"
@@ -70,14 +70,18 @@ ComponentSymbolVariantEditDialog::ComponentSymbolVariantEditDialog(
   mUi->setupUi(this);
   mUi->cbxNorm->addItems(getAvailableNorms());
 
-  // Setup graphics view.
+  // Setup graphics scene.
   const Theme& theme = mWorkspace.getSettings().themes.getActive();
-  mUi->graphicsView->setBackgroundColors(
+  mGraphicsScene->setBackgroundColors(
       theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor(),
       theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
+  mGraphicsScene->setOriginCrossVisible(false);
+
+  // Setup graphics view.
+  mUi->graphicsView->setSpinnerColor(
+      theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
   mUi->graphicsView->setScene(mGraphicsScene.data());
-  mUi->graphicsView->setOriginCrossVisible(false);
-  mGraphicsLayerProvider.reset(new DefaultGraphicsLayerProvider(theme));
+  mLayers = GraphicsLayerList::previewLayers(&mWorkspace.getSettings());
 
   // load metadata
   mUi->edtName->setText(*mSymbVar.getNames().getDefaultValue());
@@ -85,7 +89,7 @@ ComponentSymbolVariantEditDialog::ComponentSymbolVariantEditDialog(
   mUi->cbxNorm->setCurrentText(mSymbVar.getNorm());
 
   // load symbol items
-  mUi->symbolListWidget->setReferences(mWorkspace, *mGraphicsLayerProvider,
+  mUi->symbolListWidget->setReferences(mWorkspace, *mLayers,
                                        mSymbVar.getSymbolItems(),
                                        mLibraryElementCache, nullptr);
   connect(
@@ -179,7 +183,7 @@ void ComponentSymbolVariantEditDialog::updatePreview() noexcept {
 
         std::shared_ptr<SymbolGraphicsItem> graphicsItem =
             std::make_shared<SymbolGraphicsItem>(
-                *sym, *mGraphicsLayerProvider, mComponent,
+                *sym, *mLayers, mComponent,
                 mSymbVar.getSymbolItems().get(item.getUuid()),
                 mWorkspace.getSettings().libraryLocaleOrder.get());
         graphicsItem->setPosition(item.getSymbolPosition());

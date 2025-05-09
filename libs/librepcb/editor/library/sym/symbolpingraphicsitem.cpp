@@ -23,6 +23,7 @@
 #include "symbolpingraphicsitem.h"
 
 #include "../../graphics/graphicslayer.h"
+#include "../../graphics/graphicslayerlist.h"
 #include "../../graphics/linegraphicsitem.h"
 #include "../../graphics/primitivecirclegraphicsitem.h"
 #include "../../graphics/primitivetextgraphicsitem.h"
@@ -47,13 +48,13 @@ namespace editor {
  ******************************************************************************/
 
 SymbolPinGraphicsItem::SymbolPinGraphicsItem(
-    std::shared_ptr<SymbolPin> pin, const IF_GraphicsLayerProvider& lp,
+    std::shared_ptr<SymbolPin> pin, const GraphicsLayerList& layers,
     std::shared_ptr<const Component> cmp,
     std::shared_ptr<const ComponentSymbolVariantItem> cmpItem,
     QGraphicsItem* parent) noexcept
   : QGraphicsItemGroup(parent),
     mPin(pin),
-    mLayerProvider(lp),
+    mLayers(layers),
     mComponent(cmp),
     mItem(cmpItem),
     mCircleGraphicsItem(new PrimitiveCircleGraphicsItem(this)),
@@ -70,21 +71,21 @@ SymbolPinGraphicsItem::SymbolPinGraphicsItem(
   // circle
   mCircleGraphicsItem->setDiameter(UnsignedLength(1200000));
   mCircleGraphicsItem->setLineLayer(
-      lp.getLayer(Theme::Color::sSchematicOptionalPins));
+      layers.get(Theme::Color::sSchematicOptionalPins));
   mCircleGraphicsItem->setShapeMode(
       PrimitiveCircleGraphicsItem::ShapeMode::FilledOutline);
 
   // line
   mLineGraphicsItem->setRotation(mPin->getRotation());
   mLineGraphicsItem->setLineWidth(UnsignedLength(158750));
-  mLineGraphicsItem->setLayer(lp.getLayer(Theme::Color::sSchematicPinLines));
+  mLineGraphicsItem->setLayer(layers.get(Theme::Color::sSchematicPinLines));
 
   // name
   mNameGraphicsItem->setRotation(mPin->getRotation() + mPin->getNameRotation());
   mNameGraphicsItem->setAlignment(mPin->getNameAlignment());
   mNameGraphicsItem->setHeight(mPin->getNameHeight());
   mNameGraphicsItem->setFont(PrimitiveTextGraphicsItem::Font::SansSerif);
-  mNameGraphicsItem->setLayer(lp.getLayer(Theme::Color::sSchematicPinNames));
+  mNameGraphicsItem->setLayer(layers.get(Theme::Color::sSchematicPinNames));
   updateNamePosition();
   updateText();
 
@@ -93,7 +94,8 @@ SymbolPinGraphicsItem::SymbolPinGraphicsItem(
   mNumbersGraphicsItem->setHeight(SymbolPin::getNumbersHeight());
   mNumbersGraphicsItem->setFont(PrimitiveTextGraphicsItem::Font::SansSerif);
   mNumbersGraphicsItem->setLayer(
-      lp.getLayer(Theme::Color::sSchematicPinNumbers));
+      layers.get(Theme::Color::sSchematicPinNumbers));
+  mNumbersGraphicsItem->setOpacity(0.4);
   mNumbersGraphicsItem->setText("1…");
   updateNumbersTransform();
 
@@ -121,10 +123,10 @@ void SymbolPinGraphicsItem::updateText() noexcept {
           : nullptr;
       if (signal && signal->isRequired()) {
         mCircleGraphicsItem->setLineLayer(
-            mLayerProvider.getLayer(Theme::Color::sSchematicRequiredPins));
+            mLayers.get(Theme::Color::sSchematicRequiredPins));
       } else if (signal && (!signal->isRequired())) {
         mCircleGraphicsItem->setLineLayer(
-            mLayerProvider.getLayer(Theme::Color::sSchematicOptionalPins));
+            mLayers.get(Theme::Color::sSchematicOptionalPins));
       } else {
         mCircleGraphicsItem->setLineLayer(nullptr);
       }

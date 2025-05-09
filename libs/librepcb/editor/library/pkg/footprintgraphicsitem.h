@@ -50,8 +50,8 @@ namespace editor {
 
 class CircleGraphicsItem;
 class FootprintPadGraphicsItem;
+class GraphicsLayerList;
 class HoleGraphicsItem;
-class IF_GraphicsLayerProvider;
 class PolygonGraphicsItem;
 class StrokeTextGraphicsItem;
 class ZoneGraphicsItem;
@@ -84,8 +84,7 @@ public:
   FootprintGraphicsItem() = delete;
   FootprintGraphicsItem(const FootprintGraphicsItem& other) = delete;
   FootprintGraphicsItem(std::shared_ptr<Footprint> footprint,
-                        const IF_GraphicsLayerProvider& lp,
-                        const StrokeFont& font,
+                        const GraphicsLayerList& layers, const StrokeFont& font,
                         const PackagePadList* packagePadList = nullptr,
                         const Component* component = nullptr,
                         const QStringList& localeOrder = {}) noexcept;
@@ -151,7 +150,7 @@ private:  // Methods
 
 private:  // Data
   std::shared_ptr<Footprint> mFootprint;
-  const IF_GraphicsLayerProvider& mLayerProvider;
+  const GraphicsLayerList& mLayers;
   const StrokeFont& mFont;
   const PackagePadList* mPackagePadList;  // Can be nullptr.
   QPointer<const Component> mComponent;  // Can be nullptr.

@@ -39,7 +39,7 @@ class Layer;
 
 namespace editor {
 
-class IF_GraphicsLayerProvider;
+class GraphicsLayerList;
 
 /*******************************************************************************
  *  Class PrimitiveZoneGraphicsItem
@@ -53,7 +53,7 @@ public:
   // Constructors / Destructor
   PrimitiveZoneGraphicsItem() = delete;
   PrimitiveZoneGraphicsItem(const PrimitiveZoneGraphicsItem& other) = delete;
-  PrimitiveZoneGraphicsItem(const IF_GraphicsLayerProvider& lp,
+  PrimitiveZoneGraphicsItem(const GraphicsLayerList& layers,
                             QGraphicsItem* parent = nullptr) noexcept;
   virtual ~PrimitiveZoneGraphicsItem() noexcept;
 
@@ -117,14 +117,14 @@ private:  // Methods
   void updateVisibility() noexcept;
 
 private:  // Data
-  const IF_GraphicsLayerProvider& mLayerProvider;
-  QVector<std::shared_ptr<GraphicsLayer>> mAllGraphicsLayers;
-  QVector<std::shared_ptr<GraphicsLayer>> mEnabledGraphicsLayers;
+  const GraphicsLayerList& mLayers;
+  QVector<std::shared_ptr<const GraphicsLayer>> mAllGraphicsLayers;
+  QVector<std::shared_ptr<const GraphicsLayer>> mEnabledGraphicsLayers;
   Path mOutline;
   bool mEditable;
 
   // Cached attributes
-  std::shared_ptr<GraphicsLayer> mLayer;
+  std::shared_ptr<const GraphicsLayer> mLayer;
   QPen mPen;
   QPen mPenHighlighted;
   QBrush mBrush;

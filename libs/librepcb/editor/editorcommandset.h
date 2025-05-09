@@ -162,15 +162,6 @@ public:
       {},
       &categoryEditor,
   };
-  EditorCommand controlPanel{
-      "control_panel",  // clang-format break
-      QT_TR_NOOP("Control Panel"),
-      QT_TR_NOOP("Bring the control panel window to front"),
-      ":/img/actions/home.png",
-      EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_Home)},
-      &categoryEditor,
-  };
   EditorCommand workspaceSwitch{
       "workspace_switch",  // clang-format break
       QT_TR_NOOP("Switch Workspace"),
@@ -184,7 +175,7 @@ public:
       "workspace_settings",  // clang-format break
       QT_TR_NOOP("Workspace Settings"),
       QT_TR_NOOP("Open the workspace settings dialog"),
-      ":/img/actions/settings.png",
+      ":/fa/solid/sliders.svg",
       EditorCommand::Flag::OpensPopup | EditorCommand::Flag::PreferencesRole,
       {QKeySequence(Qt::CTRL | Qt::Key_Comma)},
       &categoryEditor,
@@ -202,7 +193,7 @@ public:
       "library_manager",  // clang-format break
       QT_TR_NOOP("Libraries"),
       QT_TR_NOOP("Manage installed part libraries"),
-      ":/img/library/package.png",
+      ":/bi/database.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_M)},
       &categoryEditor,
@@ -229,7 +220,7 @@ public:
       "project_new",  // clang-format break
       QT_TR_NOOP("New Project"),
       QT_TR_NOOP("Create a new project"),
-      ":/img/actions/new.png",
+      ":/fa/solid/file-circle-plus.svg",
       EditorCommand::Flag::OpensPopup,
       {QKeySequence(Qt::CTRL | Qt::Key_N)},
       &categoryEditor,
@@ -238,7 +229,7 @@ public:
       "project_open",  // clang-format break
       QT_TR_NOOP("Open Project"),
       QT_TR_NOOP("Open an existing project"),
-      ":/img/actions/open.png",
+      ":/fa/solid/folder-open.svg",
       EditorCommand::Flag::OpensPopup,
       {QKeySequence(Qt::CTRL | Qt::Key_O)},
       &categoryEditor,
@@ -247,7 +238,7 @@ public:
       "project_save",  // clang-format break
       QT_TR_NOOP("Save Project"),
       QT_TR_NOOP("Save the currently opened project"),
-      ":/img/actions/save.png",
+      ":/bi/floppy-fill.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::CTRL | Qt::Key_S)},
       &categoryEditor,
@@ -256,7 +247,7 @@ public:
       "project_setup",  // clang-format break
       QT_TR_NOOP("Project Setup"),
       QT_TR_NOOP("View/modify the project setup"),
-      ":/img/actions/settings.png",
+      ":/fa/solid/sliders.svg",
       EditorCommand::Flag::OpensPopup,
       {QKeySequence(Qt::Key_F6)},
       &categoryEditor,
@@ -274,7 +265,7 @@ public:
       "board_setup",  // clang-format break
       QT_TR_NOOP("Board Setup"),
       QT_TR_NOOP("View/modify the board setup"),
-      ":/img/actions/settings.png",
+      ":/fa/solid/sliders.svg",
       EditorCommand::Flag::OpensPopup,
       {QKeySequence(Qt::Key_F7)},
       &categoryEditor,
@@ -283,7 +274,7 @@ public:
       "run_quick_check",  // clang-format break
       QT_TR_NOOP("Run Quick Check"),
       QT_TR_NOOP("Run only the most important copper checks from the DRC"),
-      ":/img/actions/quick_check.png",
+      ":/bi/lightning-fill.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::SHIFT | Qt::Key_F8)},
       &categoryEditor,
@@ -292,7 +283,7 @@ public:
       "run_design_rule_check",  // clang-format break
       QT_TR_NOOP("Run Design Rule Check"),
       QT_TR_NOOP("Run the design rule check (DRC)"),
-      ":/img/actions/drc.png",
+      ":/fa/solid/list-check.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_F8)},
       &categoryEditor,
@@ -302,25 +293,25 @@ public:
       QT_TR_NOOP("Update Project Library"),
       QT_TR_NOOP(
           "Update the project's library elements from workspace libraries"),
-      ":/img/actions/refresh.png",
+      ":/fa/solid/arrows-rotate.svg",
       EditorCommand::Flag::OpensPopup,
       {QKeySequence(Qt::CTRL | Qt::Key_F5)},
       &categoryEditor,
   };
-  EditorCommand schematicEditor{
-      "schematic_editor",  // clang-format break
-      QT_TR_NOOP("Schematic Editor"),
-      QT_TR_NOOP("Bring the schematic editor window to front"),
-      ":/img/actions/schematic.png",
-      EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_S)},
-      &categoryEditor,
-  };
+  // EditorCommand schematicEditor{
+  //     "schematic_editor",  // clang-format break
+  //     QT_TR_NOOP("Schematic Editor"),
+  //     QT_TR_NOOP("Bring the schematic editor window to front"),
+  //     ":/img/actions/schematic.png",
+  //     EditorCommand::Flags(),
+  //     {QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_S)},
+  //     &categoryEditor,
+  // };
   EditorCommand sheetNew{
       "sheet_new",  // clang-format break
       QT_TR_NOOP("New Sheet"),
       QT_TR_NOOP("Add a new schematic sheet to the project"),
-      ":/img/actions/new.png",
+      ":/fa/solid/file-circle-plus.svg",
       EditorCommand::Flag::OpensPopup,
       {QKeySequence(Qt::CTRL | Qt::Key_N)},
       &categoryEditor,
@@ -329,7 +320,7 @@ public:
       "sheet_rename",  // clang-format break
       QT_TR_NOOP("Rename Sheet"),
       QT_TR_NOOP("Rename the current schematic sheet"),
-      QString(),
+      ":/fa/solid/pen-to-square.svg",
       EditorCommand::Flag::OpensPopup,
       {QKeySequence(Qt::CTRL | Qt::Key_F2)},
       &categoryEditor,
@@ -338,25 +329,25 @@ public:
       "sheet_remove",  // clang-format break
       QT_TR_NOOP("Remove Sheet"),
       QT_TR_NOOP("Remove the current schematic sheet from the project"),
-      ":/img/actions/delete.png",
+      ":/fa/solid/trash-can.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::CTRL | Qt::Key_Delete)},
       &categoryEditor,
   };
-  EditorCommand boardEditor{
-      "board_editor",  // clang-format break
-      QT_TR_NOOP("Board Editor"),
-      QT_TR_NOOP("Bring the board editor window to front"),
-      ":/img/actions/board_editor.png",
-      EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_B)},
-      &categoryEditor,
-  };
+  // EditorCommand boardEditor{
+  //     "board_editor",  // clang-format break
+  //     QT_TR_NOOP("Board Editor"),
+  //     QT_TR_NOOP("Bring the board editor window to front"),
+  //     ":/img/actions/board_editor.png",
+  //     EditorCommand::Flags(),
+  //     {QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_B)},
+  //     &categoryEditor,
+  // };
   EditorCommand boardNew{
       "board_new",  // clang-format break
       QT_TR_NOOP("New Board"),
       QT_TR_NOOP("Add a new board to the project"),
-      ":/img/actions/new.png",
+      ":/fa/solid/file-circle-plus.svg",
       EditorCommand::Flag::OpensPopup,
       {QKeySequence(Qt::CTRL | Qt::Key_N)},
       &categoryEditor,
@@ -365,7 +356,7 @@ public:
       "board_copy",  // clang-format break
       QT_TR_NOOP("Copy Board"),
       QT_TR_NOOP("Add a copy of the current board to the project"),
-      ":/img/actions/copy.png",
+      ":/fa/solid/clone.svg",
       EditorCommand::Flag::OpensPopup,
       {QKeySequence(Qt::CTRL | Qt::Key_D)},
       &categoryEditor,
@@ -374,7 +365,7 @@ public:
       "board_remove",  // clang-format break
       QT_TR_NOOP("Remove Board"),
       QT_TR_NOOP("Remove the current board from the project"),
-      ":/img/actions/delete.png",
+      ":/fa/solid/trash-can.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::CTRL | Qt::Key_Delete)},
       &categoryEditor,
@@ -383,7 +374,7 @@ public:
       "plane_show_all",  // clang-format break
       QT_TR_NOOP("Show All Planes"),
       QT_TR_NOOP("Make the filled areas of all planes visible"),
-      ":/img/actions/show_planes.png",
+      ":/fa/solid/eye.svg",
       EditorCommand::Flags(),
       {},
       &categoryEditor,
@@ -392,7 +383,7 @@ public:
       "plane_hide_all",  // clang-format break
       QT_TR_NOOP("Hide All Planes"),
       QT_TR_NOOP("Make the filled areas of all planes invisible"),
-      ":/img/actions/hide_planes.png",
+      ":/fa/solid/eye-slash.svg",
       EditorCommand::Flags(),
       {},
       &categoryEditor,
@@ -401,7 +392,7 @@ public:
       "plane_rebuild_all",  // clang-format break
       QT_TR_NOOP("Rebuild All Planes"),
       QT_TR_NOOP("Re-calculate the filled areas of all planes"),
-      ":/img/actions/rebuild_plane.png",
+      ":/fa/solid/arrows-rotate.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_R)},
       &categoryEditor,
@@ -452,7 +443,7 @@ public:
       "add_example_projects",  // clang-format break
       QT_TR_NOOP("Add Example Projects"),
       QT_TR_NOOP("Add some example projects to the workspace"),
-      ":/img/logo/32x32.png",
+      QString(),
       EditorCommand::Flag::OpensPopup,
       {},
       nullptr,  // Exclude from shortcuts overview & configuration
@@ -461,7 +452,7 @@ public:
       "import_dxf",  // clang-format break
       QT_TR_NOOP("Import DXF"),
       QT_TR_NOOP("Import a 2D mechanical drawing"),
-      ":/img/actions/export_svg.png",
+      QString(),
       EditorCommand::Flag::OpensPopup,
       {},
       &categoryImportExport,
@@ -497,7 +488,7 @@ public:
       "import_specctra_ses",  // clang-format break
       QT_TR_NOOP("Import Specctra SES"),
       QT_TR_NOOP("Import a Specctra session, e.g. from external autorouters"),
-      ":/img/places/file.png",
+      QString(),
       EditorCommand::Flag::OpensPopup,
       {},
       &categoryImportExport,
@@ -506,7 +497,7 @@ public:
       "export_lppz",  // clang-format break
       QT_TR_NOOP("Export *.lppz Archive"),
       QT_TR_NOOP("Export the project as a self-contained *.lppz archive"),
-      ":/img/actions/export_zip.png",
+      ":/fa/solid/file-zipper.svg",
       EditorCommand::Flag::OpensPopup,
       {},
       &categoryImportExport,
@@ -533,7 +524,7 @@ public:
       "export_specctra_dsn",  // clang-format break
       QT_TR_NOOP("Export Specctra DSN"),
       QT_TR_NOOP("Export PCB to Specctra format for external autorouters etc."),
-      ":/img/places/file.png",
+      QString(),
       EditorCommand::Flag::OpensPopup,
       {},
       &categoryImportExport,
@@ -542,7 +533,7 @@ public:
       "export_step",  // clang-format break
       QT_TR_NOOP("Export STEP Model"),
       QT_TR_NOOP("Export PCB as a STEP file for loading it into MCAD software"),
-      ":/img/actions/export_step.png",
+      ":/fa/solid/cubes.svg",
       EditorCommand::Flag::OpensPopup,
       {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_T)},
       &categoryImportExport,
@@ -560,7 +551,7 @@ public:
       "generate_bom",  // clang-format break
       QT_TR_NOOP("Generate Bill Of Materials"),
       QT_TR_NOOP("Generate bill of materials (BOM) file"),
-      ":/img/actions/generate_bom.png",
+      ":/fa/solid/file-csv.svg",
       EditorCommand::Flag::OpensPopup,
       {QKeySequence(Qt::Key_F9)},
       &categoryImportExport,
@@ -569,7 +560,7 @@ public:
       "generate_fabrication_data",  // clang-format break
       QT_TR_NOOP("Generate Fabrication Data"),
       QT_TR_NOOP("Generate Gerber/Excellon files for PCB fabrication"),
-      ":/img/actions/export_gerber.png",
+      ":/fa/solid/industry.svg",
       EditorCommand::Flag::OpensPopup,
       {QKeySequence(Qt::Key_F10)},
       &categoryImportExport,
@@ -578,7 +569,7 @@ public:
       "generate_pick_place",  // clang-format break
       QT_TR_NOOP("Generate Pick&&Place Files"),
       QT_TR_NOOP("Generate pick&place files for automated PCB assembly"),
-      ":/img/actions/export_pick_place_file.png",
+      QString(),
       EditorCommand::Flag::OpensPopup,
       {},  // Was F11 until v0.1.7
       &categoryImportExport,
@@ -587,7 +578,7 @@ public:
       "generate_d356_netlist",  // clang-format break
       QT_TR_NOOP("Generate IPC-D-356A Netlist"),
       QT_TR_NOOP("Generate netlist file for automated PCB testing"),
-      ":/img/actions/generate_bom.png",  // No netlist icon yet.
+      QString(),
       EditorCommand::Flag::OpensPopup,
       {},
       &categoryImportExport,
@@ -596,7 +587,7 @@ public:
       "output_jobs",  // clang-format break
       QT_TR_NOOP("Output Jobs"),
       QT_TR_NOOP("Modify or run output jobs"),
-      ":/img/actions/output_jobs.png",
+      ":/fa/solid/play.svg",
       EditorCommand::Flag::OpensPopup,
       {QKeySequence(Qt::Key_F11)},
       &categoryImportExport,
@@ -605,7 +596,7 @@ public:
       "order_pcb",  // clang-format break
       QT_TR_NOOP("Order PCB"),
       QT_TR_NOOP("Start ordering the PCB online"),
-      ":/img/actions/order_pcb.png",
+      ":/fa/solid/cart-shopping.svg",
       EditorCommand::Flag::OpensPopup,
       {QKeySequence(Qt::Key_F12)},
       &categoryImportExport,
@@ -774,7 +765,7 @@ public:
       "lock",  // clang-format break
       QT_TR_NOOP("Lock Placement"),
       QT_TR_NOOP("Lock the placement of the selected object(s)"),
-      ":/img/status/locked.png",
+      ":/fa/solid/lock.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::CTRL | Qt::Key_L)},
       &categoryModify,
@@ -783,7 +774,7 @@ public:
       "unlock",  // clang-format break
       QT_TR_NOOP("Unlock Placement"),
       QT_TR_NOOP("Unlock the placement of the selected object(s)"),
-      ":/img/status/unlocked.png",
+      ":/fa/solid/lock-open.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::CTRL | Qt::Key_U)},
       &categoryModify,
@@ -793,7 +784,7 @@ public:
       QT_TR_NOOP("Set Line Width"),
       QT_TR_NOOP(
           "Change the line/trace/stroke width of the selected object(s)"),
-      QString(),
+      ":/fa/solid/pen-to-square.svg",
       EditorCommand::Flag::OpensPopup,
       {},
       &categoryModify,
@@ -802,7 +793,7 @@ public:
       "device_reset_text_all",  // clang-format break
       QT_TR_NOOP("Reset All Texts"),
       QT_TR_NOOP("Reset all texts of the footprint to their initial state"),
-      ":/img/actions/undo.png",
+      ":/bi/bootstrap-reboot.svg",
       EditorCommand::Flags(),
       {},
       &categoryModify,
@@ -820,7 +811,7 @@ public:
       "rename",  // clang-format break
       QT_TR_NOOP("Rename"),
       QT_TR_NOOP("Rename the selected object"),
-      ":/img/actions/edit.png",
+      ":/fa/solid/pen-to-square.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_F2)},
       &categoryModify,
@@ -886,7 +877,7 @@ public:
       "show_pin_numbers",  // clang-format break
       QT_TR_NOOP("Show Pin Numbers"),
       QT_TR_NOOP("Show or hide symbol pin numbers"),
-      ":/img/actions/show_pin_numbers.png",
+      ":/bi/123.svg",
       EditorCommand::Flags(),
       {QKeySequence()},
       &categoryView,
@@ -895,7 +886,7 @@ public:
       "ignore_locks",  // clang-format break
       QT_TR_NOOP("Ignore Placement Locks"),
       QT_TR_NOOP("Allow dragging locked items"),
-      ":/img/status/unlocked.png",
+      ":/fa/solid/lock-open.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_L)},
       &categoryView,
@@ -1115,7 +1106,7 @@ public:
       "tool_netlabel",  // clang-format break
       QT_TR_NOOP("Add Net Label"),
       QT_TR_NOOP("Add net labels to explicitly specify the net of wires"),
-      ":/img/actions/draw_netlabel.png",
+      ":/fa/solid/tag.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_N)},
       &categoryTools,
@@ -1124,7 +1115,7 @@ public:
       "tool_component",  // clang-format break
       QT_TR_NOOP("Add Component"),
       QT_TR_NOOP("Insert components from the workspace libraries"),
-      ":/img/actions/add_component.png",
+      ":/fa/solid/microchip.svg",
       EditorCommand::Flag::OpensPopup,
       {QKeySequence(Qt::Key_A)},
       &categoryTools,
@@ -1142,7 +1133,7 @@ public:
       "tool_via",  // clang-format break
       QT_TR_NOOP("Add Via"),
       QT_TR_NOOP("Add plated through-hole vias"),
-      ":/img/actions/add_via.png",
+      ":/bi/record-circle-fill.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_V)},
       &categoryTools,
@@ -1151,7 +1142,7 @@ public:
       "tool_plane",  // clang-format break
       QT_TR_NOOP("Draw Plane"),
       QT_TR_NOOP("Draw auto-filled copper areas to interconnect pads and vias"),
-      ":/img/actions/add_plane.png",
+      ":/bi/paint-bucket.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_N)},
       &categoryTools,
@@ -1456,7 +1447,7 @@ public:
       "component_resistor",  // clang-format break
       QT_TR_NOOP("Resistor"),
       QT_TR_NOOP("Add standard component: Resistor"),
-      ":/img/library/resistor_eu.png",
+      ":/img/resistor-eu.svg",
       EditorCommand::Flags(),
       {},
       &categoryComponents,
@@ -1465,7 +1456,7 @@ public:
       "component_inductor",  // clang-format break
       QT_TR_NOOP("Inductor"),
       QT_TR_NOOP("Add standard component: Inductor"),
-      ":/img/library/inductor_eu.png",
+      ":/img/inductor-eu.svg",
       EditorCommand::Flags(),
       {},
       &categoryComponents,
@@ -1474,7 +1465,7 @@ public:
       "component_capacitor_bipolar",  // clang-format break
       QT_TR_NOOP("Bipolar Capacitor"),
       QT_TR_NOOP("Add standard component: Bipolar capacitor"),
-      ":/img/library/bipolar_capacitor_eu.png",
+      ":/img/capacitor-bipolar-eu.svg",
       EditorCommand::Flags(),
       {},
       &categoryComponents,
@@ -1483,7 +1474,7 @@ public:
       "component_capacitor_unipolar",  // clang-format break
       QT_TR_NOOP("Unipolar Capacitor"),
       QT_TR_NOOP("Add standard component: Unipolar capacitor"),
-      ":/img/library/unipolar_capacitor_eu.png",
+      ":/img/capacitor-unipolar-eu.svg",
       EditorCommand::Flags(),
       {},
       &categoryComponents,
@@ -1492,7 +1483,7 @@ public:
       "component_gnd",  // clang-format break
       QT_TR_NOOP("GND Supply"),
       QT_TR_NOOP("Add standard component: GND supply"),
-      ":/img/library/gnd.png",
+      ":/img/gnd.svg",
       EditorCommand::Flags(),
       {},
       &categoryComponents,
@@ -1501,7 +1492,7 @@ public:
       "component_vcc",  // clang-format break
       QT_TR_NOOP("VCC Supply"),
       QT_TR_NOOP("Add standard component: VCC supply"),
-      ":/img/library/vcc.png",
+      ":/img/vcc.svg",
       EditorCommand::Flags(),
       {},
       &categoryComponents,
@@ -1509,20 +1500,20 @@ public:
 
   EditorCommandCategory categoryDocks{"categoryDocks", QT_TR_NOOP("Docks"),
                                       true, &categoryRoot};
-  EditorCommand dockPages{
-      "dock_pages",  // clang-format break
-      QT_TR_NOOP("Pages"),
-      QT_TR_NOOP("Go to the pages dock"),
-      QString(),
-      EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_G)},
-      &categoryDocks,
-  };
+  // EditorCommand dockPages{
+  //     "dock_pages",  // clang-format break
+  //     QT_TR_NOOP("Pages"),
+  //     QT_TR_NOOP("Go to the pages dock"),
+  //     QString(),
+  //     EditorCommand::Flags(),
+  //     {QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_G)},
+  //     &categoryDocks,
+  // };
   EditorCommand dockErc{
       "dock_erc",  // clang-format break
       QT_TR_NOOP("Electrical Rule Check (ERC)"),
       QT_TR_NOOP("Go to the ERC messages dock"),
-      QString(),
+      ":/fa/solid/list-check.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_E)},
       &categoryDocks,
@@ -1531,7 +1522,7 @@ public:
       "dock_drc",  // clang-format break
       QT_TR_NOOP("Design Rule Check (DRC)"),
       QT_TR_NOOP("Go to the DRC messages dock"),
-      QString(),
+      ":/fa/solid/list-check.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_D)},
       &categoryDocks,
@@ -1540,7 +1531,7 @@ public:
       "dock_layers",  // clang-format break
       QT_TR_NOOP("Layers"),
       QT_TR_NOOP("Go to the layers dock"),
-      QString(),
+      ":/bi/layers.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_L)},
       &categoryDocks,
@@ -1549,7 +1540,7 @@ public:
       "dock_place_devices",  // clang-format break
       QT_TR_NOOP("Place Devices"),
       QT_TR_NOOP("Go to the dock for placing devices"),
-      QString(),
+      ":/bi/cpu.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_P)},
       &categoryDocks,
@@ -1616,7 +1607,7 @@ public:
       "project_close",  // clang-format break
       QT_TR_NOOP("Close Project"),
       QT_TR_NOOP("Close the currently opened project"),
-      ":/img/actions/close.png",
+      ":/fa/solid/xmark.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::CTRL | Qt::Key_F4)},
       &categoryWindowManagement,
@@ -1626,7 +1617,7 @@ public:
       "project_close_all",  // clang-format break
       QT_TR_NOOP("Close All Projects"),
       QT_TR_NOOP("Close all currently opened projects"),
-      ":/img/actions/close.png",
+      QString(),
       EditorCommand::Flags(),
       {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_F4)},
       nullptr,  // &categoryWindowManagement,
@@ -1761,7 +1752,7 @@ public:
       "trace_select_whole",  // clang-format break
       QT_TR_NOOP("Select Whole Trace"),
       QT_TR_NOOP("Select the whole trace"),
-      ":/img/actions/bookmark.png",
+      ":/fa/solid/highlighter.svg",
       EditorCommand::Flags(),
       {},
       &categoryContextMenu,
@@ -1770,7 +1761,7 @@ public:
       "trace_measure_length",  // clang-format break
       QT_TR_NOOP("Measure Selected Segments Length"),
       QT_TR_NOOP("Measure the total length of all selected trace segments"),
-      ":/img/actions/ruler.png",
+      ":/fa/solid/ruler.svg",
       EditorCommand::Flags(),
       {},
       &categoryContextMenu,
@@ -1779,7 +1770,7 @@ public:
       "trace_remove_whole",  // clang-format break
       QT_TR_NOOP("Remove Whole Trace"),
       QT_TR_NOOP("Remove the whole trace"),
-      ":/img/actions/minus.png",
+      ":/fa/solid/trash-can.svg",
       EditorCommand::Flags(),
       {},
       &categoryContextMenu,
@@ -1788,7 +1779,7 @@ public:
       "locked",  // clang-format break
       QT_TR_NOOP("Lock Placement"),
       QT_TR_NOOP("Toggle placement lock"),
-      ":/img/status/locked.png",  // For consistent context menu look.
+      ":/fa/solid/lock.svg",  // For consistent context menu look.
       EditorCommand::Flags(),
       {},
       &categoryContextMenu,
@@ -1797,7 +1788,7 @@ public:
       "visible",  // clang-format break
       QT_TR_NOOP("Visible"),
       QT_TR_NOOP("Toggle visibility"),
-      QString(),
+      ":/fa/solid/eye.svg",
       EditorCommand::Flags(),
       {},
       &categoryContextMenu,
@@ -1806,7 +1797,7 @@ public:
       "copy_mpn_to_clipboard",  // clang-format break
       QT_TR_NOOP("Copy MPN to Clipboard"),
       QT_TR_NOOP("Copy this MPN into the clipboard"),
-      ":/img/actions/copy.png",
+      ":/fa/regular/copy.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::CTRL | Qt::Key_C)},
       &categoryContextMenu,
@@ -1815,7 +1806,7 @@ public:
       "open_product_website",  // clang-format break
       QT_TR_NOOP("Open Product Website"),
       QT_TR_NOOP("Open product details about this part in the web browser"),
-      ":/img/actions/open_browser.png",
+      ":/fa/solid/globe.svg",
       EditorCommand::Flag::OpensPopup,
       {},
       &categoryContextMenu,
@@ -1824,7 +1815,7 @@ public:
       "open_pricing_website",  // clang-format break
       QT_TR_NOOP("Open Pricing Website"),
       QT_TR_NOOP("Open pricing details about this part in the web browser"),
-      ":/img/library/part.png",
+      ":/fa/solid/cart-shopping.svg",
       EditorCommand::Flag::OpensPopup,
       {},
       &categoryContextMenu,

@@ -41,7 +41,7 @@ class Workspace;
 
 namespace editor {
 
-class DefaultGraphicsLayerProvider;
+class GraphicsLayerList;
 class GraphicsScene;
 class LibraryElementCache;
 class SymbolGraphicsItem;
@@ -90,7 +90,7 @@ private:  // Data
   std::shared_ptr<ComponentSymbolVariant> mOriginalSymbVar;
   ComponentSymbolVariant mSymbVar;
   QScopedPointer<GraphicsScene> mGraphicsScene;
-  QScopedPointer<DefaultGraphicsLayerProvider> mGraphicsLayerProvider;
+  std::unique_ptr<GraphicsLayerList> mLayers;
   std::shared_ptr<LibraryElementCache> mLibraryElementCache;
   QScopedPointer<Ui::ComponentSymbolVariantEditDialog> mUi;
 

@@ -6,8 +6,9 @@ import {
 } from "../widgets.slint";
 import { Tab } from "../tab.slint";
 import {
-    Action,
+    Backend,
     DownloadLibraryTabData,
+    TabAction,
     WindowSectionData,
 } from "../api.slint";
 
@@ -24,7 +25,7 @@ export component DownloadLibraryTab inherits Tab {
 
     key-pressed(event) => {
         if event.text == Key.Escape {
-            section.tabs[section.current-tab-index].action = Action.tab-cancel;
+            Backend.trigger-tab(section-index, section.current-tab-index, TabAction.cancel);
             return accept;
         }
         reject
@@ -32,7 +33,7 @@ export component DownloadLibraryTab inherits Tab {
 
     function edit-key-pressed(event: KeyEvent) -> EventResult {
         if event.text == Key.Return {
-            section.tabs[section.current-tab-index].action = Action.tab-ok;
+            Backend.trigger-tab(section-index, section.current-tab-index, TabAction.accept);
             return accept;
         }
         reject
@@ -182,7 +183,7 @@ export component DownloadLibraryTab inherits Tab {
                     text: @tr("Download Library");
 
                     clicked => {
-                        section.tabs[section.current-tab-index].action = Action.tab-ok;
+                        Backend.trigger-tab(section-index, section.current-tab-index, TabAction.accept);
                     }
                 }
 
@@ -190,7 +191,7 @@ export component DownloadLibraryTab inherits Tab {
                     text: @tr("Cancel");
 
                     clicked => {
-                        section.tabs[section.current-tab-index].action = Action.tab-cancel;
+                        Backend.trigger-tab(section-index, section.current-tab-index, TabAction.cancel);
                     }
                 }
             }
@@ -210,6 +211,10 @@ export component DownloadLibraryTab inherits Tab {
                 accessible-label: "status message";
                 accessible-description: self.text;
             }
+        }
+
+        Row {
+            Rectangle { }
         }
     }
 }

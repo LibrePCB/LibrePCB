@@ -36,7 +36,7 @@
 namespace librepcb {
 namespace editor {
 
-class IF_GraphicsLayerProvider;
+class GraphicsLayerList;
 
 /*******************************************************************************
  *  Class PolygonGraphicsItem
@@ -50,7 +50,7 @@ public:
   // Constructors / Destructor
   PolygonGraphicsItem() = delete;
   PolygonGraphicsItem(const PolygonGraphicsItem& other) = delete;
-  PolygonGraphicsItem(Polygon& polygon, const IF_GraphicsLayerProvider& lp,
+  PolygonGraphicsItem(Polygon& polygon, const GraphicsLayerList& layers,
                       QGraphicsItem* parent = nullptr) noexcept;
   virtual ~PolygonGraphicsItem() noexcept;
 
@@ -103,7 +103,7 @@ private:  // Methods
 
 private:  // Data
   Polygon& mPolygon;
-  const IF_GraphicsLayerProvider& mLayerProvider;
+  const GraphicsLayerList& mLayers;
   bool mEditable;
 
   // Cached attributes

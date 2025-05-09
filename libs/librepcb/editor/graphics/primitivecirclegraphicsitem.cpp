@@ -78,7 +78,7 @@ void PrimitiveCircleGraphicsItem::setLineWidth(
 }
 
 void PrimitiveCircleGraphicsItem::setLineLayer(
-    const std::shared_ptr<GraphicsLayer>& layer) noexcept {
+    const std::shared_ptr<const GraphicsLayer>& layer) noexcept {
   if (mLineLayer) {
     mLineLayer->onEdited.detach(mOnLayerEditedSlot);
   }
@@ -92,7 +92,7 @@ void PrimitiveCircleGraphicsItem::setLineLayer(
 }
 
 void PrimitiveCircleGraphicsItem::setFillLayer(
-    const std::shared_ptr<GraphicsLayer>& layer) noexcept {
+    const std::shared_ptr<const GraphicsLayer>& layer) noexcept {
   if (mFillLayer) {
     mFillLayer->onEdited.detach(mOnLayerEditedSlot);
   }

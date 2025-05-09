@@ -59,7 +59,7 @@ public:
   void setPosition(const Point& pos) noexcept;
   void setRotation(const Angle& rot) noexcept;
   void setSize(const UnsignedLength& size) noexcept;
-  void setLayer(const std::shared_ptr<GraphicsLayer>& layer) noexcept;
+  void setLayer(const std::shared_ptr<const GraphicsLayer>& layer) noexcept;
 
   // Inherited from QGraphicsItem
   QRectF boundingRect() const noexcept override { return mBoundingRect; }
@@ -77,7 +77,7 @@ private:  // Methods
   void updateBoundingRectAndShape() noexcept;
 
 private:  // Data
-  std::shared_ptr<GraphicsLayer> mLayer;
+  std::shared_ptr<const GraphicsLayer> mLayer;
   QPen mPen;
   QPen mPenHighlighted;
   UnsignedLength mSize;

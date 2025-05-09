@@ -59,7 +59,7 @@ public:
   OutputJobsDialog() = delete;
   OutputJobsDialog(const OutputJobsDialog& other) = delete;
   explicit OutputJobsDialog(const WorkspaceSettings& settings, Project& project,
-                            UndoStack& undoStack, const QString& settingsPrefix,
+                            UndoStack& undoStack,
                             QWidget* parent = nullptr) noexcept;
   ~OutputJobsDialog() noexcept;
 
@@ -102,7 +102,6 @@ private:  // Data
   const WorkspaceSettings& mSettings;
   Project& mProject;
   UndoStack& mUndoStack;
-  const QString mSettingsPrefix;
   OutputJobList mJobs;
   QScopedPointer<Ui::OutputJobsDialog> mUi;
 

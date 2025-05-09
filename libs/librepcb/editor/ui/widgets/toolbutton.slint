@@ -1,0 +1,61 @@
+import { ToolTip } from "tooltip.slint";
+import { Data, EditorCommand } from "../api.slint";
+
+export component ToolButton inherits Rectangle {
+    in property <EditorCommand> cmd;
+    in property <image> icon: cmd.icon;
+    in property <string> tooltip: cmd.text;
+    in property <string> status-tip: cmd.status-tip;
+    in property <string> shortcut: cmd.shortcut;
+    in property <bool> checked: false;
+    out property <bool> pressed <=> ta.pressed;
+
+    callback clicked <=> ta.clicked;
+
+    width: 30px;
+    height: self.preferred-height;
+    background: (checked || ta.pressed) ? blue : (ta.has-hover ? #606060 : #303030);
+    border-radius: 3px;
+
+    // Accessibility
+    accessible-role: button;
+    accessible-description: status-tip;
+    accessible-label: tooltip;
+    accessible-action-default => {
+        ta.clicked();
+    }
+
+    VerticalLayout {
+        ta := TouchArea {
+            width: parent.width;
+            height: self.width;
+
+            Image {
+                width: parent.width * 0.7;
+                height: self.width;
+                image-fit: contain;
+                colorize: white;
+                source: icon;
+                accessible-role: none;
+            }
+
+            if ta.has-hover && (!ta.pressed): tt := ToolTip {
+                x: parent.width + 5px;
+                y: (parent.height - self.height) / 2;
+                text: shortcut.is-empty ? tooltip : (tooltip + " (" + shortcut + ")");
+            }
+
+            changed has-hover => {
+                if !root.status-tip.is-empty {
+                    if self.has-hover {
+                        Data.status-tip = root.status-tip;
+                    } else {
+                        Data.status-tip = "";
+                    }
+                }
+            }
+        }
+
+        @children
+    }
+}

@@ -71,8 +71,6 @@ public:
   FileSystemModel& operator=(const FileSystemModel& rhs) = delete;
 
 signals:
-  void actionTriggered(const FilePath& fp, ui::Action a);  // Internal signal.
-  void pinningRequested(const FilePath& fp, bool pin);  // Internal signal.
   void openFileTriggered(const FilePath& fp);
   void newProjectTriggered(const FilePath& fp);
 
@@ -81,7 +79,7 @@ private:
   void collapseDir(const FilePath& fp, std::size_t index, int level) noexcept;
   void directoryChanged(const QString& dir) noexcept;
   void favoriteProjectChanged(const FilePath& fp, bool favorite) noexcept;
-  void handleAction(const FilePath& fp, ui::Action a) noexcept;
+  void trigger(const FilePath& fp, ui::TreeViewItemAction a) noexcept;
   void removeFileOrDirectory(const FilePath& fp) noexcept;
 
   const Workspace& mWorkspace;

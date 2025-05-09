@@ -58,7 +58,6 @@ public:
   ProjectSetupDialog() = delete;
   ProjectSetupDialog(const ProjectSetupDialog& other) = delete;
   ProjectSetupDialog(Project& project, UndoStack& undoStack,
-                     const QString& settingsPrefix,
                      QWidget* parent = nullptr) noexcept;
   ~ProjectSetupDialog();
 
@@ -73,7 +72,6 @@ private:  // Methods
 private:  // Date
   Project& mProject;
   UndoStack& mUndoStack;
-  const QString mSettingsPrefix;
   AttributeList mAttributes;
   QScopedPointer<Ui::ProjectSetupDialog> mUi;
 };

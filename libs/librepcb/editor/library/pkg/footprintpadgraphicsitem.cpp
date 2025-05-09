@@ -41,12 +41,12 @@ namespace editor {
  ******************************************************************************/
 
 FootprintPadGraphicsItem::FootprintPadGraphicsItem(
-    std::shared_ptr<FootprintPad> pad, const IF_GraphicsLayerProvider& lp,
+    std::shared_ptr<FootprintPad> pad, const GraphicsLayerList& layers,
     const PackagePadList* packagePadList, QGraphicsItem* parent) noexcept
   : QGraphicsItemGroup(parent),
     mPad(pad),
     mPackagePadList(packagePadList),
-    mGraphicsItem(new PrimitiveFootprintPadGraphicsItem(lp, true, this)),
+    mGraphicsItem(new PrimitiveFootprintPadGraphicsItem(layers, true, this)),
     mOnPadEditedSlot(*this, &FootprintPadGraphicsItem::padEdited),
     mOnPackagePadsEditedSlot(*this,
                              &FootprintPadGraphicsItem::packagePadListEdited) {

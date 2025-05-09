@@ -24,6 +24,7 @@
 
 #include "../../../cmd/cmdstroketextedit.h"
 #include "../../../editorcommandset.h"
+#include "../../../graphics/graphicsscene.h"
 #include "../../../graphics/stroketextgraphicsitem.h"
 #include "../../../utils/halignactiongroup.h"
 #include "../../../utils/valignactiongroup.h"
@@ -164,8 +165,8 @@ bool PackageEditorState_DrawTextBase::entry() noexcept {
           &PackageEditorState_DrawTextBase::vAlignActionGroupValueChanged);
   mContext.commandToolBar.addActionGroup(std::move(vAlignActionGroup));
 
-  Point pos =
-      mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos(), true, true);
+  const Point pos = mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos())
+                        .mappedToGrid(mContext.graphicsScene.getGridInterval());
   if (!startAddText(pos)) {
     return false;
   }
@@ -200,10 +201,9 @@ QSet<EditorWidgetBase::Feature>
  ******************************************************************************/
 
 bool PackageEditorState_DrawTextBase::processGraphicsSceneMouseMoved(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   if (mCurrentText) {
-    Point currentPos =
-        Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
+    Point currentPos = e.scenePos.mappedToGrid(getGridInterval());
     mEditCmd->setPosition(currentPos, true);
     return true;
   } else {
@@ -213,9 +213,8 @@ bool PackageEditorState_DrawTextBase::processGraphicsSceneMouseMoved(
 
 bool PackageEditorState_DrawTextBase::
     processGraphicsSceneLeftMouseButtonPressed(
-        QGraphicsSceneMouseEvent& e) noexcept {
-  Point currentPos =
-      Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
+        const GraphicsSceneMouseEvent& e) noexcept {
+  Point currentPos = e.scenePos.mappedToGrid(getGridInterval());
   if (mCurrentText) {
     finishAddText(currentPos);
   }
@@ -224,7 +223,7 @@ bool PackageEditorState_DrawTextBase::
 
 bool PackageEditorState_DrawTextBase::
     processGraphicsSceneRightMouseButtonReleased(
-        QGraphicsSceneMouseEvent& e) noexcept {
+        const GraphicsSceneMouseEvent& e) noexcept {
   Q_UNUSED(e);
   return processRotate(Angle::deg90());
 }

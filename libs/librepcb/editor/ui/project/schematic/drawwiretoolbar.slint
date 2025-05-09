@@ -1,0 +1,22 @@
+import { WireModeSelector } from "../../widgets.slint";
+import {
+    SchematicTabData,
+    WindowSectionData,
+    WireMode,
+} from "../../api.slint";
+
+export component DrawWireToolBar inherits HorizontalLayout {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    property <[SchematicTabData]> tabs: section.schematic-tabs;
+
+    spacing: 2px;
+
+    wire-mode-selector := WireModeSelector {
+        wire-mode: tabs[section.current-tab-index].tool-wire-mode;
+
+        wire-mode-clicked(mode) => {
+            tabs[section.current-tab-index].tool-wire-mode = mode;
+        }
+    }
+}

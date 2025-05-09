@@ -34,7 +34,7 @@
 namespace librepcb {
 namespace editor {
 
-class IF_GraphicsLayerProvider;
+class GraphicsLayerList;
 class PrimitiveHoleGraphicsItem;
 
 /*******************************************************************************
@@ -50,7 +50,7 @@ public:
   // Constructors / Destructor
   HoleGraphicsItem() = delete;
   HoleGraphicsItem(const HoleGraphicsItem& other) = delete;
-  HoleGraphicsItem(Hole& hole, const IF_GraphicsLayerProvider& lp,
+  HoleGraphicsItem(Hole& hole, const GraphicsLayerList& layers,
                    bool originCrossesVisible,
                    QGraphicsItem* parent = nullptr) noexcept;
   virtual ~HoleGraphicsItem() noexcept;

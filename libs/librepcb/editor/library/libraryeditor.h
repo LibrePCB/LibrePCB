@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../graphics/graphicslayer.h"
 #include "editorwidgetbase.h"
 #include "newelementwizard/newelementwizard.h"
 
@@ -46,6 +45,7 @@ class Workspace;
 namespace editor {
 
 class ExclusiveActionGroup;
+class GraphicsLayerList;
 class LibraryOverviewWidget;
 class SearchToolBar;
 class StandardEditorCommandHandler;
@@ -62,8 +62,7 @@ class LibraryEditor;
 /**
  * @brief The LibraryEditor class
  */
-class LibraryEditor final : public QMainWindow,
-                            public IF_GraphicsLayerProvider {
+class LibraryEditor final : public QMainWindow {
   Q_OBJECT
 
 public:
@@ -72,26 +71,6 @@ public:
   LibraryEditor(const LibraryEditor& other) = delete;
   LibraryEditor(Workspace& ws, const FilePath& libFp, bool readOnly);
   ~LibraryEditor() noexcept;
-
-  /**
-   * @copydoc ::librepcb::editor::IF_GraphicsLayerProvider::getLayer()
-   */
-  std::shared_ptr<GraphicsLayer> getLayer(
-      const QString& name) const noexcept override {
-    foreach (const std::shared_ptr<GraphicsLayer>& layer, mLayers) {
-      if (layer->getName() == name) {
-        return layer;
-      }
-    }
-    return nullptr;
-  }
-
-  /**
-   * @copydoc ::librepcb::editor::IF_GraphicsLayerProvider::getAllLayers()
-   */
-  QList<std::shared_ptr<GraphicsLayer>> getAllLayers() const noexcept override {
-    return mLayers;
-  }
 
   /**
    * @brief Close the library editor (this will destroy this object!)
@@ -169,14 +148,13 @@ private:  // Methods
   void keyPressEvent(QKeyEvent* event) noexcept override;
   void closeEvent(QCloseEvent* event) noexcept override;
   bool closeAllTabs(bool withNonClosable, bool askForSave) noexcept;
-  void addLayer(const QString& name) noexcept;
 
 private:  // Data
   Workspace& mWorkspace;
   bool mIsOpenedReadOnly;
   QScopedPointer<Ui::LibraryEditor> mUi;
   QScopedPointer<StandardEditorCommandHandler> mStandardCommandHandler;
-  QList<std::shared_ptr<GraphicsLayer>> mLayers;
+  std::unique_ptr<GraphicsLayerList> mLayers;
   EditorWidgetBase* mCurrentEditorWidget;
   Library* mLibrary;
 

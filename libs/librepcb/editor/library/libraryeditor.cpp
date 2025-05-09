@@ -24,6 +24,7 @@
 #include "libraryeditor.h"
 
 #include "../editorcommandset.h"
+#include "../graphics/graphicslayerlist.h"
 #include "../utils/exclusiveactiongroup.h"
 #include "../utils/menubuilder.h"
 #include "../utils/standardeditorcommandhandler.h"
@@ -72,6 +73,7 @@ LibraryEditor::LibraryEditor(Workspace& ws, const FilePath& libFp,
     mUi(new Ui::LibraryEditor),
     mStandardCommandHandler(
         new StandardEditorCommandHandler(mWorkspace.getSettings(), this)),
+    mLayers(GraphicsLayerList::libraryLayers(&mWorkspace.getSettings())),
     mCurrentEditorWidget(nullptr),
     mLibrary(nullptr) {
   mUi->setupUi(this);
@@ -101,70 +103,6 @@ LibraryEditor::LibraryEditor(Workspace& ws, const FilePath& libFp,
           Qt::QueuedConnection);
   mUi->statusBar->setProgressBarPercent(
       mWorkspace.getLibraryDb().getScanProgressPercent());
-
-  // Add all required schematic layers.
-  addLayer(Theme::Color::sSchematicReferences);
-  addLayer(Theme::Color::sSchematicFrames);
-  addLayer(Theme::Color::sSchematicOutlines);
-  addLayer(Theme::Color::sSchematicGrabAreas);
-  addLayer(Theme::Color::sSchematicHiddenGrabAreas);
-  addLayer(Theme::Color::sSchematicOptionalPins);
-  addLayer(Theme::Color::sSchematicRequiredPins);
-  addLayer(Theme::Color::sSchematicPinLines);
-  addLayer(Theme::Color::sSchematicPinNames);
-  addLayer(Theme::Color::sSchematicPinNumbers);
-  addLayer(Theme::Color::sSchematicNames);
-  addLayer(Theme::Color::sSchematicValues);
-  addLayer(Theme::Color::sSchematicWires);
-  addLayer(Theme::Color::sSchematicNetLabels);
-  addLayer(Theme::Color::sSchematicNetLabelAnchors);
-  addLayer(Theme::Color::sSchematicDocumentation);
-  addLayer(Theme::Color::sSchematicComments);
-  addLayer(Theme::Color::sSchematicGuide);
-
-  // Add all required board layers.
-  addLayer(Theme::Color::sBoardFrames);
-  addLayer(Theme::Color::sBoardOutlines);
-  addLayer(Theme::Color::sBoardPlatedCutouts);
-  addLayer(Theme::Color::sBoardHoles);
-  addLayer(Theme::Color::sBoardVias);
-  addLayer(Theme::Color::sBoardPads);
-  addLayer(Theme::Color::sBoardZones);
-  addLayer(Theme::Color::sBoardAirWires);
-  addLayer(Theme::Color::sBoardMeasures);
-  addLayer(Theme::Color::sBoardAlignment);
-  addLayer(Theme::Color::sBoardDocumentation);
-  addLayer(Theme::Color::sBoardComments);
-  addLayer(Theme::Color::sBoardGuide);
-  addLayer(Theme::Color::sBoardCopperTop);
-  for (int i = 1; i <= Layer::innerCopperCount(); ++i) {
-    addLayer(QString(Theme::Color::sBoardCopperInner).arg(i));
-  }
-  addLayer(Theme::Color::sBoardCopperBot);
-  addLayer(Theme::Color::sBoardReferencesTop);
-  addLayer(Theme::Color::sBoardReferencesBot);
-  addLayer(Theme::Color::sBoardGrabAreasTop);
-  addLayer(Theme::Color::sBoardGrabAreasBot);
-  addLayer(Theme::Color::sBoardHiddenGrabAreasTop);
-  addLayer(Theme::Color::sBoardHiddenGrabAreasBot);
-  addLayer(Theme::Color::sBoardNamesTop);
-  addLayer(Theme::Color::sBoardNamesBot);
-  addLayer(Theme::Color::sBoardValuesTop);
-  addLayer(Theme::Color::sBoardValuesBot);
-  addLayer(Theme::Color::sBoardLegendTop);
-  addLayer(Theme::Color::sBoardLegendBot);
-  addLayer(Theme::Color::sBoardDocumentationTop);
-  addLayer(Theme::Color::sBoardDocumentationBot);
-  addLayer(Theme::Color::sBoardPackageOutlinesTop);
-  addLayer(Theme::Color::sBoardPackageOutlinesBot);
-  addLayer(Theme::Color::sBoardCourtyardTop);
-  addLayer(Theme::Color::sBoardCourtyardBot);
-  addLayer(Theme::Color::sBoardStopMaskTop);
-  addLayer(Theme::Color::sBoardStopMaskBot);
-  addLayer(Theme::Color::sBoardSolderPasteTop);
-  addLayer(Theme::Color::sBoardSolderPasteBot);
-  addLayer(Theme::Color::sBoardGlueTop);
-  addLayer(Theme::Color::sBoardGlueBot);
 
   // Add overview tab.
   LibraryOverviewWidget* overviewWidget =
@@ -549,7 +487,7 @@ void LibraryEditor::createActions() noexcept {
   }));
   mActionNewElement.reset(
       cmd.libraryElementNew.createAction(this, this, [this]() {
-        NewElementWizard wizard(mWorkspace, *mLibrary, *this, this);
+        NewElementWizard wizard(mWorkspace, *mLibrary, *mLayers, this);
         if (wizard.exec() == QDialog::Accepted) {
           FilePath fp = wizard.getContext().getOutputDirectory();
           editNewLibraryElement(wizard.getContext().mElementType, fp);
@@ -990,7 +928,7 @@ void LibraryEditor::createMenus() noexcept {
 EditorWidgetBase::Context LibraryEditor::createContext(
     bool isNewElement) noexcept {
   return {
-      mWorkspace, *this, isNewElement, mIsOpenedReadOnly, mLibrary,
+      mWorkspace, *mLayers, isNewElement, mIsOpenedReadOnly, mLibrary,
   };
 }
 
@@ -1069,7 +1007,7 @@ void LibraryEditor::setActiveEditorWidget(EditorWidgetBase* widget) {
 
 void LibraryEditor::newLibraryElement(
     NewElementWizardContext::ElementType type) {
-  NewElementWizard wizard(mWorkspace, *mLibrary, *this, this);
+  NewElementWizard wizard(mWorkspace, *mLibrary, *mLayers, this);
   wizard.setNewElementType(type);
   if (wizard.exec() == QDialog::Accepted) {
     FilePath fp = wizard.getContext().getOutputDirectory();
@@ -1080,7 +1018,7 @@ void LibraryEditor::newLibraryElement(
 
 void LibraryEditor::duplicateLibraryElement(
     NewElementWizardContext::ElementType type, const FilePath& fp) {
-  NewElementWizard wizard(mWorkspace, *mLibrary, *this, this);
+  NewElementWizard wizard(mWorkspace, *mLibrary, *mLayers, this);
   wizard.setElementToCopy(type, fp);
   if (wizard.exec() == QDialog::Accepted) {
     FilePath fp = wizard.getContext().getOutputDirectory();
@@ -1186,21 +1124,6 @@ bool LibraryEditor::closeAllTabs(bool withNonClosable,
     }
   }
   return true;
-}
-
-void LibraryEditor::addLayer(const QString& name) noexcept {
-  const Theme& theme = mWorkspace.getSettings().themes.getActive();
-  const ThemeColor& color = theme.getColor(name);
-  QColor primary = color.getPrimaryColor();
-  QColor secondary = color.getSecondaryColor();
-  if (name == Theme::Color::sSchematicPinNumbers) {
-    // Make pin numbers lighter since they are only for illustration but
-    // don't display a reasonable text.
-    primary.setAlpha(primary.alpha() / 3);
-    secondary.setAlpha(secondary.alpha() / 3);
-  }
-  mLayers.append(std::make_shared<GraphicsLayer>(name, color.getNameTr(),
-                                                 primary, secondary));
 }
 
 /*******************************************************************************

@@ -66,12 +66,10 @@ public:
     return mUiData;
   }
   void setDerivedUiData(const ui::CreateLibraryTabData& data) noexcept;
+  void trigger(ui::TabAction a) noexcept override;
 
   // Operator Overloadings
   CreateLibraryTab& operator=(const CreateLibraryTab& rhs) = delete;
-
-protected:
-  void triggerAsync(ui::Action a) noexcept override;
 
 private:
   void validate() noexcept;

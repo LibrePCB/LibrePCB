@@ -3,6 +3,7 @@ import { Constants } from "../api.slint";
 
 export component Spinner inherits Rectangle {
     in property <bool> indeterminate: false;  // Actually not supported yet.
+    in property <color> foreground-color: Palette.foreground.brighter(2);
     property <length> size: min(self.width, self.height);
     property <length> dot-size: size * 0.22;
     property <[angle]> angles: [
@@ -22,7 +23,7 @@ export component Spinner inherits Rectangle {
         y: (root.height / 2) - ((size - dot-size) / 2) * cos(angle) - (dot-size / 2);
         width: dot-size;
         height: dot-size;
-        background: Palette.foreground.brighter(2);
+        background: foreground-color;
         opacity: mod(angle - spinning-angle, 360deg) / 360deg;
         border-radius: dot-size / 2;
     }

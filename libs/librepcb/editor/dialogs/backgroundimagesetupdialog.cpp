@@ -118,9 +118,12 @@ BackgroundImageSetupDialog::BackgroundImageSetupDialog(
     mCursorGraphicsItem(createCrossGraphicsItem(true)),
     mCropGraphicsItem(new QGraphicsPathItem()) {
   mUi->setupUi(this);
-  mUi->graphicsView->setOriginCrossVisible(false);
-  mUi->graphicsView->setBackgroundColors(Qt::transparent, Qt::transparent);
-  mUi->graphicsView->setScene(new GraphicsScene(this));
+
+  GraphicsScene* scene = new GraphicsScene(this);
+  scene->setBackgroundColors(Qt::transparent, Qt::transparent);
+  scene->setOriginCrossVisible(false);
+  mUi->graphicsView->setSpinnerColor(Qt::transparent);
+  mUi->graphicsView->setScene(scene);
   mUi->graphicsView->setEventHandlerObject(this);
   mUi->graphicsView->scene()->addItem(mImageGraphicsItem.get());
   mUi->graphicsView->scene()->addItem(mCursorGraphicsItem.get());
@@ -257,59 +260,61 @@ void BackgroundImageSetupDialog::keyPressEvent(QKeyEvent* event) noexcept {
   QDialog::keyPressEvent(event);
 }
 
-bool BackgroundImageSetupDialog::graphicsViewEventHandler(
-    QEvent* event) noexcept {
-  if (event->type() == QEvent::GraphicsSceneMousePress) {
-    QGraphicsSceneMouseEvent* e = static_cast<QGraphicsSceneMouseEvent*>(event);
-    if (e->button() != Qt::LeftButton) return false;
-    if (mState == State::Crop) {
-      QPainterPath p;
-      p.moveTo(e->scenePos());
-      mCropGraphicsItem->setPath(p);
-    } else if (mState == State::Rotate) {
-      mState = State::SelectRef1;
-      updateUi();
-    } else if (mState == State::SelectRef1) {
-      auto ref = mLoadedReferences.value(0);
-      ref.first = mImageGraphicsItem->mapFromScene(e->scenePos());
-      mReferences.append(ref);
-      mState = State::SelectRef2;
-      updateUi();
-    } else if (mState == State::SelectRef2) {
-      auto ref = mLoadedReferences.value(1);
-      ref.first = mImageGraphicsItem->mapFromScene(e->scenePos());
-      mReferences.append(ref);
-      mState = State::Idle;
-      updateUi();
-      if (auto w = mReferenceWidgets.value(0)) {
-        w->setFocus(Qt::TabFocusReason);
-      }
+bool BackgroundImageSetupDialog::graphicsSceneMouseMoved(
+    const GraphicsSceneMouseEvent& e) noexcept {
+  mCursorGraphicsItem->setPos(e.scenePos.toPxQPointF());
+  if ((mState == State::Crop) &&
+      (mCropGraphicsItem->path().elementCount() > 0)) {
+    QPainterPath p = mCropGraphicsItem->path();
+    p.lineTo(e.scenePos.toPxQPointF());
+    mCropGraphicsItem->setPath(p);
+  }
+  updateAnchors();
+  return false;
+}
+
+bool BackgroundImageSetupDialog::graphicsSceneLeftMouseButtonPressed(
+    const GraphicsSceneMouseEvent& e) noexcept {
+  if (mState == State::Crop) {
+    QPainterPath p;
+    p.moveTo(e.scenePos.toPxQPointF());
+    mCropGraphicsItem->setPath(p);
+  } else if (mState == State::Rotate) {
+    mState = State::SelectRef1;
+    updateUi();
+  } else if (mState == State::SelectRef1) {
+    auto ref = mLoadedReferences.value(0);
+    ref.first = mImageGraphicsItem->mapFromScene(e.scenePos.toPxQPointF());
+    mReferences.append(ref);
+    mState = State::SelectRef2;
+    updateUi();
+  } else if (mState == State::SelectRef2) {
+    auto ref = mLoadedReferences.value(1);
+    ref.first = mImageGraphicsItem->mapFromScene(e.scenePos.toPxQPointF());
+    mReferences.append(ref);
+    mState = State::Idle;
+    updateUi();
+    if (auto w = mReferenceWidgets.value(0)) {
+      w->setFocus(Qt::TabFocusReason);
     }
-  } else if (event->type() == QEvent::GraphicsSceneMouseRelease) {
-    QGraphicsSceneMouseEvent* e = static_cast<QGraphicsSceneMouseEvent*>(event);
-    if (e->button() != Qt::LeftButton) return false;
-    if (mState == State::Crop) {
-      QPainterPath path = mCropGraphicsItem->path();
-      mCropGraphicsItem->setPath(QPainterPath());
-      path.closeSubpath();
-      path.translate(-mImageGraphicsItem->pos());
-      if (path.elementCount() > 10) {
-        mImage = cropImage(mImage, path);
-      }
-      mState = State::Rotate;
-      updateUi();
-      fitImageInView();
+  }
+  return false;
+}
+
+bool BackgroundImageSetupDialog::graphicsSceneLeftMouseButtonReleased(
+    const GraphicsSceneMouseEvent& e) noexcept {
+  Q_UNUSED(e);
+  if (mState == State::Crop) {
+    QPainterPath path = mCropGraphicsItem->path();
+    mCropGraphicsItem->setPath(QPainterPath());
+    path.closeSubpath();
+    path.translate(-mImageGraphicsItem->pos());
+    if (path.elementCount() > 10) {
+      mImage = cropImage(mImage, path);
     }
-  } else if (event->type() == QEvent::GraphicsSceneMouseMove) {
-    QGraphicsSceneMouseEvent* e = static_cast<QGraphicsSceneMouseEvent*>(event);
-    mCursorGraphicsItem->setPos(e->scenePos());
-    if ((mState == State::Crop) &&
-        (mCropGraphicsItem->path().elementCount() > 0)) {
-      QPainterPath p = mCropGraphicsItem->path();
-      p.lineTo(e->scenePos());
-      mCropGraphicsItem->setPath(p);
-    }
-    updateAnchors();
+    mState = State::Rotate;
+    updateUi();
+    fitImageInView();
   }
   return false;
 }

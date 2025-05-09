@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "appwindow.h"
+#include "utils/uiobjectlist.h"
 
 #include <librepcb/core/fileio/filepath.h>
 
@@ -68,38 +69,52 @@ public:
                           QObject* parent = nullptr) noexcept;
   ~GuiApplication() noexcept;
 
-  // Getters
+  // Workspace
   Workspace& getWorkspace() noexcept { return mWorkspace; }
-  NotificationsModel& getNotifications() noexcept { return *mNotifications; }
   QuickAccessModel& getQuickAccess() noexcept { return *mQuickAccessModel; }
-  LibrariesModel& getLocalLibraries() noexcept { return *mLocalLibraries; }
-  LibrariesModel& getRemoteLibraries() noexcept { return *mRemoteLibraries; }
-
-  // General Methods
   void openFile(const FilePath& fp, QWidget* parent) noexcept;
   void switchWorkspace(QWidget* parent) noexcept;
   void execWorkspaceSettingsDialog(QWidget* parent) noexcept;
   void addExampleProjects(QWidget* parent) noexcept;
+
+  // Libraries
+  LibrariesModel& getLocalLibraries() noexcept { return *mLocalLibraries; }
+  LibrariesModel& getRemoteLibraries() noexcept { return *mRemoteLibraries; }
+
+  // Projects
+  const QVector<std::shared_ptr<ProjectEditor>>& getProjects() noexcept {
+    return mProjects->values();
+  }
   void createProject(const FilePath& parentDir, bool eagleImport,
                      QWidget* parent) noexcept;
   /**
-   * @brief Open a project with the editor (or bring an already opened editor to
-   * front)
+   * @brief Open a project with the editor
    *
-   * @param filepath  The filepath to the *.lpp project file to open. If
+   * @param fp        The filepath to the *.lpp project file to open. If
    *                  invalid, a file dialog will be shown to select it.
    * @param parent    Parent widget for dialogs.
    *
    * @return The pointer to the opened project editor (nullptr on error)
    */
-  ProjectEditor* openProject(FilePath filepath, QWidget* parent) noexcept;
-  void createNewWindow(int id = -1) noexcept;
-  bool requestClosingWindow(QWidget* parent) noexcept;
+  std::shared_ptr<ProjectEditor> openProject(FilePath fp,
+                                             QWidget* parent) noexcept;
+  void closeProject(int index) noexcept;
+
+  // Windows
+  NotificationsModel& getNotifications() noexcept { return *mNotifications; }
+  void createNewWindow(int id = -1, int projectIndex = -1) noexcept;
+  bool requestClosingWindow() noexcept;
+
+  // General Methods
   void exec();
   void quit(QPointer<QWidget> parent) noexcept;
 
   // Operator Overloadings
   GuiApplication& operator=(const GuiApplication& rhs) = delete;
+
+signals:
+  void statusBarMessageChanged(const QString& message, int timeoutMs);
+  void librariesContainStandardComponentsChanged(bool contains);
 
 protected:
   bool eventFilter(QObject* watched, QEvent* event) noexcept override;
@@ -108,44 +123,7 @@ private:
   void openProjectsPassedByCommandLine() noexcept;
   void openProjectPassedByOs(const QString& file, bool silent = false) noexcept;
 
-  /**
-   * @brief Get the pointer to an already open project editor by its project
-   * filepath
-   *
-   * This method can also be used to check whether a project (by its filepath)
-   * is already open or not.
-   *
-   * @param filepath  The filepath to a *.lpp project file
-   *
-   * @return The pointer to the open project editor, or nullptr if the project
-   * is not open
-   */
-  ProjectEditor* getOpenProject(const FilePath& filepath) const noexcept;
-
-  /**
-   * @brief Ask the user whether to restore a backup of a project
-   *
-   * @param dir   The project directory to be restored.
-   *
-   * @retval true   Restore backup.
-   * @retval false  Do not restore backup.
-   *
-   * @throw Exception to abort opening the project.
-   */
-  static bool askForRestoringBackup(const FilePath& dir);
-
-  /**
-   * @brief Close all open project editors
-   *
-   * @param askForSave    If true, the user will be asked to save all modified
-   *                      projects
-   * @param parent        Parent for message boxes
-   *
-   * @retval  true if all projects successfully closed, false otherwise
-   */
-  bool closeAllProjects(bool askForSave, QWidget* parent) noexcept;
-
-  void projectEditorClosed() noexcept;
+  bool requestClosingAllProjects() noexcept;
   void openProjectLibraryUpdater(const FilePath& project) noexcept;
 
   void openLibraryEditor(const FilePath& libDir) noexcept;
@@ -162,10 +140,12 @@ private:
   bool closeAllLibraryEditors(bool askForSave) noexcept;
 
   std::shared_ptr<MainWindow> getCurrentWindow() noexcept;
+  void updateLibrariesContainStandardComponents() noexcept;
   void updateNoLibrariesInstalledNotification() noexcept;
   void updateDesktopIntegrationNotification() noexcept;
 
   Workspace& mWorkspace;
+  bool mLibrariesContainStandardComponents;
   std::shared_ptr<NotificationsModel> mNotifications;
   std::shared_ptr<Notification> mNotificationNoLibrariesInstalled;
   std::shared_ptr<Notification> mNotificationDesktopIntegration;
@@ -173,7 +153,7 @@ private:
   std::shared_ptr<LibrariesModel> mLocalLibraries;
   std::shared_ptr<LibrariesModel> mRemoteLibraries;
   std::unique_ptr<SlintKeyEventTextBuilder> mLibrariesFilter;
-  QHash<QString, ProjectEditor*> mOpenProjectEditors;
+  std::shared_ptr<UiObjectList<ProjectEditor, ui::ProjectData>> mProjects;
   QHash<FilePath, LibraryEditor*> mOpenLibraryEditors;
   std::unique_ptr<ProjectLibraryUpdater> mProjectLibraryUpdater;
   QList<std::shared_ptr<MainWindow>> mWindows;
