@@ -537,6 +537,24 @@ void MainWindow::triggerBoard(int project, int board,
       }
       break;
     }
+    case ui::BoardAction::PrepareOrder: {
+      if (auto brdEditor = prjEditor->getBoards().value(board)) {
+        brdEditor->prepareOrderPcb();
+      }
+      break;
+    }
+    case ui::BoardAction::StartOrder: {
+      if (auto brdEditor = prjEditor->getBoards().value(board)) {
+        brdEditor->startOrderPcbUpload(false);
+      }
+      break;
+    }
+    case ui::BoardAction::StartOrderAndOpen: {
+      if (auto brdEditor = prjEditor->getBoards().value(board)) {
+        brdEditor->startOrderPcbUpload(true);
+      }
+      break;
+    }
     default: {
       qWarning() << "Unhandled action in MainWindow::triggerBoard():"
                  << static_cast<int>(a);

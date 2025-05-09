@@ -41,7 +41,6 @@ namespace librepcb {
 
 class Board;
 class NetSignal;
-class OrderPcbApiRequest;
 class Project;
 class Workspace;
 
@@ -78,6 +77,7 @@ public:
   ~ProjectEditor() noexcept;
 
   // General Methods
+  Workspace& getWorkspace() noexcept { return mWorkspace; }
   Project& getProject() noexcept { return *mProject; }
   UndoStack& getUndoStack() noexcept { return *mUndoStack; }
   const QVector<std::shared_ptr<SchematicEditor>>& getSchematics() noexcept {
@@ -160,19 +160,6 @@ public:
    */
   void execLppzExportDialog(QWidget* parent) noexcept;
 
-  /**
-   * @brief Prepare the "Order PCB" feature (request server status)
-   */
-  void prepareOrderPcb() noexcept;
-
-  /**
-   * @brief Start the "Order PCB" upload
-   *
-   * @param openBrowser   Whether to open the web browser after the upload
-   *                      or not.
-   */
-  void startOrderPcbUpload(bool openBrowser) noexcept;
-
   std::shared_ptr<SchematicEditor> execNewSheetDialog() noexcept;
   void execRenameSheetDialog(int index) noexcept;
   void execDeleteSheetDialog(int index) noexcept;
@@ -246,12 +233,6 @@ private:
   /// The timer for the periodically automatic saving
   /// functionality (see also @ref doc_project_save)
   QTimer mAutoSaveTimer;
-
-  // Order PCB
-  std::unique_ptr<OrderPcbApiRequest> mOrderRequest;  ///< May be `nullptr`
-  QString mOrderStatus;  ///< Either error or status
-  int mOrderUploadProgressPercent;  ///< -1 means "not in progress"
-  bool mOrderOpenBrowser;
 };
 
 /*******************************************************************************

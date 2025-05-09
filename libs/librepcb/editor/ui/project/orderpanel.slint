@@ -8,26 +8,47 @@ import {
 } from "../widgets.slint";
 import {
     Backend,
+    BoardAction,
+    BoardData,
     Data,
-    ProjectAction,
     ProjectData,
+    TabType,
 } from "../api.slint";
 
 export component OrderPanel inherits Rectangle {
-    property <int> project-index: Data.current-project-index;
+    property <int> project-index: {
+        if (Data.current-tab-project-index >= 0) && (Data.current-tab-project-index < Data.projects.length) {
+            Data.current-tab-project-index
+        } else {
+            Data.current-project-index
+        }
+    };
     property <ProjectData> project: Data.projects[project-index];
-    property <bool> available: project.boards.length > 0;
-    property <bool> info-error: project.valid && project.order-info-url.is-empty && (!project.order-status.is-empty);
-    property <bool> ready: project.valid && (!project.order-info-url.is-empty);
-    property <bool> uploading: project.valid && project.order-upload-progress >= 0;
+    property <int> board-index: {
+        if Data.current-tab.type == TabType.board-2d {
+            Data.current-board-2d-tab.board-index
+        } else if Data.current-tab.type == TabType.board-3d {
+            Data.current-board-3d-tab.board-index
+        } else if Data.current-project.boards.length == 1 {
+            0
+        } else {
+            -1
+        }
+    };
+    property <BoardData> board: project.boards[board-index];
+    property <bool> board-selected: (board-index >= 0) && (board-index < project.boards.length);
+    property <bool> api-error: board-selected && board.order-info-url.is-empty && (!board.order-status.is-empty);
+    property <bool> api-ready: board-selected && (!board.order-info-url.is-empty);
+    property <bool> uploading: board-selected && board.order-upload-progress >= 0;
     property <bool> clicked: false;
+    property <bool> enabled: api-ready && (!uploading) && ((!clicked) || board.order-upload-url.is-empty);
 
     background: #2a2a2a;
 
     // Request updating API status information.
     function request-info() {
-        if available {
-            Backend.trigger-project(project-index, ProjectAction.prepare-order);
+        if board-selected {
+            Backend.trigger-board(project-index, board-index, BoardAction.prepare-order);
         }
     }
 
@@ -42,15 +63,19 @@ export component OrderPanel inherits Rectangle {
         request-info();
     }
 
+    changed board-index => {
+        request-info();
+    }
+
     fs := FocusScope {
         VerticalLayout {
             header := PanelHeader {
                 z: 10;  // For the tooltip.
-                title: @tr("Order {}", project.name);
+                title: @tr("Order {}", project.name) + ((board-selected && (project.boards.length > 1)) ? " (\{board.name})" : "");
                 highlight: fs.has-focus;
-                show-spinner: available && (!info-error) && (!ready);
+                show-spinner: board-selected && (!api-ready) && (!api-error);
 
-                if info-error: error-btn := IconButton {
+                if api-error: error-btn := IconButton {
                     width: self.height;
                     style: read-only;
                     icon: @image-url("../../../../font-awesome/svgs/solid/triangle-exclamation.svg");
@@ -75,7 +100,7 @@ export component OrderPanel inherits Rectangle {
                 open-browser-sw := CheckBox {
                     text: @tr("Open web browser after upload");
                     checked: Data.order-pcb-open-web-browser;
-                    enabled: ready && (!uploading) && ((!clicked) || project.order-upload-url.is-empty);
+                    enabled: enabled;
 
                     toggled(checked) => {
                         Data.order-pcb-open-web-browser = checked;
@@ -84,21 +109,21 @@ export component OrderPanel inherits Rectangle {
 
                 upload-btn := Button {
                     primary: true;
-                    enabled: ready && (!uploading) && ((!clicked) || project.order-upload-url.is-empty);
+                    enabled: enabled;
                     text: @tr("Upload Project");
 
                     clicked => {
                         clicked = true;
                         if open-browser-sw.checked {
-                            Backend.trigger-project(project-index, ProjectAction.start-order-and-open);
+                            Backend.trigger-board(project-index, board-index, BoardAction.start-order-and-open);
                         } else {
-                            Backend.trigger-project(project-index, ProjectAction.start-order);
+                            Backend.trigger-board(project-index, board-index, BoardAction.start-order);
                         }
                     }
                 }
 
                 if uploading: progress-bar := ProgressBar {
-                    progress: project.order-upload-progress / 100;
+                    progress: board.order-upload-progress / 100;
                 }
 
                 VerticalLayout {
@@ -110,11 +135,13 @@ export component OrderPanel inherits Rectangle {
                         single-line: false;
                         wrap: word-wrap;
                         text: {
-                            if !available {
+                            if project.boards.length == 0 {
                                 @tr("This project does not contain any board, so there's nothing you could order.")
-                            } else if !project.order-status.is-empty {
-                                project.order-status
-                            } else if project.order-info-url.is-empty {
+                            } else if !board-selected {
+                                @tr("Please open the board you like to order")
+                            } else if !board.order-status.is-empty {
+                                board.order-status
+                            } else if board.order-info-url.is-empty {
                                 @tr("Checking availability") + "..."
                             } else {
                                 ""
@@ -122,8 +149,8 @@ export component OrderPanel inherits Rectangle {
                         };
                     }
 
-                    if !project.order-upload-url.is-empty: upload-url-btn := LinkText {
-                        text: project.order-upload-url;
+                    if !board.order-upload-url.is-empty: upload-url-btn := LinkText {
+                        text: board.order-upload-url;
                         status-tip: self.text;
                         overflow: elide;
 
@@ -150,11 +177,11 @@ export component OrderPanel inherits Rectangle {
                 }
             }
 
-            if ready: PanelHeader {
+            if api-ready: PanelHeader {
                 title: @tr("Privacy Policy");
             }
 
-            if ready: VerticalLayout {
+            if api-ready: VerticalLayout {
                 padding: 8px;
                 spacing: 8px;
 
@@ -168,7 +195,7 @@ export component OrderPanel inherits Rectangle {
                 LinkText {
                     font-size: 11px;
                     overflow: elide;
-                    text: project.order-info-url;
+                    text: board.order-info-url;
                     status-tip: self.text;
                 }
             }

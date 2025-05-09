@@ -36,6 +36,7 @@ namespace librepcb {
 
 class Board;
 class BoardPlaneFragmentsBuilder;
+class OrderPcbApiRequest;
 class Project;
 
 namespace editor {
@@ -82,6 +83,19 @@ public:
   void execBoardSetupDialog(bool switchToDrcSettings = false) noexcept;
   void execStepExportDialog() noexcept;
 
+  /**
+   * @brief Prepare the "Order PCB" feature (request server status)
+   */
+  void prepareOrderPcb() noexcept;
+
+  /**
+   * @brief Start the "Order PCB" upload
+   *
+   * @param openBrowser   Whether to open the web browser after the upload
+   *                      or not.
+   */
+  void startOrderPcbUpload(bool openBrowser) noexcept;
+
   // Operator Overloadings
   BoardEditor& operator=(const BoardEditor& rhs) = delete;
 
@@ -105,6 +119,12 @@ private:
   std::unique_ptr<BoardPlaneFragmentsBuilder> mPlanesBuilder;
   std::unique_ptr<QTimer> mPlanesRebuildTimer;
   qint64 mTimestampOfLastPlaneRebuild;
+
+  // Order PCB
+  std::unique_ptr<OrderPcbApiRequest> mOrderRequest;  ///< May be `nullptr`
+  QString mOrderStatus;  ///< Either error or status
+  int mOrderUploadProgressPercent;  ///< -1 means "not in progress"
+  bool mOrderOpenBrowser;
 
   // Registered active tabs
   QVector<QPointer<Board2dTab>> mActive2dTabs;

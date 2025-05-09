@@ -576,15 +576,22 @@ export global Data {
                 { name:"Logic" },
             ],
             boards: [
-                { name:"Default" },
-                { name:"Experiment" },
+                {
+                    name:"Default",
+                    order-info-url: "https://api.librepcb.org/api/info/",
+                    order-status: "Success! Continue in the web browser:",
+                    order-upload-progress: -1,
+                    order-upload-url: "https://fab.librepcb.org/fooobaaaar",
+                },
+                {
+                    name:"Experiment",
+                    order-status: "Uploading...",
+                    order-info-url: "https://api.librepcb.org/api/info/",
+                    order-upload-progress: 30,
+                },
             ],
             writable: true,
             unsaved-changes: true,
-            order-info-url: "https://api.librepcb.org/api/info/",
-            order-status: "Success! Continue in the web browser:",
-            order-upload-progress: -1,
-            order-upload-url: "https://fab.librepcb.org/fooobaaaar",
         },
         {
             valid: true,
@@ -599,9 +606,6 @@ export global Data {
                 { name:"Experiment" },
             ],
             writable: false,
-            order-status: "Uploading...",
-            order-info-url: "https://api.librepcb.org/api/info/",
-            order-upload-progress: 30,
         },
     ];
 

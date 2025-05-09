@@ -627,10 +627,19 @@ export enum BoardAction {
     export-step,
     open-setup-dialog,
     open-drc-setup-dialog,
+    prepare-order,  // Get API server availability.
+    start-order,  // Start uploading the project.
+    start-order-and-open,  // Start uploading the project and open web browser.
 }
 
 export struct BoardData {
     name: string,
+
+    // Order PCB
+    order-status: string,  // Either progress status or error message.
+    order-info-url: string,
+    order-upload-progress: int,  // In percent, -1 means idle.
+    order-upload-url: string,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -642,9 +651,6 @@ export enum ProjectAction {
     save,
     undo,
     redo,
-    prepare-order,  // Get API server availability.
-    start-order,  // Start uploading the project.
-    start-order-and-open,  // Start uploading the project and open web browser.
     export-bom,
     export-lppz,
     open-folder,
@@ -670,12 +676,6 @@ export struct ProjectData {
     can-redo: bool,
     undo-text: string,
     redo-text: string,
-
-    // Order PCB
-    order-status: string,  // Either progress status or error message.
-    order-info-url: string,
-    order-upload-progress: int,  // In percent, -1 means idle.
-    order-upload-url: string,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
