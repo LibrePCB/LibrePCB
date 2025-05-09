@@ -261,7 +261,7 @@ ui::ProjectData ProjectEditor::getUiData() const noexcept {
       mUndoStack->canRedo(),  // Can redo
       q2s(mUndoStack->getUndoCmdText()),  // Undo text
       q2s(mUndoStack->getRedoCmdText()),  // Redo text
-          q2s(mOrderStatus),  // Order status / error
+      q2s(mOrderStatus),  // Order status / error
       mOrderRequest ? q2s(mOrderRequest->getReceivedInfoUrl().toString())
                     : slint::SharedString(),  // Order info URL
       mOrderUploadProgressPercent,  // Order upload progress

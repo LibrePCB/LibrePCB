@@ -597,7 +597,7 @@ public:
       QT_TR_NOOP("Order PCB"),
       QT_TR_NOOP("Start ordering the PCB online"),
       ":/fa/solid/cart-shopping.svg",
-      EditorCommand::Flag::OpensPopup,
+      EditorCommand::Flags(),
       {QKeySequence(Qt::Key_F12)},
       &categoryImportExport,
   };

@@ -14,7 +14,9 @@ import {
 } from "../api.slint";
 
 export component OrderPanel inherits Rectangle {
-    property <ProjectData> project: Data.current-project;
+    property <int> project-index: Data.current-project-index;
+    property <ProjectData> project: Data.projects[project-index];
+    property <bool> available: project.boards.length > 0;
     property <bool> info-error: project.valid && project.order-info-url.is-empty && (!project.order-status.is-empty);
     property <bool> ready: project.valid && (!project.order-info-url.is-empty);
     property <bool> uploading: project.valid && project.order-upload-progress >= 0;
@@ -22,12 +24,22 @@ export component OrderPanel inherits Rectangle {
 
     background: #2a2a2a;
 
+    // Request updating API status information.
+    function request-info() {
+        if available {
+            Backend.trigger-project(project-index, ProjectAction.prepare-order);
+        }
+    }
+
     init => {
-        // Request updating API status information.
-        Backend.trigger-project(Data.current-project-index, ProjectAction.prepare-order);
+        request-info();
 
         // Set focus when panel is shown. Not sure if it's always desired(?).
         fs.focus();
+    }
+
+    changed project-index => {
+        request-info();
     }
 
     fs := FocusScope {
@@ -36,7 +48,7 @@ export component OrderPanel inherits Rectangle {
                 z: 10;  // For the tooltip.
                 title: @tr("Order {}", project.name);
                 highlight: fs.has-focus;
-                show-spinner: (!ready) && (!info-error);
+                show-spinner: available && (!info-error) && (!ready);
 
                 if info-error: error-btn := IconButton {
                     width: self.height;
@@ -57,7 +69,7 @@ export component OrderPanel inherits Rectangle {
 
                 Text {
                     wrap: word-wrap;
-                    text: @tr("Manufacture your designed PCB by one of our fabrication partners - easy, safe and fast!");
+                    text: @tr("Finished the PCB design? Let it manufacture by one of our fabrication partners - easy, safe and fast!");
                 }
 
                 open-browser-sw := CheckBox {
@@ -78,9 +90,9 @@ export component OrderPanel inherits Rectangle {
                     clicked => {
                         clicked = true;
                         if open-browser-sw.checked {
-                            Backend.trigger-project(Data.current-project-index, ProjectAction.start-order-and-open);
+                            Backend.trigger-project(project-index, ProjectAction.start-order-and-open);
                         } else {
-                            Backend.trigger-project(Data.current-project-index, ProjectAction.start-order);
+                            Backend.trigger-project(project-index, ProjectAction.start-order);
                         }
                     }
                 }
@@ -98,7 +110,9 @@ export component OrderPanel inherits Rectangle {
                         single-line: false;
                         wrap: word-wrap;
                         text: {
-                            if !project.order-status.is-empty {
+                            if !available {
+                                @tr("This project does not contain any board, so there's nothing you could order.")
+                            } else if !project.order-status.is-empty {
                                 project.order-status
                             } else if project.order-info-url.is-empty {
                                 @tr("Checking availability") + "..."
