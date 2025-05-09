@@ -642,7 +642,9 @@ export enum ProjectAction {
     save,
     undo,
     redo,
-    order,
+    prepare-order,  // Get API server availability.
+    start-order,  // Start uploading the project.
+    start-order-and-open,  // Start uploading the project and open web browser.
     export-bom,
     export-lppz,
     open-folder,
@@ -670,8 +672,9 @@ export struct ProjectData {
     redo-text: string,
 
     // Order PCB
+    order-status: string,  // Either progress status or error message.
+    order-info-url: string,
     order-upload-progress: int,  // In percent, -1 means idle.
-    order-upload-status: string,
     order-upload-url: string,
 }
 

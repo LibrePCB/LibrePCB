@@ -1927,8 +1927,8 @@ void Board2dTab::execGraphicsExportDialog(GraphicsExportDialog::Output output,
 void Board2dTab::execFabricationDataExportDialog() noexcept {
   FabricationOutputDialog dialog(mApp.getWorkspace().getSettings(), mBoard,
                                  qApp->activeWindow());
-  connect(&dialog, &FabricationOutputDialog::orderPcbDialogTriggered, this,
-          [this, &dialog]() { mProjectEditor.execOrderPcbDialog(&dialog); });
+  // connect(&dialog, &FabricationOutputDialog::orderPcbDialogTriggered, this,
+  //         [this, &dialog]() { mProjectEditor.execOrderPcbDialog(&dialog); });
   dialog.exec();
 }
 

@@ -31,6 +31,7 @@
 #include "../utils/slinthelpers.h"
 #include "../utils/standardeditorcommandhandler.h"
 #include "../utils/uihelpers.h"
+#include "../workspace/desktopservices.h"
 #include "board/boardeditor.h"
 #include "bomgeneratordialog.h"
 #include "cmd/cmdboardadd.h"
@@ -38,7 +39,6 @@
 #include "cmd/cmdschematicadd.h"
 #include "cmd/cmdschematicedit.h"
 #include "cmd/cmdschematicremove.h"
-#include "orderpcbdialog.h"
 #include "outputjobsdialog/outputjobsdialog.h"
 #include "projectsetupdialog.h"
 #include "schematic/schematiceditor.h"
@@ -46,6 +46,7 @@
 
 #include <librepcb/core/application.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/network/orderpcbapirequest.h>
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/erc/electricalrulecheck.h>
 #include <librepcb/core/project/project.h>
@@ -88,7 +89,9 @@ ProjectEditor::ProjectEditor(
     mErcExecutionError(),
     mManualModificationsMade(false),
     mLastAutosaveStateId(mUndoStack->getUniqueStateId()),
-    mAutoSaveTimer() {
+    mAutoSaveTimer(),
+    mOrderUploadProgressPercent(-1),
+    mOrderOpenBrowser(false) {
   // Populate schematics.
   auto updateSchematicIndices = [this]() {
     for (int i = 0; i < mSchematics->count(); ++i) {
@@ -210,7 +213,8 @@ ProjectEditor::ProjectEditor(
 }
 
 ProjectEditor::~ProjectEditor() noexcept {
-  // Stop timers.
+  // Stop ongoing operations, timers etc.
+  mOrderRequest.reset();
   mAutoSaveTimer.stop();
   mErcTimer.stop();
 
@@ -257,6 +261,12 @@ ui::ProjectData ProjectEditor::getUiData() const noexcept {
       mUndoStack->canRedo(),  // Can redo
       q2s(mUndoStack->getUndoCmdText()),  // Undo text
       q2s(mUndoStack->getRedoCmdText()),  // Redo text
+          q2s(mOrderStatus),  // Order status / error
+      mOrderRequest ? q2s(mOrderRequest->getReceivedInfoUrl().toString())
+                    : slint::SharedString(),  // Order info URL
+      mOrderUploadProgressPercent,  // Order upload progress
+      mOrderRequest ? q2s(mOrderRequest->getReceivedRedirectUrl().toString())
+                    : slint::SharedString(),  // Order upload URL
   };
 }
 
@@ -289,8 +299,18 @@ void ProjectEditor::trigger(ui::ProjectAction a) noexcept {
       break;
     }
 
-    case ui::ProjectAction::Order: {
-      execOrderPcbDialog(qApp->activeWindow());
+    case ui::ProjectAction::PrepareOrder: {
+      prepareOrderPcb();
+      break;
+    }
+
+    case ui::ProjectAction::StartOrder: {
+      startOrderPcbUpload(false);
+      break;
+    }
+
+    case ui::ProjectAction::StartOrderAndOpen: {
+      startOrderPcbUpload(true);
       break;
     }
 
@@ -564,23 +584,93 @@ void ProjectEditor::execLppzExportDialog(QWidget* parent) noexcept {
   }
 }
 
-void ProjectEditor::execOrderPcbDialog(QWidget* parent) noexcept {
-  auto callback = [this]() {
+void ProjectEditor::prepareOrderPcb() noexcept {
+  if (mOrderRequest) {
+    return;  // Already prepared.
+  }
+
+  if (mWorkspace.getSettings().apiEndpoints.get().isEmpty()) {
+    mOrderStatus =
+        tr("This feature is not available because there is no API server "
+           "configured in your workspace settings.");
+    onUiDataChanged.notify();
+    return;
+  }
+
+  // Prepare network request.
+  mOrderRequest.reset(new OrderPcbApiRequest(
+      mWorkspace.getSettings().apiEndpoints.get().first()));
+  connect(mOrderRequest.get(), &OrderPcbApiRequest::infoRequestSucceeded, this,
+          [this]() { onUiDataChanged.notify(); });
+  connect(mOrderRequest.get(), &OrderPcbApiRequest::infoRequestFailed, this,
+          [this](QString errorMsg) {
+            mOrderStatus = errorMsg;
+            onUiDataChanged.notify();
+          });
+  connect(mOrderRequest.get(), &OrderPcbApiRequest::uploadProgressState, this,
+          [this](QString state) {
+            mOrderStatus = state;
+            onUiDataChanged.notify();
+          });
+  connect(mOrderRequest.get(), &OrderPcbApiRequest::uploadProgressPercent, this,
+          [this](int percent) {
+            mOrderUploadProgressPercent = percent;
+            onUiDataChanged.notify();
+          });
+  connect(mOrderRequest.get(), &OrderPcbApiRequest::uploadSucceeded, this,
+          [this](QUrl redirectUrl) {
+            mOrderStatus = tr("Success! Please continue in the web browser:");
+            mOrderUploadProgressPercent = -1;
+            onUiDataChanged.notify();
+            if (mOrderOpenBrowser) {
+              DesktopServices ds(mWorkspace.getSettings());
+              ds.openUrl(redirectUrl);
+            }
+          });
+  connect(mOrderRequest.get(), &OrderPcbApiRequest::uploadFailed, this,
+          [this](QString errorMsg) {
+            mOrderStatus = errorMsg;
+            mOrderUploadProgressPercent = -1;
+            onUiDataChanged.notify();
+          });
+
+  // Request status from API server.
+  mOrderStatus.clear();
+  mOrderRequest->startInfoRequest();
+  onUiDataChanged.notify();
+}
+
+void ProjectEditor::startOrderPcbUpload(bool openBrowser) noexcept {
+  if ((!mOrderRequest) || (!mOrderRequest->isReadyForUpload())) {
+    return;  // Not prepared.
+  }
+
+  try {
     if (Application::isFileFormatStable()) {
       // See explanation in execLppzExportDialog().
       mProject->save();  // can throw
     }
+
     // Export project to ZIP, but without the output directory since this can
     // be quite large and does not make sense to upload to the API server.
     auto filter = [](const QString& filePath) {
       return !filePath.startsWith("output/");
     };
-    return mProject->getDirectory().getFileSystem()->exportToZip(
-        filter);  // can throw
-  };
+    qDebug() << "Export project to *.lppz for ordering PCBs...";
+    const QByteArray lppz =
+        mProject->getDirectory().getFileSystem()->exportToZip(
+            filter);  // can throw
 
-  OrderPcbDialog dialog(mWorkspace.getSettings(), callback, parent);
-  dialog.exec();
+    qDebug() << "Upload *.lppz to API server...";
+    mOrderStatus = tr("Uploading project...");
+    mOrderUploadProgressPercent = 0;
+    mOrderOpenBrowser = openBrowser;
+    mOrderRequest->startUpload(lppz, QString());
+  } catch (const Exception& e) {
+    mOrderStatus = e.getMsg();
+  }
+
+  onUiDataChanged.notify();
 }
 
 std::shared_ptr<SchematicEditor> ProjectEditor::execNewSheetDialog() noexcept {

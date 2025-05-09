@@ -41,6 +41,7 @@ namespace librepcb {
 
 class Board;
 class NetSignal;
+class OrderPcbApiRequest;
 class Project;
 class Workspace;
 
@@ -160,11 +161,17 @@ public:
   void execLppzExportDialog(QWidget* parent) noexcept;
 
   /**
-   * @brief Execute the PCB order dialog (blocking)
-   *
-   * @param parent    Parent widget of the dialog
+   * @brief Prepare the "Order PCB" feature (request server status)
    */
-  void execOrderPcbDialog(QWidget* parent) noexcept;
+  void prepareOrderPcb() noexcept;
+
+  /**
+   * @brief Start the "Order PCB" upload
+   *
+   * @param openBrowser   Whether to open the web browser after the upload
+   *                      or not.
+   */
+  void startOrderPcbUpload(bool openBrowser) noexcept;
 
   std::shared_ptr<SchematicEditor> execNewSheetDialog() noexcept;
   void execRenameSheetDialog(int index) noexcept;
@@ -239,6 +246,12 @@ private:
   /// The timer for the periodically automatic saving
   /// functionality (see also @ref doc_project_save)
   QTimer mAutoSaveTimer;
+
+  // Order PCB
+  std::unique_ptr<OrderPcbApiRequest> mOrderRequest;  ///< May be `nullptr`
+  QString mOrderStatus;  ///< Either error or status
+  int mOrderUploadProgressPercent;  ///< -1 means "not in progress"
+  bool mOrderOpenBrowser;
 };
 
 /*******************************************************************************

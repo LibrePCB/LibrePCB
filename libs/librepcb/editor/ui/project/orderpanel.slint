@@ -1,18 +1,32 @@
 import {
-    PanelHeader, Button, CheckBox, ProgressBar, LinkText, IconButton
+    Button,
+    CheckBox,
+    IconButton,
+    LinkText,
+    PanelHeader,
+    ProgressBar,
 } from "../widgets.slint";
 import {
-    Data, Backend
+    Backend,
+    Data,
+    ProjectAction,
+    ProjectData,
 } from "../api.slint";
 
 export component OrderPanel inherits Rectangle {
-    property <bool> ready: Data.current-project.valid && (!Data.order-info-url.is-empty);
-    property <bool> uploading: Data.current-project.order-upload-progress >= 0;
+    property <ProjectData> project: Data.current-project;
+    property <bool> info-error: project.valid && project.order-info-url.is-empty && (!project.order-status.is-empty);
+    property <bool> ready: project.valid && (!project.order-info-url.is-empty);
+    property <bool> uploading: project.valid && project.order-upload-progress >= 0;
+    property <bool> clicked: false;
 
     background: #2a2a2a;
 
-    // Set focus when panel is shown. Not sure if it's always desired(?).
     init => {
+        // Request updating API status information.
+        Backend.trigger-project(Data.current-project-index, ProjectAction.prepare-order);
+
+        // Set focus when panel is shown. Not sure if it's always desired(?).
         fs.focus();
     }
 
@@ -20,24 +34,25 @@ export component OrderPanel inherits Rectangle {
         VerticalLayout {
             header := PanelHeader {
                 z: 10;  // For the tooltip.
-                title: @tr("Order {}", Data.current-project.name);
+                title: @tr("Order {}", project.name);
                 highlight: fs.has-focus;
-                show-spinner: (!ready) && Data.order-info-error.is-empty;
+                show-spinner: (!ready) && (!info-error);
 
-                if !Data.order-info-error.is-empty: error-btn := IconButton {
+                if info-error: error-btn := IconButton {
                     width: self.height;
                     style: read-only;
                     icon: @image-url("../../../../font-awesome/svgs/solid/triangle-exclamation.svg");
                     icon-scale: 0.7;
-                    color-disabled: yellow.darker(1);
-                    color-enabled: yellow;
-                    tooltip: Data.order-info-error;
+                    color-disabled: yellow;
+                    enabled: false;
+                    accessible-role: none;
                 }
             }
 
             VerticalLayout {
                 padding: 8px;
                 spacing: 10px;
+                vertical-stretch: 1;
                 alignment: start;
 
                 Text {
@@ -47,41 +62,60 @@ export component OrderPanel inherits Rectangle {
 
                 open-browser-sw := CheckBox {
                     text: @tr("Open web browser after upload");
-                    checked: true;
-                    enabled: ready && (!uploading);
+                    checked: Data.order-pcb-open-web-browser;
+                    enabled: ready && (!uploading) && ((!clicked) || project.order-upload-url.is-empty);
+
+                    toggled(checked) => {
+                        Data.order-pcb-open-web-browser = checked;
+                    }
                 }
 
                 upload-btn := Button {
                     primary: true;
-                    enabled: ready && (!uploading);
+                    enabled: ready && (!uploading) && ((!clicked) || project.order-upload-url.is-empty);
                     text: @tr("Upload Project");
 
                     clicked => {
+                        clicked = true;
+                        if open-browser-sw.checked {
+                            Backend.trigger-project(Data.current-project-index, ProjectAction.start-order-and-open);
+                        } else {
+                            Backend.trigger-project(Data.current-project-index, ProjectAction.start-order);
+                        }
                     }
                 }
 
                 if uploading: progress-bar := ProgressBar {
-                    progress: Data.current-project.order-upload-progress / 100;
+                    progress: project.order-upload-progress / 100;
                 }
 
-                status-txt := Text {
-                    font-italic: true;
-                    text: {
-                        if (!ready) && Data.order-info-error.is-empty {
-                            @tr("Checking availability") + "..."
-                        } else {
-                            Data.current-project.order-upload-status
+                VerticalLayout {
+                    spacing: 3px;
+
+                    status-txt := TextInput {
+                        font-italic: true;
+                        read-only: true;
+                        single-line: false;
+                        wrap: word-wrap;
+                        text: {
+                            if !project.order-status.is-empty {
+                                project.order-status
+                            } else if project.order-info-url.is-empty {
+                                @tr("Checking availability") + "..."
+                            } else {
+                                ""
+                            }
+                        };
+                    }
+
+                    if !project.order-upload-url.is-empty: upload-url-btn := LinkText {
+                        text: project.order-upload-url;
+                        status-tip: self.text;
+                        overflow: elide;
+
+                        clicked => {
+                            Backend.open-url(self.text);
                         }
-                    };
-                }
-
-                if !Data.current-project.order-upload-url.is-empty: upload-url-btn := LinkText {
-                    text: Data.current-project.order-upload-url;
-                    status-tip: self.text;
-                    overflow: elide;
-
-                    clicked => {
-                        Backend.open-url(self.text);
                     }
                 }
             }
@@ -120,7 +154,7 @@ export component OrderPanel inherits Rectangle {
                 LinkText {
                     font-size: 11px;
                     overflow: elide;
-                    text: Data.order-info-url;
+                    text: project.order-info-url;
                     status-tip: self.text;
                 }
             }

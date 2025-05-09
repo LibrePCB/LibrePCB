@@ -41,7 +41,8 @@ OrderPcbApiRequest::OrderPcbApiRequest(const QUrl& apiServerUrl,
     mApiServerUrl(apiServerUrl),
     mInfoUrl(),
     mUploadUrl(),
-    mMaxFileSize(-1) {
+    mMaxFileSize(-1),
+    mRedirectUrl() {
 }
 
 OrderPcbApiRequest::~OrderPcbApiRequest() noexcept {
@@ -67,7 +68,10 @@ void OrderPcbApiRequest::startInfoRequest() noexcept {
 }
 
 void OrderPcbApiRequest::startUpload(const QByteArray& lppz,
-                                     const QString& boardPath) const noexcept {
+                                     const QString& boardPath) noexcept {
+  // Reset state.
+  mRedirectUrl.clear();
+
   // Check if the info request succeeded.
   if (!mUploadUrl.isValid()) {
     emit uploadFailed("Upload URL not known yet.");  // No tr().
@@ -140,7 +144,7 @@ void OrderPcbApiRequest::infoRequestResponseReceived(
 }
 
 void OrderPcbApiRequest::uploadResponseReceived(
-    const QByteArray& data) const noexcept {
+    const QByteArray& data) noexcept {
   qDebug().noquote() << "Received JSON:" << data.left(500).replace("\n", " ");
   QJsonDocument doc = QJsonDocument::fromJson(data);
   if (doc.isNull() || doc.isEmpty() || (!doc.isObject())) {
@@ -152,7 +156,8 @@ void OrderPcbApiRequest::uploadResponseReceived(
     emit uploadFailed("Received an invalid redirection URL.");  // No tr().
     return;
   }
-  emit uploadSucceeded(redirectUrl);
+  mRedirectUrl = redirectUrl;
+  emit uploadSucceeded(mRedirectUrl);
 }
 
 /*******************************************************************************
