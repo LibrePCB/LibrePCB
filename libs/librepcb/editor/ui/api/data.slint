@@ -604,6 +604,16 @@ export global Data {
     // Rule check panel: Checked state of the "zoom to location" feature
     in property <bool> rule-check-zoom-to-location: true;
 
+    // Order info URL received from the API server
+    //
+    // This will be empty by default as the information needs to be requested
+    // from the API server. Call Backend.request-order-info-url() to trigger
+    // this request.
+    in property <string> order-info-url: "https://api.librepcb.org/api/info/";
+
+    // Error message of fetching order info URL from API server
+    in property <string> order-info-error: "Failed to get JSON";
+
     // CALCULATED, DO NET SET IN BACKEND
     in-out property <WindowSectionData> current-section: sections[current-section-index];
     in-out property <TabData> current-tab: current-section.tabs[current-section.current-tab-index];

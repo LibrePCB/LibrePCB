@@ -1,0 +1,129 @@
+import {
+    PanelHeader, Button, CheckBox, ProgressBar, LinkText, IconButton
+} from "../widgets.slint";
+import {
+    Data, Backend
+} from "../api.slint";
+
+export component OrderPanel inherits Rectangle {
+    property <bool> ready: Data.current-project.valid && (!Data.order-info-url.is-empty);
+    property <bool> uploading: Data.current-project.order-upload-progress >= 0;
+
+    background: #2a2a2a;
+
+    // Set focus when panel is shown. Not sure if it's always desired(?).
+    init => {
+        fs.focus();
+    }
+
+    fs := FocusScope {
+        VerticalLayout {
+            header := PanelHeader {
+                z: 10;  // For the tooltip.
+                title: @tr("Order {}", Data.current-project.name);
+                highlight: fs.has-focus;
+                show-spinner: (!ready) && Data.order-info-error.is-empty;
+
+                if !Data.order-info-error.is-empty: error-btn := IconButton {
+                    width: self.height;
+                    style: read-only;
+                    icon: @image-url("../../../../font-awesome/svgs/solid/triangle-exclamation.svg");
+                    icon-scale: 0.7;
+                    color-disabled: yellow.darker(1);
+                    color-enabled: yellow;
+                    tooltip: Data.order-info-error;
+                }
+            }
+
+            VerticalLayout {
+                padding: 8px;
+                spacing: 10px;
+                alignment: start;
+
+                Text {
+                    wrap: word-wrap;
+                    text: @tr("Manufacture your designed PCB by one of our fabrication partners - easy, safe and fast!");
+                }
+
+                open-browser-sw := CheckBox {
+                    text: @tr("Open web browser after upload");
+                    checked: true;
+                    enabled: ready && (!uploading);
+                }
+
+                upload-btn := Button {
+                    primary: true;
+                    enabled: ready && (!uploading);
+                    text: @tr("Upload Project");
+
+                    clicked => {
+                    }
+                }
+
+                if uploading: progress-bar := ProgressBar {
+                    progress: Data.current-project.order-upload-progress / 100;
+                }
+
+                status-txt := Text {
+                    font-italic: true;
+                    text: {
+                        if (!ready) && Data.order-info-error.is-empty {
+                            @tr("Checking availability") + "..."
+                        } else {
+                            Data.current-project.order-upload-status
+                        }
+                    };
+                }
+
+                if !Data.current-project.order-upload-url.is-empty: upload-url-btn := LinkText {
+                    text: Data.current-project.order-upload-url;
+                    status-tip: self.text;
+                    overflow: elide;
+
+                    clicked => {
+                        Backend.open-url(self.text);
+                    }
+                }
+            }
+
+            PanelHeader {
+                title: @tr("Details");
+            }
+
+            VerticalLayout {
+                padding: 8px;
+                spacing: 8px;
+
+                Text {
+                    wrap: word-wrap;
+                    font-italic: true;
+                    font-size: 11.5px;
+                    text: @tr("This tool helps you to quickly and easily get your designed PCB manufactured. The project directory will be exported to a *.lppz archive and uploaded to the API server configured in your workspace settings. Afterwards you can continue the order process in the web browser, e.g. to choose the preferred manufacturing partner. Just try it!");
+                }
+            }
+
+            if ready: PanelHeader {
+                title: @tr("Privacy Policy");
+            }
+
+            if ready: VerticalLayout {
+                padding: 8px;
+                spacing: 8px;
+
+                Text {
+                    wrap: word-wrap;
+                    font-italic: true;
+                    font-size: 11px;
+                    text: @tr("Privacy and transparency are important to us. Details about how this feature works behind the scenes are available here:");
+                }
+
+                LinkText {
+                    font-size: 11px;
+                    overflow: elide;
+                    text: Data.order-info-url;
+                    status-tip: self.text;
+                }
+            }
+        }
+    }
+}

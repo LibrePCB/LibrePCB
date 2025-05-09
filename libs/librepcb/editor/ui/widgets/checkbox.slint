@@ -1,0 +1,95 @@
+import { Palette } from "std-widgets.slint";
+import { Constants } from "../api.slint";
+
+export component CheckBox inherits Rectangle {
+    in-out property <bool> checked: false;
+    in property <bool> enabled: true;
+    in property <string> text;
+    in property <length> font-size: 12px;
+    in property <color> checked-color: Constants.librepcb-color;
+    in property <color> unchecked-color: #606060;
+    out property has-focus <=> fs.has-focus;
+    property <float> darkness: {
+        if !enabled {
+            0.5
+        } else if ta.pressed {
+            0.3
+        } else if ta.has-hover {
+            -0.1
+        } else {
+            0
+        }
+    };
+
+    preferred-width: l.preferred-width;
+    preferred-height: l.preferred-height;
+    max-width: text.is-empty ? l.preferred-width : l.max-width;
+    forward-focus: fs;
+
+    // Accessibility
+    accessible-role: checkbox;
+    accessible-checkable: true;
+    accessible-checked: checked;
+    accessible-enabled: enabled;
+    accessible-label: text;
+    accessible-action-default => {
+        ta.clicked();
+    }
+
+    callback toggled(checked: bool);
+
+    fs := FocusScope {
+        enabled: enabled;
+
+        key-pressed(event) => {
+            // Only consume Space, but not Return as the Return key is often
+            // used to confirm a dialog or something like that.
+            if event.text == Key.Space {
+                checked = !checked;
+                return accept;
+            }
+            reject
+        }
+    }
+
+    l := HorizontalLayout {
+        spacing: 6px;
+
+        Rectangle {
+            width: 16px;
+
+            Image {
+                y: (parent.height - self.height) / 2 + 2px;
+                width: parent.width;
+                height: self.width;
+                image-fit: contain;
+                colorize: (checked ? Constants.librepcb-color : Palette.foreground).darker(darkness);
+                source: {
+                    if checked {
+                        @image-url("../../../../bootstrap-icons/icons/check-square-fill.svg")
+                    } else {
+                        @image-url("../../../../bootstrap-icons/icons/square.svg")
+                    }
+                };
+                accessible-role: none;
+            }
+        }
+
+        if !text.is-empty: Text {
+            text: text;
+            wrap: word-wrap;
+            vertical-alignment: center;
+            font-size: font-size;
+            accessible-role: none;
+        }
+    }
+
+    ta := TouchArea {
+        enabled: enabled;
+
+        clicked => {
+            checked = !checked;
+            toggled(checked);
+        }
+    }
+}

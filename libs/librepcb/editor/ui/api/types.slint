@@ -40,6 +40,7 @@ export enum PanelPage {
     layers,
     place-devices,
     rule-check,
+    order,
     about,
 }
 
@@ -667,6 +668,11 @@ export struct ProjectData {
     can-redo: bool,
     undo-text: string,
     redo-text: string,
+
+    // Order PCB
+    order-upload-progress: int,  // In percent, -1 means idle.
+    order-upload-status: string,
+    order-upload-url: string,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
