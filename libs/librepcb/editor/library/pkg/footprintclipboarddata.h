@@ -91,6 +91,7 @@ public:
   std::unique_ptr<QMimeData> toMimeData(const GraphicsLayerList& layers);
   static std::unique_ptr<FootprintClipboardData> fromMimeData(
       const QMimeData* mime);
+  static bool isValid(const QMimeData* mime) noexcept;
 
   // Operator Overloadings
   FootprintClipboardData& operator=(const FootprintClipboardData& rhs) = delete;

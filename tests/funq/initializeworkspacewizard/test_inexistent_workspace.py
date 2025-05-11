@@ -41,7 +41,7 @@ def test_create_new_workspace(librepcb, helpers):
     with librepcb.open() as app:
         app.widget('mainWindow').properties()['visible'] is True
         app.widget('mainWindowTestAdapter').call_slot('trigger', 'workspace-settings')
-        user_edit = app.widget('mainWindowWorkspaceSettingsDialogGeneralUserNameEdit')
+        user_edit = app.widget('workspaceSettingsDialogGeneralUserNameEdit')
         assert user_edit.properties()['text'] == 'foobar 42'
 
 

@@ -130,7 +130,22 @@ bool BoardEditorState_Select::entry() noexcept {
   Q_ASSERT(!mCmdPolygonEdit);
   Q_ASSERT(!mCmdPlaneEdit);
   Q_ASSERT(!mCmdZoneEdit);
+
   mAdapter.fsmToolEnter(*this);
+
+  mUpdateAvailableFeaturesTimer.reset(new QTimer());
+  mUpdateAvailableFeaturesTimer->setSingleShot(true);
+  mUpdateAvailableFeaturesTimer->setInterval(50);
+  connect(mUpdateAvailableFeaturesTimer.get(), &QTimer::timeout, this,
+          &BoardEditorState_Select::updateAvailableFeatures);
+  scheduleUpdateAvailableFeatures();
+
+  mConnections.append(
+      connect(&mContext.undoStack, &UndoStack::stateModified, this,
+              &BoardEditorState_Select::scheduleUpdateAvailableFeatures));
+  mConnections.append(
+      connect(qApp->clipboard(), &QClipboard::dataChanged, this,
+              &BoardEditorState_Select::scheduleUpdateAvailableFeatures));
   return true;
 }
 
@@ -138,12 +153,19 @@ bool BoardEditorState_Select::exit() noexcept {
   // Abort the currently active command
   if (!abortCommand(true)) return false;
 
+  mUpdateAvailableFeaturesTimer.reset();
+
   // Avoid propagating the selection to other, non-selectable tools, thus
   // clearing the selection.
   if (BoardGraphicsScene* scene = getActiveBoardScene()) {
     scene->clearSelection();
   }
 
+  while (!mConnections.isEmpty()) {
+    disconnect(mConnections.takeLast());
+  }
+
+  mAdapter.fsmSetFeatures(BoardEditorFsmAdapter::Features());
   mAdapter.fsmToolLeave();
   return true;
 }
@@ -243,6 +265,7 @@ bool BoardEditorState_Select::processSelectAll() noexcept {
 
   if (BoardGraphicsScene* scene = getActiveBoardScene()) {
     scene->selectAll();
+    scheduleUpdateAvailableFeatures();
     return true;
   } else {
     return false;
@@ -473,6 +496,7 @@ bool BoardEditorState_Select::processEditProperties() noexcept {
 }
 
 bool BoardEditorState_Select::processAbortCommand() noexcept {
+  scheduleUpdateAvailableFeatures();
   abortCommand(true);
   if (BoardGraphicsScene* scene = getActiveBoardScene()) {
     scene->clearSelection();
@@ -533,6 +557,8 @@ bool BoardEditorState_Select::processGraphicsSceneMouseMoved(
 
 bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
     const GraphicsSceneMouseEvent& e) noexcept {
+  scheduleUpdateAvailableFeatures();
+
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
@@ -621,6 +647,8 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
 
 bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
     const GraphicsSceneMouseEvent& e) noexcept {
+  scheduleUpdateAvailableFeatures();
+
   BoardGraphicsScene* scene = getActiveBoardScene();
   if (!scene) return false;
 
@@ -699,6 +727,8 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonDoubleClicked(
 
 bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
     const GraphicsSceneMouseEvent& e) noexcept {
+  scheduleUpdateAvailableFeatures();
+
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
@@ -860,8 +890,7 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
 
       EditorToolbox::addResourcesToMenu(
           mContext.workspace, mb, device->getDevice().getComponentInstance(),
-          device->getDevice().getLibDevice().getUuid(), &mContext.parentWidget,
-          menu);
+          device->getDevice().getLibDevice().getUuid(), parentWidget(), menu);
     } else if (auto netline =
                    std::dynamic_pointer_cast<BGI_NetLine>(selectedItem)) {
       mb.addAction(cmd.setLineWidth.createAction(
@@ -1196,12 +1225,6 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
   return true;
 }
 
-bool BoardEditorState_Select::processSwitchToBoard(int index) noexcept {
-  Q_UNUSED(index);
-  return (!mIsUndoCmdActive) && (!mSelectedItemsDragCommand) &&
-      (!mCmdPolygonEdit) && (!mCmdPlaneEdit) && (!mCmdZoneEdit);
-}
-
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
@@ -1378,7 +1401,7 @@ bool BoardEditorState_Select::changeWidthOfSelectedItems(int step) noexcept {
     mContext.undoStack.execCmd(cmd.release());
     mAdapter.fsmSetStatusBarMessage(
         mContext.workspace.getSettings().defaultLengthUnit.get().format(
-            **width, mContext.parentWidget.locale()),
+            **width, QLocale()),
         5000);
     return true;
   } catch (const Exception& e) {
@@ -1912,6 +1935,160 @@ QList<BoardEditorState_Select::DeviceMenuItem>
     qCritical() << "Failed to list devices in context menu:" << e.getMsg();
   }
   return items;
+}
+
+void BoardEditorState_Select::scheduleUpdateAvailableFeatures() noexcept {
+  if (mUpdateAvailableFeaturesTimer) mUpdateAvailableFeaturesTimer->start();
+}
+
+void BoardEditorState_Select::updateAvailableFeatures() noexcept {
+  BoardGraphicsScene* scene = getActiveBoardScene();
+  if (!scene) return;
+
+  BoardEditorFsmAdapter::Features features;
+  if ((!mCmdPolygonEdit) && (!mCmdPlaneEdit) && (!mCmdZoneEdit)) {
+    if (!mSelectedItemsDragCommand) {
+      features |= BoardEditorFsmAdapter::Feature::Select;
+    }
+
+    if (BoardClipboardData::isValid(qApp->clipboard()->mimeData()) ||
+        FootprintClipboardData::isValid(qApp->clipboard()->mimeData())) {
+      features |= BoardEditorFsmAdapter::Feature::Paste;
+    }
+
+    BoardSelectionQuery query(*scene, true);
+    query.addDeviceInstancesOfSelectedFootprints();
+    query.addSelectedVias();
+    query.addSelectedNetPoints();
+    query.addSelectedNetLines();
+    query.addSelectedPlanes();
+    query.addSelectedZones();
+    query.addSelectedPolygons();
+    query.addSelectedBoardStrokeTexts();
+    query.addSelectedFootprintStrokeTexts();
+    query.addSelectedHoles();
+    if (!query.isResultEmpty()) {
+      features |= BoardEditorFsmAdapter::Feature::Cut;
+      features |= BoardEditorFsmAdapter::Feature::Copy;
+      features |= BoardEditorFsmAdapter::Feature::Remove;
+      features |= BoardEditorFsmAdapter::Feature::Rotate;
+      features |= BoardEditorFsmAdapter::Feature::Flip;
+    }
+    if (!query.getDeviceInstances().isEmpty()) {
+      features |= BoardEditorFsmAdapter::Feature::ResetTexts;
+    }
+    if ((!query.getDeviceInstances().isEmpty()) ||
+        (!query.getVias().isEmpty()) || (!query.getPlanes().isEmpty()) ||
+        (!query.getZones().isEmpty()) || (!query.getPolygons().isEmpty()) ||
+        (!query.getStrokeTexts().isEmpty()) || (!query.getHoles().isEmpty())) {
+      features |= BoardEditorFsmAdapter::Feature::Properties;
+    }
+    if (!query.getNetLines().isEmpty()) {
+      features |= BoardEditorFsmAdapter::Feature::ModifyLineWidth;
+    }
+    const BoardEditorFsmAdapter::Features conditionalFeatures =
+        BoardEditorFsmAdapter::Feature::SnapToGrid |
+        BoardEditorFsmAdapter::Feature::Lock |
+        BoardEditorFsmAdapter::Feature::Unlock;
+    foreach (auto ptr, query.getDeviceInstances()) {
+      if (features.testFlags(conditionalFeatures)) {
+        break;
+      }
+      if (!ptr->getPosition().isOnGrid(getGridInterval())) {
+        features |= BoardEditorFsmAdapter::Feature::SnapToGrid;
+      }
+      if (ptr->isLocked()) {
+        features |= BoardEditorFsmAdapter::Feature::Unlock;
+      } else {
+        features |= BoardEditorFsmAdapter::Feature::Lock;
+      }
+    }
+    foreach (auto ptr, query.getVias()) {
+      if (features.testFlag(BoardEditorFsmAdapter::Feature::SnapToGrid)) {
+        break;
+      }
+      if (!ptr->getPosition().isOnGrid(getGridInterval())) {
+        features |= BoardEditorFsmAdapter::Feature::SnapToGrid;
+      }
+    }
+    foreach (auto ptr, query.getNetPoints()) {
+      if (features.testFlag(BoardEditorFsmAdapter::Feature::SnapToGrid)) {
+        break;
+      }
+      if (!ptr->getPosition().isOnGrid(getGridInterval())) {
+        features |= BoardEditorFsmAdapter::Feature::SnapToGrid;
+      }
+    }
+    foreach (auto ptr, query.getPlanes()) {
+      if (features.testFlags(conditionalFeatures)) {
+        break;
+      }
+      if (!ptr->getOutline().isOnGrid(getGridInterval())) {
+        features |= BoardEditorFsmAdapter::Feature::SnapToGrid;
+      }
+      if (ptr->isLocked()) {
+        features |= BoardEditorFsmAdapter::Feature::Unlock;
+      } else {
+        features |= BoardEditorFsmAdapter::Feature::Lock;
+      }
+    }
+    foreach (auto ptr, query.getZones()) {
+      if (features.testFlags(conditionalFeatures)) {
+        break;
+      }
+      if (!ptr->getData().getOutline().isOnGrid(getGridInterval())) {
+        features |= BoardEditorFsmAdapter::Feature::SnapToGrid;
+      }
+      if (ptr->getData().isLocked()) {
+        features |= BoardEditorFsmAdapter::Feature::Unlock;
+      } else {
+        features |= BoardEditorFsmAdapter::Feature::Lock;
+      }
+    }
+    foreach (auto ptr, query.getPolygons()) {
+      if (features.testFlags(conditionalFeatures)) {
+        break;
+      }
+      if (!ptr->getData().getPath().isOnGrid(getGridInterval())) {
+        features |= BoardEditorFsmAdapter::Feature::SnapToGrid;
+      }
+      if (ptr->getData().isLocked()) {
+        features |= BoardEditorFsmAdapter::Feature::Unlock;
+      } else {
+        features |= BoardEditorFsmAdapter::Feature::Lock;
+      }
+    }
+    foreach (auto ptr, query.getStrokeTexts()) {
+      if (features.testFlags(conditionalFeatures)) {
+        break;
+      }
+      if (!ptr->getData().getPosition().isOnGrid(getGridInterval())) {
+        features |= BoardEditorFsmAdapter::Feature::SnapToGrid;
+      }
+      if (ptr->getData().isLocked()) {
+        features |= BoardEditorFsmAdapter::Feature::Unlock;
+      } else {
+        features |= BoardEditorFsmAdapter::Feature::Lock;
+      }
+    }
+    foreach (auto ptr, query.getHoles()) {
+      if (features.testFlags(conditionalFeatures)) {
+        break;
+      }
+      if (!ptr->getData().getPath()->getVertices().first().getPos().isOnGrid(
+              getGridInterval())) {
+        features |= BoardEditorFsmAdapter::Feature::SnapToGrid;
+      }
+      if (ptr->getData().isLocked()) {
+        features |= BoardEditorFsmAdapter::Feature::Unlock;
+      } else {
+        features |= BoardEditorFsmAdapter::Feature::Lock;
+      }
+    }
+  } else {
+    return;  // Do not update features in other states.
+  }
+  mAdapter.fsmSetFeatures(features);
 }
 
 /*******************************************************************************

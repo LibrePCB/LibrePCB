@@ -72,6 +72,10 @@ ui::TabData DownloadLibraryTab::getUiData() const noexcept {
   return ui::TabData{
       ui::TabType::DownloadLibrary,  // Type
       q2s(tr("Download Library")),  // Title
+      ui::TabFeatures{},  // Features
+      slint::SharedString(),  // Find term
+      nullptr,  // Find suggestions
+      nullptr,  // Layers
   };
 }
 

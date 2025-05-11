@@ -142,7 +142,7 @@ public:
   }
 
   // Setters
-  void setName(const ElementName& name) noexcept { mName = name; }
+  void setName(const ElementName& name) noexcept;
   void setDefaultFontName(const QString& name) noexcept {
     mDefaultFontFileName = name;
   }
@@ -247,6 +247,7 @@ public:
   bool operator!=(const Board& rhs) const noexcept { return (this != &rhs); }
 
 signals:
+  void nameChanged(const ElementName& name);
   void attributesChanged();
   void designRulesModified();
   void innerLayerCountChanged();

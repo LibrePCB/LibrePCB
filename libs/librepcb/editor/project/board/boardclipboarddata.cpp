@@ -186,6 +186,10 @@ std::unique_ptr<BoardClipboardData> BoardClipboardData::fromMimeData(
   }
 }
 
+bool BoardClipboardData::isValid(const QMimeData* mime) noexcept {
+  return mime && (!mime->data(getMimeType()).isNull());
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/

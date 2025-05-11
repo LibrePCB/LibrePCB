@@ -2,10 +2,19 @@ import { ToolTip } from "widgets.slint";
 import {
     Action,
     Backend,
+    Board2dTabData,
     Constants,
     Data,
     EditorCommandSet as Cmd,
+    Helpers,
     PanelPage,
+    ProjectAction,
+    ProjectData,
+    RuleCheckData,
+    RuleCheckState,
+    RuleCheckType,
+    TabAction,
+    TabType,
 } from "api.slint";
 
 enum Emblem {
@@ -17,6 +26,7 @@ enum Emblem {
 
 component SideBarButton inherits Rectangle {
     in property <image> icon;
+    in property <float> icon-scale: 1.0;
     in property <string> tooltip;
     in property <string> shortcut;
     in property <Emblem> emblem: Emblem.none;
@@ -60,16 +70,17 @@ component SideBarButton inherits Rectangle {
     }
 
     Image {
-        width: 70%;
-        height: 70%;
+        width: parent.width * icon-scale * 0.7;
+        height: self.width;
         colorize: enabled ? white : gray;
+        image-fit: contain;
         source: icon;
         accessible-role: none;
     }
 
     if emblem == Emblem.ok: Rectangle {
-        x: parent.width - self.width - 6px;
-        y: parent.height - self.height - 5px;
+        x: parent.width - self.width - 3px;
+        y: parent.height - self.height - 3px;
         width: 10px;
         height: self.width;
         background: root.background;
@@ -85,8 +96,8 @@ component SideBarButton inherits Rectangle {
     }
 
     if emblem == Emblem.warning: Rectangle {
-        x: parent.width - self.width - 5px;
-        y: parent.height - self.height - 5px;
+        x: parent.width - self.width - 3px;
+        y: parent.height - self.height - 3px;
         width: 40%;
         height: self.width;
 
@@ -157,9 +168,174 @@ export component SideBar inherits Rectangle {
             }
         }
 
+        documents-btn := SideBarButton {
+            icon: @image-url("../../../bootstrap-icons/icons/files.svg");
+            tooltip: @tr("Open Documents");
+            enabled: Data.projects.length > 0;
+            checked: Data.panel-page == PanelPage.documents;
+
+            clicked => {
+                Data.panel-page = PanelPage.documents;
+            }
+
+            changed enabled => {
+                if self.checked && (!self.enabled) {
+                    Data.panel-page = PanelPage.home;
+                }
+            }
+        }
+
+        layers-btn := SideBarButton {
+            icon: Cmd.dock-layers.icon;
+            tooltip: @tr("Layers");
+            shortcut: Cmd.dock-layers.shortcut;
+            enabled: Data.current-tab.layers.length > 0;
+            checked: Data.panel-page == PanelPage.layers;
+
+            clicked => {
+                Data.panel-page = PanelPage.layers;
+            }
+
+            changed enabled => {
+                if self.checked && (!self.enabled) {
+                    if documents-btn.enabled {
+                        Data.panel-page = PanelPage.documents;
+                    } else {
+                        Data.panel-page = PanelPage.home;
+                    }
+                }
+            }
+        }
+
+        place-devices-btn := SideBarButton {
+            property <Board2dTabData> tab: Data.current-board-2d-tab;
+
+            icon: Cmd.dock-place-devices.icon;
+            tooltip: @tr("Place Devices");
+            shortcut: Cmd.dock-place-devices.shortcut;
+            enabled: Data.current-tab.type == TabType.board-2d;
+            checked: Data.panel-page == PanelPage.place-devices;
+
+            states [
+                disabled when !self.enabled: {
+                    emblem: Emblem.none;
+                    status: "";
+                }
+                unplaced-components when tab.unplaced-components.length > 0: {
+                    emblem: Emblem.none;
+                    status: tab.unplaced-components.length;
+                    status-color: black;
+                    status-background: yellow;
+                }
+                up-to-date when tab.unplaced-components.length == 0: {
+                    emblem: Emblem.ok;
+                }
+            ]
+
+            clicked => {
+                Data.panel-page = PanelPage.place-devices;
+            }
+
+            changed enabled => {
+                if self.checked && (!self.enabled) {
+                    if documents-btn.enabled {
+                        Data.panel-page = PanelPage.documents;
+                    } else {
+                        Data.panel-page = PanelPage.home;
+                    }
+                }
+            }
+        }
+
+        rule-check-btn := SideBarButton {
+            property <RuleCheckData> check: Data.current-rule-check;
+            property <string> title: Helpers.get-rule-check-title-for-type(check.type);
+
+            icon: @image-url("../../../bootstrap-icons/icons/list-check.svg");
+            tooltip: title;
+            shortcut: Helpers.get-rule-check-shortcut-for-type(check.type);
+            enabled: check.type != RuleCheckType.none;
+            checked: Data.panel-page == PanelPage.rule-check;
+
+            states [
+                not-available when check.type == RuleCheckType.none: {
+                    emblem: Emblem.none;
+                    status: "";
+                }
+                running when check.state == RuleCheckState.running: {
+                    emblem: Emblem.running;
+                }
+                failed when !check.execution-error.is-empty: {
+                    emblem: Emblem.warning;
+                }
+                not-run-yet when check.state == RuleCheckState.not-run-yet: {
+                    emblem: Emblem.none;
+                    status: "?";
+                    status-color: black;
+                    status-background: #d4d4d4;
+                }
+                outdated when check.state == RuleCheckState.outdated: {
+                    emblem: Emblem.none;
+                    status: check.unapproved;
+                    status-color: black;
+                    status-background: #d4d4d4;
+                }
+                up-to-date when (check.state == RuleCheckState.up-to-date) && (check.unapproved != 0): {
+                    emblem: Emblem.none;
+                    status: check.unapproved;
+                    status-color: black;
+                    status-background: #ff0000;
+                }
+                up-to-date when (check.state == RuleCheckState.up-to-date) && (check.unapproved == 0): {
+                    emblem: Emblem.ok;
+                }
+            ]
+
+            clicked => {
+                Data.panel-page = PanelPage.rule-check;
+            }
+
+            changed enabled => {
+                if self.checked && (!self.enabled) {
+                    if documents-btn.enabled {
+                        Data.panel-page = PanelPage.documents;
+                    } else {
+                        Data.panel-page = PanelPage.home;
+                    }
+                }
+            }
+        }
+
+        output-jobs-btn := SideBarButton {
+            icon: @image-url("../../../bootstrap-icons/icons/play.svg");
+            tooltip: Cmd.output-jobs.text;
+            shortcut: Cmd.output-jobs.shortcut;
+            enabled: Data.current-project.valid;
+
+            clicked => {
+                Helpers.trigger-current-project-action(ProjectAction.open-output-jobs);
+            }
+        }
+
+        order-pcb-btn := SideBarButton {
+            icon: @image-url("../../../bootstrap-icons/icons/cart3.svg");
+            tooltip: Cmd.order-pcb.text;
+            shortcut: Cmd.order-pcb.shortcut;
+            enabled: Data.current-project.valid;
+
+            clicked => {
+                Helpers.trigger-current-project-action(ProjectAction.order);
+            }
+        }
+
+        Rectangle {
+            vertical-stretch: 1;
+        }
+
         libraries-btn := SideBarButton {
             icon: @image-url("../../../bootstrap-icons/icons/database.svg");
-            tooltip: Cmd.library-manager.text;
+            icon-scale: 1.2;
+            tooltip: @tr("Libraries");
             shortcut: Cmd.library-manager.shortcut;
             checked: Data.panel-page == PanelPage.libraries;
 
@@ -195,10 +371,6 @@ export component SideBar inherits Rectangle {
             clicked => {
                 Data.panel-page = PanelPage.libraries;
             }
-        }
-
-        Rectangle {
-            vertical-stretch: 1;
         }
 
         workspace-settings-btn := SideBarButton {

@@ -13,7 +13,7 @@ import {
     Constants,
     Data,
     EditorCommandSet as Cmd,
-    Helpers,
+    Shortcuts,
     TreeViewItemAction,
     TreeViewItemData,
 } from "api.slint";
@@ -106,7 +106,7 @@ component WorkspaceFolderTreeView inherits TreeView {
         if (event.text == Key.Space) && item.supports-pinning {
             root.model[index].pinned = !root.model[index].pinned;
             return accept;
-        } else if (!item.is-project-file-or-folder) && Helpers.is-shortcut(event, Cmd.project-new) {
+        } else if (!item.is-project-file-or-folder) && Shortcuts.is-shortcut(event, Cmd.project-new) {
             root.model[index].action = TreeViewItemAction.new-project;
             return accept;
         }
@@ -160,7 +160,6 @@ component WorkspaceFolderTreeView inherits TreeView {
 
         if !context-menu-item.is-project-file-or-folder: new-project-item := MenuItem {
             cmd: Cmd.project-new;
-            icon: @image-url("../../../font-awesome/svgs/solid/file-circle-plus.svg");
 
             clicked => {
                 root.model[context-menu-item-index].action = TreeViewItemAction.new-project;
@@ -199,10 +198,8 @@ component WorkspaceFolderTreeView inherits TreeView {
 
 component NewProjectButton inherits IconButton {
     width: self.height;
-    icon: @image-url("../../../font-awesome/svgs/solid/file-circle-plus.svg");
+    cmd: Cmd.project-new;
     icon-scale: 0.6;
-    tooltip: Cmd.project-new.text;
-    status-tip: Cmd.project-new.status-tip;
 
     clicked => {
         Backend.trigger(Action.project-new);
@@ -211,10 +208,8 @@ component NewProjectButton inherits IconButton {
 
 component OpenProjectButton inherits IconButton {
     width: self.height;
-    icon: @image-url("../../../font-awesome/svgs/solid/folder-open.svg");
+    cmd: Cmd.project-open;
     icon-scale: 0.6;
-    tooltip: Cmd.project-open.text;
-    status-tip: Cmd.project-open.status-tip;
 
     clicked => {
         Backend.trigger(Action.project-open);

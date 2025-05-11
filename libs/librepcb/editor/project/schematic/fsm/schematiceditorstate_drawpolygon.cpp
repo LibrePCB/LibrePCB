@@ -122,12 +122,6 @@ bool SchematicEditorState_DrawPolygon::
   return processGraphicsSceneLeftMouseButtonPressed(e);
 }
 
-bool SchematicEditorState_DrawPolygon::processSwitchToSchematicPage(
-    int index) noexcept {
-  // Allow switching to an existing schematic if no command is active.
-  return (!mIsUndoCmdActive) && (index >= 0);
-}
-
 /*******************************************************************************
  *  Connection to UI
  ******************************************************************************/
@@ -180,8 +174,6 @@ bool SchematicEditorState_DrawPolygon::startAddPolygon(
   abortBlockingToolsInOtherEditors();
 
   Q_ASSERT(mIsUndoCmdActive == false);
-  Schematic* schematic = getActiveSchematic();
-  if (!schematic) return false;
 
   try {
     // Start a new undo command
@@ -191,7 +183,7 @@ bool SchematicEditorState_DrawPolygon::startAddPolygon(
     // Add polygon with two vertices
     mCurrentProperties.setPath(Path({Vertex(pos), Vertex(pos)}));
     mCurrentPolygon = new SI_Polygon(
-        *schematic, Polygon(Uuid::createRandom(), mCurrentProperties));
+        mContext.schematic, Polygon(Uuid::createRandom(), mCurrentProperties));
     mContext.undoStack.appendToCmdGroup(
         new CmdSchematicPolygonAdd(*mCurrentPolygon));
 

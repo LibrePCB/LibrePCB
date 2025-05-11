@@ -36,6 +36,10 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class LengthUnit;
+class Point;
+
 namespace editor {
 
 class GuiApplication;
@@ -69,6 +73,12 @@ public:
   void addTab(std::shared_ptr<WindowTab> tab, int index = -1) noexcept;
   std::shared_ptr<WindowTab> removeTab(int index) noexcept;
   void triggerTab(int index, ui::TabAction a) noexcept;
+  slint::Image renderScene(float width, float height, int scene) noexcept;
+  bool processScenePointerEvent(const QPointF& pos,
+                                slint::private_api::PointerEvent e) noexcept;
+  bool processSceneScrolled(const QPointF& pos,
+                            slint::private_api::PointerScrollEvent e) noexcept;
+  bool processSceneKeyEvent(const slint::private_api::KeyEvent& e) noexcept;
 
   template <typename T>
   bool switchToTab() noexcept {
@@ -82,16 +92,34 @@ public:
     return false;
   }
 
+  template <typename T>
+  bool switchToProjectTab(int prjIndex, int objIndex) noexcept {
+    for (int i = 0; i < mTabs->count(); ++i) {
+      if (auto tab = std::dynamic_pointer_cast<T>(mTabs->at(i))) {
+        if ((tab->getProjectIndex() == prjIndex) &&
+            (tab->getProjectObjectIndex() == objIndex)) {
+          setCurrentTab(i);
+          highlight();
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   // Operator Overloadings
   WindowSection& operator=(const WindowSection& rhs) = delete;
 
 signals:
+  void currentTabChanged();
   void panelPageRequested(ui::PanelPage p);
   void derivedUiDataChanged(std::size_t index);
   void statusBarMessageChanged(const QString& message, int timeoutMs);
+  void cursorCoordinatesChanged(const Point& pos, const LengthUnit& unit);
 
 private:
-  void setCurrentTab(int index) noexcept;
+  void setCurrentTab(int index, bool forceUpdate = false) noexcept;
+  std::shared_ptr<WindowTab> getCurrentTab() noexcept;
   void highlight() noexcept;
   void tabCloseRequested() noexcept;
 

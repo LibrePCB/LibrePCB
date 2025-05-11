@@ -1,0 +1,127 @@
+import { Palette, ScrollView } from "std-widgets.slint";
+import { Constants } from "../api.slint";
+
+export component DropDownPopup inherits PopupWindow {
+    in property <[string]> model;
+    in property <int> current-index: -1;
+    in property <string> current-text;
+    in property <int> default-index: -1;
+    in property <length> item-height: 25px;
+    property <int> selected-index: 0;
+
+    callback accepted(index: int);
+
+    function set-selected-index(index: int) {
+        if ((index + 1) * item-height) > (view.height - view.viewport-y) {
+            view.viewport-y = -(index + 1) * item-height + view.height;
+        } else if (index * item-height) < -(view.viewport-y) {
+            view.viewport-y = -(index * item-height);
+        }
+        selected-index = index;
+    }
+
+    x: 0;
+    y: root.height + 2px;
+    width: self.preferred-width;
+    preferred-height: l.preferred-height;
+    max-height: 500px;
+    forward-focus: fs;
+
+    // Accessibility
+    accessible-role: list;
+    accessible-enabled: true;
+    accessible-item-count: model.length;
+
+    init => {
+        set-selected-index(max(current-index, 0));  // Scroll to current item.
+    }
+
+    fs := FocusScope {
+        key-pressed(event) => {
+            if event.text == Key.UpArrow {
+                if selected-index > 0 {
+                    set-selected-index(selected-index - 1);
+                }
+                return accept;
+            } else if event.text == Key.DownArrow {
+                if selected-index < (model.length - 1) {
+                    set-selected-index(selected-index + 1);
+                }
+                return accept;
+            } else if event.text == Key.Return {
+                accepted(selected-index);
+                root.close();
+                return accept;
+            }
+            reject
+        }
+    }
+
+    Rectangle {
+        background: black;
+        border-radius: 5px;
+
+        view := ScrollView {
+            width: root.width;
+            height: root.height;
+            viewport-width: l.width;
+            viewport-height: l.height;
+
+            l := VerticalLayout {
+                width: root.width;
+                height: self.preferred-height;
+
+                for item[index] in model: item-ta := TouchArea {
+                    property <bool> is-current: (index == current-index) || ((!current-text.is-empty) && (item == current-text));
+
+                    height: item-height;
+
+                    // Accessibility
+                    accessible-role: list-item;
+                    accessible-item-index: index;
+                    accessible-item-selectable: true;
+                    accessible-item-selected: (index == selected-index);
+                    accessible-label: item;
+
+                    changed has-hover => {
+                        if self.has-hover {
+                            selected-index = index;
+                        }
+                    }
+
+                    Rectangle {
+                        background: (index == selected-index) ? #505050 : (is-current ? #303030 : transparent);
+                        border-radius: item-height / 2;
+
+                        HorizontalLayout {
+                            padding-left: 12px;
+                            padding-right: 12px;
+                            spacing: 5px;
+
+                            item-txt := Text {
+                                font-size: 13px;
+                                overflow: elide;
+                                vertical-alignment: center;
+                                color: is-current ? Constants.librepcb-color : Palette.foreground;
+                                text: item;
+                                accessible-role: none;
+                            }
+
+                            if index == default-index: Text {
+                                width: self.preferred-width;
+                                font-size: 10px;
+                                color: item-txt.color;
+                                vertical-alignment: center;
+                                text: @tr("default").to-lowercase();
+                            }
+                        }
+                    }
+
+                    clicked => {
+                        accepted(index);
+                    }
+                }
+            }
+        }
+    }
+}

@@ -65,6 +65,7 @@ bool SchematicEditorState_AddNetLabel::entry() noexcept {
   Q_ASSERT(mUndoCmdActive == false);
 
   mAdapter.fsmToolEnter(*this);
+  mAdapter.fsmSetFeatures(SchematicEditorFsmAdapter::Features());
   mAdapter.fsmSetViewCursor(Qt::CrossCursor);
   return true;
 }
@@ -75,6 +76,7 @@ bool SchematicEditorState_AddNetLabel::exit() noexcept {
   }
 
   mAdapter.fsmSetViewCursor(std::nullopt);
+  mAdapter.fsmSetFeatures(SchematicEditorFsmAdapter::Features());
   mAdapter.fsmToolLeave();
   return true;
 }
@@ -83,11 +85,28 @@ bool SchematicEditorState_AddNetLabel::exit() noexcept {
  *  Event Handlers
  ******************************************************************************/
 
+bool SchematicEditorState_AddNetLabel::processRotate(
+    const Angle& rotation) noexcept {
+  if (mUndoCmdActive && mCurrentNetLabel && mEditCmd) {
+    mEditCmd->rotate(rotation, mCurrentNetLabel->getPosition(), true);
+    return true;
+  }
+
+  return false;
+}
+
+bool SchematicEditorState_AddNetLabel::processMirror(
+    Qt::Orientation orientation) noexcept {
+  if (mUndoCmdActive && mCurrentNetLabel && mEditCmd) {
+    mEditCmd->mirror(orientation, mCurrentNetLabel->getPosition(), true);
+    return true;
+  }
+
+  return false;
+}
+
 bool SchematicEditorState_AddNetLabel::processGraphicsSceneMouseMoved(
     const GraphicsSceneMouseEvent& e) noexcept {
-  Schematic* schematic = getActiveSchematic();
-  if (!schematic) return false;
-
   return updateLabel(e.scenePos);
 }
 
@@ -127,32 +146,6 @@ bool SchematicEditorState_AddNetLabel::
   return false;
 }
 
-bool SchematicEditorState_AddNetLabel::processSwitchToSchematicPage(
-    int index) noexcept {
-  Q_UNUSED(index);
-  return !mUndoCmdActive;
-}
-
-bool SchematicEditorState_AddNetLabel::processRotate(
-    const Angle& rotation) noexcept {
-  if (mUndoCmdActive && mCurrentNetLabel && mEditCmd) {
-    mEditCmd->rotate(rotation, mCurrentNetLabel->getPosition(), true);
-    return true;
-  }
-
-  return false;
-}
-
-bool SchematicEditorState_AddNetLabel::processMirror(
-    Qt::Orientation orientation) noexcept {
-  if (mUndoCmdActive && mCurrentNetLabel && mEditCmd) {
-    mEditCmd->mirror(orientation, mCurrentNetLabel->getPosition(), true);
-    return true;
-  }
-
-  return false;
-}
-
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
@@ -162,8 +155,6 @@ bool SchematicEditorState_AddNetLabel::addLabel(const Point& pos) noexcept {
   abortBlockingToolsInOtherEditors();
 
   Q_ASSERT(mUndoCmdActive == false);
-  Schematic* schematic = getActiveSchematic();
-  if (!schematic) return false;
 
   try {
     std::shared_ptr<SGI_NetLine> netlineUnderCursor =
@@ -183,6 +174,11 @@ bool SchematicEditorState_AddNetLabel::addLabel(const Point& pos) noexcept {
     mContext.undoStack.appendToCmdGroup(cmdAdd);
     mCurrentNetLabel = netLabel;
     mEditCmd = new CmdSchematicNetLabelEdit(*mCurrentNetLabel);
+
+    // Allow some actions.
+    mAdapter.fsmSetFeatures(SchematicEditorFsmAdapter::Features(
+        SchematicEditorFsmAdapter::Feature::Rotate |
+        SchematicEditorFsmAdapter::Feature::Mirror));
 
     // Highlight all elements of the current netsignal.
     mAdapter.fsmSetHighlightedNetSignals({&netsegment.getNetSignal()});
@@ -212,6 +208,7 @@ bool SchematicEditorState_AddNetLabel::fixLabel(const Point& pos) noexcept {
     mContext.undoStack.appendToCmdGroup(mEditCmd);
     mContext.undoStack.commitCmdGroup();
     mUndoCmdActive = false;
+    mAdapter.fsmSetFeatures(SchematicEditorFsmAdapter::Features());
     mAdapter.fsmSetHighlightedNetSignals({});
     return true;
   } catch (const Exception& e) {
@@ -224,6 +221,7 @@ bool SchematicEditorState_AddNetLabel::fixLabel(const Point& pos) noexcept {
 bool SchematicEditorState_AddNetLabel::abortCommand(
     bool showErrMsgBox) noexcept {
   try {
+    mAdapter.fsmSetFeatures(SchematicEditorFsmAdapter::Features());
     mAdapter.fsmSetHighlightedNetSignals({});
     if (mUndoCmdActive) {
       mContext.undoStack.abortCmdGroup();  // can throw

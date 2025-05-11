@@ -1,12 +1,84 @@
-import { ProgressBar } from "widgets.slint";
+import {
+    IconButton,
+    ProgressBar,
+    ToolTip,
+} from "widgets.slint";
 import { NotificationsPopup } from "notificationspopup.slint";
 import {
+    Backend,
     Constants,
     Data,
+    EditorCommandSet as Cmd,
+    GridStyle,
+    Helpers,
+    Int64,
+    LengthEditParseResult,
+    LengthUnit,
     NotificationType,
+    TabAction,
+    TabType,
 } from "api.slint";
 
 export component StatusBar inherits Rectangle {
+    property <GridStyle> current-grid-style: {
+        if Data.current-tab.type == TabType.schematic {
+            Data.current-schematic-tab.grid-style
+        } else {
+            Data.current-board-2d-tab.grid-style
+        }
+    };
+    property <Int64> current-grid-interval: {
+        if Data.current-tab.type == TabType.schematic {
+            Data.current-schematic-tab.grid-interval
+        } else {
+            Data.current-board-2d-tab.grid-interval
+        }
+    };
+    property <LengthUnit> current-unit: {
+        if Data.current-tab.type == TabType.schematic {
+            Data.current-schematic-tab.unit
+        } else {
+            Data.current-board-2d-tab.unit
+        }
+    };
+
+    function set-current-grid-style(gs: GridStyle) {
+        if Data.current-tab.type == TabType.schematic {
+            Data.current-section.schematic-tabs[Data.current-section.current-tab-index].grid-style = gs;
+        } else if Data.current-tab.type == TabType.board-2d {
+            Data.current-section.board-2d-tabs[Data.current-section.current-tab-index].grid-style = gs;
+        } else {
+            debug("Unhandled case in set-current-grid-style().");
+        }
+    }
+
+    function set-current-grid-interval(value: Int64) {
+        if Data.current-tab.type == TabType.schematic {
+            Data.current-section.schematic-tabs[Data.current-section.current-tab-index].grid-interval = value;
+        } else if Data.current-tab.type == TabType.board-2d {
+            Data.current-section.board-2d-tabs[Data.current-section.current-tab-index].grid-interval = value;
+        } else {
+            debug("Current tab type not handled.");
+        }
+    }
+
+    function set-current-unit(u: LengthUnit) {
+        if Data.current-tab.type == TabType.schematic {
+            Data.current-section.schematic-tabs[Data.current-section.current-tab-index].unit = u;
+        } else if Data.current-tab.type == TabType.board-2d {
+            Data.current-section.board-2d-tabs[Data.current-section.current-tab-index].unit = u;
+        } else {
+            debug("Unhandled case in set-current-unit().");
+        }
+    }
+
+    public function focus-grid-interval() {
+        grid-interval-edt.enabled = true;
+        grid-interval-edt.focus();
+    }
+
+    callback focus-root;
+
     height: 25px;
     background: #353535;
 
@@ -42,6 +114,227 @@ export component StatusBar inherits Rectangle {
             width: 10px;
         }
 
+        coordinates-txt := Text {
+            vertical-alignment: center;
+            font-family: "Noto Sans Mono";
+            font-size: 11px;
+            color: white;
+            text: Data.cursor-coordinates;
+            visible: Data.current-tab-is-2d;
+            accessible-role: none;
+        }
+
+        Rectangle {
+            width: max(unit-ta.preferred-width + self.height - unit-ta.preferred-height, 38px);
+            background: unit-ta.has-hover ? #454545 : transparent;
+
+            unit-ta := TouchArea {
+                enabled: Data.current-tab-is-2d;
+
+                unit-txt := Text {
+                    vertical-alignment: center;
+                    font-size: 11px;
+                    color: (!Data.current-tab-is-2d) ? #707070 : coordinates-txt.color;
+                    text: Helpers.get-unit-short-str(current-unit);
+                }
+
+                clicked => {
+                    unit-popup.show();
+                }
+            }
+
+            unit-popup := PopupWindow {
+                x: -(self.preferred-width - parent.width) / 2;
+                y: -self.preferred-height;
+
+                VerticalLayout {
+                    for unit in Helpers.all-length-units: unit-item-ta := TouchArea {
+                        Rectangle {
+                            preferred-width: unit-item-txt.preferred-width + 8px;
+                            preferred-height: unit-item-txt.preferred-height + 8px;
+                            background: parent.has-hover ? #505050 : #404040;
+
+                            unit-item-txt := Text {
+                                color: (unit == current-unit) ? Constants.librepcb-color : #cccccc;
+                                horizontal-alignment: center;
+                                vertical-alignment: center;
+                                text: Helpers.get-unit-short-str(unit);
+                                accessible-role: none;
+                            }
+                        }
+
+                        clicked => {
+                            set-current-unit(unit);
+                        }
+                    }
+                }
+            }
+        }
+
+        Rectangle {
+            width: max(grid-interval-edt.min-width, grid-interval-edt.preferred-width) + 2 * grid-interval-edt.x;
+            background: grid-interval-ta.has-hover ? #454545 : transparent;
+
+            grid-interval-ta := TouchArea {
+                enabled: Data.current-tab-is-2d;
+
+                grid-interval-edt := TextInput {
+                    property <string> data-text: Backend.format-length(current-grid-interval, current-unit);
+                    property <LengthEditParseResult> parse-result;
+
+                    x: 5px;
+                    font-family: "Noto Sans Mono";
+                    font-size: 11px;
+                    wrap: no-wrap;
+                    single-line: true;
+                    vertical-alignment: center;
+                    color: (!Data.current-tab-is-2d) ? #707070 : white;
+                    selection-background-color: Constants.librepcb-color;
+                    selection-foreground-color: black;
+                    text: data-text;
+                    enabled: false;
+
+                    changed data-text => {
+                        self.text = data-text;
+                    }
+
+                    changed has-focus => {
+                        if self.has-focus {
+                            self.select-all();
+                            self.min-width = self.preferred-width;
+                        } else {
+                            self.clear-selection();
+                            self.text = data-text;
+                            self.enabled = false;
+                            self.min-width = self.preferred-width;
+                        }
+                    }
+
+                    key-pressed(event) => {
+                        if event.text == Key.Return {
+                            focus-root();
+                            parse-result = Backend.parse-length-input(self.text, current-unit, { msb: 0, lsb: 1 });
+                            if parse-result.valid {
+                                set-current-grid-interval(parse-result.evaluated-value);
+                                set-current-unit(parse-result.evaluated-unit);
+                            }
+                            return accept;
+                        } else if event.text == Key.Escape {
+                            focus-root();
+                            return accept;
+                        }
+                        reject
+                    }
+                }
+
+                clicked => {
+                    grid-interval-edt.enabled = true;
+                    grid-interval-edt.focus();
+                }
+
+                scroll-event(event) => {
+                    if event.delta-y > 0 {
+                        Helpers.trigger-current-tab-action(TabAction.grid-interval-increase);
+                        return accept;
+                    } else if event.delta-y < 0 {
+                        Helpers.trigger-current-tab-action(TabAction.grid-interval-decrease);
+                        return accept;
+                    }
+                    reject
+                }
+            }
+
+            if grid-interval-ta.has-hover: grid-interval-tt := ToolTip {
+                x: (parent.width - self.width) / 2;
+                y: -self.height - 5px;
+                text: @tr("Grid Interval");
+            }
+        }
+
+        VerticalLayout {
+            width: self.height * 0.7;
+
+            grid-interval-increase-btn := IconButton {
+                width: parent.width;
+                height: parent.height / 2;
+                icon: @image-url("../../../font-awesome/svgs/solid/caret-up.svg");
+                icon-scale: 1.0;
+                icon-offset-y: 2px;
+                color-enabled: white;
+                enabled: Data.current-tab-is-2d;
+
+                clicked => {
+                    Helpers.trigger-current-tab-action(TabAction.grid-interval-increase);
+                }
+            }
+
+            grid-interval-decrease-btn := IconButton {
+                width: parent.width;
+                height: parent.height / 2;
+                icon: @image-url("../../../font-awesome/svgs/solid/caret-down.svg");
+                icon-scale: 1.0;
+                icon-offset-y: -2px;
+                color-enabled: white;
+                enabled: Data.current-tab-is-2d;
+
+                clicked => {
+                    Helpers.trigger-current-tab-action(TabAction.grid-interval-decrease);
+                }
+            }
+        }
+
+        grid-style-btn := IconButton {
+            tooltip: @tr("Grid Style");
+            tooltip-position: top;
+            icon: {
+                if current-grid-style == GridStyle.lines {
+                    @image-url("../../../bootstrap-icons/icons/grid-3x3.svg")
+                } else if current-grid-style == GridStyle.dots {
+                    @image-url("../../../../img/grid-dots.svg")
+                } else {
+                    @image-url("../../../../img/grid-none.svg")
+                }
+            };
+            icon-scale: 0.7;
+            color-enabled: white;
+            enabled: Data.current-tab-is-2d;
+
+            clicked => {
+                if current-grid-style == GridStyle.none {
+                    set-current-grid-style(GridStyle.dots);
+                } else if current-grid-style == GridStyle.dots {
+                    set-current-grid-style(GridStyle.lines);
+                } else {
+                    set-current-grid-style(GridStyle.none);
+                }
+            }
+        }
+
+        ignore-locks-btn := IconButton {
+            tooltip: Cmd.ignore-locks.text;
+            tooltip-position: top;
+            background-color-checked: #900000;
+            icon: {
+                if self.checked {
+                    @image-url("../../../font-awesome/svgs/solid/lock-open.svg")
+                } else {
+                    @image-url("../../../font-awesome/svgs/solid/lock.svg")
+                }
+            };
+            icon-scale: 0.6;
+            color-enabled: white;
+            checked: Data.current-board-2d-tab.ignore-placement-locks;
+            enabled: Data.current-tab.type == TabType.board-2d;
+
+            clicked => {
+                Data.current-section.board-2d-tabs[Data.current-section.current-tab-index].ignore-placement-locks = !self.checked;
+            }
+        }
+
+        Rectangle {
+            width: 10px;
+        }
+
         Rectangle {
             max-width: 150px;
 
@@ -56,9 +349,28 @@ export component StatusBar inherits Rectangle {
             width: 10px;
         }
 
-        Rectangle {
-            property <bool> enabled: Data.notifications.length > 0;
+        notifications-btn := IconButton {
             property <int> item-count: Data.notifications.length;
+
+            icon: {
+                if Data.notifications-unread > 0 {
+                    @image-url("../../../font-awesome/svgs/solid/bell.svg")
+                } else {
+                    @image-url("../../../font-awesome/svgs/regular/bell.svg")
+                }
+            };
+            color-enabled: white;
+            border-width: (Data.notifications-unread > 0) ? 1px : 0px;
+            border-color: Constants.librepcb-color;
+            enabled: Data.notifications.length > 0;
+
+            // Accessibility
+            accessible-expandable: true;
+            accessible-expanded: Data.notifications-shown;
+            accessible-label: "\{Data.notifications-unread} Notifications";
+            accessible-action-expand => {
+                self.clicked();
+            }
 
             changed item-count => {
                 if item-count == 0 {
@@ -66,54 +378,14 @@ export component StatusBar inherits Rectangle {
                 }
             }
 
-            width: self.height;
-            background: notifications-ta.has-hover ? #505050 : transparent;
-            border-width: (Data.notifications-unread > 0) ? 1px : 0px;
-            border-color: Constants.librepcb-color;
-
-            notifications-ta := TouchArea {
-                enabled: enabled;
-
-                Image {
-                    width: self.height * 0.7;
-                    height: 100%;
-                    image-fit: contain;
-                    colorize: enabled ? white : #707070;
-                    source: {
-                        if Data.notifications-unread > 0 {
-                            @image-url("../../../font-awesome/svgs/solid/bell.svg")
-                        } else {
-                            @image-url("../../../font-awesome/svgs/regular/bell.svg")
-                        }
-                    };
-
-                    // Accessibility
-                    accessible-role: button;
-                    accessible-enabled: enabled;
-                    accessible-expandable: true;
-                    accessible-expanded: Data.notifications-shown;
-                    accessible-label: "\{Data.notifications-unread} Notifications";
-                    accessible-action-default => {
-                        parent.clicked();
-                    }
-                    accessible-action-expand => {
-                        parent.clicked();
-                    }
-                }
-
-                if Data.notifications-unread > 0: notifications-unread-txt := Text {
-                    y: (parent.height - self.height) / 2 - 2px;
-                    color: root.background;
-                    horizontal-alignment: center;
-                    font-size: 12px;
-                    font-weight: 900;
-                    text: Data.notifications-unread;
-                    accessible-role: none;
-                }
-
-                clicked => {
-                    Data.notifications-shown = !Data.notifications-shown;
-                }
+            if Data.notifications-unread > 0: notifications-unread-txt := Text {
+                y: (parent.height - self.height) / 2 - 1px;
+                color: root.background;
+                horizontal-alignment: center;
+                font-size: 12px;
+                font-weight: 900;
+                text: Data.notifications-unread;
+                accessible-role: none;
             }
 
             notifications-popup := NotificationsPopup {
@@ -125,6 +397,10 @@ export component StatusBar inherits Rectangle {
                 clip: true;
 
                 animate height { duration: 100ms; }
+            }
+
+            clicked => {
+                Data.notifications-shown = !Data.notifications-shown;
             }
         }
     }

@@ -81,6 +81,10 @@ ui::TabData CreateLibraryTab::getUiData() const noexcept {
   return ui::TabData{
       ui::TabType::CreateLibrary,  // Type
       q2s(tr("New Library")),  // Title
+      ui::TabFeatures{},  // Features
+      slint::SharedString(),  // Find term
+      nullptr,  // Find suggestions
+      nullptr,  // Layers
   };
 }
 

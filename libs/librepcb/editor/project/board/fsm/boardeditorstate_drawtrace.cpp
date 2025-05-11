@@ -86,6 +86,10 @@ BoardEditorState_DrawTrace::BoardEditorState_DrawTrace(
     mPositioningNetPoint1(nullptr),
     mPositioningNetLine2(nullptr),
     mPositioningNetPoint2(nullptr) {
+  // Restore client settings.
+  QSettings cs;
+  mCurrentAutoWidth =
+      cs.value("board_editor/draw_trace/width/auto", false).toBool();
 }
 
 BoardEditorState_DrawTrace::~BoardEditorState_DrawTrace() noexcept {
@@ -214,11 +218,6 @@ bool BoardEditorState_DrawTrace::processGraphicsSceneRightMouseButtonReleased(
   return false;
 }
 
-bool BoardEditorState_DrawTrace::processSwitchToBoard(int index) noexcept {
-  // Allow switching to an existing board if no command is active.
-  return (mSubState == SubState_Idle) && (index >= 0);
-}
-
 /*******************************************************************************
  *  Connection to UI
  ******************************************************************************/
@@ -235,17 +234,11 @@ void BoardEditorState_DrawTrace::setWireMode(WireMode mode) noexcept {
 }
 
 QSet<const Layer*> BoardEditorState_DrawTrace::getAvailableLayers() noexcept {
-  if (Board* board = getActiveBoard()) {
-    return board->getCopperLayers();
-  } else {
-    return QSet<const Layer*>{};
-  }
+  return mContext.board.getCopperLayers();
 }
 
 void BoardEditorState_DrawTrace::setLayer(const Layer& layer) noexcept {
-  Board* board = getActiveBoard();
-  if (!board) return;
-  if (!board->getCopperLayers().contains(&layer)) return;
+  if (!mContext.board.getCopperLayers().contains(&layer)) return;
   makeLayerVisible(layer.getThemeColor());
 
   if ((mSubState == SubState_PositioningNetPoint) &&
@@ -262,7 +255,7 @@ void BoardEditorState_DrawTrace::setLayer(const Layer& layer) noexcept {
     if (via || pad) {
       abortPositioning(false);
       mCurrentLayer = &layer;
-      startPositioning(*board, startPos, nullptr, via, pad);
+      startPositioning(mContext.board, startPos, nullptr, via, pad);
       updateNetpointPositions();
     } else {
       mAddVia = true;
@@ -281,6 +274,10 @@ void BoardEditorState_DrawTrace::setAutoWidth(bool autoWidth) noexcept {
   if (autoWidth != mCurrentAutoWidth) {
     mCurrentAutoWidth = autoWidth;
     emit autoWidthChanged(mCurrentAutoWidth);
+
+    // Save client settings.
+    QSettings cs;
+    cs.setValue("board_editor/draw_trace/width/auto", autoWidth);
   }
 }
 

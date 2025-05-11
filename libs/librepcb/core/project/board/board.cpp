@@ -269,6 +269,14 @@ std::shared_ptr<SceneData3D> Board::buildScene3D(
  *  Setters
  ******************************************************************************/
 
+void Board::setName(const ElementName& name) noexcept {
+  if (name != mName) {
+    mName = name;
+    emit nameChanged(mName);
+    emit attributesChanged();
+  }
+}
+
 void Board::setInnerLayerCount(int count) noexcept {
   if (count != mInnerLayerCount) {
     mInnerLayerCount = count;

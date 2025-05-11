@@ -350,21 +350,6 @@ bool BoardEditorFsm::processGraphicsSceneRightMouseButtonReleased(
   return false;
 }
 
-bool BoardEditorFsm::processSwitchToBoard(int index) noexcept {
-  if (BoardEditorState* state = getCurrentStateObj()) {
-    if (state->processSwitchToBoard(index)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-void BoardEditorFsm::processSwitchedBoard() noexcept {
-  if (BoardEditorState* state = getCurrentStateObj()) {
-    state->processSwitchedBoard();
-  }
-}
-
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/

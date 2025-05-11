@@ -44,6 +44,7 @@
 
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/schematic/items/si_netlabel.h>
+#include <librepcb/core/project/schematic/items/si_netpoint.h>
 #include <librepcb/core/project/schematic/items/si_polygon.h>
 #include <librepcb/core/project/schematic/items/si_symbol.h>
 #include <librepcb/core/project/schematic/items/si_text.h>
@@ -82,6 +83,21 @@ SchematicEditorState_Select::~SchematicEditorState_Select() noexcept {
 bool SchematicEditorState_Select::entry() noexcept {
   Q_ASSERT(mSubState == SubState::IDLE);
   mAdapter.fsmToolEnter(*this);
+
+  mUpdateAvailableFeaturesTimer.reset(new QTimer());
+  mUpdateAvailableFeaturesTimer->setSingleShot(true);
+  mUpdateAvailableFeaturesTimer->setInterval(50);
+  connect(mUpdateAvailableFeaturesTimer.get(), &QTimer::timeout, this,
+          &SchematicEditorState_Select::updateAvailableFeatures);
+  scheduleUpdateAvailableFeatures();
+
+  mConnections.append(
+      connect(&mContext.undoStack, &UndoStack::stateModified, this,
+              &SchematicEditorState_Select::scheduleUpdateAvailableFeatures));
+  mConnections.append(
+      connect(qApp->clipboard(), &QClipboard::dataChanged, this,
+              &SchematicEditorState_Select::scheduleUpdateAvailableFeatures));
+
   return true;
 }
 
@@ -94,6 +110,7 @@ bool SchematicEditorState_Select::exit() noexcept {
     }
   }
 
+  mUpdateAvailableFeaturesTimer.reset();
   mSelectedItemsDragCommand.reset();
   mCmdPolygonEdit.reset();
   mSubState = SubState::IDLE;
@@ -104,6 +121,11 @@ bool SchematicEditorState_Select::exit() noexcept {
     scene->clearSelection();
   }
 
+  while (!mConnections.isEmpty()) {
+    disconnect(mConnections.takeLast());
+  }
+
+  mAdapter.fsmSetFeatures(SchematicEditorFsmAdapter::Features());
   mAdapter.fsmToolLeave();
   return true;
 }
@@ -116,6 +138,7 @@ bool SchematicEditorState_Select::processSelectAll() noexcept {
   if (mSubState == SubState::IDLE) {
     if (SchematicGraphicsScene* scene = getActiveSchematicScene()) {
       scene->selectAll();
+      scheduleUpdateAvailableFeatures();
       return true;
     }
   }
@@ -250,6 +273,8 @@ bool SchematicEditorState_Select::processEditProperties() noexcept {
 }
 
 bool SchematicEditorState_Select::processAbortCommand() noexcept {
+  scheduleUpdateAvailableFeatures();
+
   try {
     switch (mSubState) {
       case SubState::IDLE: {
@@ -323,6 +348,8 @@ bool SchematicEditorState_Select::processGraphicsSceneMouseMoved(
 
 bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
     const GraphicsSceneMouseEvent& e) noexcept {
+  scheduleUpdateAvailableFeatures();
+
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
@@ -407,6 +434,8 @@ bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
 
 bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
     const GraphicsSceneMouseEvent& e) noexcept {
+  scheduleUpdateAvailableFeatures();
+
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
@@ -472,6 +501,8 @@ bool SchematicEditorState_Select::
 
 bool SchematicEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
     const GraphicsSceneMouseEvent& e) noexcept {
+  scheduleUpdateAvailableFeatures();
+
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
@@ -538,9 +569,9 @@ bool SchematicEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
     mb.addAction(cmd.deviceResetTextAll.createAction(
         &menu, this,
         &SchematicEditorState_Select::resetAllTextsOfSelectedItems));
-    EditorToolbox::addResourcesToMenu(
-        mContext.workspace, mb, sym->getSymbol().getComponentInstance(),
-        std::nullopt, &mContext.parentWidget, menu);
+    EditorToolbox::addResourcesToMenu(mContext.workspace, mb,
+                                      sym->getSymbol().getComponentInstance(),
+                                      std::nullopt, parentWidget(), menu);
   } else if (auto item =
                  std::dynamic_pointer_cast<SGI_NetLabel>(selectedItem)) {
     mb.addAction(
@@ -658,12 +689,6 @@ bool SchematicEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
   // execute the context menu
   menu.exec(QCursor::pos());
   return true;
-}
-
-bool SchematicEditorState_Select::processSwitchToSchematicPage(
-    int index) noexcept {
-  Q_UNUSED(index);
-  return mSubState == SubState::IDLE;
 }
 
 /*******************************************************************************
@@ -969,6 +994,93 @@ void SchematicEditorState_Select::openTextPropertiesDialog(
       text, mContext.undoStack, getAllowedGeometryLayers(), getLengthUnit(),
       "schematic_editor/text_properties_dialog", parentWidget());
   dialog.exec();  // performs the modifications
+}
+
+void SchematicEditorState_Select::scheduleUpdateAvailableFeatures() noexcept {
+  if (mUpdateAvailableFeaturesTimer) mUpdateAvailableFeaturesTimer->start();
+}
+
+void SchematicEditorState_Select::updateAvailableFeatures() noexcept {
+  SchematicGraphicsScene* scene = getActiveSchematicScene();
+  if (!scene) return;
+
+  SchematicEditorFsmAdapter::Features features;
+  if (mSubState == SubState::PASTING) {
+    features |= SchematicEditorFsmAdapter::Feature::Rotate;
+    features |= SchematicEditorFsmAdapter::Feature::Mirror;
+  } else if ((mSubState == SubState::IDLE) || (mSubState == SubState::MOVING)) {
+    features |= SchematicEditorFsmAdapter::Feature::Select;
+
+    if (SchematicClipboardData::isValid(qApp->clipboard()->mimeData())) {
+      features |= SchematicEditorFsmAdapter::Feature::Paste;
+    }
+
+    SchematicSelectionQuery query(*scene);
+    query.addSelectedSymbols();
+    query.addSelectedNetPoints();
+    query.addSelectedNetLines();
+    query.addSelectedNetLabels();
+    query.addSelectedPolygons();
+    query.addSelectedSchematicTexts();
+    query.addSelectedSymbolTexts();
+    if (!query.isResultEmpty()) {
+      features |= SchematicEditorFsmAdapter::Feature::Cut;
+      features |= SchematicEditorFsmAdapter::Feature::Copy;
+      features |= SchematicEditorFsmAdapter::Feature::Remove;
+      features |= SchematicEditorFsmAdapter::Feature::Rotate;
+      features |= SchematicEditorFsmAdapter::Feature::Mirror;
+    }
+    if (!query.getSymbols().isEmpty()) {
+      features |= SchematicEditorFsmAdapter::Feature::ResetTexts;
+    }
+    if ((!query.getSymbols().isEmpty()) || (!query.getNetLabels().isEmpty()) ||
+        (!query.getPolygons().isEmpty()) || (!query.getTexts().isEmpty())) {
+      features |= SchematicEditorFsmAdapter::Feature::Properties;
+    }
+    foreach (auto ptr, query.getSymbols()) {
+      if (features.testFlag(SchematicEditorFsmAdapter::Feature::SnapToGrid)) {
+        break;
+      }
+      if (!ptr->getPosition().isOnGrid(getGridInterval())) {
+        features |= SchematicEditorFsmAdapter::Feature::SnapToGrid;
+      }
+    }
+    foreach (auto ptr, query.getNetPoints()) {
+      if (features.testFlag(SchematicEditorFsmAdapter::Feature::SnapToGrid)) {
+        break;
+      }
+      if (!ptr->getPosition().isOnGrid(getGridInterval())) {
+        features |= SchematicEditorFsmAdapter::Feature::SnapToGrid;
+      }
+    }
+    foreach (auto ptr, query.getNetLabels()) {
+      if (features.testFlag(SchematicEditorFsmAdapter::Feature::SnapToGrid)) {
+        break;
+      }
+      if (!ptr->getPosition().isOnGrid(getGridInterval())) {
+        features |= SchematicEditorFsmAdapter::Feature::SnapToGrid;
+      }
+    }
+    foreach (auto ptr, query.getPolygons()) {
+      if (features.testFlag(SchematicEditorFsmAdapter::Feature::SnapToGrid)) {
+        break;
+      }
+      if (!ptr->getPolygon().getPath().isOnGrid(getGridInterval())) {
+        features |= SchematicEditorFsmAdapter::Feature::SnapToGrid;
+      }
+    }
+    foreach (auto ptr, query.getTexts()) {
+      if (features.testFlag(SchematicEditorFsmAdapter::Feature::SnapToGrid)) {
+        break;
+      }
+      if (!ptr->getPosition().isOnGrid(getGridInterval())) {
+        features |= SchematicEditorFsmAdapter::Feature::SnapToGrid;
+      }
+    }
+  } else {
+    return;  // Do not update features in other states.
+  }
+  mAdapter.fsmSetFeatures(features);
 }
 
 /*******************************************************************************

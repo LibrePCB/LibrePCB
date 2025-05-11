@@ -126,11 +126,6 @@ bool BoardEditorState_DrawPlane::
   return processGraphicsSceneLeftMouseButtonPressed(e);
 }
 
-bool BoardEditorState_DrawPlane::processSwitchToBoard(int index) noexcept {
-  // Allow switching to an existing board if no command is active.
-  return (!mIsUndoCmdActive) && (index >= 0);
-}
-
 /*******************************************************************************
  *  Connection to UI
  ******************************************************************************/
@@ -173,11 +168,7 @@ void BoardEditorState_DrawPlane::setNet(
 }
 
 QSet<const Layer*> BoardEditorState_DrawPlane::getAvailableLayers() noexcept {
-  if (Board* board = getActiveBoard()) {
-    return board->getCopperLayers();
-  } else {
-    return {};
-  }
+  return mContext.board.getCopperLayers();
 }
 
 void BoardEditorState_DrawPlane::setLayer(const Layer& layer) noexcept {
@@ -201,8 +192,6 @@ bool BoardEditorState_DrawPlane::startAddPlane(const Point& pos) noexcept {
   abortBlockingToolsInOtherEditors();
 
   Q_ASSERT(mIsUndoCmdActive == false);
-  Board* board = getActiveBoard();
-  if (!board) return false;
 
   try {
     // Start a new undo command
@@ -211,8 +200,8 @@ bool BoardEditorState_DrawPlane::startAddPlane(const Point& pos) noexcept {
 
     // Add plane with two vertices
     Path path({Vertex(pos), Vertex(pos)});
-    mCurrentPlane = new BI_Plane(*board, Uuid::createRandom(), *mCurrentLayer,
-                                 mCurrentNetSignal, path);
+    mCurrentPlane = new BI_Plane(mContext.board, Uuid::createRandom(),
+                                 *mCurrentLayer, mCurrentNetSignal, path);
     mCurrentPlane->setConnectStyle(BI_Plane::ConnectStyle::ThermalRelief);
     mContext.undoStack.appendToCmdGroup(new CmdBoardPlaneAdd(*mCurrentPlane));
 

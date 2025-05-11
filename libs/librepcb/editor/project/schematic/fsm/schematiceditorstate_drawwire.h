@@ -96,7 +96,6 @@ public:
       const GraphicsSceneMouseEvent& e) noexcept override;
   virtual bool processGraphicsSceneRightMouseButtonReleased(
       const GraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processSwitchToSchematicPage(int index) noexcept override;
 
   // Connection to UI
   WireMode getWireMode() const noexcept { return mCurrentWireMode; }

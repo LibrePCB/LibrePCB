@@ -63,6 +63,8 @@ public:
   virtual bool exit() noexcept override;
 
   // Event Handlers
+  virtual bool processRotate(const Angle& rotation) noexcept override;
+  virtual bool processMirror(Qt::Orientation orientation) noexcept override;
   virtual bool processGraphicsSceneMouseMoved(
       const GraphicsSceneMouseEvent& e) noexcept override;
   virtual bool processGraphicsSceneLeftMouseButtonPressed(
@@ -71,9 +73,6 @@ public:
       const GraphicsSceneMouseEvent& e) noexcept override;
   virtual bool processGraphicsSceneRightMouseButtonReleased(
       const GraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processSwitchToSchematicPage(int index) noexcept override;
-  virtual bool processRotate(const Angle& rotation) noexcept override;
-  virtual bool processMirror(Qt::Orientation orientation) noexcept override;
 
   // Operator Overloadings
   SchematicEditorState_AddNetLabel& operator=(

@@ -25,6 +25,9 @@
 #include "hometab.h"
 #include "library/createlibrarytab.h"
 #include "library/downloadlibrarytab.h"
+#include "project/board/board2dtab.h"
+#include "project/board/board3dtab.h"
+#include "project/schematic/schematictab.h"
 #include "utils/deriveduiobjectlistview.h"
 #include "windowtab.h"
 
@@ -51,6 +54,15 @@ WindowSection::WindowSection(GuiApplication& app, QObject* parent) noexcept
                                              ui::CreateLibraryTabData>>(mTabs),
         std::make_shared<DerivedUiObjectList<TabList, DownloadLibraryTab,
                                              ui::DownloadLibraryTabData>>(
+            mTabs),
+        std::make_shared<
+            DerivedUiObjectList<TabList, SchematicTab, ui::SchematicTabData>>(
+            mTabs),
+        std::make_shared<
+            DerivedUiObjectList<TabList, Board2dTab, ui::Board2dTabData>>(
+            mTabs),
+        std::make_shared<
+            DerivedUiObjectList<TabList, Board3dTab, ui::Board3dTabData>>(
             mTabs),
         -1,  // Current tab index
         false,  // Highlight
@@ -83,10 +95,16 @@ void WindowSection::addTab(std::shared_ptr<WindowTab> tab, int index) noexcept {
   // calls while the tab object is getting destroyed.
   connect(tab.get(), &WindowTab::closeRequested, this,
           &WindowSection::tabCloseRequested, Qt::QueuedConnection);
+  // However, when the close request comes from the project editor rather than
+  // from the UI, we have to close it immediately to avoid dangling references.
+  connect(tab.get(), &WindowTab::closeEnforced, this,
+          &WindowSection::tabCloseRequested);
   connect(tab.get(), &WindowTab::panelPageRequested, this,
           &WindowSection::panelPageRequested);
   connect(tab.get(), &WindowTab::statusBarMessageChanged, this,
           &WindowSection::statusBarMessageChanged);
+  connect(tab.get(), &WindowTab::cursorCoordinatesChanged, this,
+          &WindowSection::cursorCoordinatesChanged);
   if (index < 0) {
     index = mTabs->count();
   } else {
@@ -99,16 +117,21 @@ void WindowSection::addTab(std::shared_ptr<WindowTab> tab, int index) noexcept {
 std::shared_ptr<WindowTab> WindowSection::removeTab(int index) noexcept {
   if (auto tab = mTabs->takeAt(index)) {
     int currentIndex = mUiData.current_tab_index;
+    const bool forceUpdate = index <= currentIndex;
     if (index < currentIndex) {
       --currentIndex;
     }
-    setCurrentTab(std::min(currentIndex, mTabs->count() - 1));
+    setCurrentTab(std::min(currentIndex, mTabs->count() - 1), forceUpdate);
     disconnect(tab.get(), &WindowTab::closeRequested, this,
+               &WindowSection::tabCloseRequested);
+    disconnect(tab.get(), &WindowTab::closeEnforced, this,
                &WindowSection::tabCloseRequested);
     disconnect(tab.get(), &WindowTab::panelPageRequested, this,
                &WindowSection::panelPageRequested);
     disconnect(tab.get(), &WindowTab::statusBarMessageChanged, this,
                &WindowSection::statusBarMessageChanged);
+    disconnect(tab.get(), &WindowTab::cursorCoordinatesChanged, this,
+               &WindowSection::cursorCoordinatesChanged);
     return tab;
   } else {
     return nullptr;
@@ -121,24 +144,63 @@ void WindowSection::triggerTab(int index, ui::TabAction a) noexcept {
   }
 }
 
+slint::Image WindowSection::renderScene(float width, float height,
+                                        int scene) noexcept {
+  if (std::shared_ptr<WindowTab> t = getCurrentTab()) {
+    return t->renderScene(width, height, scene);
+  }
+  return slint::Image();
+}
+
+bool WindowSection::processScenePointerEvent(
+    const QPointF& pos, slint::private_api::PointerEvent e) noexcept {
+  if (std::shared_ptr<WindowTab> t = getCurrentTab()) {
+    return t->processScenePointerEvent(pos, e);
+  }
+  return false;
+}
+
+bool WindowSection::processSceneScrolled(
+    const QPointF& pos, slint::private_api::PointerScrollEvent e) noexcept {
+  if (std::shared_ptr<WindowTab> t = getCurrentTab()) {
+    return t->processSceneScrolled(pos, e);
+  }
+  return false;
+}
+
+bool WindowSection::processSceneKeyEvent(
+    const slint::private_api::KeyEvent& e) noexcept {
+  if (std::shared_ptr<WindowTab> t = getCurrentTab()) {
+    return t->processSceneKeyEvent(e);
+  }
+  return false;
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
-void WindowSection::setCurrentTab(int index) noexcept {
-  if (mUiData.current_tab_index == index) {
+void WindowSection::setCurrentTab(int index, bool forceUpdate) noexcept {
+  if ((!forceUpdate) && (mUiData.current_tab_index == index)) {
     return;
   }
+
+  std::shared_ptr<WindowTab> tab = mTabs->value(index);
 
   for (auto t : *mTabs) {
     t->deactivate();
   }
-  if (std::shared_ptr<WindowTab> t = mTabs->value(index)) {
-    t->activate();
+  if (tab) {
+    tab->activate();
   }
 
   mUiData.current_tab_index = index;
   onUiDataChanged.notify();
+  emit currentTabChanged();
+}
+
+std::shared_ptr<WindowTab> WindowSection::getCurrentTab() noexcept {
+  return mTabs->value(mUiData.current_tab_index);
 }
 
 void WindowSection::highlight() noexcept {

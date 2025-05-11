@@ -23,36 +23,34 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/project/circuit/netsignal.h>
-#include <librepcb/core/rulecheck/rulecheckmessage.h>
+#include "../utils/uiobjectlist.h"
+#include "appwindow.h"
+
 #include <librepcb/core/serialization/fileformatmigration.h>
+#include <librepcb/core/serialization/sexpression.h>
+#include <librepcb/core/utils/signalslot.h>
 
 #include <QtCore>
-#include <QtWidgets>
 
 #include <memory>
-#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
-
-class QMainWindow;
-
 namespace librepcb {
 
 class Board;
-class ComponentInstance;
-class FilePath;
-class LengthUnit;
+class NetSignal;
 class Project;
 class Workspace;
 
 namespace editor {
 
 class BoardEditor;
-class MenuBuilder;
+class GuiApplication;
+class RuleCheckMessagesModel;
 class SchematicEditor;
+class SchematicTab;
 class UndoStack;
 
 /*******************************************************************************
@@ -66,118 +64,54 @@ class ProjectEditor final : public QObject {
   Q_OBJECT
 
 public:
+  // Signals
+  Signal<ProjectEditor> onUiDataChanged;
+
   // Constructors / Destructor
   ProjectEditor() = delete;
-  ProjectEditor(const Project& other) = delete;
-
-  /**
-   * @brief The constructor
-   */
-  ProjectEditor(Workspace& workspace, Project& project,
-                const std::optional<QList<FileFormatMigration::Message>>&
-                    upgradeMessages);
-
-  /**
-   * @brief The destructor
-   */
+  ProjectEditor(const ProjectEditor& other) = delete;
+  explicit ProjectEditor(
+      GuiApplication& app, std::unique_ptr<Project> project, int uiIndex,
+      const std::optional<QList<FileFormatMigration::Message>>& upgradeMessages,
+      QObject* parent = nullptr) noexcept;
   ~ProjectEditor() noexcept;
 
-  // Getters: General
-
-  Workspace& getWorkspace() const noexcept { return mWorkspace; }
-  Project& getProject() const noexcept { return mProject; }
-  const QString& getUpgradeMessageLabelText() const noexcept {
-    return mUpgradeMessageLabelText;
-  }
-  const LengthUnit& getDefaultLengthUnit() const noexcept;
-
-  /**
-   * @brief Get a reference to the undo stack of the project
-   *
-   * @return A reference to the UndoStack object
-   */
-  UndoStack& getUndoStack() const noexcept { return *mUndoStack; }
-
   // General Methods
+  GuiApplication& getApp() noexcept { return mApp; }
+  Project& getProject() noexcept { return *mProject; }
+  UndoStack& getUndoStack() noexcept { return *mUndoStack; }
+  const QVector<std::shared_ptr<SchematicEditor>>& getSchematics() noexcept {
+    return mSchematics->values();
+  }
+  const QVector<std::shared_ptr<BoardEditor>>& getBoards() noexcept {
+    return mBoards->values();
+  }
+  int getUiIndex() const noexcept { return mUiIndex; }
+  void setUiIndex(int index) noexcept;
+  ui::ProjectData getUiData() const noexcept;
+  void setUiData(const ui::ProjectData& data) noexcept;
+  void trigger(ui::ProjectAction a) noexcept;
+  bool getUseIeee315Symbols() const noexcept { return mUseIeee315Symbols; }
+  std::shared_ptr<const QSet<const NetSignal*>> getHighlightedNetSignals()
+      const noexcept {
+    return mHighlightedNetSignals;
+  }
+  void setHighlightedNetSignals(
+      const QSet<const NetSignal*>& netSignals) noexcept;
 
   /**
-   * @brief Abort any active (blocking) tools in other editors
+   * @brief Request to close the project
    *
-   * If an undo command group is already active while starting a new tool, try
-   * to abort any active tool in other editors since it is annoying to block
-   * one editor by another editor (an error message would appear). However, do
-   * NOT abort tools in the own editor since this could lead to
-   * unexpected/wrong behavior (e.g. recursion)!
+   * If there are unsaved changes to the project, this method will ask the user
+   * whether the changes should be saved or not. If the user clicks on "cancel"
+   * or the project could not be saved successfully, this method will return
+   * false. If there were no unsaved changes or they were successfully saved,
+   * the method returns true.
    *
-   * @param editor  The calling editor, which will not be aborted.
+   * @retval true   Project is safe to be closed.
+   * @retval false  Project still has unsaved changes.
    */
-  void abortBlockingToolsInOtherEditors(QWidget* editor) noexcept;
-
-  /**
-   * @brief Inform the editor that a project related window is about to close
-   *
-   * The project must be closed and destroyed automatically after the last
-   * opened window of the project is closed, because without a window the user
-   * is no longer able to close the project himself. So, every project related
-   * window have to "ask" the ::librepcb::editor::ProjectEditor object
-   * whether it is allowed to close or not. If the last opened window wants to
-   * close, the editor will first ask the user if unsaved changes should be
-   * written to the harddisc. Only if the user accepts this question and the
-   * project is saved successfully, the method will return true to allow the
-   * last window to close. Then it will also close the whole project.
-   *
-   * @param window    A reference to the window which is about to close
-   *
-   * @return true if the window can be closed, false if closing the window is
-   * denied
-   */
-  bool windowIsAboutToClose(QMainWindow& window) noexcept;
-
-  // Operator Overloadings
-  ProjectEditor& operator=(const Project& rhs) = delete;
-
-public slots:
-
-  /**
-   * @brief Show a dialog with all project file format upgrade messages
-   *
-   * @param parent    Parent widget.
-   */
-  void showUpgradeMessages(QWidget* parent) noexcept;
-
-  /**
-   * @brief Open the schematic and/or the board editor window
-   *
-   * Which editors this will open depends on whether the project has schematics
-   * and/or boards. If there aren't any boards or schematics, the schematic
-   * editor will be shown anyway (otherwise the whole project editor would be
-   * invisible).
-   */
-  void showAllRequiredEditors() noexcept;
-
-  /**
-   * @brief Open the schematic editor window and bring it to the front
-   */
-  void showSchematicEditor() noexcept;
-
-  /**
-   * @brief Open the board editor window and bring it to the front
-   */
-  void showBoardEditor() noexcept;
-
-  /**
-   * @brief Execute the *.lppz export dialog (blocking!)
-   *
-   * @param parent    parent widget of the dialog (optional)
-   */
-  void execLppzExportDialog(QWidget* parent = nullptr) noexcept;
-
-  /**
-   * @brief Execute the PCB order dialog (blocking!)
-   *
-   * @param parent    Parent widget of the dialog (optional)
-   */
-  void execOrderPcbDialog(QWidget* parent = nullptr) noexcept;
+  bool requestClose() noexcept;
 
   /**
    * @brief Save the whole project to the harddisc
@@ -198,97 +132,108 @@ public slots:
   bool autosaveProject() noexcept;
 
   /**
-   * @brief Close the project (this will destroy this object!)
-   *
-   * If there are unsaved changes to the project, this method will ask the user
-   * whether the changes should be saved or not. If the user clicks on "cancel"
-   * or the project could not be saved successfully, this method will return
-   * false. If there was no such error, this method will call
-   * QObject::deleteLater() which means that this object will be deleted in the
-   * Qt's event loop.
-   *
-   * @warning This method can be called both from within this class and from
-   *          outside this class (for example from the control panel). But
-   *          if you call this method from outside this class, you may have
-   *          to delete the object yourself afterwards! In special cases,
-   *          the deleteLater() mechanism could lead in fatal errors
-   *          otherwise!
-   *
-   * @param askForSave    If true and there are unsaved changes, this method
-   * shows a message box to ask whether the project should be saved or not. If
-   * false, the project will NOT be saved.
-   * @param msgBoxParent  Here you can specify a parent window for the message
-   * box
-   *
-   * @return true on success (project closed), false on failure (project stays
-   * open)
-   */
-  bool closeAndDestroy(bool askForSave, QWidget* msgBoxParent = 0) noexcept;
-
-  /**
    * @brief Set the flag that manual modifications (no undo stack) are made
    */
-  void setManualModificationsMade() noexcept {
-    mManualModificationsMade = true;
-  }
+  void setManualModificationsMade() noexcept;
+
+  void execSetupDialog() noexcept;
+
+  void execOutputJobsDialog() noexcept;
+
+  void execBomGeneratorDialog(const Board* board) noexcept;
 
   /**
-   * @brief Approve/unapprove an ERC message
+   * @brief Execute the *.lppz export dialog (blocking)
    *
-   * @param msg       The message to modify
-   * @param approve   The new approval state
+   * @param parent    parent widget of the dialog
    */
-  void setErcMessageApproved(const RuleCheckMessage& msg,
-                             bool approve) noexcept;
+  void execLppzExportDialog(QWidget* parent) noexcept;
 
-  std::shared_ptr<const QSet<const NetSignal*>> getHighlightedNetSignals()
-      const noexcept {
-    return mHighlightedNetSignals;
-  }
-  void setHighlightedNetSignals(
-      const QSet<const NetSignal*>& netSignals) noexcept;
-  void clearHighlightedNetSignals() noexcept;
+  /**
+   * @brief Execute the PCB order dialog (blocking)
+   *
+   * @param parent    Parent widget of the dialog
+   */
+  void execOrderPcbDialog(QWidget* parent) noexcept;
+
+  std::shared_ptr<SchematicEditor> execNewSheetDialog() noexcept;
+  void execRenameSheetDialog(int index) noexcept;
+  void execDeleteSheetDialog(int index) noexcept;
+
+  std::shared_ptr<BoardEditor> execNewBoardDialog(
+      std::optional<int> copyFromIndex) noexcept;
+  void execDeleteBoardDialog(int index) noexcept;
+
+  void registerActiveSchematicTab(SchematicTab* tab) noexcept;
+  void unregisterActiveSchematicTab(SchematicTab* tab) noexcept;
+
+  // Operator Overloadings
+  ProjectEditor& operator=(const ProjectEditor& rhs) = delete;
 
 signals:
-  void ercFinished(const RuleCheckMessageList& messages);
-  void highlightedNetSignalsChanged();
+  void uiIndexChanged();
+  void manualModificationsMade();
   void projectAboutToBeSaved();
   void projectSavedToDisk();
-  void showControlPanelClicked();
-  void openProjectLibraryUpdaterClicked(const FilePath& fp);
-  void aboutLibrePcbRequested();
-  void projectEditorClosed();
-  void showTemporaryStatusBarMessage(const QString& message, int timeoutMs);
+  void ercUnapprovedCountChanged();
+  void highlightedNetSignalsChanged();
+  void projectLibraryUpdaterRequested(const FilePath& fp);
+  void statusBarMessageChanged(const QString& message, int timeoutMs);
 
-private:  // Methods
+  /**
+   * @brief Abort any active (blocking) tools in other editors
+   *
+   * If an undo command group is already active while starting a new tool, try
+   * to abort any active tool in other editors since it is annoying to block
+   * one editor by another editor (an error message would appear). However, do
+   * NOT abort tools in the own editor since this could lead to
+   * unexpected/wrong behavior (e.g. recursion)!
+   *
+   * @param source  The calling editor (any kind of type), which will not be
+   *                aborted. Typically, a ::librepcb::editor::WindowTab pointer
+   *                is passed. Pass `nullptr` to abort in all editors.
+   */
+  void abortBlockingToolsInOtherEditors(const void* source);
+
+private:
+  /**
+   * @brief Show a dialog with all project file format upgrade messages
+   */
+  void showUpgradeMessages() noexcept;
+  void scheduleErcRun() noexcept;
   void runErc() noexcept;
-  int getCountOfVisibleEditorWindows() const noexcept;
+  void projectSettingsChanged() noexcept;
 
-private:  // Data
+private:
+  GuiApplication& mApp;
   Workspace& mWorkspace;
-  Project& mProject;
+  std::unique_ptr<Project> mProject;
+  int mUiIndex;
+  bool mUseIeee315Symbols;
   QList<FileFormatMigration::Message> mUpgradeMessages;
-  QString mUpgradeMessageLabelText;
-
-  /// The timer for the periodically automatic saving
-  /// functionality (see also @ref doc_project_save)
-  QTimer mAutoSaveTimer;
-
-  QSet<SExpression> mSupportedErcApprovals;
-  QSet<SExpression> mDisappearedErcApprovals;
-  RuleCheckMessageList mErcMessages;
+  std::shared_ptr<UiObjectList<SchematicEditor, ui::SchematicData>> mSchematics;
+  std::shared_ptr<UiObjectList<BoardEditor, ui::BoardData>> mBoards;
+  std::unique_ptr<UndoStack> mUndoStack;
 
   std::shared_ptr<QSet<const NetSignal*>> mHighlightedNetSignals;
+  QVector<QPointer<SchematicTab>> mActiveSchematicTabs;
 
-  UndoStack* mUndoStack;  ///< See @ref doc_project_undostack
-  SchematicEditor* mSchematicEditor;  ///< The schematic editor (GUI)
-  BoardEditor* mBoardEditor;  ///< The board editor (GUI)
+  // ERC
+  std::shared_ptr<RuleCheckMessagesModel> mErcMessages;  // Lazy initialized
+  QSet<SExpression> mSupportedErcApprovals;
+  QSet<SExpression> mDisappearedErcApprovals;
+  QString mErcExecutionError;
+  QTimer mErcTimer;
+
+  /// Modifications bypassing the undo stack
+  bool mManualModificationsMade;
 
   /// The UndoStack state ID of the last successful project (auto)save
   uint mLastAutosaveStateId;
 
-  /// Modifications bypassing the undo stack
-  bool mManualModificationsMade;
+  /// The timer for the periodically automatic saving
+  /// functionality (see also @ref doc_project_save)
+  QTimer mAutoSaveTimer;
 };
 
 /*******************************************************************************

@@ -99,8 +99,11 @@ bool Schematic::isEmpty() const noexcept {
  ******************************************************************************/
 
 void Schematic::setName(const ElementName& name) noexcept {
-  mName = name;
-  emit mProject.attributesChanged();
+  if (name != mName) {
+    mName = name;
+    emit nameChanged(mName);
+    emit mProject.attributesChanged();
+  }
 }
 
 /*******************************************************************************

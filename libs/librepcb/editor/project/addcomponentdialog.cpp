@@ -28,6 +28,7 @@
 #include "../library/pkg/footprintgraphicsitem.h"
 #include "../library/sym/symbolgraphicsitem.h"
 #include "../modelview/partinformationdelegate.h"
+#include "../utils/editortoolbox.h"
 #include "../widgets/graphicsview.h"
 #include "../widgets/waitingspinnerwidget.h"
 #include "../workspace/categorytreemodel.h"
@@ -481,7 +482,7 @@ void AddComponentDialog::customComponentsContextMenuRequested(
   }
   if (partInfo && (!partInfo->resources.isEmpty())) {
     QAction* action =
-        new QAction(QIcon(":/img/actions/pdf.png"),
+        new QAction(EditorToolbox::svgIcon(":/fa/solid/file-pdf.svg"),
                     partInfo->resources.first().name + "...", &menu);
     connect(action, &QAction::triggered, this, [this, partInfo]() {
       DesktopServices ds(mSettings);

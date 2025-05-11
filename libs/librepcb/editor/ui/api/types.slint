@@ -1,3 +1,7 @@
+////////////////////////////////////////////////////////////////////////////////
+// General
+////////////////////////////////////////////////////////////////////////////////
+
 // Triggerable actions
 export enum Action {
     // Application
@@ -32,16 +36,11 @@ export enum Action {
 export enum PanelPage {
     home,
     libraries,
+    documents,
+    layers,
+    place-devices,
+    rule-check,
     about,
-}
-
-// Notification types
-export enum NotificationType {
-    tip,
-    info,
-    warning,
-    critical,
-    progress,
 }
 
 // Dynamic information about editor commands, e.g. used in menus
@@ -54,11 +53,224 @@ export struct EditorCommand {
     key: string,
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Basic types
+////////////////////////////////////////////////////////////////////////////////
+
+// Base type for representing values of our C++ types Length, Angle etc.
+export struct Int64 {
+    msb: int,
+    lsb: int,
+}
+
+// Enum reflecting all our length units
+export enum LengthUnit {
+    millimeters,
+    micrometers,
+    nanometers,
+    inches,
+    mils,
+}
+
+// Enum for the different grid styles
+export enum GridStyle {
+    none,
+    dots,
+    lines,
+}
+
+// Graphics layer data structure
+export struct GraphicsLayerData {
+    name: string,
+    color: color,
+    color-highlighted: color,
+    visible: bool,
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Widgets data
+////////////////////////////////////////////////////////////////////////////////
+
+// Underlying data structure for LineEdit elements
+export struct LineEditData {
+    enabled: bool,
+    text: string,
+    placeholder: string,
+    suggestions: [string],
+}
+
+// Underlying data structure for ComboBox elements
+export struct ComboBoxData {
+    items: [string],
+    current-index: int,
+}
+
+// Underlying data structure for LengthEdit elements
+export struct LengthEditData {
+    value: Int64,
+    unit: LengthUnit,
+    minimum: Int64,
+    can-increase: bool,
+    can-decrease: bool,
+    increase: bool,  // Set by UI, reset by backend.
+    decrease: bool,  // Set by UI, reset by backend.
+}
+
+// Text parse result as used in the LengthEdit component
+export struct LengthEditParseResult {
+    valid: bool,
+    evaluated-value: Int64,
+    evaluated-unit: LengthUnit,
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Notifications
+////////////////////////////////////////////////////////////////////////////////
+
+export enum NotificationType {
+    tip,
+    info,
+    warning,
+    critical,
+    progress,
+}
+
+export struct NotificationData {
+    type: NotificationType,
+    title: string,
+    description: string,
+    button-text: string,  // Optional (empty = no button)
+    progress: int,  // [%], ignored if type is not NotificationType.progress
+    supports-dont-show-again: bool,
+    unread: bool,
+    button-clicked: bool,  // Set by UI, handled in backend
+    dismissed: bool,  // Set by UI, handled in backend
+    dont-show-again: bool,  // Set by UI, handled in backend
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Dismissable messages
+////////////////////////////////////////////////////////////////////////////////
+
+export enum DismissableMessageAction {
+    none,
+    dismiss,
+    dont-show-again,
+}
+
+export struct DismissableMessageData {
+    visible: bool,
+    supports-dont-show-again: bool,
+    action: DismissableMessageAction,  // Set by UI, handled in backend
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Rule check
+////////////////////////////////////////////////////////////////////////////////
+
+export enum RuleCheckType {
+    none,
+    erc,
+    drc,
+}
+
+export enum RuleCheckState {
+    not-run-yet,
+    running,
+    outdated,
+    up-to-date,
+}
+
+export enum RuleCheckMessageAction {
+    none,
+    highlight,
+    highlight-and-zoom-to,
+    autofix,
+}
+
+export struct RuleCheckMessageData {
+    severity: NotificationType,
+    message: string,
+    description: string,
+    approved: bool,
+    supports-autofix: bool,
+    action: RuleCheckMessageAction,  // Set by UI, handled in backend
+}
+
+export struct RuleCheckData {
+    type: RuleCheckType,
+    state: RuleCheckState,
+    messages: [RuleCheckMessageData],
+    unapproved: int,
+    execution-error: string,  // Empty if no error
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Editor tools
+////////////////////////////////////////////////////////////////////////////////
+
+export enum EditorTool {
+    select,
+    wire,
+    netlabel,
+    polygon,
+    text,
+    via,
+    plane,
+    zone,
+    hole,
+    component,
+    measure,
+}
+
+export enum WireMode {
+    h-v,
+    v-h,
+    deg90-45,
+    deg45-90,
+    straight,
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Tabs
+////////////////////////////////////////////////////////////////////////////////
+
+// Availability of editor features
+export enum FeatureState {
+    not-supported,
+    disabled,
+    enabled,
+}
+
+// Features available in a tab (see TabData)
+export struct TabFeatures {
+    export-graphics: FeatureState,
+    select: FeatureState,
+    cut: FeatureState,
+    copy: FeatureState,
+    paste: FeatureState,
+    remove: FeatureState,
+    rotate: FeatureState,
+    mirror: FeatureState,
+    flip: FeatureState,
+    move-align: FeatureState,
+    snap-to-grid: FeatureState,
+    reset-texts: FeatureState,
+    lock: FeatureState,
+    unlock: FeatureState,
+    modify-line-width: FeatureState,
+    edit-properties: FeatureState,
+    find: FeatureState,
+}
+
 // All the different kinds of window tabs
 export enum TabType {
     home,
     create-library,
     download-library,
+    schematic,
+    board-2d,
+    board-3d,
 }
 
 // Tab actions
@@ -66,6 +278,92 @@ export enum TabAction {
     close,
     cancel,
     accept,
+
+    // General
+    print,
+    export-image,
+    export-pdf,
+    export-bom,
+    export-fabrication-data,
+    export-pick-place,
+    export-d356-netlist,
+    export-specctra,
+    import-specctra,
+    import-dxf,
+    abort,
+
+    // Selection
+    select-all,
+
+    // Modify
+    cut,
+    copy,
+    paste,
+    delete,
+    rotate-ccw,
+    rotate-cw,
+    mirror-horizontally,
+    mirror-vertically,
+    flip-horizontally,
+    flip-vertically,
+    move-align,
+    move-left,
+    move-right,
+    move-up,
+    move-down,
+    snap-to-grid,
+    reset-texts,
+    lock,
+    unlock,
+    line-width-increase,
+    line-width-decrease,
+    line-width-set,
+    edit-properties,
+
+    // View
+    grid-interval-increase,
+    grid-interval-decrease,
+    layers-none,
+    layers-top,
+    layers-bottom,
+    layers-top-bottom,
+    layers-all,
+    planes-hide,
+    planes-show,
+    planes-rebuild,
+    zoom-in,
+    zoom-out,
+    zoom-fit,
+
+    // Find
+    find-refresh-suggestions,
+    find-next,
+    find-previous,
+
+    // Board 2D tab
+    board-place-component,
+    board-place-components-similar,
+    board-place-components-all,
+
+    // Tools
+    tool-select,
+    tool-wire,
+    tool-netlabel,
+    tool-polygon,
+    tool-text,
+    tool-via,
+    tool-plane,
+    tool-zone,
+    tool-hole,
+    tool-component,
+    tool-component-frame,
+    tool-component-resistor,
+    tool-component-inductor,
+    tool-component-capacitor-bipolar,
+    tool-component-capacitor-unipolar,
+    tool-component-gnd,
+    tool-component-vcc,
+    tool-measure,
 }
 
 // Window tab base data
@@ -73,8 +371,17 @@ export enum TabAction {
 // For various kinds of tabs, an additional "derived" data structure is
 // defined, see below.
 export struct TabData {
+    // Meta
     type: TabType,
     title: string,
+    features: TabFeatures,
+
+    // Find
+    find-term: string,  // Set by UI, handled in backend
+    find-autocompletions: [string],
+
+    // Layers
+    layers: [GraphicsLayerData],
 }
 
 // Additional data for "create library" tabs
@@ -110,6 +417,105 @@ export struct DownloadLibraryTabData {
     download-status: string,  // Status or error
 }
 
+// Additional data for schematic editor tabs
+export struct SchematicTabData {
+    project-index: int,
+    schematic-index: int,
+    background-color: brush,
+    foreground-color: brush,
+    overlay-color: brush,
+    overlay-text-color: brush,
+    grid-style: GridStyle,
+    grid-interval: Int64,
+    unit: LengthUnit,
+    show-pin-numbers: bool,
+
+    // Messages
+    install-libraries-msg: DismissableMessageData,
+    add-drawing-frame-msg: DismissableMessageData,
+
+    // Data about the currently active tool
+    tool: EditorTool,
+    tool-cursor: MouseCursor,
+    tool-overlay-text: string,
+    tool-wire-mode: WireMode,
+    tool-layer: ComboBoxData,
+    tool-line-width: LengthEditData,
+    tool-size: LengthEditData,
+    tool-filled: bool,
+    tool-value: LineEditData,
+    tool-attribute-value: LineEditData,
+    tool-attribute-unit: ComboBoxData,
+
+    scene-image-pos: Point,  // Absolute position of graphics scene
+    frame: int,  // Frame index to trigger repainting
+}
+
+// Additional data for board editor tabs
+export struct Board2dTabData {
+    project-index: int,
+    board-index: int,
+    background-color: brush,
+    foreground-color: brush,
+    overlay-color: brush,
+    overlay-text-color: brush,
+    grid-style: GridStyle,
+    grid-interval: Int64,
+    unit: LengthUnit,
+    ignore-placement-locks: bool,
+    refreshing: bool,
+
+    // Messages
+    empty-schematics-msg: DismissableMessageData,
+    place-devices-msg: DismissableMessageData,
+
+    // Unplaced components.
+    unplaced-components: [string],
+    unplaced-components-index: int,
+    unplaced-components-devices: [string],
+    unplaced-components-devices-index: int,
+    unplaced-components-footprints: [string],
+    unplaced-components-footprints-index: int,
+    unplaced-components-preview: image,
+
+    // Data about the currently active tool.
+    tool: EditorTool,
+    tool-cursor: MouseCursor,
+    tool-overlay-text: string,
+    tool-wire-mode: WireMode,
+    tool-net: ComboBoxData,
+    tool-layer: ComboBoxData,
+    tool-line-width: LengthEditData,
+    tool-size: LengthEditData,
+    tool-drill: LengthEditData,
+    tool-filled: bool,
+    tool-mirrored: bool,
+    tool-value: LineEditData,
+    tool-no-copper: bool,
+    tool-no-planes: bool,
+    tool-no-exposures: bool,
+    tool-no-devices: bool,
+
+    scene-image-pos: Point,  // Absolute position of graphics scene
+    frame: int,  // Frame index to trigger repainting
+}
+
+// Additional data for board 3D viewer tabs
+export struct Board3dTabData {
+    project-index: int,
+    board-index: int,
+    background-color: brush,
+    foreground-color: brush,
+    cursor: MouseCursor,
+    refreshing: bool,
+    error: string,
+    frame: int,  // Frame index to trigger repainting
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Window sections
+////////////////////////////////////////////////////////////////////////////////
+
 // Window section actions
 export enum WindowSectionAction {
     split,
@@ -121,23 +527,16 @@ export struct WindowSectionData {
     tabs: [TabData],
     create-library-tabs: [CreateLibraryTabData],  // Proxy view for `tabs`
     download-library-tabs: [DownloadLibraryTabData],  // Proxy view for `tabs`
+    schematic-tabs: [SchematicTabData],  // Proxy view for `tabs`
+    board-2d-tabs: [Board2dTabData],  // Proxy view for `tabs`
+    board-3d-tabs: [Board3dTabData],  // Proxy view for `tabs`
     current-tab-index: int,
     highlight: bool,
 }
 
-// Notification data structure
-export struct NotificationData {
-    type: NotificationType,
-    title: string,
-    description: string,
-    button-text: string,  // Optional (empty = no button)
-    progress: int,  // [%], ignored if type is not NotificationType.progress
-    supports-dont-show-again: bool,
-    unread: bool,
-    button-clicked: bool,  // Set by UI, handled in backend
-    dismissed: bool,  // Set by UI, handled in backend
-    dont-show-again: bool,  // Set by UI, handled in backend
-}
+////////////////////////////////////////////////////////////////////////////////
+// Tree views
+////////////////////////////////////////////////////////////////////////////////
 
 // Tree view item actions
 export enum TreeViewItemAction {
@@ -162,6 +561,10 @@ export struct TreeViewItemData {
     pinned: bool,
     action: TreeViewItemAction,  // Set by UI, handled in backend
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Libraries
+////////////////////////////////////////////////////////////////////////////////
 
 // Library actions
 export enum LibraryAction {
@@ -202,3 +605,81 @@ export struct LibraryListData {
     operation-in-progress: bool,
     operation-error: string,
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Schematics
+////////////////////////////////////////////////////////////////////////////////
+
+export enum SchematicAction {
+    open,
+    rename,
+    delete,
+}
+
+export struct SchematicData {
+    name: string,
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Boards
+////////////////////////////////////////////////////////////////////////////////
+
+export enum BoardAction {
+    open-2d,
+    open-3d,
+    copy,
+    delete,
+    export-step,
+    run-quick-check,
+    run-drc,
+    open-setup-dialog,
+    open-drc-setup-dialog,
+}
+
+export struct BoardData {
+    name: string,
+    drc: RuleCheckData,
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Projects
+////////////////////////////////////////////////////////////////////////////////
+
+export enum ProjectAction {
+    close,
+    save,
+    undo,
+    redo,
+    order,
+    export-bom,
+    export-lppz,
+    open-folder,
+    open-output-jobs,
+    open-setup-dialog,
+    new-sheet,
+    new-board,
+    update-library,
+}
+
+export struct ProjectData {
+    valid: bool,
+    path: string,
+    name: string,
+    schematics: [SchematicData],
+    boards: [BoardData],
+    writable: bool,
+    ieee315-symbols: bool,
+    unsaved-changes: bool,
+
+    // Undo/redo
+    can-undo: bool,
+    can-redo: bool,
+    undo-text: string,
+    redo-text: string,
+
+    erc: RuleCheckData,
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// End
+////////////////////////////////////////////////////////////////////////////////

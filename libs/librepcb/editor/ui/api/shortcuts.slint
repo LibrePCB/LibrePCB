@@ -1,0 +1,614 @@
+import {
+    Action,
+    BoardAction,
+    EditorCommand,
+    EditorTool,
+    FeatureState,
+    PanelPage,
+    ProjectAction,
+    SchematicAction,
+    TabAction,
+    TabType,
+    WireMode,
+} from "types.slint";
+import { Backend } from "backend.slint";
+import { Constants } from "constants.slint";
+import { Data } from "data.slint";
+import { EditorCommandSet as Cmd } from "editorcommandset.slint";
+
+export global Shortcuts {
+    property <int> section: Data.current-section-index;
+    property <int> tab: Data.current-section.current-tab-index;
+
+    pure public function is-shortcut(event: KeyEvent, command: EditorCommand) -> bool {
+        (event.text == command.key) && (event.modifiers == command.modifiers)
+    }
+
+    public function process-project-shortcuts(project: int, event: KeyEvent) -> bool {
+        if is-shortcut(event, Cmd.file-manager) {
+            Backend.trigger-project(project, ProjectAction.open-folder);
+            return true;
+        } else if is-shortcut(event, Cmd.project-save) && Data.projects[project].writable {
+            Backend.trigger-project(project, ProjectAction.save);
+            return true;
+        } else if is-shortcut(event, Cmd.project-setup) {
+            Backend.trigger-project(project, ProjectAction.open-setup-dialog);
+            return true;
+        } else if is-shortcut(event, Cmd.project-library-update) {
+            Backend.trigger-project(project, ProjectAction.update-library);
+            return true;
+        } else if is-shortcut(event, Cmd.sheet-new) {
+            Backend.trigger-project(project, ProjectAction.new-sheet);
+            return true;
+        } else if is-shortcut(event, Cmd.board-new) {
+            Backend.trigger-project(project, ProjectAction.new-board);
+            return true;
+        } else if is-shortcut(event, Cmd.export-lppz) {
+            Backend.trigger-project(project, ProjectAction.export-lppz);
+            return true;
+        } else if is-shortcut(event, Cmd.generate-bom) {
+            Backend.trigger-project(project, ProjectAction.export-bom);
+            return true;
+        } else if is-shortcut(event, Cmd.output-jobs) {
+            Backend.trigger-project(project, ProjectAction.open-output-jobs);
+            return true;
+        } else if is-shortcut(event, Cmd.order-pcb) {
+            Backend.trigger-project(project, ProjectAction.order);
+            return true;
+        } else if is-shortcut(event, Cmd.undo) {
+            Backend.trigger-project(project, ProjectAction.undo);
+            return true;
+        } else if is-shortcut(event, Cmd.redo) {
+            Backend.trigger-project(project, ProjectAction.redo);
+            return true;
+        } else if is-shortcut(event, Cmd.project-close) {
+            Backend.trigger-project(project, ProjectAction.close);
+            return true;
+        }
+        false
+    }
+
+    public function process-schematic-shortcuts(project: int, schematic: int, event: KeyEvent) -> bool {
+        if is-shortcut(event, Cmd.sheet-new) {
+            Backend.trigger-project(project, ProjectAction.new-sheet);
+            return true;
+        } else if is-shortcut(event, Cmd.sheet-rename) {
+            Backend.trigger-schematic(project, schematic, SchematicAction.rename);
+            return true;
+        } else if is-shortcut(event, Cmd.sheet-remove) {
+            Backend.trigger-schematic(project, schematic, SchematicAction.delete);
+            return true;
+        }
+        false
+    }
+
+    public function process-board-shortcuts(project: int, board: int, event: KeyEvent) -> bool {
+        if is-shortcut(event, Cmd.board-new) {
+            Backend.trigger-project(project, ProjectAction.new-board);
+            return true;
+        } else if is-shortcut(event, Cmd.board-copy) {
+            Backend.trigger-board(project, board, BoardAction.copy);
+            return true;
+        } else if is-shortcut(event, Cmd.board-remove) {
+            Backend.trigger-board(project, board, BoardAction.delete);
+            return true;
+        } else if is-shortcut(event, Cmd.board-setup) {
+            Backend.trigger-board(project, board, BoardAction.open-setup-dialog);
+            return true;
+        } else if is-shortcut(event, Cmd.export-step) {
+            Backend.trigger-board(project, board, BoardAction.export-step);
+            return true;
+        } else if is-shortcut(event, Cmd.run-quick-check) {
+            Backend.trigger-board(project, board, BoardAction.run-quick-check);
+            Data.panel-page = PanelPage.rule-check;
+            return true;
+        } else if is-shortcut(event, Cmd.run-design-rule-check) {
+            Backend.trigger-board(project, board, BoardAction.run-drc);
+            Data.panel-page = PanelPage.rule-check;
+            return true;
+        }
+        false
+    }
+
+    public function process-tab-shortcuts(event: KeyEvent) -> bool {
+        if is-shortcut(event, Cmd.select-all) && (Data.current-tab.features.select == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.select-all);
+            return true;
+        } else if is-shortcut(event, Cmd.find-next) && (Data.current-tab.features.find == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.find-next);
+            return true;
+        } else if is-shortcut(event, Cmd.find-previous) && (Data.current-tab.features.find == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.find-previous);
+            return true;
+        } else if is-shortcut(event, Cmd.export-image) && (Data.current-tab.features.export-graphics == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.export-image);
+            return true;
+        } else if is-shortcut(event, Cmd.export-pdf) && (Data.current-tab.features.export-graphics == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.export-pdf);
+            return true;
+        } else if is-shortcut(event, Cmd.print) && (Data.current-tab.features.export-graphics == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.print);
+            return true;
+        } else if is-shortcut(event, Cmd.clipboard-cut) && (Data.current-tab.features.cut == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.cut);
+            return true;
+        } else if is-shortcut(event, Cmd.clipboard-copy) && (Data.current-tab.features.copy == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.copy);
+            return true;
+        } else if is-shortcut(event, Cmd.clipboard-paste) && (Data.current-tab.features.paste == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.paste);
+            return true;
+        } else if is-shortcut(event, Cmd.move-left) {
+            Backend.trigger-tab(section, tab, TabAction.move-left);
+            return true;
+        } else if is-shortcut(event, Cmd.move-right) {
+            Backend.trigger-tab(section, tab, TabAction.move-right);
+            return true;
+        } else if is-shortcut(event, Cmd.move-up) {
+            Backend.trigger-tab(section, tab, TabAction.move-up);
+            return true;
+        } else if is-shortcut(event, Cmd.move-down) {
+            Backend.trigger-tab(section, tab, TabAction.move-down);
+            return true;
+        } else if is-shortcut(event, Cmd.rotate-ccw) && (Data.current-tab.features.rotate == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.rotate-ccw);
+            return true;
+        } else if is-shortcut(event, Cmd.rotate-cw) && (Data.current-tab.features.rotate == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.rotate-cw);
+            return true;
+        } else if is-shortcut(event, Cmd.mirror-horizontal) && (Data.current-tab.features.mirror == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.mirror-horizontally);
+            return true;
+        } else if is-shortcut(event, Cmd.mirror-vertical) && (Data.current-tab.features.mirror == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.mirror-vertically);
+            return true;
+        } else if is-shortcut(event, Cmd.flip-horizontal) && (Data.current-tab.features.flip == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.flip-horizontally);
+            return true;
+        } else if is-shortcut(event, Cmd.flip-vertical) && (Data.current-tab.features.flip == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.flip-vertically);
+            return true;
+        } else if is-shortcut(event, Cmd.snap-to-grid) && (Data.current-tab.features.snap-to-grid == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.snap-to-grid);
+            return true;
+        } else if is-shortcut(event, Cmd.lock) && (Data.current-tab.features.lock == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.lock);
+            return true;
+        } else if is-shortcut(event, Cmd.unlock) && (Data.current-tab.features.unlock == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.unlock);
+            return true;
+        } else if is-shortcut(event, Cmd.line-width-increase) && (Data.current-tab.features.modify-line-width == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.line-width-increase);
+            return true;
+        } else if is-shortcut(event, Cmd.line-width-decrease) && (Data.current-tab.features.modify-line-width == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.line-width-decrease);
+            return true;
+        } else if is-shortcut(event, Cmd.line-width-set) && (Data.current-tab.features.modify-line-width == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.line-width-set);
+            return true;
+        } else if is-shortcut(event, Cmd.device-reset-text-all) && (Data.current-tab.features.reset-texts == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.reset-texts);
+            return true;
+        } else if is-shortcut(event, Cmd.properties) && (Data.current-tab.features.edit-properties == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.edit-properties);
+            return true;
+        } else if is-shortcut(event, Cmd.remove) && (Data.current-tab.features.remove == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.delete);
+            return true;
+        } else if is-shortcut(event, Cmd.zoom-fit-content) {
+            Backend.trigger-tab(section, tab, TabAction.zoom-fit);
+            return true;
+        } else if is-shortcut(event, Cmd.zoom-in) {
+            Backend.trigger-tab(section, tab, TabAction.zoom-in);
+            return true;
+        } else if is-shortcut(event, Cmd.zoom-out) {
+            Backend.trigger-tab(section, tab, TabAction.zoom-out);
+            return true;
+        } else if is-shortcut(event, Cmd.grid-increase) {
+            Backend.trigger-tab(section, tab, TabAction.grid-interval-increase);
+            return true;
+        } else if is-shortcut(event, Cmd.grid-decrease) {
+            Backend.trigger-tab(section, tab, TabAction.grid-interval-decrease);
+            return true;
+        } else if is-shortcut(event, Cmd.abort) {
+            Backend.trigger-tab(section, tab, TabAction.abort);
+            return true;
+        }
+        false
+    }
+
+    public function process-schematic-tab-shortcuts(event: KeyEvent) -> bool {
+        // Tool-specific shortcuts
+        if Data.current-section.schematic-tabs[tab].tool == EditorTool.wire {
+            if is-shortcut(event, Cmd.wire-mode-h-v) {
+                Data.current-section.schematic-tabs[tab].tool-wire-mode = WireMode.h-v;
+                return true;
+            } else if is-shortcut(event, Cmd.wire-mode-v-h) {
+                Data.current-section.schematic-tabs[tab].tool-wire-mode = WireMode.v-h;
+                return true;
+            } else if is-shortcut(event, Cmd.wire-mode-90-45) {
+                Data.current-section.schematic-tabs[tab].tool-wire-mode = WireMode.deg90-45;
+                return true;
+            } else if is-shortcut(event, Cmd.wire-mode-45-90) {
+                Data.current-section.schematic-tabs[tab].tool-wire-mode = WireMode.deg45-90;
+                return true;
+            } else if is-shortcut(event, Cmd.wire-mode-straight) {
+                Data.current-section.schematic-tabs[tab].tool-wire-mode = WireMode.straight;
+                return true;
+            }
+        } else if Data.current-section.schematic-tabs[tab].tool == EditorTool.polygon {
+            if is-shortcut(event, Cmd.layer-up) && (Data.current-section.schematic-tabs[tab].tool-layer.current-index > 0) {
+                Data.current-section.schematic-tabs[tab].tool-layer.current-index -= 1;
+                return true;
+            } else if is-shortcut(event, Cmd.layer-down) && (Data.current-section.schematic-tabs[tab].tool-layer.current-index < (Data.current-section.schematic-tabs[tab].tool-layer.items.length - 1)) {
+                Data.current-section.schematic-tabs[tab].tool-layer.current-index += 1;
+                return true;
+            } else if is-shortcut(event, Cmd.line-width-increase) {
+                Data.current-section.schematic-tabs[tab].tool-line-width.increase = true;
+                return true;
+            } else if is-shortcut(event, Cmd.line-width-decrease) && Data.current-section.schematic-tabs[tab].tool-line-width.can-decrease {
+                Data.current-section.schematic-tabs[tab].tool-line-width.decrease = true;
+                return true;
+            } else if is-shortcut(event, Cmd.fill-toggle) {
+                Data.current-section.schematic-tabs[tab].tool-filled = !Data.current-section.schematic-tabs[tab].tool-filled;
+                return true;
+            }
+        } else if Data.current-section.schematic-tabs[tab].tool == EditorTool.text {
+            if is-shortcut(event, Cmd.layer-up) && (Data.current-section.schematic-tabs[tab].tool-layer.current-index > 0) {
+                Data.current-section.schematic-tabs[tab].tool-layer.current-index -= 1;
+                return true;
+            } else if is-shortcut(event, Cmd.layer-down) && (Data.current-section.schematic-tabs[tab].tool-layer.current-index < (Data.current-section.schematic-tabs[tab].tool-layer.items.length - 1)) {
+                Data.current-section.schematic-tabs[tab].tool-layer.current-index += 1;
+                return true;
+            } else if is-shortcut(event, Cmd.size-increase) {
+                Data.current-section.schematic-tabs[tab].tool-size.increase = true;
+                return true;
+            } else if is-shortcut(event, Cmd.size-decrease) && Data.current-section.schematic-tabs[tab].tool-size.can-decrease {
+                Data.current-section.schematic-tabs[tab].tool-size.decrease = true;
+                return true;
+            }
+        }
+
+        // Common shortcuts
+        if is-shortcut(event, Cmd.tool-select) {
+            Backend.trigger-tab(section, tab, TabAction.tool-select);
+            return true;
+        } else if is-shortcut(event, Cmd.tool-polygon) {
+            Backend.trigger-tab(section, tab, TabAction.tool-polygon);
+            return true;
+        } else if is-shortcut(event, Cmd.tool-text) {
+            Backend.trigger-tab(section, tab, TabAction.tool-text);
+            return true;
+        } else if is-shortcut(event, Cmd.tool-wire) {
+            Backend.trigger-tab(section, tab, TabAction.tool-wire);
+            return true;
+        } else if is-shortcut(event, Cmd.tool-netlabel) {
+            Backend.trigger-tab(section, tab, TabAction.tool-netlabel);
+            return true;
+        } else if is-shortcut(event, Cmd.tool-component) {
+            Backend.trigger-tab(section, tab, TabAction.tool-component);
+            return true;
+        } else if is-shortcut(event, Cmd.tool-measure) {
+            Backend.trigger-tab(section, tab, TabAction.tool-measure);
+            return true;
+        } else if is-shortcut(event, Cmd.abort) {
+            Backend.trigger-tab(section, tab, TabAction.abort);
+            return true;
+        } else if process-tab-shortcuts(event) {
+            return true;
+        } else if Backend.scene-key-event(section, event) {
+            return true;
+        } else if process-schematic-shortcuts(Data.current-schematic-tab.project-index, Data.current-schematic-tab.schematic-index, event) {
+            return true;
+        } else if process-project-shortcuts(Data.current-schematic-tab.project-index, event) {
+            return true;
+        }
+        false
+    }
+
+    public function process-board-2d-tab-shortcuts(event: KeyEvent) -> bool {
+        // Tool-specific shortcuts
+        if Data.current-section.board-2d-tabs[tab].tool == EditorTool.wire {
+            if is-shortcut(event, Cmd.layer-up) && (Data.current-section.board-2d-tabs[tab].tool-layer.current-index > 0) {
+                Data.current-section.board-2d-tabs[tab].tool-layer.current-index -= 1;
+                return true;
+            } else if is-shortcut(event, Cmd.layer-down) && (Data.current-section.board-2d-tabs[tab].tool-layer.current-index < (Data.current-section.board-2d-tabs[tab].tool-layer.items.length - 1)) {
+                Data.current-section.board-2d-tabs[tab].tool-layer.current-index += 1;
+                return true;
+            } else if is-shortcut(event, Cmd.line-width-increase) {
+                Data.current-section.board-2d-tabs[tab].tool-line-width.increase = true;
+                return true;
+            } else if is-shortcut(event, Cmd.line-width-decrease) && Data.current-section.board-2d-tabs[tab].tool-line-width.can-decrease {
+                Data.current-section.board-2d-tabs[tab].tool-line-width.decrease = true;
+                return true;
+            } else if is-shortcut(event, Cmd.width-auto-toggle) {
+                Data.current-section.board-2d-tabs[tab].tool-filled = !Data.current-section.board-2d-tabs[tab].tool-filled;
+                return true;
+            } else if is-shortcut(event, Cmd.size-increase) {
+                Data.current-section.board-2d-tabs[tab].tool-size.increase = true;
+                return true;
+            } else if is-shortcut(event, Cmd.size-decrease) && Data.current-section.board-2d-tabs[tab].tool-size.can-decrease {
+                Data.current-section.board-2d-tabs[tab].tool-size.decrease = true;
+                return true;
+            } else if is-shortcut(event, Cmd.drill-increase) {
+                Data.current-section.board-2d-tabs[tab].tool-drill.increase = true;
+                return true;
+            } else if is-shortcut(event, Cmd.drill-decrease) && Data.current-section.board-2d-tabs[tab].tool-drill.can-decrease {
+                Data.current-section.board-2d-tabs[tab].tool-drill.decrease = true;
+                return true;
+            } else if is-shortcut(event, Cmd.wire-mode-h-v) {
+                Data.current-section.board-2d-tabs[tab].tool-wire-mode = WireMode.h-v;
+                return true;
+            } else if is-shortcut(event, Cmd.wire-mode-v-h) {
+                Data.current-section.board-2d-tabs[tab].tool-wire-mode = WireMode.v-h;
+                return true;
+            } else if is-shortcut(event, Cmd.wire-mode-90-45) {
+                Data.current-section.board-2d-tabs[tab].tool-wire-mode = WireMode.deg90-45;
+                return true;
+            } else if is-shortcut(event, Cmd.wire-mode-45-90) {
+                Data.current-section.board-2d-tabs[tab].tool-wire-mode = WireMode.deg45-90;
+                return true;
+            } else if is-shortcut(event, Cmd.wire-mode-straight) {
+                Data.current-section.board-2d-tabs[tab].tool-wire-mode = WireMode.straight;
+                return true;
+            }
+        } else if Data.current-section.board-2d-tabs[tab].tool == EditorTool.via {
+            if is-shortcut(event, Cmd.size-increase) {
+                Data.current-section.board-2d-tabs[tab].tool-size.increase = true;
+                return true;
+            } else if is-shortcut(event, Cmd.size-decrease) && Data.current-section.board-2d-tabs[tab].tool-size.can-decrease {
+                Data.current-section.board-2d-tabs[tab].tool-size.decrease = true;
+                return true;
+            } else if is-shortcut(event, Cmd.drill-increase) {
+                Data.current-section.board-2d-tabs[tab].tool-drill.increase = true;
+                return true;
+            } else if is-shortcut(event, Cmd.drill-decrease) && Data.current-section.board-2d-tabs[tab].tool-drill.can-decrease {
+                Data.current-section.board-2d-tabs[tab].tool-drill.decrease = true;
+                return true;
+            }
+        } else if Data.current-section.board-2d-tabs[tab].tool == EditorTool.polygon {
+            if is-shortcut(event, Cmd.layer-up) && (Data.current-section.board-2d-tabs[tab].tool-layer.current-index > 0) {
+                Data.current-section.board-2d-tabs[tab].tool-layer.current-index -= 1;
+                return true;
+            } else if is-shortcut(event, Cmd.layer-down) && (Data.current-section.board-2d-tabs[tab].tool-layer.current-index < (Data.current-section.board-2d-tabs[tab].tool-layer.items.length - 1)) {
+                Data.current-section.board-2d-tabs[tab].tool-layer.current-index += 1;
+                return true;
+            } else if is-shortcut(event, Cmd.line-width-increase) {
+                Data.current-section.board-2d-tabs[tab].tool-line-width.increase = true;
+                return true;
+            } else if is-shortcut(event, Cmd.line-width-decrease) && Data.current-section.board-2d-tabs[tab].tool-line-width.can-decrease {
+                Data.current-section.board-2d-tabs[tab].tool-line-width.decrease = true;
+                return true;
+            } else if is-shortcut(event, Cmd.fill-toggle) {
+                Data.current-section.board-2d-tabs[tab].tool-filled = !Data.current-section.board-2d-tabs[tab].tool-filled;
+                return true;
+            }
+        } else if Data.current-section.board-2d-tabs[tab].tool == EditorTool.text {
+            if is-shortcut(event, Cmd.layer-up) && (Data.current-section.board-2d-tabs[tab].tool-layer.current-index > 0) {
+                Data.current-section.board-2d-tabs[tab].tool-layer.current-index -= 1;
+                return true;
+            } else if is-shortcut(event, Cmd.layer-down) && (Data.current-section.board-2d-tabs[tab].tool-layer.current-index < (Data.current-section.board-2d-tabs[tab].tool-layer.items.length - 1)) {
+                Data.current-section.board-2d-tabs[tab].tool-layer.current-index += 1;
+                return true;
+            } else if is-shortcut(event, Cmd.size-increase) {
+                Data.current-section.board-2d-tabs[tab].tool-size.increase = true;
+                return true;
+            } else if is-shortcut(event, Cmd.size-decrease) && Data.current-section.board-2d-tabs[tab].tool-size.can-decrease {
+                Data.current-section.board-2d-tabs[tab].tool-size.decrease = true;
+                return true;
+            }
+        } else if Data.current-section.board-2d-tabs[tab].tool == EditorTool.plane {
+            if is-shortcut(event, Cmd.layer-up) && (Data.current-section.board-2d-tabs[tab].tool-layer.current-index > 0) {
+                Data.current-section.board-2d-tabs[tab].tool-layer.current-index -= 1;
+                return true;
+            } else if is-shortcut(event, Cmd.layer-down) && (Data.current-section.board-2d-tabs[tab].tool-layer.current-index < (Data.current-section.board-2d-tabs[tab].tool-layer.items.length - 1)) {
+                Data.current-section.board-2d-tabs[tab].tool-layer.current-index += 1;
+                return true;
+            }
+        } else if Data.current-section.board-2d-tabs[tab].tool == EditorTool.zone {
+            if is-shortcut(event, Cmd.layer-up) && (Data.current-section.board-2d-tabs[tab].tool-layer.current-index > 0) {
+                Data.current-section.board-2d-tabs[tab].tool-layer.current-index -= 1;
+                return true;
+            } else if is-shortcut(event, Cmd.layer-down) && (Data.current-section.board-2d-tabs[tab].tool-layer.current-index < (Data.current-section.board-2d-tabs[tab].tool-layer.items.length - 1)) {
+                Data.current-section.board-2d-tabs[tab].tool-layer.current-index += 1;
+                return true;
+            }
+        } else if Data.current-section.board-2d-tabs[tab].tool == EditorTool.hole {
+            if is-shortcut(event, Cmd.drill-increase) {
+                Data.current-section.board-2d-tabs[tab].tool-drill.increase = true;
+                return true;
+            } else if is-shortcut(event, Cmd.drill-decrease) && Data.current-section.board-2d-tabs[tab].tool-drill.can-decrease {
+                Data.current-section.board-2d-tabs[tab].tool-drill.decrease = true;
+                return true;
+            }
+        }
+
+        // Common shortcuts
+        if is-shortcut(event, Cmd.plane-hide-all) {
+            Backend.trigger-tab(section, tab, TabAction.planes-hide);
+            return true;
+        } else if is-shortcut(event, Cmd.plane-show-all) {
+            Backend.trigger-tab(section, tab, TabAction.planes-show);
+            return true;
+        } else if is-shortcut(event, Cmd.plane-rebuild-all) {
+            Backend.trigger-tab(section, tab, TabAction.planes-rebuild);
+            return true;
+        } else if is-shortcut(event, Cmd.generate-fabrication-data) {
+            Backend.trigger-tab(section, tab, TabAction.export-fabrication-data);
+            return true;
+        } else if is-shortcut(event, Cmd.generate-pick-place) {
+            Backend.trigger-tab(section, tab, TabAction.export-pick-place);
+            return true;
+        } else if is-shortcut(event, Cmd.generate-d356-netlist) {
+            Backend.trigger-tab(section, tab, TabAction.export-d356-netlist);
+            return true;
+        } else if is-shortcut(event, Cmd.export-specctra-dsn) {
+            Backend.trigger-tab(section, tab, TabAction.export-specctra);
+            return true;
+        } else if is-shortcut(event, Cmd.import-specctra-ses) {
+            Backend.trigger-tab(section, tab, TabAction.import-specctra);
+            return true;
+        } else if is-shortcut(event, Cmd.import-dxf) {
+            Backend.trigger-tab(section, tab, TabAction.import-dxf);
+            return true;
+        } else if is-shortcut(event, Cmd.ignore-locks) {
+            Data.current-section.board-2d-tabs[tab].ignore-placement-locks = !Data.current-section.board-2d-tabs[tab].ignore-placement-locks;
+            return true;
+        } else if is-shortcut(event, Cmd.toggle-3d) {
+            Backend.trigger-board(Data.current-section.board-2d-tabs[tab].project-index, Data.current-section.board-2d-tabs[tab].board-index, BoardAction.open-3d);
+            return true;
+        } else if is-shortcut(event, Cmd.tool-select) {
+            Backend.trigger-tab(section, tab, TabAction.tool-select);
+            return true;
+        } else if is-shortcut(event, Cmd.tool-wire) {
+            Backend.trigger-tab(section, tab, TabAction.tool-wire);
+            return true;
+        } else if is-shortcut(event, Cmd.tool-via) {
+            Backend.trigger-tab(section, tab, TabAction.tool-via);
+            return true;
+        } else if is-shortcut(event, Cmd.tool-polygon) {
+            Backend.trigger-tab(section, tab, TabAction.tool-polygon);
+            return true;
+        } else if is-shortcut(event, Cmd.tool-text) {
+            Backend.trigger-tab(section, tab, TabAction.tool-text);
+            return true;
+        } else if is-shortcut(event, Cmd.tool-plane) {
+            Backend.trigger-tab(section, tab, TabAction.tool-plane);
+            return true;
+        } else if is-shortcut(event, Cmd.tool-zone) {
+            Backend.trigger-tab(section, tab, TabAction.tool-zone);
+            return true;
+        } else if is-shortcut(event, Cmd.tool-hole) {
+            Backend.trigger-tab(section, tab, TabAction.tool-hole);
+            return true;
+        } else if is-shortcut(event, Cmd.tool-measure) {
+            Backend.trigger-tab(section, tab, TabAction.tool-measure);
+            return true;
+        } else if is-shortcut(event, Cmd.abort) {
+            Backend.trigger-tab(section, tab, TabAction.abort);
+            return true;
+        } else if process-tab-shortcuts(event) {
+            return true;
+        } else if Backend.scene-key-event(section, event) {
+            return true;
+        } else if process-board-shortcuts(Data.current-board-2d-tab.project-index, Data.current-board-2d-tab.board-index, event) {
+            return true;
+        } else if process-project-shortcuts(Data.current-board-2d-tab.project-index, event) {
+            return true;
+        }
+        false
+    }
+
+    public function process-board-3d-tab-shortcuts(event: KeyEvent) -> bool {
+        if is-shortcut(event, Cmd.zoom-fit-content) {
+            Backend.trigger-tab(section, tab, TabAction.zoom-fit);
+            return true;
+        } else if is-shortcut(event, Cmd.zoom-in) {
+            Backend.trigger-tab(section, tab, TabAction.zoom-in);
+            return true;
+        } else if is-shortcut(event, Cmd.zoom-out) {
+            Backend.trigger-tab(section, tab, TabAction.zoom-out);
+            return true;
+        } else if is-shortcut(event, Cmd.toggle-3d) {
+            Backend.trigger-board(Data.current-board-3d-tab.project-index, Data.current-board-3d-tab.board-index, BoardAction.open-2d);
+            return true;
+        } else if Backend.scene-key-event(section, event) {
+            return true;
+        } else if process-board-shortcuts(Data.current-board-3d-tab.project-index, Data.current-board-3d-tab.board-index, event) {
+            return true;
+        } else if process-project-shortcuts(Data.current-board-3d-tab.project-index, event) {
+            return true;
+        }
+        false
+    }
+
+    public function process(event: KeyEvent) -> bool {
+        // Tab shortcuts
+        if Data.current-tab.type == TabType.schematic {
+            if process-schematic-tab-shortcuts(event) {
+                return true;
+            }
+        } else if Data.current-tab.type == TabType.board-2d {
+            if process-board-2d-tab-shortcuts(event) {
+                return true;
+            }
+        } else if Data.current-tab.type == TabType.board-3d {
+            if process-board-3d-tab-shortcuts(event) {
+                return true;
+            }
+        }
+
+        // Global shortcuts
+        if is-shortcut(event, Cmd.file-manager) {
+            Backend.trigger(Action.workspace-open-folder);
+            return true;
+        } else if is-shortcut(event, Cmd.workspace-switch) {
+            Backend.trigger(Action.workspace-switch);
+            return true;
+        } else if is-shortcut(event, Cmd.workspace-settings) {
+            Backend.trigger(Action.workspace-settings);
+            return true;
+        } else if is-shortcut(event, Cmd.workspace-libraries-rescan) {
+            Backend.trigger(Action.workspace-libraries-rescan);
+            return true;
+        } else if is-shortcut(event, Cmd.library-manager) {
+            Data.panel-page = PanelPage.libraries;
+            return true;
+        } else if is-shortcut(event, Cmd.project-new) {
+            Backend.trigger(Action.project-new);
+            return true;
+        } else if is-shortcut(event, Cmd.project-open) {
+            Backend.trigger(Action.project-open);
+            return true;
+        } else if is-shortcut(event, Cmd.add-example-projects) {
+            Backend.trigger(Action.project-import-examples);
+            return true;
+        } else if is-shortcut(event, Cmd.import-eagle-project) {
+            Backend.trigger(Action.project-import-eagle);
+            return true;
+        } else if is-shortcut(event, Cmd.dock-erc) && Data.current-project.valid {
+            Data.current-rule-check-board-index = -1;
+            Data.panel-page = PanelPage.rule-check;
+            return true;
+        } else if is-shortcut(event, Cmd.dock-drc) && Data.current-tab.type == TabType.board-2d {
+            Data.current-rule-check-board-index = Data.current-board-2d-tab.board-index;
+            Data.panel-page = PanelPage.rule-check;
+            return true;
+        } else if is-shortcut(event, Cmd.dock-layers) && (Data.current-tab.layers.length > 0) {
+            Data.panel-page = PanelPage.layers;
+            return true;
+        } else if is-shortcut(event, Cmd.dock-place-devices) && (Data.current-tab.type == TabType.board-2d) {
+            Data.panel-page = PanelPage.place-devices;
+        } else if is-shortcut(event, Cmd.window-new) {
+            Backend.trigger(Action.window-new);
+            return true;
+        } else if is-shortcut(event, Cmd.window-close) {
+            Backend.trigger(Action.window-close);
+            return true;
+        } else if is-shortcut(event, Cmd.application-quit) {
+            Backend.trigger(Action.quit);
+            return true;
+        } else if is-shortcut(event, Cmd.about-librepcb) {
+            Data.panel-page = PanelPage.about;
+            return true;
+        } else if is-shortcut(event, Cmd.website) {
+            Backend.open-url(Constants.website-url);
+            return true;
+        } else if is-shortcut(event, Cmd.documentation-online) {
+            Backend.open-url(Constants.user-manual-url);
+            return true;
+        } else if is-shortcut(event, Cmd.support) {
+            Backend.open-url(Constants.support-url);
+            return true;
+        } else if is-shortcut(event, Cmd.donate) {
+            Backend.open-url(Constants.donate-url);
+            return true;
+        } else if is-shortcut(event, Cmd.keyboard-shortcuts-reference) {
+            Backend.trigger(Action.keyboard-shortcuts-reference);
+            return true;
+        } else if Data.current-project.valid && process-project-shortcuts(Data.current-project-index, event) {
+            return true;
+        }
+        false
+    }
+}

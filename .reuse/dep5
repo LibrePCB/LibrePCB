@@ -15,7 +15,6 @@ Files:
  img/app/librepcb.png
  img/app/librepcb.svg
  img/images.qrc
- img/logo/32x32.png
  img/logo/48x48.png
  img/logo/64x64.png
  libs/librepcb/*
@@ -41,25 +40,22 @@ Files:
  CONTRIBUTING.md
  img/actions/add_hole.png
  img/actions/add_name.png
- img/actions/add_plane.png
  img/actions/add_smt_pad.png
  img/actions/add_symbol_pin.png
  img/actions/add_text.png
  img/actions/add_tht_pad.png
  img/actions/add_value.png
- img/actions/add_via.png
  img/actions/board_editor.png
  img/actions/draw_line.png
- img/actions/draw_netlabel.png
  img/actions/draw_wire.png
  img/actions/draw_zone.png
  img/actions/export_pick_place_file.png
  img/actions/grid.png
- img/actions/hide_planes.png
- img/actions/rebuild_plane.png
  img/actions/schematic.png
- img/actions/show_pin_numbers.png
- img/actions/show_planes.png
+ img/capacitor-bipolar-eu.svg
+ img/capacitor-bipolar-us.svg
+ img/capacitor-unipolar-eu.svg
+ img/capacitor-unipolar-us.svg
  img/command_toolbars/pad_bottom.png
  img/command_toolbars/pad_top.png
  img/command_toolbars/shape_octagon.png
@@ -72,21 +68,19 @@ Files:
  img/command_toolbars/wire_straight.png
  img/command_toolbars/wire_v_h.png
  img/empty.png
- img/library/bipolar_capacitor_eu.png
- img/library/bipolar_capacitor_us.png
+ img/gnd.svg
+ img/grid-dots.svg
+ img/grid-none.svg
+ img/inductor-eu.svg
+ img/inductor-us.svg
  img/library/footprint.png
- img/library/gnd.png
- img/library/inductor_eu.png
- img/library/inductor_us.png
- img/library/resistor_eu.png
- img/library/resistor_us.png
  img/library/symbol.png
- img/library/unipolar_capacitor_eu.png
- img/library/unipolar_capacitor_us.png
- img/library/vcc.png
  img/norm/iec_60617.png
  img/norm/ieee_315.png
  img/README.md
+ img/resistor-eu.svg
+ img/resistor-us.svg
+ img/vcc.svg
  img/video-tutorial.png
  img/wizards/watermark.jpg
  libs/README.md
@@ -166,10 +160,6 @@ Files:
 Copyright: Part-DB Developers
 License: GPL-2.0-only
 
-Files: img/actions/add_component.png
-Copyright: Open Icon Library and LibrePCB Developers
-License: LGPL-2.1-only
-
 Files:
  img/actions/minus.png
  img/actions/undo.png
@@ -206,7 +196,6 @@ License: LGPL-2.1-only
 Files:
  img/actions/delete.png
  img/actions/export_zip.png
- img/actions/home.png
  img/actions/open_browser.png
  img/actions/output_jobs.png
  img/actions/paste.png
@@ -226,7 +215,6 @@ Copyright: Open Icon Library
 License: CC-BY-3.0
 
 Files:
- img/actions/close.png
  img/actions/copy.png
  img/actions/download.png
  img/actions/draw_arc.png
@@ -240,7 +228,6 @@ Files:
  img/actions/open.png
  img/actions/pdf.png
  img/actions/print.png
- img/actions/quick_check.png
  img/actions/refresh.png
  img/actions/rotate_left.png
  img/actions/rotate_right.png
@@ -254,14 +241,11 @@ Files:
  img/command_toolbars/align_vertical_center.png
  img/command_toolbars/align_vertical_top.png
  img/status/dialog_warning.png
- img/status/locked.png
- img/status/unlocked.png
 Copyright: Open Icon Library
 License: CC-BY-SA-3.0 or LGPL-2.1-only
 
 Files:
  img/actions/clone.png
- img/actions/drc.png
  img/actions/export.png
  img/actions/export_pixmap.png
  img/actions/flip_horizontal.png

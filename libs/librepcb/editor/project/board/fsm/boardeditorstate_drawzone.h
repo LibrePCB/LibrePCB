@@ -74,7 +74,6 @@ public:
       const GraphicsSceneMouseEvent& e) noexcept override;
   virtual bool processGraphicsSceneLeftMouseButtonDoubleClicked(
       const GraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processSwitchToBoard(int index) noexcept override;
 
   // Connection to UI
   QSet<const Layer*> getAvailableLayers() noexcept;

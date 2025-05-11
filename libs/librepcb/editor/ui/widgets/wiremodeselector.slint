@@ -1,0 +1,102 @@
+import { IconButton } from "iconbutton.slint";
+import {
+    Constants,
+    Helpers,
+    WireMode,
+} from "../api.slint";
+
+component WireModeButton inherits IconButton {
+    width: 18px;
+    style: checkable-hyperlink;
+    color-enabled: #606060;
+    color-checked: #c0c0c0;
+}
+
+export component WireModeSelector inherits Rectangle {
+    in-out property <WireMode> wire-mode;
+    in property <bool> enabled: true;
+
+    callback wire-mode-clicked(WireMode);
+    wire-mode-clicked(mode) => {
+        wire-mode = mode;
+    }
+
+    width: self.preferred-width;
+    preferred-height: 28px;
+    background: #202020;
+    border-color: {
+        if fs.has-focus {
+            Constants.librepcb-color
+        } else if enabled {
+            #606060
+        } else {
+            transparent
+        }
+    }
+    border-width: 1px;
+    border-radius: 10px;
+    forward-focus: fs;
+
+    fs := FocusScope {
+        HorizontalLayout {
+            padding: 5px;
+            spacing: 3px;
+
+            WireModeButton {
+                icon: @image-url("../../../../../img/command_toolbars/wire_h_v.png");
+                checked: wire-mode == WireMode.h-v;
+
+                clicked => {
+                    wire-mode-clicked(WireMode.h-v);
+                }
+            }
+
+            WireModeButton {
+                icon: @image-url("../../../../../img/command_toolbars/wire_v_h.png");
+                checked: wire-mode == WireMode.v-h;
+
+                clicked => {
+                    wire-mode-clicked(WireMode.v-h);
+                }
+            }
+
+            WireModeButton {
+                icon: @image-url("../../../../../img/command_toolbars/wire_90_45.png");
+                checked: wire-mode == WireMode.deg90-45;
+
+                clicked => {
+                    wire-mode-clicked(WireMode.deg90-45);
+                }
+            }
+
+            WireModeButton {
+                icon: @image-url("../../../../../img/command_toolbars/wire_45_90.png");
+                checked: wire-mode == WireMode.deg45-90;
+
+                clicked => {
+                    wire-mode-clicked(WireMode.deg45-90);
+                }
+            }
+
+            WireModeButton {
+                icon: @image-url("../../../../../img/command_toolbars/wire_straight.png");
+                checked: wire-mode == WireMode.straight;
+
+                clicked => {
+                    wire-mode-clicked(WireMode.straight);
+                }
+            }
+        }
+
+        key-pressed(event) => {
+            if event.text == Key.LeftArrow {
+                wire-mode-clicked(Helpers.get-previous-wire-mode(wire-mode));
+                return accept;
+            } else if event.text == Key.RightArrow {
+                wire-mode-clicked(Helpers.get-next-wire-mode(wire-mode));
+                return accept;
+            }
+            reject
+        }
+    }
+}

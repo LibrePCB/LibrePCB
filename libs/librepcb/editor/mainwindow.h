@@ -67,6 +67,8 @@ public:
   void makeCurrentWindow() noexcept;
   void showPanelPage(ui::PanelPage page) noexcept;
   void popUpNotifications() noexcept;
+  void showStatusBarMessage(const QString& message, int timeoutMs);
+  void setCurrentProject(int index) noexcept;
 
   // Operator Overloadings
   MainWindow& operator=(const MainWindow& rhs) = delete;
@@ -79,11 +81,20 @@ private:
   void trigger(ui::Action a) noexcept;
   void triggerSection(int section, ui::WindowSectionAction a) noexcept;
   void triggerTab(int section, int tab, ui::TabAction a) noexcept;
+  void triggerProject(int index, ui::ProjectAction a) noexcept;
+  void triggerSchematic(int project, int schematic,
+                        ui::SchematicAction a) noexcept;
+  void triggerBoard(int project, int board, ui::BoardAction a) noexcept;
+  void openSchematicTab(int projectIndex, int index) noexcept;
+  void openBoard2dTab(int projectIndex, int index) noexcept;
+  void openBoard3dTab(int projectIndex, int index) noexcept;
   void splitSection(int index, bool makeCurrent) noexcept;
   void updateHomeTabSection() noexcept;
   void addTab(std::shared_ptr<WindowTab> tab) noexcept;
   template <typename T>
   bool switchToTab() noexcept;
+  template <typename T>
+  bool switchToProjectTab(int prjIndex, int objIndex) noexcept;
 
   const int mId;
   const QString mSettingsPrefix;
@@ -93,6 +104,8 @@ private:
   std::shared_ptr<UiObjectList<WindowSection, ui::WindowSectionData>> mSections;
   std::unique_ptr<ProjectReadmeRenderer> mProjectPreviewRenderer;
   std::unique_ptr<MainWindowTestAdapter> mTestAdapter;
+
+  friend class MainWindowTestAdapter;
 };
 
 /*******************************************************************************

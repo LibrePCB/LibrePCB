@@ -19,21 +19,21 @@ def test_create_new_workspace(librepcb, helpers):
         # Open "Switch Workspace" dialog.
         app.widget('mainWindow').properties()['visible'] is True
         app.widget('mainWindowTestAdapter').call_slot('trigger', 'workspace-switch')
-        wizard = app.widget('mainWindowInitWorkspaceWizard')
+        wizard = app.widget('initWorkspaceWizard')
 
         # Choose workspace path.
-        path_edit = app.widget('mainWindowInitWorkspaceWizardChooseWorkspacePathEdit')
+        path_edit = app.widget('initWorkspaceWizardChooseWorkspacePathEdit')
         assert path_edit.properties()['text'] == librepcb.workspace_path
-        status_label = app.widget('mainWindowInitWorkspaceWizardChooseWorkspaceStatusLabel')
+        status_label = app.widget('initWorkspaceWizardChooseWorkspaceStatusLabel')
         assert 'contains a valid workspace' in status_label.properties()['text']
         path_edit.set_property('text', test_workspace_path)
         assert 'workspace will be created' in status_label.properties()['text']
-        app.widget('mainWindowInitWorkspaceWizardNextButton').click()
+        app.widget('initWorkspaceWizardNextButton').click()
 
         # Choose workspace settings.
-        user_edit = app.widget('mainWindowInitWorkspaceWizardChooseSettingsUserNameEdit')
+        user_edit = app.widget('initWorkspaceWizardChooseSettingsUserNameEdit')
         user_edit.set_property('text', 'foobar 1337')
-        app.widget('mainWindowInitWorkspaceWizardFinishButton').click()
+        app.widget('initWorkspaceWizardFinishButton').click()
 
         # Verify that the workspace has been created.
         helpers.wait_until_widget_hidden(wizard)
@@ -45,7 +45,7 @@ def test_create_new_workspace(librepcb, helpers):
     with librepcb.open() as app:
         app.widget('mainWindow').properties()['visible'] is True
         app.widget('mainWindowTestAdapter').call_slot('trigger', 'workspace-settings')
-        user_edit = app.widget('mainWindowWorkspaceSettingsDialogGeneralUserNameEdit')
+        user_edit = app.widget('workspaceSettingsDialogGeneralUserNameEdit')
         assert user_edit.properties()['text'] == 'foobar 1337'
 
 
@@ -59,16 +59,16 @@ def test_open_compatible_workspace(librepcb, helpers):
         # Open "Switch Workspace" dialog.
         app.widget('mainWindow').properties()['visible'] is True
         app.widget('mainWindowTestAdapter').call_slot('trigger', 'workspace-switch')
-        wizard = app.widget('mainWindowInitWorkspaceWizard')
+        wizard = app.widget('initWorkspaceWizard')
 
         # Choose workspace path.
-        path_edit = app.widget('mainWindowInitWorkspaceWizardChooseWorkspacePathEdit')
+        path_edit = app.widget('initWorkspaceWizardChooseWorkspacePathEdit')
         assert path_edit.properties()['text'] == librepcb.workspace_path
-        status_label = app.widget('mainWindowInitWorkspaceWizardChooseWorkspaceStatusLabel')
+        status_label = app.widget('initWorkspaceWizardChooseWorkspaceStatusLabel')
         assert 'contains a valid workspace' in status_label.properties()['text']
         path_edit.set_property('text', test_workspace_path)
         assert 'contains a valid workspace' in status_label.properties()['text']
-        app.widget('mainWindowInitWorkspaceWizardFinishButton').click()
+        app.widget('initWorkspaceWizardFinishButton').click()
         helpers.wait_until_widget_hidden(wizard)
 
     # Open LibrePCB again to see if the workspace is automatically opened.

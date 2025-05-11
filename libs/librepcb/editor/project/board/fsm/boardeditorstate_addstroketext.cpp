@@ -83,6 +83,9 @@ bool BoardEditorState_AddStrokeText::entry() noexcept {
   if (!addText(pos)) return false;
 
   mAdapter.fsmToolEnter(*this);
+  mAdapter.fsmSetFeatures(
+      BoardEditorFsmAdapter::Features(BoardEditorFsmAdapter::Feature::Rotate |
+                                      BoardEditorFsmAdapter::Feature::Flip));
   mAdapter.fsmSetViewCursor(Qt::CrossCursor);
   return true;
 }
@@ -92,6 +95,7 @@ bool BoardEditorState_AddStrokeText::exit() noexcept {
   if (!abortCommand(true)) return false;
 
   mAdapter.fsmSetViewCursor(std::nullopt);
+  mAdapter.fsmSetFeatures(BoardEditorFsmAdapter::Features());
   mAdapter.fsmToolLeave();
   return true;
 }
@@ -212,15 +216,14 @@ bool BoardEditorState_AddStrokeText::addText(const Point& pos) noexcept {
   abortBlockingToolsInOtherEditors();
 
   Q_ASSERT(mIsUndoCmdActive == false);
-  Board* board = getActiveBoard();
-  if (!board) return false;
 
   try {
     mContext.undoStack.beginCmdGroup(tr("Add text to board"));
     mIsUndoCmdActive = true;
     mCurrentProperties.setPosition(pos);
     mCurrentTextToPlace = new BI_StrokeText(
-        *board, BoardStrokeTextData(Uuid::createRandom(), mCurrentProperties));
+        mContext.board,
+        BoardStrokeTextData(Uuid::createRandom(), mCurrentProperties));
     std::unique_ptr<CmdBoardStrokeTextAdd> cmdAdd(
         new CmdBoardStrokeTextAdd(*mCurrentTextToPlace));
     mContext.undoStack.appendToCmdGroup(cmdAdd.release());

@@ -1,11 +1,27 @@
-import { MenuPopup, MenuItem, MenuSeparator } from "widgets.slint";
+import {
+    Badge,
+    IconButton,
+    LineEdit,
+    MenuItem,
+    MenuPopup,
+    MenuSeparator,
+} from "widgets.slint";
 import {
     Action,
     Backend,
+    BoardAction,
     Constants,
     Data,
     EditorCommandSet as Cmd,
+    FeatureState,
+    Helpers,
     PanelPage,
+    ProjectAction,
+    ProjectData,
+    SchematicAction,
+    Shortcuts,
+    TabAction,
+    TabType,
     WindowSectionAction,
 } from "api.slint";
 
@@ -14,7 +30,7 @@ component MainMenuItem inherits Rectangle {
 
     callback clicked <=> ta.clicked;
 
-    width: txt.preferred-width + 10px;
+    width: self.visible ? (txt.preferred-width + 10px) : 0;
     background: ta.has-hover ? #505050 : #252525;
 
     // Accessibility
@@ -33,7 +49,59 @@ component MainMenuItem inherits Rectangle {
     ta := TouchArea { }
 }
 
+component MenuBarButton inherits IconButton {
+    style: hyperlink;
+}
+
+component MenuBarSeparator inherits Rectangle {
+    width: 5px;
+
+    Rectangle {
+        width: 1px;
+        height: 15px;
+        background: #606060;
+    }
+}
+
 export component MainMenuBar inherits Rectangle {
+    in property <length> sections-start-x;
+    property <string> undo-text: {
+        if Data.current-project.undo-text.is-empty {
+            @tr("Undo")
+        } else {
+            @tr("Undo: {}", Data.current-project.undo-text)
+        }
+    };
+    property <string> redo-text: {
+        if Data.current-project.redo-text.is-empty {
+            @tr("Redo")
+        } else {
+            @tr("Redo: {}", Data.current-project.redo-text)
+        }
+    };
+    property <int> current-tab-project-index: {
+        if Data.current-tab.type == TabType.schematic {
+            Data.current-schematic-tab.project-index
+        } else if Data.current-tab.type == TabType.board-2d {
+            Data.current-board-2d-tab.project-index
+        } else if Data.current-tab.type == TabType.board-3d {
+            Data.current-board-3d-tab.project-index
+        } else {
+            -1
+        }
+    };
+    property <ProjectData> current-tab-project: Data.projects[current-tab-project-index];
+
+    callback focus-root;
+    callback focus-grid-interval;
+
+    public function focus-search() {
+        if search-edt.enabled {
+            search-edt.select-all();
+            search-edt.focus();
+        }
+    }
+
     background: #252525;
 
     HorizontalLayout {
@@ -52,7 +120,6 @@ export component MainMenuBar inherits Rectangle {
 
                 new-project-item := MenuItem {
                     cmd: Cmd.project-new;
-                    icon: @image-url("../../../font-awesome/svgs/solid/file-circle-plus.svg");
 
                     clicked => {
                         Backend.trigger(Action.project-new);
@@ -61,7 +128,6 @@ export component MainMenuBar inherits Rectangle {
 
                 open-project-item := MenuItem {
                     cmd: Cmd.project-open;
-                    icon: @image-url("../../../font-awesome/svgs/solid/folder-open.svg");
 
                     clicked => {
                         Backend.trigger(Action.project-open);
@@ -117,15 +183,119 @@ export component MainMenuBar inherits Rectangle {
 
                 MenuSeparator { }
 
-                open-workspace-folder-item := MenuItem {
-                    cmd: Cmd.file-manager;
-                    text: @tr("Open Workspace Folder");  // More specific.
-                    status-tip: "Open the workspace directory in the file manager";  // More specific.
+                print-item := MenuItem {
+                    cmd: Cmd.print;
+                    icon: @image-url("../../../bootstrap-icons/icons/printer-fill.svg");
+                    enabled: Data.current-tab.features.export-graphics == FeatureState.enabled;
 
                     clicked => {
-                        Backend.trigger(Action.workspace-open-folder);
+                        Helpers.trigger-current-tab-action(TabAction.print);
                     }
                 }
+
+                export-pdf-item := MenuItem {
+                    cmd: Cmd.export-pdf;
+                    icon: @image-url("../../../font-awesome/svgs/solid/file-pdf.svg");
+                    enabled: Data.current-tab.features.export-graphics == FeatureState.enabled;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.export-pdf);
+                    }
+                }
+
+                export-image-item := MenuItem {
+                    cmd: Cmd.export-image;
+                    icon: @image-url("../../../bootstrap-icons/icons/image.svg");
+                    enabled: Data.current-tab.features.export-graphics == FeatureState.enabled;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.export-image);
+                    }
+                }
+
+                export-step-item := MenuItem {
+                    cmd: Cmd.export-step;
+                    enabled: (Data.current-tab.type == TabType.board-2d) || (Data.current-tab.type == TabType.board-3d);
+
+                    clicked => {
+                        if Data.current-tab.type == TabType.board-2d {
+                            Backend.trigger-board(Data.current-board-2d-tab.project-index, Data.current-board-2d-tab.board-index, BoardAction.export-step);
+                        } else {
+                            Backend.trigger-board(Data.current-board-3d-tab.project-index, Data.current-board-3d-tab.board-index, BoardAction.export-step);
+                        }
+                    }
+                }
+
+                export-bom-item := MenuItem {
+                    cmd: Cmd.generate-bom;
+                    enabled: (Data.current-tab.type == TabType.schematic) || (Data.current-tab.type == TabType.board-2d) || (Data.current-tab.type == TabType.board-3d);
+
+                    clicked => {
+                        if Data.current-tab.type == TabType.schematic {
+                            Backend.trigger-project(Data.current-schematic-tab.project-index, ProjectAction.export-bom);
+                        } else {
+                            Helpers.trigger-current-tab-action(TabAction.export-bom);
+                        }
+                    }
+                }
+
+                export-fabrication-data-item := MenuItem {
+                    cmd: Cmd.generate-fabrication-data;
+                    enabled: Data.current-tab.type == TabType.board-2d;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.export-fabrication-data);
+                    }
+                }
+
+                export-pick-place-item := MenuItem {
+                    cmd: Cmd.generate-pick-place;
+                    enabled: Data.current-tab.type == TabType.board-2d;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.export-pick-place);
+                    }
+                }
+
+                export-d356-netlist-item := MenuItem {
+                    cmd: Cmd.generate-d356-netlist;
+                    enabled: Data.current-tab.type == TabType.board-2d;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.export-d356-netlist);
+                    }
+                }
+
+                MenuSeparator { }
+
+                export-specctra-item := MenuItem {
+                    cmd: Cmd.export-specctra-dsn;
+                    enabled: Data.current-tab.type == TabType.board-2d;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.export-specctra);
+                    }
+                }
+
+                import-specctra-item := MenuItem {
+                    cmd: Cmd.import-specctra-ses;
+                    enabled: Data.current-tab.type == TabType.board-2d;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.import-specctra);
+                    }
+                }
+
+                import-dxf := MenuItem {
+                    cmd: Cmd.import-dxf;
+                    enabled: Data.current-tab.type == TabType.board-2d;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.import-dxf);
+                    }
+                }
+
+                MenuSeparator { }
 
                 switch-workspace-item := MenuItem {
                     cmd: Cmd.workspace-switch;
@@ -135,9 +305,19 @@ export component MainMenuBar inherits Rectangle {
                     }
                 }
 
+                open-workspace-folder-item := MenuItem {
+                    cmd: Cmd.file-manager;
+                    icon: @image-url("../../../font-awesome/svgs/solid/arrow-up-right-from-square.svg");
+                    text: @tr("Open Workspace Folder");  // More specific.
+                    status-tip: "Open the workspace directory in the file manager";  // More specific.
+
+                    clicked => {
+                        Backend.trigger(Action.workspace-open-folder);
+                    }
+                }
+
                 workspace-settings-item := MenuItem {
                     cmd: Cmd.workspace-settings;
-                    icon: @image-url("../../../font-awesome/svgs/solid/sliders.svg");
 
                     clicked => {
                         Backend.trigger(Action.workspace-settings);
@@ -152,6 +332,270 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Backend.trigger(Action.quit);
+                    }
+                }
+            }
+        }
+
+        edit-menu-item := MainMenuItem {
+            text: @tr("Edit");
+
+            clicked => {
+                menu-edit.show();
+            }
+
+            menu-edit := MenuPopup {
+                x: 0;
+                y: parent.height;
+
+                undo-item := MenuItem {
+                    cmd: Cmd.undo;
+                    text: undo-text;
+                    icon: @image-url("../../../font-awesome/svgs/solid/rotate-left.svg");
+                    enabled: Data.current-project.can-undo;
+
+                    clicked => {
+                        Helpers.trigger-current-project-action(ProjectAction.undo);
+                    }
+                }
+
+                redo-item := MenuItem {
+                    cmd: Cmd.redo;
+                    text: redo-text;
+                    icon: @image-url("../../../font-awesome/svgs/solid/rotate-right.svg");
+                    enabled: Data.current-project.can-redo;
+
+                    clicked => {
+                        Helpers.trigger-current-project-action(ProjectAction.redo);
+                    }
+                }
+
+                MenuSeparator { }
+
+                select-all-item := MenuItem {
+                    cmd: Cmd.select-all;
+                    icon: @image-url("../../../font-awesome/svgs/solid/object-group.svg");
+                    enabled: Data.current-tab.features.select == FeatureState.enabled;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.select-all);
+                    }
+                }
+
+                cut-item := MenuItem {
+                    text: @tr("Cut");
+                    icon: @image-url("../../../font-awesome/svgs/solid/scissors.svg");
+                    status-tip: @tr("Cut the selected object(s) to clipboard");
+                    shortcuts: "Ctrl+X";
+                    enabled: Data.current-tab.features.cut == FeatureState.enabled;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.cut);
+                    }
+                }
+
+                copy-item := MenuItem {
+                    text: @tr("Copy");
+                    icon: @image-url("../../../font-awesome/svgs/regular/copy.svg");
+                    status-tip: @tr("Copy the selected object(s) to clipboard");
+                    shortcuts: "Ctrl+C";
+                    enabled: Data.current-tab.features.copy == FeatureState.enabled;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.copy);
+                    }
+                }
+
+                paste-item := MenuItem {
+                    text: @tr("Paste");
+                    icon: @image-url("../../../font-awesome/svgs/solid/paste.svg");
+                    status-tip: @tr("Paste object(s) from the clipboard");
+                    shortcuts: "Ctrl+V";
+                    enabled: Data.current-tab.features.paste == FeatureState.enabled;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.paste);
+                    }
+                }
+
+                remove-item := MenuItem {
+                    cmd: Cmd.remove;
+                    icon: @image-url("../../../font-awesome/svgs/solid/trash-can.svg");
+                    enabled: Data.current-tab.features.remove == FeatureState.enabled;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.delete);
+                    }
+                }
+
+                rotate-ccw-item := MenuItem {
+                    cmd: Cmd.rotate-ccw;
+                    icon: @image-url("../../../font-awesome/svgs/solid/rotate-left.svg");
+                    enabled: Data.current-tab.features.rotate == FeatureState.enabled;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.rotate-ccw);
+                    }
+                }
+
+                rotate-cw-item := MenuItem {
+                    cmd: Cmd.rotate-cw;
+                    icon: @image-url("../../../font-awesome/svgs/solid/rotate-right.svg");
+                    enabled: Data.current-tab.features.rotate == FeatureState.enabled;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.rotate-cw);
+                    }
+                }
+
+                flip-h-item := MenuItem {
+                    cmd: Cmd.flip-horizontal;
+                    icon: @image-url("../../../font-awesome/svgs/solid/arrow-down-up-across-line.svg");
+                    icon-rotation: 90deg;
+                    enabled: Data.current-tab.features.flip == FeatureState.enabled;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.flip-horizontally);
+                    }
+                }
+
+                flip-v-item := MenuItem {
+                    cmd: Cmd.flip-vertical;
+                    icon: @image-url("../../../font-awesome/svgs/solid/arrow-down-up-across-line.svg");
+                    enabled: Data.current-tab.features.flip == FeatureState.enabled;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.flip-vertically);
+                    }
+                }
+
+                mirror-h-item := MenuItem {
+                    cmd: Cmd.mirror-horizontal;
+                    icon: @image-url("../../../bootstrap-icons/icons/symmetry-vertical.svg");
+                    enabled: Data.current-tab.features.mirror == FeatureState.enabled;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.mirror-horizontally);
+                    }
+                }
+
+                mirror-v-item := MenuItem {
+                    cmd: Cmd.mirror-vertical;
+                    icon: @image-url("../../../bootstrap-icons/icons/symmetry-horizontal.svg");
+                    enabled: Data.current-tab.features.mirror == FeatureState.enabled;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.mirror-vertically);
+                    }
+                }
+
+                snap-to-grid-item := MenuItem {
+                    cmd: Cmd.snap-to-grid;
+                    icon: @image-url("../../../../img/grid-dots.svg");
+                    enabled: Data.current-tab.features.snap-to-grid == FeatureState.enabled;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.snap-to-grid);
+                    }
+                }
+
+                lock-item := MenuItem {
+                    cmd: Cmd.lock;
+                    enabled: Data.current-tab.features.lock == FeatureState.enabled;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.lock);
+                    }
+                }
+
+                unlock-item := MenuItem {
+                    cmd: Cmd.unlock;
+                    enabled: Data.current-tab.features.unlock == FeatureState.enabled;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.unlock);
+                    }
+                }
+
+                reset-rexts-item := MenuItem {
+                    cmd: Cmd.device-reset-text-all;
+                    enabled: Data.current-tab.features.reset-texts == FeatureState.enabled;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.reset-texts);
+                    }
+                }
+
+                MenuSeparator { }
+
+                line-width-increase-item := MenuItem {
+                    cmd: Cmd.line-width-increase;
+                    icon: @image-url("../../../font-awesome/svgs/solid/caret-up.svg");
+                    enabled: Data.current-tab.features.modify-line-width == FeatureState.enabled;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.line-width-increase);
+                    }
+                }
+
+                line-width-decrease-item := MenuItem {
+                    cmd: Cmd.line-width-decrease;
+                    icon: @image-url("../../../font-awesome/svgs/solid/caret-down.svg");
+                    enabled: Data.current-tab.features.modify-line-width == FeatureState.enabled;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.line-width-decrease);
+                    }
+                }
+
+                line-width-set-item := MenuItem {
+                    cmd: Cmd.line-width-set;
+                    enabled: Data.current-tab.features.modify-line-width == FeatureState.enabled;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.line-width-set);
+                    }
+                }
+
+                MenuSeparator { }
+
+                find-item := MenuItem {
+                    cmd: Cmd.find;
+                    icon: @image-url("../../../font-awesome/svgs/solid/magnifying-glass.svg");
+                    enabled: Data.current-tab.features.find == FeatureState.enabled;
+
+                    clicked => {
+                        focus-search();
+                    }
+                }
+
+                find-next-item := MenuItem {
+                    cmd: Cmd.find-next;
+                    enabled: Data.current-tab.features.find == FeatureState.enabled;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.find-next);
+                    }
+                }
+
+                find-previous-item := MenuItem {
+                    cmd: Cmd.find-previous;
+                    enabled: Data.current-tab.features.find == FeatureState.enabled;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.find-previous);
+                    }
+                }
+
+                MenuSeparator { }
+
+                properties-item := MenuItem {
+                    cmd: Cmd.properties;
+                    icon: @image-url("../../../font-awesome/svgs/solid/pen-to-square.svg");
+                    enabled: Data.current-tab.features.edit-properties == FeatureState.enabled;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.edit-properties);
                     }
                 }
             }
@@ -191,6 +635,328 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Backend.trigger-section(Data.sections.length - 1, WindowSectionAction.split);
+                    }
+                }
+
+                MenuSeparator { }
+
+                grid-interval-increase-item := MenuItem {
+                    cmd: Cmd.grid-increase;
+                    icon: @image-url("../../../font-awesome/svgs/solid/caret-up.svg");
+                    enabled: Data.current-tab-is-2d;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.grid-interval-increase);
+                    }
+                }
+
+                grid-interval-decrease-item := MenuItem {
+                    cmd: Cmd.grid-decrease;
+                    icon: @image-url("../../../font-awesome/svgs/solid/caret-down.svg");
+                    enabled: Data.current-tab-is-2d;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.grid-interval-decrease);
+                    }
+                }
+
+                grid-interval-set-item := MenuItem {
+                    cmd: Cmd.grid-properties;
+                    icon: @image-url("../../../bootstrap-icons/icons/grid-3x3.svg");
+                    enabled: Data.current-tab-is-2d;
+
+                    clicked => {
+                        focus-grid-interval();
+                    }
+                }
+
+                MenuSeparator { }
+
+                show-pin-numbers-item := MenuItem {
+                    cmd: Cmd.show-pin-numbers;
+                    enabled: Data.current-tab.type == TabType.schematic;
+                    checked: Data.current-section.schematic-tabs[Data.current-section.current-tab-index].show-pin-numbers;
+
+                    clicked => {
+                        Data.current-section.schematic-tabs[Data.current-section.current-tab-index].show-pin-numbers = !Data.current-section.schematic-tabs[Data.current-section.current-tab-index].show-pin-numbers;
+                    }
+                }
+
+                planes-hide-item := MenuItem {
+                    cmd: Cmd.plane-hide-all;
+                    enabled: Data.current-tab.type == TabType.board-2d;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.planes-hide);
+                    }
+                }
+
+                planes-show-item := MenuItem {
+                    cmd: Cmd.plane-show-all;
+                    enabled: Data.current-tab.type == TabType.board-2d;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.planes-show);
+                    }
+                }
+
+                planes-rebuild-item := MenuItem {
+                    cmd: Cmd.plane-rebuild-all;
+                    enabled: Data.current-tab.type == TabType.board-2d;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.planes-rebuild);
+                    }
+                }
+
+                ignore-locks-item := MenuItem {
+                    property <bool> ignore: Data.current-section.board-2d-tabs[Data.current-section.current-tab-index].ignore-placement-locks;
+
+                    cmd: Cmd.ignore-locks;
+                    icon: ignore ? @image-url("../../../font-awesome/svgs/solid/lock-open.svg") : @image-url("../../../font-awesome/svgs/solid/lock.svg");
+                    enabled: Data.current-tab.type == TabType.board-2d;
+                    checked: ignore;
+
+                    clicked => {
+                        Data.current-section.board-2d-tabs[Data.current-section.current-tab-index].ignore-placement-locks = !ignore;
+                    }
+                }
+
+                MenuSeparator { }
+
+                toggle-3d-item := MenuItem {
+                    cmd: Cmd.toggle-3d;
+                    icon: @image-url("../../../bootstrap-icons/icons/badge-3d.svg");
+                    enabled: (Data.current-tab.type == TabType.board-2d) || (Data.current-tab.type == TabType.board-3d);
+
+                    clicked => {
+                        if Data.current-tab.type == TabType.board-2d {
+                            Backend.trigger-board(Data.current-board-2d-tab.project-index, Data.current-board-2d-tab.board-index, BoardAction.open-3d);
+                        } else {
+                            Backend.trigger-board(Data.current-board-3d-tab.project-index, Data.current-board-3d-tab.board-index, BoardAction.open-2d);
+                        }
+                    }
+                }
+
+                MenuSeparator { }
+
+                zoom-in-item := MenuItem {
+                    cmd: Cmd.zoom-in;
+                    icon: @image-url("../../../bootstrap-icons/icons/zoom-in.svg");
+                    enabled: Data.current-tab-is-2d-or-3d;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.zoom-in);
+                    }
+                }
+
+                zoom-out-item := MenuItem {
+                    cmd: Cmd.zoom-out;
+                    icon: @image-url("../../../bootstrap-icons/icons/zoom-out.svg");
+                    enabled: Data.current-tab-is-2d-or-3d;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.zoom-out);
+                    }
+                }
+
+                zoom-fit-item := MenuItem {
+                    cmd: Cmd.zoom-fit-content;
+                    icon: @image-url("../../../font-awesome/svgs/solid/expand.svg");
+                    enabled: Data.current-tab-is-2d-or-3d;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.zoom-fit);
+                    }
+                }
+            }
+        }
+
+        project-menu-item := MainMenuItem {
+            text: @tr("Project");
+            visible: Data.current-project.valid;
+
+            clicked => {
+                project-menu-popup.show();
+            }
+
+            project-menu-popup := MenuPopup {
+                x: 0;
+                y: parent.height;
+
+                project-setup-item := MenuItem {
+                    cmd: Cmd.project-setup;
+
+                    clicked => {
+                        Helpers.trigger-current-project-action(ProjectAction.open-setup-dialog);
+                    }
+                }
+
+                update-project-library-item := MenuItem {
+                    cmd: Cmd.project-library-update;
+
+                    clicked => {
+                        Helpers.trigger-current-project-action(ProjectAction.update-library);
+                    }
+                }
+
+                MenuSeparator { }
+
+                save-project-item := MenuItem {
+                    cmd: Cmd.project-save;
+                    enabled: Data.current-project.writable;
+
+                    clicked => {
+                        Helpers.trigger-current-project-action(ProjectAction.save);
+                    }
+                }
+
+                close-project-item := MenuItem {
+                    cmd: Cmd.project-close;
+
+                    clicked => {
+                        Helpers.trigger-current-project-action(ProjectAction.close);
+                    }
+                }
+
+                open-project-folder-item := MenuItem {
+                    cmd: Cmd.file-manager;
+                    icon: @image-url("../../../font-awesome/svgs/solid/arrow-up-right-from-square.svg");
+
+                    clicked => {
+                        Helpers.trigger-current-project-action(ProjectAction.open-folder);
+                    }
+                }
+
+                export-lppz-item := MenuItem {
+                    cmd: Cmd.export-lppz;
+
+                    clicked => {
+                        Helpers.trigger-current-project-action(ProjectAction.export-lppz);
+                    }
+                }
+
+                MenuSeparator { }
+
+                generate-bom-item := MenuItem {
+                    cmd: Cmd.generate-bom;
+
+                    clicked => {
+                        Helpers.trigger-current-project-action(ProjectAction.export-bom);
+                    }
+                }
+
+                output-jobs-item := MenuItem {
+                    cmd: Cmd.output-jobs;
+
+                    clicked => {
+                        Helpers.trigger-current-project-action(ProjectAction.open-output-jobs);
+                    }
+                }
+
+                order-pcb-item := MenuItem {
+                    cmd: Cmd.order-pcb;
+
+                    clicked => {
+                        Helpers.trigger-current-project-action(ProjectAction.order);
+                    }
+                }
+
+                MenuSeparator { }
+
+                new-sheet-item := MenuItem {
+                    cmd: Cmd.sheet-new;
+
+                    clicked => {
+                        Helpers.trigger-current-project-action(ProjectAction.new-sheet);
+                    }
+                }
+
+                rename-sheet-item := MenuItem {
+                    cmd: Cmd.sheet-rename;
+                    enabled: Data.current-tab.type == TabType.schematic;
+
+                    clicked => {
+                        Helpers.trigger-current-schematic-action(SchematicAction.rename);
+                    }
+                }
+
+                remove-sheet-item := MenuItem {
+                    cmd: Cmd.sheet-remove;
+                    enabled: Data.current-tab.type == TabType.schematic;
+
+                    clicked => {
+                        Helpers.trigger-current-schematic-action(SchematicAction.delete);
+                    }
+                }
+
+                erc-item := MenuItem {
+                    cmd: Cmd.dock-erc;
+                    enabled: Data.current-project.valid;
+
+                    clicked => {
+                        Data.current-rule-check-board-index = -1;
+                        Data.panel-page = PanelPage.rule-check;
+                    }
+                }
+
+                MenuSeparator { }
+
+                new-board-item := MenuItem {
+                    cmd: Cmd.board-new;
+                    enabled: Data.current-project.valid;
+
+                    clicked => {
+                        Helpers.trigger-current-project-action(ProjectAction.new-board);
+                    }
+                }
+
+                copy-board-item := MenuItem {
+                    cmd: Cmd.board-copy;
+                    enabled: (Data.current-tab.type == TabType.board-2d) || (Data.current-tab.type == TabType.board-3d);
+
+                    clicked => {
+                        Helpers.trigger-current-board-action(BoardAction.copy);
+                    }
+                }
+
+                remove-board-item := MenuItem {
+                    cmd: Cmd.board-remove;
+                    enabled: (Data.current-tab.type == TabType.board-2d) || (Data.current-tab.type == TabType.board-3d);
+
+                    clicked => {
+                        Helpers.trigger-current-board-action(BoardAction.delete);
+                    }
+                }
+
+                run-quick-check-item := MenuItem {
+                    cmd: Cmd.run-quick-check;
+                    enabled: Data.current-tab.type == TabType.board-2d;
+
+                    clicked => {
+                        Helpers.trigger-current-board-action(BoardAction.run-quick-check);
+                        Data.current-rule-check-board-index = Data.current-board-2d-tab.board-index;
+                        Data.panel-page = PanelPage.rule-check;
+                    }
+                }
+
+                run-drc-item := MenuItem {
+                    cmd: Cmd.run-design-rule-check;
+                    enabled: Data.current-tab.type == TabType.board-2d;
+
+                    clicked => {
+                        Helpers.trigger-current-board-action(BoardAction.run-drc);
+                        Data.current-rule-check-board-index = Data.current-board-2d-tab.board-index;
+                        Data.panel-page = PanelPage.rule-check;
+                    }
+                }
+
+                board-setup-item := MenuItem {
+                    cmd: Cmd.board-setup;
+                    enabled: (Data.current-tab.type == TabType.board-2d) || (Data.current-tab.type == TabType.board-3d);
+
+                    clicked => {
+                        Helpers.trigger-current-board-action(BoardAction.open-setup-dialog);
                     }
                 }
             }
@@ -260,6 +1026,308 @@ export component MainMenuBar inherits Rectangle {
                         Data.panel-page = PanelPage.about;
                     }
                 }
+            }
+        }
+
+        Rectangle {
+            width: 3px;
+        }
+
+        if current-tab-project.valid: project-buttons-l := HorizontalLayout {
+            horizontal-stretch: 0;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            spacing: 5px;
+
+            MenuBarSeparator { }
+
+            save-project-btn := MenuBarButton {
+                cmd: Cmd.project-save;
+                enabled: current-tab-project.writable;
+
+                clicked => {
+                    Backend.trigger-project(current-tab-project-index, ProjectAction.save);
+                }
+            }
+
+            undo-btn := MenuBarButton {
+                cmd: Cmd.undo;
+                icon: @image-url("../../../font-awesome/svgs/solid/rotate-left.svg");
+                tooltip: undo-text;
+                enabled: current-tab-project.can-undo;
+
+                clicked => {
+                    Backend.trigger-project(current-tab-project-index, ProjectAction.undo);
+                }
+            }
+
+            redo-btn := MenuBarButton {
+                cmd: Cmd.redo;
+                icon: @image-url("../../../font-awesome/svgs/solid/rotate-right.svg");
+                tooltip: redo-text;
+                enabled: current-tab-project.can-redo;
+
+                clicked => {
+                    Backend.trigger-project(current-tab-project-index, ProjectAction.redo);
+                }
+            }
+
+            if !current-tab-project.writable: Rectangle {
+                width: self.preferred-width + 20px;
+
+                read-only-badge := Badge {
+                    width: self.preferred-width;
+                    text-color: yellow;
+                    text: @tr("read-only").to-lowercase();
+                }
+            }
+        }
+
+        Rectangle {
+            horizontal-stretch: 1;
+
+            HorizontalLayout {
+                property <length> total-space: root.width - sections-start-x;
+                property <length> section-width: total-space / Data.sections.length;
+                property <length> offset: sections-start-x - parent.x - (self.width / 2);
+
+                x: max(min(section-width * (0.5 + Data.current-section-index) + offset, parent.width - self.width - 10px), 0);
+                width: self.preferred-width;
+                padding-top: 5px;
+                padding-bottom: 5px;
+                spacing: 5px;
+
+                common-buttons-l := HorizontalLayout {
+                    spacing: 5px;
+
+                    if (Data.current-tab.type == TabType.board-2d) || (Data.current-tab.type == TabType.board-3d): board-setup-btn := MenuBarButton {
+                        cmd: Cmd.board-setup;
+
+                        clicked => {
+                            if Data.current-tab.type == TabType.board-2d {
+                                Backend.trigger-board(Data.current-board-2d-tab.project-index, Data.current-board-2d-tab.board-index, BoardAction.open-setup-dialog);
+                            } else {
+                                Backend.trigger-board(Data.current-board-3d-tab.project-index, Data.current-board-3d-tab.board-index, BoardAction.open-setup-dialog);
+                            }
+                        }
+                    }
+
+                    if Data.current-tab.features.export-graphics != FeatureState.not-supported: export-pdf-btn := MenuBarButton {
+                        cmd: Cmd.export-pdf;
+                        icon: @image-url("../../../font-awesome/svgs/solid/file-pdf.svg");
+                        enabled: Data.current-tab.features.export-graphics == FeatureState.enabled;
+
+                        clicked => {
+                            Helpers.trigger-current-tab-action(TabAction.export-pdf);
+                        }
+                    }
+
+                    if Data.current-tab.features.export-graphics != FeatureState.not-supported: print-btn := MenuBarButton {
+                        cmd: Cmd.print;
+                        icon: @image-url("../../../bootstrap-icons/icons/printer-fill.svg");
+                        enabled: Data.current-tab.features.export-graphics == FeatureState.enabled;
+
+                        clicked => {
+                            Helpers.trigger-current-tab-action(TabAction.print);
+                        }
+                    }
+
+                    if Data.current-tab.type == TabType.board-3d: export-step-btn := MenuBarButton {
+                        cmd: Cmd.export-step;
+
+                        clicked => {
+                            Backend.trigger-board(Data.current-board-3d-tab.project-index, Data.current-board-3d-tab.board-index, BoardAction.export-step);
+                        }
+                    }
+                }
+
+                if (common-buttons-l.preferred-width > 0) && (edit-buttons-l.preferred-width > 0): MenuBarSeparator { }
+
+                edit-buttons-l := HorizontalLayout {
+                    spacing: 5px;
+
+                    if Data.current-tab.features.cut != FeatureState.not-supported: cut-btn := MenuBarButton {
+                        cmd: Cmd.clipboard-cut;
+                        icon: @image-url("../../../font-awesome/svgs/solid/scissors.svg");
+                        enabled: Data.current-tab.features.cut == FeatureState.enabled;
+
+                        clicked => {
+                            Helpers.trigger-current-tab-action(TabAction.cut);
+                        }
+                    }
+
+                    if Data.current-tab.features.copy != FeatureState.not-supported: copy-btn := MenuBarButton {
+                        cmd: Cmd.clipboard-copy;
+                        icon: @image-url("../../../font-awesome/svgs/regular/copy.svg");
+                        enabled: Data.current-tab.features.copy == FeatureState.enabled;
+
+                        clicked => {
+                            Helpers.trigger-current-tab-action(TabAction.copy);
+                        }
+                    }
+
+                    if Data.current-tab.features.paste != FeatureState.not-supported: paste-btn := MenuBarButton {
+                        cmd: Cmd.clipboard-paste;
+                        icon: @image-url("../../../font-awesome/svgs/solid/paste.svg");
+                        enabled: Data.current-tab.features.paste == FeatureState.enabled;
+
+                        clicked => {
+                            Helpers.trigger-current-tab-action(TabAction.paste);
+                        }
+                    }
+
+                    if Data.current-tab.features.remove != FeatureState.not-supported: remove-btn := MenuBarButton {
+                        cmd: Cmd.remove;
+                        icon: @image-url("../../../font-awesome/svgs/solid/trash-can.svg");
+                        enabled: Data.current-tab.features.remove == FeatureState.enabled;
+
+                        clicked => {
+                            Helpers.trigger-current-tab-action(TabAction.delete);
+                        }
+                    }
+
+                    if Data.current-tab.features.rotate != FeatureState.not-supported: rotate-ccw-btn := MenuBarButton {
+                        cmd: Cmd.rotate-ccw;
+                        icon: @image-url("../../../font-awesome/svgs/solid/rotate-left.svg");
+                        enabled: Data.current-tab.features.rotate == FeatureState.enabled;
+
+                        clicked => {
+                            Helpers.trigger-current-tab-action(TabAction.rotate-ccw);
+                        }
+                    }
+
+                    if Data.current-tab.features.rotate != FeatureState.not-supported: rotate-cw-btn := MenuBarButton {
+                        cmd: Cmd.rotate-cw;
+                        icon: @image-url("../../../font-awesome/svgs/solid/rotate-right.svg");
+                        enabled: Data.current-tab.features.rotate == FeatureState.enabled;
+
+                        clicked => {
+                            Helpers.trigger-current-tab-action(TabAction.rotate-cw);
+                        }
+                    }
+
+                    if Data.current-tab.features.flip != FeatureState.not-supported: flip-btn := MenuBarButton {
+                        cmd: Cmd.flip-horizontal;
+                        icon: @image-url("../../../font-awesome/svgs/solid/arrow-down-up-across-line.svg");
+                        enabled: Data.current-tab.features.flip == FeatureState.enabled;
+
+                        clicked => {
+                            Helpers.trigger-current-tab-action(TabAction.flip-horizontally);
+                        }
+                    }
+
+                    if Data.current-tab.features.mirror != FeatureState.not-supported: mirror-btn := MenuBarButton {
+                        cmd: Cmd.mirror-horizontal;
+                        icon: @image-url("../../../bootstrap-icons/icons/symmetry-vertical.svg");
+                        enabled: Data.current-tab.features.mirror == FeatureState.enabled;
+
+                        clicked => {
+                            Helpers.trigger-current-tab-action(TabAction.mirror-horizontally);
+                        }
+                    }
+
+                    if Data.current-tab.features.move-align != FeatureState.not-supported: move-align-btn := MenuBarButton {
+                        cmd: Cmd.move-align;
+                        icon: @image-url("../../../font-awesome/svgs/solid/up-down-left-right.svg");
+                        enabled: Data.current-tab.features.move-align == FeatureState.enabled;
+
+                        clicked => {
+                            Helpers.trigger-current-tab-action(TabAction.move-align);
+                        }
+                    }
+
+                    if Data.current-tab.features.snap-to-grid != FeatureState.not-supported: snap-to-grid-btn := MenuBarButton {
+                        cmd: Cmd.snap-to-grid;
+                        icon: @image-url("../../../../img/grid-dots.svg");
+                        enabled: Data.current-tab.features.snap-to-grid == FeatureState.enabled;
+
+                        clicked => {
+                            Helpers.trigger-current-tab-action(TabAction.snap-to-grid);
+                        }
+                    }
+
+                    if Data.current-tab.features.reset-texts != FeatureState.not-supported: reset-text-btn := MenuBarButton {
+                        cmd: Cmd.device-reset-text-all;
+                        enabled: Data.current-tab.features.reset-texts == FeatureState.enabled;
+
+                        clicked => {
+                            Helpers.trigger-current-tab-action(TabAction.reset-texts);
+                        }
+                    }
+
+                    if Data.current-tab.features.lock != FeatureState.not-supported: lock-btn := MenuBarButton {
+                        cmd: Cmd.lock;
+                        enabled: Data.current-tab.features.lock == FeatureState.enabled;
+
+                        clicked => {
+                            Helpers.trigger-current-tab-action(TabAction.lock);
+                        }
+                    }
+
+                    if Data.current-tab.features.unlock != FeatureState.not-supported: unlock-btn := MenuBarButton {
+                        cmd: Cmd.unlock;
+                        enabled: Data.current-tab.features.unlock == FeatureState.enabled;
+                        color-enabled: #d00000;
+                        color-hovered: #ff0000;
+
+                        clicked => {
+                            Helpers.trigger-current-tab-action(TabAction.unlock);
+                        }
+                    }
+
+                    if Data.current-tab.features.edit-properties != FeatureState.not-supported: properties-btn := MenuBarButton {
+                        cmd: Cmd.properties;
+                        icon: @image-url("../../../font-awesome/svgs/solid/pen-to-square.svg");
+                        enabled: Data.current-tab.features.edit-properties == FeatureState.enabled;
+
+                        clicked => {
+                            Helpers.trigger-current-tab-action(TabAction.edit-properties);
+                        }
+                    }
+                }
+            }
+        }
+
+        search-edt := LineEdit {
+            y: 2px;
+            height: parent.height - 2 * self.y;
+            max-width: self.enabled ? 300px : 0;
+            horizontal-stretch: 0;
+            font-size: 11px;
+            text: Data.current-tab.find-term;
+            autocompletions: Data.current-tab.find-autocompletions;
+            placeholder-text: @tr("Quick Find") + (Cmd.find.shortcut.is-empty ? "" : (" (" + Cmd.find.shortcut + ")"));
+            enabled: Data.current-tab.features.find == FeatureState.enabled;
+            visible: self.enabled;
+
+            changed has-focus => {
+                if self.has-focus {
+                    Helpers.trigger-current-tab-action(TabAction.find-refresh-suggestions);
+                }
+            }
+
+            text-edited(text) => {
+                Data.current-section.tabs[Data.current-section.current-tab-index].find-term = text;
+            }
+
+            autocompletion-accepted(text) => {
+                Data.current-section.tabs[Data.current-section.current-tab-index].find-term = text;
+                Helpers.trigger-current-tab-action(TabAction.find-next);
+            }
+
+            key-pressed(event) => {
+                if event.text == Key.Return {
+                    Helpers.trigger-current-tab-action(TabAction.find-next);
+                    return accept;
+                } else if event.text == Key.Escape {
+                    if self.text.is-empty {
+                        focus-root();
+                    } else {
+                        Data.current-section.tabs[Data.current-section.current-tab-index].find-term = "";
+                    }
+                    return accept;
+                }
+                reject
             }
         }
     }

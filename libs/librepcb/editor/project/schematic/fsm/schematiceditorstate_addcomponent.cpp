@@ -89,6 +89,9 @@ bool SchematicEditorState_AddComponent::entry() noexcept {
   setValue(QString());
 
   mAdapter.fsmToolEnter(*this);
+  mAdapter.fsmSetFeatures(SchematicEditorFsmAdapter::Features(
+      SchematicEditorFsmAdapter::Feature::Rotate |
+      SchematicEditorFsmAdapter::Feature::Mirror));
   mAdapter.fsmSetViewCursor(Qt::CrossCursor);
   return true;
 }
@@ -99,6 +102,7 @@ bool SchematicEditorState_AddComponent::exit() noexcept {
   Q_ASSERT(mIsUndoCmdActive == false);
 
   mAdapter.fsmSetViewCursor(std::nullopt);
+  mAdapter.fsmSetFeatures(SchematicEditorFsmAdapter::Features());
   mAdapter.fsmToolLeave();
   return true;
 }
@@ -207,8 +211,6 @@ bool SchematicEditorState_AddComponent::
     processGraphicsSceneLeftMouseButtonPressed(
         const GraphicsSceneMouseEvent& e) noexcept {
   // NOTE: This method is also called by the doubleclick event!
-  Schematic* schematic = getActiveSchematic();
-  if (!schematic) return false;
   if (!mIsUndoCmdActive) return false;
   if (!mCurrentComponent) return false;
   if (!mCurrentSymbolToPlace) return false;
@@ -236,7 +238,7 @@ bool SchematicEditorState_AddComponent::
     if (currentSymbVarItem) {
       // create the next symbol instance and add it to the schematic
       CmdAddSymbolToSchematic* cmd = new CmdAddSymbolToSchematic(
-          mContext.workspace, *schematic,
+          mContext.workspace, mContext.schematic,
           mCurrentSymbolToPlace->getComponentInstance(),
           currentSymbVarItem->getUuid(), pos);
       mContext.undoStack.appendToCmdGroup(cmd);
@@ -386,9 +388,6 @@ void SchematicEditorState_AddComponent::startAddingComponent(
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
-  Schematic* schematic = getActiveSchematic();
-  if (!schematic) return;
-
   try {
     // start a new command
     Q_ASSERT(!mIsUndoCmdActive);
@@ -475,7 +474,7 @@ void SchematicEditorState_AddComponent::startAddingComponent(
     const Point pos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos())
                           .mappedToGrid(getGridInterval());
     CmdAddSymbolToSchematic* cmd2 = new CmdAddSymbolToSchematic(
-        mContext.workspace, *schematic, *mCurrentComponent,
+        mContext.workspace, mContext.schematic, *mCurrentComponent,
         currentSymbVarItem->getUuid(), pos);
     mContext.undoStack.appendToCmdGroup(cmd2);
     mCurrentSymbolToPlace = cmd2->getSymbolInstance();
@@ -492,7 +491,8 @@ void SchematicEditorState_AddComponent::startAddingComponent(
     // place it at (0, 0) and exit this tool for convenience and to ensure
     // a consistent schematic coordinate system across all LibrePCB projects.
     const Component& libCmp = mCurrentComponent->getLibComponent();
-    if ((schematic->getSymbols().count() == 1) && libCmp.isSchematicOnly() &&
+    if ((mContext.schematic.getSymbols().count() == 1) &&
+        libCmp.isSchematicOnly() &&
         (libCmp.getNames().getDefaultValue()->toLower().contains("frame")) &&
         (mCurrentComponent->getSymbolVariant().getSymbolItems().count() == 1)) {
       mCurrentSymbolEditCommand->setPosition(Point(0, 0), true);

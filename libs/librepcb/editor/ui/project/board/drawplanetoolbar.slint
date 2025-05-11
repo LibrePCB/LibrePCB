@@ -1,0 +1,31 @@
+import { ComboBox } from "../../widgets.slint";
+import {
+    Board2dTabData,
+    WindowSectionData,
+} from "../../api.slint";
+
+export component DrawPlaneToolBar inherits HorizontalLayout {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    property <[Board2dTabData]> tabs: section.board-2d-tabs;
+
+    spacing: 2px;
+
+    layer-cbx := ComboBox {
+        model: tabs[section.current-tab-index].tool-layer.items;
+        current-index: tabs[section.current-tab-index].tool-layer.current-index;
+
+        current-index-changed(index) => {
+            tabs[section.current-tab-index].tool-layer.current-index = index;
+        }
+    }
+
+    net-cbx := ComboBox {
+        model: tabs[section.current-tab-index].tool-net.items;
+        current-index: tabs[section.current-tab-index].tool-net.current-index;
+
+        current-index-changed(index) => {
+            tabs[section.current-tab-index].tool-net.current-index = index;
+        }
+    }
+}

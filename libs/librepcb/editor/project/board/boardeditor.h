@@ -23,50 +23,29 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../dialogs/graphicsexportdialog.h"
-#include "../../widgets/if_graphicsvieweventhandler.h"
-#include "fsm/boardeditorfsmadapter.h"
-#include "ui_boardeditor.h"
+#include "appwindow.h"
 
-#include <librepcb/core/project/board/board.h>
-#include <librepcb/core/rulecheck/rulecheckmessage.h>
-#include <librepcb/core/types/uuid.h>
-#include <librepcb/core/workspace/theme.h>
+#include <librepcb/core/project/board/drc/boarddesignrulecheck.h>
+#include <librepcb/core/utils/signalslot.h>
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
+class Board;
 class BoardPlaneFragmentsBuilder;
-class ComponentInstance;
 class Project;
-class Theme;
 
 namespace editor {
 
-class BoardEditorFsm;
-class BoardGraphicsScene;
-class BoardLayersDock;
-class ExclusiveActionGroup;
-class GraphicsLayerList;
-class OpenGlSceneBuilder;
-class OpenGlSceneBuilder;
-class OpenGlView;
+class Board2dTab;
+class Board3dTab;
+class Notification;
 class ProjectEditor;
-class RuleCheckDock;
-class SearchToolBar;
-class StandardEditorCommandHandler;
-class ToolBarProxy;
-class UndoStackActionGroup;
-class UnplacedComponentsDock;
-
-namespace Ui {
-class BoardEditor;
-}
+class RuleCheckMessagesModel;
 
 /*******************************************************************************
  *  Class BoardEditor
@@ -75,274 +54,75 @@ class BoardEditor;
 /**
  * @brief The BoardEditor class
  */
-class BoardEditor final : public QMainWindow,
-                          public IF_GraphicsViewEventHandler,
-                          public BoardEditorFsmAdapter {
+class BoardEditor final : public QObject {
   Q_OBJECT
 
 public:
+  // Signals
+  Signal<BoardEditor> onUiDataChanged;
+
   // Constructors / Destructor
   BoardEditor() = delete;
   BoardEditor(const BoardEditor& other) = delete;
-  explicit BoardEditor(ProjectEditor& projectEditor, Project& project);
-  ~BoardEditor();
-
-  // Getters
-  ProjectEditor& getProjectEditor() const noexcept { return mProjectEditor; }
-  Project& getProject() const noexcept { return mProject; }
-  GraphicsLayerList& getLayers() const noexcept { return *mLayers; }
-  Board* getActiveBoard() const noexcept { return mActiveBoard.data(); }
-  BoardGraphicsScene* getActiveBoardScene() noexcept {
-    return mGraphicsScene.data();
-  }
-
-  // Setters
-  bool setActiveBoardIndex(int index) noexcept;
+  explicit BoardEditor(ProjectEditor& prjEditor, Board& board, int uiIndex,
+                       QObject* parent = nullptr) noexcept;
+  ~BoardEditor() noexcept;
 
   // General Methods
-  void abortAllCommands() noexcept;
-  void abortBlockingToolsInOtherEditors() noexcept;
-
-  // BoardEditorFsmAdapter
-  Board* fsmGetActiveBoard() noexcept override;
-  BoardGraphicsScene* fsmGetGraphicsScene() noexcept override;
-  bool fsmGetIgnoreLocks() const noexcept override;
-  void fsmSetViewCursor(
-      const std::optional<Qt::CursorShape>& shape) noexcept override;
-  void fsmSetViewGrayOut(bool grayOut) noexcept override;
-  void fsmSetViewInfoBoxText(const QString& text) noexcept override;
-  void fsmSetViewRuler(
-      const std::optional<std::pair<Point, Point>>& pos) noexcept override;
-  void fsmSetSceneCursor(const Point& pos, bool cross,
-                         bool circle) noexcept override;
-  QPainterPath fsmCalcPosWithTolerance(
-      const Point& pos, qreal multiplier) const noexcept override;
-  Point fsmMapGlobalPosToScenePos(const QPoint& pos) const noexcept override;
-  void fsmSetHighlightedNetSignals(
-      const QSet<const NetSignal*>& sigs) noexcept override;
-  void fsmAbortBlockingToolsInOtherEditors() noexcept override;
-  void fsmSetStatusBarMessage(const QString& message,
-                              int timeoutMs = -1) noexcept override;
-  void fsmToolLeave() noexcept override;
-  void fsmToolEnter(BoardEditorState_Select& state) noexcept override;
-  void fsmToolEnter(BoardEditorState_DrawTrace& state) noexcept override;
-  void fsmToolEnter(BoardEditorState_AddVia& state) noexcept override;
-  void fsmToolEnter(BoardEditorState_DrawPolygon& state) noexcept override;
-  void fsmToolEnter(BoardEditorState_AddStrokeText& state) noexcept override;
-  void fsmToolEnter(BoardEditorState_DrawPlane& state) noexcept override;
-  void fsmToolEnter(BoardEditorState_DrawZone& state) noexcept override;
-  void fsmToolEnter(BoardEditorState_AddHole& state) noexcept override;
-  void fsmToolEnter(BoardEditorState_AddDevice& state) noexcept override;
-  void fsmToolEnter(BoardEditorState_Measure& state) noexcept override;
+  ProjectEditor& getProjectEditor() noexcept { return mProjectEditor; }
+  Board& getBoard() noexcept { return mBoard; }
+  int getUiIndex() const noexcept { return mUiIndex; }
+  void setUiIndex(int index) noexcept;
+  ui::BoardData getUiData() const noexcept;
+  void setUiData(const ui::BoardData& data) noexcept;
+  bool isRebuildingPlanes() const noexcept;
+  void schedulePlanesRebuild();
+  void startPlanesRebuild(bool force = false) noexcept;
+  void startDrc(bool quick) noexcept;
+  void registerActiveTab(Board2dTab* tab) noexcept;
+  void unregisterActiveTab(Board2dTab* tab) noexcept;
+  void registerActiveTab(Board3dTab* tab) noexcept;
+  void unregisterActiveTab(Board3dTab* tab) noexcept;
+  void execBoardSetupDialog(bool switchToDrcSettings = false) noexcept;
+  void execStepExportDialog() noexcept;
 
   // Operator Overloadings
   BoardEditor& operator=(const BoardEditor& rhs) = delete;
 
-protected:
-  virtual void closeEvent(QCloseEvent* event) noexcept override;
-
-public slots:
-
-  void boardAdded(int newIndex);
-  void boardRemoved(int oldIndex);
-
-private slots:
-
-  // Actions
-  void on_tabBar_currentChanged(int index);
-  void on_lblUnplacedComponentsNote_linkActivated();
+signals:
+  void uiIndexChanged();
+  void planesRebuildStatusChanged();
+  void planesUpdated();
+  void drcMessageHighlightRequested(std::shared_ptr<const RuleCheckMessage> msg,
+                                    bool zoomTo);
+  void aboutToBeDestroyed();
 
 private:
-  // Private Methods
-  void updateEnabledCopperLayers() noexcept;
-  void loadLayersVisibility() noexcept;
-  void storeLayersVisibility() noexcept;
-  void createActions() noexcept;
-  void createToolBars() noexcept;
-  void createDockWidgets() noexcept;
-  void createMenus() noexcept;
-  void updateBoardActionGroup() noexcept;
-  bool graphicsSceneKeyPressed(
-      const GraphicsSceneKeyEvent& e) noexcept override;
-  bool graphicsSceneKeyReleased(
-      const GraphicsSceneKeyEvent& e) noexcept override;
-  bool graphicsSceneMouseMoved(
-      const GraphicsSceneMouseEvent& e) noexcept override;
-  bool graphicsSceneLeftMouseButtonPressed(
-      const GraphicsSceneMouseEvent& e) noexcept override;
-  bool graphicsSceneLeftMouseButtonReleased(
-      const GraphicsSceneMouseEvent& e) noexcept override;
-  bool graphicsSceneLeftMouseButtonDoubleClicked(
-      const GraphicsSceneMouseEvent& e) noexcept override;
-  bool graphicsSceneRightMouseButtonReleased(
-      const GraphicsSceneMouseEvent& e) noexcept override;
-  void toolRequested(const QVariant& newTool) noexcept;
-  void unplacedComponentsCountChanged(int count) noexcept;
-  void runDrc(bool quick) noexcept;
-  void highlightDrcMessage(const RuleCheckMessage& msg, bool zoomTo) noexcept;
-  void setDrcMessageApproved(const RuleCheckMessage& msg,
-                             bool approved) noexcept;
-  void clearDrcMarker() noexcept;
-  QList<BI_Device*> getSearchCandidates() noexcept;
-  QStringList getSearchToolBarCompleterList() noexcept;
-  void goToDevice(const QString& name, int index) noexcept;
-  void scheduleOpenGlSceneUpdate() noexcept;
-  void performScheduledTasks() noexcept;
-  void startPlaneRebuild(bool full = false) noexcept;
-  bool isActiveTopLevelWindow() const noexcept;
-  void newBoard() noexcept;
-  void copyBoard() noexcept;
-  void removeBoard() noexcept;
-  void setGridProperties(const PositiveLength& interval, const LengthUnit& unit,
-                         Theme::GridStyle style, bool applyToBoard) noexcept;
-  void execGridPropertiesDialog() noexcept;
-  void execBoardSetupDialog(bool switchToDrcSettings = false) noexcept;
-  void execGraphicsExportDialog(GraphicsExportDialog::Output output,
-                                const QString& settingsKey) noexcept;
-  void execStepExportDialog() noexcept;
-  void execD356NetlistExportDialog() noexcept;
-  void execSpecctraExportDialog() noexcept;
-  void execSpecctraImportDialog() noexcept;
-  bool show3DView() noexcept;
-  void hide3DView() noexcept;
+  void setDrcResult(const BoardDesignRuleCheck::Result& result) noexcept;
+  void registeredTabsModified() noexcept;
+  void planesRebuildTimerTimeout() noexcept;
 
-  // General Attributes
+private:
   ProjectEditor& mProjectEditor;
   Project& mProject;
-  QScopedPointer<Ui::BoardEditor> mUi;
-  QScopedPointer<OpenGlView> mOpenGlView;
-  QScopedPointer<ToolBarProxy> mCommandToolBarProxy;
-  QScopedPointer<StandardEditorCommandHandler> mStandardCommandHandler;
+  Board& mBoard;
+  int mUiIndex;
 
-  // Misc
-  QPointer<Board> mActiveBoard;
-  std::unique_ptr<GraphicsLayerList> mLayers;
-  QScopedPointer<BoardGraphicsScene> mGraphicsScene;
-  QScopedPointer<OpenGlSceneBuilder> mOpenGlSceneBuilder;
-  bool mOpenGlSceneBuildScheduled;
-  qint64 mTimestampOfLastOpenGlSceneRebuild;
-  QHash<Uuid, QRectF> mVisibleSceneRect;
-  QScopedPointer<BoardEditorFsm> mFsm;
-
-  // Plane Fragments Builder
-  QScopedPointer<BoardPlaneFragmentsBuilder> mPlaneFragmentsBuilder;
+  // Plane fragments builder
+  std::unique_ptr<BoardPlaneFragmentsBuilder> mPlanesBuilder;
+  std::unique_ptr<QTimer> mPlanesRebuildTimer;
   qint64 mTimestampOfLastPlaneRebuild;
 
   // DRC
-  QHash<Uuid, std::optional<RuleCheckMessageList>>
-      mDrcMessages;  ///< UUID=Board
-  QScopedPointer<QGraphicsPathItem> mDrcLocationGraphicsItem;
+  std::unique_ptr<BoardDesignRuleCheck> mDrc;
+  std::shared_ptr<Notification> mDrcNotification;
+  uint mDrcUndoStackState;
+  std::shared_ptr<RuleCheckMessagesModel> mDrcMessages;
+  QString mDrcExecutionError;
 
-  // Actions
-  QScopedPointer<QAction> mActionAboutLibrePcb;
-  QScopedPointer<QAction> mActionAboutQt;
-  QScopedPointer<QAction> mActionOnlineDocumentation;
-  QScopedPointer<QAction> mActionKeyboardShortcutsReference;
-  QScopedPointer<QAction> mActionWebsite;
-  QScopedPointer<QAction> mActionSaveProject;
-  QScopedPointer<QAction> mActionCloseProject;
-  QScopedPointer<QAction> mActionCloseWindow;
-  QScopedPointer<QAction> mActionQuit;
-  QScopedPointer<QAction> mActionFileManager;
-  QScopedPointer<QAction> mActionSchematicEditor;
-  QScopedPointer<QAction> mActionControlPanel;
-  QScopedPointer<QAction> mActionProjectSetup;
-  QScopedPointer<QAction> mActionUpdateLibrary;
-  QScopedPointer<QAction> mActionBoardSetup;
-  QScopedPointer<QAction> mActionRunQuickCheck;
-  QScopedPointer<QAction> mActionRunDesignRuleCheck;
-  QScopedPointer<QAction> mActionImportDxf;
-  QScopedPointer<QAction> mActionImportSpecctra;
-  QScopedPointer<QAction> mActionExportLppz;
-  QScopedPointer<QAction> mActionExportImage;
-  QScopedPointer<QAction> mActionExportPdf;
-  QScopedPointer<QAction> mActionExportStep;
-  QScopedPointer<QAction> mActionExportSpecctra;
-  QScopedPointer<QAction> mActionPrint;
-  QScopedPointer<QAction> mActionGenerateBom;
-  QScopedPointer<QAction> mActionGenerateFabricationData;
-  QScopedPointer<QAction> mActionGeneratePickPlace;
-  QScopedPointer<QAction> mActionGenerateD356Netlist;
-  QScopedPointer<QAction> mActionOutputJobs;
-  QScopedPointer<QAction> mActionOrderPcb;
-  QScopedPointer<QAction> mActionNewBoard;
-  QScopedPointer<QAction> mActionCopyBoard;
-  QScopedPointer<QAction> mActionRemoveBoard;
-  QScopedPointer<QAction> mActionNextPage;
-  QScopedPointer<QAction> mActionPreviousPage;
-  QScopedPointer<QAction> mActionFind;
-  QScopedPointer<QAction> mActionFindNext;
-  QScopedPointer<QAction> mActionFindPrevious;
-  QScopedPointer<QAction> mActionSelectAll;
-  QScopedPointer<QAction> mActionGridProperties;
-  QScopedPointer<QAction> mActionGridIncrease;
-  QScopedPointer<QAction> mActionGridDecrease;
-  QScopedPointer<QAction> mActionIgnoreLocks;
-  QScopedPointer<QAction> mActionZoomFit;
-  QScopedPointer<QAction> mActionZoomIn;
-  QScopedPointer<QAction> mActionZoomOut;
-  QScopedPointer<QAction> mActionToggle3D;
-  QScopedPointer<QAction> mActionUndo;
-  QScopedPointer<QAction> mActionRedo;
-  QScopedPointer<QAction> mActionCut;
-  QScopedPointer<QAction> mActionCopy;
-  QScopedPointer<QAction> mActionPaste;
-  QScopedPointer<QAction> mActionMoveLeft;
-  QScopedPointer<QAction> mActionMoveRight;
-  QScopedPointer<QAction> mActionMoveUp;
-  QScopedPointer<QAction> mActionMoveDown;
-  QScopedPointer<QAction> mActionRotateCcw;
-  QScopedPointer<QAction> mActionRotateCw;
-  QScopedPointer<QAction> mActionFlipHorizontal;
-  QScopedPointer<QAction> mActionFlipVertical;
-  QScopedPointer<QAction> mActionSnapToGrid;
-  QScopedPointer<QAction> mActionLock;
-  QScopedPointer<QAction> mActionUnlock;
-  QScopedPointer<QAction> mActionResetAllTexts;
-  QScopedPointer<QAction> mActionIncreaseLineWidth;
-  QScopedPointer<QAction> mActionDecreaseLineWidth;
-  QScopedPointer<QAction> mActionChangeLineWidth;
-  QScopedPointer<QAction> mActionProperties;
-  QScopedPointer<QAction> mActionRemove;
-  QScopedPointer<QAction> mActionShowPlanes;
-  QScopedPointer<QAction> mActionHidePlanes;
-  QScopedPointer<QAction> mActionRebuildPlanes;
-  QScopedPointer<QAction> mActionAbort;
-  QScopedPointer<QAction> mActionToolSelect;
-  QScopedPointer<QAction> mActionToolTrace;
-  QScopedPointer<QAction> mActionToolVia;
-  QScopedPointer<QAction> mActionToolPolygon;
-  QScopedPointer<QAction> mActionToolText;
-  QScopedPointer<QAction> mActionToolPlane;
-  QScopedPointer<QAction> mActionToolZone;
-  QScopedPointer<QAction> mActionToolHole;
-  QScopedPointer<QAction> mActionToolMeasure;
-  QScopedPointer<QAction> mActionDockErc;
-  QScopedPointer<QAction> mActionDockDrc;
-  QScopedPointer<QAction> mActionDockLayers;
-  QScopedPointer<QAction> mActionDockPlaceDevices;
-
-  // Action groups
-  QScopedPointer<UndoStackActionGroup> mUndoStackActionGroup;
-  QScopedPointer<ExclusiveActionGroup> mToolsActionGroup;
-  QScopedPointer<QActionGroup> mBoardActionGroup;
-
-  // Toolbars
-  QScopedPointer<QToolBar> mToolBarFile;
-  QScopedPointer<QToolBar> mToolBarEdit;
-  QScopedPointer<QToolBar> mToolBarView;
-  QScopedPointer<SearchToolBar> mToolBarSearch;
-  QScopedPointer<QToolBar> mToolBarCommand;
-  QScopedPointer<QToolBar> mToolBarTools;
-
-  // Docks
-  QScopedPointer<UnplacedComponentsDock> mDockUnplacedComponents;
-  QScopedPointer<BoardLayersDock> mDockLayers;
-  QScopedPointer<RuleCheckDock> mDockErc;
-  QScopedPointer<RuleCheckDock> mDockDrc;
-
-  // Menus
-  QPointer<QMenu> mMenuBoard;
+  // Registered active tabs
+  QVector<QPointer<Board2dTab>> mActive2dTabs;
+  QVector<QPointer<Board3dTab>> mActive3dTabs;
 };
 
 /*******************************************************************************

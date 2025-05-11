@@ -1,0 +1,137 @@
+import { Tab } from "../../tab.slint";
+import {
+    SceneButton,
+    Spinner,
+} from "../../widgets.slint";
+import {
+    Backend,
+    Board3dTabData,
+    BoardAction,
+    Data,
+    TabAction,
+    WindowSectionData,
+} from "../../api.slint";
+
+export component Board3dTab inherits Tab {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    property <[Board3dTabData]> tabs: section.board-3d-tabs;
+    property <int> index: section.current-tab-index;
+
+    enabled: true;
+
+    if Data.preview-mode: Rectangle {
+        background: tabs[index].background-color;
+    }
+
+    img := Image {
+        image-fit: ImageFit.preserve;
+        image-rendering: ImageRendering.pixelated;
+        source: Backend.render-scene(section-index, root.width, root.height, 0, tabs[index].frame);
+        accessible-role: none;
+    }
+
+    ta := TouchArea {
+        mouse-cursor: tabs[index].cursor;
+
+        if !tabs[index].error.is-empty: Rectangle {
+            width: self.preferred-width;
+            height: self.preferred-height;
+            background: red;
+            border-radius: 8px;
+
+            VerticalLayout {
+                padding: 8px;
+
+                error-txt := Text {
+                    max-width: 0.7 * root.width;
+                    color: white;
+                    wrap: word-wrap;
+                    text: tabs[index].error;
+                }
+            }
+        }
+
+        VerticalLayout {
+            x: parent.width - self.preferred-width - 10px;
+            y: 10px;
+            width: self.preferred-width;
+
+            zoom-fit-btn := SceneButton {
+                icon: @image-url("../../../../../font-awesome/svgs/solid/expand.svg");
+                icon-scale: 0.9;
+                bg-color: tabs[index].background-color;
+                fg-color: tabs[index].foreground-color;
+
+                clicked => {
+                    Backend.trigger-tab(section-index, index, TabAction.zoom-fit);
+                }
+            }
+
+            zoom-in-btn := SceneButton {
+                icon: @image-url("../../../../../bootstrap-icons/icons/zoom-in.svg");
+                bg-color: tabs[index].background-color;
+                fg-color: tabs[index].foreground-color;
+
+                clicked => {
+                    Backend.trigger-tab(section-index, index, TabAction.zoom-in);
+                }
+            }
+
+            zoom-out-btn := SceneButton {
+                icon: @image-url("../../../../../bootstrap-icons/icons/zoom-out.svg");
+                bg-color: tabs[index].background-color;
+                fg-color: tabs[index].foreground-color;
+
+                clicked => {
+                    Backend.trigger-tab(section-index, index, TabAction.zoom-out);
+                }
+            }
+
+            toggle-2d-btn := SceneButton {
+                text: "2D";
+                bg-color: tabs[index].background-color;
+                fg-color: tabs[index].foreground-color;
+
+                clicked => {
+                    Backend.trigger-board(tabs[index].project-index, tabs[index].board-index, BoardAction.open-2d);
+                }
+            }
+
+            Rectangle {
+                height: 5px;
+            }
+
+            if tabs[index].refreshing: spinner := Spinner {
+                x: (parent.width - self.width) / 2;
+                width: 20px;
+                height: self.width;
+                foreground-color: tabs[index].foreground-color;
+                indeterminate: true;
+            }
+        }
+
+        pointer-event(event) => {
+            if event.kind == PointerEventKind.down {
+                Data.set-current-tab(section-index, index);
+                if !root.has-focus {
+                    root.focus();
+                }
+            }
+            Backend.scene-pointer-event(section-index, self.mouse-x, self.mouse-y, event);
+        }
+
+        scroll-event(event) => {
+            Backend.scene-scrolled(section-index, self.mouse-x, self.mouse-y, event) ? accept : reject
+        }
+    }
+
+    key-pressed(event) => {
+        Data.set-current-tab(section-index, index);
+        reject
+    }
+
+    key-released(event) => {
+        Backend.scene-key-event(section-index, event) ? accept : reject
+    }
+}

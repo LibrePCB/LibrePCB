@@ -69,8 +69,6 @@ public:
       const GraphicsSceneMouseEvent& e) noexcept override;
   virtual bool processGraphicsSceneLeftMouseButtonPressed(
       const GraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processSwitchToSchematicPage(int index) noexcept override;
-  virtual void processSwitchedSchematicPage() noexcept override;
 
   // Operator Overloadings
   SchematicEditorState_Measure& operator=(

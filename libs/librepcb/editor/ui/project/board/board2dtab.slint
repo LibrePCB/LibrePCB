@@ -1,0 +1,479 @@
+import { DrawTraceToolBar } from "drawtracetoolbar.slint";
+import { AddViaToolBar } from "addviatoolbar.slint";
+import { DrawPolygonToolBar } from "drawpolygontoolbar.slint";
+import { AddStrokeTextToolBar } from "addstroketexttoolbar.slint";
+import { DrawPlaneToolBar } from "drawplanetoolbar.slint";
+import { DrawZoneToolBar } from "drawzonetoolbar.slint";
+import { AddHoleToolBar } from "addholetoolbar.slint";
+import { Tab } from "../../tab.slint";
+import {
+    Button,
+    LinkText,
+    MessageBox,
+    SceneButton,
+    Spinner,
+    ToolButton,
+} from "../../widgets.slint";
+import {
+    Backend,
+    Board2dTabData,
+    BoardAction,
+    BoardData,
+    Constants,
+    Data,
+    DismissableMessageAction,
+    EditorCommandSet as Cmd,
+    EditorTool,
+    PanelPage,
+    ProjectData,
+    TabAction,
+    WindowSectionData,
+} from "../../api.slint";
+
+export component Board2dTab inherits Tab {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    property <[Board2dTabData]> tabs: section.board-2d-tabs;
+    property <int> index: section.current-tab-index;
+    property <ProjectData> project: Data.projects[tabs[index].project-index];
+    property <BoardData> board: project.boards[tabs[index].board-index];
+    property <length> toolbar-space: view-buttons-l.x - toolbuttons-l.x - toolbuttons-l.width - 10px;
+    property <length> toolbutton-offset-y: (toolbar-r.width > toolbar-space) ? toolbar-r.height : 0;
+    property <EditorTool> tool: tabs[index].tool;
+
+    function tool-triggered(action: TabAction) {
+        Data.set-current-tab(section-index, index);
+        Backend.trigger-tab(section-index, index, action);
+    }
+
+    enabled: true;
+
+    changed absolute-position => {
+        section.board-2d-tabs[index].scene-image-pos = self.absolute-position;
+    }
+
+    // When the tool changes, move focus to scene to make tabulator & escape
+    // working correctly.
+    changed tool => {
+        root.focus();
+    }
+
+    init => {
+        section.board-2d-tabs[index].scene-image-pos = self.absolute-position;
+    }
+
+    if Data.preview-mode: Rectangle {
+        background: black;
+    }
+
+    img := Image {
+        image-fit: preserve;
+        image-rendering: pixelated;
+        source: Backend.render-scene(section-index, root.width, root.height, 0, tabs[index].frame);
+        accessible-role: none;
+    }
+
+    // Show overlay, if text is not empty.
+    if !tabs[index].tool-overlay-text.is-empty: Rectangle {
+        x: 2 * toolbuttons-l.x + toolbuttons-l.width;
+        y: toolbuttons-l.y;
+        width: overlay-txt.preferred-width + 2 * overlay-txt.x;
+        height: overlay-txt.preferred-height + 2 * overlay-txt.y;
+        background: tabs[index].overlay-color;
+        border-radius: 10px;
+        border-width: 1px;
+        border-color: tabs[index].overlay-text-color;
+
+        overlay-txt := Text {
+            x: 8px;
+            y: 8px;
+            horizontal-alignment: left;
+            vertical-alignment: top;
+            font-family: "Noto Sans Mono";
+            color: tabs[index].overlay-text-color;
+            text: tabs[index].tool-overlay-text;
+        }
+    }
+
+    ta := TouchArea {
+        mouse-cursor: tabs[index].tool-cursor;
+
+        toolbar-r := Rectangle {
+            y: 0;
+            width: min(self.preferred-width, root.width - 10px);
+            height: 34px;
+            background: #505050;
+            border-bottom-left-radius: 11px;
+            border-bottom-right-radius: 11px;
+            visible: self.width > 30px;
+
+            HorizontalLayout {
+                alignment: center;
+                padding: 3px;
+
+                if tabs[index].tool == EditorTool.wire: trace-toolbar := DrawTraceToolBar {
+                    section-index: section-index;
+                    section: section;
+                }
+
+                if tabs[index].tool == EditorTool.via: via-toolbar := AddViaToolBar {
+                    section-index: section-index;
+                    section: section;
+                }
+
+                if tabs[index].tool == EditorTool.polygon: polygon-toolbar := DrawPolygonToolBar {
+                    section-index: section-index;
+                    section: section;
+                }
+
+                if tabs[index].tool == EditorTool.text: text-toolbar := AddStrokeTextToolBar {
+                    section-index: section-index;
+                    section: section;
+                }
+
+                if tabs[index].tool == EditorTool.plane: plane-toolbar := DrawPlaneToolBar {
+                    section-index: section-index;
+                    section: section;
+                }
+
+                if tabs[index].tool == EditorTool.zone: zone-toolbar := DrawZoneToolBar {
+                    section-index: section-index;
+                    section: section;
+                }
+
+                if tabs[index].tool == EditorTool.hole: hole-toolbar := AddHoleToolBar {
+                    section-index: section-index;
+                    section: section;
+                }
+            }
+        }
+
+        if tabs[index].tool == EditorTool.select: VerticalLayout {
+            width: min(self.preferred-width, 0.7 * parent.width, 550px);
+            padding: 20px;
+            spacing: 10px;
+
+            if tabs[index].empty-schematics-msg.visible: empty-schematics-msg := MessageBox {
+                title: @tr("Empty Schematics");
+                supports-dont-show-again: tabs[index].empty-schematics-msg.supports-dont-show-again;
+
+                Text {
+                    wrap: word-wrap;
+                    color: parent.text-color;
+                    text: @tr("Only components existing in the schematics can be added to a board, but the schematics of this project are currently empty. Please draw the schematics first before starting with the board design.");
+                }
+
+                HorizontalLayout {
+                    alignment: start;
+
+                    empty-schematics-help-btn := LinkText {
+                        text-color: empty-schematics-msg.text-color;
+                        text-color-hovered: empty-schematics-msg.hover-color;
+                        wrap: word-wrap;
+                        text: "▸ " + @tr("Learn how to create schematics");
+                        status-tip: Constants.user-manual-create-schematics-url;
+
+                        clicked => {
+                            Backend.open-url(self.status-tip);
+                        }
+                    }
+                }
+
+                dismiss-clicked => {
+                    tabs[index].empty-schematics-msg.action = DismissableMessageAction.dismiss;
+                }
+
+                dont-show-again-clicked => {
+                    tabs[index].empty-schematics-msg.action = DismissableMessageAction.dont-show-again;
+                }
+            }
+
+            if tabs[index].place-devices-msg.visible: place-devices-msg := MessageBox {
+                title: @tr("Get Started");
+                supports-dont-show-again: tabs[index].place-devices-msg.supports-dont-show-again;
+
+                Text {
+                    wrap: word-wrap;
+                    color: parent.text-color;
+                    text: @tr("Start designing the board by placing all devices which are part of the schematics.");
+                }
+
+                if Data.panel-page == PanelPage.place-devices: VerticalLayout {
+                    padding-left: 10px;
+                    spacing: 3px;
+
+                    Text {
+                        wrap: word-wrap;
+                        color: place-devices-msg.text-color;
+                        text: "1. " + @tr("Select an unplaced component in the list.");
+                    }
+
+                    Text {
+                        wrap: word-wrap;
+                        color: place-devices-msg.text-color;
+                        text: "2. " + @tr("Choose the desired device (which defines the package to use).");
+                    }
+
+                    Text {
+                        wrap: word-wrap;
+                        color: place-devices-msg.text-color;
+                        text: "3. " + @tr("Choose the desired footprint variant if there are multiple.");
+                    }
+
+                    Text {
+                        wrap: word-wrap;
+                        color: place-devices-msg.text-color;
+                        text: "4. " + @tr("Confirm with the button and place the device interactively with the cursor.");
+                    }
+                }
+
+                if Data.panel-page != PanelPage.place-devices: place-devices-btn := Button {
+                    primary: true;
+                    text: @tr("Place Devices");
+
+                    clicked => {
+                        Data.panel-page = PanelPage.place-devices;
+                    }
+                }
+
+                HorizontalLayout {
+                    alignment: start;
+
+                    place-devices-help-btn := LinkText {
+                        text-color: place-devices-msg.text-color;
+                        text-color-hovered: place-devices-msg.hover-color;
+                        wrap: word-wrap;
+                        text: "▸ " + @tr("Learn how to create boards");
+                        status-tip: Constants.user-manual-create-board-url;
+
+                        clicked => {
+                            Backend.open-url(self.status-tip);
+                        }
+                    }
+                }
+
+                dismiss-clicked => {
+                    tabs[index].place-devices-msg.action = DismissableMessageAction.dismiss;
+                }
+
+                dont-show-again-clicked => {
+                    tabs[index].place-devices-msg.action = DismissableMessageAction.dont-show-again;
+                }
+            }
+        }
+
+        toolbuttons-l := VerticalLayout {
+            x: 7px;
+            y: 7px + toolbutton-offset-y;
+            width: self.preferred-width;
+            height: parent.height - 2 * self.y;
+            spacing: 5px;
+
+            tool-select-btn := ToolButton {
+                cmd: Cmd.tool-select;
+                icon: @image-url("../../../../../font-awesome/svgs/solid/arrow-pointer.svg");
+                checked: tabs[index].tool == EditorTool.select;
+
+                clicked => {
+                    tool-triggered(TabAction.tool-select);
+                }
+            }
+
+            tool-trace-btn := ToolButton {
+                cmd: Cmd.tool-trace;
+                icon: @image-url("../../../../../../img/actions/draw_wire.png");
+                checked: tabs[index].tool == EditorTool.wire;
+
+                clicked => {
+                    tool-triggered(TabAction.tool-wire);
+                }
+            }
+
+            tool-via-btn := ToolButton {
+                cmd: Cmd.tool-via;
+                checked: tabs[index].tool == EditorTool.via;
+
+                clicked => {
+                    tool-triggered(TabAction.tool-via);
+                }
+            }
+
+            tool-polygon-btn := ToolButton {
+                cmd: Cmd.tool-polygon;
+                icon: @image-url("../../../../../font-awesome/svgs/solid/draw-polygon.svg");
+                checked: tabs[index].tool == EditorTool.polygon;
+
+                clicked => {
+                    tool-triggered(TabAction.tool-polygon);
+                }
+            }
+
+            tool-text-btn := ToolButton {
+                cmd: Cmd.tool-text;
+                icon: @image-url("../../../../../font-awesome/svgs/solid/font.svg");
+                checked: tabs[index].tool == EditorTool.text;
+
+                clicked => {
+                    tool-triggered(TabAction.tool-text);
+                }
+            }
+
+            tool-plane-btn := ToolButton {
+                cmd: Cmd.tool-plane;
+                checked: tabs[index].tool == EditorTool.plane;
+
+                clicked => {
+                    tool-triggered(TabAction.tool-plane);
+                }
+            }
+
+            tool-zone-btn := ToolButton {
+                cmd: Cmd.tool-zone;
+                icon: @image-url("../../../../../bootstrap-icons/icons/sign-stop.svg");
+                checked: tabs[index].tool == EditorTool.zone;
+
+                clicked => {
+                    tool-triggered(TabAction.tool-zone);
+                }
+            }
+
+            tool-hole-btn := ToolButton {
+                cmd: Cmd.tool-hole;
+                icon: @image-url("../../../../../font-awesome/svgs/solid/bore-hole.svg");
+                checked: tabs[index].tool == EditorTool.hole;
+
+                clicked => {
+                    tool-triggered(TabAction.tool-hole);
+                }
+            }
+
+            tool-measure-btn := ToolButton {
+                cmd: Cmd.tool-measure;
+                icon: @image-url("../../../../../font-awesome/svgs/solid/ruler.svg");
+                checked: tabs[index].tool == EditorTool.measure;
+
+                clicked => {
+                    tool-triggered(TabAction.tool-measure);
+                }
+            }
+        }
+
+        view-buttons-l := VerticalLayout {
+            x: parent.width - self.preferred-width - 7px;
+            y: toolbutton-offset-y + 7px;
+            width: self.preferred-width;
+
+            zoom-fit-btn := SceneButton {
+                icon: @image-url("../../../../../font-awesome/svgs/solid/expand.svg");
+                icon-scale: 0.9;
+                bg-color: tabs[index].background-color;
+                fg-color: tabs[index].foreground-color;
+
+                clicked => {
+                    Backend.trigger-tab(section-index, index, TabAction.zoom-fit);
+                }
+            }
+
+            zoom-in-btn := SceneButton {
+                icon: @image-url("../../../../../bootstrap-icons/icons/zoom-in.svg");
+                bg-color: tabs[index].background-color;
+                fg-color: tabs[index].foreground-color;
+
+                clicked => {
+                    Backend.trigger-tab(section-index, index, TabAction.zoom-in);
+                }
+            }
+
+            zoom-out-btn := SceneButton {
+                icon: @image-url("../../../../../bootstrap-icons/icons/zoom-out.svg");
+                bg-color: tabs[index].background-color;
+                fg-color: tabs[index].foreground-color;
+
+                clicked => {
+                    Backend.trigger-tab(section-index, index, TabAction.zoom-out);
+                }
+            }
+
+            toggle-3d-btn := SceneButton {
+                text: "3D";
+                bg-color: tabs[index].background-color;
+                fg-color: tabs[index].foreground-color;
+
+                clicked => {
+                    Backend.trigger-board(tabs[index].project-index, tabs[index].board-index, BoardAction.open-3d);
+                }
+            }
+
+            Rectangle {
+                height: 5px;
+            }
+
+            if tabs[index].refreshing: spinner := Spinner {
+                x: (parent.width - self.width) / 2;
+                width: 20px;
+                height: self.width;
+                foreground-color: tabs[index].foreground-color;
+                indeterminate: true;
+            }
+        }
+
+        VerticalLayout {
+            x: 5px;
+            y: parent.height - self.height - self.x;
+            width: self.preferred-width;
+            height: self.preferred-height;
+
+            if board.drc.unapproved > 0: unapproved-messages-btn := LinkText {
+                text-color: tabs[index].foreground-color.with-alpha(0.7);
+                text-color-hovered: tabs[index].foreground-color;
+                text: @tr("DRC Messages: {}", board.drc.unapproved);
+                accessible-role: none;
+
+                clicked => {
+                    Data.panel-page = PanelPage.rule-check;
+                }
+            }
+
+            if tabs[index].unplaced-components.length > 0: unplaced-devices-btn := LinkText {
+                text-color: tabs[index].foreground-color.with-alpha(0.7);
+                text-color-hovered: tabs[index].foreground-color;
+                text: @tr("Unplaced: {}", tabs[index].unplaced-components.length);
+                accessible-role: none;
+
+                clicked => {
+                    Data.panel-page = PanelPage.place-devices;
+                }
+            }
+        }
+
+        pointer-event(event) => {
+            if event.kind == PointerEventKind.down {
+                Data.set-current-tab(section-index, index);
+                if !root.has-focus {
+                    root.focus();
+                }
+            }
+            Backend.scene-pointer-event(section-index, self.mouse-x, self.mouse-y, event);
+        }
+
+        scroll-event(event) => {
+            Backend.scene-scrolled(section-index, self.mouse-x, self.mouse-y, event) ? accept : reject
+        }
+    }
+
+    key-pressed(event) => {
+        Data.set-current-tab(section-index, index);
+
+        // If the focus is in the command toolbar, make the Escape key moving
+        // the focus back to the graphics scene without triggering any action.
+        if (event.text == Key.Escape) && (!root.has-focus) {
+            root.focus();
+            return accept;
+        }
+        reject
+    }
+
+    key-released(event) => {
+        Backend.scene-key-event(section-index, event) ? accept : reject
+    }
+}

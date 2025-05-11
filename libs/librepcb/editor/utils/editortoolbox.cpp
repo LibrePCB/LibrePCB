@@ -258,7 +258,7 @@ void EditorToolbox::addResourcesToMenu(const Workspace& ws, MenuBuilder& mb,
       name = name.left(97) + "…";
     }
     QAction* a =
-        new QAction(QIcon(":/img/actions/pdf.png"), name % "...", &root);
+        new QAction(svgIcon(":/fa/solid/file-pdf.svg"), name % "...", &root);
     QObject::connect(a, &QAction::triggered, editor, [&ws, res, editor]() {
       DesktopServices::downloadAndOpenResourceAsync(
           ws.getSettings(), *res.getName(), res.getMediaType(), res.getUrl(),
@@ -281,7 +281,7 @@ void EditorToolbox::addResourcesToMenu(const Workspace& ws, MenuBuilder& mb,
             ((!info) || (info->resources.value(0).url.isValid())) &&
             (!parts.contains(part)) && (actions.count() < 20)) {
           QAction* a = new QAction(
-              QIcon(":/img/actions/search.png"),
+              svgIcon(":/fa/solid/magnifying-glass.svg"),
               tr("Search datasheet for '%1'").arg(*part.getMpn()) % "...",
               &root);
           QObject::connect(

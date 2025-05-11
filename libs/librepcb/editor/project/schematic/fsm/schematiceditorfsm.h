@@ -26,7 +26,6 @@
 #include <librepcb/core/types/point.h>
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -63,8 +62,8 @@ public:
   struct Context {
     Workspace& workspace;
     Project& project;
+    Schematic& schematic;
     UndoStack& undoStack;
-    QWidget& parentWidget;
     SchematicEditorFsmAdapter& adapter;
   };
 
@@ -128,29 +127,6 @@ public:
       const GraphicsSceneMouseEvent& e) noexcept;
   bool processGraphicsSceneRightMouseButtonReleased(
       const GraphicsSceneMouseEvent& e) noexcept;
-
-  /**
-   * Switch to another schematic page
-   *
-   * If someone (the user or the application) wants to switch to another
-   * schematic page in the schematic editor, this is not allowed at any time
-   * (for example, while drawing a netline in the active schematic, you cannot
-   * switch to another schematic). So this kind of event must be processed by
-   * the FSM. The FSM then will only decide whether changing the schematic is
-   * allowed (event accepted) or not (event rejected). If the event was
-   * accepted, the schematic editor then is allowed to switch to the requested
-   * schematic page.
-   *
-   * @param index   The new schematic page index
-   * @retval true   If switching is allowed
-   * @retval false  If switching is rejected
-   */
-  bool processSwitchToSchematicPage(int index) noexcept;
-
-  /**
-   * @brief Notification about a switched schematic page
-   */
-  void processSwitchedSchematicPage() noexcept;
 
   // Operator Overloadings
   SchematicEditorFsm& operator=(const SchematicEditorFsm& rhs) = delete;
