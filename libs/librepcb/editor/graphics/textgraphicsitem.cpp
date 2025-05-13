@@ -23,6 +23,7 @@
 #include "textgraphicsitem.h"
 
 #include "graphicslayer.h"
+#include "graphicslayerlist.h"
 #include "origincrossgraphicsitem.h"
 #include "primitivetextgraphicsitem.h"
 
@@ -41,12 +42,11 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-TextGraphicsItem::TextGraphicsItem(Text& text,
-                                   const IF_GraphicsLayerProvider& lp,
+TextGraphicsItem::TextGraphicsItem(Text& text, const GraphicsLayerList& layers,
                                    QGraphicsItem* parent) noexcept
   : QGraphicsItemGroup(parent),
     mText(text),
-    mLayerProvider(lp),
+    mLayers(layers),
     mTextOverride(std::nullopt),
     mTextGraphicsItem(new PrimitiveTextGraphicsItem(this)),
     mOriginCrossGraphicsItem(new OriginCrossGraphicsItem(this)),
@@ -59,14 +59,14 @@ TextGraphicsItem::TextGraphicsItem(Text& text,
 
   mTextGraphicsItem->setFont(PrimitiveTextGraphicsItem::Font::SansSerif);
   mTextGraphicsItem->setHeight(mText.getHeight());
-  mTextGraphicsItem->setLayer(mLayerProvider.getLayer(mText.getLayer()));
+  mTextGraphicsItem->setLayer(mLayers.get(mText.getLayer()));
   mTextGraphicsItem->setRotation(mText.getRotation());
   mTextGraphicsItem->setAlignment(mText.getAlign());
   updateText();
 
   mOriginCrossGraphicsItem->setSize(UnsignedLength(1000000));
   mOriginCrossGraphicsItem->setLayer(
-      mLayerProvider.getLayer(Theme::Color::sSchematicReferences));
+      mLayers.get(Theme::Color::sSchematicReferences));
   mOriginCrossGraphicsItem->setRotation(mText.getRotation());
 
   // register to the text to get attribute updates
@@ -116,7 +116,7 @@ void TextGraphicsItem::textEdited(const Text& text,
                                   Text::Event event) noexcept {
   switch (event) {
     case Text::Event::LayerChanged:
-      mTextGraphicsItem->setLayer(mLayerProvider.getLayer(text.getLayer()));
+      mTextGraphicsItem->setLayer(mLayers.get(text.getLayer()));
       break;
     case Text::Event::TextChanged:
       updateText();

@@ -47,22 +47,25 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SymbolChooserDialog::SymbolChooserDialog(
-    const Workspace& ws, const IF_GraphicsLayerProvider& layerProvider,
-    QWidget* parent) noexcept
+SymbolChooserDialog::SymbolChooserDialog(const Workspace& ws,
+                                         const GraphicsLayerList& layers,
+                                         QWidget* parent) noexcept
   : QDialog(parent),
     mWorkspace(ws),
-    mLayerProvider(layerProvider),
+    mLayers(layers),
     mUi(new Ui::SymbolChooserDialog),
     mPreviewScene(new GraphicsScene()),
     mCategorySelected(false) {
   mUi->setupUi(this);
 
   const Theme& theme = mWorkspace.getSettings().themes.getActive();
-  mUi->graphicsView->setBackgroundColors(
+  mPreviewScene->setBackgroundColors(
       theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor(),
       theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
-  mUi->graphicsView->setOriginCrossVisible(false);
+  mPreviewScene->setOriginCrossVisible(false);
+
+  mUi->graphicsView->setSpinnerColor(
+      theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
   mUi->graphicsView->setScene(mPreviewScene.data());
 
   mCategoryTreeModel.reset(
@@ -241,8 +244,7 @@ void SymbolChooserDialog::setSelectedSymbol(const FilePath& fp) noexcept {
           *mSelectedSymbol->getNames().value(localeOrder()));
       mUi->lblSymbolDescription->setText(
           mSelectedSymbol->getDescriptions().value(localeOrder()));
-      mGraphicsItem.reset(
-          new SymbolGraphicsItem(*mSelectedSymbol, mLayerProvider));
+      mGraphicsItem.reset(new SymbolGraphicsItem(*mSelectedSymbol, mLayers));
       mPreviewScene->addItem(*mGraphicsItem);
       mUi->graphicsView->zoomAll();
     } catch (const Exception& e) {

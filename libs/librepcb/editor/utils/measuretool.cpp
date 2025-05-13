@@ -60,11 +60,10 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-MeasureTool::MeasureTool(GraphicsView& view, const LengthUnit& unit,
-                         QObject* parent) noexcept
+MeasureTool::MeasureTool(QObject* parent) noexcept
   : QObject(parent),
-    mView(&view),
-    mUnit(unit),
+    mScene(),
+    mUnit(LengthUnit::millimeters()),
     mSnapCandidates(),
     mLastScenePos(),
     mCursorPos(),
@@ -166,16 +165,17 @@ void MeasureTool::setBoard(const Board* board) noexcept {
   }
 }
 
-void MeasureTool::enter() noexcept {
-  if (mView) {
-    if (GraphicsScene* scene = mView->getScene()) {
-      scene->setSelectionArea(QPainterPath());  // clear selection
-    }
-    mView->setGrayOut(true);
-    mView->setCursor(Qt::CrossCursor);
-    mLastScenePos = mView->mapGlobalPosToScenePos(QCursor::pos(), true, true);
-  }
+void MeasureTool::enter(GraphicsScene& scene, const LengthUnit& unit,
+                        const Point& pos) noexcept {
+  mScene = &scene;
+  mUnit = unit;
+  mLastScenePos = pos;
+
+  mScene->setSelectionArea(QPainterPath());  // clear selection
+  mScene->setGrayOut(true);
+
   updateCursorPosition(Qt::KeyboardModifier::NoModifier);
+  updateRulerPositions();
   updateStatusBarMessage();
 }
 
@@ -185,14 +185,13 @@ void MeasureTool::leave() noexcept {
   // later. This might be useful in some cases to avoid needing to measure the
   // same distance again.
 
-  if (mView) {
-    mView->unsetCursor();
-    mView->setInfoBoxText(QString());
-    mView->setSceneCursor(std::nullopt);
-    mView->setRulerPositions(std::nullopt);
-    mView->setGrayOut(false);
+  if (mScene) {
+    mScene->setSceneCursor(Point(), false, false);
+    mScene->setRulerPositions(std::nullopt);
+    mScene->setGrayOut(false);
   }
 
+  emit infoBoxTextChanged(QString());
   emit statusBarMessageChanged(QString());
 }
 
@@ -200,18 +199,20 @@ void MeasureTool::leave() noexcept {
  *  Event Handlers
  ******************************************************************************/
 
-bool MeasureTool::processKeyPressed(const QKeyEvent& e) noexcept {
-  if (e.key() == Qt::Key_Shift) {
-    updateCursorPosition(e.modifiers());
+bool MeasureTool::processKeyPressed(int key,
+                                    Qt::KeyboardModifiers modifiers) noexcept {
+  if (key == Qt::Key_Shift) {
+    updateCursorPosition(modifiers);
     return true;
   }
 
   return false;
 }
 
-bool MeasureTool::processKeyReleased(const QKeyEvent& e) noexcept {
-  if (e.key() == Qt::Key_Shift) {
-    updateCursorPosition(e.modifiers());
+bool MeasureTool::processKeyReleased(int key,
+                                     Qt::KeyboardModifiers modifiers) noexcept {
+  if (key == Qt::Key_Shift) {
+    updateCursorPosition(modifiers);
     return true;
   }
 
@@ -219,16 +220,13 @@ bool MeasureTool::processKeyReleased(const QKeyEvent& e) noexcept {
 }
 
 bool MeasureTool::processGraphicsSceneMouseMoved(
-    QGraphicsSceneMouseEvent& e) noexcept {
-  mLastScenePos = Point::fromPx(e.scenePos());
-  updateCursorPosition(e.modifiers());
+    const Point& pos, Qt::KeyboardModifiers modifiers) noexcept {
+  mLastScenePos = pos;
+  updateCursorPosition(modifiers);
   return true;
 }
 
-bool MeasureTool::processGraphicsSceneLeftMouseButtonPressed(
-    QGraphicsSceneMouseEvent& e) noexcept {
-  Q_UNUSED(e);
-
+bool MeasureTool::processGraphicsSceneLeftMouseButtonPressed() noexcept {
   if ((!mStartPos) || mEndPos) {
     // Set first point.
     mStartPos = mCursorPos;
@@ -245,7 +243,7 @@ bool MeasureTool::processGraphicsSceneLeftMouseButtonPressed(
 }
 
 bool MeasureTool::processCopy() noexcept {
-  if (mView && mStartPos && mEndPos) {
+  if (mStartPos && mEndPos) {
     const Point diff = (*mEndPos) - (*mStartPos);
     const qreal value = mUnit.convertToUnit(*diff.getLength());
     const QString str = Toolbox::floatToString(value, 12, QLocale());
@@ -375,7 +373,7 @@ QSet<Point> MeasureTool::snapCandidatesFromCircle(
 
 void MeasureTool::updateCursorPosition(
     Qt::KeyboardModifiers modifiers) noexcept {
-  if (!mView) {
+  if (!mScene) {
     return;
   }
 
@@ -392,7 +390,7 @@ void MeasureTool::updateCursorPosition(
       }
     }
 
-    const Point posOnGrid = mCursorPos.mappedToGrid(mView->getGridInterval());
+    const Point posOnGrid = mCursorPos.mappedToGrid(mScene->getGridInterval());
     const Length gridDistance = *(mCursorPos - posOnGrid).getLength();
     if ((nearestDistance >= 0) && (nearestDistance <= gridDistance)) {
       mCursorPos = nearestCandidate;
@@ -405,25 +403,18 @@ void MeasureTool::updateCursorPosition(
 }
 
 void MeasureTool::updateRulerPositions() noexcept {
-  if (!mView) {
+  if (!mScene) {
     return;
   }
 
-  GraphicsView::CursorOptions cursorOptions(0);
-  if ((!mStartPos) || mEndPos) {
-    cursorOptions |= GraphicsView::CursorOption::Cross;
-  }
-  if (mCursorSnapped) {
-    cursorOptions |= GraphicsView::CursorOption::Circle;
-  }
-  mView->setSceneCursor(std::make_pair(mCursorPos, cursorOptions));
+  mScene->setSceneCursor(mCursorPos, (!mStartPos) || mEndPos, mCursorSnapped);
 
   const Point startPos = mStartPos ? *mStartPos : mCursorPos;
   const Point endPos = mEndPos ? *mEndPos : mCursorPos;
   if (mStartPos) {
-    mView->setRulerPositions(std::make_pair(startPos, endPos));
+    mScene->setRulerPositions(std::make_pair(startPos, endPos));
   } else {
-    mView->setRulerPositions(std::nullopt);
+    mScene->setRulerPositions(std::nullopt);
   }
 
   const Point diff = endPos - startPos;
@@ -458,7 +449,7 @@ void MeasureTool::updateRulerPositions() noexcept {
               .arg(mUnit.toShortStringTr());
   text += QString("<b>∠: %1°</b>").arg(angle.toDeg(), 14 - decimals, 'f', 3);
   text.replace(" ", "&nbsp;");
-  mView->setInfoBoxText(text);
+  emit infoBoxTextChanged(text);
 }
 
 void MeasureTool::updateStatusBarMessage() noexcept {

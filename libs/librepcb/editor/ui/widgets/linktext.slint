@@ -1,15 +1,45 @@
 import { Palette } from "std-widgets.slint";
+import { Data } from "../api.slint";
 
 export component LinkText inherits Text {
+    in property <string> status-tip;
     in property <color> text-color: #e0e0e0;
+    in property <color> text-color-hovered: text-color.brighter(0.5);
     in property <bool> enabled: true;
 
-    color: ta.has-hover ? text-color.brighter(0.5) : (enabled ? text-color : Palette.foreground);
+    color: ta.has-hover ? text-color-hovered : (enabled ? text-color : Palette.foreground);
 
-    callback clicked <=> ta.clicked;
+    // Accessibility
+    accessible-role: button;
+    accessible-description: status-tip;
+    accessible-action-default => {
+        ta.clicked();
+    }
+
+    callback clicked;
 
     ta := TouchArea {
         mouse-cursor: pointer;
         enabled: enabled;
+
+        changed has-hover => {
+            if !root.status-tip.is-empty {
+                if self.has-hover {
+                    Data.status-tip = root.status-tip;
+                } else {
+                    Data.status-tip = "";
+                }
+            }
+        }
+
+        clicked => {
+            // The click may destroy this element without calling the
+            // has-hover handler anymore, so we clear the status tip
+            // manually to be on the safe side.
+            if !root.status-tip.is-empty {
+                Data.status-tip = "";
+            }
+            root.clicked();
+        }
     }
 }

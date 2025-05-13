@@ -23,6 +23,7 @@
 #include "packageeditorstate_measure.h"
 
 #include "../../../utils/measuretool.h"
+#include "../../../widgets/graphicsview.h"
 
 #include <QtCore>
 
@@ -38,8 +39,9 @@ namespace editor {
 
 PackageEditorState_Measure::PackageEditorState_Measure(
     Context& context) noexcept
-  : PackageEditorState(context),
-    mTool(new MeasureTool(mContext.graphicsView, getLengthUnit())) {
+  : PackageEditorState(context), mTool(new MeasureTool()) {
+  connect(mTool.data(), &MeasureTool::infoBoxTextChanged,
+          &mContext.graphicsView, &GraphicsView::setInfoBoxText);
   connect(mTool.data(), &MeasureTool::statusBarMessageChanged, this,
           &PackageEditorState_Measure::statusBarMessageChanged);
 }
@@ -53,12 +55,15 @@ PackageEditorState_Measure::~PackageEditorState_Measure() noexcept {
 
 bool PackageEditorState_Measure::entry() noexcept {
   mTool->setFootprint(mContext.currentFootprint.get());
-  mTool->enter();
+  mTool->enter(mContext.graphicsScene, getLengthUnit(),
+               mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos()));
+  mContext.graphicsView.setCursor(Qt::CrossCursor);
   return true;
 }
 
 bool PackageEditorState_Measure::exit() noexcept {
   mTool->leave();
+  mContext.graphicsView.unsetCursor();
   return true;
 }
 
@@ -76,23 +81,24 @@ QSet<EditorWidgetBase::Feature>
  ******************************************************************************/
 
 bool PackageEditorState_Measure::processKeyPressed(
-    const QKeyEvent& e) noexcept {
-  return mTool->processKeyPressed(e);
+    const GraphicsSceneKeyEvent& e) noexcept {
+  return mTool->processKeyPressed(e.key, e.modifiers);
 }
 
 bool PackageEditorState_Measure::processKeyReleased(
-    const QKeyEvent& e) noexcept {
-  return mTool->processKeyReleased(e);
+    const GraphicsSceneKeyEvent& e) noexcept {
+  return mTool->processKeyReleased(e.key, e.modifiers);
 }
 
 bool PackageEditorState_Measure::processGraphicsSceneMouseMoved(
-    QGraphicsSceneMouseEvent& e) noexcept {
-  return mTool->processGraphicsSceneMouseMoved(e);
+    const GraphicsSceneMouseEvent& e) noexcept {
+  return mTool->processGraphicsSceneMouseMoved(e.scenePos, e.modifiers);
 }
 
 bool PackageEditorState_Measure::processGraphicsSceneLeftMouseButtonPressed(
-    QGraphicsSceneMouseEvent& e) noexcept {
-  return mTool->processGraphicsSceneLeftMouseButtonPressed(e);
+    const GraphicsSceneMouseEvent& e) noexcept {
+  Q_UNUSED(e);
+  return mTool->processGraphicsSceneLeftMouseButtonPressed();
 }
 
 bool PackageEditorState_Measure::processCopy() noexcept {

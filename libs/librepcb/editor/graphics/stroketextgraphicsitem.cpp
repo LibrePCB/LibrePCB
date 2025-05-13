@@ -23,6 +23,7 @@
 #include "stroketextgraphicsitem.h"
 
 #include "graphicslayer.h"
+#include "graphicslayerlist.h"
 #include "origincrossgraphicsitem.h"
 #include "primitivepathgraphicsitem.h"
 
@@ -39,12 +40,13 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-StrokeTextGraphicsItem::StrokeTextGraphicsItem(
-    StrokeText& text, const IF_GraphicsLayerProvider& lp,
-    const StrokeFont& font, QGraphicsItem* parent) noexcept
+StrokeTextGraphicsItem::StrokeTextGraphicsItem(StrokeText& text,
+                                               const GraphicsLayerList& layers,
+                                               const StrokeFont& font,
+                                               QGraphicsItem* parent) noexcept
   : QGraphicsItemGroup(parent),
     mText(text),
-    mLayerProvider(lp),
+    mLayers(layers),
     mFont(font),
     mTextOverride(std::nullopt),
     mPathGraphicsItem(new PrimitivePathGraphicsItem(this)),
@@ -139,7 +141,7 @@ void StrokeTextGraphicsItem::strokeTextEdited(
 }
 
 void StrokeTextGraphicsItem::updateLayer(const Layer& layer) noexcept {
-  std::shared_ptr<GraphicsLayer> obj = mLayerProvider.getLayer(layer);
+  std::shared_ptr<const GraphicsLayer> obj = mLayers.get(layer);
   mPathGraphicsItem->setLineLayer(obj);
   mOriginCrossGraphicsItem->setLayer(obj);
 }

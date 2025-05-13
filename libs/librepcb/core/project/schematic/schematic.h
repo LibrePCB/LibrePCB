@@ -144,6 +144,7 @@ public:
   }
 
 signals:
+  void nameChanged(const ElementName& name);
   void symbolAdded(SI_Symbol& symbol);
   void symbolRemoved(SI_Symbol& symbol);
   void netSegmentAdded(SI_NetSegment& netSegment);

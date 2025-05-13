@@ -1,0 +1,45 @@
+import {
+    ComboBox,
+    LineEdit,
+} from "../../widgets.slint";
+import {
+    SchematicTabData,
+    WindowSectionData,
+} from "../../api.slint";
+
+export component AddComponentToolBar inherits HorizontalLayout {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    property <[SchematicTabData]> tabs: section.schematic-tabs;
+
+    spacing: 2px;
+
+    value-edt := LineEdit {
+        min-width: 200px;
+        text: tabs[section.current-tab-index].tool-value.text;
+        placeholder-text: @tr("Enter value here...");
+        suggestions: tabs[section.current-tab-index].tool-value.suggestions;
+
+        text-edited(text) => {
+            tabs[section.current-tab-index].tool-value.text = text;
+        }
+    }
+
+    if tabs[section.current-tab-index].tool-attribute-value.enabled: attribute-value-edt := LineEdit {
+        text: tabs[section.current-tab-index].tool-attribute-value.text;
+        placeholder-text: tabs[section.current-tab-index].tool-attribute-value.placeholder;
+
+        text-edited(text) => {
+            tabs[section.current-tab-index].tool-attribute-value.text = text;
+        }
+    }
+
+    if tabs[section.current-tab-index].tool-attribute-unit.items.length > 0: unit-cbx := ComboBox {
+        model: tabs[section.current-tab-index].tool-attribute-unit.items;
+        current-index: tabs[section.current-tab-index].tool-attribute-unit.current-index;
+
+        current-index-changed(index) => {
+            tabs[section.current-tab-index].tool-attribute-unit.current-index = index;
+        }
+    }
+}

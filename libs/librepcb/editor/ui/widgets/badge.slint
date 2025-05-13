@@ -3,26 +3,43 @@ import { Palette } from "std-widgets.slint";
 export component Badge inherits Rectangle {
     in property <string> text;
     in property <color> text-color: Palette.foreground;
+    in property <color> text-color-hover: text-color.brighter(0.5);
     in property <length> font-size: 10px;
     in property <int> font-weight: 400;
+    in property <bool> clickable: false;
+    out property <bool> has-hover: false;
 
     height: txt.preferred-height + 2px;
     preferred-width: txt.preferred-width + 10px;
     min-width: (self.preferred-width > 50px) ? 10px : self.preferred-width;
     max-width: self.preferred-width;
-    border-color: text-color;
+    border-color: txt.color;
     border-width: 1px;
     border-radius: self.height / 2;
+
+    callback clicked;
 
     txt := Text {
         width: parent.width - 10px;
         height: parent.height;
         horizontal-alignment: center;
         vertical-alignment: center;
-        color: text-color;
+        color: has-hover ? text-color-hover : text-color;
         font-size: font-size;
         font-weight: font-weight;
         overflow: elide;
         text: text;
+    }
+
+    if clickable: ta := TouchArea {
+        mouse-cursor: pointer;
+
+        changed has-hover => {
+            root.has-hover = self.has-hover;
+        }
+
+        clicked => {
+            root.clicked();
+        }
     }
 }

@@ -45,8 +45,8 @@ class Symbol;
 
 namespace editor {
 
-class DefaultGraphicsLayerProvider;
 class FootprintGraphicsItem;
+class GraphicsLayerList;
 class GraphicsScene;
 class SymbolGraphicsItem;
 
@@ -110,7 +110,7 @@ private:  // Data
   QScopedPointer<Ui::DeviceEditorWidget> mUi;
   QScopedPointer<CategoryListEditorWidget> mCategoriesEditorWidget;
   std::unique_ptr<Device> mDevice;
-  QScopedPointer<DefaultGraphicsLayerProvider> mGraphicsLayerProvider;
+  std::unique_ptr<GraphicsLayerList> mLayers;
 
   // component
   std::shared_ptr<Component> mComponent;

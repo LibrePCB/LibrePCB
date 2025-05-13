@@ -1,0 +1,112 @@
+import {
+    ComboBox,
+    LengthEdit,
+    WireModeSelector,
+} from "../../widgets.slint";
+import {
+    Board2dTabData,
+    WindowSectionData,
+    WireMode,
+} from "../../api.slint";
+
+export component DrawTraceToolBar inherits HorizontalLayout {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    property <[Board2dTabData]> tabs: section.board-2d-tabs;
+
+    callback focus-rejected;
+
+    spacing: 2px;
+
+    layer-cbx := ComboBox {
+        model: tabs[section.current-tab-index].tool-layer.items;
+        current-index: tabs[section.current-tab-index].tool-layer.current-index;
+
+        current-index-changed(index) => {
+            tabs[section.current-tab-index].tool-layer.current-index = index;
+        }
+    }
+
+    line-width-edt := LengthEdit {
+        data: tabs[section.current-tab-index].tool-line-width;
+        icon: @image-url("../../../../../bootstrap-icons/icons/border-width.svg");
+        tooltip: @tr("Trace Width");
+        min-width-text: "1.234";
+        auto-supported: true;
+        auto-checked: tabs[section.current-tab-index].tool-filled;
+
+        value-changed(v) => {
+            tabs[section.current-tab-index].tool-line-width.value = v;
+        }
+
+        unit-changed(u) => {
+            tabs[section.current-tab-index].tool-line-width.unit = u;
+        }
+
+        increase-triggered => {
+            tabs[section.current-tab-index].tool-line-width.increase = true;
+        }
+
+        decrease-triggered => {
+            tabs[section.current-tab-index].tool-line-width.decrease = true;
+        }
+
+        auto-toggled(checked) => {
+            tabs[section.current-tab-index].tool-filled = checked;
+        }
+    }
+
+    via-size-edt := LengthEdit {
+        data: tabs[section.current-tab-index].tool-size;
+        icon: @image-url("../../../../../bootstrap-icons/icons/record-circle-fill.svg");
+        tooltip: @tr("Via Outer Diameter");
+        min-width-text: "1.234";
+
+        value-changed(v) => {
+            tabs[section.current-tab-index].tool-size.value = v;
+        }
+
+        unit-changed(u) => {
+            tabs[section.current-tab-index].tool-size.unit = u;
+        }
+
+        increase-triggered => {
+            tabs[section.current-tab-index].tool-size.increase = true;
+        }
+
+        decrease-triggered => {
+            tabs[section.current-tab-index].tool-size.decrease = true;
+        }
+    }
+
+    via-drill-edt := LengthEdit {
+        data: tabs[section.current-tab-index].tool-drill;
+        icon: @image-url("../../../../../font-awesome/svgs/solid/bore-hole.svg");
+        tooltip: @tr("Via Drill Diameter");
+        min-width-text: "1.234";
+
+        value-changed(v) => {
+            tabs[section.current-tab-index].tool-drill.value = v;
+        }
+
+        unit-changed(u) => {
+            tabs[section.current-tab-index].tool-drill.unit = u;
+        }
+
+        increase-triggered => {
+            tabs[section.current-tab-index].tool-drill.increase = true;
+        }
+
+        decrease-triggered => {
+            tabs[section.current-tab-index].tool-drill.decrease = true;
+        }
+    }
+
+    wire-mode-selector := WireModeSelector {
+        wire-mode: tabs[section.current-tab-index].tool-wire-mode;
+
+        wire-mode-clicked(mode) => {
+            tabs[section.current-tab-index].tool-wire-mode = mode;
+        }
+    }
+}

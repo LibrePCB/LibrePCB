@@ -36,7 +36,7 @@
 namespace librepcb {
 namespace editor {
 
-class IF_GraphicsLayerProvider;
+class GraphicsLayerList;
 
 /*******************************************************************************
  *  Class CircleGraphicsItem
@@ -50,7 +50,7 @@ public:
   // Constructors / Destructor
   CircleGraphicsItem() = delete;
   CircleGraphicsItem(const CircleGraphicsItem& other) = delete;
-  CircleGraphicsItem(Circle& circle, const IF_GraphicsLayerProvider& lp,
+  CircleGraphicsItem(Circle& circle, const GraphicsLayerList& layers,
                      QGraphicsItem* parent = nullptr) noexcept;
   virtual ~CircleGraphicsItem() noexcept;
 
@@ -67,7 +67,7 @@ private:  // Methods
 
 private:  // Data
   Circle& mCircle;
-  const IF_GraphicsLayerProvider& mLayerProvider;
+  const GraphicsLayerList& mLayers;
 
   // Slots
   Circle::OnEditedSlot mEditedSlot;

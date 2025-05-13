@@ -23,6 +23,7 @@
 #include "primitiveholegraphicsitem.h"
 
 #include "graphicslayer.h"
+#include "graphicslayerlist.h"
 #include "origincrossgraphicsitem.h"
 #include "primitivepathgraphicsitem.h"
 
@@ -42,10 +43,10 @@ namespace editor {
  ******************************************************************************/
 
 PrimitiveHoleGraphicsItem::PrimitiveHoleGraphicsItem(
-    const IF_GraphicsLayerProvider& lp, bool originCrossesVisible,
+    const GraphicsLayerList& layers, bool originCrossesVisible,
     QGraphicsItem* parent) noexcept
   : QGraphicsItemGroup(parent),
-    mHoleLayer(lp.getLayer(Theme::Color::sBoardHoles)),
+    mHoleLayer(layers.get(Theme::Color::sBoardHoles)),
     mHoleGraphicsItem(new PrimitivePathGraphicsItem(this)),
     mStopMaskGraphicsItemBot(new PrimitivePathGraphicsItem(this)),
     mStopMaskGraphicsItemTop(new PrimitivePathGraphicsItem(this)),
@@ -64,10 +65,10 @@ PrimitiveHoleGraphicsItem::PrimitiveHoleGraphicsItem(
 
   // Setup stop mask items.
   mStopMaskGraphicsItemBot->setFillLayer(
-      lp.getLayer(Theme::Color::sBoardStopMaskBot));
+      layers.get(Theme::Color::sBoardStopMaskBot));
   mStopMaskGraphicsItemBot->setZValue(-10);
   mStopMaskGraphicsItemTop->setFillLayer(
-      lp.getLayer(Theme::Color::sBoardStopMaskTop));
+      layers.get(Theme::Color::sBoardStopMaskTop));
   mStopMaskGraphicsItemTop->setZValue(10);
 
   // Setup origin crosses.

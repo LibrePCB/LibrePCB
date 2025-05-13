@@ -47,13 +47,13 @@ namespace editor {
  ******************************************************************************/
 
 SymbolGraphicsItem::SymbolGraphicsItem(
-    Symbol& symbol, const IF_GraphicsLayerProvider& lp,
+    Symbol& symbol, const GraphicsLayerList& layers,
     std::shared_ptr<const Component> cmp,
     std::shared_ptr<const ComponentSymbolVariantItem> cmpItem,
     const QStringList& localeOrder) noexcept
   : QGraphicsItemGroup(nullptr),
     mSymbol(symbol),
-    mLayerProvider(lp),
+    mLayers(layers),
     mComponent(cmp),
     mItem(cmpItem),
     mLocaleOrder(localeOrder),
@@ -247,8 +247,8 @@ void SymbolGraphicsItem::syncPins() noexcept {
   for (auto& obj : mSymbol.getPins().values()) {
     if (!mPinGraphicsItems.contains(obj)) {
       Q_ASSERT(obj);
-      auto i = std::make_shared<SymbolPinGraphicsItem>(obj, mLayerProvider,
-                                                       mComponent, mItem, this);
+      auto i = std::make_shared<SymbolPinGraphicsItem>(obj, mLayers, mComponent,
+                                                       mItem, this);
       mPinGraphicsItems.insert(obj, i);
     }
   }
@@ -271,7 +271,7 @@ void SymbolGraphicsItem::syncCircles() noexcept {
   for (auto& obj : mSymbol.getCircles().values()) {
     if (!mCircleGraphicsItems.contains(obj)) {
       Q_ASSERT(obj);
-      auto i = std::make_shared<CircleGraphicsItem>(*obj, mLayerProvider, this);
+      auto i = std::make_shared<CircleGraphicsItem>(*obj, mLayers, this);
       mCircleGraphicsItems.insert(obj, i);
     }
   }
@@ -294,8 +294,7 @@ void SymbolGraphicsItem::syncPolygons() noexcept {
   for (auto& obj : mSymbol.getPolygons().values()) {
     if (!mPolygonGraphicsItems.contains(obj)) {
       Q_ASSERT(obj);
-      auto i =
-          std::make_shared<PolygonGraphicsItem>(*obj, mLayerProvider, this);
+      auto i = std::make_shared<PolygonGraphicsItem>(*obj, mLayers, this);
       i->setEditable(true);
       mPolygonGraphicsItems.insert(obj, i);
     }
@@ -318,7 +317,7 @@ void SymbolGraphicsItem::syncTexts() noexcept {
   for (auto& obj : mSymbol.getTexts().values()) {
     if (!mTextGraphicsItems.contains(obj)) {
       Q_ASSERT(obj);
-      auto i = std::make_shared<TextGraphicsItem>(*obj, mLayerProvider, this);
+      auto i = std::make_shared<TextGraphicsItem>(*obj, mLayers, this);
       substituteText(*i);
       mTextGraphicsItems.insert(obj, i);
     }

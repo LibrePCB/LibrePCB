@@ -1,9 +1,20 @@
 import {
+    Board2dTabData,
+    Board3dTabData,
+    EditorTool,
+    FeatureState,
+    GridStyle,
+    LengthUnit,
     LibraryData,
     LibraryListData,
     NotificationData,
     NotificationType,
     PanelPage,
+    ProjectData,
+    RuleCheckData,
+    RuleCheckState,
+    RuleCheckType,
+    SchematicTabData,
     TabData,
     TabType,
     TreeViewItemData,
@@ -24,7 +35,7 @@ export global Data {
     in property <PanelPage> panel-page: PanelPage.home;
 
     // Window sections
-    in property <[WindowSectionData]> sections: [
+    in-out property <[WindowSectionData]> sections: [
         {
             tabs: [
                 {
@@ -37,6 +48,71 @@ export global Data {
                 {
                     type: TabType.download-library,
                     title: "Download Lib",
+                },
+                {
+                    type: TabType.schematic,
+                    title: "Schematic",
+                    features: {
+                        export-graphics: FeatureState.enabled,
+                        select: FeatureState.enabled,
+                        save: FeatureState.enabled,
+                        undo: FeatureState.enabled,
+                        redo: FeatureState.enabled,
+                        cut: FeatureState.enabled,
+                        copy: FeatureState.enabled,
+                        paste: FeatureState.enabled,
+                        remove: FeatureState.enabled,
+                        rotate: FeatureState.enabled,
+                        mirror: FeatureState.enabled,
+                        move-align: FeatureState.enabled,
+                        snap-to-grid: FeatureState.enabled,
+                        reset-texts: FeatureState.enabled,
+                        lock: FeatureState.enabled,
+                        unlock: FeatureState.enabled,
+                        edit-properties: FeatureState.enabled,
+                        find: FeatureState.enabled,
+                    },
+                },
+                {
+                    type: TabType.board-2d,
+                    title: "Board",
+                    features: {
+                        export-graphics: FeatureState.enabled,
+                        select: FeatureState.enabled,
+                        save: FeatureState.enabled,
+                        undo: FeatureState.enabled,
+                        redo: FeatureState.enabled,
+                        cut: FeatureState.enabled,
+                        copy: FeatureState.enabled,
+                        paste: FeatureState.enabled,
+                        remove: FeatureState.enabled,
+                        rotate: FeatureState.enabled,
+                        mirror: FeatureState.enabled,
+                        flip: FeatureState.enabled,
+                        move-align: FeatureState.enabled,
+                        snap-to-grid: FeatureState.enabled,
+                        reset-texts: FeatureState.enabled,
+                        lock: FeatureState.enabled,
+                        unlock: FeatureState.enabled,
+                        modify-line-width: FeatureState.enabled,
+                        edit-properties: FeatureState.enabled,
+                        find: FeatureState.enabled,
+                    },
+                    find-autocompletions: ["C1", "C2", "C20", "U15"],
+                    layers: [
+                        {
+                            name: "Top Copper",
+                            color: #500000,
+                            color-highlighted: #ff0000,
+                            visible: true,
+                        },
+                        {
+                            name: "Bottom Copper",
+                            color: #000050,
+                            color-highlighted: #0000ff,
+                            visible: false,
+                        },
+                    ],
                 },
             ],
             create-library-tabs: [
@@ -76,22 +152,140 @@ export global Data {
                     download-status: "Download status",
                 },
             ],
-            current-tab-index: 1,
+            schematic-tabs: [
+                { },
+                { },
+                { },
+                {
+                    project-index: 0,
+                    background-color: #ffffff,
+                    foreground-color: #555555,
+                    overlay-color: #dddddd78,
+                    overlay-text-color: Colors.black,
+                    grid-style: GridStyle.none,
+                    unit: LengthUnit.millimeters,
+                    show-pin-numbers: true,
+                    install-libraries-msg: {
+                        visible: true,
+                        supports-dont-show-again: true,
+                    },
+                    add-drawing-frame-msg: {
+                        visible: true,
+                        supports-dont-show-again: true,
+                    },
+                    tool: EditorTool.select,
+                    tool-overlay-text: "X0:   123.4567 mm\nY0:   123.4567 mm\nX1:   123.4567 mm\nY1:   123.4567 mm\n\ndX:   123.4567 mm\ndY:   123.4567 mm\n\nL:    123.4567 mm\na:     90.0000 °",
+                    tool-layer: {
+                        items: ["Layer 1", "Layer 2", "Layer with long name"],
+                        current-index: 1,
+                    },
+                    tool-line-width: {
+                        can-increase: true,
+                        can-decrease: true,
+                    },
+                    tool-value: {
+                        text: "{{PROJECT}}",
+                        suggestions: ["{{Foo}}", "{{PROJECT}}", "{{Bar}}"],
+                    },
+                    tool-attribute-value: {
+                        enabled: true,
+                        text: "42",
+                        placeholder: "CAPACITANCE",
+                    },
+                    tool-attribute-unit: {
+                        items: ["mV", "V", "kV"],
+                        current-index: 1,
+                    },
+                },
+            ],
+            board-2d-tabs: [
+                { },
+                { },
+                { },
+                { },
+                {
+                    project-index: 1,
+                    background-color: #000000,
+                    foreground-color: #999999,
+                    overlay-color: Colors.gray,
+                    overlay-text-color: Colors.white,
+                    grid-style: GridStyle.none,
+                    unit: LengthUnit.millimeters,
+                    refreshing: false,
+                    empty-schematics-msg: {
+                        visible: true,
+                        supports-dont-show-again: true,
+                    },
+                    place-devices-msg: {
+                        visible: true,
+                        supports-dont-show-again: true,
+                    },
+                    unplaced-components: ["C5: 100nF 50V", "U1: NE555"],
+                    unplaced-components-index: 0,
+                    unplaced-components-devices: ["C-0603", "C-0805", "3", "4", "5", "6", "7", "8", "end"],
+                    unplaced-components-devices-index: 0,
+                    unplaced-components-footprints: ["Density Level A", "Density Level B"],
+                    unplaced-components-footprints-index: 0,
+                    tool: EditorTool.select,
+                    tool-overlay-text: "X0:   123.4567 mm\nY0:   123.4567 mm\nX1:   123.4567 mm\nY1:   123.4567 mm\n\ndX:   123.4567 mm\ndY:   123.4567 mm\n\nL:    123.4567 mm\na:     90.0000 °",
+                    tool-net: {
+                        items: ["Net 1", "Net 2", "Net 3"],
+                        current-index: 1,
+                    },
+                    tool-layer: {
+                        items: ["Layer 1", "Layer 2", "Layer with long name"],
+                        current-index: 1,
+                    },
+                    tool-line-width: {
+                        can-increase: true,
+                    },
+                    tool-size: {
+                        can-increase: true,
+                    },
+                    tool-value: {
+                        text: "{{PROJECT}}",
+                        suggestions: ["{{Foo}}", "{{Bar}}"],
+                    },
+                },
+            ],
+            current-tab-index: 3,
         },
         {
-            tabs: [],
+            tabs: [
+                {
+                    type: TabType.board-3d,
+                    title: "3D",
+                    features: {
+                        save: FeatureState.enabled,
+                        undo: FeatureState.enabled,
+                        redo: FeatureState.enabled,
+                    },
+                },
+            ],
+            board-3d-tabs: [
+                {
+                    project-index: 1,
+                    background-color: Colors.black,
+                    foreground-color: Colors.white,
+                    refreshing: false,
+                    error: "Some error message here...",
+                }
+            ],
             current-tab-index: 0,
         },
     ];
 
     // Which section currently has focus
-    in property <int> current-section-index: 0;
+    in-out property <int> current-section-index: 0;
 
     // Static status bar message
     in property <string> status-bar-message;
 
     // Temporary status tip when hovering interactive UI elements
     in property <string> status-tip;
+
+    // Current cursor coordinates to be shown in status bar
+    in property <string> cursor-coordinates: "123.456, 123.456";
 
     // Workspace: Folder path
     in property <string> workspace-path: "/path/to/workspace";
@@ -132,6 +326,9 @@ export global Data {
             pinned: false,
         },
     ];
+
+    // Workspace contains standard components (resistor etc) from Base library
+    in property <bool> workspace-contains-standard-components: true;
 
     // Quick access items
     in property <[TreeViewItemData]> quick-access-items: [
@@ -316,10 +513,171 @@ export global Data {
         operation-in-progress: false,
     };
 
-    // CALCULATED, DO NET SET IN BACKEND
-    in property <int> remote-libraries-pending-operations: remote-libraries-data.pending-installs + remote-libraries-data.pending-updates + remote-libraries-data.pending-uninstalls;
-    in property <bool> libraries-operation-in-progress: local-libraries-data.operation-in-progress || remote-libraries-data.operation-in-progress;
-
     // Filter applied to both local libraries and remote libraries
     in property <string> libraries-filter: "Foo";
+
+    // All currently opened projects
+    in property <[ProjectData]> projects: [
+        {
+            valid: true,
+            path: "/path/to/project-1.lpp",
+            name: "Project 1",
+            schematics: [
+                { name:"Power" },
+                { name:"Logic" },
+            ],
+            boards: [
+                {
+                    name:"Default",
+                    drc: {
+                        type: RuleCheckType.drc,
+                        state: RuleCheckState.up-to-date,
+                        messages: [
+                            {
+                                severity: NotificationType.info,
+                                message: "Hint message",
+                                description: "Hint description.",
+                                approved: false,
+                                supports-autofix: true,
+                            },
+                            {
+                                severity: NotificationType.warning,
+                                message: "Warning message",
+                                description: "Warning description.",
+                                approved: true,
+                                supports-autofix: false,
+                            },
+                            {
+                                severity: NotificationType.critical,
+                                message: "Error message",
+                                description: "Error description.",
+                                approved: false,
+                                supports-autofix: true,
+                            },
+                        ],
+                        unapproved: 0,
+                        execution-error: "",
+                    },
+                },
+                { name:"Experiment" },
+            ],
+            writable: true,
+            unsaved-changes: true,
+            erc: {
+                type: RuleCheckType.erc,
+                state: RuleCheckState.outdated,
+                messages: [
+                    {
+                        severity: NotificationType.info,
+                        message: "Hint message",
+                        description: "Hint description.",
+                        approved: false,
+                        supports-autofix: true,
+                    },
+                    {
+                        severity: NotificationType.warning,
+                        message: "Warning message",
+                        description: "Warning description.",
+                        approved: true,
+                        supports-autofix: false,
+                    },
+                    {
+                        severity: NotificationType.critical,
+                        message: "Error message",
+                        description: "Error description.",
+                        approved: false,
+                        supports-autofix: true,
+                    },
+                ],
+                unapproved: 42,
+                execution-error: "",
+            },
+        },
+        {
+            valid: true,
+            path: "/path/to/project-2.lpp",
+            name: "Project 2",
+            schematics: [
+                { name:"Power" },
+                { name:"Logic" },
+            ],
+            boards: [
+                {
+                    name:"Default",
+                    drc: {
+                        type: RuleCheckType.drc,
+                    },
+                },
+                {
+                    name:"Experiment",
+                    drc: {
+                        type: RuleCheckType.drc,
+                    },
+                },
+            ],
+            writable: false,
+            erc: {
+                type: RuleCheckType.erc,
+            },
+        },
+    ];
+
+    // Currently active project index
+    out property <int> current-project-index: 0;
+
+    // Rule check panel: Checked state of the "zoom to location" feature
+    in property <bool> rule-check-zoom-to-location: true;
+
+    // CALCULATED, DO NET SET IN BACKEND
+    in-out property <WindowSectionData> current-section: sections[current-section-index];
+    in-out property <TabData> current-tab: current-section.tabs[current-section.current-tab-index];
+    out property <int> remote-libraries-pending-operations: remote-libraries-data.pending-installs + remote-libraries-data.pending-updates + remote-libraries-data.pending-uninstalls;
+    out property <bool> libraries-operation-in-progress: local-libraries-data.operation-in-progress || remote-libraries-data.operation-in-progress;
+    out property <ProjectData> current-project: projects[current-project-index];
+    out property <SchematicTabData> current-schematic-tab: current-section.schematic-tabs[current-section.current-tab-index];
+    out property <Board2dTabData> current-board-2d-tab: current-section.board-2d-tabs[current-section.current-tab-index];
+    out property <Board3dTabData> current-board-3d-tab: current-section.board-3d-tabs[current-section.current-tab-index];
+    out property <bool> current-tab-is-2d: (current-tab.type == TabType.schematic) || (current-tab.type == TabType.board-2d);
+    out property <bool> current-tab-is-2d-or-3d: (current-tab.type == TabType.schematic) || (current-tab.type == TabType.board-2d) || (current-tab.type == TabType.board-3d);
+    in-out property <int> current-rule-check-project-index: 0;
+    in-out property <int> current-rule-check-board-index: 0;
+    out property <RuleCheckData> current-rule-check: {
+        if (current-rule-check-board-index >= 0) && (current-rule-check-board-index < projects[current-rule-check-project-index].boards.length) {
+            projects[current-rule-check-project-index].boards[current-rule-check-board-index].drc
+        } else {
+            projects[current-rule-check-project-index].erc
+        }
+    };
+
+    public function current-tab-changed() {
+        if current-tab.type == TabType.schematic {
+            current-project-index = current-schematic-tab.project-index;
+            current-rule-check-project-index = current-project-index;
+            current-rule-check-board-index = -1;
+        } else if current-tab.type == TabType.board-2d {
+            current-project-index = current-board-2d-tab.project-index;
+            current-rule-check-project-index = current-project-index;
+            current-rule-check-board-index = current-board-2d-tab.board-index;
+        } else if current-tab.type == TabType.board-3d {
+            current-project-index = current-board-3d-tab.project-index;
+            current-rule-check-project-index = current-project-index;
+            current-rule-check-board-index = current-board-3d-tab.board-index;
+        } else if current-tab.type != TabType.home {
+            current-project-index = -1;
+            current-rule-check-project-index = current-project-index;
+            current-rule-check-board-index = -1;
+        }
+    }
+
+    public function set-current-tab(section: int, tab: int) {
+        current-section-index = section;
+        sections[section].current-tab-index = tab;
+        current-tab-changed();
+    }
+
+    public function set-current-project(index: int) {
+        current-project-index = index;
+        current-rule-check-project-index = index;
+        current-rule-check-board-index = -1;
+    }
 }

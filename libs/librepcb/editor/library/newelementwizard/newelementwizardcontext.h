@@ -46,7 +46,7 @@ class Workspace;
 
 namespace editor {
 
-class IF_GraphicsLayerProvider;
+class GraphicsLayerList;
 
 /*******************************************************************************
  *  Class NewElementWizardContext
@@ -88,7 +88,7 @@ public:
   NewElementWizardContext() = delete;
   NewElementWizardContext(const NewElementWizardContext& other) = delete;
   NewElementWizardContext(const Workspace& ws, Library& lib,
-                          const IF_GraphicsLayerProvider& lp,
+                          const GraphicsLayerList& layers,
                           QObject* parent = nullptr) noexcept;
   ~NewElementWizardContext() noexcept;
 
@@ -97,9 +97,7 @@ public:
     return mOutputDirectory;
   }
   const Workspace& getWorkspace() const noexcept { return mWorkspace; }
-  const IF_GraphicsLayerProvider& getLayerProvider() const noexcept {
-    return mLayerProvider;
-  }
+  const GraphicsLayerList& getLayers() const noexcept { return mLayers; }
   const QStringList& getLibLocaleOrder() const noexcept;
 
   // General Methods
@@ -114,7 +112,7 @@ public:
 private:  // Data
   const Workspace& mWorkspace;
   Library& mLibrary;
-  const IF_GraphicsLayerProvider& mLayerProvider;
+  const GraphicsLayerList& mLayers;
   FilePath mOutputDirectory;
 
 public:  // Data

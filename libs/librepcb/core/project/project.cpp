@@ -193,6 +193,20 @@ bool Project::setErcMessageApprovals(
   }
 }
 
+bool Project::setErcMessageApproved(const SExpression& approval,
+                                    bool approved) noexcept {
+  if (approved && (!mErcMessageApprovals.contains(approval))) {
+    mErcMessageApprovals.insert(approval);
+    emit ercMessageApprovalsChanged(mErcMessageApprovals);
+    return true;
+  } else if ((!approved) && mErcMessageApprovals.contains(approval)) {
+    mErcMessageApprovals.remove(approval);
+    emit ercMessageApprovalsChanged(mErcMessageApprovals);
+    return true;
+  }
+  return false;
+}
+
 /*******************************************************************************
  *  Schematic Methods
  ******************************************************************************/

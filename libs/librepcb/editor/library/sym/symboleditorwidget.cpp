@@ -74,20 +74,27 @@ SymbolEditorWidget::SymbolEditorWidget(const Context& context,
   mUi->edtVersion->setReadOnly(mContext.readOnly);
   mUi->cbxDeprecated->setCheckable(!mContext.readOnly);
   setupErrorNotificationWidget(*mUi->errorNotificationWidget);
+  setWindowIcon(QIcon(":/img/library/symbol.png"));
+
+  // Setup graphics scene.
   const Theme& theme = mContext.workspace.getSettings().themes.getActive();
-  mUi->graphicsView->setBackgroundColors(
+  mGraphicsScene->setBackgroundColors(
       theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor(),
       theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
-  mUi->graphicsView->setOverlayColors(
+  mGraphicsScene->setOverlayColors(
       theme.getColor(Theme::Color::sSchematicOverlays).getPrimaryColor(),
       theme.getColor(Theme::Color::sSchematicOverlays).getSecondaryColor());
-  mUi->graphicsView->setInfoBoxColors(
-      theme.getColor(Theme::Color::sSchematicInfoBox).getPrimaryColor(),
-      theme.getColor(Theme::Color::sSchematicInfoBox).getSecondaryColor());
   mGraphicsScene->setSelectionRectColors(
       theme.getColor(Theme::Color::sSchematicSelection).getPrimaryColor(),
       theme.getColor(Theme::Color::sSchematicSelection).getSecondaryColor());
-  mUi->graphicsView->setGridStyle(theme.getBoardGridStyle());
+  mGraphicsScene->setGridStyle(theme.getBoardGridStyle());
+
+  // Setup graphics view.
+  mUi->graphicsView->setSpinnerColor(
+      theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
+  mUi->graphicsView->setInfoBoxColors(
+      theme.getColor(Theme::Color::sSchematicInfoBox).getPrimaryColor(),
+      theme.getColor(Theme::Color::sSchematicInfoBox).getSecondaryColor());
   mUi->graphicsView->setUseOpenGl(
       mContext.workspace.getSettings().useOpenGl.get());
   mUi->graphicsView->setScene(mGraphicsScene.data());
@@ -98,7 +105,6 @@ SymbolEditorWidget::SymbolEditorWidget(const Context& context,
             mCommandToolBarProxy->startTabFocusCycle(*mUi->graphicsView);
           },
           EditorCommand::ActionFlag::WidgetShortcut));
-  setWindowIcon(QIcon(":/img/library/symbol.png"));
 
   // Apply grid properties unit from workspace settings
   setGridProperties(PositiveLength(2540000),
@@ -147,7 +153,7 @@ SymbolEditorWidget::SymbolEditorWidget(const Context& context,
           this, &SymbolEditorWidget::commitMetadata);
 
   // Load graphics items recursively.
-  mGraphicsItem.reset(new SymbolGraphicsItem(*mSymbol, mContext.layerProvider));
+  mGraphicsItem.reset(new SymbolGraphicsItem(*mSymbol, mContext.layers));
   mGraphicsScene->addItem(*mGraphicsItem);
   mUi->graphicsView->zoomAll();
 
@@ -182,6 +188,11 @@ SymbolEditorWidget::~SymbolEditorWidget() noexcept {
   mFsm->processAbortCommand();
   mFsm->processAbortCommand();
   mFsm.reset();
+
+  // Delete all command objects in the undo stack. This mmust be done before
+  // other important objects are deleted, as undo command objects can hold
+  // pointers/references to them!
+  mUndoStack->clear();
 }
 
 /*******************************************************************************
@@ -290,19 +301,19 @@ bool SymbolEditorWidget::move(Qt::ArrowType direction) noexcept {
   Point delta;
   switch (direction) {
     case Qt::LeftArrow: {
-      delta.setX(-mUi->graphicsView->getGridInterval());
+      delta.setX(-mGraphicsScene->getGridInterval());
       break;
     }
     case Qt::RightArrow: {
-      delta.setX(*mUi->graphicsView->getGridInterval());
+      delta.setX(*mGraphicsScene->getGridInterval());
       break;
     }
     case Qt::UpArrow: {
-      delta.setY(*mUi->graphicsView->getGridInterval());
+      delta.setY(*mGraphicsScene->getGridInterval());
       break;
     }
     case Qt::DownArrow: {
-      delta.setY(-mUi->graphicsView->getGridInterval());
+      delta.setY(-mGraphicsScene->getGridInterval());
       break;
     }
     default: {
@@ -358,8 +369,8 @@ bool SymbolEditorWidget::importDxf() noexcept {
 }
 
 bool SymbolEditorWidget::editGridProperties() noexcept {
-  GridSettingsDialog dialog(mUi->graphicsView->getGridInterval(), mLengthUnit,
-                            mUi->graphicsView->getGridStyle(), this);
+  GridSettingsDialog dialog(mGraphicsScene->getGridInterval(), mLengthUnit,
+                            mGraphicsScene->getGridStyle(), this);
   connect(&dialog, &GridSettingsDialog::gridPropertiesChanged, this,
           &SymbolEditorWidget::setGridProperties);
   dialog.exec();
@@ -367,17 +378,17 @@ bool SymbolEditorWidget::editGridProperties() noexcept {
 }
 
 bool SymbolEditorWidget::increaseGridInterval() noexcept {
-  const Length interval = mUi->graphicsView->getGridInterval() * 2;
+  const Length interval = mGraphicsScene->getGridInterval() * 2;
   setGridProperties(PositiveLength(interval), mLengthUnit,
-                    mUi->graphicsView->getGridStyle());
+                    mGraphicsScene->getGridStyle());
   return true;
 }
 
 bool SymbolEditorWidget::decreaseGridInterval() noexcept {
-  const Length interval = *mUi->graphicsView->getGridInterval();
+  const Length interval = *mGraphicsScene->getGridInterval();
   if ((interval % 2) == 0) {
     setGridProperties(PositiveLength(interval / 2), mLengthUnit,
-                      mUi->graphicsView->getGridStyle());
+                      mGraphicsScene->getGridStyle());
   }
   return true;
 }
@@ -430,60 +441,39 @@ QString SymbolEditorWidget::commitMetadata() noexcept {
   return QString();
 }
 
-bool SymbolEditorWidget::graphicsViewEventHandler(QEvent* event) noexcept {
-  Q_ASSERT(event);
-  switch (event->type()) {
-    case QEvent::GraphicsSceneMouseMove: {
-      auto* e = dynamic_cast<QGraphicsSceneMouseEvent*>(event);
-      Q_ASSERT(e);
-      return mFsm->processGraphicsSceneMouseMoved(*e);
-    }
-    case QEvent::GraphicsSceneMousePress: {
-      auto* e = dynamic_cast<QGraphicsSceneMouseEvent*>(event);
-      Q_ASSERT(e);
-      switch (e->button()) {
-        case Qt::LeftButton:
-          return mFsm->processGraphicsSceneLeftMouseButtonPressed(*e);
-        default:
-          return false;
-      }
-    }
-    case QEvent::GraphicsSceneMouseRelease: {
-      auto* e = dynamic_cast<QGraphicsSceneMouseEvent*>(event);
-      Q_ASSERT(e);
-      switch (e->button()) {
-        case Qt::LeftButton:
-          return mFsm->processGraphicsSceneLeftMouseButtonReleased(*e);
-        case Qt::RightButton:
-          return mFsm->processGraphicsSceneRightMouseButtonReleased(*e);
-        default:
-          return false;
-      }
-    }
-    case QEvent::GraphicsSceneMouseDoubleClick: {
-      auto* e = dynamic_cast<QGraphicsSceneMouseEvent*>(event);
-      Q_ASSERT(e);
-      switch (e->button()) {
-        case Qt::LeftButton:
-          return mFsm->processGraphicsSceneLeftMouseButtonDoubleClicked(*e);
-        default:
-          return false;
-      }
-    }
-    case QEvent::KeyPress: {
-      auto* e = dynamic_cast<QKeyEvent*>(event);
-      Q_ASSERT(e);
-      return mFsm->processKeyPressed(*e);
-    }
-    case QEvent::KeyRelease: {
-      auto* e = dynamic_cast<QKeyEvent*>(event);
-      Q_ASSERT(e);
-      return mFsm->processKeyReleased(*e);
-    }
-    default: {
-      return false;
-    }
-  }
+bool SymbolEditorWidget::graphicsSceneKeyPressed(
+    const GraphicsSceneKeyEvent& e) noexcept {
+  return mFsm->processKeyPressed(e);
+}
+
+bool SymbolEditorWidget::graphicsSceneKeyReleased(
+    const GraphicsSceneKeyEvent& e) noexcept {
+  return mFsm->processKeyReleased(e);
+}
+
+bool SymbolEditorWidget::graphicsSceneMouseMoved(
+    const GraphicsSceneMouseEvent& e) noexcept {
+  return mFsm->processGraphicsSceneMouseMoved(e);
+}
+
+bool SymbolEditorWidget::graphicsSceneLeftMouseButtonPressed(
+    const GraphicsSceneMouseEvent& e) noexcept {
+  return mFsm->processGraphicsSceneLeftMouseButtonPressed(e);
+}
+
+bool SymbolEditorWidget::graphicsSceneLeftMouseButtonReleased(
+    const GraphicsSceneMouseEvent& e) noexcept {
+  return mFsm->processGraphicsSceneLeftMouseButtonReleased(e);
+}
+
+bool SymbolEditorWidget::graphicsSceneLeftMouseButtonDoubleClicked(
+    const GraphicsSceneMouseEvent& e) noexcept {
+  return mFsm->processGraphicsSceneLeftMouseButtonDoubleClicked(e);
+}
+
+bool SymbolEditorWidget::graphicsSceneRightMouseButtonReleased(
+    const GraphicsSceneMouseEvent& e) noexcept {
+  return mFsm->processGraphicsSceneRightMouseButtonReleased(e);
 }
 
 bool SymbolEditorWidget::toolChangeRequested(Tool newTool,
@@ -597,7 +587,7 @@ void SymbolEditorWidget::fixMsg(const MsgSymbolOriginNotInCenter& msg) {
   mFsm->processAbortCommand();
   mFsm->processSelectAll();
   mFsm->processMove(
-      -msg.getCenter().mappedToGrid(mUi->graphicsView->getGridInterval()));
+      -msg.getCenter().mappedToGrid(mGraphicsScene->getGridInterval()));
   mFsm->processAbortCommand();  // Clear selection.
 }
 
@@ -670,8 +660,8 @@ bool SymbolEditorWidget::execGraphicsExportDialog(
 void SymbolEditorWidget::setGridProperties(const PositiveLength& interval,
                                            const LengthUnit& unit,
                                            Theme::GridStyle style) noexcept {
-  mUi->graphicsView->setGridInterval(interval);
-  mUi->graphicsView->setGridStyle(style);
+  mGraphicsScene->setGridInterval(interval);
+  mGraphicsScene->setGridStyle(style);
   mLengthUnit = unit;
   if (mStatusBar) {
     mStatusBar->setLengthUnit(unit);

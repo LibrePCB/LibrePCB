@@ -22,8 +22,8 @@
  ******************************************************************************/
 #include "cmdflipselectedboarditems.h"
 
-#include "../boardeditor/boardgraphicsscene.h"
-#include "../boardeditor/boardselectionquery.h"
+#include "../board/boardgraphicsscene.h"
+#include "../board/boardselectionquery.h"
 #include "cmdboardholeedit.h"
 #include "cmdboardnetlineedit.h"
 #include "cmdboardnetpointedit.h"

@@ -39,7 +39,7 @@ namespace editor {
 
 class ComponentSymbolVariantItemListModel;
 class EditableTableWidget;
-class IF_GraphicsLayerProvider;
+class GraphicsLayerList;
 class LibraryElementCache;
 class UndoStack;
 
@@ -64,7 +64,7 @@ public:
   // Setters
   void setReadOnly(bool readOnly) noexcept;
   void setReferences(
-      const Workspace& ws, const IF_GraphicsLayerProvider& layerProvider,
+      const Workspace& ws, const GraphicsLayerList& layers,
       ComponentSymbolVariantItemList& items,
       const std::shared_ptr<const LibraryElementCache>& symbolCache,
       UndoStack* undoStack) noexcept;
@@ -93,7 +93,7 @@ private:  // Data
   QScopedPointer<ComponentSymbolVariantItemListModel> mModel;
   QScopedPointer<EditableTableWidget> mView;
   const Workspace* mWorkspace;
-  const IF_GraphicsLayerProvider* mLayerProvider;
+  const GraphicsLayerList* mLayers;
 
   // Slots
   ComponentSymbolVariantItemList::OnEditedSlot mOnItemListEditedSlot;

@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "packageeditorfsm.h"
 
+#include "../../../graphics/graphicslayerlist.h"
 #include "../../../graphics/graphicsscene.h"
 #include "../../../graphics/primitivetextgraphicsitem.h"
 #include "../../../widgets/graphicsview.h"
@@ -213,7 +214,7 @@ bool PackageEditorFsm::processChangeCurrentFootprint(
   if (mContext.currentFootprint) {
     // load graphics items recursively
     mContext.currentGraphicsItem.reset(new FootprintGraphicsItem(
-        mContext.currentFootprint, mContext.editorContext.layerProvider,
+        mContext.currentFootprint, mContext.editorContext.layers,
         Application::getDefaultStrokeFont(), &mContext.package.getPads()));
     mContext.graphicsScene.addItem(*mContext.currentGraphicsItem);
     mSelectFootprintGraphicsItem.reset();
@@ -228,8 +229,7 @@ bool PackageEditorFsm::processChangeCurrentFootprint(
     mSelectFootprintGraphicsItem->setHeight(PositiveLength(Length::fromMm(5)));
     mSelectFootprintGraphicsItem->setText(tr("Please select a footprint."));
     mSelectFootprintGraphicsItem->setLayer(
-        mContext.editorContext.layerProvider.getLayer(
-            Theme::Color::sBoardOutlines));
+        mContext.editorContext.layers.get(Theme::Color::sBoardOutlines));
     mContext.graphicsScene.addItem(*mSelectFootprintGraphicsItem);
     mContext.graphicsView.setEnabled(false);
     mContext.graphicsView.zoomAll();
@@ -239,7 +239,8 @@ bool PackageEditorFsm::processChangeCurrentFootprint(
   }
 }
 
-bool PackageEditorFsm::processKeyPressed(const QKeyEvent& e) noexcept {
+bool PackageEditorFsm::processKeyPressed(
+    const GraphicsSceneKeyEvent& e) noexcept {
   if (getCurrentState() && mContext.currentFootprint &&
       mContext.currentGraphicsItem) {
     return getCurrentState()->processKeyPressed(e);
@@ -248,7 +249,8 @@ bool PackageEditorFsm::processKeyPressed(const QKeyEvent& e) noexcept {
   }
 }
 
-bool PackageEditorFsm::processKeyReleased(const QKeyEvent& e) noexcept {
+bool PackageEditorFsm::processKeyReleased(
+    const GraphicsSceneKeyEvent& e) noexcept {
   if (getCurrentState() && mContext.currentFootprint &&
       mContext.currentGraphicsItem) {
     return getCurrentState()->processKeyReleased(e);
@@ -258,7 +260,7 @@ bool PackageEditorFsm::processKeyReleased(const QKeyEvent& e) noexcept {
 }
 
 bool PackageEditorFsm::processGraphicsSceneMouseMoved(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   if (getCurrentState() && mContext.currentFootprint &&
       mContext.currentGraphicsItem) {
     return getCurrentState()->processGraphicsSceneMouseMoved(e);
@@ -268,7 +270,7 @@ bool PackageEditorFsm::processGraphicsSceneMouseMoved(
 }
 
 bool PackageEditorFsm::processGraphicsSceneLeftMouseButtonPressed(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   if (getCurrentState() && mContext.currentFootprint &&
       mContext.currentGraphicsItem) {
     return getCurrentState()->processGraphicsSceneLeftMouseButtonPressed(e);
@@ -278,7 +280,7 @@ bool PackageEditorFsm::processGraphicsSceneLeftMouseButtonPressed(
 }
 
 bool PackageEditorFsm::processGraphicsSceneLeftMouseButtonReleased(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   if (getCurrentState() && mContext.currentFootprint &&
       mContext.currentGraphicsItem) {
     return getCurrentState()->processGraphicsSceneLeftMouseButtonReleased(e);
@@ -288,7 +290,7 @@ bool PackageEditorFsm::processGraphicsSceneLeftMouseButtonReleased(
 }
 
 bool PackageEditorFsm::processGraphicsSceneLeftMouseButtonDoubleClicked(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   if (getCurrentState() && mContext.currentFootprint &&
       mContext.currentGraphicsItem) {
     return getCurrentState()->processGraphicsSceneLeftMouseButtonDoubleClicked(
@@ -299,7 +301,7 @@ bool PackageEditorFsm::processGraphicsSceneLeftMouseButtonDoubleClicked(
 }
 
 bool PackageEditorFsm::processGraphicsSceneRightMouseButtonReleased(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   PackageEditorState* state = getCurrentState();
   if (state && mContext.currentFootprint && mContext.currentGraphicsItem) {
     if (state->processGraphicsSceneRightMouseButtonReleased(e)) {

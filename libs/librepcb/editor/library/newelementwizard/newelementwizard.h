@@ -38,7 +38,7 @@ class Workspace;
 
 namespace editor {
 
-class IF_GraphicsLayerProvider;
+class GraphicsLayerList;
 class NewElementWizardContext;
 
 namespace Ui {
@@ -60,7 +60,7 @@ public:
   NewElementWizard() = delete;
   NewElementWizard(const NewElementWizard& other) = delete;
   NewElementWizard(const Workspace& ws, Library& lib,
-                   const IF_GraphicsLayerProvider& lp,
+                   const GraphicsLayerList& layers,
                    QWidget* parent = 0) noexcept;
   ~NewElementWizard() noexcept;
 

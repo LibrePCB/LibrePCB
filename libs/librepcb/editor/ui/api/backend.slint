@@ -1,4 +1,15 @@
-import { Action } from "types.slint";
+import {
+    Action,
+    BoardAction,
+    EditorTool,
+    Int64,
+    LengthEditParseResult,
+    LengthUnit,
+    ProjectAction,
+    SchematicAction,
+    TabAction,
+    WindowSectionAction,
+} from "types.slint";
 import { Data } from "data.slint";
 
 // Note: The callback implementations are just for the live preview, they will
@@ -12,6 +23,89 @@ export global Backend {
     pure callback trigger(action: Action);
     trigger(action) => {
         debug("Trigger action:", action);
+    }
+
+    // Trigger some window section action
+    //
+    // Note: This callback is executed asynchronously in the backend to
+    // guarantee there are no side effects changing the UI from within the
+    // callback. Otherwise we couldn't declare it as 'pure'.
+    pure callback trigger-section(section: int, action: WindowSectionAction);
+    trigger-section(section, action) => {
+        debug("Trigger section action:", section, action);
+    }
+
+    // Trigger some window tab action
+    //
+    // Note: This callback is executed asynchronously in the backend to
+    // guarantee there are no side effects changing the UI from within the
+    // callback.
+    callback trigger-tab(section: int, tab: int, action: TabAction);
+    trigger-tab(section, tab, action) => {
+        debug("Trigger tab action:", section, tab, action);
+
+        if action == TabAction.tool-select {
+            Data.sections[section].schematic-tabs[tab].tool = EditorTool.select;
+            Data.sections[section].board-2d-tabs[tab].tool = EditorTool.select;
+        } else if action == TabAction.tool-wire {
+            Data.sections[section].schematic-tabs[tab].tool = EditorTool.wire;
+            Data.sections[section].board-2d-tabs[tab].tool = EditorTool.wire;
+        } else if action == TabAction.tool-netlabel {
+            Data.sections[section].schematic-tabs[tab].tool = EditorTool.netlabel;
+        } else if action == TabAction.tool-via {
+            Data.sections[section].board-2d-tabs[tab].tool = EditorTool.via;
+        } else if action == TabAction.tool-polygon {
+            Data.sections[section].schematic-tabs[tab].tool = EditorTool.polygon;
+            Data.sections[section].board-2d-tabs[tab].tool = EditorTool.polygon;
+        } else if action == TabAction.tool-text {
+            Data.sections[section].schematic-tabs[tab].tool = EditorTool.text;
+            Data.sections[section].board-2d-tabs[tab].tool = EditorTool.text;
+        } else if action == TabAction.tool-plane {
+            Data.sections[section].board-2d-tabs[tab].tool = EditorTool.plane;
+        } else if action == TabAction.tool-zone {
+            Data.sections[section].board-2d-tabs[tab].tool = EditorTool.zone;
+        } else if action == TabAction.tool-hole {
+            Data.sections[section].board-2d-tabs[tab].tool = EditorTool.hole;
+        } else if action == TabAction.tool-component {
+            Data.sections[section].schematic-tabs[tab].tool = EditorTool.component;
+            Data.sections[section].board-2d-tabs[tab].tool = EditorTool.component;
+        } else if action == TabAction.tool-measure {
+            Data.sections[section].schematic-tabs[tab].tool = EditorTool.measure;
+            Data.sections[section].board-2d-tabs[tab].tool = EditorTool.measure;
+        } else if action == TabAction.abort {
+            Data.sections[section].schematic-tabs[tab].tool = EditorTool.select;
+            Data.sections[section].board-2d-tabs[tab].tool = EditorTool.select;
+        }
+    }
+
+    // Trigger some project action
+    //
+    // Note: This callback is executed asynchronously in the backend to
+    // guarantee there are no side effects changing the UI from within the
+    // callback. Otherwise we couldn't declare it as 'pure'.
+    pure callback trigger-project(project-index: int, action: ProjectAction);
+    trigger-project(project-index, action) => {
+        debug("Trigger project action:", project-index, action);
+    }
+
+    // Trigger some project schematic action
+    //
+    // Note: This callback is executed asynchronously in the backend to
+    // guarantee there are no side effects changing the UI from within the
+    // callback. Otherwise we couldn't declare it as 'pure'.
+    pure callback trigger-schematic(project-index: int, schematic-index: int, action: SchematicAction);
+    trigger-schematic(project-index, schematic-index, action) => {
+        debug("Trigger schematic action:", project-index, schematic-index, action);
+    }
+
+    // Trigger some project board action
+    //
+    // Note: This callback is executed asynchronously in the backend to
+    // guarantee there are no side effects changing the UI from within the
+    // callback. Otherwise we couldn't declare it as 'pure'.
+    pure callback trigger-board(project-index: int, board-index: int, action: BoardAction);
+    trigger-board(project-index, board-index, action) => {
+        debug("Trigger board action:", project-index, board-index, action);
     }
 
     // Open an URL by an external application (usually the web browser)
@@ -44,6 +138,18 @@ export global Backend {
         reject
     }
 
+    // Render a graphics scene image
+    pure callback render-scene(section: int, width: length, height: length, scene: int, frame-dummy: int) -> image;
+
+    // Process a graphics scene pointer event
+    pure callback scene-pointer-event(section: int, x: length, y: length, event: PointerEvent);
+
+    // Process graphics scene scrolled event
+    pure callback scene-scrolled(section: int, x-rel: length, y-rel: length, event: PointerScrollEvent) -> bool;
+
+    // Process graphics scene key event
+    pure callback scene-key-event(section: int, event: KeyEvent) -> bool;
+
     // Request generating the preview of a project (e.g. its README.md)
     //
     // Lets the backend building the preview asynchronously, and updating the
@@ -58,4 +164,19 @@ export global Backend {
         debug("Request project preview:", path, width);
         true
     }
+
+    // Format a Length value as a string
+    //
+    // Used by LengthEdit to convert a Length value to a string in the specified
+    // unit.
+    pure callback format-length(value: Int64, unit: LengthUnit) -> string;
+    format-length => {
+        return "123.456789";
+    }
+
+    // Parse the input text of a LengthEdit element
+    //
+    // The backend parses the input string and returns whether it is a valid
+    // number, and the parsed length value plus unit.
+    pure callback parse-length-input(s: string, unit: LengthUnit, minimum: Int64) -> LengthEditParseResult;
 }

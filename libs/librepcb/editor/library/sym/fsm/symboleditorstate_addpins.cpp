@@ -24,6 +24,7 @@
 
 #include "../../../dialogs/circuitidentifierimportdialog.h"
 #include "../../../editorcommandset.h"
+#include "../../../graphics/graphicsscene.h"
 #include "../../../widgets/graphicsview.h"
 #include "../../../widgets/unsignedlengthedit.h"
 #include "../../cmd/cmdsymbolpinedit.h"
@@ -99,8 +100,8 @@ bool SymbolEditorState_AddPins::entry() noexcept {
           &SymbolEditorState_AddPins::execMassImport);
   mContext.commandToolBar.addWidget(std::move(toolButtonImport));
 
-  Point pos =
-      mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos(), true, true);
+  const Point pos = mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos())
+                        .mappedToGrid(mContext.graphicsScene.getGridInterval());
   if (!addNextPin(pos)) {
     return false;
   }
@@ -142,9 +143,8 @@ QSet<EditorWidgetBase::Feature>
  ******************************************************************************/
 
 bool SymbolEditorState_AddPins::processGraphicsSceneMouseMoved(
-    QGraphicsSceneMouseEvent& e) noexcept {
-  Point currentPos =
-      Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
+    const GraphicsSceneMouseEvent& e) noexcept {
+  Point currentPos = e.scenePos.mappedToGrid(getGridInterval());
   if (mEditCmd) {
     mEditCmd->setPosition(currentPos, true);
   }
@@ -152,9 +152,8 @@ bool SymbolEditorState_AddPins::processGraphicsSceneMouseMoved(
 }
 
 bool SymbolEditorState_AddPins::processGraphicsSceneLeftMouseButtonPressed(
-    QGraphicsSceneMouseEvent& e) noexcept {
-  Point currentPos =
-      Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
+    const GraphicsSceneMouseEvent& e) noexcept {
+  Point currentPos = e.scenePos.mappedToGrid(getGridInterval());
   try {
     if (mEditCmd) {
       mEditCmd->setPosition(currentPos, true);
@@ -172,7 +171,7 @@ bool SymbolEditorState_AddPins::processGraphicsSceneLeftMouseButtonPressed(
 }
 
 bool SymbolEditorState_AddPins::processGraphicsSceneRightMouseButtonReleased(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   Q_UNUSED(e);
   return processRotate(Angle::deg90());
 }

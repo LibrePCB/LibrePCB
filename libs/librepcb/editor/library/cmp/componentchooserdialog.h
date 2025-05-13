@@ -42,8 +42,8 @@ class Workspace;
 
 namespace editor {
 
+class GraphicsLayerList;
 class GraphicsScene;
-class IF_GraphicsLayerProvider;
 class SymbolGraphicsItem;
 
 namespace Ui {
@@ -64,8 +64,7 @@ public:
   // Constructors / Destructor
   ComponentChooserDialog() = delete;
   ComponentChooserDialog(const ComponentChooserDialog& other) = delete;
-  ComponentChooserDialog(const Workspace& ws,
-                         const IF_GraphicsLayerProvider* layerProvider,
+  ComponentChooserDialog(const Workspace& ws, const GraphicsLayerList* layers,
                          QWidget* parent = nullptr) noexcept;
   ~ComponentChooserDialog() noexcept;
 
@@ -93,7 +92,7 @@ private:  // Methods
 
 private:  // Data
   const Workspace& mWorkspace;
-  const IF_GraphicsLayerProvider* mLayerProvider;
+  const GraphicsLayerList* mLayers;
   QScopedPointer<Ui::ComponentChooserDialog> mUi;
   QScopedPointer<QAbstractItemModel> mCategoryTreeModel;
   bool mCategorySelected;

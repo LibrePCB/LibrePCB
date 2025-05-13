@@ -72,7 +72,6 @@ public:
   QuickAccessModel& operator=(const QuickAccessModel& rhs) = delete;
 
 signals:
-  void actionTriggered(const FilePath& fp, ui::Action a);  // Internal signal.
   void favoriteProjectChanged(const FilePath& fp, bool favorite);
   void openFileTriggered(const FilePath& fp);
 
@@ -82,7 +81,7 @@ private:
   void saveFavoriteProjects() noexcept;
   void refreshItems() noexcept;
   void setWatchedProjects(const QSet<FilePath>& projects) noexcept;
-  void handleAction(const FilePath& fp, ui::Action a) noexcept;
+  void trigger(const FilePath& fp, ui::TreeViewItemAction a) noexcept;
 
   const Workspace& mWorkspace;
   const FilePath mRecentProjectsFp;

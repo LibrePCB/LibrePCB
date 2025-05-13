@@ -35,6 +35,7 @@ namespace librepcb {
 namespace editor {
 
 class GuiApplication;
+class MainWindow;
 
 /*******************************************************************************
  *  Class MainWindowTestAdapter
@@ -50,7 +51,7 @@ public:
   // Constructors / Destructor
   MainWindowTestAdapter() = delete;
   MainWindowTestAdapter(const MainWindowTestAdapter& other) = delete;
-  explicit MainWindowTestAdapter(GuiApplication& app,
+  explicit MainWindowTestAdapter(GuiApplication& app, MainWindow& win,
                                  QWidget* parent = nullptr) noexcept;
   ~MainWindowTestAdapter() noexcept;
 
@@ -63,12 +64,14 @@ public slots:
     return mLibraryScanFinished;
   }
   QVariant openLibraryEditor(QVariant path) noexcept;
+  QVariant getOpenProjects(QVariant) const noexcept;
 
 signals:
   void actionTriggered(ui::Action a);
 
 private:
   GuiApplication& mApp;
+  MainWindow& mWindow;
   bool mLibraryScanFinished = false;
 };
 

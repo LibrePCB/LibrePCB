@@ -44,12 +44,12 @@ namespace editor {
  ******************************************************************************/
 
 NewElementWizard::NewElementWizard(const Workspace& ws, Library& lib,
-                                   const IF_GraphicsLayerProvider& lp,
+                                   const GraphicsLayerList& layers,
                                    QWidget* parent) noexcept
   : QWizard(parent), mUi(new Ui::NewElementWizard) {
   mUi->setupUi(this);
   setPixmap(WizardPixmap::LogoPixmap, QPixmap(":/img/logo/48x48.png"));
-  mContext.reset(new NewElementWizardContext(ws, lib, lp));
+  mContext.reset(new NewElementWizardContext(ws, lib, layers));
 
   // add pages
   insertPage(NewElementWizardContext::ID_ChooseType,

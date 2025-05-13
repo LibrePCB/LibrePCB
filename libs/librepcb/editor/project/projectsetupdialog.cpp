@@ -50,12 +50,10 @@ namespace editor {
  ******************************************************************************/
 
 ProjectSetupDialog::ProjectSetupDialog(Project& project, UndoStack& undoStack,
-                                       const QString& settingsPrefix,
                                        QWidget* parent) noexcept
   : QDialog(parent),
     mProject(project),
     mUndoStack(undoStack),
-    mSettingsPrefix(settingsPrefix % "/project_setup_dialog"),
     mAttributes(mProject.getAttributes()),
     mUi(new Ui::ProjectSetupDialog) {
   mUi->setupUi(this);
@@ -175,10 +173,13 @@ ProjectSetupDialog::ProjectSetupDialog(Project& project, UndoStack& undoStack,
   // Load all properties.
   load();
 
-  // Load the window geometry.
-  QSettings clientSettings;
-  restoreGeometry(
-      clientSettings.value(mSettingsPrefix % "/window_geometry").toByteArray());
+  // Load client settings.
+  QSettings cs;
+  const QSize windowSize =
+      cs.value("project_setup_dialog/window_size").toSize();
+  if (!windowSize.isEmpty()) {
+    resize(windowSize);
+  }
 
   // Always open first tab.
   mUi->tabWidget->setCurrentIndex(0);
@@ -189,8 +190,8 @@ ProjectSetupDialog::ProjectSetupDialog(Project& project, UndoStack& undoStack,
 
 ProjectSetupDialog::~ProjectSetupDialog() {
   // Save the window geometry.
-  QSettings clientSettings;
-  clientSettings.setValue(mSettingsPrefix % "/window_geometry", saveGeometry());
+  QSettings cs;
+  cs.setValue("project_setup_dialog/window_size", size());
 
   mUi->edtProjectAttributes->setReferences(nullptr, nullptr);
 }

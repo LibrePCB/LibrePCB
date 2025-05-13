@@ -19,6 +19,7 @@ export component MenuItem inherits Rectangle {
     in property <image> icon: cmd.icon;
     in property <image> icon-checked: @image-url("../../../../font-awesome/svgs/regular/square-check.svg");
     in property <image> icon-unchecked: @image-url("../../../../font-awesome/svgs/regular/square.svg");
+    in property <angle> icon-rotation: 0deg;
     in property <bool> enabled: true;
     in property <bool> checkable: false;
     in property <bool> checked: false;
@@ -66,6 +67,7 @@ export component MenuItem inherits Rectangle {
                 image-fit: contain;
                 vertical-alignment: center;
                 horizontal-alignment: center;
+                rotation-angle: icon-rotation;
                 source: {
                     if icon.width > 0 {
                         icon

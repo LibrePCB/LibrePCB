@@ -33,6 +33,7 @@
 #include "project/projecteditor.h"
 #include "utils/slinthelpers.h"
 #include "utils/slintkeyeventtextbuilder.h"
+#include "utils/uihelpers.h"
 #include "workspace/desktopintegration.h"
 #include "workspace/desktopservices.h"
 #include "workspace/initializeworkspacewizard/initializeworkspacewizard.h"
@@ -66,11 +67,13 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
                                QObject* parent) noexcept
   : QObject(parent),
     mWorkspace(ws),
+    mLibrariesContainStandardComponents(false),
     mNotifications(new NotificationsModel(ws)),
     mQuickAccessModel(new QuickAccessModel(ws)),
     mLocalLibraries(new LibrariesModel(ws, LibrariesModel::Mode::LocalLibs)),
     mRemoteLibraries(new LibrariesModel(ws, LibrariesModel::Mode::RemoteLibs)),
-    mLibrariesFilter(new SlintKeyEventTextBuilder()) {
+    mLibrariesFilter(new SlintKeyEventTextBuilder()),
+    mProjects(new UiObjectList<ProjectEditor, ui::ProjectData>()) {
   // Open windows.
   QSettings cs;
   for (const QString& idStr : cs.value("global/windows").toStringList()) {
@@ -190,6 +193,11 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
   connect(mRemoteLibraries.get(), &LibrariesModel::onlineVersionsAvailable,
           mLocalLibraries.get(), &LibrariesModel::setOnlineVersions);
 
+  // Check if standard components are installed.
+  connect(&mWorkspace.getLibraryDb(), &WorkspaceLibraryDb::scanFinished, this,
+          &GuiApplication::updateLibrariesContainStandardComponents);
+  updateLibrariesContainStandardComponents();
+
   // Configure window saving countdown timer.
   mSaveOpenedWindowsCountdown.setSingleShot(true);
   connect(&mSaveOpenedWindowsCountdown, &QTimer::timeout, this, [this]() {
@@ -219,11 +227,162 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
 GuiApplication::~GuiApplication() noexcept {
   mProjectLibraryUpdater.reset();
   closeAllLibraryEditors(false);
-  closeAllProjects(false, nullptr);
 }
 
 /*******************************************************************************
- *  General Methods
+ *  Window Management
+ ******************************************************************************/
+
+void GuiApplication::createNewWindow(int id, int projectIndex) noexcept {
+  // Create Slint window.
+  auto win = ui::AppWindow::create();
+
+  // Helper to create filtered, sorted library models.
+  auto filteredLibs = [this](const std::shared_ptr<LibrariesModel>& model) {
+    auto filterModel = std::make_shared<slint::FilterModel<ui::LibraryData>>(
+        model, [this](const ui::LibraryData& lib) {
+          auto s = mLibrariesFilter->getText().trimmed().toLower();
+          return s.isEmpty() || s2q(lib.name).toLower().contains(s);
+        });
+    connect(mLibrariesFilter.get(), &SlintKeyEventTextBuilder::textChanged,
+            this, [filterModel](const QString&) { filterModel->reset(); });
+    return filterModel;
+  };
+  auto sortedLibs =
+      [](const std::shared_ptr<slint::Model<ui::LibraryData>>& model) {
+        return std::make_shared<slint::SortModel<ui::LibraryData>>(
+            model, [](const ui::LibraryData& a, const ui::LibraryData& b) {
+              if ((a.progress > 0) != (b.progress > 0)) {
+                return a.progress > 0;
+              } else if (a.outdated != b.outdated) {
+                return a.outdated;
+              } else if (a.installed_version.empty() !=
+                         b.installed_version.empty()) {
+                return b.installed_version.empty();
+              } else if (a.recommended != b.recommended) {
+                return a.recommended;
+              } else {
+                return a.name < b.name;
+              }
+            });
+      };
+
+  // Set global data.
+  const ui::Data& d = win->global<ui::Data>();
+  d.set_preview_mode(false);
+  d.set_window_title(
+      QString("LibrePCB %1").arg(Application::getVersion()).toUtf8().data());
+  d.set_about_librepcb_details(q2s(Application::buildFullVersionDetails()));
+  d.set_workspace_path(mWorkspace.getPath().toNative().toUtf8().data());
+  d.set_notifications(mNotifications);
+  d.set_quick_access_items(mQuickAccessModel);
+  d.set_local_libraries(filteredLibs(mLocalLibraries));
+  d.set_remote_libraries(sortedLibs(filteredLibs(mRemoteLibraries)));
+  d.set_projects(mProjects);
+  d.fn_set_current_project(projectIndex);
+
+  // Register global callbacks.
+  const ui::Backend& b = win->global<ui::Backend>();
+  b.on_open_url([this](const slint::SharedString& url) {
+    DesktopServices ds(mWorkspace.getSettings());
+    return ds.openUrl(QUrl(s2q(url)));
+  });
+  b.on_libraries_key_event(std::bind(&SlintKeyEventTextBuilder::process,
+                                     mLibrariesFilter.get(),
+                                     std::placeholders::_1));
+  b.on_copy_to_clipboard([](const slint::SharedString& s) {
+    QApplication::clipboard()->setText(s2q(s));
+    return true;
+  });
+  b.on_format_length([](const ui::Int64& value, ui::LengthUnit unit) {
+    const LengthUnit lpUnit = s2l(unit);
+    return q2s(Toolbox::floatToString(lpUnit.convertToUnit(s2l(value)),
+                                      lpUnit.getReasonableNumberOfDecimals(),
+                                      QLocale()));
+  });
+  b.on_parse_length_input([](slint::SharedString text, ui::LengthUnit unit,
+                             ui::Int64 minimum) {
+    ui::LengthEditParseResult res{false, ui::Int64{0, 0}, unit};
+    try {
+      QString value = s2q(text);
+      foreach (const LengthUnit& u, LengthUnit::getAllUnits()) {
+        foreach (const QString& suffix, u.getUserInputSuffixes()) {
+          if (value.endsWith(suffix)) {
+            value.chop(suffix.length());
+            res.evaluated_unit = l2s(u);
+          }
+        }
+      }
+      const LengthUnit lpUnit = s2l(res.evaluated_unit);
+      const Length lpValue = lpUnit.convertFromUnit(value.toDouble(&res.valid));
+      if (!(lpValue >= s2length(minimum))) {
+        res.valid = false;
+      }
+      res.evaluated_value = l2s(lpValue);
+    } catch (const Exception& e) {
+    }
+    return res;
+  });
+
+  // Reuse next free window ID.
+  if (id < 1) {
+    id = 1;
+    while (std::any_of(mWindows.begin(), mWindows.end(),
+                       [id](const std::shared_ptr<MainWindow>& w) {
+                         return w->getId() == id;
+                       })) {
+      ++id;
+    }
+  }
+
+  // Build wrapper.
+  auto mw = std::make_shared<MainWindow>(*this, win, id);
+  bind(mw.get(), d, &ui::Data::set_local_libraries_data, mLocalLibraries.get(),
+       &LibrariesModel::uiDataChanged, mLocalLibraries->getUiData());
+  bind(mw.get(), d, &ui::Data::set_remote_libraries_data,
+       mRemoteLibraries.get(), &LibrariesModel::uiDataChanged,
+       mRemoteLibraries->getUiData());
+  bind(mw.get(), d, &ui::Data::set_libraries_filter, mLibrariesFilter.get(),
+       &SlintKeyEventTextBuilder::textChanged, mLibrariesFilter->getText());
+  bind(mw.get(), d, &ui::Data::set_workspace_contains_standard_components, this,
+       &GuiApplication::librariesContainStandardComponentsChanged,
+       mLibrariesContainStandardComponents);
+  connect(this, &GuiApplication::statusBarMessageChanged, mw.get(),
+          &MainWindow::showStatusBarMessage);
+  connect(
+      mw.get(), &MainWindow::aboutToClose, this,
+      [this]() {
+        MainWindow* mw = static_cast<MainWindow*>(sender());
+        qDebug().nospace() << "Closed window with ID " << mw->getId() << ".";
+        mWindows.removeIf(
+            [mw](std::shared_ptr<MainWindow> p) { return p.get() == mw; });
+        mw = nullptr;  // Not valid anymore!
+
+        // Schedule saving number of opened windows.
+        mSaveOpenedWindowsCountdown.start(10000);
+      },
+      Qt::QueuedConnection);
+  mWindows.append(mw);
+  qDebug().nospace() << "Opened new window with ID " << id << ".";
+
+  // Schedule saving number of opened windows.
+  mSaveOpenedWindowsCountdown.start(10000);
+}
+
+bool GuiApplication::requestClosingWindow() noexcept {
+  if (mWindows.count() >= 2) {
+    return true;
+  }
+
+  // Stop possibly scheduled window state saving as the user seems to be
+  // closing the whole application, so we don't want to save this state.
+  mSaveOpenedWindowsCountdown.stop();
+
+  return closeAllLibraryEditors(true) && requestClosingAllProjects();
+}
+
+/*******************************************************************************
+ *  Workspace
  ******************************************************************************/
 
 void GuiApplication::openFile(const FilePath& fp, QWidget* parent) noexcept {
@@ -277,6 +436,10 @@ void GuiApplication::addExampleProjects(QWidget* parent) noexcept {
   }
 }
 
+/*******************************************************************************
+ *  Projects
+ ******************************************************************************/
+
 void GuiApplication::createProject(const FilePath& parentDir, bool eagleImport,
                                    QWidget* parent) noexcept {
   const NewProjectWizard::Mode mode = eagleImport
@@ -299,201 +462,126 @@ void GuiApplication::createProject(const FilePath& parentDir, bool eagleImport,
   }
 }
 
-ProjectEditor* GuiApplication::openProject(FilePath filepath,
-                                           QWidget* parent) noexcept {
-  if (!filepath.isValid()) {
-    QSettings settings;  // client settings
-    QString lastOpenedFile = settings
-                                 .value("controlpanel/last_open_project",
-                                        mWorkspace.getPath().toStr())
-                                 .toString();
+std::shared_ptr<ProjectEditor> GuiApplication::openProject(
+    FilePath fp, QWidget* parent) noexcept {
+  if (!fp.isValid()) {
+    QSettings cs;  // client settings
+    QString lastOpenedFile =
+        cs.value("controlpanel/last_open_project", mWorkspace.getPath().toStr())
+            .toString();
 
-    filepath = FilePath(FileDialog::getOpenFileName(
+    fp = FilePath(FileDialog::getOpenFileName(
         parent, tr("Open Project"), lastOpenedFile,
         tr("LibrePCB project files (%1)").arg("*.lpp *.lppz")));
-    if (!filepath.isValid()) return nullptr;
+    if (!fp.isValid()) return nullptr;
 
-    settings.setValue("controlpanel/last_open_project", filepath.toNative());
+    cs.setValue("controlpanel/last_open_project", fp.toNative());
   }
+
+  auto switchToProject = [this](int index) {
+    for (auto win : mWindows) {
+      win->setCurrentProject(index);
+      win->showPanelPage(ui::PanelPage::Documents);
+    }
+  };
+
+  // If the same project is already open, just return it.
+  const FilePath uniqueFp = fp.toUnique();
+  for (int i = 0; i < mProjects->count(); ++i) {
+    auto prj = mProjects->at(i);
+    if (prj->getProject().getFilepath().toUnique() == uniqueFp) {
+      switchToProject(i);
+      return prj;
+    }
+  }
+
+  // Opening the project can take some time, use wait cursor to provide
+  // immediate UI feedback.
+  QApplication::setOverrideCursor(Qt::WaitCursor);
+  auto cursorScopeGuard =
+      scopeGuard([]() { QApplication::restoreOverrideCursor(); });
+
+  // Callback to ask for restoring backup.
+  auto askForRestoringBackup = [parent](const FilePath&) {
+    QMessageBox::StandardButton btn = QMessageBox::question(
+        parent, tr("Restore autosave backup?"),
+        tr("It seems that the application crashed the last time you opened "
+           "this "
+           "project. Do you want to restore the last autosave backup?"),
+        QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+        QMessageBox::Cancel);
+    switch (btn) {
+      case QMessageBox::Yes:
+        return true;
+      case QMessageBox::No:
+        return false;
+      default:
+        throw UserCanceled(__FILE__, __LINE__);
+    }
+  };
 
   try {
-    ProjectEditor* editor = getOpenProject(filepath);
-    if (!editor) {
-      // Opening the project can take some time, use wait cursor to provide
-      // immediate UI feedback.
-      QGuiApplication::setOverrideCursor(Qt::WaitCursor);
-      auto tmpCursor = scopeGuard(&QGuiApplication::restoreOverrideCursor);
-
-      std::shared_ptr<TransactionalFileSystem> fs;
-      QString projectFileName = filepath.getFilename();
-      if (filepath.getSuffix() == "lppz") {
-        fs = TransactionalFileSystem::openRO(
-            FilePath::getRandomTempPath(),
-            &TransactionalFileSystem::RestoreMode::no);
-        fs->removeDirRecursively();  // 1) Get a clean initial state.
-        fs->loadFromZip(filepath);  // 2) Load files from ZIP.
-        foreach (const QString& fn, fs->getFiles()) {
-          if (fn.endsWith(".lpp")) {
-            projectFileName = fn;
-          }
+    // Open file system.
+    std::shared_ptr<TransactionalFileSystem> fs;
+    QString projectFileName = fp.getFilename();
+    if (fp.getSuffix() == "lppz") {
+      fs = TransactionalFileSystem::openRO(
+          FilePath::getRandomTempPath(),
+          &TransactionalFileSystem::RestoreMode::no);
+      fs->removeDirRecursively();  // 1) Get a clean initial state.
+      fs->loadFromZip(fp);  // 2) Load files from ZIP.
+      foreach (const QString& fn, fs->getFiles()) {
+        if (fn.endsWith(".lpp")) {
+          projectFileName = fn;
         }
-      } else {
-        fs = TransactionalFileSystem::openRW(
-            filepath.getParentDir(), &askForRestoringBackup,
-            DirectoryLockHandlerDialog::createDirectoryLockCallback());
       }
-      ProjectLoader loader;
-      std::unique_ptr<Project> project =
-          loader.open(std::unique_ptr<TransactionalDirectory>(
-                          new TransactionalDirectory(fs)),
-                      projectFileName);  // can throw
-      editor = new ProjectEditor(mWorkspace, *project.release(),
-                                 loader.getUpgradeMessages());
-      connect(editor, &ProjectEditor::projectEditorClosed, this,
-              &GuiApplication::projectEditorClosed);
-      connect(editor, &ProjectEditor::showControlPanelClicked, this, [this]() {
-        if (auto win = mWindows.value(0)) {
-          win->makeCurrentWindow();
-        }
-      });
-      connect(editor, &ProjectEditor::aboutLibrePcbRequested, this, [this]() {
-        if (auto win = mWindows.value(0)) {
-          win->showPanelPage(ui::PanelPage::About);
-          win->makeCurrentWindow();
-        }
-      });
-      connect(editor, &ProjectEditor::openProjectLibraryUpdaterClicked, this,
-              &GuiApplication::openProjectLibraryUpdater);
-      mOpenProjectEditors.insert(filepath.toUnique().toStr(), editor);
-
-      // Delay updating the last opened project to avoid an issue when
-      // double-clicking: https://github.com/LibrePCB/LibrePCB/issues/293
-      QTimer::singleShot(500, this, [this, filepath]() {
-        mQuickAccessModel->pushRecentProject(filepath);
-      });
+    } else {
+      fs = TransactionalFileSystem::openRW(
+          fp.getParentDir(), askForRestoringBackup,
+          DirectoryLockHandlerDialog::createDirectoryLockCallback());
     }
-    editor->showAllRequiredEditors();
+
+    // Open project.
+    ProjectLoader loader;
+    std::unique_ptr<Project> project = loader.open(
+        std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(fs)),
+        projectFileName);  // can throw
+
+    // Open editor & keep handle.
+    const int index = mProjects->count();
+    auto editor = std::make_shared<ProjectEditor>(
+        *this, std::move(project), index, loader.getUpgradeMessages());
+    connect(editor.get(), &ProjectEditor::statusBarMessageChanged, this,
+            &GuiApplication::statusBarMessageChanged);
+    connect(editor.get(), &ProjectEditor::projectLibraryUpdaterRequested, this,
+            &GuiApplication::openProjectLibraryUpdater);
+    mProjects->append(editor);
+
+    // Switch to documents tab.
+    switchToProject(index);
+
+    // Delay updating the last opened project to avoid an issue when
+    // double-clicking: https://github.com/LibrePCB/LibrePCB/issues/293
+    QTimer::singleShot(
+        500, this, [this, fp]() { mQuickAccessModel->pushRecentProject(fp); });
+
     return editor;
-  } catch (const UserCanceled& e) {
-    // do nothing
-    return nullptr;
   } catch (const Exception& e) {
-    QMessageBox::critical(parent, tr("Could not open project"), e.getMsg());
+    QMessageBox::critical(parent, tr("Error"), e.getMsg());
     return nullptr;
   }
 }
 
-void GuiApplication::createNewWindow(int id) noexcept {
-  // Create Slint window.
-  auto win = ui::AppWindow::create();
-
-  // Helper to create filtered, sorted library models.
-  auto filteredLibs = [this](const std::shared_ptr<LibrariesModel>& model) {
-    auto filterModel = std::make_shared<slint::FilterModel<ui::LibraryData>>(
-        model, [this](const ui::LibraryData& lib) {
-          auto s = mLibrariesFilter->getText().trimmed().toLower();
-          return s.isEmpty() || s2q(lib.name).toLower().contains(s);
-        });
-    connect(mLibrariesFilter.get(), &SlintKeyEventTextBuilder::textChanged,
-            this, [filterModel](const QString&) { filterModel->reset(); });
-    return filterModel;
-  };
-  auto sortedLibs =
-      [](const std::shared_ptr<slint::Model<ui::LibraryData>>& model) {
-        return std::make_shared<slint::SortModel<ui::LibraryData>>(
-            model, [](const ui::LibraryData& a, const ui::LibraryData& b) {
-              if ((a.progress > 0) != (b.progress > 0)) {
-                return a.progress > 0;
-              } else if (a.outdated != b.outdated) {
-                return a.outdated;
-              } else if (a.installed_version.empty() !=
-                         b.installed_version.empty()) {
-                return b.installed_version.empty();
-              } else if (a.recommended != b.recommended) {
-                return a.recommended;
-              } else {
-                return a.name < b.name;
-              }
-            });
-      };
-
-  // Set global data.
-  const ui::Data& d = win->global<ui::Data>();
-  d.set_preview_mode(false);
-  d.set_window_title(
-      QString("LibrePCB %1").arg(Application::getVersion()).toUtf8().data());
-  d.set_about_librepcb_details(q2s(Application::buildFullVersionDetails()));
-  d.set_workspace_path(mWorkspace.getPath().toNative().toUtf8().data());
-  d.set_notifications(mNotifications);
-  d.set_quick_access_items(mQuickAccessModel);
-  d.set_local_libraries(filteredLibs(mLocalLibraries));
-  d.set_remote_libraries(sortedLibs(filteredLibs(mRemoteLibraries)));
-
-  // Register global callbacks.
-  const ui::Backend& b = win->global<ui::Backend>();
-  b.on_open_url([this](const slint::SharedString& url) {
-    DesktopServices ds(mWorkspace.getSettings());
-    return ds.openUrl(QUrl(s2q(url)));
-  });
-  b.on_libraries_key_event(std::bind(&SlintKeyEventTextBuilder::process,
-                                     mLibrariesFilter.get(),
-                                     std::placeholders::_1));
-  b.on_copy_to_clipboard([](const slint::SharedString& s) {
-    QApplication::clipboard()->setText(s2q(s));
-    return true;
-  });
-
-  // Reuse next free window ID.
-  if (id < 1) {
-    id = 1;
-    while (std::any_of(mWindows.begin(), mWindows.end(),
-                       [id](const std::shared_ptr<MainWindow>& w) {
-                         return w->getId() == id;
-                       })) {
-      ++id;
-    }
+void GuiApplication::closeProject(int index) noexcept {
+  mProjects->remove(index);
+  for (int i = index; i < mProjects->count(); ++i) {
+    mProjects->at(i)->setUiIndex(i);
   }
-
-  // Build wrapper.
-  auto mw = std::make_shared<MainWindow>(*this, win, id);
-  bind(mw.get(), d, &ui::Data::set_local_libraries_data, mLocalLibraries.get(),
-       &LibrariesModel::uiDataChanged, mLocalLibraries->getUiData());
-  bind(mw.get(), d, &ui::Data::set_remote_libraries_data,
-       mRemoteLibraries.get(), &LibrariesModel::uiDataChanged,
-       mRemoteLibraries->getUiData());
-  bind(mw.get(), d, &ui::Data::set_libraries_filter, mLibrariesFilter.get(),
-       &SlintKeyEventTextBuilder::textChanged, mLibrariesFilter->getText());
-  connect(
-      mw.get(), &MainWindow::aboutToClose, this,
-      [this]() {
-        MainWindow* mw = static_cast<MainWindow*>(sender());
-        qDebug().nospace() << "Closed window with ID " << mw->getId() << ".";
-        mWindows.removeIf(
-            [mw](std::shared_ptr<MainWindow> p) { return p.get() == mw; });
-        mw = nullptr;  // Not valid anymore!
-
-        // Schedule saving number of opened windows.
-        mSaveOpenedWindowsCountdown.start(10000);
-      },
-      Qt::QueuedConnection);
-  mWindows.append(mw);
-  qDebug().nospace() << "Opened new window with ID " << id << ".";
-
-  // Schedule saving number of opened windows.
-  mSaveOpenedWindowsCountdown.start(10000);
 }
 
-bool GuiApplication::requestClosingWindow(QWidget* parent) noexcept {
-  if (mWindows.count() >= 2) {
-    return true;
-  }
-
-  // Stop possibly scheduled window state saving as the user seems to be
-  // closing the whole application, so we don't want to save this state.
-  mSaveOpenedWindowsCountdown.stop();
-
-  return closeAllLibraryEditors(true) && closeAllProjects(true, parent);
-}
+/*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
 
 void GuiApplication::exec() {
   slint::run_event_loop();
@@ -505,7 +593,7 @@ void GuiApplication::quit(QPointer<QWidget> parent) noexcept {
   QMetaObject::invokeMethod(
       this,
       [this, parent]() {
-        if (closeAllLibraryEditors(true) && closeAllProjects(true, parent)) {
+        if (closeAllLibraryEditors(true) && requestClosingAllProjects()) {
           mWindows.clear();
           slint::quit_event_loop();
         }
@@ -546,79 +634,46 @@ void GuiApplication::openProjectPassedByOs(const QString& file,
   FilePath filepath(file);
   if ((filepath.isExistingFile()) &&
       ((filepath.getSuffix() == "lpp") || (filepath.getSuffix() == "lppz"))) {
-    openProject(filepath, nullptr);
+    openProject(filepath, qApp->activeWindow());
   } else if (!silent) {
     qWarning() << "Ignore invalid request to open project:" << file;
   }
 }
 
-ProjectEditor* GuiApplication::getOpenProject(
-    const FilePath& filepath) const noexcept {
-  if (mOpenProjectEditors.contains(filepath.toUnique().toStr()))
-    return mOpenProjectEditors.value(filepath.toUnique().toStr());
-  else
-    return nullptr;
-}
-
-bool GuiApplication::askForRestoringBackup(const FilePath& dir) {
-  Q_UNUSED(dir);
-  QMessageBox::StandardButton btn = QMessageBox::question(
-      qApp->activeWindow(), tr("Restore autosave backup?"),
-      tr("It seems that the application crashed the last time you opened this "
-         "project. Do you want to restore the last autosave backup?"),
-      QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-      QMessageBox::Cancel);
-  switch (btn) {
-    case QMessageBox::Yes:
-      return true;
-    case QMessageBox::No:
-      return false;
-    default:
-      throw UserCanceled(__FILE__, __LINE__);
-  }
-}
-
-bool GuiApplication::closeAllProjects(bool askForSave,
-                                      QWidget* parent) noexcept {
-  bool success = true;
-  foreach (ProjectEditor* editor, mOpenProjectEditors) {
-    if (editor->closeAndDestroy(askForSave, parent)) {
-      delete editor;
-    } else {
-      success = false;
+bool GuiApplication::requestClosingAllProjects() noexcept {
+  for (std::size_t i = 0; i < mProjects->row_count(); ++i) {
+    if (auto prj = mProjects->value(i)) {
+      if (!prj->requestClose()) {
+        return false;
+      }
     }
   }
-  return success;
-}
-
-void GuiApplication::projectEditorClosed() noexcept {
-  ProjectEditor* editor = dynamic_cast<ProjectEditor*>(QObject::sender());
-  Q_ASSERT(editor);
-  if (!editor) return;
-
-  const QString fp = mOpenProjectEditors.key(editor);
-  Q_ASSERT(mOpenProjectEditors.contains(fp));
-  mOpenProjectEditors.remove(fp);
-
-  Project* project = &editor->getProject();
-  delete project;
+  return true;
 }
 
 void GuiApplication::openProjectLibraryUpdater(
     const FilePath& project) noexcept {
-  QPointer<ProjectEditor> editor = getOpenProject(project);
-  const bool wasOpen = !editor.isNull();
-  mProjectLibraryUpdater.reset(
-      new ProjectLibraryUpdater(mWorkspace, project, [editor](const FilePath&) {
-        if (editor) {
-          return editor->closeAndDestroy(true);
-        } else {
-          return true;
+  bool wasOpen = false;
+  for (auto prj : *mProjects) {
+    if (prj->getProject().getFilepath() == project) {
+      wasOpen = true;
+      break;
+    }
+  }
+  mProjectLibraryUpdater.reset(new ProjectLibraryUpdater(
+      mWorkspace, project, [this](const FilePath& fp) {
+        for (int i = 0; i < mProjects->count(); ++i) {
+          if (mProjects->at(i)->getProject().getFilepath() == fp) {
+            closeProject(i);
+            break;
+          }
         }
+        return true;
       }));
   if (wasOpen) {
-    connect(mProjectLibraryUpdater.get(), &ProjectLibraryUpdater::finished,
-            this, [this](const FilePath& fp) { openProject(fp, nullptr); });
+    connect(
+        mProjectLibraryUpdater.get(), &ProjectLibraryUpdater::finished, this,
+        [this](const FilePath& fp) { openProject(fp, qApp->activeWindow()); });
   }
   mProjectLibraryUpdater->show();
 }
@@ -684,6 +739,21 @@ std::shared_ptr<MainWindow> GuiApplication::getCurrentWindow() noexcept {
   // TODO: This does not work in every case yet, so we implement some fallback
   // as a workaround.
   return mWindows.value(mWindows.count() - 1);
+}
+
+void GuiApplication::updateLibrariesContainStandardComponents() noexcept {
+  bool found = false;
+  try {
+    // Check only the resistor component, that should be enough...
+    const FilePath fp = mWorkspace.getLibraryDb().getLatest<Component>(
+        Uuid::fromString("ef80cd5e-2689-47ee-8888-31d04fc99174"));
+    found = fp.isValid();
+  } catch (const Exception& e) {
+  }
+  if (found != mLibrariesContainStandardComponents) {
+    mLibrariesContainStandardComponents = found;
+    emit librariesContainStandardComponentsChanged(found);
+  }
 }
 
 void GuiApplication::updateNoLibrariesInstalledNotification() noexcept {

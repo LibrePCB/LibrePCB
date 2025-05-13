@@ -77,8 +77,8 @@ int NewElementWizardPage_DeviceProperties::nextId() const noexcept {
 
 void NewElementWizardPage_DeviceProperties::
     btnChooseComponentClicked() noexcept {
-  ComponentChooserDialog dialog(mContext.getWorkspace(),
-                                &mContext.getLayerProvider(), this);
+  ComponentChooserDialog dialog(mContext.getWorkspace(), &mContext.getLayers(),
+                                this);
   if (dialog.exec() == QDialog::Accepted) {
     std::optional<Uuid> uuid = dialog.getSelectedComponentUuid();
     setComponent(uuid);
@@ -86,8 +86,8 @@ void NewElementWizardPage_DeviceProperties::
 }
 
 void NewElementWizardPage_DeviceProperties::btnChoosePackageClicked() noexcept {
-  PackageChooserDialog dialog(mContext.getWorkspace(),
-                              &mContext.getLayerProvider(), this);
+  PackageChooserDialog dialog(mContext.getWorkspace(), &mContext.getLayers(),
+                              this);
   if (dialog.exec() == QDialog::Accepted) {
     std::optional<Uuid> uuid = dialog.getSelectedPackageUuid();
     setPackage(uuid);

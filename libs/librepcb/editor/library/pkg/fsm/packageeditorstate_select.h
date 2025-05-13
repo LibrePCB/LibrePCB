@@ -82,15 +82,15 @@ public:
 
   // Event Handlers
   bool processGraphicsSceneMouseMoved(
-      QGraphicsSceneMouseEvent& e) noexcept override;
+      const GraphicsSceneMouseEvent& e) noexcept override;
   bool processGraphicsSceneLeftMouseButtonPressed(
-      QGraphicsSceneMouseEvent& e) noexcept override;
+      const GraphicsSceneMouseEvent& e) noexcept override;
   bool processGraphicsSceneLeftMouseButtonReleased(
-      QGraphicsSceneMouseEvent& e) noexcept override;
+      const GraphicsSceneMouseEvent& e) noexcept override;
   bool processGraphicsSceneLeftMouseButtonDoubleClicked(
-      QGraphicsSceneMouseEvent& e) noexcept override;
+      const GraphicsSceneMouseEvent& e) noexcept override;
   bool processGraphicsSceneRightMouseButtonReleased(
-      QGraphicsSceneMouseEvent& e) noexcept override;
+      const GraphicsSceneMouseEvent& e) noexcept override;
   bool processSelectAll() noexcept override;
   bool processCut() noexcept override;
   bool processCopy() noexcept override;

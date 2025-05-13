@@ -3,13 +3,17 @@ import { Tab } from "tab.slint";
 import { HomeTab } from "hometab.slint";
 import { CreateLibraryTab } from "library/createlibrarytab.slint";
 import { DownloadLibraryTab } from "library/downloadlibrarytab.slint";
+import { SchematicTab } from "./project/schematic/schematictab.slint";
+import { Board2dTab } from "./project/board/board2dtab.slint";
+import { Board3dTab } from "./project/board/board3dtab.slint";
 import {
-    Action,
     Backend,
     Data,
     Helpers,
+    TabAction,
     TabData,
     TabType,
+    WindowSectionAction,
     WindowSectionData,
 } from "api.slint";
 
@@ -59,10 +63,9 @@ component TabButton inherits Rectangle {
 
         if tab.type != TabType.home: close-btn := IconButton {
             y: (parent.height - self.height) / 2;
-            width: parent.height * 0.6;
-            height: self.width;
+            height: parent.height * 0.6;
             icon-scale: 0.7;
-            colorize: txt.color;
+            color-enabled: txt.color;
             border-radius: 3px;
             icon: @image-url("../../../font-awesome/svgs/solid/xmark.svg");
             accessible-label: "close tab";
@@ -114,12 +117,11 @@ export component WindowSection inherits Rectangle {
                         is-current-tab: index == section.current-tab-index;
 
                         clicked => {
-                            Data.current-section-index = section-index;
-                            Data.sections[section-index].current-tab-index = index;
+                            Data.set-current-tab(section-index, index);
                         }
 
                         close-clicked => {
-                            section.tabs[section.current-tab-index].action = Action.tab-close;
+                            Backend.trigger-tab(section-index, index, TabAction.close);
                         }
                     }
                 }
@@ -138,7 +140,7 @@ export component WindowSection inherits Rectangle {
                     tooltip-position: bottom-left;
 
                     clicked => {
-                        Data.sections[section-index].action = Action.section-split;
+                        Backend.trigger-section(section-index, WindowSectionAction.split);
                     }
                 }
 
@@ -151,7 +153,7 @@ export component WindowSection inherits Rectangle {
                     tooltip-position: bottom-left;
 
                     clicked => {
-                        Data.sections[section-index].action = Action.section-close;
+                        Backend.trigger-section(section-index, WindowSectionAction.close);
                     }
                 }
             }
@@ -190,6 +192,27 @@ export component WindowSection inherits Rectangle {
                 section: section;
             }
 
+            if tab-open && (tab-type == TabType.schematic): schematic-tab := SchematicTab {
+                width: 100%;
+                height: 100%;
+                section-index: section-index;
+                section: section;
+            }
+
+            if tab-open && (tab-type == TabType.board-2d): board-2d-tab := Board2dTab {
+                width: 100%;
+                height: 100%;
+                section-index: section-index;
+                section: section;
+            }
+
+            if tab-open && (tab-type == TabType.board-3d): board-3d-tab := Board3dTab {
+                width: 100%;
+                height: 100%;
+                section-index: section-index;
+                section: section;
+            }
+
             // Highlight rectangle
             property <float> highlight-percentage: section.highlight ? 1.2 : 0;
             animate highlight-percentage { duration: 700ms; }
@@ -202,7 +225,7 @@ export component WindowSection inherits Rectangle {
 
         pointer-event(event) => {
             if event.kind == PointerEventKind.down {
-                Data.current-section-index = section-index;
+                Data.set-current-tab(section-index, section.current-tab-index);
             }
         }
     }

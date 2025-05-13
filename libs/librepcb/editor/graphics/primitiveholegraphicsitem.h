@@ -39,7 +39,7 @@ namespace librepcb {
 namespace editor {
 
 class GraphicsLayer;
-class IF_GraphicsLayerProvider;
+class GraphicsLayerList;
 class OriginCrossGraphicsItem;
 class PrimitivePathGraphicsItem;
 
@@ -55,7 +55,7 @@ public:
   // Constructors / Destructor
   PrimitiveHoleGraphicsItem() = delete;
   PrimitiveHoleGraphicsItem(const PrimitiveHoleGraphicsItem& other) = delete;
-  PrimitiveHoleGraphicsItem(const IF_GraphicsLayerProvider& lp,
+  PrimitiveHoleGraphicsItem(const GraphicsLayerList& layers,
                             bool originCrossesVisible,
                             QGraphicsItem* parent = nullptr) noexcept;
   virtual ~PrimitiveHoleGraphicsItem() noexcept;
@@ -76,7 +76,7 @@ private:  // Methods
                       const QVariant& value) noexcept override;
 
 private:  // Data
-  std::shared_ptr<GraphicsLayer> mHoleLayer;
+  std::shared_ptr<const GraphicsLayer> mHoleLayer;
   QScopedPointer<PrimitivePathGraphicsItem> mHoleGraphicsItem;
   QScopedPointer<PrimitivePathGraphicsItem> mStopMaskGraphicsItemBot;
   QScopedPointer<PrimitivePathGraphicsItem> mStopMaskGraphicsItemTop;

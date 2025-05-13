@@ -22,8 +22,8 @@
  ******************************************************************************/
 #include "cmdremoveselectedboarditems.h"
 
-#include "../boardeditor/boardgraphicsscene.h"
-#include "../boardeditor/boardselectionquery.h"
+#include "../board/boardgraphicsscene.h"
+#include "../board/boardselectionquery.h"
 #include "cmdremoveboarditems.h"
 
 #include <librepcb/core/project/board/board.h>

@@ -62,16 +62,14 @@ public:
 private:  // Methods
   void undoTriggered() noexcept;
   void redoTriggered() noexcept;
-  void unregisterFromStack() noexcept;
-  void registerToStack(UndoStack* stack) noexcept;
+  void updateState() noexcept;
 
 private:  // Data
   QAction& mUndo;
   QAction& mRedo;
   QAction* mSave;
-  UndoStack* mStack;
-  QWidget* mMsgBoxParent;
-  QList<QMetaObject::Connection> mConnections;
+  QPointer<UndoStack> mStack;
+  QPointer<QWidget> mMsgBoxParent;
 };
 
 /*******************************************************************************

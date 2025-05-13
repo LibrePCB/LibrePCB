@@ -1,0 +1,300 @@
+import { ListView } from "std-widgets.slint";
+import {
+    IconButton,
+    ListViewItemButton,
+    Palette,
+    PanelHeader,
+} from "widgets.slint";
+import {
+    BoardAction,
+    Data,
+    EditorCommandSet as Cmd,
+    Helpers,
+    RuleCheckData,
+    RuleCheckMessageAction,
+    RuleCheckMessageData,
+    RuleCheckState,
+    RuleCheckType,
+} from "api.slint";
+
+component RuleCheckListItem inherits Rectangle {
+    in-out property <[RuleCheckMessageData]> model;
+    in property <int> index;
+    in property <bool> enabled: true;
+    in property <bool> selected: false;
+    in property <length> scrollbar-width;
+    property <RuleCheckMessageData> item: model[index];
+
+    callback clicked <=> ta.clicked;
+    callback double-clicked <=> ta.double-clicked;
+
+    background: ta.has-hover ? #404040 : (selected ? #353535 : transparent);
+
+    // Accessibility
+    accessible-role: list-item;
+    accessible-description: item.description;
+    accessible-enabled: enabled;
+    accessible-label: item.message;
+    accessible-item-selectable: true;
+    accessible-item-selected: selected;
+    accessible-item-index: index;
+    accessible-action-default => {
+        ta.double-clicked();
+    }
+
+    ta := TouchArea {
+        enabled: enabled;
+
+        HorizontalLayout {
+            padding: 3px;
+            padding-left: 5px;
+            padding-right: 5px + scrollbar-width;
+            spacing: 5px;
+
+            Rectangle {
+                width: self.height;
+
+                Image {
+                    x: 2px;
+                    y: self.x;
+                    width: self.height;
+                    height: parent.height - 2 * self.x;
+                    source: Helpers.get-icon-for-notification-type(item.severity);
+                    colorize: (item.approved || (!root.enabled)) ? txt.color : Helpers.get-color-for-notification-type(item.severity);
+                    accessible-role: none;
+                }
+            }
+
+            txt := Text {
+                vertical-alignment: center;
+                font-size: 12px;
+                font-italic: item.approved;
+                overflow: elide;
+                color: root.enabled ? Palette.foreground : #707070;
+                text: item.message;
+                accessible-role: none;
+            }
+
+            if item.supports-autofix && (selected || ta.has-hover): autofix-btn := ListViewItemButton {
+                icon: @image-url("../../../font-awesome/svgs/solid/wand-magic-sparkles.svg");
+                tooltip: @tr("Apply Automatic Fix");
+                enabled: root.enabled && (item.action != RuleCheckMessageAction.autofix);
+
+                clicked => {
+                    model[index].action = RuleCheckMessageAction.autofix;
+                }
+            }
+
+            if selected || ta.has-hover || item.approved: approve-btn := ListViewItemButton {
+                icon: item.approved ? @image-url("../../../bootstrap-icons/icons/eye-slash-fill.svg") : @image-url("../../../bootstrap-icons/icons/eye-fill.svg");
+                tooltip: item.approved ? @tr("Remove Approval") : @tr("Approve");
+                enabled: root.enabled;
+
+                clicked => {
+                    model[index].approved = !item.approved;
+                }
+            }
+        }
+    }
+
+    // Strikethrough
+    if item.approved: Rectangle {
+        x: txt.x;
+        y: txt.y + (txt.height / 2) + 1px;
+        height: 1px;
+        width: min(txt.preferred-width, txt.width);
+        background: txt.color;
+    }
+}
+
+export component RuleCheckPanel inherits Rectangle {
+    property <RuleCheckData> check: Data.current-rule-check;
+    property <string> title: Helpers.get-rule-check-title-for-type(check.type);
+    property <[RuleCheckMessageData]> model: check.messages;
+    property <length> item-height: 22px;
+    property <int> selected-index: -1;
+    property <RuleCheckMessageData> selected-item: model[selected-index];
+    property <bool> item-selected: (selected-index >= 0) && (selected-index < model.length);
+
+    function set-current-index(index: int, force-zoom: bool) {
+        if ((index + 1) * item-height) > (view.height - view.viewport-y) {
+            view.viewport-y = -(index + 1) * item-height + view.height;
+        } else if (index * item-height) < -(view.viewport-y) {
+            view.viewport-y = -(index * item-height);
+        }
+        selected-index = index;
+        if Data.rule-check-zoom-to-location || force-zoom {
+            model[index].action = RuleCheckMessageAction.highlight-and-zoom-to;
+        } else {
+            model[index].action = RuleCheckMessageAction.highlight;
+        }
+    }
+
+    background: #2a2a2a;
+
+    // Set focus when panel is shown. Not sure if it's always desired(?).
+    init => {
+        fs.focus();
+    }
+
+    fs := FocusScope {
+        VerticalLayout {
+            header := PanelHeader {
+                z: 10;  // For the tooltip.
+                title: title.to-uppercase();
+                show-spinner: check.state == RuleCheckState.running;
+                highlight: fs.has-focus;
+
+                if !check.execution-error.is-empty: error-btn := IconButton {
+                    width: self.height;
+                    style: read-only;
+                    icon: @image-url("../../../font-awesome/svgs/solid/circle-xmark.svg");
+                    icon-scale: 0.7;
+                    tooltip: check.execution-error;
+                    color-enabled: red;
+                }
+
+                if check.state == RuleCheckState.outdated: outdated-btn := IconButton {
+                    width: self.height;
+                    style: read-only;
+                    icon: @image-url("../../../font-awesome/svgs/solid/triangle-exclamation.svg");
+                    icon-scale: 0.7;
+                    tooltip: @tr("Possibly Outdated Data") + "\n\n" + @tr("Trigger the checks again to refresh the messages.");
+                    color-enabled: yellow;
+                }
+
+                if check.type == RuleCheckType.drc: quick-check-btn := IconButton {
+                    width: self.height;
+                    cmd: Cmd.run-quick-check;
+                    icon-scale: 0.7;
+                    enabled: check.state != RuleCheckState.running;
+
+                    clicked => {
+                        Helpers.trigger-current-board-action(BoardAction.run-quick-check);
+                    }
+                }
+
+                if check.type == RuleCheckType.drc: drc-btn := IconButton {
+                    width: self.height;
+                    cmd: Cmd.run-design-rule-check;
+                    icon: @image-url("../../../font-awesome/svgs/solid/arrows-rotate.svg");
+                    icon-scale: 0.7;
+                    enabled: check.state != RuleCheckState.running;
+
+                    clicked => {
+                        Helpers.trigger-current-board-action(BoardAction.run-drc);
+                    }
+                }
+
+                if check.type == RuleCheckType.drc: drc-setup-btn := IconButton {
+                    width: self.height;
+                    icon: @image-url("../../../font-awesome/svgs/solid/sliders.svg");
+                    icon-scale: 0.7;
+                    tooltip: @tr("DRC Settings");
+                    enabled: check.state != RuleCheckState.running;
+
+                    clicked => {
+                        Helpers.trigger-current-board-action(BoardAction.open-drc-setup-dialog);
+                    }
+                }
+
+                if check.type == RuleCheckType.drc: zoom-to-location-btn := IconButton {
+                    width: self.height;
+                    icon: @image-url("../../../font-awesome/svgs/solid/location-crosshairs.svg");
+                    icon-scale: 0.7;
+                    tooltip: @tr("Zoom to Location");
+                    checked: Data.rule-check-zoom-to-location;
+                    enabled: check.state != RuleCheckState.running;
+
+                    clicked => {
+                        Data.rule-check-zoom-to-location = !Data.rule-check-zoom-to-location;
+                    }
+                }
+            }
+
+            if model.length == 0: VerticalLayout {
+                padding: 8px;
+
+                Text {
+                    width: 100%;
+                    font-size: 12px;
+                    font-italic: true;
+                    wrap: word-wrap;
+                    text: {
+                        if check.state == RuleCheckState.not-run-yet {
+                            return @tr("No checks run yet. Trigger them with one of the buttons above.");
+                        } else if check.state == RuleCheckState.running {
+                            return @tr("Running, hang on...");
+                        } else {
+                            return @tr("No messages.");
+                        }
+                    }
+                }
+            }
+
+            view := ListView {
+                property <length> scrollbar-width: (self.height < self.viewport-height) ? 7px : 0;
+
+                vertical-stretch: 1;
+                visible: model.length > 0;
+
+                for msg[index] in model: item := RuleCheckListItem {
+                    height: item-height;
+                    model: model;
+                    index: index;
+                    enabled: check.execution-error.is-empty && (check.state != RuleCheckState.running);
+                    selected: (index == selected-index);
+                    scrollbar-width: scrollbar-width;
+
+                    clicked => {
+                        set-current-index(index, false);
+                        fs.focus();
+                    }
+
+                    double-clicked => {
+                        set-current-index(index, true);
+                        fs.focus();
+                    }
+                }
+            }
+
+            if item-selected: selected-msg-header := PanelHeader {
+                title: selected-item.message;
+            }
+
+            if item-selected: Rectangle {
+                background: #202020;
+
+                VerticalLayout {
+                    padding: 8px;
+
+                    selected-msg-txt := Text {
+                        width: 100%;
+                        font-size: 12px;
+                        wrap: word-wrap;
+                        text: selected-item.description;
+                    }
+                }
+            }
+        }
+
+        key-pressed(event) => {
+            if (event.text == Key.DownArrow) && (selected-index < model.length - 1) {
+                set-current-index(selected-index + 1, false);
+                return accept;
+            } else if (event.text == Key.UpArrow) && (selected-index > 0) {
+                set-current-index(selected-index - 1, false);
+                return accept;
+            } else if item-selected {
+                if event.text == Key.Return {
+                    model[selected-index].action = RuleCheckMessageAction.highlight-and-zoom-to;
+                    return accept;
+                } else if event.text == Key.Space {
+                    model[selected-index].approved = !model[selected-index].approved;
+                    return accept;
+                }
+            }
+            reject
+        }
+    }
+}

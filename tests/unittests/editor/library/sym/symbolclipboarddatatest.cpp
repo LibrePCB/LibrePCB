@@ -22,8 +22,7 @@
  ******************************************************************************/
 #include <gtest/gtest.h>
 #include <librepcb/core/types/layer.h>
-#include <librepcb/core/workspace/theme.h>
-#include <librepcb/editor/graphics/defaultgraphicslayerprovider.h>
+#include <librepcb/editor/graphics/graphicslayerlist.h>
 #include <librepcb/editor/library/sym/symbolclipboarddata.h>
 
 #include <QtCore>
@@ -54,9 +53,9 @@ TEST(SymbolClipboardDataTest, testToFromMimeDataEmpty) {
   SymbolClipboardData obj1(uuid, pos);
 
   // Serialize to MIME data
-  Theme theme;
-  DefaultGraphicsLayerProvider layerProvider(theme);
-  std::unique_ptr<QMimeData> mime1 = obj1.toMimeData(layerProvider);
+  std::unique_ptr<GraphicsLayerList> layers =
+      GraphicsLayerList::previewLayers(nullptr);
+  std::unique_ptr<QMimeData> mime1 = obj1.toMimeData(*layers);
 
   // Load from MIME data and validate
   std::unique_ptr<SymbolClipboardData> obj2 =
@@ -122,9 +121,9 @@ TEST(SymbolClipboardDataTest, testToFromMimeDataPopulated) {
   obj1.getTexts().append(text2);
 
   // Serialize to MIME data
-  Theme theme;
-  DefaultGraphicsLayerProvider layerProvider(theme);
-  std::unique_ptr<QMimeData> mime1 = obj1.toMimeData(layerProvider);
+  std::unique_ptr<GraphicsLayerList> layers =
+      GraphicsLayerList::previewLayers(nullptr);
+  std::unique_ptr<QMimeData> mime1 = obj1.toMimeData(*layers);
 
   // Load from MIME data and validate
   std::unique_ptr<SymbolClipboardData> obj2 =

@@ -55,11 +55,10 @@ public:
     ElementRemoved,
     ElementUiDataChanged,
   };
-  Signal<UiObjectList<TObj, TUiData>, int, const std::shared_ptr<const TObj>&,
-         Event>
+  Signal<UiObjectList<TObj, TUiData>, int, const std::shared_ptr<TObj>&, Event>
       onEdited;
-  typedef Slot<UiObjectList<TObj, TUiData>, int,
-               const std::shared_ptr<const TObj>&, Event>
+  typedef Slot<UiObjectList<TObj, TUiData>, int, const std::shared_ptr<TObj>&,
+               Event>
       OnEditedSlot;
 
   // Constructors / Destructor
@@ -107,6 +106,11 @@ public:
       return nullptr;
     }
   }
+  void clear() noexcept {
+    for (int i = mObjects.count() - 1; i >= 0; --i) {
+      takeAt(i);
+    }
+  }
   std::optional<int> indexOf(const TObj* obj) const noexcept {
     for (int i = 0; i < mObjects.count(); ++i) {
       if (mObjects.at(i).get() == obj) {
@@ -115,6 +119,7 @@ public:
     }
     return std::nullopt;
   }
+  const QVector<std::shared_ptr<TObj>>& values() { return mObjects; }
   auto begin() noexcept { return mObjects.begin(); }
   auto end() noexcept { return mObjects.end(); }
 

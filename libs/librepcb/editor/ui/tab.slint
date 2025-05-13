@@ -4,6 +4,14 @@ export component Tab inherits FocusScope {
     // Focus scope is only required for the key-pressed() event.
     enabled: false;
 
+    // Not sure if this is a good idea, but e.g. when switching to a different
+    // tab it can happen that no element has the focus anymore which breaks
+    // keyboard input handling. This workaround ensures the newly opened tab
+    // gets the focus.
+    init => {
+        self.focus();
+    }
+
     if show-watermark: Image {
         width: min(root.width * 0.25, 200px);
         height: self.width;

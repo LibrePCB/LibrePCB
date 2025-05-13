@@ -92,26 +92,20 @@ UndoStack::~UndoStack() noexcept {
  *  Getters
  ******************************************************************************/
 
-QString UndoStack::getUndoText() const noexcept {
-  if (canUndo())
-    return tr("Undo: %1").arg(mCommands[mCurrentIndex - 1]->getText());
-  else
-    return tr("Undo");
+QString UndoStack::getUndoCmdText() const noexcept {
+  return canUndo() ? mCommands[mCurrentIndex - 1]->getText() : QString();
 }
 
-QString UndoStack::getRedoText() const noexcept {
-  if (canRedo())
-    return tr("Redo: %1").arg(mCommands[mCurrentIndex]->getText());
-  else
-    return tr("Redo");
+QString UndoStack::getRedoCmdText() const noexcept {
+  return canRedo() ? mCommands[mCurrentIndex]->getText() : QString();
 }
 
 bool UndoStack::canUndo() const noexcept {
-  return (mCurrentIndex > 0);
+  return (!isCommandGroupActive()) && (mCurrentIndex > 0);
 }
 
 bool UndoStack::canRedo() const noexcept {
-  return (mCurrentIndex < mCommands.count());
+  return (!isCommandGroupActive()) && (mCurrentIndex < mCommands.count());
 }
 
 uint UndoStack::getUniqueStateId() const noexcept {
@@ -188,10 +182,6 @@ bool UndoStack::execCmd(UndoCommand* cmd, bool forceKeepCmd) {
     mCurrentIndex++;
 
     // emit signals
-    emit undoTextChanged(tr("Undo: %1").arg(cmd->getText()));
-    emit redoTextChanged(tr("Redo"));
-    emit canUndoChanged(true);
-    emit canRedoChanged(false);
     emit cleanChanged(false);
     emit stateModified();
   } else {
@@ -215,7 +205,7 @@ void UndoStack::beginCmdGroup(const QString& text) {
   mActiveCommandGroup = cmd;
 
   // emit signals
-  emit canUndoChanged(false);
+  emit stateModified();
 }
 
 bool UndoStack::appendToCmdGroup(UndoCommand* cmd) {
@@ -257,8 +247,7 @@ bool UndoStack::commitCmdGroup() {
   mActiveCommandGroup = nullptr;
 
   // emit signals
-  emit canUndoChanged(canUndo());
-  emit commandGroupEnded();
+  emit stateModified();
   return true;
 }
 
@@ -282,12 +271,7 @@ void UndoStack::abortCmdGroup() {
   }
 
   // emit signals
-  emit undoTextChanged(getUndoText());
-  emit redoTextChanged(tr("Redo"));
-  emit canUndoChanged(canUndo());
-  emit canRedoChanged(false);
   emit cleanChanged(isClean());
-  emit commandGroupAborted();  // this is important!
   emit stateModified();
 }
 
@@ -305,10 +289,6 @@ void UndoStack::undo() {
   }
 
   // emit signals
-  emit undoTextChanged(getUndoText());
-  emit redoTextChanged(getRedoText());
-  emit canUndoChanged(canUndo());
-  emit canRedoChanged(canRedo());
   emit cleanChanged(isClean());
   emit stateModified();
 }
@@ -327,10 +307,6 @@ void UndoStack::redo() {
   }
 
   // emit signals
-  emit undoTextChanged(getUndoText());
-  emit redoTextChanged(getRedoText());
-  emit canUndoChanged(canUndo());
-  emit canRedoChanged(canRedo());
   emit cleanChanged(isClean());
   emit stateModified();
 }
@@ -359,11 +335,8 @@ void UndoStack::clear() noexcept {
   mActiveCommandGroup = nullptr;
 
   // emit signals
-  emit undoTextChanged(tr("Undo"));
-  emit redoTextChanged(tr("Redo"));
-  emit canUndoChanged(false);
-  emit canRedoChanged(false);
   emit cleanChanged(true);
+  emit stateModified();
 }
 
 /*******************************************************************************

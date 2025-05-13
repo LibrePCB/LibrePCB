@@ -7,7 +7,7 @@ library = 'libraries/Populated Library.lplib'
 
 
 @pytest.fixture
-def project_editor(librepcb):
+def project_editor(librepcb, helpers):
     """
     Fixture opening the project editor with an empty project
     """
@@ -15,9 +15,8 @@ def project_editor(librepcb):
     librepcb.add_project('Empty Project')
     librepcb.set_project('Empty Project/Empty Project.lpp')
     with librepcb.open() as app:
-        # Check if both editors were opened
-        assert app.widget('schematicEditor').properties()['visible'] is True
-        assert app.widget('boardEditor').properties()['visible'] is True
+        # Wait for the project to be opened
+        helpers.wait_for_project(app, 'Empty Project')
 
         # Start the actual test
         yield app

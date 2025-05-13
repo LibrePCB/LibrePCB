@@ -4,18 +4,21 @@ import "../../../../share/librepcb/fonts/NotoSansMono-Regular.ttf";
 import { MainMenuBar } from "mainmenubar.slint";
 import { SideBar } from "sidebar.slint";
 import { HomePanel } from "homepanel.slint";
+import { DocumentsPanel } from "documentspanel.slint";
+import { GraphicsLayersPanel } from "graphicslayerspanel.slint";
+import { PlaceDevicesPanel } from "project/placedevicespanel.slint";
+import { RuleCheckPanel } from "rulecheckpanel.slint";
 import { LibrariesPanel } from "library/librariespanel.slint";
 import { AboutPanel } from "aboutpanel.slint";
 import { WindowSection } from "windowsection.slint";
 import { StatusBar } from "statusbar.slint";
 import {
-    Action,
     Backend,
-    Constants,
     Data,
     EditorCommandSet as Cmd,
-    Helpers,
+    FeatureState,
     PanelPage,
+    Shortcuts,
 } from "api.slint";
 
 export { Backend, Data, Cmd as EditorCommandSet }
@@ -41,47 +44,16 @@ export component AppWindow inherits Window {
         enabled: Data.preview-mode;
 
         key-pressed(event) => {
-            if Helpers.is-shortcut(event, Cmd.file-manager) {
-                Backend.trigger(Action.workspace-open-folder);
-            } else if Helpers.is-shortcut(event, Cmd.workspace-switch) {
-                Backend.trigger(Action.workspace-switch);
-            } else if Helpers.is-shortcut(event, Cmd.workspace-settings) {
-                Backend.trigger(Action.workspace-settings);
-            } else if Helpers.is-shortcut(event, Cmd.workspace-libraries-rescan) {
-                Backend.trigger(Action.workspace-libraries-rescan);
-            } else if Helpers.is-shortcut(event, Cmd.library-manager) {
-                Data.panel-page = PanelPage.libraries;
-            } else if Helpers.is-shortcut(event, Cmd.project-new) {
-                Backend.trigger(Action.project-new);
-            } else if Helpers.is-shortcut(event, Cmd.project-open) {
-                Backend.trigger(Action.project-open);
-            } else if Helpers.is-shortcut(event, Cmd.add-example-projects) {
-                Backend.trigger(Action.project-import-examples);
-            } else if Helpers.is-shortcut(event, Cmd.import-eagle-project) {
-                Backend.trigger(Action.project-import-eagle);
-            } else if Helpers.is-shortcut(event, Cmd.window-new) {
-                Backend.trigger(Action.window-new);
-            } else if Helpers.is-shortcut(event, Cmd.window-close) {
-                Backend.trigger(Action.window-close);
-            } else if Helpers.is-shortcut(event, Cmd.application-quit) {
-                Backend.trigger(Action.quit);
-            } else if Helpers.is-shortcut(event, Cmd.about-librepcb) {
-                Data.panel-page = PanelPage.about;
-            } else if Helpers.is-shortcut(event, Cmd.website) {
-                Backend.open-url(Constants.website-url);
-            } else if Helpers.is-shortcut(event, Cmd.documentation-online) {
-                Backend.open-url(Constants.user-manual-url);
-            } else if Helpers.is-shortcut(event, Cmd.support) {
-                Backend.open-url(Constants.support-url);
-            } else if Helpers.is-shortcut(event, Cmd.donate) {
-                Backend.open-url(Constants.donate-url);
-            } else if Helpers.is-shortcut(event, Cmd.keyboard-shortcuts-reference) {
-                Backend.trigger(Action.keyboard-shortcuts-reference);
-            } else {
-                return reject;
+            if Shortcuts.process(event) {
+                return accept;
+            } else if Shortcuts.is-shortcut(event, Cmd.find) && (Data.current-tab.features.find == FeatureState.enabled) {
+                menubar.focus-search();
+                return accept;
+            } else if Shortcuts.is-shortcut(event, Cmd.grid-properties) && Data.current-tab-is-2d {
+                statusbar.focus-grid-interval();
+                return accept;
             }
-
-            accept
+            reject
         }
 
         menubar := MainMenuBar {
@@ -90,6 +62,15 @@ export component AppWindow inherits Window {
             z: 100; // For the tooltips.
             width: 100%;
             height: 26px;
+            sections-start-x: sidebar.width + panel-width;
+
+            focus-root => {
+                fs.focus();
+            }
+
+            focus-grid-interval => {
+                statusbar.focus-grid-interval();
+            }
         }
 
         sidebar := SideBar {
@@ -101,6 +82,38 @@ export component AppWindow inherits Window {
         }
 
         if Data.panel-page == PanelPage.home: home-panel := HomePanel {
+            x: sidebar.width;
+            y: sidebar.y;
+            z: 80; // For the tooltips.
+            width: panel-width;
+            height: sidebar.height;
+        }
+
+        if Data.panel-page == PanelPage.documents: DocumentsPanel {
+            x: sidebar.width;
+            y: sidebar.y;
+            z: 80; // For the tooltips.
+            width: panel-width;
+            height: sidebar.height;
+        }
+
+        if Data.panel-page == PanelPage.layers: GraphicsLayersPanel {
+            x: sidebar.width;
+            y: sidebar.y;
+            z: 80; // For the tooltips.
+            width: panel-width;
+            height: sidebar.height;
+        }
+
+        if Data.panel-page == PanelPage.place-devices: PlaceDevicesPanel {
+            x: sidebar.width;
+            y: sidebar.y;
+            z: 80; // For the tooltips.
+            width: panel-width;
+            height: sidebar.height;
+        }
+
+        if Data.panel-page == PanelPage.rule-check: RuleCheckPanel {
             x: sidebar.width;
             y: sidebar.y;
             z: 80; // For the tooltips.
@@ -153,6 +166,10 @@ export component AppWindow inherits Window {
             x: 0;
             y: parent.height - self.height;
             width: parent.width;
+
+            focus-root => {
+                fs.focus();
+            }
         }
     }
 }

@@ -131,12 +131,11 @@ component NotificationItem inherits Rectangle {
         close-btn := IconButton {
             x: parent.width - self.width - self.y;
             y: 8px;
-            width: 15px;
-            height: self.width;
-            hyperlink-style: true;
+            height: 15px;
+            style: hyperlink;
             icon-size: 16px;
             icon-rotation: 90deg;
-            colorize: self.has-hover ? white : #909090;
+            color-enabled: #909090;
             icon: @image-url("../../../font-awesome/svgs/solid/xmark.svg");
             visible: !notification.dismissed;  // Just for the preview.
             accessible-label: "Dismiss";
@@ -168,9 +167,8 @@ export component NotificationsPopup inherits Rectangle {
                 }
 
                 collapse-btn := IconButton {
-                    width: header-txt.height;
                     height: header-txt.height;
-                    hyperlink-style: true;
+                    style: hyperlink;
                     icon-size: 16px;
                     icon-rotation: 90deg;
                     icon: @image-url("../../../font-awesome/svgs/solid/angle-right.svg");

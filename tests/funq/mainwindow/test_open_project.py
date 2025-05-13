@@ -14,12 +14,6 @@ def test_open_dialog(librepcb, helpers):
     with librepcb.open() as app:
         path = librepcb.abspath('Empty Project/Empty Project.lpp')
         app.widget('mainWindowTestAdapter').call_slot('trigger', 'project-open')
-        app.widget('mainWindowOpenProjectDialogFileNameEdit').set_property('text', path)
-        app.widget('mainWindowOpenProjectDialogOkButton').click()
-
-        # Check if both editors were opened
-        assert app.widget('schematicEditor').properties()['visible'] is True
-        assert app.widget('boardEditor').properties()['visible'] is True
-
-        # Check if the schematic editor is the active window
-        helpers.wait_for_active_window(app, app.widget('schematicEditor'))  # raises on timeout
+        app.widget('openProjectDialogFileNameEdit').set_property('text', path)
+        app.widget('openProjectDialogOkButton').click()
+        helpers.wait_for_project(app, 'Empty Project')

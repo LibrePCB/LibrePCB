@@ -1,23 +1,58 @@
 import { Palette, ScrollView } from "std-widgets.slint";
+import { DropDownPopup } from "dropdownpopup.slint";
 import { IconButton } from "iconbutton.slint";
 import { Constants } from "../api.slint";
 
 export component LineEdit inherits Rectangle {
-    in-out property <string> text <=> edt.text;
+    in-out property <string> text;
     in property <string> placeholder-text;
     in property <string> validation-error;
     in property <bool> enabled: true;
     in property <bool> read-only: false;
     in property <length> font-size: 13px;
+    in property <[string]> autocompletions;
+    in property <[string]> suggestions;
+    out property <bool> has-focus <=> edt.has-focus;
+    property <int> current-autocompletion-index: -1;
+    property <int> current-suggestion-index: -1;
 
-    callback key-pressed <=> edt.key-pressed;
+    callback text-edited(string);
+    text-edited(text) => {
+        self.text = text;
+    }
+
+    callback autocompletion-accepted(string);
+    autocompletion-accepted(text) => {
+        text-edited(text);
+    }
+
+    callback key-pressed(KeyEvent) -> EventResult;
 
     public function select-all() {
         edt.select-all();
     }
 
-    preferred-width: edt.preferred-width + 16px;
-    height: edt.preferred-height + 14px;
+    function select-suggestion(index: int) {
+        current-suggestion-index = max(min(index, suggestions.length - 1), -1);
+        text-edited(suggestions[current-suggestion-index]);
+    }
+
+    changed text => {
+        if text != edt.text {
+            edt.text = text;
+        }
+    }
+
+    changed has-focus => {
+        if has-focus {
+            current-autocompletion-index = -1;
+        } else {
+            edt.text = text;
+        }
+    }
+
+    preferred-width: max(l.preferred-width, placeholder-txt.preferred-width + l.preferred-width - view.preferred-width, 100px);
+    preferred-height: 28px;
     horizontal-stretch: 1;
     background: #202020;
     border-color: {
@@ -32,69 +67,129 @@ export component LineEdit inherits Rectangle {
         }
     }
     border-width: 1px;
-    border-radius: 5px;
+    border-radius: 10px;
     forward-focus: edt;
 
     // Accessibility
     accessible-role: text-input;
     accessible-enabled: enabled;
+    accessible-expandable: suggestions.length > 0;
     accessible-value: edt.text;
     accessible-placeholder-text: placeholder-text;
     accessible-read-only: read-only;
+    accessible-action-expand => {
+        suggestions-popup.show();
+    }
     accessible-action-set-value(t) => {
         edt.text = t;
     }
 
-    if edt.text.is-empty && (!placeholder-text.is-empty): placeholder-txt := Text {
-        x: 8px;
+    placeholder-txt := Text {
+        x: 10px;
         width: root.width - 2 * self.x;
         font-size: font-size;
         color: enabled ? #909090 : #707070;
         text: placeholder-text;
         wrap: no-wrap;
         overflow: elide;
+        visible: edt.text.is-empty && (!placeholder-text.is-empty);
     }
 
     ta := TouchArea {
         enabled: enabled;
 
-        ScrollView {
-            x: 8px;
-            y: 1px;
-            width: parent.width - 2 * self.x;
-            height: parent.height - 2px;
-            viewport-width: edt.width;
-            viewport-height: edt.height;
+        l := HorizontalLayout {
+            x: 0;
+            y: 0;
+            padding-left: placeholder-txt.x;
+            padding-right: 3px;
 
-            edt := TextInput {
-                property <length> y-offset: (self.width > parent.width) ? 3px : 0;
+            view := ScrollView {
+                min-width: edt.min-width;
+                preferred-width: edt.preferred-width;
+                viewport-width: edt.width;
+                viewport-height: edt.height;
 
-                y: ((parent.height - self.height) / 2) - y-offset;
-                width: max(self.preferred-width, root.width - 16px);
-                height: self.preferred-height;
-                font-size: font-size;
-                color: enabled ? Palette.foreground : Palette.foreground.darker(0.5);
-                enabled: enabled;
-                read-only: read-only;
-                single-line: true;
-                wrap: no-wrap;
-                accessible-role: none;
+                edt := TextInput {
+                    property <length> y-offset: (self.width > parent.width) ? 3px : 0;
+
+                    y: ((parent.height - self.height) / 2) - y-offset;
+                    width: max(self.preferred-width, view.width);
+                    height: self.preferred-height;
+                    font-size: font-size;
+                    color: enabled ? Palette.foreground : Palette.foreground.darker(0.5);
+                    selection-background-color: Constants.librepcb-color;
+                    selection-foreground-color: black;
+                    enabled: enabled;
+                    read-only: read-only;
+                    single-line: true;
+                    wrap: no-wrap;
+                    text: text;
+                    accessible-role: none;
+
+                    edited => {
+                        text-edited(self.text);
+                    }
+
+                    key-pressed(event) => {
+                        if (event.text == Key.UpArrow) && (autocompletions.length > 0) {
+                            current-autocompletion-index = max(current-autocompletion-index - 1, -1);
+                            return accept;
+                        } else if (event.text == Key.DownArrow) && (autocompletions.length > 0) {
+                            current-autocompletion-index = min(current-autocompletion-index + 1, autocompletions.length - 1);
+                            return accept;
+                        } else if (event.text == Key.Return) && (current-autocompletion-index >= 0) && (current-autocompletion-index < autocompletions.length) {
+                            autocompletion-accepted(autocompletions[current-autocompletion-index]);
+                            current-autocompletion-index = -1;
+                            return accept;
+                        } else if (event.text == Key.UpArrow) && (autocompletions.length > 0) {
+                            select-suggestion(current-suggestion-index - 1);
+                            return accept;
+                        } else if (event.text == Key.DownArrow) && (suggestions.length > 0) {
+                            select-suggestion(current-suggestion-index + 1);
+                            return accept;
+                        } else if (event.text == Key.Space) && event.modifiers.control && (suggestions.length > 0) {
+                            suggestions-popup.show();
+                            return accept;
+                        } else if root.key-pressed(event) == accept {
+                            return accept;
+                        }
+                        reject;
+                    }
+                }
             }
-        }
 
-        if ta.has-hover && (!edt.text.is-empty): IconButton {
-            x: root.width - self.width - (root.height - self.height) / 2;
-            y: (root.height - self.height) / 2;
-            width: 18px;
-            height: self.width;
-            background-color: root.background;
-            border-radius: self.height / 2;
-            icon-scale: 0.7;
-            icon: @image-url("../../../../font-awesome/svgs/solid/xmark.svg");
-            accessible-role: none;
+            Rectangle {
+                width: 5px;
+            }
 
-            clicked => {
-                edt.text = "";
+            clear-btn := IconButton {
+                y: (parent.height - self.height) / 2;
+                height: 18px;
+                background-color: root.background;
+                border-radius: self.height / 2;
+                icon-scale: 0.7;
+                icon: @image-url("../../../../font-awesome/svgs/solid/xmark.svg");
+                visible: ta.has-hover && (!edt.text.is-empty);
+                accessible-role: none;
+
+                clicked => {
+                    text-edited("");
+                }
+            }
+
+            if suggestions.length > 0: expand-btn := IconButton {
+                y: (parent.height - self.height) / 2;
+                height: 18px;
+                background-color: root.background;
+                border-radius: self.height / 2;
+                icon-size: 13px;  // Same size as in ComboBox.
+                icon: @image-url("../../../../font-awesome/svgs/solid/caret-down.svg");
+                accessible-role: none;
+
+                clicked => {
+                    suggestions-popup.show();
+                }
             }
         }
     }
@@ -102,14 +197,14 @@ export component LineEdit inherits Rectangle {
     if enabled && (!validation-error.is-empty): Rectangle {
         x: root.width - self.width - 20px;
         y: -8px;
-        width: min(t-validation-error.preferred-width + 10px, root.width * 0.8);
-        height: t-validation-error.preferred-height + 4px;
+        width: min(validation-error-txt.preferred-width + 10px, root.width * 0.8);
+        height: validation-error-txt.preferred-height + 4px;
         background: #101010;
         border-width: 1px;
         border-radius: self.height / 2;
         border-color: root.border-color;
 
-        t-validation-error := Text {
+        validation-error-txt := Text {
             x: 5px;
             width: parent.width - 10px;
             vertical-alignment: center;
@@ -118,6 +213,86 @@ export component LineEdit inherits Rectangle {
             color: root.border-color;
             text: validation-error;
             accessible-description: "validation error";
+        }
+    }
+
+    if has-focus && (autocompletions.length > 0): autocompletions-r := Rectangle {
+        x: 0;
+        y: parent.height;
+        width: parent.width;
+        height: min(autocompletions-l.preferred-height, 300px);
+        background: black;
+
+        // Accessibility
+        accessible-role: list;
+        accessible-enabled: true;
+        accessible-item-count: autocompletions.length;
+
+        autocompletions-view := ScrollView {
+            width: root.width;
+            height: parent.height;
+            viewport-width: autocompletions-l.width;
+            viewport-height: autocompletions-l.height;
+
+            autocompletions-l := VerticalLayout {
+                width: root.width;
+                height: self.preferred-height;
+
+                for item[index] in autocompletions: autocompletion-item-ta := TouchArea {
+                    property <bool> is-selected: index == current-autocompletion-index;
+
+                    width: root.width;
+                    height: 22px;
+
+                    // Accessibility
+                    accessible-role: list-item;
+                    accessible-item-index: index;
+                    accessible-item-selectable: true;
+                    accessible-item-selected: is-selected;
+                    accessible-label: item;
+
+                    changed has-hover => {
+                        if self.has-hover {
+                            current-autocompletion-index = index;
+                        } else {
+                            current-autocompletion-index = -1;
+                        }
+                    }
+
+                    Rectangle {
+                        background: is-selected ? #505050 : transparent;
+
+                        autocompletion-item-txt := Text {
+                            x: 5px;
+                            width: parent.width - 2 * self.x;
+                            y: (parent.height - self.height) / 2;
+                            font-size: 12px;
+                            overflow: elide;
+                            vertical-alignment: center;
+                            color: Palette.foreground;
+                            text: item;
+                            accessible-role: none;
+                        }
+                    }
+
+                    clicked => {
+                        autocompletion-accepted(item);
+                    }
+                }
+            }
+        }
+    }
+
+    suggestions-popup := DropDownPopup {
+        x: 0;
+        y: parent.height;
+        width: root.width;
+        model: suggestions;
+        current-text: root.text;
+        item-height: root.preferred-height;
+
+        accepted(index) => {
+            text-edited(suggestions[index]);
         }
     }
 }

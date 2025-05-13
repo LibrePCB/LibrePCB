@@ -1,0 +1,288 @@
+import { ListView } from "std-widgets.slint";
+import {
+    Button,
+    ComboBox,
+    IconButton,
+    LinkText,
+    Palette,
+    PanelHeader,
+} from "../widgets.slint";
+import {
+    Backend,
+    Board2dTabData,
+    Constants,
+    Data,
+    Helpers,
+    NotificationType,
+    PanelPage,
+    TabAction,
+} from "../api.slint";
+
+component UnplacedDeviceItem inherits Rectangle {
+    in property <string> name;
+    in property <bool> enabled <=> ta.enabled;
+    in property <bool> selected: false;
+
+    callback clicked <=> ta.clicked;
+    callback double-clicked <=> ta.double-clicked;
+
+    background: ta.has-hover ? #505050 : (selected ? #454545 : transparent);
+
+    ta := TouchArea {
+        HorizontalLayout {
+            padding: 3px;
+            padding-left: 5px;
+            padding-right: 5px;
+            spacing: 5px;
+
+            Image {
+                width: 16px;
+                image-fit: contain;
+                colorize: t-title.color;
+                source: @image-url("../../../../bootstrap-icons/icons/cpu.svg");
+            }
+
+            t-title := Text {
+                vertical-alignment: center;
+                font-size: 12px;
+                overflow: elide;
+                color: root.enabled ? Palette.foreground : #707070;
+                text: name;
+            }
+        }
+    }
+}
+
+export component PlaceDevicesPanel inherits Rectangle {
+    property <length> item-height: 22px;
+    property <Board2dTabData> tab: Data.current-section.board-2d-tabs[Data.current-section.current-tab-index];
+    property <[string]> model: tab.unplaced-components;
+    property <int> selected-index: tab.unplaced-components-index;
+    property <bool> item-selected: (selected-index >= 0) && (selected-index < model.length);
+    property <int> devices-count: tab.unplaced-components-devices.length;
+
+    background: #2a2a2a;
+
+    function set-current-index(index: int) {
+        if ((index + 1) * item-height) > (view.height - view.viewport-y) {
+            view.viewport-y = -(index + 1) * item-height + view.height;
+        } else if (index * item-height) < -(view.viewport-y) {
+            view.viewport-y = -(index * item-height);
+        }
+        Data.current-section.board-2d-tabs[Data.current-section.current-tab-index].unplaced-components-index = index;
+
+        if Data.preview-mode {
+            if index == 0 {
+                Data.current-section.board-2d-tabs[Data.current-section.current-tab-index].unplaced-components-devices = ["C-0603", "C-0805"];
+            } else if index == 1 {
+                Data.current-section.board-2d-tabs[Data.current-section.current-tab-index].unplaced-components-devices = [];
+            }
+        }
+    }
+
+    // Set focus when panel is shown. Not sure if it's always desired(?).
+    init => {
+        fs.focus();
+    }
+
+    fs := FocusScope {
+        VerticalLayout {
+            header := PanelHeader {
+                z: 10;  // For the tooltip.
+                title: @tr("Place Devices").to-uppercase();
+                highlight: fs.has-focus;
+            }
+
+            if model.length == 0: VerticalLayout {
+                padding: 8px;
+
+                Text {
+                    width: 100%;
+                    font-size: 12px;
+                    font-italic: true;
+                    wrap: word-wrap;
+                    text: @tr("All components from the schematics have been added to the board. To add more components to the board, add them to the schematics first which will make them appearing here for placement.");
+                }
+            }
+
+            view := ListView {
+                vertical-stretch: 1;
+                visible: model.length > 0;
+
+                for cmp[index] in model: item := UnplacedDeviceItem {
+                    height: item-height;
+                    name: cmp;
+                    selected: (index == selected-index);
+
+                    clicked => {
+                        set-current-index(index);
+                        fs.focus();
+                    }
+
+                    double-clicked => {
+                        set-current-index(index);
+                        Helpers.trigger-current-tab-action(TabAction.board-place-component);
+                    }
+                }
+            }
+
+            if item-selected: PanelHeader {
+                z: 10;  // For the tooltip.
+                title: tab.unplaced-components[selected-index];
+
+                if devices-count == 0: IconButton {
+                    width: 18px;
+                    style: read-only;
+                    icon: Helpers.get-icon-for-notification-type(NotificationType.warning);
+                    tooltip: @tr("No device or package found");
+                    color-enabled: yellow;
+                }
+            }
+
+            if item-selected && (devices-count == 0): Rectangle {
+                background: #500000;
+
+                VerticalLayout {
+                    padding: 8px;
+                    spacing: 8px;
+
+                    Text {
+                        wrap: word-wrap;
+                        text: @tr("No compatible device was found for the selected component. Please install a library providing a suitable device or create a new device on your own in a local library.");
+                    }
+
+                    no-dev-found-info-btn := LinkText {
+                        font-size: 13px;
+                        font-weight: 500;
+                        wrap: word-wrap;
+                        horizontal-alignment: center;
+                        text: "▸ " + @tr("More information & device creation guide");
+                        status-tip: Constants.no-device-found-url;
+
+                        clicked => {
+                            Backend.open-url(self.status-tip);
+                        }
+                    }
+
+                    no-dev-found-why-btn := LinkText {
+                        font-size: 13px;
+                        font-weight: 500;
+                        wrap: word-wrap;
+                        horizontal-alignment: center;
+                        text: "▸ " + @tr("I installed all libraries, why I still get this error?");
+                        status-tip: Constants.where-is-library-element-url;
+
+                        clicked => {
+                            Backend.open-url(self.status-tip);
+                        }
+                    }
+
+                    install-libs-btn := Button {
+                        primary: true;
+                        text: @tr("Install or Create Libraries");
+
+                        clicked => {
+                            Data.panel-page = PanelPage.libraries;
+                        }
+                    }
+                }
+            }
+
+            if (model.length > 0) && (devices-count > 0): VerticalLayout {
+                padding: 5px;
+                spacing: 5px;
+
+                device-cbx := ComboBox {
+                    model: tab.unplaced-components-devices;
+                    current-index: tab.unplaced-components-devices-index;
+                    enabled: self.model.length > 1;
+
+                    current-index-changed(index) => {
+                        Data.current-section.board-2d-tabs[Data.current-section.current-tab-index].unplaced-components-devices-index = index;
+                    }
+                }
+
+                footprint-cbx := ComboBox {
+                    model: tab.unplaced-components-footprints;
+                    current-index: tab.unplaced-components-footprints-index;
+                    default-index: 0;
+                    enabled: self.model.length > 1;
+
+                    current-index-changed(index) => {
+                        Data.current-section.board-2d-tabs[Data.current-section.current-tab-index].unplaced-components-footprints-index = index;
+                    }
+                }
+            }
+
+            if (model.length > 0) && (devices-count > 0): preview-img := Image {
+                width: 100%;
+                height: parent.height * 0.3;
+                image-fit: preserve;
+                image-rendering: pixelated;
+                source: Backend.render-scene(Data.current-section-index, self.width, self.height, 1, tab.frame);
+                accessible-role: none;
+
+                if Data.preview-mode: Rectangle {
+                    background: black;
+                }
+            }
+
+            if ((model.length > 0) || (!item-selected)) && (devices-count > 0): VerticalLayout {
+                padding: 6px;
+                spacing: 6px;
+
+                if item-selected && (devices-count > 0): place-btn := Button {
+                    primary: self.enabled;
+                    icon: @image-url("../../../../font-awesome/svgs/solid/location-crosshairs.svg");
+                    text: @tr("Place Selected Device");
+                    status-tip: @tr("Interactively place the component with the selected device & footprint on the board");
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.board-place-component);
+                    }
+                }
+
+                HorizontalLayout {
+                    spacing: 5px;
+
+                    if item-selected && (devices-count > 0): place-similar-btn := Button {
+                        text: @tr("Place Similar");
+                        status-tip: @tr("Automatically add all components of the same kind to the board, using the currently selected device & footprint");
+
+                        clicked => {
+                            Helpers.trigger-current-tab-action(TabAction.board-place-components-similar);
+                        }
+                    }
+
+                    if (!item-selected) || (devices-count > 0): place-all-btn := Button {
+                        text: @tr("Place All");
+                        status-tip: @tr("Automatically add all components to the board, guessing their device & footprint (not recommended)");
+
+                        clicked => {
+                            Helpers.trigger-current-tab-action(TabAction.board-place-components-all);
+                        }
+                    }
+                }
+            }
+        }
+
+        key-pressed(event) => {
+            if (event.text == Key.DownArrow) && (selected-index < model.length - 1) {
+                set-current-index(selected-index + 1);
+                return accept;
+            } else if (event.text == Key.UpArrow) && (selected-index > 0) {
+                set-current-index(selected-index - 1);
+                return accept;
+            } else if item-selected {
+                if (event.text == Key.Return) && (!event.modifiers.shift) {
+                    Helpers.trigger-current-tab-action(TabAction.board-place-component);
+                    return accept;
+                } else if (event.text == Key.Return) && event.modifiers.shift {
+                    Helpers.trigger-current-tab-action(TabAction.board-place-components-similar);
+                    return accept;
+                }
+            }
+            reject
+        }
+    }
+}

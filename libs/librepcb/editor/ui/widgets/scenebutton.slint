@@ -1,0 +1,70 @@
+export component SceneButton inherits Rectangle {
+    in property <string> text;
+    in property <image> icon;
+    in property <float> icon-scale: 1.0;
+    in property <brush> bg-color: white;
+    in property <brush> fg-color: black;
+    in property <length> font-size: 13px;
+    in property <bool> checkable: false;
+    in-out property <bool> checked: false;
+
+    callback clicked;
+    clicked => {
+        if checkable {
+            checked = !checked;
+        }
+    }
+
+    width: 30px;
+    height: self.width;
+
+    // Accessibility
+    accessible-role: button;
+    accessible-checkable: checkable;
+    accessible-checked: checked;
+    accessible-label: text;
+    accessible-action-default => {
+        ta.clicked();
+    }
+
+    Rectangle {
+        width: parent.width * (checkable ? 0.8 : (ta.has-hover ? 1.0 : 0.85));
+        height: self.width;
+        background: checked ? fg-color : bg-color;
+        border-radius: self.height / 2;
+        border-color: fg-color;
+        border-width: (checkable && (!checked)) ? 1px : 0;
+
+        animate width { duration: 75ms; }
+
+        if !text.is-empty: Text {
+            width: parent.width;
+            height: self.width;
+            vertical-alignment: center;
+            horizontal-alignment: center;
+            color: (checkable && checked) ? bg-color : fg-color;
+            font-size: font-size * (((!checkable) && ta.has-hover) ? 1.3 : 1);
+            text: text;
+            accessible-role: none;
+
+            animate font-size { duration: 75ms; }
+        }
+
+        if text.is-empty: Image {
+            width: parent.width * icon-scale * 0.8;
+            height: self.width;
+            image-fit: ImageFit.fill;
+            source: icon;
+            colorize: (checkable && checked) ? bg-color : fg-color;
+            accessible-role: none;
+        }
+
+        ta := TouchArea {
+            mouse-cursor: pointer;
+
+            clicked => {
+                root.clicked();
+            }
+        }
+    }
+}

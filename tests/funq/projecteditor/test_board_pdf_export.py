@@ -17,13 +17,13 @@ def dialog(project_editor):
     """
     Fixture opening the PDF export dialog in the board editor
     """
-    project_editor.action('boardEditorActionExportPdf').\
-        trigger(blocking=False)
-    dialog = project_editor.widget('boardEditorGraphicsExportDialog')
+    adapter = project_editor.widget('mainWindowTestAdapter', wait_active=True)
+    adapter.call_slot('trigger', 'board-export-pdf-dialog')
+    dialog = project_editor.widget('graphicsExportDialog')
 
     # Do not open exported files since this would be annoying here.
     project_editor.widget(
-        'boardEditorGraphicsExportDialogOpenFileCheckbox').\
+        'graphicsExportDialogOpenFileCheckbox').\
         set_property('checked', False)
 
     yield dialog
@@ -34,12 +34,12 @@ def test_export_pdf(dialog, project_editor, librepcb, helpers):
     Test if the accept button asks for a filepath and then creates the PDF file
     """
     project_editor.widget(
-        'boardEditorGraphicsExportDialogButtonAccept').click()
+        'graphicsExportDialogButtonAccept').click()
     path = librepcb.abspath('test export.pdf')
     project_editor.widget(
-        'boardEditorGraphicsExportSaveFileDialogFileNameEdit').\
+        'graphicsExportSaveFileDialogFileNameEdit').\
         set_property('text', path)
     project_editor.widget(
-        'boardEditorGraphicsExportSaveFileDialogOkButton').click()
+        'graphicsExportSaveFileDialogOkButton').click()
     helpers.wait_until_widget_hidden(dialog)  # raises on timeout
     assert os.path.exists(path)

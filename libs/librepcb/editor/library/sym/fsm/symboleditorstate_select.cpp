@@ -29,6 +29,7 @@
 #include "../../../dialogs/textpropertiesdialog.h"
 #include "../../../editorcommandset.h"
 #include "../../../graphics/circlegraphicsitem.h"
+#include "../../../graphics/graphicslayerlist.h"
 #include "../../../graphics/graphicsscene.h"
 #include "../../../graphics/polygongraphicsitem.h"
 #include "../../../graphics/textgraphicsitem.h"
@@ -123,8 +124,8 @@ QSet<EditorWidgetBase::Feature> SymbolEditorState_Select::getAvailableFeatures()
  ******************************************************************************/
 
 bool SymbolEditorState_Select::processGraphicsSceneMouseMoved(
-    QGraphicsSceneMouseEvent& e) noexcept {
-  Point currentPos = Point::fromPx(e.scenePos());
+    const GraphicsSceneMouseEvent& e) noexcept {
+  Point currentPos = e.scenePos;
 
   switch (mState) {
     case SubState::SELECTING: {
@@ -166,11 +167,11 @@ bool SymbolEditorState_Select::processGraphicsSceneMouseMoved(
 }
 
 bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   switch (mState) {
     case SubState::IDLE: {
       // update start position of selection or movement
-      mStartPos = Point::fromPx(e.scenePos());
+      mStartPos = e.scenePos;
       // get items under cursor
       QList<std::shared_ptr<QGraphicsItem>> items =
           findItemsAtPosition(mStartPos);
@@ -190,7 +191,7 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
             break;
           }
         }
-        if (e.modifiers().testFlag(Qt::ControlModifier)) {
+        if (e.modifiers.testFlag(Qt::ControlModifier)) {
           // Toggle selection when CTRL is pressed.
           auto item = selectedItem ? selectedItem : items.first();
           if (auto i = std::dynamic_pointer_cast<SymbolPinGraphicsItem>(item)) {
@@ -199,7 +200,7 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
           } else {
             item->setSelected(!item->isSelected());
           }
-        } else if (e.modifiers().testFlag(Qt::ShiftModifier)) {
+        } else if (e.modifiers.testFlag(Qt::ShiftModifier)) {
           // Cycle Selection, when holding shift.
           int nextSelectionIndex = 0;
           for (int i = 0; i < items.count(); ++i) {
@@ -259,7 +260,7 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
 }
 
 bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   Q_UNUSED(e);
   switch (mState) {
     case SubState::SELECTING: {
@@ -298,25 +299,25 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
 }
 
 bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonDoubleClicked(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   // If SHIFT or CTRL is pressed, the user is modifying items selection, not
   // double-clicking.
-  if (e.modifiers() & (Qt::ShiftModifier | Qt::ControlModifier)) {
+  if (e.modifiers & (Qt::ShiftModifier | Qt::ControlModifier)) {
     return processGraphicsSceneLeftMouseButtonPressed(e);
   }
 
   if (mState == SubState::IDLE) {
-    return openPropertiesDialogOfItemAtPos(Point::fromPx(e.scenePos()));
+    return openPropertiesDialogOfItemAtPos(e.scenePos);
   } else {
     return false;
   }
 }
 
 bool SymbolEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
-    QGraphicsSceneMouseEvent& e) noexcept {
+    const GraphicsSceneMouseEvent& e) noexcept {
   switch (mState) {
     case SubState::IDLE: {
-      return openContextMenuAtPos(Point::fromPx(e.scenePos()));
+      return openContextMenuAtPos(e.scenePos);
     }
     case SubState::MOVING:
     case SubState::PASTING: {
@@ -544,8 +545,8 @@ bool SymbolEditorState_Select::processImportDxf() noexcept {
 
     // Sanity check that the chosen layer is really visible, but this should
     // always be the case anyway.
-    std::shared_ptr<GraphicsLayer> layer =
-        mContext.editorContext.layerProvider.getLayer(dialog.getLayer());
+    std::shared_ptr<const GraphicsLayer> layer =
+        mContext.editorContext.layers.get(dialog.getLayer());
     if ((!layer) || (!layer->isVisible())) {
       throw LogicError(__FILE__, __LINE__, "Layer is not visible!");  // no tr()
     }
@@ -761,8 +762,8 @@ bool SymbolEditorState_Select::openPropertiesDialogOfItemAtPos(
 
 bool SymbolEditorState_Select::copySelectedItemsToClipboard() noexcept {
   try {
-    Point cursorPos = mContext.graphicsView.mapGlobalPosToScenePos(
-        QCursor::pos(), true, false);
+    const Point cursorPos =
+        mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos());
     SymbolClipboardData data(mContext.symbol.getUuid(), cursorPos);
     foreach (const std::shared_ptr<SymbolPinGraphicsItem>& pin,
              mContext.symbolGraphicsItem.getSelectedPins()) {
@@ -786,7 +787,7 @@ bool SymbolEditorState_Select::copySelectedItemsToClipboard() noexcept {
     }
     if (data.getItemCount() > 0) {
       qApp->clipboard()->setMimeData(
-          data.toMimeData(mContext.editorContext.layerProvider).release());
+          data.toMimeData(mContext.editorContext.layers).release());
       emit statusBarMessageChanged(tr("Copied to clipboard!"), 2000);
     }
   } catch (const Exception& e) {
@@ -806,8 +807,7 @@ bool SymbolEditorState_Select::startPaste(
   setState(SubState::PASTING);
 
   // Paste items.
-  mStartPos =
-      mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos(), true, false);
+  mStartPos = mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos());
   Point offset = fixedPosition
       ? (*fixedPosition)
       : (mStartPos - data->getCursorPos()).mappedToGrid(getGridInterval());

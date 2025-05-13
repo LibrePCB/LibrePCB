@@ -1,0 +1,125 @@
+import { ComboBox } from "../../widgets.slint";
+import {
+    Board2dTabData,
+    Constants,
+    WindowSectionData,
+} from "../../api.slint";
+
+component ZoneRuleSwitch inherits FocusScope {
+    in property <string> text;
+    in property <bool> checked;
+
+    callback toggled(state: bool);
+
+    // Accessibility
+    accessible-role: button;
+    accessible-label: text;
+    accessible-checkable: true;
+    accessible-checked: checked;
+    accessible-action-default => {
+        ta.clicked();
+    }
+
+    ta := TouchArea {
+        mouse-cursor: pointer;
+
+        txt := Text {
+            color: checked ? #c0c0c0 : #606060;
+            font-size: 10px;
+            text: text.to-uppercase();
+            accessible-role: none;
+        }
+
+        clicked => {
+            toggled(!checked);
+        }
+    }
+
+    if self.has-focus: Rectangle {
+        y: root.height - 2px;
+        height: 1px;
+        background: Constants.librepcb-color;
+    }
+
+    key-pressed(event) => {
+        if event.text == Key.Space {
+            toggled(!checked);
+            return accept;
+        }
+        reject
+    }
+}
+
+export component DrawZoneToolBar inherits HorizontalLayout {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    property <[Board2dTabData]> tabs: section.board-2d-tabs;
+
+    spacing: 2px;
+
+    layer-cbx := ComboBox {
+        model: tabs[section.current-tab-index].tool-layer.items;
+        current-index: tabs[section.current-tab-index].tool-layer.current-index;
+
+        current-index-changed(index) => {
+            tabs[section.current-tab-index].tool-layer.current-index = index;
+        }
+    }
+
+    Rectangle {
+        width: self.preferred-width + 10px;
+        background: #202020;
+        border-color: #606060;
+        border-width: 1px;
+        border-radius: 10px;
+
+        HorizontalLayout {
+            padding-left: 10px;
+            padding-right: self.padding-left;
+            spacing: 5px;
+
+            Text {
+                height: root.height - 2px;
+                vertical-alignment: center;
+                wrap: no-wrap;
+                text: @tr("Keepout") + ":";
+            }
+
+            copper-sw := ZoneRuleSwitch {
+                text: @tr("Copper");
+                checked: tabs[section.current-tab-index].tool-no-copper;
+
+                toggled(state) => {
+                    tabs[section.current-tab-index].tool-no-copper = state;
+                }
+            }
+
+            planes-sw := ZoneRuleSwitch {
+                text: @tr("Planes");
+                checked: tabs[section.current-tab-index].tool-no-planes;
+
+                toggled(state) => {
+                    tabs[section.current-tab-index].tool-no-planes = state;
+                }
+            }
+
+            exposures-sw := ZoneRuleSwitch {
+                text: @tr("Exposures");
+                checked: tabs[section.current-tab-index].tool-no-exposures;
+
+                toggled(state) => {
+                    tabs[section.current-tab-index].tool-no-exposures = state;
+                }
+            }
+
+            devices-sw := ZoneRuleSwitch {
+                text: @tr("Devices");
+                checked: tabs[section.current-tab-index].tool-no-devices;
+
+                toggled(state) => {
+                    tabs[section.current-tab-index].tool-no-devices = state;
+                }
+            }
+        }
+    }
+}

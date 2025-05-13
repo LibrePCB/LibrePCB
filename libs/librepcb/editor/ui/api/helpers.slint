@@ -1,60 +1,209 @@
 import {
-    Action,
-    EditorCommand,
+    BoardAction,
+    LengthUnit,
     NotificationType,
+    ProjectAction,
+    RuleCheckType,
+    SchematicAction,
+    TabAction,
     TabType,
+    WireMode,
 } from "types.slint";
+import { Data } from "data.slint";
 import { Backend } from "backend.slint";
+import { EditorCommandSet as Cmd } from "editorcommandset.slint";
 
 export global Helpers {
-    pure public function is-shortcut(event: KeyEvent, command: EditorCommand) -> bool {
-        (event.text == command.key) && (event.modifiers == command.modifiers)
+    out property <[LengthUnit]> all-length-units: [
+        LengthUnit.millimeters,
+        LengthUnit.micrometers,
+        LengthUnit.nanometers,
+        LengthUnit.inches,
+        LengthUnit.mils,
+    ];
+
+    pure public function get-previous-unit(u: LengthUnit) -> LengthUnit {
+        if u == mils {
+            inches
+        } else if u == inches {
+            nanometers
+        } else if u == nanometers {
+            micrometers
+        } else {
+            millimeters
+        }
+    }
+
+    pure public function get-next-unit(u: LengthUnit) -> LengthUnit {
+        if u == millimeters {
+            micrometers
+        } else if u == micrometers {
+            nanometers
+        } else if u == nanometers {
+            inches
+        } else {
+            mils
+        }
+    }
+
+    pure public function get-unit-short-str(u: LengthUnit) -> string {
+        if (u == LengthUnit.millimeters) {
+            "mm"
+        } else if (u == LengthUnit.micrometers) {
+            "μm"
+        } else if (u == LengthUnit.nanometers) {
+            "nm"
+        } else if (u == LengthUnit.inches) {
+            "inch"
+        } else if (u == LengthUnit.mils) {
+            "mils"
+        } else {
+            debug("Unhandled case in get-unit-short-str().");
+            ""
+        }
+    }
+
+    pure public function get-unit-accessibility-label(u: LengthUnit) -> string {
+        if (u == LengthUnit.millimeters) {
+            "millimeters"
+        } else if (u == LengthUnit.micrometers) {
+            "micrometers"
+        } else if (u == LengthUnit.nanometers) {
+            "nanometers"
+        } else if (u == LengthUnit.inches) {
+            "inches"
+        } else if (u == LengthUnit.mils) {
+            "mils"
+        } else {
+            debug("Unhandled case in get-unit-accessibility-label().");
+            ""
+        }
+    }
+
+    out property <[WireMode]> all-wire-modes: [
+        WireMode.h-v,
+        WireMode.v-h,
+        WireMode.deg90-45,
+        WireMode.deg45-90,
+        WireMode.straight,
+    ];
+
+    pure public function get-previous-wire-mode(m: WireMode) -> WireMode {
+        if m == straight {
+            deg45-90
+        } else if m == deg45-90 {
+            deg90-45
+        } else if m == deg90-45 {
+            v-h
+        } else {
+            h-v
+        }
+    }
+
+    pure public function get-next-wire-mode(m: WireMode) -> WireMode {
+        if m == h-v {
+            v-h
+        } else if m == v-h {
+            deg90-45
+        } else if m == deg90-45 {
+            deg45-90
+        } else {
+            straight
+        }
+    }
+
+    public function trigger-current-tab-action(a: TabAction) {
+        Backend.trigger-tab(Data.current-section-index, Data.current-section.current-tab-index, a);
+    }
+
+    public function trigger-current-project-action(a: ProjectAction) {
+        Backend.trigger-project(Data.current-project-index, a);
+    }
+
+    public function trigger-current-schematic-action(a: SchematicAction) {
+        if Data.current-tab.type == TabType.schematic {
+            Backend.trigger-schematic(Data.current-schematic-tab.project-index, Data.current-schematic-tab.schematic-index, a);
+        }
+    }
+
+    public function trigger-current-board-action(a: BoardAction) {
+        if Data.current-tab.type == TabType.board-2d {
+            Backend.trigger-board(Data.current-board-2d-tab.project-index, Data.current-board-2d-tab.board-index, a);
+        } else if Data.current-tab.type == TabType.board-3d {
+            Backend.trigger-board(Data.current-board-3d-tab.project-index, Data.current-board-3d-tab.board-index, a);
+        }
     }
 
     pure public function get-icon-for-notification-type(nt: NotificationType) -> image {
         if (nt == NotificationType.tip) {
-            return @image-url("../../../../font-awesome/svgs/solid/lightbulb.svg");
+            @image-url("../../../../font-awesome/svgs/solid/lightbulb.svg")
         } else if (nt == NotificationType.info) {
-            return @image-url("../../../../font-awesome/svgs/solid/circle-info.svg");
+            @image-url("../../../../font-awesome/svgs/solid/circle-info.svg")
         } else if (nt == NotificationType.warning) {
-            return @image-url("../../../../font-awesome/svgs/solid/triangle-exclamation.svg");
+            @image-url("../../../../font-awesome/svgs/solid/triangle-exclamation.svg")
         } else if (nt == NotificationType.critical) {
-            return @image-url("../../../../font-awesome/svgs/solid/circle-xmark.svg");
+            @image-url("../../../../font-awesome/svgs/solid/circle-xmark.svg")
         } else if (nt == NotificationType.progress) {
-            return @image-url("../../../../font-awesome/svgs/solid/arrows-rotate.svg");
+            @image-url("../../../../font-awesome/svgs/solid/arrows-rotate.svg")
         } else {
             debug("Unhandled case in get-icon-for-notification-type().");
-            return @image-url("");
+            @image-url("")
         }
     }
 
     pure public function get-color-for-notification-type(nt: NotificationType) -> color {
         if (nt == NotificationType.tip) {
-            return #00e1ff;
+            #00e1ff
         } else if (nt == NotificationType.info) {
-            return white;
+            white
         } else if (nt == NotificationType.warning) {
-            return yellow;
+            yellow
         } else if (nt == NotificationType.critical) {
-            return red;
+            red
         } else if (nt == NotificationType.progress) {
-            return white;
+            white
         } else {
             debug("Unhandled case in get-color-for-notification-type().");
-            return white;
+            white
         }
     }
 
     pure public function get-icon-for-tab-type(t: TabType) -> image {
         if (t == TabType.home) {
-            return @image-url("../../../../bootstrap-icons/icons/house-fill.svg");
+            @image-url("../../../../bootstrap-icons/icons/house-fill.svg")
         } else if (t == TabType.create-library) {
-            return @image-url("../../../../bootstrap-icons/icons/database-add.svg");
+            @image-url("../../../../bootstrap-icons/icons/database-add.svg")
         } else if (t == TabType.download-library) {
-            return @image-url("../../../../bootstrap-icons/icons/cloud-arrow-down-fill.svg");
+            @image-url("../../../../bootstrap-icons/icons/cloud-arrow-down-fill.svg")
+        } else if (t == TabType.schematic) {
+            @image-url("../../../../font-awesome/svgs/regular/image.svg")
+        } else if (t == TabType.board-2d) {
+            @image-url("../../../../bootstrap-icons/icons/motherboard.svg")
+        } else if (t == TabType.board-3d) {
+            @image-url("../../../../bootstrap-icons/icons/badge-3d.svg")
         } else {
             debug("Unhandled case in get-icon-for-tab-type().");
-            return @image-url("");
+            @image-url("")
+        }
+    }
+
+    pure public function get-rule-check-title-for-type(type: RuleCheckType) -> string {
+        if type == RuleCheckType.erc {
+            @tr("Electrical Rule Check")
+        } else if type == RuleCheckType.drc {
+            @tr("Design Rule Check")
+        } else {
+            ""
+        }
+    }
+
+    pure public function get-rule-check-shortcut-for-type(type: RuleCheckType) -> string {
+        if type == RuleCheckType.erc {
+            Cmd.dock-erc.shortcut
+        } else if type == RuleCheckType.drc {
+            Cmd.dock-drc.shortcut
+        } else {
+            ""
         }
     }
 }

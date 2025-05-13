@@ -1,0 +1,280 @@
+import { ScrollView } from "std-widgets.slint";
+import {
+    Badge,
+    IconButton,
+    ListViewItemButton,
+    PanelHeader,
+} from "widgets.slint";
+import {
+    Backend,
+    BoardAction,
+    Constants,
+    Data,
+    EditorCommandSet as Cmd,
+    ProjectAction,
+    ProjectData,
+    SchematicAction,
+    TabType,
+} from "api.slint";
+
+enum ItemType {
+    schematic,
+    board,
+}
+
+component ProjectListItem inherits Rectangle {
+    in property <int> project-index;
+    in property <int> item-index;
+    in property <ItemType> type;
+    in property <string> text;
+    in property <image> icon;
+    in property <bool> selected: false;
+    in property <length> scrollbar-width;
+
+    height: 27px;
+    background: (ta.has-hover || selected) ? #454545 : transparent;
+
+    if selected: Rectangle {
+        x: 0;
+        y: 0;
+        width: 2px;
+        height: root.height;
+        background: Constants.librepcb-color;
+    }
+
+    ta := TouchArea {
+        HorizontalLayout {
+            padding: 3px;
+            padding-left: 5px;
+            padding-right: 5px;
+            spacing: 5px;
+
+            Rectangle {
+                width: self.height;
+
+                Image {
+                    x: 2px;
+                    y: self.x;
+                    width: self.height;
+                    height: parent.height - 2 * self.x;
+                    colorize: txt.color;
+                    image-fit: contain;
+                    source: icon;
+                    accessible-role: none;
+                }
+            }
+
+            txt := Text {
+                vertical-alignment: center;
+                overflow: elide;
+                text: text;
+            }
+
+            if (ta.has-hover || selected) && (type == ItemType.schematic): rename-btn := ListViewItemButton {
+                y: (parent.height - self.height) / 2;
+                height: 18px;
+                icon: Cmd.sheet-rename.icon;
+                tooltip: Cmd.sheet-rename.text;
+
+                clicked => {
+                    Backend.trigger-schematic(project-index, item-index, SchematicAction.rename);
+                }
+            }
+
+            if (ta.has-hover || selected) && (type == ItemType.board): open-3d-btn := ListViewItemButton {
+                y: (parent.height - self.height) / 2;
+                height: 20px;
+                icon: @image-url("../../../bootstrap-icons/icons/badge-3d.svg");
+                tooltip: @tr("Open 3D View");
+
+                clicked => {
+                    Backend.trigger-board(project-index, item-index, BoardAction.open-3d);
+                }
+            }
+
+            if (ta.has-hover || selected) && (type == ItemType.board): setup-btn := ListViewItemButton {
+                y: (parent.height - self.height) / 2;
+                height: 18px;
+                icon: @image-url("../../../font-awesome/svgs/solid/sliders.svg");
+                tooltip: Cmd.board-setup.text;
+
+                clicked => {
+                    Backend.trigger-board(project-index, item-index, BoardAction.open-setup-dialog);
+                }
+            }
+
+            if (ta.has-hover || selected) && (type == ItemType.board): copy-btn := ListViewItemButton {
+                y: (parent.height - self.height) / 2;
+                height: 18px;
+                icon: Cmd.board-copy.icon;
+                tooltip: Cmd.board-copy.text;
+
+                clicked => {
+                    Backend.trigger-board(project-index, item-index, BoardAction.copy);
+                }
+            }
+
+            if ta.has-hover || selected: delete-btn := ListViewItemButton {
+                y: (parent.height - self.height) / 2;
+                height: 18px;
+                icon: @image-url("../../../font-awesome/svgs/solid/trash-can.svg");
+                tooltip: (type == ItemType.schematic) ? Cmd.sheet-remove.text : Cmd.board-remove.text;
+
+                clicked => {
+                    if type == ItemType.schematic {
+                        Backend.trigger-schematic(project-index, item-index, SchematicAction.delete);
+                    } else {
+                        Backend.trigger-board(project-index, item-index, BoardAction.delete);
+                    }
+                }
+            }
+
+            // Reserve space for scrollbar.
+            Rectangle {
+                width: scrollbar-width;
+            }
+        }
+
+        clicked => {
+            if type == ItemType.schematic {
+                Backend.trigger-schematic(project-index, item-index, SchematicAction.open);
+            } else {
+                Backend.trigger-board(project-index, item-index, BoardAction.open-2d);
+            }
+        }
+    }
+}
+
+component ProjectSection inherits Rectangle {
+    in property <ProjectData> project;
+    in property <int> project-index;
+    in property <length> scrollbar-width;
+
+    VerticalLayout {
+        header-ta := TouchArea {
+            z: 10;  // For the tooltip.
+
+            header := PanelHeader {
+                title: project.name.to-uppercase();
+
+                if project.unsaved-changes && project.writable: save-badge := Badge {
+                    y: (parent.height - self.height) / 2;
+                    text: @tr("save").to-lowercase();
+                    text-color: #dddd00;
+                    clickable: true;
+
+                    clicked => {
+                        Backend.trigger-project(project-index, ProjectAction.save);
+                    }
+                }
+
+                new-sheet-btn := IconButton {
+                    cmd: Cmd.sheet-new;
+                    icon-scale: 60%;
+
+                    clicked => {
+                        Backend.trigger-project(project-index, ProjectAction.new-sheet);
+                    }
+                }
+
+                new-board-btn := IconButton {
+                    cmd: Cmd.board-new;
+                    icon: @image-url("../../../bootstrap-icons/icons/motherboard.svg");
+                    icon-scale: 60%;
+
+                    clicked => {
+                        Backend.trigger-project(project-index, ProjectAction.new-board);
+                    }
+                }
+
+                setup-dialog-btn := IconButton {
+                    cmd: Cmd.project-setup;
+                    icon-scale: 60%;
+
+                    clicked => {
+                        Backend.trigger-project(project-index, ProjectAction.open-setup-dialog);
+                    }
+                }
+
+                close-btn := IconButton {
+                    cmd: Cmd.project-close;
+                    icon-scale: 60%;
+
+                    clicked => {
+                        Backend.trigger-project(project-index, ProjectAction.close);
+                    }
+                }
+
+                // Reserve space for scrollbar.
+                Rectangle {
+                    width: scrollbar-width;
+                }
+            }
+
+            clicked => {
+                Data.set-current-project(project-index);
+            }
+        }
+
+        for schematic[index] in project.schematics: schematic-item := ProjectListItem {
+            project-index: project-index;
+            item-index: index;
+            type: ItemType.schematic;
+            text: schematic.name;
+            icon: @image-url("../../../font-awesome/svgs/regular/image.svg");
+            selected: (Data.current-tab.type == TabType.schematic) && (Data.current-schematic-tab.project-index == project-index) && (Data.current-schematic-tab.schematic-index == index);
+            scrollbar-width: scrollbar-width;
+        }
+
+        for board[index] in project.boards: board-item := ProjectListItem {
+            project-index: project-index;
+            item-index: index;
+            type: ItemType.board;
+            text: board.name;
+            icon: @image-url("../../../bootstrap-icons/icons/motherboard.svg");
+            selected: {
+                if Data.current-tab.type == TabType.board-2d {
+                    (Data.current-board-2d-tab.project-index == project-index) && (Data.current-board-2d-tab.board-index == index)
+                } else if Data.current-tab.type == TabType.board-3d {
+                    (Data.current-board-3d-tab.project-index == project-index) && (Data.current-board-3d-tab.board-index == index)
+                } else {
+                    false
+                }
+            };
+            scrollbar-width: scrollbar-width;
+        }
+    }
+
+    if project-index == Data.current-project-index: Rectangle {
+        x: 0;
+        y: 8px;
+        width: 1px;
+        height: parent.height - self.y - 4px;
+        background: #29d682;
+    }
+}
+
+export component DocumentsPanel inherits Rectangle {
+    background: #2a2a2a;
+
+    // Set focus when panel is shown. Not sure if it's always desired(?).
+    init => {
+        fs.focus();
+    }
+
+    fs := FocusScope {
+        ScrollView {
+            property <length> scrollbar-width: (self.height < self.viewport-height) ? 7px : 0;
+
+            VerticalLayout {
+                alignment: start;
+
+                for project[project-index] in Data.projects: project-item := ProjectSection {
+                    project: project;
+                    project-index: project-index;
+                    scrollbar-width: scrollbar-width;
+                }
+            }
+        }
+    }
+}

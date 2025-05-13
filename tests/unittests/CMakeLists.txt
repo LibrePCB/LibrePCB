@@ -115,10 +115,10 @@ add_executable(
   editor/library/sym/symbolclipboarddatatest.cpp
   editor/modelview/pathmodeltest.cpp
   editor/project/addcomponentdialogtest.cpp
-  editor/project/boardeditor/boardclipboarddatatest.cpp
-  editor/project/boardeditor/cmdboardspecctraimporttest.cpp
+  editor/project/board/boardclipboarddatatest.cpp
+  editor/project/board/cmdboardspecctraimporttest.cpp
   editor/project/orderpcbdialogtest.cpp
-  editor/project/schematiceditor/schematicclipboarddatatest.cpp
+  editor/project/schematic/schematicclipboarddatatest.cpp
   editor/utils/shortcutsreferencegeneratortest.cpp
   editor/widgets/editabletablewidgetreceiver.h
   editor/widgets/editabletablewidgettest.cpp

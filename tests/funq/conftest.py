@@ -191,10 +191,6 @@ class Helpers(object):
             widget.properties().get('objectName')))
 
     @staticmethod
-    def wait_for_active_window(funq, widget, timeout=5.0):
-        Helpers._wait_for_active_widget(funq, widget, timeout, 'window')
-
-    @staticmethod
     def wait_for_active_dialog(funq, widget, timeout=5.0):
         Helpers._wait_for_active_widget(funq, widget, timeout, 'modal')
 
@@ -209,6 +205,16 @@ class Helpers(object):
         properties = active_widget.properties() if active_widget else dict()
         raise Exception('Active widget is "{}" ({})!'.format(
             properties.get('windowTitle'), properties.get('objectName')))
+
+    @staticmethod
+    def wait_for_project(app, name, timeout=10.0):
+        adapter = app.widget('mainWindowTestAdapter', wait_active=True)
+        for i in range(0, 100):
+            projects = adapter.call_slot('getOpenProjects')
+            if any(p['name'] == name for p in projects):
+                return True
+            time.sleep(timeout / 100.0)
+        raise Exception('Failed to wait for project "{}"!'.format(name))
 
 
 @pytest.fixture(scope="session")

@@ -1,0 +1,66 @@
+import { IconButton } from "iconbutton.slint";
+import { LinkText } from "linktext.slint";
+
+export component MessageBox inherits Rectangle {
+    in property <string> title;
+    in property <bool> supports-dont-show-again: false;
+    out property <color> text-color: black;
+    out property <color> hover-color: #707070;
+
+    callback dismiss-clicked;
+    callback dont-show-again-clicked;
+
+    height: self.preferred-height;
+    border-radius: 10px;
+    border-color: #606060;
+    border-width: 1px;
+    background: #e0e0e0;
+
+    ta := TouchArea {
+        VerticalLayout {
+            padding: 8px;
+            spacing: 8px;
+
+            HorizontalLayout {
+                spacing: 8px;
+
+                title-txt := Text {
+                    color: text-color;
+                    font-size: 14px;
+                    font-weight: 600;
+                    text: title;
+                }
+
+                if supports-dont-show-again && ta.has-hover: dont-show-again-btn := LinkText {
+                    width: self.preferred-width;
+                    vertical-alignment: center;
+                    text-color: #707070;
+                    text-color-hovered: black;
+                    font-size: 10px;
+                    text: @tr("Don't show again");
+                    accessible-role: none;
+
+                    clicked => {
+                        dont-show-again-clicked();
+                    }
+                }
+
+                dismiss-btn := IconButton {
+                    width: 12px;
+                    height: title-txt.preferred-height;
+                    color-enabled: #707070;
+                    color-hovered: black;
+                    style: hyperlink;
+                    icon: @image-url("../../../../font-awesome/svgs/solid/xmark.svg");
+                    accessible-role: none;
+
+                    clicked => {
+                        dismiss-clicked();
+                    }
+                }
+            }
+
+            @children
+        }
+    }
+}

@@ -48,22 +48,25 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-ComponentChooserDialog::ComponentChooserDialog(
-    const Workspace& ws, const IF_GraphicsLayerProvider* layerProvider,
-    QWidget* parent) noexcept
+ComponentChooserDialog::ComponentChooserDialog(const Workspace& ws,
+                                               const GraphicsLayerList* layers,
+                                               QWidget* parent) noexcept
   : QDialog(parent),
     mWorkspace(ws),
-    mLayerProvider(layerProvider),
+    mLayers(layers),
     mUi(new Ui::ComponentChooserDialog),
-    mCategorySelected(false) {
+    mCategorySelected(false),
+    mGraphicsScene(new GraphicsScene()) {
   mUi->setupUi(this);
-  mGraphicsScene.reset(new GraphicsScene());
 
   const Theme& theme = mWorkspace.getSettings().themes.getActive();
-  mUi->graphicsView->setBackgroundColors(
+  mGraphicsScene->setBackgroundColors(
       theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor(),
       theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
-  mUi->graphicsView->setOriginCrossVisible(false);
+  mGraphicsScene->setOriginCrossVisible(false);
+
+  mUi->graphicsView->setSpinnerColor(
+      theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
   mUi->graphicsView->setScene(mGraphicsScene.data());
 
   mCategoryTreeModel.reset(
@@ -234,7 +237,7 @@ void ComponentChooserDialog::updatePreview(const FilePath& fp) noexcept {
   mSymbols.clear();
   mComponent.reset();
 
-  if (fp.isValid() && mLayerProvider) {
+  if (fp.isValid() && mLayers) {
     try {
       mComponent.reset(
           Component::open(std::unique_ptr<TransactionalDirectory>(
@@ -258,7 +261,7 @@ void ComponentChooserDialog::updatePreview(const FilePath& fp) noexcept {
 
             std::shared_ptr<SymbolGraphicsItem> graphicsItem =
                 std::make_shared<SymbolGraphicsItem>(
-                    *sym, *mLayerProvider, mComponent,
+                    *sym, *mLayers, mComponent,
                     symbVar.getSymbolItems().get(item.getUuid()),
                     localeOrder());
             graphicsItem->setPosition(item.getSymbolPosition());

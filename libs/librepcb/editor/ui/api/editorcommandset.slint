@@ -85,15 +85,6 @@ export global EditorCommandSet {
         key: "",
     };
 
-    in property <EditorCommand> control-panel: {
-        icon: @image-url(""),
-        text: "Control Panel",
-        status-tip: "Bring the control panel window to front",
-        shortcut: "Ctrl+Alt+Home",
-        modifiers: { alt: true, control: true, shift: false, meta: false },
-        key: Key.Home,
-    };
-
     in property <EditorCommand> workspace-switch: {
         icon: @image-url(""),
         text: "Switch Workspace...",
@@ -104,7 +95,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> workspace-settings: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/sliders.svg"),
         text: "Workspace Settings...",
         status-tip: "Open the workspace settings dialog",
         shortcut: "Ctrl+,",
@@ -122,7 +113,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> library-manager: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../bootstrap-icons/icons/database.svg"),
         text: "Libraries",
         status-tip: "Manage installed part libraries",
         shortcut: "Ctrl+Alt+M",
@@ -149,7 +140,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> project-new: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/file-circle-plus.svg"),
         text: "New Project...",
         status-tip: "Create a new project",
         shortcut: "Ctrl+N",
@@ -158,7 +149,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> project-open: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/folder-open.svg"),
         text: "Open Project...",
         status-tip: "Open an existing project",
         shortcut: "Ctrl+O",
@@ -167,7 +158,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> project-save: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../bootstrap-icons/icons/floppy-fill.svg"),
         text: "Save Project",
         status-tip: "Save the currently opened project",
         shortcut: "Ctrl+S",
@@ -176,7 +167,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> project-setup: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/sliders.svg"),
         text: "Project Setup...",
         status-tip: "View/modify the project setup",
         shortcut: "F6",
@@ -194,7 +185,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> board-setup: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/sliders.svg"),
         text: "Board Setup...",
         status-tip: "View/modify the board setup",
         shortcut: "F7",
@@ -203,7 +194,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> run-quick-check: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../bootstrap-icons/icons/lightning-fill.svg"),
         text: "Run Quick Check",
         status-tip: "Run only the most important copper checks from the DRC",
         shortcut: "Shift+F8",
@@ -212,7 +203,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> run-design-rule-check: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/list-check.svg"),
         text: "Run Design Rule Check",
         status-tip: "Run the design rule check (DRC)",
         shortcut: "F8",
@@ -221,7 +212,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> project-library-update: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/arrows-rotate.svg"),
         text: "Update Project Library...",
         status-tip: "Update the project's library elements from workspace libraries",
         shortcut: "Ctrl+F5",
@@ -229,17 +220,8 @@ export global EditorCommandSet {
         key: Key.F5,
     };
 
-    in property <EditorCommand> schematic-editor: {
-        icon: @image-url(""),
-        text: "Schematic Editor",
-        status-tip: "Bring the schematic editor window to front",
-        shortcut: "Ctrl+Alt+S",
-        modifiers: { alt: true, control: true, shift: false, meta: false },
-        key: "s",
-    };
-
     in property <EditorCommand> sheet-new: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/file-circle-plus.svg"),
         text: "New Sheet...",
         status-tip: "Add a new schematic sheet to the project",
         shortcut: "Ctrl+N",
@@ -248,7 +230,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> sheet-rename: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/pen-to-square.svg"),
         text: "Rename Sheet...",
         status-tip: "Rename the current schematic sheet",
         shortcut: "Ctrl+F2",
@@ -257,7 +239,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> sheet-remove: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/trash-can.svg"),
         text: "Remove Sheet",
         status-tip: "Remove the current schematic sheet from the project",
         shortcut: "Ctrl+Delete",
@@ -265,17 +247,8 @@ export global EditorCommandSet {
         key: Key.Delete,
     };
 
-    in property <EditorCommand> board-editor: {
-        icon: @image-url(""),
-        text: "Board Editor",
-        status-tip: "Bring the board editor window to front",
-        shortcut: "Ctrl+Alt+B",
-        modifiers: { alt: true, control: true, shift: false, meta: false },
-        key: "b",
-    };
-
     in property <EditorCommand> board-new: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/file-circle-plus.svg"),
         text: "New Board...",
         status-tip: "Add a new board to the project",
         shortcut: "Ctrl+N",
@@ -284,7 +257,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> board-copy: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/clone.svg"),
         text: "Copy Board...",
         status-tip: "Add a copy of the current board to the project",
         shortcut: "Ctrl+D",
@@ -293,7 +266,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> board-remove: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/trash-can.svg"),
         text: "Remove Board",
         status-tip: "Remove the current board from the project",
         shortcut: "Ctrl+Delete",
@@ -302,7 +275,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> plane-show-all: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/eye.svg"),
         text: "Show All Planes",
         status-tip: "Make the filled areas of all planes visible",
         shortcut: "",
@@ -311,7 +284,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> plane-hide-all: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/eye-slash.svg"),
         text: "Hide All Planes",
         status-tip: "Make the filled areas of all planes invisible",
         shortcut: "",
@@ -320,7 +293,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> plane-rebuild-all: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/arrows-rotate.svg"),
         text: "Rebuild All Planes",
         status-tip: "Re-calculate the filled areas of all planes",
         shortcut: "Ctrl+Shift+R",
@@ -419,7 +392,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> export-lppz: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/file-zipper.svg"),
         text: "Export *.lppz Archive...",
         status-tip: "Export the project as a self-contained *.lppz archive",
         shortcut: "",
@@ -455,7 +428,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> export-step: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/cubes.svg"),
         text: "Export STEP Model...",
         status-tip: "Export PCB as a STEP file for loading it into MCAD software",
         shortcut: "Ctrl+Shift+T",
@@ -473,7 +446,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> generate-bom: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/file-csv.svg"),
         text: "Generate Bill Of Materials...",
         status-tip: "Generate bill of materials (BOM) file",
         shortcut: "F9",
@@ -482,7 +455,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> generate-fabrication-data: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/industry.svg"),
         text: "Generate Fabrication Data...",
         status-tip: "Generate Gerber/Excellon files for PCB fabrication",
         shortcut: "F10",
@@ -509,7 +482,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> output-jobs: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/play.svg"),
         text: "Output Jobs...",
         status-tip: "Modify or run output jobs",
         shortcut: "F11",
@@ -518,7 +491,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> order-pcb: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/cart-shopping.svg"),
         text: "Order PCB...",
         status-tip: "Start ordering the PCB online",
         shortcut: "F12",
@@ -680,7 +653,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> lock: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/lock.svg"),
         text: "Lock Placement",
         status-tip: "Lock the placement of the selected object(s)",
         shortcut: "Ctrl+L",
@@ -689,7 +662,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> unlock: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/lock-open.svg"),
         text: "Unlock Placement",
         status-tip: "Unlock the placement of the selected object(s)",
         shortcut: "Ctrl+U",
@@ -698,7 +671,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> line-width-set: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/pen-to-square.svg"),
         text: "Set Line Width...",
         status-tip: "Change the line/trace/stroke width of the selected object(s)",
         shortcut: "",
@@ -707,7 +680,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> device-reset-text-all: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../bootstrap-icons/icons/bootstrap-reboot.svg"),
         text: "Reset All Texts",
         status-tip: "Reset all texts of the footprint to their initial state",
         shortcut: "",
@@ -725,7 +698,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> rename: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/pen-to-square.svg"),
         text: "Rename",
         status-tip: "Rename the selected object",
         shortcut: "F2",
@@ -788,7 +761,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> show-pin-numbers: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../bootstrap-icons/icons/123.svg"),
         text: "Show Pin Numbers",
         status-tip: "Show or hide symbol pin numbers",
         shortcut: "",
@@ -797,7 +770,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> ignore-locks: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/lock-open.svg"),
         text: "Ignore Placement Locks",
         status-tip: "Allow dragging locked items",
         shortcut: "Ctrl+Shift+L",
@@ -1013,7 +986,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-netlabel: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/tag.svg"),
         text: "Add Net Label",
         status-tip: "Add net labels to explicitly specify the net of wires",
         shortcut: "N",
@@ -1022,7 +995,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-component: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/microchip.svg"),
         text: "Add Component...",
         status-tip: "Insert components from the workspace libraries",
         shortcut: "A",
@@ -1040,7 +1013,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-via: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../bootstrap-icons/icons/record-circle-fill.svg"),
         text: "Add Via",
         status-tip: "Add plated through-hole vias",
         shortcut: "V",
@@ -1049,7 +1022,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-plane: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../bootstrap-icons/icons/paint-bucket.svg"),
         text: "Draw Plane",
         status-tip: "Draw auto-filled copper areas to interconnect pads and vias",
         shortcut: "N",
@@ -1346,7 +1319,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> component-resistor: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../../img/resistor-eu.svg"),
         text: "Resistor",
         status-tip: "Add standard component: Resistor",
         shortcut: "",
@@ -1355,7 +1328,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> component-inductor: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../../img/inductor-eu.svg"),
         text: "Inductor",
         status-tip: "Add standard component: Inductor",
         shortcut: "",
@@ -1364,7 +1337,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> component-capacitor-bipolar: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../../img/capacitor-bipolar-eu.svg"),
         text: "Bipolar Capacitor",
         status-tip: "Add standard component: Bipolar capacitor",
         shortcut: "",
@@ -1373,7 +1346,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> component-capacitor-unipolar: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../../img/capacitor-unipolar-eu.svg"),
         text: "Unipolar Capacitor",
         status-tip: "Add standard component: Unipolar capacitor",
         shortcut: "",
@@ -1382,7 +1355,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> component-gnd: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../../img/gnd.svg"),
         text: "GND Supply",
         status-tip: "Add standard component: GND supply",
         shortcut: "",
@@ -1391,7 +1364,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> component-vcc: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../../img/vcc.svg"),
         text: "VCC Supply",
         status-tip: "Add standard component: VCC supply",
         shortcut: "",
@@ -1399,17 +1372,8 @@ export global EditorCommandSet {
         key: "",
     };
 
-    in property <EditorCommand> dock-pages: {
-        icon: @image-url(""),
-        text: "Pages",
-        status-tip: "Go to the pages dock",
-        shortcut: "Ctrl+Alt+G",
-        modifiers: { alt: true, control: true, shift: false, meta: false },
-        key: "g",
-    };
-
     in property <EditorCommand> dock-erc: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/list-check.svg"),
         text: "Electrical Rule Check (ERC)",
         status-tip: "Go to the ERC messages dock",
         shortcut: "Ctrl+Alt+E",
@@ -1418,7 +1382,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> dock-drc: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/list-check.svg"),
         text: "Design Rule Check (DRC)",
         status-tip: "Go to the DRC messages dock",
         shortcut: "Ctrl+Alt+D",
@@ -1427,7 +1391,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> dock-layers: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../bootstrap-icons/icons/layers.svg"),
         text: "Layers",
         status-tip: "Go to the layers dock",
         shortcut: "Ctrl+Alt+L",
@@ -1436,7 +1400,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> dock-place-devices: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../bootstrap-icons/icons/cpu.svg"),
         text: "Place Devices",
         status-tip: "Go to the dock for placing devices",
         shortcut: "Ctrl+Alt+P",
@@ -1499,7 +1463,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> project-close: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/xmark.svg"),
         text: "Close Project",
         status-tip: "Close the currently opened project",
         shortcut: "Ctrl+F4",
@@ -1598,7 +1562,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> trace-select-whole: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/highlighter.svg"),
         text: "Select Whole Trace",
         status-tip: "Select the whole trace",
         shortcut: "",
@@ -1607,7 +1571,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> trace-measure-length: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/ruler.svg"),
         text: "Measure Selected Segments Length",
         status-tip: "Measure the total length of all selected trace segments",
         shortcut: "",
@@ -1616,7 +1580,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> trace-remove-whole: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/trash-can.svg"),
         text: "Remove Whole Trace",
         status-tip: "Remove the whole trace",
         shortcut: "",
@@ -1625,7 +1589,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> locked: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/lock.svg"),
         text: "Lock Placement",
         status-tip: "Toggle placement lock",
         shortcut: "",
@@ -1634,7 +1598,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> visible: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/eye.svg"),
         text: "Visible",
         status-tip: "Toggle visibility",
         shortcut: "",
@@ -1643,7 +1607,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> copy-mpn-to-clipboard: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/regular/copy.svg"),
         text: "Copy MPN to Clipboard",
         status-tip: "Copy this MPN into the clipboard",
         shortcut: "Ctrl+C",
@@ -1652,7 +1616,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> open-product-website: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/globe.svg"),
         text: "Open Product Website...",
         status-tip: "Open product details about this part in the web browser",
         shortcut: "",
@@ -1661,7 +1625,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> open-pricing-website: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/cart-shopping.svg"),
         text: "Open Pricing Website...",
         status-tip: "Open pricing details about this part in the web browser",
         shortcut: "",
