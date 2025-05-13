@@ -92,6 +92,13 @@ public:
    */
   int getReceivedMaxFileSize() const noexcept { return mMaxFileSize; }
 
+  /**
+   * @brief Get received URL where to continue the order process
+   *
+   * @return Redirect URL (might be invalid if failed to upload project).
+   */
+  const QUrl& getReceivedRedirectUrl() const noexcept { return mRedirectUrl; }
+
   // General Methods
 
   /**
@@ -113,8 +120,7 @@ public:
    * @param boardPath   Path to the pre-selected board (e.g.
    *                    "boards/default/board.lp"). Leave empty if unknown.
    */
-  void startUpload(const QByteArray& lppz,
-                   const QString& boardPath) const noexcept;
+  void startUpload(const QByteArray& lppz, const QString& boardPath) noexcept;
 
   // Operators
   OrderPcbApiRequest& operator=(const OrderPcbApiRequest& rhs) = delete;
@@ -165,7 +171,7 @@ signals:
 
 private:  // Methods
   void infoRequestResponseReceived(const QByteArray& data) noexcept;
-  void uploadResponseReceived(const QByteArray& data) const noexcept;
+  void uploadResponseReceived(const QByteArray& data) noexcept;
 
 private:  // Data
   QUrl mApiServerUrl;
@@ -174,6 +180,9 @@ private:  // Data
   QUrl mInfoUrl;
   QUrl mUploadUrl;
   int mMaxFileSize;
+
+  // Data received from the upload request
+  QUrl mRedirectUrl;
 };
 
 /*******************************************************************************

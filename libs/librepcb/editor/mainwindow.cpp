@@ -229,6 +229,8 @@ MainWindow::MainWindow(GuiApplication& app,
   d.set_rule_check_zoom_to_location(
       cs.value(mSettingsPrefix % "/rule_check_zoom_to_location", true)
           .toBool());
+  d.set_order_pcb_open_web_browser(
+      cs.value(mSettingsPrefix % "/order_open_web_browser", true).toBool());
   const int sectionCount = cs.beginReadArray(mSettingsPrefix % "/sections");
   for (int i = 0; i < sectionCount; ++i) {
     splitSection(mSections->count(), false);
@@ -303,6 +305,8 @@ slint::CloseRequestResponse MainWindow::closeRequested() noexcept {
   cs.setValue(mSettingsPrefix % "/geometry", mWidget->saveGeometry());
   cs.setValue(mSettingsPrefix % "/rule_check_zoom_to_location",
               d.get_rule_check_zoom_to_location());
+  cs.setValue(mSettingsPrefix % "/order_open_web_browser",
+              d.get_order_pcb_open_web_browser());
   cs.beginWriteArray(mSettingsPrefix % "/sections", mSections->count());
   cs.endArray();
 
@@ -545,6 +549,19 @@ void MainWindow::triggerBoard(int project, int board,
     case ui::BoardAction::OpenDrcSetupDialog: {
       if (auto brdEditor = prjEditor->getBoards().value(board)) {
         brdEditor->execBoardSetupDialog(true);
+      }
+      break;
+    }
+    case ui::BoardAction::PrepareOrder: {
+      if (auto brdEditor = prjEditor->getBoards().value(board)) {
+        brdEditor->prepareOrderPcb();
+      }
+      break;
+    }
+    case ui::BoardAction::StartOrder: {
+      if (auto brdEditor = prjEditor->getBoards().value(board)) {
+        const ui::Data& d = mWindow->global<ui::Data>();
+        brdEditor->startOrderPcbUpload(d.get_order_pcb_open_web_browser());
       }
       break;
     }

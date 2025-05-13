@@ -40,6 +40,7 @@ export enum PanelPage {
     layers,
     place-devices,
     rule-check,
+    order,
     about,
 }
 
@@ -634,11 +635,19 @@ export enum BoardAction {
     run-drc,
     open-setup-dialog,
     open-drc-setup-dialog,
+    prepare-order,  // Get API server availability.
+    start-order,  // Start uploading the project.
 }
 
 export struct BoardData {
     name: string,
     drc: RuleCheckData,
+
+    // Order PCB
+    order-status: string,  // Either progress status or error message.
+    order-info-url: string,
+    order-upload-progress: int,  // In percent, -1 means idle.
+    order-upload-url: string,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -650,7 +659,6 @@ export enum ProjectAction {
     save,
     undo,
     redo,
-    order,
     export-bom,
     export-lppz,
     open-folder,

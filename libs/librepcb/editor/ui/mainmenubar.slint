@@ -854,14 +854,6 @@ export component MainMenuBar inherits Rectangle {
                     }
                 }
 
-                order-pcb-item := MenuItem {
-                    cmd: Cmd.order-pcb;
-
-                    clicked => {
-                        Helpers.trigger-current-project-action(ProjectAction.order);
-                    }
-                }
-
                 MenuSeparator { }
 
                 new-sheet-item := MenuItem {

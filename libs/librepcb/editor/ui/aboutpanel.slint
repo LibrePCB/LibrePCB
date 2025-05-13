@@ -1,6 +1,7 @@
 import { ScrollView } from "std-widgets.slint";
 import {
     Button,
+    CopyToClipboardIconButton,
     IconButton,
     Palette,
     PanelHeader,
@@ -157,28 +158,8 @@ export component AboutPanel inherits Rectangle {
             note: @tr("(please copy this into bug reports)");
             z: 100;  // For the tooltips.
 
-            details-copy-btn := IconButton {
-                icon: details-copy-timer.running ? @image-url("../../../font-awesome/svgs/solid/check.svg") : @image-url("../../../font-awesome/svgs/regular/copy.svg");
-                icon-scale: 0.5;
-                color-enabled: details-copy-timer.running ? lime : Palette.foreground;
-                color-hovered: details-copy-timer.running ? lime : white;
-                tooltip: details-copy-timer.running ? @tr("Copied!") : @tr("Copy to Clipboard");
-                tooltip-delayed: false;
-
-                clicked => {
-                    if (Backend.copy-to-clipboard(Data.about-librepcb-details)) {
-                        details-copy-timer.running = true;
-                    }
-                }
-
-                details-copy-timer := Timer {
-                    interval: 1s;
-                    running: false;
-
-                    triggered => {
-                        self.running = false;
-                    }
-                }
+            details-copy-btn := CopyToClipboardIconButton {
+                text-to-copy: Data.about-librepcb-details;
             }
         }
 

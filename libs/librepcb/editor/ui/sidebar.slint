@@ -322,9 +322,16 @@ export component SideBar inherits Rectangle {
             tooltip: Cmd.order-pcb.text;
             shortcut: Cmd.order-pcb.shortcut;
             enabled: Data.current-project.valid;
+            checked: Data.panel-page == PanelPage.order;
 
             clicked => {
-                Helpers.trigger-current-project-action(ProjectAction.order);
+                Data.panel-page = PanelPage.order;
+            }
+
+            changed enabled => {
+                if self.checked && (!self.enabled) {
+                    Data.panel-page = PanelPage.home;
+                }
             }
         }
 

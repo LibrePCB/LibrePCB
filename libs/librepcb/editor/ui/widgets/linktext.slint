@@ -1,13 +1,13 @@
-import { Palette } from "std-widgets.slint";
 import { Data } from "../api.slint";
 
 export component LinkText inherits Text {
     in property <string> status-tip;
     in property <color> text-color: #e0e0e0;
+    in property <color> text-color-disabled: text-color.darker(0.5);
     in property <color> text-color-hovered: text-color.brighter(0.5);
     in property <bool> enabled: true;
 
-    color: ta.has-hover ? text-color-hovered : (enabled ? text-color : Palette.foreground);
+    color: ta.has-hover ? text-color-hovered : (enabled ? text-color : text-color-disabled);
 
     // Accessibility
     accessible-role: button;

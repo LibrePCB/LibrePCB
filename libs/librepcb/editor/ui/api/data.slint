@@ -264,7 +264,7 @@ export global Data {
             ],
             board-3d-tabs: [
                 {
-                    project-index: 1,
+                    project-index: 0,
                     background-color: Colors.black,
                     foreground-color: Colors.white,
                     refreshing: false,
@@ -558,6 +558,10 @@ export global Data {
                         unapproved: 0,
                         execution-error: "",
                     },
+                    order-info-url: "https://api.librepcb.org/api/info/",
+                    order-status: "Success! Continue in the web browser:",
+                    order-upload-progress: -1,
+                    order-upload-url: "https://fab.librepcb.org/fooobaaaar",
                 },
                 { name:"Experiment" },
             ],
@@ -607,6 +611,9 @@ export global Data {
                     drc: {
                         type: RuleCheckType.drc,
                     },
+                    order-status: "Uploading...",
+                    order-info-url: "https://api.librepcb.org/api/info/",
+                    order-upload-progress: 30,
                 },
                 {
                     name:"Experiment",
@@ -627,6 +634,9 @@ export global Data {
 
     // Rule check panel: Checked state of the "zoom to location" feature
     in property <bool> rule-check-zoom-to-location: true;
+
+    // Order PCB panel: Checked state of the "open web browser after upload" feature
+    in property <bool> order-pcb-open-web-browser: true;
 
     // CALCULATED, DO NET SET IN BACKEND
     in-out property <WindowSectionData> current-section: sections[current-section-index];

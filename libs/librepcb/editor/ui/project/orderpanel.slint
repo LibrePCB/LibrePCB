@@ -1,0 +1,364 @@
+import {
+    Button,
+    CopyToClipboardIconButton,
+    IconButton,
+    LinkText,
+    Palette,
+    PanelHeader,
+    ProgressBar,
+    Spinner,
+} from "../widgets.slint";
+import {
+    Backend,
+    BoardAction,
+    BoardData,
+    Data,
+    PanelPage,
+    ProjectData,
+    RuleCheckData,
+    RuleCheckState,
+    RuleCheckType,
+    TabType,
+} from "../api.slint";
+
+component OrderPreCheckRow inherits HorizontalLayout {
+    in property <string> title;
+    in property <RuleCheckData> check;
+    property <length> icon-size: 14px;
+    property <color> color: {
+        if check.state == RuleCheckState.running {
+            Palette.foreground
+        } else if check.state == RuleCheckState.up-to-date {
+            (check.unapproved == 0) ? #00d900 : #d93030
+        } else if check.type != RuleCheckType.none {
+            #d9d900
+        } else {
+            #d93030
+        }
+    };
+    property <string> status: {
+        if check.state == RuleCheckState.running {
+            @tr("Running...")
+        } else if (check.state == RuleCheckState.up-to-date) && (check.unapproved == 0) {
+            @tr("Successful")
+        } else if (check.state == RuleCheckState.up-to-date) && (check.unapproved != 0) {
+            @tr("{n} Message" | "{n} Messages" % check.unapproved)
+        } else if check.state == RuleCheckState.outdated {
+            @tr("Outdated")
+        } else {
+            @tr("Unknown")
+        }
+    };
+
+    callback refresh-clicked;
+    callback open-clicked;
+
+    spacing: 6px;
+
+    if check.state == RuleCheckState.running: spinner := Spinner {
+        width: icon-size;
+        height: max(icon-size, link-btn.preferred-height);
+        indeterminate: true;
+    }
+
+    if check.state != RuleCheckState.running: Image {
+        width: icon-size;
+        height: max(icon-size, link-btn.preferred-height);
+        image-fit: contain;
+        colorize: color;
+        source: {
+            if (check.state == RuleCheckState.outdated) || (check.state == RuleCheckState.not-run-yet) {
+                @image-url("../../../../font-awesome/svgs/solid/question.svg");
+            } else if check.unapproved == 0 {
+                @image-url("../../../../font-awesome/svgs/solid/check.svg");
+            } else {
+                @image-url("../../../../font-awesome/svgs/solid/triangle-exclamation.svg");
+            }
+        };
+        accessible-role: none;
+    }
+
+    link-btn := LinkText {
+        text-color: color;
+        text-color-disabled: color;
+        overflow: elide;
+        vertical-alignment: center;
+        text: {
+            if check.type != RuleCheckType.none {
+                title + ": " + status
+            } else {
+                @tr("No board selected")
+            }
+        };
+        accessible-role: none;
+        enabled: check.type != RuleCheckType.none;
+
+        clicked => {
+            open-clicked();
+        }
+    }
+
+    Rectangle { }
+
+    if ((check.state == RuleCheckState.outdated) || (check.state == RuleCheckState.not-run-yet)) && (check.type == RuleCheckType.drc): refresh-btn := IconButton {
+        width: icon-size;
+        height: max(icon-size, link-btn.preferred-height);
+        style: hyperlink;
+        icon: @image-url("../../../../font-awesome/svgs/solid/arrows-rotate.svg");
+        tooltip: @tr("Refresh");
+        tooltip-position: left;
+        accessible-description: title;
+
+        clicked => {
+            refresh-clicked();
+        }
+    }
+}
+
+export component OrderPanel inherits Rectangle {
+    property <int> project-index: Data.current-project-index;
+    property <ProjectData> project: Data.projects[project-index];
+    property <int> board-index: {
+        if Data.current-tab.type == TabType.board-2d {
+            Data.current-board-2d-tab.board-index
+        } else if Data.current-tab.type == TabType.board-3d {
+            Data.current-board-3d-tab.board-index
+        } else if Data.current-project.boards.length == 1 {
+            0
+        } else {
+            -1
+        }
+    };
+    property <BoardData> board: project.boards[board-index];
+    property <bool> board-selected: (board-index >= 0) && (board-index < project.boards.length);
+    property <bool> api-error: board-selected && board.order-info-url.is-empty && (!board.order-status.is-empty);
+    property <bool> api-ready: board-selected && (!board.order-info-url.is-empty);
+    property <bool> uploading: board-selected && board.order-upload-progress >= 0;
+    property <bool> enabled: api-ready && (!uploading) && ((!clicked) || board.order-upload-url.is-empty);
+    property <bool> erc-good: (project.erc.state == RuleCheckState.up-to-date) && (project.erc.unapproved == 0);
+    property <bool> drc-good: (board.drc.state == RuleCheckState.up-to-date) && (board.drc.unapproved == 0);
+    property <string> error-text: {
+        if project.boards.length == 0 {
+            @tr("This project does not contain any board, so there's nothing you could order.")
+        } else if !board-selected {
+            @tr("Please open the board you like to order.")
+        } else if (!erc-good) || (!drc-good) {
+            @tr("There may be some issues with your schematics or board, please check the messages above before continuing.");
+        } else {
+            ""
+        }
+    };
+    property <bool> clicked: false;
+
+    background: #2a2a2a;
+
+    // Request updating API status information.
+    function request-info() {
+        if board-selected {
+            Backend.trigger-board(project-index, board-index, BoardAction.prepare-order);
+        }
+    }
+
+    init => {
+        request-info();
+
+        // Set focus when panel is shown. Not sure if it's always desired(?).
+        fs.focus();
+    }
+
+    changed project-index => {
+        request-info();
+    }
+
+    changed board-index => {
+        request-info();
+    }
+
+    fs := FocusScope {
+        VerticalLayout {
+            header := PanelHeader {
+                property <string> name: project.name + ((board-selected && (project.boards.length > 1)) ? " (\{board.name})" : "");
+
+                z: 10;  // For the tooltip.
+                title: @tr("Order {}", name).to-uppercase();
+                highlight: fs.has-focus;
+                show-spinner: board-selected && (!api-ready) && (!api-error);
+
+                if api-error: error-btn := IconButton {
+                    width: self.height;
+                    style: read-only;
+                    icon: @image-url("../../../../font-awesome/svgs/solid/triangle-exclamation.svg");
+                    icon-scale: 0.7;
+                    color-disabled: yellow;
+                    enabled: false;
+                    accessible-role: none;
+                }
+
+                open-browser-sw := IconButton {
+                    width: self.height;
+                    icon: @image-url("../../../../font-awesome/svgs/solid/globe.svg");
+                    icon-scale: 0.7;
+                    tooltip: @tr("Open web browser after upload");
+                    checked: Data.order-pcb-open-web-browser;
+
+                    clicked => {
+                        Data.order-pcb-open-web-browser = !self.checked
+                    }
+                }
+            }
+
+            VerticalLayout {
+                padding: 8px;
+                spacing: 10px;
+                vertical-stretch: 1;
+                alignment: start;
+
+                Text {
+                    wrap: word-wrap;
+                    text: @tr("Finished the PCB design? Let it manufacture by one of our fabrication partners - easy, safe and fast!");
+                }
+
+                VerticalLayout {
+                    padding-bottom: 3px;
+                    spacing: 3px;
+
+                    erc-row := OrderPreCheckRow {
+                        title: @tr("Electrical Rule Check");
+                        check: project.erc;
+
+                        open-clicked => {
+                            Data.current-rule-check-board-index = -1;
+                            Data.panel-page = PanelPage.rule-check;
+                        }
+                    }
+
+                    drc-row := OrderPreCheckRow {
+                        title: @tr("Design Rule Check");
+                        check: board.drc;
+
+                        refresh-clicked => {
+                            Backend.trigger-board(project-index, board-index, BoardAction.run-drc);
+                        }
+
+                        open-clicked => {
+                            Data.current-rule-check-board-index = board-index;
+                            Data.panel-page = PanelPage.rule-check;
+                        }
+                    }
+                }
+
+                if !error-text.is-empty: error-txt := Text {
+                    font-size: 11.5px;
+                    font-italic: true;
+                    wrap: word-wrap;
+                    text: error-text;
+                }
+
+                upload-btn := Button {
+                    primary: enabled && erc-good && drc-good;
+                    enabled: enabled;
+                    text: @tr("Upload Project");
+
+                    clicked => {
+                        clicked = true;
+                        Backend.trigger-board(project-index, board-index, BoardAction.start-order);
+                    }
+                }
+
+                if uploading: progress-bar := ProgressBar {
+                    progress: board.order-upload-progress / 100;
+                    accessible-role: none;
+                }
+
+                VerticalLayout {
+                    spacing: 3px;
+
+                    status-txt := TextInput {
+                        font-size: 11.5px;
+                        font-italic: true;
+                        read-only: true;
+                        single-line: false;
+                        wrap: word-wrap;
+                        text: {
+                            if !board.order-status.is-empty {
+                                board.order-status
+                            } else if board-selected && board.order-info-url.is-empty {
+                                @tr("Checking availability") + "..."
+                            } else {
+                                ""
+                            }
+                        };
+                    }
+
+                    if !board.order-upload-url.is-empty: HorizontalLayout {
+                        alignment: space-between;
+
+                        upload-url-btn := LinkText {
+                            vertical-alignment: center;
+                            text: board.order-upload-url;
+                            status-tip: self.text;
+                            overflow: elide;
+
+                            clicked => {
+                                Backend.open-url(self.text);
+                            }
+                        }
+
+                        upload-url-copy-btn := CopyToClipboardIconButton {
+                            height: 13px;
+                            style: hyperlink;
+                            text-to-copy: board.order-upload-url;
+                        }
+                    }
+                }
+            }
+
+            PanelHeader {
+                title: @tr("Details");
+            }
+
+            VerticalLayout {
+                padding: 8px;
+                spacing: 8px;
+
+                Text {
+                    wrap: word-wrap;
+                    font-italic: true;
+                    font-size: 11.5px;
+                    text: @tr("This tool helps you to quickly and easily get your designed PCB manufactured. The project directory will be exported to a *.lppz archive and uploaded to the API server configured in your workspace settings. Afterwards you can continue the order process in the web browser, e.g. to choose the preferred manufacturing partner. Just try it!");
+                }
+            }
+
+            if api-ready: PanelHeader {
+                title: @tr("Privacy Policy");
+            }
+
+            if api-ready: VerticalLayout {
+                padding: 8px;
+                spacing: 8px;
+
+                Text {
+                    wrap: word-wrap;
+                    font-italic: true;
+                    font-size: 11px;
+                    text: @tr("Privacy and transparency are important to us. Details about how this feature works behind the scenes are available here:");
+                }
+
+                order-info-url-btn := LinkText {
+                    font-size: 11px;
+                    overflow: elide;
+                    text: board.order-info-url;
+                    status-tip: self.text;
+                }
+            }
+        }
+
+        key-pressed(event) => {
+            if (event.text == Key.Return) && upload-btn.enabled {
+                upload-btn.clicked();
+                return accept;
+            }
+            reject
+        }
+    }
+}

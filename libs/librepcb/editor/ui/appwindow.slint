@@ -8,6 +8,7 @@ import { DocumentsPanel } from "documentspanel.slint";
 import { GraphicsLayersPanel } from "graphicslayerspanel.slint";
 import { PlaceDevicesPanel } from "project/placedevicespanel.slint";
 import { RuleCheckPanel } from "rulecheckpanel.slint";
+import { OrderPanel } from "project/orderpanel.slint";
 import { LibrariesPanel } from "library/librariespanel.slint";
 import { AboutPanel } from "aboutpanel.slint";
 import { WindowSection } from "windowsection.slint";
@@ -114,6 +115,14 @@ export component AppWindow inherits Window {
         }
 
         if Data.panel-page == PanelPage.rule-check: RuleCheckPanel {
+            x: sidebar.width;
+            y: sidebar.y;
+            z: 80; // For the tooltips.
+            width: panel-width;
+            height: sidebar.height;
+        }
+
+        if Data.panel-page == PanelPage.order: OrderPanel {
             x: sidebar.width;
             y: sidebar.y;
             z: 80; // For the tooltips.
