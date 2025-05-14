@@ -9,8 +9,16 @@ jobs:
       ARCH: 'arm64'
       COPYFILE_DISABLE: 1 # Stop creating shit files (https://superuser.com/questions/259703/get-mac-tar-to-stop-putting-filenames-in-tar-archives)
       HOMEBREW_NO_INSTALL_CLEANUP: 1 # Might speed up homebrew commands(?)
+      # Specify build author as an environment variable because on Apple Silicon
+      # build_librepcb.sh is run locally where we want to use a different author.
+      LIBREPCB_BUILD_AUTHOR: "LibrePCB CI"
+      # Incremental builds make no sense on CI -> disable it to avoid creating
+      # additional build artifacts.
+      CARGO_INCREMENTAL: 0
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       - name: Print Environment
         run: ./ci/print_environment.sh
       - name: Install Dependencies
