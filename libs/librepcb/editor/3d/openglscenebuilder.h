@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "openglobject.h"
+
 #include <librepcb/core/3d/scenedata3d.h>
 #include <polyclipping/clipper.hpp>
 
@@ -36,7 +38,6 @@
 namespace librepcb {
 namespace editor {
 
-class OpenGlObject;
 class OpenGlTriangleObject;
 
 /*******************************************************************************
@@ -103,7 +104,8 @@ private:  // Methods
                              bool edges = true, bool closed = true) const;
   static QVector<QVector3D> tesselate(const ClipperLib::Path& path, qreal z,
                                       qreal scaleFactor);
-  void publishTriangleData(const QString& id, const QColor& color,
+  void publishTriangleData(const QString& id, OpenGlObject::Type type,
+                           const QColor& color,
                            const QVector<QVector3D>& triangles);
   void publishDevice(const SceneData3D::DeviceData& obj,
                      const QByteArray& stepContent, qreal z, qreal scaleFactor,

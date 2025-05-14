@@ -166,7 +166,8 @@ void OpenGlSceneBuilder::run(std::shared_ptr<SceneData3D> data) noexcept {
                                           ClipperLib::pftNonZero, false);
     const ClipperLib::Paths boardEdges = ClipperHelpers::treeToPaths(*tree);
     publishTriangleData(
-        Layer::boardOutlines().getId(), QColor(70, 80, 70),
+        Layer::boardOutlines().getId(), OpenGlObject::Type::Board,
+        QColor(70, 80, 70),
         extrude(boardArea, -d, 2 * d, scaleFactor, true, false) +
             extrude(boardEdges, -d, 2 * d, scaleFactor, false, true, false));
     if (mAbort) return;
@@ -177,7 +178,7 @@ void OpenGlSceneBuilder::run(std::shared_ptr<SceneData3D> data) noexcept {
                                            ClipperLib::pftNonZero, false);
     platedHoles = ClipperHelpers::treeToPaths(*tree);
     publishTriangleData(
-        "pth", QColor(124, 104, 71),
+        "pth", OpenGlObject::Type::Board, QColor(124, 104, 71),
         extrude(platedHoles, -d, 2 * d, scaleFactor, false, true, false));
     if (mAbort) return;
 
@@ -187,7 +188,7 @@ void OpenGlSceneBuilder::run(std::shared_ptr<SceneData3D> data) noexcept {
                                            ClipperLib::pftNonZero, false);
     nonPlatedHoles = ClipperHelpers::treeToPaths(*tree);
     publishTriangleData(
-        "npth", QColor(50, 50, 50),
+        "npth", OpenGlObject::Type::Board, QColor(50, 50, 50),
         extrude(nonPlatedHoles, -d, 2 * d, scaleFactor, false, true, false));
     if (mAbort) return;
 
@@ -208,7 +209,7 @@ void OpenGlSceneBuilder::run(std::shared_ptr<SceneData3D> data) noexcept {
                                              ClipperLib::pftNonZero);
       ClipperLib::Paths paths = ClipperHelpers::flattenTree(*tree);
       publishTriangleData(
-          layers.first(), QColor(188, 156, 105),
+          layers.first(), OpenGlObject::Type::Copper, QColor(188, 156, 105),
           extrude(paths, (d - epsilon) * side, 0.035 * side, scaleFactor));
       if (mAbort) return;
 
@@ -229,11 +230,13 @@ void OpenGlSceneBuilder::run(std::shared_ptr<SceneData3D> data) noexcept {
         tree = ClipperHelpers::offsetToTree(solderResist, Length(-50),
                                             mMaxArcTolerance);
         solderResist = ClipperHelpers::flattenTree(*tree);
-        publishTriangleData(layers.first(), color->toSolderResistColor(),
+        publishTriangleData(layers.first(), OpenGlObject::Type::SolderResist,
+                            color->toSolderResistColor(),
                             extrude(solderResist, (d + epsilon) * side,
                                     0.05 * side, scaleFactor));
       } else {
-        publishTriangleData(layers.first(), Qt::transparent, {});
+        publishTriangleData(layers.first(), OpenGlObject::Type::SolderResist,
+                            Qt::transparent, {});
       }
       if (mAbort) return;
 
@@ -244,7 +247,7 @@ void OpenGlSceneBuilder::run(std::shared_ptr<SceneData3D> data) noexcept {
                                              ClipperLib::pftNonZero);
       paths = ClipperHelpers::flattenTree(*tree);
       publishTriangleData(
-          layers.first(), Qt::darkGray,
+          layers.first(), OpenGlObject::Type::SolderPaste, Qt::darkGray,
           extrude(paths, (d + 0.036) * side, 0.03 * side, scaleFactor));
       if (mAbort) return;
 
@@ -262,11 +265,12 @@ void OpenGlSceneBuilder::run(std::shared_ptr<SceneData3D> data) noexcept {
         paths = ClipperHelpers::flattenTree(*tree);
         publishTriangleData(
             transform.map(Layer::topLegend()).getId(),
-            color->toSilkscreenColor(),
+            OpenGlObject::Type::Silkscreen, color->toSilkscreenColor(),
             extrude(paths, (d + 0.052) * side, 0.01 * side, scaleFactor));
       } else {
         publishTriangleData(transform.map(Layer::topLegend()).getId(),
-                            Qt::transparent, {});
+                            OpenGlObject::Type::Silkscreen, Qt::transparent,
+                            {});
       }
       if (mAbort) return;
     }
@@ -403,14 +407,14 @@ QVector<QVector3D> OpenGlSceneBuilder::tesselate(const ClipperLib::Path& path,
 }
 
 void OpenGlSceneBuilder::publishTriangleData(
-    const QString& id, const QColor& color,
+    const QString& id, OpenGlObject::Type type, const QColor& color,
     const QVector<QVector3D>& triangles) {
   std::shared_ptr<OpenGlTriangleObject> obj = mBoardObjects.value(id);
   if (obj) {
     obj->setData(color, triangles);
     emit objectUpdated(obj);
   } else {
-    obj = std::make_shared<OpenGlTriangleObject>();
+    obj = std::make_shared<OpenGlTriangleObject>(type);
     obj->setData(color, triangles);
     mBoardObjects[id] = obj;
     emit objectAdded(obj);
@@ -474,7 +478,7 @@ void OpenGlSceneBuilder::publishDevice(const SceneData3D::DeviceData& obj,
       obj->setData(color, vertices);
       emit objectUpdated(obj);
     } else {
-      obj = std::make_shared<OpenGlTriangleObject>();
+      obj = std::make_shared<OpenGlTriangleObject>(OpenGlObject::Type::Device);
       obj->setData(color, vertices);
       items[it.key()] = obj;
       emit objectAdded(obj);

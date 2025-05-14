@@ -42,14 +42,28 @@ namespace editor {
  */
 class OpenGlObject {
 public:
+  enum class Type {
+    Board,
+    Copper,
+    SolderResist,
+    SolderPaste,
+    Silkscreen,
+    Device,
+  };
+
   // Constructors / Destructor
-  OpenGlObject() noexcept = default;
-  OpenGlObject(const OpenGlObject& other) noexcept = default;
+  OpenGlObject() = delete;
+  explicit OpenGlObject(Type type) noexcept : mType(type) {}
+  OpenGlObject(const OpenGlObject& other) noexcept = delete;
   virtual ~OpenGlObject() noexcept = default;
 
   // General Methods
-  virtual void draw(QOpenGLFunctions& gl,
-                    QOpenGLShaderProgram& program) noexcept = 0;
+  Type getType() const noexcept { return mType; }
+  virtual void draw(QOpenGLFunctions& gl, QOpenGLShaderProgram& program,
+                    qreal alpha) noexcept = 0;
+
+protected:
+  const Type mType;
 };
 
 /*******************************************************************************

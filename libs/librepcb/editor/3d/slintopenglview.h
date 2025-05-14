@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "openglobject.h"
+
 #include <QtCore>
 #include <QtOpenGL>
 
@@ -33,8 +35,6 @@
  ******************************************************************************/
 namespace librepcb {
 namespace editor {
-
-class OpenGlObject;
 
 /*******************************************************************************
  *  Struct OpenGlProjection
@@ -95,12 +95,16 @@ public:
   bool isPanning() const noexcept;
   const QStringList& getOpenGlErrors() const noexcept { return mErrors; }
   const OpenGlProjection& getProjection() const noexcept { return mProjection; }
+  const QHash<OpenGlObject::Type, float>& getAlpha() const noexcept {
+    return mAlpha;
+  }
   static QColor getBackgroundColor() noexcept { return QColor(230, 242, 255); }
 
   // General Methods
   void addObject(std::shared_ptr<OpenGlObject> obj) noexcept;
   void removeObject(std::shared_ptr<OpenGlObject> obj) noexcept;
   void setObjects(const QVector<std::shared_ptr<OpenGlObject>>& objs) noexcept;
+  void setAlpha(const QHash<OpenGlObject::Type, float>& alpha) noexcept;
   slint::Image render(float width, float height) noexcept;
   bool pointerEvent(const QPointF& pos,
                     slint::private_api::PointerEvent e) noexcept;
@@ -135,6 +139,7 @@ private:  // Data
 
   // State
   OpenGlProjection mProjection;
+  QHash<OpenGlObject::Type, float> mAlpha;
   QPointF mMousePressPosition;
   QMatrix4x4 mMousePressTransform;
   QPointF mMousePressCenter;
