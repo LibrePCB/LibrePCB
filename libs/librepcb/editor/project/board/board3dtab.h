@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../3d/openglobject.h"
 #include "windowtab.h"
 
 #include <QtCore>
@@ -98,6 +99,7 @@ private:
 
   // State
   std::unique_ptr<OpenGlProjection> mProjection;
+  QHash<OpenGlObject::Type, float> mAlpha;
   qint64 mTimestampOfLastSceneRebuild;
   QStringList mSceneBuilderErrors;
   int mFrameIndex;

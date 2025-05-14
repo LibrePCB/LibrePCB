@@ -1,16 +1,29 @@
+import { ToolTip } from "tooltip.slint";
+
+export enum SceneButtonStyle {
+    button,
+    checkbox,
+    uncheckbox,
+}
+
 export component SceneButton inherits Rectangle {
     in property <string> text;
     in property <image> icon;
     in property <float> icon-scale: 1.0;
+    in property <string> tooltip;
     in property <brush> bg-color: white;
     in property <brush> fg-color: black;
     in property <length> font-size: 13px;
-    in property <bool> checkable: false;
+    in property <SceneButtonStyle> style: button;
     in-out property <bool> checked: false;
+    in property <bool> enabled: true;
+    property <color> current-fg-color: enabled ? fg-color : fg-color.with-alpha(0.7);
+    property <bool> draw-circle: ((style == SceneButtonStyle.checkbox) && (!checked)) || (style == SceneButtonStyle.uncheckbox);
+    property <color> circle-color: ((style == SceneButtonStyle.uncheckbox) && checked) ? red : current-fg-color;
 
     callback clicked;
     clicked => {
-        if checkable {
+        if (style == SceneButtonStyle.checkbox) || (style == SceneButtonStyle.uncheckbox) {
             checked = !checked;
         }
     }
@@ -20,7 +33,7 @@ export component SceneButton inherits Rectangle {
 
     // Accessibility
     accessible-role: button;
-    accessible-checkable: checkable;
+    accessible-checkable: (style == SceneButtonStyle.checkbox) || (style == SceneButtonStyle.uncheckbox);
     accessible-checked: checked;
     accessible-label: text;
     accessible-action-default => {
@@ -28,12 +41,12 @@ export component SceneButton inherits Rectangle {
     }
 
     Rectangle {
-        width: parent.width * (checkable ? 0.8 : (ta.has-hover ? 1.0 : 0.85));
+        width: parent.width * ((style != SceneButtonStyle.button) ? 0.8 : (ta.has-hover ? 1.0 : 0.85));
         height: self.width;
-        background: checked ? fg-color : bg-color;
+        background: ((style == SceneButtonStyle.checkbox) && checked) ? current-fg-color : bg-color;
         border-radius: self.height / 2;
-        border-color: fg-color;
-        border-width: (checkable && (!checked)) ? 1px : 0;
+        border-color: circle-color;
+        border-width: draw-circle ? 1px : 0;
 
         animate width { duration: 75ms; }
 
@@ -42,8 +55,8 @@ export component SceneButton inherits Rectangle {
             height: self.width;
             vertical-alignment: center;
             horizontal-alignment: center;
-            color: (checkable && checked) ? bg-color : fg-color;
-            font-size: font-size * (((!checkable) && ta.has-hover) ? 1.3 : 1);
+            color: ((style == SceneButtonStyle.checkbox) && checked) ? bg-color : current-fg-color;
+            font-size: font-size * (((style == SceneButtonStyle.button) && ta.has-hover) ? 1.3 : 1);
             text: text;
             accessible-role: none;
 
@@ -55,16 +68,34 @@ export component SceneButton inherits Rectangle {
             height: self.width;
             image-fit: ImageFit.fill;
             source: icon;
-            colorize: (checkable && checked) ? bg-color : fg-color;
+            colorize: ((style == SceneButtonStyle.checkbox) && checked) ? bg-color : current-fg-color;
             accessible-role: none;
+        }
+
+        if (style == SceneButtonStyle.uncheckbox) && checked: Rectangle {
+            width: 80%;
+            height: self.width;
+
+            Path {
+                stroke: circle-color;
+                stroke-width: 3px;
+                commands: "M -100 -100 L 100 100";
+            }
         }
 
         ta := TouchArea {
             mouse-cursor: pointer;
+            enabled: enabled;
 
             clicked => {
                 root.clicked();
             }
+        }
+
+        if ta.has-hover && (!ta.pressed) && (!tooltip.is-empty): tt := ToolTip {
+            x: -self.width - 5px;
+            y: (parent.height - self.height) / 2;
+            text: tooltip;
         }
     }
 }
