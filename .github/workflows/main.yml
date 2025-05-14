@@ -1,0 +1,16 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  macos-arm64:
+    name: MacOS ARM64
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Print Environment
+        run: ./ci/print_environment.sh
+      - name: Install Dependencies
+        run: source ./ci/install_dependencies.sh
+      - name: Print New Environment
+        run: ./ci/print_environment.sh
+      - name: Build LibrePCB
+        run: ./ci/build_librepcb.sh
