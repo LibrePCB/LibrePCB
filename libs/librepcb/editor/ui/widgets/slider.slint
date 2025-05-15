@@ -1,0 +1,150 @@
+import { Palette } from "std-widgets.slint";
+import { Constants } from "../api.slint";
+
+component Slider inherits Rectangle {
+    in-out property <float> value;
+    in property <bool> enabled: true;
+    in property <length> handle-size: 20px;
+    in property <bool> focusable: true;
+
+    callback value-changed(value: float);
+    value-changed(value) => {
+        self.value = value;
+    }
+
+    // Accessibility
+    accessible-role: slider;
+    accessible-value: value;
+    accessible-value-minimum: 0.0;
+    accessible-value-maximum: 1.0;
+    accessible-enabled: enabled;
+    accessible-action-set-value(value) => {
+        value-changed(max(min(value.to-float(), 1), 0));
+    }
+}
+
+export component HorizontalSlider inherits Slider {
+    out property has-focus <=> fs.has-focus;
+
+    preferred-width: 100px;
+    forward-focus: fs;
+
+    fs := FocusScope {
+        enabled: root.enabled && root.focusable;
+
+        ta := TouchArea {
+            height: root.height;
+            mouse-cursor: pointer;
+            enabled: root.enabled;
+
+            Rectangle {
+                x: root.handle-size / 2;
+                width: parent.width - root.handle-size;
+                height: 4px;
+                background: Palette.foreground;
+                border-radius: self.width / 2;
+                border-color: #909090;
+                border-width: 0.5px;
+            }
+
+            pointer-event(event) => {
+                if (event.kind == PointerEventKind.down) && (root.focusable) {
+                    fs.focus();
+                }
+                if ta.pressed {
+                    root.value-changed(max(min((self.mouse-x - (root.handle-size / 2)) / (self.width - root.handle-size), 1), 0));
+                }
+            }
+        }
+
+        Rectangle {
+            x: (parent.width - self.width) * root.value;
+            width: root.handle-size;
+            height: root.handle-size;
+            border-color: Constants.librepcb-color;
+            border-width: root.has-focus ? 1px : 0;
+            border-radius: self.width / 2;
+
+            Rectangle {
+                width: 70%;
+                height: self.width;
+                background: Constants.librepcb-color;
+                border-radius: self.width / 2;
+            }
+        }
+
+        key-pressed(event) => {
+            if event.text == Key.LeftArrow {
+                root.value-changed(max(root.value - 0.05, 0));
+                return accept;
+            } else if event.text == Key.RightArrow {
+                root.value-changed(min(root.value + 0.05, 1));
+                return accept;
+            }
+            reject
+        }
+    }
+}
+
+export component VerticalSlider inherits Slider {
+    out property has-focus <=> fs.has-focus;
+
+    preferred-height: 100px;
+    forward-focus: fs;
+
+    fs := FocusScope {
+        enabled: root.enabled && root.focusable;
+
+        ta := TouchArea {
+            width: root.width;
+            mouse-cursor: pointer;
+            enabled: root.enabled;
+
+            Rectangle {
+                y: root.handle-size / 2;
+                width: 4px;
+                height: parent.height - root.handle-size;
+                background: Palette.foreground;
+                border-radius: self.width / 2;
+                border-color: #909090;
+                border-width: 0.5px;
+            }
+
+            pointer-event(event) => {
+                if (event.kind == PointerEventKind.down) && (root.focusable) {
+                    fs.focus();
+                }
+                if ta.pressed {
+                    root.value-changed(max(min(1 - ((self.mouse-y - (root.handle-size / 2)) / (self.height - root.handle-size)), 1), 0));
+                }
+            }
+        }
+
+        Rectangle {
+            y: (parent.height - self.height) * (1 - root.value);
+            width: root.handle-size;
+            height: root.handle-size;
+            border-color: Constants.librepcb-color;
+            border-width: root.has-focus ? 1px : 0;
+            border-radius: self.width / 2;
+
+            Rectangle {
+                width: 70%;
+                height: self.width;
+                background: Constants.librepcb-color;
+                border-radius: self.width / 2;
+            }
+        }
+
+        key-pressed(event) => {
+            if event.text == Key.DownArrow {
+                root.value-changed(max(root.value - 0.05, 0));
+                return accept;
+            } else if event.text == Key.UpArrow {
+                root.value-changed(min(root.value + 0.05, 1));
+                return accept;
+            }
+            reject
+        }
+    }
+}

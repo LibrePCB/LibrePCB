@@ -126,6 +126,10 @@ ui::Board3dTabData Board3dTab::getDerivedUiData() const noexcept {
       q2s(Qt::black),  // Foreground color
       q2s((mView && mView->isPanning()) ? Qt::ClosedHandCursor
                                         : Qt::ArrowCursor),  // Cursor
+      mAlpha.value(OpenGlObject::Type::SolderResist, 1),  // Solder resist alpha
+      mAlpha.value(OpenGlObject::Type::Silkscreen, 1),  // Silkscreen alpha
+      mAlpha.value(OpenGlObject::Type::SolderPaste, 1),  // Solder paste alpha
+      mAlpha.value(OpenGlObject::Type::Device, 1),
       refreshing,  // Refreshing
       q2s(errors.join("\n\n")),  // Error
       mFrameIndex,  // Frame index
@@ -133,11 +137,23 @@ ui::Board3dTabData Board3dTab::getDerivedUiData() const noexcept {
 }
 
 void Board3dTab::setDerivedUiData(const ui::Board3dTabData& data) noexcept {
-  Q_UNUSED(data);
+  mAlpha[OpenGlObject::Type::SolderResist] =
+      qBound(0.0f, data.solderresist_alpha, 1.0f);
+  mAlpha[OpenGlObject::Type::Silkscreen] =
+      qBound(0.0f, data.silkscreen_alpha, 1.0f);
+  mAlpha[OpenGlObject::Type::SolderPaste] =
+      qBound(0.0f, data.solderpaste_alpha, 1.0f);
+  mAlpha[OpenGlObject::Type::Device] = qBound(0.0f, data.devices_alpha, 1.0f);
+  if (mView) {
+    mView->setAlpha(mAlpha);
+  }
+
+  requestRepaint();
 }
 
 void Board3dTab::activate() noexcept {
   mView.reset(new SlintOpenGlView(*mProjection));
+  mView->setAlpha(mAlpha);
   connect(mView.get(), &SlintOpenGlView::stateChanged, this,
           [this]() { onDerivedUiDataChanged.notify(); });
   connect(mView.get(), &SlintOpenGlView::contentChanged, this,
@@ -169,6 +185,7 @@ void Board3dTab::activate() noexcept {
 void Board3dTab::deactivate() noexcept {
   if (mView) {
     *mProjection = mView->getProjection();
+    mAlpha = mView->getAlpha();
   }
   mSceneRebuildTimer.reset();
   mBoardEditor.unregisterActiveTab(this);

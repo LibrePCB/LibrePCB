@@ -411,13 +411,14 @@ export component SchematicTab inherits Tab {
             show-pins-btn := SceneButton {
                 icon: @image-url("../../../../../bootstrap-icons/icons/123.svg");
                 icon-scale: 0.9;
+                tooltip: @tr("Pin Numbers");
                 bg-color: tabs[index].background-color;
                 fg-color: tabs[index].foreground-color;
-                checkable: true;
+                style: checkbox;
                 checked: tabs[index].show-pin-numbers;
 
-                changed checked => {
-                    tabs[index].show-pin-numbers = self.checked;
+                clicked => {
+                    tabs[index].show-pin-numbers = !self.checked;
                 }
             }
         }

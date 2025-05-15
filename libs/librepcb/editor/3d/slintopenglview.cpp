@@ -23,7 +23,6 @@
 #include "slintopenglview.h"
 
 #include "../utils/slinthelpers.h"
-#include "openglobject.h"
 
 #include <librepcb/core/application.h>
 
@@ -111,6 +110,14 @@ void SlintOpenGlView::setObjects(
   emit contentChanged();
 }
 
+void SlintOpenGlView::setAlpha(
+    const QHash<OpenGlObject::Type, float>& alpha) noexcept {
+  if (alpha != mAlpha) {
+    mAlpha = alpha;
+    emit contentChanged();
+  }
+}
+
 slint::Image SlintOpenGlView::render(float width, float height) noexcept {
   mViewSize = QSizeF(width, height);
   const QSize size(qCeil(width), qCeil(height));
@@ -162,9 +169,15 @@ slint::Image SlintOpenGlView::render(float width, float height) noexcept {
                        -sCameraPosZ);
   mProgram->setUniformValue("mvp_matrix", projection * mProjection.transform);
 
+  // Limit alpha of silkscreen.
+  auto alpha = mAlpha;
+  alpha[OpenGlObject::Type::Silkscreen] =
+      alpha.value(OpenGlObject::Type::Silkscreen, 1) *
+      alpha.value(OpenGlObject::Type::SolderResist, 1);
+
   // Draw all objects.
   foreach (const auto& obj, mObjects) {
-    obj->draw(*this, *mProgram);
+    obj->draw(*this, *mProgram, alpha.value(obj->getType(), 1));
   }
 
   // Release OpenGL resources.

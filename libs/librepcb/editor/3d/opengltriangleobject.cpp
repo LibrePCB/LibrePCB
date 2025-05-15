@@ -35,8 +35,9 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-OpenGlTriangleObject::OpenGlTriangleObject() noexcept
-  : mBuffer(QOpenGLBuffer::VertexBuffer),
+OpenGlTriangleObject::OpenGlTriangleObject(Type type) noexcept
+  : OpenGlObject(type),
+    mBuffer(QOpenGLBuffer::VertexBuffer),
     mCount(0),
     mMutex(),
     mColor(Qt::black),
@@ -59,7 +60,8 @@ void OpenGlTriangleObject::setData(const QColor& color,
 }
 
 void OpenGlTriangleObject::draw(QOpenGLFunctions& gl,
-                                QOpenGLShaderProgram& program) noexcept {
+                                QOpenGLShaderProgram& program,
+                                qreal alpha) noexcept {
   // Update buffer, if needed.
   {
     QMutexLocker lock(&mMutex);
@@ -75,7 +77,9 @@ void OpenGlTriangleObject::draw(QOpenGLFunctions& gl,
     }
   }
 
-  program.setAttributeValue("a_color", mColor);
+  QColor color = mColor;
+  color.setAlphaF(color.alphaF() * alpha);
+  program.setAttributeValue("a_color", color);
 
   mBuffer.bind();
   int vertexLocation = program.attributeLocation("a_position");

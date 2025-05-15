@@ -1,5 +1,6 @@
 import { Tab } from "../../tab.slint";
 import {
+    HorizontalSlider,
     SceneButton,
     Spinner,
 } from "../../widgets.slint";
@@ -11,6 +12,64 @@ import {
     TabAction,
     WindowSectionData,
 } from "../../api.slint";
+
+component SliderSceneButton inherits TouchArea {
+    in property <image> icon;
+    in property <string> tooltip;
+    in property <float> value;
+    in property <brush> bg-color;
+    in property <brush> fg-color;
+
+    callback value-changed(value: float);
+
+    HorizontalLayout {
+        alignment: end;
+
+        if root.has-hover: VerticalLayout {
+            spacing: 5px;
+
+            Rectangle {
+                x: (parent.width - self.width) / 2;
+                width: self.preferred-width + 6px;
+                height: self.preferred-height + 2px;
+                background: bg-color;
+                border-radius: 5px;
+
+                Text {
+                    color: fg-color;
+                    horizontal-alignment: center;
+                    font-size: 10px;
+                    text: tooltip;
+                    accessible-role: none;
+                }
+            }
+
+            slider := HorizontalSlider {
+                min-width: 80px;
+                value: value;
+                focusable: false;
+                accessible-label: tooltip;
+
+                value-changed(value) => {
+                    value-changed(value);
+                }
+            }
+        }
+
+        btn := SceneButton {
+            icon: icon;
+            icon-scale: 0.9;
+            bg-color: bg-color;
+            fg-color: fg-color;
+            style: uncheckbox;
+            checked: value < 0.2;
+
+            clicked => {
+                value-changed(self.checked ? 1 : 0);
+            }
+        }
+    }
+}
 
 export component Board3dTab inherits Tab {
     in property <int> section-index;
@@ -58,6 +117,7 @@ export component Board3dTab inherits Tab {
             width: self.preferred-width;
 
             zoom-fit-btn := SceneButton {
+                x: parent.width - self.width;
                 icon: @image-url("../../../../../font-awesome/svgs/solid/expand.svg");
                 icon-scale: 0.9;
                 bg-color: tabs[index].background-color;
@@ -69,6 +129,7 @@ export component Board3dTab inherits Tab {
             }
 
             zoom-in-btn := SceneButton {
+                x: parent.width - self.width;
                 icon: @image-url("../../../../../bootstrap-icons/icons/zoom-in.svg");
                 bg-color: tabs[index].background-color;
                 fg-color: tabs[index].foreground-color;
@@ -79,6 +140,7 @@ export component Board3dTab inherits Tab {
             }
 
             zoom-out-btn := SceneButton {
+                x: parent.width - self.width;
                 icon: @image-url("../../../../../bootstrap-icons/icons/zoom-out.svg");
                 bg-color: tabs[index].background-color;
                 fg-color: tabs[index].foreground-color;
@@ -88,7 +150,60 @@ export component Board3dTab inherits Tab {
                 }
             }
 
+            devices-alpha-ta := SliderSceneButton {
+                x: parent.width - self.width;
+                icon: @image-url("../../../../../bootstrap-icons/icons/cpu.svg");
+                tooltip: @tr("Devices");
+                value: tabs[index].devices-alpha;
+                bg-color: tabs[index].background-color;
+                fg-color: tabs[index].foreground-color;
+
+                value-changed(value) => {
+                    tabs[index].devices-alpha = value;
+                }
+            }
+
+            solderpaste-alpha-ta := SliderSceneButton {
+                x: parent.width - self.width;
+                icon: @image-url("../../../../../font-awesome/svgs/solid/highlighter.svg");
+                tooltip: @tr("Solder Paste");
+                value: tabs[index].solderpaste-alpha;
+                bg-color: tabs[index].background-color;
+                fg-color: tabs[index].foreground-color;
+
+                value-changed(value) => {
+                    tabs[index].solderpaste-alpha = value;
+                }
+            }
+
+            silkscreen-alpha-ta := SliderSceneButton {
+                x: parent.width - self.width;
+                icon: @image-url("../../../../../font-awesome/svgs/solid/font.svg");
+                tooltip: @tr("Silkscreen");
+                value: tabs[index].silkscreen-alpha;
+                bg-color: tabs[index].background-color;
+                fg-color: tabs[index].foreground-color;
+
+                value-changed(value) => {
+                    tabs[index].silkscreen-alpha = value;
+                }
+            }
+
+            solderresist-alpha-ta := SliderSceneButton {
+                x: parent.width - self.width;
+                icon: @image-url("../../../../../font-awesome/svgs/solid/fill.svg");
+                tooltip: @tr("Solder Resist");
+                value: tabs[index].solderresist-alpha;
+                bg-color: tabs[index].background-color;
+                fg-color: tabs[index].foreground-color;
+
+                value-changed(value) => {
+                    tabs[index].solderresist-alpha = value;
+                }
+            }
+
             toggle-2d-btn := SceneButton {
+                x: parent.width - self.width;
                 text: "2D";
                 bg-color: tabs[index].background-color;
                 fg-color: tabs[index].foreground-color;

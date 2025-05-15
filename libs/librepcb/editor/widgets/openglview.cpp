@@ -289,7 +289,7 @@ void OpenGlView::paintGL() {
 
   // Draw all objects.
   foreach (const auto& obj, mObjects) {
-    obj->draw(*this, mProgram);
+    obj->draw(*this, mProgram, 1);
   }
 }
 
