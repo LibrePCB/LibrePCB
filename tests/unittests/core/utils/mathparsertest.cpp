@@ -82,8 +82,13 @@ INSTANTIATE_TEST_SUITE_P(MathParserTest, MathParserTest, ::testing::Values(
     MathParserTestData({"en_US", "2+3", 5}),
     MathParserTestData({"en_US", "(1+2)/2", 1.5}),
     MathParserTestData({"en_US", " 2 * (1.1 + 2.2) / 3.3 ", 2*(1.1+2.2)/3.3}),
-    MathParserTestData({"en_US", "5,000", 5000}), // thousand separator
-    MathParserTestData({"de_DE", "5,000", 5}), // decimal point
+    MathParserTestData({"en_US", "5,123", 5123}), // thousand separator
+    MathParserTestData({"en_US", "5,123.456", 5123.456}), // both separators
+
+    // https://github.com/LibrePCB/LibrePCB/issues/1367
+    MathParserTestData({"de_DE", "5,123", 5.123}), // decimal point
+    MathParserTestData({"de_DE", "5.123", 5.123}), // support '.' in any locale
+    MathParserTestData({"de_DE", "5.123,456", std::nullopt}), // downside :-/
 
     // invalid cases
     MathParserTestData({"en_US", "", std::nullopt}),

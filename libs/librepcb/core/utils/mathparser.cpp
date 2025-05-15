@@ -47,12 +47,19 @@ void MathParser::setLocale(const QLocale& locale) noexcept {
   mLocale = locale;
 }
 
-MathParser::Result MathParser::parse(const QString& expression) const noexcept {
+MathParser::Result MathParser::parse(QString expression) const noexcept {
   MathParser::Result result;
 
   try {
     const QString decimalPoint(mLocale.decimalPoint());
     const QString groupSeparator(mLocale.groupSeparator());
+
+    // Always support '.' as decimal separator in addition to the
+    // locale-dependent separator, especially for German people
+    // (https://github.com/LibrePCB/LibrePCB/issues/1367).
+    if (decimalPoint != ".") {
+      expression.replace(".", decimalPoint);
+    }
 
     mu::Parser parser;
     parser.SetArgSep(';');  // avoid conflict with other separators
