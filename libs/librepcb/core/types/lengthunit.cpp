@@ -256,6 +256,19 @@ QList<LengthUnit> LengthUnit::getAllUnits() noexcept {
   return list;
 }
 
+std::optional<LengthUnit> LengthUnit::extractFromExpression(
+    QString& expression) noexcept {
+  foreach (const LengthUnit& unit, LengthUnit::getAllUnits()) {
+    foreach (const QString& suffix, unit.getUserInputSuffixes()) {
+      if (expression.endsWith(suffix)) {
+        expression.chop(suffix.length());
+        return unit;
+      }
+    }
+  }
+  return std::nullopt;
+}
+
 /*******************************************************************************
  *  Non-Member Functions
  ******************************************************************************/

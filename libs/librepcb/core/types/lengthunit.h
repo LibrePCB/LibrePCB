@@ -25,6 +25,8 @@
  ******************************************************************************/
 #include <QtCore>
 
+#include <optional>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -306,6 +308,20 @@ public:
     return LengthUnit(LengthUnit_t::Inches);
   }
   static LengthUnit mils() noexcept { return LengthUnit(LengthUnit_t::Mils); }
+
+  /**
+   * @brief Try to extract the unit from a user input string
+   *
+   * @param expression  User input. The found unit will be removed from the
+   *                    string. For example the input "2*0.5mm" will be changed
+   *                    to "2*0.5" and #millimeters() is returned. If no unit
+   *                    was found, the string is left untouched and
+   *                    `std::nullopt` is returned.
+   *
+   * @return Extracted unit, if any found.
+   */
+  static std::optional<LengthUnit> extractFromExpression(
+      QString& expression) noexcept;
 
   // Operators
   LengthUnit& operator=(const LengthUnit& rhs) noexcept {

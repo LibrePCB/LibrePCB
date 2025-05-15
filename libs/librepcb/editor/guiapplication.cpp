@@ -45,6 +45,7 @@
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectloader.h>
+#include <librepcb/core/utils/mathparser.h>
 #include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
@@ -300,29 +301,32 @@ void GuiApplication::createNewWindow(int id, int projectIndex) noexcept {
                                       lpUnit.getReasonableNumberOfDecimals(),
                                       QLocale()));
   });
-  b.on_parse_length_input([](slint::SharedString text, ui::LengthUnit unit,
-                             ui::Int64 minimum) {
-    ui::LengthEditParseResult res{false, ui::Int64{0, 0}, unit};
-    try {
-      QString value = s2q(text);
-      foreach (const LengthUnit& u, LengthUnit::getAllUnits()) {
-        foreach (const QString& suffix, u.getUserInputSuffixes()) {
-          if (value.endsWith(suffix)) {
-            value.chop(suffix.length());
-            res.evaluated_unit = l2s(u);
+  b.on_parse_length_input(
+      [](slint::SharedString text, ui::LengthUnit unit, ui::Int64 minimum) {
+        ui::LengthEditParseResult res{false, ui::Int64{0, 0}, unit};
+        try {
+          QString value = s2q(text);
+
+          // Extract unit from string.
+          if (auto parsedUnit = LengthUnit::extractFromExpression(value)) {
+            res.evaluated_unit = l2s(*parsedUnit);
           }
+          const LengthUnit lpUnit = s2l(res.evaluated_unit);
+
+          // Parse expression and convert to Length.
+          const MathParser::Result result = MathParser().parse(value);
+          if (result.valid) {
+            const Length lpValue =
+                lpUnit.convertFromUnit(result.value);  // can throw
+            if (lpValue >= s2length(minimum)) {
+              res.evaluated_value = l2s(lpValue);
+              res.valid = true;
+            }
+          }
+        } catch (const Exception& e) {
         }
-      }
-      const LengthUnit lpUnit = s2l(res.evaluated_unit);
-      const Length lpValue = lpUnit.convertFromUnit(value.toDouble(&res.valid));
-      if (!(lpValue >= s2length(minimum))) {
-        res.valid = false;
-      }
-      res.evaluated_value = l2s(lpValue);
-    } catch (const Exception& e) {
-    }
-    return res;
-  });
+        return res;
+      });
 
   // Reuse next free window ID.
   if (id < 1) {

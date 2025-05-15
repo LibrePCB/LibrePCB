@@ -220,15 +220,18 @@ void LengthEditBase::setValueImpl(Length value) noexcept {
 
 void LengthEditBase::updateValueFromText(QString text) noexcept {
   try {
-    LengthUnit unit = extractUnitFromExpression(text);
-    MathParser::Result result = MathParser().parse(text);
+    std::optional<LengthUnit> unit = LengthUnit::extractFromExpression(text);
+    if (!unit) {
+      unit = getDisplayedUnit();  // if no unit specified, use current unit
+    }
+    const MathParser::Result result = MathParser().parse(text);
     if (result.valid) {
-      Length value = unit.convertFromUnit(result.value);  // can throw
+      Length value = unit->convertFromUnit(result.value);  // can throw
       // Only accept values in the allowed range.
       if ((value >= mMinimum) && (value <= mMaximum)) {
         const Length diff = value - mValue;
         mValue = value;
-        setSelectedUnit(unit);
+        setSelectedUnit(*unit);
         updateSingleStep();
         // In contrast to setValueImpl(), do NOT call updateText() to avoid
         // disturbing the user while writing the text!
@@ -306,19 +309,6 @@ void LengthEditBase::updateSingleStepHalfDouble() noexcept {
 
 void LengthEditBase::updateText() noexcept {
   lineEdit()->setText(getValueStr(getDisplayedUnit()));
-}
-
-LengthUnit LengthEditBase::extractUnitFromExpression(
-    QString& expression) const noexcept {
-  foreach (const LengthUnit& unit, LengthUnit::getAllUnits()) {
-    foreach (const QString& suffix, unit.getUserInputSuffixes()) {
-      if (expression.endsWith(suffix)) {
-        expression.chop(suffix.length());
-        return unit;
-      }
-    }
-  }
-  return getDisplayedUnit();  // if no unit specified, use current unit
 }
 
 void LengthEditBase::changeUnitActionTriggered() noexcept {

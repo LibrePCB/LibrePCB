@@ -145,7 +145,6 @@ protected:  // Methods
   void updateSingleStepPredefined() noexcept;
   void updateSingleStepHalfDouble() noexcept;
   void updateText() noexcept;
-  LengthUnit extractUnitFromExpression(QString& expression) const noexcept;
   void changeUnitActionTriggered() noexcept;
   void setSelectedUnit(const LengthUnit& unit) noexcept;
   void saveSelectedUnit() noexcept;
