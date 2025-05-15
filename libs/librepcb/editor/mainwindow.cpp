@@ -224,8 +224,14 @@ MainWindow::MainWindow(GuiApplication& app,
 
   // Load window state.
   QSettings cs;
-  mWidget->restoreGeometry(
-      cs.value(mSettingsPrefix % "/geometry").toByteArray());
+  if (!mWidget->restoreGeometry(
+          cs.value(mSettingsPrefix % "/geometry").toByteArray())) {
+    // By default, open the window maximized as this is more intuitive than a
+    // small window with hardcoded, screen-independent size in the Slint file
+    // (https://github.com/LibrePCB/LibrePCB/issues/355).
+    qInfo() << "Could not restore window geometry, thus maximizing.";
+    mWidget->setWindowState(Qt::WindowMaximized | Qt::WindowActive);
+  }
   d.set_rule_check_zoom_to_location(
       cs.value(mSettingsPrefix % "/rule_check_zoom_to_location", true)
           .toBool());
