@@ -29,17 +29,23 @@
 #include "../../rulecheck/rulecheckmessagesmodel.h"
 #include "../../undostack.h"
 #include "../../utils/slinthelpers.h"
+#include "../../workspace/desktopservices.h"
 #include "../projecteditor.h"
 #include "board2dtab.h"
 #include "board3dtab.h"
 #include "boardsetupdialog.h"
 
 #include <librepcb/core/3d/stepexport.h>
+#include <librepcb/core/application.h>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/network/orderpcbapirequest.h>
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boardplanefragmentsbuilder.h>
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/types/layer.h>
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
 
@@ -65,7 +71,9 @@ BoardEditor::BoardEditor(ProjectEditor& prjEditor, Board& board, int uiIndex,
     mDrc(new BoardDesignRuleCheck(this)),
     mDrcNotification(new Notification(ui::NotificationType::Progress, QString(),
                                       QString(), QString(), QString(), true)),
-    mDrcUndoStackState(0) {
+    mDrcUndoStackState(0),
+    mOrderUploadProgressPercent(-1),
+    mOrderOpenBrowser(false) {
   // Connect board.
   connect(&mBoard, &Board::nameChanged, this,
           [this]() { onUiDataChanged.notify(); });
@@ -88,6 +96,10 @@ BoardEditor::BoardEditor(ProjectEditor& prjEditor, Board& board, int uiIndex,
 }
 
 BoardEditor::~BoardEditor() noexcept {
+  // Stop ongoing operations, timers etc.
+  mOrderRequest.reset();
+
+  // Request all tabs to close.
   emit aboutToBeDestroyed();
 
   Q_ASSERT(mActive2dTabs.isEmpty());
@@ -127,6 +139,12 @@ ui::BoardData BoardEditor::getUiData() const noexcept {
           mDrcMessages ? mDrcMessages->getUnapprovedCount() : 0,  // Unapproved
           q2s(mDrcExecutionError),  // Execution error
       },
+      q2s(mOrderStatus),  // Order status / error
+      mOrderRequest ? q2s(mOrderRequest->getReceivedInfoUrl().toString())
+                    : slint::SharedString(),  // Order info URL
+      mOrderUploadProgressPercent,  // Order upload progress
+      mOrderRequest ? q2s(mOrderRequest->getReceivedRedirectUrl().toString())
+                    : slint::SharedString(),  // Order upload URL
   };
 }
 
@@ -280,6 +298,141 @@ void BoardEditor::execStepExportDialog() noexcept {
     QMessageBox::critical(qApp->activeWindow(), tr("STEP Export Failure"),
                           errorMsg);
   }
+}
+
+void BoardEditor::prepareOrderPcb() noexcept {
+  if (mOrderRequest) {
+    return;  // Already prepared.
+  }
+
+  if (mProjectEditor.getWorkspace()
+          .getSettings()
+          .apiEndpoints.get()
+          .isEmpty()) {
+    mOrderStatus =
+        tr("This feature is not available because there is no API server "
+           "configured in your workspace settings.");
+    onUiDataChanged.notify();
+    return;
+  }
+
+  // Prepare network request.
+  mOrderRequest.reset(new OrderPcbApiRequest(
+      mProjectEditor.getWorkspace().getSettings().apiEndpoints.get().first()));
+  connect(mOrderRequest.get(), &OrderPcbApiRequest::infoRequestSucceeded, this,
+          [this]() { onUiDataChanged.notify(); });
+  connect(mOrderRequest.get(), &OrderPcbApiRequest::infoRequestFailed, this,
+          [this](QString errorMsg) {
+            mOrderStatus = errorMsg;
+            onUiDataChanged.notify();
+          });
+  connect(mOrderRequest.get(), &OrderPcbApiRequest::uploadProgressState, this,
+          [this](QString state) {
+            mOrderStatus = state;
+            onUiDataChanged.notify();
+          });
+  connect(mOrderRequest.get(), &OrderPcbApiRequest::uploadProgressPercent, this,
+          [this](int percent) {
+            mOrderUploadProgressPercent = percent;
+            onUiDataChanged.notify();
+          });
+  connect(mOrderRequest.get(), &OrderPcbApiRequest::uploadSucceeded, this,
+          [this](QUrl redirectUrl) {
+            mOrderStatus = tr("Success! Please continue in the web browser:");
+            mOrderUploadProgressPercent = -1;
+            onUiDataChanged.notify();
+            if (mOrderOpenBrowser) {
+              DesktopServices ds(mProjectEditor.getWorkspace().getSettings());
+              ds.openUrl(redirectUrl);
+            }
+          });
+  connect(mOrderRequest.get(), &OrderPcbApiRequest::uploadFailed, this,
+          [this](QString errorMsg) {
+            mOrderStatus = errorMsg;
+            mOrderUploadProgressPercent = -1;
+            onUiDataChanged.notify();
+          });
+
+  // Request status from API server.
+  mOrderStatus.clear();
+  mOrderRequest->startInfoRequest();
+  onUiDataChanged.notify();
+}
+
+void BoardEditor::startOrderPcbUpload(bool openBrowser) noexcept {
+  if ((!mOrderRequest) || (!mOrderRequest->isReadyForUpload())) {
+    return;  // Not prepared.
+  }
+
+  try {
+    // See explanation in ProjectEditor::execLppzExportDialog(). Unfortunately
+    // this way the board is not filtered on unstable releases :-(
+    if (Application::isFileFormatStable()) {
+      mProject.save();  // can throw
+    }
+
+    // Filter out all other boards in a quite ugly way o_o
+    // Ignore errors as this is very ugly and error-prone, especially while
+    // the file format is unstable.
+    QSet<QString> removedBoardDirs;
+    if (mProject.getBoards().count() > 1) {
+      try {
+        const QString boardsFp = "boards/boards.lp";
+        std::unique_ptr<SExpression> boardsRoot = SExpression::parse(
+            mProject.getDirectory().read(boardsFp),
+            mProject.getDirectory().getAbsPath(boardsFp));  // can throw
+        for (const SExpression* node : boardsRoot->getChildren("board")) {
+          const QString dir =
+              QString(node->getChild("@0").getValue()).remove("/board.lp");
+          if (dir != mBoard.getDirectory().getPath()) {
+            boardsRoot->removeChild(*node);
+            mProject.getDirectory().removeDirRecursively(dir);
+            removedBoardDirs.insert(dir);
+          }
+        }
+        if (removedBoardDirs.count() != (mProject.getBoards().count() - 1)) {
+          throw LogicError(__FILE__, __LINE__);
+        }
+        mProject.getDirectory().write(boardsFp,
+                                      boardsRoot->toByteArray());  // can throw
+      } catch (const Exception& e) {
+        qCritical() << "Failed to filter out boards:" << e.getMsg();
+        removedBoardDirs.clear();
+      }
+    }
+
+    // Export project to ZIP, but without the output directory since this can
+    // be quite large and does not make sense to upload to the API server.
+    auto filter = [&removedBoardDirs](const QString& filePath) {
+      if (filePath.startsWith("output/")) {
+        return false;
+      }
+      if (filePath.endsWith(".user.lp")) {
+        return false;
+      }
+      for (const QString& dir : removedBoardDirs) {
+        if (filePath.startsWith(dir % "/")) {
+          return false;
+        }
+      }
+      return true;
+    };
+    qDebug() << "Export project to *.lppz for ordering PCBs...";
+    const QByteArray lppz =
+        mProject.getDirectory().getFileSystem()->exportToZip(
+            filter);  // can throw
+
+    // Start upload.
+    qDebug() << "Upload *.lppz to API server...";
+    mOrderStatus = tr("Uploading project...");
+    mOrderUploadProgressPercent = 0;
+    mOrderOpenBrowser = openBrowser;
+    mOrderRequest->startUpload(lppz, QString());
+  } catch (const Exception& e) {
+    mOrderStatus = e.getMsg();
+  }
+
+  onUiDataChanged.notify();
 }
 
 /*******************************************************************************

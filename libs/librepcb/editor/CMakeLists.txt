@@ -745,9 +745,6 @@ add_library(
   project/newprojectwizard/newprojectwizardpage_metadata.cpp
   project/newprojectwizard/newprojectwizardpage_metadata.h
   project/newprojectwizard/newprojectwizardpage_metadata.ui
-  project/orderpcbdialog.cpp
-  project/orderpcbdialog.h
-  project/orderpcbdialog.ui
   project/outputjobsdialog/archiveoutputjobwidget.cpp
   project/outputjobsdialog/archiveoutputjobwidget.h
   project/outputjobsdialog/archiveoutputjobwidget.ui

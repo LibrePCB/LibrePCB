@@ -78,6 +78,7 @@ public:
 
   // General Methods
   GuiApplication& getApp() noexcept { return mApp; }
+  Workspace& getWorkspace() noexcept { return mWorkspace; }
   Project& getProject() noexcept { return *mProject; }
   UndoStack& getUndoStack() noexcept { return *mUndoStack; }
   const QVector<std::shared_ptr<SchematicEditor>>& getSchematics() noexcept {
@@ -148,13 +149,6 @@ public:
    * @param parent    parent widget of the dialog
    */
   void execLppzExportDialog(QWidget* parent) noexcept;
-
-  /**
-   * @brief Execute the PCB order dialog (blocking)
-   *
-   * @param parent    Parent widget of the dialog
-   */
-  void execOrderPcbDialog(QWidget* parent) noexcept;
 
   std::shared_ptr<SchematicEditor> execNewSheetDialog() noexcept;
   void execRenameSheetDialog(int index) noexcept;

@@ -52,9 +52,6 @@ export global Shortcuts {
         } else if is-shortcut(event, Cmd.output-jobs) {
             Backend.trigger-project(project, ProjectAction.open-output-jobs);
             return true;
-        } else if is-shortcut(event, Cmd.order-pcb) {
-            Backend.trigger-project(project, ProjectAction.order);
-            return true;
         } else if is-shortcut(event, Cmd.undo) {
             Backend.trigger-project(project, ProjectAction.undo);
             return true;
@@ -579,6 +576,8 @@ export global Shortcuts {
             return true;
         } else if is-shortcut(event, Cmd.dock-place-devices) && (Data.current-tab.type == TabType.board-2d) {
             Data.panel-page = PanelPage.place-devices;
+        } else if is-shortcut(event, Cmd.order-pcb) && Data.current-project.valid {
+            Data.panel-page = PanelPage.order;
         } else if is-shortcut(event, Cmd.window-new) {
             Backend.trigger(Action.window-new);
             return true;

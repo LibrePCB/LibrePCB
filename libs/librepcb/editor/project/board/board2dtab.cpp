@@ -1923,7 +1923,10 @@ void Board2dTab::execFabricationDataExportDialog() noexcept {
   FabricationOutputDialog dialog(mApp.getWorkspace().getSettings(), mBoard,
                                  qApp->activeWindow());
   connect(&dialog, &FabricationOutputDialog::orderPcbDialogTriggered, this,
-          [this, &dialog]() { mProjectEditor.execOrderPcbDialog(&dialog); });
+          [this, &dialog]() {
+            emit panelPageRequested(ui::PanelPage::Order);
+            dialog.close();
+          });
   dialog.exec();
 }
 

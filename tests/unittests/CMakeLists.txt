@@ -117,7 +117,6 @@ add_executable(
   editor/project/addcomponentdialogtest.cpp
   editor/project/board/boardclipboarddatatest.cpp
   editor/project/board/cmdboardspecctraimporttest.cpp
-  editor/project/orderpcbdialogtest.cpp
   editor/project/schematic/schematicclipboarddatatest.cpp
   editor/utils/shortcutsreferencegeneratortest.cpp
   editor/widgets/editabletablewidgetreceiver.h

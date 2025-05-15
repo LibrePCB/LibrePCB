@@ -1,6 +1,6 @@
 import { Palette } from "std-widgets.slint";
 import { ToolTip } from "tooltip.slint";
-import { Data, EditorCommand } from "../api.slint";
+import { Backend, Data, EditorCommand } from "../api.slint";
 
 export enum IconButtonStyle {
     standard,  // Background filled, arrow cursor, smaller icon
@@ -122,6 +122,38 @@ export component IconButton inherits Rectangle {
                 Data.status-tip = "";
             }
             root.clicked();
+        }
+    }
+}
+
+export component CopyToClipboardIconButton inherits IconButton {
+    in property <string> text-to-copy;
+
+    icon: {
+        if timer.running {
+            @image-url("../../../../font-awesome/svgs/solid/check.svg")
+        } else {
+            @image-url("../../../../font-awesome/svgs/regular/copy.svg")
+        }
+    };
+    icon-scale: (self.style == IconButtonStyle.standard) ? 0.5 : 1;
+    color-enabled: timer.running ? lime : Palette.foreground;
+    color-hovered: timer.running ? lime : white;
+    tooltip: timer.running ? @tr("Copied!") : @tr("Copy to Clipboard");
+    tooltip-delayed: false;
+
+    timer := Timer {
+        interval: 1s;
+        running: false;
+
+        triggered => {
+            self.running = false;
+        }
+    }
+
+    clicked => {
+        if Backend.copy-to-clipboard(text-to-copy) {
+            timer.running = true;
         }
     }
 }

@@ -38,7 +38,6 @@
 #include "cmd/cmdschematicadd.h"
 #include "cmd/cmdschematicedit.h"
 #include "cmd/cmdschematicremove.h"
-#include "orderpcbdialog.h"
 #include "outputjobsdialog/outputjobsdialog.h"
 #include "projectsetupdialog.h"
 #include "schematic/schematiceditor.h"
@@ -294,11 +293,6 @@ void ProjectEditor::trigger(ui::ProjectAction a) noexcept {
       break;
     }
 
-    case ui::ProjectAction::Order: {
-      execOrderPcbDialog(qApp->activeWindow());
-      break;
-    }
-
     case ui::ProjectAction::ExportBom: {
       execBomGeneratorDialog((mProject->getBoards().count() == 1)
                                  ? mProject->getBoardByIndex(0)
@@ -508,25 +502,6 @@ void ProjectEditor::execLppzExportDialog(QWidget* parent) noexcept {
   } catch (const Exception& e) {
     QMessageBox::critical(parent, tr("Error"), e.getMsg());
   }
-}
-
-void ProjectEditor::execOrderPcbDialog(QWidget* parent) noexcept {
-  auto callback = [this]() {
-    if (Application::isFileFormatStable()) {
-      // See explanation in execLppzExportDialog().
-      mProject->save();  // can throw
-    }
-    // Export project to ZIP, but without the output directory since this can
-    // be quite large and does not make sense to upload to the API server.
-    auto filter = [](const QString& filePath) {
-      return !filePath.startsWith("output/");
-    };
-    return mProject->getDirectory().getFileSystem()->exportToZip(
-        filter);  // can throw
-  };
-
-  OrderPcbDialog dialog(mWorkspace.getSettings(), callback, parent);
-  dialog.exec();
 }
 
 std::shared_ptr<SchematicEditor> ProjectEditor::execNewSheetDialog() noexcept {
