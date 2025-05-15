@@ -5,6 +5,7 @@ import { Constants } from "../api.slint";
 
 export component LineEdit inherits Rectangle {
     in-out property <string> text;
+    in property <string> label;
     in property <string> placeholder-text;
     in property <string> validation-error;
     in property <bool> enabled: true;
@@ -103,6 +104,16 @@ export component LineEdit inherits Rectangle {
             y: 0;
             padding-left: placeholder-txt.x;
             padding-right: 3px;
+
+            if !label.is-empty: HorizontalLayout {
+                padding-right: 5px;
+
+                Text {
+                    vertical-alignment: center;
+                    color: Palette.foreground.darker(0.3);
+                    text: label + ":";
+                }
+            }
 
             view := ScrollView {
                 min-width: edt.min-width;

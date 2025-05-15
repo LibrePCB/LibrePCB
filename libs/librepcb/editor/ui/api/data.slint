@@ -8,10 +8,12 @@ import {
     LibraryData,
     LibraryListData,
     NotificationData,
+    LibraryEditorData,
     NotificationType,
     PanelPage,
     ProjectData,
     RuleCheckData,
+    SymbolTabData,
     RuleCheckState,
     RuleCheckType,
     SchematicTabData,
@@ -261,6 +263,14 @@ export global Data {
                         redo: FeatureState.enabled,
                     },
                 },
+                {
+                    type: TabType.symbol,
+                    title: "Symbol",
+                },
+                {
+                    type: TabType.package,
+                    title: "Package",
+                },
             ],
             board-3d-tabs: [
                 {
@@ -271,7 +281,40 @@ export global Data {
                     error: "Some error message here...",
                 }
             ],
-            current-tab-index: 0,
+            symbol-tabs: [
+                { },
+                {
+                    library-index: 0,
+                    name: "Symbol",
+                    description: "Foo Bar\nMultiline\nBlabla",
+                    keywords: ["Foo", "Bar", "Hello World"],
+                    author: "Somebody",
+                    version: "0.1",
+                    deprecated: false,
+                    categories: ["Integrated Circuits -> Timers"],
+                },
+            ],
+            package-tabs: [
+                { },
+                { },
+                {
+                    library-index: 0,
+                    name: "Package",
+                    description: "Foo Bar\nMultiline\nBlabla",
+                    keywords: ["Foo", "Bar", "Hello World"],
+                    author: "Somebody",
+                    version: "0.1",
+                    deprecated: false,
+                    categories: ["Integrated Circuits -> Timers"],
+                    background-color: #000000,
+                    foreground-color: #999999,
+                    overlay-color: Colors.gray,
+                    overlay-text-color: Colors.white,
+                    grid-style: GridStyle.none,
+                    unit: LengthUnit.millimeters,
+                },
+            ],
+            current-tab-index: 2,
         },
     ];
 
@@ -515,6 +558,19 @@ export global Data {
 
     // Filter applied to both local libraries and remote libraries
     in property <string> libraries-filter: "Foo";
+
+    in property <[LibraryEditorData]> library-editors: [
+        {
+            valid: true,
+            path: "/path/to/library-1.lplib",
+            name: "Library 1",
+        },
+        {
+            valid: true,
+            path: "/path/to/library-2.lplib",
+            name: "Library 2",
+        },
+    ];
 
     // All currently opened projects
     in property <[ProjectData]> projects: [

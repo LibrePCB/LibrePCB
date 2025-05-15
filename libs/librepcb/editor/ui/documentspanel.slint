@@ -10,6 +10,7 @@ import {
     BoardAction,
     Constants,
     Data,
+    LibraryEditorData,
     EditorCommandSet as Cmd,
     ProjectAction,
     ProjectData,
@@ -20,6 +21,7 @@ import {
 enum ItemType {
     schematic,
     board,
+    library,
 }
 
 component ProjectListItem inherits Rectangle {
@@ -81,6 +83,17 @@ component ProjectListItem inherits Rectangle {
                 }
             }
 
+            if (ta.has-hover || selected) && (type == ItemType.schematic): delete-schematic-btn := ListViewItemButton {
+                y: (parent.height - self.height) / 2;
+                height: 18px;
+                icon: @image-url("../../../font-awesome/svgs/solid/trash-can.svg");
+                tooltip: Cmd.sheet-remove.text;
+
+                clicked => {
+                    Backend.trigger-schematic(project-index, item-index, SchematicAction.delete);
+                }
+            }
+
             if (ta.has-hover || selected) && (type == ItemType.board): open-3d-btn := ListViewItemButton {
                 y: (parent.height - self.height) / 2;
                 height: 20px;
@@ -114,18 +127,14 @@ component ProjectListItem inherits Rectangle {
                 }
             }
 
-            if ta.has-hover || selected: delete-btn := ListViewItemButton {
+            if (ta.has-hover || selected) && (type == ItemType.board): delete-board-btn := ListViewItemButton {
                 y: (parent.height - self.height) / 2;
                 height: 18px;
                 icon: @image-url("../../../font-awesome/svgs/solid/trash-can.svg");
-                tooltip: (type == ItemType.schematic) ? Cmd.sheet-remove.text : Cmd.board-remove.text;
+                tooltip: Cmd.board-remove.text;
 
                 clicked => {
-                    if type == ItemType.schematic {
-                        Backend.trigger-schematic(project-index, item-index, SchematicAction.delete);
-                    } else {
-                        Backend.trigger-board(project-index, item-index, BoardAction.delete);
-                    }
+                    Backend.trigger-board(project-index, item-index, BoardAction.delete);
                 }
             }
 
@@ -254,6 +263,69 @@ component ProjectSection inherits Rectangle {
     }
 }
 
+component LibrarySection inherits Rectangle {
+    in property <LibraryEditorData> library;
+    in property <int> library-index;
+    in property <length> scrollbar-width;
+
+    VerticalLayout {
+        header-ta := TouchArea {
+            z: 10;  // For the tooltip.
+
+            header := PanelHeader {
+                title: library.name.to-uppercase();
+
+                //if project.unsaved-changes && project.writable: save-badge := Badge {
+                //    y: (parent.height - self.height) / 2;
+                //    text: @tr("save").to-lowercase();
+                //    text-color: #dddd00;
+                //    clickable: true;
+                //
+                //    clicked => {
+                //        Backend.trigger-project(project-index, ProjectAction.save);
+                //    }
+                //}
+
+                close-btn := IconButton {
+                    cmd: Cmd.project-close;  // TODO
+                    icon-scale: 60%;
+
+                    //clicked => {
+                    //    Backend.trigger-project(project-index, ProjectAction.close);
+                    //}
+                }
+
+                // Reserve space for scrollbar.
+                Rectangle {
+                    width: scrollbar-width;
+                }
+            }
+
+            //clicked => {
+            //    Data.set-current-project(project-index);
+            //}
+        }
+
+        library-item := ProjectListItem {
+            project-index: library-index;
+            item-index: -1;
+            type: ItemType.library;
+            text: library.name;
+            icon: @image-url("../../../bootstrap-icons/icons/database.svg");
+            //selected: (Data.current-tab.type == TabType.schematic) && (Data.current-schematic-tab.project-index == project-index) && (Data.current-schematic-tab.schematic-index == index);
+            scrollbar-width: scrollbar-width;
+        }
+    }
+
+    //if project-index == Data.current-project-index: Rectangle {
+    //    x: 0;
+    //    y: 8px;
+    //    width: 1px;
+    //    height: parent.height - self.y - 4px;
+    //    background: #29d682;
+    //}
+}
+
 export component DocumentsPanel inherits Rectangle {
     background: #2a2a2a;
 
@@ -272,6 +344,12 @@ export component DocumentsPanel inherits Rectangle {
                 for project[project-index] in Data.projects: project-item := ProjectSection {
                     project: project;
                     project-index: project-index;
+                    scrollbar-width: scrollbar-width;
+                }
+
+                for library[index] in Data.library-editors: library-item := LibrarySection {
+                    library: library;
+                    library-index: index;
                     scrollbar-width: scrollbar-width;
                 }
             }

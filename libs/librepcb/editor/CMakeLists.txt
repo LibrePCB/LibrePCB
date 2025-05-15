@@ -285,6 +285,8 @@ add_library(
   library/libraryeditor.cpp
   library/libraryeditor.h
   library/libraryeditor.ui
+  library/libraryeditor2.cpp
+  library/libraryeditor2.h
   library/libraryelementcache.cpp
   library/libraryelementcache.h
   library/newelementwizard/newelementwizard.cpp
