@@ -12,6 +12,8 @@ import {
     NotificationType,
     PanelPage,
     ProjectData,
+    ComponentTabData,
+    DeviceTabData,
     RuleCheckData,
     SymbolTabData,
     RuleCheckState,
@@ -271,6 +273,14 @@ export global Data {
                     type: TabType.package,
                     title: "Package",
                 },
+                {
+                    type: TabType.component,
+                    title: "Component",
+                },
+                {
+                    type: TabType.device,
+                    title: "Device",
+                },
             ],
             board-3d-tabs: [
                 {
@@ -314,7 +324,38 @@ export global Data {
                     unit: LengthUnit.millimeters,
                 },
             ],
-            current-tab-index: 2,
+            component-tabs: [
+                { },
+                { },
+                { },
+                {
+                    library-index: 0,
+                    name: "Component",
+                    description: "Foo Bar\nMultiline\nBlabla",
+                    keywords: ["Foo", "Bar", "Hello World"],
+                    author: "Somebody",
+                    version: "0.1",
+                    deprecated: false,
+                    categories: ["Integrated Circuits -> Timers"],
+                },
+            ],
+            device-tabs: [
+                { },
+                { },
+                { },
+                { },
+                {
+                    library-index: 0,
+                    name: "Device",
+                    description: "Foo Bar\nMultiline\nBlabla",
+                    keywords: ["Foo", "Bar", "Hello World"],
+                    author: "Somebody",
+                    version: "0.1",
+                    deprecated: false,
+                    categories: ["Integrated Circuits -> Timers"],
+                },
+            ],
+            current-tab-index: 3,
         },
     ];
 

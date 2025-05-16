@@ -88,6 +88,59 @@ export struct GraphicsLayerData {
     visible: bool,
 }
 
+export struct AttributeData {
+    key: string,
+    //type: AttributeType,
+    value: string,
+    //unit: AttributeUnit,
+}
+
+export struct ResourceData {
+    name: string,
+    mediatype: string,
+    url: string,
+}
+
+export struct ComponentSignalData {
+    name: string,
+    //role: ComponentSignalRole,
+    forced-net-name: string,
+    required: bool,
+}
+
+export struct ComponentPinoutData {
+    pin-name: string,
+    //signal: string,
+}
+
+export struct ComponentGateData {
+    symbol-name: string,
+    symbol-x: Int64,
+    symbol-y: Int64,
+    symbol-rotation: Int64,
+    required: bool,
+    suffix: string,
+    pin-signal-map: [ComponentPinoutData],
+}
+
+export struct ComponentVariantData {
+    name: string,
+    description: string,
+    norm: string,
+    gates: [ComponentGateData],
+}
+
+export struct DevicePartData {
+    mpn: string,
+    manufacturer: string,
+    attributes: [AttributeData],
+}
+
+export struct DevicePinoutData {
+    pad-name: string,
+    //signal: string,
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Widgets data
 ////////////////////////////////////////////////////////////////////////////////
@@ -589,6 +642,43 @@ export struct PackageTabData {
     frame: int,  // Frame index to trigger repainting
 }
 
+// Additional data for component editor tabs
+export struct ComponentTabData {
+    library-index: int,
+    name: string,
+    description: string,
+    keywords: [string],
+    author: string,
+    version: string,
+    deprecated: bool,
+    categories: [string],
+    resources: [ResourceData],
+    schematic-only: bool,
+    prefix: string,
+    default-value: string,
+    attributes: [AttributeData],
+    signals: [ComponentSignalData],
+    variants: [ComponentVariantData],
+}
+
+// Additional data for device editor tabs
+export struct DeviceTabData {
+    library-index: int,
+    name: string,
+    description: string,
+    keywords: [string],
+    author: string,
+    version: string,
+    deprecated: bool,
+    categories: [string],
+    package-name: string,
+    component-name: string,
+    resources: [ResourceData],
+    attributes: [AttributeData],
+    parts: [DevicePartData],
+    pinout: [DevicePinoutData],
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Window sections
 ////////////////////////////////////////////////////////////////////////////////
@@ -609,6 +699,8 @@ export struct WindowSectionData {
     board-3d-tabs: [Board3dTabData],  // Proxy view for `tabs`
     symbol-tabs: [SymbolTabData],  // Proxy view for `tabs`
     package-tabs: [PackageTabData],  // Proxy view for `tabs`
+    component-tabs: [ComponentTabData],  // Proxy view for `tabs`
+    device-tabs: [DeviceTabData],  // Proxy view for `tabs`
     current-tab-index: int,
     highlight: bool,
 }

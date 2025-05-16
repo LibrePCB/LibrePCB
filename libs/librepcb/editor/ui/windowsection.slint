@@ -8,6 +8,8 @@ import { Board2dTab } from "./project/board/board2dtab.slint";
 import { Board3dTab } from "./project/board/board3dtab.slint";
 import { SymbolTab } from "./library/symbol/symboltab.slint";
 import { PackageTab } from "./library/package/packagetab.slint";
+import { ComponentTab } from "./library/component/componenttab.slint";
+import { DeviceTab } from "./library/device/devicetab.slint";
 import {
     Backend,
     Data,
@@ -223,6 +225,20 @@ export component WindowSection inherits Rectangle {
             }
 
             if tab-open && (tab-type == TabType.package): package-tab := PackageTab {
+                width: 100%;
+                height: 100%;
+                section-index: section-index;
+                section: section;
+            }
+
+            if tab-open && (tab-type == TabType.component): component-tab := ComponentTab {
+                width: 100%;
+                height: 100%;
+                section-index: section-index;
+                section: section;
+            }
+
+            if tab-open && (tab-type == TabType.device): device-tab := DeviceTab {
                 width: 100%;
                 height: 100%;
                 section-index: section-index;

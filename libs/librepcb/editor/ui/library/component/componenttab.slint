@@ -1,0 +1,175 @@
+import { TextEdit } from "std-widgets.slint";
+//import { DrawWireToolBar } from "drawwiretoolbar.slint";
+//import { DrawPolygonToolBar } from "drawpolygontoolbar.slint";
+//import { AddTextToolBar } from "addtexttoolbar.slint";
+//import { AddComponentToolBar } from "addcomponenttoolbar.slint";
+import { Tab } from "../../tab.slint";
+import {
+    Button,
+    LinkText,
+    MessageBox,
+    Palette,
+    LineEdit,
+    ComboBox,
+    Switch,
+    SceneButton,
+    ToolButton,
+} from "../../widgets.slint";
+import {
+    Backend,
+    Constants,
+    Data,
+    DismissableMessageAction,
+    EditorCommandSet as Cmd,
+    EditorTool,
+    PanelPage,
+    ComponentTabData,
+    TabAction,
+    WindowSectionData,
+} from "../../api.slint";
+
+component ComponentMetadataBox inherits Rectangle {
+    in property <[ComponentTabData]> tabs;
+    in property <int> index;
+
+    preferred-width: 400px;
+    background: Palette.background;
+    border-radius: 10px;
+
+    GridLayout {
+        padding: 10px;
+        spacing: 8px;
+
+        Row {
+            Text {
+                width: self.preferred-width;
+                vertical-alignment: center;
+                text: @tr("Name:");
+            }
+
+            LineEdit {
+                text: tabs[index].name;
+            }
+        }
+
+        Row {
+            Text {
+                width: self.preferred-width;
+                vertical-alignment: center;
+                text: @tr("Description:");
+            }
+
+            TextEdit {
+                height: 100px;
+                text: tabs[index].description;
+            }
+        }
+
+        Row {
+            Text {
+                width: self.preferred-width;
+                vertical-alignment: center;
+                text: @tr("Keywords:");
+            }
+
+            LineEdit {
+                //text: tabs[index].name;
+            }
+        }
+
+        Row {
+            Text {
+                width: self.preferred-width;
+                vertical-alignment: center;
+                text: @tr("Author:");
+            }
+
+            LineEdit {
+                text: tabs[index].author;
+            }
+        }
+
+        Row {
+            Text {
+                width: self.preferred-width;
+                vertical-alignment: center;
+                text: @tr("Version:");
+            }
+
+            LineEdit {
+                text: tabs[index].version;
+            }
+        }
+
+        Row {
+            Text {
+                width: self.preferred-width;
+                vertical-alignment: center;
+                text: @tr("Deprecated:");
+            }
+
+            Switch {
+                font-size: 10px;
+                text: @tr("Check this if the element should no longer be used.");
+                checked: tabs[index].deprecated;
+            }
+        }
+
+        Row {
+            Text {
+                width: self.preferred-width;
+                vertical-alignment: center;
+                text: @tr("Categories:");
+            }
+
+            TextEdit {
+                height: 60px;
+                //text: tabs[index].name;
+            }
+        }
+
+        Row {
+            Text {
+                width: self.preferred-width;
+                vertical-alignment: center;
+                text: @tr("Assembly:");
+            }
+
+            ComboBox { }
+        }
+    }
+}
+
+export component ComponentTab inherits Tab {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    property <[ComponentTabData]> tabs: section.component-tabs;
+    property <int> index: section.current-tab-index;
+
+    enabled: true;
+
+    metadata-r := ComponentMetadataBox {
+        x: parent.width - self.width - 5px;
+        y: parent.height - self.height - 5px;
+        width: self.preferred-width;
+        height: self.preferred-height;
+        tabs: tabs;
+        index: index;
+    }
+
+    key-pressed(event) => {
+        Data.set-current-tab(section-index, index);
+
+        // If the focus is in the command toolbar, make the Escape key moving
+        // the focus back to the graphics scene without triggering any action.
+        if (event.text == Key.Escape) && (!root.has-focus) {
+            root.focus();
+            return accept;
+        }
+        reject
+    }
+
+    key-released(event) => {
+        Backend.scene-key-event(section-index, event) ? accept : reject
+    }
+}
