@@ -79,7 +79,7 @@ public:
    * @return  The result, either valid with a value, or invalid with an error
    *          message.
    */
-  Result parse(const QString& expression) const noexcept;
+  Result parse(QString expression) const noexcept;
 
   // Operator Overloadings
   MathParser& operator=(const MathParser& rhs) = delete;
