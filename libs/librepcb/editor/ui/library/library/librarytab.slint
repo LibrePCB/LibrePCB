@@ -1,8 +1,4 @@
 import { TextEdit } from "std-widgets.slint";
-//import { DrawWireToolBar } from "drawwiretoolbar.slint";
-//import { DrawPolygonToolBar } from "drawpolygontoolbar.slint";
-//import { AddTextToolBar } from "addtexttoolbar.slint";
-//import { AddComponentToolBar } from "addcomponenttoolbar.slint";
 import { Tab } from "../../tab.slint";
 import {
     Button,
@@ -14,27 +10,28 @@ import {
     SceneButton,
     Switch,
     ToolButton,
+    TreeView,
 } from "../../widgets.slint";
 import {
     Backend,
     Constants,
     Data,
-    DeviceTabData,
     DismissableMessageAction,
     EditorCommandSet as Cmd,
     EditorTool,
+    LibraryTabData,
     PanelPage,
     TabAction,
     WindowSectionData,
 } from "../../api.slint";
 
-component DeviceMetadataBox inherits Rectangle {
-    in property <[DeviceTabData]> tabs;
+component LibraryMetadataBox inherits Rectangle {
+    in property <[LibraryTabData]> tabs;
     in property <int> index;
 
     preferred-width: 400px;
     background: Palette.background;
-    border-radius: 10px;
+    border-bottom-left-radius: 10px;
 
     GridLayout {
         padding: 10px;
@@ -119,7 +116,19 @@ component DeviceMetadataBox inherits Rectangle {
             Text {
                 width: self.preferred-width;
                 vertical-alignment: center;
-                text: @tr("Categories:");
+                text: @tr("URL:");
+            }
+
+            LineEdit {
+                text: tabs[index].url;
+            }
+        }
+
+        Row {
+            Text {
+                width: self.preferred-width;
+                vertical-alignment: center;
+                text: @tr("Dependencies:");
             }
 
             TextEdit {
@@ -132,29 +141,38 @@ component DeviceMetadataBox inherits Rectangle {
             Text {
                 width: self.preferred-width;
                 vertical-alignment: center;
-                text: @tr("Assembly:");
+                text: @tr("Manufacturer:");
             }
 
-            ComboBox { }
+            LineEdit {
+                text: tabs[index].manufacturer;
+            }
+        }
+
+        Row {
+            Rectangle { }
         }
     }
 }
 
-export component DeviceTab inherits Tab {
+export component LibraryTab inherits Tab {
     in property <int> section-index;
     in-out property <WindowSectionData> section;
-    property <[DeviceTabData]> tabs: section.device-tabs;
+    property <[LibraryTabData]> tabs: section.library-tabs;
     property <int> index: section.current-tab-index;
 
     enabled: true;
 
-    metadata-r := DeviceMetadataBox {
-        x: parent.width - self.width - 5px;
-        y: parent.height - self.height - 5px;
-        width: self.preferred-width;
-        height: self.preferred-height;
-        tabs: tabs;
-        index: index;
+    HorizontalLayout {
+        view := TreeView {
+            model: tabs[index].elements;
+        }
+
+        metadata-r := LibraryMetadataBox {
+            width: self.preferred-width;
+            tabs: tabs;
+            index: index;
+        }
     }
 
     key-pressed(event) => {

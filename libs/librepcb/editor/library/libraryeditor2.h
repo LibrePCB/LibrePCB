@@ -26,6 +26,7 @@
 #include "../utils/uiobjectlist.h"
 #include "appwindow.h"
 
+#include <librepcb/core/fileio/filepath.h>
 #include <librepcb/core/utils/signalslot.h>
 
 #include <QtCore>
@@ -36,10 +37,13 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Library;
+class Workspace;
+
 namespace editor {
 
 class GuiApplication;
-class Workspace;
 
 /*******************************************************************************
  *  Class LibraryEditor2
@@ -58,28 +62,46 @@ public:
   // Constructors / Destructor
   LibraryEditor2() = delete;
   LibraryEditor2(const LibraryEditor2& other) = delete;
-  explicit LibraryEditor2(GuiApplication& app,
-                          QObject* parent = nullptr) noexcept;
+  LibraryEditor2(GuiApplication& app, std::unique_ptr<Library> lib, int uiIndex,
+                 QObject* parent = nullptr) noexcept;
   ~LibraryEditor2() noexcept;
 
   // General Methods
   GuiApplication& getApp() noexcept { return mApp; }
   Workspace& getWorkspace() noexcept { return mWorkspace; }
-  // int getUiIndex() const noexcept { return mUiIndex; }
-  // void setUiIndex(int index) noexcept;
-  // ui::ProjectData getUiData() const noexcept;
-  // void setUiData(const ui::ProjectData& data) noexcept;
+  const FilePath& getFilePath() const noexcept;
+  Library& getLibrary() noexcept { return *mLibrary; }
+  int getUiIndex() const noexcept { return mUiIndex; }
+  void setUiIndex(int index) noexcept;
+  ui::LibraryEditorData getUiData() const noexcept;
+  void setUiData(const ui::LibraryEditorData& data) noexcept;
+
+  /**
+   * @brief Request to close the library
+   *
+   * If there are unsaved changes to the library, this method will ask the user
+   * whether the changes should be saved or not. If the user clicks on "cancel"
+   * or the library could not be saved successfully, this method will return
+   * false. If there were no unsaved changes or they were successfully saved,
+   * the method returns true.
+   *
+   * @retval true   Library is safe to be closed.
+   * @retval false  Library still has unsaved changes.
+   */
+  bool requestClose() noexcept;
 
   // Operator Overloadings
   LibraryEditor2& operator=(const LibraryEditor2& rhs) = delete;
 
 signals:
-  // void uiIndexChanged();
+  void uiIndexChanged();
   void statusBarMessageChanged(const QString& message, int timeoutMs);
 
 private:
   GuiApplication& mApp;
   Workspace& mWorkspace;
+  std::unique_ptr<Library> mLibrary;
+  int mUiIndex;
 };
 
 /*******************************************************************************

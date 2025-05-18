@@ -337,6 +337,32 @@ QMultiMap<Version, FilePath> WorkspaceLibraryDb::getAll(
   return elements;
 }
 
+QHash<FilePath, Uuid> WorkspaceLibraryDb::getAll(const QString& elementsTable,
+                                                 const FilePath& lib) const {
+  QSqlQuery query = mDb->prepareQuery(
+      "SELECT %elements.uuid, %elements.filepath FROM %elements "
+      "LEFT JOIN libraries ON %elements.library_id = libraries.id "
+      "WHERE libraries.filepath = :filepath",
+      {
+          {"%elements", elementsTable},
+      });
+  query.bindValue(":filepath", lib.toRelative(mLibrariesPath));
+  mDb->exec(query);
+
+  QHash<FilePath, Uuid> elements;
+  while (query.next()) {
+    const Uuid uuid = Uuid::fromString(query.value(0).toString());  // can throw
+    const FilePath filepath(
+        FilePath::fromRelative(mLibrariesPath, query.value(1).toString()));
+    if (filepath.isValid()) {
+      elements.insert(filepath, uuid);
+    } else {
+      throw LogicError(__FILE__, __LINE__);
+    }
+  }
+  return elements;
+}
+
 FilePath WorkspaceLibraryDb::getLatestVersionFilePath(
     const QMultiMap<Version, FilePath>& list) const noexcept {
   if (list.isEmpty())
@@ -544,6 +570,25 @@ QSet<Uuid> WorkspaceLibraryDb::getByCategory(
         replacements);
   }
   query.bindValue(":limit", limit);
+  mDb->exec(query);
+  return getUuidSet(query);
+}
+
+QSet<Uuid> WorkspaceLibraryDb::getCategoriesOf(const QString& elementsTable,
+                                               const QString& categoryTable,
+                                               const FilePath& elemDir) const {
+  QSqlQuery query;
+  SQLiteDatabase::Replacements replacements = {
+      {"%elements", elementsTable},
+      {"%categories", categoryTable},
+  };
+  query = mDb->prepareQuery(
+      "SELECT category_uuid FROM %elements_cat "
+      "INNER JOIN %elements "
+      "ON %elements_cat.element_id = %elements.id "
+      "WHERE filepath = :filepath",
+      replacements);
+  query.bindValue(":filepath", elemDir.toRelative(mLibrariesPath));
   mDb->exec(query);
   return getUuidSet(query);
 }

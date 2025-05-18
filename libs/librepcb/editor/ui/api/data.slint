@@ -1,24 +1,25 @@
 import {
     Board2dTabData,
     Board3dTabData,
+    ComponentTabData,
+    DeviceTabData,
     EditorTool,
     FeatureState,
     GridStyle,
     LengthUnit,
     LibraryData,
-    LibraryListData,
-    NotificationData,
     LibraryEditorData,
+    LibraryListData,
+    LibraryTabData,
+    NotificationData,
     NotificationType,
     PanelPage,
     ProjectData,
-    ComponentTabData,
-    DeviceTabData,
     RuleCheckData,
-    SymbolTabData,
     RuleCheckState,
     RuleCheckType,
     SchematicTabData,
+    SymbolTabData,
     TabData,
     TabType,
     TreeViewItemData,
@@ -266,6 +267,10 @@ export global Data {
                     },
                 },
                 {
+                    type: TabType.library,
+                    title: "Library",
+                },
+                {
                     type: TabType.symbol,
                     title: "Symbol",
                 },
@@ -291,7 +296,21 @@ export global Data {
                     error: "Some error message here...",
                 }
             ],
+            library-tabs: [
+                { },
+                {
+                    library-index: 0,
+                    name: "Library",
+                    description: "Foo Bar\nMultiline\nBlabla",
+                    keywords: ["Foo", "Bar", "Hello World"],
+                    author: "Somebody",
+                    version: "0.1",
+                    deprecated: false,
+                    dependencies: ["LibrePCB Base"],
+                },
+            ],
             symbol-tabs: [
+                { },
                 { },
                 {
                     library-index: 0,
@@ -305,6 +324,7 @@ export global Data {
                 },
             ],
             package-tabs: [
+                { },
                 { },
                 { },
                 {
@@ -328,6 +348,7 @@ export global Data {
                 { },
                 { },
                 { },
+                { },
                 {
                     library-index: 0,
                     name: "Component",
@@ -344,6 +365,7 @@ export global Data {
                 { },
                 { },
                 { },
+                { },
                 {
                     library-index: 0,
                     name: "Device",
@@ -355,7 +377,7 @@ export global Data {
                     categories: ["Integrated Circuits -> Timers"],
                 },
             ],
-            current-tab-index: 3,
+            current-tab-index: 1,
         },
     ];
 

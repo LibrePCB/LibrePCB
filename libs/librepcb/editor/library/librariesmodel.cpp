@@ -24,7 +24,6 @@
 
 #include "../utils/slinthelpers.h"
 #include "librarydownload.h"
-#include "libraryeditor.h"
 
 #include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/network/apiendpoint.h>
@@ -35,6 +34,7 @@
 #include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
+#include <QtWidgets>
 
 #include <algorithm>
 
@@ -267,16 +267,7 @@ void LibrariesModel::set_row_data(std::size_t i,
     }
 
     case ui::LibraryAction::Open: {
-      try {
-        const FilePath fp(s2q(data.path));
-        const bool readOnly =
-            fp.isLocatedInDir(mWorkspace.getRemoteLibrariesPath());
-        auto editor = new LibraryEditor(mWorkspace, fp, readOnly);
-        editor->show();
-      } catch (const Exception& e) {
-        // TODO: This should be implemented without message box some day...
-        QMessageBox::critical(nullptr, tr("Error"), e.getMsg());
-      }
+      emit openLibraryTriggered(FilePath(s2q(data.path)));
       break;
     }
 

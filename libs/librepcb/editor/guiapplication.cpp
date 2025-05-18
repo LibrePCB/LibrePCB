@@ -26,6 +26,7 @@
 #include "dialogs/filedialog.h"
 #include "library/librariesmodel.h"
 #include "library/libraryeditor.h"
+#include "library/libraryeditor2.h"
 #include "mainwindow.h"
 #include "notification.h"
 #include "notificationsmodel.h"
@@ -43,6 +44,7 @@
 
 #include <librepcb/core/application.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/library/library.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectloader.h>
 #include <librepcb/core/utils/mathparser.h>
@@ -74,7 +76,8 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
     mLocalLibraries(new LibrariesModel(ws, LibrariesModel::Mode::LocalLibs)),
     mRemoteLibraries(new LibrariesModel(ws, LibrariesModel::Mode::RemoteLibs)),
     mLibrariesFilter(new SlintKeyEventTextBuilder()),
-    mProjects(new UiObjectList<ProjectEditor, ui::ProjectData>()) {
+    mProjects(new UiObjectList<ProjectEditor, ui::ProjectData>()),
+    mLibraries(new UiObjectList<LibraryEditor2, ui::LibraryEditorData>()) {
   // Open windows.
   QSettings cs;
   for (const QString& idStr : cs.value("global/windows").toStringList()) {
@@ -193,6 +196,10 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
   // Setup library models & filter.
   connect(mRemoteLibraries.get(), &LibrariesModel::onlineVersionsAvailable,
           mLocalLibraries.get(), &LibrariesModel::setOnlineVersions);
+  connect(mLocalLibraries.get(), &LibrariesModel::openLibraryTriggered, this,
+          &GuiApplication::openLibrary);
+  connect(mRemoteLibraries.get(), &LibrariesModel::openLibraryTriggered, this,
+          &GuiApplication::openLibrary);
 
   // Check if standard components are installed.
   connect(&mWorkspace.getLibraryDb(), &WorkspaceLibraryDb::scanFinished, this,
@@ -227,7 +234,6 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
 
 GuiApplication::~GuiApplication() noexcept {
   mProjectLibraryUpdater.reset();
-  closeAllLibraryEditors(false);
 }
 
 /*******************************************************************************
@@ -281,6 +287,7 @@ void GuiApplication::createNewWindow(int id, int projectIndex) noexcept {
   d.set_remote_libraries(sortedLibs(filteredLibs(mRemoteLibraries)));
   d.set_projects(mProjects);
   d.fn_set_current_project(projectIndex);
+  d.set_library_editors(mLibraries);
 
   // Register global callbacks.
   const ui::Backend& b = win->global<ui::Backend>();
@@ -382,7 +389,7 @@ bool GuiApplication::requestClosingWindow() noexcept {
   // closing the whole application, so we don't want to save this state.
   mSaveOpenedWindowsCountdown.stop();
 
-  return closeAllLibraryEditors(true) && requestClosingAllProjects();
+  return requestClosingAllProjects() && requestClosingAllLibraries();
 }
 
 /*******************************************************************************
@@ -437,6 +444,17 @@ void GuiApplication::addExampleProjects(QWidget* parent) noexcept {
     InitializeWorkspaceWizardContext ctx(parent);
     ctx.setWorkspacePath(mWorkspace.getPath());
     ctx.installExampleProjects();
+  }
+}
+
+/*******************************************************************************
+ *  Libraries
+ ******************************************************************************/
+
+void GuiApplication::closeLibrary(int index) noexcept {
+  mLibraries->remove(index);
+  for (int i = index; i < mLibraries->count(); ++i) {
+    mLibraries->at(i)->setUiIndex(i);
   }
 }
 
@@ -510,8 +528,7 @@ std::shared_ptr<ProjectEditor> GuiApplication::openProject(
     QMessageBox::StandardButton btn = QMessageBox::question(
         parent, tr("Restore autosave backup?"),
         tr("It seems that the application crashed the last time you opened "
-           "this "
-           "project. Do you want to restore the last autosave backup?"),
+           "this project. Do you want to restore the last autosave backup?"),
         QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
         QMessageBox::Cancel);
     switch (btn) {
@@ -597,7 +614,7 @@ void GuiApplication::quit(QPointer<QWidget> parent) noexcept {
   QMetaObject::invokeMethod(
       this,
       [this, parent]() {
-        if (closeAllLibraryEditors(true) && requestClosingAllProjects()) {
+        if (requestClosingAllProjects() && requestClosingAllLibraries()) {
           mWindows.clear();
           slint::quit_event_loop();
         }
@@ -682,55 +699,77 @@ void GuiApplication::openProjectLibraryUpdater(
   mProjectLibraryUpdater->show();
 }
 
-void GuiApplication::openLibraryEditor(const FilePath& libDir) noexcept {
-  LibraryEditor* editor = mOpenLibraryEditors.value(libDir);
-  if (!editor) {
-    try {
-      bool remote = libDir.isLocatedInDir(mWorkspace.getRemoteLibrariesPath());
-      editor = new LibraryEditor(mWorkspace, libDir, remote);
-      connect(editor, &LibraryEditor::aboutLibrePcbRequested, this, [this]() {
-        if (auto win = mWindows.value(0)) {
-          win->showPanelPage(ui::PanelPage::About);
-          win->makeCurrentWindow();
-        }
-      });
-      connect(editor, &LibraryEditor::destroyed, this,
-              &GuiApplication::libraryEditorDestroyed);
-      mOpenLibraryEditors.insert(libDir, editor);
-    } catch (const UserCanceled& e) {
-      // User requested to abort -> do nothing.
-    } catch (const Exception& e) {
-      QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+std::shared_ptr<LibraryEditor2> GuiApplication::openLibrary(
+    const FilePath& libDir) noexcept {
+  auto switchToLibrary = [this](int index) {
+    for (auto win : mWindows) {
+      // win->setCurrentProject(index);
+      win->showPanelPage(ui::PanelPage::Documents);
+    }
+  };
+
+  for (int i = 0; i < mLibraries->count(); ++i) {
+    if (mLibraries->at(i)->getFilePath() == libDir) {
+      switchToLibrary(i);
+      return mLibraries->at(i);
     }
   }
-  if (editor) {
-    editor->show();
-    editor->raise();
-    editor->activateWindow();
+
+  auto askForRestoringBackup = [](const FilePath&) {
+    QMessageBox::StandardButton btn = QMessageBox::question(
+        qApp->activeWindow(), tr("Restore autosave backup?"),
+        tr("It seems that the application crashed the last time you opened "
+           "this "
+           "library element. Do you want to restore the last autosave backup?"),
+        QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+        QMessageBox::Cancel);
+    switch (btn) {
+      case QMessageBox::Yes:
+        return true;
+      case QMessageBox::No:
+        return false;
+      default:
+        throw UserCanceled(__FILE__, __LINE__);
+    }
+  };
+
+  try {
+    // Open file system.
+    const bool readOnly =
+        libDir.isLocatedInDir(mWorkspace.getRemoteLibrariesPath());
+    auto fs = TransactionalFileSystem::open(
+        libDir, !readOnly, askForRestoringBackup,
+        DirectoryLockHandlerDialog::createDirectoryLockCallback());  // can
+                                                                     // throw
+
+    // Open library.
+    auto lib = Library::open(std::unique_ptr<TransactionalDirectory>(
+        new TransactionalDirectory(fs)));  // can throw
+
+    // Keep handle.
+    const int index = mLibraries->count();
+    auto editor =
+        std::make_shared<LibraryEditor2>(*this, std::move(lib), index);
+    mLibraries->insert(index, editor);
+    switchToLibrary(index);
+    return editor;
+  } catch (const Exception& e) {
+    QMessageBox::critical(qApp->activeWindow(), tr("Failed to open library"),
+                          e.getMsg());
   }
+
+  return nullptr;
 }
 
-void GuiApplication::libraryEditorDestroyed() noexcept {
-  // Note: Actually we should dynamic_cast the QObject* to LibraryEditor*, but
-  // as this slot is called in the destructor of QObject (base class of
-  // LibraryEditor), the dynamic_cast does no longer work at this point, so a
-  // static_cast is used instead ;)
-  LibraryEditor* editor = static_cast<LibraryEditor*>(QObject::sender());
-  Q_ASSERT(editor);
-  FilePath library = mOpenLibraryEditors.key(editor);
-  Q_ASSERT(library.isValid());
-  mOpenLibraryEditors.remove(library);
-}
-
-bool GuiApplication::closeAllLibraryEditors(bool askForSave) noexcept {
+bool GuiApplication::requestClosingAllLibraries() noexcept {
   bool success = true;
-  foreach (LibraryEditor* editor, mOpenLibraryEditors) {
-    if (editor->closeAndDestroy(askForSave)) {
-      delete editor;  // this calls the slot "libraryEditorDestroyed()"
-    } else {
-      success = false;
-    }
-  }
+  // foreach (LibraryEditor* editor, mOpenLibraryEditors) {
+  //   if (editor->closeAndDestroy(askForSave)) {
+  //     delete editor;  // this calls the slot "libraryEditorDestroyed()"
+  //   } else {
+  //     success = false;
+  //   }
+  // }
   return success;
 }
 

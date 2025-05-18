@@ -272,12 +272,16 @@ add_library(
   library/kicadlibraryimportwizard/kicadlibraryimportwizardpage_start.cpp
   library/kicadlibraryimportwizard/kicadlibraryimportwizardpage_start.h
   library/kicadlibraryimportwizard/kicadlibraryimportwizardpage_start.ui
+  library/lib/libraryelementsmodel.cpp
+  library/lib/libraryelementsmodel.h
   library/lib/librarylisteditorwidget.cpp
   library/lib/librarylisteditorwidget.h
   library/lib/librarylisteditorwidget.ui
   library/lib/libraryoverviewwidget.cpp
   library/lib/libraryoverviewwidget.h
   library/lib/libraryoverviewwidget.ui
+  library/lib/librarytab.cpp
+  library/lib/librarytab.h
   library/librariesmodel.cpp
   library/librariesmodel.h
   library/librarydownload.cpp

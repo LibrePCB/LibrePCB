@@ -83,6 +83,7 @@ public:
   LibrariesModel& operator=(const LibrariesModel& rhs) = delete;
 
 signals:
+  void openLibraryTriggered(const FilePath& fp);
   void uiDataChanged(ui::LibraryListData data);
   void onlineVersionsAvailable(const QHash<Uuid, Version>& versions);
 

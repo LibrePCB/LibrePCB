@@ -93,6 +93,20 @@ public:
   }
 
   template <typename T>
+  bool switchToLibraryTab(int libIndex) noexcept {
+    for (int i = 0; i < mTabs->count(); ++i) {
+      if (auto tab = std::dynamic_pointer_cast<T>(mTabs->at(i))) {
+        if (tab->getLibraryIndex() == libIndex) {
+          setCurrentTab(i);
+          highlight();
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  template <typename T>
   bool switchToProjectTab(int prjIndex, int objIndex) noexcept {
     for (int i = 0; i < mTabs->count(); ++i) {
       if (auto tab = std::dynamic_pointer_cast<T>(mTabs->at(i))) {

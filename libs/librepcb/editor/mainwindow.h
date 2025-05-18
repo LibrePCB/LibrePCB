@@ -81,6 +81,7 @@ private:
   void trigger(ui::Action a) noexcept;
   void triggerSection(int section, ui::WindowSectionAction a) noexcept;
   void triggerTab(int section, int tab, ui::TabAction a) noexcept;
+  void triggerLibrary(int index, ui::LibraryEditorAction a) noexcept;
   void triggerProject(int index, ui::ProjectAction a) noexcept;
   void triggerSchematic(int project, int schematic,
                         ui::SchematicAction a) noexcept;
@@ -93,6 +94,8 @@ private:
   void addTab(std::shared_ptr<WindowTab> tab) noexcept;
   template <typename T>
   bool switchToTab() noexcept;
+  template <typename T>
+  bool switchToLibraryTab(int libIndex) noexcept;
   template <typename T>
   bool switchToProjectTab(int prjIndex, int objIndex) noexcept;
 

@@ -10,8 +10,9 @@ import {
     BoardAction,
     Constants,
     Data,
-    LibraryEditorData,
     EditorCommandSet as Cmd,
+    LibraryEditorAction,
+    LibraryEditorData,
     ProjectAction,
     ProjectData,
     SchematicAction,
@@ -147,8 +148,10 @@ component ProjectListItem inherits Rectangle {
         clicked => {
             if type == ItemType.schematic {
                 Backend.trigger-schematic(project-index, item-index, SchematicAction.open);
-            } else {
+            } else if type == ItemType.board {
                 Backend.trigger-board(project-index, item-index, BoardAction.open-2d);
+            } else if type == ItemType.library {
+                Backend.trigger-library(project-index, LibraryEditorAction.open);
             }
         }
     }
@@ -290,9 +293,9 @@ component LibrarySection inherits Rectangle {
                     cmd: Cmd.project-close;  // TODO
                     icon-scale: 60%;
 
-                    //clicked => {
-                    //    Backend.trigger-project(project-index, ProjectAction.close);
-                    //}
+                    clicked => {
+                        Backend.trigger-library(library-index, LibraryEditorAction.close);
+                    }
                 }
 
                 // Reserve space for scrollbar.

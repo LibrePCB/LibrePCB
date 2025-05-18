@@ -26,7 +26,9 @@
 #include "guiapplication.h"
 #include "library/createlibrarytab.h"
 #include "library/downloadlibrarytab.h"
+#include "library/lib/librarytab.h"
 #include "library/librariesmodel.h"
+#include "library/libraryeditor2.h"
 #include "mainwindowtestadapter.h"
 #include "notificationsmodel.h"
 #include "project/board/board2dtab.h"
@@ -141,6 +143,12 @@ MainWindow::MainWindow(GuiApplication& app,
     // if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0): Remove lambda.
     QMetaObject::invokeMethod(
         this, [this, section, tab, a]() { triggerTab(section, tab, a); },
+        Qt::QueuedConnection);
+  });
+  b.on_trigger_library([this](int index, ui::LibraryEditorAction a) {
+    // if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0): Remove lambda.
+    QMetaObject::invokeMethod(
+        this, [this, index, a]() { triggerLibrary(index, a); },
         Qt::QueuedConnection);
   });
   b.on_trigger_project([this](int index, ui::ProjectAction a) {
@@ -442,6 +450,30 @@ void MainWindow::triggerTab(int section, int tab, ui::TabAction a) noexcept {
   }
 }
 
+void MainWindow::triggerLibrary(int index, ui::LibraryEditorAction a) noexcept {
+  std::shared_ptr<LibraryEditor2> editor = mApp.getLibraries().value(index);
+  if (!editor) return;
+
+  switch (a) {
+    case ui::LibraryEditorAction::Open: {
+      if (!switchToLibraryTab<LibraryTab>(index)) {
+        addTab(std::make_shared<LibraryTab>(mApp, *editor));
+      }
+      break;
+    }
+    case ui::LibraryEditorAction::Close: {
+      if (editor->requestClose()) {
+        mApp.closeLibrary(index);
+      }
+      break;
+    }
+    default: {
+      // editor->trigger(a);
+      break;
+    }
+  }
+}
+
 void MainWindow::triggerProject(int index, ui::ProjectAction a) noexcept {
   std::shared_ptr<ProjectEditor> editor = mApp.getProjects().value(index);
   if (!editor) return;
@@ -654,6 +686,16 @@ template <typename T>
 bool MainWindow::switchToTab() noexcept {
   for (auto section : *mSections) {
     if (section->switchToTab<T>()) {
+      return true;
+    }
+  }
+  return false;
+}
+
+template <typename T>
+bool MainWindow::switchToLibraryTab(int libIndex) noexcept {
+  for (auto section : *mSections) {
+    if (section->switchToLibraryTab<T>(libIndex)) {
       return true;
     }
   }
