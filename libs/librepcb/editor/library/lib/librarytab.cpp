@@ -86,11 +86,14 @@ ui::LibraryTabData LibraryTab::getDerivedUiData() const noexcept {
       nullptr,  // Dependencies
       q2s(*mLibrary.getManufacturer()),  // Manufacturer
       mElementsModel,  // Elements
+          mIndex,
   };
 }
 
 void LibraryTab::setDerivedUiData(const ui::LibraryTabData& data) noexcept {
   Q_UNUSED(data);
+  mIndex = data.step_index;
+  onDerivedUiDataChanged.notify();
 }
 
 void LibraryTab::trigger(ui::TabAction a) noexcept {

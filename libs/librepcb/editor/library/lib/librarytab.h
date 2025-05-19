@@ -79,6 +79,7 @@ private:
   LibraryEditor2& mEditor;
   Library& mLibrary;
   std::shared_ptr<LibraryElementsModel> mElementsModel;
+  int mIndex = 1;
 };
 
 /*******************************************************************************

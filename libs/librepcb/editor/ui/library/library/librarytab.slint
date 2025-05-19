@@ -8,6 +8,7 @@ import {
     MessageBox,
     Palette,
     SceneButton,
+    PanelHeader,
     Switch,
     ToolButton,
     TreeView,
@@ -17,6 +18,7 @@ import {
     Constants,
     Data,
     DismissableMessageAction,
+    TreeViewItemData,
     EditorCommandSet as Cmd,
     EditorTool,
     LibraryTabData,
@@ -155,6 +157,19 @@ component LibraryMetadataBox inherits Rectangle {
     }
 }
 
+component LibraryTreeView inherits VerticalLayout {
+    in property <string> title;
+    in-out property <[TreeViewItemData]> model;
+
+    PanelHeader {
+        title: title;
+    }
+
+    TreeView {
+        model: model;
+    }
+}
+
 export component LibraryTab inherits Tab {
     in property <int> section-index;
     in-out property <WindowSectionData> section;
@@ -163,15 +178,68 @@ export component LibraryTab inherits Tab {
 
     enabled: true;
 
-    HorizontalLayout {
-        view := TreeView {
-            model: tabs[index].elements;
+    VerticalLayout {
+        Rectangle {
+            background: black;
+
+            HorizontalLayout {
+                padding: 8px;
+                spacing: 15px;
+                alignment: start;
+
+                LinkText {
+                    text: @tr("Metadata");
+
+                    clicked => {
+                        tabs[index].step-index = 0;
+                    }
+                }
+
+                Text {
+                    text: ">";
+                }
+
+                LinkText {
+                    text: @tr("Content");
+
+                    clicked => {
+                        tabs[index].step-index = 1;
+                    }
+                }
+            }
         }
 
-        metadata-r := LibraryMetadataBox {
-            width: self.preferred-width;
+        if tabs[index].step-index == 0: metadata-r := LibraryMetadataBox {
             tabs: tabs;
             index: index;
+        }
+
+        if tabs[index].step-index == 1: HorizontalLayout {
+            VerticalLayout {
+                horizontal-stretch: 1;
+
+                LibraryTreeView {
+                    title: @tr("Component Categories");
+                    model: tabs[index].elements;
+                }
+
+                LibraryTreeView {
+                    title: @tr("Package Categories");
+                    model: tabs[index].elements;
+                }
+            }
+
+            Rectangle {
+                width: 1px;
+                background: #555555;
+            }
+
+            LibraryTreeView {
+                horizontal-stretch: 2;
+
+                title: @tr("Elements");
+                model: tabs[index].elements;
+            }
         }
     }
 
