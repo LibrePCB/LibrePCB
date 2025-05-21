@@ -107,7 +107,7 @@ void LibraryElementsModel::setSelectedCategory(
               0,  // Level
               slint::Image(),  // Icon
               q2s(category),  // Text
-                                      slint::SharedString(), // Comment
+              slint::SharedString(),  // Comment
               slint::SharedString(),  // Hint
               slint::SharedString(),  // User data
               false,  // Is project file or folder
@@ -123,7 +123,7 @@ void LibraryElementsModel::setSelectedCategory(
             1,  // Level
             q2s(icon.pixmap(32)),  // Icon
             q2s(child->text),  // Text
-                                    slint::SharedString(), // Comment
+            slint::SharedString(),  // Comment
             q2s(child->tooltip),  // Hint
             child->uuid ? q2s(child->uuid->toStr())
                         : slint::SharedString(),  // User data
@@ -277,11 +277,11 @@ void LibraryElementsModel::addChildsToModel(TreeItem& item,
       item.childs,
       [](const QCollator& cmp, const std::shared_ptr<TreeItem>& lhs,
          const std::shared_ptr<TreeItem>& rhs) {
-    if (lhs->type != rhs->type) {
-     return static_cast<int>(lhs->type) < static_cast<int>(rhs->type);
-    } else {
-        return cmp(lhs->text, rhs->text);
-    }
+        if (lhs->type != rhs->type) {
+          return static_cast<int>(lhs->type) < static_cast<int>(rhs->type);
+        } else {
+          return cmp(lhs->text, rhs->text);
+        }
       },
       Qt::CaseInsensitive, false);
 
@@ -308,15 +308,18 @@ void LibraryElementsModel::addChildsToModel(TreeItem& item,
         break;
       }
     }
-    const int elementsCount = std::count_if(child->childs.begin(), child->childs.end(), [](const std::shared_ptr<TreeItem>& item){
-      return item->type != TreeItemType::ComponentCategory;
-    });
+    const int elementsCount =
+        std::count_if(child->childs.begin(), child->childs.end(),
+                      [](const std::shared_ptr<TreeItem>& item) {
+                        return item->type != TreeItemType::ComponentCategory;
+                      });
     if (child->type == TreeItemType::ComponentCategory) {
       mItems.push_back(ui::TreeViewItemData{
           level,  // Level
-          slint::Image(),//q2s(icon.pixmap(32)),  // Icon
+          slint::Image(),  // q2s(icon.pixmap(32)),  // Icon
           q2s(child->text),  // Text
-          (elementsCount > 0) ? q2s(QString::number(elementsCount)) : slint::SharedString(), // Comment
+          (elementsCount > 0) ? q2s(QString::number(elementsCount))
+                              : slint::SharedString(),  // Comment
           q2s(child->tooltip),  // Hint
           child->uuid ? q2s(child->uuid->toStr())
                       : slint::SharedString(),  // User data

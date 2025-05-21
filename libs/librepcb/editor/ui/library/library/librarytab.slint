@@ -248,13 +248,25 @@ export component LibraryTab inherits Tab {
         }
 
         if !tabbed:*/ HorizontalLayout {
-            LibraryTreeView {
+            VerticalLayout {
                 horizontal-stretch: 20;
-                title: @tr("Categories");
-                model: tabs[index].categories;
 
-                item-selected(idx, item) => {
-                    tabs[index].selected-category-uuid = item.user-data;
+                LibraryTreeView {
+                    title: @tr("Component Categories");
+                    model: tabs[index].categories;
+
+                    item-selected(idx, item) => {
+                        tabs[index].selected-category-uuid = item.user-data;
+                    }
+                }
+
+                LibraryTreeView {
+                    title: @tr("Package Categories");
+                    model: tabs[index].categories;
+
+                    item-selected(idx, item) => {
+                        tabs[index].selected-category-uuid = item.user-data;
+                    }
                 }
             }
 
@@ -263,10 +275,17 @@ export component LibraryTab inherits Tab {
                 background: #555555;
             }
 
-            LibraryTreeView {
+            /*LibraryTreeView {
                 horizontal-stretch: 30;
                 title: @tr("Elements");
                 model: tabs[index].elements;
+            }*/
+
+            TreeView {
+                horizontal-stretch: 30;
+                model: tabs[index].elements;
+                show-tree: true;
+                supports-expand: false;
             }
 
             Rectangle {
