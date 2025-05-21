@@ -73,6 +73,7 @@ ui::TabData LibraryTab::getUiData() const noexcept {
 }
 
 ui::LibraryTabData LibraryTab::getDerivedUiData() const noexcept {
+  const auto cat = mElementsModel->getSelectedCategory();
   return ui::LibraryTabData{
       mEditor.getUiIndex(),  // Library index
       q2s(mLibrary.getIconAsPixmap()),  // Icon
@@ -85,14 +86,18 @@ ui::LibraryTabData LibraryTab::getDerivedUiData() const noexcept {
       q2s(mLibrary.getUrl().toString()),  // URL
       nullptr,  // Dependencies
       q2s(*mLibrary.getManufacturer()),  // Manufacturer
-      mElementsModel,  // Elements
-          mIndex,
+      mElementsModel,  // Categories
+      cat ? q2s(cat->toStr()) : slint::SharedString(),  // Selected category
+      mElementsModel->getElementsModel(),  // Elements
+      mIndex,
   };
 }
 
 void LibraryTab::setDerivedUiData(const ui::LibraryTabData& data) noexcept {
   Q_UNUSED(data);
   mIndex = data.step_index;
+  mElementsModel->setSelectedCategory(
+      Uuid::tryFromString(s2q(data.selected_category_uuid)));
   onDerivedUiDataChanged.notify();
 }
 

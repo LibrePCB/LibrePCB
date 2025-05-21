@@ -53,11 +53,90 @@ LibraryElementsModel::LibraryElementsModel(const Workspace& ws,
                        std::nullopt,
                        {},
                        {},
-                       {}}) {
+                       {}}),
+    mElementsModel(new slint::VectorModel<ui::TreeViewItemData>()) {
   refresh();
 }
 
 LibraryElementsModel::~LibraryElementsModel() noexcept {
+}
+
+/*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+void LibraryElementsModel::setSelectedCategory(
+    const std::optional<Uuid>& uuid) noexcept {
+  if (uuid == mSelectedCategory) return;
+
+  mSelectedCategory = uuid;
+  mElementsModel->clear();
+  if (!uuid) return;
+  std::optional<TreeItemType> prevType;
+  if (auto item = mCategories.value(*uuid)) {
+    for (auto child : item->childs) {
+      if (child->type != TreeItemType::ComponentCategory) {
+        QIcon icon;
+        QString category;
+        switch (child->type) {
+          case TreeItemType::ComponentCategory: {
+            icon = QIcon(":/img/places/folder.png");
+            break;
+          }
+          case TreeItemType::Symbol: {
+            icon = QIcon(":/img/library/symbol.png");
+            category = "Symbols";
+            break;
+          }
+          case TreeItemType::Component: {
+            icon = QIcon(":/img/library/component.png");
+            category = "Components";
+            break;
+          }
+          case TreeItemType::Device: {
+            icon = QIcon(":/img/library/device.png");
+            category = "Devices";
+            break;
+          }
+          default: {
+            break;
+          }
+        }
+        if (child->type != prevType) {
+          mElementsModel->push_back(ui::TreeViewItemData{
+              0,  // Level
+              slint::Image(),  // Icon
+              q2s(category),  // Text
+                                      slint::SharedString(), // Comment
+              slint::SharedString(),  // Hint
+              slint::SharedString(),  // User data
+              false,  // Is project file or folder
+              false,  // Has children
+              false,  // Expanded
+              false,  // Supports pinning
+              false,  // Pinned
+              ui::TreeViewItemAction::None,  // Action
+          });
+          prevType = child->type;
+        }
+        mElementsModel->push_back(ui::TreeViewItemData{
+            1,  // Level
+            q2s(icon.pixmap(32)),  // Icon
+            q2s(child->text),  // Text
+                                    slint::SharedString(), // Comment
+            q2s(child->tooltip),  // Hint
+            child->uuid ? q2s(child->uuid->toStr())
+                        : slint::SharedString(),  // User data
+            false,  // Is project file or folder
+            false,  // Has children
+            false,  // Expanded
+            false,  // Supports pinning
+            false,  // Pinned
+            ui::TreeViewItemAction::None,  // Action
+        });
+      }
+    }
+  }
 }
 
 /*******************************************************************************
@@ -171,16 +250,16 @@ std::shared_ptr<LibraryElementsModel::TreeItem>
 template <typename ElementType, typename CategoryType>
 void LibraryElementsModel::loadElements(TreeItemType type) {
   try {
-    const QSet<FilePath> elements = Toolbox::toSet(
-        mDb.getAll<ElementType>(mLibPath).keys());
+    const QSet<FilePath> elements =
+        Toolbox::toSet(mDb.getAll<ElementType>(mLibPath).keys());
     for (const FilePath& fp : elements) {
       for (const Uuid& catUuid : mDb.getCategoriesOf<ElementType>(fp)) {
         if (auto cat = getOrCreateCategory<CategoryType>(catUuid)) {
           auto item = std::make_shared<TreeItem>();
           item->type = type;
-          //item->uuid = uuid;
+          // item->uuid = uuid;
           mDb.getTranslations<ElementType>(fp, mLocaleOrder, &item->text,
-                                            &item->tooltip);
+                                           &item->tooltip);
           cat->childs.push_back(item);
           item->parent = cat;
         }
@@ -193,14 +272,18 @@ void LibraryElementsModel::loadElements(TreeItemType type) {
 
 void LibraryElementsModel::addChildsToModel(TreeItem& item,
                                             int level) noexcept {
-  // Sort items by text.
+  // Sort items.
   Toolbox::sortNumeric(
-     item.childs,
-     [](const QCollator& cmp, const std::shared_ptr<TreeItem>& lhs,
-        const std::shared_ptr<TreeItem>& rhs) {
-       return cmp(lhs->text, rhs->text);
-     },
-     Qt::CaseInsensitive, false);
+      item.childs,
+      [](const QCollator& cmp, const std::shared_ptr<TreeItem>& lhs,
+         const std::shared_ptr<TreeItem>& rhs) {
+    if (lhs->type != rhs->type) {
+     return static_cast<int>(lhs->type) < static_cast<int>(rhs->type);
+    } else {
+        return cmp(lhs->text, rhs->text);
+    }
+      },
+      Qt::CaseInsensitive, false);
 
   for (auto child : item.childs) {
     QIcon icon;
@@ -225,19 +308,26 @@ void LibraryElementsModel::addChildsToModel(TreeItem& item,
         break;
       }
     }
-    mItems.push_back(ui::TreeViewItemData{
-        level,  // Level
-        q2s(icon.pixmap(32)),  // Icon
-        q2s(child->text),  // Text
-        q2s(child->tooltip),  // Hint
-        slint::SharedString(),  // User data
-        false,  // Is project file or folder
-        !child->childs.isEmpty(),  // Has children
-        true,  // Expanded
-        false,  // Supports pinning
-        false,  // Pinned
-        ui::TreeViewItemAction::None,  // Action
+    const int elementsCount = std::count_if(child->childs.begin(), child->childs.end(), [](const std::shared_ptr<TreeItem>& item){
+      return item->type != TreeItemType::ComponentCategory;
     });
+    if (child->type == TreeItemType::ComponentCategory) {
+      mItems.push_back(ui::TreeViewItemData{
+          level,  // Level
+          slint::Image(),//q2s(icon.pixmap(32)),  // Icon
+          q2s(child->text),  // Text
+          (elementsCount > 0) ? q2s(QString::number(elementsCount)) : slint::SharedString(), // Comment
+          q2s(child->tooltip),  // Hint
+          child->uuid ? q2s(child->uuid->toStr())
+                      : slint::SharedString(),  // User data
+          false,  // Is project file or folder
+          false,  // Has children
+          false,  // Expanded
+          false,  // Supports pinning
+          false,  // Pinned
+          ui::TreeViewItemAction::None,  // Action
+      });
+    }
     addChildsToModel(*child, level + 1);
   }
 }

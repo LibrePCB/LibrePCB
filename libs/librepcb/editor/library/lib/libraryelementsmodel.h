@@ -77,6 +77,16 @@ public:
                                 QObject* parent = nullptr) noexcept;
   virtual ~LibraryElementsModel() noexcept;
 
+  // General Methods
+  std::shared_ptr<slint::Model<ui::TreeViewItemData>> getElementsModel()
+      const noexcept {
+    return mElementsModel;
+  }
+  const std::optional<Uuid>& getSelectedCategory() const noexcept {
+    return mSelectedCategory;
+  }
+  void setSelectedCategory(const std::optional<Uuid>& uuid) noexcept;
+
   // Implementations
   std::size_t row_count() const override;
   std::optional<ui::TreeViewItemData> row_data(std::size_t i) const override;
@@ -108,6 +118,9 @@ private:
   QHash<FilePath, Uuid> mLibCategories;
   QHash<Uuid, std::shared_ptr<TreeItem>> mCategories;
   std::vector<ui::TreeViewItemData> mItems;
+
+  std::optional<Uuid> mSelectedCategory;
+  std::shared_ptr<slint::VectorModel<ui::TreeViewItemData>> mElementsModel;
 };
 
 /*******************************************************************************

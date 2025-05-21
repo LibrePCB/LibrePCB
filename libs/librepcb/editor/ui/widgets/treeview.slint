@@ -11,6 +11,7 @@ import {
 
 export component TreeView inherits Rectangle {
     in-out property <[TreeViewItemData]> model;
+    in property <bool> show-tree: false;
     in property <bool> supports-expand: true;
     out property <bool> has-focus <=> fs.has-focus;
     property <length> item-height: 22px;
@@ -105,13 +106,13 @@ export component TreeView inherits Rectangle {
 
                 HorizontalLayout {
                     spacing: 5px;
-                    padding-left: 5px;
+                    padding-left: supports-expand ? 5px : 0;
                     padding-right: 5px + scrollbar-width;
 
-                    if supports-expand: expand-ta := TouchArea {
+                    if !show-tree: expand-ta := TouchArea {
                         mouse-cursor: pointer;
-                        enabled: item.has-children;
-                        width: item.level * 10px + item-height / 2 + 2px;
+                        enabled: supports-expand && item.has-children;
+                        width: item.level * 10px + (supports-expand ? (item-height / 2 + 2px) : 0);
 
                         Image {
                             y: 4px;
@@ -133,7 +134,28 @@ export component TreeView inherits Rectangle {
                         }
                     }
 
-                    Image {
+                    if show-tree: HorizontalLayout {
+                        for i in (item.level + 1): Rectangle {
+                            width: (i > 0) ? 15px : 8px;
+
+                            if i > 0: Rectangle {
+                                x: parent.width - 8px;
+                                y: 0;
+                                width: 1px;
+                                height: ((i < item.level) || (((index + 1) < model.length) && (model[index + 1].level >= item.level))) ? parent.height : (parent.height / 2);
+                                background: #707070;
+                            }
+
+                            if i == item.level: Rectangle {
+                                x: parent.width - 8px;
+                                width: parent.width - self.x;
+                                height: 1px;
+                                background: #707070;
+                            }
+                        }
+                    }
+
+                    if item.icon.width > 0: Image {
                         y: (parent.height - self.height) / 2;
                         width: icon-size;
                         height: icon-size;
@@ -149,6 +171,17 @@ export component TreeView inherits Rectangle {
                         font-weight: 400;
                         overflow: TextOverflow.elide;
                         text: item.text;
+                        accessible-role: none;
+                    }
+
+                    if !item.comment.is-empty: item-comment-txt := Text {
+                        horizontal-stretch: 0;
+                        color: is-enabled ? #c0c0c0 : #909090;
+                        font-size: 11px;
+                        font-weight: 300;
+                        vertical-alignment: center;
+                        overflow: TextOverflow.elide;
+                        text: item.comment;
                         accessible-role: none;
                     }
 

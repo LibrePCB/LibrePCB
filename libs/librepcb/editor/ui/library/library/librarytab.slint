@@ -7,8 +7,8 @@ import {
     LinkText,
     MessageBox,
     Palette,
-    SceneButton,
     PanelHeader,
+    SceneButton,
     Switch,
     ToolButton,
     TreeView,
@@ -18,12 +18,12 @@ import {
     Constants,
     Data,
     DismissableMessageAction,
-    TreeViewItemData,
     EditorCommandSet as Cmd,
     EditorTool,
     LibraryTabData,
     PanelPage,
     TabAction,
+    TreeViewItemData,
     WindowSectionData,
 } from "../../api.slint";
 
@@ -161,12 +161,16 @@ component LibraryTreeView inherits VerticalLayout {
     in property <string> title;
     in-out property <[TreeViewItemData]> model;
 
+    callback item-selected <=> view.item-selected;
+
     PanelHeader {
         title: title;
     }
 
-    TreeView {
+    view := TreeView {
         model: model;
+        show-tree: true;
+        supports-expand: false;
     }
 }
 
@@ -210,7 +214,7 @@ export component LibraryTab inherits Tab {
             }
         }
 
-        if tabbed: Flickable {
+        /*if tabbed: Flickable {
             viewport-width: self.width * 2;
             viewport-height: self.height;
             viewport-x: -self.width * tabs[index].step-index;
@@ -227,7 +231,7 @@ export component LibraryTab inherits Tab {
                 LibraryTreeView {
                     width: 20%;
                     title: @tr("Categories");
-                    model: tabs[index].elements;
+                    model: tabs[index].categories;
                 }
 
                 Rectangle {
@@ -243,11 +247,15 @@ export component LibraryTab inherits Tab {
             }
         }
 
-        if !tabbed: HorizontalLayout {
+        if !tabbed:*/ HorizontalLayout {
             LibraryTreeView {
                 horizontal-stretch: 20;
                 title: @tr("Categories");
-                model: tabs[index].elements;
+                model: tabs[index].categories;
+
+                item-selected(idx, item) => {
+                    tabs[index].selected-category-uuid = item.user-data;
+                }
             }
 
             Rectangle {

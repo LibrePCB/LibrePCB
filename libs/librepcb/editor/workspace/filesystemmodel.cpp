@@ -181,6 +181,7 @@ void FileSystemModel::expandDir(const FilePath& fp, std::size_t index,
             level,  // Level
             q2s(icon.pixmap(32)),  // Icon
             q2s(info.fileName()),  // Text
+            slint::SharedString(), // Comment
             slint::SharedString(),  // Hint
             q2s(itemFp.toStr()),  // User data
             isProjectFileOrFolder,

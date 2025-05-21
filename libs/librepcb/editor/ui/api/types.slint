@@ -195,6 +195,7 @@ export struct TreeViewItemData {
     level: int,  // 0 = top level items
     icon: image,
     text: string,
+    comment: string,
     hint: string,
     user-data: string,  // User data to uniquely reference this item
     is-project-file-or-folder: bool,
@@ -616,6 +617,8 @@ export struct LibraryTabData {
     url: string,
     dependencies: [string],
     manufacturer: string,
+    categories: [TreeViewItemData],
+    selected-category-uuid: string,
     elements: [TreeViewItemData],
     step-index: int,
 }
