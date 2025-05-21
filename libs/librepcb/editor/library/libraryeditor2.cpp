@@ -59,7 +59,7 @@ LibraryEditor2::~LibraryEditor2() noexcept {
  *  General Methods
  ******************************************************************************/
 
-const FilePath& LibraryEditor2::getFilePath() const noexcept {
+FilePath LibraryEditor2::getFilePath() const noexcept {
   return mLibrary->getDirectory().getAbsPath();
 }
 

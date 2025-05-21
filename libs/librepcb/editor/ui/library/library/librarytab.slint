@@ -31,7 +31,7 @@ component LibraryMetadataBox inherits Rectangle {
     in property <[LibraryTabData]> tabs;
     in property <int> index;
 
-    preferred-width: 400px;
+    //preferred-width: 400px;
     background: Palette.background;
     border-bottom-left-radius: 10px;
 
@@ -175,11 +175,12 @@ export component LibraryTab inherits Tab {
     in-out property <WindowSectionData> section;
     property <[LibraryTabData]> tabs: section.library-tabs;
     property <int> index: section.current-tab-index;
+    property <bool> tabbed: self.width < 1024px;
 
     enabled: true;
 
     VerticalLayout {
-        Rectangle {
+        if tabbed: Rectangle {
             background: black;
 
             HorizontalLayout {
@@ -209,24 +210,44 @@ export component LibraryTab inherits Tab {
             }
         }
 
-        if tabs[index].step-index == 0: metadata-r := LibraryMetadataBox {
-            tabs: tabs;
-            index: index;
+        if tabbed: Flickable {
+            viewport-width: self.width * 2;
+            viewport-height: self.height;
+            viewport-x: -self.width * tabs[index].step-index;
+
+            animate viewport-x { duration: 30ms; }
+
+            HorizontalLayout {
+                LibraryMetadataBox {
+                    width: 50%;
+                    tabs: tabs;
+                    index: index;
+                }
+
+                LibraryTreeView {
+                    width: 20%;
+                    title: @tr("Categories");
+                    model: tabs[index].elements;
+                }
+
+                Rectangle {
+                    width: 1px;
+                    background: #555555;
+                }
+
+                LibraryTreeView {
+                    width: 30%;
+                    title: @tr("Elements");
+                    model: tabs[index].elements;
+                }
+            }
         }
 
-        if tabs[index].step-index == 1: HorizontalLayout {
-            VerticalLayout {
-                horizontal-stretch: 1;
-
-                LibraryTreeView {
-                    title: @tr("Component Categories");
-                    model: tabs[index].elements;
-                }
-
-                LibraryTreeView {
-                    title: @tr("Package Categories");
-                    model: tabs[index].elements;
-                }
+        if !tabbed: HorizontalLayout {
+            LibraryTreeView {
+                horizontal-stretch: 20;
+                title: @tr("Categories");
+                model: tabs[index].elements;
             }
 
             Rectangle {
@@ -235,10 +256,21 @@ export component LibraryTab inherits Tab {
             }
 
             LibraryTreeView {
-                horizontal-stretch: 2;
-
+                horizontal-stretch: 30;
                 title: @tr("Elements");
                 model: tabs[index].elements;
+            }
+
+            Rectangle {
+                width: 1px;
+                background: #555555;
+            }
+
+            LibraryMetadataBox {
+                horizontal-stretch: 3;
+                max-width: 500px;
+                tabs: tabs;
+                index: index;
             }
         }
     }

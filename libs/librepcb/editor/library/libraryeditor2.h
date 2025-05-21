@@ -69,7 +69,7 @@ public:
   // General Methods
   GuiApplication& getApp() noexcept { return mApp; }
   Workspace& getWorkspace() noexcept { return mWorkspace; }
-  const FilePath& getFilePath() const noexcept;
+  FilePath getFilePath() const noexcept;
   Library& getLibrary() noexcept { return *mLibrary; }
   int getUiIndex() const noexcept { return mUiIndex; }
   void setUiIndex(int index) noexcept;
