@@ -109,6 +109,8 @@ void LibraryElementsModel::setSelectedCategory(
               q2s(category),  // Text
               slint::SharedString(),  // Comment
               slint::SharedString(),  // Hint
+              false,  // Italic
+              false,  // Bold
               slint::SharedString(),  // User data
               false,  // Is project file or folder
               false,  // Has children
@@ -125,6 +127,8 @@ void LibraryElementsModel::setSelectedCategory(
             q2s(child->text),  // Text
             slint::SharedString(),  // Comment
             q2s(child->tooltip),  // Hint
+            false,  // Italic
+            false,  // Bold
             child->uuid ? q2s(child->uuid->toStr())
                         : slint::SharedString(),  // User data
             false,  // Is project file or folder
@@ -321,6 +325,8 @@ void LibraryElementsModel::addChildsToModel(TreeItem& item,
           (elementsCount > 0) ? q2s(QString::number(elementsCount))
                               : slint::SharedString(),  // Comment
           q2s(child->tooltip),  // Hint
+          false,  // Italic
+          false,  // Bold
           child->uuid ? q2s(child->uuid->toStr())
                       : slint::SharedString(),  // User data
           false,  // Is project file or folder

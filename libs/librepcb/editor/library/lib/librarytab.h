@@ -65,10 +65,9 @@ class LibraryTab final : public WindowTab {
   };
   struct TreeItem {
     TreeItemType type;
-    std::weak_ptr<TreeItem> parent;  ///< nullptr for root categories
-    std::optional<Uuid> uuid;  ///< std::nullopt for items without category
     QString text;
     QString tooltip;
+    bool fromOtherLib;
     QVector<std::shared_ptr<TreeItem>> childs;
   };
 
@@ -103,12 +102,11 @@ private:  // Methods
   template <typename ElementType, typename CategoryType>
   void loadElements(TreeItemType type, TreeItemType catType);
   void sortItemsRecursive(QVector<std::shared_ptr<TreeItem>>& items) noexcept;
-  void refreshCategoriesModel(
-      TreeItemType type,
-      slint::VectorModel<ui::TreeViewItemData>& model) noexcept;
-  void addChildsToModel(TreeItem& item, TreeItemType type,
-                        slint::VectorModel<ui::TreeViewItemData>& model,
-                        int level) noexcept;
+  void addCategoriesToModel(TreeItemType type, const QString& title,
+                            const QIcon& icon) noexcept;
+  void addCategoriesToModel(TreeItem& item, TreeItemType type,
+                            slint::VectorModel<ui::TreeViewItemData>& model,
+                            int level, const QIcon& icon) noexcept;
   void setSelectedCategory(const std::optional<Uuid>& uuid,
                            bool force) noexcept;
   void getChildsRecursive(TreeItem& item,
@@ -127,10 +125,8 @@ private:
   QHash<Uuid, std::shared_ptr<TreeItem>> mLibElementsMap;
 
   // UI data
-  std::shared_ptr<slint::VectorModel<ui::TreeViewItemData>> mCmpCategories;
-  std::shared_ptr<slint::VectorModel<ui::TreeViewItemData>> mPkgCategories;
-  int mCmpCatIndex = -1;
-  int mPkgCatIndex = -1;
+  std::shared_ptr<slint::VectorModel<ui::TreeViewItemData>> mCategories;
+  int mCurrentCategoryIndex = -1;
   std::shared_ptr<slint::VectorModel<ui::TreeViewItemData>> mFilteredElements;
 };
 

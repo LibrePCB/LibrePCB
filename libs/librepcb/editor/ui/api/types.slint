@@ -197,6 +197,8 @@ export struct TreeViewItemData {
     text: string,
     comment: string,
     hint: string,
+    italic: bool,
+    bold: bool,
     user-data: string,  // User data to uniquely reference this item
     is-project-file-or-folder: bool,
     has-children: bool,
@@ -617,10 +619,8 @@ export struct LibraryTabData {
     url: string,
     dependencies: [string],
     manufacturer: string,
-    cmp-categories: [TreeViewItemData],
-    cmp-categories-index: int,
-    pkg-categories: [TreeViewItemData],
-    pkg-categories-index: int,
+    categories: [TreeViewItemData],
+    categories-index: int,
     filtered-elements: [TreeViewItemData],
 }
 

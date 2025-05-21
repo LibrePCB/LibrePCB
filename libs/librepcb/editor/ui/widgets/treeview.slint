@@ -170,7 +170,8 @@ export component TreeView inherits Rectangle {
                         horizontal-stretch: 1;
                         color: is-enabled ? #dddddd : #a0a0a0;
                         font-size: 14px;
-                        font-weight: 400;
+                        font-weight: item.bold ? 600 : 400;
+                        font-italic: item.italic;
                         overflow: TextOverflow.elide;
                         text: item.text;
                         accessible-role: none;

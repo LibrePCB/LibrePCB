@@ -186,40 +186,15 @@ export component LibraryTab inherits Tab {
     enabled: true;
 
     HorizontalLayout {
-        VerticalLayout {
+        TreeView {
             horizontal-stretch: 20;
-            spacing: 20px;
+            model: tabs[index].categories;
+            current-index: tabs[index].categories-index;
+            show-tree: true;
+            supports-expand: false;
 
-            cmpcat-view := LibraryTreeView {
-                vertical-stretch: self.model.length;
-                title: @tr("Component Categories");
-                model: tabs[index].cmp-categories;
-                current-index: tabs[index].cmp-categories-index;
-
-                item-selected(idx, item) => {
-                    tabs[index].pkg-categories-index = -1;
-                    if tabs[index].cmp-categories-index != idx {
-                        tabs[index].cmp-categories-index = idx;
-                    } else {
-                        tabs[index].cmp-categories-index = -1;
-                    }
-                }
-            }
-
-            pkccat-view := LibraryTreeView {
-                vertical-stretch: self.model.length;
-                title: @tr("Package Categories");
-                model: tabs[index].pkg-categories;
-                current-index: tabs[index].pkg-categories-index;
-
-                item-selected(idx, item) => {
-                    tabs[index].cmp-categories-index = -1;
-                    if tabs[index].pkg-categories-index != idx {
-                        tabs[index].pkg-categories-index = idx;
-                    } else {
-                        tabs[index].pkg-categories-index = -1;
-                    }
-                }
+            item-selected(idx, item) => {
+                tabs[index].categories-index = idx;
             }
         }
 

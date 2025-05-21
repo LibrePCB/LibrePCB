@@ -53,8 +53,7 @@ LibraryTab::LibraryTab(GuiApplication& app, LibraryEditor2& editor,
     mLocaleOrder(editor.getWorkspace().getSettings().libraryLocaleOrder.get()),
     mLibPath(mLibrary.getDirectory().getAbsPath()),
     mLibElementsRoot(),
-    mCmpCategories(new slint::VectorModel<ui::TreeViewItemData>()),
-    mPkgCategories(new slint::VectorModel<ui::TreeViewItemData>()),
+    mCategories(new slint::VectorModel<ui::TreeViewItemData>()),
     mFilteredElements(new slint::VectorModel<ui::TreeViewItemData>()) {
   refreshLibElements();
   setSelectedCategory(std::nullopt, true);
@@ -95,23 +94,16 @@ ui::LibraryTabData LibraryTab::getDerivedUiData() const noexcept {
       q2s(mLibrary.getUrl().toString()),  // URL
       nullptr,  // Dependencies
       q2s(*mLibrary.getManufacturer()),  // Manufacturer
-      mCmpCategories,  // Component categories
-      mCmpCatIndex,
-      mPkgCategories,  // Package categories
-      mPkgCatIndex,
+      mCategories,  // Component categories
+      mCurrentCategoryIndex,
       mFilteredElements,  // Filtered elements
   };
 }
 
 void LibraryTab::setDerivedUiData(const ui::LibraryTabData& data) noexcept {
-  if (data.cmp_categories_index != mCmpCatIndex) {
-    mCmpCatIndex = data.cmp_categories_index;
-    auto item = mCmpCategories->row_data(mCmpCatIndex);
-    auto userData = item ? s2q(item->user_data) : QString();
-    setSelectedCategory(Uuid::tryFromString(userData), false);
-  } else   if (data.pkg_categories_index != mPkgCatIndex) {
-    mPkgCatIndex = data.pkg_categories_index;
-    auto item = mPkgCategories->row_data(mPkgCatIndex);
+  if (data.categories_index != mCurrentCategoryIndex) {
+    mCurrentCategoryIndex = data.categories_index;
+    auto item = mCategories->row_data(mCurrentCategoryIndex);
     auto userData = item ? s2q(item->user_data) : QString();
     setSelectedCategory(Uuid::tryFromString(userData), false);
   }
@@ -139,10 +131,9 @@ void LibraryTab::refreshLibElements() noexcept {
   mLibCategories.clear();
   mLibElementsRoot.reset(
       new TreeItem{TreeItemType::ComponentCategory,  // Ignored
-                   std::weak_ptr<TreeItem>(),
-                   std::nullopt,
-                   {},
-                   {},
+                   QString(),
+                   QString(),
+                   false,
                    {}});
   mLibElementsMap.clear();
   loadCategories<ComponentCategory>(TreeItemType::ComponentCategory);
@@ -156,8 +147,13 @@ void LibraryTab::refreshLibElements() noexcept {
   loadElements<Device, ComponentCategory>(TreeItemType::Device,
                                           TreeItemType::ComponentCategory);
   sortItemsRecursive(mLibElementsRoot->childs);
-  refreshCategoriesModel(TreeItemType::ComponentCategory, *mCmpCategories);
-  refreshCategoriesModel(TreeItemType::PackageCategory, *mPkgCategories);
+
+  mCategories->clear();
+  addCategoriesToModel(TreeItemType::ComponentCategory,
+                       tr("Component Categories"),
+                       QIcon(":/img/places/folder.png"));
+  addCategoriesToModel(TreeItemType::PackageCategory, tr("Package Categories"),
+                       QIcon(":/img/places/folder_green.png"));
 
   qDebug() << "Finished category tree model update in" << t.elapsed() << "ms.";
 }
@@ -184,11 +180,12 @@ std::shared_ptr<LibraryTab::TreeItem> LibraryTab::getOrCreateCategory(
 
   auto item = std::make_shared<TreeItem>();
   item->type = type;
-  item->uuid = uuid;
+  item->fromOtherLib = false;
   try {
     FilePath fp = mLibCategories.key(uuid);
     if (!fp.isValid()) {
       fp = mDb.getLatest<CategoryType>(uuid);
+      item->fromOtherLib = true;
     }
     if ((!fp.isValid()) ||
         (!mDb.getTranslations<CategoryType>(fp, mLocaleOrder, &item->text,
@@ -205,7 +202,6 @@ std::shared_ptr<LibraryTab::TreeItem> LibraryTab::getOrCreateCategory(
         parent = p;
       }
     }
-    item->parent = parent;
     parent->childs.append(item);
   } catch (const Exception& e) {
     // TODO
@@ -224,11 +220,10 @@ void LibraryTab::loadElements(TreeItemType type, TreeItemType catType) {
         if (auto cat = getOrCreateCategory<CategoryType>(catType, catUuid)) {
           auto item = std::make_shared<TreeItem>();
           item->type = type;
-          // item->uuid = uuid;
+          item->fromOtherLib = false;
           mDb.getTranslations<ElementType>(fp, mLocaleOrder, &item->text,
                                            &item->tooltip);
           cat->childs.push_back(item);
-          item->parent = cat;
         }
       }
     }
@@ -255,16 +250,31 @@ void LibraryTab::sortItemsRecursive(
   }
 }
 
-void LibraryTab::refreshCategoriesModel(
-    TreeItemType type,
-    slint::VectorModel<ui::TreeViewItemData>& model) noexcept {
-  model.clear();
-  addChildsToModel(*mLibElementsRoot, type, model, 0);
+void LibraryTab::addCategoriesToModel(TreeItemType type, const QString& title,
+                                      const QIcon& icon) noexcept {
+  mCategories->push_back(ui::TreeViewItemData{
+      0,  // Level
+      slint::Image(),  // Icon
+      q2s(title),  // Text
+      slint::SharedString(),  // Comment
+      slint::SharedString(),  // Hint
+      false,  // Italic
+      true,  // Bold
+      slint::SharedString(),  // User data
+      false,  // Is project file or folder
+      false,  // Has children
+      false,  // Expanded
+      false,  // Supports pinning
+      false,  // Pinned
+      ui::TreeViewItemAction::None,  // Action
+  });
+  addCategoriesToModel(*mLibElementsRoot, type, *mCategories, 1, icon);
 }
 
-void LibraryTab::addChildsToModel(
+void LibraryTab::addCategoriesToModel(
     TreeItem& item, TreeItemType type,
-    slint::VectorModel<ui::TreeViewItemData>& model, int level) noexcept {
+    slint::VectorModel<ui::TreeViewItemData>& model, int level,
+    const QIcon& icon) noexcept {
   for (auto child : item.childs) {
     const int elementsCount =
         std::count_if(child->childs.begin(), child->childs.end(),
@@ -272,15 +282,18 @@ void LibraryTab::addChildsToModel(
                         return item->type != type;
                       });
     if (child->type == type) {
+      const QIcon::Mode mode =
+          child->fromOtherLib ? QIcon::Disabled : QIcon::Normal;
       model.push_back(ui::TreeViewItemData{
           level,  // Level
-          slint::Image(),  // Icon
+          q2s(icon.pixmap(32, mode)),  // Icon
           q2s(child->text),  // Text
           (elementsCount > 0) ? q2s(QString::number(elementsCount))
                               : slint::SharedString(),  // Comment
           q2s(child->tooltip),  // Hint
-          child->uuid ? q2s(child->uuid->toStr())
-                      : slint::SharedString(),  // User data
+          child->fromOtherLib,  // Italic
+          elementsCount > 0,  // Bold
+          slint::SharedString(),  // User data
           false,  // Is project file or folder
           false,  // Has children
           false,  // Expanded
@@ -289,7 +302,7 @@ void LibraryTab::addChildsToModel(
           ui::TreeViewItemAction::None,  // Action
       });
     }
-    addChildsToModel(*child, type, model, level + 1);
+    addCategoriesToModel(*child, type, model, level + 1, icon);
   }
 }
 
@@ -349,6 +362,8 @@ void LibraryTab::setSelectedCategory(const std::optional<Uuid>& uuid,
           q2s(category),  // Text
           slint::SharedString(),  // Comment
           slint::SharedString(),  // Hint
+          false,  // Italic
+          true,  // Bold
           slint::SharedString(),  // User data
           false,  // Is project file or folder
           false,  // Has children
@@ -365,8 +380,9 @@ void LibraryTab::setSelectedCategory(const std::optional<Uuid>& uuid,
         q2s(item->text),  // Text
         slint::SharedString(),  // Comment
         q2s(item->tooltip),  // Hint
-        item->uuid ? q2s(item->uuid->toStr())
-                   : slint::SharedString(),  // User data
+        false,  // Italic
+        false,  // Bold
+        slint::SharedString(),  // User data
         false,  // Is project file or folder
         false,  // Has children
         false,  // Expanded
