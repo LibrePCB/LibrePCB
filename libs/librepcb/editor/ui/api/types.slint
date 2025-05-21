@@ -617,10 +617,11 @@ export struct LibraryTabData {
     url: string,
     dependencies: [string],
     manufacturer: string,
-    categories: [TreeViewItemData],
-    selected-category-uuid: string,
-    elements: [TreeViewItemData],
-    step-index: int,
+    cmp-categories: [TreeViewItemData],
+    cmp-categories-index: int,
+    pkg-categories: [TreeViewItemData],
+    pkg-categories-index: int,
+    filtered-elements: [TreeViewItemData],
 }
 
 // Additional data for symbol editor tabs

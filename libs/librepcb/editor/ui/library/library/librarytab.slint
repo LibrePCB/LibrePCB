@@ -160,6 +160,7 @@ component LibraryMetadataBox inherits Rectangle {
 component LibraryTreeView inherits VerticalLayout {
     in property <string> title;
     in-out property <[TreeViewItemData]> model;
+    in property <int> current-index;
 
     callback item-selected <=> view.item-selected;
 
@@ -169,6 +170,7 @@ component LibraryTreeView inherits VerticalLayout {
 
     view := TreeView {
         model: model;
+        current-index: current-index;
         show-tree: true;
         supports-expand: false;
     }
@@ -183,122 +185,66 @@ export component LibraryTab inherits Tab {
 
     enabled: true;
 
-    VerticalLayout {
-        if tabbed: Rectangle {
-            background: black;
+    HorizontalLayout {
+        VerticalLayout {
+            horizontal-stretch: 20;
+            spacing: 20px;
 
-            HorizontalLayout {
-                padding: 8px;
-                spacing: 15px;
-                alignment: start;
+            cmpcat-view := LibraryTreeView {
+                vertical-stretch: self.model.length;
+                title: @tr("Component Categories");
+                model: tabs[index].cmp-categories;
+                current-index: tabs[index].cmp-categories-index;
 
-                LinkText {
-                    text: @tr("Metadata");
-
-                    clicked => {
-                        tabs[index].step-index = 0;
+                item-selected(idx, item) => {
+                    tabs[index].pkg-categories-index = -1;
+                    if tabs[index].cmp-categories-index != idx {
+                        tabs[index].cmp-categories-index = idx;
+                    } else {
+                        tabs[index].cmp-categories-index = -1;
                     }
                 }
+            }
 
-                Text {
-                    text: ">";
-                }
+            pkccat-view := LibraryTreeView {
+                vertical-stretch: self.model.length;
+                title: @tr("Package Categories");
+                model: tabs[index].pkg-categories;
+                current-index: tabs[index].pkg-categories-index;
 
-                LinkText {
-                    text: @tr("Content");
-
-                    clicked => {
-                        tabs[index].step-index = 1;
+                item-selected(idx, item) => {
+                    tabs[index].cmp-categories-index = -1;
+                    if tabs[index].pkg-categories-index != idx {
+                        tabs[index].pkg-categories-index = idx;
+                    } else {
+                        tabs[index].pkg-categories-index = -1;
                     }
                 }
             }
         }
 
-        /*if tabbed: Flickable {
-            viewport-width: self.width * 2;
-            viewport-height: self.height;
-            viewport-x: -self.width * tabs[index].step-index;
-
-            animate viewport-x { duration: 30ms; }
-
-            HorizontalLayout {
-                LibraryMetadataBox {
-                    width: 50%;
-                    tabs: tabs;
-                    index: index;
-                }
-
-                LibraryTreeView {
-                    width: 20%;
-                    title: @tr("Categories");
-                    model: tabs[index].categories;
-                }
-
-                Rectangle {
-                    width: 1px;
-                    background: #555555;
-                }
-
-                LibraryTreeView {
-                    width: 30%;
-                    title: @tr("Elements");
-                    model: tabs[index].elements;
-                }
-            }
+        Rectangle {
+            width: 1px;
+            background: #555555;
         }
 
-        if !tabbed:*/ HorizontalLayout {
-            VerticalLayout {
-                horizontal-stretch: 20;
+        TreeView {
+            horizontal-stretch: 30;
+            model: tabs[index].filtered-elements;
+            show-tree: true;
+            supports-expand: false;
+        }
 
-                LibraryTreeView {
-                    title: @tr("Component Categories");
-                    model: tabs[index].categories;
+        Rectangle {
+            width: 1px;
+            background: #555555;
+        }
 
-                    item-selected(idx, item) => {
-                        tabs[index].selected-category-uuid = item.user-data;
-                    }
-                }
-
-                LibraryTreeView {
-                    title: @tr("Package Categories");
-                    model: tabs[index].categories;
-
-                    item-selected(idx, item) => {
-                        tabs[index].selected-category-uuid = item.user-data;
-                    }
-                }
-            }
-
-            Rectangle {
-                width: 1px;
-                background: #555555;
-            }
-
-            /*LibraryTreeView {
-                horizontal-stretch: 30;
-                title: @tr("Elements");
-                model: tabs[index].elements;
-            }*/
-
-            TreeView {
-                horizontal-stretch: 30;
-                model: tabs[index].elements;
-                show-tree: true;
-                supports-expand: false;
-            }
-
-            Rectangle {
-                width: 1px;
-                background: #555555;
-            }
-
-            LibraryMetadataBox {
-                horizontal-stretch: 3;
-                max-width: 500px;
-                tabs: tabs;
-                index: index;
-            }
+        LibraryMetadataBox {
+            horizontal-stretch: 3;
+            max-width: 500px;
+            tabs: tabs;
+            index: index;
         }
     }
 
