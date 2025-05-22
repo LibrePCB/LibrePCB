@@ -83,6 +83,7 @@ public:
   const QVector<std::shared_ptr<LibraryEditor2>>& getLibraries() noexcept {
     return mLibraries->values();
   }
+  std::shared_ptr<LibraryEditor2> openLibrary(const FilePath& libDir) noexcept;
   void closeLibrary(int index) noexcept;
 
   // Projects
@@ -130,7 +131,6 @@ private:
   bool requestClosingAllProjects() noexcept;
   void openProjectLibraryUpdater(const FilePath& project) noexcept;
 
-  std::shared_ptr<LibraryEditor2> openLibrary(const FilePath& libDir) noexcept;
   bool requestClosingAllLibraries() noexcept;
 
   std::shared_ptr<MainWindow> getCurrentWindow() noexcept;

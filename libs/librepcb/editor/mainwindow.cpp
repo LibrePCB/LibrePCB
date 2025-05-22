@@ -44,6 +44,7 @@
 #include "windowtab.h"
 #include "workspace/filesystemmodel.h"
 
+#include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
@@ -145,10 +146,16 @@ MainWindow::MainWindow(GuiApplication& app,
         this, [this, section, tab, a]() { triggerTab(section, tab, a); },
         Qt::QueuedConnection);
   });
-  b.on_trigger_library([this](int index, ui::LibraryEditorAction a) {
+  b.on_trigger_library([this](slint::SharedString path, ui::LibraryAction a) {
     // if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0): Remove lambda.
     QMetaObject::invokeMethod(
-        this, [this, index, a]() { triggerLibrary(index, a); },
+        this, [this, path, a]() { triggerLibrary(path, a); },
+        Qt::QueuedConnection);
+  });
+  b.on_trigger_library_editor([this](int index, ui::LibraryEditorAction a) {
+    // if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0): Remove lambda.
+    QMetaObject::invokeMethod(
+        this, [this, index, a]() { triggerLibraryEditor(index, a); },
         Qt::QueuedConnection);
   });
   b.on_trigger_project([this](int index, ui::ProjectAction a) {
@@ -450,7 +457,44 @@ void MainWindow::triggerTab(int section, int tab, ui::TabAction a) noexcept {
   }
 }
 
-void MainWindow::triggerLibrary(int index, ui::LibraryEditorAction a) noexcept {
+void MainWindow::triggerLibrary(slint::SharedString path,
+                                ui::LibraryAction a) noexcept {
+  const FilePath fp(s2q(path));
+  if ((!fp.isValid()) ||
+      (!fp.isLocatedInDir(mApp.getWorkspace().getLibrariesPath()))) {
+    qWarning() << "Invalid path in triggerLibrary():" << s2q(path);
+    return;
+  }
+
+  switch (a) {
+    case ui::LibraryAction::Open: {
+      if (auto editor = mApp.openLibrary(fp)) {
+        if (!switchToLibraryTab<LibraryTab>(editor->getUiIndex())) {
+          addTab(std::make_shared<LibraryTab>(mApp, *editor));
+        }
+      }
+      break;
+    }
+    case ui::LibraryAction::Uninstall: {
+      try {
+        FileUtils::removeDirRecursively(fp);  // can throw
+      } catch (const Exception& e) {
+        // TODO: This should be implemented without message box some day...
+        QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
+      }
+      mApp.getWorkspace().getLibraryDb().startLibraryRescan();
+      break;
+    }
+    default: {
+      qWarning() << "Unhandled action in triggerLibrary():"
+                 << static_cast<int>(a);
+      break;
+    }
+  }
+}
+
+void MainWindow::triggerLibraryEditor(int index,
+                                      ui::LibraryEditorAction a) noexcept {
   std::shared_ptr<LibraryEditor2> editor = mApp.getLibraries().value(index);
   if (!editor) return;
 

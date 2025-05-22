@@ -622,6 +622,7 @@ export struct LibraryTabData {
     categories: [TreeViewItemData],
     categories-index: int,
     filtered-elements: [TreeViewItemData],
+    element-index: int,
 }
 
 // Additional data for symbol editor tabs
@@ -762,7 +763,6 @@ export struct WindowSectionData {
 
 // Library actions
 export enum LibraryAction {
-    none,
     open,
     uninstall,
 }
@@ -781,7 +781,6 @@ export struct LibraryData {
     progress: int,  // [%], 0 if not installing
     checked: bool,
     highlight: bool,
-    action: LibraryAction,  // Set by UI, handled in backend
 }
 
 // Metadata for a list of LibraryData

@@ -196,10 +196,6 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
   // Setup library models & filter.
   connect(mRemoteLibraries.get(), &LibrariesModel::onlineVersionsAvailable,
           mLocalLibraries.get(), &LibrariesModel::setOnlineVersions);
-  connect(mLocalLibraries.get(), &LibrariesModel::openLibraryTriggered, this,
-          &GuiApplication::openLibrary);
-  connect(mRemoteLibraries.get(), &LibrariesModel::openLibraryTriggered, this,
-          &GuiApplication::openLibrary);
 
   // Check if standard components are installed.
   connect(&mWorkspace.getLibraryDb(), &WorkspaceLibraryDb::scanFinished, this,
@@ -451,6 +447,68 @@ void GuiApplication::addExampleProjects(QWidget* parent) noexcept {
  *  Libraries
  ******************************************************************************/
 
+std::shared_ptr<LibraryEditor2> GuiApplication::openLibrary(
+    const FilePath& libDir) noexcept {
+  auto switchToLibrary = [this](int index) {
+    for (auto win : mWindows) {
+      // win->setCurrentProject(index);
+      win->showPanelPage(ui::PanelPage::Documents);
+    }
+  };
+
+  for (int i = 0; i < mLibraries->count(); ++i) {
+    if (mLibraries->at(i)->getFilePath() == libDir) {
+      switchToLibrary(i);
+      return mLibraries->at(i);
+    }
+  }
+
+  auto askForRestoringBackup = [](const FilePath&) {
+    QMessageBox::StandardButton btn = QMessageBox::question(
+        qApp->activeWindow(), tr("Restore autosave backup?"),
+        tr("It seems that the application crashed the last time you opened "
+           "this "
+           "library element. Do you want to restore the last autosave backup?"),
+        QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+        QMessageBox::Cancel);
+    switch (btn) {
+      case QMessageBox::Yes:
+        return true;
+      case QMessageBox::No:
+        return false;
+      default:
+        throw UserCanceled(__FILE__, __LINE__);
+    }
+  };
+
+  try {
+    // Open file system.
+    const bool readOnly =
+        libDir.isLocatedInDir(mWorkspace.getRemoteLibrariesPath());
+    auto fs = TransactionalFileSystem::open(
+        libDir, !readOnly, askForRestoringBackup,
+        DirectoryLockHandlerDialog::createDirectoryLockCallback());  // can
+                                                                     // throw
+
+    // Open library.
+    auto lib = Library::open(std::unique_ptr<TransactionalDirectory>(
+        new TransactionalDirectory(fs)));  // can throw
+
+    // Keep handle.
+    const int index = mLibraries->count();
+    auto editor =
+        std::make_shared<LibraryEditor2>(*this, std::move(lib), index);
+    mLibraries->insert(index, editor);
+    switchToLibrary(index);
+    return editor;
+  } catch (const Exception& e) {
+    QMessageBox::critical(qApp->activeWindow(), tr("Failed to open library"),
+                          e.getMsg());
+  }
+
+  return nullptr;
+}
+
 void GuiApplication::closeLibrary(int index) noexcept {
   mLibraries->remove(index);
   for (int i = index; i < mLibraries->count(); ++i) {
@@ -697,68 +755,6 @@ void GuiApplication::openProjectLibraryUpdater(
         [this](const FilePath& fp) { openProject(fp, qApp->activeWindow()); });
   }
   mProjectLibraryUpdater->show();
-}
-
-std::shared_ptr<LibraryEditor2> GuiApplication::openLibrary(
-    const FilePath& libDir) noexcept {
-  auto switchToLibrary = [this](int index) {
-    for (auto win : mWindows) {
-      // win->setCurrentProject(index);
-      win->showPanelPage(ui::PanelPage::Documents);
-    }
-  };
-
-  for (int i = 0; i < mLibraries->count(); ++i) {
-    if (mLibraries->at(i)->getFilePath() == libDir) {
-      switchToLibrary(i);
-      return mLibraries->at(i);
-    }
-  }
-
-  auto askForRestoringBackup = [](const FilePath&) {
-    QMessageBox::StandardButton btn = QMessageBox::question(
-        qApp->activeWindow(), tr("Restore autosave backup?"),
-        tr("It seems that the application crashed the last time you opened "
-           "this "
-           "library element. Do you want to restore the last autosave backup?"),
-        QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-        QMessageBox::Cancel);
-    switch (btn) {
-      case QMessageBox::Yes:
-        return true;
-      case QMessageBox::No:
-        return false;
-      default:
-        throw UserCanceled(__FILE__, __LINE__);
-    }
-  };
-
-  try {
-    // Open file system.
-    const bool readOnly =
-        libDir.isLocatedInDir(mWorkspace.getRemoteLibrariesPath());
-    auto fs = TransactionalFileSystem::open(
-        libDir, !readOnly, askForRestoringBackup,
-        DirectoryLockHandlerDialog::createDirectoryLockCallback());  // can
-                                                                     // throw
-
-    // Open library.
-    auto lib = Library::open(std::unique_ptr<TransactionalDirectory>(
-        new TransactionalDirectory(fs)));  // can throw
-
-    // Keep handle.
-    const int index = mLibraries->count();
-    auto editor =
-        std::make_shared<LibraryEditor2>(*this, std::move(lib), index);
-    mLibraries->insert(index, editor);
-    switchToLibrary(index);
-    return editor;
-  } catch (const Exception& e) {
-    QMessageBox::critical(qApp->activeWindow(), tr("Failed to open library"),
-                          e.getMsg());
-  }
-
-  return nullptr;
 }
 
 bool GuiApplication::requestClosingAllLibraries() noexcept {

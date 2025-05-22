@@ -27,152 +27,127 @@ import {
     WindowSectionData,
 } from "../../api.slint";
 
-component LibraryMetadataBox inherits Rectangle {
+component LibraryMetadataBox inherits GridLayout {
     in property <[LibraryTabData]> tabs;
     in property <int> index;
 
-    //preferred-width: 400px;
-    background: Palette.background;
-    border-bottom-left-radius: 10px;
+    padding: 10px;
+    spacing: 8px;
 
-    GridLayout {
-        padding: 10px;
-        spacing: 8px;
-
-        Row {
-            Text {
-                width: self.preferred-width;
-                vertical-alignment: center;
-                text: @tr("Name:");
-            }
-
-            LineEdit {
-                text: tabs[index].name;
-            }
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Name:");
         }
 
-        Row {
-            Text {
-                width: self.preferred-width;
-                vertical-alignment: center;
-                text: @tr("Description:");
-            }
-
-            TextEdit {
-                height: 100px;
-                text: tabs[index].description;
-            }
-        }
-
-        Row {
-            Text {
-                width: self.preferred-width;
-                vertical-alignment: center;
-                text: @tr("Keywords:");
-            }
-
-            LineEdit {
-                //text: tabs[index].name;
-            }
-        }
-
-        Row {
-            Text {
-                width: self.preferred-width;
-                vertical-alignment: center;
-                text: @tr("Author:");
-            }
-
-            LineEdit {
-                text: tabs[index].author;
-            }
-        }
-
-        Row {
-            Text {
-                width: self.preferred-width;
-                vertical-alignment: center;
-                text: @tr("Version:");
-            }
-
-            LineEdit {
-                text: tabs[index].version;
-            }
-        }
-
-        Row {
-            Text {
-                width: self.preferred-width;
-                vertical-alignment: center;
-                text: @tr("Deprecated:");
-            }
-
-            Switch {
-                font-size: 10px;
-                text: @tr("Check this if the element should no longer be used.");
-                checked: tabs[index].deprecated;
-            }
-        }
-
-        Row {
-            Text {
-                width: self.preferred-width;
-                vertical-alignment: center;
-                text: @tr("URL:");
-            }
-
-            LineEdit {
-                text: tabs[index].url;
-            }
-        }
-
-        Row {
-            Text {
-                width: self.preferred-width;
-                vertical-alignment: center;
-                text: @tr("Dependencies:");
-            }
-
-            TextEdit {
-                height: 60px;
-                //text: tabs[index].name;
-            }
-        }
-
-        Row {
-            Text {
-                width: self.preferred-width;
-                vertical-alignment: center;
-                text: @tr("Manufacturer:");
-            }
-
-            LineEdit {
-                text: tabs[index].manufacturer;
-            }
-        }
-
-        Row {
-            Rectangle { }
+        LineEdit {
+            text: tabs[index].name;
         }
     }
-}
 
-component LibraryTreeView inherits VerticalLayout {
-    in property <string> title;
-    in-out property <[TreeViewItemData]> model;
-    in property <int> current-index;
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Description:");
+        }
 
-    callback item-selected <=> view.item-selected;
-
-    PanelHeader {
-        title: title;
+        TextEdit {
+            height: 100px;
+            text: tabs[index].description;
+        }
     }
 
-    view := TreeView {
-        model: model;
-        current-index: current-index;
-        show-tree: true;
-        supports-expand: false;
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Keywords:");
+        }
+
+        LineEdit {
+                //text: tabs[index].name;
+            }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Author:");
+        }
+
+        LineEdit {
+            text: tabs[index].author;
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Version:");
+        }
+
+        LineEdit {
+            text: tabs[index].version;
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Deprecated:");
+        }
+
+        Switch {
+            font-size: 10px;
+            text: @tr("Check this if the element should no longer be used.");
+            checked: tabs[index].deprecated;
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("URL:");
+        }
+
+        LineEdit {
+            text: tabs[index].url;
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Dependencies:");
+        }
+
+        TextEdit {
+            height: 60px;
+                //text: tabs[index].name;
+            }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Manufacturer:");
+        }
+
+        LineEdit {
+            text: tabs[index].manufacturer;
+        }
+    }
+
+    Row {
+        Rectangle { }
     }
 }
 
@@ -196,7 +171,15 @@ export component LibraryTab inherits Tab {
             item-height: 20px;
 
             item-selected(idx, item) => {
-                tabs[index].categories-index = idx;
+                if idx != tabs[index].categories-index {
+                    tabs[index].categories-index = idx;
+                    tabs[index].element-index = -1;
+                }
+            }
+
+            item-triggered(idx, item) => {
+                Backend.trigger-tab(section-index, index, TabAction.edit-properties);
+                true
             }
         }
 
@@ -208,10 +191,20 @@ export component LibraryTab inherits Tab {
         TreeView {
             horizontal-stretch: 30;
             model: tabs[index].filtered-elements;
+            current-index: tabs[index].element-index;
             show-tree: true;
             supports-expand: false;
             font-size: 12px;
             item-height: 20px;
+
+            item-selected(idx, item) => {
+                tabs[index].element-index = idx;
+            }
+
+            item-triggered(idx, item) => {
+                Backend.trigger-tab(section-index, index, TabAction.edit-properties);
+                true
+            }
         }
 
         Rectangle {

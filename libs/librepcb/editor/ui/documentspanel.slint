@@ -151,7 +151,7 @@ component ProjectListItem inherits Rectangle {
             } else if type == ItemType.board {
                 Backend.trigger-board(project-index, item-index, BoardAction.open-2d);
             } else if type == ItemType.library {
-                Backend.trigger-library(project-index, LibraryEditorAction.open);
+                Backend.trigger-library-editor(project-index, LibraryEditorAction.open);
             }
         }
     }
@@ -294,7 +294,7 @@ component LibrarySection inherits Rectangle {
                     icon-scale: 60%;
 
                     clicked => {
-                        Backend.trigger-library(library-index, LibraryEditorAction.close);
+                        Backend.trigger-library-editor(library-index, LibraryEditorAction.close);
                     }
                 }
 

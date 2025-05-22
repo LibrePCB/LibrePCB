@@ -65,6 +65,7 @@ class LibraryTab final : public WindowTab {
   };
   struct TreeItem {
     TreeItemType type;
+    slint::Image icon;
     QString text;
     QString userData;
     bool fromOtherLib;
@@ -97,20 +98,21 @@ private:  // Methods
   std::shared_ptr<TreeItem> createRootItem(TreeItemType type,
                                            const QString& text) noexcept;
   template <typename CategoryType>
-  void loadCategories(TreeItemType type, TreeItem& root);
+  void loadCategories(TreeItemType type, const QIcon& icon, TreeItem& root);
   template <typename CategoryType>
   std::shared_ptr<TreeItem> getOrCreateCategory(TreeItemType type,
+                                                const QIcon& icon,
                                                 const Uuid& uuid,
                                                 TreeItem& root);
   template <typename ElementType, typename CategoryType>
-  void loadElements(TreeItemType type, TreeItemType catType, TreeItem& root,
-                    int& count);
+  void loadElements(TreeItemType type, slint::Image icon, TreeItemType catType,
+                    const QIcon& catIcon, TreeItem& root, int& count);
   void sortItemsRecursive(QVector<std::shared_ptr<TreeItem>>& items) noexcept;
-  void addCategoriesToModel(TreeItemType type, const QIcon& icon,
-                            TreeItem& root, int count) noexcept;
+  void addCategoriesToModel(TreeItemType type, TreeItem& root,
+                            int count) noexcept;
   void addCategoriesToModel(TreeItem& item, TreeItemType type,
                             slint::VectorModel<ui::TreeViewItemData>& model,
-                            int level, const QIcon& icon) noexcept;
+                            int level) noexcept;
   void setSelectedCategory(
       const std::optional<ui::TreeViewItemData>& data) noexcept;
   void getChildsRecursive(TreeItem& item,
@@ -135,6 +137,7 @@ private:
   std::shared_ptr<slint::VectorModel<ui::TreeViewItemData>> mCategories;
   int mCurrentCategoryIndex;
   std::shared_ptr<slint::VectorModel<ui::TreeViewItemData>> mFilteredElements;
+  int mCurrentElementIndex;
 };
 
 /*******************************************************************************

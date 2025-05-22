@@ -5,6 +5,7 @@ import {
     Int64,
     LengthEditParseResult,
     LengthUnit,
+    LibraryAction,
     LibraryEditorAction,
     ProjectAction,
     SchematicAction,
@@ -79,14 +80,24 @@ export global Backend {
         }
     }
 
+    // Trigger some library action
+    //
+    // Note: This callback is executed asynchronously in the backend to
+    // guarantee there are no side effects changing the UI from within the
+    // callback. Otherwise we couldn't declare it as 'pure'.
+    pure callback trigger-library(library-path: string, action: LibraryAction);
+    trigger-library(library-path, action) => {
+        debug("Trigger library action:", library-path, action);
+    }
+
     // Trigger some library editor action
     //
     // Note: This callback is executed asynchronously in the backend to
     // guarantee there are no side effects changing the UI from within the
     // callback. Otherwise we couldn't declare it as 'pure'.
-    pure callback trigger-library(library-index: int, action: LibraryEditorAction);
-    trigger-library(library-index, action) => {
-        debug("Trigger library action:", library-index, action);
+    pure callback trigger-library-editor(library-index: int, action: LibraryEditorAction);
+    trigger-library-editor(library-index, action) => {
+        debug("Trigger library editor action:", library-index, action);
     }
 
     // Trigger some project action
