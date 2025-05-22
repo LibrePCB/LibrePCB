@@ -56,6 +56,7 @@ class LibraryTab final : public WindowTab {
   Q_OBJECT
 
   enum class TreeItemType {
+    Uncategorized,
     ComponentCategory,
     PackageCategory,
     Symbol,
@@ -95,7 +96,7 @@ public:
 
 private:  // Methods
   void refreshLibElements() noexcept;
-  std::shared_ptr<TreeItem> createRootItem(TreeItemType type,
+  std::shared_ptr<TreeItem> createRootItem(TreeItemType type, const QIcon& icon,
                                            const QString& text) noexcept;
   template <typename CategoryType>
   void loadCategories(TreeItemType type, const QIcon& icon, TreeItem& root);
@@ -127,6 +128,7 @@ private:
 
   // Library content
   QHash<FilePath, Uuid> mLibCategories;
+  std::shared_ptr<TreeItem> mUncategorizedRoot;
   std::shared_ptr<TreeItem> mCmpCatRoot;
   int mCmpCatElementCount;
   std::shared_ptr<TreeItem> mPkgCatRoot;

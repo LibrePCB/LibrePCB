@@ -151,10 +151,13 @@ void LibraryTab::refreshLibElements() noexcept {
   mCmpCatElementCount = 0;
   mPkgCatElementCount = 0;
 
-  mCmpCatRoot = createRootItem(TreeItemType::ComponentCategory,
+  mUncategorizedRoot = createRootItem(TreeItemType::Uncategorized,
+                                      QIcon(":/img/status/dialog_warning.png"),
+                                      tr("Not Categorized"));
+  mCmpCatRoot = createRootItem(TreeItemType::ComponentCategory, QIcon(),
                                tr("Component Categories"));
-  mPkgCatRoot =
-      createRootItem(TreeItemType::PackageCategory, tr("Package Categories"));
+  mPkgCatRoot = createRootItem(TreeItemType::PackageCategory, QIcon(),
+                               tr("Package Categories"));
 
   loadCategories<ComponentCategory>(TreeItemType::ComponentCategory,
                                     QIcon(":/img/places/folder.png"),
@@ -181,13 +184,8 @@ void LibraryTab::refreshLibElements() noexcept {
       TreeItemType::ComponentCategory, QIcon(":/img/places/folder.png"),
       *mCmpCatRoot, mCmpCatElementCount);
 
-  for (auto& root : {mCmpCatRoot, mPkgCatRoot}) {
-    auto uncategorized = root->childs.takeAt(0);
-    sortItemsRecursive(root->childs);
-    if (!uncategorized->childs.isEmpty()) {
-      root->childs.insert(0, uncategorized);
-    }
-  }
+  sortItemsRecursive(mCmpCatRoot->childs);
+  sortItemsRecursive(mPkgCatRoot->childs);
 
   mCategories->clear();
   const int count = mCmpCatElementCount + mPkgCatElementCount;
@@ -208,6 +206,10 @@ void LibraryTab::refreshLibElements() noexcept {
       false,  // Pinned
       ui::TreeViewItemAction::None,  // Action
   });
+  if (!mUncategorizedRoot->childs.isEmpty()) {
+  addCategoriesToModel(TreeItemType::Uncategorized, *mUncategorizedRoot,
+                       mUncategorizedRoot->childs.count());
+  }
   addCategoriesToModel(TreeItemType::ComponentCategory, *mCmpCatRoot,
                        mCmpCatElementCount);
   addCategoriesToModel(TreeItemType::PackageCategory, *mPkgCatRoot,
@@ -217,29 +219,17 @@ void LibraryTab::refreshLibElements() noexcept {
 }
 
 std::shared_ptr<LibraryTab::TreeItem> LibraryTab::createRootItem(
-    TreeItemType type, const QString& text) noexcept {
+    TreeItemType type, const QIcon& icon, const QString& text) noexcept {
   Uuid uuid = Uuid::createRandom();
   std::shared_ptr<TreeItem> root(new TreeItem{
       type,
-      slint::Image(),
+      q2s(icon.pixmap(32)),
       text,
       uuid.toStr(),
       false,
       {},
   });
   mLibElementsMap.insert(uuid, root);
-
-  uuid = Uuid::createRandom();
-  std::shared_ptr<TreeItem> uncategorized(new TreeItem{
-      type,
-      q2s(QIcon(":/img/status/dialog_warning.png").pixmap(32)),
-      tr("Not Categorized"),
-      uuid.toStr(),
-      false,
-      {},
-  });
-  root->childs.append(uncategorized);
-  mLibElementsMap.insert(uuid, uncategorized);
   return root;
 }
 
@@ -326,9 +316,7 @@ void LibraryTab::loadElements(TreeItemType type, slint::Image icon,
         }
       }
       if (!addedToCategory) {
-        auto uncategorized = root.childs.at(0);
-        Q_ASSERT(uncategorized);
-        uncategorized->childs.push_back(item);
+        mUncategorizedRoot->childs.push_back(item);
       }
     }
   } catch (const Exception& e) {
