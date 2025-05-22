@@ -9,6 +9,8 @@ import {
     Palette,
     PanelHeader,
     SceneButton,
+    SlideView,
+    Spinner,
     Switch,
     ToolButton,
     TreeView,
@@ -27,8 +29,9 @@ import {
     WindowSectionData,
 } from "../../api.slint";
 
-component LibraryMetadataBox inherits GridLayout {
-    in property <[LibraryTabData]> tabs;
+component LibraryMetadata inherits GridLayout {
+    in property <int> section-index;
+    in-out property <[LibraryTabData]> tabs;
     in property <int> index;
 
     padding: 10px;
@@ -43,6 +46,11 @@ component LibraryMetadataBox inherits GridLayout {
 
         LineEdit {
             text: tabs[index].name;
+            validation-error: tabs[index].name-error;
+
+            text-edited(text) => {
+                tabs[index].name = text;
+            }
         }
     }
 
@@ -56,6 +64,7 @@ component LibraryMetadataBox inherits GridLayout {
         TextEdit {
             height: 100px;
             text: tabs[index].description;
+            enabled: false;
         }
     }
 
@@ -67,8 +76,12 @@ component LibraryMetadataBox inherits GridLayout {
         }
 
         LineEdit {
-                //text: tabs[index].name;
+            text: tabs[index].keywords;
+
+            text-edited(text) => {
+                tabs[index].keywords = text;
             }
+        }
     }
 
     Row {
@@ -80,6 +93,10 @@ component LibraryMetadataBox inherits GridLayout {
 
         LineEdit {
             text: tabs[index].author;
+
+            text-edited(text) => {
+                tabs[index].author = text;
+            }
         }
     }
 
@@ -92,6 +109,11 @@ component LibraryMetadataBox inherits GridLayout {
 
         LineEdit {
             text: tabs[index].version;
+            validation-error: tabs[index].version-error;
+
+            text-edited(text) => {
+                tabs[index].version = text;
+            }
         }
     }
 
@@ -106,6 +128,10 @@ component LibraryMetadataBox inherits GridLayout {
             font-size: 10px;
             text: @tr("Check this if the element should no longer be used.");
             checked: tabs[index].deprecated;
+
+            toggled(checked) => {
+                tabs[index].deprecated = checked;
+            }
         }
     }
 
@@ -118,6 +144,11 @@ component LibraryMetadataBox inherits GridLayout {
 
         LineEdit {
             text: tabs[index].url;
+            validation-error: tabs[index].url-error;
+
+            text-edited(text) => {
+                tabs[index].url = text;
+            }
         }
     }
 
@@ -130,8 +161,8 @@ component LibraryMetadataBox inherits GridLayout {
 
         TextEdit {
             height: 60px;
-                //text: tabs[index].name;
-            }
+            enabled: false;
+        }
     }
 
     Row {
@@ -143,6 +174,28 @@ component LibraryMetadataBox inherits GridLayout {
 
         LineEdit {
             text: tabs[index].manufacturer;
+
+            text-edited(text) => {
+                tabs[index].manufacturer = text;
+            }
+        }
+    }
+
+    Row {
+        Rectangle { }
+
+        HorizontalLayout {
+            save-btn := Button {
+                width: self.preferred-width;
+                primary: true;
+                text: @tr("Apply & Save");
+
+                clicked => {
+                    Backend.trigger-tab(section-index, index, TabAction.accept);
+                }
+            }
+
+            Rectangle { }
         }
     }
 
@@ -151,36 +204,96 @@ component LibraryMetadataBox inherits GridLayout {
     }
 }
 
+component LibraryContent inherits HorizontalLayout {
+    in property <int> section-index;
+    in-out property <[LibraryTabData]> tabs;
+    in property <int> index;
+
+    TreeView {
+        horizontal-stretch: 20;
+        model: tabs[index].categories;
+        current-index: tabs[index].categories-index;
+        show-tree: true;
+        supports-expand: false;
+        font-size: 12px;
+        item-height: 20px;
+
+        if Data.libraries-rescan-in-progress: Spinner {
+            x: parent.width - self.width - parent.scrollbar-width - self.y;
+            y: 5px;
+            width: 16px;
+            height: self.width;
+            indeterminate: true;
+        }
+
+        item-selected(idx, item) => {
+            if idx != tabs[index].categories-index {
+                tabs[index].categories-index = idx;
+                tabs[index].element-index = -1;
+            }
+        }
+
+        item-triggered(idx, item) => {
+            Backend.trigger-tab(section-index, index, TabAction.edit-properties);
+            true
+        }
+    }
+
+    Rectangle {
+        width: 1px;
+        background: #555555;
+    }
+
+    TreeView {
+        horizontal-stretch: 30;
+        model: tabs[index].filtered-elements;
+        current-index: tabs[index].element-index;
+        supports-expand: false;
+        font-size: 12px;
+        item-height: 20px;
+
+        if Data.libraries-rescan-in-progress: Spinner {
+            x: parent.width - self.width - parent.scrollbar-width - self.y;
+            y: 5px;
+            width: 16px;
+            height: self.width;
+            indeterminate: true;
+        }
+
+        item-selected(idx, item) => {
+            tabs[index].element-index = idx;
+        }
+
+        item-triggered(idx, item) => {
+            Backend.trigger-tab(section-index, index, TabAction.edit-properties);
+            true
+        }
+    }
+}
+
 export component LibraryTab inherits Tab {
     in property <int> section-index;
     in-out property <WindowSectionData> section;
     property <[LibraryTabData]> tabs: section.library-tabs;
     property <int> index: section.current-tab-index;
-    property <bool> tabbed: self.width < 1024px;
+    property <bool> compact-layout: self.width < 1024px;
 
     enabled: true;
 
-    HorizontalLayout {
-        TreeView {
-            horizontal-stretch: 20;
-            model: tabs[index].categories;
-            current-index: tabs[index].categories-index;
-            show-tree: true;
-            supports-expand: false;
-            font-size: 12px;
-            item-height: 20px;
+    // Wizard mode: Only metadata.
+    if tabs[index].wizard-mode: LibraryMetadata {
+        section-index: section-index;
+        tabs: tabs;
+        index: index;
+    }
 
-            item-selected(idx, item) => {
-                if idx != tabs[index].categories-index {
-                    tabs[index].categories-index = idx;
-                    tabs[index].element-index = -1;
-                }
-            }
-
-            item-triggered(idx, item) => {
-                Backend.trigger-tab(section-index, index, TabAction.edit-properties);
-                true
-            }
+    // Normal mode: Content left, metadata right.
+    if (!tabs[index].wizard-mode) && (!compact-layout): HorizontalLayout {
+        LibraryContent {
+            horizontal-stretch: 1;
+            section-index: section-index;
+            tabs: tabs;
+            index: index;
         }
 
         Rectangle {
@@ -188,51 +301,38 @@ export component LibraryTab inherits Tab {
             background: #555555;
         }
 
-        TreeView {
-            horizontal-stretch: 30;
-            model: tabs[index].filtered-elements;
-            current-index: tabs[index].element-index;
-            show-tree: true;
-            supports-expand: false;
-            font-size: 12px;
-            item-height: 20px;
-
-            item-selected(idx, item) => {
-                tabs[index].element-index = idx;
-            }
-
-            item-triggered(idx, item) => {
-                Backend.trigger-tab(section-index, index, TabAction.edit-properties);
-                true
-            }
-        }
-
-        Rectangle {
-            width: 1px;
-            background: #555555;
-        }
-
-        LibraryMetadataBox {
-            horizontal-stretch: 3;
-            max-width: 500px;
+        LibraryMetadata {
+            horizontal-stretch: 1;
+            max-width: min(500px, parent.width * 0.4);
+            section-index: section-index;
             tabs: tabs;
             index: index;
         }
     }
 
-    key-pressed(event) => {
-        Data.set-current-tab(section-index, index);
+    // Compact mode: Slide between metadata and content.
+    if (!tabs[index].wizard-mode) && compact-layout: SlideView {
+        width: 100%;
+        height: 100%;
+        pages: [@tr("Metadata"), @tr("Library Content")];
+        current-index: tabs[index].compact-layout-page-index;
 
-        // If the focus is in the command toolbar, make the Escape key moving
-        // the focus back to the graphics scene without triggering any action.
-        if (event.text == Key.Escape) && (!root.has-focus) {
-            root.focus();
-            return accept;
+        LibraryMetadata {
+            width: parent.width;
+            section-index: section-index;
+            tabs: tabs;
+            index: index;
         }
-        reject
-    }
 
-    key-released(event) => {
-        Backend.scene-key-event(section-index, event) ? accept : reject
+        LibraryContent {
+            width: parent.width;
+            section-index: section-index;
+            tabs: tabs;
+            index: index;
+        }
+
+        page-clicked(idx) => {
+            tabs[index].compact-layout-page-index = idx;
+        }
     }
 }

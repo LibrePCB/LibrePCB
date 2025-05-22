@@ -380,7 +380,12 @@ void MainWindow::trigger(ui::Action a) noexcept {
     // Library
     case ui::Action::LibraryCreate: {
       if (!switchToTab<CreateLibraryTab>()) {
-        addTab(std::make_shared<CreateLibraryTab>(mApp));
+        auto tab = std::make_shared<CreateLibraryTab>(mApp);
+        connect(
+            tab.get(), &CreateLibraryTab::libraryCreated, this,
+            [this](const FilePath& fp) { openLibraryTab(fp, true); },
+            Qt::QueuedConnection);
+        addTab(tab);
       }
       break;
     }
@@ -468,11 +473,7 @@ void MainWindow::triggerLibrary(slint::SharedString path,
 
   switch (a) {
     case ui::LibraryAction::Open: {
-      if (auto editor = mApp.openLibrary(fp)) {
-        if (!switchToLibraryTab<LibraryTab>(editor->getUiIndex())) {
-          addTab(std::make_shared<LibraryTab>(mApp, *editor));
-        }
-      }
+      openLibraryTab(fp, false);
       break;
     }
     case ui::LibraryAction::Uninstall: {
@@ -500,9 +501,7 @@ void MainWindow::triggerLibraryEditor(int index,
 
   switch (a) {
     case ui::LibraryEditorAction::Open: {
-      if (!switchToLibraryTab<LibraryTab>(index)) {
-        addTab(std::make_shared<LibraryTab>(mApp, *editor));
-      }
+      openLibraryTab(editor->getFilePath(), false);
       break;
     }
     case ui::LibraryEditorAction::Close: {
@@ -645,6 +644,14 @@ void MainWindow::triggerBoard(int project, int board,
       qWarning() << "Unhandled action in MainWindow::triggerBoard():"
                  << static_cast<int>(a);
       break;
+    }
+  }
+}
+
+void MainWindow::openLibraryTab(const FilePath& fp, bool wizardMode) noexcept {
+  if (auto editor = mApp.openLibrary(fp)) {
+    if (!switchToLibraryTab<LibraryTab>(editor->getUiIndex())) {
+      addTab(std::make_shared<LibraryTab>(mApp, *editor, wizardMode));
     }
   }
 }

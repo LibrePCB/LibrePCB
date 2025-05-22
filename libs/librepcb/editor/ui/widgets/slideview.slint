@@ -1,0 +1,57 @@
+import { LinkText } from "linktext.slint";
+
+export component SlideView inherits VerticalLayout {
+    in property <[string]> pages;
+    in-out property <int> current-index: 0;
+
+    callback page-clicked(index: int);
+    page-clicked(index) => {
+        current-index = index;
+    }
+
+    HorizontalLayout {
+        height: self.preferred-height;
+        alignment: start;
+
+        for page[index] in pages: HorizontalLayout {
+            LinkText {
+                width: self.preferred-width + 16px;
+                height: self.preferred-height + 16px;
+                vertical-alignment: center;
+                horizontal-alignment: center;
+                text: page;
+                text-color: (index == current-index) ? #e0e0e0 : #909090;
+                text-color-hovered: (index == current-index) ? #ffffff : #a0a0a0;
+
+                clicked => {
+                    current-index = index;
+                }
+            }
+
+            if (index + 1) < pages.length: Text {
+                text: "•";
+                color: #909090;
+                vertical-alignment: center;
+            }
+        }
+    }
+
+    Rectangle {
+        height: 1px;
+        background: #555555;
+    }
+
+    Flickable {
+        viewport-width: self.width * pages.length;
+        viewport-height: self.height;
+        viewport-x: -self.width * current-index;
+        viewport-y: 0;
+        interactive: false;
+
+        animate viewport-x { duration: 200ms; }
+
+        HorizontalLayout {
+            @children
+        }
+    }
+}

@@ -96,6 +96,9 @@ WorkspaceLibraryDb::WorkspaceLibraryDb(const FilePath& librariesPath)
           &WorkspaceLibraryDb::scanFailed, Qt::QueuedConnection);
   connect(mLibraryScanner.data(), &WorkspaceLibraryScanner::scanFinished, this,
           &WorkspaceLibraryDb::scanFinished, Qt::QueuedConnection);
+  connect(mLibraryScanner.data(),
+          &WorkspaceLibraryScanner::scanInProgressChanged, this,
+          &WorkspaceLibraryDb::scanInProgressChanged, Qt::QueuedConnection);
 
   qDebug("Successfully loaded workspace library database.");
 }

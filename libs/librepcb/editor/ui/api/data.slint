@@ -300,9 +300,11 @@ export global Data {
                 { },
                 {
                     library-index: 0,
+                    wizard-mode: false,
+                    compact-layout-page-index: 0,
                     name: "Library",
                     description: "Foo Bar\nMultiline\nBlabla",
-                    keywords: ["Foo", "Bar", "Hello World"],
+                    keywords: "Foo,Bar,Hello World",
                     author: "Somebody",
                     version: "0.1",
                     deprecated: false,
@@ -679,6 +681,8 @@ export global Data {
 
     // Filter applied to both local libraries and remote libraries
     in property <string> libraries-filter: "Foo";
+
+    in property <bool> libraries-rescan-in-progress: false;
 
     in property <[LibraryEditorData]> library-editors: [
         {

@@ -26,12 +26,14 @@
 #include "libraryelementsmodel.h"
 #include "utils/slinthelpers.h"
 
+#include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/library/library.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
+#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace
@@ -44,7 +46,7 @@ namespace editor {
  ******************************************************************************/
 
 LibraryTab::LibraryTab(GuiApplication& app, LibraryEditor2& editor,
-                       QObject* parent) noexcept
+                       bool wizardMode, QObject* parent) noexcept
   : WindowTab(app, parent),
     onDerivedUiDataChanged(*this),
     mEditor(editor),
@@ -52,12 +54,23 @@ LibraryTab::LibraryTab(GuiApplication& app, LibraryEditor2& editor,
     mDb(editor.getWorkspace().getLibraryDb()),
     mLocaleOrder(editor.getWorkspace().getSettings().libraryLocaleOrder.get()),
     mLibPath(mLibrary.getDirectory().getAbsPath()),
+    mWizardMode(wizardMode),
+    mCompactLayoutPageIndex(1),
+    mCurrentCategoryIndex(0),
+    mCurrentElementIndex(-1),
     mCmpCatElementCount(0),
     mPkgCatElementCount(0),
     mCategories(new slint::VectorModel<ui::TreeViewItemData>()),
-    mCurrentCategoryIndex(0),
-    mFilteredElements(new slint::VectorModel<ui::TreeViewItemData>()),
-    mCurrentElementIndex(-1) {
+    mFilteredElements(new slint::VectorModel<ui::TreeViewItemData>()) {
+  // Connect workspace library DB.
+  connect(&mDb, &WorkspaceLibraryDb::scanFinished, this,
+          &LibraryTab::refreshLibElements);
+
+  // Connect library.
+  connect(&mLibrary, &Library::namesChanged, this,
+          [this]() { onUiDataChanged.notify(); });
+
+  // Refresh content.
   refreshLibElements();
   setSelectedCategory(std::nullopt);
 }
@@ -87,14 +100,19 @@ ui::TabData LibraryTab::getUiData() const noexcept {
 ui::LibraryTabData LibraryTab::getDerivedUiData() const noexcept {
   return ui::LibraryTabData{
       mEditor.getUiIndex(),  // Library index
+      mWizardMode,  // Wizard mode
+      mCompactLayoutPageIndex,  // Compact layout page index
       q2s(mLibrary.getIconAsPixmap()),  // Icon
       q2s(*mLibrary.getNames().getDefaultValue()),  // Name
+      mNameError,  // Name error
       q2s(mLibrary.getDescriptions().getDefaultValue()),  // Description
-      nullptr,  // Keywords
+      q2s(mLibrary.getKeywords().getDefaultValue()),  // Keywords
       q2s(mLibrary.getAuthor()),  // Author
       q2s(mLibrary.getVersion().toStr()),  // Version
+      mVersionError,  // Version error
       mLibrary.isDeprecated(),  // Deprecated
       q2s(mLibrary.getUrl().toString()),  // URL
+      mUrlError,  // URL error
       nullptr,  // Dependencies
       q2s(*mLibrary.getManufacturer()),  // Manufacturer
       mCategories,  // Component categories
@@ -105,11 +123,89 @@ ui::LibraryTabData LibraryTab::getDerivedUiData() const noexcept {
 }
 
 void LibraryTab::setDerivedUiData(const ui::LibraryTabData& data) noexcept {
+  // Name
+  {
+    const QString value = s2q(data.name);
+    if (value != mLibrary.getNames().getDefaultValue()) {
+      if (auto validated = validateElementName(value, mNameError)) {
+        auto set = mLibrary.getNames();
+        set.setDefaultValue(*validated);
+        mLibrary.setNames(set);
+      }
+    }
+  }
+
+  // Description
+  {
+    const QString value = s2q(data.description);
+    if (value != mLibrary.getDescriptions().getDefaultValue()) {
+      auto set = mLibrary.getDescriptions();
+      set.setDefaultValue(value.trimmed());
+      mLibrary.setDescriptions(set);
+    }
+  }
+
+  // Keywords
+  {
+    const QString value = s2q(data.keywords);
+    if (value != mLibrary.getKeywords().getDefaultValue()) {
+      auto set = mLibrary.getKeywords();
+      set.setDefaultValue(value.trimmed());
+      mLibrary.setKeywords(set);
+    }
+  }
+
+  // Author
+  {
+    const QString value = s2q(data.author);
+    if (value != mLibrary.getAuthor()) {
+      mLibrary.setAuthor(value.trimmed());
+    }
+  }
+
+  // Version
+  {
+    const QString value = s2q(data.version);
+    if (value != mLibrary.getVersion().toStr()) {
+      if (auto validated = validateVersion(value, mVersionError)) {
+        mLibrary.setVersion(*validated);
+      }
+    }
+  }
+
+  // Deprecated
+  if (data.deprecated != mLibrary.isDeprecated()) {
+    mLibrary.setDeprecated(data.deprecated);
+  }
+
+  // URL
+  {
+    const QString value = s2q(data.url);
+    if (value != mLibrary.getUrl().toString()) {
+      if (auto validated = validateUrl(value, mUrlError, true)) {
+        mLibrary.setUrl(*validated);
+      }
+    }
+  }
+
+  // Manufacturer
+  {
+    const QString value = s2q(data.manufacturer);
+    if (value != mLibrary.getManufacturer()) {
+      mLibrary.setManufacturer(cleanSimpleString(value));
+    }
+  }
+
+  // Current category index
   if (data.categories_index != mCurrentCategoryIndex) {
     mCurrentCategoryIndex = data.categories_index;
     setSelectedCategory(mCategories->row_data(mCurrentCategoryIndex));
   }
+
+  // Current element index
   mCurrentElementIndex = data.element_index;
+
+  // Update UI on changes
   onDerivedUiDataChanged.notify();
 }
 
@@ -122,6 +218,17 @@ void LibraryTab::trigger(ui::TabAction a) noexcept {
   const FilePath fp = uuid ? mLibCategories.key(*uuid) : FilePath(userData);
 
   switch (a) {
+    case ui::TabAction::Accept: {
+      try {
+        mLibrary.save();
+        mLibrary.getDirectory().getFileSystem()->save();
+        mWizardMode = false;
+      } catch (const Exception& e) {
+        QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+      }
+      onDerivedUiDataChanged.notify();
+      break;
+    }
     case ui::TabAction::Delete: {
       qDebug() << "Delete" << fp;
       break;
@@ -207,8 +314,8 @@ void LibraryTab::refreshLibElements() noexcept {
       ui::TreeViewItemAction::None,  // Action
   });
   if (!mUncategorizedRoot->childs.isEmpty()) {
-  addCategoriesToModel(TreeItemType::Uncategorized, *mUncategorizedRoot,
-                       mUncategorizedRoot->childs.count());
+    addCategoriesToModel(TreeItemType::Uncategorized, *mUncategorizedRoot,
+                         mUncategorizedRoot->childs.count());
   }
   addCategoriesToModel(TreeItemType::ComponentCategory, *mCmpCatRoot,
                        mCmpCatElementCount);
@@ -226,7 +333,6 @@ std::shared_ptr<LibraryTab::TreeItem> LibraryTab::createRootItem(
       q2s(icon.pixmap(32)),
       text,
       uuid.toStr(),
-      false,
       {},
   });
   mLibElementsMap.insert(uuid, root);
@@ -258,12 +364,10 @@ std::shared_ptr<LibraryTab::TreeItem> LibraryTab::getOrCreateCategory(
   auto item = std::make_shared<TreeItem>();
   item->type = type;
   item->userData = uuid.toStr();
-  item->fromOtherLib = false;
   try {
     FilePath fp = mLibCategories.key(uuid);
     if (!fp.isValid()) {
       fp = mDb.getLatest<CategoryType>(uuid);
-      item->fromOtherLib = true;
       item->icon = q2s(icon.pixmap(32, QIcon::Disabled));
     } else {
       item->icon = q2s(icon.pixmap(32, QIcon::Normal));
@@ -304,7 +408,6 @@ void LibraryTab::loadElements(TreeItemType type, slint::Image icon,
       item->type = type;
       item->icon = icon;
       item->userData = fp.toStr();
-      item->fromOtherLib = false;
       mDb.getTranslations<ElementType>(fp, mLocaleOrder, &item->text);
 
       bool addedToCategory = false;
@@ -381,7 +484,7 @@ void LibraryTab::addCategoriesToModel(
           (count > 0) ? q2s(QString::number(count))
                       : slint::SharedString(),  // Comment
           slint::SharedString(),  // Hint
-          child->fromOtherLib,  // Italic
+          false,  // Italic
           count > 0,  // Bold
           q2s(child->userData),  // User data
           false,  // Is project file or folder

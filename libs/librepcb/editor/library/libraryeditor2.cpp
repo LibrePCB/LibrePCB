@@ -50,6 +50,8 @@ LibraryEditor2::LibraryEditor2(GuiApplication& app,
     mWorkspace(app.getWorkspace()),
     mLibrary(std::move(lib)),
     mUiIndex(uiIndex) {
+  connect(mLibrary.get(), &Library::namesChanged, this,
+          [this]() { onUiDataChanged.notify(); });
 }
 
 LibraryEditor2::~LibraryEditor2() noexcept {

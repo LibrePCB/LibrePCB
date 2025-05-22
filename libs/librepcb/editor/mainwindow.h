@@ -34,6 +34,9 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class FilePath;
+
 namespace editor {
 
 class GuiApplication;
@@ -87,6 +90,7 @@ private:
   void triggerSchematic(int project, int schematic,
                         ui::SchematicAction a) noexcept;
   void triggerBoard(int project, int board, ui::BoardAction a) noexcept;
+  void openLibraryTab(const FilePath& fp, bool wizardMode) noexcept;
   void openSchematicTab(int projectIndex, int index) noexcept;
   void openBoard2dTab(int projectIndex, int index) noexcept;
   void openBoard3dTab(int projectIndex, int index) noexcept;

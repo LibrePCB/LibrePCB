@@ -18,9 +18,9 @@ export component TreeView inherits Rectangle {
     in property <bool> show-tree: false;
     in property <bool> supports-expand: true;
     out property <bool> has-focus <=> fs.has-focus;
+    out property <length> scrollbar-width: (self.height < self.preferred-height) ? 7px : 0;
     property <length> icon-size: item-height - 4px;
     property <length> pin-size: 14px;
-    property <length> scrollbar-width: (self.height < self.preferred-height) ? 7px : 0;
 
     callback key-pressed(index: int, item: TreeViewItemData, event: KeyEvent) -> EventResult;
     callback item-hovered(index: int, item: TreeViewItemData);

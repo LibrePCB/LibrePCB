@@ -69,7 +69,6 @@ class LibraryTab final : public WindowTab {
     slint::Image icon;
     QString text;
     QString userData;
-    bool fromOtherLib;
     QVector<std::shared_ptr<TreeItem>> childs;
   };
 
@@ -81,7 +80,7 @@ public:
   LibraryTab() = delete;
   LibraryTab(const LibraryTab& other) = delete;
   explicit LibraryTab(GuiApplication& app, LibraryEditor2& editor,
-                      QObject* parent = nullptr) noexcept;
+                      bool wizardMode, QObject* parent = nullptr) noexcept;
   ~LibraryTab() noexcept;
 
   // General Methods
@@ -126,6 +125,17 @@ private:
   const QStringList& mLocaleOrder;
   const FilePath mLibPath;
 
+  // State
+  bool mWizardMode;
+  int mCompactLayoutPageIndex;
+  int mCurrentCategoryIndex;
+  int mCurrentElementIndex;
+
+  // Parse errors
+  slint::SharedString mNameError;
+  slint::SharedString mVersionError;
+  slint::SharedString mUrlError;
+
   // Library content
   QHash<FilePath, Uuid> mLibCategories;
   std::shared_ptr<TreeItem> mUncategorizedRoot;
@@ -137,9 +147,7 @@ private:
 
   // UI data
   std::shared_ptr<slint::VectorModel<ui::TreeViewItemData>> mCategories;
-  int mCurrentCategoryIndex;
   std::shared_ptr<slint::VectorModel<ui::TreeViewItemData>> mFilteredElements;
-  int mCurrentElementIndex;
 };
 
 /*******************************************************************************

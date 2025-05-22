@@ -90,7 +90,10 @@ public:
   void setVersion(const Version& version) noexcept { mVersion = version; }
   void setAuthor(const QString& author) noexcept { mAuthor = author; }
   void setDeprecated(bool deprecated) noexcept { mIsDeprecated = deprecated; }
-  void setNames(const LocalizedNameMap& names) noexcept { mNames = names; }
+  void setNames(const LocalizedNameMap& names) noexcept {
+    mNames = names;
+    emit namesChanged();
+  }
   void setDescriptions(const LocalizedDescriptionMap& descriptions) noexcept {
     mDescriptions = descriptions;
   }
@@ -124,6 +127,9 @@ public:
     return dir.fileExists((path.isEmpty() ? path : path % "/") % ".librepcb-" %
                           ElementType::getShortElementName());
   }
+
+signals:
+  void namesChanged();
 
 protected:  // Methods
   /**

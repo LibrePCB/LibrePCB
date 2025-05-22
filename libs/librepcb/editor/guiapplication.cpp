@@ -351,6 +351,9 @@ void GuiApplication::createNewWindow(int id, int projectIndex) noexcept {
        mRemoteLibraries->getUiData());
   bind(mw.get(), d, &ui::Data::set_libraries_filter, mLibrariesFilter.get(),
        &SlintKeyEventTextBuilder::textChanged, mLibrariesFilter->getText());
+  bind(mw.get(), d, &ui::Data::set_libraries_rescan_in_progress,
+       &mWorkspace.getLibraryDb(), &WorkspaceLibraryDb::scanInProgressChanged,
+       mWorkspace.getLibraryDb().isScanInProgress());
   bind(mw.get(), d, &ui::Data::set_workspace_contains_standard_components, this,
        &GuiApplication::librariesContainStandardComponentsChanged,
        mLibrariesContainStandardComponents);
