@@ -56,7 +56,7 @@ LibraryTab::LibraryTab(GuiApplication& app, LibraryEditor2& editor,
     mCategories(new slint::VectorModel<ui::TreeViewItemData>()),
     mFilteredElements(new slint::VectorModel<ui::TreeViewItemData>()) {
   refreshLibElements();
-  setSelectedCategory(std::nullopt, true);
+  setSelectedCategory(std::nullopt);
 }
 
 LibraryTab::~LibraryTab() noexcept {
@@ -105,7 +105,7 @@ void LibraryTab::setDerivedUiData(const ui::LibraryTabData& data) noexcept {
     mCurrentCategoryIndex = data.categories_index;
     auto item = mCategories->row_data(mCurrentCategoryIndex);
     auto userData = item ? s2q(item->user_data) : QString();
-    setSelectedCategory(Uuid::tryFromString(userData), false);
+    setSelectedCategory(Uuid::tryFromString(userData));
   }
   onDerivedUiDataChanged.notify();
 }
@@ -133,6 +133,7 @@ void LibraryTab::refreshLibElements() noexcept {
       new TreeItem{TreeItemType::ComponentCategory,  // Ignored
                    QString(),
                    QString(),
+                   QString(),
                    false,
                    {}});
   mLibElementsMap.clear();
@@ -146,7 +147,10 @@ void LibraryTab::refreshLibElements() noexcept {
                                              TreeItemType::ComponentCategory);
   loadElements<Device, ComponentCategory>(TreeItemType::Device,
                                           TreeItemType::ComponentCategory);
-  sortItemsRecursive(mLibElementsRoot->childs);
+
+  for (auto child : mLibElementsRoot->childs) {
+    sortItemsRecursive(child->childs);
+  }
 
   mCategories->clear();
   addCategoriesToModel(TreeItemType::ComponentCategory,
@@ -180,6 +184,7 @@ std::shared_ptr<LibraryTab::TreeItem> LibraryTab::getOrCreateCategory(
 
   auto item = std::make_shared<TreeItem>();
   item->type = type;
+  item->userData = uuid.toStr();
   item->fromOtherLib = false;
   try {
     FilePath fp = mLibCategories.key(uuid);
@@ -220,6 +225,7 @@ void LibraryTab::loadElements(TreeItemType type, TreeItemType catType) {
         if (auto cat = getOrCreateCategory<CategoryType>(catType, catUuid)) {
           auto item = std::make_shared<TreeItem>();
           item->type = type;
+          item->userData = fp.toStr();
           item->fromOtherLib = false;
           mDb.getTranslations<ElementType>(fp, mLocaleOrder, &item->text,
                                            &item->tooltip);
@@ -293,7 +299,7 @@ void LibraryTab::addCategoriesToModel(
           q2s(child->tooltip),  // Hint
           child->fromOtherLib,  // Italic
           elementsCount > 0,  // Bold
-          slint::SharedString(),  // User data
+          q2s(child->userData),  // User data
           false,  // Is project file or folder
           false,  // Has children
           false,  // Expanded
@@ -306,8 +312,7 @@ void LibraryTab::addCategoriesToModel(
   }
 }
 
-void LibraryTab::setSelectedCategory(const std::optional<Uuid>& uuid,
-                                     bool force) noexcept {
+void LibraryTab::setSelectedCategory(const std::optional<Uuid>& uuid) noexcept {
   // if ((uuid == mSelectedCategory) && (!force)) return;
 
   // mSelectedCategory = uuid;
@@ -382,7 +387,7 @@ void LibraryTab::setSelectedCategory(const std::optional<Uuid>& uuid,
         q2s(item->tooltip),  // Hint
         false,  // Italic
         false,  // Bold
-        slint::SharedString(),  // User data
+        q2s(item->userData),  // User data
         false,  // Is project file or folder
         false,  // Has children
         false,  // Expanded

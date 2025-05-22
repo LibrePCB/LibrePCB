@@ -67,6 +67,7 @@ class LibraryTab final : public WindowTab {
     TreeItemType type;
     QString text;
     QString tooltip;
+    QString userData;
     bool fromOtherLib;
     QVector<std::shared_ptr<TreeItem>> childs;
   };
@@ -107,8 +108,7 @@ private:  // Methods
   void addCategoriesToModel(TreeItem& item, TreeItemType type,
                             slint::VectorModel<ui::TreeViewItemData>& model,
                             int level, const QIcon& icon) noexcept;
-  void setSelectedCategory(const std::optional<Uuid>& uuid,
-                           bool force) noexcept;
+  void setSelectedCategory(const std::optional<Uuid>& uuid) noexcept;
   void getChildsRecursive(TreeItem& item,
                           QVector<std::shared_ptr<TreeItem>>& childs) noexcept;
 
