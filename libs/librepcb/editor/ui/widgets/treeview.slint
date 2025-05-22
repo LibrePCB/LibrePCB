@@ -12,11 +12,12 @@ import {
 export component TreeView inherits Rectangle {
     in-out property <[TreeViewItemData]> model;
     in-out property <int> current-index: -1;
+    in property <length> item-height: 22px;
+    in property <length> font-size: 14px;
     in property <bool> show-tree: false;
     in property <bool> supports-expand: true;
     out property <bool> has-focus <=> fs.has-focus;
-    property <length> item-height: 22px;
-    property <length> icon-size: 18px;
+    property <length> icon-size: item-height - 4px;
     property <length> pin-size: 14px;
     property <length> scrollbar-width: (self.height < self.preferred-height) ? 7px : 0;
 
@@ -169,10 +170,11 @@ export component TreeView inherits Rectangle {
                     item-text-txt := Text {
                         horizontal-stretch: 1;
                         color: is-enabled ? #dddddd : #a0a0a0;
-                        font-size: 14px;
+                        font-size: font-size;
                         font-weight: item.bold ? 600 : 400;
                         font-italic: item.italic;
-                        overflow: TextOverflow.elide;
+                        vertical-alignment: center;
+                        overflow: elide;
                         text: item.text;
                         accessible-role: none;
                     }
@@ -183,7 +185,7 @@ export component TreeView inherits Rectangle {
                         font-size: 11px;
                         font-weight: 300;
                         vertical-alignment: center;
-                        overflow: TextOverflow.elide;
+                        overflow: elide;
                         text: item.comment;
                         accessible-role: none;
                     }

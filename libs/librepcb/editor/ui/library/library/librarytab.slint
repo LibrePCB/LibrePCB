@@ -192,6 +192,8 @@ export component LibraryTab inherits Tab {
             current-index: tabs[index].categories-index;
             show-tree: true;
             supports-expand: false;
+            font-size: 12px;
+            item-height: 20px;
 
             item-selected(idx, item) => {
                 tabs[index].categories-index = idx;
@@ -208,6 +210,8 @@ export component LibraryTab inherits Tab {
             model: tabs[index].filtered-elements;
             show-tree: true;
             supports-expand: false;
+            font-size: 12px;
+            item-height: 20px;
         }
 
         Rectangle {

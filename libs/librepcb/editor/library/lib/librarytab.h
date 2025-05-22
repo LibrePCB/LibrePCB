@@ -66,7 +66,6 @@ class LibraryTab final : public WindowTab {
   struct TreeItem {
     TreeItemType type;
     QString text;
-    QString tooltip;
     QString userData;
     bool fromOtherLib;
     QVector<std::shared_ptr<TreeItem>> childs;
@@ -95,22 +94,27 @@ public:
 
 private:  // Methods
   void refreshLibElements() noexcept;
+  std::shared_ptr<TreeItem> createRootItem(TreeItemType type,
+                                           const QString& text) noexcept;
   template <typename CategoryType>
-  void loadCategories(TreeItemType type);
+  void loadCategories(TreeItemType type, TreeItem& root);
   template <typename CategoryType>
   std::shared_ptr<TreeItem> getOrCreateCategory(TreeItemType type,
-                                                const Uuid& uuid);
+                                                const Uuid& uuid,
+                                                TreeItem& root);
   template <typename ElementType, typename CategoryType>
-  void loadElements(TreeItemType type, TreeItemType catType);
+  void loadElements(TreeItemType type, TreeItemType catType, TreeItem& root,
+                    int& count);
   void sortItemsRecursive(QVector<std::shared_ptr<TreeItem>>& items) noexcept;
-  void addCategoriesToModel(TreeItemType type, const QString& title,
-                            const QIcon& icon) noexcept;
+  void addCategoriesToModel(TreeItemType type, const QIcon& icon,
+                            TreeItem& root, int count) noexcept;
   void addCategoriesToModel(TreeItem& item, TreeItemType type,
                             slint::VectorModel<ui::TreeViewItemData>& model,
                             int level, const QIcon& icon) noexcept;
-  void setSelectedCategory(const std::optional<Uuid>& uuid) noexcept;
+  void setSelectedCategory(
+      const std::optional<ui::TreeViewItemData>& data) noexcept;
   void getChildsRecursive(TreeItem& item,
-                          QVector<std::shared_ptr<TreeItem>>& childs) noexcept;
+                          QSet<std::shared_ptr<TreeItem>>& childs) noexcept;
 
 private:
   LibraryEditor2& mEditor;
@@ -121,12 +125,15 @@ private:
 
   // Library content
   QHash<FilePath, Uuid> mLibCategories;
-  std::shared_ptr<TreeItem> mLibElementsRoot;
+  std::shared_ptr<TreeItem> mCmpCatRoot;
+  int mCmpCatElementCount;
+  std::shared_ptr<TreeItem> mPkgCatRoot;
+  int mPkgCatElementCount;
   QHash<Uuid, std::shared_ptr<TreeItem>> mLibElementsMap;
 
   // UI data
   std::shared_ptr<slint::VectorModel<ui::TreeViewItemData>> mCategories;
-  int mCurrentCategoryIndex = -1;
+  int mCurrentCategoryIndex;
   std::shared_ptr<slint::VectorModel<ui::TreeViewItemData>> mFilteredElements;
 };
 
