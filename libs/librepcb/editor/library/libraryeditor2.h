@@ -96,6 +96,7 @@ public:
 signals:
   void uiIndexChanged();
   void statusBarMessageChanged(const QString& message, int timeoutMs);
+  void aboutToBeDestroyed();
 
 private:
   GuiApplication& mApp;

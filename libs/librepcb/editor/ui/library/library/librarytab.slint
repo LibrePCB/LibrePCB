@@ -1,10 +1,10 @@
-import { TextEdit } from "std-widgets.slint";
 import { Tab } from "../../tab.slint";
 import {
     Button,
     ComboBox,
     LineEdit,
     LinkText,
+    TextEdit,
     MessageBox,
     Palette,
     PanelHeader,
@@ -64,7 +64,11 @@ component LibraryMetadata inherits GridLayout {
         TextEdit {
             height: 100px;
             text: tabs[index].description;
-            enabled: false;
+            placeholder-text: tabs[index].description;
+
+            text-edited(text) => {
+                tabs[index].description = text;
+            }
         }
     }
 

@@ -66,6 +66,10 @@ LibraryTab::LibraryTab(GuiApplication& app, LibraryEditor2& editor,
   connect(&mDb, &WorkspaceLibraryDb::scanFinished, this,
           &LibraryTab::refreshLibElements);
 
+  // Connect library editor.
+  connect(&mEditor, &LibraryEditor2::aboutToBeDestroyed, this,
+          &LibraryTab::closeEnforced);
+
   // Connect library.
   connect(&mLibrary, &Library::namesChanged, this,
           [this]() { onUiDataChanged.notify(); });
@@ -234,7 +238,9 @@ void LibraryTab::trigger(ui::TabAction a) noexcept {
       break;
     }
     case ui::TabAction::EditProperties: {
-      qDebug() << "Open" << fp;
+      //switch (data.type) {
+      //  case
+      //}
       break;
     }
     default: {

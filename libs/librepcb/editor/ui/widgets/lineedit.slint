@@ -94,6 +94,7 @@ export component LineEdit inherits Rectangle {
         wrap: no-wrap;
         overflow: elide;
         visible: edt.text.is-empty && (!placeholder-text.is-empty);
+        accessible-role: none;
     }
 
     ta := TouchArea {
@@ -165,7 +166,7 @@ export component LineEdit inherits Rectangle {
                         } else if root.key-pressed(event) == accept {
                             return accept;
                         }
-                        reject;
+                        reject
                     }
                 }
             }

@@ -55,6 +55,7 @@ LibraryEditor2::LibraryEditor2(GuiApplication& app,
 }
 
 LibraryEditor2::~LibraryEditor2() noexcept {
+  emit aboutToBeDestroyed();
 }
 
 /*******************************************************************************

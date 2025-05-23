@@ -93,6 +93,12 @@ public:
   // Operator Overloadings
   LibraryTab& operator=(const LibraryTab& rhs) = delete;
 
+signals:
+  void symbolEditorRequested(const FilePath& fp);
+  void packageEditorRequested(const FilePath& fp);
+  void componentEditorRequested(const FilePath& fp);
+  void deviceEditorRequested(const FilePath& fp);
+
 private:  // Methods
   void refreshLibElements() noexcept;
   std::shared_ptr<TreeItem> createRootItem(TreeItemType type, const QIcon& icon,
