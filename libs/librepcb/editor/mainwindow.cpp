@@ -24,11 +24,15 @@
 
 #include "editorcommandsetupdater.h"
 #include "guiapplication.h"
+#include "library/cmp/componenttab.h"
 #include "library/createlibrarytab.h"
+#include "library/dev/devicetab.h"
 #include "library/downloadlibrarytab.h"
 #include "library/lib/librarytab.h"
 #include "library/librariesmodel.h"
 #include "library/libraryeditor2.h"
+#include "library/pkg/packagetab.h"
+#include "library/sym/symboltab.h"
 #include "mainwindowtestadapter.h"
 #include "notificationsmodel.h"
 #include "project/board/board2dtab.h"
@@ -650,9 +654,46 @@ void MainWindow::triggerBoard(int project, int board,
 
 void MainWindow::openLibraryTab(const FilePath& fp, bool wizardMode) noexcept {
   if (auto editor = mApp.openLibrary(fp)) {
-    if (!switchToLibraryTab<LibraryTab>(editor->getUiIndex())) {
-      addTab(std::make_shared<LibraryTab>(mApp, *editor, wizardMode));
+    if (!switchToLibraryElementTab<LibraryTab>(fp)) {
+      auto tab = std::make_shared<LibraryTab>(mApp, *editor, wizardMode);
+      connect(tab.get(), &LibraryTab::symbolEditorRequested, this,
+              &MainWindow::openSymbolTab);
+      connect(tab.get(), &LibraryTab::packageEditorRequested, this,
+              &MainWindow::openPackageTab);
+      connect(tab.get(), &LibraryTab::componentEditorRequested, this,
+              &MainWindow::openComponentTab);
+      connect(tab.get(), &LibraryTab::deviceEditorRequested, this,
+              &MainWindow::openDeviceTab);
+      addTab(tab);
     }
+  }
+}
+
+void MainWindow::openSymbolTab(LibraryEditor2& editor,
+                               const FilePath& fp) noexcept {
+  if (!switchToLibraryElementTab<SymbolTab>(fp)) {
+    addTab(std::make_shared<SymbolTab>(mApp, editor, fp));
+  }
+}
+
+void MainWindow::openPackageTab(LibraryEditor2& editor,
+                                const FilePath& fp) noexcept {
+  if (!switchToLibraryElementTab<PackageTab>(fp)) {
+    addTab(std::make_shared<PackageTab>(mApp, editor, fp));
+  }
+}
+
+void MainWindow::openComponentTab(LibraryEditor2& editor,
+                                  const FilePath& fp) noexcept {
+  if (!switchToLibraryElementTab<ComponentTab>(fp)) {
+    addTab(std::make_shared<ComponentTab>(mApp, editor, fp));
+  }
+}
+
+void MainWindow::openDeviceTab(LibraryEditor2& editor,
+                               const FilePath& fp) noexcept {
+  if (!switchToLibraryElementTab<DeviceTab>(fp)) {
+    addTab(std::make_shared<DeviceTab>(mApp, editor, fp));
   }
 }
 
@@ -744,9 +785,9 @@ bool MainWindow::switchToTab() noexcept {
 }
 
 template <typename T>
-bool MainWindow::switchToLibraryTab(int libIndex) noexcept {
+bool MainWindow::switchToLibraryElementTab(const FilePath& fp) noexcept {
   for (auto section : *mSections) {
-    if (section->switchToLibraryTab<T>(libIndex)) {
+    if (section->switchToLibraryElementTab<T>(fp)) {
       return true;
     }
   }

@@ -40,6 +40,7 @@ class FilePath;
 namespace editor {
 
 class GuiApplication;
+class LibraryEditor2;
 class MainWindowTestAdapter;
 class ProjectReadmeRenderer;
 class WindowSection;
@@ -91,6 +92,10 @@ private:
                         ui::SchematicAction a) noexcept;
   void triggerBoard(int project, int board, ui::BoardAction a) noexcept;
   void openLibraryTab(const FilePath& fp, bool wizardMode) noexcept;
+  void openSymbolTab(LibraryEditor2& editor, const FilePath& fp) noexcept;
+  void openPackageTab(LibraryEditor2& editor, const FilePath& fp) noexcept;
+  void openComponentTab(LibraryEditor2& editor, const FilePath& fp) noexcept;
+  void openDeviceTab(LibraryEditor2& editor, const FilePath& fp) noexcept;
   void openSchematicTab(int projectIndex, int index) noexcept;
   void openBoard2dTab(int projectIndex, int index) noexcept;
   void openBoard3dTab(int projectIndex, int index) noexcept;
@@ -100,7 +105,7 @@ private:
   template <typename T>
   bool switchToTab() noexcept;
   template <typename T>
-  bool switchToLibraryTab(int libIndex) noexcept;
+  bool switchToLibraryElementTab(const FilePath& fp) noexcept;
   template <typename T>
   bool switchToProjectTab(int prjIndex, int objIndex) noexcept;
 

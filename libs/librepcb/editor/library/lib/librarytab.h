@@ -84,7 +84,7 @@ public:
   ~LibraryTab() noexcept;
 
   // General Methods
-  int getLibraryIndex() const noexcept;
+  const FilePath& getDirectoryPath() const noexcept { return mLibPath; }
   ui::TabData getUiData() const noexcept override;
   ui::LibraryTabData getDerivedUiData() const noexcept;
   void setDerivedUiData(const ui::LibraryTabData& data) noexcept;
@@ -94,10 +94,10 @@ public:
   LibraryTab& operator=(const LibraryTab& rhs) = delete;
 
 signals:
-  void symbolEditorRequested(const FilePath& fp);
-  void packageEditorRequested(const FilePath& fp);
-  void componentEditorRequested(const FilePath& fp);
-  void deviceEditorRequested(const FilePath& fp);
+  void symbolEditorRequested(LibraryEditor2& editor, const FilePath& fp);
+  void packageEditorRequested(LibraryEditor2& editor, const FilePath& fp);
+  void componentEditorRequested(LibraryEditor2& editor, const FilePath& fp);
+  void deviceEditorRequested(LibraryEditor2& editor, const FilePath& fp);
 
 private:  // Methods
   void refreshLibElements() noexcept;
@@ -149,7 +149,7 @@ private:
   int mCmpCatElementCount;
   std::shared_ptr<TreeItem> mPkgCatRoot;
   int mPkgCatElementCount;
-  QHash<Uuid, std::shared_ptr<TreeItem>> mLibElementsMap;
+  QHash<QString, std::shared_ptr<TreeItem>> mLibElementsMap;
 
   // UI data
   std::shared_ptr<slint::VectorModel<ui::TreeViewItemData>> mCategories;

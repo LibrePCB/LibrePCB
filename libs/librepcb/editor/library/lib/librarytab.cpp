@@ -86,10 +86,6 @@ LibraryTab::~LibraryTab() noexcept {
  *  General Methods
  ******************************************************************************/
 
-int LibraryTab::getLibraryIndex() const noexcept {
-  return mEditor.getUiIndex();
-}
-
 ui::TabData LibraryTab::getUiData() const noexcept {
   return ui::TabData{
       ui::TabType::Library,  // Type
@@ -220,6 +216,7 @@ void LibraryTab::trigger(ui::TabAction a) noexcept {
   const QString userData = data ? s2q(data->user_data) : QString();
   const std::optional<Uuid> uuid = Uuid::tryFromString(userData);
   const FilePath fp = uuid ? mLibCategories.key(*uuid) : FilePath(userData);
+  std::shared_ptr<TreeItem> item = mLibElementsMap.value(userData);
 
   switch (a) {
     case ui::TabAction::Accept: {
@@ -238,9 +235,29 @@ void LibraryTab::trigger(ui::TabAction a) noexcept {
       break;
     }
     case ui::TabAction::EditProperties: {
-      //switch (data.type) {
-      //  case
-      //}
+      if (fp.isValid() && item) {
+        switch (item->type) {
+          case TreeItemType::Symbol: {
+            emit symbolEditorRequested(mEditor, fp);
+            break;
+          }
+          case TreeItemType::Package: {
+            emit packageEditorRequested(mEditor, fp);
+            break;
+          }
+          case TreeItemType::Component: {
+            emit componentEditorRequested(mEditor, fp);
+            break;
+          }
+          case TreeItemType::Device: {
+            emit deviceEditorRequested(mEditor, fp);
+            break;
+          }
+          default: {
+            break;
+          }
+        }
+      }
       break;
     }
     default: {
@@ -341,7 +358,7 @@ std::shared_ptr<LibraryTab::TreeItem> LibraryTab::createRootItem(
       uuid.toStr(),
       {},
   });
-  mLibElementsMap.insert(uuid, root);
+  mLibElementsMap.insert(uuid.toStr(), root);
   return root;
 }
 
@@ -362,7 +379,7 @@ void LibraryTab::loadCategories(TreeItemType type, const QIcon& icon,
 template <typename CategoryType>
 std::shared_ptr<LibraryTab::TreeItem> LibraryTab::getOrCreateCategory(
     TreeItemType type, const QIcon& icon, const Uuid& uuid, TreeItem& root) {
-  auto it = mLibElementsMap.find(uuid);
+  auto it = mLibElementsMap.find(uuid.toStr());
   if (it != mLibElementsMap.end()) {
     return *it;
   }
@@ -397,7 +414,7 @@ std::shared_ptr<LibraryTab::TreeItem> LibraryTab::getOrCreateCategory(
   } catch (const Exception& e) {
     // TODO
   }
-  mLibElementsMap.insert(uuid, item);
+  mLibElementsMap.insert(uuid.toStr(), item);
   return item;
 }
 
@@ -427,6 +444,7 @@ void LibraryTab::loadElements(TreeItemType type, slint::Image icon,
       if (!addedToCategory) {
         mUncategorizedRoot->childs.push_back(item);
       }
+      mLibElementsMap.insert(fp.toStr(), item);
     }
   } catch (const Exception& e) {
     // TODO
@@ -516,7 +534,7 @@ void LibraryTab::setSelectedCategory(
   if (isRoot) {
     QSet<std::shared_ptr<TreeItem>> set;
     if (uuid) {
-      if (auto item = mLibElementsMap.value(*uuid)) {
+      if (auto item = mLibElementsMap.value(uuid->toStr())) {
         getChildsRecursive(*item, set);
       }
     } else {
@@ -526,7 +544,7 @@ void LibraryTab::setSelectedCategory(
     items = Toolbox::toList(set);
     sortItemsRecursive(items);
   } else if (uuid) {
-    if (auto item = mLibElementsMap.value(*uuid)) {
+    if (auto item = mLibElementsMap.value(uuid->toStr())) {
       items = item->childs;
     }
   }

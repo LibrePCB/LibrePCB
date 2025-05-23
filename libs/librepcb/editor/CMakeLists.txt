@@ -209,6 +209,8 @@ add_library(
   library/cmp/componentsymbolvariantlistmodel.h
   library/cmp/componentsymbolvariantlistwidget.cpp
   library/cmp/componentsymbolvariantlistwidget.h
+  library/cmp/componenttab.cpp
+  library/cmp/componenttab.h
   library/cmp/compsymbvarpinsignalmapeditorwidget.cpp
   library/cmp/compsymbvarpinsignalmapeditorwidget.h
   library/cmp/if_componentsymbolvarianteditorprovider.h
@@ -219,6 +221,8 @@ add_library(
   library/dev/deviceeditorwidget.ui
   library/dev/devicepadsignalmapmodel.cpp
   library/dev/devicepadsignalmapmodel.h
+  library/dev/devicetab.cpp
+  library/dev/devicetab.h
   library/dev/padsignalmapeditorwidget.cpp
   library/dev/padsignalmapeditorwidget.h
   library/dev/partlisteditorwidget.cpp
@@ -392,6 +396,8 @@ add_library(
   library/pkg/packagepadlisteditorwidget.h
   library/pkg/packagepadlistmodel.cpp
   library/pkg/packagepadlistmodel.h
+  library/pkg/packagetab.cpp
+  library/pkg/packagetab.h
   library/sym/fsm/symboleditorfsm.cpp
   library/sym/fsm/symboleditorfsm.h
   library/sym/fsm/symboleditorstate.cpp
@@ -437,6 +443,8 @@ add_library(
   library/sym/symbolpinpropertiesdialog.cpp
   library/sym/symbolpinpropertiesdialog.h
   library/sym/symbolpinpropertiesdialog.ui
+  library/sym/symboltab.cpp
+  library/sym/symboltab.h
   mainwindow.cpp
   mainwindow.h
   mainwindowtestadapter.cpp
