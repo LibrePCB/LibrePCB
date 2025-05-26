@@ -84,7 +84,7 @@ public:
   ~LibraryTab() noexcept;
 
   // General Methods
-  const FilePath& getDirectoryPath() const noexcept { return mLibPath; }
+  const FilePath& getDirectoryPath() const noexcept { return mDirPath; }
   ui::TabData getUiData() const noexcept override;
   ui::LibraryTabData getDerivedUiData() const noexcept;
   void setDerivedUiData(const ui::LibraryTabData& data) noexcept;
@@ -129,7 +129,7 @@ private:
   Library& mLibrary;
   const WorkspaceLibraryDb& mDb;
   const QStringList& mLocaleOrder;
-  const FilePath mLibPath;
+  const FilePath mDirPath;
 
   // State
   bool mWizardMode;

@@ -8,11 +8,11 @@ import {
     LineEdit,
     LinkText,
     MessageBox,
-    TextEdit,
     Palette,
     SceneButton,
     SlideView,
     Switch,
+    TextEdit,
     ToolButton,
 } from "../../widgets.slint";
 import {
@@ -171,6 +171,8 @@ component SymbolEditor inherits Rectangle {
     }
 
     img := Image {
+        width: 100%;
+        height: 100%;
         preferred-width: 0;
         preferred-height: 0;
         image-fit: preserve;
@@ -344,18 +346,20 @@ export component SymbolTab inherits Tab {
     init => {
         tabs[index].scene-image-pos = self.absolute-position;
     }
-    ta := TouchArea {
-        mouse-cursor: tabs[index].tool-cursor;
 
-        SlideView {
-            pages: [@tr("Metadata"), @tr("Graphics")];
+    SlideView {
+        pages: [@tr("Metadata"), @tr("Graphics")];
 
-            SymbolMetadata {
-                width: parent.width;
-                section-index: section-index;
-                tabs: tabs;
-                index: index;
-            }
+        SymbolMetadata {
+            width: parent.width;
+            section-index: section-index;
+            tabs: tabs;
+            index: index;
+        }
+
+        ta := TouchArea {
+            width: parent.width;
+            mouse-cursor: tabs[index].tool-cursor;
 
             SymbolEditor {
                 width: parent.width;
@@ -363,20 +367,20 @@ export component SymbolTab inherits Tab {
                 tabs: tabs;
                 index: index;
             }
-        }
 
-        pointer-event(event) => {
-            if event.kind == PointerEventKind.down {
-                Data.set-current-tab(section-index, index);
-                if !root.has-focus {
-                    root.focus();
+            pointer-event(event) => {
+                if event.kind == PointerEventKind.down {
+                    Data.set-current-tab(section-index, index);
+                    if !root.has-focus {
+                        root.focus();
+                    }
                 }
+                Backend.scene-pointer-event(section-index, self.mouse-x, self.mouse-y, event);
             }
-            Backend.scene-pointer-event(section-index, self.mouse-x, self.mouse-y, event);
-        }
 
-        scroll-event(event) => {
-            Backend.scene-scrolled(section-index, self.mouse-x, self.mouse-y, event) ? accept : reject
+            scroll-event(event) => {
+                Backend.scene-scrolled(section-index, self.mouse-x, self.mouse-y, event) ? accept : reject
+            }
         }
     }
 

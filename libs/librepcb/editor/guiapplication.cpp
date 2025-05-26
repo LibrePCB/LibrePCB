@@ -470,8 +470,8 @@ std::shared_ptr<LibraryEditor2> GuiApplication::openLibrary(
     QMessageBox::StandardButton btn = QMessageBox::question(
         qApp->activeWindow(), tr("Restore autosave backup?"),
         tr("It seems that the application crashed the last time you opened "
-           "this "
-           "library element. Do you want to restore the last autosave backup?"),
+           "this library element. Do you want to restore the last autosave "
+           "backup?"),
         QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
         QMessageBox::Cancel);
     switch (btn) {

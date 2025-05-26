@@ -26,6 +26,8 @@
 #include "../../windowtab.h"
 
 #include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/workspace/theme.h>
+#include "../../widgets/if_graphicsvieweventhandler.h"
 
 #include <QtCore>
 
@@ -33,9 +35,16 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Symbol;
+
 namespace editor {
 
 class LibraryEditor2;
+class SymbolGraphicsItem;
+class SlintGraphicsView;
+class GraphicsLayerList;
+class GraphicsScene;
 
 /*******************************************************************************
  *  Class SymbolTab
@@ -44,7 +53,8 @@ class LibraryEditor2;
 /**
  * @brief The SymbolTab class
  */
-class SymbolTab final : public WindowTab {
+class SymbolTab final : public WindowTab,
+    public IF_GraphicsViewEventHandler {
   Q_OBJECT
 
 public:
@@ -55,22 +65,67 @@ public:
   SymbolTab() = delete;
   SymbolTab(const SymbolTab& other) = delete;
   explicit SymbolTab(GuiApplication& app, LibraryEditor2& editor,
-                     const FilePath& fp, QObject* parent = nullptr) noexcept;
+                     std::unique_ptr<Symbol> sym, bool wizardMode,
+                     QObject* parent = nullptr) noexcept;
   ~SymbolTab() noexcept;
 
   // General Methods
-  const FilePath& getDirectoryPath() const noexcept { return mDirPath; }
+  FilePath getDirectoryPath() const noexcept;
   ui::TabData getUiData() const noexcept override;
   ui::SymbolTabData getDerivedUiData() const noexcept;
   void setDerivedUiData(const ui::SymbolTabData& data) noexcept;
+  void activate() noexcept override;
+  void deactivate() noexcept override;
   void trigger(ui::TabAction a) noexcept override;
+  slint::Image renderScene(float width, float height,
+                           int scene) noexcept override;
+  bool processScenePointerEvent(
+      const QPointF& pos, slint::private_api::PointerEvent e) noexcept override;
+  bool processSceneScrolled(
+      const QPointF& pos,
+      slint::private_api::PointerScrollEvent e) noexcept override;
+  bool processSceneKeyEvent(
+      const slint::private_api::KeyEvent& e) noexcept override;
+
+  // IF_GraphicsViewEventHandler
+  bool graphicsSceneKeyPressed(
+      const GraphicsSceneKeyEvent& e) noexcept override;
+  bool graphicsSceneKeyReleased(
+      const GraphicsSceneKeyEvent& e) noexcept override;
+  bool graphicsSceneMouseMoved(
+      const GraphicsSceneMouseEvent& e) noexcept override;
+  bool graphicsSceneLeftMouseButtonPressed(
+      const GraphicsSceneMouseEvent& e) noexcept override;
+  bool graphicsSceneLeftMouseButtonReleased(
+      const GraphicsSceneMouseEvent& e) noexcept override;
+  bool graphicsSceneLeftMouseButtonDoubleClicked(
+      const GraphicsSceneMouseEvent& e) noexcept override;
+  bool graphicsSceneRightMouseButtonReleased(
+      const GraphicsSceneMouseEvent& e) noexcept override;
 
   // Operator Overloadings
   SymbolTab& operator=(const SymbolTab& rhs) = delete;
 
 private:
+  void applyTheme() noexcept;
+  void requestRepaint() noexcept;
+
+private:
+  // References
   LibraryEditor2& mEditor;
-  const FilePath mDirPath;
+  std::unique_ptr<Symbol> mSymbol;
+  std::unique_ptr<GraphicsLayerList> mLayers;
+  std::unique_ptr<SlintGraphicsView> mView;
+
+  // State
+  bool mWizardMode;
+  Theme::GridStyle mGridStyle;
+  QPointF mSceneImagePos;
+  int mFrameIndex;
+
+  // Objects in active state
+  std::unique_ptr<GraphicsScene> mScene;
+  std::unique_ptr<SymbolGraphicsItem> mGraphicsItem;
 };
 
 /*******************************************************************************

@@ -64,7 +64,6 @@ component LibraryMetadata inherits GridLayout {
         TextEdit {
             height: 100px;
             text: tabs[index].description;
-            placeholder-text: tabs[index].description;
 
             text-edited(text) => {
                 tabs[index].description = text;
@@ -164,7 +163,6 @@ component LibraryMetadata inherits GridLayout {
         }
 
         TextEdit {
-            height: 60px;
             enabled: false;
         }
     }

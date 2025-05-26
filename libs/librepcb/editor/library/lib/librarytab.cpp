@@ -53,7 +53,7 @@ LibraryTab::LibraryTab(GuiApplication& app, LibraryEditor2& editor,
     mLibrary(mEditor.getLibrary()),
     mDb(editor.getWorkspace().getLibraryDb()),
     mLocaleOrder(editor.getWorkspace().getSettings().libraryLocaleOrder.get()),
-    mLibPath(mLibrary.getDirectory().getAbsPath()),
+    mDirPath(mLibrary.getDirectory().getAbsPath()),
     mWizardMode(wizardMode),
     mCompactLayoutPageIndex(1),
     mCurrentCategoryIndex(0),
@@ -366,7 +366,7 @@ template <typename CategoryType>
 void LibraryTab::loadCategories(TreeItemType type, const QIcon& icon,
                                 TreeItem& root) {
   try {
-    const auto categories = mDb.getAll<CategoryType>(mLibPath);
+    const auto categories = mDb.getAll<CategoryType>(mDirPath);
     mLibCategories.insert(categories);
     for (auto it = categories.begin(); it != categories.end(); it++) {
       getOrCreateCategory<CategoryType>(type, icon, *it, root);
@@ -424,7 +424,7 @@ void LibraryTab::loadElements(TreeItemType type, slint::Image icon,
                               TreeItem& root, int& count) {
   try {
     const QSet<FilePath> elements =
-        Toolbox::toSet(mDb.getAll<ElementType>(mLibPath).keys());
+        Toolbox::toSet(mDb.getAll<ElementType>(mDirPath).keys());
     count += elements.count();
     for (const FilePath& fp : elements) {
       auto item = std::make_shared<TreeItem>();
