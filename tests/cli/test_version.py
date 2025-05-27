@@ -12,7 +12,7 @@ PATTERN = "LibrePCB CLI Version \\d+\\.\\d+\\.\\d+(\\-\\w+)?\\n" \
           "Git Revision [0-9a-f]+\\n" \
           "Qt Version [0-9\\.]+ \\(compiled against [0-9\\.]+\\)\\n" \
           "OpenCascade [A-Z/]+( [0-9\\.]+)?\\n" \
-          "Built at [0-9a-zA-Z\\.:/ ]+\\n"
+          "Built at [0-9a-zA-Z\\.:/  ]+\\n"
 
 
 def test_valid_call(cli):
