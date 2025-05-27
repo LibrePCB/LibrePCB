@@ -1,6 +1,6 @@
 variables:
   AZURE_PIPELINES: true
-  AZURE_BRANCH_NAME: $[ variables['Build.SourceBranch'] ]
+  CI_BRANCH_NAME: $[ variables['Build.SourceBranch'] ]
   # Specify build author as an environment variable because on Apple Silicon
   # build_librepcb.sh is run locally where we want to use a different author.
   LIBREPCB_BUILD_AUTHOR: "LibrePCB CI"

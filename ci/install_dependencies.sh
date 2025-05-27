@@ -42,6 +42,10 @@ then
   echo "Installing opencascade..."
   brew install --force-bottle opencascade
 
+  # Install create-dmg
+  echo "Installing create-dmg..."
+  brew install --force-bottle create-dmg
+
   # Install dylibbundler
   echo "Installing dylibbundler..."
   brew install --force-bottle dylibbundler

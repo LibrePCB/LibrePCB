@@ -39,9 +39,8 @@ dylibbundler -ns -od -b \
   -p @executable_path/../Frameworks/
 if [ "$ARCH" = "arm64" ]
 then
-  # Not run on CI (yet), but here to allow running it locally on a Apple
-  # Silicon Mac. Apple Silicon requires the binary to be signed, but
-  # somehow macdeployqt fails on that so we have to do it manually.
+  # Apple Silicon requires the binary to be signed, but somehow macdeployqt
+  # fails on that so we have to do it manually.
   # Requirement: brew install create-dmg
   fix_macdeployqt "/opt/homebrew/lib"
   macdeployqt "LibrePCB.app" -always-overwrite \
@@ -51,9 +50,15 @@ then
     -qmldir="../../ci"
   codesign --force --deep -s - ./LibrePCB.app/Contents/MacOS/librepcb
   codesign --force --deep -s - ./LibrePCB.app/Contents/MacOS/librepcb-cli
-  create-dmg --skip-jenkins --volname "LibrePCB" \
-    --volicon ./LibrePCB.app/Contents/Resources/librepcb.icns \
-    ./LibrePCB.dmg ./LibrePCB.app
+  # This is so crappy unstable, we have to try it several times :sob:
+  for run in {1..10}; do
+    if [ ! -f ./LibrePCB.dmg ]; then
+      create-dmg --skip-jenkins --volname "LibrePCB" \
+        --volicon ./LibrePCB.app/Contents/Resources/librepcb.icns \
+        ./LibrePCB.dmg ./LibrePCB.app || true
+      sleep 5
+    fi
+  done
 else
   # On x86_64, directly create the *.dmg with macdeployqt.
   fix_macdeployqt "/usr/local/lib"
