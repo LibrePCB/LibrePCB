@@ -103,12 +103,14 @@ int Board3dTab::getProjectObjectIndex() const noexcept {
 }
 
 ui::TabData Board3dTab::getUiData() const noexcept {
+  ui::TabFeatures features = {};
+  features.undo = toFs(mProjectEditor.getUndoStack().canUndo());
+  features.redo = toFs(mProjectEditor.getUndoStack().canRedo());
+
   return ui::TabData{
       ui::TabType::Board3d,  // Type
       q2s(*mBoard.getName()),  // Title
-      ui::TabFeatures{},  // Features
-      mProjectEditor.getUndoStack().canUndo(),  // Can undo
-      mProjectEditor.getUndoStack().canRedo(),  // Can redo
+      features,  // Features
       q2s(mProjectEditor.getUndoStack().getUndoCmdText()),  // Undo text
       q2s(mProjectEditor.getUndoStack().getRedoCmdText()),  // Redo text
       slint::SharedString(),  // Find term

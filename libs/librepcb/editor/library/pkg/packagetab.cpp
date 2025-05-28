@@ -96,8 +96,6 @@ ui::TabData PackageTab::getUiData() const noexcept {
       ui::TabType::Package,  // Type
       q2s(*mPackage->getNames().getDefaultValue()),  // Title
       ui::TabFeatures{},  // Features
-      false,  // Can undo
-      false,  // Can redo
       slint::SharedString(),  // Undo text
       slint::SharedString(),  // Redo text
       slint::SharedString(),  // Find term

@@ -50,8 +50,6 @@ ui::TabData HomeTab::getUiData() const noexcept {
       ui::TabType::Home,  // Type
       slint::SharedString(),  // Title
       ui::TabFeatures{},  // Features
-      false,  // Can undo
-      false,  // Can redo
       slint::SharedString(),  // Undo text
       slint::SharedString(),  // Redo text
       slint::SharedString(),  // Find term

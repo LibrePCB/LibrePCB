@@ -62,8 +62,6 @@ ui::TabData ComponentTab::getUiData() const noexcept {
       ui::TabType::Component,  // Type
       q2s(QString("TODO")),  // Title
       ui::TabFeatures{},  // Features
-      false,  // Can undo
-      false,  // Can redo
       slint::SharedString(),  // Undo text
       slint::SharedString(),  // Redo text
       slint::SharedString(),  // Find term

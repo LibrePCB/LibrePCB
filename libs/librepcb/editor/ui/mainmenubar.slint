@@ -352,7 +352,7 @@ export component MainMenuBar inherits Rectangle {
                     cmd: Cmd.undo;
                     text: undo-text;
                     icon: @image-url("../../../font-awesome/svgs/solid/rotate-left.svg");
-                    enabled: Data.current-tab.can-undo;
+                    enabled: Data.current-tab.features.undo == FeatureState.enabled;
 
                     clicked => {
                         Helpers.trigger-current-project-action(ProjectAction.undo);
@@ -363,7 +363,7 @@ export component MainMenuBar inherits Rectangle {
                     cmd: Cmd.redo;
                     text: redo-text;
                     icon: @image-url("../../../font-awesome/svgs/solid/rotate-right.svg");
-                    enabled: Data.current-tab.can-redo;
+                    enabled: Data.current-tab.features.redo == FeatureState.enabled;
 
                     clicked => {
                         Helpers.trigger-current-project-action(ProjectAction.redo);
@@ -1025,7 +1025,7 @@ export component MainMenuBar inherits Rectangle {
             width: 3px;
         }
 
-        if current-tab-project.valid: project-buttons-l := HorizontalLayout {
+        /*if current-tab-project.valid:*/ project-buttons-l := HorizontalLayout {
             horizontal-stretch: 0;
             padding-top: 5px;
             padding-bottom: 5px;
@@ -1046,7 +1046,7 @@ export component MainMenuBar inherits Rectangle {
                 cmd: Cmd.undo;
                 icon: @image-url("../../../font-awesome/svgs/solid/rotate-left.svg");
                 tooltip: undo-text;
-                enabled: Data.current-tab.can-undo;
+                enabled: Data.current-tab.features.undo == FeatureState.enabled;
 
                 clicked => {
                     Backend.trigger-project(current-tab-project-index, ProjectAction.undo);
@@ -1057,7 +1057,7 @@ export component MainMenuBar inherits Rectangle {
                 cmd: Cmd.redo;
                 icon: @image-url("../../../font-awesome/svgs/solid/rotate-right.svg");
                 tooltip: redo-text;
-                enabled: Data.current-tab.can-redo;
+                enabled: Data.current-tab.features.redo == FeatureState.enabled;
 
                 clicked => {
                     Backend.trigger-project(current-tab-project-index, ProjectAction.redo);

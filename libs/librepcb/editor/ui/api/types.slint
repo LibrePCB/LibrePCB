@@ -329,6 +329,8 @@ export enum FeatureState {
 
 // Features available in a tab (see TabData)
 export struct TabFeatures {
+    undo: FeatureState,
+    redo: FeatureState,
     export-graphics: FeatureState,
     select: FeatureState,
     cut: FeatureState,
@@ -467,8 +469,6 @@ export struct TabData {
     features: TabFeatures,
 
     // Undo/redo
-    can-undo: bool,
-    can-redo: bool,
     undo-text: string,
     redo-text: string,
 

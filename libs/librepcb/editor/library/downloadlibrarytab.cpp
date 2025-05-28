@@ -73,8 +73,6 @@ ui::TabData DownloadLibraryTab::getUiData() const noexcept {
       ui::TabType::DownloadLibrary,  // Type
       q2s(tr("Download Library")),  // Title
       ui::TabFeatures{},  // Features
-      false,  // Can undo
-      false,  // Can redo
       slint::SharedString(),  // Undo text
       slint::SharedString(),  // Redo text
       slint::SharedString(),  // Find term
