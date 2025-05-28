@@ -96,6 +96,10 @@ ui::TabData SymbolTab::getUiData() const noexcept {
       ui::TabType::Symbol,  // Type
       q2s(*mSymbol->getNames().getDefaultValue()),  // Title
       ui::TabFeatures{},  // Features
+      false,  // Can undo
+      false,  // Can redo
+      slint::SharedString(),  // Undo text
+      slint::SharedString(),  // Redo text
       slint::SharedString(),  // Find term
       nullptr,  // Find suggestions
       nullptr,  // Layers

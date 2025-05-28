@@ -249,10 +249,6 @@ ui::ProjectData ProjectEditor::getUiData() const noexcept {
       mProject->getDirectory().isWritable(),  // Writable
       mUseIeee315Symbols,  // Use IEEE315 symbols
       mManualModificationsMade || (!mUndoStack->isClean()),  // Unsaved changes
-      mUndoStack->canUndo(),  // Can undo
-      mUndoStack->canRedo(),  // Can redo
-      q2s(mUndoStack->getUndoCmdText()),  // Undo text
-      q2s(mUndoStack->getRedoCmdText()),  // Redo text
       ui::RuleCheckData{
           ui::RuleCheckType::Erc,  // Type
           mErcMessages ? ui::RuleCheckState::UpToDate

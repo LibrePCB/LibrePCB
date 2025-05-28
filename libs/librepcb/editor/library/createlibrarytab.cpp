@@ -81,6 +81,10 @@ ui::TabData CreateLibraryTab::getUiData() const noexcept {
       ui::TabType::CreateLibrary,  // Type
       q2s(tr("New Library")),  // Title
       ui::TabFeatures{},  // Features
+      false,  // Can undo
+      false,  // Can redo
+      slint::SharedString(),  // Undo text
+      slint::SharedString(),  // Redo text
       slint::SharedString(),  // Find term
       nullptr,  // Find suggestions
       nullptr,  // Layers

@@ -107,6 +107,10 @@ ui::TabData Board3dTab::getUiData() const noexcept {
       ui::TabType::Board3d,  // Type
       q2s(*mBoard.getName()),  // Title
       ui::TabFeatures{},  // Features
+      mProjectEditor.getUndoStack().canUndo(),  // Can undo
+      mProjectEditor.getUndoStack().canRedo(),  // Can redo
+      q2s(mProjectEditor.getUndoStack().getUndoCmdText()),  // Undo text
+      q2s(mProjectEditor.getUndoStack().getRedoCmdText()),  // Redo text
       slint::SharedString(),  // Find term
       nullptr,  // Find suggestions
       nullptr,  // Layers

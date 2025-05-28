@@ -466,6 +466,12 @@ export struct TabData {
     title: string,
     features: TabFeatures,
 
+    // Undo/redo
+    can-undo: bool,
+    can-redo: bool,
+    undo-text: string,
+    redo-text: string,
+
     // Find
     find-term: string,  // Set by UI, handled in backend
     find-autocompletions: [string],
@@ -895,12 +901,6 @@ export struct ProjectData {
     writable: bool,
     ieee315-symbols: bool,
     unsaved-changes: bool,
-
-    // Undo/redo
-    can-undo: bool,
-    can-redo: bool,
-    undo-text: string,
-    redo-text: string,
 
     erc: RuleCheckData,
 }

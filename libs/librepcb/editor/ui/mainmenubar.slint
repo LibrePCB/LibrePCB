@@ -66,17 +66,17 @@ component MenuBarSeparator inherits Rectangle {
 export component MainMenuBar inherits Rectangle {
     in property <length> sections-start-x;
     property <string> undo-text: {
-        if Data.current-project.undo-text.is-empty {
+        if Data.current-tab.undo-text.is-empty {
             @tr("Undo")
         } else {
-            @tr("Undo: {}", Data.current-project.undo-text)
+            @tr("Undo: {}", Data.current-tab.undo-text)
         }
     };
     property <string> redo-text: {
-        if Data.current-project.redo-text.is-empty {
+        if Data.current-tab.redo-text.is-empty {
             @tr("Redo")
         } else {
-            @tr("Redo: {}", Data.current-project.redo-text)
+            @tr("Redo: {}", Data.current-tab.redo-text)
         }
     };
     property <int> current-tab-project-index: {
@@ -352,7 +352,7 @@ export component MainMenuBar inherits Rectangle {
                     cmd: Cmd.undo;
                     text: undo-text;
                     icon: @image-url("../../../font-awesome/svgs/solid/rotate-left.svg");
-                    enabled: Data.current-project.can-undo;
+                    enabled: Data.current-tab.can-undo;
 
                     clicked => {
                         Helpers.trigger-current-project-action(ProjectAction.undo);
@@ -363,7 +363,7 @@ export component MainMenuBar inherits Rectangle {
                     cmd: Cmd.redo;
                     text: redo-text;
                     icon: @image-url("../../../font-awesome/svgs/solid/rotate-right.svg");
-                    enabled: Data.current-project.can-redo;
+                    enabled: Data.current-tab.can-redo;
 
                     clicked => {
                         Helpers.trigger-current-project-action(ProjectAction.redo);
@@ -1046,7 +1046,7 @@ export component MainMenuBar inherits Rectangle {
                 cmd: Cmd.undo;
                 icon: @image-url("../../../font-awesome/svgs/solid/rotate-left.svg");
                 tooltip: undo-text;
-                enabled: current-tab-project.can-undo;
+                enabled: Data.current-tab.can-undo;
 
                 clicked => {
                     Backend.trigger-project(current-tab-project-index, ProjectAction.undo);
@@ -1057,7 +1057,7 @@ export component MainMenuBar inherits Rectangle {
                 cmd: Cmd.redo;
                 icon: @image-url("../../../font-awesome/svgs/solid/rotate-right.svg");
                 tooltip: redo-text;
-                enabled: current-tab-project.can-redo;
+                enabled: Data.current-tab.can-redo;
 
                 clicked => {
                     Backend.trigger-project(current-tab-project-index, ProjectAction.redo);

@@ -62,6 +62,10 @@ ui::TabData DeviceTab::getUiData() const noexcept {
       ui::TabType::Device,  // Type
       q2s(QString("TODO")),  // Title
       ui::TabFeatures{},  // Features
+      false,  // Can undo
+      false,  // Can redo
+      slint::SharedString(),  // Undo text
+      slint::SharedString(),  // Redo text
       slint::SharedString(),  // Find term
       nullptr,  // Find suggestions
       nullptr,  // Layers

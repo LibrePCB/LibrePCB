@@ -255,6 +255,10 @@ ui::TabData SchematicTab::getUiData() const noexcept {
       ui::TabType::Schematic,  // Type
       q2s(*mSchematic.getName()),  // Title
       features,  // Features
+          mProjectEditor.getUndoStack().canUndo(),  // Can undo
+          mProjectEditor.getUndoStack().canRedo(),  // Can redo
+          q2s(mProjectEditor.getUndoStack().getUndoCmdText()),  // Undo text
+          q2s(mProjectEditor.getUndoStack().getRedoCmdText()),  // Redo text
       q2s(mSearchContext.getTerm()),  // Find term
       mSearchContext.getSuggestions(),  // Find suggestions
       nullptr,  // Layers

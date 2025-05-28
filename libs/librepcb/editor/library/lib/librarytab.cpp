@@ -91,6 +91,10 @@ ui::TabData LibraryTab::getUiData() const noexcept {
       ui::TabType::Library,  // Type
       q2s(*mLibrary.getNames().getDefaultValue()),  // Title
       ui::TabFeatures{},  // Features
+      false,  // Can undo
+      false,  // Can redo
+      slint::SharedString(),  // Undo text
+      slint::SharedString(),  // Redo text
       slint::SharedString(),  // Find term
       nullptr,  // Find suggestions
       nullptr,  // Layers
