@@ -66,6 +66,8 @@ PackageTab::PackageTab(LibraryEditor2& editor, std::unique_ptr<Package> pkg,
           [this]() { onDerivedUiDataChanged.notify(); });
 
   // Connect library editor.
+  connect(&mEditor, &LibraryEditor2::uiIndexChanged, this,
+          [this]() { onDerivedUiDataChanged.notify(); });
   connect(&mEditor, &LibraryEditor2::aboutToBeDestroyed, this,
           &PackageTab::closeEnforced);
 
@@ -108,6 +110,7 @@ ui::PackageTabData PackageTab::getDerivedUiData() const noexcept {
 
   return ui::PackageTabData{
       mEditor.getUiIndex(),  // Library index
+      q2s(mPackage->getDirectory().getAbsPath().toStr()),  // Path
       q2s(*mPackage->getNames().getDefaultValue()),  // Name
       q2s(mPackage->getDescriptions().getDefaultValue()),  // Description
       q2s(mPackage->getKeywords().getDefaultValue()),  // Keywords

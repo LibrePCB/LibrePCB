@@ -72,6 +72,7 @@ public:
   void showPanelPage(ui::PanelPage page) noexcept;
   void popUpNotifications() noexcept;
   void showStatusBarMessage(const QString& message, int timeoutMs);
+  void setCurrentLibrary(int index) noexcept;
   void setCurrentProject(int index) noexcept;
 
   // Operator Overloadings
@@ -86,7 +87,8 @@ private:
   void triggerSection(int section, ui::WindowSectionAction a) noexcept;
   void triggerTab(int section, int tab, ui::TabAction a) noexcept;
   void triggerLibrary(slint::SharedString path, ui::LibraryAction a) noexcept;
-  void triggerLibraryEditor(int index, ui::LibraryEditorAction a) noexcept;
+  void triggerLibraryElement(slint::SharedString path,
+                             ui::LibraryElementAction a) noexcept;
   void triggerProject(int index, ui::ProjectAction a) noexcept;
   void triggerSchematic(int project, int schematic,
                         ui::SchematicAction a) noexcept;

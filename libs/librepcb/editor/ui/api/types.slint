@@ -633,6 +633,7 @@ export struct LibraryTabData {
 // Additional data for symbol editor tabs
 export struct SymbolTabData {
     library-index: int,
+    path: string,
     name: string,
     description: string,
     keywords: string,
@@ -667,6 +668,7 @@ export struct SymbolTabData {
 // Additional data for package editor tabs
 export struct PackageTabData {
     library-index: int,
+    path: string,
     name: string,
     description: string,
     keywords: string,
@@ -701,6 +703,7 @@ export struct PackageTabData {
 // Additional data for component editor tabs
 export struct ComponentTabData {
     library-index: int,
+    path: string,
     name: string,
     description: string,
     keywords: string,
@@ -720,6 +723,7 @@ export struct ComponentTabData {
 // Additional data for device editor tabs
 export struct DeviceTabData {
     library-index: int,
+    path: string,
     name: string,
     description: string,
     keywords: string,
@@ -808,7 +812,7 @@ export struct LibraryListData {
 // Library Editor
 ////////////////////////////////////////////////////////////////////////////////
 
-export enum LibraryEditorAction {
+export enum LibraryElementAction {
     open,
     close,
 }

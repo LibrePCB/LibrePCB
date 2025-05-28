@@ -69,6 +69,11 @@ public:
     if (auto obj = std::dynamic_pointer_cast<TDerived>(mList->value(i))) {
       return obj->getDerivedUiData();
     }
+    if (i < mList->row_count()) {
+      // For a valid index, we should return valid data. At least a for loop
+      // in Slint over this model crashes if we don't do this.
+      return TDerivedUiData{};
+    }
     return std::nullopt;
   }
   void set_row_data(size_t i, const TDerivedUiData& data) noexcept override {

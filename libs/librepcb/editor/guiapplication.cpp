@@ -454,7 +454,7 @@ std::shared_ptr<LibraryEditor2> GuiApplication::openLibrary(
     const FilePath& libDir) noexcept {
   auto switchToLibrary = [this](int index) {
     for (auto win : mWindows) {
-      // win->setCurrentProject(index);
+      win->setCurrentLibrary(index);
       win->showPanelPage(ui::PanelPage::Documents);
     }
   };

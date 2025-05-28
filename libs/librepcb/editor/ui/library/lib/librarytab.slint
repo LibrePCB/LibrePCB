@@ -22,6 +22,7 @@ import {
     DismissableMessageAction,
     EditorCommandSet as Cmd,
     EditorTool,
+    LibraryElementAction,
     LibraryTabData,
     PanelPage,
     TabAction,
@@ -236,7 +237,7 @@ component LibraryContent inherits HorizontalLayout {
         }
 
         item-triggered(idx, item) => {
-            Backend.trigger-tab(section-index, index, TabAction.edit-properties);
+            Backend.trigger-library-element(item.user-data, LibraryElementAction.open);
             true
         }
     }

@@ -44,6 +44,8 @@ ComponentTab::ComponentTab(GuiApplication& app, LibraryEditor2& editor,
     mEditor(editor),
     mDirPath(fp) {
   // Connect library editor.
+  connect(&mEditor, &LibraryEditor2::uiIndexChanged, this,
+          [this]() { onDerivedUiDataChanged.notify(); });
   connect(&mEditor, &LibraryEditor2::aboutToBeDestroyed, this,
           &ComponentTab::closeEnforced);
 }
@@ -69,6 +71,21 @@ ui::TabData ComponentTab::getUiData() const noexcept {
 ui::ComponentTabData ComponentTab::getDerivedUiData() const noexcept {
   return ui::ComponentTabData{
       mEditor.getUiIndex(),  // Library index
+      q2s(mDirPath.toStr()),  // Path
+      slint::SharedString(),  // Name
+      slint::SharedString(),  // Description
+      slint::SharedString(),  // Keywords
+      slint::SharedString(),  // Author
+      slint::SharedString(),  // Version
+      false,  // Deprecated
+      nullptr,  // Categories
+      nullptr,  // Resources
+      false,  // SChematic-only
+      slint::SharedString(),  // Prefix
+      slint::SharedString(),  // Default value
+      nullptr,  // Attributes
+      nullptr,  // Signals
+      nullptr,  // Variants
   };
 }
 

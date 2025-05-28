@@ -66,6 +66,8 @@ SymbolTab::SymbolTab(LibraryEditor2& editor, std::unique_ptr<Symbol> sym,
           [this]() { onDerivedUiDataChanged.notify(); });
 
   // Connect library editor.
+  connect(&mEditor, &LibraryEditor2::uiIndexChanged, this,
+          [this]() { onDerivedUiDataChanged.notify(); });
   connect(&mEditor, &LibraryEditor2::aboutToBeDestroyed, this,
           &SymbolTab::closeEnforced);
 
@@ -108,6 +110,7 @@ ui::SymbolTabData SymbolTab::getDerivedUiData() const noexcept {
 
   return ui::SymbolTabData{
       mEditor.getUiIndex(),  // Library index
+      q2s(mSymbol->getDirectory().getAbsPath().toStr()),  // Path
       q2s(*mSymbol->getNames().getDefaultValue()),  // Name
       q2s(mSymbol->getDescriptions().getDefaultValue()),  // Description
       q2s(mSymbol->getKeywords().getDefaultValue()),  // Keywords

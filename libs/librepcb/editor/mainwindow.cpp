@@ -180,12 +180,13 @@ MainWindow::MainWindow(GuiApplication& app,
         this, [this, path, a]() { triggerLibrary(path, a); },
         Qt::QueuedConnection);
   });
-  b.on_trigger_library_editor([this](int index, ui::LibraryEditorAction a) {
-    // if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0): Remove lambda.
-    QMetaObject::invokeMethod(
-        this, [this, index, a]() { triggerLibraryEditor(index, a); },
-        Qt::QueuedConnection);
-  });
+  b.on_trigger_library_element(
+      [this](slint::SharedString path, ui::LibraryElementAction a) {
+        // if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0): Remove lambda.
+        QMetaObject::invokeMethod(
+            this, [this, path, a]() { triggerLibraryElement(path, a); },
+            Qt::QueuedConnection);
+      });
   b.on_trigger_project([this](int index, ui::ProjectAction a) {
     // if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0): Remove lambda.
     QMetaObject::invokeMethod(
@@ -326,6 +327,11 @@ void MainWindow::showStatusBarMessage(const QString& message, int timeoutMs) {
       }
     });
   }
+}
+
+void MainWindow::setCurrentLibrary(int index) noexcept {
+  const ui::Data& d = mWindow->global<ui::Data>();
+  d.fn_set_current_library(index);
 }
 
 void MainWindow::setCurrentProject(int index) noexcept {
@@ -522,24 +528,43 @@ void MainWindow::triggerLibrary(slint::SharedString path,
   }
 }
 
-void MainWindow::triggerLibraryEditor(int index,
-                                      ui::LibraryEditorAction a) noexcept {
-  std::shared_ptr<LibraryEditor2> editor = mApp.getLibraries().value(index);
-  if (!editor) return;
+void MainWindow::triggerLibraryElement(slint::SharedString path,
+                                       ui::LibraryElementAction a) noexcept {
+  const FilePath fp(s2q(path));
+
+  auto getLibraryEditor = [this, &fp]() {
+    auto libs = mApp.getLibraries();
+    for (int i = 0; i < libs.count(); ++i) {
+      if (libs.at(i)->getFilePath() == fp) {
+        return std::make_optional(std::make_pair(libs.at(i), i));
+      }
+    }
+    return std::optional<std::pair<std::shared_ptr<LibraryEditor2>, int>>();
+  };
 
   switch (a) {
-    case ui::LibraryEditorAction::Open: {
-      openLibraryTab(editor->getFilePath(), false);
+    case ui::LibraryElementAction::Open: {
+      if (switchToLibraryElementTab<LibraryTab>(fp)) return;
+      if (switchToLibraryElementTab<SymbolTab>(fp)) return;
+      if (switchToLibraryElementTab<PackageTab>(fp)) return;
+      if (switchToLibraryElementTab<ComponentTab>(fp)) return;
+      if (switchToLibraryElementTab<DeviceTab>(fp)) return;
+      if (getLibraryEditor()) {
+        openLibraryTab(fp, false);
+      }
       break;
     }
-    case ui::LibraryEditorAction::Close: {
-      if (editor->requestClose()) {
-        mApp.closeLibrary(index);
+    case ui::LibraryElementAction::Close: {
+      if (auto pair = getLibraryEditor()) {
+        if (pair->first->requestClose()) {
+          mApp.closeLibrary(pair->second);
+        }
       }
       break;
     }
     default: {
-      // editor->trigger(a);
+      qWarning() << "Unhandled action in MainWindow::triggerLibraryElement():"
+                 << static_cast<int>(a);
       break;
     }
   }

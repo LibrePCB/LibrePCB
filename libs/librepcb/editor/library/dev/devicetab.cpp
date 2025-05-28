@@ -44,6 +44,8 @@ DeviceTab::DeviceTab(GuiApplication& app, LibraryEditor2& editor,
     mEditor(editor),
     mDirPath(fp) {
   // Connect library editor.
+  connect(&mEditor, &LibraryEditor2::uiIndexChanged, this,
+          [this]() { onDerivedUiDataChanged.notify(); });
   connect(&mEditor, &LibraryEditor2::aboutToBeDestroyed, this,
           &DeviceTab::closeEnforced);
 }
@@ -69,6 +71,20 @@ ui::TabData DeviceTab::getUiData() const noexcept {
 ui::DeviceTabData DeviceTab::getDerivedUiData() const noexcept {
   return ui::DeviceTabData{
       mEditor.getUiIndex(),  // Library index
+      q2s(mDirPath.toStr()),  // Path
+      slint::SharedString(),  // Name
+      slint::SharedString(),  // Description
+      slint::SharedString(),  // Keywords
+      slint::SharedString(),  // Author
+      slint::SharedString(),  // Version
+      false,  // Deprecated
+      nullptr,  // Categories
+      slint::SharedString(),  // Package name
+      slint::SharedString(),  // Component name
+      nullptr,  // Resources
+      nullptr,  // Attributes
+      nullptr,  // Parts
+      nullptr,  // Pinout
   };
 }
 
