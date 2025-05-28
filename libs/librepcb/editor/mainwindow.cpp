@@ -52,6 +52,7 @@
 #include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/fileio/transactionaldirectory.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/workspace/workspace.h>
@@ -65,6 +66,25 @@
  ******************************************************************************/
 namespace librepcb {
 namespace editor {
+
+static bool askForRestoringBackup(const FilePath&) {
+  QMessageBox::StandardButton btn = QMessageBox::question(
+      qApp->activeWindow(), MainWindow::tr("Restore autosave backup?"),
+      MainWindow::tr(
+          "It seems that the application crashed the last time you opened "
+          "this library element. Do you want to restore the last autosave "
+          "backup?"),
+      QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+      QMessageBox::Cancel);
+  switch (btn) {
+    case QMessageBox::Yes:
+      return true;
+    case QMessageBox::No:
+      return false;
+    default:
+      throw UserCanceled(__FILE__, __LINE__);
+  }
+}
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -675,36 +695,17 @@ void MainWindow::openLibraryTab(const FilePath& fp, bool wizardMode) noexcept {
 
 void MainWindow::openSymbolTab(LibraryEditor2& editor,
                                const FilePath& fp) noexcept {
-  // TODO: Factor this out.
-  auto askForRestoringBackup = [](const FilePath&) {
-    QMessageBox::StandardButton btn = QMessageBox::question(
-        qApp->activeWindow(), tr("Restore autosave backup?"),
-        tr("It seems that the application crashed the last time you opened "
-           "this library element. Do you want to restore the last autosave "
-           "backup?"),
-        QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-        QMessageBox::Cancel);
-    switch (btn) {
-      case QMessageBox::Yes:
-        return true;
-      case QMessageBox::No:
-        return false;
-      default:
-        throw UserCanceled(__FILE__, __LINE__);
-    }
-  };
-
   if (!switchToLibraryElementTab<SymbolTab>(fp)) {
     try {
       const bool writable =
           fp.isLocatedInDir(mApp.getWorkspace().getLocalLibrariesPath());
       auto fs = TransactionalFileSystem::open(
-          fp, writable, askForRestoringBackup,
+          fp, writable, &askForRestoringBackup,
           DirectoryLockHandlerDialog::createDirectoryLockCallback());
       std::unique_ptr<Symbol> sym =
           Symbol::open(std::unique_ptr<TransactionalDirectory>(
               new TransactionalDirectory(fs)));
-      addTab(std::make_shared<SymbolTab>(mApp, editor, std::move(sym), false));
+      addTab(std::make_shared<SymbolTab>(editor, std::move(sym), false));
     } catch (const Exception& e) {
       QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
     }
@@ -714,7 +715,19 @@ void MainWindow::openSymbolTab(LibraryEditor2& editor,
 void MainWindow::openPackageTab(LibraryEditor2& editor,
                                 const FilePath& fp) noexcept {
   if (!switchToLibraryElementTab<PackageTab>(fp)) {
-    addTab(std::make_shared<PackageTab>(mApp, editor, fp));
+    try {
+      const bool writable =
+          fp.isLocatedInDir(mApp.getWorkspace().getLocalLibrariesPath());
+      auto fs = TransactionalFileSystem::open(
+          fp, writable, &askForRestoringBackup,
+          DirectoryLockHandlerDialog::createDirectoryLockCallback());
+      std::unique_ptr<Package> pkg =
+          Package::open(std::unique_ptr<TransactionalDirectory>(
+              new TransactionalDirectory(fs)));
+      addTab(std::make_shared<PackageTab>(editor, std::move(pkg), false));
+    } catch (const Exception& e) {
+      QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
+    }
   }
 }
 

@@ -1,0 +1,262 @@
+//import { DrawWireToolBar } from "drawwiretoolbar.slint";
+//import { DrawPolygonToolBar } from "drawpolygontoolbar.slint";
+//import { AddTextToolBar } from "addtexttoolbar.slint";
+//import { AddComponentToolBar } from "addcomponenttoolbar.slint";
+import { Tab } from "../../tab.slint";
+import {
+    Button,
+    ComboBox,
+    LineEdit,
+    TextEdit,
+    LinkText,
+    MessageBox,
+    Palette,
+    SlideView,
+    SceneButton,
+    Switch,
+    ToolButton,
+} from "../../widgets.slint";
+import {
+    Backend,
+    ComponentTabData,
+    Constants,
+    Data,
+    DismissableMessageAction,
+    EditorCommandSet as Cmd,
+    EditorTool,
+    PanelPage,
+    TabAction,
+    WindowSectionData,
+} from "../../api.slint";
+
+component ComponentMetadata inherits GridLayout {
+    in property <int> section-index;
+    in-out property <[ComponentTabData]> tabs;
+    in property <int> index;
+
+    padding: 10px;
+    spacing: 8px;
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Name:");
+        }
+
+        LineEdit {
+            text: tabs[index].name;
+            //validation-error: tabs[index].name-error;
+
+            text-edited(text) => {
+                tabs[index].name = text;
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Description:");
+        }
+
+        TextEdit {
+            height: 100px;
+            text: tabs[index].description;
+
+            text-edited(text) => {
+                tabs[index].description = text;
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Keywords:");
+        }
+
+        LineEdit {
+            text: tabs[index].keywords;
+
+            text-edited(text) => {
+                tabs[index].keywords = text;
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Author:");
+        }
+
+        LineEdit {
+            text: tabs[index].author;
+
+            text-edited(text) => {
+                tabs[index].author = text;
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Version:");
+        }
+
+        LineEdit {
+            text: tabs[index].version;
+            //validation-error: tabs[index].version-error;
+
+            text-edited(text) => {
+                tabs[index].version = text;
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Deprecated:");
+        }
+
+        Switch {
+            font-size: 10px;
+            text: @tr("Check this if the element should no longer be used.");
+            checked: tabs[index].deprecated;
+
+            toggled(checked) => {
+                tabs[index].deprecated = checked;
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Categories:");
+        }
+
+        TextEdit {
+            enabled: false;
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Datasheet:");
+        }
+
+        LineEdit {
+            //text: tabs[index].datasheet;
+            //validation-error: tabs[index].datasheet-error;
+
+            //text-edited(text) => {
+            //    tabs[index].datasheet = text;
+            //}
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Schematic-Only:");
+        }
+
+        Switch {
+            font-size: 10px;
+            text: @tr("Check this if this component cannot be placed on boards (e.g. supply symbols, sheet frames, ...).");
+            checked: tabs[index].schematic-only;
+
+            toggled(checked) => {
+                tabs[index].schematic-only = checked;
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Prefix:");
+        }
+
+        LineEdit {
+            text: tabs[index].prefix;
+            //validation-error: tabs[index].prefix-error;
+
+            text-edited(text) => {
+                tabs[index].prefix = text;
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Default Value:");
+        }
+
+        TextEdit {
+            height: 100px;
+            text: tabs[index].default-value;
+
+            text-edited(text) => {
+                tabs[index].default-value = text;
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Attributes:");
+        }
+
+        TextEdit {
+            height: 100px;
+            enabled: false;
+        }
+    }
+
+    Row {
+        Rectangle { }
+    }
+}
+
+export component ComponentTab inherits Tab {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    property <[ComponentTabData]> tabs: section.component-tabs;
+    property <int> index: section.current-tab-index;
+
+    enabled: true;
+
+    SlideView {
+        pages: [@tr("Metadata"), @tr("Signals"), @tr("Symbols")];
+
+        ComponentMetadata {
+            width: parent.width;
+            section-index: section-index;
+            tabs: tabs;
+            index: index;
+        }
+
+        Rectangle { }
+
+        Rectangle { }
+    }
+}

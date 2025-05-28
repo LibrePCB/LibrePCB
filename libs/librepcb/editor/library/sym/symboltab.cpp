@@ -22,16 +22,17 @@
  ******************************************************************************/
 #include "symboltab.h"
 
+#include "../../graphics/graphicsscene.h"
+#include "../../graphics/slintgraphicsview.h"
 #include "../libraryeditor2.h"
+#include "graphics/graphicslayerlist.h"
+#include "symbolgraphicsitem.h"
 #include "utils/slinthelpers.h"
 #include "utils/uihelpers.h"
-#include "graphics/graphicslayerlist.h"
-#include <librepcb/core/workspace/workspace.h>
-#include "symbolgraphicsitem.h"
-#include "../../graphics/graphicsscene.h"
-#include <librepcb/core/workspace/workspacesettings.h>
+
 #include <librepcb/core/library/sym/symbol.h>
-#include "../../graphics/slintgraphicsview.h"
+#include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
 
@@ -45,19 +46,18 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SymbolTab::SymbolTab(GuiApplication& app, LibraryEditor2& editor,
-                     std::unique_ptr<Symbol> sym, bool wizardMode,
-                     QObject* parent) noexcept
-  : WindowTab(app, parent),
+SymbolTab::SymbolTab(LibraryEditor2& editor, std::unique_ptr<Symbol> sym,
+                     bool wizardMode, QObject* parent) noexcept
+  : WindowTab(editor.getApp(), parent),
     onDerivedUiDataChanged(*this),
     mEditor(editor),
     mSymbol(std::move(sym)),
-    mLayers(
-        GraphicsLayerList::libraryLayers(&mEditor.getWorkspace().getSettings())),
+    mLayers(GraphicsLayerList::libraryLayers(
+        &mEditor.getWorkspace().getSettings())),
     mView(new SlintGraphicsView(this)),
     mWizardMode(wizardMode),
     mGridStyle(Theme::GridStyle::None),
-    mFrameIndex(0){
+    mFrameIndex(0) {
   // Setup graphics view.
   mView->setEventHandler(this);
   connect(mView.get(), &SlintGraphicsView::transformChanged, this,
@@ -70,9 +70,10 @@ SymbolTab::SymbolTab(GuiApplication& app, LibraryEditor2& editor,
           &SymbolTab::closeEnforced);
 
   // Connect symbol.
-  connect(mSymbol.get(), &Symbol::namesChanged, this,
-          [this]() { onUiDataChanged.notify();
-  onDerivedUiDataChanged.notify();});
+  connect(mSymbol.get(), &Symbol::namesChanged, this, [this]() {
+    onUiDataChanged.notify();
+    onDerivedUiDataChanged.notify();
+  });
 }
 
 SymbolTab::~SymbolTab() noexcept {
@@ -116,11 +117,11 @@ ui::SymbolTabData SymbolTab::getDerivedUiData() const noexcept {
       nullptr,  // Categories
       q2s(bgColor),  // Background color
       q2s(fgColor),  // Foreground color
-          q2s(theme.getColor(Theme::Color::sSchematicInfoBox)
-                  .getPrimaryColor()),  // Overlay color
-          q2s(theme.getColor(Theme::Color::sSchematicInfoBox)
-                  .getSecondaryColor()),  // Overlay text color
-          l2s(mGridStyle),  // Grid style
+      q2s(theme.getColor(Theme::Color::sSchematicInfoBox)
+              .getPrimaryColor()),  // Overlay color
+      q2s(theme.getColor(Theme::Color::sSchematicInfoBox)
+              .getSecondaryColor()),  // Overlay text color
+      l2s(mGridStyle),  // Grid style
       l2s(Length(2540000)),  // Grid interval
       l2s(LengthUnit::millimeters()),  // Unit
       ui::EditorTool::Select,  // Tool
@@ -142,7 +143,7 @@ void SymbolTab::setDerivedUiData(const ui::SymbolTabData& data) noexcept {
 
 void SymbolTab::activate() noexcept {
   mScene.reset(new GraphicsScene(this));
-  //mScene->setGridInterval(mSchematic.getGridInterval());
+  // mScene->setGridInterval(mSchematic.getGridInterval());
   connect(mScene.get(), &GraphicsScene::changed, this,
           &SymbolTab::requestRepaint);
 
@@ -161,56 +162,57 @@ void SymbolTab::deactivate() noexcept {
 void SymbolTab::trigger(ui::TabAction a) noexcept {
   switch (a) {
     case ui::TabAction::Print: {
-      //execGraphicsExportDialog(GraphicsExportDialog::Output::Print, "print");
+      // execGraphicsExportDialog(GraphicsExportDialog::Output::Print, "print");
       break;
     }
     case ui::TabAction::ExportImage: {
-      //execGraphicsExportDialog(GraphicsExportDialog::Output::Image,
-      //                         "image_export");
+      // execGraphicsExportDialog(GraphicsExportDialog::Output::Image,
+      //                          "image_export");
       break;
     }
     case ui::TabAction::ExportPdf: {
-      //execGraphicsExportDialog(GraphicsExportDialog::Output::Pdf, "pdf_export");
+      // execGraphicsExportDialog(GraphicsExportDialog::Output::Pdf,
+      // "pdf_export");
       break;
     }
     case ui::TabAction::SelectAll: {
-     // mFsm->processSelectAll();
+      // mFsm->processSelectAll();
       break;
     }
     case ui::TabAction::Abort: {
-      //mFsm->processAbortCommand();
+      // mFsm->processAbortCommand();
       break;
     }
     case ui::TabAction::Cut: {
-      //mFsm->processCut();
+      // mFsm->processCut();
       break;
     }
     case ui::TabAction::Copy: {
-      //mFsm->processCopy();
+      // mFsm->processCopy();
       break;
     }
     case ui::TabAction::Paste: {
-      //mFsm->processPaste();
+      // mFsm->processPaste();
       break;
     }
     case ui::TabAction::Delete: {
-      //mFsm->processRemove();
+      // mFsm->processRemove();
       break;
     }
     case ui::TabAction::RotateCcw: {
-      //mFsm->processRotate(Angle::deg90());
+      // mFsm->processRotate(Angle::deg90());
       break;
     }
     case ui::TabAction::RotateCw: {
-      //mFsm->processRotate(-Angle::deg90());
+      // mFsm->processRotate(-Angle::deg90());
       break;
     }
     case ui::TabAction::MirrorHorizontally: {
-      //mFsm->processMirror(Qt::Horizontal);
+      // mFsm->processMirror(Qt::Horizontal);
       break;
     }
     case ui::TabAction::MirrorVertically: {
-      //mFsm->processMirror(Qt::Vertical);
+      // mFsm->processMirror(Qt::Vertical);
       break;
     }
     /*case ui::TabAction::MoveLeft: {
@@ -238,11 +240,11 @@ void SymbolTab::trigger(ui::TabAction a) noexcept {
       break;
     }*/
     case ui::TabAction::SnapToGrid: {
-      //mFsm->processSnapToGrid();
+      // mFsm->processSnapToGrid();
       break;
     }
     case ui::TabAction::EditProperties: {
-      //mFsm->processEditProperties();
+      // mFsm->processEditProperties();
       break;
     }
     /*case ui::TabAction::GridIntervalIncrease: {
@@ -278,19 +280,19 @@ void SymbolTab::trigger(ui::TabAction a) noexcept {
       break;
     }
     case ui::TabAction::ToolSelect: {
-      //mFsm->processSelect();
+      // mFsm->processSelect();
       break;
     }
     case ui::TabAction::ToolPolygon: {
-      //mFsm->processDrawPolygon();
+      // mFsm->processDrawPolygon();
       break;
     }
     case ui::TabAction::ToolText: {
-      //mFsm->processAddText();
+      // mFsm->processAddText();
       break;
     }
     case ui::TabAction::ToolMeasure: {
-      //mFsm->processMeasure();
+      // mFsm->processMeasure();
       break;
     }
     default: {
@@ -301,7 +303,7 @@ void SymbolTab::trigger(ui::TabAction a) noexcept {
 }
 
 slint::Image SymbolTab::renderScene(float width, float height,
-                                       int scene) noexcept {
+                                    int scene) noexcept {
   Q_UNUSED(scene);
   if (mScene) {
     return mView->render(*mScene, width, height);
@@ -330,38 +332,38 @@ bool SymbolTab::processSceneKeyEvent(
 
 bool SymbolTab::graphicsSceneKeyPressed(
     const GraphicsSceneKeyEvent& e) noexcept {
-  return false;//mFsm->processKeyPressed(e);
+  return false;  // mFsm->processKeyPressed(e);
 }
 
 bool SymbolTab::graphicsSceneKeyReleased(
     const GraphicsSceneKeyEvent& e) noexcept {
-  return false;//mFsm->processKeyReleased(e);
+  return false;  // mFsm->processKeyReleased(e);
 }
 
 bool SymbolTab::graphicsSceneMouseMoved(
     const GraphicsSceneMouseEvent& e) noexcept {
-  //emit cursorCoordinatesChanged(e.scenePos, mSchematic.getGridUnit());
-  return false;//mFsm->processGraphicsSceneMouseMoved(e);
+  // emit cursorCoordinatesChanged(e.scenePos, mSchematic.getGridUnit());
+  return false;  // mFsm->processGraphicsSceneMouseMoved(e);
 }
 
 bool SymbolTab::graphicsSceneLeftMouseButtonPressed(
     const GraphicsSceneMouseEvent& e) noexcept {
-  return false;//mFsm->processGraphicsSceneLeftMouseButtonPressed(e);
+  return false;  // mFsm->processGraphicsSceneLeftMouseButtonPressed(e);
 }
 
 bool SymbolTab::graphicsSceneLeftMouseButtonReleased(
     const GraphicsSceneMouseEvent& e) noexcept {
-  return false;//mFsm->processGraphicsSceneLeftMouseButtonReleased(e);
+  return false;  // mFsm->processGraphicsSceneLeftMouseButtonReleased(e);
 }
 
 bool SymbolTab::graphicsSceneLeftMouseButtonDoubleClicked(
     const GraphicsSceneMouseEvent& e) noexcept {
-  return false;//mFsm->processGraphicsSceneLeftMouseButtonDoubleClicked(e);
+  return false;  // mFsm->processGraphicsSceneLeftMouseButtonDoubleClicked(e);
 }
 
 bool SymbolTab::graphicsSceneRightMouseButtonReleased(
     const GraphicsSceneMouseEvent& e) noexcept {
-  return false;//mFsm->processGraphicsSceneRightMouseButtonReleased(e);
+  return false;  // mFsm->processGraphicsSceneRightMouseButtonReleased(e);
 }
 
 /*******************************************************************************

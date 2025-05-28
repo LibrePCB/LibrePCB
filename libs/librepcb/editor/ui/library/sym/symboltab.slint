@@ -348,7 +348,7 @@ export component SymbolTab inherits Tab {
     }
 
     SlideView {
-        pages: [@tr("Metadata"), @tr("Graphics")];
+        pages: [@tr("Metadata"), @tr("Pins"), @tr("Symbol")];
 
         SymbolMetadata {
             width: parent.width;
@@ -356,6 +356,8 @@ export component SymbolTab inherits Tab {
             tabs: tabs;
             index: index;
         }
+
+        Rectangle { }
 
         ta := TouchArea {
             width: parent.width;

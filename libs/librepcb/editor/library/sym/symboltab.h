@@ -23,11 +23,11 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../widgets/if_graphicsvieweventhandler.h"
 #include "../../windowtab.h"
 
 #include <librepcb/core/fileio/filepath.h>
 #include <librepcb/core/workspace/theme.h>
-#include "../../widgets/if_graphicsvieweventhandler.h"
 
 #include <QtCore>
 
@@ -40,11 +40,11 @@ class Symbol;
 
 namespace editor {
 
-class LibraryEditor2;
-class SymbolGraphicsItem;
-class SlintGraphicsView;
 class GraphicsLayerList;
 class GraphicsScene;
+class LibraryEditor2;
+class SlintGraphicsView;
+class SymbolGraphicsItem;
 
 /*******************************************************************************
  *  Class SymbolTab
@@ -53,8 +53,7 @@ class GraphicsScene;
 /**
  * @brief The SymbolTab class
  */
-class SymbolTab final : public WindowTab,
-    public IF_GraphicsViewEventHandler {
+class SymbolTab final : public WindowTab, public IF_GraphicsViewEventHandler {
   Q_OBJECT
 
 public:
@@ -64,9 +63,8 @@ public:
   // Constructors / Destructor
   SymbolTab() = delete;
   SymbolTab(const SymbolTab& other) = delete;
-  explicit SymbolTab(GuiApplication& app, LibraryEditor2& editor,
-                     std::unique_ptr<Symbol> sym, bool wizardMode,
-                     QObject* parent = nullptr) noexcept;
+  explicit SymbolTab(LibraryEditor2& editor, std::unique_ptr<Symbol> sym,
+                     bool wizardMode, QObject* parent = nullptr) noexcept;
   ~SymbolTab() noexcept;
 
   // General Methods
