@@ -237,7 +237,7 @@ component LibraryContent inherits HorizontalLayout {
         }
 
         item-triggered(idx, item) => {
-            Backend.trigger-library-element(item.user-data, LibraryElementAction.open);
+            Backend.trigger-tab(section-index, index, TabAction.edit-properties);
             true
         }
     }

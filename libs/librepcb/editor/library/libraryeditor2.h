@@ -44,6 +44,7 @@ class Workspace;
 namespace editor {
 
 class GuiApplication;
+class UndoStack;
 
 /*******************************************************************************
  *  Class LibraryEditor2
@@ -71,6 +72,7 @@ public:
   Workspace& getWorkspace() noexcept { return mWorkspace; }
   FilePath getFilePath() const noexcept;
   Library& getLibrary() noexcept { return *mLibrary; }
+  UndoStack& getUndoStack() noexcept { return *mUndoStack; }
   int getUiIndex() const noexcept { return mUiIndex; }
   void setUiIndex(int index) noexcept;
   ui::LibraryEditorData getUiData() const noexcept;
@@ -102,6 +104,7 @@ private:
   Workspace& mWorkspace;
   std::unique_ptr<Library> mLibrary;
   int mUiIndex;
+  std::unique_ptr<UndoStack> mUndoStack;
 };
 
 /*******************************************************************************

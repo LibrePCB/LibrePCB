@@ -26,9 +26,10 @@
 #include "../../3d/slintopenglview.h"
 #include "../../undostack.h"
 #include "../../utils/slinthelpers.h"
+#include "../../utils/uihelpers.h"
 #include "../projecteditor.h"
 #include "boardeditor.h"
-#include "../../utils/uihelpers.h"
+
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boardplanefragmentsbuilder.h>
 #include <librepcb/core/project/circuit/circuit.h>

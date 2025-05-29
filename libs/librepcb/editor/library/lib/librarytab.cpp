@@ -22,10 +22,12 @@
  ******************************************************************************/
 #include "librarytab.h"
 
+#include "../../undostack.h"
 #include "../libraryeditor2.h"
 #include "libraryelementsmodel.h"
 #include "utils/slinthelpers.h"
 #include "utils/uihelpers.h"
+
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/library/library.h>
 #include <librepcb/core/workspace/workspace.h>
@@ -95,8 +97,8 @@ ui::TabData LibraryTab::getUiData() const noexcept {
       ui::TabType::Library,  // Type
       q2s(*mLibrary.getNames().getDefaultValue()),  // Title
       features,  // Features
-      slint::SharedString(),  // Undo text
-      slint::SharedString(),  // Redo text
+      q2s(mEditor.getUndoStack().getUndoCmdText()),  // Undo text
+      q2s(mEditor.getUndoStack().getRedoCmdText()),  // Redo text
       slint::SharedString(),  // Find term
       nullptr,  // Find suggestions
       nullptr,  // Layers
@@ -263,6 +265,22 @@ void LibraryTab::trigger(ui::TabAction a) noexcept {
             break;
           }
         }
+      }
+      break;
+    }
+    case ui::TabAction::Undo: {
+      try {
+        mEditor.getUndoStack().undo();
+      } catch (const Exception& e) {
+        QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+      }
+      break;
+    }
+    case ui::TabAction::Redo: {
+      try {
+        mEditor.getUndoStack().redo();
+      } catch (const Exception& e) {
+        QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
       }
       break;
     }

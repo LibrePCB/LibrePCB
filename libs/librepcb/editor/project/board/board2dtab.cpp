@@ -290,8 +290,8 @@ ui::TabData Board2dTab::getUiData() const noexcept {
       ui::TabType::Board2d,  // Type
       q2s(*mBoard.getName()),  // Title
       features,  // Features
-          q2s(mProjectEditor.getUndoStack().getUndoCmdText()),  // Undo text
-          q2s(mProjectEditor.getUndoStack().getRedoCmdText()),  // Redo text
+      q2s(mProjectEditor.getUndoStack().getUndoCmdText()),  // Undo text
+      q2s(mProjectEditor.getUndoStack().getRedoCmdText()),  // Redo text
       q2s(mSearchContext.getTerm()),  // Find term
       mSearchContext.getSuggestions(),  // Find suggestions
       mLayersModel,  // Layers

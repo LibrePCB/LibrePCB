@@ -23,6 +23,7 @@
 #include "libraryeditor2.h"
 
 #include "../guiapplication.h"
+#include "../undostack.h"
 #include "../utils/slinthelpers.h"
 
 #include <librepcb/core/library/library.h>
@@ -49,13 +50,21 @@ LibraryEditor2::LibraryEditor2(GuiApplication& app,
     mApp(app),
     mWorkspace(app.getWorkspace()),
     mLibrary(std::move(lib)),
-    mUiIndex(uiIndex) {
+    mUiIndex(uiIndex),
+    mUndoStack(new UndoStack()) {
   connect(mLibrary.get(), &Library::namesChanged, this,
           [this]() { onUiDataChanged.notify(); });
 }
 
 LibraryEditor2::~LibraryEditor2() noexcept {
+  // Force closing all tabs.
   emit aboutToBeDestroyed();
+
+  // Delete all command objects in the undo stack. This mmust be done before
+  // other important objects are deleted, as undo command objects can hold
+  // pointers/references to them!
+  mUndoStack->clear();
+  mUndoStack.reset();
 }
 
 /*******************************************************************************
