@@ -388,6 +388,8 @@ export enum TabAction {
     select-all,
 
     // Modify
+    undo,
+    redo,
     cut,
     copy,
     paste,
@@ -880,8 +882,6 @@ export struct BoardData {
 export enum ProjectAction {
     close,
     save,
-    undo,
-    redo,
     export-bom,
     export-lppz,
     open-folder,

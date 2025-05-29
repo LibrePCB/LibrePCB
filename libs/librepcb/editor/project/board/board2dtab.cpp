@@ -600,6 +600,14 @@ void Board2dTab::trigger(ui::TabAction a) noexcept {
       }
       break;
     }
+    case ui::TabAction::Undo: {
+      mProjectEditor.undo();
+      break;
+    }
+    case ui::TabAction::Redo: {
+      mProjectEditor.redo();
+      break;
+    }
     case ui::TabAction::Cut: {
       mFsm->processCut();
       break;

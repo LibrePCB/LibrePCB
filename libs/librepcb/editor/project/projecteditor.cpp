@@ -271,24 +271,6 @@ void ProjectEditor::trigger(ui::ProjectAction a) noexcept {
       break;
     }
 
-    case ui::ProjectAction::Undo: {
-      try {
-        mUndoStack->undo();
-      } catch (const Exception& e) {
-        QMessageBox::critical(qApp->activeWindow(), "Error", e.getMsg());
-      }
-      break;
-    }
-
-    case ui::ProjectAction::Redo: {
-      try {
-        mUndoStack->redo();
-      } catch (const Exception& e) {
-        QMessageBox::critical(qApp->activeWindow(), "Error", e.getMsg());
-      }
-      break;
-    }
-
     case ui::ProjectAction::ExportBom: {
       execBomGeneratorDialog((mProject->getBoards().count() == 1)
                                  ? mProject->getBoardByIndex(0)
@@ -335,6 +317,22 @@ void ProjectEditor::setHighlightedNetSignals(
   if (netSignals != *mHighlightedNetSignals) {
     *mHighlightedNetSignals = netSignals;
     emit highlightedNetSignalsChanged();
+  }
+}
+
+void ProjectEditor::undo() noexcept {
+  try {
+    mUndoStack->undo();
+  } catch (const Exception& e) {
+    QMessageBox::critical(qApp->activeWindow(), "Error", e.getMsg());
+  }
+}
+
+void ProjectEditor::redo() noexcept {
+  try {
+    mUndoStack->redo();
+  } catch (const Exception& e) {
+    QMessageBox::critical(qApp->activeWindow(), "Error", e.getMsg());
   }
 }
 

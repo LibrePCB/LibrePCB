@@ -28,7 +28,7 @@
 #include "../../utils/slinthelpers.h"
 #include "../projecteditor.h"
 #include "boardeditor.h"
-
+#include "../../utils/uihelpers.h"
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boardplanefragmentsbuilder.h>
 #include <librepcb/core/project/circuit/circuit.h>
@@ -201,6 +201,14 @@ void Board3dTab::deactivate() noexcept {
 
 void Board3dTab::trigger(ui::TabAction a) noexcept {
   switch (a) {
+    case ui::TabAction::Undo: {
+      mProjectEditor.undo();
+      break;
+    }
+    case ui::TabAction::Redo: {
+      mProjectEditor.redo();
+      break;
+    }
     case ui::TabAction::ZoomIn: {
       if (mView) mView->zoomIn();
       break;

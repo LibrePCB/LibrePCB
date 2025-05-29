@@ -52,12 +52,6 @@ export global Shortcuts {
         } else if is-shortcut(event, Cmd.output-jobs) {
             Backend.trigger-project(project, ProjectAction.open-output-jobs);
             return true;
-        } else if is-shortcut(event, Cmd.undo) {
-            Backend.trigger-project(project, ProjectAction.undo);
-            return true;
-        } else if is-shortcut(event, Cmd.redo) {
-            Backend.trigger-project(project, ProjectAction.redo);
-            return true;
         } else if is-shortcut(event, Cmd.project-close) {
             Backend.trigger-project(project, ProjectAction.close);
             return true;
@@ -125,6 +119,12 @@ export global Shortcuts {
             return true;
         } else if is-shortcut(event, Cmd.print) && (Data.current-tab.features.export-graphics == FeatureState.enabled) {
             Backend.trigger-tab(section, tab, TabAction.print);
+            return true;
+        } else if is-shortcut(event, Cmd.undo) && (Data.current-tab.features.undo == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.undo);
+            return true;
+        } else if is-shortcut(event, Cmd.redo) && (Data.current-tab.features.redo == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.redo);
             return true;
         } else if is-shortcut(event, Cmd.clipboard-cut) && (Data.current-tab.features.cut == FeatureState.enabled) {
             Backend.trigger-tab(section, tab, TabAction.cut);

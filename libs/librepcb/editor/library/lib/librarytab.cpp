@@ -25,7 +25,7 @@
 #include "../libraryeditor2.h"
 #include "libraryelementsmodel.h"
 #include "utils/slinthelpers.h"
-
+#include "utils/uihelpers.h"
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/library/library.h>
 #include <librepcb/core/workspace/workspace.h>
@@ -87,10 +87,14 @@ LibraryTab::~LibraryTab() noexcept {
  ******************************************************************************/
 
 ui::TabData LibraryTab::getUiData() const noexcept {
+  ui::TabFeatures features = {};
+  features.undo = toFs(false);
+  features.redo = toFs(false);
+
   return ui::TabData{
       ui::TabType::Library,  // Type
       q2s(*mLibrary.getNames().getDefaultValue()),  // Title
-      ui::TabFeatures{},  // Features
+      features,  // Features
       slint::SharedString(),  // Undo text
       slint::SharedString(),  // Redo text
       slint::SharedString(),  // Find term

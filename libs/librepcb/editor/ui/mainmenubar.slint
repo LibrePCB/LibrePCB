@@ -355,7 +355,7 @@ export component MainMenuBar inherits Rectangle {
                     enabled: Data.current-tab.features.undo == FeatureState.enabled;
 
                     clicked => {
-                        Helpers.trigger-current-project-action(ProjectAction.undo);
+                        Helpers.trigger-current-tab-action(TabAction.undo);
                     }
                 }
 
@@ -366,7 +366,7 @@ export component MainMenuBar inherits Rectangle {
                     enabled: Data.current-tab.features.redo == FeatureState.enabled;
 
                     clicked => {
-                        Helpers.trigger-current-project-action(ProjectAction.redo);
+                        Helpers.trigger-current-tab-action(TabAction.redo);
                     }
                 }
 
@@ -1025,15 +1025,16 @@ export component MainMenuBar inherits Rectangle {
             width: 3px;
         }
 
-        /*if current-tab-project.valid:*/ project-buttons-l := HorizontalLayout {
+        if global-buttons-l.preferred-width > global-buttons-l.padding-left: MenuBarSeparator { }
+
+        global-buttons-l := HorizontalLayout {
             horizontal-stretch: 0;
             padding-top: 5px;
             padding-bottom: 5px;
+            padding-left: 5px;
             spacing: 5px;
 
-            MenuBarSeparator { }
-
-            save-project-btn := MenuBarButton {
+            if current-tab-project.valid: save-project-btn := MenuBarButton {
                 cmd: Cmd.project-save;
                 enabled: current-tab-project.writable;
 
@@ -1042,29 +1043,29 @@ export component MainMenuBar inherits Rectangle {
                 }
             }
 
-            undo-btn := MenuBarButton {
+            if Data.current-tab.features.undo != FeatureState.not-supported: undo-btn := MenuBarButton {
                 cmd: Cmd.undo;
                 icon: @image-url("../../../font-awesome/svgs/solid/rotate-left.svg");
                 tooltip: undo-text;
                 enabled: Data.current-tab.features.undo == FeatureState.enabled;
 
                 clicked => {
-                    Backend.trigger-project(current-tab-project-index, ProjectAction.undo);
+                    Helpers.trigger-current-tab-action(TabAction.undo);
                 }
             }
 
-            redo-btn := MenuBarButton {
+            if Data.current-tab.features.redo != FeatureState.not-supported: redo-btn := MenuBarButton {
                 cmd: Cmd.redo;
                 icon: @image-url("../../../font-awesome/svgs/solid/rotate-right.svg");
                 tooltip: redo-text;
                 enabled: Data.current-tab.features.redo == FeatureState.enabled;
 
                 clicked => {
-                    Backend.trigger-project(current-tab-project-index, ProjectAction.redo);
+                    Helpers.trigger-current-tab-action(TabAction.redo);
                 }
             }
 
-            if !current-tab-project.writable: Rectangle {
+            if current-tab-project.valid && (!current-tab-project.writable): Rectangle {
                 width: self.preferred-width + 20px;
 
                 read-only-badge := Badge {
