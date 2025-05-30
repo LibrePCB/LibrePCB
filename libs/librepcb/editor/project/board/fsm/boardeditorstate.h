@@ -63,7 +63,7 @@ class BoardEditorState : public QObject {
 public:
   using Context = BoardEditorFsm::Context;
 
-  enum class FindFlag {
+  enum class FindFlag : uint32_t {
     // Item types
     Vias = (1 << 0),
     NetPoints = (1 << 1),
@@ -84,6 +84,9 @@ public:
 
     // Performance options
     SkipLowerPriorityMatches = (1 << 15),
+
+    // Other options
+    DevicesOfPads = (1 << 20),  // Don't return pads, but their device.
   };
   Q_DECLARE_FLAGS(FindFlags, FindFlag)
 
