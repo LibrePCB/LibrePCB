@@ -201,17 +201,21 @@ void BoardGraphicsScene::selectItemsInRect(const Point& p1,
                                            const Point& p2) noexcept {
   GraphicsScene::setSelectionRect(p1, p2);
   const QRectF rectPx = QRectF(p1.toPxQPointF(), p2.toPxQPointF()).normalized();
-  foreach (auto item, mDevices) {
-    const bool selectSymbol =
-        item->mapToScene(item->shape()).intersects(rectPx);
-    item->setSelected(selectSymbol);
-  }
+  // For now we select the shole device if one of its pads is within the
+  // selection rect, see https://github.com/LibrePCB/LibrePCB/pull/1533.
+  // In case this turns out to be problematic in some cases, we should
+  // reconsider this.
+  QSet<std::shared_ptr<BGI_Device>> selectedDevices;
   foreach (auto item, mFootprintPads) {
-    bool deviceSelected = false;
     if (auto device = item->getDeviceGraphicsItem().lock()) {
-      deviceSelected = device->isSelected();
+      if ((!selectedDevices.contains(device)) &&
+          item->mapToScene(item->shape()).intersects(rectPx)) {
+        selectedDevices.insert(device);
+      }
     }
-    item->setSelected(deviceSelected ||
+  }
+  foreach (auto item, mDevices) {
+    item->setSelected(selectedDevices.contains(item) ||
                       item->mapToScene(item->shape()).intersects(rectPx));
   }
   foreach (auto item, mVias) {

@@ -234,16 +234,17 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
   };
   auto processItem = [&pos, &posExact, &posOnGrid, &posArea, &posAreaLarge,
                       flags, &except, &addItem, &canSkip](
-                         std::shared_ptr<QGraphicsItem> item,
+                         std::shared_ptr<QGraphicsItem> itemToCheck,
+                         std::shared_ptr<QGraphicsItem> itemToAdd,
                          const Point& nearestPos, int priority, bool large) {
-    if (except.contains(item)) {
+    if (except.contains(itemToAdd)) {
       return;
     }
     auto prio = std::make_pair(priority, 0);
     if (canSkip(prio)) {
       return;
     }
-    const QPainterPath grabArea = item->mapToScene(item->shape());
+    const QPainterPath grabArea = itemToCheck->mapToScene(itemToCheck->shape());
     if (grabArea.isEmpty()) {
       return;
     }
@@ -253,7 +254,7 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
       return;
     }
     if (grabArea.contains(posExact)) {
-      addItem(prio, item);
+      addItem(prio, itemToAdd);
       return;
     }
     prio = std::make_pair(priority + 1000, distance);
@@ -262,7 +263,7 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
     }
     if ((flags & (FindFlag::AcceptNearMatch | FindFlag::AcceptNextGridMatch)) &&
         grabArea.intersects(large ? posAreaLarge : posArea)) {
-      addItem(prio, item);
+      addItem(prio, itemToAdd);
       return;
     }
     prio = std::make_pair(distance + 2000, priority);  // Swapped order!
@@ -271,7 +272,7 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
     }
     if ((flags & FindFlag::AcceptNextGridMatch) && (posOnGrid != posExact) &&
         grabArea.contains(posOnGrid)) {
-      addItem(prio, item);
+      addItem(prio, itemToAdd);
       return;
     }
   };
@@ -279,7 +280,7 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
   if (flags.testFlag(FindFlag::Holes)) {
     for (auto it = scene->getHoles().begin(); it != scene->getHoles().end();
          it++) {
-      processItem(it.value(),
+      processItem(it.value(), it.value(),
                   it.key()->getData().getPath()->getVertices().first().getPos(),
                   5, false);
     }
@@ -291,7 +292,8 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
       if (netsignals.isEmpty() ||
           netsignals.contains(it.key()->getNetSegment().getNetSignal())) {
         if ((!cuLayer) || (it.key()->getVia().isOnLayer(*cuLayer))) {
-          processItem(it.value(), it.key()->getPosition(), 0, false);
+          processItem(it.value(), it.value(), it.key()->getPosition(), 0,
+                      false);
         }
       }
     }
@@ -304,7 +306,7 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
           netsignals.contains(it.key()->getNetSegment().getNetSignal())) {
         const Layer* layer = it.key()->getLayerOfTraces();
         if ((!cuLayer) || (&*cuLayer == layer)) {
-          processItem(it.value(), it.key()->getPosition(),
+          processItem(it.value(), it.value(), it.key()->getPosition(),
                       10 + (layer ? priorityFromLayer(*layer) : 0), false);
         }
       }
@@ -318,7 +320,7 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
           netsignals.contains(it.key()->getNetSegment().getNetSignal())) {
         const Layer& layer = it.key()->getLayer();
         if ((!cuLayer) || (*cuLayer == layer)) {
-          processItem(it.value(),
+          processItem(it.value(), it.value(),
                       Toolbox::nearestPointOnLine(
                           pos.mappedToGrid(getGridInterval()),
                           it.key()->getStartPoint().getPosition(),
@@ -336,7 +338,7 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
           netsignals.contains(it.key()->getNetSignal())) {
         if ((!cuLayer) || (*cuLayer == it.key()->getLayer())) {
           processItem(
-              it.value(),
+              it.value(), it.value(),
               it.key()->getOutline().calcNearestPointBetweenVertices(pos),
               30 + priorityFromLayer(it.key()->getLayer()),
               true);  // Probably large grab area makes sense?
@@ -357,7 +359,7 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
           priority += priorityFromLayer(*layers.first());
         }
         processItem(
-            it.value(),
+            it.value(), it.value(),
             it.key()->getData().getOutline().calcNearestPointBetweenVertices(
                 pos),
             priority,
@@ -369,7 +371,7 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
   if (flags.testFlag(FindFlag::Devices)) {
     for (auto it = scene->getDevices().begin(); it != scene->getDevices().end();
          it++) {
-      processItem(it.value(), it.key()->getPosition(),
+      processItem(it.value(), it.value(), it.key()->getPosition(),
                   40 + (it.key()->getMirrored() ? 300 : 100), false);
     }
   }
@@ -385,7 +387,17 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
           const int priority = it.key()->getLibPad().isTht()
               ? 1
               : (50 + (it.key()->getMirrored() ? 300 : 100));
-          processItem(it.value(), it.key()->getPosition(), priority, false);
+          std::shared_ptr<QGraphicsItem> itemToAdd;
+          if (flags.testFlag(FindFlag::DevicesOfPads)) {
+            // See https://github.com/LibrePCB/LibrePCB/issues/1531.
+            itemToAdd = it.value()->getDeviceGraphicsItem().lock();
+          } else {
+            itemToAdd = it.value();
+          }
+          if (itemToAdd) {
+            processItem(it.value(), itemToAdd, it.key()->getPosition(),
+                        priority, false);
+          }
         }
       }
     }
@@ -395,7 +407,7 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
     for (auto it = scene->getPolygons().begin();
          it != scene->getPolygons().end(); it++) {
       processItem(
-          it.value(),
+          it.value(), it.value(),
           it.key()->getData().getPath().calcNearestPointBetweenVertices(pos),
           60 + priorityFromLayer(it.key()->getData().getLayer()),
           true);  // Probably large grab area makes sense?
@@ -405,7 +417,7 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
   if (flags.testFlag(FindFlag::StrokeTexts)) {
     for (auto it = scene->getStrokeTexts().begin();
          it != scene->getStrokeTexts().end(); it++) {
-      processItem(it.value(), it.key()->getData().getPosition(),
+      processItem(it.value(), it.value(), it.key()->getData().getPosition(),
                   60 + priorityFromLayer(it.key()->getData().getLayer()),
                   false);
     }

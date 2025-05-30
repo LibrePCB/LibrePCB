@@ -596,8 +596,9 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
       return true;
     } else {
       // handle items selection
-      QList<std::shared_ptr<QGraphicsItem>> items =
-          findItemsAtPos(e.scenePos, FindFlag::All | FindFlag::AcceptNearMatch);
+      QList<std::shared_ptr<QGraphicsItem>> items = findItemsAtPos(
+          e.scenePos,
+          FindFlag::All | FindFlag::DevicesOfPads | FindFlag::AcceptNearMatch);
       if (items.isEmpty()) {
         // no items under mouse --> start drawing a selection rectangle
         scene->clearSelection();
@@ -713,8 +714,9 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonDoubleClicked(
   if ((!mSelectedItemsDragCommand) && (!mCmdPolygonEdit) && (!mCmdPlaneEdit) &&
       (!mCmdZoneEdit)) {
     // Open the properties editor dialog of the selected item, if any.
-    const QList<std::shared_ptr<QGraphicsItem>> items =
-        findItemsAtPos(e.scenePos, FindFlag::All | FindFlag::AcceptNearMatch);
+    const QList<std::shared_ptr<QGraphicsItem>> items = findItemsAtPos(
+        e.scenePos,
+        FindFlag::All | FindFlag::DevicesOfPads | FindFlag::AcceptNearMatch);
     foreach (auto item, items) {
       if (item->isSelected() && openPropertiesDialog(item)) {
         return true;
@@ -740,8 +742,9 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
   } else if ((!mCmdPolygonEdit) && (!mCmdPlaneEdit) && (!mCmdZoneEdit)) {
     // handle item selection
     Point pos = e.scenePos;
-    QList<std::shared_ptr<QGraphicsItem>> items =
-        findItemsAtPos(pos, FindFlag::All | FindFlag::AcceptNearMatch);
+    QList<std::shared_ptr<QGraphicsItem>> items = findItemsAtPos(
+        pos,
+        FindFlag::All | FindFlag::DevicesOfPads | FindFlag::AcceptNearMatch);
     if (items.isEmpty()) return false;
 
     // If the right-clicked element is part of an active selection, keep it

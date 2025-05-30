@@ -339,8 +339,12 @@ bool BoardEditorState_DrawTrace::startPositioning(
 
     // helper to avoid defining the translation string multiple times
     auto throwPadNotConnectedException = []() {
-      throw Exception(__FILE__, __LINE__,
-                      tr("Pad is not connected to any signal."));
+      throw Exception(
+          __FILE__, __LINE__,
+          tr("This pad is not connected to any net, therefore no trace can be "
+             "attached to it. To allow attaching a trace, first connect this "
+             "pad to a net in the schematics. So this is a problem of the "
+             "schematics, not of the board."));
     };
 
     // determine the fixed anchor (create one if it doesn't exist already)
