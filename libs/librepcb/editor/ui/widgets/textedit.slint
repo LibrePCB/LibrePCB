@@ -15,6 +15,8 @@ export component TextEdit inherits Rectangle {
         self.text = text;
     }
 
+    callback editing-finished;
+
     callback key-pressed(KeyEvent) -> EventResult;
 
     public function select-all() {
@@ -30,6 +32,7 @@ export component TextEdit inherits Rectangle {
     changed has-focus => {
         if !has-focus {
             edt.text = text;
+            editing-finished();
         }
     }
 

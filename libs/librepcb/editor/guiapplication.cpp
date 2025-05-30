@@ -330,6 +330,11 @@ void GuiApplication::createNewWindow(int id, int projectIndex) noexcept {
         }
         return res;
       });
+  b.on_validate_element_name([](slint::SharedString text){
+    slint::SharedString err;
+    validateElementName(s2q(text), err);
+    return err;
+  });
 
   // Reuse next free window ID.
   if (id < 1) {

@@ -27,7 +27,7 @@
 
 #include <librepcb/core/fileio/filepath.h>
 #include <librepcb/core/types/uuid.h>
-
+#include <librepcb/core/types/elementname.h>
 #include <QtCore>
 
 #include <optional>
@@ -137,10 +137,10 @@ private:
   int mCurrentCategoryIndex;
   int mCurrentElementIndex;
 
-  // Parse errors
-  slint::SharedString mNameError;
   slint::SharedString mVersionError;
   slint::SharedString mUrlError;
+
+  std::optional<ElementName> mName;
 
   // Library content
   QHash<FilePath, Uuid> mLibCategories;

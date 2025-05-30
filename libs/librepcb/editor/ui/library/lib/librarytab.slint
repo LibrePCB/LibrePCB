@@ -46,11 +46,22 @@ component LibraryMetadata inherits GridLayout {
         }
 
         LineEdit {
-            text: tabs[index].name;
-            validation-error: tabs[index].name-error;
+            property <string> data-text: tabs[index].name;
 
-            text-edited(text) => {
-                tabs[index].name = text;
+            text: data-text;
+            validation-error: Backend.validate-element-name(self.text);
+
+            changed data-text => {
+                self.text = data-text;
+            }
+
+            //text-edited(text) => {
+            //    tabs[index].name = text;
+            //}
+
+            editing-finished() => {
+                tabs[index].name = self.text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
             }
         }
     }
@@ -69,6 +80,10 @@ component LibraryMetadata inherits GridLayout {
             text-edited(text) => {
                 tabs[index].description = text;
             }
+
+            editing-finished() => {
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
         }
     }
 
@@ -85,6 +100,10 @@ component LibraryMetadata inherits GridLayout {
             text-edited(text) => {
                 tabs[index].keywords = text;
             }
+
+            editing-finished() => {
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
         }
     }
 
@@ -100,6 +119,10 @@ component LibraryMetadata inherits GridLayout {
 
             text-edited(text) => {
                 tabs[index].author = text;
+            }
+
+            editing-finished() => {
+                Backend.trigger-tab(section-index, index, TabAction.apply);
             }
         }
     }
@@ -118,6 +141,10 @@ component LibraryMetadata inherits GridLayout {
             text-edited(text) => {
                 tabs[index].version = text;
             }
+
+            editing-finished() => {
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
         }
     }
 
@@ -135,6 +162,7 @@ component LibraryMetadata inherits GridLayout {
 
             toggled(checked) => {
                 tabs[index].deprecated = checked;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
             }
         }
     }
@@ -152,6 +180,10 @@ component LibraryMetadata inherits GridLayout {
 
             text-edited(text) => {
                 tabs[index].url = text;
+            }
+
+            editing-finished() => {
+                Backend.trigger-tab(section-index, index, TabAction.apply);
             }
         }
     }
@@ -180,6 +212,10 @@ component LibraryMetadata inherits GridLayout {
 
             text-edited(text) => {
                 tabs[index].manufacturer = text;
+            }
+
+            editing-finished() => {
+                Backend.trigger-tab(section-index, index, TabAction.apply);
             }
         }
     }

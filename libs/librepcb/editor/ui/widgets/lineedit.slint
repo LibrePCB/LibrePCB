@@ -27,6 +27,8 @@ export component LineEdit inherits Rectangle {
         text-edited(text);
     }
 
+    callback editing-finished;
+
     callback key-pressed(KeyEvent) -> EventResult;
 
     public function select-all() {
@@ -49,6 +51,7 @@ export component LineEdit inherits Rectangle {
             current-autocompletion-index = -1;
         } else {
             edt.text = text;
+            editing-finished();
         }
     }
 

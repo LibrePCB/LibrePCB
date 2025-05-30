@@ -201,4 +201,12 @@ export global Backend {
     // The backend parses the input string and returns whether it is a valid
     // number, and the parsed length value plus unit.
     pure callback parse-length-input(s: string, unit: LengthUnit, minimum: Int64) -> LengthEditParseResult;
+
+    // Validate an ElementName string
+    //
+    // The return value is the error message. If empty, the string is valid.
+    pure callback validate-element-name(s: string) -> string;
+    validate-element-name(s) => {
+        return "Invalid";
+    }
 }

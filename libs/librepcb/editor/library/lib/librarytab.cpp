@@ -27,7 +27,7 @@
 #include "libraryelementsmodel.h"
 #include "utils/slinthelpers.h"
 #include "utils/uihelpers.h"
-
+#include "../cmd/cmdlibraryedit.h"
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/library/library.h>
 #include <librepcb/core/workspace/workspace.h>
@@ -72,6 +72,10 @@ LibraryTab::LibraryTab(GuiApplication& app, LibraryEditor2& editor,
   connect(&mEditor, &LibraryEditor2::aboutToBeDestroyed, this,
           &LibraryTab::closeEnforced);
 
+  // Connect undo stack.
+  connect(&mEditor.getUndoStack(), &UndoStack::stateModified, this,
+          [this]() { onUiDataChanged.notify(); onDerivedUiDataChanged.notify(); });
+
   // Connect library.
   connect(&mLibrary, &Library::namesChanged, this,
           [this]() { onUiDataChanged.notify(); });
@@ -90,8 +94,8 @@ LibraryTab::~LibraryTab() noexcept {
 
 ui::TabData LibraryTab::getUiData() const noexcept {
   ui::TabFeatures features = {};
-  features.undo = toFs(false);
-  features.redo = toFs(false);
+  features.undo = toFs(mEditor.getUndoStack().canUndo());
+  features.redo = toFs(mEditor.getUndoStack().canRedo());
 
   return ui::TabData{
       ui::TabType::Library,  // Type
@@ -112,7 +116,7 @@ ui::LibraryTabData LibraryTab::getDerivedUiData() const noexcept {
       mCompactLayoutPageIndex,  // Compact layout page index
       q2s(mLibrary.getIconAsPixmap()),  // Icon
       q2s(*mLibrary.getNames().getDefaultValue()),  // Name
-      mNameError,  // Name error
+      slint::SharedString(),  // Name error
       q2s(mLibrary.getDescriptions().getDefaultValue()),  // Description
       q2s(mLibrary.getKeywords().getDefaultValue()),  // Keywords
       q2s(mLibrary.getAuthor()),  // Author
@@ -131,17 +135,20 @@ ui::LibraryTabData LibraryTab::getDerivedUiData() const noexcept {
 }
 
 void LibraryTab::setDerivedUiData(const ui::LibraryTabData& data) noexcept {
+  mName = parseElementName(cleanElementName(s2q(data.name)));
+
+
   // Name
-  {
-    const QString value = s2q(data.name);
-    if (value != mLibrary.getNames().getDefaultValue()) {
-      if (auto validated = validateElementName(value, mNameError)) {
-        auto set = mLibrary.getNames();
-        set.setDefaultValue(*validated);
-        mLibrary.setNames(set);
-      }
-    }
-  }
+  //{
+  //  const QString value = s2q(data.name);
+  //  if (value != mLibrary.getNames().getDefaultValue()) {
+  //    if (auto validated = validateElementName(value, mNameError)) {
+  //      auto set = mLibrary.getNames();
+  //      set.setDefaultValue(*validated);
+  //      mLibrary.setNames(set);
+  //    }
+  //  }
+  //}
 
   // Description
   {
@@ -227,6 +234,19 @@ void LibraryTab::trigger(ui::TabAction a) noexcept {
   std::shared_ptr<TreeItem> item = mLibElementsMap.value(userData);
 
   switch (a) {
+    case ui::TabAction::Apply: {
+      try {
+        std::unique_ptr<CmdLibraryEdit> cmd(new CmdLibraryEdit(mLibrary));
+        if (mName) {
+          cmd->setName(QString(), *mName);
+        }
+        mEditor.getUndoStack().execCmd(cmd.release());
+      } catch (const Exception& e) {
+        QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+      }
+      onDerivedUiDataChanged.notify();
+      break;
+    }
     case ui::TabAction::Accept: {
       try {
         mLibrary.save();
