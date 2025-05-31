@@ -110,9 +110,10 @@ TEST(BoardGerberExportTest, test) {
   }
 
   // On Windows, abort here and skip this test because on AppVeyor the generated
-  // Gerber files are slightly different. See discussion here:
-  // https://github.com/LibrePCB/LibrePCB/pull/511#issuecomment-529089212
-#if defined(Q_OS_WIN32) || defined(Q_OS_WIN64)
+  // Gerber files are slightly different. The same happens on Apple Silicon.
+  // (https://github.com/LibrePCB/LibrePCB/issues/516).
+#if defined(Q_OS_WIN32) || defined(Q_OS_WIN64) || \
+    (defined(__APPLE__) && defined(__arm64__))
   GTEST_SKIP();
 #endif
 

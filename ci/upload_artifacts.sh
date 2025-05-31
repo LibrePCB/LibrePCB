@@ -8,8 +8,8 @@ set -euv -o pipefail
 # workaround, we adjust PATH.
 export PATH="/usr/bin:$PATH"
 
-# get branch name from Azure
-BRANCH_NAME="${AZURE_BRANCH_NAME#refs/heads/}"
+# get branch name from CI
+BRANCH_NAME="${CI_BRANCH_NAME#refs/heads/}"
 
 # upload build artifacts for all branches of the upstream repository
 if [ -n "${UPLOAD_URL-}" ]

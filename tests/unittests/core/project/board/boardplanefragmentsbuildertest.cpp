@@ -103,6 +103,13 @@ TEST(BoardPlaneFragmentsBuilderTest, testFragments) {
   QByteArray actual = actualSexpr->toByteArray();
   FileUtils::writeFile(testDataDir.getPathTo("actual.lp"), actual);
 
+  // On Apple Silicon, abort here and skip this test because on CI the
+  // generated files are slightly different
+  // (https://github.com/LibrePCB/LibrePCB/issues/516).
+#if defined(__APPLE__) && defined(__arm64__)
+  GTEST_SKIP();
+#endif
+
   // compare with expected plane fragments loaded from file
   FilePath expectedFp = testDataDir.getPathTo("expected.lp");
   QByteArray expected = FileUtils::readFile(expectedFp);

@@ -1,0 +1,83 @@
+name: CI
+
+on: [push, pull_request]
+
+env:
+  CI_BRANCH_NAME: ${{ github.ref }}
+  # Specify build author as an environment variable because on Apple Silicon
+  # build_librepcb.sh is run locally where we want to use a different author.
+  LIBREPCB_BUILD_AUTHOR: "LibrePCB CI"
+  # Configure ccache.
+  CCACHE_MAXSIZE: 1G
+  # Incremental builds make no sense on CI -> disable it to avoid creating
+  # additional build artifacts.
+  CARGO_INCREMENTAL: 0
+
+jobs:
+  macos-arm64:
+    name: MacOS ARM64
+    # Make sure the 'runs-on' really refers to an Apple Silicon CPU:
+    # https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners
+    runs-on: macos-14
+    env:
+      OS: 'mac'
+      ARCH: 'arm64'
+      COPYFILE_DISABLE: 1 # Stop creating shit files (https://superuser.com/questions/259703/get-mac-tar-to-stop-putting-filenames-in-tar-archives)
+      HOMEBREW_NO_INSTALL_CLEANUP: 1 # Might speed up homebrew commands(?)
+      CCACHE_DIR: '/Users/runner/ccache-dir'
+      CARGO_HOME: '/Users/runner/cargo-home'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Print Environment
+        run: ./ci/print_environment.sh
+      - name: Install Dependencies
+        run: |
+          source ./ci/install_dependencies.sh
+          # Pass modified PATH to following steps:
+          echo "$PATH" > "$GITHUB_PATH"
+      # --- caching ---
+      - name: Cache .ccache
+        uses: actions/cache@v4
+        with:
+          key: ${{ github.job }}-${{ github.ref }}
+          restore-keys: ${{ github.job }}-refs/heads/master
+          path: ${{ env.CCACHE_DIR }}
+      - name: Cache .cargo
+        uses: actions/cache@v4
+        with:
+          key: ${{ github.job }}-${{ hashFiles('libs/librepcb/**/Cargo.lock') }}-${{ github.ref }}
+          restore-keys: ${{ github.job }}-${{ hashFiles('libs/librepcb/**/Cargo.lock') }}-refs/heads/master
+          path: |
+            ${{ env.CARGO_HOME }}/bin/
+            ${{ env.CARGO_HOME }}/registry/index/
+            ${{ env.CARGO_HOME }}/registry/cache/
+            ${{ env.CARGO_HOME }}/git/db/
+            ./build/cargo/
+            ./libs/librepcb/rust-core/target/
+      # --- caching ---
+      - name: Print New Environment
+        run: ./ci/print_environment.sh
+      - name: Build LibrePCB
+        run: ./ci/build_librepcb.sh
+      - name: Build Bundle
+        run: ./ci/build_mac_bundle.sh
+      - name: Run rust-core tests
+        run: cd libs/librepcb/rust-core && cargo test --features=fail-on-warnings
+      - name: Run LibrePCB Unittests
+        run: ./build/tests/unittests/librepcb-unittests
+      - name: Run LibrePCB-CLI Functional Tests
+        run: pytest -vvv --librepcb-executable="build/install/LibrePCB.app/Contents/MacOS/librepcb-cli" ./tests/cli
+      # Note: Functional tests need to be run with the non-bundled app,
+      # otherwise we get errors due to multiple definitions of Qt symbols.
+      - name: Run LibrePCB Functional Tests
+        run: pytest -vvv --librepcb-executable="build/install/bin/librepcb.app/Contents/MacOS/librepcb" --reruns 5 --reruns-delay 10 ./tests/funq
+      - name: Upload Artifacts
+        run: ./ci/upload_artifacts.sh
+        if: ${{ success() && (github.event_name == 'push') }}
+        env:
+          UPLOAD_URL: ${{ secrets.UPLOAD_URL }}
+          UPLOAD_USER: ${{ secrets.UPLOAD_USER }}
+          UPLOAD_PASS: ${{ secrets.UPLOAD_PASS }}
+          UPLOAD_SIGN_KEY: ${{ secrets.UPLOAD_SIGN_KEY }}
