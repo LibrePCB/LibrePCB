@@ -17,21 +17,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_CREATELIBRARYTAB_H
-#define LIBREPCB_EDITOR_CREATELIBRARYTAB_H
+#ifndef LIBREPCB_EDITOR_COMPONENTTAB_H
+#define LIBREPCB_EDITOR_COMPONENTTAB_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "windowtab.h"
+#include "../../windowtab.h"
 
 #include <librepcb/core/fileio/filepath.h>
-#include <librepcb/core/types/elementname.h>
-#include <librepcb/core/types/version.h>
 
 #include <QtCore>
-
-#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -39,49 +35,42 @@
 namespace librepcb {
 namespace editor {
 
+class LibraryEditor2;
+
 /*******************************************************************************
- *  Class CreateLibraryTab
+ *  Class ComponentTab
  ******************************************************************************/
 
 /**
- * @brief The CreateLibraryTab class
+ * @brief The ComponentTab class
  */
-class CreateLibraryTab final : public WindowTab {
+class ComponentTab final : public WindowTab {
   Q_OBJECT
 
 public:
   // Signals
-  Signal<CreateLibraryTab> onDerivedUiDataChanged;
+  Signal<ComponentTab> onDerivedUiDataChanged;
 
   // Constructors / Destructor
-  CreateLibraryTab() = delete;
-  CreateLibraryTab(const CreateLibraryTab& other) = delete;
-  explicit CreateLibraryTab(GuiApplication& app,
-                            QObject* parent = nullptr) noexcept;
-  ~CreateLibraryTab() noexcept;
+  ComponentTab() = delete;
+  ComponentTab(const ComponentTab& other) = delete;
+  explicit ComponentTab(GuiApplication& app, LibraryEditor2& editor,
+                        const FilePath& fp, QObject* parent = nullptr) noexcept;
+  ~ComponentTab() noexcept;
 
   // General Methods
+  const FilePath& getDirectoryPath() const noexcept { return mDirPath; }
   ui::TabData getUiData() const noexcept override;
-  const ui::CreateLibraryTabData& getDerivedUiData() const noexcept {
-    return mUiData;
-  }
-  void setDerivedUiData(const ui::CreateLibraryTabData& data) noexcept;
+  ui::ComponentTabData getDerivedUiData() const noexcept;
+  void setDerivedUiData(const ui::ComponentTabData& data) noexcept;
   void trigger(ui::TabAction a) noexcept override;
 
   // Operator Overloadings
-  CreateLibraryTab& operator=(const CreateLibraryTab& rhs) = delete;
-
-signals:
-  void libraryCreated(const FilePath& fp);
+  ComponentTab& operator=(const ComponentTab& rhs) = delete;
 
 private:
-  void validate() noexcept;
-
-  ui::CreateLibraryTabData mUiData;
-  std::optional<ElementName> mName;
-  std::optional<Version> mVersion;
-  std::optional<QUrl> mUrl;
-  FilePath mDirectory;
+  LibraryEditor2& mEditor;
+  const FilePath mDirPath;
 };
 
 /*******************************************************************************

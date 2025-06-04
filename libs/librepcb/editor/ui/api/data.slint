@@ -1,20 +1,27 @@
 import {
     Board2dTabData,
     Board3dTabData,
+    ComponentTabData,
+    DeviceTabData,
     EditorTool,
     FeatureState,
     GridStyle,
     LengthUnit,
     LibraryData,
+    LibraryDependency,
+    LibraryEditorData,
     LibraryListData,
+    LibraryTabData,
     NotificationData,
     NotificationType,
+    PackageTabData,
     PanelPage,
     ProjectData,
     RuleCheckData,
     RuleCheckState,
     RuleCheckType,
     SchematicTabData,
+    SymbolTabData,
     TabData,
     TabType,
     TreeViewItemData,
@@ -262,6 +269,26 @@ export global Data {
                         redo: FeatureState.enabled,
                     },
                 },
+                {
+                    type: TabType.library,
+                    title: "Library",
+                },
+                {
+                    type: TabType.symbol,
+                    title: "Symbol",
+                },
+                {
+                    type: TabType.package,
+                    title: "Package",
+                },
+                {
+                    type: TabType.component,
+                    title: "Component",
+                },
+                {
+                    type: TabType.device,
+                    title: "Device",
+                },
             ],
             board-3d-tabs: [
                 {
@@ -272,7 +299,173 @@ export global Data {
                     error: "Some error message here...",
                 }
             ],
-            current-tab-index: 0,
+            library-tabs: [
+                { },
+                {
+                    library-index: 0,
+                    wizard-mode: true,
+                    page-index: 0,
+                    name: "Library",
+                    description: "Foo Bar\nMultiline\nBlabla",
+                    keywords: "Foo,Bar,Hello World",
+                    author: "Somebody",
+                    version: "0.1",
+                    deprecated: false,
+                    dependencies: [
+                        {
+                            icon: @image-url("../../../../../img/app/librepcb.svg"),
+                            name: "LibrePCB Base",
+                            checked: true,
+                        },
+                        {
+                            icon: @image-url("../../../../../img/app/librepcb.svg"),
+                            name: "LibrePCB Integrated Circuits",
+                            checked: true,
+                        },
+                        {
+                            icon: @image-url("../../../../../img/app/librepcb.svg"),
+                            name: "Foo",
+                            checked: false,
+                        },
+                        {
+                            icon: @image-url("../../../../../img/app/librepcb.svg"),
+                            name: "Bar",
+                            checked: false,
+                        },
+                    ],
+                    categories: [
+                        {
+                            level: 0,
+                            text: "Component Categories",
+                            comment: "",
+                        },
+                        {
+                            level: 1,
+                            text: "Integrated Circuits",
+                            comment: "42",
+                        },
+                        {
+                            level: 2,
+                            text: "Data Aquisition",
+                            comment: "",
+                        },
+                        {
+                            level: 3,
+                            text: "Analog-to-Digital Converters",
+                            comment: "123",
+                        },
+                        {
+                            level: 1,
+                            text: "Miscallenous",
+                            comment: "3",
+                        },
+                        {
+                            level: 0,
+                            text: "Package Categories",
+                            comment: "",
+                        },
+                        {
+                            level: 1,
+                            text: "Capacitor",
+                            comment: "42",
+                        },
+                        {
+                            level: 2,
+                            text: "Chip Capacitor",
+                            comment: "",
+                        },
+                    ],
+                    filtered-elements: [
+                        {
+                            level: 0,
+                            text: "Symbols",
+                            comment: "1",
+                        },
+                        {
+                            level: 1,
+                            text: "NE555",
+                        },
+                        {
+                            level: 0,
+                            text: "Components",
+                            comment: "0",
+                        },
+                    ],
+                },
+            ],
+            symbol-tabs: [
+                { },
+                { },
+                {
+                    library-index: 0,
+                    path: "symbol1",
+                    name: "Symbol",
+                    description: "Foo Bar\nMultiline\nBlabla",
+                    keywords: "Foo,Bar,Hello World",
+                    author: "Somebody",
+                    version: "0.1",
+                    deprecated: false,
+                    categories: ["Integrated Circuits -> Timers"],
+                },
+            ],
+            package-tabs: [
+                { },
+                { },
+                { },
+                {
+                    library-index: 0,
+                    path: "package1",
+                    name: "Package",
+                    description: "Foo Bar\nMultiline\nBlabla",
+                    keywords: "Foo,Bar,Hello World",
+                    author: "Somebody",
+                    version: "0.1",
+                    deprecated: false,
+                    categories: ["Integrated Circuits -> Timers"],
+                    background-color: #000000,
+                    foreground-color: #999999,
+                    overlay-color: Colors.gray,
+                    overlay-text-color: Colors.white,
+                    grid-style: GridStyle.none,
+                    unit: LengthUnit.millimeters,
+                },
+            ],
+            component-tabs: [
+                { },
+                { },
+                { },
+                { },
+                {
+                    library-index: 0,
+                    path: "component1",
+                    name: "Component",
+                    description: "Foo Bar\nMultiline\nBlabla",
+                    keywords: "Foo,Bar,Hello World",
+                    author: "Somebody",
+                    version: "0.1",
+                    deprecated: false,
+                    categories: ["Integrated Circuits -> Timers"],
+                },
+            ],
+            device-tabs: [
+                { },
+                { },
+                { },
+                { },
+                { },
+                {
+                    library-index: 0,
+                    path: "device1",
+                    name: "Device",
+                    description: "Foo Bar\nMultiline\nBlabla",
+                    keywords: "Foo,Bar,Hello World",
+                    author: "Somebody",
+                    version: "0.1",
+                    deprecated: false,
+                    categories: ["Integrated Circuits -> Timers"],
+                },
+            ],
+            current-tab-index: 1,
         },
     ];
 
@@ -517,6 +710,24 @@ export global Data {
     // Filter applied to both local libraries and remote libraries
     in property <string> libraries-filter: "Foo";
 
+    in property <bool> libraries-rescan-in-progress: false;
+
+    in property <[LibraryEditorData]> library-editors: [
+        {
+            valid: true,
+            path: "/path/to/library-1.lplib",
+            name: "Library 1",
+        },
+        {
+            valid: true,
+            path: "/path/to/library-2.lplib",
+            name: "Library 2",
+        },
+    ];
+
+    // Currently active library editor index
+    out property <int> current-library-index: -1;
+
     // All currently opened projects
     in property <[ProjectData]> projects: [
         {
@@ -644,7 +855,13 @@ export global Data {
     in-out property <TabData> current-tab: current-section.tabs[current-section.current-tab-index];
     out property <int> remote-libraries-pending-operations: remote-libraries-data.pending-installs + remote-libraries-data.pending-updates + remote-libraries-data.pending-uninstalls;
     out property <bool> libraries-operation-in-progress: local-libraries-data.operation-in-progress || remote-libraries-data.operation-in-progress;
+    out property <ProjectData> current-library: library-editors[current-library-index];
     out property <ProjectData> current-project: projects[current-project-index];
+    out property <LibraryTabData> current-library-tab: current-section.library-tabs[current-section.current-tab-index];
+    out property <SymbolTabData> current-symbol-tab: current-section.symbol-tabs[current-section.current-tab-index];
+    out property <PackageTabData> current-package-tab: current-section.package-tabs[current-section.current-tab-index];
+    out property <ComponentTabData> current-component-tab: current-section.component-tabs[current-section.current-tab-index];
+    out property <DeviceTabData> current-device-tab: current-section.device-tabs[current-section.current-tab-index];
     out property <SchematicTabData> current-schematic-tab: current-section.schematic-tabs[current-section.current-tab-index];
     out property <Board2dTabData> current-board-2d-tab: current-section.board-2d-tabs[current-section.current-tab-index];
     out property <Board3dTabData> current-board-3d-tab: current-section.board-3d-tabs[current-section.current-tab-index];
@@ -662,18 +879,47 @@ export global Data {
 
     public function current-tab-changed() {
         if current-tab.type == TabType.schematic {
+            current-library-index = -1;
             current-project-index = current-schematic-tab.project-index;
             current-rule-check-project-index = current-project-index;
             current-rule-check-board-index = -1;
         } else if current-tab.type == TabType.board-2d {
+            current-library-index = -1;
             current-project-index = current-board-2d-tab.project-index;
             current-rule-check-project-index = current-project-index;
             current-rule-check-board-index = current-board-2d-tab.board-index;
         } else if current-tab.type == TabType.board-3d {
+            current-library-index = -1;
             current-project-index = current-board-3d-tab.project-index;
             current-rule-check-project-index = current-project-index;
             current-rule-check-board-index = current-board-3d-tab.board-index;
+        } else if current-tab.type == TabType.library {
+            current-project-index = -1;
+            current-rule-check-project-index = -1;
+            current-rule-check-board-index = -1;
+            current-library-index = current-library-tab.library-index;
+        } else if current-tab.type == TabType.symbol {
+            current-project-index = -1;
+            current-rule-check-project-index = -1;
+            current-rule-check-board-index = -1;
+            current-library-index = current-symbol-tab.library-index;
+        } else if current-tab.type == TabType.package {
+            current-project-index = -1;
+            current-rule-check-project-index = -1;
+            current-rule-check-board-index = -1;
+            current-library-index = current-package-tab.library-index;
+        } else if current-tab.type == TabType.component {
+            current-project-index = -1;
+            current-rule-check-project-index = -1;
+            current-rule-check-board-index = -1;
+            current-library-index = current-component-tab.library-index;
+        } else if current-tab.type == TabType.device {
+            current-project-index = -1;
+            current-rule-check-project-index = -1;
+            current-rule-check-board-index = -1;
+            current-library-index = current-device-tab.library-index;
         } else if current-tab.type != TabType.home {
+            current-library-index = -1;
             current-project-index = -1;
             current-rule-check-project-index = current-project-index;
             current-rule-check-board-index = -1;
@@ -686,7 +932,15 @@ export global Data {
         current-tab-changed();
     }
 
+    public function set-current-library(index: int) {
+        current-project-index = -1;
+        current-rule-check-project-index = -1;
+        current-rule-check-board-index = -1;
+        current-library-index = index;
+    }
+
     public function set-current-project(index: int) {
+        current-library-index = -1;
         current-project-index = index;
         current-rule-check-project-index = index;
         current-rule-check-board-index = -1;

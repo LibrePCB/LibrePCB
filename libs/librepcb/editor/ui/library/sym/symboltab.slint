@@ -1,0 +1,404 @@
+//import { DrawWireToolBar } from "drawwiretoolbar.slint";
+//import { DrawPolygonToolBar } from "drawpolygontoolbar.slint";
+//import { AddTextToolBar } from "addtexttoolbar.slint";
+//import { AddComponentToolBar } from "addcomponenttoolbar.slint";
+import { Tab } from "../../tab.slint";
+import {
+    Button,
+    LineEdit,
+    LinkText,
+    MessageBox,
+    Palette,
+    SceneButton,
+    SlideView,
+    Switch,
+    TextEdit,
+    ToolButton,
+} from "../../widgets.slint";
+import {
+    Backend,
+    Constants,
+    Data,
+    DismissableMessageAction,
+    EditorCommandSet as Cmd,
+    EditorTool,
+    PanelPage,
+    SymbolTabData,
+    TabAction,
+    WindowSectionData,
+} from "../../api.slint";
+
+component SymbolMetadata inherits GridLayout {
+    in property <int> section-index;
+    in-out property <[SymbolTabData]> tabs;
+    in property <int> index;
+
+    padding: 10px;
+    spacing: 8px;
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Name:");
+        }
+
+        LineEdit {
+            text: tabs[index].name;
+            //validation-error: tabs[index].name-error;
+
+            text-edited(text) => {
+                tabs[index].name = text;
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Description:");
+        }
+
+        TextEdit {
+            height: 100px;
+            text: tabs[index].description;
+
+            text-edited(text) => {
+                tabs[index].description = text;
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Keywords:");
+        }
+
+        LineEdit {
+            text: tabs[index].keywords;
+
+            text-edited(text) => {
+                tabs[index].keywords = text;
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Author:");
+        }
+
+        LineEdit {
+            text: tabs[index].author;
+
+            text-edited(text) => {
+                tabs[index].author = text;
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Version:");
+        }
+
+        LineEdit {
+            text: tabs[index].version;
+            //validation-error: tabs[index].version-error;
+
+            text-edited(text) => {
+                tabs[index].version = text;
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Deprecated:");
+        }
+
+        Switch {
+            font-size: 10px;
+            text: @tr("Check this if the element should no longer be used.");
+            checked: tabs[index].deprecated;
+
+            toggled(checked) => {
+                tabs[index].deprecated = checked;
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Categories:");
+        }
+
+        TextEdit {
+            enabled: false;
+        }
+    }
+
+    Row {
+        Rectangle { }
+    }
+}
+
+component SymbolEditor inherits Rectangle {
+    in property <int> section-index;
+    in-out property <[SymbolTabData]> tabs;
+    in property <int> index;
+    property <length> toolbar-space: view-buttons-l.x - toolbuttons-l.x - toolbuttons-l.width - 10px;
+    property <length> toolbutton-offset-y: (toolbar-r.width > toolbar-space) ? toolbar-r.height : 0;
+
+    function tool-triggered(action: TabAction) {
+        Data.set-current-tab(section-index, index);
+        Backend.trigger-tab(section-index, index, action);
+    }
+
+    if Data.preview-mode: Rectangle {
+        background: white;
+    }
+
+    img := Image {
+        width: 100%;
+        height: 100%;
+        preferred-width: 0;
+        preferred-height: 0;
+        image-fit: preserve;
+        image-rendering: pixelated;
+        source: Backend.render-scene(section-index, self.width, self.height, 0, tabs[index].frame);
+        accessible-role: none;
+    }
+
+    // Show overlay, if text is not empty.
+    if !tabs[index].tool-overlay-text.is-empty: Rectangle {
+        x: 2 * toolbuttons-l.x + toolbuttons-l.width;
+        y: toolbuttons-l.y;
+        width: overlay-txt.preferred-width + 2 * overlay-txt.x;
+        height: overlay-txt.preferred-height + 2 * overlay-txt.y;
+        background: tabs[index].overlay-color;
+        border-radius: 10px;
+        border-width: 1px;
+        border-color: tabs[index].overlay-text-color;
+
+        overlay-txt := Text {
+            x: 8px;
+            y: 8px;
+            horizontal-alignment: left;
+            vertical-alignment: top;
+            font-family: "Noto Sans Mono";
+            color: tabs[index].overlay-text-color;
+            text: tabs[index].tool-overlay-text;
+        }
+    }
+
+    toolbar-r := Rectangle {
+        y: 0;
+        width: min(self.preferred-width, root.width - 10px);
+        height: 34px;
+        background: #505050;
+        border-bottom-left-radius: 11px;
+        border-bottom-right-radius: 11px;
+        visible: self.width > 30px;
+
+        HorizontalLayout {
+            alignment: center;
+            padding: 3px;
+
+            //if tabs[index].tool == EditorTool.wire: wire-toolbar := DrawWireToolBar {
+            //    section-index: section-index;
+            //    section: section;
+            //}
+
+            //if tabs[index].tool == EditorTool.polygon: polygon-toolbar := DrawPolygonToolBar {
+            //    section-index: section-index;
+            //    section: section;
+            //}
+
+            //if tabs[index].tool == EditorTool.text: text-toolbar := AddTextToolBar {
+            //    section-index: section-index;
+            //    section: section;
+            //}
+
+            //if tabs[index].tool == EditorTool.component: component-toolbar := AddComponentToolBar {
+            //    section-index: section-index;
+            //    section: section;
+            //}
+        }
+    }
+
+    toolbuttons-l := VerticalLayout {
+        x: 7px;
+        y: 7px + toolbutton-offset-y;
+        width: self.preferred-width;
+        height: parent.height - 2 * self.y;
+        spacing: 5px;
+
+        tool-select-btn := ToolButton {
+            cmd: Cmd.tool-select;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/arrow-pointer.svg");
+            checked: tabs[index].tool == EditorTool.select;
+
+            clicked => {
+                tool-triggered(TabAction.tool-select);
+            }
+        }
+
+        tool-polygon-btn := ToolButton {
+            cmd: Cmd.tool-polygon;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/draw-polygon.svg");
+            checked: tabs[index].tool == EditorTool.polygon;
+
+            clicked => {
+                tool-triggered(TabAction.tool-polygon);
+            }
+        }
+
+        tool-text-btn := ToolButton {
+            cmd: Cmd.tool-text;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/font.svg");
+            checked: tabs[index].tool == EditorTool.text;
+
+            clicked => {
+                tool-triggered(TabAction.tool-text);
+            }
+        }
+
+        tool-measure-btn := ToolButton {
+            cmd: Cmd.tool-measure;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/ruler.svg");
+            checked: tabs[index].tool == EditorTool.measure;
+
+            clicked => {
+                tool-triggered(TabAction.tool-measure);
+            }
+        }
+    }
+
+    view-buttons-l := VerticalLayout {
+        x: parent.width - self.preferred-width - 7px;
+        y: toolbutton-offset-y + 7px;
+        width: self.preferred-width;
+
+        zoom-fit-btn := SceneButton {
+            icon: @image-url("../../../../../font-awesome/svgs/solid/expand.svg");
+            icon-scale: 0.9;
+            bg-color: tabs[index].background-color;
+            fg-color: tabs[index].foreground-color;
+
+            clicked => {
+                Backend.trigger-tab(section-index, index, TabAction.zoom-fit);
+            }
+        }
+
+        zoom-in-btn := SceneButton {
+            icon: @image-url("../../../../../bootstrap-icons/icons/zoom-in.svg");
+            bg-color: tabs[index].background-color;
+            fg-color: tabs[index].foreground-color;
+
+            clicked => {
+                Backend.trigger-tab(section-index, index, TabAction.zoom-in);
+            }
+        }
+
+        zoom-out-btn := SceneButton {
+            icon: @image-url("../../../../../bootstrap-icons/icons/zoom-out.svg");
+            bg-color: tabs[index].background-color;
+            fg-color: tabs[index].foreground-color;
+
+            clicked => {
+                Backend.trigger-tab(section-index, index, TabAction.zoom-out);
+            }
+        }
+    }
+}
+
+export component SymbolTab inherits Tab {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    property <[SymbolTabData]> tabs: section.symbol-tabs;
+    property <int> index: section.current-tab-index;
+    property <EditorTool> tool: tabs[index].tool;
+
+    enabled: true;
+
+    changed absolute-position => {
+        tabs[index].scene-image-pos = self.absolute-position;
+    }
+
+    // When the tool changes, move focus to scene to make tabulator & escape
+    // working correctly.
+    changed tool => {
+        root.focus();
+    }
+
+    init => {
+        tabs[index].scene-image-pos = self.absolute-position;
+    }
+
+    SlideView {
+        pages: [@tr("Metadata"), @tr("Pins"), @tr("Symbol")];
+
+        SymbolMetadata {
+            width: parent.width;
+            section-index: section-index;
+            tabs: tabs;
+            index: index;
+        }
+
+        Rectangle { }
+
+        ta := TouchArea {
+            width: parent.width;
+            mouse-cursor: tabs[index].tool-cursor;
+
+            SymbolEditor {
+                width: parent.width;
+                section-index: section-index;
+                tabs: tabs;
+                index: index;
+            }
+
+            pointer-event(event) => {
+                if event.kind == PointerEventKind.down {
+                    Data.set-current-tab(section-index, index);
+                    if !root.has-focus {
+                        root.focus();
+                    }
+                }
+                Backend.scene-pointer-event(section-index, self.mouse-x, self.mouse-y, event);
+            }
+
+            scroll-event(event) => {
+                Backend.scene-scrolled(section-index, self.mouse-x, self.mouse-y, event) ? accept : reject
+            }
+        }
+    }
+
+    key-pressed(event) => {
+        Data.set-current-tab(section-index, index);
+
+        // If the focus is in the command toolbar, make the Escape key moving
+        // the focus back to the graphics scene without triggering any action.
+        if (event.text == Key.Escape) && (!root.has-focus) {
+            root.focus();
+            return accept;
+        }
+        reject
+    }
+
+    key-released(event) => {
+        Backend.scene-key-event(section-index, event) ? accept : reject
+    }
+}

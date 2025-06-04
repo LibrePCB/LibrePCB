@@ -23,8 +23,13 @@
 #include "windowsection.h"
 
 #include "hometab.h"
+#include "library/cmp/componenttab.h"
 #include "library/createlibrarytab.h"
+#include "library/dev/devicetab.h"
 #include "library/downloadlibrarytab.h"
+#include "library/lib/librarytab.h"
+#include "library/pkg/packagetab.h"
+#include "library/sym/symboltab.h"
 #include "project/board/board2dtab.h"
 #include "project/board/board3dtab.h"
 #include "project/schematic/schematictab.h"
@@ -64,6 +69,19 @@ WindowSection::WindowSection(GuiApplication& app, QObject* parent) noexcept
         std::make_shared<
             DerivedUiObjectList<TabList, Board3dTab, ui::Board3dTabData>>(
             mTabs),
+        std::make_shared<
+            DerivedUiObjectList<TabList, LibraryTab, ui::LibraryTabData>>(
+            mTabs),
+        std::make_shared<
+            DerivedUiObjectList<TabList, SymbolTab, ui::SymbolTabData>>(mTabs),
+        std::make_shared<
+            DerivedUiObjectList<TabList, PackageTab, ui::PackageTabData>>(
+            mTabs),
+        std::make_shared<
+            DerivedUiObjectList<TabList, ComponentTab, ui::ComponentTabData>>(
+            mTabs),
+        std::make_shared<
+            DerivedUiObjectList<TabList, DeviceTab, ui::DeviceTabData>>(mTabs),
         -1,  // Current tab index
         false,  // Highlight
     } {

@@ -22,11 +22,18 @@
  ******************************************************************************/
 #include "mainwindow.h"
 
+#include "dialogs/directorylockhandlerdialog.h"
 #include "editorcommandsetupdater.h"
 #include "guiapplication.h"
+#include "library/cmp/componenttab.h"
 #include "library/createlibrarytab.h"
+#include "library/dev/devicetab.h"
 #include "library/downloadlibrarytab.h"
+#include "library/lib/librarytab.h"
 #include "library/librariesmodel.h"
+#include "library/libraryeditor2.h"
+#include "library/pkg/packagetab.h"
+#include "library/sym/symboltab.h"
 #include "mainwindowtestadapter.h"
 #include "notificationsmodel.h"
 #include "project/board/board2dtab.h"
@@ -42,6 +49,11 @@
 #include "windowtab.h"
 #include "workspace/filesystemmodel.h"
 
+#include <librepcb/core/fileio/fileutils.h>
+#include <librepcb/core/fileio/transactionaldirectory.h>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/library/pkg/package.h>
+#include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
@@ -54,6 +66,25 @@
  ******************************************************************************/
 namespace librepcb {
 namespace editor {
+
+static bool askForRestoringBackup(const FilePath&) {
+  QMessageBox::StandardButton btn = QMessageBox::question(
+      qApp->activeWindow(), MainWindow::tr("Restore autosave backup?"),
+      MainWindow::tr(
+          "It seems that the application crashed the last time you opened "
+          "this library element. Do you want to restore the last autosave "
+          "backup?"),
+      QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+      QMessageBox::Cancel);
+  switch (btn) {
+    case QMessageBox::Yes:
+      return true;
+    case QMessageBox::No:
+      return false;
+    default:
+      throw UserCanceled(__FILE__, __LINE__);
+  }
+}
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -143,6 +174,19 @@ MainWindow::MainWindow(GuiApplication& app,
         this, [this, section, tab, a]() { triggerTab(section, tab, a); },
         Qt::QueuedConnection);
   });
+  b.on_trigger_library([this](slint::SharedString path, ui::LibraryAction a) {
+    // if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0): Remove lambda.
+    QMetaObject::invokeMethod(
+        this, [this, path, a]() { triggerLibrary(path, a); },
+        Qt::QueuedConnection);
+  });
+  b.on_trigger_library_element(
+      [this](slint::SharedString path, ui::LibraryElementAction a) {
+        // if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0): Remove lambda.
+        QMetaObject::invokeMethod(
+            this, [this, path, a]() { triggerLibraryElement(path, a); },
+            Qt::QueuedConnection);
+      });
   b.on_trigger_project([this](int index, ui::ProjectAction a) {
     // if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0): Remove lambda.
     QMetaObject::invokeMethod(
@@ -291,6 +335,11 @@ void MainWindow::showStatusBarMessage(const QString& message, int timeoutMs) {
   }
 }
 
+void MainWindow::setCurrentLibrary(int index) noexcept {
+  const ui::Data& d = mWindow->global<ui::Data>();
+  d.fn_set_current_library(index);
+}
+
 void MainWindow::setCurrentProject(int index) noexcept {
   const ui::Data& d = mWindow->global<ui::Data>();
   d.fn_set_current_project(index);
@@ -371,7 +420,12 @@ void MainWindow::trigger(ui::Action a) noexcept {
     // Library
     case ui::Action::LibraryCreate: {
       if (!switchToTab<CreateLibraryTab>()) {
-        addTab(std::make_shared<CreateLibraryTab>(mApp));
+        auto tab = std::make_shared<CreateLibraryTab>(mApp);
+        connect(
+            tab.get(), &CreateLibraryTab::libraryCreated, this,
+            [this](const FilePath& fp) { openLibraryTab(fp, true); },
+            Qt::QueuedConnection);
+        addTab(tab);
       }
       break;
     }
@@ -445,6 +499,80 @@ void MainWindow::triggerSection(int section,
 void MainWindow::triggerTab(int section, int tab, ui::TabAction a) noexcept {
   if (auto s = mSections->value(section)) {
     s->triggerTab(tab, a);
+  }
+}
+
+void MainWindow::triggerLibrary(slint::SharedString path,
+                                ui::LibraryAction a) noexcept {
+  const FilePath fp(s2q(path));
+  if ((!fp.isValid()) ||
+      (!fp.isLocatedInDir(mApp.getWorkspace().getLibrariesPath()))) {
+    qWarning() << "Invalid path in triggerLibrary():" << s2q(path);
+    return;
+  }
+
+  switch (a) {
+    case ui::LibraryAction::Open: {
+      openLibraryTab(fp, false);
+      break;
+    }
+    case ui::LibraryAction::Uninstall: {
+      try {
+        FileUtils::removeDirRecursively(fp);  // can throw
+      } catch (const Exception& e) {
+        // TODO: This should be implemented without message box some day...
+        QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
+      }
+      mApp.getWorkspace().getLibraryDb().startLibraryRescan();
+      break;
+    }
+    default: {
+      qWarning() << "Unhandled action in triggerLibrary():"
+                 << static_cast<int>(a);
+      break;
+    }
+  }
+}
+
+void MainWindow::triggerLibraryElement(slint::SharedString path,
+                                       ui::LibraryElementAction a) noexcept {
+  const FilePath fp(s2q(path));
+
+  auto getLibraryEditor = [this, &fp]() {
+    auto libs = mApp.getLibraries();
+    for (int i = 0; i < libs.count(); ++i) {
+      if (libs.at(i)->getFilePath() == fp) {
+        return std::make_optional(std::make_pair(libs.at(i), i));
+      }
+    }
+    return std::optional<std::pair<std::shared_ptr<LibraryEditor2>, int>>();
+  };
+
+  switch (a) {
+    case ui::LibraryElementAction::Open: {
+      if (switchToLibraryElementTab<LibraryTab>(fp)) return;
+      if (switchToLibraryElementTab<SymbolTab>(fp)) return;
+      if (switchToLibraryElementTab<PackageTab>(fp)) return;
+      if (switchToLibraryElementTab<ComponentTab>(fp)) return;
+      if (switchToLibraryElementTab<DeviceTab>(fp)) return;
+      if (getLibraryEditor()) {
+        openLibraryTab(fp, false);
+      }
+      break;
+    }
+    case ui::LibraryElementAction::Close: {
+      if (auto pair = getLibraryEditor()) {
+        if (pair->first->requestClose()) {
+          mApp.closeLibrary(pair->second);
+        }
+      }
+      break;
+    }
+    default: {
+      qWarning() << "Unhandled action in MainWindow::triggerLibraryElement():"
+                 << static_cast<int>(a);
+      break;
+    }
   }
 }
 
@@ -579,6 +707,75 @@ void MainWindow::triggerBoard(int project, int board,
   }
 }
 
+void MainWindow::openLibraryTab(const FilePath& fp, bool wizardMode) noexcept {
+  if (auto editor = mApp.openLibrary(fp)) {
+    if (!switchToLibraryElementTab<LibraryTab>(fp)) {
+      auto tab = std::make_shared<LibraryTab>(mApp, *editor, wizardMode);
+      connect(tab.get(), &LibraryTab::symbolEditorRequested, this,
+              &MainWindow::openSymbolTab);
+      connect(tab.get(), &LibraryTab::packageEditorRequested, this,
+              &MainWindow::openPackageTab);
+      connect(tab.get(), &LibraryTab::componentEditorRequested, this,
+              &MainWindow::openComponentTab);
+      connect(tab.get(), &LibraryTab::deviceEditorRequested, this,
+              &MainWindow::openDeviceTab);
+      addTab(tab);
+    }
+  }
+}
+
+void MainWindow::openSymbolTab(LibraryEditor2& editor,
+                               const FilePath& fp) noexcept {
+  if (!switchToLibraryElementTab<SymbolTab>(fp)) {
+    try {
+      const bool writable =
+          fp.isLocatedInDir(mApp.getWorkspace().getLocalLibrariesPath());
+      auto fs = TransactionalFileSystem::open(
+          fp, writable, &askForRestoringBackup,
+          DirectoryLockHandlerDialog::createDirectoryLockCallback());
+      std::unique_ptr<Symbol> sym =
+          Symbol::open(std::unique_ptr<TransactionalDirectory>(
+              new TransactionalDirectory(fs)));
+      addTab(std::make_shared<SymbolTab>(editor, std::move(sym), false));
+    } catch (const Exception& e) {
+      QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
+    }
+  }
+}
+
+void MainWindow::openPackageTab(LibraryEditor2& editor,
+                                const FilePath& fp) noexcept {
+  if (!switchToLibraryElementTab<PackageTab>(fp)) {
+    try {
+      const bool writable =
+          fp.isLocatedInDir(mApp.getWorkspace().getLocalLibrariesPath());
+      auto fs = TransactionalFileSystem::open(
+          fp, writable, &askForRestoringBackup,
+          DirectoryLockHandlerDialog::createDirectoryLockCallback());
+      std::unique_ptr<Package> pkg =
+          Package::open(std::unique_ptr<TransactionalDirectory>(
+              new TransactionalDirectory(fs)));
+      addTab(std::make_shared<PackageTab>(editor, std::move(pkg), false));
+    } catch (const Exception& e) {
+      QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
+    }
+  }
+}
+
+void MainWindow::openComponentTab(LibraryEditor2& editor,
+                                  const FilePath& fp) noexcept {
+  if (!switchToLibraryElementTab<ComponentTab>(fp)) {
+    addTab(std::make_shared<ComponentTab>(mApp, editor, fp));
+  }
+}
+
+void MainWindow::openDeviceTab(LibraryEditor2& editor,
+                               const FilePath& fp) noexcept {
+  if (!switchToLibraryElementTab<DeviceTab>(fp)) {
+    addTab(std::make_shared<DeviceTab>(mApp, editor, fp));
+  }
+}
+
 void MainWindow::openSchematicTab(int projectIndex, int index) noexcept {
   if (!switchToProjectTab<SchematicTab>(projectIndex, index)) {
     if (auto prjEditor = mApp.getProjects().value(projectIndex)) {
@@ -660,6 +857,16 @@ template <typename T>
 bool MainWindow::switchToTab() noexcept {
   for (auto section : *mSections) {
     if (section->switchToTab<T>()) {
+      return true;
+    }
+  }
+  return false;
+}
+
+template <typename T>
+bool MainWindow::switchToLibraryElementTab(const FilePath& fp) noexcept {
+  for (auto section : *mSections) {
+    if (section->switchToLibraryElementTab<T>(fp)) {
       return true;
     }
   }

@@ -17,71 +17,70 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_CREATELIBRARYTAB_H
-#define LIBREPCB_EDITOR_CREATELIBRARYTAB_H
+#ifndef LIBREPCB_EDITOR_LIBRARYDEPENDENCIESMODEL_H
+#define LIBREPCB_EDITOR_LIBRARYDEPENDENCIESMODEL_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "windowtab.h"
+#include "appwindow.h"
 
-#include <librepcb/core/fileio/filepath.h>
-#include <librepcb/core/types/elementname.h>
-#include <librepcb/core/types/version.h>
+#include <librepcb/core/types/uuid.h>
 
 #include <QtCore>
-
-#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Workspace;
+
 namespace editor {
 
 /*******************************************************************************
- *  Class CreateLibraryTab
+ *  Class LibraryDependenciesModel
  ******************************************************************************/
 
 /**
- * @brief The CreateLibraryTab class
+ * @brief The LibraryDependenciesModel class
  */
-class CreateLibraryTab final : public WindowTab {
+class LibraryDependenciesModel : public QObject,
+                                 public slint::Model<ui::LibraryDependency> {
   Q_OBJECT
 
 public:
-  // Signals
-  Signal<CreateLibraryTab> onDerivedUiDataChanged;
-
   // Constructors / Destructor
-  CreateLibraryTab() = delete;
-  CreateLibraryTab(const CreateLibraryTab& other) = delete;
-  explicit CreateLibraryTab(GuiApplication& app,
-                            QObject* parent = nullptr) noexcept;
-  ~CreateLibraryTab() noexcept;
+  LibraryDependenciesModel() = delete;
+  LibraryDependenciesModel(const LibraryDependenciesModel& other) = delete;
+  explicit LibraryDependenciesModel(const Workspace& ws, const Uuid& libUuid,
+                                    QObject* parent = nullptr) noexcept;
+  virtual ~LibraryDependenciesModel() noexcept;
 
   // General Methods
-  ui::TabData getUiData() const noexcept override;
-  const ui::CreateLibraryTabData& getDerivedUiData() const noexcept {
-    return mUiData;
-  }
-  void setDerivedUiData(const ui::CreateLibraryTabData& data) noexcept;
-  void trigger(ui::TabAction a) noexcept override;
+  const QSet<Uuid>& getUuids() const noexcept { return mCheckedUuids; }
+  void setUuids(const QSet<Uuid>& uuids) noexcept;
+
+  // Implementations
+  std::size_t row_count() const override;
+  std::optional<ui::LibraryDependency> row_data(std::size_t i) const override;
+  void set_row_data(std::size_t i,
+                    const ui::LibraryDependency& data) noexcept override;
 
   // Operator Overloadings
-  CreateLibraryTab& operator=(const CreateLibraryTab& rhs) = delete;
+  LibraryDependenciesModel& operator=(const LibraryDependenciesModel& rhs) =
+      delete;
 
 signals:
-  void libraryCreated(const FilePath& fp);
+  void modified(const QSet<Uuid>& uuids);
 
 private:
-  void validate() noexcept;
+  void refresh() noexcept;
 
-  ui::CreateLibraryTabData mUiData;
-  std::optional<ElementName> mName;
-  std::optional<Version> mVersion;
-  std::optional<QUrl> mUrl;
-  FilePath mDirectory;
+  const Workspace& mWs;
+  const Uuid mLibUuid;
+  QSet<Uuid> mCheckedUuids;
+  std::vector<ui::LibraryDependency> mItems;
 };
 
 /*******************************************************************************

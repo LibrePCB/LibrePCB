@@ -37,6 +37,7 @@
  ******************************************************************************/
 namespace librepcb {
 
+class FilePath;
 class LengthUnit;
 class Point;
 
@@ -87,6 +88,20 @@ public:
         setCurrentTab(i);
         highlight();
         return true;
+      }
+    }
+    return false;
+  }
+
+  template <typename T>
+  bool switchToLibraryElementTab(const FilePath& fp) noexcept {
+    for (int i = 0; i < mTabs->count(); ++i) {
+      if (auto tab = std::dynamic_pointer_cast<T>(mTabs->at(i))) {
+        if (tab->getDirectoryPath() == fp) {
+          setCurrentTab(i);
+          highlight();
+          return true;
+        }
       }
     }
     return false;

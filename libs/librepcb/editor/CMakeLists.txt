@@ -209,6 +209,8 @@ add_library(
   library/cmp/componentsymbolvariantlistmodel.h
   library/cmp/componentsymbolvariantlistwidget.cpp
   library/cmp/componentsymbolvariantlistwidget.h
+  library/cmp/componenttab.cpp
+  library/cmp/componenttab.h
   library/cmp/compsymbvarpinsignalmapeditorwidget.cpp
   library/cmp/compsymbvarpinsignalmapeditorwidget.h
   library/cmp/if_componentsymbolvarianteditorprovider.h
@@ -219,6 +221,8 @@ add_library(
   library/dev/deviceeditorwidget.ui
   library/dev/devicepadsignalmapmodel.cpp
   library/dev/devicepadsignalmapmodel.h
+  library/dev/devicetab.cpp
+  library/dev/devicetab.h
   library/dev/padsignalmapeditorwidget.cpp
   library/dev/padsignalmapeditorwidget.h
   library/dev/partlisteditorwidget.cpp
@@ -272,12 +276,18 @@ add_library(
   library/kicadlibraryimportwizard/kicadlibraryimportwizardpage_start.cpp
   library/kicadlibraryimportwizard/kicadlibraryimportwizardpage_start.h
   library/kicadlibraryimportwizard/kicadlibraryimportwizardpage_start.ui
+  library/lib/librarydependenciesmodel.cpp
+  library/lib/librarydependenciesmodel.h
+  library/lib/libraryelementsmodel.cpp
+  library/lib/libraryelementsmodel.h
   library/lib/librarylisteditorwidget.cpp
   library/lib/librarylisteditorwidget.h
   library/lib/librarylisteditorwidget.ui
   library/lib/libraryoverviewwidget.cpp
   library/lib/libraryoverviewwidget.h
   library/lib/libraryoverviewwidget.ui
+  library/lib/librarytab.cpp
+  library/lib/librarytab.h
   library/librariesmodel.cpp
   library/librariesmodel.h
   library/librarydownload.cpp
@@ -285,6 +295,8 @@ add_library(
   library/libraryeditor.cpp
   library/libraryeditor.h
   library/libraryeditor.ui
+  library/libraryeditor2.cpp
+  library/libraryeditor2.h
   library/libraryelementcache.cpp
   library/libraryelementcache.h
   library/newelementwizard/newelementwizard.cpp
@@ -386,6 +398,8 @@ add_library(
   library/pkg/packagepadlisteditorwidget.h
   library/pkg/packagepadlistmodel.cpp
   library/pkg/packagepadlistmodel.h
+  library/pkg/packagetab.cpp
+  library/pkg/packagetab.h
   library/sym/fsm/symboleditorfsm.cpp
   library/sym/fsm/symboleditorfsm.h
   library/sym/fsm/symboleditorstate.cpp
@@ -431,6 +445,8 @@ add_library(
   library/sym/symbolpinpropertiesdialog.cpp
   library/sym/symbolpinpropertiesdialog.h
   library/sym/symbolpinpropertiesdialog.ui
+  library/sym/symboltab.cpp
+  library/sym/symboltab.h
   mainwindow.cpp
   mainwindow.h
   mainwindowtestadapter.cpp
