@@ -67,6 +67,8 @@ ui::NotificationType l2s(RuleCheckMessage::Severity v) noexcept;
 
 ui::EditorCommand l2s(const EditorCommand& cmd, ui::EditorCommand in) noexcept;
 
+ui::FeatureState toFs(bool enabled) noexcept;
+
 /*******************************************************************************
  *  End of File
  ******************************************************************************/

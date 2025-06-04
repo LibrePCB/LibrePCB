@@ -100,6 +100,9 @@ public:
   void setHighlightedNetSignals(
       const QSet<const NetSignal*>& netSignals) noexcept;
 
+  void undo() noexcept;
+  void redo() noexcept;
+
   /**
    * @brief Request to close the project
    *
