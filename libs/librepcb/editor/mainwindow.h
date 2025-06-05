@@ -96,6 +96,8 @@ private:
   void openLibraryTab(const FilePath& fp, bool wizardMode) noexcept;
   void openComponentCategoryTab(LibraryEditor2& editor,
                                 const FilePath& fp) noexcept;
+  void openPackageCategoryTab(LibraryEditor2& editor,
+                              const FilePath& fp) noexcept;
   void openSymbolTab(LibraryEditor2& editor, const FilePath& fp) noexcept;
   void openPackageTab(LibraryEditor2& editor, const FilePath& fp) noexcept;
   void openComponentTab(LibraryEditor2& editor, const FilePath& fp) noexcept;

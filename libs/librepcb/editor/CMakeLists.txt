@@ -136,6 +136,8 @@ add_library(
   library/cat/packagecategoryeditorwidget.cpp
   library/cat/packagecategoryeditorwidget.h
   library/cat/packagecategoryeditorwidget.ui
+  library/cat/packagecategorytab.cpp
+  library/cat/packagecategorytab.h
   library/cmd/cmdcomponentedit.cpp
   library/cmd/cmdcomponentedit.h
   library/cmd/cmdcomponentpinsignalmapitemedit.cpp
@@ -978,6 +980,8 @@ add_library(
   windowtab.h
   workspace/categorytreemodel.cpp
   workspace/categorytreemodel.h
+  workspace/categorytreemodel2.cpp
+  workspace/categorytreemodel2.h
   workspace/desktopintegration.cpp
   workspace/desktopintegration.h
   workspace/desktopservices.cpp

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_COMPONENTCATEGORYTAB_H
-#define LIBREPCB_EDITOR_COMPONENTCATEGORYTAB_H
+#ifndef LIBREPCB_EDITOR_PACKAGECATEGORYTAB_H
+#define LIBREPCB_EDITOR_PACKAGECATEGORYTAB_H
 
 /*******************************************************************************
  *  Includes
@@ -36,7 +36,7 @@
  ******************************************************************************/
 namespace librepcb {
 
-class ComponentCategory;
+class PackageCategory;
 
 namespace editor {
 
@@ -45,26 +45,26 @@ class LibraryEditor2;
 class UndoStack;
 
 /*******************************************************************************
- *  Class ComponentCategoryTab
+ *  Class PackageCategoryTab
  ******************************************************************************/
 
 /**
- * @brief The ComponentCategoryTab class
+ * @brief The PackageCategoryTab class
  */
-class ComponentCategoryTab final : public WindowTab {
+class PackageCategoryTab final : public WindowTab {
   Q_OBJECT
 
 public:
   // Signals
-  Signal<ComponentCategoryTab> onDerivedUiDataChanged;
+  Signal<PackageCategoryTab> onDerivedUiDataChanged;
 
   // Constructors / Destructor
-  ComponentCategoryTab() = delete;
-  ComponentCategoryTab(const ComponentCategoryTab& other) = delete;
-  explicit ComponentCategoryTab(LibraryEditor2& editor,
-                                std::unique_ptr<ComponentCategory> cat,
-                                QObject* parent = nullptr) noexcept;
-  ~ComponentCategoryTab() noexcept;
+  PackageCategoryTab() = delete;
+  PackageCategoryTab(const PackageCategoryTab& other) = delete;
+  explicit PackageCategoryTab(LibraryEditor2& editor,
+                              std::unique_ptr<PackageCategory> cat,
+                              QObject* parent = nullptr) noexcept;
+  ~PackageCategoryTab() noexcept;
 
   // General Methods
   FilePath getDirectoryPath() const noexcept;
@@ -74,7 +74,7 @@ public:
   void trigger(ui::TabAction a) noexcept override;
 
   // Operator Overloadings
-  ComponentCategoryTab& operator=(const ComponentCategoryTab& rhs) = delete;
+  PackageCategoryTab& operator=(const PackageCategoryTab& rhs) = delete;
 
 private:  // Methods
   void refreshMetadata() noexcept;
@@ -83,7 +83,7 @@ private:  // Methods
 private:
   // References
   LibraryEditor2& mEditor;
-  std::unique_ptr<ComponentCategory> mCategory;
+  std::unique_ptr<PackageCategory> mCategory;
   std::unique_ptr<UndoStack> mUndoStack;
 
   // Library metadata to be applied

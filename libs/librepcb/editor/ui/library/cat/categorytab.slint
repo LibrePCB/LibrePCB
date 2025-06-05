@@ -236,10 +236,10 @@ component CategoryMetadata inherits GridLayout {
     }
 }
 
-export component CategoryTab inherits Tab {
+component CategoryTab inherits Tab {
     in property <int> section-index;
     in-out property <WindowSectionData> section;
-    property <[CategoryTabData]> tabs: section.category-tabs;
+    in-out property <[CategoryTabData]> tabs;
     property <int> index: section.current-tab-index;
 
     enabled: true;
@@ -299,4 +299,12 @@ export component CategoryTab inherits Tab {
         }
         reject
     }
+}
+
+export component ComponentCategoryTab inherits CategoryTab {
+    tabs: self.section.component-category-tabs;
+}
+
+export component PackageCategoryTab inherits CategoryTab {
+    tabs: self.section.package-category-tabs;
 }

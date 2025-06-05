@@ -364,7 +364,8 @@ export enum TabType {
     create-library,
     download-library,
     library,
-    category,
+    component-category,
+    package-category,
     symbol,
     package,
     component,
@@ -800,7 +801,8 @@ export struct WindowSectionData {
     board-2d-tabs: [Board2dTabData],  // Proxy view for `tabs`
     board-3d-tabs: [Board3dTabData],  // Proxy view for `tabs`
     library-tabs: [LibraryTabData],  // Proxy view for `tabs`
-    category-tabs: [CategoryTabData],  // Proxy view for `tabs`
+    component-category-tabs: [CategoryTabData],  // Proxy view for `tabs`
+    package-category-tabs: [CategoryTabData],  // Proxy view for `tabs`
     symbol-tabs: [SymbolTabData],  // Proxy view for `tabs`
     package-tabs: [PackageTabData],  // Proxy view for `tabs`
     component-tabs: [ComponentTabData],  // Proxy view for `tabs`

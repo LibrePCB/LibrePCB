@@ -20,7 +20,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "componentcategorytab.h"
+#include "packagecategorytab.h"
 
 #include "../../undostack.h"
 #include "../../workspace/categorytreemodel2.h"
@@ -32,7 +32,7 @@
 #include "utils/uihelpers.h"
 
 #include <librepcb/core/fileio/transactionalfilesystem.h>
-#include <librepcb/core/library/cat/componentcategory.h>
+#include <librepcb/core/library/cat/packagecategory.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
@@ -49,9 +49,9 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-ComponentCategoryTab::ComponentCategoryTab(
-    LibraryEditor2& editor, std::unique_ptr<ComponentCategory> cat,
-    QObject* parent) noexcept
+PackageCategoryTab::PackageCategoryTab(LibraryEditor2& editor,
+                                       std::unique_ptr<PackageCategory> cat,
+                                       QObject* parent) noexcept
   : WindowTab(editor.getApp(), parent),
     onDerivedUiDataChanged(*this),
     mEditor(editor),
@@ -63,24 +63,24 @@ ComponentCategoryTab::ComponentCategoryTab(
     mParents(new slint::VectorModel<slint::SharedString>()),
     mParentsModel(new CategoryTreeModel2(editor.getWorkspace().getLibraryDb(),
                                          editor.getWorkspace().getSettings(),
-                                         CategoryTreeModel2::Filter::CmpCat)) {
+                                         CategoryTreeModel2::Filter::PkgCat)) {
   // Connect library editor.
   connect(&mEditor, &LibraryEditor2::aboutToBeDestroyed, this,
-          &ComponentCategoryTab::closeEnforced);
+          &PackageCategoryTab::closeEnforced);
 
   // Connect undo stack.
   connect(mUndoStack.get(), &UndoStack::stateModified, this,
-          &ComponentCategoryTab::refreshMetadata);
+          &PackageCategoryTab::refreshMetadata);
 
   // Connect library element.
-  connect(mCategory.get(), &ComponentCategory::namesChanged, this,
+  connect(mCategory.get(), &PackageCategory::namesChanged, this,
           [this]() { onUiDataChanged.notify(); });
 
   // Refresh content.
   refreshMetadata();
 }
 
-ComponentCategoryTab::~ComponentCategoryTab() noexcept {
+PackageCategoryTab::~PackageCategoryTab() noexcept {
   // Delete all command objects in the undo stack. This mmust be done before
   // other important objects are deleted, as undo command objects can hold
   // pointers/references to them!
@@ -92,18 +92,18 @@ ComponentCategoryTab::~ComponentCategoryTab() noexcept {
  *  General Methods
  ******************************************************************************/
 
-FilePath ComponentCategoryTab::getDirectoryPath() const noexcept {
+FilePath PackageCategoryTab::getDirectoryPath() const noexcept {
   return mCategory->getDirectory().getAbsPath();
 }
 
-ui::TabData ComponentCategoryTab::getUiData() const noexcept {
+ui::TabData PackageCategoryTab::getUiData() const noexcept {
   ui::TabFeatures features = {};
   features.save = toFs(mCategory->getDirectory().isWritable());
   features.undo = toFs(mUndoStack->canUndo());
   features.redo = toFs(mUndoStack->canRedo());
 
   return ui::TabData{
-      ui::TabType::ComponentCategory,  // Type
+      ui::TabType::PackageCategory,  // Type
       mName,  // Title
       features,  // Features
       !mCategory->getDirectory().isWritable(),  // Read-only
@@ -115,7 +115,7 @@ ui::TabData ComponentCategoryTab::getUiData() const noexcept {
   };
 }
 
-ui::CategoryTabData ComponentCategoryTab::getDerivedUiData() const noexcept {
+ui::CategoryTabData PackageCategoryTab::getDerivedUiData() const noexcept {
   return ui::CategoryTabData{
       mEditor.getUiIndex(),  // Library index
       q2s(mCategory->getDirectory().getAbsPath().toStr()),  // Path
@@ -133,7 +133,7 @@ ui::CategoryTabData ComponentCategoryTab::getDerivedUiData() const noexcept {
   };
 }
 
-void ComponentCategoryTab::setDerivedUiData(
+void PackageCategoryTab::setDerivedUiData(
     const ui::CategoryTabData& data) noexcept {
   mName = data.name;
   if (auto value = validateElementName(s2q(mName), mNameError)) {
@@ -164,7 +164,7 @@ void ComponentCategoryTab::setDerivedUiData(
   onDerivedUiDataChanged.notify();
 }
 
-void ComponentCategoryTab::trigger(ui::TabAction a) noexcept {
+void PackageCategoryTab::trigger(ui::TabAction a) noexcept {
   switch (a) {
     case ui::TabAction::Apply: {
       commitMetadata();
@@ -209,7 +209,7 @@ void ComponentCategoryTab::trigger(ui::TabAction a) noexcept {
  *  Private Methods
  ******************************************************************************/
 
-void ComponentCategoryTab::refreshMetadata() noexcept {
+void PackageCategoryTab::refreshMetadata() noexcept {
   mName = q2s(*mCategory->getNames().getDefaultValue());
   mNameError = slint::SharedString();
   mNameParsed = mCategory->getNames().getDefaultValue();
@@ -223,7 +223,7 @@ void ComponentCategoryTab::refreshMetadata() noexcept {
 
   std::vector<slint::SharedString> parents;
   try {
-    CategoryTreeBuilder<ComponentCategory> builder(
+    CategoryTreeBuilder<PackageCategory> builder(
         mEditor.getWorkspace().getLibraryDb(),
         mEditor.getWorkspace().getSettings().libraryLocaleOrder.get(), true);
     for (auto item : builder.buildTree(mCategory->getParentUuid())) {
@@ -238,7 +238,7 @@ void ComponentCategoryTab::refreshMetadata() noexcept {
   onDerivedUiDataChanged.notify();
 }
 
-void ComponentCategoryTab::commitMetadata() noexcept {
+void PackageCategoryTab::commitMetadata() noexcept {
   try {
     std::unique_ptr<CmdLibraryCategoryEdit> cmd(
         new CmdLibraryCategoryEdit(*mCategory));

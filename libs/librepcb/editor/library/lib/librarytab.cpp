@@ -27,6 +27,7 @@
 #include "../libraryeditor2.h"
 #include "librarydependenciesmodel.h"
 #include "libraryelementsmodel.h"
+#include "utils/editortoolbox.h"
 #include "utils/slinthelpers.h"
 #include "utils/uihelpers.h"
 
@@ -222,6 +223,10 @@ void LibraryTab::trigger(ui::TabAction a) noexcept {
             emit componentCategoryEditorRequested(mEditor, fp);
             break;
           }
+          case TreeItemType::PackageCategory: {
+            emit packageCategoryEditorRequested(mEditor, fp);
+            break;
+          }
           case TreeItemType::Symbol: {
             emit symbolEditorRequested(mEditor, fp);
             break;
@@ -298,7 +303,10 @@ void LibraryTab::commitMetadata() noexcept {
     std::unique_ptr<CmdLibraryEdit> cmd(new CmdLibraryEdit(mLibrary));
     cmd->setName(QString(), mNameParsed);
     cmd->setDescription(QString(), s2q(mDescription).trimmed());
-    cmd->setKeywords(QString(), s2q(mKeywords).trimmed());
+    const QString keywords = s2q(mKeywords);
+    if (keywords != mLibrary.getKeywords().getDefaultValue()) {
+      cmd->setKeywords(QString(), EditorToolbox::cleanKeywords(keywords));
+    }
     cmd->setAuthor(s2q(mAuthor).trimmed());
     cmd->setVersion(mVersionParsed);
     cmd->setDeprecated(mDeprecated);
