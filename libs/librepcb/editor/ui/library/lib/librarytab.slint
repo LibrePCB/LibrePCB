@@ -37,42 +37,58 @@ import {
 component AddLibraryDependencyPopup inherits PopupWindow {
     in-out property <[LibraryDependency]> model;
 
-    width: min(l.preferred-width, 500px);
-    height: min(l.preferred-height, 500px);
+    Rectangle {
+        background: #00000050;
 
-    view := ScrollView {
-        l := VerticalLayout {
-            for item[index] in model: TouchArea {
-                height: item.checked ? 0 : 26px;
+        Rectangle {
+            width: min(0.8 * parent.width, 500px);
+            height: min(self.preferred-height, 0.8 * parent.height);
+            background: #000000;
+            border-radius: 15px;
+            border-width: 1px;
+            border-color: Constants.librepcb-color;
 
-                Rectangle {
-                    background: parent.has-hover ? #383838 : #101010;
-                    visible: !item.checked;  // Conditional doens't work properly.
+            VerticalLayout {
+                padding: 15px;
 
-                    HorizontalLayout {
-                        padding-left: 6px;
-                        padding-right: 6px;
-                        spacing: 5px;
-                        alignment: start;
+                view := ScrollView {
+                    preferred-height: l.preferred-height;
 
-                        Image {
-                            y: (parent.height - self.height) / 2;
-                            width: 18px;
-                            height: self.width;
-                            image-fit: contain;
-                            source: item.icon;
-                        }
+                    l := VerticalLayout {
+                        for item[idx] in model: TouchArea {
+                            height: item.checked ? 0 : 26px;
 
-                        Text {
-                            vertical-alignment: center;
-                            overflow: elide;
-                            text: item.name.is-empty ? item.uuid : item.name;
+                            Rectangle {
+                                background: parent.has-hover ? #383838 : #101010;
+                                visible: !item.checked;  // Conditional doens't work properly.
+
+                                    HorizontalLayout {
+                                    padding-left: 6px;
+                                    padding-right: 6px;
+                                    spacing: 5px;
+                                    alignment: start;
+
+                                    Image {
+                                        y: (parent.height - self.height) / 2;
+                                        width: 18px;
+                                        height: self.width;
+                                        image-fit: contain;
+                                        source: item.icon;
+                                    }
+
+                                    Text {
+                                        vertical-alignment: center;
+                                        overflow: elide;
+                                        text: item.name.is-empty ? item.uuid : item.name;
+                                    }
+                                }
+                            }
+
+                            clicked => {
+                                model[idx].checked = true;
+                            }
                         }
                     }
-                }
-
-                clicked => {
-                    model[index].checked = true;
                 }
             }
         }
@@ -290,12 +306,6 @@ component LibraryMetadata inherits GridLayout {
                     icon-scale: 0.8;
                     icon: @image-url("../../../../../bootstrap-icons/icons/plus-circle.svg");
 
-                    add-dependency-popup := AddLibraryDependencyPopup {
-                        x: 0;
-                        y: parent.height;
-                        model: tabs[index].dependencies;
-                    }
-
                     clicked => {
                         add-dependency-popup.show();
                     }
@@ -346,6 +356,12 @@ component LibraryMetadata inherits GridLayout {
     Row {
         Rectangle { }
     }
+
+    add-dependency-popup := AddLibraryDependencyPopup {
+        width: parent.width;
+        height: parent.height;
+        model: tabs[index].dependencies;
+    }
 }
 
 component LibraryContent inherits HorizontalLayout {
@@ -358,6 +374,7 @@ component LibraryContent inherits HorizontalLayout {
         model: tabs[index].categories;
         current-index: tabs[index].categories-index;
         show-tree: true;
+        hide-root-lines: true;
         supports-expand: false;
         font-size: 12px;
         item-height: 20px;

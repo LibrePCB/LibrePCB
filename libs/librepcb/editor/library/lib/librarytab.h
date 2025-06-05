@@ -97,6 +97,8 @@ public:
   LibraryTab& operator=(const LibraryTab& rhs) = delete;
 
 signals:
+  void componentCategoryEditorRequested(LibraryEditor2& editor,
+                                        const FilePath& fp);
   void symbolEditorRequested(LibraryEditor2& editor, const FilePath& fp);
   void packageEditorRequested(LibraryEditor2& editor, const FilePath& fp);
   void componentEditorRequested(LibraryEditor2& editor, const FilePath& fp);

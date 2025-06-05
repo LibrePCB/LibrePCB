@@ -25,6 +25,7 @@
 #include "dialogs/directorylockhandlerdialog.h"
 #include "editorcommandsetupdater.h"
 #include "guiapplication.h"
+#include "library/cat/componentcategorytab.h"
 #include "library/cmp/componenttab.h"
 #include "library/createlibrarytab.h"
 #include "library/dev/devicetab.h"
@@ -52,6 +53,7 @@
 #include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/fileio/transactionaldirectory.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/library/cat/componentcategory.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/project/project.h>
@@ -711,6 +713,8 @@ void MainWindow::openLibraryTab(const FilePath& fp, bool wizardMode) noexcept {
   if (auto editor = mApp.openLibrary(fp)) {
     if (!switchToLibraryElementTab<LibraryTab>(fp)) {
       auto tab = std::make_shared<LibraryTab>(mApp, *editor, wizardMode);
+      connect(tab.get(), &LibraryTab::componentCategoryEditorRequested, this,
+              &MainWindow::openComponentCategoryTab);
       connect(tab.get(), &LibraryTab::symbolEditorRequested, this,
               &MainWindow::openSymbolTab);
       connect(tab.get(), &LibraryTab::packageEditorRequested, this,
@@ -720,6 +724,26 @@ void MainWindow::openLibraryTab(const FilePath& fp, bool wizardMode) noexcept {
       connect(tab.get(), &LibraryTab::deviceEditorRequested, this,
               &MainWindow::openDeviceTab);
       addTab(tab);
+    }
+  }
+}
+
+void MainWindow::openComponentCategoryTab(LibraryEditor2& editor,
+                                          const FilePath& fp) noexcept {
+  if (!switchToLibraryElementTab<ComponentCategoryTab>(fp)) {
+    try {
+      const bool writable =
+          fp.isLocatedInDir(mApp.getWorkspace().getLocalLibrariesPath());
+      auto fs = TransactionalFileSystem::open(
+          fp, writable, &askForRestoringBackup,
+          DirectoryLockHandlerDialog::createDirectoryLockCallback());
+      std::unique_ptr<ComponentCategory> cat =
+          ComponentCategory::open(std::unique_ptr<TransactionalDirectory>(
+              new TransactionalDirectory(fs)));
+      addTab(std::make_shared<ComponentCategoryTab>(editor, std::move(cat),
+                                                    false));
+    } catch (const Exception& e) {
+      QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
     }
   }
 }

@@ -131,6 +131,8 @@ add_library(
   library/cat/componentcategoryeditorwidget.cpp
   library/cat/componentcategoryeditorwidget.h
   library/cat/componentcategoryeditorwidget.ui
+  library/cat/componentcategorytab.cpp
+  library/cat/componentcategorytab.h
   library/cat/packagecategoryeditorwidget.cpp
   library/cat/packagecategoryeditorwidget.h
   library/cat/packagecategoryeditorwidget.ui

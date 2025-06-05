@@ -218,6 +218,10 @@ void LibraryTab::trigger(ui::TabAction a) noexcept {
     case ui::TabAction::EditProperties: {
       if (fp.isValid() && item) {
         switch (item->type) {
+          case TreeItemType::ComponentCategory: {
+            emit componentCategoryEditorRequested(mEditor, fp);
+            break;
+          }
           case TreeItemType::Symbol: {
             emit symbolEditorRequested(mEditor, fp);
             break;

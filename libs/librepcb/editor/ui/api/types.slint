@@ -364,6 +364,7 @@ export enum TabType {
     create-library,
     download-library,
     library,
+    category,
     symbol,
     package,
     component,
@@ -654,6 +655,23 @@ export struct LibraryTabData {
     element-index: int,
 }
 
+// Additional data for component- or package category editor tabs
+export struct CategoryTabData {
+    library-index: int,
+    path: string,
+    name: string,
+    name-error: string,
+    description: string,
+    keywords: string,
+    author: string,
+    version: string,
+    version-error: string,
+    deprecated: bool,
+    parents: [string],
+    parents-model: [TreeViewItemData],
+    new-parent: string,  // Set to UUID or "null" by UI, reset by backend,
+}
+
 // Additional data for symbol editor tabs
 export struct SymbolTabData {
     library-index: int,
@@ -782,6 +800,7 @@ export struct WindowSectionData {
     board-2d-tabs: [Board2dTabData],  // Proxy view for `tabs`
     board-3d-tabs: [Board3dTabData],  // Proxy view for `tabs`
     library-tabs: [LibraryTabData],  // Proxy view for `tabs`
+    category-tabs: [CategoryTabData],  // Proxy view for `tabs`
     symbol-tabs: [SymbolTabData],  // Proxy view for `tabs`
     package-tabs: [PackageTabData],  // Proxy view for `tabs`
     component-tabs: [ComponentTabData],  // Proxy view for `tabs`

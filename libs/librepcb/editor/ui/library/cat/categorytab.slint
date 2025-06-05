@@ -1,0 +1,302 @@
+import { Tab } from "../../tab.slint";
+import {
+    Button,
+    IconButton,
+    LineEdit,
+    LinkText,
+    MessageBox,
+    Palette,
+    SceneButton,
+    SlideView,
+    Switch,
+    TextEdit,
+    ToolButton,
+    TreeView,
+} from "../../widgets.slint";
+import {
+    Backend,
+    CategoryTabData,
+    Constants,
+    Data,
+    DismissableMessageAction,
+    EditorCommandSet as Cmd,
+    EditorTool,
+    PanelPage,
+    TabAction,
+    WindowSectionData,
+} from "../../api.slint";
+
+component CategoryMetadata inherits GridLayout {
+    in property <int> section-index;
+    in-out property <[CategoryTabData]> tabs;
+    in property <int> index;
+
+    callback choose-parent;
+
+    padding: 10px;
+    spacing: 8px;
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Name:");
+        }
+
+        LineEdit {
+            text: tabs[index].name;
+            validation-error: tabs[index].name-error;
+
+            text-edited(text) => {
+                tabs[index].name = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].name = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Description:");
+        }
+
+        TextEdit {
+            height: 100px;
+            text: tabs[index].description;
+
+            text-edited(text) => {
+                tabs[index].description = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].description = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Keywords:");
+        }
+
+        LineEdit {
+            text: tabs[index].keywords;
+
+            text-edited(text) => {
+                tabs[index].keywords = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].keywords = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Author:");
+        }
+
+        LineEdit {
+            text: tabs[index].author;
+
+            text-edited(text) => {
+                tabs[index].author = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].author = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Version:");
+        }
+
+        LineEdit {
+            text: tabs[index].version;
+            validation-error: tabs[index].version-error;
+
+            text-edited(text) => {
+                tabs[index].version = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].version = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Deprecated:");
+        }
+
+        Switch {
+            font-size: 10px;
+            text: @tr("Check this if the element should no longer be used.");
+            checked: tabs[index].deprecated;
+
+            toggled(checked) => {
+                tabs[index].deprecated = checked;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Parent:");
+        }
+
+        HorizontalLayout {
+            z: 10;  // For the tooltips.
+            alignment: start;
+            spacing: 5px;
+
+            VerticalLayout {
+                for name[idx] in tabs[index].parents: HorizontalLayout {
+                    property <bool> last: idx == (tabs[index].parents.length - 1);
+
+                    padding-left: idx * 8px;
+
+                    Text {
+                        font-weight: last ? 600 : 400;
+                        overflow: elide;
+                        text: ((idx > 0) ? "⤷ " : "") + name;
+                    }
+                }
+            }
+
+            Rectangle {
+                width: 20px;
+            }
+
+            Rectangle {
+                width: 1px;
+                background: #707070;
+            }
+
+            IconButton {
+                y: (parent.height - self.height) / 2;
+                z: 10;  // For the tooltip.
+                height: 18px;
+                style: hyperlink;
+                icon: @image-url("../../../../../bootstrap-icons/icons/folder2-open.svg");
+                tooltip: @tr("Choose Parent Category");
+
+                clicked => {
+                    choose-parent();
+                }
+            }
+        }
+    }
+
+    Row {
+        Rectangle { }
+
+        HorizontalLayout {
+            /*if tabs[index].wizard-mode:*/ save-btn := Button {
+                width: self.preferred-width;
+                primary: true;
+                text: @tr("Apply & Save");
+
+                clicked => {
+                    Backend.trigger-tab(section-index, index, TabAction.save);
+                }
+            }
+
+            Rectangle { }
+        }
+    }
+
+    Row {
+        Rectangle { }
+    }
+}
+
+export component CategoryTab inherits Tab {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    property <[CategoryTabData]> tabs: section.category-tabs;
+    property <int> index: section.current-tab-index;
+
+    enabled: true;
+
+    CategoryMetadata {
+        width: parent.width;
+        section-index: section-index;
+        tabs: tabs;
+        index: index;
+
+        choose-parent => {
+            choose-parent-popup.show();
+        }
+    }
+
+    choose-parent-popup := PopupWindow {
+        width: parent.width;
+        height: parent.height;
+
+        Rectangle {
+            background: #00000050;
+
+            Rectangle {
+                width: min(0.8 * parent.width, 500px);
+                height: min(self.preferred-height, 0.8 * parent.height);
+                background: #000000;
+                border-radius: 15px;
+                border-width: 1px;
+                border-color: Constants.librepcb-color;
+
+                VerticalLayout {
+                    padding: 15px;
+
+                    choose-parent-view := TreeView {
+                        model: tabs[index].parents-model;
+                        show-tree: true;
+                        hide-root-tree: true;
+                        supports-expand: false;
+
+                        item-selected(idx, item) => {
+                            tabs[index].new-parent = item.user-data;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    key-pressed(event) => {
+        Data.set-current-tab(section-index, index);
+
+        // If the focus is in the command toolbar, make the Escape key moving
+        // the focus back to the graphics scene without triggering any action.
+        if (event.text == Key.Escape) && (!root.has-focus) {
+            root.focus();
+            return accept;
+        }
+        reject
+    }
+}

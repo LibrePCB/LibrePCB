@@ -1,6 +1,7 @@
 import {
     Board2dTabData,
     Board3dTabData,
+    CategoryTabData,
     ComponentTabData,
     DeviceTabData,
     EditorTool,
@@ -274,6 +275,10 @@ export global Data {
                     title: "Library",
                 },
                 {
+                    type: TabType.category,
+                    title: "Category",
+                },
+                {
                     type: TabType.symbol,
                     title: "Symbol",
                 },
@@ -303,7 +308,7 @@ export global Data {
                 { },
                 {
                     library-index: 0,
-                    wizard-mode: true,
+                    wizard-mode: false,
                     page-index: 0,
                     name: "Library",
                     description: "Foo Bar\nMultiline\nBlabla",
@@ -393,7 +398,43 @@ export global Data {
                     ],
                 },
             ],
+            category-tabs: [
+                { },
+                { },
+                {
+                    library-index: 0,
+                    path: "category1",
+                    name: "Category",
+                    name-error: "Invalid",
+                    description: "Foo Bar\nMultiline\nBlabla",
+                    keywords: "Foo,Bar,Hello World",
+                    author: "Somebody",
+                    version: "0.1",
+                    version-error: "Invalid",
+                    deprecated: false,
+                    parents: ["Root category", "Integrated Circuits", "Timers"],
+                    parents-model: [
+                        {
+                            level: 0,
+                            text: "Root Category",
+                        },
+                        {
+                            level: 1,
+                            text: "Integrated Circuits",
+                        },
+                        {
+                            level: 2,
+                            text: "Data Aquisition",
+                        },
+                        {
+                            level: 1,
+                            text: "Passive Elements",
+                        },
+                    ],
+                },
+            ],
             symbol-tabs: [
+                { },
                 { },
                 { },
                 {
@@ -409,6 +450,7 @@ export global Data {
                 },
             ],
             package-tabs: [
+                { },
                 { },
                 { },
                 { },
@@ -435,6 +477,7 @@ export global Data {
                 { },
                 { },
                 { },
+                { },
                 {
                     library-index: 0,
                     path: "component1",
@@ -448,6 +491,7 @@ export global Data {
                 },
             ],
             device-tabs: [
+                { },
                 { },
                 { },
                 { },
@@ -858,6 +902,7 @@ export global Data {
     out property <ProjectData> current-library: library-editors[current-library-index];
     out property <ProjectData> current-project: projects[current-project-index];
     out property <LibraryTabData> current-library-tab: current-section.library-tabs[current-section.current-tab-index];
+    out property <CategoryTabData> current-category-tab: current-section.category-tabs[current-section.current-tab-index];
     out property <SymbolTabData> current-symbol-tab: current-section.symbol-tabs[current-section.current-tab-index];
     out property <PackageTabData> current-package-tab: current-section.package-tabs[current-section.current-tab-index];
     out property <ComponentTabData> current-component-tab: current-section.component-tabs[current-section.current-tab-index];
@@ -898,6 +943,11 @@ export global Data {
             current-rule-check-project-index = -1;
             current-rule-check-board-index = -1;
             current-library-index = current-library-tab.library-index;
+        } else if current-tab.type == TabType.category {
+            current-project-index = -1;
+            current-rule-check-project-index = -1;
+            current-rule-check-board-index = -1;
+            current-library-index = current-category-tab.library-index;
         } else if current-tab.type == TabType.symbol {
             current-project-index = -1;
             current-rule-check-project-index = -1;

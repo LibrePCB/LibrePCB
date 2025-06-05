@@ -16,6 +16,8 @@ export component TreeView inherits Rectangle {
     in property <length> item-height: 22px;
     in property <length> font-size: 14px;
     in property <bool> show-tree: false;
+    in property <bool> hide-root-tree: false;
+    in property <bool> hide-root-lines: hide-root-tree;
     in property <bool> supports-expand: true;
     out property <bool> has-focus <=> fs.has-focus;
     out property <length> scrollbar-width: (self.height < self.preferred-height) ? 7px : 0;
@@ -138,11 +140,11 @@ export component TreeView inherits Rectangle {
                         }
                     }
 
-                    if show-tree: HorizontalLayout {
+                    if show-tree && ((!hide-root-tree) || (item.level > 0)): HorizontalLayout {
                         for i in (item.level + 1): Rectangle {
                             width: (i > 0) ? 15px : 8px;
 
-                            if i > 0: Rectangle {
+                            if (!hide-root-lines) || (i > 0): Rectangle {
                                 x: parent.width - 8px;
                                 y: 0;
                                 width: 1px;

@@ -23,6 +23,7 @@
 #include "windowsection.h"
 
 #include "hometab.h"
+#include "library/cat/componentcategorytab.h"
 #include "library/cmp/componenttab.h"
 #include "library/createlibrarytab.h"
 #include "library/dev/devicetab.h"
@@ -72,6 +73,8 @@ WindowSection::WindowSection(GuiApplication& app, QObject* parent) noexcept
         std::make_shared<
             DerivedUiObjectList<TabList, LibraryTab, ui::LibraryTabData>>(
             mTabs),
+        std::make_shared<DerivedUiObjectList<TabList, ComponentCategoryTab,
+                                             ui::CategoryTabData>>(mTabs),
         std::make_shared<
             DerivedUiObjectList<TabList, SymbolTab, ui::SymbolTabData>>(mTabs),
         std::make_shared<
