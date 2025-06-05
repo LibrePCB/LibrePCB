@@ -19,6 +19,7 @@ import {
     Constants,
     Data,
     DismissableMessageAction,
+    FeatureState,
     EditorCommandSet as Cmd,
     EditorTool,
     PanelPage,
@@ -30,8 +31,7 @@ component CategoryMetadata inherits GridLayout {
     in property <int> section-index;
     in-out property <[CategoryTabData]> tabs;
     in property <int> index;
-
-    callback choose-parent;
+    in property <bool> read-only;
 
     padding: 10px;
     spacing: 8px;
@@ -46,6 +46,7 @@ component CategoryMetadata inherits GridLayout {
         LineEdit {
             text: tabs[index].name;
             validation-error: tabs[index].name-error;
+            read-only: read-only;
 
             text-edited(text) => {
                 tabs[index].name = text;
@@ -68,6 +69,7 @@ component CategoryMetadata inherits GridLayout {
         TextEdit {
             height: 100px;
             text: tabs[index].description;
+            read-only: read-only;
 
             text-edited(text) => {
                 tabs[index].description = text;
@@ -89,6 +91,7 @@ component CategoryMetadata inherits GridLayout {
 
         LineEdit {
             text: tabs[index].keywords;
+            read-only: read-only;
 
             text-edited(text) => {
                 tabs[index].keywords = text;
@@ -110,6 +113,7 @@ component CategoryMetadata inherits GridLayout {
 
         LineEdit {
             text: tabs[index].author;
+            read-only: read-only;
 
             text-edited(text) => {
                 tabs[index].author = text;
@@ -132,6 +136,7 @@ component CategoryMetadata inherits GridLayout {
         LineEdit {
             text: tabs[index].version;
             validation-error: tabs[index].version-error;
+            read-only: read-only;
 
             text-edited(text) => {
                 tabs[index].version = text;
@@ -155,6 +160,7 @@ component CategoryMetadata inherits GridLayout {
             font-size: 10px;
             text: @tr("Check this if the element should no longer be used.");
             checked: tabs[index].deprecated;
+            enabled: !read-only;
 
             toggled(checked) => {
                 tabs[index].deprecated = checked;
@@ -193,12 +199,12 @@ component CategoryMetadata inherits GridLayout {
                 width: 20px;
             }
 
-            Rectangle {
+            if !read-only: Rectangle {
                 width: 1px;
                 background: #707070;
             }
 
-            IconButton {
+            if !read-only: IconButton {
                 y: (parent.height - self.height) / 2;
                 z: 10;  // For the tooltip.
                 height: 18px;
@@ -207,7 +213,7 @@ component CategoryMetadata inherits GridLayout {
                 tooltip: @tr("Choose Parent Category");
 
                 clicked => {
-                    choose-parent();
+                    choose-parent-popup.show();
                 }
             }
         }
@@ -217,11 +223,11 @@ component CategoryMetadata inherits GridLayout {
         Rectangle { }
 
         HorizontalLayout {
-            save-btn := Button {
+            if !read-only: save-btn := Button {
                 width: max(self.preferred-width, 100px);
                 primary: true;
-                icon-size: 16px;
-                icon: @image-url("../../../../../bootstrap-icons/icons/floppy-fill.svg");
+                icon-size: 17px;
+                icon: @image-url("../../../../../font-awesome/svgs/solid/floppy-disk.svg");
                 text: @tr("Save");
 
                 clicked => {
@@ -235,26 +241,6 @@ component CategoryMetadata inherits GridLayout {
 
     Row {
         Rectangle { }
-    }
-}
-
-component CategoryTab inherits Tab {
-    in property <int> section-index;
-    in-out property <WindowSectionData> section;
-    in-out property <[CategoryTabData]> tabs;
-    property <int> index: section.current-tab-index;
-
-    enabled: true;
-
-    CategoryMetadata {
-        width: parent.width;
-        section-index: section-index;
-        tabs: tabs;
-        index: index;
-
-        choose-parent => {
-            choose-parent-popup.show();
-        }
     }
 
     choose-parent-popup := PopupWindow {
@@ -289,17 +275,22 @@ component CategoryTab inherits Tab {
             }
         }
     }
+}
 
-    key-pressed(event) => {
-        Data.set-current-tab(section-index, index);
+component CategoryTab inherits Tab {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    in-out property <[CategoryTabData]> tabs;
+    property <int> index: section.current-tab-index;
+    property <bool> read-only: section.tabs[index].features.save != FeatureState.enabled;
 
-        // If the focus is in the command toolbar, make the Escape key moving
-        // the focus back to the graphics scene without triggering any action.
-        if (event.text == Key.Escape) && (!root.has-focus) {
-            root.focus();
-            return accept;
-        }
-        reject
+    CategoryMetadata {
+        width: parent.width;
+        height: parent.height;
+        section-index: section-index;
+        tabs: tabs;
+        index: index;
+        read-only: read-only;
     }
 }
 
