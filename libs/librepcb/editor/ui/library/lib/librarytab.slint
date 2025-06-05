@@ -58,11 +58,10 @@ component AddLibraryDependencyPopup inherits PopupWindow {
                         for item[idx] in model: TouchArea {
                             height: item.checked ? 0 : 26px;
 
-                            Rectangle {
-                                background: parent.has-hover ? #383838 : #101010;
-                                visible: !item.checked;  // Conditional doens't work properly.
+                            if !item.checked: Rectangle {
+                                background: parent.has-hover ? #383838 : transparent;
 
-                                    HorizontalLayout {
+                                HorizontalLayout {
                                     padding-left: 6px;
                                     padding-right: 6px;
                                     spacing: 5px;
@@ -339,10 +338,12 @@ component LibraryMetadata inherits GridLayout {
         Rectangle { }
 
         HorizontalLayout {
-            if tabs[index].wizard-mode: save-btn := Button {
-                width: self.preferred-width;
+            save-btn := Button {
+                width: max(self.preferred-width, 100px);
                 primary: true;
-                text: @tr("Apply & Save");
+                icon-size: 16px;
+                icon: @image-url("../../../../../bootstrap-icons/icons/floppy-fill.svg");
+                text: tabs[index].wizard-mode ? @tr("Finish") : @tr("Save");
 
                 clicked => {
                     Backend.trigger-tab(section-index, index, TabAction.save);
@@ -412,6 +413,15 @@ component LibraryContent inherits HorizontalLayout {
         supports-expand: false;
         font-size: 12px;
         item-height: 20px;
+
+        if self.model.length == 0: Text {
+            width: 0.8 * parent.width;
+            color: #808080;
+            font-size: 18px;
+            wrap: word-wrap;
+            horizontal-alignment: center;
+            text: @tr("The selected category does not contain any library elements.");
+        }
 
         if Data.libraries-rescan-in-progress: Spinner {
             x: parent.width - self.width - parent.scrollbar-width - self.y;

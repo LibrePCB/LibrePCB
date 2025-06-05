@@ -217,10 +217,12 @@ component CategoryMetadata inherits GridLayout {
         Rectangle { }
 
         HorizontalLayout {
-            /*if tabs[index].wizard-mode:*/ save-btn := Button {
-                width: self.preferred-width;
+            save-btn := Button {
+                width: max(self.preferred-width, 100px);
                 primary: true;
-                text: @tr("Apply & Save");
+                icon-size: 16px;
+                icon: @image-url("../../../../../bootstrap-icons/icons/floppy-fill.svg");
+                text: @tr("Save");
 
                 clicked => {
                     Backend.trigger-tab(section-index, index, TabAction.save);
