@@ -26,6 +26,7 @@
 #include "../../3d/slintopenglview.h"
 #include "../../undostack.h"
 #include "../../utils/slinthelpers.h"
+#include "../../utils/uihelpers.h"
 #include "../projecteditor.h"
 #include "boardeditor.h"
 
@@ -103,10 +104,19 @@ int Board3dTab::getProjectObjectIndex() const noexcept {
 }
 
 ui::TabData Board3dTab::getUiData() const noexcept {
+  ui::TabFeatures features = {};
+  features.save = toFs(mProject.getDirectory().isWritable());
+  features.undo = toFs(mProjectEditor.getUndoStack().canUndo());
+  features.redo = toFs(mProjectEditor.getUndoStack().canRedo());
+
   return ui::TabData{
       ui::TabType::Board3d,  // Type
       q2s(*mBoard.getName()),  // Title
-      ui::TabFeatures{},  // Features
+      features,  // Features
+      !mProject.getDirectory().isWritable(),  // Read-only
+      mProjectEditor.hasUnsavedChanges(),  // Unsaved changes
+      q2s(mProjectEditor.getUndoStack().getUndoCmdText()),  // Undo text
+      q2s(mProjectEditor.getUndoStack().getRedoCmdText()),  // Redo text
       slint::SharedString(),  // Find term
       nullptr,  // Find suggestions
       nullptr,  // Layers
@@ -195,6 +205,14 @@ void Board3dTab::deactivate() noexcept {
 
 void Board3dTab::trigger(ui::TabAction a) noexcept {
   switch (a) {
+    case ui::TabAction::Undo: {
+      mProjectEditor.undo();
+      break;
+    }
+    case ui::TabAction::Redo: {
+      mProjectEditor.redo();
+      break;
+    }
     case ui::TabAction::ZoomIn: {
       if (mView) mView->zoomIn();
       break;

@@ -162,6 +162,10 @@ ui::EditorCommand l2s(const EditorCommand& cmd, ui::EditorCommand in) noexcept {
   return in;
 }
 
+ui::FeatureState toFs(bool enabled) noexcept {
+  return enabled ? ui::FeatureState::Enabled : ui::FeatureState::Disabled;
+}
+
 /*******************************************************************************
  *  End of File
  ******************************************************************************/

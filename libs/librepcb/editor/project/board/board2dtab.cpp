@@ -94,10 +94,6 @@ static QString toMultiLine(const QString& s) {
   return s.trimmed().replace("\\n", "\n");
 }
 
-static ui::FeatureState toFs(bool enabled) noexcept {
-  return enabled ? ui::FeatureState::Enabled : ui::FeatureState::Disabled;
-}
-
 static ui::WireMode l2s(BoardEditorState_DrawTrace::WireMode v) noexcept {
   if (v == BoardEditorState_DrawTrace::WireMode::HV) {
     return ui::WireMode::HV;
@@ -271,6 +267,9 @@ int Board2dTab::getProjectObjectIndex() const noexcept {
 
 ui::TabData Board2dTab::getUiData() const noexcept {
   ui::TabFeatures features = {};
+  features.save = toFs(mProject.getDirectory().isWritable());
+  features.undo = toFs(mProjectEditor.getUndoStack().canUndo());
+  features.redo = toFs(mProjectEditor.getUndoStack().canRedo());
   features.export_graphics = toFs(mTool == ui::EditorTool::Select);
   features.select = toFs(mTool == ui::EditorTool::Select);
   features.cut = toFs(mToolFeatures.testFlag(Feature::Cut));
@@ -292,6 +291,10 @@ ui::TabData Board2dTab::getUiData() const noexcept {
       ui::TabType::Board2d,  // Type
       q2s(*mBoard.getName()),  // Title
       features,  // Features
+      !mProject.getDirectory().isWritable(),  // Read-only
+      mProjectEditor.hasUnsavedChanges(),  // Unsaved changes
+      q2s(mProjectEditor.getUndoStack().getUndoCmdText()),  // Undo text
+      q2s(mProjectEditor.getUndoStack().getRedoCmdText()),  // Redo text
       q2s(mSearchContext.getTerm()),  // Find term
       mSearchContext.getSuggestions(),  // Find suggestions
       mLayersModel,  // Layers
@@ -598,6 +601,14 @@ void Board2dTab::trigger(ui::TabAction a) noexcept {
       } else {
         mFsm->processAbortCommand();
       }
+      break;
+    }
+    case ui::TabAction::Undo: {
+      mProjectEditor.undo();
+      break;
+    }
+    case ui::TabAction::Redo: {
+      mProjectEditor.redo();
       break;
     }
     case ui::TabAction::Cut: {

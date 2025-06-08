@@ -69,10 +69,6 @@ static QString toMultiLine(const QString& s) {
   return s.trimmed().replace("\\n", "\n");
 }
 
-static ui::FeatureState toFs(bool enabled) noexcept {
-  return enabled ? ui::FeatureState::Enabled : ui::FeatureState::Disabled;
-}
-
 static ui::WireMode l2s(SchematicEditorState_DrawWire::WireMode v) noexcept {
   if (v == SchematicEditorState_DrawWire::WireMode::HV) {
     return ui::WireMode::HV;
@@ -238,6 +234,9 @@ int SchematicTab::getProjectObjectIndex() const noexcept {
 
 ui::TabData SchematicTab::getUiData() const noexcept {
   ui::TabFeatures features = {};
+  features.save = toFs(mProject.getDirectory().isWritable());
+  features.undo = toFs(mProjectEditor.getUndoStack().canUndo());
+  features.redo = toFs(mProjectEditor.getUndoStack().canRedo());
   features.export_graphics = toFs(mTool == ui::EditorTool::Select);
   features.select = toFs(mTool == ui::EditorTool::Select);
   features.cut = toFs(mToolFeatures.testFlag(Feature::Cut));
@@ -255,6 +254,10 @@ ui::TabData SchematicTab::getUiData() const noexcept {
       ui::TabType::Schematic,  // Type
       q2s(*mSchematic.getName()),  // Title
       features,  // Features
+      !mProject.getDirectory().isWritable(),  // Read-only
+      mProjectEditor.hasUnsavedChanges(),  // Unsaved changes
+      q2s(mProjectEditor.getUndoStack().getUndoCmdText()),  // Undo text
+      q2s(mProjectEditor.getUndoStack().getRedoCmdText()),  // Redo text
       q2s(mSearchContext.getTerm()),  // Find term
       mSearchContext.getSuggestions(),  // Find suggestions
       nullptr,  // Layers
@@ -417,6 +420,14 @@ void SchematicTab::trigger(ui::TabAction a) noexcept {
     }
     case ui::TabAction::Abort: {
       mFsm->processAbortCommand();
+      break;
+    }
+    case ui::TabAction::Undo: {
+      mProjectEditor.undo();
+      break;
+    }
+    case ui::TabAction::Redo: {
+      mProjectEditor.redo();
       break;
     }
     case ui::TabAction::Cut: {
