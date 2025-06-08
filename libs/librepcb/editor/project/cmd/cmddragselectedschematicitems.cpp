@@ -56,7 +56,7 @@ namespace editor {
 CmdDragSelectedSchematicItems::CmdDragSelectedSchematicItems(
     SchematicGraphicsScene& scene, const Point& startPos) noexcept
   : UndoCommandGroup(tr("Drag Schematic Elements")),
-    mScene(scene),
+    mSchematic(scene.getSchematic()),
     mItemCount(0),
     mStartPos(startPos),
     mDeltaPos(0, 0),
@@ -66,7 +66,7 @@ CmdDragSelectedSchematicItems::CmdDragSelectedSchematicItems(
     mMirrored(false),
     mTextsReset(false) {
   // get all selected items
-  SchematicSelectionQuery query(mScene);
+  SchematicSelectionQuery query(scene);
   query.addSelectedSymbols();
   query.addSelectedNetPoints();
   query.addSelectedNetLines();
@@ -118,7 +118,7 @@ CmdDragSelectedSchematicItems::CmdDragSelectedSchematicItems(
   // Note: If only 1 item is selected, use its exact position as center.
   if (mItemCount > 1) {
     mCenterPos /= mItemCount;
-    mCenterPos.mapToGrid(mScene.getSchematic().getGridInterval());
+    mCenterPos.mapToGrid(mSchematic.getGridInterval());
   }
 }
 
@@ -130,7 +130,7 @@ CmdDragSelectedSchematicItems::~CmdDragSelectedSchematicItems() noexcept {
  ******************************************************************************/
 
 void CmdDragSelectedSchematicItems::snapToGrid() noexcept {
-  const PositiveLength grid = mScene.getSchematic().getGridInterval();
+  const PositiveLength grid = mSchematic.getGridInterval();
   foreach (CmdSymbolInstanceEdit* cmd, mSymbolEditCmds) {
     cmd->snapToGrid(grid, true);
   }
@@ -156,7 +156,7 @@ void CmdDragSelectedSchematicItems::resetAllTexts() noexcept {
 void CmdDragSelectedSchematicItems::setCurrentPosition(
     const Point& pos) noexcept {
   Point delta = pos - mStartPos;
-  delta.mapToGrid(mScene.getSchematic().getGridInterval());
+  delta.mapToGrid(mSchematic.getGridInterval());
 
   if (delta != mDeltaPos) {
     // move selected elements
@@ -182,8 +182,7 @@ void CmdDragSelectedSchematicItems::setCurrentPosition(
 void CmdDragSelectedSchematicItems::rotate(
     const Angle& angle, bool aroundCurrentPosition) noexcept {
   const Point center = (aroundCurrentPosition && (mItemCount > 1))
-      ? (mStartPos + mDeltaPos)
-            .mappedToGrid(mScene.getSchematic().getGridInterval())
+      ? (mStartPos + mDeltaPos).mappedToGrid(mSchematic.getGridInterval())
       : (mCenterPos + mDeltaPos);
 
   // rotate selected elements
@@ -208,8 +207,7 @@ void CmdDragSelectedSchematicItems::rotate(
 void CmdDragSelectedSchematicItems::mirror(
     Qt::Orientation orientation, bool aroundCurrentPosition) noexcept {
   const Point center = (aroundCurrentPosition && (mItemCount > 1))
-      ? (mStartPos + mDeltaPos)
-            .mappedToGrid(mScene.getSchematic().getGridInterval())
+      ? (mStartPos + mDeltaPos).mappedToGrid(mSchematic.getGridInterval())
       : (mCenterPos + mDeltaPos);
 
   // rotate selected elements
@@ -283,7 +281,7 @@ bool CmdDragSelectedSchematicItems::performExecute() {
 }
 
 void CmdDragSelectedSchematicItems::performPostExecution() noexcept {
-  mScene.getSchematic().updateAllNetLabelAnchors();
+  mSchematic.updateAllNetLabelAnchors();
 }
 
 /*******************************************************************************

@@ -34,6 +34,9 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Schematic;
+
 namespace editor {
 
 class CmdPolygonEdit;
@@ -75,7 +78,7 @@ private:
   virtual void performPostExecution() noexcept override;
 
   // Private Member Variables
-  SchematicGraphicsScene& mScene;
+  Schematic& mSchematic;
   int mItemCount;
   Point mStartPos;
   Point mDeltaPos;
