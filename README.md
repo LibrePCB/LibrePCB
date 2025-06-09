@@ -2,11 +2,12 @@
 
 [![Become a Patron](https://img.shields.io/badge/Patreon-donate-orange.svg)](https://www.patreon.com/librepcb)
 [![Discourse](https://img.shields.io/badge/Discourse-discuss-blueviolet.svg)](https://librepcb.discourse.group/)
-[![Telegram](https://img.shields.io/badge/Telegram-chat-blue.svg)](https://telegram.me/LibrePCB_dev)
+[![Matrix](https://img.shields.io/badge/Matrix-chat-blue.svg)](https://matrix.to/#/#librepcb:matrix.org)
 [![Website](https://img.shields.io/badge/Website-librepcb.org-29d682.svg)](https://librepcb.org/)
 [![Docs](https://img.shields.io/badge/Docs-read-yellow.svg)](https://librepcb.org/docs/)
 
 [![Azure Build Status](https://dev.azure.com/LibrePCB/LibrePCB/_apis/build/status/LibrePCB.LibrePCB?branchName=master)](https://dev.azure.com/LibrePCB/LibrePCB/_build/latest?definitionId=2&branchName=master)
+[![Github Actions](https://github.com/LibrePCB/LibrePCB/actions/workflows/main.yml/badge.svg)](https://github.com/LibrePCB/LibrePCB/actions)
 [![OpenSSF Best Practices](https://bestpractices.coreinfrastructure.org/projects/1652/badge)](https://bestpractices.coreinfrastructure.org/projects/1652)
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/librepcb.svg?columns=3&header=LibrePCB)](https://repology.org/project/librepcb/versions)
