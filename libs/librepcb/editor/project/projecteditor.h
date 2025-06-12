@@ -139,7 +139,7 @@ public:
 
   void execSetupDialog() noexcept;
 
-  void execOutputJobsDialog() noexcept;
+  void execOutputJobsDialog(const QString& typeName = QString()) noexcept;
 
   void execBomGeneratorDialog(const Board* board) noexcept;
 

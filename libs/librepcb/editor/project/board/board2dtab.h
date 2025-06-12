@@ -216,7 +216,6 @@ private:
   void addUnplacedComponentsToBoard(PlaceComponentsMode mode) noexcept;
   void execGraphicsExportDialog(GraphicsExportDialog::Output output,
                                 const QString& settingsKey) noexcept;
-  void execFabricationDataExportDialog() noexcept;
   void execPickPlaceExportDialog() noexcept;
   void execD356NetlistExportDialog() noexcept;
   void execSpecctraExportDialog() noexcept;

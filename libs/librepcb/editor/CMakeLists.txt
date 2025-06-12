@@ -496,9 +496,6 @@ add_library(
   project/board/deviceinstancepropertiesdialog.cpp
   project/board/deviceinstancepropertiesdialog.h
   project/board/deviceinstancepropertiesdialog.ui
-  project/board/fabricationoutputdialog.cpp
-  project/board/fabricationoutputdialog.h
-  project/board/fabricationoutputdialog.ui
   project/board/fsm/boardeditorfsm.cpp
   project/board/fsm/boardeditorfsm.h
   project/board/fsm/boardeditorfsmadapter.h
