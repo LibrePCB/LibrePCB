@@ -25,7 +25,8 @@
  ******************************************************************************/
 #include "../../widgets/if_graphicsvieweventhandler.h"
 #include "../libraryeditortab.h"
-
+#include <librepcb/core/types/lengthunit.h>
+#include <librepcb/core/types/length.h>
 #include <librepcb/core/types/elementname.h>
 #include <librepcb/core/types/version.h>
 #include <librepcb/core/workspace/theme.h>
@@ -44,6 +45,7 @@ namespace editor {
 class CategoryTreeModel2;
 class GraphicsLayerList;
 class GraphicsScene;
+class SymbolEditorFsm;
 class LibraryElementCategoriesModel;
 class SlintGraphicsView;
 class SymbolGraphicsItem;
@@ -138,6 +140,8 @@ private:
   bool mWizardMode;
   int mCurrentPageIndex;
   Theme::GridStyle mGridStyle;
+  PositiveLength mGridInterval;
+  LengthUnit mUnit;
   QPointF mSceneImagePos;
   int mFrameIndex;
 
@@ -156,6 +160,9 @@ private:
   // UI data
   std::shared_ptr<LibraryElementCategoriesModel> mCategories;
   std::shared_ptr<CategoryTreeModel2> mCategoriesTree;
+
+  /// Editor state machine
+  std::unique_ptr<SymbolEditorFsm> mFsm;
 
   // Objects in active state
   std::unique_ptr<GraphicsScene> mScene;

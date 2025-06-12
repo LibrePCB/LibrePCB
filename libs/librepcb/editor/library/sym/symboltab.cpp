@@ -35,7 +35,7 @@
 #include "../libraryelementcategoriesmodel.h"
 #include "graphics/graphicslayerlist.h"
 #include "symbolgraphicsitem.h"
-
+#include "fsm/symboleditorfsm.h"
 #include <librepcb/core/fileio/transactionaldirectory.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/library/library.h>
@@ -68,6 +68,8 @@ SymbolTab::SymbolTab(LibraryEditor2& editor, std::unique_ptr<Symbol> sym,
     mWizardMode(wizardMode),
     mCurrentPageIndex(wizardMode ? 0 : 2),
     mGridStyle(Theme::GridStyle::None),
+    mGridInterval(2540000),
+    mUnit(LengthUnit::millimeters()),
     mFrameIndex(0),
     mNameParsed(mSymbol->getNames().getDefaultValue()),
     mVersionParsed(mSymbol->getVersion()),
@@ -95,6 +97,24 @@ SymbolTab::SymbolTab(LibraryEditor2& editor, std::unique_ptr<Symbol> sym,
   connect(mCategories.get(), &LibraryElementCategoriesModel::modified, this,
           &SymbolTab::commitMetadata, Qt::QueuedConnection);
 
+  // Load finite state machine (FSM).
+  //SymbolEditorFsm::Context fsmContext{mContext,
+  //                                    *this,
+  //                                    *mUndoStack,
+  //                                    *mGraphicsScene,
+  //                                    *mUi->graphicsView,
+  //                                    mLengthUnit,
+  //                                    *mSymbol,
+  //                                    *mGraphicsItem,
+  //                                    *mCommandToolBarProxy};
+  //mFsm.reset(new SymbolEditorFsm(fsmContext));
+  //connect(mUndoStack.data(), &UndoStack::stateModified, mFsm.data(),
+  //        &SymbolEditorFsm::updateAvailableFeatures);
+  //connect(mFsm.data(), &SymbolEditorFsm::availableFeaturesChanged, this,
+  //        [this]() { emit availableFeaturesChanged(getAvailableFeatures()); });
+  //connect(mFsm.data(), &SymbolEditorFsm::statusBarMessageChanged, this,
+  //        &SymbolEditorWidget::setStatusBarMessage);
+
   // Refresh content.
   refreshMetadata();
   scheduleChecks();
@@ -108,6 +128,15 @@ SymbolTab::SymbolTab(LibraryEditor2& editor, std::unique_ptr<Symbol> sym,
 
 SymbolTab::~SymbolTab() noexcept {
   deactivate();
+
+  // Clean up the state machine nicely to avoid unexpected behavior. Triggering
+  // abort (Esc) two times is usually sufficient to leave any active tool, so
+  // let's call it three times to be on the safe side. Unfortunately there's
+  // no clean way to forcible and guaranteed leaving a tool.
+  mFsm->processAbortCommand();
+  mFsm->processAbortCommand();
+  mFsm->processAbortCommand();
+  mFsm.reset();
 
   // Delete all command objects in the undo stack. This mmust be done before
   // other important objects are deleted, as undo command objects can hold
@@ -183,8 +212,8 @@ ui::SymbolTabData SymbolTab::getDerivedUiData() const noexcept {
       q2s(theme.getColor(Theme::Color::sSchematicInfoBox)
               .getSecondaryColor()),  // Overlay text color
       l2s(mGridStyle),  // Grid style
-      l2s(Length(2540000)),  // Grid interval
-      l2s(LengthUnit::millimeters()),  // Unit
+      l2s(*mGridInterval),  // Grid interval
+      l2s(mUnit),  // Unit
       ui::EditorTool::Select,  // Tool
       q2s(Qt::ArrowCursor),  // Tool cursor
       slint::SharedString(),  // Tool overlay text
@@ -310,75 +339,75 @@ void SymbolTab::trigger(ui::TabAction a) noexcept {
       break;
     }
     case ui::TabAction::SelectAll: {
-      // mFsm->processSelectAll();
+       mFsm->processSelectAll();
       break;
     }
     case ui::TabAction::Abort: {
-      // mFsm->processAbortCommand();
+       mFsm->processAbortCommand();
       break;
     }
     case ui::TabAction::Cut: {
-      // mFsm->processCut();
+      mFsm->processCut();
       break;
     }
     case ui::TabAction::Copy: {
-      // mFsm->processCopy();
+       mFsm->processCopy();
       break;
     }
     case ui::TabAction::Paste: {
-      // mFsm->processPaste();
+       mFsm->processPaste();
       break;
     }
     case ui::TabAction::Delete: {
-      // mFsm->processRemove();
+       mFsm->processRemove();
       break;
     }
     case ui::TabAction::RotateCcw: {
-      // mFsm->processRotate(Angle::deg90());
+       mFsm->processRotate(Angle::deg90());
       break;
     }
     case ui::TabAction::RotateCw: {
-      // mFsm->processRotate(-Angle::deg90());
+       mFsm->processRotate(-Angle::deg90());
       break;
     }
     case ui::TabAction::MirrorHorizontally: {
-      // mFsm->processMirror(Qt::Horizontal);
+       mFsm->processMirror(Qt::Horizontal);
       break;
     }
     case ui::TabAction::MirrorVertically: {
-      // mFsm->processMirror(Qt::Vertical);
+       mFsm->processMirror(Qt::Vertical);
       break;
     }
-    /*case ui::TabAction::MoveLeft: {
-      if (!mFsm->processMove(Point(-mSchematic.getGridInterval(), 0))) {
+    case ui::TabAction::MoveLeft: {
+      if (!mFsm->processMove(Point(-mGridInterval, 0))) {
         mView->scrollLeft();
       }
       break;
     }
     case ui::TabAction::MoveRight: {
-      if (!mFsm->processMove(Point(*mSchematic.getGridInterval(), 0))) {
+      if (!mFsm->processMove(Point(*mGridInterval, 0))) {
         mView->scrollRight();
       }
       break;
     }
     case ui::TabAction::MoveUp: {
-      if (!mFsm->processMove(Point(0, *mSchematic.getGridInterval()))) {
+      if (!mFsm->processMove(Point(0, *mGridInterval))) {
         mView->scrollUp();
       }
       break;
     }
     case ui::TabAction::MoveDown: {
-      if (!mFsm->processMove(Point(0, -mSchematic.getGridInterval()))) {
+      if (!mFsm->processMove(Point(0, -mGridInterval))) {
         mView->scrollDown();
       }
       break;
-    }*/
+    }
     case ui::TabAction::SnapToGrid: {
-      // mFsm->processSnapToGrid();
+       mFsm->processSnapToGrid();
       break;
     }
     case ui::TabAction::EditProperties: {
-      // mFsm->processEditProperties();
+       mFsm->processEditProperties();
       break;
     }
     /*case ui::TabAction::GridIntervalIncrease: {
@@ -489,38 +518,38 @@ bool SymbolTab::requestClose() noexcept {
 
 bool SymbolTab::graphicsSceneKeyPressed(
     const GraphicsSceneKeyEvent& e) noexcept {
-  return false;  // mFsm->processKeyPressed(e);
+  return  mFsm->processKeyPressed(e);
 }
 
 bool SymbolTab::graphicsSceneKeyReleased(
     const GraphicsSceneKeyEvent& e) noexcept {
-  return false;  // mFsm->processKeyReleased(e);
+  return  mFsm->processKeyReleased(e);
 }
 
 bool SymbolTab::graphicsSceneMouseMoved(
     const GraphicsSceneMouseEvent& e) noexcept {
-  // emit cursorCoordinatesChanged(e.scenePos, mSchematic.getGridUnit());
-  return false;  // mFsm->processGraphicsSceneMouseMoved(e);
+   emit cursorCoordinatesChanged(e.scenePos, mUnit);
+  return  mFsm->processGraphicsSceneMouseMoved(e);
 }
 
 bool SymbolTab::graphicsSceneLeftMouseButtonPressed(
     const GraphicsSceneMouseEvent& e) noexcept {
-  return false;  // mFsm->processGraphicsSceneLeftMouseButtonPressed(e);
+  return  mFsm->processGraphicsSceneLeftMouseButtonPressed(e);
 }
 
 bool SymbolTab::graphicsSceneLeftMouseButtonReleased(
     const GraphicsSceneMouseEvent& e) noexcept {
-  return false;  // mFsm->processGraphicsSceneLeftMouseButtonReleased(e);
+  return  mFsm->processGraphicsSceneLeftMouseButtonReleased(e);
 }
 
 bool SymbolTab::graphicsSceneLeftMouseButtonDoubleClicked(
     const GraphicsSceneMouseEvent& e) noexcept {
-  return false;  // mFsm->processGraphicsSceneLeftMouseButtonDoubleClicked(e);
+  return  mFsm->processGraphicsSceneLeftMouseButtonDoubleClicked(e);
 }
 
 bool SymbolTab::graphicsSceneRightMouseButtonReleased(
     const GraphicsSceneMouseEvent& e) noexcept {
-  return false;  // mFsm->processGraphicsSceneRightMouseButtonReleased(e);
+  return  mFsm->processGraphicsSceneRightMouseButtonReleased(e);
 }
 
 /*******************************************************************************

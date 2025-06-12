@@ -86,20 +86,6 @@ public:
 
 public slots:
   bool save() noexcept override;
-  bool selectAll() noexcept override;
-  bool cut() noexcept override;
-  bool copy() noexcept override;
-  bool paste() noexcept override;
-  bool move(Qt::ArrowType direction) noexcept override;
-  bool rotate(const librepcb::Angle& rotation) noexcept override;
-  bool mirror(Qt::Orientation orientation) noexcept override;
-  bool snapToGrid() noexcept override;
-  bool remove() noexcept override;
-  bool editProperties() noexcept override;
-  bool zoomIn() noexcept override;
-  bool zoomOut() noexcept override;
-  bool zoomAll() noexcept override;
-  bool abortCommand() noexcept override;
   bool importDxf() noexcept override;
   bool editGridProperties() noexcept override;
   bool increaseGridInterval() noexcept override;
