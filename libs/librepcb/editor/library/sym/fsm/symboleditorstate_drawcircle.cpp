@@ -111,7 +111,7 @@ bool SymbolEditorState_DrawCircle::entry() noexcept {
           &SymbolEditorState_DrawCircle::grabAreaCheckBoxCheckedChanged);
   mContext.commandToolBar.addWidget(std::move(grabAreaCheckBox));
 
-  mContext.graphicsView.setCursor(Qt::CrossCursor);
+  mAdapter.fsmSetViewCursor(Qt::CrossCursor);
   return true;
 }
 
@@ -123,15 +123,8 @@ bool SymbolEditorState_DrawCircle::exit() noexcept {
   // cleanup command toolbar
   mContext.commandToolBar.clear();
 
-  mContext.graphicsView.unsetCursor();
+  mAdapter.fsmSetViewCursor(std::nullopt);
   return true;
-}
-
-QSet<EditorWidgetBase::Feature>
-    SymbolEditorState_DrawCircle::getAvailableFeatures() const noexcept {
-  return {
-      EditorWidgetBase::Feature::Abort,
-  };
 }
 
 /*******************************************************************************
@@ -171,6 +164,9 @@ bool SymbolEditorState_DrawCircle::processAbortCommand() noexcept {
  ******************************************************************************/
 
 bool SymbolEditorState_DrawCircle::startAddCircle(const Point& pos) noexcept {
+  SymbolGraphicsItem* item = getGraphicsItem();
+  if (!item) return false;
+
   try {
     mContext.undoStack.beginCmdGroup(tr("Add symbol circle"));
     mCurrentCircle = std::make_shared<Circle>(
@@ -179,13 +175,12 @@ bool SymbolEditorState_DrawCircle::startAddCircle(const Point& pos) noexcept {
     mContext.undoStack.appendToCmdGroup(
         new CmdCircleInsert(mContext.symbol.getCircles(), mCurrentCircle));
     mEditCmd.reset(new CmdCircleEdit(*mCurrentCircle));
-    mCurrentGraphicsItem =
-        mContext.symbolGraphicsItem.getGraphicsItem(mCurrentCircle);
+    mCurrentGraphicsItem = item->getGraphicsItem(mCurrentCircle);
     Q_ASSERT(mCurrentGraphicsItem);
     mCurrentGraphicsItem->setSelected(true);
     return true;
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     mCurrentGraphicsItem.reset();
     mCurrentCircle.reset();
     mEditCmd.reset();
@@ -218,7 +213,7 @@ bool SymbolEditorState_DrawCircle::finishAddCircle(const Point& pos) noexcept {
     mContext.undoStack.commitCmdGroup();
     return true;
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     return false;
   }
 }
@@ -232,7 +227,7 @@ bool SymbolEditorState_DrawCircle::abortAddCircle() noexcept {
     mContext.undoStack.abortCmdGroup();
     return true;
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     return false;
   }
 }

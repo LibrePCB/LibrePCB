@@ -148,12 +148,12 @@ bool SymbolEditorState_DrawPolygonBase::entry() noexcept {
     mContext.commandToolBar.addWidget(std::move(grabAreaCheckBox));
   }
 
-  mLastScenePos = mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos())
-                      .mappedToGrid(mContext.graphicsScene.getGridInterval());
+  mLastScenePos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos())
+                      .mappedToGrid(getGridInterval());
   updateCursorPosition(Qt::KeyboardModifier::NoModifier);
   updateStatusBarMessage();
 
-  mContext.graphicsView.setCursor(Qt::CrossCursor);
+  mAdapter.fsmSetViewCursor(Qt::CrossCursor);
   return true;
 }
 
@@ -165,18 +165,11 @@ bool SymbolEditorState_DrawPolygonBase::exit() noexcept {
   // cleanup command toolbar
   mContext.commandToolBar.clear();
 
-  mContext.graphicsView.unsetCursor();
-  mContext.graphicsScene.setSceneCursor(Point(), false, false);
-  mContext.graphicsView.setInfoBoxText(QString());
-  emit statusBarMessageChanged(QString());
+  mAdapter.fsmSetViewCursor(std::nullopt);
+  mAdapter.fsmSetSceneCursor(Point(), false, false);
+  mAdapter.fsmSetViewInfoBoxText(QString());
+  mAdapter.fsmSetStatusBarMessage(QString());
   return true;
-}
-
-QSet<EditorWidgetBase::Feature>
-    SymbolEditorState_DrawPolygonBase::getAvailableFeatures() const noexcept {
-  return {
-      EditorWidgetBase::Feature::Abort,
-  };
 }
 
 /*******************************************************************************
@@ -241,6 +234,9 @@ bool SymbolEditorState_DrawPolygonBase::processAbortCommand() noexcept {
  ******************************************************************************/
 
 bool SymbolEditorState_DrawPolygonBase::start() noexcept {
+  SymbolGraphicsItem* item = getGraphicsItem();
+  if (!item) return false;
+
   try {
     // Reset members.
     if (mMode == Mode::ARC) {
@@ -270,15 +266,14 @@ bool SymbolEditorState_DrawPolygonBase::start() noexcept {
     mContext.undoStack.appendToCmdGroup(
         new CmdPolygonInsert(mContext.symbol.getPolygons(), mCurrentPolygon));
     mEditCmd.reset(new CmdPolygonEdit(*mCurrentPolygon));
-    mCurrentGraphicsItem =
-        mContext.symbolGraphicsItem.getGraphicsItem(mCurrentPolygon);
+    mCurrentGraphicsItem = item->getGraphicsItem(mCurrentPolygon);
     Q_ASSERT(mCurrentGraphicsItem);
     mCurrentGraphicsItem->setSelected(true);
     updateOverlayText();
     updateStatusBarMessage();
     return true;
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     abort(false);
     return false;
   }
@@ -301,7 +296,7 @@ bool SymbolEditorState_DrawPolygonBase::abort(bool showErrMsgBox) noexcept {
     return true;
   } catch (const Exception& e) {
     if (showErrMsgBox) {
-      QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+      QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     }
     return false;
   }
@@ -366,7 +361,7 @@ bool SymbolEditorState_DrawPolygonBase::addNextSegment() noexcept {
     updateStatusBarMessage();
     return true;
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     return false;
   }
 }
@@ -377,7 +372,7 @@ void SymbolEditorState_DrawPolygonBase::updateCursorPosition(
   if (!modifiers.testFlag(Qt::ShiftModifier)) {
     mCursorPos.mapToGrid(getGridInterval());
   }
-  mContext.graphicsScene.setSceneCursor(mCursorPos, true, false);
+  mAdapter.fsmSetSceneCursor(mCursorPos, true, false);
 
   if (mCurrentPolygon && mEditCmd) {
     updatePolygonPath();
@@ -527,7 +522,7 @@ void SymbolEditorState_DrawPolygonBase::updateOverlayText() noexcept {
   }
 
   text.replace(" ", "&nbsp;");
-  mContext.graphicsView.setInfoBoxText(text);
+  mAdapter.fsmSetViewInfoBoxText(text);
 }
 
 void SymbolEditorState_DrawPolygonBase::updateStatusBarMessage() noexcept {
@@ -538,29 +533,30 @@ void SymbolEditorState_DrawPolygonBase::updateStatusBarMessage() noexcept {
 
   if (mMode == Mode::RECT) {
     if (!mIsUndoCmdActive) {
-      emit statusBarMessageChanged(tr("Click to specify the first edge") %
-                                   note);
+      mAdapter.fsmSetStatusBarMessage(tr("Click to specify the first edge") %
+                                      note);
     } else {
-      emit statusBarMessageChanged(tr("Click to specify the second edge") %
-                                   note);
+      mAdapter.fsmSetStatusBarMessage(tr("Click to specify the second edge") %
+                                      note);
     }
   } else if (mMode == Mode::ARC) {
     if (!mIsUndoCmdActive) {
-      emit statusBarMessageChanged(tr("Click to specify the arc center") %
-                                   note);
+      mAdapter.fsmSetStatusBarMessage(tr("Click to specify the arc center") %
+                                      note);
     } else if (!mArcInSecondState) {
-      emit statusBarMessageChanged(tr("Click to specify the start point") %
-                                   note);
+      mAdapter.fsmSetStatusBarMessage(tr("Click to specify the start point") %
+                                      note);
     } else {
-      emit statusBarMessageChanged(tr("Click to specify the end point") % note);
+      mAdapter.fsmSetStatusBarMessage(tr("Click to specify the end point") %
+                                      note);
     }
   } else {
     if (!mIsUndoCmdActive) {
-      emit statusBarMessageChanged(tr("Click to specify the first point") %
-                                   note);
+      mAdapter.fsmSetStatusBarMessage(tr("Click to specify the first point") %
+                                      note);
     } else {
-      emit statusBarMessageChanged(tr("Click to specify the next point") %
-                                   note);
+      mAdapter.fsmSetStatusBarMessage(tr("Click to specify the next point") %
+                                      note);
     }
   }
 }

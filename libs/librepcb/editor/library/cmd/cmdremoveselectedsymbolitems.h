@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../../undocommandgroup.h"
-#include "../sym/fsm/symboleditorstate.h"
 
 #include <QtCore>
 
@@ -32,7 +31,12 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Symbol;
+
 namespace editor {
+
+class SymbolGraphicsItem;
 
 /*******************************************************************************
  *  Class CmdRemoveSelectedSymbolItems
@@ -47,8 +51,7 @@ public:
   CmdRemoveSelectedSymbolItems() = delete;
   CmdRemoveSelectedSymbolItems(const CmdRemoveSelectedSymbolItems& other) =
       delete;
-  CmdRemoveSelectedSymbolItems(
-      const SymbolEditorState::Context& context) noexcept;
+  CmdRemoveSelectedSymbolItems(Symbol& sym, SymbolGraphicsItem& item) noexcept;
   ~CmdRemoveSelectedSymbolItems() noexcept;
 
   // Operator Overloadings
@@ -62,7 +65,8 @@ private:
   bool performExecute() override;
 
   // Private Member Variables
-  const SymbolEditorState::Context& mContext;
+  Symbol& mSymbol;
+  SymbolGraphicsItem& mGraphicsItem;
 };
 
 /*******************************************************************************

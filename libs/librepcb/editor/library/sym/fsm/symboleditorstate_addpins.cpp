@@ -100,12 +100,14 @@ bool SymbolEditorState_AddPins::entry() noexcept {
           &SymbolEditorState_AddPins::execMassImport);
   mContext.commandToolBar.addWidget(std::move(toolButtonImport));
 
-  const Point pos = mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos())
-                        .mappedToGrid(mContext.graphicsScene.getGridInterval());
+  const Point pos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos())
+                        .mappedToGrid(getGridInterval());
   if (!addNextPin(pos)) {
     return false;
   }
-  mContext.graphicsView.setCursor(Qt::CrossCursor);
+  mAdapter.fsmSetViewCursor(Qt::CrossCursor);
+  mAdapter.fsmSetFeatures(SymbolEditorFsmAdapter::Feature::Rotate |
+                          SymbolEditorFsmAdapter::Feature::Mirror);
   return true;
 }
 
@@ -117,7 +119,7 @@ bool SymbolEditorState_AddPins::exit() noexcept {
     mCurrentPin.reset();
     mContext.undoStack.abortCmdGroup();
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     return false;
   }
 
@@ -125,17 +127,9 @@ bool SymbolEditorState_AddPins::exit() noexcept {
   mNameLineEdit = nullptr;
   mContext.commandToolBar.clear();
 
-  mContext.graphicsView.unsetCursor();
+  mAdapter.fsmSetViewCursor(std::nullopt);
+  mAdapter.fsmSetFeatures(SymbolEditorFsmAdapter::Features());
   return true;
-}
-
-QSet<EditorWidgetBase::Feature>
-    SymbolEditorState_AddPins::getAvailableFeatures() const noexcept {
-  return {
-      EditorWidgetBase::Feature::Abort,
-      EditorWidgetBase::Feature::Rotate,
-      EditorWidgetBase::Feature::Mirror,
-  };
 }
 
 /*******************************************************************************
@@ -165,7 +159,7 @@ bool SymbolEditorState_AddPins::processGraphicsSceneLeftMouseButtonPressed(
     mCurrentPin.reset();
     return addNextPin(currentPos);
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     return false;
   }
 }
@@ -198,6 +192,9 @@ bool SymbolEditorState_AddPins::processMirror(
  ******************************************************************************/
 
 bool SymbolEditorState_AddPins::addNextPin(const Point& pos) noexcept {
+  SymbolGraphicsItem* item = getGraphicsItem();
+  if (!item) return false;
+
   try {
     mNameLineEdit->setText(determineNextPinName());
     mContext.undoStack.beginCmdGroup(tr("Add symbol pin"));
@@ -209,14 +206,13 @@ bool SymbolEditorState_AddPins::addNextPin(const Point& pos) noexcept {
         SymbolPin::getDefaultNameAlignment());  // can throw
     mContext.undoStack.appendToCmdGroup(
         new CmdSymbolPinInsert(mContext.symbol.getPins(), mCurrentPin));
-    mCurrentGraphicsItem =
-        mContext.symbolGraphicsItem.getGraphicsItem(mCurrentPin);
+    mCurrentGraphicsItem = item->getGraphicsItem(mCurrentPin);
     Q_ASSERT(mCurrentGraphicsItem);
     mCurrentGraphicsItem->setSelected(true);
     mEditCmd.reset(new CmdSymbolPinEdit(mCurrentPin));
     return true;
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     mEditCmd.reset();
     mCurrentGraphicsItem.reset();
     mCurrentPin.reset();
@@ -248,7 +244,7 @@ void SymbolEditorState_AddPins::lengthEditValueChanged(
 void SymbolEditorState_AddPins::execMassImport() noexcept {
   try {
     CircuitIdentifierImportDialog dlg("symbol_editor/import_pins_dialog",
-                                      &mContext.editorWidget);
+                                      parentWidget());
     if (dlg.exec() != QDialog::Accepted) {
       return;
     }
@@ -269,7 +265,7 @@ void SymbolEditorState_AddPins::execMassImport() noexcept {
     }
     requestPaste(std::move(data));
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
 }
 

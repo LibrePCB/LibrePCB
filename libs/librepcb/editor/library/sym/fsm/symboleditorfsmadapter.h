@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_SCHEMATICEDITORFSMADAPTER_H
-#define LIBREPCB_EDITOR_SCHEMATICEDITORFSMADAPTER_H
+#ifndef LIBREPCB_EDITOR_SYMBOLEDITORFSMADAPTER_H
+#define LIBREPCB_EDITOR_SYMBOLEDITORFSMADAPTER_H
 
 /*******************************************************************************
  *  Includes
@@ -34,30 +34,31 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class NetSignal;
-class Schematic;
-
 namespace editor {
 
-class SchematicEditorState;
-class SchematicEditorState_AddComponent;
-class SchematicEditorState_AddNetLabel;
-class SchematicEditorState_AddText;
-class SchematicEditorState_DrawPolygon;
-class SchematicEditorState_DrawWire;
-class SchematicEditorState_Measure;
-class SchematicEditorState_Select;
-class SchematicGraphicsScene;
+class GraphicsScene;
+class SymbolEditorState;
+class SymbolEditorState_AddNames;
+class SymbolEditorState_AddPins;
+class SymbolEditorState_AddValues;
+class SymbolEditorState_DrawArc;
+class SymbolEditorState_DrawCircle;
+class SymbolEditorState_DrawLine;
+class SymbolEditorState_DrawPolygon;
+class SymbolEditorState_DrawRect;
+class SymbolEditorState_DrawText;
+class SymbolEditorState_Measure;
+class SymbolEditorState_Select;
+class SymbolGraphicsItem;
 
 /*******************************************************************************
- *  Class SchematicEditorFsmAdapter
+ *  Class SymbolEditorFsmAdapter
  ******************************************************************************/
 
 /**
- * @brief Interface for the integration of the schematic editor FSM
+ * @brief Interface for the integration of the Symbol editor FSM
  */
-class SchematicEditorFsmAdapter {
+class SymbolEditorFsmAdapter {
 public:
   enum class Feature : quint32 {
     Select = (1 << 0),
@@ -68,12 +69,14 @@ public:
     Rotate = (1 << 5),
     Mirror = (1 << 6),
     SnapToGrid = (1 << 7),
-    ResetTexts = (1 << 8),
-    Properties = (1 << 9),
+    Properties = (1 << 8),
+    ImportGraphics = (1 << 9),
   };
   Q_DECLARE_FLAGS(Features, Feature)
 
-  virtual SchematicGraphicsScene* fsmGetGraphicsScene() noexcept = 0;
+  virtual GraphicsScene* fsmGetGraphicsScene() noexcept = 0;
+  virtual SymbolGraphicsItem* fsmGetGraphicsItem() noexcept = 0;
+  virtual PositiveLength fsmGetGridInterval() const noexcept = 0;
   virtual void fsmSetViewCursor(
       const std::optional<Qt::CursorShape>& shape) noexcept = 0;
   virtual void fsmSetViewGrayOut(bool grayOut) noexcept = 0;
@@ -85,25 +88,22 @@ public:
   virtual QPainterPath fsmCalcPosWithTolerance(
       const Point& pos, qreal multiplier) const noexcept = 0;
   virtual Point fsmMapGlobalPosToScenePos(const QPoint& pos) const noexcept = 0;
-  virtual void fsmZoomToSceneRect(const QRectF& r) noexcept = 0;
-  virtual void fsmSetHighlightedNetSignals(
-      const QSet<const NetSignal*>& sigs) noexcept = 0;
-  virtual void fsmAbortBlockingToolsInOtherEditors() noexcept = 0;
   virtual void fsmSetStatusBarMessage(const QString& message,
                                       int timeoutMs = -1) noexcept = 0;
   virtual void fsmSetFeatures(Features features) noexcept = 0;
 
   virtual void fsmToolLeave() noexcept = 0;
-  virtual void fsmToolEnter(SchematicEditorState_Select& state) noexcept = 0;
-  virtual void fsmToolEnter(SchematicEditorState_DrawWire& state) noexcept = 0;
-  virtual void fsmToolEnter(
-      SchematicEditorState_AddNetLabel& state) noexcept = 0;
-  virtual void fsmToolEnter(
-      SchematicEditorState_AddComponent& state) noexcept = 0;
-  virtual void fsmToolEnter(
-      SchematicEditorState_DrawPolygon& state) noexcept = 0;
-  virtual void fsmToolEnter(SchematicEditorState_AddText& state) noexcept = 0;
-  virtual void fsmToolEnter(SchematicEditorState_Measure& state) noexcept = 0;
+  virtual void fsmToolEnter(SymbolEditorState_Select& state) noexcept = 0;
+  virtual void fsmToolEnter(SymbolEditorState_AddPins& state) noexcept = 0;
+  virtual void fsmToolEnter(SymbolEditorState_AddNames& state) noexcept = 0;
+  virtual void fsmToolEnter(SymbolEditorState_AddValues& state) noexcept = 0;
+  virtual void fsmToolEnter(SymbolEditorState_DrawLine& state) noexcept = 0;
+  virtual void fsmToolEnter(SymbolEditorState_DrawRect& state) noexcept = 0;
+  virtual void fsmToolEnter(SymbolEditorState_DrawPolygon& state) noexcept = 0;
+  virtual void fsmToolEnter(SymbolEditorState_DrawCircle& state) noexcept = 0;
+  virtual void fsmToolEnter(SymbolEditorState_DrawArc& state) noexcept = 0;
+  virtual void fsmToolEnter(SymbolEditorState_DrawText& state) noexcept = 0;
+  virtual void fsmToolEnter(SymbolEditorState_Measure& state) noexcept = 0;
 };
 
 /*******************************************************************************
@@ -113,8 +113,8 @@ public:
 }  // namespace editor
 }  // namespace librepcb
 
-Q_DECLARE_METATYPE(librepcb::editor::SchematicEditorFsmAdapter::Feature)
+Q_DECLARE_METATYPE(librepcb::editor::SymbolEditorFsmAdapter::Feature)
 Q_DECLARE_OPERATORS_FOR_FLAGS(
-    librepcb::editor::SchematicEditorFsmAdapter::Features)
+    librepcb::editor::SymbolEditorFsmAdapter::Features)
 
 #endif

@@ -145,12 +145,14 @@ bool SymbolEditorState_DrawTextBase::entry() noexcept {
           &SymbolEditorState_DrawTextBase::vAlignActionGroupValueChanged);
   mContext.commandToolBar.addActionGroup(std::move(vAlignActionGroup));
 
-  const Point pos = mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos())
-                        .mappedToGrid(mContext.graphicsScene.getGridInterval());
+  const Point pos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos())
+                        .mappedToGrid(getGridInterval());
   if (!startAddText(pos)) {
     return false;
   }
-  mContext.graphicsView.setCursor(Qt::CrossCursor);
+  mAdapter.fsmSetViewCursor(Qt::CrossCursor);
+  mAdapter.fsmSetFeatures(SymbolEditorFsmAdapter::Feature::Rotate |
+                          SymbolEditorFsmAdapter::Feature::Mirror);
   return true;
 }
 
@@ -162,17 +164,9 @@ bool SymbolEditorState_DrawTextBase::exit() noexcept {
   // cleanup command toolbar
   mContext.commandToolBar.clear();
 
-  mContext.graphicsView.unsetCursor();
+  mAdapter.fsmSetViewCursor(std::nullopt);
+  mAdapter.fsmSetFeatures(SymbolEditorFsmAdapter::Features());
   return true;
-}
-
-QSet<EditorWidgetBase::Feature>
-    SymbolEditorState_DrawTextBase::getAvailableFeatures() const noexcept {
-  return {
-      EditorWidgetBase::Feature::Abort,
-      EditorWidgetBase::Feature::Rotate,
-      EditorWidgetBase::Feature::Mirror,
-  };
 }
 
 /*******************************************************************************
@@ -240,6 +234,9 @@ bool SymbolEditorState_DrawTextBase::processMirror(
  ******************************************************************************/
 
 bool SymbolEditorState_DrawTextBase::startAddText(const Point& pos) noexcept {
+  SymbolGraphicsItem* item = getGraphicsItem();
+  if (!item) return false;
+
   try {
     mStartPos = pos;
     mContext.undoStack.beginCmdGroup(tr("Add symbol text"));
@@ -249,13 +246,12 @@ bool SymbolEditorState_DrawTextBase::startAddText(const Point& pos) noexcept {
     mContext.undoStack.appendToCmdGroup(
         new CmdTextInsert(mContext.symbol.getTexts(), mCurrentText));
     mEditCmd.reset(new CmdTextEdit(*mCurrentText));
-    mCurrentGraphicsItem =
-        mContext.symbolGraphicsItem.getGraphicsItem(mCurrentText);
+    mCurrentGraphicsItem = item->getGraphicsItem(mCurrentText);
     Q_ASSERT(mCurrentGraphicsItem);
     mCurrentGraphicsItem->setSelected(true);
     return true;
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     mCurrentGraphicsItem.reset();
     mCurrentText.reset();
     mEditCmd.reset();
@@ -277,7 +273,7 @@ bool SymbolEditorState_DrawTextBase::finishAddText(const Point& pos) noexcept {
     mContext.undoStack.commitCmdGroup();
     return true;
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     return false;
   }
 }
@@ -291,7 +287,7 @@ bool SymbolEditorState_DrawTextBase::abortAddText() noexcept {
     mContext.undoStack.abortCmdGroup();
     return true;
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     return false;
   }
 }

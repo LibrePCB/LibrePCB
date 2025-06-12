@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-
 #include <librepcb/core/geometry/circle.h>
 #include <librepcb/core/geometry/polygon.h>
 #include <librepcb/core/geometry/text.h>
@@ -75,7 +74,7 @@ public:
   const TextList& getTexts() const noexcept { return mTexts; }
 
   // General Methods
-  std::unique_ptr<QMimeData> toMimeData(const GraphicsLayerList& layers);
+  std::unique_ptr<QMimeData> toMimeData();
   static std::unique_ptr<SymbolClipboardData> fromMimeData(
       const QMimeData* mime);
 
@@ -83,7 +82,7 @@ public:
   SymbolClipboardData& operator=(const SymbolClipboardData& rhs) = delete;
 
 private:  // Methods
-  QPixmap generatePixmap(const GraphicsLayerList& layers) noexcept;
+  QPixmap generatePixmap() noexcept;
   static QString getMimeType() noexcept;
 
 private:  // Data

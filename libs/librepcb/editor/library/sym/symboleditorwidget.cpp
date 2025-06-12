@@ -158,22 +158,12 @@ SymbolEditorWidget::SymbolEditorWidget(const Context& context,
   mUi->graphicsView->zoomAll();
 
   // Load finite state machine (FSM).
-  SymbolEditorFsm::Context fsmContext{mContext,
-                                      *this,
-                                      *mUndoStack,
-                                      *mGraphicsScene,
-                                      *mUi->graphicsView,
-                                      mLengthUnit,
-                                      *mSymbol,
-                                      *mGraphicsItem,
-                                      *mCommandToolBarProxy};
+  SymbolEditorFsmAdapter* adapter = 0;
+  SymbolEditorFsm::Context fsmContext{
+      *mSymbol,    *mUndoStack,           mContext.readOnly,
+      mLengthUnit, *mCommandToolBarProxy, *adapter,
+  };
   mFsm.reset(new SymbolEditorFsm(fsmContext));
-  connect(mUndoStack.data(), &UndoStack::stateModified, mFsm.data(),
-          &SymbolEditorFsm::updateAvailableFeatures);
-  connect(mFsm.data(), &SymbolEditorFsm::availableFeaturesChanged, this,
-          [this]() { emit availableFeaturesChanged(getAvailableFeatures()); });
-  connect(mFsm.data(), &SymbolEditorFsm::statusBarMessageChanged, this,
-          &SymbolEditorWidget::setStatusBarMessage);
 
   // Last but not least, connect the graphics scene events with the FSM.
   mUi->graphicsView->setEventHandlerObject(this);
@@ -201,12 +191,7 @@ SymbolEditorWidget::~SymbolEditorWidget() noexcept {
 
 QSet<EditorWidgetBase::Feature> SymbolEditorWidget::getAvailableFeatures()
     const noexcept {
-  QSet<EditorWidgetBase::Feature> features = {
-      EditorWidgetBase::Feature::Close,
-      EditorWidgetBase::Feature::GraphicsView,
-      EditorWidgetBase::Feature::ExportGraphics,
-  };
-  return features + mFsm->getAvailableFeatures();
+  return mFeatures;
 }
 
 /*******************************************************************************
@@ -233,8 +218,6 @@ void SymbolEditorWidget::connectEditor(
   mToolsActionGroup->setActionEnabled(Tool::DRAW_TEXT, enabled);
   mToolsActionGroup->setActionEnabled(Tool::MEASURE, true);
   mToolsActionGroup->setCurrentAction(mFsm->getCurrentTool());
-  connect(mFsm.data(), &SymbolEditorFsm::toolChanged, mToolsActionGroup,
-          &ExclusiveActionGroup::setCurrentAction);
 
   mStatusBar->setField(StatusBar::AbsolutePosition, true);
   mStatusBar->setLengthUnit(mLengthUnit);
@@ -243,14 +226,182 @@ void SymbolEditorWidget::connectEditor(
 }
 
 void SymbolEditorWidget::disconnectEditor() noexcept {
-  disconnect(mFsm.data(), &SymbolEditorFsm::toolChanged, mToolsActionGroup,
-             &ExclusiveActionGroup::setCurrentAction);
-
   mStatusBar->setField(StatusBar::AbsolutePosition, false);
   disconnect(mUi->graphicsView, &GraphicsView::cursorScenePositionChanged,
              mStatusBar, &StatusBar::setAbsoluteCursorPosition);
 
   EditorWidgetBase::disconnectEditor();
+}
+
+/*******************************************************************************
+ *  SymbolEditorFsmAdapter
+ ******************************************************************************/
+
+GraphicsScene* SymbolEditorWidget::fsmGetGraphicsScene() noexcept {
+  return mGraphicsScene.data();
+}
+
+SymbolGraphicsItem* SymbolEditorWidget::fsmGetGraphicsItem() noexcept {
+  return mGraphicsItem.data();
+}
+
+PositiveLength SymbolEditorWidget::fsmGetGridInterval() const noexcept {
+  return mGraphicsScene->getGridInterval();
+}
+
+void SymbolEditorWidget::fsmSetViewCursor(
+    const std::optional<Qt::CursorShape>& shape) noexcept {
+  if (shape) {
+    mUi->graphicsView->setCursor(*shape);
+  } else {
+    mUi->graphicsView->unsetCursor();
+  }
+}
+
+void SymbolEditorWidget::fsmSetViewGrayOut(bool grayOut) noexcept {
+  mGraphicsScene->setGrayOut(grayOut);
+}
+
+void SymbolEditorWidget::fsmSetViewInfoBoxText(const QString& text) noexcept {
+  mUi->graphicsView->setInfoBoxText(text);
+}
+
+void SymbolEditorWidget::fsmSetViewRuler(
+    const std::optional<std::pair<Point, Point>>& pos) noexcept {
+  mGraphicsScene->setRulerPositions(pos);
+}
+
+void SymbolEditorWidget::fsmSetSceneCursor(const Point& pos, bool cross,
+                                           bool circle) noexcept {
+  mGraphicsScene->setSceneCursor(pos, cross, circle);
+}
+
+QPainterPath SymbolEditorWidget::fsmCalcPosWithTolerance(
+    const Point& pos, qreal multiplier) const noexcept {
+  return mUi->graphicsView->calcPosWithTolerance(pos, multiplier);
+}
+
+Point SymbolEditorWidget::fsmMapGlobalPosToScenePos(
+    const QPoint& pos) const noexcept {
+  return mUi->graphicsView->mapGlobalPosToScenePos(pos);
+}
+
+void SymbolEditorWidget::fsmSetStatusBarMessage(const QString& message,
+                                                int timeoutMs) noexcept {
+  setStatusBarMessage(message, timeoutMs);
+}
+
+void SymbolEditorWidget::fsmSetFeatures(Features features) noexcept {
+  QSet<EditorWidgetBase::Feature> editorFeatures = {
+      EditorWidgetBase::Feature::Close,
+      EditorWidgetBase::Feature::GraphicsView,
+      EditorWidgetBase::Feature::ExportGraphics,
+  };
+  if (features.testFlag(SymbolEditorFsmAdapter::Feature::Select)) {
+    editorFeatures |= EditorWidgetBase::Feature::SelectGraphics;
+  }
+  if (features.testFlag(SymbolEditorFsmAdapter::Feature::Cut)) {
+    editorFeatures |= EditorWidgetBase::Feature::Cut;
+  }
+  if (features.testFlag(SymbolEditorFsmAdapter::Feature::Copy)) {
+    editorFeatures |= EditorWidgetBase::Feature::Copy;
+  }
+  if (features.testFlag(SymbolEditorFsmAdapter::Feature::Paste)) {
+    editorFeatures |= EditorWidgetBase::Feature::Paste;
+  }
+  if (features.testFlag(SymbolEditorFsmAdapter::Feature::Remove)) {
+    editorFeatures |= EditorWidgetBase::Feature::Remove;
+  }
+  if (features.testFlag(SymbolEditorFsmAdapter::Feature::Rotate)) {
+    editorFeatures |= EditorWidgetBase::Feature::Rotate;
+  }
+  if (features.testFlag(SymbolEditorFsmAdapter::Feature::Mirror)) {
+    editorFeatures |= EditorWidgetBase::Feature::Mirror;
+  }
+  if (features.testFlag(SymbolEditorFsmAdapter::Feature::SnapToGrid)) {
+    editorFeatures |= EditorWidgetBase::Feature::SnapToGrid;
+  }
+  if (features.testFlag(SymbolEditorFsmAdapter::Feature::Properties)) {
+    editorFeatures |= EditorWidgetBase::Feature::Properties;
+  }
+  if (features.testFlag(SymbolEditorFsmAdapter::Feature::ImportGraphics)) {
+    editorFeatures |= EditorWidgetBase::Feature::ImportGraphics;
+  }
+
+  if (editorFeatures != mFeatures) {
+    mFeatures = editorFeatures;
+    emit availableFeaturesChanged(mFeatures);
+  }
+}
+
+void SymbolEditorWidget::fsmToolLeave() noexcept {
+  mToolsActionGroup->setCurrentAction(-1);
+}
+
+void SymbolEditorWidget::fsmToolEnter(
+    SymbolEditorState_Select& state) noexcept {
+  Q_UNUSED(state);
+  mToolsActionGroup->setCurrentAction(Tool::SELECT);
+}
+
+void SymbolEditorWidget::fsmToolEnter(
+    SymbolEditorState_AddPins& state) noexcept {
+  Q_UNUSED(state);
+  mToolsActionGroup->setCurrentAction(Tool::ADD_PINS);
+}
+
+void SymbolEditorWidget::fsmToolEnter(
+    SymbolEditorState_AddNames& state) noexcept {
+  Q_UNUSED(state);
+  mToolsActionGroup->setCurrentAction(Tool::ADD_NAMES);
+}
+
+void SymbolEditorWidget::fsmToolEnter(
+    SymbolEditorState_AddValues& state) noexcept {
+  Q_UNUSED(state);
+  mToolsActionGroup->setCurrentAction(Tool::ADD_VALUES);
+}
+
+void SymbolEditorWidget::fsmToolEnter(
+    SymbolEditorState_DrawLine& state) noexcept {
+  Q_UNUSED(state);
+  mToolsActionGroup->setCurrentAction(Tool::DRAW_LINE);
+}
+
+void SymbolEditorWidget::fsmToolEnter(
+    SymbolEditorState_DrawRect& state) noexcept {
+  Q_UNUSED(state);
+  mToolsActionGroup->setCurrentAction(Tool::DRAW_RECT);
+}
+
+void SymbolEditorWidget::fsmToolEnter(
+    SymbolEditorState_DrawPolygon& state) noexcept {
+  Q_UNUSED(state);
+  mToolsActionGroup->setCurrentAction(Tool::DRAW_POLYGON);
+}
+
+void SymbolEditorWidget::fsmToolEnter(
+    SymbolEditorState_DrawCircle& state) noexcept {
+  Q_UNUSED(state);
+  mToolsActionGroup->setCurrentAction(Tool::DRAW_CIRCLE);
+}
+
+void SymbolEditorWidget::fsmToolEnter(
+    SymbolEditorState_DrawArc& state) noexcept {
+  Q_UNUSED(state);
+  mToolsActionGroup->setCurrentAction(Tool::DRAW_ARC);
+}
+
+void SymbolEditorWidget::fsmToolEnter(
+    SymbolEditorState_DrawText& state) noexcept {
+  Q_UNUSED(state);
+  mToolsActionGroup->setCurrentAction(Tool::DRAW_TEXT);
+}
+
+void SymbolEditorWidget::fsmToolEnter(
+    SymbolEditorState_Measure& state) noexcept {
+  Q_UNUSED(state);
+  mToolsActionGroup->setCurrentAction(Tool::MEASURE);
 }
 
 /*******************************************************************************
@@ -666,9 +817,9 @@ void SymbolEditorWidget::setGridProperties(const PositiveLength& interval,
   if (mStatusBar) {
     mStatusBar->setLengthUnit(unit);
   }
-  if (mFsm) {
-    mFsm->updateAvailableFeatures();  // Re-calculate "snap to grid" feature!
-  }
+  // if (mFsm) {
+  //   mFsm->updateAvailableFeatures();  // Re-calculate "snap to grid" feature!
+  // }
 }
 
 /*******************************************************************************

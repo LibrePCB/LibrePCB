@@ -40,10 +40,13 @@ namespace editor {
 SymbolEditorState_Measure::SymbolEditorState_Measure(
     const Context& context) noexcept
   : SymbolEditorState(context), mTool(new MeasureTool()) {
-  connect(mTool.data(), &MeasureTool::infoBoxTextChanged,
-          &mContext.graphicsView, &GraphicsView::setInfoBoxText);
+  connect(
+      mTool.data(), &MeasureTool::infoBoxTextChanged, this,
+      [this](const QString& text) { mAdapter.fsmSetViewInfoBoxText(text); });
   connect(mTool.data(), &MeasureTool::statusBarMessageChanged, this,
-          &SymbolEditorState_Measure::statusBarMessageChanged);
+          [this](const QString& message, int timeoutMs) {
+            mAdapter.fsmSetStatusBarMessage(message, timeoutMs);
+          });
 }
 
 SymbolEditorState_Measure::~SymbolEditorState_Measure() noexcept {
@@ -54,26 +57,22 @@ SymbolEditorState_Measure::~SymbolEditorState_Measure() noexcept {
  ******************************************************************************/
 
 bool SymbolEditorState_Measure::entry() noexcept {
+  GraphicsScene* scene = getGraphicsScene();
+  if (!scene) return false;
+
+  mAdapter.fsmToolEnter(*this);
+  mAdapter.fsmSetViewCursor(Qt::CrossCursor);
   mTool->setSymbol(&mContext.symbol);
-  mTool->enter(mContext.graphicsScene, getLengthUnit(),
-               mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos()));
-  mContext.graphicsView.setCursor(Qt::CrossCursor);
+  mTool->enter(*scene, getLengthUnit(),
+               mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos()));
   return true;
 }
 
 bool SymbolEditorState_Measure::exit() noexcept {
   mTool->leave();
-  mContext.graphicsView.unsetCursor();
+  mAdapter.fsmSetViewCursor(std::nullopt);
+  mAdapter.fsmToolLeave();
   return true;
-}
-
-QSet<EditorWidgetBase::Feature>
-    SymbolEditorState_Measure::getAvailableFeatures() const noexcept {
-  return {
-      EditorWidgetBase::Feature::Abort,
-      EditorWidgetBase::Feature::Copy,
-      EditorWidgetBase::Feature::Remove,
-  };
 }
 
 /*******************************************************************************
