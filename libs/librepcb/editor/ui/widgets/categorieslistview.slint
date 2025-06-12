@@ -1,55 +1,98 @@
+import { Palette } from "std-widgets.slint";
 import { LibraryElementCategoryData } from "../api.slint";
 import { IconButton } from "iconbutton.slint";
 
 export component CategoryTreeLabel inherits VerticalLayout {
-    in property <[string]> category;
+    in property <[string]> names;
 
-    for name[index] in category: HorizontalLayout {
+    for name[index] in names: HorizontalLayout {
         padding-left: index * 8px;
 
         Text {
-            font-weight: (index == (category.length - 1)) ? 600 : 400;
+            font-weight: (index == (names.length - 1)) ? 600 : 400;
             overflow: elide;
             text: ((index > 0) ? "⤷ " : "") + name;
         }
     }
 }
 
-export component CategoriesListView {
+component CategoriesListViewRow inherits TouchArea {
+    Rectangle {
+        height: self.preferred-height;
+        background: #393939;
+        border-radius: 2px;
+
+        HorizontalLayout {
+            padding: 2px;
+            padding-left: 4px;
+            padding-right: 4px;
+            spacing: 5px;
+
+            @children
+        }
+    }
+}
+
+export component CategoriesListView inherits HorizontalLayout {
     in-out property <[LibraryElementCategoryData]> model;
     in property <bool> read-only: false;
 
+    callback add-triggered();
+
+    alignment: start;
+
     VerticalLayout {
-        spacing: 7px;
+        horizontal-stretch: 0;
+        spacing: 5px;
 
-        for item[index] in model: item-ta := TouchArea {
-            HorizontalLayout {
-                alignment: start;
-                spacing: 5px;
+        for item[index] in model: item-ta := CategoriesListViewRow {
+            CategoryTreeLabel {
+                names: item.names;
+            }
 
-                CategoryTreeLabel {
-                    category: item.category;
+            if !read-only: Rectangle {
+                width: 10px;
+                visible: item-ta.has-hover;
+            }
+
+            if !read-only: Rectangle {
+                width: 1px;
+                background: #707070;
+                visible: item-ta.has-hover;
+            }
+
+            if !read-only: IconButton {
+                width: 16px;
+                style: hyperlink;
+                icon: @image-url("../../../../font-awesome/svgs/solid/trash-can.svg");
+                visible: item-ta.has-hover;
+
+                clicked => {
+                    model[index].delete = true;
                 }
+            }
+        }
 
-                if (!read-only) && item-ta.has-hover: Rectangle {
-                    width: 10px;
-                }
+        CategoriesListViewRow {
+            mouse-cursor: pointer;
 
-                if (!read-only) && item-ta.has-hover: Rectangle {
-                    width: 1px;
-                    background: #707070;
-                }
+            Image {
+                width: 16px;
+                height: self.width;
+                image-fit: contain;
+                colorize: add-txt.color;
+                source: @image-url("../../../../bootstrap-icons/icons/plus-circle.svg");
+            }
 
-                if (!read-only) && item-ta.has-hover: IconButton {
-                    y: (parent.height - self.height) / 2;
-                    height: 16px;
-                    style: hyperlink;
-                    icon: @image-url("../../../../font-awesome/svgs/solid/trash-can.svg");
+            add-txt := Text {
+                color: parent.has-hover ? white : Palette.foreground;
+                vertical-alignment: center;
+                overflow: elide;
+                text: @tr("Add Category");
+            }
 
-                    clicked => {
-                        model[index].delete = true;
-                    }
-                }
+            clicked => {
+                add-triggered();
             }
         }
     }

@@ -378,7 +378,7 @@ component LibraryMetadata inherits GridLayout {
                     font-size: 11px;
                     vertical-alignment: center;
                     overflow: elide;
-                    text: @tr("Add dependency");
+                    text: @tr("Add Dependency");
                 }
             }
         }
@@ -767,8 +767,6 @@ export component LibraryTab inherits Tab {
 
     // Compact mode: Slide between metadata and content.
     if (!tabs[index].wizard-mode) && compact-layout: SlideView {
-        width: 100%;
-        height: 100%;
         pages: [@tr("Metadata"), @tr("Import"), @tr("Library Content")];
         current-index: tabs[index].page-index;
 

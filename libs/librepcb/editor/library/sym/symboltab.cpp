@@ -24,12 +24,15 @@
 
 #include "../../graphics/graphicsscene.h"
 #include "../../graphics/slintgraphicsview.h"
+#include "../../rulecheck/rulecheckmessagesmodel.h"
 #include "../../undostack.h"
 #include "../../utils/editortoolbox.h"
 #include "../../utils/slinthelpers.h"
 #include "../../utils/uihelpers.h"
+#include "../../workspace/categorytreemodel2.h"
 #include "../cmd/cmdlibraryelementedit.h"
 #include "../libraryeditor2.h"
+#include "../libraryelementcategoriesmodel.h"
 #include "graphics/graphicslayerlist.h"
 #include "symbolgraphicsitem.h"
 
@@ -63,10 +66,18 @@ SymbolTab::SymbolTab(LibraryEditor2& editor, std::unique_ptr<Symbol> sym,
         &mEditor.getWorkspace().getSettings())),
     mView(new SlintGraphicsView(this)),
     mWizardMode(wizardMode),
+    mCurrentPageIndex(wizardMode ? 0 : 2),
     mGridStyle(Theme::GridStyle::None),
     mFrameIndex(0),
     mNameParsed(mSymbol->getNames().getDefaultValue()),
-    mVersionParsed(mSymbol->getVersion()) {
+    mVersionParsed(mSymbol->getVersion()),
+    mCategories(new LibraryElementCategoriesModel(
+        editor.getWorkspace(),
+        LibraryElementCategoriesModel::Type::ComponentCategory)),
+    mCategoriesTree(
+        new CategoryTreeModel2(editor.getWorkspace().getLibraryDb(),
+                               editor.getWorkspace().getSettings(),
+                               CategoryTreeModel2::Filter::CmpCat)) {
   // Setup graphics view.
   mView->setEventHandler(this);
   connect(mView.get(), &SlintGraphicsView::transformChanged, this,
@@ -79,6 +90,10 @@ SymbolTab::SymbolTab(LibraryEditor2& editor, std::unique_ptr<Symbol> sym,
           &SymbolTab::scheduleChecks);
   connect(mUndoStack.get(), &UndoStack::stateModified, this,
           &SymbolTab::refreshMetadata);
+
+  // Connect models.
+  connect(mCategories.get(), &LibraryElementCategoriesModel::modified, this,
+          &SymbolTab::commitMetadata, Qt::QueuedConnection);
 
   // Refresh content.
   refreshMetadata();
@@ -141,6 +156,8 @@ ui::SymbolTabData SymbolTab::getDerivedUiData() const noexcept {
 
   return ui::SymbolTabData{
       mEditor.getUiIndex(),  // Library index
+      mWizardMode,  // Wizard mode
+      mCurrentPageIndex,  // Page index
       q2s(mSymbol->getDirectory().getAbsPath().toStr()),  // Path
       mName,  // Name
       mNameError,  // Name error
@@ -150,13 +167,14 @@ ui::SymbolTabData SymbolTab::getDerivedUiData() const noexcept {
       mVersion,  // Version
       mVersionError,  // Version error
       mDeprecated,  // Deprecated
-      nullptr,  // Categories
+      mCategories,  // Categories
+      mCategoriesTree,  // Categories tree
       ui::RuleCheckData{
-          ui::RuleCheckType::None,
-          ui::RuleCheckState::NotRunYet,
-          nullptr,
-          0,
-          slint::SharedString(),
+          ui::RuleCheckType::SymbolCheck,  // Checks type
+          ui::RuleCheckState::UpToDate,  // Checks state
+          mCheckMessages,  // Checks messages
+          mCheckMessages->getUnapprovedCount(),  // Checks unapproved count
+          mCheckError,  // Checks execution error
       },
       q2s(bgColor),  // Background color
       q2s(fgColor),  // Foreground color
@@ -177,6 +195,7 @@ ui::SymbolTabData SymbolTab::getDerivedUiData() const noexcept {
       ui::LineEditData{},  // Tool value
       q2s(mSceneImagePos),  // Scene image position
       0,  // Frame index
+      slint::SharedString(),  // New category
   };
 }
 
@@ -194,7 +213,14 @@ void SymbolTab::setDerivedUiData(const ui::SymbolTabData& data) noexcept {
   }
   mDeprecated = data.deprecated;
 
+  // Page index
+  mCurrentPageIndex = data.page_index;
+
   mSceneImagePos = s2q(data.scene_image_pos);
+
+  if (auto uuid = Uuid::tryFromString(s2q(data.new_category))) {
+    mCategories->add(*uuid);
+  }
 
   // Update UI on changes
   onDerivedUiDataChanged.notify();
@@ -220,6 +246,21 @@ void SymbolTab::deactivate() noexcept {
 
 void SymbolTab::trigger(ui::TabAction a) noexcept {
   switch (a) {
+    case ui::TabAction::Back: {
+      if (mWizardMode && (mCurrentPageIndex > 0)) {
+        --mCurrentPageIndex;
+      }
+      onDerivedUiDataChanged.notify();
+      break;
+    }
+    case ui::TabAction::Next: {
+      if (mWizardMode && (mCurrentPageIndex == 1)) {
+        mWizardMode = false;
+        ++mCurrentPageIndex;
+      }
+      onDerivedUiDataChanged.notify();
+      break;
+    }
     case ui::TabAction::Apply: {
       commitMetadata();
       refreshMetadata();
@@ -232,6 +273,7 @@ void SymbolTab::trigger(ui::TabAction a) noexcept {
     }
     case ui::TabAction::Undo: {
       try {
+        commitMetadata();
         mUndoStack->undo();
       } catch (const Exception& e) {
         QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
@@ -240,6 +282,7 @@ void SymbolTab::trigger(ui::TabAction a) noexcept {
     }
     case ui::TabAction::Redo: {
       try {
+        commitMetadata();
         mUndoStack->redo();
       } catch (const Exception& e) {
         QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
@@ -549,19 +592,7 @@ void SymbolTab::refreshMetadata() noexcept {
   mVersionError = slint::SharedString();
   mVersionParsed = mSymbol->getVersion();
   mDeprecated = mSymbol->isDeprecated();
-
-  /*std::vector<slint::SharedString> parents;
-  try {
-    CategoryTreeBuilder<ComponentCategory> builder(
-        mEditor.getWorkspace().getLibraryDb(),
-        mEditor.getWorkspace().getSettings().libraryLocaleOrder.get(), true);
-    for (auto item : builder.buildTree(mSymbol->getParentUuid())) {
-      parents.push_back(q2s(item));
-    }
-  } catch (const Exception& e) {
-    parents.push_back(q2s(e.getMsg()));
-  }
-  mParents->set_vector(parents);*/
+  mCategories->setCategories(mSymbol->getCategories());
 
   onUiDataChanged.notify();
   onDerivedUiDataChanged.notify();
@@ -580,6 +611,7 @@ void SymbolTab::commitMetadata() noexcept {
     cmd->setAuthor(s2q(mAuthor).trimmed());
     cmd->setVersion(mVersionParsed);
     cmd->setDeprecated(mDeprecated);
+    cmd->setCategories(mCategories->getCategories());
     mUndoStack->execCmd(cmd.release());
   } catch (const Exception& e) {
     QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
@@ -603,8 +635,13 @@ bool SymbolTab::save() noexcept {
     mSymbol->getDirectory().getFileSystem()->save();
     mUndoStack->setClean();
     mManualModificationsMade = false;
-    mEditor.getWorkspace().getLibraryDb().startLibraryRescan();
+
+    if (mWizardMode && (mCurrentPageIndex == 0)) {
+      ++mCurrentPageIndex;
+    }
     refreshMetadata();
+
+    mEditor.getWorkspace().getLibraryDb().startLibraryRescan();
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());

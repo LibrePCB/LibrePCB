@@ -41,8 +41,10 @@ class Symbol;
 
 namespace editor {
 
+class CategoryTreeModel2;
 class GraphicsLayerList;
 class GraphicsScene;
+class LibraryElementCategoriesModel;
 class SlintGraphicsView;
 class SymbolGraphicsItem;
 
@@ -134,6 +136,7 @@ private:
 
   // State
   bool mWizardMode;
+  int mCurrentPageIndex;
   Theme::GridStyle mGridStyle;
   QPointF mSceneImagePos;
   int mFrameIndex;
@@ -149,6 +152,10 @@ private:
   slint::SharedString mVersionError;
   Version mVersionParsed;
   bool mDeprecated;
+
+  // UI data
+  std::shared_ptr<LibraryElementCategoriesModel> mCategories;
+  std::shared_ptr<CategoryTreeModel2> mCategoriesTree;
 
   // Objects in active state
   std::unique_ptr<GraphicsScene> mScene;

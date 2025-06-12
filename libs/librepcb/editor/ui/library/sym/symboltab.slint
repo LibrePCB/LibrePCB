@@ -3,27 +3,29 @@
 //import { AddTextToolBar } from "addtexttoolbar.slint";
 //import { AddComponentToolBar } from "addcomponenttoolbar.slint";
 import { Tab } from "../../tab.slint";
+import { LibraryRuleCheckLink } from "../libraryrulechecklink.slint";
 import {
     Button,
+    CategoriesListView,
     LineEdit,
     LinkText,
     MessageBox,
     Palette,
-    CategoriesListView,
     SceneButton,
     SlideView,
     Switch,
     TextEdit,
     ToolButton,
+    TreeItemPickerPopup,
 } from "../../widgets.slint";
 import {
     Backend,
     Constants,
     Data,
-    FeatureState,
     DismissableMessageAction,
     EditorCommandSet as Cmd,
     EditorTool,
+    FeatureState,
     PanelPage,
     SymbolTabData,
     TabAction,
@@ -188,15 +190,59 @@ component SymbolMetadata inherits GridLayout {
         CategoriesListView {
             model: tabs[index].categories;
             read-only: read-only;
+
+            add-triggered => {
+                add-category-popup.show();
+            }
+        }
+    }
+
+    Row {
+        Rectangle { }
+
+        HorizontalLayout {
+            spacing: 5px;
+
+            if !read-only: save-btn := Button {
+                width: max(self.preferred-width, 100px);
+                primary: Data.sections[section-index].tabs[index].unsaved-changes;
+                icon: @image-url("../../../../../font-awesome/svgs/solid/check.svg");
+                text: @tr("Save");
+
+                clicked => {
+                    Backend.trigger-tab(section-index, index, TabAction.save);
+                }
+            }
+
+            LibraryRuleCheckLink {
+                data: tabs[index].checks;
+
+                clicked => {
+                    Data.set-current-tab(section-index, index);
+                    Data.panel-page = PanelPage.rule-check;
+                }
+            }
+
+            Rectangle { }
         }
     }
 
     Row {
         Rectangle { }
     }
+
+    add-category-popup := TreeItemPickerPopup {
+        width: parent.width;
+        height: parent.height;
+        model: tabs[index].categories-tree;
+
+        item-picked(item) => {
+            tabs[index].new-category = item.user-data;
+        }
+    }
 }
 
-component SymbolEditor inherits Rectangle {
+component SymbolEditor inherits TouchArea {
     in property <int> section-index;
     in-out property <[SymbolTabData]> tabs;
     in property <int> index;
@@ -207,6 +253,10 @@ component SymbolEditor inherits Rectangle {
         Data.set-current-tab(section-index, index);
         Backend.trigger-tab(section-index, index, action);
     }
+
+    callback focus-requested();
+
+    mouse-cursor: tabs[index].tool-cursor;
 
     if Data.preview-mode: Rectangle {
         background: white;
@@ -364,6 +414,18 @@ component SymbolEditor inherits Rectangle {
             }
         }
     }
+
+    pointer-event(event) => {
+        if event.kind == PointerEventKind.down {
+            Data.set-current-tab(section-index, index);
+            focus-requested();
+        }
+        Backend.scene-pointer-event(section-index, self.mouse-x, self.mouse-y, event);
+    }
+
+    scroll-event(event) => {
+        Backend.scene-scrolled(section-index, self.mouse-x, self.mouse-y, event) ? accept : reject
+    }
 }
 
 export component SymbolTab inherits Tab {
@@ -373,6 +435,7 @@ export component SymbolTab inherits Tab {
     property <int> index: section.current-tab-index;
     property <bool> read-only: section.tabs[index].features.save != FeatureState.enabled;
     property <EditorTool> tool: tabs[index].tool;
+    property <bool> compact-layout: self.width < 1024px;
 
     enabled: true;
 
@@ -390,8 +453,49 @@ export component SymbolTab inherits Tab {
         tabs[index].scene-image-pos = self.absolute-position;
     }
 
-    SlideView {
+    // Wizard mode: Only one page at a time.
+    if tabs[index].wizard-mode && (tabs[index].page-index <= 0): SymbolMetadata {
+        section-index: section-index;
+        tabs: tabs;
+        index: index;
+        read-only: read-only;
+    }
+
+    // Normal mode: Editor left, metadata right.
+    if (!tabs[index].wizard-mode) && (!compact-layout): HorizontalLayout {
+        SymbolEditor {
+            horizontal-stretch: 1;
+            section-index: section-index;
+            tabs: tabs;
+            index: index;
+            //read-only: read-only;
+
+            focus-requested => {
+                if !root.has-focus {
+                    root.focus();
+                }
+            }
+        }
+
+        Rectangle {
+            width: 1px;
+            background: #555555;
+        }
+
+        SymbolMetadata {
+            horizontal-stretch: 1;
+            max-width: min(500px, parent.width * 0.4);
+            section-index: section-index;
+            tabs: tabs;
+            index: index;
+            read-only: read-only;
+        }
+    }
+
+    // Compact mode: Slide between metadata and content.
+    if (!tabs[index].wizard-mode) && compact-layout: SlideView {
         pages: [@tr("Metadata"), @tr("Pins"), @tr("Symbol")];
+        current-index: tabs[index].page-index;
 
         SymbolMetadata {
             width: parent.width;
@@ -401,32 +505,26 @@ export component SymbolTab inherits Tab {
             read-only: read-only;
         }
 
-        Rectangle { }
-
-        ta := TouchArea {
+        Rectangle {
             width: parent.width;
-            mouse-cursor: tabs[index].tool-cursor;
+        }
 
-            SymbolEditor {
-                width: parent.width;
-                section-index: section-index;
-                tabs: tabs;
-                index: index;
-            }
+        ta := SymbolEditor {
+            width: parent.width;
+            section-index: section-index;
+            tabs: tabs;
+            index: index;
+            //read-only: read-only;
 
-            pointer-event(event) => {
-                if event.kind == PointerEventKind.down {
-                    Data.set-current-tab(section-index, index);
-                    if !root.has-focus {
-                        root.focus();
-                    }
+            focus-requested => {
+                if !root.has-focus {
+                    root.focus();
                 }
-                Backend.scene-pointer-event(section-index, self.mouse-x, self.mouse-y, event);
             }
+        }
 
-            scroll-event(event) => {
-                Backend.scene-scrolled(section-index, self.mouse-x, self.mouse-y, event) ? accept : reject
-            }
+        page-clicked(idx) => {
+            tabs[index].page-index = idx;
         }
     }
 

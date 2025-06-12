@@ -288,6 +288,7 @@ void LibraryTab::trigger(ui::TabAction a) noexcept {
     }
     case ui::TabAction::Undo: {
       try {
+        commitMetadata();
         mEditor.getUndoStack().undo();
       } catch (const Exception& e) {
         QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
@@ -296,6 +297,7 @@ void LibraryTab::trigger(ui::TabAction a) noexcept {
     }
     case ui::TabAction::Redo: {
       try {
+        commitMetadata();
         mEditor.getUndoStack().redo();
       } catch (const Exception& e) {
         QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());

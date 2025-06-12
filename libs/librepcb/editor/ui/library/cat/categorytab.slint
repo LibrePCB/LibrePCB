@@ -3,17 +3,18 @@ import { LibraryRuleCheckLink } from "../libraryrulechecklink.slint";
 import {
     Badge,
     Button,
+    CategoryTreeLabel,
     IconButton,
     LineEdit,
     LinkText,
     MessageBox,
     Palette,
     SceneButton,
-    CategoryTreeLabel,
     SlideView,
     Switch,
     TextEdit,
     ToolButton,
+    TreeItemPickerPopup,
     TreeView,
 } from "../../widgets.slint";
 import {
@@ -191,7 +192,7 @@ component CategoryMetadata inherits GridLayout {
             spacing: 5px;
 
             CategoryTreeLabel {
-                category: tabs[index].parents;
+                names: tabs[index].parents;
             }
 
             Rectangle {
@@ -252,36 +253,13 @@ component CategoryMetadata inherits GridLayout {
         Rectangle { }
     }
 
-    choose-parent-popup := PopupWindow {
+    choose-parent-popup := TreeItemPickerPopup {
         width: parent.width;
         height: parent.height;
+        model: tabs[index].parents-tree;
 
-        Rectangle {
-            background: #00000050;
-
-            Rectangle {
-                width: min(0.8 * parent.width, 500px);
-                height: min(self.preferred-height, 0.8 * parent.height);
-                background: #000000;
-                border-radius: 15px;
-                border-width: 1px;
-                border-color: Constants.librepcb-color;
-
-                VerticalLayout {
-                    padding: 15px;
-
-                    choose-parent-view := TreeView {
-                        model: tabs[index].parents-model;
-                        show-tree: true;
-                        hide-root-tree: true;
-                        supports-expand: false;
-
-                        item-selected(idx, item) => {
-                            tabs[index].new-parent = item.user-data;
-                        }
-                    }
-                }
-            }
+        item-picked(item) => {
+            tabs[index].new-parent = item.user-data;
         }
     }
 }

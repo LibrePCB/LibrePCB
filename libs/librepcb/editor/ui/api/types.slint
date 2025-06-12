@@ -149,7 +149,8 @@ export struct DevicePinoutData {
 }
 
 export struct LibraryElementCategoryData {
-    category: [string],
+    uuid: string,
+    names: [string],
     delete: bool,  // Set by UI, reset by backend.
 }
 
@@ -690,7 +691,7 @@ export struct CategoryTabData {
     version-error: string,
     deprecated: bool,
     parents: [string],
-    parents-model: [TreeViewItemData],
+    parents-tree: [TreeViewItemData],
     checks: RuleCheckData,
 
     new-parent: string,  // Set to UUID or "null" by UI, reset by backend,
@@ -698,7 +699,12 @@ export struct CategoryTabData {
 
 // Additional data for symbol editor tabs
 export struct SymbolTabData {
+    // General
     library-index: int,
+    wizard-mode: bool,
+    page-index: int,
+
+    // Metadata
     path: string,
     name: string,
     name-error: string,
@@ -709,6 +715,7 @@ export struct SymbolTabData {
     version-error: string,
     deprecated: bool,
     categories: [LibraryElementCategoryData],
+    categories-tree: [TreeViewItemData],
     checks: RuleCheckData,
 
     // View
@@ -732,6 +739,8 @@ export struct SymbolTabData {
 
     scene-image-pos: Point,  // Absolute position of graphics scene
     frame: int,  // Frame index to trigger repainting
+
+    new-category: string,  // Set to UUID by UI, reset by backend,
 }
 
 // Additional data for package editor tabs

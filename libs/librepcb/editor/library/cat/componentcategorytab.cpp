@@ -138,7 +138,7 @@ ui::CategoryTabData ComponentCategoryTab::getDerivedUiData() const noexcept {
       mVersionError,  // Version error
       mDeprecated,  // Deprecated
       mParents,  // Parents
-      mParentsModel,  // Parents model
+      mParentsModel,  // Parents tree
       ui::RuleCheckData{
           ui::RuleCheckType::LibraryCheck,  // Checks type
           ui::RuleCheckState::UpToDate,  // Checks state
@@ -195,6 +195,7 @@ void ComponentCategoryTab::trigger(ui::TabAction a) noexcept {
     }
     case ui::TabAction::Undo: {
       try {
+        commitMetadata();
         mUndoStack->undo();
       } catch (const Exception& e) {
         QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
@@ -203,6 +204,7 @@ void ComponentCategoryTab::trigger(ui::TabAction a) noexcept {
     }
     case ui::TabAction::Redo: {
       try {
+        commitMetadata();
         mUndoStack->redo();
       } catch (const Exception& e) {
         QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());

@@ -455,7 +455,7 @@ export global Data {
                     version-error: "Invalid",
                     deprecated: false,
                     parents: ["Root category", "Integrated Circuits", "Timers"],
-                    parents-model: [
+                    parents-tree: [
                         {
                             level: 0,
                             text: "Root Category",
@@ -505,7 +505,7 @@ export global Data {
                     version-error: "Invalid",
                     deprecated: false,
                     parents: ["Root category", "Integrated Circuits", "Timers"],
-                    parents-model: [
+                    parents-tree: [
                         {
                             level: 0,
                             text: "Root Category",
@@ -537,6 +537,8 @@ export global Data {
                 { },
                 {
                     library-index: 0,
+                    wizard-mode: false,
+                    page-index: 2,
                     path: "symbol1",
                     name: "Symbol",
                     description: "Foo Bar\nMultiline\nBlabla",
@@ -546,13 +548,26 @@ export global Data {
                     deprecated: false,
                     categories: [
                         {
-                            category: ["Integrated Circuit", "Timers"],
+                            uuid: "1",
+                            names: ["Integrated Circuit", "Timers"],
                         },
                         {
-                            category: ["Foo", "Bar", "Foobar"],
+                            uuid: "2",
+                            names: ["Foo", "Bar", "Foobar"],
                         },
                         {
-                            category: ["Miscallenous"],
+                            uuid: "3",
+                            names: ["Miscallenous"],
+                        },
+                    ],
+                    categories-tree: [
+                        {
+                            level: 0,
+                            text: "Root Category",
+                        },
+                        {
+                            level: 1,
+                            text: "Integrated Circuits",
                         },
                     ],
                     checks: {

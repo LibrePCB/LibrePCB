@@ -299,6 +299,8 @@ add_library(
   library/libraryeditortab.h
   library/libraryelementcache.cpp
   library/libraryelementcache.h
+  library/libraryelementcategoriesmodel.cpp
+  library/libraryelementcategoriesmodel.h
   library/newelementwizard/newelementwizard.cpp
   library/newelementwizard/newelementwizard.h
   library/newelementwizard/newelementwizard.ui
