@@ -82,21 +82,6 @@ OutputJobHomeWidget::OutputJobHomeWidget(const WorkspaceSettings& settings,
             DesktopServices ds(mSettings);
             ds.openUrl(QUrl(url));
           });
-
-  mUi->lblNote->setText(
-      "<p><i>" %
-      tr("This is a brand-new feature and is still undergoing some "
-         "polishing.") %
-      " " %
-      tr("Any <a href=\"%1\">bug reports, feature requests or general "
-         "feedback</a> is highly appreciated!")
-          .arg("https://librepcb.org/help/") %
-      " ♥</i></p>");
-  connect(mUi->lblNote, &QLabel::linkActivated, this,
-          [this](const QString& url) {
-            DesktopServices ds(mSettings);
-            ds.openUrl(QUrl(url));
-          });
 }
 
 OutputJobHomeWidget::~OutputJobHomeWidget() noexcept {
