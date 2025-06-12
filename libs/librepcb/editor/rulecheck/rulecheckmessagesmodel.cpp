@@ -55,6 +55,12 @@ void RuleCheckMessagesModel::clear() noexcept {
   updateUnapprovedCount();
 }
 
+void RuleCheckMessagesModel::setAutofixHandler(
+    AutofixHandler handler) noexcept {
+  mAutofixHandler = handler;
+  notify_reset();
+}
+
 void RuleCheckMessagesModel::setMessages(
     const RuleCheckMessageList& messages,
     const QSet<SExpression>& approvals) noexcept {
@@ -80,7 +86,7 @@ std::optional<ui::RuleCheckMessageData> RuleCheckMessagesModel::row_data(
         q2s(msg->getMessage()),  // Message
         q2s(msg->getDescription()),  // Description
         mApprovals.contains(msg->getApproval()),  // Approved
-        false,  // Supports autofix
+        mAutofixHandler && mAutofixHandler(msg, true),  // Supports autofix
         ui::RuleCheckMessageAction::None,  // Action
     };
   } else {
@@ -106,7 +112,14 @@ void RuleCheckMessagesModel::set_row_data(
     } else if (data.action == ui::RuleCheckMessageAction::HighlightAndZoomTo) {
       emit highlightRequested(msg, true);
     } else if (data.action == ui::RuleCheckMessageAction::Autofix) {
-      emit autofixRequested(msg);
+      QMetaObject::invokeMethod(
+          this,
+          [this, msg]() {
+            if (mAutofixHandler) {
+              mAutofixHandler(msg, false);
+            }
+          },
+          Qt::QueuedConnection);
     } else if (data.action != ui::RuleCheckMessageAction::None) {
       qWarning() << "Unhandled action in RuleCheckMessagesModel:"
                  << static_cast<int>(data.action);

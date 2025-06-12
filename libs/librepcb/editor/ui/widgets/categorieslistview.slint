@@ -1,0 +1,56 @@
+import { LibraryElementCategoryData } from "../api.slint";
+import { IconButton } from "iconbutton.slint";
+
+export component CategoryTreeLabel inherits VerticalLayout {
+    in property <[string]> category;
+
+    for name[index] in category: HorizontalLayout {
+        padding-left: index * 8px;
+
+        Text {
+            font-weight: (index == (category.length - 1)) ? 600 : 400;
+            overflow: elide;
+            text: ((index > 0) ? "⤷ " : "") + name;
+        }
+    }
+}
+
+export component CategoriesListView {
+    in-out property <[LibraryElementCategoryData]> model;
+    in property <bool> read-only: false;
+
+    VerticalLayout {
+        spacing: 7px;
+
+        for item[index] in model: item-ta := TouchArea {
+            HorizontalLayout {
+                alignment: start;
+                spacing: 5px;
+
+                CategoryTreeLabel {
+                    category: item.category;
+                }
+
+                if (!read-only) && item-ta.has-hover: Rectangle {
+                    width: 10px;
+                }
+
+                if (!read-only) && item-ta.has-hover: Rectangle {
+                    width: 1px;
+                    background: #707070;
+                }
+
+                if (!read-only) && item-ta.has-hover: IconButton {
+                    y: (parent.height - self.height) / 2;
+                    height: 16px;
+                    style: hyperlink;
+                    icon: @image-url("../../../../font-awesome/svgs/solid/trash-can.svg");
+
+                    clicked => {
+                        model[index].delete = true;
+                    }
+                }
+            }
+        }
+    }
+}

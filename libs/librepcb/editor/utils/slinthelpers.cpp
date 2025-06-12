@@ -320,7 +320,10 @@ std::optional<FileProofName> validateFileProofName(
 std::optional<QUrl> validateUrl(const QString& input,
                                 slint::SharedString& error,
                                 bool allowEmpty) noexcept {
-  const QUrl url = QUrl::fromUserInput(input.trimmed());
+  // Note: We don't use QUrl::fromUserInput() because it performs *heavy*
+  // magic to construct URLs from almost any string, which doesn't make
+  // sense to me.
+  const QUrl url(input.trimmed(), QUrl::TolerantMode);
   const std::optional<QUrl> val =
       url.isValid() ? std::make_optional(url) : std::nullopt;
   if (val || (allowEmpty && input.trimmed().isEmpty())) {
