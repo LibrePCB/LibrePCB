@@ -105,14 +105,9 @@ public:
   void fsmToolLeave() noexcept override;
   void fsmToolEnter(SymbolEditorState_Select& state) noexcept override;
   void fsmToolEnter(SymbolEditorState_AddPins& state) noexcept override;
-  void fsmToolEnter(SymbolEditorState_AddNames& state) noexcept override;
-  void fsmToolEnter(SymbolEditorState_AddValues& state) noexcept override;
-  void fsmToolEnter(SymbolEditorState_DrawLine& state) noexcept override;
-  void fsmToolEnter(SymbolEditorState_DrawRect& state) noexcept override;
-  void fsmToolEnter(SymbolEditorState_DrawPolygon& state) noexcept override;
+  void fsmToolEnter(SymbolEditorState_DrawTextBase& state) noexcept override;
+  void fsmToolEnter(SymbolEditorState_DrawPolygonBase& state) noexcept override;
   void fsmToolEnter(SymbolEditorState_DrawCircle& state) noexcept override;
-  void fsmToolEnter(SymbolEditorState_DrawArc& state) noexcept override;
-  void fsmToolEnter(SymbolEditorState_DrawText& state) noexcept override;
   void fsmToolEnter(SymbolEditorState_Measure& state) noexcept override;
 
   // Operator Overloadings

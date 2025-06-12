@@ -72,87 +72,15 @@ SymbolEditorState_DrawTextBase::~SymbolEditorState_DrawTextBase() noexcept {
  ******************************************************************************/
 
 bool SymbolEditorState_DrawTextBase::entry() noexcept {
-  EditorCommandSet& cmd = EditorCommandSet::instance();
-
-  // populate command toolbar
-  if (mMode == Mode::TEXT) {
-    mContext.commandToolBar.addLabel(tr("Layer:"));
-    std::unique_ptr<LayerComboBox> layerComboBox(new LayerComboBox());
-    layerComboBox->setLayers(getAllowedTextLayers());
-    layerComboBox->setCurrentLayer(*mLastLayer);
-    layerComboBox->addAction(cmd.layerUp.createAction(
-        layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepDown));
-    layerComboBox->addAction(cmd.layerDown.createAction(
-        layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepUp));
-    connect(layerComboBox.get(), &LayerComboBox::currentLayerChanged, this,
-            &SymbolEditorState_DrawTextBase::layerComboBoxValueChanged);
-    mContext.commandToolBar.addWidget(std::move(layerComboBox));
-
-    mContext.commandToolBar.addLabel(tr("Text:"), 10);
-    std::unique_ptr<QComboBox> textComboBox(new QComboBox());
-    textComboBox->setEditable(true);
-    textComboBox->addItem("{{NAME}}");
-    textComboBox->addItem("{{VALUE}}");
-    textComboBox->addItem("{{SHEET}}");
-    textComboBox->addItem("{{PROJECT}}");
-    textComboBox->addItem("{{DATE}}");
-    textComboBox->addItem("{{TIME}}");
-    textComboBox->addItem("{{AUTHOR}}");
-    textComboBox->addItem("{{VERSION}}");
-    textComboBox->addItem("{{PAGE_X_OF_Y}}");
-    int currentTextIndex = textComboBox->findText(mLastText);
-    if (currentTextIndex >= 0) {
-      textComboBox->setCurrentIndex(currentTextIndex);
-    } else {
-      textComboBox->setCurrentText(mLastText);
-    }
-    connect(textComboBox.get(), &QComboBox::currentTextChanged, this,
-            &SymbolEditorState_DrawTextBase::textComboBoxValueChanged);
-    mContext.commandToolBar.addWidget(std::move(textComboBox));
-  } else {
-    resetToDefaultParameters();
-  }
-
-  // Height spinbox.
-  mContext.commandToolBar.addLabel(tr("Height:"), 10);
-  std::unique_ptr<PositiveLengthEdit> edtHeight(new PositiveLengthEdit());
-  edtHeight->configure(getLengthUnit(), LengthEditBase::Steps::textHeight(),
-                       "symbol_editor/draw_text/height");
-  edtHeight->setValue(mLastHeight);
-  edtHeight->addAction(cmd.sizeIncrease.createAction(
-      edtHeight.get(), edtHeight.get(), &PositiveLengthEdit::stepUp));
-  edtHeight->addAction(cmd.sizeDecrease.createAction(
-      edtHeight.get(), edtHeight.get(), &PositiveLengthEdit::stepDown));
-  connect(edtHeight.get(), &PositiveLengthEdit::valueChanged, this,
-          &SymbolEditorState_DrawTextBase::heightEditValueChanged);
-  mContext.commandToolBar.addWidget(std::move(edtHeight));
-
-  // Horizontal alignment
-  mContext.commandToolBar.addSeparator();
-  std::unique_ptr<HAlignActionGroup> hAlignActionGroup(new HAlignActionGroup());
-  mHAlignActionGroup = hAlignActionGroup.get();
-  hAlignActionGroup->setValue(mLastAlignment.getH());
-  connect(hAlignActionGroup.get(), &HAlignActionGroup::valueChanged, this,
-          &SymbolEditorState_DrawTextBase::hAlignActionGroupValueChanged);
-  mContext.commandToolBar.addActionGroup(std::move(hAlignActionGroup));
-
-  // Vertical alignment
-  mContext.commandToolBar.addSeparator();
-  std::unique_ptr<VAlignActionGroup> vAlignActionGroup(new VAlignActionGroup());
-  mVAlignActionGroup = vAlignActionGroup.get();
-  vAlignActionGroup->setValue(mLastAlignment.getV());
-  connect(vAlignActionGroup.get(), &VAlignActionGroup::valueChanged, this,
-          &SymbolEditorState_DrawTextBase::vAlignActionGroupValueChanged);
-  mContext.commandToolBar.addActionGroup(std::move(vAlignActionGroup));
-
   const Point pos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos())
                         .mappedToGrid(getGridInterval());
   if (!startAddText(pos)) {
     return false;
   }
-  mAdapter.fsmSetViewCursor(Qt::CrossCursor);
+  mAdapter.fsmToolEnter(*this);
   mAdapter.fsmSetFeatures(SymbolEditorFsmAdapter::Feature::Rotate |
                           SymbolEditorFsmAdapter::Feature::Mirror);
+  mAdapter.fsmSetViewCursor(Qt::CrossCursor);
   return true;
 }
 
@@ -161,11 +89,9 @@ bool SymbolEditorState_DrawTextBase::exit() noexcept {
     return false;
   }
 
-  // cleanup command toolbar
-  mContext.commandToolBar.clear();
-
   mAdapter.fsmSetViewCursor(std::nullopt);
   mAdapter.fsmSetFeatures(SymbolEditorFsmAdapter::Features());
+  mAdapter.fsmToolLeave();
   return true;
 }
 

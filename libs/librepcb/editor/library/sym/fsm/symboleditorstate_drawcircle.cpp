@@ -68,49 +68,7 @@ SymbolEditorState_DrawCircle::~SymbolEditorState_DrawCircle() noexcept {
  ******************************************************************************/
 
 bool SymbolEditorState_DrawCircle::entry() noexcept {
-  // populate command toolbar
-  EditorCommandSet& cmd = EditorCommandSet::instance();
-  mContext.commandToolBar.addLabel(tr("Layer:"));
-  std::unique_ptr<LayerComboBox> layerComboBox(new LayerComboBox());
-  layerComboBox->setLayers(getAllowedCircleAndPolygonLayers());
-  layerComboBox->setCurrentLayer(*mLastLayer);
-  layerComboBox->addAction(cmd.layerUp.createAction(
-      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepDown));
-  layerComboBox->addAction(cmd.layerDown.createAction(
-      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepUp));
-  connect(layerComboBox.get(), &LayerComboBox::currentLayerChanged, this,
-          &SymbolEditorState_DrawCircle::layerComboBoxValueChanged);
-  mContext.commandToolBar.addWidget(std::move(layerComboBox));
-
-  mContext.commandToolBar.addLabel(tr("Line Width:"), 10);
-  std::unique_ptr<UnsignedLengthEdit> edtLineWidth(new UnsignedLengthEdit());
-  edtLineWidth->configure(getLengthUnit(), LengthEditBase::Steps::generic(),
-                          "symbol_editor/draw_circle/line_width");
-  edtLineWidth->setValue(mLastLineWidth);
-  edtLineWidth->addAction(cmd.lineWidthIncrease.createAction(
-      edtLineWidth.get(), edtLineWidth.get(), &UnsignedLengthEdit::stepUp));
-  edtLineWidth->addAction(cmd.lineWidthDecrease.createAction(
-      edtLineWidth.get(), edtLineWidth.get(), &UnsignedLengthEdit::stepDown));
-  connect(edtLineWidth.get(), &UnsignedLengthEdit::valueChanged, this,
-          &SymbolEditorState_DrawCircle::lineWidthEditValueChanged);
-  mContext.commandToolBar.addWidget(std::move(edtLineWidth));
-
-  std::unique_ptr<QCheckBox> fillCheckBox(new QCheckBox(tr("Fill")));
-  fillCheckBox->setChecked(mLastFill);
-  fillCheckBox->addAction(cmd.fillToggle.createAction(
-      fillCheckBox.get(), fillCheckBox.get(), &QCheckBox::toggle));
-  connect(fillCheckBox.get(), &QCheckBox::toggled, this,
-          &SymbolEditorState_DrawCircle::fillCheckBoxCheckedChanged);
-  mContext.commandToolBar.addWidget(std::move(fillCheckBox), 10);
-
-  std::unique_ptr<QCheckBox> grabAreaCheckBox(new QCheckBox(tr("Grab Area")));
-  grabAreaCheckBox->setChecked(mLastGrabArea);
-  grabAreaCheckBox->addAction(cmd.grabAreaToggle.createAction(
-      grabAreaCheckBox.get(), grabAreaCheckBox.get(), &QCheckBox::toggle));
-  connect(grabAreaCheckBox.get(), &QCheckBox::toggled, this,
-          &SymbolEditorState_DrawCircle::grabAreaCheckBoxCheckedChanged);
-  mContext.commandToolBar.addWidget(std::move(grabAreaCheckBox));
-
+  mAdapter.fsmToolEnter(*this);
   mAdapter.fsmSetViewCursor(Qt::CrossCursor);
   return true;
 }
@@ -120,10 +78,8 @@ bool SymbolEditorState_DrawCircle::exit() noexcept {
     return false;
   }
 
-  // cleanup command toolbar
-  mContext.commandToolBar.clear();
-
   mAdapter.fsmSetViewCursor(std::nullopt);
+  mAdapter.fsmToolLeave();
   return true;
 }
 

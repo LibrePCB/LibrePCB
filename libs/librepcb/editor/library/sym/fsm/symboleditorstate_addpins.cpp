@@ -53,7 +53,6 @@ SymbolEditorState_AddPins::SymbolEditorState_AddPins(
   : SymbolEditorState(context),
     mCurrentPin(nullptr),
     mCurrentGraphicsItem(nullptr),
-    mNameLineEdit(nullptr),
     mLastRotation(0),
     mLastLength(2540000)  // Default length according library conventions
 {
@@ -67,47 +66,16 @@ SymbolEditorState_AddPins::~SymbolEditorState_AddPins() noexcept {
  ******************************************************************************/
 
 bool SymbolEditorState_AddPins::entry() noexcept {
-  EditorCommandSet& cmd = EditorCommandSet::instance();
-
-  // populate command toolbar
-  mContext.commandToolBar.addLabel(tr("Name:"));
-  mNameLineEdit = new QLineEdit();
-  std::unique_ptr<QLineEdit> nameLineEdit(mNameLineEdit);
-  nameLineEdit->setMaxLength(20);
-  nameLineEdit->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-  connect(nameLineEdit.get(), &QLineEdit::textEdited, this,
-          &SymbolEditorState_AddPins::nameLineEditTextChanged);
-  mContext.commandToolBar.addWidget(std::move(nameLineEdit));
-
-  mContext.commandToolBar.addLabel(tr("Length:"), 10);
-  std::unique_ptr<UnsignedLengthEdit> edtLength(new UnsignedLengthEdit());
-  edtLength->configure(getLengthUnit(), LengthEditBase::Steps::pinLength(),
-                       "symbol_editor/add_pins/length");
-  edtLength->setValue(mLastLength);
-  edtLength->addAction(cmd.sizeIncrease.createAction(
-      edtLength.get(), edtLength.get(), &UnsignedLengthEdit::stepUp));
-  edtLength->addAction(cmd.sizeDecrease.createAction(
-      edtLength.get(), edtLength.get(), &UnsignedLengthEdit::stepDown));
-  connect(edtLength.get(), &UnsignedLengthEdit::valueChanged, this,
-          &SymbolEditorState_AddPins::lengthEditValueChanged);
-  mContext.commandToolBar.addWidget(std::move(edtLength));
-
-  std::unique_ptr<QToolButton> toolButtonImport(new QToolButton());
-  toolButtonImport->setIcon(QIcon(":/img/actions/import.png"));
-  toolButtonImport->setText(tr("Mass Import"));
-  toolButtonImport->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-  connect(toolButtonImport.get(), &QToolButton::clicked, this,
-          &SymbolEditorState_AddPins::execMassImport);
-  mContext.commandToolBar.addWidget(std::move(toolButtonImport));
-
   const Point pos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos())
                         .mappedToGrid(getGridInterval());
   if (!addNextPin(pos)) {
     return false;
   }
-  mAdapter.fsmSetViewCursor(Qt::CrossCursor);
+
+  mAdapter.fsmToolEnter(*this);
   mAdapter.fsmSetFeatures(SymbolEditorFsmAdapter::Feature::Rotate |
                           SymbolEditorFsmAdapter::Feature::Mirror);
+  mAdapter.fsmSetViewCursor(Qt::CrossCursor);
   return true;
 }
 
@@ -123,12 +91,9 @@ bool SymbolEditorState_AddPins::exit() noexcept {
     return false;
   }
 
-  // cleanup command toolbar
-  mNameLineEdit = nullptr;
-  mContext.commandToolBar.clear();
-
   mAdapter.fsmSetViewCursor(std::nullopt);
   mAdapter.fsmSetFeatures(SymbolEditorFsmAdapter::Features());
+  mAdapter.fsmToolLeave();
   return true;
 }
 
@@ -196,7 +161,7 @@ bool SymbolEditorState_AddPins::addNextPin(const Point& pos) noexcept {
   if (!item) return false;
 
   try {
-    mNameLineEdit->setText(determineNextPinName());
+    /*mNameLineEdit->setText(determineNextPinName());
     mContext.undoStack.beginCmdGroup(tr("Add symbol pin"));
     mCurrentPin = std::make_shared<SymbolPin>(
         Uuid::createRandom(), CircuitIdentifier(mNameLineEdit->text()), pos,
@@ -209,7 +174,7 @@ bool SymbolEditorState_AddPins::addNextPin(const Point& pos) noexcept {
     mCurrentGraphicsItem = item->getGraphicsItem(mCurrentPin);
     Q_ASSERT(mCurrentGraphicsItem);
     mCurrentGraphicsItem->setSelected(true);
-    mEditCmd.reset(new CmdSymbolPinEdit(mCurrentPin));
+    mEditCmd.reset(new CmdSymbolPinEdit(mCurrentPin));*/
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());

@@ -77,7 +77,6 @@ public:  // Types
     UndoStack& undoStack;
     const bool readOnly;
     const LengthUnit& lengthUnit;
-    ToolBarProxy& commandToolBar;
     SymbolEditorFsmAdapter& adapter;
   };
 

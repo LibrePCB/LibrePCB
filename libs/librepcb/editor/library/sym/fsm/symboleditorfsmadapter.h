@@ -38,15 +38,10 @@ namespace editor {
 
 class GraphicsScene;
 class SymbolEditorState;
-class SymbolEditorState_AddNames;
 class SymbolEditorState_AddPins;
-class SymbolEditorState_AddValues;
-class SymbolEditorState_DrawArc;
 class SymbolEditorState_DrawCircle;
-class SymbolEditorState_DrawLine;
-class SymbolEditorState_DrawPolygon;
-class SymbolEditorState_DrawRect;
-class SymbolEditorState_DrawText;
+class SymbolEditorState_DrawPolygonBase;
+class SymbolEditorState_DrawTextBase;
 class SymbolEditorState_Measure;
 class SymbolEditorState_Select;
 class SymbolGraphicsItem;
@@ -95,14 +90,10 @@ public:
   virtual void fsmToolLeave() noexcept = 0;
   virtual void fsmToolEnter(SymbolEditorState_Select& state) noexcept = 0;
   virtual void fsmToolEnter(SymbolEditorState_AddPins& state) noexcept = 0;
-  virtual void fsmToolEnter(SymbolEditorState_AddNames& state) noexcept = 0;
-  virtual void fsmToolEnter(SymbolEditorState_AddValues& state) noexcept = 0;
-  virtual void fsmToolEnter(SymbolEditorState_DrawLine& state) noexcept = 0;
-  virtual void fsmToolEnter(SymbolEditorState_DrawRect& state) noexcept = 0;
-  virtual void fsmToolEnter(SymbolEditorState_DrawPolygon& state) noexcept = 0;
+  virtual void fsmToolEnter(SymbolEditorState_DrawTextBase& state) noexcept = 0;
+  virtual void fsmToolEnter(
+      SymbolEditorState_DrawPolygonBase& state) noexcept = 0;
   virtual void fsmToolEnter(SymbolEditorState_DrawCircle& state) noexcept = 0;
-  virtual void fsmToolEnter(SymbolEditorState_DrawArc& state) noexcept = 0;
-  virtual void fsmToolEnter(SymbolEditorState_DrawText& state) noexcept = 0;
   virtual void fsmToolEnter(SymbolEditorState_Measure& state) noexcept = 0;
 };
 
