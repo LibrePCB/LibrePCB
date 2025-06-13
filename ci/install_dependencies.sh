@@ -85,3 +85,11 @@ export CMAKE_GENERATOR=Ninja
 export FUNQ_MAKE_PATH=ninja
 pip install $PIP_USER_INSTALL -r "$DIR/../tests/cli/requirements.txt"
 pip install $PIP_USER_INSTALL -r "$DIR/../tests/funq/requirements.txt"
+
+# If access to Slint UI testing is available, install UI testind dependencies
+if [ -n "${SLINT_UI_TESTING_AUTH-}" ]
+then
+  pip install uv
+  git config --global url."https://${SLINT_UI_TESTING_AUTH}@github.com/slint-ui/ui-testing".insteadOf "https://github.com/slint-ui/ui-testing"
+  uv --directory "$DIR/../tests/ui" sync --no-dev
+fi
