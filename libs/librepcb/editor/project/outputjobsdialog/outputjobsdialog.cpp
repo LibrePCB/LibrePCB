@@ -200,6 +200,40 @@ OutputJobsDialog::~OutputJobsDialog() noexcept {
  *  Public Methods
  ******************************************************************************/
 
+void OutputJobsDialog::preselectJobByType(const QString& typeName) noexcept {
+  for (int i = 0; i < mJobs.count(); ++i) {
+    if (mJobs.at(i)->getType() == typeName) {
+      mUi->lstJobs->setCurrentRow(i + 1);
+      return;
+    }
+  }
+
+  // Job not found, ask to create it.
+  if (typeName == GerberExcellonOutputJob::getTypeName()) {
+    QString text;
+    text += "<p><b>" +
+        tr("New since LibrePCB 2.0: The fabrication output dialog has been "
+           "removed in favor of the more powerful output jobs feature.") +
+        "</b></p>";
+    text += "<p>" +
+        tr("The project does not have a fabrication output job configured yet. "
+           "At the bottom left of this dialog you can add one of the two "
+           "pre-configured Gerber/Excellon output jobs and adjust it according "
+           "your needs.") +
+        "</p>";
+    if (mJobs.isEmpty()) {
+      text += "<p>" +
+          tr("Since this project does not have any output jobs at all yet, you "
+             "may even add a complete set of output jobs instead with the "
+             "link at the bottom left. Just try it out!") +
+          "</p>";
+    }
+    QMessageBox::information(this, tr("Generate Fabrication Data"), text);
+  } else if (!typeName.isEmpty()) {
+    qWarning() << "Unknown job type for output jobs dialog:" << typeName;
+  }
+}
+
 void OutputJobsDialog::reject() noexcept {
   if (mJobs != mProject.getOutputJobs()) {
     const int ret = QMessageBox::question(

@@ -39,7 +39,6 @@
 #include "boardeditor.h"
 #include "boardgraphicsscene.h"
 #include "boardpickplacegeneratordialog.h"
-#include "fabricationoutputdialog.h"
 #include "fsm/boardeditorfsm.h"
 #include "fsm/boardeditorstate_addhole.h"
 #include "fsm/boardeditorstate_addstroketext.h"
@@ -55,6 +54,7 @@
 #include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/fileio/transactionaldirectory.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/job/gerberexcellonoutputjob.h>
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/dev/device.h>
 #include <librepcb/core/library/pkg/package.h>
@@ -549,7 +549,8 @@ void Board2dTab::trigger(ui::TabAction a) noexcept {
       break;
     }
     case ui::TabAction::ExportFabricationData: {
-      execFabricationDataExportDialog();
+      mProjectEditor.execOutputJobsDialog(
+          GerberExcellonOutputJob::getTypeName());
       break;
     }
     case ui::TabAction::ExportPickPlace: {
@@ -1917,17 +1918,6 @@ void Board2dTab::execGraphicsExportDialog(GraphicsExportDialog::Output output,
   } catch (const Exception& e) {
     QMessageBox::warning(qApp->activeWindow(), tr("Error"), e.getMsg());
   }
-}
-
-void Board2dTab::execFabricationDataExportDialog() noexcept {
-  FabricationOutputDialog dialog(mApp.getWorkspace().getSettings(), mBoard,
-                                 qApp->activeWindow());
-  connect(&dialog, &FabricationOutputDialog::orderPcbDialogTriggered, this,
-          [this, &dialog]() {
-            emit panelPageRequested(ui::PanelPage::Order);
-            dialog.close();
-          });
-  dialog.exec();
 }
 
 void Board2dTab::execPickPlaceExportDialog() noexcept {

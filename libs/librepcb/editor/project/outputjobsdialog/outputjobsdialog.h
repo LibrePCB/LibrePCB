@@ -64,6 +64,7 @@ public:
   ~OutputJobsDialog() noexcept;
 
   // General Methods
+  void preselectJobByType(const QString& typeName) noexcept;
   virtual void reject() noexcept override;
 
   // Operator Overloads
