@@ -54,6 +54,7 @@
 #include "board/boardinteractivehtmlbomgenerator.h"
 #include "board/boardpainter.h"
 #include "board/boardpickplacegenerator.h"
+#include "board/boardplanefragmentsbuilder.h"
 #include "board/realisticboardpainter.h"
 #include "bomgenerator.h"
 #include "circuit/circuit.h"
@@ -129,8 +130,8 @@ void OutputJobRunner::removeUnknownFiles(const QList<FilePath>& files) {
   mWriter->removeUnknownFiles(files);
 }
 
-GraphicsExport::Pages OutputJobRunner::buildPages(
-    const GraphicsOutputJob& job) {
+GraphicsExport::Pages OutputJobRunner::buildPages(const GraphicsOutputJob& job,
+                                                  bool rebuildPlanes) {
   GraphicsExport::Pages pages;
   foreach (const GraphicsOutputJob::Content& content, job.getContent()) {
     std::shared_ptr<GraphicsExportSettings> settings =
@@ -186,7 +187,11 @@ GraphicsExport::Pages OutputJobRunner::buildPages(
         }
       }
     } else if (content.type == GraphicsOutputJob::Content::Type::Board) {
-      foreach (const Board* board, boards) {
+      foreach (Board* board, boards) {
+        if (rebuildPlanes) {
+          rebuildOutdatedPlanes(*board);  // can throw
+        }
+
         foreach (auto av, assemblyVariants) {
           Q_UNUSED(av);  // TODO
           std::shared_ptr<GraphicsPagePainter> painter;
@@ -263,7 +268,7 @@ void OutputJobRunner::run(const OutputJob& job) {
 
 void OutputJobRunner::runImpl(const GraphicsOutputJob& job) {
   // Build pages.
-  const GraphicsExport::Pages pages = buildPages(job);
+  const GraphicsExport::Pages pages = buildPages(job, true);  // can throw
 
   // Determine lookup objects.
   QSet<Board*> allBoards;
@@ -342,8 +347,12 @@ void OutputJobRunner::runImpl(const GerberExcellonOutputJob& job) {
   // Determine boards.
   const QList<Board*> boards = getBoards(job.getBoards());
 
-  // Perform export:
-  foreach (const Board* board, boards) {
+  // Perform export.
+  foreach (Board* board, boards) {
+    // Rebuild planes to be sure no outdated planes are exported!
+    rebuildOutdatedPlanes(*board);  // can throw
+
+    // Now actually export Gerber/Excellon.
     BoardGerberExport grbExport(*board);
     grbExport.setRemoveObsoleteFiles(false);  // must be done by this runner!
     grbExport.setBeforeWriteCallback([this, &job](const FilePath& fp) {
@@ -523,7 +532,10 @@ void OutputJobRunner::runImpl(const InteractiveHtmlBomOutputJob& job) {
   const QVector<std::shared_ptr<AssemblyVariant>> assemblyVariants =
       getAssemblyVariants(job.getAssemblyVariants());
 
-  foreach (const Board* board, boards) {
+  foreach (Board* board, boards) {
+    // Rebuild planes to be sure no outdated planes are exported!
+    rebuildOutdatedPlanes(*board);  // can throw
+
     foreach (const std::shared_ptr<AssemblyVariant>& av, assemblyVariants) {
       const ProjectAttributeLookup lookup = board
           ? ProjectAttributeLookup(*board, av)
@@ -568,7 +580,10 @@ void OutputJobRunner::runImpl(const Board3DOutputJob& job) {
   const QVector<std::shared_ptr<AssemblyVariant>> assemblyVariants =
       getAssemblyVariants(job.getAssemblyVariants(), false);
 
-  foreach (const Board* board, boards) {
+  foreach (Board* board, boards) {
+    // Rebuild planes to be sure no outdated planes are exported!
+    rebuildOutdatedPlanes(*board);  // can throw
+
     foreach (const std::shared_ptr<AssemblyVariant>& av, assemblyVariants) {
       const FilePath fp = mWriter->beginWritingFile(
           job.getUuid(),
@@ -858,6 +873,16 @@ QVector<std::shared_ptr<AssemblyVariant>> OutputJobRunner::getAssemblyVariants(
     }
   }
   return result;
+}
+
+void OutputJobRunner::rebuildOutdatedPlanes(Board& board) {
+  const auto layers = board.getCopperLayers();
+  BoardPlaneFragmentsBuilder builder;
+  if (builder.start(board, &layers)) {
+    BoardPlaneFragmentsBuilder::Result result = builder.waitForFinished();
+    result.throwOnError();
+    result.applyToBoard();
+  }
 }
 
 /*******************************************************************************

@@ -74,6 +74,7 @@ add_executable(
   core/project/board/boardpickplacegeneratortest.cpp
   core/project/board/boardplanefragmentsbuildertest.cpp
   core/project/board/boardspecctraexporttest.cpp
+  core/project/outputjobrunnertest.cpp
   core/project/projectjsonexporttest.cpp
   core/project/projectlibrarytest.cpp
   core/project/projecttest.cpp
