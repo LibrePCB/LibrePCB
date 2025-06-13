@@ -1,0 +1,18 @@
+[project]
+name = "librepcb-ui-testing"
+version = "0.1.0"
+description = "LibrePCB system level UI tests"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "pytest~=8.4.0",
+    "slint-testing @ git+https://github.com/slint-ui/ui-testing@f126424a4e3e097377542220de0dd7e5b35c2341#subdirectory=python",
+]
+
+[dependency-groups]
+dev = [
+    "ruff~=0.11.13",
+]
+
+[tool.pytest.ini_options]
+addopts = "-v --librepcb-executable=../../build/apps/librepcb/librepcb"
