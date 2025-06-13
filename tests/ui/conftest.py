@@ -121,7 +121,14 @@ class LibrePcbFixture(object):
 
 
 class Helpers(object):
-    pass
+    @staticmethod
+    def wait_for_project(app, name):
+        docs_panel = app.first_window.root_element.query_descendants().match_id("AppWindow::documents-panel").find_first()
+        for project in docs_panel.query_descendants().match_id("DocumentsPanel::project-item").find_all():
+            header = project.query_descendants().match_id("ProjectSection::header").find_first()
+            if header.accessible_label == name.upper():
+                return
+        raise Exception('Failed to wait for project "{}"!'.format(name))
 
 
 @pytest.fixture(scope="session")
