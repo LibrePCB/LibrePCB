@@ -61,6 +61,7 @@
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boardd356netlistexport.h>
 #include <librepcb/core/project/board/boardpainter.h>
+#include <librepcb/core/project/board/boardplanefragmentsbuilder.h>
 #include <librepcb/core/project/board/boardspecctraexport.h>
 #include <librepcb/core/project/board/items/bi_device.h>
 #include <librepcb/core/project/board/items/bi_plane.h>
@@ -1891,10 +1892,20 @@ void Board2dTab::execGraphicsExportDialog(GraphicsExportDialog::Output output,
     FilePath defaultFilePath = mProject.getPath().getPathTo(relativePath);
 
     // Copy board to allow processing it in worker threads.
+    // Also rebuild outdated planes to avoid exporting wrong data.
     QProgressDialog progress(tr("Preparing board..."), tr("Cancel"), 0, 1,
                              qApp->activeWindow());
     progress.setWindowModality(Qt::WindowModal);
     progress.setMinimumDuration(100);
+    const auto layers = mBoard.getCopperLayers();
+    BoardPlaneFragmentsBuilder builder;
+    connect(&progress, &QProgressDialog::canceled, &builder,
+            &BoardPlaneFragmentsBuilder::cancel);
+    if (builder.start(mBoard, &layers)) {
+      BoardPlaneFragmentsBuilder::Result result = builder.waitForFinished();
+      result.throwOnError();
+      result.applyToBoard();
+    }
     QList<std::shared_ptr<GraphicsPagePainter>> pages{
         std::make_shared<BoardPainter>(mBoard)};
     progress.setValue(1);

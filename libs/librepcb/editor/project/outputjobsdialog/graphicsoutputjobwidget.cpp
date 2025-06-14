@@ -527,7 +527,7 @@ void GraphicsOutputJobWidget::modify(
 
 void GraphicsOutputJobWidget::updatePreview() noexcept {
   try {
-    auto pages = mPreviewRunner->buildPages(*mJob);
+    auto pages = mPreviewRunner->buildPages(*mJob, false);
     mUi->previewWidget->setNumberOfPages(pages.count());
     mPreviewGraphicsExport->startPreview(pages);
   } catch (const Exception& e) {

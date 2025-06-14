@@ -82,7 +82,8 @@ public:
   void run(const QVector<std::shared_ptr<OutputJob>>& jobs);
   QList<FilePath> findUnknownFiles(const QSet<Uuid>& knownJobs) const;
   void removeUnknownFiles(const QList<FilePath>& files);
-  GraphicsExport::Pages buildPages(const GraphicsOutputJob& job);
+  GraphicsExport::Pages buildPages(const GraphicsOutputJob& job,
+                                   bool rebuildPlanes);
 
   // Operator Overloadings
   OutputJobRunner& operator=(const OutputJobRunner& rhs) = delete;
@@ -117,6 +118,7 @@ private:  // Methods
       bool includeNullInAll) const;
   QVector<std::shared_ptr<AssemblyVariant>> getAssemblyVariants(
       const OutputJob::ObjectSet<Uuid>& set) const;
+  static void rebuildOutdatedPlanes(Board& board);
 
 private:  // Data
   Project& mProject;
