@@ -303,7 +303,7 @@ component LibrariesPanelSection inherits FocusScope {
             highlight: root.has-focus;
             show-spinner: data.refreshing;
 
-            if !remote: IconButton {
+            if !remote: download-by-url-btn := IconButton {
                 width: self.height;
                 icon: @image-url("../../../../bootstrap-icons/icons/cloud-arrow-down-fill.svg");
                 icon-scale: 0.7;
@@ -315,7 +315,7 @@ component LibrariesPanelSection inherits FocusScope {
                 }
             }
 
-            if !remote: IconButton {
+            if !remote: create-btn := IconButton {
                 width: self.height;
                 icon: @image-url("../../../../font-awesome/svgs/solid/plus.svg");
                 tooltip: @tr("Create a New Library") + "...";

@@ -3,9 +3,10 @@
 
 import os
 import platform
-import shutil
 import pytest
+import shutil
 import slint_testing
+import time
 from copy import deepcopy
 
 
@@ -27,6 +28,102 @@ def pytest_addoption(parser):
     parser.addoption("--librepcb-executable",
                      action="store",
                      help="Path to librepcb executable to test")
+
+
+def _query_childs(element, query):
+    segment = query[0].split('[')
+    segment_name = segment[0]
+    if segment_name.startswith('#'):
+        segment_name = segment_name[1:]
+        childs = element.query_descendants().match_type_name(segment_name).find_all()
+    else:
+        childs = element.query_descendants().match_id(segment_name).find_all()
+    if len(segment) > 1:
+        index = int(segment[1][:-1])
+        childs = [childs[index]]
+    if len(query) > 1:
+        childs = [_query_childs(child, query[1:]) for child in childs]
+    if len(childs) == 0:
+        childs = None
+    elif len(childs) == 1:
+        childs = childs[0]
+    return childs
+
+
+class ElementQuery:
+    def __init__(self, app, window, parent=None, query=None):
+        self._app = app
+        self._window = window
+        self._parent = parent
+        self._query = query or []
+        self._result = None
+
+    def get(self, path):
+        return ElementQuery(self._app, self._window, self, path.split(' '))
+
+    @property
+    def full_query(self):
+        if self._parent is None:
+            return self._query
+        else:
+            return self._parent.full_query + self._query
+
+    @property
+    def is_valid(self):
+        self._update()
+        return self._result.is_valid if self._result else False
+
+    @property
+    def label(self):
+        self._update()
+        self._check_result()
+        return self._result.accessible_label
+
+    def click(self):
+        self._update()
+        self._check_result()
+        self._result.single_click(slint_testing.PointerEventButton.Left)
+
+    def dclick(self):
+        self._update()
+        self._check_result()
+        self._result.double_click(slint_testing.PointerEventButton.Left)
+
+    def set_value(self, value):
+        self._update()
+        self._check_result()
+        self._result.accessible_value = value
+
+    def set_checked(self, checked):
+        self._update()
+        self._check_result()
+        if self._result.accessible_checked != checked:
+            self._result.invoke_accessible_default_action()
+
+    def _update(self):
+        if not self._result or not self._result.is_valid:
+            root = self._app.windows[self._window].root_element
+            if self._parent is None:
+                self._result = root
+            else:
+                self._parent._update()
+                self._parent._check_result()
+                self._result = _query_childs(self._parent._result, self._query)
+
+    def _check_result(self):
+        if not self.is_valid:
+            raise Exception("Element does not exist: {}".format(self.full_query))
+        elif type(self.is_valid) is list:
+            raise Exception("Query returned {} results: {}".format(len(self._result), self.full_query))
+
+
+
+class Application(slint_testing.Application):
+    def root(self, window=0):
+        return ElementQuery(self, window)
+
+    def get(self, path, window=0):
+        return self.root(window=window).get(path)
 
 
 class LibrePcbFixture(object):
@@ -97,7 +194,7 @@ class LibrePcbFixture(object):
 
     def open(self):
         self._create_application_config_file()
-        return slint_testing.Application([self.executable] + self._args(), env=self.env)
+        return Application([self.executable] + self._args(), env=self.env)
 
     def _create_application_config_file(self):
         org_dir = 'LibrePCB.org' if platform.system() == 'Darwin' else 'LibrePCB'
@@ -121,6 +218,26 @@ class LibrePcbFixture(object):
 
 
 class Helpers(object):
+    @staticmethod
+    def wait_for_file_exists(path, timeout=10.0):
+        start = time.time()
+        while True:
+            if os.path.exists(path):
+                return
+            if time.time() > (start + timeout):
+                raise TimeoutError("File does not exist: {}".format(path))
+            time.sleep(0.1)
+
+    @staticmethod
+    def wait_for_element_invalid(element, timeout=10.0):
+        start = time.time()
+        while True:
+            if not element.is_valid:
+                return
+            if time.time() > (start + timeout):
+                raise TimeoutError("Element is still valid: {}".format(element.id))
+            time.sleep(0.1)
+
     @staticmethod
     def wait_for_project(app, name):
         docs_panel = app.first_window.root_element.query_descendants().match_id("AppWindow::documents-panel").find_first()
