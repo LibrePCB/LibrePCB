@@ -67,10 +67,9 @@ public:
     Remove = (1 << 4),
     Rotate = (1 << 5),
     Mirror = (1 << 6),
-    Flip = (1 << 7),
-    SnapToGrid = (1 << 8),
-    ResetTexts = (1 << 9),
-    Properties = (1 << 10),
+    SnapToGrid = (1 << 7),
+    ResetTexts = (1 << 8),
+    Properties = (1 << 9),
   };
   Q_DECLARE_FLAGS(Features, Feature)
 

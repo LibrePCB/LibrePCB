@@ -95,6 +95,9 @@ bool SchematicEditorState_Select::entry() noexcept {
       connect(&mContext.undoStack, &UndoStack::stateModified, this,
               &SchematicEditorState_Select::scheduleUpdateAvailableFeatures));
   mConnections.append(
+      connect(&mContext.schematic, &Schematic::gridIntervalChanged, this,
+              &SchematicEditorState_Select::scheduleUpdateAvailableFeatures));
+  mConnections.append(
       connect(qApp->clipboard(), &QClipboard::dataChanged, this,
               &SchematicEditorState_Select::scheduleUpdateAvailableFeatures));
 

@@ -100,7 +100,10 @@ public:
   // Setters: Attributes
   void setName(const ElementName& name) noexcept;
   void setGridInterval(const PositiveLength& interval) noexcept {
-    mGridInterval = interval;
+    if (interval != mGridInterval) {
+      mGridInterval = interval;
+      emit gridIntervalChanged(mGridInterval);
+    }
   }
   void setGridUnit(const LengthUnit& unit) noexcept { mGridUnit = unit; }
 
@@ -145,6 +148,7 @@ public:
 
 signals:
   void nameChanged(const ElementName& name);
+  void gridIntervalChanged(const PositiveLength& interval);
   void symbolAdded(SI_Symbol& symbol);
   void symbolRemoved(SI_Symbol& symbol);
   void netSegmentAdded(SI_NetSegment& netSegment);
