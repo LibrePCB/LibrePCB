@@ -28,7 +28,7 @@ export global Shortcuts {
         if is-shortcut(event, Cmd.file-manager) {
             Backend.trigger-project(project, ProjectAction.open-folder);
             return true;
-        } else if is-shortcut(event, Cmd.project-save) && Data.projects[project].writable {
+        } else if is-shortcut(event, Cmd.save) && Data.projects[project].writable {
             Backend.trigger-project(project, ProjectAction.save);
             return true;
         } else if is-shortcut(event, Cmd.project-setup) {
@@ -51,12 +51,6 @@ export global Shortcuts {
             return true;
         } else if is-shortcut(event, Cmd.output-jobs) {
             Backend.trigger-project(project, ProjectAction.open-output-jobs);
-            return true;
-        } else if is-shortcut(event, Cmd.undo) {
-            Backend.trigger-project(project, ProjectAction.undo);
-            return true;
-        } else if is-shortcut(event, Cmd.redo) {
-            Backend.trigger-project(project, ProjectAction.redo);
             return true;
         } else if is-shortcut(event, Cmd.project-close) {
             Backend.trigger-project(project, ProjectAction.close);
@@ -108,7 +102,16 @@ export global Shortcuts {
     }
 
     public function process-tab-shortcuts(event: KeyEvent) -> bool {
-        if is-shortcut(event, Cmd.select-all) && (Data.current-tab.features.select == FeatureState.enabled) {
+        if is-shortcut(event, Cmd.save) && (Data.current-tab.features.save == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.save);
+            return true;
+        } else if is-shortcut(event, Cmd.undo) && (Data.current-tab.features.undo == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.undo);
+            return true;
+        } else if is-shortcut(event, Cmd.redo) && (Data.current-tab.features.redo == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.redo);
+            return true;
+        } else if is-shortcut(event, Cmd.select-all) && (Data.current-tab.features.select == FeatureState.enabled) {
             Backend.trigger-tab(section, tab, TabAction.select-all);
             return true;
         } else if is-shortcut(event, Cmd.find-next) && (Data.current-tab.features.find == FeatureState.enabled) {
@@ -125,6 +128,12 @@ export global Shortcuts {
             return true;
         } else if is-shortcut(event, Cmd.print) && (Data.current-tab.features.export-graphics == FeatureState.enabled) {
             Backend.trigger-tab(section, tab, TabAction.print);
+            return true;
+        } else if is-shortcut(event, Cmd.undo) && (Data.current-tab.features.undo == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.undo);
+            return true;
+        } else if is-shortcut(event, Cmd.redo) && (Data.current-tab.features.redo == FeatureState.enabled) {
+            Backend.trigger-tab(section, tab, TabAction.redo);
             return true;
         } else if is-shortcut(event, Cmd.clipboard-cut) && (Data.current-tab.features.cut == FeatureState.enabled) {
             Backend.trigger-tab(section, tab, TabAction.cut);
@@ -533,6 +542,8 @@ export global Shortcuts {
             if process-board-3d-tab-shortcuts(event) {
                 return true;
             }
+        } else if process-tab-shortcuts(event) {
+            return true;
         }
 
         // Global shortcuts

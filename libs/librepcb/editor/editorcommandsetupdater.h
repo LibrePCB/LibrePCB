@@ -33,7 +33,6 @@ public:
     out.set_library_element_duplicate(l2s(cmd.libraryElementDuplicate, out.get_library_element_duplicate()));
     out.set_project_new(l2s(cmd.projectNew, out.get_project_new()));
     out.set_project_open(l2s(cmd.projectOpen, out.get_project_open()));
-    out.set_project_save(l2s(cmd.projectSave, out.get_project_save()));
     out.set_project_setup(l2s(cmd.projectSetup, out.get_project_setup()));
     out.set_grid_properties(l2s(cmd.gridProperties, out.get_grid_properties()));
     out.set_board_setup(l2s(cmd.boardSetup, out.get_board_setup()));

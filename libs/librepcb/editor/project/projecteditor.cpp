@@ -249,10 +249,6 @@ ui::ProjectData ProjectEditor::getUiData() const noexcept {
       mProject->getDirectory().isWritable(),  // Writable
       mUseIeee315Symbols,  // Use IEEE315 symbols
       mManualModificationsMade || (!mUndoStack->isClean()),  // Unsaved changes
-      mUndoStack->canUndo(),  // Can undo
-      mUndoStack->canRedo(),  // Can redo
-      q2s(mUndoStack->getUndoCmdText()),  // Undo text
-      q2s(mUndoStack->getRedoCmdText()),  // Redo text
       ui::RuleCheckData{
           ui::RuleCheckType::Erc,  // Type
           mErcMessages ? ui::RuleCheckState::UpToDate
@@ -272,24 +268,6 @@ void ProjectEditor::trigger(ui::ProjectAction a) noexcept {
   switch (a) {
     case ui::ProjectAction::Save: {
       saveProject();
-      break;
-    }
-
-    case ui::ProjectAction::Undo: {
-      try {
-        mUndoStack->undo();
-      } catch (const Exception& e) {
-        QMessageBox::critical(qApp->activeWindow(), "Error", e.getMsg());
-      }
-      break;
-    }
-
-    case ui::ProjectAction::Redo: {
-      try {
-        mUndoStack->redo();
-      } catch (const Exception& e) {
-        QMessageBox::critical(qApp->activeWindow(), "Error", e.getMsg());
-      }
       break;
     }
 
@@ -339,6 +317,26 @@ void ProjectEditor::setHighlightedNetSignals(
   if (netSignals != *mHighlightedNetSignals) {
     *mHighlightedNetSignals = netSignals;
     emit highlightedNetSignalsChanged();
+  }
+}
+
+bool ProjectEditor::hasUnsavedChanges() const noexcept {
+  return mManualModificationsMade || (!mUndoStack->isClean());
+}
+
+void ProjectEditor::undo() noexcept {
+  try {
+    mUndoStack->undo();
+  } catch (const Exception& e) {
+    QMessageBox::critical(qApp->activeWindow(), "Error", e.getMsg());
+  }
+}
+
+void ProjectEditor::redo() noexcept {
+  try {
+    mUndoStack->redo();
+  } catch (const Exception& e) {
+    QMessageBox::critical(qApp->activeWindow(), "Error", e.getMsg());
   }
 }
 

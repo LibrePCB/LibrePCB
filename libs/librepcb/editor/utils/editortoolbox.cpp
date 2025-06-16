@@ -113,6 +113,14 @@ public:
  *  Static Methods
  ******************************************************************************/
 
+QString EditorToolbox::toSingleLine(const QString& s) noexcept {
+  return QString(s).replace("\n", "\\n");
+}
+
+QString EditorToolbox::toMultiLine(const QString& s) noexcept {
+  return s.trimmed().replace("\\n", "\n");
+}
+
 QIcon EditorToolbox::svgIcon(const QString& file) noexcept {
   return QIcon(new MonochromeSvgIconEngine(file));
 }
