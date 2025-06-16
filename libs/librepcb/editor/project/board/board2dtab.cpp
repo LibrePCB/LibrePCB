@@ -147,7 +147,10 @@ Board2dTab::Board2dTab(GuiApplication& app, BoardEditor& editor,
     mView(new SlintGraphicsView(this)),
     mMsgEmptySchematics(app.getWorkspace(), "EMPTY_BOARD_NO_COMPONENTS"),
     mMsgPlaceDevices(app.getWorkspace(), "EMPTY_BOARD_PLACE_DEVICES"),
-    mGridStyle(Theme::GridStyle::None),
+    mGridStyle(mApp.getWorkspace()
+                   .getSettings()
+                   .themes.getActive()
+                   .getBoardGridStyle()),
     mIgnorePlacementLocks(false),
     mFrameIndex(0),
     mToolFeatures(),
@@ -2130,7 +2133,6 @@ void Board2dTab::goToDevice(const QString& name, int index) noexcept {
 
 void Board2dTab::applyTheme() noexcept {
   const Theme& theme = mApp.getWorkspace().getSettings().themes.getActive();
-  mGridStyle = theme.getBoardGridStyle();
 
   if (mScene) {
     mScene->setBackgroundColors(

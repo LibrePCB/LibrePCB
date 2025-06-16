@@ -123,7 +123,10 @@ SchematicTab::SchematicTab(GuiApplication& app, SchematicEditor& editor,
     mView(new SlintGraphicsView(this)),
     mMsgInstallLibraries(app.getWorkspace(), "EMPTY_SCHEMATIC_NO_LIBRARIES"),
     mMsgAddDrawingFrame(app.getWorkspace(), "EMPTY_SCHEMATIC_ADD_FRAME"),
-    mGridStyle(Theme::GridStyle::None),
+    mGridStyle(mApp.getWorkspace()
+                   .getSettings()
+                   .themes.getActive()
+                   .getSchematicGridStyle()),
     mFrameIndex(0),
     mToolFeatures(),
     mTool(ui::EditorTool::Select),
@@ -1123,7 +1126,6 @@ void SchematicTab::goToSymbol(const QString& name, int index) noexcept {
 
 void SchematicTab::applyTheme() noexcept {
   const Theme& theme = mApp.getWorkspace().getSettings().themes.getActive();
-  mGridStyle = theme.getSchematicGridStyle();
 
   if (mScene) {
     mScene->setBackgroundColors(
