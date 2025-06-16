@@ -158,7 +158,7 @@ class EditorCommand:
         if len(key) > 1:
             key = 'Key.{}'.format(key)
         else:
-            key = '"{}"'.format(key.lower())
+            key = '"{}"'.format(key.upper() if 'SHIFT' in shortcut else key.lower())
         return SLINT_COMMAND_PATTERN.format(
             icon=self.icon(),
             name=self.key.replace('_', '-'),
