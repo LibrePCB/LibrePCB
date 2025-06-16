@@ -55,6 +55,9 @@ public:
   // Operator Overloadings
   SymbolEditorState_DrawRect& operator=(const SymbolEditorState_DrawRect& rhs) =
       delete;
+
+protected:
+  void notifyToolEnter() noexcept override;
 };
 
 /*******************************************************************************

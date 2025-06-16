@@ -56,6 +56,9 @@ public:
   // Operator Overloadings
   SymbolEditorState_DrawPolygon& operator=(
       const SymbolEditorState_DrawPolygon& rhs) = delete;
+
+protected:
+  void notifyToolEnter() noexcept override;
 };
 
 /*******************************************************************************

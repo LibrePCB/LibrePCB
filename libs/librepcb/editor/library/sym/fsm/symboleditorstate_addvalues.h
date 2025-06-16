@@ -56,6 +56,9 @@ public:
   // Operator Overloadings
   SymbolEditorState_AddValues& operator=(
       const SymbolEditorState_AddValues& rhs) = delete;
+
+protected:
+  void notifyToolEnter() noexcept override;
 };
 
 /*******************************************************************************

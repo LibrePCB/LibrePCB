@@ -54,6 +54,9 @@ public:
   // Operator Overloadings
   SymbolEditorState_AddNames& operator=(const SymbolEditorState_AddNames& rhs) =
       delete;
+
+protected:
+  void notifyToolEnter() noexcept override;
 };
 
 /*******************************************************************************

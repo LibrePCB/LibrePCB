@@ -51,12 +51,21 @@ namespace editor {
 SymbolEditorState_AddPins::SymbolEditorState_AddPins(
     const Context& context) noexcept
   : SymbolEditorState(context),
+    mCurrentProperties(
+        Uuid::createRandom(),  // Not relevant
+        CircuitIdentifier("1"),  // Name
+        Point(),  // Not relevant
+        UnsignedLength(
+            2540000),  // Default length according library conventions
+        Angle::deg0(),  // Default rotation
+        Point(),  // Will be set later
+        Angle::deg0(),  // Default name rotation
+        SymbolPin::getDefaultNameHeight(),
+        SymbolPin::getDefaultNameAlignment()),
     mCurrentPin(nullptr),
-    mCurrentGraphicsItem(nullptr),
-    mNameLineEdit(nullptr),
-    mLastRotation(0),
-    mLastLength(2540000)  // Default length according library conventions
-{
+    mCurrentGraphicsItem(nullptr) {
+  mCurrentProperties.setNamePosition(
+      SymbolPin::getDefaultNamePosition(mCurrentProperties.getLength()));
 }
 
 SymbolEditorState_AddPins::~SymbolEditorState_AddPins() noexcept {
@@ -67,188 +76,72 @@ SymbolEditorState_AddPins::~SymbolEditorState_AddPins() noexcept {
  ******************************************************************************/
 
 bool SymbolEditorState_AddPins::entry() noexcept {
-  EditorCommandSet& cmd = EditorCommandSet::instance();
-
-  // populate command toolbar
-  mContext.commandToolBar.addLabel(tr("Name:"));
-  mNameLineEdit = new QLineEdit();
-  std::unique_ptr<QLineEdit> nameLineEdit(mNameLineEdit);
-  nameLineEdit->setMaxLength(20);
-  nameLineEdit->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-  connect(nameLineEdit.get(), &QLineEdit::textEdited, this,
-          &SymbolEditorState_AddPins::nameLineEditTextChanged);
-  mContext.commandToolBar.addWidget(std::move(nameLineEdit));
-
-  mContext.commandToolBar.addLabel(tr("Length:"), 10);
-  std::unique_ptr<UnsignedLengthEdit> edtLength(new UnsignedLengthEdit());
-  edtLength->configure(getLengthUnit(), LengthEditBase::Steps::pinLength(),
-                       "symbol_editor/add_pins/length");
-  edtLength->setValue(mLastLength);
-  edtLength->addAction(cmd.sizeIncrease.createAction(
-      edtLength.get(), edtLength.get(), &UnsignedLengthEdit::stepUp));
-  edtLength->addAction(cmd.sizeDecrease.createAction(
-      edtLength.get(), edtLength.get(), &UnsignedLengthEdit::stepDown));
-  connect(edtLength.get(), &UnsignedLengthEdit::valueChanged, this,
-          &SymbolEditorState_AddPins::lengthEditValueChanged);
-  mContext.commandToolBar.addWidget(std::move(edtLength));
-
-  std::unique_ptr<QToolButton> toolButtonImport(new QToolButton());
-  toolButtonImport->setIcon(QIcon(":/img/actions/import.png"));
-  toolButtonImport->setText(tr("Mass Import"));
-  toolButtonImport->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-  connect(toolButtonImport.get(), &QToolButton::clicked, this,
-          &SymbolEditorState_AddPins::execMassImport);
-  mContext.commandToolBar.addWidget(std::move(toolButtonImport));
-
-  const Point pos = mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos())
-                        .mappedToGrid(mContext.graphicsScene.getGridInterval());
+  const Point pos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos())
+                        .mappedToGrid(getGridInterval());
   if (!addNextPin(pos)) {
     return false;
   }
-  mContext.graphicsView.setCursor(Qt::CrossCursor);
+
+  mAdapter.fsmToolEnter(*this);
+  mAdapter.fsmSetFeatures(SymbolEditorFsmAdapter::Feature::Rotate |
+                          SymbolEditorFsmAdapter::Feature::Mirror);
+  mAdapter.fsmSetViewCursor(Qt::CrossCursor);
   return true;
 }
 
 bool SymbolEditorState_AddPins::exit() noexcept {
   // abort command
   try {
-    mEditCmd.reset();
+    mCurrentEditCmd.reset();
     mCurrentGraphicsItem.reset();
     mCurrentPin.reset();
     mContext.undoStack.abortCmdGroup();
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     return false;
   }
 
-  // cleanup command toolbar
-  mNameLineEdit = nullptr;
-  mContext.commandToolBar.clear();
-
-  mContext.graphicsView.unsetCursor();
-  return true;
-}
-
-QSet<EditorWidgetBase::Feature>
-    SymbolEditorState_AddPins::getAvailableFeatures() const noexcept {
-  return {
-      EditorWidgetBase::Feature::Abort,
-      EditorWidgetBase::Feature::Rotate,
-      EditorWidgetBase::Feature::Mirror,
-  };
-}
-
-/*******************************************************************************
- *  Event Handlers
- ******************************************************************************/
-
-bool SymbolEditorState_AddPins::processGraphicsSceneMouseMoved(
-    const GraphicsSceneMouseEvent& e) noexcept {
-  Point currentPos = e.scenePos.mappedToGrid(getGridInterval());
-  if (mEditCmd) {
-    mEditCmd->setPosition(currentPos, true);
-  }
-  return true;
-}
-
-bool SymbolEditorState_AddPins::processGraphicsSceneLeftMouseButtonPressed(
-    const GraphicsSceneMouseEvent& e) noexcept {
-  Point currentPos = e.scenePos.mappedToGrid(getGridInterval());
-  try {
-    if (mEditCmd) {
-      mEditCmd->setPosition(currentPos, true);
-      mContext.undoStack.appendToCmdGroup(mEditCmd.release());
-    }
-    mContext.undoStack.commitCmdGroup();
-    mCurrentGraphicsItem->setSelected(false);
-    mCurrentGraphicsItem.reset();
-    mCurrentPin.reset();
-    return addNextPin(currentPos);
-  } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
-    return false;
-  }
-}
-
-bool SymbolEditorState_AddPins::processGraphicsSceneRightMouseButtonReleased(
-    const GraphicsSceneMouseEvent& e) noexcept {
-  Q_UNUSED(e);
-  return processRotate(Angle::deg90());
-}
-
-bool SymbolEditorState_AddPins::processRotate(const Angle& rotation) noexcept {
-  if (mEditCmd) {
-    mEditCmd->rotate(rotation, mCurrentPin->getPosition(), true);
-    mLastRotation = mCurrentPin->getRotation();
-  }
-  return true;
-}
-
-bool SymbolEditorState_AddPins::processMirror(
-    Qt::Orientation orientation) noexcept {
-  if (mEditCmd) {
-    mEditCmd->mirror(orientation, mCurrentPin->getPosition(), true);
-    mLastRotation = mCurrentPin->getRotation();
-  }
+  mAdapter.fsmSetViewCursor(std::nullopt);
+  mAdapter.fsmSetFeatures(SymbolEditorFsmAdapter::Features());
+  mAdapter.fsmToolLeave();
   return true;
 }
 
 /*******************************************************************************
- *  Private Methods
+ *  Connection to UI
  ******************************************************************************/
 
-bool SymbolEditorState_AddPins::addNextPin(const Point& pos) noexcept {
-  try {
-    mNameLineEdit->setText(determineNextPinName());
-    mContext.undoStack.beginCmdGroup(tr("Add symbol pin"));
-    mCurrentPin = std::make_shared<SymbolPin>(
-        Uuid::createRandom(), CircuitIdentifier(mNameLineEdit->text()), pos,
-        mLastLength, mLastRotation,
-        SymbolPin::getDefaultNamePosition(mLastLength), Angle(0),
-        SymbolPin::getDefaultNameHeight(),
-        SymbolPin::getDefaultNameAlignment());  // can throw
-    mContext.undoStack.appendToCmdGroup(
-        new CmdSymbolPinInsert(mContext.symbol.getPins(), mCurrentPin));
-    mCurrentGraphicsItem =
-        mContext.symbolGraphicsItem.getGraphicsItem(mCurrentPin);
-    Q_ASSERT(mCurrentGraphicsItem);
-    mCurrentGraphicsItem->setSelected(true);
-    mEditCmd.reset(new CmdSymbolPinEdit(mCurrentPin));
-    return true;
-  } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
-    mEditCmd.reset();
-    mCurrentGraphicsItem.reset();
-    mCurrentPin.reset();
-    return false;
+void SymbolEditorState_AddPins::setName(
+    const CircuitIdentifier& name) noexcept {
+  if (mCurrentProperties.setName(name)) {
+    emit nameChanged(mCurrentProperties.getName());
+  }
+
+  if (mCurrentEditCmd) {
+    mCurrentEditCmd->setName(mCurrentProperties.getName(), true);
   }
 }
 
-void SymbolEditorState_AddPins::nameLineEditTextChanged(
-    const QString& text) noexcept {
-  if (mEditCmd && (!text.trimmed().isEmpty())) {
-    try {
-      mEditCmd->setName(CircuitIdentifier(text.trimmed()), true);  // can throw
-    } catch (const Exception&) {
-      // invalid name
-    }
+void SymbolEditorState_AddPins::setLength(
+    const UnsignedLength& length) noexcept {
+  if (mCurrentProperties.setLength(length)) {
+    emit lengthChanged(mCurrentProperties.getLength());
   }
-}
 
-void SymbolEditorState_AddPins::lengthEditValueChanged(
-    const UnsignedLength& value) noexcept {
-  mLastLength = value;
-  if (mEditCmd) {
-    mEditCmd->setLength(mLastLength, true);
-    mEditCmd->setNamePosition(SymbolPin::getDefaultNamePosition(mLastLength),
-                              true);
+  mCurrentProperties.setNamePosition(
+      SymbolPin::getDefaultNamePosition(mCurrentProperties.getLength()));
+
+  if (mCurrentEditCmd) {
+    mCurrentEditCmd->setLength(mCurrentProperties.getLength(), true);
+    mCurrentEditCmd->setNamePosition(mCurrentProperties.getNamePosition(),
+                                     true);
   }
 }
 
 void SymbolEditorState_AddPins::execMassImport() noexcept {
   try {
     CircuitIdentifierImportDialog dlg("symbol_editor/import_pins_dialog",
-                                      &mContext.editorWidget);
+                                      parentWidget());
     if (dlg.exec() != QDialog::Accepted) {
       return;
     }
@@ -260,23 +153,108 @@ void SymbolEditorState_AddPins::execMassImport() noexcept {
         new SymbolClipboardData(mContext.symbol.getUuid(), Point(0, 0)));
     Point pos(0, 0);
     foreach (const auto& name, names) {
-      data->getPins().append(std::make_shared<SymbolPin>(
-          Uuid::createRandom(), name, pos, mLastLength, Angle::deg0(),
-          SymbolPin::getDefaultNamePosition(mLastLength), Angle::deg0(),
-          SymbolPin::getDefaultNameHeight(),
-          SymbolPin::getDefaultNameAlignment()));
+      mCurrentProperties.setName(name);
+      mCurrentProperties.setPosition(pos);
+      data->getPins().append(std::make_shared<SymbolPin>(Uuid::createRandom(),
+                                                         mCurrentProperties));
       pos.setY(pos.getY() - Length(2540000));
     }
     requestPaste(std::move(data));
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
 }
 
-QString SymbolEditorState_AddPins::determineNextPinName() const noexcept {
+/*******************************************************************************
+ *  Event Handlers
+ ******************************************************************************/
+
+bool SymbolEditorState_AddPins::processGraphicsSceneMouseMoved(
+    const GraphicsSceneMouseEvent& e) noexcept {
+  Point currentPos = e.scenePos.mappedToGrid(getGridInterval());
+  if (mCurrentEditCmd) {
+    mCurrentEditCmd->setPosition(currentPos, true);
+  }
+  return true;
+}
+
+bool SymbolEditorState_AddPins::processGraphicsSceneLeftMouseButtonPressed(
+    const GraphicsSceneMouseEvent& e) noexcept {
+  Point currentPos = e.scenePos.mappedToGrid(getGridInterval());
+  try {
+    if (mCurrentEditCmd) {
+      mCurrentEditCmd->setPosition(currentPos, true);
+      mContext.undoStack.appendToCmdGroup(mCurrentEditCmd.release());
+    }
+    mContext.undoStack.commitCmdGroup();
+    mCurrentGraphicsItem->setSelected(false);
+    mCurrentGraphicsItem.reset();
+    mCurrentPin.reset();
+    return addNextPin(currentPos);
+  } catch (const Exception& e) {
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+    return false;
+  }
+}
+
+bool SymbolEditorState_AddPins::processGraphicsSceneRightMouseButtonReleased(
+    const GraphicsSceneMouseEvent& e) noexcept {
+  Q_UNUSED(e);
+  return processRotate(Angle::deg90());
+}
+
+bool SymbolEditorState_AddPins::processRotate(const Angle& rotation) noexcept {
+  if (mCurrentEditCmd) {
+    mCurrentEditCmd->rotate(rotation, mCurrentPin->getPosition(), true);
+    mCurrentProperties.setRotation(mCurrentPin->getRotation());
+  }
+  return true;
+}
+
+bool SymbolEditorState_AddPins::processMirror(
+    Qt::Orientation orientation) noexcept {
+  if (mCurrentEditCmd) {
+    mCurrentEditCmd->mirror(orientation, mCurrentPin->getPosition(), true);
+    mCurrentProperties.setRotation(mCurrentPin->getRotation());
+  }
+  return true;
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+bool SymbolEditorState_AddPins::addNextPin(const Point& pos) noexcept {
+  SymbolGraphicsItem* item = getGraphicsItem();
+  if (!item) return false;
+
+  try {
+    mContext.undoStack.beginCmdGroup(tr("Add symbol pin"));
+    setName(determineNextPinName());
+    mCurrentProperties.setPosition(pos);
+    mCurrentPin = std::make_shared<SymbolPin>(Uuid::createRandom(),
+                                              mCurrentProperties);  // can throw
+    mContext.undoStack.appendToCmdGroup(
+        new CmdSymbolPinInsert(mContext.symbol.getPins(), mCurrentPin));
+    mCurrentGraphicsItem = item->getGraphicsItem(mCurrentPin);
+    Q_ASSERT(mCurrentGraphicsItem);
+    mCurrentGraphicsItem->setSelected(true);
+    mCurrentEditCmd.reset(new CmdSymbolPinEdit(mCurrentPin));
+    return true;
+  } catch (const Exception& e) {
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+    mCurrentEditCmd.reset();
+    mCurrentGraphicsItem.reset();
+    mCurrentPin.reset();
+    return false;
+  }
+}
+
+CircuitIdentifier SymbolEditorState_AddPins::determineNextPinName()
+    const noexcept {
   int i = 1;
   while (hasPin(QString::number(i))) ++i;
-  return QString::number(i);
+  return CircuitIdentifier(QString::number(i));  // can throw, but should not
 }
 
 bool SymbolEditorState_AddPins::hasPin(const QString& name) const noexcept {

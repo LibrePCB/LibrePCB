@@ -67,13 +67,6 @@ struct CircuitIdentifierConstraint {
   }
 };
 
-inline static QString cleanCircuitIdentifier(
-    const QString& userInput) noexcept {
-  return Toolbox::cleanUserInputString(
-      userInput, QRegularExpression("[^-a-zA-Z0-9._+/!?&@#$()]"), true, false,
-      false, "_", CircuitIdentifierConstraint::MAX_LENGTH);
-}
-
 /**
  * CircuitIdentifier is a wrapper around QString which guarantees to contain a
  * valid identifier used in circuits.
@@ -166,6 +159,20 @@ inline QDebug operator<<(QDebug stream, const CircuitIdentifier& obj) {
 inline std::size_t qHash(const CircuitIdentifier& key,
                          std::size_t seed = 0) noexcept {
   return ::qHash(*key, seed);
+}
+
+inline static QString cleanCircuitIdentifier(
+    const QString& userInput) noexcept {
+  return Toolbox::cleanUserInputString(
+      userInput, QRegularExpression("[^-a-zA-Z0-9._+/!?&@#$()]"), true, false,
+      false, "_", CircuitIdentifierConstraint::MAX_LENGTH);
+}
+
+inline static std::optional<CircuitIdentifier> parseCircuitIdentifier(
+    const QString& name) noexcept {
+  return CircuitIdentifierConstraint()(name)
+      ? CircuitIdentifier(name)
+      : std::optional<CircuitIdentifier>();
 }
 
 /*******************************************************************************
