@@ -127,6 +127,7 @@ public:
   virtual bool processSnapToGrid() noexcept { return false; }
   virtual bool processRemove() noexcept { return false; }
   virtual bool processEditProperties() noexcept { return false; }
+  virtual bool processImportPins() noexcept { return false; }
   virtual bool processImportDxf() noexcept { return false; }
   virtual bool processAbortCommand() noexcept { return false; }
   virtual bool processGridIntervalChanged(

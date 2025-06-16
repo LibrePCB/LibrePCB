@@ -63,6 +63,14 @@ std::optional<PositiveLength> s2plength(const ui::Int64& v) noexcept {
   return (l > 0) ? std::make_optional(PositiveLength(l)) : std::nullopt;
 }
 
+int l2s(const Angle& v) noexcept {
+  return v.toMicroDeg();
+}
+
+Angle s2angle(int v) noexcept {
+  return Angle(v);
+}
+
 ui::GridStyle l2s(Theme::GridStyle v) noexcept {
   switch (v) {
     case Theme::GridStyle::Lines:
@@ -123,6 +131,48 @@ LengthUnit s2l(ui::LengthUnit v) noexcept {
     default:
       qCritical() << "Unhandled value in LengthUnit conversion.";
       return LengthUnit::millimeters();
+  }
+}
+
+ui::HAlign l2s(const HAlign& v) noexcept {
+  if (v == HAlign::left()) {
+    return ui::HAlign::Left;
+  } else if (v == HAlign::right()) {
+    return ui::HAlign::Right;
+  } else {
+    return ui::HAlign::Center;
+  }
+}
+
+HAlign s2l(ui::HAlign v) noexcept {
+  switch (v) {
+    case ui::HAlign::Left:
+      return HAlign::left();
+    case ui::HAlign::Right:
+      return HAlign::right();
+    default:
+      return HAlign::center();
+  }
+}
+
+ui::VAlign l2s(const VAlign& v) noexcept {
+  if (v == VAlign::top()) {
+    return ui::VAlign::Top;
+  } else if (v == VAlign::bottom()) {
+    return ui::VAlign::Bottom;
+  } else {
+    return ui::VAlign::Center;
+  }
+}
+
+VAlign s2l(ui::VAlign v) noexcept {
+  switch (v) {
+    case ui::VAlign::Top:
+      return VAlign::top();
+    case ui::VAlign::Bottom:
+      return VAlign::bottom();
+    default:
+      return VAlign::center();
   }
 }
 

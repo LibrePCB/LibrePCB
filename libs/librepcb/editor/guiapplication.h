@@ -42,7 +42,7 @@ class Workspace;
 namespace editor {
 
 class LibrariesModel;
-class LibraryEditor;
+class LibraryEditor2;
 class MainWindow;
 class Notification;
 class NotificationsModel;
@@ -80,6 +80,12 @@ public:
   // Libraries
   LibrariesModel& getLocalLibraries() noexcept { return *mLocalLibraries; }
   LibrariesModel& getRemoteLibraries() noexcept { return *mRemoteLibraries; }
+  const QVector<std::shared_ptr<LibraryEditor2>>& getLibraries() noexcept {
+    return mLibraries->values();
+  }
+  std::shared_ptr<LibraryEditor2> openLibrary(const FilePath& libDir) noexcept;
+  void closeLibrary(int index) noexcept;
+  bool requestClosingAllLibraries() noexcept;
 
   // Projects
   const QVector<std::shared_ptr<ProjectEditor>>& getProjects() noexcept {
@@ -99,11 +105,13 @@ public:
   std::shared_ptr<ProjectEditor> openProject(FilePath fp,
                                              QWidget* parent) noexcept;
   void closeProject(int index) noexcept;
+  bool requestClosingAllProjects() noexcept;
 
   // Windows
   NotificationsModel& getNotifications() noexcept { return *mNotifications; }
   void createNewWindow(int id = -1, int projectIndex = -1) noexcept;
-  bool requestClosingWindow() noexcept;
+  int getWindowCount() const noexcept;
+  void stopWindowStateAutosaveTimer() noexcept;
 
   // General Methods
   void exec();
@@ -122,22 +130,7 @@ protected:
 private:
   void openProjectsPassedByCommandLine() noexcept;
   void openProjectPassedByOs(const QString& file, bool silent = false) noexcept;
-
-  bool requestClosingAllProjects() noexcept;
   void openProjectLibraryUpdater(const FilePath& project) noexcept;
-
-  void openLibraryEditor(const FilePath& libDir) noexcept;
-  void libraryEditorDestroyed() noexcept;
-
-  /**
-   * @brief Close all open library editors
-   *
-   * @param askForSave    If true, the user will be asked to save all modified
-   *                      libraries
-   *
-   * @retval  true if all library editors successfully closed, false otherwise
-   */
-  bool closeAllLibraryEditors(bool askForSave) noexcept;
 
   std::shared_ptr<MainWindow> getCurrentWindow() noexcept;
   void updateLibrariesContainStandardComponents() noexcept;
@@ -154,7 +147,8 @@ private:
   std::shared_ptr<LibrariesModel> mRemoteLibraries;
   std::unique_ptr<SlintKeyEventTextBuilder> mLibrariesFilter;
   std::shared_ptr<UiObjectList<ProjectEditor, ui::ProjectData>> mProjects;
-  QHash<FilePath, LibraryEditor*> mOpenLibraryEditors;
+  std::shared_ptr<UiObjectList<LibraryEditor2, ui::LibraryEditorData>>
+      mLibraries;
   std::unique_ptr<ProjectLibraryUpdater> mProjectLibraryUpdater;
   QList<std::shared_ptr<MainWindow>> mWindows;
   QTimer mSaveOpenedWindowsCountdown;

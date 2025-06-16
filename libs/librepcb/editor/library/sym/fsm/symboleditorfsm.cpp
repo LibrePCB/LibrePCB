@@ -275,8 +275,16 @@ bool SymbolEditorFsm::processStartSelecting() noexcept {
   return setNextState(State::SELECT);
 }
 
-bool SymbolEditorFsm::processStartAddingSymbolPins() noexcept {
-  return setNextState(State::ADD_PINS);
+bool SymbolEditorFsm::processStartAddingSymbolPins(bool import) noexcept {
+  if (setNextState(State::ADD_PINS)) {
+    if (import) {
+      if (auto state = getCurrentState()) {
+        state->processImportPins();
+      }
+    }
+    return true;
+  }
+  return false;
 }
 
 bool SymbolEditorFsm::processStartAddingNames() noexcept {

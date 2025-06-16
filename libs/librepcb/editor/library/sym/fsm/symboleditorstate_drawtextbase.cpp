@@ -31,7 +31,6 @@
 #include "../../../widgets/graphicsview.h"
 #include "../../../widgets/layercombobox.h"
 #include "../../../widgets/positivelengthedit.h"
-#include "../symboleditorwidget.h"
 #include "../symbolgraphicsitem.h"
 
 #include <librepcb/core/geometry/text.h>
@@ -186,6 +185,25 @@ void SymbolEditorState_DrawTextBase::setText(const QString& text) noexcept {
 
   if (mCurrentEditCmd) {
     mCurrentEditCmd->setText(mCurrentProperties.getText(), true);
+  }
+}
+
+QStringList SymbolEditorState_DrawTextBase::getTextSuggestions()
+    const noexcept {
+  if (mMode == Mode::TEXT) {
+    return {
+        "{{NAME}}",  //
+        "{{VALUE}}",  //
+        "{{SHEET}}",  //
+        "{{PROJECT}}",  //
+        "{{DATE}}",  //
+        "{{TIME}}",  //
+        "{{AUTHOR}}",  //
+        "{{VERSION}}",  //
+        "{{PAGE_X_OF_Y}}",  //
+    };
+  } else {
+    return QStringList();
   }
 }
 

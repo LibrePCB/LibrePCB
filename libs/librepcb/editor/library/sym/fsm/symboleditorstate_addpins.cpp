@@ -29,7 +29,6 @@
 #include "../../../widgets/unsignedlengthedit.h"
 #include "../../cmd/cmdsymbolpinedit.h"
 #include "../symbolclipboarddata.h"
-#include "../symboleditorwidget.h"
 #include "../symbolgraphicsitem.h"
 #include "../symbolpingraphicsitem.h"
 
@@ -138,33 +137,6 @@ void SymbolEditorState_AddPins::setLength(
   }
 }
 
-void SymbolEditorState_AddPins::execMassImport() noexcept {
-  try {
-    CircuitIdentifierImportDialog dlg("symbol_editor/import_pins_dialog",
-                                      parentWidget());
-    if (dlg.exec() != QDialog::Accepted) {
-      return;
-    }
-    const QList<CircuitIdentifier> names = dlg.getValues();
-    if (names.isEmpty()) {
-      return;
-    }
-    std::unique_ptr<SymbolClipboardData> data(
-        new SymbolClipboardData(mContext.symbol.getUuid(), Point(0, 0)));
-    Point pos(0, 0);
-    foreach (const auto& name, names) {
-      mCurrentProperties.setName(name);
-      mCurrentProperties.setPosition(pos);
-      data->getPins().append(std::make_shared<SymbolPin>(Uuid::createRandom(),
-                                                         mCurrentProperties));
-      pos.setY(pos.getY() - Length(2540000));
-    }
-    requestPaste(std::move(data));
-  } catch (const Exception& e) {
-    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
-  }
-}
-
 /*******************************************************************************
  *  Event Handlers
  ******************************************************************************/
@@ -216,6 +188,34 @@ bool SymbolEditorState_AddPins::processMirror(
   if (mCurrentEditCmd) {
     mCurrentEditCmd->mirror(orientation, mCurrentPin->getPosition(), true);
     mCurrentProperties.setRotation(mCurrentPin->getRotation());
+  }
+  return true;
+}
+
+bool SymbolEditorState_AddPins::processImportPins() noexcept {
+  try {
+    CircuitIdentifierImportDialog dlg("symbol_editor/import_pins_dialog",
+                                      parentWidget());
+    if (dlg.exec() != QDialog::Accepted) {
+      return true;
+    }
+    const QList<CircuitIdentifier> names = dlg.getValues();
+    if (names.isEmpty()) {
+      return true;
+    }
+    std::unique_ptr<SymbolClipboardData> data(
+        new SymbolClipboardData(mContext.symbol.getUuid(), Point(0, 0)));
+    Point pos(0, 0);
+    foreach (const auto& name, names) {
+      mCurrentProperties.setName(name);
+      mCurrentProperties.setPosition(pos);
+      data->getPins().append(std::make_shared<SymbolPin>(Uuid::createRandom(),
+                                                         mCurrentProperties));
+      pos.setY(pos.getY() - Length(2540000));
+    }
+    requestPaste(std::move(data));
+  } catch (const Exception& e) {
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
   return true;
 }

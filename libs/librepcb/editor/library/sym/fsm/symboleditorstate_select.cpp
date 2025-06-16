@@ -40,7 +40,6 @@
 #include "../../cmd/cmdpastesymbolitems.h"
 #include "../../cmd/cmdremoveselectedsymbolitems.h"
 #include "../symbolclipboarddata.h"
-#include "../symboleditorwidget.h"
 #include "../symbolgraphicsitem.h"
 #include "../symbolpingraphicsitem.h"
 #include "../symbolpinpropertiesdialog.h"

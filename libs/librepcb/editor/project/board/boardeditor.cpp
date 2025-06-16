@@ -137,7 +137,9 @@ ui::BoardData BoardEditor::getUiData() const noexcept {
           drcState,  // State
           mDrcMessages,  // Rule check messages
           mDrcMessages ? mDrcMessages->getUnapprovedCount() : 0,  // Unapproved
+          mDrcMessages ? mDrcMessages->getErrorCount() : 0,  // Errors
           q2s(mDrcExecutionError),  // Execution error
+          !mProject.getDirectory().isWritable(),  // Read-only
       },
       q2s(mOrderStatus),  // Order status / error
       mOrderRequest ? q2s(mOrderRequest->getReceivedInfoUrl().toString())

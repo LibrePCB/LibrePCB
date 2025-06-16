@@ -29,7 +29,9 @@
 #include "../../../graphics/polygongraphicsitem.h"
 #include "../schematicgraphicsscene.h"
 
+#include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/schematic/items/si_symbol.h>
 #include <librepcb/core/utils/toolbox.h>
@@ -57,6 +59,15 @@ SGI_Symbol::SGI_Symbol(SI_Symbol& symbol,
   setFlag(QGraphicsItem::ItemHasNoContents, true);
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setZValue(SchematicGraphicsScene::ZValue_Symbols);
+  setToolTip(QString("<b>%1</b><p>%2</p>")
+                 .arg(*mSymbol.getComponentInstance()
+                           .getLibComponent()
+                           .getNames()
+                           .getDefaultValue())
+                 .arg(mSymbol.getComponentInstance()
+                          .getLibComponent()
+                          .getDescriptions()
+                          .getDefaultValue()));
 
   mOriginCrossGraphicsItem = std::make_shared<OriginCrossGraphicsItem>(this);
   mOriginCrossGraphicsItem->setSize(UnsignedLength(1400000));

@@ -70,6 +70,7 @@ public:
       const GraphicsSceneMouseEvent& e) noexcept override;
   bool processRotate(const Angle& rotation) noexcept override;
   bool processMirror(Qt::Orientation orientation) noexcept override;
+  bool processImportPins() noexcept override;
 
   // Connection to UI
   const CircuitIdentifier& getName() const noexcept {
@@ -80,7 +81,6 @@ public:
     return mCurrentProperties.getLength();
   }
   void setLength(const UnsignedLength& length) noexcept;
-  void execMassImport() noexcept;
 
   // Operator Overloadings
   SymbolEditorState_AddPins& operator=(const SymbolEditorState_AddPins& rhs) =

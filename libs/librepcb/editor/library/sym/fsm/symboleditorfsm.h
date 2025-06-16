@@ -115,7 +115,7 @@ public:
   bool processEditProperties() noexcept;
   bool processAbortCommand() noexcept;
   bool processStartSelecting() noexcept;
-  bool processStartAddingSymbolPins() noexcept;
+  bool processStartAddingSymbolPins(bool import) noexcept;
   bool processStartAddingNames() noexcept;
   bool processStartAddingValues() noexcept;
   bool processStartDrawLines() noexcept;

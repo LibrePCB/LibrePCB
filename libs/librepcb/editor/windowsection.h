@@ -37,6 +37,7 @@
  ******************************************************************************/
 namespace librepcb {
 
+class FilePath;
 class LengthUnit;
 class Point;
 
@@ -93,6 +94,20 @@ public:
   }
 
   template <typename T>
+  bool switchToLibraryElementTab(const FilePath& fp) noexcept {
+    for (int i = 0; i < mTabs->count(); ++i) {
+      if (auto tab = std::dynamic_pointer_cast<T>(mTabs->at(i))) {
+        if (tab->getDirectoryPath() == fp) {
+          setCurrentTab(i);
+          highlight();
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  template <typename T>
   bool switchToProjectTab(int prjIndex, int objIndex) noexcept {
     for (int i = 0; i < mTabs->count(); ++i) {
       if (auto tab = std::dynamic_pointer_cast<T>(mTabs->at(i))) {
@@ -106,6 +121,20 @@ public:
     }
     return false;
   }
+
+  /**
+   * @brief Request to close all tabs
+   *
+   * If there are unsaved changes in any tabs, this method will ask the user
+   * whether the changes should be saved or not. If the user clicks on "cancel"
+   * or the changes could not be saved successfully, this method will return
+   * false. If there were no unsaved changes or they were successfully saved,
+   * the method returns true.
+   *
+   * @retval true   All tabs are safe to be closed.
+   * @retval false  Some tabs still has unsaved changes.
+   */
+  bool requestCloseAllTabs() noexcept;
 
   // Operator Overloadings
   WindowSection& operator=(const WindowSection& rhs) = delete;

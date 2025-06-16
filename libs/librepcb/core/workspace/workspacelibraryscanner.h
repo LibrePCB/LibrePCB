@@ -76,6 +76,7 @@ signals:
   void scanSucceeded(int elementCount);
   void scanFailed(QString errorMsg);
   void scanFinished();
+  void scanInProgressChanged(bool inProgress);
 
 private:  // Methods
   void run() noexcept override;

@@ -47,6 +47,11 @@ class RuleCheckMessagesModel : public QObject,
   Q_OBJECT
 
 public:
+  // Types
+  typedef std::function<bool(const std::shared_ptr<const RuleCheckMessage>& msg,
+                             bool checkOnly)>
+      AutofixHandler;
+
   // Constructors / Destructor
   RuleCheckMessagesModel(const RuleCheckMessagesModel& other) = delete;
   explicit RuleCheckMessagesModel(QObject* parent = nullptr) noexcept;
@@ -54,9 +59,11 @@ public:
 
   // General Methods
   void clear() noexcept;
+  void setAutofixHandler(AutofixHandler handler) noexcept;
   void setMessages(const RuleCheckMessageList& messages,
                    const QSet<SExpression>& approvals) noexcept;
   int getUnapprovedCount() const noexcept { return mUnapprovedCount; }
+  int getErrorCount() const noexcept { return mErrorCount; }
 
   // Implementations
   std::size_t row_count() const override;
@@ -70,17 +77,19 @@ public:
 
 signals:
   void unapprovedCountChanged(int count);
+  void errorCountChanged(int count);
   void approvalChanged(const SExpression& approval, bool approved);
   void highlightRequested(std::shared_ptr<const RuleCheckMessage> msg,
                           bool zoomTo);
-  void autofixRequested(std::shared_ptr<const RuleCheckMessage> msg);
 
 private:
-  void updateUnapprovedCount() noexcept;
+  void updateCounters() noexcept;
 
+  AutofixHandler mAutofixHandler;
   RuleCheckMessageList mMessages;
   QSet<SExpression> mApprovals;
   int mUnapprovedCount;
+  int mErrorCount;
 };
 
 /*******************************************************************************

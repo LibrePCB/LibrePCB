@@ -88,6 +88,7 @@ public:
     return mCurrentProperties.getText();
   }
   void setText(const QString& text) noexcept;
+  QStringList getTextSuggestions() const noexcept;
   const PositiveLength& getHeight() const noexcept {
     return mCurrentProperties.getHeight();
   }

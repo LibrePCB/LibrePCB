@@ -77,6 +77,7 @@ public:
     Unlock = (1 << 11),
     Properties = (1 << 12),
     ModifyLineWidth = (1 << 13),
+    ImportGraphics = (1 << 14),
   };
   Q_DECLARE_FLAGS(Features, Feature)
 

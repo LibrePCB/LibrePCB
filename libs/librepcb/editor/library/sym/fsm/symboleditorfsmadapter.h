@@ -94,15 +94,15 @@ public:
 
   virtual void fsmToolLeave() noexcept = 0;
   virtual void fsmToolEnter(SymbolEditorState_Select& state) noexcept = 0;
-  virtual void fsmToolEnter(SymbolEditorState_AddPins& state) noexcept = 0;
-  virtual void fsmToolEnter(SymbolEditorState_AddNames& state) noexcept = 0;
-  virtual void fsmToolEnter(SymbolEditorState_AddValues& state) noexcept = 0;
   virtual void fsmToolEnter(SymbolEditorState_DrawLine& state) noexcept = 0;
   virtual void fsmToolEnter(SymbolEditorState_DrawRect& state) noexcept = 0;
   virtual void fsmToolEnter(SymbolEditorState_DrawPolygon& state) noexcept = 0;
   virtual void fsmToolEnter(SymbolEditorState_DrawCircle& state) noexcept = 0;
   virtual void fsmToolEnter(SymbolEditorState_DrawArc& state) noexcept = 0;
+  virtual void fsmToolEnter(SymbolEditorState_AddNames& state) noexcept = 0;
+  virtual void fsmToolEnter(SymbolEditorState_AddValues& state) noexcept = 0;
   virtual void fsmToolEnter(SymbolEditorState_DrawText& state) noexcept = 0;
+  virtual void fsmToolEnter(SymbolEditorState_AddPins& state) noexcept = 0;
   virtual void fsmToolEnter(SymbolEditorState_Measure& state) noexcept = 0;
 };
 

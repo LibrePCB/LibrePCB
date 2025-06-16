@@ -28,7 +28,6 @@
 #include "../../../widgets/graphicsview.h"
 #include "../../../widgets/layercombobox.h"
 #include "../../../widgets/unsignedlengthedit.h"
-#include "../symboleditorwidget.h"
 #include "../symbolgraphicsitem.h"
 
 #include <librepcb/core/geometry/circle.h>
