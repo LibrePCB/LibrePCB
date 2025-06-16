@@ -193,9 +193,9 @@ bool BoardEditorState_Select::processImportDxf() noexcept {
 
       // This operation can take some time, use wait cursor to provide
       // immediate UI feedback.
-      parentWidget()->setCursor(Qt::WaitCursor);
+      QGuiApplication::setOverrideCursor(Qt::WaitCursor);
       auto cursorScopeGuard =
-          scopeGuard([this]() { parentWidget()->unsetCursor(); });
+          scopeGuard([]() { QGuiApplication::restoreOverrideCursor(); });
 
       // Read DXF file.
       DxfReader import;
