@@ -234,15 +234,15 @@ public:
       {QKeySequence(Qt::CTRL | Qt::Key_O)},
       &categoryEditor,
   };
-  EditorCommand projectSave{
-      "project_save",  // clang-format break
-      QT_TR_NOOP("Save Project"),
-      QT_TR_NOOP("Save the currently opened project"),
-      ":/bi/floppy-fill.svg",
-      EditorCommand::Flags(),
-      {QKeySequence(Qt::CTRL | Qt::Key_S)},
-      &categoryEditor,
-  };
+  // EditorCommand projectSave{
+  //     "project_save",  // clang-format break
+  //     QT_TR_NOOP("Save Project"),
+  //     QT_TR_NOOP("Save the currently opened project"),
+  //     ":/bi/floppy-fill.svg",
+  //     EditorCommand::Flags(),
+  //     {QKeySequence(Qt::CTRL | Qt::Key_S)},
+  //     &categoryEditor,
+  // };
   EditorCommand projectSetup{
       "project_setup",  // clang-format break
       QT_TR_NOOP("Project Setup"),

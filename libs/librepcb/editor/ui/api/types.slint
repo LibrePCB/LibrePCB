@@ -245,6 +245,9 @@ export enum FeatureState {
 
 // Features available in a tab (see TabData)
 export struct TabFeatures {
+    save: FeatureState,
+    undo: FeatureState,
+    redo: FeatureState,
     export-graphics: FeatureState,
     select: FeatureState,
     cut: FeatureState,
@@ -281,6 +284,7 @@ export enum TabAction {
     accept,
 
     // General
+    save,
     print,
     export-image,
     export-pdf,
@@ -297,6 +301,8 @@ export enum TabAction {
     select-all,
 
     // Modify
+    undo,
+    redo,
     cut,
     copy,
     paste,
@@ -376,6 +382,12 @@ export struct TabData {
     type: TabType,
     title: string,
     features: TabFeatures,
+    read-only: bool,
+    unsaved-changes: bool,
+
+    // Undo/redo
+    undo-text: string,
+    redo-text: string,
 
     // Find
     find-term: string,  // Set by UI, handled in backend
@@ -661,8 +673,6 @@ export struct BoardData {
 export enum ProjectAction {
     close,
     save,
-    undo,
-    redo,
     export-bom,
     export-lppz,
     open-folder,
@@ -682,13 +692,6 @@ export struct ProjectData {
     writable: bool,
     ieee315-symbols: bool,
     unsaved-changes: bool,
-
-    // Undo/redo
-    can-undo: bool,
-    can-redo: bool,
-    undo-text: string,
-    redo-text: string,
-
     erc: RuleCheckData,
 }
 

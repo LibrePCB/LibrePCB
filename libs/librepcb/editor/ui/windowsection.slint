@@ -62,12 +62,20 @@ component TabButton inherits Rectangle {
         }
 
         if tab.type != TabType.home: close-btn := IconButton {
+            property <bool> circle: tab.unsaved-changes && (!self.has-hover);
+
             y: (parent.height - self.height) / 2;
             height: parent.height * 0.6;
-            icon-scale: 0.7;
+            icon-scale: circle ? 0.5 : 0.7;
             color-enabled: txt.color;
             border-radius: 3px;
-            icon: @image-url("../../../font-awesome/svgs/solid/xmark.svg");
+            icon: {
+                if circle {
+                    @image-url("../../../font-awesome/svgs/solid/circle.svg")
+                } else {
+                    @image-url("../../../font-awesome/svgs/solid/xmark.svg")
+                }
+            };
             accessible-label: "close tab";
 
             clicked => {
