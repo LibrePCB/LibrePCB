@@ -74,6 +74,8 @@ private:  // Methods
       const QString& setDefaultAv, bool save, bool strict) const noexcept;
   bool openLibrary(const QString& libDir, bool all, bool runCheck,
                    bool minifyStepFiles, bool save, bool strict) const noexcept;
+  bool openPackage(const QString& packageFile, bool runCheck,
+                   const QString& exportFile) const noexcept;
   void processLibraryElement(const QString& libDir, TransactionalFileSystem& fs,
                              LibraryBaseElement& element, bool runCheck,
                              bool minifyStepFiles, bool save, bool strict,

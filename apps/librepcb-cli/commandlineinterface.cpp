@@ -88,6 +88,9 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
       {"open-library",
        {tr("Open a library to execute library-related tasks."),
         "open-library [command_options]"}},  // no tr()!
+      {"open-package",
+       {tr("Open a package to execute package-related tasks."),
+        "open-package [command_options]"}},  // no tr()!
       {"open-step",
        {tr("Open a STEP model to execute STEP-related tasks outside of a "
            "library."),
@@ -281,6 +284,17 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
           .arg("--minify"),
       tr("file"));
 
+  // Define options for "open-package"
+  QCommandLineOption pkgCheckOption(
+      "check",
+      tr("Run the package check, print all non-approved messages and "
+         "report failure (exit code = 1) if there are non-approved messages."));
+  QCommandLineOption pkgExportOption("export",
+                                     tr("Export the package to a graphical "
+                                        "file. Supported file extensions: %1")
+                                         .arg("png, pdf, svg"),
+                                     tr("file"));
+
   // Build help text.
   const QString executable = args.value(0);
   QString helpText = parser.helpText() % "\n" % tr("Commands:") % "\n";
@@ -350,6 +364,14 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
     parser.addOption(stepMinifyOption);
     parser.addOption(stepTesselateOption);
     parser.addOption(stepSaveToOption);
+  } else if (command == "open-package") {
+    parser.addPositionalArgument(command, commands[command].first,
+                                 commands[command].second);
+    parser.addPositionalArgument(
+        "package", tr("Path to package directory (containing *.lp)."));
+    positionalArgNames.append("package");
+    parser.addOption(pkgCheckOption);
+    parser.addOption(pkgExportOption);
   } else if (!command.isEmpty()) {
     printErr(tr("Unknown command '%1'.").arg(command));
     printErr(usageHelpText);
@@ -465,6 +487,11 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
                           parser.isSet(stepMinifyOption),  // minify
                           parser.isSet(stepTesselateOption),  // tesselate
                           parser.value(stepSaveToOption)  // save to
+    );
+  } else if (command == "open-package") {
+    cmdSuccess = openPackage(positionalArgs.value(1),  // package directory
+                             parser.isSet(pkgCheckOption),  // run check
+                             parser.value(pkgExportOption)  // export file
     );
   } else {
     printErr("Internal failure.");  // No tr() because this cannot occur.
@@ -1294,6 +1321,41 @@ void CommandLineInterface::processLibraryElement(
   // Do not propagate changes in the transactional file system to the
   // following checks
   fs.discardChanges();
+}
+
+bool CommandLineInterface::openPackage(
+    const QString& packageFile, bool runCheck,
+    const QString& exportFile) const noexcept {
+  try {
+    bool success = true;
+
+    // Open package directory (similar to openLibrary)
+    FilePath packageFp(QFileInfo(packageFile).absoluteFilePath());
+    print(tr("Open package '%1'...").arg(prettyPath(packageFp, packageFile)));
+
+    std::shared_ptr<TransactionalFileSystem> packageFs =
+        TransactionalFileSystem::open(packageFp, false);  // can throw
+    std::unique_ptr<Package> package =
+        Package::open(std::unique_ptr<TransactionalDirectory>(
+            new TransactionalDirectory(packageFs)));  // can throw
+
+    // Process the package element (similar to how openLibrary processes
+    // individual elements)
+    if (runCheck) {
+      processLibraryElement(packageFile, *packageFs, *package, runCheck, false,
+                            false, false, success);
+    }
+
+    // TODO: Implement --export functionality
+    if (!exportFile.isEmpty()) {
+      print(QString("TODO: Export package to '%1'").arg(exportFile));
+    }
+
+    return success;
+  } catch (const Exception& e) {
+    printErr(tr("ERROR: %1").arg(e.getMsg()));
+    return false;
+  }
 }
 
 bool CommandLineInterface::openStep(const QString& filePath, bool minify,
