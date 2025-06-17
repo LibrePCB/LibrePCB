@@ -68,11 +68,11 @@ jobs:
       - name: Run LibrePCB Unittests
         run: ./build/tests/unittests/librepcb-unittests
       - name: Run LibrePCB-CLI Functional Tests
-        run: pytest -vvv --librepcb-executable="build/install/LibrePCB.app/Contents/MacOS/librepcb-cli" ./tests/cli
+        run: uv --directory ./tests/cli run --no-dev pytest -vvv --librepcb-executable="../../build/install/LibrePCB.app/Contents/MacOS/librepcb-cli"
       # Note: Functional tests need to be run with the non-bundled app,
       # otherwise we get errors due to multiple definitions of Qt symbols.
       - name: Run LibrePCB Functional Tests
-        run: pytest -vvv --librepcb-executable="build/install/bin/librepcb.app/Contents/MacOS/librepcb" --reruns 5 --reruns-delay 10 ./tests/funq
+        run: uv --directory ./tests/funq run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb.app/Contents/MacOS/librepcb" --reruns 5 --reruns-delay 10
       - name: Upload Artifacts
         run: ./ci/upload_artifacts.sh
         if: ${{ success() && (github.event_name == 'push') }}

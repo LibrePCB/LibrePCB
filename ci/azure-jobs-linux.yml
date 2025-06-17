@@ -62,9 +62,9 @@ jobs:
     displayName: Run rust-core tests
   - bash: xvfb-run -a ./build/tests/unittests/librepcb-unittests
     displayName: Run LibrePCB Unittests
-  - bash: xvfb-run -a --server-args="-screen 0 1024x768x24" pytest -vvv --librepcb-executable="build/install/bin/librepcb-cli" ./tests/cli
+  - bash: xvfb-run -a --server-args="-screen 0 1024x768x24" uv --directory ./tests/cli run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb-cli"
     displayName: Run LibrePCB-CLI Functional Tests
-  - bash: xvfb-run -a --server-args="-screen 0 1024x768x24" pytest -vvv --librepcb-executable="build/install/bin/librepcb" --reruns 5 --reruns-delay 10 ./tests/funq
+  - bash: xvfb-run -a --server-args="-screen 0 1024x768x24" uv --directory ./tests/funq run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb" --reruns 5 --reruns-delay 10
     displayName: Run LibrePCB Functional Tests
   - bash: ./ci/upload_artifacts.sh
     displayName: Upload Artifacts

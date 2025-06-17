@@ -31,10 +31,10 @@ jobs:
       displayName: Run rust-core tests
     - script: build\\tests\\unittests\\librepcb-unittests.exe
       displayName: Run LibrePCB Unittests
-    - script: pytest -vvv --librepcb-executable="build/install/bin/librepcb-cli.exe" ./tests/cli
+    - script: uv --directory ./tests/cli run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb-cli.exe"
       displayName: Run LibrePCB-CLI Functional Tests
     # GUI tests currently don't work for an unknown reason, thus disabled :-(
-    # - script: pytest -vvv --librepcb-executable="build/install/bin/librepcb.exe" --reruns 5 --reruns-delay 10 ./tests/funq
+    # - script: uv --directory ./tests/funq run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb.exe" --reruns 5 --reruns-delay 10
     #   displayName: Run LibrePCB Functional Tests
     - bash: ./ci/upload_artifacts.sh
       displayName: Upload Artifacts
