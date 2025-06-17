@@ -28,7 +28,6 @@
 #include <librepcb/core/types/point.h>
 
 #include <QtCore>
-#include <QtWidgets>
 
 #include <memory>
 #include <optional>
@@ -73,9 +72,8 @@ public:
   ~SymbolEditorState_Select() noexcept;
 
   // General Methods
+  bool entry() noexcept override;
   bool exit() noexcept override;
-  QSet<EditorWidgetBase::Feature> getAvailableFeatures()
-      const noexcept override;
 
   // Event Handlers
   bool processGraphicsSceneMouseMoved(
@@ -101,6 +99,8 @@ public:
   bool processEditProperties() noexcept override;
   bool processImportDxf() noexcept override;
   bool processAbortCommand() noexcept override;
+  bool processGridIntervalChanged(
+      const PositiveLength& inverval) noexcept override;
 
   // Operator Overloadings
   SymbolEditorState_Select& operator=(const SymbolEditorState_Select& rhs) =
@@ -127,6 +127,8 @@ private:  // Methods
       const Point& pos) noexcept;
   bool findPolygonVerticesAtPosition(const Point& pos) noexcept;
   void setState(SubState state) noexcept;
+  void scheduleUpdateAvailableFeatures() noexcept;
+  SymbolEditorFsmAdapter::Features updateAvailableFeatures() noexcept;
 
 private:  // Types / Data
   SubState mState;
@@ -139,6 +141,12 @@ private:  // Types / Data
   QVector<int> mSelectedPolygonVertices;
   /// The polygon edit command (nullptr if not editing)
   std::unique_ptr<CmdPolygonEdit> mCmdPolygonEdit;
+
+  /// Signal/slot connections only when in this state
+  QList<QMetaObject::Connection> mConnections;
+
+  /// Delay timer for #updateAvailableFeatures(), only when in this state
+  std::unique_ptr<QTimer> mUpdateAvailableFeaturesTimer;
 };
 
 /*******************************************************************************

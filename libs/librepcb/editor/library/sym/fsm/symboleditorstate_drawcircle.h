@@ -25,8 +25,9 @@
  ******************************************************************************/
 #include "symboleditorstate.h"
 
+#include <librepcb/core/geometry/circle.h>
+
 #include <QtCore>
-#include <QtWidgets>
 
 #include <memory>
 
@@ -34,10 +35,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class Circle;
-class Layer;
-
 namespace editor {
 
 class CircleGraphicsItem;
@@ -64,8 +61,6 @@ public:
   // General Methods
   bool entry() noexcept override;
   bool exit() noexcept override;
-  QSet<EditorWidgetBase::Feature> getAvailableFeatures()
-      const noexcept override;
 
   // Event Handlers
   bool processGraphicsSceneMouseMoved(
@@ -74,9 +69,30 @@ public:
       const GraphicsSceneMouseEvent& e) noexcept override;
   bool processAbortCommand() noexcept override;
 
+  // Connection to UI
+  QSet<const Layer*> getAvailableLayers() const noexcept;
+  const Layer& getLayer() const noexcept {
+    return mCurrentProperties.getLayer();
+  }
+  void setLayer(const Layer& layer) noexcept;
+  const UnsignedLength& getLineWidth() const noexcept {
+    return mCurrentProperties.getLineWidth();
+  }
+  void setLineWidth(const UnsignedLength& width) noexcept;
+  bool getFilled() const noexcept { return mCurrentProperties.isFilled(); }
+  void setFilled(bool filled) noexcept;
+  bool getGrabArea() const noexcept { return mCurrentProperties.isGrabArea(); }
+  void setGrabArea(bool grabArea) noexcept;
+
   // Operator Overloadings
   SymbolEditorState_DrawCircle& operator=(
       const SymbolEditorState_DrawCircle& rhs) = delete;
+
+signals:
+  void layerChanged(const Layer& layer);
+  void lineWidthChanged(const UnsignedLength& width);
+  void filledChanged(bool filled);
+  void grabAreaChanged(bool grabArea);
 
 private:  // Methods
   bool startAddCircle(const Point& pos) noexcept;
@@ -84,21 +100,12 @@ private:  // Methods
   bool finishAddCircle(const Point& pos) noexcept;
   bool abortAddCircle() noexcept;
 
-  void layerComboBoxValueChanged(const Layer& layer) noexcept;
-  void lineWidthEditValueChanged(const UnsignedLength& value) noexcept;
-  void fillCheckBoxCheckedChanged(bool checked) noexcept;
-  void grabAreaCheckBoxCheckedChanged(bool checked) noexcept;
+private:
+  Circle mCurrentProperties;
 
-private:  // Types / Data
-  std::unique_ptr<CmdCircleEdit> mEditCmd;
+  std::unique_ptr<CmdCircleEdit> mCurrentEditCmd;
   std::shared_ptr<Circle> mCurrentCircle;
   std::shared_ptr<CircleGraphicsItem> mCurrentGraphicsItem;
-
-  // parameter memory
-  const Layer* mLastLayer;
-  UnsignedLength mLastLineWidth;
-  bool mLastFill;
-  bool mLastGrabArea;
 };
 
 /*******************************************************************************

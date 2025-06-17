@@ -43,6 +43,14 @@ SymbolEditorState_DrawLine::~SymbolEditorState_DrawLine() noexcept {
 }
 
 /*******************************************************************************
+ *  Protected Methods
+ ******************************************************************************/
+
+void SymbolEditorState_DrawLine::notifyToolEnter() noexcept {
+  mAdapter.fsmToolEnter(*this);
+}
+
+/*******************************************************************************
  *  End of File
  ******************************************************************************/
 

@@ -121,8 +121,8 @@ public:
   explicit Alignment(const HAlign& h, const VAlign& v) noexcept
     : mH(h), mV(v) {}
   explicit Alignment(const SExpression& node);
-  const HAlign getH() const noexcept { return mH; }
-  const VAlign getV() const noexcept { return mV; }
+  const HAlign& getH() const noexcept { return mH; }
+  const VAlign& getV() const noexcept { return mV; }
   void setH(const HAlign& h) noexcept { mH = h; }
   void setV(const VAlign& v) noexcept { mV = v; }
   Qt::Alignment toQtAlign() const noexcept {
