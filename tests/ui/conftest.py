@@ -268,7 +268,27 @@ class LibrePcbFixture(object):
 
 
 class Helpers(object):
-    pass
+    @staticmethod
+    def wait_for_file_exists(path, timeout=10.0):
+        start = time.time()
+        while True:
+            if os.path.exists(path):
+                return
+            if time.time() > (start + timeout):
+                raise TimeoutError("File does not exist: {}".format(path))
+            time.sleep(0.05)
+
+    @staticmethod
+    def wait_for_project(app, name, timeout=10.0):
+        headers = app.get('#DocumentsPanel DocumentsPanel::project-item ProjectSection::header *')
+        start = time.time()
+        while True:
+            headers.refresh()
+            if name.upper() in headers.label:
+                return
+            if time.time() > (start + timeout):
+                raise TimeoutError("Timeout while waiting for project: {}".format(name))
+            time.sleep(0.05)
 
 
 @pytest.fixture(scope="session")
