@@ -33,6 +33,9 @@ export component Switch inherits Rectangle {
     }
 
     callback toggled(checked: bool);
+    toggled(state) => {
+        checked = state;
+    }
 
     fs := FocusScope {
         enabled: enabled && focusable;
@@ -41,7 +44,7 @@ export component Switch inherits Rectangle {
             // Only consume Space, but not Return as the Return key is often
             // used to confirm a dialog or something like that.
             if event.text == Key.Space {
-                checked = !checked;
+                toggled(!checked);
                 return accept;
             }
             reject
@@ -104,8 +107,7 @@ export component Switch inherits Rectangle {
         enabled: enabled;
 
         clicked => {
-            checked = !checked;
-            toggled(checked);
+            toggled(!checked);
         }
     }
 }

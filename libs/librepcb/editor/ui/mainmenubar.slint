@@ -15,10 +15,13 @@ import {
     EditorCommandSet as Cmd,
     FeatureState,
     Helpers,
+    LibraryEditorData,
+    LibraryElementAction,
     PanelPage,
     ProjectAction,
     SchematicAction,
     Shortcuts,
+    SymbolTabData,
     TabAction,
     TabType,
     WindowSectionAction,
@@ -275,7 +278,7 @@ export component MainMenuBar inherits Rectangle {
 
                 import-dxf := MenuItem {
                     cmd: Cmd.import-dxf;
-                    enabled: Data.current-tab.type == TabType.board-2d;
+                    enabled: Data.current-tab.features.import-graphics == FeatureState.enabled;
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.import-dxf);
@@ -630,7 +633,7 @@ export component MainMenuBar inherits Rectangle {
                 grid-interval-increase-item := MenuItem {
                     cmd: Cmd.grid-increase;
                     icon: @image-url("../../../font-awesome/svgs/solid/caret-up.svg");
-                    enabled: Data.current-tab-is-2d;
+                    enabled: Data.current-tab.features.grid == FeatureState.enabled;
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.grid-interval-increase);
@@ -640,7 +643,7 @@ export component MainMenuBar inherits Rectangle {
                 grid-interval-decrease-item := MenuItem {
                     cmd: Cmd.grid-decrease;
                     icon: @image-url("../../../font-awesome/svgs/solid/caret-down.svg");
-                    enabled: Data.current-tab-is-2d;
+                    enabled: Data.current-tab.features.grid == FeatureState.enabled;
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.grid-interval-decrease);
@@ -650,7 +653,7 @@ export component MainMenuBar inherits Rectangle {
                 grid-interval-set-item := MenuItem {
                     cmd: Cmd.grid-properties;
                     icon: @image-url("../../../bootstrap-icons/icons/grid-3x3.svg");
-                    enabled: Data.current-tab-is-2d;
+                    enabled: Data.current-tab.features.grid == FeatureState.enabled;
 
                     clicked => {
                         focus-grid-interval();
@@ -730,7 +733,7 @@ export component MainMenuBar inherits Rectangle {
                 zoom-in-item := MenuItem {
                     cmd: Cmd.zoom-in;
                     icon: @image-url("../../../bootstrap-icons/icons/zoom-in.svg");
-                    enabled: Data.current-tab-is-2d-or-3d;
+                    enabled: Data.current-tab.features.zoom == FeatureState.enabled;
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.zoom-in);
@@ -740,7 +743,7 @@ export component MainMenuBar inherits Rectangle {
                 zoom-out-item := MenuItem {
                     cmd: Cmd.zoom-out;
                     icon: @image-url("../../../bootstrap-icons/icons/zoom-out.svg");
-                    enabled: Data.current-tab-is-2d-or-3d;
+                    enabled: Data.current-tab.features.zoom == FeatureState.enabled;
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.zoom-out);
@@ -750,10 +753,120 @@ export component MainMenuBar inherits Rectangle {
                 zoom-fit-item := MenuItem {
                     cmd: Cmd.zoom-fit-content;
                     icon: @image-url("../../../font-awesome/svgs/solid/expand.svg");
-                    enabled: Data.current-tab-is-2d-or-3d;
+                    enabled: Data.current-tab.features.zoom == FeatureState.enabled;
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.zoom-fit);
+                    }
+                }
+            }
+        }
+
+        library-menu-item := MainMenuItem {
+            property <LibraryEditorData> library: Data.library-editors[Data.current-library-tab.library-index];
+
+            text: @tr("Library");
+            visible: Data.current-tab.type == TabType.library;
+
+            clicked => {
+                library-menu-popup.show();
+            }
+
+            library-menu-popup := MenuPopup {
+                x: 0;
+                y: parent.height;
+
+                save-library-item := MenuItem {
+                    cmd: Cmd.save;
+                    text: @tr("Save Library");  // More specific.
+                    icon: @image-url("../../../bootstrap-icons/icons/floppy-fill.svg");
+                    enabled: Data.current-tab.features.save == FeatureState.enabled;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.save);
+                    }
+                }
+
+                close-library-item := MenuItem {
+                    cmd: Cmd.project-close;
+                    text: @tr("Close Library");  // More specific.
+                    status-tip: @tr("Close the currently opened library");
+
+                    clicked => {
+                        Backend.trigger-library-element(library.path, LibraryElementAction.close);
+                    }
+                }
+
+                open-library-folder-item := MenuItem {
+                    cmd: Cmd.file-manager;
+                    icon: @image-url("../../../font-awesome/svgs/solid/arrow-up-right-from-square.svg");
+
+                    clicked => {
+                        Backend.trigger-library-element(library.path, LibraryElementAction.open-folder);
+                    }
+                }
+
+                MenuSeparator { }
+
+                import-eagle-library-item := MenuItem {
+                    cmd: Cmd.import-eagle-library;
+
+                    clicked => {
+                        Backend.trigger-library-element(library.path, LibraryElementAction.import-eagle-library);
+                    }
+                }
+
+                import-kicad-library-item := MenuItem {
+                    cmd: Cmd.import-kicad-library;
+
+                    clicked => {
+                        Backend.trigger-library-element(library.path, LibraryElementAction.import-kicad-library);
+                    }
+                }
+            }
+        }
+
+        symbol-menu-item := MainMenuItem {
+            property <SymbolTabData> symbol: Data.current-symbol-tab;
+
+            text: @tr("Symbol");
+            visible: Data.current-tab.type == TabType.symbol;
+
+            clicked => {
+                symbol-menu-popup.show();
+            }
+
+            symbol-menu-popup := MenuPopup {
+                x: 0;
+                y: parent.height;
+
+                save-symbol-item := MenuItem {
+                    cmd: Cmd.save;
+                    text: @tr("Save Symbol");  // More specific.
+                    icon: @image-url("../../../bootstrap-icons/icons/floppy-fill.svg");
+                    enabled: Data.current-tab.features.save == FeatureState.enabled;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.save);
+                    }
+                }
+
+                close-symbol-item := MenuItem {
+                    cmd: Cmd.project-close;
+                    text: @tr("Close Symbol");  // More specific.
+                    status-tip: @tr("Close the currently opened symbol");
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.close);
+                    }
+                }
+
+                open-symbol-folder-item := MenuItem {
+                    cmd: Cmd.file-manager;
+                    icon: @image-url("../../../font-awesome/svgs/solid/arrow-up-right-from-square.svg");
+
+                    clicked => {
+                        Backend.trigger-library-element(symbol.path, LibraryElementAction.open-folder);
                     }
                 }
             }

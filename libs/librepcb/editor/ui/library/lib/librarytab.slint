@@ -1,0 +1,800 @@
+import { ScrollView } from "std-widgets.slint";
+import { Tab } from "../../tab.slint";
+import { LibraryRuleCheckLink } from "../libraryrulechecklink.slint";
+import {
+    Badge,
+    Button,
+    ComboBox,
+    IconButton,
+    LineEdit,
+    LinkText,
+    ListViewItemButton,
+    MenuItem,
+    MenuPopup,
+    MessageBox,
+    Palette,
+    PanelHeader,
+    SceneButton,
+    SlideView,
+    Spinner,
+    Switch,
+    TextEdit,
+    ToolButton,
+    TreeView,
+} from "../../widgets.slint";
+import {
+    Backend,
+    Constants,
+    Data,
+    DismissableMessageAction,
+    EditorCommandSet as Cmd,
+    EditorTool,
+    FeatureState,
+    LibraryAction,
+    LibraryDependency,
+    LibraryElementAction,
+    LibraryTabData,
+    PanelPage,
+    TabAction,
+    TreeViewItemData,
+    WindowSectionData,
+} from "../../api.slint";
+
+component AddLibraryDependencyPopup inherits PopupWindow {
+    in-out property <[LibraryDependency]> model;
+
+    Rectangle {
+        background: #00000050;
+
+        Rectangle {
+            width: min(0.8 * parent.width, 500px);
+            height: min(self.preferred-height, 0.8 * parent.height);
+            background: #000000;
+            border-radius: 15px;
+            border-width: 1px;
+            border-color: Constants.librepcb-color;
+
+            VerticalLayout {
+                padding: 15px;
+
+                view := ScrollView {
+                    preferred-height: l.preferred-height;
+
+                    l := VerticalLayout {
+                        for item[idx] in model: TouchArea {
+                            height: item.checked ? 0 : 26px;
+
+                            if !item.checked: Rectangle {
+                                background: parent.has-hover ? #383838 : transparent;
+
+                                HorizontalLayout {
+                                    padding-left: 6px;
+                                    padding-right: 6px;
+                                    spacing: 5px;
+                                    alignment: start;
+
+                                    Image {
+                                        y: (parent.height - self.height) / 2;
+                                        width: 18px;
+                                        height: self.width;
+                                        image-fit: contain;
+                                        source: item.icon;
+                                    }
+
+                                    Text {
+                                        vertical-alignment: center;
+                                        overflow: elide;
+                                        text: item.name.is-empty ? item.uuid : item.name;
+                                    }
+                                }
+                            }
+
+                            clicked => {
+                                model[idx].checked = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+component LibraryMetadata inherits GridLayout {
+    in property <int> section-index;
+    in-out property <[LibraryTabData]> tabs;
+    in property <int> index;
+    in property <bool> read-only;
+
+    padding: 10px;
+    spacing: 8px;
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Icon:");
+        }
+
+        HorizontalLayout {
+            z: 10;  // For the tooltips.
+            alignment: start;
+            spacing: 8px;
+
+            icon-btn := IconButton {
+                property <bool> has-icon: tabs[index].icon.width > 0;
+
+                height: 48px;
+                style: hyperlink;
+                colorize: !has-icon;
+                icon-size: has-icon ? 48px : 20px;
+                icon: {
+                    if has-icon {
+                        tabs[index].icon
+                    } else {
+                        @image-url("../../../../../bootstrap-icons/icons/folder2-open.svg")
+                    }
+                };
+                enabled: !read-only;
+
+                clicked => {
+                    Backend.trigger-tab(section-index, index, TabAction.library-choose-icon);
+                }
+            }
+
+            if icon-btn.has-hover: Text {
+                color: #a0a0a0;
+                font-size: 11px;
+                vertical-alignment: center;
+                overflow: elide;
+                text: @tr("Click to change the icon.") + "\n" + @tr("Preferred:") + " PNG, 256x256 px";
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Name:");
+        }
+
+        LineEdit {
+            text: tabs[index].name;
+            validation-error: tabs[index].name-error;
+            read-only: read-only;
+
+            init => {
+                if (!read-only) && tabs[index].wizard-mode {
+                    self.select-all();
+                }
+            }
+
+            text-edited(text) => {
+                tabs[index].name = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].name = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Description:");
+        }
+
+        TextEdit {
+            height: 100px;
+            text: tabs[index].description;
+            read-only: read-only;
+
+            text-edited(text) => {
+                tabs[index].description = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].description = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Keywords:");
+        }
+
+        LineEdit {
+            text: tabs[index].keywords;
+            read-only: read-only;
+
+            text-edited(text) => {
+                tabs[index].keywords = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].keywords = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Author:");
+        }
+
+        LineEdit {
+            text: tabs[index].author;
+            read-only: read-only;
+
+            text-edited(text) => {
+                tabs[index].author = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].author = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Version:");
+        }
+
+        LineEdit {
+            text: tabs[index].version;
+            validation-error: tabs[index].version-error;
+            read-only: read-only;
+
+            text-edited(text) => {
+                tabs[index].version = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].version = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Deprecated:");
+        }
+
+        Switch {
+            font-size: 10px;
+            text: @tr("Check this if the element should no longer be used.");
+            checked: tabs[index].deprecated;
+            enabled: !read-only;
+
+            toggled(checked) => {
+                tabs[index].deprecated = checked;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("URL:");
+        }
+
+        LineEdit {
+            text: tabs[index].url;
+            validation-error: tabs[index].url-error;
+            read-only: read-only;
+
+            text-edited(text) => {
+                tabs[index].url = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].url = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Dependencies:");
+        }
+
+        VerticalLayout {
+            for item[idx] in tabs[index].dependencies: dependency-item-ta := TouchArea {
+                height: item.checked ? 22px : 0;
+
+                if item.checked: HorizontalLayout {
+                    padding-left: 3px;
+                    padding-right: 3px;
+                    spacing: 5px;
+                    alignment: start;
+
+                    Image {
+                        y: (parent.height - self.height) / 2;
+                        width: 18px;
+                        height: self.width;
+                        image-fit: contain;
+                        source: item.icon;
+                    }
+
+                    Text {
+                        vertical-alignment: center;
+                        overflow: elide;
+                        text: item.name.is-empty ? item.uuid : item.name;
+                    }
+
+                    if (!read-only) && dependency-item-ta.has-hover: ListViewItemButton {
+                        icon: @image-url("../../../../../font-awesome/svgs/solid/trash-can.svg");
+                        icon-size: 14px;
+
+                        clicked => {
+                            tabs[index].dependencies[idx].checked = false;
+                        }
+                    }
+                }
+            }
+
+            if !read-only: HorizontalLayout {
+                height: 22px;
+                padding-left: 1px;
+                padding-right: 3px;
+                spacing: 5px;
+                alignment: start;
+
+                add-dependency-btn := IconButton {
+                    style: hyperlink;
+                    icon-scale: 0.8;
+                    icon: @image-url("../../../../../bootstrap-icons/icons/plus-circle.svg");
+
+                    clicked => {
+                        add-dependency-popup.show();
+                    }
+                }
+
+                if add-dependency-btn.has-hover: Text {
+                    color: #a0a0a0;
+                    font-size: 11px;
+                    vertical-alignment: center;
+                    overflow: elide;
+                    text: @tr("Add Dependency");
+                }
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Manufacturer:");
+        }
+
+        LineEdit {
+            text: tabs[index].manufacturer;
+            read-only: read-only;
+
+            text-edited(text) => {
+                tabs[index].manufacturer = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].manufacturer = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        Rectangle { }
+
+        HorizontalLayout {
+            alignment: start;
+            spacing: 5px;
+
+            if !read-only: save-btn := Button {
+                width: max(self.preferred-width, 100px);
+                primary: tabs[index].wizard-mode || Data.sections[section-index].tabs[index].unsaved-changes;
+                icon: @image-url("../../../../../font-awesome/svgs/solid/check.svg");
+                text: tabs[index].wizard-mode ? @tr("Next") : @tr("Save");
+
+                clicked => {
+                    Backend.trigger-tab(section-index, index, TabAction.save);
+                }
+            }
+
+            LibraryRuleCheckLink {
+                data: tabs[index].checks;
+
+                clicked => {
+                    Data.set-current-tab(section-index, index);
+                    Data.panel-page = PanelPage.rule-check;
+                }
+            }
+        }
+    }
+
+    Row {
+        Rectangle { }
+    }
+
+    add-dependency-popup := AddLibraryDependencyPopup {
+        width: parent.width;
+        height: parent.height;
+        model: tabs[index].dependencies;
+    }
+}
+
+component LibraryImportButton inherits TouchArea {
+    in property <string> name;
+    in property <image> image;
+
+    Rectangle {
+        height: self.preferred-height;
+        background: parent.pressed ? #303030 : (parent.has-hover ? #2a2a2a : #252525);
+        border-color: #808080;
+        border-width: 1px;
+
+        HorizontalLayout {
+            padding: 8px;
+            spacing: 10px;
+
+            Image {
+                width: 140px;
+                height: self.source.height * self.width / self.source.width;
+                source: image;
+            }
+
+            VerticalLayout {
+                horizontal-stretch: 1;
+
+                Rectangle {
+                    vertical-stretch: 1;
+                }
+
+                Text {
+                    font-size: 20px;
+                    overflow: elide;
+                    horizontal-alignment: center;
+                    text: @tr("Import {} Libraries", name);
+                }
+
+                Rectangle {
+                    vertical-stretch: 0.5;
+                }
+
+                Text {
+                    font-size: 14px;
+                    color: #909090;
+                    horizontal-alignment: center;
+                    wrap: word-wrap;
+                    text: @tr("Start populating this library by importing library elements from {} libraries.", name);
+                }
+
+                Rectangle {
+                    vertical-stretch: 1;
+                }
+            }
+        }
+    }
+}
+
+component LibraryImport inherits VerticalLayout {
+    in property <int> section-index;
+    in-out property <[LibraryTabData]> tabs;
+    in property <int> index;
+
+    padding: 8px;
+    spacing: 12px;
+
+    LibraryImportButton {
+        name: "KiCad";
+        image: @image-url("../../../../../../img/wizards/kicad_watermark.png");
+
+        clicked => {
+            Backend.trigger-library-element(Data.library-editors[tabs[index].library-index].path, LibraryElementAction.import-kicad-library);
+        }
+    }
+
+    LibraryImportButton {
+        name: "EAGLE";
+        image: @image-url("../../../../../../img/wizards/eagle_watermark.png");
+
+        clicked => {
+            Backend.trigger-library-element(Data.library-editors[tabs[index].library-index].path, LibraryElementAction.import-eagle-library);
+        }
+    }
+
+    if tabs[index].wizard-mode: HorizontalLayout {
+        spacing: 8px;
+
+        next-btn := Button {
+            width: max(self.preferred-width, 100px);
+            primary: true;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/check.svg");
+            text: @tr("Finish");
+
+            clicked => {
+                Backend.trigger-tab(section-index, index, TabAction.next);
+            }
+        }
+
+        back-btn := Button {
+            width: self.preferred-width;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/angle-left.svg");
+            text: @tr("Back");
+
+            clicked => {
+                Backend.trigger-tab(section-index, index, TabAction.back);
+            }
+        }
+
+        Rectangle { }
+    }
+
+    Rectangle { }
+}
+
+component NewLibraryElementButton inherits IconButton {
+    height: 35px;
+    border-radius: self.height / 2;
+    colorize: false;
+    background-color: #101010;
+    icon-scale: 0.6;
+    tooltip-position: left;
+    tooltip-delayed: false;
+
+    Image {
+        y: 14px;
+        width: 11px;
+        height: self.width;
+        colorize: #202020;
+        source: @image-url("../../../../../font-awesome/svgs/solid/plus.svg");
+    }
+}
+
+component LibraryContent inherits HorizontalLayout {
+    in property <int> section-index;
+    in-out property <[LibraryTabData]> tabs;
+    in property <int> index;
+    in property <bool> read-only;
+
+    TreeView {
+        horizontal-stretch: 20;
+        model: tabs[index].categories;
+        current-index: tabs[index].categories-index;
+        show-tree: true;
+        hide-root-lines: true;
+        supports-expand: false;
+        comment-has-priority: true;
+        font-size: 12px;
+        item-height: 20px;
+
+        if Data.libraries-rescan-in-progress: Spinner {
+            x: parent.width - self.width - parent.scrollbar-width - self.y;
+            y: 5px;
+            width: 16px;
+            height: self.width;
+            indeterminate: true;
+        }
+
+        if !read-only: NewLibraryElementButton {
+            x: parent.width - self.width - 20px;
+            y: parent.height - 2 * self.height - 26px;
+            icon: @image-url("../../../../../../img/places/folder.png");
+            tooltip: @tr("Add Component Category");
+
+            clicked => {
+                Backend.trigger-library(Data.library-editors[tabs[index].library-index].path, LibraryAction.new-component-category);
+            }
+        }
+
+        if !read-only: NewLibraryElementButton {
+            x: parent.width - self.width - 20px;
+            y: parent.height - self.height - 16px;
+            icon: @image-url("../../../../../../img/places/folder_green.png");
+            tooltip: @tr("Add Package Category");
+
+            clicked => {
+                Backend.trigger-library(Data.library-editors[tabs[index].library-index].path, LibraryAction.new-package-category);
+            }
+        }
+
+        item-selected(idx, item) => {
+            if idx != tabs[index].categories-index {
+                tabs[index].categories-index = idx;
+                tabs[index].element-index = -1;
+            }
+        }
+
+        item-triggered(idx, item) => {
+            Backend.trigger-tab(section-index, index, TabAction.edit-properties);
+            true
+        }
+    }
+
+    Rectangle {
+        width: 1px;
+        background: #555555;
+    }
+
+    TreeView {
+        horizontal-stretch: 30;
+        model: tabs[index].filtered-elements;
+        current-index: tabs[index].element-index;
+        supports-expand: false;
+        font-size: 12px;
+        item-height: 20px;
+
+        if self.model.length == 0: Text {
+            width: 0.8 * parent.width;
+            color: #808080;
+            font-size: 18px;
+            wrap: word-wrap;
+            horizontal-alignment: center;
+            text: @tr("The selected category does not contain any library elements.");
+        }
+
+        if Data.libraries-rescan-in-progress: Spinner {
+            x: parent.width - self.width - parent.scrollbar-width - self.y;
+            y: 5px;
+            width: 16px;
+            height: self.width;
+            indeterminate: true;
+        }
+
+        if !read-only: NewLibraryElementButton {
+            x: parent.width - self.width - 20px;
+            y: parent.height - 4 * self.height - 46px;
+            icon: @image-url("../../../../../../img/library/symbol.png");
+            tooltip: @tr("Add Symbol");
+
+            clicked => {
+                Backend.trigger-library(Data.library-editors[tabs[index].library-index].path, LibraryAction.new-symbol);
+            }
+        }
+
+        if !read-only: NewLibraryElementButton {
+            x: parent.width - self.width - 20px;
+            y: parent.height - 3 * self.height - 36px;
+            icon: @image-url("../../../../../../img/library/package.png");
+            tooltip: @tr("Add Package");
+
+            clicked => {
+                Backend.trigger-library(Data.library-editors[tabs[index].library-index].path, LibraryAction.new-package);
+            }
+        }
+
+        if !read-only: NewLibraryElementButton {
+            x: parent.width - self.width - 20px;
+            y: parent.height - 2 * self.height - 26px;
+            icon: @image-url("../../../../../../img/library/component.png");
+            tooltip: @tr("Add Component");
+
+            clicked => {
+                Backend.trigger-library(Data.library-editors[tabs[index].library-index].path, LibraryAction.new-component);
+            }
+        }
+
+        if !read-only: NewLibraryElementButton {
+            x: parent.width - self.width - 20px;
+            y: parent.height - self.height - 16px;
+            icon: @image-url("../../../../../../img/library/device.png");
+            tooltip: @tr("Add Device");
+
+            clicked => {
+                Backend.trigger-library(Data.library-editors[tabs[index].library-index].path, LibraryAction.new-device);
+            }
+        }
+
+        item-selected(idx, item) => {
+            tabs[index].element-index = idx;
+        }
+
+        item-triggered(idx, item) => {
+            Backend.trigger-tab(section-index, index, TabAction.edit-properties);
+            true
+        }
+    }
+}
+
+export component LibraryTab inherits Tab {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    property <[LibraryTabData]> tabs: section.library-tabs;
+    property <int> index: section.current-tab-index;
+    property <bool> read-only: section.tabs[index].features.save != FeatureState.enabled;
+    property <bool> compact-layout: self.width < 1024px;
+
+    // Wizard mode: Only one page at a time.
+    if tabs[index].wizard-mode && (tabs[index].page-index <= 0): LibraryMetadata {
+        section-index: section-index;
+        tabs: tabs;
+        index: index;
+        read-only: read-only;
+    }
+    if tabs[index].wizard-mode && (tabs[index].page-index >= 1): LibraryImport {
+        section-index: section-index;
+        tabs: tabs;
+        index: index;
+    }
+
+    // Normal mode: Content left, metadata right.
+    if (!tabs[index].wizard-mode) && (!compact-layout): HorizontalLayout {
+        LibraryContent {
+            horizontal-stretch: 1;
+            section-index: section-index;
+            tabs: tabs;
+            index: index;
+            read-only: read-only;
+        }
+
+        Rectangle {
+            width: 1px;
+            background: #555555;
+        }
+
+        LibraryMetadata {
+            horizontal-stretch: 1;
+            max-width: min(500px, parent.width * 0.4);
+            section-index: section-index;
+            tabs: tabs;
+            index: index;
+            read-only: read-only;
+        }
+    }
+
+    // Compact mode: Slide between metadata and content.
+    if (!tabs[index].wizard-mode) && compact-layout: SlideView {
+        pages: [@tr("Metadata"), @tr("Import"), @tr("Library Content")];
+        current-index: tabs[index].page-index;
+
+        LibraryMetadata {
+            width: parent.width;
+            section-index: section-index;
+            tabs: tabs;
+            index: index;
+            read-only: read-only;
+        }
+
+        LibraryImport {
+            width: parent.width;
+            section-index: section-index;
+            tabs: tabs;
+            index: index;
+        }
+
+        LibraryContent {
+            width: parent.width;
+            section-index: section-index;
+            tabs: tabs;
+            index: index;
+            read-only: read-only;
+        }
+
+        page-clicked(idx) => {
+            tabs[index].page-index = idx;
+        }
+    }
+}

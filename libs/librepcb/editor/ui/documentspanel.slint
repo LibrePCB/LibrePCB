@@ -11,6 +11,8 @@ import {
     Constants,
     Data,
     EditorCommandSet as Cmd,
+    LibraryEditorData,
+    LibraryElementAction,
     ProjectAction,
     ProjectData,
     SchematicAction,
@@ -20,6 +22,7 @@ import {
 enum ItemType {
     schematic,
     board,
+    library,
 }
 
 component ProjectListItem inherits Rectangle {
@@ -30,6 +33,8 @@ component ProjectListItem inherits Rectangle {
     in property <image> icon;
     in property <bool> selected: false;
     in property <length> scrollbar-width;
+
+    callback clicked <=> ta.clicked;
 
     height: 27px;
     background: (ta.has-hover || selected) ? #454545 : transparent;
@@ -81,6 +86,17 @@ component ProjectListItem inherits Rectangle {
                 }
             }
 
+            if (ta.has-hover || selected) && (type == ItemType.schematic): delete-schematic-btn := ListViewItemButton {
+                y: (parent.height - self.height) / 2;
+                height: 18px;
+                icon: @image-url("../../../font-awesome/svgs/solid/trash-can.svg");
+                tooltip: Cmd.sheet-remove.text;
+
+                clicked => {
+                    Backend.trigger-schematic(project-index, item-index, SchematicAction.delete);
+                }
+            }
+
             if (ta.has-hover || selected) && (type == ItemType.board): open-3d-btn := ListViewItemButton {
                 y: (parent.height - self.height) / 2;
                 height: 20px;
@@ -114,32 +130,20 @@ component ProjectListItem inherits Rectangle {
                 }
             }
 
-            if ta.has-hover || selected: delete-btn := ListViewItemButton {
+            if (ta.has-hover || selected) && (type == ItemType.board): delete-board-btn := ListViewItemButton {
                 y: (parent.height - self.height) / 2;
                 height: 18px;
                 icon: @image-url("../../../font-awesome/svgs/solid/trash-can.svg");
-                tooltip: (type == ItemType.schematic) ? Cmd.sheet-remove.text : Cmd.board-remove.text;
+                tooltip: Cmd.board-remove.text;
 
                 clicked => {
-                    if type == ItemType.schematic {
-                        Backend.trigger-schematic(project-index, item-index, SchematicAction.delete);
-                    } else {
-                        Backend.trigger-board(project-index, item-index, BoardAction.delete);
-                    }
+                    Backend.trigger-board(project-index, item-index, BoardAction.delete);
                 }
             }
 
             // Reserve space for scrollbar.
             Rectangle {
                 width: scrollbar-width;
-            }
-        }
-
-        clicked => {
-            if type == ItemType.schematic {
-                Backend.trigger-schematic(project-index, item-index, SchematicAction.open);
-            } else {
-                Backend.trigger-board(project-index, item-index, BoardAction.open-2d);
             }
         }
     }
@@ -224,6 +228,10 @@ component ProjectSection inherits Rectangle {
             icon: @image-url("../../../font-awesome/svgs/regular/image.svg");
             selected: (Data.current-tab.type == TabType.schematic) && (Data.current-schematic-tab.project-index == project-index) && (Data.current-schematic-tab.schematic-index == index);
             scrollbar-width: scrollbar-width;
+
+            clicked => {
+                Backend.trigger-schematic(project-index, index, SchematicAction.open);
+            }
         }
 
         for board[index] in project.boards: board-item := ProjectListItem {
@@ -242,10 +250,168 @@ component ProjectSection inherits Rectangle {
                 }
             };
             scrollbar-width: scrollbar-width;
+
+            clicked => {
+                Backend.trigger-board(project-index, index, BoardAction.open-2d);
+            }
         }
     }
 
     if project-index == Data.current-project-index: Rectangle {
+        x: 0;
+        y: 8px;
+        width: 1px;
+        height: parent.height - self.y - 4px;
+        background: #29d682;
+    }
+}
+
+component LibrarySection inherits Rectangle {
+    in property <LibraryEditorData> library;
+    in property <int> library-index;
+    in property <length> scrollbar-width;
+
+    VerticalLayout {
+        header-ta := TouchArea {
+            z: 10;  // For the tooltip.
+
+            header := PanelHeader {
+                title: library.name.to-uppercase();
+
+                close-btn := IconButton {
+                    cmd: Cmd.project-close;  // TODO
+                    icon-scale: 60%;
+
+                    clicked => {
+                        Backend.trigger-library-element(library.path, LibraryElementAction.close);
+                    }
+                }
+
+                // Reserve space for scrollbar.
+                Rectangle {
+                    width: scrollbar-width;
+                }
+            }
+
+            clicked => {
+                Data.set-current-library(library-index);
+            }
+        }
+
+        library-item := ProjectListItem {
+            project-index: library-index;
+            item-index: -1;
+            type: ItemType.library;
+            text: @tr("Library Overview");
+            icon: @image-url("../../../bootstrap-icons/icons/database.svg");
+            selected: (Data.current-tab.type == TabType.library) && (Data.current-library-tab.library-index == library-index);
+            scrollbar-width: scrollbar-width;
+
+            clicked => {
+                Backend.trigger-library-element(library.path, LibraryElementAction.open);
+            }
+        }
+
+        for section in Data.sections: VerticalLayout {
+            for tab[idx] in section.component-category-tabs: VerticalLayout {
+                if (!tab.path.is-empty) && (tab.library-index == library-index): ProjectListItem {
+                    project-index: library-index;
+                    item-index: -1;
+                    type: ItemType.library;
+                    text: section.tabs[idx].title;
+                    icon: @image-url("../../../bootstrap-icons/icons/folder.svg");
+                    selected: (Data.current-tab.type == TabType.component-category) && (Data.current-component-category-tab.library-index == library-index) && (Data.current-component-category-tab.path == tab.path);
+                    scrollbar-width: scrollbar-width;
+
+                    clicked => {
+                        Backend.trigger-library-element(tab.path, LibraryElementAction.open);
+                    }
+                }
+            }
+
+            for tab[idx] in section.package-category-tabs: VerticalLayout {
+                if (!tab.path.is-empty) && (tab.library-index == library-index): ProjectListItem {
+                    project-index: library-index;
+                    item-index: -1;
+                    type: ItemType.library;
+                    text: section.tabs[idx].title;
+                    icon: @image-url("../../../bootstrap-icons/icons/folder.svg");
+                    selected: (Data.current-tab.type == TabType.package-category) && (Data.current-package-category-tab.library-index == library-index) && (Data.current-package-category-tab.path == tab.path);
+                    scrollbar-width: scrollbar-width;
+
+                    clicked => {
+                        Backend.trigger-library-element(tab.path, LibraryElementAction.open);
+                    }
+                }
+            }
+
+            for tab[idx] in section.symbol-tabs: VerticalLayout {
+                if (!tab.path.is-empty) && (tab.library-index == library-index): ProjectListItem {
+                    project-index: library-index;
+                    item-index: -1;
+                    type: ItemType.library;
+                    text: section.tabs[idx].title;
+                    icon: @image-url("../../../bootstrap-icons/icons/cpu.svg");
+                    selected: (Data.current-tab.type == TabType.symbol) && (Data.current-symbol-tab.library-index == library-index) && (Data.current-symbol-tab.path == tab.path);
+                    scrollbar-width: scrollbar-width;
+
+                    clicked => {
+                        Backend.trigger-library-element(tab.path, LibraryElementAction.open);
+                    }
+                }
+            }
+
+            for tab[idx] in section.package-tabs: VerticalLayout {
+                if (!tab.path.is-empty) && (tab.library-index == library-index): ProjectListItem {
+                    project-index: library-index;
+                    item-index: -1;
+                    type: ItemType.library;
+                    text: section.tabs[idx].title;
+                    icon: @image-url("../../../bootstrap-icons/icons/cpu.svg");
+                    selected: (Data.current-tab.type == TabType.package) && (Data.current-package-tab.library-index == library-index) && (Data.current-package-tab.path == tab.path);
+                    scrollbar-width: scrollbar-width;
+
+                    clicked => {
+                        Backend.trigger-library-element(tab.path, LibraryElementAction.open);
+                    }
+                }
+            }
+
+            for tab[idx] in section.component-tabs: VerticalLayout {
+                if (!tab.path.is-empty) && (tab.library-index == library-index): ProjectListItem {
+                    project-index: library-index;
+                    item-index: -1;
+                    type: ItemType.library;
+                    text: section.tabs[idx].title;
+                    icon: @image-url("../../../bootstrap-icons/icons/cpu.svg");
+                    selected: (Data.current-tab.type == TabType.component) && (Data.current-component-tab.library-index == library-index) && (Data.current-component-tab.path == tab.path);
+                    scrollbar-width: scrollbar-width;
+
+                    clicked => {
+                        Backend.trigger-library-element(tab.path, LibraryElementAction.open);
+                    }
+                }
+            }
+
+            for tab[idx] in section.device-tabs: VerticalLayout {
+                if (!tab.path.is-empty) && (tab.library-index == library-index): ProjectListItem {
+                    project-index: library-index;
+                    item-index: -1;
+                    type: ItemType.library;
+                    text: section.tabs[idx].title;
+                    icon: @image-url("../../../bootstrap-icons/icons/cpu.svg");
+                    selected: (Data.current-tab.type == TabType.device) && (Data.current-device-tab.library-index == library-index) && (Data.current-device-tab.path == tab.path);
+                    scrollbar-width: scrollbar-width;
+
+                    clicked => {
+                        Backend.trigger-library-element(tab.path, LibraryElementAction.open);
+                    }
+                }
+            }
+        }
+    }
+
+    if library-index == Data.current-library-index: Rectangle {
         x: 0;
         y: 8px;
         width: 1px;
@@ -272,6 +438,12 @@ export component DocumentsPanel inherits Rectangle {
                 for project[project-index] in Data.projects: project-item := ProjectSection {
                     project: project;
                     project-index: project-index;
+                    scrollbar-width: scrollbar-width;
+                }
+
+                for library[index] in Data.library-editors: library-item := LibrarySection {
+                    library: library;
+                    library-index: index;
                     scrollbar-width: scrollbar-width;
                 }
             }

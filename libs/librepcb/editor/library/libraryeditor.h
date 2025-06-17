@@ -72,63 +72,8 @@ public:
   LibraryEditor(Workspace& ws, const FilePath& libFp, bool readOnly);
   ~LibraryEditor() noexcept;
 
-  /**
-   * @brief Close the library editor (this will destroy this object!)
-   *
-   * If there are unsaved changes to the library, this method will ask the user
-   * whether the changes should be saved or not. If the user clicks on "cancel"
-   * or the library could not be saved successfully, this method will return
-   * false. If there was no such error, this method will call
-   * QObject::deleteLater() which means that this object will be deleted in the
-   * Qt's event loop.
-   *
-   * @warning This method can be called both from within this class and from
-   * outside this class (for example from the control panel). But if you call
-   * this method from outside this class, you may have to delete the object
-   * yourself afterwards! In special cases, the deleteLater() mechanism could
-   * lead in fatal errors otherwise!
-   *
-   * @param askForSave    If true and there are unsaved changes, this method
-   * shows a message box to ask whether the library should be saved or not. If
-   * false, the library will NOT be saved.
-   *
-   * @return true on success (editor closed), false on failure (editor stays
-   * open)
-   */
-  bool closeAndDestroy(bool askForSave) noexcept;
-
   // Operator Overloadings
   LibraryEditor& operator=(const LibraryEditor& rhs) = delete;
-
-signals:
-  void aboutLibrePcbRequested();
-
-private:  // GUI Event Handlers
-  void newComponentCategoryTriggered() noexcept;
-  void newPackageCategoryTriggered() noexcept;
-  void newSymbolTriggered() noexcept;
-  void newPackageTriggered() noexcept;
-  void newComponentTriggered() noexcept;
-  void newDeviceTriggered() noexcept;
-  void editComponentCategoryTriggered(const FilePath& fp) noexcept;
-  void editPackageCategoryTriggered(const FilePath& fp) noexcept;
-  void editSymbolTriggered(const FilePath& fp) noexcept;
-  void editPackageTriggered(const FilePath& fp) noexcept;
-  void editComponentTriggered(const FilePath& fp) noexcept;
-  void editDeviceTriggered(const FilePath& fp) noexcept;
-  void duplicateComponentCategoryTriggered(const FilePath& fp) noexcept;
-  void duplicatePackageCategoryTriggered(const FilePath& fp) noexcept;
-  void duplicateSymbolTriggered(const FilePath& fp) noexcept;
-  void duplicatePackageTriggered(const FilePath& fp) noexcept;
-  void duplicateComponentTriggered(const FilePath& fp) noexcept;
-  void duplicateDeviceTriggered(const FilePath& fp) noexcept;
-  void closeTabIfOpen(const FilePath& fp) noexcept;
-  template <typename EditWidgetType>
-  void editLibraryElementTriggered(const FilePath& fp,
-                                   bool isNewElement) noexcept;
-  void currentTabChanged(int index) noexcept;
-  void tabCloseRequested(int index) noexcept;
-  bool closeTab(int index) noexcept;
 
 private:  // Methods
   void createActions() noexcept;
@@ -141,13 +86,6 @@ private:  // Methods
   void newLibraryElement(NewElementWizardContext::ElementType type);
   void duplicateLibraryElement(NewElementWizardContext::ElementType type,
                                const FilePath& fp);
-  void editNewLibraryElement(NewElementWizardContext::ElementType type,
-                             const FilePath& fp);
-  void updateTabTitles() noexcept;
-  void tabCountChanged() noexcept;
-  void keyPressEvent(QKeyEvent* event) noexcept override;
-  void closeEvent(QCloseEvent* event) noexcept override;
-  bool closeAllTabs(bool withNonClosable, bool askForSave) noexcept;
 
 private:  // Data
   Workspace& mWorkspace;

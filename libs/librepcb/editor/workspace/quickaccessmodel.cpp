@@ -215,7 +215,10 @@ void QuickAccessModel::refreshItems() noexcept {
           0,  // Level
           mIcon,  // Icon
           q2s(fp.getFilename()),  // Text
+          slint::SharedString(),  // Comment
           q2s(fp.toNative()),  // Hint
+          false,  // Italic
+          false,  // Bold
           q2s(fp.toStr()),  // User data
           true,  // Is project file or folder
           false,  // Has children

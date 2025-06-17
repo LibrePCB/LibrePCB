@@ -73,9 +73,6 @@ public:
   Library& getLibrary() const noexcept { return *mLibrary; }
   QSet<Feature> getAvailableFeatures() const noexcept override;
 
-  // Setters
-  void setFilter(const QString& filter) noexcept;
-
   // Operator Overloadings
   LibraryOverviewWidget& operator=(const LibraryOverviewWidget& rhs) = delete;
 
@@ -90,8 +87,6 @@ signals:
   void newPackageTriggered();
   void newComponentTriggered();
   void newDeviceTriggered();
-  void editComponentCategoryTriggered(const FilePath& fp);
-  void editPackageCategoryTriggered(const FilePath& fp);
   void editSymbolTriggered(const FilePath& fp);
   void editPackageTriggered(const FilePath& fp);
   void editComponentTriggered(const FilePath& fp);
@@ -105,29 +100,12 @@ signals:
   void removeElementTriggered(const FilePath& fp);
 
 private:  // Methods
-  void setupListWidget(QListWidget* listWidget) noexcept;
-  void updateMetadata() noexcept;
-  QString commitMetadata() noexcept;
   bool isInterfaceBroken() const noexcept override { return false; }
   bool runChecks(RuleCheckMessageList& msgs) const override;
-  template <typename MessageType>
-  void fixMsg(const MessageType& msg);
-  template <typename MessageType>
-  bool fixMsgHelper(std::shared_ptr<const RuleCheckMessage> msg, bool applyFix);
   bool processRuleCheckMessage(std::shared_ptr<const RuleCheckMessage> msg,
                                bool applyFix) override;
   void ruleCheckApproveRequested(std::shared_ptr<const RuleCheckMessage> msg,
                                  bool approve) noexcept override;
-  void updateElementLists() noexcept;
-  template <typename ElementType>
-  void updateElementList(QListWidget& listWidget, const QIcon& icon) noexcept;
-  QHash<QListWidgetItem*, FilePath> getElementListItemFilePaths(
-      const QList<QListWidgetItem*>& items) const noexcept;
-  void updateElementListFilter(QListWidget& listWidget) noexcept;
-  void openContextMenuAtPos(const QPoint& pos) noexcept;
-  void newItem(QListWidget* list) noexcept;
-  void editItem(QListWidget* list, const FilePath& fp) noexcept;
-  void duplicateItem(QListWidget* list, const FilePath& fp) noexcept;
   void removeItems(
       const QHash<QListWidgetItem*, FilePath>& selectedItemPaths) noexcept;
   void copyElementsToOtherLibrary(
@@ -135,16 +113,9 @@ private:  // Methods
       const FilePath& libFp, const QString& libName) noexcept;
   QList<LibraryMenuItem> getLocalLibraries() const noexcept;
 
-  // Event Handlers
-  void btnIconClicked() noexcept;
-  void lstDoubleClicked(const QModelIndex& index) noexcept;
-
 private:  // Data
   QScopedPointer<Ui::LibraryOverviewWidget> mUi;
-  QScopedPointer<LibraryListEditorWidget> mDependenciesEditorWidget;
   std::unique_ptr<Library> mLibrary;
-  QByteArray mIcon;
-  QString mCurrentFilter;
 };
 
 /*******************************************************************************
