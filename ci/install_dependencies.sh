@@ -68,3 +68,10 @@ export CMAKE_GENERATOR=Ninja
 export FUNQ_MAKE_PATH=ninja
 uv --directory "$DIR/../tests/cli" sync --no-dev
 uv --directory "$DIR/../tests/funq" sync --no-dev
+
+# If access to Slint UI testing is available, install UI testind dependencies
+if [ -n "${SLINT_UI_TESTING_AUTH-}" ]
+then
+  git config --global url."https://${SLINT_UI_TESTING_AUTH}@github.com/slint-ui/ui-testing".insteadOf "ssh://git@github.com/slint-ui/ui-testing.git"
+  uv --directory "$DIR/../tests/ui" sync --no-dev
+fi
