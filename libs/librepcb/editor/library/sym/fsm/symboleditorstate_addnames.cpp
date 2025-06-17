@@ -43,6 +43,14 @@ SymbolEditorState_AddNames::~SymbolEditorState_AddNames() noexcept {
 }
 
 /*******************************************************************************
+ *  Protected Methods
+ ******************************************************************************/
+
+void SymbolEditorState_AddNames::notifyToolEnter() noexcept {
+  mAdapter.fsmToolEnter(*this);
+}
+
+/*******************************************************************************
  *  End of File
  ******************************************************************************/
 

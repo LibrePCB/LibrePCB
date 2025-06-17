@@ -38,11 +38,8 @@ class Symbol;
 
 namespace editor {
 
-class GraphicsScene;
-class GraphicsView;
+class SymbolEditorFsmAdapter;
 class SymbolEditorState;
-class SymbolEditorWidget;
-class SymbolGraphicsItem;
 class UndoStack;
 struct GraphicsSceneKeyEvent;
 struct GraphicsSceneMouseEvent;
@@ -76,15 +73,11 @@ private:  // Types
 
 public:  // Types
   struct Context {
-    EditorWidgetBase::Context& editorContext;
-    SymbolEditorWidget& editorWidget;
-    UndoStack& undoStack;
-    GraphicsScene& graphicsScene;
-    GraphicsView& graphicsView;
-    LengthUnit& lengthUnit;
     Symbol& symbol;
-    SymbolGraphicsItem& symbolGraphicsItem;
-    ToolBarProxy& commandToolBar;
+    UndoStack& undoStack;
+    const bool readOnly;
+    const LengthUnit& lengthUnit;
+    SymbolEditorFsmAdapter& adapter;
   };
 
 public:
@@ -96,12 +89,6 @@ public:
 
   // Getters
   EditorWidgetBase::Tool getCurrentTool() const noexcept;
-  const QSet<EditorWidgetBase::Feature>& getAvailableFeatures() const noexcept {
-    return mAvailableFeatures;
-  }
-
-  // General Methods
-  void updateAvailableFeatures() noexcept;
 
   // Event Handlers
   bool processKeyPressed(const GraphicsSceneKeyEvent& e) noexcept;
@@ -128,7 +115,7 @@ public:
   bool processEditProperties() noexcept;
   bool processAbortCommand() noexcept;
   bool processStartSelecting() noexcept;
-  bool processStartAddingSymbolPins() noexcept;
+  bool processStartAddingSymbolPins(bool import) noexcept;
   bool processStartAddingNames() noexcept;
   bool processStartAddingValues() noexcept;
   bool processStartDrawLines() noexcept;
@@ -139,14 +126,10 @@ public:
   bool processStartDrawTexts() noexcept;
   bool processStartDxfImport() noexcept;
   bool processStartMeasure() noexcept;
+  bool processGridIntervalChanged(const PositiveLength& inverval) noexcept;
 
   // Operator Overloadings
   SymbolEditorState& operator=(const SymbolEditorState& rhs) = delete;
-
-signals:
-  void toolChanged(EditorWidgetBase::Tool newTool);
-  void availableFeaturesChanged();
-  void statusBarMessageChanged(const QString& message, int timeoutMs = -1);
 
 private:  // Methods
   SymbolEditorState* getCurrentState() const noexcept;
@@ -160,7 +143,6 @@ private:  // Data
   QMap<State, SymbolEditorState*> mStates;
   State mCurrentState;
   State mPreviousState;
-  QSet<EditorWidgetBase::Feature> mAvailableFeatures;
 };
 
 /*******************************************************************************

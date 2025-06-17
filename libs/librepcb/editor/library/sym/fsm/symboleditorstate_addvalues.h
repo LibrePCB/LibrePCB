@@ -26,7 +26,6 @@
 #include "symboleditorstate_drawtextbase.h"
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -56,6 +55,9 @@ public:
   // Operator Overloadings
   SymbolEditorState_AddValues& operator=(
       const SymbolEditorState_AddValues& rhs) = delete;
+
+protected:
+  void notifyToolEnter() noexcept override;
 };
 
 /*******************************************************************************
