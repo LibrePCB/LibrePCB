@@ -70,6 +70,7 @@ public:
   // Constructors / Destructor
   SymbolPin() = delete;
   SymbolPin(const SymbolPin& other) noexcept;
+  SymbolPin(const Uuid& uuid, const SymbolPin& other) noexcept;
   SymbolPin(const Uuid& uuid, const CircuitIdentifier& name,
             const Point& position, const UnsignedLength& length,
             const Angle& rotation, const Point& namePosition,

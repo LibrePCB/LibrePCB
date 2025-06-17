@@ -41,7 +41,7 @@ namespace editor {
  ******************************************************************************/
 
 SymbolEditorState::SymbolEditorState(const Context& context) noexcept
-  : QObject(nullptr), mContext(context) {
+  : QObject(nullptr), mContext(context), mAdapter(mContext.adapter) {
 }
 
 SymbolEditorState::~SymbolEditorState() noexcept {
@@ -66,12 +66,24 @@ void SymbolEditorState::requestPaste(
   emit pasteRequested();
 }
 
-const PositiveLength& SymbolEditorState::getGridInterval() const noexcept {
-  return mContext.graphicsScene.getGridInterval();
+GraphicsScene* SymbolEditorState::getGraphicsScene() noexcept {
+  return mAdapter.fsmGetGraphicsScene();
+}
+
+SymbolGraphicsItem* SymbolEditorState::getGraphicsItem() noexcept {
+  return mAdapter.fsmGetGraphicsItem();
+}
+
+PositiveLength SymbolEditorState::getGridInterval() const noexcept {
+  return mAdapter.fsmGetGridInterval();
 }
 
 const LengthUnit& SymbolEditorState::getLengthUnit() const noexcept {
   return mContext.lengthUnit;
+}
+
+QWidget* SymbolEditorState::parentWidget() noexcept {
+  return qApp->activeWindow();
 }
 
 const QSet<const Layer*>& SymbolEditorState::getAllowedTextLayers() noexcept {
