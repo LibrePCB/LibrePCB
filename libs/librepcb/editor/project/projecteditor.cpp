@@ -255,7 +255,9 @@ ui::ProjectData ProjectEditor::getUiData() const noexcept {
                        : ui::RuleCheckState::NotRunYet,  // State
           mErcMessages,  // Messages
           mErcMessages ? mErcMessages->getUnapprovedCount() : 0,  // Unapproved
+          mErcMessages ? mErcMessages->getErrorCount() : 0,  // Errors
           q2s(mErcExecutionError),  // Execution error
+          !mProject->getDirectory().isWritable(),  // Read-only
       },
   };
 }

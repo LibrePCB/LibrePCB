@@ -202,8 +202,10 @@ export struct RuleCheckData {
     type: RuleCheckType,
     state: RuleCheckState,
     messages: [RuleCheckMessageData],
-    unapproved: int,
+    unapproved: int,  // Number of unapproved messages
+    errors: int,  // Messages of error severity, no matter if approved or not
     execution-error: string,  // Empty if no error
+    read-only: bool,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
