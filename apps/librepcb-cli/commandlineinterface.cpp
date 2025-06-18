@@ -38,6 +38,8 @@
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/dev/device.h>
 #include <librepcb/core/library/library.h>
+#include <librepcb/core/library/pkg/footprint.h>
+#include <librepcb/core/library/pkg/footprintpainter.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/project/board/board.h>
@@ -289,11 +291,12 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
       "check",
       tr("Run the package check, print all non-approved messages and "
          "report failure (exit code = 1) if there are non-approved messages."));
-  QCommandLineOption pkgExportOption("export",
-                                     tr("Export the package to a graphical "
-                                        "file. Supported file extensions: %1")
-                                         .arg("png, pdf, svg"),
-                                     tr("file"));
+  QCommandLineOption pkgExportOption(
+      "export",
+      tr("Export the package to a graphical "
+         "file. Supported file extensions: %1")
+          .arg(GraphicsExport::getSupportedExtensions().join(", ")),
+      tr("file"));
 
   // Build help text.
   const QString executable = args.value(0);
@@ -1346,9 +1349,81 @@ bool CommandLineInterface::openPackage(
                             false, false, success);
     }
 
-    // TODO: Implement --export functionality
+    // Export package to graphics file
     if (!exportFile.isEmpty()) {
-      print(QString("TODO: Export package to '%1'").arg(exportFile));
+      print(tr("Export package to '%1'...").arg(exportFile));
+
+      // Get footprints - put default first if it exists
+      QList<std::shared_ptr<Footprint>> footprints;
+      for (auto it = package->getFootprints().begin();
+           it != package->getFootprints().end(); ++it) {
+        footprints.append(it.ptr());
+      }
+
+      // Export each footprint
+      int index = 1;
+      foreach (const std::shared_ptr<Footprint>& footprint, footprints) {
+        // Generate output filename
+        QString destPathStr = exportFile;
+
+        // Apply attribute substitution if patterns are present
+        if (exportFile.contains("{{")) {
+          // Create attribute lookup function following ProjectAttributeLookup
+          // pattern Capture by value to ensure the lambda remains valid
+          auto lookupFunc =
+              [packageName = *package->getNames().getDefaultValue(),
+               packageUuid = package->getUuid().toStr(),
+               footprintName = *footprint->getNames().getDefaultValue(),
+               footprintUuid = footprint->getUuid().toStr(),
+               index](const QString& key) -> QString {
+            if (key == QLatin1String("PACKAGE_NAME")) {
+              return packageName;
+            } else if (key == QLatin1String("PACKAGE_UUID")) {
+              return packageUuid;
+            } else if (key == QLatin1String("FOOTPRINT_NAME")) {
+              return footprintName;
+            } else if (key == QLatin1String("FOOTPRINT_UUID")) {
+              return footprintUuid;
+            } else if (key == QLatin1String("INDEX")) {
+              return QString::number(index);
+            }
+            return QString();  // Unknown attribute
+          };
+          destPathStr =
+              AttributeSubstitutor::substitute(exportFile, lookupFunc);
+        }
+
+        // Create absolute file path
+        FilePath destPath(QFileInfo(destPathStr).absoluteFilePath());
+
+        // Set up graphics export
+        GraphicsExport graphicsExport;
+        graphicsExport.setDocumentName(*package->getNames().getDefaultValue());
+
+        // Create export settings (using default settings)
+        std::shared_ptr<GraphicsExportSettings> settings =
+            std::make_shared<GraphicsExportSettings>();
+
+        // Create pages with footprint painter
+        GraphicsExport::Pages pages;
+        pages.append(std::make_pair(
+            std::make_shared<FootprintPainter>(*footprint), settings));
+
+        // Start export and wait for completion
+        graphicsExport.startExport(pages, destPath);
+        const GraphicsExport::Result result = graphicsExport.waitForFinished();
+
+        // Report results
+        foreach (const FilePath& writtenFile, result.writtenFiles) {
+          print(QString("  => '%1'").arg(prettyPath(writtenFile, destPathStr)));
+        }
+        if (!result.errorMsg.isEmpty()) {
+          printErr("  " % tr("ERROR") % ": " % result.errorMsg);
+          success = false;
+        }
+
+        index++;
+      }
     }
 
     return success;
