@@ -42,6 +42,7 @@
 #include <librepcb/core/library/pkg/footprintpainter.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/library/sym/symbolpainter.h>
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boardd356netlistexport.h>
 #include <librepcb/core/project/board/boardfabricationoutputsettings.h>
@@ -93,6 +94,9 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
       {"open-package",
        {tr("Open a package to execute package-related tasks."),
         "open-package [command_options]"}},  // no tr()!
+      {"open-symbol",
+       {tr("Open a symbol to execute symbol-related tasks."),
+        "open-symbol [command_options]"}},  // no tr()!
       {"open-step",
        {tr("Open a STEP model to execute STEP-related tasks outside of a "
            "library."),
@@ -298,6 +302,18 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
           .arg(GraphicsExport::getSupportedExtensions().join(", ")),
       tr("file"));
 
+  // Define options for "open-symbol"
+  QCommandLineOption symCheckOption(
+      "check",
+      tr("Run the symbol check, print all non-approved messages and "
+         "report failure (exit code = 1) if there are non-approved messages."));
+  QCommandLineOption symExportOption(
+      "export",
+      tr("Export the symbol to a graphical "
+         "file. Supported file extensions: %1")
+          .arg(GraphicsExport::getSupportedExtensions().join(", ")),
+      tr("file"));
+
   // Build help text.
   const QString executable = args.value(0);
   QString helpText = parser.helpText() % "\n" % tr("Commands:") % "\n";
@@ -375,6 +391,14 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
     positionalArgNames.append("package");
     parser.addOption(pkgCheckOption);
     parser.addOption(pkgExportOption);
+  } else if (command == "open-symbol") {
+    parser.addPositionalArgument(command, commands[command].first,
+                                 commands[command].second);
+    parser.addPositionalArgument(
+        "symbol", tr("Path to symbol directory (containing *.lp)."));
+    positionalArgNames.append("symbol");
+    parser.addOption(symCheckOption);
+    parser.addOption(symExportOption);
   } else if (!command.isEmpty()) {
     printErr(tr("Unknown command '%1'.").arg(command));
     printErr(usageHelpText);
@@ -485,16 +509,21 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
                              parser.isSet(libSaveOption),  // save
                              parser.isSet(libStrictOption)  // strict mode
     );
+  } else if (command == "open-package") {
+    cmdSuccess = openPackage(positionalArgs.value(1),  // package directory
+                             parser.isSet(pkgCheckOption),  // run check
+                             parser.value(pkgExportOption)  // export file
+    );
+  } else if (command == "open-symbol") {
+    cmdSuccess = openSymbol(positionalArgs.value(1),  // symbol directory
+                            parser.isSet(symCheckOption),  // run check
+                            parser.value(symExportOption)  // export file
+    );
   } else if (command == "open-step") {
     cmdSuccess = openStep(positionalArgs.value(1),  // STEP file path
                           parser.isSet(stepMinifyOption),  // minify
                           parser.isSet(stepTesselateOption),  // tesselate
                           parser.value(stepSaveToOption)  // save to
-    );
-  } else if (command == "open-package") {
-    cmdSuccess = openPackage(positionalArgs.value(1),  // package directory
-                             parser.isSet(pkgCheckOption),  // run check
-                             parser.value(pkgExportOption)  // export file
     );
   } else {
     printErr("Internal failure.");  // No tr() because this cannot occur.
@@ -1423,6 +1452,88 @@ bool CommandLineInterface::openPackage(
         }
 
         index++;
+      }
+    }
+
+    return success;
+  } catch (const Exception& e) {
+    printErr(tr("ERROR: %1").arg(e.getMsg()));
+    return false;
+  }
+}
+
+bool CommandLineInterface::openSymbol(
+    const QString& symbolFile, bool runCheck,
+    const QString& exportFile) const noexcept {
+  try {
+    bool success = true;
+
+    // Open symbol directory (similar to openPackage)
+    FilePath symbolFp(QFileInfo(symbolFile).absoluteFilePath());
+    print(tr("Open symbol '%1'...").arg(prettyPath(symbolFp, symbolFile)));
+
+    std::shared_ptr<TransactionalFileSystem> symbolFs =
+        TransactionalFileSystem::open(symbolFp, false);  // can throw
+    std::unique_ptr<Symbol> symbol =
+        Symbol::open(std::unique_ptr<TransactionalDirectory>(
+            new TransactionalDirectory(symbolFs)));  // can throw
+
+    // Process the symbol element (validation checks)
+    if (runCheck) {
+      processLibraryElement(symbolFile, *symbolFs, *symbol, runCheck, false,
+                            false, false, success);
+    }
+
+    // Export symbol to graphics file
+    if (!exportFile.isEmpty()) {
+      print(tr("Export symbol to '%1'...").arg(exportFile));
+
+      // Generate output filename
+      QString destPathStr = exportFile;
+
+      // Apply attribute substitution if patterns are present
+      if (exportFile.contains("{{")) {
+        // Create attribute lookup function for symbol
+        auto lookupFunc = [symbolName = *symbol->getNames().getDefaultValue(),
+                           symbolUuid = symbol->getUuid().toStr()](
+                              const QString& key) -> QString {
+          if (key == QLatin1String("SYMBOL_NAME")) {
+            return symbolName;
+          } else if (key == QLatin1String("SYMBOL_UUID")) {
+            return symbolUuid;
+          }
+          return QString();  // Unknown attribute
+        };
+        destPathStr = AttributeSubstitutor::substitute(exportFile, lookupFunc);
+      }
+
+      // Create absolute file path
+      FilePath destPath(QFileInfo(destPathStr).absoluteFilePath());
+
+      // Set up graphics export
+      GraphicsExport graphicsExport;
+      graphicsExport.setDocumentName(*symbol->getNames().getDefaultValue());
+
+      // Create export settings (using default settings)
+      std::shared_ptr<GraphicsExportSettings> settings =
+          std::make_shared<GraphicsExportSettings>();
+
+      // Create pages with symbol painter
+      GraphicsExport::Pages pages;
+      pages.append(
+          std::make_pair(std::make_shared<SymbolPainter>(*symbol), settings));
+
+      // Start export and wait for completion
+      graphicsExport.startExport(pages, destPath);
+      const GraphicsExport::Result result = graphicsExport.waitForFinished();
+
+      // Report results
+      foreach (const FilePath& writtenFile, result.writtenFiles) {
+        print(QString("  => '%1'").arg(prettyPath(writtenFile, destPathStr)));
+      }
+      if (!result.errorMsg.isEmpty()) {
+        printErr("  " % tr("ERROR") % ": " % result.errorMsg);
+        success = false;
       }
     }
 
