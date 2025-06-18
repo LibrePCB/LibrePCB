@@ -3,17 +3,17 @@
 This directory contains system tests for `librepcb-cli` using
 [pytest](https://docs.pytest.org).
 
-## Create Virtualenv
+## Requirements
 
-    mkvirtualenv -p `which python3` librepcb-cli
-
-## Install Requirements
-
-    pip install -r requirements.txt
+- [`uv`](https://docs.astral.sh/uv/)
 
 ## Run Tests
 
-    pytest -v --librepcb-executable=/path/to/librepcb-cli
+    uv run pytest -v --librepcb-executable=/path/to/librepcb-cli
+
+## Run Linter
+
+    uv run ruff check
 
 ## Links
 

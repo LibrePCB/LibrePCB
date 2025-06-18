@@ -1,0 +1,20 @@
+[project]
+name = "librepcb-cli-tests"
+version = "0.1.0"
+description = "CLI tests of LibrePCB"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "pytest~=8.4.0",
+]
+
+[dependency-groups]
+dev = [
+    "ruff~=0.11.13",
+]
+
+[tool.setuptools]
+py-modules = []
+
+[tool.pytest.ini_options]
+addopts = "-v --librepcb-executable=../../build/apps/librepcb-cli/librepcb-cli"

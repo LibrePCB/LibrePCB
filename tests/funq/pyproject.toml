@@ -1,0 +1,27 @@
+[project]
+name = "librepcb-funq-tests"
+version = "0.1.0"
+description = "LibrePCB Funq UI tests"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "funq",
+    "funq-server",
+    "pytest~=8.4.0",
+    "pytest-rerunfailures~=15.1",
+]
+
+[tool.uv.sources]
+funq-server = { git = "https://github.com/LibrePCB/funq.git", subdirectory = "server", rev = "653b90fb3efe4ddc7272dad6f4e40b1f45a7051b" }
+funq = { git = "https://github.com/LibrePCB/funq.git", subdirectory = "client", rev = "653b90fb3efe4ddc7272dad6f4e40b1f45a7051b" }
+
+[dependency-groups]
+dev = [
+    "ruff~=0.11.13",
+]
+
+[tool.setuptools]
+py-modules = []
+
+[tool.pytest.ini_options]
+addopts = "-v --librepcb-executable=../../build/apps/librepcb/librepcb"

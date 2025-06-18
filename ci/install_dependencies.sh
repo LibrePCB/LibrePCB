@@ -9,12 +9,6 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 # Docker container with all tools preinstalled.
 if [ "$OS" = "mac" ]
 then
-  # Fix crappy MacOS shit (https://github.com/actions/setup-python/issues/577).
-  rm /usr/local/bin/2to3* || true
-  rm /usr/local/bin/idle3* || true
-  rm /usr/local/bin/pydoc3* || true
-  rm /usr/local/bin/python3* || true
-
   # Update homebrow to avoid issues due to outdated package database. But
   # because even the update sometimes fails, let's ignore any errors with
   # "|| true" (Apple-style error handling). Maybe this way we get succussful
@@ -27,9 +21,6 @@ then
   # the moon whether this is required or not).
   echo "Upgrading packages..."
   brew upgrade || true
-
-  # Make python3/pip3 the default
-  export PATH="/usr/local/opt/python/libexec/bin:$PATH"
 
   # Install Qt
   echo "Installing qt6..."
@@ -62,26 +53,30 @@ then
   echo "Installing ccache..."
   brew install --force-bottle ccache
 
+  # Install uv
+  echo "Installing uv..."
+  brew install --force-bottle uv
+
   # Fix macdeployqt issue (https://github.com/actions/runner-images/issues/7522)
   echo "Killing XProtect..."
   sudo pkill -9 XProtect >/dev/null || true;
   while pgrep XProtect; do sleep 3; done;
 fi
 
-# Configure pip
-if [ "$OS" != "windows" ]
+# UV is not yet available in our Docker images, thus installing it here for now
+if [ "$OS" = "linux" ]
 then
-  # We're not root, thus no permissions to install packages globally
-  PIP_USER_INSTALL="--user"
-  export PATH="$PATH:`python -m site --user-base`/bin"
-else
-  # Extending PATH does not work, thus installing Python packages globally
-  PIP_USER_INSTALL=""
+  wget -qO- https://astral.sh/uv/install.sh | sh
+  source $HOME/.local/bin/env
+fi
+if [ "$OS" = "windows" ]
+then
+  powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+  export PATH="$PATH:/c/Users/ContainerAdministrator/.local/bin"
 fi
 
 # Install Python packages
-export PIP_BREAK_SYSTEM_PACKAGES=1
 export CMAKE_GENERATOR=Ninja
 export FUNQ_MAKE_PATH=ninja
-pip install $PIP_USER_INSTALL -r "$DIR/../tests/cli/requirements.txt"
-pip install $PIP_USER_INSTALL -r "$DIR/../tests/funq/requirements.txt"
+uv --directory "$DIR/../tests/cli" sync --no-dev
+uv --directory "$DIR/../tests/funq" sync --no-dev

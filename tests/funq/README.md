@@ -3,17 +3,17 @@
 This directory contains functional tests (simulating user input) using
 [funq](https://github.com/parkouss/funq) and [pytest](https://docs.pytest.org).
 
-## Create Virtualenv
+## Requirements
 
-    mkvirtualenv -p `which python3` librepcb-funq
-
-## Install Requirements
-
-    pip install -r requirements.txt
+- [`uv`](https://docs.astral.sh/uv/)
 
 ## Run Tests
 
-    pytest -v --librepcb-executable=/path/to/librepcb
+    uv run pytest -v --librepcb-executable=/path/to/librepcb
+
+## Run Linter
+
+    uv run ruff check
 
 ## Links
 
