@@ -10,12 +10,14 @@ Test creating local libraries
 
 def test(librepcb, helpers):
     with librepcb.open() as app:
+        # Open libraries panel
+        app.get('SideBar::libraries-btn').click()
+
         # Verify that no local library exists yet
         libs = app.get('LibrariesPanel::local-libs #LibraryListViewItem *')
         assert libs.label == []
 
         # Create library
-        app.get('SideBar::libraries-btn').click()
         app.get('LibrariesPanelSection::create-btn').click()
         tab = app.get('#CreateLibraryTab')
         tab.get('CreateLibraryTab::name-edt').set_value('Local Library')

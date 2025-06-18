@@ -12,12 +12,14 @@ URL = 'http://localhost:50080/blobs/LibrePCB_Base.zip'
 
 def test(librepcb, helpers):
     with librepcb.open() as app:
+        # Open libraries panel
+        app.get('SideBar::libraries-btn').click()
+
         # Verify that no local library exists yet
         libs = app.get('LibrariesPanel::local-libs #LibraryListViewItem *')
         assert libs.label == []
 
         # Create library
-        app.get('SideBar::libraries-btn').click()
         app.get('LibrariesPanelSection::download-by-url-btn').click()
         tab = app.get('#DownloadLibraryTab')
         tab.get('DownloadLibraryTab::url-edt').set_value(URL)

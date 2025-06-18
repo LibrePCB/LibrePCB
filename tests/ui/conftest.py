@@ -56,8 +56,46 @@ def _query_childs(element, query):
     return childs
 
 
+class ElementWrapper:
+    def __init__(self, element):
+        self._element = element
+
+    @property
+    def is_valid(self):
+        return self._element.is_valid
+
+    @property
+    def label(self):
+        return self._element.accessible_label
+
+    @property
+    def placeholder(self):
+        return self._element.accessible_placeholder_text
+
+    @property
+    def checked(self):
+        return self._element.accessible_checked
+
+    @property
+    def enabled(self):
+        return self._element.accessible_enabled
+
+    def click(self):
+        self._element.single_click(slint_testing.PointerEventButton.Left)
+
+    def dclick(self):
+        self._element.double_click(slint_testing.PointerEventButton.Left)
+
+    def set_value(self, value):
+        self._element.accessible_value = value
+
+    def set_checked(self, checked):
+        if self._element.accessible_checked != checked:
+            self._element.invoke_accessible_default_action()
+
+
 class ElementQuery:
-    def __init__(self, app, window, parent=None, query=None):
+    def __init__(self, app, window, parent=None, query=None, index=None):
         self._app = app
         self._window = window
         self._parent = parent
@@ -66,7 +104,12 @@ class ElementQuery:
             self._query_mode = query[-1]
             query = query[:-1]
         self._query = query or []
+        self._index = index
         self._results = None
+
+    def __getitem__(self, index):
+        self._wait_for_results()
+        return self._results[index]
 
     def get(self, path):
         return ElementQuery(self._app, self._window, self, path.split(' '))
@@ -77,6 +120,7 @@ class ElementQuery:
             self._results = [root]
         else:
             self._results = list(_flatten(_query_childs(root, self.full_query)))
+        self._results = [ElementWrapper(x) for x in self._results]
 
     def wait(self, count=1):
         start = time.time()
@@ -88,6 +132,17 @@ class ElementQuery:
                 raise TimeoutError("Timeout while waiting for {} results: {}" \
                     .format(count, self.full_query))
             time.sleep(0.05)
+
+    def wait_for_enabled(self, timeout=10.0):
+        start = time.time()
+        while True:
+            if self.enabled is True:
+                return
+            if time.time() > (start + timeout):
+                raise TimeoutError("Element is still disabled: {}".format(
+                    self.full_path))
+            time.sleep(0.05)
+        return self
 
     def wait_for_invalid(self, timeout=10.0):
         start = time.time()
@@ -116,36 +171,48 @@ class ElementQuery:
     @property
     def label(self):
         self._wait_for_results()
-        return self._flatten([x.accessible_label for x in self._results])
+        return self._flatten([x.label for x in self._results])
 
     @property
     def placeholder(self):
         self._wait_for_results()
-        return self._flatten([x.accessible_placeholder_text for x in self._results])
+        return self._flatten([x.placeholder for x in self._results])
+
+    @property
+    def checked(self):
+        self._wait_for_results()
+        return self._flatten([x.checked for x in self._results])
+
+    @property
+    def enabled(self):
+        self._wait_for_results()
+        return self._flatten([x.enabled for x in self._results])
 
     def click(self):
         self._wait_for_results()
         for x in self._results:
-            x.single_click(slint_testing.PointerEventButton.Left)
+            x.click()
 
     def dclick(self):
         self._wait_for_results()
         for x in self._results:
-            x.double_click(slint_testing.PointerEventButton.Left)
+            x.dclick()
 
     def set_value(self, value):
         self._wait_for_results()
         for x in self._results:
-            x.accessible_value = value
+            x.set_value(value)
 
     def set_checked(self, checked):
         self._wait_for_results()
         for x in self._results:
-            if x.accessible_checked != checked:
-                x.invoke_accessible_default_action()
+            x.set_checked(checked)
 
     def _wait_for_results(self):
         if self._results is None:
+            if self._index is not None:
+                self._results = [self._parent._results[self._index]]
+                return
             min_count = 1
             max_count = 1
             if self._query_mode == '?':
