@@ -23,8 +23,10 @@ Arguments:
 
 Commands:
   open-library   Open a library to execute library-related tasks.
+  open-package   Open a package to execute package-related tasks.
   open-project   Open a project to execute project-related tasks.
   open-step      Open a STEP model to execute STEP-related tasks outside of a library.
+  open-symbol    Open a symbol to execute symbol-related tasks.
 
 List command-specific options:
   {executable} <command> --help
