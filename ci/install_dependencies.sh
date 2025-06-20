@@ -63,18 +63,6 @@ then
   while pgrep XProtect; do sleep 3; done;
 fi
 
-# UV is not yet available in our Docker images, thus installing it here for now
-if [ "$OS" = "linux" ]
-then
-  wget -qO- https://astral.sh/uv/install.sh | sh
-  source $HOME/.local/bin/env
-fi
-if [ "$OS" = "windows" ]
-then
-  powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-  export PATH="$PATH:/c/Users/ContainerAdministrator/.local/bin"
-fi
-
 # Install Python packages
 export CMAKE_GENERATOR=Ninja
 export FUNQ_MAKE_PATH=ninja

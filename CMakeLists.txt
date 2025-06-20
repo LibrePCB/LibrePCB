@@ -102,6 +102,12 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL GNU
   target_compile_options(common INTERFACE -Wno-maybe-uninitialized)
 endif()
 
+# False-positives in Qt 6.8 and 6.9, see
+# https://bugreports.qt.io/browse/QTBUG-135623)
+if(QT_VERSION VERSION_GREATER_EQUAL 6.8 AND QT_VERSION VERSION_LESS 6.10)
+  target_compile_options(common INTERFACE -Wno-array-bounds=)
+endif()
+
 # The TypeSafe library causes some compiler warnings which are not of
 # interest, so let's suppress them.
 target_compile_options(common INTERFACE -Wno-noexcept-type)

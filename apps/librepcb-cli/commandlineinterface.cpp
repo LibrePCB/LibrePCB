@@ -38,8 +38,11 @@
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/dev/device.h>
 #include <librepcb/core/library/library.h>
+#include <librepcb/core/library/pkg/footprint.h>
+#include <librepcb/core/library/pkg/footprintpainter.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/library/sym/symbolpainter.h>
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boardd356netlistexport.h>
 #include <librepcb/core/project/board/boardfabricationoutputsettings.h>
@@ -88,6 +91,12 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
       {"open-library",
        {tr("Open a library to execute library-related tasks."),
         "open-library [command_options]"}},  // no tr()!
+      {"open-package",
+       {tr("Open a package to execute package-related tasks."),
+        "open-package [command_options]"}},  // no tr()!
+      {"open-symbol",
+       {tr("Open a symbol to execute symbol-related tasks."),
+        "open-symbol [command_options]"}},  // no tr()!
       {"open-step",
        {tr("Open a STEP model to execute STEP-related tasks outside of a "
            "library."),
@@ -281,6 +290,30 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
           .arg("--minify"),
       tr("file"));
 
+  // Define options for "open-package"
+  QCommandLineOption pkgCheckOption(
+      "check",
+      tr("Run the package check, print all non-approved messages and "
+         "report failure (exit code = 1) if there are non-approved messages."));
+  QCommandLineOption pkgExportOption(
+      "export",
+      tr("Export the package to a graphical "
+         "file. Supported file extensions: %1")
+          .arg(GraphicsExport::getSupportedExtensions().join(", ")),
+      tr("file"));
+
+  // Define options for "open-symbol"
+  QCommandLineOption symCheckOption(
+      "check",
+      tr("Run the symbol check, print all non-approved messages and "
+         "report failure (exit code = 1) if there are non-approved messages."));
+  QCommandLineOption symExportOption(
+      "export",
+      tr("Export the symbol to a graphical "
+         "file. Supported file extensions: %1")
+          .arg(GraphicsExport::getSupportedExtensions().join(", ")),
+      tr("file"));
+
   // Build help text.
   const QString executable = args.value(0);
   QString helpText = parser.helpText() % "\n" % tr("Commands:") % "\n";
@@ -350,6 +383,22 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
     parser.addOption(stepMinifyOption);
     parser.addOption(stepTesselateOption);
     parser.addOption(stepSaveToOption);
+  } else if (command == "open-package") {
+    parser.addPositionalArgument(command, commands[command].first,
+                                 commands[command].second);
+    parser.addPositionalArgument(
+        "package", tr("Path to package directory (containing *.lp)."));
+    positionalArgNames.append("package");
+    parser.addOption(pkgCheckOption);
+    parser.addOption(pkgExportOption);
+  } else if (command == "open-symbol") {
+    parser.addPositionalArgument(command, commands[command].first,
+                                 commands[command].second);
+    parser.addPositionalArgument(
+        "symbol", tr("Path to symbol directory (containing *.lp)."));
+    positionalArgNames.append("symbol");
+    parser.addOption(symCheckOption);
+    parser.addOption(symExportOption);
   } else if (!command.isEmpty()) {
     printErr(tr("Unknown command '%1'.").arg(command));
     printErr(usageHelpText);
@@ -457,6 +506,16 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
                              parser.isSet(libMinifyStepOption),  // minify STEP
                              parser.isSet(libSaveOption),  // save
                              parser.isSet(libStrictOption)  // strict mode
+    );
+  } else if (command == "open-package") {
+    cmdSuccess = openPackage(positionalArgs.value(1),  // package directory
+                             parser.isSet(pkgCheckOption),  // run check
+                             parser.value(pkgExportOption)  // export file
+    );
+  } else if (command == "open-symbol") {
+    cmdSuccess = openSymbol(positionalArgs.value(1),  // symbol directory
+                            parser.isSet(symCheckOption),  // run check
+                            parser.value(symExportOption)  // export file
     );
   } else if (command == "open-step") {
     cmdSuccess = openStep(positionalArgs.value(1),  // STEP file path
@@ -1192,14 +1251,9 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
   }
 }
 
-void CommandLineInterface::processLibraryElement(
-    const QString& libDir, TransactionalFileSystem& fs,
-    LibraryBaseElement& element, bool runCheck, bool minifyStepFiles, bool save,
-    bool strict, bool& success) const {
-  // Helper function to print an error header to console only once, if
-  // there is at least one error.
-  bool errorHeaderPrinted = false;
-  auto printErrorHeaderOnce = [&errorHeaderPrinted, &element]() {
+std::function<void()> CommandLineInterface::createElementErrorHeaderPrinter(
+    bool& errorHeaderPrinted, const LibraryBaseElement& element) const {
+  return [&errorHeaderPrinted, &element]() {
     if (!errorHeaderPrinted) {
       printErr(QString("  - %1 (%2):")
                    .arg(*element.getNames().getDefaultValue(),
@@ -1207,6 +1261,36 @@ void CommandLineInterface::processLibraryElement(
       errorHeaderPrinted = true;
     }
   };
+}
+
+void CommandLineInterface::runElementChecks(
+    const QString& libDir, const TransactionalFileSystem& fs,
+    const LibraryBaseElement& element,
+    const std::function<void()>& printErrorHeaderOnce, bool& success) const {
+  qInfo().noquote() << tr("Check '%1' for non-approved messages...")
+                           .arg(prettyPath(fs.getPath(), libDir));
+  int approvedMsgCount = 0;
+  const RuleCheckMessageList messages = element.runChecks();
+  const QStringList nonApproved = prepareRuleCheckMessages(
+      messages, element.getMessageApprovals(), approvedMsgCount);
+  qInfo().noquote() << "  " % tr("Approved messages: %1").arg(approvedMsgCount);
+  qInfo().noquote() << "  " %
+          tr("Non-approved messages: %1").arg(nonApproved.count());
+  foreach (const QString& msg, nonApproved) {
+    printErrorHeaderOnce();
+    printErr("    - " % msg);
+    success = false;
+  }
+}
+
+void CommandLineInterface::processLibraryElement(
+    const QString& libDir, TransactionalFileSystem& fs,
+    LibraryBaseElement& element, bool runCheck, bool minifyStepFiles, bool save,
+    bool strict, bool& success) const {
+  // Create error header printer
+  bool errorHeaderPrinted = false;
+  auto printErrorHeaderOnce =
+      createElementErrorHeaderPrinter(errorHeaderPrinted, element);
 
   // Save element to transactional file system, if needed
   if (strict || save) {
@@ -1261,21 +1345,7 @@ void CommandLineInterface::processLibraryElement(
 
   // Run library element check, if needed.
   if (runCheck) {
-    qInfo().noquote() << tr("Check '%1' for non-approved messages...")
-                             .arg(prettyPath(fs.getPath(), libDir));
-    int approvedMsgCount = 0;
-    const RuleCheckMessageList messages = element.runChecks();
-    const QStringList nonApproved = prepareRuleCheckMessages(
-        messages, element.getMessageApprovals(), approvedMsgCount);
-    qInfo().noquote() << "  " %
-            tr("Approved messages: %1").arg(approvedMsgCount);
-    qInfo().noquote() << "  " %
-            tr("Non-approved messages: %1").arg(nonApproved.count());
-    foreach (const QString& msg, nonApproved) {
-      printErrorHeaderOnce();
-      printErr("    - " % msg);
-      success = false;
-    }
+    runElementChecks(libDir, fs, element, printErrorHeaderOnce, success);
   }
 
   // Save element to file system, if needed
@@ -1292,6 +1362,205 @@ void CommandLineInterface::processLibraryElement(
   // Do not propagate changes in the transactional file system to the
   // following checks
   fs.discardChanges();
+}
+
+bool CommandLineInterface::openPackage(
+    const QString& packageFile, bool runCheck,
+    const QString& exportFile) const noexcept {
+  try {
+    bool success = true;
+
+    // Open package directory (similar to openLibrary)
+    FilePath packageFp(QFileInfo(packageFile).absoluteFilePath());
+    print(tr("Open package '%1'...").arg(prettyPath(packageFp, packageFile)));
+
+    std::shared_ptr<TransactionalFileSystem> packageFs =
+        TransactionalFileSystem::open(packageFp, false);  // can throw
+    std::unique_ptr<Package> package =
+        Package::open(std::unique_ptr<TransactionalDirectory>(
+            new TransactionalDirectory(packageFs)));  // can throw
+
+    // Create error header printer
+    bool errorHeaderPrinted = false;
+    auto printErrorHeaderOnce =
+        createElementErrorHeaderPrinter(errorHeaderPrinted, *package);
+
+    // Process the package element (similar to how openLibrary processes
+    // individual elements)
+    if (runCheck) {
+      runElementChecks(packageFile, *packageFs, *package, printErrorHeaderOnce,
+                       success);
+    }
+
+    // Export package to graphics file
+    if (!exportFile.isEmpty()) {
+      print(tr("Export package to '%1'...").arg(exportFile));
+
+      // Get footprints - put default first if it exists
+      QList<std::shared_ptr<Footprint>> footprints;
+      for (auto it = package->getFootprints().begin();
+           it != package->getFootprints().end(); ++it) {
+        footprints.append(it.ptr());
+      }
+
+      // Export each footprint
+      int index = 1;
+      foreach (const std::shared_ptr<Footprint>& footprint, footprints) {
+        // Generate output filename
+        QString destPathStr = exportFile;
+
+        // Apply attribute substitution if patterns are present
+        if (exportFile.contains("{{")) {
+          // Create attribute lookup function following ProjectAttributeLookup
+          // pattern Capture by value to ensure the lambda remains valid
+          auto lookupFunc =
+              [packageName = *package->getNames().getDefaultValue(),
+               packageUuid = package->getUuid().toStr(),
+               footprintName = *footprint->getNames().getDefaultValue(),
+               footprintUuid = footprint->getUuid().toStr(),
+               index](const QString& key) -> QString {
+            if (key == QLatin1String("PACKAGE_NAME")) {
+              return packageName;
+            } else if (key == QLatin1String("PACKAGE_UUID")) {
+              return packageUuid;
+            } else if (key == QLatin1String("FOOTPRINT_NAME")) {
+              return footprintName;
+            } else if (key == QLatin1String("FOOTPRINT_UUID")) {
+              return footprintUuid;
+            } else if (key == QLatin1String("INDEX")) {
+              return QString::number(index);
+            }
+            return QString();  // Unknown attribute
+          };
+          destPathStr =
+              AttributeSubstitutor::substitute(exportFile, lookupFunc);
+        }
+
+        // Create absolute file path
+        FilePath destPath(QFileInfo(destPathStr).absoluteFilePath());
+
+        // Set up graphics export
+        GraphicsExport graphicsExport;
+        graphicsExport.setDocumentName(*package->getNames().getDefaultValue());
+
+        // Create export settings (using default settings)
+        std::shared_ptr<GraphicsExportSettings> settings =
+            std::make_shared<GraphicsExportSettings>();
+
+        // Create pages with footprint painter
+        GraphicsExport::Pages pages;
+        pages.append(std::make_pair(
+            std::make_shared<FootprintPainter>(*footprint), settings));
+
+        // Start export and wait for completion
+        graphicsExport.startExport(pages, destPath);
+        const GraphicsExport::Result result = graphicsExport.waitForFinished();
+
+        // Report results
+        foreach (const FilePath& writtenFile, result.writtenFiles) {
+          print(QString("  => '%1'").arg(prettyPath(writtenFile, destPathStr)));
+        }
+        if (!result.errorMsg.isEmpty()) {
+          printErr("  " % tr("ERROR") % ": " % result.errorMsg);
+          success = false;
+        }
+
+        index++;
+      }
+    }
+
+    return success;
+  } catch (const Exception& e) {
+    printErr(tr("ERROR: %1").arg(e.getMsg()));
+    return false;
+  }
+}
+
+bool CommandLineInterface::openSymbol(
+    const QString& symbolFile, bool runCheck,
+    const QString& exportFile) const noexcept {
+  try {
+    bool success = true;
+
+    // Open symbol directory (similar to openPackage)
+    FilePath symbolFp(QFileInfo(symbolFile).absoluteFilePath());
+    print(tr("Open symbol '%1'...").arg(prettyPath(symbolFp, symbolFile)));
+
+    std::shared_ptr<TransactionalFileSystem> symbolFs =
+        TransactionalFileSystem::open(symbolFp, false);  // can throw
+    std::unique_ptr<Symbol> symbol =
+        Symbol::open(std::unique_ptr<TransactionalDirectory>(
+            new TransactionalDirectory(symbolFs)));  // can throw
+
+    // Create error header printer
+    bool errorHeaderPrinted = false;
+    auto printErrorHeaderOnce =
+        createElementErrorHeaderPrinter(errorHeaderPrinted, *symbol);
+
+    // Process the symbol element (validation checks)
+    if (runCheck) {
+      runElementChecks(symbolFile, *symbolFs, *symbol, printErrorHeaderOnce,
+                       success);
+    }
+
+    // Export symbol to graphics file
+    if (!exportFile.isEmpty()) {
+      print(tr("Export symbol to '%1'...").arg(exportFile));
+
+      // Generate output filename
+      QString destPathStr = exportFile;
+
+      // Apply attribute substitution if patterns are present
+      if (exportFile.contains("{{")) {
+        // Create attribute lookup function for symbol
+        auto lookupFunc = [symbolName = *symbol->getNames().getDefaultValue(),
+                           symbolUuid = symbol->getUuid().toStr()](
+                              const QString& key) -> QString {
+          if (key == QLatin1String("SYMBOL_NAME")) {
+            return symbolName;
+          } else if (key == QLatin1String("SYMBOL_UUID")) {
+            return symbolUuid;
+          }
+          return QString();  // Unknown attribute
+        };
+        destPathStr = AttributeSubstitutor::substitute(exportFile, lookupFunc);
+      }
+
+      // Create absolute file path
+      FilePath destPath(QFileInfo(destPathStr).absoluteFilePath());
+
+      // Set up graphics export
+      GraphicsExport graphicsExport;
+      graphicsExport.setDocumentName(*symbol->getNames().getDefaultValue());
+
+      // Create export settings (using default settings)
+      std::shared_ptr<GraphicsExportSettings> settings =
+          std::make_shared<GraphicsExportSettings>();
+
+      // Create pages with symbol painter
+      GraphicsExport::Pages pages;
+      pages.append(
+          std::make_pair(std::make_shared<SymbolPainter>(*symbol), settings));
+
+      // Start export and wait for completion
+      graphicsExport.startExport(pages, destPath);
+      const GraphicsExport::Result result = graphicsExport.waitForFinished();
+
+      // Report results
+      foreach (const FilePath& writtenFile, result.writtenFiles) {
+        print(QString("  => '%1'").arg(prettyPath(writtenFile, destPathStr)));
+      }
+      if (!result.errorMsg.isEmpty()) {
+        printErr("  " % tr("ERROR") % ": " % result.errorMsg);
+        success = false;
+      }
+    }
+
+    return success;
+  } catch (const Exception& e) {
+    printErr(tr("ERROR: %1").arg(e.getMsg()));
+    return false;
+  }
 }
 
 bool CommandLineInterface::openStep(const QString& filePath, bool minify,

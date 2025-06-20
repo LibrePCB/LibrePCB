@@ -74,10 +74,25 @@ private:  // Methods
       const QString& setDefaultAv, bool save, bool strict) const noexcept;
   bool openLibrary(const QString& libDir, bool all, bool runCheck,
                    bool minifyStepFiles, bool save, bool strict) const noexcept;
+  bool openPackage(const QString& packageFile, bool runCheck,
+                   const QString& exportFile) const noexcept;
+  bool openSymbol(const QString& symbolFile, bool runCheck,
+                  const QString& exportFile) const noexcept;
   void processLibraryElement(const QString& libDir, TransactionalFileSystem& fs,
                              LibraryBaseElement& element, bool runCheck,
                              bool minifyStepFiles, bool save, bool strict,
                              bool& success) const;
+
+  // Helper function to create error header printer for library elements
+  std::function<void()> createElementErrorHeaderPrinter(
+      bool& errorHeaderPrinted, const LibraryBaseElement& element) const;
+
+  // Run validation checks on a library element
+  void runElementChecks(const QString& libDir,
+                        const TransactionalFileSystem& fs,
+                        const LibraryBaseElement& element,
+                        const std::function<void()>& printErrorHeaderOnce,
+                        bool& success) const;
   bool openStep(const QString& filePath, bool minify, bool tesselate,
                 const QString& saveTo) const noexcept;
   static QStringList prepareRuleCheckMessages(
