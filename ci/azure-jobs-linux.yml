@@ -9,16 +9,16 @@ jobs:
   strategy:
     matrix:
       Ubuntu_2004_Qt_6_6_GCC:
-        IMAGE: librepcb/librepcb-dev:ubuntu-20.04-qt6.6-3
+        IMAGE: librepcb/librepcb-dev:ubuntu-20.04-qt6.6-4
         DEPLOY: true
       Ubuntu_2204_Clang:
-        IMAGE: librepcb/librepcb-dev:ubuntu-22.04-4
+        IMAGE: librepcb/librepcb-dev:ubuntu-22.04-5
         CC: clang
         CXX: clang++
         CMAKE_OPTIONS: '-DCMAKE_CXX_FLAGS="-DQT_FORCE_ASSERTS=1"'
         LD_LIBRARY_PATH: $(Build.Repository.LocalPath)/build/install/lib
       Ubuntu_2404_Unbundled:
-        IMAGE: librepcb/librepcb-dev:ubuntu-24.04-2
+        IMAGE: librepcb/librepcb-dev:ubuntu-24.04-3
         UNBUNDLE_DXFLIB: true
         UNBUNDLE_GTEST: true
         UNBUNDLE_MUPARSER: true
@@ -33,10 +33,7 @@ jobs:
     submodules: recursive
   - bash: ./ci/print_environment.sh
     displayName: Print Environment
-  - bash: |
-      source ./ci/install_dependencies.sh
-      # Pass modified PATH to following steps:
-      echo "##vso[task.setvariable variable=PATH]$PATH"
+  - bash: ./ci/install_dependencies.sh
     displayName: Install Dependencies
   - template: azure-cache.yml
   - bash: ./ci/print_environment.sh

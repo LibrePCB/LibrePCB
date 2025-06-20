@@ -156,6 +156,12 @@ message(STATUS "Building LibrePCB with Qt ${QT_VERSION}")
 # For the ParsEagle library, use the same Qt version as for LibrePCB
 set(PARSEAGLE_QT_MAJOR_VERSION ${QT_MAJOR_VERSION})
 
+# False-positives in Qt 6.8 and 6.9 (maybe even more versions?), see
+# https://bugreports.qt.io/browse/QTBUG-135623)
+if(QT_VERSION VERSION_GREATER_EQUAL 6.8 AND QT_VERSION VERSION_LESS 6.10)
+  target_compile_options(common INTERFACE -Wno-array-bounds)
+endif()
+
 # Find third party libraries
 find_package(DelaunayTriangulation REQUIRED)
 find_package(Dxflib REQUIRED)
