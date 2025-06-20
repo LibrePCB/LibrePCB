@@ -82,13 +82,14 @@ private:  // Methods
                              LibraryBaseElement& element, bool runCheck,
                              bool minifyStepFiles, bool save, bool strict,
                              bool& success) const;
-  
+
   // Helper function to create error header printer for library elements
   std::function<void()> createElementErrorHeaderPrinter(
       bool& errorHeaderPrinted, const LibraryBaseElement& element) const;
-  
+
   // Run validation checks on a library element
-  void runElementChecks(const QString& libDir, const TransactionalFileSystem& fs,
+  void runElementChecks(const QString& libDir,
+                        const TransactionalFileSystem& fs,
                         const LibraryBaseElement& element,
                         const std::function<void()>& printErrorHeaderOnce,
                         bool& success) const;
