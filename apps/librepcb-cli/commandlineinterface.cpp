@@ -1253,14 +1253,9 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
   }
 }
 
-void CommandLineInterface::processLibraryElement(
-    const QString& libDir, TransactionalFileSystem& fs,
-    LibraryBaseElement& element, bool runCheck, bool minifyStepFiles, bool save,
-    bool strict, bool& success) const {
-  // Helper function to print an error header to console only once, if
-  // there is at least one error.
-  bool errorHeaderPrinted = false;
-  auto printErrorHeaderOnce = [&errorHeaderPrinted, &element]() {
+std::function<void()> CommandLineInterface::createElementErrorHeaderPrinter(
+    bool& errorHeaderPrinted, const LibraryBaseElement& element) const {
+  return [&errorHeaderPrinted, &element]() {
     if (!errorHeaderPrinted) {
       printErr(QString("  - %1 (%2):")
                    .arg(*element.getNames().getDefaultValue(),
@@ -1268,6 +1263,36 @@ void CommandLineInterface::processLibraryElement(
       errorHeaderPrinted = true;
     }
   };
+}
+
+void CommandLineInterface::runElementChecks(
+    const QString& libDir, const TransactionalFileSystem& fs,
+    const LibraryBaseElement& element,
+    const std::function<void()>& printErrorHeaderOnce, bool& success) const {
+  qInfo().noquote() << tr("Check '%1' for non-approved messages...")
+                           .arg(prettyPath(fs.getPath(), libDir));
+  int approvedMsgCount = 0;
+  const RuleCheckMessageList messages = element.runChecks();
+  const QStringList nonApproved = prepareRuleCheckMessages(
+      messages, element.getMessageApprovals(), approvedMsgCount);
+  qInfo().noquote() << "  " % tr("Approved messages: %1").arg(approvedMsgCount);
+  qInfo().noquote() << "  " %
+          tr("Non-approved messages: %1").arg(nonApproved.count());
+  foreach (const QString& msg, nonApproved) {
+    printErrorHeaderOnce();
+    printErr("    - " % msg);
+    success = false;
+  }
+}
+
+void CommandLineInterface::processLibraryElement(
+    const QString& libDir, TransactionalFileSystem& fs,
+    LibraryBaseElement& element, bool runCheck, bool minifyStepFiles, bool save,
+    bool strict, bool& success) const {
+  // Create error header printer
+  bool errorHeaderPrinted = false;
+  auto printErrorHeaderOnce =
+      createElementErrorHeaderPrinter(errorHeaderPrinted, element);
 
   // Save element to transactional file system, if needed
   if (strict || save) {
@@ -1322,21 +1347,7 @@ void CommandLineInterface::processLibraryElement(
 
   // Run library element check, if needed.
   if (runCheck) {
-    qInfo().noquote() << tr("Check '%1' for non-approved messages...")
-                             .arg(prettyPath(fs.getPath(), libDir));
-    int approvedMsgCount = 0;
-    const RuleCheckMessageList messages = element.runChecks();
-    const QStringList nonApproved = prepareRuleCheckMessages(
-        messages, element.getMessageApprovals(), approvedMsgCount);
-    qInfo().noquote() << "  " %
-            tr("Approved messages: %1").arg(approvedMsgCount);
-    qInfo().noquote() << "  " %
-            tr("Non-approved messages: %1").arg(nonApproved.count());
-    foreach (const QString& msg, nonApproved) {
-      printErrorHeaderOnce();
-      printErr("    - " % msg);
-      success = false;
-    }
+    runElementChecks(libDir, fs, element, printErrorHeaderOnce, success);
   }
 
   // Save element to file system, if needed
@@ -1371,11 +1382,16 @@ bool CommandLineInterface::openPackage(
         Package::open(std::unique_ptr<TransactionalDirectory>(
             new TransactionalDirectory(packageFs)));  // can throw
 
+    // Create error header printer
+    bool errorHeaderPrinted = false;
+    auto printErrorHeaderOnce =
+        createElementErrorHeaderPrinter(errorHeaderPrinted, *package);
+
     // Process the package element (similar to how openLibrary processes
     // individual elements)
     if (runCheck) {
-      processLibraryElement(packageFile, *packageFs, *package, runCheck, false,
-                            false, false, success);
+      runElementChecks(packageFile, *packageFs, *package, printErrorHeaderOnce,
+                       success);
     }
 
     // Export package to graphics file
@@ -1478,10 +1494,15 @@ bool CommandLineInterface::openSymbol(
         Symbol::open(std::unique_ptr<TransactionalDirectory>(
             new TransactionalDirectory(symbolFs)));  // can throw
 
+    // Create error header printer
+    bool errorHeaderPrinted = false;
+    auto printErrorHeaderOnce =
+        createElementErrorHeaderPrinter(errorHeaderPrinted, *symbol);
+
     // Process the symbol element (validation checks)
     if (runCheck) {
-      processLibraryElement(symbolFile, *symbolFs, *symbol, runCheck, false,
-                            false, false, success);
+      runElementChecks(symbolFile, *symbolFs, *symbol, printErrorHeaderOnce,
+                       success);
     }
 
     // Export symbol to graphics file
