@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import re
+
 """
 Test command "open-symbol" (basic parser tests)
 """
@@ -17,9 +19,7 @@ Options:
                    report failure (exit code = 1) if there are non-approved
                    messages.
   --export <file>  Export the symbol to a graphical file. Supported file
-                   extensions: pdf, svg, bmp, cur, heic, heif, icns, ico, jfif,
-                   jp2, jpeg, jpg, pbm, pgm, png, ppm, tif, tiff, wbmp, webp,
-                   xbm, xpm
+                   extensions: pdf, svg, ***
 
 Arguments:
   open-symbol      Open a symbol to execute symbol-related tasks.
@@ -33,10 +33,22 @@ Help: {executable} open-symbol --help
 """
 
 
+def _clean(help_text):
+    """
+    Remove client-dependent image file extensions from the help text to make
+    the tests portable.
+    """
+    return re.sub(
+        "extensions: pdf, svg,([\\s\\n]*[0-9a-z,]+)+",
+        "extensions: pdf, svg, ***",
+        help_text,
+    )
+
+
 def test_help(cli):
     code, stdout, stderr = cli.run("open-symbol", "--help")
     assert stderr == ""
-    assert stdout == HELP_TEXT.format(executable=cli.executable)
+    assert _clean(stdout) == HELP_TEXT.format(executable=cli.executable)
     assert code == 0
 
 
