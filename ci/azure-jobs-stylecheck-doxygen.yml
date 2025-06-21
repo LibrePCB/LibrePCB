@@ -2,7 +2,7 @@ jobs:
 - job: Stylecheck_Doxygen
   pool:
     vmImage: 'ubuntu-22.04'
-  container: librepcb/librepcb-dev:devtools-6
+  container: librepcb/librepcb-dev:devtools-7
   steps:
   - checkout: self
     clean: true
