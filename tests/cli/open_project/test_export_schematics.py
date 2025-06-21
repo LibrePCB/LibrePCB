@@ -4,6 +4,7 @@
 import os
 import params
 import pytest
+from helpers import nofmt
 
 """
 Test command "open-project --export-schematics"
@@ -19,15 +20,15 @@ def test_if_unknown_file_extension_fails(cli, project):
     code, stdout, stderr = cli.run('open-project',
                                    '--export-schematics=foo.bar',
                                    project.path)
-    assert stderr == \
-        "  ERROR: Failed to export image \"{path}\". Check file permissions " \
-        "and make sure to use a supported image file extension.\n".format(
-            path=cli.abspath('foo.bar'),
-        )
-    assert stdout == \
-        "Open project '{project.path}'...\n" \
-        "Export schematics to 'foo.bar'...\n" \
-        "Finished with errors!\n".format(project=project)
+    assert stderr == nofmt(f"""\
+  ERROR: Failed to export image "{cli.abspath('foo.bar')}". Check file permissions \
+and make sure to use a supported image file extension.
+""")
+    assert stdout == nofmt(f"""\
+Open project '{project.path}'...
+Export schematics to 'foo.bar'...
+Finished with errors!
+""")
     assert code == 1
 
 
@@ -43,11 +44,12 @@ def test_exporting_pdf_with_relative_path(cli, project):
                                    '--export-schematics=sch.pdf',
                                    project.path)
     assert stderr == ''
-    assert stdout == \
-        "Open project '{project.path}'...\n" \
-        "Export schematics to 'sch.pdf'...\n" \
-        "  => 'sch.pdf'\n" \
-        "SUCCESS\n".format(project=project)
+    assert stdout == nofmt(f"""\
+Open project '{project.path}'...
+Export schematics to 'sch.pdf'...
+  => 'sch.pdf'
+SUCCESS
+""")
     assert code == 0
     assert os.path.exists(path)
 
@@ -67,11 +69,12 @@ def test_exporting_pdf_with_absolute_path(cli, project):
                                    '--export-schematics', path,
                                    project.path)
     assert stderr == ''
-    assert stdout == \
-        "Open project '{project.path}'...\n" \
-        "Export schematics to '{path}'...\n" \
-        "  => '{path}'\n" \
-        "SUCCESS\n".format(project=project, path=path)
+    assert stdout == nofmt(f"""\
+Open project '{project.path}'...
+Export schematics to '{path}'...
+  => '{path}'
+SUCCESS
+""")
     assert code == 0
     assert os.path.exists(path)
 
@@ -89,11 +92,12 @@ def test_exporting_images(cli, file_extension):
                                    '--export-schematics={}'.format(path),
                                    project.path)
     assert stderr == ''
-    assert stdout == \
-        "Open project '{project.path}'...\n" \
-        "Export schematics to '{path}'...\n" \
-        "  => '{path}'\n" \
-        "SUCCESS\n".format(project=project, path=path)
+    assert stdout == nofmt(f"""\
+Open project '{project.path}'...
+Export schematics to '{path}'...
+  => '{path}'
+SUCCESS
+""")
     assert code == 0
     assert os.path.exists(path)
 
@@ -111,11 +115,12 @@ def test_if_output_directories_are_created(cli, project):
                                    '--export-schematics={}'.format(path),
                                    project.path)
     assert stderr == ''
-    assert stdout == \
-        "Open project '{project.path}'...\n" \
-        "Export schematics to '{path}'...\n" \
-        "  => '{path}'\n" \
-        "SUCCESS\n".format(project=project, path=path)
+    assert stdout == nofmt(f"""\
+Open project '{project.path}'...
+Export schematics to '{path}'...
+  => '{path}'
+SUCCESS
+""")
     assert code == 0
     assert os.path.exists(dir)
     assert os.path.exists(path)

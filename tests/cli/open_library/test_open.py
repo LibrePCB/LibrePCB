@@ -3,6 +3,7 @@
 
 import params
 import pytest
+from helpers import nofmt
 
 """
 Test command "open-library"
@@ -17,9 +18,10 @@ def test_open_library_absolute_path(cli, library):
     cli.add_library(library.dir)
     code, stdout, stderr = cli.run('open-library', cli.abspath(library.dir))
     assert stderr == ''
-    assert stdout == \
-        "Open library '{dir}'...\n" \
-        "SUCCESS\n".format(dir=cli.abspath(library.dir))
+    assert stdout == nofmt(f"""\
+Open library '{cli.abspath(library.dir)}'...
+SUCCESS
+""")
     assert code == 0
 
 
@@ -31,9 +33,10 @@ def test_open_library_relative_path(cli, library):
     cli.add_library(library.dir)
     code, stdout, stderr = cli.run('open-library', library.dir)
     assert stderr == ''
-    assert stdout == \
-        "Open library '{library.dir}'...\n" \
-        "SUCCESS\n".format(library=library)
+    assert stdout == nofmt(f"""\
+Open library '{library.dir}'...
+SUCCESS
+""")
     assert code == 0
 
 
@@ -45,15 +48,16 @@ def test_open_library_all(cli, library):
     cli.add_library(library.dir)
     code, stdout, stderr = cli.run('open-library', '--all', library.dir)
     assert stderr == ''
-    assert stdout == \
-        "Open library '{library.dir}'...\n" \
-        "Process {library.cmpcat} component categories...\n" \
-        "Process {library.pkgcat} package categories...\n" \
-        "Process {library.sym} symbols...\n" \
-        "Process {library.pkg} packages...\n" \
-        "Process {library.cmp} components...\n" \
-        "Process {library.dev} devices...\n" \
-        "SUCCESS\n".format(library=library)
+    assert stdout == nofmt(f"""\
+Open library '{library.dir}'...
+Process {library.cmpcat} component categories...
+Process {library.pkgcat} package categories...
+Process {library.sym} symbols...
+Process {library.pkg} packages...
+Process {library.cmp} components...
+Process {library.dev} devices...
+SUCCESS
+""")
     assert code == 0
 
 
@@ -65,13 +69,14 @@ def test_open_library_all_verbose(cli, library):
     code, stdout, stderr = cli.run('open-library', '--all', '--verbose',
                                    library.dir)
     assert len(stderr) > 100  # logging messages are on stderr
-    assert stdout == \
-        "Open library '{library.dir}'...\n" \
-        "Process {library.cmpcat} component categories...\n" \
-        "Process {library.pkgcat} package categories...\n" \
-        "Process {library.sym} symbols...\n" \
-        "Process {library.pkg} packages...\n" \
-        "Process {library.cmp} components...\n" \
-        "Process {library.dev} devices...\n" \
-        "SUCCESS\n".format(library=library)
+    assert stdout == nofmt(f"""\
+Open library '{library.dir}'...
+Process {library.cmpcat} component categories...
+Process {library.pkgcat} package categories...
+Process {library.sym} symbols...
+Process {library.pkg} packages...
+Process {library.cmp} components...
+Process {library.dev} devices...
+SUCCESS
+""")
     assert code == 0

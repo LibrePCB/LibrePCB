@@ -4,6 +4,7 @@
 import os
 import params
 import pytest
+from helpers import nofmt
 
 """
 Test command "open-project --export-pnp-top --export-pnp-bottom"
@@ -18,13 +19,15 @@ Test command "open-project --export-pnp-top --export-pnp-bottom"
 def test_if_unknown_file_extension_fails(cli, project, argument, side):
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     code, stdout, stderr = cli.run('open-project', argument, project.path)
-    assert stderr == "  ERROR: Unknown extension 'bar'.\n"
-    assert stdout == \
-        "Open project '{project.path}'...\n" \
-        "Export {side} assembly data to 'foo.bar'...\n" \
-        "  - 'default' => 'foo.bar'\n" \
-        "Finished with errors!\n" \
-        .format(project=project, side=side)
+    assert stderr == nofmt("""\
+  ERROR: Unknown extension 'bar'.
+""")
+    assert stdout == nofmt(f"""\
+Open project '{project.path}'...
+Export {side} assembly data to 'foo.bar'...
+  - 'default' => 'foo.bar'
+Finished with errors!
+""")
     assert code == 1
 
 
@@ -48,11 +51,12 @@ def test_if_project_without_boards_succeeds(cli, project, ext):
                                    '--export-pnp-bottom=' + relpath_bot,
                                    project.path)
     assert stderr == ''
-    assert stdout == \
-        "Open project '{project.path}'...\n" \
-        "Export top assembly data to '{project.output_dir}/pnp/top.{ext}'...\n" \
-        "Export bottom assembly data to '{project.output_dir}/pnp/bot.{ext}'...\n" \
-        "SUCCESS\n".format(project=project, ext=ext)
+    assert stdout == nofmt(f"""\
+Open project '{project.path}'...
+Export top assembly data to '{project.output_dir}/pnp/top.{ext}'...
+Export bottom assembly data to '{project.output_dir}/pnp/bot.{ext}'...
+SUCCESS
+""")
     assert code == 0
     assert not os.path.exists(abspath_top)  # nothing exported
     assert not os.path.exists(abspath_bot)  # nothing exported
@@ -74,15 +78,16 @@ def test_export_project_with_two_boards_implicit(cli, project, ext):
                                    '--export-pnp-bottom', fp_bot,  # --arg "val"
                                    project.path)
     assert stderr == ''
-    assert stdout == \
-        "Open project '{project.path}'...\n" \
-        "Export top assembly data to '{project.output_dir}/pnp/{{{{BOARD}}}}_top.{ext}'...\n" \
-        "  - 'default' => '{project.output_dir_native}//pnp//default_top.{ext}'\n" \
-        "  - 'copy' => '{project.output_dir_native}//pnp//copy_top.{ext}'\n" \
-        "Export bottom assembly data to '{project.output_dir}/pnp/{{{{BOARD}}}}_bot.{ext}'...\n" \
-        "  - 'default' => '{project.output_dir_native}//pnp//default_bot.{ext}'\n" \
-        "  - 'copy' => '{project.output_dir_native}//pnp//copy_bot.{ext}'\n" \
-        "SUCCESS\n".format(project=project, ext=ext).replace('//', os.sep)
+    assert stdout == nofmt(f"""\
+Open project '{project.path}'...
+Export top assembly data to '{project.output_dir}/pnp/{{{{BOARD}}}}_top.{ext}'...
+  - 'default' => '{project.output_dir_native}//pnp//default_top.{ext}'
+  - 'copy' => '{project.output_dir_native}//pnp//copy_top.{ext}'
+Export bottom assembly data to '{project.output_dir}/pnp/{{{{BOARD}}}}_bot.{ext}'...
+  - 'default' => '{project.output_dir_native}//pnp//default_bot.{ext}'
+  - 'copy' => '{project.output_dir_native}//pnp//copy_bot.{ext}'
+SUCCESS
+""").replace('//', os.sep)
     assert code == 0
     assert os.path.exists(dir)
     assert len(os.listdir(dir)) == 4
@@ -105,13 +110,14 @@ def test_export_project_with_two_boards_explicit_one(cli, project, ext):
                                    '--board=copy',
                                    project.path)
     assert stderr == ''
-    assert stdout == \
-        "Open project '{project.path}'...\n" \
-        "Export top assembly data to '{project.output_dir}/pnp/{{{{BOARD}}}}_top.{ext}'...\n" \
-        "  - 'copy' => '{project.output_dir_native}//pnp//copy_top.{ext}'\n" \
-        "Export bottom assembly data to '{project.output_dir}/pnp/{{{{BOARD}}}}_bot.{ext}'...\n" \
-        "  - 'copy' => '{project.output_dir_native}//pnp//copy_bot.{ext}'\n" \
-        "SUCCESS\n".format(project=project, ext=ext).replace('//', os.sep)
+    assert stdout == nofmt(f"""\
+Open project '{project.path}'...
+Export top assembly data to '{project.output_dir}/pnp/{{{{BOARD}}}}_top.{ext}'...
+  - 'copy' => '{project.output_dir_native}//pnp//copy_top.{ext}'
+Export bottom assembly data to '{project.output_dir}/pnp/{{{{BOARD}}}}_bot.{ext}'...
+  - 'copy' => '{project.output_dir_native}//pnp//copy_bot.{ext}'
+SUCCESS
+""").replace('//', os.sep)
     assert code == 0
     assert os.path.exists(dir)
     assert len(os.listdir(dir)) == 2
@@ -127,24 +133,22 @@ def test_export_project_with_two_conflicting_boards_fails(cli, project, ext):
                                    '--export-pnp-top=' + fp_top,
                                    '--export-pnp-bottom=' + fp_bot,
                                    project.path)
-    assert stderr == \
-        "ERROR: The file '{project.output_dir_native}//bot.{ext}' was " \
-        "written multiple times!\n" \
-        "ERROR: The file '{project.output_dir_native}//top.{ext}' was " \
-        "written multiple times!\n" \
-        "NOTE: To avoid writing files multiple times, make sure to pass " \
-        "unique filepaths to all export functions. For board output files, " \
-        "you could either add the placeholder '{{{{BOARD}}}}' to the path or " \
-        "specify the boards to export with the '--board' argument.\n" \
-        .format(project=project, ext=ext).replace('//', os.sep)
-    assert stdout == \
-        "Open project '{project.path}'...\n" \
-        "Export top assembly data to '{project.output_dir}/top.{ext}'...\n" \
-        "  - 'default' => '{project.output_dir_native}//top.{ext}'\n" \
-        "  - 'copy' => '{project.output_dir_native}//top.{ext}'\n" \
-        "Export bottom assembly data to '{project.output_dir}/bot.{ext}'...\n" \
-        "  - 'default' => '{project.output_dir_native}//bot.{ext}'\n" \
-        "  - 'copy' => '{project.output_dir_native}//bot.{ext}'\n" \
-        "Finished with errors!\n" \
-        .format(project=project, ext=ext).replace('//', os.sep)
+    assert stderr == nofmt(f"""\
+ERROR: The file '{project.output_dir_native}//bot.{ext}' was written multiple times!
+ERROR: The file '{project.output_dir_native}//top.{ext}' was written multiple times!
+NOTE: To avoid writing files multiple times, make sure to pass \
+unique filepaths to all export functions. For board output files, \
+you could either add the placeholder '{{{{BOARD}}}}' to the path or \
+specify the boards to export with the '--board' argument.
+""").replace('//', os.sep)
+    assert stdout == nofmt(f"""\
+Open project '{project.path}'...
+Export top assembly data to '{project.output_dir}/top.{ext}'...
+  - 'default' => '{project.output_dir_native}//top.{ext}'
+  - 'copy' => '{project.output_dir_native}//top.{ext}'
+Export bottom assembly data to '{project.output_dir}/bot.{ext}'...
+  - 'default' => '{project.output_dir_native}//bot.{ext}'
+  - 'copy' => '{project.output_dir_native}//bot.{ext}'
+Finished with errors!
+""").replace('//', os.sep)
     assert code == 1

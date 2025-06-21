@@ -4,6 +4,7 @@
 import os
 import params
 import pytest
+from helpers import nofmt
 
 """
 Test command "open-project --remove-other-boards"
@@ -22,12 +23,13 @@ def test_project_with_two_boards_remove_both_volatile(cli, project):
                                        '--remove-other-boards',
                                        project.path)
         assert stderr == ''
-        assert stdout == \
-            "Open project '{project.path}'...\n" \
-            "Remove other boards...\n" \
-            "  - 'default'\n" \
-            "  - 'copy'\n" \
-            "SUCCESS\n".format(project=project)
+        assert stdout == nofmt(f"""\
+Open project '{project.path}'...
+Remove other boards...
+  - 'default'
+  - 'copy'
+SUCCESS
+""")
         assert code == 0
 
 
@@ -46,12 +48,13 @@ def test_project_with_two_boards_remove_one_and_save(cli, project):
                                    '--save',
                                    project.path)
     assert stderr == ''
-    assert stdout == \
-        "Open project '{project.path}'...\n" \
-        "Remove other boards...\n" \
-        "  - 'default'\n" \
-        "Save project...\n" \
-        "SUCCESS\n".format(project=project)
+    assert stdout == nofmt(f"""\
+Open project '{project.path}'...
+Remove other boards...
+  - 'default'
+Save project...
+SUCCESS
+""")
     assert code == 0
     if not project.is_lppz:
         assert os.path.exists(removed_dir) is False
@@ -62,8 +65,9 @@ def test_project_with_two_boards_remove_one_and_save(cli, project):
                                    '--remove-other-boards',
                                    project.path)
     assert stderr == ''
-    assert stdout == \
-        "Open project '{project.path}'...\n" \
-        "Remove other boards...\n" \
-        "SUCCESS\n".format(project=project)
+    assert stdout == nofmt(f"""\
+Open project '{project.path}'...
+Remove other boards...
+SUCCESS
+""")
     assert code == 0

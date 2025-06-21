@@ -3,6 +3,7 @@
 
 import os
 import params
+from helpers import nofmt
 
 """
 Test command "open-library --strict"
@@ -15,15 +16,16 @@ def test_valid_lp(cli):
     code, stdout, stderr = cli.run('open-library', '--all', '--strict',
                                    library.dir)
     assert stderr == ''
-    assert stdout == \
-        "Open library '{library.dir}'...\n" \
-        "Process {library.cmpcat} component categories...\n" \
-        "Process {library.pkgcat} package categories...\n" \
-        "Process {library.sym} symbols...\n" \
-        "Process {library.pkg} packages...\n" \
-        "Process {library.cmp} components...\n" \
-        "Process {library.dev} devices...\n" \
-        "SUCCESS\n".format(library=library)
+    assert stdout == nofmt(f"""\
+Open library '{library.dir}'...
+Process {library.cmpcat} component categories...
+Process {library.pkgcat} package categories...
+Process {library.sym} symbols...
+Process {library.pkg} packages...
+Process {library.cmp} components...
+Process {library.dev} devices...
+SUCCESS
+""")
     assert code == 0
 
 
@@ -41,19 +43,20 @@ def test_invalid_lp(cli):
     # open library
     code, stdout, stderr = cli.run('open-library', '--all', '--strict',
                                    library.dir)
-    assert stderr == \
-        "  - Populated Library (a7cb5051-9f37-4500-be38-33eade6e621e):\n" \
-        "    - Non-canonical file: '{paths[0]}'\n" \
-        "  - Diode (9b75d0ce-ac4e-4a52-a88a-8777f66d3241):\n" \
-        "    - Non-canonical file: '{paths[1]}'\n" \
-        .format(paths=paths).replace('/', os.sep)
-    assert stdout == \
-        "Open library 'Populated Library.lplib'...\n" \
-        "Process {library.cmpcat} component categories...\n" \
-        "Process {library.pkgcat} package categories...\n" \
-        "Process {library.sym} symbols...\n" \
-        "Process {library.pkg} packages...\n" \
-        "Process {library.cmp} components...\n" \
-        "Process {library.dev} devices...\n" \
-        "Finished with errors!\n".format(library=library)
+    assert stderr == nofmt(f"""\
+  - Populated Library (a7cb5051-9f37-4500-be38-33eade6e621e):
+    - Non-canonical file: '{paths[0].replace('/', os.sep)}'
+  - Diode (9b75d0ce-ac4e-4a52-a88a-8777f66d3241):
+    - Non-canonical file: '{paths[1].replace('/', os.sep)}'
+""")
+    assert stdout == nofmt(f"""\
+Open library 'Populated Library.lplib'...
+Process {library.cmpcat} component categories...
+Process {library.pkgcat} package categories...
+Process {library.sym} symbols...
+Process {library.pkg} packages...
+Process {library.cmp} components...
+Process {library.dev} devices...
+Finished with errors!
+""")
     assert code == 1

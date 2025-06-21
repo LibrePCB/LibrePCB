@@ -4,6 +4,7 @@
 import os
 import params
 import pytest
+from helpers import nofmt
 
 """
 Test command "open-project --save"
@@ -24,9 +25,10 @@ def test_save(cli, project):
     # save project (must remove the appended zeros)
     code, stdout, stderr = cli.run('open-project', '--save', path)
     assert stderr == ''
-    assert stdout == \
-        "Open project '{path}'...\n" \
-        "Save project...\n" \
-        "SUCCESS\n".format(path=path)
+    assert stdout == nofmt(f"""\
+Open project '{path}'...
+Save project...
+SUCCESS
+""")
     assert code == 0
     assert os.path.getsize(path) != original_filesize

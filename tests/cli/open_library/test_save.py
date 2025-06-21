@@ -3,6 +3,7 @@
 
 import os
 import params
+from helpers import nofmt
 
 """
 Test command "open-library --save"
@@ -25,15 +26,16 @@ def test_save(cli):
     code, stdout, stderr = cli.run('open-library', '--all', '--save',
                                    library.dir)
     assert stderr == ''
-    assert stdout == \
-        "Open library '{library.dir}'...\n" \
-        "Process {library.cmpcat} component categories...\n" \
-        "Process {library.pkgcat} package categories...\n" \
-        "Process {library.sym} symbols...\n" \
-        "Process {library.pkg} packages...\n" \
-        "Process {library.cmp} components...\n" \
-        "Process {library.dev} devices...\n" \
-        "SUCCESS\n".format(library=library)
+    assert stdout == nofmt(f"""\
+Open library '{library.dir}'...
+Process {library.cmpcat} component categories...
+Process {library.pkgcat} package categories...
+Process {library.sym} symbols...
+Process {library.pkg} packages...
+Process {library.cmp} components...
+Process {library.dev} devices...
+SUCCESS
+""")
     assert code == 0
     filesizes = [os.path.getsize(path) for path in paths]
     assert all([s[0] == (s[1] - 2) for s in zip(filesizes, original_filesizes)])

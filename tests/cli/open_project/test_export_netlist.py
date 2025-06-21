@@ -4,6 +4,7 @@
 import os
 import params
 import pytest
+from helpers import nofmt
 
 """
 Test command "open-project --export-netlist"
@@ -25,10 +26,11 @@ def test_if_project_without_boards_succeeds(cli, project):
                                    '--export-netlist=' + relpath,
                                    project.path)
     assert stderr == ''
-    assert stdout == \
-        "Open project '{project.path}'...\n" \
-        "Export netlist to 'Empty Project/output/v1/netlist/netlist.d356'...\n" \
-        "SUCCESS\n".format(project=project)
+    assert stdout == nofmt(f"""\
+Open project '{project.path}'...
+Export netlist to 'Empty Project/output/v1/netlist/netlist.d356'...
+SUCCESS
+""")
     assert code == 0
     assert not os.path.exists(abspath)  # nothing exported
 
@@ -46,12 +48,13 @@ def test_export_project_with_two_boards_implicit(cli, project):
                                    '--export-netlist=' + fp,
                                    project.path)
     assert stderr == ''
-    assert stdout == \
-        "Open project '{project.path}'...\n" \
-        "Export netlist to '{project.output_dir}/netlist/{{{{BOARD}}}}.d356'...\n" \
-        "  - 'default' => '{project.output_dir_native}//netlist//default.d356'\n" \
-        "  - 'copy' => '{project.output_dir_native}//netlist//copy.d356'\n" \
-        "SUCCESS\n".format(project=project).replace('//', os.sep)
+    assert stdout == nofmt(f"""\
+Open project '{project.path}'...
+Export netlist to '{project.output_dir}/netlist/{{{{BOARD}}}}.d356'...
+  - 'default' => '{project.output_dir_native}//netlist//default.d356'
+  - 'copy' => '{project.output_dir_native}//netlist//copy.d356'
+SUCCESS
+""").replace('//', os.sep)
     assert code == 0
     assert os.path.exists(dir)
     assert len(os.listdir(dir)) == 2
@@ -71,11 +74,12 @@ def test_export_project_with_two_boards_explicit_one(cli, project):
                                    '--board=copy',
                                    project.path)
     assert stderr == ''
-    assert stdout == \
-        "Open project '{project.path}'...\n" \
-        "Export netlist to '{project.output_dir}/netlist/{{{{BOARD}}}}.d356'...\n" \
-        "  - 'copy' => '{project.output_dir_native}//netlist//copy.d356'\n" \
-        "SUCCESS\n".format(project=project).replace('//', os.sep)
+    assert stdout == nofmt(f"""\
+Open project '{project.path}'...
+Export netlist to '{project.output_dir}/netlist/{{{{BOARD}}}}.d356'...
+  - 'copy' => '{project.output_dir_native}//netlist//copy.d356'
+SUCCESS
+""").replace('//', os.sep)
     assert code == 0
     assert os.path.exists(dir)
     assert os.listdir(dir) == ['copy.d356']
@@ -88,18 +92,18 @@ def test_export_project_with_two_conflicting_boards_fails(cli, project):
     code, stdout, stderr = cli.run('open-project',
                                    '--export-netlist=' + fp,
                                    project.path)
-    assert stderr == \
-        "ERROR: The file '{project.output_dir_native}//netlist.d356' was " \
-        "written multiple times!\n" \
-        "NOTE: To avoid writing files multiple times, make sure to pass " \
-        "unique filepaths to all export functions. For board output files, " \
-        "you could either add the placeholder '{{{{BOARD}}}}' to the path " \
-        "or specify the boards to export with the '--board' argument.\n" \
-        .format(project=project).replace('//', os.sep)
-    assert stdout == \
-        "Open project '{project.path}'...\n" \
-        "Export netlist to '{project.output_dir}/netlist.d356'...\n" \
-        "  - 'default' => '{project.output_dir_native}//netlist.d356'\n" \
-        "  - 'copy' => '{project.output_dir_native}//netlist.d356'\n" \
-        "Finished with errors!\n".format(project=project).replace('//', os.sep)
+    assert stderr == nofmt(f"""\
+ERROR: The file '{project.output_dir_native}//netlist.d356' was written multiple times!
+NOTE: To avoid writing files multiple times, make sure to pass unique filepaths \
+to all export functions. For board output files, you could either add the \
+placeholder '{{{{BOARD}}}}' to the path or specify the boards to export with \
+the '--board' argument.
+""").replace('//', os.sep)
+    assert stdout == nofmt(f"""\
+Open project '{project.path}'...
+Export netlist to '{project.output_dir}/netlist.d356'...
+  - 'default' => '{project.output_dir_native}//netlist.d356'
+  - 'copy' => '{project.output_dir_native}//netlist.d356'
+Finished with errors!
+""").replace('//', os.sep)
     assert code == 1

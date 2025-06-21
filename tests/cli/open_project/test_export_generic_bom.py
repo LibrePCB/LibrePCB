@@ -4,6 +4,7 @@
 import os
 import params
 import pytest
+from helpers import nofmt
 
 """
 Test command "open-project --export-bom"
@@ -25,11 +26,12 @@ def test_if_project_without_boards_succeeds(cli, project):
                                    '--export-bom=' + relpath,
                                    project.path)
     assert stderr == ''
-    assert stdout == \
-        "Open project '{project.path}'...\n" \
-        "Export generic BOM to '{project.output_dir}/bom/bom.csv'...\n" \
-        "  => '{project.output_dir_native}//bom//bom.csv'\n" \
-        "SUCCESS\n".format(project=project).replace('//', os.sep)
+    assert stdout == nofmt(f"""\
+Open project '{project.path}'...
+Export generic BOM to '{project.output_dir}/bom/bom.csv'...
+  => '{project.output_dir_native}//bom//bom.csv'
+SUCCESS
+""").replace('//', os.sep)
     assert code == 0
     assert os.path.exists(abspath)
 
@@ -51,13 +53,14 @@ def test_export_multiple_files(cli, project):
                                    '--export-bom', relpath2,  # --arg "value"
                                    project.path)
     assert stderr == ''
-    assert stdout == \
-        "Open project '{project.path}'...\n" \
-        "Export generic BOM to '{project.output_dir}/bom1.csv'...\n" \
-        "  => '{project.output_dir_native}//bom1.csv'\n" \
-        "Export generic BOM to '{project.output_dir}/bom2.csv'...\n" \
-        "  => '{project.output_dir_native}//bom2.csv'\n" \
-        "SUCCESS\n".format(project=project).replace('//', os.sep)
+    assert stdout == nofmt(f"""\
+Open project '{project.path}'...
+Export generic BOM to '{project.output_dir}/bom1.csv'...
+  => '{project.output_dir_native}//bom1.csv'
+Export generic BOM to '{project.output_dir}/bom2.csv'...
+  => '{project.output_dir_native}//bom2.csv'
+SUCCESS
+""").replace('//', os.sep)
     assert code == 0
     assert os.path.exists(abspath1)
     assert os.path.exists(abspath2)

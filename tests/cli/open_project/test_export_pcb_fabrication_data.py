@@ -5,6 +5,7 @@ import os
 import fileinput
 import params
 import pytest
+from helpers import nofmt
 
 """
 Test command "open-project --export-pcb-fabrication-data"
@@ -28,10 +29,11 @@ def test_if_project_without_boards_succeeds(cli, project):
                                    '--export-pcb-fabrication-data',
                                    project.path)
     assert stderr == ''
-    assert stdout == \
-        "Open project '{project.path}'...\n" \
-        "Export PCB fabrication data...\n" \
-        "SUCCESS\n".format(project=project)
+    assert stdout == nofmt(f"""\
+Open project '{project.path}'...
+Export PCB fabrication data...
+SUCCESS
+""")
     assert code == 0
     assert not os.path.exists(dir)  # nothing was exported ;)
 
@@ -48,20 +50,21 @@ def test_export_project_with_one_board_implicit(cli, project):
                                    '--export-pcb-fabrication-data',
                                    project.path)
     assert stderr == ''
-    assert stdout == \
-        "Open project '{project.path}'...\n" \
-        "Export PCB fabrication data...\n" \
-        "  Board 'default':\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_DRILLS-NPTH.drl'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_DRILLS-PTH.drl'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_OUTLINES.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_COPPER-TOP.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_COPPER-BOTTOM.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_SOLDERMASK-TOP.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_SOLDERMASK-BOTTOM.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-TOP.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-BOTTOM.gbr'\n" \
-        "SUCCESS\n".format(project=project).replace('//', os.sep)
+    assert stdout == nofmt(f"""\
+Open project '{project.path}'...
+Export PCB fabrication data...
+  Board 'default':
+    => '{project.output_dir_native}//gerber//Empty_Project_DRILLS-NPTH.drl'
+    => '{project.output_dir_native}//gerber//Empty_Project_DRILLS-PTH.drl'
+    => '{project.output_dir_native}//gerber//Empty_Project_OUTLINES.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_COPPER-TOP.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_COPPER-BOTTOM.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_SOLDERMASK-TOP.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_SOLDERMASK-BOTTOM.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-TOP.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-BOTTOM.gbr'
+SUCCESS
+""").replace('//', os.sep)
     assert code == 0
     assert os.path.exists(dir)
     assert len(os.listdir(dir)) == 9
@@ -80,20 +83,21 @@ def test_export_project_with_one_board_explicit(cli, project):
                                    '--board=default',
                                    project.path)
     assert stderr == ''
-    assert stdout == \
-        "Open project '{project.path}'...\n" \
-        "Export PCB fabrication data...\n" \
-        "  Board 'default':\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_DRILLS-NPTH.drl'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_DRILLS-PTH.drl'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_OUTLINES.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_COPPER-TOP.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_COPPER-BOTTOM.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_SOLDERMASK-TOP.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_SOLDERMASK-BOTTOM.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-TOP.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-BOTTOM.gbr'\n" \
-        "SUCCESS\n".format(project=project).replace('//', os.sep)
+    assert stdout == nofmt(f"""\
+Open project '{project.path}'...
+Export PCB fabrication data...
+  Board 'default':
+    => '{project.output_dir_native}//gerber//Empty_Project_DRILLS-NPTH.drl'
+    => '{project.output_dir_native}//gerber//Empty_Project_DRILLS-PTH.drl'
+    => '{project.output_dir_native}//gerber//Empty_Project_OUTLINES.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_COPPER-TOP.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_COPPER-BOTTOM.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_SOLDERMASK-TOP.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_SOLDERMASK-BOTTOM.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-TOP.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-BOTTOM.gbr'
+SUCCESS
+""").replace('//', os.sep)
     assert code == 0
     assert os.path.exists(dir)
     assert len(os.listdir(dir)) == 9
@@ -115,10 +119,11 @@ def test_if_exporting_invalid_board_fails(cli, project):
                                    '--board', 'foo',
                                    project.path)
     assert stderr == "ERROR: No board with the name 'foo' found.\n"
-    assert stdout == \
-        "Open project '{project.path}'...\n" \
-        "Export PCB fabrication data...\n" \
-        "Finished with errors!\n".format(project=project)
+    assert stdout == nofmt(f"""\
+Open project '{project.path}'...
+Export PCB fabrication data...
+Finished with errors!
+""")
     assert code == 1
     assert not os.path.exists(dir)
 
@@ -135,30 +140,31 @@ def test_export_project_with_two_boards_implicit(cli, project):
                                    '--export-pcb-fabrication-data',
                                    project.path)
     assert stderr == ''
-    assert stdout == \
-        "Open project '{project.path}'...\n" \
-        "Export PCB fabrication data...\n" \
-        "  Board 'default':\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_DRILLS-NPTH.drl'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_DRILLS-PTH.drl'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_OUTLINES.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_COPPER-TOP.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_COPPER-BOTTOM.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_SOLDERMASK-TOP.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_SOLDERMASK-BOTTOM.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-TOP.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-BOTTOM.gbr'\n" \
-        "  Board 'copy':\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_copy_DRILLS-NPTH.drl'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_copy_DRILLS-PTH.drl'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_copy_OUTLINES.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_copy_COPPER-TOP.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_copy_COPPER-BOTTOM.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_copy_SOLDERMASK-TOP.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_copy_SOLDERMASK-BOTTOM.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_copy_SILKSCREEN-TOP.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_copy_SILKSCREEN-BOTTOM.gbr'\n" \
-        "SUCCESS\n".format(project=project).replace('//', os.sep)
+    assert stdout == nofmt(f"""\
+Open project '{project.path}'...
+Export PCB fabrication data...
+  Board 'default':
+    => '{project.output_dir_native}//gerber//Empty_Project_DRILLS-NPTH.drl'
+    => '{project.output_dir_native}//gerber//Empty_Project_DRILLS-PTH.drl'
+    => '{project.output_dir_native}//gerber//Empty_Project_OUTLINES.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_COPPER-TOP.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_COPPER-BOTTOM.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_SOLDERMASK-TOP.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_SOLDERMASK-BOTTOM.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-TOP.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-BOTTOM.gbr'
+  Board 'copy':
+    => '{project.output_dir_native}//gerber//Empty_Project_copy_DRILLS-NPTH.drl'
+    => '{project.output_dir_native}//gerber//Empty_Project_copy_DRILLS-PTH.drl'
+    => '{project.output_dir_native}//gerber//Empty_Project_copy_OUTLINES.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_copy_COPPER-TOP.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_copy_COPPER-BOTTOM.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_copy_SOLDERMASK-TOP.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_copy_SOLDERMASK-BOTTOM.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_copy_SILKSCREEN-TOP.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_copy_SILKSCREEN-BOTTOM.gbr'
+SUCCESS
+""").replace('//', os.sep)
     assert code == 0
     assert os.path.exists(dir)
     assert len(os.listdir(dir)) == 18
@@ -177,20 +183,21 @@ def test_export_project_with_two_boards_explicit_one(cli, project):
                                    '--board=copy',
                                    project.path)
     assert stderr == ''
-    assert stdout == \
-        "Open project '{project.path}'...\n" \
-        "Export PCB fabrication data...\n" \
-        "  Board 'copy':\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_copy_DRILLS-NPTH.drl'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_copy_DRILLS-PTH.drl'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_copy_OUTLINES.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_copy_COPPER-TOP.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_copy_COPPER-BOTTOM.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_copy_SOLDERMASK-TOP.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_copy_SOLDERMASK-BOTTOM.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_copy_SILKSCREEN-TOP.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_copy_SILKSCREEN-BOTTOM.gbr'\n" \
-        "SUCCESS\n".format(project=project).replace('//', os.sep)
+    assert stdout == nofmt(f"""\
+Open project '{project.path}'...
+Export PCB fabrication data...
+  Board 'copy':
+    => '{project.output_dir_native}//gerber//Empty_Project_copy_DRILLS-NPTH.drl'
+    => '{project.output_dir_native}//gerber//Empty_Project_copy_DRILLS-PTH.drl'
+    => '{project.output_dir_native}//gerber//Empty_Project_copy_OUTLINES.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_copy_COPPER-TOP.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_copy_COPPER-BOTTOM.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_copy_SOLDERMASK-TOP.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_copy_SOLDERMASK-BOTTOM.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_copy_SILKSCREEN-TOP.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_copy_SILKSCREEN-BOTTOM.gbr'
+SUCCESS
+""").replace('//', os.sep)
     assert code == 0
     assert os.path.exists(dir)
     assert len(os.listdir(dir)) == 9
@@ -210,30 +217,31 @@ def test_export_project_with_two_boards_explicit_two(cli, project):
                                    '--board=default',
                                    project.path)
     assert stderr == ''
-    assert stdout == \
-        "Open project '{project.path}'...\n" \
-        "Export PCB fabrication data...\n" \
-        "  Board 'copy':\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_copy_DRILLS-NPTH.drl'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_copy_DRILLS-PTH.drl'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_copy_OUTLINES.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_copy_COPPER-TOP.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_copy_COPPER-BOTTOM.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_copy_SOLDERMASK-TOP.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_copy_SOLDERMASK-BOTTOM.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_copy_SILKSCREEN-TOP.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_copy_SILKSCREEN-BOTTOM.gbr'\n" \
-        "  Board 'default':\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_DRILLS-NPTH.drl'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_DRILLS-PTH.drl'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_OUTLINES.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_COPPER-TOP.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_COPPER-BOTTOM.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_SOLDERMASK-TOP.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_SOLDERMASK-BOTTOM.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-TOP.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-BOTTOM.gbr'\n" \
-        "SUCCESS\n".format(project=project).replace('//', os.sep)
+    assert stdout == nofmt(f"""\
+Open project '{project.path}'...
+Export PCB fabrication data...
+  Board 'copy':
+    => '{project.output_dir_native}//gerber//Empty_Project_copy_DRILLS-NPTH.drl'
+    => '{project.output_dir_native}//gerber//Empty_Project_copy_DRILLS-PTH.drl'
+    => '{project.output_dir_native}//gerber//Empty_Project_copy_OUTLINES.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_copy_COPPER-TOP.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_copy_COPPER-BOTTOM.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_copy_SOLDERMASK-TOP.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_copy_SOLDERMASK-BOTTOM.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_copy_SILKSCREEN-TOP.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_copy_SILKSCREEN-BOTTOM.gbr'
+  Board 'default':
+    => '{project.output_dir_native}//gerber//Empty_Project_DRILLS-NPTH.drl'
+    => '{project.output_dir_native}//gerber//Empty_Project_DRILLS-PTH.drl'
+    => '{project.output_dir_native}//gerber//Empty_Project_OUTLINES.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_COPPER-TOP.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_COPPER-BOTTOM.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_SOLDERMASK-TOP.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_SOLDERMASK-BOTTOM.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-TOP.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-BOTTOM.gbr'
+SUCCESS
+""").replace('//', os.sep)
     assert code == 0
     assert os.path.exists(dir)
     assert len(os.listdir(dir)) == 18
@@ -255,45 +263,46 @@ def test_export_project_with_two_conflicting_boards_fails(cli, project):
     code, stdout, stderr = cli.run('open-project',
                                    '--export-pcb-fabrication-data',
                                    project.path)
-    assert stderr == \
-        "ERROR: The file '{project.output_dir_native}//gerber//Empty_Project_COPPER-BOTTOM.gbr' was written multiple times!\n" \
-        "ERROR: The file '{project.output_dir_native}//gerber//Empty_Project_COPPER-TOP.gbr' was written multiple times!\n" \
-        "ERROR: The file '{project.output_dir_native}//gerber//Empty_Project_DRILLS-NPTH.drl' was written multiple times!\n" \
-        "ERROR: The file '{project.output_dir_native}//gerber//Empty_Project_DRILLS-PTH.drl' was written multiple times!\n" \
-        "ERROR: The file '{project.output_dir_native}//gerber//Empty_Project_OUTLINES.gbr' was written multiple times!\n" \
-        "ERROR: The file '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-BOTTOM.gbr' was written multiple times!\n" \
-        "ERROR: The file '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-TOP.gbr' was written multiple times!\n" \
-        "ERROR: The file '{project.output_dir_native}//gerber//Empty_Project_SOLDERMASK-BOTTOM.gbr' was written multiple times!\n" \
-        "ERROR: The file '{project.output_dir_native}//gerber//Empty_Project_SOLDERMASK-TOP.gbr' was written multiple times!\n" \
-        "NOTE: To avoid writing files multiple times, make sure to pass " \
-        "unique filepaths to all export functions. For board output files, " \
-        "you could either add the placeholder '{{{{BOARD}}}}' to the path or " \
-        "specify the boards to export with the '--board' argument.\n"\
-        .format(project=project).replace('//', os.sep)
-    assert stdout == \
-        "Open project '{project.path}'...\n" \
-        "Export PCB fabrication data...\n" \
-        "  Board 'default':\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_DRILLS-NPTH.drl'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_DRILLS-PTH.drl'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_OUTLINES.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_COPPER-TOP.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_COPPER-BOTTOM.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_SOLDERMASK-TOP.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_SOLDERMASK-BOTTOM.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-TOP.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-BOTTOM.gbr'\n" \
-        "  Board 'copy':\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_DRILLS-NPTH.drl'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_DRILLS-PTH.drl'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_OUTLINES.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_COPPER-TOP.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_COPPER-BOTTOM.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_SOLDERMASK-TOP.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_SOLDERMASK-BOTTOM.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-TOP.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-BOTTOM.gbr'\n" \
-        "Finished with errors!\n".format(project=project).replace('//', os.sep)
+    assert stderr == nofmt(f"""\
+ERROR: The file '{project.output_dir_native}//gerber//Empty_Project_COPPER-BOTTOM.gbr' was written multiple times!
+ERROR: The file '{project.output_dir_native}//gerber//Empty_Project_COPPER-TOP.gbr' was written multiple times!
+ERROR: The file '{project.output_dir_native}//gerber//Empty_Project_DRILLS-NPTH.drl' was written multiple times!
+ERROR: The file '{project.output_dir_native}//gerber//Empty_Project_DRILLS-PTH.drl' was written multiple times!
+ERROR: The file '{project.output_dir_native}//gerber//Empty_Project_OUTLINES.gbr' was written multiple times!
+ERROR: The file '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-BOTTOM.gbr' was written multiple times!
+ERROR: The file '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-TOP.gbr' was written multiple times!
+ERROR: The file '{project.output_dir_native}//gerber//Empty_Project_SOLDERMASK-BOTTOM.gbr' was written multiple times!
+ERROR: The file '{project.output_dir_native}//gerber//Empty_Project_SOLDERMASK-TOP.gbr' was written multiple times!
+NOTE: To avoid writing files multiple times, make sure to pass \
+unique filepaths to all export functions. For board output files, \
+you could either add the placeholder '{{{{BOARD}}}}' to the path or \
+specify the boards to export with the '--board' argument.
+""").replace('//', os.sep)
+    assert stdout == nofmt(f"""\
+Open project '{project.path}'...
+Export PCB fabrication data...
+  Board 'default':
+    => '{project.output_dir_native}//gerber//Empty_Project_DRILLS-NPTH.drl'
+    => '{project.output_dir_native}//gerber//Empty_Project_DRILLS-PTH.drl'
+    => '{project.output_dir_native}//gerber//Empty_Project_OUTLINES.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_COPPER-TOP.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_COPPER-BOTTOM.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_SOLDERMASK-TOP.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_SOLDERMASK-BOTTOM.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-TOP.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-BOTTOM.gbr'
+  Board 'copy':
+    => '{project.output_dir_native}//gerber//Empty_Project_DRILLS-NPTH.drl'
+    => '{project.output_dir_native}//gerber//Empty_Project_DRILLS-PTH.drl'
+    => '{project.output_dir_native}//gerber//Empty_Project_OUTLINES.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_COPPER-TOP.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_COPPER-BOTTOM.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_SOLDERMASK-TOP.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_SOLDERMASK-BOTTOM.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-TOP.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-BOTTOM.gbr'
+Finished with errors!
+""").replace('//', os.sep)
     assert code == 1
 
 
@@ -315,20 +324,21 @@ def test_export_project_with_two_conflicting_boards_succeeds_explicit(cli, proje
                                    '--board=copy',
                                    project.path)
     assert stderr == ''
-    assert stdout == \
-        "Open project '{project.path}'...\n" \
-        "Export PCB fabrication data...\n" \
-        "  Board 'copy':\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_DRILLS-NPTH.drl'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_DRILLS-PTH.drl'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_OUTLINES.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_COPPER-TOP.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_COPPER-BOTTOM.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_SOLDERMASK-TOP.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_SOLDERMASK-BOTTOM.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-TOP.gbr'\n" \
-        "    => '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-BOTTOM.gbr'\n" \
-        "SUCCESS\n".format(project=project).replace('//', os.sep)
+    assert stdout == nofmt(f"""\
+Open project '{project.path}'...
+Export PCB fabrication data...
+  Board 'copy':
+    => '{project.output_dir_native}//gerber//Empty_Project_DRILLS-NPTH.drl'
+    => '{project.output_dir_native}//gerber//Empty_Project_DRILLS-PTH.drl'
+    => '{project.output_dir_native}//gerber//Empty_Project_OUTLINES.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_COPPER-TOP.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_COPPER-BOTTOM.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_SOLDERMASK-TOP.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_SOLDERMASK-BOTTOM.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-TOP.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-BOTTOM.gbr'
+SUCCESS
+""").replace('//', os.sep)
     assert code == 0
     assert os.path.exists(dir)
     assert len(os.listdir(dir)) == 9
@@ -379,25 +389,24 @@ def test_export_with_custom_settings(cli, project):
                                    '--export-pcb-fabrication-data',
                                    '--pcb-fabrication-settings', 'settings.lp',
                                    project.path)
+    output_prefix = '' if project.is_lppz else (project.dir + os.sep)
     assert stderr == ''
-    assert stdout == \
-        "Open project '{project.path}'...\n" \
-        "Export PCB fabrication data...\n" \
-        "  Board 'default':\n" \
-        "    => '{output_prefix}out//0_default//DRILLS.drl'\n" \
-        "    => '{output_prefix}out//0_default//OUTLINES.gbr'\n" \
-        "    => '{output_prefix}out//0_default//COPPER-TOP.gbr'\n" \
-        "    => '{output_prefix}out//0_default//COPPER-BOTTOM.gbr'\n" \
-        "    => '{output_prefix}out//0_default//SOLDERMASK-TOP.gbr'\n" \
-        "    => '{output_prefix}out//0_default//SOLDERMASK-BOTTOM.gbr'\n" \
-        "    => '{output_prefix}out//0_default//SILKSCREEN-TOP.gbr'\n" \
-        "    => '{output_prefix}out//0_default//SILKSCREEN-BOTTOM.gbr'\n" \
-        "    => '{output_prefix}out//0_default//SOLDERPASTE-TOP.gbr'\n" \
-        "    => '{output_prefix}out//0_default//SOLDERPASTE-BOTTOM.gbr'\n" \
-        "SUCCESS\n".format(
-            project=project,
-            output_prefix=('' if project.is_lppz else (project.dir + os.sep)),
-        ).replace('//', os.sep)
+    assert stdout == nofmt(f"""\
+Open project '{project.path}'...
+Export PCB fabrication data...
+  Board 'default':
+    => '{output_prefix}out//0_default//DRILLS.drl'
+    => '{output_prefix}out//0_default//OUTLINES.gbr'
+    => '{output_prefix}out//0_default//COPPER-TOP.gbr'
+    => '{output_prefix}out//0_default//COPPER-BOTTOM.gbr'
+    => '{output_prefix}out//0_default//SOLDERMASK-TOP.gbr'
+    => '{output_prefix}out//0_default//SOLDERMASK-BOTTOM.gbr'
+    => '{output_prefix}out//0_default//SILKSCREEN-TOP.gbr'
+    => '{output_prefix}out//0_default//SILKSCREEN-BOTTOM.gbr'
+    => '{output_prefix}out//0_default//SOLDERPASTE-TOP.gbr'
+    => '{output_prefix}out//0_default//SOLDERPASTE-BOTTOM.gbr'
+SUCCESS
+""").replace('//', os.sep)
     assert code == 0
     assert os.path.exists(dir)
     assert len(os.listdir(dir)) == 10
@@ -415,14 +424,15 @@ def test_if_export_with_nonexistent_settings_fails(cli, project):
                                    '--export-pcb-fabrication-data',
                                    '--pcb-fabrication-settings=nonexistent.lp',
                                    project.path)
-    assert stderr == \
-        "ERROR: Failed to load custom settings: " \
-        "The file \"{file}\" does not exist.\n" \
-        .format(file=cli.abspath('nonexistent.lp'))
-    assert stdout == \
-        "Open project '{project.path}'...\n" \
-        "Export PCB fabrication data...\n" \
-        "Finished with errors!\n".format(project=project)
+    assert stderr == nofmt(f"""\
+ERROR: Failed to load custom settings: \
+The file "{cli.abspath('nonexistent.lp')}" does not exist.
+""")
+    assert stdout == nofmt(f"""\
+Open project '{project.path}'...
+Export PCB fabrication data...
+Finished with errors!
+""")
     assert code == 1
     assert not os.path.exists(dir)
 
@@ -441,14 +451,15 @@ def test_if_export_with_invalid_settings_fails(cli, project):
                                    '--export-pcb-fabrication-data',
                                    '--pcb-fabrication-settings=settings.lp',
                                    project.path)
-    assert stderr == \
-        "ERROR: Failed to load custom settings: File parse error: " \
-        "Child not found: base_path/@0\n" \
-        "File: \n" \
-        "Invalid Content: ''\n"
-    assert stdout == \
-        "Open project '{project.path}'...\n" \
-        "Export PCB fabrication data...\n" \
-        "Finished with errors!\n".format(project=project)
+    assert stderr == nofmt(f"""\
+ERROR: Failed to load custom settings: File parse error: Child not found: base_path/@0
+File: \n\
+Invalid Content: ''
+""")
+    assert stdout == nofmt(f"""\
+Open project '{project.path}'...
+Export PCB fabrication data...
+Finished with errors!
+""")
     assert code == 1
     assert not os.path.exists(dir)
