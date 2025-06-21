@@ -143,12 +143,6 @@ export component HomeTab inherits Tab {
             viewport-height: project-preview-img.height;
             interactive: project-preview-img.source.width > 0;
 
-            // If the image was getting smaller, the scroll position might
-            // end up in nirvana, so we clip it manually.
-            changed viewport-height => {
-                self.viewport-y = max(self.viewport-y, -max(self.viewport-height - self.height, 0));
-            }
-
             project-preview-img := Image {
                 image-fit: ImageFit.preserve;
                 horizontal-alignment: left;
