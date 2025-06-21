@@ -29,7 +29,13 @@ done
 (git diff --exit-code -- "*.slint") || exit 1
 
 # run python style checks
-(flake8 --ignore=E501 dev tests) || exit 1
+(uv --directory tests/cli run --only-dev ruff format --check) || exit 1
+(uv --directory tests/funq run --only-dev ruff format --check) || exit 1
+
+# run python linters
+(flake8 --ignore=E501 dev) || exit 1
+(uv --directory tests/cli run --only-dev ruff check) || exit 1
+(uv --directory tests/funq run --only-dev ruff check) || exit 1
 
 # run reuse checks
 (reuse --suppress-deprecation lint) || exit 1
