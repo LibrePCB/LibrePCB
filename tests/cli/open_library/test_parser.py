@@ -39,27 +39,27 @@ Help: {executable} open-library --help
 
 
 def test_help(cli):
-    code, stdout, stderr = cli.run('open-library', '--help')
-    assert stderr == ''
+    code, stdout, stderr = cli.run("open-library", "--help")
+    assert stderr == ""
     assert stdout == HELP_TEXT.format(executable=cli.executable)
     assert code == 0
 
 
 def test_no_arguments(cli):
-    code, stdout, stderr = cli.run('open-library')
+    code, stdout, stderr = cli.run("open-library")
     assert stderr == ERROR_TEXT.format(
         executable=cli.executable,
         error="Missing arguments: library",
     )
-    assert stdout == ''
+    assert stdout == ""
     assert code == 1
 
 
 def test_invalid_argument(cli):
-    code, stdout, stderr = cli.run('open-library', '--invalid-argument')
+    code, stdout, stderr = cli.run("open-library", "--invalid-argument")
     assert stderr == ERROR_TEXT.format(
         executable=cli.executable,
         error="Unknown option 'invalid-argument'.",
     )
-    assert stdout == ''
+    assert stdout == ""
     assert code == 1

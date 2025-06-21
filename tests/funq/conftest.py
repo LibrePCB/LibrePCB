@@ -14,8 +14,8 @@ from funq.errors import FunqError
 
 # Avoid errors due to too long file path on Windows :-|
 def _long_path(path):
-    if os.name == 'nt':
-        return '\\\\?\\' + path.replace('/', '\\')
+    if os.name == "nt":
+        return "\\\\?\\" + path.replace("/", "\\")
     else:
         return path
 
@@ -23,32 +23,45 @@ def _long_path(path):
 FUNQ_DIR = os.path.dirname(__file__)
 TESTS_DIR = os.path.dirname(FUNQ_DIR)
 REPO_DIR = os.path.dirname(TESTS_DIR)
-DATA_DIR = os.path.join(TESTS_DIR, 'data')
+DATA_DIR = os.path.join(TESTS_DIR, "data")
 
 
 def pytest_addoption(parser):
-    parser.addoption("--librepcb-executable",
-                     action="store",
-                     help="Path to librepcb executable to test")
-    parser.addoption("--dump-widgets",
-                     action="store_true",
-                     help="At the end of the test, update widgets_list.json")
+    parser.addoption(
+        "--librepcb-executable",
+        action="store",
+        help="Path to librepcb executable to test",
+    )
+    parser.addoption(
+        "--dump-widgets",
+        action="store_true",
+        help="At the end of the test, update widgets_list.json",
+    )
 
 
 class GlobalOptions:
     def __init__(self):
-        self.funq_conf = 'funq.conf'
-        self.funq_attach_exe = funq.tools.which('funq')
-        self.funq_gkit = 'default'
-        self.funq_gkit_file = os.path.join(os.path.dirname(os.path.realpath(funq.client.__file__)), 'aliases-gkits.conf')
+        self.funq_conf = "funq.conf"
+        self.funq_attach_exe = funq.tools.which("funq")
+        self.funq_gkit = "default"
+        self.funq_gkit_file = os.path.join(
+            os.path.dirname(os.path.realpath(funq.client.__file__)),
+            "aliases-gkits.conf",
+        )
 
 
 class Application(object):
     def __init__(self, executable, dump_widgets, env=None, args=()):
         super(Application, self).__init__()
         self.dump_widgets = dump_widgets
-        cfg = ApplicationConfig(executable=executable, args=args, cwd=os.getcwd(), env=env,
-                                aliases=os.path.join(FUNQ_DIR, 'aliases'), global_options=GlobalOptions())
+        cfg = ApplicationConfig(
+            executable=executable,
+            args=args,
+            cwd=os.getcwd(),
+            env=env,
+            aliases=os.path.join(FUNQ_DIR, "aliases"),
+            global_options=GlobalOptions(),
+        )
         self._context = ApplicationContext(cfg)
 
     def __enter__(self):
@@ -56,41 +69,47 @@ class Application(object):
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if self.dump_widgets:
-            self._context.funq.dump_widgets_list('widgets_list.json', with_properties=True)
+            self._context.funq.dump_widgets_list(
+                "widgets_list.json", with_properties=True
+            )
         del self._context
 
 
 class LibrePcbFixture(object):
     def __init__(self, config, tmpdir):
         super(LibrePcbFixture, self).__init__()
-        self.executable = os.path.abspath(config.getoption('--librepcb-executable'))
+        self.executable = os.path.abspath(config.getoption("--librepcb-executable"))
         if not os.path.exists(self.executable):
-            raise Exception("Executable '{}' not found. Please pass it with "
-                            "'--librepcb-executable'.".format(self.executable))
-        self.dump_widgets = config.getoption('--dump-widgets')
+            raise Exception(
+                "Executable '{}' not found. Please pass it with "
+                "'--librepcb-executable'.".format(self.executable)
+            )
+        self.dump_widgets = config.getoption("--dump-widgets")
         self.tmpdir = tmpdir
         # Copy test data to temporary directory to avoid modifications in original data
-        shutil.copytree(_long_path(os.path.join(DATA_DIR, 'workspaces', 'Empty Workspace')),
-                        _long_path(os.path.join(self.tmpdir, 'Empty Workspace')))
+        shutil.copytree(
+            _long_path(os.path.join(DATA_DIR, "workspaces", "Empty Workspace")),
+            _long_path(os.path.join(self.tmpdir, "Empty Workspace")),
+        )
         # Init members to default values
-        self.workspace_path = os.path.join(self.tmpdir, 'Empty Workspace')
+        self.workspace_path = os.path.join(self.tmpdir, "Empty Workspace")
         self.project_path = None
 
         # Set environment variables
         self.env = deepcopy(os.environ)
         # Make GUI independent from the system's language
-        self.env['LC_ALL'] = 'C'
+        self.env["LC_ALL"] = "C"
         # Override configuration location to make tests independent of existing configs
-        self.env['LIBREPCB_CONFIG_DIR'] = os.path.join(self.tmpdir, 'config')
+        self.env["LIBREPCB_CONFIG_DIR"] = os.path.join(self.tmpdir, "config")
         # Override cache location to make each test indepotent
-        self.env['LIBREPCB_CACHE_DIR'] = os.path.join(self.tmpdir, 'cache')
+        self.env["LIBREPCB_CACHE_DIR"] = os.path.join(self.tmpdir, "cache")
         # Use a neutral username
-        self.env['USERNAME'] = 'testuser'
+        self.env["USERNAME"] = "testuser"
         # Force LibrePCB to use Qt-style file dialogs because native dialogs don't work
-        self.env['LIBREPCB_DISABLE_NATIVE_DIALOGS'] = '1'
+        self.env["LIBREPCB_DISABLE_NATIVE_DIALOGS"] = "1"
         # Disable warning about unstable file format, since tests are run also
         # on the (unstable) master branch
-        self.env['LIBREPCB_DISABLE_UNSTABLE_WARNING'] = '1'
+        self.env["LIBREPCB_DISABLE_UNSTABLE_WARNING"] = "1"
 
     def abspath(self, relpath):
         return os.path.join(self.tmpdir, relpath)
@@ -104,11 +123,11 @@ class LibrePcbFixture(object):
         self.workspace_path = path
 
     def add_project(self, project, as_lppz=False):
-        src = os.path.join(DATA_DIR, 'projects', project)
+        src = os.path.join(DATA_DIR, "projects", project)
         dst = os.path.join(self.tmpdir, project)
         if as_lppz:
-            shutil.make_archive(dst, 'zip', src)
-            shutil.move(dst + '.zip', dst + '.lppz')
+            shutil.make_archive(dst, "zip", src)
+            shutil.move(dst + ".zip", dst + ".lppz")
         else:
             shutil.copytree(_long_path(src), _long_path(dst))
 
@@ -117,33 +136,39 @@ class LibrePcbFixture(object):
             path = self.abspath(path)
         self.project_path = path
 
-    def get_workspace_libraries_path(self, subdir=''):
-        return os.path.join(self.workspace_path, 'data', 'libraries', subdir)
+    def get_workspace_libraries_path(self, subdir=""):
+        return os.path.join(self.workspace_path, "data", "libraries", subdir)
 
     def add_local_library_to_workspace(self, path):
         if not os.path.isabs(path):
             path = os.path.join(DATA_DIR, path)
-        dest = self.get_workspace_libraries_path('local')
+        dest = self.get_workspace_libraries_path("local")
         dest = os.path.join(dest, os.path.basename(path))
         shutil.copytree(_long_path(path), _long_path(dest))
 
     def open(self):
         self._create_application_config_file()
-        return Application(self.executable, self.dump_widgets, env=self.env, args=self._args())
+        return Application(
+            self.executable, self.dump_widgets, env=self.env, args=self._args()
+        )
 
     def _create_application_config_file(self):
-        org_dir = 'LibrePCB.org' if platform.system() == 'Darwin' else 'LibrePCB'
-        config_dir = os.path.join(self.tmpdir, 'config', org_dir)
-        config_ini = os.path.join(config_dir, 'LibrePCB.ini')
+        org_dir = "LibrePCB.org" if platform.system() == "Darwin" else "LibrePCB"
+        config_dir = os.path.join(self.tmpdir, "config", org_dir)
+        config_ini = os.path.join(config_dir, "LibrePCB.ini")
         if not os.path.exists(config_dir):
             os.makedirs(config_dir)
         # Only create config file once per test, so tests can check if settings
         # are stored permanently.
         if not os.path.exists(config_ini):
-            with open(config_ini, 'w') as f:
+            with open(config_ini, "w") as f:
                 if self.workspace_path:
                     f.write("[workspaces]\n")
-                    f.write("most_recently_used=\"{}\"\n".format(self.workspace_path.replace('\\', '/')))
+                    f.write(
+                        'most_recently_used="{}"\n'.format(
+                            self.workspace_path.replace("\\", "/")
+                        )
+                    )
 
     def _args(self):
         args = []
@@ -164,35 +189,41 @@ class Helpers(object):
             if min_count <= count and (max_count is None or count <= max_count):
                 return
             time.sleep(timeout / 100.0)
-        raise Exception('Widget "{}" has {} items instead of [{}..{}]!'.format(
-            widget.properties().get('objectName'), count, min_count, max_count))
+        raise Exception(
+            'Widget "{}" has {} items instead of [{}..{}]!'.format(
+                widget.properties().get("objectName"), count, min_count, max_count
+            )
+        )
 
     @staticmethod
     def wait_for_library_scan_complete(app, timeout=10.0):
-        adapter = app.widget('mainWindowTestAdapter', wait_active=True)
+        adapter = app.widget("mainWindowTestAdapter", wait_active=True)
         for i in range(0, 100):
-            if adapter.call_slot('isLibraryScanFinished') is True:
+            if adapter.call_slot("isLibraryScanFinished") is True:
                 return
             time.sleep(timeout / 100.0)
-        raise Exception('Failed to wait for library scan finished!')
+        raise Exception("Failed to wait for library scan finished!")
 
     @staticmethod
     def wait_until_widget_hidden(widget, timeout=5.0):
         for i in range(0, 100):
             try:
-                if widget.properties()['visible'] is False:
+                if widget.properties()["visible"] is False:
                     return
             except FunqError as e:
-                if e.classname == 'NotRegisteredObject':
+                if e.classname == "NotRegisteredObject":
                     return
                 raise
             time.sleep(timeout / 100.0)
-        raise Exception('Widget "{}" is still visible!'.format(
-            widget.properties().get('objectName')))
+        raise Exception(
+            'Widget "{}" is still visible!'.format(
+                widget.properties().get("objectName")
+            )
+        )
 
     @staticmethod
     def wait_for_active_dialog(funq, widget, timeout=5.0):
-        Helpers._wait_for_active_widget(funq, widget, timeout, 'modal')
+        Helpers._wait_for_active_widget(funq, widget, timeout, "modal")
 
     @staticmethod
     def _wait_for_active_widget(funq, widget, timeout, widget_type):
@@ -203,15 +234,18 @@ class Helpers(object):
                 return
             time.sleep(timeout / 100.0)
         properties = active_widget.properties() if active_widget else dict()
-        raise Exception('Active widget is "{}" ({})!'.format(
-            properties.get('windowTitle'), properties.get('objectName')))
+        raise Exception(
+            'Active widget is "{}" ({})!'.format(
+                properties.get("windowTitle"), properties.get("objectName")
+            )
+        )
 
     @staticmethod
     def wait_for_project(app, name, timeout=10.0):
-        adapter = app.widget('mainWindowTestAdapter', wait_active=True)
+        adapter = app.widget("mainWindowTestAdapter", wait_active=True)
         for i in range(0, 100):
-            projects = adapter.call_slot('getOpenProjects')
-            if any(p['name'] == name for p in projects):
+            projects = adapter.call_slot("getOpenProjects")
+            if any(p["name"] == name for p in projects):
                 return True
             time.sleep(timeout / 100.0)
         raise Exception('Failed to wait for project "{}"!'.format(name))
@@ -235,7 +269,7 @@ def librepcb_server():
         def translate_path(self, path):
             path = super(Handler, self).translate_path(path)
             relpath = os.path.relpath(path, os.curdir)
-            return os.path.join(DATA_DIR, 'server', relpath)
+            return os.path.join(DATA_DIR, "server", relpath)
 
     # Set SO_REUSEADDR option to avoid "port already in use" errors
     httpd = socketserver.TCPServer(("", 50080), Handler, bind_and_activate=False)
@@ -253,8 +287,10 @@ def create_librepcb(request, tmpdir, librepcb_server):
     """
     Fixture allowing to create multiple application instances
     """
+
     def _create():
         return LibrePcbFixture(request.config, str(tmpdir))
+
     return _create
 
 

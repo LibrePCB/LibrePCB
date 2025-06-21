@@ -15,6 +15,10 @@ This directory contains system tests for `librepcb-cli` using
 
     uv run ruff check
 
+## Auto-format Files
+
+    uv run ruff format
+
 ## Links
 
 - [Documentation of `pytest`](https://docs.pytest.org/en/latest/contents.html)

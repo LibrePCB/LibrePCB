@@ -37,27 +37,27 @@ Help: {executable} open-step --help
 
 
 def test_help(cli):
-    code, stdout, stderr = cli.run('open-step', '--help')
-    assert stderr == ''
+    code, stdout, stderr = cli.run("open-step", "--help")
+    assert stderr == ""
     assert stdout == HELP_TEXT.format(executable=cli.executable)
     assert code == 0
 
 
 def test_no_arguments(cli):
-    code, stdout, stderr = cli.run('open-step')
+    code, stdout, stderr = cli.run("open-step")
     assert stderr == ERROR_TEXT.format(
         executable=cli.executable,
         error="Missing arguments: file",
     )
-    assert stdout == ''
+    assert stdout == ""
     assert code == 1
 
 
 def test_invalid_argument(cli):
-    code, stdout, stderr = cli.run('open-step', '--invalid-argument')
+    code, stdout, stderr = cli.run("open-step", "--invalid-argument")
     assert stderr == ERROR_TEXT.format(
         executable=cli.executable,
         error="Unknown option 'invalid-argument'.",
     )
-    assert stdout == ''
+    assert stdout == ""
     assert code == 1

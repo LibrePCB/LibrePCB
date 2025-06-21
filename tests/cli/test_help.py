@@ -38,34 +38,34 @@ Help: {executable} --help
 
 
 def test_explicit(cli):
-    code, stdout, stderr = cli.run('--help')
-    assert stderr == ''
+    code, stdout, stderr = cli.run("--help")
+    assert stderr == ""
     assert stdout == HELP_TEXT.format(executable=cli.executable)
     assert code == 0
 
 
 def test_implicit_if_no_arguments(cli):
     code, stdout, stderr = cli.run()
-    assert stderr == ''
+    assert stderr == ""
     assert stdout == HELP_TEXT.format(executable=cli.executable)
     assert code == 0
 
 
 def test_implicit_if_passing_invalid_command(cli):
-    code, stdout, stderr = cli.run('invalid-command')
+    code, stdout, stderr = cli.run("invalid-command")
     assert stderr == ERROR_TEXT.format(
         executable=cli.executable,
         error="Unknown command 'invalid-command'.",
     )
-    assert stdout == ''
+    assert stdout == ""
     assert code == 1
 
 
 def test_implicit_if_passing_invalid_argument(cli):
-    code, stdout, stderr = cli.run('--invalid-argument')
+    code, stdout, stderr = cli.run("--invalid-argument")
     assert stderr == ERROR_TEXT.format(
         executable=cli.executable,
         error="Unknown option 'invalid-argument'.",
     )
-    assert stdout == ''
+    assert stdout == ""
     assert code == 1

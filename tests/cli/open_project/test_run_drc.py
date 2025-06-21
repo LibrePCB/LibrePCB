@@ -14,10 +14,10 @@ Test command "open-project --drc"
 def test_if_project_without_boards_succeeds(cli, project):
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     # remove all boards
-    with open(cli.abspath(project.dir + '/boards/boards.lp'), 'w') as f:
-        f.write('(librepcb_boards)')
-    code, stdout, stderr = cli.run('open-project', '--drc', project.path)
-    assert stderr == ''
+    with open(cli.abspath(project.dir + "/boards/boards.lp"), "w") as f:
+        f.write("(librepcb_boards)")
+    code, stdout, stderr = cli.run("open-project", "--drc", project.path)
+    assert stderr == ""
     assert stdout == nofmt(f"""\
 Open project '{project.path}'...
 Run DRC...
@@ -29,9 +29,10 @@ SUCCESS
 @pytest.mark.parametrize("project", [params.PROJECT_WITH_TWO_BOARDS_LPPZ_PARAM])
 def test_project_with_two_boards_explicit_one(cli, project):
     cli.add_project(project.dir, as_lppz=project.is_lppz)
-    code, stdout, stderr = cli.run('open-project', '--drc', '--board=copy',
-                                   project.path)
-    assert stderr == ''
+    code, stdout, stderr = cli.run(
+        "open-project", "--drc", "--board=copy", project.path
+    )
+    assert stderr == ""
     assert stdout == nofmt(f"""\
 Open project '{project.path}'...
 Run DRC...
@@ -47,34 +48,34 @@ SUCCESS
 def test_board_with_approved_message(cli, project):
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     # Add a hole with small diameter and the corresponding approval.
-    with open(cli.abspath(project.dir + '/boards/default/board.lp'), 'r') as f:
+    with open(cli.abspath(project.dir + "/boards/default/board.lp"), "r") as f:
         board_content = f.read()
     board_content = board_content.replace(
-"""
+        """
 )
 """,
-"""
+        """
  (hole 82506db2-3323-4732-8480-f3517f10dd44
   (diameter 0.1) (stop_mask auto) (lock false)
   (vertex (position 50.0 50.0) (angle 0.0))
  )
 )
-"""
+""",
     )
     board_content = board_content.replace(
-"""
+        """
  (design_rule_check
 """,
-"""
+        """
  (design_rule_check
   (approved minimum_drill_diameter_violation
    (hole 82506db2-3323-4732-8480-f3517f10dd44)
   )
-"""
+""",
     )
-    with open(cli.abspath(project.dir + '/boards/default/board.lp'), 'w') as f:
+    with open(cli.abspath(project.dir + "/boards/default/board.lp"), "w") as f:
         f.write(board_content)
-    code, stdout, stderr = cli.run('open-project', '--drc', project.path)
+    code, stdout, stderr = cli.run("open-project", "--drc", project.path)
     assert stdout == nofmt(f"""\
 Open project '{project.path}'...
 Run DRC...
@@ -89,8 +90,8 @@ SUCCESS
 @pytest.mark.parametrize("project", [params.EMPTY_PROJECT_LPP_PARAM])
 def test_board_without_messages(cli, project):
     cli.add_project(project.dir, as_lppz=project.is_lppz)
-    code, stdout, stderr = cli.run('open-project', '--drc', project.path)
-    assert stderr == ''
+    code, stdout, stderr = cli.run("open-project", "--drc", project.path)
+    assert stderr == ""
     assert stdout == nofmt(f"""\
 Open project '{project.path}'...
 Run DRC...
@@ -106,23 +107,23 @@ SUCCESS
 def test_board_with_nonapproved_message(cli, project):
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     # Add a hole with small diameter.
-    with open(cli.abspath(project.dir + '/boards/default/board.lp'), 'r') as f:
+    with open(cli.abspath(project.dir + "/boards/default/board.lp"), "r") as f:
         board_content = f.read()
     board_content = board_content.replace(
-"""
+        """
 )
 """,
-"""
+        """
  (hole 82506db2-3323-4732-8480-f3517f10dd44
   (diameter 0.1) (stop_mask auto) (lock false)
   (vertex (position 50.0 50.0) (angle 0.0))
  )
 )
-"""
+""",
     )
-    with open(cli.abspath(project.dir + '/boards/default/board.lp'), 'w') as f:
+    with open(cli.abspath(project.dir + "/boards/default/board.lp"), "w") as f:
         f.write(board_content)
-    code, stdout, stderr = cli.run('open-project', '--drc', project.path)
+    code, stdout, stderr = cli.run("open-project", "--drc", project.path)
     assert stderr == nofmt("""\
       - [WARNING] NPTH drill diameter: 0.1 < 0.25 mm
 """)
@@ -164,29 +165,28 @@ def test_with_custom_settings(cli, project):
        (approvals_version "0.2")
       )
     """
-    with open(cli.abspath('settings.lp'), mode='w') as f:
+    with open(cli.abspath("settings.lp"), mode="w") as f:
         f.write(settings)
     # Add a hole with small diameter.
-    with open(cli.abspath(project.dir + '/boards/default/board.lp'), 'r') as f:
+    with open(cli.abspath(project.dir + "/boards/default/board.lp"), "r") as f:
         board_content = f.read()
     board_content = board_content.replace(
-"""
+        """
 )
 """,
-"""
+        """
  (hole 82506db2-3323-4732-8480-f3517f10dd44
   (diameter 0.1) (stop_mask auto) (lock false)
   (vertex (position 50.0 50.0) (angle 0.0))
  )
 )
-"""
+""",
     )
-    with open(cli.abspath(project.dir + '/boards/default/board.lp'), 'w') as f:
+    with open(cli.abspath(project.dir + "/boards/default/board.lp"), "w") as f:
         f.write(board_content)
-    code, stdout, stderr = cli.run('open-project',
-                                   '--drc',
-                                   '--drc-settings', 'settings.lp',
-                                   project.path)
+    code, stdout, stderr = cli.run(
+        "open-project", "--drc", "--drc-settings", "settings.lp", project.path
+    )
     assert stderr == nofmt("""\
       - [WARNING] NPTH drill diameter: 0.1 < 0.1234 mm
 """)

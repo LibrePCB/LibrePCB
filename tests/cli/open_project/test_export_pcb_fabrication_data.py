@@ -12,23 +12,26 @@ Test command "open-project --export-pcb-fabrication-data"
 """
 
 
-@pytest.mark.parametrize("project", [
-    params.EMPTY_PROJECT_LPP_PARAM,
-    params.PROJECT_WITH_TWO_BOARDS_LPP_PARAM,
-])
+@pytest.mark.parametrize(
+    "project",
+    [
+        params.EMPTY_PROJECT_LPP_PARAM,
+        params.PROJECT_WITH_TWO_BOARDS_LPP_PARAM,
+    ],
+)
 def test_if_project_without_boards_succeeds(cli, project):
     cli.add_project(project.dir, as_lppz=project.is_lppz)
 
     # remove all boards first
-    with open(cli.abspath(project.dir + '/boards/boards.lp'), 'w') as f:
-        f.write('(librepcb_boards)')
+    with open(cli.abspath(project.dir + "/boards/boards.lp"), "w") as f:
+        f.write("(librepcb_boards)")
 
-    dir = cli.abspath(project.output_dir + '/gerber')
+    dir = cli.abspath(project.output_dir + "/gerber")
     assert not os.path.exists(dir)
-    code, stdout, stderr = cli.run('open-project',
-                                   '--export-pcb-fabrication-data',
-                                   project.path)
-    assert stderr == ''
+    code, stdout, stderr = cli.run(
+        "open-project", "--export-pcb-fabrication-data", project.path
+    )
+    assert stderr == ""
     assert stdout == nofmt(f"""\
 Open project '{project.path}'...
 Export PCB fabrication data...
@@ -38,18 +41,21 @@ SUCCESS
     assert not os.path.exists(dir)  # nothing was exported ;)
 
 
-@pytest.mark.parametrize("project", [
-    params.EMPTY_PROJECT_LPP_PARAM,
-    params.EMPTY_PROJECT_LPPZ_PARAM,
-])
+@pytest.mark.parametrize(
+    "project",
+    [
+        params.EMPTY_PROJECT_LPP_PARAM,
+        params.EMPTY_PROJECT_LPPZ_PARAM,
+    ],
+)
 def test_export_project_with_one_board_implicit(cli, project):
     cli.add_project(project.dir, as_lppz=project.is_lppz)
-    dir = cli.abspath(project.output_dir + '/gerber')
+    dir = cli.abspath(project.output_dir + "/gerber")
     assert not os.path.exists(dir)
-    code, stdout, stderr = cli.run('open-project',
-                                   '--export-pcb-fabrication-data',
-                                   project.path)
-    assert stderr == ''
+    code, stdout, stderr = cli.run(
+        "open-project", "--export-pcb-fabrication-data", project.path
+    )
+    assert stderr == ""
     assert stdout == nofmt(f"""\
 Open project '{project.path}'...
 Export PCB fabrication data...
@@ -64,25 +70,27 @@ Export PCB fabrication data...
     => '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-TOP.gbr'
     => '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-BOTTOM.gbr'
 SUCCESS
-""").replace('//', os.sep)
+""").replace("//", os.sep)
     assert code == 0
     assert os.path.exists(dir)
     assert len(os.listdir(dir)) == 9
 
 
-@pytest.mark.parametrize("project", [
-    params.EMPTY_PROJECT_LPP_PARAM,
-    params.EMPTY_PROJECT_LPPZ_PARAM,
-])
+@pytest.mark.parametrize(
+    "project",
+    [
+        params.EMPTY_PROJECT_LPP_PARAM,
+        params.EMPTY_PROJECT_LPPZ_PARAM,
+    ],
+)
 def test_export_project_with_one_board_explicit(cli, project):
     cli.add_project(project.dir, as_lppz=project.is_lppz)
-    dir = cli.abspath(project.output_dir + '/gerber')
+    dir = cli.abspath(project.output_dir + "/gerber")
     assert not os.path.exists(dir)
-    code, stdout, stderr = cli.run('open-project',
-                                   '--export-pcb-fabrication-data',
-                                   '--board=default',
-                                   project.path)
-    assert stderr == ''
+    code, stdout, stderr = cli.run(
+        "open-project", "--export-pcb-fabrication-data", "--board=default", project.path
+    )
+    assert stderr == ""
     assert stdout == nofmt(f"""\
 Open project '{project.path}'...
 Export PCB fabrication data...
@@ -97,27 +105,29 @@ Export PCB fabrication data...
     => '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-TOP.gbr'
     => '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-BOTTOM.gbr'
 SUCCESS
-""").replace('//', os.sep)
+""").replace("//", os.sep)
     assert code == 0
     assert os.path.exists(dir)
     assert len(os.listdir(dir)) == 9
 
 
-@pytest.mark.parametrize("project", [
-    params.EMPTY_PROJECT_LPP_PARAM,
-    params.PROJECT_WITH_TWO_BOARDS_LPPZ_PARAM,
-])
+@pytest.mark.parametrize(
+    "project",
+    [
+        params.EMPTY_PROJECT_LPP_PARAM,
+        params.PROJECT_WITH_TWO_BOARDS_LPPZ_PARAM,
+    ],
+)
 def test_if_exporting_invalid_board_fails(cli, project):
     """
     Note: Test with passing the argument as "--arg <value>".
     """
     cli.add_project(project.dir, as_lppz=project.is_lppz)
-    dir = cli.abspath(project.output_dir + '/gerber')
+    dir = cli.abspath(project.output_dir + "/gerber")
     assert not os.path.exists(dir)
-    code, stdout, stderr = cli.run('open-project',
-                                   '--export-pcb-fabrication-data',
-                                   '--board', 'foo',
-                                   project.path)
+    code, stdout, stderr = cli.run(
+        "open-project", "--export-pcb-fabrication-data", "--board", "foo", project.path
+    )
     assert stderr == "ERROR: No board with the name 'foo' found.\n"
     assert stdout == nofmt(f"""\
 Open project '{project.path}'...
@@ -128,18 +138,21 @@ Finished with errors!
     assert not os.path.exists(dir)
 
 
-@pytest.mark.parametrize("project", [
-    params.PROJECT_WITH_TWO_BOARDS_LPP_PARAM,
-    params.PROJECT_WITH_TWO_BOARDS_LPPZ_PARAM,
-])
+@pytest.mark.parametrize(
+    "project",
+    [
+        params.PROJECT_WITH_TWO_BOARDS_LPP_PARAM,
+        params.PROJECT_WITH_TWO_BOARDS_LPPZ_PARAM,
+    ],
+)
 def test_export_project_with_two_boards_implicit(cli, project):
     cli.add_project(project.dir, as_lppz=project.is_lppz)
-    dir = cli.abspath(project.output_dir + '/gerber')
+    dir = cli.abspath(project.output_dir + "/gerber")
     assert not os.path.exists(dir)
-    code, stdout, stderr = cli.run('open-project',
-                                   '--export-pcb-fabrication-data',
-                                   project.path)
-    assert stderr == ''
+    code, stdout, stderr = cli.run(
+        "open-project", "--export-pcb-fabrication-data", project.path
+    )
+    assert stderr == ""
     assert stdout == nofmt(f"""\
 Open project '{project.path}'...
 Export PCB fabrication data...
@@ -164,25 +177,27 @@ Export PCB fabrication data...
     => '{project.output_dir_native}//gerber//Empty_Project_copy_SILKSCREEN-TOP.gbr'
     => '{project.output_dir_native}//gerber//Empty_Project_copy_SILKSCREEN-BOTTOM.gbr'
 SUCCESS
-""").replace('//', os.sep)
+""").replace("//", os.sep)
     assert code == 0
     assert os.path.exists(dir)
     assert len(os.listdir(dir)) == 18
 
 
-@pytest.mark.parametrize("project", [
-    params.PROJECT_WITH_TWO_BOARDS_LPP_PARAM,
-    params.PROJECT_WITH_TWO_BOARDS_LPPZ_PARAM,
-])
+@pytest.mark.parametrize(
+    "project",
+    [
+        params.PROJECT_WITH_TWO_BOARDS_LPP_PARAM,
+        params.PROJECT_WITH_TWO_BOARDS_LPPZ_PARAM,
+    ],
+)
 def test_export_project_with_two_boards_explicit_one(cli, project):
     cli.add_project(project.dir, as_lppz=project.is_lppz)
-    dir = cli.abspath(project.output_dir + '/gerber')
+    dir = cli.abspath(project.output_dir + "/gerber")
     assert not os.path.exists(dir)
-    code, stdout, stderr = cli.run('open-project',
-                                   '--export-pcb-fabrication-data',
-                                   '--board=copy',
-                                   project.path)
-    assert stderr == ''
+    code, stdout, stderr = cli.run(
+        "open-project", "--export-pcb-fabrication-data", "--board=copy", project.path
+    )
+    assert stderr == ""
     assert stdout == nofmt(f"""\
 Open project '{project.path}'...
 Export PCB fabrication data...
@@ -197,26 +212,31 @@ Export PCB fabrication data...
     => '{project.output_dir_native}//gerber//Empty_Project_copy_SILKSCREEN-TOP.gbr'
     => '{project.output_dir_native}//gerber//Empty_Project_copy_SILKSCREEN-BOTTOM.gbr'
 SUCCESS
-""").replace('//', os.sep)
+""").replace("//", os.sep)
     assert code == 0
     assert os.path.exists(dir)
     assert len(os.listdir(dir)) == 9
 
 
-@pytest.mark.parametrize("project", [
-    params.PROJECT_WITH_TWO_BOARDS_LPP_PARAM,
-    params.PROJECT_WITH_TWO_BOARDS_LPPZ_PARAM,
-])
+@pytest.mark.parametrize(
+    "project",
+    [
+        params.PROJECT_WITH_TWO_BOARDS_LPP_PARAM,
+        params.PROJECT_WITH_TWO_BOARDS_LPPZ_PARAM,
+    ],
+)
 def test_export_project_with_two_boards_explicit_two(cli, project):
     cli.add_project(project.dir, as_lppz=project.is_lppz)
-    dir = cli.abspath(project.output_dir + '/gerber')
+    dir = cli.abspath(project.output_dir + "/gerber")
     assert not os.path.exists(dir)
-    code, stdout, stderr = cli.run('open-project',
-                                   '--export-pcb-fabrication-data',
-                                   '--board=copy',
-                                   '--board=default',
-                                   project.path)
-    assert stderr == ''
+    code, stdout, stderr = cli.run(
+        "open-project",
+        "--export-pcb-fabrication-data",
+        "--board=copy",
+        "--board=default",
+        project.path,
+    )
+    assert stderr == ""
     assert stdout == nofmt(f"""\
 Open project '{project.path}'...
 Export PCB fabrication data...
@@ -241,28 +261,31 @@ Export PCB fabrication data...
     => '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-TOP.gbr'
     => '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-BOTTOM.gbr'
 SUCCESS
-""").replace('//', os.sep)
+""").replace("//", os.sep)
     assert code == 0
     assert os.path.exists(dir)
     assert len(os.listdir(dir)) == 18
 
 
-@pytest.mark.parametrize("project", [
-    params.PROJECT_WITH_TWO_BOARDS_LPP_PARAM,
-])
+@pytest.mark.parametrize(
+    "project",
+    [
+        params.PROJECT_WITH_TWO_BOARDS_LPP_PARAM,
+    ],
+)
 def test_export_project_with_two_conflicting_boards_fails(cli, project):
     cli.add_project(project.dir, as_lppz=project.is_lppz)
 
     # change gerber output path to the same for both boards
-    boardfile = cli.abspath(project.dir + '/boards/copy/board.lp')
+    boardfile = cli.abspath(project.dir + "/boards/copy/board.lp")
     for line in fileinput.input(boardfile, inplace=1):
         print(line.replace("_copy", ""))
 
-    dir = cli.abspath(project.output_dir + '/gerber')
+    dir = cli.abspath(project.output_dir + "/gerber")
     assert not os.path.exists(dir)
-    code, stdout, stderr = cli.run('open-project',
-                                   '--export-pcb-fabrication-data',
-                                   project.path)
+    code, stdout, stderr = cli.run(
+        "open-project", "--export-pcb-fabrication-data", project.path
+    )
     assert stderr == nofmt(f"""\
 ERROR: The file '{project.output_dir_native}//gerber//Empty_Project_COPPER-BOTTOM.gbr' was written multiple times!
 ERROR: The file '{project.output_dir_native}//gerber//Empty_Project_COPPER-TOP.gbr' was written multiple times!
@@ -277,7 +300,7 @@ NOTE: To avoid writing files multiple times, make sure to pass \
 unique filepaths to all export functions. For board output files, \
 you could either add the placeholder '{{{{BOARD}}}}' to the path or \
 specify the boards to export with the '--board' argument.
-""").replace('//', os.sep)
+""").replace("//", os.sep)
     assert stdout == nofmt(f"""\
 Open project '{project.path}'...
 Export PCB fabrication data...
@@ -302,28 +325,30 @@ Export PCB fabrication data...
     => '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-TOP.gbr'
     => '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-BOTTOM.gbr'
 Finished with errors!
-""").replace('//', os.sep)
+""").replace("//", os.sep)
     assert code == 1
 
 
-@pytest.mark.parametrize("project", [
-    params.PROJECT_WITH_TWO_BOARDS_LPP_PARAM,
-])
+@pytest.mark.parametrize(
+    "project",
+    [
+        params.PROJECT_WITH_TWO_BOARDS_LPP_PARAM,
+    ],
+)
 def test_export_project_with_two_conflicting_boards_succeeds_explicit(cli, project):
     cli.add_project(project.dir, as_lppz=project.is_lppz)
 
     # change gerber output path to the same for both boards
-    boardfile = cli.abspath(project.dir + '/boards/copy/board.lp')
+    boardfile = cli.abspath(project.dir + "/boards/copy/board.lp")
     for line in fileinput.input(boardfile, inplace=1):
         print(line.replace("_copy", ""))
 
-    dir = cli.abspath(project.output_dir + '/gerber')
+    dir = cli.abspath(project.output_dir + "/gerber")
     assert not os.path.exists(dir)
-    code, stdout, stderr = cli.run('open-project',
-                                   '--export-pcb-fabrication-data',
-                                   '--board=copy',
-                                   project.path)
-    assert stderr == ''
+    code, stdout, stderr = cli.run(
+        "open-project", "--export-pcb-fabrication-data", "--board=copy", project.path
+    )
+    assert stderr == ""
     assert stdout == nofmt(f"""\
 Open project '{project.path}'...
 Export PCB fabrication data...
@@ -338,16 +363,19 @@ Export PCB fabrication data...
     => '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-TOP.gbr'
     => '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-BOTTOM.gbr'
 SUCCESS
-""").replace('//', os.sep)
+""").replace("//", os.sep)
     assert code == 0
     assert os.path.exists(dir)
     assert len(os.listdir(dir)) == 9
 
 
-@pytest.mark.parametrize("project", [
-    params.EMPTY_PROJECT_LPP_PARAM,
-    params.EMPTY_PROJECT_LPPZ_PARAM,
-])
+@pytest.mark.parametrize(
+    "project",
+    [
+        params.EMPTY_PROJECT_LPP_PARAM,
+        params.EMPTY_PROJECT_LPPZ_PARAM,
+    ],
+)
 def test_export_with_custom_settings(cli, project):
     """
     Notes:
@@ -381,16 +409,19 @@ def test_export_with_custom_settings(cli, project):
         (solderpaste_bot (create true) (suffix "SOLDERPASTE-BOTTOM.gbr"))
       )
     """
-    with open(cli.abspath('settings.lp'), mode='w') as f:
+    with open(cli.abspath("settings.lp"), mode="w") as f:
         f.write(settings)
-    dir = os.path.dirname(cli.abspath(project.path)) + '/out/0_default'
+    dir = os.path.dirname(cli.abspath(project.path)) + "/out/0_default"
     assert not os.path.exists(dir)
-    code, stdout, stderr = cli.run('open-project',
-                                   '--export-pcb-fabrication-data',
-                                   '--pcb-fabrication-settings', 'settings.lp',
-                                   project.path)
-    output_prefix = '' if project.is_lppz else (project.dir + os.sep)
-    assert stderr == ''
+    code, stdout, stderr = cli.run(
+        "open-project",
+        "--export-pcb-fabrication-data",
+        "--pcb-fabrication-settings",
+        "settings.lp",
+        project.path,
+    )
+    output_prefix = "" if project.is_lppz else (project.dir + os.sep)
+    assert stderr == ""
     assert stdout == nofmt(f"""\
 Open project '{project.path}'...
 Export PCB fabrication data...
@@ -406,27 +437,32 @@ Export PCB fabrication data...
     => '{output_prefix}out//0_default//SOLDERPASTE-TOP.gbr'
     => '{output_prefix}out//0_default//SOLDERPASTE-BOTTOM.gbr'
 SUCCESS
-""").replace('//', os.sep)
+""").replace("//", os.sep)
     assert code == 0
     assert os.path.exists(dir)
     assert len(os.listdir(dir)) == 10
 
 
-@pytest.mark.parametrize("project", [
-    params.EMPTY_PROJECT_LPP_PARAM,
-    params.PROJECT_WITH_TWO_BOARDS_LPPZ_PARAM,
-])
+@pytest.mark.parametrize(
+    "project",
+    [
+        params.EMPTY_PROJECT_LPP_PARAM,
+        params.PROJECT_WITH_TWO_BOARDS_LPPZ_PARAM,
+    ],
+)
 def test_if_export_with_nonexistent_settings_fails(cli, project):
     cli.add_project(project.dir, as_lppz=project.is_lppz)
-    dir = cli.abspath(project.output_dir + '/gerber')
+    dir = cli.abspath(project.output_dir + "/gerber")
     assert not os.path.exists(dir)
-    code, stdout, stderr = cli.run('open-project',
-                                   '--export-pcb-fabrication-data',
-                                   '--pcb-fabrication-settings=nonexistent.lp',
-                                   project.path)
+    code, stdout, stderr = cli.run(
+        "open-project",
+        "--export-pcb-fabrication-data",
+        "--pcb-fabrication-settings=nonexistent.lp",
+        project.path,
+    )
     assert stderr == nofmt(f"""\
 ERROR: Failed to load custom settings: \
-The file "{cli.abspath('nonexistent.lp')}" does not exist.
+The file "{cli.abspath("nonexistent.lp")}" does not exist.
 """)
     assert stdout == nofmt(f"""\
 Open project '{project.path}'...
@@ -437,21 +473,26 @@ Finished with errors!
     assert not os.path.exists(dir)
 
 
-@pytest.mark.parametrize("project", [
-    params.EMPTY_PROJECT_LPP_PARAM,
-    params.PROJECT_WITH_TWO_BOARDS_LPPZ_PARAM,
-])
+@pytest.mark.parametrize(
+    "project",
+    [
+        params.EMPTY_PROJECT_LPP_PARAM,
+        params.PROJECT_WITH_TWO_BOARDS_LPPZ_PARAM,
+    ],
+)
 def test_if_export_with_invalid_settings_fails(cli, project):
     cli.add_project(project.dir, as_lppz=project.is_lppz)
-    with open(cli.abspath('settings.lp'), mode='w') as f:
-        f.write('foobar')
-    dir = cli.abspath(project.output_dir + '/gerber')
+    with open(cli.abspath("settings.lp"), mode="w") as f:
+        f.write("foobar")
+    dir = cli.abspath(project.output_dir + "/gerber")
     assert not os.path.exists(dir)
-    code, stdout, stderr = cli.run('open-project',
-                                   '--export-pcb-fabrication-data',
-                                   '--pcb-fabrication-settings=settings.lp',
-                                   project.path)
-    assert stderr == nofmt(f"""\
+    code, stdout, stderr = cli.run(
+        "open-project",
+        "--export-pcb-fabrication-data",
+        "--pcb-fabrication-settings=settings.lp",
+        project.path,
+    )
+    assert stderr == nofmt("""\
 ERROR: Failed to load custom settings: File parse error: Child not found: base_path/@0
 File: \n\
 Invalid Content: ''

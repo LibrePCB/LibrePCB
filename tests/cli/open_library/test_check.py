@@ -14,9 +14,8 @@ Test command "open-library --check"
 def test_no_messages(cli):
     library = params.EMPTY_LIBRARY
     cli.add_library(library.dir)
-    code, stdout, stderr = cli.run('open-library', '--all', '--check',
-                                   library.dir)
-    assert stderr == ''
+    code, stdout, stderr = cli.run("open-library", "--all", "--check", library.dir)
+    assert stderr == ""
     assert stdout == nofmt(f"""\
 Open library '{library.dir}'...
 Process {library.cmpcat} component categories...
@@ -33,10 +32,9 @@ SUCCESS
 def test_messages(cli):
     library = params.POPULATED_LIBRARY
     cli.add_library(library.dir)
-    for subdir in ['sym', 'pkg', 'cmp']:
+    for subdir in ["sym", "pkg", "cmp"]:
         shutil.rmtree(cli.abspath(os.path.join(library.dir, subdir)))
-    code, stdout, stderr = cli.run('open-library', '--all', '--check',
-                                   library.dir)
+    code, stdout, stderr = cli.run("open-library", "--all", "--check", library.dir)
     assert stderr == nofmt("""\
   - R-0805 (078650d3-483c-4b9e-a848-b14f1aad2edc):
     - [HINT] No part numbers added

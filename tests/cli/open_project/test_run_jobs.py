@@ -12,41 +12,43 @@ Test command "open-project --run-jobs"
 """
 
 
-@pytest.mark.parametrize("project", [
-    params.EMPTY_PROJECT_LPP_PARAM,
-])
+@pytest.mark.parametrize(
+    "project",
+    [
+        params.EMPTY_PROJECT_LPP_PARAM,
+    ],
+)
 def test_if_project_without_jobs_succeeds(cli, project):
     cli.add_project(project.dir, as_lppz=project.is_lppz)
 
     dir = cli.abspath(project.output_dir)
     assert not os.path.exists(dir)
-    code, stdout, stderr = cli.run('open-project',
-                                   '--run-jobs',
-                                   project.path)
-    assert stderr == ''
+    code, stdout, stderr = cli.run("open-project", "--run-jobs", project.path)
+    assert stderr == ""
     assert stdout == nofmt(f"""\
 Open project '{project.path}'...
 SUCCESS
 """)
     assert code == 0
     assert os.path.exists(dir)
-    assert os.listdir(dir) == ['.librepcb-output']
+    assert os.listdir(dir) == [".librepcb-output"]
 
 
-@pytest.mark.parametrize("project", [
-    params.PROJECT_WITH_TWO_BOARDS_LPP_PARAM,
-    params.PROJECT_WITH_TWO_BOARDS_LPPZ_PARAM,
-])
+@pytest.mark.parametrize(
+    "project",
+    [
+        params.PROJECT_WITH_TWO_BOARDS_LPP_PARAM,
+        params.PROJECT_WITH_TWO_BOARDS_LPPZ_PARAM,
+    ],
+)
 def test_project_with_jobs(cli, project):
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     dir = cli.abspath(project.output_dir)
     assert not os.path.exists(dir)
-    code, stdout, stderr = cli.run('open-project',
-                                   '--run-jobs',
-                                   project.path)
-    if 'LibrePCB was compiled without OpenCascade' in stderr:
+    code, stdout, stderr = cli.run("open-project", "--run-jobs", project.path)
+    if "LibrePCB was compiled without OpenCascade" in stderr:
         pytest.skip("Feature not available.")
-    assert stderr == ''
+    assert stderr == ""
     assert stdout == nofmt(f"""\
 Open project '{project.path}'...
 Run output job 'Schematic PDF'...
@@ -88,20 +90,21 @@ Run output job 'Project Data'...
 Run output job 'Project Archive'...
   => '{project.output_dir_native}//Empty_Project_v1.lppz'
 SUCCESS
-""").replace('//', os.sep)
+""").replace("//", os.sep)
     assert code == 0
     assert os.path.exists(dir)
     assert len(os.listdir(dir)) == 11
 
 
-@pytest.mark.parametrize("project", [
-    params.PROJECT_WITH_TWO_BOARDS_LPP_PARAM,
-])
+@pytest.mark.parametrize(
+    "project",
+    [
+        params.PROJECT_WITH_TWO_BOARDS_LPP_PARAM,
+    ],
+)
 def test_if_invalid_job_fails(cli, project):
     cli.add_project(project.dir, as_lppz=project.is_lppz)
-    code, stdout, stderr = cli.run('open-project',
-                                   '--run-job', 'foo',
-                                   project.path)
+    code, stdout, stderr = cli.run("open-project", "--run-job", "foo", project.path)
     assert stderr == "ERROR: No output job with the name 'foo' found.\n"
     assert stdout == nofmt(f"""\
 Open project '{project.path}'...
@@ -110,26 +113,27 @@ Finished with errors!
     assert code == 1
 
 
-@pytest.mark.parametrize("project", [
-    params.PROJECT_WITH_TWO_BOARDS_LPP_PARAM,
-])
+@pytest.mark.parametrize(
+    "project",
+    [
+        params.PROJECT_WITH_TWO_BOARDS_LPP_PARAM,
+    ],
+)
 def test_conflicting_output_file_fails(cli, project):
     cli.add_project(project.dir, as_lppz=project.is_lppz)
 
     # change one output file to be identical as another one
-    boardfile = cli.abspath(project.dir + '/project/jobs.lp')
+    boardfile = cli.abspath(project.dir + "/project/jobs.lp")
     for line in fileinput.input(boardfile, inplace=1):
         print(line.replace("_TOP.gbr", "_BOT.gbr"))
 
-    code, stdout, stderr = cli.run('open-project',
-                                   '--run-jobs',
-                                   project.path)
+    code, stdout, stderr = cli.run("open-project", "--run-jobs", project.path)
     assert stderr == nofmt("""\
 ERROR: Attempted to write the output file \
 'asm//Empty_Project_v1_PnP_AV_BOT.gbr' multiple times! \
 Make sure to specify unique output file paths, e.g. by using \
 placeholders like '{{BOARD}}' or '{{VARIANT}}'.
-""").replace('//', os.sep)
+""").replace("//", os.sep)
     assert stdout == nofmt(f"""\
 Open project '{project.path}'...
 Run output job 'Schematic PDF'...
@@ -155,14 +159,17 @@ Run output job 'Pick&Place X3'...
   => '{project.output_dir_native}//asm//Empty_Project_v1_PnP_AV_BOT.gbr'
   => '{project.output_dir_native}//asm//Empty_Project_v1_PnP_AV_BOT.gbr'
 Finished with errors!
-""").replace('//', os.sep)
+""").replace("//", os.sep)
     assert code == 1
 
 
-@pytest.mark.parametrize("project", [
-    params.EMPTY_PROJECT_LPP_PARAM,
-    params.EMPTY_PROJECT_LPPZ_PARAM,
-])
+@pytest.mark.parametrize(
+    "project",
+    [
+        params.EMPTY_PROJECT_LPP_PARAM,
+        params.EMPTY_PROJECT_LPPZ_PARAM,
+    ],
+)
 def test_custom_jobs(cli, project):
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     jobs = """
@@ -174,39 +181,40 @@ def test_custom_jobs(cli, project):
        )
       )
     """
-    with open(cli.abspath('custom_jobs.lp'), mode='w') as f:
+    with open(cli.abspath("custom_jobs.lp"), mode="w") as f:
         f.write(jobs)
     dir = cli.abspath(project.output_dir)
     assert not os.path.exists(dir)
-    code, stdout, stderr = cli.run('open-project',
-                                   '--run-jobs',
-                                   '--jobs', 'custom_jobs.lp',
-                                   project.path)
-    output_prefix = '' if project.is_lppz else (project.dir + os.sep)
-    assert stderr == ''
+    code, stdout, stderr = cli.run(
+        "open-project", "--run-jobs", "--jobs", "custom_jobs.lp", project.path
+    )
+    output_prefix = "" if project.is_lppz else (project.dir + os.sep)
+    assert stderr == ""
     assert stdout == nofmt(f"""\
 Open project '{project.path}'...
 Run output job 'Custom Job'...
   => '{output_prefix}output//v1//custom.d356'
 SUCCESS
-""").replace('//', os.sep)
+""").replace("//", os.sep)
     assert code == 0
     assert os.path.exists(dir)
     assert len(os.listdir(dir)) == 2
 
 
-@pytest.mark.parametrize("project", [
-    params.EMPTY_PROJECT_LPP_PARAM,
-])
+@pytest.mark.parametrize(
+    "project",
+    [
+        params.EMPTY_PROJECT_LPP_PARAM,
+    ],
+)
 def test_nonexistent_jobs_fails(cli, project):
     cli.add_project(project.dir, as_lppz=project.is_lppz)
-    code, stdout, stderr = cli.run('open-project',
-                                   '--run-jobs',
-                                   '--jobs=nonexistent.lp',
-                                   project.path)
+    code, stdout, stderr = cli.run(
+        "open-project", "--run-jobs", "--jobs=nonexistent.lp", project.path
+    )
     assert stderr == nofmt(f"""\
 ERROR: Failed to load custom output jobs: \
-The file "{cli.abspath('nonexistent.lp')}" does not exist.
+The file "{cli.abspath("nonexistent.lp")}" does not exist.
 """)
     assert stdout == nofmt(f"""\
 Open project '{project.path}'...
@@ -215,17 +223,19 @@ Finished with errors!
     assert code == 1
 
 
-@pytest.mark.parametrize("project", [
-    params.EMPTY_PROJECT_LPP_PARAM,
-])
+@pytest.mark.parametrize(
+    "project",
+    [
+        params.EMPTY_PROJECT_LPP_PARAM,
+    ],
+)
 def test_invalid_jobs_fails(cli, project):
     cli.add_project(project.dir, as_lppz=project.is_lppz)
-    with open(cli.abspath('custom_jobs.lp'), mode='w') as f:
-        f.write('(librepcb_jobs (job))')
-    code, stdout, stderr = cli.run('open-project',
-                                   '--run-jobs',
-                                   '--jobs=custom_jobs.lp',
-                                   project.path)
+    with open(cli.abspath("custom_jobs.lp"), mode="w") as f:
+        f.write("(librepcb_jobs (job))")
+    code, stdout, stderr = cli.run(
+        "open-project", "--run-jobs", "--jobs=custom_jobs.lp", project.path
+    )
     assert stderr == nofmt("""\
 ERROR: Failed to load custom output jobs: \
 File parse error: Child not found: type/@0
@@ -239,21 +249,23 @@ Finished with errors!
     assert code == 1
 
 
-@pytest.mark.parametrize("project", [
-    params.PROJECT_WITH_TWO_BOARDS_LPP_PARAM,
-    params.PROJECT_WITH_TWO_BOARDS_LPPZ_PARAM,
-])
+@pytest.mark.parametrize(
+    "project",
+    [
+        params.PROJECT_WITH_TWO_BOARDS_LPP_PARAM,
+        params.PROJECT_WITH_TWO_BOARDS_LPPZ_PARAM,
+    ],
+)
 def test_custom_outdir_relative(cli, project):
     cli.add_project(project.dir, as_lppz=project.is_lppz)
-    dir = cli.abspath('foo')
+    dir = cli.abspath("foo")
     assert not os.path.exists(dir)
-    code, stdout, stderr = cli.run('open-project',
-                                   '--run-jobs',
-                                   '--outdir=foo',
-                                   project.path)
-    if 'LibrePCB was compiled without OpenCascade' in stderr:
+    code, stdout, stderr = cli.run(
+        "open-project", "--run-jobs", "--outdir=foo", project.path
+    )
+    if "LibrePCB was compiled without OpenCascade" in stderr:
         pytest.skip("Feature not available.")
-    assert stderr == ''
+    assert stderr == ""
     assert stdout == nofmt(f"""\
 Open project '{project.path}'...
 Run output job 'Schematic PDF'...
@@ -295,31 +307,33 @@ Run output job 'Project Data'...
 Run output job 'Project Archive'...
   => 'foo//Empty_Project_v1.lppz'
 SUCCESS
-""").replace('//', os.sep)
+""").replace("//", os.sep)
     assert code == 0
     assert os.path.exists(dir)
     assert len(os.listdir(dir)) == 11
 
 
-@pytest.mark.parametrize("project", [
-    params.PROJECT_WITH_TWO_BOARDS_LPP_PARAM,
-    params.PROJECT_WITH_TWO_BOARDS_LPPZ_PARAM,
-])
+@pytest.mark.parametrize(
+    "project",
+    [
+        params.PROJECT_WITH_TWO_BOARDS_LPP_PARAM,
+        params.PROJECT_WITH_TWO_BOARDS_LPPZ_PARAM,
+    ],
+)
 def test_custom_outdir_absolute(cli, project):
     """
     Note: Actually the stdout should show absolute paths as well, but that's
     not implemented correctly yet.
     """
     cli.add_project(project.dir, as_lppz=project.is_lppz)
-    dir = cli.abspath('foo')
+    dir = cli.abspath("foo")
     assert not os.path.exists(dir)
-    code, stdout, stderr = cli.run('open-project',
-                                   '--run-jobs',
-                                   '--outdir', dir,
-                                   project.path)
-    if 'LibrePCB was compiled without OpenCascade' in stderr:
+    code, stdout, stderr = cli.run(
+        "open-project", "--run-jobs", "--outdir", dir, project.path
+    )
+    if "LibrePCB was compiled without OpenCascade" in stderr:
         pytest.skip("Feature not available.")
-    assert stderr == ''
+    assert stderr == ""
     assert stdout == nofmt(f"""\
 Open project '{project.path}'...
 Run output job 'Schematic PDF'...
@@ -361,7 +375,7 @@ Run output job 'Project Data'...
 Run output job 'Project Archive'...
   => 'foo//Empty_Project_v1.lppz'
 SUCCESS
-""").replace('//', os.sep)
+""").replace("//", os.sep)
     assert code == 0
     assert os.path.exists(dir)
     assert len(os.listdir(dir)) == 11

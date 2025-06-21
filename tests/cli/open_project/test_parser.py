@@ -115,34 +115,34 @@ def _clean(help_text):
     the tests portable.
     """
     return re.sub(
-        'Supported file extensions: pdf, svg,([\\s\\n]*[0-9a-z,]+)+',
-        'Supported file extensions: pdf, svg, ***',
+        "Supported file extensions: pdf, svg,([\\s\\n]*[0-9a-z,]+)+",
+        "Supported file extensions: pdf, svg, ***",
         help_text,
     )
 
 
 def test_help(cli):
-    code, stdout, stderr = cli.run('open-project', '--help')
-    assert stderr == ''
+    code, stdout, stderr = cli.run("open-project", "--help")
+    assert stderr == ""
     assert _clean(stdout) == HELP_TEXT.format(executable=cli.executable)
     assert code == 0
 
 
 def test_no_arguments(cli):
-    code, stdout, stderr = cli.run('open-project')
+    code, stdout, stderr = cli.run("open-project")
     assert stderr == ERROR_TEXT.format(
         executable=cli.executable,
         error="Missing arguments: project",
     )
-    assert stdout == ''
+    assert stdout == ""
     assert code == 1
 
 
 def test_invalid_argument(cli):
-    code, stdout, stderr = cli.run('open-project', '--invalid-argument')
+    code, stdout, stderr = cli.run("open-project", "--invalid-argument")
     assert stderr == ERROR_TEXT.format(
         executable=cli.executable,
         error="Unknown option 'invalid-argument'.",
     )
-    assert stdout == ''
+    assert stdout == ""
     assert code == 1

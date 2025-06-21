@@ -15,6 +15,10 @@ This directory contains functional tests (simulating user input) using
 
     uv run ruff check
 
+## Auto-format Files
+
+    uv run ruff format
+
 ## Links
 
 - [Documentation of `funq`](http://funq.readthedocs.io/en/latest/)
