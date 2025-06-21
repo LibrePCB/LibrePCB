@@ -13,3 +13,11 @@ This directory contains system tests (simulating user input) using
 ## Run Tests
 
     uv run pytest -v --librepcb-executable=/path/to/librepcb
+
+## Run Linter
+
+    uv run ruff check
+
+## Auto-format Files
+
+    uv run ruff format

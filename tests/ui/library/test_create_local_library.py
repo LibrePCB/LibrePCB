@@ -11,25 +11,25 @@ Test creating local libraries
 def test(librepcb, helpers):
     with librepcb.open() as app:
         # Open libraries panel
-        app.get('SideBar::libraries-btn').click()
+        app.get("SideBar::libraries-btn").click()
 
         # Verify that no local library exists yet
-        libs = app.get('LibrariesPanel::local-libs #LibraryListViewItem *')
+        libs = app.get("LibrariesPanel::local-libs #LibraryListViewItem *")
         assert libs.label == []
 
         # Create library
-        app.get('LibrariesPanelSection::create-btn').click()
-        tab = app.get('#CreateLibraryTab')
-        tab.get('CreateLibraryTab::name-edt').set_value('Local Library')
-        tab.get('CreateLibraryTab::description-edt').set_value('Foo Bar')
-        tab.get('CreateLibraryTab::author-edt').set_value('Functional Test')
-        tab.get('CreateLibraryTab::version-edt').set_value('1.2.3')
-        tab.get('CreateLibraryTab::url-edt').set_value('')
-        tab.get('CreateLibraryTab::cc0-sw').set_checked(True)
-        directory_edt = tab.get('CreateLibraryTab::directory-edt')
-        assert directory_edt.placeholder == 'Local_Library.lplib'
-        directory_edt.set_value('local-lib.lplib')
-        tab.get('CreateLibraryTab::create-btn').click()
+        app.get("LibrariesPanelSection::create-btn").click()
+        tab = app.get("#CreateLibraryTab")
+        tab.get("CreateLibraryTab::name-edt").set_value("Local Library")
+        tab.get("CreateLibraryTab::description-edt").set_value("Foo Bar")
+        tab.get("CreateLibraryTab::author-edt").set_value("Functional Test")
+        tab.get("CreateLibraryTab::version-edt").set_value("1.2.3")
+        tab.get("CreateLibraryTab::url-edt").set_value("")
+        tab.get("CreateLibraryTab::cc0-sw").set_checked(True)
+        directory_edt = tab.get("CreateLibraryTab::directory-edt")
+        assert directory_edt.placeholder == "Local_Library.lplib"
+        directory_edt.set_value("local-lib.lplib")
+        tab.get("CreateLibraryTab::create-btn").click()
 
         # Verify that the tab has been closed
         tab.wait_for_invalid()
@@ -42,5 +42,8 @@ def test(librepcb, helpers):
         # a lock file has been created
         libs.dclick()
         helpers.wait_for_file_exists(
-            os.path.join(librepcb.workspace_path, 'data', 'libraries', 'local', 'local-lib.lplib', '.lock')
+            os.path.join(
+                librepcb.workspace_path,
+                "data/libraries/local/local-lib.lplib/.lock",
+            )
         )

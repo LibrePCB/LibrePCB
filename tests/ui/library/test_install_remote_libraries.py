@@ -11,14 +11,14 @@ REMOTE_LIBRARY_COUNT = 3  # The dummy API provides 3 libraries
 def test(librepcb, helpers):
     with librepcb.open() as app:
         # Open libraries panel
-        app.get('SideBar::libraries-btn').click()
+        app.get("SideBar::libraries-btn").click()
 
         # Wait until all libraries are fetched
-        libs = app.get('LibrariesPanel::remote-libs #LibraryListViewItem *')
+        libs = app.get("LibrariesPanel::remote-libs #LibraryListViewItem *")
         libs.wait(REMOTE_LIBRARY_COUNT)
 
         # Check the last library, which also checks dependent library 0
-        switches = libs.get('#Switch *')
+        switches = libs.get("#Switch *")
         assert switches.checked == [False, False, False]
         switches[2].click()
         assert switches.checked == [True, False, True]
@@ -32,7 +32,8 @@ def test(librepcb, helpers):
         assert switches.checked == [True, True, False]
 
         # Install selected libraries
-        app.get('LibrariesPanel::apply-btn').wait_for_enabled().click()
+        app.get("LibrariesPanel::apply-btn").wait_for_enabled().click()
+
 
 #        app.widget('libraryManagerInstallLibrariesDownloadButton').click()
 #
@@ -55,4 +56,4 @@ def test(librepcb, helpers):
 #            else:
 #                assert statuslabels[i].properties()['text'] == 'Recommended'
 
-        import time; time.sleep(3)
+# import time; time.sleep(3)
