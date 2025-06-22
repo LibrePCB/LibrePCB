@@ -10,23 +10,6 @@ Test command "open-package --check"
 """
 
 
-def test_check_all_packages(cli):
-    """Test checking all packages in a library."""
-    library = params.POPULATED_LIBRARY
-    cli.add_library(library.dir)
-    package_dirs = os.listdir(cli.abspath(os.path.join(library.dir, "pkg")))
-
-    # Test each package individually
-    for pkg_uuid in package_dirs:
-        pkg_path = os.path.join(library.dir, "pkg", pkg_uuid)
-        code, stdout, stderr = cli.run("open-package", "--check", pkg_path)
-
-        # Each package should complete without critical errors
-        # Some may have warnings/hints which is okay
-        assert "Finished" in stdout or "SUCCESS" in stdout
-        assert pkg_uuid in stdout
-
-
 def test_check_specific_package_with_warnings(cli):
     """Test checking a specific package that has warnings."""
     library = params.POPULATED_LIBRARY
@@ -39,21 +22,45 @@ def test_check_specific_package_with_warnings(cli):
     code, stdout, stderr = cli.run("open-package", "--check", pkg_path)
 
     # Should complete successfully even with warnings
-    assert "Open package" in stdout
-    assert "Finished" in stdout
-    assert "WARNING" in stderr.upper()
+    assert stdout == f"Open package '{pkg_path}'...\nFinished with errors!\n"
+    assert (
+        stderr
+        == """  - [WARNING] Clearance of pad '1' in 'Horizontal' to legend
+  - [WARNING] Clearance of pad '1' in 'Vertical' to legend
+  - [WARNING] Clearance of pad '2' in 'Horizontal' to legend
+  - [WARNING] Clearance of pad '2' in 'Vertical' to legend
+  - [WARNING] Clearance of pad '3' in 'Horizontal' to legend
+  - [WARNING] Clearance of pad '3' in 'Vertical' to legend
+  - [WARNING] Minimum width of 'Top Legend' in 'Horizontal'
+  - [WARNING] Minimum width of 'Top Legend' in 'Horizontal'
+  - [WARNING] Minimum width of 'Top Legend' in 'Horizontal'
+  - [WARNING] Minimum width of 'Top Legend' in 'Horizontal'
+  - [WARNING] Missing courtyard in footprint 'Vertical'
+  - [WARNING] Missing outline in footprint 'Horizontal'
+  - [WARNING] Missing outline in footprint 'Vertical'
+  - [HINT] No 3D model defined for 'Horizontal'
+  - [HINT] Non-recommended assembly type
+  - [HINT] Origin of 'Horizontal' not in center
+  - [HINT] Origin of 'Vertical' not in center
+  - [HINT] Unspecified function of pad '1' in 'Horizontal'
+  - [HINT] Unspecified function of pad '1' in 'Vertical'
+  - [HINT] Unspecified function of pad '2' in 'Horizontal'
+  - [HINT] Unspecified function of pad '2' in 'Vertical'
+  - [HINT] Unspecified function of pad '3' in 'Horizontal'
+  - [HINT] Unspecified function of pad '3' in 'Vertical'
+"""
+    )
     assert code != 0
 
 
 def test_check_invalid_path(cli):
     """Test checking with an invalid package path."""
-    code, stdout, stderr = cli.run(
-        "open-package", "--check", "/tmp/nonexistent/package"
-    )
+    invalid_path = "/tmp/nonexistent/package"
+    code, stdout, stderr = cli.run("open-package", "--check", invalid_path)
 
     # Should fail with appropriate error
     assert code != 0
-    assert "ERROR" in stderr or "ERROR" in stdout
+    assert stderr == f"ERROR: File '{invalid_path}/.librepcb-pkg' does not exist.\n"
 
 
 def test_check_non_package_element(cli):

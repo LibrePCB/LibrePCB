@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import os
-import tempfile
 
 import params
 
@@ -18,24 +17,18 @@ def test_export_symbol_to_png(cli):
 
     # Export the A4 Frame symbol
     sym_path = os.path.join(library.dir, "sym", "f00ab942-6980-442b-86a8-51b92de5704d")
+    export_path = "symbol.png"
 
-    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp:
-        export_path = tmp.name
+    code, stdout, stderr = cli.run("open-symbol", "--export", export_path, sym_path)
 
-    try:
-        code, stdout, stderr = cli.run("open-symbol", "--export", export_path, sym_path)
+    # Should succeed
+    assert code == 0
+    assert "Open symbol" in stdout
+    assert "Export" in stdout
 
-        # Should succeed
-        assert code == 0
-        assert "Open symbol" in stdout
-        assert "Export" in stdout
-
-        # File should exist and have content
-        assert os.path.exists(export_path)
-        assert os.path.getsize(export_path) > 0
-    finally:
-        if os.path.exists(export_path):
-            os.unlink(export_path)
+    # File should exist and have content
+    assert os.path.exists(cli.abspath(export_path))
+    assert os.path.getsize(cli.abspath(export_path)) > 0
 
 
 def test_export_symbol_with_substitutions(cli):
@@ -45,22 +38,24 @@ def test_export_symbol_with_substitutions(cli):
 
     sym_path = os.path.join(library.dir, "sym", "f00ab942-6980-442b-86a8-51b92de5704d")
 
-    with tempfile.TemporaryDirectory() as tmpdir:
-        # Use substitution patterns
-        export_pattern = os.path.join(tmpdir, "{{SYMBOL}}.png")
-        code, stdout, stderr = cli.run(
-            "open-symbol", "--export", export_pattern, sym_path
-        )
+    # Use substitution patterns
+    export_pattern = "{{SYMBOL}}.png"
+    code, stdout, stderr = cli.run(
+        "open-symbol", "--export", export_pattern, sym_path
+    )
 
-        # Should succeed
-        assert code == 0
+    # Should succeed
+    assert code == 0
 
-        # Check that a file was created with substitutions applied
-        files = os.listdir(tmpdir)
-        assert len(files) > 0
+    # Check that a file was created with substitutions applied
+    files = os.listdir(cli.abspath("."))
+    
+    # Should have created a file
+    png_files = [f for f in files if f.endswith(".png")]
+    assert len(png_files) > 0
 
-        # The file should have the symbol name in it
-        assert any("A4" in f for f in files)
+    # The file should have the symbol name in it
+    assert any("A4" in f for f in png_files)
 
 
 def test_export_multiple_formats(cli):
@@ -72,32 +67,29 @@ def test_export_multiple_formats(cli):
 
     formats = [".png", ".svg", ".pdf"]
 
-    with tempfile.TemporaryDirectory() as tmpdir:
-        for fmt in formats:
-            export_path = os.path.join(tmpdir, f"symbol{fmt}")
-            code, stdout, stderr = cli.run(
-                "open-symbol", "--export", export_path, sym_path
-            )
+    for fmt in formats:
+        export_path = f"symbol{fmt}"
+        code, stdout, stderr = cli.run(
+            "open-symbol", "--export", export_path, sym_path
+        )
 
-            # Should succeed for supported formats
-            if code == 0:
-                assert os.path.exists(export_path)
-                assert os.path.getsize(export_path) > 0
+        # Should succeed for supported formats
+        if code == 0:
+            assert os.path.exists(cli.abspath(export_path))
+            assert os.path.getsize(cli.abspath(export_path)) > 0
 
 
 def test_export_invalid_path(cli):
     """Test exporting with an invalid symbol path."""
-    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp:
-        export_path = tmp.name
+    export_path = "symbol.png"
+    
+    code, stdout, stderr = cli.run(
+        "open-symbol", "--export", export_path, "/nonexistent/symbol"
+    )
 
-    try:
-        code, stdout, stderr = cli.run(
-            "open-symbol", "--export", export_path, "/nonexistent/symbol"
-        )
-
-        # Should fail
-        assert code != 0
-        assert "ERROR" in stderr or "ERROR" in stdout
-    finally:
-        if os.path.exists(export_path):
-            os.unlink(export_path)
+    # Should fail
+    assert code != 0
+    assert "ERROR" in stderr or "ERROR" in stdout
+    
+    # No file should be created
+    assert not os.path.exists(cli.abspath(export_path))

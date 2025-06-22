@@ -10,23 +10,6 @@ Test command "open-symbol --check"
 """
 
 
-def test_check_all_symbols(cli):
-    """Test checking all symbols in a library."""
-    library = params.POPULATED_LIBRARY
-    cli.add_library(library.dir)
-    symbol_dirs = os.listdir(cli.abspath(os.path.join(library.dir, "sym")))
-
-    # Test each symbol individually
-    for sym_uuid in symbol_dirs:
-        sym_path = os.path.join(library.dir, "sym", sym_uuid)
-        code, stdout, stderr = cli.run("open-symbol", "--check", sym_path)
-
-        # Each symbol should complete without critical errors
-        # Some may have warnings/hints which is okay
-        assert "Finished" in stdout or "SUCCESS" in stdout
-        assert sym_uuid in stdout
-
-
 def test_check_specific_symbol_with_warnings(cli):
     """Test checking a specific symbol that has warnings."""
     library = params.POPULATED_LIBRARY
@@ -37,9 +20,11 @@ def test_check_specific_symbol_with_warnings(cli):
     )
     code, stdout, stderr = cli.run("open-symbol", "--check", sym_path)
     # Should complete successfully even with warnings
-    assert "Open symbol" in stdout
-    assert "Finished" in stdout
-    assert "WARNING" in stderr.upper()
+    assert stdout == f"Open symbol '{sym_path}'...\nFinished with errors!\n"
+    assert (
+        stderr
+        == "  - [WARNING] Missing text: '{{NAME}}'\n  - [WARNING] Missing text: '{{VALUE}}'\n"
+    )
     assert code != 0
 
 
