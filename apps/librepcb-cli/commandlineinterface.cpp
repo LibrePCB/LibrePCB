@@ -297,7 +297,7 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
          "report failure (exit code = 1) if there are non-approved messages."));
   QCommandLineOption pkgExportOption(
       "export",
-      tr("Export the package to a graphical "
+      tr("Export the contained footprint(s) to a graphical "
          "file. Supported file extensions: %1")
           .arg(GraphicsExport::getSupportedExtensions().join(", ")),
       tr("file"));
