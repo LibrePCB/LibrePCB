@@ -58,31 +58,6 @@ public:
   int execute(const QStringList& args) noexcept;
 
 private:  // Methods
-  bool openProject(
-      const QString& projectFile, bool runErc, bool runDrc,
-      const QString& drcSettingsPath, const QStringList& runJobs,
-      bool runAllJobs, const QString& customJobsPath,
-      const QString& customOutDir, const QStringList& exportSchematicsFiles,
-      const QStringList& exportBomFiles, const QStringList& exportBoardBomFiles,
-      const QString& bomAttributes, bool exportPcbFabricationData,
-      const QString& pcbFabricationSettingsPath,
-      const QStringList& exportPnpTopFiles,
-      const QStringList& exportPnpBottomFiles,
-      const QStringList& exportNetlistFiles, const QStringList& boardNames,
-      const QStringList& boardIndices, bool removeOtherBoards,
-      const QStringList& avNames, const QStringList& avIndices,
-      const QString& setDefaultAv, bool save, bool strict) const noexcept;
-  bool openLibrary(const QString& libDir, bool all, bool runCheck,
-                   bool minifyStepFiles, bool save, bool strict) const noexcept;
-  bool openPackage(const QString& packageFile, bool runCheck,
-                   const QString& exportFile) const noexcept;
-  bool openSymbol(const QString& symbolFile, bool runCheck,
-                  const QString& exportFile) const noexcept;
-  void processLibraryElement(const QString& libDir, TransactionalFileSystem& fs,
-                             LibraryBaseElement& element, bool runCheck,
-                             bool minifyStepFiles, bool save, bool strict,
-                             bool& success) const;
-
   // Check result structure
   struct CheckResult {
     int approvedMsgCount;
@@ -106,6 +81,30 @@ private:  // Methods
   void printCheckSummary(const FilePath& path, const QString& relPath,
                          const CheckResult& checkResult) const;
 
+  void processLibraryElement(const QString& libDir, TransactionalFileSystem& fs,
+                             LibraryBaseElement& element, bool runCheck,
+                             bool minifyStepFiles, bool save, bool strict,
+                             bool& success) const;
+  bool openProject(
+      const QString& projectFile, bool runErc, bool runDrc,
+      const QString& drcSettingsPath, const QStringList& runJobs,
+      bool runAllJobs, const QString& customJobsPath,
+      const QString& customOutDir, const QStringList& exportSchematicsFiles,
+      const QStringList& exportBomFiles, const QStringList& exportBoardBomFiles,
+      const QString& bomAttributes, bool exportPcbFabricationData,
+      const QString& pcbFabricationSettingsPath,
+      const QStringList& exportPnpTopFiles,
+      const QStringList& exportPnpBottomFiles,
+      const QStringList& exportNetlistFiles, const QStringList& boardNames,
+      const QStringList& boardIndices, bool removeOtherBoards,
+      const QStringList& avNames, const QStringList& avIndices,
+      const QString& setDefaultAv, bool save, bool strict) const noexcept;
+  bool openLibrary(const QString& libDir, bool all, bool runCheck,
+                   bool minifyStepFiles, bool save, bool strict) const noexcept;
+  bool openSymbol(const QString& symbolFile, bool runCheck,
+                  const QString& exportFile) const noexcept;
+  bool openPackage(const QString& packageFile, bool runCheck,
+                   const QString& exportFile) const noexcept;
   bool openStep(const QString& filePath, bool minify, bool tesselate,
                 const QString& saveTo) const noexcept;
   static QStringList prepareRuleCheckMessages(
