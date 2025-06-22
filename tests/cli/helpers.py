@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import re
 
 
 def nofmt(arg):
@@ -8,3 +9,15 @@ def nofmt(arg):
     in a very ugly way.
     """
     return arg
+
+
+def _clean(help_text):
+    """
+    Remove client-dependent image file extensions from the help text to make
+    the tests portable.
+    """
+    return re.sub(
+        "extensions: pdf, svg,([\\s\\n]*[0-9a-z,]+)+",
+        "extensions: pdf, svg, ***",
+        help_text,
+    )

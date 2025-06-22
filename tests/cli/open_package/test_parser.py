@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import re
+from helpers import _clean
 
 """
 Test command "open-package" (basic parser tests)
@@ -31,18 +31,6 @@ ERROR_TEXT = """\
 Usage: {executable} [options] open-package [command_options] package
 Help: {executable} open-package --help
 """
-
-
-def _clean(help_text):
-    """
-    Remove client-dependent image file extensions from the help text to make
-    the tests portable.
-    """
-    return re.sub(
-        "extensions: pdf, svg,([\\s\\n]*[0-9a-z,]+)+",
-        "extensions: pdf, svg, ***",
-        help_text,
-    )
 
 
 def test_help(cli):

@@ -1416,6 +1416,16 @@ bool CommandLineInterface::openSymbol(
     if (!exportFile.isEmpty()) {
       print(tr("Export symbol to '%1'...").arg(exportFile));
 
+      // Simple extension check to prevent error messages
+      const QString suffix = QFileInfo(exportFile).suffix().toLower();
+      if (!GraphicsExport::getSupportedExtensions().contains(suffix)) {
+        printErr("  " % tr("ERROR") % ": " %
+                 tr("Unknown extension '%1'. Supported extensions: %2")
+                     .arg(suffix)
+                     .arg(GraphicsExport::getSupportedExtensions().join(", ")));
+        return false;
+      }
+
       // Generate output filename
       QString destPathStr = exportFile;
 

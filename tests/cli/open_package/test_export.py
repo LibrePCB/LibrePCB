@@ -5,7 +5,7 @@ import os
 
 import params
 import pytest
-from helpers import nofmt
+from helpers import _clean, nofmt
 
 """
 Test command "open-package --export"
@@ -29,10 +29,10 @@ def test_if_unknown_file_extension_fails(cli, pkg_uuid):
     export_path = "package.foo"
     code, stdout, stderr = cli.run("open-package", "--export", export_path, pkg_path)
     assert code == 1
-    # Get the list of supported extensions for the error message
-    # This is a bit hacky but matches what the CLI shows
-    assert "ERROR: Unknown extension 'foo'" in stderr
-    assert "Supported extensions:" in stderr
+    assert (
+        _clean(stderr)
+        == "  ERROR: Unknown extension 'foo'. Supported extensions: pdf, svg, ***\n"
+    )
     assert stdout == nofmt(f"""\
 Open package '{pkg_path}'...
 Export package to '{export_path}'...
@@ -60,7 +60,6 @@ def test_export_package_to_png_relative(cli, pkg_uuid):
     code, stdout, stderr = cli.run("open-package", "--export", export_path, pkg_path)
 
     assert code == 0
-    assert "SUCCESS" in stdout
     assert stderr == ""
 
     # Check that all footprints were exported
@@ -94,7 +93,6 @@ def test_export_package_to_svg_absolute(cli, pkg_uuid):
     code, stdout, stderr = cli.run("open-package", "--export", export_path, pkg_path)
 
     assert code == 0
-    assert "SUCCESS" in stdout
     assert stderr == ""
 
     # Check that all footprints were exported
@@ -123,7 +121,6 @@ def test_if_output_directories_are_created(cli):
     code, stdout, stderr = cli.run("open-package", "--export", export_path, pkg_path)
 
     assert code == 0
-    assert "SUCCESS" in stdout
     assert stderr == ""
     assert os.path.isdir(export_dir)
 
@@ -169,6 +166,6 @@ def test_export_invalid_package_path(cli):
     )
 
     assert code == 1
-    assert "does not exist" in stderr
-    assert "Finished with errors!" in stdout
+    assert stderr == f"ERROR: File '{invalid_pkg_path}/.librepcb-pkg' does not exist.\n"
+    assert stdout == f"Open package '{invalid_pkg_path}'...\nFinished with errors!\n"
     assert not os.path.exists(cli.abspath(export_path))
