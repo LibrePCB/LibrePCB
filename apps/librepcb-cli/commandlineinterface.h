@@ -83,16 +83,29 @@ private:  // Methods
                              bool minifyStepFiles, bool save, bool strict,
                              bool& success) const;
 
-  // Helper function to create error header printer for library elements
-  std::function<void()> createElementErrorHeaderPrinter(
-      bool& errorHeaderPrinted, const LibraryBaseElement& element) const;
+  // Check result structure
+  struct CheckResult {
+    int approvedMsgCount;
+    QStringList nonApprovedMessages;
+  };
 
-  // Run validation checks on a library element
-  void runElementChecks(const QString& libDir,
-                        const TransactionalFileSystem& fs,
-                        const LibraryBaseElement& element,
-                        const std::function<void()>& printErrorHeaderOnce,
-                        bool& success) const;
+  /**
+   * @brief Gather validation check messages for a library element
+   *
+   * This function runs validation checks on a library element and separates
+   * the results into approved and non-approved messages.
+   *
+   * @param element The library element to check
+   * @return CheckResult containing the count of approved messages and a list
+   *         of non-approved messages
+   */
+  CheckResult gatherElementCheckMessages(
+      const LibraryBaseElement& element) const;
+
+  // Print check summary
+  void printCheckSummary(const FilePath& path, const QString& relPath,
+                         const CheckResult& checkResult) const;
+
   bool openStep(const QString& filePath, bool minify, bool tesselate,
                 const QString& saveTo) const noexcept;
   static QStringList prepareRuleCheckMessages(

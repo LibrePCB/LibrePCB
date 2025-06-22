@@ -1253,9 +1253,36 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
   }
 }
 
-std::function<void()> CommandLineInterface::createElementErrorHeaderPrinter(
-    bool& errorHeaderPrinted, const LibraryBaseElement& element) const {
-  return [&errorHeaderPrinted, &element]() {
+CommandLineInterface::CheckResult
+    CommandLineInterface::gatherElementCheckMessages(
+        const LibraryBaseElement& element) const {
+  CheckResult result;
+  result.approvedMsgCount = 0;
+  const RuleCheckMessageList messages = element.runChecks();
+  result.nonApprovedMessages = prepareRuleCheckMessages(
+      messages, element.getMessageApprovals(), result.approvedMsgCount);
+  return result;
+}
+
+void CommandLineInterface::printCheckSummary(
+    const FilePath& path, const QString& relPath,
+    const CheckResult& checkResult) const {
+  qInfo().noquote() << tr("Check '%1' for non-approved messages...")
+                           .arg(prettyPath(path, relPath));
+  qInfo().noquote() << "  " %
+          tr("Approved messages: %1").arg(checkResult.approvedMsgCount);
+  qInfo().noquote() << "  " %
+          tr("Non-approved messages: %1")
+              .arg(checkResult.nonApprovedMessages.count());
+}
+
+void CommandLineInterface::processLibraryElement(
+    const QString& libDir, TransactionalFileSystem& fs,
+    LibraryBaseElement& element, bool runCheck, bool minifyStepFiles, bool save,
+    bool strict, bool& success) const {
+  // Keep track of whether we've yet printed the error header for this element
+  bool errorHeaderPrinted = false;
+  auto printErrorHeaderOnce = [&errorHeaderPrinted, &element]() {
     if (!errorHeaderPrinted) {
       printErr(QString("  - %1 (%2):")
                    .arg(*element.getNames().getDefaultValue(),
@@ -1263,36 +1290,6 @@ std::function<void()> CommandLineInterface::createElementErrorHeaderPrinter(
       errorHeaderPrinted = true;
     }
   };
-}
-
-void CommandLineInterface::runElementChecks(
-    const QString& libDir, const TransactionalFileSystem& fs,
-    const LibraryBaseElement& element,
-    const std::function<void()>& printErrorHeaderOnce, bool& success) const {
-  qInfo().noquote() << tr("Check '%1' for non-approved messages...")
-                           .arg(prettyPath(fs.getPath(), libDir));
-  int approvedMsgCount = 0;
-  const RuleCheckMessageList messages = element.runChecks();
-  const QStringList nonApproved = prepareRuleCheckMessages(
-      messages, element.getMessageApprovals(), approvedMsgCount);
-  qInfo().noquote() << "  " % tr("Approved messages: %1").arg(approvedMsgCount);
-  qInfo().noquote() << "  " %
-          tr("Non-approved messages: %1").arg(nonApproved.count());
-  foreach (const QString& msg, nonApproved) {
-    printErrorHeaderOnce();
-    printErr("    - " % msg);
-    success = false;
-  }
-}
-
-void CommandLineInterface::processLibraryElement(
-    const QString& libDir, TransactionalFileSystem& fs,
-    LibraryBaseElement& element, bool runCheck, bool minifyStepFiles, bool save,
-    bool strict, bool& success) const {
-  // Create error header printer
-  bool errorHeaderPrinted = false;
-  auto printErrorHeaderOnce =
-      createElementErrorHeaderPrinter(errorHeaderPrinted, element);
 
   // Save element to transactional file system, if needed
   if (strict || save) {
@@ -1347,7 +1344,21 @@ void CommandLineInterface::processLibraryElement(
 
   // Run library element check, if needed.
   if (runCheck) {
-    runElementChecks(libDir, fs, element, printErrorHeaderOnce, success);
+    // Gather messages
+    CheckResult checkResult = gatherElementCheckMessages(element);
+
+    // Print summary
+    printCheckSummary(fs.getPath(), libDir, checkResult);
+
+    // If we have non-approved messages, print the header once, then all
+    // messages
+    if (!checkResult.nonApprovedMessages.isEmpty()) {
+      printErrorHeaderOnce();
+      success = false;
+      foreach (const QString& msg, checkResult.nonApprovedMessages) {
+        printErr("    - " % msg);
+      }
+    }
   }
 
   // Save element to file system, if needed
@@ -1382,16 +1393,21 @@ bool CommandLineInterface::openPackage(
         Package::open(std::unique_ptr<TransactionalDirectory>(
             new TransactionalDirectory(packageFs)));  // can throw
 
-    // Create error header printer
-    bool errorHeaderPrinted = false;
-    auto printErrorHeaderOnce =
-        createElementErrorHeaderPrinter(errorHeaderPrinted, *package);
-
-    // Process the package element (similar to how openLibrary processes
-    // individual elements)
+    // Process the package element (validation checks)
     if (runCheck) {
-      runElementChecks(packageFile, *packageFs, *package, printErrorHeaderOnce,
-                       success);
+      // Gather messages
+      CheckResult checkResult = gatherElementCheckMessages(*package);
+
+      // Print summary
+      printCheckSummary(packageFs->getPath(), packageFile, checkResult);
+
+      // Print messages without error header
+      if (!checkResult.nonApprovedMessages.isEmpty()) {
+        success = false;
+        foreach (const QString& msg, checkResult.nonApprovedMessages) {
+          printErr("  - " % msg);
+        }
+      }
     }
 
     // Export package to graphics file
@@ -1494,15 +1510,21 @@ bool CommandLineInterface::openSymbol(
         Symbol::open(std::unique_ptr<TransactionalDirectory>(
             new TransactionalDirectory(symbolFs)));  // can throw
 
-    // Create error header printer
-    bool errorHeaderPrinted = false;
-    auto printErrorHeaderOnce =
-        createElementErrorHeaderPrinter(errorHeaderPrinted, *symbol);
-
     // Process the symbol element (validation checks)
     if (runCheck) {
-      runElementChecks(symbolFile, *symbolFs, *symbol, printErrorHeaderOnce,
-                       success);
+      // Gather messages
+      CheckResult checkResult = gatherElementCheckMessages(*symbol);
+
+      // Print summary
+      printCheckSummary(symbolFs->getPath(), symbolFile, checkResult);
+
+      // Print messages without error header
+      if (!checkResult.nonApprovedMessages.isEmpty()) {
+        success = false;
+        foreach (const QString& msg, checkResult.nonApprovedMessages) {
+          printErr("  - " % msg);
+        }
+      }
     }
 
     // Export symbol to graphics file
