@@ -40,16 +40,14 @@ def test_export_symbol_with_substitutions(cli):
 
     # Use substitution patterns
     export_pattern = "{{SYMBOL}}.png"
-    code, stdout, stderr = cli.run(
-        "open-symbol", "--export", export_pattern, sym_path
-    )
+    code, stdout, stderr = cli.run("open-symbol", "--export", export_pattern, sym_path)
 
     # Should succeed
     assert code == 0
 
     # Check that a file was created with substitutions applied
     files = os.listdir(cli.abspath("."))
-    
+
     # Should have created a file
     png_files = [f for f in files if f.endswith(".png")]
     assert len(png_files) > 0
@@ -69,9 +67,7 @@ def test_export_multiple_formats(cli):
 
     for fmt in formats:
         export_path = f"symbol{fmt}"
-        code, stdout, stderr = cli.run(
-            "open-symbol", "--export", export_path, sym_path
-        )
+        code, stdout, stderr = cli.run("open-symbol", "--export", export_path, sym_path)
 
         # Should succeed for supported formats
         if code == 0:
@@ -82,7 +78,7 @@ def test_export_multiple_formats(cli):
 def test_export_invalid_path(cli):
     """Test exporting with an invalid symbol path."""
     export_path = "symbol.png"
-    
+
     code, stdout, stderr = cli.run(
         "open-symbol", "--export", export_path, "/nonexistent/symbol"
     )
@@ -90,6 +86,6 @@ def test_export_invalid_path(cli):
     # Should fail
     assert code != 0
     assert "ERROR" in stderr or "ERROR" in stdout
-    
+
     # No file should be created
     assert not os.path.exists(cli.abspath(export_path))
