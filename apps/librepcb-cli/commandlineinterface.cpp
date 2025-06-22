@@ -1382,6 +1382,7 @@ bool CommandLineInterface::openPackage(
     const QString& exportFile) const noexcept {
   try {
     bool success = true;
+    QMap<FilePath, int> writtenFilesCounter;
 
     // Open package directory (similar to openLibrary)
     FilePath packageFp(QFileInfo(packageFile).absoluteFilePath());
@@ -1392,6 +1393,9 @@ bool CommandLineInterface::openPackage(
     std::unique_ptr<Package> package =
         Package::open(std::unique_ptr<TransactionalDirectory>(
             new TransactionalDirectory(packageFs)));  // can throw
+
+    qInfo().noquote()
+        << tr("Package name: %1").arg(*package->getNames().getDefaultValue());
 
     // Process the package element (validation checks)
     if (runCheck) {
@@ -1414,7 +1418,18 @@ bool CommandLineInterface::openPackage(
     if (!exportFile.isEmpty()) {
       print(tr("Export package to '%1'...").arg(exportFile));
 
+      // Simple extension check to prevent duplicate error messages
+      const QString suffix = QFileInfo(exportFile).suffix().toLower();
+      if (!GraphicsExport::getSupportedExtensions().contains(suffix)) {
+        printErr("  " % tr("ERROR") % ": " %
+                 tr("Unknown extension '%1'. Supported extensions: %2")
+                     .arg(suffix)
+                     .arg(GraphicsExport::getSupportedExtensions().join(", ")));
+        return false;
+      }
+
       // Export each footprint
+      QMap<FilePath, int> writtenFilesCounter;
       int index = 1;
       for (auto it = package->getFootprints().begin();
            it != package->getFootprints().end(); ++it) {
@@ -1423,8 +1438,8 @@ bool CommandLineInterface::openPackage(
         QString destPathStr = exportFile;
 
         // Apply attribute substitution
-        auto lookupFunc =
-            [&package, &footprint, index](const QString& key) -> QString {
+        auto lookupFunc = [&package, &footprint,
+                           index](const QString& key) -> QString {
           if (key == QLatin1String("PACKAGE")) {
             return *package->getNames().getDefaultValue();
           } else if (key == QLatin1String("PACKAGE_UUID")) {
@@ -1438,13 +1453,11 @@ bool CommandLineInterface::openPackage(
           }
           return QString();  // Unknown attribute
         };
-        destPathStr =
-            AttributeSubstitutor::substitute(exportFile, lookupFunc,
-                                             [&](const QString& str) {
-                                               return FilePath::cleanFileName(
-                                                   str, FilePath::ReplaceSpaces |
-                                                            FilePath::KeepCase);
-                                             });
+        destPathStr = AttributeSubstitutor::substitute(
+            exportFile, lookupFunc, [&](const QString& str) {
+              return FilePath::cleanFileName(
+                  str, FilePath::ReplaceSpaces | FilePath::KeepCase);
+            });
 
         // Create absolute file path
         FilePath destPath(QFileInfo(destPathStr).absoluteFilePath());
@@ -1468,7 +1481,9 @@ bool CommandLineInterface::openPackage(
 
         // Report results
         foreach (const FilePath& writtenFile, result.writtenFiles) {
-          print(QString("  => '%1'").arg(prettyPath(writtenFile, destPathStr)));
+          print(QString("  => '%1'")
+                    .arg(prettyPath(writtenFile, destPathStr)));
+          writtenFilesCounter[writtenFile]++;
         }
         if (!result.errorMsg.isEmpty()) {
           printErr("  " % tr("ERROR") % ": " % result.errorMsg);
@@ -1476,6 +1491,23 @@ bool CommandLineInterface::openPackage(
         }
 
         index++;
+      }
+      
+      // Fail if some files were written multiple times
+      bool filesOverwritten = false;
+      for (auto it = writtenFilesCounter.begin(); it != writtenFilesCounter.end();
+           ++it) {
+        if (it.value() > 1) {
+          filesOverwritten = true;
+          printErr(tr("ERROR: The file '%1' was written multiple times!")
+                       .arg(prettyPath(it.key(), packageFile)));
+        }
+      }
+      if (filesOverwritten) {
+        printErr(tr("NOTE: To avoid writing files multiple times, make sure to pass unique filepaths "
+                    "to all export functions. For package output files, you could add a placeholder "
+                    "like '%1' to the path.").arg("{{FOOTPRINT}}"));
+        success = false;
       }
     }
 
@@ -1502,6 +1534,8 @@ bool CommandLineInterface::openSymbol(
         Symbol::open(std::unique_ptr<TransactionalDirectory>(
             new TransactionalDirectory(symbolFs)));  // can throw
 
+    qInfo().noquote()
+        << tr("Symbol name: %1").arg(*symbol->getNames().getDefaultValue());
     // Process the symbol element (validation checks)
     if (runCheck) {
       // Gather messages
@@ -1535,12 +1569,11 @@ bool CommandLineInterface::openSymbol(
         }
         return QString();  // Unknown attribute
       };
-      destPathStr = AttributeSubstitutor::substitute(exportFile, lookupFunc,
-                                                     [&](const QString& str) {
-                                                       return FilePath::cleanFileName(
-                                                           str, FilePath::ReplaceSpaces |
-                                                                    FilePath::KeepCase);
-                                                     });
+      destPathStr = AttributeSubstitutor::substitute(
+          exportFile, lookupFunc, [&](const QString& str) {
+            return FilePath::cleanFileName(
+                str, FilePath::ReplaceSpaces | FilePath::KeepCase);
+          });
 
       // Create absolute file path
       FilePath destPath(QFileInfo(destPathStr).absoluteFilePath());

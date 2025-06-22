@@ -18,8 +18,8 @@ Options:
   --check          Run the package check, print all non-approved messages and
                    report failure (exit code = 1) if there are non-approved
                    messages.
-  --export <file>  Export the package to a graphical file. Supported file
-                   extensions: pdf, svg, ***
+  --export <file>  Export the contained footprint(s) to a graphical file.
+                   Supported file extensions: pdf, svg, ***
 
 Arguments:
   open-package     Open a package to execute package-related tasks.
