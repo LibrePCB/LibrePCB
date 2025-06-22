@@ -49,7 +49,7 @@ def test_export_package_with_substitutions(cli):
 
     with tempfile.TemporaryDirectory() as tmpdir:
         # Use substitution patterns
-        export_pattern = os.path.join(tmpdir, "{{PACKAGE_NAME}}_{{FOOTPRINT_NAME}}.png")
+        export_pattern = os.path.join(tmpdir, "{{PACKAGE}}_{{FOOTPRINT}}.png")
         code, stdout, stderr = cli.run(
             "open-package", "--export", export_pattern, pkg_path
         )

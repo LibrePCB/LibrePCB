@@ -47,7 +47,7 @@ def test_export_symbol_with_substitutions(cli):
 
     with tempfile.TemporaryDirectory() as tmpdir:
         # Use substitution patterns
-        export_pattern = os.path.join(tmpdir, "{{SYMBOL_NAME}}.png")
+        export_pattern = os.path.join(tmpdir, "{{SYMBOL}}.png")
         code, stdout, stderr = cli.run(
             "open-symbol", "--export", export_pattern, sym_path
         )

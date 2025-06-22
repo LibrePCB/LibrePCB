@@ -1414,45 +1414,37 @@ bool CommandLineInterface::openPackage(
     if (!exportFile.isEmpty()) {
       print(tr("Export package to '%1'...").arg(exportFile));
 
-      // Get footprints - put default first if it exists
-      QList<std::shared_ptr<Footprint>> footprints;
-      for (auto it = package->getFootprints().begin();
-           it != package->getFootprints().end(); ++it) {
-        footprints.append(it.ptr());
-      }
-
       // Export each footprint
       int index = 1;
-      foreach (const std::shared_ptr<Footprint>& footprint, footprints) {
+      for (auto it = package->getFootprints().begin();
+           it != package->getFootprints().end(); ++it) {
+        const std::shared_ptr<Footprint>& footprint = it.ptr();
         // Generate output filename
         QString destPathStr = exportFile;
 
-        // Apply attribute substitution if patterns are present
-        if (exportFile.contains("{{")) {
-          // Create attribute lookup function following ProjectAttributeLookup
-          // pattern Capture by value to ensure the lambda remains valid
-          auto lookupFunc =
-              [packageName = *package->getNames().getDefaultValue(),
-               packageUuid = package->getUuid().toStr(),
-               footprintName = *footprint->getNames().getDefaultValue(),
-               footprintUuid = footprint->getUuid().toStr(),
-               index](const QString& key) -> QString {
-            if (key == QLatin1String("PACKAGE_NAME")) {
-              return packageName;
-            } else if (key == QLatin1String("PACKAGE_UUID")) {
-              return packageUuid;
-            } else if (key == QLatin1String("FOOTPRINT_NAME")) {
-              return footprintName;
-            } else if (key == QLatin1String("FOOTPRINT_UUID")) {
-              return footprintUuid;
-            } else if (key == QLatin1String("INDEX")) {
-              return QString::number(index);
-            }
-            return QString();  // Unknown attribute
-          };
-          destPathStr =
-              AttributeSubstitutor::substitute(exportFile, lookupFunc);
-        }
+        // Apply attribute substitution
+        auto lookupFunc =
+            [&package, &footprint, index](const QString& key) -> QString {
+          if (key == QLatin1String("PACKAGE")) {
+            return *package->getNames().getDefaultValue();
+          } else if (key == QLatin1String("PACKAGE_UUID")) {
+            return package->getUuid().toStr();
+          } else if (key == QLatin1String("FOOTPRINT")) {
+            return *footprint->getNames().getDefaultValue();
+          } else if (key == QLatin1String("FOOTPRINT_UUID")) {
+            return footprint->getUuid().toStr();
+          } else if (key == QLatin1String("FOOTPRINT_INDEX")) {
+            return QString::number(index);
+          }
+          return QString();  // Unknown attribute
+        };
+        destPathStr =
+            AttributeSubstitutor::substitute(exportFile, lookupFunc,
+                                             [&](const QString& str) {
+                                               return FilePath::cleanFileName(
+                                                   str, FilePath::ReplaceSpaces |
+                                                            FilePath::KeepCase);
+                                             });
 
         // Create absolute file path
         FilePath destPath(QFileInfo(destPathStr).absoluteFilePath());
@@ -1534,21 +1526,21 @@ bool CommandLineInterface::openSymbol(
       // Generate output filename
       QString destPathStr = exportFile;
 
-      // Apply attribute substitution if patterns are present
-      if (exportFile.contains("{{")) {
-        // Create attribute lookup function for symbol
-        auto lookupFunc = [symbolName = *symbol->getNames().getDefaultValue(),
-                           symbolUuid = symbol->getUuid().toStr()](
-                              const QString& key) -> QString {
-          if (key == QLatin1String("SYMBOL_NAME")) {
-            return symbolName;
-          } else if (key == QLatin1String("SYMBOL_UUID")) {
-            return symbolUuid;
-          }
-          return QString();  // Unknown attribute
-        };
-        destPathStr = AttributeSubstitutor::substitute(exportFile, lookupFunc);
-      }
+      // Apply attribute substitution
+      auto lookupFunc = [&symbol](const QString& key) -> QString {
+        if (key == QLatin1String("SYMBOL")) {
+          return *symbol->getNames().getDefaultValue();
+        } else if (key == QLatin1String("SYMBOL_UUID")) {
+          return symbol->getUuid().toStr();
+        }
+        return QString();  // Unknown attribute
+      };
+      destPathStr = AttributeSubstitutor::substitute(exportFile, lookupFunc,
+                                                     [&](const QString& str) {
+                                                       return FilePath::cleanFileName(
+                                                           str, FilePath::ReplaceSpaces |
+                                                                    FilePath::KeepCase);
+                                                     });
 
       // Create absolute file path
       FilePath destPath(QFileInfo(destPathStr).absoluteFilePath());
