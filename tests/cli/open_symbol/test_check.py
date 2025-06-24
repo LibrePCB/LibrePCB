@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+
 import os
+from pathlib import Path
 
 import params
 
@@ -30,11 +32,12 @@ def test_check_specific_symbol_with_warnings(cli):
 
 def test_check_invalid_path(cli):
     """Test checking with an invalid symbol path."""
-    code, stdout, stderr = cli.run("open-symbol", "--check", "/tmp/nonexistent/symbol")
-
+    invalid_path = cli.abspath("nonexistent")
+    code, stdout, stderr = cli.run("open-symbol", "--check", invalid_path)
+    check_path = Path(invalid_path, ".librepcb-sym")
     # Should fail with appropriate error
     assert code != 0
-    assert "ERROR" in stderr or "ERROR" in stdout
+    assert stderr == f"ERROR: File '{check_path}' does not exist.\n"
 
 
 def test_check_non_symbol_element(cli):

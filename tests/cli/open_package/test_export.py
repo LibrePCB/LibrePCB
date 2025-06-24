@@ -56,7 +56,7 @@ def test_export_package_to_png_relative(cli, pkg_uuid):
     pkg_path = os.path.join(library.dir, "pkg", pkg_uuid)
 
     # Use substitution patterns to avoid conflicts
-    export_path = "footprints/{{FOOTPRINT}}.png"
+    export_path = os.path.join("footprints", "{{FOOTPRINT}}.png")
     code, stdout, stderr = cli.run("open-package", "--export", export_path, pkg_path)
 
     assert code == 0
@@ -160,12 +160,13 @@ def test_export_invalid_package_path(cli):
     Test exporting with an invalid package path.
     """
     export_path = "package.png"
-    invalid_pkg_path = "/nonexistent/package"
+    invalid_pkg_path = cli.abspath("nonexistent")
     code, stdout, stderr = cli.run(
         "open-package", "--export", export_path, invalid_pkg_path
     )
-
+    check_path = os.path.join(invalid_pkg_path, ".librepcb-pkg")
+    # Should fail with appropriate error
     assert code == 1
-    assert stderr == f"ERROR: File '{invalid_pkg_path}/.librepcb-pkg' does not exist.\n"
+    assert stderr == f"ERROR: File '{check_path}' does not exist.\n"
     assert stdout == f"Open package '{invalid_pkg_path}'...\nFinished with errors!\n"
     assert not os.path.exists(cli.abspath(export_path))

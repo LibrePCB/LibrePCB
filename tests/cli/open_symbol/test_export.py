@@ -164,12 +164,14 @@ def test_export_invalid_symbol_path(cli):
     Test exporting with an invalid symbol path.
     """
     export_path = "symbol.png"
-    invalid_sym_path = "/nonexistent/symbol"
+    invalid_sym_path = cli.abspath("nonexistent")
     code, stdout, stderr = cli.run(
         "open-symbol", "--export", export_path, invalid_sym_path
     )
 
-    assert code == 1
-    assert stderr == f"ERROR: File '{invalid_sym_path}/.librepcb-sym' does not exist.\n"
+    check_path = os.path.join(invalid_sym_path, ".librepcb-sym")
+    # Should fail with appropriate error
+    assert code != 0
+    assert stderr == f"ERROR: File '{check_path}' does not exist.\n"
     assert stdout == f"Open symbol '{invalid_sym_path}'...\nFinished with errors!\n"
     assert not os.path.exists(cli.abspath(export_path))

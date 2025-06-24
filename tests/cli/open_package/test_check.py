@@ -55,12 +55,12 @@ def test_check_specific_package_with_warnings(cli):
 
 def test_check_invalid_path(cli):
     """Test checking with an invalid package path."""
-    invalid_path = "/tmp/nonexistent/package"
+    invalid_path = cli.abspath("nonexistent")
     code, stdout, stderr = cli.run("open-package", "--check", invalid_path)
-
+    check_path = os.path.join(invalid_path, ".librepcb-pkg")
     # Should fail with appropriate error
     assert code != 0
-    assert stderr == f"ERROR: File '{invalid_path}/.librepcb-pkg' does not exist.\n"
+    assert stderr == f"ERROR: File '{check_path}' does not exist.\n"
 
 
 def test_check_non_package_element(cli):
