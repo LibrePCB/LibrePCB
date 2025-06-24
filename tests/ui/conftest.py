@@ -446,7 +446,31 @@ class LibrePcbFixture(object):
 
 
 class Helpers(object):
-    pass
+    @staticmethod
+    def wait_for_file_exists(path, timeout=10.0):
+        start = time.time()
+        while True:
+            if os.path.exists(path):
+                return
+            if time.time() > (start + timeout):
+                raise TimeoutError(f"File does not exist: {path}")
+            time.sleep(0.02)
+
+    @staticmethod
+    def wait_for_directories(parent, directories, timeout=10.0):
+        start = time.time()
+        directories = set(directories)
+        dirs = None
+        while True:
+            if os.path.exists(parent):
+                dirs = set(os.listdir(parent))
+                if dirs == directories:
+                    return
+            if time.time() > (start + timeout):
+                raise TimeoutError(
+                    f"Expected directories {directories}, but found {dirs}."
+                )
+            time.sleep(0.02)
 
 
 @pytest.fixture(scope="session")

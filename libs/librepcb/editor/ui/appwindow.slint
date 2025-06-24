@@ -90,7 +90,7 @@ export component AppWindow inherits Window {
             height: sidebar.height;
         }
 
-        if Data.panel-page == PanelPage.documents: DocumentsPanel {
+        if Data.panel-page == PanelPage.documents: documents-panel := DocumentsPanel {
             x: sidebar.width;
             y: sidebar.y;
             z: 80; // For the tooltips.

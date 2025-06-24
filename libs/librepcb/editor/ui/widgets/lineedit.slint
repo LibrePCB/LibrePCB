@@ -81,7 +81,7 @@ export component LineEdit inherits Rectangle {
         suggestions-popup.show();
     }
     accessible-action-set-value(t) => {
-        edt.text = t;
+        text-edited(t)
     }
 
     placeholder-txt := Text {
