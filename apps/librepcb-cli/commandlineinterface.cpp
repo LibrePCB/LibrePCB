@@ -1455,6 +1455,12 @@ bool CommandLineInterface::openSymbol(
       std::shared_ptr<GraphicsExportSettings> settings =
           std::make_shared<GraphicsExportSettings>();
 
+      // Set margins to 0
+      settings->setMarginLeft(UnsignedLength(0));
+      settings->setMarginTop(UnsignedLength(0));
+      settings->setMarginRight(UnsignedLength(0));
+      settings->setMarginBottom(UnsignedLength(0));
+
       // Create pages with symbol painter
       GraphicsExport::Pages pages;
       pages.append(
@@ -1573,6 +1579,12 @@ bool CommandLineInterface::openPackage(
         // Create export settings (using default settings)
         std::shared_ptr<GraphicsExportSettings> settings =
             std::make_shared<GraphicsExportSettings>();
+
+        // Set margins to 0
+        settings->setMarginLeft(UnsignedLength(0));
+        settings->setMarginTop(UnsignedLength(0));
+        settings->setMarginRight(UnsignedLength(0));
+        settings->setMarginBottom(UnsignedLength(0));
 
         // Create pages with footprint painter
         GraphicsExport::Pages pages;
