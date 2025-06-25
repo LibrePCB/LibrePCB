@@ -128,6 +128,15 @@ export global Data {
                         },
                     ],
                 },
+                {
+                    type: TabType.board-3d,
+                    title: "3D",
+                    features: {
+                        save: FeatureState.enabled,
+                        undo: FeatureState.enabled,
+                        redo: FeatureState.enabled,
+                    },
+                },
             ],
             create-library-tabs: [
                 { },
@@ -262,19 +271,24 @@ export global Data {
                     },
                 },
             ],
+            board-3d-tabs: [
+                { },
+                { },
+                { },
+                { },
+                { },
+                {
+                    project-index: 0,
+                    background-color: #e6f2ff,
+                    foreground-color: Colors.black,
+                    refreshing: false,
+                    error: "Some error message here...",
+                }
+            ],
             current-tab-index: 3,
         },
         {
             tabs: [
-                {
-                    type: TabType.board-3d,
-                    title: "3D",
-                    features: {
-                        save: FeatureState.enabled,
-                        undo: FeatureState.enabled,
-                        redo: FeatureState.enabled,
-                    },
-                },
                 {
                     type: TabType.library,
                     title: "Library",
@@ -286,7 +300,7 @@ export global Data {
                 },
                 {
                     type: TabType.component-category,
-                    title: "Component Category",
+                    title: "Cmp Category",
                     features: {
                         save: FeatureState.enabled,
                         undo: FeatureState.enabled,
@@ -295,7 +309,7 @@ export global Data {
                 },
                 {
                     type: TabType.package-category,
-                    title: "Package Category",
+                    title: "Pkg Category",
                     features: { },
                 },
                 {
@@ -339,15 +353,6 @@ export global Data {
                         redo: FeatureState.enabled,
                     },
                 },
-            ],
-            board-3d-tabs: [
-                {
-                    project-index: 0,
-                    background-color: #e6f2ff,
-                    foreground-color: Colors.black,
-                    refreshing: false,
-                    error: "Some error message here...",
-                }
             ],
             library-tabs: [
                 { },
@@ -644,6 +649,8 @@ export global Data {
                 { },
                 {
                     library-index: 0,
+                    wizard-mode: false,
+                    page-index: 1,
                     path: "component1",
                     name: "Component",
                     description: "Foo Bar\nMultiline\nBlabla",
@@ -651,11 +658,35 @@ export global Data {
                     author: "Somebody",
                     version: "0.1",
                     deprecated: false,
-                    categories: ["Integrated Circuits -> Timers"],
+                    categories: [
+                        {
+                            uuid: "1",
+                            names: ["Integrated Circuit", "Timers"],
+                        },
+                        {
+                            uuid: "2",
+                            names: ["Foo", "Bar", "Foobar"],
+                        },
+                        {
+                            uuid: "3",
+                            names: ["Miscallenous"],
+                        },
+                    ],
+                    categories-tree: [
+                        {
+                            level: 0,
+                            text: "Root Category",
+                        },
+                        {
+                            level: 1,
+                            text: "Integrated Circuits",
+                        },
+                    ],
                     checks: {
                         type: RuleCheckType.component-check,
                         state: RuleCheckState.up-to-date,
                         unapproved: 2,
+                        errors: 0,
                     },
                 },
             ],
@@ -684,7 +715,7 @@ export global Data {
                     },
                 },
             ],
-            current-tab-index: 4,
+            current-tab-index: 5,
         },
     ];
 

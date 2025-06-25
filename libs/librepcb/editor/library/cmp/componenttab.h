@@ -23,9 +23,11 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../windowtab.h"
+#include "../libraryeditortab.h"
 
-#include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/library/cmp/componentsymbolvariant.h>
+#include <librepcb/core/types/elementname.h>
+#include <librepcb/core/types/version.h>
 
 #include <QtCore>
 
@@ -38,7 +40,9 @@ class Component;
 
 namespace editor {
 
+class CategoryTreeModel2;
 class LibraryEditor2;
+class LibraryElementCategoriesModel;
 
 /*******************************************************************************
  *  Class ComponentTab
@@ -47,7 +51,7 @@ class LibraryEditor2;
 /**
  * @brief The ComponentTab class
  */
-class ComponentTab final : public WindowTab {
+class ComponentTab final : public LibraryEditorTab {
   Q_OBJECT
 
 public:
@@ -62,18 +66,75 @@ public:
   ~ComponentTab() noexcept;
 
   // General Methods
-  FilePath getDirectoryPath() const noexcept;
+  FilePath getDirectoryPath() const noexcept override;
   ui::TabData getUiData() const noexcept override;
   ui::ComponentTabData getDerivedUiData() const noexcept;
   void setDerivedUiData(const ui::ComponentTabData& data) noexcept;
   void trigger(ui::TabAction a) noexcept override;
+  bool requestClose() noexcept override;
 
   // Operator Overloadings
   ComponentTab& operator=(const ComponentTab& rhs) = delete;
 
+protected:
+  std::optional<std::pair<RuleCheckMessageList, QSet<SExpression>>>
+      runChecksImpl() override;
+  bool autoFixImpl(const std::shared_ptr<const RuleCheckMessage>& msg,
+                   bool checkOnly) override;
+  template <typename MessageType>
+  bool autoFixHelper(const std::shared_ptr<const RuleCheckMessage>& msg,
+                     bool checkOnly);
+  template <typename MessageType>
+  void autoFix(const MessageType& msg);
+  void messageApprovalChanged(const SExpression& approval,
+                              bool approved) noexcept override;
+  void notifyDerivedUiDataChanged() noexcept override;
+
 private:
-  LibraryEditor2& mEditor;
+  bool isWritable() const noexcept;
+  bool isInterfaceBroken() const noexcept;
+  void refreshMetadata() noexcept;
+  void commitMetadata() noexcept;
+  bool save() noexcept;
+
+private:
+  // References
   std::unique_ptr<Component> mComponent;
+  const bool mIsNewElement;
+
+  // State
+  bool mWizardMode;
+  int mCurrentPageIndex;
+  bool mAddCategoryRequested;
+  // bool mCompactLayout;
+
+  // Library metadata to be applied
+  slint::SharedString mName;
+  slint::SharedString mNameError;
+  ElementName mNameParsed;
+  slint::SharedString mDescription;
+  slint::SharedString mKeywords;
+  slint::SharedString mAuthor;
+  slint::SharedString mVersion;
+  slint::SharedString mVersionError;
+  Version mVersionParsed;
+  bool mDeprecated;
+  slint::SharedString mDatasheetUrl;
+  slint::SharedString mDatasheetUrlError;
+  bool mSchematicOnly;
+  slint::SharedString mPrefix;
+  slint::SharedString mPrefixError;
+  slint::SharedString mDefaultValue;
+  slint::SharedString mDefaultValueError;
+
+  // UI data
+  std::shared_ptr<LibraryElementCategoriesModel> mCategories;
+  std::shared_ptr<CategoryTreeModel2> mCategoriesTree;
+
+  /// Broken interface detection
+  bool mOriginalIsSchematicOnly;
+  QSet<Uuid> mOriginalSignalUuids;
+  ComponentSymbolVariantList mOriginalSymbolVariants;
 };
 
 /*******************************************************************************

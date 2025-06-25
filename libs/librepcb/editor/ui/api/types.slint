@@ -837,23 +837,41 @@ export struct PackageTabData {
 
 // Additional data for component editor tabs
 export struct ComponentTabData {
+    // General
     library-index: int,
+    wizard-mode: bool,
+    page-index: int,
+
+    // Metadata
     path: string,
     name: string,
+    name-error: string,
     description: string,
     keywords: string,
     author: string,
     version: string,
+    version-error: string,
     deprecated: bool,
-    categories: [string],
-    resources: [ResourceData],
+    categories: [LibraryElementCategoryData],
+    categories-tree: [TreeViewItemData],
+    datasheet-url: string,
+    datasheet-url-error: string,
     schematic-only: bool,
     prefix: string,
+    prefix-error: string,
     default-value: string,
-    attributes: [AttributeData],
-    cmp-signals: [ComponentSignalData],  // Name conflict with Qt's "signals"
-    variants: [ComponentVariantData],
+    default-value-error: string,
     checks: RuleCheckData,
+
+    // Messages
+    interface-broken-msg: bool,
+
+    new-category: string,  // Set to UUID by UI, reset by backend.
+
+
+    //attributes: [AttributeData],
+    //cmp-signals: [ComponentSignalData],  // Name conflict with Qt's "signals"
+    //variants: [ComponentVariantData],
 }
 
 // Additional data for device editor tabs

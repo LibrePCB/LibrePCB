@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/core/library/cmp/componentprefix.h>
 #include <librepcb/core/types/elementname.h>
 #include <librepcb/core/types/fileproofname.h>
 #include <librepcb/core/types/version.h>
@@ -120,6 +121,12 @@ std::optional<FileProofName> validateFileProofName(
 std::optional<QUrl> validateUrl(const QString& input,
                                 slint::SharedString& error,
                                 bool allowEmpty = false) noexcept;
+
+void validateComponentPrefix(const QString& input,
+                             slint::SharedString& error) noexcept;
+
+void validateComponentDefaultValue(const QString& input,
+                                   slint::SharedString& error) noexcept;
 
 /*******************************************************************************
  *  End of File

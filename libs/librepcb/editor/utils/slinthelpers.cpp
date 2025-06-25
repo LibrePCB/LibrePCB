@@ -354,6 +354,25 @@ std::optional<QUrl> validateUrl(const QString& input,
   }
 }
 
+void validateComponentPrefix(const QString& input,
+                             slint::SharedString& error) noexcept {
+  if (ComponentPrefixConstraint()(input.trimmed()) &&
+      (!input.trimmed().isEmpty())) {
+    error = slint::SharedString();
+  } else {
+    error = getInputError(input);
+  }
+}
+
+void validateComponentDefaultValue(const QString& input,
+                                   slint::SharedString& error) noexcept {
+  if (!input.trimmed().isEmpty()) {
+    error = slint::SharedString();
+  } else {
+    error = getInputError(input);
+  }
+}
+
 /*******************************************************************************
  *  End of File
  ******************************************************************************/

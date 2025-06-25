@@ -63,6 +63,7 @@
 #include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
+#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace

@@ -1,10 +1,8 @@
-//import { DrawWireToolBar } from "drawwiretoolbar.slint";
-//import { DrawPolygonToolBar } from "drawpolygontoolbar.slint";
-//import { AddTextToolBar } from "addtexttoolbar.slint";
-//import { AddComponentToolBar } from "addcomponenttoolbar.slint";
 import { Tab } from "../../tab.slint";
+import { LibraryRuleCheckLink } from "../libraryrulechecklink.slint";
 import {
     Button,
+    CategoriesListView,
     ComboBox,
     LineEdit,
     LinkText,
@@ -15,6 +13,7 @@ import {
     Switch,
     TextEdit,
     ToolButton,
+    TreeItemPickerPopup,
 } from "../../widgets.slint";
 import {
     Backend,
@@ -33,6 +32,7 @@ component ComponentMetadata inherits GridLayout {
     in property <int> section-index;
     in-out property <[ComponentTabData]> tabs;
     in property <int> index;
+    in property <bool> read-only;
 
     padding: 10px;
     spacing: 8px;
@@ -46,10 +46,22 @@ component ComponentMetadata inherits GridLayout {
 
         LineEdit {
             text: tabs[index].name;
-            //validation-error: tabs[index].name-error;
+            validation-error: tabs[index].name-error;
+            read-only: read-only;
+
+            init => {
+                if !read-only {
+                    self.select-all();
+                }
+            }
 
             text-edited(text) => {
                 tabs[index].name = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].name = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
             }
         }
     }
@@ -64,9 +76,15 @@ component ComponentMetadata inherits GridLayout {
         TextEdit {
             height: 100px;
             text: tabs[index].description;
+            read-only: read-only;
 
             text-edited(text) => {
                 tabs[index].description = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].description = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
             }
         }
     }
@@ -80,9 +98,15 @@ component ComponentMetadata inherits GridLayout {
 
         LineEdit {
             text: tabs[index].keywords;
+            read-only: read-only;
 
             text-edited(text) => {
                 tabs[index].keywords = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].keywords = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
             }
         }
     }
@@ -96,9 +120,15 @@ component ComponentMetadata inherits GridLayout {
 
         LineEdit {
             text: tabs[index].author;
+            read-only: read-only;
 
             text-edited(text) => {
                 tabs[index].author = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].author = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
             }
         }
     }
@@ -112,10 +142,16 @@ component ComponentMetadata inherits GridLayout {
 
         LineEdit {
             text: tabs[index].version;
-            //validation-error: tabs[index].version-error;
+            validation-error: tabs[index].version-error;
+            read-only: read-only;
 
             text-edited(text) => {
                 tabs[index].version = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].version = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
             }
         }
     }
@@ -131,9 +167,11 @@ component ComponentMetadata inherits GridLayout {
             font-size: 10px;
             text: @tr("Check this if the element should no longer be used.");
             checked: tabs[index].deprecated;
+            enabled: !read-only;
 
             toggled(checked) => {
                 tabs[index].deprecated = checked;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
             }
         }
     }
@@ -145,8 +183,13 @@ component ComponentMetadata inherits GridLayout {
             text: @tr("Categories:");
         }
 
-        TextEdit {
-            enabled: false;
+        CategoriesListView {
+            model: tabs[index].categories;
+            read-only: read-only;
+
+            add-triggered => {
+                add-category-popup.show();
+            }
         }
     }
 
@@ -158,12 +201,18 @@ component ComponentMetadata inherits GridLayout {
         }
 
         LineEdit {
-            //text: tabs[index].datasheet;
-            //validation-error: tabs[index].datasheet-error;
+            text: tabs[index].datasheet-url;
+            validation-error: tabs[index].datasheet-url-error;
+            read-only: read-only;
 
-            //text-edited(text) => {
-            //    tabs[index].datasheet = text;
-            //}
+            text-edited(text) => {
+                tabs[index].datasheet-url = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].datasheet-url = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
         }
     }
 
@@ -178,9 +227,11 @@ component ComponentMetadata inherits GridLayout {
             font-size: 10px;
             text: @tr("Check this if this component cannot be placed on boards (e.g. supply symbols, sheet frames, ...).");
             checked: tabs[index].schematic-only;
+            enabled: !read-only;
 
             toggled(checked) => {
                 tabs[index].schematic-only = checked;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
             }
         }
     }
@@ -194,10 +245,16 @@ component ComponentMetadata inherits GridLayout {
 
         LineEdit {
             text: tabs[index].prefix;
-            //validation-error: tabs[index].prefix-error;
+            validation-error: tabs[index].prefix-error;
+            read-only: read-only;
 
             text-edited(text) => {
                 tabs[index].prefix = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].prefix = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
             }
         }
     }
@@ -210,11 +267,18 @@ component ComponentMetadata inherits GridLayout {
         }
 
         TextEdit {
-            height: 100px;
+            preferred-height: 100px;
             text: tabs[index].default-value;
+            validation-error: tabs[index].default-value-error;
+            read-only: read-only;
 
             text-edited(text) => {
                 tabs[index].default-value = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].default-value = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
             }
         }
     }
@@ -226,9 +290,71 @@ component ComponentMetadata inherits GridLayout {
             text: @tr("Attributes:");
         }
 
-        TextEdit {
-            height: 100px;
-            enabled: false;
+        /*TextEdit {
+            preferred-height: 100px;
+            text: tabs[index].default-value;
+            read-only: read-only;
+
+            text-edited(text) => {
+                tabs[index].default-value = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].default-value = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }*/
+    }
+
+    Row {
+        Rectangle { }
+
+        HorizontalLayout {
+            spacing: 5px;
+
+            if !read-only: save-btn := Button {
+                width: max(self.preferred-width, 100px);
+                primary: Data.sections[section-index].tabs[index].unsaved-changes;
+                icon: @image-url("../../../../../font-awesome/svgs/solid/check.svg");
+                text: @tr("Save");
+
+                clicked => {
+                    Backend.trigger-tab(section-index, index, TabAction.save);
+                }
+            }
+
+            if !tabs[index].wizard-mode: LibraryRuleCheckLink {
+                data: tabs[index].checks;
+
+                clicked => {
+                    Data.set-current-tab(section-index, index);
+                    Data.panel-page = PanelPage.rule-check;
+                }
+            }
+
+            Rectangle { }
+        }
+    }
+
+    Row {
+        Rectangle { }
+    }
+
+    // Open the category chooser when requested by the backend.
+    //property <string> new-category: tabs[index].new-category;
+    //changed new-category => {
+    //    if new-category == "choose" {
+    //        add-category-popup.show();
+    //    }
+    //}
+
+    add-category-popup := TreeItemPickerPopup {
+        width: parent.width;
+        height: parent.height;
+        model: tabs[index].categories-tree;
+
+        item-picked(item) => {
+            tabs[index].new-category = item.user-data;
         }
     }
 
@@ -245,18 +371,40 @@ export component ComponentTab inherits Tab {
 
     enabled: true;
 
-    SlideView {
-        pages: [@tr("Metadata"), @tr("Signals"), @tr("Symbols")];
-
-        ComponentMetadata {
+    VerticalLayout {
+        Rectangle {
             width: parent.width;
-            section-index: section-index;
-            tabs: tabs;
-            index: index;
+            height: tabs[index].interface-broken-msg ? (self.preferred-height + 8px) : 0;
+            background: yellow;
+            visible: self.height > 0;
+            clip: true;
+
+            animate height { duration: 150ms; }
+
+            Text {
+                width: parent.width - 8px;
+                color: #800000;
+                font-weight: 600;
+                horizontal-alignment: left;
+                vertical-alignment: center;
+                wrap: word-wrap;
+                text: @tr("Attention").to-uppercase() + ": " + @tr("You have changed some important properties of this library element. This is a serious issue as it breaks all dependent library elements! If this library element is already used somewhere, it is highly recommended to create a new one instead of modifying this one.");
+            }
         }
 
-        Rectangle { }
+        SlideView {
+            pages: [@tr("Metadata"), @tr("Signals"), @tr("Symbols")];
 
-        Rectangle { }
+            ComponentMetadata {
+                width: parent.width;
+                section-index: section-index;
+                tabs: tabs;
+                index: index;
+            }
+
+            Rectangle { }
+
+            Rectangle { }
+        }
     }
 }
