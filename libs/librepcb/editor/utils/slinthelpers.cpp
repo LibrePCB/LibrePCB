@@ -336,6 +336,17 @@ std::optional<FileProofName> validateFileProofName(
   }
 }
 
+std::optional<CircuitIdentifier> validateCircuitIdentifier(const QString& input,
+                                                           slint::SharedString& error) noexcept {
+  if (auto val = parseCircuitIdentifier(cleanCircuitIdentifier(input))) {
+    error = slint::SharedString();
+    return val;
+  } else {
+    error = getInputError(input);
+    return std::nullopt;
+  }
+}
+
 std::optional<QUrl> validateUrl(const QString& input,
                                 slint::SharedString& error,
                                 bool allowEmpty) noexcept {

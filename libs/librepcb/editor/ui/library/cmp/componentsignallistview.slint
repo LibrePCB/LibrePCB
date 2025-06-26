@@ -1,0 +1,235 @@
+import { ScrollView } from "std-widgets.slint";
+import {
+    Button,
+    CategoriesListView,
+    ComboBox,
+    IconButton,
+    LineEdit,
+    LinkText,
+    MessageBox,
+    Palette,
+    SceneButton,
+    SlideView,
+    Switch,
+    TextEdit,
+    ToolButton,
+    TreeItemPickerPopup,
+} from "../../widgets.slint";
+import {
+    Backend,
+    ComponentSignalData,
+    ComponentTabData,
+    Constants,
+    Data,
+    DismissableMessageAction,
+    EditorCommandSet as Cmd,
+    EditorTool,
+    PanelPage,
+    TabAction,
+    WindowSectionData,
+} from "../../api.slint";
+
+
+component ComponentSignalListViewHeader inherits TouchArea {
+    in property <string> text;
+
+    Text {
+        width: 100%;
+        horizontal-alignment: left;
+        vertical-alignment: center;
+        text: text;
+    }
+}
+
+export component ComponentSignalListView {
+    in-out property <[ComponentSignalData]> model;
+    property <length> row-height: 25px;
+    property <length> row-spacing: 3px;
+
+    callback edited;
+
+    VerticalLayout {
+        alignment: start;
+        spacing: 10px;
+
+        HorizontalLayout {
+            padding: 5px;
+            spacing: 5px;
+
+            Text {
+                height: row-height;
+                vertical-alignment: center;
+                text: @tr("Add Signals:");
+            }
+
+            LineEdit {
+                height: row-height;
+                placeholder-text: @tr("Signal name (may contain ranges like \"1..5\")");
+            }
+
+            IconButton {
+                height: row-height;
+                style: hyperlink;
+                icon-scale: 0.7;
+                icon: @image-url("../../../../../font-awesome/svgs/solid/plus.svg");
+            }
+        }
+
+        ScrollView {
+            preferred-height: l.preferred-height;
+
+            Rectangle {
+                x: 0;
+                y: row-height + 3px;
+                height: 1px;
+                background: #404040;
+            }
+
+            l := HorizontalLayout {
+                padding: 5px;
+                spacing: 5px;
+
+                col0-l := VerticalLayout {
+                    width: self.preferred-width;
+                    spacing: row-spacing;
+
+                    ComponentSignalListViewHeader {
+                        height: row-height;
+                        text: @tr("#");
+                    }
+
+                    for item[index] in model: Text {
+                        height: row-height;
+                        horizontal-alignment: right;
+                        vertical-alignment: center;
+                        text: index + 1;
+                    }
+                }
+
+                Rectangle {
+                    width: 1px;
+                    background: #404040;
+                }
+
+                VerticalLayout {
+                    width: self.preferred-width;
+                    spacing: row-spacing;
+
+                    ComponentSignalListViewHeader {
+                        height: row-height;
+                        text: @tr("ID");
+                    }
+
+                    for item[index] in model: Text {
+                        height: row-height;
+                        horizontal-alignment: right;
+                        vertical-alignment: center;
+                        font-family: "Noto Sans Mono";
+                        text: item.id;
+                    }
+                }
+
+                Rectangle {
+                    width: 1px;
+                    background: #404040;
+                }
+
+                VerticalLayout {
+                    spacing: row-spacing;
+
+                    ComponentSignalListViewHeader {
+                        height: row-height;
+                        text: @tr("Name");
+                    }
+
+                    for item[index] in model: LineEdit {
+                        height: row-height;
+                        text: item.name;
+                        validation-error: item.name-error;
+
+                        text-edited(text) => {
+                            model[index].name = text;
+                        }
+
+                        text-accepted(text) => {
+                            model[index].name = text;
+                            edited();
+                        }
+                    }
+                }
+
+                Rectangle {
+                    width: 1px;
+                    background: #404040;
+                }
+
+                VerticalLayout {
+                    spacing: row-spacing;
+
+                    ComponentSignalListViewHeader {
+                        height: row-height;
+                        text: @tr("Required");
+                    }
+
+                    for item[index] in model: Rectangle {
+                        height: row-height;
+
+                        Switch {
+                            width: self.preferred-width;
+                            size: 20px;
+                            checked: item.required;
+
+                            toggled(checked) => {
+                                model[index].required = checked;
+                                edited();
+                            }
+                        }
+                    }
+                }
+
+                Rectangle {
+                    width: 1px;
+                    background: #404040;
+                }
+
+                VerticalLayout {
+                    spacing: row-spacing;
+
+                    ComponentSignalListViewHeader {
+                        height: row-height;
+                        text: @tr("Forced Net");
+                    }
+
+                    for item[index] in model: LineEdit {
+                        height: row-height;
+                        text: item.forced-net-name;
+
+                        text-edited(text) => {
+                            model[index].forced-net-name = text;
+                        }
+
+                        text-accepted(text) => {
+                            model[index].forced-net-name = text;
+                            edited();
+                        }
+                    }
+                }
+
+                VerticalLayout {
+                    spacing: row-spacing;
+
+                    ComponentSignalListViewHeader {
+                        height: row-height;
+                    }
+
+                    for item[index] in model: IconButton {
+                        height: row-height;
+                        style: hyperlink;
+                        icon-scale: 0.7;
+                        icon: @image-url("../../../../../font-awesome/svgs/solid/trash-can.svg");
+                    }
+                }
+            }
+        }
+    }
+}

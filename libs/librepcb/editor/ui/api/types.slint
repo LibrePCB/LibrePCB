@@ -109,7 +109,9 @@ export struct LibraryDependency {
 }
 
 export struct ComponentSignalData {
+    id: string,
     name: string,
+    name-error: string,
     //role: ComponentSignalRole,
     forced-net-name: string,
     required: bool,
@@ -861,6 +863,7 @@ export struct ComponentTabData {
     prefix-error: string,
     default-value: string,
     default-value-error: string,
+    cmp-signals: [ComponentSignalData],  // Name conflict with Qt's "signals"
     checks: RuleCheckData,
 
     // Messages
@@ -870,7 +873,6 @@ export struct ComponentTabData {
 
 
     //attributes: [AttributeData],
-    //cmp-signals: [ComponentSignalData],  // Name conflict with Qt's "signals"
     //variants: [ComponentVariantData],
 }
 

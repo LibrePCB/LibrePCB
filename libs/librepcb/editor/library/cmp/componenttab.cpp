@@ -33,6 +33,7 @@
 #include "../cmd/cmdcomponentsymbolvariantedit.h"
 #include "../libraryeditor2.h"
 #include "../libraryelementcategoriesmodel.h"
+#include "componentsignallistmodel2.h"
 #include "utils/slinthelpers.h"
 
 #include <librepcb/core/fileio/transactionalfilesystem.h>
@@ -75,6 +76,7 @@ ComponentTab::ComponentTab(LibraryEditor2& editor,
     mCategoriesTree(new CategoryTreeModel2(editor.getWorkspace().getLibraryDb(),
                                            editor.getWorkspace().getSettings(),
                                            CategoryTreeModel2::Filter::CmpCat)),
+    mSignals(new ComponentSignalListModel2()),
     mOriginalIsSchematicOnly(mComponent->isSchematicOnly()),
     mOriginalSignalUuids(mComponent->getSignals().getUuidSet()),
     mOriginalSymbolVariants(mComponent->getSymbolVariants()) {
@@ -85,6 +87,8 @@ ComponentTab::ComponentTab(LibraryEditor2& editor,
           &ComponentTab::refreshMetadata);
 
   // Connect models.
+  mSignals->setSignalList(&mComponent->getSignals());
+  mSignals->setUndoStack(mUndoStack.get());
   connect(mCategories.get(), &LibraryElementCategoriesModel::modified, this,
           &ComponentTab::commitMetadata, Qt::QueuedConnection);
 
@@ -101,6 +105,9 @@ ComponentTab::ComponentTab(LibraryEditor2& editor,
 
 ComponentTab::~ComponentTab() noexcept {
   deactivate();
+
+  mSignals->setSignalList(nullptr);
+  mSignals->setUndoStack(nullptr);
 
   // Delete all command objects in the undo stack. This mmust be done before
   // other important objects are deleted, as undo command objects can hold
@@ -162,6 +169,7 @@ ui::ComponentTabData ComponentTab::getDerivedUiData() const noexcept {
       mPrefixError,  // Prefix error
       mDefaultValue,  // Default value
       mDefaultValueError,  // Default value error
+      mSignals,  // Signals
       ui::RuleCheckData{
           ui::RuleCheckType::ComponentCheck,  // Checks type
           ui::RuleCheckState::UpToDate,  // Checks state
@@ -206,6 +214,7 @@ void ComponentTab::setDerivedUiData(const ui::ComponentTabData& data) noexcept {
   }
   mAddCategoryRequested = false;
   mDatasheetUrl = data.datasheet_url;
+  validateUrl(s2q(mDatasheetUrl), mDatasheetUrlError, true);
   mSchematicOnly = data.schematic_only;
   mPrefix = data.prefix;
   validateComponentPrefix(s2q(mPrefix), mPrefixError);
@@ -481,7 +490,7 @@ void ComponentTab::refreshMetadata() noexcept {
   validateComponentDefaultValue(s2q(mDefaultValue), mDefaultValueError);
 
   if (auto dbRes = mComponent->getResources().value(0)) {
-    mDatasheetUrl = q2s(dbRes->getUrl().toDisplayString());
+    mDatasheetUrl = q2s(dbRes->getUrl().toString());
   } else {
     mDatasheetUrl = slint::SharedString();
   }
@@ -513,7 +522,7 @@ void ComponentTab::commitMetadata() noexcept {
       const ElementName name(
           cleanElementName("Datasheet " % s2q(mName).trimmed()));
       const QString dbUrlStr = s2q(mDatasheetUrl).trimmed();
-      const QUrl dbUrl = QUrl::fromUserInput(dbUrlStr);
+      const QUrl dbUrl(dbUrlStr, QUrl::TolerantMode);
       std::shared_ptr<Resource> res = resources.value(0);
       if ((dbUrl.isValid()) && (!res)) {
         resources.append(
@@ -521,7 +530,7 @@ void ComponentTab::commitMetadata() noexcept {
       } else if ((!dbUrl.isValid()) && res) {
         resources.remove(res.get());
       } else if ((dbUrl.isValid()) && res &&
-                 (dbUrlStr != res->getUrl().toDisplayString())) {
+                 (dbUrlStr != res->getUrl().toString())) {
         res->setName(name);
         res->setUrl(dbUrl);
       }
@@ -530,6 +539,8 @@ void ComponentTab::commitMetadata() noexcept {
     }
 
     mUndoStack->execCmd(cmd.release());
+
+    mSignals->apply();
   } catch (const Exception& e) {
     QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
   }

@@ -122,7 +122,7 @@ export component LineEdit inherits Rectangle {
             }
 
             view := ScrollView {
-                min-width: edt.min-width;
+                min-width: 0;  // Required to avoid text overflow.
                 preferred-width: edt.preferred-width;
                 viewport-width: edt.width;
                 viewport-height: edt.height;

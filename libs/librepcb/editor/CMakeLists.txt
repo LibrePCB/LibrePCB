@@ -196,6 +196,8 @@ add_library(
   library/cmp/componentsignallisteditorwidget.h
   library/cmp/componentsignallistmodel.cpp
   library/cmp/componentsignallistmodel.h
+  library/cmp/componentsignallistmodel2.cpp
+  library/cmp/componentsignallistmodel2.h
   library/cmp/componentsymbolvarianteditdialog.cpp
   library/cmp/componentsymbolvarianteditdialog.h
   library/cmp/componentsymbolvarianteditdialog.ui

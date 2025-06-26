@@ -1,5 +1,6 @@
 import { Tab } from "../../tab.slint";
 import { LibraryRuleCheckLink } from "../libraryrulechecklink.slint";
+import { ComponentSignalListView } from "componentsignallistview.slint";
 import {
     Button,
     CategoriesListView,
@@ -394,6 +395,7 @@ export component ComponentTab inherits Tab {
 
         SlideView {
             pages: [@tr("Metadata"), @tr("Signals"), @tr("Symbols")];
+            current-index: tabs[index].page-index;
 
             ComponentMetadata {
                 width: parent.width;
@@ -402,9 +404,20 @@ export component ComponentTab inherits Tab {
                 index: index;
             }
 
-            Rectangle { }
+            ComponentSignalListView {
+                width: parent.width;
+                model: tabs[index].cmp-signals;
+
+                edited => {
+                    Backend.trigger-tab(section-index, index, TabAction.apply);
+                }
+            }
 
             Rectangle { }
+
+            page-clicked(idx) => {
+                tabs[index].page-index = idx;
+            }
         }
     }
 }
