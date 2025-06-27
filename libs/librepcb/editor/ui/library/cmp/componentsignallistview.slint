@@ -1,4 +1,3 @@
-import { ScrollView } from "std-widgets.slint";
 import {
     Button,
     CategoriesListView,
@@ -6,10 +5,13 @@ import {
     IconButton,
     LineEdit,
     LinkText,
+    ScrollView,
     MessageBox,
     Palette,
+    MenuPopup,
     SceneButton,
     SlideView,
+    MenuItem,
     Switch,
     TextEdit,
     ToolButton,
@@ -32,10 +34,11 @@ import {
 
 component ComponentSignalListViewHeader inherits TouchArea {
     in property <string> text;
+    in property <TextHorizontalAlignment> alignment: left;
 
     Text {
         width: 100%;
-        horizontal-alignment: left;
+        horizontal-alignment: alignment;
         vertical-alignment: center;
         text: text;
     }
@@ -75,7 +78,7 @@ export component ComponentSignalListView {
             }
         }
 
-        ScrollView {
+        view := ScrollView {
             preferred-height: l.preferred-height;
 
             Rectangle {
@@ -95,6 +98,7 @@ export component ComponentSignalListView {
 
                     ComponentSignalListViewHeader {
                         height: row-height;
+                        alignment: right;
                         text: @tr("#");
                     }
 
@@ -193,24 +197,35 @@ export component ComponentSignalListView {
                 }
 
                 VerticalLayout {
+                    width: (forced-net-cells-l.preferred-width > 0) ? self.preferred-width : 0;
                     spacing: row-spacing;
+
+                    animate width { duration: 150ms; }
 
                     ComponentSignalListViewHeader {
                         height: row-height;
                         text: @tr("Forced Net");
                     }
 
-                    for item[index] in model: LineEdit {
-                        height: row-height;
-                        text: item.forced-net-name;
+                    forced-net-cells-l := VerticalLayout {
+                        for item[index] in model: HorizontalLayout {
+                            alignment: start;
 
-                        text-edited(text) => {
-                            model[index].forced-net-name = text;
-                        }
+                            LineEdit {
+                                height: row-height;
+                                text: item.forced-net-name;
+                                visible: self.has-focus || (!self.text.is-empty);
+                                max-width: self.visible ? self.preferred-width : 0;
 
-                        text-accepted(text) => {
-                            model[index].forced-net-name = text;
-                            edited();
+                                text-edited(text) => {
+                                    model[index].forced-net-name = text;
+                                }
+
+                                text-accepted(text) => {
+                                    model[index].forced-net-name = text;
+                                    edited();
+                                }
+                            }
                         }
                     }
                 }
@@ -226,9 +241,45 @@ export component ComponentSignalListView {
                         height: row-height;
                         style: hyperlink;
                         icon-scale: 0.7;
-                        icon: @image-url("../../../../../font-awesome/svgs/solid/trash-can.svg");
+                        icon: @image-url("../../../../../font-awesome/svgs/solid/ellipsis.svg");
+
+                        clicked => {
+                            context-menu-item-index = index;
+                            context-menu-x = self.absolute-position.x - root.absolute-position.x;
+                            context-menu-y = self.absolute-position.y - root.absolute-position.y + self.height;
+                            context-menu-popup.show();
+                        }
                     }
                 }
+            }
+        }
+    }
+
+    property <length> context-menu-x;
+    property <length> context-menu-y;
+    property <int> context-menu-item-index;
+    context-menu-popup := MenuPopup {
+        x: context-menu-x;
+        y: context-menu-y;
+
+        set-forced-net-name-item := MenuItem {
+            text: @tr("Set Forced Net Name");
+            //icon: @image-url("../../../font-awesome/svgs/solid/folder-open.svg");
+            enabled: model[context-menu-item-index].forced-net-name.is-empty;
+
+            clicked => {
+                model[context-menu-item-index].forced-net-name = " ";
+            }
+        }
+
+        remove-item := MenuItem {
+            cmd: Cmd.remove;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/trash-can.svg");
+            //shortcuts: "Del";  // Hardcoded in the UI.
+            shortcuts: "";
+
+            clicked => {
+                //root.model[context-menu-item-index].action = TreeViewItemAction.delete;
             }
         }
     }
