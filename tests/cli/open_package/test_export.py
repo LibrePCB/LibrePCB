@@ -5,7 +5,7 @@ import os
 
 import params
 import pytest
-from helpers import _clean, nofmt
+from helpers import nofmt, strip_image_file_extensions
 
 """
 Test command "open-package --export"
@@ -30,7 +30,7 @@ def test_if_unknown_file_extension_fails(cli, pkg_uuid):
     code, stdout, stderr = cli.run("open-package", "--export", export_path, pkg_path)
     assert code == 1
     assert (
-        _clean(stderr)
+        strip_image_file_extensions(stderr)
         == "  ERROR: Unknown extension 'foo'. Supported extensions: pdf, svg, ***\n"
     )
     assert stdout == nofmt(f"""\
@@ -65,12 +65,7 @@ def test_export_package_to_png_relative(cli, pkg_uuid):
     # Check that all footprints were exported
     footprint_dir = cli.abspath("footprints")
     assert os.path.isdir(footprint_dir)
-    exported_files = os.listdir(footprint_dir)
-    # This package has 2 footprints, so we expect 2 PNGs
-    assert len(exported_files) == 2
-    for f in exported_files:
-        assert f.endswith(".png")
-        assert os.path.getsize(os.path.join(footprint_dir, f)) > 0
+    assert set(os.listdir(footprint_dir)) == set(["Vertical.png", "Horizontal.png"])
 
 
 @pytest.mark.parametrize(
@@ -97,12 +92,9 @@ def test_export_package_to_svg_absolute(cli, pkg_uuid):
 
     # Check that all footprints were exported
     assert os.path.isdir(export_dir)
-    exported_files = os.listdir(export_dir)
-    assert len(exported_files) == 2
-    for f in exported_files:
-        assert f.endswith(".svg")
-        assert " with spaces" in f
-        assert os.path.getsize(os.path.join(export_dir, f)) > 0
+    assert set(os.listdir(export_dir)) == set(
+        ["Vertical with spaces.svg", "Horizontal with spaces.svg"]
+    )
 
 
 def test_if_output_directories_are_created(cli):
@@ -124,8 +116,7 @@ def test_if_output_directories_are_created(cli):
     assert stderr == ""
     assert os.path.isdir(export_dir)
 
-    exported_files = os.listdir(export_dir)
-    assert len(exported_files) == 2
+    assert set(os.listdir(export_dir)) == set(["Vertical.pdf", "Horizontal.pdf"])
 
 
 def test_export_with_conflicting_filenames_fails(cli):

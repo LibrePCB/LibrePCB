@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from helpers import _clean
+from helpers import strip_image_file_extensions
 
 """
 Test command "open-package" (basic parser tests)
@@ -36,7 +36,9 @@ Help: {executable} open-package --help
 def test_help(cli):
     code, stdout, stderr = cli.run("open-package", "--help")
     assert stderr == ""
-    assert _clean(stdout) == HELP_TEXT.format(executable=cli.executable)
+    assert strip_image_file_extensions(stdout) == HELP_TEXT.format(
+        executable=cli.executable
+    )
     assert code == 0
 
 

@@ -64,27 +64,6 @@ private:  // Methods
     QStringList nonApprovedMessages;
   };
 
-  /**
-   * @brief Gather validation check messages for a library element
-   *
-   * This function runs validation checks on a library element and separates
-   * the results into approved and non-approved messages.
-   *
-   * @param element The library element to check
-   * @return CheckResult containing the count of approved messages and a list
-   *         of non-approved messages
-   */
-  CheckResult gatherElementCheckMessages(
-      const LibraryBaseElement& element) const;
-
-  // Print check summary
-  void printCheckSummary(const FilePath& path, const QString& relPath,
-                         const CheckResult& checkResult) const;
-
-  void processLibraryElement(const QString& libDir, TransactionalFileSystem& fs,
-                             LibraryBaseElement& element, bool runCheck,
-                             bool minifyStepFiles, bool save, bool strict,
-                             bool& success) const;
   bool openProject(
       const QString& projectFile, bool runErc, bool runDrc,
       const QString& drcSettingsPath, const QStringList& runJobs,
@@ -99,8 +78,35 @@ private:  // Methods
       const QStringList& boardIndices, bool removeOtherBoards,
       const QStringList& avNames, const QStringList& avIndices,
       const QString& setDefaultAv, bool save, bool strict) const noexcept;
+
   bool openLibrary(const QString& libDir, bool all, bool runCheck,
                    bool minifyStepFiles, bool save, bool strict) const noexcept;
+
+  /**
+   * @brief Gather validation check messages for a library element
+   *
+   * This function runs validation checks on a library element and separates
+   * the results into approved and non-approved messages.
+   *
+   * @param element The library element to check
+   * @return CheckResult containing the count of approved messages and a list
+   *         of non-approved messages
+   */
+  CheckResult gatherElementCheckMessages(
+      const LibraryBaseElement& element) const;
+
+  // Format check summary  
+  QStringList formatCheckSummary(const FilePath& path, const QString& relPath,
+                                 const CheckResult& checkResult) const;
+  
+  // Format simple check counts (for ERC/DRC)
+  QStringList formatCheckCounts(int approvedCount, int nonApprovedCount,
+                                const QString& indent = "") const;
+
+  void processLibraryElement(const QString& libDir, TransactionalFileSystem& fs,
+                             LibraryBaseElement& element, bool runCheck,
+                             bool minifyStepFiles, bool save, bool strict,
+                             bool& success) const;
   bool openSymbol(const QString& symbolFile, bool runCheck,
                   const QString& exportFile) const noexcept;
   bool openPackage(const QString& packageFile, bool runCheck,

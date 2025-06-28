@@ -11,7 +11,7 @@ def nofmt(arg):
     return arg
 
 
-def _clean(help_text):
+def strip_image_file_extensions(help_text):
     """
     Remove client-dependent image file extensions from the help text to make
     the tests portable.

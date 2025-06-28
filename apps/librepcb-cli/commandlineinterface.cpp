@@ -742,8 +742,14 @@ bool CommandLineInterface::openProject(
       const RuleCheckMessageList messages = erc.runChecks();
       const QStringList nonApproved = prepareRuleCheckMessages(
           messages, project->getErcMessageApprovals(), approvedMsgCount);
-      print("  " % tr("Approved messages: %1").arg(approvedMsgCount));
-      print("  " % tr("Non-approved messages: %1").arg(nonApproved.count()));
+
+      // Print summary using shared formatting
+      QStringList summaryMessages =
+          formatCheckCounts(approvedMsgCount, nonApproved.count(), "  ");
+      foreach (const QString& msg, summaryMessages) {
+        print(msg);
+      }
+
       foreach (const QString& msg, nonApproved) {
         printErr("    - " % msg);
         success = false;
@@ -783,9 +789,14 @@ bool CommandLineInterface::openProject(
         int approvedMsgCount = 0;
         const QStringList nonApproved = prepareRuleCheckMessages(
             result.messages, board->getDrcMessageApprovals(), approvedMsgCount);
-        print("    " % tr("Approved messages: %1").arg(approvedMsgCount));
-        print("    " %
-              tr("Non-approved messages: %1").arg(nonApproved.count()));
+
+        // Print summary using shared formatting
+        QStringList summaryMessages =
+            formatCheckCounts(approvedMsgCount, nonApproved.count(), "    ");
+        foreach (const QString& msg, summaryMessages) {
+          print(msg);
+        }
+
         foreach (const QString& msg, nonApproved) {
           printErr("      - " % msg);
           success = false;
@@ -1264,16 +1275,26 @@ CommandLineInterface::CheckResult
   return result;
 }
 
-void CommandLineInterface::printCheckSummary(
+QStringList CommandLineInterface::formatCheckSummary(
     const FilePath& path, const QString& relPath,
     const CheckResult& checkResult) const {
-  qInfo().noquote() << tr("Check '%1' for non-approved messages...")
-                           .arg(prettyPath(path, relPath));
-  qInfo().noquote() << "  " %
+  QStringList messages;
+  messages << tr("Check '%1' for non-approved messages...")
+                  .arg(prettyPath(path, relPath));
+  messages << "  " %
           tr("Approved messages: %1").arg(checkResult.approvedMsgCount);
-  qInfo().noquote() << "  " %
+  messages << "  " %
           tr("Non-approved messages: %1")
               .arg(checkResult.nonApprovedMessages.count());
+  return messages;
+}
+
+QStringList CommandLineInterface::formatCheckCounts(
+    int approvedCount, int nonApprovedCount, const QString& indent) const {
+  QStringList messages;
+  messages << indent % tr("Approved messages: %1").arg(approvedCount);
+  messages << indent % tr("Non-approved messages: %1").arg(nonApprovedCount);
+  return messages;
 }
 
 void CommandLineInterface::processLibraryElement(
@@ -1347,17 +1368,19 @@ void CommandLineInterface::processLibraryElement(
     // Gather messages
     CheckResult checkResult = gatherElementCheckMessages(element);
 
-    // Print summary
-    printCheckSummary(fs.getPath(), libDir, checkResult);
+    // Print summary to qInfo (stderr) for libraries
+    QStringList summaryMessages =
+        formatCheckSummary(fs.getPath(), libDir, checkResult);
+    foreach (const QString& msg, summaryMessages) {
+      qInfo().noquote() << msg;
+    }
 
     // If we have non-approved messages, print the header once, then all
     // messages
-    if (!checkResult.nonApprovedMessages.isEmpty()) {
+    foreach (const QString& msg, checkResult.nonApprovedMessages) {
       printErrorHeaderOnce();
+      printErr("    - " % msg);
       success = false;
-      foreach (const QString& msg, checkResult.nonApprovedMessages) {
-        printErr("    - " % msg);
-      }
     }
   }
 
@@ -1400,15 +1423,16 @@ bool CommandLineInterface::openSymbol(
       // Gather messages
       CheckResult checkResult = gatherElementCheckMessages(*symbol);
 
-      // Print summary
-      printCheckSummary(symbolFs->getPath(), symbolFile, checkResult);
+      // Print summary to stdout for individual elements
+      QStringList summaryMessages =
+          formatCheckSummary(symbolFs->getPath(), symbolFile, checkResult);
+      foreach (const QString& msg, summaryMessages) {
+        print(msg);
+      }
 
-      // Print messages without error header
-      if (!checkResult.nonApprovedMessages.isEmpty()) {
+      foreach (const QString& msg, checkResult.nonApprovedMessages) {
+        printErr("  - " % msg);
         success = false;
-        foreach (const QString& msg, checkResult.nonApprovedMessages) {
-          printErr("  - " % msg);
-        }
       }
     }
 
@@ -1512,15 +1536,16 @@ bool CommandLineInterface::openPackage(
       // Gather messages
       CheckResult checkResult = gatherElementCheckMessages(*package);
 
-      // Print summary
-      printCheckSummary(packageFs->getPath(), packageFile, checkResult);
+      // Print summary to stdout for individual elements
+      QStringList summaryMessages =
+          formatCheckSummary(packageFs->getPath(), packageFile, checkResult);
+      foreach (const QString& msg, summaryMessages) {
+        print(msg);
+      }
 
-      // Print messages without error header
-      if (!checkResult.nonApprovedMessages.isEmpty()) {
+      foreach (const QString& msg, checkResult.nonApprovedMessages) {
+        printErr("  - " % msg);
         success = false;
-        foreach (const QString& msg, checkResult.nonApprovedMessages) {
-          printErr("  - " % msg);
-        }
       }
     }
 

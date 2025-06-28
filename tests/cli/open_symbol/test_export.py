@@ -5,7 +5,7 @@ import os
 
 import params
 import pytest
-from helpers import _clean, nofmt
+from helpers import nofmt, strip_image_file_extensions
 
 """
 Test command "open-symbol --export"
@@ -31,7 +31,7 @@ def test_if_unknown_file_extension_fails(cli, sym_uuid):
 
     assert code == 1
     assert (
-        _clean(stderr)
+        strip_image_file_extensions(stderr)
         == "  ERROR: Unknown extension 'foo'. Supported extensions: pdf, svg, ***\n"
     )
     assert stdout == nofmt(f"""\
@@ -171,7 +171,7 @@ def test_export_invalid_symbol_path(cli):
 
     check_path = os.path.join(invalid_sym_path, ".librepcb-sym")
     # Should fail with appropriate error
-    assert code != 0
+    assert code == 1
     assert stderr == f"ERROR: File '{check_path}' does not exist.\n"
     assert stdout == f"Open symbol '{invalid_sym_path}'...\nFinished with errors!\n"
     assert not os.path.exists(cli.abspath(export_path))

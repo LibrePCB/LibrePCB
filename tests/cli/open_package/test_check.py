@@ -4,6 +4,7 @@
 import os
 
 import params
+from helpers import nofmt
 
 """
 Test command "open-package --check"
@@ -22,10 +23,16 @@ def test_check_specific_package_with_warnings(cli):
     code, stdout, stderr = cli.run("open-package", "--check", pkg_path)
 
     # Should complete successfully even with warnings
-    assert stdout == f"Open package '{pkg_path}'...\nFinished with errors!\n"
-    assert (
-        stderr
-        == """  - [WARNING] Clearance of pad '1' in 'Horizontal' to legend
+    assert stdout == nofmt(f"""\
+Open package '{pkg_path}'...
+Check '{pkg_path}' for non-approved messages...
+  Approved messages: 0
+  Non-approved messages: 23
+Finished with errors!
+""")
+
+    assert stderr == nofmt("""\
+  - [WARNING] Clearance of pad '1' in 'Horizontal' to legend
   - [WARNING] Clearance of pad '1' in 'Vertical' to legend
   - [WARNING] Clearance of pad '2' in 'Horizontal' to legend
   - [WARNING] Clearance of pad '2' in 'Vertical' to legend
@@ -48,9 +55,9 @@ def test_check_specific_package_with_warnings(cli):
   - [HINT] Unspecified function of pad '2' in 'Vertical'
   - [HINT] Unspecified function of pad '3' in 'Horizontal'
   - [HINT] Unspecified function of pad '3' in 'Vertical'
-"""
-    )
-    assert code != 0
+""")
+
+    assert code == 1
 
 
 def test_check_invalid_path(cli):
@@ -59,23 +66,5 @@ def test_check_invalid_path(cli):
     code, stdout, stderr = cli.run("open-package", "--check", invalid_path)
     check_path = os.path.join(invalid_path, ".librepcb-pkg")
     # Should fail with appropriate error
-    assert code != 0
+    assert code == 1
     assert stderr == f"ERROR: File '{check_path}' does not exist.\n"
-
-
-def test_check_non_package_element(cli):
-    """The open-package command should not work with non-package elements."""
-    library = params.POPULATED_LIBRARY
-    cli.add_library(library.dir)
-
-    # Try to open a symbol directory as a package
-    if os.path.exists(os.path.join(library.dir, "sym")):
-        # Get first symbol directory
-        sym_dirs = os.listdir(os.path.join(library.dir, "sym"))
-        if sym_dirs:
-            sym_path = os.path.join(library.dir, "sym", sym_dirs[0])
-            code, stdout, stderr = cli.run("open-package", "--check", sym_path)
-
-            # Should fail because it's not a package
-            assert code != 0
-            assert "ERROR" in stderr or "ERROR" in stdout

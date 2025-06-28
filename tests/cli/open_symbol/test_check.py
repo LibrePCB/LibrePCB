@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 
 import params
+from helpers import nofmt
 
 """
 Test command "open-symbol --check"
@@ -22,12 +23,19 @@ def test_check_specific_symbol_with_warnings(cli):
     )
     code, stdout, stderr = cli.run("open-symbol", "--check", sym_path)
     # Should complete successfully even with warnings
-    assert stdout == f"Open symbol '{sym_path}'...\nFinished with errors!\n"
-    assert (
-        stderr
-        == "  - [WARNING] Missing text: '{{NAME}}'\n  - [WARNING] Missing text: '{{VALUE}}'\n"
-    )
-    assert code != 0
+    assert stdout == nofmt(f"""\
+Open symbol '{sym_path}'...
+Check '{sym_path}' for non-approved messages...
+  Approved messages: 0
+  Non-approved messages: 2
+Finished with errors!
+""")
+    assert stderr == nofmt("""\
+  - [WARNING] Missing text: '{{NAME}}'
+  - [WARNING] Missing text: '{{VALUE}}'
+""")
+
+    assert code == 1
 
 
 def test_check_invalid_path(cli):
@@ -36,7 +44,7 @@ def test_check_invalid_path(cli):
     code, stdout, stderr = cli.run("open-symbol", "--check", invalid_path)
     check_path = Path(invalid_path, ".librepcb-sym")
     # Should fail with appropriate error
-    assert code != 0
+    assert code == 1
     assert stderr == f"ERROR: File '{check_path}' does not exist.\n"
 
 
@@ -54,5 +62,5 @@ def test_check_non_symbol_element(cli):
             code, stdout, stderr = cli.run("open-symbol", "--check", sym_path)
 
             # Should fail because it's not a symbol
-            assert code != 0
+            assert code == 1
             assert "ERROR" in stderr or "ERROR" in stdout
