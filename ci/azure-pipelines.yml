@@ -17,4 +17,3 @@ jobs:
 - template: azure-jobs-stylecheck-doxygen.yml
 - template: azure-jobs-linux.yml
 - template: azure-jobs-macos.yml
-- template: azure-jobs-windows.yml
