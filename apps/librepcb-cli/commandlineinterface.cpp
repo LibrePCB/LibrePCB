@@ -1573,13 +1573,14 @@ bool CommandLineInterface::openPackage(
 
         // Set up graphics export
         GraphicsExport graphicsExport;
-        graphicsExport.setDocumentName(*package->getNames().getDefaultValue());
+        graphicsExport.setDocumentName(
+            QString("%1 (%2)")
+                .arg(*package->getNames().getDefaultValue())
+                .arg(*footprint->getNames().getDefaultValue()));
 
-        // Create export settings (using default settings)
+        // Create export settings
         std::shared_ptr<GraphicsExportSettings> settings =
             std::make_shared<GraphicsExportSettings>();
-
-        // Set margins to 0
         settings->setMarginLeft(UnsignedLength(0));
         settings->setMarginTop(UnsignedLength(0));
         settings->setMarginRight(UnsignedLength(0));
