@@ -112,9 +112,10 @@ export struct ComponentSignalData {
     id: string,
     name: string,
     name-error: string,
-    //role: ComponentSignalRole,
     forced-net-name: string,
     required: bool,
+
+    delete: bool,  // Set by UI, reset by backend.
 }
 
 export struct ComponentPinoutData {

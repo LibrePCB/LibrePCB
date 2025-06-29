@@ -5,13 +5,13 @@ import {
     IconButton,
     LineEdit,
     LinkText,
-    ScrollView,
+    MenuItem,
+    MenuPopup,
     MessageBox,
     Palette,
-    MenuPopup,
     SceneButton,
+    ScrollView,
     SlideView,
-    MenuItem,
     Switch,
     TextEdit,
     ToolButton,
@@ -264,7 +264,6 @@ export component ComponentSignalListView {
 
         set-forced-net-name-item := MenuItem {
             text: @tr("Set Forced Net Name");
-            //icon: @image-url("../../../font-awesome/svgs/solid/folder-open.svg");
             enabled: model[context-menu-item-index].forced-net-name.is-empty;
 
             clicked => {
@@ -275,11 +274,10 @@ export component ComponentSignalListView {
         remove-item := MenuItem {
             cmd: Cmd.remove;
             icon: @image-url("../../../../../font-awesome/svgs/solid/trash-can.svg");
-            //shortcuts: "Del";  // Hardcoded in the UI.
             shortcuts: "";
 
             clicked => {
-                //root.model[context-menu-item-index].action = TreeViewItemAction.delete;
+                model[context-menu-item-index].delete = true;
             }
         }
     }

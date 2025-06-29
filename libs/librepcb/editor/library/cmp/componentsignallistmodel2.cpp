@@ -21,10 +21,11 @@
  *  Includes
  ******************************************************************************/
 #include "componentsignallistmodel2.h"
-#include "../cmd/cmdcomponentsignaledit.h"
+
 #include "../../undocommand.h"
 #include "../../undostack.h"
 #include "../../utils/slinthelpers.h"
+#include "../cmd/cmdcomponentsignaledit.h"
 
 #include <QtCore>
 
@@ -84,8 +85,10 @@ void ComponentSignalListModel2::apply() {
   for (auto i = 0; i < mItems.count(); ++i) {
     auto& item = mItems[i];
     if (auto sig = mSignalList->value(i)) {
-      std::unique_ptr<CmdComponentSignalEdit> cmd(new CmdComponentSignalEdit(*sig));
-      if (auto name = parseCircuitIdentifier(cleanCircuitIdentifier(s2q(item.name)))) {
+      std::unique_ptr<CmdComponentSignalEdit> cmd(
+          new CmdComponentSignalEdit(*sig));
+      if (auto name =
+              parseCircuitIdentifier(cleanCircuitIdentifier(s2q(item.name)))) {
         cmd->setName(*name);
       } else {
         item.name = q2s(*sig->getName());
@@ -109,15 +112,33 @@ std::size_t ComponentSignalListModel2::row_count() const {
 
 std::optional<ui::ComponentSignalData> ComponentSignalListModel2::row_data(
     std::size_t i) const {
-  return (i < mItems.count()) ? std::make_optional(mItems.at(i)) : std::nullopt;
+  return (i < static_cast<std::size_t>(mItems.count()))
+      ? std::make_optional(mItems.at(i))
+      : std::nullopt;
 }
 
 void ComponentSignalListModel2::set_row_data(
     std::size_t i, const ui::ComponentSignalData& data) noexcept {
-  if (i < mItems.count()) {
-    mItems[i] = data;
-    validateCircuitIdentifier(s2q(data.name), mItems[i].name_error);
-    notify_row_changed(i);
+  if (mSignalList && (i < static_cast<std::size_t>(mItems.count()))) {
+    if (auto sig = mSignalList->value(i)) {
+      if (data.delete_) {
+        // if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0): Remove lambda.
+        QMetaObject::invokeMethod(
+            this,
+            [this, sig]() {
+              try {
+                execCmd(new CmdComponentSignalRemove(*mSignalList, sig.get()));
+              } catch (const Exception& e) {
+                qCritical() << e.getMsg();
+              }
+            },
+            Qt::QueuedConnection);
+      } else {
+        mItems[i] = data;
+        validateCircuitIdentifier(s2q(data.name), mItems[i].name_error);
+        notify_row_changed(i);
+      }
+    }
   }
 }
 
@@ -125,14 +146,16 @@ void ComponentSignalListModel2::set_row_data(
  *  Private Methods
  ******************************************************************************/
 
-ui::ComponentSignalData ComponentSignalListModel2::createItem(const ComponentSignal& sig) noexcept {
+ui::ComponentSignalData ComponentSignalListModel2::createItem(
+    const ComponentSignal& sig) noexcept {
   return ui::ComponentSignalData{
-    q2s(sig.getUuid().toStr().left(8)),  // ID
-    q2s(*sig.getName()),  // Name
-    slint::SharedString(),  // Name error
-    q2s(sig.getForcedNetName()),  // Forced net name
-    sig.isRequired(),  // Required
-};
+      q2s(sig.getUuid().toStr().left(8)),  // ID
+      q2s(*sig.getName()),  // Name
+      slint::SharedString(),  // Name error
+      q2s(sig.getForcedNetName()),  // Forced net name
+      sig.isRequired(),  // Required
+      false,  // Delete
+  };
 }
 
 void ComponentSignalListModel2::signalListEdited(

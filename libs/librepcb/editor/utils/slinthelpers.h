@@ -24,10 +24,11 @@
  *  Includes
  ******************************************************************************/
 #include <librepcb/core/library/cmp/componentprefix.h>
+#include <librepcb/core/types/circuitidentifier.h>
 #include <librepcb/core/types/elementname.h>
 #include <librepcb/core/types/fileproofname.h>
 #include <librepcb/core/types/version.h>
-#include <librepcb/core/types/circuitidentifier.h>
+
 #include <QtCore>
 #include <QtGui>
 
@@ -118,8 +119,8 @@ std::optional<FileProofName> validateFileProofName(
     const QString& input, slint::SharedString& error,
     const QString& requiredSuffix = QString()) noexcept;
 
-std::optional<CircuitIdentifier> validateCircuitIdentifier(const QString& input,
-                                   slint::SharedString& error) noexcept;
+std::optional<CircuitIdentifier> validateCircuitIdentifier(
+    const QString& input, slint::SharedString& error) noexcept;
 
 std::optional<QUrl> validateUrl(const QString& input,
                                 slint::SharedString& error,

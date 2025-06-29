@@ -336,8 +336,8 @@ std::optional<FileProofName> validateFileProofName(
   }
 }
 
-std::optional<CircuitIdentifier> validateCircuitIdentifier(const QString& input,
-                                                           slint::SharedString& error) noexcept {
+std::optional<CircuitIdentifier> validateCircuitIdentifier(
+    const QString& input, slint::SharedString& error) noexcept {
   if (auto val = parseCircuitIdentifier(cleanCircuitIdentifier(input))) {
     error = slint::SharedString();
     return val;
