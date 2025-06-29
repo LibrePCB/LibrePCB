@@ -30,7 +30,6 @@ linuxdeploy-x86_64.AppImage --plugin qt \
   --custom-apprun ./dist/appimage/AppRun \
   --appdir ./build/AppDir \
   --output appimage
-mv ./LibrePCB-x86_64.AppImage ./artifacts/nightly_builds/librepcb-nightly-linux-$ARCH.AppImage
 
 # For the portable package, we only need the usr/ directory.
 mv "./build/AppDir/usr" "./build/install"
@@ -40,5 +39,10 @@ mv "./build/AppDir/usr" "./build/install"
 xvfb-run -a ./build/install/bin/librepcb-cli --version
 xvfb-run -a ./build/install/bin/librepcb --exit-after-startup
 
+# Print checksums to allow fully transparent public verification.
+sha256sum ./LibrePCB-x86_64.AppImage
+find ./build/install -type f -exec sha256sum {} \; | sort -k 2
+
 # Copy to artifacts.
+mv ./LibrePCB-x86_64.AppImage ./artifacts/nightly_builds/librepcb-nightly-linux-$ARCH.AppImage
 cp -r "./build/install" "./artifacts/nightly_builds/librepcb-nightly-linux-$ARCH"

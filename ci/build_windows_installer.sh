@@ -8,10 +8,13 @@ set -euv -o pipefail
 # we adjust PATH.
 export PATH="/usr/bin:$PATH"
 
-TARGET="$OS-$ARCH"
-
+# Build the installer.
+OUTPUT_DIRECTORY=".\\artifacts\\nightly_builds"
+OUTPUT_BASENAME="librepcb-installer-nightly-$OS-$ARCH"
 cp -r ./dist/innosetup/* ./build/dist/innosetup/
 cp -r ./build/install/. ./build/dist/innosetup/files
 iscc ./build/dist/innosetup/installer.iss \
-  //O".\\artifacts\\nightly_builds" \
-  //F"librepcb-installer-nightly-$TARGET"
+  //O"$OUTPUT_DIRECTORY" //F"$OUTPUT_BASENAME"
+
+# Print checksum to allow fully transparent public verification.
+sha256sum "$OUTPUT_DIRECTORY\\$OUTPUT_BASENAME.exe"
