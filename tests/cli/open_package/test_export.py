@@ -29,10 +29,11 @@ def test_if_unknown_file_extension_fails(cli, pkg_uuid):
     export_path = "package.foo"
     code, stdout, stderr = cli.run("open-package", "--export", export_path, pkg_path)
     assert code == 1
-    assert (
-        strip_image_file_extensions(stderr)
-        == "  ERROR: Unknown extension 'foo'. Supported extensions: pdf, svg, ***\n"
+    # We get the error twice - once for each failing footprint
+    assert strip_image_file_extensions(stderr) == nofmt(
+        "  ERROR: Unknown extension 'foo'. Supported extensions: pdf, svg, ***\n" * 2
     )
+
     assert stdout == nofmt(f"""\
 Open package '{pkg_path}'...
 Export package to '{export_path}'...

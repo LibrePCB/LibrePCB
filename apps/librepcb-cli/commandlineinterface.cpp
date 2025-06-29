@@ -745,7 +745,7 @@ bool CommandLineInterface::openProject(
 
       // Print summary using shared formatting
       QStringList summaryMessages =
-          formatCheckCounts(approvedMsgCount, nonApproved.count(), "  ");
+          formatCheckSummary(approvedMsgCount, nonApproved.count(), "  ");
       foreach (const QString& msg, summaryMessages) {
         print(msg);
       }
@@ -792,7 +792,7 @@ bool CommandLineInterface::openProject(
 
         // Print summary using shared formatting
         QStringList summaryMessages =
-            formatCheckCounts(approvedMsgCount, nonApproved.count(), "    ");
+            formatCheckSummary(approvedMsgCount, nonApproved.count(), "    ");
         foreach (const QString& msg, summaryMessages) {
           print(msg);
         }
@@ -1281,15 +1281,12 @@ QStringList CommandLineInterface::formatCheckSummary(
   QStringList messages;
   messages << tr("Check '%1' for non-approved messages...")
                   .arg(prettyPath(path, relPath));
-  messages << "  " %
-          tr("Approved messages: %1").arg(checkResult.approvedMsgCount);
-  messages << "  " %
-          tr("Non-approved messages: %1")
-              .arg(checkResult.nonApprovedMessages.count());
+  messages += formatCheckSummary(checkResult.approvedMsgCount,
+                                 checkResult.nonApprovedMessages.count(), "  ");
   return messages;
 }
 
-QStringList CommandLineInterface::formatCheckCounts(
+QStringList CommandLineInterface::formatCheckSummary(
     int approvedCount, int nonApprovedCount, const QString& indent) const {
   QStringList messages;
   messages << indent % tr("Approved messages: %1").arg(approvedCount);
@@ -1439,17 +1436,6 @@ bool CommandLineInterface::openSymbol(
     // Export symbol to graphics file
     if (!exportFile.isEmpty()) {
       print(tr("Export symbol to '%1'...").arg(exportFile));
-
-      // Simple extension check to prevent error messages
-      const QString suffix = QFileInfo(exportFile).suffix().toLower();
-      if (!GraphicsExport::getSupportedExtensions().contains(suffix)) {
-        printErr("  " % tr("ERROR") % ": " %
-                 tr("Unknown extension '%1'. Supported extensions: %2")
-                     .arg(suffix)
-                     .arg(GraphicsExport::getSupportedExtensions().join(", ")));
-        return false;
-      }
-
       // Generate output filename
       QString destPathStr = exportFile;
 
@@ -1552,16 +1538,6 @@ bool CommandLineInterface::openPackage(
     // Export package to graphics file
     if (!exportFile.isEmpty()) {
       print(tr("Export package to '%1'...").arg(exportFile));
-
-      // Simple extension check to prevent duplicate error messages
-      const QString suffix = QFileInfo(exportFile).suffix().toLower();
-      if (!GraphicsExport::getSupportedExtensions().contains(suffix)) {
-        printErr("  " % tr("ERROR") % ": " %
-                 tr("Unknown extension '%1'. Supported extensions: %2")
-                     .arg(suffix)
-                     .arg(GraphicsExport::getSupportedExtensions().join(", ")));
-        return false;
-      }
 
       // Export each footprint
       QMap<FilePath, int> writtenFilesCounter;

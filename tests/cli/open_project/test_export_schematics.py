@@ -2,9 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import os
+
 import params
 import pytest
-from helpers import nofmt
+from helpers import nofmt, strip_image_file_extensions
 
 """
 Test command "open-project --export-schematics"
@@ -23,9 +24,8 @@ def test_if_unknown_file_extension_fails(cli, project):
     code, stdout, stderr = cli.run(
         "open-project", "--export-schematics=foo.bar", project.path
     )
-    assert stderr == nofmt(f"""\
-  ERROR: Failed to export image "{cli.abspath("foo.bar")}". Check file permissions \
-and make sure to use a supported image file extension.
+    assert strip_image_file_extensions(stderr) == nofmt("""\
+  ERROR: Unknown extension 'bar'. Supported extensions: pdf, svg, ***
 """)
     assert stdout == nofmt(f"""\
 Open project '{project.path}'...

@@ -95,13 +95,11 @@ private:  // Methods
   CheckResult gatherElementCheckMessages(
       const LibraryBaseElement& element) const;
 
-  // Format check summary  
+  // Format check summary with optional header
   QStringList formatCheckSummary(const FilePath& path, const QString& relPath,
                                  const CheckResult& checkResult) const;
-  
-  // Format simple check counts (for ERC/DRC)
-  QStringList formatCheckCounts(int approvedCount, int nonApprovedCount,
-                                const QString& indent = "") const;
+  QStringList formatCheckSummary(int approvedCount, int nonApprovedCount,
+                                 const QString& indent = "") const;
 
   void processLibraryElement(const QString& libDir, TransactionalFileSystem& fs,
                              LibraryBaseElement& element, bool runCheck,
