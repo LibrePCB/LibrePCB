@@ -35,6 +35,8 @@ jobs:
     displayName: Print Environment
   - bash: ./ci/install_dependencies.sh
     displayName: Install Dependencies
+    env:
+      SLINT_UI_TESTING_AUTH: $(SLINT_UI_TESTING_AUTH)
   - template: azure-cache.yml
   - bash: ./ci/print_environment.sh
     displayName: Print New Environment  # Print again since it has been modified
@@ -63,6 +65,11 @@ jobs:
     displayName: Run LibrePCB-CLI Functional Tests
   - bash: xvfb-run -a --server-args="-screen 0 1024x768x24" uv --directory ./tests/funq run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb" --reruns 5 --reruns-delay 10
     displayName: Run LibrePCB Functional Tests
+  - bash: xvfb-run -a --server-args="-screen 0 1600x1200x24" uv --directory "./tests/ui" run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb"
+    displayName: Run LibrePCB UI Tests
+    condition: and(succeeded(), variables['SLINT_UI_TESTING_AUTH'])
+    env:
+      SLINT_UI_TESTING_AUTH: $(SLINT_UI_TESTING_AUTH)
   - bash: ./ci/upload_artifacts.sh
     displayName: Upload Artifacts
     condition: and(succeeded(), eq(variables['DEPLOY'], 'true'), ne(variables['Build.Reason'], 'PullRequest'))

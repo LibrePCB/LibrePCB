@@ -13,7 +13,9 @@ def test_open_lpp(librepcb, helpers):
     librepcb.add_project("Empty Project")
     librepcb.set_project("Empty Project/Empty Project.lpp")
     with librepcb.open() as app:
-        helpers.wait_for_project(app, "Empty Project")
+        projects = app.get("DocumentsPanel::project-item ProjectSection::header *")
+        projects.wait(1)
+        assert projects.label == ["Empty Project".upper()]
 
 
 def test_open_lppz(librepcb, helpers):
@@ -23,4 +25,6 @@ def test_open_lppz(librepcb, helpers):
     librepcb.add_project("Empty Project", as_lppz=True)
     librepcb.set_project("Empty Project.lppz")
     with librepcb.open() as app:
-        helpers.wait_for_project(app, "Empty Project")
+        projects = app.get("DocumentsPanel::project-item ProjectSection::header *")
+        projects.wait(1)
+        assert projects.label == ["Empty Project".upper()]

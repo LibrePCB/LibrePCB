@@ -37,6 +37,8 @@ jobs:
           source ./ci/install_dependencies.sh
           # Pass modified PATH to following steps:
           echo "$PATH" > "$GITHUB_PATH"
+        env:
+          SLINT_UI_TESTING_AUTH: ${{ secrets.SLINT_UI_TESTING_AUTH }}
       # --- caching ---
       - name: Cache .ccache
         uses: actions/cache@v4
@@ -73,6 +75,11 @@ jobs:
       # otherwise we get errors due to multiple definitions of Qt symbols.
       - name: Run LibrePCB Functional Tests
         run: uv --directory ./tests/funq run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb.app/Contents/MacOS/librepcb" --reruns 5 --reruns-delay 10
+      - name: Run LibrePCB UI Tests
+        run: uv --directory ./tests/ui run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb.app/Contents/MacOS/librepcb"
+        if: ${{ success() && env.SLINT_UI_TESTING_AUTH }}
+        env:
+          SLINT_UI_TESTING_AUTH: ${{ secrets.SLINT_UI_TESTING_AUTH }}
       - name: Upload Artifacts
         run: ./ci/upload_artifacts.sh
         if: ${{ success() && (github.event_name == 'push') }}

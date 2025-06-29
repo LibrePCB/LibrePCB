@@ -68,3 +68,18 @@ export CMAKE_GENERATOR=Ninja
 export FUNQ_MAKE_PATH=ninja
 uv --directory "$DIR/../tests/cli" sync --no-dev
 uv --directory "$DIR/../tests/funq" sync --no-dev
+
+# If access to Slint UI testing is available, install UI testing dependencies
+if [ -n "${SLINT_UI_TESTING_AUTH-}" ]
+then
+  git config --global url."https://${SLINT_UI_TESTING_AUTH}@github.com/slint-ui/ui-testing".insteadOf "ssh://git@github.com/slint-ui/ui-testing.git"
+  uv --directory "$DIR/../tests/ui" sync --no-dev
+fi
+
+# Fix crashing librepcb.exe tests with temporary workaround as long as
+# arial.ttf is not added to the Docker image yet (see
+# https://github.com/slint-ui/slint/issues/2556#issuecomment-2995413102).
+if [ "$OS" = "windows" ]
+then
+  curl -o /c/Windows/Fonts/arial.ttf -L "https://github.com/LibrePCB/docker-librepcb-dev/raw/42c92a59559bdbda7bf8a8e082803573226b5570/windowsservercore-ltsc2025-qt6.6-64bit/arial.ttf"
+fi

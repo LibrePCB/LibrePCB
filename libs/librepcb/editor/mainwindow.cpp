@@ -55,6 +55,19 @@
 namespace librepcb {
 namespace editor {
 
+// Detect window size enforced by environment variable (required for testing).
+static std::optional<QSize> getOverrideWindowSize() noexcept {
+  static const QStringList numbers =
+      QString(qgetenv("LIBREPCB_WINDOW_SIZE")).split("x");
+  const int width = numbers.value(0).toInt();
+  const int height = numbers.value(1).toInt();
+  if ((width > 0) && (height > 0)) {
+    return QSize(width, height);
+  } else {
+    return std::nullopt;
+  }
+}
+
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
@@ -224,8 +237,11 @@ MainWindow::MainWindow(GuiApplication& app,
 
   // Load window state.
   QSettings cs;
-  if (!mWidget->restoreGeometry(
-          cs.value(mSettingsPrefix % "/geometry").toByteArray())) {
+  if (auto size = getOverrideWindowSize()) {
+    qInfo() << "Window size enforced to" << *size;
+    mWidget->resize(*size);
+  } else if (!mWidget->restoreGeometry(
+                 cs.value(mSettingsPrefix % "/geometry").toByteArray())) {
     // By default, open the window maximized as this is more intuitive than a
     // small window with hardcoded, screen-independent size in the Slint file
     // (https://github.com/LibrePCB/LibrePCB/issues/355).
