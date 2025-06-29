@@ -53,11 +53,13 @@ QString Application::getGitRevision() noexcept {
   return QStringLiteral(GIT_COMMIT_SHA);
 }
 
-QDateTime Application::getBuildDate() noexcept {
-  static const QDateTime value = QDateTime(
-      QLocale(QLocale::C)
-          .toDate(QString(__DATE__).simplified(), QLatin1String("MMM d yyyy")),
-      QTime::fromString(__TIME__, Qt::TextDate));
+QDateTime Application::getGitCommitDate() noexcept {
+  static const QDateTime value =
+#if GIT_COMMIT_TIMESTAMP
+      QDateTime::fromSecsSinceEpoch(GIT_COMMIT_TIMESTAMP);
+#else
+      QDateTime();
+#endif
   return value;
 }
 
@@ -78,12 +80,17 @@ bool Application::isFileFormatStable() noexcept {
 
 QString Application::buildFullVersionDetails() noexcept {
   // Always English, not translatable!
-  QStringList details;
-  const QString date = getBuildDate().toString(Qt::ISODate);
+
+  QString revision = getGitRevision();
+  const QDate date = getGitCommitDate().date();
+  if (date.isValid()) {
+    revision += " (" + date.toString(Qt::ISODate) + ")";
+  }
   QString qt = QString(qVersion()) + " (built against " + QT_VERSION_STR + ")";
+
+  QStringList details;
   details << "LibrePCB Version: " + getVersion();
-  details << "Git Revision:     " + getGitRevision();
-  details << "Build Date:       " + date;
+  details << "Git Revision:     " + revision;
   if (!getBuildAuthor().isEmpty()) {
     details << "Build Author:     " + getBuildAuthor();
   }
