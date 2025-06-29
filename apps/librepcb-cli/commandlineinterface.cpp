@@ -1414,7 +1414,7 @@ bool CommandLineInterface::openSymbol(
             new TransactionalDirectory(symbolFs)));  // can throw
 
     qInfo().noquote()
-        << tr("Symbol name: %1").arg(*symbol->getNames().getDefaultValue());
+        << tr("Opened symbol: %1").arg(*symbol->getNames().getDefaultValue());
     // Process the symbol element (validation checks)
     if (runCheck) {
       // Gather messages
@@ -1461,11 +1461,9 @@ bool CommandLineInterface::openSymbol(
       GraphicsExport graphicsExport;
       graphicsExport.setDocumentName(*symbol->getNames().getDefaultValue());
 
-      // Create export settings (using default settings)
+      // Create export settings
       std::shared_ptr<GraphicsExportSettings> settings =
           std::make_shared<GraphicsExportSettings>();
-
-      // Set margins to 0
       settings->setMarginLeft(UnsignedLength(0));
       settings->setMarginTop(UnsignedLength(0));
       settings->setMarginRight(UnsignedLength(0));
@@ -1537,7 +1535,7 @@ bool CommandLineInterface::openPackage(
 
     // Export package to graphics file
     if (!exportFile.isEmpty()) {
-      print(tr("Export package to '%1'...").arg(exportFile));
+      print(tr("Export footprint(s) to '%1'...").arg(exportFile));
 
       // Export each footprint
       QMap<FilePath, int> writtenFilesCounter;
