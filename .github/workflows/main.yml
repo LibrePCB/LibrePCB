@@ -14,6 +14,87 @@ env:
   CARGO_INCREMENTAL: 0
 
 jobs:
+  windows-x64:
+    name: Windows x86_64
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Start Docker Container
+        run: >
+          docker run -d -t --name ci -w C:/work
+          -v ${{ github.workspace }}:C:/work
+          -e OS="windows"
+          -e ARCH="x86_64"
+          -e CI_BRANCH_NAME="${{ env.CI_BRANCH_NAME }}"
+          -e CCACHE_DIR="C:/work/build/.ccache-dir"
+          -e CCACHE_MAXSIZE="${{ env.CCACHE_MAXSIZE }}"
+          -e CARGO_HOME="C:/work/build/.cargo-home"
+          -e CARGO_INCREMENTAL="${{ env.CARGO_INCREMENTAL }}"
+          -e LIBREPCB_BUILD_AUTHOR="${{ env.LIBREPCB_BUILD_AUTHOR }}"
+          librepcb/librepcb-dev:windowsservercore-ltsc2025-qt6.6-64bit-1
+      - name: Print Environment
+        run: docker exec ci bash ./ci/print_environment.sh
+      - name: Install Dependencies
+        run: >
+          docker exec
+          -e SLINT_UI_TESTING_AUTH="${{ secrets.SLINT_UI_TESTING_AUTH }}"
+          ci bash ./ci/install_dependencies.sh
+      # caching --->
+      - name: Cache .ccache
+        uses: actions/cache@v4
+        with:
+          key: ${{ github.job }}-${{ github.ref }}
+          restore-keys: ${{ github.job }}-refs/heads/master
+          path: build/.ccache-dir
+      - name: Cache .cargo
+        uses: actions/cache@v4
+        with:
+          key: ${{ github.job }}-${{ hashFiles('libs/librepcb/**/Cargo.lock') }}-${{ github.ref }}
+          restore-keys: ${{ github.job }}-${{ hashFiles('libs/librepcb/**/Cargo.lock') }}-refs/heads/master
+          path: |
+            ./build/.cargo-home/bin/
+            ./build/.cargo-home/registry/index/
+            ./build/.cargo-home/registry/cache/
+            ./build/.cargo-home/git/db/
+            ./build/cargo/
+            ./libs/librepcb/rust-core/target/
+      # <--- caching
+      - name: Print New Environment  # Print again since it has been modified
+        run: docker exec ci bash ./ci/print_environment.sh
+      - name: Build LibrePCB
+        run: docker exec ci bash ./ci/build_librepcb.sh
+      - name: Build Archive
+        run: docker exec ci bash ./ci/build_windows_archive.sh
+      - name: Build Installer
+        run: docker exec ci bash ./ci/build_windows_installer.sh
+      - name: Run rust-core tests
+        run: docker exec -w C:/work/libs/librepcb/rust-core ci cargo test --features=fail-on-warnings
+      - name: Run LibrePCB Unittests
+        run: docker exec ci build\\tests\\unittests\\librepcb-unittests.exe
+      - name: Run LibrePCB-CLI Functional Tests
+        run: docker exec ci uv --directory ./tests/cli run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb-cli.exe"
+      - name: Run LibrePCB Functional Tests
+        run: docker exec ci uv --directory ./tests/funq run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb.exe" --reruns 5 --reruns-delay 10
+      - name: Run LibrePCB UI Tests
+        if: ${{ success() && env.SLINT_UI_TESTING_AUTH }}
+        run: docker exec ci uv --directory ./tests/ui run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb.exe"
+        env:
+          SLINT_UI_TESTING_AUTH: ${{ secrets.SLINT_UI_TESTING_AUTH }}
+      - name: Upload Artifacts
+        if: ${{ success() && (github.event_name == 'push') }}
+        run: >
+          docker exec
+          -e UPLOAD_URL="${{ secrets.UPLOAD_URL }}"
+          -e UPLOAD_USER="${{ secrets.UPLOAD_USER }}"
+          -e UPLOAD_PASS="${{ secrets.UPLOAD_PASS }}"
+          -e UPLOAD_SIGN_KEY="${{ secrets.UPLOAD_SIGN_KEY }}"
+          ci bash ./ci/upload_artifacts.sh
+      - name: Stop Container
+        if: ${{ always() }}
+        run: docker stop ci
+
   macos-arm64:
     name: MacOS ARM64
     # Make sure the 'runs-on' really refers to an Apple Silicon CPU:
@@ -39,7 +120,7 @@ jobs:
           echo "$PATH" > "$GITHUB_PATH"
         env:
           SLINT_UI_TESTING_AUTH: ${{ secrets.SLINT_UI_TESTING_AUTH }}
-      # --- caching ---
+      # caching --->
       - name: Cache .ccache
         uses: actions/cache@v4
         with:
@@ -58,7 +139,7 @@ jobs:
             ${{ env.CARGO_HOME }}/git/db/
             ./build/cargo/
             ./libs/librepcb/rust-core/target/
-      # --- caching ---
+      # <--- caching
       - name: Print New Environment
         run: ./ci/print_environment.sh
       - name: Build LibrePCB
@@ -76,13 +157,13 @@ jobs:
       - name: Run LibrePCB Functional Tests
         run: uv --directory ./tests/funq run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb.app/Contents/MacOS/librepcb" --reruns 5 --reruns-delay 10
       - name: Run LibrePCB UI Tests
-        run: uv --directory ./tests/ui run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb.app/Contents/MacOS/librepcb"
         if: ${{ success() && env.SLINT_UI_TESTING_AUTH }}
+        run: uv --directory ./tests/ui run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb.app/Contents/MacOS/librepcb"
         env:
           SLINT_UI_TESTING_AUTH: ${{ secrets.SLINT_UI_TESTING_AUTH }}
       - name: Upload Artifacts
-        run: ./ci/upload_artifacts.sh
         if: ${{ success() && (github.event_name == 'push') }}
+        run: ./ci/upload_artifacts.sh
         env:
           UPLOAD_URL: ${{ secrets.UPLOAD_URL }}
           UPLOAD_USER: ${{ secrets.UPLOAD_USER }}
