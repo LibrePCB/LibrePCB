@@ -14,7 +14,7 @@ fi
 git -C ./i18n checkout master && git -C ./i18n pull origin master
 
 # set SOURCE_DATE_EPOCH to commit timestamp to achieve reproducible builds
-export SOURCE_DATE_EPOCH=`git show -s --format=%ct HEAD`
+#export SOURCE_DATE_EPOCH=`git show -s --format=%ct HEAD`
 
 # build librepcb
 echo "Using CXX=$CXX"

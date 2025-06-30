@@ -33,6 +33,7 @@ jobs:
           -e CARGO_HOME="C:/work/build/.cargo-home"
           -e CARGO_INCREMENTAL="${{ env.CARGO_INCREMENTAL }}"
           -e LIBREPCB_BUILD_AUTHOR="${{ env.LIBREPCB_BUILD_AUTHOR }}"
+          -e SOURCE_DATE_EPOCH=0
           librepcb/librepcb-dev:windowsservercore-ltsc2025-qt6.6-64bit-1
       - name: Print Environment
         run: docker exec ci bash ./ci/print_environment.sh
