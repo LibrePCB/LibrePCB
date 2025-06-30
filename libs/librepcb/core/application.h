@@ -70,13 +70,13 @@ public:
   static QString getGitRevision() noexcept;
 
   /**
-   * @brief Get the date/time when the application was built
+   * @brief Get the commit datetime of the sources used to build the application
    *
    * @note This function is thread-safe.
    *
    * @return Date/time (might be invalid)
    */
-  static QDateTime getBuildDate() noexcept;
+  static QDateTime getGitCommitDate() noexcept;
 
   /**
    * @brief Get the author who has built the application

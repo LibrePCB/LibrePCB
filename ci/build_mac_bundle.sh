@@ -80,5 +80,8 @@ popd
 ./build/install/LibrePCB.app/Contents/MacOS/librepcb-cli --version
 ./build/install/LibrePCB.app/Contents/MacOS/librepcb --exit-after-startup
 
-# Move bundles to artifacts directory
+# Print checksums to allow fully transparent public verification.
+shasum -a 256 ./build/install/LibrePCB.dmg
+
+# Move to artifacts.
 mv ./build/install/LibrePCB.dmg ./artifacts/nightly_builds/librepcb-nightly-mac-$ARCH.dmg

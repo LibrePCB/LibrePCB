@@ -36,6 +36,13 @@ else()
       OUTPUT_STRIP_TRAILING_WHITESPACE
     )
     set(GIT_COMMIT_SHA ${SHORT_SHA})
+    execute_process(
+      COMMAND ${GIT_EXECUTABLE} -C "${CMAKE_SOURCE_DIR}" show -s --format=%ct
+              HEAD
+      OUTPUT_VARIABLE COMMIT_TIMESTAMP
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    set(GIT_COMMIT_TIMESTAMP ${COMMIT_TIMESTAMP})
   else()
     message(STATUS "Git not found, cannot set version info")
   endif()
