@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_COMPONENTVARIANTEDITOR_H
-#define LIBREPCB_EDITOR_COMPONENTVARIANTEDITOR_H
+#ifndef LIBREPCB_EDITOR_COMPONENTGATEEDITOR_H
+#define LIBREPCB_EDITOR_COMPONENTGATEEDITOR_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include "appwindow.h"
 
-#include <librepcb/core/library/cmp/componentsymbolvariant.h>
+#include <librepcb/core/library/cmp/componentsymbolvariantitem.h>
 
 #include <QtCore>
 
@@ -34,52 +34,63 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Symbol;
 class Workspace;
 
 namespace editor {
 
-class ComponentGateListModel;
-class GraphicsLayerList;
+class ComponentPinoutListModel;
 class UndoCommand;
 class UndoStack;
+class GraphicsScene;
+class SymbolGraphicsItem;
+class GraphicsLayerList;
 
 /*******************************************************************************
- *  Class ComponentVariantEditor
+ *  Class ComponentGateEditor
  ******************************************************************************/
 
 /**
- * @brief The ComponentVariantEditor class
+ * @brief The ComponentGateEditor class
  */
-class ComponentVariantEditor : public QObject {
+class ComponentGateEditor : public QObject {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  ComponentVariantEditor() = delete;
-  ComponentVariantEditor(const ComponentVariantEditor& other) = delete;
-  explicit ComponentVariantEditor(
-      const Workspace& ws, const GraphicsLayerList& layers,
-      std::shared_ptr<ComponentSymbolVariant> variant,
-      QObject* parent = nullptr) noexcept;
-  virtual ~ComponentVariantEditor() noexcept;
+  ComponentGateEditor() = delete;
+  ComponentGateEditor(const ComponentGateEditor& other) = delete;
+  explicit ComponentGateEditor(const Workspace& ws,
+                               const GraphicsLayerList& layers,
+                               std::shared_ptr<ComponentSymbolVariantItem> item,
+                               QObject* parent = nullptr) noexcept;
+  virtual ~ComponentGateEditor() noexcept;
 
   // General Methods
-  ui::ComponentVariantData getUiData() const;
-  void setUiData(const ui::ComponentVariantData& data) noexcept;
+  ui::ComponentGateData getUiData() const;
+  void setUiData(const ui::ComponentGateData& data) noexcept;
   void setUndoStack(UndoStack* stack) noexcept;
   // void apply();
+  slint::Image renderScene(float width, float height) noexcept;
 
   // Operator Overloadings
-  ComponentVariantEditor& operator=(const ComponentVariantEditor& rhs) = delete;
+  ComponentGateEditor& operator=(const ComponentGateEditor& rhs) = delete;
 
 private:
   void execCmd(UndoCommand* cmd);
+  void loadSymbol() noexcept;
 
 private:
   const Workspace& mWorkspace;
-  std::shared_ptr<ComponentSymbolVariant> mVariant;
+  const GraphicsLayerList& mLayers;
+
+  std::shared_ptr<ComponentSymbolVariantItem> mItem;
   UndoStack* mUndoStack;
-  std::shared_ptr<ComponentGateListModel> mGates;
+  std::shared_ptr<ComponentPinoutListModel> mPinout;
+
+  std::unique_ptr<Symbol> mSymbol;
+  std::unique_ptr<GraphicsScene> mScene;
+  std::unique_ptr<SymbolGraphicsItem> mGraphicsItem;
 };
 
 /*******************************************************************************

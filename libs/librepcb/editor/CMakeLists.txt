@@ -190,8 +190,12 @@ add_library(
   library/cmp/componenteditorwidget.cpp
   library/cmp/componenteditorwidget.h
   library/cmp/componenteditorwidget.ui
+  library/cmp/componentgateeditor.cpp
+  library/cmp/componentgateeditor.h
   library/cmp/componentgatelistmodel.cpp
   library/cmp/componentgatelistmodel.h
+  library/cmp/componentpinoutlistmodel.cpp
+  library/cmp/componentpinoutlistmodel.h
   library/cmp/componentpinsignalmapmodel.cpp
   library/cmp/componentpinsignalmapmodel.h
   library/cmp/componentsignallistmodel.cpp

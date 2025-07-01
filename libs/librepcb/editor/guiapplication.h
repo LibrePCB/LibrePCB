@@ -50,6 +50,7 @@ class ProjectEditor;
 class ProjectLibraryUpdater;
 class QuickAccessModel;
 class SlintKeyEventTextBuilder;
+class GraphicsLayerList;
 
 /*******************************************************************************
  *  Class GuiApplication
@@ -76,6 +77,9 @@ public:
   void switchWorkspace(QWidget* parent) noexcept;
   void execWorkspaceSettingsDialog(QWidget* parent) noexcept;
   void addExampleProjects(QWidget* parent) noexcept;
+
+  // General
+  const GraphicsLayerList& getPreviewLayers() const noexcept {return *mPreviewLayers;}
 
   // Libraries
   LibrariesModel& getLocalLibraries() noexcept { return *mLocalLibraries; }
@@ -139,6 +143,7 @@ private:
 
   Workspace& mWorkspace;
   bool mLibrariesContainStandardComponents;
+  std::unique_ptr<GraphicsLayerList> mPreviewLayers;
   std::shared_ptr<NotificationsModel> mNotifications;
   std::shared_ptr<Notification> mNotificationNoLibrariesInstalled;
   std::shared_ptr<Notification> mNotificationDesktopIntegration;

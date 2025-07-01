@@ -28,6 +28,7 @@
 #include "../../utils/slinthelpers.h"
 #include "../../utils/uihelpers.h"
 #include "../cmd/cmdcomponentsymbolvariantitemedit.h"
+#include "componentgateeditor.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -42,8 +43,11 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-ComponentGateListModel::ComponentGateListModel(QObject* parent) noexcept
+ComponentGateListModel::ComponentGateListModel(const Workspace& ws, const GraphicsLayerList& layers,
+                                               QObject* parent) noexcept
   : QObject(parent),
+    mWorkspace(ws),
+    mLayers(layers),
     mGateList(nullptr),
     mUndoStack(nullptr),
     mOnEditedSlot(*this, &ComponentGateListModel::variantListEdited) {
@@ -70,8 +74,8 @@ void ComponentGateListModel::setGateList(
   if (mGateList) {
     mGateList->onEdited.attach(mOnEditedSlot);
 
-    for (auto sig : *mGateList) {
-      mItems.append(createItem(sig));
+    for (auto gate : mGateList->values()) {
+      mItems.append(std::make_shared<ComponentGateEditor>(mWorkspace, mLayers, gate));
     }
   }
 
@@ -147,9 +151,11 @@ std::size_t ComponentGateListModel::row_count() const {
 
 std::optional<ui::ComponentGateData> ComponentGateListModel::row_data(
     std::size_t i) const {
-  return (i < static_cast<std::size_t>(mItems.count()))
-      ? std::make_optional(mItems.at(i))
-      : std::nullopt;
+  if (auto item = mItems.value(i)) {
+    return item->getUiData();
+  } else {
+    return std::nullopt;
+  }
 }
 
 void ComponentGateListModel::set_row_data(
@@ -181,21 +187,6 @@ void ComponentGateListModel::set_row_data(
  *  Private Methods
  ******************************************************************************/
 
-ui::ComponentGateData ComponentGateListModel::createItem(
-    const ComponentSymbolVariantItem& item) noexcept {
-  return ui::ComponentGateData{
-      q2s(item.getUuid().toStr().left(8)),  // ID
-      slint::SharedString(),  // Symbol name
-      l2s(item.getSymbolPosition().getX()),  // Symbol X
-      l2s(item.getSymbolPosition().getY()),  // Symbol Y
-      l2s(item.getSymbolRotation()),  // Symbol rotation
-      item.isRequired(),  // Required
-      q2s(*item.getSuffix()),  // Suffix
-      nullptr,  // Pinout
-      slint::Image(),  // Image
-  };
-}
-
 void ComponentGateListModel::variantListEdited(
     const ComponentSymbolVariantItemList& list, int index,
     const std::shared_ptr<const ComponentSymbolVariantItem>& item,
@@ -203,7 +194,11 @@ void ComponentGateListModel::variantListEdited(
   Q_UNUSED(list);
   switch (event) {
     case ComponentSymbolVariantItemList::Event::ElementAdded:
-      mItems.insert(index, createItem(*item));
+      mItems.insert(
+          index,
+          std::make_shared<ComponentGateEditor>(
+              mWorkspace,mLayers,
+              std::const_pointer_cast<ComponentSymbolVariantItem>(item)));
       notify_row_added(index, 1);
       break;
     case ComponentSymbolVariantItemList::Event::ElementRemoved:
@@ -211,7 +206,7 @@ void ComponentGateListModel::variantListEdited(
       notify_row_removed(index, 1);
       break;
     case ComponentSymbolVariantItemList::Event::ElementEdited:
-      mItems[index] = createItem(*item);
+      // mItems[index] = createItem(*item);
       notify_row_changed(index);
       break;
     default:

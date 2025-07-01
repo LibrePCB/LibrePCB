@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_COMPONENTVARIANTEDITOR_H
-#define LIBREPCB_EDITOR_COMPONENTVARIANTEDITOR_H
+#ifndef LIBREPCB_EDITOR_COMPONENTPINOUTLISTMODEL_H
+#define LIBREPCB_EDITOR_COMPONENTPINOUTLISTMODEL_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include "appwindow.h"
 
-#include <librepcb/core/library/cmp/componentsymbolvariant.h>
+#include <librepcb/core/library/cmp/componentpinsignalmap.h>
 
 #include <QtCore>
 
@@ -33,53 +33,60 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class Workspace;
-
 namespace editor {
 
-class ComponentGateListModel;
-class GraphicsLayerList;
 class UndoCommand;
 class UndoStack;
 
 /*******************************************************************************
- *  Class ComponentVariantEditor
+ *  Class ComponentPinoutListModel
  ******************************************************************************/
 
 /**
- * @brief The ComponentVariantEditor class
+ * @brief The ComponentPinoutListModel class
  */
-class ComponentVariantEditor : public QObject {
+class ComponentPinoutListModel : public QObject,
+                                 public slint::Model<ui::ComponentPinoutData> {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  ComponentVariantEditor() = delete;
-  ComponentVariantEditor(const ComponentVariantEditor& other) = delete;
-  explicit ComponentVariantEditor(
-      const Workspace& ws, const GraphicsLayerList& layers,
-      std::shared_ptr<ComponentSymbolVariant> variant,
-      QObject* parent = nullptr) noexcept;
-  virtual ~ComponentVariantEditor() noexcept;
+  // ComponentPinoutListModel() = delete;
+  ComponentPinoutListModel(const ComponentPinoutListModel& other) = delete;
+  explicit ComponentPinoutListModel(QObject* parent = nullptr) noexcept;
+  virtual ~ComponentPinoutListModel() noexcept;
 
   // General Methods
-  ui::ComponentVariantData getUiData() const;
-  void setUiData(const ui::ComponentVariantData& data) noexcept;
+  void setList(ComponentPinSignalMap* list) noexcept;
   void setUndoStack(UndoStack* stack) noexcept;
   // void apply();
 
+  // Implementations
+  std::size_t row_count() const override;
+  std::optional<ui::ComponentPinoutData> row_data(std::size_t i) const override;
+  void set_row_data(std::size_t i,
+                    const ui::ComponentPinoutData& data) noexcept override;
+
   // Operator Overloadings
-  ComponentVariantEditor& operator=(const ComponentVariantEditor& rhs) = delete;
+  ComponentPinoutListModel& operator=(const ComponentPinoutListModel& rhs) =
+      delete;
 
 private:
+  ui::ComponentPinoutData createItem(
+      const ComponentPinSignalMapItem& item) noexcept;
+  void listEdited(const ComponentPinSignalMap& list, int index,
+                  const std::shared_ptr<const ComponentPinSignalMapItem>& item,
+                  ComponentPinSignalMap::Event event) noexcept;
   void execCmd(UndoCommand* cmd);
 
 private:
-  const Workspace& mWorkspace;
-  std::shared_ptr<ComponentSymbolVariant> mVariant;
+  ComponentPinSignalMap* mList;
   UndoStack* mUndoStack;
-  std::shared_ptr<ComponentGateListModel> mGates;
+
+  QList<ui::ComponentPinoutData> mItems;
+
+  // Slots
+  ComponentPinSignalMap::OnEditedSlot mOnEditedSlot;
 };
 
 /*******************************************************************************

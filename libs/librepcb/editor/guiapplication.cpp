@@ -51,7 +51,7 @@
 #include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
-
+#include "graphics/graphicslayerlist.h"
 #include <QtCore>
 
 #include <algorithm>
@@ -71,6 +71,7 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
   : QObject(parent),
     mWorkspace(ws),
     mLibrariesContainStandardComponents(false),
+    mPreviewLayers(GraphicsLayerList::previewLayers(&ws.getSettings())),
     mNotifications(new NotificationsModel(ws)),
     mQuickAccessModel(new QuickAccessModel(ws)),
     mLocalLibraries(new LibrariesModel(ws, LibrariesModel::Mode::LocalLibs)),

@@ -36,7 +36,7 @@
 #include "componentsignallistmodel.h"
 #include "componentvariantlistmodel.h"
 #include "utils/slinthelpers.h"
-
+#include "../../guiapplication.h"
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/cmp/componentcheckmessages.h>
@@ -78,7 +78,7 @@ ComponentTab::ComponentTab(LibraryEditor2& editor,
                                            editor.getWorkspace().getSettings(),
                                            CategoryTreeModel2::Filter::CmpCat)),
     mSignals(new ComponentSignalListModel()),
-    mVariants(new ComponentVariantListModel()),
+    mVariants(new ComponentVariantListModel(mApp.getWorkspace(), mApp.getPreviewLayers())),
     mOriginalIsSchematicOnly(mComponent->isSchematicOnly()),
     mOriginalSignalUuids(mComponent->getSignals().getUuidSet()),
     mOriginalSymbolVariants(mComponent->getSymbolVariants()) {
@@ -153,6 +153,12 @@ ui::TabData ComponentTab::getUiData() const noexcept {
 }
 
 ui::ComponentTabData ComponentTab::getDerivedUiData() const noexcept {
+  // TODO: replace this by a map model.
+  QStringList signalNames;
+  for (const auto& sig : mComponent->getSignals()) {
+    signalNames.append(*sig.getName());
+  }
+
   return ui::ComponentTabData{
       mEditor.getUiIndex(),  // Library index
       mWizardMode,  // Wizard mode
@@ -176,7 +182,7 @@ ui::ComponentTabData ComponentTab::getDerivedUiData() const noexcept {
       mDefaultValue,  // Default value
       mDefaultValueError,  // Default value error
       mSignals,  // Signals
-      nullptr,  // Signal names
+      q2s(signalNames),  // Signal names
       mVariants,  // Variants
       ui::RuleCheckData{
           ui::RuleCheckType::ComponentCheck,  // Checks type

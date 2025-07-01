@@ -33,10 +33,15 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Workspace;
+
 namespace editor {
 
+class ComponentGateEditor;
 class UndoCommand;
 class UndoStack;
+class GraphicsLayerList;
 
 /*******************************************************************************
  *  Class ComponentGateListModel
@@ -51,9 +56,11 @@ class ComponentGateListModel : public QObject,
 
 public:
   // Constructors / Destructor
-  // ComponentGateListModel() = delete;
+  ComponentGateListModel() = delete;
   ComponentGateListModel(const ComponentGateListModel& other) = delete;
-  explicit ComponentGateListModel(QObject* parent = nullptr) noexcept;
+  explicit ComponentGateListModel(const Workspace& ws,
+                                  const GraphicsLayerList& layers,
+                                  QObject* parent = nullptr) noexcept;
   virtual ~ComponentGateListModel() noexcept;
 
   // General Methods
@@ -72,8 +79,6 @@ public:
   ComponentGateListModel& operator=(const ComponentGateListModel& rhs) = delete;
 
 private:
-  ui::ComponentGateData createItem(
-      const ComponentSymbolVariantItem& item) noexcept;
   void variantListEdited(
       const ComponentSymbolVariantItemList& list, int index,
       const std::shared_ptr<const ComponentSymbolVariantItem>& item,
@@ -83,10 +88,13 @@ private:
   static QString cleanForcedNetName(const QString& name) noexcept;
 
 private:
+  const Workspace& mWorkspace;
+  const GraphicsLayerList& mLayers;
+
   ComponentSymbolVariantItemList* mGateList;
   UndoStack* mUndoStack;
 
-  QList<ui::ComponentGateData> mItems;
+  QList<std::shared_ptr<ComponentGateEditor>> mItems;
 
   // Slots
   ComponentSymbolVariantItemList::OnEditedSlot mOnEditedSlot;

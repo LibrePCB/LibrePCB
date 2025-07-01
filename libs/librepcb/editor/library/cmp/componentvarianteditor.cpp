@@ -40,30 +40,34 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-ComponentVariantEditor::ComponentVariantEditor(ComponentSymbolVariant& variant,
-                                               QObject* parent) noexcept
+ComponentVariantEditor::ComponentVariantEditor(
+    const Workspace& ws, const GraphicsLayerList& layers, std::shared_ptr<ComponentSymbolVariant> variant,
+    QObject* parent) noexcept
   : QObject(parent),
+    mWorkspace(ws),
     mVariant(variant),
     mUndoStack(nullptr),
-    mGates(new ComponentGateListModel()) {
+    mGates(new ComponentGateListModel(ws, layers)) {
+  mGates->setGateList(&mVariant->getSymbolItems());
 }
 
 ComponentVariantEditor::~ComponentVariantEditor() noexcept {
+  mGates->setGateList(nullptr);
+  mGates->setUndoStack(nullptr);
 }
 
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
 
-std::optional<ui::ComponentVariantData> ComponentVariantEditor::getUiData()
-    const {
+ui::ComponentVariantData ComponentVariantEditor::getUiData() const {
   return ui::ComponentVariantData{
-      q2s(mVariant.getUuid().toStr().left(8)),  // ID
-      q2s(*mVariant.getNames().getDefaultValue()),  // Name
+      q2s(mVariant->getUuid().toStr().left(8)),  // ID
+      q2s(*mVariant->getNames().getDefaultValue()),  // Name
       slint::SharedString(),  // Name error
-      q2s(mVariant.getDescriptions().getDefaultValue()),  // Description
-      q2s(mVariant.getNorm()),  // Norm
-      nullptr,  // Gates
+      q2s(mVariant->getDescriptions().getDefaultValue()),  // Description
+      q2s(mVariant->getNorm()),  // Norm
+      mGates,  // Gates
   };
 }
 
@@ -73,6 +77,7 @@ void ComponentVariantEditor::setUiData(
 
 void ComponentVariantEditor::setUndoStack(UndoStack* stack) noexcept {
   mUndoStack = stack;
+  mGates->setUndoStack(mUndoStack);
 }
 
 /*******************************************************************************
