@@ -145,9 +145,6 @@ void NewElementWizardPage_ComponentSignals::initializePage() noexcept {
       }
     }
   }
-
-  mUi->signalListEditorWidget->setReferences(nullptr,
-                                             &mContext.mComponentSignals);
 }
 
 void NewElementWizardPage_ComponentSignals::cleanupPage() noexcept {

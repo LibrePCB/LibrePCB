@@ -192,12 +192,8 @@ add_library(
   library/cmp/componenteditorwidget.ui
   library/cmp/componentpinsignalmapmodel.cpp
   library/cmp/componentpinsignalmapmodel.h
-  library/cmp/componentsignallisteditorwidget.cpp
-  library/cmp/componentsignallisteditorwidget.h
   library/cmp/componentsignallistmodel.cpp
   library/cmp/componentsignallistmodel.h
-  library/cmp/componentsignallistmodel2.cpp
-  library/cmp/componentsignallistmodel2.h
   library/cmp/componentsymbolvarianteditdialog.cpp
   library/cmp/componentsymbolvarianteditdialog.h
   library/cmp/componentsymbolvarianteditdialog.ui

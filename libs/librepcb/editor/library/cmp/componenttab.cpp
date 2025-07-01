@@ -33,7 +33,7 @@
 #include "../cmd/cmdcomponentsymbolvariantedit.h"
 #include "../libraryeditor2.h"
 #include "../libraryelementcategoriesmodel.h"
-#include "componentsignallistmodel2.h"
+#include "componentsignallistmodel.h"
 #include "utils/slinthelpers.h"
 
 #include <librepcb/core/fileio/transactionalfilesystem.h>
@@ -76,7 +76,7 @@ ComponentTab::ComponentTab(LibraryEditor2& editor,
     mCategoriesTree(new CategoryTreeModel2(editor.getWorkspace().getLibraryDb(),
                                            editor.getWorkspace().getSettings(),
                                            CategoryTreeModel2::Filter::CmpCat)),
-    mSignals(new ComponentSignalListModel2()),
+    mSignals(new ComponentSignalListModel()),
     mOriginalIsSchematicOnly(mComponent->isSchematicOnly()),
     mOriginalSignalUuids(mComponent->getSignals().getUuidSet()),
     mOriginalSymbolVariants(mComponent->getSymbolVariants()) {
@@ -170,6 +170,8 @@ ui::ComponentTabData ComponentTab::getDerivedUiData() const noexcept {
       mDefaultValue,  // Default value
       mDefaultValueError,  // Default value error
       mSignals,  // Signals
+      nullptr,  // Signal names
+      nullptr,  // Variants
       ui::RuleCheckData{
           ui::RuleCheckType::ComponentCheck,  // Checks type
           ui::RuleCheckState::UpToDate,  // Checks state

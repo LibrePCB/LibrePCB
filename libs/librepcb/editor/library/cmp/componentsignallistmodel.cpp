@@ -22,11 +22,11 @@
  ******************************************************************************/
 #include "componentsignallistmodel.h"
 
+#include "../../undocommand.h"
 #include "../../undocommandgroup.h"
 #include "../../undostack.h"
+#include "../../utils/slinthelpers.h"
 #include "../cmd/cmdcomponentsignaledit.h"
-
-#include <librepcb/core/utils/toolbox.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -42,12 +42,9 @@ namespace editor {
  ******************************************************************************/
 
 ComponentSignalListModel::ComponentSignalListModel(QObject* parent) noexcept
-  : QAbstractTableModel(parent),
+  : QObject(parent),
     mSignalList(nullptr),
     mUndoStack(nullptr),
-    mNewName(),
-    mNewIsRequired(false),
-    mNewForcedNetName(),
     mOnEditedSlot(*this, &ComponentSignalListModel::signalListEdited) {
 }
 
@@ -55,267 +52,145 @@ ComponentSignalListModel::~ComponentSignalListModel() noexcept {
 }
 
 /*******************************************************************************
- *  Setters
+ *  General Methods
  ******************************************************************************/
 
 void ComponentSignalListModel::setSignalList(
     ComponentSignalList* list) noexcept {
-  emit beginResetModel();
+  if (list == mSignalList) return;
 
   if (mSignalList) {
     mSignalList->onEdited.detach(mOnEditedSlot);
   }
 
   mSignalList = list;
+  mItems.clear();
 
   if (mSignalList) {
     mSignalList->onEdited.attach(mOnEditedSlot);
+
+    for (auto sig : *mSignalList) {
+      mItems.append(createItem(sig));
+    }
   }
 
-  emit endResetModel();
+  notify_reset();
 }
 
 void ComponentSignalListModel::setUndoStack(UndoStack* stack) noexcept {
   mUndoStack = stack;
 }
 
-/*******************************************************************************
- *  Slots
- ******************************************************************************/
-
-void ComponentSignalListModel::add(
-    const QPersistentModelIndex& itemIndex) noexcept {
-  Q_UNUSED(itemIndex);
-  if (!mSignalList) {
-    return;
-  }
+bool ComponentSignalListModel::add(const QStringList& names) noexcept {
+  if (!mSignalList) return false;
 
   try {
     std::unique_ptr<UndoCommandGroup> cmd(
-        new UndoCommandGroup(tr("Add component signal(s)")));
-    foreach (const QString& name, Toolbox::expandRangesInString(mNewName)) {
+        new UndoCommandGroup(tr("Add Component Signal(s)")));
+    foreach (const QString& nameStr, names) {
+      const CircuitIdentifier name(
+          cleanCircuitIdentifier(nameStr));  // can throw
+      if (mSignalList->contains(*name)) {
+        throwDuplicateNameError(*name);
+      }
       std::shared_ptr<ComponentSignal> sig = std::make_shared<ComponentSignal>(
-          Uuid::createRandom(), validateNameOrThrow(name),
-          SignalRole::passive(), mNewForcedNetName, mNewIsRequired, false,
-          false);
+          Uuid::createRandom(), name, SignalRole::passive(), QString(), false,
+          false, false);
       cmd->appendChild(new CmdComponentSignalInsert(*mSignalList, sig));
     }
     execCmd(cmd.release());
-    mNewName = QString();
-    mNewIsRequired = false;
-    mNewForcedNetName = QString();
+    return true;
   } catch (const Exception& e) {
-    QMessageBox::critical(0, tr("Error"), e.getMsg());
+    QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+    return false;
   }
 }
 
-void ComponentSignalListModel::remove(
-    const QPersistentModelIndex& itemIndex) noexcept {
-  if (!mSignalList) {
-    return;
-  }
+void ComponentSignalListModel::apply() {
+  if (!mSignalList) return;
 
-  try {
-    Uuid uuid = Uuid::fromString(itemIndex.data(Qt::EditRole).toString());
-    std::shared_ptr<ComponentSignal> sig = mSignalList->get(uuid);
-    execCmd(new CmdComponentSignalRemove(*mSignalList, sig.get()));
-  } catch (const Exception& e) {
-    QMessageBox::critical(0, tr("Error"), e.getMsg());
+  for (auto i = 0; i < mItems.count(); ++i) {
+    auto& item = mItems[i];
+    if (auto sig = mSignalList->value(i)) {
+      std::unique_ptr<CmdComponentSignalEdit> cmd(
+          new CmdComponentSignalEdit(*sig));
+      const auto name =
+          parseCircuitIdentifier(cleanCircuitIdentifier(s2q(item.name)));
+      if (name && ((*name) != sig->getName())) {
+        if (mSignalList->contains(**name)) {
+          item.name = q2s(*sig->getName());
+          item.name_error = slint::SharedString();
+          notify_row_changed(i);
+          throwDuplicateNameError(**name);
+        }
+        cmd->setName(*name);
+      } else {
+        item.name = q2s(*sig->getName());
+        item.name_error = slint::SharedString();
+        notify_row_changed(i);
+      }
+      cmd->setIsRequired(item.required);
+      cmd->setForcedNetName(cleanForcedNetName(s2q(item.forced_net_name)));
+      execCmd(cmd.release());
+    }
   }
 }
 
 /*******************************************************************************
- *  Inherited from QAbstractItemModel
+ *  Implementations
  ******************************************************************************/
 
-int ComponentSignalListModel::rowCount(const QModelIndex& parent) const {
-  if (!parent.isValid() && mSignalList) {
-    return mSignalList->count() + 1;
-  }
-  return 0;
+std::size_t ComponentSignalListModel::row_count() const {
+  return mSignalList ? mSignalList->count() : 0;
 }
 
-int ComponentSignalListModel::columnCount(const QModelIndex& parent) const {
-  if (!parent.isValid()) {
-    return _COLUMN_COUNT;
-  }
-  return 0;
+std::optional<ui::ComponentSignalData> ComponentSignalListModel::row_data(
+    std::size_t i) const {
+  return (i < static_cast<std::size_t>(mItems.count()))
+      ? std::make_optional(mItems.at(i))
+      : std::nullopt;
 }
 
-QVariant ComponentSignalListModel::data(const QModelIndex& index,
-                                        int role) const {
-  if (!index.isValid() || !mSignalList) {
-    return QVariant();
-  }
-
-  std::shared_ptr<ComponentSignal> item = mSignalList->value(index.row());
-  switch (index.column()) {
-    case COLUMN_NAME: {
-      QString name = item ? *item->getName() : mNewName;
-      bool showHint = (!item) && mNewName.isEmpty();
-      QString hint =
-          tr("Signal name (may contain ranges like \"%1\")").arg("1..5");
-      switch (role) {
-        case Qt::DisplayRole:
-          return showHint ? hint : name;
-        case Qt::ToolTipRole:
-          return showHint ? hint : QVariant();
-        case Qt::EditRole:
-          return name;
-        case Qt::ForegroundRole:
-          if (showHint) {
-            QColor color = qApp->palette().text().color();
-            color.setAlpha(128);
-            return QBrush(color);
-          } else {
-            return QVariant();
-          }
-        default:
-          return QVariant();
-      }
-    }
-    case COLUMN_ISREQUIRED: {
-      bool required = item ? item->isRequired() : mNewIsRequired;
-      switch (role) {
-        case Qt::DisplayRole:
-          // See https://github.com/LibrePCB/LibrePCB/issues/475.
-          return QString();
-        case Qt::CheckStateRole:
-          return required ? Qt::Checked : Qt::Unchecked;
-        case Qt::ToolTipRole:
-          return tr("If checked, the signal needs to be connected in schematics, otherwise an ERC error is raised.") +
-              "\n" +
-              tr("If unchecked, it's allowed to leave the signal unconnected "
-                 "in schematics.");
-        default:
-          return QVariant();
-      }
-    }
-    case COLUMN_FORCEDNETNAME: {
-      switch (role) {
-        case Qt::DisplayRole:
-        case Qt::EditRole:
-          return item ? item->getForcedNetName() : mNewForcedNetName;
-        default:
-          return QVariant();
-      }
-    }
-    case COLUMN_ACTIONS: {
-      switch (role) {
-        case Qt::EditRole:
-          return item ? item->getUuid().toStr() : QVariant();
-        default:
-          return QVariant();
-      }
-    }
-    default:
-      return QVariant();
-  }
-
-  return QVariant();
-}
-
-QVariant ComponentSignalListModel::headerData(int section,
-                                              Qt::Orientation orientation,
-                                              int role) const {
-  if (orientation == Qt::Horizontal) {
-    if (role == Qt::DisplayRole) {
-      switch (section) {
-        case COLUMN_NAME:
-          return tr("Name");
-        case COLUMN_ISREQUIRED:
-          return tr("Required");
-        case COLUMN_FORCEDNETNAME:
-          return tr("Forced Net");
-        default:
-          return QVariant();
-      }
-    }
-  } else if (orientation == Qt::Vertical) {
-    if (mSignalList && (role == Qt::DisplayRole)) {
-      std::shared_ptr<ComponentSignal> item = mSignalList->value(section);
-      return item ? QString::number(section + 1) : tr("New:");
-    } else if (mSignalList && (role == Qt::ToolTipRole)) {
-      std::shared_ptr<ComponentSignal> item = mSignalList->value(section);
-      return item ? item->getUuid().toStr() : tr("Add a new signal");
-    } else if (role == Qt::TextAlignmentRole) {
-      return QVariant(Qt::AlignRight | Qt::AlignVCenter);
-    }
-  }
-  return QVariant();
-}
-
-Qt::ItemFlags ComponentSignalListModel::flags(const QModelIndex& index) const {
-  Qt::ItemFlags f = QAbstractTableModel::flags(index);
-  if (index.isValid() && (index.column() == COLUMN_ISREQUIRED)) {
-    f |= Qt::ItemIsUserCheckable;
-  } else if (index.isValid() && (index.column() != COLUMN_ACTIONS)) {
-    f |= Qt::ItemIsEditable;
-  }
-  return f;
-}
-
-bool ComponentSignalListModel::setData(const QModelIndex& index,
-                                       const QVariant& value, int role) {
-  if (!mSignalList) {
-    return false;
-  }
-
-  try {
-    std::shared_ptr<ComponentSignal> item = mSignalList->value(index.row());
-    std::unique_ptr<CmdComponentSignalEdit> cmd;
-    if (item) {
-      cmd.reset(new CmdComponentSignalEdit(*item));
-    }
-    if ((index.column() == COLUMN_NAME) && role == Qt::EditRole) {
-      QString name = value.toString().trimmed();
-      QString cleanedName = cleanCircuitIdentifier(name);
-      if (cmd) {
-        if (cleanedName != item->getName()) {
-          cmd->setName(validateNameOrThrow(cleanedName));
-        }
+void ComponentSignalListModel::set_row_data(
+    std::size_t i, const ui::ComponentSignalData& data) noexcept {
+  if (mSignalList && (i < static_cast<std::size_t>(mItems.count()))) {
+    if (auto sig = mSignalList->value(i)) {
+      if (data.delete_) {
+        // if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0): Remove lambda.
+        QMetaObject::invokeMethod(
+            this,
+            [this, sig]() {
+              try {
+                execCmd(new CmdComponentSignalRemove(*mSignalList, sig.get()));
+              } catch (const Exception& e) {
+                qCritical() << e.getMsg();
+              }
+            },
+            Qt::QueuedConnection);
       } else {
-        QStringList names = Toolbox::expandRangesInString(name);
-        if (names.count() == 1 && (names.first() == name)) {
-          mNewName = cleanedName;  // no ranges -> clean name
-        } else {
-          mNewName = name;  // contains ranges -> keep them!
-        }
+        mItems[i] = data;
+        validateCircuitIdentifier(s2q(data.name), mItems[i].name_error);
+        notify_row_changed(i);
       }
-    } else if ((index.column() == COLUMN_ISREQUIRED) &&
-               role == Qt::CheckStateRole) {
-      bool required = value.toInt() == Qt::Checked;
-      if (cmd) {
-        cmd->setIsRequired(required);
-      } else {
-        mNewIsRequired = required;
-      }
-    } else if ((index.column() == COLUMN_FORCEDNETNAME) &&
-               role == Qt::EditRole) {
-      QString forcedNetName = cleanForcedNetName(value.toString());
-      if (cmd) {
-        cmd->setForcedNetName(forcedNetName);
-      } else {
-        mNewForcedNetName = forcedNetName;
-      }
-    } else {
-      return false;  // do not execute command!
     }
-    if (cmd) {
-      execCmd(cmd.release());
-    } else if (!item) {
-      emit dataChanged(index, index);
-    }
-    return true;
-  } catch (const Exception& e) {
-    QMessageBox::critical(0, tr("Error"), e.getMsg());
   }
-  return false;
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+ui::ComponentSignalData ComponentSignalListModel::createItem(
+    const ComponentSignal& sig) noexcept {
+  return ui::ComponentSignalData{
+      q2s(sig.getUuid().toStr().left(8)),  // ID
+      q2s(*sig.getName()),  // Name
+      slint::SharedString(),  // Name error
+      q2s(sig.getForcedNetName()),  // Forced net name
+      sig.isRequired(),  // Required
+      false,  // Delete
+  };
+}
 
 void ComponentSignalListModel::signalListEdited(
     const ComponentSignalList& list, int index,
@@ -325,15 +200,16 @@ void ComponentSignalListModel::signalListEdited(
   Q_UNUSED(signal);
   switch (event) {
     case ComponentSignalList::Event::ElementAdded:
-      beginInsertRows(QModelIndex(), index, index);
-      endInsertRows();
+      mItems.insert(index, createItem(*signal));
+      notify_row_added(index, 1);
       break;
     case ComponentSignalList::Event::ElementRemoved:
-      beginRemoveRows(QModelIndex(), index, index);
-      endRemoveRows();
+      mItems.remove(index);
+      notify_row_removed(index, 1);
       break;
     case ComponentSignalList::Event::ElementEdited:
-      dataChanged(this->index(index, 0), this->index(index, _COLUMN_COUNT - 1));
+      mItems[index] = createItem(*signal);
+      notify_row_changed(index);
       break;
     default:
       qWarning() << "Unhandled switch-case in "
@@ -347,19 +223,15 @@ void ComponentSignalListModel::execCmd(UndoCommand* cmd) {
   if (mUndoStack) {
     mUndoStack->execCmd(cmd);
   } else {
-    QScopedPointer<UndoCommand> cmdGuard(cmd);
+    std::unique_ptr<UndoCommand> cmdGuard(cmd);
     cmdGuard->execute();
   }
 }
 
-CircuitIdentifier ComponentSignalListModel::validateNameOrThrow(
-    const QString& name) const {
-  if (mSignalList && mSignalList->contains(name)) {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        tr("There is already a signal with the name \"%1\".").arg(name));
-  }
-  return CircuitIdentifier(name);  // can throw
+void ComponentSignalListModel::throwDuplicateNameError(const QString& name) {
+  throw RuntimeError(
+      __FILE__, __LINE__,
+      tr("There is already a signal with the name \"%1\".").arg(name));
 }
 
 QString ComponentSignalListModel::cleanForcedNetName(

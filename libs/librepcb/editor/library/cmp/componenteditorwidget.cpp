@@ -73,8 +73,6 @@ ComponentEditorWidget::ComponentEditorWidget(const Context& context,
   mUi->cbxSchematicOnly->setCheckable(!mContext.readOnly);
   mUi->edtPrefix->setReadOnly(mContext.readOnly);
   mUi->edtDefaultValue->setReadOnly(mContext.readOnly);
-  mUi->signalEditorWidget->setFrameStyle(QFrame::NoFrame);
-  mUi->signalEditorWidget->setReadOnly(mContext.readOnly);
   mUi->symbolVariantsEditorWidget->setFrameStyle(QFrame::NoFrame);
   mUi->symbolVariantsEditorWidget->setReadOnly(mContext.readOnly);
   mUi->attributesEditorWidget->setFrameStyle(QFrame::NoFrame);
@@ -98,8 +96,6 @@ ComponentEditorWidget::ComponentEditorWidget(const Context& context,
   mComponent.reset(Component::open(std::unique_ptr<TransactionalDirectory>(
                                        new TransactionalDirectory(mFileSystem)))
                        .release());  // can throw
-  mUi->signalEditorWidget->setReferences(mUndoStack.data(),
-                                         &mComponent->getSignals());
   mUi->symbolVariantsEditorWidget->setReferences(
       mUndoStack.data(), &mComponent->getSymbolVariants(), this);
 
@@ -120,7 +116,6 @@ ComponentEditorWidget::~ComponentEditorWidget() noexcept {
 
   // Disconnect UI from library element to avoid dangling pointers.
   mUi->attributesEditorWidget->setReferences(nullptr, nullptr);
-  mUi->signalEditorWidget->setReferences(nullptr, nullptr);
   mUi->symbolVariantsEditorWidget->setReferences(nullptr, nullptr, nullptr);
 }
 
