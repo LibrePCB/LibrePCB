@@ -190,6 +190,8 @@ add_library(
   library/cmp/componenteditorwidget.cpp
   library/cmp/componenteditorwidget.h
   library/cmp/componenteditorwidget.ui
+  library/cmp/componentgatelistmodel.cpp
+  library/cmp/componentgatelistmodel.h
   library/cmp/componentpinsignalmapmodel.cpp
   library/cmp/componentpinsignalmapmodel.h
   library/cmp/componentsignallistmodel.cpp
@@ -207,6 +209,10 @@ add_library(
   library/cmp/componentsymbolvariantlistwidget.h
   library/cmp/componenttab.cpp
   library/cmp/componenttab.h
+  library/cmp/componentvarianteditor.cpp
+  library/cmp/componentvarianteditor.h
+  library/cmp/componentvariantlistmodel.cpp
+  library/cmp/componentvariantlistmodel.h
   library/cmp/compsymbvarpinsignalmapeditorwidget.cpp
   library/cmp/compsymbvarpinsignalmapeditorwidget.h
   library/cmp/if_componentsymbolvarianteditorprovider.h

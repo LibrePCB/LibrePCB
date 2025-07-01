@@ -42,6 +42,7 @@ namespace editor {
 
 class CategoryTreeModel2;
 class ComponentSignalListModel;
+class ComponentVariantListModel;
 class LibraryEditor2;
 class LibraryElementCategoriesModel;
 
@@ -134,6 +135,7 @@ private:
   std::shared_ptr<LibraryElementCategoriesModel> mCategories;
   std::shared_ptr<CategoryTreeModel2> mCategoriesTree;
   std::shared_ptr<ComponentSignalListModel> mSignals;
+  std::shared_ptr<ComponentVariantListModel> mVariants;
 
   /// Broken interface detection
   bool mOriginalIsSchematicOnly;

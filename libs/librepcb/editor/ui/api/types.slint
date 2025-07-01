@@ -132,6 +132,7 @@ export struct ComponentPinoutData {
 }
 
 export struct ComponentGateData {
+    id: string,
     symbol-name: string,
     symbol-x: Int64,
     symbol-y: Int64,
@@ -143,7 +144,9 @@ export struct ComponentGateData {
 }
 
 export struct ComponentVariantData {
+    id: string,
     name: string,
+    name-error: string,
     description: string,
     norm: string,
     gates: [ComponentGateData],

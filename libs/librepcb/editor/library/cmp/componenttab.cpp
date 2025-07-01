@@ -34,6 +34,7 @@
 #include "../libraryeditor2.h"
 #include "../libraryelementcategoriesmodel.h"
 #include "componentsignallistmodel.h"
+#include "componentvariantlistmodel.h"
 #include "utils/slinthelpers.h"
 
 #include <librepcb/core/fileio/transactionalfilesystem.h>
@@ -77,6 +78,7 @@ ComponentTab::ComponentTab(LibraryEditor2& editor,
                                            editor.getWorkspace().getSettings(),
                                            CategoryTreeModel2::Filter::CmpCat)),
     mSignals(new ComponentSignalListModel()),
+    mVariants(new ComponentVariantListModel()),
     mOriginalIsSchematicOnly(mComponent->isSchematicOnly()),
     mOriginalSignalUuids(mComponent->getSignals().getUuidSet()),
     mOriginalSymbolVariants(mComponent->getSymbolVariants()) {
@@ -89,6 +91,8 @@ ComponentTab::ComponentTab(LibraryEditor2& editor,
   // Connect models.
   mSignals->setSignalList(&mComponent->getSignals());
   mSignals->setUndoStack(mUndoStack.get());
+  mVariants->setVariantList(&mComponent->getSymbolVariants());
+  mVariants->setUndoStack(mUndoStack.get());
   connect(mCategories.get(), &LibraryElementCategoriesModel::modified, this,
           &ComponentTab::commitMetadata, Qt::QueuedConnection);
 
@@ -108,6 +112,8 @@ ComponentTab::~ComponentTab() noexcept {
 
   mSignals->setSignalList(nullptr);
   mSignals->setUndoStack(nullptr);
+  mVariants->setVariantList(nullptr);
+  mVariants->setUndoStack(nullptr);
 
   // Delete all command objects in the undo stack. This mmust be done before
   // other important objects are deleted, as undo command objects can hold
@@ -171,7 +177,7 @@ ui::ComponentTabData ComponentTab::getDerivedUiData() const noexcept {
       mDefaultValueError,  // Default value error
       mSignals,  // Signals
       nullptr,  // Signal names
-      nullptr,  // Variants
+      mVariants,  // Variants
       ui::RuleCheckData{
           ui::RuleCheckType::ComponentCheck,  // Checks type
           ui::RuleCheckState::UpToDate,  // Checks state
@@ -559,6 +565,7 @@ void ComponentTab::commitMetadata() noexcept {
     mUndoStack->execCmd(cmd.release());
 
     mSignals->apply();
+    mVariants->apply();
   } catch (const Exception& e) {
     QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
   }
