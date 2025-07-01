@@ -59,6 +59,7 @@ public:
   // General Methods
   void setSignalList(ComponentSignalList* list) noexcept;
   void setUndoStack(UndoStack* stack) noexcept;
+  bool add(const QStringList& names) noexcept;
   void apply();
 
   // Implementations
@@ -77,6 +78,8 @@ private:
                         const std::shared_ptr<const ComponentSignal>& signal,
                         ComponentSignalList::Event event) noexcept;
   void execCmd(UndoCommand* cmd);
+  static void throwDuplicateNameError(const QString& name);
+  static QString cleanForcedNetName(const QString& name) noexcept;
 
 private:
   ComponentSignalList* mSignalList;

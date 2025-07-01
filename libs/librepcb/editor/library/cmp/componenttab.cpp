@@ -182,6 +182,9 @@ ui::ComponentTabData ComponentTab::getDerivedUiData() const noexcept {
       isInterfaceBroken(),  // Interface broken
       // mCompactLayout,  // Compact layout
       mAddCategoryRequested ? "choose" : slint::SharedString(),  // New category
+      mNewSignalName,  // New signal name
+      mNewSignalNameError,  // New signal name error
+      false,  // New signal commit
   };
 }
 
@@ -220,6 +223,19 @@ void ComponentTab::setDerivedUiData(const ui::ComponentTabData& data) noexcept {
   validateComponentPrefix(s2q(mPrefix), mPrefixError);
   mDefaultValue = data.default_value;
   validateComponentDefaultValue(s2q(mDefaultValue), mDefaultValueError);
+
+  mNewSignalName = data.new_signal_name;
+  const QStringList newNames =
+      Toolbox::expandRangesInString(s2q(mNewSignalName).trimmed());
+  if (!newNames.value(0).isEmpty()) {
+    validateCircuitIdentifier(newNames.value(0), mNewSignalNameError);
+  } else {
+    mNewSignalNameError = slint::SharedString();
+  }
+  if (data.new_signal_commit && (!newNames.value(0).isEmpty()) &&
+      mNewSignalNameError.empty() && mSignals->add(newNames)) {
+    mNewSignalName = slint::SharedString();
+  }
 
   onDerivedUiDataChanged.notify();
 }

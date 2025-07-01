@@ -1,0 +1,226 @@
+import {
+    Button,
+    CategoriesListView,
+    ComboBox,
+    IconButton,
+    LineEdit,
+    LinkText,
+    MenuItem,
+    MenuPopup,
+    MessageBox,
+    Palette,
+    SceneButton,
+    ScrollView,
+    SlideView,
+    Switch,
+    TextEdit,
+    ToolButton,
+    TreeItemPickerPopup,
+} from "../../widgets.slint";
+import {
+    Backend,
+    ComponentVariantData,
+    ComponentTabData,
+    ComponentGateData,
+    Constants,
+    ComponentPinoutData,
+    ComponentPinoutDisplayMode,
+    Data,
+    DismissableMessageAction,
+    EditorCommandSet as Cmd,
+    EditorTool,
+    PanelPage,
+    TabAction,
+    WindowSectionData,
+} from "../../api.slint";
+
+component ComponentGateListItem {
+    in-out property <[ComponentGateData]> model;
+    in property <int> index;
+    in-out property <[string]> signal-names;
+    property <length> pinout-row-height: 25px;
+
+    HorizontalLayout {
+        padding: 5px;
+        spacing: 5px;
+
+        Image {
+            width: 50px;
+            image-fit: contain;
+            source: model[index].image;
+        }
+
+        VerticalLayout {
+            spacing: 5px;
+
+            HorizontalLayout {
+                spacing: 5px;
+
+                Text {
+                    vertical-alignment: center;
+                    text: @tr("Gate:");
+                }
+
+                Text {
+                    font-size: 14px;
+                    font-weight: 600;
+                    vertical-alignment: center;
+                    text: model[index].symbol-name;
+                }
+
+                Rectangle { }
+
+                Switch {
+                    width: self.preferred-width;
+                    size: 18px;
+                    text: @tr("Required:");
+                    text-side: left;
+                }
+
+                Text {
+                    vertical-alignment: center;
+                    text: @tr("Suffix:");
+                }
+
+                LineEdit {
+                    height: 22px;
+                    max-width: 80px;
+                    text: model[index].suffix;
+                }
+            }
+
+            HorizontalLayout {
+                spacing: 8px;
+                padding-left: 20px;
+
+                VerticalLayout {
+                    width: self.preferred-width;
+                    spacing: 2px;
+
+                    for pinout in model[index].pinout: Text {
+                        height: pinout-row-height;
+                        horizontal-alignment: right;
+                        vertical-alignment: center;
+                        text: pinout.pin-name + ":";
+                    }
+                }
+
+                VerticalLayout {
+                    spacing: 2px;
+
+                    for pinout in model[index].pinout: ComboBox {
+                        height: pinout-row-height;
+                        model: signal-names;
+                        current-index: pinout.signal-index;
+                    }
+                }
+
+                VerticalLayout {
+                    width: self.preferred-width;
+                    spacing: 2px;
+
+                    for pinout in model[index].pinout: HorizontalLayout {
+                        height: pinout-row-height;
+                        spacing: 8px;
+
+                        LinkText {
+                            text: @tr("None").to-uppercase();
+                            text-color: (pinout.display-mode == ComponentPinoutDisplayMode.none) ? #e0e0e0 : #909090;
+                            vertical-alignment: center;
+                            font-size: 10px;
+                        }
+
+                        LinkText {
+                            text: @tr("Pin").to-uppercase();
+                            text-color: (pinout.display-mode == ComponentPinoutDisplayMode.pin-name) ? #e0e0e0 : #909090;
+                            vertical-alignment: center;
+                            font-size: 10px;
+                        }
+
+                        LinkText {
+                            text: @tr("Signal").to-uppercase();
+                            text-color: (pinout.display-mode == ComponentPinoutDisplayMode.signal-name) ? #e0e0e0 : #909090;
+                            vertical-alignment: center;
+                            font-size: 10px;
+                        }
+
+                        LinkText {
+                            text: @tr("Net").to-uppercase();
+                            text-color: (pinout.display-mode == ComponentPinoutDisplayMode.net-name) ? #e0e0e0 : #909090;
+                            vertical-alignment: center;
+                            font-size: 10px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+component ComponentVariantListItem inherits Rectangle {
+    in-out property <[ComponentVariantData]> model;
+    in property <int> index;
+    in-out property <[string]> signal-names;
+
+    height: self.preferred-height;
+    border-color: #909090;
+    border-width: 1px;
+    border-radius: 10px;
+
+    VerticalLayout {
+        HorizontalLayout {
+            padding: 5px;
+            spacing: 5px;
+
+            Text {
+                vertical-alignment: center;
+                text: @tr("Variant:");
+            }
+
+            LineEdit {
+                text: model[index].name;
+            }
+
+            Text {
+                vertical-alignment: center;
+                text: @tr("Norm:");
+            }
+
+            LineEdit {
+                text: model[index].norm;
+            }
+        }
+
+        Rectangle {
+            height: 1px;
+            background: #909090;
+        }
+
+        for gate[gate-index] in model[index].gates: ComponentGateListItem {
+            model: model[index].gates;
+            index: gate-index;
+            signal-names: signal-names;
+        }
+    }
+}
+
+export component ComponentVariantListView {
+    in-out property <[ComponentVariantData]> model;
+    in-out property <[string]> signal-names;
+
+    VerticalLayout {
+        ScrollView {
+            preferred-height: l.preferred-height;
+
+            l := VerticalLayout {
+                padding: 8px;
+
+                for item[index] in model: ComponentVariantListItem {
+                    model: model;
+                    index: index;
+                    signal-names: signal-names;
+                }
+            }
+        }
+    }
+}

@@ -7,6 +7,7 @@ import {
     EditorTool,
     FeatureState,
     GridStyle,
+    ComponentPinoutDisplayMode,
     LengthUnit,
     LibraryData,
     LibraryDependency,
@@ -644,7 +645,7 @@ export global Data {
                 {
                     library-index: 0,
                     wizard-mode: false,
-                    page-index: 1,
+                    page-index: 2,
                     path: "component1",
                     name: "Component",
                     description: "Foo Bar\nMultiline\nBlabla",
@@ -695,6 +696,54 @@ export global Data {
                             forced-net-name: "FORCED",
                             required: true,
                         },
+                    ],
+                    cmp-signal-names: ["(unconnected)", "GND", "3V3", "5V"],
+                    variants: [
+                        {
+                            name: "default",
+                            description: "The default variant",
+                            norm: "ISO1234",
+                            gates: [
+                                {
+                                    symbol-name: "Power",
+                                    symbol-x: { },
+                                    symbol-y: { },
+                                    symbol-rotation: 0,
+                                    required: true,
+                                    suffix: "A",
+                                    pinout: [
+                                        {
+                                            pin-name: "1",
+                                            signal-index: 1,
+                                            display-mode: ComponentPinoutDisplayMode.none,
+                                        },
+                                        {
+                                            pin-name: "2",
+                                            signal-index: 2,
+                                            display-mode: ComponentPinoutDisplayMode.net-name,
+                                        },
+                                    ],
+                                    image: @image-url("../../../../../img/places/project_folder.png"),
+                                },
+                                {
+                                    symbol-name: "Logic",
+                                    symbol-x: { },
+                                    symbol-y: { },
+                                    symbol-rotation: 0,
+                                    required: true,
+                                    suffix: "B",
+                                    pinout: [
+                                        {
+                                            pin-name: "3",
+                                        },
+                                        {
+                                            pin-name: "4",
+                                        },
+                                    ],
+                                    image: @image-url("../../../../../img/places/project_folder.png"),
+                                },
+                            ],
+                        }
                     ],
                     checks: {
                         type: RuleCheckType.component-check,
@@ -865,7 +914,7 @@ export global Data {
     in property <int> notifications-progress-index: 4;
 
     // Notifications: Popup shown status
-    in property <bool> notifications-shown: true;
+    in property <bool> notifications-shown: false;
 
     // Locally installed libraries (may be filtered)
     in property <[LibraryData]> local-libraries: [

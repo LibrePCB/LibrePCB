@@ -23,11 +23,13 @@
 #include "componentsignallistmodel2.h"
 
 #include "../../undocommand.h"
+#include "../../undocommandgroup.h"
 #include "../../undostack.h"
 #include "../../utils/slinthelpers.h"
 #include "../cmd/cmdcomponentsignaledit.h"
 
 #include <QtCore>
+#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace
@@ -79,6 +81,31 @@ void ComponentSignalListModel2::setUndoStack(UndoStack* stack) noexcept {
   mUndoStack = stack;
 }
 
+bool ComponentSignalListModel2::add(const QStringList& names) noexcept {
+  if (!mSignalList) return false;
+
+  try {
+    std::unique_ptr<UndoCommandGroup> cmd(
+        new UndoCommandGroup(tr("Add Component Signal(s)")));
+    foreach (const QString& nameStr, names) {
+      const CircuitIdentifier name(
+          cleanCircuitIdentifier(nameStr));  // can throw
+      if (mSignalList->contains(*name)) {
+        throwDuplicateNameError(*name);
+      }
+      std::shared_ptr<ComponentSignal> sig = std::make_shared<ComponentSignal>(
+          Uuid::createRandom(), name, SignalRole::passive(), QString(), false,
+          false, false);
+      cmd->appendChild(new CmdComponentSignalInsert(*mSignalList, sig));
+    }
+    execCmd(cmd.release());
+    return true;
+  } catch (const Exception& e) {
+    QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+    return false;
+  }
+}
+
 void ComponentSignalListModel2::apply() {
   if (!mSignalList) return;
 
@@ -87,8 +114,15 @@ void ComponentSignalListModel2::apply() {
     if (auto sig = mSignalList->value(i)) {
       std::unique_ptr<CmdComponentSignalEdit> cmd(
           new CmdComponentSignalEdit(*sig));
-      if (auto name =
-              parseCircuitIdentifier(cleanCircuitIdentifier(s2q(item.name)))) {
+      const auto name =
+          parseCircuitIdentifier(cleanCircuitIdentifier(s2q(item.name)));
+      if (name && ((*name) != sig->getName())) {
+        if (mSignalList->contains(**name)) {
+          item.name = q2s(*sig->getName());
+          item.name_error = slint::SharedString();
+          notify_row_changed(i);
+          throwDuplicateNameError(**name);
+        }
         cmd->setName(*name);
       } else {
         item.name = q2s(*sig->getName());
@@ -96,7 +130,7 @@ void ComponentSignalListModel2::apply() {
         notify_row_changed(i);
       }
       cmd->setIsRequired(item.required);
-      cmd->setForcedNetName(s2q(item.forced_net_name).trimmed());
+      cmd->setForcedNetName(cleanForcedNetName(s2q(item.forced_net_name)));
       execCmd(cmd.release());
     }
   }
@@ -192,6 +226,22 @@ void ComponentSignalListModel2::execCmd(UndoCommand* cmd) {
     std::unique_ptr<UndoCommand> cmdGuard(cmd);
     cmdGuard->execute();
   }
+}
+
+void ComponentSignalListModel2::throwDuplicateNameError(const QString& name) {
+  throw RuntimeError(
+      __FILE__, __LINE__,
+      tr("There is already a signal with the name \"%1\".").arg(name));
+}
+
+QString ComponentSignalListModel2::cleanForcedNetName(
+    const QString& name) noexcept {
+  // Same as cleanCircuitIdentifier(), but allowing '{' and '}' because it's
+  // allowed to have attribute placeholders in a forced net name. Also remove
+  // spaces because they must not be replaced by underscores inside {{ and }}.
+  return Toolbox::cleanUserInputString(
+      name, QRegularExpression("[^-a-zA-Z0-9_+/!?@#$\\{\\}]"), true, false,
+      false, "");
 }
 
 /*******************************************************************************

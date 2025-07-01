@@ -35,21 +35,30 @@ import {
 component ComponentSignalListViewHeader inherits TouchArea {
     in property <string> text;
     in property <TextHorizontalAlignment> alignment: left;
+    in property <color> color: Palette.foreground;
 
     Text {
         width: 100%;
         horizontal-alignment: alignment;
         vertical-alignment: center;
+        color: color;
         text: text;
     }
 }
 
 export component ComponentSignalListView {
     in-out property <[ComponentSignalData]> model;
+    in-out property <string> new-name;
+    in-out property <string> new-name-error;
     property <length> row-height: 25px;
     property <length> row-spacing: 3px;
 
     callback edited;
+    callback new-signal-edited(text: string);
+    new-signal-edited(text) => {
+        new-name = text;
+    }
+    callback new-signal-committed();
 
     VerticalLayout {
         alignment: start;
@@ -65,16 +74,34 @@ export component ComponentSignalListView {
                 text: @tr("Add Signals:");
             }
 
-            LineEdit {
+            new-signal-edt := LineEdit {
                 height: row-height;
                 placeholder-text: @tr("Signal name (may contain ranges like \"1..5\")");
+                text: new-name;
+                validation-error: new-name-error;
+
+                text-edited(text) => {
+                    new-signal-edited(text);
+                }
+
+                key-pressed(event) => {
+                    if event.text == Key.Return {
+                        new-signal-btn.clicked();
+                        return accept;
+                    }
+                    reject
+                }
             }
 
-            IconButton {
+            new-signal-btn := IconButton {
                 height: row-height;
                 style: hyperlink;
                 icon-scale: 0.7;
                 icon: @image-url("../../../../../font-awesome/svgs/solid/plus.svg");
+
+                clicked => {
+                    new-signal-committed();
+                }
             }
         }
 
@@ -92,13 +119,14 @@ export component ComponentSignalListView {
                 padding: 5px;
                 spacing: 5px;
 
-                col0-l := VerticalLayout {
+                VerticalLayout {
                     width: self.preferred-width;
                     spacing: row-spacing;
 
                     ComponentSignalListViewHeader {
                         height: row-height;
                         alignment: right;
+                        color: #909090;
                         text: @tr("#");
                     }
 
@@ -106,6 +134,8 @@ export component ComponentSignalListView {
                         height: row-height;
                         horizontal-alignment: right;
                         vertical-alignment: center;
+                        font-size: 10px;
+                        color: #909090;
                         text: index + 1;
                     }
                 }
@@ -121,6 +151,7 @@ export component ComponentSignalListView {
 
                     ComponentSignalListViewHeader {
                         height: row-height;
+                        color: #909090;
                         text: @tr("ID");
                     }
 
@@ -129,6 +160,8 @@ export component ComponentSignalListView {
                         horizontal-alignment: right;
                         vertical-alignment: center;
                         font-family: "Noto Sans Mono";
+                        font-size: 10px;
+                        color: #909090;
                         text: item.id;
                     }
                 }
@@ -181,6 +214,7 @@ export component ComponentSignalListView {
                         Switch {
                             width: self.preferred-width;
                             size: 20px;
+                            status-tip: @tr("If checked, an ERC error is raised when this signal is left unconnected in the schematics");
                             checked: item.required;
 
                             toggled(checked) => {

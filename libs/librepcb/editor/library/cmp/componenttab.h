@@ -127,6 +127,8 @@ private:
   slint::SharedString mPrefixError;
   slint::SharedString mDefaultValue;
   slint::SharedString mDefaultValueError;
+  slint::SharedString mNewSignalName;
+  slint::SharedString mNewSignalNameError;
 
   // UI data
   std::shared_ptr<LibraryElementCategoriesModel> mCategories;

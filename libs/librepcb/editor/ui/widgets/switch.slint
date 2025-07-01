@@ -1,4 +1,4 @@
-import { Constants } from "../api.slint";
+import { Constants, Data } from "../api.slint";
 
 export enum TextSide {
     left,
@@ -12,6 +12,7 @@ export component Switch inherits Rectangle {
     in property <TextSide> text-side: right;
     in property <length> size: 25px;
     in property <length> font-size: 12px;
+    in property <string> status-tip;
     in property <color> checked-color: Constants.librepcb-color;
     in property <color> unchecked-color: #606060;
     in property <bool> focusable: true;
@@ -24,6 +25,7 @@ export component Switch inherits Rectangle {
 
     // Accessibility
     accessible-role: switch;
+    accessible-description: status-tip;
     accessible-checkable: true;
     accessible-checked: checked;
     accessible-enabled: enabled;
@@ -106,7 +108,23 @@ export component Switch inherits Rectangle {
     ta := TouchArea {
         enabled: enabled;
 
+        changed has-hover => {
+            if !root.status-tip.is-empty {
+                if self.has-hover {
+                    Data.status-tip = root.status-tip;
+                } else {
+                    Data.status-tip = "";
+                }
+            }
+        }
+
         clicked => {
+            // The click may destroy this element without calling the
+            // has-hover handler anymore, so we clear the status tip
+            // manually to be on the safe side.
+            if !root.status-tip.is-empty {
+                Data.status-tip = "";
+            }
             toggled(!checked);
         }
     }

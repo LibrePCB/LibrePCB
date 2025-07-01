@@ -183,8 +183,7 @@ QVariant ComponentSignalListModel::data(const QModelIndex& index,
         case Qt::CheckStateRole:
           return required ? Qt::Checked : Qt::Unchecked;
         case Qt::ToolTipRole:
-          return tr("If checked, the signal needs to be connected in "
-                    "schematics, otherwise an ERC error is raised.") +
+          return tr("If checked, the signal needs to be connected in schematics, otherwise an ERC error is raised.") +
               "\n" +
               tr("If unchecked, it's allowed to leave the signal unconnected "
                  "in schematics.");

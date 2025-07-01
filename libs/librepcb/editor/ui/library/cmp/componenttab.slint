@@ -1,6 +1,7 @@
 import { Tab } from "../../tab.slint";
 import { LibraryRuleCheckLink } from "../libraryrulechecklink.slint";
 import { ComponentSignalListView } from "componentsignallistview.slint";
+import { ComponentVariantListView } from "componentvariantlistview.slint";
 import {
     Button,
     CategoriesListView,
@@ -407,13 +408,27 @@ export component ComponentTab inherits Tab {
             ComponentSignalListView {
                 width: parent.width;
                 model: tabs[index].cmp-signals;
+                new-name: tabs[index].new-signal-name;
+                new-name-error: tabs[index].new-signal-name-error;
 
                 edited => {
                     Backend.trigger-tab(section-index, index, TabAction.apply);
                 }
+
+                new-signal-edited(text) => {
+                    tabs[index].new-signal-name = text;
+                }
+
+                new-signal-committed => {
+                    tabs[index].new-signal-commit = true;
+                }
             }
 
-            Rectangle { }
+            ComponentVariantListView {
+                width: parent.width;
+                model: tabs[index].variants;
+                signal-names: tabs[index].cmp-signal-names;
+            }
 
             page-clicked(idx) => {
                 tabs[index].page-index = idx;
