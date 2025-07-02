@@ -11,60 +11,110 @@ Test command "open-package --check"
 """
 
 
-def test_check_specific_package_with_warnings(cli):
-    """Test checking a specific package that has warnings."""
+def test_no_warnings(cli):
+    """
+    Test checking a specific package that has no warnings.
+    """
     library = params.POPULATED_LIBRARY
     cli.add_library(library.dir)
 
-    # Check the TO220AB package
     pkg_path = cli.abspath(
-        os.path.join(library.dir, "pkg", "0eaf289c-166d-4bd9-a4ba-dbf6bbc76ef1")
+        os.path.join(library.dir, "pkg", "2d00d07c-bfc1-4a96-a1cb-195c5ff93db9")
     )
     code, stdout, stderr = cli.run("open-package", "--check", pkg_path)
 
-    # Should complete successfully even with warnings
+    assert stderr == ""
     assert stdout == nofmt(f"""\
 Open package '{pkg_path}'...
-Check '{pkg_path}' for non-approved messages...
+Run checks...
   Approved messages: 0
-  Non-approved messages: 23
-Finished with errors!
+  Non-approved messages: 0
+SUCCESS
 """)
+    assert code == 0
+
+
+def test_approved_warnings(cli):
+    """
+    Test checking a specific package that has only approved warnings.
+    """
+    library = params.POPULATED_LIBRARY
+    cli.add_library(library.dir)
+
+    pkg_path = cli.abspath(
+        os.path.join(library.dir, "pkg", "2d00d07c-bfc1-4a96-a1cb-195c5ff93db9")
+    )
+
+    # Add a warning and its corresponding approval
+    lp_path = os.path.join(pkg_path, "package.lp")
+    with open(lp_path, "r") as f:
+        content = f.read()
+    content = content.replace("RESC2012", "resc2012")
+    content = content.replace("\n)\n", "\n (approved name_not_title_case)\n)\n")
+    with open(lp_path, "w") as f:
+        f.write(content)
+
+    code, stdout, stderr = cli.run("open-package", "--check", pkg_path)
+
+    assert stderr == ""
+    assert stdout == nofmt(f"""\
+Open package '{pkg_path}'...
+Run checks...
+  Approved messages: 1
+  Non-approved messages: 0
+SUCCESS
+""")
+    assert code == 0
+
+
+def test_nonapproved_warnings(cli):
+    """
+    Test checking a specific package that has non-approved warnings.
+    """
+    library = params.POPULATED_LIBRARY
+    cli.add_library(library.dir)
+
+    pkg_path = cli.abspath(
+        os.path.join(library.dir, "pkg", "2d00d07c-bfc1-4a96-a1cb-195c5ff93db9")
+    )
+
+    # Add warnings
+    lp_path = os.path.join(pkg_path, "package.lp")
+    with open(lp_path, "r") as f:
+        content = f.read()
+    content = content.replace("RESC2012", "resc2012")
+    content = content.replace("Some Author", "")
+    with open(lp_path, "w") as f:
+        f.write(content)
+
+    code, stdout, stderr = cli.run("open-package", "--check", pkg_path)
 
     assert stderr == nofmt("""\
-  - [WARNING] Clearance of pad '1' in 'Horizontal' to legend
-  - [WARNING] Clearance of pad '1' in 'Vertical' to legend
-  - [WARNING] Clearance of pad '2' in 'Horizontal' to legend
-  - [WARNING] Clearance of pad '2' in 'Vertical' to legend
-  - [WARNING] Clearance of pad '3' in 'Horizontal' to legend
-  - [WARNING] Clearance of pad '3' in 'Vertical' to legend
-  - [WARNING] Minimum width of 'Top Legend' in 'Horizontal'
-  - [WARNING] Minimum width of 'Top Legend' in 'Horizontal'
-  - [WARNING] Minimum width of 'Top Legend' in 'Horizontal'
-  - [WARNING] Minimum width of 'Top Legend' in 'Horizontal'
-  - [WARNING] Missing courtyard in footprint 'Vertical'
-  - [WARNING] Missing outline in footprint 'Horizontal'
-  - [WARNING] Missing outline in footprint 'Vertical'
-  - [HINT] No 3D model defined for 'Horizontal'
-  - [HINT] Non-recommended assembly type
-  - [HINT] Origin of 'Horizontal' not in center
-  - [HINT] Origin of 'Vertical' not in center
-  - [HINT] Unspecified function of pad '1' in 'Horizontal'
-  - [HINT] Unspecified function of pad '1' in 'Vertical'
-  - [HINT] Unspecified function of pad '2' in 'Horizontal'
-  - [HINT] Unspecified function of pad '2' in 'Vertical'
-  - [HINT] Unspecified function of pad '3' in 'Horizontal'
-  - [HINT] Unspecified function of pad '3' in 'Vertical'
+    - [WARNING] Author not set
+    - [HINT] Name not title case: 'resc2012 (0805)'
 """)
-
+    assert stdout == nofmt(f"""\
+Open package '{pkg_path}'...
+Run checks...
+  Approved messages: 0
+  Non-approved messages: 2
+Finished with errors!
+""")
     assert code == 1
 
 
-def test_check_invalid_path(cli):
-    """Test checking with an invalid package path."""
-    invalid_path = cli.abspath("nonexistent")
-    code, stdout, stderr = cli.run("open-package", "--check", invalid_path)
-    check_path = os.path.join(invalid_path, ".librepcb-pkg")
-    # Should fail with appropriate error
+def test_invalid_package(cli):
+    """
+    Test checking with an invalid package path.
+    """
+    pkg_path = cli.abspath("nonexistent")
+    check_path = os.path.join(pkg_path, ".librepcb-pkg")
+    code, stdout, stderr = cli.run("open-package", "--check", pkg_path)
+    assert stderr == nofmt(f"""\
+ERROR: File '{check_path}' does not exist.
+""")
+    assert stdout == nofmt(f"""\
+Open package '{pkg_path}'...
+Finished with errors!
+""")
     assert code == 1
-    assert stderr == f"ERROR: File '{check_path}' does not exist.\n"

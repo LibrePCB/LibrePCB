@@ -96,8 +96,8 @@ private:  // Methods
       const LibraryBaseElement& element) const;
 
   // Format check summary with optional header
-  QStringList formatCheckSummary(const FilePath& path, const QString& relPath,
-                                 const CheckResult& checkResult) const;
+  QStringList formatLibraryElementCheckSummary(
+      const CheckResult& checkResult) const;
   QStringList formatCheckSummary(int approvedCount, int nonApprovedCount,
                                  const QString& indent = "") const;
 

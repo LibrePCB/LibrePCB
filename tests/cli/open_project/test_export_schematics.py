@@ -24,8 +24,9 @@ def test_if_unknown_file_extension_fails(cli, project):
     code, stdout, stderr = cli.run(
         "open-project", "--export-schematics=foo.bar", project.path
     )
-    assert strip_image_file_extensions(stderr) == nofmt("""\
-  ERROR: Unknown extension 'bar'. Supported extensions: pdf, svg, ***
+    assert strip_image_file_extensions(stderr) == nofmt(f"""\
+  ERROR: Failed to export image '{cli.abspath("foo.bar")}' due to unknown file \
+extension. Supported extensions: pdf, svg, ***
 """)
     assert stdout == nofmt(f"""\
 Open project '{project.path}'...

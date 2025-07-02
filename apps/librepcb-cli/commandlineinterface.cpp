@@ -91,12 +91,12 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
       {"open-library",
        {tr("Open a library to execute library-related tasks."),
         "open-library [command_options]"}},  // no tr()!
-      {"open-package",
-       {tr("Open a package to execute package-related tasks."),
-        "open-package [command_options]"}},  // no tr()!
       {"open-symbol",
        {tr("Open a symbol to execute symbol-related tasks."),
         "open-symbol [command_options]"}},  // no tr()!
+      {"open-package",
+       {tr("Open a package to execute package-related tasks."),
+        "open-package [command_options]"}},  // no tr()!
       {"open-step",
        {tr("Open a STEP model to execute STEP-related tasks outside of a "
            "library."),
@@ -509,15 +509,15 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
                              parser.isSet(libSaveOption),  // save
                              parser.isSet(libStrictOption)  // strict mode
     );
-  } else if (command == "open-package") {
-    cmdSuccess = openPackage(positionalArgs.value(1),  // package directory
-                             parser.isSet(pkgCheckOption),  // run check
-                             parser.value(pkgExportOption)  // export file
-    );
   } else if (command == "open-symbol") {
     cmdSuccess = openSymbol(positionalArgs.value(1),  // symbol directory
                             parser.isSet(symCheckOption),  // run check
                             parser.value(symExportOption)  // export file
+    );
+  } else if (command == "open-package") {
+    cmdSuccess = openPackage(positionalArgs.value(1),  // package directory
+                             parser.isSet(pkgCheckOption),  // run check
+                             parser.value(pkgExportOption)  // export file
     );
   } else if (command == "open-step") {
     cmdSuccess = openStep(positionalArgs.value(1),  // STEP file path
@@ -1275,12 +1275,10 @@ CommandLineInterface::CheckResult
   return result;
 }
 
-QStringList CommandLineInterface::formatCheckSummary(
-    const FilePath& path, const QString& relPath,
+QStringList CommandLineInterface::formatLibraryElementCheckSummary(
     const CheckResult& checkResult) const {
   QStringList messages;
-  messages << tr("Check '%1' for non-approved messages...")
-                  .arg(prettyPath(path, relPath));
+  messages << tr("Run checks...");
   messages += formatCheckSummary(checkResult.approvedMsgCount,
                                  checkResult.nonApprovedMessages.count(), "  ");
   return messages;
@@ -1363,11 +1361,14 @@ void CommandLineInterface::processLibraryElement(
   // Run library element check, if needed.
   if (runCheck) {
     // Gather messages
+    qInfo().noquote()
+        << tr("Run checks for '%1'...").arg(prettyPath(fs.getPath(), libDir));
     CheckResult checkResult = gatherElementCheckMessages(element);
 
     // Print summary to qInfo (stderr) for libraries
     QStringList summaryMessages =
-        formatCheckSummary(fs.getPath(), libDir, checkResult);
+        formatCheckSummary(checkResult.approvedMsgCount,
+                           checkResult.nonApprovedMessages.count(), "  ");
     foreach (const QString& msg, summaryMessages) {
       qInfo().noquote() << msg;
     }
@@ -1406,29 +1407,24 @@ bool CommandLineInterface::openSymbol(
     // Open symbol directory (similar to openPackage)
     FilePath symbolFp(QFileInfo(symbolFile).absoluteFilePath());
     print(tr("Open symbol '%1'...").arg(prettyPath(symbolFp, symbolFile)));
-
     std::shared_ptr<TransactionalFileSystem> symbolFs =
         TransactionalFileSystem::open(symbolFp, false);  // can throw
     std::unique_ptr<Symbol> symbol =
         Symbol::open(std::unique_ptr<TransactionalDirectory>(
             new TransactionalDirectory(symbolFs)));  // can throw
-
     qInfo().noquote()
         << tr("Opened symbol: %1").arg(*symbol->getNames().getDefaultValue());
+
     // Process the symbol element (validation checks)
     if (runCheck) {
-      // Gather messages
       CheckResult checkResult = gatherElementCheckMessages(*symbol);
-
-      // Print summary to stdout for individual elements
       QStringList summaryMessages =
-          formatCheckSummary(symbolFs->getPath(), symbolFile, checkResult);
+          formatLibraryElementCheckSummary(checkResult);
       foreach (const QString& msg, summaryMessages) {
         print(msg);
       }
-
       foreach (const QString& msg, checkResult.nonApprovedMessages) {
-        printErr("  - " % msg);
+        printErr("    - " % msg);
         success = false;
       }
     }
@@ -1505,30 +1501,24 @@ bool CommandLineInterface::openPackage(
     // Open package directory (similar to openLibrary)
     FilePath packageFp(QFileInfo(packageFile).absoluteFilePath());
     print(tr("Open package '%1'...").arg(prettyPath(packageFp, packageFile)));
-
     std::shared_ptr<TransactionalFileSystem> packageFs =
         TransactionalFileSystem::open(packageFp, false);  // can throw
     std::unique_ptr<Package> package =
         Package::open(std::unique_ptr<TransactionalDirectory>(
             new TransactionalDirectory(packageFs)));  // can throw
-
     qInfo().noquote()
-        << tr("Package name: %1").arg(*package->getNames().getDefaultValue());
+        << tr("Opened package: %1").arg(*package->getNames().getDefaultValue());
 
     // Process the package element (validation checks)
     if (runCheck) {
-      // Gather messages
       CheckResult checkResult = gatherElementCheckMessages(*package);
-
-      // Print summary to stdout for individual elements
       QStringList summaryMessages =
-          formatCheckSummary(packageFs->getPath(), packageFile, checkResult);
+          formatLibraryElementCheckSummary(checkResult);
       foreach (const QString& msg, summaryMessages) {
         print(msg);
       }
-
       foreach (const QString& msg, checkResult.nonApprovedMessages) {
-        printErr("  - " % msg);
+        printErr("    - " % msg);
         success = false;
       }
     }
@@ -1538,7 +1528,6 @@ bool CommandLineInterface::openPackage(
       print(tr("Export footprint(s) to '%1'...").arg(exportFile));
 
       // Export each footprint
-      QMap<FilePath, int> writtenFilesCounter;
       int index = 1;
       for (auto it = package->getFootprints().begin();
            it != package->getFootprints().end(); ++it) {
@@ -1619,12 +1608,11 @@ bool CommandLineInterface::openPackage(
         }
       }
       if (filesOverwritten) {
-        printErr(tr("NOTE: To avoid writing files multiple times, make sure to "
-                    "pass unique filepaths "
-                    "to all export functions. For package output files, you "
-                    "could add a placeholder "
-                    "like '%1' to the path.")
-                     .arg("{{FOOTPRINT}}"));
+        printErr(
+            tr("NOTE: To avoid writing files multiple times, make sure to pass "
+               "unique filepaths to all export functions. For footprint output "
+               "files, you could add a placeholder like '%1' to the path.")
+                .arg("{{FOOTPRINT}}"));
         success = false;
       }
     }
