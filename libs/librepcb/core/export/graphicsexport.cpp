@@ -364,11 +364,20 @@ GraphicsExport::Result GraphicsExport::run(RunArgs args) noexcept {
       if (image && outputFilePath.isValid()) {
         emit savingFile(outputFilePath);
         if (!image->save(outputFilePath.toStr())) {
-          throw RuntimeError(
-              __FILE__, __LINE__,
-              tr("Failed to export image \"%1\". Check file permissions and "
-                 "make sure to use a supported image file extension.")
-                  .arg(outputFilePath.toNative()));
+          const QString suffix = outputFilePath.getSuffix().toLower();
+          const QStringList supportedExtensions = getSupportedExtensions();
+          if (!supportedExtensions.contains(suffix)) {
+            throw RuntimeError(__FILE__, __LINE__,
+                               tr("Unknown extension '%1'. "
+                                  "Supported extensions: %2")
+                                   .arg(suffix)
+                                   .arg(supportedExtensions.join(", ")));
+          } else {
+            throw RuntimeError(
+                __FILE__, __LINE__,
+                tr("Failed to export image '%1'. Check file permissions.")
+                    .arg(outputFilePath.toNative()));
+          }
         }
         result.writtenFiles.append(outputFilePath);
       } else if (image) {
