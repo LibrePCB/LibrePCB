@@ -159,7 +159,7 @@ export struct DevicePartData {
 
 export struct DevicePinoutData {
     pad-name: string,
-    //signal: string,
+    signal-index: int,
 }
 
 export struct LibraryElementCategoryData {
@@ -888,30 +888,44 @@ export struct ComponentTabData {
     new-signal-name: string,
     new-signal-name-error: string,
     new-signal-commit: bool,  // Set to UUID by UI, reset by backend.
-
-
-    //attributes: [AttributeData],
-    //variants: [ComponentVariantData],
 }
 
 // Additional data for device editor tabs
 export struct DeviceTabData {
+    // General
     library-index: int,
+    wizard-mode: bool,
+    page-index: int,
+
+    // Metadata
     path: string,
     name: string,
+    name-error: string,
     description: string,
     keywords: string,
     author: string,
     version: string,
+    version-error: string,
     deprecated: bool,
-    categories: [string],
-    package-name: string,
-    component-name: string,
-    resources: [ResourceData],
+    categories: [LibraryElementCategoryData],
+    categories-tree: [TreeViewItemData],
+    datasheet-url: string,
+    datasheet-url-error: string,
     attributes: [AttributeData],
-    parts: [DevicePartData],
+    component-name: string,
+    component-description: string,
+    package-name: string,
+    package-description: string,
+    cmp-signal-names: [string],  // Used for the pinout combobox
     pinout: [DevicePinoutData],
     checks: RuleCheckData,
+
+    // Messages
+    interface-broken-msg: bool,
+
+    new-category: string,  // Set to UUID by UI, reset by backend.
+
+    //parts: [DevicePartData],
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -23,9 +23,11 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../windowtab.h"
+#include "../libraryeditortab.h"
 
-#include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/library/dev/devicepadsignalmap.h>
+#include <librepcb/core/types/elementname.h>
+#include <librepcb/core/types/version.h>
 
 #include <QtCore>
 
@@ -34,11 +36,18 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Component;
 class Device;
+class Package;
 
 namespace editor {
 
+class CategoryTreeModel2;
+class FootprintGraphicsItem;
+class GraphicsScene;
 class LibraryEditor2;
+class LibraryElementCategoriesModel;
+class SymbolGraphicsItem;
 
 /*******************************************************************************
  *  Class DeviceTab
@@ -47,7 +56,7 @@ class LibraryEditor2;
 /**
  * @brief The DeviceTab class
  */
-class DeviceTab final : public WindowTab {
+class DeviceTab final : public LibraryEditorTab {
   Q_OBJECT
 
 public:
@@ -62,18 +71,87 @@ public:
   ~DeviceTab() noexcept;
 
   // General Methods
-  FilePath getDirectoryPath() const noexcept;
+  FilePath getDirectoryPath() const noexcept override;
   ui::TabData getUiData() const noexcept override;
   ui::DeviceTabData getDerivedUiData() const noexcept;
   void setDerivedUiData(const ui::DeviceTabData& data) noexcept;
   void trigger(ui::TabAction a) noexcept override;
+  slint::Image renderScene(float width, float height,
+                           int scene) noexcept override;
+  bool requestClose() noexcept override;
 
   // Operator Overloadings
   DeviceTab& operator=(const DeviceTab& rhs) = delete;
 
+protected:
+  std::optional<std::pair<RuleCheckMessageList, QSet<SExpression>>>
+      runChecksImpl() override;
+  bool autoFixImpl(const std::shared_ptr<const RuleCheckMessage>& msg,
+                   bool checkOnly) override;
+  template <typename MessageType>
+  bool autoFixHelper(const std::shared_ptr<const RuleCheckMessage>& msg,
+                     bool checkOnly);
+  template <typename MessageType>
+  void autoFix(const MessageType& msg);
+  void messageApprovalChanged(const SExpression& approval,
+                              bool approved) noexcept override;
+  void notifyDerivedUiDataChanged() noexcept override;
+
 private:
-  LibraryEditor2& mEditor;
+  bool isWritable() const noexcept;
+  bool isInterfaceBroken() const noexcept;
+  void refreshMetadata() noexcept;
+  void commitMetadata() noexcept;
+  bool save() noexcept;
+
+private:
+  // References
   std::unique_ptr<Device> mDevice;
+  const bool mIsNewElement;
+  std::unique_ptr<GraphicsScene> mComponentScene;
+  std::unique_ptr<GraphicsScene> mPackageScene;
+
+  // State
+  bool mWizardMode;
+  int mCurrentPageIndex;
+  bool mAddCategoryRequested;
+  // bool mCompactLayout;
+
+  // Library metadata to be applied
+  slint::SharedString mName;
+  slint::SharedString mNameError;
+  ElementName mNameParsed;
+  slint::SharedString mDescription;
+  slint::SharedString mKeywords;
+  slint::SharedString mAuthor;
+  slint::SharedString mVersion;
+  slint::SharedString mVersionError;
+  Version mVersionParsed;
+  bool mDeprecated;
+  slint::SharedString mDatasheetUrl;
+  slint::SharedString mDatasheetUrlError;
+  bool mSchematicOnly;
+  slint::SharedString mPrefix;
+  slint::SharedString mPrefixError;
+  slint::SharedString mDefaultValue;
+  slint::SharedString mDefaultValueError;
+  slint::SharedString mNewSignalName;
+  slint::SharedString mNewSignalNameError;
+
+  // UI data
+  std::shared_ptr<LibraryElementCategoriesModel> mCategories;
+  std::shared_ptr<CategoryTreeModel2> mCategoriesTree;
+
+  /// Broken interface detection
+  Uuid mOriginalComponentUuid;
+  Uuid mOriginalPackageUuid;
+  DevicePadSignalMap mOriginalPadSignalMap;
+
+  // Referenced library elements
+  std::unique_ptr<Component> mComponent;  // May be nullptr!
+  QList<std::shared_ptr<SymbolGraphicsItem>> mComponentGraphicsItems;
+  std::unique_ptr<Package> mPackage;  // May be nullptr!
+  std::unique_ptr<FootprintGraphicsItem> mPackageGraphicsItem;
 };
 
 /*******************************************************************************

@@ -1,0 +1,68 @@
+import {
+    Button,
+    CategoriesListView,
+    ComboBox,
+    IconButton,
+    LineEdit,
+    LinkText,
+    MenuItem,
+    MenuPopup,
+    MessageBox,
+    Palette,
+    SceneButton,
+    ScrollView,
+    SlideView,
+    Switch,
+    TextEdit,
+    ToolButton,
+    TreeItemPickerPopup,
+} from "../../widgets.slint";
+import {
+    Backend,
+    ComponentSignalData,
+    ComponentTabData,
+    Constants,
+    Data,
+    DismissableMessageAction,
+    EditorCommandSet as Cmd,
+    EditorTool,
+    PanelPage,
+    DevicePinoutData,
+    TabAction,
+    WindowSectionData,
+} from "../../api.slint";
+
+
+export component DevicePinoutTableView {
+    in-out property <[DevicePinoutData]> model;
+    in-out property <[string]> signal-names;
+    property <length> row-height: 25px;
+    property <length> row-spacing: 3px;
+
+    HorizontalLayout {
+        spacing: 8px;
+        padding-left: 20px;
+
+        VerticalLayout {
+            width: self.preferred-width;
+            spacing: 2px;
+
+            for pinout in model: Text {
+                height: row-height;
+                horizontal-alignment: right;
+                vertical-alignment: center;
+                text: pinout.pad-name + ":";
+            }
+        }
+
+        VerticalLayout {
+            spacing: 2px;
+
+            for pinout in model: ComboBox {
+                height: row-height;
+                model: signal-names;
+                current-index: pinout.signal-index;
+            }
+        }
+    }
+}

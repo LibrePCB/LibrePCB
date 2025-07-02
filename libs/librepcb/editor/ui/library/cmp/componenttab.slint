@@ -26,6 +26,7 @@ import {
     DismissableMessageAction,
     EditorCommandSet as Cmd,
     EditorTool,
+    FeatureState,
     PanelPage,
     TabAction,
     WindowSectionData,
@@ -361,6 +362,7 @@ export component ComponentTab inherits Tab {
     in-out property <WindowSectionData> section;
     property <[ComponentTabData]> tabs: section.component-tabs;
     property <int> index: section.current-tab-index;
+    property <bool> read-only: section.tabs[index].features.save != FeatureState.enabled;
 
     enabled: true;
 
@@ -394,6 +396,7 @@ export component ComponentTab inherits Tab {
                 section-index: section-index;
                 tabs: tabs;
                 index: index;
+                read-only: read-only;
             }
 
             ComponentSignalListView {

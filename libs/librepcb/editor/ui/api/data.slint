@@ -771,6 +771,8 @@ export global Data {
                 { },
                 {
                     library-index: 0,
+                    wizard-mode: false,
+                    page-index: 1,
                     path: "device1",
                     name: "Device",
                     description: "Foo Bar\nMultiline\nBlabla",
@@ -778,15 +780,63 @@ export global Data {
                     author: "Somebody",
                     version: "0.1",
                     deprecated: false,
-                    categories: ["Integrated Circuits -> Timers"],
+                    categories: [
+                        {
+                            uuid: "1",
+                            names: ["Integrated Circuit", "Timers"],
+                        },
+                        {
+                            uuid: "2",
+                            names: ["Foo", "Bar", "Foobar"],
+                        },
+                        {
+                            uuid: "3",
+                            names: ["Miscallenous"],
+                        },
+                    ],
+                    categories-tree: [
+                        {
+                            level: 0,
+                            text: "Root Category",
+                        },
+                        {
+                            level: 1,
+                            text: "Integrated Circuits",
+                        },
+                    ],
+                    attributes: [
+                        {
+                            key: "FOO",
+                            type: 1,
+                            value: "100",
+                            unit: 0,
+                        },
+                    ],
+                    component-name: "Resistor",
+                    component-description: "Standard resistor\nBlabla...",
+                    package-name: "R-0805",
+                    package-description: "SMT 0805 resistor\nBlabla",
+                    cmp-signal-names: ["(unconnected)", "GND", "3V3", "5V"],
+                    pinout: [
+                        {
+                            pad-name: "1",
+                        },
+                        {
+                            pad-name: "2",
+                        },
+                        {
+                            pad-name: "3",
+                        },
+                    ],
                     checks: {
                         type: RuleCheckType.device-check,
                         state: RuleCheckState.up-to-date,
                         unapproved: 2,
+                        errors: 0,
                     },
                 },
             ],
-            current-tab-index: 5,
+            current-tab-index: 6,
         },
     ];
 
