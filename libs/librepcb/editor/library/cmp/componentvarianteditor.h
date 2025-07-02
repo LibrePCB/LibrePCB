@@ -34,6 +34,7 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Component;
 class Workspace;
 
 namespace editor {
@@ -59,6 +60,7 @@ public:
   ComponentVariantEditor(const ComponentVariantEditor& other) = delete;
   explicit ComponentVariantEditor(
       const Workspace& ws, const GraphicsLayerList& layers,
+      QPointer<const Component> component,
       std::shared_ptr<ComponentSymbolVariant> variant,
       QObject* parent = nullptr) noexcept;
   virtual ~ComponentVariantEditor() noexcept;
@@ -67,6 +69,7 @@ public:
   ui::ComponentVariantData getUiData() const;
   void setUiData(const ui::ComponentVariantData& data) noexcept;
   void setUndoStack(UndoStack* stack) noexcept;
+  slint::Image renderScene(int gate, float width, float height) noexcept;
   // void apply();
 
   // Operator Overloadings

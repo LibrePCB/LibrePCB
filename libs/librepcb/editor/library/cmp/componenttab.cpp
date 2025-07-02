@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "componenttab.h"
 
+#include "../../guiapplication.h"
 #include "../../rulecheck/rulecheckmessagesmodel.h"
 #include "../../undostack.h"
 #include "../../utils/editortoolbox.h"
@@ -36,7 +37,7 @@
 #include "componentsignallistmodel.h"
 #include "componentvariantlistmodel.h"
 #include "utils/slinthelpers.h"
-#include "../../guiapplication.h"
+
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/cmp/componentcheckmessages.h>
@@ -78,7 +79,8 @@ ComponentTab::ComponentTab(LibraryEditor2& editor,
                                            editor.getWorkspace().getSettings(),
                                            CategoryTreeModel2::Filter::CmpCat)),
     mSignals(new ComponentSignalListModel()),
-    mVariants(new ComponentVariantListModel(mApp.getWorkspace(), mApp.getPreviewLayers())),
+    mVariants(new ComponentVariantListModel(
+        mApp.getWorkspace(), mApp.getPreviewLayers(), mComponent.get())),
     mOriginalIsSchematicOnly(mComponent->isSchematicOnly()),
     mOriginalSignalUuids(mComponent->getSignals().getUuidSet()),
     mOriginalSymbolVariants(mComponent->getSymbolVariants()) {
@@ -295,6 +297,13 @@ void ComponentTab::trigger(ui::TabAction a) noexcept {
       break;
     }
   }
+}
+
+slint::Image ComponentTab::renderScene(float width, float height,
+                                       int scene) noexcept {
+  const int variant = scene / 1000;
+  const int gate = scene % 1000;
+  return mVariants->renderScene(variant, gate, width, height);
 }
 
 bool ComponentTab::requestClose() noexcept {

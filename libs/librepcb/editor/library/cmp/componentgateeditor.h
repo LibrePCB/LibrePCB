@@ -34,17 +34,18 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Component;
 class Symbol;
 class Workspace;
 
 namespace editor {
 
 class ComponentPinoutListModel;
-class UndoCommand;
-class UndoStack;
+class GraphicsLayerList;
 class GraphicsScene;
 class SymbolGraphicsItem;
-class GraphicsLayerList;
+class UndoCommand;
+class UndoStack;
 
 /*******************************************************************************
  *  Class ComponentGateEditor
@@ -62,6 +63,7 @@ public:
   ComponentGateEditor(const ComponentGateEditor& other) = delete;
   explicit ComponentGateEditor(const Workspace& ws,
                                const GraphicsLayerList& layers,
+                               QPointer<const Component> component,
                                std::shared_ptr<ComponentSymbolVariantItem> item,
                                QObject* parent = nullptr) noexcept;
   virtual ~ComponentGateEditor() noexcept;
@@ -83,6 +85,7 @@ private:
 private:
   const Workspace& mWorkspace;
   const GraphicsLayerList& mLayers;
+  const QPointer<const Component> mComponent;
 
   std::shared_ptr<ComponentSymbolVariantItem> mItem;
   UndoStack* mUndoStack;

@@ -22,20 +22,22 @@
  ******************************************************************************/
 #include "componentgateeditor.h"
 
+#include "../../graphics/graphicsscene.h"
+#include "../../graphics/slintgraphicsview.h"
 #include "../../undocommand.h"
 #include "../../undostack.h"
 #include "../../utils/slinthelpers.h"
 #include "../../utils/uihelpers.h"
 #include "../cmd/cmdcomponentsymbolvariantitemedit.h"
-#include "componentpinoutlistmodel.h"
-#include "../../graphics/graphicsscene.h"
 #include "../sym/symbolgraphicsitem.h"
+#include "componentpinoutlistmodel.h"
+
 #include <librepcb/core/fileio/transactionaldirectory.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
-#include "../../graphics/slintgraphicsview.h"
+#include <librepcb/core/library/cmp/component.h>
 #include <QtCore>
 
 /*******************************************************************************
@@ -49,15 +51,18 @@ namespace editor {
  ******************************************************************************/
 
 ComponentGateEditor::ComponentGateEditor(
-    const Workspace& ws, const GraphicsLayerList& layers, std::shared_ptr<ComponentSymbolVariantItem> item,
-    QObject* parent) noexcept
+    const Workspace& ws, const GraphicsLayerList& layers,
+    QPointer<const Component> component,
+    std::shared_ptr<ComponentSymbolVariantItem> item, QObject* parent) noexcept
   : QObject(parent),
     mWorkspace(ws),
     mLayers(layers),
+    mComponent(component),
     mItem(item),
     mUndoStack(nullptr),
     mPinout(new ComponentPinoutListModel()) {
   loadSymbol();
+  mPinout->setSignals(component ? &component->getSignals() : nullptr);
   mPinout->setList(&item->getPinSignalMap());
 }
 
@@ -83,7 +88,6 @@ ui::ComponentGateData ComponentGateEditor::getUiData() const {
       mItem->isRequired(),  // Required
       q2s(*mItem->getSuffix()),  // Suffix
       mPinout,  // Pinout
-      mSymbolPreview,  // Image
   };
 }
 
@@ -96,10 +100,11 @@ void ComponentGateEditor::setUndoStack(UndoStack* stack) noexcept {
   mPinout->setUndoStack(mUndoStack);
 }
 
-slint::Image ComponentGateEditor::renderScene(float width, float height) noexcept {
+slint::Image ComponentGateEditor::renderScene(float width,
+                                              float height) noexcept {
   if (mScene) {
     SlintGraphicsView view;
-    return view.render(*mUnplacedComponentGraphicsScene, width, height);
+    return view.render(*mScene, width, height);
   } else {
     return slint::Image();
   }
@@ -121,7 +126,9 @@ void ComponentGateEditor::execCmd(UndoCommand* cmd) {
 void ComponentGateEditor::loadSymbol() noexcept {
   if (mSymbol && (mSymbol->getUuid() == mItem->getSymbolUuid())) return;
 
-  mSymbolPreview = slint::Image();
+  mPinout->setPins(nullptr);
+  mGraphicsItem.reset();
+  mScene.reset();
   mSymbol.reset();
 
   try {
@@ -130,9 +137,11 @@ void ComponentGateEditor::loadSymbol() noexcept {
     if (!fp.isValid()) return;
     mSymbol = Symbol::open(std::unique_ptr<TransactionalDirectory>(
         new TransactionalDirectory(TransactionalFileSystem::openRO(fp))));
+    mPinout->setPins(&mSymbol->getPins());
 
     mScene.reset(new GraphicsScene());
-    mGraphicsItem.reset(new SymbolGraphicsItem(*mSymbol, mLayers));
+    mGraphicsItem.reset(
+        new SymbolGraphicsItem(*mSymbol, mLayers, mComponent, mItem));
     mScene->addItem(*mGraphicsItem);
   } catch (const Exception& e) {
     // TODO

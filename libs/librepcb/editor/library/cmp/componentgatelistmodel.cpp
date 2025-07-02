@@ -43,11 +43,13 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-ComponentGateListModel::ComponentGateListModel(const Workspace& ws, const GraphicsLayerList& layers,
-                                               QObject* parent) noexcept
+ComponentGateListModel::ComponentGateListModel(
+    const Workspace& ws, const GraphicsLayerList& layers,
+    QPointer<const Component> component, QObject* parent) noexcept
   : QObject(parent),
     mWorkspace(ws),
     mLayers(layers),
+    mComponent(component),
     mGateList(nullptr),
     mUndoStack(nullptr),
     mOnEditedSlot(*this, &ComponentGateListModel::variantListEdited) {
@@ -75,7 +77,8 @@ void ComponentGateListModel::setGateList(
     mGateList->onEdited.attach(mOnEditedSlot);
 
     for (auto gate : mGateList->values()) {
-      mItems.append(std::make_shared<ComponentGateEditor>(mWorkspace, mLayers, gate));
+      mItems.append(std::make_shared<ComponentGateEditor>(mWorkspace, mLayers,
+                                                          mComponent, gate));
     }
   }
 
@@ -84,6 +87,15 @@ void ComponentGateListModel::setGateList(
 
 void ComponentGateListModel::setUndoStack(UndoStack* stack) noexcept {
   mUndoStack = stack;
+}
+
+slint::Image ComponentGateListModel::renderScene(int gate, float width,
+                                                 float height) noexcept {
+  if (auto editor = mItems.value(gate)) {
+    return editor->renderScene(width, height);
+  } else {
+    return slint::Image();
+  }
 }
 
 /*bool ComponentGateListModel::add(const QStringList& names) noexcept {
@@ -197,7 +209,7 @@ void ComponentGateListModel::variantListEdited(
       mItems.insert(
           index,
           std::make_shared<ComponentGateEditor>(
-              mWorkspace,mLayers,
+              mWorkspace, mLayers, mComponent,
               std::const_pointer_cast<ComponentSymbolVariantItem>(item)));
       notify_row_added(index, 1);
       break;

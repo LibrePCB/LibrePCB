@@ -34,14 +34,15 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Component;
 class Workspace;
 
 namespace editor {
 
 class ComponentGateEditor;
+class GraphicsLayerList;
 class UndoCommand;
 class UndoStack;
-class GraphicsLayerList;
 
 /*******************************************************************************
  *  Class ComponentGateListModel
@@ -60,12 +61,14 @@ public:
   ComponentGateListModel(const ComponentGateListModel& other) = delete;
   explicit ComponentGateListModel(const Workspace& ws,
                                   const GraphicsLayerList& layers,
+                                  QPointer<const Component> component,
                                   QObject* parent = nullptr) noexcept;
   virtual ~ComponentGateListModel() noexcept;
 
   // General Methods
   void setGateList(ComponentSymbolVariantItemList* list) noexcept;
   void setUndoStack(UndoStack* stack) noexcept;
+  slint::Image renderScene(int gate, float width, float height) noexcept;
   // bool add(const QStringList& names) noexcept;
   void apply();
 
@@ -90,6 +93,7 @@ private:
 private:
   const Workspace& mWorkspace;
   const GraphicsLayerList& mLayers;
+  QPointer<const Component> mComponent;
 
   ComponentSymbolVariantItemList* mGateList;
   UndoStack* mUndoStack;

@@ -41,6 +41,7 @@ class Workspace;
 
 namespace editor {
 
+class GraphicsLayerList;
 class LibrariesModel;
 class LibraryEditor2;
 class MainWindow;
@@ -50,7 +51,6 @@ class ProjectEditor;
 class ProjectLibraryUpdater;
 class QuickAccessModel;
 class SlintKeyEventTextBuilder;
-class GraphicsLayerList;
 
 /*******************************************************************************
  *  Class GuiApplication
@@ -79,7 +79,9 @@ public:
   void addExampleProjects(QWidget* parent) noexcept;
 
   // General
-  const GraphicsLayerList& getPreviewLayers() const noexcept {return *mPreviewLayers;}
+  const GraphicsLayerList& getPreviewLayers() const noexcept {
+    return *mPreviewLayers;
+  }
 
   // Libraries
   LibrariesModel& getLocalLibraries() noexcept { return *mLocalLibraries; }

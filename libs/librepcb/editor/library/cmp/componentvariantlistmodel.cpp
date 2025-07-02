@@ -43,11 +43,13 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-ComponentVariantListModel::ComponentVariantListModel(const Workspace& ws, const GraphicsLayerList& layers,
-                                                     QObject* parent) noexcept
+ComponentVariantListModel::ComponentVariantListModel(
+    const Workspace& ws, const GraphicsLayerList& layers,
+    QPointer<const Component> component, QObject* parent) noexcept
   : QObject(parent),
     mWorkspace(ws),
     mLayers(layers),
+    mComponent(component),
     mVariantList(nullptr),
     mUndoStack(nullptr),
     mOnEditedSlot(*this, &ComponentVariantListModel::variantListEdited) {
@@ -75,8 +77,8 @@ void ComponentVariantListModel::setVariantList(
     mVariantList->onEdited.attach(mOnEditedSlot);
 
     for (auto variant : mVariantList->values()) {
-      mItems.append(
-          std::make_shared<ComponentVariantEditor>(mWorkspace, mLayers, variant));
+      mItems.append(std::make_shared<ComponentVariantEditor>(
+          mWorkspace, mLayers, mComponent, variant));
     }
   }
 
@@ -85,6 +87,16 @@ void ComponentVariantListModel::setVariantList(
 
 void ComponentVariantListModel::setUndoStack(UndoStack* stack) noexcept {
   mUndoStack = stack;
+}
+
+slint::Image ComponentVariantListModel::renderScene(int variant, int gate,
+                                                    float width,
+                                                    float height) noexcept {
+  if (auto editor = mItems.value(variant)) {
+    return editor->renderScene(gate, width, height);
+  } else {
+    return slint::Image();
+  }
 }
 
 /*bool ComponentVariantListModel::add(const QStringList& names) noexcept {
@@ -198,7 +210,7 @@ void ComponentVariantListModel::variantListEdited(
       mItems.insert(
           index,
           std::make_shared<ComponentVariantEditor>(
-              mWorkspace,mLayers,
+              mWorkspace, mLayers, mComponent,
               std::const_pointer_cast<ComponentSymbolVariant>(variant)));
       notify_row_added(index, 1);
       break;

@@ -45,6 +45,8 @@ namespace editor {
 ComponentPinoutListModel::ComponentPinoutListModel(QObject* parent) noexcept
   : QObject(parent),
     mList(nullptr),
+    mSignals(nullptr),
+    mPins(nullptr),
     mUndoStack(nullptr),
     mOnEditedSlot(*this, &ComponentPinoutListModel::listEdited) {
 }
@@ -75,6 +77,14 @@ void ComponentPinoutListModel::setList(ComponentPinSignalMap* list) noexcept {
   }
 
   notify_reset();
+}
+
+void ComponentPinoutListModel::setSignals(const ComponentSignalList* sigs) noexcept {
+  mSignals = sigs;
+}
+
+void ComponentPinoutListModel::setPins(const SymbolPinList* pins) noexcept {
+  mPins = pins;
 }
 
 void ComponentPinoutListModel::setUndoStack(UndoStack* stack) noexcept {
@@ -127,9 +137,20 @@ void ComponentPinoutListModel::set_row_data(
 
 ui::ComponentPinoutData ComponentPinoutListModel::createItem(
     const ComponentPinSignalMapItem& item) noexcept {
+  QString name = item.getPinUuid().toStr().left(8);
+  if (mPins) {
+    if (auto pin = mPins->find(item.getPinUuid())) {
+      name = *pin->getName();
+    }
+  }
+  int sigIndex = -1;
+  if (mSignals && item.getSignalUuid()) {
+    sigIndex = mSignals->indexOf(*item.getSignalUuid());
+  }
+
   return ui::ComponentPinoutData{
-      slint::SharedString(),  // Pin name
-      -1,  // Signal index
+      q2s(name),  // Pin name
+      sigIndex,  // Signal index
       l2s(item.getDisplayType()),  // Display mode
   };
 }

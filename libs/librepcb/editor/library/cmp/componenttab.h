@@ -73,6 +73,8 @@ public:
   ui::ComponentTabData getDerivedUiData() const noexcept;
   void setDerivedUiData(const ui::ComponentTabData& data) noexcept;
   void trigger(ui::TabAction a) noexcept override;
+  slint::Image renderScene(float width, float height,
+                           int scene) noexcept override;
   bool requestClose() noexcept override;
 
   // Operator Overloadings

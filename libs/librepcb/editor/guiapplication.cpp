@@ -24,6 +24,7 @@
 
 #include "dialogs/directorylockhandlerdialog.h"
 #include "dialogs/filedialog.h"
+#include "graphics/graphicslayerlist.h"
 #include "library/librariesmodel.h"
 #include "library/libraryeditor.h"
 #include "library/libraryeditor2.h"
@@ -51,7 +52,7 @@
 #include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
-#include "graphics/graphicslayerlist.h"
+
 #include <QtCore>
 
 #include <algorithm>

@@ -37,18 +37,27 @@ import {
 component ComponentGateListItem {
     in-out property <[ComponentGateData]> model;
     in property <int> index;
-    in property <image> preview;
     in-out property <[string]> signal-names;
     property <length> pinout-row-height: 25px;
+
+    pure callback render-scene(width: length, height: length) -> image;
 
     HorizontalLayout {
         padding: 5px;
         spacing: 5px;
 
-        Image {
-            width: 100px;
-            image-fit: contain;
-            source: preview;
+        Rectangle {
+            max-width: 200px;
+
+            Image {
+                x: 0;
+                y: 0;
+                width: 100%;
+                height: 100%;
+                image-fit: preserve;
+                image-rendering: pixelated;
+                source: render-scene(parent.width, parent.height);
+            }
         }
 
         VerticalLayout {
@@ -163,7 +172,7 @@ component ComponentVariantListItem inherits Rectangle {
     in property <int> index;
     in-out property <[string]> signal-names;
 
-    callback render-preview(gate: int, width: length, height: length);
+    pure callback render-scene(gate: int, width: length, height: length) -> image;
 
     height: self.preferred-height;
     border-color: #909090;
@@ -203,7 +212,10 @@ component ComponentVariantListItem inherits Rectangle {
             model: model[index].gates;
             index: gate-index;
             signal-names: signal-names;
-            preview: render-preview()
+
+            render-scene(width, height) => {
+                root.render-scene(gate-index, width, height)
+            }
         }
     }
 }
@@ -212,7 +224,7 @@ export component ComponentVariantListView {
     in-out property <[ComponentVariantData]> model;
     in-out property <[string]> signal-names;
 
-    callback render-preview(variant: int, gate: int, width: length, height: length);
+    pure callback render-scene(variant: int, gate: int, width: length, height: length) -> image;
 
     VerticalLayout {
         ScrollView {
@@ -220,14 +232,15 @@ export component ComponentVariantListView {
 
             l := VerticalLayout {
                 padding: 8px;
+                spacing: 10px;
 
                 for item[index] in model: ComponentVariantListItem {
                     model: model;
                     index: index;
                     signal-names: signal-names;
 
-                    render-preview(gate, width, height) => {
-                        root.render-preview(index, gate, width, height)
+                    render-scene(gate, width, height) => {
+                        root.render-scene(index, gate, width, height)
                     }
                 }
             }

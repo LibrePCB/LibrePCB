@@ -428,6 +428,10 @@ export component ComponentTab inherits Tab {
                 width: parent.width;
                 model: tabs[index].variants;
                 signal-names: tabs[index].cmp-signal-names;
+
+                render-scene(variant, gate, width, height) => {
+                    Backend.render-scene(section-index, width, height, variant * 1000 + gate, 0)
+                }
             }
 
             page-clicked(idx) => {

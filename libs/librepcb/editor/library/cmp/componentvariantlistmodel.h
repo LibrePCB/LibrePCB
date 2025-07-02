@@ -34,14 +34,15 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Component;
 class Workspace;
 
 namespace editor {
 
 class ComponentVariantEditor;
+class GraphicsLayerList;
 class UndoCommand;
 class UndoStack;
-class GraphicsLayerList;
 
 /*******************************************************************************
  *  Class ComponentVariantListModel
@@ -61,12 +62,15 @@ public:
   ComponentVariantListModel(const ComponentVariantListModel& other) = delete;
   explicit ComponentVariantListModel(const Workspace& ws,
                                      const GraphicsLayerList& layers,
+                                     QPointer<const Component> component,
                                      QObject* parent = nullptr) noexcept;
   virtual ~ComponentVariantListModel() noexcept;
 
   // General Methods
   void setVariantList(ComponentSymbolVariantList* list) noexcept;
   void setUndoStack(UndoStack* stack) noexcept;
+  slint::Image renderScene(int variant, int gate, float width,
+                           float height) noexcept;
   // bool add(const QStringList& names) noexcept;
   void apply();
 
@@ -93,6 +97,7 @@ private:
 private:
   const Workspace& mWorkspace;
   const GraphicsLayerList& mLayers;
+  QPointer<const Component> mComponent;
 
   ComponentSymbolVariantList* mVariantList;
   UndoStack* mUndoStack;

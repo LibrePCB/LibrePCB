@@ -26,6 +26,8 @@
 #include "appwindow.h"
 
 #include <librepcb/core/library/cmp/componentpinsignalmap.h>
+#include <librepcb/core/library/cmp/componentsignal.h>
+#include <librepcb/core/library/sym/symbolpin.h>
 
 #include <QtCore>
 
@@ -58,6 +60,8 @@ public:
 
   // General Methods
   void setList(ComponentPinSignalMap* list) noexcept;
+  void setSignals(const ComponentSignalList* sigs) noexcept;
+  void setPins(const SymbolPinList* pins) noexcept;
   void setUndoStack(UndoStack* stack) noexcept;
   // void apply();
 
@@ -81,6 +85,8 @@ private:
 
 private:
   ComponentPinSignalMap* mList;
+  const ComponentSignalList* mSignals;
+  const SymbolPinList* mPins;
   UndoStack* mUndoStack;
 
   QList<ui::ComponentPinoutData> mItems;

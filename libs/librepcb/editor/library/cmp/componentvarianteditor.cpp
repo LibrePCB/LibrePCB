@@ -41,13 +41,14 @@ namespace editor {
  ******************************************************************************/
 
 ComponentVariantEditor::ComponentVariantEditor(
-    const Workspace& ws, const GraphicsLayerList& layers, std::shared_ptr<ComponentSymbolVariant> variant,
-    QObject* parent) noexcept
+    const Workspace& ws, const GraphicsLayerList& layers,
+    QPointer<const Component> component,
+    std::shared_ptr<ComponentSymbolVariant> variant, QObject* parent) noexcept
   : QObject(parent),
     mWorkspace(ws),
     mVariant(variant),
     mUndoStack(nullptr),
-    mGates(new ComponentGateListModel(ws, layers)) {
+    mGates(new ComponentGateListModel(ws, layers, component)) {
   mGates->setGateList(&mVariant->getSymbolItems());
 }
 
@@ -78,6 +79,11 @@ void ComponentVariantEditor::setUiData(
 void ComponentVariantEditor::setUndoStack(UndoStack* stack) noexcept {
   mUndoStack = stack;
   mGates->setUndoStack(mUndoStack);
+}
+
+slint::Image ComponentVariantEditor::renderScene(int gate, float width,
+                                                 float height) noexcept {
+  return mGates->renderScene(gate, width, height);
 }
 
 /*******************************************************************************
