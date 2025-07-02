@@ -68,7 +68,7 @@ ComponentTab::ComponentTab(LibraryEditor2& editor,
     mComponent(std::move(cmp)),
     mIsNewElement(isPathOutsideLibDir()),
     mWizardMode(wizardMode),
-    mCurrentPageIndex(wizardMode ? 0 : 1),
+    mCurrentPageIndex(wizardMode ? 0 : 2),
     // mCompactLayout(false),
     mNameParsed(mComponent->getNames().getDefaultValue()),
     mVersionParsed(mComponent->getVersion()),
@@ -183,6 +183,7 @@ ui::ComponentTabData ComponentTab::getDerivedUiData() const noexcept {
       mPrefixError,  // Prefix error
       mDefaultValue,  // Default value
       mDefaultValueError,  // Default value error
+      nullptr,  // Attributes
       mSignals,  // Signals
       q2s(signalNames),  // Signal names
       mVariants,  // Variants
@@ -612,10 +613,12 @@ bool ComponentTab::save() noexcept {
     mOriginalSignalUuids = mComponent->getSignals().getUuidSet();
     mOriginalSymbolVariants = mComponent->getSymbolVariants();
 
-    if (mWizardMode && (mCurrentPageIndex == 0)) {
+    if (mWizardMode && (mCurrentPageIndex < 2)) {
       ++mCurrentPageIndex;
-      mWizardMode = false;
-      scheduleChecks();
+      if (mCurrentPageIndex >= 2) {
+        mWizardMode = false;
+        scheduleChecks();
+      }
     }
     refreshMetadata();
 

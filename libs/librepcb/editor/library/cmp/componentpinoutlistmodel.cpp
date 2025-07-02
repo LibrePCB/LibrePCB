@@ -79,7 +79,8 @@ void ComponentPinoutListModel::setList(ComponentPinSignalMap* list) noexcept {
   notify_reset();
 }
 
-void ComponentPinoutListModel::setSignals(const ComponentSignalList* sigs) noexcept {
+void ComponentPinoutListModel::setSignals(
+    const ComponentSignalList* sigs) noexcept {
   mSignals = sigs;
 }
 

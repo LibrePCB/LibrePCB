@@ -645,7 +645,7 @@ export global Data {
                 {
                     library-index: 0,
                     wizard-mode: false,
-                    page-index: 2,
+                    page-index: 0,
                     path: "component1",
                     name: "Component",
                     description: "Foo Bar\nMultiline\nBlabla",
@@ -675,6 +675,14 @@ export global Data {
                         {
                             level: 1,
                             text: "Integrated Circuits",
+                        },
+                    ],
+                    attributes: [
+                        {
+                            key: "FOO",
+                            type: 1,
+                            value: "100",
+                            unit: 0,
                         },
                     ],
                     cmp-signals: [
@@ -1156,6 +1164,15 @@ export global Data {
 
     // Currently active project index
     out property <int> current-project-index: 0;
+
+    // All available norms
+    in property <[string]> norms: ["IEC 60617", "IEEE 315"];
+
+    // All available attribute types and their units
+    // Attention: The types order corresponds to AttributeType::getAllTypes()
+    // and the units order to AttributeType::getAvailableUnits()!
+    in property <[string]> attribute-types: ["String", "Capacitance", "Power"];
+    in property <[[string]]> attribute-units: [[], ["nF", "F"], ["mW", "W", "kW"]];
 
     // Rule check panel: Checked state of the "zoom to location" feature
     in property <bool> rule-check-zoom-to-location: true;

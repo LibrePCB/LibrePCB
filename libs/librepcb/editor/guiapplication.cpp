@@ -44,8 +44,11 @@
 #include "workspace/workspacesettingsdialog.h"
 
 #include <librepcb/core/application.h>
+#include <librepcb/core/attribute/attributetype.h>
+#include <librepcb/core/attribute/attributeunit.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/library/library.h>
+#include <librepcb/core/norms.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectloader.h>
 #include <librepcb/core/utils/mathparser.h>
@@ -286,6 +289,21 @@ void GuiApplication::createNewWindow(int id, int projectIndex) noexcept {
   d.set_projects(mProjects);
   d.fn_set_current_project(projectIndex);
   d.set_library_editors(mLibraries);
+  d.set_norms(q2s(getAvailableNorms()));
+
+  QStringList attributeTypes;
+  auto attributeUnits = std::make_shared<
+      slint::VectorModel<std::shared_ptr<slint::Model<slint::SharedString>>>>();
+  for (auto t : AttributeType::getAllTypes()) {
+    attributeTypes.append(t->getNameTr());
+    QStringList units;
+    for (auto u : t->getAvailableUnits()) {
+      units.append(u->getSymbolTr());
+    }
+    attributeUnits->push_back(q2s(units));
+  }
+  d.set_attribute_types(q2s(attributeTypes));
+  d.set_attribute_units(attributeUnits);
 
   // Register global callbacks.
   const ui::Backend& b = win->global<ui::Backend>();

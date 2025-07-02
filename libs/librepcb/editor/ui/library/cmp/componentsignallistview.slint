@@ -275,7 +275,7 @@ export component ComponentSignalListView {
                         height: row-height;
                         style: hyperlink;
                         icon-scale: 0.7;
-                        icon: @image-url("../../../../../font-awesome/svgs/solid/ellipsis.svg");
+                        icon: @image-url("../../../../../font-awesome/svgs/solid/ellipsis-vertical.svg");
 
                         clicked => {
                             context-menu-item-index = index;
@@ -293,7 +293,7 @@ export component ComponentSignalListView {
     property <length> context-menu-y;
     property <int> context-menu-item-index;
     context-menu-popup := MenuPopup {
-        x: context-menu-x;
+        x: min(context-menu-x, parent.width - self.width);
         y: context-menu-y;
 
         set-forced-net-name-item := MenuItem {

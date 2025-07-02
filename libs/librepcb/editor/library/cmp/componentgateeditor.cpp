@@ -34,10 +34,11 @@
 
 #include <librepcb/core/fileio/transactionaldirectory.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
-#include <librepcb/core/library/cmp/component.h>
+
 #include <QtCore>
 
 /*******************************************************************************

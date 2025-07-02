@@ -667,28 +667,17 @@ component LibraryContent inherits HorizontalLayout {
         if !read-only: NewLibraryElementButton {
             x: parent.width - self.width - 20px;
             y: parent.height - 4 * self.height - 46px;
-            icon: @image-url("../../../../../../img/library/symbol.png");
-            tooltip: @tr("Add Symbol");
+            icon: @image-url("../../../../../../img/library/device.png");
+            tooltip: @tr("Add Device");
 
             clicked => {
-                Backend.trigger-library(Data.library-editors[tabs[index].library-index].path, LibraryAction.new-symbol);
+                Backend.trigger-library(Data.library-editors[tabs[index].library-index].path, LibraryAction.new-device);
             }
         }
 
         if !read-only: NewLibraryElementButton {
             x: parent.width - self.width - 20px;
             y: parent.height - 3 * self.height - 36px;
-            icon: @image-url("../../../../../../img/library/package.png");
-            tooltip: @tr("Add Package");
-
-            clicked => {
-                Backend.trigger-library(Data.library-editors[tabs[index].library-index].path, LibraryAction.new-package);
-            }
-        }
-
-        if !read-only: NewLibraryElementButton {
-            x: parent.width - self.width - 20px;
-            y: parent.height - 2 * self.height - 26px;
             icon: @image-url("../../../../../../img/library/component.png");
             tooltip: @tr("Add Component");
 
@@ -699,12 +688,23 @@ component LibraryContent inherits HorizontalLayout {
 
         if !read-only: NewLibraryElementButton {
             x: parent.width - self.width - 20px;
-            y: parent.height - self.height - 16px;
-            icon: @image-url("../../../../../../img/library/device.png");
-            tooltip: @tr("Add Device");
+            y: parent.height - 2 * self.height - 26px;
+            icon: @image-url("../../../../../../img/library/package.png");
+            tooltip: @tr("Add Package");
 
             clicked => {
-                Backend.trigger-library(Data.library-editors[tabs[index].library-index].path, LibraryAction.new-device);
+                Backend.trigger-library(Data.library-editors[tabs[index].library-index].path, LibraryAction.new-package);
+            }
+        }
+
+        if !read-only: NewLibraryElementButton {
+            x: parent.width - self.width - 20px;
+            y: parent.height - self.height - 16px;
+            icon: @image-url("../../../../../../img/library/symbol.png");
+            tooltip: @tr("Add Symbol");
+
+            clicked => {
+                Backend.trigger-library(Data.library-editors[tabs[index].library-index].path, LibraryAction.new-symbol);
             }
         }
 

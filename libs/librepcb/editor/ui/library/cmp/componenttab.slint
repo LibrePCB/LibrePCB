@@ -3,6 +3,7 @@ import { LibraryRuleCheckLink } from "../libraryrulechecklink.slint";
 import { ComponentSignalListView } from "componentsignallistview.slint";
 import { ComponentVariantListView } from "componentvariantlistview.slint";
 import {
+    AttributeTableView,
     Button,
     CategoriesListView,
     ComboBox,
@@ -292,20 +293,10 @@ component ComponentMetadata inherits GridLayout {
             text: @tr("Attributes:");
         }
 
-        /*TextEdit {
-            preferred-height: 100px;
-            text: tabs[index].default-value;
-            read-only: read-only;
-
-            text-edited(text) => {
-                tabs[index].default-value = text;
-            }
-
-            text-accepted(text) => {
-                tabs[index].default-value = text;
-                Backend.trigger-tab(section-index, index, TabAction.apply);
-            }
-        }*/
+        AttributeTableView {
+            model: tabs[index].attributes;
+            //read-only: read-only;
+        }
     }
 
     Row {

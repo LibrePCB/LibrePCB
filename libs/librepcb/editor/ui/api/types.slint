@@ -90,9 +90,9 @@ export struct GraphicsLayerData {
 
 export struct AttributeData {
     key: string,
-    //type: AttributeType,
+    type: int,  // Index corresponds to AttributeType::getAllTypes().
     value: string,
-    //unit: AttributeUnit,
+    unit: int,  // Index corresponds to AttributeType::getAvailableUnits().
 }
 
 export struct ResourceData {
@@ -875,6 +875,7 @@ export struct ComponentTabData {
     prefix-error: string,
     default-value: string,
     default-value-error: string,
+    attributes: [AttributeData],
     cmp-signals: [ComponentSignalData],  // Name conflict with Qt's "signals"
     cmp-signal-names: [string],  // Used for the pinout combobox
     variants: [ComponentVariantData],
