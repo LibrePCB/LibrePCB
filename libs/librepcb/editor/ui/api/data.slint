@@ -615,6 +615,8 @@ export global Data {
                 { },
                 {
                     library-index: 0,
+                    wizard-mode: false,
+                    page-index: 2,
                     path: "package1",
                     name: "Package",
                     description: "Foo Bar\nMultiline\nBlabla",
@@ -622,17 +624,82 @@ export global Data {
                     author: "Somebody",
                     version: "0.1",
                     deprecated: false,
-                    categories: ["Integrated Circuits -> Timers"],
-                    background-color: #000000,
-                    foreground-color: #999999,
-                    overlay-color: Colors.gray,
-                    overlay-text-color: Colors.white,
-                    grid-style: GridStyle.none,
-                    unit: LengthUnit.millimeters,
+                    categories: [
+                        {
+                            uuid: "1",
+                            names: ["Integrated Circuit", "Timers"],
+                        },
+                        {
+                            uuid: "2",
+                            names: ["Foo", "Bar", "Foobar"],
+                        },
+                        {
+                            uuid: "3",
+                            names: ["Miscallenous"],
+                        },
+                    ],
+                    categories-tree: [
+                        {
+                            level: 0,
+                            text: "Root Category",
+                        },
+                        {
+                            level: 1,
+                            text: "Integrated Circuits",
+                        },
+                    ],
+                    pads: [
+                        {
+                            id: "deadbeef",
+                            name: "1",
+                        },
+                        {
+                            id: "12345678",
+                            name: "2",
+                        },
+                        {
+                            id: "dead1234",
+                            name: "SHIELD",
+                        },
+                    ],
+                    footprints: [
+                        {
+                            id: "deadbeef",
+                            name: "default",
+                        },
+                        {
+                            id: "12345678",
+                            name: "large",
+                        },
+                        {
+                            id: "dead1234",
+                            name: "small",
+                        },
+                    ],
                     checks: {
                         type: RuleCheckType.package-check,
                         state: RuleCheckState.up-to-date,
                         unapproved: 2,
+                        errors: 1,
+                    },
+                    interface-broken-msg: true,
+                    //import-pins-msg: {
+                    //    visible: true,
+                    //    supports-dont-show-again: false,
+                    //},
+                    tool: EditorTool.select,
+                    tool-overlay-text: "X0:   123.4567 mm\nY0:   123.4567 mm\nX1:   123.4567 mm\nY1:   123.4567 mm\n\ndX:   123.4567 mm\ndY:   123.4567 mm\n\nL:    123.4567 mm\na:     90.0000 °",
+                    tool-layer: {
+                        items: ["Layer 1", "Layer 2", "Layer with long name"],
+                        current-index: 1,
+                    },
+                    tool-line-width: {
+                        can-increase: true,
+                        can-decrease: true,
+                    },
+                    tool-value: {
+                        text: "{{PROJECT}}",
+                        suggestions: ["{{Foo}}", "{{PROJECT}}", "{{Bar}}"],
                     },
                 },
             ],
@@ -861,7 +928,7 @@ export global Data {
                     },
                 },
             ],
-            current-tab-index: 6,
+            current-tab-index: 4,
         },
     ];
 

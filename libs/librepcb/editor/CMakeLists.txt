@@ -412,6 +412,8 @@ add_library(
   library/pkg/packagepadlisteditorwidget.h
   library/pkg/packagepadlistmodel.cpp
   library/pkg/packagepadlistmodel.h
+  library/pkg/packagepadlistmodel2.cpp
+  library/pkg/packagepadlistmodel2.h
   library/pkg/packagetab.cpp
   library/pkg/packagetab.h
   library/sym/fsm/symboleditorfsm.cpp

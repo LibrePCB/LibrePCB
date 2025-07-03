@@ -33,12 +33,10 @@ export component Switch inherits Rectangle {
     accessible-action-default => {
         ta.clicked();
     }
-
     callback toggled(checked: bool);
     toggled(state) => {
         checked = state;
     }
-
     fs := FocusScope {
         enabled: enabled && focusable;
 
@@ -85,10 +83,9 @@ export component Switch inherits Rectangle {
             border-width: has-focus ? 1px : 0;
 
             Rectangle {
-                x: checked ? (parent.width - self.width - self.padding) : self.padding;
+                x: checked ? (parent.width - self.width - 3px) : 3px;
                 width: self.height;
-                height: parent.height - 2 * self.padding;
-                padding: 3px;
+                height: parent.height - 6px;
                 background: ta.has-hover ? #303030 : #101010;
                 border-radius: self.height / 2;
 

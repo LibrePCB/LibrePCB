@@ -1405,7 +1405,7 @@ void SymbolTab::commitMetadata() noexcept {
 
   try {
     std::unique_ptr<CmdLibraryElementEdit> cmd(
-        new CmdLibraryElementEdit(*mSymbol, tr("Edit Symbol Metadata")));
+        new CmdLibraryElementEdit(*mSymbol, tr("Edit Symbol Properties")));
     cmd->setName(QString(), mNameParsed);
     cmd->setDescription(QString(), s2q(mDescription).trimmed());
     const QString keywords = s2q(mKeywords);

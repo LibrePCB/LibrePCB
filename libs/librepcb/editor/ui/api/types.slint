@@ -108,6 +108,22 @@ export struct LibraryDependency {
     checked: bool,
 }
 
+export struct PackagePadData {
+    id: string,
+    name: string,
+    name-error: string,
+
+    delete: bool,  // Set by UI, reset by backend.
+}
+
+export struct FootprintData {
+    id: string,
+    name: string,
+    name-error: string,
+
+    delete: bool,  // Set by UI, reset by backend.
+}
+
 export struct ComponentSignalData {
     id: string,
     name: string,
@@ -815,15 +831,25 @@ export struct SymbolTabData {
 
 // Additional data for package editor tabs
 export struct PackageTabData {
+    // General
     library-index: int,
+    wizard-mode: bool,
+    page-index: int,
+
+    // Metadata
     path: string,
     name: string,
+    name-error: string,
     description: string,
     keywords: string,
     author: string,
     version: string,
+    version-error: string,
     deprecated: bool,
-    categories: [string],
+    categories: [LibraryElementCategoryData],
+    categories-tree: [TreeViewItemData],
+    pads: [PackagePadData],
+    footprints: [FootprintData],
     checks: RuleCheckData,
 
     // View
@@ -835,6 +861,10 @@ export struct PackageTabData {
     grid-interval: Int64,
     unit: LengthUnit,
 
+    // Messages
+    interface-broken-msg: bool,
+    //import-pins-msg: DismissableMessageData,
+
     // Data about the currently active tool
     tool: EditorTool,
     tool-cursor: MouseCursor,
@@ -842,11 +872,18 @@ export struct PackageTabData {
     tool-layer: ComboBoxData,
     tool-line-width: LengthEditData,
     tool-size: LengthEditData,
+    tool-angle: AngleEditData,
     tool-filled: bool,
+    tool-grab-area: bool,
     tool-value: LineEditData,
+    tool-halign: HAlign,
+    tool-valign: VAlign,
 
+    //compact-layout: bool,  // Set by UI
     scene-image-pos: Point,  // Absolute position of graphics scene
     frame: int,  // Frame index to trigger repainting
+
+    new-category: string,  // Set to UUID by UI, reset by backend.
 }
 
 // Additional data for component editor tabs
