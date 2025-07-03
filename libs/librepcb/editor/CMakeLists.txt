@@ -272,19 +272,26 @@ add_library(
   library/kicadlibraryimportwizard/kicadlibraryimportwizardpage_start.cpp
   library/kicadlibraryimportwizard/kicadlibraryimportwizardpage_start.h
   library/kicadlibraryimportwizard/kicadlibraryimportwizardpage_start.ui
+  library/lib/librarydependenciesmodel.cpp
+  library/lib/librarydependenciesmodel.h
+  library/lib/libraryelementsmodel.cpp
+  library/lib/libraryelementsmodel.h
   library/lib/librarylisteditorwidget.cpp
   library/lib/librarylisteditorwidget.h
   library/lib/librarylisteditorwidget.ui
-  library/lib/libraryoverviewwidget.cpp
-  library/lib/libraryoverviewwidget.h
-  library/lib/libraryoverviewwidget.ui
+  library/lib/librarytab.cpp
+  library/lib/librarytab.h
   library/librariesmodel.cpp
   library/librariesmodel.h
   library/librarydownload.cpp
   library/librarydownload.h
+  library/libraryeditor.cpp
+  library/libraryeditor.h
   library/libraryeditorlegacy.cpp
   library/libraryeditorlegacy.h
   library/libraryeditorlegacy.ui
+  library/libraryeditortab.cpp
+  library/libraryeditortab.h
   library/libraryelementcache.cpp
   library/libraryelementcache.h
   library/newelementwizard/newelementwizard.cpp
@@ -957,6 +964,8 @@ add_library(
   windowtab.h
   workspace/categorytreemodel.cpp
   workspace/categorytreemodel.h
+  workspace/categorytreemodel2.cpp
+  workspace/categorytreemodel2.h
   workspace/desktopintegration.cpp
   workspace/desktopintegration.h
   workspace/desktopservices.cpp

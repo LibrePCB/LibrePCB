@@ -1,0 +1,41 @@
+import { LinkText, Badge } from "../widgets.slint";
+import { RuleCheckData } from "../api.slint";
+
+export component LibraryRuleCheckLink inherits HorizontalLayout {
+    in property <RuleCheckData> data;
+    property <bool> has-messages: (data.unapproved > 0) || (data.messages.length > 0);
+
+    callback clicked;
+
+    if !has-messages: LinkText {
+        text-color: #00d000;
+        text-color-hovered: #00ff00;
+        vertical-alignment: center;
+        text: @tr("All checks passed!");
+
+        clicked => {
+            clicked();
+        }
+    }
+
+    if has-messages: Badge {
+        y: (parent.height - self.height) / 2;
+        clickable: true;
+        background: (data.unapproved > 0) ? #ff0000 : #006000;
+        border-color: self.background;
+        text-color: (data.unapproved > 0) ? white : #d0d0d0;
+        text-color-hover: (data.unapproved > 0) ? #c0c0c0 : white;
+        font-size: 12px;
+        text: {
+            if data.unapproved > 0 {
+                @tr("{n} warning" | "{n} warnings" % data.unapproved)
+            } else {
+                @tr("{n} approved message" | "{n} approved messages" % data.messages.length)
+            }
+        };
+
+        clicked => {
+            clicked();
+        }
+    }
+}

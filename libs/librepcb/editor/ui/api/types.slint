@@ -88,6 +88,13 @@ export struct GraphicsLayerData {
     visible: bool,
 }
 
+export struct LibraryDependency {
+    uuid: string,
+    icon: image,
+    name: string,
+    checked: bool,
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Widgets data
 ////////////////////////////////////////////////////////////////////////////////
@@ -122,6 +129,37 @@ export struct LengthEditParseResult {
     valid: bool,
     evaluated-value: Int64,
     evaluated-unit: LengthUnit,
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Tree views
+////////////////////////////////////////////////////////////////////////////////
+
+// Tree view item actions
+export enum TreeViewItemAction {
+    none,
+    open,
+    delete,
+    new-folder,
+    new-project,
+}
+
+// Generic tree view item data structure
+export struct TreeViewItemData {
+    level: int,  // 0 = top level items
+    icon: image,
+    text: string,
+    comment: string,
+    hint: string,
+    italic: bool,
+    bold: bool,
+    user-data: string,  // User data to uniquely reference this item
+    is-project-file-or-folder: bool,
+    has-children: bool,
+    expanded: bool,
+    supports-pinning: bool,
+    pinned: bool,
+    action: TreeViewItemAction,  // Set by UI, handled in backend
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -173,6 +211,7 @@ export enum RuleCheckType {
     none,
     erc,
     drc,
+    library-check,
 }
 
 export enum RuleCheckState {
@@ -250,6 +289,9 @@ export struct TabFeatures {
     save: FeatureState,
     undo: FeatureState,
     redo: FeatureState,
+    grid: FeatureState,
+    zoom: FeatureState,
+    import-graphics: FeatureState,
     export-graphics: FeatureState,
     select: FeatureState,
     cut: FeatureState,
@@ -274,6 +316,7 @@ export enum TabType {
     home,
     create-library,
     download-library,
+    library,
     schematic,
     board-2d,
     board-3d,
@@ -282,8 +325,11 @@ export enum TabType {
 // Tab actions
 export enum TabAction {
     close,
+    apply,
     cancel,
     accept,
+    back,
+    next,
 
     // General
     save,
@@ -348,6 +394,9 @@ export enum TabAction {
     find-refresh-suggestions,
     find-next,
     find-previous,
+
+    // Library tab
+    library-choose-icon,
 
     // Board 2D tab
     board-place-component,
@@ -531,6 +580,38 @@ export struct Board3dTabData {
     frame: int,  // Frame index to trigger repainting
 }
 
+// Additional data for library editor tabs
+export struct LibraryTabData {
+    // General
+    library-index: int,
+    wizard-mode: bool,
+    page-index: int,
+
+    // Metadata
+    icon: image,
+    name: string,
+    name-error: string,
+    description: string,
+    keywords: string,
+    author: string,
+    version: string,
+    version-error: string,
+    deprecated: bool,
+    url: string,
+    url-error: string,
+    dependencies: [LibraryDependency],
+    manufacturer: string,
+
+    // Content
+    categories: [TreeViewItemData],
+    categories-index: int,
+    filtered-elements: [TreeViewItemData],
+    element-index: int,
+
+    // Checks
+    checks: RuleCheckData,
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Window sections
 ////////////////////////////////////////////////////////////////////////////////
@@ -549,36 +630,9 @@ export struct WindowSectionData {
     schematic-tabs: [SchematicTabData],  // Proxy view for `tabs`
     board-2d-tabs: [Board2dTabData],  // Proxy view for `tabs`
     board-3d-tabs: [Board3dTabData],  // Proxy view for `tabs`
+    library-tabs: [LibraryTabData],  // Proxy view for `tabs`
     current-tab-index: int,
     highlight: bool,
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Tree views
-////////////////////////////////////////////////////////////////////////////////
-
-// Tree view item actions
-export enum TreeViewItemAction {
-    none,
-    open,
-    delete,
-    new-folder,
-    new-project,
-}
-
-// Generic tree view item data structure
-export struct TreeViewItemData {
-    level: int,  // 0 = top level items
-    icon: image,
-    text: string,
-    hint: string,
-    user-data: string,  // User data to uniquely reference this item
-    is-project-file-or-folder: bool,
-    has-children: bool,
-    expanded: bool,
-    supports-pinning: bool,
-    pinned: bool,
-    action: TreeViewItemAction,  // Set by UI, handled in backend
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -587,7 +641,6 @@ export struct TreeViewItemData {
 
 // Library actions
 export enum LibraryAction {
-    none,
     open,
     uninstall,
 }
@@ -606,7 +659,6 @@ export struct LibraryData {
     progress: int,  // [%], 0 if not installing
     checked: bool,
     highlight: bool,
-    action: LibraryAction,  // Set by UI, handled in backend
 }
 
 // Metadata for a list of LibraryData
@@ -623,6 +675,25 @@ export struct LibraryListData {
     pending-oneway-uninstalls: int,  // Only for remote libraries
     operation-in-progress: bool,
     operation-error: string,
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Library Editor
+////////////////////////////////////////////////////////////////////////////////
+
+export enum LibraryElementAction {
+    open,
+    close,
+    open-folder,
+    import-eagle-library,
+    import-kicad-library,
+}
+
+export struct LibraryEditorData {
+    valid: bool,
+    path: string,
+    name: string,
+    writable: bool,
 }
 
 ////////////////////////////////////////////////////////////////////////////////

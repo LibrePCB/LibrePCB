@@ -35,19 +35,8 @@
    <property name="bottomMargin">
     <number>0</number>
    </property>
-   <item>
-    <widget class="librepcb::editor::ComponentSignalListEditorWidget" name="signalListEditorWidget" native="true"/>
-   </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>librepcb::editor::ComponentSignalListEditorWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">librepcb/editor/library/cmp/componentsignallisteditorwidget.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

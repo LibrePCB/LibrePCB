@@ -5,6 +5,8 @@ import {
     Int64,
     LengthEditParseResult,
     LengthUnit,
+    LibraryAction,
+    LibraryElementAction,
     ProjectAction,
     SchematicAction,
     TabAction,
@@ -47,6 +49,12 @@ export global Backend {
         if action == TabAction.tool-select {
             Data.sections[section].schematic-tabs[tab].tool = EditorTool.select;
             Data.sections[section].board-2d-tabs[tab].tool = EditorTool.select;
+        } else if action == TabAction.tool-polygon {
+            Data.sections[section].schematic-tabs[tab].tool = EditorTool.polygon;
+            Data.sections[section].board-2d-tabs[tab].tool = EditorTool.polygon;
+        } else if action == TabAction.tool-text {
+            Data.sections[section].schematic-tabs[tab].tool = EditorTool.text;
+            Data.sections[section].board-2d-tabs[tab].tool = EditorTool.text;
         } else if action == TabAction.tool-wire {
             Data.sections[section].schematic-tabs[tab].tool = EditorTool.wire;
             Data.sections[section].board-2d-tabs[tab].tool = EditorTool.wire;
@@ -54,12 +62,6 @@ export global Backend {
             Data.sections[section].schematic-tabs[tab].tool = EditorTool.netlabel;
         } else if action == TabAction.tool-via {
             Data.sections[section].board-2d-tabs[tab].tool = EditorTool.via;
-        } else if action == TabAction.tool-polygon {
-            Data.sections[section].schematic-tabs[tab].tool = EditorTool.polygon;
-            Data.sections[section].board-2d-tabs[tab].tool = EditorTool.polygon;
-        } else if action == TabAction.tool-text {
-            Data.sections[section].schematic-tabs[tab].tool = EditorTool.text;
-            Data.sections[section].board-2d-tabs[tab].tool = EditorTool.text;
         } else if action == TabAction.tool-plane {
             Data.sections[section].board-2d-tabs[tab].tool = EditorTool.plane;
         } else if action == TabAction.tool-zone {
@@ -76,6 +78,26 @@ export global Backend {
             Data.sections[section].schematic-tabs[tab].tool = EditorTool.select;
             Data.sections[section].board-2d-tabs[tab].tool = EditorTool.select;
         }
+    }
+
+    // Trigger some library action
+    //
+    // Note: This callback is executed asynchronously in the backend to
+    // guarantee there are no side effects changing the UI from within the
+    // callback. Otherwise we couldn't declare it as 'pure'.
+    pure callback trigger-library(library-path: string, action: LibraryAction);
+    trigger-library(library-path, action) => {
+        debug("Trigger library action:", library-path, action);
+    }
+
+    // Trigger some library element action
+    //
+    // Note: This callback is executed asynchronously in the backend to
+    // guarantee there are no side effects changing the UI from within the
+    // callback. Otherwise we couldn't declare it as 'pure'.
+    pure callback trigger-library-element(path: string, action: LibraryElementAction);
+    trigger-library-element(path, action) => {
+        debug("Trigger library element action:", path, action);
     }
 
     // Trigger some project action

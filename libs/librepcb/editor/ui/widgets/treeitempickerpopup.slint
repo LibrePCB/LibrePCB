@@ -1,0 +1,36 @@
+import { TreeViewItemData, Constants } from "../api.slint";
+import { TreeView } from "treeview.slint";
+
+export component TreeItemPickerPopup inherits PopupWindow {
+    in property <[TreeViewItemData]> model;
+
+    callback item-picked(item: TreeViewItemData);
+
+    Rectangle {
+        background: #00000050;
+
+        Rectangle {
+            width: min(0.8 * parent.width, 500px);
+            height: min(self.preferred-height, 0.8 * parent.height);
+            background: #000000;
+            border-radius: 15px;
+            border-width: 1px;
+            border-color: Constants.librepcb-color;
+
+            VerticalLayout {
+                padding: 15px;
+
+                choose-parent-view := TreeView {
+                    model: model;
+                    show-tree: true;
+                    hide-root-tree: true;
+                    supports-expand: false;
+
+                    item-selected(idx, item) => {
+                        item-picked(item);
+                    }
+                }
+            }
+        }
+    }
+}

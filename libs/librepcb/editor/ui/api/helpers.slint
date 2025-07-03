@@ -175,6 +175,8 @@ export global Helpers {
             @image-url("../../../../bootstrap-icons/icons/database-add.svg")
         } else if (t == TabType.download-library) {
             @image-url("../../../../bootstrap-icons/icons/cloud-arrow-down-fill.svg")
+        } else if (t == TabType.library) {
+            @image-url("../../../../bootstrap-icons/icons/database.svg")
         } else if (t == TabType.schematic) {
             @image-url("../../../../font-awesome/svgs/regular/image.svg")
         } else if (t == TabType.board-2d) {
@@ -192,6 +194,8 @@ export global Helpers {
             @tr("Electrical Rule Check")
         } else if type == RuleCheckType.drc {
             @tr("Design Rule Check")
+        } else if type == RuleCheckType.library-check {
+            @tr("Library Check")
         } else {
             ""
         }

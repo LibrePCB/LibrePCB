@@ -3,6 +3,7 @@ import { ListViewItemButton } from "listviewitembutton.slint";
 import {
     Backend,
     Constants,
+    Data,
     EditorCommandSet as Cmd,
     Helpers,
     TreeViewItemAction,
@@ -11,17 +12,25 @@ import {
 
 export component TreeView inherits Rectangle {
     in-out property <[TreeViewItemData]> model;
+    in-out property <int> current-index: -1;
+    in property <length> item-height: 22px;
+    in property <length> font-size: 14px;
+    in property <bool> show-tree: false;
+    in property <bool> hide-root-tree: false;
+    in property <bool> hide-root-lines: hide-root-tree;
     in property <bool> supports-expand: true;
+    in property <bool> comment-has-priority: false;
     out property <bool> has-focus <=> fs.has-focus;
-    property <length> item-height: 22px;
-    property <length> icon-size: 18px;
+    out property <length> scrollbar-width: (self.height < self.preferred-height) ? 7px : 0;
+    property <length> icon-size: item-height - 4px;
     property <length> pin-size: 14px;
-    property <int> current-index: -1;
-    property <length> scrollbar-width: (self.height < self.preferred-height) ? 7px : 0;
 
     callback key-pressed(index: int, item: TreeViewItemData, event: KeyEvent) -> EventResult;
     callback item-hovered(index: int, item: TreeViewItemData);
     callback item-selected(index: int, item: TreeViewItemData);
+    item-selected(index, item) => {
+        current-index = index;
+    }
     callback item-triggered(index: int, item: TreeViewItemData) -> bool;
     callback item-right-clicked(index: int, item: TreeViewItemData, x: length, y: length);
     callback item-deleted(index: int, item: TreeViewItemData) -> bool;
@@ -34,7 +43,6 @@ export component TreeView inherits Rectangle {
     accessible-item-count: model.length;
 
     function set-current-index(index: int) {
-        current-index = index;
         item-selected(index, model[index]);
     }
 
@@ -71,7 +79,7 @@ export component TreeView inherits Rectangle {
 
     view := ListView {
         for item[index] in model: item-ta := TouchArea {
-            property <bool> is-enabled: item.action == TreeViewItemAction.none;
+            property <bool> is-enabled: (!Data.preview-mode) || (item.action == TreeViewItemAction.none);
             property <bool> show-pin: item.supports-pinning && (item.pinned || self.has-hover || (current-index == index));
 
             width: parent.width;
@@ -105,13 +113,13 @@ export component TreeView inherits Rectangle {
 
                 HorizontalLayout {
                     spacing: 5px;
-                    padding-left: 5px;
+                    padding-left: supports-expand ? 5px : 0;
                     padding-right: 5px + scrollbar-width;
 
-                    if supports-expand: expand-ta := TouchArea {
+                    if !show-tree: expand-ta := TouchArea {
                         mouse-cursor: pointer;
-                        enabled: item.has-children;
-                        width: item.level * 10px + item-height / 2 + 2px;
+                        enabled: supports-expand && item.has-children;
+                        width: item.level * 10px + (supports-expand ? (item-height / 2 + 2px) : 0);
 
                         Image {
                             y: 4px;
@@ -133,7 +141,28 @@ export component TreeView inherits Rectangle {
                         }
                     }
 
-                    Image {
+                    if show-tree && ((!hide-root-tree) || (item.level > 0)): HorizontalLayout {
+                        for i in (item.level + 1): Rectangle {
+                            width: (i > 0) ? 15px : 8px;
+
+                            if (!hide-root-lines) || (i > 0): Rectangle {
+                                x: parent.width - 8px;
+                                y: 0;
+                                width: 1px;
+                                height: ((i < item.level) || (((index + 1) < model.length) && (model[index + 1].level >= item.level))) ? parent.height : (parent.height / 2);
+                                background: #707070;
+                            }
+
+                            if i == item.level: Rectangle {
+                                x: parent.width - 8px;
+                                width: parent.width - self.x;
+                                height: 1px;
+                                background: #707070;
+                            }
+                        }
+                    }
+
+                    if item.icon.width > 0: Image {
                         y: (parent.height - self.height) / 2;
                         width: icon-size;
                         height: icon-size;
@@ -143,12 +172,27 @@ export component TreeView inherits Rectangle {
                     }
 
                     item-text-txt := Text {
-                        horizontal-stretch: 1;
+                        horizontal-stretch: 0;
                         color: is-enabled ? #dddddd : #a0a0a0;
-                        font-size: 14px;
-                        font-weight: 400;
-                        overflow: TextOverflow.elide;
+                        font-size: font-size;
+                        font-weight: item.bold ? 600 : 400;
+                        font-italic: item.italic;
+                        vertical-alignment: center;
+                        overflow: elide;
                         text: item.text;
+                        accessible-role: none;
+                    }
+
+                    if !item.comment.is-empty: item-comment-txt := Text {
+                        min-width: comment-has-priority ? self.preferred-width : 0;
+                        horizontal-stretch: 1;
+                        color: is-enabled ? #a0a0a0 : #808080;
+                        font-size: 11px;
+                        font-weight: 300;
+                        horizontal-alignment: right;
+                        vertical-alignment: center;
+                        overflow: elide;
+                        text: item.comment;
                         accessible-role: none;
                     }
 

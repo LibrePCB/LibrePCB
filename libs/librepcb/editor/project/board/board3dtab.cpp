@@ -108,6 +108,7 @@ ui::TabData Board3dTab::getUiData() const noexcept {
   features.save = toFs(mProject.getDirectory().isWritable());
   features.undo = toFs(mProjectEditor.getUndoStack().canUndo());
   features.redo = toFs(mProjectEditor.getUndoStack().canRedo());
+  features.zoom = toFs(true);
 
   return ui::TabData{
       ui::TabType::Board3d,  // Type

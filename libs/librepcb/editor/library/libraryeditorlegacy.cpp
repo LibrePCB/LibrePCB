@@ -37,7 +37,6 @@
 #include "dev/deviceeditorwidget.h"
 #include "eaglelibraryimportwizard/eaglelibraryimportwizard.h"
 #include "kicadlibraryimportwizard/kicadlibraryimportwizard.h"
-#include "lib/libraryoverviewwidget.h"
 #include "pkg/packageeditorwidget.h"
 #include "sym/symboleditorwidget.h"
 #include "ui_libraryeditorlegacy.h"
@@ -65,7 +64,7 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-LibraryEditorLegacy::LibraryEditorLegacy(Workspace& ws, const FilePath& libFp,
+LibraryEditorLegacy::LibraryEditorLegacy(Workspace& ws, Library& lib,
                                          bool readOnly)
   : QMainWindow(nullptr),
     mWorkspace(ws),
@@ -75,7 +74,7 @@ LibraryEditorLegacy::LibraryEditorLegacy(Workspace& ws, const FilePath& libFp,
         new StandardEditorCommandHandler(mWorkspace.getSettings(), this)),
     mLayers(GraphicsLayerList::libraryLayers(&mWorkspace.getSettings())),
     mCurrentEditorWidget(nullptr),
-    mLibrary(nullptr) {
+    mLibrary(&lib) {
   mUi->setupUi(this);
 
   // Workaround for automatically closing window when opening 3D viewer,
@@ -104,66 +103,6 @@ LibraryEditorLegacy::LibraryEditorLegacy(Workspace& ws, const FilePath& libFp,
   mUi->statusBar->setProgressBarPercent(
       mWorkspace.getLibraryDb().getScanProgressPercent());
 
-  // Add overview tab.
-  LibraryOverviewWidget* overviewWidget =
-      new LibraryOverviewWidget(createContext(false), libFp);
-  mLibrary = &overviewWidget->getLibrary();
-  mUi->tabWidget->addTab(overviewWidget, overviewWidget->windowIcon(),
-                         overviewWidget->windowTitle());
-  tabCountChanged();
-  connect(overviewWidget, &LibraryOverviewWidget::windowTitleChanged, this,
-          &LibraryEditorLegacy::updateTabTitles);
-  connect(overviewWidget, &LibraryOverviewWidget::dirtyChanged, this,
-          &LibraryEditorLegacy::updateTabTitles);
-  connect(overviewWidget, &EditorWidgetBase::elementEdited,
-          &mWorkspace.getLibraryDb(), &WorkspaceLibraryDb::startLibraryRescan);
-  connect(overviewWidget, &LibraryOverviewWidget::newComponentCategoryTriggered,
-          this, &LibraryEditorLegacy::newComponentCategoryTriggered);
-  connect(overviewWidget, &LibraryOverviewWidget::newPackageCategoryTriggered,
-          this, &LibraryEditorLegacy::newPackageCategoryTriggered);
-  connect(overviewWidget, &LibraryOverviewWidget::newSymbolTriggered, this,
-          &LibraryEditorLegacy::newSymbolTriggered);
-  connect(overviewWidget, &LibraryOverviewWidget::newPackageTriggered, this,
-          &LibraryEditorLegacy::newPackageTriggered);
-  connect(overviewWidget, &LibraryOverviewWidget::newComponentTriggered, this,
-          &LibraryEditorLegacy::newComponentTriggered);
-  connect(overviewWidget, &LibraryOverviewWidget::newDeviceTriggered, this,
-          &LibraryEditorLegacy::newDeviceTriggered);
-  connect(overviewWidget,
-          &LibraryOverviewWidget::editComponentCategoryTriggered, this,
-          &LibraryEditorLegacy::editComponentCategoryTriggered);
-  connect(overviewWidget, &LibraryOverviewWidget::editPackageCategoryTriggered,
-          this, &LibraryEditorLegacy::editPackageCategoryTriggered);
-  connect(overviewWidget, &LibraryOverviewWidget::editSymbolTriggered, this,
-          &LibraryEditorLegacy::editSymbolTriggered);
-  connect(overviewWidget, &LibraryOverviewWidget::editPackageTriggered, this,
-          &LibraryEditorLegacy::editPackageTriggered);
-  connect(overviewWidget, &LibraryOverviewWidget::editComponentTriggered, this,
-          &LibraryEditorLegacy::editComponentTriggered);
-  connect(overviewWidget, &LibraryOverviewWidget::editDeviceTriggered, this,
-          &LibraryEditorLegacy::editDeviceTriggered);
-  connect(overviewWidget,
-          &LibraryOverviewWidget::duplicateComponentCategoryTriggered, this,
-          &LibraryEditorLegacy::duplicateComponentCategoryTriggered);
-  connect(overviewWidget,
-          &LibraryOverviewWidget::duplicatePackageCategoryTriggered, this,
-          &LibraryEditorLegacy::duplicatePackageCategoryTriggered);
-  connect(overviewWidget, &LibraryOverviewWidget::duplicateSymbolTriggered,
-          this, &LibraryEditorLegacy::duplicateSymbolTriggered);
-  connect(overviewWidget, &LibraryOverviewWidget::duplicatePackageTriggered,
-          this, &LibraryEditorLegacy::duplicatePackageTriggered);
-  connect(overviewWidget, &LibraryOverviewWidget::duplicateComponentTriggered,
-          this, &LibraryEditorLegacy::duplicateComponentTriggered);
-  connect(overviewWidget, &LibraryOverviewWidget::duplicateDeviceTriggered,
-          this, &LibraryEditorLegacy::duplicateDeviceTriggered);
-  connect(overviewWidget, &LibraryOverviewWidget::removeElementTriggered, this,
-          &LibraryEditorLegacy::closeTabIfOpen);
-
-  // Remove close button on first tab (which is the library overview).
-  QTabBar* tabBar = mUi->tabWidget->tabBar();
-  Q_ASSERT(tabBar);
-  tabBar->setTabButton(0, QTabBar::RightSide, nullptr);
-
   // Set window title and icon.
   const QStringList localeOrder =
       mWorkspace.getSettings().libraryLocaleOrder.get();
@@ -172,8 +111,7 @@ LibraryEditorLegacy::LibraryEditorLegacy(Workspace& ws, const FilePath& libFp,
   setWindowTitle(tr("%1 - LibrePCB Library Editor").arg(libName));
   setWindowIcon(mLibrary->getIconAsPixmap());
 
-  // Open the overview tab.
-  setActiveEditorWidget(overviewWidget);
+  // Connect tab widget.
   connect(mUi->tabWidget, &QTabWidget::currentChanged, this,
           &LibraryEditorLegacy::currentTabChanged);
   connect(mUi->tabWidget, &QTabWidget::tabCloseRequested, this,
@@ -185,6 +123,9 @@ LibraryEditorLegacy::LibraryEditorLegacy(Workspace& ws, const FilePath& libFp,
       clientSettings.value("library_editor/window_geometry").toByteArray());
   restoreState(
       clientSettings.value("library_editor/window_state_v2").toByteArray());
+
+  tabCountChanged();
+  setActiveEditorWidget(nullptr);
 }
 
 LibraryEditorLegacy::~LibraryEditorLegacy() noexcept {
@@ -197,9 +138,9 @@ LibraryEditorLegacy::~LibraryEditorLegacy() noexcept {
  *  Public Methods
  ******************************************************************************/
 
-bool LibraryEditorLegacy::closeAndDestroy(bool askForSave) noexcept {
+bool LibraryEditorLegacy::requestClose() noexcept {
   // Close tabs.
-  if (!closeAllTabs(true, askForSave)) {
+  if (!closeAllTabs(true, true)) {
     return false;
   }
 
@@ -208,8 +149,31 @@ bool LibraryEditorLegacy::closeAndDestroy(bool askForSave) noexcept {
   clientSettings.setValue("library_editor/window_geometry", saveGeometry());
   clientSettings.setValue("library_editor/window_state_v2", saveState());
 
-  deleteLater();
   return true;
+}
+
+void LibraryEditorLegacy::openComponentCategory(const FilePath& fp) noexcept {
+  editLibraryElementTriggered<ComponentCategoryEditorWidget>(fp, false);
+}
+
+void LibraryEditorLegacy::openPackageCategory(const FilePath& fp) noexcept {
+  editLibraryElementTriggered<PackageCategoryEditorWidget>(fp, false);
+}
+
+void LibraryEditorLegacy::openSymbol(const FilePath& fp) noexcept {
+  editLibraryElementTriggered<SymbolEditorWidget>(fp, false);
+}
+
+void LibraryEditorLegacy::openPackage(const FilePath& fp) noexcept {
+  editLibraryElementTriggered<PackageEditorWidget>(fp, false);
+}
+
+void LibraryEditorLegacy::openComponent(const FilePath& fp) noexcept {
+  editLibraryElementTriggered<ComponentEditorWidget>(fp, false);
+}
+
+void LibraryEditorLegacy::openDevice(const FilePath& fp) noexcept {
+  editLibraryElementTriggered<DeviceEditorWidget>(fp, false);
 }
 
 /*******************************************************************************
@@ -256,32 +220,6 @@ void LibraryEditorLegacy::newComponentTriggered() noexcept {
 
 void LibraryEditorLegacy::newDeviceTriggered() noexcept {
   newLibraryElement(NewElementWizardContext::ElementType::Device);
-}
-
-void LibraryEditorLegacy::editComponentCategoryTriggered(
-    const FilePath& fp) noexcept {
-  editLibraryElementTriggered<ComponentCategoryEditorWidget>(fp, false);
-}
-
-void LibraryEditorLegacy::editPackageCategoryTriggered(
-    const FilePath& fp) noexcept {
-  editLibraryElementTriggered<PackageCategoryEditorWidget>(fp, false);
-}
-
-void LibraryEditorLegacy::editSymbolTriggered(const FilePath& fp) noexcept {
-  editLibraryElementTriggered<SymbolEditorWidget>(fp, false);
-}
-
-void LibraryEditorLegacy::editPackageTriggered(const FilePath& fp) noexcept {
-  editLibraryElementTriggered<PackageEditorWidget>(fp, false);
-}
-
-void LibraryEditorLegacy::editComponentTriggered(const FilePath& fp) noexcept {
-  editLibraryElementTriggered<ComponentEditorWidget>(fp, false);
-}
-
-void LibraryEditorLegacy::editDeviceTriggered(const FilePath& fp) noexcept {
-  editLibraryElementTriggered<DeviceEditorWidget>(fp, false);
 }
 
 void LibraryEditorLegacy::duplicateComponentCategoryTriggered(
@@ -748,23 +686,6 @@ void LibraryEditorLegacy::createToolBars() noexcept {
   mToolBarView->addAction(mActionToggle3D.data());
   addToolBar(Qt::TopToolBarArea, mToolBarView.data());
 
-  // Search.
-  mToolBarSearch.reset(new SearchToolBar(this));
-  mToolBarSearch->setObjectName("toolBarSearch");
-  mToolBarSearch->setPlaceholderText(tr("Filter elements..."));
-  connect(mActionFind.data(), &QAction::triggered, mToolBarSearch.data(),
-          &SearchToolBar::selectAllAndSetFocus);
-  addToolBar(Qt::TopToolBarArea, mToolBarSearch.data());
-  connect(mToolBarSearch.data(), &SearchToolBar::textChanged, this,
-          [this](const QString& text) {
-            if (auto w = dynamic_cast<LibraryOverviewWidget*>(
-                    mUi->tabWidget->widget(0))) {
-              w->setFilter(text);
-            } else {
-              qCritical() << "Could not get overview widget in library editor.";
-            }
-          });
-
   // Command.
   mToolBarCommand.reset(new QToolBar(tr("Command"), this));
   mToolBarCommand->setObjectName("toolBarCommand");
@@ -981,8 +902,6 @@ void LibraryEditorLegacy::setAvailableFeatures(
   mActionSnapToGrid->setEnabled(features.contains(Feature::SnapToGrid));
   mActionProperties->setEnabled(features.contains(Feature::Properties));
   mActionCloseTab->setEnabled(features.contains(Feature::Close));
-
-  mToolBarSearch->setEnabled(features.contains(Feature::Filter));
 }
 
 void LibraryEditorLegacy::setActiveEditorWidget(EditorWidgetBase* widget) {
@@ -1088,21 +1007,8 @@ void LibraryEditorLegacy::tabCountChanged() noexcept {
   mActionCloseAllTabs->setEnabled(mUi->tabWidget->count() > 1);
 }
 
-void LibraryEditorLegacy::keyPressEvent(QKeyEvent* event) noexcept {
-  // If the overview tab is opened and a filter is active, discard the filter
-  // with the escape key.
-  if ((event->key() == Qt::Key_Escape) && (mToolBarSearch) &&
-      (!mToolBarSearch->getText().isEmpty()) && (mCurrentEditorWidget) &&
-      (mCurrentEditorWidget->getAvailableFeatures().contains(
-          EditorWidgetBase::Feature::Filter))) {
-    mToolBarSearch->clear();
-    return;
-  }
-  QMainWindow::keyPressEvent(event);
-}
-
 void LibraryEditorLegacy::closeEvent(QCloseEvent* event) noexcept {
-  if (closeAndDestroy(true)) {
+  if (requestClose()) {
     QMainWindow::closeEvent(event);
   } else {
     event->ignore();

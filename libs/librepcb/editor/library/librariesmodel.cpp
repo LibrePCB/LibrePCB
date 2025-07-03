@@ -24,7 +24,6 @@
 
 #include "../utils/slinthelpers.h"
 #include "librarydownload.h"
-#include "libraryeditorlegacy.h"
 
 #include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/network/apiendpoint.h>
@@ -35,6 +34,7 @@
 #include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
+#include <QtWidgets>
 
 #include <algorithm>
 
@@ -260,42 +260,6 @@ void LibrariesModel::set_row_data(std::size_t i,
     updateCheckStates(true);
     emit uiDataChanged(getUiData());
   }
-
-  switch (data.action) {
-    case ui::LibraryAction::None: {
-      break;
-    }
-
-    case ui::LibraryAction::Open: {
-      try {
-        const FilePath fp(s2q(data.path));
-        const bool readOnly =
-            fp.isLocatedInDir(mWorkspace.getRemoteLibrariesPath());
-        auto editor = new LibraryEditorLegacy(mWorkspace, fp, readOnly);
-        editor->show();
-      } catch (const Exception& e) {
-        // TODO: This should be implemented without message box some day...
-        QMessageBox::critical(nullptr, tr("Error"), e.getMsg());
-      }
-      break;
-    }
-
-    case ui::LibraryAction::Uninstall: {
-      try {
-        FileUtils::removeDirRecursively(FilePath(s2q(data.path)));  // can throw
-      } catch (const Exception& e) {
-        // TODO: This should be implemented without message box some day...
-        QMessageBox::critical(nullptr, tr("Error"), e.getMsg());
-      }
-      mWorkspace.getLibraryDb().startLibraryRescan();
-      break;
-    }
-
-    default:
-      qWarning() << "Unhandled action in LibrariesModel:"
-                 << static_cast<int>(data.action);
-      break;
-  }
 }
 
 /*******************************************************************************
@@ -350,7 +314,6 @@ void LibrariesModel::updateLibraries(bool resetHighlight) noexcept {
           0,  // Progress [%]
           true,  // Checked
           mHighlightedLib == libDir,  // Highlight
-          ui::LibraryAction::None,  // Action
       });
       uuids.insert(uuid);
     }
@@ -491,7 +454,6 @@ void LibrariesModel::updateMergedLibraries() noexcept {
           0,  // Progress
           false,  // Checked
           false,  // Highlight
-          ui::LibraryAction::None,  // Action
       });
     }
   }

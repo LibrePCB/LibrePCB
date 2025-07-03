@@ -63,7 +63,9 @@ private:  // Methods
   /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override {
     mIndex = mList.indexOf(mElement);
-    Q_ASSERT(mIndex >= 0);
+    if (mIndex < 0) {
+      throw LogicError(__FILE__, __LINE__, "Invalid list index.");
+    }
     performRedo();  // can throw
     return true;
   }
