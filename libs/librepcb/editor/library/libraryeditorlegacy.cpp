@@ -21,7 +21,7 @@
  *  Includes
  ******************************************************************************/
 
-#include "libraryeditor.h"
+#include "libraryeditorlegacy.h"
 
 #include "../editorcommandset.h"
 #include "../graphics/graphicslayerlist.h"
@@ -40,7 +40,7 @@
 #include "lib/libraryoverviewwidget.h"
 #include "pkg/packageeditorwidget.h"
 #include "sym/symboleditorwidget.h"
-#include "ui_libraryeditor.h"
+#include "ui_libraryeditorlegacy.h"
 
 #include <librepcb/core/application.h>
 #include <librepcb/core/exceptions.h>
@@ -65,12 +65,12 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-LibraryEditor::LibraryEditor(Workspace& ws, const FilePath& libFp,
-                             bool readOnly)
+LibraryEditorLegacy::LibraryEditorLegacy(Workspace& ws, const FilePath& libFp,
+                                         bool readOnly)
   : QMainWindow(nullptr),
     mWorkspace(ws),
     mIsOpenedReadOnly(readOnly),
-    mUi(new Ui::LibraryEditor),
+    mUi(new Ui::LibraryEditorLegacy),
     mStandardCommandHandler(
         new StandardEditorCommandHandler(mWorkspace.getSettings(), this)),
     mLayers(GraphicsLayerList::libraryLayers(&mWorkspace.getSettings())),
@@ -112,52 +112,52 @@ LibraryEditor::LibraryEditor(Workspace& ws, const FilePath& libFp,
                          overviewWidget->windowTitle());
   tabCountChanged();
   connect(overviewWidget, &LibraryOverviewWidget::windowTitleChanged, this,
-          &LibraryEditor::updateTabTitles);
+          &LibraryEditorLegacy::updateTabTitles);
   connect(overviewWidget, &LibraryOverviewWidget::dirtyChanged, this,
-          &LibraryEditor::updateTabTitles);
+          &LibraryEditorLegacy::updateTabTitles);
   connect(overviewWidget, &EditorWidgetBase::elementEdited,
           &mWorkspace.getLibraryDb(), &WorkspaceLibraryDb::startLibraryRescan);
   connect(overviewWidget, &LibraryOverviewWidget::newComponentCategoryTriggered,
-          this, &LibraryEditor::newComponentCategoryTriggered);
+          this, &LibraryEditorLegacy::newComponentCategoryTriggered);
   connect(overviewWidget, &LibraryOverviewWidget::newPackageCategoryTriggered,
-          this, &LibraryEditor::newPackageCategoryTriggered);
+          this, &LibraryEditorLegacy::newPackageCategoryTriggered);
   connect(overviewWidget, &LibraryOverviewWidget::newSymbolTriggered, this,
-          &LibraryEditor::newSymbolTriggered);
+          &LibraryEditorLegacy::newSymbolTriggered);
   connect(overviewWidget, &LibraryOverviewWidget::newPackageTriggered, this,
-          &LibraryEditor::newPackageTriggered);
+          &LibraryEditorLegacy::newPackageTriggered);
   connect(overviewWidget, &LibraryOverviewWidget::newComponentTriggered, this,
-          &LibraryEditor::newComponentTriggered);
+          &LibraryEditorLegacy::newComponentTriggered);
   connect(overviewWidget, &LibraryOverviewWidget::newDeviceTriggered, this,
-          &LibraryEditor::newDeviceTriggered);
+          &LibraryEditorLegacy::newDeviceTriggered);
   connect(overviewWidget,
           &LibraryOverviewWidget::editComponentCategoryTriggered, this,
-          &LibraryEditor::editComponentCategoryTriggered);
+          &LibraryEditorLegacy::editComponentCategoryTriggered);
   connect(overviewWidget, &LibraryOverviewWidget::editPackageCategoryTriggered,
-          this, &LibraryEditor::editPackageCategoryTriggered);
+          this, &LibraryEditorLegacy::editPackageCategoryTriggered);
   connect(overviewWidget, &LibraryOverviewWidget::editSymbolTriggered, this,
-          &LibraryEditor::editSymbolTriggered);
+          &LibraryEditorLegacy::editSymbolTriggered);
   connect(overviewWidget, &LibraryOverviewWidget::editPackageTriggered, this,
-          &LibraryEditor::editPackageTriggered);
+          &LibraryEditorLegacy::editPackageTriggered);
   connect(overviewWidget, &LibraryOverviewWidget::editComponentTriggered, this,
-          &LibraryEditor::editComponentTriggered);
+          &LibraryEditorLegacy::editComponentTriggered);
   connect(overviewWidget, &LibraryOverviewWidget::editDeviceTriggered, this,
-          &LibraryEditor::editDeviceTriggered);
+          &LibraryEditorLegacy::editDeviceTriggered);
   connect(overviewWidget,
           &LibraryOverviewWidget::duplicateComponentCategoryTriggered, this,
-          &LibraryEditor::duplicateComponentCategoryTriggered);
+          &LibraryEditorLegacy::duplicateComponentCategoryTriggered);
   connect(overviewWidget,
           &LibraryOverviewWidget::duplicatePackageCategoryTriggered, this,
-          &LibraryEditor::duplicatePackageCategoryTriggered);
+          &LibraryEditorLegacy::duplicatePackageCategoryTriggered);
   connect(overviewWidget, &LibraryOverviewWidget::duplicateSymbolTriggered,
-          this, &LibraryEditor::duplicateSymbolTriggered);
+          this, &LibraryEditorLegacy::duplicateSymbolTriggered);
   connect(overviewWidget, &LibraryOverviewWidget::duplicatePackageTriggered,
-          this, &LibraryEditor::duplicatePackageTriggered);
+          this, &LibraryEditorLegacy::duplicatePackageTriggered);
   connect(overviewWidget, &LibraryOverviewWidget::duplicateComponentTriggered,
-          this, &LibraryEditor::duplicateComponentTriggered);
+          this, &LibraryEditorLegacy::duplicateComponentTriggered);
   connect(overviewWidget, &LibraryOverviewWidget::duplicateDeviceTriggered,
-          this, &LibraryEditor::duplicateDeviceTriggered);
+          this, &LibraryEditorLegacy::duplicateDeviceTriggered);
   connect(overviewWidget, &LibraryOverviewWidget::removeElementTriggered, this,
-          &LibraryEditor::closeTabIfOpen);
+          &LibraryEditorLegacy::closeTabIfOpen);
 
   // Remove close button on first tab (which is the library overview).
   QTabBar* tabBar = mUi->tabWidget->tabBar();
@@ -175,9 +175,9 @@ LibraryEditor::LibraryEditor(Workspace& ws, const FilePath& libFp,
   // Open the overview tab.
   setActiveEditorWidget(overviewWidget);
   connect(mUi->tabWidget, &QTabWidget::currentChanged, this,
-          &LibraryEditor::currentTabChanged);
+          &LibraryEditorLegacy::currentTabChanged);
   connect(mUi->tabWidget, &QTabWidget::tabCloseRequested, this,
-          &LibraryEditor::tabCloseRequested);
+          &LibraryEditorLegacy::tabCloseRequested);
 
   // Restore window geometry.
   QSettings clientSettings;
@@ -187,7 +187,7 @@ LibraryEditor::LibraryEditor(Workspace& ws, const FilePath& libFp,
       clientSettings.value("library_editor/window_state_v2").toByteArray());
 }
 
-LibraryEditor::~LibraryEditor() noexcept {
+LibraryEditorLegacy::~LibraryEditorLegacy() noexcept {
   setActiveEditorWidget(nullptr);
   mLibrary = nullptr;
   closeAllTabs(true, false);
@@ -197,7 +197,7 @@ LibraryEditor::~LibraryEditor() noexcept {
  *  Public Methods
  ******************************************************************************/
 
-bool LibraryEditor::closeAndDestroy(bool askForSave) noexcept {
+bool LibraryEditorLegacy::closeAndDestroy(bool askForSave) noexcept {
   // Close tabs.
   if (!closeAllTabs(true, askForSave)) {
     return false;
@@ -216,7 +216,7 @@ bool LibraryEditor::closeAndDestroy(bool askForSave) noexcept {
  *  Public Slots
  ******************************************************************************/
 
-void LibraryEditor::closeTabIfOpen(const FilePath& fp) noexcept {
+void LibraryEditorLegacy::closeTabIfOpen(const FilePath& fp) noexcept {
   for (int i = 0; i < mUi->tabWidget->count(); i++) {
     EditorWidgetBase* widget =
         dynamic_cast<EditorWidgetBase*>(mUi->tabWidget->widget(i));
@@ -234,86 +234,91 @@ void LibraryEditor::closeTabIfOpen(const FilePath& fp) noexcept {
  *  GUI Event Handlers
  ******************************************************************************/
 
-void LibraryEditor::newComponentCategoryTriggered() noexcept {
+void LibraryEditorLegacy::newComponentCategoryTriggered() noexcept {
   newLibraryElement(NewElementWizardContext::ElementType::ComponentCategory);
 }
 
-void LibraryEditor::newPackageCategoryTriggered() noexcept {
+void LibraryEditorLegacy::newPackageCategoryTriggered() noexcept {
   newLibraryElement(NewElementWizardContext::ElementType::PackageCategory);
 }
 
-void LibraryEditor::newSymbolTriggered() noexcept {
+void LibraryEditorLegacy::newSymbolTriggered() noexcept {
   newLibraryElement(NewElementWizardContext::ElementType::Symbol);
 }
 
-void LibraryEditor::newPackageTriggered() noexcept {
+void LibraryEditorLegacy::newPackageTriggered() noexcept {
   newLibraryElement(NewElementWizardContext::ElementType::Package);
 }
 
-void LibraryEditor::newComponentTriggered() noexcept {
+void LibraryEditorLegacy::newComponentTriggered() noexcept {
   newLibraryElement(NewElementWizardContext::ElementType::Component);
 }
 
-void LibraryEditor::newDeviceTriggered() noexcept {
+void LibraryEditorLegacy::newDeviceTriggered() noexcept {
   newLibraryElement(NewElementWizardContext::ElementType::Device);
 }
 
-void LibraryEditor::editComponentCategoryTriggered(
+void LibraryEditorLegacy::editComponentCategoryTriggered(
     const FilePath& fp) noexcept {
   editLibraryElementTriggered<ComponentCategoryEditorWidget>(fp, false);
 }
 
-void LibraryEditor::editPackageCategoryTriggered(const FilePath& fp) noexcept {
+void LibraryEditorLegacy::editPackageCategoryTriggered(
+    const FilePath& fp) noexcept {
   editLibraryElementTriggered<PackageCategoryEditorWidget>(fp, false);
 }
 
-void LibraryEditor::editSymbolTriggered(const FilePath& fp) noexcept {
+void LibraryEditorLegacy::editSymbolTriggered(const FilePath& fp) noexcept {
   editLibraryElementTriggered<SymbolEditorWidget>(fp, false);
 }
 
-void LibraryEditor::editPackageTriggered(const FilePath& fp) noexcept {
+void LibraryEditorLegacy::editPackageTriggered(const FilePath& fp) noexcept {
   editLibraryElementTriggered<PackageEditorWidget>(fp, false);
 }
 
-void LibraryEditor::editComponentTriggered(const FilePath& fp) noexcept {
+void LibraryEditorLegacy::editComponentTriggered(const FilePath& fp) noexcept {
   editLibraryElementTriggered<ComponentEditorWidget>(fp, false);
 }
 
-void LibraryEditor::editDeviceTriggered(const FilePath& fp) noexcept {
+void LibraryEditorLegacy::editDeviceTriggered(const FilePath& fp) noexcept {
   editLibraryElementTriggered<DeviceEditorWidget>(fp, false);
 }
 
-void LibraryEditor::duplicateComponentCategoryTriggered(
+void LibraryEditorLegacy::duplicateComponentCategoryTriggered(
     const FilePath& fp) noexcept {
   duplicateLibraryElement(
       NewElementWizardContext::ElementType::ComponentCategory, fp);
 }
 
-void LibraryEditor::duplicatePackageCategoryTriggered(
+void LibraryEditorLegacy::duplicatePackageCategoryTriggered(
     const FilePath& fp) noexcept {
   duplicateLibraryElement(NewElementWizardContext::ElementType::PackageCategory,
                           fp);
 }
 
-void LibraryEditor::duplicateSymbolTriggered(const FilePath& fp) noexcept {
+void LibraryEditorLegacy::duplicateSymbolTriggered(
+    const FilePath& fp) noexcept {
   duplicateLibraryElement(NewElementWizardContext::ElementType::Symbol, fp);
 }
 
-void LibraryEditor::duplicatePackageTriggered(const FilePath& fp) noexcept {
+void LibraryEditorLegacy::duplicatePackageTriggered(
+    const FilePath& fp) noexcept {
   duplicateLibraryElement(NewElementWizardContext::ElementType::Package, fp);
 }
 
-void LibraryEditor::duplicateComponentTriggered(const FilePath& fp) noexcept {
+void LibraryEditorLegacy::duplicateComponentTriggered(
+    const FilePath& fp) noexcept {
   duplicateLibraryElement(NewElementWizardContext::ElementType::Component, fp);
 }
 
-void LibraryEditor::duplicateDeviceTriggered(const FilePath& fp) noexcept {
+void LibraryEditorLegacy::duplicateDeviceTriggered(
+    const FilePath& fp) noexcept {
   duplicateLibraryElement(NewElementWizardContext::ElementType::Device, fp);
 }
 
 template <typename EditWidgetType>
-void LibraryEditor::editLibraryElementTriggered(const FilePath& fp,
-                                                bool isNewElement) noexcept {
+void LibraryEditorLegacy::editLibraryElementTriggered(
+    const FilePath& fp, bool isNewElement) noexcept {
   try {
     for (int i = 0; i < mUi->tabWidget->count(); i++) {
       EditorWidgetBase* widget =
@@ -327,9 +332,9 @@ void LibraryEditor::editLibraryElementTriggered(const FilePath& fp,
     EditWidgetType* widget =
         new EditWidgetType(createContext(isNewElement), fp);
     connect(widget, &QWidget::windowTitleChanged, this,
-            &LibraryEditor::updateTabTitles);
+            &LibraryEditorLegacy::updateTabTitles);
     connect(widget, &EditorWidgetBase::dirtyChanged, this,
-            &LibraryEditor::updateTabTitles);
+            &LibraryEditorLegacy::updateTabTitles);
     connect(widget, &EditorWidgetBase::elementEdited,
             &mWorkspace.getLibraryDb(),
             &WorkspaceLibraryDb::startLibraryRescan);
@@ -344,12 +349,12 @@ void LibraryEditor::editLibraryElementTriggered(const FilePath& fp,
   }
 }
 
-void LibraryEditor::currentTabChanged(int index) noexcept {
+void LibraryEditorLegacy::currentTabChanged(int index) noexcept {
   setActiveEditorWidget(
       dynamic_cast<EditorWidgetBase*>(mUi->tabWidget->widget(index)));
 }
 
-void LibraryEditor::tabCloseRequested(int index) noexcept {
+void LibraryEditorLegacy::tabCloseRequested(int index) noexcept {
   const EditorWidgetBase* widget =
       dynamic_cast<const EditorWidgetBase*>(mUi->tabWidget->widget(index));
   if (widget &&
@@ -359,7 +364,7 @@ void LibraryEditor::tabCloseRequested(int index) noexcept {
   }
 }
 
-bool LibraryEditor::closeTab(int index) noexcept {
+bool LibraryEditorLegacy::closeTab(int index) noexcept {
   // Get editor widget reference
   EditorWidgetBase* widget =
       dynamic_cast<EditorWidgetBase*>(mUi->tabWidget->widget(index));
@@ -411,11 +416,11 @@ bool LibraryEditor::closeTab(int index) noexcept {
  *  Private Methods
  ******************************************************************************/
 
-void LibraryEditor::createActions() noexcept {
+void LibraryEditorLegacy::createActions() noexcept {
   const EditorCommandSet& cmd = EditorCommandSet::instance();
 
   mActionAboutLibrePcb.reset(cmd.aboutLibrePcb.createAction(
-      this, this, &LibraryEditor::aboutLibrePcbRequested));
+      this, this, &LibraryEditorLegacy::aboutLibrePcbRequested));
   mActionAboutQt.reset(
       cmd.aboutQt.createAction(this, qApp, &QApplication::aboutQt));
   mActionOnlineDocumentation.reset(cmd.documentationOnline.createAction(
@@ -447,7 +452,7 @@ void LibraryEditor::createActions() noexcept {
   mActionCloseAllTabs.reset(cmd.tabCloseAll.createAction(
       this, this, [this]() { closeAllTabs(false, true); }));
   mActionCloseWindow.reset(
-      cmd.windowClose.createAction(this, this, &LibraryEditor::close));
+      cmd.windowClose.createAction(this, this, &LibraryEditorLegacy::close));
   mActionQuit.reset(cmd.applicationQuit.createAction(
       this, qApp, &QApplication::closeAllWindows,
       EditorCommand::ActionFlag::QueuedConnection));
@@ -706,7 +711,7 @@ void LibraryEditor::createActions() noexcept {
   mToolsActionGroup->setEnabled(false);
 }
 
-void LibraryEditor::createToolBars() noexcept {
+void LibraryEditorLegacy::createToolBars() noexcept {
   // File.
   mToolBarFile.reset(new QToolBar(tr("File"), this));
   mToolBarFile->setObjectName("toolBarFile");
@@ -815,7 +820,7 @@ void LibraryEditor::createToolBars() noexcept {
   addToolBar(Qt::LeftToolBarArea, mToolBarTools.data());
 }
 
-void LibraryEditor::createMenus() noexcept {
+void LibraryEditorLegacy::createMenus() noexcept {
   MenuBuilder mb(mUi->menuBar);
 
   // File.
@@ -925,14 +930,14 @@ void LibraryEditor::createMenus() noexcept {
   mb.addAction(mActionAboutQt);
 }
 
-EditorWidgetBase::Context LibraryEditor::createContext(
+EditorWidgetBase::Context LibraryEditorLegacy::createContext(
     bool isNewElement) noexcept {
   return {
       mWorkspace, *mLayers, isNewElement, mIsOpenedReadOnly, mLibrary,
   };
 }
 
-void LibraryEditor::setAvailableFeatures(
+void LibraryEditorLegacy::setAvailableFeatures(
     const QSet<EditorWidgetBase::Feature>& features) noexcept {
   using Feature = EditorWidgetBase::Feature;
 
@@ -980,12 +985,12 @@ void LibraryEditor::setAvailableFeatures(
   mToolBarSearch->setEnabled(features.contains(Feature::Filter));
 }
 
-void LibraryEditor::setActiveEditorWidget(EditorWidgetBase* widget) {
+void LibraryEditorLegacy::setActiveEditorWidget(EditorWidgetBase* widget) {
   if (mCurrentEditorWidget) {
     mCurrentEditorWidget->disconnectEditor();
     disconnect(mCurrentEditorWidget,
                &EditorWidgetBase::availableFeaturesChanged, this,
-               &LibraryEditor::setAvailableFeatures);
+               &LibraryEditorLegacy::setAvailableFeatures);
   }
   mCurrentEditorWidget = widget;
   if (mCurrentEditorWidget) {
@@ -997,7 +1002,7 @@ void LibraryEditor::setActiveEditorWidget(EditorWidgetBase* widget) {
     mActionToggleBgImage->setChecked(bgImageSet);
     setAvailableFeatures(mCurrentEditorWidget->getAvailableFeatures());
     connect(mCurrentEditorWidget, &EditorWidgetBase::availableFeaturesChanged,
-            this, &LibraryEditor::setAvailableFeatures);
+            this, &LibraryEditorLegacy::setAvailableFeatures);
   } else {
     mActionToggleBgImage->setChecked(false);
     setAvailableFeatures({});
@@ -1005,7 +1010,7 @@ void LibraryEditor::setActiveEditorWidget(EditorWidgetBase* widget) {
   updateTabTitles();  // force updating the "Save" action title
 }
 
-void LibraryEditor::newLibraryElement(
+void LibraryEditorLegacy::newLibraryElement(
     NewElementWizardContext::ElementType type) {
   NewElementWizard wizard(mWorkspace, *mLibrary, *mLayers, this);
   wizard.setNewElementType(type);
@@ -1016,7 +1021,7 @@ void LibraryEditor::newLibraryElement(
   }
 }
 
-void LibraryEditor::duplicateLibraryElement(
+void LibraryEditorLegacy::duplicateLibraryElement(
     NewElementWizardContext::ElementType type, const FilePath& fp) {
   NewElementWizard wizard(mWorkspace, *mLibrary, *mLayers, this);
   wizard.setElementToCopy(type, fp);
@@ -1027,7 +1032,7 @@ void LibraryEditor::duplicateLibraryElement(
   }
 }
 
-void LibraryEditor::editNewLibraryElement(
+void LibraryEditorLegacy::editNewLibraryElement(
     NewElementWizardContext::ElementType type, const FilePath& fp) {
   switch (type) {
     case NewElementWizardContext::ElementType::ComponentCategory:
@@ -1053,7 +1058,7 @@ void LibraryEditor::editNewLibraryElement(
   }
 }
 
-void LibraryEditor::updateTabTitles() noexcept {
+void LibraryEditorLegacy::updateTabTitles() noexcept {
   for (int i = 0; i < mUi->tabWidget->count(); ++i) {
     QWidget* widget = mUi->tabWidget->widget(i);
     const EditorWidgetBase* editorWidget =
@@ -1079,11 +1084,11 @@ void LibraryEditor::updateTabTitles() noexcept {
   }
 }
 
-void LibraryEditor::tabCountChanged() noexcept {
+void LibraryEditorLegacy::tabCountChanged() noexcept {
   mActionCloseAllTabs->setEnabled(mUi->tabWidget->count() > 1);
 }
 
-void LibraryEditor::keyPressEvent(QKeyEvent* event) noexcept {
+void LibraryEditorLegacy::keyPressEvent(QKeyEvent* event) noexcept {
   // If the overview tab is opened and a filter is active, discard the filter
   // with the escape key.
   if ((event->key() == Qt::Key_Escape) && (mToolBarSearch) &&
@@ -1096,7 +1101,7 @@ void LibraryEditor::keyPressEvent(QKeyEvent* event) noexcept {
   QMainWindow::keyPressEvent(event);
 }
 
-void LibraryEditor::closeEvent(QCloseEvent* event) noexcept {
+void LibraryEditorLegacy::closeEvent(QCloseEvent* event) noexcept {
   if (closeAndDestroy(true)) {
     QMainWindow::closeEvent(event);
   } else {
@@ -1104,8 +1109,8 @@ void LibraryEditor::closeEvent(QCloseEvent* event) noexcept {
   }
 }
 
-bool LibraryEditor::closeAllTabs(bool withNonClosable,
-                                 bool askForSave) noexcept {
+bool LibraryEditorLegacy::closeAllTabs(bool withNonClosable,
+                                       bool askForSave) noexcept {
   for (int i = mUi->tabWidget->count() - 1; i >= 0; --i) {
     auto widget = dynamic_cast<EditorWidgetBase*>(mUi->tabWidget->widget(i));
     if (withNonClosable ||

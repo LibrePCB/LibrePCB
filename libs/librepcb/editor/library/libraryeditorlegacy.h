@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_LIBRARYEDITOR_H
-#define LIBREPCB_EDITOR_LIBRARYEDITOR_H
+#ifndef LIBREPCB_EDITOR_LIBRARYEDITORLEGACY_H
+#define LIBREPCB_EDITOR_LIBRARYEDITORLEGACY_H
 
 /*******************************************************************************
  *  Includes
@@ -52,25 +52,25 @@ class StandardEditorCommandHandler;
 class UndoStackActionGroup;
 
 namespace Ui {
-class LibraryEditor;
+class LibraryEditorLegacy;
 }
 
 /*******************************************************************************
- *  Class LibraryEditor
+ *  Class LibraryEditorLegacy
  ******************************************************************************/
 
 /**
- * @brief The LibraryEditor class
+ * @brief The LibraryEditorLegacy class
  */
-class LibraryEditor final : public QMainWindow {
+class LibraryEditorLegacy final : public QMainWindow {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  LibraryEditor() = delete;
-  LibraryEditor(const LibraryEditor& other) = delete;
-  LibraryEditor(Workspace& ws, const FilePath& libFp, bool readOnly);
-  ~LibraryEditor() noexcept;
+  LibraryEditorLegacy() = delete;
+  LibraryEditorLegacy(const LibraryEditorLegacy& other) = delete;
+  LibraryEditorLegacy(Workspace& ws, const FilePath& libFp, bool readOnly);
+  ~LibraryEditorLegacy() noexcept;
 
   /**
    * @brief Close the library editor (this will destroy this object!)
@@ -98,7 +98,7 @@ public:
   bool closeAndDestroy(bool askForSave) noexcept;
 
   // Operator Overloadings
-  LibraryEditor& operator=(const LibraryEditor& rhs) = delete;
+  LibraryEditorLegacy& operator=(const LibraryEditorLegacy& rhs) = delete;
 
 signals:
   void aboutLibrePcbRequested();
@@ -152,7 +152,7 @@ private:  // Methods
 private:  // Data
   Workspace& mWorkspace;
   bool mIsOpenedReadOnly;
-  QScopedPointer<Ui::LibraryEditor> mUi;
+  QScopedPointer<Ui::LibraryEditorLegacy> mUi;
   QScopedPointer<StandardEditorCommandHandler> mStandardCommandHandler;
   std::unique_ptr<GraphicsLayerList> mLayers;
   EditorWidgetBase* mCurrentEditorWidget;

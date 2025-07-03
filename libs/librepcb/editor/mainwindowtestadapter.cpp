@@ -23,7 +23,7 @@
 #include "mainwindowtestadapter.h"
 
 #include "guiapplication.h"
-#include "library/libraryeditor.h"
+#include "library/libraryeditorlegacy.h"
 #include "mainwindow.h"
 #include "project/projecteditor.h"
 
@@ -124,7 +124,7 @@ QVariant MainWindowTestAdapter::openLibraryEditor(QVariant path) noexcept {
   try {
     const FilePath fp =
         mApp.getWorkspace().getLibrariesPath().getPathTo(path.toString());
-    auto editor = new LibraryEditor(mApp.getWorkspace(), fp, false);
+    auto editor = new LibraryEditorLegacy(mApp.getWorkspace(), fp, false);
     editor->show();
     return QVariant();
   } catch (const Exception& e) {

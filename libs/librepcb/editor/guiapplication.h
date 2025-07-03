@@ -42,7 +42,7 @@ class Workspace;
 namespace editor {
 
 class LibrariesModel;
-class LibraryEditor;
+class LibraryEditorLegacy;
 class MainWindow;
 class Notification;
 class NotificationsModel;
@@ -154,7 +154,7 @@ private:
   std::shared_ptr<LibrariesModel> mRemoteLibraries;
   std::unique_ptr<SlintKeyEventTextBuilder> mLibrariesFilter;
   std::shared_ptr<UiObjectList<ProjectEditor, ui::ProjectData>> mProjects;
-  QHash<FilePath, LibraryEditor*> mOpenLibraryEditors;
+  QHash<FilePath, LibraryEditorLegacy*> mOpenLibraryEditors;
   std::unique_ptr<ProjectLibraryUpdater> mProjectLibraryUpdater;
   QList<std::shared_ptr<MainWindow>> mWindows;
   QTimer mSaveOpenedWindowsCountdown;
