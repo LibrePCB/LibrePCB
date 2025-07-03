@@ -25,7 +25,7 @@
 #include "dialogs/directorylockhandlerdialog.h"
 #include "dialogs/filedialog.h"
 #include "library/librariesmodel.h"
-#include "library/libraryeditor.h"
+#include "library/libraryeditorlegacy.h"
 #include "mainwindow.h"
 #include "notification.h"
 #include "notificationsmodel.h"
@@ -683,18 +683,19 @@ void GuiApplication::openProjectLibraryUpdater(
 }
 
 void GuiApplication::openLibraryEditor(const FilePath& libDir) noexcept {
-  LibraryEditor* editor = mOpenLibraryEditors.value(libDir);
+  LibraryEditorLegacy* editor = mOpenLibraryEditors.value(libDir);
   if (!editor) {
     try {
       bool remote = libDir.isLocatedInDir(mWorkspace.getRemoteLibrariesPath());
-      editor = new LibraryEditor(mWorkspace, libDir, remote);
-      connect(editor, &LibraryEditor::aboutLibrePcbRequested, this, [this]() {
-        if (auto win = mWindows.value(0)) {
-          win->showPanelPage(ui::PanelPage::About);
-          win->makeCurrentWindow();
-        }
-      });
-      connect(editor, &LibraryEditor::destroyed, this,
+      editor = new LibraryEditorLegacy(mWorkspace, libDir, remote);
+      connect(editor, &LibraryEditorLegacy::aboutLibrePcbRequested, this,
+              [this]() {
+                if (auto win = mWindows.value(0)) {
+                  win->showPanelPage(ui::PanelPage::About);
+                  win->makeCurrentWindow();
+                }
+              });
+      connect(editor, &LibraryEditorLegacy::destroyed, this,
               &GuiApplication::libraryEditorDestroyed);
       mOpenLibraryEditors.insert(libDir, editor);
     } catch (const UserCanceled& e) {
@@ -715,7 +716,8 @@ void GuiApplication::libraryEditorDestroyed() noexcept {
   // as this slot is called in the destructor of QObject (base class of
   // LibraryEditor), the dynamic_cast does no longer work at this point, so a
   // static_cast is used instead ;)
-  LibraryEditor* editor = static_cast<LibraryEditor*>(QObject::sender());
+  LibraryEditorLegacy* editor =
+      static_cast<LibraryEditorLegacy*>(QObject::sender());
   Q_ASSERT(editor);
   FilePath library = mOpenLibraryEditors.key(editor);
   Q_ASSERT(library.isValid());
@@ -724,7 +726,7 @@ void GuiApplication::libraryEditorDestroyed() noexcept {
 
 bool GuiApplication::closeAllLibraryEditors(bool askForSave) noexcept {
   bool success = true;
-  foreach (LibraryEditor* editor, mOpenLibraryEditors) {
+  foreach (LibraryEditorLegacy* editor, mOpenLibraryEditors) {
     if (editor->closeAndDestroy(askForSave)) {
       delete editor;  // this calls the slot "libraryEditorDestroyed()"
     } else {

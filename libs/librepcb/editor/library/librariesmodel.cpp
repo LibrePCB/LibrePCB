@@ -24,7 +24,7 @@
 
 #include "../utils/slinthelpers.h"
 #include "librarydownload.h"
-#include "libraryeditor.h"
+#include "libraryeditorlegacy.h"
 
 #include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/network/apiendpoint.h>
@@ -271,7 +271,7 @@ void LibrariesModel::set_row_data(std::size_t i,
         const FilePath fp(s2q(data.path));
         const bool readOnly =
             fp.isLocatedInDir(mWorkspace.getRemoteLibrariesPath());
-        auto editor = new LibraryEditor(mWorkspace, fp, readOnly);
+        auto editor = new LibraryEditorLegacy(mWorkspace, fp, readOnly);
         editor->show();
       } catch (const Exception& e) {
         // TODO: This should be implemented without message box some day...

@@ -282,9 +282,9 @@ add_library(
   library/librariesmodel.h
   library/librarydownload.cpp
   library/librarydownload.h
-  library/libraryeditor.cpp
-  library/libraryeditor.h
-  library/libraryeditor.ui
+  library/libraryeditorlegacy.cpp
+  library/libraryeditorlegacy.h
+  library/libraryeditorlegacy.ui
   library/libraryelementcache.cpp
   library/libraryelementcache.h
   library/newelementwizard/newelementwizard.cpp
