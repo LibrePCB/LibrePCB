@@ -8,7 +8,6 @@ export component SlideView inherits VerticalLayout {
     page-clicked(index) => {
         current-index = index;
     }
-
     HorizontalLayout {
         height: self.preferred-height;
         alignment: start;
@@ -53,6 +52,8 @@ export component SlideView inherits VerticalLayout {
         animate animated-index { duration: 200ms; }
 
         HorizontalLayout {
+            height: 100%;
+
             @children
         }
     }

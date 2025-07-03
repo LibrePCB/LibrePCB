@@ -828,6 +828,31 @@ export global Data {
                             pad-name: "3",
                         },
                     ],
+                    parts: [
+                        {
+                            mpn: "R0805FOOBAR",
+                            manufacturer: "Any Company",
+                            attributes: [
+                                {
+                                    key: "FOO",
+                                    type: 1,
+                                    value: "100",
+                                    unit: 0,
+                                },
+                                {
+                                    key: "BAR",
+                                    type: 0,
+                                    value: "hello",
+                                    unit: -1,
+                                },
+                            ],
+                        },
+                        {
+                            mpn: "R0805FOOBARTR",
+                            manufacturer: "Any Company",
+                            attributes: [],
+                        },
+                    ],
                     checks: {
                         type: RuleCheckType.device-check,
                         state: RuleCheckState.up-to-date,

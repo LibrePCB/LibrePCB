@@ -1,6 +1,7 @@
 import { Tab } from "../../tab.slint";
 import { LibraryRuleCheckLink } from "../libraryrulechecklink.slint";
 import { DevicePinoutTableView } from "devicepinouttableview.slint";
+import { DevicePartsView } from "devicepartsview.slint";
 import {
     AttributeTableView,
     Button,
@@ -57,11 +58,9 @@ component DeviceMetadata inherits GridLayout {
                     self.select-all();
                 }
             }
-
             text-edited(text) => {
                 tabs[index].name = text;
             }
-
             text-accepted(text) => {
                 tabs[index].name = text;
                 Backend.trigger-tab(section-index, index, TabAction.apply);
@@ -84,7 +83,6 @@ component DeviceMetadata inherits GridLayout {
             text-edited(text) => {
                 tabs[index].description = text;
             }
-
             text-accepted(text) => {
                 tabs[index].description = text;
                 Backend.trigger-tab(section-index, index, TabAction.apply);
@@ -106,7 +104,6 @@ component DeviceMetadata inherits GridLayout {
             text-edited(text) => {
                 tabs[index].keywords = text;
             }
-
             text-accepted(text) => {
                 tabs[index].keywords = text;
                 Backend.trigger-tab(section-index, index, TabAction.apply);
@@ -128,7 +125,6 @@ component DeviceMetadata inherits GridLayout {
             text-edited(text) => {
                 tabs[index].author = text;
             }
-
             text-accepted(text) => {
                 tabs[index].author = text;
                 Backend.trigger-tab(section-index, index, TabAction.apply);
@@ -151,7 +147,6 @@ component DeviceMetadata inherits GridLayout {
             text-edited(text) => {
                 tabs[index].version = text;
             }
-
             text-accepted(text) => {
                 tabs[index].version = text;
                 Backend.trigger-tab(section-index, index, TabAction.apply);
@@ -211,7 +206,6 @@ component DeviceMetadata inherits GridLayout {
             text-edited(text) => {
                 tabs[index].datasheet-url = text;
             }
-
             text-accepted(text) => {
                 tabs[index].datasheet-url = text;
                 Backend.trigger-tab(section-index, index, TabAction.apply);
@@ -295,81 +289,97 @@ component DevicePinoutTab {
     in property <int> index;
     in property <bool> read-only;
 
-    HorizontalLayout {
+    VerticalLayout {
         padding: 5px;
         spacing: 5px;
 
-        VerticalLayout {
-            horizontal-stretch: 1;
-            max-width: root.width / 2;
+        HorizontalLayout {
+            vertical-stretch: 1;
+            padding: 5px;
             spacing: 5px;
 
-            Text {
-                font-size: 14px;
-                font-weight: 600;
-                overflow: elide;
-                text: @tr("Component: {}", tabs[index].component-name);
-            }
+            VerticalLayout {
+                max-width: root.width / 2;
+                spacing: 5px;
 
-            Rectangle {
-                //width: min(root.width * 0.15, 200px);
-                //min-height: 100px;
-                background: Data.preview-mode ? white : transparent;
-                border-radius: 8px;
-                clip: true;
+                Text {
+                    font-size: 14px;
+                    font-weight: 600;
+                    overflow: elide;
+                    text: @tr("Package: {}", tabs[index].package-name);
+                }
 
-                Image {
-                    x: 0;
-                    y: 0;
-                    width: 100%;
-                    height: 100%;
-                    image-fit: preserve;
-                    image-rendering: pixelated;
-                    source: Backend.render-scene(section-index, parent.width, parent.height, 0, 0);
+                Rectangle {
+                    //width: min(root.width * 0.15, 200px);
+                    //min-height: 100px;
+                    background: Data.preview-mode ? black : transparent;
+                    border-radius: 8px;
+                    clip: true;
+
+                    Image {
+                        x: 0;
+                        y: 0;
+                        width: 100%;
+                        height: 100%;
+                        image-fit: preserve;
+                        image-rendering: pixelated;
+                        source: Backend.render-scene(section-index, parent.width, parent.height, 1, 0);
+                    }
+                }
+
+                Text {
+                    font-size: 14px;
+                    font-weight: 600;
+                    overflow: elide;
+                    text: @tr("Component: {}", tabs[index].component-name);
+                }
+
+                Rectangle {
+                    //width: min(root.width * 0.15, 200px);
+                    //min-height: 100px;
+                    background: Data.preview-mode ? white : transparent;
+                    border-radius: 8px;
+                    clip: true;
+
+                    Image {
+                        x: 0;
+                        y: 0;
+                        width: 100%;
+                        height: 100%;
+                        image-fit: preserve;
+                        image-rendering: pixelated;
+                        source: Backend.render-scene(section-index, parent.width, parent.height, 0, 0);
+                    }
                 }
             }
 
-            Text {
-                font-size: 14px;
-                font-weight: 600;
-                overflow: elide;
-                text: @tr("Package: {}", tabs[index].package-name);
-            }
+            VerticalLayout {
+                alignment: start;
+                spacing: 5px;
 
-            Rectangle {
-                //width: min(root.width * 0.15, 200px);
-                //min-height: 100px;
-                background: Data.preview-mode ? black : transparent;
-                border-radius: 8px;
-                clip: true;
+                Text {
+                    font-size: 14px;
+                    font-weight: 600;
+                    text: @tr("Pinout:");
+                }
 
-                Image {
-                    x: 0;
-                    y: 0;
-                    width: 100%;
-                    height: 100%;
-                    image-fit: preserve;
-                    image-rendering: pixelated;
-                    source: Backend.render-scene(section-index, parent.width, parent.height, 1, 0);
+                DevicePinoutTableView {
+                    model: tabs[index].pinout;
+                    signal-names: tabs[index].cmp-signal-names;
                 }
             }
         }
 
-        VerticalLayout {
-            horizontal-stretch: 1;
-            alignment: start;
-            spacing: 5px;
+        DevicePartsView {
+            vertical-stretch: 0;
+            //width: parent.width;
+            //height: min(self.preferred-height, root.height / 2);
+            model: tabs[index].parts;
+        }
 
-            Text {
-                font-size: 14px;
-                font-weight: 600;
-                text: @tr("Pinout:");
-            }
-
-            DevicePinoutTableView {
-                model: tabs[index].pinout;
-                signal-names: tabs[index].cmp-signal-names;
-            }
+        Button {
+            icon: @image-url("../../../../../font-awesome/svgs/solid/plus.svg");
+            text: @tr("Add Part...");
         }
     }
 }
@@ -405,7 +415,7 @@ export component DeviceTab inherits Tab {
         }
 
         SlideView {
-            pages: [@tr("Metadata"), @tr("Pinout"), @tr("Parts")];
+            pages: [@tr("Metadata"), @tr("Pinout & Parts")];
             current-index: tabs[index].page-index;
 
             DeviceMetadata {
@@ -423,8 +433,6 @@ export component DeviceTab inherits Tab {
                 index: index;
                 read-only: read-only;
             }
-
-            Rectangle { }
 
             page-clicked(idx) => {
                 tabs[index].page-index = idx;

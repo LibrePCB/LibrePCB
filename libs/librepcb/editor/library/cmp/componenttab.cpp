@@ -188,13 +188,13 @@ ui::ComponentTabData ComponentTab::getDerivedUiData() const noexcept {
       q2s(signalNames),  // Signal names
       mVariants,  // Variants
       ui::RuleCheckData{
-          ui::RuleCheckType::ComponentCheck,  // Checks type
-          ui::RuleCheckState::UpToDate,  // Checks state
-          mCheckMessages,  // Checks messages
-          mCheckMessages->getUnapprovedCount(),  // Checks unapproved count
+          ui::RuleCheckType::ComponentCheck,  // Check type
+          ui::RuleCheckState::UpToDate,  // Check state
+          mCheckMessages,  // Check messages
+          mCheckMessages->getUnapprovedCount(),  // Check unapproved count
           mCheckMessages->getErrorCount(),  // Check errors count
-          mCheckError,  // Checks execution error
-          !isWritable(),  // Checks read-only
+          mCheckError,  // Check execution error
+          !isWritable(),  // Check read-only
       },
       isInterfaceBroken(),  // Interface broken
       // mCompactLayout,  // Compact layout

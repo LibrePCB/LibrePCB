@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/cmp/componentsymbolvariantitem.h>
 #include <librepcb/core/library/sym/symbol.h>
 
@@ -35,9 +36,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class Component;
-
 namespace editor {
 
 class CircleGraphicsItem;

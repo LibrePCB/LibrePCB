@@ -242,13 +242,13 @@ ui::SymbolTabData SymbolTab::getDerivedUiData() const noexcept {
       mCategories,  // Categories
       mCategoriesTree,  // Categories tree
       ui::RuleCheckData{
-          ui::RuleCheckType::SymbolCheck,  // Checks type
-          ui::RuleCheckState::UpToDate,  // Checks state
-          mCheckMessages,  // Checks messages
-          mCheckMessages->getUnapprovedCount(),  // Checks unapproved count
+          ui::RuleCheckType::SymbolCheck,  // Check type
+          ui::RuleCheckState::UpToDate,  // Check state
+          mCheckMessages,  // Check messages
+          mCheckMessages->getUnapprovedCount(),  // Check unapproved count
           mCheckMessages->getErrorCount(),  // Check errors count
-          mCheckError,  // Checks execution error
-          !isWritable(),  // Checks read-only
+          mCheckError,  // Check execution error
+          !isWritable(),  // Check read-only
       },
       q2s(bgColor),  // Background color
       q2s(fgColor),  // Foreground color

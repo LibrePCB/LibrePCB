@@ -163,13 +163,13 @@ ui::LibraryTabData LibraryTab::getDerivedUiData() const noexcept {
       mFilteredElements,  // Filtered elements
       mCurrentElementIndex,  // Current element index
       ui::RuleCheckData{
-          ui::RuleCheckType::LibraryCheck,  // Checks type
-          ui::RuleCheckState::UpToDate,  // Checks state
-          mCheckMessages,  // Checks messages
-          mCheckMessages->getUnapprovedCount(),  // Checks unapproved count
-          mCheckMessages->getErrorCount(),  // Checks error count
-          mCheckError,  // Checks execution error
-          !mLibrary.getDirectory().isWritable(),  // Checks read-only
+          ui::RuleCheckType::LibraryCheck,  // Check type
+          ui::RuleCheckState::UpToDate,  // Check state
+          mCheckMessages,  // Check messages
+          mCheckMessages->getUnapprovedCount(),  // Check unapproved count
+          mCheckMessages->getErrorCount(),  // Check error count
+          mCheckError,  // Check execution error
+          !mLibrary.getDirectory().isWritable(),  // Check read-only
       },
   };
 }

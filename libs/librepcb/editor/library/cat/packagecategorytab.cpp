@@ -139,13 +139,13 @@ ui::CategoryTabData PackageCategoryTab::getDerivedUiData() const noexcept {
       mParents,  // Parents
       mParentsModel,  // Parents tree
       ui::RuleCheckData{
-          ui::RuleCheckType::LibraryCheck,  // Checks type
-          ui::RuleCheckState::UpToDate,  // Checks state
-          mCheckMessages,  // Checks messages
-          mCheckMessages->getUnapprovedCount(),  // Checks unapproved count
+          ui::RuleCheckType::LibraryCheck,  // Check type
+          ui::RuleCheckState::UpToDate,  // Check state
+          mCheckMessages,  // Check messages
+          mCheckMessages->getUnapprovedCount(),  // Check unapproved count
           mCheckMessages->getErrorCount(),  // Check errors count
-          mCheckError,  // Checks execution error
-          !isWritable(),  // Checks read-only
+          mCheckError,  // Check execution error
+          !isWritable(),  // Check read-only
       },
       slint::SharedString(),  // New parent
   };

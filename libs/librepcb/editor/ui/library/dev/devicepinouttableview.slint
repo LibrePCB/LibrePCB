@@ -23,11 +23,11 @@ import {
     ComponentTabData,
     Constants,
     Data,
+    DevicePinoutData,
     DismissableMessageAction,
     EditorCommandSet as Cmd,
     EditorTool,
     PanelPage,
-    DevicePinoutData,
     TabAction,
     WindowSectionData,
 } from "../../api.slint";
@@ -39,29 +39,39 @@ export component DevicePinoutTableView {
     property <length> row-height: 25px;
     property <length> row-spacing: 3px;
 
-    HorizontalLayout {
-        spacing: 8px;
-        padding-left: 20px;
+    preferred-width: l.preferred-width;
+    preferred-height: l.preferred-height;
 
-        VerticalLayout {
-            width: self.preferred-width;
-            spacing: 2px;
+    ScrollView {
+        x: 0;
+        y: 0;
+        width: 100%;
+        height: 100%;
 
-            for pinout in model: Text {
-                height: row-height;
-                horizontal-alignment: right;
-                vertical-alignment: center;
-                text: pinout.pad-name + ":";
+        l := HorizontalLayout {
+            spacing: 8px;
+            padding-left: 20px;
+
+            VerticalLayout {
+                width: self.preferred-width;
+                spacing: 2px;
+
+                for pinout in model: Text {
+                    height: row-height;
+                    horizontal-alignment: right;
+                    vertical-alignment: center;
+                    text: pinout.pad-name + ":";
+                }
             }
-        }
 
-        VerticalLayout {
-            spacing: 2px;
+            VerticalLayout {
+                spacing: 2px;
 
-            for pinout in model: ComboBox {
-                height: row-height;
-                model: signal-names;
-                current-index: pinout.signal-index;
+                for pinout in model: ComboBox {
+                    height: row-height;
+                    model: signal-names;
+                    current-index: pinout.signal-index;
+                }
             }
         }
     }

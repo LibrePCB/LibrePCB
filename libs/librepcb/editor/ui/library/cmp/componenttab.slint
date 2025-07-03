@@ -58,11 +58,9 @@ component ComponentMetadata inherits GridLayout {
                     self.select-all();
                 }
             }
-
             text-edited(text) => {
                 tabs[index].name = text;
             }
-
             text-accepted(text) => {
                 tabs[index].name = text;
                 Backend.trigger-tab(section-index, index, TabAction.apply);
@@ -85,7 +83,6 @@ component ComponentMetadata inherits GridLayout {
             text-edited(text) => {
                 tabs[index].description = text;
             }
-
             text-accepted(text) => {
                 tabs[index].description = text;
                 Backend.trigger-tab(section-index, index, TabAction.apply);
@@ -107,7 +104,6 @@ component ComponentMetadata inherits GridLayout {
             text-edited(text) => {
                 tabs[index].keywords = text;
             }
-
             text-accepted(text) => {
                 tabs[index].keywords = text;
                 Backend.trigger-tab(section-index, index, TabAction.apply);
@@ -129,7 +125,6 @@ component ComponentMetadata inherits GridLayout {
             text-edited(text) => {
                 tabs[index].author = text;
             }
-
             text-accepted(text) => {
                 tabs[index].author = text;
                 Backend.trigger-tab(section-index, index, TabAction.apply);
@@ -152,7 +147,6 @@ component ComponentMetadata inherits GridLayout {
             text-edited(text) => {
                 tabs[index].version = text;
             }
-
             text-accepted(text) => {
                 tabs[index].version = text;
                 Backend.trigger-tab(section-index, index, TabAction.apply);
@@ -212,7 +206,6 @@ component ComponentMetadata inherits GridLayout {
             text-edited(text) => {
                 tabs[index].datasheet-url = text;
             }
-
             text-accepted(text) => {
                 tabs[index].datasheet-url = text;
                 Backend.trigger-tab(section-index, index, TabAction.apply);
@@ -255,7 +248,6 @@ component ComponentMetadata inherits GridLayout {
             text-edited(text) => {
                 tabs[index].prefix = text;
             }
-
             text-accepted(text) => {
                 tabs[index].prefix = text;
                 Backend.trigger-tab(section-index, index, TabAction.apply);
@@ -279,7 +271,6 @@ component ComponentMetadata inherits GridLayout {
             text-edited(text) => {
                 tabs[index].default-value = text;
             }
-
             text-accepted(text) => {
                 tabs[index].default-value = text;
                 Backend.trigger-tab(section-index, index, TabAction.apply);
@@ -408,11 +399,9 @@ export component ComponentTab inherits Tab {
                 edited => {
                     Backend.trigger-tab(section-index, index, TabAction.apply);
                 }
-
                 new-signal-edited(text) => {
                     tabs[index].new-signal-name = text;
                 }
-
                 new-signal-committed => {
                     tabs[index].new-signal-commit = true;
                 }

@@ -918,14 +918,13 @@ export struct DeviceTabData {
     package-description: string,
     cmp-signal-names: [string],  // Used for the pinout combobox
     pinout: [DevicePinoutData],
+    parts: [DevicePartData],
     checks: RuleCheckData,
 
     // Messages
     interface-broken-msg: bool,
 
     new-category: string,  // Set to UUID by UI, reset by backend.
-
-    //parts: [DevicePartData],
 }
 
 ////////////////////////////////////////////////////////////////////////////////

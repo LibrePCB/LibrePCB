@@ -35,6 +35,8 @@
 #include "../libraryelementcategoriesmodel.h"
 #include "../pkg/footprintgraphicsitem.h"
 #include "../sym/symbolgraphicsitem.h"
+#include "devicepinoutmodel.h"
+#include "partlistmodel2.h"
 #include "utils/slinthelpers.h"
 
 #include <librepcb/core/application.h>
@@ -73,7 +75,7 @@ DeviceTab::DeviceTab(LibraryEditor2& editor, std::unique_ptr<Device> dev,
     mComponentScene(new GraphicsScene()),
     mPackageScene(new GraphicsScene()),
     mWizardMode(wizardMode),
-    mCurrentPageIndex(wizardMode ? 0 : 2),
+    mCurrentPageIndex(wizardMode ? 0 : 1),
     // mCompactLayout(false),
     mNameParsed(mDevice->getNames().getDefaultValue()),
     mVersionParsed(mDevice->getVersion()),
@@ -83,6 +85,8 @@ DeviceTab::DeviceTab(LibraryEditor2& editor, std::unique_ptr<Device> dev,
     mCategoriesTree(new CategoryTreeModel2(editor.getWorkspace().getLibraryDb(),
                                            editor.getWorkspace().getSettings(),
                                            CategoryTreeModel2::Filter::CmpCat)),
+    mPinout(new DevicePinoutModel()),
+    mParts(new PartListModel2()),
     mOriginalComponentUuid(mDevice->getComponentUuid()),
     mOriginalPackageUuid(mDevice->getPackageUuid()),
     mOriginalPadSignalMap(mDevice->getPadSignalMap()) {
@@ -92,15 +96,13 @@ DeviceTab::DeviceTab(LibraryEditor2& editor, std::unique_ptr<Device> dev,
   mComponentScene.reset(new GraphicsScene());
   mComponentScene->setBackgroundColors(
       theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor(),
-      theme.getColor(Theme::Color::sSchematicBackground)
-          .getSecondaryColor());
+      theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
   mComponentScene->setOverlayColors(
       theme.getColor(Theme::Color::sSchematicOverlays).getPrimaryColor(),
       theme.getColor(Theme::Color::sSchematicOverlays).getSecondaryColor());
   mComponentScene->setSelectionRectColors(
       theme.getColor(Theme::Color::sSchematicSelection).getPrimaryColor(),
-      theme.getColor(Theme::Color::sSchematicSelection)
-          .getSecondaryColor());
+      theme.getColor(Theme::Color::sSchematicSelection).getSecondaryColor());
   mComponentScene->setGridStyle(Theme::GridStyle::Lines);
 
   // Setup package scene.
@@ -122,6 +124,9 @@ DeviceTab::DeviceTab(LibraryEditor2& editor, std::unique_ptr<Device> dev,
           &DeviceTab::refreshMetadata);
 
   // Connect models.
+  mPinout->setList(&mDevice->getPadSignalMap());
+  mPinout->setUndoStack(mUndoStack.get());
+  mParts->setList(&mDevice->getParts());
   connect(mCategories.get(), &LibraryElementCategoriesModel::modified, this,
           &DeviceTab::commitMetadata, Qt::QueuedConnection);
 
@@ -138,6 +143,12 @@ DeviceTab::DeviceTab(LibraryEditor2& editor, std::unique_ptr<Device> dev,
 
 DeviceTab::~DeviceTab() noexcept {
   deactivate();
+
+  mPinout->setList(nullptr);
+  mPinout->setSignals(nullptr);
+  mPinout->setPads(nullptr);
+  mPinout->setUndoStack(nullptr);
+  mParts->setList(nullptr);
 
   // Delete all command objects in the undo stack. This mmust be done before
   // other important objects are deleted, as undo command objects can hold
@@ -177,6 +188,14 @@ ui::TabData DeviceTab::getUiData() const noexcept {
 }
 
 ui::DeviceTabData DeviceTab::getDerivedUiData() const noexcept {
+  // TODO: replace this by a map model.
+  QStringList signalNames;
+  if (mComponent) {
+    for (const auto& sig : mComponent->getSignals()) {
+      signalNames.append(*sig.getName());
+    }
+  }
+
   return ui::DeviceTabData{
       mEditor.getUiIndex(),  // Library index
       mWizardMode,  // Wizard mode
@@ -203,16 +222,17 @@ ui::DeviceTabData DeviceTab::getDerivedUiData() const noexcept {
                : slint::SharedString(),  // Package name
       mPackage ? q2s(mPackage->getDescriptions().getDefaultValue())
                : slint::SharedString(),  // Package description
-          nullptr, // Component signal names
-          nullptr, // Pinout
+      q2s(signalNames),  // Component signal names
+      mPinout,  // Pinout
+      mParts,  // Parts
       ui::RuleCheckData{
-          ui::RuleCheckType::DeviceCheck,  // Checks type
-          ui::RuleCheckState::UpToDate,  // Checks state
-          mCheckMessages,  // Checks messages
-          mCheckMessages->getUnapprovedCount(),  // Checks unapproved count
+          ui::RuleCheckType::DeviceCheck,  // Check type
+          ui::RuleCheckState::UpToDate,  // Check state
+          mCheckMessages,  // Check messages
+          mCheckMessages->getUnapprovedCount(),  // Check unapproved count
           mCheckMessages->getErrorCount(),  // Check errors count
-          mCheckError,  // Checks execution error
-          !isWritable(),  // Checks read-only
+          mCheckError,  // Check execution error
+          !isWritable(),  // Check read-only
       },
       isInterfaceBroken(),  // Interface broken
       // mCompactLayout,  // Compact layout
@@ -452,30 +472,47 @@ void DeviceTab::refreshMetadata() noexcept {
   const QStringList& localeOrder =
       mApp.getWorkspace().getSettings().libraryLocaleOrder.get();
   if ((!mComponent) || (mComponent->getUuid() != mDevice->getComponentUuid())) {
-    mComponentGraphicsItems.clear();
+    mPinout->setSignals(nullptr);
+    mSymbolGraphicsItems.clear();
+    mSymbols.clear();
     mComponent.reset();
 
     try {
       const FilePath fp = db.getLatest<Component>(mDevice->getComponentUuid());
-      if (!fp.isValid()) return;
       mComponent = Component::open(std::unique_ptr<TransactionalDirectory>(
           new TransactionalDirectory(TransactionalFileSystem::openRO(fp))));
-      // mComponentGraphicsItem.reset(
-      //     new SymbolGraphicsItem(*mSymbol, mLayers, mComponent, mItem));
-      // mScene->addItem(*mGraphicsItem);
+      mPinout->setSignals(&mComponent->getSignals());
+      if (const auto& variant = mComponent->getSymbolVariants().value(0)) {
+        for (const auto& gate : variant->getSymbolItems().values()) {
+          const FilePath fp = db.getLatest<Symbol>(gate->getSymbolUuid());
+          std::shared_ptr<Symbol> symbol(
+              Symbol::open(std::unique_ptr<TransactionalDirectory>(
+                               new TransactionalDirectory(
+                                   TransactionalFileSystem::openRO(fp))))
+                  .release());
+          mSymbols.append(symbol);
+          auto graphicsItem = std::make_shared<SymbolGraphicsItem>(
+              *symbol, mApp.getPreviewLayers(), mComponent.get(), gate);
+          graphicsItem->setPosition(gate->getSymbolPosition());
+          graphicsItem->setRotation(gate->getSymbolRotation());
+          mComponentScene->addItem(*graphicsItem);
+          mSymbolGraphicsItems.append(graphicsItem);
+        }
+      }
     } catch (const Exception& e) {
       // TODO
     }
   }
   if ((!mPackage) || (mPackage->getUuid() != mDevice->getPackageUuid())) {
+    mPinout->setPads(nullptr);
     mPackageGraphicsItem.reset();
     mPackage.reset();
 
     try {
       const FilePath fp = db.getLatest<Package>(mDevice->getPackageUuid());
-      if (!fp.isValid()) return;
       mPackage = Package::open(std::unique_ptr<TransactionalDirectory>(
           new TransactionalDirectory(TransactionalFileSystem::openRO(fp))));
+      mPinout->setPads(&mPackage->getPads());
       if (auto footprint = mPackage->getFootprints().value(0)) {
         mPackageGraphicsItem.reset(new FootprintGraphicsItem(
             footprint, mApp.getPreviewLayers(),

@@ -227,6 +227,8 @@ add_library(
   library/dev/deviceeditorwidget.ui
   library/dev/devicepadsignalmapmodel.cpp
   library/dev/devicepadsignalmapmodel.h
+  library/dev/devicepinoutmodel.cpp
+  library/dev/devicepinoutmodel.h
   library/dev/devicetab.cpp
   library/dev/devicetab.h
   library/dev/padsignalmapeditorwidget.cpp
@@ -235,6 +237,8 @@ add_library(
   library/dev/partlisteditorwidget.h
   library/dev/partlistmodel.cpp
   library/dev/partlistmodel.h
+  library/dev/partlistmodel2.cpp
+  library/dev/partlistmodel2.h
   library/downloadlibrarytab.cpp
   library/downloadlibrarytab.h
   library/eaglelibraryimportwizard/eaglelibraryimportwizard.cpp

@@ -39,14 +39,17 @@ namespace librepcb {
 class Component;
 class Device;
 class Package;
+class Symbol;
 
 namespace editor {
 
 class CategoryTreeModel2;
+class DevicePinoutModel;
 class FootprintGraphicsItem;
 class GraphicsScene;
 class LibraryEditor2;
 class LibraryElementCategoriesModel;
+class PartListModel2;
 class SymbolGraphicsItem;
 
 /*******************************************************************************
@@ -141,6 +144,8 @@ private:
   // UI data
   std::shared_ptr<LibraryElementCategoriesModel> mCategories;
   std::shared_ptr<CategoryTreeModel2> mCategoriesTree;
+  std::shared_ptr<DevicePinoutModel> mPinout;
+  std::shared_ptr<PartListModel2> mParts;
 
   /// Broken interface detection
   Uuid mOriginalComponentUuid;
@@ -149,7 +154,8 @@ private:
 
   // Referenced library elements
   std::unique_ptr<Component> mComponent;  // May be nullptr!
-  QList<std::shared_ptr<SymbolGraphicsItem>> mComponentGraphicsItems;
+  QList<std::shared_ptr<Symbol>> mSymbols;
+  QList<std::shared_ptr<SymbolGraphicsItem>> mSymbolGraphicsItems;
   std::unique_ptr<Package> mPackage;  // May be nullptr!
   std::unique_ptr<FootprintGraphicsItem> mPackageGraphicsItem;
 };

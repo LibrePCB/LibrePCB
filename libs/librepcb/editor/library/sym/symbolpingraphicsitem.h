@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/sym/symbolpin.h>
 
 #include <QtCore>
@@ -32,10 +33,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class Component;
-class ComponentSymbolVariantItem;
-
 namespace editor {
 
 class GraphicsLayerList;

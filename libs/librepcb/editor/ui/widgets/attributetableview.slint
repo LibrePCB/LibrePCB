@@ -45,12 +45,11 @@ export component AttributeTableView {
                     for item[index] in model: LineEdit {
                         height: row-height;
                         text: item.key;
-                    //validation-error: item.name-error;
+                        //validation-error: item.name-error;
 
-                    text-edited(text) => {
-                        //model[index].name = text;
-                    }
-
+                        text-edited(text) => {
+                            //model[index].name = text;
+                        }
                         text-accepted(text) => {
                             //model[index].name = text;
                             edited();
@@ -79,7 +78,6 @@ export component AttributeTableView {
                     text-edited(text) => {
                         //model[index].name = text;
                     }
-
                         text-accepted(text) => {
                             //model[index].name = text;
                             edited();
@@ -108,7 +106,6 @@ export component AttributeTableView {
                 text-edited(text) => {
                         //model[index].name = text;
                     }
-
                 text-accepted(text) => {
                             //model[index].name = text;
                             edited();
