@@ -610,6 +610,9 @@ export struct LibraryTabData {
 
     // Checks
     checks: RuleCheckData,
+
+    // Persistent memory for UI
+    categories-scroll-position: length,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -643,6 +646,12 @@ export struct WindowSectionData {
 export enum LibraryAction {
     open,
     uninstall,
+    new-component-category,
+    new-package-category,
+    new-symbol,
+    new-package,
+    new-component,
+    new-device,
 }
 
 // Workspace library data structure

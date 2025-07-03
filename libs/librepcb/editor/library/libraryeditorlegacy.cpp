@@ -153,27 +153,51 @@ bool LibraryEditorLegacy::requestClose() noexcept {
 }
 
 void LibraryEditorLegacy::openComponentCategory(const FilePath& fp) noexcept {
-  editLibraryElementTriggered<ComponentCategoryEditorWidget>(fp, false);
+  if (fp.isValid()) {
+    editLibraryElementTriggered<ComponentCategoryEditorWidget>(fp, false);
+  } else {
+    newLibraryElement(NewElementWizardContext::ElementType::ComponentCategory);
+  }
 }
 
 void LibraryEditorLegacy::openPackageCategory(const FilePath& fp) noexcept {
-  editLibraryElementTriggered<PackageCategoryEditorWidget>(fp, false);
+  if (fp.isValid()) {
+    editLibraryElementTriggered<PackageCategoryEditorWidget>(fp, false);
+  } else {
+    newLibraryElement(NewElementWizardContext::ElementType::PackageCategory);
+  }
 }
 
 void LibraryEditorLegacy::openSymbol(const FilePath& fp) noexcept {
-  editLibraryElementTriggered<SymbolEditorWidget>(fp, false);
+  if (fp.isValid()) {
+    editLibraryElementTriggered<SymbolEditorWidget>(fp, false);
+  } else {
+    newLibraryElement(NewElementWizardContext::ElementType::Symbol);
+  }
 }
 
 void LibraryEditorLegacy::openPackage(const FilePath& fp) noexcept {
-  editLibraryElementTriggered<PackageEditorWidget>(fp, false);
+  if (fp.isValid()) {
+    editLibraryElementTriggered<PackageEditorWidget>(fp, false);
+  } else {
+    newLibraryElement(NewElementWizardContext::ElementType::Package);
+  }
 }
 
 void LibraryEditorLegacy::openComponent(const FilePath& fp) noexcept {
-  editLibraryElementTriggered<ComponentEditorWidget>(fp, false);
+  if (fp.isValid()) {
+    editLibraryElementTriggered<ComponentEditorWidget>(fp, false);
+  } else {
+    newLibraryElement(NewElementWizardContext::ElementType::Component);
+  }
 }
 
 void LibraryEditorLegacy::openDevice(const FilePath& fp) noexcept {
-  editLibraryElementTriggered<DeviceEditorWidget>(fp, false);
+  if (fp.isValid()) {
+    editLibraryElementTriggered<DeviceEditorWidget>(fp, false);
+  } else {
+    newLibraryElement(NewElementWizardContext::ElementType::Device);
+  }
 }
 
 /*******************************************************************************
@@ -197,30 +221,6 @@ void LibraryEditorLegacy::closeTabIfOpen(const FilePath& fp) noexcept {
 /*******************************************************************************
  *  GUI Event Handlers
  ******************************************************************************/
-
-void LibraryEditorLegacy::newComponentCategoryTriggered() noexcept {
-  newLibraryElement(NewElementWizardContext::ElementType::ComponentCategory);
-}
-
-void LibraryEditorLegacy::newPackageCategoryTriggered() noexcept {
-  newLibraryElement(NewElementWizardContext::ElementType::PackageCategory);
-}
-
-void LibraryEditorLegacy::newSymbolTriggered() noexcept {
-  newLibraryElement(NewElementWizardContext::ElementType::Symbol);
-}
-
-void LibraryEditorLegacy::newPackageTriggered() noexcept {
-  newLibraryElement(NewElementWizardContext::ElementType::Package);
-}
-
-void LibraryEditorLegacy::newComponentTriggered() noexcept {
-  newLibraryElement(NewElementWizardContext::ElementType::Component);
-}
-
-void LibraryEditorLegacy::newDeviceTriggered() noexcept {
-  newLibraryElement(NewElementWizardContext::ElementType::Device);
-}
 
 void LibraryEditorLegacy::duplicateComponentCategoryTriggered(
     const FilePath& fp) noexcept {

@@ -583,6 +583,9 @@ component LibraryContent inherits HorizontalLayout {
         font-size: 12px;
         item-height: 20px;
 
+        init => {
+            self.scroll-y(tabs[index].categories-scroll-position);
+        }
         if Data.libraries-rescan-in-progress: Spinner {
             x: parent.width - self.width - parent.scrollbar-width - self.y;
             y: 5px;
@@ -598,7 +601,7 @@ component LibraryContent inherits HorizontalLayout {
             tooltip: @tr("Add Component Category");
 
             clicked => {
-                //Backend.trigger-library(Data.library-editors[tabs[index].library-index].path, LibraryAction.new-component-category);
+                Backend.trigger-library(Data.library-editors[tabs[index].library-index].path, LibraryAction.new-component-category);
             }
         }
 
@@ -609,7 +612,7 @@ component LibraryContent inherits HorizontalLayout {
             tooltip: @tr("Add Package Category");
 
             clicked => {
-                //Backend.trigger-library(Data.library-editors[tabs[index].library-index].path, LibraryAction.new-package-category);
+                Backend.trigger-library(Data.library-editors[tabs[index].library-index].path, LibraryAction.new-package-category);
             }
         }
 
@@ -622,6 +625,9 @@ component LibraryContent inherits HorizontalLayout {
         item-triggered(idx, item) => {
             Backend.trigger-tab(section-index, index, TabAction.edit-properties);
             true
+        }
+        scrolled(x, y) => {
+            tabs[index].categories-scroll-position = y;
         }
     }
 
@@ -662,7 +668,7 @@ component LibraryContent inherits HorizontalLayout {
             tooltip: @tr("Add Device");
 
             clicked => {
-                //Backend.trigger-library(Data.library-editors[tabs[index].library-index].path, LibraryAction.new-device);
+                Backend.trigger-library(Data.library-editors[tabs[index].library-index].path, LibraryAction.new-device);
             }
         }
 
@@ -673,7 +679,7 @@ component LibraryContent inherits HorizontalLayout {
             tooltip: @tr("Add Component");
 
             clicked => {
-                //Backend.trigger-library(Data.library-editors[tabs[index].library-index].path, LibraryAction.new-component);
+                Backend.trigger-library(Data.library-editors[tabs[index].library-index].path, LibraryAction.new-component);
             }
         }
 
@@ -684,7 +690,7 @@ component LibraryContent inherits HorizontalLayout {
             tooltip: @tr("Add Package");
 
             clicked => {
-                //Backend.trigger-library(Data.library-editors[tabs[index].library-index].path, LibraryAction.new-package);
+                Backend.trigger-library(Data.library-editors[tabs[index].library-index].path, LibraryAction.new-package);
             }
         }
 
@@ -695,7 +701,7 @@ component LibraryContent inherits HorizontalLayout {
             tooltip: @tr("Add Symbol");
 
             clicked => {
-                //Backend.trigger-library(Data.library-editors[tabs[index].library-index].path, LibraryAction.new-symbol);
+                Backend.trigger-library(Data.library-editors[tabs[index].library-index].path, LibraryAction.new-symbol);
             }
         }
 

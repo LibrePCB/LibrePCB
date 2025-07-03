@@ -85,12 +85,6 @@ signals:
   void aboutLibrePcbRequested();
 
 private:  // GUI Event Handlers
-  void newComponentCategoryTriggered() noexcept;
-  void newPackageCategoryTriggered() noexcept;
-  void newSymbolTriggered() noexcept;
-  void newPackageTriggered() noexcept;
-  void newComponentTriggered() noexcept;
-  void newDeviceTriggered() noexcept;
   void duplicateComponentCategoryTriggered(const FilePath& fp) noexcept;
   void duplicatePackageCategoryTriggered(const FilePath& fp) noexcept;
   void duplicateSymbolTriggered(const FilePath& fp) noexcept;

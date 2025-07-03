@@ -66,6 +66,7 @@ LibraryTab::LibraryTab(LibraryEditor& editor, bool wizardMode,
     mCurrentPageIndex(wizardMode ? 0 : 2),
     mCurrentCategoryIndex(0),
     mCurrentElementIndex(-1),
+    mCategoriesScrollPosition(0),
     mNameParsed(mLibrary.getNames().getDefaultValue()),
     mVersionParsed(mLibrary.getVersion()),
     mDeprecated(false),
@@ -171,6 +172,7 @@ ui::LibraryTabData LibraryTab::getDerivedUiData() const noexcept {
           mCheckError,  // Check execution error
           !mLibrary.getDirectory().isWritable(),  // Check read-only
       },
+      mCategoriesScrollPosition, // Categories scroll position
   };
 }
 
@@ -202,6 +204,9 @@ void LibraryTab::setDerivedUiData(const ui::LibraryTabData& data) noexcept {
 
   // Current element index
   mCurrentElementIndex = data.element_index;
+
+  // Scroll positions
+  mCategoriesScrollPosition = data.categories_scroll_position;
 
   // Update UI on changes
   onDerivedUiDataChanged.notify();

@@ -162,6 +162,7 @@ private:
   int mCurrentPageIndex;
   int mCurrentCategoryIndex;
   int mCurrentElementIndex;
+  float mCategoriesScrollPosition;
 
   // Library metadata to be applied
   QByteArray mIcon;

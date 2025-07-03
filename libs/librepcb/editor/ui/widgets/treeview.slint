@@ -34,6 +34,7 @@ export component TreeView inherits Rectangle {
     callback item-triggered(index: int, item: TreeViewItemData) -> bool;
     callback item-right-clicked(index: int, item: TreeViewItemData, x: length, y: length);
     callback item-deleted(index: int, item: TreeViewItemData) -> bool;
+    callback scrolled(x: length, y: length);
 
     preferred-height: model.length * item-height;
     forward-focus: fs;
@@ -44,6 +45,10 @@ export component TreeView inherits Rectangle {
 
     function set-current-index(index: int) {
         item-selected(index, model[index]);
+    }
+
+    public function scroll-y(offset: length) {
+        view.viewport-y = min(max(offset, view.viewport-height - view.height), 0);
     }
 
     fs := FocusScope {
@@ -99,7 +104,6 @@ export component TreeView inherits Rectangle {
             accessible-action-expand => {
                 item.expanded = !item.expanded;
             }
-
             changed has-hover => {
                 if self.has-hover {
                     item-hovered(index, item);
@@ -218,7 +222,6 @@ export component TreeView inherits Rectangle {
                 fs.focus();
                 set-current-index(index);
             }
-
             double-clicked => {
                 if item.has-children {
                     item.expanded = !item.expanded;
@@ -226,13 +229,16 @@ export component TreeView inherits Rectangle {
                     model[index].action = TreeViewItemAction.open;
                 }
             }
-
             pointer-event(event) => {
                 if (event.button == PointerEventButton.right) && (event.kind == PointerEventKind.up) {
                     self.clicked(); // Handle focus & selection
                     item-right-clicked(index, item, self.absolute-position.x - root.absolute-position.x + self.mouse-x, self.absolute-position.y - root.absolute-position.y + self.mouse-y);
                 }
             }
+        }
+
+        scrolled => {
+            root.scrolled(self.viewport-x, self.viewport-y);
         }
     }
 }

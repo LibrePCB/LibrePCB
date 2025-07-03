@@ -83,25 +83,6 @@ static std::optional<QSize> getOverrideWindowSize() noexcept {
   }
 }
 
-static bool askForRestoringBackup(const FilePath&) {
-  QMessageBox::StandardButton btn = QMessageBox::question(
-      qApp->activeWindow(), MainWindow::tr("Restore autosave backup?"),
-      MainWindow::tr(
-          "It seems that the application crashed the last time you opened "
-          "this library element. Do you want to restore the last autosave "
-          "backup?"),
-      QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-      QMessageBox::Cancel);
-  switch (btn) {
-    case QMessageBox::Yes:
-      return true;
-    case QMessageBox::No:
-      return false;
-    default:
-      throw UserCanceled(__FILE__, __LINE__);
-  }
-}
-
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
@@ -558,7 +539,7 @@ void MainWindow::triggerLibrary(slint::SharedString path,
       mApp.getWorkspace().getLibraryDb().startLibraryRescan();
       break;
     }
-    /*case ui::LibraryAction::NewComponentCategory: {
+    case ui::LibraryAction::NewComponentCategory: {
       if (auto editor = mApp.openLibrary(fp)) {
         openComponentCategoryTab(*editor, FilePath());
       }
@@ -593,7 +574,7 @@ void MainWindow::triggerLibrary(slint::SharedString path,
         openDeviceTab(*editor, FilePath());
       }
       break;
-    }*/
+    }
     default: {
       qWarning() << "Unhandled action in triggerLibrary():"
                  << static_cast<int>(a);
