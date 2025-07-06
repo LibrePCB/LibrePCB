@@ -317,7 +317,20 @@ void MainWindow::setCurrentProject(int index) noexcept {
  ******************************************************************************/
 
 slint::CloseRequestResponse MainWindow::closeRequested() noexcept {
-  if (!mApp.requestClosingWindow()) {
+  // Any message boxes might delay closing the window so we don't want to
+  // autosave any intermediate window state during this process. The timer
+  // will be restarted by GuiApplication once the window was closed.
+  mApp.stopWindowStateAutosaveTimer();
+
+  // Ask to close tabs, projects, libraries etc.
+  if (mApp.getWindowCount() >= 2) {
+    for (auto section : *mSections) {
+      if (!section->requestCloseAllTabs()) {
+        return slint::CloseRequestResponse::KeepWindowShown;
+      }
+    }
+  } else if ((!mApp.requestClosingAllProjects()) ||
+             (!mApp.requestClosingAllLibraries())) {
     return slint::CloseRequestResponse::KeepWindowShown;
   }
 

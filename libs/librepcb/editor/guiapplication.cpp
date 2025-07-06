@@ -231,6 +231,222 @@ GuiApplication::~GuiApplication() noexcept {
 }
 
 /*******************************************************************************
+ *  Workspace
+ ******************************************************************************/
+
+void GuiApplication::openFile(const FilePath& fp, QWidget* parent) noexcept {
+  if ((fp.getSuffix() == "lpp") || (fp.getSuffix() == "lppz")) {
+    openProject(fp, parent);
+  } else if (fp.isValid()) {
+    DesktopServices ds(mWorkspace.getSettings());
+    ds.openLocalPath(fp);
+  }
+}
+
+void GuiApplication::switchWorkspace(QWidget* parent) noexcept {
+  InitializeWorkspaceWizard wizard(true, parent);
+  wizard.setWindowModality(Qt::WindowModal);
+  try {
+    wizard.setWorkspacePath(mWorkspace.getPath());
+  } catch (const Exception& e) {
+    qWarning() << "Failed to prepare workspace switching:" << e.getMsg();
+  }
+  if ((wizard.exec() == QDialog::Accepted) &&
+      (wizard.getWorkspacePath().isValid())) {
+    Workspace::setMostRecentlyUsedWorkspacePath(wizard.getWorkspacePath());
+    QMessageBox::information(parent, tr("Workspace changed"),
+                             tr("The chosen workspace will be used after "
+                                "restarting the application."));
+  }
+}
+
+void GuiApplication::execWorkspaceSettingsDialog(QWidget* parent) noexcept {
+  WorkspaceSettingsDialog dlg(mWorkspace, parent);
+  connect(&dlg, &WorkspaceSettingsDialog::desktopIntegrationStatusChanged, this,
+          &GuiApplication::updateDesktopIntegrationNotification);
+  dlg.exec();
+}
+
+void GuiApplication::addExampleProjects(QWidget* parent) noexcept {
+  const QString msg =
+      tr("This downloads some example projects from the internet and copies "
+         "them into the workspace to help you evaluating LibrePCB with real "
+         "projects.") %
+      "\n\n" %
+      tr("Once you don't need them anymore, just delete the examples "
+         "directory to get rid of them.");
+  const int ret =
+      QMessageBox::information(parent, tr("Add Example Projects"), msg,
+                               QMessageBox::Ok | QMessageBox::Cancel);
+  if (ret == QMessageBox::Ok) {
+    InitializeWorkspaceWizardContext ctx(parent);
+    ctx.setWorkspacePath(mWorkspace.getPath());
+    ctx.installExampleProjects();
+  }
+}
+
+/*******************************************************************************
+ *  Libraries
+ ******************************************************************************/
+
+bool GuiApplication::requestClosingAllLibraries() noexcept {
+  return closeAllLibraryEditors(true);
+}
+
+/*******************************************************************************
+ *  Projects
+ ******************************************************************************/
+
+void GuiApplication::createProject(const FilePath& parentDir, bool eagleImport,
+                                   QWidget* parent) noexcept {
+  const NewProjectWizard::Mode mode = eagleImport
+      ? NewProjectWizard::Mode::EagleImport
+      : NewProjectWizard::Mode::NewProject;
+  NewProjectWizard wizard(mWorkspace, mode, parent);
+  wizard.setWindowModality(Qt::WindowModal);
+  if (parentDir.isValid()) {
+    wizard.setLocationOverride(parentDir);
+  }
+  if (wizard.exec() == QWizard::Accepted) {
+    try {
+      std::unique_ptr<Project> project = wizard.createProject();  // can throw
+      const FilePath fp = project->getFilepath();
+      project.reset();  // Release lock.
+      openProject(fp, parent);
+    } catch (const Exception& e) {
+      QMessageBox::critical(parent, tr("Could not create project"), e.getMsg());
+    }
+  }
+}
+
+std::shared_ptr<ProjectEditor> GuiApplication::openProject(
+    FilePath fp, QWidget* parent) noexcept {
+  if (!fp.isValid()) {
+    QSettings cs;  // client settings
+    QString lastOpenedFile =
+        cs.value("controlpanel/last_open_project", mWorkspace.getPath().toStr())
+            .toString();
+
+    fp = FilePath(FileDialog::getOpenFileName(
+        parent, tr("Open Project"), lastOpenedFile,
+        tr("LibrePCB project files (%1)").arg("*.lpp *.lppz")));
+    if (!fp.isValid()) return nullptr;
+
+    cs.setValue("controlpanel/last_open_project", fp.toNative());
+  }
+
+  auto switchToProject = [this](int index) {
+    for (auto win : mWindows) {
+      win->setCurrentProject(index);
+      win->showPanelPage(ui::PanelPage::Documents);
+    }
+  };
+
+  // If the same project is already open, just return it.
+  const FilePath uniqueFp = fp.toUnique();
+  for (int i = 0; i < mProjects->count(); ++i) {
+    auto prj = mProjects->at(i);
+    if (prj->getProject().getFilepath().toUnique() == uniqueFp) {
+      switchToProject(i);
+      return prj;
+    }
+  }
+
+  // Opening the project can take some time, use wait cursor to provide
+  // immediate UI feedback.
+  QApplication::setOverrideCursor(Qt::WaitCursor);
+  auto cursorScopeGuard =
+      scopeGuard([]() { QApplication::restoreOverrideCursor(); });
+
+  // Callback to ask for restoring backup.
+  auto askForRestoringBackup = [parent](const FilePath&) {
+    QMessageBox::StandardButton btn = QMessageBox::question(
+        parent, tr("Restore autosave backup?"),
+        tr("It seems that the application crashed the last time you opened "
+           "this project. Do you want to restore the last autosave backup?"),
+        QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+        QMessageBox::Cancel);
+    switch (btn) {
+      case QMessageBox::Yes:
+        return true;
+      case QMessageBox::No:
+        return false;
+      default:
+        throw UserCanceled(__FILE__, __LINE__);
+    }
+  };
+
+  try {
+    // Open file system.
+    std::shared_ptr<TransactionalFileSystem> fs;
+    QString projectFileName = fp.getFilename();
+    if (fp.getSuffix() == "lppz") {
+      fs = TransactionalFileSystem::openRO(
+          FilePath::getRandomTempPath(),
+          &TransactionalFileSystem::RestoreMode::no);
+      fs->removeDirRecursively();  // 1) Get a clean initial state.
+      fs->loadFromZip(fp);  // 2) Load files from ZIP.
+      foreach (const QString& fn, fs->getFiles()) {
+        if (fn.endsWith(".lpp")) {
+          projectFileName = fn;
+        }
+      }
+    } else {
+      fs = TransactionalFileSystem::openRW(
+          fp.getParentDir(), askForRestoringBackup,
+          DirectoryLockHandlerDialog::createDirectoryLockCallback());
+    }
+
+    // Open project.
+    ProjectLoader loader;
+    std::unique_ptr<Project> project = loader.open(
+        std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(fs)),
+        projectFileName);  // can throw
+
+    // Open editor & keep handle.
+    const int index = mProjects->count();
+    auto editor = std::make_shared<ProjectEditor>(
+        *this, std::move(project), index, loader.getUpgradeMessages());
+    connect(editor.get(), &ProjectEditor::statusBarMessageChanged, this,
+            &GuiApplication::statusBarMessageChanged);
+    connect(editor.get(), &ProjectEditor::projectLibraryUpdaterRequested, this,
+            &GuiApplication::openProjectLibraryUpdater);
+    mProjects->append(editor);
+
+    // Switch to documents tab.
+    switchToProject(index);
+
+    // Delay updating the last opened project to avoid an issue when
+    // double-clicking: https://github.com/LibrePCB/LibrePCB/issues/293
+    QTimer::singleShot(
+        500, this, [this, fp]() { mQuickAccessModel->pushRecentProject(fp); });
+
+    return editor;
+  } catch (const Exception& e) {
+    QMessageBox::critical(parent, tr("Error"), e.getMsg());
+    return nullptr;
+  }
+}
+
+void GuiApplication::closeProject(int index) noexcept {
+  mProjects->remove(index);
+  for (int i = index; i < mProjects->count(); ++i) {
+    mProjects->at(i)->setUiIndex(i);
+  }
+}
+
+bool GuiApplication::requestClosingAllProjects() noexcept {
+  for (std::size_t i = 0; i < mProjects->row_count(); ++i) {
+    if (auto prj = mProjects->value(i)) {
+      if (!prj->requestClose()) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+/*******************************************************************************
  *  Window Management
  ******************************************************************************/
 
@@ -373,214 +589,12 @@ void GuiApplication::createNewWindow(int id, int projectIndex) noexcept {
   mSaveOpenedWindowsCountdown.start(10000);
 }
 
-bool GuiApplication::requestClosingWindow() noexcept {
-  if (mWindows.count() >= 2) {
-    return true;
-  }
+int GuiApplication::getWindowCount() const noexcept {
+  return mWindows.count();
+}
 
-  // Stop possibly scheduled window state saving as the user seems to be
-  // closing the whole application, so we don't want to save this state.
+void GuiApplication::stopWindowStateAutosaveTimer() noexcept {
   mSaveOpenedWindowsCountdown.stop();
-
-  return closeAllLibraryEditors(true) && requestClosingAllProjects();
-}
-
-/*******************************************************************************
- *  Workspace
- ******************************************************************************/
-
-void GuiApplication::openFile(const FilePath& fp, QWidget* parent) noexcept {
-  if ((fp.getSuffix() == "lpp") || (fp.getSuffix() == "lppz")) {
-    openProject(fp, parent);
-  } else if (fp.isValid()) {
-    DesktopServices ds(mWorkspace.getSettings());
-    ds.openLocalPath(fp);
-  }
-}
-
-void GuiApplication::switchWorkspace(QWidget* parent) noexcept {
-  InitializeWorkspaceWizard wizard(true, parent);
-  wizard.setWindowModality(Qt::WindowModal);
-  try {
-    wizard.setWorkspacePath(mWorkspace.getPath());
-  } catch (const Exception& e) {
-    qWarning() << "Failed to prepare workspace switching:" << e.getMsg();
-  }
-  if ((wizard.exec() == QDialog::Accepted) &&
-      (wizard.getWorkspacePath().isValid())) {
-    Workspace::setMostRecentlyUsedWorkspacePath(wizard.getWorkspacePath());
-    QMessageBox::information(parent, tr("Workspace changed"),
-                             tr("The chosen workspace will be used after "
-                                "restarting the application."));
-  }
-}
-
-void GuiApplication::execWorkspaceSettingsDialog(QWidget* parent) noexcept {
-  WorkspaceSettingsDialog dlg(mWorkspace, parent);
-  connect(&dlg, &WorkspaceSettingsDialog::desktopIntegrationStatusChanged, this,
-          &GuiApplication::updateDesktopIntegrationNotification);
-  dlg.exec();
-}
-
-void GuiApplication::addExampleProjects(QWidget* parent) noexcept {
-  const QString msg =
-      tr("This downloads some example projects from the internet and copies "
-         "them into the workspace to help you evaluating LibrePCB with real "
-         "projects.") %
-      "\n\n" %
-      tr("Once you don't need them anymore, just delete the examples "
-         "directory to get rid of them.");
-  const int ret =
-      QMessageBox::information(parent, tr("Add Example Projects"), msg,
-                               QMessageBox::Ok | QMessageBox::Cancel);
-  if (ret == QMessageBox::Ok) {
-    InitializeWorkspaceWizardContext ctx(parent);
-    ctx.setWorkspacePath(mWorkspace.getPath());
-    ctx.installExampleProjects();
-  }
-}
-
-/*******************************************************************************
- *  Projects
- ******************************************************************************/
-
-void GuiApplication::createProject(const FilePath& parentDir, bool eagleImport,
-                                   QWidget* parent) noexcept {
-  const NewProjectWizard::Mode mode = eagleImport
-      ? NewProjectWizard::Mode::EagleImport
-      : NewProjectWizard::Mode::NewProject;
-  NewProjectWizard wizard(mWorkspace, mode, parent);
-  wizard.setWindowModality(Qt::WindowModal);
-  if (parentDir.isValid()) {
-    wizard.setLocationOverride(parentDir);
-  }
-  if (wizard.exec() == QWizard::Accepted) {
-    try {
-      std::unique_ptr<Project> project = wizard.createProject();  // can throw
-      const FilePath fp = project->getFilepath();
-      project.reset();  // Release lock.
-      openProject(fp, parent);
-    } catch (const Exception& e) {
-      QMessageBox::critical(parent, tr("Could not create project"), e.getMsg());
-    }
-  }
-}
-
-std::shared_ptr<ProjectEditor> GuiApplication::openProject(
-    FilePath fp, QWidget* parent) noexcept {
-  if (!fp.isValid()) {
-    QSettings cs;  // client settings
-    QString lastOpenedFile =
-        cs.value("controlpanel/last_open_project", mWorkspace.getPath().toStr())
-            .toString();
-
-    fp = FilePath(FileDialog::getOpenFileName(
-        parent, tr("Open Project"), lastOpenedFile,
-        tr("LibrePCB project files (%1)").arg("*.lpp *.lppz")));
-    if (!fp.isValid()) return nullptr;
-
-    cs.setValue("controlpanel/last_open_project", fp.toNative());
-  }
-
-  auto switchToProject = [this](int index) {
-    for (auto win : mWindows) {
-      win->setCurrentProject(index);
-      win->showPanelPage(ui::PanelPage::Documents);
-    }
-  };
-
-  // If the same project is already open, just return it.
-  const FilePath uniqueFp = fp.toUnique();
-  for (int i = 0; i < mProjects->count(); ++i) {
-    auto prj = mProjects->at(i);
-    if (prj->getProject().getFilepath().toUnique() == uniqueFp) {
-      switchToProject(i);
-      return prj;
-    }
-  }
-
-  // Opening the project can take some time, use wait cursor to provide
-  // immediate UI feedback.
-  QApplication::setOverrideCursor(Qt::WaitCursor);
-  auto cursorScopeGuard =
-      scopeGuard([]() { QApplication::restoreOverrideCursor(); });
-
-  // Callback to ask for restoring backup.
-  auto askForRestoringBackup = [parent](const FilePath&) {
-    QMessageBox::StandardButton btn = QMessageBox::question(
-        parent, tr("Restore autosave backup?"),
-        tr("It seems that the application crashed the last time you opened "
-           "this "
-           "project. Do you want to restore the last autosave backup?"),
-        QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-        QMessageBox::Cancel);
-    switch (btn) {
-      case QMessageBox::Yes:
-        return true;
-      case QMessageBox::No:
-        return false;
-      default:
-        throw UserCanceled(__FILE__, __LINE__);
-    }
-  };
-
-  try {
-    // Open file system.
-    std::shared_ptr<TransactionalFileSystem> fs;
-    QString projectFileName = fp.getFilename();
-    if (fp.getSuffix() == "lppz") {
-      fs = TransactionalFileSystem::openRO(
-          FilePath::getRandomTempPath(),
-          &TransactionalFileSystem::RestoreMode::no);
-      fs->removeDirRecursively();  // 1) Get a clean initial state.
-      fs->loadFromZip(fp);  // 2) Load files from ZIP.
-      foreach (const QString& fn, fs->getFiles()) {
-        if (fn.endsWith(".lpp")) {
-          projectFileName = fn;
-        }
-      }
-    } else {
-      fs = TransactionalFileSystem::openRW(
-          fp.getParentDir(), askForRestoringBackup,
-          DirectoryLockHandlerDialog::createDirectoryLockCallback());
-    }
-
-    // Open project.
-    ProjectLoader loader;
-    std::unique_ptr<Project> project = loader.open(
-        std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(fs)),
-        projectFileName);  // can throw
-
-    // Open editor & keep handle.
-    const int index = mProjects->count();
-    auto editor = std::make_shared<ProjectEditor>(
-        *this, std::move(project), index, loader.getUpgradeMessages());
-    connect(editor.get(), &ProjectEditor::statusBarMessageChanged, this,
-            &GuiApplication::statusBarMessageChanged);
-    connect(editor.get(), &ProjectEditor::projectLibraryUpdaterRequested, this,
-            &GuiApplication::openProjectLibraryUpdater);
-    mProjects->append(editor);
-
-    // Switch to documents tab.
-    switchToProject(index);
-
-    // Delay updating the last opened project to avoid an issue when
-    // double-clicking: https://github.com/LibrePCB/LibrePCB/issues/293
-    QTimer::singleShot(
-        500, this, [this, fp]() { mQuickAccessModel->pushRecentProject(fp); });
-
-    return editor;
-  } catch (const Exception& e) {
-    QMessageBox::critical(parent, tr("Error"), e.getMsg());
-    return nullptr;
-  }
-}
-
-void GuiApplication::closeProject(int index) noexcept {
-  mProjects->remove(index);
-  for (int i = index; i < mProjects->count(); ++i) {
-    mProjects->at(i)->setUiIndex(i);
-  }
 }
 
 /*******************************************************************************
@@ -597,7 +611,7 @@ void GuiApplication::quit(QPointer<QWidget> parent) noexcept {
   QMetaObject::invokeMethod(
       this,
       [this, parent]() {
-        if (closeAllLibraryEditors(true) && requestClosingAllProjects()) {
+        if (requestClosingAllProjects() && requestClosingAllLibraries()) {
           mWindows.clear();
           slint::quit_event_loop();
         }
@@ -642,17 +656,6 @@ void GuiApplication::openProjectPassedByOs(const QString& file,
   } else if (!silent) {
     qWarning() << "Ignore invalid request to open project:" << file;
   }
-}
-
-bool GuiApplication::requestClosingAllProjects() noexcept {
-  for (std::size_t i = 0; i < mProjects->row_count(); ++i) {
-    if (auto prj = mProjects->value(i)) {
-      if (!prj->requestClose()) {
-        return false;
-      }
-    }
-  }
-  return true;
 }
 
 void GuiApplication::openProjectLibraryUpdater(

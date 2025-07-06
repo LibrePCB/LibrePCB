@@ -176,6 +176,15 @@ bool WindowSection::processSceneKeyEvent(
   return false;
 }
 
+bool WindowSection::requestCloseAllTabs() noexcept {
+  for (auto tab : *mTabs) {
+    if (!tab->requestClose()) {
+      return false;
+    }
+  }
+  return true;
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
