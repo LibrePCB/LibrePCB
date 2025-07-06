@@ -23,7 +23,7 @@
 #include "newelementwizardpage_copyfrom.h"
 
 #include "../../widgets/waitingspinnerwidget.h"
-#include "../../workspace/categorytreemodel.h"
+#include "../../workspace/categorytreemodellegacy.h"
 #include "ui_newelementwizardpage_copyfrom.h"
 
 #include <librepcb/core/fileio/transactionalfilesystem.h>
@@ -266,40 +266,40 @@ void NewElementWizardPage_CopyFrom::initializePage() noexcept {
   switch (mContext.mElementType) {
     case NewElementWizardContext::ElementType::ComponentCategory: {
       mIsCategoryElement = true;
-      setCategoryTreeModel(new CategoryTreeModel(
+      setCategoryTreeModel(new CategoryTreeModelLegacy(
           mContext.getWorkspace().getLibraryDb(), mContext.getLibLocaleOrder(),
-          CategoryTreeModel::Filter::CmpCat));
+          CategoryTreeModelLegacy::Filter::CmpCat));
       break;
     }
     case NewElementWizardContext::ElementType::Symbol: {
-      setCategoryTreeModel(new CategoryTreeModel(
+      setCategoryTreeModel(new CategoryTreeModelLegacy(
           mContext.getWorkspace().getLibraryDb(), mContext.getLibLocaleOrder(),
-          CategoryTreeModel::Filter::CmpCatWithSymbols));
+          CategoryTreeModelLegacy::Filter::CmpCatWithSymbols));
       break;
     }
     case NewElementWizardContext::ElementType::Component: {
-      setCategoryTreeModel(new CategoryTreeModel(
+      setCategoryTreeModel(new CategoryTreeModelLegacy(
           mContext.getWorkspace().getLibraryDb(), mContext.getLibLocaleOrder(),
-          CategoryTreeModel::Filter::CmpCatWithComponents));
+          CategoryTreeModelLegacy::Filter::CmpCatWithComponents));
       break;
     }
     case NewElementWizardContext::ElementType::Device: {
-      setCategoryTreeModel(new CategoryTreeModel(
+      setCategoryTreeModel(new CategoryTreeModelLegacy(
           mContext.getWorkspace().getLibraryDb(), mContext.getLibLocaleOrder(),
-          CategoryTreeModel::Filter::CmpCatWithDevices));
+          CategoryTreeModelLegacy::Filter::CmpCatWithDevices));
       break;
     }
     case NewElementWizardContext::ElementType::PackageCategory: {
       mIsCategoryElement = true;
-      setCategoryTreeModel(new CategoryTreeModel(
+      setCategoryTreeModel(new CategoryTreeModelLegacy(
           mContext.getWorkspace().getLibraryDb(), mContext.getLibLocaleOrder(),
-          CategoryTreeModel::Filter::PkgCat));
+          CategoryTreeModelLegacy::Filter::PkgCat));
       break;
     }
     case NewElementWizardContext::ElementType::Package: {
-      setCategoryTreeModel(new CategoryTreeModel(
+      setCategoryTreeModel(new CategoryTreeModelLegacy(
           mContext.getWorkspace().getLibraryDb(), mContext.getLibLocaleOrder(),
-          CategoryTreeModel::Filter::PkgCatWithPackages));
+          CategoryTreeModelLegacy::Filter::PkgCatWithPackages));
       break;
     }
     default: {

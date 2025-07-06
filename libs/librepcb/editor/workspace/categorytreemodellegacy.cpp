@@ -20,7 +20,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "categorytreemodel.h"
+#include "categorytreemodellegacy.h"
 
 #include <librepcb/core/library/cat/componentcategory.h>
 #include <librepcb/core/library/cat/packagecategory.h>
@@ -39,9 +39,9 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-CategoryTreeModel::CategoryTreeModel(const WorkspaceLibraryDb& library,
-                                     const QStringList& localeOrder,
-                                     Filters filters) noexcept
+CategoryTreeModelLegacy::CategoryTreeModelLegacy(
+    const WorkspaceLibraryDb& library, const QStringList& localeOrder,
+    Filters filters) noexcept
   : QAbstractItemModel(nullptr),
     mLibrary(library),
     mLocaleOrder(localeOrder),
@@ -49,17 +49,18 @@ CategoryTreeModel::CategoryTreeModel(const WorkspaceLibraryDb& library,
     mRootItem(new Item{std::weak_ptr<Item>(), std::nullopt, {}, {}, {}}) {
   update();
   connect(&mLibrary, &WorkspaceLibraryDb::scanSucceeded, this,
-          &CategoryTreeModel::update);
+          &CategoryTreeModelLegacy::update);
 }
 
-CategoryTreeModel::~CategoryTreeModel() noexcept {
+CategoryTreeModelLegacy::~CategoryTreeModelLegacy() noexcept {
 }
 
 /*******************************************************************************
  *  Setters
  ******************************************************************************/
 
-void CategoryTreeModel::setLocaleOrder(const QStringList& order) noexcept {
+void CategoryTreeModelLegacy::setLocaleOrder(
+    const QStringList& order) noexcept {
   if (order != mLocaleOrder) {
     mLocaleOrder = order;
     update();
@@ -70,18 +71,20 @@ void CategoryTreeModel::setLocaleOrder(const QStringList& order) noexcept {
  *  Inherited Methods
  ******************************************************************************/
 
-int CategoryTreeModel::columnCount(const QModelIndex& parent) const noexcept {
+int CategoryTreeModelLegacy::columnCount(
+    const QModelIndex& parent) const noexcept {
   Q_UNUSED(parent);
   return 1;
 }
 
-int CategoryTreeModel::rowCount(const QModelIndex& parent) const noexcept {
+int CategoryTreeModelLegacy::rowCount(
+    const QModelIndex& parent) const noexcept {
   const Item* item = itemFromIndex(parent);
   return item ? item->childs.count() : 0;
 }
 
-QModelIndex CategoryTreeModel::index(int row, int column,
-                                     const QModelIndex& parent) const noexcept {
+QModelIndex CategoryTreeModelLegacy::index(
+    int row, int column, const QModelIndex& parent) const noexcept {
   Item* p = itemFromIndex(parent);
   if ((p) && (row >= 0) && (row < p->childs.count()) && (column == 0)) {
     return createIndex(row, column, p);
@@ -90,7 +93,8 @@ QModelIndex CategoryTreeModel::index(int row, int column,
   }
 }
 
-QModelIndex CategoryTreeModel::parent(const QModelIndex& index) const noexcept {
+QModelIndex CategoryTreeModelLegacy::parent(
+    const QModelIndex& index) const noexcept {
   if (index.isValid() && (index.model() == this)) {
     return indexFromItem(static_cast<Item*>(index.internalPointer()));
   } else {
@@ -98,8 +102,9 @@ QModelIndex CategoryTreeModel::parent(const QModelIndex& index) const noexcept {
   }
 }
 
-QVariant CategoryTreeModel::headerData(int section, Qt::Orientation orientation,
-                                       int role) const noexcept {
+QVariant CategoryTreeModelLegacy::headerData(int section,
+                                             Qt::Orientation orientation,
+                                             int role) const noexcept {
   if ((role == Qt::DisplayRole) && (orientation == Qt::Horizontal)) {
     switch (section) {
       case 0:
@@ -111,8 +116,8 @@ QVariant CategoryTreeModel::headerData(int section, Qt::Orientation orientation,
   return QVariant();
 }
 
-QVariant CategoryTreeModel::data(const QModelIndex& index,
-                                 int role) const noexcept {
+QVariant CategoryTreeModelLegacy::data(const QModelIndex& index,
+                                       int role) const noexcept {
   if (const Item* item = itemFromIndex(index)) {
     switch (role) {
       case Qt::DisplayRole:
@@ -132,7 +137,7 @@ QVariant CategoryTreeModel::data(const QModelIndex& index,
  *  Private Methods
  ******************************************************************************/
 
-void CategoryTreeModel::update() noexcept {
+void CategoryTreeModelLegacy::update() noexcept {
   qDebug() << "Update category tree model...";
   QElapsedTimer t;
   t.start();
@@ -160,8 +165,9 @@ void CategoryTreeModel::update() noexcept {
   qDebug() << "Finished category tree model update in" << t.elapsed() << "ms.";
 }
 
-QVector<std::shared_ptr<CategoryTreeModel::Item>> CategoryTreeModel::getChilds(
-    std::shared_ptr<Item> parent) const noexcept {
+QVector<std::shared_ptr<CategoryTreeModelLegacy::Item>>
+    CategoryTreeModelLegacy::getChilds(
+        std::shared_ptr<Item> parent) const noexcept {
   QVector<std::shared_ptr<Item>> childs;
   std::optional<Uuid> parentUuid = parent ? parent->uuid : std::nullopt;
   try {
@@ -204,7 +210,8 @@ QVector<std::shared_ptr<CategoryTreeModel::Item>> CategoryTreeModel::getChilds(
   return childs;
 }
 
-bool CategoryTreeModel::containsItems(const std::optional<Uuid>& uuid) const {
+bool CategoryTreeModelLegacy::containsItems(
+    const std::optional<Uuid>& uuid) const {
   if (listPackageCategories()) {
     if (mFilters.testFlag(Filter::PkgCatWithPackages) &&
         (mLibrary.getByCategory<Package>(uuid, 1).count() > 0)) {
@@ -227,16 +234,16 @@ bool CategoryTreeModel::containsItems(const std::optional<Uuid>& uuid) const {
   return false;
 }
 
-bool CategoryTreeModel::listAll() const noexcept {
+bool CategoryTreeModelLegacy::listAll() const noexcept {
   return mFilters.testFlag(Filter::PkgCat) || mFilters.testFlag(Filter::CmpCat);
 }
 
-bool CategoryTreeModel::listPackageCategories() const noexcept {
+bool CategoryTreeModelLegacy::listPackageCategories() const noexcept {
   return mFilters.testFlag(Filter::PkgCat) ||
       mFilters.testFlag(Filter::PkgCatWithPackages);
 }
 
-void CategoryTreeModel::updateModelItem(
+void CategoryTreeModelLegacy::updateModelItem(
     std::shared_ptr<Item> parentItem,
     const QVector<std::shared_ptr<Item>>& newChilds) noexcept {
   for (int i = 0; i < newChilds.count(); ++i) {
@@ -280,7 +287,7 @@ void CategoryTreeModel::updateModelItem(
   Q_ASSERT(parentItem->childs.count() == newChilds.count());
 }
 
-CategoryTreeModel::Item* CategoryTreeModel::itemFromIndex(
+CategoryTreeModelLegacy::Item* CategoryTreeModelLegacy::itemFromIndex(
     const QModelIndex& index) const noexcept {
   if (!index.isValid()) {
     return mRootItem.get();
@@ -295,7 +302,8 @@ CategoryTreeModel::Item* CategoryTreeModel::itemFromIndex(
   }
 }
 
-QModelIndex CategoryTreeModel::indexFromItem(const Item* item) const noexcept {
+QModelIndex CategoryTreeModelLegacy::indexFromItem(
+    const Item* item) const noexcept {
   if (std::shared_ptr<Item> parent = (item ? item->parent.lock() : nullptr)) {
     for (int i = 0; i < parent->childs.count(); ++i) {
       if (parent->childs.at(i).get() == item) {

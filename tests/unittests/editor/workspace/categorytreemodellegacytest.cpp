@@ -27,7 +27,7 @@
 #include <librepcb/core/sqlitedatabase.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <librepcb/core/workspace/workspacelibrarydbwriter.h>
-#include <librepcb/editor/workspace/categorytreemodel.h>
+#include <librepcb/editor/workspace/categorytreemodellegacy.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -43,7 +43,7 @@ namespace tests {
  *  Test Class
  ******************************************************************************/
 
-class CategoryTreeModelTest : public ::testing::Test {
+class CategoryTreeModelLegacyTest : public ::testing::Test {
 protected:
   struct Item {
     QString text;
@@ -55,14 +55,16 @@ protected:
   std::unique_ptr<SQLiteDatabase> mDb;
   std::unique_ptr<WorkspaceLibraryDbWriter> mWriter;
 
-  CategoryTreeModelTest() : mWsDir(FilePath::getRandomTempPath()) {
+  CategoryTreeModelLegacyTest() : mWsDir(FilePath::getRandomTempPath()) {
     FileUtils::makePath(mWsDir);
     mWsDb.reset(new WorkspaceLibraryDb(mWsDir));
     mDb.reset(new SQLiteDatabase(mWsDb->getFilePath()));
     mWriter.reset(new WorkspaceLibraryDbWriter(mWsDir, *mDb));
   }
 
-  virtual ~CategoryTreeModelTest() { QDir(mWsDir.toStr()).removeRecursively(); }
+  virtual ~CategoryTreeModelLegacyTest() {
+    QDir(mWsDir.toStr()).removeRecursively();
+  }
 
   std::string str(const QVariant& data) {
     return data.toString().toStdString();
@@ -78,7 +80,7 @@ protected:
     return s + "]";
   }
 
-  QVector<Item> getItems(const CategoryTreeModel& model,
+  QVector<Item> getItems(const CategoryTreeModelLegacy& model,
                          const QModelIndex& index = QModelIndex()) {
     QVector<Item> items;
     for (int i = 0; i < model.rowCount(index); ++i) {
@@ -112,24 +114,26 @@ protected:
  *  Tests
  ******************************************************************************/
 
-TEST_F(CategoryTreeModelTest, testDatabaseError) {
+TEST_F(CategoryTreeModelLegacyTest, testDatabaseError) {
   mDb->exec("DROP TABLE component_categories");
   mDb->exec("DROP TABLE package_categories");
 
-  CategoryTreeModel model(*mWsDb, {},
-                          CategoryTreeModel::Filter::CmpCat |
-                              CategoryTreeModel::Filter::CmpCatWithComponents);
+  CategoryTreeModelLegacy model(
+      *mWsDb, {},
+      CategoryTreeModelLegacy::Filter::CmpCat |
+          CategoryTreeModelLegacy::Filter::CmpCatWithComponents);
   EXPECT_EQ(str(QVector<Item>{}), str(getItems(model)));
 }
 
-TEST_F(CategoryTreeModelTest, testEmptyDb) {
-  CategoryTreeModel model(*mWsDb, {},
-                          CategoryTreeModel::Filter::CmpCat |
-                              CategoryTreeModel::Filter::CmpCatWithComponents);
+TEST_F(CategoryTreeModelLegacyTest, testEmptyDb) {
+  CategoryTreeModelLegacy model(
+      *mWsDb, {},
+      CategoryTreeModelLegacy::Filter::CmpCat |
+          CategoryTreeModelLegacy::Filter::CmpCatWithComponents);
   EXPECT_EQ(str(QVector<Item>{}), str(getItems(model)));
 }
 
-TEST_F(CategoryTreeModelTest, testData) {
+TEST_F(CategoryTreeModelLegacyTest, testData) {
   // - cat 1
   //   - cat 2
   int cat = mWriter->addCategory<ComponentCategory>(
@@ -141,7 +145,8 @@ TEST_F(CategoryTreeModelTest, testData) {
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 2"),
                                              std::nullopt, std::nullopt);
 
-  CategoryTreeModel model(*mWsDb, {}, CategoryTreeModel::Filter::CmpCat);
+  CategoryTreeModelLegacy model(*mWsDb, {},
+                                CategoryTreeModelLegacy::Filter::CmpCat);
   QModelIndex i1 = model.index(0, 0);
   EXPECT_EQ("cat 1", str(i1.data(Qt::DisplayRole)));
   EXPECT_EQ("desc 1", str(i1.data(Qt::ToolTipRole)));
@@ -152,7 +157,7 @@ TEST_F(CategoryTreeModelTest, testData) {
   EXPECT_EQ(str(uuid(2)), str(i2.data(Qt::UserRole)));
 }
 
-TEST_F(CategoryTreeModelTest, testComponentCategories) {
+TEST_F(CategoryTreeModelLegacyTest, testComponentCategories) {
   // - cat 1
   //   - cat 2
   //     - cat 3
@@ -174,7 +179,8 @@ TEST_F(CategoryTreeModelTest, testComponentCategories) {
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 4"),
                                              std::nullopt, std::nullopt);
 
-  CategoryTreeModel model(*mWsDb, {}, CategoryTreeModel::Filter::CmpCat);
+  CategoryTreeModelLegacy model(*mWsDb, {},
+                                CategoryTreeModelLegacy::Filter::CmpCat);
   QVector<Item> expected = {
       {"cat 1",
        {
@@ -188,7 +194,7 @@ TEST_F(CategoryTreeModelTest, testComponentCategories) {
   EXPECT_EQ(str(expected), str(getItems(model)));
 }
 
-TEST_F(CategoryTreeModelTest, testPackageCategories) {
+TEST_F(CategoryTreeModelLegacyTest, testPackageCategories) {
   // - cat 1
   //   - cat 2
   //     - cat 3
@@ -210,7 +216,8 @@ TEST_F(CategoryTreeModelTest, testPackageCategories) {
   mWriter->addTranslation<PackageCategory>(cat, "", ElementName("cat 4"),
                                            std::nullopt, std::nullopt);
 
-  CategoryTreeModel model(*mWsDb, {}, CategoryTreeModel::Filter::PkgCat);
+  CategoryTreeModelLegacy model(*mWsDb, {},
+                                CategoryTreeModelLegacy::Filter::PkgCat);
   QVector<Item> expected = {
       {"cat 1",
        {
@@ -224,7 +231,7 @@ TEST_F(CategoryTreeModelTest, testPackageCategories) {
   EXPECT_EQ(str(expected), str(getItems(model)));
 }
 
-TEST_F(CategoryTreeModelTest, testSort) {
+TEST_F(CategoryTreeModelLegacyTest, testSort) {
   // - cat 9
   // - cat 10
   // - cat foo
@@ -241,7 +248,8 @@ TEST_F(CategoryTreeModelTest, testSort) {
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 9"),
                                              std::nullopt, std::nullopt);
 
-  CategoryTreeModel model(*mWsDb, {}, CategoryTreeModel::Filter::CmpCat);
+  CategoryTreeModelLegacy model(*mWsDb, {},
+                                CategoryTreeModelLegacy::Filter::CmpCat);
   QVector<Item> expected = {
       {"cat 9", {}},
       {"cat 10", {}},
@@ -250,7 +258,7 @@ TEST_F(CategoryTreeModelTest, testSort) {
   EXPECT_EQ(str(expected), str(getItems(model)));
 }
 
-TEST_F(CategoryTreeModelTest, testCmpCatWithEmpty) {
+TEST_F(CategoryTreeModelLegacyTest, testCmpCatWithEmpty) {
   // - cat 1 (0 elements)
   //   - cat 2 (0 elements)
   //   - cat 3 (0 elements)
@@ -267,14 +275,15 @@ TEST_F(CategoryTreeModelTest, testCmpCatWithEmpty) {
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 3"),
                                              std::nullopt, std::nullopt);
 
-  CategoryTreeModel model(*mWsDb, {},
-                          CategoryTreeModel::Filter::CmpCatWithSymbols |
-                              CategoryTreeModel::Filter::CmpCatWithComponents |
-                              CategoryTreeModel::Filter::CmpCatWithDevices);
+  CategoryTreeModelLegacy model(
+      *mWsDb, {},
+      CategoryTreeModelLegacy::Filter::CmpCatWithSymbols |
+          CategoryTreeModelLegacy::Filter::CmpCatWithComponents |
+          CategoryTreeModelLegacy::Filter::CmpCatWithDevices);
   EXPECT_EQ(str(QVector<Item>{}), str(getItems(model)));
 }
 
-TEST_F(CategoryTreeModelTest, testCmpCatWithSymbols) {
+TEST_F(CategoryTreeModelLegacyTest, testCmpCatWithSymbols) {
   // - cat 1 (0 elements)
   //   - cat 2 (0 elements)
   //   - cat 3 (1 elements)
@@ -294,8 +303,8 @@ TEST_F(CategoryTreeModelTest, testCmpCatWithSymbols) {
                                         false, QString());
   mWriter->addToCategory<Symbol>(sym, uuid(3));
 
-  CategoryTreeModel model(*mWsDb, {},
-                          CategoryTreeModel::Filter::CmpCatWithSymbols);
+  CategoryTreeModelLegacy model(
+      *mWsDb, {}, CategoryTreeModelLegacy::Filter::CmpCatWithSymbols);
   QVector<Item> expected = {
       {"cat 1",
        {
@@ -305,7 +314,7 @@ TEST_F(CategoryTreeModelTest, testCmpCatWithSymbols) {
   EXPECT_EQ(str(expected), str(getItems(model)));
 }
 
-TEST_F(CategoryTreeModelTest, testCmpCatWithComponents) {
+TEST_F(CategoryTreeModelLegacyTest, testCmpCatWithComponents) {
   // - cat 1 (0 elements)
   //   - cat 2 (0 elements)
   //   - cat 3 (1 elements)
@@ -325,8 +334,8 @@ TEST_F(CategoryTreeModelTest, testCmpCatWithComponents) {
                                            version("0.1"), false, QString());
   mWriter->addToCategory<Component>(cmp, uuid(3));
 
-  CategoryTreeModel model(*mWsDb, {},
-                          CategoryTreeModel::Filter::CmpCatWithComponents);
+  CategoryTreeModelLegacy model(
+      *mWsDb, {}, CategoryTreeModelLegacy::Filter::CmpCatWithComponents);
   QVector<Item> expected = {
       {"cat 1",
        {
@@ -336,7 +345,7 @@ TEST_F(CategoryTreeModelTest, testCmpCatWithComponents) {
   EXPECT_EQ(str(expected), str(getItems(model)));
 }
 
-TEST_F(CategoryTreeModelTest, testCmpCatWithDevices) {
+TEST_F(CategoryTreeModelLegacyTest, testCmpCatWithDevices) {
   // - cat 1 (0 elements)
   //   - cat 2 (0 elements)
   //   - cat 3 (1 elements)
@@ -356,8 +365,8 @@ TEST_F(CategoryTreeModelTest, testCmpCatWithDevices) {
                                QString(), uuid(), uuid());
   mWriter->addToCategory<Device>(dev, uuid(3));
 
-  CategoryTreeModel model(*mWsDb, {},
-                          CategoryTreeModel::Filter::CmpCatWithDevices);
+  CategoryTreeModelLegacy model(
+      *mWsDb, {}, CategoryTreeModelLegacy::Filter::CmpCatWithDevices);
   QVector<Item> expected = {
       {"cat 1",
        {
@@ -367,7 +376,7 @@ TEST_F(CategoryTreeModelTest, testCmpCatWithDevices) {
   EXPECT_EQ(str(expected), str(getItems(model)));
 }
 
-TEST_F(CategoryTreeModelTest, testPkgCatWithEmpty) {
+TEST_F(CategoryTreeModelLegacyTest, testPkgCatWithEmpty) {
   // - cat 1 (0 elements)
   //   - cat 2 (0 elements)
   //   - cat 3 (0 elements)
@@ -384,12 +393,12 @@ TEST_F(CategoryTreeModelTest, testPkgCatWithEmpty) {
   mWriter->addTranslation<PackageCategory>(cat, "", ElementName("cat 3"),
                                            std::nullopt, std::nullopt);
 
-  CategoryTreeModel model(*mWsDb, {},
-                          CategoryTreeModel::Filter::PkgCatWithPackages);
+  CategoryTreeModelLegacy model(
+      *mWsDb, {}, CategoryTreeModelLegacy::Filter::PkgCatWithPackages);
   EXPECT_EQ(str(QVector<Item>{}), str(getItems(model)));
 }
 
-TEST_F(CategoryTreeModelTest, testPkgCatWithPackages) {
+TEST_F(CategoryTreeModelLegacyTest, testPkgCatWithPackages) {
   // - cat 1 (0 elements)
   //   - cat 2 (0 elements)
   //   - cat 3 (1 elements)
@@ -409,8 +418,8 @@ TEST_F(CategoryTreeModelTest, testPkgCatWithPackages) {
                                          version("0.1"), false, QString());
   mWriter->addToCategory<Package>(pkg, uuid(3));
 
-  CategoryTreeModel model(*mWsDb, {},
-                          CategoryTreeModel::Filter::PkgCatWithPackages);
+  CategoryTreeModelLegacy model(
+      *mWsDb, {}, CategoryTreeModelLegacy::Filter::PkgCatWithPackages);
   QVector<Item> expected = {
       {"cat 1",
        {
@@ -420,33 +429,34 @@ TEST_F(CategoryTreeModelTest, testPkgCatWithPackages) {
   EXPECT_EQ(str(expected), str(getItems(model)));
 }
 
-TEST_F(CategoryTreeModelTest, testWithoutCategory) {
+TEST_F(CategoryTreeModelLegacyTest, testWithoutCategory) {
   mWriter->addDevice(0, toAbs("dev"), uuid(), version("0.1"), false, QString(),
                      uuid(), uuid());
 
-  CategoryTreeModel model(*mWsDb, {},
-                          CategoryTreeModel::Filter::CmpCatWithDevices);
+  CategoryTreeModelLegacy model(
+      *mWsDb, {}, CategoryTreeModelLegacy::Filter::CmpCatWithDevices);
   QVector<Item> expected = {
       {"(Without Category)", {}},
   };
   EXPECT_EQ(str(expected), str(getItems(model)));
 }
 
-TEST_F(CategoryTreeModelTest, testInexistentCategory) {
+TEST_F(CategoryTreeModelLegacyTest, testInexistentCategory) {
   int dev = mWriter->addDevice(0, toAbs("dev"), uuid(), version("0.1"), false,
                                QString(), uuid(), uuid());
   mWriter->addToCategory<Device>(dev, uuid(1));  // Inexistent category.
 
-  CategoryTreeModel model(*mWsDb, {},
-                          CategoryTreeModel::Filter::CmpCatWithDevices);
+  CategoryTreeModelLegacy model(
+      *mWsDb, {}, CategoryTreeModelLegacy::Filter::CmpCatWithDevices);
   QVector<Item> expected = {
       {"(Without Category)", {}},
   };
   EXPECT_EQ(str(expected), str(getItems(model)));
 }
 
-TEST_F(CategoryTreeModelTest, testLiveUpdateAllNew) {
-  CategoryTreeModel model(*mWsDb, {}, CategoryTreeModel::Filter::CmpCat);
+TEST_F(CategoryTreeModelLegacyTest, testLiveUpdateAllNew) {
+  CategoryTreeModelLegacy model(*mWsDb, {},
+                                CategoryTreeModelLegacy::Filter::CmpCat);
   QVector<Item> expected = {};
   EXPECT_EQ(str(expected), str(getItems(model)));
 
@@ -486,7 +496,7 @@ TEST_F(CategoryTreeModelTest, testLiveUpdateAllNew) {
   EXPECT_EQ(str(expected), str(getItems(model)));
 }
 
-TEST_F(CategoryTreeModelTest, testLiveUpdateAllRemoved) {
+TEST_F(CategoryTreeModelLegacyTest, testLiveUpdateAllRemoved) {
   // - cat 1
   //   - cat 2
   //     - cat 3
@@ -508,7 +518,8 @@ TEST_F(CategoryTreeModelTest, testLiveUpdateAllRemoved) {
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 4"),
                                              std::nullopt, std::nullopt);
 
-  CategoryTreeModel model(*mWsDb, {}, CategoryTreeModel::Filter::CmpCat);
+  CategoryTreeModelLegacy model(*mWsDb, {},
+                                CategoryTreeModelLegacy::Filter::CmpCat);
   QVector<Item> expected = {
       {"cat 1",
        {
@@ -528,7 +539,7 @@ TEST_F(CategoryTreeModelTest, testLiveUpdateAllRemoved) {
   EXPECT_EQ(str(expected), str(getItems(model)));
 }
 
-TEST_F(CategoryTreeModelTest, testLiveUpdateVariousModifications) {
+TEST_F(CategoryTreeModelLegacyTest, testLiveUpdateVariousModifications) {
   // - cat 1
   //   - cat 2
   //     - cat 3
@@ -550,7 +561,8 @@ TEST_F(CategoryTreeModelTest, testLiveUpdateVariousModifications) {
   mWriter->addTranslation<ComponentCategory>(cat, "", ElementName("cat 4"),
                                              std::nullopt, std::nullopt);
 
-  CategoryTreeModel model(*mWsDb, {}, CategoryTreeModel::Filter::CmpCat);
+  CategoryTreeModelLegacy model(*mWsDb, {},
+                                CategoryTreeModelLegacy::Filter::CmpCat);
   QVector<Item> expected = {
       {"cat 1",
        {
@@ -612,7 +624,7 @@ TEST_F(CategoryTreeModelTest, testLiveUpdateVariousModifications) {
   EXPECT_EQ("cat 5", str(view.currentIndex().data()));
 }
 
-TEST_F(CategoryTreeModelTest, testSetLocaleOrder) {
+TEST_F(CategoryTreeModelLegacyTest, testSetLocaleOrder) {
   // - cat 1
   // - cat 2, cat 0 (de_CH)
   int cat = mWriter->addCategory<ComponentCategory>(
@@ -626,7 +638,8 @@ TEST_F(CategoryTreeModelTest, testSetLocaleOrder) {
   mWriter->addTranslation<ComponentCategory>(cat, "de_CH", ElementName("cat 0"),
                                              std::nullopt, std::nullopt);
 
-  CategoryTreeModel model(*mWsDb, {}, CategoryTreeModel::Filter::CmpCat);
+  CategoryTreeModelLegacy model(*mWsDb, {},
+                                CategoryTreeModelLegacy::Filter::CmpCat);
   QVector<Item> expected = {
       {"cat 1", {}},
       {"cat 2", {}},

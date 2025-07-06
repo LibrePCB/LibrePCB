@@ -31,7 +31,7 @@
 #include "../utils/editortoolbox.h"
 #include "../widgets/graphicsview.h"
 #include "../widgets/waitingspinnerwidget.h"
-#include "../workspace/categorytreemodel.h"
+#include "../workspace/categorytreemodellegacy.h"
 #include "../workspace/desktopservices.h"
 #include "partinformationtooltip.h"
 #include "ui_addcomponentdialog.h"
@@ -76,8 +76,9 @@ AddComponentDialog::AddComponentDialog(const WorkspaceLibraryDb& db,
     mComponentPreviewScene(new GraphicsScene()),
     mDevicePreviewScene(new GraphicsScene()),
     mLayers(GraphicsLayerList::previewLayers(&mSettings)),
-    mCategoryTreeModel(new CategoryTreeModel(
-        mDb, mLocaleOrder, CategoryTreeModel::Filter::CmpCatWithComponents)),
+    mCategoryTreeModel(new CategoryTreeModelLegacy(
+        mDb, mLocaleOrder,
+        CategoryTreeModelLegacy::Filter::CmpCatWithComponents)),
     mPartToolTip(new PartInformationToolTip(mSettings, this)),
     mPartInfoProgress(0),
     mUpdatePartInformationScheduled(false),

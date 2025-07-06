@@ -125,7 +125,7 @@ add_executable(
   editor/widgets/lengthedittest.cpp
   editor/widgets/positivelengthedittest.cpp
   editor/widgets/unsignedlengthedittest.cpp
-  editor/workspace/categorytreemodeltest.cpp
+  editor/workspace/categorytreemodellegacytest.cpp
   kicadimport/kicadlibraryimporttest.cpp
   main.cpp
   testhelpers.cpp

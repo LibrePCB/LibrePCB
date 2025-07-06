@@ -24,7 +24,7 @@
 
 #include "../../graphics/graphicsscene.h"
 #include "../../widgets/waitingspinnerwidget.h"
-#include "../../workspace/categorytreemodel.h"
+#include "../../workspace/categorytreemodellegacy.h"
 #include "symbolgraphicsitem.h"
 #include "ui_symbolchooserdialog.h"
 
@@ -68,9 +68,9 @@ SymbolChooserDialog::SymbolChooserDialog(const Workspace& ws,
       theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
   mUi->graphicsView->setScene(mPreviewScene.data());
 
-  mCategoryTreeModel.reset(
-      new CategoryTreeModel(mWorkspace.getLibraryDb(), localeOrder(),
-                            CategoryTreeModel::Filter::CmpCatWithSymbols));
+  mCategoryTreeModel.reset(new CategoryTreeModelLegacy(
+      mWorkspace.getLibraryDb(), localeOrder(),
+      CategoryTreeModelLegacy::Filter::CmpCatWithSymbols));
   mUi->treeCategories->setModel(mCategoryTreeModel.data());
   connect(mUi->treeCategories->selectionModel(),
           &QItemSelectionModel::currentChanged, this,
