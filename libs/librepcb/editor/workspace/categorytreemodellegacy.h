@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_CATEGORYTREEMODEL_H
-#define LIBREPCB_EDITOR_CATEGORYTREEMODEL_H
+#ifndef LIBREPCB_EDITOR_CATEGORYTREEMODELLEGACY_H
+#define LIBREPCB_EDITOR_CATEGORYTREEMODELLEGACY_H
 
 /*******************************************************************************
  *  Includes
@@ -39,13 +39,13 @@ class WorkspaceLibraryDb;
 namespace editor {
 
 /*******************************************************************************
- *  Class CategoryTreeModel
+ *  Class CategoryTreeModelLegacy
  ******************************************************************************/
 
 /**
- * @brief The CategoryTreeModel class
+ * @brief The CategoryTreeModelLegacy class
  */
-class CategoryTreeModel final : public QAbstractItemModel {
+class CategoryTreeModelLegacy final : public QAbstractItemModel {
   struct Item {
     std::weak_ptr<Item> parent;  ///< nullptr for root categories
     std::optional<Uuid> uuid;  ///< std::nullopt for items without category
@@ -73,12 +73,12 @@ public:
   Q_DECLARE_FLAGS(Filters, Filter)
 
   // Constructors / Destructor
-  CategoryTreeModel() = delete;
-  CategoryTreeModel(const CategoryTreeModel& other) = delete;
-  explicit CategoryTreeModel(const WorkspaceLibraryDb& library,
-                             const QStringList& localeOrder,
-                             Filters filters) noexcept;
-  ~CategoryTreeModel() noexcept;
+  CategoryTreeModelLegacy() = delete;
+  CategoryTreeModelLegacy(const CategoryTreeModelLegacy& other) = delete;
+  explicit CategoryTreeModelLegacy(const WorkspaceLibraryDb& library,
+                                   const QStringList& localeOrder,
+                                   Filters filters) noexcept;
+  ~CategoryTreeModelLegacy() noexcept;
 
   // Setters
   void setLocaleOrder(const QStringList& order) noexcept;
@@ -98,7 +98,8 @@ public:
                 int role = Qt::DisplayRole) const noexcept override;
 
   // Operator Overloadings
-  CategoryTreeModel& operator=(const CategoryTreeModel& rhs) = delete;
+  CategoryTreeModelLegacy& operator=(const CategoryTreeModelLegacy& rhs) =
+      delete;
 
 private:  // Methods
   void update() noexcept;
@@ -123,7 +124,8 @@ private:  // Data
 }  // namespace editor
 }  // namespace librepcb
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(librepcb::editor::CategoryTreeModel::Filters)
+Q_DECLARE_OPERATORS_FOR_FLAGS(
+    librepcb::editor::CategoryTreeModelLegacy::Filters)
 
 /*******************************************************************************
  *  End of File

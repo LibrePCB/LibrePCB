@@ -957,8 +957,8 @@ add_library(
   windowsection.h
   windowtab.cpp
   windowtab.h
-  workspace/categorytreemodel.cpp
-  workspace/categorytreemodel.h
+  workspace/categorytreemodellegacy.cpp
+  workspace/categorytreemodellegacy.h
   workspace/desktopintegration.cpp
   workspace/desktopintegration.h
   workspace/desktopservices.cpp

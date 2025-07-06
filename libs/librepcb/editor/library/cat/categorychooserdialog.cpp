@@ -50,7 +50,7 @@ CategoryChooserDialog::CategoryChooserDialog(const Workspace& ws,
   connect(mUi->treeView, &QTreeView::doubleClicked, this,
           &CategoryChooserDialog::accept);
 
-  mModel.reset(new CategoryTreeModel(
+  mModel.reset(new CategoryTreeModelLegacy(
       ws.getLibraryDb(), ws.getSettings().libraryLocaleOrder.get(), filters));
   mUi->treeView->setModel(mModel.data());
   mUi->treeView->setRootIndex(QModelIndex());
