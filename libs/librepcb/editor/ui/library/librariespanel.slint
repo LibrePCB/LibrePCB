@@ -16,12 +16,12 @@ import {
     Constants,
     Data,
     LibraryAction,
-    LibraryData,
+    LibraryInfoData,
     LibraryListData,
 } from "../api.slint";
 
 component LibraryUninstallPopup inherits MessagePopup {
-    in-out property <[LibraryData]> model;
+    in-out property <[LibraryInfoData]> model;
     in property <int> index;
 
     title: @tr("Uninstall {}", model[index].name);
@@ -47,20 +47,20 @@ component LibraryUninstallPopup inherits MessagePopup {
     }
 
     accepted => {
-        model[index].action = LibraryAction.uninstall;
+        Backend.trigger-library(model[index].path, LibraryAction.uninstall);
         self.close();
     }
 }
 
 component LibraryListViewItem inherits Rectangle {
-    in-out property <[LibraryData]> model;
+    in-out property <[LibraryInfoData]> model;
     in property <int> index;
     in property <bool> remote: false;
     in property <bool> check-all: false;
     in property <bool> is-current: false;
     in property <bool> enabled: true;
     in property <length> scrollbar-width: 0;
-    property <LibraryData> lib: model[index];
+    property <LibraryInfoData> lib: model[index];
     property <bool> has-switch: remote && (!lib.uuid.is-empty);
     property <bool> version-as-badge: (!lib.installed-version.is-empty) && (remote || (!lib.online-version.is-empty));
     property <bool> buttons-visible: ta.has-hover || is-current;
@@ -261,7 +261,7 @@ component LibraryListViewItem inherits Rectangle {
 
         double-clicked => {
             if !lib.path.is-empty {
-                model[index].action = LibraryAction.open;
+                Backend.trigger-library(lib.path, LibraryAction.open);
             }
         }
     }
@@ -270,7 +270,7 @@ component LibraryListViewItem inherits Rectangle {
 component LibrariesPanelSection inherits FocusScope {
     in property <string> title;
     in property <string> title-count;
-    in-out property <[LibraryData]> libraries;
+    in-out property <[LibraryInfoData]> libraries;
     in property <LibraryListData> data;
     in property <bool> remote;
     in property <int> min-items-height: 1;
@@ -388,7 +388,7 @@ component LibrariesPanelSection inherits FocusScope {
             }
         }
 
-        if (!Data.libraries-filter.is-empty) && (libraries.length == 0) && (data.installed > 0): HorizontalLayout {
+        if (!Data.libraries-panel-filter.is-empty) && (libraries.length == 0) && (data.installed > 0): HorizontalLayout {
             padding: 8px;
 
             no-libs-matching-filter-txt := Text {
@@ -411,7 +411,7 @@ component LibrariesPanelSection inherits FocusScope {
             accessible-item-count: libraries.length;
 
             changed item-count => {
-                if !Data.libraries-filter.is-empty {
+                if !Data.libraries-panel-filter.is-empty {
                     self.viewport-y = 0;
                     current-index = (item-count > 0) ? 0 : -1;
                 }
@@ -458,7 +458,7 @@ component LibrariesPanelSection inherits FocusScope {
             return accept;
         } else if (current-index >= 0) && (current-index < libraries.length) {
             if (event.text == Key.Return) && (!libraries[current-index].path.is-empty) {
-                libraries[current-index].action = LibraryAction.open;
+                Backend.trigger-library(libraries[current-index].path, LibraryAction.open);
                 return accept;
             } else if event.text == Key.Delete {
                 uninstall-library(current-index);
@@ -634,8 +634,8 @@ export component LibrariesPanel inherits Rectangle {
             padding: min(5px, filter-edt.height);
 
             filter-edt := FilterTermEdit {
-                height: Data.libraries-filter.is-empty ? 0 : self.preferred-height;
-                term: Data.libraries-filter;
+                height: Data.libraries-panel-filter.is-empty ? 0 : self.preferred-height;
+                term: Data.libraries-panel-filter;
 
                 animate height { duration: 100ms; }
 

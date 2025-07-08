@@ -51,7 +51,8 @@ class LibraryDownload;
 /**
  * @brief The LibrariesModel class
  */
-class LibrariesModel : public QObject, public slint::Model<ui::LibraryData> {
+class LibrariesModel : public QObject,
+                       public slint::Model<ui::LibraryInfoData> {
   Q_OBJECT
 
 public:
@@ -75,9 +76,9 @@ public:
 
   // Implementations
   std::size_t row_count() const override;
-  std::optional<ui::LibraryData> row_data(std::size_t i) const override;
+  std::optional<ui::LibraryInfoData> row_data(std::size_t i) const override;
   void set_row_data(std::size_t i,
-                    const ui::LibraryData& data) noexcept override;
+                    const ui::LibraryInfoData& data) noexcept override;
 
   // Operator Overloadings
   LibrariesModel& operator=(const LibrariesModel& rhs) = delete;
@@ -85,6 +86,7 @@ public:
 signals:
   void uiDataChanged(ui::LibraryListData data);
   void onlineVersionsAvailable(const QHash<Uuid, Version>& versions);
+  void aboutToUninstallLibrary(const FilePath& fp);
 
 private:
   void updateLibraries(bool resetHighlight = true) noexcept;
@@ -98,19 +100,19 @@ private:
   void updateCheckStates(bool notify) noexcept;
   void checkMissingDependenciesOfLibs() noexcept;
   void uncheckLibsWithUnmetDependencies() noexcept;
-  bool isLibraryChecked(const ui::LibraryData& lib) const noexcept;
-  static bool isMarkedForInstall(const ui::LibraryData& lib) noexcept;
-  static bool isMarkedForUpdate(const ui::LibraryData& lib) noexcept;
-  static bool isMarkedForUninstall(const ui::LibraryData& lib) noexcept;
+  bool isLibraryChecked(const ui::LibraryInfoData& lib) const noexcept;
+  static bool isMarkedForInstall(const ui::LibraryInfoData& lib) noexcept;
+  static bool isMarkedForUpdate(const ui::LibraryInfoData& lib) noexcept;
+  static bool isMarkedForUninstall(const ui::LibraryInfoData& lib) noexcept;
   std::optional<std::size_t> indexOf(const Uuid& uuid) noexcept;
 
   Workspace& mWorkspace;
   const Mode mMode;
-  std::vector<ui::LibraryData> mInstalledLibs;  /// Either local or remote libs
+  std::vector<ui::LibraryInfoData> mInstalledLibs;  /// Either local or remote
   QStringList mInstalledLibsErrors;
   QHash<Uuid, ApiEndpoint::Library> mOnlineLibs;
   QStringList mOnlineLibsErrors;
-  std::vector<ui::LibraryData> mMergedLibs;
+  std::vector<ui::LibraryInfoData> mMergedLibs;
   QHash<Uuid, bool> mCheckStates;
 
   bool mRequestIcons;

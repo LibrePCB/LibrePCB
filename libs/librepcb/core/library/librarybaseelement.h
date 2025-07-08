@@ -100,6 +100,7 @@ public:
   void setMessageApprovals(const QSet<SExpression>& approvals) noexcept {
     mMessageApprovals = approvals;
   }
+  bool setMessageApproved(const SExpression& approval, bool approved) noexcept;
 
   // General Methods
   virtual RuleCheckMessageList runChecks() const;

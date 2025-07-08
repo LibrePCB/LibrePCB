@@ -1,0 +1,56 @@
+import { Badge, LinkText } from "../widgets.slint";
+import { RuleCheckData } from "../api.slint";
+
+export component LibraryRuleCheckLink inherits HorizontalLayout {
+    in property <RuleCheckData> data;
+    property <bool> has-messages: (data.unapproved > 0) || (data.messages.length > 0);
+    property <string> text: {
+        if data.unapproved > 0 {
+            @tr("{n} warning" | "{n} warnings" % data.unapproved)
+        } else if data.messages.length > 0 {
+            @tr("{n} approved message" | "{n} approved messages" % data.messages.length)
+        } else {
+            @tr("All checks passed!")
+        }
+    };
+
+    callback clicked;
+
+    // Accessibility
+    accessible-role: button;
+    accessible-description: "rule check status";
+    accessible-enabled: true;
+    accessible-label: text;
+    accessible-action-default => {
+        clicked();
+    }
+
+    if has-messages: badge := Badge {
+        y: (parent.height - self.height) / 2;
+        background: (data.unapproved > 0) ? #ff0000 : #006000;
+        border-color: self.background;
+        text-color: (data.unapproved > 0) ? white : #d0d0d0;
+        text-color-hover: (data.unapproved > 0) ? #c0c0c0 : white;
+        font-size: 12px;
+        text: text;
+        clickable: true;
+        accessible-role: none;
+
+        clicked => {
+            clicked();
+        }
+    }
+
+    if !has-messages: link-btn := LinkText {
+        text-color: #00d000;
+        text-color-hovered: #00ff00;
+        vertical-alignment: center;
+        text: text;
+        overflow: elide;
+        accessible-role: none;
+
+        clicked => {
+            clicked();
+        }
+    }
+}

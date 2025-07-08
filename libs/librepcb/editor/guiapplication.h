@@ -42,7 +42,7 @@ class Workspace;
 namespace editor {
 
 class LibrariesModel;
-class LibraryEditorLegacy;
+class LibraryEditor;
 class MainWindow;
 class Notification;
 class NotificationsModel;
@@ -80,6 +80,12 @@ public:
   // Libraries
   LibrariesModel& getLocalLibraries() noexcept { return *mLocalLibraries; }
   LibrariesModel& getRemoteLibraries() noexcept { return *mRemoteLibraries; }
+  const QVector<std::shared_ptr<LibraryEditor>>& getLibraries() noexcept {
+    return mLibraries->values();
+  }
+  std::shared_ptr<LibraryEditor> getLibrary(const FilePath& libDir) noexcept;
+  std::shared_ptr<LibraryEditor> openLibrary(const FilePath& libDir) noexcept;
+  void closeLibrary(const FilePath& libDir) noexcept;
   bool requestClosingAllLibraries() noexcept;
 
   // Projects
@@ -127,10 +133,6 @@ private:
   void openProjectPassedByOs(const QString& file, bool silent = false) noexcept;
   void openProjectLibraryUpdater(const FilePath& project) noexcept;
 
-  void openLibraryEditor(const FilePath& libDir) noexcept;
-  void libraryEditorDestroyed() noexcept;
-  bool closeAllLibraryEditors(bool askForSave) noexcept;
-
   std::shared_ptr<MainWindow> getCurrentWindow() noexcept;
   void updateLibrariesContainStandardComponents() noexcept;
   void updateNoLibrariesInstalledNotification() noexcept;
@@ -146,7 +148,7 @@ private:
   std::shared_ptr<LibrariesModel> mRemoteLibraries;
   std::unique_ptr<SlintKeyEventTextBuilder> mLibrariesFilter;
   std::shared_ptr<UiObjectList<ProjectEditor, ui::ProjectData>> mProjects;
-  QHash<FilePath, LibraryEditorLegacy*> mOpenLibraryEditors;
+  std::shared_ptr<UiObjectList<LibraryEditor, ui::LibraryData>> mLibraries;
   std::unique_ptr<ProjectLibraryUpdater> mProjectLibraryUpdater;
   QList<std::shared_ptr<MainWindow>> mWindows;
   QTimer mSaveOpenedWindowsCountdown;

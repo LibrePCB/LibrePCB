@@ -95,7 +95,7 @@ bool CategoryTreeBuilder<ElementType>::getParentNames(
       return false;
     }
   } else if (mNulloptIsRootCategory) {
-    names.prepend(tr("Root category"));
+    names.prepend(tr("Root Category"));
   }
   return true;
 }

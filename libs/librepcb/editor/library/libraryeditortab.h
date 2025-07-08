@@ -17,17 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_CREATELIBRARYTAB_H
-#define LIBREPCB_EDITOR_CREATELIBRARYTAB_H
+#ifndef LIBREPCB_EDITOR_LIBRARYEDITORTAB_H
+#define LIBREPCB_EDITOR_LIBRARYEDITORTAB_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "windowtab.h"
+#include "../windowtab.h"
 
-#include <librepcb/core/fileio/filepath.h>
-#include <librepcb/core/types/elementname.h>
-#include <librepcb/core/types/version.h>
+#include <librepcb/core/rulecheck/rulecheckmessage.h>
 
 #include <QtCore>
 
@@ -37,51 +35,68 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class SExpression;
+
 namespace editor {
 
+class LibraryEditor;
+class RuleCheckMessagesModel;
+class UndoStack;
+
 /*******************************************************************************
- *  Class CreateLibraryTab
+ *  Class LibraryEditorTab
  ******************************************************************************/
 
 /**
- * @brief The CreateLibraryTab class
+ * @brief Specialized base class for all library editor tabs
  */
-class CreateLibraryTab final : public WindowTab {
+class LibraryEditorTab : public WindowTab {
   Q_OBJECT
 
 public:
-  // Signals
-  Signal<CreateLibraryTab> onDerivedUiDataChanged;
-
   // Constructors / Destructor
-  CreateLibraryTab() = delete;
-  CreateLibraryTab(const CreateLibraryTab& other) = delete;
-  explicit CreateLibraryTab(GuiApplication& app,
+  LibraryEditorTab() = delete;
+  LibraryEditorTab(const LibraryEditorTab& other) = delete;
+  explicit LibraryEditorTab(LibraryEditor& editor,
                             QObject* parent = nullptr) noexcept;
-  ~CreateLibraryTab() noexcept;
+  virtual ~LibraryEditorTab() noexcept;
 
   // General Methods
-  ui::TabData getUiData() const noexcept override;
-  const ui::CreateLibraryTabData& getDerivedUiData() const noexcept {
-    return mUiData;
-  }
-  void setDerivedUiData(const ui::CreateLibraryTabData& data) noexcept;
-  void trigger(ui::TabAction a) noexcept override;
+  virtual FilePath getDirectoryPath() const noexcept = 0;
 
   // Operator Overloadings
-  CreateLibraryTab& operator=(const CreateLibraryTab& rhs) = delete;
+  LibraryEditorTab& operator=(const LibraryEditorTab& rhs) = delete;
 
-signals:
-  void libraryCreated(const FilePath& fp);
+protected:
+  bool isPathOutsideLibDir() const noexcept;
+  bool hasUnsavedChanges() const noexcept;
+  void scheduleChecks() noexcept;
+  void runChecks() noexcept;
+  virtual std::optional<std::pair<RuleCheckMessageList, QSet<SExpression>>>
+      runChecksImpl() = 0;
+  virtual bool autoFixImpl(const std::shared_ptr<const RuleCheckMessage>& msg,
+                           bool checkOnly) = 0;
+  virtual void messageApprovalChanged(const SExpression& approval,
+                                      bool approved) noexcept = 0;
+  virtual void notifyDerivedUiDataChanged() noexcept = 0;
+  QString getWorkspaceSettingsUserName() const noexcept;
 
 private:
-  void validate() noexcept;
+  bool autoFixHandler(const std::shared_ptr<const RuleCheckMessage>& msg,
+                      bool checkOnly) noexcept;
 
-  ui::CreateLibraryTabData mUiData;
-  std::optional<ElementName> mName;
-  std::optional<Version> mVersion;
-  std::optional<QUrl> mUrl;
-  FilePath mDirectory;
+protected:
+  LibraryEditor& mEditor;
+  std::unique_ptr<UndoStack> mUndoStack;
+  bool mManualModificationsMade;
+
+  // Rule check
+  QSet<SExpression> mSupportedApprovals;
+  QSet<SExpression> mDisappearedApprovals;
+  std::shared_ptr<RuleCheckMessagesModel> mCheckMessages;
+  slint::SharedString mCheckError;
+  QTimer mRuleCheckDelayTimer;
 };
 
 /*******************************************************************************

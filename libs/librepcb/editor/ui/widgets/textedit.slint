@@ -1,0 +1,130 @@
+import { Palette } from "std-widgets.slint";
+import { Constants } from "../api.slint";
+
+export component TextEdit inherits Rectangle {
+    in-out property <string> text;
+    in property <string> placeholder-text;
+    in property <string> validation-error: validate(edt.text);
+    in property <bool> enabled: true;
+    in property <bool> read-only: false;
+    in property <length> font-size: 13px;
+    out property <bool> has-focus <=> edt.has-focus;
+
+    pure callback validate(string) -> string;
+
+    callback text-edited(string);
+    text-edited(text) => {
+        self.text = text;
+    }
+
+    callback text-accepted(string);
+
+    callback key-pressed(KeyEvent) -> EventResult;
+
+    public function select-all() {
+        edt.select-all();
+    }
+
+    changed text => {
+        if text != edt.text {
+            edt.text = text;
+        }
+    }
+
+    changed has-focus => {
+        if !has-focus {
+            text-accepted(edt.text);
+            edt.text = self.text;
+        }
+    }
+
+    preferred-width: max(placeholder-txt.preferred-width, edt.preferred-width) + (2 * edt.x);
+    preferred-height: max(placeholder-txt.preferred-height, edt.preferred-height) + (2 * edt.y);
+    horizontal-stretch: 1;
+    background: #202020;
+    border-color: {
+        if enabled && (!validation-error.is-empty) {
+            edt.has-focus ? #ff0000 : #900000
+        } else if edt.has-focus {
+            Constants.librepcb-color
+        } else if enabled {
+            #606060
+        } else {
+            transparent
+        }
+    }
+    border-width: 1px;
+    border-radius: 10px;
+    forward-focus: edt;
+
+    // Accessibility
+    accessible-role: text-input;
+    accessible-enabled: enabled;
+    accessible-value: edt.text;
+    accessible-placeholder-text: placeholder-text;
+    accessible-read-only: read-only;
+    accessible-action-set-value(t) => {
+        text-edited(t)
+    }
+
+    placeholder-txt := Text {
+        x: 10px;
+        y: 8px;
+        width: root.width - (2 * self.x);
+        height: parent.height - (2 * self.y);
+        font-size: font-size;
+        color: enabled ? #909090 : #707070;
+        text: placeholder-text;
+        wrap: word-wrap;
+        overflow: elide;
+        visible: edt.text.is-empty && (!placeholder-text.is-empty);
+        accessible-role: none;
+    }
+
+    edt := TextInput {
+        x: placeholder-txt.x;
+        y: placeholder-txt.y;
+        width: parent.width - (2 * self.x);
+        height: parent.height - (2 * self.y);
+        font-size: font-size;
+        color: enabled ? Palette.foreground : Palette.foreground.darker(0.5);
+        selection-background-color: Constants.librepcb-color;
+        selection-foreground-color: black;
+        enabled: enabled;
+        read-only: read-only;
+        single-line: false;
+        wrap: word-wrap;
+        text: text;
+        accessible-role: none;
+
+        edited => {
+            text-edited(self.text);
+        }
+
+        key-pressed(event) => {
+            root.key-pressed(event)
+        }
+    }
+
+    if enabled && (!validation-error.is-empty): Rectangle {
+        x: root.width - self.width - 20px;
+        y: -8px;
+        width: min(validation-error-txt.preferred-width + 10px, root.width * 0.8);
+        height: validation-error-txt.preferred-height + 4px;
+        background: #101010;
+        border-width: 1px;
+        border-radius: self.height / 2;
+        border-color: root.border-color;
+
+        validation-error-txt := Text {
+            x: 5px;
+            width: parent.width - 10px;
+            vertical-alignment: center;
+            font-size: 11px;
+            overflow: elide;
+            color: root.border-color;
+            text: validation-error;
+            accessible-description: "validation error";
+        }
+    }
+}
