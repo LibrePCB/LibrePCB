@@ -111,6 +111,22 @@ QStringList LibraryBaseElement::getAllAvailableLocales() const noexcept {
 }
 
 /*******************************************************************************
+ *  Setters
+ ******************************************************************************/
+
+bool LibraryBaseElement::setMessageApproved(const SExpression& approval,
+                                            bool approved) noexcept {
+  if (approved && (!mMessageApprovals.contains(approval))) {
+    mMessageApprovals.insert(approval);
+    return true;
+  } else if ((!approved) && mMessageApprovals.contains(approval)) {
+    mMessageApprovals.remove(approval);
+    return true;
+  }
+  return false;
+}
+
+/*******************************************************************************
  *  General Methods
  ******************************************************************************/
 

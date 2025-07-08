@@ -63,7 +63,6 @@ public slots:
   QVariant isLibraryScanFinished(QVariant) const noexcept {
     return mLibraryScanFinished;
   }
-  QVariant openLibraryEditor(QVariant path) noexcept;
   QVariant getOpenProjects(QVariant) const noexcept;
 
 signals:

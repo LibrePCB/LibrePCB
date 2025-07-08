@@ -110,6 +110,7 @@ void WorkspaceLibraryScanner::scan() noexcept {
     QElapsedTimer timer;
     timer.start();
     emit scanStarted();
+    emit scanInProgressChanged(true);
     emit scanProgressUpdate(0);
     qDebug() << "Start workspace library scan in worker thread...";
 
@@ -187,6 +188,7 @@ void WorkspaceLibraryScanner::scan() noexcept {
     emit scanFailed(e.getMsg());
   }
   emit scanProgressUpdate(100);
+  emit scanInProgressChanged(false);
   emit scanFinished();
 }
 

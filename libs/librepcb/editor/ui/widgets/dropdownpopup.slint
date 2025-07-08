@@ -24,7 +24,7 @@ export component DropDownPopup inherits PopupWindow {
     y: root.height + 2px;
     width: self.preferred-width;
     preferred-height: l.preferred-height;
-    max-height: 500px;
+    max-height: 20 * item-height;  // Should be a multiple of item height.
     forward-focus: fs;
 
     // Accessibility

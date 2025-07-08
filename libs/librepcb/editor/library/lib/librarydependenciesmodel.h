@@ -17,18 +17,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_LIBRARYLISTEDITORWIDGET_H
-#define LIBREPCB_EDITOR_LIBRARYLISTEDITORWIDGET_H
+#ifndef LIBREPCB_EDITOR_LIBRARYDEPENDENCIESMODEL_H
+#define LIBREPCB_EDITOR_LIBRARYDEPENDENCIESMODEL_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../modelview/editablelistmodel.h"
+#include "appwindow.h"
 
 #include <librepcb/core/types/uuid.h>
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -39,50 +38,50 @@ class Workspace;
 
 namespace editor {
 
-class SortFilterProxyModel;
-
-namespace Ui {
-class LibraryListEditorWidget;
-}
-
 /*******************************************************************************
- *  Class LibraryListEditorWidget
+ *  Class LibraryDependenciesModel
  ******************************************************************************/
 
 /**
- * @brief The LibraryListEditorWidget class
+ * @brief The LibraryDependenciesModel class
  */
-class LibraryListEditorWidget final : public QWidget {
+class LibraryDependenciesModel final
+  : public QObject,
+    public slint::Model<ui::LibraryDependency> {
   Q_OBJECT
-
-  typedef EditableListModel<QList<Uuid>> Model;
 
 public:
   // Constructors / Destructor
-  LibraryListEditorWidget() = delete;
-  explicit LibraryListEditorWidget(const Workspace& ws,
-                                   QWidget* parent = nullptr) noexcept;
-  LibraryListEditorWidget(const LibraryListEditorWidget& other) = delete;
-  ~LibraryListEditorWidget() noexcept;
+  LibraryDependenciesModel() = delete;
+  LibraryDependenciesModel(const LibraryDependenciesModel& other) = delete;
+  explicit LibraryDependenciesModel(const Workspace& ws, const Uuid& libUuid,
+                                    QObject* parent = nullptr) noexcept;
+  ~LibraryDependenciesModel() noexcept;
 
-  // Getters
-  QSet<Uuid> getUuids() const noexcept;
-
-  // Setters
-  void setReadOnly(bool readOnly) noexcept;
+  // General Methods
+  const QSet<Uuid>& getUuids() const noexcept { return mCheckedUuids; }
   void setUuids(const QSet<Uuid>& uuids) noexcept;
 
+  // Implementations
+  std::size_t row_count() const override;
+  std::optional<ui::LibraryDependency> row_data(std::size_t i) const override;
+  void set_row_data(std::size_t i,
+                    const ui::LibraryDependency& data) noexcept override;
+
   // Operator Overloadings
-  LibraryListEditorWidget& operator=(const LibraryListEditorWidget& rhs) =
+  LibraryDependenciesModel& operator=(const LibraryDependenciesModel& rhs) =
       delete;
 
 signals:
-  void edited();
+  void modified(const QSet<Uuid>& uuids);
 
-protected:  // Data
-  QScopedPointer<Model> mModel;
-  QScopedPointer<SortFilterProxyModel> mProxyModel;
-  QScopedPointer<Ui::LibraryListEditorWidget> mUi;
+private:
+  void refresh() noexcept;
+
+  const Workspace& mWs;
+  const Uuid mLibUuid;
+  QSet<Uuid> mCheckedUuids;
+  std::vector<ui::LibraryDependency> mItems;
 };
 
 /*******************************************************************************

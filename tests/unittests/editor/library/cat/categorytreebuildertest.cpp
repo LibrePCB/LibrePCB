@@ -116,8 +116,8 @@ TEST_F(CategoryTreeBuilderTest, testEmptyDbNull) {
 }
 
 TEST_F(CategoryTreeBuilderTest, testEmptyRootDbNull) {
-  test<ComponentCategory>({}, true, std::nullopt, true, {"Root category"});
-  test<PackageCategory>({}, true, std::nullopt, true, {"Root category"});
+  test<ComponentCategory>({}, true, std::nullopt, true, {"Root Category"});
+  test<PackageCategory>({}, true, std::nullopt, true, {"Root Category"});
 }
 
 TEST_F(CategoryTreeBuilderTest, testInexistent) {
@@ -185,7 +185,7 @@ TEST_F(CategoryTreeBuilderTest, testLocaleOrder) {
   test<ComponentCategory>({"fr_FR", "de_CH", "de_DE"}, false, uuid(1), true,
                           {"cat 3", "cat 2 ch", "cat 1 de"});
   test<ComponentCategory>({"fr_FR", "de_CH", "de_DE"}, true, uuid(1), true,
-                          {"Root category", "cat 3", "cat 2 ch", "cat 1 de"});
+                          {"Root Category", "cat 3", "cat 2 ch", "cat 1 de"});
 }
 
 TEST_F(CategoryTreeBuilderTest, testMultipleParents) {
@@ -210,7 +210,7 @@ TEST_F(CategoryTreeBuilderTest, testMultipleParents) {
                           {"cat 4", "cat 3", "cat 2", "cat 1"});
   test<ComponentCategory>(
       {}, true, uuid(1), true,
-      {"Root category", "cat 4", "cat 3", "cat 2", "cat 1"});
+      {"Root Category", "cat 4", "cat 3", "cat 2", "cat 1"});
 }
 
 TEST_F(CategoryTreeBuilderTest, testEndlessRecursionDirect) {

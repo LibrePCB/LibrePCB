@@ -6,7 +6,7 @@ import { Constants } from "../api.slint";
 export component LineEdit inherits Rectangle {
     in-out property <string> text;
     in property <string> placeholder-text;
-    in property <string> validation-error;
+    in property <string> validation-error: validate(edt.text);
     in property <bool> enabled: true;
     in property <bool> read-only: false;
     in property <length> font-size: 13px;
@@ -15,6 +15,8 @@ export component LineEdit inherits Rectangle {
     out property <bool> has-focus <=> edt.has-focus;
     property <int> current-autocompletion-index: -1;
     property <int> current-suggestion-index: -1;
+
+    pure callback validate(string) -> string;
 
     callback text-edited(string);
     text-edited(text) => {
@@ -25,6 +27,8 @@ export component LineEdit inherits Rectangle {
     autocompletion-accepted(text) => {
         text-edited(text);
     }
+
+    callback text-accepted(string);
 
     callback key-pressed(KeyEvent) -> EventResult;
 
@@ -47,7 +51,8 @@ export component LineEdit inherits Rectangle {
         if has-focus {
             current-autocompletion-index = -1;
         } else {
-            edt.text = text;
+            text-accepted(edt.text);
+            edt.text = self.text;
         }
     }
 
@@ -93,6 +98,7 @@ export component LineEdit inherits Rectangle {
         wrap: no-wrap;
         overflow: elide;
         visible: edt.text.is-empty && (!placeholder-text.is-empty);
+        accessible-role: none;
     }
 
     ta := TouchArea {
@@ -105,7 +111,7 @@ export component LineEdit inherits Rectangle {
             padding-right: 3px;
 
             view := ScrollView {
-                min-width: edt.min-width;
+                min-width: 0;  // Required to avoid text overflow.
                 preferred-width: edt.preferred-width;
                 viewport-width: edt.width;
                 viewport-height: edt.height;
@@ -154,7 +160,7 @@ export component LineEdit inherits Rectangle {
                         } else if root.key-pressed(event) == accept {
                             return accept;
                         }
-                        reject;
+                        reject
                     }
                 }
             }
@@ -163,7 +169,7 @@ export component LineEdit inherits Rectangle {
                 width: 5px;
             }
 
-            clear-btn := IconButton {
+            if enabled && (!read-only): clear-btn := IconButton {
                 y: (parent.height - self.height) / 2;
                 height: 18px;
                 background-color: root.background;

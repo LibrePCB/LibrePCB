@@ -22,11 +22,16 @@
  ******************************************************************************/
 #include "mainwindow.h"
 
+#include "dialogs/directorylockhandlerdialog.h"
 #include "editorcommandsetupdater.h"
 #include "guiapplication.h"
 #include "library/createlibrarytab.h"
 #include "library/downloadlibrarytab.h"
+#include "library/eaglelibraryimportwizard/eaglelibraryimportwizard.h"
+#include "library/kicadlibraryimportwizard/kicadlibraryimportwizard.h"
+#include "library/lib/librarytab.h"
 #include "library/librariesmodel.h"
+#include "library/libraryeditor.h"
 #include "mainwindowtestadapter.h"
 #include "notificationsmodel.h"
 #include "project/board/board2dtab.h"
@@ -40,8 +45,10 @@
 #include "utils/standardeditorcommandhandler.h"
 #include "windowsection.h"
 #include "windowtab.h"
+#include "workspace/desktopservices.h"
 #include "workspace/filesystemmodel.h"
 
+#include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
@@ -156,6 +163,19 @@ MainWindow::MainWindow(GuiApplication& app,
         this, [this, section, tab, a]() { triggerTab(section, tab, a); },
         Qt::QueuedConnection);
   });
+  b.on_trigger_library([this](slint::SharedString path, ui::LibraryAction a) {
+    // if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0): Remove lambda.
+    QMetaObject::invokeMethod(
+        this, [this, path, a]() { triggerLibrary(path, a); },
+        Qt::QueuedConnection);
+  });
+  b.on_trigger_library_element(
+      [this](slint::SharedString path, ui::LibraryElementAction a) {
+        // if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0): Remove lambda.
+        QMetaObject::invokeMethod(
+            this, [this, path, a]() { triggerLibraryElement(path, a); },
+            Qt::QueuedConnection);
+      });
   b.on_trigger_project([this](int index, ui::ProjectAction a) {
     // if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0): Remove lambda.
     QMetaObject::invokeMethod(
@@ -307,6 +327,11 @@ void MainWindow::showStatusBarMessage(const QString& message, int timeoutMs) {
   }
 }
 
+void MainWindow::setCurrentLibrary(int index) noexcept {
+  const ui::Data& d = mWindow->global<ui::Data>();
+  d.fn_set_current_library(index);
+}
+
 void MainWindow::setCurrentProject(int index) noexcept {
   const ui::Data& d = mWindow->global<ui::Data>();
   d.fn_set_current_project(index);
@@ -400,7 +425,12 @@ void MainWindow::trigger(ui::Action a) noexcept {
     // Library
     case ui::Action::LibraryCreate: {
       if (!switchToTab<CreateLibraryTab>()) {
-        addTab(std::make_shared<CreateLibraryTab>(mApp));
+        auto tab = std::make_shared<CreateLibraryTab>(mApp);
+        connect(
+            tab.get(), &CreateLibraryTab::libraryCreated, this,
+            [this](const FilePath& fp) { openLibraryTab(fp, true); },
+            Qt::QueuedConnection);
+        addTab(tab);
       }
       break;
     }
@@ -474,6 +504,124 @@ void MainWindow::triggerSection(int section,
 void MainWindow::triggerTab(int section, int tab, ui::TabAction a) noexcept {
   if (auto s = mSections->value(section)) {
     s->triggerTab(tab, a);
+  }
+}
+
+void MainWindow::triggerLibrary(slint::SharedString path,
+                                ui::LibraryAction a) noexcept {
+  const FilePath fp(s2q(path));
+  if ((!fp.isValid()) ||
+      (!fp.isLocatedInDir(mApp.getWorkspace().getLibrariesPath()))) {
+    qWarning() << "Invalid path in triggerLibrary():" << s2q(path);
+    return;
+  }
+
+  switch (a) {
+    case ui::LibraryAction::Open: {
+      openLibraryTab(fp, false);
+      break;
+    }
+    case ui::LibraryAction::Uninstall: {
+      try {
+        mApp.closeLibrary(fp);
+        FileUtils::removeDirRecursively(fp);  // can throw
+      } catch (const Exception& e) {
+        // TODO: This should be implemented without message box some day...
+        QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
+      }
+      mApp.getWorkspace().getLibraryDb().startLibraryRescan();
+      break;
+    }
+    case ui::LibraryAction::NewComponentCategory: {
+      if (auto editor = mApp.getLibrary(fp)) {
+        openComponentCategoryTab(*editor, FilePath());
+      }
+      break;
+    }
+    case ui::LibraryAction::NewPackageCategory: {
+      if (auto editor = mApp.getLibrary(fp)) {
+        openPackageCategoryTab(*editor, FilePath());
+      }
+      break;
+    }
+    case ui::LibraryAction::NewSymbol: {
+      if (auto editor = mApp.getLibrary(fp)) {
+        openSymbolTab(*editor, FilePath());
+      }
+      break;
+    }
+    case ui::LibraryAction::NewPackage: {
+      if (auto editor = mApp.getLibrary(fp)) {
+        openPackageTab(*editor, FilePath());
+      }
+      break;
+    }
+    case ui::LibraryAction::NewComponent: {
+      if (auto editor = mApp.getLibrary(fp)) {
+        openComponentTab(*editor, FilePath());
+      }
+      break;
+    }
+    case ui::LibraryAction::NewDevice: {
+      if (auto editor = mApp.getLibrary(fp)) {
+        openDeviceTab(*editor, FilePath());
+      }
+      break;
+    }
+    default: {
+      qWarning() << "Unhandled action in triggerLibrary():"
+                 << static_cast<int>(a);
+      break;
+    }
+  }
+}
+
+void MainWindow::triggerLibraryElement(slint::SharedString path,
+                                       ui::LibraryElementAction a) noexcept {
+  const FilePath fp(s2q(path));
+
+  switch (a) {
+    case ui::LibraryElementAction::Open: {
+      if (switchToLibraryElementTab<LibraryTab>(fp)) return;
+      if (mApp.getLibrary(fp)) {
+        openLibraryTab(fp, false);
+      }
+      break;
+    }
+    case ui::LibraryElementAction::Close: {
+      if (auto lib = mApp.getLibrary(fp)) {
+        if (lib->requestClose()) {
+          mApp.closeLibrary(fp);
+        }
+      }
+      break;
+    }
+    case ui::LibraryElementAction::OpenFolder: {
+      DesktopServices ds(mApp.getWorkspace().getSettings());
+      ds.openLocalPath(fp);
+      break;
+    }
+    case ui::LibraryElementAction::ImportEagleLibrary: {
+      if (mApp.getLibrary(fp)) {
+        EagleLibraryImportWizard wiz(mApp.getWorkspace(), fp,
+                                     qApp->activeWindow());
+        wiz.exec();
+      }
+      break;
+    }
+    case ui::LibraryElementAction::ImportKicadLibrary: {
+      if (mApp.getLibrary(fp)) {
+        KiCadLibraryImportWizard wiz(mApp.getWorkspace(), fp,
+                                     qApp->activeWindow());
+        wiz.exec();
+      }
+      break;
+    }
+    default: {
+      qWarning() << "Unhandled action in MainWindow::triggerLibraryElement():"
+                 << static_cast<int>(a);
+      break;
+    }
   }
 }
 
@@ -608,6 +756,57 @@ void MainWindow::triggerBoard(int project, int board,
   }
 }
 
+void MainWindow::openLibraryTab(const FilePath& fp, bool wizardMode) noexcept {
+  if (auto editor = mApp.openLibrary(fp)) {
+    if (!switchToLibraryElementTab<LibraryTab>(fp)) {
+      auto tab = std::make_shared<LibraryTab>(*editor, wizardMode);
+      connect(tab.get(), &LibraryTab::componentCategoryEditorRequested, this,
+              &MainWindow::openComponentCategoryTab);
+      connect(tab.get(), &LibraryTab::packageCategoryEditorRequested, this,
+              &MainWindow::openPackageCategoryTab);
+      connect(tab.get(), &LibraryTab::symbolEditorRequested, this,
+              &MainWindow::openSymbolTab);
+      connect(tab.get(), &LibraryTab::packageEditorRequested, this,
+              &MainWindow::openPackageTab);
+      connect(tab.get(), &LibraryTab::componentEditorRequested, this,
+              &MainWindow::openComponentTab);
+      connect(tab.get(), &LibraryTab::deviceEditorRequested, this,
+              &MainWindow::openDeviceTab);
+      addTab(tab);
+    }
+  }
+}
+
+void MainWindow::openComponentCategoryTab(LibraryEditor& editor,
+                                          const FilePath& fp) noexcept {
+  editor.openLegacyComponentCategoryEditor(fp);
+}
+
+void MainWindow::openPackageCategoryTab(LibraryEditor& editor,
+                                        const FilePath& fp) noexcept {
+  editor.openLegacyPackageCategoryEditor(fp);
+}
+
+void MainWindow::openSymbolTab(LibraryEditor& editor,
+                               const FilePath& fp) noexcept {
+  editor.openLegacySymbolEditor(fp);
+}
+
+void MainWindow::openPackageTab(LibraryEditor& editor,
+                                const FilePath& fp) noexcept {
+  editor.openLegacyPackageEditor(fp);
+}
+
+void MainWindow::openComponentTab(LibraryEditor& editor,
+                                  const FilePath& fp) noexcept {
+  editor.openLegacyComponentEditor(fp);
+}
+
+void MainWindow::openDeviceTab(LibraryEditor& editor,
+                               const FilePath& fp) noexcept {
+  editor.openLegacyDeviceEditor(fp);
+}
+
 void MainWindow::openSchematicTab(int projectIndex, int index) noexcept {
   if (!switchToProjectTab<SchematicTab>(projectIndex, index)) {
     if (auto prjEditor = mApp.getProjects().value(projectIndex)) {
@@ -689,6 +888,16 @@ template <typename T>
 bool MainWindow::switchToTab() noexcept {
   for (auto section : *mSections) {
     if (section->switchToTab<T>()) {
+      return true;
+    }
+  }
+  return false;
+}
+
+template <typename T>
+bool MainWindow::switchToLibraryElementTab(const FilePath& fp) noexcept {
+  for (auto section : *mSections) {
+    if (section->switchToLibraryElementTab<T>(fp)) {
       return true;
     }
   }

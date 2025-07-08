@@ -15,6 +15,8 @@ import {
     EditorCommandSet as Cmd,
     FeatureState,
     Helpers,
+    LibraryData,
+    LibraryElementAction,
     PanelPage,
     ProjectAction,
     SchematicAction,
@@ -754,6 +756,70 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.zoom-fit);
+                    }
+                }
+            }
+        }
+
+        library-menu-item := MainMenuItem {
+            property <LibraryData> library: Data.libraries[Data.current-library-tab.library-index];
+
+            text: @tr("Library");
+            visible: Data.current-tab.type == TabType.library;
+
+            clicked => {
+                library-menu-popup.show();
+            }
+
+            library-menu-popup := MenuPopup {
+                x: 0;
+                y: parent.height;
+
+                save-library-item := MenuItem {
+                    cmd: Cmd.save;
+                    text: @tr("Save Library");  // More specific.
+                    icon: @image-url("../../../bootstrap-icons/icons/floppy-fill.svg");
+                    enabled: Data.current-tab.features.save == FeatureState.enabled;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.save);
+                    }
+                }
+
+                close-library-item := MenuItem {
+                    text: @tr("Close Library");  // More specific.
+                    status-tip: @tr("Close the currently opened library");
+                    icon: @image-url("../../../font-awesome/svgs/solid/xmark.svg");
+
+                    clicked => {
+                        Backend.trigger-library-element(library.path, LibraryElementAction.close);
+                    }
+                }
+
+                open-library-folder-item := MenuItem {
+                    cmd: Cmd.file-manager;
+                    icon: @image-url("../../../font-awesome/svgs/solid/arrow-up-right-from-square.svg");
+
+                    clicked => {
+                        Backend.trigger-library-element(library.path, LibraryElementAction.open-folder);
+                    }
+                }
+
+                MenuSeparator { }
+
+                import-eagle-library-item := MenuItem {
+                    cmd: Cmd.import-eagle-library;
+
+                    clicked => {
+                        Backend.trigger-library-element(library.path, LibraryElementAction.import-eagle-library);
+                    }
+                }
+
+                import-kicad-library-item := MenuItem {
+                    cmd: Cmd.import-kicad-library;
+
+                    clicked => {
+                        Backend.trigger-library-element(library.path, LibraryElementAction.import-kicad-library);
                     }
                 }
             }

@@ -11,6 +11,8 @@ import {
     Constants,
     Data,
     EditorCommandSet as Cmd,
+    LibraryData,
+    LibraryElementAction,
     ProjectAction,
     ProjectData,
     SchematicAction,
@@ -20,16 +22,19 @@ import {
 enum ItemType {
     schematic,
     board,
+    library,
 }
 
-component ProjectListItem inherits Rectangle {
-    in property <int> project-index;
-    in property <int> item-index;
+component DocumentsListItem inherits Rectangle {
     in property <ItemType> type;
     in property <string> text;
     in property <image> icon;
     in property <bool> selected: false;
     in property <length> scrollbar-width;
+
+    callback clicked <=> ta.clicked;
+    callback schematic-action-triggered(a: SchematicAction);
+    callback board-action-triggered(a: BoardAction);
 
     height: 27px;
     background: (ta.has-hover || selected) ? #454545 : transparent;
@@ -77,7 +82,18 @@ component ProjectListItem inherits Rectangle {
                 tooltip: Cmd.sheet-rename.text;
 
                 clicked => {
-                    Backend.trigger-schematic(project-index, item-index, SchematicAction.rename);
+                    schematic-action-triggered(SchematicAction.rename);
+                }
+            }
+
+            if (ta.has-hover || selected) && (type == ItemType.schematic): delete-schematic-btn := ListViewItemButton {
+                y: (parent.height - self.height) / 2;
+                height: 18px;
+                icon: @image-url("../../../font-awesome/svgs/solid/trash-can.svg");
+                tooltip: Cmd.sheet-remove.text;
+
+                clicked => {
+                    schematic-action-triggered(SchematicAction.delete);
                 }
             }
 
@@ -88,7 +104,7 @@ component ProjectListItem inherits Rectangle {
                 tooltip: @tr("Open 3D View");
 
                 clicked => {
-                    Backend.trigger-board(project-index, item-index, BoardAction.open-3d);
+                    board-action-triggered(BoardAction.open-3d);
                 }
             }
 
@@ -99,7 +115,7 @@ component ProjectListItem inherits Rectangle {
                 tooltip: Cmd.board-setup.text;
 
                 clicked => {
-                    Backend.trigger-board(project-index, item-index, BoardAction.open-setup-dialog);
+                    board-action-triggered(BoardAction.open-setup-dialog);
                 }
             }
 
@@ -110,36 +126,24 @@ component ProjectListItem inherits Rectangle {
                 tooltip: Cmd.board-copy.text;
 
                 clicked => {
-                    Backend.trigger-board(project-index, item-index, BoardAction.copy);
+                    board-action-triggered(BoardAction.copy);
                 }
             }
 
-            if ta.has-hover || selected: delete-btn := ListViewItemButton {
+            if (ta.has-hover || selected) && (type == ItemType.board): delete-board-btn := ListViewItemButton {
                 y: (parent.height - self.height) / 2;
                 height: 18px;
                 icon: @image-url("../../../font-awesome/svgs/solid/trash-can.svg");
-                tooltip: (type == ItemType.schematic) ? Cmd.sheet-remove.text : Cmd.board-remove.text;
+                tooltip: Cmd.board-remove.text;
 
                 clicked => {
-                    if type == ItemType.schematic {
-                        Backend.trigger-schematic(project-index, item-index, SchematicAction.delete);
-                    } else {
-                        Backend.trigger-board(project-index, item-index, BoardAction.delete);
-                    }
+                    board-action-triggered(BoardAction.delete);
                 }
             }
 
             // Reserve space for scrollbar.
             Rectangle {
                 width: scrollbar-width;
-            }
-        }
-
-        clicked => {
-            if type == ItemType.schematic {
-                Backend.trigger-schematic(project-index, item-index, SchematicAction.open);
-            } else {
-                Backend.trigger-board(project-index, item-index, BoardAction.open-2d);
             }
         }
     }
@@ -216,19 +220,23 @@ component ProjectSection inherits Rectangle {
             }
         }
 
-        for schematic[index] in project.schematics: schematic-item := ProjectListItem {
-            project-index: project-index;
-            item-index: index;
+        for schematic[index] in project.schematics: schematic-item := DocumentsListItem {
             type: ItemType.schematic;
             text: schematic.name;
             icon: @image-url("../../../font-awesome/svgs/regular/image.svg");
             selected: (Data.current-tab.type == TabType.schematic) && (Data.current-schematic-tab.project-index == project-index) && (Data.current-schematic-tab.schematic-index == index);
             scrollbar-width: scrollbar-width;
+
+            clicked => {
+                Backend.trigger-schematic(project-index, index, SchematicAction.open);
+            }
+
+            schematic-action-triggered(a) => {
+                Backend.trigger-schematic(project-index, index, a);
+            }
         }
 
-        for board[index] in project.boards: board-item := ProjectListItem {
-            project-index: project-index;
-            item-index: index;
+        for board[index] in project.boards: board-item := DocumentsListItem {
             type: ItemType.board;
             text: board.name;
             icon: @image-url("../../../bootstrap-icons/icons/motherboard.svg");
@@ -242,10 +250,74 @@ component ProjectSection inherits Rectangle {
                 }
             };
             scrollbar-width: scrollbar-width;
+
+            clicked => {
+                Backend.trigger-board(project-index, index, BoardAction.open-2d);
+            }
+
+            board-action-triggered(a) => {
+                Backend.trigger-board(project-index, index, a);
+            }
         }
     }
 
     if project-index == Data.current-project-index: Rectangle {
+        x: 0;
+        y: 8px;
+        width: 1px;
+        height: parent.height - self.y - 4px;
+        background: #29d682;
+    }
+}
+
+component LibrarySection inherits Rectangle {
+    in property <LibraryData> library;
+    in property <int> library-index;
+    in property <length> scrollbar-width;
+
+    VerticalLayout {
+        header-ta := TouchArea {
+            z: 10;  // For the tooltip.
+
+            header := PanelHeader {
+                title: library.name.to-uppercase();
+
+                close-btn := IconButton {
+                    tooltip: @tr("Close Library");
+                    status-tip: @tr("Close this library and all its opened tabs");
+                    icon: @image-url("../../../font-awesome/svgs/solid/xmark.svg");
+                    icon-scale: 60%;
+
+                    clicked => {
+                        Backend.trigger-library-element(library.path, LibraryElementAction.close);
+                    }
+                }
+
+                // Reserve space for scrollbar.
+                Rectangle {
+                    width: scrollbar-width;
+                }
+            }
+
+            clicked => {
+                Data.set-current-library(library-index);
+            }
+        }
+
+        overview-item := DocumentsListItem {
+            type: ItemType.library;
+            text: @tr("Library Overview");
+            icon: @image-url("../../../bootstrap-icons/icons/database.svg");
+            selected: (Data.current-tab.type == TabType.library) && (Data.current-library-tab.library-index == library-index);
+            scrollbar-width: scrollbar-width;
+
+            clicked => {
+                Backend.trigger-library-element(library.path, LibraryElementAction.open);
+            }
+        }
+    }
+
+    if library-index == Data.current-library-index: Rectangle {
         x: 0;
         y: 8px;
         width: 1px;
@@ -272,6 +344,12 @@ export component DocumentsPanel inherits Rectangle {
                 for project[project-index] in Data.projects: project-item := ProjectSection {
                     project: project;
                     project-index: project-index;
+                    scrollbar-width: scrollbar-width;
+                }
+
+                for library[library-index] in Data.libraries: library-item := LibrarySection {
+                    library: library;
+                    library-index: library-index;
                     scrollbar-width: scrollbar-width;
                 }
             }

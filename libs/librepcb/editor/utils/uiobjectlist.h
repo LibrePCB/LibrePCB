@@ -73,7 +73,9 @@ public:
   // General Methods
   int count() const noexcept { return mObjects.count(); }
   bool isEmpty() const noexcept { return mObjects.isEmpty(); }
-  std::shared_ptr<TObj> at(int index) noexcept { return mObjects.at(index); }
+  const std::shared_ptr<TObj>& at(int index) noexcept {
+    return mObjects.at(index);
+  }
   std::shared_ptr<TObj> value(int index) noexcept {
     return mObjects.value(index);
   }

@@ -46,8 +46,6 @@ namespace editor {
 
 class ExclusiveActionGroup;
 class GraphicsLayerList;
-class LibraryOverviewWidget;
-class SearchToolBar;
 class StandardEditorCommandHandler;
 class UndoStackActionGroup;
 
@@ -69,33 +67,23 @@ public:
   // Constructors / Destructor
   LibraryEditorLegacy() = delete;
   LibraryEditorLegacy(const LibraryEditorLegacy& other) = delete;
-  LibraryEditorLegacy(Workspace& ws, const FilePath& libFp, bool readOnly);
+  LibraryEditorLegacy(Workspace& ws, Library& lib, bool readOnly);
   ~LibraryEditorLegacy() noexcept;
 
-  /**
-   * @brief Close the library editor (this will destroy this object!)
-   *
-   * If there are unsaved changes to the library, this method will ask the user
-   * whether the changes should be saved or not. If the user clicks on "cancel"
-   * or the library could not be saved successfully, this method will return
-   * false. If there was no such error, this method will call
-   * QObject::deleteLater() which means that this object will be deleted in the
-   * Qt's event loop.
-   *
-   * @warning This method can be called both from within this class and from
-   * outside this class (for example from the control panel). But if you call
-   * this method from outside this class, you may have to delete the object
-   * yourself afterwards! In special cases, the deleteLater() mechanism could
-   * lead in fatal errors otherwise!
-   *
-   * @param askForSave    If true and there are unsaved changes, this method
-   * shows a message box to ask whether the library should be saved or not. If
-   * false, the library will NOT be saved.
-   *
-   * @return true on success (editor closed), false on failure (editor stays
-   * open)
-   */
-  bool closeAndDestroy(bool askForSave) noexcept;
+  bool requestClose() noexcept;
+  void openComponentCategory(const FilePath& fp) noexcept;
+  void openPackageCategory(const FilePath& fp) noexcept;
+  void openSymbol(const FilePath& fp) noexcept;
+  void openPackage(const FilePath& fp) noexcept;
+  void openComponent(const FilePath& fp) noexcept;
+  void openDevice(const FilePath& fp) noexcept;
+  void duplicateComponentCategory(const FilePath& fp) noexcept;
+  void duplicatePackageCategory(const FilePath& fp) noexcept;
+  void duplicateSymbol(const FilePath& fp) noexcept;
+  void duplicatePackage(const FilePath& fp) noexcept;
+  void duplicateComponent(const FilePath& fp) noexcept;
+  void duplicateDevice(const FilePath& fp) noexcept;
+  void forceCloseTabs(const QSet<FilePath>& fp) noexcept;
 
   // Operator Overloadings
   LibraryEditorLegacy& operator=(const LibraryEditorLegacy& rhs) = delete;
@@ -104,24 +92,6 @@ signals:
   void aboutLibrePcbRequested();
 
 private:  // GUI Event Handlers
-  void newComponentCategoryTriggered() noexcept;
-  void newPackageCategoryTriggered() noexcept;
-  void newSymbolTriggered() noexcept;
-  void newPackageTriggered() noexcept;
-  void newComponentTriggered() noexcept;
-  void newDeviceTriggered() noexcept;
-  void editComponentCategoryTriggered(const FilePath& fp) noexcept;
-  void editPackageCategoryTriggered(const FilePath& fp) noexcept;
-  void editSymbolTriggered(const FilePath& fp) noexcept;
-  void editPackageTriggered(const FilePath& fp) noexcept;
-  void editComponentTriggered(const FilePath& fp) noexcept;
-  void editDeviceTriggered(const FilePath& fp) noexcept;
-  void duplicateComponentCategoryTriggered(const FilePath& fp) noexcept;
-  void duplicatePackageCategoryTriggered(const FilePath& fp) noexcept;
-  void duplicateSymbolTriggered(const FilePath& fp) noexcept;
-  void duplicatePackageTriggered(const FilePath& fp) noexcept;
-  void duplicateComponentTriggered(const FilePath& fp) noexcept;
-  void duplicateDeviceTriggered(const FilePath& fp) noexcept;
   void closeTabIfOpen(const FilePath& fp) noexcept;
   template <typename EditWidgetType>
   void editLibraryElementTriggered(const FilePath& fp,
@@ -145,7 +115,6 @@ private:  // Methods
                              const FilePath& fp);
   void updateTabTitles() noexcept;
   void tabCountChanged() noexcept;
-  void keyPressEvent(QKeyEvent* event) noexcept override;
   void closeEvent(QCloseEvent* event) noexcept override;
   bool closeAllTabs(bool withNonClosable, bool askForSave) noexcept;
 
@@ -245,7 +214,6 @@ private:  // Data
   QScopedPointer<QToolBar> mToolBarFile;
   QScopedPointer<QToolBar> mToolBarEdit;
   QScopedPointer<QToolBar> mToolBarView;
-  QScopedPointer<SearchToolBar> mToolBarSearch;
   QScopedPointer<QToolBar> mToolBarCommand;
   QScopedPointer<QToolBar> mToolBarTools;
 };

@@ -25,7 +25,7 @@
 #include "dialogs/directorylockhandlerdialog.h"
 #include "dialogs/filedialog.h"
 #include "library/librariesmodel.h"
-#include "library/libraryeditorlegacy.h"
+#include "library/libraryeditor.h"
 #include "mainwindow.h"
 #include "notification.h"
 #include "notificationsmodel.h"
@@ -43,6 +43,7 @@
 
 #include <librepcb/core/application.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/library/library.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectloader.h>
 #include <librepcb/core/utils/mathparser.h>
@@ -74,7 +75,8 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
     mLocalLibraries(new LibrariesModel(ws, LibrariesModel::Mode::LocalLibs)),
     mRemoteLibraries(new LibrariesModel(ws, LibrariesModel::Mode::RemoteLibs)),
     mLibrariesFilter(new SlintKeyEventTextBuilder()),
-    mProjects(new UiObjectList<ProjectEditor, ui::ProjectData>()) {
+    mProjects(new UiObjectList<ProjectEditor, ui::ProjectData>()),
+    mLibraries(new UiObjectList<LibraryEditor, ui::LibraryData>()) {
   // Open windows.
   QSettings cs;
   for (const QString& idStr : cs.value("global/windows").toStringList()) {
@@ -193,6 +195,8 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
   // Setup library models & filter.
   connect(mRemoteLibraries.get(), &LibrariesModel::onlineVersionsAvailable,
           mLocalLibraries.get(), &LibrariesModel::setOnlineVersions);
+  connect(mRemoteLibraries.get(), &LibrariesModel::aboutToUninstallLibrary,
+          this, &GuiApplication::closeLibrary);
 
   // Check if standard components are installed.
   connect(&mWorkspace.getLibraryDb(), &WorkspaceLibraryDb::scanFinished, this,
@@ -227,7 +231,6 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
 
 GuiApplication::~GuiApplication() noexcept {
   mProjectLibraryUpdater.reset();
-  closeAllLibraryEditors(false);
 }
 
 /*******************************************************************************
@@ -289,8 +292,94 @@ void GuiApplication::addExampleProjects(QWidget* parent) noexcept {
  *  Libraries
  ******************************************************************************/
 
+std::shared_ptr<LibraryEditor> GuiApplication::getLibrary(
+    const FilePath& libDir) noexcept {
+  for (int i = 0; i < mLibraries->count(); ++i) {
+    if (mLibraries->at(i)->getFilePath() == libDir) {
+      return mLibraries->at(i);
+    }
+  }
+  return nullptr;
+}
+
+std::shared_ptr<LibraryEditor> GuiApplication::openLibrary(
+    const FilePath& libDir) noexcept {
+  auto switchToLibrary = [this](int index) {
+    for (auto win : mWindows) {
+      win->setCurrentLibrary(index);
+      win->showPanelPage(ui::PanelPage::Documents);
+    }
+  };
+
+  if (auto lib = getLibrary(libDir)) {
+    if (auto index = mLibraries->indexOf(lib.get())) {
+      switchToLibrary(*index);
+    }
+    return lib;
+  }
+
+  auto askForRestoringBackup = [](const FilePath&) {
+    QMessageBox::StandardButton btn = QMessageBox::question(
+        qApp->activeWindow(), tr("Restore autosave backup?"),
+        tr("It seems that the application crashed the last time you opened "
+           "this library. Do you want to restore the last autosave backup?"),
+        QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+        QMessageBox::Cancel);
+    switch (btn) {
+      case QMessageBox::Yes:
+        return true;
+      case QMessageBox::No:
+        return false;
+      default:
+        throw UserCanceled(__FILE__, __LINE__);
+    }
+  };
+
+  try {
+    // Open file system.
+    const bool readOnly =
+        libDir.isLocatedInDir(mWorkspace.getRemoteLibrariesPath());
+    auto fs = TransactionalFileSystem::open(
+        libDir, !readOnly, askForRestoringBackup,
+        DirectoryLockHandlerDialog::createDirectoryLockCallback());  // can
+                                                                     // throw
+
+    // Open library.
+    auto lib = Library::open(std::unique_ptr<TransactionalDirectory>(
+        new TransactionalDirectory(fs)));  // can throw
+
+    // Keep handle.
+    const int index = mLibraries->count();
+    auto editor = std::make_shared<LibraryEditor>(*this, std::move(lib), index);
+    mLibraries->insert(index, editor);
+    switchToLibrary(index);
+    return editor;
+  } catch (const Exception& e) {
+    QMessageBox::critical(qApp->activeWindow(), tr("Failed to open library"),
+                          e.getMsg());
+  }
+
+  return nullptr;
+}
+
+void GuiApplication::closeLibrary(const FilePath& libDir) noexcept {
+  if (auto index = mLibraries->indexOf(getLibrary(libDir).get())) {
+    mLibraries->remove(*index);
+    for (int i = *index; i < mLibraries->count(); ++i) {
+      mLibraries->at(i)->setUiIndex(i);
+    }
+  }
+}
+
 bool GuiApplication::requestClosingAllLibraries() noexcept {
-  return closeAllLibraryEditors(true);
+  for (std::size_t i = 0; i < mLibraries->row_count(); ++i) {
+    if (auto lib = mLibraries->value(i)) {
+      if (!lib->requestClose()) {
+        return false;
+      }
+    }
+  }
+  return true;
 }
 
 /*******************************************************************************
@@ -456,19 +545,21 @@ void GuiApplication::createNewWindow(int id, int projectIndex) noexcept {
 
   // Helper to create filtered, sorted library models.
   auto filteredLibs = [this](const std::shared_ptr<LibrariesModel>& model) {
-    auto filterModel = std::make_shared<slint::FilterModel<ui::LibraryData>>(
-        model, [this](const ui::LibraryData& lib) {
-          auto s = mLibrariesFilter->getText().trimmed().toLower();
-          return s.isEmpty() || s2q(lib.name).toLower().contains(s);
-        });
+    auto filterModel =
+        std::make_shared<slint::FilterModel<ui::LibraryInfoData>>(
+            model, [this](const ui::LibraryInfoData& lib) {
+              auto s = mLibrariesFilter->getText().trimmed().toLower();
+              return s.isEmpty() || s2q(lib.name).toLower().contains(s);
+            });
     connect(mLibrariesFilter.get(), &SlintKeyEventTextBuilder::textChanged,
             this, [filterModel](const QString&) { filterModel->reset(); });
     return filterModel;
   };
   auto sortedLibs =
-      [](const std::shared_ptr<slint::Model<ui::LibraryData>>& model) {
-        return std::make_shared<slint::SortModel<ui::LibraryData>>(
-            model, [](const ui::LibraryData& a, const ui::LibraryData& b) {
+      [](const std::shared_ptr<slint::Model<ui::LibraryInfoData>>& model) {
+        return std::make_shared<slint::SortModel<ui::LibraryInfoData>>(
+            model,
+            [](const ui::LibraryInfoData& a, const ui::LibraryInfoData& b) {
               if ((a.progress > 0) != (b.progress > 0)) {
                 return a.progress > 0;
               } else if (a.outdated != b.outdated) {
@@ -497,6 +588,7 @@ void GuiApplication::createNewWindow(int id, int projectIndex) noexcept {
   d.set_remote_libraries(sortedLibs(filteredLibs(mRemoteLibraries)));
   d.set_projects(mProjects);
   d.fn_set_current_project(projectIndex);
+  d.set_libraries(mLibraries);
 
   // Register global callbacks.
   const ui::Backend& b = win->global<ui::Backend>();
@@ -562,8 +654,12 @@ void GuiApplication::createNewWindow(int id, int projectIndex) noexcept {
   bind(mw.get(), d, &ui::Data::set_remote_libraries_data,
        mRemoteLibraries.get(), &LibrariesModel::uiDataChanged,
        mRemoteLibraries->getUiData());
-  bind(mw.get(), d, &ui::Data::set_libraries_filter, mLibrariesFilter.get(),
-       &SlintKeyEventTextBuilder::textChanged, mLibrariesFilter->getText());
+  bind(mw.get(), d, &ui::Data::set_libraries_panel_filter,
+       mLibrariesFilter.get(), &SlintKeyEventTextBuilder::textChanged,
+       mLibrariesFilter->getText());
+  bind(mw.get(), d, &ui::Data::set_libraries_rescan_in_progress,
+       &mWorkspace.getLibraryDb(), &WorkspaceLibraryDb::scanInProgressChanged,
+       mWorkspace.getLibraryDb().isScanInProgress());
   bind(mw.get(), d, &ui::Data::set_workspace_contains_standard_components, this,
        &GuiApplication::librariesContainStandardComponentsChanged,
        mLibrariesContainStandardComponents);
@@ -683,60 +779,6 @@ void GuiApplication::openProjectLibraryUpdater(
         [this](const FilePath& fp) { openProject(fp, qApp->activeWindow()); });
   }
   mProjectLibraryUpdater->show();
-}
-
-void GuiApplication::openLibraryEditor(const FilePath& libDir) noexcept {
-  LibraryEditorLegacy* editor = mOpenLibraryEditors.value(libDir);
-  if (!editor) {
-    try {
-      bool remote = libDir.isLocatedInDir(mWorkspace.getRemoteLibrariesPath());
-      editor = new LibraryEditorLegacy(mWorkspace, libDir, remote);
-      connect(editor, &LibraryEditorLegacy::aboutLibrePcbRequested, this,
-              [this]() {
-                if (auto win = mWindows.value(0)) {
-                  win->showPanelPage(ui::PanelPage::About);
-                  win->makeCurrentWindow();
-                }
-              });
-      connect(editor, &LibraryEditorLegacy::destroyed, this,
-              &GuiApplication::libraryEditorDestroyed);
-      mOpenLibraryEditors.insert(libDir, editor);
-    } catch (const UserCanceled& e) {
-      // User requested to abort -> do nothing.
-    } catch (const Exception& e) {
-      QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
-    }
-  }
-  if (editor) {
-    editor->show();
-    editor->raise();
-    editor->activateWindow();
-  }
-}
-
-void GuiApplication::libraryEditorDestroyed() noexcept {
-  // Note: Actually we should dynamic_cast the QObject* to LibraryEditor*, but
-  // as this slot is called in the destructor of QObject (base class of
-  // LibraryEditor), the dynamic_cast does no longer work at this point, so a
-  // static_cast is used instead ;)
-  LibraryEditorLegacy* editor =
-      static_cast<LibraryEditorLegacy*>(QObject::sender());
-  Q_ASSERT(editor);
-  FilePath library = mOpenLibraryEditors.key(editor);
-  Q_ASSERT(library.isValid());
-  mOpenLibraryEditors.remove(library);
-}
-
-bool GuiApplication::closeAllLibraryEditors(bool askForSave) noexcept {
-  bool success = true;
-  foreach (LibraryEditorLegacy* editor, mOpenLibraryEditors) {
-    if (editor->closeAndDestroy(askForSave)) {
-      delete editor;  // this calls the slot "libraryEditorDestroyed()"
-    } else {
-      success = false;
-    }
-  }
-  return success;
 }
 
 std::shared_ptr<MainWindow> GuiApplication::getCurrentWindow() noexcept {

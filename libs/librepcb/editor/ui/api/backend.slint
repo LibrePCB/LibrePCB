@@ -5,6 +5,8 @@ import {
     Int64,
     LengthEditParseResult,
     LengthUnit,
+    LibraryAction,
+    LibraryElementAction,
     ProjectAction,
     SchematicAction,
     TabAction,
@@ -78,6 +80,26 @@ export global Backend {
         }
     }
 
+    // Trigger some library action
+    //
+    // Note: This callback is executed asynchronously in the backend to
+    // guarantee there are no side effects changing the UI from within the
+    // callback. Otherwise we couldn't declare it as 'pure'.
+    pure callback trigger-library(path: string, action: LibraryAction);
+    trigger-library(path, action) => {
+        debug("Trigger library action:", path, action);
+    }
+
+    // Trigger some library element action
+    //
+    // Note: This callback is executed asynchronously in the backend to
+    // guarantee there are no side effects changing the UI from within the
+    // callback. Otherwise we couldn't declare it as 'pure'.
+    pure callback trigger-library-element(path: string, action: LibraryElementAction);
+    trigger-library-element(path, action) => {
+        debug("Trigger library element action:", path, action);
+    }
+
     // Trigger some project action
     //
     // Note: This callback is executed asynchronously in the backend to
@@ -131,9 +153,9 @@ export global Backend {
     callback libraries-key-event(event: KeyEvent) -> EventResult;
     libraries-key-event(event) => {
         if event.text == Key.Escape {
-            Data.libraries-filter = "";
+            Data.libraries-panel-filter = "";
         } else {
-            Data.libraries-filter += event.text;
+            Data.libraries-panel-filter += event.text;
         }
         reject
     }

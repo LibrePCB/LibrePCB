@@ -173,6 +173,7 @@ export enum RuleCheckType {
     none,
     erc,
     drc,
+    library-check,
 }
 
 export enum RuleCheckState {
@@ -235,6 +236,59 @@ export enum WireMode {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Library Editor
+////////////////////////////////////////////////////////////////////////////////
+
+// Library element actions (for libraries, symbols, components, ...)
+export enum LibraryElementAction {
+    open,
+    close,
+    open-folder,
+    import-eagle-library,
+    import-kicad-library,
+}
+
+// Type of LibraryTreeViewItemData
+// Note: The order of items defines the sort order in the UI.
+export enum LibraryTreeViewItemType {
+    all,
+    uncategorized,
+    component-category,
+    package-category,
+    device,
+    component,
+    symbol,
+    package,
+}
+
+// Library content tree view item data structure
+export struct LibraryTreeViewItemData {
+    type: LibraryTreeViewItemType,
+    level: int,  // 0 = top level items
+    name: string,
+    summary: string,
+    elements: int,  // Number of contained elements
+    is-external: bool,  // External category, not from this library
+    user-data: string,  // File path for internal elements, UUID for external
+}
+
+// A possible dependency of a library (either marked as dependent or not)
+export struct LibraryDependency {
+    uuid: string,
+    icon: image,
+    name: string,
+    checked: bool,
+}
+
+// Opened library (editor) data
+export struct LibraryData {
+    valid: bool,
+    path: string,
+    name: string,
+    writable: bool,
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Tabs
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -274,6 +328,7 @@ export enum TabType {
     home,
     create-library,
     download-library,
+    library,
     schematic,
     board-2d,
     board-3d,
@@ -282,8 +337,11 @@ export enum TabType {
 // Tab actions
 export enum TabAction {
     close,
+    apply,
     cancel,
     accept,
+    back,
+    next,
 
     // General
     save,
@@ -348,6 +406,13 @@ export enum TabAction {
     find-refresh-suggestions,
     find-next,
     find-previous,
+
+    // Library tab
+    library-choose-icon,
+    library-categories-duplicate,
+    library-categories-remove,
+    library-elements-duplicate,
+    library-elements-remove,
 
     // Board 2D tab
     board-place-component,
@@ -430,6 +495,42 @@ export struct DownloadLibraryTabData {
     download-running: bool,
     download-progress: int,
     download-status: string,  // Status or error
+}
+
+// Additional data for library editor tabs
+export struct LibraryTabData {
+    // General
+    library-index: int,
+    wizard-mode: bool,
+    page-index: int,
+
+    // Metadata
+    icon: image,
+    name: string,
+    name-error: string,
+    description: string,
+    keywords: string,
+    author: string,
+    version: string,
+    version-error: string,
+    deprecated: bool,
+    url: string,
+    url-error: string,
+    dependencies: [LibraryDependency],
+    manufacturer: string,
+
+    // Content
+    categories: [LibraryTreeViewItemData],
+    categories-index: int,
+    filtered-elements: [LibraryTreeViewItemData],
+    filtered-elements-index: int,
+
+    // Checks
+    checks: RuleCheckData,
+
+    // Actions
+    move-category-to-lib: string,  // File path to a local library
+    move-element-to-lib: string,  // File path to a local library
 }
 
 // Additional data for schematic editor tabs
@@ -546,6 +647,7 @@ export struct WindowSectionData {
     tabs: [TabData],
     create-library-tabs: [CreateLibraryTabData],  // Proxy view for `tabs`
     download-library-tabs: [DownloadLibraryTabData],  // Proxy view for `tabs`
+    library-tabs: [LibraryTabData],  // Proxy view for `tabs`
     schematic-tabs: [SchematicTabData],  // Proxy view for `tabs`
     board-2d-tabs: [Board2dTabData],  // Proxy view for `tabs`
     board-3d-tabs: [Board3dTabData],  // Proxy view for `tabs`
@@ -587,13 +689,18 @@ export struct TreeViewItemData {
 
 // Library actions
 export enum LibraryAction {
-    none,
     open,
     uninstall,
+    new-component-category,
+    new-package-category,
+    new-symbol,
+    new-package,
+    new-component,
+    new-device,
 }
 
 // Workspace library data structure
-export struct LibraryData {
+export struct LibraryInfoData {
     uuid: string,
     path: string,  // Empty if not installed
     icon: image,
@@ -606,10 +713,9 @@ export struct LibraryData {
     progress: int,  // [%], 0 if not installing
     checked: bool,
     highlight: bool,
-    action: LibraryAction,  // Set by UI, handled in backend
 }
 
-// Metadata for a list of LibraryData
+// Metadata for a list of LibraryInfoData
 export struct LibraryListData {
     refreshing: bool,  // Only for remote libraries (async operation)
     refreshing-error: string,
