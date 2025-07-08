@@ -5,6 +5,7 @@ export component Button inherits Rectangle {
     in property <string> text;
     in property <string> status-tip;
     in property <image> icon;
+    in property <length> icon-size: 16px;
     in property <bool> enabled: true;
     in property <bool> primary: false;
     out property has-focus <=> fs.has-focus;
@@ -72,13 +73,12 @@ export component Button inherits Rectangle {
                 alignment: center;
 
                 if icon.width > 0: Rectangle {
-                    y: (parent.height - self.height) / 2;
-                    width: self.height;
-                    height: 20px;
+                    width: icon-size;
+                    height: max(icon-size, text-txt.preferred-height);
 
                     Image {
                         width: 100%;
-                        height: 100%;
+                        height: self.width;
                         image-fit: contain;
                         colorize: text-color;
                         source: icon;

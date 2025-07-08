@@ -357,7 +357,10 @@ std::optional<CircuitIdentifier> validateCircuitIdentifier(
 std::optional<QUrl> validateUrl(const QString& input,
                                 slint::SharedString& error,
                                 bool allowEmpty) noexcept {
-  const QUrl url = QUrl::fromUserInput(input.trimmed());
+  // Note: We don't use QUrl::fromUserInput() because it performs *heavy*
+  // magic to construct URLs from almost any string, which doesn't make
+  // sense to me.
+  const QUrl url(input.trimmed(), QUrl::TolerantMode);
   const std::optional<QUrl> val =
       url.isValid() ? std::make_optional(url) : std::nullopt;
   if (val || (allowEmpty && input.trimmed().isEmpty())) {
@@ -366,6 +369,25 @@ std::optional<QUrl> validateUrl(const QString& input,
   } else {
     error = getInputError(input);
     return std::nullopt;
+  }
+}
+
+void validateComponentPrefix(const QString& input,
+                             slint::SharedString& error) noexcept {
+  if (ComponentPrefixConstraint()(input.trimmed()) &&
+      (!input.trimmed().isEmpty())) {
+    error = slint::SharedString();
+  } else {
+    error = getInputError(input);
+  }
+}
+
+void validateComponentDefaultValue(const QString& input,
+                                   slint::SharedString& error) noexcept {
+  if (!input.trimmed().isEmpty()) {
+    error = slint::SharedString();
+  } else {
+    error = getInputError(input);
   }
 }
 

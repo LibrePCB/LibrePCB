@@ -1,0 +1,318 @@
+import {
+    Button,
+    CategoriesListView,
+    ComboBox,
+    IconButton,
+    LineEdit,
+    LinkText,
+    MenuItem,
+    MenuPopup,
+    MessageBox,
+    Palette,
+    SceneButton,
+    ScrollView,
+    SlideView,
+    Switch,
+    TextEdit,
+    ToolButton,
+    TreeItemPickerPopup,
+} from "../../widgets.slint";
+import {
+    Backend,
+    ComponentSignalData,
+    ComponentTabData,
+    Constants,
+    Data,
+    DismissableMessageAction,
+    EditorCommandSet as Cmd,
+    EditorTool,
+    PanelPage,
+    TabAction,
+    WindowSectionData,
+} from "../../api.slint";
+
+
+component ComponentSignalListViewHeader inherits TouchArea {
+    in property <string> text;
+    in property <TextHorizontalAlignment> alignment: left;
+    in property <color> color: Palette.foreground;
+
+    Text {
+        width: 100%;
+        horizontal-alignment: alignment;
+        vertical-alignment: center;
+        color: color;
+        text: text;
+    }
+}
+
+export component ComponentSignalListView {
+    in-out property <[ComponentSignalData]> model;
+    in-out property <string> new-name;
+    in-out property <string> new-name-error;
+    property <length> row-height: 25px;
+    property <length> row-spacing: 3px;
+
+    callback edited;
+    callback new-signal-edited(text: string);
+    new-signal-edited(text) => {
+        new-name = text;
+    }
+    callback new-signal-committed();
+
+    VerticalLayout {
+        alignment: start;
+        spacing: 10px;
+
+        HorizontalLayout {
+            padding: 5px;
+            spacing: 5px;
+
+            Text {
+                height: row-height;
+                vertical-alignment: center;
+                text: @tr("Add Signals:");
+            }
+
+            new-signal-edt := LineEdit {
+                height: row-height;
+                placeholder-text: @tr("Signal name (may contain ranges like \"1..5\")");
+                text: new-name;
+                validation-error: new-name-error;
+
+                text-edited(text) => {
+                    new-signal-edited(text);
+                }
+
+                key-pressed(event) => {
+                    if event.text == Key.Return {
+                        new-signal-btn.clicked();
+                        return accept;
+                    }
+                    reject
+                }
+            }
+
+            new-signal-btn := IconButton {
+                height: row-height;
+                style: hyperlink;
+                icon-scale: 0.7;
+                icon: @image-url("../../../../../font-awesome/svgs/solid/plus.svg");
+
+                clicked => {
+                    new-signal-committed();
+                }
+            }
+        }
+
+        view := ScrollView {
+            preferred-height: l.preferred-height;
+
+            Rectangle {
+                x: 0;
+                y: row-height + 3px;
+                height: 1px;
+                background: #404040;
+            }
+
+            l := HorizontalLayout {
+                padding: 5px;
+                spacing: 5px;
+
+                VerticalLayout {
+                    width: self.preferred-width;
+                    spacing: row-spacing;
+
+                    ComponentSignalListViewHeader {
+                        height: row-height;
+                        alignment: right;
+                        color: #909090;
+                        text: @tr("#");
+                    }
+
+                    for item[index] in model: Text {
+                        height: row-height;
+                        horizontal-alignment: right;
+                        vertical-alignment: center;
+                        font-size: 10px;
+                        color: #909090;
+                        text: index + 1;
+                    }
+                }
+
+                Rectangle {
+                    width: 1px;
+                    background: #404040;
+                }
+
+                VerticalLayout {
+                    width: self.preferred-width;
+                    spacing: row-spacing;
+
+                    ComponentSignalListViewHeader {
+                        height: row-height;
+                        color: #909090;
+                        text: @tr("ID");
+                    }
+
+                    for item[index] in model: Text {
+                        height: row-height;
+                        horizontal-alignment: right;
+                        vertical-alignment: center;
+                        font-family: "Noto Sans Mono";
+                        font-size: 10px;
+                        color: #909090;
+                        text: item.id;
+                    }
+                }
+
+                Rectangle {
+                    width: 1px;
+                    background: #404040;
+                }
+
+                VerticalLayout {
+                    spacing: row-spacing;
+
+                    ComponentSignalListViewHeader {
+                        height: row-height;
+                        text: @tr("Name");
+                    }
+
+                    for item[index] in model: LineEdit {
+                        height: row-height;
+                        text: item.name;
+                        validation-error: item.name-error;
+
+                        text-edited(text) => {
+                            model[index].name = text;
+                        }
+
+                        text-accepted(text) => {
+                            model[index].name = text;
+                            edited();
+                        }
+                    }
+                }
+
+                Rectangle {
+                    width: 1px;
+                    background: #404040;
+                }
+
+                VerticalLayout {
+                    spacing: row-spacing;
+
+                    ComponentSignalListViewHeader {
+                        height: row-height;
+                        text: @tr("Required");
+                    }
+
+                    for item[index] in model: Rectangle {
+                        height: row-height;
+
+                        Switch {
+                            width: self.preferred-width;
+                            size: 20px;
+                            status-tip: @tr("If checked, an ERC error is raised when this signal is left unconnected in the schematics");
+                            checked: item.required;
+
+                            toggled(checked) => {
+                                model[index].required = checked;
+                                edited();
+                            }
+                        }
+                    }
+                }
+
+                Rectangle {
+                    width: 1px;
+                    background: #404040;
+                }
+
+                VerticalLayout {
+                    width: (forced-net-cells-l.preferred-width > 0) ? self.preferred-width : 0;
+                    spacing: row-spacing;
+
+                    animate width { duration: 150ms; }
+
+                    ComponentSignalListViewHeader {
+                        height: row-height;
+                        text: @tr("Forced Net");
+                    }
+
+                    forced-net-cells-l := VerticalLayout {
+                        for item[index] in model: HorizontalLayout {
+                            alignment: start;
+
+                            LineEdit {
+                                height: row-height;
+                                text: item.forced-net-name;
+                                visible: self.has-focus || (!self.text.is-empty);
+                                max-width: self.visible ? self.preferred-width : 0;
+
+                                text-edited(text) => {
+                                    model[index].forced-net-name = text;
+                                }
+
+                                text-accepted(text) => {
+                                    model[index].forced-net-name = text;
+                                    edited();
+                                }
+                            }
+                        }
+                    }
+                }
+
+                VerticalLayout {
+                    spacing: row-spacing;
+
+                    ComponentSignalListViewHeader {
+                        height: row-height;
+                    }
+
+                    for item[index] in model: IconButton {
+                        height: row-height;
+                        style: hyperlink;
+                        icon-scale: 0.7;
+                        icon: @image-url("../../../../../font-awesome/svgs/solid/ellipsis-vertical.svg");
+
+                        clicked => {
+                            context-menu-item-index = index;
+                            context-menu-x = self.absolute-position.x - root.absolute-position.x;
+                            context-menu-y = self.absolute-position.y - root.absolute-position.y + self.height;
+                            context-menu-popup.show();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    property <length> context-menu-x;
+    property <length> context-menu-y;
+    property <int> context-menu-item-index;
+    context-menu-popup := MenuPopup {
+        x: min(context-menu-x, parent.width - self.width);
+        y: context-menu-y;
+
+        set-forced-net-name-item := MenuItem {
+            text: @tr("Set Forced Net Name");
+            enabled: model[context-menu-item-index].forced-net-name.is-empty;
+
+            clicked => {
+                model[context-menu-item-index].forced-net-name = " ";
+            }
+        }
+
+        remove-item := MenuItem {
+            cmd: Cmd.remove;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/trash-can.svg");
+            shortcuts: "";
+
+            clicked => {
+                model[context-menu-item-index].delete = true;
+            }
+        }
+    }
+}

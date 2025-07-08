@@ -183,7 +183,7 @@ void ComponentSymbolVariantEditDialog::updatePreview() noexcept {
 
         std::shared_ptr<SymbolGraphicsItem> graphicsItem =
             std::make_shared<SymbolGraphicsItem>(
-                *sym, *mLayers, mComponent,
+                *sym, *mLayers, mComponent.get(),
                 mSymbVar.getSymbolItems().get(item.getUuid()),
                 mWorkspace.getSettings().libraryLocaleOrder.get());
         graphicsItem->setPosition(item.getSymbolPosition());

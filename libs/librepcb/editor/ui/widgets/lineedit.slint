@@ -1,10 +1,12 @@
-import { Palette, ScrollView } from "std-widgets.slint";
+import { Palette } from "std-widgets.slint";
 import { DropDownPopup } from "dropdownpopup.slint";
 import { IconButton } from "iconbutton.slint";
+import { ScrollView } from "scrollview.slint";
 import { Constants } from "../api.slint";
 
 export component LineEdit inherits Rectangle {
     in-out property <string> text;
+    in property <string> label;
     in property <string> placeholder-text;
     in property <string> validation-error: validate(edt.text);
     in property <bool> enabled: true;
@@ -109,6 +111,16 @@ export component LineEdit inherits Rectangle {
             y: 0;
             padding-left: placeholder-txt.x;
             padding-right: 3px;
+
+            if !label.is-empty: HorizontalLayout {
+                padding-right: 5px;
+
+                Text {
+                    vertical-alignment: center;
+                    color: Palette.foreground.darker(0.3);
+                    text: label + ":";
+                }
+            }
 
             view := ScrollView {
                 min-width: 0;  // Required to avoid text overflow.

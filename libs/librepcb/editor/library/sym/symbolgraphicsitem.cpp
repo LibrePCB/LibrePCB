@@ -48,7 +48,7 @@ namespace editor {
 
 SymbolGraphicsItem::SymbolGraphicsItem(
     Symbol& symbol, const GraphicsLayerList& layers,
-    std::shared_ptr<const Component> cmp,
+    QPointer<const Component> cmp,
     std::shared_ptr<const ComponentSymbolVariantItem> cmpItem,
     const QStringList& localeOrder) noexcept
   : QGraphicsItemGroup(nullptr),

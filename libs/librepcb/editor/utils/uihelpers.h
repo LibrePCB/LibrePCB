@@ -25,6 +25,7 @@
  ******************************************************************************/
 #include "appwindow.h"
 
+#include <librepcb/core/library/cmp/cmpsigpindisplaytype.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/rulecheck/rulecheckmessage.h>
 #include <librepcb/core/types/alignment.h>
@@ -84,6 +85,9 @@ ui::NotificationType l2s(RuleCheckMessage::Severity v) noexcept;
 
 int l2s(Package::AssemblyType v) noexcept;
 std::optional<Package::AssemblyType> s2assemblyType(int v) noexcept;
+
+ui::ComponentPinoutDisplayMode l2s(const CmpSigPinDisplayType& v) noexcept;
+const CmpSigPinDisplayType& s2l(ui::ComponentPinoutDisplayMode v) noexcept;
 
 ui::EditorCommand l2s(const EditorCommand& cmd, ui::EditorCommand in) noexcept;
 

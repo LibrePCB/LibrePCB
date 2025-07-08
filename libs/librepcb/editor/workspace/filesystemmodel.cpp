@@ -183,8 +183,7 @@ void FileSystemModel::expandDir(const FilePath& fp, std::size_t index,
             q2s(info.fileName()),  // Text
             slint::SharedString(),  // Hint
             q2s(itemFp.toStr()),  // User data
-            isProjectFileOrFolder,
-            // Is project file or folder
+            isProjectFileOrFolder,  // Is project file or folder
             info.isDir(),  // Has children
             expand,  // Expanded
             isPinnable,  // Supports pinning

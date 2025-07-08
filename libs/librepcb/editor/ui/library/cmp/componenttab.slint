@@ -1,0 +1,429 @@
+import { Tab } from "../../tab.slint";
+import { LibraryRuleCheckLink } from "../libraryrulechecklink.slint";
+import { ComponentSignalListView } from "componentsignallistview.slint";
+import { ComponentVariantListView } from "componentvariantlistview.slint";
+import {
+    AttributeTableView,
+    Button,
+    CategoriesListView,
+    ComboBox,
+    LineEdit,
+    LinkText,
+    MessageBox,
+    Palette,
+    SceneButton,
+    SlideView,
+    Switch,
+    TextEdit,
+    ToolButton,
+    TreeItemPickerPopup,
+} from "../../widgets.slint";
+import {
+    Backend,
+    ComponentTabData,
+    Constants,
+    Data,
+    DismissableMessageAction,
+    EditorCommandSet as Cmd,
+    EditorTool,
+    FeatureState,
+    PanelPage,
+    TabAction,
+    WindowSectionData,
+} from "../../api.slint";
+
+component ComponentMetadata inherits GridLayout {
+    in property <int> section-index;
+    in-out property <[ComponentTabData]> tabs;
+    in property <int> index;
+    in property <bool> read-only;
+
+    padding: 10px;
+    spacing: 8px;
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Name:");
+        }
+
+        LineEdit {
+            text: tabs[index].name;
+            validation-error: tabs[index].name-error;
+            read-only: read-only;
+
+            init => {
+                if !read-only {
+                    self.select-all();
+                }
+            }
+            text-edited(text) => {
+                tabs[index].name = text;
+            }
+            text-accepted(text) => {
+                tabs[index].name = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Description:");
+        }
+
+        TextEdit {
+            height: 100px;
+            text: tabs[index].description;
+            read-only: read-only;
+
+            text-edited(text) => {
+                tabs[index].description = text;
+            }
+            text-accepted(text) => {
+                tabs[index].description = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Keywords:");
+        }
+
+        LineEdit {
+            text: tabs[index].keywords;
+            read-only: read-only;
+
+            text-edited(text) => {
+                tabs[index].keywords = text;
+            }
+            text-accepted(text) => {
+                tabs[index].keywords = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Author:");
+        }
+
+        LineEdit {
+            text: tabs[index].author;
+            read-only: read-only;
+
+            text-edited(text) => {
+                tabs[index].author = text;
+            }
+            text-accepted(text) => {
+                tabs[index].author = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Version:");
+        }
+
+        LineEdit {
+            text: tabs[index].version;
+            validation-error: tabs[index].version-error;
+            read-only: read-only;
+
+            text-edited(text) => {
+                tabs[index].version = text;
+            }
+            text-accepted(text) => {
+                tabs[index].version = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Deprecated:");
+        }
+
+        Switch {
+            font-size: 10px;
+            text: @tr("Check this if the element should no longer be used.");
+            checked: tabs[index].deprecated;
+            enabled: !read-only;
+
+            toggled(checked) => {
+                tabs[index].deprecated = checked;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Categories:");
+        }
+
+        CategoriesListView {
+            model: tabs[index].categories;
+            read-only: read-only;
+
+            add-triggered => {
+                add-category-popup.show();
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Datasheet:");
+        }
+
+        LineEdit {
+            text: tabs[index].datasheet-url;
+            validation-error: tabs[index].datasheet-url-error;
+            read-only: read-only;
+
+            text-edited(text) => {
+                tabs[index].datasheet-url = text;
+            }
+            text-accepted(text) => {
+                tabs[index].datasheet-url = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Schematic-Only:");
+        }
+
+        Switch {
+            font-size: 10px;
+            text: @tr("Check this if this component cannot be placed on boards (e.g. supply symbols, sheet frames, ...).");
+            checked: tabs[index].schematic-only;
+            enabled: !read-only;
+
+            toggled(checked) => {
+                tabs[index].schematic-only = checked;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Prefix:");
+        }
+
+        LineEdit {
+            text: tabs[index].prefix;
+            validation-error: tabs[index].prefix-error;
+            read-only: read-only;
+
+            text-edited(text) => {
+                tabs[index].prefix = text;
+            }
+            text-accepted(text) => {
+                tabs[index].prefix = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Default Value:");
+        }
+
+        TextEdit {
+            preferred-height: 100px;
+            text: tabs[index].default-value;
+            validation-error: tabs[index].default-value-error;
+            read-only: read-only;
+
+            text-edited(text) => {
+                tabs[index].default-value = text;
+            }
+            text-accepted(text) => {
+                tabs[index].default-value = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Attributes:");
+        }
+
+        AttributeTableView {
+            model: tabs[index].attributes;
+            //read-only: read-only;
+        }
+    }
+
+    Row {
+        Rectangle { }
+
+        HorizontalLayout {
+            spacing: 5px;
+
+            if !read-only: save-btn := Button {
+                width: max(self.preferred-width, 100px);
+                primary: Data.sections[section-index].tabs[index].unsaved-changes;
+                icon: @image-url("../../../../../font-awesome/svgs/solid/check.svg");
+                text: @tr("Save");
+
+                clicked => {
+                    Backend.trigger-tab(section-index, index, TabAction.save);
+                }
+            }
+
+            if !tabs[index].wizard-mode: LibraryRuleCheckLink {
+                data: tabs[index].checks;
+
+                clicked => {
+                    Data.set-current-tab(section-index, index);
+                    Data.panel-page = PanelPage.rule-check;
+                }
+            }
+
+            Rectangle { }
+        }
+    }
+
+    Row {
+        Rectangle { }
+    }
+
+    // Open the category chooser when requested by the backend.
+    //property <string> new-category: tabs[index].new-category;
+    //changed new-category => {
+    //    if new-category == "choose" {
+    //        add-category-popup.show();
+    //    }
+    //}
+
+    add-category-popup := TreeItemPickerPopup {
+        width: parent.width;
+        height: parent.height;
+        model: tabs[index].categories-tree;
+
+        item-picked(idx, item) => {
+            tabs[index].new-category = item.user-data;
+        }
+    }
+
+    Row {
+        Rectangle { }
+    }
+}
+
+export component ComponentTab inherits Tab {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    property <[ComponentTabData]> tabs: section.component-tabs;
+    property <int> index: section.current-tab-index;
+    property <bool> read-only: section.tabs[index].features.save != FeatureState.enabled;
+
+    enabled: true;
+
+    VerticalLayout {
+        Rectangle {
+            width: parent.width;
+            height: tabs[index].interface-broken-msg ? (self.preferred-height + 8px) : 0;
+            background: yellow;
+            visible: self.height > 0;
+            clip: true;
+
+            animate height { duration: 150ms; }
+
+            Text {
+                width: parent.width - 8px;
+                color: #800000;
+                font-weight: 600;
+                horizontal-alignment: left;
+                vertical-alignment: center;
+                wrap: word-wrap;
+                text: @tr("Attention").to-uppercase() + ": " + @tr("You have changed some important properties of this library element. This is a serious issue as it breaks all dependent library elements! If this library element is already used somewhere, it is highly recommended to create a new one instead of modifying this one.");
+            }
+        }
+
+        SlideView {
+            pages: [
+                { title: @tr("Metadata") },
+                { title: @tr("Signals") },
+                { title: @tr("Symbols") },
+            ];
+            current-index: tabs[index].page-index;
+
+            ComponentMetadata {
+                width: parent.width;
+                section-index: section-index;
+                tabs: tabs;
+                index: index;
+                read-only: read-only;
+            }
+
+            ComponentSignalListView {
+                width: parent.width;
+                model: tabs[index].cmp-signals;
+                new-name: tabs[index].new-signal-name;
+                new-name-error: tabs[index].new-signal-name-error;
+
+                edited => {
+                    Backend.trigger-tab(section-index, index, TabAction.apply);
+                }
+                new-signal-edited(text) => {
+                    tabs[index].new-signal-name = text;
+                }
+                new-signal-committed => {
+                    tabs[index].new-signal-commit = true;
+                }
+            }
+
+            ComponentVariantListView {
+                width: parent.width;
+                model: tabs[index].variants;
+                signal-names: tabs[index].cmp-signal-names;
+
+                render-scene(variant, gate, width, height) => {
+                    Backend.render-scene(section-index, width, height, variant * 1000 + gate, 0)
+                }
+            }
+
+            page-clicked(idx) => {
+                tabs[index].page-index = idx;
+            }
+        }
+    }
+}
