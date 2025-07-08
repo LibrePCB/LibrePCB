@@ -190,10 +190,14 @@ add_library(
   library/cmp/componenteditorwidget.cpp
   library/cmp/componenteditorwidget.h
   library/cmp/componenteditorwidget.ui
+  library/cmp/componentgateeditor.cpp
+  library/cmp/componentgateeditor.h
+  library/cmp/componentgatelistmodel.cpp
+  library/cmp/componentgatelistmodel.h
+  library/cmp/componentpinoutlistmodel.cpp
+  library/cmp/componentpinoutlistmodel.h
   library/cmp/componentpinsignalmapmodel.cpp
   library/cmp/componentpinsignalmapmodel.h
-  library/cmp/componentsignallisteditorwidget.cpp
-  library/cmp/componentsignallisteditorwidget.h
   library/cmp/componentsignallistmodel.cpp
   library/cmp/componentsignallistmodel.h
   library/cmp/componentsymbolvarianteditdialog.cpp
@@ -207,6 +211,12 @@ add_library(
   library/cmp/componentsymbolvariantlistmodel.h
   library/cmp/componentsymbolvariantlistwidget.cpp
   library/cmp/componentsymbolvariantlistwidget.h
+  library/cmp/componenttab.cpp
+  library/cmp/componenttab.h
+  library/cmp/componentvarianteditor.cpp
+  library/cmp/componentvarianteditor.h
+  library/cmp/componentvariantlistmodel.cpp
+  library/cmp/componentvariantlistmodel.h
   library/cmp/compsymbvarpinsignalmapeditorwidget.cpp
   library/cmp/compsymbvarpinsignalmapeditorwidget.h
   library/cmp/if_componentsymbolvarianteditorprovider.h
@@ -217,12 +227,18 @@ add_library(
   library/dev/deviceeditorwidget.ui
   library/dev/devicepadsignalmapmodel.cpp
   library/dev/devicepadsignalmapmodel.h
+  library/dev/devicepinoutmodel.cpp
+  library/dev/devicepinoutmodel.h
+  library/dev/devicetab.cpp
+  library/dev/devicetab.h
   library/dev/padsignalmapeditorwidget.cpp
   library/dev/padsignalmapeditorwidget.h
   library/dev/partlisteditorwidget.cpp
   library/dev/partlisteditorwidget.h
   library/dev/partlistmodel.cpp
   library/dev/partlistmodel.h
+  library/dev/partlistmodel2.cpp
+  library/dev/partlistmodel2.h
   library/downloadlibrarytab.cpp
   library/downloadlibrarytab.h
   library/eaglelibraryimportwizard/eaglelibraryimportwizard.cpp
@@ -272,6 +288,8 @@ add_library(
   library/kicadlibraryimportwizard/kicadlibraryimportwizardpage_start.ui
   library/lib/librarydependenciesmodel.cpp
   library/lib/librarydependenciesmodel.h
+  library/lib/libraryelementsmodel.cpp
+  library/lib/libraryelementsmodel.h
   library/lib/librarytab.cpp
   library/lib/librarytab.h
   library/librariesmodel.cpp
@@ -388,6 +406,10 @@ add_library(
   library/pkg/packagepadlisteditorwidget.h
   library/pkg/packagepadlistmodel.cpp
   library/pkg/packagepadlistmodel.h
+  library/pkg/packagepadlistmodel2.cpp
+  library/pkg/packagepadlistmodel2.h
+  library/pkg/packagetab.cpp
+  library/pkg/packagetab.h
   library/sym/fsm/symboleditorfsm.cpp
   library/sym/fsm/symboleditorfsm.h
   library/sym/fsm/symboleditorfsmadapter.h

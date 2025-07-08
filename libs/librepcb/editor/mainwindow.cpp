@@ -27,13 +27,16 @@
 #include "guiapplication.h"
 #include "library/cat/componentcategorytab.h"
 #include "library/cat/packagecategorytab.h"
+#include "library/cmp/componenttab.h"
 #include "library/createlibrarytab.h"
+#include "library/dev/devicetab.h"
 #include "library/downloadlibrarytab.h"
 #include "library/eaglelibraryimportwizard/eaglelibraryimportwizard.h"
 #include "library/kicadlibraryimportwizard/kicadlibraryimportwizard.h"
 #include "library/lib/librarytab.h"
 #include "library/librariesmodel.h"
 #include "library/libraryeditor.h"
+#include "library/pkg/packagetab.h"
 #include "library/sym/symboltab.h"
 #include "mainwindowtestadapter.h"
 #include "notificationsmodel.h"
@@ -56,6 +59,9 @@
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/library/cat/componentcategory.h>
 #include <librepcb/core/library/cat/packagecategory.h>
+#include <librepcb/core/library/cmp/component.h>
+#include <librepcb/core/library/dev/device.h>
+#include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/workspace/workspace.h>
@@ -629,6 +635,9 @@ void MainWindow::triggerLibraryElement(slint::SharedString path,
       if (switchToLibraryElementTab<ComponentCategoryTab>(fp)) return;
       if (switchToLibraryElementTab<PackageCategoryTab>(fp)) return;
       if (switchToLibraryElementTab<SymbolTab>(fp)) return;
+      if (switchToLibraryElementTab<PackageTab>(fp)) return;
+      if (switchToLibraryElementTab<ComponentTab>(fp)) return;
+      if (switchToLibraryElementTab<DeviceTab>(fp)) return;
       if (mApp.getLibrary(fp)) {
         openLibraryTab(fp, false);
       }
@@ -968,17 +977,77 @@ void MainWindow::openSymbolTab(LibraryEditor& editor, const FilePath& fp,
 
 void MainWindow::openPackageTab(LibraryEditor& editor,
                                 const FilePath& fp) noexcept {
-  editor.openLegacyPackageEditor(fp);
+  if (!switchToLibraryElementTab<PackageTab>(fp)) {
+    try {
+      std::unique_ptr<Package> pkg;
+      if (fp.isValid()) {
+        auto fs = TransactionalFileSystem::open(
+            fp, editor.isWritable(), &askForRestoringBackup,
+            DirectoryLockHandlerDialog::createDirectoryLockCallback());
+        pkg = Package::open(std::unique_ptr<TransactionalDirectory>(
+            new TransactionalDirectory(fs)));
+      } else {
+        pkg.reset(new Package(Uuid::createRandom(), Version::fromString("0.1"),
+                              mApp.getWorkspace().getSettings().userName.get(),
+                              ElementName("New Package"), QString(), QString(),
+                              Package::AssemblyType::Auto));
+      }
+      addTab(
+          std::make_shared<PackageTab>(editor, std::move(pkg), !fp.isValid()));
+    } catch (const Exception& e) {
+      QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
+    }
+  }
 }
 
 void MainWindow::openComponentTab(LibraryEditor& editor,
                                   const FilePath& fp) noexcept {
-  editor.openLegacyComponentEditor(fp);
+  if (!switchToLibraryElementTab<ComponentTab>(fp)) {
+    try {
+      std::unique_ptr<Component> cmp;
+      if (fp.isValid()) {
+        auto fs = TransactionalFileSystem::open(
+            fp, editor.isWritable(), &askForRestoringBackup,
+            DirectoryLockHandlerDialog::createDirectoryLockCallback());
+        cmp = Component::open(std::unique_ptr<TransactionalDirectory>(
+            new TransactionalDirectory(fs)));
+      } else {
+        cmp.reset(
+            new Component(Uuid::createRandom(), Version::fromString("0.1"),
+                          mApp.getWorkspace().getSettings().userName.get(),
+                          ElementName("New Component"), QString(), QString()));
+      }
+      addTab(std::make_shared<ComponentTab>(editor, std::move(cmp),
+                                            !fp.isValid()));
+    } catch (const Exception& e) {
+      QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
+    }
+  }
 }
 
 void MainWindow::openDeviceTab(LibraryEditor& editor,
                                const FilePath& fp) noexcept {
-  editor.openLegacyDeviceEditor(fp);
+  if (!switchToLibraryElementTab<DeviceTab>(fp)) {
+    try {
+      std::unique_ptr<Device> dev;
+      if (fp.isValid()) {
+        auto fs = TransactionalFileSystem::open(
+            fp, editor.isWritable(), &askForRestoringBackup,
+            DirectoryLockHandlerDialog::createDirectoryLockCallback());
+        dev = Device::open(std::unique_ptr<TransactionalDirectory>(
+            new TransactionalDirectory(fs)));
+      } else {
+        dev.reset(new Device(Uuid::createRandom(), Version::fromString("0.1"),
+                             mApp.getWorkspace().getSettings().userName.get(),
+                             ElementName("New Device"), QString(), QString(),
+                             Uuid::createRandom(), Uuid::createRandom()));
+      }
+      addTab(
+          std::make_shared<DeviceTab>(editor, std::move(dev), !fp.isValid()));
+    } catch (const Exception& e) {
+      QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
+    }
+  }
 }
 
 void MainWindow::openSchematicTab(int projectIndex, int index) noexcept {

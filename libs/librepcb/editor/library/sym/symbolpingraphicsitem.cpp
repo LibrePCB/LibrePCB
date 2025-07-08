@@ -49,7 +49,7 @@ namespace editor {
 
 SymbolPinGraphicsItem::SymbolPinGraphicsItem(
     std::shared_ptr<SymbolPin> pin, const GraphicsLayerList& layers,
-    std::shared_ptr<const Component> cmp,
+    QPointer<const Component> cmp,
     std::shared_ptr<const ComponentSymbolVariantItem> cmpItem,
     QGraphicsItem* parent) noexcept
   : QGraphicsItemGroup(parent),

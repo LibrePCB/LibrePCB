@@ -1,0 +1,308 @@
+import {
+    Button,
+    CategoriesListView,
+    ComboBox,
+    IconButton,
+    LineEdit,
+    LinkText,
+    MenuItem,
+    MenuPopup,
+    MessageBox,
+    Palette,
+    SceneButton,
+    ScrollView,
+    SlideView,
+    Switch,
+    TextEdit,
+    ToolButton,
+    TreeItemPickerPopup,
+} from "../../widgets.slint";
+import {
+    Backend,
+    ComponentGateData,
+    ComponentPinoutData,
+    ComponentPinoutDisplayMode,
+    ComponentTabData,
+    ComponentVariantData,
+    Constants,
+    Data,
+    DismissableMessageAction,
+    EditorCommandSet as Cmd,
+    EditorTool,
+    PanelPage,
+    TabAction,
+    WindowSectionData,
+} from "../../api.slint";
+
+component ComponentGateListItem {
+    in-out property <[ComponentGateData]> model;
+    in property <int> index;
+    in-out property <[string]> signal-names;
+    property <length> pinout-row-height: 25px;
+
+    pure callback render-scene(width: length, height: length) -> image;
+
+    HorizontalLayout {
+        padding: 5px;
+        spacing: 5px;
+
+        Rectangle {
+            max-width: 200px;
+
+            Image {
+                x: 0;
+                y: 0;
+                width: 100%;
+                height: 100%;
+                image-fit: preserve;
+                image-rendering: pixelated;
+                source: render-scene(parent.width, parent.height);
+            }
+        }
+
+        VerticalLayout {
+            spacing: 5px;
+
+            HorizontalLayout {
+                spacing: 5px;
+
+                Text {
+                    vertical-alignment: center;
+                    text: @tr("Gate:");
+                }
+
+                Text {
+                    font-size: 14px;
+                    font-weight: 600;
+                    vertical-alignment: center;
+                    text: model[index].symbol-name;
+                }
+
+                Rectangle { }
+
+                Switch {
+                    width: self.preferred-width;
+                    size: 18px;
+                    text: @tr("Required:");
+                    text-side: left;
+                    font-size: 10px;
+                }
+
+                LineEdit {
+                    horizontal-stretch: 0;
+                    height: 22px;
+                    label: @tr("Suffix");
+                    text: model[index].suffix;
+                }
+
+                IconButton {
+                    style: hyperlink;
+                    icon-scale: 0.7;
+                    icon: @image-url("../../../../../font-awesome/svgs/solid/trash-can.svg");
+                }
+            }
+
+            HorizontalLayout {
+                spacing: 8px;
+                padding-left: 20px;
+
+                VerticalLayout {
+                    width: self.preferred-width;
+                    spacing: 2px;
+
+                    for pinout in model[index].pinout: Text {
+                        height: pinout-row-height;
+                        horizontal-alignment: right;
+                        vertical-alignment: center;
+                        text: pinout.pin-name + ":";
+                    }
+                }
+
+                VerticalLayout {
+                    spacing: 2px;
+
+                    for pinout in model[index].pinout: ComboBox {
+                        height: pinout-row-height;
+                        model: signal-names;
+                        current-index: pinout.signal-index;
+                    }
+
+                    LinkText {
+                        text: @tr("Auto-assign all signals by name");
+                    }
+                }
+
+                VerticalLayout {
+                    width: self.preferred-width;
+                    spacing: 2px;
+
+                    for pinout in model[index].pinout: HorizontalLayout {
+                        height: pinout-row-height;
+                        spacing: 8px;
+
+                        LinkText {
+                            text: @tr("None").to-uppercase();
+                            text-color: (pinout.display-mode == ComponentPinoutDisplayMode.none) ? #e0e0e0 : #909090;
+                            vertical-alignment: center;
+                            font-size: 10px;
+                        }
+
+                        LinkText {
+                            text: @tr("Pin").to-uppercase();
+                            text-color: (pinout.display-mode == ComponentPinoutDisplayMode.pin-name) ? #e0e0e0 : #909090;
+                            vertical-alignment: center;
+                            font-size: 10px;
+                        }
+
+                        LinkText {
+                            text: @tr("Signal").to-uppercase();
+                            text-color: (pinout.display-mode == ComponentPinoutDisplayMode.signal-name) ? #e0e0e0 : #909090;
+                            vertical-alignment: center;
+                            font-size: 10px;
+                        }
+
+                        LinkText {
+                            text: @tr("Net").to-uppercase();
+                            text-color: (pinout.display-mode == ComponentPinoutDisplayMode.net-name) ? #e0e0e0 : #909090;
+                            vertical-alignment: center;
+                            font-size: 10px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+component ComponentVariantListItem inherits Rectangle {
+    in-out property <[ComponentVariantData]> model;
+    in property <int> index;
+    in-out property <[string]> signal-names;
+
+    pure callback render-scene(gate: int, width: length, height: length) -> image;
+
+    height: self.preferred-height;
+    border-color: #909090;
+    border-width: 1px;
+    border-radius: 10px;
+
+    VerticalLayout {
+        HorizontalLayout {
+            padding: 5px;
+            spacing: 5px;
+
+            LineEdit {
+                label: @tr("Variant");
+                text: model[index].name;
+            }
+
+            LineEdit {
+                label: @tr("Description");
+                text: model[index].description;
+            }
+
+            LineEdit {
+                label: @tr("Norm");
+                text: model[index].norm;
+                suggestions: Data.norms;
+            }
+
+            IconButton {
+                style: hyperlink;
+                icon-scale: 0.7;
+                icon: @image-url("../../../../../font-awesome/svgs/solid/ellipsis-vertical.svg");
+
+                clicked => {
+                    context-menu-item-index = index;
+                    context-menu-x = self.absolute-position.x - root.absolute-position.x;
+                    context-menu-y = self.absolute-position.y - root.absolute-position.y + self.height;
+                    context-menu-popup.show();
+                }
+            }
+        }
+
+        Rectangle {
+            height: 1px;
+            background: #909090;
+        }
+
+        for gate[gate-index] in model[index].gates: ComponentGateListItem {
+            model: model[index].gates;
+            index: gate-index;
+            signal-names: signal-names;
+
+            render-scene(width, height) => {
+                root.render-scene(gate-index, width, height)
+            }
+        }
+
+        VerticalLayout {
+            padding: 5px;
+
+            Button {
+                icon: @image-url("../../../../../font-awesome/svgs/solid/plus.svg");
+                text: @tr("Add Gate") + "...";
+            }
+        }
+    }
+
+    property <length> context-menu-x;
+    property <length> context-menu-y;
+    property <int> context-menu-item-index;
+    context-menu-popup := MenuPopup {
+        x: min(context-menu-x, parent.width - self.width);
+        y: context-menu-y;
+
+        set-default-item := MenuItem {
+            text: @tr("Set as Default");
+            enabled: context-menu-item-index > 0;
+
+            clicked => {
+                //model[context-menu-item-index].forced-net-name = " ";
+            }
+        }
+
+        remove-item := MenuItem {
+            cmd: Cmd.remove;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/trash-can.svg");
+            shortcuts: "";
+
+            clicked => {
+                //model[context-menu-item-index].delete = true;
+            }
+        }
+    }
+}
+
+export component ComponentVariantListView {
+    in-out property <[ComponentVariantData]> model;
+    in-out property <[string]> signal-names;
+
+    pure callback render-scene(variant: int, gate: int, width: length, height: length) -> image;
+
+    VerticalLayout {
+        ScrollView {
+            preferred-height: l.preferred-height;
+
+            l := VerticalLayout {
+                padding: 8px;
+                spacing: 10px;
+
+                for item[index] in model: ComponentVariantListItem {
+                    model: model;
+                    index: index;
+                    signal-names: signal-names;
+
+                    render-scene(gate, width, height) => {
+                        root.render-scene(index, gate, width, height)
+                    }
+                }
+
+                Button {
+                    icon: @image-url("../../../../../font-awesome/svgs/solid/plus.svg");
+                    text: @tr("Add Variant") + "...";
+                }
+            }
+        }
+    }
+}

@@ -88,6 +88,107 @@ export struct GraphicsLayerData {
     visible: bool,
 }
 
+export struct AttributeData {
+    key: string,
+    type: int,  // Index corresponds to AttributeType::getAllTypes().
+    value: string,
+    unit: int,  // Index corresponds to AttributeType::getAvailableUnits().
+}
+
+export struct ResourceData {
+    name: string,
+    mediatype: string,
+    url: string,
+}
+
+export struct PackagePadData {
+    id: string,
+    name: string,
+    name-error: string,
+
+    delete: bool,  // Set by UI, reset by backend.
+}
+
+export struct FootprintData {
+    id: string,
+    name: string,
+    name-error: string,
+
+    delete: bool,  // Set by UI, reset by backend.
+}
+
+export struct ComponentSignalData {
+    id: string,
+    name: string,
+    name-error: string,
+    forced-net-name: string,
+    required: bool,
+
+    delete: bool,  // Set by UI, reset by backend.
+}
+
+export enum ComponentPinoutDisplayMode {
+    none,
+    pin-name,
+    signal-name,
+    net-name,
+}
+
+export struct ComponentPinoutData {
+    pin-name: string,
+    signal-index: int,
+    display-mode: ComponentPinoutDisplayMode,
+}
+
+export struct ComponentGateData {
+    id: string,
+    symbol-name: string,
+    symbol-x: Int64,
+    symbol-y: Int64,
+    symbol-rotation: int,
+    required: bool,
+    suffix: string,
+    pinout: [ComponentPinoutData],
+}
+
+export struct ComponentVariantData {
+    id: string,
+    name: string,
+    name-error: string,
+    description: string,
+    norm: string,
+    gates: [ComponentGateData],
+}
+
+export struct DevicePartData {
+    mpn: string,
+    manufacturer: string,
+    attributes: [AttributeData],
+}
+
+export struct DevicePinoutData {
+    pad-name: string,
+    signal-index: int,
+}
+
+export struct LibraryElementCategoryData {
+    uuid: string,
+    names: [string],
+    delete: bool,  // Set by UI, reset by backend.
+}
+
+export enum HAlign {
+    left,
+    center,
+    right,
+}
+
+export enum VAlign {
+    top,
+    center,
+    bottom,
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Widgets data
 ////////////////////////////////////////////////////////////////////////////////
@@ -218,6 +319,9 @@ export enum RuleCheckType {
     component-category-check,
     package-category-check,
     symbol-check,
+    package-check,
+    component-check,
+    device-check,
 }
 
 export enum RuleCheckState {
@@ -393,6 +497,9 @@ export enum TabType {
     component-category,
     package-category,
     symbol,
+    package,
+    component,
+    device,
     schematic,
     board-2d,
     board-3d,
@@ -691,6 +798,141 @@ export struct SymbolTabData {
     new-category: string,  // Set to UUID by UI, reset by backend.
 }
 
+// Additional data for package editor tabs
+export struct PackageTabData {
+    // General
+    library-index: int,
+    wizard-mode: bool,
+    page-index: int,
+
+    // Metadata
+    path: string,
+    name: string,
+    name-error: string,
+    description: string,
+    keywords: string,
+    author: string,
+    version: string,
+    version-error: string,
+    deprecated: bool,
+    categories: [LibraryElementCategoryData],
+    categories-tree: [TreeViewItemData],
+    pads: [PackagePadData],
+    footprints: [FootprintData],
+    checks: RuleCheckData,
+
+    // View
+    background-color: brush,
+    foreground-color: brush,
+    overlay-color: brush,
+    overlay-text-color: brush,
+    grid-style: GridStyle,
+    grid-interval: Int64,
+    unit: LengthUnit,
+
+    // Messages
+    interface-broken-msg: bool,
+    //import-pins-msg: DismissableMessageData,
+
+    // Data about the currently active tool
+    tool: EditorTool,
+    tool-cursor: MouseCursor,
+    tool-overlay-text: string,
+    tool-layer: ComboBoxData,
+    tool-line-width: LengthEditData,
+    tool-size: LengthEditData,
+    tool-angle: AngleEditData,
+    tool-filled: bool,
+    tool-grab-area: bool,
+    tool-value: LineEditData,
+    tool-halign: HAlign,
+    tool-valign: VAlign,
+
+    //compact-layout: bool,  // Set by UI
+    scene-image-pos: Point,  // Absolute position of graphics scene
+    frame: int,  // Frame index to trigger repainting
+
+    new-category: string,  // Set to UUID by UI, reset by backend.
+}
+
+// Additional data for component editor tabs
+export struct ComponentTabData {
+    // General
+    library-index: int,
+    wizard-mode: bool,
+    page-index: int,
+
+    // Metadata
+    path: string,
+    name: string,
+    name-error: string,
+    description: string,
+    keywords: string,
+    author: string,
+    version: string,
+    version-error: string,
+    deprecated: bool,
+    categories: [LibraryElementCategoryData],
+    categories-tree: [TreeViewItemData],
+    datasheet-url: string,
+    datasheet-url-error: string,
+    schematic-only: bool,
+    prefix: string,
+    prefix-error: string,
+    default-value: string,
+    default-value-error: string,
+    attributes: [AttributeData],
+    cmp-signals: [ComponentSignalData],  // Name conflict with Qt's "signals"
+    cmp-signal-names: [string],  // Used for the pinout combobox
+    variants: [ComponentVariantData],
+    checks: RuleCheckData,
+
+    // Messages
+    interface-broken-msg: bool,
+
+    new-category: string,  // Set to UUID by UI, reset by backend.
+    new-signal-name: string,
+    new-signal-name-error: string,
+    new-signal-commit: bool,  // Set to UUID by UI, reset by backend.
+}
+
+// Additional data for device editor tabs
+export struct DeviceTabData {
+    // General
+    library-index: int,
+    wizard-mode: bool,
+    page-index: int,
+
+    // Metadata
+    path: string,
+    name: string,
+    name-error: string,
+    description: string,
+    keywords: string,
+    author: string,
+    version: string,
+    version-error: string,
+    deprecated: bool,
+    categories: [LibraryElementCategoryData],
+    categories-tree: [TreeViewItemData],
+    datasheet-url: string,
+    datasheet-url-error: string,
+    attributes: [AttributeData],
+    component-name: string,
+    component-description: string,
+    package-name: string,
+    package-description: string,
+    cmp-signal-names: [string],  // Used for the pinout combobox
+    pinout: [DevicePinoutData],
+    parts: [DevicePartData],
+    checks: RuleCheckData,
+
+    // Messages
+    interface-broken-msg: bool,
+
+    new-category: string,  // Set to UUID by UI, reset by backend.
+}
+
 // Additional data for schematic editor tabs
 export struct SchematicTabData {
     project-index: int,
@@ -809,6 +1051,9 @@ export struct WindowSectionData {
     component-category-tabs: [CategoryTabData],  // Proxy view for `tabs`
     package-category-tabs: [CategoryTabData],  // Proxy view for `tabs`
     symbol-tabs: [SymbolTabData],  // Proxy view for `tabs`
+    package-tabs: [PackageTabData],  // Proxy view for `tabs`
+    component-tabs: [ComponentTabData],  // Proxy view for `tabs`
+    device-tabs: [DeviceTabData],  // Proxy view for `tabs`
     schematic-tabs: [SchematicTabData],  // Proxy view for `tabs`
     board-2d-tabs: [Board2dTabData],  // Proxy view for `tabs`
     board-3d-tabs: [Board3dTabData],  // Proxy view for `tabs`
