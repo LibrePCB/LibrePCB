@@ -1,15 +1,28 @@
 import { ScrollView } from "std-widgets.slint";
 import { Tab } from "../../tab.slint";
-import { LibraryRuleCheckLink } from "../libraryrulechecklink.slint";
 import { LibraryTreeView } from "../librarytreeview.slint";
+import {
+    AuthorRowHeader,
+    DependenciesRowCell,
+    DependenciesRowHeader,
+    DeprecatedRowCell,
+    DeprecatedRowHeader,
+    DescriptionRowHeader,
+    IconRowCell,
+    IconRowHeader,
+    KeywordsRowHeader,
+    ManufacturerRowHeader,
+    MetadataFooterRowCell,
+    NameRowHeader,
+    UrlRowHeader,
+    VersionRowHeader,
+} from "../metadatawidgets.slint";
 import {
     Button,
     IconButton,
     LineEdit,
-    ListViewItemButton,
     SlideView,
     Spinner,
-    Switch,
     TextEdit,
 } from "../../widgets.slint";
 import {
@@ -22,7 +35,6 @@ import {
     LibraryDependency,
     LibraryElementAction,
     LibraryTabData,
-    PanelPage,
     TabAction,
     WindowSectionData,
 } from "../../api.slint";
@@ -159,57 +171,19 @@ component LibraryMetadataTab inherits GridLayout {
     spacing: 8px;
 
     Row {
-        Text {
-            width: self.preferred-width;
-            vertical-alignment: center;
-            text: @tr("Icon:");
-            accessible-role: none;
-        }
+        icon-txt := IconRowHeader { }
 
-        HorizontalLayout {
-            z: 10;  // For the tooltips.
-            alignment: start;
-            spacing: 8px;
+        icon-cell := IconRowCell {
+            icon: tabs[index].icon;
 
-            icon-btn := IconButton {
-                property <bool> has-icon: tabs[index].icon.width > 0;
-
-                height: 48px;
-                style: hyperlink;
-                colorize: !has-icon;
-                icon-size: has-icon ? 48px : 20px;
-                icon: {
-                    if has-icon {
-                        tabs[index].icon
-                    } else {
-                        @image-url("../../../../../bootstrap-icons/icons/folder2-open.svg")
-                    }
-                };
-                enabled: !read-only;
-
-                clicked => {
-                    Backend.trigger-tab(section-index, index, TabAction.library-choose-icon);
-                }
-            }
-
-            if icon-btn.has-hover: Text {
-                color: #a0a0a0;
-                font-size: 11px;
-                vertical-alignment: center;
-                overflow: elide;
-                text: @tr("Click to change the icon.") + "\n" + @tr("Preferred:") + " PNG, 256x256 px";
-                accessible-role: none;
+            clicked => {
+                Backend.trigger-tab(section-index, index, TabAction.library-choose-icon);
             }
         }
     }
 
     Row {
-        name-txt := Text {
-            width: self.preferred-width;
-            vertical-alignment: center;
-            text: @tr("Name:");
-            accessible-role: none;
-        }
+        name-txt := NameRowHeader { }
 
         name-edt := LineEdit {
             text: tabs[index].name;
@@ -235,12 +209,7 @@ component LibraryMetadataTab inherits GridLayout {
     }
 
     Row {
-        description-txt := Text {
-            width: self.preferred-width;
-            vertical-alignment: center;
-            text: @tr("Description:");
-            accessible-role: none;
-        }
+        description-txt := DescriptionRowHeader { }
 
         description-edt := TextEdit {
             height: 100px;
@@ -260,12 +229,7 @@ component LibraryMetadataTab inherits GridLayout {
     }
 
     Row {
-        keywords-txt := Text {
-            width: self.preferred-width;
-            vertical-alignment: center;
-            text: @tr("Keywords:");
-            accessible-role: none;
-        }
+        keywords-txt := KeywordsRowHeader { }
 
         keywords-edt := LineEdit {
             text: tabs[index].keywords;
@@ -284,12 +248,7 @@ component LibraryMetadataTab inherits GridLayout {
     }
 
     Row {
-        author-txt := Text {
-            width: self.preferred-width;
-            vertical-alignment: center;
-            text: @tr("Author:");
-            accessible-role: none;
-        }
+        author-txt := AuthorRowHeader { }
 
         author-edt := LineEdit {
             text: tabs[index].author;
@@ -308,12 +267,7 @@ component LibraryMetadataTab inherits GridLayout {
     }
 
     Row {
-        version-txt := Text {
-            width: self.preferred-width;
-            vertical-alignment: center;
-            text: @tr("Version:");
-            accessible-role: none;
-        }
+        version-txt := VersionRowHeader { }
 
         version-edt := LineEdit {
             text: tabs[index].version;
@@ -333,20 +287,13 @@ component LibraryMetadataTab inherits GridLayout {
     }
 
     Row {
-        deprecated-txt := Text {
-            width: self.preferred-width;
-            vertical-alignment: center;
-            text: @tr("Deprecated:");
-            accessible-role: none;
-        }
+        deprecated-txt := DeprecatedRowHeader { }
 
-        deprecated-sw := Switch {
-            font-size: 10px;
-            text: @tr("Check this if the library should no longer be used.");
+        deprecated-sw := DeprecatedRowCell {
+            text: @tr("Check this if this library should no longer be used.");
             checked: tabs[index].deprecated;
             enabled: !read-only;
             accessible-label: deprecated-txt.text;
-            accessible-description: self.text;
 
             toggled(checked) => {
                 tabs[index].deprecated = checked;
@@ -356,12 +303,7 @@ component LibraryMetadataTab inherits GridLayout {
     }
 
     Row {
-        url-txt := Text {
-            width: self.preferred-width;
-            vertical-alignment: center;
-            text: @tr("URL:");
-            accessible-role: none;
-        }
+        url-txt := UrlRowHeader { }
 
         url-edt := LineEdit {
             text: tabs[index].url;
@@ -381,87 +323,20 @@ component LibraryMetadataTab inherits GridLayout {
     }
 
     Row {
-        Text {
-            width: self.preferred-width;
-            vertical-alignment: center;
-            text: @tr("Dependencies:");
-            accessible-role: none;
-        }
+        dependencies-txt := DependenciesRowHeader { }
 
-        VerticalLayout {
-            for item[idx] in tabs[index].dependencies: dependency-item-ta := TouchArea {
-                height: item.checked ? 22px : 0;
+        dependencies-cell := DependenciesRowCell {
+            model: tabs[index].dependencies;
+            read-only: read-only;
 
-                if item.checked: HorizontalLayout {
-                    padding-left: 3px;
-                    padding-right: 3px;
-                    spacing: 5px;
-                    alignment: start;
-
-                    Image {
-                        y: (parent.height - self.height) / 2;
-                        width: 18px;
-                        height: self.width;
-                        image-fit: contain;
-                        source: item.icon;
-                        accessible-role: none;
-                    }
-
-                    dependency-item-txt := Text {
-                        vertical-alignment: center;
-                        overflow: elide;
-                        text: item.name.is-empty ? item.uuid : item.name;
-                        accessible-description: "dependency";
-                    }
-
-                    if (!read-only) && dependency-item-ta.has-hover: ListViewItemButton {
-                        icon: @image-url("../../../../../font-awesome/svgs/solid/trash-can.svg");
-                        icon-size: 14px;
-
-                        clicked => {
-                            tabs[index].dependencies[idx].checked = false;
-                        }
-                    }
-                }
-            }
-
-            if !read-only: HorizontalLayout {
-                height: 22px;
-                padding-left: 1px;
-                padding-right: 3px;
-                spacing: 5px;
-                alignment: start;
-
-                add-dependency-btn := IconButton {
-                    style: hyperlink;
-                    icon-scale: 0.8;
-                    icon: @image-url("../../../../../bootstrap-icons/icons/plus-circle.svg");
-                    accessible-label: "add dependency";
-
-                    clicked => {
-                        add-dependency-popup.show();
-                    }
-                }
-
-                if add-dependency-btn.has-hover: Text {
-                    color: #a0a0a0;
-                    font-size: 11px;
-                    vertical-alignment: center;
-                    overflow: elide;
-                    text: @tr("Add Dependency");
-                    accessible-role: none;
-                }
+            add-dependency-clicked => {
+                add-dependency-popup.show();
             }
         }
     }
 
     Row {
-        manufacturer-txt := Text {
-            width: self.preferred-width;
-            vertical-alignment: center;
-            text: @tr("Manufacturer:");
-            accessible-role: none;
-        }
+        manufacturer-txt := ManufacturerRowHeader { }
 
         manufacturer-edt := LineEdit {
             text: tabs[index].manufacturer;
@@ -483,35 +358,12 @@ component LibraryMetadataTab inherits GridLayout {
     Row {
         Rectangle { }
 
-        HorizontalLayout {
-            alignment: start;
-            spacing: 5px;
-
-            if !read-only: save-btn := Button {
-                width: max(self.preferred-width, 100px);
-                primary: tabs[index].wizard-mode || Data.sections[section-index].tabs[index].unsaved-changes;
-                icon: {
-                    if tabs[index].wizard-mode {
-                        @image-url("../../../../../font-awesome/svgs/solid/angle-right.svg")
-                    } else {
-                        @image-url("../../../../../font-awesome/svgs/solid/check.svg")
-                    }
-                };
-                text: tabs[index].wizard-mode ? @tr("Next") : @tr("Save");
-
-                clicked => {
-                    Backend.trigger-tab(section-index, index, TabAction.save);
-                }
-            }
-
-            LibraryRuleCheckLink {
-                data: tabs[index].checks;
-
-                clicked => {
-                    Data.set-current-tab(section-index, index);
-                    Data.panel-page = PanelPage.rule-check;
-                }
-            }
+        footer-cell := MetadataFooterRowCell {
+            section-index: section-index;
+            tab-index: index;
+            wizard-mode: tabs[index].wizard-mode;
+            unsaved-changes: Data.sections[section-index].tabs[index].unsaved-changes;
+            checks: tabs[index].checks;
         }
     }
 

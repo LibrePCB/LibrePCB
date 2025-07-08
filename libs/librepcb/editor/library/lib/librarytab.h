@@ -90,9 +90,9 @@ public:
 
 signals:
   void componentCategoryEditorRequested(LibraryEditor& editor,
-                                        const FilePath& fp);
-  void packageCategoryEditorRequested(LibraryEditor& editor,
-                                      const FilePath& fp);
+                                        const FilePath& fp, bool copyFrom);
+  void packageCategoryEditorRequested(LibraryEditor& editor, const FilePath& fp,
+                                      bool copyFrom);
   void symbolEditorRequested(LibraryEditor& editor, const FilePath& fp);
   void packageEditorRequested(LibraryEditor& editor, const FilePath& fp);
   void componentEditorRequested(LibraryEditor& editor, const FilePath& fp);

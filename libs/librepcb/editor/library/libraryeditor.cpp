@@ -192,22 +192,6 @@ void LibraryEditor::forceClosingTabs(const QSet<FilePath>& fp) noexcept {
   }
 }
 
-void LibraryEditor::openLegacyComponentCategoryEditor(
-    const FilePath& fp) noexcept {
-  mLegacyEditor->show();
-  mLegacyEditor->raise();
-  mLegacyEditor->activateWindow();
-  mLegacyEditor->openComponentCategory(fp);
-}
-
-void LibraryEditor::openLegacyPackageCategoryEditor(
-    const FilePath& fp) noexcept {
-  mLegacyEditor->show();
-  mLegacyEditor->raise();
-  mLegacyEditor->activateWindow();
-  mLegacyEditor->openPackageCategory(fp);
-}
-
 void LibraryEditor::openLegacySymbolEditor(const FilePath& fp) noexcept {
   mLegacyEditor->show();
   mLegacyEditor->raise();
@@ -234,22 +218,6 @@ void LibraryEditor::openLegacyDeviceEditor(const FilePath& fp) noexcept {
   mLegacyEditor->raise();
   mLegacyEditor->activateWindow();
   mLegacyEditor->openDevice(fp);
-}
-
-void LibraryEditor::duplicateInLegacyComponentCategoryEditor(
-    const FilePath& fp) noexcept {
-  mLegacyEditor->show();
-  mLegacyEditor->raise();
-  mLegacyEditor->activateWindow();
-  mLegacyEditor->duplicateComponentCategory(fp);
-}
-
-void LibraryEditor::duplicateInLegacyPackageCategoryEditor(
-    const FilePath& fp) noexcept {
-  mLegacyEditor->show();
-  mLegacyEditor->raise();
-  mLegacyEditor->activateWindow();
-  mLegacyEditor->duplicatePackageCategory(fp);
 }
 
 void LibraryEditor::duplicateInLegacySymbolEditor(const FilePath& fp) noexcept {

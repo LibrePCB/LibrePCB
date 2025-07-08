@@ -5,6 +5,7 @@
         <file alias="/bi/cpu.svg">../libs/bootstrap-icons/icons/cpu.svg</file>
         <file alias="/bi/database.svg">../libs/bootstrap-icons/icons/database.svg</file>
         <file alias="/bi/floppy-fill.svg">../libs/bootstrap-icons/icons/floppy-fill.svg</file>
+        <file alias="/bi/folder.svg">../libs/bootstrap-icons/icons/folder.svg</file>
         <file alias="/bi/layers.svg">../libs/bootstrap-icons/icons/layers.svg</file>
         <file alias="/bi/lightning-fill.svg">../libs/bootstrap-icons/icons/lightning-fill.svg</file>
         <file alias="/bi/paint-bucket.svg">../libs/bootstrap-icons/icons/paint-bucket.svg</file>
