@@ -67,6 +67,31 @@ public:
   // Static Methods
 
   /**
+   * @brief Escape newlines to convert a multi-line to a single-line string
+   *
+   * @param s     Input string.
+   * @return Input string with `\n` converted to `\\n`.
+   */
+  static QString toSingleLine(const QString& s) noexcept;
+
+  /**
+   * @brief Replace newlines to convert a single-line to a multi-line string
+   *
+   * @param s     Input string.
+   * @return Input string with `\\n` converted to `\n`.
+   */
+  static QString toMultiLine(const QString& s) noexcept;
+
+  /**
+   * @brief Clean/normalize comma-separated keywords from user input
+   *
+   * @param userInput   Raw user input (e.g. "Foo, bar,foo, ").
+   *
+   * @return Lowercase with whitespaces & duplicates removed (e.g. "foo,bar").
+   */
+  static QString cleanKeywords(const QString& userInput) noexcept;
+
+  /**
    * @brief Load a SVG QIcon which is properly colorized
    *
    * @param file  Resource file path (e.g. ":/fa/solid/globe.svg")

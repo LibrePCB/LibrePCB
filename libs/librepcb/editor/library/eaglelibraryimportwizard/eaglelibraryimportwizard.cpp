@@ -78,17 +78,17 @@ EagleLibraryImportWizard::EagleLibraryImportWizard(Workspace& workspace,
       Qt::QueuedConnection);
 
   // Load window geometry.
-  QSettings clientSettings;
-  restoreGeometry(
-      clientSettings.value("library_editor/eagle_import_wizard/window_geometry")
-          .toByteArray());
+  QSettings cs;
+  const QSize windowSize = cs.value("eagle_import_wizard/window_size").toSize();
+  if (!windowSize.isEmpty()) {
+    resize(windowSize);
+  }
 }
 
 EagleLibraryImportWizard::~EagleLibraryImportWizard() noexcept {
   // Save window geometry.
-  QSettings clientSettings;
-  clientSettings.setValue("library_editor/eagle_import_wizard/window_geometry",
-                          saveGeometry());
+  QSettings cs;
+  cs.setValue("eagle_import_wizard/window_size", size());
 }
 
 /*******************************************************************************

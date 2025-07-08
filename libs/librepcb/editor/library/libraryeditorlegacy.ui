@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>librepcb::editor::LibraryEditor</class>
- <widget class="QMainWindow" name="librepcb::editor::LibraryEditor">
+ <class>librepcb::editor::LibraryEditorLegacy</class>
+ <widget class="QMainWindow" name="librepcb::editor::LibraryEditorLegacy">
   <property name="geometry">
    <rect>
     <x>0</x>

@@ -38,7 +38,7 @@ namespace editor {
  ******************************************************************************/
 
 RuleCheckMessagesModel::RuleCheckMessagesModel(QObject* parent) noexcept
-  : QObject(parent), mUnapprovedCount(0) {
+  : QObject(parent), mUnapprovedCount(0), mErrorCount(0) {
 }
 
 RuleCheckMessagesModel::~RuleCheckMessagesModel() noexcept {
@@ -52,7 +52,13 @@ void RuleCheckMessagesModel::clear() noexcept {
   mMessages.clear();
   mApprovals.clear();
   notify_reset();
-  updateUnapprovedCount();
+  updateCounters();
+}
+
+void RuleCheckMessagesModel::setAutofixHandler(
+    AutofixHandler handler) noexcept {
+  mAutofixHandler = handler;
+  notify_reset();
 }
 
 void RuleCheckMessagesModel::setMessages(
@@ -61,7 +67,7 @@ void RuleCheckMessagesModel::setMessages(
   mMessages = messages;
   mApprovals = approvals;
   notify_reset();
-  updateUnapprovedCount();
+  updateCounters();
 }
 
 /*******************************************************************************
@@ -80,7 +86,7 @@ std::optional<ui::RuleCheckMessageData> RuleCheckMessagesModel::row_data(
         q2s(msg->getMessage()),  // Message
         q2s(msg->getDescription()),  // Description
         mApprovals.contains(msg->getApproval()),  // Approved
-        false,  // Supports autofix
+        mAutofixHandler && mAutofixHandler(msg, true),  // Supports autofix
         ui::RuleCheckMessageAction::None,  // Action
     };
   } else {
@@ -95,18 +101,25 @@ void RuleCheckMessagesModel::set_row_data(
       mApprovals.insert(msg->getApproval());
       emit approvalChanged(msg->getApproval(), true);
       notify_row_changed(i);
-      updateUnapprovedCount();
+      updateCounters();
     } else if ((!data.approved) && mApprovals.contains(msg->getApproval())) {
       mApprovals.remove(msg->getApproval());
       emit approvalChanged(msg->getApproval(), false);
       notify_row_changed(i);
-      updateUnapprovedCount();
+      updateCounters();
     } else if (data.action == ui::RuleCheckMessageAction::Highlight) {
       emit highlightRequested(msg, false);
     } else if (data.action == ui::RuleCheckMessageAction::HighlightAndZoomTo) {
       emit highlightRequested(msg, true);
     } else if (data.action == ui::RuleCheckMessageAction::Autofix) {
-      emit autofixRequested(msg);
+      QMetaObject::invokeMethod(
+          this,
+          [this, msg]() {
+            if (mAutofixHandler) {
+              mAutofixHandler(msg, false);
+            }
+          },
+          Qt::QueuedConnection);
     } else if (data.action != ui::RuleCheckMessageAction::None) {
       qWarning() << "Unhandled action in RuleCheckMessagesModel:"
                  << static_cast<int>(data.action);
@@ -118,16 +131,24 @@ void RuleCheckMessagesModel::set_row_data(
  *  Private Methods
  ******************************************************************************/
 
-void RuleCheckMessagesModel::updateUnapprovedCount() noexcept {
-  int count = 0;
+void RuleCheckMessagesModel::updateCounters() noexcept {
+  int unapproved = 0;
+  int errors = 0;
   for (auto msg : mMessages) {
     if (!mApprovals.contains(msg->getApproval())) {
-      ++count;
+      ++unapproved;
+    }
+    if (msg->getSeverity() == RuleCheckMessage::Severity::Error) {
+      ++errors;
     }
   }
-  if (count != mUnapprovedCount) {
-    mUnapprovedCount = count;
+  if (unapproved != mUnapprovedCount) {
+    mUnapprovedCount = unapproved;
     emit unapprovedCountChanged(mUnapprovedCount);
+  }
+  if (errors != mErrorCount) {
+    mErrorCount = errors;
+    emit errorCountChanged(mErrorCount);
   }
 }
 

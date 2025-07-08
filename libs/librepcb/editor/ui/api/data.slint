@@ -6,7 +6,10 @@ import {
     GridStyle,
     LengthUnit,
     LibraryData,
+    LibraryInfoData,
     LibraryListData,
+    LibraryTabData,
+    LibraryTreeViewItemType,
     NotificationData,
     NotificationType,
     PanelPage,
@@ -72,6 +75,7 @@ export global Data {
                         edit-properties: FeatureState.enabled,
                         find: FeatureState.enabled,
                     },
+                    read-only: true,
                 },
                 {
                     type: TabType.board-2d,
@@ -98,6 +102,7 @@ export global Data {
                         edit-properties: FeatureState.enabled,
                         find: FeatureState.enabled,
                     },
+                    unsaved-changes: true,
                     find-autocompletions: ["C1", "C2", "C20", "U15"],
                     layers: [
                         {
@@ -113,6 +118,15 @@ export global Data {
                             visible: false,
                         },
                     ],
+                },
+                {
+                    type: TabType.board-3d,
+                    title: "3D",
+                    features: {
+                        save: FeatureState.enabled,
+                        undo: FeatureState.enabled,
+                        redo: FeatureState.enabled,
+                    },
                 },
             ],
             create-library-tabs: [
@@ -248,21 +262,12 @@ export global Data {
                     },
                 },
             ],
-            current-tab-index: 3,
-        },
-        {
-            tabs: [
-                {
-                    type: TabType.board-3d,
-                    title: "3D",
-                    features: {
-                        save: FeatureState.enabled,
-                        undo: FeatureState.enabled,
-                        redo: FeatureState.enabled,
-                    },
-                },
-            ],
             board-3d-tabs: [
+                { },
+                { },
+                { },
+                { },
+                { },
                 {
                     project-index: 0,
                     background-color: #e6f2ff,
@@ -270,6 +275,133 @@ export global Data {
                     refreshing: false,
                     error: "Some error message here...",
                 }
+            ],
+            current-tab-index: 3,
+        },
+        {
+            tabs: [
+                {
+                    type: TabType.library,
+                    title: "Library",
+                    features: {
+                        save: FeatureState.enabled,
+                        undo: FeatureState.enabled,
+                        redo: FeatureState.enabled,
+                    },
+                },
+            ],
+            library-tabs: [
+                {
+                    library-index: 0,
+                    wizard-mode: false,
+                    page-index: 2,
+                    icon: @image-url("../../../../../img/app/librepcb.svg"),
+                    name: "Library",
+                    description: "Foo Bar\nMultiline\nBlabla",
+                    keywords: "Foo,Bar,Hello World",
+                    author: "Somebody",
+                    version: "0.1",
+                    deprecated: false,
+                    dependencies: [
+                        {
+                            icon: @image-url("../../../../../img/app/librepcb.svg"),
+                            name: "LibrePCB Base",
+                            checked: true,
+                        },
+                        {
+                            icon: @image-url("../../../../../img/app/librepcb.svg"),
+                            name: "LibrePCB Integrated Circuits",
+                            checked: true,
+                        },
+                        {
+                            icon: @image-url("../../../../../img/app/librepcb.svg"),
+                            name: "Foo",
+                            checked: false,
+                        },
+                        {
+                            icon: @image-url("../../../../../img/app/librepcb.svg"),
+                            name: "Bar",
+                            checked: false,
+                        },
+                    ],
+                    categories: [
+                        {
+                            type: LibraryTreeViewItemType.all,
+                            elements: 1234,
+                        },
+                        {
+                            type: LibraryTreeViewItemType.uncategorized,
+                            elements: 99,
+                        },
+                        {
+                            type: LibraryTreeViewItemType.component-category,
+                        },
+                        {
+                            type: LibraryTreeViewItemType.component-category,
+                            level: 1,
+                            name: "Integrated Circuits",
+                            elements: 42,
+                        },
+                        {
+                            type: LibraryTreeViewItemType.component-category,
+                            level: 2,
+                            name: "Data Aquisition",
+                            is-external: true,
+                        },
+                        {
+                            type: LibraryTreeViewItemType.component-category,
+                            level: 3,
+                            name: "Analog-to-Digital Converters",
+                            elements: 123,
+                        },
+                        {
+                            type: LibraryTreeViewItemType.component-category,
+                            level: 1,
+                            name: "Miscallenous",
+                            elements: 3,
+                        },
+                        {
+                            type: LibraryTreeViewItemType.package-category,
+                        },
+                        {
+                            type: LibraryTreeViewItemType.package-category,
+                            level: 1,
+                            name: "Capacitor",
+                            elements: 42,
+                        },
+                        {
+                            type: LibraryTreeViewItemType.package-category,
+                            level: 2,
+                            name: "Chip Capacitor",
+                            is-external: true,
+                        },
+                    ],
+                    filtered-elements: [
+                        {
+                            type: LibraryTreeViewItemType.device,
+                        },
+                        {
+                            type: LibraryTreeViewItemType.component,
+                        },
+                        {
+                            type: LibraryTreeViewItemType.symbol,
+                        },
+                        {
+                            type: LibraryTreeViewItemType.package,
+                        },
+                        {
+                            type: LibraryTreeViewItemType.symbol,
+                            level: 1,
+                            name: "NE555",
+                            summary: "Foo bar very long text bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla bla",
+                        },
+                    ],
+                    checks: {
+                        type: RuleCheckType.library-check,
+                        state: RuleCheckState.up-to-date,
+                        unapproved: 2,
+                    },
+                },
             ],
             current-tab-index: 0,
         },
@@ -408,10 +540,10 @@ export global Data {
     in property <int> notifications-progress-index: 4;
 
     // Notifications: Popup shown status
-    in property <bool> notifications-shown: true;
+    in property <bool> notifications-shown: false;
 
     // Locally installed libraries (may be filtered)
-    in property <[LibraryData]> local-libraries: [
+    in property <[LibraryInfoData]> local-libraries: [
         {
             path: "/foo/bar",
             icon: @image-url("../../../../../img/app/librepcb.svg"),
@@ -445,7 +577,7 @@ export global Data {
     };
 
     // Remote libraries, either installed or not (may be filtered)
-    in property <[LibraryData]> remote-libraries: [
+    in property <[LibraryInfoData]> remote-libraries: [
         {
             uuid: "x",
             icon: @image-url("../../../../../img/app/librepcb.svg"),
@@ -514,7 +646,27 @@ export global Data {
     };
 
     // Filter applied to both local libraries and remote libraries
-    in property <string> libraries-filter: "Foo";
+    in property <string> libraries-panel-filter: "Foo";
+
+    // Flag if the background library scan is currently running
+    in property <bool> libraries-rescan-in-progress: false;
+
+    // All opened libraries (editors)
+    in property <[LibraryData]> libraries: [
+        {
+            valid: true,
+            path: "/path/to/library-1.lplib",
+            name: "Library 1",
+        },
+        {
+            valid: true,
+            path: "/path/to/library-2.lplib",
+            name: "Library 2",
+        },
+    ];
+
+    // Currently active library editor index
+    out property <int> current-library-index: -1;
 
     // All currently opened projects
     in property <[ProjectData]> projects: [
@@ -643,7 +795,9 @@ export global Data {
     in-out property <TabData> current-tab: current-section.tabs[current-section.current-tab-index];
     out property <int> remote-libraries-pending-operations: remote-libraries-data.pending-installs + remote-libraries-data.pending-updates + remote-libraries-data.pending-uninstalls;
     out property <bool> libraries-operation-in-progress: local-libraries-data.operation-in-progress || remote-libraries-data.operation-in-progress;
+    out property <LibraryData> current-library: libraries[current-library-index];
     out property <ProjectData> current-project: projects[current-project-index];
+    out property <LibraryTabData> current-library-tab: current-section.library-tabs[current-section.current-tab-index];
     out property <SchematicTabData> current-schematic-tab: current-section.schematic-tabs[current-section.current-tab-index];
     out property <Board2dTabData> current-board-2d-tab: current-section.board-2d-tabs[current-section.current-tab-index];
     out property <Board3dTabData> current-board-3d-tab: current-section.board-3d-tabs[current-section.current-tab-index];
@@ -652,27 +806,42 @@ export global Data {
     in-out property <int> current-rule-check-project-index: 0;
     in-out property <int> current-rule-check-board-index: 0;
     out property <RuleCheckData> current-rule-check: {
-        if (current-rule-check-board-index >= 0) && (current-rule-check-board-index < projects[current-rule-check-project-index].boards.length) {
-            projects[current-rule-check-project-index].boards[current-rule-check-board-index].drc
+        if (current-rule-check-project-index >= 0) && (current-rule-check-project-index < projects.length) {
+            if (current-rule-check-board-index >= 0) && (current-rule-check-board-index < projects[current-rule-check-project-index].boards.length) {
+                projects[current-rule-check-project-index].boards[current-rule-check-board-index].drc
+            } else {
+                projects[current-rule-check-project-index].erc
+            }
+        } else if current-tab.type == TabType.library {
+            current-library-tab.checks
         } else {
-            projects[current-rule-check-project-index].erc
+            projects[-1].erc  // Not nice, but avoids compiler warning
         }
     };
 
     public function current-tab-changed() {
-        if current-tab.type == TabType.schematic {
+        if current-tab.type == TabType.library {
+            current-project-index = -1;
+            current-rule-check-project-index = -1;
+            current-rule-check-board-index = -1;
+            current-library-index = current-library-tab.library-index;
+        } else if current-tab.type == TabType.schematic {
+            current-library-index = -1;
             current-project-index = current-schematic-tab.project-index;
             current-rule-check-project-index = current-project-index;
             current-rule-check-board-index = -1;
         } else if current-tab.type == TabType.board-2d {
+            current-library-index = -1;
             current-project-index = current-board-2d-tab.project-index;
             current-rule-check-project-index = current-project-index;
             current-rule-check-board-index = current-board-2d-tab.board-index;
         } else if current-tab.type == TabType.board-3d {
+            current-library-index = -1;
             current-project-index = current-board-3d-tab.project-index;
             current-rule-check-project-index = current-project-index;
             current-rule-check-board-index = current-board-3d-tab.board-index;
         } else if current-tab.type != TabType.home {
+            current-library-index = -1;
             current-project-index = -1;
             current-rule-check-project-index = current-project-index;
             current-rule-check-board-index = -1;
@@ -685,7 +854,15 @@ export global Data {
         current-tab-changed();
     }
 
+    public function set-current-library(index: int) {
+        current-project-index = -1;
+        current-rule-check-project-index = -1;
+        current-rule-check-board-index = -1;
+        current-library-index = index;
+    }
+
     public function set-current-project(index: int) {
+        current-library-index = -1;
         current-project-index = index;
         current-rule-check-project-index = index;
         current-rule-check-board-index = -1;

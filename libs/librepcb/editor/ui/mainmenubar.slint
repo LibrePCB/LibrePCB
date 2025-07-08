@@ -15,9 +15,10 @@ import {
     EditorCommandSet as Cmd,
     FeatureState,
     Helpers,
+    LibraryData,
+    LibraryElementAction,
     PanelPage,
     ProjectAction,
-    ProjectData,
     SchematicAction,
     Shortcuts,
     TabAction,
@@ -66,31 +67,19 @@ component MenuBarSeparator inherits Rectangle {
 export component MainMenuBar inherits Rectangle {
     in property <length> sections-start-x;
     property <string> undo-text: {
-        if Data.current-project.undo-text.is-empty {
+        if Data.current-tab.undo-text.is-empty {
             @tr("Undo")
         } else {
-            @tr("Undo: {}", Data.current-project.undo-text)
+            @tr("Undo: {}", Data.current-tab.undo-text)
         }
     };
     property <string> redo-text: {
-        if Data.current-project.redo-text.is-empty {
+        if Data.current-tab.redo-text.is-empty {
             @tr("Redo")
         } else {
-            @tr("Redo: {}", Data.current-project.redo-text)
+            @tr("Redo: {}", Data.current-tab.redo-text)
         }
     };
-    property <int> current-tab-project-index: {
-        if Data.current-tab.type == TabType.schematic {
-            Data.current-schematic-tab.project-index
-        } else if Data.current-tab.type == TabType.board-2d {
-            Data.current-board-2d-tab.project-index
-        } else if Data.current-tab.type == TabType.board-3d {
-            Data.current-board-3d-tab.project-index
-        } else {
-            -1
-        }
-    };
-    property <ProjectData> current-tab-project: Data.projects[current-tab-project-index];
 
     callback focus-root;
     callback focus-grid-interval;
@@ -352,10 +341,10 @@ export component MainMenuBar inherits Rectangle {
                     cmd: Cmd.undo;
                     text: undo-text;
                     icon: @image-url("../../../font-awesome/svgs/solid/rotate-left.svg");
-                    enabled: Data.current-project.can-undo;
+                    enabled: Data.current-tab.features.undo == FeatureState.enabled;
 
                     clicked => {
-                        Helpers.trigger-current-project-action(ProjectAction.undo);
+                        Helpers.trigger-current-tab-action(TabAction.undo);
                     }
                 }
 
@@ -363,10 +352,10 @@ export component MainMenuBar inherits Rectangle {
                     cmd: Cmd.redo;
                     text: redo-text;
                     icon: @image-url("../../../font-awesome/svgs/solid/rotate-right.svg");
-                    enabled: Data.current-project.can-redo;
+                    enabled: Data.current-tab.features.redo == FeatureState.enabled;
 
                     clicked => {
-                        Helpers.trigger-current-project-action(ProjectAction.redo);
+                        Helpers.trigger-current-tab-action(TabAction.redo);
                     }
                 }
 
@@ -772,6 +761,70 @@ export component MainMenuBar inherits Rectangle {
             }
         }
 
+        library-menu-item := MainMenuItem {
+            property <LibraryData> library: Data.libraries[Data.current-library-tab.library-index];
+
+            text: @tr("Library");
+            visible: Data.current-tab.type == TabType.library;
+
+            clicked => {
+                library-menu-popup.show();
+            }
+
+            library-menu-popup := MenuPopup {
+                x: 0;
+                y: parent.height;
+
+                save-library-item := MenuItem {
+                    cmd: Cmd.save;
+                    text: @tr("Save Library");  // More specific.
+                    icon: @image-url("../../../bootstrap-icons/icons/floppy-fill.svg");
+                    enabled: Data.current-tab.features.save == FeatureState.enabled;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.save);
+                    }
+                }
+
+                close-library-item := MenuItem {
+                    text: @tr("Close Library");  // More specific.
+                    status-tip: @tr("Close the currently opened library");
+                    icon: @image-url("../../../font-awesome/svgs/solid/xmark.svg");
+
+                    clicked => {
+                        Backend.trigger-library-element(library.path, LibraryElementAction.close);
+                    }
+                }
+
+                open-library-folder-item := MenuItem {
+                    cmd: Cmd.file-manager;
+                    icon: @image-url("../../../font-awesome/svgs/solid/arrow-up-right-from-square.svg");
+
+                    clicked => {
+                        Backend.trigger-library-element(library.path, LibraryElementAction.open-folder);
+                    }
+                }
+
+                MenuSeparator { }
+
+                import-eagle-library-item := MenuItem {
+                    cmd: Cmd.import-eagle-library;
+
+                    clicked => {
+                        Backend.trigger-library-element(library.path, LibraryElementAction.import-eagle-library);
+                    }
+                }
+
+                import-kicad-library-item := MenuItem {
+                    cmd: Cmd.import-kicad-library;
+
+                    clicked => {
+                        Backend.trigger-library-element(library.path, LibraryElementAction.import-kicad-library);
+                    }
+                }
+            }
+        }
+
         project-menu-item := MainMenuItem {
             text: @tr("Project");
             visible: Data.current-project.valid;
@@ -803,7 +856,9 @@ export component MainMenuBar inherits Rectangle {
                 MenuSeparator { }
 
                 save-project-item := MenuItem {
-                    cmd: Cmd.project-save;
+                    cmd: Cmd.save;
+                    text: @tr("Save Project");  // More specific.
+                    icon: @image-url("../../../bootstrap-icons/icons/floppy-fill.svg");
                     enabled: Data.current-project.writable;
 
                     clicked => {
@@ -1025,46 +1080,48 @@ export component MainMenuBar inherits Rectangle {
             width: 3px;
         }
 
-        if current-tab-project.valid: project-buttons-l := HorizontalLayout {
+        if global-buttons-l.preferred-width > global-buttons-l.padding-left: MenuBarSeparator { }
+
+        global-buttons-l := HorizontalLayout {
             horizontal-stretch: 0;
             padding-top: 5px;
             padding-bottom: 5px;
+            padding-left: 5px;
             spacing: 5px;
 
-            MenuBarSeparator { }
-
-            save-project-btn := MenuBarButton {
-                cmd: Cmd.project-save;
-                enabled: current-tab-project.writable;
+            if Data.current-tab.features.save != FeatureState.not-supported: save-btn := MenuBarButton {
+                cmd: Cmd.save;
+                icon: @image-url("../../../bootstrap-icons/icons/floppy-fill.svg");
+                enabled: Data.current-tab.features.save == FeatureState.enabled;
 
                 clicked => {
-                    Backend.trigger-project(current-tab-project-index, ProjectAction.save);
+                    Helpers.trigger-current-tab-action(TabAction.save);
                 }
             }
 
-            undo-btn := MenuBarButton {
+            if Data.current-tab.features.undo != FeatureState.not-supported: undo-btn := MenuBarButton {
                 cmd: Cmd.undo;
                 icon: @image-url("../../../font-awesome/svgs/solid/rotate-left.svg");
                 tooltip: undo-text;
-                enabled: current-tab-project.can-undo;
+                enabled: Data.current-tab.features.undo == FeatureState.enabled;
 
                 clicked => {
-                    Backend.trigger-project(current-tab-project-index, ProjectAction.undo);
+                    Helpers.trigger-current-tab-action(TabAction.undo);
                 }
             }
 
-            redo-btn := MenuBarButton {
+            if Data.current-tab.features.redo != FeatureState.not-supported: redo-btn := MenuBarButton {
                 cmd: Cmd.redo;
                 icon: @image-url("../../../font-awesome/svgs/solid/rotate-right.svg");
                 tooltip: redo-text;
-                enabled: current-tab-project.can-redo;
+                enabled: Data.current-tab.features.redo == FeatureState.enabled;
 
                 clicked => {
-                    Backend.trigger-project(current-tab-project-index, ProjectAction.redo);
+                    Helpers.trigger-current-tab-action(TabAction.redo);
                 }
             }
 
-            if !current-tab-project.writable: Rectangle {
+            if Data.current-tab.read-only: Rectangle {
                 width: self.preferred-width + 20px;
 
                 read-only-badge := Badge {
