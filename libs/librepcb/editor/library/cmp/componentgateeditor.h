@@ -17,58 +17,83 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_COMPONENTSIGNALLISTEDITORWIDGET_H
-#define LIBREPCB_EDITOR_COMPONENTSIGNALLISTEDITORWIDGET_H
+#ifndef LIBREPCB_EDITOR_COMPONENTGATEEDITOR_H
+#define LIBREPCB_EDITOR_COMPONENTGATEEDITOR_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/library/cmp/componentsignal.h>
+#include "appwindow.h"
+
+#include <librepcb/core/library/cmp/componentsymbolvariantitem.h>
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Component;
+class Symbol;
+class Workspace;
+
 namespace editor {
 
-class ComponentSignalListModel;
-class EditableTableWidget;
-class SortFilterProxyModel;
+class ComponentPinoutListModel;
+class GraphicsLayerList;
+class GraphicsScene;
+class SymbolGraphicsItem;
+class UndoCommand;
 class UndoStack;
 
 /*******************************************************************************
- *  Class ComponentSignalListEditorWidget
+ *  Class ComponentGateEditor
  ******************************************************************************/
 
 /**
- * @brief The ComponentSignalListEditorWidget class
+ * @brief The ComponentGateEditor class
  */
-class ComponentSignalListEditorWidget final : public QWidget {
+class ComponentGateEditor : public QObject {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  explicit ComponentSignalListEditorWidget(QWidget* parent = nullptr) noexcept;
-  ComponentSignalListEditorWidget(
-      const ComponentSignalListEditorWidget& other) = delete;
-  ~ComponentSignalListEditorWidget() noexcept;
+  ComponentGateEditor() = delete;
+  ComponentGateEditor(const ComponentGateEditor& other) = delete;
+  explicit ComponentGateEditor(const Workspace& ws,
+                               const GraphicsLayerList& layers,
+                               QPointer<const Component> component,
+                               std::shared_ptr<ComponentSymbolVariantItem> item,
+                               QObject* parent = nullptr) noexcept;
+  virtual ~ComponentGateEditor() noexcept;
 
-  // Setters
-  void setFrameStyle(int style) noexcept;
-  void setReadOnly(bool readOnly) noexcept;
-  void setReferences(UndoStack* undoStack, ComponentSignalList* list) noexcept;
+  // General Methods
+  ui::ComponentGateData getUiData() const;
+  void setUiData(const ui::ComponentGateData& data) noexcept;
+  void setUndoStack(UndoStack* stack) noexcept;
+  // void apply();
+  slint::Image renderScene(float width, float height) noexcept;
 
   // Operator Overloadings
-  ComponentSignalListEditorWidget& operator=(
-      const ComponentSignalListEditorWidget& rhs) = delete;
+  ComponentGateEditor& operator=(const ComponentGateEditor& rhs) = delete;
 
 private:
-  QScopedPointer<ComponentSignalListModel> mModel;
-  QScopedPointer<SortFilterProxyModel> mProxy;
-  QScopedPointer<EditableTableWidget> mView;
+  void execCmd(UndoCommand* cmd);
+  void loadSymbol() noexcept;
+
+private:
+  const Workspace& mWorkspace;
+  const GraphicsLayerList& mLayers;
+  const QPointer<const Component> mComponent;
+
+  std::shared_ptr<ComponentSymbolVariantItem> mItem;
+  UndoStack* mUndoStack;
+  std::shared_ptr<ComponentPinoutListModel> mPinout;
+
+  std::unique_ptr<Symbol> mSymbol;
+  std::unique_ptr<GraphicsScene> mScene;
+  std::unique_ptr<SymbolGraphicsItem> mGraphicsItem;
 };
 
 /*******************************************************************************

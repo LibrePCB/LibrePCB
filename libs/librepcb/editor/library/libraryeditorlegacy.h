@@ -71,9 +71,6 @@ public:
   ~LibraryEditorLegacy() noexcept;
 
   bool requestClose() noexcept;
-  void openComponentCategory(const FilePath& fp) noexcept;
-  void openPackageCategory(const FilePath& fp) noexcept;
-  void openSymbol(const FilePath& fp) noexcept;
   void openPackage(const FilePath& fp) noexcept;
   void openComponent(const FilePath& fp) noexcept;
   void openDevice(const FilePath& fp) noexcept;

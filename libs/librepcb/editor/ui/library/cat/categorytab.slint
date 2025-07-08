@@ -1,0 +1,290 @@
+import { Tab } from "../../tab.slint";
+import { LibraryRuleCheckLink } from "../libraryrulechecklink.slint";
+import {
+    Badge,
+    Button,
+    CategoryTreeLabel,
+    IconButton,
+    LineEdit,
+    LinkText,
+    MessageBox,
+    Palette,
+    SceneButton,
+    SlideView,
+    Switch,
+    TextEdit,
+    ToolButton,
+    TreeItemPickerPopup,
+    TreeView,
+} from "../../widgets.slint";
+import {
+    Backend,
+    CategoryTabData,
+    Constants,
+    Data,
+    DismissableMessageAction,
+    EditorCommandSet as Cmd,
+    EditorTool,
+    FeatureState,
+    PanelPage,
+    TabAction,
+    WindowSectionData,
+} from "../../api.slint";
+
+component CategoryMetadata inherits GridLayout {
+    in property <int> section-index;
+    in-out property <[CategoryTabData]> tabs;
+    in property <int> index;
+    in property <bool> read-only;
+
+    padding: 10px;
+    spacing: 8px;
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Name:");
+        }
+
+        LineEdit {
+            text: tabs[index].name;
+            validation-error: tabs[index].name-error;
+            read-only: read-only;
+
+            init => {
+                if !read-only {
+                    self.select-all();
+                }
+            }
+
+            text-edited(text) => {
+                tabs[index].name = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].name = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Description:");
+        }
+
+        TextEdit {
+            height: 100px;
+            text: tabs[index].description;
+            read-only: read-only;
+
+            text-edited(text) => {
+                tabs[index].description = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].description = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Keywords:");
+        }
+
+        LineEdit {
+            text: tabs[index].keywords;
+            read-only: read-only;
+
+            text-edited(text) => {
+                tabs[index].keywords = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].keywords = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Author:");
+        }
+
+        LineEdit {
+            text: tabs[index].author;
+            read-only: read-only;
+
+            text-edited(text) => {
+                tabs[index].author = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].author = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Version:");
+        }
+
+        LineEdit {
+            text: tabs[index].version;
+            validation-error: tabs[index].version-error;
+            read-only: read-only;
+
+            text-edited(text) => {
+                tabs[index].version = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].version = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Deprecated:");
+        }
+
+        Switch {
+            font-size: 10px;
+            text: @tr("Check this if the element should no longer be used.");
+            checked: tabs[index].deprecated;
+            enabled: !read-only;
+
+            toggled(checked) => {
+                tabs[index].deprecated = checked;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Parent:");
+        }
+
+        HorizontalLayout {
+            z: 10;  // For the tooltips.
+            alignment: start;
+            spacing: 5px;
+
+            CategoryTreeLabel {
+                names: tabs[index].parents;
+            }
+
+            Rectangle {
+                width: 20px;
+            }
+
+            if !read-only: Rectangle {
+                width: 1px;
+                background: #707070;
+            }
+
+            if !read-only: IconButton {
+                y: (parent.height - self.height) / 2;
+                z: 10;  // For the tooltip.
+                height: 18px;
+                style: hyperlink;
+                icon: @image-url("../../../../../bootstrap-icons/icons/folder2-open.svg");
+                tooltip: @tr("Choose Parent Category");
+
+                clicked => {
+                    choose-parent-popup.show();
+                }
+            }
+        }
+    }
+
+    Row {
+        Rectangle { }
+
+        HorizontalLayout {
+            spacing: 5px;
+
+            if !read-only: save-btn := Button {
+                width: max(self.preferred-width, 100px);
+                primary: Data.sections[section-index].tabs[index].unsaved-changes;
+                icon: @image-url("../../../../../font-awesome/svgs/solid/check.svg");
+                text: @tr("Save");
+
+                clicked => {
+                    Backend.trigger-tab(section-index, index, TabAction.save);
+                }
+            }
+
+            LibraryRuleCheckLink {
+                data: tabs[index].checks;
+
+                clicked => {
+                    Data.set-current-tab(section-index, index);
+                    Data.panel-page = PanelPage.rule-check;
+                }
+            }
+
+            Rectangle { }
+        }
+    }
+
+    Row {
+        Rectangle { }
+    }
+
+    choose-parent-popup := TreeItemPickerPopup {
+        width: parent.width;
+        height: parent.height;
+        model: tabs[index].parents-tree;
+
+        item-picked(item) => {
+            tabs[index].new-parent = item.user-data;
+        }
+    }
+}
+
+component CategoryTab inherits Tab {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    in-out property <[CategoryTabData]> tabs;
+    property <int> index: section.current-tab-index;
+    property <bool> read-only: section.tabs[index].features.save != FeatureState.enabled;
+
+    CategoryMetadata {
+        width: parent.width;
+        height: parent.height;
+        section-index: section-index;
+        tabs: tabs;
+        index: index;
+        read-only: read-only;
+    }
+}
+
+export component ComponentCategoryTab inherits CategoryTab {
+    tabs: self.section.component-category-tabs;
+}
+
+export component PackageCategoryTab inherits CategoryTab {
+    tabs: self.section.package-category-tabs;
+}

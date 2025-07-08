@@ -1,0 +1,775 @@
+//import { DrawPolygonToolBar } from "drawpolygontoolbar.slint";
+//import { AddTextToolBar } from "addtexttoolbar.slint";
+//import { AddPinToolBar } from "addpintoolbar.slint";
+import { Tab } from "../../tab.slint";
+import { LibraryRuleCheckLink } from "../libraryrulechecklink.slint";
+import { PackagePadListView } from "packagepadlistview.slint";
+import {
+    Button,
+    CategoriesListView,
+    ComboBox,
+    LineEdit,
+    LinkText,
+    MessageBox,
+    Palette,
+    SceneButton,
+    SlideView,
+    Switch,
+    TextEdit,
+    ToolButton,
+    TreeItemPickerPopup,
+} from "../../widgets.slint";
+import {
+    Backend,
+    Constants,
+    Data,
+    DismissableMessageAction,
+    EditorCommandSet as Cmd,
+    EditorTool,
+    FeatureState,
+    PackageTabData,
+    PanelPage,
+    TabAction,
+    WindowSectionData,
+} from "../../api.slint";
+
+component PackageMetadata inherits GridLayout {
+    in property <int> section-index;
+    in-out property <[PackageTabData]> tabs;
+    in property <int> index;
+    in property <bool> read-only;
+
+    padding: 10px;
+    spacing: 8px;
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Name:");
+        }
+
+        LineEdit {
+            text: tabs[index].name;
+            validation-error: tabs[index].name-error;
+            read-only: read-only;
+
+            init => {
+                if !read-only {
+                    self.select-all();
+                }
+            }
+            text-edited(text) => {
+                tabs[index].name = text;
+            }
+            text-accepted(text) => {
+                tabs[index].name = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Description:");
+        }
+
+        TextEdit {
+            height: 100px;
+            text: tabs[index].description;
+            read-only: read-only;
+
+            text-edited(text) => {
+                tabs[index].description = text;
+            }
+            text-accepted(text) => {
+                tabs[index].description = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Keywords:");
+        }
+
+        LineEdit {
+            text: tabs[index].keywords;
+            read-only: read-only;
+
+            text-edited(text) => {
+                tabs[index].keywords = text;
+            }
+            text-accepted(text) => {
+                tabs[index].keywords = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Author:");
+        }
+
+        LineEdit {
+            text: tabs[index].author;
+            read-only: read-only;
+
+            text-edited(text) => {
+                tabs[index].author = text;
+            }
+            text-accepted(text) => {
+                tabs[index].author = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Version:");
+        }
+
+        LineEdit {
+            text: tabs[index].version;
+            validation-error: tabs[index].version-error;
+            read-only: read-only;
+
+            text-edited(text) => {
+                tabs[index].version = text;
+            }
+            text-accepted(text) => {
+                tabs[index].version = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Deprecated:");
+        }
+
+        Switch {
+            font-size: 10px;
+            text: @tr("Check this if the element should no longer be used.");
+            checked: tabs[index].deprecated;
+            enabled: !read-only;
+
+            toggled(checked) => {
+                tabs[index].deprecated = checked;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Categories:");
+        }
+
+        CategoriesListView {
+            model: tabs[index].categories;
+            read-only: read-only;
+
+            add-triggered => {
+                add-category-popup.show();
+            }
+        }
+    }
+
+    Row {
+        Text {
+            width: self.preferred-width;
+            vertical-alignment: center;
+            text: @tr("Assembly:");
+        }
+
+        ComboBox {
+            /*text: tabs[index].version;
+            validation-error: tabs[index].version-error;
+            read-only: read-only;
+
+            text-edited(text) => {
+                tabs[index].version = text;
+            }
+            text-accepted(text) => {
+                tabs[index].version = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }*/
+        }
+    }
+
+    Row {
+        Rectangle { }
+
+        HorizontalLayout {
+            spacing: 5px;
+
+            if !read-only: save-btn := Button {
+                width: max(self.preferred-width, 100px);
+                primary: Data.sections[section-index].tabs[index].unsaved-changes;
+                icon: @image-url("../../../../../font-awesome/svgs/solid/check.svg");
+                text: @tr("Save");
+
+                clicked => {
+                    Backend.trigger-tab(section-index, index, TabAction.save);
+                }
+            }
+
+            if !tabs[index].wizard-mode: LibraryRuleCheckLink {
+                data: tabs[index].checks;
+
+                clicked => {
+                    Data.set-current-tab(section-index, index);
+                    Data.panel-page = PanelPage.rule-check;
+                }
+            }
+
+            Rectangle { }
+        }
+    }
+
+    Row {
+        Rectangle { }
+    }
+
+    // Open the category chooser when requested by the backend.
+    //property <string> new-category: tabs[index].new-category;
+    //changed new-category => {
+    //    if new-category == "choose" {
+    //        add-category-popup.show();
+    //    }
+    //}
+
+    add-category-popup := TreeItemPickerPopup {
+        width: parent.width;
+        height: parent.height;
+        model: tabs[index].categories-tree;
+
+        item-picked(item) => {
+            tabs[index].new-category = item.user-data;
+        }
+    }
+}
+
+component FootprintListView inherits Rectangle {
+    width: 100px;
+    height: 100px;
+    background: Palette.background;
+    border-color: #505050;
+    border-width: 1px;
+    border-radius: 8px;
+}
+
+component PackageEditor inherits TouchArea {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    in-out property <[PackageTabData]> tabs;
+    in property <int> index;
+    in property <bool> read-only;
+    property <length> toolbar-space: view-buttons-l.x - toolbuttons-l.x - toolbuttons-l.width - 10px;
+    property <length> toolbutton-offset-y: (toolbar-r.width > toolbar-space) ? toolbar-r.height : 0;
+
+    function tool-triggered(action: TabAction) {
+        Data.set-current-tab(section-index, index);
+        Backend.trigger-tab(section-index, index, action);
+    }
+
+    callback focus-requested();
+
+    mouse-cursor: tabs[index].tool-cursor;
+
+    if Data.preview-mode: Rectangle {
+        background: black;
+    }
+
+    img := Image {
+        width: 100%;
+        height: 100%;
+        preferred-width: 0;
+        preferred-height: 0;
+        image-fit: preserve;
+        image-rendering: pixelated;
+        source: Backend.render-scene(section-index, self.width, self.height, 0, tabs[index].frame);
+        accessible-role: none;
+    }
+
+    // Show overlay, if text is not empty.
+    if !tabs[index].tool-overlay-text.is-empty: Rectangle {
+        x: 2 * toolbuttons-l.x + toolbuttons-l.width;
+        y: toolbuttons-l.y;
+        width: overlay-txt.preferred-width + 2 * overlay-txt.x;
+        height: overlay-txt.preferred-height + 2 * overlay-txt.y;
+        background: tabs[index].overlay-color;
+        border-radius: 10px;
+        border-width: 1px;
+        border-color: tabs[index].overlay-text-color;
+
+        overlay-txt := Text {
+            x: 8px;
+            y: 8px;
+            horizontal-alignment: left;
+            vertical-alignment: top;
+            font-family: "Noto Sans Mono";
+            color: tabs[index].overlay-text-color;
+            text: tabs[index].tool-overlay-text;
+        }
+    }
+
+    toolbar-r := Rectangle {
+        y: 0;
+        width: min(self.preferred-width, root.width - 10px);
+        height: 34px;
+        background: #505050;
+        border-bottom-left-radius: 11px;
+        border-bottom-right-radius: 11px;
+        visible: self.width > 30px;
+
+        HorizontalLayout {
+            alignment: center;
+            padding: 3px;
+
+            /*if tabs[index].tool == EditorTool.line: line-toolbar := DrawPolygonToolBar {
+                section-index: section-index;
+                section: section;
+                show-angle-edt: true;
+                show-fill-sw: false;
+                show-grab-area-sw: false;
+            }
+
+            if tabs[index].tool == EditorTool.rect: rect-toolbar := DrawPolygonToolBar {
+                section-index: section-index;
+                section: section;
+                show-angle-edt: false;
+                show-fill-sw: true;
+                show-grab-area-sw: true;
+            }
+
+            if tabs[index].tool == EditorTool.polygon: polygon-toolbar := DrawPolygonToolBar {
+                section-index: section-index;
+                section: section;
+                show-angle-edt: true;
+                show-fill-sw: true;
+                show-grab-area-sw: true;
+            }
+
+            if tabs[index].tool == EditorTool.circle: circle-toolbar := DrawPolygonToolBar {
+                section-index: section-index;
+                section: section;
+                show-angle-edt: false;
+                show-fill-sw: true;
+                show-grab-area-sw: true;
+            }
+
+            if tabs[index].tool == EditorTool.arc: arc-toolbar := DrawPolygonToolBar {
+                section-index: section-index;
+                section: section;
+                show-angle-edt: false;
+                show-fill-sw: false;
+                show-grab-area-sw: false;
+            }
+
+            if tabs[index].tool == EditorTool.name: name-toolbar := AddTextToolBar {
+                section-index: section-index;
+                section: section;
+                show-layer-cbx: false;
+                show-text-edt: false;
+            }
+
+            if tabs[index].tool == EditorTool.value: value-toolbar := AddTextToolBar {
+                section-index: section-index;
+                section: section;
+                show-layer-cbx: false;
+                show-text-edt: false;
+            }
+
+            if tabs[index].tool == EditorTool.text: text-toolbar := AddTextToolBar {
+                section-index: section-index;
+                section: section;
+                show-layer-cbx: true;
+                show-text-edt: true;
+            }
+
+            if tabs[index].tool == EditorTool.pin: pin-toolbar := AddPinToolBar {
+                section-index: section-index;
+                section: section;
+                tab-index: index;
+            }*/
+        }
+    }
+
+    if tabs[index].tool == EditorTool.select: VerticalLayout {
+        width: min(self.preferred-width, 0.7 * parent.width, 550px);
+        padding: 20px;
+        spacing: 10px;
+
+        /*if tabs[index].import-pins-msg.visible: import-pins-msg := MessageBox {
+            title: @tr("Import Pins From Datasheet");
+            supports-dont-show-again: tabs[index].import-pins-msg.supports-dont-show-again;
+
+            Text {
+                wrap: word-wrap;
+                color: parent.text-color;
+                text: @tr("It is recommended to start drawing a new package by adding all pins. Especially for larger packages, the fastest way to do so is to import them from a datasheet or any other documentation of the part.");
+            }
+
+            import-pins-btn := Button {
+                primary: true;
+                text: @tr("Import Pins");
+
+                clicked => {
+                    Backend.trigger-tab(section-index, index, TabAction.package-import-pins);
+                }
+            }
+
+            HorizontalLayout {
+                alignment: start;
+
+                import-pins-help-btn := LinkText {
+                    text-color: import-pins-msg.text-color;
+                    text-color-hovered: import-pins-msg.hover-color;
+                    wrap: word-wrap;
+                    text: "▸ " + @tr("Learn how to create packages");
+                    status-tip: Constants.user-manual-create-package-url;
+
+                    clicked => {
+                        Backend.open-url(self.status-tip);
+                    }
+                }
+            }
+
+            dismiss-clicked => {
+                tabs[index].import-pins-msg.action = DismissableMessageAction.dismiss;
+            }
+            dont-show-again-clicked => {
+                tabs[index].import-pins-msg.action = DismissableMessageAction.dont-show-again;
+            }
+        }*/
+    }
+
+    toolbuttons-l := VerticalLayout {
+        x: 7px;
+        y: 7px + toolbutton-offset-y;
+        width: self.preferred-width;
+        height: parent.height - 2 * self.y;
+        spacing: 5px;
+
+        tool-select-btn := ToolButton {
+            cmd: Cmd.tool-select;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/arrow-pointer.svg");
+            checked: tabs[index].tool == EditorTool.select;
+
+            clicked => {
+                tool-triggered(TabAction.tool-select);
+            }
+        }
+
+        tool-line-btn := ToolButton {
+            cmd: Cmd.tool-line;
+            icon: @image-url("../../../../../../img/actions/draw_wire.png");
+            checked: tabs[index].tool == EditorTool.line;
+            enabled: !read-only;
+
+            clicked => {
+                tool-triggered(TabAction.tool-line);
+            }
+        }
+
+        tool-rect-btn := ToolButton {
+            cmd: Cmd.tool-rect;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/vector-square.svg");
+            checked: tabs[index].tool == EditorTool.rect;
+            enabled: !read-only;
+
+            clicked => {
+                tool-triggered(TabAction.tool-rect);
+            }
+        }
+
+        tool-polygon-btn := ToolButton {
+            cmd: Cmd.tool-polygon;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/draw-polygon.svg");
+            checked: tabs[index].tool == EditorTool.polygon;
+            enabled: !read-only;
+
+            clicked => {
+                tool-triggered(TabAction.tool-polygon);
+            }
+        }
+
+        tool-circle-btn := ToolButton {
+            cmd: Cmd.tool-circle;
+            icon: @image-url("../../../../../bootstrap-icons/icons/circle.svg");
+            checked: tabs[index].tool == EditorTool.circle;
+            enabled: !read-only;
+
+            clicked => {
+                tool-triggered(TabAction.tool-circle);
+            }
+        }
+
+        tool-arc-btn := ToolButton {
+            cmd: Cmd.tool-arc;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/circle-notch.svg");
+            checked: tabs[index].tool == EditorTool.arc;
+            enabled: !read-only;
+
+            clicked => {
+                tool-triggered(TabAction.tool-arc);
+            }
+        }
+
+        tool-name-btn := ToolButton {
+            cmd: Cmd.tool-name;
+            icon: @image-url("../../../../../../img/actions/add_name.png");
+            checked: tabs[index].tool == EditorTool.name;
+            enabled: !read-only;
+
+            clicked => {
+                tool-triggered(TabAction.tool-name);
+            }
+        }
+
+        tool-value-btn := ToolButton {
+            cmd: Cmd.tool-value;
+            icon: @image-url("../../../../../../img/actions/add_value.png");
+            checked: tabs[index].tool == EditorTool.value;
+            enabled: !read-only;
+
+            clicked => {
+                tool-triggered(TabAction.tool-value);
+            }
+        }
+
+        tool-text-btn := ToolButton {
+            cmd: Cmd.tool-text;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/font.svg");
+            checked: tabs[index].tool == EditorTool.text;
+            enabled: !read-only;
+
+            clicked => {
+                tool-triggered(TabAction.tool-text);
+            }
+        }
+
+        /*tool-pin-btn := ToolButton {
+            cmd: Cmd.tool-pin;
+            icon: @image-url("../../../../../../img/actions/add_package_pin.png");
+            checked: tabs[index].tool == EditorTool.pin;
+            enabled: !read-only;
+
+            clicked => {
+                tool-triggered(TabAction.tool-pin);
+            }
+        }*/
+
+        tool-measure-btn := ToolButton {
+            cmd: Cmd.tool-measure;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/ruler.svg");
+            checked: tabs[index].tool == EditorTool.measure;
+
+            clicked => {
+                tool-triggered(TabAction.tool-measure);
+            }
+        }
+    }
+
+    view-buttons-l := VerticalLayout {
+        x: parent.width - self.preferred-width - 7px;
+        y: toolbutton-offset-y + 7px;
+        width: self.preferred-width;
+
+        zoom-fit-btn := SceneButton {
+            icon: @image-url("../../../../../font-awesome/svgs/solid/expand.svg");
+            icon-scale: 0.9;
+            bg-color: tabs[index].background-color;
+            fg-color: tabs[index].foreground-color;
+
+            clicked => {
+                Backend.trigger-tab(section-index, index, TabAction.zoom-fit);
+            }
+        }
+
+        zoom-in-btn := SceneButton {
+            icon: @image-url("../../../../../bootstrap-icons/icons/zoom-in.svg");
+            bg-color: tabs[index].background-color;
+            fg-color: tabs[index].foreground-color;
+
+            clicked => {
+                Backend.trigger-tab(section-index, index, TabAction.zoom-in);
+            }
+        }
+
+        zoom-out-btn := SceneButton {
+            icon: @image-url("../../../../../bootstrap-icons/icons/zoom-out.svg");
+            bg-color: tabs[index].background-color;
+            fg-color: tabs[index].foreground-color;
+
+            clicked => {
+                Backend.trigger-tab(section-index, index, TabAction.zoom-out);
+            }
+        }
+    }
+
+    FootprintListView {
+        x: 8px;
+        y: parent.height - self.height - self.x;
+    }
+
+    pointer-event(event) => {
+        if event.kind == PointerEventKind.down {
+            Data.set-current-tab(section-index, index);
+            focus-requested();
+        }
+        Backend.scene-pointer-event(section-index, self.mouse-x, self.mouse-y, event);
+    }
+    scroll-event(event) => {
+        Backend.scene-scrolled(section-index, self.mouse-x, self.mouse-y, event) ? accept : reject
+    }
+}
+
+export component PackageTab inherits Tab {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    property <[PackageTabData]> tabs: section.package-tabs;
+    property <int> index: section.current-tab-index;
+    property <bool> read-only: section.tabs[index].features.save != FeatureState.enabled;
+    property <EditorTool> tool: tabs[index].tool;
+
+    enabled: true;
+
+    changed absolute-position => {
+        tabs[index].scene-image-pos = self.absolute-position;
+    }
+
+    // When the tool changes, move focus to scene to make tabulator & escape
+    // working correctly.
+    changed tool => {
+        root.focus();
+    }
+
+    init => {
+        tabs[index].scene-image-pos = self.absolute-position;
+    }
+    VerticalLayout {
+        Rectangle {
+            width: parent.width;
+            height: tabs[index].interface-broken-msg ? (self.preferred-height + 8px) : 0;
+            background: yellow;
+            visible: self.height > 0;
+            clip: true;
+
+            animate height { duration: 150ms; }
+
+            Text {
+                width: parent.width - 8px;
+                color: #800000;
+                font-weight: 600;
+                horizontal-alignment: left;
+                vertical-alignment: center;
+                wrap: word-wrap;
+                text: @tr("Attention").to-uppercase() + ": " + @tr("You have changed some important properties of this library element. This is a serious issue as it breaks all dependent library elements! If this library element is already used somewhere, it is highly recommended to create a new one instead of modifying this one.");
+            }
+        }
+
+        Rectangle {
+            width: parent.width;
+            height: (tabs[index].checks.errors > 0) ? (self.preferred-height + 8px) : 0;
+            background: yellow;
+            visible: self.height > 0;
+            clip: true;
+
+            animate height { duration: 150ms; }
+
+            Text {
+                width: parent.width - 8px;
+                color: #800000;
+                font-weight: 600;
+                horizontal-alignment: left;
+                vertical-alignment: center;
+                wrap: word-wrap;
+                text: @tr("Attention").to-uppercase() + ": " + @tr("This library element contains serious errors. Please review them in the rule check panel.");
+            }
+        }
+
+        // Wizard mode: Only one page at a time.
+        if tabs[index].wizard-mode && (tabs[index].page-index <= 0): PackageMetadata {
+            section-index: section-index;
+            tabs: tabs;
+            index: index;
+            read-only: read-only;
+        }
+
+        // Normal mode: Slide between metadata and content.
+        if !tabs[index].wizard-mode: SlideView {
+            pages: [
+                { title: @tr("Metadata") },
+                { title: @tr("Pads") },
+                { title: @tr("Footprints") },
+            ];
+            current-index: tabs[index].page-index;
+
+            PackageMetadata {
+                width: parent.width;
+                section-index: section-index;
+                tabs: tabs;
+                index: index;
+                read-only: read-only;
+            }
+
+            PackagePadListView {
+                width: parent.width;
+                model: tabs[index].pads;
+            }
+
+            ta := PackageEditor {
+                width: parent.width;
+                section-index: section-index;
+                section: section;
+                tabs: tabs;
+                index: index;
+                read-only: read-only;
+
+                focus-requested => {
+                    if !root.has-focus {
+                        root.focus();
+                    }
+                }
+            }
+
+            page-clicked(idx) => {
+                tabs[index].page-index = idx;
+            }
+        }
+    }
+
+    key-pressed(event) => {
+        Data.set-current-tab(section-index, index);
+
+        // If the focus is in the command toolbar, make the Escape key moving
+        // the focus back to the graphics scene without triggering any action.
+        if (event.text == Key.Escape) && (!root.has-focus) {
+            root.focus();
+            return accept;
+        }
+        reject
+    }
+    key-released(event) => {
+        Backend.scene-key-event(section-index, event) ? accept : reject
+    }
+}

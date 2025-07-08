@@ -105,8 +105,8 @@ QString LibraryEditorTab::getWorkspaceSettingsUserName() const noexcept {
   if (u.isEmpty()) {
     QMessageBox::warning(
         qApp->activeWindow(), tr("User name not set"),
-        tr("No user name is defined in the workspace settings. Please open "
-           "the workspace settings to set a default user name."));
+        tr("No user name defined in workspace settings. Please open "
+           "workspace settings to set the default user name."));
   }
   return u;
 }

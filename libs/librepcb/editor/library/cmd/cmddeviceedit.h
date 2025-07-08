@@ -23,7 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../undocommand.h"
+#include "cmdlibraryelementedit.h"
 
 #include <librepcb/core/types/uuid.h>
 
@@ -45,13 +45,13 @@ namespace editor {
 /**
  * @brief The CmdDeviceEdit class
  */
-class CmdDeviceEdit final : public UndoCommand {
+class CmdDeviceEdit final : public CmdLibraryElementEdit {
 public:
   // Constructors / Destructor
   CmdDeviceEdit() = delete;
   CmdDeviceEdit(const CmdDeviceEdit& other) = delete;
   explicit CmdDeviceEdit(Device& device) noexcept;
-  ~CmdDeviceEdit() noexcept;
+  virtual ~CmdDeviceEdit() noexcept;
 
   // Setters
   void setComponentUuid(const Uuid& uuid) noexcept;

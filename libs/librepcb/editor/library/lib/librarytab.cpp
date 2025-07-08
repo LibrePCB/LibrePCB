@@ -825,15 +825,15 @@ void LibraryTab::duplicateElements(
   auto item = items.first();
   switch (item->type) {
     case ui::LibraryTreeViewItemType::ComponentCategory: {
-      mEditor.duplicateInLegacyComponentCategoryEditor(item->path);
+      // mEditor.duplicateInLegacyComponentCategoryEditor(item->path);
       break;
     }
     case ui::LibraryTreeViewItemType::PackageCategory: {
-      mEditor.duplicateInLegacyPackageCategoryEditor(item->path);
+      // mEditor.duplicateInLegacyPackageCategoryEditor(item->path);
       break;
     }
     case ui::LibraryTreeViewItemType::Symbol: {
-      mEditor.duplicateInLegacySymbolEditor(item->path);
+      // mEditor.duplicateInLegacySymbolEditor(item->path);
       break;
     }
     case ui::LibraryTreeViewItemType::Package: {

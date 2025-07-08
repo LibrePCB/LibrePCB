@@ -70,6 +70,25 @@ QString s2q(const slint::SharedString& s) noexcept {
   return QString::fromUtf8(view.data(), view.size());
 }
 
+std::shared_ptr<slint::VectorModel<slint::SharedString>> q2s(
+    const QStringList& s) noexcept {
+  auto m = std::make_shared<slint::VectorModel<slint::SharedString>>();
+  for (const QString& item : s) {
+    m->push_back(q2s(item));
+  }
+  return m;
+}
+
+QStringList s2q(const slint::Model<slint::SharedString>& s) noexcept {
+  QStringList list;
+  for (std::size_t i = 0; i < s.row_count(); ++i) {
+    if (auto item = s.row_data(i)) {
+      list.append(s2q(*item));
+    }
+  }
+  return list;
+}
+
 bool operator==(const QString& s1, const slint::SharedString& s2) noexcept {
   return s1.toUtf8().data() == std::string_view(s2);
 }
@@ -317,10 +336,24 @@ std::optional<FileProofName> validateFileProofName(
   }
 }
 
+std::optional<CircuitIdentifier> validateCircuitIdentifier(
+    const QString& input, slint::SharedString& error) noexcept {
+  if (auto val = parseCircuitIdentifier(cleanCircuitIdentifier(input))) {
+    error = slint::SharedString();
+    return val;
+  } else {
+    error = getInputError(input);
+    return std::nullopt;
+  }
+}
+
 std::optional<QUrl> validateUrl(const QString& input,
                                 slint::SharedString& error,
                                 bool allowEmpty) noexcept {
-  const QUrl url = QUrl::fromUserInput(input.trimmed());
+  // Note: We don't use QUrl::fromUserInput() because it performs *heavy*
+  // magic to construct URLs from almost any string, which doesn't make
+  // sense to me.
+  const QUrl url(input.trimmed(), QUrl::TolerantMode);
   const std::optional<QUrl> val =
       url.isValid() ? std::make_optional(url) : std::nullopt;
   if (val || (allowEmpty && input.trimmed().isEmpty())) {
@@ -329,6 +362,25 @@ std::optional<QUrl> validateUrl(const QString& input,
   } else {
     error = getInputError(input);
     return std::nullopt;
+  }
+}
+
+void validateComponentPrefix(const QString& input,
+                             slint::SharedString& error) noexcept {
+  if (ComponentPrefixConstraint()(input.trimmed()) &&
+      (!input.trimmed().isEmpty())) {
+    error = slint::SharedString();
+  } else {
+    error = getInputError(input);
+  }
+}
+
+void validateComponentDefaultValue(const QString& input,
+                                   slint::SharedString& error) noexcept {
+  if (!input.trimmed().isEmpty()) {
+    error = slint::SharedString();
+  } else {
+    error = getInputError(input);
   }
 }
 

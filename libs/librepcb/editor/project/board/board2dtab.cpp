@@ -267,6 +267,10 @@ ui::TabData Board2dTab::getUiData() const noexcept {
   features.save = toFs(mProject.getDirectory().isWritable());
   features.undo = toFs(mProjectEditor.getUndoStack().canUndo());
   features.redo = toFs(mProjectEditor.getUndoStack().canRedo());
+  features.grid = toFs(mProject.getDirectory().isWritable());
+  features.zoom = toFs(true);
+  features.import_graphics =
+      toFs(mToolFeatures.testFlag(Feature::ImportGraphics));
   features.export_graphics = toFs(mTool == ui::EditorTool::Select);
   features.select = toFs(mTool == ui::EditorTool::Select);
   features.cut = toFs(mToolFeatures.testFlag(Feature::Cut));

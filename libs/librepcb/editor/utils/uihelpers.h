@@ -25,7 +25,9 @@
  ******************************************************************************/
 #include "appwindow.h"
 
+#include <librepcb/core/library/cmp/cmpsigpindisplaytype.h>
 #include <librepcb/core/rulecheck/rulecheckmessage.h>
+#include <librepcb/core/types/alignment.h>
 #include <librepcb/core/types/length.h>
 #include <librepcb/core/types/lengthunit.h>
 #include <librepcb/core/workspace/theme.h>
@@ -49,6 +51,7 @@ class EditorCommand;
 
 static_assert(sizeof(ui::Int64) == 8);
 static_assert(sizeof(LengthBase_t) == 8);
+static_assert(sizeof(Angle) == sizeof(int));
 
 qint64 s2l(const ui::Int64& v) noexcept;
 
@@ -57,13 +60,25 @@ Length s2length(const ui::Int64& v) noexcept;
 std::optional<UnsignedLength> s2ulength(const ui::Int64& v) noexcept;
 std::optional<PositiveLength> s2plength(const ui::Int64& v) noexcept;
 
+int l2s(const Angle& v) noexcept;
+Angle s2angle(int v) noexcept;
+
 ui::GridStyle l2s(Theme::GridStyle v) noexcept;
 Theme::GridStyle s2l(ui::GridStyle v) noexcept;
 
 ui::LengthUnit l2s(const LengthUnit& v) noexcept;
 LengthUnit s2l(ui::LengthUnit v) noexcept;
 
+ui::HAlign l2s(const HAlign& v) noexcept;
+HAlign s2l(ui::HAlign v) noexcept;
+
+ui::VAlign l2s(const VAlign& v) noexcept;
+VAlign s2l(ui::VAlign v) noexcept;
+
 ui::NotificationType l2s(RuleCheckMessage::Severity v) noexcept;
+
+ui::ComponentPinoutDisplayMode l2s(const CmpSigPinDisplayType& v) noexcept;
+const CmpSigPinDisplayType& s2l(ui::ComponentPinoutDisplayMode v) noexcept;
 
 ui::EditorCommand l2s(const EditorCommand& cmd, ui::EditorCommand in) noexcept;
 

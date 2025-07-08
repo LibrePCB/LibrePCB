@@ -49,7 +49,7 @@ class UndoStack;
  ******************************************************************************/
 
 /**
- * @brief Specialized base class for all library editor tabs
+ * @brief The LibraryEditorTab class
  */
 class LibraryEditorTab : public WindowTab {
   Q_OBJECT

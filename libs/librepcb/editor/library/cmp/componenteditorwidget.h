@@ -79,17 +79,12 @@ public slots:
   bool save() noexcept override;
 
 private:  // Methods
-  void updateMetadata() noexcept;
-  QString commitMetadata() noexcept;
   bool openComponentSymbolVariantEditor(
       std::shared_ptr<ComponentSymbolVariant> variant) noexcept override;
-  void memorizeComponentInterface() noexcept;
   bool isInterfaceBroken() const noexcept override;
   bool runChecks(RuleCheckMessageList& msgs) const override;
   template <typename MessageType>
   void fixMsg(const MessageType& msg);
-  template <typename MessageType>
-  bool fixMsgHelper(std::shared_ptr<const RuleCheckMessage> msg, bool applyFix);
   bool processRuleCheckMessage(std::shared_ptr<const RuleCheckMessage> msg,
                                bool applyFix) override;
   void ruleCheckApproveRequested(std::shared_ptr<const RuleCheckMessage> msg,

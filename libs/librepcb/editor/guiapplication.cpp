@@ -24,6 +24,7 @@
 
 #include "dialogs/directorylockhandlerdialog.h"
 #include "dialogs/filedialog.h"
+#include "graphics/graphicslayerlist.h"
 #include "library/librariesmodel.h"
 #include "library/libraryeditor.h"
 #include "mainwindow.h"
@@ -42,8 +43,11 @@
 #include "workspace/workspacesettingsdialog.h"
 
 #include <librepcb/core/application.h>
+#include <librepcb/core/attribute/attributetype.h>
+#include <librepcb/core/attribute/attributeunit.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/library/library.h>
+#include <librepcb/core/norms.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectloader.h>
 #include <librepcb/core/utils/mathparser.h>
@@ -70,6 +74,7 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
   : QObject(parent),
     mWorkspace(ws),
     mLibrariesContainStandardComponents(false),
+    mPreviewLayers(GraphicsLayerList::previewLayers(&ws.getSettings())),
     mNotifications(new NotificationsModel(ws)),
     mQuickAccessModel(new QuickAccessModel(ws)),
     mLocalLibraries(new LibrariesModel(ws, LibrariesModel::Mode::LocalLibs)),
@@ -589,6 +594,21 @@ void GuiApplication::createNewWindow(int id, int projectIndex) noexcept {
   d.set_projects(mProjects);
   d.fn_set_current_project(projectIndex);
   d.set_libraries(mLibraries);
+  d.set_norms(q2s(getAvailableNorms()));
+
+  QStringList attributeTypes;
+  auto attributeUnits = std::make_shared<
+      slint::VectorModel<std::shared_ptr<slint::Model<slint::SharedString>>>>();
+  for (auto t : AttributeType::getAllTypes()) {
+    attributeTypes.append(t->getNameTr());
+    QStringList units;
+    for (auto u : t->getAvailableUnits()) {
+      units.append(u->getSymbolTr());
+    }
+    attributeUnits->push_back(q2s(units));
+  }
+  d.set_attribute_types(q2s(attributeTypes));
+  d.set_attribute_units(attributeUnits);
 
   // Register global callbacks.
   const ui::Backend& b = win->global<ui::Backend>();
@@ -635,6 +655,29 @@ void GuiApplication::createNewWindow(int id, int projectIndex) noexcept {
         }
         return res;
       });
+  b.on_format_angle([](const int& value) {
+    const Angle angle = s2angle(value);
+    return q2s(Toolbox::floatToString(angle.toDeg(), 3, QLocale()));
+  });
+  b.on_parse_angle_input([](slint::SharedString text) {
+    ui::AngleEditParseResult res{false, 0};
+    try {
+      QString value = s2q(text);
+
+      // Remove unit
+      value.replace("°", "");
+
+      // Parse expression and convert to Length.
+      const MathParser::Result result = MathParser().parse(value);
+      if (result.valid) {
+        const Angle angle = Angle::fromDeg(result.value);
+        res.evaluated_value = l2s(angle);
+        res.valid = true;
+      }
+    } catch (const Exception& e) {
+    }
+    return res;
+  });
 
   // Reuse next free window ID.
   if (id < 1) {

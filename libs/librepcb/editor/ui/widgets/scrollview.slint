@@ -1,0 +1,96 @@
+import { Palette } from "std-widgets.slint";
+
+export component ScrollView {
+    in-out property <bool> interactive <=> flickable.interactive;
+    in-out property <length> viewport-width <=> flickable.viewport-width;
+    in-out property <length> viewport-height <=> flickable.viewport-height;
+    property <length> slider-width: 9px;
+
+    preferred-width: flickable.viewport-width + slider-width;
+    preferred-height: flickable.viewport-height;
+
+    flickable := Flickable {
+        x: 0;
+        y: 0;
+        width: parent.width - v-bar.width;
+        height: parent.height;
+
+        @children
+    }
+
+    v-bar := Rectangle {
+        x: parent.width - slider-width;
+        y: 0;
+        width: self.visible ? slider-width : 0;
+        height: parent.height - h-bar.height;
+        background: #404040;
+        border-radius: slider-width / 2;
+        visible: flickable.viewport-height > flickable.height;
+
+        TouchArea {
+            property <bool> dragging: false;
+            property <length> mouse-down-y;
+            property <float> pos;
+
+            pointer-event(event) => {
+                if (event.kind == PointerEventKind.down) && (event.button == PointerEventButton.left) && (self.mouse-y >= v-slider.y) && (self.mouse-y <= v-slider.y + v-slider.height) {
+                    mouse-down-y = v-slider.y;
+                    dragging = true;
+                } else if dragging && (event.kind == PointerEventKind.move) {
+                    pos = max(min((mouse-down-y + self.mouse-y - self.pressed-y) / (parent.height - v-slider.height), 1), 0);
+                    flickable.viewport-y = -pos * (flickable.viewport-height - flickable.height);
+                } else if dragging && (event.kind == PointerEventKind.up) && (event.button == PointerEventButton.left) {
+                    dragging = false;
+                }
+            }
+        }
+
+        v-slider := Rectangle {
+            property <float> pos: (-flickable.viewport-y / (flickable.viewport-height - flickable.height));
+
+            y: pos * (parent.height - self.height);
+            width: slider-width;
+            height: max(parent.height * flickable.height / flickable.viewport-height, min(parent.height / 2, 20px));
+            background: #606060;
+            border-radius: slider-width / 2;
+        }
+    }
+
+    h-bar := Rectangle {
+        x: 0;
+        y: parent.height - self.height;
+        width: parent.width - v-bar.width;
+        height: self.visible ? slider-width / 2 : 0;
+        background: #404040;
+        border-radius: slider-width / 2;
+        visible: flickable.viewport-width > flickable.width;
+
+        TouchArea {
+            property <bool> dragging: false;
+            property <length> mouse-down-x;
+            property <float> pos;
+
+            pointer-event(event) => {
+                if (event.kind == PointerEventKind.down) && (event.button == PointerEventButton.left) && (self.mouse-x >= h-slider.x) && (self.mouse-x <= h-slider.x + h-slider.width) {
+                    mouse-down-x = h-slider.x;
+                    dragging = true;
+                } else if dragging && (event.kind == PointerEventKind.move) {
+                    pos = max(min((mouse-down-x + self.mouse-x - self.pressed-x) / (parent.width - h-slider.width), 1), 0);
+                    flickable.viewport-x = -pos * (flickable.viewport-width - flickable.width);
+                } else if dragging && (event.kind == PointerEventKind.up) && (event.button == PointerEventButton.left) {
+                    dragging = false;
+                }
+            }
+        }
+
+        h-slider := Rectangle {
+            property <float> pos: (-flickable.viewport-x / (flickable.viewport-width - flickable.width));
+
+            x: pos * (parent.width - self.width);
+            width: max(parent.width * flickable.width / flickable.viewport-width, min(parent.width / 2, 20px));
+            height: slider-width;
+            background: #606060;
+            border-radius: slider-width / 2;
+        }
+    }
+}
