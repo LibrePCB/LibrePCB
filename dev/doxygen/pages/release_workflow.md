@@ -144,6 +144,8 @@ downloading translations from [Transifex].
    older releases!). If necessary, add tags to the submodule repositories to
    avoid garbage collection of these commits.
 4. Verify that translations are up-to-date, i.e. the auto-sync still works.
+5. Check that the code signing configuration is still up-to-date and set up
+   for all executables to be signed.
 
 ### Release
 
@@ -163,6 +165,7 @@ downloading translations from [Transifex].
      * 3D viewer (check OpenGL and OpenCASCADE)
      * Translations
      * Desktop services (e.g. opening keyboard shortcuts reference PDF)
+     * Code signing (TODO: Can we make a test run of code signing?)
 8. If everything looks good, merge the branch into `master` (either by merging
    the PR or locally with merge commit [preferred] or fast-forward).
 9. Important: Only proceed with the following steps if you have a lot of time
