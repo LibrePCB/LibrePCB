@@ -23,7 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../workspace/categorytreemodel.h"
+#include "../../workspace/categorytreemodellegacy.h"
 
 #include <librepcb/core/types/uuid.h>
 
@@ -54,8 +54,8 @@ class CategoryChooserDialog final : public QDialog {
   Q_OBJECT
 
 public:
-  using Filter = CategoryTreeModel::Filter;
-  using Filters = CategoryTreeModel::Filters;
+  using Filter = CategoryTreeModelLegacy::Filter;
+  using Filters = CategoryTreeModelLegacy::Filters;
 
   // Constructors / Destructor
   CategoryChooserDialog() = delete;
@@ -72,7 +72,7 @@ public:
 
 private:  // Data
   QScopedPointer<Ui::CategoryChooserDialog> mUi;
-  QScopedPointer<CategoryTreeModel> mModel;
+  QScopedPointer<CategoryTreeModelLegacy> mModel;
 };
 
 /*******************************************************************************

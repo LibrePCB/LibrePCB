@@ -25,6 +25,8 @@
 #include "dialogs/directorylockhandlerdialog.h"
 #include "editorcommandsetupdater.h"
 #include "guiapplication.h"
+#include "library/cat/componentcategorytab.h"
+#include "library/cat/packagecategorytab.h"
 #include "library/createlibrarytab.h"
 #include "library/downloadlibrarytab.h"
 #include "library/eaglelibraryimportwizard/eaglelibraryimportwizard.h"
@@ -49,6 +51,10 @@
 #include "workspace/filesystemmodel.h"
 
 #include <librepcb/core/fileio/fileutils.h>
+#include <librepcb/core/fileio/transactionaldirectory.h>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/library/cat/componentcategory.h>
+#include <librepcb/core/library/cat/packagecategory.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
@@ -73,6 +79,41 @@ static std::optional<QSize> getOverrideWindowSize() noexcept {
   } else {
     return std::nullopt;
   }
+}
+
+static bool askForRestoringBackup(const FilePath&) {
+  QMessageBox::StandardButton btn = QMessageBox::question(
+      qApp->activeWindow(), MainWindow::tr("Restore autosave backup?"),
+      MainWindow::tr(
+          "It seems that the application crashed the last time you opened "
+          "this library element. Do you want to restore the last autosave "
+          "backup?"),
+      QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+      QMessageBox::Cancel);
+  switch (btn) {
+    case QMessageBox::Yes:
+      return true;
+    case QMessageBox::No:
+      return false;
+    default:
+      throw UserCanceled(__FILE__, __LINE__);
+  }
+}
+
+static LocalizedNameMap copyLibraryElementNames(const LocalizedNameMap& names) {
+  // Note: We copy only the default locale for now because the UI doesn't show
+  // the other locales so the user can't edit them.
+  QString newNameStr = *names.getDefaultValue() % " (" %
+      MainWindow::tr("Copy", "The noun (a copy of), not the verb (to copy)") %
+      ")";
+  if (auto newName = parseElementName(newNameStr)) {
+    return LocalizedNameMap(*newName);
+  }
+  newNameStr = *names.getDefaultValue() % " (Copy)";
+  if (auto newName = parseElementName(newNameStr)) {
+    return LocalizedNameMap(*newName);
+  }
+  return LocalizedNameMap(names.getDefaultValue());
 }
 
 /*******************************************************************************
@@ -534,13 +575,13 @@ void MainWindow::triggerLibrary(slint::SharedString path,
     }
     case ui::LibraryAction::NewComponentCategory: {
       if (auto editor = mApp.getLibrary(fp)) {
-        openComponentCategoryTab(*editor, FilePath());
+        openComponentCategoryTab(*editor, FilePath(), false);
       }
       break;
     }
     case ui::LibraryAction::NewPackageCategory: {
       if (auto editor = mApp.getLibrary(fp)) {
-        openPackageCategoryTab(*editor, FilePath());
+        openPackageCategoryTab(*editor, FilePath(), false);
       }
       break;
     }
@@ -583,6 +624,8 @@ void MainWindow::triggerLibraryElement(slint::SharedString path,
   switch (a) {
     case ui::LibraryElementAction::Open: {
       if (switchToLibraryElementTab<LibraryTab>(fp)) return;
+      if (switchToLibraryElementTab<ComponentCategoryTab>(fp)) return;
+      if (switchToLibraryElementTab<PackageCategoryTab>(fp)) return;
       if (mApp.getLibrary(fp)) {
         openLibraryTab(fp, false);
       }
@@ -778,13 +821,81 @@ void MainWindow::openLibraryTab(const FilePath& fp, bool wizardMode) noexcept {
 }
 
 void MainWindow::openComponentCategoryTab(LibraryEditor& editor,
-                                          const FilePath& fp) noexcept {
-  editor.openLegacyComponentCategoryEditor(fp);
+                                          const FilePath& fp,
+                                          bool copyFrom) noexcept {
+  if (!switchToLibraryElementTab<ComponentCategoryTab>(fp)) {
+    try {
+      std::unique_ptr<ComponentCategory> cat;
+      ComponentCategoryTab::Mode mode = ComponentCategoryTab::Mode::Open;
+      if (fp.isValid() && (!copyFrom)) {
+        auto fs = TransactionalFileSystem::open(
+            fp, editor.isWritable(), &askForRestoringBackup,
+            DirectoryLockHandlerDialog::createDirectoryLockCallback());
+        cat = ComponentCategory::open(std::unique_ptr<TransactionalDirectory>(
+            new TransactionalDirectory(fs)));
+      } else {
+        mode = ComponentCategoryTab::Mode::New;
+        cat.reset(new ComponentCategory(
+            Uuid::createRandom(), Version::fromString("0.1"),
+            mApp.getWorkspace().getSettings().userName.get(),
+            ElementName("New Component Category"), QString(), QString()));
+        if (copyFrom) {
+          mode = ComponentCategoryTab::Mode::Duplicate;
+          auto fs = TransactionalFileSystem::openRO(fp, &askForRestoringBackup);
+          std::unique_ptr<ComponentCategory> src =
+              ComponentCategory::open(std::unique_ptr<TransactionalDirectory>(
+                  new TransactionalDirectory(fs)));
+          cat->setNames(copyLibraryElementNames(src->getNames()));
+          cat->setDescriptions(src->getDescriptions());
+          cat->setKeywords(src->getKeywords());
+          cat->setParentUuid(src->getParentUuid());
+        }
+      }
+      addTab(
+          std::make_shared<ComponentCategoryTab>(editor, std::move(cat), mode));
+    } catch (const Exception& e) {
+      QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
+    }
+  }
 }
 
 void MainWindow::openPackageCategoryTab(LibraryEditor& editor,
-                                        const FilePath& fp) noexcept {
-  editor.openLegacyPackageCategoryEditor(fp);
+                                        const FilePath& fp,
+                                        bool copyFrom) noexcept {
+  if (!switchToLibraryElementTab<PackageCategoryTab>(fp)) {
+    try {
+      std::unique_ptr<PackageCategory> cat;
+      PackageCategoryTab::Mode mode = PackageCategoryTab::Mode::Open;
+      if (fp.isValid() && (!copyFrom)) {
+        auto fs = TransactionalFileSystem::open(
+            fp, editor.isWritable(), &askForRestoringBackup,
+            DirectoryLockHandlerDialog::createDirectoryLockCallback());
+        cat = PackageCategory::open(std::unique_ptr<TransactionalDirectory>(
+            new TransactionalDirectory(fs)));
+      } else {
+        mode = PackageCategoryTab::Mode::New;
+        cat.reset(new PackageCategory(
+            Uuid::createRandom(), Version::fromString("0.1"),
+            mApp.getWorkspace().getSettings().userName.get(),
+            ElementName("New Package Category"), QString(), QString()));
+        if (copyFrom) {
+          mode = PackageCategoryTab::Mode::Duplicate;
+          auto fs = TransactionalFileSystem::openRO(fp, &askForRestoringBackup);
+          std::unique_ptr<PackageCategory> src =
+              PackageCategory::open(std::unique_ptr<TransactionalDirectory>(
+                  new TransactionalDirectory(fs)));
+          cat->setNames(copyLibraryElementNames(src->getNames()));
+          cat->setDescriptions(src->getDescriptions());
+          cat->setKeywords(src->getKeywords());
+          cat->setParentUuid(src->getParentUuid());
+        }
+      }
+      addTab(
+          std::make_shared<PackageCategoryTab>(editor, std::move(cat), mode));
+    } catch (const Exception& e) {
+      QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
+    }
+  }
 }
 
 void MainWindow::openSymbolTab(LibraryEditor& editor,

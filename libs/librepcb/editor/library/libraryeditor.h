@@ -114,14 +114,10 @@ public:
   void forceClosingTabs(const QSet<FilePath>& fp) noexcept;
 
   // Legacy editors
-  void openLegacyComponentCategoryEditor(const FilePath& fp) noexcept;
-  void openLegacyPackageCategoryEditor(const FilePath& fp) noexcept;
   void openLegacySymbolEditor(const FilePath& fp) noexcept;
   void openLegacyPackageEditor(const FilePath& fp) noexcept;
   void openLegacyComponentEditor(const FilePath& fp) noexcept;
   void openLegacyDeviceEditor(const FilePath& fp) noexcept;
-  void duplicateInLegacyComponentCategoryEditor(const FilePath& fp) noexcept;
-  void duplicateInLegacyPackageCategoryEditor(const FilePath& fp) noexcept;
   void duplicateInLegacySymbolEditor(const FilePath& fp) noexcept;
   void duplicateInLegacyPackageEditor(const FilePath& fp) noexcept;
   void duplicateInLegacyComponentEditor(const FilePath& fp) noexcept;

@@ -1,0 +1,280 @@
+import { LibraryRuleCheckLink } from "libraryrulechecklink.slint";
+import {
+    Button,
+    CategoryTreeLabel,
+    IconButton,
+    ListViewItemButton,
+    Switch,
+} from "../widgets.slint";
+import {
+    Backend,
+    Data,
+    LibraryDependency,
+    PanelPage,
+    RuleCheckData,
+    TabAction,
+} from "../api.slint";
+
+export component IconRowHeader inherits Text {
+    width: self.preferred-width;
+    vertical-alignment: center;
+    text: @tr("Icon:");
+    accessible-role: none;
+}
+
+export component IconRowCell inherits HorizontalLayout {
+    in property <image> icon;
+    in property <bool> read-only: false;
+    property <bool> has-icon: icon.width > 0;
+
+    callback clicked <=> btn.clicked;
+
+    alignment: start;
+    spacing: 8px;
+
+    btn := IconButton {
+        height: 48px;
+        style: hyperlink;
+        colorize: !has-icon;
+        icon-size: has-icon ? 48px : 20px;
+        icon: {
+            if has-icon {
+                root.icon
+            } else {
+                @image-url("../../../../bootstrap-icons/icons/folder2-open.svg")
+            }
+        };
+        enabled: !read-only;
+    }
+
+    if btn.has-hover: Text {
+        color: #a0a0a0;
+        font-size: 11px;
+        vertical-alignment: center;
+        overflow: elide;
+        text: @tr("Click to change the icon.") + "\n" + @tr("Preferred:") + " PNG, 256x256 px";
+        accessible-role: none;
+    }
+}
+
+export component NameRowHeader inherits Text {
+    width: self.preferred-width;
+    vertical-alignment: center;
+    text: @tr("Name:");
+    accessible-role: none;
+}
+
+export component DescriptionRowHeader inherits Text {
+    width: self.preferred-width;
+    vertical-alignment: center;
+    text: @tr("Description:");
+    accessible-role: none;
+}
+
+export component KeywordsRowHeader inherits Text {
+    width: self.preferred-width;
+    vertical-alignment: center;
+    text: @tr("Keywords:");
+    accessible-role: none;
+}
+
+export component AuthorRowHeader inherits Text {
+    width: self.preferred-width;
+    vertical-alignment: center;
+    text: @tr("Author:");
+    accessible-role: none;
+}
+
+export component VersionRowHeader inherits Text {
+    width: self.preferred-width;
+    vertical-alignment: center;
+    text: @tr("Version:");
+    accessible-role: none;
+}
+
+export component DeprecatedRowHeader inherits Text {
+    width: self.preferred-width;
+    vertical-alignment: center;
+    text: @tr("Deprecated:");
+    accessible-role: none;
+}
+
+export component DeprecatedRowCell inherits Switch {
+    font-size: 10px;
+    text: @tr("Check this if this library element should no longer be used.");
+    accessible-description: self.text;
+}
+
+export component UrlRowHeader inherits Text {
+    width: self.preferred-width;
+    vertical-alignment: center;
+    text: @tr("URL:");
+    accessible-role: none;
+}
+
+export component DependenciesRowHeader inherits Text {
+    width: self.preferred-width;
+    vertical-alignment: center;
+    text: @tr("Dependencies:");
+    accessible-role: none;
+}
+
+export component DependenciesRowCell inherits VerticalLayout {
+    in-out property <[LibraryDependency]> model;
+    in property <bool> read-only: false;
+
+    callback add-dependency-clicked;
+
+    for item[idx] in model: item-ta := TouchArea {
+        height: item.checked ? 22px : 0;
+
+        if item.checked: HorizontalLayout {
+            padding-left: 3px;
+            padding-right: 3px;
+            spacing: 5px;
+            alignment: start;
+
+            Image {
+                y: (parent.height - self.height) / 2;
+                width: 18px;
+                height: self.width;
+                image-fit: contain;
+                source: item.icon;
+                accessible-role: none;
+            }
+
+            item-txt := Text {
+                vertical-alignment: center;
+                overflow: elide;
+                text: item.name.is-empty ? item.uuid : item.name;
+                accessible-description: "dependency";
+            }
+
+            if (!read-only) && item-ta.has-hover: ListViewItemButton {
+                icon: @image-url("../../../../font-awesome/svgs/solid/trash-can.svg");
+                icon-size: 14px;
+
+                clicked => {
+                    model[idx].checked = false;
+                }
+            }
+        }
+    }
+
+    if !read-only: HorizontalLayout {
+        height: 22px;
+        padding-left: 1px;
+        padding-right: 3px;
+        spacing: 5px;
+        alignment: start;
+
+        add-dependency-btn := IconButton {
+            style: hyperlink;
+            icon-scale: 0.8;
+            icon: @image-url("../../../../bootstrap-icons/icons/plus-circle.svg");
+            accessible-label: "add dependency";
+
+            clicked => {
+                add-dependency-clicked();
+            }
+        }
+
+        if add-dependency-btn.has-hover: Text {
+            color: #a0a0a0;
+            font-size: 11px;
+            vertical-alignment: center;
+            overflow: elide;
+            text: @tr("Add Dependency");
+            accessible-role: none;
+        }
+    }
+}
+
+export component ManufacturerRowHeader inherits Text {
+    width: self.preferred-width;
+    vertical-alignment: center;
+    text: @tr("Manufacturer:");
+    accessible-role: none;
+}
+
+export component ParentRowHeader inherits Text {
+    width: self.preferred-width;
+    vertical-alignment: center;
+    text: @tr("Parent:");
+    accessible-role: none;
+}
+
+export component ParentRowCell inherits HorizontalLayout {
+    in property <[string]> model;
+    in property <bool> read-only: false;
+
+    callback choose-parent-clicked;
+
+    alignment: start;
+    spacing: 5px;
+
+    tree-txt := CategoryTreeLabel {
+        names: model;
+        accessible-description: "parent category";
+    }
+
+    Rectangle {
+        width: 20px;
+    }
+
+    if !read-only: Rectangle {
+        width: 1px;
+        background: #707070;
+    }
+
+    if !read-only: select-btn := IconButton {
+        y: (parent.height - self.height) / 2;
+        z: 10;  // For the tooltip.
+        height: 18px;
+        style: hyperlink;
+        icon: @image-url("../../../../bootstrap-icons/icons/folder2-open.svg");
+        tooltip: @tr("Choose Parent Category");
+
+        clicked => {
+            choose-parent-clicked();
+        }
+    }
+}
+
+export component MetadataFooterRowCell inherits HorizontalLayout {
+    in property <int> section-index;
+    in property <int> tab-index;
+    in property <bool> wizard-mode: false;
+    in property <bool> unsaved-changes: false;
+    in property <RuleCheckData> checks;
+    in property <bool> read-only: false;
+
+    alignment: start;
+    spacing: 5px;
+
+    if !read-only: save-btn := Button {
+        width: max(self.preferred-width, 100px);
+        primary: wizard-mode || unsaved-changes;
+        icon: {
+            if wizard-mode {
+                @image-url("../../../../font-awesome/svgs/solid/angle-right.svg")
+            } else {
+                @image-url("../../../../font-awesome/svgs/solid/check.svg")
+            }
+        };
+        text: wizard-mode ? @tr("Next") : @tr("Save");
+
+        clicked => {
+            Backend.trigger-tab(section-index, tab-index, TabAction.save);
+        }
+    }
+
+    LibraryRuleCheckLink {
+        data: checks;
+
+        clicked => {
+            Data.set-current-tab(section-index, tab-index);
+            Data.panel-page = PanelPage.rule-check;
+        }
+    }
+}

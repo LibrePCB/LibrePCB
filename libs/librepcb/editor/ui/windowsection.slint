@@ -4,6 +4,7 @@ import { HomeTab } from "hometab.slint";
 import { CreateLibraryTab } from "library/createlibrarytab.slint";
 import { DownloadLibraryTab } from "library/downloadlibrarytab.slint";
 import { LibraryTab } from "library/lib/librarytab.slint";
+import { ComponentCategoryTab, PackageCategoryTab } from "library/cat/categorytab.slint";
 import { SchematicTab } from "project/schematic/schematictab.slint";
 import { Board2dTab } from "project/board/board2dtab.slint";
 import { Board3dTab } from "project/board/board3dtab.slint";
@@ -202,6 +203,20 @@ export component WindowSection inherits Rectangle {
             }
 
             if tab-open && (tab-type == TabType.library): library-tab := LibraryTab {
+                width: 100%;
+                height: 100%;
+                section-index: section-index;
+                section: section;
+            }
+
+            if tab-open && (tab-type == TabType.component-category): component-category-tab := ComponentCategoryTab {
+                width: 100%;
+                height: 100%;
+                section-index: section-index;
+                section: section;
+            }
+
+            if tab-open && (tab-type == TabType.package-category): package-category-tab := PackageCategoryTab {
                 width: 100%;
                 height: 100%;
                 section-index: section-index;

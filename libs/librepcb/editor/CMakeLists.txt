@@ -128,12 +128,10 @@ add_library(
   library/cat/categorytreebuilder.h
   library/cat/categorytreelabeltextbuilder.cpp
   library/cat/categorytreelabeltextbuilder.h
-  library/cat/componentcategoryeditorwidget.cpp
-  library/cat/componentcategoryeditorwidget.h
-  library/cat/componentcategoryeditorwidget.ui
-  library/cat/packagecategoryeditorwidget.cpp
-  library/cat/packagecategoryeditorwidget.h
-  library/cat/packagecategoryeditorwidget.ui
+  library/cat/componentcategorytab.cpp
+  library/cat/componentcategorytab.h
+  library/cat/packagecategorytab.cpp
+  library/cat/packagecategorytab.h
   library/cmd/cmdcomponentedit.cpp
   library/cmd/cmdcomponentedit.h
   library/cmd/cmdcomponentpinsignalmapitemedit.cpp
@@ -959,6 +957,8 @@ add_library(
   windowtab.h
   workspace/categorytreemodel.cpp
   workspace/categorytreemodel.h
+  workspace/categorytreemodellegacy.cpp
+  workspace/categorytreemodellegacy.h
   workspace/desktopintegration.cpp
   workspace/desktopintegration.h
   workspace/desktopservices.cpp

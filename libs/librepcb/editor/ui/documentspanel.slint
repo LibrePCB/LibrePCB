@@ -315,6 +315,36 @@ component LibrarySection inherits Rectangle {
                 Backend.trigger-library-element(library.path, LibraryElementAction.open);
             }
         }
+
+        for section in Data.sections: VerticalLayout {
+            for tab[idx] in section.component-category-tabs: VerticalLayout {
+                if (!tab.path.is-empty) && (tab.library-index == library-index): DocumentsListItem {
+                    type: ItemType.library;
+                    text: section.tabs[idx].title;
+                    icon: @image-url("../../../bootstrap-icons/icons/folder.svg");
+                    selected: (Data.current-tab.type == TabType.component-category) && (Data.current-component-category-tab.library-index == library-index) && (Data.current-component-category-tab.path == tab.path);
+                    scrollbar-width: scrollbar-width;
+
+                    clicked => {
+                        Backend.trigger-library-element(tab.path, LibraryElementAction.open);
+                    }
+                }
+            }
+
+            for tab[idx] in section.package-category-tabs: VerticalLayout {
+                if (!tab.path.is-empty) && (tab.library-index == library-index): DocumentsListItem {
+                    type: ItemType.library;
+                    text: section.tabs[idx].title;
+                    icon: @image-url("../../../bootstrap-icons/icons/folder.svg");
+                    selected: (Data.current-tab.type == TabType.package-category) && (Data.current-package-category-tab.library-index == library-index) && (Data.current-package-category-tab.path == tab.path);
+                    scrollbar-width: scrollbar-width;
+
+                    clicked => {
+                        Backend.trigger-library-element(tab.path, LibraryElementAction.open);
+                    }
+                }
+            }
+        }
     }
 
     if library-index == Data.current-library-index: Rectangle {

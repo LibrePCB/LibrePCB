@@ -1,6 +1,7 @@
 import {
     Board2dTabData,
     Board3dTabData,
+    CategoryTabData,
     EditorTool,
     FeatureState,
     GridStyle,
@@ -289,6 +290,20 @@ export global Data {
                         redo: FeatureState.enabled,
                     },
                 },
+                {
+                    type: TabType.component-category,
+                    title: "Cmp Category",
+                    features: {
+                        save: FeatureState.enabled,
+                        undo: FeatureState.enabled,
+                        redo: FeatureState.enabled,
+                    },
+                },
+                {
+                    type: TabType.package-category,
+                    title: "Pkg Category",
+                    features: { },
+                },
             ],
             library-tabs: [
                 {
@@ -403,7 +418,103 @@ export global Data {
                     },
                 },
             ],
-            current-tab-index: 0,
+            component-category-tabs: [
+                { },
+                {
+                    library-index: 0,
+                    path: "cmpcat1",
+                    name: "Component Category",
+                    name-error: "Invalid",
+                    description: "Foo Bar\nMultiline\nBlabla",
+                    keywords: "Foo,Bar,Hello World",
+                    author: "Somebody",
+                    version: "0.1",
+                    version-error: "Invalid",
+                    deprecated: false,
+                    parents: ["Root category", "Integrated Circuits", "Timers"],
+                    parents-tree: [
+                        {
+                            level: 0,
+                            icon: @image-url("../../../../bootstrap-icons/icons/folder.svg"),
+                            text: "Root Category",
+                        },
+                        {
+                            level: 1,
+                            icon: @image-url("../../../../bootstrap-icons/icons/folder.svg"),
+                            text: "Integrated Circuits",
+                        },
+                        {
+                            level: 2,
+                            icon: @image-url("../../../../bootstrap-icons/icons/folder.svg"),
+                            text: "Data Aquisition",
+                        },
+                        {
+                            level: 1,
+                            icon: @image-url("../../../../bootstrap-icons/icons/folder.svg"),
+                            text: "Passive Elements",
+                        },
+                    ],
+                    checks: {
+                        type: RuleCheckType.component-category-check,
+                        state: RuleCheckState.up-to-date,
+                        messages: [
+                            {
+                                severity: NotificationType.info,
+                                message: "Hint message",
+                                description: "Hint description.",
+                                approved: false,
+                                supports-autofix: true,
+                            },
+                        ],
+                        unapproved: 0,
+                    },
+                },
+            ],
+            package-category-tabs: [
+                { },
+                { },
+                {
+                    library-index: 0,
+                    path: "pkgcat1",
+                    name: "Package Category",
+                    name-error: "Invalid",
+                    description: "Foo Bar\nMultiline\nBlabla",
+                    keywords: "Foo,Bar,Hello World",
+                    author: "Somebody",
+                    version: "0.1",
+                    version-error: "Invalid",
+                    deprecated: false,
+                    parents: ["Root category", "Integrated Circuits", "Timers"],
+                    parents-tree: [
+                        {
+                            level: 0,
+                            icon: @image-url("../../../../bootstrap-icons/icons/folder.svg"),
+                            text: "Root Category",
+                        },
+                        {
+                            level: 1,
+                            icon: @image-url("../../../../bootstrap-icons/icons/folder.svg"),
+                            text: "Integrated Circuits",
+                        },
+                        {
+                            level: 2,
+                            icon: @image-url("../../../../bootstrap-icons/icons/folder.svg"),
+                            text: "Data Aquisition",
+                        },
+                        {
+                            level: 1,
+                            icon: @image-url("../../../../bootstrap-icons/icons/folder.svg"),
+                            text: "Passive Elements",
+                        },
+                    ],
+                    checks: {
+                        type: RuleCheckType.package-category-check,
+                        state: RuleCheckState.up-to-date,
+                        unapproved: 0,
+                    },
+                },
+            ],
+            current-tab-index: 2,
         },
     ];
 
@@ -798,6 +909,8 @@ export global Data {
     out property <LibraryData> current-library: libraries[current-library-index];
     out property <ProjectData> current-project: projects[current-project-index];
     out property <LibraryTabData> current-library-tab: current-section.library-tabs[current-section.current-tab-index];
+    out property <CategoryTabData> current-component-category-tab: current-section.component-category-tabs[current-section.current-tab-index];
+    out property <CategoryTabData> current-package-category-tab: current-section.package-category-tabs[current-section.current-tab-index];
     out property <SchematicTabData> current-schematic-tab: current-section.schematic-tabs[current-section.current-tab-index];
     out property <Board2dTabData> current-board-2d-tab: current-section.board-2d-tabs[current-section.current-tab-index];
     out property <Board3dTabData> current-board-3d-tab: current-section.board-3d-tabs[current-section.current-tab-index];
@@ -814,6 +927,10 @@ export global Data {
             }
         } else if current-tab.type == TabType.library {
             current-library-tab.checks
+        } else if current-tab.type == TabType.component-category {
+            current-component-category-tab.checks
+        } else if current-tab.type == TabType.package-category {
+            current-package-category-tab.checks
         } else {
             projects[-1].erc  // Not nice, but avoids compiler warning
         }
@@ -825,6 +942,16 @@ export global Data {
             current-rule-check-project-index = -1;
             current-rule-check-board-index = -1;
             current-library-index = current-library-tab.library-index;
+        } else if current-tab.type == TabType.component-category {
+            current-project-index = -1;
+            current-rule-check-project-index = -1;
+            current-rule-check-board-index = -1;
+            current-library-index = current-component-category-tab.library-index;
+        } else if current-tab.type == TabType.package-category {
+            current-project-index = -1;
+            current-rule-check-project-index = -1;
+            current-rule-check-board-index = -1;
+            current-library-index = current-package-category-tab.library-index;
         } else if current-tab.type == TabType.schematic {
             current-library-index = -1;
             current-project-index = current-schematic-tab.project-index;

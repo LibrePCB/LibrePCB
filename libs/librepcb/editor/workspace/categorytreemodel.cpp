@@ -22,10 +22,10 @@
  ******************************************************************************/
 #include "categorytreemodel.h"
 
-#include <librepcb/core/library/cat/componentcategory.h>
-#include <librepcb/core/library/cat/packagecategory.h>
-#include <librepcb/core/utils/toolbox.h>
+#include "../utils/slinthelpers.h"
+
 #include <librepcb/core/workspace/workspacelibrarydb.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
 
@@ -39,271 +39,111 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-CategoryTreeModel::CategoryTreeModel(const WorkspaceLibraryDb& library,
-                                     const QStringList& localeOrder,
-                                     Filters filters) noexcept
-  : QAbstractItemModel(nullptr),
-    mLibrary(library),
-    mLocaleOrder(localeOrder),
+CategoryTreeModel::CategoryTreeModel(const WorkspaceLibraryDb& db,
+                                     const WorkspaceSettings& ws,
+                                     Filters filters,
+                                     const std::optional<Uuid>& hiddenCategory,
+                                     QObject* parent) noexcept
+  : QObject(parent),
+    mDb(db),
+    mSettings(ws),
     mFilters(filters),
-    mRootItem(new Item{std::weak_ptr<Item>(), std::nullopt, {}, {}, {}}) {
-  update();
-  connect(&mLibrary, &WorkspaceLibraryDb::scanSucceeded, this,
-          &CategoryTreeModel::update);
+    mHiddenCategory(hiddenCategory),
+    mIcon(q2s(QIcon(":/bi/folder.svg").pixmap(32))) {
+  connect(&mDb, &WorkspaceLibraryDb::scanSucceeded, this,
+          &CategoryTreeModel::refresh, Qt::QueuedConnection);
+  connect(&mSettings.libraryLocaleOrder, &WorkspaceSettingsItem::edited, this,
+          &CategoryTreeModel::refresh, Qt::QueuedConnection);
+  refresh();
 }
 
 CategoryTreeModel::~CategoryTreeModel() noexcept {
 }
 
 /*******************************************************************************
- *  Setters
+ *  Implementations
  ******************************************************************************/
 
-void CategoryTreeModel::setLocaleOrder(const QStringList& order) noexcept {
-  if (order != mLocaleOrder) {
-    mLocaleOrder = order;
-    update();
-  }
+std::size_t CategoryTreeModel::row_count() const {
+  return mItems.size();
 }
 
-/*******************************************************************************
- *  Inherited Methods
- ******************************************************************************/
-
-int CategoryTreeModel::columnCount(const QModelIndex& parent) const noexcept {
-  Q_UNUSED(parent);
-  return 1;
-}
-
-int CategoryTreeModel::rowCount(const QModelIndex& parent) const noexcept {
-  const Item* item = itemFromIndex(parent);
-  return item ? item->childs.count() : 0;
-}
-
-QModelIndex CategoryTreeModel::index(int row, int column,
-                                     const QModelIndex& parent) const noexcept {
-  Item* p = itemFromIndex(parent);
-  if ((p) && (row >= 0) && (row < p->childs.count()) && (column == 0)) {
-    return createIndex(row, column, p);
-  } else {
-    return QModelIndex();
-  }
-}
-
-QModelIndex CategoryTreeModel::parent(const QModelIndex& index) const noexcept {
-  if (index.isValid() && (index.model() == this)) {
-    return indexFromItem(static_cast<Item*>(index.internalPointer()));
-  } else {
-    return QModelIndex();
-  }
-}
-
-QVariant CategoryTreeModel::headerData(int section, Qt::Orientation orientation,
-                                       int role) const noexcept {
-  if ((role == Qt::DisplayRole) && (orientation == Qt::Horizontal)) {
-    switch (section) {
-      case 0:
-        return tr("Category");
-      default:
-        break;
-    }
-  }
-  return QVariant();
-}
-
-QVariant CategoryTreeModel::data(const QModelIndex& index,
-                                 int role) const noexcept {
-  if (const Item* item = itemFromIndex(index)) {
-    switch (role) {
-      case Qt::DisplayRole:
-        return item->text;
-      case Qt::ToolTipRole:
-        return item->tooltip;
-      case Qt::UserRole:
-        return item->uuid ? item->uuid->toStr() : QString();
-      default:
-        break;
-    }
-  }
-  return QVariant();
+std::optional<ui::TreeViewItemData> CategoryTreeModel::row_data(
+    std::size_t i) const {
+  return (i < mItems.size()) ? std::optional(mItems.at(i)) : std::nullopt;
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
-void CategoryTreeModel::update() noexcept {
-  qDebug() << "Update category tree model...";
-  QElapsedTimer t;
-  t.start();
-
-  // Determine new items.
-  QVector<std::shared_ptr<Item>> items = getChilds(nullptr);
-
-  // Add virtual category for library elements with no category assigned.
+void CategoryTreeModel::refresh() noexcept {
   try {
-    if (containsItems(std::nullopt)) {
-      items.append(std::shared_ptr<Item>(
-          new Item{std::weak_ptr<Item>(),
-                   std::nullopt,
-                   tr("(Without Category)"),
-                   tr("All library elements without a category"),
-                   {}}));
+    mItems.clear();
+    mItems.push_back(ui::TreeViewItemData{
+        0,  // Level
+        mIcon,  // Icon
+        q2s(tr("Root Category")),  // Text
+        slint::SharedString(),  // Hint
+        "null",  // User data
+        false,  // Is project file or folder
+        false,  // Has children
+        false,  // Expanded
+        false,  // Supports pinning
+        false,  // Pinned
+        ui::TreeViewItemAction::None,  // Action
+    });
+
+    if (mFilters.testFlag(Filter::CmpCat)) {
+      loadChilds<ComponentCategory>(std::nullopt, 1);  // can throw
+    } else if (mFilters.testFlag(Filter::PkgCat)) {
+      loadChilds<PackageCategory>(std::nullopt, 1);  // can throw
     }
   } catch (const Exception& e) {
-    qCritical() << "Failed to update category tree model:" << e.getMsg();
+    qCritical() << "Failed to refresh CategoryTreeModel:" << e.getMsg();
   }
-
-  // Update tree with new items in a way which keeps the selection in views.
-  updateModelItem(mRootItem, items);
-
-  qDebug() << "Finished category tree model update in" << t.elapsed() << "ms.";
+  notify_reset();
 }
 
-QVector<std::shared_ptr<CategoryTreeModel::Item>> CategoryTreeModel::getChilds(
-    std::shared_ptr<Item> parent) const noexcept {
-  QVector<std::shared_ptr<Item>> childs;
-  std::optional<Uuid> parentUuid = parent ? parent->uuid : std::nullopt;
-  try {
-    QSet<Uuid> uuids = listPackageCategories()
-        ? mLibrary.getChilds<PackageCategory>(parentUuid)
-        : mLibrary.getChilds<ComponentCategory>(parentUuid);
-    foreach (const Uuid& uuid, uuids) {
-      std::shared_ptr<Item> child(
-          new Item{parent, uuid, QString(), QString(), {}});
-      child->childs = getChilds(child);
-      if (!child->childs.isEmpty() || listAll() || containsItems(uuid)) {
-        FilePath fp = listPackageCategories()
-            ? mLibrary.getLatest<PackageCategory>(uuid)
-            : mLibrary.getLatest<ComponentCategory>(uuid);
-        if (fp.isValid()) {
-          if (listPackageCategories()) {
-            mLibrary.getTranslations<PackageCategory>(
-                fp, mLocaleOrder, &child->text, &child->tooltip);
-          } else {
-            mLibrary.getTranslations<ComponentCategory>(
-                fp, mLocaleOrder, &child->text, &child->tooltip);
-          }
-        }
-        childs.append(child);
-      }
-    }
-  } catch (const Exception& e) {
-    qCritical() << "Failed to update category tree model items:" << e.getMsg();
+template <typename T>
+void CategoryTreeModel::loadChilds(const std::optional<Uuid>& parent,
+                                   int level) {
+  QVector<std::pair<Uuid, QString>> childs;
+  for (auto uuid : mDb.getChilds<T>(parent)) {  // can throw
+    if (uuid == mHiddenCategory) continue;
+
+    const FilePath fp = mDb.getLatest<T>(uuid);  // can throw
+
+    QString name;
+    mDb.getTranslations<T>(fp, mSettings.libraryLocaleOrder.get(),
+                           &name);  // can throw
+
+    childs.append(std::make_pair(uuid, name));
   }
 
-  // Sort items by text.
   Toolbox::sortNumeric(
       childs,
-      [](const QCollator& cmp, const std::shared_ptr<Item>& lhs,
-         const std::shared_ptr<Item>& rhs) {
-        return cmp(lhs->text, rhs->text);
-      },
-      Qt::CaseInsensitive, false);
+      [](const QCollator& collator, const std::pair<Uuid, QString>& lhs,
+         const std::pair<Uuid, QString>& rhs) {
+        return collator(lhs.second, rhs.second);
+      });
 
-  return childs;
-}
-
-bool CategoryTreeModel::containsItems(const std::optional<Uuid>& uuid) const {
-  if (listPackageCategories()) {
-    if (mFilters.testFlag(Filter::PkgCatWithPackages) &&
-        (mLibrary.getByCategory<Package>(uuid, 1).count() > 0)) {
-      return true;
-    }
-  } else {
-    if (mFilters.testFlag(Filter::CmpCatWithSymbols) &&
-        (mLibrary.getByCategory<Symbol>(uuid, 1).count() > 0)) {
-      return true;
-    }
-    if (mFilters.testFlag(Filter::CmpCatWithComponents) &&
-        (mLibrary.getByCategory<Component>(uuid, 1).count() > 0)) {
-      return true;
-    }
-    if (mFilters.testFlag(Filter::CmpCatWithDevices) &&
-        (mLibrary.getByCategory<Device>(uuid, 1).count() > 0)) {
-      return true;
-    }
+  for (const auto& pair : childs) {
+    mItems.push_back(ui::TreeViewItemData{
+        level,  // Level
+        mIcon,  // Icon
+        q2s(pair.second.isEmpty() ? pair.first.toStr() : pair.second),  // Text
+        slint::SharedString(),  // Hint
+        q2s(pair.first.toStr()),  // User data
+        false,  // Is project file or folder
+        false,  // Has children
+        false,  // Expanded
+        false,  // Supports pinning
+        false,  // Pinned
+        ui::TreeViewItemAction::None,  // Action
+    });
+    loadChilds<T>(pair.first, level + 1);
   }
-  return false;
-}
-
-bool CategoryTreeModel::listAll() const noexcept {
-  return mFilters.testFlag(Filter::PkgCat) || mFilters.testFlag(Filter::CmpCat);
-}
-
-bool CategoryTreeModel::listPackageCategories() const noexcept {
-  return mFilters.testFlag(Filter::PkgCat) ||
-      mFilters.testFlag(Filter::PkgCatWithPackages);
-}
-
-void CategoryTreeModel::updateModelItem(
-    std::shared_ptr<Item> parentItem,
-    const QVector<std::shared_ptr<Item>>& newChilds) noexcept {
-  for (int i = 0; i < newChilds.count(); ++i) {
-    std::shared_ptr<Item> item = parentItem->childs.value(i);  // Might be null.
-    std::shared_ptr<Item> newItem = newChilds.at(i);
-    if (item) {
-      // Update existing item.
-      if ((item->uuid != newItem->uuid) || (item->text != newItem->text) ||
-          (item->tooltip != newItem->tooltip)) {
-        item->uuid = newItem->uuid;
-        item->text = newItem->text;
-        item->tooltip = newItem->tooltip;
-        QModelIndex idx = indexFromItem(item.get());
-        Q_ASSERT(idx.isValid());
-        emit dataChanged(idx, idx);
-      }
-      updateModelItem(item, newItem->childs);
-    } else {
-      // Add new item.
-      newItem->parent = parentItem;  // Update parent of item.
-      QModelIndex idx = indexFromItem(parentItem.get());
-      Q_ASSERT(idx.isValid() != (parentItem == mRootItem));
-      beginInsertRows(idx, i, i);
-      parentItem->childs.insert(i, newItem);
-      endInsertRows();
-    }
-  }
-
-  // Remove no longer existing items.
-  const int removeCount = parentItem->childs.count() - newChilds.count();
-  if (removeCount > 0) {
-    QModelIndex idx = indexFromItem(parentItem.get());
-    Q_ASSERT(idx.isValid() != (parentItem == mRootItem));
-    const int removeFrom = newChilds.count();
-    beginRemoveRows(idx, removeFrom, removeFrom + removeCount - 1);
-    parentItem->childs.remove(removeFrom, removeCount);
-    endRemoveRows();
-  }
-
-  // Sanity check that the number of childs is now correct.
-  Q_ASSERT(parentItem->childs.count() == newChilds.count());
-}
-
-CategoryTreeModel::Item* CategoryTreeModel::itemFromIndex(
-    const QModelIndex& index) const noexcept {
-  if (!index.isValid()) {
-    return mRootItem.get();
-  } else if (index.model() != this) {
-    return nullptr;
-  } else if (index.column() != 0) {
-    return nullptr;
-  } else if (Item* parent = static_cast<Item*>(index.internalPointer())) {
-    return parent->childs.value(index.row()).get();
-  } else {
-    return nullptr;
-  }
-}
-
-QModelIndex CategoryTreeModel::indexFromItem(const Item* item) const noexcept {
-  if (std::shared_ptr<Item> parent = (item ? item->parent.lock() : nullptr)) {
-    for (int i = 0; i < parent->childs.count(); ++i) {
-      if (parent->childs.at(i).get() == item) {
-        return createIndex(i, 0, parent.get());
-      }
-    }
-  }
-  return QModelIndex();
 }
 
 /*******************************************************************************

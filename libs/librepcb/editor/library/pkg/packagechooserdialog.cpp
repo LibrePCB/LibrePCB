@@ -24,7 +24,7 @@
 
 #include "../../graphics/graphicsscene.h"
 #include "../../widgets/waitingspinnerwidget.h"
-#include "../../workspace/categorytreemodel.h"
+#include "../../workspace/categorytreemodellegacy.h"
 #include "footprintgraphicsitem.h"
 #include "ui_packagechooserdialog.h"
 
@@ -67,9 +67,9 @@ PackageChooserDialog::PackageChooserDialog(const Workspace& ws,
       theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor());
   mUi->graphicsView->setScene(mGraphicsScene.data());
 
-  mCategoryTreeModel.reset(
-      new CategoryTreeModel(mWorkspace.getLibraryDb(), localeOrder(),
-                            CategoryTreeModel::Filter::PkgCatWithPackages));
+  mCategoryTreeModel.reset(new CategoryTreeModelLegacy(
+      mWorkspace.getLibraryDb(), localeOrder(),
+      CategoryTreeModelLegacy::Filter::PkgCatWithPackages));
   mUi->treeCategories->setModel(mCategoryTreeModel.data());
   connect(mUi->treeCategories->selectionModel(),
           &QItemSelectionModel::currentChanged, this,

@@ -94,10 +94,10 @@ private:
                         ui::SchematicAction a) noexcept;
   void triggerBoard(int project, int board, ui::BoardAction a) noexcept;
   void openLibraryTab(const FilePath& fp, bool wizardMode) noexcept;
-  void openComponentCategoryTab(LibraryEditor& editor,
-                                const FilePath& fp) noexcept;
-  void openPackageCategoryTab(LibraryEditor& editor,
-                              const FilePath& fp) noexcept;
+  void openComponentCategoryTab(LibraryEditor& editor, const FilePath& fp,
+                                bool copyFrom) noexcept;
+  void openPackageCategoryTab(LibraryEditor& editor, const FilePath& fp,
+                              bool copyFrom) noexcept;
   void openSymbolTab(LibraryEditor& editor, const FilePath& fp) noexcept;
   void openPackageTab(LibraryEditor& editor, const FilePath& fp) noexcept;
   void openComponentTab(LibraryEditor& editor, const FilePath& fp) noexcept;

@@ -31,8 +31,6 @@
 #include "../utils/undostackactiongroup.h"
 #include "../widgets/openglview.h"
 #include "../widgets/searchtoolbar.h"
-#include "cat/componentcategoryeditorwidget.h"
-#include "cat/packagecategoryeditorwidget.h"
 #include "cmp/componenteditorwidget.h"
 #include "dev/deviceeditorwidget.h"
 #include "eaglelibraryimportwizard/eaglelibraryimportwizard.h"
@@ -152,22 +150,6 @@ bool LibraryEditorLegacy::requestClose() noexcept {
   return true;
 }
 
-void LibraryEditorLegacy::openComponentCategory(const FilePath& fp) noexcept {
-  if (fp.isValid()) {
-    editLibraryElementTriggered<ComponentCategoryEditorWidget>(fp, false);
-  } else {
-    newLibraryElement(NewElementWizardContext::ElementType::ComponentCategory);
-  }
-}
-
-void LibraryEditorLegacy::openPackageCategory(const FilePath& fp) noexcept {
-  if (fp.isValid()) {
-    editLibraryElementTriggered<PackageCategoryEditorWidget>(fp, false);
-  } else {
-    newLibraryElement(NewElementWizardContext::ElementType::PackageCategory);
-  }
-}
-
 void LibraryEditorLegacy::openSymbol(const FilePath& fp) noexcept {
   if (fp.isValid()) {
     editLibraryElementTriggered<SymbolEditorWidget>(fp, false);
@@ -198,18 +180,6 @@ void LibraryEditorLegacy::openDevice(const FilePath& fp) noexcept {
   } else {
     newLibraryElement(NewElementWizardContext::ElementType::Device);
   }
-}
-
-void LibraryEditorLegacy::duplicateComponentCategory(
-    const FilePath& fp) noexcept {
-  duplicateLibraryElement(
-      NewElementWizardContext::ElementType::ComponentCategory, fp);
-}
-
-void LibraryEditorLegacy::duplicatePackageCategory(
-    const FilePath& fp) noexcept {
-  duplicateLibraryElement(NewElementWizardContext::ElementType::PackageCategory,
-                          fp);
 }
 
 void LibraryEditorLegacy::duplicateSymbol(const FilePath& fp) noexcept {
@@ -956,12 +926,6 @@ void LibraryEditorLegacy::duplicateLibraryElement(
 void LibraryEditorLegacy::editNewLibraryElement(
     NewElementWizardContext::ElementType type, const FilePath& fp) {
   switch (type) {
-    case NewElementWizardContext::ElementType::ComponentCategory:
-      editLibraryElementTriggered<ComponentCategoryEditorWidget>(fp, true);
-      break;
-    case NewElementWizardContext::ElementType::PackageCategory:
-      editLibraryElementTriggered<PackageCategoryEditorWidget>(fp, true);
-      break;
     case NewElementWizardContext::ElementType::Symbol:
       editLibraryElementTriggered<SymbolEditorWidget>(fp, true);
       break;

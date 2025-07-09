@@ -1,0 +1,19 @@
+export component CategoryTreeLabel inherits VerticalLayout {
+    in property <[string]> names;
+
+    // Accessibility
+    accessible-role: text;
+    accessible-description: "category";
+    accessible-label: names[names.length - 1];  // Not ideal, but how else?
+
+    for name[index] in names: HorizontalLayout {
+        padding-left: index * 8px;
+
+        row-txt := Text {
+            font-weight: (index == (names.length - 1)) ? 600 : 400;
+            overflow: elide;
+            text: ((index > 0) ? "⤷ " : "") + name;
+            accessible-role: none;
+        }
+    }
+}

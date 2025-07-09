@@ -288,11 +288,11 @@ void LibraryTab::trigger(ui::TabAction a) noexcept {
       if (item && item->path.isValid()) {
         switch (item->type) {
           case ui::LibraryTreeViewItemType::ComponentCategory: {
-            emit componentCategoryEditorRequested(mEditor, item->path);
+            emit componentCategoryEditorRequested(mEditor, item->path, false);
             break;
           }
           case ui::LibraryTreeViewItemType::PackageCategory: {
-            emit packageCategoryEditorRequested(mEditor, item->path);
+            emit packageCategoryEditorRequested(mEditor, item->path, false);
             break;
           }
           case ui::LibraryTreeViewItemType::Symbol: {
@@ -828,11 +828,11 @@ void LibraryTab::duplicateElements(
   auto item = items.first();
   switch (item->type) {
     case ui::LibraryTreeViewItemType::ComponentCategory: {
-      mEditor.duplicateInLegacyComponentCategoryEditor(item->path);
+      emit componentCategoryEditorRequested(mEditor, item->path, true);
       break;
     }
     case ui::LibraryTreeViewItemType::PackageCategory: {
-      mEditor.duplicateInLegacyPackageCategoryEditor(item->path);
+      emit packageCategoryEditorRequested(mEditor, item->path, true);
       break;
     }
     case ui::LibraryTreeViewItemType::Symbol: {

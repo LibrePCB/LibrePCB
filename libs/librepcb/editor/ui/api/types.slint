@@ -125,6 +125,34 @@ export struct LengthEditParseResult {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Tree views
+////////////////////////////////////////////////////////////////////////////////
+
+// Tree view item actions
+export enum TreeViewItemAction {
+    none,
+    open,
+    delete,
+    new-folder,
+    new-project,
+}
+
+// Generic tree view item data structure
+export struct TreeViewItemData {
+    level: int,  // 0 = top level items
+    icon: image,
+    text: string,
+    hint: string,
+    user-data: string,  // User data to uniquely reference this item
+    is-project-file-or-folder: bool,
+    has-children: bool,
+    expanded: bool,
+    supports-pinning: bool,
+    pinned: bool,
+    action: TreeViewItemAction,  // Set by UI, handled in backend
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Notifications
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -174,6 +202,8 @@ export enum RuleCheckType {
     erc,
     drc,
     library-check,
+    component-category-check,
+    package-category-check,
 }
 
 export enum RuleCheckState {
@@ -329,6 +359,8 @@ export enum TabType {
     create-library,
     download-library,
     library,
+    component-category,
+    package-category,
     schematic,
     board-2d,
     board-3d,
@@ -533,6 +565,31 @@ export struct LibraryTabData {
     move-element-to-lib: string,  // File path to a local library
 }
 
+// Additional data for component- or package category editor tabs
+export struct CategoryTabData {
+    // General
+    library-index: int,
+    path: string,
+
+    // Metadata
+    name: string,
+    name-error: string,
+    description: string,
+    keywords: string,
+    author: string,
+    version: string,
+    version-error: string,
+    deprecated: bool,
+    parents: [string],
+    parents-tree: [TreeViewItemData],
+
+    // Checks
+    checks: RuleCheckData,
+
+    // Actions
+    new-parent: string,  // Set to UUID or "null" by UI, reset by backend,
+}
+
 // Additional data for schematic editor tabs
 export struct SchematicTabData {
     project-index: int,
@@ -648,39 +705,13 @@ export struct WindowSectionData {
     create-library-tabs: [CreateLibraryTabData],  // Proxy view for `tabs`
     download-library-tabs: [DownloadLibraryTabData],  // Proxy view for `tabs`
     library-tabs: [LibraryTabData],  // Proxy view for `tabs`
+    component-category-tabs: [CategoryTabData],  // Proxy view for `tabs`
+    package-category-tabs: [CategoryTabData],  // Proxy view for `tabs`
     schematic-tabs: [SchematicTabData],  // Proxy view for `tabs`
     board-2d-tabs: [Board2dTabData],  // Proxy view for `tabs`
     board-3d-tabs: [Board3dTabData],  // Proxy view for `tabs`
     current-tab-index: int,
     highlight: bool,
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Tree views
-////////////////////////////////////////////////////////////////////////////////
-
-// Tree view item actions
-export enum TreeViewItemAction {
-    none,
-    open,
-    delete,
-    new-folder,
-    new-project,
-}
-
-// Generic tree view item data structure
-export struct TreeViewItemData {
-    level: int,  // 0 = top level items
-    icon: image,
-    text: string,
-    hint: string,
-    user-data: string,  // User data to uniquely reference this item
-    is-project-file-or-folder: bool,
-    has-children: bool,
-    expanded: bool,
-    supports-pinning: bool,
-    pinned: bool,
-    action: TreeViewItemAction,  // Set by UI, handled in backend
 }
 
 ////////////////////////////////////////////////////////////////////////////////
