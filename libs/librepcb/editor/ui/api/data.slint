@@ -19,6 +19,7 @@ import {
     RuleCheckState,
     RuleCheckType,
     SchematicTabData,
+    SymbolTabData,
     TabData,
     TabType,
     TreeViewItemData,
@@ -308,6 +309,18 @@ export global Data {
                     title: "Pkg Category",
                     features: { },
                 },
+                {
+                    type: TabType.symbol,
+                    title: "Symbol",
+                    features: {
+                        save: FeatureState.enabled,
+                        undo: FeatureState.enabled,
+                        redo: FeatureState.enabled,
+                        grid: FeatureState.enabled,
+                        zoom: FeatureState.enabled,
+                    },
+                    read-only: true,
+                },
             ],
             library-tabs: [
                 {
@@ -518,7 +531,89 @@ export global Data {
                     },
                 },
             ],
-            current-tab-index: 2,
+            symbol-tabs: [
+                { },
+                { },
+                { },
+                {
+                    library-index: 0,
+                    path: "symbol1",
+                    wizard-mode: false,
+                    page-index: 1,
+                    name: "Symbol",
+                    description: "Foo Bar\nMultiline\nBlabla",
+                    keywords: "Foo,Bar,Hello World",
+                    author: "Somebody",
+                    version: "0.1",
+                    deprecated: false,
+                    categories: [
+                        {
+                            uuid: "1",
+                            names: ["Integrated Circuit", "Timers"],
+                        },
+                        {
+                            uuid: "2",
+                            names: ["Foo", "Bar", "Foobar"],
+                        },
+                        {
+                            uuid: "3",
+                            names: ["Miscallenous"],
+                        },
+                    ],
+                    categories-tree: [
+                        {
+                            level: 0,
+                            icon: @image-url("../../../../bootstrap-icons/icons/folder.svg"),
+                            text: "Root Category",
+                        },
+                        {
+                            level: 1,
+                            icon: @image-url("../../../../bootstrap-icons/icons/folder.svg"),
+                            text: "Integrated Circuits",
+                        },
+                        {
+                            level: 2,
+                            icon: @image-url("../../../../bootstrap-icons/icons/folder.svg"),
+                            text: "Data Aquisition",
+                        },
+                        {
+                            level: 1,
+                            icon: @image-url("../../../../bootstrap-icons/icons/folder.svg"),
+                            text: "Passive Elements",
+                        },
+                    ],
+                    checks: {
+                        type: RuleCheckType.symbol-check,
+                        state: RuleCheckState.up-to-date,
+                        unapproved: 2,
+                        errors: 1,
+                    },
+                    background-color: #ffffff,
+                    foreground-color: #555555,
+                    overlay-color: #dddddd78,
+                    overlay-text-color: Colors.black,
+                    interface-broken-msg: true,
+                    import-pins-msg: {
+                        visible: true,
+                        supports-dont-show-again: false,
+                    },
+                    tool: EditorTool.select,
+                    tool-overlay-text: "X0:   123.4567 mm\nY0:   123.4567 mm\nX1:   123.4567 mm\nY1:   123.4567 mm\n\ndX:   123.4567 mm\ndY:   123.4567 mm\n\nL:    123.4567 mm\na:     90.0000 °",
+                    tool-layer: {
+                        items: ["Layer 1", "Layer 2", "Layer with long name"],
+                        current-index: 1,
+                    },
+                    tool-line-width: {
+                        can-increase: true,
+                        can-decrease: true,
+                    },
+                    tool-value: {
+                        text: "{{PROJECT}}",
+                        suggestions: ["{{Foo}}", "{{PROJECT}}", "{{Bar}}"],
+                    },
+                },
+            ],
+            current-tab-index: 3,
         },
     ];
 
@@ -915,6 +1010,7 @@ export global Data {
     out property <LibraryTabData> current-library-tab: current-section.library-tabs[current-section.current-tab-index];
     out property <CategoryTabData> current-component-category-tab: current-section.component-category-tabs[current-section.current-tab-index];
     out property <CategoryTabData> current-package-category-tab: current-section.package-category-tabs[current-section.current-tab-index];
+    out property <SymbolTabData> current-symbol-tab: current-section.symbol-tabs[current-section.current-tab-index];
     out property <SchematicTabData> current-schematic-tab: current-section.schematic-tabs[current-section.current-tab-index];
     out property <Board2dTabData> current-board-2d-tab: current-section.board-2d-tabs[current-section.current-tab-index];
     out property <Board3dTabData> current-board-3d-tab: current-section.board-3d-tabs[current-section.current-tab-index];
@@ -933,6 +1029,8 @@ export global Data {
             current-component-category-tab.checks
         } else if current-tab.type == TabType.package-category {
             current-package-category-tab.checks
+        } else if current-tab.type == TabType.symbol {
+            current-symbol-tab.checks
         } else {
             projects[-1].erc  // Not nice, but avoids compiler warning
         }
@@ -954,6 +1052,11 @@ export global Data {
             current-rule-check-project-index = -1;
             current-rule-check-board-index = -1;
             current-library-index = current-package-category-tab.library-index;
+        } else if current-tab.type == TabType.symbol {
+            current-project-index = -1;
+            current-rule-check-project-index = -1;
+            current-rule-check-board-index = -1;
+            current-library-index = current-symbol-tab.library-index;
         } else if current-tab.type == TabType.schematic {
             current-library-index = -1;
             current-project-index = current-schematic-tab.project-index;

@@ -1,0 +1,9 @@
+import { MessageBanner } from "../widgets.slint";
+
+export component BreakingChangesMessageBanner inherits MessageBanner {
+    text: @tr("Attention").to-uppercase() + ": " + @tr("You have changed some important properties of this library element. This is a serious issue as it breaks all dependent library elements! If this library element is already used somewhere, it is highly recommended to create a new one instead of modifying this one.");
+}
+
+export component CheckErrorsMessageBanner inherits MessageBanner {
+    text: @tr("Attention").to-uppercase() + ": " + @tr("This library element contains serious errors. Please review them in the rule check panel.");
+}

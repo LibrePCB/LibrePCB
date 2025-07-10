@@ -63,6 +63,14 @@ std::optional<PositiveLength> s2plength(const ui::Int64& v) noexcept {
   return (l > 0) ? std::make_optional(PositiveLength(l)) : std::nullopt;
 }
 
+int l2s(const Angle& v) noexcept {
+  return v.toMicroDeg();
+}
+
+Angle s2angle(int v) noexcept {
+  return Angle(v);
+}
+
 ui::GridStyle l2s(Theme::GridStyle v) noexcept {
   switch (v) {
     case Theme::GridStyle::Lines:
@@ -123,6 +131,48 @@ LengthUnit s2l(ui::LengthUnit v) noexcept {
     default:
       qCritical() << "Unhandled value in LengthUnit conversion.";
       return LengthUnit::millimeters();
+  }
+}
+
+slint::cbindgen_private::TextHorizontalAlignment l2s(const HAlign& v) noexcept {
+  if (v == HAlign::left()) {
+    return slint::cbindgen_private::TextHorizontalAlignment::Left;
+  } else if (v == HAlign::right()) {
+    return slint::cbindgen_private::TextHorizontalAlignment::Right;
+  } else {
+    return slint::cbindgen_private::TextHorizontalAlignment::Center;
+  }
+}
+
+HAlign s2l(slint::cbindgen_private::TextHorizontalAlignment v) noexcept {
+  switch (v) {
+    case slint::cbindgen_private::TextHorizontalAlignment::Left:
+      return HAlign::left();
+    case slint::cbindgen_private::TextHorizontalAlignment::Right:
+      return HAlign::right();
+    default:
+      return HAlign::center();
+  }
+}
+
+slint::cbindgen_private::TextVerticalAlignment l2s(const VAlign& v) noexcept {
+  if (v == VAlign::top()) {
+    return slint::cbindgen_private::TextVerticalAlignment::Top;
+  } else if (v == VAlign::bottom()) {
+    return slint::cbindgen_private::TextVerticalAlignment::Bottom;
+  } else {
+    return slint::cbindgen_private::TextVerticalAlignment::Center;
+  }
+}
+
+VAlign s2l(slint::cbindgen_private::TextVerticalAlignment v) noexcept {
+  switch (v) {
+    case slint::cbindgen_private::TextVerticalAlignment::Top:
+      return VAlign::top();
+    case slint::cbindgen_private::TextVerticalAlignment::Bottom:
+      return VAlign::bottom();
+    default:
+      return VAlign::center();
   }
 }
 

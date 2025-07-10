@@ -1,5 +1,6 @@
 import {
     Action,
+    AngleEditParseResult,
     BoardAction,
     EditorTool,
     Int64,
@@ -47,8 +48,31 @@ export global Backend {
         debug("Trigger tab action:", section, tab, action);
 
         if action == TabAction.tool-select {
+            Data.sections[section].symbol-tabs[tab].tool = EditorTool.select;
             Data.sections[section].schematic-tabs[tab].tool = EditorTool.select;
             Data.sections[section].board-2d-tabs[tab].tool = EditorTool.select;
+        } else if action == TabAction.tool-line {
+            Data.sections[section].symbol-tabs[tab].tool = EditorTool.line;
+        } else if action == TabAction.tool-rect {
+            Data.sections[section].symbol-tabs[tab].tool = EditorTool.rect;
+        } else if action == TabAction.tool-polygon {
+            Data.sections[section].symbol-tabs[tab].tool = EditorTool.polygon;
+            Data.sections[section].schematic-tabs[tab].tool = EditorTool.polygon;
+            Data.sections[section].board-2d-tabs[tab].tool = EditorTool.polygon;
+        } else if action == TabAction.tool-circle {
+            Data.sections[section].symbol-tabs[tab].tool = EditorTool.circle;
+        } else if action == TabAction.tool-arc {
+            Data.sections[section].symbol-tabs[tab].tool = EditorTool.arc;
+        } else if action == TabAction.tool-text {
+            Data.sections[section].symbol-tabs[tab].tool = EditorTool.text;
+            Data.sections[section].schematic-tabs[tab].tool = EditorTool.text;
+            Data.sections[section].board-2d-tabs[tab].tool = EditorTool.text;
+        } else if action == TabAction.tool-name {
+            Data.sections[section].symbol-tabs[tab].tool = EditorTool.name;
+        } else if action == TabAction.tool-value {
+            Data.sections[section].symbol-tabs[tab].tool = EditorTool.value;
+        } else if action == TabAction.tool-pin {
+            Data.sections[section].symbol-tabs[tab].tool = EditorTool.pin;
         } else if action == TabAction.tool-wire {
             Data.sections[section].schematic-tabs[tab].tool = EditorTool.wire;
             Data.sections[section].board-2d-tabs[tab].tool = EditorTool.wire;
@@ -56,12 +80,6 @@ export global Backend {
             Data.sections[section].schematic-tabs[tab].tool = EditorTool.netlabel;
         } else if action == TabAction.tool-via {
             Data.sections[section].board-2d-tabs[tab].tool = EditorTool.via;
-        } else if action == TabAction.tool-polygon {
-            Data.sections[section].schematic-tabs[tab].tool = EditorTool.polygon;
-            Data.sections[section].board-2d-tabs[tab].tool = EditorTool.polygon;
-        } else if action == TabAction.tool-text {
-            Data.sections[section].schematic-tabs[tab].tool = EditorTool.text;
-            Data.sections[section].board-2d-tabs[tab].tool = EditorTool.text;
         } else if action == TabAction.tool-plane {
             Data.sections[section].board-2d-tabs[tab].tool = EditorTool.plane;
         } else if action == TabAction.tool-zone {
@@ -72,9 +90,11 @@ export global Backend {
             Data.sections[section].schematic-tabs[tab].tool = EditorTool.component;
             Data.sections[section].board-2d-tabs[tab].tool = EditorTool.component;
         } else if action == TabAction.tool-measure {
+            Data.sections[section].symbol-tabs[tab].tool = EditorTool.measure;
             Data.sections[section].schematic-tabs[tab].tool = EditorTool.measure;
             Data.sections[section].board-2d-tabs[tab].tool = EditorTool.measure;
         } else if action == TabAction.abort {
+            Data.sections[section].symbol-tabs[tab].tool = EditorTool.select;
             Data.sections[section].schematic-tabs[tab].tool = EditorTool.select;
             Data.sections[section].board-2d-tabs[tab].tool = EditorTool.select;
         }
@@ -201,4 +221,18 @@ export global Backend {
     // The backend parses the input string and returns whether it is a valid
     // number, and the parsed length value plus unit.
     pure callback parse-length-input(s: string, unit: LengthUnit, minimum: Int64) -> LengthEditParseResult;
+
+    // Format an Angle value as a string
+    //
+    // Used by AngleEdit to convert an Angle value to a string.
+    pure callback format-angle(value: int) -> string;
+    format-angle => {
+        return "123.456°";
+    }
+
+    // Parse the input text of an AngleEdit element
+    //
+    // The backend parses the input string and returns whether it is a valid
+    // number, and the parsed angle value.
+    pure callback parse-angle-input(s: string) -> AngleEditParseResult;
 }

@@ -1,0 +1,28 @@
+export component MessageBanner inherits Rectangle {
+    in property <bool> shown: true;
+    in property <string> text;
+
+    width: 100%;
+    height: shown ? self.preferred-height : 0;
+    background: yellow;
+    visible: self.height > 0;
+    clip: true;
+
+    animate height { duration: 150ms; }
+
+    VerticalLayout {
+        padding: 5px;
+        spacing: 5px;
+
+        if !text.is-empty: txt := Text {
+            color: #800000;
+            font-weight: 600;
+            horizontal-alignment: left;
+            vertical-alignment: center;
+            wrap: word-wrap;
+            text: text;
+        }
+
+        @children
+    }
+}

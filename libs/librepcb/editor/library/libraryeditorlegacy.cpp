@@ -36,7 +36,6 @@
 #include "eaglelibraryimportwizard/eaglelibraryimportwizard.h"
 #include "kicadlibraryimportwizard/kicadlibraryimportwizard.h"
 #include "pkg/packageeditorwidget.h"
-#include "sym/symboleditorwidget.h"
 #include "ui_libraryeditorlegacy.h"
 
 #include <librepcb/core/application.h>
@@ -150,14 +149,6 @@ bool LibraryEditorLegacy::requestClose() noexcept {
   return true;
 }
 
-void LibraryEditorLegacy::openSymbol(const FilePath& fp) noexcept {
-  if (fp.isValid()) {
-    editLibraryElementTriggered<SymbolEditorWidget>(fp, false);
-  } else {
-    newLibraryElement(NewElementWizardContext::ElementType::Symbol);
-  }
-}
-
 void LibraryEditorLegacy::openPackage(const FilePath& fp) noexcept {
   if (fp.isValid()) {
     editLibraryElementTriggered<PackageEditorWidget>(fp, false);
@@ -180,10 +171,6 @@ void LibraryEditorLegacy::openDevice(const FilePath& fp) noexcept {
   } else {
     newLibraryElement(NewElementWizardContext::ElementType::Device);
   }
-}
-
-void LibraryEditorLegacy::duplicateSymbol(const FilePath& fp) noexcept {
-  duplicateLibraryElement(NewElementWizardContext::ElementType::Symbol, fp);
 }
 
 void LibraryEditorLegacy::duplicatePackage(const FilePath& fp) noexcept {
@@ -926,9 +913,6 @@ void LibraryEditorLegacy::duplicateLibraryElement(
 void LibraryEditorLegacy::editNewLibraryElement(
     NewElementWizardContext::ElementType type, const FilePath& fp) {
   switch (type) {
-    case NewElementWizardContext::ElementType::Symbol:
-      editLibraryElementTriggered<SymbolEditorWidget>(fp, true);
-      break;
     case NewElementWizardContext::ElementType::Package:
       editLibraryElementTriggered<PackageEditorWidget>(fp, true);
       break;

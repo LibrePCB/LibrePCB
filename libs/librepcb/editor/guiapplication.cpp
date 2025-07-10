@@ -635,6 +635,29 @@ void GuiApplication::createNewWindow(int id, int projectIndex) noexcept {
         }
         return res;
       });
+  b.on_format_angle([](const int& value) {
+    const Angle angle = s2angle(value);
+    return q2s(Toolbox::floatToString(angle.toDeg(), 3, QLocale()));
+  });
+  b.on_parse_angle_input([](slint::SharedString text) {
+    ui::AngleEditParseResult res{false, 0};
+    try {
+      QString value = s2q(text);
+
+      // Remove unit
+      value.replace("°", "");
+
+      // Parse expression and convert to Angle.
+      const MathParser::Result result = MathParser().parse(value);
+      if (result.valid) {
+        const Angle angle = Angle::fromDeg(result.value);
+        res.evaluated_value = l2s(angle);
+        res.valid = true;
+      }
+    } catch (const Exception& e) {
+    }
+    return res;
+  });
 
   // Reuse next free window ID.
   if (id < 1) {

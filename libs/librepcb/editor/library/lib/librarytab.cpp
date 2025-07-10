@@ -256,7 +256,10 @@ void LibraryTab::trigger(ui::TabAction a) noexcept {
       break;
     }
     case ui::TabAction::Next: {
-      if (mWizardMode && (mCurrentPageIndex == 1)) {
+      commitUiData();
+      if (mWizardMode && (mCurrentPageIndex == 0) && mEditor.save()) {
+        ++mCurrentPageIndex;
+      } else if (mWizardMode && (mCurrentPageIndex == 1)) {
         mWizardMode = false;
         ++mCurrentPageIndex;
       }
@@ -278,9 +281,7 @@ void LibraryTab::trigger(ui::TabAction a) noexcept {
       mLibrary.setMessageApprovals(mLibrary.getMessageApprovals() -
                                    mDisappearedApprovals);
 
-      if (mEditor.save() && mWizardMode && (mCurrentPageIndex == 0)) {
-        ++mCurrentPageIndex;
-      }
+      mEditor.save();
       refreshUiData();
       break;
     }
@@ -296,7 +297,7 @@ void LibraryTab::trigger(ui::TabAction a) noexcept {
             break;
           }
           case ui::LibraryTreeViewItemType::Symbol: {
-            emit symbolEditorRequested(mEditor, item->path);
+            emit symbolEditorRequested(mEditor, item->path, false);
             break;
           }
           case ui::LibraryTreeViewItemType::Package: {
@@ -836,7 +837,7 @@ void LibraryTab::duplicateElements(
       break;
     }
     case ui::LibraryTreeViewItemType::Symbol: {
-      mEditor.duplicateInLegacySymbolEditor(item->path);
+      emit symbolEditorRequested(mEditor, item->path, true);
       break;
     }
     case ui::LibraryTreeViewItemType::Package: {

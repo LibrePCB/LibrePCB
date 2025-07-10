@@ -58,6 +58,7 @@ export component LengthEdit inherits Rectangle {
 
     // Accessibility
     accessible-role: spinbox;
+    accessible-description: tooltip;
     accessible-enabled: enabled;
     accessible-value: edt.text + " " + Helpers.get-unit-accessibility-label(root.unit);
     accessible-action-increment => {
