@@ -4,12 +4,14 @@ import {
     CategoryTreeLabel,
     IconButton,
     ListViewItemButton,
+    Palette,
     Switch,
 } from "../widgets.slint";
 import {
     Backend,
     Data,
     LibraryDependency,
+    LibraryElementCategoryData,
     PanelPage,
     RuleCheckData,
     TabAction,
@@ -241,6 +243,118 @@ export component ParentRowCell inherits HorizontalLayout {
     }
 }
 
+export component CategoriesRowHeader inherits Text {
+    width: self.preferred-width;
+    vertical-alignment: center;
+    text: @tr("Categories:");
+    accessible-role: none;
+}
+
+component CategoriesListViewRow inherits TouchArea {
+    Rectangle {
+        height: self.preferred-height;
+        background: #393939;
+        border-radius: 2px;
+
+        HorizontalLayout {
+            padding: 2px;
+            padding-left: 4px;
+            padding-right: 4px;
+            spacing: 5px;
+
+            @children
+        }
+    }
+}
+
+export component CategoriesRowCell inherits HorizontalLayout {
+    in-out property <[LibraryElementCategoryData]> model;
+    in property <bool> read-only: false;
+
+    callback add-triggered();
+
+    alignment: start;
+
+    // Accessibility
+    accessible-role: list;
+    accessible-description: "";
+    accessible-item-count: model.length;
+
+    VerticalLayout {
+        horizontal-stretch: 0;
+        spacing: 5px;
+
+        for item[index] in model: item-ta := CategoriesListViewRow {
+            enabled: !read-only;
+
+            // Accessibility
+            accessible-role: list-item;
+            accessible-enabled: self.enabled;
+            accessible-label: item-txt.accessible-label;
+            accessible-item-index: index;
+
+            item-txt := CategoryTreeLabel {
+                names: item.names;
+                accessible-role: none;
+            }
+
+            if !read-only: Rectangle {
+                width: 10px;
+                visible: item-ta.has-hover;
+            }
+
+            if !read-only: Rectangle {
+                width: 1px;
+                background: #707070;
+                visible: item-ta.has-hover;
+            }
+
+            if !read-only: item-remove-btn := IconButton {
+                width: 16px;
+                style: hyperlink;
+                icon: @image-url("../../../../font-awesome/svgs/solid/trash-can.svg");
+                visible: item-ta.has-hover;
+
+                clicked => {
+                    model[index].delete = true;
+                }
+            }
+        }
+
+        if !read-only: add-ta := CategoriesListViewRow {
+            mouse-cursor: pointer;
+
+            // Accessibility
+            accessible-role: button;
+            accessible-label: add-txt.text;
+            accessible-action-default => {
+                self.clicked();
+            }
+
+            Image {
+                width: 16px;
+                height: self.width;
+                image-fit: contain;
+                colorize: add-txt.color;
+                source: @image-url("../../../../bootstrap-icons/icons/plus-circle.svg");
+                accessible-role: none;
+            }
+
+            add-txt := Text {
+                color: parent.has-hover ? white : Palette.foreground;
+                vertical-alignment: center;
+                overflow: elide;
+                text: @tr("Add Category");
+                accessible-role: none;
+            }
+
+            clicked => {
+                add-triggered();
+            }
+        }
+    }
+}
+
 export component MetadataFooterRowCell inherits HorizontalLayout {
     in property <int> section-index;
     in property <int> tab-index;
@@ -265,11 +379,11 @@ export component MetadataFooterRowCell inherits HorizontalLayout {
         text: wizard-mode ? @tr("Next") : @tr("Save");
 
         clicked => {
-            Backend.trigger-tab(section-index, tab-index, TabAction.save);
+            Backend.trigger-tab(section-index, tab-index, wizard-mode ? TabAction.next : TabAction.save);
         }
     }
 
-    LibraryRuleCheckLink {
+    if !wizard-mode: LibraryRuleCheckLink {
         data: checks;
 
         clicked => {

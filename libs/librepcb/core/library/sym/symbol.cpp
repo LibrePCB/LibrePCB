@@ -82,6 +82,11 @@ Symbol::~Symbol() noexcept {
  *  General Methods
  ******************************************************************************/
 
+bool Symbol::isEmpty() const noexcept {
+  return mPins.isEmpty() && mPolygons.isEmpty() && mCircles.isEmpty() &&
+      mTexts.isEmpty();
+}
+
 RuleCheckMessageList Symbol::runChecks() const {
   SymbolCheck check(*this);
   return check.runChecks();  // can throw

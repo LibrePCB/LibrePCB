@@ -287,6 +287,8 @@ add_library(
   library/libraryeditortab.h
   library/libraryelementcache.cpp
   library/libraryelementcache.h
+  library/libraryelementcategoriesmodel.cpp
+  library/libraryelementcategoriesmodel.h
   library/newelementwizard/newelementwizard.cpp
   library/newelementwizard/newelementwizard.h
   library/newelementwizard/newelementwizard.ui
@@ -422,9 +424,6 @@ add_library(
   library/sym/symbolchooserdialog.ui
   library/sym/symbolclipboarddata.cpp
   library/sym/symbolclipboarddata.h
-  library/sym/symboleditorwidget.cpp
-  library/sym/symboleditorwidget.h
-  library/sym/symboleditorwidget.ui
   library/sym/symbolgraphicsitem.cpp
   library/sym/symbolgraphicsitem.h
   library/sym/symbolpingraphicsitem.cpp
@@ -432,6 +431,8 @@ add_library(
   library/sym/symbolpinpropertiesdialog.cpp
   library/sym/symbolpinpropertiesdialog.h
   library/sym/symbolpinpropertiesdialog.ui
+  library/sym/symboltab.cpp
+  library/sym/symboltab.h
   mainwindow.cpp
   mainwindow.h
   mainwindowtestadapter.cpp

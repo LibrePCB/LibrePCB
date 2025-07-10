@@ -75,6 +75,7 @@ public:
   ~Symbol() noexcept;
 
   // Getters: Geometry
+  bool isEmpty() const noexcept;
   SymbolPinList& getPins() noexcept { return mPins; }
   const SymbolPinList& getPins() const noexcept { return mPins; }
   PolygonList& getPolygons() noexcept { return mPolygons; }

@@ -71,11 +71,9 @@ public:
   ~LibraryEditorLegacy() noexcept;
 
   bool requestClose() noexcept;
-  void openSymbol(const FilePath& fp) noexcept;
   void openPackage(const FilePath& fp) noexcept;
   void openComponent(const FilePath& fp) noexcept;
   void openDevice(const FilePath& fp) noexcept;
-  void duplicateSymbol(const FilePath& fp) noexcept;
   void duplicatePackage(const FilePath& fp) noexcept;
   void duplicateComponent(const FilePath& fp) noexcept;
   void duplicateDevice(const FilePath& fp) noexcept;

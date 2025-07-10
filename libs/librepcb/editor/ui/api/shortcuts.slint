@@ -223,6 +223,227 @@ export global Shortcuts {
         false
     }
 
+    public function process-symbol-tab-shortcuts(event: KeyEvent) -> bool {
+        // Tool-specific shortcuts
+        if Data.current-section.symbol-tabs[tab].tool == EditorTool.line {
+            if is-shortcut(event, Cmd.layer-up) && (Data.current-section.symbol-tabs[tab].tool-layer.current-index > 0) {
+                Data.current-section.symbol-tabs[tab].tool-layer.current-index -= 1;
+                return true;
+            } else if is-shortcut(event, Cmd.layer-down) && (Data.current-section.symbol-tabs[tab].tool-layer.current-index < (Data.current-section.symbol-tabs[tab].tool-layer.items.length - 1)) {
+                Data.current-section.symbol-tabs[tab].tool-layer.current-index += 1;
+                return true;
+            } else if is-shortcut(event, Cmd.line-width-increase) {
+                Data.current-section.symbol-tabs[tab].tool-line-width.increase = true;
+                return true;
+            } else if is-shortcut(event, Cmd.line-width-decrease) && Data.current-section.symbol-tabs[tab].tool-line-width.can-decrease {
+                Data.current-section.symbol-tabs[tab].tool-line-width.decrease = true;
+                return true;
+            }
+        } else if Data.current-section.symbol-tabs[tab].tool == EditorTool.rect {
+            if is-shortcut(event, Cmd.layer-up) && (Data.current-section.symbol-tabs[tab].tool-layer.current-index > 0) {
+                Data.current-section.symbol-tabs[tab].tool-layer.current-index -= 1;
+                return true;
+            } else if is-shortcut(event, Cmd.layer-down) && (Data.current-section.symbol-tabs[tab].tool-layer.current-index < (Data.current-section.symbol-tabs[tab].tool-layer.items.length - 1)) {
+                Data.current-section.symbol-tabs[tab].tool-layer.current-index += 1;
+                return true;
+            } else if is-shortcut(event, Cmd.line-width-increase) {
+                Data.current-section.symbol-tabs[tab].tool-line-width.increase = true;
+                return true;
+            } else if is-shortcut(event, Cmd.line-width-decrease) && Data.current-section.symbol-tabs[tab].tool-line-width.can-decrease {
+                Data.current-section.symbol-tabs[tab].tool-line-width.decrease = true;
+                return true;
+            } else if is-shortcut(event, Cmd.fill-toggle) {
+                Data.current-section.symbol-tabs[tab].tool-filled = !Data.current-section.symbol-tabs[tab].tool-filled;
+                return true;
+            } else if is-shortcut(event, Cmd.grab-area-toggle) {
+                Data.current-section.symbol-tabs[tab].tool-grab-area = !Data.current-section.symbol-tabs[tab].tool-grab-area;
+                return true;
+            }
+        } else if Data.current-section.symbol-tabs[tab].tool == EditorTool.polygon {
+            if is-shortcut(event, Cmd.layer-up) && (Data.current-section.symbol-tabs[tab].tool-layer.current-index > 0) {
+                Data.current-section.symbol-tabs[tab].tool-layer.current-index -= 1;
+                return true;
+            } else if is-shortcut(event, Cmd.layer-down) && (Data.current-section.symbol-tabs[tab].tool-layer.current-index < (Data.current-section.symbol-tabs[tab].tool-layer.items.length - 1)) {
+                Data.current-section.symbol-tabs[tab].tool-layer.current-index += 1;
+                return true;
+            } else if is-shortcut(event, Cmd.line-width-increase) {
+                Data.current-section.symbol-tabs[tab].tool-line-width.increase = true;
+                return true;
+            } else if is-shortcut(event, Cmd.line-width-decrease) && Data.current-section.symbol-tabs[tab].tool-line-width.can-decrease {
+                Data.current-section.symbol-tabs[tab].tool-line-width.decrease = true;
+                return true;
+            } else if is-shortcut(event, Cmd.fill-toggle) {
+                Data.current-section.symbol-tabs[tab].tool-filled = !Data.current-section.symbol-tabs[tab].tool-filled;
+                return true;
+            } else if is-shortcut(event, Cmd.grab-area-toggle) {
+                Data.current-section.symbol-tabs[tab].tool-grab-area = !Data.current-section.symbol-tabs[tab].tool-grab-area;
+                return true;
+            }
+        } else if Data.current-section.symbol-tabs[tab].tool == EditorTool.circle {
+            if is-shortcut(event, Cmd.layer-up) && (Data.current-section.symbol-tabs[tab].tool-layer.current-index > 0) {
+                Data.current-section.symbol-tabs[tab].tool-layer.current-index -= 1;
+                return true;
+            } else if is-shortcut(event, Cmd.layer-down) && (Data.current-section.symbol-tabs[tab].tool-layer.current-index < (Data.current-section.symbol-tabs[tab].tool-layer.items.length - 1)) {
+                Data.current-section.symbol-tabs[tab].tool-layer.current-index += 1;
+                return true;
+            } else if is-shortcut(event, Cmd.line-width-increase) {
+                Data.current-section.symbol-tabs[tab].tool-line-width.increase = true;
+                return true;
+            } else if is-shortcut(event, Cmd.line-width-decrease) && Data.current-section.symbol-tabs[tab].tool-line-width.can-decrease {
+                Data.current-section.symbol-tabs[tab].tool-line-width.decrease = true;
+                return true;
+            } else if is-shortcut(event, Cmd.fill-toggle) {
+                Data.current-section.symbol-tabs[tab].tool-filled = !Data.current-section.symbol-tabs[tab].tool-filled;
+                return true;
+            } else if is-shortcut(event, Cmd.grab-area-toggle) {
+                Data.current-section.symbol-tabs[tab].tool-grab-area = !Data.current-section.symbol-tabs[tab].tool-grab-area;
+                return true;
+            }
+        } else if Data.current-section.symbol-tabs[tab].tool == EditorTool.arc {
+            if is-shortcut(event, Cmd.layer-up) && (Data.current-section.symbol-tabs[tab].tool-layer.current-index > 0) {
+                Data.current-section.symbol-tabs[tab].tool-layer.current-index -= 1;
+                return true;
+            } else if is-shortcut(event, Cmd.layer-down) && (Data.current-section.symbol-tabs[tab].tool-layer.current-index < (Data.current-section.symbol-tabs[tab].tool-layer.items.length - 1)) {
+                Data.current-section.symbol-tabs[tab].tool-layer.current-index += 1;
+                return true;
+            } else if is-shortcut(event, Cmd.line-width-increase) {
+                Data.current-section.symbol-tabs[tab].tool-line-width.increase = true;
+                return true;
+            } else if is-shortcut(event, Cmd.line-width-decrease) && Data.current-section.symbol-tabs[tab].tool-line-width.can-decrease {
+                Data.current-section.symbol-tabs[tab].tool-line-width.decrease = true;
+                return true;
+            }
+        } else if Data.current-section.symbol-tabs[tab].tool == EditorTool.name {
+            if is-shortcut(event, Cmd.size-increase) {
+                Data.current-section.symbol-tabs[tab].tool-size.increase = true;
+                return true;
+            } else if is-shortcut(event, Cmd.size-decrease) && Data.current-section.symbol-tabs[tab].tool-size.can-decrease {
+                Data.current-section.symbol-tabs[tab].tool-size.decrease = true;
+                return true;
+            } else if is-shortcut(event, Cmd.align-horizontal-left) {
+                Data.current-section.symbol-tabs[tab].tool-halign = TextHorizontalAlignment.left;
+                return true;
+            } else if is-shortcut(event, Cmd.align-horizontal-center) {
+                Data.current-section.symbol-tabs[tab].tool-halign = TextHorizontalAlignment.center;
+                return true;
+            } else if is-shortcut(event, Cmd.align-horizontal-right) {
+                Data.current-section.symbol-tabs[tab].tool-halign = TextHorizontalAlignment.right;
+                return true;
+            } else if is-shortcut(event, Cmd.align-vertical-top) {
+                Data.current-section.symbol-tabs[tab].tool-valign = TextVerticalAlignment.top;
+                return true;
+            } else if is-shortcut(event, Cmd.align-vertical-center) {
+                Data.current-section.symbol-tabs[tab].tool-valign = TextVerticalAlignment.center;
+                return true;
+            } else if is-shortcut(event, Cmd.align-vertical-bottom) {
+                Data.current-section.symbol-tabs[tab].tool-valign = TextVerticalAlignment.bottom;
+                return true;
+            }
+        } else if Data.current-section.symbol-tabs[tab].tool == EditorTool.value {
+            if is-shortcut(event, Cmd.size-increase) {
+                Data.current-section.symbol-tabs[tab].tool-size.increase = true;
+                return true;
+            } else if is-shortcut(event, Cmd.size-decrease) && Data.current-section.symbol-tabs[tab].tool-size.can-decrease {
+                Data.current-section.symbol-tabs[tab].tool-size.decrease = true;
+                return true;
+            } else if is-shortcut(event, Cmd.align-horizontal-left) {
+                Data.current-section.symbol-tabs[tab].tool-halign = TextHorizontalAlignment.left;
+                return true;
+            } else if is-shortcut(event, Cmd.align-horizontal-center) {
+                Data.current-section.symbol-tabs[tab].tool-halign = TextHorizontalAlignment.center;
+                return true;
+            } else if is-shortcut(event, Cmd.align-horizontal-right) {
+                Data.current-section.symbol-tabs[tab].tool-halign = TextHorizontalAlignment.right;
+                return true;
+            } else if is-shortcut(event, Cmd.align-vertical-top) {
+                Data.current-section.symbol-tabs[tab].tool-valign = TextVerticalAlignment.top;
+                return true;
+            } else if is-shortcut(event, Cmd.align-vertical-center) {
+                Data.current-section.symbol-tabs[tab].tool-valign = TextVerticalAlignment.center;
+                return true;
+            } else if is-shortcut(event, Cmd.align-vertical-bottom) {
+                Data.current-section.symbol-tabs[tab].tool-valign = TextVerticalAlignment.bottom;
+                return true;
+            }
+        } else if Data.current-section.symbol-tabs[tab].tool == EditorTool.text {
+            if is-shortcut(event, Cmd.layer-up) && (Data.current-section.symbol-tabs[tab].tool-layer.current-index > 0) {
+                Data.current-section.symbol-tabs[tab].tool-layer.current-index -= 1;
+                return true;
+            } else if is-shortcut(event, Cmd.layer-down) && (Data.current-section.symbol-tabs[tab].tool-layer.current-index < (Data.current-section.symbol-tabs[tab].tool-layer.items.length - 1)) {
+                Data.current-section.symbol-tabs[tab].tool-layer.current-index += 1;
+                return true;
+            } else if is-shortcut(event, Cmd.size-increase) {
+                Data.current-section.symbol-tabs[tab].tool-size.increase = true;
+                return true;
+            } else if is-shortcut(event, Cmd.size-decrease) && Data.current-section.symbol-tabs[tab].tool-size.can-decrease {
+                Data.current-section.symbol-tabs[tab].tool-size.decrease = true;
+                return true;
+            } else if is-shortcut(event, Cmd.align-horizontal-left) {
+                Data.current-section.symbol-tabs[tab].tool-halign = TextHorizontalAlignment.left;
+                return true;
+            } else if is-shortcut(event, Cmd.align-horizontal-center) {
+                Data.current-section.symbol-tabs[tab].tool-halign = TextHorizontalAlignment.center;
+                return true;
+            } else if is-shortcut(event, Cmd.align-horizontal-right) {
+                Data.current-section.symbol-tabs[tab].tool-halign = TextHorizontalAlignment.right;
+                return true;
+            } else if is-shortcut(event, Cmd.align-vertical-top) {
+                Data.current-section.symbol-tabs[tab].tool-valign = TextVerticalAlignment.top;
+                return true;
+            } else if is-shortcut(event, Cmd.align-vertical-center) {
+                Data.current-section.symbol-tabs[tab].tool-valign = TextVerticalAlignment.center;
+                return true;
+            } else if is-shortcut(event, Cmd.align-vertical-bottom) {
+                Data.current-section.symbol-tabs[tab].tool-valign = TextVerticalAlignment.bottom;
+                return true;
+            }
+        }
+
+        // Common shortcuts
+        if is-shortcut(event, Cmd.tool-select) {
+            Backend.trigger-tab(section, tab, TabAction.tool-select);
+            return true;
+        } else if is-shortcut(event, Cmd.tool-line) {
+            Backend.trigger-tab(section, tab, TabAction.tool-line);
+            return true;
+        } else if is-shortcut(event, Cmd.tool-rect) {
+            Backend.trigger-tab(section, tab, TabAction.tool-rect);
+            return true;
+        } else if is-shortcut(event, Cmd.tool-polygon) {
+            Backend.trigger-tab(section, tab, TabAction.tool-polygon);
+            return true;
+        } else if is-shortcut(event, Cmd.tool-circle) {
+            Backend.trigger-tab(section, tab, TabAction.tool-circle);
+            return true;
+        } else if is-shortcut(event, Cmd.tool-arc) {
+            Backend.trigger-tab(section, tab, TabAction.tool-arc);
+            return true;
+        } else if is-shortcut(event, Cmd.tool-name) {
+            Backend.trigger-tab(section, tab, TabAction.tool-name);
+            return true;
+        } else if is-shortcut(event, Cmd.tool-value) {
+            Backend.trigger-tab(section, tab, TabAction.tool-value);
+            return true;
+        } else if is-shortcut(event, Cmd.tool-text) {
+            Backend.trigger-tab(section, tab, TabAction.tool-text);
+            return true;
+        } else if is-shortcut(event, Cmd.tool-pin) {
+            Backend.trigger-tab(section, tab, TabAction.tool-pin);
+            return true;
+        } else if is-shortcut(event, Cmd.tool-measure) {
+            Backend.trigger-tab(section, tab, TabAction.tool-measure);
+            return true;
+        } else if is-shortcut(event, Cmd.abort) {
+            Backend.trigger-tab(section, tab, TabAction.abort);
+            return true;
+        } else if process-tab-shortcuts(event) {
+            return true;
+        } else if Backend.scene-key-event(section, event) {
+            return true;
+        }
+        false
+    }
+
     public function process-schematic-tab-shortcuts(event: KeyEvent) -> bool {
         // Tool-specific shortcuts
         if Data.current-section.schematic-tabs[tab].tool == EditorTool.wire {
@@ -530,7 +751,11 @@ export global Shortcuts {
 
     public function process(event: KeyEvent) -> bool {
         // Tab shortcuts
-        if Data.current-tab.type == TabType.schematic {
+        if Data.current-tab.type == TabType.symbol {
+            if process-symbol-tab-shortcuts(event) {
+                return true;
+            }
+        } else if Data.current-tab.type == TabType.schematic {
             if process-schematic-tab-shortcuts(event) {
                 return true;
             }

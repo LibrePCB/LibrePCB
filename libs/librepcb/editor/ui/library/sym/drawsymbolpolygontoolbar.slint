@@ -1,0 +1,109 @@
+import {
+    AngleEdit,
+    ComboBox,
+    IconButton,
+    LengthEdit,
+} from "../../widgets.slint";
+import {
+    SymbolTabData,
+    WindowSectionData,
+} from "../../api.slint";
+
+export component DrawSymbolPolygonToolBar inherits HorizontalLayout {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    in property <bool> show-angle-edt: true;
+    in property <bool> show-fill-sw: true;
+    in property <bool> show-grab-area-sw: true;
+    property <[SymbolTabData]> tabs: section.symbol-tabs;
+
+    spacing: 2px;
+
+    layer-cbx := ComboBox {
+        model: tabs[section.current-tab-index].tool-layer.items;
+        current-index: tabs[section.current-tab-index].tool-layer.current-index;
+
+        current-index-changed(index) => {
+            tabs[section.current-tab-index].tool-layer.current-index = index;
+        }
+    }
+
+    line-width-edt := LengthEdit {
+        data: tabs[section.current-tab-index].tool-line-width;
+        icon: @image-url("../../../../../bootstrap-icons/icons/border-width.svg");
+        tooltip: @tr("Line Width");
+        min-width-text: "1.234";
+
+        value-changed(v) => {
+            tabs[section.current-tab-index].tool-line-width.value = v;
+        }
+
+        unit-changed(u) => {
+            tabs[section.current-tab-index].tool-line-width.unit = u;
+        }
+
+        increase-triggered => {
+            tabs[section.current-tab-index].tool-line-width.increase = true;
+        }
+
+        decrease-triggered => {
+            tabs[section.current-tab-index].tool-line-width.decrease = true;
+        }
+    }
+
+    if show-angle-edt: angle-edt := AngleEdit {
+        data: tabs[section.current-tab-index].tool-angle;
+        tooltip: @tr("Arc Angle");
+        min-width-text: "123.4";
+
+        value-changed(v) => {
+            tabs[section.current-tab-index].tool-angle.value = v;
+        }
+
+        increase-triggered => {
+            tabs[section.current-tab-index].tool-angle.increase = true;
+        }
+
+        decrease-triggered => {
+            tabs[section.current-tab-index].tool-angle.decrease = true;
+        }
+    }
+
+    if show-fill-sw: fill-sw := IconButton {
+        icon: @image-url("../../../../../font-awesome/svgs/solid/fill-drip.svg");
+        icon-scale: 0.6;
+        tooltip: @tr("Fill Area");
+        status-tip: @tr("Fill the polygon with its outline color (only when closed)");
+        background-color: #202020;
+        background-color-hovered: #404040;
+        background-color-checked: black;
+        color-enabled: #606060;
+        color-hovered: #e0e0e0;
+        color-checked: #e0e0e0;
+        border-radius: 10px;
+        checked: tabs[section.current-tab-index].tool-filled;
+
+        clicked => {
+            tabs[section.current-tab-index].tool-filled = !self.checked;
+        }
+    }
+
+    if show-grab-area-sw: grab-area-sw := IconButton {
+        icon: @image-url("../../../../../font-awesome/svgs/solid/hand.svg");
+        icon-scale: 0.6;
+        tooltip: @tr("Grab Area");
+        status-tip: @tr("Allow grabbing the symbol within the polygon's area");
+        background-color: #202020;
+        background-color-hovered: #404040;
+        background-color-checked: black;
+        color-enabled: #606060;
+        color-hovered: #e0e0e0;
+        color-checked: #e0e0e0;
+        border-radius: 10px;
+        checked: tabs[section.current-tab-index].tool-grab-area;
+
+        clicked => {
+            tabs[section.current-tab-index].tool-grab-area = !self.checked;
+        }
+    }
+}
