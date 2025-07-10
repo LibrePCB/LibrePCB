@@ -901,9 +901,28 @@ void MainWindow::openPackageCategoryTab(LibraryEditor& editor,
   }
 }
 
-void MainWindow::openSymbolTab(LibraryEditor& editor,
-                               const FilePath& fp) noexcept {
-  editor.openLegacySymbolEditor(fp);
+void MainWindow::openSymbolTab(LibraryEditor& editor, const FilePath& fp,
+                               bool copyFrom) noexcept {
+  if (!switchToLibraryElementTab<SymbolTab>(fp)) {
+    try {
+      std::unique_ptr<Symbol> sym;
+      if (fp.isValid()) {
+        auto fs = TransactionalFileSystem::open(
+            fp, editor.isWritable(), &askForRestoringBackup,
+            DirectoryLockHandlerDialog::createDirectoryLockCallback());
+        sym = Symbol::open(std::unique_ptr<TransactionalDirectory>(
+            new TransactionalDirectory(fs)));
+      } else {
+        sym.reset(new Symbol(Uuid::createRandom(), Version::fromString("0.1"),
+                             mApp.getWorkspace().getSettings().userName.get(),
+                             ElementName("New Symbol"), QString(), QString()));
+      }
+      addTab(
+          std::make_shared<SymbolTab>(editor, std::move(sym), !fp.isValid()));
+    } catch (const Exception& e) {
+      QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
+    }
+  }
 }
 
 void MainWindow::openPackageTab(LibraryEditor& editor,
