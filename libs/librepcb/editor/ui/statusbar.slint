@@ -22,21 +22,27 @@ import {
 
 export component StatusBar inherits Rectangle {
     property <GridStyle> current-grid-style: {
-        if Data.current-tab.type == TabType.schematic {
+        if Data.current-tab.type == TabType.symbol {
+            Data.current-symbol-tab.grid-style
+        } else if Data.current-tab.type == TabType.schematic {
             Data.current-schematic-tab.grid-style
         } else {
             Data.current-board-2d-tab.grid-style
         }
     };
     property <Int64> current-grid-interval: {
-        if Data.current-tab.type == TabType.schematic {
+        if Data.current-tab.type == TabType.symbol {
+            Data.current-symbol-tab.grid-interval
+        } else if Data.current-tab.type == TabType.schematic {
             Data.current-schematic-tab.grid-interval
         } else {
             Data.current-board-2d-tab.grid-interval
         }
     };
     property <LengthUnit> current-unit: {
-        if Data.current-tab.type == TabType.schematic {
+        if Data.current-tab.type == TabType.symbol {
+            Data.current-symbol-tab.unit
+        } else if Data.current-tab.type == TabType.schematic {
             Data.current-schematic-tab.unit
         } else {
             Data.current-board-2d-tab.unit
@@ -44,7 +50,9 @@ export component StatusBar inherits Rectangle {
     };
 
     function set-current-grid-style(gs: GridStyle) {
-        if Data.current-tab.type == TabType.schematic {
+        if Data.current-tab.type == TabType.symbol {
+            Data.current-section.symbol-tabs[Data.current-section.current-tab-index].grid-style = gs;
+        } else if Data.current-tab.type == TabType.schematic {
             Data.current-section.schematic-tabs[Data.current-section.current-tab-index].grid-style = gs;
         } else if Data.current-tab.type == TabType.board-2d {
             Data.current-section.board-2d-tabs[Data.current-section.current-tab-index].grid-style = gs;
@@ -54,7 +62,9 @@ export component StatusBar inherits Rectangle {
     }
 
     function set-current-grid-interval(value: Int64) {
-        if Data.current-tab.type == TabType.schematic {
+        if Data.current-tab.type == TabType.symbol {
+            Data.current-section.symbol-tabs[Data.current-section.current-tab-index].grid-interval = value;
+        } else if Data.current-tab.type == TabType.schematic {
             Data.current-section.schematic-tabs[Data.current-section.current-tab-index].grid-interval = value;
         } else if Data.current-tab.type == TabType.board-2d {
             Data.current-section.board-2d-tabs[Data.current-section.current-tab-index].grid-interval = value;
@@ -64,7 +74,9 @@ export component StatusBar inherits Rectangle {
     }
 
     function set-current-unit(u: LengthUnit) {
-        if Data.current-tab.type == TabType.schematic {
+        if Data.current-tab.type == TabType.symbol {
+            Data.current-section.symbol-tabs[Data.current-section.current-tab-index].unit = u;
+        } else if Data.current-tab.type == TabType.schematic {
             Data.current-section.schematic-tabs[Data.current-section.current-tab-index].unit = u;
         } else if Data.current-tab.type == TabType.board-2d {
             Data.current-section.board-2d-tabs[Data.current-section.current-tab-index].unit = u;

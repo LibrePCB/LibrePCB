@@ -296,7 +296,7 @@ void LibraryTab::trigger(ui::TabAction a) noexcept {
             break;
           }
           case ui::LibraryTreeViewItemType::Symbol: {
-            emit symbolEditorRequested(mEditor, item->path);
+            emit symbolEditorRequested(mEditor, item->path, false);
             break;
           }
           case ui::LibraryTreeViewItemType::Package: {
@@ -836,7 +836,7 @@ void LibraryTab::duplicateElements(
       break;
     }
     case ui::LibraryTreeViewItemType::Symbol: {
-      mEditor.duplicateInLegacySymbolEditor(item->path);
+      emit symbolEditorRequested(mEditor, item->path, true);
       break;
     }
     case ui::LibraryTreeViewItemType::Package: {

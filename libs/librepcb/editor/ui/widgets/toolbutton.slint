@@ -7,6 +7,7 @@ export component ToolButton inherits Rectangle {
     in property <string> tooltip: cmd.text;
     in property <string> status-tip: cmd.status-tip;
     in property <string> shortcut: cmd.shortcut;
+    in property <bool> enabled: true;
     in property <bool> checked: false;
     out property <bool> pressed <=> ta.pressed;
 
@@ -20,6 +21,7 @@ export component ToolButton inherits Rectangle {
     // Accessibility
     accessible-role: button;
     accessible-description: status-tip;
+    accessible-enabled: enabled;
     accessible-label: tooltip;
     accessible-action-default => {
         ta.clicked();
@@ -29,12 +31,13 @@ export component ToolButton inherits Rectangle {
         ta := TouchArea {
             width: parent.width;
             height: self.width;
+            enabled: enabled;
 
             Image {
                 width: parent.width * 0.7;
                 height: self.width;
                 image-fit: contain;
-                colorize: white;
+                colorize: enabled ? white : #b0b0b0;
                 source: icon;
                 accessible-role: none;
             }

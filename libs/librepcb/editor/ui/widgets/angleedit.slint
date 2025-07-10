@@ -1,0 +1,215 @@
+import { IconButton } from "iconbutton.slint";
+import { ToolTip } from "tooltip.slint";
+import {
+    AngleEditData,
+    AngleEditParseResult,
+    Backend,
+    Constants,
+} from "../api.slint";
+
+export component AngleEdit inherits Rectangle {
+    in property <AngleEditData> data;
+    in-out property <int> value: data.value;
+    in property <image> icon: @image-url("../../../../font-awesome/svgs/solid/compass-drafting.svg");
+    in property <string> tooltip;
+    in property <string> min-width-text: "123.456";
+    in property <bool> enabled: true;
+    property <AngleEditParseResult> parse-result;
+    property <bool> disable-update: false;
+
+    callback value-changed(int);
+    value-changed(value) => {
+        self.value = value;
+    }
+
+    callback increase-triggered;
+    callback decrease-triggered;
+
+    public function select-all() {
+        edt.select-all();
+    }
+
+    function update-text-from-value() {
+        edt.text = Backend.format-angle(root.value);
+        parse-result.valid = true;
+    }
+
+    // Accessibility
+    accessible-role: spinbox;
+    accessible-description: tooltip.is-empty ? "angle" : tooltip;
+    accessible-enabled: enabled;
+    accessible-value: edt.text + " degrees";
+    accessible-action-increment => {
+        up-btn.clicked();
+    }
+    accessible-action-decrement => {
+        down-btn.clicked();
+    }
+    accessible-action-set-value(s) => {
+        edt.text = s;
+        edt.edited();
+    }
+
+    changed value => {
+        if !disable-update {
+            update-text-from-value();
+        }
+    }
+
+    preferred-height: 28px;
+    background: #202020;
+    border-color: {
+        if enabled && (!parse-result.valid) {
+            edt.has-focus ? #ff0000 : #900000
+        } else if edt.has-focus {
+            Constants.librepcb-color
+        } else if enabled {
+            #606060
+        } else {
+            transparent
+        }
+    }
+    border-width: 1px;
+    border-radius: 10px;
+    forward-focus: edt;
+
+    // A bit ugly: Ensure enough space for numbers in the typical range.
+    metrics-edt := TextInput {
+        width: 0;
+        height: 0;
+        font-size: 13px;
+        single-line: true;
+        wrap: no-wrap;
+        text: min-width-text;
+        visible: false;
+        accessible-role: none;
+    }
+
+    ta := TouchArea {
+        enabled: enabled;
+
+        l := HorizontalLayout {
+            padding-left: 8px;
+            padding-right: 2px;
+            padding-top: self.padding-right;
+            padding-bottom: self.padding-top;
+            spacing: 5px;
+
+            if icon.width > 0: Image {
+                width: 12px;
+                image-fit: contain;
+                colorize: edt.color;
+                source: icon;
+                accessible-role: none;
+            }
+
+            edt := TextInput {
+                min-width: max(self.preferred-width, metrics-edt.preferred-width);
+                font-size: 13px;
+                single-line: true;
+                horizontal-alignment: right;
+                vertical-alignment: center;
+                selection-background-color: Constants.librepcb-color;
+                selection-foreground-color: black;
+                enabled: enabled;
+                accessible-role: none;
+
+                changed has-focus => {
+                    if !self.has-focus {
+                        disable-update = false;
+                        update-text-from-value();
+                    }
+                }
+
+                init => {
+                    update-text-from-value();
+                }
+
+                edited => {
+                    disable-update = true;
+                    parse-result = Backend.parse-angle-input(self.text);
+                    if parse-result.valid {
+                        if parse-result.evaluated-value != value {
+                            value-changed(parse-result.evaluated-value);
+                        }
+                    }
+                }
+
+                accepted => {
+                    disable-update = false;
+                    update-text-from-value();
+                }
+
+                key-pressed(event) => {
+                    if event.text == Key.UpArrow {
+                        disable-update = false;
+                        increase-triggered();
+                        return accept;
+                    } else if event.text == Key.DownArrow {
+                        disable-update = false;
+                        decrease-triggered();
+                        return accept;
+                    } else if (event.text == Key.Escape) && disable-update {
+                        disable-update = false;
+                        update-text-from-value();
+                        return accept;
+                    }
+                    reject
+                }
+            }
+
+            Rectangle {
+                background: black;
+                border-top-right-radius: root.border-radius;
+                border-bottom-right-radius: root.border-radius;
+
+                VerticalLayout {
+                    up-btn := IconButton {
+                        width: 15px;
+                        background-color: black;
+                        icon: @image-url("../../../../font-awesome/svgs/solid/caret-up.svg");
+                        icon-offset-y: 1px;
+                        accessible-label: "increase";
+
+                        clicked => {
+                            disable-update = false;
+                            increase-triggered();
+                        }
+                    }
+
+                    down-btn := IconButton {
+                        width: 15px;
+                        background-color: black;
+                        icon: @image-url("../../../../font-awesome/svgs/solid/caret-down.svg");
+                        icon-offset-y: -1px;
+                        accessible-label: "decrease";
+
+                        clicked => {
+                            disable-update = false;
+                            decrease-triggered();
+                        }
+                    }
+                }
+            }
+        }
+
+        scroll-event(event) => {
+            if event.delta-y > 0 {
+                disable-update = false;
+                increase-triggered();
+                return accept;
+            } else if event.delta-y < 0 {
+                disable-update = false;
+                decrease-triggered();
+                return accept;
+            }
+            reject
+        }
+    }
+
+    if ta.has-hover && (!ta.pressed) && (!tooltip.is-empty): tt := ToolTip {
+        x: (parent.width - self.width) / 2;
+        y: parent.height + 5px;
+        text: tooltip;
+    }
+}

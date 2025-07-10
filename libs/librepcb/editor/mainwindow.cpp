@@ -34,6 +34,7 @@
 #include "library/lib/librarytab.h"
 #include "library/librariesmodel.h"
 #include "library/libraryeditor.h"
+#include "library/sym/symboltab.h"
 #include "mainwindowtestadapter.h"
 #include "notificationsmodel.h"
 #include "project/board/board2dtab.h"
@@ -55,6 +56,7 @@
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/library/cat/componentcategory.h>
 #include <librepcb/core/library/cat/packagecategory.h>
+#include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
@@ -587,7 +589,7 @@ void MainWindow::triggerLibrary(slint::SharedString path,
     }
     case ui::LibraryAction::NewSymbol: {
       if (auto editor = mApp.getLibrary(fp)) {
-        openSymbolTab(*editor, FilePath());
+        openSymbolTab(*editor, FilePath(), false);
       }
       break;
     }
@@ -626,6 +628,7 @@ void MainWindow::triggerLibraryElement(slint::SharedString path,
       if (switchToLibraryElementTab<LibraryTab>(fp)) return;
       if (switchToLibraryElementTab<ComponentCategoryTab>(fp)) return;
       if (switchToLibraryElementTab<PackageCategoryTab>(fp)) return;
+      if (switchToLibraryElementTab<SymbolTab>(fp)) return;
       if (mApp.getLibrary(fp)) {
         openLibraryTab(fp, false);
       }
