@@ -9,6 +9,7 @@ import {
     Constants,
     Data,
     EditorCommandSet as Cmd,
+    FeatureState,
     GridStyle,
     Helpers,
     Int64,
@@ -120,7 +121,7 @@ export component StatusBar inherits Rectangle {
             font-size: 11px;
             color: white;
             text: Data.cursor-coordinates;
-            visible: Data.current-tab-is-2d;
+            visible: Data.current-tab.features.grid != FeatureState.not-supported;
             accessible-role: none;
         }
 
@@ -129,12 +130,12 @@ export component StatusBar inherits Rectangle {
             background: unit-ta.has-hover ? #454545 : transparent;
 
             unit-ta := TouchArea {
-                enabled: Data.current-tab-is-2d;
+                enabled: Data.current-tab.features.grid == FeatureState.enabled;
 
                 unit-txt := Text {
                     vertical-alignment: center;
                     font-size: 11px;
-                    color: (!Data.current-tab-is-2d) ? #707070 : coordinates-txt.color;
+                    color: (!parent.enabled) ? #707070 : coordinates-txt.color;
                     text: Helpers.get-unit-short-str(current-unit);
                 }
 
@@ -176,7 +177,7 @@ export component StatusBar inherits Rectangle {
             background: grid-interval-ta.has-hover ? #454545 : transparent;
 
             grid-interval-ta := TouchArea {
-                enabled: Data.current-tab-is-2d;
+                enabled: Data.current-tab.features.grid == FeatureState.enabled;
 
                 grid-interval-edt := TextInput {
                     property <string> data-text: Backend.format-length(current-grid-interval, current-unit);
@@ -188,7 +189,7 @@ export component StatusBar inherits Rectangle {
                     wrap: no-wrap;
                     single-line: true;
                     vertical-alignment: center;
-                    color: (!Data.current-tab-is-2d) ? #707070 : white;
+                    color: (!parent.enabled) ? #707070 : white;
                     selection-background-color: Constants.librepcb-color;
                     selection-foreground-color: black;
                     text: data-text;
@@ -261,7 +262,7 @@ export component StatusBar inherits Rectangle {
                 icon-scale: 1.0;
                 icon-offset-y: 2px;
                 color-enabled: white;
-                enabled: Data.current-tab-is-2d;
+                enabled: Data.current-tab.features.grid == FeatureState.enabled;
 
                 clicked => {
                     Helpers.trigger-current-tab-action(TabAction.grid-interval-increase);
@@ -275,7 +276,7 @@ export component StatusBar inherits Rectangle {
                 icon-scale: 1.0;
                 icon-offset-y: -2px;
                 color-enabled: white;
-                enabled: Data.current-tab-is-2d;
+                enabled: Data.current-tab.features.grid == FeatureState.enabled;
 
                 clicked => {
                     Helpers.trigger-current-tab-action(TabAction.grid-interval-decrease);
@@ -297,7 +298,7 @@ export component StatusBar inherits Rectangle {
             };
             icon-scale: 0.7;
             color-enabled: white;
-            enabled: Data.current-tab-is-2d;
+            enabled: Data.current-tab.features.grid == FeatureState.enabled;
 
             clicked => {
                 if current-grid-style == GridStyle.none {
