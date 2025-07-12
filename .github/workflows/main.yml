@@ -71,9 +71,27 @@ jobs:
       - name: Build LibrePCB
         run: docker exec ci bash ./ci/build_librepcb.sh
       - name: Build Archive
-        run: docker exec ci bash ./ci/build_windows_archive.sh
+        run: >
+          docker exec
+          -e AST_CERT="${{ secrets.AST_CERT }}"
+          -e AST_IDENT="${{ secrets.AST_IDENT }}"
+          -e AST_SECRET="${{ secrets.AST_SECRET }}"
+          -e AST_TD="${{ secrets.AST_TD }}"
+          -e AST_TENANT="${{ secrets.AST_TENANT }}"
+          -e AST_TIMESTAMP="${{ secrets.AST_TIMESTAMP }}"
+          -e AST_VAULT="${{ secrets.AST_VAULT }}"
+          ci bash ./ci/build_windows_archive.sh
       - name: Build Installer
-        run: docker exec ci bash ./ci/build_windows_installer.sh
+        run: >
+          docker exec
+          -e AST_CERT="${{ secrets.AST_CERT }}"
+          -e AST_IDENT="${{ secrets.AST_IDENT }}"
+          -e AST_SECRET="${{ secrets.AST_SECRET }}"
+          -e AST_TD="${{ secrets.AST_TD }}"
+          -e AST_TENANT="${{ secrets.AST_TENANT }}"
+          -e AST_TIMESTAMP="${{ secrets.AST_TIMESTAMP }}"
+          -e AST_VAULT="${{ secrets.AST_VAULT }}"
+          ci bash ./ci/build_windows_installer.sh
       - name: Run rust-core tests
         run: docker exec -w C:/work/libs/librepcb/rust-core ci cargo test --features=fail-on-warnings
       - name: Run LibrePCB Unittests
@@ -87,6 +105,21 @@ jobs:
         run: docker exec ci uv --directory ./tests/ui run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb.exe"
         env:
           SLINT_UI_TESTING_AUTH: ${{ secrets.SLINT_UI_TESTING_AUTH }}
+      - name: Build Signed Artifacts Tarball
+        #if: ${{ success() && env.AST_TENANT }}
+        run: docker exec ci bash -c "tar -czvf artifacts.tar artifacts"
+        env:
+          AST_TENANT: ${{ secrets.AST_TENANT }}
+      - name: Upload Signed Artifacts Tarball
+        #if: ${{ success() && env.AST_TENANT }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ github.job }}
+          path: artifacts.tar
+        env:
+          AST_TENANT: ${{ secrets.AST_TENANT }}
+      # This creates an additional *.tar within the artifacts directory, so
+      # we should run this step *after* creating the signed artifacts tarball.
       - name: Upload Artifacts
         if: ${{ success() && (github.event_name == 'push') }}
         run: >
