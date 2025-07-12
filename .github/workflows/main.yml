@@ -105,6 +105,21 @@ jobs:
         run: docker exec ci uv --directory ./tests/ui run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb.exe"
         env:
           SLINT_UI_TESTING_AUTH: ${{ secrets.SLINT_UI_TESTING_AUTH }}
+      - name: Build Signed Artifacts Tarball
+        #if: ${{ success() && env.AST_TENANT }}
+        run: docker exec ci bash -c "tar -czvf artifacts.tar artifacts"
+        env:
+          AST_TENANT: ${{ secrets.AST_TENANT }}
+      - name: Upload Signed Artifacts Tarball
+        #if: ${{ success() && env.AST_TENANT }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ github.job }}
+          path: artifacts.tar
+        env:
+          AST_TENANT: ${{ secrets.AST_TENANT }}
+      # This creates an additional *.tar within the artifacts directory, so
+      # we should run this step *after* creating the signed artifacts tarball.
       - name: Upload Artifacts
         if: ${{ success() && (github.event_name == 'push') }}
         run: >
