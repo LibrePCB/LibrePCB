@@ -87,8 +87,10 @@ jobs:
         run: docker exec ci uv --directory ./tests/ui run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb.exe"
         env:
           SLINT_UI_TESTING_AUTH: ${{ secrets.SLINT_UI_TESTING_AUTH }}
+      - name: Tar Artifacts
+        run: docker exec ci bash ./ci/tar_artifacts.sh
       - name: Upload Artifacts
-        if: ${{ success() && (github.event_name == 'push') }}
+        if: ${{ success() && (github.event_name == 'push') && env.UPLOAD_URL }}
         run: >
           docker exec
           -e UPLOAD_URL="${{ secrets.UPLOAD_URL }}"
@@ -96,6 +98,8 @@ jobs:
           -e UPLOAD_PASS="${{ secrets.UPLOAD_PASS }}"
           -e UPLOAD_SIGN_KEY="${{ secrets.UPLOAD_SIGN_KEY }}"
           ci bash ./ci/upload_artifacts.sh
+        env:
+          UPLOAD_URL: ${{ secrets.UPLOAD_URL }}  # Required to use it in 'if' condition
       - name: Stop Container
         if: ${{ always() }}
         run: docker stop -t 30 ci
@@ -166,9 +170,11 @@ jobs:
         run: uv --directory ./tests/ui run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb.app/Contents/MacOS/librepcb"
         env:
           SLINT_UI_TESTING_AUTH: ${{ secrets.SLINT_UI_TESTING_AUTH }}
-      - name: Upload Artifacts
-        if: ${{ success() && (github.event_name == 'push') }}
-        run: ./ci/upload_artifacts.sh
+      - name: Tar & Upload Artifacts
+        if: ${{ success() && (github.event_name == 'push') && env.UPLOAD_URL }}
+        run: |
+          ./ci/tar_artifacts.sh
+          ./ci/upload_artifacts.sh
         env:
           UPLOAD_URL: ${{ secrets.UPLOAD_URL }}
           UPLOAD_USER: ${{ secrets.UPLOAD_USER }}
