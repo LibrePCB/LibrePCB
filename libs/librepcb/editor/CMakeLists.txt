@@ -388,6 +388,7 @@ add_library(
   library/pkg/packagepadlistmodel.h
   library/sym/fsm/symboleditorfsm.cpp
   library/sym/fsm/symboleditorfsm.h
+  library/sym/fsm/symboleditorfsmadapter.h
   library/sym/fsm/symboleditorstate.cpp
   library/sym/fsm/symboleditorstate.h
   library/sym/fsm/symboleditorstate_addnames.cpp

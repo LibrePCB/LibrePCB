@@ -29,18 +29,14 @@
 #include "../../../dialogs/textpropertiesdialog.h"
 #include "../../../editorcommandset.h"
 #include "../../../graphics/circlegraphicsitem.h"
-#include "../../../graphics/graphicslayerlist.h"
-#include "../../../graphics/graphicsscene.h"
 #include "../../../graphics/polygongraphicsitem.h"
 #include "../../../graphics/textgraphicsitem.h"
 #include "../../../undostack.h"
 #include "../../../utils/menubuilder.h"
-#include "../../../widgets/graphicsview.h"
 #include "../../cmd/cmddragselectedsymbolitems.h"
 #include "../../cmd/cmdpastesymbolitems.h"
 #include "../../cmd/cmdremoveselectedsymbolitems.h"
 #include "../symbolclipboarddata.h"
-#include "../symboleditorwidget.h"
 #include "../symbolgraphicsitem.h"
 #include "../symbolpingraphicsitem.h"
 #include "../symbolpinpropertiesdialog.h"
@@ -80,43 +76,41 @@ SymbolEditorState_Select::~SymbolEditorState_Select() noexcept {
  *  General Methods
  ******************************************************************************/
 
-bool SymbolEditorState_Select::exit() noexcept {
-  processAbortCommand();
+bool SymbolEditorState_Select::entry() noexcept {
+  mAdapter.fsmToolEnter(*this);
 
-  // Avoid propagating the selection to other, non-selectable tools.
-  clearSelectionRect(true);
+  mUpdateAvailableFeaturesTimer.reset(new QTimer());
+  mUpdateAvailableFeaturesTimer->setSingleShot(true);
+  mUpdateAvailableFeaturesTimer->setInterval(50);
+  connect(mUpdateAvailableFeaturesTimer.get(), &QTimer::timeout, this,
+          &SymbolEditorState_Select::updateAvailableFeatures);
+  scheduleUpdateAvailableFeatures();
+
+  mConnections.append(
+      connect(&mContext.undoStack, &UndoStack::stateModified, this,
+              &SymbolEditorState_Select::scheduleUpdateAvailableFeatures));
+  mConnections.append(
+      connect(qApp->clipboard(), &QClipboard::dataChanged, this,
+              &SymbolEditorState_Select::scheduleUpdateAvailableFeatures));
 
   return true;
 }
 
-QSet<EditorWidgetBase::Feature> SymbolEditorState_Select::getAvailableFeatures()
-    const noexcept {
-  QSet<EditorWidgetBase::Feature> features;
-  // The abort command is always enabled to clear the selection.
-  features |= EditorWidgetBase::Feature::Abort;
-  if (mState != SubState::PASTING) {
-    features |= EditorWidgetBase::Feature::SelectGraphics;
-    if (!mContext.editorContext.readOnly) {
-      features |= EditorWidgetBase::Feature::ImportGraphics;
-      features |= EditorWidgetBase::Feature::Paste;
-    }
+bool SymbolEditorState_Select::exit() noexcept {
+  processAbortCommand();
+
+  mUpdateAvailableFeaturesTimer.reset();
+
+  // Avoid propagating the selection to other, non-selectable tools.
+  clearSelectionRect(true);
+
+  while (!mConnections.isEmpty()) {
+    disconnect(mConnections.takeLast());
   }
-  CmdDragSelectedSymbolItems cmd(mContext);
-  if (cmd.getSelectedItemsCount() > 0) {
-    features |= EditorWidgetBase::Feature::Copy;
-    features |= EditorWidgetBase::Feature::Properties;
-    if (!mContext.editorContext.readOnly) {
-      features |= EditorWidgetBase::Feature::Cut;
-      features |= EditorWidgetBase::Feature::Remove;
-      features |= EditorWidgetBase::Feature::Move;
-      features |= EditorWidgetBase::Feature::Rotate;
-      features |= EditorWidgetBase::Feature::Mirror;
-      if (cmd.hasOffTheGridElements()) {
-        features |= EditorWidgetBase::Feature::SnapToGrid;
-      }
-    }
-  }
-  return features;
+
+  mAdapter.fsmSetFeatures(SymbolEditorFsmAdapter::Features());
+  mAdapter.fsmToolLeave();
+  return true;
 }
 
 /*******************************************************************************
@@ -125,19 +119,23 @@ QSet<EditorWidgetBase::Feature> SymbolEditorState_Select::getAvailableFeatures()
 
 bool SymbolEditorState_Select::processGraphicsSceneMouseMoved(
     const GraphicsSceneMouseEvent& e) noexcept {
+  SymbolGraphicsItem* item = getGraphicsItem();
+  if (!item) return false;
+
   Point currentPos = e.scenePos;
 
   switch (mState) {
     case SubState::SELECTING: {
       setSelectionRect(mStartPos, currentPos);
-      emit availableFeaturesChanged();  // Selection might have changed.
+      scheduleUpdateAvailableFeatures();  // Selection might have changed.
       return true;
     }
     case SubState::MOVING:
     case SubState::PASTING: {
       if (!mCmdDragSelectedItems) {
-        mCmdDragSelectedItems.reset(new CmdDragSelectedSymbolItems(mContext));
-        emit availableFeaturesChanged();
+        mCmdDragSelectedItems.reset(
+            new CmdDragSelectedSymbolItems(*item, getGridInterval()));
+        scheduleUpdateAvailableFeatures();
       }
       Point delta = (currentPos - mStartPos).mappedToGrid(getGridInterval());
       mCmdDragSelectedItems->setDeltaToStartPos(delta);
@@ -149,7 +147,7 @@ bool SymbolEditorState_Select::processGraphicsSceneMouseMoved(
       }
       if (!mCmdPolygonEdit) {
         mCmdPolygonEdit.reset(new CmdPolygonEdit(*mSelectedPolygon));
-        emit availableFeaturesChanged();
+        scheduleUpdateAvailableFeatures();
       }
       QVector<Vertex> vertices = mSelectedPolygon->getPath().getVertices();
       foreach (int i, mSelectedPolygonVertices) {
@@ -175,8 +173,7 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
       // get items under cursor
       QList<std::shared_ptr<QGraphicsItem>> items =
           findItemsAtPosition(mStartPos);
-      if (findPolygonVerticesAtPosition(mStartPos) &&
-          (!mContext.editorContext.readOnly)) {
+      if (findPolygonVerticesAtPosition(mStartPos) && (!mContext.readOnly)) {
         setState(SubState::MOVING_POLYGON_VERTEX);
       } else if (items.isEmpty()) {
         // start selecting
@@ -231,10 +228,10 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
             items.first()->setSelected(true);
           }
         }
-        emit availableFeaturesChanged();  // Selection might have changed.
+        scheduleUpdateAvailableFeatures();  // Selection might have changed.
 
         // Start moving, if not read only.
-        if (!mContext.editorContext.readOnly) {
+        if (!mContext.readOnly) {
           Q_ASSERT(!mCmdDragSelectedItems);
           setState(SubState::MOVING);
         }
@@ -249,7 +246,7 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
         setState(SubState::IDLE);
         clearSelectionRect(true);
       } catch (const Exception& e) {
-        QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+        QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
       }
       return true;
     }
@@ -273,8 +270,7 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
         try {
           mContext.undoStack.execCmd(mCmdDragSelectedItems.release());
         } catch (const Exception& e) {
-          QMessageBox::critical(&mContext.editorWidget, tr("Error"),
-                                e.getMsg());
+          QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
         }
       }
       setState(SubState::IDLE);
@@ -285,8 +281,7 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
         try {
           mContext.undoStack.execCmd(mCmdPolygonEdit.release());
         } catch (const Exception& e) {
-          QMessageBox::critical(&mContext.editorWidget, tr("Error"),
-                                e.getMsg());
+          QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
         }
       }
       setState(SubState::IDLE);
@@ -330,14 +325,18 @@ bool SymbolEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
 }
 
 bool SymbolEditorState_Select::processSelectAll() noexcept {
+  GraphicsScene* scene = getGraphicsScene();
+  SymbolGraphicsItem* item = getGraphicsItem();
+  if ((!scene) || (!item)) return false;
+
   switch (mState) {
     case SubState::IDLE: {
       // Set a selection rect slightly larger than the total items bounding
       // rect to get all items selected.
-      auto bounds = mContext.graphicsScene.itemsBoundingRect();
+      auto bounds = scene->itemsBoundingRect();
       bounds.adjust(-100, -100, 100, 100);
-      mContext.symbolGraphicsItem.setSelectionRect(bounds);
-      emit availableFeaturesChanged();  // Selection might have changed.
+      item->setSelectionRect(bounds);
+      scheduleUpdateAvailableFeatures();  // Selection might have changed.
       return true;
     }
     default: {
@@ -386,7 +385,7 @@ bool SymbolEditorState_Select::processPaste(
           return startPaste(std::move(data), std::nullopt);
         }
       } catch (const Exception& e) {
-        QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+        QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
         processAbortCommand();
         return false;
       }
@@ -400,16 +399,19 @@ bool SymbolEditorState_Select::processPaste(
 }
 
 bool SymbolEditorState_Select::processMove(const Point& delta) noexcept {
+  SymbolGraphicsItem* item = getGraphicsItem();
+  if (!item) return false;
+
   switch (mState) {
     case SubState::IDLE: {
       try {
         std::unique_ptr<CmdDragSelectedSymbolItems> cmd(
-            new CmdDragSelectedSymbolItems(mContext));
+            new CmdDragSelectedSymbolItems(*item, getGridInterval()));
         cmd->translate(delta);
         mContext.undoStack.execCmd(cmd.release());
         return true;
       } catch (const Exception& e) {
-        QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+        QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
       }
     }
     default:
@@ -471,18 +473,21 @@ bool SymbolEditorState_Select::processRemove() noexcept {
 }
 
 bool SymbolEditorState_Select::processEditProperties() noexcept {
+  SymbolGraphicsItem* item = getGraphicsItem();
+  if (!item) return false;
+
   switch (mState) {
     case SubState::IDLE: {
-      foreach (auto ptr, mContext.symbolGraphicsItem.getSelectedPins()) {
+      foreach (auto ptr, item->getSelectedPins()) {
         return openPropertiesDialogOfItem(ptr);
       }
-      foreach (auto ptr, mContext.symbolGraphicsItem.getSelectedCircles()) {
+      foreach (auto ptr, item->getSelectedCircles()) {
         return openPropertiesDialogOfItem(ptr);
       }
-      foreach (auto ptr, mContext.symbolGraphicsItem.getSelectedPolygons()) {
+      foreach (auto ptr, item->getSelectedPolygons()) {
         return openPropertiesDialogOfItem(ptr);
       }
-      foreach (auto ptr, mContext.symbolGraphicsItem.getSelectedTexts()) {
+      foreach (auto ptr, item->getSelectedTexts()) {
         return openPropertiesDialogOfItem(ptr);
       }
       break;
@@ -499,8 +504,7 @@ bool SymbolEditorState_Select::processImportDxf() noexcept {
     // Ask for file path and import options.
     DxfImportDialog dialog(getAllowedCircleAndPolygonLayers(),
                            Layer::symbolOutlines(), false, getLengthUnit(),
-                           "symbol_editor/dxf_import_dialog",
-                           &mContext.editorWidget);
+                           "symbol_editor/dxf_import_dialog", parentWidget());
     FilePath fp = dialog.chooseFile();  // Opens the file chooser dialog.
     if ((!fp.isValid()) || (dialog.exec() != QDialog::Accepted)) {
       return false;  // Aborted.
@@ -508,9 +512,9 @@ bool SymbolEditorState_Select::processImportDxf() noexcept {
 
     // This operation can take some time, use wait cursor to provide
     // immediate UI feedback.
-    mContext.editorWidget.setCursor(Qt::WaitCursor);
+    QGuiApplication::setOverrideCursor(Qt::WaitCursor);
     auto cursorScopeGuard =
-        scopeGuard([this]() { mContext.editorWidget.unsetCursor(); });
+        scopeGuard([]() { QGuiApplication::restoreOverrideCursor(); });
 
     // Read DXF file.
     DxfReader import;
@@ -543,19 +547,11 @@ bool SymbolEditorState_Select::processImportDxf() noexcept {
       DxfImportDialog::throwNoObjectsImportedError();  // will throw
     }
 
-    // Sanity check that the chosen layer is really visible, but this should
-    // always be the case anyway.
-    std::shared_ptr<const GraphicsLayer> layer =
-        mContext.editorContext.layers.get(dialog.getLayer());
-    if ((!layer) || (!layer->isVisible())) {
-      throw LogicError(__FILE__, __LINE__, "Layer is not visible!");  // no tr()
-    }
-
     // Start the paste tool.
     return startPaste(std::move(data),
                       dialog.getPlacementPosition());  // can throw
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     processAbortCommand();
     return false;
   }
@@ -580,7 +576,7 @@ bool SymbolEditorState_Select::processAbortCommand() noexcept {
         setState(SubState::IDLE);
         return true;
       } catch (const Exception& e) {
-        QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+        QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
         return false;
       }
     }
@@ -589,6 +585,13 @@ bool SymbolEditorState_Select::processAbortCommand() noexcept {
       return true;
     }
   }
+}
+
+bool SymbolEditorState_Select::processGridIntervalChanged(
+    const PositiveLength& inverval) noexcept {
+  Q_UNUSED(inverval);
+  scheduleUpdateAvailableFeatures();
+  return true;
 }
 
 /*******************************************************************************
@@ -620,17 +623,17 @@ bool SymbolEditorState_Select::openContextMenuAtPos(const Point& pos) noexcept {
   }
   Q_ASSERT(selectedItem);
   Q_ASSERT(selectedItem->isSelected());
-  emit availableFeaturesChanged();  // Selection might have changed.
+  const SymbolEditorFsmAdapter::Features features =
+      updateAvailableFeatures();  // Selection might have changed.
 
   // Build the context menu.
   QMenu menu;
   MenuBuilder mb(&menu);
   const EditorCommandSet& cmd = EditorCommandSet::instance();
-  const QSet<EditorWidgetBase::Feature> features = getAvailableFeatures();
   QAction* aProperties = cmd.properties.createAction(
       &menu, this, [this]() { processEditProperties(); });
   aProperties->setEnabled(
-      features.contains(EditorWidgetBase::Feature::Properties));
+      features.testFlag(SymbolEditorFsmAdapter::Feature::Properties));
   mb.addAction(aProperties, MenuBuilder::Flag::DefaultAction);
   mb.addSeparator();
 
@@ -646,7 +649,7 @@ bool SymbolEditorState_Select::openContextMenuAtPos(const Point& pos) noexcept {
         int remainingVertices =
             polygon->getPath().getVertices().count() - vertices.count();
         aRemoveVertex->setEnabled((remainingVertices >= 2) &&
-                                  (!mContext.editorContext.readOnly));
+                                  (!mContext.readOnly));
         mb.addAction(aRemoveVertex);
       }
 
@@ -655,7 +658,7 @@ bool SymbolEditorState_Select::openContextMenuAtPos(const Point& pos) noexcept {
         QAction* aAddVertex = cmd.vertexAdd.createAction(
             &menu, this,
             [=, this]() { startAddingPolygonVertex(polygon, lineIndex, pos); });
-        aAddVertex->setEnabled(!mContext.editorContext.readOnly);
+        aAddVertex->setEnabled(!mContext.readOnly);
         mb.addAction(aAddVertex);
       }
 
@@ -669,40 +672,43 @@ bool SymbolEditorState_Select::openContextMenuAtPos(const Point& pos) noexcept {
     copySelectedItemsToClipboard();
     removeSelectedItems();
   });
-  aCut->setEnabled(features.contains(EditorWidgetBase::Feature::Cut));
+  aCut->setEnabled(features.testFlag(SymbolEditorFsmAdapter::Feature::Cut));
   mb.addAction(aCut);
   QAction* aCopy = cmd.clipboardCopy.createAction(
       &menu, this, [this]() { copySelectedItemsToClipboard(); });
-  aCopy->setEnabled(features.contains(EditorWidgetBase::Feature::Copy));
+  aCopy->setEnabled(features.testFlag(SymbolEditorFsmAdapter::Feature::Copy));
   mb.addAction(aCopy);
   QAction* aRemove =
       cmd.remove.createAction(&menu, this, [this]() { removeSelectedItems(); });
-  aRemove->setEnabled(features.contains(EditorWidgetBase::Feature::Remove));
+  aRemove->setEnabled(
+      features.testFlag(SymbolEditorFsmAdapter::Feature::Remove));
   mb.addAction(aRemove);
   mb.addSeparator();
   QAction* aRotateCcw = cmd.rotateCcw.createAction(
       &menu, this, [this]() { rotateSelectedItems(Angle::deg90()); });
-  aRotateCcw->setEnabled(features.contains(EditorWidgetBase::Feature::Rotate));
+  aRotateCcw->setEnabled(
+      features.testFlag(SymbolEditorFsmAdapter::Feature::Rotate));
   mb.addAction(aRotateCcw);
   QAction* aRotateCw = cmd.rotateCw.createAction(
       &menu, this, [this]() { rotateSelectedItems(-Angle::deg90()); });
-  aRotateCw->setEnabled(features.contains(EditorWidgetBase::Feature::Rotate));
+  aRotateCw->setEnabled(
+      features.testFlag(SymbolEditorFsmAdapter::Feature::Rotate));
   mb.addAction(aRotateCw);
   QAction* aMirrorHorizontal = cmd.mirrorHorizontal.createAction(
       &menu, this, [this]() { mirrorSelectedItems(Qt::Horizontal); });
   aMirrorHorizontal->setEnabled(
-      features.contains(EditorWidgetBase::Feature::Mirror));
+      features.testFlag(SymbolEditorFsmAdapter::Feature::Mirror));
   mb.addAction(aMirrorHorizontal);
   QAction* aMirrorVertical = cmd.mirrorVertical.createAction(
       &menu, this, [this]() { mirrorSelectedItems(Qt::Vertical); });
   aMirrorVertical->setEnabled(
-      features.contains(EditorWidgetBase::Feature::Mirror));
+      features.testFlag(SymbolEditorFsmAdapter::Feature::Mirror));
   mb.addAction(aMirrorVertical);
   mb.addSeparator();
   QAction* aSnapToGrid = cmd.snapToGrid.createAction(
       &menu, this, [this]() { snapSelectedItemsToGrid(); });
   aSnapToGrid->setEnabled(
-      features.contains(EditorWidgetBase::Feature::SnapToGrid));
+      features.testFlag(SymbolEditorFsmAdapter::Feature::SnapToGrid));
   mb.addAction(aSnapToGrid);
 
   // execute the context menu
@@ -717,32 +723,32 @@ bool SymbolEditorState_Select::openPropertiesDialogOfItem(
   if (auto i = std::dynamic_pointer_cast<SymbolPinGraphicsItem>(item)) {
     SymbolPinPropertiesDialog dialog(
         i->getPtr(), mContext.undoStack, getLengthUnit(),
-        "symbol_editor/pin_properties_dialog", &mContext.editorWidget);
-    dialog.setReadOnly(mContext.editorContext.readOnly);
+        "symbol_editor/pin_properties_dialog", parentWidget());
+    dialog.setReadOnly(mContext.readOnly);
     dialog.exec();
     return true;
   } else if (auto i = std::dynamic_pointer_cast<TextGraphicsItem>(item)) {
     TextPropertiesDialog dialog(i->getObj(), mContext.undoStack,
                                 getAllowedTextLayers(), getLengthUnit(),
                                 "symbol_editor/text_properties_dialog",
-                                &mContext.editorWidget);
-    dialog.setReadOnly(mContext.editorContext.readOnly);
+                                parentWidget());
+    dialog.setReadOnly(mContext.readOnly);
     dialog.exec();
     return true;
   } else if (auto i = std::dynamic_pointer_cast<PolygonGraphicsItem>(item)) {
     PolygonPropertiesDialog dialog(
         i->getObj(), mContext.undoStack, getAllowedCircleAndPolygonLayers(),
         getLengthUnit(), "symbol_editor/polygon_properties_dialog",
-        &mContext.editorWidget);
-    dialog.setReadOnly(mContext.editorContext.readOnly);
+        parentWidget());
+    dialog.setReadOnly(mContext.readOnly);
     dialog.exec();
     return true;
   } else if (auto i = std::dynamic_pointer_cast<CircleGraphicsItem>(item)) {
     CirclePropertiesDialog dialog(
         i->getObj(), mContext.undoStack, getAllowedCircleAndPolygonLayers(),
         getLengthUnit(), "symbol_editor/circle_properties_dialog",
-        &mContext.editorWidget);
-    dialog.setReadOnly(mContext.editorContext.readOnly);
+        parentWidget());
+    dialog.setReadOnly(mContext.readOnly);
     dialog.exec();
     return true;
   }
@@ -761,37 +767,38 @@ bool SymbolEditorState_Select::openPropertiesDialogOfItemAtPos(
 }
 
 bool SymbolEditorState_Select::copySelectedItemsToClipboard() noexcept {
+  SymbolGraphicsItem* item = getGraphicsItem();
+  if (!item) return false;
+
   try {
-    const Point cursorPos =
-        mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos());
+    const Point cursorPos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos());
     SymbolClipboardData data(mContext.symbol.getUuid(), cursorPos);
     foreach (const std::shared_ptr<SymbolPinGraphicsItem>& pin,
-             mContext.symbolGraphicsItem.getSelectedPins()) {
+             item->getSelectedPins()) {
       Q_ASSERT(pin);
       data.getPins().append(std::make_shared<SymbolPin>(pin->getObj()));
     }
     foreach (const std::shared_ptr<CircleGraphicsItem>& circle,
-             mContext.symbolGraphicsItem.getSelectedCircles()) {
+             item->getSelectedCircles()) {
       Q_ASSERT(circle);
       data.getCircles().append(std::make_shared<Circle>(circle->getObj()));
     }
     foreach (const std::shared_ptr<PolygonGraphicsItem>& polygon,
-             mContext.symbolGraphicsItem.getSelectedPolygons()) {
+             item->getSelectedPolygons()) {
       Q_ASSERT(polygon);
       data.getPolygons().append(std::make_shared<Polygon>(polygon->getObj()));
     }
     foreach (const std::shared_ptr<TextGraphicsItem>& text,
-             mContext.symbolGraphicsItem.getSelectedTexts()) {
+             item->getSelectedTexts()) {
       Q_ASSERT(text);
       data.getTexts().append(std::make_shared<Text>(text->getObj()));
     }
     if (data.getItemCount() > 0) {
-      qApp->clipboard()->setMimeData(
-          data.toMimeData(mContext.editorContext.layers).release());
-      emit statusBarMessageChanged(tr("Copied to clipboard!"), 2000);
+      qApp->clipboard()->setMimeData(data.toMimeData().release());
+      mAdapter.fsmSetStatusBarMessage(tr("Copied to clipboard!"), 2000);
     }
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
   return true;
 }
@@ -801,18 +808,21 @@ bool SymbolEditorState_Select::startPaste(
     const std::optional<Point>& fixedPosition) {
   Q_ASSERT(data);
 
+  SymbolGraphicsItem* item = getGraphicsItem();
+  if (!item) return false;
+
   // Start undo command group.
   clearSelectionRect(true);
   mContext.undoStack.beginCmdGroup(tr("Paste Symbol Elements"));
   setState(SubState::PASTING);
 
   // Paste items.
-  mStartPos = mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos());
+  mStartPos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos());
   Point offset = fixedPosition
       ? (*fixedPosition)
       : (mStartPos - data->getCursorPos()).mappedToGrid(getGridInterval());
-  std::unique_ptr<CmdPasteSymbolItems> cmd(new CmdPasteSymbolItems(
-      mContext.symbol, mContext.symbolGraphicsItem, std::move(data), offset));
+  std::unique_ptr<CmdPasteSymbolItems> cmd(
+      new CmdPasteSymbolItems(mContext.symbol, *item, std::move(data), offset));
   if (mContext.undoStack.appendToCmdGroup(cmd.release())) {  // can throw
     if (fixedPosition) {
       // Fixed position provided (no interactive placement), finish tool.
@@ -821,7 +831,8 @@ bool SymbolEditorState_Select::startPaste(
       clearSelectionRect(true);
     } else {
       // Start moving the selected items.
-      mCmdDragSelectedItems.reset(new CmdDragSelectedSymbolItems(mContext));
+      mCmdDragSelectedItems.reset(
+          new CmdDragSelectedSymbolItems(*item, getGridInterval()));
     }
     return true;
   } else {
@@ -834,55 +845,68 @@ bool SymbolEditorState_Select::startPaste(
 
 bool SymbolEditorState_Select::rotateSelectedItems(
     const Angle& angle) noexcept {
+  SymbolGraphicsItem* item = getGraphicsItem();
+  if (!item) return false;
+
   try {
     if (mCmdDragSelectedItems) {
       mCmdDragSelectedItems->rotate(angle);
     } else {
       std::unique_ptr<CmdDragSelectedSymbolItems> cmd(
-          new CmdDragSelectedSymbolItems(mContext));
+          new CmdDragSelectedSymbolItems(*item, getGridInterval()));
       cmd->rotate(angle);
       mContext.undoStack.execCmd(cmd.release());
     }
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
   return true;  // TODO: return false if no items were selected
 }
 
 bool SymbolEditorState_Select::mirrorSelectedItems(
     Qt::Orientation orientation) noexcept {
+  SymbolGraphicsItem* item = getGraphicsItem();
+  if (!item) return false;
+
   try {
     if (mCmdDragSelectedItems) {
       mCmdDragSelectedItems->mirror(orientation);
     } else {
       std::unique_ptr<CmdDragSelectedSymbolItems> cmd(
-          new CmdDragSelectedSymbolItems(mContext));
+          new CmdDragSelectedSymbolItems(*item, getGridInterval()));
       cmd->mirror(orientation);
       mContext.undoStack.execCmd(cmd.release());
     }
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
   return true;  // TODO: return false if no items were selected
 }
 
 bool SymbolEditorState_Select::snapSelectedItemsToGrid() noexcept {
+  SymbolGraphicsItem* item = getGraphicsItem();
+  if (!item) return false;
+
   try {
     std::unique_ptr<CmdDragSelectedSymbolItems> cmdMove(
-        new CmdDragSelectedSymbolItems(mContext));
-    cmdMove->snapToGrid();
+        new CmdDragSelectedSymbolItems(*item, getGridInterval()));
+    cmdMove->snapToGrid(getGridInterval());
     mContext.undoStack.execCmd(cmdMove.release());
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
   return true;  // TODO: return false if no items were selected
 }
 
 bool SymbolEditorState_Select::removeSelectedItems() noexcept {
+  SymbolGraphicsItem* item = getGraphicsItem();
+  if (!item) return false;
+
   try {
-    mContext.undoStack.execCmd(new CmdRemoveSelectedSymbolItems(mContext));
+    mContext.undoStack.execCmd(
+        new CmdRemoveSelectedSymbolItems(mContext.symbol, *item));
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
   return true;  // TODO: return false if no items were selected
 }
@@ -909,7 +933,7 @@ void SymbolEditorState_Select::removePolygonVertices(
     cmd->setPath(path, false);
     mContext.undoStack.execCmd(cmd.release());
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
 }
 
@@ -930,38 +954,49 @@ void SymbolEditorState_Select::startAddingPolygonVertex(
     mStartPos = pos;
     setState(SubState::MOVING_POLYGON_VERTEX);
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
 }
 
 void SymbolEditorState_Select::setSelectionRect(const Point& p1,
                                                 const Point& p2) noexcept {
-  mContext.graphicsScene.setSelectionRect(p1, p2);
-  mContext.symbolGraphicsItem.setSelectionRect(
-      QRectF(p1.toPxQPointF(), p2.toPxQPointF()));
+  if (auto scene = getGraphicsScene()) {
+    scene->setSelectionRect(p1, p2);
+  }
+  if (auto item = getGraphicsItem()) {
+    item->setSelectionRect(QRectF(p1.toPxQPointF(), p2.toPxQPointF()));
+  }
 }
 
 void SymbolEditorState_Select::clearSelectionRect(
     bool updateItemsSelectionState) noexcept {
-  mContext.graphicsScene.setSelectionRect(Point(), Point());
-  if (updateItemsSelectionState) {
-    mContext.graphicsScene.setSelectionArea(QPainterPath());
+  if (auto scene = getGraphicsScene()) {
+    scene->setSelectionRect(Point(), Point());
+    if (updateItemsSelectionState) {
+      scene->setSelectionArea(QPainterPath());
+    }
   }
 }
 
 QList<std::shared_ptr<QGraphicsItem>>
     SymbolEditorState_Select::findItemsAtPosition(const Point& pos) noexcept {
-  return mContext.symbolGraphicsItem.findItemsAtPos(
-      mContext.graphicsView.calcPosWithTolerance(pos),
-      mContext.graphicsView.calcPosWithTolerance(pos, 2),
+  SymbolGraphicsItem* item = getGraphicsItem();
+  if (!item) return {};
+
+  return item->findItemsAtPos(
+      mAdapter.fsmCalcPosWithTolerance(pos, 1),
+      mAdapter.fsmCalcPosWithTolerance(pos, 2),
       SymbolGraphicsItem::FindFlag::All |
           SymbolGraphicsItem::FindFlag::AcceptNearMatch);
 }
 
 bool SymbolEditorState_Select::findPolygonVerticesAtPosition(
     const Point& pos) noexcept {
+  SymbolGraphicsItem* item = getGraphicsItem();
+  if (!item) return false;
+
   for (auto ptr : mContext.symbol.getPolygons().values()) {
-    auto graphicsItem = mContext.symbolGraphicsItem.getGraphicsItem(ptr);
+    auto graphicsItem = item->getGraphicsItem(ptr);
     if (graphicsItem && graphicsItem->isSelected()) {
       mSelectedPolygonVertices = graphicsItem->getVertexIndicesAtPosition(pos);
       if (!mSelectedPolygonVertices.isEmpty()) {
@@ -979,8 +1014,47 @@ bool SymbolEditorState_Select::findPolygonVerticesAtPosition(
 void SymbolEditorState_Select::setState(SubState state) noexcept {
   if (state != mState) {
     mState = state;
-    emit availableFeaturesChanged();
+    scheduleUpdateAvailableFeatures();
   }
+}
+
+void SymbolEditorState_Select::scheduleUpdateAvailableFeatures() noexcept {
+  if (mUpdateAvailableFeaturesTimer) mUpdateAvailableFeaturesTimer->start();
+}
+
+SymbolEditorFsmAdapter::Features
+    SymbolEditorState_Select::updateAvailableFeatures() noexcept {
+  SymbolEditorFsmAdapter::Features features;
+
+  if (mState != SubState::PASTING) {
+    features |= SymbolEditorFsmAdapter::Feature::Select;
+    if (!mContext.readOnly) {
+      features |= SymbolEditorFsmAdapter::Feature::ImportGraphics;
+      if (SymbolClipboardData::isValid(qApp->clipboard()->mimeData())) {
+        features |= SymbolEditorFsmAdapter::Feature::Paste;
+      }
+    }
+  }
+
+  if (auto item = mAdapter.fsmGetGraphicsItem()) {
+    CmdDragSelectedSymbolItems cmd(*item, getGridInterval());
+    if (cmd.getSelectedItemsCount() > 0) {
+      features |= SymbolEditorFsmAdapter::Feature::Copy;
+      features |= SymbolEditorFsmAdapter::Feature::Properties;
+      if (!mContext.readOnly) {
+        features |= SymbolEditorFsmAdapter::Feature::Cut;
+        features |= SymbolEditorFsmAdapter::Feature::Remove;
+        features |= SymbolEditorFsmAdapter::Feature::Rotate;
+        features |= SymbolEditorFsmAdapter::Feature::Mirror;
+        if (cmd.hasOffTheGridElements()) {
+          features |= SymbolEditorFsmAdapter::Feature::SnapToGrid;
+        }
+      }
+    }
+  }
+
+  mAdapter.fsmSetFeatures(features);
+  return features;
 }
 
 /*******************************************************************************

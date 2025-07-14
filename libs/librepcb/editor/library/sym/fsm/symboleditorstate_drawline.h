@@ -26,7 +26,6 @@
 #include "symboleditorstate_drawpolygonbase.h"
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -55,6 +54,9 @@ public:
   // Operator Overloadings
   SymbolEditorState_DrawLine& operator=(const SymbolEditorState_DrawLine& rhs) =
       delete;
+
+protected:
+  void notifyToolEnter() noexcept override;
 };
 
 /*******************************************************************************

@@ -29,11 +29,26 @@
 #include "../../graphics/graphicsscene.h"
 #include "../../library/cmd/cmdlibraryelementedit.h"
 #include "../../utils/exclusiveactiongroup.h"
+#include "../../utils/halignactiongroup.h"
 #include "../../utils/toolbarproxy.h"
+#include "../../utils/valignactiongroup.h"
+#include "../../widgets/angleedit.h"
+#include "../../widgets/layercombobox.h"
+#include "../../widgets/positivelengthedit.h"
 #include "../../widgets/statusbar.h"
+#include "../../widgets/unsignedlengthedit.h"
 #include "../../workspace/desktopservices.h"
 #include "../cmd/cmdsymbolpinedit.h"
 #include "fsm/symboleditorfsm.h"
+#include "fsm/symboleditorstate_addnames.h"
+#include "fsm/symboleditorstate_addpins.h"
+#include "fsm/symboleditorstate_addvalues.h"
+#include "fsm/symboleditorstate_drawarc.h"
+#include "fsm/symboleditorstate_drawcircle.h"
+#include "fsm/symboleditorstate_drawline.h"
+#include "fsm/symboleditorstate_drawpolygon.h"
+#include "fsm/symboleditorstate_drawrect.h"
+#include "fsm/symboleditorstate_drawtext.h"
 #include "symbolgraphicsitem.h"
 #include "ui_symboleditorwidget.h"
 
@@ -158,22 +173,10 @@ SymbolEditorWidget::SymbolEditorWidget(const Context& context,
   mUi->graphicsView->zoomAll();
 
   // Load finite state machine (FSM).
-  SymbolEditorFsm::Context fsmContext{mContext,
-                                      *this,
-                                      *mUndoStack,
-                                      *mGraphicsScene,
-                                      *mUi->graphicsView,
-                                      mLengthUnit,
-                                      *mSymbol,
-                                      *mGraphicsItem,
-                                      *mCommandToolBarProxy};
+  SymbolEditorFsm::Context fsmContext{
+      *mSymbol, *mUndoStack, mContext.readOnly, mLengthUnit, *this,
+  };
   mFsm.reset(new SymbolEditorFsm(fsmContext));
-  connect(mUndoStack.data(), &UndoStack::stateModified, mFsm.data(),
-          &SymbolEditorFsm::updateAvailableFeatures);
-  connect(mFsm.data(), &SymbolEditorFsm::availableFeaturesChanged, this,
-          [this]() { emit availableFeaturesChanged(getAvailableFeatures()); });
-  connect(mFsm.data(), &SymbolEditorFsm::statusBarMessageChanged, this,
-          &SymbolEditorWidget::setStatusBarMessage);
 
   // Last but not least, connect the graphics scene events with the FSM.
   mUi->graphicsView->setEventHandlerObject(this);
@@ -201,12 +204,7 @@ SymbolEditorWidget::~SymbolEditorWidget() noexcept {
 
 QSet<EditorWidgetBase::Feature> SymbolEditorWidget::getAvailableFeatures()
     const noexcept {
-  QSet<EditorWidgetBase::Feature> features = {
-      EditorWidgetBase::Feature::Close,
-      EditorWidgetBase::Feature::GraphicsView,
-      EditorWidgetBase::Feature::ExportGraphics,
-  };
-  return features + mFsm->getAvailableFeatures();
+  return mFeatures;
 }
 
 /*******************************************************************************
@@ -233,8 +231,6 @@ void SymbolEditorWidget::connectEditor(
   mToolsActionGroup->setActionEnabled(Tool::DRAW_TEXT, enabled);
   mToolsActionGroup->setActionEnabled(Tool::MEASURE, true);
   mToolsActionGroup->setCurrentAction(mFsm->getCurrentTool());
-  connect(mFsm.data(), &SymbolEditorFsm::toolChanged, mToolsActionGroup,
-          &ExclusiveActionGroup::setCurrentAction);
 
   mStatusBar->setField(StatusBar::AbsolutePosition, true);
   mStatusBar->setLengthUnit(mLengthUnit);
@@ -243,14 +239,727 @@ void SymbolEditorWidget::connectEditor(
 }
 
 void SymbolEditorWidget::disconnectEditor() noexcept {
-  disconnect(mFsm.data(), &SymbolEditorFsm::toolChanged, mToolsActionGroup,
-             &ExclusiveActionGroup::setCurrentAction);
-
   mStatusBar->setField(StatusBar::AbsolutePosition, false);
   disconnect(mUi->graphicsView, &GraphicsView::cursorScenePositionChanged,
              mStatusBar, &StatusBar::setAbsoluteCursorPosition);
 
   EditorWidgetBase::disconnectEditor();
+}
+
+/*******************************************************************************
+ *  SymbolEditorFsmAdapter
+ ******************************************************************************/
+
+GraphicsScene* SymbolEditorWidget::fsmGetGraphicsScene() noexcept {
+  return mGraphicsScene.data();
+}
+
+SymbolGraphicsItem* SymbolEditorWidget::fsmGetGraphicsItem() noexcept {
+  return mGraphicsItem.data();
+}
+
+PositiveLength SymbolEditorWidget::fsmGetGridInterval() const noexcept {
+  return mGraphicsScene->getGridInterval();
+}
+
+void SymbolEditorWidget::fsmSetViewCursor(
+    const std::optional<Qt::CursorShape>& shape) noexcept {
+  if (shape) {
+    mUi->graphicsView->setCursor(*shape);
+  } else {
+    mUi->graphicsView->unsetCursor();
+  }
+}
+
+void SymbolEditorWidget::fsmSetViewGrayOut(bool grayOut) noexcept {
+  mGraphicsScene->setGrayOut(grayOut);
+}
+
+void SymbolEditorWidget::fsmSetViewInfoBoxText(const QString& text) noexcept {
+  mUi->graphicsView->setInfoBoxText(text);
+}
+
+void SymbolEditorWidget::fsmSetViewRuler(
+    const std::optional<std::pair<Point, Point>>& pos) noexcept {
+  mGraphicsScene->setRulerPositions(pos);
+}
+
+void SymbolEditorWidget::fsmSetSceneCursor(const Point& pos, bool cross,
+                                           bool circle) noexcept {
+  mGraphicsScene->setSceneCursor(pos, cross, circle);
+}
+
+QPainterPath SymbolEditorWidget::fsmCalcPosWithTolerance(
+    const Point& pos, qreal multiplier) const noexcept {
+  return mUi->graphicsView->calcPosWithTolerance(pos, multiplier);
+}
+
+Point SymbolEditorWidget::fsmMapGlobalPosToScenePos(
+    const QPoint& pos) const noexcept {
+  return mUi->graphicsView->mapGlobalPosToScenePos(pos);
+}
+
+void SymbolEditorWidget::fsmSetStatusBarMessage(const QString& message,
+                                                int timeoutMs) noexcept {
+  setStatusBarMessage(message, timeoutMs);
+}
+
+void SymbolEditorWidget::fsmSetFeatures(Features features) noexcept {
+  QSet<EditorWidgetBase::Feature> editorFeatures = {
+      EditorWidgetBase::Feature::Abort,
+      EditorWidgetBase::Feature::Close,
+      EditorWidgetBase::Feature::GraphicsView,
+      EditorWidgetBase::Feature::ExportGraphics,
+  };
+  if (features.testFlag(SymbolEditorFsmAdapter::Feature::Select)) {
+    editorFeatures |= EditorWidgetBase::Feature::SelectGraphics;
+  }
+  if (features.testFlag(SymbolEditorFsmAdapter::Feature::Cut)) {
+    editorFeatures |= EditorWidgetBase::Feature::Cut;
+  }
+  if (features.testFlag(SymbolEditorFsmAdapter::Feature::Copy)) {
+    editorFeatures |= EditorWidgetBase::Feature::Copy;
+  }
+  if (features.testFlag(SymbolEditorFsmAdapter::Feature::Paste)) {
+    editorFeatures |= EditorWidgetBase::Feature::Paste;
+  }
+  if (features.testFlag(SymbolEditorFsmAdapter::Feature::Remove)) {
+    editorFeatures |= EditorWidgetBase::Feature::Remove;
+  }
+  if (features.testFlag(SymbolEditorFsmAdapter::Feature::Rotate)) {
+    editorFeatures |= EditorWidgetBase::Feature::Rotate;
+  }
+  if (features.testFlag(SymbolEditorFsmAdapter::Feature::Mirror)) {
+    editorFeatures |= EditorWidgetBase::Feature::Mirror;
+  }
+  if (features.testFlag(SymbolEditorFsmAdapter::Feature::SnapToGrid)) {
+    editorFeatures |= EditorWidgetBase::Feature::SnapToGrid;
+  }
+  if (features.testFlag(SymbolEditorFsmAdapter::Feature::Properties)) {
+    editorFeatures |= EditorWidgetBase::Feature::Properties;
+  }
+  if (features.testFlag(SymbolEditorFsmAdapter::Feature::ImportGraphics)) {
+    editorFeatures |= EditorWidgetBase::Feature::ImportGraphics;
+  }
+
+  if (editorFeatures != mFeatures) {
+    mFeatures = editorFeatures;
+    emit availableFeaturesChanged(mFeatures);
+  }
+}
+
+void SymbolEditorWidget::fsmToolLeave() noexcept {
+  while (!mFsmStateConnections.isEmpty()) {
+    disconnect(mFsmStateConnections.takeLast());
+  }
+  mCommandToolBarProxy->clear();
+  if (mToolsActionGroup) mToolsActionGroup->setCurrentAction(-1);
+  fsmSetFeatures(Features());
+}
+
+void SymbolEditorWidget::fsmToolEnter(
+    SymbolEditorState_Select& state) noexcept {
+  Q_UNUSED(state);
+  if (mToolsActionGroup) mToolsActionGroup->setCurrentAction(Tool::SELECT);
+}
+
+void SymbolEditorWidget::fsmToolEnter(
+    SymbolEditorState_DrawLine& state) noexcept {
+  if ((!mToolsActionGroup) || (!mCommandToolBarProxy)) return;
+
+  mToolsActionGroup->setCurrentAction(Tool::DRAW_LINE);
+
+  // Layer
+  EditorCommandSet& cmd = EditorCommandSet::instance();
+  mCommandToolBarProxy->addLabel(tr("Layer:"));
+  std::unique_ptr<LayerComboBox> layerComboBox(new LayerComboBox());
+  layerComboBox->setLayers(state.getAvailableLayers());
+  layerComboBox->setCurrentLayer(state.getLayer());
+  layerComboBox->addAction(cmd.layerUp.createAction(
+      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepDown));
+  layerComboBox->addAction(cmd.layerDown.createAction(
+      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepUp));
+  mFsmStateConnections.append(
+      connect(&state, &SymbolEditorState_DrawLine::layerChanged,
+              layerComboBox.get(), &LayerComboBox::setCurrentLayer));
+  mFsmStateConnections.append(
+      connect(layerComboBox.get(), &LayerComboBox::currentLayerChanged, &state,
+              &SymbolEditorState_DrawLine::setLayer));
+  mCommandToolBarProxy->addWidget(std::move(layerComboBox));
+
+  // Line width
+  mCommandToolBarProxy->addLabel(tr("Line Width:"), 10);
+  std::unique_ptr<UnsignedLengthEdit> edtLineWidth(new UnsignedLengthEdit());
+  edtLineWidth->configure(mLengthUnit, LengthEditBase::Steps::generic(),
+                          "symbol_editor/draw_polygon/line_width");
+  edtLineWidth->setValue(state.getLineWidth());
+  edtLineWidth->addAction(cmd.lineWidthIncrease.createAction(
+      edtLineWidth.get(), edtLineWidth.get(), &UnsignedLengthEdit::stepUp));
+  edtLineWidth->addAction(cmd.lineWidthDecrease.createAction(
+      edtLineWidth.get(), edtLineWidth.get(), &UnsignedLengthEdit::stepDown));
+  mFsmStateConnections.append(
+      connect(&state, &SymbolEditorState_DrawLine::lineWidthChanged,
+              edtLineWidth.get(), &UnsignedLengthEdit::setValue));
+  mFsmStateConnections.append(
+      connect(edtLineWidth.get(), &UnsignedLengthEdit::valueChanged, &state,
+              &SymbolEditorState_DrawLine::setLineWidth));
+  mCommandToolBarProxy->addWidget(std::move(edtLineWidth));
+
+  // Arc angle
+  mCommandToolBarProxy->addLabel(tr("Arc Angle:"), 10);
+  std::unique_ptr<AngleEdit> edtAngle(new AngleEdit());
+  edtAngle->setSingleStep(90.0);  // [°]
+  edtAngle->setValue(state.getAngle());
+  mFsmStateConnections.append(connect(&state,
+                                      &SymbolEditorState_DrawLine::angleChanged,
+                                      edtAngle.get(), &AngleEdit::setValue));
+  mFsmStateConnections.append(connect(edtAngle.get(), &AngleEdit::valueChanged,
+                                      &state,
+                                      &SymbolEditorState_DrawLine::setAngle));
+  mCommandToolBarProxy->addWidget(std::move(edtAngle));
+}
+
+void SymbolEditorWidget::fsmToolEnter(
+    SymbolEditorState_DrawRect& state) noexcept {
+  if ((!mToolsActionGroup) || (!mCommandToolBarProxy)) return;
+
+  mToolsActionGroup->setCurrentAction(Tool::DRAW_RECT);
+
+  // Layer
+  EditorCommandSet& cmd = EditorCommandSet::instance();
+  mCommandToolBarProxy->addLabel(tr("Layer:"));
+  std::unique_ptr<LayerComboBox> layerComboBox(new LayerComboBox());
+  layerComboBox->setLayers(state.getAvailableLayers());
+  layerComboBox->setCurrentLayer(state.getLayer());
+  layerComboBox->addAction(cmd.layerUp.createAction(
+      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepDown));
+  layerComboBox->addAction(cmd.layerDown.createAction(
+      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepUp));
+  mFsmStateConnections.append(
+      connect(&state, &SymbolEditorState_DrawRect::layerChanged,
+              layerComboBox.get(), &LayerComboBox::setCurrentLayer));
+  mFsmStateConnections.append(
+      connect(layerComboBox.get(), &LayerComboBox::currentLayerChanged, &state,
+              &SymbolEditorState_DrawRect::setLayer));
+  mCommandToolBarProxy->addWidget(std::move(layerComboBox));
+
+  // Line width
+  mCommandToolBarProxy->addLabel(tr("Line Width:"), 10);
+  std::unique_ptr<UnsignedLengthEdit> edtLineWidth(new UnsignedLengthEdit());
+  edtLineWidth->configure(mLengthUnit, LengthEditBase::Steps::generic(),
+                          "symbol_editor/draw_polygon/line_width");
+  edtLineWidth->setValue(state.getLineWidth());
+  edtLineWidth->addAction(cmd.lineWidthIncrease.createAction(
+      edtLineWidth.get(), edtLineWidth.get(), &UnsignedLengthEdit::stepUp));
+  edtLineWidth->addAction(cmd.lineWidthDecrease.createAction(
+      edtLineWidth.get(), edtLineWidth.get(), &UnsignedLengthEdit::stepDown));
+  mFsmStateConnections.append(
+      connect(&state, &SymbolEditorState_DrawRect::lineWidthChanged,
+              edtLineWidth.get(), &UnsignedLengthEdit::setValue));
+  mFsmStateConnections.append(
+      connect(edtLineWidth.get(), &UnsignedLengthEdit::valueChanged, &state,
+              &SymbolEditorState_DrawRect::setLineWidth));
+  mCommandToolBarProxy->addWidget(std::move(edtLineWidth));
+
+  // Fill
+  std::unique_ptr<QCheckBox> fillCheckBox(new QCheckBox(tr("Fill")));
+  fillCheckBox->setChecked(state.getFilled());
+  fillCheckBox->addAction(cmd.fillToggle.createAction(
+      fillCheckBox.get(), fillCheckBox.get(), &QCheckBox::toggle));
+  QString toolTip = tr("Fill polygon, if closed");
+  if (!cmd.fillToggle.getKeySequences().isEmpty()) {
+    toolTip += " (" %
+        cmd.fillToggle.getKeySequences().first().toString(
+            QKeySequence::NativeText) %
+        ")";
+  }
+  fillCheckBox->setToolTip(toolTip);
+  mFsmStateConnections.append(
+      connect(&state, &SymbolEditorState_DrawRect::filledChanged,
+              fillCheckBox.get(), &QCheckBox::setChecked));
+  mFsmStateConnections.append(connect(fillCheckBox.get(), &QCheckBox::toggled,
+                                      &state,
+                                      &SymbolEditorState_DrawRect::setFilled));
+  mCommandToolBarProxy->addWidget(std::move(fillCheckBox), 10);
+
+  // Grab area
+  std::unique_ptr<QCheckBox> grabAreaCheckBox(new QCheckBox(tr("Grab Area")));
+  grabAreaCheckBox->setChecked(state.getGrabArea());
+  grabAreaCheckBox->addAction(cmd.grabAreaToggle.createAction(
+      grabAreaCheckBox.get(), grabAreaCheckBox.get(), &QCheckBox::toggle));
+  toolTip = tr("Use polygon as grab area");
+  if (!cmd.grabAreaToggle.getKeySequences().isEmpty()) {
+    toolTip += " (" %
+        cmd.grabAreaToggle.getKeySequences().first().toString(
+            QKeySequence::NativeText) %
+        ")";
+  }
+  grabAreaCheckBox->setToolTip(toolTip);
+  mFsmStateConnections.append(
+      connect(&state, &SymbolEditorState_DrawRect::grabAreaChanged,
+              grabAreaCheckBox.get(), &QCheckBox::setChecked));
+  mFsmStateConnections.append(
+      connect(grabAreaCheckBox.get(), &QCheckBox::toggled, &state,
+              &SymbolEditorState_DrawRect::setGrabArea));
+  mCommandToolBarProxy->addWidget(std::move(grabAreaCheckBox));
+}
+
+void SymbolEditorWidget::fsmToolEnter(
+    SymbolEditorState_DrawPolygon& state) noexcept {
+  if ((!mToolsActionGroup) || (!mCommandToolBarProxy)) return;
+
+  mToolsActionGroup->setCurrentAction(Tool::DRAW_POLYGON);
+
+  // Layer
+  EditorCommandSet& cmd = EditorCommandSet::instance();
+  mCommandToolBarProxy->addLabel(tr("Layer:"));
+  std::unique_ptr<LayerComboBox> layerComboBox(new LayerComboBox());
+  layerComboBox->setLayers(state.getAvailableLayers());
+  layerComboBox->setCurrentLayer(state.getLayer());
+  layerComboBox->addAction(cmd.layerUp.createAction(
+      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepDown));
+  layerComboBox->addAction(cmd.layerDown.createAction(
+      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepUp));
+  mFsmStateConnections.append(
+      connect(&state, &SymbolEditorState_DrawPolygon::layerChanged,
+              layerComboBox.get(), &LayerComboBox::setCurrentLayer));
+  mFsmStateConnections.append(
+      connect(layerComboBox.get(), &LayerComboBox::currentLayerChanged, &state,
+              &SymbolEditorState_DrawPolygon::setLayer));
+  mCommandToolBarProxy->addWidget(std::move(layerComboBox));
+
+  // Line width
+  mCommandToolBarProxy->addLabel(tr("Line Width:"), 10);
+  std::unique_ptr<UnsignedLengthEdit> edtLineWidth(new UnsignedLengthEdit());
+  edtLineWidth->configure(mLengthUnit, LengthEditBase::Steps::generic(),
+                          "symbol_editor/draw_polygon/line_width");
+  edtLineWidth->setValue(state.getLineWidth());
+  edtLineWidth->addAction(cmd.lineWidthIncrease.createAction(
+      edtLineWidth.get(), edtLineWidth.get(), &UnsignedLengthEdit::stepUp));
+  edtLineWidth->addAction(cmd.lineWidthDecrease.createAction(
+      edtLineWidth.get(), edtLineWidth.get(), &UnsignedLengthEdit::stepDown));
+  mFsmStateConnections.append(
+      connect(&state, &SymbolEditorState_DrawPolygon::lineWidthChanged,
+              edtLineWidth.get(), &UnsignedLengthEdit::setValue));
+  mFsmStateConnections.append(
+      connect(edtLineWidth.get(), &UnsignedLengthEdit::valueChanged, &state,
+              &SymbolEditorState_DrawPolygon::setLineWidth));
+  mCommandToolBarProxy->addWidget(std::move(edtLineWidth));
+
+  // Arc angle
+  mCommandToolBarProxy->addLabel(tr("Arc Angle:"), 10);
+  std::unique_ptr<AngleEdit> edtAngle(new AngleEdit());
+  edtAngle->setSingleStep(90.0);  // [°]
+  edtAngle->setValue(state.getAngle());
+  mFsmStateConnections.append(
+      connect(&state, &SymbolEditorState_DrawPolygon::angleChanged,
+              edtAngle.get(), &AngleEdit::setValue));
+  mFsmStateConnections.append(
+      connect(edtAngle.get(), &AngleEdit::valueChanged, &state,
+              &SymbolEditorState_DrawPolygon::setAngle));
+  mCommandToolBarProxy->addWidget(std::move(edtAngle));
+
+  // Fill
+  std::unique_ptr<QCheckBox> fillCheckBox(new QCheckBox(tr("Fill")));
+  fillCheckBox->setChecked(state.getFilled());
+  fillCheckBox->addAction(cmd.fillToggle.createAction(
+      fillCheckBox.get(), fillCheckBox.get(), &QCheckBox::toggle));
+  QString toolTip = tr("Fill polygon, if closed");
+  if (!cmd.fillToggle.getKeySequences().isEmpty()) {
+    toolTip += " (" %
+        cmd.fillToggle.getKeySequences().first().toString(
+            QKeySequence::NativeText) %
+        ")";
+  }
+  fillCheckBox->setToolTip(toolTip);
+  mFsmStateConnections.append(
+      connect(&state, &SymbolEditorState_DrawPolygon::filledChanged,
+              fillCheckBox.get(), &QCheckBox::setChecked));
+  mFsmStateConnections.append(
+      connect(fillCheckBox.get(), &QCheckBox::toggled, &state,
+              &SymbolEditorState_DrawPolygon::setFilled));
+  mCommandToolBarProxy->addWidget(std::move(fillCheckBox), 10);
+
+  // Grab area
+  std::unique_ptr<QCheckBox> grabAreaCheckBox(new QCheckBox(tr("Grab Area")));
+  grabAreaCheckBox->setChecked(state.getGrabArea());
+  grabAreaCheckBox->addAction(cmd.grabAreaToggle.createAction(
+      grabAreaCheckBox.get(), grabAreaCheckBox.get(), &QCheckBox::toggle));
+  toolTip = tr("Use polygon as grab area");
+  if (!cmd.grabAreaToggle.getKeySequences().isEmpty()) {
+    toolTip += " (" %
+        cmd.grabAreaToggle.getKeySequences().first().toString(
+            QKeySequence::NativeText) %
+        ")";
+  }
+  grabAreaCheckBox->setToolTip(toolTip);
+  mFsmStateConnections.append(
+      connect(&state, &SymbolEditorState_DrawPolygon::grabAreaChanged,
+              grabAreaCheckBox.get(), &QCheckBox::setChecked));
+  mFsmStateConnections.append(
+      connect(grabAreaCheckBox.get(), &QCheckBox::toggled, &state,
+              &SymbolEditorState_DrawPolygon::setGrabArea));
+  mCommandToolBarProxy->addWidget(std::move(grabAreaCheckBox));
+}
+
+void SymbolEditorWidget::fsmToolEnter(
+    SymbolEditorState_DrawCircle& state) noexcept {
+  Q_UNUSED(state);
+  if (mToolsActionGroup) mToolsActionGroup->setCurrentAction(Tool::DRAW_CIRCLE);
+
+  // Layer
+  EditorCommandSet& cmd = EditorCommandSet::instance();
+  mCommandToolBarProxy->addLabel(tr("Layer:"));
+  std::unique_ptr<LayerComboBox> layerComboBox(new LayerComboBox());
+  layerComboBox->setLayers(state.getAvailableLayers());
+  layerComboBox->setCurrentLayer(state.getLayer());
+  layerComboBox->addAction(cmd.layerUp.createAction(
+      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepDown));
+  layerComboBox->addAction(cmd.layerDown.createAction(
+      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepUp));
+  mFsmStateConnections.append(
+      connect(&state, &SymbolEditorState_DrawCircle::layerChanged,
+              layerComboBox.get(), &LayerComboBox::setCurrentLayer));
+  mFsmStateConnections.append(
+      connect(layerComboBox.get(), &LayerComboBox::currentLayerChanged, &state,
+              &SymbolEditorState_DrawCircle::setLayer));
+  mCommandToolBarProxy->addWidget(std::move(layerComboBox));
+
+  // Line width
+  mCommandToolBarProxy->addLabel(tr("Line Width:"), 10);
+  std::unique_ptr<UnsignedLengthEdit> edtLineWidth(new UnsignedLengthEdit());
+  edtLineWidth->configure(mLengthUnit, LengthEditBase::Steps::generic(),
+                          "symbol_editor/draw_circle/line_width");
+  edtLineWidth->setValue(state.getLineWidth());
+  edtLineWidth->addAction(cmd.lineWidthIncrease.createAction(
+      edtLineWidth.get(), edtLineWidth.get(), &UnsignedLengthEdit::stepUp));
+  edtLineWidth->addAction(cmd.lineWidthDecrease.createAction(
+      edtLineWidth.get(), edtLineWidth.get(), &UnsignedLengthEdit::stepDown));
+  mFsmStateConnections.append(
+      connect(&state, &SymbolEditorState_DrawCircle::lineWidthChanged,
+              edtLineWidth.get(), &UnsignedLengthEdit::setValue));
+  mFsmStateConnections.append(
+      connect(edtLineWidth.get(), &UnsignedLengthEdit::valueChanged, &state,
+              &SymbolEditorState_DrawCircle::setLineWidth));
+  mCommandToolBarProxy->addWidget(std::move(edtLineWidth));
+
+  // Fill
+  std::unique_ptr<QCheckBox> fillCheckBox(new QCheckBox(tr("Fill")));
+  fillCheckBox->setChecked(state.getFilled());
+  fillCheckBox->addAction(cmd.fillToggle.createAction(
+      fillCheckBox.get(), fillCheckBox.get(), &QCheckBox::toggle));
+  mFsmStateConnections.append(
+      connect(&state, &SymbolEditorState_DrawCircle::filledChanged,
+              fillCheckBox.get(), &QCheckBox::setChecked));
+  mFsmStateConnections.append(
+      connect(fillCheckBox.get(), &QCheckBox::toggled, &state,
+              &SymbolEditorState_DrawCircle::setFilled));
+  mCommandToolBarProxy->addWidget(std::move(fillCheckBox), 10);
+
+  // Grab area
+  std::unique_ptr<QCheckBox> grabAreaCheckBox(new QCheckBox(tr("Grab Area")));
+  grabAreaCheckBox->setChecked(state.getGrabArea());
+  grabAreaCheckBox->addAction(cmd.grabAreaToggle.createAction(
+      grabAreaCheckBox.get(), grabAreaCheckBox.get(), &QCheckBox::toggle));
+  mFsmStateConnections.append(
+      connect(&state, &SymbolEditorState_DrawCircle::grabAreaChanged,
+              grabAreaCheckBox.get(), &QCheckBox::setChecked));
+  mFsmStateConnections.append(
+      connect(grabAreaCheckBox.get(), &QCheckBox::toggled, &state,
+              &SymbolEditorState_DrawCircle::setGrabArea));
+  mCommandToolBarProxy->addWidget(std::move(grabAreaCheckBox));
+}
+
+void SymbolEditorWidget::fsmToolEnter(
+    SymbolEditorState_DrawArc& state) noexcept {
+  if ((!mToolsActionGroup) || (!mCommandToolBarProxy)) return;
+
+  mToolsActionGroup->setCurrentAction(Tool::DRAW_ARC);
+
+  // Layer
+  EditorCommandSet& cmd = EditorCommandSet::instance();
+  mCommandToolBarProxy->addLabel(tr("Layer:"));
+  std::unique_ptr<LayerComboBox> layerComboBox(new LayerComboBox());
+  layerComboBox->setLayers(state.getAvailableLayers());
+  layerComboBox->setCurrentLayer(state.getLayer());
+  layerComboBox->addAction(cmd.layerUp.createAction(
+      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepDown));
+  layerComboBox->addAction(cmd.layerDown.createAction(
+      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepUp));
+  mFsmStateConnections.append(
+      connect(&state, &SymbolEditorState_DrawArc::layerChanged,
+              layerComboBox.get(), &LayerComboBox::setCurrentLayer));
+  mFsmStateConnections.append(
+      connect(layerComboBox.get(), &LayerComboBox::currentLayerChanged, &state,
+              &SymbolEditorState_DrawArc::setLayer));
+  mCommandToolBarProxy->addWidget(std::move(layerComboBox));
+
+  // Line width
+  mCommandToolBarProxy->addLabel(tr("Line Width:"), 10);
+  std::unique_ptr<UnsignedLengthEdit> edtLineWidth(new UnsignedLengthEdit());
+  edtLineWidth->configure(mLengthUnit, LengthEditBase::Steps::generic(),
+                          "symbol_editor/draw_polygon/line_width");
+  edtLineWidth->setValue(state.getLineWidth());
+  edtLineWidth->addAction(cmd.lineWidthIncrease.createAction(
+      edtLineWidth.get(), edtLineWidth.get(), &UnsignedLengthEdit::stepUp));
+  edtLineWidth->addAction(cmd.lineWidthDecrease.createAction(
+      edtLineWidth.get(), edtLineWidth.get(), &UnsignedLengthEdit::stepDown));
+  mFsmStateConnections.append(
+      connect(&state, &SymbolEditorState_DrawArc::lineWidthChanged,
+              edtLineWidth.get(), &UnsignedLengthEdit::setValue));
+  mFsmStateConnections.append(
+      connect(edtLineWidth.get(), &UnsignedLengthEdit::valueChanged, &state,
+              &SymbolEditorState_DrawArc::setLineWidth));
+  mCommandToolBarProxy->addWidget(std::move(edtLineWidth));
+}
+
+void SymbolEditorWidget::fsmToolEnter(
+    SymbolEditorState_AddNames& state) noexcept {
+  if (mToolsActionGroup) mToolsActionGroup->setCurrentAction(Tool::ADD_NAMES);
+
+  // Height
+  EditorCommandSet& cmd = EditorCommandSet::instance();
+  mCommandToolBarProxy->addLabel(tr("Height:"), 10);
+  std::unique_ptr<PositiveLengthEdit> edtHeight(new PositiveLengthEdit());
+  edtHeight->configure(mLengthUnit, LengthEditBase::Steps::textHeight(),
+                       "symbol_editor/draw_text/height");
+  edtHeight->setValue(state.getHeight());
+  edtHeight->addAction(cmd.sizeIncrease.createAction(
+      edtHeight.get(), edtHeight.get(), &PositiveLengthEdit::stepUp));
+  edtHeight->addAction(cmd.sizeDecrease.createAction(
+      edtHeight.get(), edtHeight.get(), &PositiveLengthEdit::stepDown));
+  mFsmStateConnections.append(
+      connect(&state, &SymbolEditorState_DrawText::heightChanged,
+              edtHeight.get(), &PositiveLengthEdit::setValue));
+  mFsmStateConnections.append(connect(edtHeight.get(),
+                                      &PositiveLengthEdit::valueChanged, &state,
+                                      &SymbolEditorState_DrawText::setHeight));
+  mCommandToolBarProxy->addWidget(std::move(edtHeight));
+
+  // Horizontal alignment
+  mCommandToolBarProxy->addSeparator();
+  std::unique_ptr<HAlignActionGroup> hAlignActionGroup(new HAlignActionGroup());
+  hAlignActionGroup->setValue(state.getHAlign());
+  mFsmStateConnections.append(
+      connect(&state, &SymbolEditorState_DrawText::hAlignChanged,
+              hAlignActionGroup.get(), &HAlignActionGroup::setValue));
+  mFsmStateConnections.append(connect(hAlignActionGroup.get(),
+                                      &HAlignActionGroup::valueChanged, &state,
+                                      &SymbolEditorState_DrawText::setHAlign));
+  mCommandToolBarProxy->addActionGroup(std::move(hAlignActionGroup));
+
+  // Vertical alignment
+  mCommandToolBarProxy->addSeparator();
+  std::unique_ptr<VAlignActionGroup> vAlignActionGroup(new VAlignActionGroup());
+  vAlignActionGroup->setValue(state.getVAlign());
+  mFsmStateConnections.append(
+      connect(&state, &SymbolEditorState_DrawText::vAlignChanged,
+              vAlignActionGroup.get(), &VAlignActionGroup::setValue));
+  mFsmStateConnections.append(connect(vAlignActionGroup.get(),
+                                      &VAlignActionGroup::valueChanged, &state,
+                                      &SymbolEditorState_DrawText::setVAlign));
+  mCommandToolBarProxy->addActionGroup(std::move(vAlignActionGroup));
+}
+
+void SymbolEditorWidget::fsmToolEnter(
+    SymbolEditorState_AddValues& state) noexcept {
+  if (mToolsActionGroup) mToolsActionGroup->setCurrentAction(Tool::ADD_VALUES);
+
+  // Height
+  EditorCommandSet& cmd = EditorCommandSet::instance();
+  mCommandToolBarProxy->addLabel(tr("Height:"), 10);
+  std::unique_ptr<PositiveLengthEdit> edtHeight(new PositiveLengthEdit());
+  edtHeight->configure(mLengthUnit, LengthEditBase::Steps::textHeight(),
+                       "symbol_editor/draw_text/height");
+  edtHeight->setValue(state.getHeight());
+  edtHeight->addAction(cmd.sizeIncrease.createAction(
+      edtHeight.get(), edtHeight.get(), &PositiveLengthEdit::stepUp));
+  edtHeight->addAction(cmd.sizeDecrease.createAction(
+      edtHeight.get(), edtHeight.get(), &PositiveLengthEdit::stepDown));
+  mFsmStateConnections.append(
+      connect(&state, &SymbolEditorState_DrawText::heightChanged,
+              edtHeight.get(), &PositiveLengthEdit::setValue));
+  mFsmStateConnections.append(connect(edtHeight.get(),
+                                      &PositiveLengthEdit::valueChanged, &state,
+                                      &SymbolEditorState_DrawText::setHeight));
+  mCommandToolBarProxy->addWidget(std::move(edtHeight));
+
+  // Horizontal alignment
+  mCommandToolBarProxy->addSeparator();
+  std::unique_ptr<HAlignActionGroup> hAlignActionGroup(new HAlignActionGroup());
+  hAlignActionGroup->setValue(state.getHAlign());
+  mFsmStateConnections.append(
+      connect(&state, &SymbolEditorState_DrawText::hAlignChanged,
+              hAlignActionGroup.get(), &HAlignActionGroup::setValue));
+  mFsmStateConnections.append(connect(hAlignActionGroup.get(),
+                                      &HAlignActionGroup::valueChanged, &state,
+                                      &SymbolEditorState_DrawText::setHAlign));
+  mCommandToolBarProxy->addActionGroup(std::move(hAlignActionGroup));
+
+  // Vertical alignment
+  mCommandToolBarProxy->addSeparator();
+  std::unique_ptr<VAlignActionGroup> vAlignActionGroup(new VAlignActionGroup());
+  vAlignActionGroup->setValue(state.getVAlign());
+  mFsmStateConnections.append(
+      connect(&state, &SymbolEditorState_DrawText::vAlignChanged,
+              vAlignActionGroup.get(), &VAlignActionGroup::setValue));
+  mFsmStateConnections.append(connect(vAlignActionGroup.get(),
+                                      &VAlignActionGroup::valueChanged, &state,
+                                      &SymbolEditorState_DrawText::setVAlign));
+  mCommandToolBarProxy->addActionGroup(std::move(vAlignActionGroup));
+}
+
+void SymbolEditorWidget::fsmToolEnter(
+    SymbolEditorState_DrawText& state) noexcept {
+  if (mToolsActionGroup) mToolsActionGroup->setCurrentAction(Tool::DRAW_TEXT);
+
+  // Layer
+  EditorCommandSet& cmd = EditorCommandSet::instance();
+  mCommandToolBarProxy->addLabel(tr("Layer:"));
+  std::unique_ptr<LayerComboBox> layerComboBox(new LayerComboBox());
+  layerComboBox->setLayers(state.getAvailableLayers());
+  layerComboBox->setCurrentLayer(state.getLayer());
+  layerComboBox->addAction(cmd.layerUp.createAction(
+      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepDown));
+  layerComboBox->addAction(cmd.layerDown.createAction(
+      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepUp));
+  mFsmStateConnections.append(
+      connect(&state, &SymbolEditorState_DrawText::layerChanged,
+              layerComboBox.get(), &LayerComboBox::setCurrentLayer));
+  mFsmStateConnections.append(
+      connect(layerComboBox.get(), &LayerComboBox::currentLayerChanged, &state,
+              &SymbolEditorState_DrawText::setLayer));
+  mCommandToolBarProxy->addWidget(std::move(layerComboBox));
+
+  // Text
+  mCommandToolBarProxy->addLabel(tr("Text:"), 10);
+  std::unique_ptr<QComboBox> textComboBox(new QComboBox());
+  textComboBox->setEditable(true);
+  textComboBox->addItems(state.getTextSuggestions());
+  QPointer<QComboBox> textComboBoxPtr = textComboBox.get();
+  auto setText = [textComboBoxPtr](const QString& text) {
+    if (textComboBoxPtr) {
+      int index = textComboBoxPtr->findText(text);
+      if (index >= 0) {
+        textComboBoxPtr->setCurrentIndex(index);
+      } else {
+        textComboBoxPtr->setCurrentText(text);
+      }
+    }
+  };
+  setText(state.getText());
+  mFsmStateConnections.append(connect(&state,
+                                      &SymbolEditorState_DrawText::textChanged,
+                                      textComboBox.get(), setText));
+  mFsmStateConnections.append(connect(textComboBox.get(),
+                                      &QComboBox::currentTextChanged, &state,
+                                      &SymbolEditorState_DrawText::setText));
+  mCommandToolBarProxy->addWidget(std::move(textComboBox));
+
+  // Height
+  mCommandToolBarProxy->addLabel(tr("Height:"), 10);
+  std::unique_ptr<PositiveLengthEdit> edtHeight(new PositiveLengthEdit());
+  edtHeight->configure(mLengthUnit, LengthEditBase::Steps::textHeight(),
+                       "symbol_editor/draw_text/height");
+  edtHeight->setValue(state.getHeight());
+  edtHeight->addAction(cmd.sizeIncrease.createAction(
+      edtHeight.get(), edtHeight.get(), &PositiveLengthEdit::stepUp));
+  edtHeight->addAction(cmd.sizeDecrease.createAction(
+      edtHeight.get(), edtHeight.get(), &PositiveLengthEdit::stepDown));
+  mFsmStateConnections.append(
+      connect(&state, &SymbolEditorState_DrawText::heightChanged,
+              edtHeight.get(), &PositiveLengthEdit::setValue));
+  mFsmStateConnections.append(connect(edtHeight.get(),
+                                      &PositiveLengthEdit::valueChanged, &state,
+                                      &SymbolEditorState_DrawText::setHeight));
+  mCommandToolBarProxy->addWidget(std::move(edtHeight));
+
+  // Horizontal alignment
+  mCommandToolBarProxy->addSeparator();
+  std::unique_ptr<HAlignActionGroup> hAlignActionGroup(new HAlignActionGroup());
+  hAlignActionGroup->setValue(state.getHAlign());
+  mFsmStateConnections.append(
+      connect(&state, &SymbolEditorState_DrawText::hAlignChanged,
+              hAlignActionGroup.get(), &HAlignActionGroup::setValue));
+  mFsmStateConnections.append(connect(hAlignActionGroup.get(),
+                                      &HAlignActionGroup::valueChanged, &state,
+                                      &SymbolEditorState_DrawText::setHAlign));
+  mCommandToolBarProxy->addActionGroup(std::move(hAlignActionGroup));
+
+  // Vertical alignment
+  mCommandToolBarProxy->addSeparator();
+  std::unique_ptr<VAlignActionGroup> vAlignActionGroup(new VAlignActionGroup());
+  vAlignActionGroup->setValue(state.getVAlign());
+  mFsmStateConnections.append(
+      connect(&state, &SymbolEditorState_DrawText::vAlignChanged,
+              vAlignActionGroup.get(), &VAlignActionGroup::setValue));
+  mFsmStateConnections.append(connect(vAlignActionGroup.get(),
+                                      &VAlignActionGroup::valueChanged, &state,
+                                      &SymbolEditorState_DrawText::setVAlign));
+  mCommandToolBarProxy->addActionGroup(std::move(vAlignActionGroup));
+}
+
+void SymbolEditorWidget::fsmToolEnter(
+    SymbolEditorState_AddPins& state) noexcept {
+  Q_UNUSED(state);
+  if (mToolsActionGroup) mToolsActionGroup->setCurrentAction(Tool::ADD_PINS);
+
+  EditorCommandSet& cmd = EditorCommandSet::instance();
+
+  // Name
+  mCommandToolBarProxy->addLabel(tr("Name:"));
+  std::unique_ptr<QLineEdit> nameLineEdit(new QLineEdit());
+  nameLineEdit->setMaxLength(20);
+  nameLineEdit->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+  nameLineEdit->setText(*state.getName());
+  QPointer<QLineEdit> nameLineEditPtr = nameLineEdit.get();
+  mFsmStateConnections.append(
+      connect(&state, &SymbolEditorState_AddPins::nameChanged, nameLineEditPtr,
+              [nameLineEditPtr](const CircuitIdentifier& name) {
+                if (nameLineEditPtr) nameLineEditPtr->setText(*name);
+              }));
+  mFsmStateConnections.append(connect(
+      nameLineEdit.get(), &QLineEdit::textEdited, &state,
+      [&state](const QString& text) {
+        if (auto name = parseCircuitIdentifier(cleanCircuitIdentifier(text))) {
+          state.setName(*name);
+        }
+      }));
+  mCommandToolBarProxy->addWidget(std::move(nameLineEdit));
+
+  // Length
+  mCommandToolBarProxy->addLabel(tr("Length:"), 10);
+  std::unique_ptr<UnsignedLengthEdit> edtLength(new UnsignedLengthEdit());
+  edtLength->configure(mLengthUnit, LengthEditBase::Steps::pinLength(),
+                       "symbol_editor/add_pins/length");
+  edtLength->setValue(state.getLength());
+  edtLength->addAction(cmd.sizeIncrease.createAction(
+      edtLength.get(), edtLength.get(), &UnsignedLengthEdit::stepUp));
+  edtLength->addAction(cmd.sizeDecrease.createAction(
+      edtLength.get(), edtLength.get(), &UnsignedLengthEdit::stepDown));
+  mFsmStateConnections.append(
+      connect(&state, &SymbolEditorState_AddPins::lengthChanged,
+              edtLength.get(), &UnsignedLengthEdit::setValue));
+  mFsmStateConnections.append(connect(edtLength.get(),
+                                      &UnsignedLengthEdit::valueChanged, &state,
+                                      &SymbolEditorState_AddPins::setLength));
+  mCommandToolBarProxy->addWidget(std::move(edtLength));
+
+  // Mass import
+  std::unique_ptr<QToolButton> toolButtonImport(new QToolButton());
+  toolButtonImport->setIcon(QIcon(":/img/actions/import.png"));
+  toolButtonImport->setText(tr("Mass Import"));
+  toolButtonImport->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+  mFsmStateConnections.append(
+      connect(toolButtonImport.get(), &QToolButton::clicked, &state,
+              &SymbolEditorState_AddPins::processImportPins));
+  mCommandToolBarProxy->addWidget(std::move(toolButtonImport));
+}
+
+void SymbolEditorWidget::fsmToolEnter(
+    SymbolEditorState_Measure& state) noexcept {
+  Q_UNUSED(state);
+  if (mToolsActionGroup) mToolsActionGroup->setCurrentAction(Tool::MEASURE);
 }
 
 /*******************************************************************************
@@ -483,7 +1192,7 @@ bool SymbolEditorWidget::toolChangeRequested(Tool newTool,
     case Tool::SELECT:
       return mFsm->processStartSelecting();
     case Tool::ADD_PINS:
-      return mFsm->processStartAddingSymbolPins();
+      return mFsm->processStartAddingSymbolPins(false);
     case Tool::ADD_NAMES:
       return mFsm->processStartAddingNames();
     case Tool::ADD_VALUES:
@@ -667,7 +1376,8 @@ void SymbolEditorWidget::setGridProperties(const PositiveLength& interval,
     mStatusBar->setLengthUnit(unit);
   }
   if (mFsm) {
-    mFsm->updateAvailableFeatures();  // Re-calculate "snap to grid" feature!
+    // Re-calculate "snap to grid" feature!
+    mFsm->processGridIntervalChanged(interval);
   }
 }
 

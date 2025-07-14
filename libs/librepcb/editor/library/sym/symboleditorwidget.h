@@ -26,6 +26,7 @@
 #include "../../widgets/if_graphicsvieweventhandler.h"
 #include "../cat/categorylisteditorwidget.h"
 #include "../editorwidgetbase.h"
+#include "fsm/symboleditorfsmadapter.h"
 
 #include <librepcb/core/types/lengthunit.h>
 #include <librepcb/core/workspace/theme.h>
@@ -60,6 +61,7 @@ class SymbolEditorWidget;
  * @brief The SymbolEditorWidget class
  */
 class SymbolEditorWidget final : public EditorWidgetBase,
+                                 public SymbolEditorFsmAdapter,
                                  public IF_GraphicsViewEventHandler {
   Q_OBJECT
 
@@ -72,7 +74,8 @@ public:
   ~SymbolEditorWidget() noexcept;
 
   // Getters
-  QSet<Feature> getAvailableFeatures() const noexcept override;
+  QSet<EditorWidgetBase::Feature> getAvailableFeatures()
+      const noexcept override;
 
   // Setters
   void connectEditor(UndoStackActionGroup& undoStackActionGroup,
@@ -80,6 +83,37 @@ public:
                      QToolBar& commandToolBar,
                      StatusBar& statusBar) noexcept override;
   void disconnectEditor() noexcept override;
+
+  // SymbolEditorFsmAdapter
+  GraphicsScene* fsmGetGraphicsScene() noexcept override;
+  SymbolGraphicsItem* fsmGetGraphicsItem() noexcept override;
+  PositiveLength fsmGetGridInterval() const noexcept override;
+  void fsmSetViewCursor(
+      const std::optional<Qt::CursorShape>& shape) noexcept override;
+  void fsmSetViewGrayOut(bool grayOut) noexcept override;
+  void fsmSetViewInfoBoxText(const QString& text) noexcept override;
+  void fsmSetViewRuler(
+      const std::optional<std::pair<Point, Point>>& pos) noexcept override;
+  void fsmSetSceneCursor(const Point& pos, bool cross,
+                         bool circle) noexcept override;
+  QPainterPath fsmCalcPosWithTolerance(
+      const Point& pos, qreal multiplier) const noexcept override;
+  Point fsmMapGlobalPosToScenePos(const QPoint& pos) const noexcept override;
+  void fsmSetStatusBarMessage(const QString& message,
+                              int timeoutMs = -1) noexcept override;
+  void fsmSetFeatures(Features features) noexcept override;
+  void fsmToolLeave() noexcept override;
+  void fsmToolEnter(SymbolEditorState_Select& state) noexcept override;
+  void fsmToolEnter(SymbolEditorState_DrawLine& state) noexcept override;
+  void fsmToolEnter(SymbolEditorState_DrawRect& state) noexcept override;
+  void fsmToolEnter(SymbolEditorState_DrawPolygon& state) noexcept override;
+  void fsmToolEnter(SymbolEditorState_DrawCircle& state) noexcept override;
+  void fsmToolEnter(SymbolEditorState_DrawArc& state) noexcept override;
+  void fsmToolEnter(SymbolEditorState_AddNames& state) noexcept override;
+  void fsmToolEnter(SymbolEditorState_AddValues& state) noexcept override;
+  void fsmToolEnter(SymbolEditorState_DrawText& state) noexcept override;
+  void fsmToolEnter(SymbolEditorState_AddPins& state) noexcept override;
+  void fsmToolEnter(SymbolEditorState_Measure& state) noexcept override;
 
   // Operator Overloadings
   SymbolEditorWidget& operator=(const SymbolEditorWidget& rhs) = delete;
@@ -151,7 +185,9 @@ private:  // Data
   QSet<Uuid> mOriginalSymbolPinUuids;
 
   /// Editor state machine
+  QVector<QMetaObject::Connection> mFsmStateConnections;
   QScopedPointer<SymbolEditorFsm> mFsm;
+  QSet<EditorWidgetBase::Feature> mFeatures;
 };
 
 /*******************************************************************************

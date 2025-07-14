@@ -23,6 +23,7 @@
 #include "symbolclipboarddata.h"
 
 #include "../../graphics/circlegraphicsitem.h"
+#include "../../graphics/graphicslayerlist.h"
 #include "../../graphics/graphicsscene.h"
 #include "../../graphics/polygongraphicsitem.h"
 #include "../../graphics/textgraphicsitem.h"
@@ -64,8 +65,7 @@ SymbolClipboardData::~SymbolClipboardData() noexcept {
  *  General Methods
  ******************************************************************************/
 
-std::unique_ptr<QMimeData> SymbolClipboardData::toMimeData(
-    const GraphicsLayerList& layers) {
+std::unique_ptr<QMimeData> SymbolClipboardData::toMimeData() {
   std::unique_ptr<SExpression> root =
       SExpression::createList("librepcb_clipboard_symbol");
   root->ensureLineBreak();
@@ -84,7 +84,7 @@ std::unique_ptr<QMimeData> SymbolClipboardData::toMimeData(
 
   const QByteArray sexpr = root->toByteArray();
   std::unique_ptr<QMimeData> data(new QMimeData());
-  data->setImageData(generatePixmap(layers));
+  data->setImageData(generatePixmap());
   data->setData(getMimeType(), sexpr);
   // Note: At least on one system the clipboard didn't work if no text was
   // set, so let's also copy the SExpression as text as a workaround. This
@@ -106,25 +106,33 @@ std::unique_ptr<SymbolClipboardData> SymbolClipboardData::fromMimeData(
   }
 }
 
+bool SymbolClipboardData::isValid(const QMimeData* mime) noexcept {
+  return mime && (!mime->data(getMimeType()).isNull());
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
-QPixmap SymbolClipboardData::generatePixmap(
-    const GraphicsLayerList& layers) noexcept {
+QPixmap SymbolClipboardData::generatePixmap() noexcept {
+  // Maybe it's good that we don't pass the workspace here, to get
+  // workspace-independent pixmaps?
+  std::unique_ptr<GraphicsLayerList> layers =
+      GraphicsLayerList::libraryLayers(nullptr);
+
   GraphicsScene scene;
   QVector<std::shared_ptr<QGraphicsItem>> items;
   for (auto ptr : mPins.values()) {
-    items.append(std::make_shared<SymbolPinGraphicsItem>(ptr, layers));
+    items.append(std::make_shared<SymbolPinGraphicsItem>(ptr, *layers));
   }
   for (Polygon& polygon : mPolygons) {
-    items.append(std::make_shared<PolygonGraphicsItem>(polygon, layers));
+    items.append(std::make_shared<PolygonGraphicsItem>(polygon, *layers));
   }
   for (Circle& circle : mCircles) {
-    items.append(std::make_shared<CircleGraphicsItem>(circle, layers));
+    items.append(std::make_shared<CircleGraphicsItem>(circle, *layers));
   }
   for (Text& text : mTexts) {
-    items.append(std::make_shared<TextGraphicsItem>(text, layers));
+    items.append(std::make_shared<TextGraphicsItem>(text, *layers));
   }
   foreach (const auto& item, items) {
     scene.addItem(*item);

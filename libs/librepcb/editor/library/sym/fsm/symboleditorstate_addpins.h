@@ -25,11 +25,9 @@
  ******************************************************************************/
 #include "symboleditorstate.h"
 
-#include <librepcb/core/types/angle.h>
-#include <librepcb/core/types/length.h>
+#include <librepcb/core/library/sym/symbolpin.h>
 
 #include <QtCore>
-#include <QtWidgets>
 
 #include <memory>
 
@@ -37,10 +35,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class Point;
-class SymbolPin;
-
 namespace editor {
 
 class CmdSymbolPinEdit;
@@ -66,8 +60,6 @@ public:
   // General Methods
   bool entry() noexcept override;
   bool exit() noexcept override;
-  QSet<EditorWidgetBase::Feature> getAvailableFeatures()
-      const noexcept override;
 
   // Event Handlers
   bool processGraphicsSceneMouseMoved(
@@ -78,28 +70,37 @@ public:
       const GraphicsSceneMouseEvent& e) noexcept override;
   bool processRotate(const Angle& rotation) noexcept override;
   bool processMirror(Qt::Orientation orientation) noexcept override;
+  bool processImportPins() noexcept override;
+
+  // Connection to UI
+  const CircuitIdentifier& getName() const noexcept {
+    return mCurrentProperties.getName();
+  }
+  void setName(const CircuitIdentifier& name) noexcept;
+  const UnsignedLength& getLength() const noexcept {
+    return mCurrentProperties.getLength();
+  }
+  void setLength(const UnsignedLength& length) noexcept;
 
   // Operator Overloadings
   SymbolEditorState_AddPins& operator=(const SymbolEditorState_AddPins& rhs) =
       delete;
 
+signals:
+  void nameChanged(const CircuitIdentifier& name);
+  void lengthChanged(const UnsignedLength& length);
+
 private:  // Methods
   bool addNextPin(const Point& pos) noexcept;
-  void nameLineEditTextChanged(const QString& text) noexcept;
-  void lengthEditValueChanged(const UnsignedLength& value) noexcept;
-  void execMassImport() noexcept;
-  QString determineNextPinName() const noexcept;
+  CircuitIdentifier determineNextPinName() const noexcept;
   bool hasPin(const QString& name) const noexcept;
 
-private:  // Types / Data
+private:
+  SymbolPin mCurrentProperties;
+
   std::shared_ptr<SymbolPin> mCurrentPin;
   std::shared_ptr<SymbolPinGraphicsItem> mCurrentGraphicsItem;
-  std::unique_ptr<CmdSymbolPinEdit> mEditCmd;
-  QLineEdit* mNameLineEdit;
-
-  // parameter memory
-  Angle mLastRotation;
-  UnsignedLength mLastLength;
+  std::unique_ptr<CmdSymbolPinEdit> mCurrentEditCmd;
 };
 
 /*******************************************************************************

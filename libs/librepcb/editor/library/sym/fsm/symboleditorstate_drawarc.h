@@ -26,7 +26,6 @@
 #include "symboleditorstate_drawpolygonbase.h"
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -55,6 +54,9 @@ public:
   // Operator Overloadings
   SymbolEditorState_DrawArc& operator=(const SymbolEditorState_DrawArc& rhs) =
       delete;
+
+protected:
+  void notifyToolEnter() noexcept override;
 };
 
 /*******************************************************************************
