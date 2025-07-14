@@ -50,9 +50,8 @@ namespace editor {
  ******************************************************************************/
 
 CmdDragSelectedFootprintItems::CmdDragSelectedFootprintItems(
-    const PackageEditorState::Context& context) noexcept
+    FootprintGraphicsItem& item, const PositiveLength& grid) noexcept
   : UndoCommandGroup(tr("Drag Footprint Elements")),
-    mContext(context),
     mPositions(),
     mCenterPos(0, 0),
     mDeltaPos(0, 0),
@@ -62,13 +61,10 @@ CmdDragSelectedFootprintItems::CmdDragSelectedFootprintItems(
     mSnappedToGrid(false),
     mNewPositionsSet(false),
     mHasOffTheGridElements(false) {
-  Q_ASSERT(context.currentFootprint && context.currentGraphicsItem);
-
   int count = 0;
-  PositiveLength grid = mContext.graphicsScene.getGridInterval();
 
   QList<std::shared_ptr<FootprintPadGraphicsItem>> pads =
-      context.currentGraphicsItem->getSelectedPads();
+      item.getSelectedPads();
   foreach (const std::shared_ptr<FootprintPadGraphicsItem>& pad, pads) {
     Q_ASSERT(pad);
     mPadEditCmds.append(new CmdFootprintPadEdit(pad->getObj()));
@@ -81,7 +77,7 @@ CmdDragSelectedFootprintItems::CmdDragSelectedFootprintItems(
   }
 
   QList<std::shared_ptr<CircleGraphicsItem>> circles =
-      context.currentGraphicsItem->getSelectedCircles();
+      item.getSelectedCircles();
   foreach (const std::shared_ptr<CircleGraphicsItem>& circle, circles) {
     Q_ASSERT(circle);
     mCircleEditCmds.append(new CmdCircleEdit(circle->getObj()));
@@ -94,7 +90,7 @@ CmdDragSelectedFootprintItems::CmdDragSelectedFootprintItems(
   }
 
   QList<std::shared_ptr<PolygonGraphicsItem>> polygons =
-      context.currentGraphicsItem->getSelectedPolygons();
+      item.getSelectedPolygons();
   foreach (const std::shared_ptr<PolygonGraphicsItem>& polygon, polygons) {
     Q_ASSERT(polygon);
     mPolygonEditCmds.append(new CmdPolygonEdit(polygon->getObj()));
@@ -108,7 +104,7 @@ CmdDragSelectedFootprintItems::CmdDragSelectedFootprintItems(
   }
 
   QList<std::shared_ptr<StrokeTextGraphicsItem>> texts =
-      context.currentGraphicsItem->getSelectedStrokeTexts();
+      item.getSelectedStrokeTexts();
   foreach (const std::shared_ptr<StrokeTextGraphicsItem>& text, texts) {
     Q_ASSERT(text);
     mTextEditCmds.append(new CmdStrokeTextEdit(text->getObj()));
@@ -120,8 +116,7 @@ CmdDragSelectedFootprintItems::CmdDragSelectedFootprintItems(
     ++count;
   }
 
-  QList<std::shared_ptr<ZoneGraphicsItem>> zones =
-      context.currentGraphicsItem->getSelectedZones();
+  QList<std::shared_ptr<ZoneGraphicsItem>> zones = item.getSelectedZones();
   foreach (const std::shared_ptr<ZoneGraphicsItem>& zone, zones) {
     Q_ASSERT(zone);
     mZoneEditCmds.append(new CmdZoneEdit(zone->getObj()));
@@ -134,8 +129,7 @@ CmdDragSelectedFootprintItems::CmdDragSelectedFootprintItems(
     }
   }
 
-  QList<std::shared_ptr<HoleGraphicsItem>> holes =
-      context.currentGraphicsItem->getSelectedHoles();
+  QList<std::shared_ptr<HoleGraphicsItem>> holes = item.getSelectedHoles();
   foreach (const std::shared_ptr<HoleGraphicsItem>& hole, holes) {
     Q_ASSERT(hole);
     // Note: The const_cast<> is a bit ugly, but it was by far the easiest
@@ -175,8 +169,8 @@ int CmdDragSelectedFootprintItems::getSelectedItemsCount() const noexcept {
  *  General Methods
  ******************************************************************************/
 
-void CmdDragSelectedFootprintItems::snapToGrid() noexcept {
-  PositiveLength grid = mContext.graphicsScene.getGridInterval();
+void CmdDragSelectedFootprintItems::snapToGrid(
+    const PositiveLength& grid) noexcept {
   foreach (CmdFootprintPadEdit* cmd, mPadEditCmds) {
     cmd->snapToGrid(grid, true);
   }

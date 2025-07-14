@@ -26,7 +26,6 @@
 #include "packageeditorstate_drawpolygonbase.h"
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -55,6 +54,9 @@ public:
   // Operator Overloadings
   PackageEditorState_DrawArc& operator=(const PackageEditorState_DrawArc& rhs) =
       delete;
+
+protected:
+  void notifyToolEnter() noexcept override;
 };
 
 /*******************************************************************************

@@ -26,7 +26,6 @@
 #include "packageeditorstate.h"
 
 #include <QtCore>
-#include <QtWidgets>
 
 #include <memory>
 
@@ -62,8 +61,6 @@ public:
   // General Methods
   bool entry() noexcept override;
   bool exit() noexcept override;
-  QSet<EditorWidgetBase::Feature> getAvailableFeatures()
-      const noexcept override;
 
   // Event Handlers
   bool processKeyPressed(const GraphicsSceneKeyEvent& e) noexcept override;
@@ -72,6 +69,7 @@ public:
       const GraphicsSceneMouseEvent& e) noexcept override;
   bool processGraphicsSceneLeftMouseButtonPressed(
       const GraphicsSceneMouseEvent& e) noexcept override;
+  bool processAcceptCommand() noexcept override;
 
   // Operator Overloadings
   PackageEditorState_ReNumberPads& operator=(
@@ -81,7 +79,6 @@ private:  // Methods
   bool start() noexcept;
   void updateCurrentPad(bool force = false) noexcept;
   bool commitCurrentPad() noexcept;
-  void finish() noexcept;
   int findIndexOfPad(const Uuid& uuid) const noexcept;
 
 private:  // Data

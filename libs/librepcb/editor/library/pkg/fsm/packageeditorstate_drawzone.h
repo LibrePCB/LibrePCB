@@ -26,12 +26,8 @@
 #include "packageeditorstate.h"
 
 #include <librepcb/core/geometry/zone.h>
-#include <librepcb/core/types/angle.h>
-#include <librepcb/core/types/length.h>
-#include <librepcb/core/types/point.h>
 
 #include <QtCore>
-#include <QtWidgets>
 
 #include <memory>
 
@@ -65,8 +61,6 @@ public:
   // General Methods
   bool entry() noexcept override;
   bool exit() noexcept override;
-  QSet<EditorWidgetBase::Feature> getAvailableFeatures()
-      const noexcept override;
 
   // Event Handlers
   bool processKeyPressed(const GraphicsSceneKeyEvent& e) noexcept override;
@@ -79,9 +73,26 @@ public:
       const GraphicsSceneMouseEvent& e) noexcept override;
   bool processAbortCommand() noexcept override;
 
+  // Connection to UI
+  Zone::Layers getLayers() const noexcept {
+    return mCurrentProperties.getLayers();
+  }
+  void setLayer(Zone::Layer layer, bool enable) noexcept;
+  Zone::Rules getRules() const noexcept {
+    return mCurrentProperties.getRules();
+  }
+  void setRule(Zone::Rule rule, bool enable) noexcept;
+  const Angle& getAngle() const noexcept { return mLastAngle; }
+  void setAngle(const Angle& angle) noexcept;
+
   // Operator Overloadings
   PackageEditorState_DrawZone& operator=(
       const PackageEditorState_DrawZone& rhs) = delete;
+
+signals:
+  void layersChanged(Zone::Layers layers);
+  void rulesChanged(Zone::Rules rules);
+  void angleChanged(const Angle& angle);
 
 private:  // Methods
   bool start() noexcept;
@@ -91,20 +102,21 @@ private:  // Methods
   void updateOutline() noexcept;
   void updateOverlayText() noexcept;
   void updateStatusBarMessage() noexcept;
-  void angleEditValueChanged(const Angle& value) noexcept;
 
-private:  // Types / Data
+private:
+  Point mLastScenePos;
+  Angle mLastAngle;
+  Point mCursorPos;
   bool mIsUndoCmdActive;
-  std::unique_ptr<CmdZoneEdit> mEditCmd;
+
+  // Current tool settings
+  Zone mCurrentProperties;
+
+  // Information about the current zone to draw. Only valid if
+  // mIsUndoCmdActive == true.
   std::shared_ptr<Zone> mCurrentZone;
   std::shared_ptr<ZoneGraphicsItem> mCurrentGraphicsItem;
-  Point mLastScenePos;
-  Point mCursorPos;
-
-  // Parameter memory
-  Zone::Layers mLastLayers;
-  Zone::Rules mLastRules;
-  Angle mLastAngle;
+  std::unique_ptr<CmdZoneEdit> mCurrentEditCmd;
 };
 
 /*******************************************************************************

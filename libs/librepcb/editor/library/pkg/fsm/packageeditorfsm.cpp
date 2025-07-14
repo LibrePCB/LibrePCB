@@ -22,11 +22,6 @@
  ******************************************************************************/
 #include "packageeditorfsm.h"
 
-#include "../../../graphics/graphicslayerlist.h"
-#include "../../../graphics/graphicsscene.h"
-#include "../../../graphics/primitivetextgraphicsitem.h"
-#include "../../../widgets/graphicsview.h"
-#include "../footprintgraphicsitem.h"
 #include "packageeditorstate_addholes.h"
 #include "packageeditorstate_addnames.h"
 #include "packageeditorstate_addpads.h"
@@ -41,10 +36,6 @@
 #include "packageeditorstate_measure.h"
 #include "packageeditorstate_renumberpads.h"
 #include "packageeditorstate_select.h"
-
-#include <librepcb/core/application.h>
-#include <librepcb/core/library/pkg/footprint.h>
-#include <librepcb/core/library/pkg/package.h>
 
 #include <QtCore>
 
@@ -112,11 +103,6 @@ PackageEditorFsm::PackageEditorFsm(const Context& context) noexcept
   mStates.insert(State::RENUMBER_PADS,
                  new PackageEditorState_ReNumberPads(mContext));
 
-  foreach (PackageEditorState* state, mStates) {
-    connect(state, &PackageEditorState::statusBarMessageChanged, this,
-            &PackageEditorFsm::statusBarMessageChanged);
-  }
-
   enterNextState(State::SELECT);
 }
 
@@ -176,24 +162,14 @@ EditorWidgetBase::Tool PackageEditorFsm::getCurrentTool() const noexcept {
   }
 }
 
-std::shared_ptr<Footprint> PackageEditorFsm::getCurrentFootprint()
-    const noexcept {
+const std::shared_ptr<Footprint>&
+    PackageEditorFsm::getCurrentFootprint() noexcept {
   return mContext.currentFootprint;
 }
 
-/*******************************************************************************
- *  General Methods
- ******************************************************************************/
-
-void PackageEditorFsm::updateAvailableFeatures() noexcept {
-  QSet<EditorWidgetBase::Feature> features;
-  if (PackageEditorState* state = getCurrentState()) {
-    features |= state->getAvailableFeatures();
-  }
-  if (features != mAvailableFeatures) {
-    mAvailableFeatures = features;
-    emit availableFeaturesChanged();
-  }
+const std::shared_ptr<FootprintGraphicsItem>&
+    PackageEditorFsm::getCurrentGraphicsItem() noexcept {
+  return mContext.currentGraphicsItem;
 }
 
 /*******************************************************************************
@@ -201,7 +177,8 @@ void PackageEditorFsm::updateAvailableFeatures() noexcept {
  ******************************************************************************/
 
 bool PackageEditorFsm::processChangeCurrentFootprint(
-    const std::shared_ptr<Footprint>& fpt) noexcept {
+    const std::shared_ptr<Footprint>& fpt,
+    const std::shared_ptr<FootprintGraphicsItem>& item) noexcept {
   if (fpt == mContext.currentFootprint) return false;
 
   // leave current state before changing the footprint because
@@ -211,29 +188,11 @@ bool PackageEditorFsm::processChangeCurrentFootprint(
   }
 
   mContext.currentFootprint = fpt;
+  mContext.currentGraphicsItem = item;
   if (mContext.currentFootprint) {
-    // load graphics items recursively
-    mContext.currentGraphicsItem.reset(new FootprintGraphicsItem(
-        mContext.currentFootprint, mContext.editorContext.layers,
-        Application::getDefaultStrokeFont(), &mContext.package.getPads()));
-    mContext.graphicsScene.addItem(*mContext.currentGraphicsItem);
-    mSelectFootprintGraphicsItem.reset();
-    mContext.graphicsView.setEnabled(true);
-    mContext.graphicsView.zoomAll();
-
     // restore previous state
     return setNextState(previousState);
   } else {
-    mContext.currentGraphicsItem.reset();
-    mSelectFootprintGraphicsItem.reset(new PrimitiveTextGraphicsItem());
-    mSelectFootprintGraphicsItem->setHeight(PositiveLength(Length::fromMm(5)));
-    mSelectFootprintGraphicsItem->setText(tr("Please select a footprint."));
-    mSelectFootprintGraphicsItem->setLayer(
-        mContext.editorContext.layers.get(Theme::Color::sBoardOutlines));
-    mContext.graphicsScene.addItem(*mSelectFootprintGraphicsItem);
-    mContext.graphicsView.setEnabled(false);
-    mContext.graphicsView.zoomAll();
-
     // go to selection tool because other tools may no longer work properly!
     return setNextState(State::SELECT);
   }
@@ -435,6 +394,14 @@ bool PackageEditorFsm::processGenerateCourtyard() noexcept {
   }
 }
 
+bool PackageEditorFsm::processAcceptCommand() noexcept {
+  if (getCurrentState()) {
+    return getCurrentState()->processAcceptCommand();
+  } else {
+    return false;
+  }
+}
+
 bool PackageEditorFsm::processAbortCommand() noexcept {
   if (getCurrentState() && (!getCurrentState()->processAbortCommand())) {
     return setNextState(State::SELECT);
@@ -529,6 +496,16 @@ bool PackageEditorFsm::processStartReNumberPads() noexcept {
   return setNextState(State::RENUMBER_PADS);
 }
 
+bool PackageEditorFsm::processGridIntervalChanged(
+    const PositiveLength& inverval) noexcept {
+  if (PackageEditorState* state = getCurrentState()) {
+    if (state->processGridIntervalChanged(inverval)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
@@ -548,9 +525,7 @@ bool PackageEditorFsm::setNextState(State state) noexcept {
   if (!leaveCurrentState()) {
     return false;
   }
-  const bool success = enterNextState(state);
-  updateAvailableFeatures();
-  return success;
+  return enterNextState(state);
 }
 
 bool PackageEditorFsm::leaveCurrentState() noexcept {
@@ -560,15 +535,12 @@ bool PackageEditorFsm::leaveCurrentState() noexcept {
     }
     disconnect(state, &PackageEditorState::abortRequested, this,
                &PackageEditorFsm::processAbortCommand);
-    disconnect(state, &PackageEditorState::availableFeaturesChanged, this,
-               &PackageEditorFsm::updateAvailableFeatures);
   }
   if (mCurrentState != State::SELECT) {
     // Only memorize states other than SELECT.
     mPreviousState = mCurrentState;
   }
   mCurrentState = State::IDLE;
-  emit toolChanged(getCurrentTool());
   return true;
 }
 
@@ -580,11 +552,8 @@ bool PackageEditorFsm::enterNextState(State state) noexcept {
     }
     connect(nextState, &PackageEditorState::abortRequested, this,
             &PackageEditorFsm::processAbortCommand, Qt::QueuedConnection);
-    connect(nextState, &PackageEditorState::availableFeaturesChanged, this,
-            &PackageEditorFsm::updateAvailableFeatures);
   }
   mCurrentState = state;
-  emit toolChanged(getCurrentTool());
   return true;
 }
 

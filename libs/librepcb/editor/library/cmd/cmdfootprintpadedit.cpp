@@ -122,10 +122,11 @@ void CmdFootprintPadEdit::setSolderPasteConfig(
   mNewProperties.setSolderPasteConfig(config);
 }
 
-void CmdFootprintPadEdit::setCopperClearance(
-    const UnsignedLength& clearance) noexcept {
+void CmdFootprintPadEdit::setCopperClearance(const UnsignedLength& clearance,
+                                             bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewProperties.setCopperClearance(clearance);
+  if (immediate) mPad.setCopperClearance(clearance);
 }
 
 void CmdFootprintPadEdit::setPosition(const Point& pos,

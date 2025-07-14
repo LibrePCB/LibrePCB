@@ -25,8 +25,9 @@
  ******************************************************************************/
 #include "packageeditorstate.h"
 
+#include <librepcb/core/geometry/hole.h>
+
 #include <QtCore>
-#include <QtWidgets>
 
 #include <memory>
 
@@ -34,9 +35,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class Hole;
-
 namespace editor {
 
 class CmdHoleEdit;
@@ -63,8 +61,6 @@ public:
   // General Methods
   bool entry() noexcept override;
   bool exit() noexcept override;
-  QSet<EditorWidgetBase::Feature> getAvailableFeatures()
-      const noexcept override;
 
   // Event Handlers
   bool processGraphicsSceneMouseMoved(
@@ -72,23 +68,30 @@ public:
   bool processGraphicsSceneLeftMouseButtonPressed(
       const GraphicsSceneMouseEvent& e) noexcept override;
 
+  // Connection to UI
+  const PositiveLength& getDiameter() const noexcept {
+    return mCurrentProperties.getDiameter();
+  }
+  void setDiameter(const PositiveLength& diameter) noexcept;
+
   // Operator Overloadings
   PackageEditorState_AddHoles& operator=(
       const PackageEditorState_AddHoles& rhs) = delete;
+
+signals:
+  void diameterChanged(const PositiveLength& diameter);
 
 private:  // Methods
   bool startAddHole(const Point& pos) noexcept;
   bool finishAddHole(const Point& pos) noexcept;
   bool abortAddHole() noexcept;
-  void diameterEditValueChanged(const PositiveLength& value) noexcept;
 
-private:  // Data
-  std::unique_ptr<CmdHoleEdit> mEditCmd;
+private:
+  Hole mCurrentProperties;
+
   std::shared_ptr<Hole> mCurrentHole;
   std::shared_ptr<HoleGraphicsItem> mCurrentGraphicsItem;
-
-  // parameter memory
-  PositiveLength mLastDiameter;
+  std::unique_ptr<CmdHoleEdit> mCurrentEditCmd;
 };
 
 /*******************************************************************************

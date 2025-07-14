@@ -23,16 +23,9 @@
 #include "packageeditorstate_addholes.h"
 
 #include "../../../cmd/cmdholeedit.h"
-#include "../../../editorcommandset.h"
-#include "../../../graphics/graphicslayer.h"
-#include "../../../graphics/graphicsscene.h"
 #include "../../../graphics/holegraphicsitem.h"
-#include "../../../widgets/graphicsview.h"
-#include "../../../widgets/positivelengthedit.h"
 #include "../footprintgraphicsitem.h"
-#include "../packageeditorwidget.h"
 
-#include <librepcb/core/geometry/hole.h>
 #include <librepcb/core/library/pkg/footprint.h>
 
 #include <QtCore>
@@ -50,14 +43,17 @@ namespace editor {
 PackageEditorState_AddHoles::PackageEditorState_AddHoles(
     Context& context) noexcept
   : PackageEditorState(context),
+    mCurrentProperties(Uuid::createRandom(),  // Not relevant
+                       PositiveLength(1000000),  // Commonly used drill diameter
+                       makeNonEmptyPath(Point()),  // Not relevant
+                       MaskConfig::automatic()  // Default
+                       ),
     mCurrentHole(nullptr),
-    mCurrentGraphicsItem(nullptr),
-    mLastDiameter(1000000)  // Commonly used drill diameter
-{
+    mCurrentGraphicsItem(nullptr) {
 }
 
 PackageEditorState_AddHoles::~PackageEditorState_AddHoles() noexcept {
-  Q_ASSERT(!mEditCmd);
+  Q_ASSERT(!mCurrentEditCmd);
 }
 
 /*******************************************************************************
@@ -65,29 +61,14 @@ PackageEditorState_AddHoles::~PackageEditorState_AddHoles() noexcept {
  ******************************************************************************/
 
 bool PackageEditorState_AddHoles::entry() noexcept {
-  // populate command toolbar
-  EditorCommandSet& cmd = EditorCommandSet::instance();
-  mContext.commandToolBar.addLabel(tr("Diameter:"), 10);
-
-  std::unique_ptr<PositiveLengthEdit> edtDiameter(new PositiveLengthEdit());
-  edtDiameter->configure(getLengthUnit(),
-                         LengthEditBase::Steps::drillDiameter(),
-                         "package_editor/add_holes/diameter");
-  edtDiameter->setValue(mLastDiameter);
-  edtDiameter->addAction(cmd.drillIncrease.createAction(
-      edtDiameter.get(), edtDiameter.get(), &PositiveLengthEdit::stepUp));
-  edtDiameter->addAction(cmd.drillDecrease.createAction(
-      edtDiameter.get(), edtDiameter.get(), &PositiveLengthEdit::stepDown));
-  connect(edtDiameter.get(), &PositiveLengthEdit::valueChanged, this,
-          &PackageEditorState_AddHoles::diameterEditValueChanged);
-  mContext.commandToolBar.addWidget(std::move(edtDiameter));
-
-  const Point pos = mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos())
-                        .mappedToGrid(mContext.graphicsScene.getGridInterval());
+  const Point pos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos())
+                        .mappedToGrid(getGridInterval());
   if (!startAddHole(pos)) {
     return false;
   }
-  mContext.graphicsView.setCursor(Qt::CrossCursor);
+
+  mAdapter.fsmToolEnter(*this);
+  mAdapter.fsmSetViewCursor(Qt::CrossCursor);
   return true;
 }
 
@@ -96,18 +77,9 @@ bool PackageEditorState_AddHoles::exit() noexcept {
     return false;
   }
 
-  // cleanup command toolbar
-  mContext.commandToolBar.clear();
-
-  mContext.graphicsView.unsetCursor();
+  mAdapter.fsmSetViewCursor(std::nullopt);
+  mAdapter.fsmToolLeave();
   return true;
-}
-
-QSet<EditorWidgetBase::Feature>
-    PackageEditorState_AddHoles::getAvailableFeatures() const noexcept {
-  return {
-      EditorWidgetBase::Feature::Abort,
-  };
 }
 
 /*******************************************************************************
@@ -118,7 +90,7 @@ bool PackageEditorState_AddHoles::processGraphicsSceneMouseMoved(
     const GraphicsSceneMouseEvent& e) noexcept {
   if (mCurrentHole) {
     const Point pos = e.scenePos.mappedToGrid(getGridInterval());
-    mEditCmd->setPath(makeNonEmptyPath(pos), true);
+    mCurrentEditCmd->setPath(makeNonEmptyPath(pos), true);
     return true;
   } else {
     return false;
@@ -135,43 +107,60 @@ bool PackageEditorState_AddHoles::processGraphicsSceneLeftMouseButtonPressed(
 }
 
 /*******************************************************************************
+ *  Connection to UI
+ ******************************************************************************/
+
+void PackageEditorState_AddHoles::setDiameter(
+    const PositiveLength& diameter) noexcept {
+  if (mCurrentProperties.setDiameter(diameter)) {
+    emit diameterChanged(mCurrentProperties.getDiameter());
+  }
+
+  if (mCurrentEditCmd) {
+    mCurrentEditCmd->setDiameter(mCurrentProperties.getDiameter(), true);
+  }
+}
+
+/*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
 bool PackageEditorState_AddHoles::startAddHole(const Point& pos) noexcept {
+  if (!mContext.currentGraphicsItem) return false;
+
   try {
-    mContext.undoStack.beginCmdGroup(tr("Add hole"));
+    mContext.undoStack.beginCmdGroup(tr("Add Footprint Hole"));
+    mCurrentProperties.setPath(makeNonEmptyPath(pos));
     mCurrentHole =
-        std::make_shared<Hole>(Uuid::createRandom(), mLastDiameter,
-                               makeNonEmptyPath(pos), MaskConfig::automatic());
+        std::make_shared<Hole>(Uuid::createRandom(), mCurrentProperties);
     mContext.undoStack.appendToCmdGroup(
         new CmdHoleInsert(mContext.currentFootprint->getHoles(), mCurrentHole));
-    mEditCmd.reset(new CmdHoleEdit(*mCurrentHole));
+    mCurrentEditCmd.reset(new CmdHoleEdit(*mCurrentHole));
     mCurrentGraphicsItem =
         mContext.currentGraphicsItem->getGraphicsItem(mCurrentHole);
     Q_ASSERT(mCurrentGraphicsItem);
     mCurrentGraphicsItem->setSelected(true);
     return true;
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     mCurrentGraphicsItem.reset();
     mCurrentHole.reset();
-    mEditCmd.reset();
+    mCurrentEditCmd.reset();
     return false;
   }
 }
 
 bool PackageEditorState_AddHoles::finishAddHole(const Point& pos) noexcept {
   try {
-    mEditCmd->setPath(makeNonEmptyPath(pos), true);
+    mCurrentEditCmd->setPath(makeNonEmptyPath(pos), true);
     mCurrentGraphicsItem->setSelected(false);
     mCurrentGraphicsItem.reset();
     mCurrentHole.reset();
-    mContext.undoStack.appendToCmdGroup(mEditCmd.release());
+    mContext.undoStack.appendToCmdGroup(mCurrentEditCmd.release());
     mContext.undoStack.commitCmdGroup();
     return true;
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     return false;
   }
 }
@@ -181,20 +170,12 @@ bool PackageEditorState_AddHoles::abortAddHole() noexcept {
     mCurrentGraphicsItem->setSelected(false);
     mCurrentGraphicsItem.reset();
     mCurrentHole.reset();
-    mEditCmd.reset();
+    mCurrentEditCmd.reset();
     mContext.undoStack.abortCmdGroup();
     return true;
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     return false;
-  }
-}
-
-void PackageEditorState_AddHoles::diameterEditValueChanged(
-    const PositiveLength& value) noexcept {
-  mLastDiameter = value;
-  if (mEditCmd) {
-    mEditCmd->setDiameter(mLastDiameter, true);
   }
 }
 

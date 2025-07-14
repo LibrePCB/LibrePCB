@@ -28,7 +28,6 @@
 #include <librepcb/core/library/pkg/footprintpad.h>
 
 #include <QtCore>
-#include <QtWidgets>
 
 #include <memory>
 
@@ -36,14 +35,10 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class PackagePad;
-
 namespace editor {
 
 class CmdFootprintPadEdit;
 class FootprintPadGraphicsItem;
-class PackagePadComboBox;
 
 /*******************************************************************************
  *  Class PackageEditorState_AddPads
@@ -69,8 +64,6 @@ public:
   // General Methods
   virtual bool entry() noexcept override;
   virtual bool exit() noexcept override;
-  QSet<EditorWidgetBase::Feature> getAvailableFeatures()
-      const noexcept override;
 
   // Event Handlers
   virtual bool processGraphicsSceneMouseMoved(
@@ -81,42 +74,88 @@ public:
       const GraphicsSceneMouseEvent& e) noexcept override;
   virtual bool processRotate(const Angle& rotation) noexcept override;
 
+  // Connection to UI
+  PadType getType() const noexcept { return mPadType; }
+  const std::optional<Uuid>& getPackagePad() const noexcept {
+    return mCurrentProperties.getPackagePadUuid();
+  }
+  void setPackagePad(const std::optional<Uuid>& pad) noexcept;
+  FootprintPad::ComponentSide getComponentSide() const noexcept {
+    return mCurrentProperties.getComponentSide();
+  }
+  void setComponentSide(FootprintPad::ComponentSide side) noexcept;
+  FootprintPad::Shape getShape() const noexcept {
+    return mCurrentProperties.getShape();
+  }
+  void setShape(FootprintPad::Shape shape) noexcept;
+  const PositiveLength& getWidth() const noexcept {
+    return mCurrentProperties.getWidth();
+  }
+  void setWidth(const PositiveLength& width) noexcept;
+  const PositiveLength& getHeight() const noexcept {
+    return mCurrentProperties.getHeight();
+  }
+  void setHeight(const PositiveLength& height) noexcept;
+  const UnsignedLimitedRatio& getRadius() const noexcept {
+    return mCurrentProperties.getRadius();
+  }
+  void setRadius(const UnsignedLimitedRatio& radius) noexcept;
+  std::optional<PositiveLength> getDrillDiameter() const noexcept {
+    if (std::shared_ptr<const PadHole> hole =
+            mCurrentProperties.getHoles().value(0)) {
+      return hole->getDiameter();
+    } else {
+      return std::nullopt;
+    }
+  }
+  void setDrillDiameter(const PositiveLength& diameter) noexcept;
+  const UnsignedLength& getCopperClearance() const noexcept {
+    return mCurrentProperties.getCopperClearance();
+  }
+  void setCopperClearance(const UnsignedLength& clearance) noexcept;
+  const MaskConfig& getStopMaskConfig() const noexcept {
+    return mCurrentProperties.getStopMaskConfig();
+  }
+  void setStopMaskConfig(const MaskConfig& cfg) noexcept;
+  FootprintPad::Function getFunction() const noexcept {
+    return mCurrentProperties.getFunction();
+  }
+  bool getFunctionIsFiducial() const noexcept {
+    return mCurrentProperties.getFunctionIsFiducial();
+  }
+  void setFunction(FootprintPad::Function function) noexcept;
+
   // Operator Overloadings
   PackageEditorState_AddPads& operator=(const PackageEditorState_AddPads& rhs) =
       delete;
+
+signals:
+  void packagePadChanged(const std::optional<Uuid>& pad);
+  void componentSideChanged(FootprintPad::ComponentSide side);
+  void shapeChanged(FootprintPad::Shape shape);
+  void widthChanged(const PositiveLength& width);
+  void heightChanged(const PositiveLength& height);
+  void radiusChanged(const UnsignedLimitedRatio& radius);
+  void drillDiameterChanged(const PositiveLength& diameter);
+  void copperClearanceChanged(const UnsignedLength& clearance);
+  void stopMaskConfigChanged(const MaskConfig& cfg);
+  void functionChanged(FootprintPad::Function function);
 
 private:  // Methods
   bool startAddPad(const Point& pos) noexcept;
   bool finishAddPad(const Point& pos) noexcept;
   bool abortAddPad() noexcept;
-  void selectNextFreePadInComboBox() noexcept;
-  void packagePadComboBoxCurrentPadChanged(std::optional<Uuid> pad) noexcept;
-  void boardSideSelectorCurrentSideChanged(
-      FootprintPad::ComponentSide side) noexcept;
-  void shapeSelectorCurrentShapeChanged(FootprintPad::Shape shape,
-                                        const UnsignedLimitedRatio& radius,
-                                        bool customRadius) noexcept;
-  void widthEditValueChanged(const PositiveLength& value) noexcept;
-  void heightEditValueChanged(const PositiveLength& value) noexcept;
-  void drillDiameterEditValueChanged(const PositiveLength& value) noexcept;
-  void fiducialClearanceEditValueChanged(const UnsignedLength& value) noexcept;
-  void radiusEditValueChanged(const UnsignedLimitedRatio& value) noexcept;
-  void pressFitCheckedChanged(bool value) noexcept;
+  void selectNextFreePackagePad() noexcept;
   void applyRecommendedRoundedRectRadius() noexcept;
 
-signals:
-  void requestRadiusInputEnabled(bool enabled);
-  void requestRadius(const UnsignedLimitedRatio& radius);
-
 private:  // Types / Data
-  PadType mPadType;
-  std::unique_ptr<CmdFootprintPadEdit> mEditCmd;
+  const PadType mPadType;
+
+  FootprintPad mCurrentProperties;
+
   std::shared_ptr<FootprintPad> mCurrentPad;
   std::shared_ptr<FootprintPadGraphicsItem> mCurrentGraphicsItem;
-  PackagePadComboBox* mPackagePadComboBox;
-
-  // parameter memory
-  FootprintPad mLastPad;
+  std::unique_ptr<CmdFootprintPadEdit> mCurrentEditCmd;
 };
 
 /*******************************************************************************

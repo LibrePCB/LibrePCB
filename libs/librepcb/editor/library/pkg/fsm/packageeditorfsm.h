@@ -42,11 +42,8 @@ class Package;
 namespace editor {
 
 class FootprintGraphicsItem;
-class GraphicsScene;
-class GraphicsView;
+class PackageEditorFsmAdapter;
 class PackageEditorState;
-class PackageEditorWidget;
-class PrimitiveTextGraphicsItem;
 class UndoStack;
 struct GraphicsSceneKeyEvent;
 struct GraphicsSceneMouseEvent;
@@ -90,16 +87,16 @@ private:  // Types
 
 public:  // Types
   struct Context {
-    EditorWidgetBase::Context& editorContext;
-    PackageEditorWidget& editorWidget;
-    UndoStack& undoStack;
-    GraphicsScene& graphicsScene;
-    GraphicsView& graphicsView;
-    LengthUnit& lengthUnit;
     Package& package;
+    UndoStack& undoStack;
+    const bool readOnly;
+    LengthUnit& lengthUnit;
+    const GraphicsLayerList& layers;
+    PackageEditorFsmAdapter& adapter;
+
+    // Set by PackageEditorFsm::processChangeCurrentFootprint()
     std::shared_ptr<Footprint> currentFootprint;
     std::shared_ptr<FootprintGraphicsItem> currentGraphicsItem;
-    ToolBarProxy& commandToolBar;
   };
 
 public:
@@ -111,17 +108,14 @@ public:
 
   // Getters
   EditorWidgetBase::Tool getCurrentTool() const noexcept;
-  std::shared_ptr<Footprint> getCurrentFootprint() const noexcept;
-  const QSet<EditorWidgetBase::Feature>& getAvailableFeatures() const noexcept {
-    return mAvailableFeatures;
-  }
-
-  // General Methods
-  void updateAvailableFeatures() noexcept;
+  const std::shared_ptr<Footprint>& getCurrentFootprint() noexcept;
+  const std::shared_ptr<FootprintGraphicsItem>&
+      getCurrentGraphicsItem() noexcept;
 
   // Event Handlers
   bool processChangeCurrentFootprint(
-      const std::shared_ptr<Footprint>& fpt) noexcept;
+      const std::shared_ptr<Footprint>& fpt,
+      const std::shared_ptr<FootprintGraphicsItem>& item) noexcept;
   bool processKeyPressed(const GraphicsSceneKeyEvent& e) noexcept;
   bool processKeyReleased(const GraphicsSceneKeyEvent& e) noexcept;
   bool processGraphicsSceneMouseMoved(
@@ -148,6 +142,7 @@ public:
   bool processEditProperties() noexcept;
   bool processGenerateOutline() noexcept;
   bool processGenerateCourtyard() noexcept;
+  bool processAcceptCommand() noexcept;
   bool processAbortCommand() noexcept;
   bool processStartSelecting() noexcept;
   bool processStartAddingFootprintThtPads() noexcept;
@@ -166,14 +161,10 @@ public:
   bool processStartDxfImport() noexcept;
   bool processStartMeasure() noexcept;
   bool processStartReNumberPads() noexcept;
+  bool processGridIntervalChanged(const PositiveLength& inverval) noexcept;
 
   // Operator Overloadings
   PackageEditorFsm& operator=(const PackageEditorFsm& rhs) = delete;
-
-signals:
-  void toolChanged(EditorWidgetBase::Tool newTool);
-  void availableFeaturesChanged();
-  void statusBarMessageChanged(const QString& message, int timeoutMs = -1);
 
 private:  // Methods
   PackageEditorState* getCurrentState() const noexcept;
@@ -187,8 +178,6 @@ private:  // Data
   QMap<State, PackageEditorState*> mStates;
   State mCurrentState;
   State mPreviousState;
-  QScopedPointer<PrimitiveTextGraphicsItem> mSelectFootprintGraphicsItem;
-  QSet<EditorWidgetBase::Feature> mAvailableFeatures;
 };
 
 /*******************************************************************************

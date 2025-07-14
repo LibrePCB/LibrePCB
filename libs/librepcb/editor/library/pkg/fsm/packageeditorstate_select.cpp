@@ -36,15 +36,12 @@
 #include "../../../dialogs/zonepropertiesdialog.h"
 #include "../../../editorcommandset.h"
 #include "../../../graphics/circlegraphicsitem.h"
-#include "../../../graphics/graphicslayerlist.h"
-#include "../../../graphics/graphicsscene.h"
 #include "../../../graphics/holegraphicsitem.h"
 #include "../../../graphics/polygongraphicsitem.h"
 #include "../../../graphics/stroketextgraphicsitem.h"
 #include "../../../graphics/zonegraphicsitem.h"
 #include "../../../undostack.h"
 #include "../../../utils/menubuilder.h"
-#include "../../../widgets/graphicsview.h"
 #include "../../../widgets/positivelengthedit.h"
 #include "../../cmd/cmddragselectedfootprintitems.h"
 #include "../../cmd/cmdfootprintpadedit.h"
@@ -54,7 +51,6 @@
 #include "../footprintgraphicsitem.h"
 #include "../footprintpadgraphicsitem.h"
 #include "../footprintpadpropertiesdialog.h"
-#include "../packageeditorwidget.h"
 
 #include <librepcb/core/import/dxfreader.h>
 #include <librepcb/core/library/pkg/package.h>
@@ -92,49 +88,41 @@ PackageEditorState_Select::~PackageEditorState_Select() noexcept {
  *  General Methods
  ******************************************************************************/
 
-bool PackageEditorState_Select::exit() noexcept {
-  processAbortCommand();
+bool PackageEditorState_Select::entry() noexcept {
+  mAdapter.fsmToolEnter(*this);
 
-  // Avoid propagating the selection to other, non-selectable tools.
-  clearSelectionRect(true);
+  mUpdateAvailableFeaturesTimer.reset(new QTimer());
+  mUpdateAvailableFeaturesTimer->setSingleShot(true);
+  mUpdateAvailableFeaturesTimer->setInterval(50);
+  connect(mUpdateAvailableFeaturesTimer.get(), &QTimer::timeout, this,
+          &PackageEditorState_Select::updateAvailableFeatures);
+  scheduleUpdateAvailableFeatures();
+
+  mConnections.append(
+      connect(&mContext.undoStack, &UndoStack::stateModified, this,
+              &PackageEditorState_Select::scheduleUpdateAvailableFeatures));
+  mConnections.append(
+      connect(qApp->clipboard(), &QClipboard::dataChanged, this,
+              &PackageEditorState_Select::scheduleUpdateAvailableFeatures));
 
   return true;
 }
 
-QSet<EditorWidgetBase::Feature>
-    PackageEditorState_Select::getAvailableFeatures() const noexcept {
-  QSet<EditorWidgetBase::Feature> features;
-  // The abort command is always enabled to clear the selection.
-  features |= EditorWidgetBase::Feature::Abort;
-  if (mState != SubState::PASTING) {
-    features |= EditorWidgetBase::Feature::SelectGraphics;
-    if (!mContext.editorContext.readOnly) {
-      features |= EditorWidgetBase::Feature::ImportGraphics;
-      features |= EditorWidgetBase::Feature::Paste;
-    }
+bool PackageEditorState_Select::exit() noexcept {
+  processAbortCommand();
+
+  mUpdateAvailableFeaturesTimer.reset();
+
+  // Avoid propagating the selection to other, non-selectable tools.
+  clearSelectionRect(true);
+
+  while (!mConnections.isEmpty()) {
+    disconnect(mConnections.takeLast());
   }
-  if (mContext.currentGraphicsItem) {
-    CmdDragSelectedFootprintItems cmd(mContext);
-    if (cmd.getSelectedItemsCount() > 0) {
-      features |= EditorWidgetBase::Feature::Copy;
-      features |= EditorWidgetBase::Feature::Properties;
-      if (!mContext.editorContext.readOnly) {
-        features |= EditorWidgetBase::Feature::Cut;
-        features |= EditorWidgetBase::Feature::Remove;
-        features |= EditorWidgetBase::Feature::Move;
-        features |= EditorWidgetBase::Feature::Rotate;
-        features |= EditorWidgetBase::Feature::Mirror;
-        features |= EditorWidgetBase::Feature::Flip;
-        if (!cmd.getPositions().isEmpty()) {
-          features |= EditorWidgetBase::Feature::MoveAlign;
-        }
-        if (cmd.hasOffTheGridElements()) {
-          features |= EditorWidgetBase::Feature::SnapToGrid;
-        }
-      }
-    }
-  }
-  return features;
+
+  mAdapter.fsmSetFeatures(PackageEditorFsmAdapter::Features());
+  mAdapter.fsmToolLeave();
+  return true;
 }
 
 /*******************************************************************************
@@ -143,20 +131,22 @@ QSet<EditorWidgetBase::Feature>
 
 bool PackageEditorState_Select::processGraphicsSceneMouseMoved(
     const GraphicsSceneMouseEvent& e) noexcept {
+  if (!mContext.currentGraphicsItem) return false;
+
   Point currentPos = e.scenePos;
 
   switch (mState) {
     case SubState::SELECTING: {
       setSelectionRect(mStartPos, currentPos);
-      emit availableFeaturesChanged();  // Selection might have changed.
+      scheduleUpdateAvailableFeatures();  // Selection might have changed.
       return true;
     }
     case SubState::MOVING:
     case SubState::PASTING: {
       if (!mCmdDragSelectedItems) {
-        mCmdDragSelectedItems.reset(
-            new CmdDragSelectedFootprintItems(mContext));
-        emit availableFeaturesChanged();
+        mCmdDragSelectedItems.reset(new CmdDragSelectedFootprintItems(
+            *mContext.currentGraphicsItem, getGridInterval()));
+        scheduleUpdateAvailableFeatures();
       }
       Point delta = (currentPos - mStartPos).mappedToGrid(getGridInterval());
       mCmdDragSelectedItems->setDeltaToStartPos(delta);
@@ -168,7 +158,7 @@ bool PackageEditorState_Select::processGraphicsSceneMouseMoved(
       }
       if (!mCmdPolygonEdit) {
         mCmdPolygonEdit.reset(new CmdPolygonEdit(*mSelectedPolygon));
-        emit availableFeaturesChanged();
+        scheduleUpdateAvailableFeatures();
       }
       QVector<Vertex> vertices = mSelectedPolygon->getPath().getVertices();
       foreach (int i, mSelectedPolygonVertices) {
@@ -185,7 +175,7 @@ bool PackageEditorState_Select::processGraphicsSceneMouseMoved(
       }
       if (!mCmdZoneEdit) {
         mCmdZoneEdit.reset(new CmdZoneEdit(*mSelectedZone));
-        emit availableFeaturesChanged();
+        scheduleUpdateAvailableFeatures();
       }
       QVector<Vertex> vertices = mSelectedZone->getOutline().getVertices();
       foreach (int i, mSelectedZoneVertices) {
@@ -211,11 +201,10 @@ bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
       // get items under cursor
       QList<std::shared_ptr<QGraphicsItem>> items =
           findItemsAtPosition(mStartPos);
-      if (findPolygonVerticesAtPosition(mStartPos) &&
-          (!mContext.editorContext.readOnly)) {
+      if (findPolygonVerticesAtPosition(mStartPos) && (!mContext.readOnly)) {
         setState(SubState::MOVING_POLYGON_VERTEX);
       } else if (findZoneVerticesAtPosition(mStartPos) &&
-                 (!mContext.editorContext.readOnly)) {
+                 (!mContext.readOnly)) {
         setState(SubState::MOVING_ZONE_VERTEX);
       } else if (items.isEmpty()) {
         // start selecting
@@ -272,10 +261,10 @@ bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
             items.first()->setSelected(true);
           }
         }
-        emit availableFeaturesChanged();  // Selection might have changed.
+        scheduleUpdateAvailableFeatures();  // Selection might have changed.
 
         // Start moving, if not read only.
-        if (!mContext.editorContext.readOnly) {
+        if (!mContext.readOnly) {
           Q_ASSERT(!mCmdDragSelectedItems);
           setState(SubState::MOVING);
         }
@@ -290,7 +279,7 @@ bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
         setState(SubState::IDLE);
         clearSelectionRect(true);
       } catch (const Exception& e) {
-        QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+        QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
       }
       return true;
     }
@@ -314,8 +303,7 @@ bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
         try {
           mContext.undoStack.execCmd(mCmdDragSelectedItems.release());
         } catch (const Exception& e) {
-          QMessageBox::critical(&mContext.editorWidget, tr("Error"),
-                                e.getMsg());
+          QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
         }
       }
       setState(SubState::IDLE);
@@ -326,8 +314,7 @@ bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
         try {
           mContext.undoStack.execCmd(mCmdPolygonEdit.release());
         } catch (const Exception& e) {
-          QMessageBox::critical(&mContext.editorWidget, tr("Error"),
-                                e.getMsg());
+          QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
         }
       }
       setState(SubState::IDLE);
@@ -338,8 +325,7 @@ bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
         try {
           mContext.undoStack.execCmd(mCmdZoneEdit.release());
         } catch (const Exception& e) {
-          QMessageBox::critical(&mContext.editorWidget, tr("Error"),
-                                e.getMsg());
+          QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
         }
       }
       setState(SubState::IDLE);
@@ -384,18 +370,18 @@ bool PackageEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
 }
 
 bool PackageEditorState_Select::processSelectAll() noexcept {
+  GraphicsScene* scene = getGraphicsScene();
+  if ((!scene) || (!mContext.currentGraphicsItem)) return false;
+
   switch (mState) {
     case SubState::IDLE: {
-      if (auto item = mContext.currentGraphicsItem) {
-        // Set a selection rect slightly larger than the total items bounding
-        // rect to get all items selected.
-        auto bounds = mContext.graphicsScene.itemsBoundingRect();
-        bounds.adjust(-100, -100, 100, 100);
-        item->setSelectionRect(bounds);
-        emit availableFeaturesChanged();  // Selection might have changed.
-        return true;
-      }
-      return false;
+      // Set a selection rect slightly larger than the total items bounding
+      // rect to get all items selected.
+      auto bounds = scene->itemsBoundingRect();
+      bounds.adjust(-100, -100, 100, 100);
+      mContext.currentGraphicsItem->setSelectionRect(bounds);
+      scheduleUpdateAvailableFeatures();  // Selection might have changed.
+      return true;
     }
     default: {
       return false;
@@ -448,7 +434,7 @@ bool PackageEditorState_Select::processPaste() noexcept {
           }
         }
       } catch (const Exception& e) {
-        QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+        QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
         processAbortCommand();
         return false;
       }
@@ -462,20 +448,19 @@ bool PackageEditorState_Select::processPaste() noexcept {
 }
 
 bool PackageEditorState_Select::processMove(const Point& delta) noexcept {
-  if ((!mContext.currentFootprint) || (!mContext.currentGraphicsItem)) {
-    return false;
-  }
+  if (!mContext.currentGraphicsItem) return false;
 
   switch (mState) {
     case SubState::IDLE: {
       try {
         std::unique_ptr<CmdDragSelectedFootprintItems> cmd(
-            new CmdDragSelectedFootprintItems(mContext));
+            new CmdDragSelectedFootprintItems(*mContext.currentGraphicsItem,
+                                              getGridInterval()));
         cmd->translate(delta);
         mContext.undoStack.execCmd(cmd.release());
         return true;
       } catch (const Exception& e) {
-        QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+        QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
       }
     }
     default:
@@ -624,8 +609,7 @@ bool PackageEditorState_Select::processImportDxf() noexcept {
     // Ask for file path and import options.
     DxfImportDialog dialog(getAllowedCircleAndPolygonLayers(),
                            Layer::topDocumentation(), true, getLengthUnit(),
-                           "package_editor/dxf_import_dialog",
-                           &mContext.editorWidget);
+                           "package_editor/dxf_import_dialog", parentWidget());
     FilePath fp = dialog.chooseFile();  // Opens the file chooser dialog.
     if ((!fp.isValid()) || (dialog.exec() != QDialog::Accepted)) {
       return false;  // Aborted.
@@ -633,9 +617,9 @@ bool PackageEditorState_Select::processImportDxf() noexcept {
 
     // This operation can take some time, use wait cursor to provide
     // immediate UI feedback.
-    mContext.editorWidget.setCursor(Qt::WaitCursor);
+    QGuiApplication::setOverrideCursor(Qt::WaitCursor);
     auto cursorScopeGuard =
-        scopeGuard([this]() { mContext.editorWidget.unsetCursor(); });
+        scopeGuard([]() { QGuiApplication::restoreOverrideCursor(); });
 
     // Read DXF file.
     DxfReader import;
@@ -676,22 +660,11 @@ bool PackageEditorState_Select::processImportDxf() noexcept {
       DxfImportDialog::throwNoObjectsImportedError();  // will throw
     }
 
-    // Sanity check that the chosen layer is really visible, but this should
-    // always be the case anyway.
-    std::shared_ptr<const GraphicsLayer> polygonLayer =
-        mContext.editorContext.layers.get(dialog.getLayer());
-    std::shared_ptr<const GraphicsLayer> holeLayer =
-        mContext.editorContext.layers.get(Theme::Color::sBoardHoles);
-    if ((!polygonLayer) || (!polygonLayer->isVisible()) || (!holeLayer) ||
-        (!holeLayer->isVisible())) {
-      throw LogicError(__FILE__, __LINE__, "Layer is not visible!");  // no tr()
-    }
-
     // Start the paste tool.
     return startPaste(std::move(data),
                       dialog.getPlacementPosition());  // can throw
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     processAbortCommand();
     return false;
   }
@@ -721,7 +694,7 @@ bool PackageEditorState_Select::processAbortCommand() noexcept {
         setState(SubState::IDLE);
         return true;
       } catch (const Exception& e) {
-        QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+        QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
         return false;
       }
     }
@@ -730,6 +703,13 @@ bool PackageEditorState_Select::processAbortCommand() noexcept {
       return true;
     }
   }
+}
+
+bool PackageEditorState_Select::processGridIntervalChanged(
+    const PositiveLength& inverval) noexcept {
+  Q_UNUSED(inverval);
+  scheduleUpdateAvailableFeatures();
+  return true;
 }
 
 /*******************************************************************************
@@ -762,17 +742,17 @@ bool PackageEditorState_Select::openContextMenuAtPos(
   }
   Q_ASSERT(selectedItem);
   Q_ASSERT(selectedItem->isSelected());
-  emit availableFeaturesChanged();  // Selection might have changed.
+  const PackageEditorFsmAdapter::Features features =
+      updateAvailableFeatures();  // Selection might have changed.
 
   // Build the context menu.
   QMenu menu;
   MenuBuilder mb(&menu);
   const EditorCommandSet& cmd = EditorCommandSet::instance();
-  const QSet<EditorWidgetBase::Feature> features = getAvailableFeatures();
   QAction* aProperties = cmd.properties.createAction(
       &menu, this, [this]() { processEditProperties(); });
   aProperties->setEnabled(
-      features.contains(EditorWidgetBase::Feature::Properties));
+      features.testFlag(PackageEditorFsmAdapter::Feature::Properties));
   mb.addAction(aProperties, MenuBuilder::Flag::DefaultAction);
   mb.addSeparator();
 
@@ -789,8 +769,7 @@ bool PackageEditorState_Select::openContextMenuAtPos(
               });
           int remainingVertices =
               polygon->getPath().getVertices().count() - vertices.count();
-          aRemove->setEnabled((remainingVertices >= 2) &&
-                              (!mContext.editorContext.readOnly));
+          aRemove->setEnabled((remainingVertices >= 2) && (!mContext.readOnly));
           mb.addAction(aRemove);
         }
 
@@ -800,7 +779,7 @@ bool PackageEditorState_Select::openContextMenuAtPos(
               cmd.vertexAdd.createAction(&menu, this, [=, this]() {
                 startAddingPolygonVertex(polygon, lineIndex, pos);
               });
-          aAddVertex->setEnabled(!mContext.editorContext.readOnly);
+          aAddVertex->setEnabled(!mContext.readOnly);
           mb.addAction(aAddVertex);
         }
 
@@ -823,8 +802,7 @@ bool PackageEditorState_Select::openContextMenuAtPos(
               [this, zone, vertices]() { removeZoneVertices(zone, vertices); });
           int remainingVertices =
               zone->getOutline().getVertices().count() - vertices.count();
-          aRemove->setEnabled((remainingVertices >= 2) &&
-                              (!mContext.editorContext.readOnly));
+          aRemove->setEnabled((remainingVertices >= 2) && (!mContext.readOnly));
           mb.addAction(aRemove);
         }
 
@@ -833,7 +811,7 @@ bool PackageEditorState_Select::openContextMenuAtPos(
           QAction* aAddVertex = cmd.vertexAdd.createAction(
               &menu, this,
               [=, this]() { startAddingZoneVertex(zone, lineIndex, pos); });
-          aAddVertex->setEnabled(!mContext.editorContext.readOnly);
+          aAddVertex->setEnabled(!mContext.readOnly);
           mb.addAction(aAddVertex);
         }
 
@@ -848,11 +826,11 @@ bool PackageEditorState_Select::openContextMenuAtPos(
     copySelectedItemsToClipboard();
     removeSelectedItems();
   });
-  aCut->setEnabled(features.contains(EditorWidgetBase::Feature::Cut));
+  aCut->setEnabled(features.testFlag(PackageEditorFsmAdapter::Feature::Cut));
   mb.addAction(aCut);
   QAction* aCopy = cmd.clipboardCopy.createAction(
       &menu, this, [this]() { copySelectedItemsToClipboard(); });
-  aCopy->setEnabled(features.contains(EditorWidgetBase::Feature::Copy));
+  aCopy->setEnabled(features.testFlag(PackageEditorFsmAdapter::Feature::Copy));
   mb.addAction(aCopy);
 
   // If exactly one object is in the clipboard and objects of the same type are
@@ -869,7 +847,8 @@ bool PackageEditorState_Select::openContextMenuAtPos(
       aPaste->setText(tr("Paste Geometry"));
       aPaste->setToolTip(
           tr("Apply the same geometry as the object in the clipboard"));
-      aPaste->setEnabled(features.contains(EditorWidgetBase::Feature::Paste));
+      aPaste->setEnabled(
+          features.testFlag(PackageEditorFsmAdapter::Feature::Paste));
       mb.addAction(aPaste);
     }
   } catch (const Exception& e) {
@@ -878,46 +857,50 @@ bool PackageEditorState_Select::openContextMenuAtPos(
 
   QAction* aRemove =
       cmd.remove.createAction(&menu, this, [this]() { removeSelectedItems(); });
-  aRemove->setEnabled(features.contains(EditorWidgetBase::Feature::Remove));
+  aRemove->setEnabled(
+      features.testFlag(PackageEditorFsmAdapter::Feature::Remove));
   mb.addAction(aRemove);
   mb.addSeparator();
   QAction* aRotateCcw = cmd.rotateCcw.createAction(
       &menu, this, [this]() { rotateSelectedItems(Angle::deg90()); });
-  aRotateCcw->setEnabled(features.contains(EditorWidgetBase::Feature::Rotate));
+  aRotateCcw->setEnabled(
+      features.testFlag(PackageEditorFsmAdapter::Feature::Rotate));
   mb.addAction(aRotateCcw);
   QAction* aRotateCw = cmd.rotateCw.createAction(
       &menu, this, [this]() { rotateSelectedItems(-Angle::deg90()); });
-  aRotateCw->setEnabled(features.contains(EditorWidgetBase::Feature::Rotate));
+  aRotateCw->setEnabled(
+      features.testFlag(PackageEditorFsmAdapter::Feature::Rotate));
   mb.addAction(aRotateCw);
   QAction* aMirrorHorizontal = cmd.mirrorHorizontal.createAction(
       &menu, this, [this]() { mirrorSelectedItems(Qt::Horizontal, false); });
   aMirrorHorizontal->setEnabled(
-      features.contains(EditorWidgetBase::Feature::Mirror));
+      features.testFlag(PackageEditorFsmAdapter::Feature::Mirror));
   mb.addAction(aMirrorHorizontal);
   QAction* aMirrorVertical = cmd.mirrorVertical.createAction(
       &menu, this, [this]() { mirrorSelectedItems(Qt::Vertical, false); });
   aMirrorVertical->setEnabled(
-      features.contains(EditorWidgetBase::Feature::Mirror));
+      features.testFlag(PackageEditorFsmAdapter::Feature::Mirror));
   mb.addAction(aMirrorVertical);
   QAction* aFlipHorizontal = cmd.flipHorizontal.createAction(
       &menu, this, [this]() { mirrorSelectedItems(Qt::Horizontal, true); });
   aFlipHorizontal->setEnabled(
-      features.contains(EditorWidgetBase::Feature::Flip));
+      features.testFlag(PackageEditorFsmAdapter::Feature::Flip));
   mb.addAction(aFlipHorizontal);
   QAction* aFlipVertical = cmd.flipVertical.createAction(
       &menu, this, [this]() { mirrorSelectedItems(Qt::Vertical, true); });
-  aFlipVertical->setEnabled(features.contains(EditorWidgetBase::Feature::Flip));
+  aFlipVertical->setEnabled(
+      features.testFlag(PackageEditorFsmAdapter::Feature::Flip));
   mb.addAction(aFlipVertical);
   mb.addSeparator();
   QAction* aMoveAlign = cmd.moveAlign.createAction(
       &menu, this, &PackageEditorState_Select::moveAlignSelectedItems);
   aMoveAlign->setEnabled(
-      features.contains(EditorWidgetBase::Feature::MoveAlign));
+      features.testFlag(PackageEditorFsmAdapter::Feature::MoveAlign));
   mb.addAction(aMoveAlign);
   QAction* aSnapToGrid = cmd.snapToGrid.createAction(
       &menu, this, &PackageEditorState_Select::snapSelectedItemsToGrid);
   aSnapToGrid->setEnabled(
-      features.contains(EditorWidgetBase::Feature::SnapToGrid));
+      features.testFlag(PackageEditorFsmAdapter::Feature::SnapToGrid));
   mb.addAction(aSnapToGrid);
 
   // execute the context menu
@@ -932,41 +915,39 @@ bool PackageEditorState_Select::openPropertiesDialogOfItem(
   if (auto i = std::dynamic_pointer_cast<FootprintPadGraphicsItem>(item)) {
     FootprintPadPropertiesDialog dialog(
         mContext.package, i->getObj(), mContext.undoStack, getLengthUnit(),
-        "package_editor/footprint_pad_properties_dialog",
-        &mContext.editorWidget);
-    dialog.setReadOnly(mContext.editorContext.readOnly);
+        "package_editor/footprint_pad_properties_dialog", parentWidget());
+    dialog.setReadOnly(mContext.readOnly);
     dialog.exec();
     return true;
   } else if (auto i = std::dynamic_pointer_cast<StrokeTextGraphicsItem>(item)) {
     StrokeTextPropertiesDialog dialog(
         i->getObj(), mContext.undoStack, getAllowedTextLayers(),
         getLengthUnit(), "package_editor/stroke_text_properties_dialog",
-        &mContext.editorWidget);
-    dialog.setReadOnly(mContext.editorContext.readOnly);
+        parentWidget());
+    dialog.setReadOnly(mContext.readOnly);
     dialog.exec();
     return true;
   } else if (auto i = std::dynamic_pointer_cast<PolygonGraphicsItem>(item)) {
     PolygonPropertiesDialog dialog(
         i->getObj(), mContext.undoStack, getAllowedCircleAndPolygonLayers(),
         getLengthUnit(), "package_editor/polygon_properties_dialog",
-        &mContext.editorWidget);
-    dialog.setReadOnly(mContext.editorContext.readOnly);
+        parentWidget());
+    dialog.setReadOnly(mContext.readOnly);
     dialog.exec();
     return true;
   } else if (auto i = std::dynamic_pointer_cast<CircleGraphicsItem>(item)) {
     CirclePropertiesDialog dialog(
         i->getObj(), mContext.undoStack, getAllowedCircleAndPolygonLayers(),
         getLengthUnit(), "package_editor/circle_properties_dialog",
-        &mContext.editorWidget);
-    dialog.setReadOnly(mContext.editorContext.readOnly);
+        parentWidget());
+    dialog.setReadOnly(mContext.readOnly);
     dialog.exec();
     return true;
   } else if (auto i = std::dynamic_pointer_cast<ZoneGraphicsItem>(item)) {
-    ZonePropertiesDialog dialog(i->getObj(), mContext.undoStack,
-                                getLengthUnit(), mContext.editorContext.layers,
-                                "package_editor/zone_properties_dialog",
-                                &mContext.editorWidget);
-    dialog.setReadOnly(mContext.editorContext.readOnly);
+    ZonePropertiesDialog dialog(
+        i->getObj(), mContext.undoStack, getLengthUnit(), mContext.layers,
+        "package_editor/zone_properties_dialog", parentWidget());
+    dialog.setReadOnly(mContext.readOnly);
     dialog.exec();
     return true;
   } else if (auto i = std::dynamic_pointer_cast<HoleGraphicsItem>(item)) {
@@ -974,8 +955,8 @@ bool PackageEditorState_Select::openPropertiesDialogOfItem(
     // way and is safe since here we know that we're allowed to modify the hole.
     HolePropertiesDialog dialog(
         const_cast<Hole&>(i->getObj()), mContext.undoStack, getLengthUnit(),
-        "package_editor/hole_properties_dialog", &mContext.editorWidget);
-    dialog.setReadOnly(mContext.editorContext.readOnly);
+        "package_editor/hole_properties_dialog", parentWidget());
+    dialog.setReadOnly(mContext.readOnly);
     dialog.exec();
     return true;
   }
@@ -994,13 +975,10 @@ bool PackageEditorState_Select::openPropertiesDialogOfItemAtPos(
 }
 
 bool PackageEditorState_Select::copySelectedItemsToClipboard() noexcept {
-  if ((!mContext.currentFootprint) || (!mContext.currentGraphicsItem)) {
-    return false;
-  }
+  if (!mContext.currentGraphicsItem) return false;
 
   try {
-    const Point cursorPos =
-        mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos());
+    const Point cursorPos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos());
     FootprintClipboardData data(mContext.currentFootprint->getUuid(),
                                 mContext.package.getPads(), cursorPos);
     foreach (const std::shared_ptr<FootprintPadGraphicsItem>& pad,
@@ -1036,12 +1014,11 @@ bool PackageEditorState_Select::copySelectedItemsToClipboard() noexcept {
       data.getHoles().append(std::make_shared<Hole>(hole->getObj()));
     }
     if (data.getItemCount() > 0) {
-      qApp->clipboard()->setMimeData(
-          data.toMimeData(mContext.editorContext.layers).release());
-      emit statusBarMessageChanged(tr("Copied to clipboard!"), 2000);
+      qApp->clipboard()->setMimeData(data.toMimeData().release());
+      mAdapter.fsmSetStatusBarMessage(tr("Copied to clipboard!"), 2000);
     }
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
   return true;
 }
@@ -1114,7 +1091,7 @@ bool PackageEditorState_Select::pasteGeometryFromClipboard(
         cmd->setCustomShapeOutline(src->getCustomShapeOutline());
         cmd->setStopMaskConfig(src->getStopMaskConfig(), false);
         cmd->setSolderPasteConfig(src->getSolderPasteConfig());
-        cmd->setCopperClearance(src->getCopperClearance());
+        cmd->setCopperClearance(src->getCopperClearance(), false);
         cmd->setHoles(src->getHoles(), false);
         transaction.append(cmd.release());
       }
@@ -1180,7 +1157,7 @@ bool PackageEditorState_Select::pasteGeometryFromClipboard(
     }
     return transaction.commit();  // can throw
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     return false;
   }
 }
@@ -1191,9 +1168,7 @@ bool PackageEditorState_Select::startPaste(
   Q_ASSERT(data);
 
   // Abort if no footprint is selected.
-  if ((!mContext.currentFootprint) || (!mContext.currentGraphicsItem)) {
-    return false;
-  }
+  if (!mContext.currentGraphicsItem) return false;
 
   // Start undo command group.
   clearSelectionRect(true);
@@ -1201,7 +1176,7 @@ bool PackageEditorState_Select::startPaste(
   setState(SubState::PASTING);
 
   // Paste items.
-  mStartPos = mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos());
+  mStartPos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos());
   Point offset = fixedPosition
       ? (*fixedPosition)
       : (mStartPos - data->getCursorPos()).mappedToGrid(getGridInterval());
@@ -1216,7 +1191,8 @@ bool PackageEditorState_Select::startPaste(
       clearSelectionRect(true);
     } else {
       // Start moving the selected items.
-      mCmdDragSelectedItems.reset(new CmdDragSelectedFootprintItems(mContext));
+      mCmdDragSelectedItems.reset(new CmdDragSelectedFootprintItems(
+          *mContext.currentGraphicsItem, getGridInterval()));
     }
     return true;
   } else {
@@ -1229,23 +1205,28 @@ bool PackageEditorState_Select::startPaste(
 
 bool PackageEditorState_Select::rotateSelectedItems(
     const Angle& angle) noexcept {
+  if (!mContext.currentGraphicsItem) return false;
+
   try {
     if (mCmdDragSelectedItems) {
       mCmdDragSelectedItems->rotate(angle);
     } else {
       std::unique_ptr<CmdDragSelectedFootprintItems> cmd(
-          new CmdDragSelectedFootprintItems(mContext));
+          new CmdDragSelectedFootprintItems(*mContext.currentGraphicsItem,
+                                            getGridInterval()));
       cmd->rotate(angle);
       mContext.undoStack.execCmd(cmd.release());
     }
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
   return true;  // TODO: return false if no items were selected
 }
 
 bool PackageEditorState_Select::mirrorSelectedItems(Qt::Orientation orientation,
                                                     bool flipLayers) noexcept {
+  if (!mContext.currentGraphicsItem) return false;
+
   try {
     if (mCmdDragSelectedItems) {
       mCmdDragSelectedItems->mirrorGeometry(orientation);
@@ -1254,7 +1235,8 @@ bool PackageEditorState_Select::mirrorSelectedItems(Qt::Orientation orientation,
       }
     } else {
       std::unique_ptr<CmdDragSelectedFootprintItems> cmd(
-          new CmdDragSelectedFootprintItems(mContext));
+          new CmdDragSelectedFootprintItems(*mContext.currentGraphicsItem,
+                                            getGridInterval()));
       cmd->mirrorGeometry(orientation);
       if (flipLayers) {
         cmd->mirrorLayer();
@@ -1262,21 +1244,24 @@ bool PackageEditorState_Select::mirrorSelectedItems(Qt::Orientation orientation,
       mContext.undoStack.execCmd(cmd.release());
     }
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
   return true;  // TODO: return false if no items were selected
 }
 
 bool PackageEditorState_Select::moveAlignSelectedItems() noexcept {
+  if (!mContext.currentGraphicsItem) return false;
+
   try {
     std::unique_ptr<CmdDragSelectedFootprintItems> cmdMove(
-        new CmdDragSelectedFootprintItems(mContext));
+        new CmdDragSelectedFootprintItems(*mContext.currentGraphicsItem,
+                                          getGridInterval()));
     MoveAlignDialog dlg(cmdMove->getPositions(),
-                        "symbol_editor/move_align_dialog",
-                        &mContext.editorWidget);
-    const QPoint globalPos = mContext.graphicsView.mapToGlobal(QPoint(
-        mContext.graphicsView.width(), mContext.graphicsView.height() / 2));
-    dlg.move(globalPos - dlg.geometry().center());
+                        "symbol_editor/move_align_dialog", parentWidget());
+    // TODO: Move the dialog outside of the graphics view(?)
+    // const QPoint globalPos = mContext.graphicsView.mapToGlobal(QPoint(
+    //    mContext.graphicsView.width(), mContext.graphicsView.height() / 2));
+    // dlg.move(globalPos - dlg.geometry().center());
     connect(&dlg, &MoveAlignDialog::positionsChanged, this,
             [&](const QList<Point>& positions) {
               try {
@@ -1291,36 +1276,39 @@ bool PackageEditorState_Select::moveAlignSelectedItems() noexcept {
     cmdMove->setNewPositions(dlg.getNewPositions());  // can throw
     mContext.undoStack.execCmd(cmdMove.release());
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
   return true;
 }
 
 bool PackageEditorState_Select::snapSelectedItemsToGrid() noexcept {
+  if (!mContext.currentGraphicsItem) return false;
+
   try {
     std::unique_ptr<CmdDragSelectedFootprintItems> cmdMove(
-        new CmdDragSelectedFootprintItems(mContext));
-    cmdMove->snapToGrid();
+        new CmdDragSelectedFootprintItems(*mContext.currentGraphicsItem,
+                                          getGridInterval()));
+    cmdMove->snapToGrid(getGridInterval());
     mContext.undoStack.execCmd(cmdMove.release());
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
   return true;  // TODO: return false if no items were selected
 }
 
 bool PackageEditorState_Select::removeSelectedItems() noexcept {
+  if (!mContext.currentGraphicsItem) return false;
+
   try {
     mContext.undoStack.execCmd(new CmdRemoveSelectedFootprintItems(mContext));
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
   return true;  // TODO: return false if no items were selected
 }
 
 bool PackageEditorState_Select::generateOutline() noexcept {
-  if ((!mContext.currentFootprint) || (!mContext.currentGraphicsItem)) {
-    return false;
-  }
+  if (!mContext.currentGraphicsItem) return false;
 
   try {
     clearSelectionRect(true);
@@ -1394,27 +1382,25 @@ bool PackageEditorState_Select::generateOutline() noexcept {
 
     if (!transaction.commit()) {
       QMessageBox::information(
-          &mContext.editorWidget, tr("No Content"),
+          parentWidget(), tr("No Content"),
           tr("No content (e.g. pads or documentation polygons) found to "
              "generate the package outline from. Please add at least the pads "
              "before invoking this command."));
     }
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
   return true;
 }
 
 bool PackageEditorState_Select::generateCourtyard() noexcept {
-  if ((!mContext.currentFootprint) || (!mContext.currentGraphicsItem)) {
-    return false;
-  }
+  if (!mContext.currentGraphicsItem) return false;
 
   try {
     std::optional<PositiveLength> offset;
     auto getOffset = [&]() {
       if (!offset) {
-        QDialog dlg(&mContext.editorWidget);
+        QDialog dlg(parentWidget());
         dlg.setWindowTitle(tr("Courtyard Excess"));
         QVBoxLayout* vLayout = new QVBoxLayout(&dlg);
         PositiveLengthEdit* edtOffset = new PositiveLengthEdit(&dlg);
@@ -1523,14 +1509,14 @@ bool PackageEditorState_Select::generateCourtyard() noexcept {
 
     if (!transaction.commit()) {
       QMessageBox::information(
-          &mContext.editorWidget, tr("No Outline"),
+          parentWidget(), tr("No Outline"),
           tr("The courtyard can only be generated if there's a package outline "
              "polygon or circle, so that needs to be added first."));
     }
   } catch (const UserCanceled& e) {
     Q_UNUSED(e);
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
   return true;
 }
@@ -1557,7 +1543,7 @@ void PackageEditorState_Select::removePolygonVertices(
     cmd->setPath(path, false);
     mContext.undoStack.execCmd(cmd.release());
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
 }
 
@@ -1578,7 +1564,7 @@ void PackageEditorState_Select::startAddingPolygonVertex(
     mStartPos = pos;
     setState(SubState::MOVING_POLYGON_VERTEX);
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
 }
 
@@ -1599,7 +1585,7 @@ void PackageEditorState_Select::removeZoneVertices(
     cmd->setOutline(path, false);
     mContext.undoStack.execCmd(cmd.release());
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
 }
 
@@ -1620,39 +1606,45 @@ void PackageEditorState_Select::startAddingZoneVertex(
     mStartPos = pos;
     setState(SubState::MOVING_ZONE_VERTEX);
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
 }
 
 void PackageEditorState_Select::setSelectionRect(const Point& p1,
                                                  const Point& p2) noexcept {
-  mContext.graphicsScene.setSelectionRect(p1, p2);
-  mContext.currentGraphicsItem->setSelectionRect(
-      QRectF(p1.toPxQPointF(), p2.toPxQPointF()));
+  if (auto scene = getGraphicsScene()) {
+    scene->setSelectionRect(p1, p2);
+  }
+  if (auto item = mContext.currentGraphicsItem) {
+    item->setSelectionRect(QRectF(p1.toPxQPointF(), p2.toPxQPointF()));
+  }
 }
 
 void PackageEditorState_Select::clearSelectionRect(
     bool updateItemsSelectionState) noexcept {
-  mContext.graphicsScene.setSelectionRect(Point(), Point());
-  if (updateItemsSelectionState) {
-    mContext.graphicsScene.setSelectionArea(QPainterPath());
+  if (auto scene = getGraphicsScene()) {
+    scene->setSelectionRect(Point(), Point());
+    if (updateItemsSelectionState) {
+      scene->setSelectionArea(QPainterPath());
+    }
   }
 }
 
 QList<std::shared_ptr<QGraphicsItem>>
     PackageEditorState_Select::findItemsAtPosition(const Point& pos) noexcept {
-  if (!mContext.currentGraphicsItem) {
-    return QList<std::shared_ptr<QGraphicsItem>>();
-  }
+  if (!mContext.currentGraphicsItem) return {};
+
   return mContext.currentGraphicsItem->findItemsAtPos(
-      mContext.graphicsView.calcPosWithTolerance(pos),
-      mContext.graphicsView.calcPosWithTolerance(pos, 2),
+      mAdapter.fsmCalcPosWithTolerance(pos, 1),
+      mAdapter.fsmCalcPosWithTolerance(pos, 2),
       FootprintGraphicsItem::FindFlag::All |
           FootprintGraphicsItem::FindFlag::AcceptNearMatch);
 }
 
 bool PackageEditorState_Select::findPolygonVerticesAtPosition(
     const Point& pos) noexcept {
+  if (!mContext.currentGraphicsItem) return {};
+
   if (mContext.currentFootprint) {
     for (auto ptr : mContext.currentFootprint->getPolygons().values()) {
       auto graphicsItem = mContext.currentGraphicsItem->getGraphicsItem(ptr);
@@ -1674,6 +1666,8 @@ bool PackageEditorState_Select::findPolygonVerticesAtPosition(
 
 bool PackageEditorState_Select::findZoneVerticesAtPosition(
     const Point& pos) noexcept {
+  if (!mContext.currentGraphicsItem) return {};
+
   if (mContext.currentFootprint) {
     for (auto ptr : mContext.currentFootprint->getZones().values()) {
       auto graphicsItem = mContext.currentGraphicsItem->getGraphicsItem(ptr);
@@ -1695,8 +1689,53 @@ bool PackageEditorState_Select::findZoneVerticesAtPosition(
 void PackageEditorState_Select::setState(SubState state) noexcept {
   if (state != mState) {
     mState = state;
-    emit availableFeaturesChanged();
+    scheduleUpdateAvailableFeatures();
   }
+}
+
+void PackageEditorState_Select::scheduleUpdateAvailableFeatures() noexcept {
+  if (mUpdateAvailableFeaturesTimer) mUpdateAvailableFeaturesTimer->start();
+}
+
+PackageEditorFsmAdapter::Features
+    PackageEditorState_Select::updateAvailableFeatures() noexcept {
+  PackageEditorFsmAdapter::Features features;
+
+  if (mContext.currentFootprint) {
+    if (mState != SubState::PASTING) {
+      features |= PackageEditorFsmAdapter::Feature::Select;
+      if (!mContext.readOnly) {
+        features |= PackageEditorFsmAdapter::Feature::ImportGraphics;
+        if (FootprintClipboardData::isValid(qApp->clipboard()->mimeData())) {
+          features |= PackageEditorFsmAdapter::Feature::Paste;
+        }
+      }
+    }
+
+    if (auto item = mContext.currentGraphicsItem) {
+      CmdDragSelectedFootprintItems cmd(*item, getGridInterval());
+      if (cmd.getSelectedItemsCount() > 0) {
+        features |= PackageEditorFsmAdapter::Feature::Copy;
+        features |= PackageEditorFsmAdapter::Feature::Properties;
+        if (!mContext.readOnly) {
+          features |= PackageEditorFsmAdapter::Feature::Cut;
+          features |= PackageEditorFsmAdapter::Feature::Remove;
+          features |= PackageEditorFsmAdapter::Feature::Rotate;
+          features |= PackageEditorFsmAdapter::Feature::Mirror;
+          features |= PackageEditorFsmAdapter::Feature::Flip;
+          if (!cmd.getPositions().isEmpty()) {
+            features |= PackageEditorFsmAdapter::Feature::MoveAlign;
+          }
+          if (cmd.hasOffTheGridElements()) {
+            features |= PackageEditorFsmAdapter::Feature::SnapToGrid;
+          }
+        }
+      }
+    }
+  }
+
+  mAdapter.fsmSetFeatures(features);
+  return features;
 }
 
 /*******************************************************************************

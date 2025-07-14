@@ -23,6 +23,7 @@
 #include "footprintclipboarddata.h"
 
 #include "../../graphics/circlegraphicsitem.h"
+#include "../../graphics/graphicslayerlist.h"
 #include "../../graphics/graphicsscene.h"
 #include "../../graphics/holegraphicsitem.h"
 #include "../../graphics/polygongraphicsitem.h"
@@ -72,8 +73,7 @@ FootprintClipboardData::~FootprintClipboardData() noexcept {
  *  General Methods
  ******************************************************************************/
 
-std::unique_ptr<QMimeData> FootprintClipboardData::toMimeData(
-    const GraphicsLayerList& layers) {
+std::unique_ptr<QMimeData> FootprintClipboardData::toMimeData() {
   std::unique_ptr<SExpression> root =
       SExpression::createList("librepcb_clipboard_footprint");
   root->ensureLineBreak();
@@ -101,7 +101,7 @@ std::unique_ptr<QMimeData> FootprintClipboardData::toMimeData(
 
   const QByteArray sexpr = root->toByteArray();
   std::unique_ptr<QMimeData> data(new QMimeData());
-  data->setImageData(generatePixmap(layers));
+  data->setImageData(generatePixmap());
   data->setData(getMimeType(), sexpr);
   // Note: At least on one system the clipboard didn't work if no text was
   // set, so let's also copy the SExpression as text as a workaround. This
@@ -131,29 +131,33 @@ bool FootprintClipboardData::isValid(const QMimeData* mime) noexcept {
  *  Private Methods
  ******************************************************************************/
 
-QPixmap FootprintClipboardData::generatePixmap(
-    const GraphicsLayerList& layers) noexcept {
+QPixmap FootprintClipboardData::generatePixmap() noexcept {
+  // Maybe it's good that we don't pass the workspace here, to get
+  // workspace-independent pixmaps?
+  std::unique_ptr<GraphicsLayerList> layers =
+      GraphicsLayerList::libraryLayers(nullptr);
+
   GraphicsScene scene;
   QVector<std::shared_ptr<QGraphicsItem>> items;
   for (auto it = mFootprintPads.begin(); it != mFootprintPads.end(); ++it) {
-    items.append(std::make_shared<FootprintPadGraphicsItem>(it.ptr(), layers,
+    items.append(std::make_shared<FootprintPadGraphicsItem>(it.ptr(), *layers,
                                                             &mPackagePads));
   }
   for (Polygon& polygon : mPolygons) {
-    items.append(std::make_shared<PolygonGraphicsItem>(polygon, layers));
+    items.append(std::make_shared<PolygonGraphicsItem>(polygon, *layers));
   }
   for (Circle& circle : mCircles) {
-    items.append(std::make_shared<CircleGraphicsItem>(circle, layers));
+    items.append(std::make_shared<CircleGraphicsItem>(circle, *layers));
   }
   for (StrokeText& text : mStrokeTexts) {
     items.append(std::make_shared<StrokeTextGraphicsItem>(
-        text, layers, Application::getDefaultStrokeFont()));
+        text, *layers, Application::getDefaultStrokeFont()));
   }
   for (Zone& zone : mZones) {
-    items.append(std::make_shared<ZoneGraphicsItem>(zone, layers));
+    items.append(std::make_shared<ZoneGraphicsItem>(zone, *layers));
   }
   for (Hole& hole : mHoles) {
-    items.append(std::make_shared<HoleGraphicsItem>(hole, layers, false));
+    items.append(std::make_shared<HoleGraphicsItem>(hole, *layers, false));
   }
   foreach (const auto& item, items) {
     scene.addItem(*item);

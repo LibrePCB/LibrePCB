@@ -66,7 +66,8 @@ public:
   void setCustomShapeOutline(const Path& outline) noexcept;
   void setStopMaskConfig(const MaskConfig& config, bool immediate) noexcept;
   void setSolderPasteConfig(const MaskConfig& config) noexcept;
-  void setCopperClearance(const UnsignedLength& clearance) noexcept;
+  void setCopperClearance(const UnsignedLength& clearance,
+                          bool immediate) noexcept;
   void setPosition(const Point& pos, bool immediate) noexcept;
   void translate(const Point& deltaPos, bool immediate) noexcept;
   void snapToGrid(const PositiveLength& gridInterval, bool immediate) noexcept;

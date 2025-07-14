@@ -43,6 +43,14 @@ PackageEditorState_DrawLine::~PackageEditorState_DrawLine() noexcept {
 }
 
 /*******************************************************************************
+ *  Protected Methods
+ ******************************************************************************/
+
+void PackageEditorState_DrawLine::notifyToolEnter() noexcept {
+  mAdapter.fsmToolEnter(*this);
+}
+
+/*******************************************************************************
  *  End of File
  ******************************************************************************/
 

@@ -43,6 +43,14 @@ PackageEditorState_DrawPolygon::~PackageEditorState_DrawPolygon() noexcept {
 }
 
 /*******************************************************************************
+ *  Protected Methods
+ ******************************************************************************/
+
+void PackageEditorState_DrawPolygon::notifyToolEnter() noexcept {
+  mAdapter.fsmToolEnter(*this);
+}
+
+/*******************************************************************************
  *  End of File
  ******************************************************************************/
 

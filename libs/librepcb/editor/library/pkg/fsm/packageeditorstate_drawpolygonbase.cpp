@@ -23,19 +23,10 @@
 #include "packageeditorstate_drawpolygonbase.h"
 
 #include "../../../cmd/cmdpolygonedit.h"
-#include "../../../editorcommandset.h"
-#include "../../../graphics/graphicsscene.h"
 #include "../../../graphics/polygongraphicsitem.h"
-#include "../../../widgets/angleedit.h"
-#include "../../../widgets/graphicsview.h"
-#include "../../../widgets/layercombobox.h"
-#include "../../../widgets/unsignedlengthedit.h"
 #include "../footprintgraphicsitem.h"
-#include "../packageeditorwidget.h"
 
-#include <librepcb/core/geometry/polygon.h>
 #include <librepcb/core/library/pkg/footprint.h>
-#include <librepcb/core/types/layer.h>
 
 #include <QtCore>
 
@@ -54,16 +45,17 @@ PackageEditorState_DrawPolygonBase::PackageEditorState_DrawPolygonBase(
   : PackageEditorState(context),
     mMode(mode),
     mIsUndoCmdActive(false),
-    mCurrentPolygon(nullptr),
-    mCurrentGraphicsItem(nullptr),
-    mArcCenter(),
     mArcInSecondState(false),
-    mLastLayer(&Layer::topLegend()),  // Most important layer
-    mLastLineWidth(200000),  // Typical width according library conventions
-    mLastAngle(0),
-    mLastFill(false),  // Fill is needed very rarely
-    mLastGrabArea(false)  // Avoid creating annoying grab areas "by accident"
-{
+    mCurrentProperties(
+        Uuid::createRandom(),  // UUID is not relevant here
+        Layer::topLegend(),  // Most important layer
+        UnsignedLength(200000),  // Typical width according library conventions
+        false,  // Fill is needed very rarely
+        false,  // Avoid creating annoying grab areas "by accident"
+        Path()  // Path is not relevant here
+        ),
+    mCurrentPolygon(nullptr),
+    mCurrentEditCmd(nullptr) {
 }
 
 PackageEditorState_DrawPolygonBase::
@@ -75,88 +67,13 @@ PackageEditorState_DrawPolygonBase::
  ******************************************************************************/
 
 bool PackageEditorState_DrawPolygonBase::entry() noexcept {
-  // populate command toolbar
-  EditorCommandSet& cmd = EditorCommandSet::instance();
-  mContext.commandToolBar.addLabel(tr("Layer:"));
-  std::unique_ptr<LayerComboBox> layerComboBox(new LayerComboBox());
-  layerComboBox->setLayers(getAllowedCircleAndPolygonLayers());
-  layerComboBox->setCurrentLayer(*mLastLayer);
-  layerComboBox->addAction(cmd.layerUp.createAction(
-      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepDown));
-  layerComboBox->addAction(cmd.layerDown.createAction(
-      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepUp));
-  connect(layerComboBox.get(), &LayerComboBox::currentLayerChanged, this,
-          &PackageEditorState_DrawPolygonBase::layerComboBoxValueChanged);
-  mContext.commandToolBar.addWidget(std::move(layerComboBox));
-
-  mContext.commandToolBar.addLabel(tr("Line Width:"), 10);
-  std::unique_ptr<UnsignedLengthEdit> edtLineWidth(new UnsignedLengthEdit());
-  edtLineWidth->configure(getLengthUnit(), LengthEditBase::Steps::generic(),
-                          "package_editor/draw_polygon/line_width");
-  edtLineWidth->setValue(mLastLineWidth);
-  edtLineWidth->addAction(cmd.lineWidthIncrease.createAction(
-      edtLineWidth.get(), edtLineWidth.get(), &UnsignedLengthEdit::stepUp));
-  edtLineWidth->addAction(cmd.lineWidthDecrease.createAction(
-      edtLineWidth.get(), edtLineWidth.get(), &UnsignedLengthEdit::stepDown));
-  connect(this, &PackageEditorState_DrawPolygonBase::requestLineWidth,
-          edtLineWidth.get(), &UnsignedLengthEdit::setValue);
-  connect(edtLineWidth.get(), &UnsignedLengthEdit::valueChanged, this,
-          &PackageEditorState_DrawPolygonBase::lineWidthEditValueChanged);
-  mContext.commandToolBar.addWidget(std::move(edtLineWidth));
-
-  if ((mMode == Mode::LINE) || (mMode == Mode::POLYGON)) {
-    mContext.commandToolBar.addLabel(tr("Arc Angle:"), 10);
-    std::unique_ptr<AngleEdit> edtAngle(new AngleEdit());
-    edtAngle->setSingleStep(90.0);  // [°]
-    edtAngle->setValue(mLastAngle);
-    connect(edtAngle.get(), &AngleEdit::valueChanged, this,
-            &PackageEditorState_DrawPolygonBase::angleEditValueChanged);
-    mContext.commandToolBar.addWidget(std::move(edtAngle));
-  }
-
-  if ((mMode == Mode::RECT) || (mMode == Mode::POLYGON)) {
-    std::unique_ptr<QCheckBox> fillCheckBox(new QCheckBox(tr("Fill")));
-    fillCheckBox->setChecked(mLastFill);
-    fillCheckBox->addAction(cmd.fillToggle.createAction(
-        fillCheckBox.get(), fillCheckBox.get(), &QCheckBox::toggle));
-    QString toolTip = tr("Fill polygon, if closed");
-    if (!cmd.fillToggle.getKeySequences().isEmpty()) {
-      toolTip += " (" %
-          cmd.fillToggle.getKeySequences().first().toString(
-              QKeySequence::NativeText) %
-          ")";
-    }
-    fillCheckBox->setToolTip(toolTip);
-    connect(fillCheckBox.get(), &QCheckBox::toggled, this,
-            &PackageEditorState_DrawPolygonBase::fillCheckBoxCheckedChanged);
-    mContext.commandToolBar.addWidget(std::move(fillCheckBox), 10);
-  }
-
-  if ((mMode == Mode::RECT) || (mMode == Mode::POLYGON)) {
-    std::unique_ptr<QCheckBox> grabAreaCheckBox(new QCheckBox(tr("Grab Area")));
-    grabAreaCheckBox->setChecked(mLastGrabArea);
-    grabAreaCheckBox->addAction(cmd.grabAreaToggle.createAction(
-        grabAreaCheckBox.get(), grabAreaCheckBox.get(), &QCheckBox::toggle));
-    QString toolTip = tr("Use polygon as grab area");
-    if (!cmd.grabAreaToggle.getKeySequences().isEmpty()) {
-      toolTip += " (" %
-          cmd.grabAreaToggle.getKeySequences().first().toString(
-              QKeySequence::NativeText) %
-          ")";
-    }
-    grabAreaCheckBox->setToolTip(toolTip);
-    connect(
-        grabAreaCheckBox.get(), &QCheckBox::toggled, this,
-        &PackageEditorState_DrawPolygonBase::grabAreaCheckBoxCheckedChanged);
-    mContext.commandToolBar.addWidget(std::move(grabAreaCheckBox));
-  }
-
-  mLastScenePos = mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos())
-                      .mappedToGrid(mContext.graphicsScene.getGridInterval());
+  mLastScenePos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos())
+                      .mappedToGrid(getGridInterval());
   updateCursorPosition(Qt::KeyboardModifier::NoModifier);
   updateStatusBarMessage();
 
-  mContext.graphicsView.setCursor(Qt::CrossCursor);
+  notifyToolEnter();
+  mAdapter.fsmSetViewCursor(Qt::CrossCursor);
   return true;
 }
 
@@ -165,21 +82,12 @@ bool PackageEditorState_DrawPolygonBase::exit() noexcept {
     return false;
   }
 
-  // cleanup command toolbar
-  mContext.commandToolBar.clear();
-
-  mContext.graphicsView.unsetCursor();
-  mContext.graphicsScene.setSceneCursor(Point(), false, false);
-  mContext.graphicsView.setInfoBoxText(QString());
-  emit statusBarMessageChanged(QString());
+  mAdapter.fsmSetViewCursor(std::nullopt);
+  mAdapter.fsmSetSceneCursor(Point(), false, false);
+  mAdapter.fsmSetViewInfoBoxText(QString());
+  mAdapter.fsmSetStatusBarMessage(QString());
+  mAdapter.fsmToolLeave();
   return true;
-}
-
-QSet<EditorWidgetBase::Feature>
-    PackageEditorState_DrawPolygonBase::getAvailableFeatures() const noexcept {
-  return {
-      EditorWidgetBase::Feature::Abort,
-  };
 }
 
 /*******************************************************************************
@@ -240,10 +148,89 @@ bool PackageEditorState_DrawPolygonBase::processAbortCommand() noexcept {
 }
 
 /*******************************************************************************
+ *  Connection to UI
+ ******************************************************************************/
+
+QSet<const Layer*> PackageEditorState_DrawPolygonBase::getAvailableLayers()
+    const noexcept {
+  return getAllowedCircleAndPolygonLayers();
+}
+
+void PackageEditorState_DrawPolygonBase::setLayer(const Layer& layer) noexcept {
+  if (mCurrentProperties.setLayer(layer)) {
+    emit layerChanged(mCurrentProperties.getLayer());
+  }
+
+  if (mCurrentEditCmd) {
+    mCurrentEditCmd->setLayer(mCurrentProperties.getLayer(), true);
+  }
+
+  if (mUsedLineWidths.contains(&layer)) {
+    setLineWidth(*mUsedLineWidths.find(&layer));
+  } else if (layer.getPolygonsRepresentAreas()) {
+    // Zero-width polygons.
+    setLineWidth(UnsignedLength(0));
+  } else {
+    // Typical width according library conventions.
+    setLineWidth(UnsignedLength(200000));
+  }
+}
+
+void PackageEditorState_DrawPolygonBase::setLineWidth(
+    const UnsignedLength& width) noexcept {
+  if (mCurrentProperties.setLineWidth(width)) {
+    emit lineWidthChanged(mCurrentProperties.getLineWidth());
+  }
+
+  if (mCurrentEditCmd) {
+    mCurrentEditCmd->setLineWidth(mCurrentProperties.getLineWidth(), true);
+  }
+
+  mUsedLineWidths.insert(&mCurrentProperties.getLayer(), width);
+}
+
+void PackageEditorState_DrawPolygonBase::setFilled(bool filled) noexcept {
+  if (mCurrentProperties.setIsFilled(filled)) {
+    emit filledChanged(mCurrentProperties.isFilled());
+  }
+
+  if (mCurrentEditCmd) {
+    mCurrentEditCmd->setIsFilled(mCurrentProperties.isFilled(), true);
+  }
+}
+
+void PackageEditorState_DrawPolygonBase::setGrabArea(bool grabArea) noexcept {
+  if (mCurrentProperties.setIsGrabArea(grabArea)) {
+    emit grabAreaChanged(mCurrentProperties.isGrabArea());
+  }
+
+  if (mCurrentEditCmd) {
+    mCurrentEditCmd->setIsGrabArea(mCurrentProperties.isGrabArea(), true);
+  }
+}
+
+void PackageEditorState_DrawPolygonBase::setAngle(const Angle& angle) noexcept {
+  if (angle != mLastAngle) {
+    mLastAngle = angle;
+    emit angleChanged(mLastAngle);
+  }
+
+  if (mCurrentPolygon && mCurrentEditCmd) {
+    Path path = mCurrentPolygon->getPath();
+    if (path.getVertices().count() > 1) {
+      path.getVertices()[path.getVertices().count() - 2].setAngle(mLastAngle);
+      mCurrentEditCmd->setPath(path, true);
+    }
+  }
+}
+
+/*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
 bool PackageEditorState_DrawPolygonBase::start() noexcept {
+  if (!mContext.currentGraphicsItem) return false;
+
   try {
     // Reset members.
     if (mMode == Mode::ARC) {
@@ -263,16 +250,16 @@ bool PackageEditorState_DrawPolygonBase::start() noexcept {
         path.addVertex(mCursorPos, (i == 0) ? mLastAngle : Angle::deg0());
       }
     }
+    mCurrentProperties.setPath(path);
 
     // Add polygon.
-    mContext.undoStack.beginCmdGroup(tr("Add footprint polygon"));
+    mContext.undoStack.beginCmdGroup(tr("Add Footprint Polygon"));
     mIsUndoCmdActive = true;
-    mCurrentPolygon = std::make_shared<Polygon>(Uuid::createRandom(),
-                                                *mLastLayer, mLastLineWidth,
-                                                mLastFill, mLastGrabArea, path);
+    mCurrentPolygon =
+        std::make_shared<Polygon>(Uuid::createRandom(), mCurrentProperties);
     mContext.undoStack.appendToCmdGroup(new CmdPolygonInsert(
         mContext.currentFootprint->getPolygons(), mCurrentPolygon));
-    mEditCmd.reset(new CmdPolygonEdit(*mCurrentPolygon));
+    mCurrentEditCmd.reset(new CmdPolygonEdit(*mCurrentPolygon));
     mCurrentGraphicsItem =
         mContext.currentGraphicsItem->getGraphicsItem(mCurrentPolygon);
     Q_ASSERT(mCurrentGraphicsItem);
@@ -281,7 +268,7 @@ bool PackageEditorState_DrawPolygonBase::start() noexcept {
     updateStatusBarMessage();
     return true;
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     abort(false);
     return false;
   }
@@ -293,7 +280,7 @@ bool PackageEditorState_DrawPolygonBase::abort(bool showErrMsgBox) noexcept {
       mCurrentGraphicsItem->setSelected(false);
       mCurrentGraphicsItem.reset();
     }
-    mEditCmd.reset();
+    mCurrentEditCmd.reset();
     mCurrentPolygon.reset();
     if (mIsUndoCmdActive) {
       mContext.undoStack.abortCmdGroup();
@@ -304,7 +291,7 @@ bool PackageEditorState_DrawPolygonBase::abort(bool showErrMsgBox) noexcept {
     return true;
   } catch (const Exception& e) {
     if (showErrMsgBox) {
-      QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+      QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     }
     return false;
   }
@@ -347,8 +334,8 @@ bool PackageEditorState_DrawPolygonBase::addNextSegment() noexcept {
     }
 
     // Commit current polygon segment.
-    mEditCmd->setPath(Path(vertices), true);
-    mContext.undoStack.appendToCmdGroup(mEditCmd.release());
+    mCurrentEditCmd->setPath(Path(vertices), true);
+    mContext.undoStack.appendToCmdGroup(mCurrentEditCmd.release());
     mContext.undoStack.commitCmdGroup();
     mIsUndoCmdActive = false;
 
@@ -359,17 +346,17 @@ bool PackageEditorState_DrawPolygonBase::addNextSegment() noexcept {
     }
 
     // Add next polygon segment.
-    mContext.undoStack.beginCmdGroup(tr("Add footprint polygon"));
+    mContext.undoStack.beginCmdGroup(tr("Add Footprint Polygon"));
     mIsUndoCmdActive = true;
-    mEditCmd.reset(new CmdPolygonEdit(*mCurrentPolygon));
+    mCurrentEditCmd.reset(new CmdPolygonEdit(*mCurrentPolygon));
     vertices.last().setAngle(mLastAngle);
     vertices.append(Vertex(mCursorPos, Angle::deg0()));
-    mEditCmd->setPath(Path(vertices), true);
+    mCurrentEditCmd->setPath(Path(vertices), true);
     updateOverlayText();
     updateStatusBarMessage();
     return true;
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     return false;
   }
 }
@@ -380,9 +367,9 @@ void PackageEditorState_DrawPolygonBase::updateCursorPosition(
   if (!modifiers.testFlag(Qt::ShiftModifier)) {
     mCursorPos.mapToGrid(getGridInterval());
   }
-  mContext.graphicsScene.setSceneCursor(mCursorPos, true, false);
+  mAdapter.fsmSetSceneCursor(mCursorPos, true, false);
 
-  if (mCurrentPolygon && mEditCmd) {
+  if (mCurrentPolygon && mCurrentEditCmd) {
     updatePolygonPath();
   }
 
@@ -443,7 +430,7 @@ void PackageEditorState_DrawPolygonBase::updatePolygonPath() noexcept {
     Q_ASSERT(count >= 2);
     vertices[count - 1].setPos(mCursorPos);
   }
-  mEditCmd->setPath(Path(vertices), true);
+  mCurrentEditCmd->setPath(Path(vertices), true);
 }
 
 void PackageEditorState_DrawPolygonBase::updateOverlayText() noexcept {
@@ -530,7 +517,7 @@ void PackageEditorState_DrawPolygonBase::updateOverlayText() noexcept {
   }
 
   text.replace(" ", "&nbsp;");
-  mContext.graphicsView.setInfoBoxText(text);
+  mAdapter.fsmSetViewInfoBoxText(text);
 }
 
 void PackageEditorState_DrawPolygonBase::updateStatusBarMessage() noexcept {
@@ -541,84 +528,31 @@ void PackageEditorState_DrawPolygonBase::updateStatusBarMessage() noexcept {
 
   if (mMode == Mode::RECT) {
     if (!mIsUndoCmdActive) {
-      emit statusBarMessageChanged(tr("Click to specify the first edge") %
-                                   note);
+      mAdapter.fsmSetStatusBarMessage(tr("Click to specify the first edge") %
+                                      note);
     } else {
-      emit statusBarMessageChanged(tr("Click to specify the second edge") %
-                                   note);
+      mAdapter.fsmSetStatusBarMessage(tr("Click to specify the second edge") %
+                                      note);
     }
   } else if (mMode == Mode::ARC) {
     if (!mIsUndoCmdActive) {
-      emit statusBarMessageChanged(tr("Click to specify the arc center") %
-                                   note);
+      mAdapter.fsmSetStatusBarMessage(tr("Click to specify the arc center") %
+                                      note);
     } else if (!mArcInSecondState) {
-      emit statusBarMessageChanged(tr("Click to specify the start point") %
-                                   note);
+      mAdapter.fsmSetStatusBarMessage(tr("Click to specify the start point") %
+                                      note);
     } else {
-      emit statusBarMessageChanged(tr("Click to specify the end point") % note);
+      mAdapter.fsmSetStatusBarMessage(tr("Click to specify the end point") %
+                                      note);
     }
   } else {
     if (!mIsUndoCmdActive) {
-      emit statusBarMessageChanged(tr("Click to specify the first point") %
-                                   note);
+      mAdapter.fsmSetStatusBarMessage(tr("Click to specify the first point") %
+                                      note);
     } else {
-      emit statusBarMessageChanged(tr("Click to specify the next point") %
-                                   note);
+      mAdapter.fsmSetStatusBarMessage(tr("Click to specify the next point") %
+                                      note);
     }
-  }
-}
-
-void PackageEditorState_DrawPolygonBase::layerComboBoxValueChanged(
-    const Layer& layer) noexcept {
-  mLastLayer = &layer;
-  if (mEditCmd) {
-    mEditCmd->setLayer(*mLastLayer, true);
-  }
-  if (mUsedLineWidths.contains(&layer)) {
-    emit requestLineWidth(*mUsedLineWidths.find(&layer));
-  } else if (layer.getPolygonsRepresentAreas()) {
-    // Zero-width polygons.
-    emit requestLineWidth(UnsignedLength(0));
-  } else {
-    // Typical width according library conventions.
-    emit requestLineWidth(UnsignedLength(200000));
-  }
-}
-
-void PackageEditorState_DrawPolygonBase::lineWidthEditValueChanged(
-    const UnsignedLength& value) noexcept {
-  mLastLineWidth = value;
-  if (mEditCmd) {
-    mEditCmd->setLineWidth(mLastLineWidth, true);
-  }
-  mUsedLineWidths.insert(mLastLayer, value);
-}
-
-void PackageEditorState_DrawPolygonBase::angleEditValueChanged(
-    const Angle& value) noexcept {
-  mLastAngle = value;
-  if (mCurrentPolygon && mEditCmd) {
-    Path path = mCurrentPolygon->getPath();
-    if (path.getVertices().count() > 1) {
-      path.getVertices()[path.getVertices().count() - 2].setAngle(mLastAngle);
-      mEditCmd->setPath(path, true);
-    }
-  }
-}
-
-void PackageEditorState_DrawPolygonBase::fillCheckBoxCheckedChanged(
-    bool checked) noexcept {
-  mLastFill = checked;
-  if (mEditCmd) {
-    mEditCmd->setIsFilled(mLastFill, true);
-  }
-}
-
-void PackageEditorState_DrawPolygonBase::grabAreaCheckBoxCheckedChanged(
-    bool checked) noexcept {
-  mLastGrabArea = checked;
-  if (mEditCmd) {
-    mEditCmd->setIsGrabArea(mLastGrabArea, true);
   }
 }
 

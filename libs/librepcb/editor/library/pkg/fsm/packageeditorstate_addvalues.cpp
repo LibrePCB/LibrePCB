@@ -43,6 +43,14 @@ PackageEditorState_AddValues::~PackageEditorState_AddValues() noexcept {
 }
 
 /*******************************************************************************
+ *  Protected Methods
+ ******************************************************************************/
+
+void PackageEditorState_AddValues::notifyToolEnter() noexcept {
+  mAdapter.fsmToolEnter(*this);
+}
+
+/*******************************************************************************
  *  End of File
  ******************************************************************************/
 

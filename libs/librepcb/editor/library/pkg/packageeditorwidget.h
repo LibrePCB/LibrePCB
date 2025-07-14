@@ -26,6 +26,7 @@
 #include "../../widgets/if_graphicsvieweventhandler.h"
 #include "../cat/categorylisteditorwidget.h"
 #include "../editorwidgetbase.h"
+#include "fsm/packageeditorfsmadapter.h"
 
 #include <librepcb/core/library/pkg/footprint.h>
 #include <librepcb/core/types/lengthunit.h>
@@ -50,6 +51,7 @@ class GraphicsScene;
 class OpenGlSceneBuilder;
 class OpenGlView;
 class PackageEditorFsm;
+class PrimitiveTextGraphicsItem;
 
 namespace Ui {
 class PackageEditorWidget;
@@ -78,6 +80,7 @@ struct BackgroundImageSettings {
  * @brief The PackageEditorWidget class
  */
 class PackageEditorWidget final : public EditorWidgetBase,
+                                  public PackageEditorFsmAdapter,
                                   public IF_GraphicsViewEventHandler {
   Q_OBJECT
 
@@ -91,7 +94,8 @@ public:
 
   // Getters
   bool isBackgroundImageSet() const noexcept override;
-  QSet<Feature> getAvailableFeatures() const noexcept override;
+  QSet<EditorWidgetBase::Feature> getAvailableFeatures()
+      const noexcept override;
 
   // Setters
   void connectEditor(UndoStackActionGroup& undoStackActionGroup,
@@ -99,6 +103,39 @@ public:
                      QToolBar& commandToolBar,
                      StatusBar& statusBar) noexcept override;
   void disconnectEditor() noexcept override;
+
+  // PackageEditorFsmAdapter
+  GraphicsScene* fsmGetGraphicsScene() noexcept override;
+  PositiveLength fsmGetGridInterval() const noexcept override;
+  void fsmSetViewCursor(
+      const std::optional<Qt::CursorShape>& shape) noexcept override;
+  void fsmSetViewGrayOut(bool grayOut) noexcept override;
+  void fsmSetViewInfoBoxText(const QString& text) noexcept override;
+  void fsmSetViewRuler(
+      const std::optional<std::pair<Point, Point>>& pos) noexcept override;
+  void fsmSetSceneCursor(const Point& pos, bool cross,
+                         bool circle) noexcept override;
+  QPainterPath fsmCalcPosWithTolerance(
+      const Point& pos, qreal multiplier) const noexcept override;
+  Point fsmMapGlobalPosToScenePos(const QPoint& pos) const noexcept override;
+  void fsmSetStatusBarMessage(const QString& message,
+                              int timeoutMs = -1) noexcept override;
+  void fsmSetFeatures(Features features) noexcept override;
+  void fsmToolLeave() noexcept override;
+  void fsmToolEnter(PackageEditorState_Select& state) noexcept override;
+  void fsmToolEnter(PackageEditorState_DrawLine& state) noexcept override;
+  void fsmToolEnter(PackageEditorState_DrawRect& state) noexcept override;
+  void fsmToolEnter(PackageEditorState_DrawPolygon& state) noexcept override;
+  void fsmToolEnter(PackageEditorState_DrawCircle& state) noexcept override;
+  void fsmToolEnter(PackageEditorState_DrawArc& state) noexcept override;
+  void fsmToolEnter(PackageEditorState_AddNames& state) noexcept override;
+  void fsmToolEnter(PackageEditorState_AddValues& state) noexcept override;
+  void fsmToolEnter(PackageEditorState_DrawText& state) noexcept override;
+  void fsmToolEnter(PackageEditorState_AddPads& state) noexcept override;
+  void fsmToolEnter(PackageEditorState_DrawZone& state) noexcept override;
+  void fsmToolEnter(PackageEditorState_AddHoles& state) noexcept override;
+  void fsmToolEnter(PackageEditorState_ReNumberPads& state) noexcept override;
+  void fsmToolEnter(PackageEditorState_Measure& state) noexcept override;
 
   // Operator Overloadings
   PackageEditorWidget& operator=(const PackageEditorWidget& rhs) = delete;
@@ -186,6 +223,7 @@ private:  // Data
   std::unique_ptr<Package> mPackage;
   std::shared_ptr<Footprint> mCurrentFootprint;
   std::shared_ptr<PackageModel> mCurrentModel;
+  QScopedPointer<PrimitiveTextGraphicsItem> mSelectFootprintGraphicsItem;
 
   // Background image
   BackgroundImageSettings mBackgroundImageSettings;
@@ -196,7 +234,9 @@ private:  // Data
   FootprintList mOriginalFootprints;
 
   /// Editor state machine
+  QVector<QMetaObject::Connection> mFsmStateConnections;
   QScopedPointer<PackageEditorFsm> mFsm;
+  QSet<EditorWidgetBase::Feature> mFeatures;
 };
 
 /*******************************************************************************
