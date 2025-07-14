@@ -26,7 +26,6 @@
 #include "packageeditorstate_drawtextbase.h"
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -56,6 +55,9 @@ public:
   // Operator Overloadings
   PackageEditorState_DrawText& operator=(
       const PackageEditorState_DrawText& rhs) = delete;
+
+protected:
+  void notifyToolEnter() noexcept override;
 };
 
 /*******************************************************************************

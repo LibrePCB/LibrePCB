@@ -22,14 +22,11 @@
  ******************************************************************************/
 #include "packageeditorstate_renumberpads.h"
 
-#include "../../../graphics/graphicsscene.h"
 #include "../../../undocommandgroup.h"
 #include "../../../undostack.h"
-#include "../../../widgets/graphicsview.h"
 #include "../../cmd/cmdfootprintpadedit.h"
 #include "../footprintgraphicsitem.h"
 #include "../footprintpadgraphicsitem.h"
-#include "../packageeditorwidget.h"
 
 #include <librepcb/core/library/pkg/footprint.h>
 #include <librepcb/core/library/pkg/footprintpad.h>
@@ -63,30 +60,24 @@ PackageEditorState_ReNumberPads::~PackageEditorState_ReNumberPads() noexcept {
  ******************************************************************************/
 
 bool PackageEditorState_ReNumberPads::entry() noexcept {
-  // Populate command toolbar.
-  std::unique_ptr<QToolButton> btnFinish(new QToolButton());
-  btnFinish->setIcon(QIcon(":/img/actions/apply.png"));
-  btnFinish->setText(tr("Finish"));
-  btnFinish->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-  connect(btnFinish.get(), &QToolButton::clicked, this,
-          &PackageEditorState_ReNumberPads::finish);
-  mContext.commandToolBar.addWidget(std::move(btnFinish));
-
   // Start undo command.
   if (!start()) {
-    mContext.commandToolBar.clear();
     return false;
   }
 
+  if (auto scene = getGraphicsScene()) {
+    scene->setSelectionArea(QPainterPath());
+  }
+
+  mAdapter.fsmToolEnter(*this);
   const QString note = " " %
       tr("(press %1 for single-selection, %2 to change numbering mode, %3 to "
          "finish)")
           .arg(QCoreApplication::translate("QShortcut", "Ctrl"))
           .arg(QCoreApplication::translate("QShortcut", "Shift"))
           .arg(QCoreApplication::translate("QShortcut", "Return"));
-  emit statusBarMessageChanged(tr("Click on the next pad") % note);
-  mContext.graphicsScene.setSelectionArea(QPainterPath());
-  mContext.graphicsView.setCursor(Qt::PointingHandCursor);
+  mAdapter.fsmSetStatusBarMessage(tr("Click on the next pad") % note);
+  mAdapter.fsmSetViewCursor(Qt::PointingHandCursor);
   return true;
 }
 
@@ -106,20 +97,14 @@ bool PackageEditorState_ReNumberPads::exit() noexcept {
 
   mPackagePads.clear();
 
-  // Cleanup command toolbar.
-  mContext.commandToolBar.clear();
+  if (auto scene = getGraphicsScene()) {
+    scene->setSelectionArea(QPainterPath());
+  }
 
-  mContext.graphicsView.unsetCursor();
-  mContext.graphicsScene.setSelectionArea(QPainterPath());
-  emit statusBarMessageChanged(QString());
+  mAdapter.fsmSetViewCursor(std::nullopt);
+  mAdapter.fsmSetStatusBarMessage(QString());
+  mAdapter.fsmToolLeave();
   return true;
-}
-
-QSet<EditorWidgetBase::Feature>
-    PackageEditorState_ReNumberPads::getAvailableFeatures() const noexcept {
-  return {
-      EditorWidgetBase::Feature::Abort,
-  };
 }
 
 /*******************************************************************************
@@ -129,7 +114,7 @@ QSet<EditorWidgetBase::Feature>
 bool PackageEditorState_ReNumberPads::processKeyPressed(
     const GraphicsSceneKeyEvent& e) noexcept {
   if (e.key == Qt::Key_Return) {
-    finish();
+    processAcceptCommand();
     return true;
   } else if (mCurrentModifiers != e.modifiers) {
     mCurrentModifiers = e.modifiers;
@@ -165,9 +150,22 @@ bool PackageEditorState_ReNumberPads::
   if (mContext.currentFootprint &&
       (mAssignedFootprintPadCount ==
        mContext.currentFootprint->getPads().count())) {
-    finish();
+    processAcceptCommand();  // Finish
   } else {
     updateCurrentPad(force);
+  }
+  return true;
+}
+
+bool PackageEditorState_ReNumberPads::processAcceptCommand() noexcept {
+  try {
+    if (mUndoCmdActive) {
+      mContext.undoStack.commitCmdGroup();
+      mUndoCmdActive = false;
+      emit abortRequested();
+    }
+  } catch (const Exception& e) {
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
   return true;
 }
@@ -198,7 +196,7 @@ bool PackageEditorState_ReNumberPads::start() noexcept {
     mPreviousPad.reset();
     mCurrentPad.reset();
     mTmpCmd.reset();
-    mCurrentPos = mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos());
+    mCurrentPos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos());
     mCurrentModifiers = Qt::KeyboardModifiers();
 
     // Start undo command group.
@@ -213,7 +211,7 @@ bool PackageEditorState_ReNumberPads::start() noexcept {
     }
     return true;
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     return false;
   }
 }
@@ -228,8 +226,8 @@ void PackageEditorState_ReNumberPads::updateCurrentPad(bool force) noexcept {
     // Find pad under cursor.
     QList<std::shared_ptr<QGraphicsItem>> items =
         mContext.currentGraphicsItem->findItemsAtPos(
-            mContext.graphicsView.calcPosWithTolerance(mCurrentPos),
-            mContext.graphicsView.calcPosWithTolerance(mCurrentPos, 2),
+            mAdapter.fsmCalcPosWithTolerance(mCurrentPos, 1),
+            mAdapter.fsmCalcPosWithTolerance(mCurrentPos, 2),
             FootprintGraphicsItem::FindFlag::Pads |
                 FootprintGraphicsItem::FindFlag::AcceptNearMatch);
     std::shared_ptr<FootprintPadGraphicsItem> pad =
@@ -243,7 +241,9 @@ void PackageEditorState_ReNumberPads::updateCurrentPad(bool force) noexcept {
     // Discard temporary changes.
     mTmpCmd.reset();
     mCurrentPad = pad;
-    mContext.graphicsScene.setSelectionArea(QPainterPath());
+    if (auto scene = getGraphicsScene()) {
+      scene->setSelectionArea(QPainterPath());
+    }
 
     // If no pad selected, return.
     if ((!pad) || (pad->getObj().getPackagePadUuid())) {
@@ -331,7 +331,7 @@ void PackageEditorState_ReNumberPads::updateCurrentPad(bool force) noexcept {
     }
 
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
 }
 
@@ -339,7 +339,9 @@ bool PackageEditorState_ReNumberPads::commitCurrentPad() noexcept {
   try {
     if (mCurrentPad && mTmpCmd) {
       const int count = mTmpCmd->getChildCount();
-      mContext.graphicsScene.setSelectionArea(QPainterPath());
+      if (auto scene = getGraphicsScene()) {
+        scene->setSelectionArea(QPainterPath());
+      }
       mContext.undoStack.appendToCmdGroup(mTmpCmd.release());
       mPreviousPad = mCurrentPad;
       mCurrentPad = nullptr;
@@ -347,20 +349,8 @@ bool PackageEditorState_ReNumberPads::commitCurrentPad() noexcept {
     }
     return true;
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     return false;
-  }
-}
-
-void PackageEditorState_ReNumberPads::finish() noexcept {
-  try {
-    if (mUndoCmdActive) {
-      mContext.undoStack.commitCmdGroup();
-      mUndoCmdActive = false;
-      emit abortRequested();
-    }
-  } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
   }
 }
 

@@ -338,6 +338,7 @@ add_library(
   library/pkg/footprintpadpropertiesdialog.ui
   library/pkg/fsm/packageeditorfsm.cpp
   library/pkg/fsm/packageeditorfsm.h
+  library/pkg/fsm/packageeditorfsmadapter.h
   library/pkg/fsm/packageeditorstate.cpp
   library/pkg/fsm/packageeditorstate.h
   library/pkg/fsm/packageeditorstate_addholes.cpp

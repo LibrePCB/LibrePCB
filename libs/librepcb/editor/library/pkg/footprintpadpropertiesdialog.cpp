@@ -518,7 +518,7 @@ bool FootprintPadPropertiesDialog::applyChanges() noexcept {
     } else {
       cmd->setSolderPasteConfig(MaskConfig::off());
     }
-    cmd->setCopperClearance(mUi->edtCopperClearance->getValue());
+    cmd->setCopperClearance(mUi->edtCopperClearance->getValue(), false);
     cmd->setHoles(mHoles, false);
     cmd->setPosition(Point(mUi->edtPosX->getValue(), mUi->edtPosY->getValue()),
                      false);

@@ -23,14 +23,9 @@
 #include "packageeditorstate_drawzone.h"
 
 #include "../../../cmd/cmdzoneedit.h"
-#include "../../../graphics/graphicsscene.h"
 #include "../../../graphics/zonegraphicsitem.h"
-#include "../../../widgets/angleedit.h"
-#include "../../../widgets/graphicsview.h"
 #include "../footprintgraphicsitem.h"
-#include "../packageeditorwidget.h"
 
-#include <librepcb/core/geometry/zone.h>
 #include <librepcb/core/library/pkg/footprint.h>
 
 #include <QtCore>
@@ -48,12 +43,15 @@ namespace editor {
 PackageEditorState_DrawZone::PackageEditorState_DrawZone(
     Context& context) noexcept
   : PackageEditorState(context),
+    mLastAngle(0),
     mIsUndoCmdActive(false),
+    mCurrentProperties(Uuid::createRandom(),  // Not relevant
+                       Zone::Layer::Top,  // Layers
+                       Zone::Rule::All,  // Rules,
+                       Path()  // Not relevant
+                       ),
     mCurrentZone(nullptr),
-    mCurrentGraphicsItem(nullptr),
-    mLastLayers(Zone::Layer::Top),
-    mLastRules(Zone::Rule::All),
-    mLastAngle(0) {
+    mCurrentGraphicsItem(nullptr) {
 }
 
 PackageEditorState_DrawZone::~PackageEditorState_DrawZone() noexcept {
@@ -64,93 +62,13 @@ PackageEditorState_DrawZone::~PackageEditorState_DrawZone() noexcept {
  ******************************************************************************/
 
 bool PackageEditorState_DrawZone::entry() noexcept {
-  // populate command toolbar
-  std::unique_ptr<QCheckBox> cbxTop(new QCheckBox(tr("Top")));
-  cbxTop->setChecked(mLastLayers.testFlag(Zone::Layer::Top));
-  connect(cbxTop.get(), &QCheckBox::toggled, this, [this](bool checked) {
-    mLastLayers.setFlag(Zone::Layer::Top, checked);
-    if (mEditCmd) {
-      mEditCmd->setLayers(mLastLayers, true);
-    }
-  });
-  mContext.commandToolBar.addWidget(std::move(cbxTop));
-
-  std::unique_ptr<QCheckBox> cbxInner(new QCheckBox(tr("Inner")));
-  cbxInner->setChecked(mLastLayers.testFlag(Zone::Layer::Inner));
-  connect(cbxInner.get(), &QCheckBox::toggled, this, [this](bool checked) {
-    mLastLayers.setFlag(Zone::Layer::Inner, checked);
-    if (mEditCmd) {
-      mEditCmd->setLayers(mLastLayers, true);
-    }
-  });
-  mContext.commandToolBar.addWidget(std::move(cbxInner));
-
-  std::unique_ptr<QCheckBox> cbxBottom(new QCheckBox(tr("Bottom")));
-  cbxBottom->setChecked(mLastLayers.testFlag(Zone::Layer::Bottom));
-  connect(cbxBottom.get(), &QCheckBox::toggled, this, [this](bool checked) {
-    mLastLayers.setFlag(Zone::Layer::Bottom, checked);
-    if (mEditCmd) {
-      mEditCmd->setLayers(mLastLayers, true);
-    }
-  });
-  mContext.commandToolBar.addWidget(std::move(cbxBottom));
-  mContext.commandToolBar.addSeparator();
-
-  std::unique_ptr<QCheckBox> cbxNoCopper(new QCheckBox(tr("No Copper")));
-  cbxNoCopper->setChecked(mLastRules.testFlag(Zone::Rule::NoCopper));
-  connect(cbxNoCopper.get(), &QCheckBox::toggled, this, [this](bool checked) {
-    mLastRules.setFlag(Zone::Rule::NoCopper, checked);
-    if (mEditCmd) {
-      mEditCmd->setRules(mLastRules, true);
-    }
-  });
-  mContext.commandToolBar.addWidget(std::move(cbxNoCopper));
-
-  std::unique_ptr<QCheckBox> cbxNoPlanes(new QCheckBox(tr("No Planes")));
-  cbxNoPlanes->setChecked(mLastRules.testFlag(Zone::Rule::NoPlanes));
-  connect(cbxNoPlanes.get(), &QCheckBox::toggled, this, [this](bool checked) {
-    mLastRules.setFlag(Zone::Rule::NoPlanes, checked);
-    if (mEditCmd) {
-      mEditCmd->setRules(mLastRules, true);
-    }
-  });
-  mContext.commandToolBar.addWidget(std::move(cbxNoPlanes));
-
-  std::unique_ptr<QCheckBox> cbxNoExposure(new QCheckBox(tr("No Exposure")));
-  cbxNoExposure->setChecked(mLastRules.testFlag(Zone::Rule::NoExposure));
-  connect(cbxNoExposure.get(), &QCheckBox::toggled, this, [this](bool checked) {
-    mLastRules.setFlag(Zone::Rule::NoExposure, checked);
-    if (mEditCmd) {
-      mEditCmd->setRules(mLastRules, true);
-    }
-  });
-  mContext.commandToolBar.addWidget(std::move(cbxNoExposure));
-
-  std::unique_ptr<QCheckBox> cbxNoDevices(new QCheckBox(tr("No Devices")));
-  cbxNoDevices->setChecked(mLastRules.testFlag(Zone::Rule::NoDevices));
-  connect(cbxNoDevices.get(), &QCheckBox::toggled, this, [this](bool checked) {
-    mLastRules.setFlag(Zone::Rule::NoDevices, checked);
-    if (mEditCmd) {
-      mEditCmd->setRules(mLastRules, true);
-    }
-  });
-  mContext.commandToolBar.addWidget(std::move(cbxNoDevices));
-  mContext.commandToolBar.addSeparator();
-
-  mContext.commandToolBar.addLabel(tr("Arc Angle:"), 10);
-  std::unique_ptr<AngleEdit> edtAngle(new AngleEdit());
-  edtAngle->setSingleStep(90.0);  // [°]
-  edtAngle->setValue(mLastAngle);
-  connect(edtAngle.get(), &AngleEdit::valueChanged, this,
-          &PackageEditorState_DrawZone::angleEditValueChanged);
-  mContext.commandToolBar.addWidget(std::move(edtAngle));
-
-  mLastScenePos = mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos())
-                      .mappedToGrid(mContext.graphicsScene.getGridInterval());
+  mLastScenePos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos())
+                      .mappedToGrid(getGridInterval());
   updateCursorPosition(Qt::KeyboardModifier::NoModifier);
   updateStatusBarMessage();
 
-  mContext.graphicsView.setCursor(Qt::CrossCursor);
+  mAdapter.fsmToolEnter(*this);
+  mAdapter.fsmSetViewCursor(Qt::CrossCursor);
   return true;
 }
 
@@ -159,21 +77,12 @@ bool PackageEditorState_DrawZone::exit() noexcept {
     return false;
   }
 
-  // cleanup command toolbar
-  mContext.commandToolBar.clear();
-
-  mContext.graphicsView.unsetCursor();
-  mContext.graphicsScene.setSceneCursor(Point(), false, false);
-  mContext.graphicsView.setInfoBoxText(QString());
-  emit statusBarMessageChanged(QString());
+  mAdapter.fsmSetViewCursor(std::nullopt);
+  mAdapter.fsmSetSceneCursor(Point(), false, false);
+  mAdapter.fsmSetViewInfoBoxText(QString());
+  mAdapter.fsmSetStatusBarMessage(QString());
+  mAdapter.fsmToolLeave();
   return true;
-}
-
-QSet<EditorWidgetBase::Feature>
-    PackageEditorState_DrawZone::getAvailableFeatures() const noexcept {
-  return {
-      EditorWidgetBase::Feature::Abort,
-  };
 }
 
 /*******************************************************************************
@@ -233,25 +142,73 @@ bool PackageEditorState_DrawZone::processAbortCommand() noexcept {
 }
 
 /*******************************************************************************
+ *  Connection to UI
+ ******************************************************************************/
+
+void PackageEditorState_DrawZone::setLayer(Zone::Layer layer,
+                                           bool enable) noexcept {
+  Zone::Layers layers = mCurrentProperties.getLayers();
+  layers.setFlag(layer, enable);
+
+  if (mCurrentProperties.setLayers(layers)) {
+    emit layersChanged(mCurrentProperties.getLayers());
+  }
+
+  if (mCurrentEditCmd) {
+    mCurrentEditCmd->setLayers(mCurrentProperties.getLayers(), true);
+  }
+}
+
+void PackageEditorState_DrawZone::setRule(Zone::Rule rule,
+                                          bool enable) noexcept {
+  Zone::Rules rules = mCurrentProperties.getRules();
+  rules.setFlag(rule, enable);
+
+  if (mCurrentProperties.setRules(rules)) {
+    emit rulesChanged(mCurrentProperties.getRules());
+  }
+
+  if (mCurrentEditCmd) {
+    mCurrentEditCmd->setRules(mCurrentProperties.getRules(), true);
+  }
+}
+
+void PackageEditorState_DrawZone::setAngle(const Angle& angle) noexcept {
+  if (angle != mLastAngle) {
+    mLastAngle = angle;
+    emit angleChanged(mLastAngle);
+  }
+
+  if (mCurrentZone && mCurrentEditCmd) {
+    Path path = mCurrentZone->getOutline();
+    Q_ASSERT(path.getVertices().count() >= 2);
+    path.getVertices()[path.getVertices().count() - 2].setAngle(mLastAngle);
+    mCurrentEditCmd->setOutline(path, true);
+  }
+}
+
+/*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
 bool PackageEditorState_DrawZone::start() noexcept {
+  if (!mContext.currentGraphicsItem) return false;
+
   try {
     // Create inital path.
-    Path path({
+    mCurrentProperties.setOutline(Path({
         Vertex(mCursorPos, mLastAngle),
         Vertex(mCursorPos),
-    });
+    }));
 
     // Add zone.
-    mContext.undoStack.beginCmdGroup(tr("Add footprint zone"));
+    mContext.undoStack.beginCmdGroup(tr("Add Footprint Zone"));
     mIsUndoCmdActive = true;
-    mCurrentZone = std::make_shared<Zone>(Uuid::createRandom(), mLastLayers,
-                                          mLastRules, path);
+    mCurrentZone =
+        std::make_shared<Zone>(Uuid::createRandom(), mCurrentProperties);
     mContext.undoStack.appendToCmdGroup(
         new CmdZoneInsert(mContext.currentFootprint->getZones(), mCurrentZone));
-    mEditCmd.reset(new CmdZoneEdit(*mCurrentZone));
+    mCurrentEditCmd.reset(new CmdZoneEdit(*mCurrentZone));
     mCurrentGraphicsItem =
         mContext.currentGraphicsItem->getGraphicsItem(mCurrentZone);
     Q_ASSERT(mCurrentGraphicsItem);
@@ -260,7 +217,7 @@ bool PackageEditorState_DrawZone::start() noexcept {
     updateStatusBarMessage();
     return true;
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     abort(false);
     return false;
   }
@@ -272,7 +229,7 @@ bool PackageEditorState_DrawZone::abort(bool showErrMsgBox) noexcept {
       mCurrentGraphicsItem->setSelected(false);
       mCurrentGraphicsItem.reset();
     }
-    mEditCmd.reset();
+    mCurrentEditCmd.reset();
     mCurrentZone.reset();
     if (mIsUndoCmdActive) {
       mContext.undoStack.abortCmdGroup();
@@ -283,7 +240,7 @@ bool PackageEditorState_DrawZone::abort(bool showErrMsgBox) noexcept {
     return true;
   } catch (const Exception& e) {
     if (showErrMsgBox) {
-      QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+      QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     }
     return false;
   }
@@ -306,8 +263,8 @@ bool PackageEditorState_DrawZone::addNextSegment() noexcept {
     }
 
     // Commit current segment.
-    mEditCmd->setOutline(Path(vertices), true);
-    mContext.undoStack.appendToCmdGroup(mEditCmd.release());
+    mCurrentEditCmd->setOutline(Path(vertices), true);
+    mContext.undoStack.appendToCmdGroup(mCurrentEditCmd.release());
     mContext.undoStack.commitCmdGroup();
     mIsUndoCmdActive = false;
 
@@ -317,17 +274,17 @@ bool PackageEditorState_DrawZone::addNextSegment() noexcept {
     }
 
     // Add next segment.
-    mContext.undoStack.beginCmdGroup(tr("Add footprint zone"));
+    mContext.undoStack.beginCmdGroup(tr("Add Footprint Zone"));
     mIsUndoCmdActive = true;
-    mEditCmd.reset(new CmdZoneEdit(*mCurrentZone));
+    mCurrentEditCmd.reset(new CmdZoneEdit(*mCurrentZone));
     vertices.last().setAngle(mLastAngle);
     vertices.append(Vertex(mCursorPos, Angle::deg0()));
-    mEditCmd->setOutline(Path(vertices), true);
+    mCurrentEditCmd->setOutline(Path(vertices), true);
     updateOverlayText();
     updateStatusBarMessage();
     return true;
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     return false;
   }
 }
@@ -338,9 +295,9 @@ void PackageEditorState_DrawZone::updateCursorPosition(
   if (!modifiers.testFlag(Qt::ShiftModifier)) {
     mCursorPos.mapToGrid(getGridInterval());
   }
-  mContext.graphicsScene.setSceneCursor(mCursorPos, true, false);
+  mAdapter.fsmSetSceneCursor(mCursorPos, true, false);
 
-  if (mCurrentZone && mEditCmd) {
+  if (mCurrentZone && mCurrentEditCmd) {
     updateOutline();
   }
 
@@ -351,7 +308,7 @@ void PackageEditorState_DrawZone::updateOutline() noexcept {
   QVector<Vertex> vertices = mCurrentZone->getOutline().getVertices();
   Q_ASSERT(vertices.count() >= 2);
   vertices.last().setPos(mCursorPos);
-  mEditCmd->setOutline(Path(vertices), true);
+  mCurrentEditCmd->setOutline(Path(vertices), true);
 }
 
 void PackageEditorState_DrawZone::updateOverlayText() noexcept {
@@ -389,7 +346,7 @@ void PackageEditorState_DrawZone::updateOverlayText() noexcept {
   text += "<b>" % formatLength("Δ", *length) % "</b><br>";
   text += "<b>" % formatAngle("∠", angle) % "</b>";
   text.replace(" ", "&nbsp;");
-  mContext.graphicsView.setInfoBoxText(text);
+  mAdapter.fsmSetViewInfoBoxText(text);
 }
 
 void PackageEditorState_DrawZone::updateStatusBarMessage() noexcept {
@@ -399,20 +356,11 @@ void PackageEditorState_DrawZone::updateStatusBarMessage() noexcept {
           .arg(tr("right click"));
 
   if (!mIsUndoCmdActive) {
-    emit statusBarMessageChanged(tr("Click to specify the first point") % note);
+    mAdapter.fsmSetStatusBarMessage(tr("Click to specify the first point") %
+                                    note);
   } else {
-    emit statusBarMessageChanged(tr("Click to specify the next point") % note);
-  }
-}
-
-void PackageEditorState_DrawZone::angleEditValueChanged(
-    const Angle& value) noexcept {
-  mLastAngle = value;
-  if (mCurrentZone && mEditCmd) {
-    Path path = mCurrentZone->getOutline();
-    Q_ASSERT(path.getVertices().count() >= 2);
-    path.getVertices()[path.getVertices().count() - 2].setAngle(mLastAngle);
-    mEditCmd->setOutline(path, true);
+    mAdapter.fsmSetStatusBarMessage(tr("Click to specify the next point") %
+                                    note);
   }
 }
 
