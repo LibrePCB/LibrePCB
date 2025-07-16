@@ -124,6 +124,19 @@ export struct LengthEditParseResult {
     evaluated-unit: LengthUnit,
 }
 
+// Underlying data structure for AngleEdit elements
+export struct AngleEditData {
+    value: int,  // Microdegrees like in the backend
+    increase: bool,  // Set by UI, reset by backend
+    decrease: bool,  // Set by UI, reset by backend
+}
+
+// Text parse result as used in the AngleEdit component
+export struct AngleEditParseResult {
+    valid: bool,
+    evaluated-value: int,
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Tree views
 ////////////////////////////////////////////////////////////////////////////////
@@ -204,6 +217,7 @@ export enum RuleCheckType {
     library-check,
     component-category-check,
     package-category-check,
+    symbol-check,
 }
 
 export enum RuleCheckState {
@@ -245,14 +259,21 @@ export struct RuleCheckData {
 
 export enum EditorTool {
     select,
+    line,
+    rect,
+    polygon,
+    circle,
+    arc,
+    text,
+    name,
+    value,
+    hole,
+    pin,
     wire,
     netlabel,
-    polygon,
-    text,
     via,
     plane,
     zone,
-    hole,
     component,
     measure,
 }
@@ -318,6 +339,13 @@ export struct LibraryData {
     writable: bool,
 }
 
+// Library element category (e.g. "Integrated Circuits -> Timers")
+export struct LibraryElementCategoryData {
+    uuid: string,  // Just for reference in the backend
+    names: [string],  // Category level names, starting from root category
+    delete: bool,  // Set by UI, reset by backend
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Tabs
 ////////////////////////////////////////////////////////////////////////////////
@@ -334,6 +362,9 @@ export struct TabFeatures {
     save: FeatureState,
     undo: FeatureState,
     redo: FeatureState,
+    grid: FeatureState,
+    zoom: FeatureState,
+    import-graphics: FeatureState,
     export-graphics: FeatureState,
     select: FeatureState,
     cut: FeatureState,
@@ -361,6 +392,7 @@ export enum TabType {
     library,
     component-category,
     package-category,
+    symbol,
     schematic,
     board-2d,
     board-3d,
@@ -446,6 +478,9 @@ export enum TabAction {
     library-elements-duplicate,
     library-elements-remove,
 
+    // Symbol tab
+    symbol-import-pins,
+
     // Board 2D tab
     board-place-component,
     board-place-components-similar,
@@ -453,14 +488,21 @@ export enum TabAction {
 
     // Tools
     tool-select,
+    tool-line,
+    tool-rect,
+    tool-polygon,
+    tool-circle,
+    tool-arc,
+    tool-text,
+    tool-name,
+    tool-value,
+    tool-hole,
+    tool-pin,
     tool-wire,
     tool-netlabel,
-    tool-polygon,
-    tool-text,
     tool-via,
     tool-plane,
     tool-zone,
-    tool-hole,
     tool-component,
     tool-component-frame,
     tool-component-resistor,
@@ -590,6 +632,65 @@ export struct CategoryTabData {
     new-parent: string,  // Set to UUID or "null" by UI, reset by backend,
 }
 
+// Additional data for symbol editor tabs
+export struct SymbolTabData {
+    // General
+    library-index: int,
+    path: string,
+    wizard-mode: bool,
+    page-index: int,
+
+    // Metadata
+    name: string,
+    name-error: string,
+    description: string,
+    keywords: string,
+    author: string,
+    version: string,
+    version-error: string,
+    deprecated: bool,
+    categories: [LibraryElementCategoryData],
+    categories-tree: [TreeViewItemData],
+
+    // Checks
+    checks: RuleCheckData,
+
+    // View
+    background-color: brush,
+    foreground-color: brush,
+    overlay-color: brush,
+    overlay-text-color: brush,
+    grid-style: GridStyle,
+    grid-interval: Int64,
+    unit: LengthUnit,
+
+    // Messages
+    interface-broken-msg: bool,
+    import-pins-msg: DismissableMessageData,
+
+    // Data about the currently active tool
+    tool: EditorTool,
+    tool-cursor: MouseCursor,
+    tool-overlay-text: string,
+    tool-layer: ComboBoxData,
+    tool-line-width: LengthEditData,
+    tool-size: LengthEditData,
+    tool-angle: AngleEditData,
+    tool-filled: bool,
+    tool-grab-area: bool,
+    tool-value: LineEditData,
+    tool-halign: TextHorizontalAlignment,
+    tool-valign: TextVerticalAlignment,
+
+    // Misc
+    compact-layout: bool,  // Set by UI
+    scene-image-pos: Point,  // Absolute position of graphics scene
+    frame: int,  // Frame index to trigger repainting
+
+    // Actions
+    new-category: string,  // Set to UUID by UI, reset by backend.
+}
+
 // Additional data for schematic editor tabs
 export struct SchematicTabData {
     project-index: int,
@@ -707,6 +808,7 @@ export struct WindowSectionData {
     library-tabs: [LibraryTabData],  // Proxy view for `tabs`
     component-category-tabs: [CategoryTabData],  // Proxy view for `tabs`
     package-category-tabs: [CategoryTabData],  // Proxy view for `tabs`
+    symbol-tabs: [SymbolTabData],  // Proxy view for `tabs`
     schematic-tabs: [SchematicTabData],  // Proxy view for `tabs`
     board-2d-tabs: [Board2dTabData],  // Proxy view for `tabs`
     board-3d-tabs: [Board3dTabData],  // Proxy view for `tabs`

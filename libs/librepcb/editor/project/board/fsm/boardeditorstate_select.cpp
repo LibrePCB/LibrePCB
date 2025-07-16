@@ -1952,6 +1952,7 @@ void BoardEditorState_Select::updateAvailableFeatures() noexcept {
   if ((!mCmdPolygonEdit) && (!mCmdPlaneEdit) && (!mCmdZoneEdit)) {
     if (!mSelectedItemsDragCommand) {
       features |= BoardEditorFsmAdapter::Feature::Select;
+      features |= BoardEditorFsmAdapter::Feature::ImportGraphics;
     }
 
     if (BoardClipboardData::isValid(qApp->clipboard()->mimeData()) ||

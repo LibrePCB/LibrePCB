@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../../undocommandgroup.h"
-#include "../sym/fsm/symboleditorstate.h"
 
 #include <librepcb/core/types/angle.h>
 #include <librepcb/core/types/point.h>
@@ -41,6 +40,7 @@ class CmdCircleEdit;
 class CmdPolygonEdit;
 class CmdSymbolPinEdit;
 class CmdTextEdit;
+class SymbolGraphicsItem;
 
 /*******************************************************************************
  *  Class CmdDragSelectedSymbolItems
@@ -54,8 +54,8 @@ public:
   // Constructors / Destructor
   CmdDragSelectedSymbolItems() = delete;
   CmdDragSelectedSymbolItems(const CmdDragSelectedSymbolItems& other) = delete;
-  explicit CmdDragSelectedSymbolItems(
-      const SymbolEditorState::Context& context) noexcept;
+  explicit CmdDragSelectedSymbolItems(SymbolGraphicsItem& item,
+                                      const PositiveLength& grid) noexcept;
   ~CmdDragSelectedSymbolItems() noexcept;
 
   // Getters
@@ -63,7 +63,7 @@ public:
   bool hasOffTheGridElements() const noexcept { return mHasOffTheGridElements; }
 
   // General Methods
-  void snapToGrid() noexcept;
+  void snapToGrid(const PositiveLength& grid) noexcept;
   void setDeltaToStartPos(const Point& delta) noexcept;
   void translate(const Point& deltaPos) noexcept;
   void rotate(const Angle& angle) noexcept;
@@ -82,7 +82,6 @@ private:
   void deleteAllCommands() noexcept;
 
   // Private Member Variables
-  const SymbolEditorState::Context& mContext;
   Point mCenterPos;
   Point mDeltaPos;
   Angle mDeltaRot;

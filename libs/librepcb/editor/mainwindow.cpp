@@ -34,6 +34,7 @@
 #include "library/lib/librarytab.h"
 #include "library/librariesmodel.h"
 #include "library/libraryeditor.h"
+#include "library/sym/symboltab.h"
 #include "mainwindowtestadapter.h"
 #include "notificationsmodel.h"
 #include "project/board/board2dtab.h"
@@ -55,6 +56,7 @@
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/library/cat/componentcategory.h>
 #include <librepcb/core/library/cat/packagecategory.h>
+#include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
@@ -587,7 +589,7 @@ void MainWindow::triggerLibrary(slint::SharedString path,
     }
     case ui::LibraryAction::NewSymbol: {
       if (auto editor = mApp.getLibrary(fp)) {
-        openSymbolTab(*editor, FilePath());
+        openSymbolTab(*editor, FilePath(), false);
       }
       break;
     }
@@ -626,6 +628,7 @@ void MainWindow::triggerLibraryElement(slint::SharedString path,
       if (switchToLibraryElementTab<LibraryTab>(fp)) return;
       if (switchToLibraryElementTab<ComponentCategoryTab>(fp)) return;
       if (switchToLibraryElementTab<PackageCategoryTab>(fp)) return;
+      if (switchToLibraryElementTab<SymbolTab>(fp)) return;
       if (mApp.getLibrary(fp)) {
         openLibraryTab(fp, false);
       }
@@ -898,9 +901,69 @@ void MainWindow::openPackageCategoryTab(LibraryEditor& editor,
   }
 }
 
-void MainWindow::openSymbolTab(LibraryEditor& editor,
-                               const FilePath& fp) noexcept {
-  editor.openLegacySymbolEditor(fp);
+void MainWindow::openSymbolTab(LibraryEditor& editor, const FilePath& fp,
+                               bool copyFrom) noexcept {
+  if (!switchToLibraryElementTab<SymbolTab>(fp)) {
+    try {
+      std::unique_ptr<Symbol> sym;
+      SymbolTab::Mode mode = SymbolTab::Mode::Open;
+      if (fp.isValid() && (!copyFrom)) {
+        auto fs = TransactionalFileSystem::open(
+            fp, editor.isWritable(), &askForRestoringBackup,
+            DirectoryLockHandlerDialog::createDirectoryLockCallback());
+        sym = Symbol::open(std::unique_ptr<TransactionalDirectory>(
+            new TransactionalDirectory(fs)));
+      } else {
+        mode = SymbolTab::Mode::New;
+        sym.reset(new Symbol(Uuid::createRandom(), Version::fromString("0.1"),
+                             mApp.getWorkspace().getSettings().userName.get(),
+                             ElementName("New Symbol"), QString(), QString()));
+        if (copyFrom) {
+          mode = SymbolTab::Mode::Duplicate;
+          auto fs = TransactionalFileSystem::openRO(fp, &askForRestoringBackup);
+          std::unique_ptr<Symbol> src =
+              Symbol::open(std::unique_ptr<TransactionalDirectory>(
+                  new TransactionalDirectory(fs)));
+          sym->setNames(copyLibraryElementNames(src->getNames()));
+          sym->setDescriptions(src->getDescriptions());
+          sym->setKeywords(src->getKeywords());
+          sym->setCategories(src->getCategories());
+          // Copy pins but generate new UUIDs.
+          for (const SymbolPin& pin : src->getPins()) {
+            sym->getPins().append(std::make_shared<SymbolPin>(
+                Uuid::createRandom(), pin.getName(), pin.getPosition(),
+                pin.getLength(), pin.getRotation(), pin.getNamePosition(),
+                pin.getNameRotation(), pin.getNameHeight(),
+                pin.getNameAlignment()));
+          }
+          // Copy polygons but generate new UUIDs.
+          for (const Polygon& polygon : src->getPolygons()) {
+            sym->getPolygons().append(std::make_shared<Polygon>(
+                Uuid::createRandom(), polygon.getLayer(),
+                polygon.getLineWidth(), polygon.isFilled(),
+                polygon.isGrabArea(), polygon.getPath()));
+          }
+          // Copy circles but generate new UUIDs.
+          for (const Circle& circle : src->getCircles()) {
+            sym->getCircles().append(std::make_shared<Circle>(
+                Uuid::createRandom(), circle.getLayer(), circle.getLineWidth(),
+                circle.isFilled(), circle.isGrabArea(), circle.getCenter(),
+                circle.getDiameter()));
+          }
+          // Copy texts but generate new UUIDs.
+          for (const Text& text : src->getTexts()) {
+            sym->getTexts().append(std::make_shared<Text>(
+                Uuid::createRandom(), text.getLayer(), text.getText(),
+                text.getPosition(), text.getRotation(), text.getHeight(),
+                text.getAlign()));
+          }
+        }
+      }
+      addTab(std::make_shared<SymbolTab>(editor, std::move(sym), mode));
+    } catch (const Exception& e) {
+      QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
+    }
+  }
 }
 
 void MainWindow::openPackageTab(LibraryEditor& editor,

@@ -25,12 +25,9 @@
  ******************************************************************************/
 #include "symboleditorstate.h"
 
-#include <librepcb/core/types/angle.h>
-#include <librepcb/core/types/length.h>
-#include <librepcb/core/types/point.h>
+#include <librepcb/core/geometry/polygon.h>
 
 #include <QtCore>
-#include <QtWidgets>
 
 #include <memory>
 
@@ -38,10 +35,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class Layer;
-class Polygon;
-
 namespace editor {
 
 class CmdPolygonEdit;
@@ -73,8 +66,6 @@ public:
   bool processKeyReleased(const GraphicsSceneKeyEvent& e) noexcept override;
   bool entry() noexcept override;
   bool exit() noexcept override;
-  QSet<EditorWidgetBase::Feature> getAvailableFeatures()
-      const noexcept override;
 
   // Event Handlers
   bool processGraphicsSceneMouseMoved(
@@ -85,9 +76,36 @@ public:
       const GraphicsSceneMouseEvent& e) noexcept override;
   bool processAbortCommand() noexcept override;
 
+  // Connection to UI
+  QSet<const Layer*> getAvailableLayers() const noexcept;
+  const Layer& getLayer() const noexcept {
+    return mCurrentProperties.getLayer();
+  }
+  void setLayer(const Layer& layer) noexcept;
+  const UnsignedLength& getLineWidth() const noexcept {
+    return mCurrentProperties.getLineWidth();
+  }
+  void setLineWidth(const UnsignedLength& width) noexcept;
+  bool getFilled() const noexcept { return mCurrentProperties.isFilled(); }
+  void setFilled(bool filled) noexcept;
+  bool getGrabArea() const noexcept { return mCurrentProperties.isGrabArea(); }
+  void setGrabArea(bool grabArea) noexcept;
+  const Angle& getAngle() const noexcept { return mLastAngle; }
+  void setAngle(const Angle& angle) noexcept;
+
   // Operator Overloadings
   SymbolEditorState_DrawPolygonBase& operator=(
       const SymbolEditorState_DrawPolygonBase& rhs) = delete;
+
+signals:
+  void layerChanged(const Layer& layer);
+  void lineWidthChanged(const UnsignedLength& width);
+  void filledChanged(bool filled);
+  void grabAreaChanged(bool grabArea);
+  void angleChanged(const Angle& angle);
+
+protected:
+  virtual void notifyToolEnter() noexcept = 0;
 
 private:  // Methods
   bool start() noexcept;
@@ -98,31 +116,25 @@ private:  // Methods
   void updateOverlayText() noexcept;
   void updateStatusBarMessage() noexcept;
 
-  void layerComboBoxValueChanged(const Layer& layer) noexcept;
-  void lineWidthEditValueChanged(const UnsignedLength& value) noexcept;
-  void angleEditValueChanged(const Angle& value) noexcept;
-  void fillCheckBoxCheckedChanged(bool checked) noexcept;
-  void grabAreaCheckBoxCheckedChanged(bool checked) noexcept;
-
-private:  // Types / Data
-  Mode mMode;
-  bool mIsUndoCmdActive;
-  std::unique_ptr<CmdPolygonEdit> mEditCmd;
-  std::shared_ptr<Polygon> mCurrentPolygon;
-  std::shared_ptr<PolygonGraphicsItem> mCurrentGraphicsItem;
+private:
+  const Mode mMode;
   Point mLastScenePos;
+  Angle mLastAngle;
   Point mCursorPos;
+  bool mIsUndoCmdActive;
 
   // Arc tool state
   Point mArcCenter;
   bool mArcInSecondState;
 
-  // parameter memory
-  const Layer* mLastLayer;
-  UnsignedLength mLastLineWidth;
-  Angle mLastAngle;
-  bool mLastFill;
-  bool mLastGrabArea;
+  // Current tool settings
+  Polygon mCurrentProperties;
+
+  // Information about the current polygon to place. Only valid if
+  // mIsUndoCmdActive == true.
+  std::shared_ptr<Polygon> mCurrentPolygon;
+  std::unique_ptr<CmdPolygonEdit> mCurrentEditCmd;
+  std::shared_ptr<PolygonGraphicsItem> mCurrentGraphicsItem;
 };
 
 /*******************************************************************************

@@ -47,8 +47,10 @@ namespace editor {
  ******************************************************************************/
 
 CmdRemoveSelectedSymbolItems::CmdRemoveSelectedSymbolItems(
-    const SymbolEditorState::Context& context) noexcept
-  : UndoCommandGroup(tr("Remove Symbol Elements")), mContext(context) {
+    Symbol& sym, SymbolGraphicsItem& item) noexcept
+  : UndoCommandGroup(tr("Remove Symbol Elements")),
+    mSymbol(sym),
+    mGraphicsItem(item) {
 }
 
 CmdRemoveSelectedSymbolItems::~CmdRemoveSelectedSymbolItems() noexcept {
@@ -60,28 +62,24 @@ CmdRemoveSelectedSymbolItems::~CmdRemoveSelectedSymbolItems() noexcept {
 
 bool CmdRemoveSelectedSymbolItems::performExecute() {
   // remove pins
-  foreach (const auto& pin, mContext.symbolGraphicsItem.getSelectedPins()) {
-    appendChild(
-        new CmdSymbolPinRemove(mContext.symbol.getPins(), &pin->getObj()));
+  foreach (const auto& pin, mGraphicsItem.getSelectedPins()) {
+    appendChild(new CmdSymbolPinRemove(mSymbol.getPins(), &pin->getObj()));
   }
 
   // remove circles
-  foreach (const auto& circle,
-           mContext.symbolGraphicsItem.getSelectedCircles()) {
-    appendChild(
-        new CmdCircleRemove(mContext.symbol.getCircles(), &circle->getObj()));
+  foreach (const auto& circle, mGraphicsItem.getSelectedCircles()) {
+    appendChild(new CmdCircleRemove(mSymbol.getCircles(), &circle->getObj()));
   }
 
   // remove polygons
-  foreach (const auto& polygon,
-           mContext.symbolGraphicsItem.getSelectedPolygons()) {
-    appendChild(new CmdPolygonRemove(mContext.symbol.getPolygons(),
-                                     &polygon->getObj()));
+  foreach (const auto& polygon, mGraphicsItem.getSelectedPolygons()) {
+    appendChild(
+        new CmdPolygonRemove(mSymbol.getPolygons(), &polygon->getObj()));
   }
 
   // remove texts
-  foreach (const auto& text, mContext.symbolGraphicsItem.getSelectedTexts()) {
-    appendChild(new CmdTextRemove(mContext.symbol.getTexts(), &text->getObj()));
+  foreach (const auto& text, mGraphicsItem.getSelectedTexts()) {
+    appendChild(new CmdTextRemove(mSymbol.getTexts(), &text->getObj()));
   }
 
   // execute all child commands

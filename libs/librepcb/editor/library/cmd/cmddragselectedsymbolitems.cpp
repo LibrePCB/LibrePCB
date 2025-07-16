@@ -46,9 +46,8 @@ namespace editor {
  ******************************************************************************/
 
 CmdDragSelectedSymbolItems::CmdDragSelectedSymbolItems(
-    const SymbolEditorState::Context& context) noexcept
+    SymbolGraphicsItem& item, const PositiveLength& grid) noexcept
   : UndoCommandGroup(tr("Drag Symbol Elements")),
-    mContext(context),
     mCenterPos(0, 0),
     mDeltaPos(0, 0),
     mDeltaRot(0),
@@ -56,10 +55,8 @@ CmdDragSelectedSymbolItems::CmdDragSelectedSymbolItems(
     mSnappedToGrid(false),
     mHasOffTheGridElements(false) {
   int count = 0;
-  PositiveLength grid = mContext.graphicsScene.getGridInterval();
 
-  QList<std::shared_ptr<SymbolPinGraphicsItem>> pins =
-      context.symbolGraphicsItem.getSelectedPins();
+  QList<std::shared_ptr<SymbolPinGraphicsItem>> pins = item.getSelectedPins();
   foreach (const std::shared_ptr<SymbolPinGraphicsItem>& pin, pins) {
     Q_ASSERT(pin);
     mPinEditCmds.append(new CmdSymbolPinEdit(pin->getPtr()));
@@ -71,7 +68,7 @@ CmdDragSelectedSymbolItems::CmdDragSelectedSymbolItems(
   }
 
   QList<std::shared_ptr<CircleGraphicsItem>> circles =
-      context.symbolGraphicsItem.getSelectedCircles();
+      item.getSelectedCircles();
   foreach (const std::shared_ptr<CircleGraphicsItem>& circle, circles) {
     Q_ASSERT(circle);
     mCircleEditCmds.append(new CmdCircleEdit(circle->getObj()));
@@ -83,7 +80,7 @@ CmdDragSelectedSymbolItems::CmdDragSelectedSymbolItems(
   }
 
   QList<std::shared_ptr<PolygonGraphicsItem>> polygons =
-      context.symbolGraphicsItem.getSelectedPolygons();
+      item.getSelectedPolygons();
   foreach (const std::shared_ptr<PolygonGraphicsItem>& polygon, polygons) {
     Q_ASSERT(polygon);
     mPolygonEditCmds.append(new CmdPolygonEdit(polygon->getObj()));
@@ -96,8 +93,7 @@ CmdDragSelectedSymbolItems::CmdDragSelectedSymbolItems(
     }
   }
 
-  QList<std::shared_ptr<TextGraphicsItem>> texts =
-      context.symbolGraphicsItem.getSelectedTexts();
+  QList<std::shared_ptr<TextGraphicsItem>> texts = item.getSelectedTexts();
   foreach (const std::shared_ptr<TextGraphicsItem>& text, texts) {
     Q_ASSERT(text);
     mTextEditCmds.append(new CmdTextEdit(text->getObj()));
@@ -132,8 +128,8 @@ int CmdDragSelectedSymbolItems::getSelectedItemsCount() const noexcept {
  *  General Methods
  ******************************************************************************/
 
-void CmdDragSelectedSymbolItems::snapToGrid() noexcept {
-  PositiveLength grid = mContext.graphicsScene.getGridInterval();
+void CmdDragSelectedSymbolItems::snapToGrid(
+    const PositiveLength& grid) noexcept {
   foreach (CmdSymbolPinEdit* cmd, mPinEditCmds) {
     cmd->snapToGrid(grid, true);
   }

@@ -70,6 +70,25 @@ QString s2q(const slint::SharedString& s) noexcept {
   return QString::fromUtf8(view.data(), view.size());
 }
 
+std::shared_ptr<slint::VectorModel<slint::SharedString>> q2s(
+    const QStringList& s) noexcept {
+  auto m = std::make_shared<slint::VectorModel<slint::SharedString>>();
+  for (const QString& item : s) {
+    m->push_back(q2s(item));
+  }
+  return m;
+}
+
+QStringList s2q(const slint::Model<slint::SharedString>& s) noexcept {
+  QStringList list;
+  for (std::size_t i = 0; i < s.row_count(); ++i) {
+    if (auto item = s.row_data(i)) {
+      list.append(s2q(*item));
+    }
+  }
+  return list;
+}
+
 bool operator==(const QString& s1, const slint::SharedString& s2) noexcept {
   return s1.toUtf8().data() == std::string_view(s2);
 }

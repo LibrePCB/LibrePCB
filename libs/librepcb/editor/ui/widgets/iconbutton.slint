@@ -62,6 +62,7 @@ export component IconButton inherits Rectangle {
     accessible-description: status-tip;
     accessible-enabled: enabled && (!read-only);
     accessible-label: tooltip;
+    accessible-checked: checked;
     //accessible-read-only: read-only;  Causing compiler warning :-/
     accessible-action-default => {
         ta.clicked();

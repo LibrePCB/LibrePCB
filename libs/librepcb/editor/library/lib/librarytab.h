@@ -93,7 +93,8 @@ signals:
                                         const FilePath& fp, bool copyFrom);
   void packageCategoryEditorRequested(LibraryEditor& editor, const FilePath& fp,
                                       bool copyFrom);
-  void symbolEditorRequested(LibraryEditor& editor, const FilePath& fp);
+  void symbolEditorRequested(LibraryEditor& editor, const FilePath& fp,
+                             bool copyFrom);
   void packageEditorRequested(LibraryEditor& editor, const FilePath& fp);
   void componentEditorRequested(LibraryEditor& editor, const FilePath& fp);
   void deviceEditorRequested(LibraryEditor& editor, const FilePath& fp);

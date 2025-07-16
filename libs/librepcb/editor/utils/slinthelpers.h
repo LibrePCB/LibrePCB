@@ -62,6 +62,10 @@ bool operator!=(const QString& s1, const slint::SharedString& s2) noexcept;
 bool operator==(const slint::SharedString& s1, const QString& s2) noexcept;
 bool operator!=(const slint::SharedString& s1, const QString& s2) noexcept;
 
+std::shared_ptr<slint::VectorModel<slint::SharedString>> q2s(
+    const QStringList& s) noexcept;
+QStringList s2q(const slint::Model<slint::SharedString>& s) noexcept;
+
 slint::Image q2s(const QPixmap& p) noexcept;
 
 slint::Color q2s(const QColor& c) noexcept;
