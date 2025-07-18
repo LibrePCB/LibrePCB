@@ -438,71 +438,49 @@ component SymbolEditorTab inherits TouchArea {
             clicked => {
                 tool-triggered(TabAction.tool-line);
             }
-        }
 
-        tool-rect-btn := ToolButton {
-            cmd: Cmd.tool-rect;
-            icon: @image-url("../../../../../font-awesome/svgs/solid/vector-square.svg");
-            checked: tabs[index].tool == EditorTool.rect;
-            enabled: !read-only;
+            tool-rect-btn := ToolButton {
+                cmd: Cmd.tool-rect;
+                icon: @image-url("../../../../../font-awesome/svgs/solid/vector-square.svg");
+                checked: tabs[index].tool == EditorTool.rect;
+                enabled: !read-only;
 
-            clicked => {
-                tool-triggered(TabAction.tool-rect);
+                clicked => {
+                    tool-triggered(TabAction.tool-rect);
+                }
             }
-        }
 
-        tool-polygon-btn := ToolButton {
-            cmd: Cmd.tool-polygon;
-            icon: @image-url("../../../../../font-awesome/svgs/solid/draw-polygon.svg");
-            checked: tabs[index].tool == EditorTool.polygon;
-            enabled: !read-only;
+            tool-polygon-btn := ToolButton {
+                cmd: Cmd.tool-polygon;
+                icon: @image-url("../../../../../font-awesome/svgs/solid/draw-polygon.svg");
+                checked: tabs[index].tool == EditorTool.polygon;
+                enabled: !read-only;
 
-            clicked => {
-                tool-triggered(TabAction.tool-polygon);
+                clicked => {
+                    tool-triggered(TabAction.tool-polygon);
+                }
             }
-        }
 
-        tool-circle-btn := ToolButton {
-            cmd: Cmd.tool-circle;
-            icon: @image-url("../../../../../bootstrap-icons/icons/circle.svg");
-            checked: tabs[index].tool == EditorTool.circle;
-            enabled: !read-only;
+            tool-circle-btn := ToolButton {
+                cmd: Cmd.tool-circle;
+                icon: @image-url("../../../../../bootstrap-icons/icons/circle.svg");
+                checked: tabs[index].tool == EditorTool.circle;
+                enabled: !read-only;
 
-            clicked => {
-                tool-triggered(TabAction.tool-circle);
+                clicked => {
+                    tool-triggered(TabAction.tool-circle);
+                }
             }
-        }
 
-        tool-arc-btn := ToolButton {
-            cmd: Cmd.tool-arc;
-            icon: @image-url("../../../../../font-awesome/svgs/solid/circle-notch.svg");
-            checked: tabs[index].tool == EditorTool.arc;
-            enabled: !read-only;
+            tool-arc-btn := ToolButton {
+                cmd: Cmd.tool-arc;
+                icon: @image-url("../../../../../font-awesome/svgs/solid/circle-notch.svg");
+                checked: tabs[index].tool == EditorTool.arc;
+                enabled: !read-only;
 
-            clicked => {
-                tool-triggered(TabAction.tool-arc);
-            }
-        }
-
-        tool-name-btn := ToolButton {
-            cmd: Cmd.tool-name;
-            icon: @image-url("../../../../../../img/actions/add_name.png");
-            checked: tabs[index].tool == EditorTool.name;
-            enabled: !read-only;
-
-            clicked => {
-                tool-triggered(TabAction.tool-name);
-            }
-        }
-
-        tool-value-btn := ToolButton {
-            cmd: Cmd.tool-value;
-            icon: @image-url("../../../../../../img/actions/add_value.png");
-            checked: tabs[index].tool == EditorTool.value;
-            enabled: !read-only;
-
-            clicked => {
-                tool-triggered(TabAction.tool-value);
+                clicked => {
+                    tool-triggered(TabAction.tool-arc);
+                }
             }
         }
 
@@ -514,6 +492,28 @@ component SymbolEditorTab inherits TouchArea {
 
             clicked => {
                 tool-triggered(TabAction.tool-text);
+            }
+
+            tool-name-btn := ToolButton {
+                cmd: Cmd.tool-name;
+                icon: @image-url("../../../../../../img/actions/add_name.png");
+                checked: tabs[index].tool == EditorTool.name;
+                enabled: !read-only;
+
+                clicked => {
+                    tool-triggered(TabAction.tool-name);
+                }
+            }
+
+            tool-value-btn := ToolButton {
+                cmd: Cmd.tool-value;
+                icon: @image-url("../../../../../../img/actions/add_value.png");
+                checked: tabs[index].tool == EditorTool.value;
+                enabled: !read-only;
+
+                clicked => {
+                    tool-triggered(TabAction.tool-value);
+                }
             }
         }
 
