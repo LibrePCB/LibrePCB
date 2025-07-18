@@ -76,9 +76,6 @@ public:
 
   enum class ElementType {
     None,
-    ComponentCategory,
-    PackageCategory,
-    Symbol,
     Package,
     Component,
     Device,
@@ -125,12 +122,6 @@ public:  // Data
   QString mElementAuthor;
   std::optional<Version> mElementVersion;
   QSet<Uuid> mElementCategoryUuids;
-
-  // symbol
-  SymbolPinList mSymbolPins;
-  PolygonList mSymbolPolygons;
-  CircleList mSymbolCircles;
-  TextList mSymbolTexts;
 
   // package
   Package::AssemblyType mPackageAssemblyType;

@@ -41,12 +41,6 @@ NewElementWizardPage_ChooseType::NewElementWizardPage_ChooseType(
     mUi(new Ui::NewElementWizardPage_ChooseType) {
   mUi->setupUi(this);
   setPixmap(QWizard::WatermarkPixmap, QPixmap(":/img/wizards/watermark.jpg"));
-  connect(mUi->btnComponentCategory, &QToolButton::clicked, this,
-          &NewElementWizardPage_ChooseType::btnComponentCategoryClicked);
-  connect(mUi->btnPackageCategory, &QToolButton::clicked, this,
-          &NewElementWizardPage_ChooseType::btnPackageCategoryClicked);
-  connect(mUi->btnSymbol, &QToolButton::clicked, this,
-          &NewElementWizardPage_ChooseType::btnSymbolClicked);
   connect(mUi->btnPackage, &QToolButton::clicked, this,
           &NewElementWizardPage_ChooseType::btnPackageClicked);
   connect(mUi->btnComponent, &QToolButton::clicked, this,
@@ -77,18 +71,6 @@ int NewElementWizardPage_ChooseType::nextId() const noexcept {
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
-
-void NewElementWizardPage_ChooseType::btnComponentCategoryClicked() noexcept {
-  setElementType(NewElementWizardContext::ElementType::ComponentCategory);
-}
-
-void NewElementWizardPage_ChooseType::btnPackageCategoryClicked() noexcept {
-  setElementType(NewElementWizardContext::ElementType::PackageCategory);
-}
-
-void NewElementWizardPage_ChooseType::btnSymbolClicked() noexcept {
-  setElementType(NewElementWizardContext::ElementType::Symbol);
-}
 
 void NewElementWizardPage_ChooseType::btnPackageClicked() noexcept {
   setElementType(NewElementWizardContext::ElementType::Package);
