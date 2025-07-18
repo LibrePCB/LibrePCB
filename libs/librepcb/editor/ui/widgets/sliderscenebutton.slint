@@ -1,0 +1,61 @@
+import { SceneButton } from "scenebutton.slint";
+import { HorizontalSlider } from "slider.slint";
+
+export component SliderSceneButton inherits TouchArea {
+    in property <image> icon;
+    in property <string> tooltip;
+    in property <float> value;
+    in property <brush> bg-color;
+    in property <brush> fg-color;
+
+    callback value-changed(value: float);
+
+    HorizontalLayout {
+        alignment: end;
+
+        if root.has-hover: VerticalLayout {
+            spacing: 5px;
+
+            Rectangle {
+                x: (parent.width - self.width) / 2;
+                width: self.preferred-width + 6px;
+                height: self.preferred-height + 2px;
+                background: bg-color;
+                border-radius: 5px;
+
+                Text {
+                    color: fg-color;
+                    horizontal-alignment: center;
+                    font-size: 10px;
+                    text: tooltip;
+                    accessible-role: none;
+                }
+            }
+
+            slider := HorizontalSlider {
+                min-width: 80px;
+                value: value;
+                focusable: false;
+                accessible-label: tooltip;
+
+                value-changed(value) => {
+                    value-changed(value);
+                }
+            }
+        }
+
+        btn := SceneButton {
+            icon: icon;
+            icon-scale: 0.9;
+            bg-color: bg-color;
+            fg-color: fg-color;
+            style: uncheckbox;
+            checked: value < 0.2;
+            accessible-label: tooltip;
+
+            clicked => {
+                value-changed(self.checked ? 1 : 0);
+            }
+        }
+    }
+}

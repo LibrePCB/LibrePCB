@@ -1,0 +1,69 @@
+import { LinkText } from "linktext.slint";
+import { ToolBarWidget } from "toolbarwidget.slint";
+import { Constants } from "../api.slint";
+
+export struct TextFlagsBoxItemData {
+    text: string,
+    status-tip: string,
+    checked: bool,
+}
+
+export component TextFlagsBox inherits ToolBarWidget {
+    in property <string> title;
+    in-out property <[TextFlagsBoxItemData]> model;
+    property <int> current-index: 0;
+
+    callback toggled(int, bool);
+    toggled(index, state) => {
+        model[index].checked = state;
+    }
+
+    padding-left: 8px;
+    padding-right: 8px;
+    spacing: 6px;
+
+    if !title.is-empty: Text {
+        vertical-alignment: center;
+        wrap: no-wrap;
+        text: title + ":";
+        accessible-role: none;
+    }
+
+    for item[index] in model: item-btn := LinkText {
+        font-size: 10px;
+        vertical-alignment: center;
+        text-color: item.checked ? #c0c0c0 : #606060;
+        text: item.text.to-uppercase();
+        accessible-label: title + " " + item.text;
+        accessible-checkable: true;
+        accessible-checked: item.checked;
+
+        if root.has-focus && (index == current-index): Rectangle {
+            y: parent.height + 2px;  // 2px above border!
+            height: 2px;
+            background: Constants.librepcb-color;
+        }
+
+        clicked => {
+            toggled(index, !item.checked);
+        }
+    }
+
+    key-pressed(event) => {
+        if event.text == Key.LeftArrow {
+            if current-index > 0 {
+                current-index -= 1;
+            }
+            return accept;
+        } else if event.text == Key.RightArrow {
+            if current-index < (model.length - 1) {
+                current-index += 1;
+            }
+            return accept;
+        } else if event.text == Key.Space {
+            toggled(current-index, !model[current-index].checked);
+            return accept;
+        }
+        reject
+    }
+}

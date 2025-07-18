@@ -1,0 +1,43 @@
+import { LinkText } from "linktext.slint";
+
+export struct NavBarItemData {
+    title: string,
+    disabled: bool,
+}
+
+export component NavBar inherits HorizontalLayout {
+    in property <[NavBarItemData]> items;
+    in-out property <int> current-index: 0;
+
+    callback page-clicked(index: int);
+    page-clicked(index) => {
+        current-index = index;
+    }
+
+    height: self.preferred-height;
+    alignment: start;
+
+    for item[index] in items: item-l := HorizontalLayout {
+        item-btn := LinkText {
+            width: self.preferred-width + 16px;
+            height: self.preferred-height + 16px;
+            vertical-alignment: center;
+            horizontal-alignment: center;
+            text: item.title;
+            text-color: (index == current-index) ? #e0e0e0 : #909090;
+            text-color-hovered: (index == current-index) ? #ffffff : #a0a0a0;
+            enabled: !item.disabled;
+
+            clicked => {
+                page-clicked(index);
+            }
+        }
+
+        if (index + 1) < items.length: Text {
+            text: "•";
+            color: #909090;
+            vertical-alignment: center;
+            accessible-role: none;
+        }
+    }
+}

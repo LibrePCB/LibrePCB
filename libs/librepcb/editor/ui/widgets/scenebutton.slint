@@ -35,7 +35,7 @@ export component SceneButton inherits Rectangle {
     accessible-role: button;
     accessible-checkable: (style == SceneButtonStyle.checkbox) || (style == SceneButtonStyle.uncheckbox);
     accessible-checked: checked;
-    accessible-label: text;
+    accessible-label: text + " " + tooltip;
     accessible-action-default => {
         ta.clicked();
     }

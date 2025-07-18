@@ -1,5 +1,5 @@
 import { IconButton } from "iconbutton.slint";
-import { Constants } from "../api.slint";
+import { ToolBarWidget } from "toolbarwidget.slint";
 
 component AlignmentButton inherits IconButton {
     width: 18px;
@@ -8,60 +8,36 @@ component AlignmentButton inherits IconButton {
     color-checked: #c0c0c0;
 }
 
-component AlignmentSelector inherits Rectangle {
+component AlignmentSelector inherits ToolBarWidget {
     in property <[image]> icons;
     in property <[string]> tooltips;
     in property <int> index: 0;
-    in property <bool> enabled: true;
 
     callback index-clicked(int);
 
-    width: self.preferred-width;
-    preferred-height: 28px;
-    background: #202020;
-    border-color: {
-        if fs.has-focus {
-            Constants.librepcb-color
-        } else if enabled {
-            #606060
-        } else {
-            transparent
-        }
-    }
-    border-width: 1px;
-    border-radius: 10px;
-    forward-focus: fs;
+    for i in 3: btn := AlignmentButton {
+        icon: icons[i];
+        tooltip: tooltips[i];
+        checked: index == i;
 
-    fs := FocusScope {
-        key-pressed(event) => {
-            if event.text == Key.LeftArrow {
-                if index > 0 {
-                    index-clicked(index - 1);
-                }
-                return accept;
-            } else if event.text == Key.RightArrow {
-                if index < 2 {
-                    index-clicked(index + 1);
-                }
-                return accept;
-            }
-            reject
+        clicked => {
+            index-clicked(i);
         }
     }
 
-    HorizontalLayout {
-        padding: 5px;
-        spacing: 3px;
-
-        for i in 3: btn := AlignmentButton {
-            icon: icons[i];
-            tooltip: tooltips[i];
-            checked: index == i;
-
-            clicked => {
-                index-clicked(i);
+    key-pressed(event) => {
+        if event.text == Key.LeftArrow {
+            if index > 0 {
+                index-clicked(index - 1);
             }
+            return accept;
+        } else if event.text == Key.RightArrow {
+            if index < 2 {
+                index-clicked(index + 1);
+            }
+            return accept;
         }
+        reject
     }
 }
 

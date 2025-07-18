@@ -1,45 +1,21 @@
-import { LinkText } from "linktext.slint";
-
-export struct SlideViewPageData {
-    title: string,
-    disabled: bool,
-}
+import { NavBar, NavBarItemData } from "navbar.slint";
 
 export component SlideView inherits VerticalLayout {
-    in property <[SlideViewPageData]> pages;
+    in property <[NavBarItemData]> pages;
     in-out property <int> current-index: 0;
+    in-out property <int> current-navbar-index: current-index;
 
     callback page-clicked(index: int);
     page-clicked(index) => {
         current-index = index;
     }
 
-    HorizontalLayout {
-        height: self.preferred-height;
-        alignment: start;
+    navbar := NavBar {
+        items: pages;
+        current-index: current-navbar-index;
 
-        for page[index] in pages: header-item-l := HorizontalLayout {
-            header-item-btn := LinkText {
-                width: self.preferred-width + 16px;
-                height: self.preferred-height + 16px;
-                vertical-alignment: center;
-                horizontal-alignment: center;
-                text: page.title;
-                text-color: (index == current-index) ? #e0e0e0 : #909090;
-                text-color-hovered: (index == current-index) ? #ffffff : #a0a0a0;
-                enabled: !page.disabled;
-
-                clicked => {
-                    page-clicked(index);
-                }
-            }
-
-            if (index + 1) < pages.length: Text {
-                text: "•";
-                color: #909090;
-                vertical-alignment: center;
-                accessible-role: none;
-            }
+        page-clicked(index) => {
+            root.page-clicked(index);
         }
     }
 
