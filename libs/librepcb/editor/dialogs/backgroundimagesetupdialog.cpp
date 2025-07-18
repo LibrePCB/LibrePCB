@@ -208,9 +208,12 @@ BackgroundImageSetupDialog::BackgroundImageSetupDialog(
     updateUi();
   });
 
-  // Load initial values and window geometry.
+  // Load client settings.
   QSettings cs;
-  restoreGeometry(cs.value(mSettingsPrefix % "/window_geometry").toByteArray());
+  const QSize windowSize = cs.value(mSettingsPrefix % "/window_size").toSize();
+  if (!windowSize.isEmpty()) {
+    resize(windowSize);
+  }
 
   // Try to load image from clipboard.
   pasteFromClipboard();
@@ -220,9 +223,9 @@ BackgroundImageSetupDialog::BackgroundImageSetupDialog(
 BackgroundImageSetupDialog::~BackgroundImageSetupDialog() noexcept {
   mUi->graphicsView->setEventHandlerObject(nullptr);
 
-  // Save the values and window geometry.
+  // Save client settings.
   QSettings cs;
-  cs.setValue(mSettingsPrefix % "/window_geometry", saveGeometry());
+  cs.setValue(mSettingsPrefix % "/window_size", size());
 }
 
 /*******************************************************************************
