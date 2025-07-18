@@ -324,8 +324,9 @@ public:
   }
   void swap(int i, int j) noexcept {
     // do not call mObjects.swap() because it would not notify the observers
-    qBound(0, i, count() - 1);
-    qBound(0, j, count() - 1);
+    if (mObjects.count() < 2) return;  // Avoid assert in qBound()!
+    i = qBound(0, i, count() - 1);
+    j = qBound(0, j, count() - 1);
     if (i == j) return;
     if (i > j) qSwap(i, j);
     std::shared_ptr<T> oj = take(j);
@@ -335,7 +336,7 @@ public:
   }
   int insert(int index, const std::shared_ptr<T>& obj) noexcept {
     Q_ASSERT(obj);
-    qBound(0, index, count());
+    index = qBound(0, index, count());
     insertElement(index, obj);
     return index;
   }
