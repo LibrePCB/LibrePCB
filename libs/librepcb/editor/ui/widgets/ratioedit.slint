@@ -1,28 +1,31 @@
 import { IconButton } from "iconbutton.slint";
 import { ToolTip } from "tooltip.slint";
 import {
-    AngleEditData,
-    AngleEditParseResult,
     Backend,
     Constants,
+    RatioEditData,
+    RatioEditParseResult,
 } from "../api.slint";
 
-export component AngleEdit inherits Rectangle {
-    in property <AngleEditData> data;
+export component RatioEdit inherits Rectangle {
+    in property <RatioEditData> data;
     in-out property <int> value: data.value;
-    in property <image> icon: @image-url("../../../../font-awesome/svgs/solid/compass-drafting.svg");
+    in property <int> minimum: data.minimum;
+    in property <int> maximum: data.maximum;
+    in property <image> icon;
     in property <string> tooltip;
-    in property <string> min-width-text: "123.456 °";
+    in property <string> min-width-text: "12.345 %";
+    in property <bool> can-increase: data.can-increase;
+    in property <bool> can-decrease: data.can-decrease;
     in property <bool> enabled: true;
-    property <AngleEditParseResult> parse-result;
+    in property <bool> read-only: false;
+    property <RatioEditParseResult> parse-result;
     property <bool> disable-update: false;
 
     callback value-changed(int);
     value-changed(value) => {
         self.value = value;
     }
-
-    callback value-accepted(int);
 
     callback increase-triggered;
     callback decrease-triggered;
@@ -32,15 +35,15 @@ export component AngleEdit inherits Rectangle {
     }
 
     function update-text-from-value() {
-        edt.text = Backend.format-angle(root.value) + "°";
+        edt.text = Backend.format-ratio(root.value) + " %";
         parse-result.valid = true;
     }
 
     // Accessibility
     accessible-role: spinbox;
-    accessible-description: tooltip.is-empty ? "angle" : tooltip;
+    accessible-description: tooltip.is-empty ? "ratio" : tooltip;
     accessible-enabled: enabled;
-    accessible-value: edt.text + " degrees";
+    accessible-value: edt.text + " percent";
     accessible-action-increment => {
         up-btn.clicked();
     }
@@ -114,6 +117,7 @@ export component AngleEdit inherits Rectangle {
                 selection-background-color: Constants.librepcb-color;
                 selection-foreground-color: black;
                 enabled: enabled;
+                read-only: read-only;
                 accessible-role: none;
 
                 changed has-focus => {
@@ -129,7 +133,7 @@ export component AngleEdit inherits Rectangle {
 
                 edited => {
                     disable-update = true;
-                    parse-result = Backend.parse-angle-input(self.text);
+                    parse-result = Backend.parse-ratio-input(self.text, minimum, maximum);
                     if parse-result.valid {
                         if parse-result.evaluated-value != value {
                             value-changed(parse-result.evaluated-value);
@@ -140,17 +144,20 @@ export component AngleEdit inherits Rectangle {
                 accepted => {
                     disable-update = false;
                     update-text-from-value();
-                    value-accepted(parse-result.evaluated-value);
                 }
 
                 key-pressed(event) => {
                     if event.text == Key.UpArrow {
-                        disable-update = false;
-                        increase-triggered();
+                        if can-increase {
+                            disable-update = false;
+                            increase-triggered();
+                        }
                         return accept;
                     } else if event.text == Key.DownArrow {
-                        disable-update = false;
-                        decrease-triggered();
+                        if can-decrease {
+                            disable-update = false;
+                            decrease-triggered();
+                        }
                         return accept;
                     } else if (event.text == Key.Escape) && disable-update {
                         disable-update = false;
@@ -169,7 +176,7 @@ export component AngleEdit inherits Rectangle {
                 VerticalLayout {
                     up-btn := IconButton {
                         width: 15px;
-                        enabled: enabled;
+                        enabled: enabled && can-increase;
                         background-color: black;
                         icon: @image-url("../../../../font-awesome/svgs/solid/caret-up.svg");
                         icon-offset-y: 1px;
@@ -183,7 +190,7 @@ export component AngleEdit inherits Rectangle {
 
                     down-btn := IconButton {
                         width: 15px;
-                        enabled: enabled;
+                        enabled: enabled && can-decrease;
                         background-color: black;
                         icon: @image-url("../../../../font-awesome/svgs/solid/caret-down.svg");
                         icon-offset-y: -1px;

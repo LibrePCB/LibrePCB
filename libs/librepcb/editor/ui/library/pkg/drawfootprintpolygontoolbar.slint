@@ -5,23 +5,24 @@ import {
     LengthEdit,
 } from "../../widgets.slint";
 import {
-    SymbolTabData,
+    PackageTabData,
     WindowSectionData,
 } from "../../api.slint";
 
-export component DrawSymbolPolygonToolBar inherits HorizontalLayout {
+export component DrawFootprintPolygonToolBar inherits HorizontalLayout {
     in property <int> section-index;
     in-out property <WindowSectionData> section;
     in property <bool> show-angle-edt: true;
     in property <bool> show-fill-sw: true;
     in property <bool> show-grab-area-sw: true;
-    property <[SymbolTabData]> tabs: section.symbol-tabs;
+    property <[PackageTabData]> tabs: section.package-tabs;
 
     spacing: 2px;
 
     layer-cbx := ComboBox {
         model: tabs[section.current-tab-index].tool-layer.items;
         current-index: tabs[section.current-tab-index].tool-layer.current-index;
+        accessible-label: "layer";
 
         current-index-changed(index) => {
             tabs[section.current-tab-index].tool-layer.current-index = index;
@@ -92,7 +93,7 @@ export component DrawSymbolPolygonToolBar inherits HorizontalLayout {
         icon: @image-url("../../../../../font-awesome/svgs/solid/hand.svg");
         icon-scale: 0.6;
         tooltip: @tr("Grab Area");
-        status-tip: @tr("Allow grabbing the symbol within the polygon's area");
+        status-tip: @tr("Allow grabbing the footprint within the polygon's area");
         background-color: #202020;
         background-color-hovered: #404040;
         background-color-checked: black;

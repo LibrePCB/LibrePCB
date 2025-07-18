@@ -1,0 +1,141 @@
+import { ScrollView } from "std-widgets.slint";
+import { IconButton, LineEdit } from "../../widgets.slint";
+import { PackagePadData } from "../../api.slint";
+
+component PackagePadListViewHeader inherits Rectangle {
+    in property <string> text;
+    in property <TextHorizontalAlignment> alignment: left;
+
+    Text {
+        width: 100%;
+        horizontal-alignment: alignment;
+        vertical-alignment: center;
+        color: #909090;
+        text: text;
+    }
+}
+
+export component PackagePadListView inherits ScrollView {
+    in-out property <[PackagePadData]> model;
+    in property <bool> read-only;
+    property <length> row-height: 25px;
+    property <length> row-spacing: 3px;
+
+    callback edited;
+
+    preferred-height: l.preferred-height;
+
+    Rectangle {
+        x: 0;
+        y: row-height - 2px;
+        width: parent.width - 8px;
+        height: 1px;
+        background: #404040;
+    }
+
+    l := HorizontalLayout {
+        padding-right: 8px;
+        spacing: 5px;
+
+        VerticalLayout {
+            width: self.preferred-width;
+            spacing: row-spacing;
+
+            PackagePadListViewHeader {
+                height: row-height;
+                alignment: right;
+                text: @tr("#");
+            }
+
+            for item[index] in model: number-txt := Text {
+                height: row-height;
+                horizontal-alignment: right;
+                vertical-alignment: center;
+                font-size: 10px;
+                color: #909090;
+                text: index + 1;
+                accessible-role: none;
+            }
+        }
+
+        Rectangle {
+            width: 1px;
+            background: #404040;
+        }
+
+        VerticalLayout {
+            width: self.preferred-width;
+            spacing: row-spacing;
+
+            PackagePadListViewHeader {
+                height: row-height;
+                text: @tr("ID");
+            }
+
+            for item[index] in model: id-txt := Text {
+                height: row-height;
+                horizontal-alignment: right;
+                vertical-alignment: center;
+                font-family: "Noto Sans Mono";
+                font-size: 10px;
+                color: #909090;
+                text: item.id;
+                accessible-role: none;
+            }
+        }
+
+        Rectangle {
+            width: 1px;
+            background: #404040;
+        }
+
+        VerticalLayout {
+            spacing: row-spacing;
+
+            PackagePadListViewHeader {
+                height: row-height;
+                text: @tr("Name");
+            }
+
+            for item[index] in model: name-edt := LineEdit {
+                height: row-height;
+                text: item.name;
+                validation-error: item.name-error;
+                read-only: read-only;
+
+                text-edited(text) => {
+                    model[index].name = text;
+                }
+
+                text-accepted(text) => {
+                    model[index].name = text;
+                    edited();
+                }
+            }
+        }
+
+        if !read-only: Rectangle {
+            width: 1px;
+            background: #404040;
+        }
+
+        if !read-only: VerticalLayout {
+            spacing: row-spacing;
+
+            PackagePadListViewHeader {
+                height: row-height;
+            }
+
+            for item[index] in model: delete-btn := IconButton {
+                height: row-height;
+                style: hyperlink;
+                icon-scale: 0.65;
+                icon: @image-url("../../../../../font-awesome/svgs/solid/trash-can.svg");
+
+                clicked => {
+                    model[index].delete = true;
+                }
+            }
+        }
+    }
+}

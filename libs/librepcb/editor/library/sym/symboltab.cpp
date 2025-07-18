@@ -419,7 +419,7 @@ void SymbolTab::trigger(ui::TabAction a) noexcept {
     }
     case ui::TabAction::Undo: {
       try {
-        commitUiData();
+        // commitUiData(); TODO: May end up in an endless undo command loop.
         mUndoStack->undo();
       } catch (const Exception& e) {
         QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
@@ -428,7 +428,7 @@ void SymbolTab::trigger(ui::TabAction a) noexcept {
     }
     case ui::TabAction::Redo: {
       try {
-        commitUiData();
+        // commitUiData(); TODO: May end up in an endless undo command loop.
         mUndoStack->redo();
       } catch (const Exception& e) {
         QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());

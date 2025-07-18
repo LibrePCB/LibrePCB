@@ -4,14 +4,17 @@ import { Data, EditorCommand } from "../api.slint";
 export component ToolButton inherits Rectangle {
     in property <EditorCommand> cmd;
     in property <image> icon: cmd.icon;
+    in property <color> colorize: white;
     in property <string> tooltip: cmd.text;
     in property <string> status-tip: cmd.status-tip;
     in property <string> shortcut: cmd.shortcut;
+    in property <bool> has-menu: false;
     in property <bool> enabled: true;
     in property <bool> checked: false;
     out property <bool> pressed <=> ta.pressed;
 
     callback clicked <=> ta.clicked;
+    callback right-clicked;
 
     width: 30px;
     height: self.preferred-height;
@@ -37,15 +40,27 @@ export component ToolButton inherits Rectangle {
                 width: parent.width * 0.7;
                 height: self.width;
                 image-fit: contain;
-                colorize: enabled ? white : #b0b0b0;
+                colorize: enabled ? colorize : #b0b0b0;
                 source: icon;
                 accessible-role: none;
+            }
+
+            if has-menu: Rectangle {
+                x: parent.width - self.width;
+                y: parent.height - self.height;
+                width: 7px;
+                height: self.width;
+
+                Path {
+                    commands: "M 100 0 L 100 100 L 0 100 Z";
+                    fill: enabled ? white : #b0b0b0;
+                }
             }
 
             if ta.has-hover && (!ta.pressed): tt := ToolTip {
                 x: parent.width + 5px;
                 y: (parent.height - self.height) / 2;
-                text: shortcut.is-empty ? tooltip : (tooltip + " (" + shortcut + ")");
+                text: (shortcut.is-empty ? tooltip : (tooltip + " (" + shortcut + ")")) + (has-menu ? ("\n(" + @tr("right-click for menu") + ")") : "");
             }
 
             changed has-hover => {
@@ -55,6 +70,12 @@ export component ToolButton inherits Rectangle {
                     } else {
                         Data.status-tip = "";
                     }
+                }
+            }
+
+            pointer-event(event) => {
+                if (event.button == PointerEventButton.right) && (event.kind == PointerEventKind.down) {
+                    right-clicked();
                 }
             }
         }

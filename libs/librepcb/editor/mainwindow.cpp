@@ -34,6 +34,7 @@
 #include "library/lib/librarytab.h"
 #include "library/librariesmodel.h"
 #include "library/libraryeditor.h"
+#include "library/pkg/packagetab.h"
 #include "library/sym/symboltab.h"
 #include "mainwindowtestadapter.h"
 #include "notificationsmodel.h"
@@ -56,6 +57,7 @@
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/library/cat/componentcategory.h>
 #include <librepcb/core/library/cat/packagecategory.h>
+#include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/workspace/workspace.h>
@@ -595,7 +597,7 @@ void MainWindow::triggerLibrary(slint::SharedString path,
     }
     case ui::LibraryAction::NewPackage: {
       if (auto editor = mApp.getLibrary(fp)) {
-        openPackageTab(*editor, FilePath());
+        openPackageTab(*editor, FilePath(), false);
       }
       break;
     }
@@ -629,6 +631,7 @@ void MainWindow::triggerLibraryElement(slint::SharedString path,
       if (switchToLibraryElementTab<ComponentCategoryTab>(fp)) return;
       if (switchToLibraryElementTab<PackageCategoryTab>(fp)) return;
       if (switchToLibraryElementTab<SymbolTab>(fp)) return;
+      if (switchToLibraryElementTab<PackageTab>(fp)) return;
       if (mApp.getLibrary(fp)) {
         openLibraryTab(fp, false);
       }
@@ -966,9 +969,133 @@ void MainWindow::openSymbolTab(LibraryEditor& editor, const FilePath& fp,
   }
 }
 
-void MainWindow::openPackageTab(LibraryEditor& editor,
-                                const FilePath& fp) noexcept {
-  editor.openLegacyPackageEditor(fp);
+void MainWindow::openPackageTab(LibraryEditor& editor, const FilePath& fp,
+                                bool copyFrom) noexcept {
+  if (!switchToLibraryElementTab<PackageTab>(fp)) {
+    try {
+      std::unique_ptr<Package> pkg;
+      PackageTab::Mode mode = PackageTab::Mode::Open;
+      if (fp.isValid() && (!copyFrom)) {
+        auto fs = TransactionalFileSystem::open(
+            fp, editor.isWritable(), &askForRestoringBackup,
+            DirectoryLockHandlerDialog::createDirectoryLockCallback());
+        pkg = Package::open(std::unique_ptr<TransactionalDirectory>(
+            new TransactionalDirectory(fs)));
+      } else {
+        mode = PackageTab::Mode::New;
+        pkg.reset(new Package(Uuid::createRandom(), Version::fromString("0.1"),
+                              mApp.getWorkspace().getSettings().userName.get(),
+                              ElementName("New Package"), QString(), QString(),
+                              Package::AssemblyType::Auto));
+        if (copyFrom) {
+          mode = PackageTab::Mode::Duplicate;
+          auto fs = TransactionalFileSystem::openRO(fp, &askForRestoringBackup);
+          std::unique_ptr<Package> src =
+              Package::open(std::unique_ptr<TransactionalDirectory>(
+                  new TransactionalDirectory(fs)));
+          pkg->setNames(copyLibraryElementNames(src->getNames()));
+          pkg->setDescriptions(src->getDescriptions());
+          pkg->setKeywords(src->getKeywords());
+          pkg->setCategories(src->getCategories());
+          pkg->setAssemblyType(src->getAssemblyType(false));
+          // Copy pads but generate new UUIDs.
+          QHash<Uuid, std::optional<Uuid>> padUuidMap;
+          for (const PackagePad& pad : src->getPads()) {
+            const Uuid newUuid = Uuid::createRandom();
+            padUuidMap.insert(pad.getUuid(), newUuid);
+            pkg->getPads().append(
+                std::make_shared<PackagePad>(newUuid, pad.getName()));
+          }
+          // Copy 3D models but generate new UUIDs.
+          QHash<Uuid, std::optional<Uuid>> modelsUuidMap;
+          for (const PackageModel& model : src->getModels()) {
+            auto newModel = std::make_shared<PackageModel>(Uuid::createRandom(),
+                                                           model.getName());
+            modelsUuidMap.insert(model.getUuid(), newModel->getUuid());
+            pkg->getModels().append(newModel);
+            const QByteArray fileContent =
+                src->getDirectory().readIfExists(model.getFileName());
+            if (!fileContent.isNull()) {
+              pkg->getDirectory().write(newModel->getFileName(), fileContent);
+            }
+          }
+          // Copy footprints but generate new UUIDs.
+          for (const Footprint& footprint : src->getFootprints()) {
+            // Don't copy translations as they would need to be adjusted anyway.
+            std::shared_ptr<Footprint> newFootprint(new Footprint(
+                Uuid::createRandom(), footprint.getNames().getDefaultValue(),
+                footprint.getDescriptions().getDefaultValue()));
+            newFootprint->setModelPosition(footprint.getModelPosition());
+            newFootprint->setModelRotation(footprint.getModelRotation());
+            // Copy models but with the new UUIDs.
+            QSet<Uuid> models;
+            foreach (const Uuid& uuid, footprint.getModels()) {
+              if (auto newUuid = modelsUuidMap.value(uuid)) {
+                models.insert(*newUuid);
+              }
+            }
+            newFootprint->setModels(models);
+            // Copy pads but generate new UUIDs.
+            for (const FootprintPad& pad : footprint.getPads()) {
+              std::optional<Uuid> pkgPad = pad.getPackagePadUuid();
+              if (pkgPad) {
+                pkgPad = padUuidMap.value(*pkgPad);  // Translate to new UUID
+              }
+              newFootprint->getPads().append(std::make_shared<FootprintPad>(
+                  Uuid::createRandom(), pkgPad, pad.getPosition(),
+                  pad.getRotation(), pad.getShape(), pad.getWidth(),
+                  pad.getHeight(), pad.getRadius(), pad.getCustomShapeOutline(),
+                  pad.getStopMaskConfig(), pad.getSolderPasteConfig(),
+                  pad.getCopperClearance(), pad.getComponentSide(),
+                  pad.getFunction(), pad.getHoles()));
+            }
+            // Copy polygons but generate new UUIDs.
+            for (const Polygon& polygon : footprint.getPolygons()) {
+              newFootprint->getPolygons().append(std::make_shared<Polygon>(
+                  Uuid::createRandom(), polygon.getLayer(),
+                  polygon.getLineWidth(), polygon.isFilled(),
+                  polygon.isGrabArea(), polygon.getPath()));
+            }
+            // Copy circles but generate new UUIDs.
+            for (const Circle& circle : footprint.getCircles()) {
+              newFootprint->getCircles().append(std::make_shared<Circle>(
+                  Uuid::createRandom(), circle.getLayer(),
+                  circle.getLineWidth(), circle.isFilled(), circle.isGrabArea(),
+                  circle.getCenter(), circle.getDiameter()));
+            }
+            // Copy stroke texts but generate new UUIDs.
+            for (const StrokeText& text : footprint.getStrokeTexts()) {
+              newFootprint->getStrokeTexts().append(
+                  std::make_shared<StrokeText>(
+                      Uuid::createRandom(), text.getLayer(), text.getText(),
+                      text.getPosition(), text.getRotation(), text.getHeight(),
+                      text.getStrokeWidth(), text.getLetterSpacing(),
+                      text.getLineSpacing(), text.getAlign(),
+                      text.getMirrored(), text.getAutoRotate()));
+            }
+            // Copy zones but generate new UUIDs.
+            for (const Zone& zone : footprint.getZones()) {
+              newFootprint->getZones().append(
+                  std::make_shared<Zone>(Uuid::createRandom(), zone));
+            }
+            // Copy holes but generate new UUIDs.
+            for (const Hole& hole : footprint.getHoles()) {
+              newFootprint->getHoles().append(std::make_shared<Hole>(
+                  Uuid::createRandom(), hole.getDiameter(), hole.getPath(),
+                  hole.getStopMaskConfig()));
+            }
+            pkg->getFootprints().append(newFootprint);
+          }
+        } else {
+          pkg->getFootprints().append(std::make_shared<Footprint>(
+              Uuid::createRandom(), ElementName("default"), ""));
+        }
+      }
+      addTab(std::make_shared<PackageTab>(editor, std::move(pkg), mode));
+    } catch (const Exception& e) {
+      QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
+    }
+  }
 }
 
 void MainWindow::openComponentTab(LibraryEditor& editor,

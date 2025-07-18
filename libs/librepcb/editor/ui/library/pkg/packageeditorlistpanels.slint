@@ -1,0 +1,345 @@
+import { PackageEditorPanel } from "packageeditorpanel.slint";
+import { Badge, IconButton } from "../../widgets.slint";
+import {
+    Backend,
+    Constants,
+    FootprintAction,
+    PackageModelAction,
+    PackageTabData,
+    TabAction,
+    WindowSectionData,
+} from "../../api.slint";
+
+component PackageEditorPanelListItem inherits TouchArea {
+    in property <int> index;
+    in property <string> name;
+    in property <bool> show-number: false;
+    in property <bool> allow-rename: false;
+    in property <bool> show-move-button: false;
+    in property <bool> show-browse-button: false;
+    in property <bool> show-duplicate-button: false;
+    in property <bool> show-delete-button: false;
+    in property <[bool]> checked-numbers;
+    in property <bool> highlight: false;
+    in property <bool> read-only: false;
+    property <color> base-color: highlight ? #e0e0e0 : #909090;
+    property <color> color: root.has-hover ? base-color.brighter(0.2) : base-color;
+    property <bool> edit-mode: false;
+
+    callback name-changed(string);
+    callback move-up-triggered();
+    callback browse-triggered();
+    callback duplicate-triggered();
+    callback delete-triggered();
+    callback checked-number-toggled(int, bool);
+
+    public function enter-edit-mode() {
+        if index == -1 {
+            name-edt.text = "";
+        }
+        edit-mode = true;
+        name-edt.select-all();
+        name-edt.focus();
+    }
+
+    public function leave-edit-mode() {
+        name-edt.clear-selection();
+        name-edt.text = name;
+        edit-mode = false;
+    }
+
+    height: 22px;
+    mouse-cursor: pointer;
+    enabled: !edit-mode;
+
+    changed name => {
+        name-edt.text = name;
+    }
+
+    HorizontalLayout {
+        if show-number: number-badge := Badge {
+            y: (parent.height - self.height) / 2;
+            background: color;
+            text-color: black;
+            border-color: color;
+            text: index + 1;
+            visible: index >= 0;
+            accessible-role: none;
+        }
+
+        Rectangle {
+            width: 3px;
+        }
+
+        name-edt := TextInput {
+            min-width: placeholder-txt.preferred-width;
+            vertical-alignment: center;
+            color: color;
+            selection-background-color: Constants.librepcb-color;
+            selection-foreground-color: black;
+            single-line: true;
+            wrap: no-wrap;
+            text: name;
+            enabled: edit-mode;
+
+            changed has-focus => {
+                if !self.has-focus {
+                    leave-edit-mode();
+                }
+            }
+
+            placeholder-txt := Text {
+                x: 0;
+                y: 0;
+                width: 100%;
+                height: 100%;
+                color: #707070;
+                font-weight: 400;
+                horizontal-alignment: left;
+                vertical-alignment: center;
+                text: allow-rename ? @tr("Enter name & press Return") : "";
+                visible: edit-mode && parent.text.is-empty;
+                accessible-role: none;
+            }
+
+            key-pressed(event) => {
+                if event.text == Key.Return {
+                    name-changed(self.text);
+                    leave-edit-mode();
+                    return accept;
+                } else if event.text == Key.Escape {
+                    leave-edit-mode();
+                    return accept;
+                }
+                reject
+            }
+        }
+
+        HorizontalLayout {
+            padding-left: 10px;
+            padding-right: 5px;
+            spacing: 3px;
+
+            for checked[idx] in checked-numbers: checked-numbers-btn := Badge {
+                y: (parent.height - self.height) / 2;
+                background: checked ? color.brighter(self.has-hover ? 0.2 : 0) : transparent;
+                text-color: checked ? black : color;
+                border-color: checked ? self.background : (self.has-hover ? self.text-color-hover : self.text-color);
+                text: idx + 1;
+                clickable: !read-only;
+
+                clicked => {
+                    checked-number-toggled(idx, !checked);
+                }
+            }
+        }
+
+        if show-move-button: move-up-btn := IconButton {
+            height: root.height;
+            style: hyperlink;
+            color-enabled: #909090;
+            icon-scale: 0.7;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/arrow-up.svg");
+            tooltip: @tr("Move Up");
+            tooltip-position: left;
+            enabled: !edit-mode;
+            visible: (index > 0) && (highlight || root.has-hover);
+
+            clicked => {
+                move-up-triggered();
+            }
+        }
+
+        if allow-rename: rename-btn := IconButton {
+            height: root.height;
+            style: hyperlink;
+            color-enabled: #909090;
+            icon-scale: 0.7;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/pen-to-square.svg");
+            tooltip: @tr("Rename");
+            tooltip-position: left;
+            enabled: !edit-mode;
+            visible: highlight || root.has-hover;
+
+            clicked => {
+                enter-edit-mode();
+            }
+        }
+
+        if show-duplicate-button: duplicate-btn := IconButton {
+            height: root.height;
+            style: hyperlink;
+            color-enabled: #909090;
+            icon-scale: 0.7;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/copy.svg");
+            tooltip: @tr("Duplicate");
+            tooltip-position: left;
+            enabled: !edit-mode;
+            visible: highlight || root.has-hover;
+
+            clicked => {
+                duplicate-triggered();
+            }
+        }
+
+        if show-browse-button: browse-btn := IconButton {
+            height: root.height;
+            style: hyperlink;
+            color-enabled: #909090;
+            icon-scale: 0.7;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/folder-open.svg");
+            tooltip: @tr("Load From File") + "...";
+            tooltip-position: left;
+            enabled: !edit-mode;
+            visible: highlight || root.has-hover;
+
+            clicked => {
+                browse-triggered();
+            }
+        }
+
+        if show-delete-button: delete-btn := IconButton {
+            height: root.height;
+            style: hyperlink;
+            color-enabled: #909090;
+            icon-scale: 0.7;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/trash-can.svg");
+            tooltip: @tr("Remove");
+            tooltip-position: left;
+            enabled: !edit-mode;
+            visible: highlight || root.has-hover;
+
+            clicked => {
+                delete-triggered();
+            }
+        }
+
+        if index == -1: IconButton {
+            height: root.height;
+            style: hyperlink;
+            color-disabled: color;
+            icon-scale: 0.7;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/plus.svg");
+            enabled: false;
+            accessible-role: none;
+        }
+    }
+
+    double-clicked => {
+        if allow-rename {
+            self.enter-edit-mode();
+        }
+    }
+}
+
+export component PackageEditorFootprintsPanel inherits PackageEditorPanel {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    in-out property <[PackageTabData]> tabs;
+    in property <int> index;
+    in property <bool> models-editor: false;
+    in property <bool> read-only;
+
+    error-state: (tabs[index].footprint-index < 0) || (tabs[index].footprint-index >= tabs[index].footprints.length);
+
+    for item[idx] in tabs[index].footprints: item-ta := PackageEditorPanelListItem {
+        index: idx;
+        name: item.name;
+        allow-rename: (!models-editor) && (!read-only);
+        show-move-button: (!models-editor) && (!read-only);
+        show-duplicate-button: (!models-editor) && (!read-only);
+        show-delete-button: (!models-editor) && (!read-only);
+        checked-numbers: models-editor ? tabs[index].footprints[idx].models : [];
+        highlight: idx == tabs[index].footprint-index;
+        read-only: read-only;
+
+        clicked => {
+            tabs[index].footprint-index = idx;
+        }
+
+        name-changed(s) => {
+            tabs[index].footprints[idx].name = s;
+        }
+
+        move-up-triggered() => {
+            tabs[index].footprints[idx].action = FootprintAction.move-up;
+        }
+
+        duplicate-triggered() => {
+            tabs[index].footprints[idx].action = FootprintAction.duplicate;
+        }
+
+        delete-triggered() => {
+            tabs[index].footprints[idx].action = FootprintAction.delete;
+        }
+
+        checked-number-toggled(i, c) => {
+            tabs[index].footprints[idx].models[i] = c;
+            Backend.trigger-tab(section-index, index, TabAction.apply);
+        }
+    }
+
+    if (!models-editor) && (!read-only): new-ta := PackageEditorPanelListItem {
+        index: -1;
+        name: @tr("Add Footprint") + "...";
+
+        clicked => {
+            self.enter-edit-mode();
+        }
+
+        name-changed(s) => {
+            tabs[index].new-footprint = s;
+        }
+    }
+}
+
+export component PackageEditorModelsPanel inherits PackageEditorPanel {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    in-out property <[PackageTabData]> tabs;
+    in property <int> index;
+    in property <bool> read-only;
+
+    for item[idx] in tabs[index].models: item-ta := PackageEditorPanelListItem {
+        index: idx;
+        name: item.name;
+        show-number: true;
+        allow-rename: !read-only;
+        show-move-button: !read-only;
+        show-browse-button: !read-only;
+        show-delete-button: !read-only;
+        highlight: idx == tabs[index].model-index;
+        read-only: read-only;
+
+        clicked => {
+            tabs[index].model-index = idx;
+        }
+
+        name-changed(s) => {
+            tabs[index].models[idx].name = s;
+        }
+
+        move-up-triggered() => {
+            tabs[index].models[idx].action = PackageModelAction.move-up;
+        }
+
+        browse-triggered() => {
+            tabs[index].model-index = idx;  // To see the new model.
+            tabs[index].models[idx].action = PackageModelAction.browse;
+        }
+
+        delete-triggered() => {
+            tabs[index].models[idx].action = PackageModelAction.delete;
+        }
+    }
+
+    if !read-only: new-ta := PackageEditorPanelListItem {
+        index: -1;
+        name: @tr("Add 3D Model") + "...";
+        show-number: true;
+
+        clicked => {
+            Backend.trigger-tab(section-index, index, TabAction.package-add-model);
+        }
+    }
+}

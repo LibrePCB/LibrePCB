@@ -187,9 +187,6 @@ QSet<Uuid> NewElementWizardPage_CopyFrom::getElementsByCategory(
     case NewElementWizardContext::ElementType::Device:
       return mContext.getWorkspace().getLibraryDb().getByCategory<Device>(
           category);
-    case NewElementWizardContext::ElementType::Package:
-      return mContext.getWorkspace().getLibraryDb().getByCategory<Package>(
-          category);
     default:
       throw LogicError(__FILE__, __LINE__);
   }
@@ -211,12 +208,6 @@ void NewElementWizardPage_CopyFrom::getElementMetadata(const Uuid& uuid,
       mContext.getWorkspace().getLibraryDb().getTranslations<Device>(
           fp, mContext.getLibLocaleOrder(), &name);  // can throw
       return;
-    case NewElementWizardContext::ElementType::Package:
-      fp = mContext.getWorkspace().getLibraryDb().getLatest<Package>(
-          uuid);  // can throw
-      mContext.getWorkspace().getLibraryDb().getTranslations<Package>(
-          fp, mContext.getLibLocaleOrder(), &name);  // can throw
-      return;
     default:
       throw LogicError(__FILE__, __LINE__);
   }
@@ -236,12 +227,6 @@ void NewElementWizardPage_CopyFrom::initializePage() noexcept {
       setCategoryTreeModel(new CategoryTreeModelLegacy(
           mContext.getWorkspace().getLibraryDb(), mContext.getLibLocaleOrder(),
           CategoryTreeModelLegacy::Filter::CmpCatWithDevices));
-      break;
-    }
-    case NewElementWizardContext::ElementType::Package: {
-      setCategoryTreeModel(new CategoryTreeModelLegacy(
-          mContext.getWorkspace().getLibraryDb(), mContext.getLibLocaleOrder(),
-          CategoryTreeModelLegacy::Filter::PkgCatWithPackages));
       break;
     }
     default: {

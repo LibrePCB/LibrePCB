@@ -108,8 +108,7 @@ private:  // Methods
                            const QColor& color,
                            const QVector<QVector3D>& triangles);
   void publishDevice(const SceneData3D::DeviceData& obj,
-                     const QByteArray& stepContent, qreal z, qreal scaleFactor,
-                     qreal alpha);
+                     const QByteArray& stepContent, qreal z, qreal scaleFactor);
 
 private:  // Data
   const PositiveLength mMaxArcTolerance;

@@ -1,0 +1,94 @@
+import { AngleEdit, TextFlagsBox } from "../../widgets.slint";
+import {
+    Constants,
+    PackageTabData,
+    WindowSectionData,
+} from "../../api.slint";
+
+export component DrawFootprintZoneToolBar inherits HorizontalLayout {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    property <[PackageTabData]> tabs: section.package-tabs;
+
+    spacing: 2px;
+
+    layers := TextFlagsBox {
+        title: @tr("Layers");
+        model: [
+            {
+                text: @tr("Top"),
+                checked: tabs[section.current-tab-index].tool-layer-top,
+            },
+            {
+                text: @tr("Inner"),
+                checked: tabs[section.current-tab-index].tool-layer-inner,
+            },
+            {
+                text: @tr("Bottom"),
+                checked: tabs[section.current-tab-index].tool-layer-bottom,
+            },
+        ];
+
+        toggled(idx, state) => {
+            if idx == 0 {
+                tabs[section.current-tab-index].tool-layer-top = state;
+            } else if idx == 1 {
+                tabs[section.current-tab-index].tool-layer-inner = state;
+            } else if idx == 2 {
+                tabs[section.current-tab-index].tool-layer-bottom = state;
+            }
+        }
+    }
+
+    rules := TextFlagsBox {
+        title: @tr("Keepout");
+        model: [
+            {
+                text: @tr("Copper"),
+                checked: tabs[section.current-tab-index].tool-no-copper,
+            },
+            {
+                text: @tr("Planes"),
+                checked: tabs[section.current-tab-index].tool-no-planes,
+            },
+            {
+                text: @tr("Exposures"),
+                checked: tabs[section.current-tab-index].tool-no-exposures,
+            },
+            {
+                text: @tr("Devices"),
+                checked: tabs[section.current-tab-index].tool-no-devices,
+            },
+        ];
+
+        toggled(idx, state) => {
+            if idx == 0 {
+                tabs[section.current-tab-index].tool-no-copper = state;
+            } else if idx == 1 {
+                tabs[section.current-tab-index].tool-no-planes = state;
+            } else if idx == 2 {
+                tabs[section.current-tab-index].tool-no-exposures = state;
+            } else if idx == 3 {
+                tabs[section.current-tab-index].tool-no-devices = state;
+            }
+        }
+    }
+
+    angle-edt := AngleEdit {
+        data: tabs[section.current-tab-index].tool-angle;
+        tooltip: @tr("Arc Angle");
+        min-width-text: "123.4 °";
+
+        value-changed(v) => {
+            tabs[section.current-tab-index].tool-angle.value = v;
+        }
+
+        increase-triggered => {
+            tabs[section.current-tab-index].tool-angle.increase = true;
+        }
+
+        decrease-triggered => {
+            tabs[section.current-tab-index].tool-angle.decrease = true;
+        }
+    }
+}

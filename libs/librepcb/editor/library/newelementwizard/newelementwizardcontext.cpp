@@ -27,7 +27,6 @@
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/dev/device.h>
 #include <librepcb/core/library/library.h>
-#include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
@@ -49,7 +48,6 @@ NewElementWizardContext::NewElementWizardContext(
     mLibrary(lib),
     mLayers(layers),
     mElementType(ElementType::None),
-    mPackageAssemblyType(Package::AssemblyType::Auto),
     mComponentPrefixes(ComponentPrefix("")) {
   reset();
 }
@@ -79,12 +77,6 @@ void NewElementWizardContext::reset(ElementType newType) noexcept {
   mElementAuthor = mWorkspace.getSettings().userName.get();
   mElementVersion = Version::fromString("0.1");
   mElementCategoryUuids.clear();
-
-  // package
-  mPackageAssemblyType = Package::AssemblyType::Auto;
-  mPackagePads.clear();
-  mPackageModels.clear();
-  mPackageFootprints.clear();
 
   // component
   mComponentSchematicOnly = false;
@@ -120,10 +112,6 @@ void NewElementWizardContext::copyElement(ElementType type,
       element = Device::open(std::move(dir));
       break;
     }
-    case NewElementWizardContext::ElementType::Package: {
-      element = Package::open(std::move(dir));
-      break;
-    }
     default: {
       qCritical()
           << "Unhandled switch-case in NewElementWizardContext::copyElement():"
@@ -141,102 +129,6 @@ void NewElementWizardContext::copyElement(ElementType type,
   }
 
   switch (mElementType) {
-    case ElementType::Package: {
-      const Package* package = dynamic_cast<Package*>(element.get());
-      Q_ASSERT(package);
-      mPackageAssemblyType = package->getAssemblyType(false);
-      // copy pads but generate new UUIDs
-      QHash<Uuid, std::optional<Uuid>> padUuidMap;
-      mPackagePads.clear();
-      for (const PackagePad& pad : package->getPads()) {
-        Uuid newUuid = Uuid::createRandom();
-        padUuidMap.insert(pad.getUuid(), newUuid);
-        mPackagePads.append(
-            std::make_shared<PackagePad>(newUuid, pad.getName()));
-      }
-      // Copy 3D models but generate new UUIDs.
-      QHash<Uuid, std::optional<Uuid>> modelsUuidMap;
-      mPackageModels.clear();
-      for (const PackageModel& model : package->getModels()) {
-        auto newModel = std::make_shared<PackageModel>(Uuid::createRandom(),
-                                                       model.getName());
-        modelsUuidMap.insert(model.getUuid(), newModel->getUuid());
-        mPackageModels.append(newModel);
-        const QByteArray fileContent =
-            package->getDirectory().readIfExists(model.getFileName());
-        if (!fileContent.isNull()) {
-          mFiles.insert(newModel->getFileName(), fileContent);
-        }
-      }
-      // copy footprints but generate new UUIDs
-      mPackageFootprints.clear();
-      for (const Footprint& footprint : package->getFootprints()) {
-        // don't copy translations as they would need to be adjusted anyway
-        std::shared_ptr<Footprint> newFootprint(new Footprint(
-            Uuid::createRandom(), footprint.getNames().getDefaultValue(),
-            footprint.getDescriptions().getDefaultValue()));
-        newFootprint->setModelPosition(footprint.getModelPosition());
-        newFootprint->setModelRotation(footprint.getModelRotation());
-        // Copy models but with the new UUIDs.
-        QSet<Uuid> models;
-        foreach (const Uuid& uuid, footprint.getModels()) {
-          if (auto newUuid = modelsUuidMap.value(uuid)) {
-            models.insert(*newUuid);
-          }
-        }
-        newFootprint->setModels(models);
-        // copy pads but generate new UUIDs
-        for (const FootprintPad& pad : footprint.getPads()) {
-          std::optional<Uuid> pkgPad = pad.getPackagePadUuid();
-          if (pkgPad) {
-            pkgPad = padUuidMap.value(*pkgPad);  // Translate to new UUID
-          }
-          newFootprint->getPads().append(std::make_shared<FootprintPad>(
-              Uuid::createRandom(), pkgPad, pad.getPosition(),
-              pad.getRotation(), pad.getShape(), pad.getWidth(),
-              pad.getHeight(), pad.getRadius(), pad.getCustomShapeOutline(),
-              pad.getStopMaskConfig(), pad.getSolderPasteConfig(),
-              pad.getCopperClearance(), pad.getComponentSide(),
-              pad.getFunction(), pad.getHoles()));
-        }
-        // copy polygons but generate new UUIDs
-        for (const Polygon& polygon : footprint.getPolygons()) {
-          newFootprint->getPolygons().append(std::make_shared<Polygon>(
-              Uuid::createRandom(), polygon.getLayer(), polygon.getLineWidth(),
-              polygon.isFilled(), polygon.isGrabArea(), polygon.getPath()));
-        }
-        // copy circles but generate new UUIDs
-        for (const Circle& circle : footprint.getCircles()) {
-          newFootprint->getCircles().append(std::make_shared<Circle>(
-              Uuid::createRandom(), circle.getLayer(), circle.getLineWidth(),
-              circle.isFilled(), circle.isGrabArea(), circle.getCenter(),
-              circle.getDiameter()));
-        }
-        // copy stroke texts but generate new UUIDs
-        for (const StrokeText& text : footprint.getStrokeTexts()) {
-          newFootprint->getStrokeTexts().append(std::make_shared<StrokeText>(
-              Uuid::createRandom(), text.getLayer(), text.getText(),
-              text.getPosition(), text.getRotation(), text.getHeight(),
-              text.getStrokeWidth(), text.getLetterSpacing(),
-              text.getLineSpacing(), text.getAlign(), text.getMirrored(),
-              text.getAutoRotate()));
-        }
-        // copy zones but generate new UUIDs
-        for (const Zone& zone : footprint.getZones()) {
-          newFootprint->getZones().append(
-              std::make_shared<Zone>(Uuid::createRandom(), zone));
-        }
-        // copy holes but generate new UUIDs
-        for (const Hole& hole : footprint.getHoles()) {
-          newFootprint->getHoles().append(
-              std::make_shared<Hole>(Uuid::createRandom(), hole.getDiameter(),
-                                     hole.getPath(), hole.getStopMaskConfig()));
-        }
-        mPackageFootprints.append(newFootprint);
-      }
-      break;
-    }
-
     case ElementType::Component: {
       const Component* component = dynamic_cast<Component*>(element.get());
       Q_ASSERT(component);
@@ -320,25 +212,6 @@ void NewElementWizardContext::createLibraryElement() {
   };
 
   switch (mElementType) {
-    case NewElementWizardContext::ElementType::Package: {
-      Package element(Uuid::createRandom(), *mElementVersion, mElementAuthor,
-                      *mElementName, mElementDescription, mElementKeywords,
-                      mPackageAssemblyType);
-      element.setCategories(mElementCategoryUuids);
-      element.getPads() = mPackagePads;
-      element.getModels() = mPackageModels;
-      element.getFootprints() = mPackageFootprints;
-      if (element.getFootprints().isEmpty()) {
-        element.getFootprints().append(std::make_shared<Footprint>(
-            Uuid::createRandom(), ElementName("default"), ""));
-      }
-      TransactionalDirectory dir(mLibrary.getDirectory(),
-                                 mLibrary.getElementsDirectoryName<Package>());
-      element.moveIntoParentDirectory(dir);
-      copyFiles(element.getDirectory());
-      mOutputDirectory = element.getDirectory().getAbsPath();
-      break;
-    }
     case NewElementWizardContext::ElementType::Component: {
       Component element(Uuid::createRandom(), *mElementVersion, mElementAuthor,
                         *mElementName, mElementDescription, mElementKeywords);

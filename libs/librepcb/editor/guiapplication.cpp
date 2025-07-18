@@ -658,6 +658,33 @@ void GuiApplication::createNewWindow(int id, int projectIndex) noexcept {
     }
     return res;
   });
+  b.on_format_ratio([](const int& value) {
+    const Ratio ratio = s2ratio(value);
+    return q2s(Toolbox::floatToString(ratio.toPercent(), 3, QLocale()));
+  });
+  b.on_parse_ratio_input(
+      [](slint::SharedString text, int minimum, int maximum) {
+        ui::RatioEditParseResult res{false, 0};
+        try {
+          QString value = s2q(text);
+
+          // Remove unit and spaces
+          value.replace("%", "");
+          value.replace(" ", "");
+
+          // Parse expression and convert to Ratio.
+          const MathParser::Result result = MathParser().parse(value);
+          if (result.valid) {
+            const Ratio ratio = Ratio::fromPercent(result.value);
+            if ((ratio >= s2ratio(minimum)) && (ratio <= s2ratio(maximum))) {
+              res.evaluated_value = l2s(ratio);
+              res.valid = true;
+            }
+          }
+        } catch (const Exception& e) {
+        }
+        return res;
+      });
 
   // Reuse next free window ID.
   if (id < 1) {

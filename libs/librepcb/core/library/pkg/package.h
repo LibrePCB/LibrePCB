@@ -82,6 +82,7 @@ public:
     Mixed,  ///< Mixed THT/SMT package
     Other,  ///< Anything special, e.g. mechanical parts
     Auto,  ///< Auto detection (deprecated, only for file format migration!)
+    // ATTENTION: Update uihelpers.cpp & constants.slint when changing the enum!
   };
 
   // Constructors / Destructor
