@@ -203,6 +203,10 @@ ui::EditorCommand l2s(const EditorCommand& cmd, ui::EditorCommand in) noexcept {
     in.shortcut = q2s(shortcut.toString());
     in.modifiers = q2s(shortcut[0].keyboardModifiers());
     in.key = q2s(shortcut[0].key());
+    if (in.modifiers.shift && (in.key.size() == 1) &&
+        std::isalpha(in.key.data()[0])) {
+      in.key = in.key.to_uppercase();
+    }
   } else {
     // Multi-combination shortcuts are not supported yet.
     in.shortcut = slint::SharedString();
