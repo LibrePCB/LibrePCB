@@ -109,7 +109,8 @@ SchematicTab::SchematicTab(GuiApplication& app, SchematicEditor& editor,
     mLayers(
         GraphicsLayerList::schematicLayers(&app.getWorkspace().getSettings())),
     mPinNumbersLayer(mLayers->get(Theme::Color::sSchematicPinNumbers)),
-    mView(new SlintGraphicsView(this)),
+    mView(new SlintGraphicsView(SlintGraphicsView::defaultSchematicSceneRect(),
+                                this)),
     mMsgInstallLibraries(app.getWorkspace(), "EMPTY_SCHEMATIC_NO_LIBRARIES"),
     mMsgAddDrawingFrame(app.getWorkspace(), "EMPTY_SCHEMATIC_ADD_FRAME"),
     mGridStyle(mApp.getWorkspace()

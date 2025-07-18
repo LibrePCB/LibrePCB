@@ -75,7 +75,8 @@ class SlintGraphicsView final : public QObject {
 
 public:
   // Constructors / Destructor
-  explicit SlintGraphicsView(QObject* parent = nullptr) noexcept;
+  explicit SlintGraphicsView(const QRectF& defaultSceneRect,
+                             QObject* parent = nullptr) noexcept;
   SlintGraphicsView(const SlintGraphicsView& other) = delete;
   virtual ~SlintGraphicsView() noexcept;
 
@@ -101,6 +102,12 @@ public:
   void zoomOut() noexcept;
   void zoomToSceneRect(const QRectF& r) noexcept;
 
+  // Static Methods
+  static QRectF defaultSymbolSceneRect() noexcept;
+  static QRectF defaultFootprintSceneRect() noexcept;
+  static QRectF defaultSchematicSceneRect() noexcept;
+  static QRectF defaultBoardSceneRect() noexcept;
+
   // Operator Overloadings
   SlintGraphicsView& operator=(const SlintGraphicsView& rhs) = delete;
 
@@ -113,8 +120,10 @@ private:  // Methods
   void zoom(const QPointF& center, qreal factor) noexcept;
   void smoothTo(const Projection& projection) noexcept;
   bool applyProjection(const Projection& projection) noexcept;
+  QRectF validateSceneRect(const QRectF& r) const noexcept;
 
 private:  // Data
+  const QRectF mDefaultSceneRect;
   IF_GraphicsViewEventHandler* mEventHandler;
   Projection mProjection;
   QSizeF mViewSize;

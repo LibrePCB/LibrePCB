@@ -35,22 +35,14 @@ namespace editor {
 
 static const qreal sScrollFactor = 0.07;
 
-// Helper to avoid division by zero on empty scenes.
-static QRectF validateSceneRect(const QRectF& r) noexcept {
-  if (r.isEmpty()) {
-    const qreal pxPerMm = Length::fromMm(1).toPx();
-    return QRectF(-20 * pxPerMm, -180 * pxPerMm, 300 * pxPerMm, 220 * pxPerMm);
-  } else {
-    return r;
-  }
-}
-
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
-SlintGraphicsView::SlintGraphicsView(QObject* parent) noexcept
+SlintGraphicsView::SlintGraphicsView(const QRectF& defaultSceneRect,
+                                     QObject* parent) noexcept
   : QObject(parent),
+    mDefaultSceneRect(defaultSceneRect),
     mEventHandler(nullptr),
     mAnimation(new QVariantAnimation(this)) {
   mAnimation->setDuration(500);
@@ -292,6 +284,29 @@ void SlintGraphicsView::zoomToSceneRect(const QRectF& r) noexcept {
 }
 
 /*******************************************************************************
+ *  Static Methods
+ ******************************************************************************/
+
+QRectF SlintGraphicsView::defaultSymbolSceneRect() noexcept {
+  const qreal pxPerMm = Length::fromMm(1).toPx();
+  return QRectF(-50 * pxPerMm, -50 * pxPerMm, 100 * pxPerMm, 100 * pxPerMm);
+}
+
+QRectF SlintGraphicsView::defaultFootprintSceneRect() noexcept {
+  return defaultSymbolSceneRect();
+}
+
+QRectF SlintGraphicsView::defaultSchematicSceneRect() noexcept {
+  const qreal pxPerMm = Length::fromMm(1).toPx();
+  return QRectF(-20 * pxPerMm, -180 * pxPerMm, 300 * pxPerMm, 220 * pxPerMm);
+}
+
+QRectF SlintGraphicsView::defaultBoardSceneRect() noexcept {
+  const qreal pxPerMm = Length::fromMm(1).toPx();
+  return QRectF(-20 * pxPerMm, -120 * pxPerMm, 140 * pxPerMm, 140 * pxPerMm);
+}
+
+/*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
@@ -336,6 +351,11 @@ bool SlintGraphicsView::applyProjection(const Projection& projection) noexcept {
     return true;
   }
   return false;
+}
+
+// Helper to avoid division by zero on empty scenes.
+QRectF SlintGraphicsView::validateSceneRect(const QRectF& r) const noexcept {
+  return r.isEmpty() ? mDefaultSceneRect : r;
 }
 
 /*******************************************************************************

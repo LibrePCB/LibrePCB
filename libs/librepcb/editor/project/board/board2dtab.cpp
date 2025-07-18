@@ -133,7 +133,8 @@ Board2dTab::Board2dTab(GuiApplication& app, BoardEditor& editor,
     mBoardEditor(editor),
     mBoard(mBoardEditor.getBoard()),
     mLayers(GraphicsLayerList::boardLayers(&app.getWorkspace().getSettings())),
-    mView(new SlintGraphicsView(this)),
+    mView(new SlintGraphicsView(SlintGraphicsView::defaultBoardSceneRect(),
+                                this)),
     mMsgEmptySchematics(app.getWorkspace(), "EMPTY_BOARD_NO_COMPONENTS"),
     mMsgPlaceDevices(app.getWorkspace(), "EMPTY_BOARD_PLACE_DEVICES"),
     mGridStyle(mApp.getWorkspace()
@@ -827,7 +828,7 @@ slint::Image Board2dTab::renderScene(float width, float height,
                                      int scene) noexcept {
   if (scene == 1) {
     if (mUnplacedComponentGraphicsScene) {
-      SlintGraphicsView view;
+      SlintGraphicsView view(SlintGraphicsView::defaultFootprintSceneRect());
       return view.render(*mUnplacedComponentGraphicsScene, width, height);
     } else {
       QPixmap pix(width, height);
