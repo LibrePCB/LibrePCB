@@ -327,16 +327,6 @@ export component Board2dTab inherits Tab {
                 }
             }
 
-            tool-zone-btn := ToolButton {
-                cmd: Cmd.tool-zone;
-                icon: @image-url("../../../../../bootstrap-icons/icons/sign-stop.svg");
-                checked: tabs[index].tool == EditorTool.zone;
-
-                clicked => {
-                    tool-triggered(TabAction.tool-zone);
-                }
-            }
-
             tool-hole-btn := ToolButton {
                 cmd: Cmd.tool-hole;
                 icon: @image-url("../../../../../font-awesome/svgs/solid/bore-hole.svg");
@@ -344,6 +334,16 @@ export component Board2dTab inherits Tab {
 
                 clicked => {
                     tool-triggered(TabAction.tool-hole);
+                }
+            }
+
+            tool-zone-btn := ToolButton {
+                cmd: Cmd.tool-zone;
+                icon: @image-url("../../../../../bootstrap-icons/icons/sign-stop.svg");
+                checked: tabs[index].tool == EditorTool.zone;
+
+                clicked => {
+                    tool-triggered(TabAction.tool-zone);
                 }
             }
 
