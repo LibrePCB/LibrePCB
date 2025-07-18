@@ -65,55 +65,52 @@ DxfImportDialog::DxfImportDialog(const QSet<const Layer*>& layers,
 
   // Load initial values and window geometry.
   try {
-    QSettings clientSettings;
+    QSettings cs;
     mUi->cbxLayer->setCurrentLayer(Layer::get(
-        clientSettings.value(settingsPrefix % "/layer", defaultLayer.getId())
-            .toString()));
+        cs.value(settingsPrefix % "/layer", defaultLayer.getId()).toString()));
     mUi->edtLineWidth->setValue(UnsignedLength(Length::fromMm(
-        clientSettings.value(settingsPrefix % "/line_width", "0").toString())));
+        cs.value(settingsPrefix % "/line_width", "0").toString())));
     mUi->spbxScaleFactor->setValue(
-        clientSettings.value(settingsPrefix % "/scale_factor", "1").toDouble());
+        cs.value(settingsPrefix % "/scale_factor", "1").toDouble());
     mUi->cbxInteractivePlacement->setChecked(
-        clientSettings.value(settingsPrefix % "/interactive_placement", true)
-            .toBool());
-    mUi->edtPosX->setValue(Length::fromMm(
-        clientSettings.value(settingsPrefix % "/pos_x", "0").toString()));
-    mUi->edtPosY->setValue(Length::fromMm(
-        clientSettings.value(settingsPrefix % "/pos_y", "0").toString()));
+        cs.value(settingsPrefix % "/interactive_placement", true).toBool());
+    mUi->edtPosX->setValue(
+        Length::fromMm(cs.value(settingsPrefix % "/pos_x", "0").toString()));
+    mUi->edtPosY->setValue(
+        Length::fromMm(cs.value(settingsPrefix % "/pos_y", "0").toString()));
     mUi->cbxJoinTangentPolylines->setChecked(
-        clientSettings.value(settingsPrefix % "/join_tangent_polylines", true)
-            .toBool());
+        cs.value(settingsPrefix % "/join_tangent_polylines", true).toBool());
     mUi->cbxCirclesAsDrills->setChecked(
-        clientSettings.value(settingsPrefix % "/circles_as_drills", false)
-            .toBool());
-    restoreGeometry(clientSettings.value(settingsPrefix % "/window_geometry")
-                        .toByteArray());
+        cs.value(settingsPrefix % "/circles_as_drills", false).toBool());
+    const QSize windowSize = cs.value(settingsPrefix % "/window_size").toSize();
+    if (!windowSize.isEmpty()) {
+      resize(windowSize);
+    }
   } catch (const Exception& e) {
     qCritical() << "Failed to initialize DXF import dialog:" << e.getMsg();
   }
 }
 
 DxfImportDialog::~DxfImportDialog() noexcept {
-  // Save the values and window geometry.
-  QSettings clientSettings;
+  // Save client settings.
+  QSettings cs;
   if (auto layer = mUi->cbxLayer->getCurrentLayer()) {
-    clientSettings.setValue(mSettingsPrefix % "/layer", layer->getId());
+    cs.setValue(mSettingsPrefix % "/layer", layer->getId());
   }
-  clientSettings.setValue(mSettingsPrefix % "/line_width",
-                          mUi->edtLineWidth->getValue()->toMmString());
-  clientSettings.setValue(mSettingsPrefix % "/scale_factor",
-                          mUi->spbxScaleFactor->value());
-  clientSettings.setValue(mSettingsPrefix % "/interactive_placement",
-                          mUi->cbxInteractivePlacement->isChecked());
-  clientSettings.setValue(mSettingsPrefix % "/pos_x",
-                          mUi->edtPosX->getValue().toMmString());
-  clientSettings.setValue(mSettingsPrefix % "/pos_y",
-                          mUi->edtPosY->getValue().toMmString());
-  clientSettings.setValue(mSettingsPrefix % "/join_tangent_polylines",
-                          mUi->cbxJoinTangentPolylines->isChecked());
-  clientSettings.setValue(mSettingsPrefix % "/circles_as_drills",
-                          mUi->cbxCirclesAsDrills->isChecked());
-  clientSettings.setValue(mSettingsPrefix % "/window_geometry", saveGeometry());
+  cs.setValue(mSettingsPrefix % "/line_width",
+              mUi->edtLineWidth->getValue()->toMmString());
+  cs.setValue(mSettingsPrefix % "/scale_factor", mUi->spbxScaleFactor->value());
+  cs.setValue(mSettingsPrefix % "/interactive_placement",
+              mUi->cbxInteractivePlacement->isChecked());
+  cs.setValue(mSettingsPrefix % "/pos_x",
+              mUi->edtPosX->getValue().toMmString());
+  cs.setValue(mSettingsPrefix % "/pos_y",
+              mUi->edtPosY->getValue().toMmString());
+  cs.setValue(mSettingsPrefix % "/join_tangent_polylines",
+              mUi->cbxJoinTangentPolylines->isChecked());
+  cs.setValue(mSettingsPrefix % "/circles_as_drills",
+              mUi->cbxCirclesAsDrills->isChecked());
+  cs.setValue(mSettingsPrefix % "/window_size", size());
 }
 
 /*******************************************************************************
@@ -157,13 +154,13 @@ bool DxfImportDialog::getImportCirclesAsDrills() const noexcept {
  ******************************************************************************/
 
 FilePath DxfImportDialog::chooseFile() const noexcept {
-  QSettings clientSettings;
+  QSettings cs;
   QString key = mSettingsPrefix % "/file";
-  QString selectedFile = clientSettings.value(key, QDir::homePath()).toString();
+  QString selectedFile = cs.value(key, QDir::homePath()).toString();
   FilePath fp(FileDialog::getOpenFileName(parentWidget(), tr("Choose file"),
                                           selectedFile, "*.dxf;;*"));
   if (fp.isValid()) {
-    clientSettings.setValue(key, fp.toStr());
+    cs.setValue(key, fp.toStr());
   }
   return fp;
 }
