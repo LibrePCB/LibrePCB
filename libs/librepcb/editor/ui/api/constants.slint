@@ -1,4 +1,14 @@
 export global Constants {
+    // ATTENTION: Keep this list in sync with uihelpers.cpp!
+    out property <[string]> package-assembly-types: [
+        @tr("THT (all leads)"),
+        @tr("SMT (all leads)"),
+        @tr("THT+SMT (mixed leads)"),
+        @tr("Other (included in BOM/PnP)"),
+        @tr("None (excluded from BOM/PnP"),
+        @tr("Auto-detect (not recommended)"),
+    ];
+
     out property <color> librepcb-color: #29d682;
 
     out property <string> donate-url: "https://librepcb.org/donate/";

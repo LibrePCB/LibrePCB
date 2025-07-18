@@ -71,10 +71,8 @@ public:
   ~LibraryEditorLegacy() noexcept;
 
   bool requestClose() noexcept;
-  void openPackage(const FilePath& fp) noexcept;
   void openComponent(const FilePath& fp) noexcept;
   void openDevice(const FilePath& fp) noexcept;
-  void duplicatePackage(const FilePath& fp) noexcept;
   void duplicateComponent(const FilePath& fp) noexcept;
   void duplicateDevice(const FilePath& fp) noexcept;
   void forceCloseTabs(const QSet<FilePath>& fp) noexcept;

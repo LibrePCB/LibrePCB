@@ -113,10 +113,7 @@ bool PackageEditorState_ReNumberPads::exit() noexcept {
 
 bool PackageEditorState_ReNumberPads::processKeyPressed(
     const GraphicsSceneKeyEvent& e) noexcept {
-  if (e.key == Qt::Key_Return) {
-    processAcceptCommand();
-    return true;
-  } else if (mCurrentModifiers != e.modifiers) {
+  if (mCurrentModifiers != e.modifiers) {
     mCurrentModifiers = e.modifiers;
     updateCurrentPad(true);
     return true;

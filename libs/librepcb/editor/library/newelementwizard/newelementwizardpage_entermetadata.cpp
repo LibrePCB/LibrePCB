@@ -77,8 +77,6 @@ bool NewElementWizardPage_EnterMetadata::isComplete() const noexcept {
 
 int NewElementWizardPage_EnterMetadata::nextId() const noexcept {
   switch (mContext.mElementType) {
-    case NewElementWizardContext::ElementType::Package:
-      return NewElementWizardContext::ID_PackagePads;
     case NewElementWizardContext::ElementType::Component:
       return NewElementWizardContext::ID_ComponentProperties;
     case NewElementWizardContext::ElementType::Device:
@@ -133,13 +131,6 @@ void NewElementWizardPage_EnterMetadata::btnChooseCategoryClicked() noexcept {
       categoryUuid = dialog.getSelectedCategoryUuid();
       break;
     }
-    case NewElementWizardContext::ElementType::Package: {
-      CategoryChooserDialog dialog(mContext.getWorkspace(),
-                                   CategoryChooserDialog::Filter::PkgCat, this);
-      if (dialog.exec() != QDialog::Accepted) return;
-      categoryUuid = dialog.getSelectedCategoryUuid();
-      break;
-    }
     default: {
       qCritical()
           << "Unhandled switch-case in "
@@ -171,16 +162,6 @@ void NewElementWizardPage_EnterMetadata::updateCategoryTreeLabel() noexcept {
     case NewElementWizardContext::ElementType::Component:
     case NewElementWizardContext::ElementType::Device: {
       ComponentCategoryTreeLabelTextBuilder builder(
-          mContext.getWorkspace().getLibraryDb(),
-          mContext.getWorkspace().getSettings().libraryLocaleOrder.get(),
-          nulloptIsRootCategory, *mUi->lblCategoryTree);
-      builder.setOneLine(true);
-      builder.setPleaseChooseIfEmpty(true);
-      builder.updateText(rootCategoryUuid);
-      break;
-    }
-    case NewElementWizardContext::ElementType::Package: {
-      PackageCategoryTreeLabelTextBuilder builder(
           mContext.getWorkspace().getLibraryDb(),
           mContext.getWorkspace().getSettings().libraryLocaleOrder.get(),
           nulloptIsRootCategory, *mUi->lblCategoryTree);

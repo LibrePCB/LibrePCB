@@ -355,6 +355,13 @@ export component CategoriesRowCell inherits HorizontalLayout {
     }
 }
 
+export component AssemblyTypeRowHeader inherits Text {
+    width: self.preferred-width;
+    vertical-alignment: center;
+    text: @tr("Assembly:");
+    accessible-role: none;
+}
+
 export component MetadataFooterRowCell inherits HorizontalLayout {
     in property <int> section-index;
     in property <int> tab-index;

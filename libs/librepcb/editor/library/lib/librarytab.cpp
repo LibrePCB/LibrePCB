@@ -301,7 +301,7 @@ void LibraryTab::trigger(ui::TabAction a) noexcept {
             break;
           }
           case ui::LibraryTreeViewItemType::Package: {
-            emit packageEditorRequested(mEditor, item->path);
+            emit packageEditorRequested(mEditor, item->path, false);
             break;
           }
           case ui::LibraryTreeViewItemType::Component: {
@@ -321,7 +321,7 @@ void LibraryTab::trigger(ui::TabAction a) noexcept {
     }
     case ui::TabAction::Undo: {
       try {
-        commitUiData();
+        // commitUiData(); TODO: May end up in an endless undo command loop.
         mEditor.getUndoStack().undo();
       } catch (const Exception& e) {
         QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
@@ -330,7 +330,7 @@ void LibraryTab::trigger(ui::TabAction a) noexcept {
     }
     case ui::TabAction::Redo: {
       try {
-        commitUiData();
+        // commitUiData(); TODO: May end up in an endless undo command loop.
         mEditor.getUndoStack().redo();
       } catch (const Exception& e) {
         QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
@@ -841,7 +841,7 @@ void LibraryTab::duplicateElements(
       break;
     }
     case ui::LibraryTreeViewItemType::Package: {
-      mEditor.duplicateInLegacyPackageEditor(item->path);
+      emit packageEditorRequested(mEditor, item->path, true);
       break;
     }
     case ui::LibraryTreeViewItemType::Component: {

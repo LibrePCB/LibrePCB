@@ -295,6 +295,10 @@ static slint::SharedString getInputError(const QString& input) {
   }
 }
 
+static slint::SharedString getDuplicateError() {
+  return q2s(QCoreApplication::translate("SlintHelpers", "Duplicate"));
+}
+
 std::optional<ElementName> validateElementName(
     const QString& input, slint::SharedString& error) noexcept {
   if (auto val = parseElementName(cleanElementName(input))) {
@@ -334,6 +338,20 @@ std::optional<FileProofName> validateFileProofName(
     error = getInputError(input);
     return std::nullopt;
   }
+}
+
+std::optional<CircuitIdentifier> validateCircuitIdentifier(
+    const QString& input, slint::SharedString& error,
+    bool isDuplicate) noexcept {
+  auto val = parseCircuitIdentifier(cleanCircuitIdentifier(input));
+  if (isDuplicate) {
+    error = getDuplicateError();
+  } else if (val) {
+    error = slint::SharedString();
+  } else {
+    error = getInputError(input);
+  }
+  return val;
 }
 
 std::optional<QUrl> validateUrl(const QString& input,

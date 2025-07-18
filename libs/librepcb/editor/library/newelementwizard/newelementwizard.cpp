@@ -30,7 +30,6 @@
 #include "newelementwizardpage_copyfrom.h"
 #include "newelementwizardpage_deviceproperties.h"
 #include "newelementwizardpage_entermetadata.h"
-#include "newelementwizardpage_packagepads.h"
 #include "ui_newelementwizard.h"
 
 /*******************************************************************************
@@ -58,8 +57,6 @@ NewElementWizard::NewElementWizard(const Workspace& ws, Library& lib,
              new NewElementWizardPage_CopyFrom(*mContext, this));
   insertPage(NewElementWizardContext::ID_EnterMetadata,
              new NewElementWizardPage_EnterMetadata(*mContext, this));
-  insertPage(NewElementWizardContext::ID_PackagePads,
-             new NewElementWizardPage_PackagePads(*mContext, this));
   insertPage(NewElementWizardContext::ID_ComponentProperties,
              new NewElementWizardPage_ComponentProperties(*mContext, this));
   insertPage(NewElementWizardContext::ID_ComponentSymbols,
