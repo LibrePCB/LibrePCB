@@ -276,7 +276,11 @@ public:
                            std::shared_ptr<const StrokeText> text,
                            const Length& minWidth) noexcept;
   MsgMinimumWidthViolation(const MsgMinimumWidthViolation& other) noexcept
-    : RuleCheckMessage(other), mFootprint(other.mFootprint) {}
+    : RuleCheckMessage(other),
+      mFootprint(other.mFootprint),
+      mPolygon(other.mPolygon),
+      mCircle(other.mCircle),
+      mStrokeText(other.mStrokeText) {}
   virtual ~MsgMinimumWidthViolation() noexcept {}
 
   // Getters
@@ -318,7 +322,7 @@ public:
   explicit MsgMissingCourtyard(
       std::shared_ptr<const Footprint> footprint) noexcept;
   MsgMissingCourtyard(const MsgMissingCourtyard& other) noexcept
-    : RuleCheckMessage(other) {}
+    : RuleCheckMessage(other), mFootprint(other.mFootprint) {}
   virtual ~MsgMissingCourtyard() noexcept {}
 
   // Getters
@@ -363,8 +367,16 @@ public:
   MsgMissingFootprintModel() = delete;
   MsgMissingFootprintModel(std::shared_ptr<const Footprint> footprint) noexcept;
   MsgMissingFootprintModel(const MsgMissingFootprintModel& other) noexcept
-    : RuleCheckMessage(other) {}
+    : RuleCheckMessage(other), mFootprint(other.mFootprint) {}
   virtual ~MsgMissingFootprintModel() noexcept {}
+
+  // Getters
+  std::shared_ptr<const Footprint> getFootprint() const noexcept {
+    return mFootprint;
+  }
+
+private:
+  std::shared_ptr<const Footprint> mFootprint;
 };
 
 /*******************************************************************************
@@ -383,7 +395,7 @@ public:
   explicit MsgMissingFootprintName(
       std::shared_ptr<const Footprint> footprint) noexcept;
   MsgMissingFootprintName(const MsgMissingFootprintName& other) noexcept
-    : RuleCheckMessage(other) {}
+    : RuleCheckMessage(other), mFootprint(other.mFootprint) {}
   virtual ~MsgMissingFootprintName() noexcept {}
 
   // Getters
@@ -411,7 +423,7 @@ public:
   explicit MsgMissingFootprintValue(
       std::shared_ptr<const Footprint> footprint) noexcept;
   MsgMissingFootprintValue(const MsgMissingFootprintValue& other) noexcept
-    : RuleCheckMessage(other) {}
+    : RuleCheckMessage(other), mFootprint(other.mFootprint) {}
   virtual ~MsgMissingFootprintValue() noexcept {}
 
   // Getters
@@ -439,7 +451,7 @@ public:
   explicit MsgMissingPackageOutline(
       std::shared_ptr<const Footprint> footprint) noexcept;
   MsgMissingPackageOutline(const MsgMissingPackageOutline& other) noexcept
-    : RuleCheckMessage(other) {}
+    : RuleCheckMessage(other), mFootprint(other.mFootprint) {}
   virtual ~MsgMissingPackageOutline() noexcept {}
 
   // Getters

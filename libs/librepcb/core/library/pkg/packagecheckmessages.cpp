@@ -325,7 +325,8 @@ MsgMissingFootprintModel::MsgMissingFootprintModel(
         tr("The footprint has no 3D model specified, so the package will be "
            "missing in the 3D viewer and in 3D data exports. However, this has "
            "no impact on the PCB production data."),
-        "missing_footprint_3d_model") {
+        "missing_footprint_3d_model"),
+    mFootprint(footprint) {
   mApproval->ensureLineBreak();
   mApproval->appendChild("footprint", footprint->getUuid());
   mApproval->ensureLineBreak();
