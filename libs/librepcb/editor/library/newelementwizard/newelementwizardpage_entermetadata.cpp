@@ -77,10 +77,6 @@ bool NewElementWizardPage_EnterMetadata::isComplete() const noexcept {
 
 int NewElementWizardPage_EnterMetadata::nextId() const noexcept {
   switch (mContext.mElementType) {
-    case NewElementWizardContext::ElementType::ComponentCategory:
-    case NewElementWizardContext::ElementType::PackageCategory:
-    case NewElementWizardContext::ElementType::Symbol:
-      return NewElementWizardContext::ID_None;
     case NewElementWizardContext::ElementType::Package:
       return NewElementWizardContext::ID_PackagePads;
     case NewElementWizardContext::ElementType::Component:
@@ -129,8 +125,6 @@ void NewElementWizardPage_EnterMetadata::edtVersionTextChanged(
 void NewElementWizardPage_EnterMetadata::btnChooseCategoryClicked() noexcept {
   std::optional<Uuid> categoryUuid;
   switch (mContext.mElementType) {
-    case NewElementWizardContext::ElementType::ComponentCategory:
-    case NewElementWizardContext::ElementType::Symbol:
     case NewElementWizardContext::ElementType::Component:
     case NewElementWizardContext::ElementType::Device: {
       CategoryChooserDialog dialog(mContext.getWorkspace(),
@@ -139,7 +133,6 @@ void NewElementWizardPage_EnterMetadata::btnChooseCategoryClicked() noexcept {
       categoryUuid = dialog.getSelectedCategoryUuid();
       break;
     }
-    case NewElementWizardContext::ElementType::PackageCategory:
     case NewElementWizardContext::ElementType::Package: {
       CategoryChooserDialog dialog(mContext.getWorkspace(),
                                    CategoryChooserDialog::Filter::PkgCat, this);
@@ -175,10 +168,6 @@ void NewElementWizardPage_EnterMetadata::updateCategoryTreeLabel() noexcept {
 
   bool nulloptIsRootCategory = false;
   switch (mContext.mElementType) {
-    case NewElementWizardContext::ElementType::ComponentCategory:
-      nulloptIsRootCategory = true;
-      // fallthrough
-    case NewElementWizardContext::ElementType::Symbol:
     case NewElementWizardContext::ElementType::Component:
     case NewElementWizardContext::ElementType::Device: {
       ComponentCategoryTreeLabelTextBuilder builder(
@@ -190,9 +179,6 @@ void NewElementWizardPage_EnterMetadata::updateCategoryTreeLabel() noexcept {
       builder.updateText(rootCategoryUuid);
       break;
     }
-    case NewElementWizardContext::ElementType::PackageCategory:
-      nulloptIsRootCategory = true;
-      // fallthrough
     case NewElementWizardContext::ElementType::Package: {
       PackageCategoryTreeLabelTextBuilder builder(
           mContext.getWorkspace().getLibraryDb(),

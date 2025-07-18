@@ -79,7 +79,6 @@ private:  // Methods
   void setSelectedCategory(const std::optional<Uuid>& uuid) noexcept;
   void setSelectedElement(const FilePath& fp) noexcept;
   void setCategoryTreeModel(QAbstractItemModel* model) noexcept;
-  FilePath getCategoryFilePath(const std::optional<Uuid>& category) const;
   QSet<Uuid> getElementsByCategory(const std::optional<Uuid>& category) const;
   void getElementMetadata(const Uuid& uuid, FilePath& fp, QString& name) const;
   void initializePage() noexcept override;
@@ -89,7 +88,6 @@ private:  // Data
   NewElementWizardContext& mContext;
   QScopedPointer<Ui::NewElementWizardPage_CopyFrom> mUi;
   QScopedPointer<QAbstractItemModel> mCategoryTreeModel;
-  bool mIsCategoryElement;
   std::optional<Uuid> mSelectedCategoryUuid;
   bool mIsComplete;
 };

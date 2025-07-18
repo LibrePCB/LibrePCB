@@ -24,13 +24,10 @@
 
 #include <librepcb/core/exceptions.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
-#include <librepcb/core/library/cat/componentcategory.h>
-#include <librepcb/core/library/cat/packagecategory.h>
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/dev/device.h>
 #include <librepcb/core/library/library.h>
 #include <librepcb/core/library/pkg/package.h>
-#include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
@@ -83,12 +80,6 @@ void NewElementWizardContext::reset(ElementType newType) noexcept {
   mElementVersion = Version::fromString("0.1");
   mElementCategoryUuids.clear();
 
-  // symbol
-  mSymbolPins.clear();
-  mSymbolPolygons.clear();
-  mSymbolCircles.clear();
-  mSymbolTexts.clear();
-
   // package
   mPackageAssemblyType = Package::AssemblyType::Auto;
   mPackagePads.clear();
@@ -121,18 +112,6 @@ void NewElementWizardContext::copyElement(ElementType type,
   std::unique_ptr<LibraryBaseElement> element;
 
   switch (mElementType) {
-    case NewElementWizardContext::ElementType::ComponentCategory: {
-      element = ComponentCategory::open(std::move(dir));
-      break;
-    }
-    case NewElementWizardContext::ElementType::PackageCategory: {
-      element = PackageCategory::open(std::move(dir));
-      break;
-    }
-    case NewElementWizardContext::ElementType::Symbol: {
-      element = Symbol::open(std::move(dir));
-      break;
-    }
     case NewElementWizardContext::ElementType::Component: {
       element = Component::open(std::move(dir));
       break;
@@ -156,56 +135,12 @@ void NewElementWizardContext::copyElement(ElementType type,
   mElementName = element->getNames().getDefaultValue();
   mElementDescription = element->getDescriptions().getDefaultValue();
   mElementKeywords = element->getKeywords().getDefaultValue();
-  if (const LibraryCategory* category =
-          dynamic_cast<const LibraryCategory*>(element.get())) {
-    if (category->getParentUuid().has_value()) {
-      mElementCategoryUuids.insert(*category->getParentUuid());
-    }
-  }
   if (const LibraryElement* libElement =
           dynamic_cast<const LibraryElement*>(element.get())) {
     mElementCategoryUuids = libElement->getCategories();
   }
 
   switch (mElementType) {
-    case NewElementWizardContext::ElementType::Symbol: {
-      const Symbol* symbol = dynamic_cast<Symbol*>(element.get());
-      Q_ASSERT(symbol);
-      // copy pins but generate new UUIDs
-      mSymbolPins.clear();
-      for (const SymbolPin& pin : symbol->getPins()) {
-        mSymbolPins.append(std::make_shared<SymbolPin>(
-            Uuid::createRandom(), pin.getName(), pin.getPosition(),
-            pin.getLength(), pin.getRotation(), pin.getNamePosition(),
-            pin.getNameRotation(), pin.getNameHeight(),
-            pin.getNameAlignment()));
-      }
-      // copy polygons but generate new UUIDs
-      mSymbolPolygons.clear();
-      for (const Polygon& polygon : symbol->getPolygons()) {
-        mSymbolPolygons.append(std::make_shared<Polygon>(
-            Uuid::createRandom(), polygon.getLayer(), polygon.getLineWidth(),
-            polygon.isFilled(), polygon.isGrabArea(), polygon.getPath()));
-      }
-      // copy circles but generate new UUIDs
-      mSymbolCircles.clear();
-      for (const Circle& circle : symbol->getCircles()) {
-        mSymbolCircles.append(std::make_shared<Circle>(
-            Uuid::createRandom(), circle.getLayer(), circle.getLineWidth(),
-            circle.isFilled(), circle.isGrabArea(), circle.getCenter(),
-            circle.getDiameter()));
-      }
-      // copy texts but generate new UUIDs
-      mSymbolTexts.clear();
-      for (const Text& text : symbol->getTexts()) {
-        mSymbolTexts.append(std::make_shared<Text>(
-            Uuid::createRandom(), text.getLayer(), text.getText(),
-            text.getPosition(), text.getRotation(), text.getHeight(),
-            text.getAlign()));
-      }
-      break;
-    }
-
     case ElementType::Package: {
       const Package* package = dynamic_cast<Package*>(element.get());
       Q_ASSERT(package);
@@ -385,47 +320,6 @@ void NewElementWizardContext::createLibraryElement() {
   };
 
   switch (mElementType) {
-    case NewElementWizardContext::ElementType::ComponentCategory: {
-      ComponentCategory element(Uuid::createRandom(), *mElementVersion,
-                                mElementAuthor, *mElementName,
-                                mElementDescription, mElementKeywords);
-      element.setParentUuid(rootCategoryUuid);
-      TransactionalDirectory dir(
-          mLibrary.getDirectory(),
-          mLibrary.getElementsDirectoryName<ComponentCategory>());
-      element.moveIntoParentDirectory(dir);
-      copyFiles(element.getDirectory());
-      mOutputDirectory = element.getDirectory().getAbsPath();
-      break;
-    }
-    case NewElementWizardContext::ElementType::PackageCategory: {
-      PackageCategory element(Uuid::createRandom(), *mElementVersion,
-                              mElementAuthor, *mElementName,
-                              mElementDescription, mElementKeywords);
-      element.setParentUuid(rootCategoryUuid);
-      TransactionalDirectory dir(
-          mLibrary.getDirectory(),
-          mLibrary.getElementsDirectoryName<PackageCategory>());
-      element.moveIntoParentDirectory(dir);
-      copyFiles(element.getDirectory());
-      mOutputDirectory = element.getDirectory().getAbsPath();
-      break;
-    }
-    case NewElementWizardContext::ElementType::Symbol: {
-      Symbol element(Uuid::createRandom(), *mElementVersion, mElementAuthor,
-                     *mElementName, mElementDescription, mElementKeywords);
-      element.setCategories(mElementCategoryUuids);
-      element.getPins() = mSymbolPins;
-      element.getPolygons() = mSymbolPolygons;
-      element.getCircles() = mSymbolCircles;
-      element.getTexts() = mSymbolTexts;
-      TransactionalDirectory dir(mLibrary.getDirectory(),
-                                 mLibrary.getElementsDirectoryName<Symbol>());
-      element.moveIntoParentDirectory(dir);
-      copyFiles(element.getDirectory());
-      mOutputDirectory = element.getDirectory().getAbsPath();
-      break;
-    }
     case NewElementWizardContext::ElementType::Package: {
       Package element(Uuid::createRandom(), *mElementVersion, mElementAuthor,
                       *mElementName, mElementDescription, mElementKeywords,

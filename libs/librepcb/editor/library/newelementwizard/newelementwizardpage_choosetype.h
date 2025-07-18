@@ -66,9 +66,6 @@ public:
       const NewElementWizardPage_ChooseType& rhs) = delete;
 
 private:  // Methods
-  void btnComponentCategoryClicked() noexcept;
-  void btnPackageCategoryClicked() noexcept;
-  void btnSymbolClicked() noexcept;
   void btnPackageClicked() noexcept;
   void btnComponentClicked() noexcept;
   void btnDeviceClicked() noexcept;
