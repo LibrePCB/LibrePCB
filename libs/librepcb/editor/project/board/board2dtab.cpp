@@ -174,7 +174,13 @@ Board2dTab::Board2dTab(GuiApplication& app, BoardEditor& editor,
           &Board2dTab::storeLayersVisibility);
 
   // Setup graphics view.
+  mView->setUseOpenGl(mApp.getWorkspace().getSettings().useOpenGl.get());
   mView->setEventHandler(this);
+  connect(
+      &mApp.getWorkspace().getSettings().useOpenGl,
+      &WorkspaceSettingsItem_GenericValue<bool>::edited, this, [this]() {
+        mView->setUseOpenGl(mApp.getWorkspace().getSettings().useOpenGl.get());
+      });
   connect(mView.get(), &SlintGraphicsView::transformChanged, this,
           &Board2dTab::requestRepaint);
   connect(mView.get(), &SlintGraphicsView::stateChanged, this,
@@ -829,6 +835,7 @@ slint::Image Board2dTab::renderScene(float width, float height,
   if (scene == 1) {
     if (mUnplacedComponentGraphicsScene) {
       SlintGraphicsView view(SlintGraphicsView::defaultFootprintSceneRect());
+      view.setUseOpenGl(mApp.getWorkspace().getSettings().useOpenGl.get());
       return view.render(*mUnplacedComponentGraphicsScene, width, height);
     } else {
       QPixmap pix(width, height);

@@ -29,6 +29,7 @@
 
 #include <QtCore>
 #include <QtGui>
+#include <QtOpenGL>
 
 #include <slint.h>
 
@@ -87,6 +88,7 @@ public:
   Point mapToScenePos(const QPointF& pos) const noexcept;
 
   // General Methods
+  void setUseOpenGl(bool use) noexcept;
   void setEventHandler(IF_GraphicsViewEventHandler* obj) noexcept;
   slint::Image render(GraphicsScene& scene, float width, float height) noexcept;
   bool pointerEvent(const QPointF& pos,
@@ -125,6 +127,10 @@ private:  // Methods
 private:  // Data
   const QRectF mDefaultSceneRect;
   IF_GraphicsViewEventHandler* mEventHandler;
+  std::unique_ptr<QOffscreenSurface> mGlSurface;
+  std::unique_ptr<QOpenGLContext> mGlContext;
+  std::unique_ptr<QOpenGLFramebufferObject> mGlFbo;
+  QString mGlError;
   Projection mProjection;
   QSizeF mViewSize;
 
