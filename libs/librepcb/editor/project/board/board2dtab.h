@@ -282,7 +282,6 @@ private:
   std::shared_ptr<slint::VectorModel<slint::SharedString>>
       mUnplacedComponentFootprintsModel;
   int mUnplacedComponentFootprintIndex;
-  std::unique_ptr<GraphicsLayerList> mUnplacedComponentLayers;
   std::unique_ptr<GraphicsScene> mUnplacedComponentGraphicsScene;
   std::unique_ptr<FootprintGraphicsItem> mUnplacedComponentGraphicsItem;
   QHash<Uuid, Uuid> mLastDeviceOfComponent;

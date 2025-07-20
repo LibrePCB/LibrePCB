@@ -24,6 +24,7 @@
 
 #include "dialogs/directorylockhandlerdialog.h"
 #include "dialogs/filedialog.h"
+#include "graphics/graphicslayerlist.h"
 #include "library/librariesmodel.h"
 #include "library/libraryeditor.h"
 #include "mainwindow.h"
@@ -70,6 +71,7 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
   : QObject(parent),
     mWorkspace(ws),
     mLibrariesContainStandardComponents(false),
+    mPreviewLayers(GraphicsLayerList::previewLayers(&ws.getSettings())),
     mNotifications(new NotificationsModel(ws)),
     mQuickAccessModel(new QuickAccessModel(ws)),
     mLocalLibraries(new LibrariesModel(ws, LibrariesModel::Mode::LocalLibs)),
