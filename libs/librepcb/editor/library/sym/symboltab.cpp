@@ -118,7 +118,13 @@ SymbolTab::SymbolTab(LibraryEditor& editor, std::unique_ptr<Symbol> sym,
     mIsInterfaceBroken(false),
     mOriginalSymbolPinUuids(mSymbol->getPins().getUuidSet()) {
   // Setup graphics view.
+  mView->setUseOpenGl(mApp.getWorkspace().getSettings().useOpenGl.get());
   mView->setEventHandler(this);
+  connect(
+      &mApp.getWorkspace().getSettings().useOpenGl,
+      &WorkspaceSettingsItem_GenericValue<bool>::edited, this, [this]() {
+        mView->setUseOpenGl(mApp.getWorkspace().getSettings().useOpenGl.get());
+      });
   connect(mView.get(), &SlintGraphicsView::transformChanged, this,
           &SymbolTab::requestRepaint);
   connect(mView.get(), &SlintGraphicsView::stateChanged, this,
