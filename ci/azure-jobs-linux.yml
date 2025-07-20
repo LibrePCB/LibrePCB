@@ -2,7 +2,7 @@ jobs:
 - job: Linux
   pool:
     vmImage: 'ubuntu-22.04'
-  timeoutInMinutes: 120
+  timeoutInMinutes: 180
   variables:
     OS: 'linux'
     ARCH: 'x86_64'
