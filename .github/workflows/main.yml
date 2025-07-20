@@ -14,6 +14,13 @@ env:
   CARGO_INCREMENTAL: 0
 
 jobs:
+  Ubuntu_2004_Qt_6_6_GCC:
+    uses: ./.github/workflows/linux.yml
+    with:
+      image: librepcb/librepcb-dev:ubuntu-20.04-qt6.6-4
+      deploy: true
+    secrets: inherit
+
   windows:
     uses: ./.github/workflows/windows.yml
     secrets: inherit

@@ -1,0 +1,84 @@
+on:
+  workflow_call:
+    inputs:
+      image:
+        required: true
+        type: string
+      deploy:
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  linux:
+    name: Linux
+    runs-on: ubuntu-24.04
+    container: ${{ inputs.image }}
+    env:
+      OS: 'linux'
+      ARCH: 'x86_64'
+      #CCACHE_DIR: '/Users/runner/ccache-dir'
+      #CARGO_HOME: '/Users/runner/cargo-home'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Print Environment
+        run: ./ci/print_environment.sh
+      - name: Install Dependencies
+        run: |
+          source ./ci/install_dependencies.sh
+          # Pass modified PATH to following steps:
+          echo "$PATH" > "$GITHUB_PATH"
+        env:
+          SLINT_UI_TESTING_AUTH: ${{ secrets.SLINT_UI_TESTING_AUTH }}
+      # caching --->
+      #- name: Cache .ccache
+      #  uses: actions/cache@v4
+      #  with:
+      #    key: ${{ github.job }}-${{ github.ref }}
+      #    restore-keys: ${{ github.job }}-refs/heads/master
+      #    path: ${{ env.CCACHE_DIR }}
+      #- name: Cache .cargo
+      #  uses: actions/cache@v4
+      #  with:
+      #    key: ${{ github.job }}-${{ hashFiles('libs/librepcb/**/Cargo.lock') }}-${{ github.ref }}
+      #    restore-keys: ${{ github.job }}-${{ hashFiles('libs/librepcb/**/Cargo.lock') }}-refs/heads/master
+      #    path: |
+      #      ${{ env.CARGO_HOME }}/bin/
+      #      ${{ env.CARGO_HOME }}/registry/index/
+      #      ${{ env.CARGO_HOME }}/registry/cache/
+      #      ${{ env.CARGO_HOME }}/git/db/
+      #      ./build/cargo/
+      #      ./libs/librepcb/rust-core/target/
+      # <--- caching
+      - name: Print New Environment
+        run: ./ci/print_environment.sh
+      - name: Build LibrePCB
+        run: ./ci/build_librepcb.sh
+      - name: Build Portable Packages
+        if: ${{ success() && inputs.deploy }}
+        run: ./ci/build_linux_portables.sh
+      - name: Run rust-core tests
+        run: cd libs/librepcb/rust-core && cargo test --features=fail-on-warnings
+      - name: Run LibrePCB Unittests
+        run: xvfb-run -a ./build/tests/unittests/librepcb-unittests
+      - name: Run LibrePCB-CLI Functional Tests
+        run: xvfb-run -a --server-args="-screen 0 1024x768x24" uv --directory ./tests/cli run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb-cli"
+      - name: Run LibrePCB Functional Tests
+        run: xvfb-run -a --server-args="-screen 0 1024x768x24" uv --directory ./tests/funq run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb" --reruns 5 --reruns-delay 10
+      - name: Run LibrePCB UI Tests
+        if: ${{ success() && env.SLINT_UI_TESTING_AUTH }}
+        run: xvfb-run -a --server-args="-screen 0 1600x1200x24" uv --directory "./tests/ui" run --no-dev pytest -vvv --librepcb-executable="../../build/install/bin/librepcb"
+        env:
+          SLINT_UI_TESTING_AUTH: ${{ secrets.SLINT_UI_TESTING_AUTH }}
+      - name: Tar & Upload Artifacts
+        if: ${{ success() && inputs.deploy && (github.event_name == 'push') && env.UPLOAD_URL }}
+        run: |
+          ./ci/tar_artifacts.sh
+          ./ci/upload_artifacts.sh
+        env:
+          UPLOAD_URL: ${{ secrets.UPLOAD_URL }}
+          UPLOAD_USER: ${{ secrets.UPLOAD_USER }}
+          UPLOAD_PASS: ${{ secrets.UPLOAD_PASS }}
+          UPLOAD_SIGN_KEY: ${{ secrets.UPLOAD_SIGN_KEY }}
