@@ -113,10 +113,6 @@ public:
 
   void forceClosingTabs(const QSet<FilePath>& fp) noexcept;
 
-  // Legacy editors
-  void openLegacyDeviceEditor(const FilePath& fp) noexcept;
-  void duplicateInLegacyDeviceEditor(const FilePath& fp) noexcept;
-
   // Operator Overloadings
   LibraryEditor& operator=(const LibraryEditor& rhs) = delete;
 

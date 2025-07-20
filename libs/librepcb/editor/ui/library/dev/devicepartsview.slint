@@ -1,0 +1,100 @@
+import { ScrollView } from "std-widgets.slint";
+import {
+    AttributeListView,
+    Button,
+    ComboBox,
+    IconButton,
+    LineEdit,
+    LinkText,
+    MenuItem,
+    MenuPopup,
+    MessageBox,
+    Palette,
+    SceneButton,
+    SlideView,
+    Switch,
+    TextEdit,
+    ToolButton,
+    TreeItemPickerPopup,
+} from "../../widgets.slint";
+import {
+    Backend,
+    Constants,
+    Data,
+    DevicePartData,
+    DismissableMessageAction,
+    EditorCommandSet as Cmd,
+    EditorTool,
+    PanelPage,
+    TabAction,
+    WindowSectionData,
+} from "../../api.slint";
+
+
+export component DevicePartsView {
+    in-out property <[DevicePartData]> model;
+    property <length> row-height: 25px;
+    property <length> row-spacing: 3px;
+
+    preferred-width: l.preferred-width;
+    preferred-height: l.preferred-height;
+
+    ScrollView {
+        x: 0;
+        y: 0;
+        width: 100%;
+        height: 100%;
+
+        l := VerticalLayout {
+            alignment: start;
+            spacing: 5px;
+
+            for item in model: Rectangle {
+                border-color: #505050;
+                border-width: 1px;
+                border-radius: 5px;
+
+                VerticalLayout {
+                    padding: 5px;
+                    spacing: 5px;
+
+                    HorizontalLayout {
+                        spacing: 5px;
+
+                        LineEdit {
+                            label: @tr("MPN");
+                            text: item.mpn;
+                        }
+
+                        LineEdit {
+                            label: @tr("Manufacturer");
+                            text: item.manufacturer;
+                        }
+
+                        HorizontalLayout {
+                            IconButton {
+                                style: hyperlink;
+                                icon-scale: 0.6;
+                                icon: @image-url("../../../../../font-awesome/svgs/solid/copy.svg");
+                            }
+
+                            IconButton {
+                                style: hyperlink;
+                                icon-scale: 0.6;
+                                icon: @image-url("../../../../../font-awesome/svgs/solid/trash-can.svg");
+                            }
+                        }
+                    }
+
+                    HorizontalLayout {
+                        padding-left: 20px;
+
+                        AttributeListView {
+                            model: item.attributes;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -62,8 +62,6 @@ NewElementWizardPage_DeviceProperties::
  ******************************************************************************/
 
 bool NewElementWizardPage_DeviceProperties::isComplete() const noexcept {
-  if (!mContext.mDeviceComponentUuid) return false;
-  if (!mContext.mDevicePackageUuid) return false;
   return true;
 }
 
@@ -96,7 +94,6 @@ void NewElementWizardPage_DeviceProperties::btnChoosePackageClicked() noexcept {
 
 void NewElementWizardPage_DeviceProperties::setComponent(
     const std::optional<Uuid>& uuid) noexcept {
-  mContext.mDeviceComponentUuid = uuid;
   if (uuid) {
     try {
       FilePath fp = mContext.getWorkspace().getLibraryDb().getLatest<Component>(
@@ -119,7 +116,6 @@ void NewElementWizardPage_DeviceProperties::setComponent(
 
 void NewElementWizardPage_DeviceProperties::setPackage(
     const std::optional<Uuid>& uuid) noexcept {
-  mContext.mDevicePackageUuid = uuid;
   if (uuid) {
     try {
       FilePath fp = mContext.getWorkspace().getLibraryDb().getLatest<Package>(
@@ -127,8 +123,8 @@ void NewElementWizardPage_DeviceProperties::setPackage(
       std::unique_ptr<Package> package = Package::open(
           std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
               TransactionalFileSystem::openRO(fp))));  // can throw
-      DevicePadSignalMapHelpers::setPads(mContext.mDevicePadSignalMap,
-                                         package->getPads().getUuidSet());
+      // DevicePadSignalMapHelpers::setPads(mContext.mDevicePadSignalMap,
+      //                                    package->getPads().getUuidSet());
       mUi->lblPackageName->setText(
           *package->getNames().value(mContext.getLibLocaleOrder()));
       mUi->lblPackageDescription->setText(
@@ -136,7 +132,6 @@ void NewElementWizardPage_DeviceProperties::setPackage(
     } catch (const Exception& e) {
       mUi->lblPackageName->setText(tr("ERROR:"));
       mUi->lblPackageDescription->setText(e.getMsg());
-      mContext.mDevicePackageUuid = std::nullopt;  // invalid package!
     }
   } else {
     mUi->lblPackageName->setText(tr("No package selected"));
@@ -147,8 +142,6 @@ void NewElementWizardPage_DeviceProperties::setPackage(
 
 void NewElementWizardPage_DeviceProperties::initializePage() noexcept {
   QWizardPage::initializePage();
-  setComponent(mContext.mDeviceComponentUuid);
-  setPackage(mContext.mDevicePackageUuid);
 }
 
 void NewElementWizardPage_DeviceProperties::cleanupPage() noexcept {

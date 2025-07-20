@@ -41,8 +41,6 @@ NewElementWizardPage_ChooseType::NewElementWizardPage_ChooseType(
     mUi(new Ui::NewElementWizardPage_ChooseType) {
   mUi->setupUi(this);
   setPixmap(QWizard::WatermarkPixmap, QPixmap(":/img/wizards/watermark.jpg"));
-  connect(mUi->btnDevice, &QToolButton::clicked, this,
-          &NewElementWizardPage_ChooseType::btnDeviceClicked);
 }
 
 NewElementWizardPage_ChooseType::~NewElementWizardPage_ChooseType() noexcept {
@@ -67,10 +65,6 @@ int NewElementWizardPage_ChooseType::nextId() const noexcept {
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
-
-void NewElementWizardPage_ChooseType::btnDeviceClicked() noexcept {
-  setElementType(NewElementWizardContext::ElementType::Device);
-}
 
 void NewElementWizardPage_ChooseType::initializePage() noexcept {
   QWizardPage::initializePage();

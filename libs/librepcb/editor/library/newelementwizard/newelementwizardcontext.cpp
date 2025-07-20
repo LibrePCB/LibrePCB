@@ -76,13 +76,6 @@ void NewElementWizardContext::reset(ElementType newType) noexcept {
   mElementAuthor = mWorkspace.getSettings().userName.get();
   mElementVersion = Version::fromString("0.1");
   mElementCategoryUuids.clear();
-
-  // device
-  mDeviceComponentUuid = std::nullopt;
-  mDevicePackageUuid = std::nullopt;
-  mDevicePadSignalMap.clear();
-  mDeviceAttributes.clear();
-  mDeviceParts.clear();
 }
 
 void NewElementWizardContext::copyElement(ElementType type,
@@ -95,10 +88,6 @@ void NewElementWizardContext::copyElement(ElementType type,
   std::unique_ptr<LibraryBaseElement> element;
 
   switch (mElementType) {
-    case NewElementWizardContext::ElementType::Device: {
-      element = Device::open(std::move(dir));
-      break;
-    }
     default: {
       qCritical()
           << "Unhandled switch-case in NewElementWizardContext::copyElement():"
@@ -116,17 +105,6 @@ void NewElementWizardContext::copyElement(ElementType type,
   }
 
   switch (mElementType) {
-    case ElementType::Device: {
-      const Device* device = dynamic_cast<Device*>(element.get());
-      Q_ASSERT(device);
-      mDeviceComponentUuid = device->getComponentUuid();
-      mDevicePackageUuid = device->getPackageUuid();
-      mDevicePadSignalMap = device->getPadSignalMap();
-      mDeviceAttributes = device->getAttributes();
-      mDeviceParts = device->getParts();
-      break;
-    }
-
     default: {
       break;
     }
@@ -149,23 +127,6 @@ void NewElementWizardContext::createLibraryElement() {
   };
 
   switch (mElementType) {
-    case NewElementWizardContext::ElementType::Device: {
-      if (!mDeviceComponentUuid) throw LogicError(__FILE__, __LINE__);
-      if (!mDevicePackageUuid) throw LogicError(__FILE__, __LINE__);
-      Device element(Uuid::createRandom(), *mElementVersion, mElementAuthor,
-                     *mElementName, mElementDescription, mElementKeywords,
-                     *mDeviceComponentUuid, *mDevicePackageUuid);
-      element.setCategories(mElementCategoryUuids);
-      element.getPadSignalMap() = mDevicePadSignalMap;
-      element.getAttributes() = mDeviceAttributes;
-      element.getParts() = mDeviceParts;
-      TransactionalDirectory dir(mLibrary.getDirectory(),
-                                 mLibrary.getElementsDirectoryName<Device>());
-      element.moveIntoParentDirectory(dir);
-      copyFiles(element.getDirectory());
-      mOutputDirectory = element.getDirectory().getAbsPath();
-      break;
-    }
     default:
       throw LogicError(__FILE__, __LINE__);
   }

@@ -66,7 +66,6 @@ public:
       const NewElementWizardPage_ChooseType& rhs) = delete;
 
 private:  // Methods
-  void btnDeviceClicked() noexcept;
   void initializePage() noexcept override;
   void cleanupPage() noexcept override;
   void setElementType(NewElementWizardContext::ElementType type) noexcept;

@@ -187,6 +187,8 @@ export global Helpers {
             @image-url("../../../../../img/library/package.png")
         } else if (t == TabType.component) {
             @image-url("../../../../bootstrap-icons/icons/cpu.svg")
+        } else if (t == TabType.device) {
+            @image-url("../../../../../img/library/device.png")
         } else if (t == TabType.schematic) {
             @image-url("../../../../font-awesome/svgs/regular/image.svg")
         } else if (t == TabType.board-2d) {
@@ -216,6 +218,8 @@ export global Helpers {
             @tr("Package Check")
         } else if type == RuleCheckType.component-check {
             @tr("Component Check")
+        } else if type == RuleCheckType.device-check {
+            @tr("Device Check")
         } else {
             ""
         }

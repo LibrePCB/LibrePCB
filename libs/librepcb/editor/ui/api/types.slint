@@ -255,6 +255,7 @@ export enum RuleCheckType {
     symbol-check,
     package-check,
     component-check,
+    device-check,
 }
 
 export enum RuleCheckState {
@@ -509,6 +510,17 @@ export struct ComponentVariantData {
     action: ComponentVariantAction,
 }
 
+export struct DevicePartData {
+    mpn: string,
+    manufacturer: string,
+    attributes: [AttributeData],
+}
+
+export struct DevicePinoutData {
+    pad-name: string,
+    signal-index: int,
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Tabs
 ////////////////////////////////////////////////////////////////////////////////
@@ -559,6 +571,7 @@ export enum TabType {
     symbol,
     package,
     component,
+    device,
     schematic,
     board-2d,
     board-3d,
@@ -1009,6 +1022,46 @@ export struct ComponentTabData {
     new-category: string,  // Set to UUID by UI, reset by backend
 }
 
+// Additional data for device editor tabs
+export struct DeviceTabData {
+    // General
+    library-index: int,
+    path: string,
+    wizard-mode: bool,
+    page-index: int,
+
+    // Metadata
+    name: string,
+    name-error: string,
+    description: string,
+    keywords: string,
+    author: string,
+    version: string,
+    version-error: string,
+    deprecated: bool,
+    categories: [LibraryElementCategoryData],
+    categories-tree: [TreeViewItemData],
+    datasheet-url: string,
+    datasheet-url-error: string,
+    attributes: [AttributeData],
+    component-name: string,
+    component-description: string,
+    package-name: string,
+    package-description: string,
+    cmp-signal-names: [string],  // Used for the pinout combobox
+    pinout: [DevicePinoutData],
+    parts: [DevicePartData],
+
+    // Checks
+    checks: RuleCheckData,
+
+    // Messages
+    interface-broken-msg: bool,
+
+    // Actions
+    new-category: string,  // Set to UUID by UI, reset by backend
+}
+
 // Additional data for schematic editor tabs
 export struct SchematicTabData {
     project-index: int,
@@ -1129,6 +1182,7 @@ export struct WindowSectionData {
     symbol-tabs: [SymbolTabData],  // Proxy view for `tabs`
     package-tabs: [PackageTabData],  // Proxy view for `tabs`
     component-tabs: [ComponentTabData],  // Proxy view for `tabs`
+    device-tabs: [DeviceTabData],  // Proxy view for `tabs`
     schematic-tabs: [SchematicTabData],  // Proxy view for `tabs`
     board-2d-tabs: [Board2dTabData],  // Proxy view for `tabs`
     board-3d-tabs: [Board3dTabData],  // Proxy view for `tabs`

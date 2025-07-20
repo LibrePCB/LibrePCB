@@ -1,0 +1,116 @@
+import { ScrollView } from "std-widgets.slint";
+import { ComboBox } from "combobox.slint";
+import { IconButton } from "iconbutton.slint";
+import { LineEdit } from "lineedit.slint";
+import {
+    AttributeData,
+    Data,
+} from "../api.slint";
+
+
+export component AttributeTableView {
+    in-out property <[AttributeData]> model;
+    in-out property <string> new-name;
+    in-out property <string> new-name-error;
+    property <length> row-height: 25px;
+    property <length> row-spacing: 3px;
+
+    callback edited;
+    callback new-signal-edited(text: string);
+    new-signal-edited(text) => {
+        new-name = text;
+    }
+    callback new-signal-committed();
+
+    preferred-width: view.preferred-width;
+    preferred-height: view.preferred-height;
+
+    view := ScrollView {
+        x: 0;
+        y: 0;
+        width: 100%;
+        height: 100%;
+        preferred-width: l.preferred-width;
+        preferred-height: l.preferred-height;
+
+        l := VerticalLayout {
+            spacing: 5px;
+
+            HorizontalLayout {
+                spacing: 5px;
+
+                VerticalLayout {
+                    spacing: row-spacing;
+
+                    for item[index] in model: LineEdit {
+                        height: row-height;
+                        text: item.key;
+                        //validation-error: item.name-error;
+
+                        text-edited(text) => {
+                            //model[index].name = text;
+                        }
+                        text-accepted(text) => {
+                            //model[index].name = text;
+                            edited();
+                        }
+                    }
+                }
+
+                VerticalLayout {
+                    spacing: row-spacing;
+
+                    for item[index] in model: ComboBox {
+                        height: row-height;
+                        model: Data.attribute-types;
+                        current-index: item.type;
+                    }
+                }
+
+                VerticalLayout {
+                    spacing: row-spacing;
+
+                    for item[index] in model: LineEdit {
+                        height: row-height;
+                        text: item.value;
+                    //validation-error: item.name-error;
+
+                    text-edited(text) => {
+                        //model[index].name = text;
+                    }
+                        text-accepted(text) => {
+                            //model[index].name = text;
+                            edited();
+                        }
+                    }
+                }
+
+                VerticalLayout {
+                    spacing: row-spacing;
+
+                    for item[index] in model: ComboBox {
+                        height: row-height;
+                        model: Data.attribute-units[item.type];
+                        current-index: item.unit;
+                        enabled: self.model.length > 1;
+                    }
+                }
+            }
+
+            LineEdit {
+                height: row-height;
+                //text: item.key;
+                //validation-error: item.name-error;
+                placeholder-text: @tr("Type to add a new attribute");
+
+                text-edited(text) => {
+                        //model[index].name = text;
+                    }
+                text-accepted(text) => {
+                            //model[index].name = text;
+                            edited();
+                }
+            }
+        }
+    }
+}

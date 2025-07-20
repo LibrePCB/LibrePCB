@@ -181,9 +181,6 @@ void NewElementWizardPage_CopyFrom::setCategoryTreeModel(
 QSet<Uuid> NewElementWizardPage_CopyFrom::getElementsByCategory(
     const std::optional<Uuid>& category) const {
   switch (mContext.mElementType) {
-    case NewElementWizardContext::ElementType::Device:
-      return mContext.getWorkspace().getLibraryDb().getByCategory<Device>(
-          category);
     default:
       throw LogicError(__FILE__, __LINE__);
   }
@@ -193,12 +190,6 @@ void NewElementWizardPage_CopyFrom::getElementMetadata(const Uuid& uuid,
                                                        FilePath& fp,
                                                        QString& name) const {
   switch (mContext.mElementType) {
-    case NewElementWizardContext::ElementType::Device:
-      fp = mContext.getWorkspace().getLibraryDb().getLatest<Device>(
-          uuid);  // can throw
-      mContext.getWorkspace().getLibraryDb().getTranslations<Device>(
-          fp, mContext.getLibLocaleOrder(), &name);  // can throw
-      return;
     default:
       throw LogicError(__FILE__, __LINE__);
   }
@@ -208,12 +199,6 @@ void NewElementWizardPage_CopyFrom::initializePage() noexcept {
   QWizardPage::initializePage();
   setSelectedElement(FilePath());
   switch (mContext.mElementType) {
-    case NewElementWizardContext::ElementType::Device: {
-      setCategoryTreeModel(new CategoryTreeModelLegacy(
-          mContext.getWorkspace().getLibraryDb(), mContext.getLibLocaleOrder(),
-          CategoryTreeModelLegacy::Filter::CmpCatWithDevices));
-      break;
-    }
     default: {
       qCritical() << "Unhandled switch-case in "
                      "NewElementWizardPage_CopyFrom::initializePage():"
