@@ -70,9 +70,11 @@ jobs:
     condition: and(succeeded(), variables['SLINT_UI_TESTING_AUTH'])
     env:
       SLINT_UI_TESTING_AUTH: $(SLINT_UI_TESTING_AUTH)
-  - bash: ./ci/upload_artifacts.sh
-    displayName: Upload Artifacts
-    condition: and(succeeded(), eq(variables['DEPLOY'], 'true'), ne(variables['Build.Reason'], 'PullRequest'))
+  - bash: |
+      ./ci/tar_artifacts.sh
+      ./ci/upload_artifacts.sh
+    displayName: Tar & Upload Artifacts
+    condition: and(succeeded(), eq(variables['DEPLOY'], 'true'), ne(variables.UPLOAD_URL, ''), ne(variables['Build.Reason'], 'PullRequest'))
     env:
       UPLOAD_URL: $(ARTIFACTS_UPLOAD_URL)
       UPLOAD_USER: $(ARTIFACTS_UPLOAD_USER)
