@@ -77,8 +77,6 @@ bool NewElementWizardPage_EnterMetadata::isComplete() const noexcept {
 
 int NewElementWizardPage_EnterMetadata::nextId() const noexcept {
   switch (mContext.mElementType) {
-    case NewElementWizardContext::ElementType::Component:
-      return NewElementWizardContext::ID_ComponentProperties;
     case NewElementWizardContext::ElementType::Device:
       return NewElementWizardContext::ID_DeviceProperties;
     default:
@@ -123,7 +121,6 @@ void NewElementWizardPage_EnterMetadata::edtVersionTextChanged(
 void NewElementWizardPage_EnterMetadata::btnChooseCategoryClicked() noexcept {
   std::optional<Uuid> categoryUuid;
   switch (mContext.mElementType) {
-    case NewElementWizardContext::ElementType::Component:
     case NewElementWizardContext::ElementType::Device: {
       CategoryChooserDialog dialog(mContext.getWorkspace(),
                                    CategoryChooserDialog::Filter::CmpCat, this);
@@ -159,7 +156,6 @@ void NewElementWizardPage_EnterMetadata::updateCategoryTreeLabel() noexcept {
 
   bool nulloptIsRootCategory = false;
   switch (mContext.mElementType) {
-    case NewElementWizardContext::ElementType::Component:
     case NewElementWizardContext::ElementType::Device: {
       ComponentCategoryTreeLabelTextBuilder builder(
           mContext.getWorkspace().getLibraryDb(),

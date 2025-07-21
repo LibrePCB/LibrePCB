@@ -232,6 +232,37 @@ std::optional<Package::AssemblyType> s2assemblyType(int v) noexcept {
   }
 }
 
+ui::ComponentPinoutDisplayMode l2s(const CmpSigPinDisplayType& v) noexcept {
+  if (v == CmpSigPinDisplayType::none()) {
+    return ui::ComponentPinoutDisplayMode::None;
+  } else if (v == CmpSigPinDisplayType::pinName()) {
+    return ui::ComponentPinoutDisplayMode::PinName;
+  } else if (v == CmpSigPinDisplayType::componentSignal()) {
+    return ui::ComponentPinoutDisplayMode::SignalName;
+  } else if (v == CmpSigPinDisplayType::netSignal()) {
+    return ui::ComponentPinoutDisplayMode::NetName;
+  } else {
+    qCritical() << "Unhandled value in CmpSigPinDisplayType conversion.";
+    return ui::ComponentPinoutDisplayMode::SignalName;
+  }
+}
+
+const CmpSigPinDisplayType& s2l(ui::ComponentPinoutDisplayMode v) noexcept {
+  switch (v) {
+    case ui::ComponentPinoutDisplayMode::None:
+      return CmpSigPinDisplayType::none();
+    case ui::ComponentPinoutDisplayMode::PinName:
+      return CmpSigPinDisplayType::pinName();
+    case ui::ComponentPinoutDisplayMode::SignalName:
+      return CmpSigPinDisplayType::componentSignal();
+    case ui::ComponentPinoutDisplayMode::NetName:
+      return CmpSigPinDisplayType::netSignal();
+    default:
+      qCritical() << "Unhandled value in CmpSigPinDisplayType conversion.";
+      return CmpSigPinDisplayType::componentSignal();
+  }
+}
+
 ui::EditorCommand l2s(const EditorCommand& cmd, ui::EditorCommand in) noexcept {
   QString text = cmd.getDisplayText();
   if (cmd.getFlags().testFlag(EditorCommand::Flag::OpensPopup)) {

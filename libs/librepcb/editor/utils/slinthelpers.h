@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/core/attribute/attributekey.h>
+#include <librepcb/core/library/cmp/componentprefix.h>
 #include <librepcb/core/types/circuitidentifier.h>
 #include <librepcb/core/types/elementname.h>
 #include <librepcb/core/types/fileproofname.h>
@@ -118,6 +120,10 @@ std::optional<FileProofName> validateFileProofName(
     const QString& input, slint::SharedString& error,
     const QString& requiredSuffix = QString()) noexcept;
 
+std::optional<AttributeKey> validateAttributeKey(const QString& input,
+                                                 slint::SharedString& error,
+                                                 bool isDuplicate) noexcept;
+
 std::optional<CircuitIdentifier> validateCircuitIdentifier(
     const QString& input, slint::SharedString& error,
     bool isDuplicate) noexcept;
@@ -125,6 +131,12 @@ std::optional<CircuitIdentifier> validateCircuitIdentifier(
 std::optional<QUrl> validateUrl(const QString& input,
                                 slint::SharedString& error,
                                 bool allowEmpty = false) noexcept;
+
+std::optional<ComponentPrefix> validateComponentPrefix(
+    const QString& input, slint::SharedString& error) noexcept;
+
+void validateComponentDefaultValue(const QString& input,
+                                   slint::SharedString& error) noexcept;
 
 /*******************************************************************************
  *  End of File

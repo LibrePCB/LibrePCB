@@ -23,9 +23,12 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../cmd/cmdlistelementinsert.h"
+#include "../../cmd/cmdlistelementremove.h"
 #include "../../undocommand.h"
 
 #include <librepcb/core/library/cmp/cmpsigpindisplaytype.h>
+#include <librepcb/core/library/cmp/componentpinsignalmap.h>
 #include <librepcb/core/types/uuid.h>
 
 #include <QtCore>
@@ -53,7 +56,7 @@ public:
   CmdComponentPinSignalMapItemEdit(
       const CmdComponentPinSignalMapItemEdit& other) = delete;
   explicit CmdComponentPinSignalMapItemEdit(
-      ComponentPinSignalMapItem& item) noexcept;
+      const std::shared_ptr<ComponentPinSignalMapItem>& item) noexcept;
   ~CmdComponentPinSignalMapItemEdit() noexcept;
 
   // Setters
@@ -75,13 +78,26 @@ private:  // Methods
   void performRedo() override;
 
 private:  // Data
-  ComponentPinSignalMapItem& mItem;
+  std::shared_ptr<ComponentPinSignalMapItem> mItem;
 
   std::optional<Uuid> mOldSignalUuid;
   std::optional<Uuid> mNewSignalUuid;
   CmpSigPinDisplayType mOldDisplayType;
   CmpSigPinDisplayType mNewDisplayType;
 };
+
+/*******************************************************************************
+ *  Undo Commands
+ ******************************************************************************/
+
+using CmdComponentPinSignalMapItemInsert =
+    CmdListElementInsert<ComponentPinSignalMapItem,
+                         ComponentPinSignalMapNameProvider,
+                         ComponentPinSignalMapItem::Event>;
+using CmdComponentPinSignalMapItemRemove =
+    CmdListElementRemove<ComponentPinSignalMapItem,
+                         ComponentPinSignalMapNameProvider,
+                         ComponentPinSignalMapItem::Event>;
 
 /*******************************************************************************
  *  End of File

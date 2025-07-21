@@ -102,7 +102,8 @@ private:
                      bool copyFrom) noexcept;
   void openPackageTab(LibraryEditor& editor, const FilePath& fp,
                       bool copyFrom) noexcept;
-  void openComponentTab(LibraryEditor& editor, const FilePath& fp) noexcept;
+  void openComponentTab(LibraryEditor& editor, const FilePath& fp,
+                        bool copyFrom) noexcept;
   void openDeviceTab(LibraryEditor& editor, const FilePath& fp) noexcept;
   void openSchematicTab(int projectIndex, int index) noexcept;
   void openBoard2dTab(int projectIndex, int index) noexcept;

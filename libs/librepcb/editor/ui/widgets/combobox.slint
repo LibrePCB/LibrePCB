@@ -5,6 +5,8 @@ import { Constants } from "../api.slint";
 export component ComboBox inherits Rectangle {
     in property <[string]> model;
     in property <bool> enabled: true;
+    in property <bool> editable-only-when-focused: false;
+    in property <bool> frameless: false;
     in-out property <int> current-index: -1;
     in-out property <int> default-index: -1;
     out property has-focus <=> fs.has-focus;
@@ -38,8 +40,8 @@ export component ComboBox inherits Rectangle {
             #505050
         }
     }
-    border-width: 1px;
-    border-radius: 10px;
+    border-width: frameless ? 0 : 1px;
+    border-radius: frameless ? 0 : 10px;
     forward-focus: fs;
 
     // Accessibility
@@ -92,7 +94,7 @@ export component ComboBox inherits Rectangle {
 
             VerticalLayout {
                 txt := Text {
-                    color: enabled ? Palette.foreground : #a0a0a0;
+                    color: enabled ? Palette.foreground : #909090;
                     font-size: 13px;
                     overflow: elide;
                     vertical-alignment: center;
@@ -112,13 +114,13 @@ export component ComboBox inherits Rectangle {
             }
 
             Rectangle {
-                width: 13px;  // Same size as in LengthEdit.
+                width: 13px;  // Same size as in LineEdit.
 
                 Image {
                     width: parent.width;
                     height: self.width;
                     image-fit: contain;
-                    colorize: txt.color;
+                    colorize: enabled ? Palette.foreground : #707070;
                     source: @image-url("../../../../font-awesome/svgs/solid/caret-down.svg");
                     accessible-role: none;
                 }
@@ -126,20 +128,30 @@ export component ComboBox inherits Rectangle {
         }
 
         clicked => {
+            if editable-only-when-focused && (!has-focus) {
+                fs.focus();
+                return;
+            }
             fs.focus();
             popup.show();
         }
 
         scroll-event(event) => {
-            if event.delta-y > 0 {
+            if (event.delta-y > 0) && ((!editable-only-when-focused) || has-focus) {
                 decrement();
                 return accept;
-            } else if event.delta-y < 0 {
+            } else if (event.delta-y < 0) && ((!editable-only-when-focused) || has-focus) {
                 increment();
                 return accept;
             }
             reject
         }
+    }
+
+    if frameless && self.has-focus: Rectangle {
+        y: parent.height - self.height;
+        height: 1px;
+        background: Constants.librepcb-color;
     }
 
     popup := DropDownPopup {
@@ -150,6 +162,7 @@ export component ComboBox inherits Rectangle {
         current-index: current-index;
         default-index: default-index;
         item-height: root.preferred-height;
+        rounded-corners: root.border-radius > 0;
 
         accepted(index) => {
             current-index-changed(index);

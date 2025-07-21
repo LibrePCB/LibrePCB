@@ -17,16 +17,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_COMPONENTSIGNALLISTEDITORWIDGET_H
-#define LIBREPCB_EDITOR_COMPONENTSIGNALLISTEDITORWIDGET_H
+#ifndef LIBREPCB_EDITOR_COMPONENTSIGNALNAMELISTMODEL_H
+#define LIBREPCB_EDITOR_COMPONENTSIGNALNAMELISTMODEL_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "appwindow.h"
+
 #include <librepcb/core/library/cmp/componentsignal.h>
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -34,41 +35,61 @@
 namespace librepcb {
 namespace editor {
 
-class ComponentSignalListModel;
-class EditableTableWidget;
-class SortFilterProxyModel;
+class UndoCommand;
 class UndoStack;
 
 /*******************************************************************************
- *  Class ComponentSignalListEditorWidget
+ *  Class ComponentSignalNameListModel
  ******************************************************************************/
 
 /**
- * @brief The ComponentSignalListEditorWidget class
+ * @brief The ComponentSignalNameListModel class
  */
-class ComponentSignalListEditorWidget final : public QWidget {
+class ComponentSignalNameListModel final
+  : public QObject,
+    public slint::Model<slint::SharedString> {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  explicit ComponentSignalListEditorWidget(QWidget* parent = nullptr) noexcept;
-  ComponentSignalListEditorWidget(
-      const ComponentSignalListEditorWidget& other) = delete;
-  ~ComponentSignalListEditorWidget() noexcept;
+  // ComponentSignalNameListModel() = delete;
+  ComponentSignalNameListModel(const ComponentSignalNameListModel& other) =
+      delete;
+  explicit ComponentSignalNameListModel(QObject* parent = nullptr) noexcept;
+  ~ComponentSignalNameListModel() noexcept;
 
-  // Setters
-  void setFrameStyle(int style) noexcept;
-  void setReadOnly(bool readOnly) noexcept;
-  void setReferences(UndoStack* undoStack, ComponentSignalList* list) noexcept;
+  // General Methods
+  void setReferences(ComponentSignalList* list, UndoStack* stack) noexcept;
+  std::optional<Uuid> getUuid(std::size_t i) const noexcept;
+  int getIndexOf(const std::optional<Uuid>& sig) const noexcept;
+
+  // Implementations
+  std::size_t row_count() const override;
+  std::optional<slint::SharedString> row_data(std::size_t i) const override;
+  void set_row_data(std::size_t i, const slint::SharedString& data) override;
 
   // Operator Overloadings
-  ComponentSignalListEditorWidget& operator=(
-      const ComponentSignalListEditorWidget& rhs) = delete;
+  ComponentSignalNameListModel& operator=(
+      const ComponentSignalNameListModel& rhs) = delete;
+
+signals:
+  void modified();
 
 private:
-  QScopedPointer<ComponentSignalListModel> mModel;
-  QScopedPointer<SortFilterProxyModel> mProxy;
-  QScopedPointer<EditableTableWidget> mView;
+  void updateItems() noexcept;
+  void listEdited(const ComponentSignalList& list, int index,
+                  const std::shared_ptr<const ComponentSignal>& item,
+                  ComponentSignalList::Event event) noexcept;
+  void execCmd(UndoCommand* cmd);
+
+private:
+  ComponentSignalList* mList;
+  QPointer<UndoStack> mUndoStack;
+
+  QList<std::shared_ptr<ComponentSignal>> mSignalsSorted;
+
+  // Slots
+  ComponentSignalList::OnEditedSlot mOnEditedSlot;
 };
 
 /*******************************************************************************

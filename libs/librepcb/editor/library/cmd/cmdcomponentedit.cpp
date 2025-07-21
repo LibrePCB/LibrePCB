@@ -35,7 +35,7 @@ namespace editor {
  ******************************************************************************/
 
 CmdComponentEdit::CmdComponentEdit(Component& component) noexcept
-  : CmdLibraryElementEdit(component, tr("Edit component metadata")),
+  : CmdLibraryElementEdit(component, tr("Edit Component Properties")),
     mComponent(component),
     mOldSchematicOnly(component.isSchematicOnly()),
     mNewSchematicOnly(mOldSchematicOnly),

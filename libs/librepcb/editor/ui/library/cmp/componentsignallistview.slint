@@ -1,0 +1,334 @@
+import { ScrollView } from "std-widgets.slint";
+import {
+    IconButton,
+    LineEdit,
+    MenuItem,
+    MenuPopup,
+    Switch,
+} from "../../widgets.slint";
+import {
+    ComponentSignalData,
+    EditorCommandSet as Cmd,
+} from "../../api.slint";
+
+component HorizontalLine inherits Rectangle {
+    height: 1px;
+    background: #505050;
+}
+
+component VerticalLine inherits Rectangle {
+    width: 1px;
+    background: #505050;
+}
+
+component ComponentSignalListViewTextCell inherits Rectangle {
+    in property <string> text;
+    in property <string> font-family;
+    in property <length> font-size: 12px;
+    in property <TextHorizontalAlignment> horizontal-alignment: left;
+
+    preferred-width: txt.preferred-width + 10px;
+
+    txt := Text {
+        x: 5px;
+        width: parent.width - 10px;
+        horizontal-alignment: horizontal-alignment;
+        vertical-alignment: center;
+        color: #909090;
+        font-family: font-family;
+        font-size: font-size;
+        text: text;
+        accessible-role: none;
+    }
+}
+
+export component ComponentSignalListView {
+    in-out property <[ComponentSignalData]> model;
+    in property <bool> read-only;
+    property <length> row-height: 25px;
+    property <bool> show-ids: self.width > 350px;
+    property <int> show-forced-net-index: -1;
+
+    min-height: min(l.preferred-height, 3 * row-height);
+    preferred-height: l.preferred-height;
+
+    callback edited;
+    callback focus-rejected;
+
+    view := ScrollView {
+        mouse-drag-pan-enabled: true;
+
+        l := VerticalLayout {
+            padding-right: 8px;  // Reserve space for the scrollbar
+
+            HorizontalLayout {
+
+                VerticalLine { }
+
+                VerticalLayout {
+                    width: self.preferred-width;
+
+                    HorizontalLine { }
+
+                    ComponentSignalListViewTextCell {
+                        height: row-height;
+                        horizontal-alignment: right;
+                        text: "#";
+                    }
+
+                    for item[index] in model: VerticalLayout {
+                        HorizontalLine { }
+
+                        number-cell := ComponentSignalListViewTextCell {
+                            height: row-height;
+                            background: #202020;
+                            horizontal-alignment: right;
+                            font-size: 10px;
+                            text: index + 1;
+                        }
+                    }
+                }
+
+                VerticalLine { }
+
+                if show-ids: VerticalLayout {
+                    width: self.preferred-width;
+
+                    HorizontalLine { }
+
+                    ComponentSignalListViewTextCell {
+                        height: row-height;
+                        text: @tr("ID");
+                    }
+
+                    for item[index] in model: VerticalLayout {
+                        HorizontalLine { }
+
+                        id-cell := ComponentSignalListViewTextCell {
+                            height: row-height;
+                            background: #202020;
+                            horizontal-alignment: right;
+                            font-family: "Noto Sans Mono";
+                            font-size: 10px;
+                            text: item.id;
+                        }
+                    }
+                }
+
+                if show-ids: VerticalLine { }
+
+                VerticalLayout {
+                    HorizontalLine { }
+
+                    name-header := ComponentSignalListViewTextCell {
+                        height: row-height;
+                        text: @tr("Name");
+                    }
+
+                    for item[index] in model: VerticalLayout {
+                        HorizontalLine { }
+
+                        name-edt := LineEdit {
+                            height: row-height;
+                            text: item.name;
+                            validation-error: item.name-error;
+                            read-only: read-only;
+                            frameless: true;
+                            accessible-label: name-header.text;
+
+                            text-edited(text) => {
+                                model[index].name = text;
+                            }
+
+                            text-accepted(text) => {
+                                model[index].name = text;
+                                edited();
+                            }
+                        }
+                    }
+                }
+
+                VerticalLine { }
+
+                VerticalLayout {
+                    width: max(self.preferred-width, required-header.preferred-width);
+
+                    HorizontalLine { }
+
+                    required-header := ComponentSignalListViewTextCell {
+                        height: row-height;
+                        text: @tr("Required");
+                    }
+
+                    for item[index] in model: VerticalLayout {
+                        HorizontalLine { }
+
+                        Rectangle {
+                            height: row-height;
+                            background: #202020;
+
+                            required-sw := Switch {
+                                width: self.preferred-width;
+                                size: 20px;
+                                status-tip: @tr("If checked, an ERC error is raised when this signal is left unconnected in the schematics");
+                                checked: item.required;
+                                enabled: !read-only;
+                                accessible-label: required-header.text;
+
+                                toggled(checked) => {
+                                    model[index].required = checked;
+                                    edited();
+                                }
+                            }
+                        }
+                    }
+                }
+
+                VerticalLine { }
+
+                VerticalLayout {
+                    width: (forced-net-cells-l.preferred-width > 0) ? self.preferred-width : 0;
+                    visible: self.width > 0;
+
+                    animate width { duration: 150ms; }
+
+                    HorizontalLine { }
+
+                    ComponentSignalListViewTextCell {
+                        height: row-height;
+                        text: @tr("Forced Net Name");
+                        visible: self.width >= self.preferred-width;
+                    }
+
+                    forced-net-cells-l := VerticalLayout {
+                        for item[index] in model: VerticalLayout {
+                            HorizontalLine { }
+
+                            forced-net-edt := LineEdit {
+                                property <bool> request-focus: index == show-forced-net-index;
+                                property <bool> trigger-focus: request-focus && (self.width == self.preferred-width);
+
+                                height: row-height;
+                                preferred-width: (self.has-focus || request-focus || (!self.text.is-empty)) ? min(200px, root.width * 0.3) : 0;
+                                text: item.forced-net-name;
+                                read-only: read-only;
+                                frameless: true;
+
+                                changed has-focus => {
+                                    if !self.has-focus {
+                                        show-forced-net-index = -1;
+                                    }
+                                }
+
+                                changed trigger-focus => {
+                                    if trigger-focus {
+                                        self.select-all();
+                                        self.focus();
+                                    }
+                                }
+
+                                text-edited(text) => {
+                                    model[index].forced-net-name = text;
+                                }
+
+                                text-accepted(text) => {
+                                    model[index].forced-net-name = text;
+                                    edited();
+                                }
+
+                                key-pressed(event) => {
+                                    if event.text == Key.Escape {
+                                        focus-rejected();
+                                        return accept;
+                                    }
+                                    reject
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if forced-net-cells-l.preferred-width > 0: VerticalLine { }
+
+                if !read-only: VerticalLayout {
+                    width: self.preferred-width;
+
+                    HorizontalLine { }
+
+                    ComponentSignalListViewTextCell {
+                        height: row-height;
+                    }
+
+                    for item[index] in model: VerticalLayout {
+                        HorizontalLine { }
+
+                        menu-btn := IconButton {
+                            height: row-height;
+                            background-color: #202020;
+                            icon-scale: 0.6;
+                            icon: @image-url("../../../../../font-awesome/svgs/solid/ellipsis-vertical.svg");
+
+                            clicked => {
+                                context-menu-item-index = index;
+                                context-menu-x = self.absolute-position.x - root.absolute-position.x;
+                                context-menu-y = self.absolute-position.y - root.absolute-position.y + self.height;
+                                context-menu-popup.show();
+                            }
+                        }
+                    }
+                }
+
+                if !read-only: VerticalLine { }
+            }
+
+            HorizontalLine { }
+
+            if model.length == 0: HorizontalLayout {
+                VerticalLine { }
+
+                Rectangle {
+                    height: row-height;
+                    background: #202020;
+
+                    no-signals-txt := Text {
+                        width: parent.width - 10px;
+                        horizontal-alignment: left;
+                        wrap: word-wrap;
+                        text: @tr("This package contains no signals (yet).");
+                    }
+                }
+
+                VerticalLine { }
+            }
+
+            if model.length == 0: HorizontalLine { }
+        }
+    }
+
+    property <length> context-menu-x;
+    property <length> context-menu-y;
+    property <int> context-menu-item-index;
+    context-menu-popup := MenuPopup {
+        x: min(context-menu-x, parent.width - self.width - l.padding-right);
+        y: context-menu-y;
+
+        set-forced-net-name-item := MenuItem {
+            text: @tr("Set Forced Net Name");
+            enabled: (model[context-menu-item-index].forced-net-name.is-empty) && (show-forced-net-index != context-menu-item-index);
+
+            clicked => {
+                show-forced-net-index = context-menu-item-index;
+            }
+        }
+
+        remove-item := MenuItem {
+            cmd: Cmd.remove;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/trash-can.svg");
+            shortcuts: "";
+
+            clicked => {
+                model[context-menu-item-index].delete = true;
+            }
+        }
+    }
+}
