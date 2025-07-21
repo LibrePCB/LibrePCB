@@ -34,7 +34,7 @@
 namespace librepcb {
 namespace editor {
 
-class AttributeListModel;
+class AttributeListModelLegacy;
 class EditableTableWidget;
 class UndoStack;
 
@@ -64,7 +64,7 @@ public:
       delete;
 
 private:  // Data
-  QScopedPointer<AttributeListModel> mModel;
+  QScopedPointer<AttributeListModelLegacy> mModel;
   QScopedPointer<EditableTableWidget> mView;
 };
 

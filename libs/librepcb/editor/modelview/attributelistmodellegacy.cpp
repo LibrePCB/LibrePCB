@@ -20,7 +20,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "attributelistmodel.h"
+#include "attributelistmodellegacy.h"
 
 #include "../undostack.h"
 #include "cmd/cmdattributeedit.h"
@@ -42,7 +42,7 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-AttributeListModel::AttributeListModel(QObject* parent) noexcept
+AttributeListModelLegacy::AttributeListModelLegacy(QObject* parent) noexcept
   : QAbstractTableModel(parent),
     mAttributeList(nullptr),
     mUndoStack(nullptr),
@@ -51,7 +51,7 @@ AttributeListModel::AttributeListModel(QObject* parent) noexcept
     mNewType(&AttrTypeString::instance()),
     mNewValue(),
     mNewUnit(mNewType->getDefaultUnit()),
-    mOnEditedSlot(*this, &AttributeListModel::attributeListEdited) {
+    mOnEditedSlot(*this, &AttributeListModelLegacy::attributeListEdited) {
   foreach (const AttributeType* type, AttributeType::getAllTypes()) {
     mTypeComboBoxItems.append(
         ComboBoxDelegate::Item{type->getNameTr(), QIcon(), type->getName()});
@@ -59,14 +59,14 @@ AttributeListModel::AttributeListModel(QObject* parent) noexcept
   mTypeComboBoxItems.sort();
 }
 
-AttributeListModel::~AttributeListModel() noexcept {
+AttributeListModelLegacy::~AttributeListModelLegacy() noexcept {
 }
 
 /*******************************************************************************
  *  Setters
  ******************************************************************************/
 
-void AttributeListModel::setAttributeList(AttributeList* list) noexcept {
+void AttributeListModelLegacy::setAttributeList(AttributeList* list) noexcept {
   emit beginResetModel();
 
   if (mAttributeList) {
@@ -82,7 +82,7 @@ void AttributeListModel::setAttributeList(AttributeList* list) noexcept {
   emit endResetModel();
 }
 
-void AttributeListModel::setUndoStack(UndoStack* stack) noexcept {
+void AttributeListModelLegacy::setUndoStack(UndoStack* stack) noexcept {
   mUndoStack = stack;
 }
 
@@ -90,7 +90,8 @@ void AttributeListModel::setUndoStack(UndoStack* stack) noexcept {
  *  Slots
  ******************************************************************************/
 
-void AttributeListModel::add(const QPersistentModelIndex& itemIndex) noexcept {
+void AttributeListModelLegacy::add(
+    const QPersistentModelIndex& itemIndex) noexcept {
   Q_UNUSED(itemIndex);
   if (!mAttributeList) {
     return;
@@ -109,7 +110,7 @@ void AttributeListModel::add(const QPersistentModelIndex& itemIndex) noexcept {
   }
 }
 
-void AttributeListModel::remove(
+void AttributeListModelLegacy::remove(
     const QPersistentModelIndex& itemIndex) noexcept {
   if (!mAttributeList) {
     return;
@@ -124,7 +125,7 @@ void AttributeListModel::remove(
   }
 }
 
-void AttributeListModel::moveUp(
+void AttributeListModelLegacy::moveUp(
     const QPersistentModelIndex& itemIndex) noexcept {
   if (!mAttributeList) {
     return;
@@ -141,7 +142,7 @@ void AttributeListModel::moveUp(
   }
 }
 
-void AttributeListModel::moveDown(
+void AttributeListModelLegacy::moveDown(
     const QPersistentModelIndex& itemIndex) noexcept {
   if (!mAttributeList) {
     return;
@@ -162,21 +163,22 @@ void AttributeListModel::moveDown(
  *  Inherited from QAbstractItemModel
  ******************************************************************************/
 
-int AttributeListModel::rowCount(const QModelIndex& parent) const {
+int AttributeListModelLegacy::rowCount(const QModelIndex& parent) const {
   if (!parent.isValid() && mAttributeList) {
     return mAttributeList->count() + 1;
   }
   return 0;
 }
 
-int AttributeListModel::columnCount(const QModelIndex& parent) const {
+int AttributeListModelLegacy::columnCount(const QModelIndex& parent) const {
   if (!parent.isValid()) {
     return _COLUMN_COUNT;
   }
   return 0;
 }
 
-QVariant AttributeListModel::data(const QModelIndex& index, int role) const {
+QVariant AttributeListModelLegacy::data(const QModelIndex& index,
+                                        int role) const {
   if (!index.isValid() || !mAttributeList) {
     return QVariant();
   }
@@ -262,9 +264,9 @@ QVariant AttributeListModel::data(const QModelIndex& index, int role) const {
   return QVariant();
 }
 
-QVariant AttributeListModel::headerData(int section,
-                                        Qt::Orientation orientation,
-                                        int role) const {
+QVariant AttributeListModelLegacy::headerData(int section,
+                                              Qt::Orientation orientation,
+                                              int role) const {
   if (orientation == Qt::Horizontal) {
     if (role == Qt::DisplayRole) {
       switch (section) {
@@ -294,7 +296,7 @@ QVariant AttributeListModel::headerData(int section,
   return QVariant();
 }
 
-Qt::ItemFlags AttributeListModel::flags(const QModelIndex& index) const {
+Qt::ItemFlags AttributeListModelLegacy::flags(const QModelIndex& index) const {
   Qt::ItemFlags f = QAbstractTableModel::flags(index);
   if (index.isValid() && (index.column() != COLUMN_ACTIONS)) {
     if (index.column() == COLUMN_UNIT) {
@@ -310,8 +312,8 @@ Qt::ItemFlags AttributeListModel::flags(const QModelIndex& index) const {
   return f;
 }
 
-bool AttributeListModel::setData(const QModelIndex& index,
-                                 const QVariant& value, int role) {
+bool AttributeListModelLegacy::setData(const QModelIndex& index,
+                                       const QVariant& value, int role) {
   if (!mAttributeList) {
     return false;
   }
@@ -390,7 +392,7 @@ bool AttributeListModel::setData(const QModelIndex& index,
  *  Private Methods
  ******************************************************************************/
 
-void AttributeListModel::attributeListEdited(
+void AttributeListModelLegacy::attributeListEdited(
     const AttributeList& list, int index,
     const std::shared_ptr<const Attribute>& attribute,
     AttributeList::Event event) noexcept {
@@ -410,13 +412,13 @@ void AttributeListModel::attributeListEdited(
       break;
     default:
       qWarning() << "Unhandled switch-case in "
-                    "AttributeListModel::attributeListEdited():"
+                    "AttributeListModelLegacy::attributeListEdited():"
                  << static_cast<int>(event);
       break;
   }
 }
 
-void AttributeListModel::execCmd(UndoCommand* cmd) {
+void AttributeListModelLegacy::execCmd(UndoCommand* cmd) {
   if (mUndoStack) {
     mUndoStack->execCmd(cmd);
   } else {
@@ -425,7 +427,8 @@ void AttributeListModel::execCmd(UndoCommand* cmd) {
   }
 }
 
-AttributeKey AttributeListModel::validateKeyOrThrow(const QString& key) const {
+AttributeKey AttributeListModelLegacy::validateKeyOrThrow(
+    const QString& key) const {
   if (mAttributeList && mAttributeList->contains(key)) {
     throw RuntimeError(
         __FILE__, __LINE__,
@@ -434,7 +437,7 @@ AttributeKey AttributeListModel::validateKeyOrThrow(const QString& key) const {
   return AttributeKey(key);  // can throw
 }
 
-ComboBoxDelegate::Items AttributeListModel::buildUnitComboBoxData(
+ComboBoxDelegate::Items AttributeListModelLegacy::buildUnitComboBoxData(
     const AttributeType& type) noexcept {
   ComboBoxDelegate::Items items;
   foreach (const AttributeUnit* unit, type.getAvailableUnits()) {

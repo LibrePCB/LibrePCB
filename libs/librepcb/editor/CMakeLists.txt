@@ -423,8 +423,8 @@ add_library(
   mainwindowtestadapter.h
   modelview/angledelegate.cpp
   modelview/angledelegate.h
-  modelview/attributelistmodel.cpp
-  modelview/attributelistmodel.h
+  modelview/attributelistmodellegacy.cpp
+  modelview/attributelistmodellegacy.h
   modelview/checkableitemsdelegate.cpp
   modelview/checkableitemsdelegate.h
   modelview/comboboxdelegate.cpp

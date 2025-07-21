@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "attributelisteditorwidget.h"
 
-#include "../modelview/attributelistmodel.h"
+#include "../modelview/attributelistmodellegacy.h"
 #include "../modelview/comboboxdelegate.h"
 #include "../widgets/editabletablewidget.h"
 
@@ -41,7 +41,7 @@ namespace editor {
 
 AttributeListEditorWidget::AttributeListEditorWidget(QWidget* parent) noexcept
   : QWidget(parent),
-    mModel(new AttributeListModel(this)),
+    mModel(new AttributeListModelLegacy(this)),
     mView(new EditableTableWidget(this)) {
   mView->setShowMoveButtons(true);
   mView->setModel(mModel.data());
@@ -50,27 +50,27 @@ AttributeListEditorWidget::AttributeListEditorWidget(QWidget* parent) noexcept
   // than needing one more click to drop down comboboxes...
   mView->setEditTriggers(QAbstractItemView::AllEditTriggers);
   mView->horizontalHeader()->setSectionResizeMode(
-      AttributeListModel::COLUMN_KEY, QHeaderView::Stretch);
+      AttributeListModelLegacy::COLUMN_KEY, QHeaderView::Stretch);
   mView->horizontalHeader()->setSectionResizeMode(
-      AttributeListModel::COLUMN_TYPE, QHeaderView::Stretch);
+      AttributeListModelLegacy::COLUMN_TYPE, QHeaderView::Stretch);
   mView->horizontalHeader()->setSectionResizeMode(
-      AttributeListModel::COLUMN_VALUE, QHeaderView::Stretch);
+      AttributeListModelLegacy::COLUMN_VALUE, QHeaderView::Stretch);
   mView->horizontalHeader()->setSectionResizeMode(
-      AttributeListModel::COLUMN_UNIT, QHeaderView::Stretch);
+      AttributeListModelLegacy::COLUMN_UNIT, QHeaderView::Stretch);
   mView->horizontalHeader()->setSectionResizeMode(
-      AttributeListModel::COLUMN_ACTIONS, QHeaderView::ResizeToContents);
-  mView->setItemDelegateForColumn(AttributeListModel::COLUMN_TYPE,
+      AttributeListModelLegacy::COLUMN_ACTIONS, QHeaderView::ResizeToContents);
+  mView->setItemDelegateForColumn(AttributeListModelLegacy::COLUMN_TYPE,
                                   new ComboBoxDelegate(false, this));
-  mView->setItemDelegateForColumn(AttributeListModel::COLUMN_UNIT,
+  mView->setItemDelegateForColumn(AttributeListModelLegacy::COLUMN_UNIT,
                                   new ComboBoxDelegate(false, this));
   connect(mView.data(), &EditableTableWidget::btnAddClicked, mModel.data(),
-          &AttributeListModel::add);
+          &AttributeListModelLegacy::add);
   connect(mView.data(), &EditableTableWidget::btnRemoveClicked, mModel.data(),
-          &AttributeListModel::remove);
+          &AttributeListModelLegacy::remove);
   connect(mView.data(), &EditableTableWidget::btnMoveUpClicked, mModel.data(),
-          &AttributeListModel::moveUp);
+          &AttributeListModelLegacy::moveUp);
   connect(mView.data(), &EditableTableWidget::btnMoveDownClicked, mModel.data(),
-          &AttributeListModel::moveDown);
+          &AttributeListModelLegacy::moveDown);
 
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->setContentsMargins(0, 0, 0, 0);

@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_ATTRIBUTELISTMODEL_H
-#define LIBREPCB_EDITOR_ATTRIBUTELISTMODEL_H
+#ifndef LIBREPCB_EDITOR_ATTRIBUTELISTMODELLEGACY_H
+#define LIBREPCB_EDITOR_ATTRIBUTELISTMODELLEGACY_H
 
 /*******************************************************************************
  *  Includes
@@ -39,13 +39,13 @@ class UndoCommand;
 class UndoStack;
 
 /*******************************************************************************
- *  Class AttributeListModel
+ *  Class AttributeListModelLegacy
  ******************************************************************************/
 
 /**
- * @brief The AttributeListModel class
+ * @brief The AttributeListModelLegacy class
  */
-class AttributeListModel final : public QAbstractTableModel {
+class AttributeListModelLegacy final : public QAbstractTableModel {
   Q_OBJECT
 
 public:
@@ -59,10 +59,10 @@ public:
   };
 
   // Constructors / Destructor
-  AttributeListModel() = delete;
-  AttributeListModel(const AttributeListModel& other) = delete;
-  explicit AttributeListModel(QObject* parent = nullptr) noexcept;
-  ~AttributeListModel() noexcept;
+  AttributeListModelLegacy() = delete;
+  AttributeListModelLegacy(const AttributeListModelLegacy& other) = delete;
+  explicit AttributeListModelLegacy(QObject* parent = nullptr) noexcept;
+  ~AttributeListModelLegacy() noexcept;
 
   // Setters
   void setAttributeList(AttributeList* list) noexcept;
@@ -86,7 +86,8 @@ public:
                int role = Qt::EditRole) override;
 
   // Operator Overloadings
-  AttributeListModel& operator=(const AttributeListModel& rhs) noexcept;
+  AttributeListModelLegacy& operator=(
+      const AttributeListModelLegacy& rhs) noexcept;
 
 private:
   void attributeListEdited(const AttributeList& list, int index,
