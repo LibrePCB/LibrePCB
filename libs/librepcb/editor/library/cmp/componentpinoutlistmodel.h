@@ -17,15 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_COMPONENTSIGNALLISTMODEL_H
-#define LIBREPCB_EDITOR_COMPONENTSIGNALLISTMODEL_H
+#ifndef LIBREPCB_EDITOR_COMPONENTPINOUTLISTMODEL_H
+#define LIBREPCB_EDITOR_COMPONENTPINOUTLISTMODEL_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include "appwindow.h"
 
-#include <librepcb/core/library/cmp/componentsignal.h>
+#include <librepcb/core/library/cmp/componentpinsignalmap.h>
+#include <librepcb/core/library/sym/symbolpin.h>
 
 #include <QtCore>
 
@@ -33,67 +34,65 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class Component;
-
 namespace editor {
 
+class ComponentSignalNameListModel;
 class UndoCommand;
 class UndoStack;
 
 /*******************************************************************************
- *  Class ComponentSignalListModel
+ *  Class ComponentPinoutListModel
  ******************************************************************************/
 
 /**
- * @brief The ComponentSignalListModel class
+ * @brief The ComponentPinoutListModel class
  */
-class ComponentSignalListModel final
+class ComponentPinoutListModel final
   : public QObject,
-    public slint::Model<ui::ComponentSignalData> {
+    public slint::Model<ui::ComponentPinoutData> {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  // ComponentSignalListModel() = delete;
-  ComponentSignalListModel(const ComponentSignalListModel& other) = delete;
-  explicit ComponentSignalListModel(QObject* parent = nullptr) noexcept;
-  ~ComponentSignalListModel() noexcept;
+  // ComponentPinoutListModel() = delete;
+  ComponentPinoutListModel(const ComponentPinoutListModel& other) = delete;
+  explicit ComponentPinoutListModel(QObject* parent = nullptr) noexcept;
+  ~ComponentPinoutListModel() noexcept;
 
   // General Methods
-  void setReferences(Component* component, UndoStack* stack) noexcept;
-  bool add(QString names) noexcept;
-  void apply();
+  void setReferences(ComponentPinSignalMap* list, const SymbolPinList* pins,
+                     const std::shared_ptr<ComponentSignalNameListModel>& sigs,
+                     UndoStack* stack) noexcept;
 
   // Implementations
   std::size_t row_count() const override;
-  std::optional<ui::ComponentSignalData> row_data(std::size_t i) const override;
+  std::optional<ui::ComponentPinoutData> row_data(std::size_t i) const override;
   void set_row_data(std::size_t i,
-                    const ui::ComponentSignalData& data) noexcept override;
+                    const ui::ComponentPinoutData& data) noexcept override;
 
   // Operator Overloadings
-  ComponentSignalListModel& operator=(const ComponentSignalListModel& rhs) =
+  ComponentPinoutListModel& operator=(const ComponentPinoutListModel& rhs) =
       delete;
 
 private:
-  ui::ComponentSignalData createItem(const ComponentSignal& obj,
-                                     int sortIndex) noexcept;
-  void updateSortOrder(bool notify) noexcept;
-  void listEdited(const ComponentSignalList& list, int index,
-                  const std::shared_ptr<const ComponentSignal>& item,
-                  ComponentSignalList::Event event) noexcept;
+  ui::ComponentPinoutData createItem(
+      const ComponentPinSignalMapItem& obj) noexcept;
+  void refresh() noexcept;
+  void listEdited(const ComponentPinSignalMap& list, int index,
+                  const std::shared_ptr<const ComponentPinSignalMapItem>& item,
+                  ComponentPinSignalMap::Event event) noexcept;
   void execCmd(UndoCommand* cmd);
-  CircuitIdentifier validateNameOrThrow(const QString& name) const;
-  static QString cleanForcedNetName(const QString& name) noexcept;
 
 private:
-  QPointer<Component> mComponent;
+  ComponentPinSignalMap* mList;
+  std::shared_ptr<ComponentSignalNameListModel> mSignals;
+  const SymbolPinList* mPins;
   QPointer<UndoStack> mUndoStack;
 
-  QList<ui::ComponentSignalData> mItems;
+  QList<ui::ComponentPinoutData> mItems;
 
   // Slots
-  ComponentSignalList::OnEditedSlot mOnEditedSlot;
+  ComponentPinSignalMap::OnEditedSlot mOnEditedSlot;
 };
 
 /*******************************************************************************

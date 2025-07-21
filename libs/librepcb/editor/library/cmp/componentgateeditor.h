@@ -17,18 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_COMPONENTSYMBOLVARIANTEDITDIALOG_H
-#define LIBREPCB_EDITOR_COMPONENTSYMBOLVARIANTEDITDIALOG_H
+#ifndef LIBREPCB_EDITOR_COMPONENTGATEEDITOR_H
+#define LIBREPCB_EDITOR_COMPONENTGATEEDITOR_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/library/cmp/componentsymbolvariant.h>
+#include "appwindow.h"
 
 #include <QtCore>
-#include <QtWidgets>
-
-#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -36,68 +33,76 @@
 namespace librepcb {
 
 class Component;
+class ComponentSymbolVariantItem;
 class Symbol;
 class Workspace;
 
 namespace editor {
 
+class ComponentPinoutListModel;
+class ComponentSignalNameListModel;
 class GraphicsLayerList;
 class GraphicsScene;
 class LibraryElementCache;
 class SymbolGraphicsItem;
-
-namespace Ui {
-class ComponentSymbolVariantEditDialog;
-}
+class UndoCommand;
+class UndoStack;
 
 /*******************************************************************************
- *  Class ComponentSymbolVariantEditDialog
+ *  Class ComponentGateEditor
  ******************************************************************************/
 
 /**
- * @brief The ComponentSymbolVariantEditDialog class
+ * @brief The ComponentGateEditor class
  */
-class ComponentSymbolVariantEditDialog final : public QDialog {
+class ComponentGateEditor final : public QObject {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  ComponentSymbolVariantEditDialog() = delete;
-  ComponentSymbolVariantEditDialog(
-      const ComponentSymbolVariantEditDialog& other) = delete;
-  ComponentSymbolVariantEditDialog(
-      const Workspace& ws, std::shared_ptr<const Component> cmp,
-      std::shared_ptr<ComponentSymbolVariant> symbVar,
-      QWidget* parent = nullptr) noexcept;
-  ~ComponentSymbolVariantEditDialog() noexcept;
+  ComponentGateEditor() = delete;
+  ComponentGateEditor(const ComponentGateEditor& other) = delete;
+  explicit ComponentGateEditor(
+      const Workspace& ws, const GraphicsLayerList& layers,
+      const LibraryElementCache& cache, QPointer<const Component> component,
+      const std::shared_ptr<ComponentSignalNameListModel>& sigs,
+      std::shared_ptr<ComponentSymbolVariantItem> item, UndoStack* stack,
+      QObject* parent = nullptr) noexcept;
+  ~ComponentGateEditor() noexcept;
 
-  // Setters
-  void setReadOnly(bool readOnly) noexcept;
+  // General Methods
+  ui::ComponentGateData getUiData() const;
+  void setUiData(const ui::ComponentGateData& data) noexcept;
+  slint::Image renderScene(float width, float height) noexcept;
+  void chooseSymbol();
+  void refresh() noexcept;
 
   // Operator Overloadings
-  ComponentSymbolVariantEditDialog& operator=(
-      const ComponentSymbolVariantEditDialog& rhs) = delete;
+  ComponentGateEditor& operator=(const ComponentGateEditor& rhs) = delete;
 
-private:  // Methods
-  void accept() noexcept override;
-  void schedulePreviewUpdate() noexcept;
-  void schedulePreviewTextsUpdate() noexcept;
-  void updatePreview() noexcept;
+signals:
+  void previewUpdated();
 
-private:  // Data
+private:
+  void execCmd(UndoCommand* cmd);
+
+private:
   const Workspace& mWorkspace;
-  std::shared_ptr<const Component> mComponent;
-  std::shared_ptr<ComponentSymbolVariant> mOriginalSymbVar;
-  ComponentSymbolVariant mSymbVar;
-  QScopedPointer<GraphicsScene> mGraphicsScene;
-  std::unique_ptr<GraphicsLayerList> mLayers;
-  std::shared_ptr<LibraryElementCache> mLibraryElementCache;
-  QScopedPointer<Ui::ComponentSymbolVariantEditDialog> mUi;
+  const GraphicsLayerList& mLayers;
+  const LibraryElementCache& mCache;
+  const QPointer<const Component> mComponent;
+  std::shared_ptr<ComponentSignalNameListModel> mSignals;
+  std::shared_ptr<ComponentSymbolVariantItem> mItem;
+  UndoStack* mUndoStack;
+  QCollator mCollator;
+  int mFrameIndex;
 
-  bool mPreviewUpdateScheduled;
-  bool mPreviewTextsUpdateScheduled;
-  QList<std::shared_ptr<Symbol>> mSymbols;
-  QList<std::shared_ptr<SymbolGraphicsItem>> mGraphicsItems;
+  std::shared_ptr<const Symbol> mSymbol;
+  std::unique_ptr<GraphicsScene> mScene;
+  std::unique_ptr<SymbolGraphicsItem> mGraphicsItem;
+
+  std::shared_ptr<ComponentPinoutListModel> mPinout;
+  std::shared_ptr<slint::SortModel<ui::ComponentPinoutData>> mPinoutSorted;
 };
 
 /*******************************************************************************

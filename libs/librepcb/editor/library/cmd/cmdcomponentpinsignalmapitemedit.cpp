@@ -37,12 +37,12 @@ namespace editor {
  ******************************************************************************/
 
 CmdComponentPinSignalMapItemEdit::CmdComponentPinSignalMapItemEdit(
-    ComponentPinSignalMapItem& item) noexcept
-  : UndoCommand(tr("Edit component pin-signal-map")),
+    const std::shared_ptr<ComponentPinSignalMapItem>& item) noexcept
+  : UndoCommand(tr("Edit Component Pinout")),
     mItem(item),
-    mOldSignalUuid(item.getSignalUuid()),
+    mOldSignalUuid(item->getSignalUuid()),
     mNewSignalUuid(mOldSignalUuid),
-    mOldDisplayType(item.getDisplayType()),
+    mOldDisplayType(item->getDisplayType()),
     mNewDisplayType(mOldDisplayType) {
 }
 
@@ -78,13 +78,13 @@ bool CmdComponentPinSignalMapItemEdit::performExecute() {
 }
 
 void CmdComponentPinSignalMapItemEdit::performUndo() {
-  mItem.setSignalUuid(mOldSignalUuid);
-  mItem.setDisplayType(mOldDisplayType);
+  mItem->setSignalUuid(mOldSignalUuid);
+  mItem->setDisplayType(mOldDisplayType);
 }
 
 void CmdComponentPinSignalMapItemEdit::performRedo() {
-  mItem.setSignalUuid(mNewSignalUuid);
-  mItem.setDisplayType(mNewDisplayType);
+  mItem->setSignalUuid(mNewSignalUuid);
+  mItem->setDisplayType(mNewDisplayType);
 }
 
 /*******************************************************************************

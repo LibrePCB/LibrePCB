@@ -59,7 +59,6 @@ public:
   void setNorm(const QString& norm) noexcept;
   void setNames(const LocalizedNameMap& names) noexcept;
   void setDescriptions(const LocalizedDescriptionMap& descriptions) noexcept;
-  void setSymbolItems(const ComponentSymbolVariantItemList& items) noexcept;
 
   // Operator Overloadings
   CmdComponentSymbolVariantEdit& operator=(
@@ -84,8 +83,6 @@ private:  // Data
   LocalizedNameMap mNewNames;
   LocalizedDescriptionMap mOldDescriptions;
   LocalizedDescriptionMap mNewDescriptions;
-  ComponentSymbolVariantItemList mOldSymbolItems;
-  ComponentSymbolVariantItemList mNewSymbolItems;
 };
 
 /*******************************************************************************

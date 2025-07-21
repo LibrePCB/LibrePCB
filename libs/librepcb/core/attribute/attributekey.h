@@ -39,11 +39,6 @@ namespace librepcb {
  *  Class AttributeKey
  ******************************************************************************/
 
-inline static QString cleanAttributeKey(const QString& userInput) noexcept {
-  return Toolbox::cleanUserInputString(
-      userInput, QRegularExpression("[^_0-9A-Z]"), true, false, true, "_", 40);
-}
-
 struct AttributeKeyVerifier {
   template <typename Value, typename Predicate>
   static constexpr auto verify(Value&& val, const Predicate& p) ->
@@ -118,6 +113,17 @@ inline QDebug operator<<(QDebug stream, const AttributeKey& obj) {
 inline std::size_t qHash(const AttributeKey& key,
                          std::size_t seed = 0) noexcept {
   return ::qHash(*key, seed);
+}
+
+inline static QString cleanAttributeKey(const QString& userInput) noexcept {
+  return Toolbox::cleanUserInputString(
+      userInput, QRegularExpression("[^_0-9A-Z]"), true, false, true, "_", 40);
+}
+
+inline static std::optional<AttributeKey> parseAttributeKey(
+    const QString& name) noexcept {
+  return AttributeKeyConstraint()(name) ? AttributeKey(name)
+                                        : std::optional<AttributeKey>();
 }
 
 /*******************************************************************************

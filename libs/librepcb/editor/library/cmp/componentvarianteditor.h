@@ -17,66 +17,82 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_COMPSYMBVARPINSIGNALMAPEDITORWIDGET_H
-#define LIBREPCB_EDITOR_COMPSYMBVARPINSIGNALMAPEDITORWIDGET_H
+#ifndef LIBREPCB_EDITOR_COMPONENTVARIANTEDITOR_H
+#define LIBREPCB_EDITOR_COMPONENTVARIANTEDITOR_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/library/cmp/componentsignal.h>
+#include "appwindow.h"
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
+class Component;
 class ComponentSymbolVariant;
+class Workspace;
 
 namespace editor {
 
-class ComponentPinSignalMapModel;
+class ComponentGateListModel;
+class ComponentSignalNameListModel;
+class GraphicsLayerList;
 class LibraryElementCache;
-class SortFilterProxyModel;
+class UndoCommand;
 class UndoStack;
 
 /*******************************************************************************
- *  Class CompSymbVarPinSignalMapEditorWidget
+ *  Class ComponentVariantEditor
  ******************************************************************************/
 
 /**
- * @brief The CompSymbVarPinSignalMapEditorWidget class
+ * @brief The ComponentVariantEditor class
  */
-class CompSymbVarPinSignalMapEditorWidget final : public QWidget {
+class ComponentVariantEditor final : public QObject {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  explicit CompSymbVarPinSignalMapEditorWidget(
-      QWidget* parent = nullptr) noexcept;
-  CompSymbVarPinSignalMapEditorWidget(
-      const CompSymbVarPinSignalMapEditorWidget& other) = delete;
-  ~CompSymbVarPinSignalMapEditorWidget() noexcept;
+  ComponentVariantEditor() = delete;
+  ComponentVariantEditor(const ComponentVariantEditor& other) = delete;
+  explicit ComponentVariantEditor(
+      const Workspace& ws, const GraphicsLayerList& layers,
+      const LibraryElementCache& cache, QPointer<Component> component,
+      const std::shared_ptr<ComponentSignalNameListModel>& sigs,
+      std::shared_ptr<ComponentSymbolVariant> variant, UndoStack* stack,
+      const bool* wizardMode, QObject* parent = nullptr) noexcept;
+  ~ComponentVariantEditor() noexcept;
 
   // General Methods
-  void setReadOnly(bool readOnly) noexcept;
-  void setReferences(
-      ComponentSymbolVariant* variant,
-      const std::shared_ptr<const LibraryElementCache>& symbolCache,
-      const ComponentSignalList* sigs, UndoStack* undoStack) noexcept;
-  void resetReferences() noexcept;
+  ui::ComponentVariantData getUiData() const;
+  void setUiData(const ui::ComponentVariantData& data) noexcept;
+  slint::Image renderScene(int gate, float width, float height) noexcept;
+  void addGate();
+  void autoConnectPins();
+  void updateUnassignedSignals() noexcept;
 
   // Operator Overloadings
-  CompSymbVarPinSignalMapEditorWidget& operator=(
-      const CompSymbVarPinSignalMapEditorWidget& rhs) = delete;
+  ComponentVariantEditor& operator=(const ComponentVariantEditor& rhs) = delete;
 
 private:
-  QScopedPointer<ComponentPinSignalMapModel> mModel;
-  QScopedPointer<SortFilterProxyModel> mProxy;
-  QScopedPointer<QTableView> mView;
-  QScopedPointer<QPushButton> mBtnAutoAssign;
+  void execCmd(UndoCommand* cmd);
+  static QString appendNumberToSignalName(QString name, int number) noexcept;
+
+private:
+  const Workspace& mWorkspace;
+  const GraphicsLayerList& mLayers;
+  const LibraryElementCache& mCache;
+  const QPointer<Component> mComponent;
+  std::shared_ptr<ComponentSymbolVariant> mVariant;
+  QPointer<UndoStack> mUndoStack;
+  const bool* mWizardMode;
+
+  std::shared_ptr<ComponentGateListModel> mGates;
+  bool mHasUnassignedSignals;
 };
 
 /*******************************************************************************

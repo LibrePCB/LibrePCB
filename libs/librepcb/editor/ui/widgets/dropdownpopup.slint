@@ -7,6 +7,7 @@ export component DropDownPopup inherits PopupWindow {
     in property <string> current-text;
     in property <int> default-index: -1;
     in property <length> item-height: 25px;
+    in property <bool> rounded-corners: true;
     property <int> selected-index: 0;
 
     callback accepted(index: int);
@@ -59,7 +60,7 @@ export component DropDownPopup inherits PopupWindow {
 
     Rectangle {
         background: black;
-        border-radius: 5px;
+        border-radius: rounded-corners ? 5px : 0;
 
         view := ScrollView {
             width: root.width;
@@ -91,7 +92,7 @@ export component DropDownPopup inherits PopupWindow {
 
                     Rectangle {
                         background: (index == selected-index) ? #505050 : (is-current ? #303030 : transparent);
-                        border-radius: item-height / 2;
+                        border-radius: rounded-corners ? (item-height / 2) : 0;
 
                         HorizontalLayout {
                             padding-left: 12px;

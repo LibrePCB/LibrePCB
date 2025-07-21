@@ -185,6 +185,8 @@ export global Helpers {
             @image-url("../../../../../img/library/symbol.png")
         } else if (t == TabType.package) {
             @image-url("../../../../../img/library/package.png")
+        } else if (t == TabType.component) {
+            @image-url("../../../../bootstrap-icons/icons/cpu.svg")
         } else if (t == TabType.schematic) {
             @image-url("../../../../font-awesome/svgs/regular/image.svg")
         } else if (t == TabType.board-2d) {
@@ -212,6 +214,8 @@ export global Helpers {
             @tr("Symbol Check")
         } else if type == RuleCheckType.package-check {
             @tr("Package Check")
+        } else if type == RuleCheckType.component-check {
+            @tr("Component Check")
         } else {
             ""
         }

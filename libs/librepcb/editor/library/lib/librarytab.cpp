@@ -305,7 +305,7 @@ void LibraryTab::trigger(ui::TabAction a) noexcept {
             break;
           }
           case ui::LibraryTreeViewItemType::Component: {
-            emit componentEditorRequested(mEditor, item->path);
+            emit componentEditorRequested(mEditor, item->path, false);
             break;
           }
           case ui::LibraryTreeViewItemType::Device: {
@@ -854,7 +854,7 @@ void LibraryTab::duplicateElements(
       break;
     }
     case ui::LibraryTreeViewItemType::Component: {
-      mEditor.duplicateInLegacyComponentEditor(item->path);
+      emit componentEditorRequested(mEditor, item->path, true);
       break;
     }
     case ui::LibraryTreeViewItemType::Device: {
