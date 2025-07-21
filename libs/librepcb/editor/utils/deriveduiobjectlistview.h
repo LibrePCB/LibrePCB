@@ -54,7 +54,7 @@ public:
           &DerivedUiObjectList<TList, TDerived, TDerivedUiData>::
               elementDerivedUiDataChangedHandler) {
     Q_ASSERT(mList);
-    for (auto obj : *mList) {
+    for (const auto& obj : *mList) {
       if (auto o = std::dynamic_pointer_cast<TDerived>(obj)) {
         o->onDerivedUiDataChanged.attach(mOnDerivedUiDataChangedSlot);
       }

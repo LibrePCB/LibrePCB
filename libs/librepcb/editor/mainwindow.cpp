@@ -27,6 +27,7 @@
 #include "guiapplication.h"
 #include "library/cat/componentcategorytab.h"
 #include "library/cat/packagecategorytab.h"
+#include "library/cmp/componenttab.h"
 #include "library/createlibrarytab.h"
 #include "library/downloadlibrarytab.h"
 #include "library/eaglelibraryimportwizard/eaglelibraryimportwizard.h"
@@ -57,6 +58,7 @@
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/library/cat/componentcategory.h>
 #include <librepcb/core/library/cat/packagecategory.h>
+#include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/project/project.h>
@@ -603,7 +605,7 @@ void MainWindow::triggerLibrary(slint::SharedString path,
     }
     case ui::LibraryAction::NewComponent: {
       if (auto editor = mApp.getLibrary(fp)) {
-        openComponentTab(*editor, FilePath());
+        openComponentTab(*editor, FilePath(), false);
       }
       break;
     }
@@ -632,6 +634,7 @@ void MainWindow::triggerLibraryElement(slint::SharedString path,
       if (switchToLibraryElementTab<PackageCategoryTab>(fp)) return;
       if (switchToLibraryElementTab<SymbolTab>(fp)) return;
       if (switchToLibraryElementTab<PackageTab>(fp)) return;
+      if (switchToLibraryElementTab<ComponentTab>(fp)) return;
       if (mApp.getLibrary(fp)) {
         openLibraryTab(fp, false);
       }
@@ -1098,9 +1101,90 @@ void MainWindow::openPackageTab(LibraryEditor& editor, const FilePath& fp,
   }
 }
 
-void MainWindow::openComponentTab(LibraryEditor& editor,
-                                  const FilePath& fp) noexcept {
-  editor.openLegacyComponentEditor(fp);
+void MainWindow::openComponentTab(LibraryEditor& editor, const FilePath& fp,
+                                  bool copyFrom) noexcept {
+  if (!switchToLibraryElementTab<ComponentTab>(fp)) {
+    try {
+      std::unique_ptr<Component> cmp;
+      ComponentTab::Mode mode = ComponentTab::Mode::Open;
+      if (fp.isValid() && (!copyFrom)) {
+        auto fs = TransactionalFileSystem::open(
+            fp, editor.isWritable(), &askForRestoringBackup,
+            DirectoryLockHandlerDialog::createDirectoryLockCallback());
+        cmp = Component::open(std::unique_ptr<TransactionalDirectory>(
+            new TransactionalDirectory(fs)));
+      } else {
+        mode = ComponentTab::Mode::New;
+        cmp.reset(
+            new Component(Uuid::createRandom(), Version::fromString("0.1"),
+                          mApp.getWorkspace().getSettings().userName.get(),
+                          ElementName("New Component"), QString(), QString()));
+        if (copyFrom) {
+          mode = ComponentTab::Mode::Duplicate;
+          auto fs = TransactionalFileSystem::openRO(fp, &askForRestoringBackup);
+          std::unique_ptr<Component> src =
+              Component::open(std::unique_ptr<TransactionalDirectory>(
+                  new TransactionalDirectory(fs)));
+          cmp->setNames(copyLibraryElementNames(src->getNames()));
+          cmp->setDescriptions(src->getDescriptions());
+          cmp->setKeywords(src->getKeywords());
+          cmp->setCategories(src->getCategories());
+          cmp->setIsSchematicOnly(src->isSchematicOnly());
+          cmp->getAttributes() = src->getAttributes();
+          cmp->setDefaultValue(src->getDefaultValue());
+          cmp->setPrefixes(src->getPrefixes());
+          // Copy signals but generate new UUIDs.
+          QHash<Uuid, Uuid> signalUuidMap;
+          for (const ComponentSignal& signal : src->getSignals()) {
+            const Uuid newUuid = Uuid::createRandom();
+            signalUuidMap.insert(signal.getUuid(), newUuid);
+            cmp->getSignals().append(std::make_shared<ComponentSignal>(
+                newUuid, signal.getName(), signal.getRole(),
+                signal.getForcedNetName(), signal.isRequired(),
+                signal.isNegated(), signal.isClock()));
+          }
+          // Copy symbol variants but generate new UUIDs.
+          for (const ComponentSymbolVariant& var : src->getSymbolVariants()) {
+            // don't copy translations as they would need to be adjusted anyway
+            std::shared_ptr<ComponentSymbolVariant> copy(
+                new ComponentSymbolVariant(
+                    Uuid::createRandom(), var.getNorm(),
+                    var.getNames().getDefaultValue(),
+                    var.getDescriptions().getDefaultValue()));
+            // Copy gates.
+            for (const ComponentSymbolVariantItem& item :
+                 var.getSymbolItems()) {
+              std::shared_ptr<ComponentSymbolVariantItem> gateCopy(
+                  new ComponentSymbolVariantItem(
+                      Uuid::createRandom(), item.getSymbolUuid(),
+                      item.getSymbolPosition(), item.getSymbolRotation(),
+                      item.isRequired(), item.getSuffix()));
+              // Copy pin-signal-map.
+              for (const ComponentPinSignalMapItem& map :
+                   item.getPinSignalMap()) {
+                std::optional<Uuid> signal = map.getSignalUuid();
+                if (signal) {
+                  signal = *signalUuidMap.find(*map.getSignalUuid());
+                }
+                gateCopy->getPinSignalMap().append(
+                    std::make_shared<ComponentPinSignalMapItem>(
+                        map.getPinUuid(), signal, map.getDisplayType()));
+              }
+              copy->getSymbolItems().append(gateCopy);
+            }
+            cmp->getSymbolVariants().append(copy);
+          }
+        } else {
+          cmp->getSymbolVariants().append(
+              std::make_shared<ComponentSymbolVariant>(
+                  Uuid::createRandom(), "", ElementName("default"), ""));
+        }
+      }
+      addTab(std::make_shared<ComponentTab>(editor, std::move(cmp), mode));
+    } catch (const Exception& e) {
+      QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
+    }
+  }
 }
 
 void MainWindow::openDeviceTab(LibraryEditor& editor,

@@ -35,7 +35,7 @@ namespace editor {
  ******************************************************************************/
 
 CmdAttributeEdit::CmdAttributeEdit(Attribute& attribute) noexcept
-  : UndoCommand(tr("Edit circle")),
+  : UndoCommand(tr("Edit Attribute")),
     mAttribute(attribute),
     mOldKey(attribute.getKey()),
     mNewKey(mOldKey),

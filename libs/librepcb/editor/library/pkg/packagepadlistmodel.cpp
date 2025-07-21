@@ -73,7 +73,7 @@ void PackagePadListModel::setReferences(PackagePadList* list,
   if (mList) {
     mList->onEdited.attach(mOnEditedSlot);
 
-    for (auto obj : *mList) {
+    for (const auto& obj : *mList) {
       mItems.append(createItem(obj, mItems.count()));
     }
     updateSortOrder(false);

@@ -17,18 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_COMPONENTSYMBOLVARIANTEDITDIALOG_H
-#define LIBREPCB_EDITOR_COMPONENTSYMBOLVARIANTEDITDIALOG_H
+#ifndef LIBREPCB_EDITOR_COMPONENTVARIANTEDITOR_H
+#define LIBREPCB_EDITOR_COMPONENTVARIANTEDITOR_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/library/cmp/componentsymbolvariant.h>
+#include "appwindow.h"
 
 #include <QtCore>
-#include <QtWidgets>
-
-#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -36,68 +33,73 @@
 namespace librepcb {
 
 class Component;
-class Symbol;
+class ComponentSymbolVariant;
 class Workspace;
 
 namespace editor {
 
+class ComponentGateListModel;
+class ComponentSignalNameListModel;
 class GraphicsLayerList;
 class GraphicsScene;
 class LibraryElementCache;
-class SymbolGraphicsItem;
-
-namespace Ui {
-class ComponentSymbolVariantEditDialog;
-}
+class UndoCommand;
+class UndoStack;
 
 /*******************************************************************************
- *  Class ComponentSymbolVariantEditDialog
+ *  Class ComponentVariantEditor
  ******************************************************************************/
 
 /**
- * @brief The ComponentSymbolVariantEditDialog class
+ * @brief The ComponentVariantEditor class
  */
-class ComponentSymbolVariantEditDialog final : public QDialog {
+class ComponentVariantEditor final : public QObject {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  ComponentSymbolVariantEditDialog() = delete;
-  ComponentSymbolVariantEditDialog(
-      const ComponentSymbolVariantEditDialog& other) = delete;
-  ComponentSymbolVariantEditDialog(
-      const Workspace& ws, std::shared_ptr<const Component> cmp,
-      std::shared_ptr<ComponentSymbolVariant> symbVar,
-      QWidget* parent = nullptr) noexcept;
-  ~ComponentSymbolVariantEditDialog() noexcept;
+  ComponentVariantEditor() = delete;
+  ComponentVariantEditor(const ComponentVariantEditor& other) = delete;
+  explicit ComponentVariantEditor(
+      const Workspace& ws, const GraphicsLayerList& layers,
+      const LibraryElementCache& cache, QPointer<Component> component,
+      const std::shared_ptr<ComponentSignalNameListModel>& sigs,
+      std::shared_ptr<ComponentSymbolVariant> variant, UndoStack* stack,
+      const bool* wizardMode, QObject* parent = nullptr) noexcept;
+  ~ComponentVariantEditor() noexcept;
 
-  // Setters
-  void setReadOnly(bool readOnly) noexcept;
+  // General Methods
+  ui::ComponentVariantData getUiData() const;
+  void setUiData(const ui::ComponentVariantData& data) noexcept;
+  slint::Image renderScene(int gate, float width, float height) noexcept;
+  void addGate();
+  void autoConnectPins();
+  void updateUnassignedSignals() noexcept;
 
   // Operator Overloadings
-  ComponentSymbolVariantEditDialog& operator=(
-      const ComponentSymbolVariantEditDialog& rhs) = delete;
+  ComponentVariantEditor& operator=(const ComponentVariantEditor& rhs) = delete;
 
-private:  // Methods
-  void accept() noexcept override;
-  void schedulePreviewUpdate() noexcept;
-  void schedulePreviewTextsUpdate() noexcept;
-  void updatePreview() noexcept;
+signals:
+  void uiDataChanged();
 
-private:  // Data
+private:
+  void execCmd(UndoCommand* cmd);
+  static QString appendNumberToSignalName(QString name, int number) noexcept;
+
+private:
   const Workspace& mWorkspace;
-  std::shared_ptr<const Component> mComponent;
-  std::shared_ptr<ComponentSymbolVariant> mOriginalSymbVar;
-  ComponentSymbolVariant mSymbVar;
-  QScopedPointer<GraphicsScene> mGraphicsScene;
-  std::unique_ptr<GraphicsLayerList> mLayers;
-  std::shared_ptr<LibraryElementCache> mLibraryElementCache;
-  QScopedPointer<Ui::ComponentSymbolVariantEditDialog> mUi;
+  const GraphicsLayerList& mLayers;
+  const LibraryElementCache& mCache;
+  const QPointer<Component> mComponent;
+  std::shared_ptr<ComponentSymbolVariant> mVariant;
+  QPointer<UndoStack> mUndoStack;
+  const bool* mWizardMode;
 
-  bool mPreviewUpdateScheduled;
-  bool mPreviewTextsUpdateScheduled;
-  QList<std::shared_ptr<Symbol>> mSymbols;
-  QList<std::shared_ptr<SymbolGraphicsItem>> mGraphicsItems;
+  std::unique_ptr<GraphicsScene> mScene;
+  int mFrameIndex;
+
+  std::shared_ptr<ComponentGateListModel> mGates;
+  bool mHasUnassignedSignals;
 };
 
 /*******************************************************************************

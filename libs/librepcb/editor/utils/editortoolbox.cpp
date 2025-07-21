@@ -132,6 +132,13 @@ QString EditorToolbox::cleanKeywords(const QString& userInput) noexcept {
   return list.join(",");
 }
 
+QString EditorToolbox::sortableCircuitIdentifier(QString identifier) noexcept {
+  const int count = identifier.count('!');
+  identifier.remove('!');
+  identifier.append(QString(" ").repeated(count));
+  return identifier;
+}
+
 QIcon EditorToolbox::svgIcon(const QString& file) noexcept {
   return QIcon(new MonochromeSvgIconEngine(file));
 }

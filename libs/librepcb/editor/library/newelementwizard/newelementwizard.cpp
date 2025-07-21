@@ -23,10 +23,6 @@
 #include "newelementwizard.h"
 
 #include "newelementwizardpage_choosetype.h"
-#include "newelementwizardpage_componentpinsignalmap.h"
-#include "newelementwizardpage_componentproperties.h"
-#include "newelementwizardpage_componentsignals.h"
-#include "newelementwizardpage_componentsymbols.h"
 #include "newelementwizardpage_copyfrom.h"
 #include "newelementwizardpage_deviceproperties.h"
 #include "newelementwizardpage_entermetadata.h"
@@ -57,14 +53,6 @@ NewElementWizard::NewElementWizard(const Workspace& ws, Library& lib,
              new NewElementWizardPage_CopyFrom(*mContext, this));
   insertPage(NewElementWizardContext::ID_EnterMetadata,
              new NewElementWizardPage_EnterMetadata(*mContext, this));
-  insertPage(NewElementWizardContext::ID_ComponentProperties,
-             new NewElementWizardPage_ComponentProperties(*mContext, this));
-  insertPage(NewElementWizardContext::ID_ComponentSymbols,
-             new NewElementWizardPage_ComponentSymbols(*mContext, this));
-  insertPage(NewElementWizardContext::ID_ComponentSignals,
-             new NewElementWizardPage_ComponentSignals(*mContext, this));
-  insertPage(NewElementWizardContext::ID_ComponentPinSignalMap,
-             new NewElementWizardPage_ComponentPinSignalMap(*mContext, this));
   insertPage(NewElementWizardContext::ID_DeviceProperties,
              new NewElementWizardPage_DeviceProperties(*mContext, this));
 

@@ -184,29 +184,22 @@ add_library(
   library/cmp/componentchooserdialog.cpp
   library/cmp/componentchooserdialog.h
   library/cmp/componentchooserdialog.ui
-  library/cmp/componenteditorwidget.cpp
-  library/cmp/componenteditorwidget.h
-  library/cmp/componenteditorwidget.ui
-  library/cmp/componentpinsignalmapmodel.cpp
-  library/cmp/componentpinsignalmapmodel.h
-  library/cmp/componentsignallisteditorwidget.cpp
-  library/cmp/componentsignallisteditorwidget.h
+  library/cmp/componentgateeditor.cpp
+  library/cmp/componentgateeditor.h
+  library/cmp/componentgatelistmodel.cpp
+  library/cmp/componentgatelistmodel.h
+  library/cmp/componentpinoutlistmodel.cpp
+  library/cmp/componentpinoutlistmodel.h
   library/cmp/componentsignallistmodel.cpp
   library/cmp/componentsignallistmodel.h
-  library/cmp/componentsymbolvarianteditdialog.cpp
-  library/cmp/componentsymbolvarianteditdialog.h
-  library/cmp/componentsymbolvarianteditdialog.ui
-  library/cmp/componentsymbolvariantitemlisteditorwidget.cpp
-  library/cmp/componentsymbolvariantitemlisteditorwidget.h
-  library/cmp/componentsymbolvariantitemlistmodel.cpp
-  library/cmp/componentsymbolvariantitemlistmodel.h
-  library/cmp/componentsymbolvariantlistmodel.cpp
-  library/cmp/componentsymbolvariantlistmodel.h
-  library/cmp/componentsymbolvariantlistwidget.cpp
-  library/cmp/componentsymbolvariantlistwidget.h
-  library/cmp/compsymbvarpinsignalmapeditorwidget.cpp
-  library/cmp/compsymbvarpinsignalmapeditorwidget.h
-  library/cmp/if_componentsymbolvarianteditorprovider.h
+  library/cmp/componentsignalnamelistmodel.cpp
+  library/cmp/componentsignalnamelistmodel.h
+  library/cmp/componenttab.cpp
+  library/cmp/componenttab.h
+  library/cmp/componentvarianteditor.cpp
+  library/cmp/componentvarianteditor.h
+  library/cmp/componentvariantlistmodel.cpp
+  library/cmp/componentvariantlistmodel.h
   library/createlibrarytab.cpp
   library/createlibrarytab.h
   library/dev/deviceeditorwidget.cpp
@@ -294,18 +287,6 @@ add_library(
   library/newelementwizard/newelementwizardpage_choosetype.cpp
   library/newelementwizard/newelementwizardpage_choosetype.h
   library/newelementwizard/newelementwizardpage_choosetype.ui
-  library/newelementwizard/newelementwizardpage_componentpinsignalmap.cpp
-  library/newelementwizard/newelementwizardpage_componentpinsignalmap.h
-  library/newelementwizard/newelementwizardpage_componentpinsignalmap.ui
-  library/newelementwizard/newelementwizardpage_componentproperties.cpp
-  library/newelementwizard/newelementwizardpage_componentproperties.h
-  library/newelementwizard/newelementwizardpage_componentproperties.ui
-  library/newelementwizard/newelementwizardpage_componentsignals.cpp
-  library/newelementwizard/newelementwizardpage_componentsignals.h
-  library/newelementwizard/newelementwizardpage_componentsignals.ui
-  library/newelementwizard/newelementwizardpage_componentsymbols.cpp
-  library/newelementwizard/newelementwizardpage_componentsymbols.h
-  library/newelementwizard/newelementwizardpage_componentsymbols.ui
   library/newelementwizard/newelementwizardpage_copyfrom.cpp
   library/newelementwizard/newelementwizardpage_copyfrom.h
   library/newelementwizard/newelementwizardpage_copyfrom.ui
@@ -423,6 +404,8 @@ add_library(
   mainwindowtestadapter.h
   modelview/angledelegate.cpp
   modelview/angledelegate.h
+  modelview/attributelistmodel.cpp
+  modelview/attributelistmodel.h
   modelview/attributelistmodellegacy.cpp
   modelview/attributelistmodellegacy.h
   modelview/checkableitemsdelegate.cpp
@@ -919,8 +902,6 @@ add_library(
   widgets/rulechecklistwidget.h
   widgets/searchtoolbar.cpp
   widgets/searchtoolbar.h
-  widgets/signalrolecombobox.cpp
-  widgets/signalrolecombobox.h
   widgets/statusbar.cpp
   widgets/statusbar.h
   widgets/tabwidget.cpp

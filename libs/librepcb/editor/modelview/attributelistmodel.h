@@ -17,16 +17,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_NEWELEMENTWIZARDPAGE_COMPONENTSYMBOLS_H
-#define LIBREPCB_EDITOR_NEWELEMENTWIZARDPAGE_COMPONENTSYMBOLS_H
+#ifndef LIBREPCB_EDITOR_ATTRIBUTELISTMODEL_H
+#define LIBREPCB_EDITOR_ATTRIBUTELISTMODEL_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "newelementwizardcontext.h"
+#include "appwindow.h"
+
+#include <librepcb/core/attribute/attribute.h>
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -34,47 +35,59 @@
 namespace librepcb {
 namespace editor {
 
-namespace Ui {
-class NewElementWizardPage_ComponentSymbols;
-}
+class UndoCommand;
+class UndoStack;
 
 /*******************************************************************************
- *  Class NewElementWizardPage_ComponentSymbols
+ *  Class AttributeListModel
  ******************************************************************************/
 
 /**
- * @brief The NewElementWizardPage_ComponentSymbols class
+ * @brief The AttributeListModel class
  */
-class NewElementWizardPage_ComponentSymbols final : public QWizardPage {
+class AttributeListModel final : public QObject,
+                                 public slint::Model<ui::AttributeData> {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  NewElementWizardPage_ComponentSymbols() = delete;
-  NewElementWizardPage_ComponentSymbols(
-      const NewElementWizardPage_ComponentSymbols& other) = delete;
-  explicit NewElementWizardPage_ComponentSymbols(
-      NewElementWizardContext& context, QWidget* parent = 0) noexcept;
-  ~NewElementWizardPage_ComponentSymbols() noexcept;
+  // AttributeListModel() = delete;
+  AttributeListModel(const AttributeListModel& other) = delete;
+  explicit AttributeListModel(QObject* parent = nullptr) noexcept;
+  ~AttributeListModel() noexcept;
 
-  // Getters
-  bool validatePage() noexcept override;
-  bool isComplete() const noexcept override;
-  int nextId() const noexcept override;
+  // General Methods
+  void setReferences(AttributeList* list, UndoStack* stack) noexcept;
+  void apply();
+
+  // Implementations
+  std::size_t row_count() const override;
+  std::optional<ui::AttributeData> row_data(std::size_t i) const override;
+  void set_row_data(std::size_t i,
+                    const ui::AttributeData& data) noexcept override;
 
   // Operator Overloadings
-  NewElementWizardPage_ComponentSymbols& operator=(
-      const NewElementWizardPage_ComponentSymbols& rhs) = delete;
+  AttributeListModel& operator=(const AttributeListModel& rhs) = delete;
 
-private:  // Methods
-  void initializePage() noexcept override;
-  void cleanupPage() noexcept override;
-  QList<Uuid> getSymbolUuids() const noexcept;
+private:
+  ui::AttributeData createItem(const Attribute& obj) noexcept;
+  static ui::AttributeData createLastItem() noexcept;
+  void trigger(int index, std::shared_ptr<Attribute> obj,
+               ui::AttributeAction a) noexcept;
+  void listEdited(const AttributeList& list, int index,
+                  const std::shared_ptr<const Attribute>& item,
+                  AttributeList::Event event) noexcept;
+  void execCmd(UndoCommand* cmd);
+  AttributeKey validateKeyOrThrow(const QString& name) const;
 
-private:  // Data
-  QList<Uuid> mLoadedSymbolUuids;
-  NewElementWizardContext& mContext;
-  QScopedPointer<Ui::NewElementWizardPage_ComponentSymbols> mUi;
+private:
+  AttributeList* mList;
+  QPointer<UndoStack> mUndoStack;
+
+  QList<ui::AttributeData> mItems;
+
+  // Slots
+  AttributeList::OnEditedSlot mOnEditedSlot;
 };
 
 /*******************************************************************************

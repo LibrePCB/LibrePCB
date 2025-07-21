@@ -92,6 +92,20 @@ public:
   static QString cleanKeywords(const QString& userInput) noexcept;
 
   /**
+   * @brief Make a circuit identifier sortable
+   *
+   * Transform a circuit identifier (e.g. component signal name) to allow
+   * a more natural sort algorithm. For example the identifier "!OUT" is
+   * converted to "OUT " to have "!OUT" next to "OUT" while still keeping
+   * the sort order deterministic (due to the trailing space).
+   *
+   * @param identifier  Pin name, signal name etc. (e.g. "!EN").
+   *
+   * @return The passed identifier, possibly modified for sorting.
+   */
+  static QString sortableCircuitIdentifier(QString identifier) noexcept;
+
+  /**
    * @brief Load a SVG QIcon which is properly colorized
    *
    * @param file  Resource file path (e.g. ":/fa/solid/globe.svg")
