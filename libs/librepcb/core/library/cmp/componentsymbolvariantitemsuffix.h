@@ -31,6 +31,8 @@
 
 #include <QtCore>
 
+#include <optional>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -39,13 +41,6 @@ namespace librepcb {
 /*******************************************************************************
  *  Class ComponentSymbolVariantItemSuffix
  ******************************************************************************/
-
-inline static QString cleanComponentSymbolVariantItemSuffix(
-    const QString& userInput) noexcept {
-  return Toolbox::cleanUserInputString(userInput,
-                                       QRegularExpression("[^0-9a-zA-Z_]"),
-                                       true, false, false, "_", 16);
-}
 
 struct ComponentSymbolVariantItemSuffixVerifier {
   template <typename Value, typename Predicate>
@@ -138,6 +133,20 @@ inline QDebug operator<<(QDebug stream,
 inline std::size_t qHash(const ComponentSymbolVariantItemSuffix& key,
                          std::size_t seed = 0) noexcept {
   return ::qHash(*key, seed);
+}
+
+inline static QString cleanComponentSymbolVariantItemSuffix(
+    const QString& userInput) noexcept {
+  return Toolbox::cleanUserInputString(userInput,
+                                       QRegularExpression("[^0-9a-zA-Z_]"),
+                                       true, false, false, "_", 16);
+}
+
+inline static std::optional<ComponentSymbolVariantItemSuffix>
+    parseComponentSymbolVariantItemSuffix(const QString& suffix) noexcept {
+  return ComponentSymbolVariantItemSuffixConstraint()(suffix)
+      ? ComponentSymbolVariantItemSuffix(suffix)
+      : std::optional<ComponentSymbolVariantItemSuffix>();
 }
 
 /*******************************************************************************

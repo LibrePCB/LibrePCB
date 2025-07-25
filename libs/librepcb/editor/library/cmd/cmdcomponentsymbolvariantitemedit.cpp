@@ -36,7 +36,7 @@ namespace editor {
 
 CmdComponentSymbolVariantItemEdit::CmdComponentSymbolVariantItemEdit(
     ComponentSymbolVariantItem& item) noexcept
-  : UndoCommand(tr("Edit component symbol variant item")),
+  : UndoCommand(tr("Edit Component Gate")),
     mItem(item),
     mOldSymbolUuid(item.getSymbolUuid()),
     mNewSymbolUuid(mOldSymbolUuid),
@@ -47,9 +47,7 @@ CmdComponentSymbolVariantItemEdit::CmdComponentSymbolVariantItemEdit(
     mOldIsRequired(item.isRequired()),
     mNewIsRequired(mOldIsRequired),
     mOldSuffix(item.getSuffix()),
-    mNewSuffix(mOldSuffix),
-    mOldPinSignalMap(item.getPinSignalMap()),
-    mNewPinSignalMap(mOldPinSignalMap) {
+    mNewSuffix(mOldSuffix) {
 }
 
 CmdComponentSymbolVariantItemEdit::
@@ -89,12 +87,6 @@ void CmdComponentSymbolVariantItemEdit::setSuffix(
   mNewSuffix = suffix;
 }
 
-void CmdComponentSymbolVariantItemEdit::setPinSignalMap(
-    const ComponentPinSignalMap& map) noexcept {
-  Q_ASSERT(!wasEverExecuted());
-  mNewPinSignalMap = map;
-}
-
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/
@@ -107,7 +99,6 @@ bool CmdComponentSymbolVariantItemEdit::performExecute() {
   if (mNewSymbolRot != mOldSymbolRot) return true;
   if (mNewIsRequired != mOldIsRequired) return true;
   if (mNewSuffix != mOldSuffix) return true;
-  if (mNewPinSignalMap != mOldPinSignalMap) return true;
   return false;
 }
 
@@ -117,7 +108,6 @@ void CmdComponentSymbolVariantItemEdit::performUndo() {
   mItem.setSymbolRotation(mOldSymbolRot);
   mItem.setIsRequired(mOldIsRequired);
   mItem.setSuffix(mOldSuffix);
-  mItem.getPinSignalMap() = mOldPinSignalMap;
 }
 
 void CmdComponentSymbolVariantItemEdit::performRedo() {
@@ -126,7 +116,6 @@ void CmdComponentSymbolVariantItemEdit::performRedo() {
   mItem.setSymbolRotation(mNewSymbolRot);
   mItem.setIsRequired(mNewIsRequired);
   mItem.setSuffix(mNewSuffix);
-  mItem.getPinSignalMap() = mNewPinSignalMap;
 }
 
 /*******************************************************************************

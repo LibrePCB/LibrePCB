@@ -28,7 +28,6 @@
 #include "../../graphics/primitivecirclegraphicsitem.h"
 #include "../../graphics/primitivetextgraphicsitem.h"
 
-#include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/types/angle.h>
 #include <librepcb/core/types/point.h>
 #include <librepcb/core/utils/overlinemarkupparser.h>
@@ -49,7 +48,7 @@ namespace editor {
 
 SymbolPinGraphicsItem::SymbolPinGraphicsItem(
     std::shared_ptr<SymbolPin> pin, const GraphicsLayerList& layers,
-    std::shared_ptr<const Component> cmp,
+    QPointer<const Component> cmp,
     std::shared_ptr<const ComponentSymbolVariantItem> cmpItem,
     QGraphicsItem* parent) noexcept
   : QGraphicsItemGroup(parent),

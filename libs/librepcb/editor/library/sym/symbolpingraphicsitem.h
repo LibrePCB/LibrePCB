@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/sym/symbolpin.h>
 
 #include <QtCore>
@@ -57,7 +58,7 @@ public:
   SymbolPinGraphicsItem(const SymbolPinGraphicsItem& other) = delete;
   SymbolPinGraphicsItem(
       std::shared_ptr<SymbolPin> pin, const GraphicsLayerList& layers,
-      std::shared_ptr<const Component> cmp = nullptr,
+      QPointer<const Component> cmp = nullptr,
       std::shared_ptr<const ComponentSymbolVariantItem> cmpItem = nullptr,
       QGraphicsItem* parent = nullptr) noexcept;
   ~SymbolPinGraphicsItem() noexcept;
@@ -86,7 +87,7 @@ private:  // Methods
 private:  // Data
   std::shared_ptr<SymbolPin> mPin;
   const GraphicsLayerList& mLayers;
-  std::shared_ptr<const Component> mComponent;  // Can be nullptr.
+  QPointer<const Component> mComponent;  // Can be nullptr.
   std::shared_ptr<const ComponentSymbolVariantItem> mItem;  // Can be nullptr.
   QScopedPointer<PrimitiveCircleGraphicsItem> mCircleGraphicsItem;
   QScopedPointer<LineGraphicsItem> mLineGraphicsItem;

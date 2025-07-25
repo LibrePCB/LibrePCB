@@ -43,9 +43,7 @@ CmdComponentSymbolVariantEdit::CmdComponentSymbolVariantEdit(
     mOldNames(variant.getNames()),
     mNewNames(mOldNames),
     mOldDescriptions(variant.getDescriptions()),
-    mNewDescriptions(mOldDescriptions),
-    mOldSymbolItems(variant.getSymbolItems()),
-    mNewSymbolItems(mOldSymbolItems) {
+    mNewDescriptions(mOldDescriptions) {
 }
 
 CmdComponentSymbolVariantEdit::~CmdComponentSymbolVariantEdit() noexcept {
@@ -72,12 +70,6 @@ void CmdComponentSymbolVariantEdit::setDescriptions(
   mNewDescriptions = descriptions;
 }
 
-void CmdComponentSymbolVariantEdit::setSymbolItems(
-    const ComponentSymbolVariantItemList& items) noexcept {
-  Q_ASSERT(!wasEverExecuted());
-  mNewSymbolItems = items;
-}
-
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/
@@ -88,7 +80,6 @@ bool CmdComponentSymbolVariantEdit::performExecute() {
   if (mNewNorm != mOldNorm) return true;
   if (mNewNames != mOldNames) return true;
   if (mNewDescriptions != mOldDescriptions) return true;
-  if (mNewSymbolItems != mOldSymbolItems) return true;
   return false;
 }
 
@@ -96,14 +87,12 @@ void CmdComponentSymbolVariantEdit::performUndo() {
   mVariant.setNorm(mOldNorm);
   mVariant.setNames(mOldNames);
   mVariant.setDescriptions(mOldDescriptions);
-  mVariant.getSymbolItems() = mOldSymbolItems;
 }
 
 void CmdComponentSymbolVariantEdit::performRedo() {
   mVariant.setNorm(mNewNorm);
   mVariant.setNames(mNewNames);
   mVariant.setDescriptions(mNewDescriptions);
-  mVariant.getSymbolItems() = mNewSymbolItems;
 }
 
 /*******************************************************************************

@@ -482,8 +482,6 @@ void Board2dTab::activate() noexcept {
       new slint::VectorModel<slint::SharedString>());
   mUnplacedComponentFootprintsModel.reset(
       new slint::VectorModel<slint::SharedString>());
-  mUnplacedComponentLayers =
-      GraphicsLayerList::previewLayers(&mApp.getWorkspace().getSettings());
   mUnplacedComponentGraphicsScene.reset(new GraphicsScene());
   mUnplacedComponentGraphicsScene->setOriginCrossVisible(false);
   mUnplacedComponentGraphicsItem.reset();
@@ -532,7 +530,6 @@ void Board2dTab::deactivate() noexcept {
   mUnplacedComponentFootprintsModel.reset();
   mUnplacedComponentDevicesModel.reset();
   mUnplacedComponentsModel.reset();
-  mUnplacedComponentLayers.reset();
   mDrcLocationGraphicsItem.reset();
   mScene.reset();
   mLayersModel.reset();
@@ -1652,7 +1649,7 @@ void Board2dTab::setSelectedUnplacedComponentFootprint(int index) noexcept {
   if (mUnplacedComponent && mUnplacedComponentPackage) {
     if (auto fpt = mUnplacedComponentPackage->getFootprints().value(index)) {
       mUnplacedComponentGraphicsItem.reset(new FootprintGraphicsItem(
-          fpt, *mUnplacedComponentLayers, Application::getDefaultStrokeFont(),
+          fpt, mApp.getPreviewLayers(), Application::getDefaultStrokeFont(),
           &mUnplacedComponentPackage->getPads(),
           &mUnplacedComponent->getLibComponent(), mProject.getLocaleOrder()));
       mUnplacedComponentGraphicsScene->addItem(*mUnplacedComponentGraphicsItem);

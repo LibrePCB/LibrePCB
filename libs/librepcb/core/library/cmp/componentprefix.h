@@ -31,6 +31,8 @@
 
 #include <QtCore>
 
+#include <optional>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -39,11 +41,6 @@ namespace librepcb {
 /*******************************************************************************
  *  Class ComponentPrefix
  ******************************************************************************/
-
-inline static QString cleanComponentPrefix(const QString& userInput) noexcept {
-  return Toolbox::cleanUserInputString(
-      userInput, QRegularExpression("[^a-zA-Z_]"), true, false, false, "_", 16);
-}
 
 struct ComponentPrefixVerifier {
   template <typename Value, typename Predicate>
@@ -132,6 +129,17 @@ inline QDebug operator<<(QDebug stream, const ComponentPrefix& obj) {
 inline std::size_t qHash(const ComponentPrefix& key,
                          std::size_t seed = 0) noexcept {
   return ::qHash(*key, seed);
+}
+
+inline static QString cleanComponentPrefix(const QString& userInput) noexcept {
+  return Toolbox::cleanUserInputString(
+      userInput, QRegularExpression("[^a-zA-Z_]"), true, false, false, "_", 16);
+}
+
+inline static std::optional<ComponentPrefix> parseComponentPrefix(
+    const QString& prefix) noexcept {
+  return ComponentPrefixConstraint()(prefix) ? ComponentPrefix(prefix)
+                                             : std::optional<ComponentPrefix>();
 }
 
 /*******************************************************************************

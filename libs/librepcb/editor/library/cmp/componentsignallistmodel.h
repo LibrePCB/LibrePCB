@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "appwindow.h"
+
 #include <librepcb/core/library/cmp/componentsignal.h>
 
 #include <QtCore>
@@ -31,6 +33,9 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Component;
+
 namespace editor {
 
 class UndoCommand;
@@ -43,61 +48,49 @@ class UndoStack;
 /**
  * @brief The ComponentSignalListModel class
  */
-class ComponentSignalListModel final : public QAbstractTableModel {
+class ComponentSignalListModel final
+  : public QObject,
+    public slint::Model<ui::ComponentSignalData> {
   Q_OBJECT
 
 public:
-  enum Column {
-    COLUMN_NAME,
-    COLUMN_ISREQUIRED,
-    COLUMN_FORCEDNETNAME,
-    COLUMN_ACTIONS,
-    _COLUMN_COUNT
-  };
-
   // Constructors / Destructor
-  ComponentSignalListModel() = delete;
+  // ComponentSignalListModel() = delete;
   ComponentSignalListModel(const ComponentSignalListModel& other) = delete;
   explicit ComponentSignalListModel(QObject* parent = nullptr) noexcept;
   ~ComponentSignalListModel() noexcept;
 
-  // Setters
-  void setSignalList(ComponentSignalList* list) noexcept;
-  void setUndoStack(UndoStack* stack) noexcept;
+  // General Methods
+  void setReferences(Component* component, UndoStack* stack) noexcept;
+  bool add(QString names) noexcept;
+  void apply();
 
-  // Slots
-  void add(const QPersistentModelIndex& itemIndex) noexcept;
-  void remove(const QPersistentModelIndex& itemIndex) noexcept;
-
-  // Inherited from QAbstractItemModel
-  int rowCount(const QModelIndex& parent = QModelIndex()) const override;
-  int columnCount(const QModelIndex& parent = QModelIndex()) const override;
-  QVariant data(const QModelIndex& index,
-                int role = Qt::DisplayRole) const override;
-  QVariant headerData(int section, Qt::Orientation orientation,
-                      int role = Qt::DisplayRole) const override;
-  Qt::ItemFlags flags(const QModelIndex& index) const override;
-  bool setData(const QModelIndex& index, const QVariant& value,
-               int role = Qt::EditRole) override;
+  // Implementations
+  std::size_t row_count() const override;
+  std::optional<ui::ComponentSignalData> row_data(std::size_t i) const override;
+  void set_row_data(std::size_t i,
+                    const ui::ComponentSignalData& data) noexcept override;
 
   // Operator Overloadings
-  ComponentSignalListModel& operator=(
-      const ComponentSignalListModel& rhs) noexcept;
+  ComponentSignalListModel& operator=(const ComponentSignalListModel& rhs) =
+      delete;
 
 private:
-  void signalListEdited(const ComponentSignalList& list, int index,
-                        const std::shared_ptr<const ComponentSignal>& signal,
-                        ComponentSignalList::Event event) noexcept;
+  ui::ComponentSignalData createItem(const ComponentSignal& obj,
+                                     int sortIndex) noexcept;
+  void updateSortOrder(bool notify) noexcept;
+  void listEdited(const ComponentSignalList& list, int index,
+                  const std::shared_ptr<const ComponentSignal>& item,
+                  ComponentSignalList::Event event) noexcept;
   void execCmd(UndoCommand* cmd);
   CircuitIdentifier validateNameOrThrow(const QString& name) const;
   static QString cleanForcedNetName(const QString& name) noexcept;
 
-private:  // Data
-  ComponentSignalList* mSignalList;
-  UndoStack* mUndoStack;
-  QString mNewName;
-  bool mNewIsRequired;
-  QString mNewForcedNetName;
+private:
+  QPointer<Component> mComponent;
+  QPointer<UndoStack> mUndoStack;
+
+  QList<ui::ComponentSignalData> mItems;
 
   // Slots
   ComponentSignalList::OnEditedSlot mOnEditedSlot;
