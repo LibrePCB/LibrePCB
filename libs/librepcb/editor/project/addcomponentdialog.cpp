@@ -839,7 +839,7 @@ void AddComponentDialog::setSelectedSymbVar(
       mPreviewSymbols.append(symbol);
 
       auto graphicsItem = std::make_shared<SymbolGraphicsItem>(
-          *symbol, *mLayers, mSelectedComponent,
+          *symbol, *mLayers, mSelectedComponent.get(),
           mSelectedSymbVar->getSymbolItems().get(item.getUuid()), mLocaleOrder);
       graphicsItem->setPosition(item.getSymbolPosition());
       graphicsItem->setRotation(item.getSymbolRotation());

@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/cmp/componentsymbolvariantitem.h>
 #include <librepcb/core/library/sym/symbol.h>
 
@@ -73,7 +74,7 @@ public:
   SymbolGraphicsItem(const SymbolGraphicsItem& other) = delete;
   SymbolGraphicsItem(
       Symbol& symbol, const GraphicsLayerList& layers,
-      std::shared_ptr<const Component> cmp = nullptr,
+      QPointer<const Component> cmp = nullptr,
       std::shared_ptr<const ComponentSymbolVariantItem> cmpItem = nullptr,
       const QStringList& localeOrder = {}) noexcept;
   ~SymbolGraphicsItem() noexcept;
@@ -125,7 +126,7 @@ private:  // Methods
 private:  // Data
   Symbol& mSymbol;
   const GraphicsLayerList& mLayers;
-  std::shared_ptr<const Component> mComponent;  // Can be nullptr.
+  QPointer<const Component> mComponent;  // Can be nullptr.
   std::shared_ptr<const ComponentSymbolVariantItem> mItem;  // Can be nullptr.
   QStringList mLocaleOrder;
   QMap<std::shared_ptr<SymbolPin>, std::shared_ptr<SymbolPinGraphicsItem>>
