@@ -137,6 +137,23 @@ export struct AngleEditParseResult {
     evaluated-value: int,
 }
 
+// Underlying data structure for RatioEdit elements
+export struct RatioEditData {
+    value: int,  // PPM like in the backend
+    minimum: int,  // PPM like in the backend
+    maximum: int,  // PPM like in the backend
+    can-increase: bool,
+    can-decrease: bool,
+    increase: bool,  // Set by UI, reset by backend
+    decrease: bool,  // Set by UI, reset by backend
+}
+
+// Text parse result as used in the RatioEdit component
+export struct RatioEditParseResult {
+    valid: bool,
+    evaluated-value: int,
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Tree views
 ////////////////////////////////////////////////////////////////////////////////
@@ -218,6 +235,7 @@ export enum RuleCheckType {
     component-category-check,
     package-category-check,
     symbol-check,
+    package-check,
 }
 
 export enum RuleCheckState {
@@ -269,11 +287,14 @@ export enum EditorTool {
     value,
     hole,
     pin,
+    pad-tht,
+    pad-smt,
     wire,
     netlabel,
     via,
     plane,
     zone,
+    renumber-pads,
     component,
     measure,
 }
@@ -346,6 +367,60 @@ export struct LibraryElementCategoryData {
     delete: bool,  // Set by UI, reset by backend
 }
 
+// Enum of footprint pad shapes available in the toolbar
+export enum PadShape {
+    round,
+    rounded-rect,
+    rect,
+    octagon,
+}
+
+// Actions for FootprintData
+export enum FootprintAction {
+    none,
+    move-up,
+    duplicate,
+    delete,
+}
+
+// Footprint data structure
+export struct FootprintData {
+    id: string,
+    name: string,
+    model-x: Int64,
+    model-y: Int64,
+    model-z: Int64,
+    model-rx: int,
+    model-ry: int,
+    model-rz: int,
+    models: [bool],  // One flag for each 3D model
+    action: FootprintAction,  // Set by UI, handled in backend
+}
+
+// Package pad data structure
+export struct PackagePadData {
+    id: string,
+    name: string,
+    name-error: string,
+    delete: bool,  // Set by UI, reset by backend
+    sort-index: int,  // Used by backend for sorting
+}
+
+// Actions for PackageModelData
+export enum PackageModelAction {
+    none,
+    move-up,
+    browse,
+    delete,
+}
+
+// Package 3D model data structure
+export struct PackageModelData {
+    id: string,
+    name: string,
+    action: PackageModelAction,  // Set by UI, handled in backend
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Tabs
 ////////////////////////////////////////////////////////////////////////////////
@@ -364,6 +439,7 @@ export struct TabFeatures {
     redo: FeatureState,
     grid: FeatureState,
     zoom: FeatureState,
+    background-image: FeatureState,
     import-graphics: FeatureState,
     export-graphics: FeatureState,
     select: FeatureState,
@@ -393,6 +469,7 @@ export enum TabType {
     component-category,
     package-category,
     symbol,
+    package,
     schematic,
     board-2d,
     board-3d,
@@ -465,6 +542,7 @@ export enum TabAction {
     zoom-in,
     zoom-out,
     zoom-fit,
+    toggle-background-image,
 
     // Find
     find-refresh-suggestions,
@@ -480,6 +558,12 @@ export enum TabAction {
 
     // Symbol tab
     symbol-import-pins,
+
+    // Package tab
+    package-add-pads,
+    package-add-model,
+    package-generate-outline,
+    package-generate-courtyard,
 
     // Board 2D tab
     board-place-component,
@@ -498,11 +582,20 @@ export enum TabAction {
     tool-value,
     tool-hole,
     tool-pin,
+    tool-pad-tht,
+    tool-pad-smt,
+    tool-pad-thermal,
+    tool-pad-bga,
+    tool-pad-edge-connector,
+    tool-pad-test-point,
+    tool-pad-local-fiducial,
+    tool-pad-global-fiducial,
     tool-wire,
     tool-netlabel,
     tool-via,
     tool-plane,
     tool-zone,
+    tool-renumber-pads,
     tool-component,
     tool-component-frame,
     tool-component-resistor,
@@ -691,6 +784,94 @@ export struct SymbolTabData {
     new-category: string,  // Set to UUID by UI, reset by backend.
 }
 
+// Additional data for package editor tabs
+export struct PackageTabData {
+    // General
+    library-index: int,
+    path: string,
+    wizard-mode: bool,
+    page-index: int,
+    view-3d: bool,
+
+    // Metadata
+    name: string,
+    name-error: string,
+    description: string,
+    keywords: string,
+    author: string,
+    version: string,
+    version-error: string,
+    deprecated: bool,
+    categories: [LibraryElementCategoryData],
+    categories-tree: [TreeViewItemData],
+    assembly-type: int,
+    pads: [PackagePadData],
+    new-pad-name: string,
+    new-pad-name-error: string,
+    footprints: [FootprintData],
+    footprint-index: int,
+    models: [PackageModelData],
+    model-index: int,
+
+    // Checks
+    checks: RuleCheckData,
+
+    // View
+    background-color: brush,
+    foreground-color: brush,
+    overlay-color: brush,
+    overlay-text-color: brush,
+    grid-style: GridStyle,
+    grid-interval: Int64,
+    unit: LengthUnit,
+    background-image-set: bool,
+    solderresist-alpha: float,  // 3D view
+    silkscreen-alpha: float,  // 3D view
+    solderpaste-alpha: float,  // 3D view
+    devices-alpha: float,  // 3D view
+    refreshing: bool,  // 3D view
+    opengl-error: string,  // 3D view
+
+    // Messages
+    interface-broken-msg: bool,
+
+    // Data about the currently active tool
+    tool: EditorTool,
+    tool-cursor: MouseCursor,
+    tool-overlay-text: string,
+    tool-layer: ComboBoxData,
+    tool-line-width: LengthEditData,
+    tool-size: LengthEditData,
+    tool-drill: LengthEditData,
+    tool-angle: AngleEditData,
+    tool-ratio: RatioEditData,
+    tool-filled: bool,
+    tool-grab-area: bool,
+    tool-value: LineEditData,
+    tool-halign: TextHorizontalAlignment,
+    tool-valign: TextVerticalAlignment,
+    tool-package-pad: ComboBoxData,
+    tool-bottom: bool,
+    tool-shape: PadShape,
+    tool-fiducial: bool,  // Read-only
+    tool-pressfit: bool,
+    tool-layer-top: bool,
+    tool-layer-inner: bool,
+    tool-layer-bottom: bool,
+    tool-no-copper: bool,
+    tool-no-planes: bool,
+    tool-no-exposures: bool,
+    tool-no-devices: bool,
+
+    // Misc
+    scene-image-pos: Point,  // Absolute position of graphics scene
+    frame: int,  // Frame index to trigger repainting
+
+    // Actions
+    new-category: string,  // Set to UUID by UI, reset by backend
+    new-footprint: string,  // Set to new name by UI, reset by backend
+}
+
 // Additional data for schematic editor tabs
 export struct SchematicTabData {
     project-index: int,
@@ -809,6 +990,7 @@ export struct WindowSectionData {
     component-category-tabs: [CategoryTabData],  // Proxy view for `tabs`
     package-category-tabs: [CategoryTabData],  // Proxy view for `tabs`
     symbol-tabs: [SymbolTabData],  // Proxy view for `tabs`
+    package-tabs: [PackageTabData],  // Proxy view for `tabs`
     schematic-tabs: [SchematicTabData],  // Proxy view for `tabs`
     board-2d-tabs: [Board2dTabData],  // Proxy view for `tabs`
     board-3d-tabs: [Board3dTabData],  // Proxy view for `tabs`

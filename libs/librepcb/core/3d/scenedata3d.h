@@ -125,7 +125,6 @@ public:
     return mSilkscreenLayersBot;
   }
   bool getAutoBoardOutline() const noexcept { return mAutoBoardOutline; }
-  qreal getStepAlphaValue() const noexcept { return mStepAlphaValue; }
   const QString& getProjectName() const noexcept { return mProjectName; }
   const QList<DeviceData>& getDevices() const noexcept { return mDevices; }
   const QList<PolygonData>& getPolygons() const noexcept { return mPolygons; }
@@ -150,7 +149,6 @@ public:
     mSilkscreenLayersBot = value;
   }
   void setAutoBoardOutline(bool value) noexcept { mAutoBoardOutline = value; }
-  void setStepAlphaValue(qreal value) noexcept { mStepAlphaValue = value; }
   void setProjectName(const QString& value) noexcept { mProjectName = value; }
 
   // General Methods
@@ -185,7 +183,6 @@ private:  // Data
   QSet<const Layer*> mSilkscreenLayersTop;
   QSet<const Layer*> mSilkscreenLayersBot;
   bool mAutoBoardOutline;
-  qreal mStepAlphaValue;
   QString mProjectName;
 
   QList<DeviceData> mDevices;

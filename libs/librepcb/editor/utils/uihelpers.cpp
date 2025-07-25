@@ -71,6 +71,14 @@ Angle s2angle(int v) noexcept {
   return Angle(v);
 }
 
+int l2s(const Ratio& v) noexcept {
+  return v.toPpm();
+}
+
+Ratio s2ratio(int v) noexcept {
+  return Ratio(v);
+}
+
 ui::GridStyle l2s(Theme::GridStyle v) noexcept {
   switch (v) {
     case Theme::GridStyle::Lines:
@@ -188,6 +196,39 @@ ui::NotificationType l2s(RuleCheckMessage::Severity v) noexcept {
       qCritical()
           << "Unhandled value in RuleCheckMessage::Severity conversion.";
       return ui::NotificationType::Critical;
+  }
+}
+
+static const std::vector<Package::AssemblyType>& getAssemblyTypes() noexcept {
+  static const std::vector<Package::AssemblyType> list = {
+      // ATTENTION: Keep in sync with constants.slint!
+      Package::AssemblyType::Tht,  // clang-format break
+      Package::AssemblyType::Smt,  // clang-format break
+      Package::AssemblyType::Mixed,  // clang-format break
+      Package::AssemblyType::Other,  // clang-format break
+      Package::AssemblyType::None,  // clang-format break
+      Package::AssemblyType::Auto,  // clang-format break
+  };
+  return list;
+}
+
+int l2s(Package::AssemblyType v) noexcept {
+  const auto& list = getAssemblyTypes();
+  const auto it = std::find(list.begin(), list.end(), v);
+  if (it == list.end()) {
+    qCritical() << "Unhandled value in Package::AssemblyType conversion.";
+    return -1;
+  }
+  return it - list.begin();
+}
+
+std::optional<Package::AssemblyType> s2assemblyType(int v) noexcept {
+  const auto& list = getAssemblyTypes();
+  if ((v >= 0) && (v < static_cast<int>(list.size()))) {
+    return list.at(v);
+  } else {
+    qCritical() << "Unhandled value in Package::AssemblyType conversion.";
+    return std::nullopt;
   }
 }
 

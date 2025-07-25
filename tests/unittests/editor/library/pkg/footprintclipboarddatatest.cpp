@@ -22,7 +22,6 @@
  ******************************************************************************/
 #include <gtest/gtest.h>
 #include <librepcb/core/types/layer.h>
-#include <librepcb/editor/graphics/graphicslayerlist.h>
 #include <librepcb/editor/library/pkg/footprintclipboarddata.h>
 
 #include <QtCore>
@@ -54,9 +53,7 @@ TEST(FootprintClipboardDataTest, testToFromMimeDataEmpty) {
   FootprintClipboardData obj1(uuid, packagePads, pos);
 
   // Serialize to MIME data
-  std::unique_ptr<GraphicsLayerList> layers =
-      GraphicsLayerList::previewLayers(nullptr);
-  std::unique_ptr<QMimeData> mime1 = obj1.toMimeData(*layers);
+  std::unique_ptr<QMimeData> mime1 = obj1.toMimeData();
 
   // Load from MIME data and validate
   std::unique_ptr<FootprintClipboardData> obj2 =
@@ -167,9 +164,7 @@ TEST(FootprintClipboardDataTest, testToFromMimeDataPopulated) {
   obj1.getHoles().append(hole2);
 
   // Serialize to MIME data
-  std::unique_ptr<GraphicsLayerList> layers =
-      GraphicsLayerList::previewLayers(nullptr);
-  std::unique_ptr<QMimeData> mime1 = obj1.toMimeData(*layers);
+  std::unique_ptr<QMimeData> mime1 = obj1.toMimeData();
 
   // Load from MIME data and validate
   std::unique_ptr<FootprintClipboardData> obj2 =

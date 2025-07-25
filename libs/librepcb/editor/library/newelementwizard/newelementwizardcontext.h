@@ -66,7 +66,6 @@ public:
     ID_ChooseType,
     ID_CopyFrom,
     ID_EnterMetadata,
-    ID_PackagePads,
     ID_ComponentProperties,
     ID_ComponentSymbols,
     ID_ComponentSignals,
@@ -76,7 +75,6 @@ public:
 
   enum class ElementType {
     None,
-    Package,
     Component,
     Device,
   };
@@ -122,12 +120,6 @@ public:  // Data
   QString mElementAuthor;
   std::optional<Version> mElementVersion;
   QSet<Uuid> mElementCategoryUuids;
-
-  // package
-  Package::AssemblyType mPackageAssemblyType;
-  PackagePadList mPackagePads;
-  PackageModelList mPackageModels;
-  FootprintList mPackageFootprints;
 
   // component
   bool mComponentSchematicOnly;

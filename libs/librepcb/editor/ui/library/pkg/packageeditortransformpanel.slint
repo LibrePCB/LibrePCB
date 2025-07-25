@@ -1,0 +1,170 @@
+import { PackageEditorPanel } from "packageeditorpanel.slint";
+import {
+    AngleEdit,
+    LengthEdit,
+    Palette,
+} from "../../widgets.slint";
+import {
+    PackageTabData,
+    WindowSectionData,
+} from "../../api.slint";
+
+export component PackageEditorTransformPanel inherits PackageEditorPanel {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    in-out property <[PackageTabData]> tabs;
+    in property <int> index;
+    in property <int> footprint-index: tabs[index].footprint-index;
+    in property <bool> read-only;
+
+    GridLayout {
+        spacing: 3px;
+
+        Row {
+            Rectangle {
+                width: 16px;
+
+                Image {
+                    width: parent.width;
+                    height: self.width;
+                    colorize: Palette.foreground;
+                    image-fit: contain;
+                    source: @image-url("../../../../../font-awesome/svgs/solid/up-down-left-right.svg");
+                    accessible-role: none;
+                }
+            }
+
+            x-edt := LengthEdit {
+                value: tabs[index].footprints[footprint-index].model-x;
+                unit: tabs[index].unit;
+                min-width-text: "12.345";
+                can-change-unit: false;
+                enabled: !read-only;
+
+                value-changed(v) => {
+                    // Ignore intermediate values.
+                }
+
+                value-accepted(v) => {
+                    tabs[index].footprints[footprint-index].model-x = v;
+                }
+            }
+
+            y-edt := LengthEdit {
+                value: tabs[index].footprints[footprint-index].model-y;
+                unit: tabs[index].unit;
+                min-width-text: "12.345";
+                can-change-unit: false;
+                enabled: !read-only;
+
+                value-changed(v) => {
+                    // Ignore intermediate values.
+                }
+
+                value-accepted(v) => {
+                    tabs[index].footprints[footprint-index].model-y = v;
+                }
+            }
+
+            z-edt := LengthEdit {
+                value: tabs[index].footprints[footprint-index].model-z;
+                unit: tabs[index].unit;
+                min-width-text: "12.345";
+                can-change-unit: false;
+                enabled: !read-only;
+
+                value-changed(v) => {
+                    // Ignore intermediate values.
+                }
+
+                value-accepted(v) => {
+                    tabs[index].footprints[footprint-index].model-z = v;
+                }
+            }
+        }
+
+        Row {
+            Rectangle {
+                width: 16px;
+
+                Image {
+                    width: parent.width;
+                    height: self.width;
+                    colorize: Palette.foreground;
+                    image-fit: contain;
+                    source: @image-url("../../../../../font-awesome/svgs/solid/rotate-right.svg");
+                    accessible-role: none;
+                }
+            }
+
+            rx-edt := AngleEdit {
+                value: tabs[index].footprints[footprint-index].model-rx;
+                icon: @image-url("");
+                min-width-text: "12.345 °";
+                enabled: !read-only;
+
+                value-changed(v) => {
+                    // Ignore intermediate values.
+                }
+
+                value-accepted(v) => {
+                    tabs[index].footprints[footprint-index].model-rx = v;
+                }
+
+                increase-triggered => {
+                    tabs[index].footprints[footprint-index].model-rx += 90000000;
+                }
+
+                decrease-triggered => {
+                    tabs[index].footprints[footprint-index].model-rx -= 90000000;
+                }
+            }
+
+            ry-edt := AngleEdit {
+                value: tabs[index].footprints[footprint-index].model-ry;
+                icon: @image-url("");
+                min-width-text: "12.345 °";
+                enabled: !read-only;
+
+                value-changed(v) => {
+                    // Ignore intermediate values.
+                }
+
+                value-accepted(v) => {
+                    tabs[index].footprints[footprint-index].model-ry = v;
+                }
+
+                increase-triggered => {
+                    tabs[index].footprints[footprint-index].model-ry += 90000000;
+                }
+
+                decrease-triggered => {
+                    tabs[index].footprints[footprint-index].model-ry -= 90000000;
+                }
+            }
+
+            rz-edt := AngleEdit {
+                value: tabs[index].footprints[footprint-index].model-rz;
+                icon: @image-url("");
+                min-width-text: "12.345 °";
+                enabled: !read-only;
+
+                value-changed(v) => {
+                    // Ignore intermediate values.
+                }
+
+                value-accepted(v) => {
+                    tabs[index].footprints[footprint-index].model-rz = v;
+                }
+
+                increase-triggered => {
+                    tabs[index].footprints[footprint-index].model-rz += 90000000;
+                }
+
+                decrease-triggered => {
+                    tabs[index].footprints[footprint-index].model-rz -= 90000000;
+                }
+            }
+        }
+    }
+}

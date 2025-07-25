@@ -47,7 +47,6 @@ SceneData3D::SceneData3D(std::shared_ptr<FileSystem> fs,
     mSilkscreenLayersTop({&Layer::topLegend(), &Layer::topNames()}),
     mSilkscreenLayersBot({&Layer::botLegend(), &Layer::botNames()}),
     mAutoBoardOutline(autoBoardOutline),
-    mStepAlphaValue(1),
     mProjectName("LibrePCB Project") {
 }
 

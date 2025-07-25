@@ -22,18 +22,9 @@
  ******************************************************************************/
 #include "packageeditorstate_addpads.h"
 
-#include "../../../editorcommandset.h"
-#include "../../../graphics/graphicsscene.h"
-#include "../../../widgets/graphicsview.h"
-#include "../../../widgets/positivelengthedit.h"
-#include "../../../widgets/unsignedlengthedit.h"
-#include "../../../widgets/unsignedlimitedratioedit.h"
 #include "../../cmd/cmdfootprintpadedit.h"
-#include "../boardsideselectorwidget.h"
 #include "../footprintgraphicsitem.h"
 #include "../footprintpadgraphicsitem.h"
-#include "../packageeditorwidget.h"
-#include "../packagepadcombobox.h"
 
 #include <librepcb/core/library/pkg/footprint.h>
 #include <librepcb/core/library/pkg/package.h>
@@ -54,10 +45,7 @@ PackageEditorState_AddPads::PackageEditorState_AddPads(
     Context& context, PadType type, FootprintPad::Function function) noexcept
   : PackageEditorState(context),
     mPadType(type),
-    mCurrentPad(nullptr),
-    mCurrentGraphicsItem(nullptr),
-    mPackagePadComboBox(nullptr),
-    mLastPad(
+    mCurrentProperties(
         Uuid::createRandom(), std::nullopt, Point(0, 0), Angle::deg0(),
         FootprintPad::Shape::RoundedRect,  // Commonly used pad shape
         PositiveLength(2500000),  // There is no default/recommended pad size
@@ -69,48 +57,55 @@ PackageEditorState_AddPads::PackageEditorState_AddPads(
         UnsignedLength(0),  // Copper clearance
         FootprintPad::ComponentSide::Top,  // Default side
         function,  // Supplied by library editor
-        PadHoleList{}) {
+        PadHoleList{}),
+    mCurrentPad(nullptr),
+    mCurrentGraphicsItem(nullptr) {
   if (mPadType == PadType::SMT) {
-    mLastPad.setRadius(UnsignedLimitedRatio(Ratio::fromPercent(50)));
-    mLastPad.setWidth(PositiveLength(1500000));
-    mLastPad.setHeight(PositiveLength(700000));
-    mLastPad.setSolderPasteConfig(MaskConfig::automatic());
+    mCurrentProperties.setRadius(UnsignedLimitedRatio(Ratio::fromPercent(50)));
+    mCurrentProperties.setWidth(PositiveLength(1500000));
+    mCurrentProperties.setHeight(PositiveLength(700000));
+    mCurrentProperties.setSolderPasteConfig(MaskConfig::automatic());
     switch (function) {
       case FootprintPad::Function::ThermalPad:
-        mLastPad.setRadius(UnsignedLimitedRatio(Ratio::fromPercent(0)));
-        mLastPad.setWidth(PositiveLength(2000000));
-        mLastPad.setHeight(PositiveLength(2000000));
+        mCurrentProperties.setRadius(
+            UnsignedLimitedRatio(Ratio::fromPercent(0)));
+        mCurrentProperties.setWidth(PositiveLength(2000000));
+        mCurrentProperties.setHeight(PositiveLength(2000000));
         break;
       case FootprintPad::Function::BgaPad:
-        mLastPad.setRadius(UnsignedLimitedRatio(Ratio::fromPercent(100)));
-        mLastPad.setWidth(PositiveLength(300000));
-        mLastPad.setHeight(PositiveLength(300000));
+        mCurrentProperties.setRadius(
+            UnsignedLimitedRatio(Ratio::fromPercent(100)));
+        mCurrentProperties.setWidth(PositiveLength(300000));
+        mCurrentProperties.setHeight(PositiveLength(300000));
         break;
       case FootprintPad::Function::EdgeConnectorPad:
-        mLastPad.setRadius(UnsignedLimitedRatio(Ratio::fromPercent(0)));
-        mLastPad.setSolderPasteConfig(MaskConfig::off());
+        mCurrentProperties.setRadius(
+            UnsignedLimitedRatio(Ratio::fromPercent(0)));
+        mCurrentProperties.setSolderPasteConfig(MaskConfig::off());
         break;
       case FootprintPad::Function::TestPad:
-        mLastPad.setRadius(UnsignedLimitedRatio(Ratio::fromPercent(100)));
-        mLastPad.setWidth(PositiveLength(700000));
-        mLastPad.setHeight(PositiveLength(700000));
-        mLastPad.setSolderPasteConfig(MaskConfig::off());
+        mCurrentProperties.setRadius(
+            UnsignedLimitedRatio(Ratio::fromPercent(100)));
+        mCurrentProperties.setWidth(PositiveLength(700000));
+        mCurrentProperties.setHeight(PositiveLength(700000));
+        mCurrentProperties.setSolderPasteConfig(MaskConfig::off());
         break;
       case FootprintPad::Function::LocalFiducial:
       case FootprintPad::Function::GlobalFiducial:
-        mLastPad.setRadius(UnsignedLimitedRatio(Ratio::fromPercent(100)));
-        mLastPad.setWidth(PositiveLength(1000000));
-        mLastPad.setHeight(PositiveLength(1000000));
-        mLastPad.setCopperClearance(UnsignedLength(500000));
-        mLastPad.setStopMaskConfig(
-            MaskConfig::manual(*mLastPad.getCopperClearance()));
-        mLastPad.setSolderPasteConfig(MaskConfig::off());
+        mCurrentProperties.setRadius(
+            UnsignedLimitedRatio(Ratio::fromPercent(100)));
+        mCurrentProperties.setWidth(PositiveLength(1000000));
+        mCurrentProperties.setHeight(PositiveLength(1000000));
+        mCurrentProperties.setCopperClearance(UnsignedLength(500000));
+        mCurrentProperties.setStopMaskConfig(
+            MaskConfig::manual(*mCurrentProperties.getCopperClearance()));
+        mCurrentProperties.setSolderPasteConfig(MaskConfig::off());
         break;
       default:
         break;
     }
   } else {
-    mLastPad.getHoles().append(std::make_shared<PadHole>(
+    mCurrentProperties.getHoles().append(std::make_shared<PadHole>(
         Uuid::createRandom(),
         PositiveLength(800000),  // Commonly used drill diameter
         makeNonEmptyPath(Point())));
@@ -119,7 +114,7 @@ PackageEditorState_AddPads::PackageEditorState_AddPads(
 }
 
 PackageEditorState_AddPads::~PackageEditorState_AddPads() noexcept {
-  Q_ASSERT(!mEditCmd);
+  Q_ASSERT(!mCurrentEditCmd);
 }
 
 /*******************************************************************************
@@ -127,235 +122,19 @@ PackageEditorState_AddPads::~PackageEditorState_AddPads() noexcept {
  ******************************************************************************/
 
 bool PackageEditorState_AddPads::entry() noexcept {
-  // populate command toolbar
-  EditorCommandSet& cmd = EditorCommandSet::instance();
-
-  // package pad
-  if (!mLastPad.getFunctionIsFiducial()) {
-    mContext.commandToolBar.addLabel(tr("Package Pad:"));
-    mPackagePadComboBox = new PackagePadComboBox();
-    std::unique_ptr<PackagePadComboBox> packagePadComboBox(mPackagePadComboBox);
-    connect(packagePadComboBox.get(), &PackagePadComboBox::currentPadChanged,
-            this,
-            &PackageEditorState_AddPads::packagePadComboBoxCurrentPadChanged);
-    packagePadComboBox->setPads(mContext.package.getPads());
-    mContext.commandToolBar.addWidget(std::move(packagePadComboBox));
-    mContext.commandToolBar.addSeparator();
-    selectNextFreePadInComboBox();
+  if (!mCurrentProperties.getFunctionIsFiducial()) {
+    selectNextFreePackagePad();
   }
 
-  // board side
-  if (mPadType == PadType::SMT) {
-    std::unique_ptr<BoardSideSelectorWidget> boardSideSelector(
-        new BoardSideSelectorWidget());
-    boardSideSelector->setCurrentBoardSide(mLastPad.getComponentSide());
-    boardSideSelector->addAction(cmd.layerUp.createAction(
-        boardSideSelector.get(), boardSideSelector.get(),
-        &BoardSideSelectorWidget::setBoardSideTop));
-    boardSideSelector->addAction(cmd.layerDown.createAction(
-        boardSideSelector.get(), boardSideSelector.get(),
-        &BoardSideSelectorWidget::setBoardSideBottom));
-    connect(boardSideSelector.get(),
-            &BoardSideSelectorWidget::currentBoardSideChanged, this,
-            &PackageEditorState_AddPads::boardSideSelectorCurrentSideChanged);
-    mContext.commandToolBar.addWidget(std::move(boardSideSelector));
-    mContext.commandToolBar.addSeparator();
-  }
-
-  // Shape.
-  std::unique_ptr<QActionGroup> shapeActionGroup(
-      new QActionGroup(&mContext.commandToolBar));
-  QAction* aShapeRound =
-      cmd.shapeRound.createAction(shapeActionGroup.get(), this, [this]() {
-        shapeSelectorCurrentShapeChanged(
-            FootprintPad::Shape::RoundedRect,
-            UnsignedLimitedRatio(Ratio::fromPercent(100)), false);
-      });
-  aShapeRound->setCheckable(true);
-  aShapeRound->setChecked(
-      (mLastPad.getShape() == FootprintPad::Shape::RoundedRect) &&
-      (*mLastPad.getRadius() == Ratio::fromPercent(100)));
-  aShapeRound->setActionGroup(shapeActionGroup.get());
-  QAction* aShapeRoundedRect =
-      cmd.shapeRoundedRect.createAction(shapeActionGroup.get(), this, [this]() {
-        shapeSelectorCurrentShapeChanged(
-            FootprintPad::Shape::RoundedRect,
-            UnsignedLimitedRatio(Ratio::fromPercent(50)), true);
-      });
-  aShapeRoundedRect->setCheckable(true);
-  aShapeRoundedRect->setChecked(
-      (mLastPad.getShape() == FootprintPad::Shape::RoundedRect) &&
-      (*mLastPad.getRadius() != Ratio::fromPercent(0)) &&
-      (*mLastPad.getRadius() != Ratio::fromPercent(100)));
-  aShapeRoundedRect->setActionGroup(shapeActionGroup.get());
-  QAction* aShapeRect =
-      cmd.shapeRect.createAction(shapeActionGroup.get(), this, [this]() {
-        shapeSelectorCurrentShapeChanged(
-            FootprintPad::Shape::RoundedRect,
-            UnsignedLimitedRatio(Ratio::fromPercent(0)), false);
-      });
-  aShapeRect->setCheckable(true);
-  aShapeRect->setChecked(
-      (mLastPad.getShape() == FootprintPad::Shape::RoundedRect) &&
-      (*mLastPad.getRadius() == Ratio::fromPercent(0)));
-  aShapeRect->setActionGroup(shapeActionGroup.get());
-  QAction* aShapeOctagon =
-      cmd.shapeOctagon.createAction(shapeActionGroup.get(), this, [this]() {
-        shapeSelectorCurrentShapeChanged(
-            FootprintPad::Shape::RoundedOctagon,
-            UnsignedLimitedRatio(Ratio::fromPercent(0)), true);
-      });
-  aShapeOctagon->setCheckable(true);
-  aShapeOctagon->setChecked(mLastPad.getShape() ==
-                            FootprintPad::Shape::RoundedOctagon);
-  aShapeOctagon->setActionGroup(shapeActionGroup.get());
-  mContext.commandToolBar.addActionGroup(std::move(shapeActionGroup));
-  mContext.commandToolBar.addSeparator();
-
-  // width / size
-  mContext.commandToolBar.addLabel(
-      mLastPad.getFunctionIsFiducial() ? tr("Size:") : tr("Width:"), 10);
-  std::unique_ptr<PositiveLengthEdit> edtWidth(new PositiveLengthEdit());
-  QPointer<PositiveLengthEdit> edtWidthPtr = edtWidth.get();
-  edtWidth->configure(getLengthUnit(), LengthEditBase::Steps::generic(),
-                      "package_editor/add_pads/width");
-  edtWidth->setValue(mLastPad.getWidth());
-  edtWidth->addAction(cmd.lineWidthIncrease.createAction(
-      edtWidth.get(), edtWidth.get(), &PositiveLengthEdit::stepUp));
-  edtWidth->addAction(cmd.lineWidthDecrease.createAction(
-      edtWidth.get(), edtWidth.get(), &PositiveLengthEdit::stepDown));
-  connect(edtWidth.get(), &PositiveLengthEdit::valueChanged, this,
-          &PackageEditorState_AddPads::widthEditValueChanged);
-  if (mLastPad.getFunctionIsFiducial()) {
-    connect(edtWidth.get(), &PositiveLengthEdit::valueChanged, this,
-            &PackageEditorState_AddPads::heightEditValueChanged);
-  }
-  mContext.commandToolBar.addWidget(std::move(edtWidth));
-
-  // height
-  QPointer<PositiveLengthEdit> edtHeightPtr;
-  if (!mLastPad.getFunctionIsFiducial()) {
-    mContext.commandToolBar.addLabel(tr("Height:"), 10);
-    std::unique_ptr<PositiveLengthEdit> edtHeight(new PositiveLengthEdit());
-    edtHeightPtr = edtHeight.get();
-    edtHeight->configure(getLengthUnit(), LengthEditBase::Steps::generic(),
-                         "package_editor/add_pads/height");
-    edtHeight->setValue(mLastPad.getHeight());
-    edtHeight->addAction(cmd.sizeIncrease.createAction(
-        edtHeight.get(), edtHeight.get(), &PositiveLengthEdit::stepUp));
-    edtHeight->addAction(cmd.sizeDecrease.createAction(
-        edtHeight.get(), edtHeight.get(), &PositiveLengthEdit::stepDown));
-    connect(edtHeight.get(), &PositiveLengthEdit::valueChanged, this,
-            &PackageEditorState_AddPads::heightEditValueChanged);
-    mContext.commandToolBar.addWidget(std::move(edtHeight));
-  }
-
-  // drill diameter
-  QPointer<PositiveLengthEdit> edtDrillDiameterPtr;
-  if ((mPadType == PadType::THT) && (!mLastPad.getHoles().isEmpty())) {
-    mContext.commandToolBar.addLabel(tr("Drill:"), 10);
-    std::unique_ptr<PositiveLengthEdit> edtDrillDiameter(
-        new PositiveLengthEdit());
-    edtDrillDiameterPtr = edtDrillDiameter.get();
-    edtDrillDiameter->configure(getLengthUnit(),
-                                LengthEditBase::Steps::drillDiameter(),
-                                "package_editor/add_pads/drill_diameter");
-    edtDrillDiameter->setValue(mLastPad.getHoles().first()->getDiameter());
-    edtDrillDiameter->addAction(cmd.drillIncrease.createAction(
-        edtDrillDiameter.get(), edtDrillDiameter.get(),
-        &PositiveLengthEdit::stepUp));
-    edtDrillDiameter->addAction(cmd.drillDecrease.createAction(
-        edtDrillDiameter.get(), edtDrillDiameter.get(),
-        &PositiveLengthEdit::stepDown));
-    connect(edtDrillDiameter.get(), &PositiveLengthEdit::valueChanged, this,
-            &PackageEditorState_AddPads::drillDiameterEditValueChanged);
-    mContext.commandToolBar.addWidget(std::move(edtDrillDiameter));
-  }
-
-  // Avoid creating pads with a drill diameter larger than its size!
-  // See https://github.com/LibrePCB/LibrePCB/issues/946.
-  if (edtWidthPtr && edtHeightPtr && edtDrillDiameterPtr) {
-    connect(edtWidthPtr.data(), &PositiveLengthEdit::valueChanged, this,
-            [edtDrillDiameterPtr](const PositiveLength& value) {
-              if (edtDrillDiameterPtr &&
-                  (value < edtDrillDiameterPtr->getValue())) {
-                edtDrillDiameterPtr->setValue(value);
-              }
-            });
-    connect(edtHeightPtr.data(), &PositiveLengthEdit::valueChanged, this,
-            [edtDrillDiameterPtr](const PositiveLength& value) {
-              if (edtDrillDiameterPtr &&
-                  (value < edtDrillDiameterPtr->getValue())) {
-                edtDrillDiameterPtr->setValue(value);
-              }
-            });
-    connect(edtDrillDiameterPtr.data(), &PositiveLengthEdit::valueChanged, this,
-            [edtWidthPtr, edtHeightPtr](const PositiveLength& value) {
-              if (edtWidthPtr && (value > edtWidthPtr->getValue())) {
-                edtWidthPtr->setValue(value);
-              }
-              if (edtHeightPtr && (value > edtHeightPtr->getValue())) {
-                edtHeightPtr->setValue(value);
-              }
-            });
-  }
-
-  // fiducial clearance
-  if (mLastPad.getFunctionIsFiducial()) {
-    mContext.commandToolBar.addLabel(tr("Clearance:"), 10);
-    std::unique_ptr<UnsignedLengthEdit> edtFiducialClearance(
-        new UnsignedLengthEdit());
-    edtFiducialClearance->configure(
-        getLengthUnit(), LengthEditBase::Steps::generic(),
-        "package_editor/add_pads/fiducial_clearance");
-    const std::optional<Length> offset =
-        mLastPad.getStopMaskConfig().getOffset();
-    if (offset && (*offset > 0)) {
-      edtFiducialClearance->setValue(UnsignedLength(*offset));
-    }
-    edtFiducialClearance->addAction(cmd.sizeIncrease.createAction(
-        edtFiducialClearance.get(), edtFiducialClearance.get(),
-        &PositiveLengthEdit::stepUp));
-    edtFiducialClearance->addAction(cmd.sizeDecrease.createAction(
-        edtFiducialClearance.get(), edtFiducialClearance.get(),
-        &PositiveLengthEdit::stepDown));
-    connect(edtFiducialClearance.get(), &UnsignedLengthEdit::valueChanged, this,
-            &PackageEditorState_AddPads::fiducialClearanceEditValueChanged);
-    mContext.commandToolBar.addWidget(std::move(edtFiducialClearance));
-  }
-
-  // Radius.
-  mContext.commandToolBar.addLabel(tr("Radius:"), 10);
-  std::unique_ptr<UnsignedLimitedRatioEdit> edtRadius(
-      new UnsignedLimitedRatioEdit());
-  edtRadius->setSingleStep(1.0);  // [%]
-  edtRadius->setValue(mLastPad.getRadius());
-  edtRadius->setEnabled(aShapeRoundedRect->isChecked() ||
-                        aShapeOctagon->isChecked());
-  connect(this, &PackageEditorState_AddPads::requestRadiusInputEnabled,
-          edtRadius.get(), &UnsignedLimitedRatioEdit::setEnabled);
-  connect(this, &PackageEditorState_AddPads::requestRadius, edtRadius.get(),
-          &UnsignedLimitedRatioEdit::setValue);
-  connect(edtRadius.get(), &UnsignedLimitedRatioEdit::valueChanged, this,
-          &PackageEditorState_AddPads::radiusEditValueChanged);
-  mContext.commandToolBar.addWidget(std::move(edtRadius));
-
-  // Press-Fit.
-  if (mPadType == PadType::THT) {
-    std::unique_ptr<QCheckBox> cbxPressFit(new QCheckBox(tr("Press-Fit")));
-    cbxPressFit->setChecked(mLastPad.getFunction() ==
-                            FootprintPad::Function::PressFitPad);
-    connect(cbxPressFit.get(), &QCheckBox::toggled, this,
-            &PackageEditorState_AddPads::pressFitCheckedChanged);
-    mContext.commandToolBar.addWidget(std::move(cbxPressFit), 10);
-  }
-
-  const Point pos = mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos())
-                        .mappedToGrid(mContext.graphicsScene.getGridInterval());
+  const Point pos = mAdapter.fsmMapGlobalPosToScenePos(QCursor::pos())
+                        .mappedToGrid(getGridInterval());
   if (!startAddPad(pos)) {
     return false;
   }
-  mContext.graphicsView.setCursor(Qt::CrossCursor);
+
+  mAdapter.fsmToolEnter(*this);
+  mAdapter.fsmSetFeatures(PackageEditorFsmAdapter::Feature::Rotate);
+  mAdapter.fsmSetViewCursor(Qt::CrossCursor);
   return true;
 }
 
@@ -364,20 +143,10 @@ bool PackageEditorState_AddPads::exit() noexcept {
     return false;
   }
 
-  // cleanup command toolbar
-  mPackagePadComboBox = nullptr;
-  mContext.commandToolBar.clear();
-
-  mContext.graphicsView.unsetCursor();
+  mAdapter.fsmSetViewCursor(std::nullopt);
+  mAdapter.fsmSetFeatures(PackageEditorFsmAdapter::Features());
+  mAdapter.fsmToolLeave();
   return true;
-}
-
-QSet<EditorWidgetBase::Feature>
-    PackageEditorState_AddPads::getAvailableFeatures() const noexcept {
-  return {
-      EditorWidgetBase::Feature::Abort,
-      EditorWidgetBase::Feature::Rotate,
-  };
 }
 
 /*******************************************************************************
@@ -388,7 +157,7 @@ bool PackageEditorState_AddPads::processGraphicsSceneMouseMoved(
     const GraphicsSceneMouseEvent& e) noexcept {
   if (mCurrentPad) {
     Point currentPos = e.scenePos.mappedToGrid(getGridInterval());
-    mEditCmd->setPosition(currentPos, true);
+    mCurrentEditCmd->setPosition(currentPos, true);
     return true;
   } else {
     return false;
@@ -412,10 +181,155 @@ bool PackageEditorState_AddPads::processGraphicsSceneRightMouseButtonReleased(
 
 bool PackageEditorState_AddPads::processRotate(const Angle& rotation) noexcept {
   if (mCurrentPad) {
-    mEditCmd->rotate(rotation, mCurrentPad->getPosition(), true);
+    mCurrentEditCmd->rotate(rotation, mCurrentPad->getPosition(), true);
     return true;
   } else {
     return false;
+  }
+}
+
+/*******************************************************************************
+ *  Connection to UI
+ ******************************************************************************/
+
+void PackageEditorState_AddPads::setPackagePad(
+    const std::optional<Uuid>& pad) noexcept {
+  if (mCurrentProperties.setPackagePadUuid(pad)) {
+    emit packagePadChanged(mCurrentProperties.getPackagePadUuid());
+  }
+
+  if (mCurrentEditCmd) {
+    mCurrentEditCmd->setPackagePadUuid(mCurrentProperties.getPackagePadUuid(),
+                                       true);
+  }
+}
+
+void PackageEditorState_AddPads::setComponentSide(
+    FootprintPad::ComponentSide side) noexcept {
+  if (mCurrentProperties.setComponentSide(side)) {
+    emit componentSideChanged(mCurrentProperties.getComponentSide());
+  }
+
+  if (mCurrentEditCmd) {
+    mCurrentEditCmd->setComponentSide(mCurrentProperties.getComponentSide(),
+                                      true);
+  }
+}
+
+void PackageEditorState_AddPads::setShape(FootprintPad::Shape shape) noexcept {
+  if (mCurrentProperties.setShape(shape)) {
+    emit shapeChanged(mCurrentProperties.getShape());
+    applyRecommendedRoundedRectRadius();
+  }
+
+  if (mCurrentEditCmd) {
+    mCurrentEditCmd->setShape(mCurrentProperties.getShape(), true);
+  }
+}
+
+void PackageEditorState_AddPads::setWidth(
+    const PositiveLength& width) noexcept {
+  if (mCurrentProperties.setWidth(width)) {
+    emit widthChanged(mCurrentProperties.getWidth());
+    applyRecommendedRoundedRectRadius();
+  }
+
+  if (mCurrentEditCmd) {
+    mCurrentEditCmd->setWidth(mCurrentProperties.getWidth(), true);
+  }
+
+  // Avoid creating pads with a drill larger than width or height.
+  if (auto drill = getDrillDiameter()) {
+    if (*drill > width) {
+      setDrillDiameter(width);
+    }
+  }
+}
+
+void PackageEditorState_AddPads::setHeight(
+    const PositiveLength& height) noexcept {
+  if (mCurrentProperties.setHeight(height)) {
+    emit heightChanged(mCurrentProperties.getHeight());
+    applyRecommendedRoundedRectRadius();
+  }
+
+  if (mCurrentEditCmd) {
+    mCurrentEditCmd->setHeight(mCurrentProperties.getHeight(), true);
+  }
+
+  // Avoid creating pads with a drill larger than width or height.
+  if (auto drill = getDrillDiameter()) {
+    if (*drill > height) {
+      setDrillDiameter(height);
+    }
+  }
+}
+
+void PackageEditorState_AddPads::setRadius(
+    const UnsignedLimitedRatio& radius) noexcept {
+  if (mCurrentProperties.setRadius(radius)) {
+    emit radiusChanged(mCurrentProperties.getRadius());
+  }
+
+  if (mCurrentEditCmd) {
+    mCurrentEditCmd->setRadius(mCurrentProperties.getRadius(), true);
+  }
+}
+
+void PackageEditorState_AddPads::setDrillDiameter(
+    const PositiveLength& diameter) noexcept {
+  if (std::shared_ptr<PadHole> hole = mCurrentProperties.getHoles().value(0)) {
+    if (hole->getDiameter() != diameter) {
+      hole->setDiameter(diameter);
+      emit drillDiameterChanged(diameter);
+    }
+
+    if (mCurrentEditCmd) {
+      mCurrentEditCmd->setHoles(mCurrentProperties.getHoles(), true);
+    }
+
+    // Avoid creating pads with a drill larger than width or height.
+    if (diameter > mCurrentProperties.getWidth()) {
+      setWidth(diameter);
+    }
+    if (diameter > mCurrentProperties.getHeight()) {
+      setHeight(diameter);
+    }
+  }
+}
+
+void PackageEditorState_AddPads::setCopperClearance(
+    const UnsignedLength& clearance) noexcept {
+  if (mCurrentProperties.setCopperClearance(clearance)) {
+    emit copperClearanceChanged(mCurrentProperties.getCopperClearance());
+  }
+
+  if (mCurrentEditCmd) {
+    mCurrentEditCmd->setCopperClearance(mCurrentProperties.getCopperClearance(),
+                                        true);
+  }
+}
+
+void PackageEditorState_AddPads::setStopMaskConfig(
+    const MaskConfig& cfg) noexcept {
+  if (mCurrentProperties.setStopMaskConfig(cfg)) {
+    emit stopMaskConfigChanged(mCurrentProperties.getStopMaskConfig());
+  }
+
+  if (mCurrentEditCmd) {
+    mCurrentEditCmd->setStopMaskConfig(mCurrentProperties.getStopMaskConfig(),
+                                       true);
+  }
+}
+
+void PackageEditorState_AddPads::setFunction(
+    FootprintPad::Function function) noexcept {
+  if (mCurrentProperties.setFunction(function)) {
+    emit functionChanged(mCurrentProperties.getFunction());
+  }
+
+  if (mCurrentEditCmd) {
+    mCurrentEditCmd->setFunction(mCurrentProperties.getFunction(), true);
   }
 }
 
@@ -426,48 +340,52 @@ bool PackageEditorState_AddPads::processRotate(const Angle& rotation) noexcept {
 bool PackageEditorState_AddPads::startAddPad(const Point& pos) noexcept {
   try {
     mContext.undoStack.beginCmdGroup(tr("Add footprint pad"));
-    mLastPad.setPosition(pos);
+    mCurrentProperties.setPosition(pos);
     mCurrentPad = std::make_shared<FootprintPad>(
-        Uuid::createRandom(), mLastPad.getPackagePadUuid(),
-        mLastPad.getPosition(), mLastPad.getRotation(), mLastPad.getShape(),
-        mLastPad.getWidth(), mLastPad.getHeight(), mLastPad.getRadius(),
-        mLastPad.getCustomShapeOutline(), mLastPad.getStopMaskConfig(),
-        mLastPad.getSolderPasteConfig(), mLastPad.getCopperClearance(),
-        mLastPad.getComponentSide(), mLastPad.getFunction(), PadHoleList{});
-    for (const PadHole& hole : mLastPad.getHoles()) {
+        Uuid::createRandom(), mCurrentProperties.getPackagePadUuid(),
+        mCurrentProperties.getPosition(), mCurrentProperties.getRotation(),
+        mCurrentProperties.getShape(), mCurrentProperties.getWidth(),
+        mCurrentProperties.getHeight(), mCurrentProperties.getRadius(),
+        mCurrentProperties.getCustomShapeOutline(),
+        mCurrentProperties.getStopMaskConfig(),
+        mCurrentProperties.getSolderPasteConfig(),
+        mCurrentProperties.getCopperClearance(),
+        mCurrentProperties.getComponentSide(), mCurrentProperties.getFunction(),
+        PadHoleList{});
+    for (const PadHole& hole : mCurrentProperties.getHoles()) {
       mCurrentPad->getHoles().append(std::make_shared<PadHole>(
           Uuid::createRandom(), hole.getDiameter(), hole.getPath()));
     }
     mContext.undoStack.appendToCmdGroup(new CmdFootprintPadInsert(
         mContext.currentFootprint->getPads(), mCurrentPad));
-    mEditCmd.reset(new CmdFootprintPadEdit(*mCurrentPad));
+    mCurrentEditCmd.reset(new CmdFootprintPadEdit(*mCurrentPad));
     mCurrentGraphicsItem =
         mContext.currentGraphicsItem->getGraphicsItem(mCurrentPad);
     Q_ASSERT(mCurrentGraphicsItem);
     mCurrentGraphicsItem->setSelected(true);
     return true;
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     mCurrentGraphicsItem.reset();
     mCurrentPad.reset();
-    mEditCmd.reset();
+    mCurrentEditCmd.reset();
     return false;
   }
 }
 
 bool PackageEditorState_AddPads::finishAddPad(const Point& pos) noexcept {
   try {
-    mEditCmd->setPosition(pos, true);
+    mCurrentEditCmd->setPosition(pos, true);
     mCurrentGraphicsItem->setSelected(false);
     mCurrentGraphicsItem.reset();
-    mLastPad = *mCurrentPad;
+    mCurrentProperties = *mCurrentPad;
     mCurrentPad.reset();
-    mContext.undoStack.appendToCmdGroup(mEditCmd.release());
+    mContext.undoStack.appendToCmdGroup(mCurrentEditCmd.release());
     mContext.undoStack.commitCmdGroup();
-    selectNextFreePadInComboBox();
+    selectNextFreePackagePad();
     return true;
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     return false;
   }
 }
@@ -476,19 +394,19 @@ bool PackageEditorState_AddPads::abortAddPad() noexcept {
   try {
     mCurrentGraphicsItem->setSelected(false);
     mCurrentGraphicsItem.reset();
-    mLastPad = *mCurrentPad;
+    mCurrentProperties = *mCurrentPad;
     mCurrentPad.reset();
-    mEditCmd.reset();
+    mCurrentEditCmd.reset();
     mContext.undoStack.abortCmdGroup();
     return true;
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     return false;
   }
 }
 
-void PackageEditorState_AddPads::selectNextFreePadInComboBox() noexcept {
-  if (mContext.currentFootprint && mPackagePadComboBox) {
+void PackageEditorState_AddPads::selectNextFreePackagePad() noexcept {
+  if (mContext.currentFootprint) {
     std::optional<Uuid> pad;
     for (const PackagePad& pkgPad : mContext.package.getPads()) {
       bool connected = false;
@@ -502,95 +420,15 @@ void PackageEditorState_AddPads::selectNextFreePadInComboBox() noexcept {
         break;
       }
     }
-    mPackagePadComboBox->setCurrentPad(pad);
-  }
-}
-
-void PackageEditorState_AddPads::packagePadComboBoxCurrentPadChanged(
-    std::optional<Uuid> pad) noexcept {
-  mLastPad.setPackagePadUuid(pad);
-  if (mEditCmd) {
-    mEditCmd->setPackagePadUuid(mLastPad.getPackagePadUuid(), true);
-  }
-}
-
-void PackageEditorState_AddPads::boardSideSelectorCurrentSideChanged(
-    FootprintPad::ComponentSide side) noexcept {
-  mLastPad.setComponentSide(side);
-  if (mEditCmd) {
-    mEditCmd->setComponentSide(side, true);
-  }
-}
-
-void PackageEditorState_AddPads::shapeSelectorCurrentShapeChanged(
-    FootprintPad::Shape shape, const UnsignedLimitedRatio& radius,
-    bool customRadius) noexcept {
-  mLastPad.setShape(shape);
-  if (mEditCmd) {
-    mEditCmd->setShape(shape, true);
-  }
-  requestRadius(radius);
-  requestRadiusInputEnabled(customRadius);
-  applyRecommendedRoundedRectRadius();
-}
-
-void PackageEditorState_AddPads::widthEditValueChanged(
-    const PositiveLength& value) noexcept {
-  mLastPad.setWidth(value);
-  if (mEditCmd) {
-    mEditCmd->setWidth(mLastPad.getWidth(), true);
-  }
-  applyRecommendedRoundedRectRadius();
-}
-
-void PackageEditorState_AddPads::heightEditValueChanged(
-    const PositiveLength& value) noexcept {
-  mLastPad.setHeight(value);
-  if (mEditCmd) {
-    mEditCmd->setHeight(mLastPad.getHeight(), true);
-  }
-  applyRecommendedRoundedRectRadius();
-}
-
-void PackageEditorState_AddPads::drillDiameterEditValueChanged(
-    const PositiveLength& value) noexcept {
-  if (std::shared_ptr<PadHole> hole = mLastPad.getHoles().value(0)) {
-    hole->setDiameter(value);
-    if (mEditCmd) {
-      mEditCmd->setHoles(mLastPad.getHoles(), true);
-    }
-  }
-}
-
-void PackageEditorState_AddPads::fiducialClearanceEditValueChanged(
-    const UnsignedLength& value) noexcept {
-  mLastPad.setStopMaskConfig(MaskConfig::manual(*value));
-  if (mEditCmd) {
-    mEditCmd->setStopMaskConfig(mLastPad.getStopMaskConfig(), true);
-  }
-}
-
-void PackageEditorState_AddPads::radiusEditValueChanged(
-    const UnsignedLimitedRatio& value) noexcept {
-  mLastPad.setRadius(value);
-  if (mEditCmd) {
-    mEditCmd->setRadius(mLastPad.getRadius(), true);
-  }
-}
-
-void PackageEditorState_AddPads::pressFitCheckedChanged(bool value) noexcept {
-  mLastPad.setFunction(value ? FootprintPad::Function::PressFitPad
-                             : FootprintPad::Function::StandardPad);
-  if (mEditCmd) {
-    mEditCmd->setFunction(mLastPad.getFunction(), true);
+    setPackagePad(pad);
   }
 }
 
 void PackageEditorState_AddPads::applyRecommendedRoundedRectRadius() noexcept {
-  if ((*mLastPad.getRadius() > Ratio::fromPercent(0)) &&
-      (*mLastPad.getRadius() < Ratio::fromPercent(100))) {
-    emit requestRadius(FootprintPad::getRecommendedRadius(
-        mLastPad.getWidth(), mLastPad.getHeight()));
+  if ((*mCurrentProperties.getRadius() > Ratio::fromPercent(0)) &&
+      (*mCurrentProperties.getRadius() < Ratio::fromPercent(100))) {
+    setRadius(FootprintPad::getRecommendedRadius(
+        mCurrentProperties.getWidth(), mCurrentProperties.getHeight()));
   }
 }
 

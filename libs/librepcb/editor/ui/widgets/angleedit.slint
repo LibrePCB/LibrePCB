@@ -12,7 +12,7 @@ export component AngleEdit inherits Rectangle {
     in-out property <int> value: data.value;
     in property <image> icon: @image-url("../../../../font-awesome/svgs/solid/compass-drafting.svg");
     in property <string> tooltip;
-    in property <string> min-width-text: "123.456";
+    in property <string> min-width-text: "123.456 °";
     in property <bool> enabled: true;
     property <AngleEditParseResult> parse-result;
     property <bool> disable-update: false;
@@ -22,6 +22,8 @@ export component AngleEdit inherits Rectangle {
         self.value = value;
     }
 
+    callback value-accepted(int);
+
     callback increase-triggered;
     callback decrease-triggered;
 
@@ -30,7 +32,7 @@ export component AngleEdit inherits Rectangle {
     }
 
     function update-text-from-value() {
-        edt.text = Backend.format-angle(root.value);
+        edt.text = Backend.format-angle(root.value) + "°";
         parse-result.valid = true;
     }
 
@@ -138,6 +140,7 @@ export component AngleEdit inherits Rectangle {
                 accepted => {
                     disable-update = false;
                     update-text-from-value();
+                    value-accepted(parse-result.evaluated-value);
                 }
 
                 key-pressed(event) => {
@@ -166,6 +169,7 @@ export component AngleEdit inherits Rectangle {
                 VerticalLayout {
                     up-btn := IconButton {
                         width: 15px;
+                        enabled: enabled;
                         background-color: black;
                         icon: @image-url("../../../../font-awesome/svgs/solid/caret-up.svg");
                         icon-offset-y: 1px;
@@ -179,6 +183,7 @@ export component AngleEdit inherits Rectangle {
 
                     down-btn := IconButton {
                         width: 15px;
+                        enabled: enabled;
                         background-color: black;
                         icon: @image-url("../../../../font-awesome/svgs/solid/caret-down.svg");
                         icon-offset-y: -1px;

@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../../undocommandgroup.h"
-#include "../pkg/fsm/packageeditorstate.h"
 
 #include <librepcb/core/types/angle.h>
 #include <librepcb/core/types/point.h>
@@ -43,6 +42,7 @@ class CmdHoleEdit;
 class CmdPolygonEdit;
 class CmdStrokeTextEdit;
 class CmdZoneEdit;
+class FootprintGraphicsItem;
 
 /*******************************************************************************
  *  Class CmdDragSelectedFootprintItems
@@ -57,8 +57,8 @@ public:
   CmdDragSelectedFootprintItems() = delete;
   CmdDragSelectedFootprintItems(const CmdDragSelectedFootprintItems& other) =
       delete;
-  explicit CmdDragSelectedFootprintItems(
-      const PackageEditorState::Context& context) noexcept;
+  explicit CmdDragSelectedFootprintItems(FootprintGraphicsItem& item,
+                                         const PositiveLength& grid) noexcept;
   ~CmdDragSelectedFootprintItems() noexcept;
 
   // Getters
@@ -67,7 +67,7 @@ public:
   const QList<Point>& getPositions() const noexcept { return mPositions; }
 
   // General Methods
-  void snapToGrid() noexcept;
+  void snapToGrid(const PositiveLength& grid) noexcept;
   void setDeltaToStartPos(const Point& delta) noexcept;
   void setNewPositions(QList<Point> positions);
   void translate(const Point& deltaPos) noexcept;
@@ -88,7 +88,6 @@ private:
   void deleteAllCommands() noexcept;
 
   // Private Member Variables
-  const PackageEditorState::Context& mContext;
   QList<Point> mPositions;
   Point mCenterPos;
   Point mDeltaPos;

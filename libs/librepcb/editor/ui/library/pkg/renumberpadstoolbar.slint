@@ -1,0 +1,36 @@
+import { Button } from "../../widgets.slint";
+import {
+    Backend,
+    PackageTabData,
+    TabAction,
+    WindowSectionData,
+} from "../../api.slint";
+
+export component ReNumberPadsToolBar inherits HorizontalLayout {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    property <[PackageTabData]> tabs: section.package-tabs;
+
+    spacing: 4px;
+
+    accept-btn := Button {
+        primary: true;
+        icon: @image-url("../../../../../font-awesome/svgs/solid/check.svg");
+        text: @tr("Accept");
+        border-radius: 10px;
+
+        clicked => {
+            Backend.trigger-tab(section-index, section.current-tab-index, TabAction.accept);
+        }
+    }
+
+    cancel-btn := Button {
+        icon: @image-url("../../../../../font-awesome/svgs/solid/xmark.svg");
+        text: @tr("Cancel");
+        border-radius: 10px;
+
+        clicked => {
+            Backend.trigger-tab(section-index, section.current-tab-index, TabAction.abort);
+        }
+    }
+}

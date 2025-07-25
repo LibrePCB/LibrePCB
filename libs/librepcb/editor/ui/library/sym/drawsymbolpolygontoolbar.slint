@@ -54,7 +54,7 @@ export component DrawSymbolPolygonToolBar inherits HorizontalLayout {
     if show-angle-edt: angle-edt := AngleEdit {
         data: tabs[section.current-tab-index].tool-angle;
         tooltip: @tr("Arc Angle");
-        min-width-text: "123.4";
+        min-width-text: "123.4 °";
 
         value-changed(v) => {
             tabs[section.current-tab-index].tool-angle.value = v;

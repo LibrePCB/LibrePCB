@@ -22,8 +22,10 @@
  ******************************************************************************/
 #include "packagepadlistmodel.h"
 
+#include "../../undocommand.h"
 #include "../../undocommandgroup.h"
 #include "../../undostack.h"
+#include "../../utils/slinthelpers.h"
 #include "../cmd/cmdpackagepadedit.h"
 
 #include <librepcb/core/utils/toolbox.h>
@@ -42,255 +44,201 @@ namespace editor {
  ******************************************************************************/
 
 PackagePadListModel::PackagePadListModel(QObject* parent) noexcept
-  : QAbstractTableModel(parent),
-    mPadList(nullptr),
+  : QObject(parent),
+    mList(nullptr),
     mUndoStack(nullptr),
-    mNewName(),
-    mOnEditedSlot(*this, &PackagePadListModel::padListEdited) {
+    mOnEditedSlot(*this, &PackagePadListModel::listEdited) {
 }
 
 PackagePadListModel::~PackagePadListModel() noexcept {
 }
 
 /*******************************************************************************
- *  Setters
+ *  General Methods
  ******************************************************************************/
 
-void PackagePadListModel::setPadList(PackagePadList* list) noexcept {
-  emit beginResetModel();
-
-  if (mPadList) {
-    mPadList->onEdited.detach(mOnEditedSlot);
-  }
-
-  mPadList = list;
-
-  if (mPadList) {
-    mPadList->onEdited.attach(mOnEditedSlot);
-  }
-
-  emit endResetModel();
-}
-
-void PackagePadListModel::setUndoStack(UndoStack* stack) noexcept {
+void PackagePadListModel::setReferences(PackagePadList* list,
+                                        UndoStack* stack) noexcept {
   mUndoStack = stack;
+
+  if (list == mList) return;
+
+  if (mList) {
+    mList->onEdited.detach(mOnEditedSlot);
+  }
+
+  mList = list;
+  mItems.clear();
+
+  if (mList) {
+    mList->onEdited.attach(mOnEditedSlot);
+
+    for (auto obj : *mList) {
+      mItems.append(createItem(obj, mItems.count()));
+    }
+    updateSortOrder(false);
+  }
+
+  notify_reset();
 }
 
-/*******************************************************************************
- *  Slots
- ******************************************************************************/
-
-void PackagePadListModel::add(const QPersistentModelIndex& itemIndex) noexcept {
-  Q_UNUSED(itemIndex);
-  if (!mPadList) {
-    return;
-  }
+bool PackagePadListModel::add(QString names) noexcept {
+  if (!mList) return false;
 
   try {
-    std::unique_ptr<UndoCommandGroup> cmd(
-        new UndoCommandGroup(tr("Add package pad(s)")));
-    // if no name is set we search for the next free numerical pad name
-    if (mNewName.isEmpty()) {
-      mNewName = getNextPadNameProposal();
+    // If no name is set we search for the next free numerical pad name.
+    if (names.isEmpty()) {
+      names = getNextPadNameProposal();
     }
-    foreach (const QString& name, Toolbox::expandRangesInString(mNewName)) {
-      std::shared_ptr<PackagePad> pad = std::make_shared<PackagePad>(
-          Uuid::createRandom(), validateNameOrThrow(name));
-      cmd->appendChild(new CmdPackagePadInsert(*mPadList, pad));
+
+    std::unique_ptr<UndoCommandGroup> cmd(
+        new UndoCommandGroup(tr("Add Package Pad(s)")));
+    foreach (const QString& nameStr, Toolbox::expandRangesInString(names)) {
+      std::shared_ptr<PackagePad> obj = std::make_shared<PackagePad>(
+          Uuid::createRandom(),
+          validateNameOrThrow(cleanCircuitIdentifier(nameStr)));
+      cmd->appendChild(new CmdPackagePadInsert(*mList, obj));
     }
     execCmd(cmd.release());
-    mNewName = QString();
+    return true;
   } catch (const Exception& e) {
-    QMessageBox::critical(0, tr("Error"), e.getMsg());
+    QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
+    return false;
   }
 }
 
-void PackagePadListModel::remove(
-    const QPersistentModelIndex& itemIndex) noexcept {
-  if (!mPadList) {
+void PackagePadListModel::apply() {
+  if ((!mList) || (mList->count() != mItems.count())) {
     return;
   }
 
-  try {
-    Uuid uuid = Uuid::fromString(itemIndex.data(Qt::EditRole).toString());
-    std::shared_ptr<PackagePad> pad = mPadList->get(uuid);
-    execCmd(new CmdPackagePadRemove(*mPadList, pad.get()));
-  } catch (const Exception& e) {
-    QMessageBox::critical(0, tr("Error"), e.getMsg());
+  for (int i = 0; i < mList->count(); ++i) {
+    auto& item = mItems[i];
+    if (auto obj = mList->value(i)) {
+      const QString nameStr = s2q(item.name);
+      if ((nameStr != obj->getName()) && (item.name_error.empty())) {
+        std::unique_ptr<CmdPackagePadEdit> cmd(new CmdPackagePadEdit(*obj));
+        cmd->setName(validateNameOrThrow(cleanCircuitIdentifier(nameStr)));
+        execCmd(cmd.release());
+      } else {
+        item.name = q2s(*obj->getName());
+        item.name_error = slint::SharedString();
+        notify_row_changed(i);
+      }
+    }
   }
 }
 
 /*******************************************************************************
- *  Inherited from QAbstractItemModel
+ *  Implementations
  ******************************************************************************/
 
-int PackagePadListModel::rowCount(const QModelIndex& parent) const {
-  if (!parent.isValid() && mPadList) {
-    return mPadList->count() + 1;
-  }
-  return 0;
+std::size_t PackagePadListModel::row_count() const {
+  return mItems.count();
 }
 
-int PackagePadListModel::columnCount(const QModelIndex& parent) const {
-  if (!parent.isValid()) {
-    return _COLUMN_COUNT;
-  }
-  return 0;
+std::optional<ui::PackagePadData> PackagePadListModel::row_data(
+    std::size_t i) const {
+  return (i < static_cast<std::size_t>(mItems.count()))
+      ? std::make_optional(mItems.at(i))
+      : std::nullopt;
 }
 
-QVariant PackagePadListModel::data(const QModelIndex& index, int role) const {
-  if (!index.isValid() || !mPadList) {
-    return QVariant();
+void PackagePadListModel::set_row_data(
+    std::size_t i, const ui::PackagePadData& data) noexcept {
+  if ((!mList) || (i >= static_cast<std::size_t>(mItems.count()))) {
+    return;
   }
 
-  std::shared_ptr<PackagePad> item = mPadList->value(index.row());
-  switch (index.column()) {
-    case COLUMN_NAME: {
-      QString name = item ? *item->getName() : mNewName;
-      bool showHint = (!item) && mNewName.isEmpty();
-      QString hint =
-          tr("Pad name (may contain ranges like \"%1\")").arg("1..5");
-      switch (role) {
-        case Qt::DisplayRole:
-          return showHint ? hint : name;
-        case Qt::ToolTipRole:
-          return showHint ? hint : QVariant();
-        case Qt::EditRole:
-          return name;
-        case Qt::ForegroundRole:
-          if (showHint) {
-            QColor color = qApp->palette().text().color();
-            color.setAlpha(128);
-            return QBrush(color);
-          } else {
-            return QVariant();
-          }
-        default:
-          return QVariant();
-      }
-    }
-    case COLUMN_ACTIONS: {
-      switch (role) {
-        case Qt::EditRole:
-          return item ? item->getUuid().toStr() : QVariant();
-        default:
-          return QVariant();
-      }
-    }
-    default:
-      return QVariant();
-  }
-
-  return QVariant();
-}
-
-QVariant PackagePadListModel::headerData(int section,
-                                         Qt::Orientation orientation,
-                                         int role) const {
-  if (orientation == Qt::Horizontal) {
-    if (role == Qt::DisplayRole) {
-      switch (section) {
-        case COLUMN_NAME:
-          return tr("Package Pads");
-        default:
-          return QVariant();
-      }
-    } else if ((role == Qt::TextAlignmentRole) && (section == COLUMN_NAME)) {
-      return QVariant(Qt::AlignLeft | Qt::AlignVCenter);
-    } else if (role == Qt::FontRole) {
-      QFont f = QAbstractItemModel::headerData(section, orientation, role)
-                    .value<QFont>();
-      f.setBold(section == COLUMN_NAME);
-      return f;
-    }
-  } else if (orientation == Qt::Vertical) {
-    if (mPadList && (role == Qt::DisplayRole)) {
-      std::shared_ptr<PackagePad> item = mPadList->value(section);
-      return item ? QString::number(section + 1) : tr("New:");
-    } else if (mPadList && (role == Qt::ToolTipRole)) {
-      std::shared_ptr<PackagePad> item = mPadList->value(section);
-      return item ? item->getUuid().toStr() : tr("Add a new pad");
-    } else if (role == Qt::TextAlignmentRole) {
-      return QVariant(Qt::AlignRight | Qt::AlignVCenter);
-    }
-  }
-  return QVariant();
-}
-
-Qt::ItemFlags PackagePadListModel::flags(const QModelIndex& index) const {
-  Qt::ItemFlags f = QAbstractTableModel::flags(index);
-  if (index.isValid()) {
-    f |= Qt::ItemIsEditable;
-  }
-  return f;
-}
-
-bool PackagePadListModel::setData(const QModelIndex& index,
-                                  const QVariant& value, int role) {
-  if (!mPadList) {
-    return false;
-  }
-
-  try {
-    std::shared_ptr<PackagePad> item = mPadList->value(index.row());
-    std::unique_ptr<CmdPackagePadEdit> cmd;
-    if (item) {
-      cmd.reset(new CmdPackagePadEdit(*item));
-    }
-    if ((index.column() == COLUMN_NAME) && role == Qt::EditRole) {
-      QString name = value.toString().trimmed();
-      QString cleanedName = cleanCircuitIdentifier(name);
-      if (cmd) {
-        if (cleanedName != item->getName()) {
-          cmd->setName(validateNameOrThrow(cleanedName));
-        }
-      } else {
-        QStringList names = Toolbox::expandRangesInString(name);
-        if (names.count() == 1 && (names.first() == name)) {
-          mNewName = cleanedName;  // no ranges -> clean name
-        } else {
-          mNewName = name;  // contains ranges -> keep them!
-        }
-      }
+  if (auto obj = mList->value(i)) {
+    if (data.delete_) {
+      // if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0): Remove lambda.
+      QMetaObject::invokeMethod(
+          this,
+          [this, i, obj]() {
+            try {
+              if (mList && (mList->value(i) == obj)) {
+                execCmd(new CmdPackagePadRemove(*mList, obj.get()));
+              }
+            } catch (const Exception& e) {
+              qCritical() << e.getMsg();
+            }
+          },
+          Qt::QueuedConnection);
     } else {
-      return false;  // do not execute command!
+      mItems[i] = data;
+      const QString name = s2q(data.name);
+      const bool duplicate = (name != obj->getName()) && mList->find(name);
+      validateCircuitIdentifier(name, mItems[i].name_error, duplicate);
+      notify_row_changed(i);
     }
-    if (cmd) {
-      execCmd(cmd.release());
-    } else if (!item) {
-      emit dataChanged(index, index);
-    }
-    return true;
-  } catch (const Exception& e) {
-    QMessageBox::critical(0, tr("Error"), e.getMsg());
   }
-  return false;
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
-void PackagePadListModel::padListEdited(
+ui::PackagePadData PackagePadListModel::createItem(const PackagePad& obj,
+                                                   int sortIndex) noexcept {
+  return ui::PackagePadData{
+      q2s(obj.getUuid().toStr().left(8)),  // ID
+      q2s(*obj.getName()),  // Name
+      slint::SharedString(),  // Name error
+      false,  // Delete
+      sortIndex,  // Sort index
+  };
+}
+
+void PackagePadListModel::updateSortOrder(bool notify) noexcept {
+  // Note: The sorting needs to be done only when the underlying list data
+  // was modfied, not when the UI data is changed, since this would lead to
+  // reordering while the user is typing, causing focus issues etc.
+
+  if (!mList) return;
+
+  auto sorted = mList->values();
+  Toolbox::sortNumeric(
+      sorted,
+      [](const QCollator& collator, const std::shared_ptr<PackagePad>& lhs,
+         const std::shared_ptr<PackagePad>& rhs) {
+        return collator(*lhs->getName(), *rhs->getName());
+      });
+  for (int i = 0; i < mList->count(); ++i) {
+    const int sortIndex = sorted.indexOf(mList->value(i));
+    if (sortIndex != mItems[i].sort_index) {
+      mItems[i].sort_index = sortIndex;
+      if (notify) {
+        notify_row_changed(i);
+      }
+    }
+  }
+}
+
+void PackagePadListModel::listEdited(
     const PackagePadList& list, int index,
-    const std::shared_ptr<const PackagePad>& pad,
+    const std::shared_ptr<const PackagePad>& item,
     PackagePadList::Event event) noexcept {
   Q_UNUSED(list);
-  Q_UNUSED(pad);
+
   switch (event) {
     case PackagePadList::Event::ElementAdded:
-      beginInsertRows(QModelIndex(), index, index);
-      endInsertRows();
+      mItems.insert(index, createItem(*item, index));
+      notify_row_added(index, 1);
+      updateSortOrder(true);
       break;
     case PackagePadList::Event::ElementRemoved:
-      beginRemoveRows(QModelIndex(), index, index);
-      endRemoveRows();
+      mItems.remove(index);
+      notify_row_removed(index, 1);
       break;
     case PackagePadList::Event::ElementEdited:
-      dataChanged(this->index(index, 0), this->index(index, _COLUMN_COUNT - 1));
+      mItems[index] = createItem(*item, index);
+      notify_row_changed(index);
+      updateSortOrder(true);
       break;
     default:
-      qWarning() << "Unhandled switch-case in PackagePadList::padListEdited():"
+      qWarning() << "Unhandled switch-case in "
+                    "PackagePadListModel::listEdited():"
                  << static_cast<int>(event);
       break;
   }
@@ -300,14 +248,14 @@ void PackagePadListModel::execCmd(UndoCommand* cmd) {
   if (mUndoStack) {
     mUndoStack->execCmd(cmd);
   } else {
-    QScopedPointer<UndoCommand> cmdGuard(cmd);
+    std::unique_ptr<UndoCommand> cmdGuard(cmd);
     cmdGuard->execute();
   }
 }
 
 CircuitIdentifier PackagePadListModel::validateNameOrThrow(
     const QString& name) const {
-  if (mPadList && mPadList->contains(name)) {
+  if (mList && mList->contains(name)) {
     throw RuntimeError(
         __FILE__, __LINE__,
         tr("There is already a pad with the name \"%1\".").arg(name));
@@ -317,7 +265,7 @@ CircuitIdentifier PackagePadListModel::validateNameOrThrow(
 
 QString PackagePadListModel::getNextPadNameProposal() const noexcept {
   int i = 1;
-  while (mPadList->contains(QString::number(i))) {
+  while (mList && mList->contains(QString::number(i))) {
     ++i;
   }
   return QString::number(i);
