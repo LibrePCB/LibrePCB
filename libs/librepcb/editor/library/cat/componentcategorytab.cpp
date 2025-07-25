@@ -352,12 +352,18 @@ void ComponentCategoryTab::commitUiData() noexcept {
     std::unique_ptr<CmdLibraryCategoryEdit> cmd(
         new CmdLibraryCategoryEdit(*mCategory));
     cmd->setName(QString(), mNameParsed);
-    cmd->setDescription(QString(), s2q(mDescription).trimmed());
+    const QString description = s2q(mDescription);
+    if (description != mCategory->getDescriptions().getDefaultValue()) {
+      cmd->setDescription(QString(), description.trimmed());
+    }
     const QString keywords = s2q(mKeywords);
     if (keywords != mCategory->getKeywords().getDefaultValue()) {
       cmd->setKeywords(QString(), EditorToolbox::cleanKeywords(keywords));
     }
-    cmd->setAuthor(s2q(mAuthor).trimmed());
+    const QString author = s2q(mAuthor);
+    if (author != mCategory->getAuthor()) {
+      cmd->setAuthor(author.trimmed());
+    }
     cmd->setVersion(mVersionParsed);
     cmd->setDeprecated(mDeprecated);
     cmd->setParentUuid(mParent);

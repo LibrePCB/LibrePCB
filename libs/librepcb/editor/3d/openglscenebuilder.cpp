@@ -280,8 +280,7 @@ void OpenGlSceneBuilder::run(std::shared_ptr<SceneData3D> data) noexcept {
     if (std::shared_ptr<FileSystem> fs = data->getFileSystem()) {
       for (const auto& obj : data->getDevices()) {
         const QByteArray content = fs->readIfExists(obj.stepFile);
-        publishDevice(obj, content, d + 0.067, scaleFactor,
-                      data->getStepAlphaValue());
+        publishDevice(obj, content, d + 0.067, scaleFactor);
         deviceUuids.insert(obj.uuid);
         if (mAbort) return;
       }
@@ -423,7 +422,7 @@ void OpenGlSceneBuilder::publishTriangleData(
 
 void OpenGlSceneBuilder::publishDevice(const SceneData3D::DeviceData& obj,
                                        const QByteArray& stepContent, qreal z,
-                                       qreal scaleFactor, qreal alpha) {
+                                       qreal scaleFactor) {
   StepModel model;
   if (mStepModels.contains(stepContent)) {
     model = mStepModels.value(stepContent);
@@ -471,9 +470,6 @@ void OpenGlSceneBuilder::publishDevice(const SceneData3D::DeviceData& obj,
     std::shared_ptr<OpenGlTriangleObject> obj = items.value(it.key());
     QColor color = QColor::fromRgbF(
         std::get<0>(it.key()), std::get<1>(it.key()), std::get<2>(it.key()));
-    if (alpha != 1) {
-      color.setAlphaF(alpha);
-    }
     if (obj) {
       obj->setData(color, vertices);
       emit objectUpdated(obj);

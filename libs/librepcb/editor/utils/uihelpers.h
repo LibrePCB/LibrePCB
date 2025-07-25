@@ -25,10 +25,12 @@
  ******************************************************************************/
 #include "appwindow.h"
 
+#include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/rulecheck/rulecheckmessage.h>
 #include <librepcb/core/types/alignment.h>
 #include <librepcb/core/types/length.h>
 #include <librepcb/core/types/lengthunit.h>
+#include <librepcb/core/types/ratio.h>
 #include <librepcb/core/workspace/theme.h>
 
 #include <optional>
@@ -51,6 +53,7 @@ class EditorCommand;
 static_assert(sizeof(ui::Int64) == 8);
 static_assert(sizeof(LengthBase_t) == 8);
 static_assert(sizeof(Angle) == sizeof(int));
+static_assert(sizeof(Ratio) == sizeof(int));
 
 qint64 s2l(const ui::Int64& v) noexcept;
 
@@ -61,6 +64,9 @@ std::optional<PositiveLength> s2plength(const ui::Int64& v) noexcept;
 
 int l2s(const Angle& v) noexcept;
 Angle s2angle(int v) noexcept;
+
+int l2s(const Ratio& v) noexcept;
+Ratio s2ratio(int v) noexcept;
 
 ui::GridStyle l2s(Theme::GridStyle v) noexcept;
 Theme::GridStyle s2l(ui::GridStyle v) noexcept;
@@ -75,6 +81,9 @@ slint::cbindgen_private::TextVerticalAlignment l2s(const VAlign& v) noexcept;
 VAlign s2l(slint::cbindgen_private::TextVerticalAlignment v) noexcept;
 
 ui::NotificationType l2s(RuleCheckMessage::Severity v) noexcept;
+
+int l2s(Package::AssemblyType v) noexcept;
+std::optional<Package::AssemblyType> s2assemblyType(int v) noexcept;
 
 ui::EditorCommand l2s(const EditorCommand& cmd, ui::EditorCommand in) noexcept;
 

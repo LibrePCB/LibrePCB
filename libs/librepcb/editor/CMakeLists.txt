@@ -50,9 +50,6 @@ add_library(
   dialogs/graphicsexportdialog.cpp
   dialogs/graphicsexportdialog.h
   dialogs/graphicsexportdialog.ui
-  dialogs/gridsettingsdialog.cpp
-  dialogs/gridsettingsdialog.h
-  dialogs/gridsettingsdialog.ui
   dialogs/holepropertiesdialog.cpp
   dialogs/holepropertiesdialog.h
   dialogs/holepropertiesdialog.ui
@@ -318,17 +315,10 @@ add_library(
   library/newelementwizard/newelementwizardpage_entermetadata.cpp
   library/newelementwizard/newelementwizardpage_entermetadata.h
   library/newelementwizard/newelementwizardpage_entermetadata.ui
-  library/newelementwizard/newelementwizardpage_packagepads.cpp
-  library/newelementwizard/newelementwizardpage_packagepads.h
-  library/newelementwizard/newelementwizardpage_packagepads.ui
-  library/pkg/boardsideselectorwidget.cpp
-  library/pkg/boardsideselectorwidget.h
   library/pkg/footprintclipboarddata.cpp
   library/pkg/footprintclipboarddata.h
   library/pkg/footprintgraphicsitem.cpp
   library/pkg/footprintgraphicsitem.h
-  library/pkg/footprintlisteditorwidget.cpp
-  library/pkg/footprintlisteditorwidget.h
   library/pkg/footprintlistmodel.cpp
   library/pkg/footprintlistmodel.h
   library/pkg/footprintpadgraphicsitem.cpp
@@ -376,19 +366,12 @@ add_library(
   library/pkg/packagechooserdialog.cpp
   library/pkg/packagechooserdialog.h
   library/pkg/packagechooserdialog.ui
-  library/pkg/packageeditorwidget.cpp
-  library/pkg/packageeditorwidget.h
-  library/pkg/packageeditorwidget.ui
-  library/pkg/packagemodellisteditorwidget.cpp
-  library/pkg/packagemodellisteditorwidget.h
   library/pkg/packagemodellistmodel.cpp
   library/pkg/packagemodellistmodel.h
-  library/pkg/packagepadcombobox.cpp
-  library/pkg/packagepadcombobox.h
-  library/pkg/packagepadlisteditorwidget.cpp
-  library/pkg/packagepadlisteditorwidget.h
   library/pkg/packagepadlistmodel.cpp
   library/pkg/packagepadlistmodel.h
+  library/pkg/packagetab.cpp
+  library/pkg/packagetab.h
   library/sym/fsm/symboleditorfsm.cpp
   library/sym/fsm/symboleditorfsm.h
   library/sym/fsm/symboleditorfsmadapter.h
@@ -866,8 +849,6 @@ add_library(
   utils/editortoolbox.h
   utils/exclusiveactiongroup.cpp
   utils/exclusiveactiongroup.h
-  utils/halignactiongroup.cpp
-  utils/halignactiongroup.h
   utils/lengtheditcontext.cpp
   utils/lengtheditcontext.h
   utils/measuretool.cpp
@@ -891,8 +872,6 @@ add_library(
   utils/uiobjectlist.h
   utils/undostackactiongroup.cpp
   utils/undostackactiongroup.h
-  utils/valignactiongroup.cpp
-  utils/valignactiongroup.h
   widgets/alignmentselector.cpp
   widgets/alignmentselector.h
   widgets/alignmentselector.ui

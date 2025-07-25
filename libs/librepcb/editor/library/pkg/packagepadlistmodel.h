@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "appwindow.h"
+
 #include <librepcb/core/library/pkg/packagepad.h>
 
 #include <QtCore>
@@ -43,52 +45,46 @@ class UndoStack;
 /**
  * @brief The PackagePadListModel class
  */
-class PackagePadListModel final : public QAbstractTableModel {
+class PackagePadListModel final : public QObject,
+                                  public slint::Model<ui::PackagePadData> {
   Q_OBJECT
 
 public:
-  enum Column { COLUMN_NAME, COLUMN_ACTIONS, _COLUMN_COUNT };
-
   // Constructors / Destructor
-  PackagePadListModel() = delete;
+  // PackagePadListModel() = delete;
   PackagePadListModel(const PackagePadListModel& other) = delete;
   explicit PackagePadListModel(QObject* parent = nullptr) noexcept;
   ~PackagePadListModel() noexcept;
 
-  // Setters
-  void setPadList(PackagePadList* list) noexcept;
-  void setUndoStack(UndoStack* stack) noexcept;
+  // General Methods
+  void setReferences(PackagePadList* list, UndoStack* stack) noexcept;
+  bool add(QString names) noexcept;
+  void apply();
 
-  // Slots
-  void add(const QPersistentModelIndex& itemIndex) noexcept;
-  void remove(const QPersistentModelIndex& itemIndex) noexcept;
-
-  // Inherited from QAbstractItemModel
-  int rowCount(const QModelIndex& parent = QModelIndex()) const override;
-  int columnCount(const QModelIndex& parent = QModelIndex()) const override;
-  QVariant data(const QModelIndex& index,
-                int role = Qt::DisplayRole) const override;
-  QVariant headerData(int section, Qt::Orientation orientation,
-                      int role = Qt::DisplayRole) const override;
-  Qt::ItemFlags flags(const QModelIndex& index) const override;
-  bool setData(const QModelIndex& index, const QVariant& value,
-               int role = Qt::EditRole) override;
+  // Implementations
+  std::size_t row_count() const override;
+  std::optional<ui::PackagePadData> row_data(std::size_t i) const override;
+  void set_row_data(std::size_t i,
+                    const ui::PackagePadData& data) noexcept override;
 
   // Operator Overloadings
-  PackagePadListModel& operator=(const PackagePadListModel& rhs) noexcept;
+  PackagePadListModel& operator=(const PackagePadListModel& rhs) = delete;
 
 private:
-  void padListEdited(const PackagePadList& list, int index,
-                     const std::shared_ptr<const PackagePad>& pad,
-                     PackagePadList::Event event) noexcept;
+  ui::PackagePadData createItem(const PackagePad& obj, int sortIndex) noexcept;
+  void updateSortOrder(bool notify) noexcept;
+  void listEdited(const PackagePadList& list, int index,
+                  const std::shared_ptr<const PackagePad>& item,
+                  PackagePadList::Event event) noexcept;
   void execCmd(UndoCommand* cmd);
   CircuitIdentifier validateNameOrThrow(const QString& name) const;
   QString getNextPadNameProposal() const noexcept;
 
-private:  // Data
-  PackagePadList* mPadList;
-  UndoStack* mUndoStack;
-  QString mNewName;
+private:
+  PackagePadList* mList;
+  QPointer<UndoStack> mUndoStack;
+
+  QList<ui::PackagePadData> mItems;
 
   // Slots
   PackagePadList::OnEditedSlot mOnEditedSlot;

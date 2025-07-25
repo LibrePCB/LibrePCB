@@ -1,0 +1,1140 @@
+import { AddFootprintHoleToolBar } from "addfootprintholetoolbar.slint";
+import { AddFootprintPadToolBar } from "addfootprintpadtoolbar.slint";
+import { AddFootprintStrokeTextToolBar } from "addfootprintstroketexttoolbar.slint";
+import { DrawFootprintPolygonToolBar } from "drawfootprintpolygontoolbar.slint";
+import { DrawFootprintZoneToolBar } from "drawfootprintzonetoolbar.slint";
+import { ReNumberPadsToolBar } from "renumberpadstoolbar.slint";
+import { PackagePadListView } from "packagepadlistview.slint";
+import { PackageEditorTransformPanel } from "packageeditortransformpanel.slint";
+import {
+    PackageEditorFootprintsPanel,
+    PackageEditorModelsPanel,
+} from "packageeditorlistpanels.slint";
+import { Tab } from "../../tab.slint";
+import {
+    AssemblyTypeRowHeader,
+    AuthorRowHeader,
+    CategoriesRowCell,
+    CategoriesRowHeader,
+    DeprecatedRowCell,
+    DeprecatedRowHeader,
+    DescriptionRowHeader,
+    KeywordsRowHeader,
+    MetadataFooterRowCell,
+    NameRowHeader,
+    VersionRowHeader,
+} from "../metadatawidgets.slint";
+import {
+    BreakingChangesMessageBanner,
+    CheckErrorsMessageBanner,
+} from "../messagebanners.slint";
+import {
+    Button,
+    ComboBox,
+    IconButton,
+    LineEdit,
+    MenuItem,
+    MenuPopup,
+    Palette,
+    SceneButton,
+    SlideView,
+    SliderSceneButton,
+    Spinner,
+    TextEdit,
+    ToolButton,
+    TreeItemPickerPopup,
+} from "../../widgets.slint";
+import {
+    Backend,
+    Constants,
+    Data,
+    EditorCommandSet as Cmd,
+    EditorTool,
+    FeatureState,
+    PackageTabData,
+    TabAction,
+    WindowSectionData,
+} from "../../api.slint";
+
+component PackageMetadataTab inherits GridLayout {
+    in property <int> section-index;
+    in-out property <[PackageTabData]> tabs;
+    in property <int> index;
+    in property <bool> read-only;
+
+    padding: 8px;
+    spacing: 8px;
+
+    Row {
+        name-txt := NameRowHeader { }
+
+        name-edt := LineEdit {
+            text: tabs[index].name;
+            validation-error: tabs[index].name-error;
+            read-only: read-only;
+            accessible-label: name-txt.text;
+
+            init => {
+                if (!read-only) && tabs[index].wizard-mode {
+                    self.select-all();
+                }
+            }
+
+            text-edited(text) => {
+                tabs[index].name = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].name = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        description-txt := DescriptionRowHeader { }
+
+        description-edt := TextEdit {
+            height: 100px;
+            text: tabs[index].description;
+            read-only: read-only;
+            accessible-label: description-txt.text;
+
+            text-edited(text) => {
+                tabs[index].description = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].description = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        keywords-txt := KeywordsRowHeader { }
+
+        keywords-edt := LineEdit {
+            text: tabs[index].keywords;
+            read-only: read-only;
+            accessible-label: keywords-txt.text;
+
+            text-edited(text) => {
+                tabs[index].keywords = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].keywords = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        author-txt := AuthorRowHeader { }
+
+        author-edt := LineEdit {
+            text: tabs[index].author;
+            read-only: read-only;
+            accessible-label: author-txt.text;
+
+            text-edited(text) => {
+                tabs[index].author = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].author = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        version-txt := VersionRowHeader { }
+
+        version-edt := LineEdit {
+            text: tabs[index].version;
+            validation-error: tabs[index].version-error;
+            read-only: read-only;
+            accessible-label: version-txt.text;
+
+            text-edited(text) => {
+                tabs[index].version = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].version = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        deprecated-txt := DeprecatedRowHeader { }
+
+        deprecated-sw := DeprecatedRowCell {
+            checked: tabs[index].deprecated;
+            enabled: !read-only;
+            accessible-label: deprecated-txt.text;
+
+            toggled(checked) => {
+                tabs[index].deprecated = checked;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        categories-txt := CategoriesRowHeader { }
+
+        categories-cell := CategoriesRowCell {
+            model: tabs[index].categories;
+            read-only: read-only;
+            accessible-label: categories-txt.text;
+
+            add-triggered => {
+                add-category-popup.show();
+            }
+        }
+    }
+
+    Row {
+        assembly-type-txt := AssemblyTypeRowHeader { }
+
+        assembly-type-cbx := ComboBox {
+            model: Constants.package-assembly-types;
+            current-index: tabs[index].assembly-type;
+            enabled: !read-only;
+            accessible-label: assembly-type-txt.text;
+
+            current-index-changed(idx) => {
+                tabs[index].assembly-type = idx;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        Rectangle { }
+
+        footer-cell := MetadataFooterRowCell {
+            section-index: section-index;
+            tab-index: index;
+            wizard-mode: tabs[index].wizard-mode;
+            unsaved-changes: Data.sections[section-index].tabs[index].unsaved-changes;
+            checks: tabs[index].checks;
+            read-only: read-only;
+        }
+    }
+
+    Row {
+        Rectangle { }
+    }
+
+    // Open the category chooser when requested by the backend.
+    property <string> new-category: tabs[index].new-category;
+    changed new-category => {
+        if new-category == "choose" {
+            add-category-popup.show();
+        }
+    }
+
+    add-category-popup := TreeItemPickerPopup {
+        width: parent.width;
+        height: parent.height;
+        model: tabs[index].categories-tree;
+        icons-color: Palette.foreground;
+
+        item-picked(idx, item) => {
+            tabs[index].new-category = item.user-data;
+        }
+    }
+}
+
+component PackagePadsEditorTab inherits VerticalLayout {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    in-out property <[PackageTabData]> tabs;
+    in property <int> index;
+    in property <bool> read-only;
+
+    alignment: start;
+    padding-left: 8px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    spacing: 10px;
+
+    if !read-only: Rectangle {
+        width: parent.width - 2 * parent.padding-left;
+        height: self.preferred-height + 16px;
+        background: #454545;
+        border-radius: 10px;
+
+        Text {
+            property <string> s1: @tr("Add all (potentially solderable) package pads which are electrically independent, no matter if they actually have an electrical function in a particular part.");
+            property <string> s2: @tr("For example, a thermal pad should be listed here, even though it may not have an electrical function.");
+            property <string> s3: @tr("Once the package is finished, it is *not* possible anymore to add or remove pads.");
+
+            width: parent.width - 16px;
+            font-size: 11px;
+            wrap: word-wrap;
+            text: @tr("Important:") + " " + s1 + " " + s2 + " " + s3;
+        }
+    }
+
+    if !read-only: HorizontalLayout {
+        padding-right: 8px;
+        spacing: 5px;
+
+        new-pad-txt := Text {
+            vertical-alignment: center;
+            text: @tr("Add Pads:");
+            accessible-role: none;
+        }
+
+        new-pad-edt := LineEdit {
+            placeholder-text: @tr("Pad name (may contain ranges like \"1..5\")");
+            text: tabs[index].new-pad-name;
+            validation-error: tabs[index].new-pad-name-error;
+            accessible-label: new-pad-txt.text;
+
+            text-edited(text) => {
+                tabs[index].new-pad-name = text;
+            }
+
+            key-pressed(event) => {
+                if event.text == Key.Return {
+                    new-pad-btn.clicked();
+                    return accept;
+                }
+                reject
+            }
+        }
+
+        new-pad-btn := IconButton {
+            style: hyperlink;
+            icon-scale: 0.65;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/plus.svg");
+            accessible-label: "add pad";
+
+            clicked => {
+                Backend.trigger-tab(section-index, index, TabAction.package-add-pads);
+            }
+        }
+    }
+
+    pads-view := PackagePadListView {
+        model: tabs[index].pads;
+        read-only: read-only;
+
+        edited => {
+            Backend.trigger-tab(section-index, index, TabAction.apply);
+        }
+    }
+
+    if tabs[index].wizard-mode: HorizontalLayout {
+        alignment: start;
+        padding-right: 8px;
+        spacing: 8px;
+
+        next-btn := Button {
+            width: max(self.preferred-width, 100px);
+            primary: true;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/check.svg");
+            text: @tr("Finish");
+
+            clicked => {
+                Backend.trigger-tab(section-index, index, TabAction.next);
+            }
+        }
+
+        back-btn := Button {
+            width: self.preferred-width;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/angle-left.svg");
+            text: @tr("Back");
+
+            clicked => {
+                Backend.trigger-tab(section-index, index, TabAction.back);
+            }
+        }
+    }
+}
+
+component PackageEditorTab inherits TouchArea {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    in-out property <[PackageTabData]> tabs;
+    in property <int> index;
+    in property <bool> read-only;
+    property <bool> view-3d: tabs[index].view-3d;
+    property <bool> footprint-selected: (tabs[index].footprint-index >= 0) && (tabs[index].footprint-index < tabs[index].footprints.length);
+    property <length> toolbar-space: view-buttons-l.x - toolbuttons-l.x - toolbuttons-l.width - 10px;
+    property <length> toolbutton-offset-y: (toolbar-r.width > toolbar-space) ? toolbar-r.height : 0;
+
+    function tool-triggered(action: TabAction) {
+        Data.set-current-tab(section-index, index);
+        Backend.trigger-tab(section-index, index, action);
+    }
+
+    callback focus-requested();
+
+    mouse-cursor: tabs[index].tool-cursor;
+
+    if Data.preview-mode: Rectangle {
+        background: view-3d ? #e6f2ff : black;
+    }
+
+    img := Image {
+        width: 100%;
+        height: 100%;
+        preferred-width: 0;
+        preferred-height: 0;
+        image-fit: preserve;
+        image-rendering: pixelated;
+        source: Backend.render-scene(section-index, self.width, self.height, 0, tabs[index].frame);
+        accessible-role: none;
+    }
+
+    if view-3d && (!tabs[index].opengl-error.is-empty): Rectangle {
+        width: self.preferred-width;
+        height: self.preferred-height;
+        background: red;
+        border-radius: 8px;
+
+        VerticalLayout {
+            padding: 8px;
+
+            opengl-error-txt := Text {
+                max-width: 0.7 * root.width;
+                color: white;
+                wrap: word-wrap;
+                text: tabs[index].opengl-error;
+            }
+        }
+    }
+
+    // Show overlay, if text is not empty.
+    if (!view-3d) && (!tabs[index].tool-overlay-text.is-empty): Rectangle {
+        x: 2 * toolbuttons-l.x + toolbuttons-l.width;
+        y: toolbuttons-l.y;
+        width: overlay-txt.preferred-width + 2 * overlay-txt.x;
+        height: overlay-txt.preferred-height + 2 * overlay-txt.y;
+        background: tabs[index].overlay-color;
+        border-radius: 10px;
+        border-width: 1px;
+        border-color: tabs[index].overlay-text-color;
+
+        overlay-txt := Text {
+            x: 8px;
+            y: 8px;
+            horizontal-alignment: left;
+            vertical-alignment: top;
+            font-family: "Noto Sans Mono";
+            color: tabs[index].overlay-text-color;
+            text: tabs[index].tool-overlay-text;
+        }
+    }
+
+    toolbar-r := Rectangle {
+        y: 0;
+        width: min(self.preferred-width, root.width - 10px);
+        height: 34px;
+        background: #505050;
+        border-bottom-left-radius: 11px;
+        border-bottom-right-radius: 11px;
+        visible: self.width > 30px;
+
+        HorizontalLayout {
+            alignment: center;
+            padding: 3px;
+
+            if tabs[index].tool == EditorTool.line: line-toolbar := DrawFootprintPolygonToolBar {
+                section-index: section-index;
+                section: section;
+                show-angle-edt: true;
+                show-fill-sw: false;
+                show-grab-area-sw: false;
+            }
+
+            if tabs[index].tool == EditorTool.rect: rect-toolbar := DrawFootprintPolygonToolBar {
+                section-index: section-index;
+                section: section;
+                show-angle-edt: false;
+                show-fill-sw: true;
+                show-grab-area-sw: true;
+            }
+
+            if tabs[index].tool == EditorTool.polygon: polygon-toolbar := DrawFootprintPolygonToolBar {
+                section-index: section-index;
+                section: section;
+                show-angle-edt: true;
+                show-fill-sw: true;
+                show-grab-area-sw: true;
+            }
+
+            if tabs[index].tool == EditorTool.circle: circle-toolbar := DrawFootprintPolygonToolBar {
+                section-index: section-index;
+                section: section;
+                show-angle-edt: false;
+                show-fill-sw: true;
+                show-grab-area-sw: true;
+            }
+
+            if tabs[index].tool == EditorTool.arc: arc-toolbar := DrawFootprintPolygonToolBar {
+                section-index: section-index;
+                section: section;
+                show-angle-edt: false;
+                show-fill-sw: false;
+                show-grab-area-sw: false;
+            }
+
+            if tabs[index].tool == EditorTool.name: name-toolbar := AddFootprintStrokeTextToolBar {
+                section-index: section-index;
+                section: section;
+                show-layer-cbx: false;
+                show-text-edt: false;
+            }
+
+            if tabs[index].tool == EditorTool.value: value-toolbar := AddFootprintStrokeTextToolBar {
+                section-index: section-index;
+                section: section;
+                show-layer-cbx: false;
+                show-text-edt: false;
+            }
+
+            if tabs[index].tool == EditorTool.text: text-toolbar := AddFootprintStrokeTextToolBar {
+                section-index: section-index;
+                section: section;
+                show-layer-cbx: true;
+                show-text-edt: true;
+            }
+
+            if tabs[index].tool == EditorTool.pad-tht: pad-tht-toolbar := AddFootprintPadToolBar {
+                section-index: section-index;
+                section: section;
+                show-side-selector: false;
+                show-drill-edt: true;
+                show-ratio-sw: root.width > 850px;
+                show-pressfit-sw: root.width > 900px;
+                fiducial-mode: tabs[index].tool-fiducial;
+            }
+
+            if tabs[index].tool == EditorTool.pad-smt: pad-smt-toolbar := AddFootprintPadToolBar {
+                section-index: section-index;
+                section: section;
+                show-side-selector: true;
+                show-drill-edt: false;
+                show-pressfit-sw: false;
+                fiducial-mode: tabs[index].tool-fiducial;
+            }
+
+            if tabs[index].tool == EditorTool.zone: zone-toolbar := DrawFootprintZoneToolBar {
+                section-index: section-index;
+                section: section;
+            }
+
+            if tabs[index].tool == EditorTool.hole: hole-toolbar := AddFootprintHoleToolBar {
+                section-index: section-index;
+                section: section;
+            }
+
+            if tabs[index].tool == EditorTool.renumber-pads: renumber-pads-toolbar := ReNumberPadsToolBar {
+                section-index: section-index;
+                section: section;
+            }
+        }
+    }
+
+    toolbuttons-l := VerticalLayout {
+        x: 7px;
+        y: 7px + toolbutton-offset-y;
+        width: self.preferred-width;
+        height: self.preferred-height;
+        spacing: 5px;
+        visible: !view-3d;
+
+        tool-select-btn := ToolButton {
+            cmd: Cmd.tool-select;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/arrow-pointer.svg");
+            checked: tabs[index].tool == EditorTool.select;
+            enabled: footprint-selected;
+
+            clicked => {
+                tool-triggered(TabAction.tool-select);
+            }
+        }
+
+        tool-line-btn := ToolButton {
+            cmd: Cmd.tool-line;
+            icon: @image-url("../../../../../../img/actions/draw_wire.png");
+            checked: tabs[index].tool == EditorTool.line;
+            enabled: footprint-selected && (!read-only);
+
+            clicked => {
+                tool-triggered(TabAction.tool-line);
+            }
+
+            tool-rect-btn := ToolButton {
+                cmd: Cmd.tool-rect;
+                icon: @image-url("../../../../../font-awesome/svgs/solid/vector-square.svg");
+                checked: tabs[index].tool == EditorTool.rect;
+                enabled: footprint-selected && (!read-only);
+
+                clicked => {
+                    tool-triggered(TabAction.tool-rect);
+                }
+            }
+
+            tool-polygon-btn := ToolButton {
+                cmd: Cmd.tool-polygon;
+                icon: @image-url("../../../../../font-awesome/svgs/solid/draw-polygon.svg");
+                checked: tabs[index].tool == EditorTool.polygon;
+                enabled: footprint-selected && (!read-only);
+
+                clicked => {
+                    tool-triggered(TabAction.tool-polygon);
+                }
+            }
+
+            tool-circle-btn := ToolButton {
+                cmd: Cmd.tool-circle;
+                icon: @image-url("../../../../../bootstrap-icons/icons/circle.svg");
+                checked: tabs[index].tool == EditorTool.circle;
+                enabled: footprint-selected && (!read-only);
+
+                clicked => {
+                    tool-triggered(TabAction.tool-circle);
+                }
+            }
+
+            tool-arc-btn := ToolButton {
+                cmd: Cmd.tool-arc;
+                icon: @image-url("../../../../../font-awesome/svgs/solid/circle-notch.svg");
+                checked: tabs[index].tool == EditorTool.arc;
+                enabled: footprint-selected && (!read-only);
+
+                clicked => {
+                    tool-triggered(TabAction.tool-arc);
+                }
+            }
+        }
+
+        tool-text-btn := ToolButton {
+            cmd: Cmd.tool-text;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/font.svg");
+            checked: tabs[index].tool == EditorTool.text;
+            enabled: footprint-selected && (!read-only);
+
+            clicked => {
+                tool-triggered(TabAction.tool-text);
+            }
+
+            tool-name-btn := ToolButton {
+                cmd: Cmd.tool-name;
+                icon: @image-url("../../../../../../img/actions/add_name.png");
+                checked: tabs[index].tool == EditorTool.name;
+                enabled: footprint-selected && (!read-only);
+
+                clicked => {
+                    tool-triggered(TabAction.tool-name);
+                }
+            }
+
+            tool-value-btn := ToolButton {
+                cmd: Cmd.tool-value;
+                icon: @image-url("../../../../../../img/actions/add_value.png");
+                checked: tabs[index].tool == EditorTool.value;
+                enabled: footprint-selected && (!read-only);
+
+                clicked => {
+                    tool-triggered(TabAction.tool-value);
+                }
+            }
+        }
+
+        tool-pad-tht-btn := ToolButton {
+            cmd: Cmd.tool-pad-tht;
+            icon: @image-url("../../../../../../img/actions/add_tht_pad.png");
+            colorize: transparent;
+            checked: tabs[index].tool == EditorTool.pad-tht;
+            enabled: footprint-selected && (!read-only);
+
+            clicked => {
+                tool-triggered(TabAction.tool-pad-tht);
+            }
+
+            tool-pad-smt-btn := ToolButton {
+                cmd: Cmd.tool-pad-smt;
+                icon: @image-url("../../../../../../img/actions/add_smt_pad.png");
+                colorize: transparent;
+                has-menu: true;
+                checked: tabs[index].tool == EditorTool.pad-smt;
+                enabled: footprint-selected && (!read-only);
+
+                clicked => {
+                    tool-triggered(TabAction.tool-pad-smt);
+                }
+
+                right-clicked => {
+                    smt-pads-popup.show();
+                }
+
+                smt-pads-popup := MenuPopup {
+                    x: parent.width + 5px;
+                    y: 0;
+
+                    tool-pad-thermal-item := MenuItem {
+                        cmd: Cmd.tool-pad-thermal;
+                        icon: tool-pad-smt-btn.icon;
+
+                        clicked => {
+                            Backend.trigger-tab(section-index, index, TabAction.tool-pad-thermal);
+                        }
+                    }
+
+                    tool-pad-bga-item := MenuItem {
+                        cmd: Cmd.tool-pad-bga;
+                        icon: tool-pad-smt-btn.icon;
+
+                        clicked => {
+                            Backend.trigger-tab(section-index, index, TabAction.tool-pad-bga);
+                        }
+                    }
+
+                    tool-pad-edge-connector-item := MenuItem {
+                        cmd: Cmd.tool-pad-edge-connector;
+                        icon: tool-pad-smt-btn.icon;
+
+                        clicked => {
+                            Backend.trigger-tab(section-index, index, TabAction.tool-pad-edge-connector);
+                        }
+                    }
+
+                    tool-pad-test-point-item := MenuItem {
+                        cmd: Cmd.tool-pad-test-point;
+                        icon: tool-pad-smt-btn.icon;
+
+                        clicked => {
+                            Backend.trigger-tab(section-index, index, TabAction.tool-pad-test-point);
+                        }
+                    }
+
+                    tool-pad-local-fiducial-item := MenuItem {
+                        cmd: Cmd.tool-pad-local-fiducial;
+                        icon: tool-pad-smt-btn.icon;
+
+                        clicked => {
+                            Backend.trigger-tab(section-index, index, TabAction.tool-pad-local-fiducial);
+                        }
+                    }
+
+                    tool-pad-global-fiducial-item := MenuItem {
+                        cmd: Cmd.tool-pad-global-fiducial;
+                        icon: tool-pad-smt-btn.icon;
+
+                        clicked => {
+                            Backend.trigger-tab(section-index, index, TabAction.tool-pad-global-fiducial);
+                        }
+                    }
+                }
+            }
+        }
+
+        tool-hole-btn := ToolButton {
+            cmd: Cmd.tool-hole;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/bore-hole.svg");
+            checked: tabs[index].tool == EditorTool.hole;
+            enabled: footprint-selected && (!read-only);
+
+            clicked => {
+                tool-triggered(TabAction.tool-hole);
+            }
+        }
+
+        tool-zone-btn := ToolButton {
+            cmd: Cmd.tool-zone;
+            icon: @image-url("../../../../../bootstrap-icons/icons/sign-stop.svg");
+            checked: tabs[index].tool == EditorTool.zone;
+            enabled: footprint-selected && (!read-only);
+
+            clicked => {
+                tool-triggered(TabAction.tool-zone);
+            }
+        }
+
+        tool-helpers-btn := ToolButton {
+            icon: @image-url("../../../../../font-awesome/svgs/solid/wand-magic-sparkles.svg");
+            tooltip: @tr("Helper Tools");
+            has-menu: true;
+            checked: tabs[index].tool == EditorTool.renumber-pads;
+            enabled: footprint-selected && (!read-only);
+
+            clicked => {
+                helpers-popup.show();
+            }
+
+            right-clicked => {
+                helpers-popup.show();
+            }
+
+            helpers-popup := MenuPopup {
+                x: parent.width + 5px;
+                y: 0;
+
+                generate-outline-item := MenuItem {
+                    cmd: Cmd.tool-generate-outline;
+                    icon: @image-url("../../../../../font-awesome/svgs/solid/wand-magic-sparkles.svg");
+
+                    clicked => {
+                        Backend.trigger-tab(section-index, index, TabAction.package-generate-outline);
+                    }
+                }
+
+                generate-courtyard-item := MenuItem {
+                    cmd: Cmd.tool-generate-courtyard;
+                    icon: @image-url("../../../../../font-awesome/svgs/solid/wand-magic-sparkles.svg");
+
+                    clicked => {
+                        Backend.trigger-tab(section-index, index, TabAction.package-generate-courtyard);
+                    }
+                }
+
+                renumber-pads-item := MenuItem {
+                    cmd: Cmd.tool-renumber-pads;
+                    icon: @image-url("../../../../../font-awesome/svgs/solid/wand-magic-sparkles.svg");
+
+                    clicked => {
+                        tool-triggered(TabAction.tool-renumber-pads);
+                    }
+                }
+            }
+        }
+
+        tool-measure-btn := ToolButton {
+            cmd: Cmd.tool-measure;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/ruler.svg");
+            checked: tabs[index].tool == EditorTool.measure;
+            enabled: footprint-selected;
+
+            clicked => {
+                tool-triggered(TabAction.tool-measure);
+            }
+        }
+    }
+
+    view-buttons-l := VerticalLayout {
+        x: parent.width - self.preferred-width - 10px;
+        y: toolbutton-offset-y + 10px;
+        width: self.preferred-width;
+
+        zoom-fit-btn := SceneButton {
+            x: parent.width - self.width;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/expand.svg");
+            icon-scale: 0.9;
+            bg-color: tabs[index].background-color;
+            fg-color: tabs[index].foreground-color;
+            enabled: footprint-selected;
+
+            clicked => {
+                Backend.trigger-tab(section-index, index, TabAction.zoom-fit);
+            }
+        }
+
+        zoom-in-btn := SceneButton {
+            x: parent.width - self.width;
+            icon: @image-url("../../../../../bootstrap-icons/icons/zoom-in.svg");
+            bg-color: tabs[index].background-color;
+            fg-color: tabs[index].foreground-color;
+            enabled: footprint-selected;
+
+            clicked => {
+                Backend.trigger-tab(section-index, index, TabAction.zoom-in);
+            }
+        }
+
+        zoom-out-btn := SceneButton {
+            x: parent.width - self.width;
+            icon: @image-url("../../../../../bootstrap-icons/icons/zoom-out.svg");
+            bg-color: tabs[index].background-color;
+            fg-color: tabs[index].foreground-color;
+            enabled: footprint-selected;
+
+            clicked => {
+                Backend.trigger-tab(section-index, index, TabAction.zoom-out);
+            }
+        }
+
+        if !view-3d: toggle-background-image-btn := SceneButton {
+            x: parent.width - self.width;
+            style: self.checked ? checkbox : button;
+            icon-scale: self.checked ? 0.8 : 0.9;
+            icon: @image-url("../../../../../bootstrap-icons/icons/image.svg");
+            tooltip: Cmd.toggle-background-image.text;
+            bg-color: tabs[index].background-color;
+            fg-color: tabs[index].foreground-color;
+            checked: tabs[index].background-image-set;
+            enabled: footprint-selected;
+
+            clicked => {
+                Backend.trigger-tab(section-index, index, TabAction.toggle-background-image);
+            }
+        }
+
+        if view-3d: devices-alpha-ta := SliderSceneButton {
+            x: parent.width - self.width;
+            icon: @image-url("../../../../../bootstrap-icons/icons/cpu.svg");
+            tooltip: @tr("Devices");
+            value: tabs[index].devices-alpha;
+            bg-color: tabs[index].background-color;
+            fg-color: tabs[index].foreground-color;
+
+            value-changed(value) => {
+                tabs[index].devices-alpha = value;
+            }
+        }
+
+        if view-3d: solderpaste-alpha-ta := SliderSceneButton {
+            x: parent.width - self.width;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/highlighter.svg");
+            tooltip: @tr("Solder Paste");
+            value: tabs[index].solderpaste-alpha;
+            bg-color: tabs[index].background-color;
+            fg-color: tabs[index].foreground-color;
+
+            value-changed(value) => {
+                tabs[index].solderpaste-alpha = value;
+            }
+        }
+
+        if view-3d: silkscreen-alpha-ta := SliderSceneButton {
+            x: parent.width - self.width;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/font.svg");
+            tooltip: @tr("Silkscreen");
+            value: tabs[index].silkscreen-alpha;
+            bg-color: tabs[index].background-color;
+            fg-color: tabs[index].foreground-color;
+
+            value-changed(value) => {
+                tabs[index].silkscreen-alpha = value;
+            }
+        }
+
+        if view-3d: solderresist-alpha-ta := SliderSceneButton {
+            x: parent.width - self.width;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/fill.svg");
+            tooltip: @tr("Solder Resist");
+            value: tabs[index].solderresist-alpha;
+            bg-color: tabs[index].background-color;
+            fg-color: tabs[index].foreground-color;
+
+            value-changed(value) => {
+                tabs[index].solderresist-alpha = value;
+            }
+        }
+
+        toggle-3d-btn := SceneButton {
+            x: parent.width - self.width;
+            text: view-3d ? "2D" : "3D";
+            bg-color: tabs[index].background-color;
+            fg-color: tabs[index].foreground-color;
+            enabled: footprint-selected;
+
+            clicked => {
+                tabs[index].view-3d = !view-3d;
+
+                // When switching to 3D this way (rather via navbar), hide
+                // the 3D models so the naked PCB can be reviewed. Note that
+                // the condition looks inversed but this is needed since the
+                // statement above already inverted view-3d. When swapping the
+                // order of the statements, the backend would reject a model
+                // index of -1.
+                if view-3d {
+                    tabs[index].model-index = -1;
+                }
+            }
+        }
+
+        Rectangle {
+            height: 5px;
+        }
+
+        if tabs[index].refreshing: spinner := Spinner {
+            x: (parent.width - self.width) / 2;
+            width: 20px;
+            height: self.width;
+            foreground-color: tabs[index].foreground-color;
+            indeterminate: true;
+        }
+    }
+
+    if view-3d: models-panel := PackageEditorModelsPanel {
+        x: 8px;
+        y: 8px;
+        section-index: section-index;
+        tabs: tabs;
+        index: index;
+        read-only: read-only;
+    }
+
+    property <bool> panels-vertical-layout: transform-panel.visible && (self.width - footprints-panel.width - transform-panel.width < 24px);
+    footprints-panel := PackageEditorFootprintsPanel {
+        property <length> offset-x: (self.y - toolbuttons-l.y - toolbuttons-l.height < 8px) ? (toolbuttons-l.x + toolbuttons-l.width) : 0;
+
+        x: 8px + offset-x;
+        y: (panels-vertical-layout ? transform-panel.y : parent.height) - self.height - 8px;
+        section-index: section-index;
+        tabs: tabs;
+        index: index;
+        models-editor: view-3d;
+        read-only: read-only;
+    }
+
+    transform-panel := PackageEditorTransformPanel {
+        x: panels-vertical-layout ? 8px : (parent.width - self.width - 8px);
+        y: parent.height - self.height - 8px;
+        section-index: section-index;
+        tabs: tabs;
+        index: index;
+        read-only: read-only;
+        visible: view-3d && footprint-selected;
+    }
+
+    pointer-event(event) => {
+        if event.kind == PointerEventKind.down {
+            Data.set-current-tab(section-index, index);
+            focus-requested();
+        }
+        Backend.scene-pointer-event(section-index, self.mouse-x, self.mouse-y, event);
+    }
+
+    scroll-event(event) => {
+        Backend.scene-scrolled(section-index, self.mouse-x, self.mouse-y, event) ? accept : reject
+    }
+}
+
+export component PackageTab inherits Tab {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    property <[PackageTabData]> tabs: section.package-tabs;
+    property <int> index: section.current-tab-index;
+    property <bool> read-only: section.tabs[index].features.save != FeatureState.enabled;
+    property <EditorTool> tool: tabs[index].tool;
+
+    enabled: true;
+
+    changed absolute-position => {
+        tabs[index].scene-image-pos = self.absolute-position;
+    }
+
+    // When the tool changes, move focus to scene to make tabulator & escape
+    // working correctly.
+    changed tool => {
+        root.focus();
+    }
+
+    init => {
+        tabs[index].scene-image-pos = self.absolute-position;
+    }
+
+    VerticalLayout {
+        BreakingChangesMessageBanner {
+            shown: tabs[index].interface-broken-msg;
+        }
+
+        CheckErrorsMessageBanner {
+            shown: tabs[index].checks.errors > 0;
+        }
+
+        // Wizard mode: Only one page at a time.
+        if tabs[index].wizard-mode && (tabs[index].page-index <= 0): metadata-tab-1 := PackageMetadataTab {
+            section-index: section-index;
+            tabs: tabs;
+            index: index;
+            read-only: read-only;
+        }
+        if tabs[index].wizard-mode && (tabs[index].page-index == 1): pads-tab-1 := PackagePadsEditorTab {
+            width: parent.width;
+            section-index: section-index;
+            tabs: tabs;
+            index: index;
+            read-only: read-only;
+        }
+
+        // Normal mode: Slide between metadata and content.
+        if !tabs[index].wizard-mode: SlideView {
+            pages: [
+                { title: @tr("Metadata") },
+                { title: @tr("Pads") },
+                { title: @tr("Footprints") },
+                { title: @tr("3D Models") },
+            ];
+            current-index: tabs[index].page-index;
+            current-navbar-index: {
+                if ((tabs[index].page-index == 2) && (tabs[index].view-3d)) {
+                    3
+                } else {
+                    tabs[index].page-index
+                }
+            };
+
+            metadata-tab-2 := PackageMetadataTab {
+                width: parent.width;
+                section-index: section-index;
+                tabs: tabs;
+                index: index;
+                read-only: read-only;
+            }
+
+            pads-tab-2 := PackagePadsEditorTab {
+                width: parent.width;
+                section-index: section-index;
+                tabs: tabs;
+                index: index;
+                read-only: read-only;
+            }
+
+            editor-tab := PackageEditorTab {
+                width: parent.width;
+                section-index: section-index;
+                section: section;
+                tabs: tabs;
+                index: index;
+                read-only: read-only;
+
+                focus-requested => {
+                    if !root.has-focus {
+                        root.focus();
+                    }
+                }
+            }
+
+            page-clicked(idx) => {
+                if idx == 3 {
+                    tabs[index].page-index = 2;
+                    tabs[index].view-3d = true;
+                } else if idx == 2 {
+                    tabs[index].page-index = 2;
+                    tabs[index].view-3d = false;
+                } else {
+                    tabs[index].page-index = idx;
+                }
+            }
+        }
+    }
+
+    key-pressed(event) => {
+        Data.set-current-tab(section-index, index);
+
+        // If the focus is in the command toolbar, make the Escape key moving
+        // the focus back to the graphics scene without triggering any action.
+        if (event.text == Key.Escape) && (!root.has-focus) {
+            root.focus();
+            return accept;
+        }
+        reject
+    }
+
+    key-released(event) => {
+        Backend.scene-key-event(section-index, event) ? accept : reject
+    }
+}

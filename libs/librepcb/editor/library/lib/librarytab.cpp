@@ -301,7 +301,7 @@ void LibraryTab::trigger(ui::TabAction a) noexcept {
             break;
           }
           case ui::LibraryTreeViewItemType::Package: {
-            emit packageEditorRequested(mEditor, item->path);
+            emit packageEditorRequested(mEditor, item->path, false);
             break;
           }
           case ui::LibraryTreeViewItemType::Component: {
@@ -467,20 +467,29 @@ void LibraryTab::commitUiData() noexcept {
     std::unique_ptr<CmdLibraryEdit> cmd(new CmdLibraryEdit(mLibrary));
     cmd->setIcon(mIcon);
     cmd->setName(QString(), mNameParsed);
-    cmd->setDescription(QString(), s2q(mDescription).trimmed());
+    const QString description = s2q(mDescription);
+    if (description != mLibrary.getDescriptions().getDefaultValue()) {
+      cmd->setDescription(QString(), description.trimmed());
+    }
     const QString keywords = s2q(mKeywords);
     if (keywords != mLibrary.getKeywords().getDefaultValue()) {
       cmd->setKeywords(QString(), EditorToolbox::cleanKeywords(keywords));
     }
-    cmd->setAuthor(s2q(mAuthor).trimmed());
+    const QString author = s2q(mAuthor);
+    if (author != mLibrary.getAuthor()) {
+      cmd->setAuthor(author.trimmed());
+    }
     cmd->setVersion(mVersionParsed);
     cmd->setDeprecated(mDeprecated);
-    const QString urlStr = s2q(mUrl).trimmed();
+    const QString urlStr = s2q(mUrl);
     if (urlStr != mLibrary.getUrl().toString()) {
-      cmd->setUrl(QUrl(urlStr, QUrl::TolerantMode));
+      cmd->setUrl(QUrl(urlStr.trimmed(), QUrl::TolerantMode));
     }
     cmd->setDependencies(mDependencies->getUuids());
-    cmd->setManufacturer(cleanSimpleString(s2q(mManufacturer)));
+    const QString manufacturer = s2q(mManufacturer);
+    if (manufacturer != mLibrary.getManufacturer()) {
+      cmd->setManufacturer(cleanSimpleString(manufacturer));
+    }
     mEditor.getUndoStack().execCmd(cmd.release());
   } catch (const Exception& e) {
     QMessageBox::critical(qApp->activeWindow(), tr("Error"), e.getMsg());
@@ -841,7 +850,7 @@ void LibraryTab::duplicateElements(
       break;
     }
     case ui::LibraryTreeViewItemType::Package: {
-      mEditor.duplicateInLegacyPackageEditor(item->path);
+      emit packageEditorRequested(mEditor, item->path, true);
       break;
     }
     case ui::LibraryTreeViewItemType::Component: {

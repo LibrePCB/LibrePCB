@@ -1,0 +1,84 @@
+import { IconButton } from "iconbutton.slint";
+import { ToolBarWidget } from "toolbarwidget.slint";
+import { PadShape } from "../api.slint";
+
+struct ShapeData {
+    shape: PadShape,
+    icon: image,
+    tooltip: string,
+    scale: float,
+}
+
+// Intended for use in toolbars.
+export component PadShapeSelector inherits ToolBarWidget {
+    in-out property <PadShape> shape;
+    property <[ShapeData]> shapes: [
+        {
+            shape: PadShape.round,
+            icon: @image-url("../../../../font-awesome/svgs/solid/circle.svg"),
+            tooltip:@tr("Round"),
+            scale: 1,
+        },
+        {
+            shape: PadShape.rounded-rect,
+            icon: @image-url("../../../../font-awesome/svgs/solid/square.svg"),
+            tooltip:@tr("Rounded Rect"),
+            scale: 1,
+        },
+        {
+            shape: PadShape.rect,
+            icon: @image-url("../../../../font-awesome/svgs/solid/square-full.svg"),
+            tooltip:@tr("Rectangular"),
+            scale: 0.9,
+        },
+        {
+            shape: PadShape.octagon,
+            icon: @image-url("../../../../bootstrap-icons/icons/octagon-fill.svg"),
+            tooltip:@tr("Octagon"),
+            scale: 1,
+        },
+    ];
+
+    callback value-clicked(PadShape);
+    value-clicked(s) => {
+        shape = s;
+    }
+
+    key-pressed(event) => {
+        if event.text == Key.LeftArrow {
+            if shape == PadShape.octagon {
+                value-clicked(PadShape.rect);
+            } else if shape == PadShape.rect {
+                value-clicked(PadShape.rounded-rect);
+            } else {
+                value-clicked(PadShape.round);
+            }
+            return accept;
+        } else if event.text == Key.RightArrow {
+            if shape == PadShape.round {
+                value-clicked(PadShape.rounded-rect);
+            } else if shape == PadShape.rounded-rect {
+                value-clicked(PadShape.rect);
+            } else {
+                value-clicked(PadShape.octagon);
+            }
+            return accept;
+        }
+        reject
+    }
+
+    for data in shapes: btn := IconButton {
+        width: 18px;
+        style: checkable-hyperlink;
+        color-enabled: #606060;
+        color-checked: #c0c0c0;
+        icon: data.icon;
+        icon-scale: data.scale;
+        tooltip: @tr("Shape") + ": " + data.tooltip;
+        checked: data.shape == root.shape;
+
+        clicked => {
+            value-clicked(data.shape);
+        }
+    }
+}

@@ -1,0 +1,190 @@
+import { ScrollView } from "std-widgets.slint";
+import { IconButton, LineEdit } from "../../widgets.slint";
+import { PackagePadData } from "../../api.slint";
+
+component HorizontalLine inherits Rectangle {
+    height: 1px;
+    background: #505050;
+}
+
+component VerticalLine inherits Rectangle {
+    width: 1px;
+    background: #505050;
+}
+
+component PackagePadListViewTextCell inherits Rectangle {
+    in property <string> text;
+    in property <string> font-family;
+    in property <length> font-size: 12px;
+    in property <TextHorizontalAlignment> horizontal-alignment: left;
+
+    preferred-width: txt.preferred-width + 10px;
+
+    txt := Text {
+        x: 5px;
+        width: parent.width - 10px;
+        horizontal-alignment: horizontal-alignment;
+        vertical-alignment: center;
+        color: #909090;
+        font-family: font-family;
+        font-size: font-size;
+        text: text;
+        accessible-role: none;
+    }
+}
+
+export component PackagePadListView inherits ScrollView {
+    in-out property <[PackagePadData]> model;
+    in property <bool> read-only;
+    property <length> row-height: 25px;
+    property <bool> show-ids: self.width > 350px;
+
+    callback edited;
+
+    min-height: min(l.preferred-height, 3 * row-height);
+    preferred-height: l.preferred-height;
+    mouse-drag-pan-enabled: true;
+
+    l := VerticalLayout {
+        padding-right: 8px;  // Reserve space for the scrollbar
+
+        HorizontalLayout {
+
+            VerticalLine { }
+
+            VerticalLayout {
+                width: self.preferred-width;
+
+                HorizontalLine { }
+
+                PackagePadListViewTextCell {
+                    height: row-height;
+                    horizontal-alignment: right;
+                    text: "#";
+                }
+
+                for item[index] in model: VerticalLayout {
+                    HorizontalLine { }
+
+                    number-cell := PackagePadListViewTextCell {
+                        height: row-height;
+                        background: #202020;
+                        horizontal-alignment: right;
+                        font-size: 10px;
+                        text: index + 1;
+                    }
+                }
+            }
+
+            VerticalLine { }
+
+            if show-ids: VerticalLayout {
+                width: self.preferred-width;
+
+                HorizontalLine { }
+
+                PackagePadListViewTextCell {
+                    height: row-height;
+                    text: @tr("ID");
+                }
+
+                for item[index] in model: VerticalLayout {
+                    HorizontalLine { }
+
+                    id-cell := PackagePadListViewTextCell {
+                        height: row-height;
+                        background: #202020;
+                        horizontal-alignment: right;
+                        font-family: "Noto Sans Mono";
+                        font-size: 10px;
+                        text: item.id;
+                    }
+                }
+            }
+
+            if show-ids: VerticalLine { }
+
+            VerticalLayout {
+                HorizontalLine { }
+
+                name-header := PackagePadListViewTextCell {
+                    height: row-height;
+                    text: @tr("Name");
+                }
+
+                for item[index] in model: VerticalLayout {
+                    HorizontalLine { }
+
+                    name-edt := LineEdit {
+                        height: row-height;
+                        text: item.name;
+                        validation-error: item.name-error;
+                        read-only: read-only;
+                        frameless: true;
+                        accessible-label: name-header.text;
+
+                        text-edited(text) => {
+                            model[index].name = text;
+                        }
+
+                        text-accepted(text) => {
+                            model[index].name = text;
+                            edited();
+                        }
+                    }
+                }
+            }
+
+            VerticalLine { }
+
+            if !read-only: VerticalLayout {
+                width: self.preferred-width;
+
+                HorizontalLine { }
+
+                PackagePadListViewTextCell {
+                    height: row-height;
+                }
+
+                for item[index] in model: VerticalLayout {
+                    HorizontalLine { }
+
+                    delete-btn := IconButton {
+                        height: row-height;
+                        background-color: #202020;
+                        icon-scale: 0.6;
+                        icon: @image-url("../../../../../font-awesome/svgs/solid/trash-can.svg");
+
+                        clicked => {
+                            model[index].delete = true;
+                        }
+                    }
+                }
+            }
+
+            if !read-only: VerticalLine { }
+        }
+
+        HorizontalLine { }
+
+        if model.length == 0: HorizontalLayout {
+            VerticalLine { }
+
+            Rectangle {
+                height: row-height;
+                background: #202020;
+
+                no-pads-txt := Text {
+                    width: parent.width - 10px;
+                    horizontal-alignment: left;
+                    wrap: word-wrap;
+                    text: @tr("This package contains no pads (yet).");
+                }
+            }
+
+            VerticalLine { }
+        }
+
+        if model.length == 0: HorizontalLine { }
+    }
+}

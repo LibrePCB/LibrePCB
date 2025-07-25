@@ -23,12 +23,11 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/library/pkg/footprint.h>
+#include "appwindow.h"
+
 #include <librepcb/core/library/pkg/packagemodel.h>
 
 #include <QtCore>
-
-#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -49,66 +48,49 @@ class UndoStack;
 /**
  * @brief The PackageModelListModel class
  */
-class PackageModelListModel final : public QAbstractTableModel {
+class PackageModelListModel final : public QObject,
+                                    public slint::Model<ui::PackageModelData> {
   Q_OBJECT
 
 public:
-  enum Column { COLUMN_ENABLED, COLUMN_NAME, COLUMN_ACTIONS, _COLUMN_COUNT };
-
   // Constructors / Destructor
-  PackageModelListModel() = delete;
+  // PackageModelListModel() = delete;
   PackageModelListModel(const PackageModelListModel& other) = delete;
   explicit PackageModelListModel(QObject* parent = nullptr) noexcept;
   ~PackageModelListModel() noexcept;
 
-  // Setters
-  void setPackage(Package* package) noexcept;
-  void setFootprint(std::shared_ptr<Footprint> footprint) noexcept;
-  void setUndoStack(UndoStack* stack) noexcept;
+  // General Methods
+  void setReferences(Package* pkg, UndoStack* stack) noexcept;
+  std::optional<int> add() noexcept;
 
-  // Slots
-  void add(const QPersistentModelIndex& itemIndex) noexcept;
-  void remove(const QPersistentModelIndex& itemIndex) noexcept;
-  void edit(const QPersistentModelIndex& itemIndex) noexcept;
-  void moveUp(const QPersistentModelIndex& itemIndex) noexcept;
-  void moveDown(const QPersistentModelIndex& itemIndex) noexcept;
-
-  // Inherited from QAbstractItemModel
-  int rowCount(const QModelIndex& parent = QModelIndex()) const override;
-  int columnCount(const QModelIndex& parent = QModelIndex()) const override;
-  QVariant data(const QModelIndex& index,
-                int role = Qt::DisplayRole) const override;
-  QVariant headerData(int section, Qt::Orientation orientation,
-                      int role = Qt::DisplayRole) const override;
-  Qt::ItemFlags flags(const QModelIndex& index) const override;
-  bool setData(const QModelIndex& index, const QVariant& value,
-               int role = Qt::EditRole) override;
+  // Implementations
+  std::size_t row_count() const override;
+  std::optional<ui::PackageModelData> row_data(std::size_t i) const override;
+  void set_row_data(std::size_t i,
+                    const ui::PackageModelData& data) noexcept override;
 
   // Operator Overloadings
-  PackageModelListModel& operator=(const PackageModelListModel& rhs) noexcept;
-
-signals:
-  void newModelAdded(int index);
+  PackageModelListModel& operator=(const PackageModelListModel& rhs) = delete;
 
 private:
-  void modelListEdited(const PackageModelList& list, int index,
-                       const std::shared_ptr<const PackageModel>& obj,
-                       PackageModelList::Event event) noexcept;
-  void footprintEdited(const Footprint& obj, Footprint::Event event) noexcept;
+  ui::PackageModelData createItem(const PackageModel& obj) noexcept;
+  void trigger(int index, std::shared_ptr<PackageModel> obj,
+               ui::PackageModelAction a) noexcept;
+  void listEdited(const PackageModelList& list, int index,
+                  const std::shared_ptr<const PackageModel>& item,
+                  PackageModelList::Event event) noexcept;
   void execCmd(UndoCommand* cmd);
   ElementName validateNameOrThrow(const QString& name) const;
   bool chooseStepFile(QByteArray& content, FilePath* selectedFile = nullptr);
 
-private:  // Data
+private:
   QPointer<Package> mPackage;
-  std::shared_ptr<Footprint> mFootprint;
-  UndoStack* mUndoStack;
-  bool mNewEnabled;
-  QString mNewName;
+  QPointer<UndoStack> mUndoStack;
+
+  QList<ui::PackageModelData> mItems;
 
   // Slots
   PackageModelList::OnEditedSlot mOnEditedSlot;
-  Footprint::OnEditedSlot mOnFootprintEditedSlot;
 };
 
 /*******************************************************************************

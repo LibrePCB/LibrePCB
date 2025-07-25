@@ -1431,12 +1431,18 @@ void SymbolTab::commitUiData() noexcept {
     std::unique_ptr<CmdLibraryElementEdit> cmd(
         new CmdLibraryElementEdit(*mSymbol, tr("Edit Symbol Properties")));
     cmd->setName(QString(), mNameParsed);
-    cmd->setDescription(QString(), s2q(mDescription).trimmed());
+    const QString description = s2q(mDescription);
+    if (description != mSymbol->getDescriptions().getDefaultValue()) {
+      cmd->setDescription(QString(), description.trimmed());
+    }
     const QString keywords = s2q(mKeywords);
     if (keywords != mSymbol->getKeywords().getDefaultValue()) {
       cmd->setKeywords(QString(), EditorToolbox::cleanKeywords(keywords));
     }
-    cmd->setAuthor(s2q(mAuthor).trimmed());
+    const QString author = s2q(mAuthor);
+    if (author != mSymbol->getAuthor()) {
+      cmd->setAuthor(author.trimmed());
+    }
     cmd->setVersion(mVersionParsed);
     cmd->setDeprecated(mDeprecated);
     cmd->setCategories(mCategories->getCategories());

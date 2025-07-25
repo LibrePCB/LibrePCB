@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/core/types/circuitidentifier.h>
 #include <librepcb/core/types/elementname.h>
 #include <librepcb/core/types/fileproofname.h>
 #include <librepcb/core/types/version.h>
@@ -116,6 +117,10 @@ std::optional<Version> validateVersion(const QString& input,
 std::optional<FileProofName> validateFileProofName(
     const QString& input, slint::SharedString& error,
     const QString& requiredSuffix = QString()) noexcept;
+
+std::optional<CircuitIdentifier> validateCircuitIdentifier(
+    const QString& input, slint::SharedString& error,
+    bool isDuplicate) noexcept;
 
 std::optional<QUrl> validateUrl(const QString& input,
                                 slint::SharedString& error,

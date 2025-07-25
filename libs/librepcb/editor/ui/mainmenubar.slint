@@ -713,16 +713,28 @@ export component MainMenuBar inherits Rectangle {
 
                 MenuSeparator { }
 
+                toggle-background-image-item := MenuItem {
+                    cmd: Cmd.toggle-background-image;
+                    icon: @image-url("../../../bootstrap-icons/icons/image.svg");
+                    enabled: Data.current-tab.features.background-image == FeatureState.enabled;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.toggle-background-image);
+                    }
+                }
+
                 toggle-3d-item := MenuItem {
                     cmd: Cmd.toggle-3d;
                     icon: @image-url("../../../bootstrap-icons/icons/badge-3d.svg");
-                    enabled: (Data.current-tab.type == TabType.board-2d) || (Data.current-tab.type == TabType.board-3d);
+                    enabled: (Data.current-tab.type == TabType.board-2d) || (Data.current-tab.type == TabType.board-3d) || ((Data.current-tab.type == TabType.package) && (Data.current-package-tab.page-index == 2));
 
                     clicked => {
                         if Data.current-tab.type == TabType.board-2d {
                             Backend.trigger-board(Data.current-board-2d-tab.project-index, Data.current-board-2d-tab.board-index, BoardAction.open-3d);
-                        } else {
+                        } else if Data.current-tab.type == TabType.board-3d {
                             Backend.trigger-board(Data.current-board-3d-tab.project-index, Data.current-board-3d-tab.board-index, BoardAction.open-2d);
+                        } else if Data.current-tab.type == TabType.package {
+                            Data.current-section.package-tabs[Data.current-section.current-tab-index].view-3d = !Data.current-package-tab.view-3d;
                         }
                     }
                 }
@@ -912,6 +924,50 @@ export component MainMenuBar inherits Rectangle {
 
                     clicked => {
                         Backend.trigger-library-element(Data.current-symbol-tab.path, LibraryElementAction.open-folder);
+                    }
+                }
+            }
+        }
+
+        package-menu-item := MainMenuItem {
+            text: @tr("Package");
+            visible: Data.current-tab.type == TabType.package;
+
+            clicked => {
+                package-menu-popup.show();
+            }
+
+            package-menu-popup := MenuPopup {
+                x: 0;
+                y: parent.height;
+
+                save-package-item := MenuItem {
+                    cmd: Cmd.save;
+                    text: @tr("Save Package");  // More specific.
+                    icon: @image-url("../../../bootstrap-icons/icons/floppy-fill.svg");
+                    enabled: Data.current-tab.features.save == FeatureState.enabled;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.save);
+                    }
+                }
+
+                close-package-item := MenuItem {
+                    text: @tr("Close Package");  // More specific.
+                    status-tip: @tr("Close the currently opened package");
+                    icon: @image-url("../../../font-awesome/svgs/solid/xmark.svg");
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.close);
+                    }
+                }
+
+                open-package-folder-item := MenuItem {
+                    cmd: Cmd.file-manager;
+                    icon: @image-url("../../../font-awesome/svgs/solid/arrow-up-right-from-square.svg");
+
+                    clicked => {
+                        Backend.trigger-library-element(Data.current-package-tab.path, LibraryElementAction.open-folder);
                     }
                 }
             }

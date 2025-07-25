@@ -23,7 +23,10 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "appwindow.h"
+
 #include <librepcb/core/library/pkg/footprint.h>
+#include <librepcb/core/library/pkg/packagemodel.h>
 
 #include <QtCore>
 
@@ -46,69 +49,57 @@ class UndoStack;
 /**
  * @brief The FootprintListModel class
  */
-class FootprintListModel final : public QAbstractTableModel {
+class FootprintListModel final : public QObject,
+                                 public slint::Model<ui::FootprintData> {
   Q_OBJECT
 
 public:
-  enum Column {
-    COLUMN_NAME,
-    COLUMN_MODEL_POSITION_X,
-    COLUMN_MODEL_POSITION_Y,
-    COLUMN_MODEL_POSITION_Z,
-    COLUMN_MODEL_ROTATION_X,
-    COLUMN_MODEL_ROTATION_Y,
-    COLUMN_MODEL_ROTATION_Z,
-    COLUMN_ACTIONS,
-    _COLUMN_COUNT,
-  };
-
   // Constructors / Destructor
-  FootprintListModel() = delete;
+  // FootprintListModel() = delete;
   FootprintListModel(const FootprintListModel& other) = delete;
   explicit FootprintListModel(QObject* parent = nullptr) noexcept;
   ~FootprintListModel() noexcept;
 
-  // Setters
-  void setPackage(Package* package) noexcept;
-  void setUndoStack(UndoStack* stack) noexcept;
+  // General Methods
+  void setReferences(Package* pkg, UndoStack* stack) noexcept;
+  void add(const QString& name) noexcept;
+  void apply();
 
-  // Slots
-  void add(const QPersistentModelIndex& itemIndex) noexcept;
-  void copy(const QPersistentModelIndex& itemIndex) noexcept;
-  void remove(const QPersistentModelIndex& itemIndex) noexcept;
-  void moveUp(const QPersistentModelIndex& itemIndex) noexcept;
-  void moveDown(const QPersistentModelIndex& itemIndex) noexcept;
-
-  // Inherited from QAbstractItemModel
-  int rowCount(const QModelIndex& parent = QModelIndex()) const override;
-  int columnCount(const QModelIndex& parent = QModelIndex()) const override;
-  QVariant data(const QModelIndex& index,
-                int role = Qt::DisplayRole) const override;
-  QVariant headerData(int section, Qt::Orientation orientation,
-                      int role = Qt::DisplayRole) const override;
-  Qt::ItemFlags flags(const QModelIndex& index) const override;
-  bool setData(const QModelIndex& index, const QVariant& value,
-               int role = Qt::EditRole) override;
+  // Implementations
+  std::size_t row_count() const override;
+  std::optional<ui::FootprintData> row_data(std::size_t i) const override;
+  void set_row_data(std::size_t i,
+                    const ui::FootprintData& data) noexcept override;
 
   // Operator Overloadings
-  FootprintListModel& operator=(const FootprintListModel& rhs) noexcept;
+  FootprintListModel& operator=(const FootprintListModel& rhs) = delete;
+
+signals:
+  void footprintAdded(int index);
 
 private:
-  void footprintListEdited(const FootprintList& list, int index,
-                           const std::shared_ptr<const Footprint>& footprint,
-                           FootprintList::Event event) noexcept;
+  ui::FootprintData createItem(const Footprint& obj) noexcept;
+  void updateModels(const Footprint& obj, ui::FootprintData& item) noexcept;
+  void trigger(int index, std::shared_ptr<Footprint> obj,
+               ui::FootprintAction a) noexcept;
+  void listEdited(const FootprintList& list, int index,
+                  const std::shared_ptr<const Footprint>& item,
+                  FootprintList::Event event) noexcept;
+  void modelListEdited(const PackageModelList& list, int index,
+                       const std::shared_ptr<const PackageModel>& item,
+                       PackageModelList::Event event) noexcept;
   void execCmd(UndoCommand* cmd);
   ElementName validateNameOrThrow(const QString& name) const;
 
-private:  // Data
+private:
   QPointer<Package> mPackage;
-  UndoStack* mUndoStack;
-  QString mNewName;
-  Point3D mNewModelPosition;
-  Angle3D mNewModelRotation;
+  QPointer<UndoStack> mUndoStack;
+
+  QList<ui::FootprintData> mItems;
 
   // Slots
   FootprintList::OnEditedSlot mOnEditedSlot;
+  PackageModelList::OnEditedSlot mOnModelsEditedSlot;
 };
 
 /*******************************************************************************
