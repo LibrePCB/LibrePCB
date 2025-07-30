@@ -1,0 +1,873 @@
+import { ScrollView } from "std-widgets.slint";
+import { Tab } from "../../tab.slint";
+import { LibraryTreeView } from "../librarytreeview.slint";
+import {
+    AuthorRowHeader,
+    DependenciesRowCell,
+    DependenciesRowHeader,
+    DeprecatedRowCell,
+    DeprecatedRowHeader,
+    DescriptionRowHeader,
+    IconRowCell,
+    IconRowHeader,
+    KeywordsRowHeader,
+    ManufacturerRowHeader,
+    MetadataFooterRowCell,
+    NameRowHeader,
+    UrlRowHeader,
+    VersionRowHeader,
+} from "../metadatawidgets.slint";
+import {
+    Button,
+    IconButton,
+    LineEdit,
+    SlideView,
+    Spinner,
+    TextEdit,
+} from "../../widgets.slint";
+import {
+    Backend,
+    Constants,
+    Data,
+    EditorCommandSet as Cmd,
+    FeatureState,
+    LibraryAction,
+    LibraryDependency,
+    LibraryElementAction,
+    LibraryTabData,
+    TabAction,
+    WindowSectionData,
+} from "../../api.slint";
+
+component ChooseLibraryPopupListItem inherits TouchArea {
+    in property <image> icon;
+    in property <string> name;
+
+    // Accessibility
+    accessible-role: list-item;
+    accessible-enabled: self.enabled;
+    accessible-label: name;
+    accessible-action-default => {
+        self.clicked();
+    }
+
+    if self.height > 0: Rectangle {
+        background: parent.has-hover ? #383838 : transparent;
+
+        HorizontalLayout {
+            padding-left: 6px;
+            padding-right: 6px;
+            spacing: 5px;
+            alignment: start;
+
+            Image {
+                y: (parent.height - self.height) / 2;
+                width: 18px;
+                height: self.width;
+                image-fit: contain;
+                source: icon;
+                accessible-role: none;
+            }
+
+            name-txt := Text {
+                vertical-alignment: center;
+                overflow: elide;
+                text: name;
+                accessible-role: none;
+            }
+        }
+    }
+}
+
+component AddLibraryDependencyPopup inherits PopupWindow {
+    in-out property <[LibraryDependency]> model;
+
+    callback item-clicked(idx: int);
+
+    Rectangle {
+        background: #00000050;
+
+        Rectangle {
+            width: min(0.8 * parent.width, 500px);
+            height: min(self.preferred-height, 0.8 * parent.height);
+            background: #000000;
+            border-radius: 15px;
+            border-width: 1px;
+            border-color: Constants.librepcb-color;
+
+            VerticalLayout {
+                padding: 15px;
+
+                view := ScrollView {
+                    preferred-width: l.preferred-width;
+                    preferred-height: l.preferred-height;
+
+                    l := VerticalLayout {
+                        for item[idx] in model: item-ta := ChooseLibraryPopupListItem {
+                            height: item.checked ? 0 : 26px;
+                            icon: item.icon;
+                            name: item.name;
+                            accessible-item-index: idx;
+
+                            clicked => {
+                                item-clicked(idx);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+component ChooseLocalLibraryPopup inherits PopupWindow {
+    in property <string> hide-library-with-path;
+
+    callback item-clicked(path: string);
+
+    Rectangle {
+        background: #00000050;
+
+        Rectangle {
+            width: min(0.8 * parent.width, 500px);
+            height: min(self.preferred-height, 0.8 * parent.height);
+            background: #000000;
+            border-radius: 15px;
+            border-width: 1px;
+            border-color: Constants.librepcb-color;
+
+            VerticalLayout {
+                padding: 15px;
+
+                view := ScrollView {
+                    preferred-width: l.preferred-width;
+                    preferred-height: l.preferred-height;
+
+                    l := VerticalLayout {
+                        for item[idx] in Data.local-libraries: item-ta := ChooseLibraryPopupListItem {
+                            height: (item.path == hide-library-with-path) ? 0 : 26px;
+                            icon: item.icon;
+                            name: item.name;
+                            accessible-item-index: idx;
+
+                            clicked => {
+                                item-clicked(item.path);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+component LibraryMetadataTab inherits GridLayout {
+    in property <int> section-index;
+    in-out property <[LibraryTabData]> tabs;
+    in property <int> index;
+    in property <bool> read-only;
+
+    padding: 8px;
+    spacing: 8px;
+
+    Row {
+        icon-txt := IconRowHeader { }
+
+        icon-cell := IconRowCell {
+            icon: tabs[index].icon;
+
+            clicked => {
+                Backend.trigger-tab(section-index, index, TabAction.library-choose-icon);
+            }
+        }
+    }
+
+    Row {
+        name-txt := NameRowHeader { }
+
+        name-edt := LineEdit {
+            text: tabs[index].name;
+            validation-error: tabs[index].name-error;
+            read-only: read-only;
+            accessible-label: name-txt.text;
+
+            init => {
+                if (!read-only) && tabs[index].wizard-mode {
+                    self.select-all();
+                }
+            }
+
+            text-edited(text) => {
+                tabs[index].name = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].name = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        description-txt := DescriptionRowHeader { }
+
+        description-edt := TextEdit {
+            height: 100px;
+            text: tabs[index].description;
+            read-only: read-only;
+            accessible-label: description-txt.text;
+
+            text-edited(text) => {
+                tabs[index].description = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].description = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        keywords-txt := KeywordsRowHeader { }
+
+        keywords-edt := LineEdit {
+            text: tabs[index].keywords;
+            read-only: read-only;
+            accessible-label: keywords-txt.text;
+
+            text-edited(text) => {
+                tabs[index].keywords = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].keywords = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        author-txt := AuthorRowHeader { }
+
+        author-edt := LineEdit {
+            text: tabs[index].author;
+            read-only: read-only;
+            accessible-label: author-txt.text;
+
+            text-edited(text) => {
+                tabs[index].author = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].author = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        version-txt := VersionRowHeader { }
+
+        version-edt := LineEdit {
+            text: tabs[index].version;
+            validation-error: tabs[index].version-error;
+            read-only: read-only;
+            accessible-label: version-txt.text;
+
+            text-edited(text) => {
+                tabs[index].version = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].version = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        deprecated-txt := DeprecatedRowHeader { }
+
+        deprecated-sw := DeprecatedRowCell {
+            text: @tr("Check this if this library should no longer be used.");
+            checked: tabs[index].deprecated;
+            enabled: !read-only;
+            accessible-label: deprecated-txt.text;
+
+            toggled(checked) => {
+                tabs[index].deprecated = checked;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        url-txt := UrlRowHeader { }
+
+        url-edt := LineEdit {
+            text: tabs[index].url;
+            validation-error: tabs[index].url-error;
+            read-only: read-only;
+            accessible-label: url-txt.text;
+
+            text-edited(text) => {
+                tabs[index].url = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].url = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        dependencies-txt := DependenciesRowHeader { }
+
+        dependencies-cell := DependenciesRowCell {
+            model: tabs[index].dependencies;
+            read-only: read-only;
+
+            add-dependency-clicked => {
+                add-dependency-popup.show();
+            }
+        }
+    }
+
+    Row {
+        manufacturer-txt := ManufacturerRowHeader { }
+
+        manufacturer-edt := LineEdit {
+            text: tabs[index].manufacturer;
+            placeholder-text: @tr("If this is a manufacturer-specific library (optional)");
+            read-only: read-only;
+            accessible-label: manufacturer-txt.text;
+
+            text-edited(text) => {
+                tabs[index].manufacturer = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].manufacturer = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        Rectangle { }
+
+        footer-cell := MetadataFooterRowCell {
+            section-index: section-index;
+            tab-index: index;
+            wizard-mode: tabs[index].wizard-mode;
+            unsaved-changes: Data.sections[section-index].tabs[index].unsaved-changes;
+            checks: tabs[index].checks;
+            read-only: read-only;
+        }
+    }
+
+    Row {
+        Rectangle { }
+    }
+
+    add-dependency-popup := AddLibraryDependencyPopup {
+        width: parent.width;
+        height: parent.height;
+        model: tabs[index].dependencies;
+
+        item-clicked(idx) => {
+            self.model[idx].checked = true;
+        }
+    }
+}
+
+component LibraryImportButton inherits TouchArea {
+    in property <string> name;
+    in property <image> image;
+
+    // Accessibility
+    accessible-role: button;
+    accessible-description: description-txt.text;
+    accessible-enabled: self.enabled;
+    accessible-label: title-txt.text;
+    accessible-action-default => {
+        self.clicked();
+    }
+
+    Rectangle {
+        height: self.preferred-height;
+        background: parent.pressed ? #303030 : (parent.has-hover ? #2a2a2a : #252525);
+        border-color: #808080;
+        border-width: 1px;
+
+        HorizontalLayout {
+            padding: 8px;
+            spacing: 10px;
+
+            Image {
+                width: 140px;
+                height: self.source.height * self.width / self.source.width;
+                source: image;
+                accessible-role: none;
+            }
+
+            VerticalLayout {
+                horizontal-stretch: 1;
+
+                Rectangle {
+                    vertical-stretch: 1;
+                }
+
+                title-txt := Text {
+                    font-size: 20px;
+                    overflow: elide;
+                    horizontal-alignment: center;
+                    text: @tr("Import {} Libraries", name);
+                    accessible-role: none;
+                }
+
+                Rectangle {
+                    vertical-stretch: 0.5;
+                }
+
+                description-txt := Text {
+                    font-size: 14px;
+                    color: #909090;
+                    horizontal-alignment: center;
+                    wrap: word-wrap;
+                    text: @tr("Start populating this library by importing {} library elements.", name);
+                    accessible-role: none;
+                }
+
+                Rectangle {
+                    vertical-stretch: 1;
+                }
+            }
+        }
+    }
+}
+
+component LibraryImportTab inherits VerticalLayout {
+    in property <int> section-index;
+    in-out property <[LibraryTabData]> tabs;
+    in property <int> index;
+
+    alignment: start;
+    padding: 8px;
+    spacing: 12px;
+
+    LibraryImportButton {
+        name: "KiCad";
+        image: @image-url("../../../../../../img/wizards/kicad_watermark.png");
+
+        clicked => {
+            Backend.trigger-library-element(Data.libraries[tabs[index].library-index].path, LibraryElementAction.import-kicad-library);
+        }
+    }
+
+    LibraryImportButton {
+        name: "EAGLE";
+        image: @image-url("../../../../../../img/wizards/eagle_watermark.png");
+
+        clicked => {
+            Backend.trigger-library-element(Data.libraries[tabs[index].library-index].path, LibraryElementAction.import-eagle-library);
+        }
+    }
+
+    if tabs[index].wizard-mode: HorizontalLayout {
+        alignment: start;
+        spacing: 8px;
+
+        next-btn := Button {
+            width: max(self.preferred-width, 100px);
+            primary: true;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/check.svg");
+            text: @tr("Finish");
+
+            clicked => {
+                Backend.trigger-tab(section-index, index, TabAction.next);
+            }
+        }
+
+        back-btn := Button {
+            width: self.preferred-width;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/angle-left.svg");
+            text: @tr("Back");
+
+            clicked => {
+                Backend.trigger-tab(section-index, index, TabAction.back);
+            }
+        }
+    }
+}
+
+component NewLibraryElementButton inherits IconButton {
+    height: 35px;
+    border-radius: self.height / 2;
+    colorize: false;
+    background-color: #101010;
+    icon-scale: 0.6;
+    tooltip-position: left;
+    tooltip-delayed: false;
+
+    Image {
+        y: 14px;
+        width: 11px;
+        height: self.width;
+        colorize: #202020;
+        source: @image-url("../../../../../font-awesome/svgs/solid/plus.svg");
+        accessible-role: none;
+    }
+}
+
+component LibraryTreeViewToolBar inherits Rectangle {
+    in property <int> count;
+    in property <bool> read-only;
+
+    height: l.preferred-height;
+
+    callback duplicate-clicked <=> duplicate-btn.clicked;
+    callback move-clicked <=> move-btn.clicked;
+    callback remove-clicked <=> remove-btn.clicked;
+
+    l := HorizontalLayout {
+        x: 0;
+        y: 0;
+        width: 100%;
+        height: 100%;
+        padding: 5px;
+
+        Text {
+            overflow: elide;
+            text: @tr("Selected item" | "{n} selected items" % count) + ":";
+        }
+
+        duplicate-btn := IconButton {
+            cmd: Cmd.library-element-duplicate;
+            style: hyperlink;
+            icon-scale: 0.7;
+            tooltip-position: left;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/clone.svg");
+            enabled: (!read-only) && (count == 1);
+        }
+
+        move-btn := IconButton {
+            style: hyperlink;
+            icon-scale: 0.7;
+            tooltip: @tr("Move to Other Library");
+            tooltip-position: left;
+            status-tip: @tr("Move or copy library element(s) to another library");
+            icon: @image-url("../../../../../font-awesome/svgs/solid/arrow-right-from-bracket.svg");
+        }
+
+        remove-btn := IconButton {
+            cmd: Cmd.remove;
+            style: hyperlink;
+            icon-scale: 0.7;
+            tooltip-position: left;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/trash-can.svg");
+            enabled: !read-only;
+        }
+    }
+}
+
+component LibraryContentTab inherits HorizontalLayout {
+    in property <int> section-index;
+    in-out property <[LibraryTabData]> tabs;
+    in property <int> index;
+    in property <bool> read-only;
+
+    VerticalLayout {
+        horizontal-stretch: 20;
+
+        categories-view := LibraryTreeView {
+            model: tabs[index].categories;
+            current-index: tabs[index].categories-index;
+
+            if Data.libraries-rescan-in-progress: Spinner {
+                x: parent.width - self.width - self.y;
+                y: 5px;
+                width: 16px;
+                height: self.width;
+                indeterminate: true;
+            }
+
+            if !read-only: NewLibraryElementButton {
+                x: parent.width - self.width - 20px;
+                y: parent.height - 2 * self.height - 26px;
+                icon: @image-url("../../../../../../img/places/folder.png");
+                tooltip: @tr("Add Component Category");
+
+                clicked => {
+                    Backend.trigger-library(Data.libraries[tabs[index].library-index].path, LibraryAction.new-component-category);
+                }
+            }
+
+            if !read-only: NewLibraryElementButton {
+                x: parent.width - self.width - 20px;
+                y: parent.height - self.height - 16px;
+                icon: @image-url("../../../../../../img/places/folder_green.png");
+                tooltip: @tr("Add Package Category");
+
+                clicked => {
+                    Backend.trigger-library(Data.libraries[tabs[index].library-index].path, LibraryAction.new-package-category);
+                }
+            }
+
+            move-category-popup := ChooseLocalLibraryPopup {
+                width: parent.width;
+                height: parent.height;
+                hide-library-with-path: Data.libraries[tabs[index].library-index].path;
+
+                item-clicked(path) => {
+                    tabs[index].move-category-to-lib = path;
+                }
+            }
+
+            item-selected(idx, item) => {
+                Data.set-current-tab(section-index, index);
+                if (idx != tabs[index].categories-index) || (tabs[index].filtered-elements-index != -1) {
+                    tabs[index].categories-index = idx;
+                    tabs[index].filtered-elements-index = -1;
+                }
+            }
+
+            item-triggered(idx, item) => {
+                self.item-selected(idx, item);
+                Backend.trigger-tab(section-index, index, TabAction.edit-properties);
+                true
+            }
+
+            item-deleted(idx, item) => {
+                self.item-selected(idx, item);
+                Backend.trigger-tab(section-index, index, TabAction.library-categories-remove);
+                true
+            }
+        }
+
+        property <int> selected-items: ((categories-view.current-index >= 0) && (categories-view.current-index < categories-view.model.length) && (categories-view.model[categories-view.current-index].level > 0) && (!categories-view.model[categories-view.current-index].is-external)) ? 1 : 0;
+        if selected-items > 0: LibraryTreeViewToolBar {
+            count: selected-items;
+            read-only: read-only;
+
+            duplicate-clicked => {
+                Backend.trigger-tab(section-index, index, TabAction.library-categories-duplicate);
+            }
+
+            move-clicked => {
+                move-category-popup.show();
+            }
+
+            remove-clicked => {
+                Backend.trigger-tab(section-index, index, TabAction.library-categories-remove);
+            }
+        }
+    }
+
+    Rectangle {
+        width: 1px;
+        background: #555555;
+    }
+
+    VerticalLayout {
+        horizontal-stretch: 30;
+
+        elements-view := LibraryTreeView {
+            model: tabs[index].filtered-elements;
+            current-index: tabs[index].filtered-elements-index;
+
+            if self.model.length == 0: Text {
+                width: 0.8 * parent.width;
+                color: #808080;
+                font-size: 18px;
+                wrap: word-wrap;
+                horizontal-alignment: center;
+                text: @tr("The selected category does not contain any library elements.");
+            }
+
+            if Data.libraries-rescan-in-progress: Spinner {
+                x: parent.width - self.width - self.y;
+                y: 5px;
+                width: 16px;
+                height: self.width;
+                indeterminate: true;
+            }
+
+            if !read-only: NewLibraryElementButton {
+                x: parent.width - self.width - 20px;
+                y: parent.height - 4 * self.height - 46px;
+                icon: @image-url("../../../../../../img/library/device.png");
+                tooltip: @tr("Add Device");
+
+                clicked => {
+                    Backend.trigger-library(Data.libraries[tabs[index].library-index].path, LibraryAction.new-device);
+                }
+            }
+
+            if !read-only: NewLibraryElementButton {
+                x: parent.width - self.width - 20px;
+                y: parent.height - 3 * self.height - 36px;
+                icon: @image-url("../../../../../../img/library/component.png");
+                tooltip: @tr("Add Component");
+
+                clicked => {
+                    Backend.trigger-library(Data.libraries[tabs[index].library-index].path, LibraryAction.new-component);
+                }
+            }
+
+            if !read-only: NewLibraryElementButton {
+                x: parent.width - self.width - 20px;
+                y: parent.height - 2 * self.height - 26px;
+                icon: @image-url("../../../../../../img/library/package.png");
+                tooltip: @tr("Add Package");
+
+                clicked => {
+                    Backend.trigger-library(Data.libraries[tabs[index].library-index].path, LibraryAction.new-package);
+                }
+            }
+
+            if !read-only: NewLibraryElementButton {
+                x: parent.width - self.width - 20px;
+                y: parent.height - self.height - 16px;
+                icon: @image-url("../../../../../../img/library/symbol.png");
+                tooltip: @tr("Add Symbol");
+
+                clicked => {
+                    Backend.trigger-library(Data.libraries[tabs[index].library-index].path, LibraryAction.new-symbol);
+                }
+            }
+
+            move-element-popup := ChooseLocalLibraryPopup {
+                width: parent.width;
+                height: parent.height;
+                hide-library-with-path: Data.libraries[tabs[index].library-index].path;
+
+                item-clicked(path) => {
+                    tabs[index].move-element-to-lib = path;
+                }
+            }
+
+            item-selected(idx, item) => {
+                Data.set-current-tab(section-index, index);
+                tabs[index].filtered-elements-index = idx;
+            }
+
+            item-triggered(idx, item) => {
+                self.item-selected(idx, item);
+                Backend.trigger-tab(section-index, index, TabAction.edit-properties);
+                true
+            }
+
+            item-deleted(idx, item) => {
+                self.item-selected(idx, item);
+                Backend.trigger-tab(section-index, index, TabAction.library-elements-remove);
+                true
+            }
+        }
+
+        property <int> selected-items: ((elements-view.current-index >= 0) && (elements-view.current-index < elements-view.model.length) && (elements-view.model[elements-view.current-index].level > 0)) ? 1 : 0;
+        if selected-items > 0: LibraryTreeViewToolBar {
+            count: selected-items;
+            read-only: read-only;
+
+            duplicate-clicked => {
+                Backend.trigger-tab(section-index, index, TabAction.library-elements-duplicate);
+            }
+
+            move-clicked => {
+                move-element-popup.show();
+            }
+
+            remove-clicked => {
+                Backend.trigger-tab(section-index, index, TabAction.library-elements-remove);
+            }
+        }
+    }
+}
+
+export component LibraryTab inherits Tab {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    property <[LibraryTabData]> tabs: section.library-tabs;
+    property <int> index: section.current-tab-index;
+    property <bool> read-only: section.tabs[index].features.save != FeatureState.enabled;
+    property <bool> compact-layout: self.width < 1024px;
+
+    // Wizard mode: Only one page at a time.
+    if tabs[index].wizard-mode && (tabs[index].page-index <= 0): LibraryMetadataTab {
+        section-index: section-index;
+        tabs: tabs;
+        index: index;
+        read-only: read-only;
+    }
+    if tabs[index].wizard-mode && (tabs[index].page-index >= 1): LibraryImportTab {
+        section-index: section-index;
+        tabs: tabs;
+        index: index;
+    }
+
+    // Normal mode: Content left, metadata right.
+    if (!tabs[index].wizard-mode) && (!compact-layout): HorizontalLayout {
+        LibraryContentTab {
+            horizontal-stretch: 1;
+            section-index: section-index;
+            tabs: tabs;
+            index: index;
+            read-only: read-only;
+        }
+
+        Rectangle {
+            width: 1px;
+            background: #555555;
+        }
+
+        LibraryMetadataTab {
+            horizontal-stretch: 1;
+            max-width: min(500px, parent.width * 0.4);
+            section-index: section-index;
+            tabs: tabs;
+            index: index;
+            read-only: read-only;
+        }
+    }
+
+    // Compact mode: Slide between metadata, import and content.
+    if (!tabs[index].wizard-mode) && compact-layout: SlideView {
+        pages: [
+            { title: @tr("Metadata") },
+            { title: @tr("Import"), disabled: read-only },
+            { title: @tr("Library Content") },
+        ];
+        current-index: tabs[index].page-index;
+
+        LibraryMetadataTab {
+            width: parent.width;
+            section-index: section-index;
+            tabs: tabs;
+            index: index;
+            read-only: read-only;
+        }
+
+        LibraryImportTab {
+            width: parent.width;
+            section-index: section-index;
+            tabs: tabs;
+            index: index;
+        }
+
+        LibraryContentTab {
+            width: parent.width;
+            section-index: section-index;
+            tabs: tabs;
+            index: index;
+            read-only: read-only;
+        }
+
+        page-clicked(idx) => {
+            Data.set-current-tab(section-index, index);
+            tabs[index].page-index = idx;
+        }
+    }
+}

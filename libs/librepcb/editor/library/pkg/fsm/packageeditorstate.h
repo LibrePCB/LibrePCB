@@ -24,13 +24,12 @@
  *  Includes
  ******************************************************************************/
 #include "../../../graphics/graphicsscene.h"
-#include "../../../utils/toolbarproxy.h"
 #include "packageeditorfsm.h"
+#include "packageeditorfsmadapter.h"
 
 #include <librepcb/core/types/length.h>
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -65,8 +64,6 @@ public:
   // General Methods
   virtual bool entry() noexcept { return true; }
   virtual bool exit() noexcept { return true; }
-  virtual QSet<EditorWidgetBase::Feature> getAvailableFeatures()
-      const noexcept = 0;
 
   // Event Handlers
   virtual bool processKeyPressed(const GraphicsSceneKeyEvent& e) noexcept {
@@ -129,24 +126,31 @@ public:
   virtual bool processGenerateOutline() noexcept { return false; }
   virtual bool processGenerateCourtyard() noexcept { return false; }
   virtual bool processImportDxf() noexcept { return false; }
+  virtual bool processAcceptCommand() noexcept { return false; }
   virtual bool processAbortCommand() noexcept { return false; }
+  virtual bool processGridIntervalChanged(
+      const PositiveLength& inverval) noexcept {
+    Q_UNUSED(inverval);
+    return false;
+  }
 
   // Operator Overloadings
   PackageEditorState& operator=(const PackageEditorState& rhs) = delete;
 
 signals:
   void abortRequested();
-  void availableFeaturesChanged();
-  void statusBarMessageChanged(const QString& message, int timeoutMs = -1);
 
 protected:  // Methods
-  const PositiveLength& getGridInterval() const noexcept;
+  GraphicsScene* getGraphicsScene() noexcept;
+  PositiveLength getGridInterval() const noexcept;
   const LengthUnit& getLengthUnit() const noexcept;
+  QWidget* parentWidget() noexcept;
   static const QSet<const Layer*>& getAllowedTextLayers() noexcept;
   static const QSet<const Layer*>& getAllowedCircleAndPolygonLayers() noexcept;
 
 protected:  // Data
   Context& mContext;
+  PackageEditorFsmAdapter& mAdapter;
 };
 
 /*******************************************************************************

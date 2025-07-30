@@ -23,12 +23,7 @@
 #include "symboleditorstate_drawcircle.h"
 
 #include "../../../cmd/cmdcircleedit.h"
-#include "../../../editorcommandset.h"
 #include "../../../graphics/circlegraphicsitem.h"
-#include "../../../widgets/graphicsview.h"
-#include "../../../widgets/layercombobox.h"
-#include "../../../widgets/unsignedlengthedit.h"
-#include "../symboleditorwidget.h"
 #include "../symbolgraphicsitem.h"
 
 #include <librepcb/core/geometry/circle.h>
@@ -50,17 +45,21 @@ namespace editor {
 SymbolEditorState_DrawCircle::SymbolEditorState_DrawCircle(
     const Context& context) noexcept
   : SymbolEditorState(context),
+    mCurrentProperties(
+        Uuid::createRandom(),  // Not relevant
+        Layer::symbolOutlines(),  // Most important layer
+        UnsignedLength(200000),  // Typical width according library conventions
+        false,  // Fill is needed very rarely
+        true,  // Most symbol outlines are used as grab areas
+        Point(),  // Center is not relevant
+        PositiveLength(1)  // Diameter is not relevant
+        ),
     mCurrentCircle(nullptr),
-    mCurrentGraphicsItem(nullptr),
-    mLastLayer(&Layer::symbolOutlines()),  // Most important layer
-    mLastLineWidth(200000),  // Typical width according library conventions
-    mLastFill(false),  // Fill is needed very rarely
-    mLastGrabArea(true)  // Most symbol outlines are used as grab areas
-{
+    mCurrentGraphicsItem(nullptr) {
 }
 
 SymbolEditorState_DrawCircle::~SymbolEditorState_DrawCircle() noexcept {
-  Q_ASSERT(!mEditCmd);
+  Q_ASSERT(!mCurrentEditCmd);
 }
 
 /*******************************************************************************
@@ -68,50 +67,8 @@ SymbolEditorState_DrawCircle::~SymbolEditorState_DrawCircle() noexcept {
  ******************************************************************************/
 
 bool SymbolEditorState_DrawCircle::entry() noexcept {
-  // populate command toolbar
-  EditorCommandSet& cmd = EditorCommandSet::instance();
-  mContext.commandToolBar.addLabel(tr("Layer:"));
-  std::unique_ptr<LayerComboBox> layerComboBox(new LayerComboBox());
-  layerComboBox->setLayers(getAllowedCircleAndPolygonLayers());
-  layerComboBox->setCurrentLayer(*mLastLayer);
-  layerComboBox->addAction(cmd.layerUp.createAction(
-      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepDown));
-  layerComboBox->addAction(cmd.layerDown.createAction(
-      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepUp));
-  connect(layerComboBox.get(), &LayerComboBox::currentLayerChanged, this,
-          &SymbolEditorState_DrawCircle::layerComboBoxValueChanged);
-  mContext.commandToolBar.addWidget(std::move(layerComboBox));
-
-  mContext.commandToolBar.addLabel(tr("Line Width:"), 10);
-  std::unique_ptr<UnsignedLengthEdit> edtLineWidth(new UnsignedLengthEdit());
-  edtLineWidth->configure(getLengthUnit(), LengthEditBase::Steps::generic(),
-                          "symbol_editor/draw_circle/line_width");
-  edtLineWidth->setValue(mLastLineWidth);
-  edtLineWidth->addAction(cmd.lineWidthIncrease.createAction(
-      edtLineWidth.get(), edtLineWidth.get(), &UnsignedLengthEdit::stepUp));
-  edtLineWidth->addAction(cmd.lineWidthDecrease.createAction(
-      edtLineWidth.get(), edtLineWidth.get(), &UnsignedLengthEdit::stepDown));
-  connect(edtLineWidth.get(), &UnsignedLengthEdit::valueChanged, this,
-          &SymbolEditorState_DrawCircle::lineWidthEditValueChanged);
-  mContext.commandToolBar.addWidget(std::move(edtLineWidth));
-
-  std::unique_ptr<QCheckBox> fillCheckBox(new QCheckBox(tr("Fill")));
-  fillCheckBox->setChecked(mLastFill);
-  fillCheckBox->addAction(cmd.fillToggle.createAction(
-      fillCheckBox.get(), fillCheckBox.get(), &QCheckBox::toggle));
-  connect(fillCheckBox.get(), &QCheckBox::toggled, this,
-          &SymbolEditorState_DrawCircle::fillCheckBoxCheckedChanged);
-  mContext.commandToolBar.addWidget(std::move(fillCheckBox), 10);
-
-  std::unique_ptr<QCheckBox> grabAreaCheckBox(new QCheckBox(tr("Grab Area")));
-  grabAreaCheckBox->setChecked(mLastGrabArea);
-  grabAreaCheckBox->addAction(cmd.grabAreaToggle.createAction(
-      grabAreaCheckBox.get(), grabAreaCheckBox.get(), &QCheckBox::toggle));
-  connect(grabAreaCheckBox.get(), &QCheckBox::toggled, this,
-          &SymbolEditorState_DrawCircle::grabAreaCheckBoxCheckedChanged);
-  mContext.commandToolBar.addWidget(std::move(grabAreaCheckBox));
-
-  mContext.graphicsView.setCursor(Qt::CrossCursor);
+  mAdapter.fsmToolEnter(*this);
+  mAdapter.fsmSetViewCursor(Qt::CrossCursor);
   return true;
 }
 
@@ -120,18 +77,9 @@ bool SymbolEditorState_DrawCircle::exit() noexcept {
     return false;
   }
 
-  // cleanup command toolbar
-  mContext.commandToolBar.clear();
-
-  mContext.graphicsView.unsetCursor();
+  mAdapter.fsmSetViewCursor(std::nullopt);
+  mAdapter.fsmToolLeave();
   return true;
-}
-
-QSet<EditorWidgetBase::Feature>
-    SymbolEditorState_DrawCircle::getAvailableFeatures() const noexcept {
-  return {
-      EditorWidgetBase::Feature::Abort,
-  };
 }
 
 /*******************************************************************************
@@ -167,28 +115,80 @@ bool SymbolEditorState_DrawCircle::processAbortCommand() noexcept {
 }
 
 /*******************************************************************************
+ *  Connection to UI
+ ******************************************************************************/
+
+QSet<const Layer*> SymbolEditorState_DrawCircle::getAvailableLayers()
+    const noexcept {
+  return getAllowedCircleAndPolygonLayers();
+}
+
+void SymbolEditorState_DrawCircle::setLayer(const Layer& layer) noexcept {
+  if (mCurrentProperties.setLayer(layer)) {
+    emit layerChanged(mCurrentProperties.getLayer());
+  }
+
+  if (mCurrentEditCmd) {
+    mCurrentEditCmd->setLayer(mCurrentProperties.getLayer(), true);
+  }
+}
+
+void SymbolEditorState_DrawCircle::setLineWidth(
+    const UnsignedLength& width) noexcept {
+  if (mCurrentProperties.setLineWidth(width)) {
+    emit lineWidthChanged(mCurrentProperties.getLineWidth());
+  }
+
+  if (mCurrentEditCmd) {
+    mCurrentEditCmd->setLineWidth(mCurrentProperties.getLineWidth(), true);
+  }
+}
+
+void SymbolEditorState_DrawCircle::setFilled(bool filled) noexcept {
+  if (mCurrentProperties.setIsFilled(filled)) {
+    emit filledChanged(mCurrentProperties.isFilled());
+  }
+
+  if (mCurrentEditCmd) {
+    mCurrentEditCmd->setIsFilled(mCurrentProperties.isFilled(), true);
+  }
+}
+
+void SymbolEditorState_DrawCircle::setGrabArea(bool grabArea) noexcept {
+  if (mCurrentProperties.setIsGrabArea(grabArea)) {
+    emit grabAreaChanged(mCurrentProperties.isGrabArea());
+  }
+
+  if (mCurrentEditCmd) {
+    mCurrentEditCmd->setIsGrabArea(mCurrentProperties.isGrabArea(), true);
+  }
+}
+
+/*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
 bool SymbolEditorState_DrawCircle::startAddCircle(const Point& pos) noexcept {
+  SymbolGraphicsItem* item = getGraphicsItem();
+  if (!item) return false;
+
   try {
     mContext.undoStack.beginCmdGroup(tr("Add symbol circle"));
-    mCurrentCircle = std::make_shared<Circle>(
-        Uuid::createRandom(), *mLastLayer, mLastLineWidth, mLastFill,
-        mLastGrabArea, pos, PositiveLength(1));
+    mCurrentProperties.setCenter(pos);
+    mCurrentCircle =
+        std::make_shared<Circle>(Uuid::createRandom(), mCurrentProperties);
     mContext.undoStack.appendToCmdGroup(
         new CmdCircleInsert(mContext.symbol.getCircles(), mCurrentCircle));
-    mEditCmd.reset(new CmdCircleEdit(*mCurrentCircle));
-    mCurrentGraphicsItem =
-        mContext.symbolGraphicsItem.getGraphicsItem(mCurrentCircle);
+    mCurrentEditCmd.reset(new CmdCircleEdit(*mCurrentCircle));
+    mCurrentGraphicsItem = item->getGraphicsItem(mCurrentCircle);
     Q_ASSERT(mCurrentGraphicsItem);
     mCurrentGraphicsItem->setSelected(true);
     return true;
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     mCurrentGraphicsItem.reset();
     mCurrentCircle.reset();
-    mEditCmd.reset();
+    mCurrentEditCmd.reset();
     return false;
   }
 }
@@ -200,7 +200,7 @@ bool SymbolEditorState_DrawCircle::updateCircleDiameter(
   if (diameter < 1) {
     diameter = 1;
   }  // diameter must be greater than zero!
-  mEditCmd->setDiameter(PositiveLength(diameter), true);
+  mCurrentEditCmd->setDiameter(PositiveLength(diameter), true);
   return true;
 }
 
@@ -214,11 +214,11 @@ bool SymbolEditorState_DrawCircle::finishAddCircle(const Point& pos) noexcept {
     mCurrentGraphicsItem->setSelected(false);
     mCurrentGraphicsItem.reset();
     mCurrentCircle.reset();
-    mContext.undoStack.appendToCmdGroup(mEditCmd.release());
+    mContext.undoStack.appendToCmdGroup(mCurrentEditCmd.release());
     mContext.undoStack.commitCmdGroup();
     return true;
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     return false;
   }
 }
@@ -228,44 +228,12 @@ bool SymbolEditorState_DrawCircle::abortAddCircle() noexcept {
     mCurrentGraphicsItem->setSelected(false);
     mCurrentGraphicsItem.reset();
     mCurrentCircle.reset();
-    mEditCmd.reset();
+    mCurrentEditCmd.reset();
     mContext.undoStack.abortCmdGroup();
     return true;
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     return false;
-  }
-}
-
-void SymbolEditorState_DrawCircle::layerComboBoxValueChanged(
-    const Layer& layer) noexcept {
-  mLastLayer = &layer;
-  if (mEditCmd) {
-    mEditCmd->setLayer(*mLastLayer, true);
-  }
-}
-
-void SymbolEditorState_DrawCircle::lineWidthEditValueChanged(
-    const UnsignedLength& value) noexcept {
-  mLastLineWidth = value;
-  if (mEditCmd) {
-    mEditCmd->setLineWidth(mLastLineWidth, true);
-  }
-}
-
-void SymbolEditorState_DrawCircle::fillCheckBoxCheckedChanged(
-    bool checked) noexcept {
-  mLastFill = checked;
-  if (mEditCmd) {
-    mEditCmd->setIsFilled(mLastFill, true);
-  }
-}
-
-void SymbolEditorState_DrawCircle::grabAreaCheckBoxCheckedChanged(
-    bool checked) noexcept {
-  mLastGrabArea = checked;
-  if (mEditCmd) {
-    mEditCmd->setIsGrabArea(mLastGrabArea, true);
   }
 }
 

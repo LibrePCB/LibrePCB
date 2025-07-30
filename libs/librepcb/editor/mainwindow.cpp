@@ -22,11 +22,20 @@
  ******************************************************************************/
 #include "mainwindow.h"
 
+#include "dialogs/directorylockhandlerdialog.h"
 #include "editorcommandsetupdater.h"
 #include "guiapplication.h"
+#include "library/cat/componentcategorytab.h"
+#include "library/cat/packagecategorytab.h"
 #include "library/createlibrarytab.h"
 #include "library/downloadlibrarytab.h"
+#include "library/eaglelibraryimportwizard/eaglelibraryimportwizard.h"
+#include "library/kicadlibraryimportwizard/kicadlibraryimportwizard.h"
+#include "library/lib/librarytab.h"
 #include "library/librariesmodel.h"
+#include "library/libraryeditor.h"
+#include "library/pkg/packagetab.h"
+#include "library/sym/symboltab.h"
 #include "mainwindowtestadapter.h"
 #include "notificationsmodel.h"
 #include "project/board/board2dtab.h"
@@ -40,8 +49,16 @@
 #include "utils/standardeditorcommandhandler.h"
 #include "windowsection.h"
 #include "windowtab.h"
+#include "workspace/desktopservices.h"
 #include "workspace/filesystemmodel.h"
 
+#include <librepcb/core/fileio/fileutils.h>
+#include <librepcb/core/fileio/transactionaldirectory.h>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/library/cat/componentcategory.h>
+#include <librepcb/core/library/cat/packagecategory.h>
+#include <librepcb/core/library/pkg/package.h>
+#include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
@@ -66,6 +83,41 @@ static std::optional<QSize> getOverrideWindowSize() noexcept {
   } else {
     return std::nullopt;
   }
+}
+
+static bool askForRestoringBackup(const FilePath&) {
+  QMessageBox::StandardButton btn = QMessageBox::question(
+      qApp->activeWindow(), MainWindow::tr("Restore autosave backup?"),
+      MainWindow::tr(
+          "It seems that the application crashed the last time you opened "
+          "this library element. Do you want to restore the last autosave "
+          "backup?"),
+      QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+      QMessageBox::Cancel);
+  switch (btn) {
+    case QMessageBox::Yes:
+      return true;
+    case QMessageBox::No:
+      return false;
+    default:
+      throw UserCanceled(__FILE__, __LINE__);
+  }
+}
+
+static LocalizedNameMap copyLibraryElementNames(const LocalizedNameMap& names) {
+  // Note: We copy only the default locale for now because the UI doesn't show
+  // the other locales so the user can't edit them.
+  QString newNameStr = *names.getDefaultValue() % " (" %
+      MainWindow::tr("Copy", "The noun (a copy of), not the verb (to copy)") %
+      ")";
+  if (auto newName = parseElementName(newNameStr)) {
+    return LocalizedNameMap(*newName);
+  }
+  newNameStr = *names.getDefaultValue() % " (Copy)";
+  if (auto newName = parseElementName(newNameStr)) {
+    return LocalizedNameMap(*newName);
+  }
+  return LocalizedNameMap(names.getDefaultValue());
 }
 
 /*******************************************************************************
@@ -156,6 +208,19 @@ MainWindow::MainWindow(GuiApplication& app,
         this, [this, section, tab, a]() { triggerTab(section, tab, a); },
         Qt::QueuedConnection);
   });
+  b.on_trigger_library([this](slint::SharedString path, ui::LibraryAction a) {
+    // if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0): Remove lambda.
+    QMetaObject::invokeMethod(
+        this, [this, path, a]() { triggerLibrary(path, a); },
+        Qt::QueuedConnection);
+  });
+  b.on_trigger_library_element(
+      [this](slint::SharedString path, ui::LibraryElementAction a) {
+        // if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0): Remove lambda.
+        QMetaObject::invokeMethod(
+            this, [this, path, a]() { triggerLibraryElement(path, a); },
+            Qt::QueuedConnection);
+      });
   b.on_trigger_project([this](int index, ui::ProjectAction a) {
     // if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0): Remove lambda.
     QMetaObject::invokeMethod(
@@ -307,6 +372,11 @@ void MainWindow::showStatusBarMessage(const QString& message, int timeoutMs) {
   }
 }
 
+void MainWindow::setCurrentLibrary(int index) noexcept {
+  const ui::Data& d = mWindow->global<ui::Data>();
+  d.fn_set_current_library(index);
+}
+
 void MainWindow::setCurrentProject(int index) noexcept {
   const ui::Data& d = mWindow->global<ui::Data>();
   d.fn_set_current_project(index);
@@ -317,7 +387,20 @@ void MainWindow::setCurrentProject(int index) noexcept {
  ******************************************************************************/
 
 slint::CloseRequestResponse MainWindow::closeRequested() noexcept {
-  if (!mApp.requestClosingWindow()) {
+  // Any message boxes might delay closing the window so we don't want to
+  // autosave any intermediate window state during this process. The timer
+  // will be restarted by GuiApplication once the window was closed.
+  mApp.stopWindowStateAutosaveTimer();
+
+  // Ask to close tabs, projects, libraries etc.
+  if (mApp.getWindowCount() >= 2) {
+    for (auto section : *mSections) {
+      if (!section->requestCloseAllTabs()) {
+        return slint::CloseRequestResponse::KeepWindowShown;
+      }
+    }
+  } else if ((!mApp.requestClosingAllProjects()) ||
+             (!mApp.requestClosingAllLibraries())) {
     return slint::CloseRequestResponse::KeepWindowShown;
   }
 
@@ -387,7 +470,12 @@ void MainWindow::trigger(ui::Action a) noexcept {
     // Library
     case ui::Action::LibraryCreate: {
       if (!switchToTab<CreateLibraryTab>()) {
-        addTab(std::make_shared<CreateLibraryTab>(mApp));
+        auto tab = std::make_shared<CreateLibraryTab>(mApp);
+        connect(
+            tab.get(), &CreateLibraryTab::libraryCreated, this,
+            [this](const FilePath& fp) { openLibraryTab(fp, true); },
+            Qt::QueuedConnection);
+        addTab(tab);
       }
       break;
     }
@@ -461,6 +549,128 @@ void MainWindow::triggerSection(int section,
 void MainWindow::triggerTab(int section, int tab, ui::TabAction a) noexcept {
   if (auto s = mSections->value(section)) {
     s->triggerTab(tab, a);
+  }
+}
+
+void MainWindow::triggerLibrary(slint::SharedString path,
+                                ui::LibraryAction a) noexcept {
+  const FilePath fp(s2q(path));
+  if ((!fp.isValid()) ||
+      (!fp.isLocatedInDir(mApp.getWorkspace().getLibrariesPath()))) {
+    qWarning() << "Invalid path in triggerLibrary():" << s2q(path);
+    return;
+  }
+
+  switch (a) {
+    case ui::LibraryAction::Open: {
+      openLibraryTab(fp, false);
+      break;
+    }
+    case ui::LibraryAction::Uninstall: {
+      try {
+        mApp.closeLibrary(fp);
+        FileUtils::removeDirRecursively(fp);  // can throw
+      } catch (const Exception& e) {
+        // TODO: This should be implemented without message box some day...
+        QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
+      }
+      mApp.getWorkspace().getLibraryDb().startLibraryRescan();
+      break;
+    }
+    case ui::LibraryAction::NewComponentCategory: {
+      if (auto editor = mApp.getLibrary(fp)) {
+        openComponentCategoryTab(*editor, FilePath(), false);
+      }
+      break;
+    }
+    case ui::LibraryAction::NewPackageCategory: {
+      if (auto editor = mApp.getLibrary(fp)) {
+        openPackageCategoryTab(*editor, FilePath(), false);
+      }
+      break;
+    }
+    case ui::LibraryAction::NewSymbol: {
+      if (auto editor = mApp.getLibrary(fp)) {
+        openSymbolTab(*editor, FilePath(), false);
+      }
+      break;
+    }
+    case ui::LibraryAction::NewPackage: {
+      if (auto editor = mApp.getLibrary(fp)) {
+        openPackageTab(*editor, FilePath(), false);
+      }
+      break;
+    }
+    case ui::LibraryAction::NewComponent: {
+      if (auto editor = mApp.getLibrary(fp)) {
+        openComponentTab(*editor, FilePath());
+      }
+      break;
+    }
+    case ui::LibraryAction::NewDevice: {
+      if (auto editor = mApp.getLibrary(fp)) {
+        openDeviceTab(*editor, FilePath());
+      }
+      break;
+    }
+    default: {
+      qWarning() << "Unhandled action in triggerLibrary():"
+                 << static_cast<int>(a);
+      break;
+    }
+  }
+}
+
+void MainWindow::triggerLibraryElement(slint::SharedString path,
+                                       ui::LibraryElementAction a) noexcept {
+  const FilePath fp(s2q(path));
+
+  switch (a) {
+    case ui::LibraryElementAction::Open: {
+      if (switchToLibraryElementTab<LibraryTab>(fp)) return;
+      if (switchToLibraryElementTab<ComponentCategoryTab>(fp)) return;
+      if (switchToLibraryElementTab<PackageCategoryTab>(fp)) return;
+      if (switchToLibraryElementTab<SymbolTab>(fp)) return;
+      if (switchToLibraryElementTab<PackageTab>(fp)) return;
+      if (mApp.getLibrary(fp)) {
+        openLibraryTab(fp, false);
+      }
+      break;
+    }
+    case ui::LibraryElementAction::Close: {
+      if (auto lib = mApp.getLibrary(fp)) {
+        if (lib->requestClose()) {
+          mApp.closeLibrary(fp);
+        }
+      }
+      break;
+    }
+    case ui::LibraryElementAction::OpenFolder: {
+      DesktopServices ds(mApp.getWorkspace().getSettings());
+      ds.openLocalPath(fp);
+      break;
+    }
+    case ui::LibraryElementAction::ImportEagleLibrary: {
+      if (mApp.getLibrary(fp)) {
+        EagleLibraryImportWizard wiz(mApp.getWorkspace(), fp,
+                                     qApp->activeWindow());
+        wiz.exec();
+      }
+      break;
+    }
+    case ui::LibraryElementAction::ImportKicadLibrary: {
+      if (mApp.getLibrary(fp)) {
+        KiCadLibraryImportWizard wiz(mApp.getWorkspace(), fp,
+                                     qApp->activeWindow());
+        wiz.exec();
+      }
+      break;
+    }
+    default: {
+      qWarning() << "Unhandled action in MainWindow::triggerLibraryElement():"
+                 << static_cast<int>(a);
+      break;
+    }
   }
 }
 
@@ -595,6 +805,309 @@ void MainWindow::triggerBoard(int project, int board,
   }
 }
 
+void MainWindow::openLibraryTab(const FilePath& fp, bool wizardMode) noexcept {
+  if (auto editor = mApp.openLibrary(fp)) {
+    if (!switchToLibraryElementTab<LibraryTab>(fp)) {
+      auto tab = std::make_shared<LibraryTab>(*editor, wizardMode);
+      connect(tab.get(), &LibraryTab::componentCategoryEditorRequested, this,
+              &MainWindow::openComponentCategoryTab);
+      connect(tab.get(), &LibraryTab::packageCategoryEditorRequested, this,
+              &MainWindow::openPackageCategoryTab);
+      connect(tab.get(), &LibraryTab::symbolEditorRequested, this,
+              &MainWindow::openSymbolTab);
+      connect(tab.get(), &LibraryTab::packageEditorRequested, this,
+              &MainWindow::openPackageTab);
+      connect(tab.get(), &LibraryTab::componentEditorRequested, this,
+              &MainWindow::openComponentTab);
+      connect(tab.get(), &LibraryTab::deviceEditorRequested, this,
+              &MainWindow::openDeviceTab);
+      addTab(tab);
+    }
+  }
+}
+
+void MainWindow::openComponentCategoryTab(LibraryEditor& editor,
+                                          const FilePath& fp,
+                                          bool copyFrom) noexcept {
+  if (!switchToLibraryElementTab<ComponentCategoryTab>(fp)) {
+    try {
+      std::unique_ptr<ComponentCategory> cat;
+      ComponentCategoryTab::Mode mode = ComponentCategoryTab::Mode::Open;
+      if (fp.isValid() && (!copyFrom)) {
+        auto fs = TransactionalFileSystem::open(
+            fp, editor.isWritable(), &askForRestoringBackup,
+            DirectoryLockHandlerDialog::createDirectoryLockCallback());
+        cat = ComponentCategory::open(std::unique_ptr<TransactionalDirectory>(
+            new TransactionalDirectory(fs)));
+      } else {
+        mode = ComponentCategoryTab::Mode::New;
+        cat.reset(new ComponentCategory(
+            Uuid::createRandom(), Version::fromString("0.1"),
+            mApp.getWorkspace().getSettings().userName.get(),
+            ElementName("New Component Category"), QString(), QString()));
+        if (copyFrom) {
+          mode = ComponentCategoryTab::Mode::Duplicate;
+          auto fs = TransactionalFileSystem::openRO(fp, &askForRestoringBackup);
+          std::unique_ptr<ComponentCategory> src =
+              ComponentCategory::open(std::unique_ptr<TransactionalDirectory>(
+                  new TransactionalDirectory(fs)));
+          cat->setNames(copyLibraryElementNames(src->getNames()));
+          cat->setDescriptions(src->getDescriptions());
+          cat->setKeywords(src->getKeywords());
+          cat->setParentUuid(src->getParentUuid());
+        }
+      }
+      addTab(
+          std::make_shared<ComponentCategoryTab>(editor, std::move(cat), mode));
+    } catch (const Exception& e) {
+      QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
+    }
+  }
+}
+
+void MainWindow::openPackageCategoryTab(LibraryEditor& editor,
+                                        const FilePath& fp,
+                                        bool copyFrom) noexcept {
+  if (!switchToLibraryElementTab<PackageCategoryTab>(fp)) {
+    try {
+      std::unique_ptr<PackageCategory> cat;
+      PackageCategoryTab::Mode mode = PackageCategoryTab::Mode::Open;
+      if (fp.isValid() && (!copyFrom)) {
+        auto fs = TransactionalFileSystem::open(
+            fp, editor.isWritable(), &askForRestoringBackup,
+            DirectoryLockHandlerDialog::createDirectoryLockCallback());
+        cat = PackageCategory::open(std::unique_ptr<TransactionalDirectory>(
+            new TransactionalDirectory(fs)));
+      } else {
+        mode = PackageCategoryTab::Mode::New;
+        cat.reset(new PackageCategory(
+            Uuid::createRandom(), Version::fromString("0.1"),
+            mApp.getWorkspace().getSettings().userName.get(),
+            ElementName("New Package Category"), QString(), QString()));
+        if (copyFrom) {
+          mode = PackageCategoryTab::Mode::Duplicate;
+          auto fs = TransactionalFileSystem::openRO(fp, &askForRestoringBackup);
+          std::unique_ptr<PackageCategory> src =
+              PackageCategory::open(std::unique_ptr<TransactionalDirectory>(
+                  new TransactionalDirectory(fs)));
+          cat->setNames(copyLibraryElementNames(src->getNames()));
+          cat->setDescriptions(src->getDescriptions());
+          cat->setKeywords(src->getKeywords());
+          cat->setParentUuid(src->getParentUuid());
+        }
+      }
+      addTab(
+          std::make_shared<PackageCategoryTab>(editor, std::move(cat), mode));
+    } catch (const Exception& e) {
+      QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
+    }
+  }
+}
+
+void MainWindow::openSymbolTab(LibraryEditor& editor, const FilePath& fp,
+                               bool copyFrom) noexcept {
+  if (!switchToLibraryElementTab<SymbolTab>(fp)) {
+    try {
+      std::unique_ptr<Symbol> sym;
+      SymbolTab::Mode mode = SymbolTab::Mode::Open;
+      if (fp.isValid() && (!copyFrom)) {
+        auto fs = TransactionalFileSystem::open(
+            fp, editor.isWritable(), &askForRestoringBackup,
+            DirectoryLockHandlerDialog::createDirectoryLockCallback());
+        sym = Symbol::open(std::unique_ptr<TransactionalDirectory>(
+            new TransactionalDirectory(fs)));
+      } else {
+        mode = SymbolTab::Mode::New;
+        sym.reset(new Symbol(Uuid::createRandom(), Version::fromString("0.1"),
+                             mApp.getWorkspace().getSettings().userName.get(),
+                             ElementName("New Symbol"), QString(), QString()));
+        if (copyFrom) {
+          mode = SymbolTab::Mode::Duplicate;
+          auto fs = TransactionalFileSystem::openRO(fp, &askForRestoringBackup);
+          std::unique_ptr<Symbol> src =
+              Symbol::open(std::unique_ptr<TransactionalDirectory>(
+                  new TransactionalDirectory(fs)));
+          sym->setNames(copyLibraryElementNames(src->getNames()));
+          sym->setDescriptions(src->getDescriptions());
+          sym->setKeywords(src->getKeywords());
+          sym->setCategories(src->getCategories());
+          // Copy pins but generate new UUIDs.
+          for (const SymbolPin& pin : src->getPins()) {
+            sym->getPins().append(std::make_shared<SymbolPin>(
+                Uuid::createRandom(), pin.getName(), pin.getPosition(),
+                pin.getLength(), pin.getRotation(), pin.getNamePosition(),
+                pin.getNameRotation(), pin.getNameHeight(),
+                pin.getNameAlignment()));
+          }
+          // Copy polygons but generate new UUIDs.
+          for (const Polygon& polygon : src->getPolygons()) {
+            sym->getPolygons().append(std::make_shared<Polygon>(
+                Uuid::createRandom(), polygon.getLayer(),
+                polygon.getLineWidth(), polygon.isFilled(),
+                polygon.isGrabArea(), polygon.getPath()));
+          }
+          // Copy circles but generate new UUIDs.
+          for (const Circle& circle : src->getCircles()) {
+            sym->getCircles().append(std::make_shared<Circle>(
+                Uuid::createRandom(), circle.getLayer(), circle.getLineWidth(),
+                circle.isFilled(), circle.isGrabArea(), circle.getCenter(),
+                circle.getDiameter()));
+          }
+          // Copy texts but generate new UUIDs.
+          for (const Text& text : src->getTexts()) {
+            sym->getTexts().append(std::make_shared<Text>(
+                Uuid::createRandom(), text.getLayer(), text.getText(),
+                text.getPosition(), text.getRotation(), text.getHeight(),
+                text.getAlign()));
+          }
+        }
+      }
+      addTab(std::make_shared<SymbolTab>(editor, std::move(sym), mode));
+    } catch (const Exception& e) {
+      QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
+    }
+  }
+}
+
+void MainWindow::openPackageTab(LibraryEditor& editor, const FilePath& fp,
+                                bool copyFrom) noexcept {
+  if (!switchToLibraryElementTab<PackageTab>(fp)) {
+    try {
+      std::unique_ptr<Package> pkg;
+      PackageTab::Mode mode = PackageTab::Mode::Open;
+      if (fp.isValid() && (!copyFrom)) {
+        auto fs = TransactionalFileSystem::open(
+            fp, editor.isWritable(), &askForRestoringBackup,
+            DirectoryLockHandlerDialog::createDirectoryLockCallback());
+        pkg = Package::open(std::unique_ptr<TransactionalDirectory>(
+            new TransactionalDirectory(fs)));
+      } else {
+        mode = PackageTab::Mode::New;
+        pkg.reset(new Package(Uuid::createRandom(), Version::fromString("0.1"),
+                              mApp.getWorkspace().getSettings().userName.get(),
+                              ElementName("New Package"), QString(), QString(),
+                              Package::AssemblyType::Auto));
+        if (copyFrom) {
+          mode = PackageTab::Mode::Duplicate;
+          auto fs = TransactionalFileSystem::openRO(fp, &askForRestoringBackup);
+          std::unique_ptr<Package> src =
+              Package::open(std::unique_ptr<TransactionalDirectory>(
+                  new TransactionalDirectory(fs)));
+          pkg->setNames(copyLibraryElementNames(src->getNames()));
+          pkg->setDescriptions(src->getDescriptions());
+          pkg->setKeywords(src->getKeywords());
+          pkg->setCategories(src->getCategories());
+          pkg->setAssemblyType(src->getAssemblyType(false));
+          // Copy pads but generate new UUIDs.
+          QHash<Uuid, std::optional<Uuid>> padUuidMap;
+          for (const PackagePad& pad : src->getPads()) {
+            const Uuid newUuid = Uuid::createRandom();
+            padUuidMap.insert(pad.getUuid(), newUuid);
+            pkg->getPads().append(
+                std::make_shared<PackagePad>(newUuid, pad.getName()));
+          }
+          // Copy 3D models but generate new UUIDs.
+          QHash<Uuid, std::optional<Uuid>> modelsUuidMap;
+          for (const PackageModel& model : src->getModels()) {
+            auto newModel = std::make_shared<PackageModel>(Uuid::createRandom(),
+                                                           model.getName());
+            modelsUuidMap.insert(model.getUuid(), newModel->getUuid());
+            pkg->getModels().append(newModel);
+            const QByteArray fileContent =
+                src->getDirectory().readIfExists(model.getFileName());
+            if (!fileContent.isNull()) {
+              pkg->getDirectory().write(newModel->getFileName(), fileContent);
+            }
+          }
+          // Copy footprints but generate new UUIDs.
+          for (const Footprint& footprint : src->getFootprints()) {
+            // Don't copy translations as they would need to be adjusted anyway.
+            std::shared_ptr<Footprint> newFootprint(new Footprint(
+                Uuid::createRandom(), footprint.getNames().getDefaultValue(),
+                footprint.getDescriptions().getDefaultValue()));
+            newFootprint->setModelPosition(footprint.getModelPosition());
+            newFootprint->setModelRotation(footprint.getModelRotation());
+            // Copy models but with the new UUIDs.
+            QSet<Uuid> models;
+            foreach (const Uuid& uuid, footprint.getModels()) {
+              if (auto newUuid = modelsUuidMap.value(uuid)) {
+                models.insert(*newUuid);
+              }
+            }
+            newFootprint->setModels(models);
+            // Copy pads but generate new UUIDs.
+            for (const FootprintPad& pad : footprint.getPads()) {
+              std::optional<Uuid> pkgPad = pad.getPackagePadUuid();
+              if (pkgPad) {
+                pkgPad = padUuidMap.value(*pkgPad);  // Translate to new UUID
+              }
+              newFootprint->getPads().append(std::make_shared<FootprintPad>(
+                  Uuid::createRandom(), pkgPad, pad.getPosition(),
+                  pad.getRotation(), pad.getShape(), pad.getWidth(),
+                  pad.getHeight(), pad.getRadius(), pad.getCustomShapeOutline(),
+                  pad.getStopMaskConfig(), pad.getSolderPasteConfig(),
+                  pad.getCopperClearance(), pad.getComponentSide(),
+                  pad.getFunction(), pad.getHoles()));
+            }
+            // Copy polygons but generate new UUIDs.
+            for (const Polygon& polygon : footprint.getPolygons()) {
+              newFootprint->getPolygons().append(std::make_shared<Polygon>(
+                  Uuid::createRandom(), polygon.getLayer(),
+                  polygon.getLineWidth(), polygon.isFilled(),
+                  polygon.isGrabArea(), polygon.getPath()));
+            }
+            // Copy circles but generate new UUIDs.
+            for (const Circle& circle : footprint.getCircles()) {
+              newFootprint->getCircles().append(std::make_shared<Circle>(
+                  Uuid::createRandom(), circle.getLayer(),
+                  circle.getLineWidth(), circle.isFilled(), circle.isGrabArea(),
+                  circle.getCenter(), circle.getDiameter()));
+            }
+            // Copy stroke texts but generate new UUIDs.
+            for (const StrokeText& text : footprint.getStrokeTexts()) {
+              newFootprint->getStrokeTexts().append(
+                  std::make_shared<StrokeText>(
+                      Uuid::createRandom(), text.getLayer(), text.getText(),
+                      text.getPosition(), text.getRotation(), text.getHeight(),
+                      text.getStrokeWidth(), text.getLetterSpacing(),
+                      text.getLineSpacing(), text.getAlign(),
+                      text.getMirrored(), text.getAutoRotate()));
+            }
+            // Copy zones but generate new UUIDs.
+            for (const Zone& zone : footprint.getZones()) {
+              newFootprint->getZones().append(
+                  std::make_shared<Zone>(Uuid::createRandom(), zone));
+            }
+            // Copy holes but generate new UUIDs.
+            for (const Hole& hole : footprint.getHoles()) {
+              newFootprint->getHoles().append(std::make_shared<Hole>(
+                  Uuid::createRandom(), hole.getDiameter(), hole.getPath(),
+                  hole.getStopMaskConfig()));
+            }
+            pkg->getFootprints().append(newFootprint);
+          }
+        } else {
+          pkg->getFootprints().append(std::make_shared<Footprint>(
+              Uuid::createRandom(), ElementName("default"), ""));
+        }
+      }
+      addTab(std::make_shared<PackageTab>(editor, std::move(pkg), mode));
+    } catch (const Exception& e) {
+      QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
+    }
+  }
+}
+
+void MainWindow::openComponentTab(LibraryEditor& editor,
+                                  const FilePath& fp) noexcept {
+  editor.openLegacyComponentEditor(fp);
+}
+
+void MainWindow::openDeviceTab(LibraryEditor& editor,
+                               const FilePath& fp) noexcept {
+  editor.openLegacyDeviceEditor(fp);
+}
+
 void MainWindow::openSchematicTab(int projectIndex, int index) noexcept {
   if (!switchToProjectTab<SchematicTab>(projectIndex, index)) {
     if (auto prjEditor = mApp.getProjects().value(projectIndex)) {
@@ -676,6 +1189,16 @@ template <typename T>
 bool MainWindow::switchToTab() noexcept {
   for (auto section : *mSections) {
     if (section->switchToTab<T>()) {
+      return true;
+    }
+  }
+  return false;
+}
+
+template <typename T>
+bool MainWindow::switchToLibraryElementTab(const FilePath& fp) noexcept {
+  for (auto section : *mSections) {
+    if (section->switchToLibraryElementTab<T>(fp)) {
       return true;
     }
   }

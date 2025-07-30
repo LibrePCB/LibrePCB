@@ -1,11 +1,15 @@
 import {
     Action,
+    AngleEditParseResult,
     BoardAction,
     EditorTool,
     Int64,
     LengthEditParseResult,
     LengthUnit,
+    LibraryAction,
+    LibraryElementAction,
     ProjectAction,
+    RatioEditParseResult,
     SchematicAction,
     TabAction,
     WindowSectionAction,
@@ -45,8 +49,44 @@ export global Backend {
         debug("Trigger tab action:", section, tab, action);
 
         if action == TabAction.tool-select {
+            Data.sections[section].symbol-tabs[tab].tool = EditorTool.select;
+            Data.sections[section].package-tabs[tab].tool = EditorTool.select;
             Data.sections[section].schematic-tabs[tab].tool = EditorTool.select;
             Data.sections[section].board-2d-tabs[tab].tool = EditorTool.select;
+        } else if action == TabAction.tool-line {
+            Data.sections[section].symbol-tabs[tab].tool = EditorTool.line;
+            Data.sections[section].package-tabs[tab].tool = EditorTool.line;
+        } else if action == TabAction.tool-rect {
+            Data.sections[section].symbol-tabs[tab].tool = EditorTool.rect;
+            Data.sections[section].package-tabs[tab].tool = EditorTool.rect;
+        } else if action == TabAction.tool-polygon {
+            Data.sections[section].symbol-tabs[tab].tool = EditorTool.polygon;
+            Data.sections[section].package-tabs[tab].tool = EditorTool.polygon;
+            Data.sections[section].schematic-tabs[tab].tool = EditorTool.polygon;
+            Data.sections[section].board-2d-tabs[tab].tool = EditorTool.polygon;
+        } else if action == TabAction.tool-circle {
+            Data.sections[section].symbol-tabs[tab].tool = EditorTool.circle;
+            Data.sections[section].package-tabs[tab].tool = EditorTool.circle;
+        } else if action == TabAction.tool-arc {
+            Data.sections[section].symbol-tabs[tab].tool = EditorTool.arc;
+            Data.sections[section].package-tabs[tab].tool = EditorTool.arc;
+        } else if action == TabAction.tool-text {
+            Data.sections[section].symbol-tabs[tab].tool = EditorTool.text;
+            Data.sections[section].package-tabs[tab].tool = EditorTool.text;
+            Data.sections[section].schematic-tabs[tab].tool = EditorTool.text;
+            Data.sections[section].board-2d-tabs[tab].tool = EditorTool.text;
+        } else if action == TabAction.tool-name {
+            Data.sections[section].symbol-tabs[tab].tool = EditorTool.name;
+            Data.sections[section].package-tabs[tab].tool = EditorTool.name;
+        } else if action == TabAction.tool-value {
+            Data.sections[section].symbol-tabs[tab].tool = EditorTool.value;
+            Data.sections[section].package-tabs[tab].tool = EditorTool.value;
+        } else if action == TabAction.tool-pin {
+            Data.sections[section].symbol-tabs[tab].tool = EditorTool.pin;
+        } else if action == TabAction.tool-pad-tht {
+            Data.sections[section].package-tabs[tab].tool = EditorTool.pad-tht;
+        } else if action == TabAction.tool-pad-smt {
+            Data.sections[section].package-tabs[tab].tool = EditorTool.pad-smt;
         } else if action == TabAction.tool-wire {
             Data.sections[section].schematic-tabs[tab].tool = EditorTool.wire;
             Data.sections[section].board-2d-tabs[tab].tool = EditorTool.wire;
@@ -54,28 +94,50 @@ export global Backend {
             Data.sections[section].schematic-tabs[tab].tool = EditorTool.netlabel;
         } else if action == TabAction.tool-via {
             Data.sections[section].board-2d-tabs[tab].tool = EditorTool.via;
-        } else if action == TabAction.tool-polygon {
-            Data.sections[section].schematic-tabs[tab].tool = EditorTool.polygon;
-            Data.sections[section].board-2d-tabs[tab].tool = EditorTool.polygon;
-        } else if action == TabAction.tool-text {
-            Data.sections[section].schematic-tabs[tab].tool = EditorTool.text;
-            Data.sections[section].board-2d-tabs[tab].tool = EditorTool.text;
         } else if action == TabAction.tool-plane {
             Data.sections[section].board-2d-tabs[tab].tool = EditorTool.plane;
         } else if action == TabAction.tool-zone {
+            Data.sections[section].package-tabs[tab].tool = EditorTool.zone;
             Data.sections[section].board-2d-tabs[tab].tool = EditorTool.zone;
         } else if action == TabAction.tool-hole {
+            Data.sections[section].package-tabs[tab].tool = EditorTool.hole;
             Data.sections[section].board-2d-tabs[tab].tool = EditorTool.hole;
+        } else if action == TabAction.tool-renumber-pads {
+            Data.sections[section].package-tabs[tab].tool = EditorTool.renumber-pads;
         } else if action == TabAction.tool-component {
             Data.sections[section].schematic-tabs[tab].tool = EditorTool.component;
             Data.sections[section].board-2d-tabs[tab].tool = EditorTool.component;
         } else if action == TabAction.tool-measure {
+            Data.sections[section].symbol-tabs[tab].tool = EditorTool.measure;
+            Data.sections[section].package-tabs[tab].tool = EditorTool.measure;
             Data.sections[section].schematic-tabs[tab].tool = EditorTool.measure;
             Data.sections[section].board-2d-tabs[tab].tool = EditorTool.measure;
         } else if action == TabAction.abort {
+            Data.sections[section].symbol-tabs[tab].tool = EditorTool.select;
+            Data.sections[section].package-tabs[tab].tool = EditorTool.select;
             Data.sections[section].schematic-tabs[tab].tool = EditorTool.select;
             Data.sections[section].board-2d-tabs[tab].tool = EditorTool.select;
         }
+    }
+
+    // Trigger some library action
+    //
+    // Note: This callback is executed asynchronously in the backend to
+    // guarantee there are no side effects changing the UI from within the
+    // callback. Otherwise we couldn't declare it as 'pure'.
+    pure callback trigger-library(path: string, action: LibraryAction);
+    trigger-library(path, action) => {
+        debug("Trigger library action:", path, action);
+    }
+
+    // Trigger some library element action
+    //
+    // Note: This callback is executed asynchronously in the backend to
+    // guarantee there are no side effects changing the UI from within the
+    // callback. Otherwise we couldn't declare it as 'pure'.
+    pure callback trigger-library-element(path: string, action: LibraryElementAction);
+    trigger-library-element(path, action) => {
+        debug("Trigger library element action:", path, action);
     }
 
     // Trigger some project action
@@ -131,9 +193,9 @@ export global Backend {
     callback libraries-key-event(event: KeyEvent) -> EventResult;
     libraries-key-event(event) => {
         if event.text == Key.Escape {
-            Data.libraries-filter = "";
+            Data.libraries-panel-filter = "";
         } else {
-            Data.libraries-filter += event.text;
+            Data.libraries-panel-filter += event.text;
         }
         reject
     }
@@ -179,4 +241,32 @@ export global Backend {
     // The backend parses the input string and returns whether it is a valid
     // number, and the parsed length value plus unit.
     pure callback parse-length-input(s: string, unit: LengthUnit, minimum: Int64) -> LengthEditParseResult;
+
+    // Format an Angle value as a string
+    //
+    // Used by AngleEdit to convert an Angle value to a string.
+    pure callback format-angle(value: int) -> string;
+    format-angle => {
+        return "123.456";
+    }
+
+    // Parse the input text of an AngleEdit element
+    //
+    // The backend parses the input string and returns whether it is a valid
+    // number, and the parsed angle value.
+    pure callback parse-angle-input(s: string) -> AngleEditParseResult;
+
+    // Format a Ratio value as a string
+    //
+    // Used by RatioEdit to convert a Ratio value to a string.
+    pure callback format-ratio(value: int) -> string;
+    format-ratio => {
+        return "123.455";
+    }
+
+    // Parse the input text of a RatioEdit element
+    //
+    // The backend parses the input string and returns whether it is a valid
+    // ratio, and the parsed length value.
+    pure callback parse-ratio-input(s: string, minimum: int, maximum: int) -> RatioEditParseResult;
 }

@@ -23,6 +23,7 @@ export component IconButton inherits Rectangle {
     in property <length> icon-size: min(root.width, root.height) * icon-scale;
     in property <length> icon-offset-y: 0;
     in property <angle> icon-rotation: 0deg;
+    in property <bool> colorize: true;
     in property <color> color-disabled: #707070;
     in property <color> color-enabled: (style == IconButtonStyle.checkable-hyperlink) ? #909090 : Palette.foreground;
     in property <color> color-checked: (style == IconButtonStyle.checkable-hyperlink) ? #e0e0e0 : color-enabled;
@@ -61,6 +62,7 @@ export component IconButton inherits Rectangle {
     accessible-description: status-tip;
     accessible-enabled: enabled && (!read-only);
     accessible-label: tooltip;
+    accessible-checked: checked;
     //accessible-read-only: read-only;  Causing compiler warning :-/
     accessible-action-default => {
         ta.clicked();
@@ -75,7 +77,7 @@ export component IconButton inherits Rectangle {
             width: icon-size * (((!read-only) && ta.pressed) ? 0.85 : 1.0);
             height: self.width;
             image-fit: contain;
-            colorize: ((!read-only) && ta.has-hover) ? color-hovered : (checked ? color-checked : (enabled ? color-enabled : color-disabled));
+            colorize: colorize ? (((!read-only) && ta.has-hover) ? color-hovered : (checked ? color-checked : (enabled ? color-enabled : color-disabled))) : transparent;
             rotation-angle: icon-rotation;
             source: icon;
             accessible-role: none;

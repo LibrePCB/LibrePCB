@@ -73,7 +73,9 @@ public:
   // General Methods
   int count() const noexcept { return mObjects.count(); }
   bool isEmpty() const noexcept { return mObjects.isEmpty(); }
-  std::shared_ptr<TObj> at(int index) noexcept { return mObjects.at(index); }
+  const std::shared_ptr<TObj>& at(int index) noexcept {
+    return mObjects.at(index);
+  }
   std::shared_ptr<TObj> value(int index) noexcept {
     return mObjects.value(index);
   }
@@ -82,7 +84,7 @@ public:
   }
   void insert(int index, const std::shared_ptr<TObj>& obj) noexcept {
     Q_ASSERT(obj);
-    index = qBound(0, index, mObjects.count() + 1);
+    index = qBound(0, index, mObjects.count());
     mObjects.insert(index, obj);
     slint::Model<TUiData>::notify_row_added(index, 1);
     obj->onUiDataChanged.attach(mOnUiDataChangedSlot);

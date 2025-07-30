@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-
 #include <librepcb/core/geometry/circle.h>
 #include <librepcb/core/geometry/hole.h>
 #include <librepcb/core/geometry/polygon.h>
@@ -42,8 +41,6 @@
  ******************************************************************************/
 namespace librepcb {
 namespace editor {
-
-class GraphicsLayerList;
 
 /*******************************************************************************
  *  Class FootprintClipboardData
@@ -88,7 +85,7 @@ public:
   const HoleList& getHoles() const noexcept { return mHoles; }
 
   // General Methods
-  std::unique_ptr<QMimeData> toMimeData(const GraphicsLayerList& layers);
+  std::unique_ptr<QMimeData> toMimeData();
   static std::unique_ptr<FootprintClipboardData> fromMimeData(
       const QMimeData* mime);
   static bool isValid(const QMimeData* mime) noexcept;
@@ -97,7 +94,7 @@ public:
   FootprintClipboardData& operator=(const FootprintClipboardData& rhs) = delete;
 
 private:  // Methods
-  QPixmap generatePixmap(const GraphicsLayerList& layers) noexcept;
+  QPixmap generatePixmap() noexcept;
   static QString getMimeType() noexcept;
 
 private:  // Data

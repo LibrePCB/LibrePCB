@@ -1,0 +1,209 @@
+import { Tab } from "../../tab.slint";
+import {
+    AuthorRowHeader,
+    DeprecatedRowCell,
+    DeprecatedRowHeader,
+    DescriptionRowHeader,
+    KeywordsRowHeader,
+    MetadataFooterRowCell,
+    NameRowHeader,
+    ParentRowCell,
+    ParentRowHeader,
+    VersionRowHeader,
+} from "../metadatawidgets.slint";
+import {
+    IconButton,
+    LineEdit,
+    Palette,
+    TextEdit,
+    TreeItemPickerPopup,
+} from "../../widgets.slint";
+import {
+    Backend,
+    CategoryTabData,
+    Data,
+    FeatureState,
+    TabAction,
+    WindowSectionData,
+} from "../../api.slint";
+
+component CategoryTab inherits Tab {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    in-out property <[CategoryTabData]> tabs;
+    property <int> index: section.current-tab-index;
+    property <bool> read-only: section.tabs[index].features.save != FeatureState.enabled;
+
+    GridLayout {
+        padding: 8px;
+        spacing: 8px;
+
+        Row {
+            name-txt := NameRowHeader { }
+
+            name-edt := LineEdit {
+                text: tabs[index].name;
+                validation-error: tabs[index].name-error;
+                read-only: read-only;
+                accessible-label: name-txt.text;
+
+                init => {
+                    if !read-only {
+                        self.select-all();
+                    }
+                }
+
+                text-edited(text) => {
+                    tabs[index].name = text;
+                }
+
+                text-accepted(text) => {
+                    tabs[index].name = text;
+                    Backend.trigger-tab(section-index, index, TabAction.apply);
+                }
+            }
+        }
+
+        Row {
+            description-txt := DescriptionRowHeader { }
+
+            description-edt := TextEdit {
+                height: 100px;
+                text: tabs[index].description;
+                read-only: read-only;
+                accessible-label: description-txt.text;
+
+                text-edited(text) => {
+                    tabs[index].description = text;
+                }
+
+                text-accepted(text) => {
+                    tabs[index].description = text;
+                    Backend.trigger-tab(section-index, index, TabAction.apply);
+                }
+            }
+        }
+
+        Row {
+            keywords-txt := KeywordsRowHeader { }
+
+            keywords-edt := LineEdit {
+                text: tabs[index].keywords;
+                read-only: read-only;
+                accessible-label: keywords-txt.text;
+
+                text-edited(text) => {
+                    tabs[index].keywords = text;
+                }
+
+                text-accepted(text) => {
+                    tabs[index].keywords = text;
+                    Backend.trigger-tab(section-index, index, TabAction.apply);
+                }
+            }
+        }
+
+        Row {
+            author-txt := AuthorRowHeader { }
+
+            author-edt := LineEdit {
+                text: tabs[index].author;
+                read-only: read-only;
+                accessible-label: author-txt.text;
+
+                text-edited(text) => {
+                    tabs[index].author = text;
+                }
+
+                text-accepted(text) => {
+                    tabs[index].author = text;
+                    Backend.trigger-tab(section-index, index, TabAction.apply);
+                }
+            }
+        }
+
+        Row {
+            version-txt := VersionRowHeader { }
+
+            version-edt := LineEdit {
+                text: tabs[index].version;
+                validation-error: tabs[index].version-error;
+                read-only: read-only;
+                accessible-label: version-txt.text;
+
+                text-edited(text) => {
+                    tabs[index].version = text;
+                }
+
+                text-accepted(text) => {
+                    tabs[index].version = text;
+                    Backend.trigger-tab(section-index, index, TabAction.apply);
+                }
+            }
+        }
+
+        Row {
+            deprecated-txt := DeprecatedRowHeader { }
+
+            deprecated-sw := DeprecatedRowCell {
+                checked: tabs[index].deprecated;
+                enabled: !read-only;
+                accessible-label: deprecated-txt.text;
+
+                toggled(checked) => {
+                    tabs[index].deprecated = checked;
+                    Backend.trigger-tab(section-index, index, TabAction.apply);
+                }
+            }
+        }
+
+        Row {
+            parent-txt := ParentRowHeader { }
+
+            parent-cell := ParentRowCell {
+                model: tabs[index].parents;
+                read-only: read-only;
+
+                choose-parent-clicked => {
+                    choose-parent-popup.show();
+                }
+            }
+        }
+
+        Row {
+            Rectangle { }
+
+            MetadataFooterRowCell {
+                section-index: section-index;
+                tab-index: index;
+                wizard-mode: false;
+                unsaved-changes: Data.sections[section-index].tabs[index].unsaved-changes;
+                checks: tabs[index].checks;
+                read-only: read-only;
+            }
+        }
+
+        Row {
+            Rectangle { }
+        }
+
+        choose-parent-popup := TreeItemPickerPopup {
+            width: parent.width;
+            height: parent.height;
+            model: tabs[index].parents-tree;
+            icons-color: Palette.foreground;
+
+            item-picked(idx, item) => {
+                tabs[index].new-parent = item.user-data;
+            }
+        }
+    }
+}
+
+export component ComponentCategoryTab inherits CategoryTab {
+    tabs: self.section.component-category-tabs;
+}
+
+export component PackageCategoryTab inherits CategoryTab {
+    tabs: self.section.package-category-tabs;
+}

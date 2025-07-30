@@ -29,6 +29,7 @@
 
 #include <QtCore>
 #include <QtGui>
+#include <QtOpenGL>
 
 #include <slint.h>
 
@@ -75,7 +76,8 @@ class SlintGraphicsView final : public QObject {
 
 public:
   // Constructors / Destructor
-  explicit SlintGraphicsView(QObject* parent = nullptr) noexcept;
+  explicit SlintGraphicsView(const QRectF& defaultSceneRect,
+                             QObject* parent = nullptr) noexcept;
   SlintGraphicsView(const SlintGraphicsView& other) = delete;
   virtual ~SlintGraphicsView() noexcept;
 
@@ -86,6 +88,7 @@ public:
   Point mapToScenePos(const QPointF& pos) const noexcept;
 
   // General Methods
+  void setUseOpenGl(bool use) noexcept;
   void setEventHandler(IF_GraphicsViewEventHandler* obj) noexcept;
   slint::Image render(GraphicsScene& scene, float width, float height) noexcept;
   bool pointerEvent(const QPointF& pos,
@@ -101,6 +104,12 @@ public:
   void zoomOut() noexcept;
   void zoomToSceneRect(const QRectF& r) noexcept;
 
+  // Static Methods
+  static QRectF defaultSymbolSceneRect() noexcept;
+  static QRectF defaultFootprintSceneRect() noexcept;
+  static QRectF defaultSchematicSceneRect() noexcept;
+  static QRectF defaultBoardSceneRect() noexcept;
+
   // Operator Overloadings
   SlintGraphicsView& operator=(const SlintGraphicsView& rhs) = delete;
 
@@ -113,9 +122,15 @@ private:  // Methods
   void zoom(const QPointF& center, qreal factor) noexcept;
   void smoothTo(const Projection& projection) noexcept;
   bool applyProjection(const Projection& projection) noexcept;
+  QRectF validateSceneRect(const QRectF& r) const noexcept;
 
 private:  // Data
+  const QRectF mDefaultSceneRect;
   IF_GraphicsViewEventHandler* mEventHandler;
+  std::unique_ptr<QOffscreenSurface> mGlSurface;
+  std::unique_ptr<QOpenGLContext> mGlContext;
+  std::unique_ptr<QOpenGLFramebufferObject> mGlFbo;
+  QString mGlError;
   Projection mProjection;
   QSizeF mViewSize;
 

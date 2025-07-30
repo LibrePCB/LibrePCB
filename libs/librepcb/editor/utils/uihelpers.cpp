@@ -63,6 +63,22 @@ std::optional<PositiveLength> s2plength(const ui::Int64& v) noexcept {
   return (l > 0) ? std::make_optional(PositiveLength(l)) : std::nullopt;
 }
 
+int l2s(const Angle& v) noexcept {
+  return v.toMicroDeg();
+}
+
+Angle s2angle(int v) noexcept {
+  return Angle(v);
+}
+
+int l2s(const Ratio& v) noexcept {
+  return v.toPpm();
+}
+
+Ratio s2ratio(int v) noexcept {
+  return Ratio(v);
+}
+
 ui::GridStyle l2s(Theme::GridStyle v) noexcept {
   switch (v) {
     case Theme::GridStyle::Lines:
@@ -126,6 +142,48 @@ LengthUnit s2l(ui::LengthUnit v) noexcept {
   }
 }
 
+slint::cbindgen_private::TextHorizontalAlignment l2s(const HAlign& v) noexcept {
+  if (v == HAlign::left()) {
+    return slint::cbindgen_private::TextHorizontalAlignment::Left;
+  } else if (v == HAlign::right()) {
+    return slint::cbindgen_private::TextHorizontalAlignment::Right;
+  } else {
+    return slint::cbindgen_private::TextHorizontalAlignment::Center;
+  }
+}
+
+HAlign s2l(slint::cbindgen_private::TextHorizontalAlignment v) noexcept {
+  switch (v) {
+    case slint::cbindgen_private::TextHorizontalAlignment::Left:
+      return HAlign::left();
+    case slint::cbindgen_private::TextHorizontalAlignment::Right:
+      return HAlign::right();
+    default:
+      return HAlign::center();
+  }
+}
+
+slint::cbindgen_private::TextVerticalAlignment l2s(const VAlign& v) noexcept {
+  if (v == VAlign::top()) {
+    return slint::cbindgen_private::TextVerticalAlignment::Top;
+  } else if (v == VAlign::bottom()) {
+    return slint::cbindgen_private::TextVerticalAlignment::Bottom;
+  } else {
+    return slint::cbindgen_private::TextVerticalAlignment::Center;
+  }
+}
+
+VAlign s2l(slint::cbindgen_private::TextVerticalAlignment v) noexcept {
+  switch (v) {
+    case slint::cbindgen_private::TextVerticalAlignment::Top:
+      return VAlign::top();
+    case slint::cbindgen_private::TextVerticalAlignment::Bottom:
+      return VAlign::bottom();
+    default:
+      return VAlign::center();
+  }
+}
+
 ui::NotificationType l2s(RuleCheckMessage::Severity v) noexcept {
   switch (v) {
     case RuleCheckMessage::Severity::Hint:
@@ -141,6 +199,39 @@ ui::NotificationType l2s(RuleCheckMessage::Severity v) noexcept {
   }
 }
 
+static const std::vector<Package::AssemblyType>& getAssemblyTypes() noexcept {
+  static const std::vector<Package::AssemblyType> list = {
+      // ATTENTION: Keep in sync with constants.slint!
+      Package::AssemblyType::Tht,  // clang-format break
+      Package::AssemblyType::Smt,  // clang-format break
+      Package::AssemblyType::Mixed,  // clang-format break
+      Package::AssemblyType::Other,  // clang-format break
+      Package::AssemblyType::None,  // clang-format break
+      Package::AssemblyType::Auto,  // clang-format break
+  };
+  return list;
+}
+
+int l2s(Package::AssemblyType v) noexcept {
+  const auto& list = getAssemblyTypes();
+  const auto it = std::find(list.begin(), list.end(), v);
+  if (it == list.end()) {
+    qCritical() << "Unhandled value in Package::AssemblyType conversion.";
+    return -1;
+  }
+  return it - list.begin();
+}
+
+std::optional<Package::AssemblyType> s2assemblyType(int v) noexcept {
+  const auto& list = getAssemblyTypes();
+  if ((v >= 0) && (v < static_cast<int>(list.size()))) {
+    return list.at(v);
+  } else {
+    qCritical() << "Unhandled value in Package::AssemblyType conversion.";
+    return std::nullopt;
+  }
+}
+
 ui::EditorCommand l2s(const EditorCommand& cmd, ui::EditorCommand in) noexcept {
   QString text = cmd.getDisplayText();
   if (cmd.getFlags().testFlag(EditorCommand::Flag::OpensPopup)) {
@@ -153,6 +244,10 @@ ui::EditorCommand l2s(const EditorCommand& cmd, ui::EditorCommand in) noexcept {
     in.shortcut = q2s(shortcut.toString());
     in.modifiers = q2s(shortcut[0].keyboardModifiers());
     in.key = q2s(shortcut[0].key());
+    if (in.modifiers.shift && (in.key.size() == 1) &&
+        std::isalpha(in.key.data()[0])) {
+      in.key = in.key.to_uppercase();
+    }
   } else {
     // Multi-combination shortcuts are not supported yet.
     in.shortcut = slint::SharedString();
@@ -160,6 +255,10 @@ ui::EditorCommand l2s(const EditorCommand& cmd, ui::EditorCommand in) noexcept {
     in.key = slint::SharedString();
   }
   return in;
+}
+
+ui::FeatureState toFs(bool enabled) noexcept {
+  return enabled ? ui::FeatureState::Enabled : ui::FeatureState::Disabled;
 }
 
 /*******************************************************************************

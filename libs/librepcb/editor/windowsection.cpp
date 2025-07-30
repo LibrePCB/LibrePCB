@@ -23,8 +23,13 @@
 #include "windowsection.h"
 
 #include "hometab.h"
+#include "library/cat/componentcategorytab.h"
+#include "library/cat/packagecategorytab.h"
 #include "library/createlibrarytab.h"
 #include "library/downloadlibrarytab.h"
+#include "library/lib/librarytab.h"
+#include "library/pkg/packagetab.h"
+#include "library/sym/symboltab.h"
 #include "project/board/board2dtab.h"
 #include "project/board/board3dtab.h"
 #include "project/schematic/schematictab.h"
@@ -54,6 +59,18 @@ WindowSection::WindowSection(GuiApplication& app, QObject* parent) noexcept
                                              ui::CreateLibraryTabData>>(mTabs),
         std::make_shared<DerivedUiObjectList<TabList, DownloadLibraryTab,
                                              ui::DownloadLibraryTabData>>(
+            mTabs),
+        std::make_shared<
+            DerivedUiObjectList<TabList, LibraryTab, ui::LibraryTabData>>(
+            mTabs),
+        std::make_shared<DerivedUiObjectList<TabList, ComponentCategoryTab,
+                                             ui::CategoryTabData>>(mTabs),
+        std::make_shared<DerivedUiObjectList<TabList, PackageCategoryTab,
+                                             ui::CategoryTabData>>(mTabs),
+        std::make_shared<
+            DerivedUiObjectList<TabList, SymbolTab, ui::SymbolTabData>>(mTabs),
+        std::make_shared<
+            DerivedUiObjectList<TabList, PackageTab, ui::PackageTabData>>(
             mTabs),
         std::make_shared<
             DerivedUiObjectList<TabList, SchematicTab, ui::SchematicTabData>>(
@@ -174,6 +191,15 @@ bool WindowSection::processSceneKeyEvent(
     return t->processSceneKeyEvent(e);
   }
   return false;
+}
+
+bool WindowSection::requestCloseAllTabs() noexcept {
+  for (auto tab : *mTabs) {
+    if (!tab->requestClose()) {
+      return false;
+    }
+  }
+  return true;
 }
 
 /*******************************************************************************

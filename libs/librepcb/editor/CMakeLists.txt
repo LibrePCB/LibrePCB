@@ -50,9 +50,6 @@ add_library(
   dialogs/graphicsexportdialog.cpp
   dialogs/graphicsexportdialog.h
   dialogs/graphicsexportdialog.ui
-  dialogs/gridsettingsdialog.cpp
-  dialogs/gridsettingsdialog.h
-  dialogs/gridsettingsdialog.ui
   dialogs/holepropertiesdialog.cpp
   dialogs/holepropertiesdialog.h
   dialogs/holepropertiesdialog.ui
@@ -128,12 +125,10 @@ add_library(
   library/cat/categorytreebuilder.h
   library/cat/categorytreelabeltextbuilder.cpp
   library/cat/categorytreelabeltextbuilder.h
-  library/cat/componentcategoryeditorwidget.cpp
-  library/cat/componentcategoryeditorwidget.h
-  library/cat/componentcategoryeditorwidget.ui
-  library/cat/packagecategoryeditorwidget.cpp
-  library/cat/packagecategoryeditorwidget.h
-  library/cat/packagecategoryeditorwidget.ui
+  library/cat/componentcategorytab.cpp
+  library/cat/componentcategorytab.h
+  library/cat/packagecategorytab.cpp
+  library/cat/packagecategorytab.h
   library/cmd/cmdcomponentedit.cpp
   library/cmd/cmdcomponentedit.h
   library/cmd/cmdcomponentpinsignalmapitemedit.cpp
@@ -272,21 +267,25 @@ add_library(
   library/kicadlibraryimportwizard/kicadlibraryimportwizardpage_start.cpp
   library/kicadlibraryimportwizard/kicadlibraryimportwizardpage_start.h
   library/kicadlibraryimportwizard/kicadlibraryimportwizardpage_start.ui
-  library/lib/librarylisteditorwidget.cpp
-  library/lib/librarylisteditorwidget.h
-  library/lib/librarylisteditorwidget.ui
-  library/lib/libraryoverviewwidget.cpp
-  library/lib/libraryoverviewwidget.h
-  library/lib/libraryoverviewwidget.ui
+  library/lib/librarydependenciesmodel.cpp
+  library/lib/librarydependenciesmodel.h
+  library/lib/librarytab.cpp
+  library/lib/librarytab.h
   library/librariesmodel.cpp
   library/librariesmodel.h
   library/librarydownload.cpp
   library/librarydownload.h
   library/libraryeditor.cpp
   library/libraryeditor.h
-  library/libraryeditor.ui
+  library/libraryeditorlegacy.cpp
+  library/libraryeditorlegacy.h
+  library/libraryeditorlegacy.ui
+  library/libraryeditortab.cpp
+  library/libraryeditortab.h
   library/libraryelementcache.cpp
   library/libraryelementcache.h
+  library/libraryelementcategoriesmodel.cpp
+  library/libraryelementcategoriesmodel.h
   library/newelementwizard/newelementwizard.cpp
   library/newelementwizard/newelementwizard.h
   library/newelementwizard/newelementwizard.ui
@@ -316,17 +315,10 @@ add_library(
   library/newelementwizard/newelementwizardpage_entermetadata.cpp
   library/newelementwizard/newelementwizardpage_entermetadata.h
   library/newelementwizard/newelementwizardpage_entermetadata.ui
-  library/newelementwizard/newelementwizardpage_packagepads.cpp
-  library/newelementwizard/newelementwizardpage_packagepads.h
-  library/newelementwizard/newelementwizardpage_packagepads.ui
-  library/pkg/boardsideselectorwidget.cpp
-  library/pkg/boardsideselectorwidget.h
   library/pkg/footprintclipboarddata.cpp
   library/pkg/footprintclipboarddata.h
   library/pkg/footprintgraphicsitem.cpp
   library/pkg/footprintgraphicsitem.h
-  library/pkg/footprintlisteditorwidget.cpp
-  library/pkg/footprintlisteditorwidget.h
   library/pkg/footprintlistmodel.cpp
   library/pkg/footprintlistmodel.h
   library/pkg/footprintpadgraphicsitem.cpp
@@ -336,6 +328,7 @@ add_library(
   library/pkg/footprintpadpropertiesdialog.ui
   library/pkg/fsm/packageeditorfsm.cpp
   library/pkg/fsm/packageeditorfsm.h
+  library/pkg/fsm/packageeditorfsmadapter.h
   library/pkg/fsm/packageeditorstate.cpp
   library/pkg/fsm/packageeditorstate.h
   library/pkg/fsm/packageeditorstate_addholes.cpp
@@ -373,21 +366,15 @@ add_library(
   library/pkg/packagechooserdialog.cpp
   library/pkg/packagechooserdialog.h
   library/pkg/packagechooserdialog.ui
-  library/pkg/packageeditorwidget.cpp
-  library/pkg/packageeditorwidget.h
-  library/pkg/packageeditorwidget.ui
-  library/pkg/packagemodellisteditorwidget.cpp
-  library/pkg/packagemodellisteditorwidget.h
   library/pkg/packagemodellistmodel.cpp
   library/pkg/packagemodellistmodel.h
-  library/pkg/packagepadcombobox.cpp
-  library/pkg/packagepadcombobox.h
-  library/pkg/packagepadlisteditorwidget.cpp
-  library/pkg/packagepadlisteditorwidget.h
   library/pkg/packagepadlistmodel.cpp
   library/pkg/packagepadlistmodel.h
+  library/pkg/packagetab.cpp
+  library/pkg/packagetab.h
   library/sym/fsm/symboleditorfsm.cpp
   library/sym/fsm/symboleditorfsm.h
+  library/sym/fsm/symboleditorfsmadapter.h
   library/sym/fsm/symboleditorstate.cpp
   library/sym/fsm/symboleditorstate.h
   library/sym/fsm/symboleditorstate_addnames.cpp
@@ -421,9 +408,6 @@ add_library(
   library/sym/symbolchooserdialog.ui
   library/sym/symbolclipboarddata.cpp
   library/sym/symbolclipboarddata.h
-  library/sym/symboleditorwidget.cpp
-  library/sym/symboleditorwidget.h
-  library/sym/symboleditorwidget.ui
   library/sym/symbolgraphicsitem.cpp
   library/sym/symbolgraphicsitem.h
   library/sym/symbolpingraphicsitem.cpp
@@ -431,6 +415,8 @@ add_library(
   library/sym/symbolpinpropertiesdialog.cpp
   library/sym/symbolpinpropertiesdialog.h
   library/sym/symbolpinpropertiesdialog.ui
+  library/sym/symboltab.cpp
+  library/sym/symboltab.h
   mainwindow.cpp
   mainwindow.h
   mainwindowtestadapter.cpp
@@ -863,8 +849,6 @@ add_library(
   utils/editortoolbox.h
   utils/exclusiveactiongroup.cpp
   utils/exclusiveactiongroup.h
-  utils/halignactiongroup.cpp
-  utils/halignactiongroup.h
   utils/lengtheditcontext.cpp
   utils/lengtheditcontext.h
   utils/measuretool.cpp
@@ -888,8 +872,6 @@ add_library(
   utils/uiobjectlist.h
   utils/undostackactiongroup.cpp
   utils/undostackactiongroup.h
-  utils/valignactiongroup.cpp
-  utils/valignactiongroup.h
   widgets/alignmentselector.cpp
   widgets/alignmentselector.h
   widgets/alignmentselector.ui
@@ -957,6 +939,8 @@ add_library(
   windowtab.h
   workspace/categorytreemodel.cpp
   workspace/categorytreemodel.h
+  workspace/categorytreemodellegacy.cpp
+  workspace/categorytreemodellegacy.h
   workspace/desktopintegration.cpp
   workspace/desktopintegration.h
   workspace/desktopservices.cpp

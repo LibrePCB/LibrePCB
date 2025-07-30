@@ -35,7 +35,7 @@ namespace editor {
  ******************************************************************************/
 
 CmdPackageEdit::CmdPackageEdit(Package& package) noexcept
-  : CmdLibraryElementEdit(package, tr("Edit Package Metadata")),
+  : CmdLibraryElementEdit(package, tr("Edit Package Properties")),
     mPackage(package),
     mOldAssemblyType(package.getAssemblyType(false)),
     mNewAssemblyType(mOldAssemblyType) {

@@ -124,6 +124,64 @@ export struct LengthEditParseResult {
     evaluated-unit: LengthUnit,
 }
 
+// Underlying data structure for AngleEdit elements
+export struct AngleEditData {
+    value: int,  // Microdegrees like in the backend
+    increase: bool,  // Set by UI, reset by backend
+    decrease: bool,  // Set by UI, reset by backend
+}
+
+// Text parse result as used in the AngleEdit component
+export struct AngleEditParseResult {
+    valid: bool,
+    evaluated-value: int,
+}
+
+// Underlying data structure for RatioEdit elements
+export struct RatioEditData {
+    value: int,  // PPM like in the backend
+    minimum: int,  // PPM like in the backend
+    maximum: int,  // PPM like in the backend
+    can-increase: bool,
+    can-decrease: bool,
+    increase: bool,  // Set by UI, reset by backend
+    decrease: bool,  // Set by UI, reset by backend
+}
+
+// Text parse result as used in the RatioEdit component
+export struct RatioEditParseResult {
+    valid: bool,
+    evaluated-value: int,
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Tree views
+////////////////////////////////////////////////////////////////////////////////
+
+// Tree view item actions
+export enum TreeViewItemAction {
+    none,
+    open,
+    delete,
+    new-folder,
+    new-project,
+}
+
+// Generic tree view item data structure
+export struct TreeViewItemData {
+    level: int,  // 0 = top level items
+    icon: image,
+    text: string,
+    hint: string,
+    user-data: string,  // User data to uniquely reference this item
+    is-project-file-or-folder: bool,
+    has-children: bool,
+    expanded: bool,
+    supports-pinning: bool,
+    pinned: bool,
+    action: TreeViewItemAction,  // Set by UI, handled in backend
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Notifications
 ////////////////////////////////////////////////////////////////////////////////
@@ -173,6 +231,11 @@ export enum RuleCheckType {
     none,
     erc,
     drc,
+    library-check,
+    component-category-check,
+    package-category-check,
+    symbol-check,
+    package-check,
 }
 
 export enum RuleCheckState {
@@ -202,8 +265,10 @@ export struct RuleCheckData {
     type: RuleCheckType,
     state: RuleCheckState,
     messages: [RuleCheckMessageData],
-    unapproved: int,
+    unapproved: int,  // Number of unapproved messages
+    errors: int,  // Messages of error severity, no matter if approved or not
     execution-error: string,  // Empty if no error
+    read-only: bool,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -212,14 +277,24 @@ export struct RuleCheckData {
 
 export enum EditorTool {
     select,
+    line,
+    rect,
+    polygon,
+    circle,
+    arc,
+    text,
+    name,
+    value,
+    hole,
+    pin,
+    pad-tht,
+    pad-smt,
     wire,
     netlabel,
-    polygon,
-    text,
     via,
     plane,
     zone,
-    hole,
+    renumber-pads,
     component,
     measure,
 }
@@ -230,6 +305,120 @@ export enum WireMode {
     deg90-45,
     deg45-90,
     straight,
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Library Editor
+////////////////////////////////////////////////////////////////////////////////
+
+// Library element actions (for libraries, symbols, components, ...)
+export enum LibraryElementAction {
+    open,
+    close,
+    open-folder,
+    import-eagle-library,
+    import-kicad-library,
+}
+
+// Type of LibraryTreeViewItemData
+// Note: The order of items defines the sort order in the UI.
+export enum LibraryTreeViewItemType {
+    all,
+    uncategorized,
+    component-category,
+    package-category,
+    device,
+    component,
+    symbol,
+    package,
+}
+
+// Library content tree view item data structure
+export struct LibraryTreeViewItemData {
+    type: LibraryTreeViewItemType,
+    level: int,  // 0 = top level items
+    name: string,
+    summary: string,
+    elements: int,  // Number of contained elements
+    is-external: bool,  // External category, not from this library
+    user-data: string,  // File path for internal elements, UUID for external
+}
+
+// A possible dependency of a library (either marked as dependent or not)
+export struct LibraryDependency {
+    uuid: string,
+    icon: image,
+    name: string,
+    checked: bool,
+}
+
+// Opened library (editor) data
+export struct LibraryData {
+    valid: bool,
+    path: string,
+    name: string,
+    writable: bool,
+}
+
+// Library element category (e.g. "Integrated Circuits -> Timers")
+export struct LibraryElementCategoryData {
+    uuid: string,  // Just for reference in the backend
+    names: [string],  // Category level names, starting from root category
+    delete: bool,  // Set by UI, reset by backend
+}
+
+// Enum of footprint pad shapes available in the toolbar
+export enum PadShape {
+    round,
+    rounded-rect,
+    rect,
+    octagon,
+}
+
+// Actions for FootprintData
+export enum FootprintAction {
+    none,
+    move-up,
+    duplicate,
+    delete,
+}
+
+// Footprint data structure
+export struct FootprintData {
+    id: string,
+    name: string,
+    model-x: Int64,
+    model-y: Int64,
+    model-z: Int64,
+    model-rx: int,
+    model-ry: int,
+    model-rz: int,
+    models: [bool],  // One flag for each 3D model
+    action: FootprintAction,  // Set by UI, handled in backend
+}
+
+// Package pad data structure
+export struct PackagePadData {
+    id: string,
+    name: string,
+    name-error: string,
+    delete: bool,  // Set by UI, reset by backend
+    sort-index: int,  // Used by backend for sorting
+}
+
+// Actions for PackageModelData
+export enum PackageModelAction {
+    none,
+    move-up,
+    browse,
+    delete,
+}
+
+// Package 3D model data structure
+export struct PackageModelData {
+    id: string,
+    name: string,
+    action: PackageModelAction,  // Set by UI, handled in backend
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -245,6 +434,13 @@ export enum FeatureState {
 
 // Features available in a tab (see TabData)
 export struct TabFeatures {
+    save: FeatureState,
+    undo: FeatureState,
+    redo: FeatureState,
+    grid: FeatureState,
+    zoom: FeatureState,
+    background-image: FeatureState,
+    import-graphics: FeatureState,
     export-graphics: FeatureState,
     select: FeatureState,
     cut: FeatureState,
@@ -269,6 +465,11 @@ export enum TabType {
     home,
     create-library,
     download-library,
+    library,
+    component-category,
+    package-category,
+    symbol,
+    package,
     schematic,
     board-2d,
     board-3d,
@@ -277,10 +478,14 @@ export enum TabType {
 // Tab actions
 export enum TabAction {
     close,
+    apply,
     cancel,
     accept,
+    back,
+    next,
 
     // General
+    save,
     print,
     export-image,
     export-pdf,
@@ -297,6 +502,8 @@ export enum TabAction {
     select-all,
 
     // Modify
+    undo,
+    redo,
     cut,
     copy,
     paste,
@@ -335,11 +542,28 @@ export enum TabAction {
     zoom-in,
     zoom-out,
     zoom-fit,
+    toggle-background-image,
 
     // Find
     find-refresh-suggestions,
     find-next,
     find-previous,
+
+    // Library tab
+    library-choose-icon,
+    library-categories-duplicate,
+    library-categories-remove,
+    library-elements-duplicate,
+    library-elements-remove,
+
+    // Symbol tab
+    symbol-import-pins,
+
+    // Package tab
+    package-add-pads,
+    package-add-model,
+    package-generate-outline,
+    package-generate-courtyard,
 
     // Board 2D tab
     board-place-component,
@@ -348,14 +572,30 @@ export enum TabAction {
 
     // Tools
     tool-select,
+    tool-line,
+    tool-rect,
+    tool-polygon,
+    tool-circle,
+    tool-arc,
+    tool-text,
+    tool-name,
+    tool-value,
+    tool-hole,
+    tool-pin,
+    tool-pad-tht,
+    tool-pad-smt,
+    tool-pad-thermal,
+    tool-pad-bga,
+    tool-pad-edge-connector,
+    tool-pad-test-point,
+    tool-pad-local-fiducial,
+    tool-pad-global-fiducial,
     tool-wire,
     tool-netlabel,
-    tool-polygon,
-    tool-text,
     tool-via,
     tool-plane,
     tool-zone,
-    tool-hole,
+    tool-renumber-pads,
     tool-component,
     tool-component-frame,
     tool-component-resistor,
@@ -376,6 +616,12 @@ export struct TabData {
     type: TabType,
     title: string,
     features: TabFeatures,
+    read-only: bool,
+    unsaved-changes: bool,
+
+    // Undo/redo
+    undo-text: string,
+    redo-text: string,
 
     // Find
     find-term: string,  // Set by UI, handled in backend
@@ -416,6 +662,214 @@ export struct DownloadLibraryTabData {
     download-running: bool,
     download-progress: int,
     download-status: string,  // Status or error
+}
+
+// Additional data for library editor tabs
+export struct LibraryTabData {
+    // General
+    library-index: int,
+    wizard-mode: bool,
+    page-index: int,
+
+    // Metadata
+    icon: image,
+    name: string,
+    name-error: string,
+    description: string,
+    keywords: string,
+    author: string,
+    version: string,
+    version-error: string,
+    deprecated: bool,
+    url: string,
+    url-error: string,
+    dependencies: [LibraryDependency],
+    manufacturer: string,
+
+    // Content
+    categories: [LibraryTreeViewItemData],
+    categories-index: int,
+    filtered-elements: [LibraryTreeViewItemData],
+    filtered-elements-index: int,
+
+    // Checks
+    checks: RuleCheckData,
+
+    // Actions
+    move-category-to-lib: string,  // File path to a local library
+    move-element-to-lib: string,  // File path to a local library
+}
+
+// Additional data for component- or package category editor tabs
+export struct CategoryTabData {
+    // General
+    library-index: int,
+    path: string,
+
+    // Metadata
+    name: string,
+    name-error: string,
+    description: string,
+    keywords: string,
+    author: string,
+    version: string,
+    version-error: string,
+    deprecated: bool,
+    parents: [string],
+    parents-tree: [TreeViewItemData],
+
+    // Checks
+    checks: RuleCheckData,
+
+    // Actions
+    new-parent: string,  // Set to UUID or "null" by UI, reset by backend,
+}
+
+// Additional data for symbol editor tabs
+export struct SymbolTabData {
+    // General
+    library-index: int,
+    path: string,
+    wizard-mode: bool,
+    page-index: int,
+
+    // Metadata
+    name: string,
+    name-error: string,
+    description: string,
+    keywords: string,
+    author: string,
+    version: string,
+    version-error: string,
+    deprecated: bool,
+    categories: [LibraryElementCategoryData],
+    categories-tree: [TreeViewItemData],
+
+    // Checks
+    checks: RuleCheckData,
+
+    // View
+    background-color: brush,
+    foreground-color: brush,
+    overlay-color: brush,
+    overlay-text-color: brush,
+    grid-style: GridStyle,
+    grid-interval: Int64,
+    unit: LengthUnit,
+
+    // Messages
+    interface-broken-msg: bool,
+    import-pins-msg: DismissableMessageData,
+
+    // Data about the currently active tool
+    tool: EditorTool,
+    tool-cursor: MouseCursor,
+    tool-overlay-text: string,
+    tool-layer: ComboBoxData,
+    tool-line-width: LengthEditData,
+    tool-size: LengthEditData,
+    tool-angle: AngleEditData,
+    tool-filled: bool,
+    tool-grab-area: bool,
+    tool-value: LineEditData,
+    tool-halign: TextHorizontalAlignment,
+    tool-valign: TextVerticalAlignment,
+
+    // Misc
+    compact-layout: bool,  // Set by UI
+    scene-image-pos: Point,  // Absolute position of graphics scene
+    frame: int,  // Frame index to trigger repainting
+
+    // Actions
+    new-category: string,  // Set to UUID by UI, reset by backend.
+}
+
+// Additional data for package editor tabs
+export struct PackageTabData {
+    // General
+    library-index: int,
+    path: string,
+    wizard-mode: bool,
+    page-index: int,
+    view-3d: bool,
+
+    // Metadata
+    name: string,
+    name-error: string,
+    description: string,
+    keywords: string,
+    author: string,
+    version: string,
+    version-error: string,
+    deprecated: bool,
+    categories: [LibraryElementCategoryData],
+    categories-tree: [TreeViewItemData],
+    assembly-type: int,
+    pads: [PackagePadData],
+    new-pad-name: string,
+    new-pad-name-error: string,
+    footprints: [FootprintData],
+    footprint-index: int,
+    models: [PackageModelData],
+    model-index: int,
+
+    // Checks
+    checks: RuleCheckData,
+
+    // View
+    background-color: brush,
+    foreground-color: brush,
+    overlay-color: brush,
+    overlay-text-color: brush,
+    grid-style: GridStyle,
+    grid-interval: Int64,
+    unit: LengthUnit,
+    background-image-set: bool,
+    solderresist-alpha: float,  // 3D view
+    silkscreen-alpha: float,  // 3D view
+    solderpaste-alpha: float,  // 3D view
+    devices-alpha: float,  // 3D view
+    refreshing: bool,  // 3D view
+    opengl-error: string,  // 3D view
+
+    // Messages
+    interface-broken-msg: bool,
+
+    // Data about the currently active tool
+    tool: EditorTool,
+    tool-cursor: MouseCursor,
+    tool-overlay-text: string,
+    tool-layer: ComboBoxData,
+    tool-line-width: LengthEditData,
+    tool-size: LengthEditData,
+    tool-drill: LengthEditData,
+    tool-angle: AngleEditData,
+    tool-ratio: RatioEditData,
+    tool-filled: bool,
+    tool-grab-area: bool,
+    tool-value: LineEditData,
+    tool-halign: TextHorizontalAlignment,
+    tool-valign: TextVerticalAlignment,
+    tool-package-pad: ComboBoxData,
+    tool-bottom: bool,
+    tool-shape: PadShape,
+    tool-fiducial: bool,  // Read-only
+    tool-pressfit: bool,
+    tool-layer-top: bool,
+    tool-layer-inner: bool,
+    tool-layer-bottom: bool,
+    tool-no-copper: bool,
+    tool-no-planes: bool,
+    tool-no-exposures: bool,
+    tool-no-devices: bool,
+
+    // Misc
+    scene-image-pos: Point,  // Absolute position of graphics scene
+    frame: int,  // Frame index to trigger repainting
+
+    // Actions
+    new-category: string,  // Set to UUID by UI, reset by backend
+    new-footprint: string,  // Set to new name by UI, reset by backend
 }
 
 // Additional data for schematic editor tabs
@@ -532,6 +986,11 @@ export struct WindowSectionData {
     tabs: [TabData],
     create-library-tabs: [CreateLibraryTabData],  // Proxy view for `tabs`
     download-library-tabs: [DownloadLibraryTabData],  // Proxy view for `tabs`
+    library-tabs: [LibraryTabData],  // Proxy view for `tabs`
+    component-category-tabs: [CategoryTabData],  // Proxy view for `tabs`
+    package-category-tabs: [CategoryTabData],  // Proxy view for `tabs`
+    symbol-tabs: [SymbolTabData],  // Proxy view for `tabs`
+    package-tabs: [PackageTabData],  // Proxy view for `tabs`
     schematic-tabs: [SchematicTabData],  // Proxy view for `tabs`
     board-2d-tabs: [Board2dTabData],  // Proxy view for `tabs`
     board-3d-tabs: [Board3dTabData],  // Proxy view for `tabs`
@@ -540,46 +999,23 @@ export struct WindowSectionData {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Tree views
-////////////////////////////////////////////////////////////////////////////////
-
-// Tree view item actions
-export enum TreeViewItemAction {
-    none,
-    open,
-    delete,
-    new-folder,
-    new-project,
-}
-
-// Generic tree view item data structure
-export struct TreeViewItemData {
-    level: int,  // 0 = top level items
-    icon: image,
-    text: string,
-    hint: string,
-    user-data: string,  // User data to uniquely reference this item
-    is-project-file-or-folder: bool,
-    has-children: bool,
-    expanded: bool,
-    supports-pinning: bool,
-    pinned: bool,
-    action: TreeViewItemAction,  // Set by UI, handled in backend
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // Libraries
 ////////////////////////////////////////////////////////////////////////////////
 
 // Library actions
 export enum LibraryAction {
-    none,
     open,
     uninstall,
+    new-component-category,
+    new-package-category,
+    new-symbol,
+    new-package,
+    new-component,
+    new-device,
 }
 
 // Workspace library data structure
-export struct LibraryData {
+export struct LibraryInfoData {
     uuid: string,
     path: string,  // Empty if not installed
     icon: image,
@@ -592,10 +1028,9 @@ export struct LibraryData {
     progress: int,  // [%], 0 if not installing
     checked: bool,
     highlight: bool,
-    action: LibraryAction,  // Set by UI, handled in backend
 }
 
-// Metadata for a list of LibraryData
+// Metadata for a list of LibraryInfoData
 export struct LibraryListData {
     refreshing: bool,  // Only for remote libraries (async operation)
     refreshing-error: string,
@@ -661,8 +1096,6 @@ export struct BoardData {
 export enum ProjectAction {
     close,
     save,
-    undo,
-    redo,
     export-bom,
     export-lppz,
     open-folder,
@@ -682,13 +1115,6 @@ export struct ProjectData {
     writable: bool,
     ieee315-symbols: bool,
     unsaved-changes: bool,
-
-    // Undo/redo
-    can-undo: bool,
-    can-redo: bool,
-    undo-text: string,
-    redo-text: string,
-
     erc: RuleCheckData,
 }
 

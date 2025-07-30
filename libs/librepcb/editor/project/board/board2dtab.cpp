@@ -30,6 +30,7 @@
 #include "../../guiapplication.h"
 #include "../../library/pkg/footprintgraphicsitem.h"
 #include "../../undostack.h"
+#include "../../utils/editortoolbox.h"
 #include "../../utils/slinthelpers.h"
 #include "../../utils/uihelpers.h"
 #include "../../workspace/desktopservices.h"
@@ -87,18 +88,6 @@
 namespace librepcb {
 namespace editor {
 
-static QString toSingleLine(const QString& s) {
-  return QString(s).replace("\n", "\\n");
-}
-
-static QString toMultiLine(const QString& s) {
-  return s.trimmed().replace("\\n", "\n");
-}
-
-static ui::FeatureState toFs(bool enabled) noexcept {
-  return enabled ? ui::FeatureState::Enabled : ui::FeatureState::Disabled;
-}
-
 static ui::WireMode l2s(BoardEditorState_DrawTrace::WireMode v) noexcept {
   if (v == BoardEditorState_DrawTrace::WireMode::HV) {
     return ui::WireMode::HV;
@@ -144,7 +133,8 @@ Board2dTab::Board2dTab(GuiApplication& app, BoardEditor& editor,
     mBoardEditor(editor),
     mBoard(mBoardEditor.getBoard()),
     mLayers(GraphicsLayerList::boardLayers(&app.getWorkspace().getSettings())),
-    mView(new SlintGraphicsView(this)),
+    mView(new SlintGraphicsView(SlintGraphicsView::defaultBoardSceneRect(),
+                                this)),
     mMsgEmptySchematics(app.getWorkspace(), "EMPTY_BOARD_NO_COMPONENTS"),
     mMsgPlaceDevices(app.getWorkspace(), "EMPTY_BOARD_PLACE_DEVICES"),
     mGridStyle(mApp.getWorkspace()
@@ -184,7 +174,13 @@ Board2dTab::Board2dTab(GuiApplication& app, BoardEditor& editor,
           &Board2dTab::storeLayersVisibility);
 
   // Setup graphics view.
+  mView->setUseOpenGl(mApp.getWorkspace().getSettings().useOpenGl.get());
   mView->setEventHandler(this);
+  connect(
+      &mApp.getWorkspace().getSettings().useOpenGl,
+      &WorkspaceSettingsItem_GenericValue<bool>::edited, this, [this]() {
+        mView->setUseOpenGl(mApp.getWorkspace().getSettings().useOpenGl.get());
+      });
   connect(mView.get(), &SlintGraphicsView::transformChanged, this,
           &Board2dTab::requestRepaint);
   connect(mView.get(), &SlintGraphicsView::stateChanged, this,
@@ -275,6 +271,13 @@ int Board2dTab::getProjectObjectIndex() const noexcept {
 
 ui::TabData Board2dTab::getUiData() const noexcept {
   ui::TabFeatures features = {};
+  features.save = toFs(mProject.getDirectory().isWritable());
+  features.undo = toFs(mProjectEditor.getUndoStack().canUndo());
+  features.redo = toFs(mProjectEditor.getUndoStack().canRedo());
+  features.grid = toFs(mProject.getDirectory().isWritable());
+  features.zoom = toFs(true);
+  features.import_graphics =
+      toFs(mToolFeatures.testFlag(Feature::ImportGraphics));
   features.export_graphics = toFs(mTool == ui::EditorTool::Select);
   features.select = toFs(mTool == ui::EditorTool::Select);
   features.cut = toFs(mToolFeatures.testFlag(Feature::Cut));
@@ -296,6 +299,10 @@ ui::TabData Board2dTab::getUiData() const noexcept {
       ui::TabType::Board2d,  // Type
       q2s(*mBoard.getName()),  // Title
       features,  // Features
+      !mProject.getDirectory().isWritable(),  // Read-only
+      mProjectEditor.hasUnsavedChanges(),  // Unsaved changes
+      q2s(mProjectEditor.getUndoStack().getUndoCmdText()),  // Undo text
+      q2s(mProjectEditor.getUndoStack().getRedoCmdText()),  // Redo text
       q2s(mSearchContext.getTerm()),  // Find term
       mSearchContext.getSuggestions(),  // Find suggestions
       mLayersModel,  // Layers
@@ -360,7 +367,7 @@ ui::Board2dTabData Board2dTab::getDerivedUiData() const noexcept {
       ui::LineEditData{
           // Tool value
           true,  // Enabled
-          q2s(toSingleLine(mToolValue)),  // Text
+          q2s(EditorToolbox::toSingleLine(mToolValue)),  // Text
           slint::SharedString(),  // Placeholder
           mToolValueSuggestions,  // Suggestions
       },
@@ -439,7 +446,7 @@ void Board2dTab::setDerivedUiData(const ui::Board2dTabData& data) noexcept {
   emit mirroredRequested(data.tool_mirrored);
 
   // Tool value
-  emit valueRequested(toMultiLine(s2q(data.tool_value.text)));
+  emit valueRequested(EditorToolbox::toMultiLine(s2q(data.tool_value.text)));
 
   // Tool zone rules
   emit zoneRuleRequested(Zone::Rule::NoCopper, data.tool_no_copper);
@@ -603,6 +610,14 @@ void Board2dTab::trigger(ui::TabAction a) noexcept {
       } else {
         mFsm->processAbortCommand();
       }
+      break;
+    }
+    case ui::TabAction::Undo: {
+      mProjectEditor.undo();
+      break;
+    }
+    case ui::TabAction::Redo: {
+      mProjectEditor.redo();
       break;
     }
     case ui::TabAction::Cut: {
@@ -819,7 +834,8 @@ slint::Image Board2dTab::renderScene(float width, float height,
                                      int scene) noexcept {
   if (scene == 1) {
     if (mUnplacedComponentGraphicsScene) {
-      SlintGraphicsView view;
+      SlintGraphicsView view(SlintGraphicsView::defaultFootprintSceneRect());
+      view.setUseOpenGl(mApp.getWorkspace().getSettings().useOpenGl.get());
       return view.render(*mUnplacedComponentGraphicsScene, width, height);
     } else {
       QPixmap pix(width, height);

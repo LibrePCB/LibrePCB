@@ -35,22 +35,14 @@ namespace editor {
 
 static const qreal sScrollFactor = 0.07;
 
-// Helper to avoid division by zero on empty scenes.
-static QRectF validateSceneRect(const QRectF& r) noexcept {
-  if (r.isEmpty()) {
-    const qreal pxPerMm = Length::fromMm(1).toPx();
-    return QRectF(-20 * pxPerMm, -180 * pxPerMm, 300 * pxPerMm, 220 * pxPerMm);
-  } else {
-    return r;
-  }
-}
-
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
-SlintGraphicsView::SlintGraphicsView(QObject* parent) noexcept
+SlintGraphicsView::SlintGraphicsView(const QRectF& defaultSceneRect,
+                                     QObject* parent) noexcept
   : QObject(parent),
+    mDefaultSceneRect(defaultSceneRect),
     mEventHandler(nullptr),
     mAnimation(new QVariantAnimation(this)) {
   mAnimation->setDuration(500);
@@ -90,6 +82,32 @@ Point SlintGraphicsView::mapToScenePos(const QPointF& pos) const noexcept {
  *  General Methods
  ******************************************************************************/
 
+void SlintGraphicsView::setUseOpenGl(bool use) noexcept {
+  if (use && (!mGlContext)) {
+    // Create off-screen surface.
+    std::unique_ptr<QOffscreenSurface> surface(new QOffscreenSurface());
+    surface->create();
+
+    // Create OpenGL context.
+    std::unique_ptr<QOpenGLContext> context(new QOpenGLContext());
+    if ((!context->create()) || (!context->makeCurrent(surface.get()))) {
+      mGlError = "Failed to create & activate OpenGL context.";
+      return;
+    }
+
+    // Keep objects.
+    mGlSurface = std::move(surface);
+    mGlContext = std::move(context);
+    emit transformChanged();
+  } else if ((!use) && mGlSurface) {
+    mGlFbo.reset();
+    mGlContext.reset();
+    mGlSurface.reset();
+    mGlError.clear();
+    emit transformChanged();
+  }
+}
+
 void SlintGraphicsView::setEventHandler(
     IF_GraphicsViewEventHandler* obj) noexcept {
   mEventHandler = obj;
@@ -97,16 +115,40 @@ void SlintGraphicsView::setEventHandler(
 
 slint::Image SlintGraphicsView::render(GraphicsScene& scene, float width,
                                        float height) noexcept {
-  if ((width < 2) || (height < 2)) {
+  const QSize size(qCeil(width), qCeil(height));
+  if ((size.width() < 2) || (size.height() < 2)) {
     return slint::Image();
   }
 
-  QPixmap pixmap(qCeil(width), qCeil(height));
+  // If OpenGL is activated, enable context and prepare FBO.
+  QString openGlError = mGlError;
+  if (mGlSurface && mGlContext && openGlError.isEmpty()) {
+    if (!mGlContext->makeCurrent(mGlSurface.get())) {
+      openGlError = "Failed to make OpenGL context current.";
+    }
+    if (openGlError.isEmpty() && ((!mGlFbo) || (mGlFbo->size() != size))) {
+      mGlFbo.reset();  // Release memory first.
+      QOpenGLFramebufferObjectFormat format;
+      format.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
+      format.setSamples(4);
+      mGlFbo.reset(new QOpenGLFramebufferObject(size, format));
+    }
+    if (openGlError.isEmpty() && (!mGlFbo->bind())) {
+      openGlError = "Failed to bind OpenGL FBO.";
+    }
+  }
+
+  QPixmap pixmap(size);
   {
-    QPainter painter(&pixmap);
+    std::unique_ptr<QOpenGLPaintDevice> glDev;
+    if (mGlFbo && openGlError.isEmpty()) {
+      glDev.reset(new QOpenGLPaintDevice(size));
+    }
+    QPainter painter(glDev ? static_cast<QPaintDevice*>(glDev.get())
+                           : static_cast<QPaintDevice*>(&pixmap));
     painter.setRenderHints(QPainter::Antialiasing |
                            QPainter::SmoothPixmapTransform);
-    const QRectF targetRect(0, 0, pixmap.width(), pixmap.height());
+    const QRectF targetRect(QPoint(0, 0), size);
     if (mViewSize.isEmpty()) {
       const QRectF initialRect = validateSceneRect(scene.itemsBoundingRect());
       mProjection.scale = std::min(targetRect.width() / initialRect.width(),
@@ -114,12 +156,28 @@ slint::Image SlintGraphicsView::render(GraphicsScene& scene, float width,
       mProjection.offset =
           initialRect.center() - targetRect.center() / mProjection.scale;
     }
-    QRectF sceneRect(0, 0, pixmap.width() / mProjection.scale,
-                     pixmap.height() / mProjection.scale);
+    QRectF sceneRect(0, 0, size.width() / mProjection.scale,
+                     size.height() / mProjection.scale);
     sceneRect.translate(mProjection.offset);
     scene.render(&painter, targetRect, sceneRect);
+
+    // If there was an OpenGL error, print it at the bottom right.
+    if (!openGlError.isEmpty()) {
+      painter.setPen(Qt::red);
+      painter.drawText(size.width() - 5, size.height() - 5, 0, 0,
+                       Qt::AlignRight | Qt::AlignBottom | Qt::TextDontClip,
+                       openGlError);
+    }
+
     mViewSize = targetRect.size();
   }
+
+  // OpenGl mode: Release FBO and fetch framebuffer content.
+  if (mGlFbo && openGlError.isEmpty()) {
+    mGlFbo->release();
+    pixmap = QPixmap::fromImage(mGlFbo->toImage());
+  }
+
   return q2s(pixmap);
 }
 
@@ -292,6 +350,31 @@ void SlintGraphicsView::zoomToSceneRect(const QRectF& r) noexcept {
 }
 
 /*******************************************************************************
+ *  Static Methods
+ ******************************************************************************/
+
+static QRectF createSceneRect(qreal x, qreal y, qreal w, qreal h) noexcept {
+  const qreal pxPerMm = Length::fromMm(1).toPx();
+  return QRectF(x * pxPerMm, y * pxPerMm, w * pxPerMm, h * pxPerMm);
+}
+
+QRectF SlintGraphicsView::defaultSymbolSceneRect() noexcept {
+  return createSceneRect(-50, -50, 100, 100);
+}
+
+QRectF SlintGraphicsView::defaultFootprintSceneRect() noexcept {
+  return createSceneRect(-50, -50, 100, 100);
+}
+
+QRectF SlintGraphicsView::defaultSchematicSceneRect() noexcept {
+  return createSceneRect(-20, -180, 300, 220);
+}
+
+QRectF SlintGraphicsView::defaultBoardSceneRect() noexcept {
+  return createSceneRect(-20, -120, 140, 140);
+}
+
+/*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
@@ -336,6 +419,11 @@ bool SlintGraphicsView::applyProjection(const Projection& projection) noexcept {
     return true;
   }
   return false;
+}
+
+// Helper to avoid division by zero on empty scenes.
+QRectF SlintGraphicsView::validateSceneRect(const QRectF& r) const noexcept {
+  return r.isEmpty() ? mDefaultSceneRect : r;
 }
 
 /*******************************************************************************

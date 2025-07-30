@@ -1,0 +1,44 @@
+import { NavBar, NavBarItemData } from "navbar.slint";
+
+export component SlideView inherits VerticalLayout {
+    in property <[NavBarItemData]> pages;
+    in-out property <int> current-index: 0;
+    in-out property <int> current-navbar-index: current-index;
+
+    callback page-clicked(index: int);
+    page-clicked(index) => {
+        current-index = index;
+    }
+
+    navbar := NavBar {
+        items: pages;
+        current-index: current-navbar-index;
+
+        page-clicked(index) => {
+            root.page-clicked(index);
+        }
+    }
+
+    Rectangle {
+        height: 1px;
+        background: #555555;
+    }
+
+    flickable := Flickable {
+        property <float> animated-index: max(min(current-index, pages.length - 1), 0);
+
+        animate animated-index { duration: 200ms; }
+
+        viewport-width: self.width * pages.length;
+        viewport-height: self.height;
+        viewport-x: min(max(-self.width * animated-index, -self.viewport-width + self.width), 0);
+        viewport-y: 0;
+        interactive: false;
+
+        HorizontalLayout {
+            height: 100%;
+
+            @children
+        }
+    }
+}

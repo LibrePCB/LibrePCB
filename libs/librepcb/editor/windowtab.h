@@ -76,6 +76,20 @@ public:
   virtual bool processSceneKeyEvent(
       const slint::private_api::KeyEvent& e) noexcept;
 
+  /**
+   * @brief Request to close the tab
+   *
+   * If there are unsaved changes to the tab, this method will ask the user
+   * whether the changes should be saved or not. If the user clicks on "cancel"
+   * or the changes could not be saved successfully, this method will return
+   * false. If there were no unsaved changes or they were successfully saved,
+   * the method returns true.
+   *
+   * @retval true   Tab is safe to be closed.
+   * @retval false  Tab still has unsaved changes.
+   */
+  virtual bool requestClose() noexcept { return true; }
+
   // Operator Overloadings
   WindowTab& operator=(const WindowTab& rhs) = delete;
 

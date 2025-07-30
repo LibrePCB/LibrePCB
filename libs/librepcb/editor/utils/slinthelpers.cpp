@@ -70,6 +70,25 @@ QString s2q(const slint::SharedString& s) noexcept {
   return QString::fromUtf8(view.data(), view.size());
 }
 
+std::shared_ptr<slint::VectorModel<slint::SharedString>> q2s(
+    const QStringList& s) noexcept {
+  auto m = std::make_shared<slint::VectorModel<slint::SharedString>>();
+  for (const QString& item : s) {
+    m->push_back(q2s(item));
+  }
+  return m;
+}
+
+QStringList s2q(const slint::Model<slint::SharedString>& s) noexcept {
+  QStringList list;
+  for (std::size_t i = 0; i < s.row_count(); ++i) {
+    if (auto item = s.row_data(i)) {
+      list.append(s2q(*item));
+    }
+  }
+  return list;
+}
+
 bool operator==(const QString& s1, const slint::SharedString& s2) noexcept {
   return s1.toUtf8().data() == std::string_view(s2);
 }
@@ -276,6 +295,10 @@ static slint::SharedString getInputError(const QString& input) {
   }
 }
 
+static slint::SharedString getDuplicateError() {
+  return q2s(QCoreApplication::translate("SlintHelpers", "Duplicate"));
+}
+
 std::optional<ElementName> validateElementName(
     const QString& input, slint::SharedString& error) noexcept {
   if (auto val = parseElementName(cleanElementName(input))) {
@@ -315,6 +338,20 @@ std::optional<FileProofName> validateFileProofName(
     error = getInputError(input);
     return std::nullopt;
   }
+}
+
+std::optional<CircuitIdentifier> validateCircuitIdentifier(
+    const QString& input, slint::SharedString& error,
+    bool isDuplicate) noexcept {
+  auto val = parseCircuitIdentifier(cleanCircuitIdentifier(input));
+  if (isDuplicate) {
+    error = getDuplicateError();
+  } else if (val) {
+    error = slint::SharedString();
+  } else {
+    error = getInputError(input);
+  }
+  return val;
 }
 
 std::optional<QUrl> validateUrl(const QString& input,

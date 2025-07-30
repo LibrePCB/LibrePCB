@@ -1,0 +1,120 @@
+import { IconButton } from "iconbutton.slint";
+import { ToolBarWidget } from "toolbarwidget.slint";
+
+component AlignmentButton inherits IconButton {
+    width: 18px;
+    style: checkable-hyperlink;
+    color-enabled: #606060;
+    color-checked: #c0c0c0;
+}
+
+component AlignmentSelector inherits ToolBarWidget {
+    in property <[image]> icons;
+    in property <[string]> tooltips;
+    in property <int> index: 0;
+
+    callback index-clicked(int);
+
+    for i in 3: btn := AlignmentButton {
+        icon: icons[i];
+        tooltip: tooltips[i];
+        checked: index == i;
+
+        clicked => {
+            index-clicked(i);
+        }
+    }
+
+    key-pressed(event) => {
+        if event.text == Key.LeftArrow {
+            if index > 0 {
+                index-clicked(index - 1);
+            }
+            return accept;
+        } else if event.text == Key.RightArrow {
+            if index < 2 {
+                index-clicked(index + 1);
+            }
+            return accept;
+        }
+        reject
+    }
+}
+
+export component HAlignSelector inherits AlignmentSelector {
+    in-out property <TextHorizontalAlignment> align;
+
+    icons: [
+        @image-url("../../../../font-awesome/svgs/solid/align-left.svg"),
+        @image-url("../../../../font-awesome/svgs/solid/align-center.svg"),
+        @image-url("../../../../font-awesome/svgs/solid/align-right.svg"),
+    ];
+    tooltips: [
+        @tr("Align Left"),
+        @tr("Align Center"),
+        @tr("Align Right"),
+    ];
+    index: {
+        if align == TextHorizontalAlignment.left {
+            return 0;
+        } else if align == TextHorizontalAlignment.center {
+            return 1;
+        } else {
+            return 2;
+        }
+    };
+
+    callback value-clicked(TextHorizontalAlignment);
+    value-clicked(a) => {
+        align = a;
+    }
+
+    index-clicked(index) => {
+        if index == 0 {
+            value-clicked(TextHorizontalAlignment.left);
+        } else if index == 1 {
+            value-clicked(TextHorizontalAlignment.center);
+        } else {
+            value-clicked(TextHorizontalAlignment.right);
+        }
+    }
+}
+
+export component VAlignSelector inherits AlignmentSelector {
+    in-out property <TextVerticalAlignment> align;
+
+    icons: [
+        @image-url("../../../../bootstrap-icons/icons/align-bottom.svg"),
+        @image-url("../../../../bootstrap-icons/icons/align-center.svg"),
+        @image-url("../../../../bootstrap-icons/icons/align-top.svg"),
+    ];
+    tooltips: [
+        @tr("Align Bottom"),
+        @tr("Align Center"),
+        @tr("Align Top"),
+    ];
+    index: {
+        if align == TextVerticalAlignment.bottom {
+            return 0;
+        } else if align == TextVerticalAlignment.center {
+            return 1;
+        } else {
+            return 2;
+        }
+    };
+
+    callback value-clicked(TextVerticalAlignment);
+    value-clicked(a) => {
+        align = a;
+    }
+
+    index-clicked(index) => {
+        if index == 0 {
+            value-clicked(TextVerticalAlignment.bottom);
+        } else if index == 1 {
+            value-clicked(TextVerticalAlignment.center);
+        } else {
+            value-clicked(TextVerticalAlignment.top);
+        }
+    }
+}

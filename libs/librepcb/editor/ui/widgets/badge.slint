@@ -7,6 +7,7 @@ export component Badge inherits Rectangle {
     in property <length> font-size: 10px;
     in property <int> font-weight: 400;
     in property <bool> clickable: false;
+    in property <string> description;
     out property <bool> has-hover: false;
 
     height: txt.preferred-height + 2px;
@@ -29,6 +30,7 @@ export component Badge inherits Rectangle {
         font-weight: font-weight;
         overflow: elide;
         text: text;
+        accessible-description: description;
     }
 
     if clickable: ta := TouchArea {

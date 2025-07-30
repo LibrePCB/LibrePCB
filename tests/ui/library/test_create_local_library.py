@@ -36,16 +36,15 @@ def test(librepcb, helpers):
         # Verify that the tab has been closed
         tab.wait_for(valid=False)
 
-        # Verify that the new library appears in the library list
-        libs.wait(1)
-        assert libs.label == ["Local Library"]
-
-        # Open the new library to verify everything is OK by checking that
+        # Verify that the new library has been opened by checking that
         # a lock file has been created
-        libs[0].dclick()
         helpers.wait_for_file_exists(
             os.path.join(
                 librepcb.workspace_path,
                 "data/libraries/local/local-lib.lplib/.lock",
             )
         )
+
+        # Verify the library has been opened in a new tab
+        tab = app.get("#LibraryTab")
+        assert tab.get("LibraryMetadataTab::name-edt").value == "Local Library"

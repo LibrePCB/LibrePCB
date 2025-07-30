@@ -23,7 +23,7 @@
 #include "newelementwizardpage_copyfrom.h"
 
 #include "../../widgets/waitingspinnerwidget.h"
-#include "../../workspace/categorytreemodel.h"
+#include "../../workspace/categorytreemodellegacy.h"
 #include "ui_newelementwizardpage_copyfrom.h"
 
 #include <librepcb/core/fileio/transactionalfilesystem.h>
@@ -47,7 +47,6 @@ NewElementWizardPage_CopyFrom::NewElementWizardPage_CopyFrom(
   : QWizardPage(parent),
     mContext(context),
     mUi(new Ui::NewElementWizardPage_CopyFrom),
-    mIsCategoryElement(false),
     mIsComplete(false) {
   mUi->setupUi(this);
   connect(mUi->treeView, &QTreeView::doubleClicked, this,
@@ -107,13 +106,11 @@ void NewElementWizardPage_CopyFrom::treeView_currentItemChanged(
 void NewElementWizardPage_CopyFrom::treeView_doubleClicked(
     const QModelIndex& item) noexcept {
   setSelectedCategory(Uuid::tryFromString(item.data(Qt::UserRole).toString()));
-  if (mIsCategoryElement) wizard()->next();
 }
 
 void NewElementWizardPage_CopyFrom::listWidget_currentItemChanged(
     QListWidgetItem* current, QListWidgetItem* previous) noexcept {
   Q_UNUSED(previous);
-  if (mIsCategoryElement) return;
   if (current) {
     setSelectedElement(FilePath(current->data(Qt::UserRole).toString()));
   } else {
@@ -123,7 +120,6 @@ void NewElementWizardPage_CopyFrom::listWidget_currentItemChanged(
 
 void NewElementWizardPage_CopyFrom::listWidget_itemDoubleClicked(
     QListWidgetItem* item) noexcept {
-  if (mIsCategoryElement) return;
   if (item) {
     setSelectedElement(FilePath(item->data(Qt::UserRole).toString()));
     wizard()->next();
@@ -139,21 +135,17 @@ void NewElementWizardPage_CopyFrom::setSelectedCategory(
   mSelectedCategoryUuid = uuid;
 
   try {
-    if (mIsCategoryElement) {
-      setSelectedElement(getCategoryFilePath(uuid));  // can throw
-    } else {
-      QSet<Uuid> elements = getElementsByCategory(uuid);  // can throw
-      foreach (const Uuid& elementUuid, elements) {
-        try {
-          FilePath fp;
-          QString name;
-          getElementMetadata(elementUuid, fp, name);
-          QListWidgetItem* item = new QListWidgetItem(name);
-          item->setData(Qt::UserRole, fp.toStr());
-          mUi->listWidget->addItem(item);
-        } catch (const Exception& e) {
-          continue;  // should we do something here?
-        }
+    QSet<Uuid> elements = getElementsByCategory(uuid);  // can throw
+    foreach (const Uuid& elementUuid, elements) {
+      try {
+        FilePath fp;
+        QString name;
+        getElementMetadata(elementUuid, fp, name);
+        QListWidgetItem* item = new QListWidgetItem(name);
+        item->setData(Qt::UserRole, fp.toStr());
+        mUi->listWidget->addItem(item);
+      } catch (const Exception& e) {
+        continue;  // should we do something here?
       }
     }
   } catch (const Exception& e) {
@@ -186,40 +178,14 @@ void NewElementWizardPage_CopyFrom::setCategoryTreeModel(
           this, &NewElementWizardPage_CopyFrom::treeView_currentItemChanged);
 }
 
-FilePath NewElementWizardPage_CopyFrom::getCategoryFilePath(
-    const std::optional<Uuid>& category) const {
-  if (category) {
-    switch (mContext.mElementType) {
-      case NewElementWizardContext::ElementType::ComponentCategory:
-        return mContext.getWorkspace()
-            .getLibraryDb()
-            .getLatest<ComponentCategory>(*category);
-      case NewElementWizardContext::ElementType::PackageCategory:
-        return mContext.getWorkspace()
-            .getLibraryDb()
-            .getLatest<PackageCategory>(*category);
-      default:
-        throw LogicError(__FILE__, __LINE__);
-    }
-  } else {
-    return FilePath();
-  }
-}
-
 QSet<Uuid> NewElementWizardPage_CopyFrom::getElementsByCategory(
     const std::optional<Uuid>& category) const {
   switch (mContext.mElementType) {
-    case NewElementWizardContext::ElementType::Symbol:
-      return mContext.getWorkspace().getLibraryDb().getByCategory<Symbol>(
-          category);
     case NewElementWizardContext::ElementType::Component:
       return mContext.getWorkspace().getLibraryDb().getByCategory<Component>(
           category);
     case NewElementWizardContext::ElementType::Device:
       return mContext.getWorkspace().getLibraryDb().getByCategory<Device>(
-          category);
-    case NewElementWizardContext::ElementType::Package:
-      return mContext.getWorkspace().getLibraryDb().getByCategory<Package>(
           category);
     default:
       throw LogicError(__FILE__, __LINE__);
@@ -230,12 +196,6 @@ void NewElementWizardPage_CopyFrom::getElementMetadata(const Uuid& uuid,
                                                        FilePath& fp,
                                                        QString& name) const {
   switch (mContext.mElementType) {
-    case NewElementWizardContext::ElementType::Symbol:
-      fp = mContext.getWorkspace().getLibraryDb().getLatest<Symbol>(
-          uuid);  // can throw
-      mContext.getWorkspace().getLibraryDb().getTranslations<Symbol>(
-          fp, mContext.getLibLocaleOrder(), &name);  // can throw
-      return;
     case NewElementWizardContext::ElementType::Component:
       fp = mContext.getWorkspace().getLibraryDb().getLatest<Component>(
           uuid);  // can throw
@@ -248,12 +208,6 @@ void NewElementWizardPage_CopyFrom::getElementMetadata(const Uuid& uuid,
       mContext.getWorkspace().getLibraryDb().getTranslations<Device>(
           fp, mContext.getLibLocaleOrder(), &name);  // can throw
       return;
-    case NewElementWizardContext::ElementType::Package:
-      fp = mContext.getWorkspace().getLibraryDb().getLatest<Package>(
-          uuid);  // can throw
-      mContext.getWorkspace().getLibraryDb().getTranslations<Package>(
-          fp, mContext.getLibLocaleOrder(), &name);  // can throw
-      return;
     default:
       throw LogicError(__FILE__, __LINE__);
   }
@@ -262,44 +216,17 @@ void NewElementWizardPage_CopyFrom::getElementMetadata(const Uuid& uuid,
 void NewElementWizardPage_CopyFrom::initializePage() noexcept {
   QWizardPage::initializePage();
   setSelectedElement(FilePath());
-  mIsCategoryElement = false;
   switch (mContext.mElementType) {
-    case NewElementWizardContext::ElementType::ComponentCategory: {
-      mIsCategoryElement = true;
-      setCategoryTreeModel(new CategoryTreeModel(
-          mContext.getWorkspace().getLibraryDb(), mContext.getLibLocaleOrder(),
-          CategoryTreeModel::Filter::CmpCat));
-      break;
-    }
-    case NewElementWizardContext::ElementType::Symbol: {
-      setCategoryTreeModel(new CategoryTreeModel(
-          mContext.getWorkspace().getLibraryDb(), mContext.getLibLocaleOrder(),
-          CategoryTreeModel::Filter::CmpCatWithSymbols));
-      break;
-    }
     case NewElementWizardContext::ElementType::Component: {
-      setCategoryTreeModel(new CategoryTreeModel(
+      setCategoryTreeModel(new CategoryTreeModelLegacy(
           mContext.getWorkspace().getLibraryDb(), mContext.getLibLocaleOrder(),
-          CategoryTreeModel::Filter::CmpCatWithComponents));
+          CategoryTreeModelLegacy::Filter::CmpCatWithComponents));
       break;
     }
     case NewElementWizardContext::ElementType::Device: {
-      setCategoryTreeModel(new CategoryTreeModel(
+      setCategoryTreeModel(new CategoryTreeModelLegacy(
           mContext.getWorkspace().getLibraryDb(), mContext.getLibLocaleOrder(),
-          CategoryTreeModel::Filter::CmpCatWithDevices));
-      break;
-    }
-    case NewElementWizardContext::ElementType::PackageCategory: {
-      mIsCategoryElement = true;
-      setCategoryTreeModel(new CategoryTreeModel(
-          mContext.getWorkspace().getLibraryDb(), mContext.getLibLocaleOrder(),
-          CategoryTreeModel::Filter::PkgCat));
-      break;
-    }
-    case NewElementWizardContext::ElementType::Package: {
-      setCategoryTreeModel(new CategoryTreeModel(
-          mContext.getWorkspace().getLibraryDb(), mContext.getLibLocaleOrder(),
-          CategoryTreeModel::Filter::PkgCatWithPackages));
+          CategoryTreeModelLegacy::Filter::CmpCatWithDevices));
       break;
     }
     default: {
@@ -310,8 +237,8 @@ void NewElementWizardPage_CopyFrom::initializePage() noexcept {
       break;
     }
   }
-  mUi->treeView->setExpandsOnDoubleClick(!mIsCategoryElement);
-  mUi->listWidget->setVisible(!mIsCategoryElement);
+  mUi->treeView->setExpandsOnDoubleClick(true);
+  mUi->listWidget->setVisible(true);
 }
 
 void NewElementWizardPage_CopyFrom::cleanupPage() noexcept {

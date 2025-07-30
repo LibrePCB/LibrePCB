@@ -32,6 +32,12 @@ WizardImageFile=watermark.bmp
 WizardSmallImageFile=logo.bmp
 WizardStyle=modern
 
+; Support conditional code signing by CLI flag "/DSIGN"
+#ifdef SIGN
+SignTool=signtool $f
+SignedUninstaller=yes
+#endif
+
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "armenian"; MessagesFile: "compiler:Languages\Armenian.isl"

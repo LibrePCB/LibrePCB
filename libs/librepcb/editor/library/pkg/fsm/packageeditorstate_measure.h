@@ -26,7 +26,6 @@
 #include "packageeditorstate.h"
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -56,8 +55,6 @@ public:
   // General Methods
   bool entry() noexcept override;
   bool exit() noexcept override;
-  QSet<EditorWidgetBase::Feature> getAvailableFeatures()
-      const noexcept override;
 
   // Event Handlers
   bool processKeyPressed(const GraphicsSceneKeyEvent& e) noexcept override;

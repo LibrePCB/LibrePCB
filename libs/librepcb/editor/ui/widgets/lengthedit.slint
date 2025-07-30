@@ -22,6 +22,7 @@ export component LengthEdit inherits Rectangle {
     in property <string> min-width-text: "123.456";
     in property <bool> can-increase: data.can-increase;
     in property <bool> can-decrease: data.can-decrease;
+    in property <bool> can-change-unit: true;
     in property <bool> auto-supported: false;
     in-out property <bool> auto-checked: false;
     in property <bool> enabled: true;
@@ -33,6 +34,8 @@ export component LengthEdit inherits Rectangle {
     value-changed(value) => {
         self.value = value;
     }
+
+    callback value-accepted(Int64);
 
     callback unit-changed(LengthUnit);
     unit-changed(unit) => {
@@ -58,13 +61,16 @@ export component LengthEdit inherits Rectangle {
 
     // Accessibility
     accessible-role: spinbox;
+    accessible-description: tooltip;
     accessible-enabled: enabled;
     accessible-value: edt.text + " " + Helpers.get-unit-accessibility-label(root.unit);
     accessible-action-increment => {
-        up-btn.clicked();
+        disable-update = false;
+        increase-triggered();
     }
     accessible-action-decrement => {
-        down-btn.clicked();
+        disable-update = false;
+        decrease-triggered();
     }
     accessible-action-set-value(s) => {
         edt.text = s;
@@ -159,7 +165,7 @@ export component LengthEdit inherits Rectangle {
                         if parse-result.evaluated-value != value {
                             value-changed(parse-result.evaluated-value);
                         }
-                        if parse-result.evaluated-unit != unit {
+                        if can-change-unit && (parse-result.evaluated-unit != unit) {
                             unit-changed(parse-result.evaluated-unit);
                         }
                     }
@@ -168,6 +174,7 @@ export component LengthEdit inherits Rectangle {
                 accepted => {
                     disable-update = false;
                     update-text-from-value();
+                    value-accepted(parse-result.evaluated-value);
                 }
 
                 key-pressed(event) => {
@@ -183,11 +190,11 @@ export component LengthEdit inherits Rectangle {
                             decrease-triggered();
                         }
                         return accept;
-                    } else if event.text == Key.PageUp {
+                    } else if (event.text == Key.PageUp) && can-change-unit {
                         disable-update = false;
                         unit-changed(Helpers.get-previous-unit(unit));
                         return accept;
-                    } else if event.text == Key.PageDown {
+                    } else if (event.text == Key.PageDown) && can-change-unit {
                         disable-update = false;
                         unit-changed(Helpers.get-next-unit(unit));
                         return accept;
@@ -206,10 +213,10 @@ export component LengthEdit inherits Rectangle {
                 border-bottom-right-radius: root.border-radius;
 
                 HorizontalLayout {
-                    VerticalLayout {
+                    if can-increase || can-decrease: VerticalLayout {
                         up-btn := IconButton {
                             width: 15px;
-                            enabled: can-increase;
+                            enabled: enabled && can-increase;
                             background-color: black;
                             icon: @image-url("../../../../font-awesome/svgs/solid/caret-up.svg");
                             icon-offset-y: 1px;
@@ -223,7 +230,7 @@ export component LengthEdit inherits Rectangle {
 
                         down-btn := IconButton {
                             width: 15px;
-                            enabled: can-decrease;
+                            enabled: enabled && can-decrease;
                             background-color: black;
                             icon: @image-url("../../../../font-awesome/svgs/solid/caret-down.svg");
                             icon-offset-y: -1px;
@@ -237,10 +244,13 @@ export component LengthEdit inherits Rectangle {
                     }
 
                     Rectangle {
-                        y: (parent.height - self.height) / 2;
                         width: 1px;
-                        height: 15px;
-                        background: gray;
+
+                        Rectangle {
+                            y: (parent.height - self.height) / 2;
+                            height: 15px;
+                            background: gray;
+                        }
                     }
 
                     unit-btn := LinkText {
@@ -249,7 +259,9 @@ export component LengthEdit inherits Rectangle {
                         horizontal-alignment: center;
                         vertical-alignment: center;
                         text-color: edt.color;
+                        text-color-disabled: edt.color;
                         text: Helpers.get-unit-short-str(root.unit);
+                        enabled: can-change-unit;
 
                         // Accessibility
                         accessible-description: "unit";

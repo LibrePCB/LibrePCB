@@ -12,9 +12,11 @@ import {
 export component TreeView inherits Rectangle {
     in-out property <[TreeViewItemData]> model;
     in property <bool> supports-expand: true;
+    in property <color> icons-color: transparent;  // Not colorized by default
+    in property <length> font-size: 14px;
+    in property <length> item-height: font-size + 8px;  // 22px
+    in property <length> icon-size: font-size + 4px;  // 18px
     out property <bool> has-focus <=> fs.has-focus;
-    property <length> item-height: 22px;
-    property <length> icon-size: 18px;
     property <length> pin-size: 14px;
     property <int> current-index: -1;
     property <length> scrollbar-width: (self.height < self.preferred-height) ? 7px : 0;
@@ -105,7 +107,7 @@ export component TreeView inherits Rectangle {
 
                 HorizontalLayout {
                     spacing: 5px;
-                    padding-left: 5px;
+                    padding-left: 5px + (supports-expand ? 0 : item.level * 10px);
                     padding-right: 5px + scrollbar-width;
 
                     if supports-expand: expand-ta := TouchArea {
@@ -138,6 +140,7 @@ export component TreeView inherits Rectangle {
                         width: icon-size;
                         height: icon-size;
                         image-fit: fill;
+                        colorize: icons-color;
                         source: item.icon;
                         accessible-role: none;
                     }
@@ -145,9 +148,10 @@ export component TreeView inherits Rectangle {
                     item-text-txt := Text {
                         horizontal-stretch: 1;
                         color: is-enabled ? #dddddd : #a0a0a0;
-                        font-size: 14px;
+                        font-size: font-size;
                         font-weight: 400;
                         overflow: TextOverflow.elide;
+                        vertical-alignment: center;
                         text: item.text;
                         accessible-role: none;
                     }

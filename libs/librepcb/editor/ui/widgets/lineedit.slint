@@ -1,4 +1,5 @@
 import { Palette, ScrollView } from "std-widgets.slint";
+import { Badge } from "badge.slint";
 import { DropDownPopup } from "dropdownpopup.slint";
 import { IconButton } from "iconbutton.slint";
 import { Constants } from "../api.slint";
@@ -6,15 +7,20 @@ import { Constants } from "../api.slint";
 export component LineEdit inherits Rectangle {
     in-out property <string> text;
     in property <string> placeholder-text;
-    in property <string> validation-error;
+    in property <string> validation-error: validate(edt.text);
+    in property <bool> has-error: !validation-error.is-empty;
     in property <bool> enabled: true;
     in property <bool> read-only: false;
     in property <length> font-size: 13px;
     in property <[string]> autocompletions;
     in property <[string]> suggestions;
+    in property <bool> frameless: false;
     out property <bool> has-focus <=> edt.has-focus;
+    property <bool> show-error-badge: enabled && has-error && (!validation-error.is-empty);
     property <int> current-autocompletion-index: -1;
     property <int> current-suggestion-index: -1;
+
+    pure callback validate(string) -> string;
 
     callback text-edited(string);
     text-edited(text) => {
@@ -25,6 +31,8 @@ export component LineEdit inherits Rectangle {
     autocompletion-accepted(text) => {
         text-edited(text);
     }
+
+    callback text-accepted(string);
 
     callback key-pressed(KeyEvent) -> EventResult;
 
@@ -47,7 +55,8 @@ export component LineEdit inherits Rectangle {
         if has-focus {
             current-autocompletion-index = -1;
         } else {
-            edt.text = text;
+            text-accepted(edt.text);
+            edt.text = self.text;
         }
     }
 
@@ -56,7 +65,7 @@ export component LineEdit inherits Rectangle {
     horizontal-stretch: 1;
     background: #202020;
     border-color: {
-        if enabled && (!validation-error.is-empty) {
+        if enabled && has-error {
             edt.has-focus ? #ff0000 : #900000
         } else if edt.has-focus {
             Constants.librepcb-color
@@ -66,8 +75,8 @@ export component LineEdit inherits Rectangle {
             transparent
         }
     }
-    border-width: 1px;
-    border-radius: 10px;
+    border-width: frameless ? 0 : 1px;
+    border-radius: frameless ? 0 : 10px;
     forward-focus: edt;
 
     // Accessibility
@@ -93,6 +102,7 @@ export component LineEdit inherits Rectangle {
         wrap: no-wrap;
         overflow: elide;
         visible: edt.text.is-empty && (!placeholder-text.is-empty);
+        accessible-role: none;
     }
 
     ta := TouchArea {
@@ -105,7 +115,7 @@ export component LineEdit inherits Rectangle {
             padding-right: 3px;
 
             view := ScrollView {
-                min-width: edt.min-width;
+                min-width: 0;  // Required to avoid text overflow.
                 preferred-width: edt.preferred-width;
                 viewport-width: edt.width;
                 viewport-height: edt.height;
@@ -154,7 +164,7 @@ export component LineEdit inherits Rectangle {
                         } else if root.key-pressed(event) == accept {
                             return accept;
                         }
-                        reject;
+                        reject
                     }
                 }
             }
@@ -163,14 +173,15 @@ export component LineEdit inherits Rectangle {
                 width: 5px;
             }
 
-            clear-btn := IconButton {
+            if enabled && (!read-only): clear-btn := IconButton {
                 y: (parent.height - self.height) / 2;
                 height: 18px;
                 background-color: root.background;
                 border-radius: self.height / 2;
                 icon-scale: 0.7;
                 icon: @image-url("../../../../font-awesome/svgs/solid/xmark.svg");
-                visible: ta.has-hover && (!edt.text.is-empty);
+                // If the error badge is shown inside the edit (=frameless), hide the button.
+                visible: ta.has-hover && (!edt.text.is-empty) && ((!show-error-badge) || (!frameless));
                 accessible-role: none;
 
                 clicked => {
@@ -194,26 +205,18 @@ export component LineEdit inherits Rectangle {
         }
     }
 
-    if enabled && (!validation-error.is-empty): Rectangle {
-        x: root.width - self.width - 20px;
-        y: -8px;
-        width: min(validation-error-txt.preferred-width + 10px, root.width * 0.8);
-        height: validation-error-txt.preferred-height + 4px;
-        background: #101010;
-        border-width: 1px;
-        border-radius: self.height / 2;
-        border-color: root.border-color;
+    if show-error-badge: validation-error-badge := Badge {
+        property <length> expand-btn-width: (suggestions.length > 0) ? 18px : 0;
 
-        validation-error-txt := Text {
-            x: 5px;
-            width: parent.width - 10px;
-            vertical-alignment: center;
-            font-size: 11px;
-            overflow: elide;
-            color: root.border-color;
-            text: validation-error;
-            accessible-description: "validation error";
-        }
+        x: root.width - self.width - (frameless ? (expand-btn-width + 5px) : 20px);
+        y: frameless ? ((parent.height - self.height) / 2) : -8px;
+        width: min(self.preferred-width, root.width * (frameless ? 0.3 : 0.8));
+        background: #101010;
+        text-color: root.border-color;
+        font-size: 10px;
+        text: validation-error;
+        visible: (!frameless) || (self.width >= self.preferred-width) || (self.width >= 30px);
+        description: "validation error";  // Accessibility
     }
 
     if has-focus && (autocompletions.length > 0): autocompletions-r := Rectangle {
@@ -281,6 +284,12 @@ export component LineEdit inherits Rectangle {
                 }
             }
         }
+    }
+
+    if frameless && (self.has-focus || self.has-error): Rectangle {
+        y: parent.height - self.height;
+        height: 1px;
+        background: parent.border-color;
     }
 
     suggestions-popup := DropDownPopup {

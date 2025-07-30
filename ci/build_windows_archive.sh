@@ -33,6 +33,14 @@ rm -rfv ./build/install/lib
 windeployqt --compiler-runtime --force ./build/install/bin/librepcb.exe
 windeployqt --compiler-runtime --force ./build/install/bin/librepcb-cli.exe
 
+# Print checksums of executables *before signing* to allow public verification.
+sha256sum ./build/install/bin/*.exe
+
+# Sign the executables (the conditional is in sign.ps1 to ensure by CI that
+# the call is correct even if signing is disabled for nightly builds).
+powershell.exe -File ci/sign.ps1 $(cygpath -aw ./build/install/bin/librepcb.exe)
+powershell.exe -File ci/sign.ps1 $(cygpath -aw ./build/install/bin/librepcb-cli.exe)
+
 # Test if the bundles are working (hopefully catching deployment issues).
 ./build/install/bin/librepcb-cli.exe --version
 ./build/install/bin/librepcb.exe --exit-after-startup

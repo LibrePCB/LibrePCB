@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/core/types/circuitidentifier.h>
 #include <librepcb/core/types/elementname.h>
 #include <librepcb/core/types/fileproofname.h>
 #include <librepcb/core/types/version.h>
@@ -61,6 +62,10 @@ bool operator==(const QString& s1, const slint::SharedString& s2) noexcept;
 bool operator!=(const QString& s1, const slint::SharedString& s2) noexcept;
 bool operator==(const slint::SharedString& s1, const QString& s2) noexcept;
 bool operator!=(const slint::SharedString& s1, const QString& s2) noexcept;
+
+std::shared_ptr<slint::VectorModel<slint::SharedString>> q2s(
+    const QStringList& s) noexcept;
+QStringList s2q(const slint::Model<slint::SharedString>& s) noexcept;
 
 slint::Image q2s(const QPixmap& p) noexcept;
 
@@ -112,6 +117,10 @@ std::optional<Version> validateVersion(const QString& input,
 std::optional<FileProofName> validateFileProofName(
     const QString& input, slint::SharedString& error,
     const QString& requiredSuffix = QString()) noexcept;
+
+std::optional<CircuitIdentifier> validateCircuitIdentifier(
+    const QString& input, slint::SharedString& error,
+    bool isDuplicate) noexcept;
 
 std::optional<QUrl> validateUrl(const QString& input,
                                 slint::SharedString& error,

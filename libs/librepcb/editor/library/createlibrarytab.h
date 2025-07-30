@@ -71,6 +71,9 @@ public:
   // Operator Overloadings
   CreateLibraryTab& operator=(const CreateLibraryTab& rhs) = delete;
 
+signals:
+  void libraryCreated(const FilePath& fp);
+
 private:
   void validate() noexcept;
 

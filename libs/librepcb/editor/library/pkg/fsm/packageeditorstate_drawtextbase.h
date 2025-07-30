@@ -25,13 +25,9 @@
  ******************************************************************************/
 #include "packageeditorstate.h"
 
-#include <librepcb/core/types/alignment.h>
-#include <librepcb/core/types/angle.h>
-#include <librepcb/core/types/length.h>
-#include <librepcb/core/types/point.h>
+#include <librepcb/core/geometry/stroketext.h>
 
 #include <QtCore>
-#include <QtWidgets>
 
 #include <memory>
 
@@ -39,17 +35,11 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class Layer;
-class StrokeText;
-
 namespace editor {
 
 class CmdStrokeTextEdit;
-class HAlignActionGroup;
 class LayerComboBox;
 class StrokeTextGraphicsItem;
-class VAlignActionGroup;
 
 /*******************************************************************************
  *  Class PackageEditorState_DrawTextBase
@@ -76,8 +66,6 @@ public:
   // General Methods
   bool entry() noexcept override;
   bool exit() noexcept override;
-  QSet<EditorWidgetBase::Feature> getAvailableFeatures()
-      const noexcept override;
 
   // Event Handlers
   bool processGraphicsSceneMouseMoved(
@@ -90,40 +78,63 @@ public:
   bool processMirror(Qt::Orientation orientation) noexcept override;
   bool processFlip(Qt::Orientation orientation) noexcept override;
 
+  // Connection to UI
+  QSet<const Layer*> getAvailableLayers() const noexcept;
+  const Layer& getLayer() const noexcept {
+    return mCurrentProperties.getLayer();
+  }
+  void setLayer(const Layer& layer) noexcept;
+  const QString& getText() const noexcept {
+    return mCurrentProperties.getText();
+  }
+  void setText(const QString& text) noexcept;
+  QStringList getTextSuggestions() const noexcept;
+  const PositiveLength& getHeight() const noexcept {
+    return mCurrentProperties.getHeight();
+  }
+  void setHeight(const PositiveLength& height) noexcept;
+  const UnsignedLength& getStrokeWidth() const noexcept {
+    return mCurrentProperties.getStrokeWidth();
+  }
+  void setStrokeWidth(const UnsignedLength& width) noexcept;
+  const HAlign& getHAlign() const noexcept {
+    return mCurrentProperties.getAlign().getH();
+  }
+  void setHAlign(const HAlign& align) noexcept;
+  const VAlign& getVAlign() const noexcept {
+    return mCurrentProperties.getAlign().getV();
+  }
+  void setVAlign(const VAlign& align) noexcept;
+
   // Operator Overloadings
   PackageEditorState_DrawTextBase& operator=(
       const PackageEditorState_DrawTextBase& rhs) = delete;
+
+signals:
+  void layerChanged(const Layer& layer);
+  void textChanged(const QString& text);
+  void heightChanged(const PositiveLength& height);
+  void strokeWidthChanged(const UnsignedLength& width);
+  void hAlignChanged(const HAlign& align);
+  void vAlignChanged(const VAlign& align);
+
+protected:
+  virtual void notifyToolEnter() noexcept = 0;
 
 private:  // Methods
   bool startAddText(const Point& pos) noexcept;
   bool finishAddText(const Point& pos) noexcept;
   bool abortAddText() noexcept;
   void resetToDefaultParameters() noexcept;
-  void layerComboBoxValueChanged(const Layer& layer) noexcept;
-  void heightEditValueChanged(const PositiveLength& value) noexcept;
-  void strokeWidthEditValueChanged(const UnsignedLength& value) noexcept;
-  void textComboBoxValueChanged(const QString& value) noexcept;
-  void hAlignActionGroupValueChanged(const HAlign& value) noexcept;
-  void vAlignActionGroupValueChanged(const VAlign& value) noexcept;
 
-private:  // Types / Data
+private:
   Mode mMode;
+  StrokeText mCurrentProperties;
+
   Point mStartPos;
-  std::unique_ptr<CmdStrokeTextEdit> mEditCmd;
+  std::unique_ptr<CmdStrokeTextEdit> mCurrentEditCmd;
   std::shared_ptr<StrokeText> mCurrentText;
   std::shared_ptr<StrokeTextGraphicsItem> mCurrentGraphicsItem;
-  QPointer<LayerComboBox> mLayerComboBox;
-  QPointer<HAlignActionGroup> mHAlignActionGroup;
-  QPointer<VAlignActionGroup> mVAlignActionGroup;
-
-  // parameter memory
-  const Layer* mLastLayer;
-  Angle mLastRotation;
-  PositiveLength mLastHeight;
-  UnsignedLength mLastStrokeWidth;
-  Alignment mLastAlignment;
-  QString mLastText;
-  bool mLastMirrored;
 };
 
 /*******************************************************************************

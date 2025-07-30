@@ -62,11 +62,6 @@ SymbolEditorFsm::SymbolEditorFsm(const Context& context) noexcept
   mStates.insert(State::DRAW_TEXT, new SymbolEditorState_DrawText(context));
   mStates.insert(State::MEASURE, new SymbolEditorState_Measure(context));
 
-  foreach (SymbolEditorState* state, mStates) {
-    connect(state, &SymbolEditorState::statusBarMessageChanged, this,
-            &SymbolEditorFsm::statusBarMessageChanged);
-  }
-
   enterNextState(State::SELECT);
 }
 
@@ -109,21 +104,6 @@ EditorWidgetBase::Tool SymbolEditorFsm::getCurrentTool() const noexcept {
     default:
       Q_ASSERT(false);
       return EditorWidgetBase::Tool::NONE;
-  }
-}
-
-/*******************************************************************************
- *  General Methods
- ******************************************************************************/
-
-void SymbolEditorFsm::updateAvailableFeatures() noexcept {
-  QSet<EditorWidgetBase::Feature> features;
-  if (SymbolEditorState* state = getCurrentState()) {
-    features |= state->getAvailableFeatures();
-  }
-  if (features != mAvailableFeatures) {
-    mAvailableFeatures = features;
-    emit availableFeaturesChanged();
   }
 }
 
@@ -295,8 +275,15 @@ bool SymbolEditorFsm::processStartSelecting() noexcept {
   return setNextState(State::SELECT);
 }
 
-bool SymbolEditorFsm::processStartAddingSymbolPins() noexcept {
-  return setNextState(State::ADD_PINS);
+bool SymbolEditorFsm::processStartAddingSymbolPins(bool import) noexcept {
+  if (setNextState(State::ADD_PINS)) {
+    auto state = getCurrentState();
+    if (state && import) {
+      state->processImportPins();
+    }
+    return true;
+  }
+  return false;
 }
 
 bool SymbolEditorFsm::processStartAddingNames() noexcept {
@@ -345,6 +332,16 @@ bool SymbolEditorFsm::processStartMeasure() noexcept {
   return setNextState(State::MEASURE);
 }
 
+bool SymbolEditorFsm::processGridIntervalChanged(
+    const PositiveLength& inverval) noexcept {
+  if (SymbolEditorState* state = getCurrentState()) {
+    if (state->processGridIntervalChanged(inverval)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
@@ -360,9 +357,7 @@ bool SymbolEditorFsm::setNextState(State state) noexcept {
   if (!leaveCurrentState()) {
     return false;
   }
-  const bool success = enterNextState(state);
-  updateAvailableFeatures();
-  return success;
+  return enterNextState(state);
 }
 
 bool SymbolEditorFsm::leaveCurrentState() noexcept {
@@ -370,8 +365,6 @@ bool SymbolEditorFsm::leaveCurrentState() noexcept {
     if (!getCurrentState()->exit()) {
       return false;
     }
-    disconnect(state, &SymbolEditorState::availableFeaturesChanged, this,
-               &SymbolEditorFsm::updateAvailableFeatures);
     disconnect(state, &SymbolEditorState::pasteRequested, this,
                &SymbolEditorFsm::handlePasteRequest);
   }
@@ -380,7 +373,6 @@ bool SymbolEditorFsm::leaveCurrentState() noexcept {
     mPreviousState = mCurrentState;
   }
   mCurrentState = State::IDLE;
-  emit toolChanged(getCurrentTool());
   return true;
 }
 
@@ -390,13 +382,10 @@ bool SymbolEditorFsm::enterNextState(State state) noexcept {
     if (!nextState->entry()) {
       return false;
     }
-    connect(nextState, &SymbolEditorState::availableFeaturesChanged, this,
-            &SymbolEditorFsm::updateAvailableFeatures);
     connect(nextState, &SymbolEditorState::pasteRequested, this,
             &SymbolEditorFsm::handlePasteRequest, Qt::QueuedConnection);
   }
   mCurrentState = state;
-  emit toolChanged(getCurrentTool());
   return true;
 }
 

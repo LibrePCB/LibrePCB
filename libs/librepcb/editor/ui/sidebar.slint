@@ -171,7 +171,7 @@ export component SideBar inherits Rectangle {
         documents-btn := SideBarButton {
             icon: @image-url("../../../bootstrap-icons/icons/files.svg");
             tooltip: @tr("Open Documents");
-            enabled: Data.projects.length > 0;
+            enabled: (Data.projects.length + Data.libraries.length) > 0;
             checked: Data.panel-page == PanelPage.documents;
 
             clicked => {

@@ -24,7 +24,6 @@
 
 #include "../utils/slinthelpers.h"
 #include "librarydownload.h"
-#include "libraryeditor.h"
 
 #include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/network/apiendpoint.h>
@@ -35,6 +34,7 @@
 #include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
+#include <QtWidgets>
 
 #include <algorithm>
 
@@ -199,7 +199,9 @@ void LibrariesModel::applyChanges() noexcept {
     } else if (isMarkedForUninstall(lib)) {
       // Uninstall library.
       try {
-        FileUtils::removeDirRecursively(FilePath(s2q(lib.path)));  // can throw
+        const FilePath fp(s2q(lib.path));
+        emit aboutToUninstallLibrary(fp);  // Let the app close it if needed
+        FileUtils::removeDirRecursively(fp);  // can throw
       } catch (const Exception& e) {
         // TODO: This should be implemented without message box some day...
         QMessageBox::critical(nullptr, tr("Error"), e.getMsg());
@@ -236,13 +238,14 @@ std::size_t LibrariesModel::row_count() const {
   return mMergedLibs.size();
 }
 
-std::optional<ui::LibraryData> LibrariesModel::row_data(std::size_t i) const {
+std::optional<ui::LibraryInfoData> LibrariesModel::row_data(
+    std::size_t i) const {
   return (i < mMergedLibs.size()) ? std::optional(mMergedLibs.at(i))
                                   : std::nullopt;
 }
 
 void LibrariesModel::set_row_data(std::size_t i,
-                                  const ui::LibraryData& data) noexcept {
+                                  const ui::LibraryInfoData& data) noexcept {
   if (i >= mMergedLibs.size()) return;
 
   // Show wait cursor since some operations can take a while.
@@ -259,42 +262,6 @@ void LibrariesModel::set_row_data(std::size_t i,
     }
     updateCheckStates(true);
     emit uiDataChanged(getUiData());
-  }
-
-  switch (data.action) {
-    case ui::LibraryAction::None: {
-      break;
-    }
-
-    case ui::LibraryAction::Open: {
-      try {
-        const FilePath fp(s2q(data.path));
-        const bool readOnly =
-            fp.isLocatedInDir(mWorkspace.getRemoteLibrariesPath());
-        auto editor = new LibraryEditor(mWorkspace, fp, readOnly);
-        editor->show();
-      } catch (const Exception& e) {
-        // TODO: This should be implemented without message box some day...
-        QMessageBox::critical(nullptr, tr("Error"), e.getMsg());
-      }
-      break;
-    }
-
-    case ui::LibraryAction::Uninstall: {
-      try {
-        FileUtils::removeDirRecursively(FilePath(s2q(data.path)));  // can throw
-      } catch (const Exception& e) {
-        // TODO: This should be implemented without message box some day...
-        QMessageBox::critical(nullptr, tr("Error"), e.getMsg());
-      }
-      mWorkspace.getLibraryDb().startLibraryRescan();
-      break;
-    }
-
-    default:
-      qWarning() << "Unhandled action in LibrariesModel:"
-                 << static_cast<int>(data.action);
-      break;
   }
 }
 
@@ -335,7 +302,7 @@ void LibrariesModel::updateLibraries(bool resetHighlight) noexcept {
           &description, &keywords);  // can throw
 
       const auto sName = q2s(name);
-      mInstalledLibs.push_back(ui::LibraryData{
+      mInstalledLibs.push_back(ui::LibraryInfoData{
           uuids.contains(uuid)
               ? slint::SharedString()
               : q2s(uuid.toStr()),  // UUID (empty for duplicates)
@@ -350,7 +317,6 @@ void LibrariesModel::updateLibraries(bool resetHighlight) noexcept {
           0,  // Progress [%]
           true,  // Checked
           mHighlightedLib == libDir,  // Highlight
-          ui::LibraryAction::None,  // Action
       });
       uuids.insert(uuid);
     }
@@ -360,7 +326,7 @@ void LibrariesModel::updateLibraries(bool resetHighlight) noexcept {
   }
 
   std::sort(mInstalledLibs.begin(), mInstalledLibs.end(),
-            [](const ui::LibraryData& a, const ui::LibraryData& b) {
+            [](const ui::LibraryInfoData& a, const ui::LibraryInfoData& b) {
               return a.name < b.name;
             });
 
@@ -478,7 +444,7 @@ void LibrariesModel::updateMergedLibraries() noexcept {
     }
     if (!isInstalled) {
       auto name = q2s(lib.name);
-      mMergedLibs.push_back(ui::LibraryData{
+      mMergedLibs.push_back(ui::LibraryInfoData{
           q2s(lib.uuid.toStr()),  // UUID
           slint::SharedString(),  // Path
           q2s(mIcons.value(lib.uuid)),  // Icon
@@ -491,7 +457,6 @@ void LibrariesModel::updateMergedLibraries() noexcept {
           0,  // Progress
           false,  // Checked
           false,  // Highlight
-          ui::LibraryAction::None,  // Action
       });
     }
   }
@@ -570,20 +535,23 @@ void LibrariesModel::uncheckLibsWithUnmetDependencies() noexcept {
 }
 
 bool LibrariesModel::isLibraryChecked(
-    const ui::LibraryData& lib) const noexcept {
+    const ui::LibraryInfoData& lib) const noexcept {
   const auto uuid = Uuid::tryFromString(s2q(lib.uuid));
   return uuid && mCheckStates.value(*uuid, !lib.installed_version.empty());
 }
 
-bool LibrariesModel::isMarkedForInstall(const ui::LibraryData& lib) noexcept {
+bool LibrariesModel::isMarkedForInstall(
+    const ui::LibraryInfoData& lib) noexcept {
   return lib.installed_version.empty() && lib.checked;
 }
 
-bool LibrariesModel::isMarkedForUpdate(const ui::LibraryData& lib) noexcept {
+bool LibrariesModel::isMarkedForUpdate(
+    const ui::LibraryInfoData& lib) noexcept {
   return (!lib.installed_version.empty()) && lib.outdated && lib.checked;
 }
 
-bool LibrariesModel::isMarkedForUninstall(const ui::LibraryData& lib) noexcept {
+bool LibrariesModel::isMarkedForUninstall(
+    const ui::LibraryInfoData& lib) noexcept {
   return (!lib.installed_version.empty()) && (!lib.checked);
 }
 

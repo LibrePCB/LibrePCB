@@ -1,0 +1,723 @@
+import { AddSymbolPinToolBar } from "addsymbolpintoolbar.slint";
+import { AddSymbolTextToolBar } from "addsymboltexttoolbar.slint";
+import { DrawSymbolPolygonToolBar } from "drawsymbolpolygontoolbar.slint";
+import { Tab } from "../../tab.slint";
+import {
+    AuthorRowHeader,
+    CategoriesRowCell,
+    CategoriesRowHeader,
+    DeprecatedRowCell,
+    DeprecatedRowHeader,
+    DescriptionRowHeader,
+    KeywordsRowHeader,
+    MetadataFooterRowCell,
+    NameRowHeader,
+    VersionRowHeader,
+} from "../metadatawidgets.slint";
+import {
+    BreakingChangesMessageBanner,
+    CheckErrorsMessageBanner,
+} from "../messagebanners.slint";
+import {
+    Button,
+    LineEdit,
+    LinkText,
+    MessageBanner,
+    MessageBox,
+    Palette,
+    SceneButton,
+    SlideView,
+    TextEdit,
+    ToolButton,
+    TreeItemPickerPopup,
+} from "../../widgets.slint";
+import {
+    Backend,
+    Constants,
+    Data,
+    DismissableMessageAction,
+    EditorCommandSet as Cmd,
+    EditorTool,
+    FeatureState,
+    SymbolTabData,
+    TabAction,
+    WindowSectionData,
+} from "../../api.slint";
+
+component SymbolMetadataTab inherits GridLayout {
+    in property <int> section-index;
+    in-out property <[SymbolTabData]> tabs;
+    in property <int> index;
+    in property <bool> read-only;
+
+    padding: 8px;
+    spacing: 8px;
+
+    Row {
+        name-txt := NameRowHeader { }
+
+        name-edt := LineEdit {
+            text: tabs[index].name;
+            validation-error: tabs[index].name-error;
+            read-only: read-only;
+            accessible-label: name-txt.text;
+
+            init => {
+                if (!read-only) && tabs[index].wizard-mode {
+                    self.select-all();
+                }
+            }
+
+            text-edited(text) => {
+                tabs[index].name = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].name = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        description-txt := DescriptionRowHeader { }
+
+        description-edt := TextEdit {
+            height: 100px;
+            text: tabs[index].description;
+            read-only: read-only;
+            accessible-label: description-txt.text;
+
+            text-edited(text) => {
+                tabs[index].description = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].description = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        keywords-txt := KeywordsRowHeader { }
+
+        keywords-edt := LineEdit {
+            text: tabs[index].keywords;
+            read-only: read-only;
+            accessible-label: keywords-txt.text;
+
+            text-edited(text) => {
+                tabs[index].keywords = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].keywords = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        author-txt := AuthorRowHeader { }
+
+        author-edt := LineEdit {
+            text: tabs[index].author;
+            read-only: read-only;
+            accessible-label: author-txt.text;
+
+            text-edited(text) => {
+                tabs[index].author = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].author = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        version-txt := VersionRowHeader { }
+
+        version-edt := LineEdit {
+            text: tabs[index].version;
+            validation-error: tabs[index].version-error;
+            read-only: read-only;
+            accessible-label: version-txt.text;
+
+            text-edited(text) => {
+                tabs[index].version = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].version = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        deprecated-txt := DeprecatedRowHeader { }
+
+        deprecated-sw := DeprecatedRowCell {
+            checked: tabs[index].deprecated;
+            enabled: !read-only;
+            accessible-label: deprecated-txt.text;
+
+            toggled(checked) => {
+                tabs[index].deprecated = checked;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        categories-txt := CategoriesRowHeader { }
+
+        categories-cell := CategoriesRowCell {
+            model: tabs[index].categories;
+            read-only: read-only;
+            accessible-label: categories-txt.text;
+
+            add-triggered => {
+                add-category-popup.show();
+            }
+        }
+    }
+
+    Row {
+        Rectangle { }
+
+        footer-cell := MetadataFooterRowCell {
+            section-index: section-index;
+            tab-index: index;
+            wizard-mode: tabs[index].wizard-mode;
+            unsaved-changes: Data.sections[section-index].tabs[index].unsaved-changes;
+            checks: tabs[index].checks;
+            read-only: read-only;
+        }
+    }
+
+    Row {
+        Rectangle { }
+    }
+
+    // Open the category chooser when requested by the backend.
+    property <string> new-category: tabs[index].new-category;
+    changed new-category => {
+        if new-category == "choose" {
+            add-category-popup.show();
+        }
+    }
+
+    add-category-popup := TreeItemPickerPopup {
+        width: parent.width;
+        height: parent.height;
+        model: tabs[index].categories-tree;
+        icons-color: Palette.foreground;
+
+        item-picked(idx, item) => {
+            tabs[index].new-category = item.user-data;
+        }
+    }
+}
+
+component SymbolEditorTab inherits TouchArea {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    in-out property <[SymbolTabData]> tabs;
+    in property <int> index;
+    in property <bool> read-only;
+    property <length> toolbar-space: view-buttons-l.x - toolbuttons-l.x - toolbuttons-l.width - 10px;
+    property <length> toolbutton-offset-y: (toolbar-r.width > toolbar-space) ? toolbar-r.height : 0;
+
+    function tool-triggered(action: TabAction) {
+        Data.set-current-tab(section-index, index);
+        Backend.trigger-tab(section-index, index, action);
+    }
+
+    callback focus-requested();
+
+    mouse-cursor: tabs[index].tool-cursor;
+
+    if Data.preview-mode: Rectangle {
+        background: white;
+    }
+
+    img := Image {
+        width: 100%;
+        height: 100%;
+        preferred-width: 0;
+        preferred-height: 0;
+        image-fit: preserve;
+        image-rendering: pixelated;
+        source: Backend.render-scene(section-index, self.width, self.height, 0, tabs[index].frame);
+        accessible-role: none;
+    }
+
+    // Show overlay, if text is not empty.
+    if !tabs[index].tool-overlay-text.is-empty: Rectangle {
+        // Move down if it would conflict with the toolbar.
+        property <bool> move-down: (self.x + self.width + toolbuttons-l.x) > toolbar-r.x;
+
+        x: 2 * toolbuttons-l.x + toolbuttons-l.width;
+        y: toolbuttons-l.y + (move-down ? toolbar-r.height : 0);
+        width: overlay-txt.preferred-width + 2 * overlay-txt.x;
+        height: overlay-txt.preferred-height + 2 * overlay-txt.y;
+        background: tabs[index].overlay-color;
+        border-radius: 10px;
+        border-width: 1px;
+        border-color: tabs[index].overlay-text-color;
+
+        overlay-txt := Text {
+            x: 8px;
+            y: 8px;
+            horizontal-alignment: left;
+            vertical-alignment: top;
+            font-family: "Noto Sans Mono";
+            color: tabs[index].overlay-text-color;
+            text: tabs[index].tool-overlay-text;
+        }
+    }
+
+    toolbar-r := Rectangle {
+        y: 0;
+        width: min(self.preferred-width, root.width - 10px);
+        height: 34px;
+        background: #505050;
+        border-bottom-left-radius: 11px;
+        border-bottom-right-radius: 11px;
+        visible: self.width > 30px;
+
+        HorizontalLayout {
+            alignment: center;
+            padding: 3px;
+
+            if tabs[index].tool == EditorTool.line: line-toolbar := DrawSymbolPolygonToolBar {
+                section-index: section-index;
+                section: section;
+                show-angle-edt: true;
+                show-fill-sw: false;
+                show-grab-area-sw: false;
+            }
+
+            if tabs[index].tool == EditorTool.rect: rect-toolbar := DrawSymbolPolygonToolBar {
+                section-index: section-index;
+                section: section;
+                show-angle-edt: false;
+                show-fill-sw: true;
+                show-grab-area-sw: true;
+            }
+
+            if tabs[index].tool == EditorTool.polygon: polygon-toolbar := DrawSymbolPolygonToolBar {
+                section-index: section-index;
+                section: section;
+                show-angle-edt: true;
+                show-fill-sw: true;
+                show-grab-area-sw: true;
+            }
+
+            if tabs[index].tool == EditorTool.circle: circle-toolbar := DrawSymbolPolygonToolBar {
+                section-index: section-index;
+                section: section;
+                show-angle-edt: false;
+                show-fill-sw: true;
+                show-grab-area-sw: true;
+            }
+
+            if tabs[index].tool == EditorTool.arc: arc-toolbar := DrawSymbolPolygonToolBar {
+                section-index: section-index;
+                section: section;
+                show-angle-edt: false;
+                show-fill-sw: false;
+                show-grab-area-sw: false;
+            }
+
+            if tabs[index].tool == EditorTool.name: name-toolbar := AddSymbolTextToolBar {
+                section-index: section-index;
+                section: section;
+                show-layer-cbx: false;
+                show-text-edt: false;
+            }
+
+            if tabs[index].tool == EditorTool.value: value-toolbar := AddSymbolTextToolBar {
+                section-index: section-index;
+                section: section;
+                show-layer-cbx: false;
+                show-text-edt: false;
+            }
+
+            if tabs[index].tool == EditorTool.text: text-toolbar := AddSymbolTextToolBar {
+                section-index: section-index;
+                section: section;
+                show-layer-cbx: true;
+                show-text-edt: true;
+            }
+
+            if tabs[index].tool == EditorTool.pin: pin-toolbar := AddSymbolPinToolBar {
+                section-index: section-index;
+                section: section;
+            }
+        }
+    }
+
+    if tabs[index].tool == EditorTool.select: VerticalLayout {
+        width: min(self.preferred-width, 0.7 * parent.width, 550px);
+        padding: 20px;
+        spacing: 10px;
+
+        if tabs[index].import-pins-msg.visible: import-pins-msg := MessageBox {
+            title: @tr("Import Pins From Datasheet");
+            supports-dont-show-again: tabs[index].import-pins-msg.supports-dont-show-again;
+
+            Text {
+                wrap: word-wrap;
+                color: parent.text-color;
+                text: @tr("It is recommended to start drawing a new symbol by adding all pins. Especially for larger symbols, the fastest way to do so is to import them from a datasheet or any other documentation of the part.");
+            }
+
+            import-pins-btn := Button {
+                primary: true;
+                text: @tr("Import Pins");
+
+                clicked => {
+                    Backend.trigger-tab(section-index, index, TabAction.symbol-import-pins);
+                }
+            }
+
+            HorizontalLayout {
+                alignment: start;
+
+                import-pins-help-btn := LinkText {
+                    text-color: import-pins-msg.text-color;
+                    text-color-hovered: import-pins-msg.hover-color;
+                    wrap: word-wrap;
+                    text: "▸ " + @tr("Learn how to create symbols");
+                    status-tip: Constants.user-manual-create-symbol-url;
+
+                    clicked => {
+                        Backend.open-url(self.status-tip);
+                    }
+                }
+            }
+
+            dismiss-clicked => {
+                tabs[index].import-pins-msg.action = DismissableMessageAction.dismiss;
+            }
+
+            dont-show-again-clicked => {
+                tabs[index].import-pins-msg.action = DismissableMessageAction.dont-show-again;
+            }
+        }
+    }
+
+    toolbuttons-l := VerticalLayout {
+        x: 7px;
+        y: 7px + toolbutton-offset-y;
+        width: self.preferred-width;
+        height: parent.height - 2 * self.y;
+        spacing: 5px;
+
+        tool-select-btn := ToolButton {
+            cmd: Cmd.tool-select;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/arrow-pointer.svg");
+            checked: tabs[index].tool == EditorTool.select;
+
+            clicked => {
+                tool-triggered(TabAction.tool-select);
+            }
+        }
+
+        tool-line-btn := ToolButton {
+            cmd: Cmd.tool-line;
+            icon: @image-url("../../../../../../img/actions/draw_wire.png");
+            checked: tabs[index].tool == EditorTool.line;
+            enabled: !read-only;
+
+            clicked => {
+                tool-triggered(TabAction.tool-line);
+            }
+
+            tool-rect-btn := ToolButton {
+                cmd: Cmd.tool-rect;
+                icon: @image-url("../../../../../font-awesome/svgs/solid/vector-square.svg");
+                checked: tabs[index].tool == EditorTool.rect;
+                enabled: !read-only;
+
+                clicked => {
+                    tool-triggered(TabAction.tool-rect);
+                }
+            }
+
+            tool-polygon-btn := ToolButton {
+                cmd: Cmd.tool-polygon;
+                icon: @image-url("../../../../../font-awesome/svgs/solid/draw-polygon.svg");
+                checked: tabs[index].tool == EditorTool.polygon;
+                enabled: !read-only;
+
+                clicked => {
+                    tool-triggered(TabAction.tool-polygon);
+                }
+            }
+
+            tool-circle-btn := ToolButton {
+                cmd: Cmd.tool-circle;
+                icon: @image-url("../../../../../bootstrap-icons/icons/circle.svg");
+                checked: tabs[index].tool == EditorTool.circle;
+                enabled: !read-only;
+
+                clicked => {
+                    tool-triggered(TabAction.tool-circle);
+                }
+            }
+
+            tool-arc-btn := ToolButton {
+                cmd: Cmd.tool-arc;
+                icon: @image-url("../../../../../font-awesome/svgs/solid/circle-notch.svg");
+                checked: tabs[index].tool == EditorTool.arc;
+                enabled: !read-only;
+
+                clicked => {
+                    tool-triggered(TabAction.tool-arc);
+                }
+            }
+        }
+
+        tool-text-btn := ToolButton {
+            cmd: Cmd.tool-text;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/font.svg");
+            checked: tabs[index].tool == EditorTool.text;
+            enabled: !read-only;
+
+            clicked => {
+                tool-triggered(TabAction.tool-text);
+            }
+
+            tool-name-btn := ToolButton {
+                cmd: Cmd.tool-name;
+                icon: @image-url("../../../../../../img/actions/add_name.png");
+                checked: tabs[index].tool == EditorTool.name;
+                enabled: !read-only;
+
+                clicked => {
+                    tool-triggered(TabAction.tool-name);
+                }
+            }
+
+            tool-value-btn := ToolButton {
+                cmd: Cmd.tool-value;
+                icon: @image-url("../../../../../../img/actions/add_value.png");
+                checked: tabs[index].tool == EditorTool.value;
+                enabled: !read-only;
+
+                clicked => {
+                    tool-triggered(TabAction.tool-value);
+                }
+            }
+        }
+
+        tool-pin-btn := ToolButton {
+            cmd: Cmd.tool-pin;
+            icon: @image-url("../../../../../../img/actions/add_symbol_pin.png");
+            checked: tabs[index].tool == EditorTool.pin;
+            enabled: !read-only;
+
+            clicked => {
+                tool-triggered(TabAction.tool-pin);
+            }
+        }
+
+        tool-measure-btn := ToolButton {
+            cmd: Cmd.tool-measure;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/ruler.svg");
+            checked: tabs[index].tool == EditorTool.measure;
+
+            clicked => {
+                tool-triggered(TabAction.tool-measure);
+            }
+        }
+    }
+
+    view-buttons-l := VerticalLayout {
+        x: parent.width - self.preferred-width - 7px;
+        y: toolbutton-offset-y + 7px;
+        width: self.preferred-width;
+
+        zoom-fit-btn := SceneButton {
+            icon: @image-url("../../../../../font-awesome/svgs/solid/expand.svg");
+            icon-scale: 0.9;
+            bg-color: tabs[index].background-color;
+            fg-color: tabs[index].foreground-color;
+
+            clicked => {
+                Backend.trigger-tab(section-index, index, TabAction.zoom-fit);
+            }
+        }
+
+        zoom-in-btn := SceneButton {
+            icon: @image-url("../../../../../bootstrap-icons/icons/zoom-in.svg");
+            bg-color: tabs[index].background-color;
+            fg-color: tabs[index].foreground-color;
+
+            clicked => {
+                Backend.trigger-tab(section-index, index, TabAction.zoom-in);
+            }
+        }
+
+        zoom-out-btn := SceneButton {
+            icon: @image-url("../../../../../bootstrap-icons/icons/zoom-out.svg");
+            bg-color: tabs[index].background-color;
+            fg-color: tabs[index].foreground-color;
+
+            clicked => {
+                Backend.trigger-tab(section-index, index, TabAction.zoom-out);
+            }
+        }
+    }
+
+    pointer-event(event) => {
+        if event.kind == PointerEventKind.down {
+            Data.set-current-tab(section-index, index);
+            focus-requested();
+        }
+        Backend.scene-pointer-event(section-index, self.mouse-x, self.mouse-y, event);
+    }
+
+    scroll-event(event) => {
+        Backend.scene-scrolled(section-index, self.mouse-x, self.mouse-y, event) ? accept : reject
+    }
+}
+
+export component SymbolTab inherits Tab {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    property <[SymbolTabData]> tabs: section.symbol-tabs;
+    property <int> index: section.current-tab-index;
+    property <bool> read-only: section.tabs[index].features.save != FeatureState.enabled;
+    property <EditorTool> tool: tabs[index].tool;
+    property <bool> compact-layout: self.width < 1024px;
+
+    enabled: true;
+
+    changed compact-layout => {
+        tabs[index].compact-layout = self.compact-layout;
+    }
+
+    changed absolute-position => {
+        tabs[index].scene-image-pos = self.absolute-position;
+    }
+
+    // When the tool changes, move focus to scene to make tabulator & escape
+    // working correctly.
+    changed tool => {
+        root.focus();
+    }
+
+    init => {
+        tabs[index].compact-layout = self.compact-layout;
+        tabs[index].scene-image-pos = self.absolute-position;
+    }
+
+    VerticalLayout {
+        BreakingChangesMessageBanner {
+            shown: tabs[index].interface-broken-msg;
+        }
+
+        CheckErrorsMessageBanner {
+            shown: tabs[index].checks.errors > 0;
+        }
+
+        // Wizard mode: Only one page at a time.
+        if tabs[index].wizard-mode && (tabs[index].page-index <= 0): SymbolMetadataTab {
+            section-index: section-index;
+            tabs: tabs;
+            index: index;
+            read-only: read-only;
+        }
+
+        // Normal mode: Editor left, metadata right.
+        if (!tabs[index].wizard-mode) && (!compact-layout): HorizontalLayout {
+            SymbolEditorTab {
+                horizontal-stretch: 1;
+                section-index: section-index;
+                section: section;
+                tabs: tabs;
+                index: index;
+                read-only: read-only;
+
+                focus-requested => {
+                    if !root.has-focus {
+                        root.focus();
+                    }
+                }
+            }
+
+            Rectangle {
+                width: 1px;
+                background: #555555;
+            }
+
+            SymbolMetadataTab {
+                horizontal-stretch: 1;
+                max-width: min(500px, parent.width * 0.4);
+                section-index: section-index;
+                tabs: tabs;
+                index: index;
+                read-only: read-only;
+            }
+        }
+
+        // Compact mode: Slide between metadata and content.
+        if (!tabs[index].wizard-mode) && compact-layout: SlideView {
+            pages: [
+                { title: @tr("Metadata") },
+                { title: @tr("Graphics") },
+            ];
+            current-index: tabs[index].page-index;
+
+            SymbolMetadataTab {
+                width: parent.width;
+                section-index: section-index;
+                tabs: tabs;
+                index: index;
+                read-only: read-only;
+            }
+
+            SymbolEditorTab {
+                width: parent.width;
+                section-index: section-index;
+                section: section;
+                tabs: tabs;
+                index: index;
+                read-only: read-only;
+
+                focus-requested => {
+                    if !root.has-focus {
+                        root.focus();
+                    }
+                }
+            }
+
+            page-clicked(idx) => {
+                tabs[index].page-index = idx;
+            }
+        }
+    }
+
+    key-pressed(event) => {
+        Data.set-current-tab(section-index, index);
+
+        // If the focus is in the command toolbar, make the Escape key moving
+        // the focus back to the graphics scene without triggering any action.
+        if (event.text == Key.Escape) && (!root.has-focus) {
+            root.focus();
+            return accept;
+        }
+        reject
+    }
+
+    key-released(event) => {
+        Backend.scene-key-event(section-index, event) ? accept : reject
+    }
+}

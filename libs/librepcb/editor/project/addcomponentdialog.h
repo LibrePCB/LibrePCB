@@ -23,7 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../workspace/categorytreemodel.h"
+#include "../workspace/categorytreemodellegacy.h"
 #include "partinformationprovider.h"
 
 #include <librepcb/core/fileio/filepath.h>
@@ -187,7 +187,7 @@ private:
   QScopedPointer<GraphicsScene> mComponentPreviewScene;
   QScopedPointer<GraphicsScene> mDevicePreviewScene;
   std::unique_ptr<GraphicsLayerList> mLayers;
-  QScopedPointer<CategoryTreeModel> mCategoryTreeModel;
+  QScopedPointer<CategoryTreeModelLegacy> mCategoryTreeModel;
   QScopedPointer<PartInformationToolTip> mPartToolTip;
   uint mPartInfoProgress;
   bool mUpdatePartInformationScheduled;

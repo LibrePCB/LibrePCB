@@ -20,6 +20,7 @@ import {
 component RuleCheckListItem inherits Rectangle {
     in-out property <[RuleCheckMessageData]> model;
     in property <int> index;
+    in property <bool> read-only: false;
     in property <bool> enabled: true;
     in property <bool> selected: false;
     in property <length> scrollbar-width;
@@ -75,7 +76,7 @@ component RuleCheckListItem inherits Rectangle {
                 accessible-role: none;
             }
 
-            if item.supports-autofix && (selected || ta.has-hover): autofix-btn := ListViewItemButton {
+            if (!read-only) && item.supports-autofix && (selected || ta.has-hover): autofix-btn := ListViewItemButton {
                 icon: @image-url("../../../font-awesome/svgs/solid/wand-magic-sparkles.svg");
                 tooltip: @tr("Apply Automatic Fix");
                 enabled: root.enabled && (item.action != RuleCheckMessageAction.autofix);
@@ -85,7 +86,7 @@ component RuleCheckListItem inherits Rectangle {
                 }
             }
 
-            if selected || ta.has-hover || item.approved: approve-btn := ListViewItemButton {
+            if (!read-only) && (selected || ta.has-hover || item.approved): approve-btn := ListViewItemButton {
                 icon: item.approved ? @image-url("../../../bootstrap-icons/icons/eye-slash-fill.svg") : @image-url("../../../bootstrap-icons/icons/eye-fill.svg");
                 tooltip: item.approved ? @tr("Remove Approval") : @tr("Approve");
                 enabled: root.enabled;
@@ -242,6 +243,7 @@ export component RuleCheckPanel inherits Rectangle {
                     height: item-height;
                     model: model;
                     index: index;
+                    read-only: check.read-only;
                     enabled: check.execution-error.is-empty && (check.state != RuleCheckState.running);
                     selected: (index == selected-index);
                     scrollbar-width: scrollbar-width;

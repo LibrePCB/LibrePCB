@@ -34,9 +34,13 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class FilePath;
+
 namespace editor {
 
 class GuiApplication;
+class LibraryEditor;
 class MainWindowTestAdapter;
 class ProjectReadmeRenderer;
 class WindowSection;
@@ -68,6 +72,7 @@ public:
   void showPanelPage(ui::PanelPage page) noexcept;
   void popUpNotifications() noexcept;
   void showStatusBarMessage(const QString& message, int timeoutMs);
+  void setCurrentLibrary(int index) noexcept;
   void setCurrentProject(int index) noexcept;
 
   // Operator Overloadings
@@ -81,10 +86,24 @@ private:
   void trigger(ui::Action a) noexcept;
   void triggerSection(int section, ui::WindowSectionAction a) noexcept;
   void triggerTab(int section, int tab, ui::TabAction a) noexcept;
+  void triggerLibrary(slint::SharedString path, ui::LibraryAction a) noexcept;
+  void triggerLibraryElement(slint::SharedString path,
+                             ui::LibraryElementAction a) noexcept;
   void triggerProject(int index, ui::ProjectAction a) noexcept;
   void triggerSchematic(int project, int schematic,
                         ui::SchematicAction a) noexcept;
   void triggerBoard(int project, int board, ui::BoardAction a) noexcept;
+  void openLibraryTab(const FilePath& fp, bool wizardMode) noexcept;
+  void openComponentCategoryTab(LibraryEditor& editor, const FilePath& fp,
+                                bool copyFrom) noexcept;
+  void openPackageCategoryTab(LibraryEditor& editor, const FilePath& fp,
+                              bool copyFrom) noexcept;
+  void openSymbolTab(LibraryEditor& editor, const FilePath& fp,
+                     bool copyFrom) noexcept;
+  void openPackageTab(LibraryEditor& editor, const FilePath& fp,
+                      bool copyFrom) noexcept;
+  void openComponentTab(LibraryEditor& editor, const FilePath& fp) noexcept;
+  void openDeviceTab(LibraryEditor& editor, const FilePath& fp) noexcept;
   void openSchematicTab(int projectIndex, int index) noexcept;
   void openBoard2dTab(int projectIndex, int index) noexcept;
   void openBoard3dTab(int projectIndex, int index) noexcept;
@@ -93,6 +112,8 @@ private:
   void addTab(std::shared_ptr<WindowTab> tab) noexcept;
   template <typename T>
   bool switchToTab() noexcept;
+  template <typename T>
+  bool switchToLibraryElementTab(const FilePath& fp) noexcept;
   template <typename T>
   bool switchToProjectTab(int prjIndex, int objIndex) noexcept;
 

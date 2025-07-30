@@ -22,8 +22,6 @@
  ******************************************************************************/
 #include "packageeditorstate.h"
 
-#include "../../../graphics/graphicsscene.h"
-
 #include <librepcb/core/types/layer.h>
 
 #include <QtCore>
@@ -39,7 +37,7 @@ namespace editor {
  ******************************************************************************/
 
 PackageEditorState::PackageEditorState(Context& context) noexcept
-  : QObject(nullptr), mContext(context) {
+  : QObject(nullptr), mContext(context), mAdapter(mContext.adapter) {
 }
 
 PackageEditorState::~PackageEditorState() noexcept {
@@ -49,12 +47,20 @@ PackageEditorState::~PackageEditorState() noexcept {
  *  Protected Methods
  ******************************************************************************/
 
-const PositiveLength& PackageEditorState::getGridInterval() const noexcept {
-  return mContext.graphicsScene.getGridInterval();
+GraphicsScene* PackageEditorState::getGraphicsScene() noexcept {
+  return mAdapter.fsmGetGraphicsScene();
+}
+
+PositiveLength PackageEditorState::getGridInterval() const noexcept {
+  return mAdapter.fsmGetGridInterval();
 }
 
 const LengthUnit& PackageEditorState::getLengthUnit() const noexcept {
   return mContext.lengthUnit;
+}
+
+QWidget* PackageEditorState::parentWidget() noexcept {
+  return qApp->activeWindow();
 }
 
 const QSet<const Layer*>& PackageEditorState::getAllowedTextLayers() noexcept {

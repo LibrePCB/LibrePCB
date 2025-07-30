@@ -1,0 +1,202 @@
+import {
+    ComboBox,
+    IconButton,
+    LengthEdit,
+    PadShapeSelector,
+    Palette,
+    RatioEdit,
+    TextFlagsBox,
+    ToolBarWidget,
+} from "../../widgets.slint";
+import {
+    PackageTabData,
+    PadShape,
+    WindowSectionData,
+} from "../../api.slint";
+
+component BoardSideSelector inherits ToolBarWidget {
+    in-out property <bool> bottom: false;
+
+    callback toggled(bool);
+    toggled(b) => {
+        bottom = b;
+    }
+
+    key-pressed(event) => {
+        if event.text == Key.Space {
+            toggled(!bottom);
+            return accept;
+        }
+        reject
+    }
+
+    btn := IconButton {
+        width: 18px;
+        style: checkable-hyperlink;
+        color-enabled: Palette.foreground;
+        icon: {
+            if bottom {
+                @image-url("../../../../../bootstrap-icons/icons/back.svg")
+            } else {
+                @image-url("../../../../../bootstrap-icons/icons/front.svg")
+            }
+        };
+        tooltip: @tr("Board Side");
+
+        clicked => {
+            toggled(!bottom);
+        }
+    }
+}
+
+export component AddFootprintPadToolBar inherits HorizontalLayout {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    in property <bool> show-side-selector: true;
+    in property <bool> show-drill-edt: true;
+    in property <bool> show-ratio-sw: true;
+    in property <bool> show-pressfit-sw: true;
+    in property <bool> fiducial-mode: false;
+    property <[PackageTabData]> tabs: section.package-tabs;
+
+    spacing: 2px;
+
+    if !fiducial-mode: package-pad-cbx := ComboBox {
+        model: tabs[section.current-tab-index].tool-package-pad.items;
+        current-index: tabs[section.current-tab-index].tool-package-pad.current-index;
+        accessible-label: "package pad";
+
+        current-index-changed(index) => {
+            tabs[section.current-tab-index].tool-package-pad.current-index = index;
+        }
+    }
+
+    if show-side-selector: side-selector := BoardSideSelector {
+        bottom: tabs[section.current-tab-index].tool-bottom;
+
+        toggled(b) => {
+            tabs[section.current-tab-index].tool-bottom = b;
+        }
+    }
+
+    shape-selector := PadShapeSelector {
+        shape: tabs[section.current-tab-index].tool-shape;
+
+        value-clicked(s) => {
+            tabs[section.current-tab-index].tool-shape = s;
+        }
+    }
+
+    width-size-edt := LengthEdit {
+        data: tabs[section.current-tab-index].tool-line-width;
+        icon: @image-url("../../../../../font-awesome/svgs/solid/arrows-left-right.svg");
+        tooltip: fiducial-mode ? @tr("Diameter") : @tr("Width");
+        min-width-text: "1.234";
+
+        value-changed(v) => {
+            tabs[section.current-tab-index].tool-line-width.value = v;
+        }
+
+        unit-changed(u) => {
+            tabs[section.current-tab-index].tool-line-width.unit = u;
+        }
+
+        increase-triggered => {
+            tabs[section.current-tab-index].tool-line-width.increase = true;
+        }
+
+        decrease-triggered => {
+            tabs[section.current-tab-index].tool-line-width.decrease = true;
+        }
+    }
+
+    height-clearance-edt := LengthEdit {
+        data: tabs[section.current-tab-index].tool-size;
+        icon: {
+            if fiducial-mode {
+                @image-url("../../../../../bootstrap-icons/icons/sign-stop.svg")
+            } else {
+                @image-url("../../../../../font-awesome/svgs/solid/arrows-up-down.svg")
+            }
+        };
+        tooltip: fiducial-mode ? @tr("Copper Clearance") : @tr("Height");
+        min-width-text: "1.234";
+
+        value-changed(v) => {
+            tabs[section.current-tab-index].tool-size.value = v;
+        }
+
+        unit-changed(u) => {
+            tabs[section.current-tab-index].tool-size.unit = u;
+        }
+
+        increase-triggered => {
+            tabs[section.current-tab-index].tool-size.increase = true;
+        }
+
+        decrease-triggered => {
+            tabs[section.current-tab-index].tool-size.decrease = true;
+        }
+    }
+
+    if show-drill-edt: drill-edt := LengthEdit {
+        data: tabs[section.current-tab-index].tool-drill;
+        icon: @image-url("../../../../../font-awesome/svgs/solid/bore-hole.svg");
+        tooltip: @tr("Drill Diameter");
+        min-width-text: "1.234";
+
+        value-changed(v) => {
+            tabs[section.current-tab-index].tool-drill.value = v;
+        }
+
+        unit-changed(u) => {
+            tabs[section.current-tab-index].tool-drill.unit = u;
+        }
+
+        increase-triggered => {
+            tabs[section.current-tab-index].tool-drill.increase = true;
+        }
+
+        decrease-triggered => {
+            tabs[section.current-tab-index].tool-drill.decrease = true;
+        }
+    }
+
+    if show-ratio-sw: ratio-edt := RatioEdit {
+        property <PadShape> shape: tabs[section.current-tab-index].tool-shape;
+
+        data: tabs[section.current-tab-index].tool-ratio;
+        icon: @image-url("../../../../../font-awesome/svgs/solid/border-top-left.svg");
+        tooltip: @tr("Corner Radius");
+        min-width-text: "12.345 %";
+        read-only: (shape != PadShape.rounded-rect) && (shape != PadShape.octagon);
+
+        value-changed(v) => {
+            tabs[section.current-tab-index].tool-ratio.value = v;
+        }
+
+        increase-triggered => {
+            tabs[section.current-tab-index].tool-ratio.increase = true;
+        }
+
+        decrease-triggered => {
+            tabs[section.current-tab-index].tool-ratio.decrease = true;
+        }
+    }
+
+    if show-pressfit-sw: flags-box := TextFlagsBox {
+        model: [
+            {
+                text: @tr("Press-Fit"),
+                status-tip: @tr("Mark this pad as a press-fit pad"),
+                checked: tabs[section.current-tab-index].tool-pressfit,
+            },
+        ];
+
+        toggled(index, state) => {
+            if index == 0 {
+                tabs[section.current-tab-index].tool-pressfit = state;
+            }
+        }
+    }
+}

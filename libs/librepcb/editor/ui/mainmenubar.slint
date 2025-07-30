@@ -15,9 +15,10 @@ import {
     EditorCommandSet as Cmd,
     FeatureState,
     Helpers,
+    LibraryData,
+    LibraryElementAction,
     PanelPage,
     ProjectAction,
-    ProjectData,
     SchematicAction,
     Shortcuts,
     TabAction,
@@ -66,31 +67,19 @@ component MenuBarSeparator inherits Rectangle {
 export component MainMenuBar inherits Rectangle {
     in property <length> sections-start-x;
     property <string> undo-text: {
-        if Data.current-project.undo-text.is-empty {
+        if Data.current-tab.undo-text.is-empty {
             @tr("Undo")
         } else {
-            @tr("Undo: {}", Data.current-project.undo-text)
+            @tr("Undo: {}", Data.current-tab.undo-text)
         }
     };
     property <string> redo-text: {
-        if Data.current-project.redo-text.is-empty {
+        if Data.current-tab.redo-text.is-empty {
             @tr("Redo")
         } else {
-            @tr("Redo: {}", Data.current-project.redo-text)
+            @tr("Redo: {}", Data.current-tab.redo-text)
         }
     };
-    property <int> current-tab-project-index: {
-        if Data.current-tab.type == TabType.schematic {
-            Data.current-schematic-tab.project-index
-        } else if Data.current-tab.type == TabType.board-2d {
-            Data.current-board-2d-tab.project-index
-        } else if Data.current-tab.type == TabType.board-3d {
-            Data.current-board-3d-tab.project-index
-        } else {
-            -1
-        }
-    };
-    property <ProjectData> current-tab-project: Data.projects[current-tab-project-index];
 
     callback focus-root;
     callback focus-grid-interval;
@@ -288,7 +277,7 @@ export component MainMenuBar inherits Rectangle {
 
                 import-dxf := MenuItem {
                     cmd: Cmd.import-dxf;
-                    enabled: Data.current-tab.type == TabType.board-2d;
+                    enabled: Data.current-tab.features.import-graphics == FeatureState.enabled;
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.import-dxf);
@@ -352,10 +341,10 @@ export component MainMenuBar inherits Rectangle {
                     cmd: Cmd.undo;
                     text: undo-text;
                     icon: @image-url("../../../font-awesome/svgs/solid/rotate-left.svg");
-                    enabled: Data.current-project.can-undo;
+                    enabled: Data.current-tab.features.undo == FeatureState.enabled;
 
                     clicked => {
-                        Helpers.trigger-current-project-action(ProjectAction.undo);
+                        Helpers.trigger-current-tab-action(TabAction.undo);
                     }
                 }
 
@@ -363,10 +352,10 @@ export component MainMenuBar inherits Rectangle {
                     cmd: Cmd.redo;
                     text: redo-text;
                     icon: @image-url("../../../font-awesome/svgs/solid/rotate-right.svg");
-                    enabled: Data.current-project.can-redo;
+                    enabled: Data.current-tab.features.redo == FeatureState.enabled;
 
                     clicked => {
-                        Helpers.trigger-current-project-action(ProjectAction.redo);
+                        Helpers.trigger-current-tab-action(TabAction.redo);
                     }
                 }
 
@@ -643,7 +632,7 @@ export component MainMenuBar inherits Rectangle {
                 grid-interval-increase-item := MenuItem {
                     cmd: Cmd.grid-increase;
                     icon: @image-url("../../../font-awesome/svgs/solid/caret-up.svg");
-                    enabled: Data.current-tab-is-2d;
+                    enabled: Data.current-tab.features.grid == FeatureState.enabled;
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.grid-interval-increase);
@@ -653,7 +642,7 @@ export component MainMenuBar inherits Rectangle {
                 grid-interval-decrease-item := MenuItem {
                     cmd: Cmd.grid-decrease;
                     icon: @image-url("../../../font-awesome/svgs/solid/caret-down.svg");
-                    enabled: Data.current-tab-is-2d;
+                    enabled: Data.current-tab.features.grid == FeatureState.enabled;
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.grid-interval-decrease);
@@ -663,7 +652,7 @@ export component MainMenuBar inherits Rectangle {
                 grid-interval-set-item := MenuItem {
                     cmd: Cmd.grid-properties;
                     icon: @image-url("../../../bootstrap-icons/icons/grid-3x3.svg");
-                    enabled: Data.current-tab-is-2d;
+                    enabled: Data.current-tab.features.grid == FeatureState.enabled;
 
                     clicked => {
                         focus-grid-interval();
@@ -724,16 +713,28 @@ export component MainMenuBar inherits Rectangle {
 
                 MenuSeparator { }
 
+                toggle-background-image-item := MenuItem {
+                    cmd: Cmd.toggle-background-image;
+                    icon: @image-url("../../../bootstrap-icons/icons/image.svg");
+                    enabled: Data.current-tab.features.background-image == FeatureState.enabled;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.toggle-background-image);
+                    }
+                }
+
                 toggle-3d-item := MenuItem {
                     cmd: Cmd.toggle-3d;
                     icon: @image-url("../../../bootstrap-icons/icons/badge-3d.svg");
-                    enabled: (Data.current-tab.type == TabType.board-2d) || (Data.current-tab.type == TabType.board-3d);
+                    enabled: (Data.current-tab.type == TabType.board-2d) || (Data.current-tab.type == TabType.board-3d) || ((Data.current-tab.type == TabType.package) && (Data.current-package-tab.page-index == 2));
 
                     clicked => {
                         if Data.current-tab.type == TabType.board-2d {
                             Backend.trigger-board(Data.current-board-2d-tab.project-index, Data.current-board-2d-tab.board-index, BoardAction.open-3d);
-                        } else {
+                        } else if Data.current-tab.type == TabType.board-3d {
                             Backend.trigger-board(Data.current-board-3d-tab.project-index, Data.current-board-3d-tab.board-index, BoardAction.open-2d);
+                        } else if Data.current-tab.type == TabType.package {
+                            Data.current-section.package-tabs[Data.current-section.current-tab-index].view-3d = !Data.current-package-tab.view-3d;
                         }
                     }
                 }
@@ -743,7 +744,7 @@ export component MainMenuBar inherits Rectangle {
                 zoom-in-item := MenuItem {
                     cmd: Cmd.zoom-in;
                     icon: @image-url("../../../bootstrap-icons/icons/zoom-in.svg");
-                    enabled: Data.current-tab-is-2d-or-3d;
+                    enabled: Data.current-tab.features.zoom == FeatureState.enabled;
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.zoom-in);
@@ -753,7 +754,7 @@ export component MainMenuBar inherits Rectangle {
                 zoom-out-item := MenuItem {
                     cmd: Cmd.zoom-out;
                     icon: @image-url("../../../bootstrap-icons/icons/zoom-out.svg");
-                    enabled: Data.current-tab-is-2d-or-3d;
+                    enabled: Data.current-tab.features.zoom == FeatureState.enabled;
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.zoom-out);
@@ -763,10 +764,210 @@ export component MainMenuBar inherits Rectangle {
                 zoom-fit-item := MenuItem {
                     cmd: Cmd.zoom-fit-content;
                     icon: @image-url("../../../font-awesome/svgs/solid/expand.svg");
-                    enabled: Data.current-tab-is-2d-or-3d;
+                    enabled: Data.current-tab.features.zoom == FeatureState.enabled;
 
                     clicked => {
                         Helpers.trigger-current-tab-action(TabAction.zoom-fit);
+                    }
+                }
+            }
+        }
+
+        library-menu-item := MainMenuItem {
+            property <LibraryData> library: Data.libraries[Data.current-library-tab.library-index];
+
+            text: @tr("Library");
+            visible: Data.current-tab.type == TabType.library;
+
+            clicked => {
+                library-menu-popup.show();
+            }
+
+            library-menu-popup := MenuPopup {
+                x: 0;
+                y: parent.height;
+
+                save-library-item := MenuItem {
+                    cmd: Cmd.save;
+                    text: @tr("Save Library");  // More specific.
+                    icon: @image-url("../../../bootstrap-icons/icons/floppy-fill.svg");
+                    enabled: Data.current-tab.features.save == FeatureState.enabled;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.save);
+                    }
+                }
+
+                close-library-item := MenuItem {
+                    text: @tr("Close Library");  // More specific.
+                    status-tip: @tr("Close the currently opened library");
+                    icon: @image-url("../../../font-awesome/svgs/solid/xmark.svg");
+
+                    clicked => {
+                        Backend.trigger-library-element(library.path, LibraryElementAction.close);
+                    }
+                }
+
+                open-library-folder-item := MenuItem {
+                    cmd: Cmd.file-manager;
+                    icon: @image-url("../../../font-awesome/svgs/solid/arrow-up-right-from-square.svg");
+
+                    clicked => {
+                        Backend.trigger-library-element(library.path, LibraryElementAction.open-folder);
+                    }
+                }
+
+                MenuSeparator { }
+
+                import-eagle-library-item := MenuItem {
+                    cmd: Cmd.import-eagle-library;
+
+                    clicked => {
+                        Backend.trigger-library-element(library.path, LibraryElementAction.import-eagle-library);
+                    }
+                }
+
+                import-kicad-library-item := MenuItem {
+                    cmd: Cmd.import-kicad-library;
+
+                    clicked => {
+                        Backend.trigger-library-element(library.path, LibraryElementAction.import-kicad-library);
+                    }
+                }
+            }
+        }
+
+        category-menu-item := MainMenuItem {
+            text: @tr("Category");
+            visible: (Data.current-tab.type == TabType.component-category) || (Data.current-tab.type == TabType.package-category);
+
+            clicked => {
+                category-menu-popup.show();
+            }
+
+            category-menu-popup := MenuPopup {
+                x: 0;
+                y: parent.height;
+
+                save-category-item := MenuItem {
+                    cmd: Cmd.save;
+                    text: @tr("Save Category");  // More specific.
+                    icon: @image-url("../../../bootstrap-icons/icons/floppy-fill.svg");
+                    enabled: Data.current-tab.features.save == FeatureState.enabled;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.save);
+                    }
+                }
+
+                close-category-item := MenuItem {
+                    text: @tr("Close Category");  // More specific.
+                    status-tip: @tr("Close the currently opened category");
+                    icon: @image-url("../../../font-awesome/svgs/solid/xmark.svg");
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.close);
+                    }
+                }
+
+                open-category-folder-item := MenuItem {
+                    cmd: Cmd.file-manager;
+                    icon: @image-url("../../../font-awesome/svgs/solid/arrow-up-right-from-square.svg");
+
+                    clicked => {
+                        if Data.current-tab.type == TabType.component-category {
+                            Backend.trigger-library-element(Data.current-component-category-tab.path, LibraryElementAction.open-folder);
+                        } else {
+                            Backend.trigger-library-element(Data.current-package-category-tab.path, LibraryElementAction.open-folder);
+                        }
+                    }
+                }
+            }
+        }
+
+        symbol-menu-item := MainMenuItem {
+            text: @tr("Symbol");
+            visible: Data.current-tab.type == TabType.symbol;
+
+            clicked => {
+                symbol-menu-popup.show();
+            }
+
+            symbol-menu-popup := MenuPopup {
+                x: 0;
+                y: parent.height;
+
+                save-symbol-item := MenuItem {
+                    cmd: Cmd.save;
+                    text: @tr("Save Symbol");  // More specific.
+                    icon: @image-url("../../../bootstrap-icons/icons/floppy-fill.svg");
+                    enabled: Data.current-tab.features.save == FeatureState.enabled;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.save);
+                    }
+                }
+
+                close-symbol-item := MenuItem {
+                    text: @tr("Close Symbol");  // More specific.
+                    status-tip: @tr("Close the currently opened symbol");
+                    icon: @image-url("../../../font-awesome/svgs/solid/xmark.svg");
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.close);
+                    }
+                }
+
+                open-symbol-folder-item := MenuItem {
+                    cmd: Cmd.file-manager;
+                    icon: @image-url("../../../font-awesome/svgs/solid/arrow-up-right-from-square.svg");
+
+                    clicked => {
+                        Backend.trigger-library-element(Data.current-symbol-tab.path, LibraryElementAction.open-folder);
+                    }
+                }
+            }
+        }
+
+        package-menu-item := MainMenuItem {
+            text: @tr("Package");
+            visible: Data.current-tab.type == TabType.package;
+
+            clicked => {
+                package-menu-popup.show();
+            }
+
+            package-menu-popup := MenuPopup {
+                x: 0;
+                y: parent.height;
+
+                save-package-item := MenuItem {
+                    cmd: Cmd.save;
+                    text: @tr("Save Package");  // More specific.
+                    icon: @image-url("../../../bootstrap-icons/icons/floppy-fill.svg");
+                    enabled: Data.current-tab.features.save == FeatureState.enabled;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.save);
+                    }
+                }
+
+                close-package-item := MenuItem {
+                    text: @tr("Close Package");  // More specific.
+                    status-tip: @tr("Close the currently opened package");
+                    icon: @image-url("../../../font-awesome/svgs/solid/xmark.svg");
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.close);
+                    }
+                }
+
+                open-package-folder-item := MenuItem {
+                    cmd: Cmd.file-manager;
+                    icon: @image-url("../../../font-awesome/svgs/solid/arrow-up-right-from-square.svg");
+
+                    clicked => {
+                        Backend.trigger-library-element(Data.current-package-tab.path, LibraryElementAction.open-folder);
                     }
                 }
             }
@@ -803,7 +1004,9 @@ export component MainMenuBar inherits Rectangle {
                 MenuSeparator { }
 
                 save-project-item := MenuItem {
-                    cmd: Cmd.project-save;
+                    cmd: Cmd.save;
+                    text: @tr("Save Project");  // More specific.
+                    icon: @image-url("../../../bootstrap-icons/icons/floppy-fill.svg");
                     enabled: Data.current-project.writable;
 
                     clicked => {
@@ -1025,46 +1228,48 @@ export component MainMenuBar inherits Rectangle {
             width: 3px;
         }
 
-        if current-tab-project.valid: project-buttons-l := HorizontalLayout {
+        if global-buttons-l.preferred-width > global-buttons-l.padding-left: MenuBarSeparator { }
+
+        global-buttons-l := HorizontalLayout {
             horizontal-stretch: 0;
             padding-top: 5px;
             padding-bottom: 5px;
+            padding-left: 5px;
             spacing: 5px;
 
-            MenuBarSeparator { }
-
-            save-project-btn := MenuBarButton {
-                cmd: Cmd.project-save;
-                enabled: current-tab-project.writable;
+            if Data.current-tab.features.save != FeatureState.not-supported: save-btn := MenuBarButton {
+                cmd: Cmd.save;
+                icon: @image-url("../../../bootstrap-icons/icons/floppy-fill.svg");
+                enabled: Data.current-tab.features.save == FeatureState.enabled;
 
                 clicked => {
-                    Backend.trigger-project(current-tab-project-index, ProjectAction.save);
+                    Helpers.trigger-current-tab-action(TabAction.save);
                 }
             }
 
-            undo-btn := MenuBarButton {
+            if Data.current-tab.features.undo != FeatureState.not-supported: undo-btn := MenuBarButton {
                 cmd: Cmd.undo;
                 icon: @image-url("../../../font-awesome/svgs/solid/rotate-left.svg");
                 tooltip: undo-text;
-                enabled: current-tab-project.can-undo;
+                enabled: Data.current-tab.features.undo == FeatureState.enabled;
 
                 clicked => {
-                    Backend.trigger-project(current-tab-project-index, ProjectAction.undo);
+                    Helpers.trigger-current-tab-action(TabAction.undo);
                 }
             }
 
-            redo-btn := MenuBarButton {
+            if Data.current-tab.features.redo != FeatureState.not-supported: redo-btn := MenuBarButton {
                 cmd: Cmd.redo;
                 icon: @image-url("../../../font-awesome/svgs/solid/rotate-right.svg");
                 tooltip: redo-text;
-                enabled: current-tab-project.can-redo;
+                enabled: Data.current-tab.features.redo == FeatureState.enabled;
 
                 clicked => {
-                    Backend.trigger-project(current-tab-project-index, ProjectAction.redo);
+                    Helpers.trigger-current-tab-action(TabAction.redo);
                 }
             }
 
-            if !current-tab-project.writable: Rectangle {
+            if Data.current-tab.read-only: Rectangle {
                 width: self.preferred-width + 20px;
 
                 read-only-badge := Badge {

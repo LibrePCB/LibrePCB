@@ -418,7 +418,7 @@ void FootprintPadPropertiesDialog::updateGeneralTabHoleWidgets() noexcept {
 }
 
 void FootprintPadPropertiesDialog::setSelectedHole(int index) noexcept {
-  mSelectedHoleIndex = qBound(0, index, mHoles.count() - 1);
+  mSelectedHoleIndex = qBound(-1, index, mHoles.count() - 1);
   const std::shared_ptr<PadHole> hole = mHoles.value(mSelectedHoleIndex);
   if (hole) {
     mUi->lblSelectedHole->setText(
@@ -518,7 +518,7 @@ bool FootprintPadPropertiesDialog::applyChanges() noexcept {
     } else {
       cmd->setSolderPasteConfig(MaskConfig::off());
     }
-    cmd->setCopperClearance(mUi->edtCopperClearance->getValue());
+    cmd->setCopperClearance(mUi->edtCopperClearance->getValue(), false);
     cmd->setHoles(mHoles, false);
     cmd->setPosition(Point(mUi->edtPosX->getValue(), mUi->edtPosY->getValue()),
                      false);

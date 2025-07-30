@@ -28,6 +28,7 @@
 #include "../../guiapplication.h"
 #include "../../rulecheck/rulecheckmessagesmodel.h"
 #include "../../undostack.h"
+#include "../../utils/editortoolbox.h"
 #include "../../utils/slinthelpers.h"
 #include "../../utils/uihelpers.h"
 #include "../../workspace/desktopservices.h"
@@ -60,18 +61,6 @@
  ******************************************************************************/
 namespace librepcb {
 namespace editor {
-
-static QString toSingleLine(const QString& s) {
-  return QString(s).replace("\n", "\\n");
-}
-
-static QString toMultiLine(const QString& s) {
-  return s.trimmed().replace("\\n", "\n");
-}
-
-static ui::FeatureState toFs(bool enabled) noexcept {
-  return enabled ? ui::FeatureState::Enabled : ui::FeatureState::Disabled;
-}
 
 static ui::WireMode l2s(SchematicEditorState_DrawWire::WireMode v) noexcept {
   if (v == SchematicEditorState_DrawWire::WireMode::HV) {
@@ -120,7 +109,8 @@ SchematicTab::SchematicTab(GuiApplication& app, SchematicEditor& editor,
     mLayers(
         GraphicsLayerList::schematicLayers(&app.getWorkspace().getSettings())),
     mPinNumbersLayer(mLayers->get(Theme::Color::sSchematicPinNumbers)),
-    mView(new SlintGraphicsView(this)),
+    mView(new SlintGraphicsView(SlintGraphicsView::defaultSchematicSceneRect(),
+                                this)),
     mMsgInstallLibraries(app.getWorkspace(), "EMPTY_SCHEMATIC_NO_LIBRARIES"),
     mMsgAddDrawingFrame(app.getWorkspace(), "EMPTY_SCHEMATIC_ADD_FRAME"),
     mGridStyle(mApp.getWorkspace()
@@ -145,7 +135,13 @@ SchematicTab::SchematicTab(GuiApplication& app, SchematicEditor& editor,
   Q_ASSERT(&mSchematic.getProject() == &mProject);
 
   // Setup graphics view.
+  mView->setUseOpenGl(mApp.getWorkspace().getSettings().useOpenGl.get());
   mView->setEventHandler(this);
+  connect(
+      &mApp.getWorkspace().getSettings().useOpenGl,
+      &WorkspaceSettingsItem_GenericValue<bool>::edited, this, [this]() {
+        mView->setUseOpenGl(mApp.getWorkspace().getSettings().useOpenGl.get());
+      });
   connect(mView.get(), &SlintGraphicsView::transformChanged, this,
           &SchematicTab::requestRepaint);
   connect(mView.get(), &SlintGraphicsView::stateChanged, this,
@@ -241,8 +237,13 @@ int SchematicTab::getProjectObjectIndex() const noexcept {
 
 ui::TabData SchematicTab::getUiData() const noexcept {
   ui::TabFeatures features = {};
+  features.save = toFs(mProject.getDirectory().isWritable());
+  features.undo = toFs(mProjectEditor.getUndoStack().canUndo());
+  features.redo = toFs(mProjectEditor.getUndoStack().canRedo());
+  features.grid = toFs(mProject.getDirectory().isWritable());
+  features.zoom = toFs(true);
   features.export_graphics = toFs(mTool == ui::EditorTool::Select);
-  features.select = toFs(mTool == ui::EditorTool::Select);
+  features.select = toFs(mToolFeatures.testFlag(Feature::Select));
   features.cut = toFs(mToolFeatures.testFlag(Feature::Cut));
   features.copy = toFs(mToolFeatures.testFlag(Feature::Copy));
   features.paste = toFs(mToolFeatures.testFlag(Feature::Paste));
@@ -258,6 +259,10 @@ ui::TabData SchematicTab::getUiData() const noexcept {
       ui::TabType::Schematic,  // Type
       q2s(*mSchematic.getName()),  // Title
       features,  // Features
+      !mProject.getDirectory().isWritable(),  // Read-only
+      mProjectEditor.hasUnsavedChanges(),  // Unsaved changes
+      q2s(mProjectEditor.getUndoStack().getUndoCmdText()),  // Undo text
+      q2s(mProjectEditor.getUndoStack().getRedoCmdText()),  // Redo text
       q2s(mSearchContext.getTerm()),  // Find term
       mSearchContext.getSuggestions(),  // Find suggestions
       nullptr,  // Layers
@@ -307,15 +312,16 @@ ui::SchematicTabData SchematicTab::getDerivedUiData() const noexcept {
       ui::LineEditData{
           // Tool value
           true,  // Enabled
-          q2s(toSingleLine(mToolValue)),  // Text
+          q2s(EditorToolbox::toSingleLine(mToolValue)),  // Text
           slint::SharedString(),  // Placeholder
           mToolValueSuggestions,  // Suggestions
       },
       ui::LineEditData{
           // Tool attribute value
           mToolAttributeValue.has_value(),  // Enabled
-          mToolAttributeValue ? q2s(toSingleLine(*mToolAttributeValue))
-                              : slint::SharedString(),  // Text
+          mToolAttributeValue
+              ? q2s(EditorToolbox::toSingleLine(*mToolAttributeValue))
+              : slint::SharedString(),  // Text
           q2s(mToolAttributeValuePlaceholder),  // Placeholder
           mToolValueSuggestions,  // Suggestions
       },
@@ -366,12 +372,12 @@ void SchematicTab::setDerivedUiData(const ui::SchematicTabData& data) noexcept {
   emit filledRequested(data.tool_filled);
   mToolLineWidth.setUiData(data.tool_line_width);
   mToolSize.setUiData(data.tool_size);
-  emit valueRequested(toMultiLine(s2q(data.tool_value.text)));
+  emit valueRequested(EditorToolbox::toMultiLine(s2q(data.tool_value.text)));
   // Unit must be set before value, because value may override the unit!
   emit attributeUnitRequested(
       mToolAttributeUnitsQt.value(data.tool_attribute_unit.current_index));
   emit attributeValueRequested(
-      toMultiLine(s2q(data.tool_attribute_value.text)));
+      EditorToolbox::toMultiLine(s2q(data.tool_attribute_value.text)));
 
   requestRepaint();
 }
@@ -420,6 +426,14 @@ void SchematicTab::trigger(ui::TabAction a) noexcept {
     }
     case ui::TabAction::Abort: {
       mFsm->processAbortCommand();
+      break;
+    }
+    case ui::TabAction::Undo: {
+      mProjectEditor.undo();
+      break;
+    }
+    case ui::TabAction::Redo: {
+      mProjectEditor.redo();
       break;
     }
     case ui::TabAction::Cut: {
