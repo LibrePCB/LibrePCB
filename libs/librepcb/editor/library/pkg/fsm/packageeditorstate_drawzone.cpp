@@ -24,6 +24,7 @@
 
 #include "../../../cmd/cmdzoneedit.h"
 #include "../../../graphics/zonegraphicsitem.h"
+#include "../../../undostack.h"
 #include "../footprintgraphicsitem.h"
 
 #include <librepcb/core/library/pkg/footprint.h>

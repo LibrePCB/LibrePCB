@@ -24,6 +24,7 @@
 
 #include "../../../cmd/cmdholeedit.h"
 #include "../../../graphics/holegraphicsitem.h"
+#include "../../../undostack.h"
 #include "../footprintgraphicsitem.h"
 
 #include <librepcb/core/library/pkg/footprint.h>

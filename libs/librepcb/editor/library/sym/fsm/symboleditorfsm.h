@@ -23,7 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../editorwidgetbase.h"
+#include <librepcb/core/types/length.h>
 
 #include <QtCore>
 
@@ -34,6 +34,9 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Angle;
+class LengthUnit;
+class Point;
 class Symbol;
 
 namespace editor {
@@ -85,10 +88,7 @@ public:
   SymbolEditorFsm() = delete;
   SymbolEditorFsm(const SymbolEditorFsm& other) = delete;
   explicit SymbolEditorFsm(const Context& context) noexcept;
-  virtual ~SymbolEditorFsm() noexcept;
-
-  // Getters
-  EditorWidgetBase::Tool getCurrentTool() const noexcept;
+  ~SymbolEditorFsm() noexcept;
 
   // Event Handlers
   bool processKeyPressed(const GraphicsSceneKeyEvent& e) noexcept;

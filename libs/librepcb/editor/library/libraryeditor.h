@@ -43,7 +43,6 @@ class Workspace;
 namespace editor {
 
 class GuiApplication;
-class LibraryEditorLegacy;
 class LibraryEditorTab;
 class UndoStack;
 
@@ -132,8 +131,6 @@ private:
   bool mManualModificationsMade;
 
   QVector<QPointer<LibraryEditorTab>> mRegisteredTabs;
-
-  std::unique_ptr<LibraryEditorLegacy> mLegacyEditor;
 };
 
 /*******************************************************************************

@@ -421,7 +421,6 @@ component SymbolEditorTab inherits TouchArea {
 
         tool-select-btn := ToolButton {
             cmd: Cmd.tool-select;
-            icon: @image-url("../../../../../font-awesome/svgs/solid/arrow-pointer.svg");
             checked: tabs[index].tool == EditorTool.select;
 
             clicked => {
@@ -441,7 +440,6 @@ component SymbolEditorTab inherits TouchArea {
 
             tool-rect-btn := ToolButton {
                 cmd: Cmd.tool-rect;
-                icon: @image-url("../../../../../font-awesome/svgs/solid/vector-square.svg");
                 checked: tabs[index].tool == EditorTool.rect;
                 enabled: !read-only;
 
@@ -452,7 +450,6 @@ component SymbolEditorTab inherits TouchArea {
 
             tool-polygon-btn := ToolButton {
                 cmd: Cmd.tool-polygon;
-                icon: @image-url("../../../../../font-awesome/svgs/solid/draw-polygon.svg");
                 checked: tabs[index].tool == EditorTool.polygon;
                 enabled: !read-only;
 
@@ -463,7 +460,6 @@ component SymbolEditorTab inherits TouchArea {
 
             tool-circle-btn := ToolButton {
                 cmd: Cmd.tool-circle;
-                icon: @image-url("../../../../../bootstrap-icons/icons/circle.svg");
                 checked: tabs[index].tool == EditorTool.circle;
                 enabled: !read-only;
 
@@ -474,7 +470,6 @@ component SymbolEditorTab inherits TouchArea {
 
             tool-arc-btn := ToolButton {
                 cmd: Cmd.tool-arc;
-                icon: @image-url("../../../../../font-awesome/svgs/solid/circle-notch.svg");
                 checked: tabs[index].tool == EditorTool.arc;
                 enabled: !read-only;
 
@@ -486,7 +481,6 @@ component SymbolEditorTab inherits TouchArea {
 
         tool-text-btn := ToolButton {
             cmd: Cmd.tool-text;
-            icon: @image-url("../../../../../font-awesome/svgs/solid/font.svg");
             checked: tabs[index].tool == EditorTool.text;
             enabled: !read-only;
 
@@ -530,7 +524,6 @@ component SymbolEditorTab inherits TouchArea {
 
         tool-measure-btn := ToolButton {
             cmd: Cmd.tool-measure;
-            icon: @image-url("../../../../../font-awesome/svgs/solid/ruler.svg");
             checked: tabs[index].tool == EditorTool.measure;
 
             clicked => {

@@ -24,6 +24,7 @@
 
 #include "../../../cmd/cmdpolygonedit.h"
 #include "../../../graphics/polygongraphicsitem.h"
+#include "../../../undostack.h"
 #include "../symbolgraphicsitem.h"
 
 #include <librepcb/core/geometry/polygon.h>

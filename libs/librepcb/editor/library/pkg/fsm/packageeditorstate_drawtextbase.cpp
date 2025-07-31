@@ -24,6 +24,7 @@
 
 #include "../../../cmd/cmdstroketextedit.h"
 #include "../../../graphics/stroketextgraphicsitem.h"
+#include "../../../undostack.h"
 #include "../footprintgraphicsitem.h"
 
 #include <librepcb/core/library/pkg/footprint.h>
