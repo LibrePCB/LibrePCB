@@ -25,6 +25,7 @@
 #include "hometab.h"
 #include "library/cat/componentcategorytab.h"
 #include "library/cat/packagecategorytab.h"
+#include "library/cmp/componenttab.h"
 #include "library/createlibrarytab.h"
 #include "library/downloadlibrarytab.h"
 #include "library/lib/librarytab.h"
@@ -71,6 +72,9 @@ WindowSection::WindowSection(GuiApplication& app, QObject* parent) noexcept
             DerivedUiObjectList<TabList, SymbolTab, ui::SymbolTabData>>(mTabs),
         std::make_shared<
             DerivedUiObjectList<TabList, PackageTab, ui::PackageTabData>>(
+            mTabs),
+        std::make_shared<
+            DerivedUiObjectList<TabList, ComponentTab, ui::ComponentTabData>>(
             mTabs),
         std::make_shared<
             DerivedUiObjectList<TabList, SchematicTab, ui::SchematicTabData>>(

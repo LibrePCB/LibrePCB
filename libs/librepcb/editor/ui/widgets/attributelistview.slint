@@ -1,0 +1,225 @@
+import { ScrollView } from "std-widgets.slint";
+import { ComboBox } from "combobox.slint";
+import { IconButton } from "iconbutton.slint";
+import { LineEdit } from "lineedit.slint";
+import { AttributeAction, AttributeData, Data } from "../api.slint";
+
+component HorizontalLine inherits Rectangle {
+    height: 1px;
+    background: #505050;
+}
+
+component VerticalLine inherits Rectangle {
+    width: 1px;
+    background: #505050;
+}
+
+export component AttributeListView inherits ScrollView {
+    in-out property <[AttributeData]> model;  // Last item is "new attribute" row!
+    in property <bool> read-only;
+    property <length> row-height: 25px;
+
+    callback edited;
+
+    min-height: min(l.preferred-height, 3 * row-height);
+    min-width: l.min-width;
+    preferred-width: l.preferred-width;
+    preferred-height: l.preferred-height;
+    mouse-drag-pan-enabled: true;
+
+    pure function is-last-row(idx: int) -> bool {
+        idx == (model.length - 1)
+    }
+
+    pure function is-visible-row(idx: int) -> bool {
+        (!read-only) || (idx < (model.length - 1))
+    }
+
+    l := HorizontalLayout {
+        VerticalLine { }
+
+        VerticalLayout {
+            HorizontalLine { }
+
+            for item[index] in model: VerticalLayout {
+                key-edt := LineEdit {
+                    height: is-visible-row(index) ? row-height : 0;
+                    text: item.key;
+                    validation-error: item.key-error;
+                    placeholder-text: is-last-row(index) ? @tr("Type to add a new attribute...") : "";
+                    show-clear-button: is-last-row(index);  // Empty key is not valid
+                    read-only: read-only;
+                    frameless: true;
+                    visible: self.height > 0;
+                    accessible-label: "attribute key";
+
+                    text-edited(text) => {
+                        model[index].key = text;
+                    }
+
+                    text-accepted(text) => {
+                        model[index].key = text;
+                        edited();
+                    }
+
+                    key-pressed(event) => {
+                        if is-last-row(index) && (event.text == Key.Escape) && (!self.text.is-empty) {
+                            self.text-edited("");
+                            return accept;
+                        }
+                        reject
+                    }
+                }
+
+                HorizontalLine {
+                    visible: is-visible-row(index);
+                }
+            }
+        }
+
+        VerticalLine { }
+
+        VerticalLayout {
+            HorizontalLine { }
+
+            for item[index] in model: VerticalLayout {
+                type-cbx := ComboBox {
+                    height: is-visible-row(index) ? row-height : 0;
+                    model: Data.attribute-types;
+                    current-index: item.type;
+                    enabled: (!read-only) && (!is-last-row(index));
+                    frameless: true;
+                    visible: self.height > 0;
+                    accessible-label: "attribute type";
+
+                    current-index-changed(idx) => {
+                        model[index].type = idx;
+                        edited();
+                    }
+                }
+
+                HorizontalLine {
+                    visible: is-visible-row(index);
+                }
+            }
+        }
+
+        VerticalLine { }
+
+        VerticalLayout {
+            HorizontalLine { }
+
+            for item[index] in model: VerticalLayout {
+                value-edt := LineEdit {
+                    height: is-visible-row(index) ? row-height : 0;
+                    text: item.value;
+                    placeholder-text: @tr("(no value set)");
+                    has-error: !item.value-valid;
+                    read-only: read-only;
+                    enabled: !is-last-row(index);
+                    frameless: true;
+                    visible: self.height > 0;
+                    accessible-label: "attribute value";
+
+                    text-edited(text) => {
+                        model[index].value = text;
+                    }
+
+                    text-accepted(text) => {
+                        model[index].value = text;
+                        edited();
+                    }
+                }
+
+                HorizontalLine {
+                    visible: is-visible-row(index);
+                }
+            }
+        }
+
+        VerticalLine { }
+
+        VerticalLayout {
+            HorizontalLine { }
+
+            for item[index] in model: VerticalLayout {
+                unit-cbx := ComboBox {
+                    height: is-visible-row(index) ? row-height : 0;
+                    model: Data.attribute-units[item.type];
+                    current-index: item.unit;
+                    enabled: (!read-only) && (!is-last-row(index)) && (self.model.length > 1);
+                    frameless: true;
+                    visible: self.height > 0;
+                    accessible-description: "attribute unit";
+
+                    current-index-changed(idx) => {
+                        model[index].unit = idx;
+                        edited();
+                    }
+                }
+
+                HorizontalLine {
+                    visible: is-visible-row(index);
+                }
+            }
+        }
+
+        VerticalLine { }
+
+        if (!read-only) && (model.length > 2): VerticalLayout {
+            HorizontalLine { }
+
+            for item[index] in model: VerticalLayout {
+                move-up-btn := IconButton {
+                    height: row-height;
+                    background-color: #202020;
+                    icon-size: 14px;
+                    icon: @image-url("../../../../font-awesome/svgs/solid/arrow-up.svg");
+                    enabled: (index > 0) && (!is-last-row(index));
+                    accessible-label: "move up";
+
+                    clicked => {
+                        model[index].action = AttributeAction.move-up;
+                    }
+                }
+
+                HorizontalLine { }
+            }
+        }
+
+        if (!read-only) && (model.length > 2): VerticalLine { }
+
+        if !read-only: VerticalLayout {
+            HorizontalLine { }
+
+            for item[index] in model: VerticalLayout {
+                add-delete-btn := IconButton {
+                    height: row-height;
+                    background-color: #202020;
+                    icon-size: 13px;
+                    icon: {
+                        if is-last-row(index) {
+                            @image-url("../../../../font-awesome/svgs/solid/check.svg")
+                        } else {
+                            @image-url("../../../../font-awesome/svgs/solid/trash-can.svg")
+                        }
+                    };
+                    enabled: is-last-row(index) ? ((!item.key.is-empty) && item.key-error.is-empty) : true;
+                    accessible-label: is-last-row(index) ? "add" : "delete";
+
+                    clicked => {
+                        if is-last-row(index) {
+                            edited();
+                        } else {
+                            model[index].action = AttributeAction.delete;
+                        }
+                    }
+                }
+
+                HorizontalLine { }
+            }
+        }
+
+        if !read-only: VerticalLine { }
+    }
+}

@@ -299,6 +299,10 @@ static slint::SharedString getDuplicateError() {
   return q2s(QCoreApplication::translate("SlintHelpers", "Duplicate"));
 }
 
+static slint::SharedString getRecommendedError() {
+  return q2s(QCoreApplication::translate("SlintHelpers", "Recommended"));
+}
+
 std::optional<ElementName> validateElementName(
     const QString& input, slint::SharedString& error) noexcept {
   if (auto val = parseElementName(cleanElementName(input))) {
@@ -340,6 +344,20 @@ std::optional<FileProofName> validateFileProofName(
   }
 }
 
+std::optional<AttributeKey> validateAttributeKey(const QString& input,
+                                                 slint::SharedString& error,
+                                                 bool isDuplicate) noexcept {
+  auto val = parseAttributeKey(cleanAttributeKey(input));
+  if (isDuplicate) {
+    error = getDuplicateError();
+  } else if (val) {
+    error = slint::SharedString();
+  } else {
+    error = getInputError(input);
+  }
+  return val;
+}
+
 std::optional<CircuitIdentifier> validateCircuitIdentifier(
     const QString& input, slint::SharedString& error,
     bool isDuplicate) noexcept {
@@ -366,6 +384,28 @@ std::optional<QUrl> validateUrl(const QString& input,
   } else {
     error = getInputError(input);
     return std::nullopt;
+  }
+}
+
+std::optional<ComponentPrefix> validateComponentPrefix(
+    const QString& input, slint::SharedString& error) noexcept {
+  auto val = parseComponentPrefix(cleanComponentPrefix(input));
+  if (val && (!input.trimmed().isEmpty())) {
+    error = slint::SharedString();
+  } else if (!input.trimmed().isEmpty()) {
+    error = getInputError(input);
+  } else {
+    error = getRecommendedError();
+  }
+  return val;
+}
+
+void validateComponentDefaultValue(const QString& input,
+                                   slint::SharedString& error) noexcept {
+  if (!input.trimmed().isEmpty()) {
+    error = slint::SharedString();
+  } else {
+    error = getRecommendedError();
   }
 }
 

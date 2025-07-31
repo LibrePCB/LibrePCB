@@ -61,7 +61,6 @@ public:
   void setSymbolRotation(const Angle& rot) noexcept;
   void setIsRequired(bool required) noexcept;
   void setSuffix(const ComponentSymbolVariantItemSuffix& suffix) noexcept;
-  void setPinSignalMap(const ComponentPinSignalMap& map) noexcept;
 
   // Operator Overloadings
   CmdComponentSymbolVariantItemEdit& operator=(
@@ -90,8 +89,6 @@ private:  // Data
   bool mNewIsRequired;
   ComponentSymbolVariantItemSuffix mOldSuffix;
   ComponentSymbolVariantItemSuffix mNewSuffix;
-  ComponentPinSignalMap mOldPinSignalMap;
-  ComponentPinSignalMap mNewPinSignalMap;
 };
 
 /*******************************************************************************

@@ -181,9 +181,6 @@ void NewElementWizardPage_CopyFrom::setCategoryTreeModel(
 QSet<Uuid> NewElementWizardPage_CopyFrom::getElementsByCategory(
     const std::optional<Uuid>& category) const {
   switch (mContext.mElementType) {
-    case NewElementWizardContext::ElementType::Component:
-      return mContext.getWorkspace().getLibraryDb().getByCategory<Component>(
-          category);
     case NewElementWizardContext::ElementType::Device:
       return mContext.getWorkspace().getLibraryDb().getByCategory<Device>(
           category);
@@ -196,12 +193,6 @@ void NewElementWizardPage_CopyFrom::getElementMetadata(const Uuid& uuid,
                                                        FilePath& fp,
                                                        QString& name) const {
   switch (mContext.mElementType) {
-    case NewElementWizardContext::ElementType::Component:
-      fp = mContext.getWorkspace().getLibraryDb().getLatest<Component>(
-          uuid);  // can throw
-      mContext.getWorkspace().getLibraryDb().getTranslations<Component>(
-          fp, mContext.getLibLocaleOrder(), &name);  // can throw
-      return;
     case NewElementWizardContext::ElementType::Device:
       fp = mContext.getWorkspace().getLibraryDb().getLatest<Device>(
           uuid);  // can throw
@@ -217,12 +208,6 @@ void NewElementWizardPage_CopyFrom::initializePage() noexcept {
   QWizardPage::initializePage();
   setSelectedElement(FilePath());
   switch (mContext.mElementType) {
-    case NewElementWizardContext::ElementType::Component: {
-      setCategoryTreeModel(new CategoryTreeModelLegacy(
-          mContext.getWorkspace().getLibraryDb(), mContext.getLibLocaleOrder(),
-          CategoryTreeModelLegacy::Filter::CmpCatWithComponents));
-      break;
-    }
     case NewElementWizardContext::ElementType::Device: {
       setCategoryTreeModel(new CategoryTreeModelLegacy(
           mContext.getWorkspace().getLibraryDb(), mContext.getLibLocaleOrder(),

@@ -192,26 +192,11 @@ void LibraryEditor::forceClosingTabs(const QSet<FilePath>& fp) noexcept {
   }
 }
 
-void LibraryEditor::openLegacyComponentEditor(const FilePath& fp) noexcept {
-  mLegacyEditor->show();
-  mLegacyEditor->raise();
-  mLegacyEditor->activateWindow();
-  mLegacyEditor->openComponent(fp);
-}
-
 void LibraryEditor::openLegacyDeviceEditor(const FilePath& fp) noexcept {
   mLegacyEditor->show();
   mLegacyEditor->raise();
   mLegacyEditor->activateWindow();
   mLegacyEditor->openDevice(fp);
-}
-
-void LibraryEditor::duplicateInLegacyComponentEditor(
-    const FilePath& fp) noexcept {
-  mLegacyEditor->show();
-  mLegacyEditor->raise();
-  mLegacyEditor->activateWindow();
-  mLegacyEditor->duplicateComponent(fp);
 }
 
 void LibraryEditor::duplicateInLegacyDeviceEditor(const FilePath& fp) noexcept {

@@ -88,6 +88,24 @@ export struct GraphicsLayerData {
     visible: bool,
 }
 
+// Actions for AttributeData
+export enum AttributeAction {
+    none,
+    move-up,
+    delete,
+}
+
+// Attribute data structure
+export struct AttributeData {
+    key: string,
+    key-error: string,
+    type: int,  // Index corresponds to AttributeType::getAllTypes()
+    value: string,
+    value-valid: bool,
+    unit: int,  // Index corresponds to AttributeType::getAvailableUnits()
+    action: AttributeAction,  // Set by UI, reset by backend
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Widgets data
 ////////////////////////////////////////////////////////////////////////////////
@@ -236,6 +254,7 @@ export enum RuleCheckType {
     package-category-check,
     symbol-check,
     package-check,
+    component-check,
 }
 
 export enum RuleCheckState {
@@ -421,6 +440,76 @@ export struct PackageModelData {
     action: PackageModelAction,  // Set by UI, handled in backend
 }
 
+// Component signal data structure
+export struct ComponentSignalData {
+    id: string,
+    name: string,
+    name-error: string,
+    forced-net-name: string,
+    required: bool,
+    sort-index: int,  // Used by backend for sorting
+    delete: bool,  // Set by UI, reset by backend
+}
+
+// Component pinout display mode
+export enum ComponentPinoutDisplayMode {
+    none,
+    pin-name,
+    signal-name,
+    net-name,
+}
+
+// Component pinout data structure
+export struct ComponentPinoutData {
+    pin-name: string,
+    signal-index: int,  // Corresponds to ComponentTabData::cmp-signal-names
+    display-mode: ComponentPinoutDisplayMode,
+}
+
+// Actions for ComponentGateData
+export enum ComponentGateAction {
+    none,
+    move-up,
+    choose-symbol,
+    delete,
+}
+
+// Component gate data structure
+export struct ComponentGateData {
+    id: string,
+    symbol-name: string,
+    symbol-x: Int64,
+    symbol-y: Int64,
+    symbol-rotation: int,
+    required: bool,
+    suffix: string,
+    pinout: [ComponentPinoutData],
+    action: ComponentGateAction,
+    frame-index: int,  // For repainting the symbol preview
+}
+
+// Actions for ComponentVariantData
+export enum ComponentVariantAction {
+    none,
+    move-up,
+    set-as-default,
+    add-gate,
+    auto-connect-pins,
+    delete,
+}
+
+// Component symbol variant data structure
+export struct ComponentVariantData {
+    id: string,
+    name: string,
+    description: string,
+    norm: string,
+    gates: [ComponentGateData],
+    has-unassigned-signals: bool,
+    action: ComponentVariantAction,
+    frame-index: int,  // For repainting the symbol preview
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Tabs
 ////////////////////////////////////////////////////////////////////////////////
@@ -470,6 +559,7 @@ export enum TabType {
     package-category,
     symbol,
     package,
+    component,
     schematic,
     board-2d,
     board-3d,
@@ -496,6 +586,7 @@ export enum TabAction {
     export-specctra,
     import-specctra,
     import-dxf,
+    open-datasheet,
     abort,
 
     // Selection
@@ -564,6 +655,10 @@ export enum TabAction {
     package-add-model,
     package-generate-outline,
     package-generate-courtyard,
+
+    // Component tab
+    component-add-signals,
+    component-add-variant,
 
     // Board 2D tab
     board-place-component,
@@ -872,6 +967,52 @@ export struct PackageTabData {
     new-footprint: string,  // Set to new name by UI, reset by backend
 }
 
+// Additional data for component editor tabs
+export struct ComponentTabData {
+    // General
+    library-index: int,
+    path: string,
+    wizard-mode: bool,
+    page-index: int,
+
+    // Metadata
+    name: string,
+    name-error: string,
+    description: string,
+    keywords: string,
+    author: string,
+    version: string,
+    version-error: string,
+    deprecated: bool,
+    categories: [LibraryElementCategoryData],
+    categories-tree: [TreeViewItemData],
+    datasheet-url: string,
+    datasheet-url-error: string,
+    schematic-only: bool,
+    prefix: string,
+    prefix-error: string,
+    default-value: string,
+    default-value-error: string,
+    attributes: [AttributeData],  // With additional row for "add attribute"!
+    cmp-signals: [ComponentSignalData],  // Name conflict with Qt's "signals"
+    new-signal-name: string,
+    new-signal-name-error: string,
+    signal-names: [string],  // Used for the pinout combobox, first item is "unconnected"
+    variants: [ComponentVariantData],
+
+    // Checks
+    checks: RuleCheckData,
+
+    // View
+    unit: LengthUnit,
+
+    // Messages
+    interface-broken-msg: bool,
+
+    // Actions
+    new-category: string,  // Set to UUID by UI, reset by backend
+}
+
 // Additional data for schematic editor tabs
 export struct SchematicTabData {
     project-index: int,
@@ -991,6 +1132,7 @@ export struct WindowSectionData {
     package-category-tabs: [CategoryTabData],  // Proxy view for `tabs`
     symbol-tabs: [SymbolTabData],  // Proxy view for `tabs`
     package-tabs: [PackageTabData],  // Proxy view for `tabs`
+    component-tabs: [ComponentTabData],  // Proxy view for `tabs`
     schematic-tabs: [SchematicTabData],  // Proxy view for `tabs`
     board-2d-tabs: [Board2dTabData],  // Proxy view for `tabs`
     board-3d-tabs: [Board3dTabData],  // Proxy view for `tabs`

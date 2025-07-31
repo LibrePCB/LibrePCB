@@ -3,6 +3,7 @@ import {
     Button,
     CategoryTreeLabel,
     IconButton,
+    LineEdit,
     ListViewItemButton,
     Palette,
     Switch,
@@ -112,6 +113,47 @@ export component UrlRowHeader inherits Text {
     vertical-alignment: center;
     text: @tr("URL:");
     accessible-role: none;
+}
+
+export component UrlRowCell inherits HorizontalLayout {
+    in property <string> url;
+    in property <string> url-error;
+    in property <string> placeholder-text;
+    in property <bool> read-only;
+    in property <string> label;
+
+    callback text-edited <=> edt.text-edited;
+    callback text-accepted <=> edt.text-accepted;
+    callback open-url-clicked(url: string);
+    open-url-clicked(url) => {
+        Backend.open-url(url);
+    }
+
+    spacing: 5px;
+
+    edt := LineEdit {
+        text: url;
+        validation-error: url-error;
+        placeholder-text: placeholder-text;
+        read-only: read-only;
+        accessible-label: label;
+    }
+
+    Rectangle {
+        horizontal-stretch: 0;
+
+        open-btn := IconButton {
+            height: 16px;
+            style: hyperlink;
+            status-tip: edt.text;
+            icon: @image-url("../../../../font-awesome/svgs/solid/arrow-up-right-from-square.svg");
+            enabled: (!edt.text.is-empty) && url-error.is-empty;
+
+            clicked => {
+                open-url-clicked(edt.text);
+            }
+        }
+    }
 }
 
 export component DependenciesRowHeader inherits Text {
@@ -359,6 +401,45 @@ export component AssemblyTypeRowHeader inherits Text {
     width: self.preferred-width;
     vertical-alignment: center;
     text: @tr("Assembly:");
+    accessible-role: none;
+}
+
+export component DatasheetRowHeader inherits Text {
+    width: self.preferred-width;
+    vertical-alignment: center;
+    text: @tr("Datasheet:");
+    accessible-role: none;
+}
+
+export component DatasheetRowCell inherits UrlRowCell {
+    placeholder-text: @tr("URL to online datasheet (optional)");
+}
+
+export component SchematicOnlyRowHeader inherits Text {
+    width: self.preferred-width;
+    vertical-alignment: center;
+    text: @tr("Schematic-Only:");
+    accessible-role: none;
+}
+
+export component PrefixRowHeader inherits Text {
+    width: self.preferred-width;
+    vertical-alignment: center;
+    text: @tr("Prefix:");
+    accessible-role: none;
+}
+
+export component DefaultValueRowHeader inherits Text {
+    width: self.preferred-width;
+    vertical-alignment: center;
+    text: @tr("Default Value:");
+    accessible-role: none;
+}
+
+export component AttributesRowHeader inherits Text {
+    width: self.preferred-width;
+    vertical-alignment: center;
+    text: @tr("Attributes:");
     accessible-role: none;
 }
 

@@ -1,0 +1,754 @@
+import { ScrollView } from "std-widgets.slint";
+import {
+    AngleEdit,
+    Button,
+    ComboBox,
+    IconButton,
+    LengthEdit,
+    LineEdit,
+    LinkText,
+    MenuItem,
+    MenuPopup,
+} from "../../widgets.slint";
+import {
+    ComponentGateAction,
+    ComponentGateData,
+    ComponentPinoutDisplayMode,
+    ComponentVariantAction,
+    ComponentVariantData,
+    Data,
+    EditorCommandSet as Cmd,
+    LengthUnit,
+} from "../../api.slint";
+
+component ComponentGateListItem {
+    in-out property <[ComponentGateData]> model;
+    in property <int> index;
+    in property <bool> has-unassigned-signals;
+    in-out property <[string]> signal-names;
+    in property <bool> wizard-mode;
+    in property <bool> read-only;
+    property <length> pinout-row-height: 25px;
+
+    pure callback render-scene(width: length, height: length, frame-dummy: int) -> image;
+    callback auto-connect-pins;
+
+    HorizontalLayout {
+        padding: 5px;
+        padding-bottom: 7px;
+        spacing: 10px;
+
+        Rectangle {
+            max-width: 500px;  // Only to ensure some alignment across gates on a large screen
+            min-height: 120px;
+            background: white;  // For the preview
+            border-radius: 10px;
+            clip: true;  // For the rounded corners
+
+            Image {
+                x: 0;
+                y: 0;
+                width: 100%;
+                height: 100%;
+                image-fit: preserve;
+                image-rendering: pixelated;
+                source: render-scene(parent.width, parent.height, model[index].frame-index);
+                accessible-role: none;
+            }
+        }
+
+        VerticalLayout {
+            width: self.preferred-width;
+            spacing: 2px;
+
+            Text {
+                height: pinout-row-height;
+                horizontal-alignment: right;
+                vertical-alignment: center;
+                color: #909090;
+                text: @tr("Gate") + ":";
+                accessible-role: none;
+            }
+
+            for pinout in model[index].pinout: pin-name-txt := Text {
+                height: pinout-row-height;
+                horizontal-alignment: right;
+                vertical-alignment: center;
+                overflow: elide;
+                text: pinout.pin-name + ":";
+                accessible-role: none;
+            }
+        }
+
+        VerticalLayout {
+            spacing: 2px;
+
+            symbol-name-txt := Text {
+                height: pinout-row-height;
+                font-size: 13px;
+                font-weight: 600;
+                vertical-alignment: center;
+                overflow: elide;
+                text: model[index].symbol-name;
+                accessible-description: "symbol name";
+            }
+
+            for pinout[pinout-index] in model[index].pinout: HorizontalLayout {
+                if wizard-mode: signal-edt := LineEdit {
+                    height: pinout-row-height;
+                    text: signal-names[pinout.signal-index];
+                    show-clear-button: false;
+                    enabled: pinout.signal-index > 0;  // 0 = unconnected
+                    accessible-label: "signal name";
+
+                    text-edited => {
+                        // Ignore intermediate edits
+                    }
+
+                    text-accepted(text) => {
+                        signal-names[pinout.signal-index] = text;
+                    }
+                }
+
+                if !wizard-mode: signal-cbx := ComboBox {
+                    height: pinout-row-height;
+                    model: signal-names;
+                    current-index: pinout.signal-index;
+                    editable-only-when-focused: true;
+                    enabled: !read-only;
+                    accessible-label: "signal of pin " + pinout.pin-name;
+
+                    current-index-changed(idx) => {
+                        model[index].pinout[pinout-index].signal-index = idx;
+                    }
+                }
+            }
+
+            Rectangle {
+                // Stretch button to bottom
+            }
+
+            if (!wizard-mode) && (!read-only) && has-unassigned-signals && (index == (model.length - 1)): auto-assign-btn := Button {
+                height: pinout-row-height;
+                text: @tr("Auto-Connect all Pins by Name");
+                primary: true;
+
+                clicked => {
+                    auto-connect-pins();
+                }
+            }
+        }
+
+        VerticalLayout {
+            width: self.preferred-width;
+            spacing: 2px;
+
+            suffix-txt := Text {
+                height: pinout-row-height;
+                horizontal-alignment: right;
+                vertical-alignment: center;
+                color: #909090;
+                text: @tr("Suffix") + ":";
+                accessible-role: none;
+            }
+
+            for pinout in model[index].pinout: Text {
+                height: pinout-row-height;
+                horizontal-alignment: right;
+                vertical-alignment: center;
+                color: #909090;
+                text: @tr("Label") + ":";
+                accessible-role: none;
+            }
+        }
+
+        VerticalLayout {
+            width: self.preferred-width;
+            spacing: 2px;
+
+            HorizontalLayout {
+                height: pinout-row-height;
+                spacing: 5px;
+
+                suffix-edt := LineEdit {
+                    height: 22px;
+                    min-width: 60px;
+                    text: model[index].suffix;
+                    placeholder-text: "-";
+                    has-error: self.text.is-empty && (model.length > 1);
+                    show-clear-button: false;
+                    read-only: read-only;
+                    frameless: true;
+                    accessible-label: suffix-txt.text;
+
+                    text-edited(text) => {
+                        // Ignore intermediate edits
+                    }
+
+                    text-accepted(text) => {
+                        model[index].suffix = text;
+                    }
+                }
+
+                required-sw := IconButton {
+                    style: hyperlink;
+                    icon-scale: 0.7;
+                    icon: {
+                        if model[index].required {
+                            @image-url("../../../../../bootstrap-icons/icons/exclamation-circle-fill.svg")
+                        } else {
+                            @image-url("../../../../../bootstrap-icons/icons/exclamation-circle.svg")
+                        }
+                    };
+                    tooltip: model[index].required ? @tr("Gate is Required") : @tr("Gate is Optional");
+                    tooltip-position: left;
+                    status-tip: @tr("If marked as required, an ERC error is raised when this gate is not placed in the schematics");
+                    enabled: !read-only;
+
+                    clicked => {
+                        model[index].required = !model[index].required;
+                    }
+                }
+
+                if !read-only: menu-btn := IconButton {
+                    style: hyperlink;
+                    icon-scale: 0.7;
+                    icon: @image-url("../../../../../font-awesome/svgs/solid/caret-down.svg");
+                    accessible-label: "menu";
+
+                    clicked => {
+                        context-menu-x = self.absolute-position.x - root.absolute-position.x;
+                        context-menu-y = self.absolute-position.y - root.absolute-position.y + self.height;
+                        context-menu-popup.show();
+                    }
+                }
+            }
+
+            for pinout[pinout-index] in model[index].pinout: HorizontalLayout {
+                height: pinout-row-height;
+                spacing: 8px;
+
+                display-none-btn := LinkText {
+                    text: @tr("None").to-uppercase();
+                    text-color: (pinout.display-mode == ComponentPinoutDisplayMode.none) ? #e0e0e0 : #909090;
+                    status-tip: @tr("When added to a schematic, hide this pin name");
+                    vertical-alignment: center;
+                    font-size: 10px;
+                    enabled: !read-only;
+                    accessible-description: "label";
+
+                    clicked => {
+                        model[index].pinout[pinout-index].display-mode = ComponentPinoutDisplayMode.none;
+                    }
+                }
+
+                display-pin-btn := LinkText {
+                    text: @tr("Pin").to-uppercase();
+                    text-color: (pinout.display-mode == ComponentPinoutDisplayMode.pin-name) ? #e0e0e0 : #909090;
+                    status-tip: @tr("When added to a schematic, display the pin name");
+                    vertical-alignment: center;
+                    font-size: 10px;
+                    enabled: !read-only;
+                    accessible-description: "label";
+
+                    clicked => {
+                        model[index].pinout[pinout-index].display-mode = ComponentPinoutDisplayMode.pin-name;
+                    }
+                }
+
+                display-signal-btn := LinkText {
+                    text: @tr("Signal").to-uppercase();
+                    text-color: (pinout.display-mode == ComponentPinoutDisplayMode.signal-name) ? #e0e0e0 : #909090;
+                    status-tip: @tr("When added to a schematic, display the signal name (default)");
+                    vertical-alignment: center;
+                    font-size: 10px;
+                    enabled: !read-only;
+                    accessible-description: "label";
+
+                    clicked => {
+                        model[index].pinout[pinout-index].display-mode = ComponentPinoutDisplayMode.signal-name;
+                    }
+                }
+
+                display-net-btn := LinkText {
+                    text: @tr("Net").to-uppercase();
+                    text-color: (pinout.display-mode == ComponentPinoutDisplayMode.net-name) ? #e0e0e0 : #909090;
+                    status-tip: @tr("When added to a schematic, display the name of the net connected to this pin (if any)");
+                    vertical-alignment: center;
+                    font-size: 10px;
+                    enabled: !read-only;
+                    accessible-description: "label";
+
+                    clicked => {
+                        model[index].pinout[pinout-index].display-mode = ComponentPinoutDisplayMode.net-name;
+                    }
+                }
+            }
+        }
+    }
+
+    property <length> context-menu-x;
+    property <length> context-menu-y;
+    context-menu-popup := MenuPopup {
+        x: min(context-menu-x, parent.width - self.width);
+        y: context-menu-y;
+
+        // Note: Currently disabled in wizard mode because the signal list
+        // in the backend is not updated yet during symbol change.
+        if !wizard-mode: change-symbol-item := MenuItem {
+            text: @tr("Change Symbol") + "...";
+            icon: @image-url("../../../../../font-awesome/svgs/solid/folder-open.svg");
+
+            clicked => {
+                model[index].action = ComponentGateAction.choose-symbol;
+            }
+        }
+
+        move-up-item := MenuItem {
+            text: @tr("Move Up");
+            icon: @image-url("../../../../../font-awesome/svgs/solid/arrow-up.svg");
+            enabled: index > 0;
+
+            clicked => {
+                model[index].action = ComponentGateAction.move-up;
+            }
+        }
+
+        delete-item := MenuItem {
+            cmd: Cmd.remove;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/trash-can.svg");
+            shortcuts: "";
+
+            clicked => {
+                model[index].action = ComponentGateAction.delete;
+            }
+        }
+    }
+}
+
+component ComponentVariantListItem inherits Rectangle {
+    in-out property <[ComponentVariantData]> model;
+    in property <int> index;
+    in-out property <[string]> signal-names;
+    in property <LengthUnit> unit;
+    in property <bool> wizard-mode: false;
+    in property <bool> read-only: false;
+    property <bool> light-background: wizard-mode && (model[index].gates.length == 0);
+
+    pure callback render-scene(gate: int, width: length, height: length, frame-dummy: int) -> image;
+
+    height: self.preferred-height;
+    background: light-background ? #454545 : #202020;
+    border-color: #606060;
+    border-width: light-background ? 0 : 1px;
+    border-radius: 14px;
+
+    VerticalLayout {
+        if wizard-mode && (model[index].gates.length > 0) && (signal-names.length > 1): VerticalLayout {
+            padding: 5px;
+
+            Rectangle {
+                height: self.preferred-height + 16px;
+                background: #454545;
+                border-radius: 10px;
+
+                Text {
+                    property <string> s1: @tr("Now define the names of the electrical signals of the component in the table below. Usually you can just keep the names from the symbol pins.");
+                    property <string> s2: @tr("Note that unconnected or inter-connected pins (i.e. duplicate signal names) are not allowed in this step, but you can rework them on the following pages.");
+
+                    width: parent.width - 16px;
+                    wrap: word-wrap;
+                    text: s1 + " " + s2;
+                }
+            }
+        }
+
+        if !wizard-mode: HorizontalLayout {
+            padding: 3px;
+            padding-left: 8px;
+            spacing: 5px;
+
+            name-txt := Text {
+                horizontal-stretch: 0;
+                color: #909090;
+                vertical-alignment: center;
+                text: @tr("Variant") + ":";
+                accessible-role: none;
+            }
+
+            name-edt := LineEdit {
+                horizontal-stretch: 1;
+                font-size: 13px;
+                font-weight: 600;
+                text: model[index].name;
+                show-clear-button: false;  // Empty name is not valid
+                read-only: read-only;
+                frameless: true;
+                accessible-label: name-txt.text;
+
+                text-edited(text) => {
+                    // Ignore intermediate edits
+                }
+
+                text-accepted(text) => {
+                    model[index].name = text;
+                }
+            }
+
+            description-txt := Text {
+                horizontal-stretch: 0;
+                color: #909090;
+                vertical-alignment: center;
+                text: @tr("Description") + ":";
+                accessible-role: none;
+            }
+
+            description-edt := LineEdit {
+                horizontal-stretch: 1;
+                text: model[index].description;
+                placeholder-text: "-";
+                read-only: read-only;
+                frameless: true;
+                accessible-label: description-txt.text;
+
+                text-edited(text) => {
+                    // Ignore intermediate edits
+                }
+
+                text-accepted(text) => {
+                    model[index].description = text;
+                }
+            }
+
+            norm-txt := Text {
+                horizontal-stretch: 0;
+                color: #909090;
+                vertical-alignment: center;
+                text: @tr("Norm") + ":";
+                accessible-role: none;
+            }
+
+            norm-edt := LineEdit {
+                horizontal-stretch: 0;
+                text: model[index].norm;
+                placeholder-text: "-";
+                suggestions: Data.norms;
+                show-clear-button: false;
+                read-only: read-only;
+                frameless: true;
+                accessible-label: norm-txt.text;
+
+                text-edited(text) => {
+                    // Ignore intermediate edits
+                }
+
+                text-accepted(text) => {
+                    model[index].norm = text;
+                }
+
+                suggestion-accepted(text) => {
+                    model[index].norm = text;
+                }
+            }
+
+            if !read-only: menu-btn := IconButton {
+                height: norm-edt.preferred-height;
+                style: hyperlink;
+                icon-scale: 0.7;
+                icon: @image-url("../../../../../font-awesome/svgs/solid/ellipsis-vertical.svg");
+
+                clicked => {
+                    context-menu-x = self.absolute-position.x - root.absolute-position.x;
+                    context-menu-y = self.absolute-position.y - root.absolute-position.y + self.height;
+                    context-menu-popup.show();
+                }
+            }
+        }
+
+        if !wizard-mode: Rectangle {
+            height: 1px;
+            background: #606060;
+        }
+
+        for gate[gate-index] in model[index].gates: gate-item := ComponentGateListItem {
+            model: model[index].gates;
+            index: gate-index;
+            has-unassigned-signals: model[index].has-unassigned-signals;
+            signal-names: signal-names;
+            wizard-mode: wizard-mode;
+            read-only: read-only;
+
+            render-scene(width, height, frame-dummy) => {
+                root.render-scene(gate-index, width, height, frame-dummy)
+            }
+
+            auto-connect-pins => {
+                model[index].action = ComponentVariantAction.auto-connect-pins;
+            }
+        }
+
+        if model[index].gates.length > 1: VerticalLayout {
+            property <bool> expanded: false;
+
+            padding-top: 5px;
+            padding-bottom: 10px;
+            padding-left: 8px;
+            padding-right: self.padding-left;
+            spacing: 10px;
+
+            expand-placement-btn := LinkText {
+                text: (expanded ? "▼ " : "► ") + @tr("Component Preview Placement");
+
+                clicked => {
+                    expanded = !expanded;
+                }
+            }
+
+            placement-l := HorizontalLayout {
+                height: expanded ? self.preferred-height : 0;
+                spacing: 10px;
+                visible: self.height > 0;
+
+                animate height { duration: 150ms; }
+
+                Rectangle {
+                    max-width: 500px;  // Only to ensure some alignment across gates on a large screen
+                    min-height: 250px;  // Vertically aligned symbols require a lot of space
+                    background: white;  // For the preview
+                    border-radius: 10px;
+                    clip: true;  // For the rounded corners
+
+                    Image {
+                        x: 0;
+                        y: 0;
+                        width: 100%;
+                        height: 100%;
+                        image-fit: preserve;
+                        image-rendering: pixelated;
+                        source: render-scene(model[index].gates.length, parent.width, parent.height, model[index].frame-index);
+                        visible: placement-l.height == placement-l.preferred-height;  // Avoid rendering during animation
+                        accessible-role: none;
+                    }
+                }
+
+                VerticalLayout {
+                    alignment: start;
+                    spacing: 3px;
+                    visible: placement-l.height == placement-l.preferred-height;
+
+                    for gate[gate-index] in model[index].gates: Text {
+                        height: 25px;
+                        horizontal-alignment: right;
+                        vertical-alignment: center;
+                        text: (gate.suffix.is-empty ? (gate-index + 1) : gate.suffix) + ":";
+                        accessible-role: none;
+                    }
+                }
+
+                VerticalLayout {
+                    alignment: start;
+                    spacing: 3px;
+                    visible: parent.height == parent.preferred-height;
+
+                    for gate[gate-index] in model[index].gates: x-edt := LengthEdit {
+                        height: 25px;
+                        value: gate.symbol-x;
+                        unit: unit;
+                        min-width-text: "12.345";
+                        can-change-unit: false;
+                        background: #101010;  // Required for read-only mode
+                        enabled: !read-only;
+                        accessible-label: gate.suffix + " x";
+
+                        value-changed(v) => {
+                            // Ignore intermediate values.
+                        }
+
+                        value-accepted(v) => {
+                            model[index].gates[gate-index].symbol-x = v;
+                        }
+                    }
+                }
+
+                VerticalLayout {
+                    alignment: start;
+                    spacing: 3px;
+                    visible: parent.height == parent.preferred-height;
+
+                    for gate[gate-index] in model[index].gates: y-edt := LengthEdit {
+                        height: 25px;
+                        value: gate.symbol-y;
+                        unit: unit;
+                        min-width-text: "12.345";
+                        can-change-unit: false;
+                        background: #101010;  // Required for read-only mode
+                        enabled: !read-only;
+                        accessible-label: gate.suffix + " y";
+
+                        value-changed(v) => {
+                            // Ignore intermediate values.
+                        }
+
+                        value-accepted(v) => {
+                            model[index].gates[gate-index].symbol-y = v;
+                        }
+                    }
+                }
+
+                VerticalLayout {
+                    alignment: start;
+                    spacing: 3px;
+                    visible: parent.height == parent.preferred-height;
+
+                    for gate[gate-index] in model[index].gates: rotation-edt := AngleEdit {
+                        height: 25px;
+                        value: gate.symbol-rotation;
+                        icon: @image-url("");
+                        min-width-text: "12.345 °";
+                        background: #101010;  // Required for read-only mode
+                        enabled: !read-only;
+                        accessible-label: gate.suffix + " rotation";
+
+                        value-changed(v) => {
+                            // Ignore intermediate values.
+                        }
+
+                        value-accepted(v) => {
+                            model[index].gates[gate-index].symbol-rotation = v;
+                        }
+
+                        increase-triggered => {
+                            model[index].gates[gate-index].symbol-rotation += 90000000;
+                        }
+
+                        decrease-triggered => {
+                            model[index].gates[gate-index].symbol-rotation -= 90000000;
+                        }
+                    }
+                }
+            }
+        }
+
+        if wizard-mode || (model[index].gates.length == 0): VerticalLayout {
+            padding: 10px;
+            spacing: 10px;
+
+            if !wizard-mode: Text {
+                color: red;
+                font-weight: 600;
+                horizontal-alignment: center;
+                overflow: elide;
+                text: @tr("This variant contains no gate!");
+            }
+
+            if wizard-mode && (model[index].gates.length == 0): Text {
+                property <string> s1: @tr("Add gates to this component by choosing the corresponding symbols.");
+                property <string> s2: @tr("Most components consist of only one gate, but for example a 4-channel ADC could be built up with four single-channel ADC gates.");
+                property <string> s3: @tr("Those gates are all part of the same component, but can be placed individually in the schematics.");
+
+                wrap: word-wrap;
+                text: s1 + " " + s2 + " " + s3;
+            }
+
+            if wizard-mode: add-gate-btn := Button {
+                width: self.preferred-width;
+                icon: @image-url("../../../../../font-awesome/svgs/solid/plus.svg");
+                text: @tr("Add Gate") + "...";
+                primary: model[index].gates.length == 0;
+
+                clicked => {
+                    model[index].action = ComponentVariantAction.add-gate;
+                }
+            }
+        }
+    }
+
+    property <length> context-menu-x;
+    property <length> context-menu-y;
+    context-menu-popup := MenuPopup {
+        x: min(context-menu-x, parent.width - self.width);
+        y: context-menu-y;
+
+        add-gate-item := MenuItem {
+            text: @tr("Add Gate") + "...";
+            icon: @image-url("../../../../../font-awesome/svgs/solid/plus.svg");
+
+            clicked => {
+                model[index].action = ComponentVariantAction.add-gate;
+            }
+        }
+
+        move-up-item := MenuItem {
+            text: @tr("Move Up");
+            icon: @image-url("../../../../../font-awesome/svgs/solid/arrow-up.svg");
+            enabled: index > 0;
+
+            clicked => {
+                model[index].action = ComponentVariantAction.move-up;
+            }
+        }
+
+        set-as-default-item := MenuItem {
+            text: @tr("Set as Default");
+            icon: @image-url("../../../../../font-awesome/svgs/solid/star.svg");
+            enabled: index > 0;
+
+            clicked => {
+                model[index].action = ComponentVariantAction.set-as-default;
+            }
+        }
+
+        delete-item := MenuItem {
+            cmd: Cmd.remove;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/trash-can.svg");
+            shortcuts: "";
+
+            clicked => {
+                model[index].action = ComponentVariantAction.delete;
+            }
+        }
+    }
+}
+
+export component ComponentVariantListView inherits ScrollView {
+    in-out property <[ComponentVariantData]> model;
+    in-out property <[string]> signal-names;
+    in property <LengthUnit> unit;
+    in property <bool> wizard-mode: false;
+    in property <bool> read-only: false;
+
+    pure callback render-scene(variant: int, gate: int, width: length, height: length, frame-dummy: int) -> image;
+    callback add-variant-clicked;
+
+    preferred-height: l.preferred-height;
+    mouse-drag-pan-enabled: true;
+
+    l := VerticalLayout {
+        alignment: start;
+        padding: 8px;
+        spacing: 10px;
+
+        for item[index] in model: variant-item := ComponentVariantListItem {
+            model: model;
+            index: index;
+            signal-names: signal-names;
+            unit: unit;
+            wizard-mode: wizard-mode;
+            read-only: read-only;
+
+            render-scene(gate, width, height, frame-dummy) => {
+                root.render-scene(index, gate, width, height, frame-dummy)
+            }
+        }
+
+        if (!wizard-mode) && (!read-only): add-variant-btn := Button {
+            width: self.preferred-width;
+            icon: @image-url("../../../../../font-awesome/svgs/solid/plus.svg");
+            text: @tr("Add Variant") + "...";
+
+            clicked => {
+                add-variant-clicked();
+            }
+        }
+    }
+}

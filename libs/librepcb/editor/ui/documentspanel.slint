@@ -372,6 +372,20 @@ component LibrarySection inherits Rectangle {
                     }
                 }
             }
+
+            for tab[idx] in section.component-tabs: VerticalLayout {
+                if (!tab.path.is-empty) && (tab.library-index == library-index): DocumentsListItem {
+                    type: ItemType.library;
+                    text: section.tabs[idx].title;
+                    icon: @image-url("../../../bootstrap-icons/icons/cpu.svg");
+                    selected: (Data.current-tab.type == TabType.component) && (Data.current-component-tab.library-index == library-index) && (Data.current-component-tab.path == tab.path);
+                    scrollbar-width: scrollbar-width;
+
+                    clicked => {
+                        Backend.trigger-library-element(tab.path, LibraryElementAction.open);
+                    }
+                }
+            }
         }
     }
 

@@ -2,9 +2,12 @@ import {
     Board2dTabData,
     Board3dTabData,
     CategoryTabData,
+    ComponentPinoutDisplayMode,
+    ComponentTabData,
     EditorTool,
     FeatureState,
     GridStyle,
+    Int64,
     LengthUnit,
     LibraryData,
     LibraryInfoData,
@@ -332,6 +335,15 @@ export global Data {
                         grid: FeatureState.enabled,
                         zoom: FeatureState.enabled,
                         background-image: FeatureState.enabled,
+                    },
+                },
+                {
+                    type: TabType.component,
+                    title: "Component",
+                    features: {
+                        save: FeatureState.enabled,
+                        undo: FeatureState.enabled,
+                        redo: FeatureState.enabled,
                     },
                 },
             ],
@@ -750,7 +762,146 @@ export global Data {
                     },
                 },
             ],
-            current-tab-index: 4,
+            component-tabs: [
+                { },
+                { },
+                { },
+                { },
+                { },
+                {
+                    library-index: 0,
+                    path: "component1",
+                    wizard-mode: false,
+                    page-index: 2,
+                    name: "Component",
+                    description: "Foo Bar\nMultiline\nBlabla",
+                    keywords: "Foo,Bar,Hello World",
+                    author: "Somebody",
+                    version: "0.1",
+                    deprecated: false,
+                    categories: [
+                        {
+                            uuid: "1",
+                            names: ["Integrated Circuit", "Timers"],
+                        },
+                        {
+                            uuid: "2",
+                            names: ["Foo", "Bar", "Foobar"],
+                        },
+                        {
+                            uuid: "3",
+                            names: ["Miscallenous"],
+                        },
+                    ],
+                    categories-tree: [
+                        {
+                            level: 0,
+                            text: "Root Category",
+                        },
+                        {
+                            level: 1,
+                            text: "Integrated Circuits",
+                        },
+                    ],
+                    prefix-error: "Recommended",
+                    default-value-error: "Recommended",
+                    attributes: [
+                        {
+                            key: "FOO",
+                            type: 1,
+                            value: "100",
+                            unit: 0,
+                        },
+                        {
+                            key: "FOO",
+                            key-error: "Duplicate",
+                            type: 1,
+                            value: "100",
+                            value-valid: true,
+                            unit: 0,
+                        },
+                        { },
+                    ],
+                    cmp-signals: [
+                        {
+                            id: "8402bf9a",
+                            name: "GND",
+                            forced-net-name: "",
+                            required: true,
+                        },
+                        {
+                            id: "23485b92",
+                            name: "3V3",
+                            name-error: "Invalid",
+                            forced-net-name: "",
+                            required: false,
+                        },
+                        {
+                            id: "9a09e67c",
+                            name: "5V",
+                            forced-net-name: "FORCED",
+                            required: true,
+                        },
+                    ],
+                    signal-names: ["(unconnected)", "GND", "3V3", "5V"],
+                    variants: [
+                        {
+                            id: "9a09e67c",
+                            name: "default",
+                            description: "The default variant",
+                            norm: "ISO1234",
+                            gates: [
+                                {
+                                    id: "8402bf9a",
+                                    symbol-name: "Power",
+                                    symbol-x: { },
+                                    symbol-y: { },
+                                    symbol-rotation: 0,
+                                    required: true,
+                                    suffix: "A",
+                                    pinout: [
+                                        {
+                                            pin-name: "1",
+                                            signal-index: 1,
+                                            display-mode: ComponentPinoutDisplayMode.none,
+                                        },
+                                        {
+                                            pin-name: "2",
+                                            signal-index: 2,
+                                            display-mode: ComponentPinoutDisplayMode.net-name,
+                                        },
+                                    ],
+                                },
+                                {
+                                    id: "23485b92",
+                                    symbol-name: "Logic",
+                                    symbol-x: { },
+                                    symbol-y: { },
+                                    symbol-rotation: 0,
+                                    required: true,
+                                    suffix: "B",
+                                    pinout: [
+                                        {
+                                            pin-name: "3",
+                                        },
+                                        {
+                                            pin-name: "4",
+                                        },
+                                    ],
+                                },
+                            ],
+                            has-unassigned-signals: true,
+                        }
+                    ],
+                    checks: {
+                        type: RuleCheckType.component-check,
+                        state: RuleCheckState.up-to-date,
+                        unapproved: 2,
+                        errors: 0,
+                    },
+                },
+            ],
+            current-tab-index: 5,
         },
     ];
 
@@ -1131,6 +1282,18 @@ export global Data {
     // Currently active project index
     out property <int> current-project-index: 0;
 
+    // Min/max values
+    in property <Int64> min-length;
+
+    // All available norms
+    in property <[string]> norms: ["IEC 60617", "IEEE 315"];
+
+    // All available attribute types and their units
+    // Attention: The types order corresponds to AttributeType::getAllTypes()
+    // and the units order to AttributeType::getAvailableUnits()!
+    in property <[string]> attribute-types: ["String", "Capacitance", "Power"];
+    in property <[[string]]> attribute-units: [[], ["nF", "F"], ["mW", "W", "kW"]];
+
     // Rule check panel: Checked state of the "zoom to location" feature
     in property <bool> rule-check-zoom-to-location: true;
 
@@ -1149,6 +1312,7 @@ export global Data {
     out property <CategoryTabData> current-package-category-tab: current-section.package-category-tabs[current-section.current-tab-index];
     out property <SymbolTabData> current-symbol-tab: current-section.symbol-tabs[current-section.current-tab-index];
     out property <PackageTabData> current-package-tab: current-section.package-tabs[current-section.current-tab-index];
+    out property <ComponentTabData> current-component-tab: current-section.component-tabs[current-section.current-tab-index];
     out property <SchematicTabData> current-schematic-tab: current-section.schematic-tabs[current-section.current-tab-index];
     out property <Board2dTabData> current-board-2d-tab: current-section.board-2d-tabs[current-section.current-tab-index];
     out property <Board3dTabData> current-board-3d-tab: current-section.board-3d-tabs[current-section.current-tab-index];
@@ -1171,6 +1335,8 @@ export global Data {
             current-symbol-tab.checks
         } else if current-tab.type == TabType.package {
             current-package-tab.checks
+        } else if current-tab.type == TabType.component {
+            current-component-tab.checks
         } else {
             projects[-1].erc  // Not nice, but avoids compiler warning
         }
@@ -1202,6 +1368,11 @@ export global Data {
             current-rule-check-project-index = -1;
             current-rule-check-board-index = -1;
             current-library-index = current-package-tab.library-index;
+        } else if current-tab.type == TabType.component {
+            current-project-index = -1;
+            current-rule-check-project-index = -1;
+            current-rule-check-board-index = -1;
+            current-library-index = current-component-tab.library-index;
         } else if current-tab.type == TabType.schematic {
             current-library-index = -1;
             current-project-index = current-schematic-tab.project-index;

@@ -17,16 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_COMPONENTPINSIGNALMAPMODEL_H
-#define LIBREPCB_EDITOR_COMPONENTPINSIGNALMAPMODEL_H
+#ifndef LIBREPCB_EDITOR_ATTRIBUTELISTMODELLEGACY_H
+#define LIBREPCB_EDITOR_ATTRIBUTELISTMODELLEGACY_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../modelview/comboboxdelegate.h"
+#include "../modelview/comboboxdelegate.h"
 
-#include <librepcb/core/library/cmp/componentsignal.h>
-#include <librepcb/core/library/cmp/componentsymbolvariant.h>
+#include <librepcb/core/attribute/attribute.h>
 
 #include <QtCore>
 
@@ -36,44 +35,44 @@
 namespace librepcb {
 namespace editor {
 
-class LibraryElementCache;
 class UndoCommand;
 class UndoStack;
 
 /*******************************************************************************
- *  Class ComponentPinSignalMapModel
+ *  Class AttributeListModelLegacy
  ******************************************************************************/
 
 /**
- * @brief The ComponentPinSignalMapModel class
+ * @brief The AttributeListModelLegacy class
  */
-class ComponentPinSignalMapModel final : public QAbstractTableModel {
+class AttributeListModelLegacy final : public QAbstractTableModel {
   Q_OBJECT
 
 public:
   enum Column {
-    COLUMN_SYMBOL,
-    COLUMN_PIN,
-    COLUMN_SIGNAL,
-    COLUMN_DISPLAY,
+    COLUMN_KEY,
+    COLUMN_TYPE,
+    COLUMN_VALUE,
+    COLUMN_UNIT,
+    COLUMN_ACTIONS,
     _COLUMN_COUNT
   };
 
   // Constructors / Destructor
-  ComponentPinSignalMapModel() = delete;
-  ComponentPinSignalMapModel(const ComponentPinSignalMapModel& other) = delete;
-  explicit ComponentPinSignalMapModel(QObject* parent = nullptr) noexcept;
-  ~ComponentPinSignalMapModel() noexcept;
+  AttributeListModelLegacy() = delete;
+  AttributeListModelLegacy(const AttributeListModelLegacy& other) = delete;
+  explicit AttributeListModelLegacy(QObject* parent = nullptr) noexcept;
+  ~AttributeListModelLegacy() noexcept;
 
   // Setters
-  void setSymbolVariant(ComponentSymbolVariant* variant) noexcept;
-  void setSignalList(const ComponentSignalList* list) noexcept;
-  void setSymbolsCache(
-      const std::shared_ptr<const LibraryElementCache>& cache) noexcept;
+  void setAttributeList(AttributeList* list) noexcept;
   void setUndoStack(UndoStack* stack) noexcept;
 
-  // General Methods
-  void autoAssignSignals() noexcept;
+  // Slots
+  void add(const QPersistentModelIndex& itemIndex) noexcept;
+  void remove(const QPersistentModelIndex& itemIndex) noexcept;
+  void moveUp(const QPersistentModelIndex& itemIndex) noexcept;
+  void moveDown(const QPersistentModelIndex& itemIndex) noexcept;
 
   // Inherited from QAbstractItemModel
   int rowCount(const QModelIndex& parent = QModelIndex()) const override;
@@ -87,35 +86,29 @@ public:
                int role = Qt::EditRole) override;
 
   // Operator Overloadings
-  ComponentPinSignalMapModel& operator=(
-      const ComponentPinSignalMapModel& rhs) noexcept;
+  AttributeListModelLegacy& operator=(
+      const AttributeListModelLegacy& rhs) noexcept;
 
 private:
-  void symbolItemsEdited(
-      const ComponentSymbolVariantItemList& list, int index,
-      const std::shared_ptr<const ComponentSymbolVariantItem>& item,
-      ComponentSymbolVariantItemList::Event event) noexcept;
-  void signalListEdited(const ComponentSignalList& list, int index,
-                        const std::shared_ptr<const ComponentSignal>& signal,
-                        ComponentSignalList::Event event) noexcept;
+  void attributeListEdited(const AttributeList& list, int index,
+                           const std::shared_ptr<const Attribute>& attribute,
+                           AttributeList::Event event) noexcept;
   void execCmd(UndoCommand* cmd);
-  void updateSignalComboBoxItems() noexcept;
-  void getRowItem(
-      int row, int& symbolItemIndex,
-      std::shared_ptr<ComponentSymbolVariantItem>& symbolItem,
-      std::shared_ptr<ComponentPinSignalMapItem>& mapItem) const noexcept;
+  AttributeKey validateKeyOrThrow(const QString& key) const;
+  static ComboBoxDelegate::Items buildUnitComboBoxData(
+      const AttributeType& type) noexcept;
 
 private:  // Data
-  ComponentSymbolVariant* mSymbolVariant;
-  const ComponentSignalList* mSignals;
-  std::shared_ptr<const LibraryElementCache> mSymbolsCache;
+  AttributeList* mAttributeList;
   UndoStack* mUndoStack;
-  ComboBoxDelegate::Items mSignalComboBoxItems;
-  ComboBoxDelegate::Items mDisplayTypeComboBoxItems;
+  ComboBoxDelegate::Items mTypeComboBoxItems;
+  QString mNewKey;
+  const AttributeType* mNewType;
+  QString mNewValue;
+  const AttributeUnit* mNewUnit;
 
   // Slots
-  ComponentSymbolVariantItemList::OnEditedSlot mOnItemsEditedSlot;
-  ComponentSignalList::OnEditedSlot mOnSignalsEditedSlot;
+  AttributeList::OnEditedSlot mOnEditedSlot;
 };
 
 /*******************************************************************************

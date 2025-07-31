@@ -31,7 +31,6 @@
 #include "../utils/undostackactiongroup.h"
 #include "../widgets/openglview.h"
 #include "../widgets/searchtoolbar.h"
-#include "cmp/componenteditorwidget.h"
 #include "dev/deviceeditorwidget.h"
 #include "eaglelibraryimportwizard/eaglelibraryimportwizard.h"
 #include "kicadlibraryimportwizard/kicadlibraryimportwizard.h"
@@ -148,24 +147,12 @@ bool LibraryEditorLegacy::requestClose() noexcept {
   return true;
 }
 
-void LibraryEditorLegacy::openComponent(const FilePath& fp) noexcept {
-  if (fp.isValid()) {
-    editLibraryElementTriggered<ComponentEditorWidget>(fp, false);
-  } else {
-    newLibraryElement(NewElementWizardContext::ElementType::Component);
-  }
-}
-
 void LibraryEditorLegacy::openDevice(const FilePath& fp) noexcept {
   if (fp.isValid()) {
     editLibraryElementTriggered<DeviceEditorWidget>(fp, false);
   } else {
     newLibraryElement(NewElementWizardContext::ElementType::Device);
   }
-}
-
-void LibraryEditorLegacy::duplicateComponent(const FilePath& fp) noexcept {
-  duplicateLibraryElement(NewElementWizardContext::ElementType::Component, fp);
 }
 
 void LibraryEditorLegacy::duplicateDevice(const FilePath& fp) noexcept {
@@ -900,9 +887,6 @@ void LibraryEditorLegacy::duplicateLibraryElement(
 void LibraryEditorLegacy::editNewLibraryElement(
     NewElementWizardContext::ElementType type, const FilePath& fp) {
   switch (type) {
-    case NewElementWizardContext::ElementType::Component:
-      editLibraryElementTriggered<ComponentEditorWidget>(fp, true);
-      break;
     case NewElementWizardContext::ElementType::Device:
       editLibraryElementTriggered<DeviceEditorWidget>(fp, true);
       break;

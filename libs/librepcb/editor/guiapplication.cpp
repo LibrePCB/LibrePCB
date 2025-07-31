@@ -24,8 +24,10 @@
 
 #include "dialogs/directorylockhandlerdialog.h"
 #include "dialogs/filedialog.h"
+#include "graphics/graphicslayerlist.h"
 #include "library/librariesmodel.h"
 #include "library/libraryeditor.h"
+#include "library/libraryelementcache.h"
 #include "mainwindow.h"
 #include "notification.h"
 #include "notificationsmodel.h"
@@ -42,8 +44,11 @@
 #include "workspace/workspacesettingsdialog.h"
 
 #include <librepcb/core/application.h>
+#include <librepcb/core/attribute/attributetype.h>
+#include <librepcb/core/attribute/attributeunit.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/library/library.h>
+#include <librepcb/core/norms.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectloader.h>
 #include <librepcb/core/utils/mathparser.h>
@@ -70,6 +75,8 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
   : QObject(parent),
     mWorkspace(ws),
     mLibrariesContainStandardComponents(false),
+    mPreviewLayers(GraphicsLayerList::previewLayers(&ws.getSettings())),
+    mLibraryElementCache(new LibraryElementCache(ws.getLibraryDb())),
     mNotifications(new NotificationsModel(ws)),
     mQuickAccessModel(new QuickAccessModel(ws)),
     mLocalLibraries(new LibrariesModel(ws, LibrariesModel::Mode::LocalLibs)),
@@ -589,6 +596,24 @@ void GuiApplication::createNewWindow(int id, int projectIndex) noexcept {
   d.set_projects(mProjects);
   d.fn_set_current_project(projectIndex);
   d.set_libraries(mLibraries);
+  d.set_min_length(l2s(Length::min()));
+  d.set_norms(q2s(getAvailableNorms()));
+
+  // Populate attribute types & units.
+  auto attributeTypes =
+      std::make_shared<slint::VectorModel<slint::SharedString>>();
+  auto attributeUnits = std::make_shared<
+      slint::VectorModel<std::shared_ptr<slint::Model<slint::SharedString>>>>();
+  for (auto t : AttributeType::getAllTypes()) {
+    attributeTypes->push_back(q2s(t->getNameTr()));
+    auto units = std::make_shared<slint::VectorModel<slint::SharedString>>();
+    for (auto u : t->getAvailableUnits()) {
+      units->push_back(q2s(u->getSymbolTr()));
+    }
+    attributeUnits->push_back(units);
+  }
+  d.set_attribute_types(attributeTypes);
+  d.set_attribute_units(attributeUnits);
 
   // Register global callbacks.
   const ui::Backend& b = win->global<ui::Backend>();

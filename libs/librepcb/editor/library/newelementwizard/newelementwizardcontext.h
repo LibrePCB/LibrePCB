@@ -66,16 +66,11 @@ public:
     ID_ChooseType,
     ID_CopyFrom,
     ID_EnterMetadata,
-    ID_ComponentProperties,
-    ID_ComponentSymbols,
-    ID_ComponentSignals,
-    ID_ComponentPinSignalMap,
     ID_DeviceProperties,
   };
 
   enum class ElementType {
     None,
-    Component,
     Device,
   };
 
@@ -120,14 +115,6 @@ public:  // Data
   QString mElementAuthor;
   std::optional<Version> mElementVersion;
   QSet<Uuid> mElementCategoryUuids;
-
-  // component
-  bool mComponentSchematicOnly;
-  AttributeList mComponentAttributes;
-  QString mComponentDefaultValue;
-  NormDependentPrefixMap mComponentPrefixes;
-  ComponentSignalList mComponentSignals;
-  ComponentSymbolVariantList mComponentSymbolVariants;
 
   // device
   std::optional<Uuid> mDeviceComponentUuid;

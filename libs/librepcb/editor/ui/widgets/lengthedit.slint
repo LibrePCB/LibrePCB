@@ -13,7 +13,9 @@ import {
 } from "../api.slint";
 
 export component LengthEdit inherits Rectangle {
-    in property <LengthEditData> data;
+    in property <LengthEditData> data: {
+        minimum: Data.min-length,
+    };
     in-out property <Int64> value: data.value;
     in-out property <LengthUnit> unit: data.unit;
     in property <Int64> minimum: data.minimum;
@@ -211,6 +213,7 @@ export component LengthEdit inherits Rectangle {
                 background: black;
                 border-top-right-radius: root.border-radius;
                 border-bottom-right-radius: root.border-radius;
+                clip: true;
 
                 HorizontalLayout {
                     if can-increase || can-decrease: VerticalLayout {

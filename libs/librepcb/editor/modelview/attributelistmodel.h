@@ -23,7 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../modelview/comboboxdelegate.h"
+#include "appwindow.h"
 
 #include <librepcb/core/attribute/attribute.h>
 
@@ -45,66 +45,46 @@ class UndoStack;
 /**
  * @brief The AttributeListModel class
  */
-class AttributeListModel final : public QAbstractTableModel {
+class AttributeListModel final : public QObject,
+                                 public slint::Model<ui::AttributeData> {
   Q_OBJECT
 
 public:
-  enum Column {
-    COLUMN_KEY,
-    COLUMN_TYPE,
-    COLUMN_VALUE,
-    COLUMN_UNIT,
-    COLUMN_ACTIONS,
-    _COLUMN_COUNT
-  };
-
   // Constructors / Destructor
-  AttributeListModel() = delete;
+  // AttributeListModel() = delete;
   AttributeListModel(const AttributeListModel& other) = delete;
   explicit AttributeListModel(QObject* parent = nullptr) noexcept;
   ~AttributeListModel() noexcept;
 
-  // Setters
-  void setAttributeList(AttributeList* list) noexcept;
-  void setUndoStack(UndoStack* stack) noexcept;
+  // General Methods
+  void setReferences(AttributeList* list, UndoStack* stack) noexcept;
+  void apply();
 
-  // Slots
-  void add(const QPersistentModelIndex& itemIndex) noexcept;
-  void remove(const QPersistentModelIndex& itemIndex) noexcept;
-  void moveUp(const QPersistentModelIndex& itemIndex) noexcept;
-  void moveDown(const QPersistentModelIndex& itemIndex) noexcept;
-
-  // Inherited from QAbstractItemModel
-  int rowCount(const QModelIndex& parent = QModelIndex()) const override;
-  int columnCount(const QModelIndex& parent = QModelIndex()) const override;
-  QVariant data(const QModelIndex& index,
-                int role = Qt::DisplayRole) const override;
-  QVariant headerData(int section, Qt::Orientation orientation,
-                      int role = Qt::DisplayRole) const override;
-  Qt::ItemFlags flags(const QModelIndex& index) const override;
-  bool setData(const QModelIndex& index, const QVariant& value,
-               int role = Qt::EditRole) override;
+  // Implementations
+  std::size_t row_count() const override;
+  std::optional<ui::AttributeData> row_data(std::size_t i) const override;
+  void set_row_data(std::size_t i,
+                    const ui::AttributeData& data) noexcept override;
 
   // Operator Overloadings
-  AttributeListModel& operator=(const AttributeListModel& rhs) noexcept;
+  AttributeListModel& operator=(const AttributeListModel& rhs) = delete;
 
 private:
-  void attributeListEdited(const AttributeList& list, int index,
-                           const std::shared_ptr<const Attribute>& attribute,
-                           AttributeList::Event event) noexcept;
+  ui::AttributeData createItem(const Attribute& obj) noexcept;
+  static ui::AttributeData createLastItem() noexcept;
+  void trigger(int index, std::shared_ptr<Attribute> obj,
+               ui::AttributeAction a) noexcept;
+  void listEdited(const AttributeList& list, int index,
+                  const std::shared_ptr<const Attribute>& item,
+                  AttributeList::Event event) noexcept;
   void execCmd(UndoCommand* cmd);
-  AttributeKey validateKeyOrThrow(const QString& key) const;
-  static ComboBoxDelegate::Items buildUnitComboBoxData(
-      const AttributeType& type) noexcept;
+  AttributeKey validateKeyOrThrow(const QString& name) const;
 
-private:  // Data
-  AttributeList* mAttributeList;
-  UndoStack* mUndoStack;
-  ComboBoxDelegate::Items mTypeComboBoxItems;
-  QString mNewKey;
-  const AttributeType* mNewType;
-  QString mNewValue;
-  const AttributeUnit* mNewUnit;
+private:
+  AttributeList* mList;
+  QPointer<UndoStack> mUndoStack;
+
+  QList<ui::AttributeData> mItems;
 
   // Slots
   AttributeList::OnEditedSlot mOnEditedSlot;

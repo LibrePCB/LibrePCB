@@ -52,35 +52,44 @@ namespace editor {
 /**
  * @brief Cache for fast access to library elements
  */
-class LibraryElementCache final {
-  Q_DECLARE_TR_FUNCTIONS(LibraryElementCache)
+class LibraryElementCache final : public QObject {
+  Q_OBJECT
 
 public:
   // Constructors / Destructor
   LibraryElementCache() = delete;
   LibraryElementCache(const LibraryElementCache& other) = delete;
-  explicit LibraryElementCache(const WorkspaceLibraryDb& db) noexcept;
+  explicit LibraryElementCache(const WorkspaceLibraryDb& db,
+                               QObject* parent = nullptr) noexcept;
   ~LibraryElementCache() noexcept;
 
-  // Getters
+  // General Methods
+  void reset() noexcept;
   std::shared_ptr<const ComponentCategory> getComponentCategory(
-      const Uuid& uuid) const noexcept;
+      const Uuid& uuid, bool throwIfNotFound) const;
   std::shared_ptr<const PackageCategory> getPackageCategory(
-      const Uuid& uuid) const noexcept;
-  std::shared_ptr<const Symbol> getSymbol(const Uuid& uuid) const noexcept;
-  std::shared_ptr<const Package> getPackage(const Uuid& uuid) const noexcept;
-  std::shared_ptr<const Component> getComponent(
-      const Uuid& uuid) const noexcept;
-  std::shared_ptr<const Device> getDevice(const Uuid& uuid) const noexcept;
+      const Uuid& uuid, bool throwIfNotFound) const;
+  std::shared_ptr<const Symbol> getSymbol(const Uuid& uuid,
+                                          bool throwIfNotFound) const;
+  std::shared_ptr<const Package> getPackage(const Uuid& uuid,
+                                            bool throwIfNotFound) const;
+  std::shared_ptr<const Component> getComponent(const Uuid& uuid,
+                                                bool throwIfNotFound) const;
+  std::shared_ptr<const Device> getDevice(const Uuid& uuid,
+                                          bool throwIfNotFound) const;
 
   // Operator Overloadings
   LibraryElementCache& operator=(const LibraryElementCache& rhs) = delete;
 
+signals:
+  void scanStarted();
+  void scanSucceeded();
+
 private:  // Methods
   template <typename T>
   std::shared_ptr<const T> getElement(
-      QHash<Uuid, std::shared_ptr<const T>>& container,
-      const Uuid& uuid) const noexcept;
+      QHash<Uuid, std::shared_ptr<const T>>& container, const Uuid& uuid,
+      bool throwIfNotFound) const;
 
 private:  // Data
   QPointer<const WorkspaceLibraryDb> mDb;

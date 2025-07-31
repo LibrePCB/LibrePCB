@@ -455,7 +455,7 @@ void DeviceEditorWidget::updateComponentPreview() noexcept {
 
         std::shared_ptr<SymbolGraphicsItem> graphicsItem =
             std::make_shared<SymbolGraphicsItem>(
-                *sym, *mLayers, mComponent,
+                *sym, *mLayers, mComponent.get(),
                 symbVar.getSymbolItems().get(item.getUuid()),
                 getLibLocaleOrder());
         graphicsItem->setPosition(item.getSymbolPosition());

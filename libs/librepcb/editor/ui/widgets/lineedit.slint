@@ -9,9 +9,11 @@ export component LineEdit inherits Rectangle {
     in property <string> placeholder-text;
     in property <string> validation-error: validate(edt.text);
     in property <bool> has-error: !validation-error.is-empty;
+    in property <bool> show-clear-button: true;
     in property <bool> enabled: true;
     in property <bool> read-only: false;
     in property <length> font-size: 13px;
+    in property <int> font-weight: 400;
     in property <[string]> autocompletions;
     in property <[string]> suggestions;
     in property <bool> frameless: false;
@@ -32,7 +34,17 @@ export component LineEdit inherits Rectangle {
         text-edited(text);
     }
 
+    callback suggestion-accepted(string);
+    suggestion-accepted(text) => {
+        text-edited(text);
+    }
+
     callback text-accepted(string);
+
+    callback clear-clicked;
+    clear-clicked => {
+        text-edited("");
+    }
 
     callback key-pressed(KeyEvent) -> EventResult;
 
@@ -87,14 +99,16 @@ export component LineEdit inherits Rectangle {
     accessible-placeholder-text: placeholder-text;
     accessible-read-only: read-only;
     accessible-action-expand => {
-        suggestions-popup.show();
+        if enabled && (!read-only) {
+            suggestions-popup.show();
+        }
     }
     accessible-action-set-value(t) => {
         text-edited(t)
     }
 
     placeholder-txt := Text {
-        x: 10px;
+        x: frameless ? 5px : 10px;
         width: root.width - 2 * self.x;
         font-size: font-size;
         color: enabled ? #909090 : #707070;
@@ -127,6 +141,7 @@ export component LineEdit inherits Rectangle {
                     width: max(self.preferred-width, view.width);
                     height: self.preferred-height;
                     font-size: font-size;
+                    font-weight: font-weight;
                     color: enabled ? Palette.foreground : Palette.foreground.darker(0.5);
                     selection-background-color: Constants.librepcb-color;
                     selection-foreground-color: black;
@@ -139,6 +154,10 @@ export component LineEdit inherits Rectangle {
 
                     edited => {
                         text-edited(self.text);
+                    }
+
+                    accepted => {
+                        text-accepted(self.text);
                     }
 
                     key-pressed(event) => {
@@ -158,7 +177,7 @@ export component LineEdit inherits Rectangle {
                         } else if (event.text == Key.DownArrow) && (suggestions.length > 0) {
                             select-suggestion(current-suggestion-index + 1);
                             return accept;
-                        } else if (event.text == Key.Space) && event.modifiers.control && (suggestions.length > 0) {
+                        } else if (event.text == Key.Space) && event.modifiers.control && (suggestions.length > 0) && enabled && (!read-only) {
                             suggestions-popup.show();
                             return accept;
                         } else if root.key-pressed(event) == accept {
@@ -173,7 +192,7 @@ export component LineEdit inherits Rectangle {
                 width: 5px;
             }
 
-            if enabled && (!read-only): clear-btn := IconButton {
+            if enabled && (!read-only) && show-clear-button: clear-btn := IconButton {
                 y: (parent.height - self.height) / 2;
                 height: 18px;
                 background-color: root.background;
@@ -185,11 +204,11 @@ export component LineEdit inherits Rectangle {
                 accessible-role: none;
 
                 clicked => {
-                    text-edited("");
+                    clear-clicked();
                 }
             }
 
-            if suggestions.length > 0: expand-btn := IconButton {
+            if enabled && (!read-only) && (suggestions.length > 0): expand-btn := IconButton {
                 y: (parent.height - self.height) / 2;
                 height: 18px;
                 background-color: root.background;
@@ -301,7 +320,7 @@ export component LineEdit inherits Rectangle {
         item-height: root.preferred-height;
 
         accepted(index) => {
-            text-edited(suggestions[index]);
+            suggestion-accepted(suggestions[index]);
         }
     }
 }

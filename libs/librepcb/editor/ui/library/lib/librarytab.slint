@@ -14,6 +14,7 @@ import {
     ManufacturerRowHeader,
     MetadataFooterRowCell,
     NameRowHeader,
+    UrlRowCell,
     UrlRowHeader,
     VersionRowHeader,
 } from "../metadatawidgets.slint";
@@ -305,11 +306,11 @@ component LibraryMetadataTab inherits GridLayout {
     Row {
         url-txt := UrlRowHeader { }
 
-        url-edt := LineEdit {
-            text: tabs[index].url;
-            validation-error: tabs[index].url-error;
+        url-cell := UrlRowCell {
+            url: tabs[index].url;
+            url-error: tabs[index].url-error;
             read-only: read-only;
-            accessible-label: url-txt.text;
+            label: url-txt.text;
 
             text-edited(text) => {
                 tabs[index].url = text;

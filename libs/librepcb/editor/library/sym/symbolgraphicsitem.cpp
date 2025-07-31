@@ -28,7 +28,6 @@
 #include "symbolpingraphicsitem.h"
 
 #include <librepcb/core/attribute/attributesubstitutor.h>
-#include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/types/angle.h>
 #include <librepcb/core/types/point.h>
@@ -48,7 +47,7 @@ namespace editor {
 
 SymbolGraphicsItem::SymbolGraphicsItem(
     Symbol& symbol, const GraphicsLayerList& layers,
-    std::shared_ptr<const Component> cmp,
+    QPointer<const Component> cmp,
     std::shared_ptr<const ComponentSymbolVariantItem> cmpItem,
     const QStringList& localeOrder) noexcept
   : QGraphicsItemGroup(nullptr),
@@ -351,8 +350,11 @@ void SymbolGraphicsItem::substituteText(TextGraphicsItem& text) noexcept {
       if (key == "COMPONENT") {
         return *mComponent->getNames().value(mLocaleOrder);
       } else if (mItem && (key == "NAME")) {
-        return *mComponent->getPrefixes().value(mLocaleOrder) + "?" +
-            *mItem->getSuffix();
+        QString name = *mComponent->getPrefixes().value(mLocaleOrder) + "?";
+        if (!mItem->getSuffix()->isEmpty()) {
+          name += "-" % *mItem->getSuffix();
+        }
+        return name;
       } else {
         // If an attribute is not defined, return its key. This makes sure that
         // e.g.  in a schematic frame the texts like "{{FIELD_SHEET}}" are
