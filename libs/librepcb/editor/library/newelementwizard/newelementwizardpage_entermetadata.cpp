@@ -77,8 +77,6 @@ bool NewElementWizardPage_EnterMetadata::isComplete() const noexcept {
 
 int NewElementWizardPage_EnterMetadata::nextId() const noexcept {
   switch (mContext.mElementType) {
-    case NewElementWizardContext::ElementType::Device:
-      return NewElementWizardContext::ID_DeviceProperties;
     default:
       return NewElementWizardContext::ID_None;
   }
@@ -121,13 +119,6 @@ void NewElementWizardPage_EnterMetadata::edtVersionTextChanged(
 void NewElementWizardPage_EnterMetadata::btnChooseCategoryClicked() noexcept {
   std::optional<Uuid> categoryUuid;
   switch (mContext.mElementType) {
-    case NewElementWizardContext::ElementType::Device: {
-      CategoryChooserDialog dialog(mContext.getWorkspace(),
-                                   CategoryChooserDialog::Filter::CmpCat, this);
-      if (dialog.exec() != QDialog::Accepted) return;
-      categoryUuid = dialog.getSelectedCategoryUuid();
-      break;
-    }
     default: {
       qCritical()
           << "Unhandled switch-case in "
@@ -154,18 +145,7 @@ void NewElementWizardPage_EnterMetadata::updateCategoryTreeLabel() noexcept {
     rootCategoryUuid = mContext.mElementCategoryUuids.values().first();
   }
 
-  bool nulloptIsRootCategory = false;
   switch (mContext.mElementType) {
-    case NewElementWizardContext::ElementType::Device: {
-      ComponentCategoryTreeLabelTextBuilder builder(
-          mContext.getWorkspace().getLibraryDb(),
-          mContext.getWorkspace().getSettings().libraryLocaleOrder.get(),
-          nulloptIsRootCategory, *mUi->lblCategoryTree);
-      builder.setOneLine(true);
-      builder.setPleaseChooseIfEmpty(true);
-      builder.updateText(rootCategoryUuid);
-      break;
-    }
     default: {
       qCritical()
           << "NewElementWizardPage_EnterMetadata: Unhandled switch-case value:"

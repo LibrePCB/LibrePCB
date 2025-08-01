@@ -202,15 +202,14 @@ add_library(
   library/cmp/componentvariantlistmodel.h
   library/createlibrarytab.cpp
   library/createlibrarytab.h
-  library/dev/deviceeditorwidget.cpp
-  library/dev/deviceeditorwidget.h
-  library/dev/deviceeditorwidget.ui
-  library/dev/devicepadsignalmapmodel.cpp
-  library/dev/devicepadsignalmapmodel.h
-  library/dev/padsignalmapeditorwidget.cpp
-  library/dev/padsignalmapeditorwidget.h
-  library/dev/partlisteditorwidget.cpp
-  library/dev/partlisteditorwidget.h
+  library/dev/devicepinoutbuilder.cpp
+  library/dev/devicepinoutbuilder.h
+  library/dev/devicepinoutlistmodel.cpp
+  library/dev/devicepinoutlistmodel.h
+  library/dev/devicetab.cpp
+  library/dev/devicetab.h
+  library/dev/parteditor.cpp
+  library/dev/parteditor.h
   library/dev/partlistmodel.cpp
   library/dev/partlistmodel.h
   library/downloadlibrarytab.cpp
@@ -290,9 +289,6 @@ add_library(
   library/newelementwizard/newelementwizardpage_copyfrom.cpp
   library/newelementwizard/newelementwizardpage_copyfrom.h
   library/newelementwizard/newelementwizardpage_copyfrom.ui
-  library/newelementwizard/newelementwizardpage_deviceproperties.cpp
-  library/newelementwizard/newelementwizardpage_deviceproperties.h
-  library/newelementwizard/newelementwizardpage_deviceproperties.ui
   library/newelementwizard/newelementwizardpage_entermetadata.cpp
   library/newelementwizard/newelementwizardpage_entermetadata.h
   library/newelementwizard/newelementwizardpage_entermetadata.ui

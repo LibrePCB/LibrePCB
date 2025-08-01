@@ -34,12 +34,12 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-CmdPartEdit::CmdPartEdit(Part& part) noexcept
-  : UndoCommand(tr("Edit part")),
+CmdPartEdit::CmdPartEdit(const std::shared_ptr<Part>& part) noexcept
+  : UndoCommand(tr("Edit Part")),
     mPart(part),
-    mOldMpn(part.getMpn()),
+    mOldMpn(part->getMpn()),
     mNewMpn(mOldMpn),
-    mOldManufacturer(part.getManufacturer()),
+    mOldManufacturer(part->getManufacturer()),
     mNewManufacturer(mOldManufacturer) {
 }
 
@@ -73,13 +73,13 @@ bool CmdPartEdit::performExecute() {
 }
 
 void CmdPartEdit::performUndo() {
-  mPart.setMpn(mOldMpn);
-  mPart.setManufacturer(mOldManufacturer);
+  mPart->setMpn(mOldMpn);
+  mPart->setManufacturer(mOldManufacturer);
 }
 
 void CmdPartEdit::performRedo() {
-  mPart.setMpn(mNewMpn);
-  mPart.setManufacturer(mNewManufacturer);
+  mPart->setMpn(mNewMpn);
+  mPart->setManufacturer(mNewManufacturer);
 }
 
 /*******************************************************************************

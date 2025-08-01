@@ -1017,6 +1017,50 @@ export component MainMenuBar inherits Rectangle {
             }
         }
 
+        device-menu-item := MainMenuItem {
+            text: @tr("Device");
+            visible: Data.current-tab.type == TabType.device;
+
+            clicked => {
+                device-menu-popup.show();
+            }
+
+            device-menu-popup := MenuPopup {
+                x: 0;
+                y: parent.height;
+
+                save-device-item := MenuItem {
+                    cmd: Cmd.save;
+                    text: @tr("Save Device");  // More specific.
+                    icon: @image-url("../../../bootstrap-icons/icons/floppy-fill.svg");
+                    enabled: Data.current-tab.features.save == FeatureState.enabled;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.save);
+                    }
+                }
+
+                close-device-item := MenuItem {
+                    text: @tr("Close Device");  // More specific.
+                    status-tip: @tr("Close the currently opened device");
+                    icon: @image-url("../../../font-awesome/svgs/solid/xmark.svg");
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.close);
+                    }
+                }
+
+                open-device-folder-item := MenuItem {
+                    cmd: Cmd.file-manager;
+                    icon: @image-url("../../../font-awesome/svgs/solid/arrow-up-right-from-square.svg");
+
+                    clicked => {
+                        Backend.trigger-library-element(Data.current-device-tab.path, LibraryElementAction.open-folder);
+                    }
+                }
+            }
+        }
+
         project-menu-item := MainMenuItem {
             text: @tr("Project");
             visible: Data.current-project.valid;

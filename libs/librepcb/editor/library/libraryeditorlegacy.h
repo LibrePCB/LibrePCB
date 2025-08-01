@@ -71,8 +71,6 @@ public:
   ~LibraryEditorLegacy() noexcept;
 
   bool requestClose() noexcept;
-  void openDevice(const FilePath& fp) noexcept;
-  void duplicateDevice(const FilePath& fp) noexcept;
   void forceCloseTabs(const QSet<FilePath>& fp) noexcept;
 
   // Operator Overloadings

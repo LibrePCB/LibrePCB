@@ -4,6 +4,7 @@ import {
     CategoryTabData,
     ComponentPinoutDisplayMode,
     ComponentTabData,
+    DeviceTabData,
     EditorTool,
     FeatureState,
     GridStyle,
@@ -340,6 +341,15 @@ export global Data {
                 {
                     type: TabType.component,
                     title: "Component",
+                    features: {
+                        save: FeatureState.enabled,
+                        undo: FeatureState.enabled,
+                        redo: FeatureState.enabled,
+                    },
+                },
+                {
+                    type: TabType.device,
+                    title: "Device",
                     features: {
                         save: FeatureState.enabled,
                         undo: FeatureState.enabled,
@@ -901,7 +911,151 @@ export global Data {
                     },
                 },
             ],
-            current-tab-index: 5,
+            device-tabs: [
+                { },
+                { },
+                { },
+                { },
+                { },
+                { },
+                {
+                    library-index: 0,
+                    path: "device1",
+                    wizard-mode: false,
+                    page-index: 1,
+                    name: "Device",
+                    description: "Foo Bar\nMultiline\nBlabla",
+                    keywords: "Foo,Bar,Hello World",
+                    author: "Somebody",
+                    version: "0.1",
+                    deprecated: false,
+                    categories: [
+                        {
+                            uuid: "1",
+                            names: ["Integrated Circuit", "Timers"],
+                        },
+                        {
+                            uuid: "2",
+                            names: ["Foo", "Bar", "Foobar"],
+                        },
+                        {
+                            uuid: "3",
+                            names: ["Miscallenous"],
+                        },
+                    ],
+                    categories-tree: [
+                        {
+                            level: 0,
+                            icon: @image-url("../../../../bootstrap-icons/icons/folder.svg"),
+                            text: "Root Category",
+                        },
+                        {
+                            level: 1,
+                            icon: @image-url("../../../../bootstrap-icons/icons/folder.svg"),
+                            text: "Integrated Circuits",
+                        },
+                        {
+                            level: 2,
+                            icon: @image-url("../../../../bootstrap-icons/icons/folder.svg"),
+                            text: "Data Aquisition",
+                        },
+                        {
+                            level: 1,
+                            icon: @image-url("../../../../bootstrap-icons/icons/folder.svg"),
+                            text: "Passive Elements",
+                        },
+                    ],
+                    datasheet-url: "https://librepcb.org",
+                    attributes: [
+                        {
+                            key: "FOO",
+                            type: 1,
+                            value: "100",
+                            unit: 0,
+                        },
+                        { },
+                    ],
+                    component-error: false,
+                    component-name: "Resistor",
+                    component-description: "Standard resistor\nBlabla...",
+                    package-error: true,
+                    package-name: "",
+                    package-description: "SMT 0805 resistor\nBlabla",
+                    signal-names: ["(unconnected)", "GND", "3V3", "5V"],
+                    pinout: [
+                        {
+                            pad-name: "1",
+                            signal-uuid: "deadbeef",
+                            signal-index: 0,
+                        },
+                        {
+                            pad-name: "2",
+                            signal-uuid: "12345678",
+                            signal-index: -1,
+                        },
+                        {
+                            pad-name: "3",
+                            signal-uuid: "1234beef",
+                            signal-index: 1,
+                        },
+                    ],
+                    parts: [
+                        {
+                            mpn: "R0805FOOBAR",
+                            manufacturer: "Any Company",
+                            attributes: [
+                                {
+                                    key: "FOO",
+                                    type: 1,
+                                    value: "100",
+                                    unit: 0,
+                                },
+                                {
+                                    key: "BAR",
+                                    type: 0,
+                                    value: "hello",
+                                    unit: -1,
+                                },
+                                { },
+                            ],
+                        },
+                        {
+                            mpn: "R0805FOOBARTR",
+                            manufacturer: "Any Company",
+                            attributes: [{ }],
+                        },
+                        { },
+                    ],
+                    checks: {
+                        type: RuleCheckType.device-check,
+                        state: RuleCheckState.up-to-date,
+                        unapproved: 2,
+                        errors: 0,
+                    },
+                    has-unconnected-pads: true,
+                    has-auto-connectable-pads: true,
+                    all-pads-unconnected: true,
+                    interactive-pinout-number: 0,
+                    interactive-pinout-pad: "!FOO",
+                    interactive-pinout-filter: "",
+                    interactive-pinout-signals: [
+                        {
+                            name: "",  // Unconnected
+                            used: false,
+                        },
+                        {
+                            name: "Foo",
+                            used: false,
+                        },
+                        {
+                            name: "!BAR",
+                            used: true,
+                        },
+                    ],
+                    interactive-pinout-signal-index: 2,
+                },
+            ],
+            current-tab-index: 6,
         },
     ];
 
@@ -1313,6 +1467,7 @@ export global Data {
     out property <SymbolTabData> current-symbol-tab: current-section.symbol-tabs[current-section.current-tab-index];
     out property <PackageTabData> current-package-tab: current-section.package-tabs[current-section.current-tab-index];
     out property <ComponentTabData> current-component-tab: current-section.component-tabs[current-section.current-tab-index];
+    out property <DeviceTabData> current-device-tab: current-section.device-tabs[current-section.current-tab-index];
     out property <SchematicTabData> current-schematic-tab: current-section.schematic-tabs[current-section.current-tab-index];
     out property <Board2dTabData> current-board-2d-tab: current-section.board-2d-tabs[current-section.current-tab-index];
     out property <Board3dTabData> current-board-3d-tab: current-section.board-3d-tabs[current-section.current-tab-index];
@@ -1337,6 +1492,8 @@ export global Data {
             current-package-tab.checks
         } else if current-tab.type == TabType.component {
             current-component-tab.checks
+        } else if current-tab.type == TabType.device {
+            current-device-tab.checks
         } else {
             projects[-1].erc  // Not nice, but avoids compiler warning
         }
@@ -1373,6 +1530,10 @@ export global Data {
             current-rule-check-project-index = -1;
             current-rule-check-board-index = -1;
             current-library-index = current-component-tab.library-index;
+        } else if current-tab.type == TabType.device {
+            current-project-index = -1;
+            current-rule-check-project-index = -1;
+            current-rule-check-board-index = -1;
         } else if current-tab.type == TabType.schematic {
             current-library-index = -1;
             current-project-index = current-schematic-tab.project-index;

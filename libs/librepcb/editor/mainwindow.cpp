@@ -29,6 +29,7 @@
 #include "library/cat/packagecategorytab.h"
 #include "library/cmp/componenttab.h"
 #include "library/createlibrarytab.h"
+#include "library/dev/devicetab.h"
 #include "library/downloadlibrarytab.h"
 #include "library/eaglelibraryimportwizard/eaglelibraryimportwizard.h"
 #include "library/kicadlibraryimportwizard/kicadlibraryimportwizard.h"
@@ -59,6 +60,7 @@
 #include <librepcb/core/library/cat/componentcategory.h>
 #include <librepcb/core/library/cat/packagecategory.h>
 #include <librepcb/core/library/cmp/component.h>
+#include <librepcb/core/library/dev/device.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/project/project.h>
@@ -611,7 +613,7 @@ void MainWindow::triggerLibrary(slint::SharedString path,
     }
     case ui::LibraryAction::NewDevice: {
       if (auto editor = mApp.getLibrary(fp)) {
-        openDeviceTab(*editor, FilePath());
+        openDeviceTab(*editor, FilePath(), false);
       }
       break;
     }
@@ -635,6 +637,7 @@ void MainWindow::triggerLibraryElement(slint::SharedString path,
       if (switchToLibraryElementTab<SymbolTab>(fp)) return;
       if (switchToLibraryElementTab<PackageTab>(fp)) return;
       if (switchToLibraryElementTab<ComponentTab>(fp)) return;
+      if (switchToLibraryElementTab<DeviceTab>(fp)) return;
       if (mApp.getLibrary(fp)) {
         openLibraryTab(fp, false);
       }
@@ -1187,9 +1190,46 @@ void MainWindow::openComponentTab(LibraryEditor& editor, const FilePath& fp,
   }
 }
 
-void MainWindow::openDeviceTab(LibraryEditor& editor,
-                               const FilePath& fp) noexcept {
-  editor.openLegacyDeviceEditor(fp);
+void MainWindow::openDeviceTab(LibraryEditor& editor, const FilePath& fp,
+                               bool copyFrom) noexcept {
+  if (!switchToLibraryElementTab<DeviceTab>(fp)) {
+    try {
+      std::unique_ptr<Device> dev;
+      DeviceTab::Mode mode = DeviceTab::Mode::Open;
+      if (fp.isValid() && (!copyFrom)) {
+        auto fs = TransactionalFileSystem::open(
+            fp, editor.isWritable(), &askForRestoringBackup,
+            DirectoryLockHandlerDialog::createDirectoryLockCallback());
+        dev = Device::open(std::unique_ptr<TransactionalDirectory>(
+            new TransactionalDirectory(fs)));
+      } else {
+        mode = DeviceTab::Mode::New;
+        dev.reset(new Device(Uuid::createRandom(), Version::fromString("0.1"),
+                             mApp.getWorkspace().getSettings().userName.get(),
+                             ElementName("New Device"), QString(), QString(),
+                             Uuid::createRandom(), Uuid::createRandom()));
+        if (copyFrom) {
+          mode = DeviceTab::Mode::Duplicate;
+          auto fs = TransactionalFileSystem::openRO(fp, &askForRestoringBackup);
+          std::unique_ptr<Device> src =
+              Device::open(std::unique_ptr<TransactionalDirectory>(
+                  new TransactionalDirectory(fs)));
+          dev->setNames(copyLibraryElementNames(src->getNames()));
+          dev->setDescriptions(src->getDescriptions());
+          dev->setKeywords(src->getKeywords());
+          dev->setCategories(src->getCategories());
+          dev->setComponentUuid(src->getComponentUuid());
+          dev->setPackageUuid(src->getPackageUuid());
+          dev->getPadSignalMap() = src->getPadSignalMap();
+          dev->getAttributes() = src->getAttributes();
+          dev->getParts() = src->getParts();
+        }
+      }
+      addTab(std::make_shared<DeviceTab>(editor, std::move(dev), mode));
+    } catch (const Exception& e) {
+      QMessageBox::critical(mWidget, tr("Error"), e.getMsg());
+    }
+  }
 }
 
 void MainWindow::openSchematicTab(int projectIndex, int index) noexcept {

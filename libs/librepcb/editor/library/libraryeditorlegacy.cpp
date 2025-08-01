@@ -31,7 +31,6 @@
 #include "../utils/undostackactiongroup.h"
 #include "../widgets/openglview.h"
 #include "../widgets/searchtoolbar.h"
-#include "dev/deviceeditorwidget.h"
 #include "eaglelibraryimportwizard/eaglelibraryimportwizard.h"
 #include "kicadlibraryimportwizard/kicadlibraryimportwizard.h"
 #include "ui_libraryeditorlegacy.h"
@@ -145,18 +144,6 @@ bool LibraryEditorLegacy::requestClose() noexcept {
   clientSettings.setValue("library_editor/window_state_v2", saveState());
 
   return true;
-}
-
-void LibraryEditorLegacy::openDevice(const FilePath& fp) noexcept {
-  if (fp.isValid()) {
-    editLibraryElementTriggered<DeviceEditorWidget>(fp, false);
-  } else {
-    newLibraryElement(NewElementWizardContext::ElementType::Device);
-  }
-}
-
-void LibraryEditorLegacy::duplicateDevice(const FilePath& fp) noexcept {
-  duplicateLibraryElement(NewElementWizardContext::ElementType::Device, fp);
 }
 
 void LibraryEditorLegacy::forceCloseTabs(const QSet<FilePath>& fp) noexcept {
@@ -887,9 +874,6 @@ void LibraryEditorLegacy::duplicateLibraryElement(
 void LibraryEditorLegacy::editNewLibraryElement(
     NewElementWizardContext::ElementType type, const FilePath& fp) {
   switch (type) {
-    case NewElementWizardContext::ElementType::Device:
-      editLibraryElementTriggered<DeviceEditorWidget>(fp, true);
-      break;
     default:
       break;
   }

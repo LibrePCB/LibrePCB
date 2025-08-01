@@ -24,7 +24,6 @@
 
 #include "newelementwizardpage_choosetype.h"
 #include "newelementwizardpage_copyfrom.h"
-#include "newelementwizardpage_deviceproperties.h"
 #include "newelementwizardpage_entermetadata.h"
 #include "ui_newelementwizard.h"
 
@@ -53,8 +52,6 @@ NewElementWizard::NewElementWizard(const Workspace& ws, Library& lib,
              new NewElementWizardPage_CopyFrom(*mContext, this));
   insertPage(NewElementWizardContext::ID_EnterMetadata,
              new NewElementWizardPage_EnterMetadata(*mContext, this));
-  insertPage(NewElementWizardContext::ID_DeviceProperties,
-             new NewElementWizardPage_DeviceProperties(*mContext, this));
 
   setStartId(NewElementWizardContext::ID_ChooseType);
 }

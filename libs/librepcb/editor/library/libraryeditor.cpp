@@ -192,20 +192,6 @@ void LibraryEditor::forceClosingTabs(const QSet<FilePath>& fp) noexcept {
   }
 }
 
-void LibraryEditor::openLegacyDeviceEditor(const FilePath& fp) noexcept {
-  mLegacyEditor->show();
-  mLegacyEditor->raise();
-  mLegacyEditor->activateWindow();
-  mLegacyEditor->openDevice(fp);
-}
-
-void LibraryEditor::duplicateInLegacyDeviceEditor(const FilePath& fp) noexcept {
-  mLegacyEditor->show();
-  mLegacyEditor->raise();
-  mLegacyEditor->activateWindow();
-  mLegacyEditor->duplicateDevice(fp);
-}
-
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
