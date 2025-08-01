@@ -115,7 +115,7 @@ private:
   // State
   bool mWizardMode;
   int mCurrentPageIndex;
-  bool mAddCategoryRequested;
+  bool mChooseCategory;
 
   // Library metadata to be applied
   slint::SharedString mName;

@@ -60,6 +60,7 @@ ComponentCategoryTab::ComponentCategoryTab(
   : LibraryEditorTab(editor, parent),
     onDerivedUiDataChanged(*this),
     mCategory(std::move(cat)),
+    mChooseParent(false),
     mNameParsed(mCategory->getNames().getDefaultValue()),
     mVersionParsed(mCategory->getVersion()),
     mDeprecated(false),
@@ -144,6 +145,7 @@ ui::CategoryTabData ComponentCategoryTab::getDerivedUiData() const noexcept {
       mDeprecated,  // Deprecated
       mParents,  // Parents
       mParentsModel,  // Parents tree
+      mChooseParent,  // Choose parent
       ui::RuleCheckData{
           ui::RuleCheckType::ComponentCategoryCheck,  // Check type
           ui::RuleCheckState::UpToDate,  // Check state
@@ -172,6 +174,7 @@ void ComponentCategoryTab::setDerivedUiData(
   }
   mDeprecated = data.deprecated;
 
+  mChooseParent = data.choose_parent;
   const QString newParent = s2q(data.new_parent);
   if (!newParent.isEmpty()) {
     mParent = Uuid::tryFromString(newParent);

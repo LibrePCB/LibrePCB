@@ -130,7 +130,7 @@ private:
   int mCurrentPageIndex;
   bool mComponentSelected;
   bool mPackageSelected;
-  bool mAddCategoryRequested;
+  bool mChooseCategory;
 
   // Library metadata to be applied
   slint::SharedString mName;

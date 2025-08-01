@@ -94,6 +94,7 @@ SymbolTab::SymbolTab(LibraryEditor& editor, std::unique_ptr<Symbol> sym,
                    .getSchematicGridStyle()),
     mGridInterval(2540000),
     mUnit(LengthUnit::millimeters()),
+    mChooseCategory(false),
     mCompactLayout(false),
     mFrameIndex(0),
     mNameParsed(mSymbol->getNames().getDefaultValue()),
@@ -254,6 +255,7 @@ ui::SymbolTabData SymbolTab::getDerivedUiData() const noexcept {
       mDeprecated,  // Deprecated
       mCategories,  // Categories
       mCategoriesTree,  // Categories tree
+      mChooseCategory,  // Choose category
       ui::RuleCheckData{
           ui::RuleCheckType::SymbolCheck,  // Check type
           ui::RuleCheckState::UpToDate,  // Check state
@@ -305,7 +307,7 @@ ui::SymbolTabData SymbolTab::getDerivedUiData() const noexcept {
       mCompactLayout,  // Compact layout
       q2s(mSceneImagePos),  // Scene image position
       mFrameIndex,  // Frame index
-      mAddCategoryRequested ? "choose" : slint::SharedString(),  // New category
+      slint::SharedString(),  // New category
   };
 }
 
@@ -337,7 +339,7 @@ void SymbolTab::setDerivedUiData(const ui::SymbolTabData& data) noexcept {
   if (auto uuid = Uuid::tryFromString(s2q(data.new_category))) {
     mCategories->add(*uuid);
   }
-  mAddCategoryRequested = false;
+  mChooseCategory = data.choose_category;
 
   // View
   mGridStyle = s2l(data.grid_style);
@@ -1337,7 +1339,8 @@ void SymbolTab::autoFix(const MsgMissingAuthor& msg) {
 template <>
 void SymbolTab::autoFix(const MsgMissingCategories& msg) {
   Q_UNUSED(msg);
-  mAddCategoryRequested = true;
+  mCurrentPageIndex = 0;
+  mChooseCategory = true;
   onDerivedUiDataChanged.notify();
 }
 

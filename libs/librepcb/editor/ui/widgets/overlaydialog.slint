@@ -10,6 +10,12 @@ export component OverlayDialog inherits Rectangle {
     callback accepted;
     callback rejected;
 
+    // If no accepted handler is registered, consider it as rejected so the
+    // dialog can still be closed with the Return key.
+    accepted => {
+        rejected();
+    }
+
     ta := TouchArea {
         clicked => {
             rejected();

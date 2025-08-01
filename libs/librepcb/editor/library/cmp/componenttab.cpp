@@ -72,6 +72,7 @@ ComponentTab::ComponentTab(LibraryEditor& editor,
     mIsNewElement(isPathOutsideLibDir()),
     mWizardMode(mode != Mode::Open),
     mCurrentPageIndex(mWizardMode ? 0 : 2),
+    mChooseCategory(false),
     mNameParsed(mComponent->getNames().getDefaultValue()),
     mVersionParsed(mComponent->getVersion()),
     mDeprecated(false),
@@ -192,6 +193,7 @@ ui::ComponentTabData ComponentTab::getDerivedUiData() const noexcept {
       mDeprecated,  // Deprecated
       mCategories,  // Categories
       mCategoriesTree,  // Categories tree
+      mChooseCategory,  // Choose category
       mDatasheetUrl,  // Datasheet URL
       mDatasheetUrlError,  // Datasheet URL error
       mSchematicOnly,  // Schematic-only
@@ -216,7 +218,7 @@ ui::ComponentTabData ComponentTab::getDerivedUiData() const noexcept {
       },
       l2s(mApp.getWorkspace().getSettings().defaultLengthUnit.get()),  // Unit
       mIsInterfaceBroken,  // Interface broken
-      mAddCategoryRequested ? "choose" : slint::SharedString(),  // New category
+      slint::SharedString(),  // New category
   };
 }
 
@@ -243,7 +245,7 @@ void ComponentTab::setDerivedUiData(const ui::ComponentTabData& data) noexcept {
   if (auto uuid = Uuid::tryFromString(s2q(data.new_category))) {
     mCategories->add(*uuid);
   }
-  mAddCategoryRequested = false;
+  mChooseCategory = data.choose_category;
   mDatasheetUrl = data.datasheet_url;
   validateUrl(s2q(mDatasheetUrl), mDatasheetUrlError, true);
   mSchematicOnly = data.schematic_only;
@@ -467,16 +469,9 @@ void ComponentTab::autoFix(const MsgMissingAuthor& msg) {
 template <>
 void ComponentTab::autoFix(const MsgMissingCategories& msg) {
   Q_UNUSED(msg);
-
-  const int delay = (mCurrentPageIndex != 0) ? 500 : 50;
   mCurrentPageIndex = 0;
-  mAddCategoryRequested = false;
+  mChooseCategory = true;
   onDerivedUiDataChanged.notify();
-
-  QTimer::singleShot(delay, this, [this]() {
-    mAddCategoryRequested = true;
-    onDerivedUiDataChanged.notify();
-  });
 }
 
 template <>
