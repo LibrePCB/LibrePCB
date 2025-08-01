@@ -20,9 +20,17 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "newelementwizardpage_choosetype.h"
+#include "parteditor.h"
 
-#include "ui_newelementwizardpage_choosetype.h"
+#include "../../modelview/attributelistmodel.h"
+#include "../../undocommand.h"
+#include "../../undostack.h"
+#include "../../utils/slinthelpers.h"
+#include "../cmd/cmdpartedit.h"
+
+#include <librepcb/core/library/dev/part.h>
+
+#include <QtCore>
 
 /*******************************************************************************
  *  Namespace
@@ -34,54 +42,67 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-NewElementWizardPage_ChooseType::NewElementWizardPage_ChooseType(
-    NewElementWizardContext& context, QWidget* parent) noexcept
-  : QWizardPage(parent),
-    mContext(context),
-    mUi(new Ui::NewElementWizardPage_ChooseType) {
-  mUi->setupUi(this);
-  setPixmap(QWizard::WatermarkPixmap, QPixmap(":/img/wizards/watermark.jpg"));
+PartEditor::PartEditor(std::shared_ptr<Part> part, UndoStack* stack,
+                       QObject* parent) noexcept
+  : QObject(parent),
+    mPart(part),
+    mUndoStack(stack),
+    mAttributes(new AttributeListModel()) {
+  mAttributes->setReferences(&part->getAttributes(), stack);
 }
 
-NewElementWizardPage_ChooseType::~NewElementWizardPage_ChooseType() noexcept {
+PartEditor::~PartEditor() noexcept {
+  mAttributes->setReferences(nullptr, nullptr);
 }
 
 /*******************************************************************************
- *  Getters
+ *  General Methods
  ******************************************************************************/
 
-bool NewElementWizardPage_ChooseType::isComplete() const noexcept {
-  return (mContext.mElementType != NewElementWizardContext::ElementType::None);
+ui::PartData PartEditor::getUiData() const {
+  return ui::PartData{
+      q2s(*mPart->getMpn()),  // MPN
+      q2s(*mPart->getManufacturer()),  // Manufacturer
+      mAttributes,  // Attributes
+      ui::PartAction::None,  // Action
+  };
 }
 
-int NewElementWizardPage_ChooseType::nextId() const noexcept {
-  if (mUi->rbtnCopyExistingElement->isChecked()) {
-    return NewElementWizardContext::ID_CopyFrom;
-  } else {
-    return NewElementWizardContext::ID_EnterMetadata;
+void PartEditor::setUiData(const ui::PartData& data, bool allowEmpty) noexcept {
+  try {
+    const QString mpnStr = s2q(data.mpn);
+    const SimpleString mpn = cleanSimpleString(mpnStr);
+    const QString mfrStr = s2q(data.manufacturer);
+    const SimpleString mfr = cleanSimpleString(mfrStr);
+
+    std::unique_ptr<CmdPartEdit> cmd(new CmdPartEdit(mPart));
+    if ((mpnStr != mPart->getMpn()) && ((!mpn->isEmpty()) || allowEmpty)) {
+      cmd->setMpn(mpn);
+    }
+    if ((mfrStr != mPart->getManufacturer()) &&
+        ((!mfr->isEmpty()) || allowEmpty)) {
+      cmd->setManufacturer(mfr);
+    }
+    execCmd(cmd.release());
+  } catch (const Exception& e) {
+    qCritical() << e.getMsg();
   }
+}
+
+void PartEditor::apply() {
+  mAttributes->apply();
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
-void NewElementWizardPage_ChooseType::initializePage() noexcept {
-  QWizardPage::initializePage();
-  setElementType(NewElementWizardContext::ElementType::None);
-}
-
-void NewElementWizardPage_ChooseType::cleanupPage() noexcept {
-  QWizardPage::cleanupPage();
-  setElementType(NewElementWizardContext::ElementType::None);
-}
-
-void NewElementWizardPage_ChooseType::setElementType(
-    NewElementWizardContext::ElementType type) noexcept {
-  mContext.reset(type);
-  emit completeChanged();
-  if (isComplete()) {
-    wizard()->next();
+void PartEditor::execCmd(UndoCommand* cmd) {
+  if (mUndoStack) {
+    mUndoStack->execCmd(cmd);
+  } else {
+    std::unique_ptr<UndoCommand> cmdGuard(cmd);
+    cmdGuard->execute();
   }
 }
 

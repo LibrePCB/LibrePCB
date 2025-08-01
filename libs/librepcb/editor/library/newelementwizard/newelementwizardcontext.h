@@ -66,12 +66,10 @@ public:
     ID_ChooseType,
     ID_CopyFrom,
     ID_EnterMetadata,
-    ID_DeviceProperties,
   };
 
   enum class ElementType {
     None,
-    Device,
   };
 
   // Constructors / Destructor
@@ -115,13 +113,6 @@ public:  // Data
   QString mElementAuthor;
   std::optional<Version> mElementVersion;
   QSet<Uuid> mElementCategoryUuids;
-
-  // device
-  std::optional<Uuid> mDeviceComponentUuid;
-  std::optional<Uuid> mDevicePackageUuid;
-  DevicePadSignalMap mDevicePadSignalMap;
-  AttributeList mDeviceAttributes;
-  PartList mDeviceParts;
 };
 
 /*******************************************************************************

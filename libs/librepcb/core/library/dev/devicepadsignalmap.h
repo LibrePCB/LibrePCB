@@ -104,39 +104,6 @@ using DevicePadSignalMap =
                            DevicePadSignalMapItem::Event>;
 
 /*******************************************************************************
- *  Class DevicePadSignalMapHelpers
- ******************************************************************************/
-
-class DevicePadSignalMapHelpers {
-public:
-  DevicePadSignalMapHelpers() = delete;  // disable instantiation
-
-  static std::optional<Uuid> tryGetSignalUuid(const DevicePadSignalMap& map,
-                                              const Uuid& pad) noexcept {
-    std::shared_ptr<const DevicePadSignalMapItem> item = map.find(pad);
-    return item ? item->getSignalUuid() : std::nullopt;
-  }
-
-  static DevicePadSignalMap create(const QSet<Uuid> pads) noexcept {
-    DevicePadSignalMap map;
-    foreach (const Uuid& pad, pads) {
-      map.append(std::make_shared<DevicePadSignalMapItem>(pad, std::nullopt));
-    }
-    return map;
-  }
-
-  static void setPads(DevicePadSignalMap& map, QSet<Uuid> pads) noexcept {
-    foreach (const Uuid& pad, map.getUuidSet() - pads) {
-      map.remove(pad);
-    }
-    foreach (const Uuid& pad, pads - map.getUuidSet()) {
-      map.append(std::make_shared<DevicePadSignalMapItem>(pad, std::nullopt));
-    }
-    Q_ASSERT(map.getUuidSet() == pads);
-  }
-};
-
-/*******************************************************************************
  *  End of File
  ******************************************************************************/
 

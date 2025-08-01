@@ -35,10 +35,10 @@ namespace editor {
  ******************************************************************************/
 
 CmdDevicePadSignalMapItemEdit::CmdDevicePadSignalMapItemEdit(
-    DevicePadSignalMapItem& item) noexcept
-  : UndoCommand(tr("Edit device pad-signal-map")),
+    const std::shared_ptr<DevicePadSignalMapItem>& item) noexcept
+  : UndoCommand(tr("Edit Device Pinout")),
     mItem(item),
-    mOldSignalUuid(item.getSignalUuid()),
+    mOldSignalUuid(item->getSignalUuid()),
     mNewSignalUuid(mOldSignalUuid) {
 }
 
@@ -67,11 +67,11 @@ bool CmdDevicePadSignalMapItemEdit::performExecute() {
 }
 
 void CmdDevicePadSignalMapItemEdit::performUndo() {
-  mItem.setSignalUuid(mOldSignalUuid);
+  mItem->setSignalUuid(mOldSignalUuid);
 }
 
 void CmdDevicePadSignalMapItemEdit::performRedo() {
-  mItem.setSignalUuid(mNewSignalUuid);
+  mItem->setSignalUuid(mNewSignalUuid);
 }
 
 /*******************************************************************************

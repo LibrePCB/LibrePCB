@@ -1,0 +1,66 @@
+import { Button } from "button.slint";
+import { Constants } from "../api.slint";
+
+export component OverlayDialog inherits Rectangle {
+    in property <bool> ok-button: false;
+
+    background: #00000080;
+    forward-focus: fs;
+
+    callback accepted;
+    callback rejected;
+
+    ta := TouchArea {
+        clicked => {
+            rejected();
+        }
+    }
+
+    fs := FocusScope {
+        Rectangle {
+            width: min(0.8 * root.width, max(self.preferred-width, 500px));
+            height: min(0.8 * root.height, max(self.preferred-height, 50px));
+            background: #000000;
+            border-radius: 15px;
+            border-width: 1px;
+            border-color: Constants.librepcb-color;
+
+            TouchArea {
+                // Here just to discard clicks within the dialog content.
+            }
+
+            VerticalLayout {
+                padding: 15px;
+                spacing: 8px;
+
+                @children
+
+                if ok-button: HorizontalLayout {
+                    alignment: end;
+
+                    if ok-button: ok-btn := Button {
+                        width: max(self.preferred-width, 100px);
+                        text: @tr("OK");
+                        icon: @image-url("../../../../font-awesome/svgs/solid/check.svg");
+                        primary: true;
+
+                        clicked => {
+                            accepted();
+                        }
+                    }
+                }
+            }
+        }
+
+        key-pressed(event) => {
+            if event.text == Key.Escape {
+                rejected();
+                return accept;
+            } else if event.text == Key.Return {
+                accepted();
+                return accept;
+            }
+            reject
+        }
+    }
+}

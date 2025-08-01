@@ -255,6 +255,7 @@ export enum RuleCheckType {
     symbol-check,
     package-check,
     component-check,
+    device-check,
 }
 
 export enum RuleCheckState {
@@ -510,6 +511,35 @@ export struct ComponentVariantData {
     frame-index: int,  // For repainting the symbol preview
 }
 
+// Actions for PartData
+export enum PartAction {
+    none,
+    move-up,
+    duplicate,
+    delete,
+}
+
+// Part data structure
+export struct PartData {
+    mpn: string,
+    manufacturer: string,
+    attributes: [AttributeData],
+    action: PartAction,  // Set by UI, reset by backend
+}
+
+// Device pinout data structure
+export struct DevicePinoutData {
+    pad-name: string,  // 8-char UUID if not found (error case)
+    signal-uuid: string,  // Full UUID (empty if not connected)
+    signal-index: int,  // -1 if not found (error case)
+}
+
+// Signal data structure for interactive pinout assignment in device editor
+export struct DeviceInteractivePinoutSignalData {
+    name: string,  // Empty string = unconnected
+    used: bool,  // Whether any pad is already assigned to this signal
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Tabs
 ////////////////////////////////////////////////////////////////////////////////
@@ -560,6 +590,7 @@ export enum TabType {
     symbol,
     package,
     component,
+    device,
     schematic,
     board-2d,
     board-3d,
@@ -659,6 +690,14 @@ export enum TabAction {
     // Component tab
     component-add-signals,
     component-add-variant,
+
+    // Device tab
+    device-select-component,
+    device-select-package,
+    device-pinout-reset,
+    device-pinout-connect-auto,
+    device-pinout-connect-interactively,
+    device-pinout-load-from-file,
 
     // Board 2D tab
     board-place-component,
@@ -1013,6 +1052,58 @@ export struct ComponentTabData {
     new-category: string,  // Set to UUID by UI, reset by backend
 }
 
+// Additional data for device editor tabs
+export struct DeviceTabData {
+    // General
+    library-index: int,
+    path: string,
+    wizard-mode: bool,
+    page-index: int,
+
+    // Metadata
+    name: string,
+    name-error: string,
+    description: string,
+    keywords: string,
+    author: string,
+    version: string,
+    version-error: string,
+    deprecated: bool,
+    categories: [LibraryElementCategoryData],
+    categories-tree: [TreeViewItemData],
+    datasheet-url: string,
+    datasheet-url-error: string,
+    attributes: [AttributeData],
+    component-error: bool,  // If failed to load
+    component-name: string,  // Empty if not loaded or on error
+    component-description: string,  // Error message if component-error
+    package-error: bool,  // If failed to load
+    package-name: string,  // Empty if not loaded or on error
+    package-description: string,  // Error message if package-error
+    signal-names: [string],  // Used for the pinout combobox, first item is "unconnected"
+    pinout: [DevicePinoutData],
+    parts: [PartData],
+
+    // Checks
+    checks: RuleCheckData,
+
+    // Messages
+    interface-broken-msg: bool,
+
+    // Pinout assignment
+    has-unconnected-pads: bool,
+    has-auto-connectable-pads: bool,
+    all-pads-unconnected: bool,
+    interactive-pinout-number: int,  // 0 = inactive
+    interactive-pinout-pad: string,  // Current pad name
+    interactive-pinout-filter: string,  // User input (signal name)
+    interactive-pinout-signals: [DeviceInteractivePinoutSignalData],  // Filtered & sorted
+    interactive-pinout-signal-index: int,  // Index of interactive-pinout-signals, UI can set to -2 to select "unconnected"
+
+    // Actions
+    new-category: string,  // Set to UUID by UI, reset by backend
+}
+
 // Additional data for schematic editor tabs
 export struct SchematicTabData {
     project-index: int,
@@ -1133,6 +1224,7 @@ export struct WindowSectionData {
     symbol-tabs: [SymbolTabData],  // Proxy view for `tabs`
     package-tabs: [PackageTabData],  // Proxy view for `tabs`
     component-tabs: [ComponentTabData],  // Proxy view for `tabs`
+    device-tabs: [DeviceTabData],  // Proxy view for `tabs`
     schematic-tabs: [SchematicTabData],  // Proxy view for `tabs`
     board-2d-tabs: [Board2dTabData],  // Proxy view for `tabs`
     board-3d-tabs: [Board3dTabData],  // Proxy view for `tabs`

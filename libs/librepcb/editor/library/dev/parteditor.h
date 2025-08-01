@@ -17,58 +17,63 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_PARTLISTEDITORWIDGET_H
-#define LIBREPCB_EDITOR_PARTLISTEDITORWIDGET_H
+#ifndef LIBREPCB_EDITOR_PARTEDITOR_H
+#define LIBREPCB_EDITOR_PARTEDITOR_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/library/dev/part.h>
+#include "appwindow.h"
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Part;
+
 namespace editor {
 
-class EditableTableWidget;
-class PartListModel;
+class AttributeListModel;
+class UndoCommand;
 class UndoStack;
 
 /*******************************************************************************
- *  Class PartListEditorWidget
+ *  Class PartEditor
  ******************************************************************************/
 
 /**
- * @brief The PartListEditorWidget class
+ * @brief The PartEditor class
  */
-class PartListEditorWidget final : public QWidget {
+class PartEditor final : public QObject {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  explicit PartListEditorWidget(QWidget* parent = nullptr) noexcept;
-  PartListEditorWidget(const PartListEditorWidget& other) = delete;
-  ~PartListEditorWidget() noexcept;
+  PartEditor() = delete;
+  PartEditor(const PartEditor& other) = delete;
+  explicit PartEditor(std::shared_ptr<Part> part, UndoStack* stack,
+                      QObject* parent = nullptr) noexcept;
+  ~PartEditor() noexcept;
 
-  // Setters
-  void setFrameStyle(int style) noexcept;
-  void setReadOnly(bool readOnly) noexcept;
-  void setInitialManufacturer(const SimpleString& value) noexcept;
-  void setReferences(UndoStack* undoStack, PartList* list) noexcept;
+  // General Methods
+  ui::PartData getUiData() const;
+  void setUiData(const ui::PartData& data, bool allowEmpty) noexcept;
+  void apply();
 
   // Operator Overloadings
-  PartListEditorWidget& operator=(const PartListEditorWidget& rhs) = delete;
+  PartEditor& operator=(const PartEditor& rhs) = delete;
 
-signals:
-  void currentItemChanged(int index);
+private:
+  void execCmd(UndoCommand* cmd);
 
-private:  // Data
-  QScopedPointer<PartListModel> mModel;
-  QScopedPointer<EditableTableWidget> mView;
+private:
+  std::shared_ptr<Part> mPart;
+  QPointer<UndoStack> mUndoStack;
+
+  std::shared_ptr<AttributeListModel> mAttributes;
 };
 
 /*******************************************************************************

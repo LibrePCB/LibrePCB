@@ -1,0 +1,571 @@
+import { DevicePinoutPanel } from "devicepinoutpanel.slint";
+import { PackageCard, ComponentCard } from "devicedependencycards.slint";
+import { PartListView } from "partlistview.slint";
+import { Tab } from "../../tab.slint";
+import {
+    AttributesRowHeader,
+    AuthorRowHeader,
+    CategoriesRowCell,
+    CategoriesRowHeader,
+    DatasheetRowCell,
+    DatasheetRowHeader,
+    DeprecatedRowCell,
+    DeprecatedRowHeader,
+    DescriptionRowHeader,
+    KeywordsRowHeader,
+    MetadataFooterRowCell,
+    NameRowHeader,
+    VersionRowHeader,
+} from "../metadatawidgets.slint";
+import {
+    BreakingChangesMessageBanner,
+    CheckErrorsMessageBanner,
+} from "../messagebanners.slint";
+import { WizardHeader } from "../wizardheader.slint";
+import {
+    AttributeListView,
+    Button,
+    LineEdit,
+    OverlayDialog,
+    Palette,
+    SlideView,
+    TextEdit,
+    TreeItemPickerPopup,
+} from "../../widgets.slint";
+import {
+    Backend,
+    Data,
+    DeviceTabData,
+    FeatureState,
+    TabAction,
+    WindowSectionData,
+} from "../../api.slint";
+
+component DeviceInitTab {
+    in property <int> section-index;
+    in-out property <[DeviceTabData]> tabs;
+    in property <int> index;
+    in property <bool> read-only;
+
+    VerticalLayout {
+        alignment: start;
+        padding: 8px;
+        spacing: 10px;
+
+        WizardHeader {
+            text: @tr("Select the package & component of the new device.");
+        }
+
+        HorizontalLayout {
+            spacing: 10px;
+
+            package-card := PackageCard {
+                horizontal-stretch: 1;
+                preferred-width: root.width / 2;
+                section-index: section-index;
+                tabs: tabs;
+                index: index;
+                read-only: read-only;
+                primary: tabs[index].package-name.is-empty;
+            }
+
+            component-card := ComponentCard {
+                horizontal-stretch: 1;
+                preferred-width: root.width / 2;
+                section-index: section-index;
+                tabs: tabs;
+                index: index;
+                read-only: read-only;
+                primary: (!tabs[index].package-name.is-empty) && tabs[index].component-name.is-empty;
+            }
+        }
+
+        HorizontalLayout {
+            alignment: start;
+            padding-right: 8px;
+            spacing: 8px;
+
+            next-btn := Button {
+                width: max(self.preferred-width, 100px);
+                primary: (!tabs[index].component-name.is-empty) && (!tabs[index].package-name.is-empty);
+                enabled: self.primary;
+                icon: @image-url("../../../../../font-awesome/svgs/solid/angle-right.svg");
+                text: @tr("Next");
+
+                clicked => {
+                    Backend.trigger-tab(section-index, index, TabAction.next);
+                }
+            }
+        }
+    }
+}
+
+component DeviceMetadataTab inherits GridLayout {
+    in property <int> section-index;
+    in-out property <[DeviceTabData]> tabs;
+    in property <int> index;
+    in property <bool> read-only;
+
+    padding: 8px;
+    padding-top: tabs[index].wizard-mode ? 8px : 0;
+    spacing: 8px;
+
+    Row {
+        WizardHeader {
+            colspan: 2;
+            height: tabs[index].wizard-mode ? self.preferred-height : 0;
+            text: @tr("Specify the metadata of the device. Some values have already been initialized from the selected package & component, you may need to adjust it accordingly.");
+            visible: self.height > 0;
+        }
+    }
+
+    Row {
+        name-txt := NameRowHeader { }
+
+        name-edt := LineEdit {
+            text: tabs[index].name;
+            validation-error: tabs[index].name-error;
+            read-only: read-only;
+            accessible-label: name-txt.text;
+
+            init => {
+                if (!read-only) && tabs[index].wizard-mode {
+                    self.select-all();
+                }
+            }
+
+            text-edited(text) => {
+                tabs[index].name = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].name = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        description-txt := DescriptionRowHeader { }
+
+        description-edt := TextEdit {
+            height: 100px;
+            text: tabs[index].description;
+            read-only: read-only;
+            accessible-label: description-txt.text;
+
+            text-edited(text) => {
+                tabs[index].description = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].description = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        keywords-txt := KeywordsRowHeader { }
+
+        keywords-edt := LineEdit {
+            text: tabs[index].keywords;
+            read-only: read-only;
+            accessible-label: keywords-txt.text;
+
+            text-edited(text) => {
+                tabs[index].keywords = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].keywords = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        author-txt := AuthorRowHeader { }
+
+        author-edt := LineEdit {
+            text: tabs[index].author;
+            read-only: read-only;
+            accessible-label: author-txt.text;
+
+            text-edited(text) => {
+                tabs[index].author = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].author = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        version-txt := VersionRowHeader { }
+
+        version-edt := LineEdit {
+            text: tabs[index].version;
+            validation-error: tabs[index].version-error;
+            read-only: read-only;
+            accessible-label: version-txt.text;
+
+            text-edited(text) => {
+                tabs[index].version = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].version = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        deprecated-txt := DeprecatedRowHeader { }
+
+        deprecated-sw := DeprecatedRowCell {
+            checked: tabs[index].deprecated;
+            enabled: !read-only;
+            accessible-label: deprecated-txt.text;
+
+            toggled(checked) => {
+                tabs[index].deprecated = checked;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        categories-txt := CategoriesRowHeader { }
+
+        categories-cell := CategoriesRowCell {
+            model: tabs[index].categories;
+            read-only: read-only;
+            accessible-label: categories-txt.text;
+
+            add-triggered => {
+                add-category-popup.show();
+            }
+        }
+    }
+
+    Row {
+        datasheet-txt := DatasheetRowHeader { }
+
+        datasheet-cell := DatasheetRowCell {
+            url: tabs[index].datasheet-url;
+            url-error: tabs[index].datasheet-url-error;
+            read-only: read-only;
+            label: datasheet-txt.text;
+
+            text-edited(text) => {
+                tabs[index].datasheet-url = text;
+            }
+
+            text-accepted(text) => {
+                tabs[index].datasheet-url = text;
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+
+            open-url-clicked(url) => {
+                Backend.trigger-tab(section-index, index, TabAction.open-datasheet);
+            }
+        }
+    }
+
+    Row {
+        attributes-txt := AttributesRowHeader { }
+
+        attributes-view := AttributeListView {
+            model: tabs[index].attributes;
+            read-only: read-only;
+
+            edited => {
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+    }
+
+    Row {
+        Rectangle { }
+
+        footer-cell := MetadataFooterRowCell {
+            section-index: section-index;
+            tab-index: index;
+            wizard-mode: tabs[index].wizard-mode;
+            show-back-button: true;
+            unsaved-changes: Data.sections[section-index].tabs[index].unsaved-changes;
+            checks: tabs[index].checks;
+            read-only: read-only;
+        }
+    }
+
+    Row {
+        Rectangle { }
+    }
+
+    // Open the category chooser when requested by the backend.
+    property <string> new-category: tabs[index].new-category;
+    changed new-category => {
+        if new-category == "choose" {
+            add-category-popup.show();
+        }
+    }
+
+    add-category-popup := TreeItemPickerPopup {
+        width: parent.width;
+        height: parent.height;
+        model: tabs[index].categories-tree;
+        icons-color: Palette.foreground;
+
+        item-picked(idx, item) => {
+            tabs[index].new-category = item.user-data;
+        }
+    }
+}
+
+component DeviceContentTab {
+    in property <int> section-index;
+    in-out property <[DeviceTabData]> tabs;
+    in property <int> index;
+    in property <bool> read-only;
+    in property <length> page-height;
+    property <bool> horizontal-layout: self.width > 1000px;
+    property <bool> interactive: tabs[index].interactive-pinout-number > 0;
+    property <int> attributes-editor-part-index: -1;  // -1 = hide popup
+
+    VerticalLayout {
+        alignment: ((!tabs[index].wizard-mode) || (tabs[index].page-index == 2)) ? stretch : start;
+        padding: 8px;
+        padding-right: 0;  // The parts list view reserves its own space for the scrollbar
+        spacing: 10px;
+
+        if tabs[index].wizard-mode && (tabs[index].page-index == 2): VerticalLayout {
+            padding-right: 8px;
+
+            WizardHeader {
+                text: @tr("Define the pinout, i.e. connect package pads with component signals. This can be done either manually pad-by-pad or in an automated way by using one of the buttons below.");
+            }
+        }
+
+        if tabs[index].wizard-mode && (tabs[index].page-index == 3): VerticalLayout {
+            padding-right: 8px;
+
+            WizardHeader {
+                text: @tr("Optionally, specify concrete part numbers of this device. These can then be used to generate a bill of materials (BOM) from a project.");
+            }
+        }
+
+        if (!tabs[index].wizard-mode) || (tabs[index].page-index == 2): HorizontalLayout {
+            vertical-stretch: 1;
+            padding-right: 8px;
+            spacing: 10px;
+
+            VerticalLayout {
+                horizontal-stretch: 1;
+                preferred-width: root.width / 4;
+                spacing: 8px;
+
+                package-card := PackageCard {
+                    section-index: section-index;
+                    tabs: tabs;
+                    index: index;
+                    read-only: read-only;
+                }
+
+                if !horizontal-layout: component-card-1 := ComponentCard {
+                    section-index: section-index;
+                    tabs: tabs;
+                    index: index;
+                    read-only: read-only;
+                }
+            }
+
+            pinout-panel := DevicePinoutPanel {
+                horizontal-stretch: 1;
+                section-index: section-index;
+                tabs: tabs;
+                index: index;
+                read-only: read-only;
+                interactive: interactive;
+            }
+
+            if horizontal-layout: component-card-2 := ComponentCard {
+                horizontal-stretch: 1;
+                preferred-width: root.width / 4;
+                section-index: section-index;
+                tabs: tabs;
+                index: index;
+                read-only: read-only;
+            }
+        }
+
+        if (!interactive) && ((!tabs[index].wizard-mode) || (tabs[index].page-index == 3)): parts-view := PartListView {
+            vertical-stretch: 0;
+            max-height: page-height / 2;
+            model: tabs[index].parts;
+            read-only: read-only;
+
+            edited => {
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+
+            request-attributes-editor(part-index) => {
+                attributes-editor-part-index = part-index;
+            }
+        }
+
+        if tabs[index].wizard-mode: HorizontalLayout {
+            alignment: start;
+            padding-right: 8px;
+            spacing: 8px;
+
+            next-btn := Button {
+                width: max(self.preferred-width, 100px);
+                primary: {
+                    if tabs[index].page-index == 2 {
+                        !tabs[index].has-unconnected-pads
+                    } else if tabs[index].page-index == 3 {
+                        tabs[index].parts.length > 1
+                    } else {
+                        false
+                    }
+                };
+                icon: @image-url("../../../../../font-awesome/svgs/solid/angle-right.svg");
+                text: {
+                    if tabs[index].page-index == 3 {
+                        @tr("Finish")
+                    } else if self.primary || ((tabs[index].page-index == 2) && (!tabs[index].all-pads-unconnected)) {
+                        @tr("Next")
+                    } else {
+                        @tr("Skip")
+                    }
+                };
+
+                clicked => {
+                    Backend.trigger-tab(section-index, index, TabAction.next);
+                }
+            }
+
+            back-btn := Button {
+                width: max(self.preferred-width, 100px);
+                icon: @image-url("../../../../../font-awesome/svgs/solid/angle-left.svg");
+                text: @tr("Back");
+
+                clicked => {
+                    Backend.trigger-tab(section-index, index, TabAction.back);
+                }
+            }
+        }
+    }
+
+    attributes-overlay := OverlayDialog {
+        width: parent.width;
+        height: parent.height;
+        ok-button: true;
+        // Actually we want to make the whole dialog's lifetime conditionally,
+        // but it leads to crashes when closing it from its callbacks. Thus
+        // only controlling its visibility.
+        visible: attributes-editor-part-index >= 0;
+
+        changed visible => {
+            if self.visible {
+                self.focus();
+            }
+        }
+
+        attributes-overlay-view := AttributeListView {
+            model: tabs[index].parts[attributes-editor-part-index].attributes;
+            read-only: read-only;
+
+            edited => {
+                Backend.trigger-tab(section-index, index, TabAction.apply);
+            }
+        }
+
+        accepted => {
+            Backend.trigger-tab(section-index, index, TabAction.apply);
+            attributes-editor-part-index = -1;
+        }
+
+        rejected => {
+            attributes-editor-part-index = -1;
+        }
+    }
+}
+
+export component DeviceTab inherits Tab {
+    in property <int> section-index;
+    in-out property <WindowSectionData> section;
+    property <[DeviceTabData]> tabs: section.device-tabs;
+    property <int> index: section.current-tab-index;
+    property <bool> read-only: section.tabs[index].features.save != FeatureState.enabled;
+
+    enabled: true;
+
+    VerticalLayout {
+        BreakingChangesMessageBanner {
+            shown: tabs[index].interface-broken-msg;
+        }
+
+        CheckErrorsMessageBanner {
+            shown: tabs[index].checks.errors > 0;
+        }
+
+        // Wizard mode: Only one page at a time.
+        if tabs[index].wizard-mode && (tabs[index].page-index <= 0): init-tab := DeviceInitTab {
+            width: parent.width;
+            section-index: section-index;
+            tabs: tabs;
+            index: index;
+            read-only: read-only;
+        }
+        if tabs[index].wizard-mode && (tabs[index].page-index == 1): metadata-tab-1 := DeviceMetadataTab {
+            section-index: section-index;
+            tabs: tabs;
+            index: index;
+            read-only: read-only;
+        }
+        if tabs[index].wizard-mode && (tabs[index].page-index >= 2): content-tab-1 := DeviceContentTab {
+            width: parent.width;
+            section-index: section-index;
+            tabs: tabs;
+            index: index;
+            read-only: read-only;
+            page-height: root.height;
+        }
+
+        // Normal mode: Slide between metadata and content.
+        if !tabs[index].wizard-mode: SlideView {
+            pages: [
+                { title: @tr("Metadata") },
+                { title: @tr("Pinout & Parts") },
+            ];
+            current-index: tabs[index].page-index;
+
+            metadata-tab-2 := DeviceMetadataTab {
+                width: parent.width;
+                section-index: section-index;
+                tabs: tabs;
+                index: index;
+                read-only: read-only;
+            }
+
+            content-tab-2 := DeviceContentTab {
+                width: parent.width;
+                section-index: section-index;
+                tabs: tabs;
+                index: index;
+                read-only: read-only;
+                page-height: root.height;
+            }
+
+            page-clicked(idx) => {
+                tabs[index].page-index = idx;
+            }
+        }
+    }
+}

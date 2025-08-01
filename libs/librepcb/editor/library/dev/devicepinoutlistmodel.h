@@ -17,15 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_DEVICEPADSIGNALMAPMODEL_H
-#define LIBREPCB_EDITOR_DEVICEPADSIGNALMAPMODEL_H
+#ifndef LIBREPCB_EDITOR_DEVICEPINOUTLISTMODEL_H
+#define LIBREPCB_EDITOR_DEVICEPINOUTLISTMODEL_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../modelview/comboboxdelegate.h"
+#include "appwindow.h"
 
-#include <librepcb/core/library/cmp/componentsignal.h>
 #include <librepcb/core/library/dev/devicepadsignalmap.h>
 #include <librepcb/core/library/pkg/packagepad.h>
 
@@ -37,63 +36,57 @@
 namespace librepcb {
 namespace editor {
 
+class ComponentSignalNameListModel;
 class UndoCommand;
 class UndoStack;
 
 /*******************************************************************************
- *  Class DevicePadSignalMapModel
+ *  Class DevicePinoutListModel
  ******************************************************************************/
 
 /**
- * @brief The DevicePadSignalMapModel class
+ * @brief The DevicePinoutListModel class
  */
-class DevicePadSignalMapModel final : public QAbstractTableModel {
+class DevicePinoutListModel final : public QObject,
+                                    public slint::Model<ui::DevicePinoutData> {
   Q_OBJECT
 
 public:
-  enum Column { COLUMN_PAD, COLUMN_SIGNAL, _COLUMN_COUNT };
-
   // Constructors / Destructor
-  DevicePadSignalMapModel() = delete;
-  DevicePadSignalMapModel(const DevicePadSignalMapModel& other) = delete;
-  explicit DevicePadSignalMapModel(QObject* parent = nullptr) noexcept;
-  ~DevicePadSignalMapModel() noexcept;
+  // DevicePinoutListModel() = delete;
+  DevicePinoutListModel(const DevicePinoutListModel& other) = delete;
+  explicit DevicePinoutListModel(QObject* parent = nullptr) noexcept;
+  ~DevicePinoutListModel() noexcept;
 
-  // Setters
-  void setPadSignalMap(DevicePadSignalMap* map) noexcept;
-  void setUndoStack(UndoStack* stack) noexcept;
-  void setSignalList(const ComponentSignalList& list) noexcept;
-  void setPadList(const PackagePadList& list) noexcept;
+  // General Methods
+  void setReferences(DevicePadSignalMap* list, const PackagePadList* pads,
+                     const std::shared_ptr<ComponentSignalNameListModel>& sigs,
+                     UndoStack* stack) noexcept;
 
-  // Inherited from QAbstractItemModel
-  int rowCount(const QModelIndex& parent = QModelIndex()) const override;
-  int columnCount(const QModelIndex& parent = QModelIndex()) const override;
-  QVariant data(const QModelIndex& index,
-                int role = Qt::DisplayRole) const override;
-  QVariant headerData(int section, Qt::Orientation orientation,
-                      int role = Qt::DisplayRole) const override;
-  Qt::ItemFlags flags(const QModelIndex& index) const override;
-  bool setData(const QModelIndex& index, const QVariant& value,
-               int role = Qt::EditRole) override;
+  // Implementations
+  std::size_t row_count() const override;
+  std::optional<ui::DevicePinoutData> row_data(std::size_t i) const override;
+  void set_row_data(std::size_t i,
+                    const ui::DevicePinoutData& data) noexcept override;
 
   // Operator Overloadings
-  DevicePadSignalMapModel& operator=(
-      const DevicePadSignalMapModel& rhs) noexcept;
+  DevicePinoutListModel& operator=(const DevicePinoutListModel& rhs) = delete;
 
 private:
-  void padSignalMapEdited(
-      const DevicePadSignalMap& map, int index,
-      const std::shared_ptr<const DevicePadSignalMapItem>& item,
-      DevicePadSignalMap::Event event) noexcept;
+  ui::DevicePinoutData createItem(const DevicePadSignalMapItem& obj) noexcept;
+  void refresh() noexcept;
+  void listEdited(const DevicePadSignalMap& list, int index,
+                  const std::shared_ptr<const DevicePadSignalMapItem>& item,
+                  DevicePadSignalMap::Event event) noexcept;
   void execCmd(UndoCommand* cmd);
-  void updateComboBoxItems() noexcept;
 
-private:  // Data
-  DevicePadSignalMap* mPadSignalMap;
-  UndoStack* mUndoStack;
-  ComponentSignalList mSignals;
-  PackagePadList mPads;
-  ComboBoxDelegate::Items mComboBoxItems;
+private:
+  DevicePadSignalMap* mList;
+  const PackagePadList* mPads;
+  std::shared_ptr<ComponentSignalNameListModel> mSignals;
+  QPointer<UndoStack> mUndoStack;
+
+  QList<ui::DevicePinoutData> mItems;
 
   // Slots
   DevicePadSignalMap::OnEditedSlot mOnEditedSlot;

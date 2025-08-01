@@ -1,0 +1,24 @@
+export component WizardHeaderPanel inherits Rectangle {
+    background: #454545;
+    border-radius: 10px;
+
+    VerticalLayout {
+        padding: 8px;
+        spacing: 8px;
+
+        @children
+    }
+}
+
+export component WizardHeaderText inherits Text {
+    font-size: 12px;
+    wrap: word-wrap;
+}
+
+export component WizardHeader inherits WizardHeaderPanel {
+    in property <string> text;
+
+    WizardHeaderText {
+        text: text;
+    }
+}

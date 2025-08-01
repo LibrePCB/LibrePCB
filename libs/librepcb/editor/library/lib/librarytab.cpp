@@ -309,7 +309,7 @@ void LibraryTab::trigger(ui::TabAction a) noexcept {
             break;
           }
           case ui::LibraryTreeViewItemType::Device: {
-            emit deviceEditorRequested(mEditor, item->path);
+            emit deviceEditorRequested(mEditor, item->path, false);
             break;
           }
           default: {
@@ -858,7 +858,7 @@ void LibraryTab::duplicateElements(
       break;
     }
     case ui::LibraryTreeViewItemType::Device: {
-      mEditor.duplicateInLegacyDeviceEditor(item->path);
+      emit deviceEditorRequested(mEditor, item->path, true);
       break;
     }
     default: {

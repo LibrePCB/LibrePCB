@@ -24,6 +24,10 @@ import {
     CheckErrorsMessageBanner,
 } from "../messagebanners.slint";
 import {
+    WizardHeaderPanel,
+    WizardHeaderText,
+} from "../wizardheader.slint";
+import {
     AttributeListView,
     Button,
     IconButton,
@@ -451,32 +455,21 @@ component ComponentSignalsEditorTab inherits VerticalLayout {
 
     callback focus-rejected <=> signals-view.focus-rejected;
 
-    if !read-only: Rectangle {
-        background: #454545;
-        border-radius: 10px;
+    if !read-only: WizardHeaderPanel {
+        if tabs[index].wizard-mode: WizardHeaderText {
+            property <string> s1: @tr("Now review & correct the list of signals, if needed (often it is not needed, then just proceed).");
+            property <string> s2: @tr("If you add or remove any signals, don't forget to update the pinout afterwards (on the next step)!");
 
-        VerticalLayout {
-            padding: 8px;
-            spacing: 8px;
+            text: s1 + " " + s2;
+        }
 
-            if tabs[index].wizard-mode: Text {
-                property <string> s1: @tr("Now review & correct the list of signals, if needed (often it is not needed, then just proceed).");
-                property <string> s2: @tr("If you add or remove any signals, don't forget to update the pinout afterwards (on the next step)!");
+        WizardHeaderText {
+            property <string> s1: @tr("This signal list should represent the *electrical* interface of the component, not the *mechanical* pads.");
+            property <string> s2: @tr("For example, if an IC has two or more GND pads which are internally connected, only one GND signal should be added here.");
+            property <string> s3: @tr("Note that once the component is finished, it is *not* possible anymore to add or remove signals.");
 
-                wrap: word-wrap;
-                text: s1 + " " + s2;
-            }
-
-            Text {
-                property <string> s1: @tr("This signal list should represent the *electrical* interface of the component, not the *mechanical* pads.");
-                property <string> s2: @tr("For example, if an IC has two or more GND pads which are internally connected, only one GND signal should be added here.");
-                property <string> s3: @tr("Note that once the component is finished, it is *not* possible anymore to add or remove signals.");
-
-                font-size: 11px;
-                font-italic: true;
-                wrap: word-wrap;
-                text: @tr("Important:") + " " + s1 + " " + s2 + " " + s3;
-            }
+            font-italic: true;
+            text: @tr("Important:") + " " + s1 + " " + s2 + " " + s3;
         }
     }
 
