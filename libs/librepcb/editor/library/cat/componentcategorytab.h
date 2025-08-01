@@ -102,6 +102,9 @@ private:
   // References
   std::unique_ptr<ComponentCategory> mCategory;
 
+  // State
+  bool mChooseParent;
+
   // Library metadata to be applied
   slint::SharedString mName;
   slint::SharedString mNameError;

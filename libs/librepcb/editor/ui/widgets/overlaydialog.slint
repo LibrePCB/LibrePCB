@@ -10,6 +10,12 @@ export component OverlayDialog inherits Rectangle {
     callback accepted;
     callback rejected;
 
+    // If no accepted handler is registered, consider it as rejected so the
+    // dialog can still be closed with the Return key.
+    accepted => {
+        rejected();
+    }
+
     ta := TouchArea {
         clicked => {
             rejected();
@@ -17,6 +23,10 @@ export component OverlayDialog inherits Rectangle {
     }
 
     fs := FocusScope {
+        // We gain focus only on show, afterwards it should not be possible
+        // to move the focus with keyboard or mouse to this focus scope.
+        enabled: false;
+
         Rectangle {
             width: min(0.8 * root.width, max(self.preferred-width, 500px));
             height: min(0.8 * root.height, max(self.preferred-height, 50px));

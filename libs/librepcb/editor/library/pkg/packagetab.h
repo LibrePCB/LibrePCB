@@ -244,7 +244,7 @@ private:
   Theme::GridStyle mGridStyle;
   PositiveLength mGridInterval;
   LengthUnit mUnit;
-  bool mAddCategoryRequested;
+  bool mChooseCategory;
   std::shared_ptr<PackageModel> mCurrentModel;
   std::unique_ptr<OpenGlProjection> mOpenGlProjection;
   QHash<OpenGlObject::Type, float> mAlpha;

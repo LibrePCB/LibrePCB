@@ -202,7 +202,7 @@ private:
   Theme::GridStyle mGridStyle;
   PositiveLength mGridInterval;
   LengthUnit mUnit;
-  bool mAddCategoryRequested;
+  bool mChooseCategory;
   bool mCompactLayout;
   QPointF mSceneImagePos;
   int mFrameIndex;

@@ -218,7 +218,7 @@ PackageTab::PackageTab(LibraryEditor& editor, std::unique_ptr<Package> pkg,
                    .getBoardGridStyle()),
     mGridInterval(2540000),
     mUnit(LengthUnit::millimeters()),
-    mAddCategoryRequested(false),
+    mChooseCategory(false),
     mOpenGlProjection(new OpenGlProjection()),
     mFrameIndex(0),
     mNameParsed(mPackage->getNames().getDefaultValue()),
@@ -431,6 +431,7 @@ ui::PackageTabData PackageTab::getDerivedUiData() const noexcept {
       mDeprecated,  // Deprecated
       mCategories,  // Categories
       mCategoriesTree,  // Categories tree
+      mChooseCategory,  // Choose category
       l2s(mAssemblyType),  // Assembly type
       mPadsSorted,  // Package pads
       mNewPadName,  // New pad name
@@ -526,7 +527,7 @@ ui::PackageTabData PackageTab::getDerivedUiData() const noexcept {
       mToolZoneRules.testFlag(Zone::Rule::NoDevices),  // Tool no devices
       q2s(mSceneImagePos),  // Scene image position
       mFrameIndex,  // Frame index
-      mAddCategoryRequested ? "choose" : slint::SharedString(),  // New category
+      slint::SharedString(),  // New category
       slint::SharedString(),  // New footprint
   };
 }
@@ -565,7 +566,7 @@ void PackageTab::setDerivedUiData(const ui::PackageTabData& data) noexcept {
   if (auto uuid = Uuid::tryFromString(s2q(data.new_category))) {
     mCategories->add(*uuid);
   }
-  mAddCategoryRequested = false;
+  mChooseCategory = data.choose_category;
   if (auto at = s2assemblyType(data.assembly_type)) {
     mAssemblyType = *at;
   }
@@ -2057,7 +2058,8 @@ void PackageTab::autoFix(const MsgMissingAuthor& msg) {
 template <>
 void PackageTab::autoFix(const MsgMissingCategories& msg) {
   Q_UNUSED(msg);
-  mAddCategoryRequested = true;
+  mCurrentPageIndex = 0;
+  mChooseCategory = true;
   onDerivedUiDataChanged.notify();
 }
 

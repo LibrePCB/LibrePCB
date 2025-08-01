@@ -1,6 +1,7 @@
 import { Tab } from "../../tab.slint";
 import {
     AuthorRowHeader,
+    CategoriesChooserDialog,
     DeprecatedRowCell,
     DeprecatedRowHeader,
     DescriptionRowHeader,
@@ -14,9 +15,7 @@ import {
 import {
     IconButton,
     LineEdit,
-    Palette,
     TextEdit,
-    TreeItemPickerPopup,
 } from "../../widgets.slint";
 import {
     Backend,
@@ -165,7 +164,7 @@ component CategoryTab inherits Tab {
                 read-only: read-only;
 
                 choose-parent-clicked => {
-                    choose-parent-popup.show();
+                    tabs[index].choose-parent = true;
                 }
             }
         }
@@ -186,16 +185,20 @@ component CategoryTab inherits Tab {
         Row {
             Rectangle { }
         }
+    }
 
-        choose-parent-popup := TreeItemPickerPopup {
-            width: parent.width;
-            height: parent.height;
-            model: tabs[index].parents-tree;
-            icons-color: Palette.foreground;
+    if tabs[index].choose-parent: choose-parent-dialog := CategoriesChooserDialog {
+        width: parent.width;
+        height: parent.height;
+        model: tabs[index].parents-tree;
 
-            item-picked(idx, item) => {
-                tabs[index].new-parent = item.user-data;
-            }
+        item-picked(idx, item) => {
+            tabs[index].new-parent = item.user-data;
+            tabs[index].choose-parent = false;
+        }
+
+        rejected => {
+            tabs[index].choose-parent = false;
         }
     }
 }

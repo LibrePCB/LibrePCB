@@ -4,6 +4,7 @@ import { Tab } from "../../tab.slint";
 import {
     AttributesRowHeader,
     AuthorRowHeader,
+    CategoriesChooserDialog,
     CategoriesRowCell,
     CategoriesRowHeader,
     DatasheetRowCell,
@@ -33,11 +34,9 @@ import {
     IconButton,
     LineEdit,
     LinkText,
-    Palette,
     SlideView,
     Switch,
     TextEdit,
-    TreeItemPickerPopup,
 } from "../../widgets.slint";
 import {
     Backend,
@@ -185,7 +184,7 @@ component ComponentMetadataTab inherits GridLayout {
             accessible-label: categories-txt.text;
 
             add-triggered => {
-                add-category-popup.show();
+                tabs[index].choose-category = true;
             }
         }
     }
@@ -366,25 +365,6 @@ component ComponentMetadataTab inherits GridLayout {
 
     Row {
         Rectangle { }
-    }
-
-    // Open the category chooser when requested by the backend.
-    property <string> new-category: tabs[index].new-category;
-    changed new-category => {
-        if new-category == "choose" {
-            add-category-popup.show();
-        }
-    }
-
-    add-category-popup := TreeItemPickerPopup {
-        width: parent.width;
-        height: parent.height;
-        model: tabs[index].categories-tree;
-        icons-color: Palette.foreground;
-
-        item-picked(idx, item) => {
-            tabs[index].new-category = item.user-data;
-        }
     }
 }
 
@@ -643,6 +623,21 @@ export component ComponentTab inherits Tab {
             page-clicked(idx) => {
                 tabs[index].page-index = idx;
             }
+        }
+    }
+
+    if tabs[index].choose-category: add-category-dialog := CategoriesChooserDialog {
+        width: parent.width;
+        height: parent.height;
+        model: tabs[index].categories-tree;
+
+        item-picked(idx, item) => {
+            tabs[index].new-category = item.user-data;
+            tabs[index].choose-category = false;
+        }
+
+        rejected => {
+            tabs[index].choose-category = false;
         }
     }
 }

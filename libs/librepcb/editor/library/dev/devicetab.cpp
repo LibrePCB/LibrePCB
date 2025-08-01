@@ -89,7 +89,7 @@ DeviceTab::DeviceTab(LibraryEditor& editor, std::unique_ptr<Device> dev,
     mCurrentPageIndex(mWizardMode ? 0 : 1),
     mComponentSelected(true),
     mPackageSelected(true),
-    mAddCategoryRequested(false),
+    mChooseCategory(false),
     mNameParsed(mDevice->getNames().getDefaultValue()),
     mVersionParsed(mDevice->getVersion()),
     mCategories(new LibraryElementCategoriesModel(
@@ -274,6 +274,7 @@ ui::DeviceTabData DeviceTab::getDerivedUiData() const noexcept {
       mDeprecated,  // Deprecated
       mCategories,  // Categories
       mCategoriesTree,  // Categories tree
+      mChooseCategory,  // Choose category
       mDatasheetUrl,  // Datasheet URL
       mDatasheetUrlError,  // Datasheet URL error
       mAttributes,  // Attributes
@@ -304,7 +305,7 @@ ui::DeviceTabData DeviceTab::getDerivedUiData() const noexcept {
       q2s(mPinoutBuilder->getSignalsFilter()),  // Interactive signals filter
       mPinoutBuilder->getFilteredSignals(),  // Interactive signals
       mPinoutBuilder->getCurrentSignalIndex(),  // Interactive signal index
-      mAddCategoryRequested ? "choose" : slint::SharedString(),  // New category
+      slint::SharedString(),  // New category
   };
 }
 
@@ -331,7 +332,7 @@ void DeviceTab::setDerivedUiData(const ui::DeviceTabData& data) noexcept {
   if (auto uuid = Uuid::tryFromString(s2q(data.new_category))) {
     mCategories->add(*uuid);
   }
-  mAddCategoryRequested = false;
+  mChooseCategory = data.choose_category;
   mDatasheetUrl = data.datasheet_url;
   validateUrl(s2q(mDatasheetUrl), mDatasheetUrlError, true);
 
@@ -595,16 +596,9 @@ void DeviceTab::autoFix(const MsgMissingAuthor& msg) {
 template <>
 void DeviceTab::autoFix(const MsgMissingCategories& msg) {
   Q_UNUSED(msg);
-
-  const int delay = (mCurrentPageIndex != 0) ? 500 : 50;
   mCurrentPageIndex = 0;
-  mAddCategoryRequested = false;
+  mChooseCategory = true;
   onDerivedUiDataChanged.notify();
-
-  QTimer::singleShot(delay, this, [this]() {
-    mAddCategoryRequested = true;
-    onDerivedUiDataChanged.notify();
-  });
 }
 
 /*******************************************************************************
