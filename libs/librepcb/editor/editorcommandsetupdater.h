@@ -19,7 +19,6 @@ public:
     out.set_item_new(l2s(cmd.itemNew, out.get_item_new()));
     out.set_item_open(l2s(cmd.itemOpen, out.get_item_open()));
     out.set_save(l2s(cmd.save, out.get_save()));
-    out.set_save_all(l2s(cmd.saveAll, out.get_save_all()));
     out.set_select_all(l2s(cmd.selectAll, out.get_select_all()));
     out.set_find(l2s(cmd.find, out.get_find()));
     out.set_find_next(l2s(cmd.findNext, out.get_find_next()));
@@ -29,7 +28,6 @@ public:
     out.set_workspace_settings(l2s(cmd.workspaceSettings, out.get_workspace_settings()));
     out.set_workspace_libraries_rescan(l2s(cmd.workspaceLibrariesRescan, out.get_workspace_libraries_rescan()));
     out.set_library_manager(l2s(cmd.libraryManager, out.get_library_manager()));
-    out.set_library_element_new(l2s(cmd.libraryElementNew, out.get_library_element_new()));
     out.set_library_element_duplicate(l2s(cmd.libraryElementDuplicate, out.get_library_element_duplicate()));
     out.set_project_new(l2s(cmd.projectNew, out.get_project_new()));
     out.set_project_open(l2s(cmd.projectOpen, out.get_project_open()));
@@ -171,10 +169,6 @@ public:
     out.set_dock_drc(l2s(cmd.dockDrc, out.get_dock_drc()));
     out.set_dock_layers(l2s(cmd.dockLayers, out.get_dock_layers()));
     out.set_dock_place_devices(l2s(cmd.dockPlaceDevices, out.get_dock_place_devices()));
-    out.set_page_next(l2s(cmd.pageNext, out.get_page_next()));
-    out.set_page_previous(l2s(cmd.pagePrevious, out.get_page_previous()));
-    out.set_tab_close(l2s(cmd.tabClose, out.get_tab_close()));
-    out.set_tab_close_all(l2s(cmd.tabCloseAll, out.get_tab_close_all()));
     out.set_window_new(l2s(cmd.windowNew, out.get_window_new()));
     out.set_window_close(l2s(cmd.windowClose, out.get_window_close()));
     out.set_project_close(l2s(cmd.projectClose, out.get_project_close()));
@@ -196,7 +190,6 @@ public:
     out.set_copy_mpn_to_clipboard(l2s(cmd.copyMpnToClipboard, out.get_copy_mpn_to_clipboard()));
     out.set_open_product_website(l2s(cmd.openProductWebsite, out.get_open_product_website()));
     out.set_open_pricing_website(l2s(cmd.openPricingWebsite, out.get_open_pricing_website()));
-    out.set_helper_tools(l2s(cmd.helperTools, out.get_helper_tools()));
     // clang-format on
   }
 };

@@ -118,9 +118,6 @@ add_library(
   library/cat/categorychooserdialog.cpp
   library/cat/categorychooserdialog.h
   library/cat/categorychooserdialog.ui
-  library/cat/categorylisteditorwidget.cpp
-  library/cat/categorylisteditorwidget.h
-  library/cat/categorylisteditorwidget.ui
   library/cat/categorytreebuilder.cpp
   library/cat/categorytreebuilder.h
   library/cat/categorytreelabeltextbuilder.cpp
@@ -234,8 +231,6 @@ add_library(
   library/eaglelibraryimportwizard/eaglelibraryimportwizardpage_start.cpp
   library/eaglelibraryimportwizard/eaglelibraryimportwizardpage_start.h
   library/eaglelibraryimportwizard/eaglelibraryimportwizardpage_start.ui
-  library/editorwidgetbase.cpp
-  library/editorwidgetbase.h
   library/kicadlibraryimportwizard/kicadlibraryimportwizard.cpp
   library/kicadlibraryimportwizard/kicadlibraryimportwizard.h
   library/kicadlibraryimportwizard/kicadlibraryimportwizard.ui
@@ -269,29 +264,12 @@ add_library(
   library/librarydownload.h
   library/libraryeditor.cpp
   library/libraryeditor.h
-  library/libraryeditorlegacy.cpp
-  library/libraryeditorlegacy.h
-  library/libraryeditorlegacy.ui
   library/libraryeditortab.cpp
   library/libraryeditortab.h
   library/libraryelementcache.cpp
   library/libraryelementcache.h
   library/libraryelementcategoriesmodel.cpp
   library/libraryelementcategoriesmodel.h
-  library/newelementwizard/newelementwizard.cpp
-  library/newelementwizard/newelementwizard.h
-  library/newelementwizard/newelementwizard.ui
-  library/newelementwizard/newelementwizardcontext.cpp
-  library/newelementwizard/newelementwizardcontext.h
-  library/newelementwizard/newelementwizardpage_choosetype.cpp
-  library/newelementwizard/newelementwizardpage_choosetype.h
-  library/newelementwizard/newelementwizardpage_choosetype.ui
-  library/newelementwizard/newelementwizardpage_copyfrom.cpp
-  library/newelementwizard/newelementwizardpage_copyfrom.h
-  library/newelementwizard/newelementwizardpage_copyfrom.ui
-  library/newelementwizard/newelementwizardpage_entermetadata.cpp
-  library/newelementwizard/newelementwizardpage_entermetadata.h
-  library/newelementwizard/newelementwizardpage_entermetadata.ui
   library/pkg/footprintclipboarddata.cpp
   library/pkg/footprintclipboarddata.h
   library/pkg/footprintgraphicsitem.cpp
@@ -419,8 +397,6 @@ add_library(
   modelview/partinformationdelegate.h
   modelview/pathmodel.cpp
   modelview/pathmodel.h
-  modelview/sortfilterproxymodel.cpp
-  modelview/sortfilterproxymodel.h
   notification.cpp
   notification.h
   notificationsmodel.cpp
@@ -826,8 +802,6 @@ add_library(
   utils/dismissablemessagecontext.h
   utils/editortoolbox.cpp
   utils/editortoolbox.h
-  utils/exclusiveactiongroup.cpp
-  utils/exclusiveactiongroup.h
   utils/lengtheditcontext.cpp
   utils/lengtheditcontext.h
   utils/measuretool.cpp
@@ -849,8 +823,6 @@ add_library(
   utils/uihelpers.cpp
   utils/uihelpers.h
   utils/uiobjectlist.h
-  utils/undostackactiongroup.cpp
-  utils/undostackactiongroup.h
   widgets/alignmentselector.cpp
   widgets/alignmentselector.h
   widgets/alignmentselector.ui
@@ -888,20 +860,10 @@ add_library(
   widgets/openglview.h
   widgets/patheditorwidget.cpp
   widgets/patheditorwidget.h
-  widgets/plaintextedit.cpp
-  widgets/plaintextedit.h
   widgets/positivelengthedit.cpp
   widgets/positivelengthedit.h
   widgets/ratioedit.cpp
   widgets/ratioedit.h
-  widgets/rulechecklistwidget.cpp
-  widgets/rulechecklistwidget.h
-  widgets/searchtoolbar.cpp
-  widgets/searchtoolbar.h
-  widgets/statusbar.cpp
-  widgets/statusbar.h
-  widgets/tabwidget.cpp
-  widgets/tabwidget.h
   widgets/unsignedlengthedit.cpp
   widgets/unsignedlengthedit.h
   widgets/unsignedlimitedratioedit.cpp

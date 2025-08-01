@@ -898,7 +898,7 @@ void AddComponentDialog::addPartItem(std::shared_ptr<Part> part,
   }
 
   QTreeWidgetItem* item = new QTreeWidgetItem(parent);
-  item->setIcon(0, QIcon(":/img/library/part.png"));
+  item->setIcon(0, EditorToolbox::svgIcon(":/fa/solid/cart-shopping.svg"));
   item->setText(0, text);
   item->setText(1, part->getAttributeValuesTr().join(", "));
   item->setToolTip(1, part->getAttributeKeyValuesTr().join("\n"));

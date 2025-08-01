@@ -271,7 +271,6 @@ export component Board2dTab inherits Tab {
 
             tool-select-btn := ToolButton {
                 cmd: Cmd.tool-select;
-                icon: @image-url("../../../../../font-awesome/svgs/solid/arrow-pointer.svg");
                 checked: tabs[index].tool == EditorTool.select;
 
                 clicked => {
@@ -300,7 +299,6 @@ export component Board2dTab inherits Tab {
 
             tool-polygon-btn := ToolButton {
                 cmd: Cmd.tool-polygon;
-                icon: @image-url("../../../../../font-awesome/svgs/solid/draw-polygon.svg");
                 checked: tabs[index].tool == EditorTool.polygon;
 
                 clicked => {
@@ -310,7 +308,6 @@ export component Board2dTab inherits Tab {
 
             tool-text-btn := ToolButton {
                 cmd: Cmd.tool-text;
-                icon: @image-url("../../../../../font-awesome/svgs/solid/font.svg");
                 checked: tabs[index].tool == EditorTool.text;
 
                 clicked => {
@@ -329,7 +326,6 @@ export component Board2dTab inherits Tab {
 
             tool-hole-btn := ToolButton {
                 cmd: Cmd.tool-hole;
-                icon: @image-url("../../../../../font-awesome/svgs/solid/bore-hole.svg");
                 checked: tabs[index].tool == EditorTool.hole;
 
                 clicked => {
@@ -339,7 +335,6 @@ export component Board2dTab inherits Tab {
 
             tool-zone-btn := ToolButton {
                 cmd: Cmd.tool-zone;
-                icon: @image-url("../../../../../bootstrap-icons/icons/sign-stop.svg");
                 checked: tabs[index].tool == EditorTool.zone;
 
                 clicked => {
@@ -349,7 +344,6 @@ export component Board2dTab inherits Tab {
 
             tool-measure-btn := ToolButton {
                 cmd: Cmd.tool-measure;
-                icon: @image-url("../../../../../font-awesome/svgs/solid/ruler.svg");
                 checked: tabs[index].tool == EditorTool.measure;
 
                 clicked => {

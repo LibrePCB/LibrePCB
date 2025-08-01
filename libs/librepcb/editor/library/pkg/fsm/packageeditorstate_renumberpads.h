@@ -39,6 +39,7 @@ class PackagePad;
 namespace editor {
 
 class FootprintPadGraphicsItem;
+class UndoCommandGroup;
 
 /*******************************************************************************
  *  Class PackageEditorState_ReNumberPads

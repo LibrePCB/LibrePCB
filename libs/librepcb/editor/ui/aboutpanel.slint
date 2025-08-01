@@ -230,18 +230,11 @@ export component AboutPanel inherits Rectangle {
                 }
             }
 
-            if is-wide && (available-space > 660px): Text {
+            if is-wide && (available-space > 620px): Text {
                 wrap: word-wrap;
                 font-italic: true;
                 font-size: 11px;
                 text: "This project is funded through the NGI0 Commons Fund, a fund established by NLnet with financial support from the European Commission’s Next Generation Internet programme, under the aegis of DG Communications Networks, Content and Technology under grant agreement No 101135429.";
-            }
-
-            if is-wide && (available-space > 570px): Text {
-                wrap: word-wrap;
-                font-italic: true;
-                font-size: 11px;
-                text: "Some of the icons used in LibrePCB are provided by icons8.com, thank you!";
             }
         }
 

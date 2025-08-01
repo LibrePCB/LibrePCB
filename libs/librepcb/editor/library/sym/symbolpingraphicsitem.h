@@ -33,10 +33,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class Component;
-class ComponentSymbolVariantItem;
-
 namespace editor {
 
 class GraphicsLayerList;

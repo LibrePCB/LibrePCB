@@ -24,6 +24,7 @@
 
 #include "../../../cmd/cmdcircleedit.h"
 #include "../../../graphics/circlegraphicsitem.h"
+#include "../../../undostack.h"
 #include "../footprintgraphicsitem.h"
 
 #include <librepcb/core/library/pkg/footprint.h>

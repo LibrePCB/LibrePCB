@@ -23,6 +23,7 @@
 #include "symboleditorstate_addpins.h"
 
 #include "../../../dialogs/circuitidentifierimportdialog.h"
+#include "../../../undostack.h"
 #include "../../cmd/cmdsymbolpinedit.h"
 #include "../symbolclipboarddata.h"
 #include "../symbolgraphicsitem.h"

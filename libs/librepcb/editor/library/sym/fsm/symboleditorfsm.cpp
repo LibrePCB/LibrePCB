@@ -72,42 +72,6 @@ SymbolEditorFsm::~SymbolEditorFsm() noexcept {
 }
 
 /*******************************************************************************
- *  Getters
- ******************************************************************************/
-
-EditorWidgetBase::Tool SymbolEditorFsm::getCurrentTool() const noexcept {
-  switch (mCurrentState) {
-    case State::IDLE:
-      return EditorWidgetBase::Tool::NONE;
-    case State::SELECT:
-      return EditorWidgetBase::Tool::SELECT;
-    case State::ADD_PINS:
-      return EditorWidgetBase::Tool::ADD_PINS;
-    case State::ADD_NAMES:
-      return EditorWidgetBase::Tool::ADD_NAMES;
-    case State::ADD_VALUES:
-      return EditorWidgetBase::Tool::ADD_VALUES;
-    case State::DRAW_LINE:
-      return EditorWidgetBase::Tool::DRAW_LINE;
-    case State::DRAW_ARC:
-      return EditorWidgetBase::Tool::DRAW_ARC;
-    case State::DRAW_RECT:
-      return EditorWidgetBase::Tool::DRAW_RECT;
-    case State::DRAW_POLYGON:
-      return EditorWidgetBase::Tool::DRAW_POLYGON;
-    case State::DRAW_CIRCLE:
-      return EditorWidgetBase::Tool::DRAW_CIRCLE;
-    case State::DRAW_TEXT:
-      return EditorWidgetBase::Tool::DRAW_TEXT;
-    case State::MEASURE:
-      return EditorWidgetBase::Tool::MEASURE;
-    default:
-      Q_ASSERT(false);
-      return EditorWidgetBase::Tool::NONE;
-  }
-}
-
-/*******************************************************************************
  *  Event Handlers
  ******************************************************************************/
 
