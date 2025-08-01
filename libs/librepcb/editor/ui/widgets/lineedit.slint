@@ -81,7 +81,7 @@ export component LineEdit inherits Rectangle {
             edt.has-focus ? #ff0000 : #900000
         } else if edt.has-focus {
             Constants.librepcb-color
-        } else if enabled {
+        } else if enabled && (!read-only) {
             #606060
         } else {
             transparent

@@ -26,6 +26,9 @@ export component AttributeListView inherits ScrollView {
     preferred-width: l.preferred-width;
     preferred-height: l.preferred-height;
     mouse-drag-pan-enabled: true;
+    // Hide ugly borders if the table is empty but the paren'ts layout
+    // enforces a high larger than the preferred height of 0px.
+    visible: model.length > (read-only ? 1 : 0);
 
     pure function is-last-row(idx: int) -> bool {
         idx == (model.length - 1)
