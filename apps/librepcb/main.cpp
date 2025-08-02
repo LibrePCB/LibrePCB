@@ -283,25 +283,33 @@ static bool isFileFormatStableOrAcceptUnstable() noexcept {
  ******************************************************************************/
 
 static int openWorkspace(FilePath& path) {
-  InitializeWorkspaceWizard wizard(false);
-  wizard.setWorkspacePath(path);  // can throw
-  while (wizard.getNeedsToBeShown()) {
-    if (wizard.exec() != QDialog::Accepted) {
+  // Run initialize workspace wizard as many times as needed until a valid
+  // workspace is selected.
+  std::unique_ptr<InitializeWorkspaceWizard> wizard(
+      new InitializeWorkspaceWizard(false));
+  wizard->setWorkspacePath(path);  // can throw
+  while (wizard->getNeedsToBeShown()) {
+    if (wizard->exec() != QDialog::Accepted) {
       throw UserCanceled(__FILE__, __LINE__);
     }
-    Workspace::setMostRecentlyUsedWorkspacePath(wizard.getWorkspacePath());
+    Workspace::setMostRecentlyUsedWorkspacePath(wizard->getWorkspacePath());
 
     // Just to be on the safe side that the workspace is now *really* ready
     // to open (created, upgraded, initialized, ...), check the status again
     // before continue opening the workspace.
-    wizard.setWorkspacePath(wizard.getWorkspacePath());  // can throw
-    wizard.restart();
+    wizard->setWorkspacePath(wizard->getWorkspacePath());  // can throw
+    wizard->restart();
   }
 
   // Open the workspace (can throw). If it is locked, a dialog will show
   // an error and possibly provides an option to override the lock.
-  Workspace ws(wizard.getWorkspacePath(), wizard.getDataDir(),
+  Workspace ws(wizard->getWorkspacePath(), wizard->getDataDir(),
                DirectoryLockHandlerDialog::createDirectoryLockCallback());
+
+  // We don't need the wizard anymore (and it disturbes the Funq tests).
+  const bool wsContainsNewerFileFormats =
+      wizard->getWorkspaceContainsNewerFileFormats();
+  wizard.reset();
 
   // Now since workspace settings are loaded, switch to the locale defined
   // there (until now, the system locale was used).
@@ -343,7 +351,7 @@ static int openWorkspace(FilePath& path) {
                    &ws.getSettings().keyboardShortcuts, applyKeyboardShortcuts);
 
   // Run the application.
-  GuiApplication app(ws, wizard.getWorkspaceContainsNewerFileFormats());
+  GuiApplication app(ws, wsContainsNewerFileFormats);
   app.exec();
   return 0;
 }
