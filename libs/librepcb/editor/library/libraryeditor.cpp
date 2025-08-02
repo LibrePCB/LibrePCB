@@ -25,9 +25,9 @@
 #include "../guiapplication.h"
 #include "../undostack.h"
 #include "../utils/slinthelpers.h"
-#include "libraryeditorlegacy.h"
 #include "libraryeditortab.h"
 
+#include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/library/library.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
@@ -55,10 +55,7 @@ LibraryEditor::LibraryEditor(GuiApplication& app, std::unique_ptr<Library> lib,
     mLibrary(std::move(lib)),
     mUiIndex(uiIndex),
     mUndoStack(new UndoStack()),
-    mManualModificationsMade(false),
-    mLegacyEditor(
-        new LibraryEditorLegacy(app.getWorkspace(), *mLibrary,
-                                !mLibrary->getDirectory().isWritable())) {
+    mManualModificationsMade(false) {
   connect(mUndoStack.get(), &UndoStack::stateModified, this,
           [this]() { onUiDataChanged.notify(); });
 }
@@ -108,11 +105,6 @@ void LibraryEditor::setUiData(const ui::LibraryData& data) noexcept {
 }
 
 bool LibraryEditor::requestClose() noexcept {
-  // Check legacy editor changes.
-  if (!mLegacyEditor->requestClose()) {
-    return false;
-  }
-
   // Check all opened tabs first.
   for (auto tab : mRegisteredTabs) {
     Q_ASSERT(tab);
@@ -183,27 +175,12 @@ void LibraryEditor::unregisterTab(LibraryEditorTab& tab) noexcept {
 }
 
 void LibraryEditor::forceClosingTabs(const QSet<FilePath>& fp) noexcept {
-  mLegacyEditor->forceCloseTabs(fp);
   for (auto tab : mRegisteredTabs) {
     Q_ASSERT(tab);
     if (tab && (fp.contains(tab->getDirectoryPath()))) {
       tab->closeEnforced();
     }
   }
-}
-
-void LibraryEditor::openLegacyDeviceEditor(const FilePath& fp) noexcept {
-  mLegacyEditor->show();
-  mLegacyEditor->raise();
-  mLegacyEditor->activateWindow();
-  mLegacyEditor->openDevice(fp);
-}
-
-void LibraryEditor::duplicateInLegacyDeviceEditor(const FilePath& fp) noexcept {
-  mLegacyEditor->show();
-  mLegacyEditor->raise();
-  mLegacyEditor->activateWindow();
-  mLegacyEditor->duplicateDevice(fp);
 }
 
 /*******************************************************************************

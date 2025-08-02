@@ -59,7 +59,6 @@ component QuickAccessListView inherits TreeView {
 
         open-item := MenuItem {
             cmd: Cmd.item-open;
-            icon: @image-url("../../../font-awesome/svgs/solid/folder-open.svg");
             status-tip: @tr("Open the project");  // More specific.
             shortcuts: "⏎";  // Hardcoded in the UI.
             default: true;
@@ -137,7 +136,6 @@ component WorkspaceFolderTreeView inherits TreeView {
 
         open-item := MenuItem {
             cmd: Cmd.item-open;
-            icon: @image-url("../../../font-awesome/svgs/solid/folder-open.svg");
             status-tip: @tr("Open the file or project");  // More specific.
             shortcuts: "⏎";  // Hardcoded in the UI.
             default: true;

@@ -94,7 +94,7 @@ public:
       "item_open",  // clang-format break
       QT_TR_NOOP("Open"),
       QT_TR_NOOP("Open the selected item(s)"),
-      ":/img/actions/open.png",
+      ":/fa/solid/folder-open.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_Return)},
       &categoryEditor,
@@ -103,12 +103,12 @@ public:
       "save",  // clang-format break
       QT_TR_NOOP("Save"),
       QT_TR_NOOP("Save changes to filesystem"),
-      ":/img/actions/save.png",
+      ":/bi/floppy-fill.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::CTRL | Qt::Key_S)},
       &categoryEditor,
   };
-  EditorCommand saveAll{
+  EditorCommand _saveAll{
       "save_all",  // clang-format break
       QT_TR_NOOP("Save All"),
       QT_TR_NOOP("Save all elements to filesystem"),
@@ -121,7 +121,7 @@ public:
       "select_all",  // clang-format break
       QT_TR_NOOP("Select All"),
       QT_TR_NOOP("Select all visible objects"),
-      ":/img/actions/select_all.png",
+      ":/fa/solid/object-group.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::CTRL | Qt::Key_A)},
       &categoryEditor,
@@ -157,7 +157,7 @@ public:
       "file_manager",  // clang-format break
       QT_TR_NOOP("Show in File Manager"),
       QT_TR_NOOP("Open the directory in the file manager"),
-      ":/img/places/folder.png",
+      ":/fa/solid/arrow-up-right-from-square.svg",
       EditorCommand::Flags(),
       {},
       &categoryEditor,
@@ -184,7 +184,7 @@ public:
       "workspace_libraries_rescan",  // clang-format break
       QT_TR_NOOP("Rescan Libraries"),
       QT_TR_NOOP("Scan all workspace libraries to update the cache"),
-      ":/img/actions/refresh.png",
+      ":/fa/solid/arrows-rotate.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_F5)},
       &categoryEditor,
@@ -198,20 +198,20 @@ public:
       {QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_M)},
       &categoryEditor,
   };
-  EditorCommand libraryElementNew{
-      "library_element_new",  // clang-format break
-      QT_TR_NOOP("New Library Element"),
-      QT_TR_NOOP("Create a new library element"),
-      ":/img/actions/new.png",
-      EditorCommand::Flag::OpensPopup,
-      {QKeySequence(Qt::CTRL | Qt::Key_N)},
-      &categoryEditor,
-  };
+  // EditorCommand libraryElementNew{
+  //     "library_element_new",  // clang-format break
+  //     QT_TR_NOOP("New Library Element"),
+  //     QT_TR_NOOP("Create a new library element"),
+  //     ":/img/actions/new.png",
+  //     EditorCommand::Flag::OpensPopup,
+  //     {QKeySequence(Qt::CTRL | Qt::Key_N)},
+  //     &categoryEditor,
+  // };
   EditorCommand libraryElementDuplicate{
       "library_element_duplicate",  // clang-format break
       QT_TR_NOOP("Duplicate"),
       QT_TR_NOOP("Create a new element by duplicating this one"),
-      ":/img/actions/clone.png",
+      ":/fa/solid/clone.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::CTRL | Qt::Key_D)},
       &categoryEditor,
@@ -256,7 +256,7 @@ public:
       "grid_properties",  // clang-format break
       QT_TR_NOOP("Grid Properties"),
       QT_TR_NOOP("View/modify the grid properties"),
-      ":/img/actions/grid.png",
+      ":/bi/grid-3x3.svg",
       EditorCommand::Flag::OpensPopup,
       {QKeySequence(Qt::Key_F4)},
       &categoryEditor,
@@ -413,7 +413,7 @@ public:
       "input_unit_change",  // clang-format break
       QT_TR_NOOP("Change Unit"),
       QT_TR_NOOP("Change the measurement unit of the text input"),
-      ":/img/actions/ruler.png",
+      ":/fa/solid/ruler.svg",
       EditorCommand::Flag::OpensPopup,
       {QKeySequence(Qt::CTRL | Qt::Key_M)},
       &categoryTextInput,
@@ -506,7 +506,7 @@ public:
       "export_image",  // clang-format break
       QT_TR_NOOP("Export Image"),
       QT_TR_NOOP("Export graphics as a pixmap"),
-      ":/img/actions/export_pixmap.png",
+      ":/bi/image.svg",
       EditorCommand::Flag::OpensPopup,
       {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_I)},
       &categoryImportExport,
@@ -515,7 +515,7 @@ public:
       "export_pdf",  // clang-format break
       QT_TR_NOOP("Export PDF"),
       QT_TR_NOOP("Export graphics as a PDF"),
-      ":/img/actions/pdf.png",
+      ":/fa/solid/file-pdf.svg",
       EditorCommand::Flag::OpensPopup,
       {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_P)},
       &categoryImportExport,
@@ -542,7 +542,7 @@ public:
       "print",  // clang-format break
       QT_TR_NOOP("Print"),
       QT_TR_NOOP("Send graphics to a printer"),
-      ":/img/actions/print.png",
+      ":/bi/printer-fill.svg",
       EditorCommand::Flag::OpensPopup,
       {QKeySequence(Qt::CTRL | Qt::Key_P)},
       &categoryImportExport,
@@ -608,7 +608,7 @@ public:
       "undo",  // clang-format break
       QT_TR_NOOP("Undo"),
       QT_TR_NOOP("Revert the last modification"),
-      ":/img/actions/undo.png",
+      ":/fa/solid/rotate-left.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::CTRL | Qt::Key_Z)},
       &categoryModify,
@@ -617,7 +617,7 @@ public:
       "redo",  // clang-format break
       QT_TR_NOOP("Redo"),
       QT_TR_NOOP("Re-apply the last reverted modification"),
-      ":/img/actions/redo.png",
+      ":/fa/solid/rotate-right.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::CTRL | Qt::Key_Y),
        QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_Z)},
@@ -727,7 +727,7 @@ public:
       QT_TR_NOOP("Flip Horizontally"),
       QT_TR_NOOP(
           "Flip the selected object(s) horizontally to the other board side"),
-      ":/img/actions/flip_horizontal.png",
+      ":/img/arrow-right-left-across-line.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_F)},
       &categoryModify,
@@ -737,7 +737,7 @@ public:
       QT_TR_NOOP("Flip Vertically"),
       QT_TR_NOOP(
           "Flip the selected object(s) vertically to the other board side"),
-      ":/img/actions/flip_vertical.png",
+      ":/fa/solid/arrow-down-up-across-line.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::SHIFT | Qt::Key_F)},
       &categoryModify,
@@ -832,7 +832,7 @@ public:
       "zoom_fit_content",  // clang-format break
       QT_TR_NOOP("Zoom to Fit Contents"),
       QT_TR_NOOP("Set the zoom level to fit the whole content"),
-      ":/img/actions/zoom_all.png",
+      ":/fa/solid/expand.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::CTRL | Qt::Key_Home)},
       &categoryView,
@@ -841,7 +841,7 @@ public:
       "zoom_in",  // clang-format break
       QT_TR_NOOP("Zoom In"),
       QT_TR_NOOP("Increase the zoom level"),
-      ":/img/actions/zoom_in.png",
+      ":/bi/zoom-in.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::CTRL | Qt::Key_Plus)},
       &categoryView,
@@ -850,7 +850,7 @@ public:
       "zoom_out",  // clang-format break
       QT_TR_NOOP("Zoom Out"),
       QT_TR_NOOP("Decrease the zoom level"),
-      ":/img/actions/zoom_out.png",
+      ":/bi/zoom-out.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::CTRL | Qt::Key_Minus)},
       &categoryView,
@@ -859,7 +859,7 @@ public:
       "grid_increase",  // clang-format break
       QT_TR_NOOP("Increase Grid Interval"),
       QT_TR_NOOP("Increase the grid interval"),
-      QString(),
+      ":/fa/solid/caret-up.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_Plus)},
       &categoryView,
@@ -868,7 +868,7 @@ public:
       "grid_decrease",  // clang-format break
       QT_TR_NOOP("Decrease Grid Interval"),
       QT_TR_NOOP("Decrease the grid interval"),
-      QString(),
+      ":/fa/solid/caret-down.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_Minus)},
       &categoryView,
@@ -895,7 +895,7 @@ public:
       "toggle_background_image",  // clang-format break
       QT_TR_NOOP("Set/Unset Background Image"),
       QT_TR_NOOP("Use a datasheet drawing as the background for verification"),
-      ":/img/actions/export_pixmap.png",
+      ":/bi/image.svg",
       EditorCommand::Flag::OpensPopup,
       {},
       &categoryView,
@@ -904,7 +904,7 @@ public:
       "toggle_3d",  // clang-format break
       QT_TR_NOOP("Toggle 2D/3D Mode"),
       QT_TR_NOOP("Switch between 2D and 3D viewer mode"),
-      ":/img/actions/view_3d.png",
+      ":/bi/badge-3d.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::CTRL | Qt::Key_3)},
       &categoryView,
@@ -916,7 +916,7 @@ public:
       "tool_select",  // clang-format break
       QT_TR_NOOP("Select"),
       QT_TR_NOOP("Select & modify existing objects"),
-      ":/img/actions/select.png",
+      ":/fa/solid/arrow-pointer.svg",
       EditorCommand::Flags(),
       {},
       &categoryTools,
@@ -925,7 +925,7 @@ public:
       "tool_line",  // clang-format break
       QT_TR_NOOP("Draw Line"),
       QT_TR_NOOP("Draw graphical lines"),
-      ":/img/actions/draw_line.png",
+      ":/img/actions/draw_wire.png",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_L)},
       &categoryTools,
@@ -934,7 +934,7 @@ public:
       "tool_rect",  // clang-format break
       QT_TR_NOOP("Draw Rectangle"),
       QT_TR_NOOP("Draw graphical rectangles"),
-      ":/img/actions/draw_rectangle.png",
+      ":/fa/solid/vector-square.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_G)},
       &categoryTools,
@@ -943,7 +943,7 @@ public:
       "tool_polygon",  // clang-format break
       QT_TR_NOOP("Draw Polygon"),
       QT_TR_NOOP("Draw graphical polygons"),
-      ":/img/actions/draw_polygon.png",
+      ":/fa/solid/draw-polygon.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_P)},
       &categoryTools,
@@ -952,7 +952,7 @@ public:
       "tool_circle",  // clang-format break
       QT_TR_NOOP("Draw Circle"),
       QT_TR_NOOP("Draw graphical circles"),
-      ":/img/actions/draw_circle.png",
+      ":/bi/circle.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_C)},
       &categoryTools,
@@ -961,7 +961,7 @@ public:
       "tool_arc",  // clang-format break
       QT_TR_NOOP("Draw Arc"),
       QT_TR_NOOP("Draw graphical arcs"),
-      ":/img/actions/draw_arc.png",
+      ":/fa/solid/circle-notch.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::SHIFT | Qt::Key_C)},
       &categoryTools,
@@ -970,7 +970,7 @@ public:
       "tool_text",  // clang-format break
       QT_TR_NOOP("Add Text"),
       QT_TR_NOOP("Add graphical text objects"),
-      ":/img/actions/add_text.png",
+      ":/fa/solid/font.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_T)},
       &categoryTools,
@@ -1078,7 +1078,7 @@ public:
       "tool_zone",  // clang-format break
       QT_TR_NOOP("Draw Keepout Zone"),
       QT_TR_NOOP("Draw keep-out zones"),
-      ":/img/actions/draw_zone.png",
+      ":/bi/sign-stop.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_Z)},
       &categoryTools,
@@ -1087,7 +1087,7 @@ public:
       "tool_hole",  // clang-format break
       QT_TR_NOOP("Add Hole"),
       QT_TR_NOOP("Add non-plated holes (NPTH drills)"),
-      ":/img/actions/add_hole.png",
+      ":/fa/solid/bore-hole.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_O)},
       &categoryTools,
@@ -1151,7 +1151,7 @@ public:
       "tool_generate_outline",  // clang-format break
       QT_TR_NOOP("Generate Outline"),
       QT_TR_NOOP("Automatically generate the outline polygon"),
-      ":/img/actions/wizard.png",
+      ":/fa/solid/wand-magic-sparkles.svg",
       EditorCommand::Flags(),
       {},
       &categoryTools,
@@ -1160,7 +1160,7 @@ public:
       "tool_generate_courtyard",  // clang-format break
       QT_TR_NOOP("Generate Courtyard"),
       QT_TR_NOOP("Automatically generate the courtyard polygon"),
-      ":/img/actions/wizard.png",
+      ":/fa/solid/wand-magic-sparkles.svg",
       EditorCommand::Flag::OpensPopup,
       {},
       &categoryTools,
@@ -1169,7 +1169,7 @@ public:
       "tool_renumber_pads",  // clang-format break
       QT_TR_NOOP("Re-Number Pads"),
       QT_TR_NOOP("Helper tool to interactively change pad numbers"),
-      ":/img/actions/wizard.png",
+      ":/fa/solid/wand-magic-sparkles.svg",
       EditorCommand::Flag::OpensPopup,
       {},
       &categoryTools,
@@ -1178,7 +1178,7 @@ public:
       "tool_measure",  // clang-format break
       QT_TR_NOOP("Measure Distance"),
       QT_TR_NOOP("Measure the distance between two points"),
-      ":/img/actions/ruler.png",
+      ":/fa/solid/ruler.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::CTRL | Qt::Key_M)},
       &categoryTools,
@@ -1199,7 +1199,7 @@ public:
       "abort",  // clang-format break
       QT_TR_NOOP("Abort Command"),
       QT_TR_NOOP("Abort the currently active command"),
-      ":/img/actions/stop.png",
+      QString(),
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_Escape)},
       &categoryCommands,
@@ -1226,7 +1226,7 @@ public:
       "line_width_increase",  // clang-format break
       QT_TR_NOOP("Increase Line Width"),
       QT_TR_NOOP("Increase the line/trace/stroke/pad width"),
-      QString(),
+      ":/fa/solid/caret-up.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_Plus)},
       &categoryCommands,
@@ -1235,7 +1235,7 @@ public:
       "line_width_decrease",  // clang-format break
       QT_TR_NOOP("Decrease Line Width"),
       QT_TR_NOOP("Decrease the line/trace/stroke/pad width"),
-      QString(),
+      ":/fa/solid/caret-down.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_Minus)},
       &categoryCommands,
@@ -1305,54 +1305,54 @@ public:
   };
   EditorCommand alignHorizontalLeft{
       "align_horizontal_left",  // clang-format break
-      QT_TR_NOOP("Align Left"),
+      QT_TR_NOOP("Align Left"),  // clang-format break
       QT_TR_NOOP("Horizontal alignment: Left"),
-      ":/img/command_toolbars/align_horizontal_left.png",
+      ":/fa/solid/align-left.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_1)},
       &categoryCommands,
   };
   EditorCommand alignHorizontalCenter{
       "align_horizontal_center",  // clang-format break
-      QT_TR_NOOP("Align Center"),
+      QT_TR_NOOP("Align Center"),  // clang-format break
       QT_TR_NOOP("Horizontal alignment: Center"),
-      ":/img/command_toolbars/align_horizontal_center.png",
+      ":/fa/solid/align-center.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_2)},
       &categoryCommands,
   };
   EditorCommand alignHorizontalRight{
       "align_horizontal_right",  // clang-format break
-      QT_TR_NOOP("Align Right"),
+      QT_TR_NOOP("Align Right"),  // clang-format break
       QT_TR_NOOP("Horizontal alignment: Right"),
-      ":/img/command_toolbars/align_horizontal_right.png",
+      ":/fa/solid/align-right.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_3)},
       &categoryCommands,
   };
   EditorCommand alignVerticalBottom{
       "align_vertical_bottom",  // clang-format break
-      QT_TR_NOOP("Align Bottom"),
+      QT_TR_NOOP("Align Bottom"),  // clang-format break
       QT_TR_NOOP("Vertical alignment: Bottom"),
-      ":/img/command_toolbars/align_vertical_bottom.png",
+      ":/bi/align-bottom.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_4)},
       &categoryCommands,
   };
   EditorCommand alignVerticalCenter{
       "align_vertical_center",  // clang-format break
-      QT_TR_NOOP("Align Center"),
+      QT_TR_NOOP("Align Center"),  // clang-format break
       QT_TR_NOOP("Vertical alignment: Center"),
-      ":/img/command_toolbars/align_vertical_center.png",
+      ":/bi/align-center.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_5)},
       &categoryCommands,
   };
   EditorCommand alignVerticalTop{
       "align_vertical_top",  // clang-format break
-      QT_TR_NOOP("Align Top"),
+      QT_TR_NOOP("Align Top"),  // clang-format break
       QT_TR_NOOP("Vertical alignment: Top"),
-      ":/img/command_toolbars/align_vertical_top.png",
+      ":/bi/align-top.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_6)},
       &categoryCommands,
@@ -1408,7 +1408,7 @@ public:
       "shape_round",  // clang-format break
       QT_TR_NOOP("Round"),
       QT_TR_NOOP("Shape: Round"),
-      ":/img/command_toolbars/shape_round.png",
+      ":/fa/solid/circle.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_1)},
       &categoryCommands,
@@ -1417,7 +1417,7 @@ public:
       "shape_rounded_rect",  // clang-format break
       QT_TR_NOOP("Rounded Rectangle"),
       QT_TR_NOOP("Shape: Rounded Rectangle"),
-      ":/img/command_toolbars/shape_rounded_rect.png",
+      ":/fa/solid/square.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_2)},
       &categoryCommands,
@@ -1426,16 +1426,16 @@ public:
       "shape_rect",  // clang-format break
       QT_TR_NOOP("Rectangle"),
       QT_TR_NOOP("Shape: Rectangle"),
-      ":/img/command_toolbars/shape_rect.png",
+      ":/fa/solid/square-full.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_3)},
       &categoryCommands,
   };
   EditorCommand shapeOctagon{
       "shape_octagon",  // clang-format break
-      QT_TR_NOOP("Octagon"),
+      QT_TR_NOOP("Octagon"),  // clang-format break
       QT_TR_NOOP("Shape: Octagon"),
-      ":/img/command_toolbars/shape_octagon.png",
+      ":/bi/octagon-fill.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_4)},
       &categoryCommands,
@@ -1549,7 +1549,7 @@ public:
   EditorCommandCategory categoryWindowManagement{
       "categoryWindowManagement", QT_TR_NOOP("Window Management"), true,
       &categoryRoot};
-  EditorCommand pageNext{
+  EditorCommand _pageNext{
       "page_next",  // clang-format break
       QT_TR_NOOP("Next Tab/Page"),
       QT_TR_NOOP("Navigate to the next tab or page"),
@@ -1558,7 +1558,7 @@ public:
       {QKeySequence(Qt::CTRL | Qt::Key_Tab)},
       &categoryWindowManagement,
   };
-  EditorCommand pagePrevious{
+  EditorCommand _pagePrevious{
       "page_previous",  // clang-format break
       QT_TR_NOOP("Previous Tab/Page"),
       QT_TR_NOOP("Navigate to the previous tab or page"),
@@ -1567,7 +1567,7 @@ public:
       {QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_Tab)},
       &categoryWindowManagement,
   };
-  EditorCommand tabClose{
+  EditorCommand _tabClose{
       "tab_close",  // clang-format break
       QT_TR_NOOP("Close Tab"),
       QT_TR_NOOP("Close the currently opened tab"),
@@ -1576,7 +1576,7 @@ public:
       {QKeySequence(Qt::CTRL | Qt::Key_W)},
       &categoryWindowManagement,
   };
-  EditorCommand tabCloseAll{
+  EditorCommand _tabCloseAll{
       "tab_close_all",  // clang-format break
       QT_TR_NOOP("Close All Tabs"),
       QT_TR_NOOP("Close all currently opened tabs"),
@@ -1626,7 +1626,7 @@ public:
       "application_quit",  // clang-format break
       QT_TR_NOOP("Quit"),
       QT_TR_NOOP("Close the whole application"),
-      ":/img/actions/quit.png",
+      ":/bi/box-arrow-left.svg",
       EditorCommand::Flag::QuitRole,
       {QKeySequence(Qt::CTRL | Qt::Key_Q)},
       &categoryWindowManagement,
@@ -1638,7 +1638,7 @@ public:
       "about_librepcb",  // clang-format break
       QT_TR_NOOP("About LibrePCB"),
       QT_TR_NOOP("Show information about the application"),
-      ":/img/logo/48x48.png",
+      ":/bi/question-circle.svg",
       EditorCommand::Flag::AboutRole,
       {},
       &categoryHelp,
@@ -1656,7 +1656,7 @@ public:
       "website",  // clang-format break
       QT_TR_NOOP("LibrePCB Website"),
       QT_TR_NOOP("Open the LibrePCB website in the web browser"),
-      ":/img/actions/open_browser.png",
+      ":/fa/solid/globe.svg",
       EditorCommand::Flags(),
       {},
       &categoryHelp,
@@ -1665,7 +1665,7 @@ public:
       "documentation_online",  // clang-format break
       QT_TR_NOOP("User Manual && Tutorials"),
       QT_TR_NOOP("Open the online user manual in the web browser"),
-      ":/img/actions/help.png",
+      ":/fa/solid/book.svg",
       EditorCommand::Flags(),
       {QKeySequence(Qt::Key_F1)},
       &categoryHelp,
@@ -1820,7 +1820,7 @@ public:
       {},
       &categoryContextMenu,
   };
-  EditorCommand helperTools{
+  EditorCommand _helperTools{
       // Actually not really for the context menu :-/
       "helper_tools",  // clang-format break
       QT_TR_NOOP("Generate Content"),

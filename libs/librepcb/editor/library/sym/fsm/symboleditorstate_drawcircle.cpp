@@ -24,6 +24,7 @@
 
 #include "../../../cmd/cmdcircleedit.h"
 #include "../../../graphics/circlegraphicsitem.h"
+#include "../../../undostack.h"
 #include "../symbolgraphicsitem.h"
 
 #include <librepcb/core/geometry/circle.h>

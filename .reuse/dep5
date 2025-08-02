@@ -38,17 +38,13 @@ Files:
  AUTHORS.md
  ci/*
  CONTRIBUTING.md
- img/actions/add_hole.png
  img/actions/add_name.png
  img/actions/add_smt_pad.png
  img/actions/add_symbol_pin.png
- img/actions/add_text.png
  img/actions/add_tht_pad.png
  img/actions/add_value.png
  img/actions/board_editor.png
- img/actions/draw_line.png
  img/actions/draw_wire.png
- img/actions/draw_zone.png
  img/actions/export_pick_place_file.png
  img/actions/grid.png
  img/actions/schematic.png
@@ -98,6 +94,7 @@ Copyright: Font Awesome
 License: MIT
 
 Files:
+ img/arrow-right-left-across-line.svg
  libs/font-awesome/js/*
  libs/font-awesome/svgs/*
 Copyright: Font Awesome
@@ -137,10 +134,6 @@ Files: img/wizards/kicad_watermark.png
 Copyright: KiCad and LibrePCB Developers
 License: GPL-3.0-or-later
 
-Files: img/actions/select.png
-Copyright: publicdomainvectors.org
-License: CC0-1.0
-
 Files:
  img/places/folder.png
  img/places/folder_green.png
@@ -167,7 +160,6 @@ License: GPL-2.0-only
 Files:
  img/actions/clean.png
  img/actions/down.png
- img/actions/select_all.png
  img/actions/up.png
 Copyright: Open Icon Library
 License: CC0-1.0
@@ -179,9 +171,9 @@ Files:
  img/actions/cancel.png
  img/actions/cut.png
  img/actions/edit.png
+ img/actions/export_pixmap.png
  img/actions/export_step.png
  img/actions/generate_bom.png
- img/actions/help.png
  img/actions/new.png
  img/actions/plus_2.png
  img/actions/search.png
@@ -197,13 +189,6 @@ Files:
  img/actions/open_browser.png
  img/actions/output_jobs.png
  img/actions/paste.png
- img/actions/quit.png
- img/actions/redo.png
- img/actions/save.png
- img/actions/stop.png
- img/actions/zoom_all.png
- img/actions/zoom_in.png
- img/actions/zoom_out.png
  img/status/dialog_error.png
 Copyright: Open Icon Library
 License: GPL-2.0-only
@@ -214,11 +199,6 @@ License: CC-BY-3.0
 
 Files:
  img/actions/copy.png
- img/actions/download.png
- img/actions/draw_arc.png
- img/actions/draw_circle.png
- img/actions/draw_polygon.png
- img/actions/draw_rectangle.png
  img/actions/export_svg.png
  img/actions/mirror_horizontal.png
  img/actions/mirror_vertical.png
@@ -233,28 +213,10 @@ Files:
  img/actions/run_all.png
  img/actions/wizard.png
  img/command_toolbars/align_horizontal_center.png
- img/command_toolbars/align_horizontal_left.png
- img/command_toolbars/align_horizontal_right.png
- img/command_toolbars/align_vertical_bottom.png
  img/command_toolbars/align_vertical_center.png
- img/command_toolbars/align_vertical_top.png
  img/status/dialog_warning.png
 Copyright: Open Icon Library
 License: CC-BY-SA-3.0 or LGPL-2.1-only
-
-Files:
- img/actions/clone.png
- img/actions/export.png
- img/actions/export_pixmap.png
- img/actions/flip_horizontal.png
- img/actions/flip_vertical.png
- img/actions/import.png
- img/actions/move_to.png
- img/actions/ruler.png
- img/actions/view_3d.png
- img/library/part.png
-Copyright: Icons8
-License: LicenseRef-Icons8
 
 Files: libs/delaunay-triangulation/*
 Copyright: 2015, Simon Zeni

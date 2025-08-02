@@ -163,7 +163,6 @@ export component MainMenuBar inherits Rectangle {
 
                 rescan-libraries-item := MenuItem {
                     cmd: Cmd.workspace-libraries-rescan;
-                    icon: @image-url("../../../font-awesome/svgs/solid/arrows-rotate.svg");
 
                     clicked => {
                         Backend.trigger(Action.workspace-libraries-rescan);
@@ -174,7 +173,6 @@ export component MainMenuBar inherits Rectangle {
 
                 print-item := MenuItem {
                     cmd: Cmd.print;
-                    icon: @image-url("../../../bootstrap-icons/icons/printer-fill.svg");
                     enabled: Data.current-tab.features.export-graphics == FeatureState.enabled;
 
                     clicked => {
@@ -184,7 +182,6 @@ export component MainMenuBar inherits Rectangle {
 
                 export-pdf-item := MenuItem {
                     cmd: Cmd.export-pdf;
-                    icon: @image-url("../../../font-awesome/svgs/solid/file-pdf.svg");
                     enabled: Data.current-tab.features.export-graphics == FeatureState.enabled;
 
                     clicked => {
@@ -194,7 +191,6 @@ export component MainMenuBar inherits Rectangle {
 
                 export-image-item := MenuItem {
                     cmd: Cmd.export-image;
-                    icon: @image-url("../../../bootstrap-icons/icons/image.svg");
                     enabled: Data.current-tab.features.export-graphics == FeatureState.enabled;
 
                     clicked => {
@@ -296,7 +292,6 @@ export component MainMenuBar inherits Rectangle {
 
                 open-workspace-folder-item := MenuItem {
                     cmd: Cmd.file-manager;
-                    icon: @image-url("../../../font-awesome/svgs/solid/arrow-up-right-from-square.svg");
                     text: @tr("Open Workspace Folder");  // More specific.
                     status-tip: "Open the workspace directory in the file manager";  // More specific.
 
@@ -317,7 +312,6 @@ export component MainMenuBar inherits Rectangle {
 
                 quit-application-item := MenuItem {
                     cmd: Cmd.application-quit;
-                    icon: @image-url("../../../bootstrap-icons/icons/box-arrow-left.svg");
 
                     clicked => {
                         Backend.trigger(Action.quit);
@@ -340,7 +334,6 @@ export component MainMenuBar inherits Rectangle {
                 undo-item := MenuItem {
                     cmd: Cmd.undo;
                     text: undo-text;
-                    icon: @image-url("../../../font-awesome/svgs/solid/rotate-left.svg");
                     enabled: Data.current-tab.features.undo == FeatureState.enabled;
 
                     clicked => {
@@ -351,7 +344,6 @@ export component MainMenuBar inherits Rectangle {
                 redo-item := MenuItem {
                     cmd: Cmd.redo;
                     text: redo-text;
-                    icon: @image-url("../../../font-awesome/svgs/solid/rotate-right.svg");
                     enabled: Data.current-tab.features.redo == FeatureState.enabled;
 
                     clicked => {
@@ -363,7 +355,6 @@ export component MainMenuBar inherits Rectangle {
 
                 select-all-item := MenuItem {
                     cmd: Cmd.select-all;
-                    icon: @image-url("../../../font-awesome/svgs/solid/object-group.svg");
                     enabled: Data.current-tab.features.select == FeatureState.enabled;
 
                     clicked => {
@@ -439,8 +430,6 @@ export component MainMenuBar inherits Rectangle {
 
                 flip-h-item := MenuItem {
                     cmd: Cmd.flip-horizontal;
-                    icon: @image-url("../../../font-awesome/svgs/solid/arrow-down-up-across-line.svg");
-                    icon-rotation: 90deg;
                     enabled: Data.current-tab.features.flip == FeatureState.enabled;
 
                     clicked => {
@@ -450,7 +439,6 @@ export component MainMenuBar inherits Rectangle {
 
                 flip-v-item := MenuItem {
                     cmd: Cmd.flip-vertical;
-                    icon: @image-url("../../../font-awesome/svgs/solid/arrow-down-up-across-line.svg");
                     enabled: Data.current-tab.features.flip == FeatureState.enabled;
 
                     clicked => {
@@ -631,7 +619,6 @@ export component MainMenuBar inherits Rectangle {
 
                 grid-interval-increase-item := MenuItem {
                     cmd: Cmd.grid-increase;
-                    icon: @image-url("../../../font-awesome/svgs/solid/caret-up.svg");
                     enabled: Data.current-tab.features.grid == FeatureState.enabled;
 
                     clicked => {
@@ -641,7 +628,6 @@ export component MainMenuBar inherits Rectangle {
 
                 grid-interval-decrease-item := MenuItem {
                     cmd: Cmd.grid-decrease;
-                    icon: @image-url("../../../font-awesome/svgs/solid/caret-down.svg");
                     enabled: Data.current-tab.features.grid == FeatureState.enabled;
 
                     clicked => {
@@ -651,7 +637,6 @@ export component MainMenuBar inherits Rectangle {
 
                 grid-interval-set-item := MenuItem {
                     cmd: Cmd.grid-properties;
-                    icon: @image-url("../../../bootstrap-icons/icons/grid-3x3.svg");
                     enabled: Data.current-tab.features.grid == FeatureState.enabled;
 
                     clicked => {
@@ -715,7 +700,6 @@ export component MainMenuBar inherits Rectangle {
 
                 toggle-background-image-item := MenuItem {
                     cmd: Cmd.toggle-background-image;
-                    icon: @image-url("../../../bootstrap-icons/icons/image.svg");
                     enabled: Data.current-tab.features.background-image == FeatureState.enabled;
 
                     clicked => {
@@ -725,7 +709,6 @@ export component MainMenuBar inherits Rectangle {
 
                 toggle-3d-item := MenuItem {
                     cmd: Cmd.toggle-3d;
-                    icon: @image-url("../../../bootstrap-icons/icons/badge-3d.svg");
                     enabled: (Data.current-tab.type == TabType.board-2d) || (Data.current-tab.type == TabType.board-3d) || ((Data.current-tab.type == TabType.package) && (Data.current-package-tab.page-index == 2));
 
                     clicked => {
@@ -743,7 +726,6 @@ export component MainMenuBar inherits Rectangle {
 
                 zoom-in-item := MenuItem {
                     cmd: Cmd.zoom-in;
-                    icon: @image-url("../../../bootstrap-icons/icons/zoom-in.svg");
                     enabled: Data.current-tab.features.zoom == FeatureState.enabled;
 
                     clicked => {
@@ -753,7 +735,6 @@ export component MainMenuBar inherits Rectangle {
 
                 zoom-out-item := MenuItem {
                     cmd: Cmd.zoom-out;
-                    icon: @image-url("../../../bootstrap-icons/icons/zoom-out.svg");
                     enabled: Data.current-tab.features.zoom == FeatureState.enabled;
 
                     clicked => {
@@ -763,7 +744,6 @@ export component MainMenuBar inherits Rectangle {
 
                 zoom-fit-item := MenuItem {
                     cmd: Cmd.zoom-fit-content;
-                    icon: @image-url("../../../font-awesome/svgs/solid/expand.svg");
                     enabled: Data.current-tab.features.zoom == FeatureState.enabled;
 
                     clicked => {
@@ -790,7 +770,6 @@ export component MainMenuBar inherits Rectangle {
                 save-library-item := MenuItem {
                     cmd: Cmd.save;
                     text: @tr("Save Library");  // More specific.
-                    icon: @image-url("../../../bootstrap-icons/icons/floppy-fill.svg");
                     enabled: Data.current-tab.features.save == FeatureState.enabled;
 
                     clicked => {
@@ -810,7 +789,6 @@ export component MainMenuBar inherits Rectangle {
 
                 open-library-folder-item := MenuItem {
                     cmd: Cmd.file-manager;
-                    icon: @image-url("../../../font-awesome/svgs/solid/arrow-up-right-from-square.svg");
 
                     clicked => {
                         Backend.trigger-library-element(library.path, LibraryElementAction.open-folder);
@@ -852,7 +830,6 @@ export component MainMenuBar inherits Rectangle {
                 save-category-item := MenuItem {
                     cmd: Cmd.save;
                     text: @tr("Save Category");  // More specific.
-                    icon: @image-url("../../../bootstrap-icons/icons/floppy-fill.svg");
                     enabled: Data.current-tab.features.save == FeatureState.enabled;
 
                     clicked => {
@@ -872,7 +849,6 @@ export component MainMenuBar inherits Rectangle {
 
                 open-category-folder-item := MenuItem {
                     cmd: Cmd.file-manager;
-                    icon: @image-url("../../../font-awesome/svgs/solid/arrow-up-right-from-square.svg");
 
                     clicked => {
                         if Data.current-tab.type == TabType.component-category {
@@ -900,7 +876,6 @@ export component MainMenuBar inherits Rectangle {
                 save-symbol-item := MenuItem {
                     cmd: Cmd.save;
                     text: @tr("Save Symbol");  // More specific.
-                    icon: @image-url("../../../bootstrap-icons/icons/floppy-fill.svg");
                     enabled: Data.current-tab.features.save == FeatureState.enabled;
 
                     clicked => {
@@ -920,7 +895,6 @@ export component MainMenuBar inherits Rectangle {
 
                 open-symbol-folder-item := MenuItem {
                     cmd: Cmd.file-manager;
-                    icon: @image-url("../../../font-awesome/svgs/solid/arrow-up-right-from-square.svg");
 
                     clicked => {
                         Backend.trigger-library-element(Data.current-symbol-tab.path, LibraryElementAction.open-folder);
@@ -944,7 +918,6 @@ export component MainMenuBar inherits Rectangle {
                 save-package-item := MenuItem {
                     cmd: Cmd.save;
                     text: @tr("Save Package");  // More specific.
-                    icon: @image-url("../../../bootstrap-icons/icons/floppy-fill.svg");
                     enabled: Data.current-tab.features.save == FeatureState.enabled;
 
                     clicked => {
@@ -964,7 +937,6 @@ export component MainMenuBar inherits Rectangle {
 
                 open-package-folder-item := MenuItem {
                     cmd: Cmd.file-manager;
-                    icon: @image-url("../../../font-awesome/svgs/solid/arrow-up-right-from-square.svg");
 
                     clicked => {
                         Backend.trigger-library-element(Data.current-package-tab.path, LibraryElementAction.open-folder);
@@ -988,7 +960,6 @@ export component MainMenuBar inherits Rectangle {
                 save-component-item := MenuItem {
                     cmd: Cmd.save;
                     text: @tr("Save Component");  // More specific.
-                    icon: @image-url("../../../bootstrap-icons/icons/floppy-fill.svg");
                     enabled: Data.current-tab.features.save == FeatureState.enabled;
 
                     clicked => {
@@ -1008,10 +979,51 @@ export component MainMenuBar inherits Rectangle {
 
                 open-component-folder-item := MenuItem {
                     cmd: Cmd.file-manager;
-                    icon: @image-url("../../../font-awesome/svgs/solid/arrow-up-right-from-square.svg");
 
                     clicked => {
                         Backend.trigger-library-element(Data.current-component-tab.path, LibraryElementAction.open-folder);
+                    }
+                }
+            }
+        }
+
+        device-menu-item := MainMenuItem {
+            text: @tr("Device");
+            visible: Data.current-tab.type == TabType.device;
+
+            clicked => {
+                device-menu-popup.show();
+            }
+
+            device-menu-popup := MenuPopup {
+                x: 0;
+                y: parent.height;
+
+                save-device-item := MenuItem {
+                    cmd: Cmd.save;
+                    text: @tr("Save Device");  // More specific.
+                    enabled: Data.current-tab.features.save == FeatureState.enabled;
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.save);
+                    }
+                }
+
+                close-device-item := MenuItem {
+                    text: @tr("Close Device");  // More specific.
+                    status-tip: @tr("Close the currently opened device");
+                    icon: @image-url("../../../font-awesome/svgs/solid/xmark.svg");
+
+                    clicked => {
+                        Helpers.trigger-current-tab-action(TabAction.close);
+                    }
+                }
+
+                open-device-folder-item := MenuItem {
+                    cmd: Cmd.file-manager;
+
+                    clicked => {
+                        Backend.trigger-library-element(Data.current-device-tab.path, LibraryElementAction.open-folder);
                     }
                 }
             }
@@ -1050,7 +1062,6 @@ export component MainMenuBar inherits Rectangle {
                 save-project-item := MenuItem {
                     cmd: Cmd.save;
                     text: @tr("Save Project");  // More specific.
-                    icon: @image-url("../../../bootstrap-icons/icons/floppy-fill.svg");
                     enabled: Data.current-project.writable;
 
                     clicked => {
@@ -1068,7 +1079,6 @@ export component MainMenuBar inherits Rectangle {
 
                 open-project-folder-item := MenuItem {
                     cmd: Cmd.file-manager;
-                    icon: @image-url("../../../font-awesome/svgs/solid/arrow-up-right-from-square.svg");
 
                     clicked => {
                         Helpers.trigger-current-project-action(ProjectAction.open-folder);
@@ -1222,7 +1232,6 @@ export component MainMenuBar inherits Rectangle {
 
                 user-manual-item := MenuItem {
                     cmd: Cmd.documentation-online;
-                    icon: @image-url("../../../font-awesome/svgs/solid/book.svg");
 
                     clicked => {
                         Backend.open-url(Constants.user-manual-url);
@@ -1248,7 +1257,6 @@ export component MainMenuBar inherits Rectangle {
 
                 website-item := MenuItem {
                     cmd: Cmd.website;
-                    icon: @image-url("../../../font-awesome/svgs/solid/globe.svg");
 
                     clicked => {
                         Backend.open-url(Constants.website-url);
@@ -1259,7 +1267,6 @@ export component MainMenuBar inherits Rectangle {
 
                 about-librepcb-item := MenuItem {
                     cmd: Cmd.about-librepcb;
-                    icon: @image-url("../../../bootstrap-icons/icons/question-circle.svg");
 
                     clicked => {
                         Data.panel-page = PanelPage.about;
@@ -1283,7 +1290,6 @@ export component MainMenuBar inherits Rectangle {
 
             if Data.current-tab.features.save != FeatureState.not-supported: save-btn := MenuBarButton {
                 cmd: Cmd.save;
-                icon: @image-url("../../../bootstrap-icons/icons/floppy-fill.svg");
                 enabled: Data.current-tab.features.save == FeatureState.enabled;
 
                 clicked => {
@@ -1293,7 +1299,6 @@ export component MainMenuBar inherits Rectangle {
 
             if Data.current-tab.features.undo != FeatureState.not-supported: undo-btn := MenuBarButton {
                 cmd: Cmd.undo;
-                icon: @image-url("../../../font-awesome/svgs/solid/rotate-left.svg");
                 tooltip: undo-text;
                 enabled: Data.current-tab.features.undo == FeatureState.enabled;
 
@@ -1304,7 +1309,6 @@ export component MainMenuBar inherits Rectangle {
 
             if Data.current-tab.features.redo != FeatureState.not-supported: redo-btn := MenuBarButton {
                 cmd: Cmd.redo;
-                icon: @image-url("../../../font-awesome/svgs/solid/rotate-right.svg");
                 tooltip: redo-text;
                 enabled: Data.current-tab.features.redo == FeatureState.enabled;
 
@@ -1355,7 +1359,6 @@ export component MainMenuBar inherits Rectangle {
 
                     if Data.current-tab.features.export-graphics != FeatureState.not-supported: export-pdf-btn := MenuBarButton {
                         cmd: Cmd.export-pdf;
-                        icon: @image-url("../../../font-awesome/svgs/solid/file-pdf.svg");
                         enabled: Data.current-tab.features.export-graphics == FeatureState.enabled;
 
                         clicked => {
@@ -1365,7 +1368,6 @@ export component MainMenuBar inherits Rectangle {
 
                     if Data.current-tab.features.export-graphics != FeatureState.not-supported: print-btn := MenuBarButton {
                         cmd: Cmd.print;
-                        icon: @image-url("../../../bootstrap-icons/icons/printer-fill.svg");
                         enabled: Data.current-tab.features.export-graphics == FeatureState.enabled;
 
                         clicked => {
@@ -1449,7 +1451,6 @@ export component MainMenuBar inherits Rectangle {
 
                     if Data.current-tab.features.flip != FeatureState.not-supported: flip-btn := MenuBarButton {
                         cmd: Cmd.flip-horizontal;
-                        icon: @image-url("../../../font-awesome/svgs/solid/arrow-down-up-across-line.svg");
                         enabled: Data.current-tab.features.flip == FeatureState.enabled;
 
                         clicked => {

@@ -22,13 +22,12 @@
  ******************************************************************************/
 #include "partlistmodel.h"
 
+#include "../../undocommand.h"
 #include "../../undostack.h"
 #include "../cmd/cmdpartedit.h"
+#include "parteditor.h"
 
 #include <QtCore>
-#include <QtWidgets>
-
-#include <algorithm>
 
 /*******************************************************************************
  *  Namespace
@@ -41,324 +40,158 @@ namespace editor {
  ******************************************************************************/
 
 PartListModel::PartListModel(QObject* parent) noexcept
-  : QAbstractTableModel(parent),
-    mPartList(nullptr),
+  : QObject(parent),
+    mList(nullptr),
     mUndoStack(nullptr),
-    mNewMpn(),
-    mNewManufacturer(),
-    mOnEditedSlot(*this, &PartListModel::partListEdited) {
+    mNewPart(new Part(SimpleString(QString()), SimpleString(QString()),
+                      AttributeList())),
+    mOnEditedSlot(*this, &PartListModel::listEdited) {
 }
 
 PartListModel::~PartListModel() noexcept {
 }
 
 /*******************************************************************************
- *  Setters
+ *  General Methods
  ******************************************************************************/
 
-void PartListModel::setInitialManufacturer(const SimpleString& value) noexcept {
-  mNewManufacturer = *value;
+void PartListModel::setDefaultManufacturer(const SimpleString& mfr) noexcept {
+  mNewPart->setManufacturer(mfr);
+  if (!mItems.isEmpty()) {
+    notify_row_changed(mItems.count() - 1);
+  }
 }
 
-void PartListModel::setPartList(PartList* list) noexcept {
-  emit beginResetModel();
+void PartListModel::setReferences(PartList* list, UndoStack* stack) noexcept {
+  if ((list == mList) && (stack == mUndoStack)) return;
 
-  if (mPartList) {
-    mPartList->onEdited.detach(mOnEditedSlot);
-  }
-
-  mPartList = list;
-
-  if (mPartList) {
-    mPartList->onEdited.attach(mOnEditedSlot);
-  }
-
-  emit endResetModel();
-}
-
-void PartListModel::setUndoStack(UndoStack* stack) noexcept {
   mUndoStack = stack;
-}
 
-/*******************************************************************************
- *  Slots
- ******************************************************************************/
-
-void PartListModel::add(const QPersistentModelIndex& itemIndex) noexcept {
-  Q_UNUSED(itemIndex);
-  if (!mPartList) {
-    return;
+  if (mList) {
+    mList->onEdited.detach(mOnEditedSlot);
   }
 
-  try {
-    std::shared_ptr<Part> obj = std::make_shared<Part>(
-        SimpleString(mNewMpn), SimpleString(mNewManufacturer),
-        AttributeList());  // can throw
-    execCmd(new CmdPartInsert(*mPartList, obj));
-    mNewMpn.clear();
-  } catch (const Exception& e) {
-    QMessageBox::critical(0, tr("Error"), e.getMsg());
-  }
-}
+  mList = list;
+  mItems.clear();
 
-void PartListModel::copy(const QPersistentModelIndex& itemIndex) noexcept {
-  if (!mPartList) {
-    return;
-  }
+  if (mList) {
+    mList->onEdited.attach(mOnEditedSlot);
 
-  try {
-    const int index = itemIndex.row();
-    if ((index >= 0) && (index < mPartList->count())) {
-      std::shared_ptr<const Part> original = mPartList->at(index);
-      std::shared_ptr<Part> copy = std::make_shared<Part>(*original);
-      execCmd(new CmdPartInsert(*mPartList, copy));
+    for (auto obj : mList->values()) {
+      mItems.append(std::make_shared<PartEditor>(obj, mUndoStack));
     }
-  } catch (const Exception& e) {
-    QMessageBox::critical(0, tr("Error"), e.getMsg());
+
+    // Add the "New part..." row.
+    mItems.append(std::make_shared<PartEditor>(mNewPart, nullptr));
   }
+
+  notify_reset();
 }
 
-void PartListModel::remove(const QPersistentModelIndex& itemIndex) noexcept {
-  if (!mPartList) {
+void PartListModel::apply() {
+  if ((!mList) || ((mList->count() + 1) != mItems.count())) {
     return;
   }
 
-  try {
-    const int index = itemIndex.row();
-    if ((index >= 0) && (index < mPartList->count())) {
-      execCmd(new CmdPartRemove(*mPartList, mPartList->at(index).get()));
-    }
-  } catch (const Exception& e) {
-    QMessageBox::critical(0, tr("Error"), e.getMsg());
-  }
-}
-
-void PartListModel::moveUp(const QPersistentModelIndex& itemIndex) noexcept {
-  if (!mPartList) {
-    return;
+  for (auto editor : mItems) {
+    editor->apply();
   }
 
-  try {
-    const int index = itemIndex.row();
-    if ((index >= 1) && (index < mPartList->count())) {
-      execCmd(new CmdPartsSwap(*mPartList, index, index - 1));
-    }
-  } catch (const Exception& e) {
-    QMessageBox::critical(0, tr("Error"), e.getMsg());
-  }
-}
+  if ((!mNewPart->getMpn()->isEmpty()) &&
+      (!mNewPart->getManufacturer()->isEmpty())) {
+    // Copy part.
+    auto obj = std::make_shared<Part>(*mNewPart);
 
-void PartListModel::moveDown(const QPersistentModelIndex& itemIndex) noexcept {
-  if (!mPartList) {
-    return;
-  }
+    // Reset MPN but keep the rest.
+    mNewPart->setMpn(SimpleString(QString()));
+    notify_row_changed(mList->count());
 
-  try {
-    const int index = itemIndex.row();
-    if ((index >= 0) && (index < mPartList->count() - 1)) {
-      execCmd(new CmdPartsSwap(*mPartList, index, index + 1));
-    }
-  } catch (const Exception& e) {
-    QMessageBox::critical(0, tr("Error"), e.getMsg());
+    // Add new part.
+    execCmd(new CmdPartInsert(*mList, obj, mItems.count()));
   }
 }
 
 /*******************************************************************************
- *  Inherited from QAbstractItemModel
+ *  Implementations
  ******************************************************************************/
 
-int PartListModel::rowCount(const QModelIndex& parent) const {
-  if (!parent.isValid() && mPartList) {
-    return mPartList->count() + 1;
-  }
-  return 0;
+std::size_t PartListModel::row_count() const {
+  return mItems.count();
 }
 
-int PartListModel::columnCount(const QModelIndex& parent) const {
-  if (!parent.isValid()) {
-    return _COLUMN_COUNT;
+std::optional<ui::PartData> PartListModel::row_data(std::size_t i) const {
+  if (auto item = mItems.value(i)) {
+    return item->getUiData();
+  } else {
+    return std::nullopt;
   }
-  return 0;
 }
 
-QVariant PartListModel::data(const QModelIndex& index, int role) const {
-  if (!index.isValid() || !mPartList) {
-    return QVariant();
+void PartListModel::set_row_data(std::size_t i,
+                                 const ui::PartData& data) noexcept {
+  if ((!mList) || (i >= static_cast<std::size_t>(mItems.count()))) {
+    return;
   }
 
-  std::shared_ptr<Part> item = mPartList->value(index.row());
-
-  const QBrush bgRed(QColor(255, 0, 0, 80));
-  const QBrush bgYellow(QColor(255, 255, 0, 120));
-  if ((!item) && (mPartList->isEmpty()) && (role == Qt::BackgroundRole)) {
-    return bgRed;
-  } else if ((item) && (item->isEmpty()) && (role == Qt::BackgroundRole)) {
-    return bgRed;
+  auto obj = mList->value(i);
+  if (data.action != ui::PartAction::None) {
+    // if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0): Remove lambda.
+    QMetaObject::invokeMethod(
+        this, [this, i, obj, a = data.action]() { trigger(i, obj, a); },
+        Qt::QueuedConnection);
+  } else if (auto editor = mItems.value(i)) {
+    editor->setUiData(data, static_cast<int>(i) == mList->count());
+    notify_row_changed(i);
   }
-
-  switch (index.column()) {
-    case COLUMN_MPN: {
-      switch (role) {
-        case Qt::DisplayRole:
-        case Qt::EditRole:
-          return item ? *item->getMpn() : mNewMpn;
-        case Qt::ToolTipRole:
-          return item
-              ? QVariant()
-              : tr("Exact manufacturer part number (without placeholders)");
-        case Qt::BackgroundRole:
-          return (item && item->getMpn()->isEmpty()) ? QVariant(bgYellow)
-                                                     : QVariant();
-        default:
-          return QVariant();
-      }
-    }
-    case COLUMN_MANUFACTURER: {
-      switch (role) {
-        case Qt::DisplayRole:
-        case Qt::EditRole:
-          return item ? *item->getManufacturer() : mNewManufacturer;
-        case Qt::ToolTipRole:
-          return item ? QVariant() : tr("Name of the manufacturer");
-        case Qt::BackgroundRole:
-          return (item && item->getManufacturer()->isEmpty())
-              ? QVariant(bgYellow)
-              : QVariant();
-        default:
-          return QVariant();
-      }
-    }
-    case COLUMN_ATTRIBUTES: {
-      switch (role) {
-        case Qt::DisplayRole:
-          return item ? item->getAttributeValuesTr().join(", ") : QVariant();
-        case Qt::ToolTipRole:
-          return item ? item->getAttributeKeyValuesTr().join("\n") : QVariant();
-        default:
-          return QVariant();
-      }
-    }
-    default:
-      return QVariant();
-  }
-
-  return QVariant();
-}
-
-QVariant PartListModel::headerData(int section, Qt::Orientation orientation,
-                                   int role) const {
-  if (orientation == Qt::Horizontal) {
-    if (role == Qt::DisplayRole) {
-      switch (section) {
-        case COLUMN_MPN:
-          return tr("Part Number");
-        case COLUMN_MANUFACTURER:
-          return tr("Manufacturer");
-        case COLUMN_ATTRIBUTES:
-          return tr("Attributes");
-        default:
-          return QVariant();
-      }
-    }
-  } else if (orientation == Qt::Vertical) {
-    if (mPartList && (role == Qt::DisplayRole)) {
-      std::shared_ptr<Part> item = mPartList->value(section);
-      return item ? QString::number(section + 1) : tr("New:");
-    } else if (mPartList && (role == Qt::ToolTipRole)) {
-      std::shared_ptr<Part> item = mPartList->value(section);
-      return item ? QVariant() : tr("Add a new part");
-    } else if (role == Qt::TextAlignmentRole) {
-      return QVariant(Qt::AlignRight | Qt::AlignVCenter);
-    }
-  }
-  return QVariant();
-}
-
-Qt::ItemFlags PartListModel::flags(const QModelIndex& index) const {
-  Qt::ItemFlags f = QAbstractTableModel::flags(index);
-  if (index.isValid() && (index.column() != COLUMN_ATTRIBUTES) &&
-      (index.column() != COLUMN_ACTIONS)) {
-    f |= Qt::ItemIsEditable;
-  }
-  return f;
-}
-
-bool PartListModel::setData(const QModelIndex& index, const QVariant& value,
-                            int role) {
-  if (!mPartList) {
-    return false;
-  }
-
-  try {
-    std::shared_ptr<Part> item = mPartList->value(index.row());
-    std::unique_ptr<CmdPartEdit> cmd;
-    if (item) {
-      cmd.reset(new CmdPartEdit(*item));
-    }
-    if ((index.column() == COLUMN_MPN) && role == Qt::EditRole) {
-      const SimpleString cleaned = cleanSimpleString(value.toString());
-      if (cmd) {
-        cmd->setMpn(cleaned);
-      } else {
-        mNewMpn = *cleaned;
-      }
-    } else if ((index.column() == COLUMN_MANUFACTURER) &&
-               role == Qt::EditRole) {
-      const SimpleString cleaned = cleanSimpleString(value.toString());
-      if (cmd) {
-        cmd->setManufacturer(cleaned);
-      } else {
-        mNewManufacturer = *cleaned;
-      }
-    } else {
-      return false;  // do not execute command!
-    }
-    if (cmd) {
-      execCmd(cmd.release());
-    } else if (!item) {
-      emit dataChanged(index, index);
-    }
-    return true;
-  } catch (const Exception& e) {
-    QMessageBox::critical(0, tr("Error"), e.getMsg());
-  }
-  return false;
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
-void PartListModel::partListEdited(const PartList& list, int index,
-                                   const std::shared_ptr<const Part>& part,
-                                   PartList::Event event) noexcept {
+void PartListModel::trigger(int index, std::shared_ptr<Part> obj,
+                            ui::PartAction a) noexcept {
+  if ((!mList) || (!obj) || (mList->value(index) != obj)) {
+    return;
+  }
+
+  try {
+    if (a == ui::PartAction::MoveUp) {
+      execCmd(new CmdPartsSwap(*mList, index, index - 1));
+    } else if (a == ui::PartAction::Duplicate) {
+      auto copy = std::make_shared<Part>(*obj);
+      execCmd(new CmdPartInsert(*mList, copy, index + 1));
+    } else if (a == ui::PartAction::Delete) {
+      execCmd(new CmdPartRemove(*mList, obj.get()));
+    }
+  } catch (const Exception& e) {
+    qCritical() << e.getMsg();
+  }
+}
+
+void PartListModel::listEdited(const PartList& list, int index,
+                               const std::shared_ptr<const Part>& item,
+                               PartList::Event event) noexcept {
   Q_UNUSED(list);
-  Q_UNUSED(part);
+
   switch (event) {
-    case PartList::Event::ElementAdded:
-      beginInsertRows(QModelIndex(), index, index);
-      endInsertRows();
-      if (list.count() == 1) {
-        // Update color of last row.
-        dataChanged(this->index(list.count() - 1, 0),
-                    this->index(list.count() - 1, _COLUMN_COUNT - 1));
-      }
+    case PartList::Event::ElementAdded: {
+      auto editor = std::make_shared<PartEditor>(
+          std::const_pointer_cast<Part>(item), mUndoStack);
+      mItems.insert(index, editor);
+      notify_row_added(index, 1);
       break;
+    }
     case PartList::Event::ElementRemoved:
-      beginRemoveRows(QModelIndex(), index, index);
-      endRemoveRows();
-      if (list.isEmpty()) {
-        // Update color of last row.
-        dataChanged(this->index(list.count() - 1, 0),
-                    this->index(list.count() - 1, _COLUMN_COUNT - 1));
-      }
+      mItems.remove(index);
+      notify_row_removed(index, 1);
       break;
     case PartList::Event::ElementEdited:
-      dataChanged(this->index(index, 0), this->index(index, _COLUMN_COUNT - 1));
+      notify_row_changed(index);
       break;
     default:
       qWarning() << "Unhandled switch-case in "
-                    "PartListModel::partListEdited():"
+                    "PartListModel::listEdited():"
                  << static_cast<int>(event);
       break;
   }
@@ -368,7 +201,7 @@ void PartListModel::execCmd(UndoCommand* cmd) {
   if (mUndoStack) {
     mUndoStack->execCmd(cmd);
   } else {
-    QScopedPointer<UndoCommand> cmdGuard(cmd);
+    std::unique_ptr<UndoCommand> cmdGuard(cmd);
     cmdGuard->execute();
   }
 }

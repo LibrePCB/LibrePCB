@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "appwindow.h"
+
 #include <librepcb/core/library/dev/part.h>
 
 #include <QtCore>
@@ -33,6 +35,7 @@
 namespace librepcb {
 namespace editor {
 
+class PartEditor;
 class UndoCommand;
 class UndoStack;
 
@@ -43,61 +46,42 @@ class UndoStack;
 /**
  * @brief The PartListModel class
  */
-class PartListModel final : public QAbstractTableModel {
+class PartListModel final : public QObject, public slint::Model<ui::PartData> {
   Q_OBJECT
 
 public:
-  enum Column {
-    COLUMN_MPN,
-    COLUMN_MANUFACTURER,
-    COLUMN_ATTRIBUTES,
-    COLUMN_ACTIONS,
-    _COLUMN_COUNT
-  };
-
   // Constructors / Destructor
-  PartListModel() = delete;
+  // PartListModel() = delete;
   PartListModel(const PartListModel& other) = delete;
   explicit PartListModel(QObject* parent = nullptr) noexcept;
   ~PartListModel() noexcept;
 
-  // Setters
-  void setInitialManufacturer(const SimpleString& value) noexcept;
-  void setPartList(PartList* list) noexcept;
-  void setUndoStack(UndoStack* stack) noexcept;
+  // General Methods
+  void setDefaultManufacturer(const SimpleString& mfr) noexcept;
+  void setReferences(PartList* list, UndoStack* stack) noexcept;
+  void apply();
 
-  // Slots
-  void add(const QPersistentModelIndex& itemIndex) noexcept;
-  void copy(const QPersistentModelIndex& itemIndex) noexcept;
-  void remove(const QPersistentModelIndex& itemIndex) noexcept;
-  void moveUp(const QPersistentModelIndex& itemIndex) noexcept;
-  void moveDown(const QPersistentModelIndex& itemIndex) noexcept;
-
-  // Inherited from QAbstractItemModel
-  int rowCount(const QModelIndex& parent = QModelIndex()) const override;
-  int columnCount(const QModelIndex& parent = QModelIndex()) const override;
-  QVariant data(const QModelIndex& index,
-                int role = Qt::DisplayRole) const override;
-  QVariant headerData(int section, Qt::Orientation orientation,
-                      int role = Qt::DisplayRole) const override;
-  Qt::ItemFlags flags(const QModelIndex& index) const override;
-  bool setData(const QModelIndex& index, const QVariant& value,
-               int role = Qt::EditRole) override;
+  // Implementations
+  std::size_t row_count() const override;
+  std::optional<ui::PartData> row_data(std::size_t i) const override;
+  void set_row_data(std::size_t i, const ui::PartData& data) noexcept override;
 
   // Operator Overloadings
-  PartListModel& operator=(const PartListModel& rhs) noexcept;
+  PartListModel& operator=(const PartListModel& rhs) = delete;
 
 private:
-  void partListEdited(const PartList& list, int index,
-                      const std::shared_ptr<const Part>& part,
-                      PartList::Event event) noexcept;
+  void trigger(int index, std::shared_ptr<Part> obj, ui::PartAction a) noexcept;
+  void listEdited(const PartList& list, int index,
+                  const std::shared_ptr<const Part>& item,
+                  PartList::Event event) noexcept;
   void execCmd(UndoCommand* cmd);
 
-private:  // Data
-  PartList* mPartList;
-  UndoStack* mUndoStack;
-  QString mNewMpn;
-  QString mNewManufacturer;
+private:
+  PartList* mList;
+  QPointer<UndoStack> mUndoStack;
+  std::shared_ptr<Part> mNewPart;
+
+  QList<std::shared_ptr<PartEditor>> mItems;
 
   // Slots
   PartList::OnEditedSlot mOnEditedSlot;

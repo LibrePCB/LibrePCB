@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "packageeditorstate_addpads.h"
 
+#include "../../../undostack.h"
 #include "../../cmd/cmdfootprintpadedit.h"
 #include "../footprintgraphicsitem.h"
 #include "../footprintpadgraphicsitem.h"

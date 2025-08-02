@@ -50,7 +50,7 @@ public:
   // Constructors / Destructor
   CmdPartEdit() = delete;
   CmdPartEdit(const CmdPartEdit& other) = delete;
-  explicit CmdPartEdit(Part& part) noexcept;
+  explicit CmdPartEdit(const std::shared_ptr<Part>& part) noexcept;
   ~CmdPartEdit() noexcept;
 
   // Setters
@@ -71,7 +71,7 @@ private:  // Methods
   void performRedo() override;
 
 private:  // Data
-  Part& mPart;
+  std::shared_ptr<Part> mPart;
 
   SimpleString mOldMpn;
   SimpleString mNewMpn;

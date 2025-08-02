@@ -23,8 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../editorwidgetbase.h"
-
 #include <librepcb/core/library/pkg/footprintpad.h>
 
 #include <QtCore>
@@ -37,11 +35,13 @@
 namespace librepcb {
 
 class Footprint;
+class LengthUnit;
 class Package;
 
 namespace editor {
 
 class FootprintGraphicsItem;
+class GraphicsLayerList;
 class PackageEditorFsmAdapter;
 class PackageEditorState;
 class UndoStack;
@@ -104,10 +104,9 @@ public:
   PackageEditorFsm() = delete;
   PackageEditorFsm(const PackageEditorFsm& other) = delete;
   explicit PackageEditorFsm(const Context& context) noexcept;
-  virtual ~PackageEditorFsm() noexcept;
+  ~PackageEditorFsm() noexcept;
 
   // Getters
-  EditorWidgetBase::Tool getCurrentTool() const noexcept;
   const std::shared_ptr<Footprint>& getCurrentFootprint() noexcept;
   const std::shared_ptr<FootprintGraphicsItem>&
       getCurrentGraphicsItem() noexcept;

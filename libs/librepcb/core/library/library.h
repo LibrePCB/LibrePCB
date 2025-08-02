@@ -71,7 +71,10 @@ public:
   }
   void setIcon(const QByteArray& png) noexcept { mIcon = png; }
   void setManufacturer(const SimpleString& value) noexcept {
-    mManufacturer = value;
+    if (value != mManufacturer) {
+      mManufacturer = value;
+      emit manufacturerChanged(mManufacturer);
+    }
   }
 
   // General Methods
@@ -93,6 +96,9 @@ public:
   static QString getLongElementName() noexcept {
     return QStringLiteral("library");
   }
+
+signals:
+  void manufacturerChanged(const SimpleString& mfr);
 
 protected:
   virtual void serialize(SExpression& root) const override;

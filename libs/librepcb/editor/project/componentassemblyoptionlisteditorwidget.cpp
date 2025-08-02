@@ -23,6 +23,7 @@
 #include "componentassemblyoptionlisteditorwidget.h"
 
 #include "../modelview/checkableitemsdelegate.h"
+#include "../utils/editortoolbox.h"
 #include "../widgets/checkableitemseditorwidget.h"
 #include "../widgets/editabletablewidget.h"
 #include "addcomponentdialog.h"
@@ -101,7 +102,8 @@ ComponentAssemblyOptionListEditorWidget::
   buttonsLayout->addWidget(mAddOptionButton.data());
 
   mAddPartButton.reset(new QToolButton(this));
-  mAddPartButton->setIcon(QIcon(":/img/library/part.png"));
+  mAddPartButton->setIcon(
+      EditorToolbox::svgIcon(":/fa/solid/cart-shopping.svg"));
   mAddPartButton->setToolTip(tr("Add a new (alternative) part by MPN"));
   connect(mAddPartButton.data(), &QToolButton::clicked, this,
           &ComponentAssemblyOptionListEditorWidget::addPart);
@@ -525,7 +527,9 @@ void ComponentAssemblyOptionListEditorWidget::optionListEdited(
     if (index > 0) {
       item->setText(COLUMN_DEVICE, "↳ " % tr("Alternative %1:").arg(index));
     }
-    item->setIcon(COLUMN_MPN, part ? QIcon(":/img/library/part.png") : QIcon());
+    item->setIcon(COLUMN_MPN,
+                  part ? EditorToolbox::svgIcon(":/fa/solid/cart-shopping.svg")
+                       : QIcon());
     item->setText(COLUMN_MPN, part ? *part->getMpn() : QString());
     item->setBackground(
         COLUMN_MPN,

@@ -447,6 +447,7 @@ export component MetadataFooterRowCell inherits HorizontalLayout {
     in property <int> section-index;
     in property <int> tab-index;
     in property <bool> wizard-mode: false;
+    in property <bool> show-back-button: false;
     in property <bool> unsaved-changes: false;
     in property <RuleCheckData> checks;
     in property <bool> read-only: false;
@@ -468,6 +469,16 @@ export component MetadataFooterRowCell inherits HorizontalLayout {
 
         clicked => {
             Backend.trigger-tab(section-index, tab-index, wizard-mode ? TabAction.next : TabAction.save);
+        }
+    }
+
+    if wizard-mode && show-back-button: back-btn := Button {
+        width: max(self.preferred-width, 100px);
+        icon: @image-url("../../../../font-awesome/svgs/solid/angle-left.svg");
+        text: @tr("Back");
+
+        clicked => {
+            Backend.trigger-tab(section-index, tab-index, TabAction.back);
         }
     }
 

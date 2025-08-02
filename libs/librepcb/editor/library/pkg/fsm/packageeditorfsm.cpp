@@ -112,56 +112,6 @@ PackageEditorFsm::~PackageEditorFsm() noexcept {
   mStates.clear();
 }
 
-/*******************************************************************************
- *  Getters
- ******************************************************************************/
-
-EditorWidgetBase::Tool PackageEditorFsm::getCurrentTool() const noexcept {
-  switch (mCurrentState) {
-    case State::IDLE:
-      return EditorWidgetBase::Tool::NONE;
-    case State::SELECT:
-      return EditorWidgetBase::Tool::SELECT;
-    case State::ADD_THT_PADS:
-      return EditorWidgetBase::Tool::ADD_THT_PADS;
-    case State::ADD_SMT_PADS_STANDARD:
-    case State::ADD_SMT_PADS_THERMAL:
-    case State::ADD_SMT_PADS_BGA:
-    case State::ADD_SMT_PADS_EDGE_CONNECTOR:
-    case State::ADD_SMT_PADS_TEST:
-    case State::ADD_SMT_PADS_LOCAL_FIDUCIAL:
-    case State::ADD_SMT_PADS_GLOBAL_FIDUCIAL:
-      return EditorWidgetBase::Tool::ADD_SMT_PADS;
-    case State::ADD_NAMES:
-      return EditorWidgetBase::Tool::ADD_NAMES;
-    case State::ADD_VALUES:
-      return EditorWidgetBase::Tool::ADD_VALUES;
-    case State::DRAW_LINE:
-      return EditorWidgetBase::Tool::DRAW_LINE;
-    case State::DRAW_ARC:
-      return EditorWidgetBase::Tool::DRAW_ARC;
-    case State::DRAW_RECT:
-      return EditorWidgetBase::Tool::DRAW_RECT;
-    case State::DRAW_POLYGON:
-      return EditorWidgetBase::Tool::DRAW_POLYGON;
-    case State::DRAW_CIRCLE:
-      return EditorWidgetBase::Tool::DRAW_CIRCLE;
-    case State::DRAW_TEXT:
-      return EditorWidgetBase::Tool::DRAW_TEXT;
-    case State::DRAW_ZONE:
-      return EditorWidgetBase::Tool::DRAW_ZONE;
-    case State::ADD_HOLES:
-      return EditorWidgetBase::Tool::ADD_HOLES;
-    case State::MEASURE:
-      return EditorWidgetBase::Tool::MEASURE;
-    case State::RENUMBER_PADS:
-      return EditorWidgetBase::Tool::RENUMBER_PADS;
-    default:
-      Q_ASSERT(false);
-      return EditorWidgetBase::Tool::NONE;
-  }
-}
-
 const std::shared_ptr<Footprint>&
     PackageEditorFsm::getCurrentFootprint() noexcept {
   return mContext.currentFootprint;

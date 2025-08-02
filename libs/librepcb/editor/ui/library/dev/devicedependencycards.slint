@@ -1,0 +1,160 @@
+import {
+    Button,
+    IconButton,
+} from "../../widgets.slint";
+import {
+    Backend,
+    DeviceTabData,
+    TabAction,
+} from "../../api.slint";
+
+component DeviceDependencyCard inherits Rectangle {
+    in property <string> type;
+    in property <bool> error;
+    in property <string> error-title;
+    in property <string> uninitialized-title;
+    in property <string> name;
+    in property <string> description;
+    in property <color> preview-background;
+    in property <bool> primary;
+    in property <bool> read-only;
+    property <string> choose-text: @tr("Choose {}", type) + "...";
+
+    pure callback render-scene(width: length, height: length) -> image;
+    callback choose-clicked;
+
+    background: error ? #900000 : #404040;
+    border-color: self.background;
+    border-width: 2px;
+    border-radius: 10px;
+    clip: true;  // For the rounded corners
+
+    VerticalLayout {
+        VerticalLayout {
+            padding: 6px;
+            spacing: 5px;
+
+            HorizontalLayout {
+                spacing: 8px;
+
+                title-txt := Text {
+                    horizontal-stretch: 0;
+                    font-size: 14px;
+                    font-weight: 600;
+                    overflow: elide;
+                    vertical-alignment: center;
+                    text: error ? error-title : (name.is-empty ? uninitialized-title : name);
+                    accessible-label: type;
+                }
+
+                if (!read-only) && ((!name.is-empty) || error): choose-btn-1 := IconButton {
+                    z: 10;
+                    height: 18px;
+                    style: hyperlink;
+                    icon: @image-url("../../../../../font-awesome/svgs/solid/folder-open.svg");
+                    tooltip: choose-text;
+                    tooltip-position: error ? left : right;
+
+                    clicked => {
+                        choose-clicked();
+                    }
+                }
+
+                if !name.is-empty: type-txt := Text {
+                    horizontal-stretch: 1;
+                    font-size: 10px;
+                    font-weight: 300;
+                    horizontal-alignment: right;
+                    vertical-alignment: center;
+                    text: type.to-uppercase();
+                    accessible-role: none;
+                }
+            }
+
+            if !description.is-empty: description-txt := Text {
+                max-height: 30px;
+                font-size: error ? 12px : 11px;
+                font-weight: error ? 600 : 400;
+                font-italic: true;
+                wrap: word-wrap;
+                overflow: elide;
+                text: description;
+                accessible-label: "description";
+            }
+        }
+
+        Rectangle {
+            min-width: 100px;
+            min-height: 100px;
+            preferred-width: 300px;
+            preferred-height: 300px;
+            background: name.is-empty ? #202020 : preview-background;
+
+            if (!name.is-empty) || error: Image {
+                x: 0;
+                y: 0;
+                width: 100%;
+                height: 100%;
+                image-fit: preserve;
+                image-rendering: pixelated;
+                source: render-scene(parent.width, parent.height);
+                accessible-role: none;
+            }
+
+            if (!read-only) && name.is-empty && (!error): choose-btn-2 := Button {
+                width: max(self.preferred-width, 100px);
+                icon: @image-url("../../../../../font-awesome/svgs/solid/folder-open.svg");
+                text: choose-text;
+                primary: primary;
+
+                clicked => {
+                    choose-clicked();
+                }
+            }
+        }
+    }
+}
+
+export component ComponentCard inherits DeviceDependencyCard {
+    in property <int> section-index;
+    in-out property <[DeviceTabData]> tabs;
+    in property <int> index;
+
+    type: @tr("Component");
+    error: tabs[index].component-error;
+    error-title: @tr("Failed to load component");
+    uninitialized-title: @tr("No component selected");
+    name: tabs[index].component-name;
+    description: tabs[index].component-description;
+    preview-background: white;
+
+    render-scene(width, height) => {
+        Backend.render-scene(section-index, width, height, 0, 0)
+    }
+
+    choose-clicked => {
+        Backend.trigger-tab(section-index, index, TabAction.device-select-component);
+    }
+}
+
+export component PackageCard inherits DeviceDependencyCard {
+    in property <int> section-index;
+    in-out property <[DeviceTabData]> tabs;
+    in property <int> index;
+
+    type: @tr("Package");
+    error: tabs[index].package-error;
+    error-title: @tr("Failed to load package");
+    uninitialized-title: @tr("No package selected");
+    name: tabs[index].package-name;
+    description: tabs[index].package-description;
+    preview-background: black;
+
+    render-scene(width, height) => {
+        Backend.render-scene(section-index, width, height, 1, 0)
+    }
+
+    choose-clicked => {
+        Backend.trigger-tab(section-index, index, TabAction.device-select-package);
+    }
+}
