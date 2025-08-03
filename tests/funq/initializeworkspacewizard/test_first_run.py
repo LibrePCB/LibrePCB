@@ -97,14 +97,14 @@ def test_open_compatible_workspace(librepcb):
         app.widget("mainWindow").properties()["visible"] is True
 
 
-def test_open_workspace_upgrade_v01(librepcb, helpers):
+def test_open_workspace_upgrade_versioned(librepcb, helpers):
     """
     Choose a workspace to open, which needs to be upgraded first, by
-    copying 'v0.1' to 'data'
+    copying 'v1' to 'data'
     """
     test_workspace_path = librepcb.workspace_path
     librepcb.workspace_path = None  # Do not set workspace in LibrePCB.ini
-    v01_path = os.path.join(test_workspace_path, "v0.1")
+    old_path = os.path.join(test_workspace_path, "v1")
     data_path = os.path.join(test_workspace_path, "data")
     shutil.rmtree(data_path)
     with librepcb.open() as app:
@@ -123,7 +123,7 @@ def test_open_workspace_upgrade_v01(librepcb, helpers):
 
         # Perform upgrade.
         src_label = app.widget("initWorkspaceWizardUpgradeSourceLabel")
-        assert v01_path in src_label.properties()["text"]
+        assert old_path in src_label.properties()["text"]
         dst_label = app.widget("initWorkspaceWizardUpgradeDestinationLabel")
         assert data_path in dst_label.properties()["text"]
         app.widget("initWorkspaceWizardFinishButton").click()
@@ -193,10 +193,10 @@ def test_open_workspace_downgrade(librepcb, helpers):
     """
     test_workspace_path = librepcb.workspace_path
     librepcb.workspace_path = None  # Do not set workspace in LibrePCB.ini
-    v01_path = os.path.join(test_workspace_path, "v0.1")
-    v02_path = os.path.join(test_workspace_path, "v1")
+    shutil.rmtree(os.path.join(test_workspace_path, "v0.1"))
+    shutil.rmtree(os.path.join(test_workspace_path, "v1"))
+    current_path = os.path.join(test_workspace_path, "v2")
     data_path = os.path.join(test_workspace_path, "data")
-    shutil.rmtree(v01_path)
     with open(os.path.join(data_path, ".librepcb-data"), "wb") as f:
         f.write(b"999\n")
     with librepcb.open() as app:
@@ -220,7 +220,7 @@ def test_open_workspace_downgrade(librepcb, helpers):
 
         # Verify that the v1 directory has been created.
         helpers.wait_until_widget_hidden(wizard)
-        assert os.path.exists(os.path.join(v02_path, ".librepcb-data"))
+        assert os.path.exists(os.path.join(current_path, ".librepcb-data"))
 
         # Verify that the main window is now opened.
         app.widget("mainWindow").properties()["visible"] is True

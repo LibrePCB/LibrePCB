@@ -20,16 +20,16 @@ import sys
 )
 def test_upgrade_v01(librepcb, helpers):
     """
-    Test an upgrade which copies from 'v0.1' to 'data'
+    Test an upgrade which copies from 'v1' to 'data'
     """
-    v01_path = os.path.join(librepcb.workspace_path, "v0.1")
+    old_path = os.path.join(librepcb.workspace_path, "v1")
     data_path = os.path.join(librepcb.workspace_path, "data")
     shutil.rmtree(data_path)
     with librepcb.open() as app:
         # Perform upgrade.
         wizard = app.widget("initWorkspaceWizard")
         src_label = app.widget("initWorkspaceWizardUpgradeSourceLabel")
-        assert v01_path in src_label.properties()["text"]
+        assert old_path in src_label.properties()["text"]
         dst_label = app.widget("initWorkspaceWizardUpgradeDestinationLabel")
         assert data_path in dst_label.properties()["text"]
         app.widget("initWorkspaceWizardFinishButton").click()
@@ -88,10 +88,10 @@ def test_downgrade(librepcb, helpers):
     Test opening a workspace which needs to be initialized with an
     older file format
     """
-    v01_path = os.path.join(librepcb.workspace_path, "v0.1")
-    v02_path = os.path.join(librepcb.workspace_path, "v1")
+    shutil.rmtree(os.path.join(librepcb.workspace_path, "v0.1"))
+    shutil.rmtree(os.path.join(librepcb.workspace_path, "v1"))
+    current_path = os.path.join(librepcb.workspace_path, "v2")
     data_path = os.path.join(librepcb.workspace_path, "data")
-    shutil.rmtree(v01_path)
     with open(os.path.join(data_path, ".librepcb-data"), "wb") as f:
         f.write(b"999\n")
     with librepcb.open() as app:
@@ -103,7 +103,7 @@ def test_downgrade(librepcb, helpers):
 
         # Verify that the v1 directory has been created.
         helpers.wait_until_widget_hidden(wizard)
-        assert os.path.exists(os.path.join(v02_path, ".librepcb-data"))
+        assert os.path.exists(os.path.join(current_path, ".librepcb-data"))
 
         # Verify that the main window is now opened.
         app.widget("mainWindow").properties()["visible"] is True
