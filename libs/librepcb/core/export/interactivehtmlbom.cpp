@@ -252,7 +252,11 @@ std::size_t InteractiveHtmlBom::addFootprint(
   std::vector<QString> svgs;
   svgs.reserve(pads.size());
   std::vector<rs::InteractiveHtmlBomPad> padsVec;
-  padsVec.reserve(pads.size());
+  // Important: Always allocate a non-empty pads vector even if there are no
+  // pads. This makes sure the pointer passed to Rust is pointing to a valid
+  // memory location. An empty vector caused a panic in debug mode which was
+  // fixed by the line below.
+  padsVec.reserve(pads.isEmpty() ? 1 : pads.size());
   for (const Pad& pad : pads) {
     // Determine hole.
     bool hasDrill = false;
