@@ -71,8 +71,10 @@ public:
   const ui::WindowSectionData& getUiData() const noexcept { return mUiData; }
   void setUiData(const ui::WindowSectionData& data) noexcept;
   void setHomeTabVisible(bool visible) noexcept;
-  void addTab(std::shared_ptr<WindowTab> tab, int index = -1) noexcept;
-  std::shared_ptr<WindowTab> removeTab(int index) noexcept;
+  void addTab(std::shared_ptr<WindowTab> tab, int index = -1,
+              bool switchToTab = true) noexcept;
+  std::shared_ptr<WindowTab> removeTab(int index,
+                                       bool* wasCurrent = nullptr) noexcept;
   void triggerTab(int index, ui::TabAction a) noexcept;
   slint::Image renderScene(float width, float height, int scene) noexcept;
   bool processScenePointerEvent(const QPointF& pos,

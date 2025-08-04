@@ -114,7 +114,8 @@ void WindowSection::setHomeTabVisible(bool visible) noexcept {
   }
 }
 
-void WindowSection::addTab(std::shared_ptr<WindowTab> tab, int index) noexcept {
+void WindowSection::addTab(std::shared_ptr<WindowTab> tab, int index,
+                           bool switchToTab) noexcept {
   // Connect closeRequested() asynchronously to avoid complex nested function
   // calls while the tab object is getting destroyed.
   connect(tab.get(), &WindowTab::closeRequested, this,
@@ -134,13 +135,23 @@ void WindowSection::addTab(std::shared_ptr<WindowTab> tab, int index) noexcept {
   } else {
     index = qBound(0, index, mTabs->count());
   }
+  int currentIndex = std::max(mUiData.current_tab_index, 0);
+  const bool forceUpdate = (index <= currentIndex) || mTabs->isEmpty();
+  if ((!mTabs->isEmpty()) && (index <= currentIndex)) {
+    ++currentIndex;
+  }
   mTabs->insert(index, tab);
-  setCurrentTab(index);
+  setCurrentTab(switchToTab ? index : currentIndex, forceUpdate);
 }
 
-std::shared_ptr<WindowTab> WindowSection::removeTab(int index) noexcept {
+std::shared_ptr<WindowTab> WindowSection::removeTab(int index,
+                                                    bool* wasCurrent) noexcept {
+  int currentIndex = mUiData.current_tab_index;
+  if (wasCurrent) {
+    *wasCurrent = (currentIndex == index);
+  }
+
   if (auto tab = mTabs->takeAt(index)) {
-    int currentIndex = mUiData.current_tab_index;
     const bool forceUpdate = index <= currentIndex;
     if (index < currentIndex) {
       --currentIndex;

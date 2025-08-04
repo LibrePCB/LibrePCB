@@ -69,6 +69,12 @@ public:
   int getId() const noexcept { return mId; }
   bool isCurrentWindow() const noexcept;
   void makeCurrentWindow() noexcept;
+  void addSection(int newIndex, bool makeCurrent) noexcept;
+  void addTab(std::shared_ptr<WindowTab> tab, int section = -1, int index = -1,
+              bool switchToTab = true, bool switchToSection = true) noexcept;
+  std::shared_ptr<WindowTab> removeTab(
+      int section, int tab, bool* wasCurrentTab = nullptr,
+      bool* wasCurrentSection = nullptr) noexcept;
   void showPanelPage(ui::PanelPage page) noexcept;
   void popUpNotifications() noexcept;
   void showStatusBarMessage(const QString& message, int timeoutMs);
@@ -109,9 +115,7 @@ private:
   void openSchematicTab(int projectIndex, int index) noexcept;
   void openBoard2dTab(int projectIndex, int index) noexcept;
   void openBoard3dTab(int projectIndex, int index) noexcept;
-  void splitSection(int index, bool makeCurrent) noexcept;
   void updateHomeTabSection() noexcept;
-  void addTab(std::shared_ptr<WindowTab> tab) noexcept;
   template <typename T>
   bool switchToTab() noexcept;
   template <typename T>

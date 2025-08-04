@@ -324,12 +324,12 @@ MainWindow::MainWindow(GuiApplication& app,
       cs.value(mSettingsPrefix % "/order_open_web_browser", true).toBool());
   const int sectionCount = cs.beginReadArray(mSettingsPrefix % "/sections");
   for (int i = 0; i < sectionCount; ++i) {
-    splitSection(mSections->count(), false);
+    addSection(mSections->count(), false);
   }
   cs.endArray();
 
   if (mSections->isEmpty()) {
-    splitSection(0, true);
+    addSection(0, true);
   }
 }
 
@@ -351,6 +351,72 @@ void MainWindow::makeCurrentWindow() noexcept {
   mWidget->show();
   mWidget->raise();
   mWidget->activateWindow();
+}
+
+void MainWindow::addSection(int newIndex, bool makeCurrent) noexcept {
+  newIndex = qBound(0, newIndex, mSections->count());
+  std::shared_ptr<WindowSection> s = std::make_shared<WindowSection>(mApp);
+  connect(s.get(), &WindowSection::currentTabChanged, this, [this]() {
+    const ui::Data& d = mWindow->global<ui::Data>();
+    d.fn_current_tab_changed();
+  });
+  connect(s.get(), &WindowSection::panelPageRequested, this,
+          &MainWindow::showPanelPage);
+  connect(s.get(), &WindowSection::cursorCoordinatesChanged, this,
+          [this](const Point& pos, const LengthUnit& unit) {
+            const ui::Data& d = mWindow->global<ui::Data>();
+            d.set_cursor_coordinates(
+                q2s(QString("%1, %2")
+                        .arg(unit.convertToUnit(pos.getX()), 1, 'f',
+                             unit.getReasonableNumberOfDecimals())
+                        .arg(unit.convertToUnit(pos.getY()), 1, 'f',
+                             unit.getReasonableNumberOfDecimals())));
+          });
+  connect(s.get(), &WindowSection::statusBarMessageChanged, this,
+          &MainWindow::showStatusBarMessage);
+  mSections->insert(newIndex, s);
+
+  if (makeCurrent || (mSections->count() == 1)) {
+    const ui::Data& d = mWindow->global<ui::Data>();
+    d.set_current_section_index(newIndex);
+    d.fn_current_tab_changed();
+  }
+
+  updateHomeTabSection();
+}
+
+void MainWindow::addTab(std::shared_ptr<WindowTab> tab, int section, int index,
+                        bool switchToTab, bool switchToSection) noexcept {
+  // If no section was specified, add it to the end.
+  const ui::Data& d = mWindow->global<ui::Data>();
+  if (section < 0) {
+    section = d.get_current_section_index();
+  }
+
+  // Bound the section to make sure the tab is not lost on invalid indices.
+  section = qBound(0, section, mSections->count() - 1);
+
+  if (auto s = mSections->value(section)) {
+    s->addTab(tab, index, switchToTab);
+    if (switchToSection) {
+      d.set_current_section_index(section);
+      d.fn_current_tab_changed();
+    }
+  }
+}
+
+std::shared_ptr<WindowTab> MainWindow::removeTab(
+    int section, int tab, bool* wasCurrentTab,
+    bool* wasCurrentSection) noexcept {
+  const ui::Data& d = mWindow->global<ui::Data>();
+  const int currentSection = d.get_current_section_index();
+  if (wasCurrentSection) {
+    *wasCurrentSection = (section == currentSection);
+  }
+  if (auto s = mSections->value(section)) {
+    return s->removeTab(tab, wasCurrentTab);
+  }
+  return nullptr;
 }
 
 void MainWindow::showPanelPage(ui::PanelPage page) noexcept {
@@ -528,7 +594,7 @@ void MainWindow::triggerSection(int section,
                                 ui::WindowSectionAction a) noexcept {
   switch (a) {
     case ui::WindowSectionAction::Split: {
-      splitSection(section, true);
+      addSection(section + 1, true);
       break;
     }
     case ui::WindowSectionAction::Close: {
@@ -1262,50 +1328,9 @@ void MainWindow::openBoard3dTab(int projectIndex, int index) noexcept {
   }
 }
 
-void MainWindow::splitSection(int index, bool makeCurrent) noexcept {
-  const int newIndex = qBound(0, index + 1, mSections->count());
-  std::shared_ptr<WindowSection> s = std::make_shared<WindowSection>(mApp);
-  connect(s.get(), &WindowSection::currentTabChanged, this, [this]() {
-    const ui::Data& d = mWindow->global<ui::Data>();
-    d.fn_current_tab_changed();
-  });
-  connect(s.get(), &WindowSection::panelPageRequested, this,
-          &MainWindow::showPanelPage);
-  connect(s.get(), &WindowSection::cursorCoordinatesChanged, this,
-          [this](const Point& pos, const LengthUnit& unit) {
-            const ui::Data& d = mWindow->global<ui::Data>();
-            d.set_cursor_coordinates(
-                q2s(QString("%1, %2")
-                        .arg(unit.convertToUnit(pos.getX()), 1, 'f',
-                             unit.getReasonableNumberOfDecimals())
-                        .arg(unit.convertToUnit(pos.getY()), 1, 'f',
-                             unit.getReasonableNumberOfDecimals())));
-          });
-  connect(s.get(), &WindowSection::statusBarMessageChanged, this,
-          &MainWindow::showStatusBarMessage);
-  mSections->insert(newIndex, s);
-
-  if (makeCurrent || (mSections->count() == 1)) {
-    const ui::Data& d = mWindow->global<ui::Data>();
-    d.set_current_section_index(newIndex);
-    d.fn_current_tab_changed();
-  }
-
-  updateHomeTabSection();
-}
-
 void MainWindow::updateHomeTabSection() noexcept {
   for (int i = 0; i < mSections->count(); ++i) {
     mSections->at(i)->setHomeTabVisible(i == 0);
-  }
-}
-
-void MainWindow::addTab(std::shared_ptr<WindowTab> tab) noexcept {
-  const ui::Data& d = mWindow->global<ui::Data>();
-  const int sectionIndex =
-      qBound(0, d.get_current_section_index(), mSections->count() - 1);
-  if (std::shared_ptr<WindowSection> s = mSections->value(sectionIndex)) {
-    s->addTab(tab);
   }
 }
 
