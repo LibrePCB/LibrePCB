@@ -112,11 +112,16 @@ def update():
             elif line.startswith('msgid "'):
                 key = 'msgid'
                 values[key] = line.replace('msgid "', '')[:-1]
+            elif line.startswith('msgid_plural "'):
+                key = 'msgid_plural'
+                values[key] = line.replace('msgid_plural "', '')[:-1]
             elif line.startswith('"') and key is not None:
                 values[key] += line[1:-1]
             elif len(sources) and key and values:
+                # If plural form is available, ignore the singular form.
+                # This is the way it is done by Qt.
+                msgid = values.get('msgid_plural', values['msgid'])
                 msgctxt = values['msgctxt']
-                msgid = values['msgid']
                 if msgctxt not in slint_strings:
                     slint_strings[msgctxt] = list()
                 slint_strings[msgctxt].append((sources, msgid))
