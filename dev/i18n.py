@@ -98,13 +98,13 @@ def update():
     # Parse Slint strings
     slint_strings = dict()
     with open(os.path.join(REPO_DIR, UI_PO_FILE), 'r') as f:
-        source = None
+        sources = list()
         key = None
         values = dict()
         for line in f.readlines():
             line = line.strip()
             if line.startswith('#: '):
-                source = line.replace('#: ', '')
+                sources.extend(line.replace('#: ', '').split(' '))
                 values = dict()
             elif line.startswith('msgctxt "'):
                 key = 'msgctxt'
@@ -114,13 +114,13 @@ def update():
                 values[key] = line.replace('msgid "', '')[:-1]
             elif line.startswith('"') and key is not None:
                 values[key] += line[1:-1]
-            elif source and key and values:
+            elif len(sources) and key and values:
                 msgctxt = values['msgctxt']
                 msgid = values['msgid']
                 if msgctxt not in slint_strings:
                     slint_strings[msgctxt] = list()
-                slint_strings[msgctxt].append((source, msgid))
-                source = None
+                slint_strings[msgctxt].append((sources, msgid))
+                sources = list()
                 key = None
                 values = dict()
     total_count = sum([len(ctx) for ctx in slint_strings])
@@ -136,10 +136,13 @@ def update():
     for context, strings in sorted(slint_strings.items()):
         ts.insert(-1, '<context>\n')
         ts.insert(-1, '    <name>ui::{}</name>\n'.format(context))
-        for source, string in sorted(strings):
+        for sources, string in sorted(strings):
             ts.insert(-1, '    <message>\n')
-            ts.insert(-1, '        <location filename="{}" line="{}"/>\n'
-                          .format(*source.split(':')))
+            for source in sources:
+                path = source.split(':')[0].replace('"', '')
+                line = int(source.split(':')[1])
+                ts.insert(-1, '        <location filename="{}" line="{}"/>\n'
+                              .format(path, line))
             ts.insert(-1, '        <source>{}</source>\n'
                           .format(escape_xml(po_str_to_qs(string))))
             ts.insert(-1, '        <translation type="{}"></translation>\n'
