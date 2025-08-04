@@ -23,7 +23,6 @@
 #include "symboleditorstate.h"
 
 #include "../../../graphics/graphicsscene.h"
-#include "../../editorwidgetbase.h"
 #include "../symbolclipboarddata.h"
 
 #include <librepcb/core/types/layer.h>

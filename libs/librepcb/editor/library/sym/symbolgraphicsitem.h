@@ -36,9 +36,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class Component;
-
 namespace editor {
 
 class CircleGraphicsItem;

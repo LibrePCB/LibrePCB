@@ -37,7 +37,7 @@ namespace editor {
  ******************************************************************************/
 
 CmdDeviceEdit::CmdDeviceEdit(Device& device) noexcept
-  : UndoCommand(tr("Edit device properties")),
+  : CmdLibraryElementEdit(device, tr("Edit Device Properties")),
     mDevice(device),
     mOldComponentUuid(device.getComponentUuid()),
     mNewComponentUuid(mOldComponentUuid),
@@ -67,19 +67,20 @@ void CmdDeviceEdit::setPackageUuid(const Uuid& uuid) noexcept {
  ******************************************************************************/
 
 bool CmdDeviceEdit::performExecute() {
-  performRedo();  // can throw
-
+  if (CmdLibraryElementEdit::performExecute()) return true;  // can throw
   if (mNewComponentUuid != mOldComponentUuid) return true;
   if (mNewPackageUuid != mOldPackageUuid) return true;
   return false;
 }
 
 void CmdDeviceEdit::performUndo() {
+  CmdLibraryElementEdit::performUndo();  // can throw
   mDevice.setComponentUuid(mOldComponentUuid);
   mDevice.setPackageUuid(mOldPackageUuid);
 }
 
 void CmdDeviceEdit::performRedo() {
+  CmdLibraryElementEdit::performRedo();  // can throw
   mDevice.setComponentUuid(mNewComponentUuid);
   mDevice.setPackageUuid(mNewPackageUuid);
 }

@@ -52,7 +52,8 @@ public:
   CmdDevicePadSignalMapItemEdit() = delete;
   CmdDevicePadSignalMapItemEdit(const CmdDevicePadSignalMapItemEdit& other) =
       delete;
-  explicit CmdDevicePadSignalMapItemEdit(DevicePadSignalMapItem& item) noexcept;
+  explicit CmdDevicePadSignalMapItemEdit(
+      const std::shared_ptr<DevicePadSignalMapItem>& item) noexcept;
   ~CmdDevicePadSignalMapItemEdit() noexcept;
 
   // Setters
@@ -73,7 +74,7 @@ private:  // Methods
   void performRedo() override;
 
 private:  // Data
-  DevicePadSignalMapItem& mItem;
+  std::shared_ptr<DevicePadSignalMapItem> mItem;
 
   std::optional<Uuid> mOldSignalUuid;
   std::optional<Uuid> mNewSignalUuid;

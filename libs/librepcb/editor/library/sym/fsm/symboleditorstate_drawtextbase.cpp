@@ -24,6 +24,7 @@
 
 #include "../../../cmd/cmdtextedit.h"
 #include "../../../graphics/textgraphicsitem.h"
+#include "../../../undostack.h"
 #include "../symbolgraphicsitem.h"
 
 #include <librepcb/core/geometry/text.h>

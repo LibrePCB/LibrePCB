@@ -1,0 +1,404 @@
+import { ScrollView } from "std-widgets.slint";
+import { DevicePinoutListView } from "devicepinoutlistview.slint";
+import {
+    Badge,
+    Button,
+    IconButton,
+    LineEdit,
+    Palette,
+} from "../../widgets.slint";
+import {
+    Backend,
+    Constants,
+    DeviceInteractivePinoutSignalData,
+    DeviceTabData,
+    TabAction,
+} from "../../api.slint";
+
+component DevicePinoutShortcutsText inherits Text {
+    font-size: 11px;
+    color: #707070;
+    accessible-role: none;
+}
+
+component DevicePinoutShortcutsOverlay inherits GridLayout {
+    width: self.preferred-width;
+    height: self.preferred-height;
+    spacing-horizontal: 5px;
+
+    Row {
+        DevicePinoutShortcutsText {
+            horizontal-alignment: right;
+            text: @tr("Next/previous signal:");
+        }
+
+        DevicePinoutShortcutsText {
+            horizontal-alignment: left;
+            text: "⇩⇧";
+        }
+    }
+
+    Row {
+        DevicePinoutShortcutsText {
+            horizontal-alignment: right;
+            text: @tr("Select \"(unconnected)\":");
+        }
+
+        DevicePinoutShortcutsText {
+            horizontal-alignment: left;
+            text: "⌫";
+        }
+    }
+
+    Row {
+        DevicePinoutShortcutsText {
+            horizontal-alignment: right;
+            text: @tr("Confirm selected signal:");
+        }
+
+        DevicePinoutShortcutsText {
+            horizontal-alignment: left;
+            text: "⏎";
+        }
+    }
+
+    Row {
+        DevicePinoutShortcutsText {
+            horizontal-alignment: right;
+            text: @tr("Exit interactive mode:");
+        }
+
+        DevicePinoutShortcutsText {
+            horizontal-alignment: left;
+            text: "Esc";
+        }
+    }
+
+    Row {
+        mouse-txt := DevicePinoutShortcutsText {
+            horizontal-alignment: right;
+            text: @tr("Or assign by mouse:");
+        }
+
+        Image {
+            width: 10px;
+            height: mouse-txt.preferred-height;
+            image-fit: contain;
+            colorize: mouse-txt.color;
+            source: @image-url("../../../../../font-awesome/svgs/solid/computer-mouse.svg");
+            accessible-role: none;
+        }
+    }
+}
+
+component DeviceInteractiveSignalListView inherits ScrollView {
+    in-out property <[DeviceInteractivePinoutSignalData]> model;
+    in property <int> current-index;
+
+    min-height: min(l.preferred-height, 50px);
+    min-width: l.min-width;
+    preferred-width: l.preferred-width;
+    preferred-height: l.preferred-height;
+    mouse-drag-pan-enabled: true;
+
+    callback signal-clicked(idx: int);
+
+    l := VerticalLayout {
+        for item[index] in model: item-ta := TouchArea {
+            mouse-cursor: pointer;
+
+            Rectangle {
+                property <bool> is-current: index == current-index;
+                property <color> text-color: {
+                    if is-current {
+                        item-ta.has-hover ? #404040 : black
+                    } else {
+                        item-ta.has-hover ? white : Palette.foreground
+                    }
+                };
+
+                background: {
+                    if is-current {
+                        item-ta.has-hover ? #00ff84 : Constants.librepcb-color
+                    } else {
+                        item-ta.has-hover ? #404040 : transparent
+                    }
+                };
+
+                HorizontalLayout {
+                    padding-left: 6px;
+                    padding-right: 6px;
+                    spacing: 5px;
+
+                    Image {
+                        width: 13px;
+                        height: 20px;
+                        image-fit: contain;
+                        colorize: text-color;
+                        source: {
+                            if item.name.is-empty {
+                                @image-url("../../../../../font-awesome/svgs/solid/link-slash.svg")
+                            } else if item.used {
+                                @image-url("../../../../../font-awesome/svgs/regular/square-check.svg")
+                            } else {
+                                @image-url("../../../../../font-awesome/svgs/regular/square.svg")
+                            }
+                        };
+                        accessible-role: none;
+                    }
+
+                    Text {
+                        horizontal-alignment: left;
+                        vertical-alignment: center;
+                        color: text-color;
+                        font-italic: item.name.is-empty;
+                        overflow: elide;
+                        text: item.name.is-empty ? @tr("(unconnected)") : item.name;
+                    }
+                }
+            }
+
+            clicked => {
+                signal-clicked(index);
+            }
+        }
+    }
+}
+
+export component DevicePinoutPanel inherits Rectangle {
+    in property <int> section-index;
+    in-out property <[DeviceTabData]> tabs;
+    in property <int> index;
+    in property <bool> read-only;
+    in property <bool> interactive;
+
+    background: #404040;
+    border-color: interactive ? Constants.librepcb-color : self.background;
+    border-width: 2px;
+    border-radius: 10px;
+    clip: true;
+
+    VerticalLayout {
+        padding: 2px;
+
+        HorizontalLayout {
+            padding: 3px;
+            spacing: 8px;
+
+            Text {
+                horizontal-stretch: 1;
+                font-size: 14px;
+                font-weight: 600;
+                overflow: elide;
+                vertical-alignment: center;
+                text: @tr("Pinout");
+                accessible-role: none;
+            }
+
+            if interactive: Badge {
+                text-color: Constants.librepcb-color;
+                font-size: 11px;
+                text: @tr("Pad {}/{}", tabs[index].interactive-pinout-number, tabs[index].pinout.length);
+            }
+
+            Rectangle {
+                horizontal-stretch: 1;
+            }
+
+            if (!tabs[index].datasheet-url.is-empty) && tabs[index].datasheet-url-error.is-empty: datasheet-btn := IconButton {
+                height: 18px;
+                style: hyperlink;
+                icon: @image-url("../../../../../font-awesome/svgs/solid/file-pdf.svg");
+                tooltip: @tr("Open Datasheet");
+                tooltip-position: left;
+                status-tip: tabs[index].datasheet-url;
+
+                clicked => {
+                    Backend.trigger-tab(section-index, index, TabAction.open-datasheet);
+                }
+            }
+
+            if !interactive: reset-btn := IconButton {
+                height: 18px;
+                style: hyperlink;
+                icon: @image-url("../../../../../bootstrap-icons/icons/bootstrap-reboot.svg");
+                tooltip: @tr("Reset All Connections");
+                tooltip-position: left;
+                status-tip: @tr("Reset all pads to 'unconnected' state");
+
+                clicked => {
+                    Backend.trigger-tab(section-index, index, TabAction.device-pinout-reset);
+                }
+            }
+
+            if interactive: exit-btn := IconButton {
+                height: 18px;
+                style: hyperlink;
+                color-enabled: Constants.librepcb-color;
+                icon: @image-url("../../../../../font-awesome/svgs/solid/circle-xmark.svg");
+                tooltip: @tr("Exit Interactive Mode") + " (Esc)";
+                tooltip-position: left;
+
+                clicked => {
+                    Backend.trigger-tab(section-index, index, TabAction.abort);
+                }
+            }
+        }
+
+        if interactive: HorizontalLayout {
+            padding: 5px;
+            spacing: 5px;
+
+            Rectangle {
+                background: #202020;
+                border-color: interactive-filter-edt.has-focus ? Constants.librepcb-color : #606060;
+                border-width: 1px;
+                border-radius: 10px;
+
+                HorizontalLayout {
+                    padding: 1px;
+                    padding-left: 8px;
+                    padding-right: 8px;
+                    spacing: 2px;
+
+                    current-pad-name-txt := Text {
+                        horizontal-stretch: 0;
+                        font-size: 14px;
+                        font-weight: 600;
+                        horizontal-alignment: right;
+                        vertical-alignment: center;
+                        overflow: elide;
+                        font-family: "Noto Sans Mono";
+                        text: tabs[index].interactive-pinout-pad + ":";
+                        accessible-label: "current pad";
+                    }
+
+                    interactive-filter-edt := LineEdit {
+                        horizontal-stretch: 0;
+                        text: tabs[index].interactive-pinout-filter;
+                        placeholder-text: @tr("Type to filter signals...");
+                        border-color: transparent;
+                        border-width: 0;
+                        frameless: true;
+                        accessible-label: "signal filter";
+
+                        // Actually we want to gain the focus in the init()
+                        // callback, but that leads to a crash :-/
+                        Timer {
+                            running: true;
+                            interval: 200ms;
+
+                            triggered => {
+                                self.running = false;
+                                parent.focus();
+                            }
+                        }
+
+                        text-edited(text) => {
+                            tabs[index].interactive-pinout-filter = text;
+                        }
+
+                        key-pressed(event) => {
+                            if event.text == Key.UpArrow {
+                                tabs[index].interactive-pinout-signal-index -= 1;
+                                return accept;
+                            } else if event.text == Key.DownArrow {
+                                tabs[index].interactive-pinout-signal-index += 1;
+                                return accept;
+                            } else if event.text == Key.Return {
+                                Backend.trigger-tab(section-index, index, TabAction.accept);
+                                return accept;
+                            } else if (event.text == Key.Escape) && (!self.text.is-empty) {
+                                tabs[index].interactive-pinout-filter = "";
+                                return accept;
+                            } else if (event.text == Key.Backspace) && self.text.is-empty {
+                                tabs[index].interactive-pinout-signal-index = -2;  // Select "unconnected"
+                                return accept;
+                            }
+                            reject
+                        }
+                    }
+                }
+            }
+        }
+
+        Rectangle {
+            min-width: 300px;
+            max-width: self.preferred-width * 1.5;
+            background: #2c2c2c;
+
+            VerticalLayout {
+                alignment: start;
+                padding-top: interactive ? 0 : 5px;
+                padding-bottom: 8px;
+
+                if interactive: interactive-view := DeviceInteractiveSignalListView {
+                    vertical-stretch: 1;
+                    model: tabs[index].interactive-pinout-signals;
+                    current-index: tabs[index].interactive-pinout-signal-index;
+
+                    signal-clicked(idx) => {
+                        tabs[index].interactive-pinout-signal-index = idx;
+                        Backend.trigger-tab(section-index, index, TabAction.accept);
+                    }
+                }
+
+                pinout-view := DevicePinoutListView {
+                    max-height: interactive ? 0 : 9999px;
+                    model: tabs[index].pinout;
+                    signal-names: tabs[index].signal-names;
+                    visible: !interactive;
+                }
+
+                if !interactive: VerticalLayout {
+                    padding-left: 8px;
+                    padding-right: 8px;
+                    spacing: 8px;
+
+                    // Workaround for broken layout (not growing
+                    // horizontally) if the layout is empty.
+                    Rectangle {
+                        height: 3px;
+                    }
+
+                    if tabs[index].has-auto-connectable-pads: auto-connect-btn := Button {
+                        text: @tr("Auto-Connect By Names");
+                        icon: @image-url("../../../../../font-awesome/svgs/solid/wand-magic-sparkles.svg");
+                        status-tip: @tr("Try to automatically connect pads to signals by their name");
+                        primary: true;
+
+                        clicked => {
+                            Backend.trigger-tab(section-index, index, TabAction.device-pinout-connect-auto);
+                        }
+                    }
+
+                    if tabs[index].has-unconnected-pads: interactive-connect-btn := Button {
+                        text: @tr("Connect Interactively");
+                        icon: @image-url("../../../../../font-awesome/svgs/solid/hand-sparkles.svg");
+                        status-tip: @tr("Connect the remaining pads one by one in an interactive mode");
+                        primary: !tabs[index].has-auto-connectable-pads;  // Exclusive-or
+
+                        clicked => {
+                            Backend.trigger-tab(section-index, index, TabAction.device-pinout-connect-interactively);
+                        }
+                    }
+
+                    if tabs[index].all-pads-unconnected: import-btn := Button {
+                        text: @tr("Load From File");
+                        icon: @image-url("../../../../../font-awesome/svgs/solid/arrow-up-from-bracket.svg");
+                        status-tip: @tr("Import the pinout from a CSV file with these columns:") + " Pad,Signal";
+
+                        clicked => {
+                            Backend.trigger-tab(section-index, index, TabAction.device-pinout-load-from-file);
+                        }
+                    }
+                }
+            }
+
+            if interactive: DevicePinoutShortcutsOverlay {
+                x: parent.width - self.width - 8px;
+                y: parent.height - self.height - 8px;
+            }
+        }
+    }
+}

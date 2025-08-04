@@ -13,6 +13,7 @@ export enum ToolTipPosition {
     bottom,
     bottom-left,
     left,
+    right,
     top,
 }
 
@@ -87,6 +88,8 @@ export component IconButton inherits Rectangle {
             x: {
                 if tooltip-position == ToolTipPosition.left {
                     -5px - self.width;
+                } else if tooltip-position == ToolTipPosition.right {
+                    parent.width + 5px
                 } else if tooltip-position == ToolTipPosition.bottom-left {
                     parent.width - self.width
                 } else {
@@ -94,7 +97,7 @@ export component IconButton inherits Rectangle {
                 }
             };
             y: {
-                if tooltip-position == ToolTipPosition.left {
+                if (tooltip-position == ToolTipPosition.left) || (tooltip-position == ToolTipPosition.right) {
                     (parent.height - self.height) / 2
                 } else if tooltip-position == ToolTipPosition.top {
                     -self.height - 5px

@@ -43,7 +43,6 @@ class Workspace;
 namespace editor {
 
 class GuiApplication;
-class LibraryEditorLegacy;
 class LibraryEditorTab;
 class UndoStack;
 
@@ -113,10 +112,6 @@ public:
 
   void forceClosingTabs(const QSet<FilePath>& fp) noexcept;
 
-  // Legacy editors
-  void openLegacyDeviceEditor(const FilePath& fp) noexcept;
-  void duplicateInLegacyDeviceEditor(const FilePath& fp) noexcept;
-
   // Operator Overloadings
   LibraryEditor& operator=(const LibraryEditor& rhs) = delete;
 
@@ -136,8 +131,6 @@ private:
   bool mManualModificationsMade;
 
   QVector<QPointer<LibraryEditorTab>> mRegisteredTabs;
-
-  std::unique_ptr<LibraryEditorLegacy> mLegacyEditor;
 };
 
 /*******************************************************************************

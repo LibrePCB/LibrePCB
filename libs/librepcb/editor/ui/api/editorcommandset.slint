@@ -14,7 +14,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> item-open: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/folder-open.svg"),
         text: "Open",
         status-tip: "Open the selected item(s)",
         shortcut: "Return",
@@ -23,7 +23,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> save: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../bootstrap-icons/icons/floppy-fill.svg"),
         text: "Save",
         status-tip: "Save changes to filesystem",
         shortcut: "Ctrl+S",
@@ -31,17 +31,8 @@ export global EditorCommandSet {
         key: "s",
     };
 
-    in property <EditorCommand> save-all: {
-        icon: @image-url(""),
-        text: "Save All",
-        status-tip: "Save all elements to filesystem",
-        shortcut: "Ctrl+Shift+S",
-        modifiers: { alt: false, control: true, shift: true, meta: false },
-        key: "S",
-    };
-
     in property <EditorCommand> select-all: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/object-group.svg"),
         text: "Select All",
         status-tip: "Select all visible objects",
         shortcut: "Ctrl+A",
@@ -77,7 +68,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> file-manager: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/arrow-up-right-from-square.svg"),
         text: "Show in File Manager",
         status-tip: "Open the directory in the file manager",
         shortcut: "",
@@ -104,7 +95,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> workspace-libraries-rescan: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/arrows-rotate.svg"),
         text: "Rescan Libraries",
         status-tip: "Scan all workspace libraries to update the cache",
         shortcut: "F5",
@@ -121,17 +112,8 @@ export global EditorCommandSet {
         key: "m",
     };
 
-    in property <EditorCommand> library-element-new: {
-        icon: @image-url(""),
-        text: "New Library Element...",
-        status-tip: "Create a new library element",
-        shortcut: "Ctrl+N",
-        modifiers: { alt: false, control: true, shift: false, meta: false },
-        key: "n",
-    };
-
     in property <EditorCommand> library-element-duplicate: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/clone.svg"),
         text: "Duplicate",
         status-tip: "Create a new element by duplicating this one",
         shortcut: "Ctrl+D",
@@ -167,7 +149,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> grid-properties: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../bootstrap-icons/icons/grid-3x3.svg"),
         text: "Grid Properties...",
         status-tip: "View/modify the grid properties",
         shortcut: "F4",
@@ -302,7 +284,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> input-unit-change: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/ruler.svg"),
         text: "Change Unit...",
         status-tip: "Change the measurement unit of the text input",
         shortcut: "Ctrl+M",
@@ -392,7 +374,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> export-image: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../bootstrap-icons/icons/image.svg"),
         text: "Export Image...",
         status-tip: "Export graphics as a pixmap",
         shortcut: "Ctrl+Shift+I",
@@ -401,7 +383,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> export-pdf: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/file-pdf.svg"),
         text: "Export PDF...",
         status-tip: "Export graphics as a PDF",
         shortcut: "Ctrl+Shift+P",
@@ -428,7 +410,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> print: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../bootstrap-icons/icons/printer-fill.svg"),
         text: "Print...",
         status-tip: "Send graphics to a printer",
         shortcut: "Ctrl+P",
@@ -491,7 +473,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> undo: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/rotate-left.svg"),
         text: "Undo",
         status-tip: "Revert the last modification",
         shortcut: "Ctrl+Z",
@@ -500,7 +482,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> redo: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/rotate-right.svg"),
         text: "Redo",
         status-tip: "Re-apply the last reverted modification",
         shortcut: "Ctrl+Y",
@@ -608,7 +590,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> flip-horizontal: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../../img/arrow-right-left-across-line.svg"),
         text: "Flip Horizontally",
         status-tip: "Flip the selected object(s) horizontally to the other board side",
         shortcut: "F",
@@ -617,7 +599,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> flip-vertical: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/arrow-down-up-across-line.svg"),
         text: "Flip Vertically",
         status-tip: "Flip the selected object(s) vertically to the other board side",
         shortcut: "Shift+F",
@@ -707,7 +689,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> zoom-fit-content: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/expand.svg"),
         text: "Zoom to Fit Contents",
         status-tip: "Set the zoom level to fit the whole content",
         shortcut: "Ctrl+Home",
@@ -716,7 +698,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> zoom-in: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../bootstrap-icons/icons/zoom-in.svg"),
         text: "Zoom In",
         status-tip: "Increase the zoom level",
         shortcut: "Ctrl++",
@@ -725,7 +707,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> zoom-out: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../bootstrap-icons/icons/zoom-out.svg"),
         text: "Zoom Out",
         status-tip: "Decrease the zoom level",
         shortcut: "Ctrl+-",
@@ -734,7 +716,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> grid-increase: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/caret-up.svg"),
         text: "Increase Grid Interval",
         status-tip: "Increase the grid interval",
         shortcut: "Ctrl+Shift++",
@@ -743,7 +725,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> grid-decrease: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/caret-down.svg"),
         text: "Decrease Grid Interval",
         status-tip: "Decrease the grid interval",
         shortcut: "Ctrl+Shift+-",
@@ -770,7 +752,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> toggle-background-image: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../bootstrap-icons/icons/image.svg"),
         text: "Set/Unset Background Image...",
         status-tip: "Use a datasheet drawing as the background for verification",
         shortcut: "",
@@ -779,7 +761,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> toggle-3d: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../bootstrap-icons/icons/badge-3d.svg"),
         text: "Toggle 2D/3D Mode",
         status-tip: "Switch between 2D and 3D viewer mode",
         shortcut: "Ctrl+3",
@@ -788,7 +770,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-select: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/arrow-pointer.svg"),
         text: "Select",
         status-tip: "Select & modify existing objects",
         shortcut: "",
@@ -806,7 +788,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-rect: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/vector-square.svg"),
         text: "Draw Rectangle",
         status-tip: "Draw graphical rectangles",
         shortcut: "G",
@@ -815,7 +797,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-polygon: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/draw-polygon.svg"),
         text: "Draw Polygon",
         status-tip: "Draw graphical polygons",
         shortcut: "P",
@@ -824,7 +806,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-circle: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../bootstrap-icons/icons/circle.svg"),
         text: "Draw Circle",
         status-tip: "Draw graphical circles",
         shortcut: "C",
@@ -833,7 +815,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-arc: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/circle-notch.svg"),
         text: "Draw Arc",
         status-tip: "Draw graphical arcs",
         shortcut: "Shift+C",
@@ -842,7 +824,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-text: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/font.svg"),
         text: "Add Text",
         status-tip: "Add graphical text objects",
         shortcut: "T",
@@ -950,7 +932,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-zone: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../bootstrap-icons/icons/sign-stop.svg"),
         text: "Draw Keepout Zone",
         status-tip: "Draw keep-out zones",
         shortcut: "Z",
@@ -959,7 +941,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-hole: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/bore-hole.svg"),
         text: "Add Hole",
         status-tip: "Add non-plated holes (NPTH drills)",
         shortcut: "O",
@@ -1022,7 +1004,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-generate-outline: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/wand-magic-sparkles.svg"),
         text: "Generate Outline",
         status-tip: "Automatically generate the outline polygon",
         shortcut: "",
@@ -1031,7 +1013,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-generate-courtyard: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/wand-magic-sparkles.svg"),
         text: "Generate Courtyard...",
         status-tip: "Automatically generate the courtyard polygon",
         shortcut: "",
@@ -1040,7 +1022,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-renumber-pads: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/wand-magic-sparkles.svg"),
         text: "Re-Number Pads...",
         status-tip: "Helper tool to interactively change pad numbers",
         shortcut: "",
@@ -1049,7 +1031,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> tool-measure: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/ruler.svg"),
         text: "Measure Distance",
         status-tip: "Measure the distance between two points",
         shortcut: "Ctrl+M",
@@ -1094,7 +1076,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> line-width-increase: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/caret-up.svg"),
         text: "Increase Line Width",
         status-tip: "Increase the line/trace/stroke/pad width",
         shortcut: "+",
@@ -1103,7 +1085,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> line-width-decrease: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/caret-down.svg"),
         text: "Decrease Line Width",
         status-tip: "Decrease the line/trace/stroke/pad width",
         shortcut: "-",
@@ -1175,7 +1157,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> align-horizontal-left: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/align-left.svg"),
         text: "Align Left",
         status-tip: "Horizontal alignment: Left",
         shortcut: "1",
@@ -1184,7 +1166,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> align-horizontal-center: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/align-center.svg"),
         text: "Align Center",
         status-tip: "Horizontal alignment: Center",
         shortcut: "2",
@@ -1193,7 +1175,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> align-horizontal-right: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/align-right.svg"),
         text: "Align Right",
         status-tip: "Horizontal alignment: Right",
         shortcut: "3",
@@ -1202,7 +1184,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> align-vertical-bottom: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../bootstrap-icons/icons/align-bottom.svg"),
         text: "Align Bottom",
         status-tip: "Vertical alignment: Bottom",
         shortcut: "4",
@@ -1211,7 +1193,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> align-vertical-center: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../bootstrap-icons/icons/align-center.svg"),
         text: "Align Center",
         status-tip: "Vertical alignment: Center",
         shortcut: "5",
@@ -1220,7 +1202,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> align-vertical-top: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../bootstrap-icons/icons/align-top.svg"),
         text: "Align Top",
         status-tip: "Vertical alignment: Top",
         shortcut: "6",
@@ -1274,7 +1256,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> shape-round: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/circle.svg"),
         text: "Round",
         status-tip: "Shape: Round",
         shortcut: "1",
@@ -1283,7 +1265,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> shape-rounded-rect: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/square.svg"),
         text: "Rounded Rectangle",
         status-tip: "Shape: Rounded Rectangle",
         shortcut: "2",
@@ -1292,7 +1274,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> shape-rect: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/square-full.svg"),
         text: "Rectangle",
         status-tip: "Shape: Rectangle",
         shortcut: "3",
@@ -1301,7 +1283,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> shape-octagon: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../bootstrap-icons/icons/octagon-fill.svg"),
         text: "Octagon",
         status-tip: "Shape: Octagon",
         shortcut: "4",
@@ -1399,42 +1381,6 @@ export global EditorCommandSet {
         key: "p",
     };
 
-    in property <EditorCommand> page-next: {
-        icon: @image-url(""),
-        text: "Next Tab/Page",
-        status-tip: "Navigate to the next tab or page",
-        shortcut: "Ctrl+Tab",
-        modifiers: { alt: false, control: true, shift: false, meta: false },
-        key: Key.Tab,
-    };
-
-    in property <EditorCommand> page-previous: {
-        icon: @image-url(""),
-        text: "Previous Tab/Page",
-        status-tip: "Navigate to the previous tab or page",
-        shortcut: "Ctrl+Shift+Tab",
-        modifiers: { alt: false, control: true, shift: true, meta: false },
-        key: Key.Tab,
-    };
-
-    in property <EditorCommand> tab-close: {
-        icon: @image-url(""),
-        text: "Close Tab",
-        status-tip: "Close the currently opened tab",
-        shortcut: "Ctrl+W",
-        modifiers: { alt: false, control: true, shift: false, meta: false },
-        key: "w",
-    };
-
-    in property <EditorCommand> tab-close-all: {
-        icon: @image-url(""),
-        text: "Close All Tabs",
-        status-tip: "Close all currently opened tabs",
-        shortcut: "Ctrl+Shift+W",
-        modifiers: { alt: false, control: true, shift: true, meta: false },
-        key: "W",
-    };
-
     in property <EditorCommand> window-new: {
         icon: @image-url("../../../../bootstrap-icons/icons/window-plus.svg"),
         text: "New Window",
@@ -1463,7 +1409,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> application-quit: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../bootstrap-icons/icons/box-arrow-left.svg"),
         text: "Quit",
         status-tip: "Close the whole application",
         shortcut: "Ctrl+Q",
@@ -1472,7 +1418,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> about-librepcb: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../bootstrap-icons/icons/question-circle.svg"),
         text: "About LibrePCB",
         status-tip: "Show information about the application",
         shortcut: "",
@@ -1490,7 +1436,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> website: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/globe.svg"),
         text: "LibrePCB Website",
         status-tip: "Open the LibrePCB website in the web browser",
         shortcut: "",
@@ -1499,7 +1445,7 @@ export global EditorCommandSet {
     };
 
     in property <EditorCommand> documentation-online: {
-        icon: @image-url(""),
+        icon: @image-url("../../../../font-awesome/svgs/solid/book.svg"),
         text: "User Manual & Tutorials",
         status-tip: "Open the online user manual in the web browser",
         shortcut: "F1",
@@ -1619,15 +1565,6 @@ export global EditorCommandSet {
         icon: @image-url("../../../../font-awesome/svgs/solid/cart-shopping.svg"),
         text: "Open Pricing Website...",
         status-tip: "Open pricing details about this part in the web browser",
-        shortcut: "",
-        modifiers: { alt: false, control: false, shift: false, meta: false },
-        key: "",
-    };
-
-    in property <EditorCommand> helper-tools: {
-        icon: @image-url(""),
-        text: "Generate Content...",
-        status-tip: "Various helper tools to generate or modify objects",
         shortcut: "",
         modifiers: { alt: false, control: false, shift: false, meta: false },
         key: "",

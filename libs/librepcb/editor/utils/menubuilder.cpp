@@ -107,70 +107,6 @@ void MenuBuilder::addSeparator() noexcept {
  *  Static Methods
  ******************************************************************************/
 
-QMenu* MenuBuilder::createFileMenu(QWidget* parent) noexcept {
-  return createMenu("menuFile", tr("&File"), QIcon(), parent);
-}
-
-QMenu* MenuBuilder::createEditMenu(QWidget* parent) noexcept {
-  return createMenu("menuEdit", tr("&Edit"), QIcon(), parent);
-}
-
-QMenu* MenuBuilder::createViewMenu(QWidget* parent) noexcept {
-  return createMenu("menuView", tr("&View"), QIcon(), parent);
-}
-
-QMenu* MenuBuilder::createSchematicMenu(QWidget* parent) noexcept {
-  return createMenu("menuSchematic", tr("&Schematic"), QIcon(), parent);
-}
-
-QMenu* MenuBuilder::createBoardMenu(QWidget* parent) noexcept {
-  return createMenu("menuBoard", tr("&Board"), QIcon(), parent);
-}
-
-QMenu* MenuBuilder::createProjectMenu(QWidget* parent) noexcept {
-  return createMenu("menuProject", tr("&Project"), QIcon(), parent);
-}
-
-QMenu* MenuBuilder::createToolsMenu(QWidget* parent) noexcept {
-  return createMenu("menuTools", tr("&Tools"), QIcon(), parent);
-}
-
-QMenu* MenuBuilder::createExtrasMenu(QWidget* parent) noexcept {
-  return createMenu("menuExtras", tr("&Extras"), QIcon(), parent);
-}
-
-QMenu* MenuBuilder::createHelpMenu(QWidget* parent) noexcept {
-  return createMenu("menuHelp", tr("&Help"), QIcon(), parent);
-}
-
-QMenu* MenuBuilder::createGoToDockMenu(QWidget* parent) noexcept {
-  return createMenu("menuGoToDock", tr("Go to &Dock"), QIcon(), parent);
-}
-
-QMenu* MenuBuilder::createDocksVisibilityMenu(QWidget* parent) noexcept {
-  return createMenu("menuDocksVisibility", tr("&Show/Hide Docks"), QIcon(),
-                    parent);
-}
-
-QMenu* MenuBuilder::createImportMenu(QWidget* parent) noexcept {
-  return createMenu("menuImport", tr("&Import"),
-                    QIcon(":/img/actions/import.png"), parent);
-}
-
-QMenu* MenuBuilder::createExportMenu(QWidget* parent) noexcept {
-  return createMenu("menuExport", tr("&Export"),
-                    QIcon(":/img/actions/export.png"), parent);
-}
-
-QMenu* MenuBuilder::createProductionDataMenu(QWidget* parent) noexcept {
-  return createMenu("menuProductionData", tr("Production &Data"),
-                    QIcon(":/img/actions/export_pick_place_file.png"), parent);
-}
-
-QMenu* MenuBuilder::createLineWidthMenu(QWidget* parent) noexcept {
-  return createMenu("menuLineWidth", tr("Line &Width"), QIcon(), parent);
-}
-
 QMenu* MenuBuilder::createChangeDeviceMenu(QWidget* parent) noexcept {
   return createMenu("menuChangeDevice", tr("Change &Device"),
                     QIcon(":/img/library/package.png"), parent);
@@ -184,14 +120,6 @@ QMenu* MenuBuilder::createChangeFootprintMenu(QWidget* parent) noexcept {
 QMenu* MenuBuilder::createChangeModelMenu(QWidget* parent) noexcept {
   return createMenu("menuChangeModel", tr("Change 3D &Model"),
                     QIcon(":/img/library/3d_model.png"), parent);
-}
-
-QMenu* MenuBuilder::createMoveToOtherLibraryMenu(QWidget* parent) noexcept {
-  QMenu* menu =
-      createMenu("menuMoveToOtherLibrary", tr("Move to Other Library"),
-                 QIcon(":/img/actions/move_to.png"), parent);
-  menu->setStatusTip(tr("Move this element to another library"));
-  return menu;
 }
 
 QMenu* MenuBuilder::createMoreResourcesMenu(QWidget* parent) noexcept {

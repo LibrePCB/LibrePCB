@@ -1,0 +1,74 @@
+import { ScrollView } from "std-widgets.slint";
+import { ComboBox } from "../../widgets.slint";
+import { DevicePinoutData } from "../../api.slint";
+
+export component DevicePinoutListView inherits ScrollView {
+    in-out property <[DevicePinoutData]> model;
+    in-out property <[string]> signal-names;
+    property <length> row-height: 25px;
+
+    preferred-width: l.preferred-width;
+    preferred-height: l.preferred-height;
+    mouse-drag-pan-enabled: true;
+
+    l := HorizontalLayout {
+        spacing: 8px;
+        padding-left: 8px;
+        padding-right: 8px;  // Reserve space for the scrollbar
+
+        VerticalLayout {
+            horizontal-stretch: 0;
+            spacing: 2px;
+
+            for item in model: pad-name-txt := Text {
+                height: row-height;
+                horizontal-alignment: right;
+                vertical-alignment: center;
+                overflow: elide;
+                text: item.pad-name + ":";
+                accessible-role: none;
+            }
+        }
+
+        VerticalLayout {
+            horizontal-stretch: 1;
+            spacing: 2px;
+
+            for item[index] in model: Rectangle {
+                height: row-height;
+
+                signal-cbx := ComboBox {
+                    height: row-height;
+                    model: signal-names;
+                    current-index: item.signal-index;
+                    editable-only-when-focused: true;
+                    enabled: self.model.length > 1;  // If component signals available
+                    accessible-label: "signal of pad " + item.pad-name;
+
+                    current-index-changed(idx) => {
+                        model[index].signal-index = idx;
+                    }
+                }
+
+                // If the selected signal is invalid (unknown UUID), show
+                // the UUID as a red overlay over the combobox. But the
+                // combobox is still operational, so the user can fix the
+                // error by assigning a valid signal.
+                if (item.signal-index < 0) || (item.signal-index >= signal-names.length): HorizontalLayout {
+                    padding-left: 8px;
+                    padding-right: 15px;  // Skip the drop-down arrow
+
+                    signal-uuid-txt := Text {
+                        color: red;
+                        horizontal-alignment: left;
+                        vertical-alignment: center;
+                        font-family: "Noto Sans Mono";
+                        overflow: elide;
+                        text: item.signal-uuid;
+                        accessible-role: none;
+                    }
+                }
+            }
+        }
+    }
+}

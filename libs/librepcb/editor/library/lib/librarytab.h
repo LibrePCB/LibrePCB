@@ -99,7 +99,8 @@ signals:
                               bool copyFrom);
   void componentEditorRequested(LibraryEditor& editor, const FilePath& fp,
                                 bool copyFrom);
-  void deviceEditorRequested(LibraryEditor& editor, const FilePath& fp);
+  void deviceEditorRequested(LibraryEditor& editor, const FilePath& fp,
+                             bool copyFrom);
 
 protected:
   std::optional<std::pair<RuleCheckMessageList, QSet<SExpression>>>

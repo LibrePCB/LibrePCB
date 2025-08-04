@@ -73,25 +73,9 @@ public:
   MenuBuilder& operator=(const MenuBuilder& rhs) = delete;
 
   // Static Methods
-  static QMenu* createFileMenu(QWidget* parent) noexcept;
-  static QMenu* createEditMenu(QWidget* parent) noexcept;
-  static QMenu* createViewMenu(QWidget* parent) noexcept;
-  static QMenu* createSchematicMenu(QWidget* parent) noexcept;
-  static QMenu* createBoardMenu(QWidget* parent) noexcept;
-  static QMenu* createProjectMenu(QWidget* parent) noexcept;
-  static QMenu* createToolsMenu(QWidget* parent) noexcept;
-  static QMenu* createExtrasMenu(QWidget* parent) noexcept;
-  static QMenu* createHelpMenu(QWidget* parent) noexcept;
-  static QMenu* createGoToDockMenu(QWidget* parent) noexcept;
-  static QMenu* createDocksVisibilityMenu(QWidget* parent) noexcept;
-  static QMenu* createImportMenu(QWidget* parent) noexcept;
-  static QMenu* createExportMenu(QWidget* parent) noexcept;
-  static QMenu* createProductionDataMenu(QWidget* parent) noexcept;
-  static QMenu* createLineWidthMenu(QWidget* parent) noexcept;
   static QMenu* createChangeDeviceMenu(QWidget* parent) noexcept;
   static QMenu* createChangeFootprintMenu(QWidget* parent) noexcept;
   static QMenu* createChangeModelMenu(QWidget* parent) noexcept;
-  static QMenu* createMoveToOtherLibraryMenu(QWidget* parent) noexcept;
   static QMenu* createMoreResourcesMenu(QWidget* parent) noexcept;
 
 private:  // Methods
