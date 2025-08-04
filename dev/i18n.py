@@ -121,10 +121,11 @@ def update():
                 # If plural form is available, ignore the singular form.
                 # This is the way it is done by Qt.
                 msgid = values.get('msgid_plural', values['msgid'])
+                numerus = 'msgid_plural' in values
                 msgctxt = values['msgctxt']
                 if msgctxt not in slint_strings:
                     slint_strings[msgctxt] = list()
-                slint_strings[msgctxt].append((sources, msgid))
+                slint_strings[msgctxt].append((sources, msgid, numerus))
                 sources = list()
                 key = None
                 values = dict()
@@ -141,8 +142,11 @@ def update():
     for context, strings in sorted(slint_strings.items()):
         ts.insert(-1, '<context>\n')
         ts.insert(-1, '    <name>ui::{}</name>\n'.format(context))
-        for sources, string in sorted(strings):
-            ts.insert(-1, '    <message>\n')
+        for sources, string, numerus in sorted(strings):
+            if numerus is True:
+                ts.insert(-1, '    <message numerus="yes">\n')
+            else:
+                ts.insert(-1, '    <message>\n')
             for source in sources:
                 path = source.split(':')[0].replace('"', '')
                 line = int(source.split(':')[1])
@@ -150,8 +154,14 @@ def update():
                               .format(path, line))
             ts.insert(-1, '        <source>{}</source>\n'
                           .format(escape_xml(po_str_to_qs(string))))
-            ts.insert(-1, '        <translation type="{}"></translation>\n'
-                          .format('unfinished'))
+            if numerus is True:
+                ts.insert(-1, '        <translation type="unfinished">\n')
+                ts.insert(-1, '            <numerusform></numerusform>\n')
+                ts.insert(-1, '            <numerusform></numerusform>\n')
+                ts.insert(-1, '        </translation>\n')
+            else:
+                ts.insert(-1, '        <translation type="{}"></translation>\n'
+                              .format('unfinished'))
             ts.insert(-1, '    </message>\n')
         ts.insert(-1, '</context>\n')
     with open(os.path.join(REPO_DIR, TS_FILE), 'w') as f:
