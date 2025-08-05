@@ -24,18 +24,18 @@ export component SlideView inherits VerticalLayout {
         background: #555555;
     }
 
-    flickable := Flickable {
+    // Using a Rectangle instead of a Flickable, see explanation in
+    // https://github.com/slint-ui/slint/issues/9080.
+    Rectangle {
         property <float> animated-index: max(min(current-index, pages.length - 1), 0);
 
         animate animated-index { duration: 200ms; }
 
-        viewport-width: self.width * pages.length;
-        viewport-height: self.height;
-        viewport-x: min(max(-self.width * animated-index, -self.viewport-width + self.width), 0);
-        viewport-y: 0;
-        interactive: false;
+        clip: true;
 
         HorizontalLayout {
+            x: -parent.width * animated-index;
+            width: parent.width * pages.length;
             height: 100%;
 
             @children
