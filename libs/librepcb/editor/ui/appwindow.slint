@@ -27,6 +27,7 @@ export { Backend, Data, Cmd as EditorCommandSet }
 export component AppWindow inherits Window {
     property <float> panel-width-factor: (Data.sections.length > 1) ? 0.25 : 0.3;
     property <length> panel-width: min(self.width * panel-width-factor, 350px);
+    property <length> actual-panel-width: (Data.panel-page != PanelPage.none) ? panel-width : 0;
 
     title: Data.window-title;
     background: #2a2a2a;
@@ -64,7 +65,7 @@ export component AppWindow inherits Window {
             z: 100; // For the tooltips.
             width: 100%;
             height: 26px;
-            sections-start-x: sidebar.width + panel-width;
+            sections-start-x: sidebar.width + actual-panel-width;
 
             focus-root => {
                 fs.focus();
@@ -148,12 +149,12 @@ export component AppWindow inherits Window {
         }
 
         HorizontalLayout {
-            x: sidebar.width + panel-width;
+            x: sidebar.width + actual-panel-width;
             y: sidebar.y + 1px;
             width: parent.width - self.x;
             height: sidebar.height - 1px;
 
-            Rectangle {
+            if actual-panel-width > 0: Rectangle {
                 background: #555555;
                 width: 1px;
             }
