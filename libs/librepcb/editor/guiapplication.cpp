@@ -66,6 +66,30 @@
 namespace librepcb {
 namespace editor {
 
+// Translation callback for Slint. Needs to convert gettext placeholders
+// to Qt placeholders ("{1}" -> "%1").
+void slintTr(slint::private_api::Slice<uint8_t> string,
+             slint::private_api::Slice<uint8_t> ctx,
+             slint::private_api::Slice<uint8_t> domain, int32_t n,
+             slint::private_api::Slice<uint8_t> plural,
+             slint::SharedString* out) noexcept {
+  Q_UNUSED(domain);
+  const QString context = "ui::" %
+      QString::fromUtf8(reinterpret_cast<const char*>(ctx.ptr), ctx.len);
+  QString str = plural.len
+      ? QString::fromUtf8(reinterpret_cast<const char*>(plural.ptr), plural.len)
+      : QString::fromUtf8(reinterpret_cast<const char*>(string.ptr),
+                          string.len);
+  str.replace("{n}", "%n");
+  int num = 1;
+  while (str.contains(QString("{%1}").arg(num))) {
+    str.replace(QString("{%1}").arg(num), "%" % QString::number(num));
+    ++num;
+  }
+  *out = q2s(QCoreApplication::translate(qPrintable(context), qPrintable(str),
+                                         nullptr, n));
+}
+
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
@@ -94,6 +118,11 @@ GuiApplication::GuiApplication(Workspace& ws, bool fileFormatIsOutdated,
   if (mWindows.isEmpty()) {
     createNewWindow();
   }
+
+  // It seems registering the callback *before* the first Slint window is
+  // created, doesn't work for some reason so we do it here. Maybe the reason
+  // is that that's not an official Slint feature but a hack from myself ;-)
+  slint::private_api::slint_translate_set_translate_callback(&slintTr);
 
   // Setup quick access.
   connect(mQuickAccessModel.get(), &QuickAccessModel::openFileTriggered, this,
