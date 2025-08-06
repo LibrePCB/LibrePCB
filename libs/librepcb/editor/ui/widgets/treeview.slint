@@ -36,6 +36,11 @@ export component TreeView inherits Rectangle {
     accessible-item-count: model.length;
 
     function set-current-index(index: int) {
+        if ((index + 1) * item-height) > (view.height - view.viewport-y) {
+            view.viewport-y = -(index + 1) * item-height + view.height;
+        } else if (index * item-height) < -(view.viewport-y) {
+            view.viewport-y = -(index * item-height);
+        }
         current-index = index;
         item-selected(index, model[index]);
     }
