@@ -931,7 +931,7 @@ void SchematicTab::fsmToolEnter(
   mTool = ui::EditorTool::Polygon;
 
   // Layers
-  mToolLayersQt = Toolbox::sortedQSet(state.getAvailableLayers());
+  mToolLayersQt = Layer::sorted(state.getAvailableLayers());
   mToolLayers->clear();
   for (const Layer* layer : mToolLayersQt) {
     mToolLayers->push_back(q2s(layer->getNameTr()));
@@ -980,7 +980,7 @@ void SchematicTab::fsmToolEnter(SchematicEditorState_AddText& state) noexcept {
   mTool = ui::EditorTool::Text;
 
   // Layers
-  mToolLayersQt = Toolbox::sortedQSet(state.getAvailableLayers());
+  mToolLayersQt = Layer::sorted(state.getAvailableLayers());
   mToolLayers->clear();
   for (const Layer* layer : mToolLayersQt) {
     mToolLayers->push_back(q2s(layer->getNameTr()));

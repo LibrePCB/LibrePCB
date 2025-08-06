@@ -1246,7 +1246,7 @@ void PackageTab::fsmToolEnter(PackageEditorState_DrawLine& state) noexcept {
   mTool = ui::EditorTool::Line;
 
   // Layers
-  mToolLayersQt = Toolbox::sortedQSet(state.getAvailableLayers());
+  mToolLayersQt = Layer::sorted(state.getAvailableLayers());
   mToolLayers->clear();
   for (const Layer* layer : mToolLayersQt) {
     mToolLayers->push_back(q2s(layer->getNameTr()));
@@ -1292,7 +1292,7 @@ void PackageTab::fsmToolEnter(PackageEditorState_DrawRect& state) noexcept {
   mTool = ui::EditorTool::Rect;
 
   // Layers
-  mToolLayersQt = Toolbox::sortedQSet(state.getAvailableLayers());
+  mToolLayersQt = Layer::sorted(state.getAvailableLayers());
   mToolLayers->clear();
   for (const Layer* layer : mToolLayersQt) {
     mToolLayers->push_back(q2s(layer->getNameTr()));
@@ -1352,7 +1352,7 @@ void PackageTab::fsmToolEnter(PackageEditorState_DrawPolygon& state) noexcept {
   mTool = ui::EditorTool::Polygon;
 
   // Layers
-  mToolLayersQt = Toolbox::sortedQSet(state.getAvailableLayers());
+  mToolLayersQt = Layer::sorted(state.getAvailableLayers());
   mToolLayers->clear();
   for (const Layer* layer : mToolLayersQt) {
     mToolLayers->push_back(q2s(layer->getNameTr()));
@@ -1425,7 +1425,7 @@ void PackageTab::fsmToolEnter(PackageEditorState_DrawCircle& state) noexcept {
   mTool = ui::EditorTool::Circle;
 
   // Layers
-  mToolLayersQt = Toolbox::sortedQSet(state.getAvailableLayers());
+  mToolLayersQt = Layer::sorted(state.getAvailableLayers());
   mToolLayers->clear();
   for (const Layer* layer : mToolLayersQt) {
     mToolLayers->push_back(q2s(layer->getNameTr()));
@@ -1486,7 +1486,7 @@ void PackageTab::fsmToolEnter(PackageEditorState_DrawArc& state) noexcept {
   mTool = ui::EditorTool::Arc;
 
   // Layers
-  mToolLayersQt = Toolbox::sortedQSet(state.getAvailableLayers());
+  mToolLayersQt = Layer::sorted(state.getAvailableLayers());
   mToolLayers->clear();
   for (const Layer* layer : mToolLayersQt) {
     mToolLayers->push_back(q2s(layer->getNameTr()));
@@ -1623,7 +1623,7 @@ void PackageTab::fsmToolEnter(PackageEditorState_DrawText& state) noexcept {
   mTool = ui::EditorTool::Text;
 
   // Layers
-  mToolLayersQt = Toolbox::sortedQSet(state.getAvailableLayers());
+  mToolLayersQt = Layer::sorted(state.getAvailableLayers());
   mToolLayers->clear();
   for (const Layer* layer : mToolLayersQt) {
     mToolLayers->push_back(q2s(layer->getNameTr()));

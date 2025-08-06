@@ -23,7 +23,6 @@
 #include "layercombobox.h"
 
 #include <librepcb/core/types/layer.h>
-#include <librepcb/core/utils/toolbox.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -78,8 +77,7 @@ const Layer* LayerComboBox::getCurrentLayer() const noexcept {
  ******************************************************************************/
 
 void LayerComboBox::setLayers(const QSet<const Layer*>& layers) noexcept {
-  QList<const Layer*> sorted = Toolbox::toList(layers);
-  std::sort(sorted.begin(), sorted.end(), &Layer::lessThan);
+  const QVector<const Layer*> sorted = Layer::sorted(layers);
 
   blockSignals(true);
   const Layer* selected = getCurrentLayer();

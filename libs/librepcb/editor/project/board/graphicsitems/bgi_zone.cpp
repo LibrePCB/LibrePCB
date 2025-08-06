@@ -119,8 +119,7 @@ void BGI_Zone::zoneEdited(const BI_Zone& obj, BI_Zone::Event event) noexcept {
 }
 
 void BGI_Zone::updateZValue() noexcept {
-  auto layers =
-      Toolbox::sortedQSet(mZone.getData().getLayers(), &Layer::lessThan);
+  auto layers = Layer::sorted(mZone.getData().getLayers());
   if (!layers.isEmpty()) {
     setZValue(BoardGraphicsScene::getZValueOfCopperLayer(*layers.first()));
   }

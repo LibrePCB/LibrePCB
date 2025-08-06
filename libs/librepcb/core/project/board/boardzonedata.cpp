@@ -24,7 +24,6 @@
 
 #include "../../serialization/sexpression.h"
 #include "../../types/layer.h"
-#include "../../utils/toolbox.h"
 
 #include <QtCore>
 
@@ -141,7 +140,7 @@ void BoardZoneData::serialize(SExpression& root) const {
   root.appendChild("no_exposure", mRules.testFlag(Zone::Rule::NoExposure));
   root.appendChild("no_devices", mRules.testFlag(Zone::Rule::NoDevices));
   root.ensureLineBreak();
-  foreach (const Layer* layer, Toolbox::sortedQSet(mLayers, &Layer::lessThan)) {
+  foreach (const Layer* layer, Layer::sorted(mLayers)) {
     root.appendChild("layer", *layer);
     root.ensureLineBreak();
   }

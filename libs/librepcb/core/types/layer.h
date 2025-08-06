@@ -285,6 +285,15 @@ public:
    */
   static bool lessThan(const Layer* a, const Layer* b) noexcept;
 
+  /**
+   * @brief Sort a set of layers using #lessThan()
+   *
+   * @param set A set of layers (must not contain `nullptr`!).
+   *
+   * @return The sorted set as a vector.
+   */
+  static QVector<const Layer*> sorted(const QSet<const Layer*>& set) noexcept;
+
 private:  // Methods
   Layer(const QString& id, const QString& nameTr, const QString& themeColor,
         Flags flags) noexcept;
