@@ -43,6 +43,7 @@ export component AppWindow inherits Window {
         // property changes to false during application startup which seems
         // to keep the focus here.
         enabled: Data.preview-mode;
+        focus-policy: click-only;
 
         key-pressed(event) => {
             if Shortcuts.process(event) {

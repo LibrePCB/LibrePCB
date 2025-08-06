@@ -415,29 +415,22 @@ component LibrarySection inherits Rectangle {
 export component DocumentsPanel inherits Rectangle {
     background: #2a2a2a;
 
-    // Set focus when panel is shown. Not sure if it's always desired(?).
-    init => {
-        fs.focus();
-    }
+    ScrollView {
+        property <length> scrollbar-width: (self.height < self.viewport-height) ? 7px : 0;
 
-    fs := FocusScope {
-        ScrollView {
-            property <length> scrollbar-width: (self.height < self.viewport-height) ? 7px : 0;
+        VerticalLayout {
+            alignment: start;
 
-            VerticalLayout {
-                alignment: start;
+            for project[project-index] in Data.projects: project-item := ProjectSection {
+                project: project;
+                project-index: project-index;
+                scrollbar-width: scrollbar-width;
+            }
 
-                for project[project-index] in Data.projects: project-item := ProjectSection {
-                    project: project;
-                    project-index: project-index;
-                    scrollbar-width: scrollbar-width;
-                }
-
-                for library[library-index] in Data.libraries: library-item := LibrarySection {
-                    library: library;
-                    library-index: library-index;
-                    scrollbar-width: scrollbar-width;
-                }
+            for library[library-index] in Data.libraries: library-item := LibrarySection {
+                library: library;
+                library-index: library-index;
+                scrollbar-width: scrollbar-width;
             }
         }
     }

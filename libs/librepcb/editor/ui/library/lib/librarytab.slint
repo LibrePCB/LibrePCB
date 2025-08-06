@@ -633,6 +633,10 @@ component LibraryContentTab inherits HorizontalLayout {
                 }
             }
 
+            focus-gained(reason) => {
+                Data.set-current-tab(section-index, index);
+            }
+
             item-selected(idx, item) => {
                 Data.set-current-tab(section-index, index);
                 if (idx != tabs[index].categories-index) || (tabs[index].filtered-elements-index != -1) {
@@ -759,6 +763,10 @@ component LibraryContentTab inherits HorizontalLayout {
                 item-clicked(path) => {
                     tabs[index].move-element-to-lib = path;
                 }
+            }
+
+            focus-gained(reason) => {
+                Data.set-current-tab(section-index, index);
             }
 
             item-selected(idx, item) => {

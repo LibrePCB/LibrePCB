@@ -640,4 +640,8 @@ export component ComponentTab inherits Tab {
             tabs[index].choose-category = false;
         }
     }
+
+    focus-gained(reason) => {
+        Data.set-current-tab(section-index, index);
+    }
 }

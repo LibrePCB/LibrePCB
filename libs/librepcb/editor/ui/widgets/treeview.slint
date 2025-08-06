@@ -9,19 +9,18 @@ import {
     TreeViewItemData,
 } from "../api.slint";
 
-export component TreeView inherits Rectangle {
+export component TreeView inherits FocusScope {
     in-out property <[TreeViewItemData]> model;
     in property <bool> supports-expand: true;
     in property <color> icons-color: transparent;  // Not colorized by default
     in property <length> font-size: 14px;
     in property <length> item-height: font-size + 8px;  // 22px
     in property <length> icon-size: font-size + 4px;  // 18px
-    out property <bool> has-focus <=> fs.has-focus;
     property <length> pin-size: 14px;
     property <int> current-index: -1;
     property <length> scrollbar-width: (self.height < self.preferred-height) ? 7px : 0;
 
-    callback key-pressed(index: int, item: TreeViewItemData, event: KeyEvent) -> EventResult;
+    callback item-key-pressed(index: int, item: TreeViewItemData, event: KeyEvent) -> EventResult;
     callback item-hovered(index: int, item: TreeViewItemData);
     callback item-selected(index: int, item: TreeViewItemData);
     callback item-triggered(index: int, item: TreeViewItemData) -> bool;
@@ -29,7 +28,6 @@ export component TreeView inherits Rectangle {
     callback item-deleted(index: int, item: TreeViewItemData) -> bool;
 
     preferred-height: model.length * item-height;
-    forward-focus: fs;
 
     // Accessibility
     accessible-role: list;
@@ -43,37 +41,6 @@ export component TreeView inherits Rectangle {
         }
         current-index = index;
         item-selected(index, model[index]);
-    }
-
-    fs := FocusScope {
-        key-pressed(event) => {
-            if event.text == Key.DownArrow {
-                set-current-index(min(current-index + 1, model.length - 1));
-                return accept;
-            } else if event.text == Key.UpArrow {
-                set-current-index(max(current-index - 1, 0));
-                return accept;
-            } else if (current-index >= 0) && (current-index < model.length) {
-                if event.text == Key.Return {
-                    if !item-triggered(current-index, model[current-index]) {
-                        model[current-index].action = TreeViewItemAction.open;
-                    }
-                    return accept;
-                } else if (event.text == Key.Space) && (model[current-index].has-children) {
-                    model[current-index].expanded = !model[current-index].expanded;
-                    return accept;
-                } else if event.text == Key.Delete {
-                    if !item-deleted(current-index, model[current-index]) {
-                        model[current-index].action = TreeViewItemAction.delete;
-                    }
-                    return accept;
-                } else if event.text == Key.Menu {
-                    item-right-clicked(current-index, model[current-index], 0, item-height * (current-index + 1) + view.viewport-y);
-                    return accept;
-                }
-            }
-            root.key-pressed(current-index, model[current-index], event)
-        }
     }
 
     view := ListView {
@@ -180,7 +147,7 @@ export component TreeView inherits Rectangle {
             }
 
             clicked => {
-                fs.focus();
+                root.focus();
                 set-current-index(index);
             }
 
@@ -199,5 +166,34 @@ export component TreeView inherits Rectangle {
                 }
             }
         }
+    }
+
+    key-pressed(event) => {
+        if event.text == Key.DownArrow {
+            set-current-index(min(current-index + 1, model.length - 1));
+            return accept;
+        } else if event.text == Key.UpArrow {
+            set-current-index(max(current-index - 1, 0));
+            return accept;
+        } else if (current-index >= 0) && (current-index < model.length) {
+            if event.text == Key.Return {
+                if !item-triggered(current-index, model[current-index]) {
+                    model[current-index].action = TreeViewItemAction.open;
+                }
+                return accept;
+            } else if (event.text == Key.Space) && (model[current-index].has-children) {
+                model[current-index].expanded = !model[current-index].expanded;
+                return accept;
+            } else if event.text == Key.Delete {
+                if !item-deleted(current-index, model[current-index]) {
+                    model[current-index].action = TreeViewItemAction.delete;
+                }
+                return accept;
+            } else if event.text == Key.Menu {
+                item-right-clicked(current-index, model[current-index], 0, item-height * (current-index + 1) + view.viewport-y);
+                return accept;
+            }
+        }
+        item-key-pressed(current-index, model[current-index], event)
     }
 }

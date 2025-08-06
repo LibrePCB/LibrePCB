@@ -695,9 +695,11 @@ export component SymbolTab inherits Tab {
         }
     }
 
-    key-pressed(event) => {
+    focus-gained(reason) => {
         Data.set-current-tab(section-index, index);
+    }
 
+    key-pressed(event) => {
         // If the focus is in the command toolbar, make the Escape key moving
         // the focus back to the graphics scene without triggering any action.
         if (event.text == Key.Escape) && (!root.has-focus) {
