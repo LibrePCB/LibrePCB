@@ -79,6 +79,7 @@ DeviceTab::DeviceTab(LibraryEditor& editor, std::unique_ptr<Device> dev,
   : LibraryEditorTab(editor, parent),
     onDerivedUiDataChanged(*this),
     mDevice(std::move(dev)),
+    mMode(mode),
     mIsNewElement(isPathOutsideLibDir()),
     mPinoutBuilder(
         new DevicePinoutBuilder(mDevice->getPadSignalMap(), *mUndoStack)),
@@ -115,7 +116,7 @@ DeviceTab::DeviceTab(LibraryEditor& editor, std::unique_ptr<Device> dev,
   mCollator.setIgnorePunctuation(false);
 
   // Invalidate referenced elements if this is new.
-  if (mIsNewElement) {
+  if (mode == Mode::New) {
     mComponentSelected = false;
     mPackageSelected = false;
   }
@@ -367,7 +368,7 @@ void DeviceTab::trigger(ui::TabAction a) noexcept {
       if (mWizardMode && (mCurrentPageIndex == 0)) {
         ++mCurrentPageIndex;
         // Initialize device metadata from selected component & package.
-        if (mComponent && mPackage) {
+        if ((mMode == Mode::New) && mComponent && mPackage) {
           std::optional<ElementName> name = parseElementName(
               QString("%1 (%2)").arg(*mComponent->getNames().getDefaultValue(),
                                      *mPackage->getNames().getDefaultValue()));
@@ -731,15 +732,15 @@ void DeviceTab::commitUiData() noexcept {
     std::unique_ptr<CmdDeviceEdit> cmd(new CmdDeviceEdit(*mDevice));
     cmd->setName(QString(), mNameParsed);
     const QString description = s2q(mDescription);
-    if (description != mComponent->getDescriptions().getDefaultValue()) {
+    if (description != mDevice->getDescriptions().getDefaultValue()) {
       cmd->setDescription(QString(), description.trimmed());
     }
     const QString keywords = s2q(mKeywords);
-    if (keywords != mComponent->getKeywords().getDefaultValue()) {
+    if (keywords != mDevice->getKeywords().getDefaultValue()) {
       cmd->setKeywords(QString(), EditorToolbox::cleanKeywords(keywords));
     }
     const QString author = s2q(mAuthor);
-    if (author != mComponent->getAuthor()) {
+    if (author != mDevice->getAuthor()) {
       cmd->setAuthor(author.trimmed());
     }
     cmd->setVersion(mVersionParsed);

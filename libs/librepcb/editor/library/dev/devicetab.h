@@ -118,6 +118,7 @@ private:
 private:
   // References
   std::unique_ptr<Device> mDevice;
+  const Mode mMode;
   const bool mIsNewElement;
   QCollator mCollator;
   std::unique_ptr<DevicePinoutBuilder> mPinoutBuilder;
