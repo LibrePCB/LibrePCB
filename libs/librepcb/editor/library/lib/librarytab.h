@@ -160,6 +160,7 @@ private:
   int mCurrentPageIndex;
   int mCurrentCategoryIndex;
   int mCurrentElementIndex;
+  std::shared_ptr<slint::VectorModel<float>> mViewsScrollPositions;
   QString mFilterTerm;
 
   // Library metadata to be applied

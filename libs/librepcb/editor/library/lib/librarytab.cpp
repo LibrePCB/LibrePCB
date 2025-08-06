@@ -64,6 +64,7 @@ LibraryTab::LibraryTab(LibraryEditor& editor, bool wizardMode,
     mCurrentPageIndex(mWizardMode ? 0 : 2),
     mCurrentCategoryIndex(0),
     mCurrentElementIndex(-1),
+    mViewsScrollPositions(new slint::VectorModel<float>({0, 0})),
     mNameParsed(mLibrary.getNames().getDefaultValue()),
     mVersionParsed(mLibrary.getVersion()),
     mDeprecated(false),
@@ -164,6 +165,7 @@ ui::LibraryTabData LibraryTab::getDerivedUiData() const noexcept {
       mEditor.getUiIndex(),  // Library index
       mWizardMode,  // Wizard mode
       mCurrentPageIndex,  // Page index
+      mViewsScrollPositions,  // View scroll positions
       q2s(mLibrary.getIconAsPixmap()),  // Icon
       mName,  // Name
       mNameError,  // Name error

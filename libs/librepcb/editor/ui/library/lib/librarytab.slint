@@ -579,12 +579,19 @@ component LibraryContentTab inherits HorizontalLayout {
     in property <int> index;
     in property <bool> read-only;
 
+    // If the tab is switched, restore scroll positions.
+    changed index => {
+        categories-view.restore-scroll-position();
+        elements-view.restore-scroll-position();
+    }
+
     VerticalLayout {
         horizontal-stretch: 20;
 
         categories-view := LibraryTreeView {
             model: tabs[index].categories;
             current-index: tabs[index].categories-index;
+            initial-scroll-position: tabs[index].views-scroll-positions[0];
 
             if Data.libraries-rescan-in-progress: Spinner {
                 x: parent.width - self.width - self.y;
@@ -645,6 +652,10 @@ component LibraryContentTab inherits HorizontalLayout {
                 Backend.trigger-tab(section-index, index, TabAction.library-categories-remove);
                 true
             }
+
+            scrolled(pos) => {
+                tabs[index].views-scroll-positions[0] = pos;
+            }
         }
 
         property <int> selected-items: ((categories-view.current-index >= 0) && (categories-view.current-index < categories-view.model.length) && (categories-view.model[categories-view.current-index].level > 0) && (!categories-view.model[categories-view.current-index].is-external)) ? 1 : 0;
@@ -677,6 +688,7 @@ component LibraryContentTab inherits HorizontalLayout {
         elements-view := LibraryTreeView {
             model: tabs[index].filtered-elements;
             current-index: tabs[index].filtered-elements-index;
+            initial-scroll-position: tabs[index].views-scroll-positions[1];
 
             if self.model.length == 0: Text {
                 width: 0.8 * parent.width;
@@ -764,6 +776,10 @@ component LibraryContentTab inherits HorizontalLayout {
                 self.item-selected(idx, item);
                 Backend.trigger-tab(section-index, index, TabAction.library-elements-remove);
                 true
+            }
+
+            scrolled(pos) => {
+                tabs[index].views-scroll-positions[1] = pos;
             }
         }
 
