@@ -642,7 +642,7 @@ void PackageTab::setDerivedUiData(const ui::PackageTabData& data) noexcept {
   }
   emit filledRequested(data.tool_filled);
   emit grabAreaRequested(data.tool_grab_area);
-  // Note: We set the drill before width/height to let the FSM devrease the
+  // Note: We set the drill before width/height to let the FSM decrease the
   // drill if width or height are set to a smaller value. This clipping does
   // not work in both directions yet because we don't know if the user edited
   // the drill or width/height.

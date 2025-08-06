@@ -433,11 +433,15 @@ void Board2dTab::setDerivedUiData(const ui::Board2dTabData& data) noexcept {
   // Tool line width
   mToolLineWidth.setUiData(data.tool_line_width);
 
+  // Tool drill
+  // Note: We set the drill before (via) size to let the FSM decrease the
+  // drill if size is set to a smaller value. This clipping does
+  // not work in both directions yet because we don't know if the user edited
+  // the drill or size.
+  mToolDrill.setUiData(data.tool_drill);
+
   // Tool size
   mToolSize.setUiData(data.tool_size);
-
-  // Tool drill
-  mToolDrill.setUiData(data.tool_drill);
 
   // Tool filled / auto-width
   emit filledRequested(data.tool_filled);

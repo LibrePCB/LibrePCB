@@ -298,6 +298,11 @@ void BoardEditorState_DrawTrace::setViaSize(
     emit viaSizeChanged(mCurrentViaProperties.getSize());
   }
 
+  // Avoid creating vias with a drill larger than size.
+  if (size < mCurrentViaProperties.getDrillDiameter()) {
+    setViaDrillDiameter(size);
+  }
+
   updateNetpointPositions();
 }
 
@@ -305,6 +310,11 @@ void BoardEditorState_DrawTrace::setViaDrillDiameter(
     const PositiveLength& diameter) noexcept {
   if (mCurrentViaProperties.setDrillDiameter(diameter)) {
     emit viaDrillDiameterChanged(mCurrentViaProperties.getDrillDiameter());
+  }
+
+  // Avoid creating vias with a drill larger than size.
+  if (diameter > mCurrentViaProperties.getSize()) {
+    setViaSize(diameter);
   }
 
   updateNetpointPositions();
