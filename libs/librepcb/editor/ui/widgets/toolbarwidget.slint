@@ -1,14 +1,14 @@
 import { Constants } from "../api.slint";
 
 export component ToolBarWidget inherits FocusScope {
+    in property <length> content-padding-left: 5px;
+    in property <length> content-padding-right: 5px;
+    in property <length> content-padding-top: 5px;
+    in property <length> content-padding-bottom: 5px;
     in property <length> spacing: 3px;
 
     width: self.preferred-width;
     preferred-height: 28px;
-    padding-left: 5px;
-    padding-right: 5px;
-    padding-top: 5px;
-    padding-bottom: 5px;
 
     Rectangle {
         background: #202020;
@@ -25,10 +25,10 @@ export component ToolBarWidget inherits FocusScope {
         border-radius: 10px;
 
         HorizontalLayout {
-            padding-left: root.padding-left;
-            padding-right: root.padding-right;
-            padding-top: root.padding-top;
-            padding-bottom: root.padding-bottom;
+            padding-left: content-padding-left;
+            padding-right: content-padding-right;
+            padding-top: content-padding-top;
+            padding-bottom: content-padding-bottom;
             spacing: spacing;
 
             @children

@@ -170,6 +170,17 @@ export global Backend {
         debug("Trigger board action:", project-index, board-index, action);
     }
 
+    // Move a tab with drag&drop
+    //
+    // The source & destination data are coming from the drag event and is
+    // a comma-separated string containing window ID, section index, tab index
+    // (e.g. "1,1,0"). A destination tab index of -1 will create a new section
+    // for the moved tab.
+    pure callback drop-tab(src-data: string, dst-data: string, force-switch-to-tab: bool);
+    drop-tab(src-data, dst-data, force-switch-to-tab) => {
+        debug("Drop tab \{src-data} to \{dst-data}");
+    }
+
     // Open an URL by an external application (usually the web browser)
     //
     // The return value indicates whether the operation was successful or not.

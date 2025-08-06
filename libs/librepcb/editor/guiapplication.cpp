@@ -576,6 +576,17 @@ bool GuiApplication::requestClosingAllProjects() noexcept {
  ******************************************************************************/
 
 void GuiApplication::createNewWindow(int id, int projectIndex) noexcept {
+  // Reuse next free window ID.
+  if (id < 1) {
+    id = 1;
+    while (std::any_of(mWindows.begin(), mWindows.end(),
+                       [id](const std::shared_ptr<MainWindow>& w) {
+                         return w->getId() == id;
+                       })) {
+      ++id;
+    }
+  }
+
   // Create Slint window.
   auto win = ui::AppWindow::create();
 
@@ -614,6 +625,7 @@ void GuiApplication::createNewWindow(int id, int projectIndex) noexcept {
   // Set global data.
   const ui::Data& d = win->global<ui::Data>();
   d.set_preview_mode(false);
+  d.set_window_id(id);
   d.set_window_title(
       QString("LibrePCB %1").arg(Application::getVersion()).toUtf8().data());
   d.set_about_librepcb_details(q2s(Application::buildFullVersionDetails()));
@@ -646,6 +658,14 @@ void GuiApplication::createNewWindow(int id, int projectIndex) noexcept {
 
   // Register global callbacks.
   const ui::Backend& b = win->global<ui::Backend>();
+  b.on_drop_tab([this](const slint::SharedString& srcData,
+                       const slint::SharedString& dstData,
+                       bool forceSwitchToTab) {
+    const QStringList src = s2q(srcData).split(",");
+    const QStringList dst = s2q(dstData).split(",");
+    moveTab(src[0].toInt(), src[1].toInt(), src[2].toInt(),  //
+            dst[0].toInt(), dst[1].toInt(), dst[2].toInt(), forceSwitchToTab);
+  });
   b.on_open_url([this](const slint::SharedString& url) {
     DesktopServices ds(mWorkspace.getSettings());
     return ds.openUrl(QUrl(s2q(url)));
@@ -739,17 +759,6 @@ void GuiApplication::createNewWindow(int id, int projectIndex) noexcept {
         }
         return res;
       });
-
-  // Reuse next free window ID.
-  if (id < 1) {
-    id = 1;
-    while (std::any_of(mWindows.begin(), mWindows.end(),
-                       [id](const std::shared_ptr<MainWindow>& w) {
-                         return w->getId() == id;
-                       })) {
-      ++id;
-    }
-  }
 
   // Build wrapper.
   auto mw = std::make_shared<MainWindow>(*this, win, id);
@@ -937,6 +946,55 @@ void GuiApplication::updateDesktopIntegrationNotification() noexcept {
   } else {
     mNotificationDesktopIntegration->dismiss();
   }
+}
+
+void GuiApplication::moveTab(int srcWindowId, int srcSectionIndex,
+                             int srcTabIndex, int dstWindowId,
+                             int dstSectionIndex, int dstTabIndex,
+                             bool forceSwitchToTab) noexcept {
+  if ((srcWindowId == dstWindowId) && (srcSectionIndex == dstSectionIndex) &&
+      (dstTabIndex > srcTabIndex)) {
+    --dstTabIndex;  // Moving to the right needs index correction.
+  }
+  if ((srcWindowId == dstWindowId) && (srcSectionIndex == dstSectionIndex) &&
+      (dstTabIndex == srcTabIndex)) {
+    return;  // Tab is actually not moved (destination == source).
+  }
+  if ((srcSectionIndex == 0) && (srcTabIndex == 0)) {
+    return;  // Home tab is not movable.
+  }
+  auto srcWindow = getWindowById(srcWindowId);
+  auto dstWindow = getWindowById(dstWindowId);
+  if (srcWindow && dstWindow) {
+    bool wasCurrentTab = false;
+    bool wasCurrentSection = false;
+    if (auto tab = srcWindow->removeTab(srcSectionIndex, srcTabIndex,
+                                        &wasCurrentTab, &wasCurrentSection)) {
+      if (dstTabIndex == -1) {
+        dstWindow->addSection(dstSectionIndex, true);
+        dstTabIndex = 0;
+      }
+      if ((dstSectionIndex == 0) && (dstTabIndex == 0)) {
+        dstTabIndex = 1;  // Index 0 is the home tab.
+      }
+      const bool switchToTab = forceSwitchToTab ||
+          (wasCurrentTab &&
+           (wasCurrentSection || (dstWindowId != srcWindowId) ||
+            (dstSectionIndex != srcSectionIndex)));
+      const bool switchToSection = (wasCurrentSection && wasCurrentTab);
+      dstWindow->addTab(tab, dstSectionIndex, dstTabIndex, switchToTab,
+                        switchToSection);
+    }
+  }
+}
+
+std::shared_ptr<MainWindow> GuiApplication::getWindowById(int id) noexcept {
+  for (const auto& win : mWindows) {
+    if (win->getId() == id) {
+      return win;
+    }
+  }
+  return nullptr;
 }
 
 /*******************************************************************************

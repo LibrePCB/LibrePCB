@@ -14,6 +14,7 @@ import { Board2dTab } from "project/board/board2dtab.slint";
 import { Board3dTab } from "project/board/board3dtab.slint";
 import {
     Backend,
+    Constants,
     Data,
     Helpers,
     TabAction,
@@ -23,14 +24,44 @@ import {
     WindowSectionData,
 } from "api.slint";
 
+component TabDropArea inherits DropArea {
+    in property <string> id;
+    in property <bool> force-switch-to-tab: false;
+
+    can-drop(event) => {
+        (event.mime-type == Constants.drag-tab-mime-type) && (event.data != id)
+    }
+
+    dropped(event) => {
+        Backend.drop-tab(event.data, id, force-switch-to-tab);
+    }
+}
+
+component TabBarDropArea inherits TabDropArea {
+    if self.contains-drag: Rectangle {
+        x: max(-parent.x, 0);
+        width: 2px;
+        background: Constants.librepcb-color;
+    }
+}
+
+component TabPageDropArea inherits TabDropArea {
+    if self.contains-drag: Rectangle {
+        background: #80808050;
+    }
+}
+
 component TabButton inherits Rectangle {
     in property <TabData> tab;
+    in property <string> drop-id;
     in property <bool> is-current-section: false;
     in property <bool> is-current-tab: false;
 
     callback clicked <=> ta.clicked;
     callback close-clicked;
 
+    preferred-width: l.preferred-width;
+    max-width: max(l.preferred-width, tab.title.is-empty ? 0 : 200px);
     background: is-current-tab ? #505050 : (ta.has-hover ? #454545 : #3a3a3a);
 
     // Accessibility
@@ -40,15 +71,26 @@ component TabButton inherits Rectangle {
         ta.clicked();
     }
 
-    ta := TouchArea {
-        pointer-event(event) => {
-            if (event.button == PointerEventButton.middle) && (event.kind == PointerEventKind.down) {
-                close-clicked();
+    DragArea {
+        mime-type: Constants.drag-tab-mime-type;
+        data: drop-id;
+
+        ta := TouchArea {
+            pointer-event(event) => {
+                if (event.button == PointerEventButton.middle) && (event.kind == PointerEventKind.down) {
+                    close-clicked();
+                }
             }
         }
     }
 
-    HorizontalLayout {
+    if !tab.title.is-empty: TabBarDropArea {
+        x: -10px;
+        width: 10px + parent.width / 2;
+        id: drop-id;
+    }
+
+    l := HorizontalLayout {
         padding-left: 4px;
         padding-right: 2px;
         spacing: 3px;
@@ -61,9 +103,11 @@ component TabButton inherits Rectangle {
         }
 
         txt := Text {
-            vertical-alignment: TextVerticalAlignment.center;
+            min-width: 0;
+            vertical-alignment: center;
             color: is-current-tab ? white : #a0a0a0;
             text: tab.title;
+            overflow: elide;
             accessible-role: none;
         }
 
@@ -106,68 +150,68 @@ export component WindowSection inherits Rectangle {
     property <bool> tab-open: (section.current-tab-index >= 0) && (section.current-tab-index < section.tabs.length);
     property <TabType> tab-type: section.tabs[section.current-tab-index].type;
 
+    pure function create-drop-id(section-index: int, tab-index: int) -> string {
+        Data.window-id + "," + section-index + "," + tab-index
+    }
+
     ta := TouchArea {
         tab-bar := Rectangle {
             x: 0;
             y: 0;
+            z: 100;  // For the tooltips
             height: 30px;
             background: #2c2c2c;
 
             // Accessibility
             accessible-role: tab-list;
 
-            Rectangle {
-                x: 0;
-                width: controls-l.x;
-                clip: true;
-
-                HorizontalLayout {
-                    alignment: start;
-                    width: 100%;
-
-                    for tab[index] in section.tabs: tab-btn := TabButton {
-                        tab: tab;
-                        is-current-section: is-current-section;
-                        is-current-tab: index == section.current-tab-index;
-
-                        clicked => {
-                            Data.set-current-tab(section-index, index);
-                        }
-
-                        close-clicked => {
-                            Backend.trigger-tab(section-index, index, TabAction.close);
-                        }
-                    }
-                }
-            }
-
-            controls-l := HorizontalLayout {
-                x: parent.width - self.width;
-                width: self.preferred-width;
-                padding: 3px;
-
-                split-btn := IconButton {
-                    width: self.height;
-                    icon-scale: 0.6;
-                    icon: @image-url("../../../bootstrap-icons/icons/layout-split.svg");
-                    tooltip: @tr("Split Section");
-                    tooltip-position: bottom-left;
+            HorizontalLayout {
+                for tab[index] in section.tabs: tab-btn := TabButton {
+                    tab: tab;
+                    drop-id: create-drop-id(section-index, index);
+                    is-current-section: is-current-section;
+                    is-current-tab: index == section.current-tab-index;
 
                     clicked => {
-                        Backend.trigger-section(section-index, WindowSectionAction.split);
+                        Data.set-current-tab(section-index, index);
+                    }
+
+                    close-clicked => {
+                        Backend.trigger-tab(section-index, index, TabAction.close);
                     }
                 }
 
-                property <bool> can-close: (Data.sections.length > 1) && ((section.tabs.length == 0) || ((section.tabs.length == 1) && (section.tabs[0].type == TabType.home)));
-                if can-close: close-btn := IconButton {
-                    width: self.height;
-                    icon-scale: 0.6;
-                    icon: @image-url("../../../font-awesome/svgs/solid/xmark.svg");
-                    tooltip: @tr("Close Section");
-                    tooltip-position: bottom-left;
+                da := TabBarDropArea {
+                    id: create-drop-id(section-index, section.tabs.length);
 
-                    clicked => {
-                        Backend.trigger-section(section-index, WindowSectionAction.close);
+                    controls-l := HorizontalLayout {
+                        alignment: end;
+                        padding: 3px;
+
+                        split-btn := IconButton {
+                            width: self.height;
+                            icon-scale: 0.6;
+                            icon: @image-url("../../../bootstrap-icons/icons/layout-split.svg");
+                            tooltip: @tr("Split Section");
+                            tooltip-position: bottom-left;
+
+                            clicked => {
+                                Backend.trigger-section(section-index, WindowSectionAction.split);
+                            }
+                        }
+
+                        property <bool> can-close: (Data.sections.length > 1) && ((section.tabs.length == 0) || ((section.tabs.length == 1) && (section.tabs[0].type == TabType.home)));
+                        if can-close: close-btn := IconButton {
+                            width: self.height;
+                            icon-scale: 0.6;
+                            icon: @image-url("../../../font-awesome/svgs/solid/xmark.svg");
+                            tooltip: @tr("Close Section");
+                            tooltip-position: bottom-left;
+
+                            clicked => {
+                                Backend.trigger-section(section-index, WindowSectionAction.close);
+                            }
+                        }
                     }
                 }
             }
@@ -274,6 +318,30 @@ export component WindowSection inherits Rectangle {
                 height: 100%;
                 section-index: section-index;
                 section: section;
+            }
+
+            // Tab drop area left (overlaps with previous section)
+            TabPageDropArea {
+                x: (section-index == 0) ? 0 : -(parent.width / 8);
+                width: (section-index == 0) ? (parent.width / 8) : (parent.width / 4);
+                id: create-drop-id(section-index, -1);
+                force-switch-to-tab: true;
+            }
+
+            // Tab drop area center
+            TabPageDropArea {
+                x: parent.width / 8;
+                width: parent.width * 6 / 8;
+                id: create-drop-id(section-index, section.tabs.length);
+                force-switch-to-tab: true;
+            }
+
+            // Tab drop area right (only last section)
+            if section-index == (Data.sections.length - 1): TabPageDropArea {
+                x: parent.width * 7 / 8;
+                width: parent.width / 8;
+                id: create-drop-id(section-index + 1, -1);
+                force-switch-to-tab: true;
             }
 
             // Highlight rectangle

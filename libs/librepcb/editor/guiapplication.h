@@ -148,6 +148,11 @@ private:
   void updateNoLibrariesInstalledNotification() noexcept;
   void updateDesktopIntegrationNotification() noexcept;
 
+  void moveTab(int srcWindowId, int srcSectionIndex, int srcTabIndex,
+               int dstWindowId, int dstSectionIndex, int dstTabIndex,
+               bool forceSwitchToTab) noexcept;
+  std::shared_ptr<MainWindow> getWindowById(int id) noexcept;
+
   Workspace& mWorkspace;
   bool mLibrariesContainStandardComponents;
   std::unique_ptr<GraphicsLayerList> mPreviewLayers;
