@@ -40,7 +40,7 @@ namespace librepcb {
 
 FileFormatMigrationUnstable::FileFormatMigrationUnstable(
     QObject* parent) noexcept
-  : FileFormatMigrationV01(parent) {
+  : FileFormatMigrationV1(parent) {
   mFromVersion = mToVersion;  // Clearly distinguish from the base class.
 }
 
@@ -85,51 +85,6 @@ void FileFormatMigrationUnstable::upgradeLibrary(TransactionalDirectory& dir) {
 void FileFormatMigrationUnstable::upgradeWorkspaceData(
     TransactionalDirectory& dir) {
   Q_UNUSED(dir);
-}
-
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
-
-void FileFormatMigrationUnstable::createOutputJobs(
-    TransactionalDirectory& dir) {
-  Q_UNUSED(dir);
-}
-
-void FileFormatMigrationUnstable::upgradeSettings(SExpression& root) {
-  Q_UNUSED(root);
-}
-
-void FileFormatMigrationUnstable::upgradeCircuit(SExpression& root,
-                                                 ProjectContext& context) {
-  Q_UNUSED(root);
-  Q_UNUSED(context);
-}
-
-void FileFormatMigrationUnstable::upgradeErc(SExpression& root,
-                                             ProjectContext& context) {
-  Q_UNUSED(root);
-  Q_UNUSED(context);
-}
-
-void FileFormatMigrationUnstable::upgradeSchematic(SExpression& root,
-                                                   ProjectContext& context) {
-  Q_UNUSED(root);
-  Q_UNUSED(context);
-}
-
-void FileFormatMigrationUnstable::upgradeBoard(SExpression& root,
-                                               ProjectContext& context) {
-  Q_UNUSED(root);
-  Q_UNUSED(context);
-}
-
-void FileFormatMigrationUnstable::upgradeBoardUserSettings(SExpression& root) {
-  Q_UNUSED(root);
-}
-
-void FileFormatMigrationUnstable::upgradeBoardDrcSettings(SExpression& root) {
-  Q_UNUSED(root);
 }
 
 /*******************************************************************************

@@ -123,10 +123,7 @@ inline FootprintPad::Function deserialize(const SExpression& node) {
     return FootprintPad::Function::Unspecified;
   } else if (str == QLatin1String("standard")) {
     return FootprintPad::Function::StandardPad;
-  } else if ((str == QLatin1String("pressfit")) ||
-             (str == QLatin1String("press_fit"))) {
-    // NOTE: Remove press_fit in LibrePCB 2.x since it will be renamed during
-    // file format upgrade.
+  } else if (str == QLatin1String("pressfit")) {
     return FootprintPad::Function::PressFitPad;
   } else if (str == QLatin1String("thermal")) {
     return FootprintPad::Function::ThermalPad;
