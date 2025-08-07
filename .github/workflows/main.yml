@@ -100,6 +100,16 @@ jobs:
           ci bash ./ci/upload_artifacts.sh
         env:
           UPLOAD_URL: ${{ secrets.UPLOAD_URL }}  # Required to use it in 'if' condition
+      # Temporary upload action to investigate spurious CI failure.
+      - name: Upload sources after failure
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: sources-${{matrix.os}}
+          path: |
+            build/**/*.cpp
+            build/**/*.h
+            libs/slint/api/cpp/include
       - name: Stop Container
         if: ${{ always() }}
         run: docker stop -t 30 ci
@@ -180,3 +190,13 @@ jobs:
           UPLOAD_USER: ${{ secrets.UPLOAD_USER }}
           UPLOAD_PASS: ${{ secrets.UPLOAD_PASS }}
           UPLOAD_SIGN_KEY: ${{ secrets.UPLOAD_SIGN_KEY }}
+      # Temporary upload action to investigate spurious CI failure.
+      - name: Upload sources after failure
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: sources-${{matrix.os}}
+          path: |
+            build/**/*.cpp
+            build/**/*.h
+            libs/slint/api/cpp/include
