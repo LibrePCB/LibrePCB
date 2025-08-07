@@ -24,6 +24,7 @@
 #include <librepcb/core/application.h>
 #include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/job/graphicsoutputjob.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectloader.h>
 
@@ -130,6 +131,22 @@ TEST_F(ProjectTest, testUpgradeV1) {
         loader.open(createDir(), mProjectFile.getFilename());
     EXPECT_EQ(schematicCount, project->getSchematics().count());
     EXPECT_EQ(boardCount, project->getBoards().count());
+
+    // Check if the "realistic" flag has been migrated.
+    auto graphicsJob = std::dynamic_pointer_cast<GraphicsOutputJob>(
+        project->getOutputJobs().value(0));
+    ASSERT_TRUE(graphicsJob);
+    ASSERT_EQ(2, graphicsJob->getContent().count());
+    // Output job without "(option realistic)" is not modified.
+    EXPECT_EQ(GraphicsOutputJob::Content::Type::Board,
+              graphicsJob->getContent().at(0).type);
+    EXPECT_FALSE(graphicsJob->getContent().at(0).options.contains("realistic"));
+    EXPECT_EQ(22, graphicsJob->getContent().at(0).layers.count());
+    // Output job with "(option realistic)" is migrated.
+    EXPECT_EQ(GraphicsOutputJob::Content::Type::BoardRendering,
+              graphicsJob->getContent().at(1).type);
+    EXPECT_FALSE(graphicsJob->getContent().at(1).options.contains("realistic"));
+    EXPECT_EQ(4, graphicsJob->getContent().at(1).layers.count());
   }
 }
 

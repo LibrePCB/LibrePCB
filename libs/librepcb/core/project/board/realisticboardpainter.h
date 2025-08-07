@@ -25,10 +25,13 @@
  ******************************************************************************/
 #include "../../export/graphicsexport.h"
 
+#include <polyclipping/clipper.hpp>
+
 #include <QtCore>
 #include <QtGui>
 
 #include <memory>
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -59,15 +62,6 @@ class SceneData3D;
  * @see ::librepcb::SceneData3D
  */
 class RealisticBoardPainter final : public GraphicsPagePainter {
-  struct Content {
-    bool initialized = false;
-    QPainterPath body;
-    QPainterPath copper;
-    QPainterPath solderResist;
-    QPainterPath silkscreen;
-    QPainterPath solderPaste;
-  };
-
 public:
   // Constructors / Destructor
   RealisticBoardPainter() = delete;
@@ -83,17 +77,22 @@ public:
   RealisticBoardPainter& operator=(const RealisticBoardPainter& rhs) = delete;
 
 private:  // Methods
-  const Content& getContent(bool mirrored) const noexcept;
+  QVector<std::pair<QColor, QPainterPath>> getContent(
+      const GraphicsExportSettings& settings) const noexcept;
 
 private:  // Data
   const PositiveLength mMaxArcTolerance;
   std::shared_ptr<SceneData3D> mData;
-  bool mDrawSolderPaste;
 
   mutable QMutex mMutex;
   mutable bool mDataPreprocessed;
-  mutable Content mContentTop;
-  mutable Content mContentBot;
+  mutable std::optional<ClipperLib::Paths> mCachedHoles;
+  mutable std::optional<ClipperLib::Paths> mCachedCopperHoles;
+  mutable std::optional<ClipperLib::Paths> mCachedBoardOutlines;
+  mutable std::optional<ClipperLib::Paths> mCachedBoardArea;
+  mutable std::optional<ClipperLib::Paths> mCachedSolderResistTop;
+  mutable std::optional<ClipperLib::Paths> mCachedSolderResistBot;
+  mutable QHash<QString, QPainterPath> mCachedContentPerLayer;
 };
 
 /*******************************************************************************

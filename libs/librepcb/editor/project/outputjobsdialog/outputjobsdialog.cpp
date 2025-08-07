@@ -270,6 +270,9 @@ void OutputJobsDialog::addClicked() noexcept {
   menu.addAction(QIcon(":/img/actions/pdf.png"),
                  escape(tr("Board Assembly PDF/Image")),
                  [&]() { add(GraphicsOutputJob::boardAssemblyPdf()); });
+  menu.addAction(QIcon(":/img/actions/pdf.png"),
+                 escape(tr("Board Rendering PDF/Image")),
+                 [&]() { add(GraphicsOutputJob::boardRenderingPdf()); });
   menu.addSection(tr("Production Data"));
   menu.addAction(QIcon(":/img/actions/export_gerber.png"),
                  escape(GerberExcellonOutputJob::getTypeTrStatic()),

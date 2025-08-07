@@ -61,10 +61,13 @@ public:
       BoardImage,
       BoardAssemblyTop,
       BoardAssemblyBottom,
+      BoardRenderingTop,
+      BoardRenderingBottom,
     };
     enum class Type {
       Schematic,
       Board,
+      BoardRendering,
       AssemblyGuide,  // Reserved for future use.
     };
 
@@ -90,7 +93,7 @@ public:
 
     // Arbitrary options for forward compatibility in case we really need to
     // add new settings in a minor release. Supported options:
-    //  - realistic: If present, render boards in realistic mode
+    //  - none
     QMap<QString, QList<SExpression>> options;
 
     Content(Preset preset) noexcept
@@ -135,57 +138,87 @@ public:
             QString(Theme::Color::sSchematicPinNumbers),
         };
       } else if (preset != Preset::None) {
-        type = Type::Board;
         if (preset == Preset::BoardAssemblyTop) {
+          type = Type::Board;
           title = tr("Assembly Top");
           mirror = false;
         } else if (preset == Preset::BoardAssemblyBottom) {
+          type = Type::Board;
           title = tr("Assembly Bottom");
           mirror = true;
+        } else if (preset == Preset::BoardRenderingTop) {
+          type = Type::BoardRendering;
+          title = tr("Rendering Top");
+          mirror = false;
+        } else if (preset == Preset::BoardRenderingBottom) {
+          type = Type::BoardRendering;
+          title = tr("Rendering Bottom");
+          mirror = true;
         } else {
+          type = Type::Board;
           title = tr("Board");
           mirror = false;
         }
         boards = BoardSet::onlyDefault();
         assemblyVariants = AssemblyVariantSet::set({std::nullopt});
-        enabledLayers = {
-            QString(Theme::Color::sBoardFrames),
-            QString(Theme::Color::sBoardOutlines),
-            QString(Theme::Color::sBoardPlatedCutouts),
-            QString(Theme::Color::sBoardHoles),
-            QString(Theme::Color::sBoardPads),
-            QString(Theme::Color::sBoardMeasures),
-            QString(Theme::Color::sBoardDocumentation),
-            QString(Theme::Color::sBoardComments),
-            QString(Theme::Color::sBoardGuide),
-        };
-        if (preset != Preset::BoardAssemblyBottom) {
-          enabledLayers += {
-              QString(Theme::Color::sBoardLegendTop),
-              QString(Theme::Color::sBoardDocumentationTop),
-              QString(Theme::Color::sBoardGrabAreasTop),
-              QString(Theme::Color::sBoardNamesTop),
-              QString(Theme::Color::sBoardValuesTop),
-          };
-        }
-        if (preset != Preset::BoardAssemblyTop) {
-          enabledLayers += {
-              QString(Theme::Color::sBoardLegendBot),
-              QString(Theme::Color::sBoardDocumentationBot),
-              QString(Theme::Color::sBoardGrabAreasBot),
-              QString(Theme::Color::sBoardNamesBot),
-              QString(Theme::Color::sBoardValuesBot),
-          };
-        }
-        if (preset == Preset::BoardImage) {
-          enabledLayers += {
-              QString(Theme::Color::sBoardVias),
+        if (preset == Preset::BoardRenderingTop) {
+          enabledLayers = {
+              QString(Theme::Color::sBoardOutlines),
               QString(Theme::Color::sBoardCopperTop),
-              QString(Theme::Color::sBoardCopperBot),
+              QString(Theme::Color::sBoardStopMaskTop),
+              QString(Theme::Color::sBoardLegendTop),
           };
+        } else if (preset == Preset::BoardRenderingBottom) {
+          enabledLayers = {
+              QString(Theme::Color::sBoardOutlines),
+              QString(Theme::Color::sBoardCopperBot),
+              QString(Theme::Color::sBoardStopMaskBot),
+              QString(Theme::Color::sBoardLegendBot),
+          };
+        } else {
+          enabledLayers = {
+              QString(Theme::Color::sBoardFrames),
+              QString(Theme::Color::sBoardOutlines),
+              QString(Theme::Color::sBoardPlatedCutouts),
+              QString(Theme::Color::sBoardHoles),
+              QString(Theme::Color::sBoardPads),
+              QString(Theme::Color::sBoardMeasures),
+              QString(Theme::Color::sBoardDocumentation),
+              QString(Theme::Color::sBoardComments),
+              QString(Theme::Color::sBoardGuide),
+          };
+          if (preset != Preset::BoardAssemblyBottom) {
+            enabledLayers += {
+                QString(Theme::Color::sBoardLegendTop),
+                QString(Theme::Color::sBoardDocumentationTop),
+                QString(Theme::Color::sBoardGrabAreasTop),
+                QString(Theme::Color::sBoardNamesTop),
+                QString(Theme::Color::sBoardValuesTop),
+            };
+          }
+          if (preset != Preset::BoardAssemblyTop) {
+            enabledLayers += {
+                QString(Theme::Color::sBoardLegendBot),
+                QString(Theme::Color::sBoardDocumentationBot),
+                QString(Theme::Color::sBoardGrabAreasBot),
+                QString(Theme::Color::sBoardNamesBot),
+                QString(Theme::Color::sBoardValuesBot),
+            };
+          }
+          if (preset == Preset::BoardImage) {
+            enabledLayers += {
+                QString(Theme::Color::sBoardVias),
+                QString(Theme::Color::sBoardCopperTop),
+                QString(Theme::Color::sBoardCopperBot),
+            };
+          }
         }
       }
       GraphicsExportSettings defaultSettings;
+      if ((preset == Preset::BoardRenderingTop) ||
+          (preset == Preset::BoardRenderingBottom)) {
+        defaultSettings.loadBoardRenderingColors(0);
+      }
       foreach (const auto& pair, defaultSettings.getColors()) {
         if (enabledLayers.contains(pair.first)) {
           layers.insert(pair.first, pair.second);
@@ -251,6 +284,7 @@ public:
   // Static Methods
   static std::shared_ptr<GraphicsOutputJob> schematicPdf() noexcept;
   static std::shared_ptr<GraphicsOutputJob> boardAssemblyPdf() noexcept;
+  static std::shared_ptr<GraphicsOutputJob> boardRenderingPdf() noexcept;
 
 private:  // Methods
   GraphicsOutputJob() noexcept;
