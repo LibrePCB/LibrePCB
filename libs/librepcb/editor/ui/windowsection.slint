@@ -74,6 +74,7 @@ component TabButton inherits Rectangle {
     DragArea {
         mime-type: Constants.drag-tab-mime-type;
         data: drop-id;
+        enabled: !tab.title.is-empty;  // The home tab shall not be draggable
 
         ta := TouchArea {
             pointer-event(event) => {
