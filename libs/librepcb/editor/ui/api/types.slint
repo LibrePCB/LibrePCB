@@ -42,6 +42,7 @@ export enum PanelPage {
     rule-check,
     order,
     about,
+    none,
 }
 
 // Dynamic information about editor commands, e.g. used in menus
@@ -804,6 +805,7 @@ export struct LibraryTabData {
     library-index: int,
     wizard-mode: bool,
     page-index: int,
+    views-scroll-positions: [length],  // Ignored by the backend
 
     // Metadata
     icon: image,
@@ -851,6 +853,7 @@ export struct CategoryTabData {
     deprecated: bool,
     parents: [string],
     parents-tree: [TreeViewItemData],
+    choose-parent: bool,  // If true, the dialog is shown
 
     // Checks
     checks: RuleCheckData,
@@ -878,6 +881,7 @@ export struct SymbolTabData {
     deprecated: bool,
     categories: [LibraryElementCategoryData],
     categories-tree: [TreeViewItemData],
+    choose-category: bool,  // If true, the dialog is shown
 
     // Checks
     checks: RuleCheckData,
@@ -938,6 +942,7 @@ export struct PackageTabData {
     deprecated: bool,
     categories: [LibraryElementCategoryData],
     categories-tree: [TreeViewItemData],
+    choose-category: bool,  // If true, the dialog is shown
     assembly-type: int,
     pads: [PackagePadData],
     new-pad-name: string,
@@ -1025,6 +1030,7 @@ export struct ComponentTabData {
     deprecated: bool,
     categories: [LibraryElementCategoryData],
     categories-tree: [TreeViewItemData],
+    choose-category: bool,  // If true, the dialog is shown
     datasheet-url: string,
     datasheet-url-error: string,
     schematic-only: bool,
@@ -1071,6 +1077,7 @@ export struct DeviceTabData {
     deprecated: bool,
     categories: [LibraryElementCategoryData],
     categories-tree: [TreeViewItemData],
+    choose-category: bool,  // If true, the dialog is shown
     datasheet-url: string,
     datasheet-url-error: string,
     attributes: [AttributeData],

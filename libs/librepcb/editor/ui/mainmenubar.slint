@@ -757,7 +757,7 @@ export component MainMenuBar inherits Rectangle {
             property <LibraryData> library: Data.libraries[Data.current-library-tab.library-index];
 
             text: @tr("Library");
-            visible: Data.current-tab.type == TabType.library;
+            visible: (Data.current-tab.type == TabType.library) && (!project-menu-item.visible);
 
             clicked => {
                 library-menu-popup.show();
@@ -817,7 +817,7 @@ export component MainMenuBar inherits Rectangle {
 
         category-menu-item := MainMenuItem {
             text: @tr("Category");
-            visible: (Data.current-tab.type == TabType.component-category) || (Data.current-tab.type == TabType.package-category);
+            visible: ((Data.current-tab.type == TabType.component-category) || (Data.current-tab.type == TabType.package-category)) && (!project-menu-item.visible);
 
             clicked => {
                 category-menu-popup.show();
@@ -863,7 +863,7 @@ export component MainMenuBar inherits Rectangle {
 
         symbol-menu-item := MainMenuItem {
             text: @tr("Symbol");
-            visible: Data.current-tab.type == TabType.symbol;
+            visible: (Data.current-tab.type == TabType.symbol) && (!project-menu-item.visible);
 
             clicked => {
                 symbol-menu-popup.show();
@@ -905,7 +905,7 @@ export component MainMenuBar inherits Rectangle {
 
         package-menu-item := MainMenuItem {
             text: @tr("Package");
-            visible: Data.current-tab.type == TabType.package;
+            visible: (Data.current-tab.type == TabType.package) && (!project-menu-item.visible);
 
             clicked => {
                 package-menu-popup.show();
@@ -947,7 +947,7 @@ export component MainMenuBar inherits Rectangle {
 
         component-menu-item := MainMenuItem {
             text: @tr("Component");
-            visible: Data.current-tab.type == TabType.component;
+            visible: (Data.current-tab.type == TabType.component) && (!project-menu-item.visible);
 
             clicked => {
                 component-menu-popup.show();
@@ -989,7 +989,7 @@ export component MainMenuBar inherits Rectangle {
 
         device-menu-item := MainMenuItem {
             text: @tr("Device");
-            visible: Data.current-tab.type == TabType.device;
+            visible: (Data.current-tab.type == TabType.device) && (!project-menu-item.visible);
 
             clicked => {
                 device-menu-popup.show();

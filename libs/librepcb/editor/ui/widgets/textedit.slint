@@ -1,4 +1,4 @@
-import { Palette } from "std-widgets.slint";
+import { Palette, ScrollView } from "std-widgets.slint";
 import { Badge } from "badge.slint";
 import { Constants } from "../api.slint";
 
@@ -84,28 +84,45 @@ export component TextEdit inherits Rectangle {
         accessible-role: none;
     }
 
-    edt := TextInput {
+    view := ScrollView {
         x: placeholder-txt.x;
         y: placeholder-txt.y;
         width: parent.width - (2 * self.x);
         height: parent.height - (2 * self.y);
-        font-size: font-size;
-        color: enabled ? Palette.foreground : Palette.foreground.darker(0.5);
-        selection-background-color: Constants.librepcb-color;
-        selection-foreground-color: black;
-        enabled: enabled;
-        read-only: read-only;
-        single-line: false;
-        wrap: word-wrap;
-        text: text;
-        accessible-role: none;
+        viewport-width: self.width;
+        viewport-height: edt.preferred-height;
 
-        edited => {
-            text-edited(self.text);
-        }
+        edt := TextInput {
+            x: 0;
+            y: 0;
+            width: parent.width;
+            height: max(self.preferred-height, parent.height);
+            font-size: font-size;
+            color: enabled ? Palette.foreground : Palette.foreground.darker(0.5);
+            selection-background-color: Constants.librepcb-color;
+            selection-foreground-color: black;
+            enabled: enabled;
+            read-only: read-only;
+            single-line: false;
+            wrap: word-wrap;
+            text: text;
+            accessible-role: none;
 
-        key-pressed(event) => {
-            root.key-pressed(event)
+            cursor-position-changed(position) => {
+                if position.y < -view.viewport-y {
+                    view.viewport-y = -position.y;
+                } else if (position.y + self.font-metrics.ascent - self.font-metrics.descent) > (view.height - view.viewport-y) {
+                    view.viewport-y = view.height - (position.y + self.font-metrics.ascent - self.font-metrics.descent);
+                }
+            }
+
+            edited => {
+                text-edited(self.text);
+            }
+
+            key-pressed(event) => {
+                root.key-pressed(event)
+            }
         }
     }
 

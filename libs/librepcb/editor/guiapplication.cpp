@@ -67,7 +67,8 @@ namespace librepcb {
 namespace editor {
 
 // Translation callback for Slint. Needs to convert gettext placeholders
-// to Qt placeholders ("{1}" -> "%1").
+// to Qt placeholders ("{1}" -> "%1"). Not very elegant for now, could
+// probably be improved a lot...
 void slintTr(slint::private_api::Slice<uint8_t> string,
              slint::private_api::Slice<uint8_t> ctx,
              slint::private_api::Slice<uint8_t> domain, int32_t n,
@@ -81,13 +82,19 @@ void slintTr(slint::private_api::Slice<uint8_t> string,
       : QString::fromUtf8(reinterpret_cast<const char*>(string.ptr),
                           string.len);
   str.replace("{n}", "%n");
-  int num = 1;
-  while (str.contains(QString("{%1}").arg(num))) {
-    str.replace(QString("{%1}").arg(num), "%" % QString::number(num));
-    ++num;
+  for (int i = 0; str.contains(QString("{%1}").arg(i)); ++i) {
+    str.replace(QString("{%1}").arg(i), "%" % QString::number(i + 1));
   }
-  *out = q2s(QCoreApplication::translate(qPrintable(context), qPrintable(str),
-                                         nullptr, n));
+  for (int i = 1; str.contains("{}"); ++i) {
+    str.replace(str.indexOf("{}"), 2, "%" % QString::number(i));
+  }
+  str = QCoreApplication::translate(qPrintable(context), qPrintable(str),
+                                    nullptr, n);
+  str.replace("%n", "{n}");
+  for (int i = 1; str.contains("%" % QString::number(i)); ++i) {
+    str.replace("%" % QString::number(i), QString("{%1}").arg(i - 1));
+  }
+  *out = q2s(str);
 }
 
 /*******************************************************************************

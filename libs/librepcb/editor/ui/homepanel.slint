@@ -25,7 +25,7 @@ component QuickAccessListView inherits TreeView {
     // Accessibility
     accessible-label: "Quick Access";
 
-    key-pressed(index, item, event) => {
+    item-key-pressed(index, item, event) => {
         if (event.text == Key.Space) && item.supports-pinning {
             self.model[index].pinned = !self.model[index].pinned;
             return accept;
@@ -101,7 +101,7 @@ component WorkspaceFolderTreeView inherits TreeView {
     // Accessibility
     accessible-label: "Workspace Projects";
 
-    key-pressed(index, item, event) => {
+    item-key-pressed(index, item, event) => {
         if (event.text == Key.Space) && item.supports-pinning {
             root.model[index].pinned = !root.model[index].pinned;
             return accept;

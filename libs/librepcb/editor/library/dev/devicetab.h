@@ -118,6 +118,7 @@ private:
 private:
   // References
   std::unique_ptr<Device> mDevice;
+  const Mode mMode;
   const bool mIsNewElement;
   QCollator mCollator;
   std::unique_ptr<DevicePinoutBuilder> mPinoutBuilder;
@@ -130,7 +131,7 @@ private:
   int mCurrentPageIndex;
   bool mComponentSelected;
   bool mPackageSelected;
-  bool mAddCategoryRequested;
+  bool mChooseCategory;
 
   // Library metadata to be applied
   slint::SharedString mName;

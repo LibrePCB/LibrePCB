@@ -79,6 +79,7 @@ DeviceTab::DeviceTab(LibraryEditor& editor, std::unique_ptr<Device> dev,
   : LibraryEditorTab(editor, parent),
     onDerivedUiDataChanged(*this),
     mDevice(std::move(dev)),
+    mMode(mode),
     mIsNewElement(isPathOutsideLibDir()),
     mPinoutBuilder(
         new DevicePinoutBuilder(mDevice->getPadSignalMap(), *mUndoStack)),
@@ -89,7 +90,7 @@ DeviceTab::DeviceTab(LibraryEditor& editor, std::unique_ptr<Device> dev,
     mCurrentPageIndex(mWizardMode ? 0 : 1),
     mComponentSelected(true),
     mPackageSelected(true),
-    mAddCategoryRequested(false),
+    mChooseCategory(false),
     mNameParsed(mDevice->getNames().getDefaultValue()),
     mVersionParsed(mDevice->getVersion()),
     mCategories(new LibraryElementCategoriesModel(
@@ -115,7 +116,7 @@ DeviceTab::DeviceTab(LibraryEditor& editor, std::unique_ptr<Device> dev,
   mCollator.setIgnorePunctuation(false);
 
   // Invalidate referenced elements if this is new.
-  if (mIsNewElement) {
+  if (mode == Mode::New) {
     mComponentSelected = false;
     mPackageSelected = false;
   }
@@ -274,6 +275,7 @@ ui::DeviceTabData DeviceTab::getDerivedUiData() const noexcept {
       mDeprecated,  // Deprecated
       mCategories,  // Categories
       mCategoriesTree,  // Categories tree
+      mChooseCategory,  // Choose category
       mDatasheetUrl,  // Datasheet URL
       mDatasheetUrlError,  // Datasheet URL error
       mAttributes,  // Attributes
@@ -304,7 +306,7 @@ ui::DeviceTabData DeviceTab::getDerivedUiData() const noexcept {
       q2s(mPinoutBuilder->getSignalsFilter()),  // Interactive signals filter
       mPinoutBuilder->getFilteredSignals(),  // Interactive signals
       mPinoutBuilder->getCurrentSignalIndex(),  // Interactive signal index
-      mAddCategoryRequested ? "choose" : slint::SharedString(),  // New category
+      slint::SharedString(),  // New category
   };
 }
 
@@ -331,7 +333,7 @@ void DeviceTab::setDerivedUiData(const ui::DeviceTabData& data) noexcept {
   if (auto uuid = Uuid::tryFromString(s2q(data.new_category))) {
     mCategories->add(*uuid);
   }
-  mAddCategoryRequested = false;
+  mChooseCategory = data.choose_category;
   mDatasheetUrl = data.datasheet_url;
   validateUrl(s2q(mDatasheetUrl), mDatasheetUrlError, true);
 
@@ -366,7 +368,7 @@ void DeviceTab::trigger(ui::TabAction a) noexcept {
       if (mWizardMode && (mCurrentPageIndex == 0)) {
         ++mCurrentPageIndex;
         // Initialize device metadata from selected component & package.
-        if (mComponent && mPackage) {
+        if ((mMode == Mode::New) && mComponent && mPackage) {
           std::optional<ElementName> name = parseElementName(
               QString("%1 (%2)").arg(*mComponent->getNames().getDefaultValue(),
                                      *mPackage->getNames().getDefaultValue()));
@@ -595,16 +597,9 @@ void DeviceTab::autoFix(const MsgMissingAuthor& msg) {
 template <>
 void DeviceTab::autoFix(const MsgMissingCategories& msg) {
   Q_UNUSED(msg);
-
-  const int delay = (mCurrentPageIndex != 0) ? 500 : 50;
   mCurrentPageIndex = 0;
-  mAddCategoryRequested = false;
+  mChooseCategory = true;
   onDerivedUiDataChanged.notify();
-
-  QTimer::singleShot(delay, this, [this]() {
-    mAddCategoryRequested = true;
-    onDerivedUiDataChanged.notify();
-  });
 }
 
 /*******************************************************************************
@@ -737,15 +732,15 @@ void DeviceTab::commitUiData() noexcept {
     std::unique_ptr<CmdDeviceEdit> cmd(new CmdDeviceEdit(*mDevice));
     cmd->setName(QString(), mNameParsed);
     const QString description = s2q(mDescription);
-    if (description != mComponent->getDescriptions().getDefaultValue()) {
+    if (description != mDevice->getDescriptions().getDefaultValue()) {
       cmd->setDescription(QString(), description.trimmed());
     }
     const QString keywords = s2q(mKeywords);
-    if (keywords != mComponent->getKeywords().getDefaultValue()) {
+    if (keywords != mDevice->getKeywords().getDefaultValue()) {
       cmd->setKeywords(QString(), EditorToolbox::cleanKeywords(keywords));
     }
     const QString author = s2q(mAuthor);
-    if (author != mComponent->getAuthor()) {
+    if (author != mDevice->getAuthor()) {
       cmd->setAuthor(author.trimmed());
     }
     cmd->setVersion(mVersionParsed);

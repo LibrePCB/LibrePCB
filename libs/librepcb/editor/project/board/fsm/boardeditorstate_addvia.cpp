@@ -146,6 +146,11 @@ void BoardEditorState_AddVia::setSize(const PositiveLength& size) noexcept {
   if (mCurrentViaEditCmd) {
     mCurrentViaEditCmd->setSize(mCurrentProperties.getSize(), true);
   }
+
+  // Avoid creating vias with a drill larger than size.
+  if (size < mCurrentProperties.getDrillDiameter()) {
+    setDrillDiameter(size);
+  }
 }
 
 void BoardEditorState_AddVia::setDrillDiameter(
@@ -157,6 +162,11 @@ void BoardEditorState_AddVia::setDrillDiameter(
   if (mCurrentViaEditCmd) {
     mCurrentViaEditCmd->setDrillDiameter(mCurrentProperties.getDrillDiameter(),
                                          true);
+  }
+
+  // Avoid creating vias with a drill larger than size.
+  if (diameter > mCurrentProperties.getSize()) {
+    setSize(diameter);
   }
 }
 

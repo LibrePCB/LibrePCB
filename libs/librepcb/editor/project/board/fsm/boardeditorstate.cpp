@@ -351,9 +351,8 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
     for (auto it = scene->getZones().begin(); it != scene->getZones().end();
          it++) {
       if ((!cuLayer) || (it.key()->getData().getLayers().contains(&*cuLayer))) {
-        QList<const Layer*> layers =
-            Toolbox::toList(it.key()->getData().getLayers());
-        std::sort(layers.begin(), layers.end(), &Layer::lessThan);
+        const QVector<const Layer*> layers =
+            Layer::sorted(it.key()->getData().getLayers());
         int priority = 30;
         if (!layers.isEmpty()) {
           priority += priorityFromLayer(*layers.first());

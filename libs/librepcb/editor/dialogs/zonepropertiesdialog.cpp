@@ -33,7 +33,6 @@
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/items/bi_zone.h>
 #include <librepcb/core/types/layer.h>
-#include <librepcb/core/utils/toolbox.h>
 #include <librepcb/core/workspace/theme.h>
 
 #include <QtCore>
@@ -114,11 +113,9 @@ ZonePropertiesDialog::ZonePropertiesDialog(BI_Zone& zone, UndoStack& undoStack,
                                            const GraphicsLayerList& layers,
                                            const QString& settingsPrefix,
                                            QWidget* parent) noexcept
-  : ZonePropertiesDialog(nullptr, &zone,
-                         Toolbox::sortedQSet(zone.getBoard().getCopperLayers(),
-                                             &Layer::lessThan),
-                         undoStack, lengthUnit, layers, settingsPrefix,
-                         parent) {
+  : ZonePropertiesDialog(
+        nullptr, &zone, Layer::sorted(zone.getBoard().getCopperLayers()),
+        undoStack, lengthUnit, layers, settingsPrefix, parent) {
   load(zone.getData(), zone.getData().getLayers());
   mUi->cbxLock->setChecked(zone.getData().isLocked());
 }

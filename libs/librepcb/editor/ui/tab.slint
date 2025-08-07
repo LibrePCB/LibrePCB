@@ -3,6 +3,7 @@ export component Tab inherits FocusScope {
 
     // Focus scope is only required for the key-pressed() event.
     enabled: false;
+    focus-policy: click-only;
 
     // Not sure if this is a good idea, but e.g. when switching to a different
     // tab it can happen that no element has the focus anymore which breaks

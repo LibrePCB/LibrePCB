@@ -115,6 +115,8 @@ public:
 
   template <typename T>
   static QList<T> sortedQSet(const QSet<T>& set) noexcept {
+    static_assert(!std::is_pointer<T>::value,
+                  "Container holds pointers, sorting makes no sense.");
     QList<T> list = set.values();
     std::sort(list.begin(), list.end());
     return list;
@@ -129,6 +131,8 @@ public:
 
   template <typename T>
   static T sorted(const T& container) noexcept {
+    static_assert(!std::is_pointer<T>::value,
+                  "Container holds pointers, sorting makes no sense.");
     T copy(container);
     std::sort(copy.begin(), copy.end());
     return copy;

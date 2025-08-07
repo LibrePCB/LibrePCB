@@ -14,6 +14,7 @@ import { Tab } from "../../tab.slint";
 import {
     AssemblyTypeRowHeader,
     AuthorRowHeader,
+    CategoriesChooserDialog,
     CategoriesRowCell,
     CategoriesRowHeader,
     DeprecatedRowCell,
@@ -35,14 +36,12 @@ import {
     LineEdit,
     MenuItem,
     MenuPopup,
-    Palette,
     SceneButton,
     SlideView,
     SliderSceneButton,
     Spinner,
     TextEdit,
     ToolButton,
-    TreeItemPickerPopup,
 } from "../../widgets.slint";
 import {
     Backend,
@@ -193,7 +192,7 @@ component PackageMetadataTab inherits GridLayout {
             accessible-label: categories-txt.text;
 
             add-triggered => {
-                add-category-popup.show();
+                tabs[index].choose-category = true;
             }
         }
     }
@@ -229,25 +228,6 @@ component PackageMetadataTab inherits GridLayout {
 
     Row {
         Rectangle { }
-    }
-
-    // Open the category chooser when requested by the backend.
-    property <string> new-category: tabs[index].new-category;
-    changed new-category => {
-        if new-category == "choose" {
-            add-category-popup.show();
-        }
-    }
-
-    add-category-popup := TreeItemPickerPopup {
-        width: parent.width;
-        height: parent.height;
-        model: tabs[index].categories-tree;
-        icons-color: Palette.foreground;
-
-        item-picked(idx, item) => {
-            tabs[index].new-category = item.user-data;
-        }
     }
 }
 
@@ -1110,9 +1090,26 @@ export component PackageTab inherits Tab {
         }
     }
 
-    key-pressed(event) => {
-        Data.set-current-tab(section-index, index);
+    if tabs[index].choose-category: add-category-dialog := CategoriesChooserDialog {
+        width: parent.width;
+        height: parent.height;
+        model: tabs[index].categories-tree;
 
+        item-picked(idx, item) => {
+            tabs[index].new-category = item.user-data;
+            tabs[index].choose-category = false;
+        }
+
+        rejected => {
+            tabs[index].choose-category = false;
+        }
+    }
+
+    focus-gained(reason) => {
+        Data.set-current-tab(section-index, index);
+    }
+
+    key-pressed(event) => {
         // If the focus is in the command toolbar, make the Escape key moving
         // the focus back to the graphics scene without triggering any action.
         if (event.text == Key.Escape) && (!root.has-focus) {

@@ -4,6 +4,7 @@ import { DrawSymbolPolygonToolBar } from "drawsymbolpolygontoolbar.slint";
 import { Tab } from "../../tab.slint";
 import {
     AuthorRowHeader,
+    CategoriesChooserDialog,
     CategoriesRowCell,
     CategoriesRowHeader,
     DeprecatedRowCell,
@@ -24,12 +25,10 @@ import {
     LinkText,
     MessageBanner,
     MessageBox,
-    Palette,
     SceneButton,
     SlideView,
     TextEdit,
     ToolButton,
-    TreeItemPickerPopup,
 } from "../../widgets.slint";
 import {
     Backend,
@@ -44,181 +43,179 @@ import {
     WindowSectionData,
 } from "../../api.slint";
 
-component SymbolMetadataTab inherits GridLayout {
+component SymbolMetadataTab {
     in property <int> section-index;
     in-out property <[SymbolTabData]> tabs;
     in property <int> index;
     in property <bool> read-only;
 
-    padding: 8px;
-    spacing: 8px;
+    GridLayout {
+        padding: 8px;
+        spacing: 8px;
 
-    Row {
-        name-txt := NameRowHeader { }
+        Row {
+            name-txt := NameRowHeader { }
 
-        name-edt := LineEdit {
-            text: tabs[index].name;
-            validation-error: tabs[index].name-error;
-            read-only: read-only;
-            accessible-label: name-txt.text;
+            name-edt := LineEdit {
+                text: tabs[index].name;
+                validation-error: tabs[index].name-error;
+                read-only: read-only;
+                accessible-label: name-txt.text;
 
-            init => {
-                if (!read-only) && tabs[index].wizard-mode {
-                    self.select-all();
+                init => {
+                    if (!read-only) && tabs[index].wizard-mode {
+                        self.select-all();
+                    }
+                }
+
+                text-edited(text) => {
+                    tabs[index].name = text;
+                }
+
+                text-accepted(text) => {
+                    tabs[index].name = text;
+                    Backend.trigger-tab(section-index, index, TabAction.apply);
                 }
             }
+        }
 
-            text-edited(text) => {
-                tabs[index].name = text;
-            }
+        Row {
+            description-txt := DescriptionRowHeader { }
 
-            text-accepted(text) => {
-                tabs[index].name = text;
-                Backend.trigger-tab(section-index, index, TabAction.apply);
+            description-edt := TextEdit {
+                height: 100px;
+                text: tabs[index].description;
+                read-only: read-only;
+                accessible-label: description-txt.text;
+
+                text-edited(text) => {
+                    tabs[index].description = text;
+                }
+
+                text-accepted(text) => {
+                    tabs[index].description = text;
+                    Backend.trigger-tab(section-index, index, TabAction.apply);
+                }
             }
+        }
+
+        Row {
+            keywords-txt := KeywordsRowHeader { }
+
+            keywords-edt := LineEdit {
+                text: tabs[index].keywords;
+                read-only: read-only;
+                accessible-label: keywords-txt.text;
+
+                text-edited(text) => {
+                    tabs[index].keywords = text;
+                }
+
+                text-accepted(text) => {
+                    tabs[index].keywords = text;
+                    Backend.trigger-tab(section-index, index, TabAction.apply);
+                }
+            }
+        }
+
+        Row {
+            author-txt := AuthorRowHeader { }
+
+            author-edt := LineEdit {
+                text: tabs[index].author;
+                read-only: read-only;
+                accessible-label: author-txt.text;
+
+                text-edited(text) => {
+                    tabs[index].author = text;
+                }
+
+                text-accepted(text) => {
+                    tabs[index].author = text;
+                    Backend.trigger-tab(section-index, index, TabAction.apply);
+                }
+            }
+        }
+
+        Row {
+            version-txt := VersionRowHeader { }
+
+            version-edt := LineEdit {
+                text: tabs[index].version;
+                validation-error: tabs[index].version-error;
+                read-only: read-only;
+                accessible-label: version-txt.text;
+
+                text-edited(text) => {
+                    tabs[index].version = text;
+                }
+
+                text-accepted(text) => {
+                    tabs[index].version = text;
+                    Backend.trigger-tab(section-index, index, TabAction.apply);
+                }
+            }
+        }
+
+        Row {
+            deprecated-txt := DeprecatedRowHeader { }
+
+            deprecated-sw := DeprecatedRowCell {
+                checked: tabs[index].deprecated;
+                enabled: !read-only;
+                accessible-label: deprecated-txt.text;
+
+                toggled(checked) => {
+                    tabs[index].deprecated = checked;
+                    Backend.trigger-tab(section-index, index, TabAction.apply);
+                }
+            }
+        }
+
+        Row {
+            categories-txt := CategoriesRowHeader { }
+
+            categories-cell := CategoriesRowCell {
+                model: tabs[index].categories;
+                read-only: read-only;
+                accessible-label: categories-txt.text;
+
+                add-triggered => {
+                    tabs[index].choose-category = true;
+                }
+            }
+        }
+
+        Row {
+            Rectangle { }
+
+            footer-cell := MetadataFooterRowCell {
+                section-index: section-index;
+                tab-index: index;
+                wizard-mode: tabs[index].wizard-mode;
+                unsaved-changes: Data.sections[section-index].tabs[index].unsaved-changes;
+                checks: tabs[index].checks;
+                read-only: read-only;
+            }
+        }
+
+        Row {
+            Rectangle { }
         }
     }
 
-    Row {
-        description-txt := DescriptionRowHeader { }
-
-        description-edt := TextEdit {
-            height: 100px;
-            text: tabs[index].description;
-            read-only: read-only;
-            accessible-label: description-txt.text;
-
-            text-edited(text) => {
-                tabs[index].description = text;
-            }
-
-            text-accepted(text) => {
-                tabs[index].description = text;
-                Backend.trigger-tab(section-index, index, TabAction.apply);
-            }
-        }
-    }
-
-    Row {
-        keywords-txt := KeywordsRowHeader { }
-
-        keywords-edt := LineEdit {
-            text: tabs[index].keywords;
-            read-only: read-only;
-            accessible-label: keywords-txt.text;
-
-            text-edited(text) => {
-                tabs[index].keywords = text;
-            }
-
-            text-accepted(text) => {
-                tabs[index].keywords = text;
-                Backend.trigger-tab(section-index, index, TabAction.apply);
-            }
-        }
-    }
-
-    Row {
-        author-txt := AuthorRowHeader { }
-
-        author-edt := LineEdit {
-            text: tabs[index].author;
-            read-only: read-only;
-            accessible-label: author-txt.text;
-
-            text-edited(text) => {
-                tabs[index].author = text;
-            }
-
-            text-accepted(text) => {
-                tabs[index].author = text;
-                Backend.trigger-tab(section-index, index, TabAction.apply);
-            }
-        }
-    }
-
-    Row {
-        version-txt := VersionRowHeader { }
-
-        version-edt := LineEdit {
-            text: tabs[index].version;
-            validation-error: tabs[index].version-error;
-            read-only: read-only;
-            accessible-label: version-txt.text;
-
-            text-edited(text) => {
-                tabs[index].version = text;
-            }
-
-            text-accepted(text) => {
-                tabs[index].version = text;
-                Backend.trigger-tab(section-index, index, TabAction.apply);
-            }
-        }
-    }
-
-    Row {
-        deprecated-txt := DeprecatedRowHeader { }
-
-        deprecated-sw := DeprecatedRowCell {
-            checked: tabs[index].deprecated;
-            enabled: !read-only;
-            accessible-label: deprecated-txt.text;
-
-            toggled(checked) => {
-                tabs[index].deprecated = checked;
-                Backend.trigger-tab(section-index, index, TabAction.apply);
-            }
-        }
-    }
-
-    Row {
-        categories-txt := CategoriesRowHeader { }
-
-        categories-cell := CategoriesRowCell {
-            model: tabs[index].categories;
-            read-only: read-only;
-            accessible-label: categories-txt.text;
-
-            add-triggered => {
-                add-category-popup.show();
-            }
-        }
-    }
-
-    Row {
-        Rectangle { }
-
-        footer-cell := MetadataFooterRowCell {
-            section-index: section-index;
-            tab-index: index;
-            wizard-mode: tabs[index].wizard-mode;
-            unsaved-changes: Data.sections[section-index].tabs[index].unsaved-changes;
-            checks: tabs[index].checks;
-            read-only: read-only;
-        }
-    }
-
-    Row {
-        Rectangle { }
-    }
-
-    // Open the category chooser when requested by the backend.
-    property <string> new-category: tabs[index].new-category;
-    changed new-category => {
-        if new-category == "choose" {
-            add-category-popup.show();
-        }
-    }
-
-    add-category-popup := TreeItemPickerPopup {
+    if tabs[index].choose-category: add-category-dialog := CategoriesChooserDialog {
         width: parent.width;
         height: parent.height;
         model: tabs[index].categories-tree;
-        icons-color: Palette.foreground;
 
         item-picked(idx, item) => {
             tabs[index].new-category = item.user-data;
+            tabs[index].choose-category = false;
+        }
+
+        rejected => {
+            tabs[index].choose-category = false;
         }
     }
 }
@@ -698,9 +695,11 @@ export component SymbolTab inherits Tab {
         }
     }
 
-    key-pressed(event) => {
+    focus-gained(reason) => {
         Data.set-current-tab(section-index, index);
+    }
 
+    key-pressed(event) => {
         // If the focus is in the command toolbar, make the Escape key moving
         // the focus back to the graphics scene without triggering any action.
         if (event.text == Key.Escape) && (!root.has-focus) {

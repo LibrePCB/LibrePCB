@@ -5,8 +5,10 @@ import {
     IconButton,
     LineEdit,
     ListViewItemButton,
+    OverlayDialog,
     Palette,
     Switch,
+    TreeView,
 } from "../widgets.slint";
 import {
     Backend,
@@ -16,6 +18,7 @@ import {
     PanelPage,
     RuleCheckData,
     TabAction,
+    TreeViewItemData,
 } from "../api.slint";
 
 export component IconRowHeader inherits Text {
@@ -278,6 +281,7 @@ export component ParentRowCell inherits HorizontalLayout {
         style: hyperlink;
         icon: @image-url("../../../../bootstrap-icons/icons/folder2-open.svg");
         tooltip: @tr("Choose Parent Category");
+        tooltip-position: right;
 
         clicked => {
             choose-parent-clicked();
@@ -394,6 +398,28 @@ export component CategoriesRowCell inherits HorizontalLayout {
                 add-triggered();
             }
         }
+    }
+}
+
+export component CategoriesChooserDialog inherits OverlayDialog {
+    in property <[TreeViewItemData]> model;
+
+    callback item-picked(index: int, item: TreeViewItemData);
+
+    ok-button: false;
+
+    view := TreeView {
+        model: model;
+        supports-expand: false;
+        icons-color: Palette.foreground;
+
+        item-selected(idx, item) => {
+            item-picked(idx, item);
+        }
+    }
+
+    init => {
+        self.focus();
     }
 }
 

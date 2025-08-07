@@ -901,7 +901,7 @@ void MainWindow::openLibraryTab(const FilePath& fp, bool wizardMode) noexcept {
 void MainWindow::openComponentCategoryTab(LibraryEditor& editor,
                                           const FilePath& fp,
                                           bool copyFrom) noexcept {
-  if (!switchToLibraryElementTab<ComponentCategoryTab>(fp)) {
+  if (copyFrom || (!switchToLibraryElementTab<ComponentCategoryTab>(fp))) {
     try {
       std::unique_ptr<ComponentCategory> cat;
       ComponentCategoryTab::Mode mode = ComponentCategoryTab::Mode::Open;
@@ -940,7 +940,7 @@ void MainWindow::openComponentCategoryTab(LibraryEditor& editor,
 void MainWindow::openPackageCategoryTab(LibraryEditor& editor,
                                         const FilePath& fp,
                                         bool copyFrom) noexcept {
-  if (!switchToLibraryElementTab<PackageCategoryTab>(fp)) {
+  if (copyFrom || (!switchToLibraryElementTab<PackageCategoryTab>(fp))) {
     try {
       std::unique_ptr<PackageCategory> cat;
       PackageCategoryTab::Mode mode = PackageCategoryTab::Mode::Open;
@@ -978,7 +978,7 @@ void MainWindow::openPackageCategoryTab(LibraryEditor& editor,
 
 void MainWindow::openSymbolTab(LibraryEditor& editor, const FilePath& fp,
                                bool copyFrom) noexcept {
-  if (!switchToLibraryElementTab<SymbolTab>(fp)) {
+  if (copyFrom || (!switchToLibraryElementTab<SymbolTab>(fp))) {
     try {
       std::unique_ptr<Symbol> sym;
       SymbolTab::Mode mode = SymbolTab::Mode::Open;
@@ -1043,7 +1043,7 @@ void MainWindow::openSymbolTab(LibraryEditor& editor, const FilePath& fp,
 
 void MainWindow::openPackageTab(LibraryEditor& editor, const FilePath& fp,
                                 bool copyFrom) noexcept {
-  if (!switchToLibraryElementTab<PackageTab>(fp)) {
+  if (copyFrom || (!switchToLibraryElementTab<PackageTab>(fp))) {
     try {
       std::unique_ptr<Package> pkg;
       PackageTab::Mode mode = PackageTab::Mode::Open;
@@ -1172,7 +1172,7 @@ void MainWindow::openPackageTab(LibraryEditor& editor, const FilePath& fp,
 
 void MainWindow::openComponentTab(LibraryEditor& editor, const FilePath& fp,
                                   bool copyFrom) noexcept {
-  if (!switchToLibraryElementTab<ComponentTab>(fp)) {
+  if (copyFrom || (!switchToLibraryElementTab<ComponentTab>(fp))) {
     try {
       std::unique_ptr<Component> cmp;
       ComponentTab::Mode mode = ComponentTab::Mode::Open;
@@ -1258,7 +1258,7 @@ void MainWindow::openComponentTab(LibraryEditor& editor, const FilePath& fp,
 
 void MainWindow::openDeviceTab(LibraryEditor& editor, const FilePath& fp,
                                bool copyFrom) noexcept {
-  if (!switchToLibraryElementTab<DeviceTab>(fp)) {
+  if (copyFrom || (!switchToLibraryElementTab<DeviceTab>(fp))) {
     try {
       std::unique_ptr<Device> dev;
       DeviceTab::Mode mode = DeviceTab::Mode::Open;

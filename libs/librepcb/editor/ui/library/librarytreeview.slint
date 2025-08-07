@@ -6,16 +6,17 @@ import {
 
 // Very similar to the TreeView component, but with some special features for
 // library tree views
-export component LibraryTreeView inherits Rectangle {
+export component LibraryTreeView inherits FocusScope {
     in-out property <[LibraryTreeViewItemData]> model;
+    in property <length> initial-scroll-position;
     in-out property <int> current-index: -1;
     in property <length> item-height: 20px;
     in property <length> font-size: 12px;
-    out property <bool> has-focus <=> fs.has-focus;
     out property <length> scrollbar-width: (self.height < self.preferred-height) ? 7px : 0;
     property <length> icon-size: item-height - 4px;
+    property <bool> initial-scroll-position-restored: false;
 
-    callback key-pressed(index: int, item: LibraryTreeViewItemData, event: KeyEvent) -> EventResult;
+    callback item-key-pressed(index: int, item: LibraryTreeViewItemData, event: KeyEvent) -> EventResult;
     callback item-hovered(index: int, item: LibraryTreeViewItemData);
     callback item-selected(index: int, item: LibraryTreeViewItemData);
     item-selected(index, item) => {
@@ -24,44 +25,40 @@ export component LibraryTreeView inherits Rectangle {
     callback item-triggered(index: int, item: LibraryTreeViewItemData) -> bool;
     callback item-right-clicked(index: int, item: LibraryTreeViewItemData, x: length, y: length);
     callback item-deleted(index: int, item: LibraryTreeViewItemData) -> bool;
+    callback scrolled(pos: length);
+
+    public function restore-scroll-position() {
+        initial-scroll-position-restored = false;
+        view.viewport-y = initial-scroll-position;
+    }
 
     preferred-height: model.length * item-height;
-    forward-focus: fs;
 
     // Accessibility
     accessible-role: list;
     accessible-item-count: model.length;
 
     function set-current-index(index: int) {
+        if ((index + 1) * item-height) > (view.height - view.viewport-y) {
+            view.viewport-y = -(index + 1) * item-height + view.height;
+        } else if (index * item-height) < -(view.viewport-y) {
+            view.viewport-y = -(index * item-height);
+        }
         item-selected(index, model[index]);
     }
 
-    fs := FocusScope {
-        width: 0;
-        height: 0;
-
-        key-pressed(event) => {
-            if event.text == Key.DownArrow {
-                set-current-index(min(current-index + 1, model.length - 1));
-                return accept;
-            } else if event.text == Key.UpArrow {
-                set-current-index(max(current-index - 1, 0));
-                return accept;
-            } else if (current-index >= 0) && (current-index < model.length) {
-                if (event.text == Key.Return) && item-triggered(current-index, model[current-index]) {
-                    return accept;
-                } else if (event.text == Key.Delete) && item-deleted(current-index, model[current-index]) {
-                    return accept;
-                } else if event.text == Key.Menu {
-                    item-right-clicked(current-index, model[current-index], 0, item-height * (current-index + 1) + view.viewport-y);
-                    return accept;
-                }
-            }
-            root.key-pressed(current-index, model[current-index], event)
-        }
-    }
-
     view := ListView {
+        changed viewport-height => {
+            if (!initial-scroll-position-restored) && ((view.height - self.viewport-height) <= initial-scroll-position) {
+                view.viewport-y = initial-scroll-position;
+                initial-scroll-position-restored = true;
+            }
+        }
+
+        scrolled => {
+            scrolled(self.viewport-y);
+        }
+
         for item[index] in model: item-ta := TouchArea {
             width: parent.width;
             height: item-height;
@@ -207,7 +204,7 @@ export component LibraryTreeView inherits Rectangle {
             }
 
             clicked => {
-                fs.focus();
+                root.focus();
                 set-current-index(index);
             }
 
@@ -222,5 +219,25 @@ export component LibraryTreeView inherits Rectangle {
                 }
             }
         }
+    }
+
+    key-pressed(event) => {
+        if event.text == Key.DownArrow {
+            set-current-index(min(current-index + 1, model.length - 1));
+            return accept;
+        } else if event.text == Key.UpArrow {
+            set-current-index(max(current-index - 1, 0));
+            return accept;
+        } else if (current-index >= 0) && (current-index < model.length) {
+            if (event.text == Key.Return) && item-triggered(current-index, model[current-index]) {
+                return accept;
+            } else if (event.text == Key.Delete) && item-deleted(current-index, model[current-index]) {
+                return accept;
+            } else if event.text == Key.Menu {
+                item-right-clicked(current-index, model[current-index], 0, item-height * (current-index + 1) + view.viewport-y);
+                return accept;
+            }
+        }
+        item-key-pressed(current-index, model[current-index], event)
     }
 }

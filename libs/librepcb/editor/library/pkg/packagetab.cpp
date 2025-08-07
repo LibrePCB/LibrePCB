@@ -218,7 +218,7 @@ PackageTab::PackageTab(LibraryEditor& editor, std::unique_ptr<Package> pkg,
                    .getBoardGridStyle()),
     mGridInterval(2540000),
     mUnit(LengthUnit::millimeters()),
-    mAddCategoryRequested(false),
+    mChooseCategory(false),
     mOpenGlProjection(new OpenGlProjection()),
     mFrameIndex(0),
     mNameParsed(mPackage->getNames().getDefaultValue()),
@@ -431,6 +431,7 @@ ui::PackageTabData PackageTab::getDerivedUiData() const noexcept {
       mDeprecated,  // Deprecated
       mCategories,  // Categories
       mCategoriesTree,  // Categories tree
+      mChooseCategory,  // Choose category
       l2s(mAssemblyType),  // Assembly type
       mPadsSorted,  // Package pads
       mNewPadName,  // New pad name
@@ -526,7 +527,7 @@ ui::PackageTabData PackageTab::getDerivedUiData() const noexcept {
       mToolZoneRules.testFlag(Zone::Rule::NoDevices),  // Tool no devices
       q2s(mSceneImagePos),  // Scene image position
       mFrameIndex,  // Frame index
-      mAddCategoryRequested ? "choose" : slint::SharedString(),  // New category
+      slint::SharedString(),  // New category
       slint::SharedString(),  // New footprint
   };
 }
@@ -565,7 +566,7 @@ void PackageTab::setDerivedUiData(const ui::PackageTabData& data) noexcept {
   if (auto uuid = Uuid::tryFromString(s2q(data.new_category))) {
     mCategories->add(*uuid);
   }
-  mAddCategoryRequested = false;
+  mChooseCategory = data.choose_category;
   if (auto at = s2assemblyType(data.assembly_type)) {
     mAssemblyType = *at;
   }
@@ -641,7 +642,7 @@ void PackageTab::setDerivedUiData(const ui::PackageTabData& data) noexcept {
   }
   emit filledRequested(data.tool_filled);
   emit grabAreaRequested(data.tool_grab_area);
-  // Note: We set the drill before width/height to let the FSM devrease the
+  // Note: We set the drill before width/height to let the FSM decrease the
   // drill if width or height are set to a smaller value. This clipping does
   // not work in both directions yet because we don't know if the user edited
   // the drill or width/height.
@@ -1245,7 +1246,7 @@ void PackageTab::fsmToolEnter(PackageEditorState_DrawLine& state) noexcept {
   mTool = ui::EditorTool::Line;
 
   // Layers
-  mToolLayersQt = Toolbox::sortedQSet(state.getAvailableLayers());
+  mToolLayersQt = Layer::sorted(state.getAvailableLayers());
   mToolLayers->clear();
   for (const Layer* layer : mToolLayersQt) {
     mToolLayers->push_back(q2s(layer->getNameTr()));
@@ -1291,7 +1292,7 @@ void PackageTab::fsmToolEnter(PackageEditorState_DrawRect& state) noexcept {
   mTool = ui::EditorTool::Rect;
 
   // Layers
-  mToolLayersQt = Toolbox::sortedQSet(state.getAvailableLayers());
+  mToolLayersQt = Layer::sorted(state.getAvailableLayers());
   mToolLayers->clear();
   for (const Layer* layer : mToolLayersQt) {
     mToolLayers->push_back(q2s(layer->getNameTr()));
@@ -1351,7 +1352,7 @@ void PackageTab::fsmToolEnter(PackageEditorState_DrawPolygon& state) noexcept {
   mTool = ui::EditorTool::Polygon;
 
   // Layers
-  mToolLayersQt = Toolbox::sortedQSet(state.getAvailableLayers());
+  mToolLayersQt = Layer::sorted(state.getAvailableLayers());
   mToolLayers->clear();
   for (const Layer* layer : mToolLayersQt) {
     mToolLayers->push_back(q2s(layer->getNameTr()));
@@ -1424,7 +1425,7 @@ void PackageTab::fsmToolEnter(PackageEditorState_DrawCircle& state) noexcept {
   mTool = ui::EditorTool::Circle;
 
   // Layers
-  mToolLayersQt = Toolbox::sortedQSet(state.getAvailableLayers());
+  mToolLayersQt = Layer::sorted(state.getAvailableLayers());
   mToolLayers->clear();
   for (const Layer* layer : mToolLayersQt) {
     mToolLayers->push_back(q2s(layer->getNameTr()));
@@ -1485,7 +1486,7 @@ void PackageTab::fsmToolEnter(PackageEditorState_DrawArc& state) noexcept {
   mTool = ui::EditorTool::Arc;
 
   // Layers
-  mToolLayersQt = Toolbox::sortedQSet(state.getAvailableLayers());
+  mToolLayersQt = Layer::sorted(state.getAvailableLayers());
   mToolLayers->clear();
   for (const Layer* layer : mToolLayersQt) {
     mToolLayers->push_back(q2s(layer->getNameTr()));
@@ -1622,7 +1623,7 @@ void PackageTab::fsmToolEnter(PackageEditorState_DrawText& state) noexcept {
   mTool = ui::EditorTool::Text;
 
   // Layers
-  mToolLayersQt = Toolbox::sortedQSet(state.getAvailableLayers());
+  mToolLayersQt = Layer::sorted(state.getAvailableLayers());
   mToolLayers->clear();
   for (const Layer* layer : mToolLayersQt) {
     mToolLayers->push_back(q2s(layer->getNameTr()));
@@ -2057,7 +2058,8 @@ void PackageTab::autoFix(const MsgMissingAuthor& msg) {
 template <>
 void PackageTab::autoFix(const MsgMissingCategories& msg) {
   Q_UNUSED(msg);
-  mAddCategoryRequested = true;
+  mCurrentPageIndex = 0;
+  mChooseCategory = true;
   onDerivedUiDataChanged.notify();
 }
 

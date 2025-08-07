@@ -433,11 +433,15 @@ void Board2dTab::setDerivedUiData(const ui::Board2dTabData& data) noexcept {
   // Tool line width
   mToolLineWidth.setUiData(data.tool_line_width);
 
+  // Tool drill
+  // Note: We set the drill before (via) size to let the FSM decrease the
+  // drill if size is set to a smaller value. This clipping does
+  // not work in both directions yet because we don't know if the user edited
+  // the drill or size.
+  mToolDrill.setUiData(data.tool_drill);
+
   // Tool size
   mToolSize.setUiData(data.tool_size);
-
-  // Tool drill
-  mToolDrill.setUiData(data.tool_drill);
 
   // Tool filled / auto-width
   emit filledRequested(data.tool_filled);
@@ -1071,7 +1075,7 @@ void Board2dTab::fsmToolEnter(BoardEditorState_DrawTrace& state) noexcept {
               &BoardEditorState_DrawTrace::setAutoWidth));
 
   // Layers
-  mToolLayersQt = Toolbox::sortedQSet(state.getAvailableLayers());
+  mToolLayersQt = Layer::sorted(state.getAvailableLayers());
   mToolLayers->clear();
   for (const Layer* layer : mToolLayersQt) {
     mToolLayers->push_back(q2s(layer->getNameTr()));
@@ -1170,7 +1174,7 @@ void Board2dTab::fsmToolEnter(BoardEditorState_DrawPolygon& state) noexcept {
   mTool = ui::EditorTool::Polygon;
 
   // Layers
-  mToolLayersQt = Toolbox::sortedQSet(state.getAvailableLayers());
+  mToolLayersQt = Layer::sorted(state.getAvailableLayers());
   mToolLayers->clear();
   for (const Layer* layer : mToolLayersQt) {
     mToolLayers->push_back(q2s(layer->getNameTr()));
@@ -1217,7 +1221,7 @@ void Board2dTab::fsmToolEnter(BoardEditorState_AddStrokeText& state) noexcept {
   mTool = ui::EditorTool::Text;
 
   // Layers
-  mToolLayersQt = Toolbox::sortedQSet(state.getAvailableLayers());
+  mToolLayersQt = Layer::sorted(state.getAvailableLayers());
   mToolLayers->clear();
   for (const Layer* layer : mToolLayersQt) {
     mToolLayers->push_back(q2s(layer->getNameTr()));
@@ -1308,7 +1312,7 @@ void Board2dTab::fsmToolEnter(BoardEditorState_DrawPlane& state) noexcept {
               }));
 
   // Layers
-  mToolLayersQt = Toolbox::sortedQSet(state.getAvailableLayers());
+  mToolLayersQt = Layer::sorted(state.getAvailableLayers());
   mToolLayers->clear();
   for (const Layer* layer : mToolLayersQt) {
     mToolLayers->push_back(q2s(layer->getNameTr()));
@@ -1332,7 +1336,7 @@ void Board2dTab::fsmToolEnter(BoardEditorState_DrawZone& state) noexcept {
   mTool = ui::EditorTool::Zone;
 
   // Available layers
-  mToolLayersQt = Toolbox::sortedQSet(state.getAvailableLayers());
+  mToolLayersQt = Layer::sorted(state.getAvailableLayers());
   mToolLayers->clear();
   for (const Layer* layer : mToolLayersQt) {
     mToolLayers->push_back(q2s(layer->getNameTr()));

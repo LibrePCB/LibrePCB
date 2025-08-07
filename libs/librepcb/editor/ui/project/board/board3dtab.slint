@@ -183,9 +183,8 @@ export component Board3dTab inherits Tab {
         }
     }
 
-    key-pressed(event) => {
+    focus-gained(reason) => {
         Data.set-current-tab(section-index, index);
-        reject
     }
 
     key-released(event) => {

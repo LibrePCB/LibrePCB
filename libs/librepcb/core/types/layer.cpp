@@ -461,6 +461,12 @@ bool Layer::lessThan(const Layer* a, const Layer* b) noexcept {
   return indexA < indexB;
 }
 
+QVector<const Layer*> Layer::sorted(const QSet<const Layer*>& set) noexcept {
+  QVector<const Layer*> list = set.values();
+  std::sort(list.begin(), list.end(), Layer::lessThan);
+  return list;
+}
+
 /*******************************************************************************
  *  Non-Member Functions
  ******************************************************************************/
