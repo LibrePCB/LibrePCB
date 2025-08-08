@@ -50,9 +50,10 @@ static qreal calcAspectRatio(qreal width, qreal height) noexcept {
   return (height > 1) ? (width / height) : 1;
 }
 
-static slint::Image createBackground(const QSize& size) noexcept {
+static slint::Image createBackground(const QSize& size,
+                                     const QColor& color) noexcept {
   QPixmap pix(size);
-  pix.fill(SlintOpenGlView::getBackgroundColor());
+  pix.fill(color);
   return q2s(pix);
 }
 
@@ -64,6 +65,7 @@ SlintOpenGlView::SlintOpenGlView(const OpenGlProjection& projection,
                                  QObject* parent) noexcept
   : QObject(parent),
     QOpenGLFunctions(),
+    mBackgroundColor(Qt::white),
     mProjection(projection),
     mAnimation(new QVariantAnimation(this)) {
   mAnimation->setDuration(500);
@@ -88,6 +90,18 @@ bool SlintOpenGlView::isPanning() const noexcept {
   using PointerEventButton = slint::private_api::PointerEventButton;
   return mPressedMouseButtons.contains(PointerEventButton::Middle) ||
       mPressedMouseButtons.contains(PointerEventButton::Right);
+}
+
+/*******************************************************************************
+ *  Setters
+ ******************************************************************************/
+
+void SlintOpenGlView::setBackgroundColor(QColor color) noexcept {
+  color.setAlpha(255);  // Transparent background leads to wrong PCB colors.
+  if (color != mBackgroundColor) {
+    mBackgroundColor = color;
+    emit contentChanged();
+  }
 }
 
 /*******************************************************************************
@@ -123,14 +137,14 @@ slint::Image SlintOpenGlView::render(float width, float height) noexcept {
   const QSize size(qCeil(width), qCeil(height));
 
   if (!mErrors.isEmpty()) {
-    return createBackground(size);
+    return createBackground(size, mBackgroundColor);
   }
 
   // Make OpenGL context current.
   if (!mContext->makeCurrent(mSurface.get())) {
     mErrors.append("Failed to make OpenGL context current.");
     emit stateChanged();
-    return createBackground(size);
+    return createBackground(size, mBackgroundColor);
   }
 
   // Prepare FBO (if the view was resized, create a new FBO).
@@ -144,15 +158,19 @@ slint::Image SlintOpenGlView::render(float width, float height) noexcept {
   if (!mFbo->bind()) {
     mErrors.append("Failed to bind OpenGL FBO.");
     emit stateChanged();
-    return createBackground(size);
+    return createBackground(size, mBackgroundColor);
   }
 
   // Bind the shader program.
   if (!mProgram->bind()) {
     mErrors.append("Failed to bind OpenGL shader program.");
     emit stateChanged();
-    return createBackground(size);
+    return createBackground(size, mBackgroundColor);
   }
+
+  // The background color can be changed at any time so we need to update it.
+  glClearColor(mBackgroundColor.redF(), mBackgroundColor.greenF(),
+               mBackgroundColor.blueF(), 1);
 
   // Set viewport, clear color and depth buffer.
   glViewport(0, 0, width, height);
@@ -258,7 +276,18 @@ void SlintOpenGlView::zoomOut() noexcept {
 }
 
 void SlintOpenGlView::zoomAll() noexcept {
-  smoothTo(OpenGlProjection());
+  // If the transform is already reset, flip to the other board side. A bit
+  // ugly implemented, could be improved a bit...
+  const OpenGlProjection currentProjection =
+      (mAnimation->state() == QAbstractAnimation::Running)
+      ? mAnimationDataStart.interpolated(mAnimationDataDelta, 1)
+      : mProjection;
+
+  OpenGlProjection p;
+  if (currentProjection == p) {
+    p.transform.rotate(180, 0, 1, 0);
+  }
+  smoothTo(p);
 }
 
 /*******************************************************************************
@@ -296,10 +325,6 @@ void SlintOpenGlView::initializeGl() noexcept {
     }
     return;
   }
-
-  // Use a background color which ensures good contrast to both black and white
-  // STEP models.
-  glClearColor(0.9, 0.95, 1.0, 1);
 
   // Set OpenGL options.
   glEnable(GL_DEPTH_TEST);
