@@ -41,6 +41,8 @@ std::unique_ptr<SExpression> serialize(
     return SExpression::createToken("schematic");
   } else if (obj == GraphicsOutputJob::Content::Type::Board) {
     return SExpression::createToken("board");
+  } else if (obj == GraphicsOutputJob::Content::Type::BoardRendering) {
+    return SExpression::createToken("board_rendering");
   } else if (obj == GraphicsOutputJob::Content::Type::AssemblyGuide) {
     return SExpression::createToken("assembly_guide");
   } else {
@@ -54,6 +56,8 @@ GraphicsOutputJob::Content::Type deserialize(const SExpression& node) {
     return GraphicsOutputJob::Content::Type::Schematic;
   } else if (node.getValue() == "board") {
     return GraphicsOutputJob::Content::Type::Board;
+  } else if (node.getValue() == "board_rendering") {
+    return GraphicsOutputJob::Content::Type::BoardRendering;
   } else if (node.getValue() == "assembly_guide") {
     return GraphicsOutputJob::Content::Type::AssemblyGuide;
   } else {
@@ -202,6 +206,17 @@ std::shared_ptr<GraphicsOutputJob>
   obj->setContent({Content(Content::Preset::BoardAssemblyTop),
                    Content(Content::Preset::BoardAssemblyBottom)});
   obj->setOutputPath("{{PROJECT}}_{{VERSION}}_Assembly.pdf");
+  return obj;
+}
+
+std::shared_ptr<GraphicsOutputJob>
+    GraphicsOutputJob::boardRenderingPdf() noexcept {
+  std::shared_ptr<GraphicsOutputJob> obj(new GraphicsOutputJob());
+  obj->setName(elementNameFromTr("GraphicsOutputJob",
+                                 QT_TR_NOOP("Board Rendering PDF")));
+  obj->setContent({Content(Content::Preset::BoardRenderingTop),
+                   Content(Content::Preset::BoardRenderingBottom)});
+  obj->setOutputPath("{{PROJECT}}_{{VERSION}}_Rendering.pdf");
   return obj;
 }
 

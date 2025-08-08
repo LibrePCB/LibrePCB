@@ -64,6 +64,9 @@ public:
 
   // Operator Overloadings
   FileFormatMigrationV1& operator=(const FileFormatMigrationV1& rhs) = delete;
+
+protected:
+  virtual void upgradeOutputJobs(SExpression& root);
 };
 
 /*******************************************************************************

@@ -237,6 +237,34 @@ void GraphicsExportSettings::loadColorsFromTheme(const Theme& theme,
   }
 }
 
+void GraphicsExportSettings::loadBoardRenderingColors(
+    int innerLayerCount) noexcept {
+  auto addColor = [this](const QString& colorName, const QColor& color) {
+    mColors.append(std::make_pair(colorName, color));
+  };
+
+  mColors.clear();
+
+  // Note: Transparent layers mean to take colors from board settings.
+  // RealisticBoardPainter will only use colors from these settings which
+  // have a nonzero alpha value.
+  addColor(Theme::Color::sBoardOutlines, QColor(70, 80, 70));
+  addColor(Theme::Color::sBoardCopperTop, QColor(188, 156, 105));
+  addColor(Theme::Color::sBoardStopMaskTop, Qt::transparent);
+  addColor(Theme::Color::sBoardLegendTop, Qt::transparent);
+  addColor(Theme::Color::sBoardSolderPasteTop, Qt::darkGray);
+  addColor(Theme::Color::sBoardGlueTop, QColor(200, 50, 50, 80));  // untested
+  for (int i = 1; i <= innerLayerCount; ++i) {
+    addColor(QString(Theme::Color::sBoardCopperInner).arg(i),
+             QColor(188, 156, 105));
+  }
+  addColor(Theme::Color::sBoardCopperBot, QColor(188, 156, 105));
+  addColor(Theme::Color::sBoardStopMaskBot, Qt::transparent);
+  addColor(Theme::Color::sBoardLegendBot, Qt::transparent);
+  addColor(Theme::Color::sBoardSolderPasteBot, Qt::darkGray);
+  addColor(Theme::Color::sBoardGlueBot, QColor(200, 50, 50, 80));  // untested
+}
+
 /*******************************************************************************
  *  Operator Overloadings
  ******************************************************************************/

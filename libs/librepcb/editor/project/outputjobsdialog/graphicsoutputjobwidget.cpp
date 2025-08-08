@@ -362,6 +362,18 @@ void GraphicsOutputJobWidget::addClicked() noexcept {
             GraphicsOutputJob::Content(
                 GraphicsOutputJob::Content::Preset::BoardAssemblyBottom));
       });
+  menu.addAction(
+      QIcon(":/img/actions/board_editor.png"), tr("Rendering Top/Bottom"),
+      [&]() {
+        content.insert(
+            index,
+            GraphicsOutputJob::Content(
+                GraphicsOutputJob::Content::Preset::BoardRenderingTop));
+        content.insert(
+            index + 1,
+            GraphicsOutputJob::Content(
+                GraphicsOutputJob::Content::Preset::BoardRenderingBottom));
+      });
   if (menu.exec(QCursor::pos())) {
     mJob->setContent(content);
     updateContentList();
@@ -464,10 +476,14 @@ void GraphicsOutputJobWidget::currentContentChanged(int index) noexcept {
     }
     Theme t;
     GraphicsExportSettings s;
-    s.loadColorsFromTheme(
-        t, (c.type == GraphicsOutputJob::Content::Type::Schematic),
-        (c.type != GraphicsOutputJob::Content::Type::Schematic),
-        innerLayerCount);
+    if (c.type == GraphicsOutputJob::Content::Type::BoardRendering) {
+      s.loadBoardRenderingColors(innerLayerCount);
+    } else {
+      s.loadColorsFromTheme(
+          t, (c.type == GraphicsOutputJob::Content::Type::Schematic),
+          (c.type != GraphicsOutputJob::Content::Type::Schematic),
+          innerLayerCount);
+    }
     mUi->lstLayerColors->clear();
     foreach (const auto& pair, s.getColors()) {
       const bool enabled = c.layers.contains(pair.first);
@@ -494,6 +510,9 @@ void GraphicsOutputJobWidget::updateContentList() noexcept {
     if (content.type == GraphicsOutputJob::Content::Type::Schematic) {
       item->setIcon(QIcon(":/img/actions/schematic.png"));
     } else if (content.type == GraphicsOutputJob::Content::Type::Board) {
+      item->setIcon(QIcon(":/img/actions/board_editor.png"));
+    } else if (content.type ==
+               GraphicsOutputJob::Content::Type::BoardRendering) {
       item->setIcon(QIcon(":/img/actions/board_editor.png"));
     }
   }

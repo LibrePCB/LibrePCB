@@ -149,6 +149,15 @@ void FileFormatMigrationV1::upgradeProject(TransactionalDirectory& dir,
       upgradeDevice(subDir);
     }
   }
+
+  // Output Jobs.
+  {
+    const QString fp = "project/jobs.lp";
+    std::unique_ptr<SExpression> root =
+        SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+    upgradeOutputJobs(*root);
+    dir.write(fp, root->toByteArray());
+  }
 }
 
 void FileFormatMigrationV1::upgradeWorkspaceData(TransactionalDirectory& dir) {
@@ -168,6 +177,51 @@ void FileFormatMigrationV1::upgradeWorkspaceData(TransactionalDirectory& dir) {
       qInfo() << "Removing legacy file:"
               << librariesDir.getAbsPath(fileName).toNative();
       librariesDir.removeFile(fileName);
+    }
+  }
+}
+
+/*******************************************************************************
+ *  Protected Methods
+ ******************************************************************************/
+
+void FileFormatMigrationV1::upgradeOutputJobs(SExpression& root) {
+  for (SExpression* jobNode : root.getChildren("job")) {
+    if (jobNode->getChild("type/@0").getValue() == "graphics") {
+      for (SExpression* contentNode : jobNode->getChildren("content")) {
+        SExpression& contentTypeNode = contentNode->getChild("type/@0");
+        if (contentTypeNode.getValue() == "board") {
+          // We don't need to check the option value since "realistic" was
+          // the only supported option in v1.
+          const auto optionNodes = contentNode->getChildren("option");
+          for (SExpression* optionNode : optionNodes) {
+            contentNode->removeChild(*optionNode);
+          }
+          if (!optionNodes.isEmpty()) {
+            contentTypeNode.setValue("board_rendering");
+            for (SExpression* layerNode : contentNode->getChildren("layer")) {
+              contentNode->removeChild(*layerNode);
+            }
+            auto addLayer = [&contentNode](const QString& layer,
+                                           const QString& color) {
+              SExpression& node = contentNode->appendList("layer");
+              node.appendChild(SExpression::createToken(layer));
+              node.appendChild("color", color);
+            };
+            if (contentNode->getChild("mirror/@0").getValue() == "true") {
+              addLayer("board_copper_bottom", "#ffbc9c69");
+              addLayer("board_legend_bottom", "#00000000");
+              addLayer("board_outlines", "#ff465046");
+              addLayer("board_stop_mask_bottom", "#00000000");
+            } else {
+              addLayer("board_copper_top", "#ffbc9c69");
+              addLayer("board_legend_top", "#00000000");
+              addLayer("board_outlines", "#ff465046");
+              addLayer("board_stop_mask_top", "#00000000");
+            }
+          }
+        }
+      }
     }
   }
 }

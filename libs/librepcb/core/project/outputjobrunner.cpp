@@ -46,6 +46,7 @@
 #include "../job/netlistoutputjob.h"
 #include "../job/pickplaceoutputjob.h"
 #include "../job/projectjsonoutputjob.h"
+#include "../types/layer.h"
 #include "../utils/toolbox.h"
 #include "board/board.h"
 #include "board/boardd356netlistexport.h"
@@ -132,6 +133,8 @@ void OutputJobRunner::removeUnknownFiles(const QList<FilePath>& files) {
 
 GraphicsExport::Pages OutputJobRunner::buildPages(const GraphicsOutputJob& job,
                                                   bool rebuildPlanes) {
+  using Type = GraphicsOutputJob::Content::Type;
+
   GraphicsExport::Pages pages;
   foreach (const GraphicsOutputJob::Content& content, job.getContent()) {
     std::shared_ptr<GraphicsExportSettings> settings =
@@ -165,6 +168,9 @@ GraphicsExport::Pages OutputJobRunner::buildPages(const GraphicsOutputJob& job,
     settings->setBackgroundColor(content.backgroundColor);
     settings->setMinLineWidth(content.minLineWidth);
     QList<std::pair<QString, QColor>> layers;
+    if (content.type == Type::BoardRendering) {
+      settings->loadBoardRenderingColors(Layer::innerCopperCount());
+    }
     foreach (const auto& pair, settings->getColors()) {
       if (content.layers.contains(pair.first)) {
         layers.append(std::make_pair(pair.first, content.layers[pair.first]));
@@ -174,7 +180,7 @@ GraphicsExport::Pages OutputJobRunner::buildPages(const GraphicsOutputJob& job,
     const QList<Board*> boards = getBoards(content.boards, false);
     const QVector<std::shared_ptr<AssemblyVariant>> assemblyVariants =
         getAssemblyVariants(content.assemblyVariants, false);
-    if (content.type == GraphicsOutputJob::Content::Type::Schematic) {
+    if (content.type == Type::Schematic) {
       foreach (auto av, assemblyVariants) {
         Q_UNUSED(av);  // TODO
         foreach (const Board* board, boards) {
@@ -186,7 +192,8 @@ GraphicsExport::Pages OutputJobRunner::buildPages(const GraphicsOutputJob& job,
           }
         }
       }
-    } else if (content.type == GraphicsOutputJob::Content::Type::Board) {
+    } else if ((content.type == Type::Board) ||
+               (content.type == Type::BoardRendering)) {
       foreach (Board* board, boards) {
         if (rebuildPlanes) {
           rebuildOutdatedPlanes(*board);  // can throw
@@ -195,11 +202,7 @@ GraphicsExport::Pages OutputJobRunner::buildPages(const GraphicsOutputJob& job,
         foreach (auto av, assemblyVariants) {
           Q_UNUSED(av);  // TODO
           std::shared_ptr<GraphicsPagePainter> painter;
-          // New option "realistic" was added after the v1.0.0 release, thus
-          // not officially supported in file format v1.0. Should probably be
-          // migrated to a new content type in file format v2, maybe with
-          // some configuration options.
-          if (content.options.contains("realistic")) {
+          if (content.type == Type::BoardRendering) {
             painter = std::make_shared<RealisticBoardPainter>(
                 board->buildScene3D(std::nullopt));
           } else {
@@ -208,8 +211,7 @@ GraphicsExport::Pages OutputJobRunner::buildPages(const GraphicsOutputJob& job,
           pages.append(std::make_pair(painter, settings));
         }
       }
-    } else if (content.type ==
-               GraphicsOutputJob::Content::Type::AssemblyGuide) {
+    } else if (content.type == Type::AssemblyGuide) {
       throw RuntimeError(__FILE__, __LINE__,
                          "Assembly guide output jobs are not supported yet, "
                          "you need to use a more recent release of LibrePCB.");

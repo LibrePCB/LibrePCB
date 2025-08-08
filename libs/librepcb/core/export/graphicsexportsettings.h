@@ -125,9 +125,38 @@ public:
   }
 
   // General Methods
+
+  /**
+   * @brief Load layer colors from a ::librepcb::Theme
+   *
+   * This initializes the list of colors as used for
+   * ::librepcb::SchematicPainter and other painter classes.
+   *
+   * @param theme           The theme to load the colors from. Just pass a
+   *                        default-constructed theme to load default colors.
+   * @param schematic       Whether to add schematic layers or not.
+   * @param board           Whether to add board layers or not.
+   * @param innerLayerCount How many board inner copper layers should be added.
+   *                        Pass ::librepcb::Layer::innerCopperCount() to
+   *                        load all layers.
+   */
   void loadColorsFromTheme(const Theme& theme, bool schematic = true,
-                           bool board = true,
-                           int innerLayerCount = -1) noexcept;
+                           bool board = true, int innerLayerCount = 0) noexcept;
+
+  /**
+   * @brief Load layer colors for ::librepcb::RealisticBoardPainter
+   *
+   * This will clear the layer colors list and add only those few layer colors
+   * which are used by ::librepcb::RealisticBoardPainter. Note that stop mask
+   * and legend layers are set to Qt::transparent, which means
+   * ::librepcb::RealisticBoardPainter shall use the colors configured on
+   * the board to be rendered.
+   *
+   * @param innerLayerCount How many board inner copper layers should be added.
+   *                        Pass ::librepcb::Layer::innerCopperCount() to
+   *                        load all layers.
+   */
+  void loadBoardRenderingColors(int innerLayerCount) noexcept;
 
   // Operator Overloadings
   GraphicsExportSettings& operator=(const GraphicsExportSettings& rhs) noexcept;

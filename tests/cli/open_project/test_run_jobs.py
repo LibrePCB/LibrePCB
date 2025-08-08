@@ -55,6 +55,8 @@ Run output job 'Schematic PDF'...
   => '{project.output_dir_native}//Empty_Project_v1_Schematic.pdf'
 Run output job 'Board Assembly PDF'...
   => '{project.output_dir_native}//Empty_Project_v1_Assembly.pdf'
+Run output job 'Board Rendering PDF'...
+  => '{project.output_dir_native}//Empty_Project_v1_Rendering.pdf'
 Run output job 'Gerber/Excellon'...
   => '{project.output_dir_native}//gbr//Empty_Project_v1_DRILLS-NPTH.drl'
   => '{project.output_dir_native}//gbr//Empty_Project_v1_DRILLS-PTH.drl'
@@ -93,7 +95,7 @@ SUCCESS
 """).replace("//", os.sep)
     assert code == 0
     assert os.path.exists(dir)
-    assert len(os.listdir(dir)) == 11
+    assert len(os.listdir(dir)) == 12
 
 
 @pytest.mark.parametrize(
@@ -140,6 +142,8 @@ Run output job 'Schematic PDF'...
   => '{project.output_dir_native}//Empty_Project_v1_Schematic.pdf'
 Run output job 'Board Assembly PDF'...
   => '{project.output_dir_native}//Empty_Project_v1_Assembly.pdf'
+Run output job 'Board Rendering PDF'...
+  => '{project.output_dir_native}//Empty_Project_v1_Rendering.pdf'
 Run output job 'Gerber/Excellon'...
   => '{project.output_dir_native}//gbr//Empty_Project_v1_DRILLS-NPTH.drl'
   => '{project.output_dir_native}//gbr//Empty_Project_v1_DRILLS-PTH.drl'
@@ -272,6 +276,8 @@ Run output job 'Schematic PDF'...
   => 'foo//Empty_Project_v1_Schematic.pdf'
 Run output job 'Board Assembly PDF'...
   => 'foo//Empty_Project_v1_Assembly.pdf'
+Run output job 'Board Rendering PDF'...
+  => 'foo//Empty_Project_v1_Rendering.pdf'
 Run output job 'Gerber/Excellon'...
   => 'foo//gbr//Empty_Project_v1_DRILLS-NPTH.drl'
   => 'foo//gbr//Empty_Project_v1_DRILLS-PTH.drl'
@@ -310,7 +316,7 @@ SUCCESS
 """).replace("//", os.sep)
     assert code == 0
     assert os.path.exists(dir)
-    assert len(os.listdir(dir)) == 11
+    assert len(os.listdir(dir)) == 12
 
 
 @pytest.mark.parametrize(
@@ -340,6 +346,8 @@ Run output job 'Schematic PDF'...
   => 'foo//Empty_Project_v1_Schematic.pdf'
 Run output job 'Board Assembly PDF'...
   => 'foo//Empty_Project_v1_Assembly.pdf'
+Run output job 'Board Rendering PDF'...
+  => 'foo//Empty_Project_v1_Rendering.pdf'
 Run output job 'Gerber/Excellon'...
   => 'foo//gbr//Empty_Project_v1_DRILLS-NPTH.drl'
   => 'foo//gbr//Empty_Project_v1_DRILLS-PTH.drl'
@@ -378,4 +386,4 @@ SUCCESS
 """).replace("//", os.sep)
     assert code == 0
     assert os.path.exists(dir)
-    assert len(os.listdir(dir)) == 11
+    assert len(os.listdir(dir)) == 12
