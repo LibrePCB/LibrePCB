@@ -216,7 +216,6 @@ PackageTab::PackageTab(LibraryEditor& editor, std::unique_ptr<Package> pkg,
                    .getSettings()
                    .themes.getActive()
                    .getBoardGridStyle()),
-    mGridInterval(2540000),
     mUnit(LengthUnit::millimeters()),
     mChooseCategory(false),
     mOpenGlProjection(new OpenGlProjection()),
@@ -457,7 +456,7 @@ ui::PackageTabData PackageTab::getDerivedUiData() const noexcept {
       q2s(theme.getColor(Theme::Color::sBoardInfoBox)
               .getSecondaryColor()),  // Overlay text color
       l2s(mGridStyle),  // Grid style
-      l2s(*mGridInterval),  // Grid interval
+      l2s(*mPackage->getGridInterval()),  // Grid interval
       l2s(mUnit),  // Unit
       mBackgroundImageGraphicsItem->isVisible(),  // Background image set
       mAlpha.value(OpenGlObject::Type::SolderResist, 1),  // Solder resist alpha
@@ -599,7 +598,7 @@ void PackageTab::setDerivedUiData(const ui::PackageTabData& data) noexcept {
   }
   if (mScene) {
     mScene->setGridStyle(mGridStyle);
-    mScene->setGridInterval(mGridInterval);
+    mScene->setGridInterval(mPackage->getGridInterval());
   }
   const LengthUnit unit = s2l(data.unit);
   if (unit != mUnit) {
@@ -672,7 +671,7 @@ void PackageTab::setDerivedUiData(const ui::PackageTabData& data) noexcept {
 
 void PackageTab::activate() noexcept {
   mScene.reset(new GraphicsScene(this));
-  mScene->setGridInterval(mGridInterval);
+  mScene->setGridInterval(mPackage->getGridInterval());
   connect(mScene.get(), &GraphicsScene::changed, this,
           &PackageTab::requestRepaint);
 
@@ -861,25 +860,25 @@ void PackageTab::trigger(ui::TabAction a) noexcept {
       break;
     }
     case ui::TabAction::MoveLeft: {
-      if (!mFsm->processMove(Point(-mGridInterval, 0))) {
+      if (!mFsm->processMove(Point(-mPackage->getGridInterval(), 0))) {
         mView->scrollLeft();
       }
       break;
     }
     case ui::TabAction::MoveRight: {
-      if (!mFsm->processMove(Point(*mGridInterval, 0))) {
+      if (!mFsm->processMove(Point(*mPackage->getGridInterval(), 0))) {
         mView->scrollRight();
       }
       break;
     }
     case ui::TabAction::MoveUp: {
-      if (!mFsm->processMove(Point(0, *mGridInterval))) {
+      if (!mFsm->processMove(Point(0, *mPackage->getGridInterval()))) {
         mView->scrollUp();
       }
       break;
     }
     case ui::TabAction::MoveDown: {
-      if (!mFsm->processMove(Point(0, -mGridInterval))) {
+      if (!mFsm->processMove(Point(0, -mPackage->getGridInterval()))) {
         mView->scrollDown();
       }
       break;
@@ -893,12 +892,12 @@ void PackageTab::trigger(ui::TabAction a) noexcept {
       break;
     }
     case ui::TabAction::GridIntervalIncrease: {
-      setGridInterval(PositiveLength(mGridInterval * 2));
+      setGridInterval(PositiveLength(mPackage->getGridInterval() * 2));
       break;
     }
     case ui::TabAction::GridIntervalDecrease: {
-      if ((*mGridInterval % 2) == 0) {
-        setGridInterval(PositiveLength(mGridInterval / 2));
+      if ((*mPackage->getGridInterval() % 2) == 0) {
+        setGridInterval(PositiveLength(mPackage->getGridInterval() / 2));
       }
       break;
     }
@@ -1154,7 +1153,7 @@ GraphicsScene* PackageTab::fsmGetGraphicsScene() noexcept {
 }
 
 PositiveLength PackageTab::fsmGetGridInterval() const noexcept {
-  return mGridInterval;
+  return mPackage->getGridInterval();
 }
 
 void PackageTab::fsmSetViewCursor(
@@ -2544,13 +2543,15 @@ bool PackageTab::save() noexcept {
 }
 
 void PackageTab::setGridInterval(const PositiveLength& interval) noexcept {
-  if (interval != mGridInterval) {
-    mGridInterval = interval;
-    mFsm->processGridIntervalChanged(mGridInterval);
+  if (interval != mPackage->getGridInterval()) {
+    mPackage->setGridInterval(interval);  // Not going through undo stack
+    mFsm->processGridIntervalChanged(mPackage->getGridInterval());
     if (mScene) {
-      mScene->setGridInterval(mGridInterval);
+      mScene->setGridInterval(mPackage->getGridInterval());
       requestRepaint();
     }
+    mManualModificationsMade = true;
+    onUiDataChanged.notify();
   }
 }
 

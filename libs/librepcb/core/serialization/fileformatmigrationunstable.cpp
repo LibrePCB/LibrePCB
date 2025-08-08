@@ -63,10 +63,32 @@ void FileFormatMigrationUnstable::upgradePackageCategory(
 
 void FileFormatMigrationUnstable::upgradeSymbol(TransactionalDirectory& dir) {
   Q_UNUSED(dir);
+
+  // Content File.
+  {
+    const QString fp = "symbol.lp";
+    std::unique_ptr<SExpression> root =
+        SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+    if (!root->tryGetChild("grid_interval")) {
+      root->appendChild("grid_interval", SExpression::createToken("2.54"));
+    }
+    dir.write(fp, root->toByteArray());
+  }
 }
 
 void FileFormatMigrationUnstable::upgradePackage(TransactionalDirectory& dir) {
   Q_UNUSED(dir);
+
+  // Content File.
+  {
+    const QString fp = "package.lp";
+    std::unique_ptr<SExpression> root =
+        SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+    if (!root->tryGetChild("grid_interval")) {
+      root->appendChild("grid_interval", SExpression::createToken("2.54"));
+    }
+    dir.write(fp, root->toByteArray());
+  }
 }
 
 void FileFormatMigrationUnstable::upgradeComponent(

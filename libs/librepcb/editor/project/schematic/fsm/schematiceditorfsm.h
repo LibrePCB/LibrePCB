@@ -127,6 +127,7 @@ public:
       const GraphicsSceneMouseEvent& e) noexcept;
   bool processGraphicsSceneRightMouseButtonReleased(
       const GraphicsSceneMouseEvent& e) noexcept;
+  bool processGridIntervalChanged(const PositiveLength& interval) noexcept;
 
   // Operator Overloadings
   SchematicEditorFsm& operator=(const SchematicEditorFsm& rhs) = delete;

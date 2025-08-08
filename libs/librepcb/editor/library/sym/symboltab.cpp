@@ -92,7 +92,6 @@ SymbolTab::SymbolTab(LibraryEditor& editor, std::unique_ptr<Symbol> sym,
                    .getSettings()
                    .themes.getActive()
                    .getSchematicGridStyle()),
-    mGridInterval(2540000),
     mUnit(LengthUnit::millimeters()),
     mChooseCategory(false),
     mCompactLayout(false),
@@ -272,7 +271,7 @@ ui::SymbolTabData SymbolTab::getDerivedUiData() const noexcept {
       q2s(theme.getColor(Theme::Color::sSchematicInfoBox)
               .getSecondaryColor()),  // Overlay text color
       l2s(mGridStyle),  // Grid style
-      l2s(*mGridInterval),  // Grid interval
+      l2s(*mSymbol->getGridInterval()),  // Grid interval
       l2s(mUnit),  // Unit
       mIsInterfaceBroken,  // Interface broken
       mMsgImportPins.getUiData(),  // Message "import pins"
@@ -348,7 +347,7 @@ void SymbolTab::setDerivedUiData(const ui::SymbolTabData& data) noexcept {
   }
   if (mScene) {
     mScene->setGridStyle(mGridStyle);
-    mScene->setGridInterval(mGridInterval);
+    mScene->setGridInterval(mSymbol->getGridInterval());
   }
   const LengthUnit unit = s2l(data.unit);
   if (unit != mUnit) {
@@ -382,7 +381,7 @@ void SymbolTab::setDerivedUiData(const ui::SymbolTabData& data) noexcept {
 
 void SymbolTab::activate() noexcept {
   mScene.reset(new GraphicsScene(this));
-  mScene->setGridInterval(mGridInterval);
+  mScene->setGridInterval(mSymbol->getGridInterval());
   connect(mScene.get(), &GraphicsScene::changed, this,
           &SymbolTab::requestRepaint);
 
@@ -501,25 +500,25 @@ void SymbolTab::trigger(ui::TabAction a) noexcept {
       break;
     }
     case ui::TabAction::MoveLeft: {
-      if (!mFsm->processMove(Point(-mGridInterval, 0))) {
+      if (!mFsm->processMove(Point(-mSymbol->getGridInterval(), 0))) {
         mView->scrollLeft();
       }
       break;
     }
     case ui::TabAction::MoveRight: {
-      if (!mFsm->processMove(Point(*mGridInterval, 0))) {
+      if (!mFsm->processMove(Point(*mSymbol->getGridInterval(), 0))) {
         mView->scrollRight();
       }
       break;
     }
     case ui::TabAction::MoveUp: {
-      if (!mFsm->processMove(Point(0, *mGridInterval))) {
+      if (!mFsm->processMove(Point(0, *mSymbol->getGridInterval()))) {
         mView->scrollUp();
       }
       break;
     }
     case ui::TabAction::MoveDown: {
-      if (!mFsm->processMove(Point(0, -mGridInterval))) {
+      if (!mFsm->processMove(Point(0, -mSymbol->getGridInterval()))) {
         mView->scrollDown();
       }
       break;
@@ -533,12 +532,12 @@ void SymbolTab::trigger(ui::TabAction a) noexcept {
       break;
     }
     case ui::TabAction::GridIntervalIncrease: {
-      setGridInterval(PositiveLength(mGridInterval * 2));
+      setGridInterval(PositiveLength(mSymbol->getGridInterval() * 2));
       break;
     }
     case ui::TabAction::GridIntervalDecrease: {
-      if ((*mGridInterval % 2) == 0) {
-        setGridInterval(PositiveLength(mGridInterval / 2));
+      if ((*mSymbol->getGridInterval() % 2) == 0) {
+        setGridInterval(PositiveLength(mSymbol->getGridInterval() / 2));
       }
       break;
     }
@@ -709,7 +708,7 @@ SymbolGraphicsItem* SymbolTab::fsmGetGraphicsItem() noexcept {
 }
 
 PositiveLength SymbolTab::fsmGetGridInterval() const noexcept {
-  return mGridInterval;
+  return mSymbol->getGridInterval();
 }
 
 void SymbolTab::fsmSetViewCursor(
@@ -1386,7 +1385,7 @@ void SymbolTab::autoFix(const MsgSymbolOriginNotInCenter& msg) {
   mFsm->processAbortCommand();
   mFsm->processAbortCommand();
   mFsm->processSelectAll();
-  mFsm->processMove(-msg.getCenter().mappedToGrid(mGridInterval));
+  mFsm->processMove(-msg.getCenter().mappedToGrid(mSymbol->getGridInterval()));
   mFsm->processAbortCommand();  // Clear selection.
 }
 
@@ -1496,13 +1495,15 @@ bool SymbolTab::save() noexcept {
 }
 
 void SymbolTab::setGridInterval(const PositiveLength& interval) noexcept {
-  if (interval != mGridInterval) {
-    mGridInterval = interval;
-    mFsm->processGridIntervalChanged(mGridInterval);
+  if (interval != mSymbol->getGridInterval()) {
+    mSymbol->setGridInterval(interval);
+    mFsm->processGridIntervalChanged(mSymbol->getGridInterval());
     if (mScene) {
-      mScene->setGridInterval(mGridInterval);
+      mScene->setGridInterval(mSymbol->getGridInterval());
       requestRepaint();
     }
+    mManualModificationsMade = true;
+    onUiDataChanged.notify();
   }
 }
 

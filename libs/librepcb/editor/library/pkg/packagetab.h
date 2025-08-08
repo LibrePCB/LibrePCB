@@ -242,7 +242,6 @@ private:
   int mCurrentPageIndex;
   bool mView3d;
   Theme::GridStyle mGridStyle;
-  PositiveLength mGridInterval;
   LengthUnit mUnit;
   bool mChooseCategory;
   std::shared_ptr<PackageModel> mCurrentModel;

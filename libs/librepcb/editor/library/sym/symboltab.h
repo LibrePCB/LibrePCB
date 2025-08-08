@@ -200,7 +200,6 @@ private:
   bool mWizardMode;
   int mCurrentPageIndex;
   Theme::GridStyle mGridStyle;
-  PositiveLength mGridInterval;
   LengthUnit mUnit;
   bool mChooseCategory;
   bool mCompactLayout;

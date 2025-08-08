@@ -1003,6 +1003,7 @@ void MainWindow::openSymbolTab(LibraryEditor& editor, const FilePath& fp,
           sym->setDescriptions(src->getDescriptions());
           sym->setKeywords(src->getKeywords());
           sym->setCategories(src->getCategories());
+          sym->setGridInterval(src->getGridInterval());
           // Copy pins but generate new UUIDs.
           for (const SymbolPin& pin : src->getPins()) {
             sym->getPins().append(std::make_shared<SymbolPin>(
@@ -1070,6 +1071,7 @@ void MainWindow::openPackageTab(LibraryEditor& editor, const FilePath& fp,
           pkg->setKeywords(src->getKeywords());
           pkg->setCategories(src->getCategories());
           pkg->setAssemblyType(src->getAssemblyType(false));
+          pkg->setGridInterval(src->getGridInterval());
           // Copy pads but generate new UUIDs.
           QHash<Uuid, std::optional<Uuid>> padUuidMap;
           for (const PackagePad& pad : src->getPads()) {

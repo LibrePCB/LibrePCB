@@ -74,6 +74,16 @@ public:
          const QString& keywords_en_US);
   ~Symbol() noexcept;
 
+  // Getters: Attributes
+  const PositiveLength& getGridInterval() const noexcept {
+    return mGridInterval;
+  }
+
+  // Setters: Attributes
+  void setGridInterval(const PositiveLength& interval) noexcept {
+    mGridInterval = interval;
+  }
+
   // Getters: Geometry
   bool isEmpty() const noexcept;
   SymbolPinList& getPins() noexcept { return mPins; }
@@ -122,6 +132,8 @@ private:  // Methods
                    TextList::Event event) noexcept;
 
 private:  // Data
+  PositiveLength mGridInterval;
+
   SymbolPinList mPins;
   PolygonList mPolygons;
   CircleList mCircles;

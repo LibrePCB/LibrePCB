@@ -328,6 +328,16 @@ bool SchematicEditorFsm::processGraphicsSceneRightMouseButtonReleased(
   return false;
 }
 
+bool SchematicEditorFsm::processGridIntervalChanged(
+    const PositiveLength& interval) noexcept {
+  if (SchematicEditorState* state = getCurrentStateObj()) {
+    if (state->processGridIntervalChanged(interval)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/

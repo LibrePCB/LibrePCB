@@ -89,6 +89,7 @@ Package::Package(const Uuid& uuid, const Version& version,
                    author, name_en_US, description_en_US, keywords_en_US),
     mAlternativeNames(),
     mAssemblyType(assemblyType),
+    mGridInterval(2540000),
     mPads(),
     mModels(),
     mFootprints() {
@@ -100,6 +101,8 @@ Package::Package(std::unique_ptr<TransactionalDirectory> directory,
                    std::move(directory), root),
     mAlternativeNames(),
     mAssemblyType(deserialize<AssemblyType>(root.getChild("assembly_type/@0"))),
+    mGridInterval(
+        deserialize<PositiveLength>(root.getChild("grid_interval/@0"))),
     mPads(root),
     mModels(root),
     mFootprints(root) {
@@ -217,6 +220,8 @@ void Package::serialize(SExpression& root) const {
   }
   root.ensureLineBreak();
   root.appendChild("assembly_type", mAssemblyType);
+  root.ensureLineBreak();
+  root.appendChild("grid_interval", mGridInterval);
   root.ensureLineBreak();
   mPads.serialize(root);
   root.ensureLineBreak();

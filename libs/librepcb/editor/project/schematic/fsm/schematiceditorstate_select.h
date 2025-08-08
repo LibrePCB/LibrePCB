@@ -95,6 +95,8 @@ public:
       const GraphicsSceneMouseEvent& e) noexcept override;
   virtual bool processGraphicsSceneRightMouseButtonReleased(
       const GraphicsSceneMouseEvent& e) noexcept override;
+  virtual bool processGridIntervalChanged(
+      const PositiveLength& interval) noexcept override;
 
   // Operator Overloadings
   SchematicEditorState_Select& operator=(

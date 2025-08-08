@@ -160,7 +160,7 @@ public:
   bool processStartDxfImport() noexcept;
   bool processStartMeasure() noexcept;
   bool processStartReNumberPads() noexcept;
-  bool processGridIntervalChanged(const PositiveLength& inverval) noexcept;
+  bool processGridIntervalChanged(const PositiveLength& interval) noexcept;
 
   // Operator Overloadings
   PackageEditorFsm& operator=(const PackageEditorFsm& rhs) = delete;

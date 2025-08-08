@@ -95,9 +95,6 @@ bool SchematicEditorState_Select::entry() noexcept {
       connect(&mContext.undoStack, &UndoStack::stateModified, this,
               &SchematicEditorState_Select::scheduleUpdateAvailableFeatures));
   mConnections.append(
-      connect(&mContext.schematic, &Schematic::gridIntervalChanged, this,
-              &SchematicEditorState_Select::scheduleUpdateAvailableFeatures));
-  mConnections.append(
       connect(qApp->clipboard(), &QClipboard::dataChanged, this,
               &SchematicEditorState_Select::scheduleUpdateAvailableFeatures));
 
@@ -691,6 +688,13 @@ bool SchematicEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
 
   // execute the context menu
   menu.exec(QCursor::pos());
+  return true;
+}
+
+bool SchematicEditorState_Select::processGridIntervalChanged(
+    const PositiveLength& interval) noexcept {
+  Q_UNUSED(interval);
+  scheduleUpdateAvailableFeatures();
   return true;
 }
 
