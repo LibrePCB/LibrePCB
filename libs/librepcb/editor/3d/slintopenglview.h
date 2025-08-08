@@ -57,9 +57,12 @@ struct OpenGlProjection {
                             center + delta.center * factor,
                             transform + delta.transform * factor);
   }
+  bool operator==(const OpenGlProjection& rhs) const noexcept {
+    return (fov == rhs.fov) && (center == rhs.center) &&
+        (transform == rhs.transform);
+  }
   bool operator!=(const OpenGlProjection& rhs) const noexcept {
-    return (fov != rhs.fov) || (center != rhs.center) ||
-        (transform != rhs.transform);
+    return !(*this == rhs);
   }
   OpenGlProjection operator-(const OpenGlProjection& rhs) const noexcept {
     return OpenGlProjection(fov - rhs.fov, center - rhs.center,
@@ -98,7 +101,9 @@ public:
   const QHash<OpenGlObject::Type, float>& getAlpha() const noexcept {
     return mAlpha;
   }
-  static QColor getBackgroundColor() noexcept { return QColor(230, 242, 255); }
+
+  // Setters
+  void setBackgroundColor(QColor color) noexcept;
 
   // General Methods
   void addObject(std::shared_ptr<OpenGlObject> obj) noexcept;
@@ -136,6 +141,7 @@ private:  // Data
   std::unique_ptr<QOpenGLFramebufferObject> mFbo;
   QStringList mErrors;
   QSizeF mViewSize;
+  QColor mBackgroundColor;
 
   // State
   OpenGlProjection mProjection;

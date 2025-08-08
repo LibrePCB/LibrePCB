@@ -123,6 +123,7 @@ public:
     static constexpr const char* sBoardCopperTop           = "board_copper_top";
     static constexpr const char* sBoardCopperInner         = "board_copper_inner_%1";
     static constexpr const char* sBoardCopperBot           = "board_copper_bottom";
+    static constexpr const char* s3dBackground             = "3d_background";
     // clang-format on
   };
 
