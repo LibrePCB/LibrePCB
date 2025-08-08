@@ -215,7 +215,6 @@ ProjectEditor::~ProjectEditor() noexcept {
   // other important objects are deleted, as undo command objects can hold
   // pointers/references to them!
   mUndoStack->clear();
-  mUndoStack.reset();
 
   // Delete objects to avoid issues with still connected signal/slots.
   mHighlightedNetSignals->clear();
@@ -227,6 +226,10 @@ ProjectEditor::~ProjectEditor() noexcept {
   Q_ASSERT(mSchematics->isEmpty());
   Q_ASSERT(mBoards->isEmpty());
   Q_ASSERT(mActiveSchematicTabs.isEmpty());
+
+  // Now after the editors are closed, we are save to delete the undo stack.
+  // Must *not* be done earlier since the editors have references to this!
+  mUndoStack.reset();
 }
 
 /*******************************************************************************
