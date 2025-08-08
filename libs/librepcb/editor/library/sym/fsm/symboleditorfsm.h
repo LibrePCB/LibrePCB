@@ -126,7 +126,7 @@ public:
   bool processStartDrawTexts() noexcept;
   bool processStartDxfImport() noexcept;
   bool processStartMeasure() noexcept;
-  bool processGridIntervalChanged(const PositiveLength& inverval) noexcept;
+  bool processGridIntervalChanged(const PositiveLength& interval) noexcept;
 
   // Operator Overloadings
   SymbolEditorState& operator=(const SymbolEditorState& rhs) = delete;

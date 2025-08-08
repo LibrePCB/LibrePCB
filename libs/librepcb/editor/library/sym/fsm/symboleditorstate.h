@@ -131,8 +131,8 @@ public:
   virtual bool processImportDxf() noexcept { return false; }
   virtual bool processAbortCommand() noexcept { return false; }
   virtual bool processGridIntervalChanged(
-      const PositiveLength& inverval) noexcept {
-    Q_UNUSED(inverval);
+      const PositiveLength& interval) noexcept {
+    Q_UNUSED(interval);
     return false;
   }
 

@@ -297,9 +297,9 @@ bool SymbolEditorFsm::processStartMeasure() noexcept {
 }
 
 bool SymbolEditorFsm::processGridIntervalChanged(
-    const PositiveLength& inverval) noexcept {
+    const PositiveLength& interval) noexcept {
   if (SymbolEditorState* state = getCurrentState()) {
-    if (state->processGridIntervalChanged(inverval)) {
+    if (state->processGridIntervalChanged(interval)) {
       return true;
     }
   }

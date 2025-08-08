@@ -160,6 +160,11 @@ public:
     Q_UNUSED(e);
     return false;
   }
+  virtual bool processGridIntervalChanged(
+      const PositiveLength& interval) noexcept {
+    Q_UNUSED(interval);
+    return false;
+  }
 
   // Operator Overloadings
   SchematicEditorState& operator=(const SchematicEditorState& rhs) = delete;

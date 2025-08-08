@@ -588,8 +588,8 @@ bool SymbolEditorState_Select::processAbortCommand() noexcept {
 }
 
 bool SymbolEditorState_Select::processGridIntervalChanged(
-    const PositiveLength& inverval) noexcept {
-  Q_UNUSED(inverval);
+    const PositiveLength& interval) noexcept {
+  Q_UNUSED(interval);
   scheduleUpdateAvailableFeatures();
   return true;
 }
