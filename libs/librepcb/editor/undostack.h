@@ -293,7 +293,6 @@ public:
   void clear() noexcept;
 
 signals:
-  void cleanChanged(bool clean);
   void stateModified();
 
 private:

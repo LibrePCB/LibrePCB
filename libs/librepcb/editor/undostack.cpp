@@ -141,7 +141,7 @@ void UndoStack::setClean() noexcept {
 
   mCleanIndex = mCurrentIndex;
 
-  emit cleanChanged(true);
+  emit stateModified();
 }
 
 /*******************************************************************************
@@ -182,7 +182,6 @@ bool UndoStack::execCmd(UndoCommand* cmd, bool forceKeepCmd) {
     mCurrentIndex++;
 
     // emit signals
-    emit cleanChanged(false);
     emit stateModified();
   } else {
     // the command has done nothing, so we will just discard it
@@ -271,7 +270,6 @@ void UndoStack::abortCmdGroup() {
   }
 
   // emit signals
-  emit cleanChanged(isClean());
   emit stateModified();
 }
 
@@ -289,7 +287,6 @@ void UndoStack::undo() {
   }
 
   // emit signals
-  emit cleanChanged(isClean());
   emit stateModified();
 }
 
@@ -307,7 +304,6 @@ void UndoStack::redo() {
   }
 
   // emit signals
-  emit cleanChanged(isClean());
   emit stateModified();
 }
 
@@ -335,7 +331,6 @@ void UndoStack::clear() noexcept {
   mActiveCommandGroup = nullptr;
 
   // emit signals
-  emit cleanChanged(true);
   emit stateModified();
 }
 

@@ -613,6 +613,10 @@ void Board2dTab::trigger(ui::TabAction a) noexcept {
       }
       break;
     }
+    case ui::TabAction::Save: {
+      mProjectEditor.saveProject();
+      break;
+    }
     case ui::TabAction::Undo: {
       mProjectEditor.undo();
       break;

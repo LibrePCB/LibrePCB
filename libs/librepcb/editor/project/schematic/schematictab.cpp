@@ -428,6 +428,10 @@ void SchematicTab::trigger(ui::TabAction a) noexcept {
       mFsm->processAbortCommand();
       break;
     }
+    case ui::TabAction::Save: {
+      mProjectEditor.saveProject();
+      break;
+    }
     case ui::TabAction::Undo: {
       mProjectEditor.undo();
       break;

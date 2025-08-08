@@ -209,7 +209,7 @@ private:
   std::unique_ptr<Project> mProject;
   int mUiIndex;
   bool mUseIeee315Symbols;
-  QList<FileFormatMigration::Message> mUpgradeMessages;
+  std::optional<QList<FileFormatMigration::Message>> mUpgradeMessages;
   std::shared_ptr<UiObjectList<SchematicEditor, ui::SchematicData>> mSchematics;
   std::shared_ptr<UiObjectList<BoardEditor, ui::BoardData>> mBoards;
   std::unique_ptr<UndoStack> mUndoStack;

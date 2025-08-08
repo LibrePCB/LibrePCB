@@ -77,7 +77,7 @@ ProjectEditor::ProjectEditor(
     mProject(std::move(project)),
     mUiIndex(uiIndex),
     mUseIeee315Symbols(false),
-    mUpgradeMessages(),
+    mUpgradeMessages(upgradeMessages),
     mSchematics(new UiObjectList<SchematicEditor, ui::SchematicData>()),
     mBoards(new UiObjectList<BoardEditor, ui::BoardData>()),
     mUndoStack(new UndoStack()),
@@ -144,27 +144,28 @@ ProjectEditor::ProjectEditor(
           });
 
   // Show notification if file format has been upgraded.
-  if (upgradeMessages) {
-    mUpgradeMessages = *upgradeMessages;
+  if (mUpgradeMessages) {
     QString msg =
         tr("The project '%1' has been upgraded to a new file format. "
            "After saving, it will not be possible anymore to open it with an "
            "older LibrePCB version!")
             .arg(*mProject->getName() % " " % mProject->getVersion());
-    if (!upgradeMessages->isEmpty()) {
+    if (!mUpgradeMessages->isEmpty()) {
       msg += "\n\n" %
           tr("The upgrade produced %n message(s), please review before "
              "proceeding.",
-             nullptr, upgradeMessages->count());
+             nullptr, mUpgradeMessages->count());
     }
     auto notification = std::make_shared<Notification>(
         ui::NotificationType::Warning,
         tr("ATTENTION: Project File Format Upgraded"), msg,
-        (!upgradeMessages->isEmpty()) ? tr("Show Messages") : QString(),
+        (!mUpgradeMessages->isEmpty()) ? tr("Show Messages") : QString(),
         QString(), true);
     connect(notification.get(), &Notification::buttonClicked, this,
             &ProjectEditor::showUpgradeMessages);
     connect(this, &ProjectEditor::projectSavedToDisk, notification.get(),
+            &Notification::dismiss);
+    connect(this, &ProjectEditor::destroyed, notification.get(),
             &Notification::dismiss);
     mApp.getNotifications().push(notification);
   }
@@ -323,7 +324,10 @@ void ProjectEditor::setHighlightedNetSignals(
 }
 
 bool ProjectEditor::hasUnsavedChanges() const noexcept {
-  return mManualModificationsMade || (!mUndoStack->isClean());
+  // If the project was upgraded, show it as modified to make it clear that
+  // saving the project will modify the files.
+  return mManualModificationsMade || (!mUndoStack->isClean()) ||
+      mUpgradeMessages;
 }
 
 void ProjectEditor::undo() noexcept {
@@ -386,6 +390,13 @@ bool ProjectEditor::saveProject() noexcept {
 
     // Saving was successful --> clean the undo stack.
     mUndoStack->setClean();
+    if (mUpgradeMessages) {
+      mUpgradeMessages = std::nullopt;  // Not needed anymore.
+      // It's a bit ugly, but if no changes were made to the project, the UI
+      // remains in "modified" state so we manually emit the stateModified()
+      // signal here to ensure it gets updated.
+      emit mUndoStack->stateModified();
+    }
     emit projectSavedToDisk();
     emit statusBarMessageChanged(tr("Project saved!"), 2000);
     qDebug() << "Successfully saved project.";
@@ -660,7 +671,9 @@ void ProjectEditor::unregisterActiveSchematicTab(SchematicTab* tab) noexcept {
  ******************************************************************************/
 
 void ProjectEditor::showUpgradeMessages() noexcept {
-  std::sort(mUpgradeMessages.begin(), mUpgradeMessages.end(),
+  if (!mUpgradeMessages) return;
+
+  std::sort(mUpgradeMessages->begin(), mUpgradeMessages->end(),
             [](const FileFormatMigration::Message& a,
                const FileFormatMigration::Message& b) {
               if (a.severity > b.severity) return true;
@@ -673,7 +686,7 @@ void ProjectEditor::showUpgradeMessages() noexcept {
   dialog.setWindowTitle(tr("File Format Upgrade Messages"));
   dialog.resize(800, 400);
   QVBoxLayout* layout = new QVBoxLayout(&dialog);
-  QTableWidget* table = new QTableWidget(mUpgradeMessages.count(), 4, &dialog);
+  QTableWidget* table = new QTableWidget(mUpgradeMessages->count(), 4, &dialog);
   table->setHorizontalHeaderLabels(
       {tr("Severity"), tr("Version"), tr("Occurrences"), tr("Message")});
   table->horizontalHeader()->setSectionResizeMode(
@@ -687,8 +700,8 @@ void ProjectEditor::showUpgradeMessages() noexcept {
   table->setEditTriggers(QAbstractItemView::NoEditTriggers);
   table->setSelectionBehavior(QAbstractItemView::SelectRows);
   table->setWordWrap(true);
-  for (int i = 0; i < mUpgradeMessages.count(); ++i) {
-    const FileFormatMigration::Message m = mUpgradeMessages.at(i);
+  for (int i = 0; i < mUpgradeMessages->count(); ++i) {
+    const FileFormatMigration::Message m = mUpgradeMessages->at(i);
     QTableWidgetItem* item = new QTableWidgetItem(m.getSeverityStrTr());
     item->setTextAlignment(Qt::AlignCenter);
     table->setItem(i, 0, item);
