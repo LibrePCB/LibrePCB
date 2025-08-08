@@ -406,9 +406,11 @@ ui::TabData PackageTab::getUiData() const noexcept {
 ui::PackageTabData PackageTab::getDerivedUiData() const noexcept {
   const Theme& theme = mEditor.getWorkspace().getSettings().themes.getActive();
   const QColor bgColor = mView3d
-      ? SlintOpenGlView::getBackgroundColor()
+      ? theme.getColor(Theme::Color::s3dBackground).getPrimaryColor()
       : theme.getColor(Theme::Color::sBoardBackground).getPrimaryColor();
-  const QColor fgColor = (bgColor.lightnessF() >= 0.5) ? Qt::black : Qt::white;
+  const QColor fgColor = mView3d
+      ? theme.getColor(Theme::Color::s3dBackground).getSecondaryColor()
+      : ((bgColor.lightnessF() >= 0.5) ? Qt::black : Qt::white);
   const bool refreshing =
       (mOpenGlSceneBuilder && mOpenGlSceneBuilder->isBusy());
   QStringList errors = mOpenGlSceneBuilderErrors;
@@ -2768,6 +2770,11 @@ void PackageTab::applyTheme() noexcept {
         theme.getColor(Theme::Color::sBoardSelection).getPrimaryColor(),
         theme.getColor(Theme::Color::sBoardSelection).getSecondaryColor());
     mScene->setGridStyle(mGridStyle);
+  }
+
+  if (mOpenGlView) {
+    mOpenGlView->setBackgroundColor(
+        theme.getColor(Theme::Color::s3dBackground).getPrimaryColor());
   }
 
   onDerivedUiDataChanged.notify();

@@ -79,6 +79,7 @@ Theme::Theme(const Uuid& uuid, const QString& name) noexcept
   // clang-format off
   const char* sch = QT_TR_NOOP("Schematic");
   const char* brd = QT_TR_NOOP("Board");
+  const char* view3d = QT_TR_NOOP("3D View");
   addColor(Color::sSchematicBackground,        sch, QT_TR_NOOP("Background/Grid"),      Qt::white,                  Qt::gray);
   addColor(Color::sSchematicOverlays,          sch, QT_TR_NOOP("Overlays"),             QColor(255, 255, 255, 120), Qt::black);
   addColor(Color::sSchematicInfoBox,           sch, QT_TR_NOOP("Info Box"),             QColor(255, 255, 255, 130), Qt::black);
@@ -186,6 +187,10 @@ Theme::Theme(const Uuid& uuid, const QString& name) noexcept
   }
   addColor(Color::sBoardCopperBot, brd, QT_TR_NOOP("Copper Bottom"),
            QColor("#964578CC"), QColor("#C00A66FC"));
+  // Use a background color which ensures good contrast to both black and white
+  // STEP models. The secondary color is used e.g. for overlay buttons.
+  addColor(Color::s3dBackground, view3d, QT_TR_NOOP("Background/Foreground"),
+           QColor(230, 242, 255), Qt::black);
 }
 
 Theme::Theme(const Uuid& uuid, const QString& name,
