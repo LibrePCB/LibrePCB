@@ -29,6 +29,7 @@
 #include "../types/version.h"
 #include "fileformatmigrationunstable.h"
 #include "fileformatmigrationv01.h"
+#include "fileformatmigrationv1.h"
 
 #include <QtCore>
 
@@ -76,6 +77,9 @@ QList<std::shared_ptr<FileFormatMigration>> FileFormatMigration::getMigrations(
   QList<std::shared_ptr<FileFormatMigration>> migrations;
   if (fileFormat <= Version::fromString("0.1")) {
     migrations.append(std::make_shared<FileFormatMigrationV01>());
+  }
+  if (fileFormat <= Version::fromString("1")) {
+    migrations.append(std::make_shared<FileFormatMigrationV1>());
   }
 
   // Allow partially upgrading previous unstable file format releases if the

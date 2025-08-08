@@ -23,7 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "fileformatmigrationv01.h"
+#include "fileformatmigrationv1.h"
 
 #include <QtCore>
 
@@ -47,7 +47,7 @@ class SExpression;
  * (feature branch). This upgrade is only performed when the environment
  * variable `LIBREPCB_UPGRADE_UNSTABLE=1` is set.
  */
-class FileFormatMigrationUnstable final : public FileFormatMigrationV01 {
+class FileFormatMigrationUnstable final : public FileFormatMigrationV1 {
   Q_OBJECT
 
 public:
@@ -70,19 +70,6 @@ public:
   // Operator Overloadings
   FileFormatMigrationUnstable& operator=(
       const FileFormatMigrationUnstable& rhs) = delete;
-
-private:  // Methods
-  virtual void createOutputJobs(TransactionalDirectory& dir) override;
-  virtual void upgradeSettings(SExpression& root) override;
-  virtual void upgradeCircuit(SExpression& root,
-                              ProjectContext& context) override;
-  virtual void upgradeErc(SExpression& root, ProjectContext& context) override;
-  virtual void upgradeSchematic(SExpression& root,
-                                ProjectContext& context) override;
-  virtual void upgradeBoard(SExpression& root,
-                            ProjectContext& context) override;
-  virtual void upgradeBoardUserSettings(SExpression& root) override;
-  virtual void upgradeBoardDrcSettings(SExpression& root) override;
 };
 
 /*******************************************************************************

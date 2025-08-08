@@ -159,6 +159,8 @@ void FileFormatMigrationV1::upgradeWorkspaceData(TransactionalDirectory& dir) {
   const QStringList filesToRemove = {
       "cache_v3",
       "cache_v4",
+      "cache_v5",
+      "cache_v6",
   };
   TransactionalDirectory librariesDir(dir, "libraries");
   foreach (const QString fileName, librariesDir.getFiles()) {
