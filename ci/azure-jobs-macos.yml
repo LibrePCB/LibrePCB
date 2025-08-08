@@ -47,7 +47,7 @@ jobs:
       ./ci/tar_artifacts.sh
       ./ci/upload_artifacts.sh
     displayName: Tar & Upload Artifacts
-    condition: and(succeeded(), ne(variables.UPLOAD_URL, ''), ne(variables['Build.Reason'], 'PullRequest'))
+    condition: and(succeeded(), variables['ARTIFACTS_UPLOAD_URL'], ne(variables['Build.Reason'], 'PullRequest'))
     env:
       UPLOAD_URL: $(ARTIFACTS_UPLOAD_URL)
       UPLOAD_USER: $(ARTIFACTS_UPLOAD_USER)
