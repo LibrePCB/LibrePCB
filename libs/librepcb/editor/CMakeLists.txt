@@ -912,6 +912,8 @@ add_library(
   workspace/workspacesettingsdialog.h
   workspace/workspacesettingsdialog.ui
 )
+# Maybe the explicit dependency fixes spurious race conditions on CI.
+add_dependencies(librepcb_editor Slint::Slint)
 slint_target_sources(
   librepcb_editor ui/appwindow.slint
   NAMESPACE ui
