@@ -447,9 +447,9 @@ bool PackageEditorFsm::processStartReNumberPads() noexcept {
 }
 
 bool PackageEditorFsm::processGridIntervalChanged(
-    const PositiveLength& inverval) noexcept {
+    const PositiveLength& interval) noexcept {
   if (PackageEditorState* state = getCurrentState()) {
-    if (state->processGridIntervalChanged(inverval)) {
+    if (state->processGridIntervalChanged(interval)) {
       return true;
     }
   }

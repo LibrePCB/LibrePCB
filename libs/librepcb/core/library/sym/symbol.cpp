@@ -42,6 +42,7 @@ Symbol::Symbol(const Uuid& uuid, const Version& version, const QString& author,
   : LibraryElement(getShortElementName(), getLongElementName(), uuid, version,
                    author, name_en_US, description_en_US, keywords_en_US),
     onEdited(*this),
+    mGridInterval(2540000),
     mPins(),
     mPolygons(),
     mCircles(),
@@ -61,6 +62,8 @@ Symbol::Symbol(std::unique_ptr<TransactionalDirectory> directory,
   : LibraryElement(getShortElementName(), getLongElementName(), true,
                    std::move(directory), root),
     onEdited(*this),
+    mGridInterval(
+        deserialize<PositiveLength>(root.getChild("grid_interval/@0"))),
     mPins(root),
     mPolygons(root),
     mCircles(root),
@@ -126,6 +129,8 @@ std::unique_ptr<Symbol> Symbol::open(
 
 void Symbol::serialize(SExpression& root) const {
   LibraryElement::serialize(root);
+  root.ensureLineBreak();
+  root.appendChild("grid_interval", mGridInterval);
   root.ensureLineBreak();
   mPins.serialize(root);
   root.ensureLineBreak();

@@ -99,6 +99,9 @@ public:
   }
   AssemblyType getAssemblyType(bool resolveAuto) const noexcept;
   AssemblyType guessAssemblyType() const noexcept;
+  const PositiveLength& getGridInterval() const noexcept {
+    return mGridInterval;
+  }
   PackagePadList& getPads() noexcept { return mPads; }
   const PackagePadList& getPads() const noexcept { return mPads; }
   PackageModelList& getModels() noexcept { return mModels; }
@@ -110,6 +113,9 @@ public:
 
   // Setters
   void setAssemblyType(AssemblyType type) noexcept { mAssemblyType = type; }
+  void setGridInterval(const PositiveLength& interval) noexcept {
+    mGridInterval = interval;
+  }
 
   // General Methods
   virtual RuleCheckMessageList runChecks() const override;
@@ -138,6 +144,7 @@ private:  // Methods
 private:  // Data
   QList<AlternativeName> mAlternativeNames;  ///< Optional
   AssemblyType mAssemblyType;  ///< Package assembly type (metadata)
+  PositiveLength mGridInterval;
   PackagePadList mPads;  ///< empty list if the package has no pads
   PackageModelList mModels;  ///< 3D models (optional)
   FootprintList mFootprints;  ///< minimum one footprint

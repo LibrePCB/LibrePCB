@@ -106,7 +106,7 @@ public:
   bool processImportDxf() noexcept override;
   bool processAbortCommand() noexcept override;
   bool processGridIntervalChanged(
-      const PositiveLength& inverval) noexcept override;
+      const PositiveLength& interval) noexcept override;
 
   // Operator Overloadings
   PackageEditorState_Select& operator=(const PackageEditorState_Select& rhs) =

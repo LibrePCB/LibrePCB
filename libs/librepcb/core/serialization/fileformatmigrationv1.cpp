@@ -64,6 +64,15 @@ void FileFormatMigrationV1::upgradePackageCategory(
 void FileFormatMigrationV1::upgradeSymbol(TransactionalDirectory& dir) {
   // Version File.
   upgradeVersionFile(dir, ".librepcb-sym");
+
+  // Content File.
+  {
+    const QString fp = "symbol.lp";
+    std::unique_ptr<SExpression> root =
+        SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+    root->appendChild("grid_interval", SExpression::createToken("2.54"));
+    dir.write(fp, root->toByteArray());
+  }
 }
 
 void FileFormatMigrationV1::upgradePackage(TransactionalDirectory& dir) {
@@ -75,6 +84,7 @@ void FileFormatMigrationV1::upgradePackage(TransactionalDirectory& dir) {
     const QString fp = "package.lp";
     std::unique_ptr<SExpression> root =
         SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+    root->appendChild("grid_interval", SExpression::createToken("2.54"));
 
     // Footprints.
     for (SExpression* fptNode : root->getChildren("footprint")) {

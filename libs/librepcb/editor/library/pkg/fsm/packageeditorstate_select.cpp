@@ -706,8 +706,8 @@ bool PackageEditorState_Select::processAbortCommand() noexcept {
 }
 
 bool PackageEditorState_Select::processGridIntervalChanged(
-    const PositiveLength& inverval) noexcept {
-  Q_UNUSED(inverval);
+    const PositiveLength& interval) noexcept {
+  Q_UNUSED(interval);
   scheduleUpdateAvailableFeatures();
   return true;
 }
