@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "board2dtab.h"
 
+#include "../../dialogs/backgroundimagesetupdialog.h"
 #include "../../dialogs/filedialog.h"
 #include "../../editorcommandset.h"
 #include "../../graphics/graphicslayerlist.h"
@@ -162,7 +163,8 @@ Board2dTab::Board2dTab(GuiApplication& app, BoardEditor& editor,
     mUnplacedComponentIndex(0),
     mUnplacedComponentDeviceIndex(0),
     mUnplacedComponentPackageOwned(false),
-    mUnplacedComponentFootprintIndex(0) {
+    mUnplacedComponentFootprintIndex(0),
+    mBackgroundImageGraphicsItem(new QGraphicsPixmapItem()) {
   Q_ASSERT(&mBoard.getProject() == &mProject);
 
   // Load/store layers visibility.
@@ -233,6 +235,15 @@ Board2dTab::Board2dTab(GuiApplication& app, BoardEditor& editor,
   connect(&mMsgPlaceDevices, &DismissableMessageContext::visibilityChanged,
           this, [this]() { onDerivedUiDataChanged.notify(); });
   updateMessages();
+
+  // Setup background image.
+  mBackgroundImageGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
+  mBackgroundImageGraphicsItem->setTransformationMode(Qt::SmoothTransformation);
+  mBackgroundImageGraphicsItem->setZValue(-1000);
+  mBackgroundImageGraphicsItem->setOpacity(0.8);
+  mBackgroundImageGraphicsItem->setVisible(false);
+  mBackgroundImageSettings.tryLoadFromDir(getBackgroundImageCacheDir());
+  applyBackgroundImageSettings();
 
   // Build the whole board editor finite state machine.
   BoardEditorFsm::Context fsmContext{
@@ -333,6 +344,7 @@ ui::Board2dTabData Board2dTab::getDerivedUiData() const noexcept {
       l2s(mGridStyle),  // Grid style
       l2s(*mBoard.getGridInterval()),  // Grid interval
       l2s(mBoard.getGridUnit()),  // Length unit
+      mBackgroundImageGraphicsItem->isVisible(),  // Background image set
       mIgnorePlacementLocks,  // Ignore placement locks
       mBoardEditor.isRebuildingPlanes(),  // Refreshing
       mMsgEmptySchematics.getUiData(),  // Message "empty schematics"
@@ -474,6 +486,8 @@ void Board2dTab::activate() noexcept {
   connect(mScene.get(), &GraphicsScene::changed, this,
           &Board2dTab::requestRepaint);
 
+  mScene->addItem(*mBackgroundImageGraphicsItem);
+
   // Force airwire rebuild immediately and on every project modification.
   mBoard.triggerAirWiresRebuild();
   mActiveConnections.append(connect(&mProjectEditor.getUndoStack(),
@@ -535,6 +549,9 @@ void Board2dTab::deactivate() noexcept {
   mUnplacedComponentDevicesModel.reset();
   mUnplacedComponentsModel.reset();
   mDrcLocationGraphicsItem.reset();
+  if (mScene && (mBackgroundImageGraphicsItem->scene() == mScene.get())) {
+    mScene->removeItem(*mBackgroundImageGraphicsItem);
+  }
   mScene.reset();
   mLayersModel.reset();
 }
@@ -761,6 +778,10 @@ void Board2dTab::trigger(ui::TabAction a) noexcept {
     }
     case ui::TabAction::ZoomFit: {
       if (mScene) mView->zoomToSceneRect(mScene->itemsBoundingRect());
+      break;
+    }
+    case ui::TabAction::ToggleBackgroundImage: {
+      toggleBackgroundImage();
       break;
     }
     case ui::TabAction::FindRefreshSuggestions: {
@@ -2150,6 +2171,62 @@ void Board2dTab::goToDevice(const QString& name, int index) noexcept {
       }
     }
   }
+}
+
+bool Board2dTab::toggleBackgroundImage() noexcept {
+  if (mBackgroundImageGraphicsItem->isVisible()) {
+    mBackgroundImageSettings.enabled = false;
+  } else {
+    // Show dialog.
+    BackgroundImageSetupDialog dlg("board_editor", qApp->activeWindow());
+    if (!mBackgroundImageSettings.image.isNull()) {
+      dlg.setData(mBackgroundImageSettings.image,
+                  mBackgroundImageSettings.rotation,
+                  mBackgroundImageSettings.references);
+    }
+    if (dlg.exec() != QDialog::Accepted) {
+      return mBackgroundImageGraphicsItem->isVisible();  // Aborted.
+    }
+
+    mBackgroundImageSettings.image = dlg.getImage();
+    mBackgroundImageSettings.rotation = dlg.getRotation();
+    mBackgroundImageSettings.references = dlg.getReferences();
+    mBackgroundImageSettings.enabled =
+        (!mBackgroundImageSettings.image.isNull()) &&
+        (mBackgroundImageSettings.references.count() >= 2);
+  }
+
+  // Store & apply new settings.
+  mBackgroundImageSettings.saveToDir(getBackgroundImageCacheDir());
+  applyBackgroundImageSettings();
+  return mBackgroundImageGraphicsItem->isVisible();
+}
+
+void Board2dTab::applyBackgroundImageSettings() noexcept {
+  BackgroundImageSettings& s = mBackgroundImageSettings;
+
+  const bool enable = s.enabled && (!s.image.isNull());
+  mBackgroundImageGraphicsItem->setVisible(enable);
+
+  if (enable) {
+    // Post-process the image.
+    const Theme& theme = mApp.getWorkspace().getSettings().themes.getActive();
+    mBackgroundImageGraphicsItem->setPixmap(s.buildPixmap(
+        theme.getColor(Theme::Color::sBoardBackground).getPrimaryColor()));
+
+    // Apply the image & transform.
+    mBackgroundImageGraphicsItem->setTransform(s.calcTransform());
+    if (s.references.count() >= 1) {
+      mBackgroundImageGraphicsItem->setPos(
+          s.references.first().second.toPxQPointF());
+    }
+  }
+}
+
+FilePath Board2dTab::getBackgroundImageCacheDir() const noexcept {
+  return Application::getCacheDir()
+      .getPathTo("backgrounds")
+      .getPathTo(mBoard.getUuid().toStr());
 }
 
 void Board2dTab::applyTheme() noexcept {

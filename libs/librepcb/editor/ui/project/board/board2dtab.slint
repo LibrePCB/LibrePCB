@@ -388,6 +388,21 @@ export component Board2dTab inherits Tab {
                 }
             }
 
+            toggle-background-image-btn := SceneButton {
+                x: parent.width - self.width;
+                style: self.checked ? checkbox : button;
+                icon-scale: self.checked ? 0.8 : 0.9;
+                icon: Cmd.toggle-background-image.icon;
+                tooltip: Cmd.toggle-background-image.text;
+                bg-color: tabs[index].background-color;
+                fg-color: tabs[index].foreground-color;
+                checked: tabs[index].background-image-set;
+
+                clicked => {
+                    Backend.trigger-tab(section-index, index, TabAction.toggle-background-image);
+                }
+            }
+
             toggle-3d-btn := SceneButton {
                 text: "3D";
                 bg-color: tabs[index].background-color;

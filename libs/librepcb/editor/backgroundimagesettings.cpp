@@ -115,22 +115,42 @@ QPixmap BackgroundImageSettings::buildPixmap(
     const QColor& bgColor) const noexcept {
   QImage img = image.convertToFormat(QImage::Format_ARGB32);
 
-  auto colorDiff = [](const QColor& a, const QColor& b) {
-    return std::abs(a.lightnessF() - b.lightnessF());
-  };
+  // Get the images background color. This could be improved a lot :-/
+  QColor imgBgColor = img.pixelColor(0, 0);
 
-  // If the image background color is the inverse of the graphics view
-  // background, invert the image to get good contrast for lines in the image.
-  if (colorDiff(img.pixelColor(0, 0), bgColor) > 0.5) {
-    img.invertPixels();
-  }
+  // Detect if the images background is either white or black.
+  const int blackThreshold = 30;
+  const int whiteThreshold = 255 - 30;
+  const bool imgBgIsBlack = (imgBgColor.red() <= blackThreshold) &&
+      (imgBgColor.green() <= blackThreshold) &&
+      (imgBgColor.blue() <= blackThreshold);
+  const bool imgBgIsWhite = (imgBgColor.red() >= whiteThreshold) &&
+      (imgBgColor.green() >= whiteThreshold) &&
+      (imgBgColor.blue() >= whiteThreshold);
 
-  // Make the image background transparent.
-  const QColor imgBgColor = img.pixelColor(0, 0);
-  for (int i = 0; i < img.width(); ++i) {
-    for (int k = 0; k < img.height(); ++k) {
-      if (colorDiff(img.pixelColor(i, k), imgBgColor) < 0.3) {
-        img.setPixelColor(i, k, Qt::transparent);
+  // If the images background is either white or black, make it transparent.
+  // This is important for datasheet drawings to get only the drawing lines,
+  // not the PDF background. However, for images neither white or black, we
+  // don't do this since it is probably a photo of a PCB where we must not
+  // remove the background as it might also remove the traces.
+  if (imgBgIsBlack || imgBgIsWhite) {
+    auto colorDiff = [](const QColor& a, const QColor& b) {
+      return std::abs(a.lightnessF() - b.lightnessF());
+    };
+
+    // If the image background color is the inverse of the graphics view
+    // background, invert the image to get good contrast for lines in the image.
+    if (colorDiff(imgBgColor, bgColor) > 0.5) {
+      img.invertPixels();
+    }
+
+    // Make the image background transparent.
+    imgBgColor = img.pixelColor(0, 0);  // Might have been inverted!
+    for (int i = 0; i < img.width(); ++i) {
+      for (int k = 0; k < img.height(); ++k) {
+        if (colorDiff(img.pixelColor(i, k), imgBgColor) < 0.3) {
+          img.setPixelColor(i, k, Qt::transparent);
+        }
       }
     }
   }
