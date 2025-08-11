@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../../3d/openglobject.h"
+#include "../../backgroundimagesettings.h"
 #include "../../dialogs/graphicsexportdialog.h"
 #include "../../utils/lengtheditcontext.h"
 #include "../../widgets/if_graphicsvieweventhandler.h"
@@ -65,21 +66,6 @@ class PackagePadListModel;
 class SlintGraphicsView;
 class SlintOpenGlView;
 struct OpenGlProjection;
-
-/*******************************************************************************
- *  Class BackgroundImageSettings
- ******************************************************************************/
-
-struct BackgroundImageSettings {
-  bool enabled = true;  ///< Whether the background is enabled or not
-  QImage image;  ///< The original loaded image
-  Angle rotation;  ///< Rotation in scene
-  QList<std::pair<QPointF, Point>> references;  ///< References in #image
-
-  bool tryLoadFromDir(const FilePath& dir) noexcept;
-  void saveToDir(const FilePath& dir) noexcept;
-  QPixmap buildPixmap(const QColor& bgColor) const noexcept;
-};
 
 /*******************************************************************************
  *  Class PackageTab

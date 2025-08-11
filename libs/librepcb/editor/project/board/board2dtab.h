@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../backgroundimagesettings.h"
 #include "../../dialogs/graphicsexportdialog.h"
 #include "../../utils/dismissablemessagecontext.h"
 #include "../../utils/lengtheditcontext.h"
@@ -221,6 +222,9 @@ private:
   void execSpecctraExportDialog() noexcept;
   void execSpecctraImportDialog() noexcept;
   void goToDevice(const QString& name, int index) noexcept;
+  bool toggleBackgroundImage() noexcept;
+  void applyBackgroundImageSettings() noexcept;
+  FilePath getBackgroundImageCacheDir() const noexcept;
   void applyTheme() noexcept;
   void requestRepaint() noexcept;
 
@@ -297,6 +301,10 @@ private:
   std::unique_ptr<BoardGraphicsScene> mScene;
   std::unique_ptr<QTimer> mInputIdleTimer;
   std::unique_ptr<QGraphicsPathItem> mDrcLocationGraphicsItem;
+
+  // Background image
+  BackgroundImageSettings mBackgroundImageSettings;
+  std::shared_ptr<QGraphicsPixmapItem> mBackgroundImageGraphicsItem;
 };
 
 /*******************************************************************************
