@@ -83,6 +83,7 @@ signals:
                           bool zoomTo);
 
 private:
+  void sortMessages() noexcept;
   void updateCounters() noexcept;
 
   AutofixHandler mAutofixHandler;
