@@ -13,6 +13,8 @@ add_library(
   3d/opengltriangleobject.h
   3d/slintopenglview.cpp
   3d/slintopenglview.h
+  backgroundimagesettings.cpp
+  backgroundimagesettings.h
   cmd/cmdattributeedit.cpp
   cmd/cmdattributeedit.h
   cmd/cmdcircleedit.cpp
