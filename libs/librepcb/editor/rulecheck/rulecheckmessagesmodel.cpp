@@ -25,6 +25,8 @@
 #include "../utils/slinthelpers.h"
 #include "../utils/uihelpers.h"
 
+#include <librepcb/core/utils/toolbox.h>
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -66,7 +68,7 @@ void RuleCheckMessagesModel::setMessages(
     const QSet<SExpression>& approvals) noexcept {
   mMessages = messages;
   mApprovals = approvals;
-  notify_reset();
+  sortMessages();
   updateCounters();
 }
 
@@ -100,12 +102,12 @@ void RuleCheckMessagesModel::set_row_data(
     if (data.approved && (!mApprovals.contains(msg->getApproval()))) {
       mApprovals.insert(msg->getApproval());
       emit approvalChanged(msg->getApproval(), true);
-      notify_row_changed(i);
+      sortMessages();
       updateCounters();
     } else if ((!data.approved) && mApprovals.contains(msg->getApproval())) {
       mApprovals.remove(msg->getApproval());
       emit approvalChanged(msg->getApproval(), false);
-      notify_row_changed(i);
+      sortMessages();
       updateCounters();
     } else if (data.action == ui::RuleCheckMessageAction::Highlight) {
       emit highlightRequested(msg, false);
@@ -130,6 +132,32 @@ void RuleCheckMessagesModel::set_row_data(
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void RuleCheckMessagesModel::sortMessages() noexcept {
+  // Sort by approval state, severity and message.
+  Toolbox::sortNumeric(
+      mMessages,
+      [this](const QCollator& cmp,
+             const std::shared_ptr<const RuleCheckMessage>& lhs,
+             const std::shared_ptr<const RuleCheckMessage>& rhs) {
+        if (lhs && rhs) {
+          const bool lhsApproved = mApprovals.contains(lhs->getApproval());
+          const bool rhsApproved = mApprovals.contains(rhs->getApproval());
+          if (lhsApproved != rhsApproved) {
+            return rhsApproved;
+          } else if (lhs->getSeverity() != rhs->getSeverity()) {
+            return lhs->getSeverity() > rhs->getSeverity();
+          } else {
+            return cmp(lhs->getMessage(), rhs->getMessage());
+          }
+        } else {
+          return false;
+        }
+      },
+      Qt::CaseInsensitive, false);
+
+  notify_reset();
+}
 
 void RuleCheckMessagesModel::updateCounters() noexcept {
   int unapproved = 0;
