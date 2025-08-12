@@ -212,6 +212,8 @@ private:  // Methods
   void saveDiff(const QString& type) const;
   void loadDiff(const FilePath& fp);
   void removeDiff(const QString& type);
+  void sanitizePathOrThrow(const QString& cleanedPath) const;
+  bool checkIfPathIsSafe(const QString& cleanedPath) const noexcept;
 
 private:  // Data
   const FilePath mFilePath;
