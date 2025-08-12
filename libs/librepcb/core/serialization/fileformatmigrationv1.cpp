@@ -233,7 +233,14 @@ void FileFormatMigrationV1::upgradeOutputJobs(SExpression& root) {
     if (jobNode->getChild("type/@0").getValue() == "graphics") {
       for (SExpression* contentNode : jobNode->getChildren("content")) {
         SExpression& contentTypeNode = contentNode->getChild("type/@0");
-        if (contentTypeNode.getValue() == "board") {
+        if (contentTypeNode.getValue() == "schematic") {
+          // Add the new layer for image borders.
+          SExpression& imgBordersLayerNode = contentNode->appendList("layer");
+          imgBordersLayerNode.appendChild(
+              SExpression::createToken("schematic_image_borders"));
+          imgBordersLayerNode.appendChild(
+              "color", SExpression::createString("#ff808080"));
+        } else if (contentTypeNode.getValue() == "board") {
           // We don't need to check the option value since "realistic" was
           // the only supported option in v1.
           const auto optionNodes = contentNode->getChildren("option");

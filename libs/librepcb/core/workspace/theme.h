@@ -63,6 +63,7 @@ public:
     static constexpr const char* sSchematicWires           = "schematic_wires";
     static constexpr const char* sSchematicNetLabels       = "schematic_net_labels";
     static constexpr const char* sSchematicNetLabelAnchors = "schematic_net_label_anchors";
+    static constexpr const char* sSchematicImageBorders    = "schematic_image_borders";
     static constexpr const char* sSchematicDocumentation   = "schematic_documentation";
     static constexpr const char* sSchematicComments        = "schematic_comments";
     static constexpr const char* sSchematicGuide           = "schematic_guide";
