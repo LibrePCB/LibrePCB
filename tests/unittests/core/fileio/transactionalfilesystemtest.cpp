@@ -47,6 +47,7 @@ protected:
   TransactionalFileSystemTest() {
     // temporary dir (with spaces in path to make tests harder)
     mTmpDir = FilePath::getRandomTempPath().getPathTo("spaces in path");
+    FileUtils::writeFile(mTmpDir.getPathTo("1.txt"), "1");
 
     // non-existing dir
     mNonExistingDir = mTmpDir.getPathTo("nonexisting");
@@ -762,6 +763,77 @@ TEST_F(TransactionalFileSystemTest, testReleaseLock) {
 }
 
 /*******************************************************************************
+ *  Security Tests: Sandbox Breakout
+ ******************************************************************************/
+
+// These tests make sure that any file operation outside the file system (i.e.
+// with too many "../" in the path) will fail. This is important for security
+// reasons (sandbox breakout).
+
+TEST_F(TransactionalFileSystemTest, testGetAbsPathBreakout) {
+  TransactionalFileSystem fs(mPopulatedDir);
+  EXPECT_FALSE(fs.getAbsPath("../1.txt").isValid());
+}
+
+TEST_F(TransactionalFileSystemTest, testGetDirsBreakout) {
+  TransactionalFileSystem fs(mPopulatedDir);
+  ASSERT_GT(FileUtils::findDirectories(mTmpDir).count(), 0);
+  EXPECT_EQ(0, fs.getDirs("../").count());
+}
+
+TEST_F(TransactionalFileSystemTest, testGetFilesBreakout) {
+  TransactionalFileSystem fs(mPopulatedDir);
+  ASSERT_GT(FileUtils::getFilesInDirectory(mTmpDir).count(), 0);
+  EXPECT_EQ(0, fs.getFiles("../").count());
+}
+
+TEST_F(TransactionalFileSystemTest, testFileExistsBreakout) {
+  TransactionalFileSystem fs(mPopulatedDir);
+  ASSERT_TRUE(mPopulatedDir.getParentDir().getPathTo("1.txt").isExistingFile());
+  EXPECT_FALSE(fs.fileExists("../1.txt"));
+}
+
+TEST_F(TransactionalFileSystemTest, testReadBreakout) {
+  TransactionalFileSystem fs(mPopulatedDir);
+  ASSERT_EQ(
+      "1",
+      FileUtils::readFile(mPopulatedDir.getParentDir().getPathTo("1.txt")));
+  ASSERT_EQ("1", fs.read("1.txt"));
+  EXPECT_THROW(fs.read("../1.txt"), Exception);
+  EXPECT_THROW(fs.read("../populated/1.txt"), Exception);
+  EXPECT_THROW(fs.readIfExists("../1.txt"), Exception);
+  EXPECT_THROW(fs.readIfExists("../populated/1.txt"), Exception);
+}
+
+TEST_F(TransactionalFileSystemTest, testWriteBreakout) {
+  TransactionalFileSystem fs(mPopulatedDir, true);
+  EXPECT_THROW(fs.write("../new", "new"), Exception);
+  EXPECT_THROW(fs.write("../populated/new", "new"), Exception);
+  EXPECT_FALSE(mPopulatedDir.getParentDir().getPathTo("new").isExistingFile());
+  EXPECT_FALSE(fs.fileExists("new"));
+}
+
+TEST_F(TransactionalFileSystemTest, testRenameFileBreakout) {
+  TransactionalFileSystem fs(mPopulatedDir, true);
+  EXPECT_THROW(fs.renameFile("../1.txt", "new"), Exception);
+  EXPECT_THROW(fs.renameFile("1.txt", "../new"), Exception);
+  EXPECT_FALSE(fs.fileExists("new"));
+  EXPECT_FALSE(mPopulatedDir.getParentDir().getPathTo("new").isExistingFile());
+}
+
+TEST_F(TransactionalFileSystemTest, testRemoveFileBreakout) {
+  TransactionalFileSystem fs(mPopulatedDir, true);
+  EXPECT_THROW(fs.removeFile("../1.txt"), Exception);
+  EXPECT_TRUE(mPopulatedDir.getParentDir().getPathTo("1.txt").isExistingFile());
+}
+
+TEST_F(TransactionalFileSystemTest, testRemoveDirRecursivelyBreakout) {
+  TransactionalFileSystem fs(mPopulatedDir, true);
+  EXPECT_THROW(fs.removeDirRecursively("../"), Exception);
+  EXPECT_TRUE(mPopulatedDir.getParentDir().getPathTo("1.txt").isExistingFile());
+}
+
+/*******************************************************************************
  *  Parametrized getSubDirs() Tests
  ******************************************************************************/
 
@@ -972,11 +1044,18 @@ static TransactionalFileSystemCleanPathTestData sCleanPathTestData[] = {
 // input,                             output
   {"",                                ""},
   {"   ",                             ""},
+  {".",                               ""},
+  {"..",                              ".."},
+  {"../",                             ".."},
   {"foo bar",                         "foo bar"},
   {"/foo\\\\bar/",                    "foo/bar"},
   {" /hello world/foo bar/.txt ",     "hello world/foo bar/.txt"},
   {"///HELLO/\\\\/FOO///",            "HELLO/FOO"},
   {"  /\\  Hello World  \\/  ",       "Hello World"},
+  {"foo/../bar",                      "bar"},
+  {"foo/bar/../././.",                "foo"},
+  {"./foo/bar/hello/../..",           "foo"},
+  {"./foo/bar/hello/../../",          "foo"},
 };
 // clang-format on
 

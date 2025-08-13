@@ -92,14 +92,20 @@ TransactionalFileSystem::~TransactionalFileSystem() noexcept {
 
 FilePath TransactionalFileSystem::getAbsPath(
     const QString& path) const noexcept {
-  return mFilePath.getPathTo(cleanPath(path));
+  const QString cleanedPath = cleanPath(path);
+  return checkIfPathIsSafe(cleanedPath) ? mFilePath.getPathTo(cleanedPath)
+                                        : FilePath();
 }
 
 QStringList TransactionalFileSystem::getDirs(
     const QString& path) const noexcept {
-  QSet<QString> dirnames;
   QString dirpath = cleanPath(path);
+  if (!checkIfPathIsSafe(dirpath)) {
+    return QStringList();
+  }
   if (!dirpath.isEmpty()) dirpath.append("/");
+
+  QSet<QString> dirnames;
   QMutexLocker lock(&mMutex);
 
   // add directories from file system, if not removed
@@ -126,9 +132,13 @@ QStringList TransactionalFileSystem::getDirs(
 
 QStringList TransactionalFileSystem::getFiles(
     const QString& path) const noexcept {
-  QSet<QString> filenames;
   QString dirpath = cleanPath(path);
+  if (!checkIfPathIsSafe(dirpath)) {
+    return QStringList();
+  }
   if (!dirpath.isEmpty()) dirpath.append("/");
+
+  QSet<QString> filenames;
   QMutexLocker lock(&mMutex);
 
   // add files from file system, if not removed
@@ -154,6 +164,10 @@ QStringList TransactionalFileSystem::getFiles(
 
 bool TransactionalFileSystem::fileExists(const QString& path) const noexcept {
   const QString cleanedPath = cleanPath(path);
+  if (!checkIfPathIsSafe(cleanedPath)) {
+    return false;
+  }
+
   QMutexLocker lock(&mMutex);
   if (mModifiedFiles.contains(cleanedPath)) {
     return true;
@@ -177,6 +191,8 @@ QByteArray TransactionalFileSystem::read(const QString& path) const {
 
 QByteArray TransactionalFileSystem::readIfExists(const QString& path) const {
   const QString cleanedPath = cleanPath(path);
+  sanitizePathOrThrow(cleanedPath);
+
   QMutexLocker lock(&mMutex);
   if (mModifiedFiles.contains(cleanedPath)) {
     return mModifiedFiles.value(cleanedPath);
@@ -192,6 +208,8 @@ QByteArray TransactionalFileSystem::readIfExists(const QString& path) const {
 void TransactionalFileSystem::write(const QString& path,
                                     const QByteArray& content) {
   const QString cleanedPath = cleanPath(path);
+  sanitizePathOrThrow(cleanedPath);
+
   QMutexLocker lock(&mMutex);
   mModifiedFiles[cleanedPath] = content;
   mRemovedFiles.remove(cleanedPath);
@@ -205,6 +223,8 @@ void TransactionalFileSystem::renameFile(const QString& src,
 
 void TransactionalFileSystem::removeFile(const QString& path) {
   const QString cleanedPath = cleanPath(path);
+  sanitizePathOrThrow(cleanedPath);
+
   QMutexLocker lock(&mMutex);
   mModifiedFiles.remove(cleanedPath);
   mRemovedFiles.insert(cleanedPath);
@@ -212,7 +232,9 @@ void TransactionalFileSystem::removeFile(const QString& path) {
 
 void TransactionalFileSystem::removeDirRecursively(const QString& path) {
   QString dirpath = cleanPath(path);
+  sanitizePathOrThrow(dirpath);
   if (!dirpath.isEmpty()) dirpath.append("/");
+
   QMutexLocker lock(&mMutex);
   foreach (const QString& fp, mModifiedFiles.keys()) {
     if (dirpath.isEmpty() || fp.startsWith(dirpath)) {
@@ -375,11 +397,12 @@ void TransactionalFileSystem::releaseLock() {
  ******************************************************************************/
 
 QString TransactionalFileSystem::cleanPath(QString path) noexcept {
-  return path.trimmed()
-      .replace('\\', '/')
-      .split('/', Qt::SkipEmptyParts)
-      .join('/')
-      .trimmed();
+  // Note: QDir::cleanPath() is required to resolve "..".
+  QStringList segments = QDir::cleanPath(path.trimmed())
+                             .replace('\\', '/')
+                             .split('/', Qt::SkipEmptyParts);
+  segments.removeAll(".");
+  return segments.join('/').trimmed();
 }
 
 /*******************************************************************************
@@ -503,6 +526,27 @@ void TransactionalFileSystem::removeDiff(const QString& type) {
 
   // then remove the whole directory
   FileUtils::removeDirRecursively(dir);  // can throw
+}
+
+void TransactionalFileSystem::sanitizePathOrThrow(
+    const QString& cleanedPath) const {
+  if (!checkIfPathIsSafe(cleanedPath)) {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString("Attempted to access file outside sandboxed file system: %1")
+            .arg(mFilePath.getPathTo(cleanedPath).toNative()));
+  }
+}
+
+bool TransactionalFileSystem::checkIfPathIsSafe(
+    const QString& cleanedPath) const noexcept {
+  if (cleanedPath.startsWith("..")) {
+    qCritical() << "Attempted to access file outside sandboxed file system:"
+                << mFilePath.getPathTo(cleanedPath).toNative();
+    return false;
+  } else {
+    return true;
+  }
 }
 
 /*******************************************************************************
