@@ -123,7 +123,6 @@ void FileFormatMigrationV1::upgradeProject(TransactionalDirectory& dir,
   // ATTENTION: Do not actually perform any upgrade in this method! Instead,
   // just call virtual protected methods which do the upgrade. This allows
   // FileFormatMigrationUnstable to override them with partial upgrades.
-  Q_UNUSED(messages);
 
   // Version File.
   upgradeVersionFile(dir, ".librepcb-project");
@@ -160,12 +159,30 @@ void FileFormatMigrationV1::upgradeProject(TransactionalDirectory& dir,
     }
   }
 
+  // Metadata.
+  {
+    const QString fp = "project/metadata.lp";
+    std::unique_ptr<SExpression> root =
+        SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+    upgradeMetadata(*root, messages);
+    dir.write(fp, root->toByteArray());
+  }
+
   // Output Jobs.
   {
     const QString fp = "project/jobs.lp";
     std::unique_ptr<SExpression> root =
         SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
     upgradeOutputJobs(*root);
+    dir.write(fp, root->toByteArray());
+  }
+
+  // Circuit.
+  {
+    const QString fp = "circuit/circuit.lp";
+    std::unique_ptr<SExpression> root =
+        SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+    upgradeCircuit(*root, messages);
     dir.write(fp, root->toByteArray());
   }
 }
@@ -194,6 +211,22 @@ void FileFormatMigrationV1::upgradeWorkspaceData(TransactionalDirectory& dir) {
 /*******************************************************************************
  *  Protected Methods
  ******************************************************************************/
+
+void FileFormatMigrationV1::upgradeMetadata(SExpression& root,
+                                            QList<Message>& messages) {
+  // FileProofName does no longer allow string consisting of only dots
+  // (e.g. "..") so we rename them.
+  SExpression& versionNode = root.getChild("version/@0");
+  if (auto newVersion = upgradeFileProofName(versionNode.getValue())) {
+    versionNode.setValue(*newVersion);
+    // Not translated because it's unlikely someone will ever see this message.
+    messages.append(buildMessage(
+        Message::Severity::Note,
+        "Project version has been adjusted due to more restrictive naming "
+        "requirements. Please review the new version number.",
+        1));
+  }
+}
 
 void FileFormatMigrationV1::upgradeOutputJobs(SExpression& root) {
   for (SExpression* jobNode : root.getChildren("job")) {
@@ -234,6 +267,40 @@ void FileFormatMigrationV1::upgradeOutputJobs(SExpression& root) {
       }
     }
   }
+}
+
+void FileFormatMigrationV1::upgradeCircuit(SExpression& root,
+                                           QList<Message>& messages) {
+  // Assembly variants.
+  int renamedAssemblyVariants = 0;
+  for (SExpression* variantNode : root.getChildren("variant")) {
+    // FileProofName does no longer allow string consisting of only dots
+    // (e.g. "..") so we rename them. We don't do conflict resolution here
+    // as it is very unlikely to ever happen.
+    SExpression& nameNode = variantNode->getChild("name/@0");
+    if (auto newName = upgradeFileProofName(nameNode.getValue())) {
+      nameNode.setValue(*newName);
+      ++renamedAssemblyVariants;
+    }
+  }
+  if (renamedAssemblyVariants > 0) {
+    // Not translated because it's unlikely someone will ever see this message.
+    messages.append(buildMessage(
+        Message::Severity::Note,
+        "Assembly variants have been renamed due to more restrictive naming "
+        "requirements. Please review the new names.",
+        renamedAssemblyVariants));
+  }
+}
+
+std::optional<QString> FileFormatMigrationV1::upgradeFileProofName(
+    QString name) {
+  if (QRegularExpression("\\A\\.+\\z")
+          .match(name, 0, QRegularExpression::PartialPreferCompleteMatch)
+          .hasMatch()) {
+    return name.replace(".", "_");
+  }
+  return std::nullopt;
 }
 
 /*******************************************************************************

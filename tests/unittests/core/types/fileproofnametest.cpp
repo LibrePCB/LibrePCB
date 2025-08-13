@@ -96,10 +96,17 @@ TEST_P(FileProofNameTest, testDeserialize) {
 INSTANTIATE_TEST_SUITE_P(FileProofNameTest, FileProofNameTest, ::testing::Values(
     // Valid strings.
     FileProofNameTestData({"1", "1", true}),
+    FileProofNameTestData({".1", ".1", true}),
+    FileProofNameTestData({"..1", "..1", true}),
+    FileProofNameTestData({".1.", ".1.", true}),
     FileProofNameTestData({"foo-bar_+().", "foo-bar_+().", true}),
 
     // Invalid strings.
     FileProofNameTestData({"", "", false}), // too short
+    FileProofNameTestData({".", "", false}), // only dots (invalid filename!)
+    FileProofNameTestData({"..", "", false}), // only dots (invalid filename!)
+    FileProofNameTestData({"...", "", false}), // only dots (invalid filename!)
+    FileProofNameTestData({"../", "", false}), // invalid characters, only dots
     FileProofNameTestData({"123456789012345678901", "12345678901234567890", false}), // too long
     FileProofNameTestData({" ", "", false}), // space
     FileProofNameTestData({"äöü", "aou", false}), // invalid characters
