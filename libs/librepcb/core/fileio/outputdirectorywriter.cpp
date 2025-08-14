@@ -110,11 +110,46 @@ FilePath OutputDirectoryWriter::beginWritingFile(const Uuid& job,
     throw LogicError(__FILE__, __LINE__, "Output directory index not loaded.");
   }
 
+  // Throw a proper error if the given path is not valid.
+  if ((!fp.isValid()) || (fp == mDirPath)) {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        tr("The output file path '%1' is invalid.").arg(relPath));
+  }
+
+  // For security reasons, do not allow to write any files outside the output
+  // directory! This could destroy the project or even overwrite user- or
+  // system files!
+  if (!fp.isLocatedInDir(mDirPath)) {
+    throw RuntimeError(__FILE__, __LINE__,
+                       tr("Attempted to write file '%1' outside the output "
+                          "directory, which is not allowed!")
+                           .arg(relPath));
+  }
+
+  // Explicitly handle absolute file paths because "fp" might be a valid
+  // path even though relPath was absolute.
+  if (QDir::isAbsolutePath(relPath)) {
+    throw RuntimeError(__FILE__, __LINE__,
+                       tr("The file path '%1' is absolute, but only relative "
+                          "paths are allowed!")
+                           .arg(relPath));
+  }
+
+  // Special cases, unlikely to happen.
+  if (fp == mIndexFilePath) {
+    throw RuntimeError(__FILE__, __LINE__,
+                       QString("Attempted to overwrite the index file '%2'.")
+                           .arg(mIndexFilePath.getFilename()));
+  }
   if (relPath.contains("|")) {
     throw RuntimeError(
         __FILE__, __LINE__,
         "Sorry, the character '|' cannot be used in output filenames.");
   }
+
+  // The main purpose of this whole class: Detect if a file is overwritten
+  // multiple times.
   if (mWrittenFiles.values().contains(fp)) {
     throw RuntimeError(
         __FILE__, __LINE__,

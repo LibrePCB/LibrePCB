@@ -24,6 +24,8 @@
 #include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/fileio/transactionaldirectory.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/job/bomoutputjob.h>
+#include <librepcb/core/job/copyoutputjob.h>
 #include <librepcb/core/job/gerberexcellonoutputjob.h>
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/items/bi_plane.h>
@@ -50,9 +52,7 @@ protected:
 
   OutputJobRunnerTest() { mOutDir = FilePath::getRandomTempPath(); }
 
-  virtual ~OutputJobRunnerTest() {
-    QDir(mOutDir.getParentDir().toStr()).removeRecursively();
-  }
+  virtual ~OutputJobRunnerTest() { QDir(mOutDir.toStr()).removeRecursively(); }
 
   std::unique_ptr<BI_Polygon> createBoardOutline(Board& board) const {
     std::unique_ptr<BI_Polygon> polygon(new BI_Polygon(
@@ -119,6 +119,72 @@ TEST_F(OutputJobRunnerTest, testGerberExcellonRebuildsPlanes) {
   const QByteArray content = FileUtils::readFile(fp);
   EXPECT_TRUE(content.contains("\nG36*\n"));
   EXPECT_TRUE(content.contains("\nG37*\n"));
+}
+
+// Very important: For portability reasons, no absolute file paths are allowed!
+TEST_F(OutputJobRunnerTest, testAbsoluteOutputFilePath) {
+  std::unique_ptr<Project> project = createProject();
+
+  std::shared_ptr<BomOutputJob> job = std::make_shared<BomOutputJob>();
+  job->setOutputPath(mOutDir.getPathTo("bom.csv").toStr());
+
+  OutputJobRunner runner(*project);
+  runner.setOutputDirectory(mOutDir);
+  EXPECT_THROW(runner.run({job}), Exception);
+  EXPECT_FALSE(mOutDir.getPathTo("bom.csv").isExistingFile());
+
+  // Verify that a valid job would succeed.
+  job->setOutputPath("bom.csv");
+  runner.run({job});
+}
+
+// Very important: For security reasons, no write access outside the output
+// directory is allowed!
+TEST_F(OutputJobRunnerTest, testOutputFolderBreakout) {
+  std::unique_ptr<Project> project = createProject();
+
+  std::shared_ptr<BomOutputJob> job = std::make_shared<BomOutputJob>();
+  job->setOutputPath("../bom.csv");
+
+  OutputJobRunner runner(*project);
+  runner.setOutputDirectory(mOutDir);
+  EXPECT_THROW(runner.run({job}), Exception);
+  EXPECT_FALSE(mOutDir.getPathTo("../bom.csv").isExistingFile());
+
+  // Verify that a valid job would succeed.
+  job->setOutputPath("bom.csv");
+  runner.run({job});
+}
+
+// Very important: For security reasons, no read access outside the project
+// directory is allowed!
+TEST_F(OutputJobRunnerTest, testProjectFolderBreakout) {
+  const FilePath projectDir = mOutDir.getPathTo("project");
+  std::unique_ptr<Project> project = Project::create(
+      std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
+          TransactionalFileSystem::openRW(projectDir))),
+      "project.lpp");
+  project->save();
+  project->getDirectory().getFileSystem()->save();
+
+  const FilePath outDir = projectDir.getPathTo("out");
+  const FilePath inputFp = mOutDir.getPathTo(".librepcb-project");
+  FileUtils::writeFile(inputFp, "foo");
+
+  std::shared_ptr<CopyOutputJob> job = std::make_shared<CopyOutputJob>();
+  job->setInputPath("../.librepcb-project");
+  job->setOutputPath("out.txt");
+
+  OutputJobRunner runner(*project);
+  runner.setOutputDirectory(outDir);
+  EXPECT_THROW(runner.run({job}), Exception);
+  EXPECT_FALSE(outDir.getPathTo("out.txt").isExistingFile());
+
+  // Verify that a valid job would succeed.
+  job->setInputPath(".librepcb-project");
+  job->setOutputPath("out2.txt");  // Avoid "file overwritten" error.
+  runner.run({job});
+  EXPECT_TRUE(outDir.getPathTo("out2.txt").isExistingFile());
 }
 
 /*******************************************************************************
