@@ -27,6 +27,7 @@
 #include "../../../dialogs/textpropertiesdialog.h"
 #include "../../../editorcommandset.h"
 #include "../../../graphics/polygongraphicsitem.h"
+#include "../../../library/sym/symbolclipboarddata.h"
 #include "../../../undostack.h"
 #include "../../../utils/editortoolbox.h"
 #include "../../../utils/menubuilder.h"
@@ -42,7 +43,9 @@
 #include "../schematicselectionquery.h"
 #include "../symbolinstancepropertiesdialog.h"
 
+#include <librepcb/core/attribute/attributesubstitutor.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectattributelookup.h>
 #include <librepcb/core/project/schematic/items/si_netlabel.h>
 #include <librepcb/core/project/schematic/items/si_netpoint.h>
 #include <librepcb/core/project/schematic/items/si_polygon.h>
@@ -882,10 +885,42 @@ bool SchematicEditorState_Select::pasteFromClipboard() noexcept {
   if (!scene) return false;
 
   try {
-    // get symbol items and abort if there are no items
+    // Get schematic data from clipboard.
+    const QMimeData* mimeData = qApp->clipboard()->mimeData();
     std::unique_ptr<SchematicClipboardData> data =
-        SchematicClipboardData::fromMimeData(
-            qApp->clipboard()->mimeData());  // can throw
+        SchematicClipboardData::fromMimeData(mimeData);  // can throw
+
+    // If there is no schematic data, get symbol data from clipboard to allow
+    // pasting graphical elements from the symbol editor.
+    if (!data) {
+      if (std::unique_ptr<const SymbolClipboardData> symbolData =
+              SymbolClipboardData::fromMimeData(mimeData)) {  // can throw
+        data.reset(new SchematicClipboardData(symbolData->getSymbolUuid(),
+                                              symbolData->getCursorPos(),
+                                              AssemblyVariantList()));
+        for (const auto& polygon : symbolData->getPolygons()) {
+          data->getPolygons().append(std::make_shared<Polygon>(polygon));
+        }
+        for (const auto& text : symbolData->getTexts()) {
+          // If the texts consist of a placeholder (e.g. "{{NAME}}"), they
+          // might evaluate to an empty string in the schematic, making them
+          // almost invisible. To avoid that, we remove "{" and "}" from those.
+          auto copy = std::make_shared<Text>(text);
+          QString textValue = text.getText();
+          ProjectAttributeLookup lookup(scene->getSchematic(), nullptr);
+          if (AttributeSubstitutor::substitute(textValue, lookup)
+                  .trimmed()
+                  .isEmpty()) {
+            textValue.replace("{", "");
+            textValue.replace("}", "");
+            copy->setText(textValue);
+          }
+          data->getTexts().append(copy);
+        }
+      }
+    }
+
+    // If there is nothing to paste, abort.
     if (!data) {
       return false;
     }
@@ -1014,7 +1049,8 @@ void SchematicEditorState_Select::updateAvailableFeatures() noexcept {
   } else if ((mSubState == SubState::IDLE) || (mSubState == SubState::MOVING)) {
     features |= SchematicEditorFsmAdapter::Feature::Select;
 
-    if (SchematicClipboardData::isValid(qApp->clipboard()->mimeData())) {
+    if (SchematicClipboardData::isValid(qApp->clipboard()->mimeData()) ||
+        SymbolClipboardData::isValid(qApp->clipboard()->mimeData())) {
       features |= SchematicEditorFsmAdapter::Feature::Paste;
     }
 
