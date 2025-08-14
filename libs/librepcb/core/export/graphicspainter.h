@@ -76,6 +76,11 @@ public:
                 const QString& text, QFont font, const QColor& color,
                 bool autoRotate, bool mirrorInPlace, bool parseOverlines,
                 int fontPixelSize = 0) noexcept;
+  void drawImage(const Point& position, const Angle& rotation,
+                 const QImage& image, const PositiveLength& width,
+                 const PositiveLength& height,
+                 const std::optional<UnsignedLength>& borderWidth,
+                 const QColor& borderColor) noexcept;
   void drawSymbolPin(const Point& position, const Angle& rotation,
                      const Length& length, const QColor& lineColor,
                      const QColor& circleColor) noexcept;

@@ -1076,8 +1076,8 @@ void SchematicTab::execGraphicsExportDialog(
     progress.setMinimumDuration(100);
     QList<std::shared_ptr<GraphicsPagePainter>> pages;
     for (int i = 0; i < count; ++i) {
-      pages.append(
-          std::make_shared<SchematicPainter>(*mProject.getSchematicByIndex(i)));
+      pages.append(std::make_shared<SchematicPainter>(
+          *mProject.getSchematicByIndex(i), nullptr));
       progress.setValue(i + 1);
       if (progress.wasCanceled()) {
         return;

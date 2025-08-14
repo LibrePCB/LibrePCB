@@ -87,6 +87,8 @@ add_library(
   graphics/graphicsscene.h
   graphics/holegraphicsitem.cpp
   graphics/holegraphicsitem.h
+  graphics/imagegraphicsitem.cpp
+  graphics/imagegraphicsitem.h
   graphics/linegraphicsitem.cpp
   graphics/linegraphicsitem.h
   graphics/origincrossgraphicsitem.cpp

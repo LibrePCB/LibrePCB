@@ -40,6 +40,7 @@ namespace editor {
 
 class CircleGraphicsItem;
 class GraphicsLayerList;
+class ImageGraphicsItem;
 class PolygonGraphicsItem;
 class SymbolPinGraphicsItem;
 class TextGraphicsItem;
@@ -59,7 +60,8 @@ public:
     Circles = (1 << 1),
     Polygons = (1 << 2),
     Texts = (1 << 3),
-    All = Pins | Circles | Polygons | Texts,
+    Images = (1 << 4),
+    All = Pins | Circles | Polygons | Texts | Images,
 
     // Match behavior
     AcceptNearMatch = (1 << 10),
@@ -93,10 +95,15 @@ public:
       std::shared_ptr<Text> text) noexcept {
     return mTextGraphicsItems.value(text);
   }
+  std::shared_ptr<ImageGraphicsItem> getGraphicsItem(
+      std::shared_ptr<Image> iamge) noexcept {
+    return mImageGraphicsItems.value(iamge);
+  }
   QList<std::shared_ptr<SymbolPinGraphicsItem>> getSelectedPins() noexcept;
   QList<std::shared_ptr<CircleGraphicsItem>> getSelectedCircles() noexcept;
   QList<std::shared_ptr<PolygonGraphicsItem>> getSelectedPolygons() noexcept;
   QList<std::shared_ptr<TextGraphicsItem>> getSelectedTexts() noexcept;
+  QList<std::shared_ptr<ImageGraphicsItem>> getSelectedImages() noexcept;
   QList<std::shared_ptr<QGraphicsItem>> findItemsAtPos(
       const QPainterPath& posAreaSmall, const QPainterPath& posAreaLarge,
       FindFlags flags) noexcept;
@@ -117,6 +124,7 @@ private:  // Methods
   void syncCircles() noexcept;
   void syncPolygons() noexcept;
   void syncTexts() noexcept;
+  void syncImages() noexcept;
   void symbolEdited(const Symbol& symbol, Symbol::Event event) noexcept;
   void substituteText(TextGraphicsItem& text) noexcept;
 
@@ -134,6 +142,8 @@ private:  // Data
       mPolygonGraphicsItems;
   QMap<std::shared_ptr<Text>, std::shared_ptr<TextGraphicsItem>>
       mTextGraphicsItems;
+  QMap<std::shared_ptr<Image>, std::shared_ptr<ImageGraphicsItem>>
+      mImageGraphicsItems;
 
   // Slots
   Symbol::OnEditedSlot mOnEditedSlot;

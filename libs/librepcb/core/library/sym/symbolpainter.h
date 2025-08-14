@@ -34,6 +34,7 @@
 namespace librepcb {
 
 class Circle;
+class Image;
 class Polygon;
 class Symbol;
 class SymbolPin;
@@ -52,7 +53,7 @@ class SymbolPainter final : public GraphicsPagePainter {
 public:
   // Constructors / Destructor
   SymbolPainter() = delete;
-  explicit SymbolPainter(const Symbol& symbol) noexcept;
+  explicit SymbolPainter(const Symbol& symbol, QStringList* errors) noexcept;
   SymbolPainter(const SymbolPainter& other) = delete;
   ~SymbolPainter() noexcept;
 
@@ -69,6 +70,9 @@ private:  // Data
   QList<Polygon> mPolygons;
   QList<Circle> mCircles;
   QList<Text> mTexts;
+  QList<Image> mImages;
+  // Note: QPixmap is only allowed in the GUI thread so we have to use QImage.
+  QHash<QString, QImage> mImageFiles;
 };
 
 /*******************************************************************************

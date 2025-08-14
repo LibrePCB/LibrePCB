@@ -167,6 +167,8 @@ add_library(
   geometry/circle.h
   geometry/hole.cpp
   geometry/hole.h
+  geometry/image.cpp
+  geometry/image.h
   geometry/junction.cpp
   geometry/junction.h
   geometry/netlabel.cpp

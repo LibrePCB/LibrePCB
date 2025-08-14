@@ -83,7 +83,8 @@ public:
   QList<FilePath> findUnknownFiles(const QSet<Uuid>& knownJobs) const;
   void removeUnknownFiles(const QList<FilePath>& files);
   GraphicsExport::Pages buildPages(const GraphicsOutputJob& job,
-                                   bool rebuildPlanes);
+                                   bool rebuildPlanes,
+                                   QStringList* errors = nullptr);
 
   // Operator Overloadings
   OutputJobRunner& operator=(const OutputJobRunner& rhs) = delete;

@@ -40,7 +40,7 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SymbolPainter::SymbolPainter(const Symbol& symbol) noexcept
+SymbolPainter::SymbolPainter(const Symbol& symbol, QStringList* errors) noexcept
   : mDefaultFont(Application::getDefaultSansSerifFont()) {
   for (const SymbolPin& pin : symbol.getPins()) {
     mPins.append(pin);
@@ -53,6 +53,28 @@ SymbolPainter::SymbolPainter(const Symbol& symbol) noexcept
   }
   for (const Text& text : symbol.getTexts()) {
     mTexts.append(text);
+  }
+  for (const Image& image : symbol.getImages()) {
+    try {
+      if (!mImageFiles.contains(*image.getFileName())) {
+        const QByteArray content =
+            symbol.getDirectory().read(*image.getFileName());  // can throw
+        QString error = "Unknown error.";
+        if (auto pix =
+                Image::tryLoad(content, image.getFileExtension(), &error)) {
+          mImageFiles.insert(*image.getFileName(), *pix);
+        } else {
+          throw RuntimeError(__FILE__, __LINE__,
+                             QString("Failed to load image '%1': %2")
+                                 .arg(*image.getFileName(), error));
+        }
+      }
+      mImages.append(image);
+    } catch (const Exception& e) {
+      if (errors) {
+        errors->append(e.getMsg());
+      }
+    }
   }
 }
 
@@ -68,29 +90,61 @@ void SymbolPainter::paint(
   GraphicsPainter p(painter);
   p.setMinLineWidth(settings.getMinLineWidth());
 
-  // Draw grab areas first to make them appearing behind every other graphics
-  // item. Otherwise they might completely cover (hide) other items.
-  for (bool grabArea : {true, false}) {
+  // Helper to draw grab areas first to make them appearing behind every other
+  // graphics item. Otherwise they might completely cover (hide) other items.
+  // Images shall be drawn in front of filled polygons/circles, but behind
+  // non-filled polygons/circles.
+  enum class ShapeType { GrabArea, Filled, Others };
+  auto doDraw = [](ShapeType type, bool grabArea, bool filled) {
+    if (type == ShapeType::GrabArea) {
+      return grabArea && (!filled);
+    } else if (type == ShapeType::Filled) {
+      return filled;
+    } else {
+      return (!grabArea) && (!filled);
+    }
+  };
+  auto drawShapes = [this, &settings, &p, &doDraw](ShapeType type) {
     // Draw Polygons.
     foreach (const Polygon& polygon, mPolygons) {
-      if (polygon.isGrabArea() != grabArea) continue;
-      const QString color = polygon.getLayer().getThemeColor();
-      p.drawPolygon(polygon.getPath(), *polygon.getLineWidth(),
-                    settings.getColor(color),
-                    settings.getFillColor(color, polygon.isFilled(),
-                                          polygon.isGrabArea()));
+      if (doDraw(type, polygon.isGrabArea(), polygon.isFilled())) {
+        const QString color = polygon.getLayer().getThemeColor();
+        p.drawPolygon(polygon.getPath(), *polygon.getLineWidth(),
+                      settings.getColor(color),
+                      settings.getFillColor(color, polygon.isFilled(),
+                                            polygon.isGrabArea()));
+      }
     }
 
     // Draw Circles.
     foreach (const Circle& circle, mCircles) {
-      if (circle.isGrabArea() != grabArea) continue;
-      const QString color = circle.getLayer().getThemeColor();
-      p.drawCircle(
-          circle.getCenter(), *circle.getDiameter(), *circle.getLineWidth(),
-          settings.getColor(color),
-          settings.getFillColor(color, circle.isFilled(), circle.isGrabArea()));
+      if (doDraw(type, circle.isGrabArea(), circle.isFilled())) {
+        const QString color = circle.getLayer().getThemeColor();
+        p.drawCircle(circle.getCenter(), *circle.getDiameter(),
+                     *circle.getLineWidth(), settings.getColor(color),
+                     settings.getFillColor(color, circle.isFilled(),
+                                           circle.isGrabArea()));
+      }
     }
+  };
+
+  // Draw grab-area shapes.
+  drawShapes(ShapeType::GrabArea);
+
+  // Draw filled shaped.
+  drawShapes(ShapeType::Filled);
+
+  // Draw images.
+  foreach (const Image& image, mImages) {
+    p.drawImage(
+        image.getPosition(), image.getRotation(),
+        settings.convertImageColors(mImageFiles.value(*image.getFileName())),
+        image.getWidth(), image.getHeight(), image.getBorderWidth(),
+        settings.getColor(Theme::Color::sSchematicImageBorders));
   }
+
+  // Draw line shapes (no fill, no grab area).
+  drawShapes(ShapeType::Others);
 
   // Draw Texts.
   foreach (const Text& text, mTexts) {

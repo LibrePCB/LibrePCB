@@ -1004,6 +1004,7 @@ void MainWindow::openSymbolTab(LibraryEditor& editor, const FilePath& fp,
           sym->setKeywords(src->getKeywords());
           sym->setCategories(src->getCategories());
           sym->setGridInterval(src->getGridInterval());
+          QSet<QString> filesToCopy;
           // Copy pins but generate new UUIDs.
           for (const SymbolPin& pin : src->getPins()) {
             sym->getPins().append(std::make_shared<SymbolPin>(
@@ -1032,6 +1033,19 @@ void MainWindow::openSymbolTab(LibraryEditor& editor, const FilePath& fp,
                 Uuid::createRandom(), text.getLayer(), text.getText(),
                 text.getPosition(), text.getRotation(), text.getHeight(),
                 text.getAlign()));
+          }
+          // Copy images but generate new UUIDs.
+          for (const Image& image : src->getImages()) {
+            sym->getImages().append(
+                std::make_shared<Image>(Uuid::createRandom(), image));
+            filesToCopy.insert(*image.getFileName());
+          }
+          // Copy all referenced files.
+          for (const QString& fileName : filesToCopy) {
+            if (src->getDirectory().fileExists(fileName)) {
+              sym->getDirectory().write(fileName,
+                                        src->getDirectory().read(fileName));
+            }
           }
         }
       }

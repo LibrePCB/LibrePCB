@@ -1518,7 +1518,7 @@ bool SymbolTab::execGraphicsExportDialog(GraphicsExportDialog::Output output,
 
     // Copy symbol items to allow processing them in worker threads.
     QList<std::shared_ptr<GraphicsPagePainter>> pages = {
-        std::make_shared<SymbolPainter>(*mSymbol),
+        std::make_shared<SymbolPainter>(*mSymbol, nullptr),
     };
 
     // Show dialog, which will do all the work.

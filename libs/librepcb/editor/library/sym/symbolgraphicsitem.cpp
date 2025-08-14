@@ -23,6 +23,7 @@
 #include "symbolgraphicsitem.h"
 
 #include "../../graphics/circlegraphicsitem.h"
+#include "../../graphics/imagegraphicsitem.h"
 #include "../../graphics/polygongraphicsitem.h"
 #include "../../graphics/textgraphicsitem.h"
 #include "symbolpingraphicsitem.h"
@@ -61,6 +62,7 @@ SymbolGraphicsItem::SymbolGraphicsItem(
   syncCircles();
   syncPolygons();
   syncTexts();
+  syncImages();
 
   // Register to the symbol to get notified about any modifications.
   mSymbol.onEdited.attach(mOnEditedSlot);
@@ -117,6 +119,17 @@ QList<std::shared_ptr<TextGraphicsItem>>
   return texts;
 }
 
+QList<std::shared_ptr<ImageGraphicsItem>>
+    SymbolGraphicsItem::getSelectedImages() noexcept {
+  QList<std::shared_ptr<ImageGraphicsItem>> images;
+  foreach (const auto& ptr, mImageGraphicsItems) {
+    if (ptr->isSelected()) {
+      images.append(ptr);
+    }
+  }
+  return images;
+}
+
 QList<std::shared_ptr<QGraphicsItem>> SymbolGraphicsItem::findItemsAtPos(
     const QPainterPath& posAreaSmall, const QPainterPath& posAreaLarge,
     FindFlags flags) noexcept {
@@ -128,7 +141,8 @@ QList<std::shared_ptr<QGraphicsItem>> SymbolGraphicsItem::findItemsAtPos(
   //
   //    0: pins
   //   10: texts
-  //   20: circles/polygons (±1 for stacking order)
+  //   20: circles/polygons (±2 for stacking order)
+  //   21: images
   //
   // And for items not directly under the cursor, but very close to the cursor,
   // add +1000.
@@ -164,8 +178,8 @@ QList<std::shared_ptr<QGraphicsItem>> SymbolGraphicsItem::findItemsAtPos(
   if (flags.testFlag(FindFlag::Circles)) {
     foreach (auto ptr, mCircleGraphicsItems) {
       int priority = 20;
-      if (ptr->zValue() > 0) priority -= 1;
-      if (ptr->zValue() < 0) priority += 1;
+      if (ptr->zValue() > 0) priority -= 2;
+      if (ptr->zValue() < 0) priority += 2;
       processItem(std::dynamic_pointer_cast<QGraphicsItem>(ptr), priority,
                   true);  // Probably large grab area makes sense?
     }
@@ -174,10 +188,16 @@ QList<std::shared_ptr<QGraphicsItem>> SymbolGraphicsItem::findItemsAtPos(
   if (flags.testFlag(FindFlag::Polygons)) {
     foreach (auto ptr, mPolygonGraphicsItems) {
       int priority = 20;
-      if (ptr->zValue() > 0) priority -= 1;
-      if (ptr->zValue() < 0) priority += 1;
+      if (ptr->zValue() > 0) priority -= 2;
+      if (ptr->zValue() < 0) priority += 2;
       processItem(std::dynamic_pointer_cast<QGraphicsItem>(ptr), priority,
                   true);  // Probably large grab area makes sense?
+    }
+  }
+
+  if (flags.testFlag(FindFlag::Images)) {
+    foreach (auto ptr, mImageGraphicsItems) {
+      processItem(std::dynamic_pointer_cast<QGraphicsItem>(ptr), 21, false);
     }
   }
 
@@ -221,6 +241,10 @@ void SymbolGraphicsItem::setSelectionRect(const QRectF rect) noexcept {
     ptr->setSelected(ptr->shape().intersects(mappedPath));
   }
   foreach (const auto& ptr, mTextGraphicsItems) {
+    QPainterPath mappedPath = mapToItem(ptr.get(), path);
+    ptr->setSelected(ptr->shape().intersects(mappedPath));
+  }
+  foreach (const auto& ptr, mImageGraphicsItems) {
     QPainterPath mappedPath = mapToItem(ptr.get(), path);
     ptr->setSelected(ptr->shape().intersects(mappedPath));
   }
@@ -323,6 +347,31 @@ void SymbolGraphicsItem::syncTexts() noexcept {
   }
 }
 
+void SymbolGraphicsItem::syncImages() noexcept {
+  // Remove obsolete items.
+  for (auto it = mImageGraphicsItems.begin();
+       it != mImageGraphicsItems.end();) {
+    if (!mSymbol.getImages().contains(it.key().get())) {
+      Q_ASSERT(it.key() && it.value());
+      it.value()->setParentItem(nullptr);
+      it = mImageGraphicsItems.erase(it);
+    } else {
+      it++;
+    }
+  }
+
+  // Add new items.
+  for (auto& obj : mSymbol.getImages().values()) {
+    if (!mImageGraphicsItems.contains(obj)) {
+      Q_ASSERT(obj);
+      auto i = std::make_shared<ImageGraphicsItem>(mSymbol.getDirectory(), obj,
+                                                   mLayers, this);
+      i->setEditable(true);
+      mImageGraphicsItems.insert(obj, i);
+    }
+  }
+}
+
 void SymbolGraphicsItem::symbolEdited(const Symbol& symbol,
                                       Symbol::Event event) noexcept {
   Q_UNUSED(symbol);
@@ -338,6 +387,9 @@ void SymbolGraphicsItem::symbolEdited(const Symbol& symbol,
       break;
     case Symbol::Event::TextsEdited:
       syncTexts();
+      break;
+    case Symbol::Event::ImagesEdited:
+      syncImages();
       break;
     default:
       break;
