@@ -273,6 +273,15 @@ export component SchematicTab inherits Tab {
                 }
             }
 
+            tool-image-btn := ToolButton {
+                cmd: Cmd.tool-image;
+                checked: tabs[index].tool == EditorTool.image;
+
+                clicked => {
+                    tool-triggered(TabAction.tool-image);
+                }
+            }
+
             tool-component-btn := ToolButton {
                 cmd: Cmd.tool-component;
                 checked: tabs[index].tool == EditorTool.component;

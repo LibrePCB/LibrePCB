@@ -33,6 +33,7 @@
 #include <librepcb/core/project/circuit/componentsignalinstance.h>
 #include <librepcb/core/project/circuit/netsignal.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/project/schematic/items/si_image.h>
 #include <librepcb/core/project/schematic/items/si_netlabel.h>
 #include <librepcb/core/project/schematic/items/si_netpoint.h>
 #include <librepcb/core/project/schematic/items/si_netsegment.h>
@@ -81,6 +82,7 @@ std::unique_ptr<SchematicClipboardData> SchematicClipboardDataBuilder::generate(
   query.addSelectedNetLabels();
   query.addSelectedPolygons();
   query.addSelectedSchematicTexts();
+  query.addSelectedImages();
   query.addNetPointsOfNetLines();
 
   // Add components
@@ -169,6 +171,18 @@ std::unique_ptr<SchematicClipboardData> SchematicClipboardDataBuilder::generate(
   // Add texts
   foreach (SI_Text* text, query.getTexts()) {
     data->getTexts().append(std::make_shared<Text>(text->getTextObj()));
+  }
+
+  // Add images
+  std::unique_ptr<TransactionalDirectory> dir = data->getDirectory();
+  foreach (SI_Image* image, query.getImages()) {
+    const QString fileName = *image->getImage()->getFileName();
+    const QByteArray content =
+        mScene.getSchematic().getDirectory().readIfExists(fileName);
+    if (!content.isNull()) {
+      dir->write(fileName, content);
+    }
+    data->getImages().append(std::make_shared<Image>(*image->getImage()));
   }
 
   return data;

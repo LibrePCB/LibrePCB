@@ -25,6 +25,7 @@
 #include "../../project/cmd/cmdcomponentinstanceremove.h"
 #include "../../project/cmd/cmdcompsiginstsetnetsignal.h"
 #include "../../project/cmd/cmdnetsignaladd.h"
+#include "../../project/cmd/cmdschematicimageremove.h"
 #include "../../project/cmd/cmdschematicnetlabeladd.h"
 #include "../../project/cmd/cmdschematicnetsegmentadd.h"
 #include "../../project/cmd/cmdschematicnetsegmentaddelements.h"
@@ -99,6 +100,7 @@ bool CmdRemoveSelectedSchematicItems::performExecute() {
   query.addSelectedPolygons();
   query.addSelectedSchematicTexts();
   query.addSelectedSymbolTexts();
+  query.addSelectedImages();
   query.addNetPointsOfNetLines(true);
   query.addNetLinesOfSymbolPins();
 
@@ -133,6 +135,12 @@ bool CmdRemoveSelectedSchematicItems::performExecute() {
   // remove polygons
   foreach (SI_Polygon* polygon, query.getPolygons()) {
     execNewChildCmd(new CmdSchematicPolygonRemove(*polygon));  // can throw
+  }
+
+  // remove images
+  foreach (SI_Image* image, query.getImages()) {
+    execNewChildCmd(new CmdSchematicImageRemove(
+        *image, mScene.getSchematic().getDirectory()));  // can throw
   }
 
   // remove netsignals which are no longer required

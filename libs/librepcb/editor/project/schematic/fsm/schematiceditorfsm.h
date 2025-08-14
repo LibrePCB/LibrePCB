@@ -83,6 +83,8 @@ public:
     DRAW_POLYGON,
     /// ::librepcb::editor::SchematicEditorState_AddText
     ADD_TEXT,
+    /// ::librepcb::editor::SchematicEditorState_AddImage
+    ADD_IMAGE,
     /// ::librepcb::editor::SchematicEditorState_Measure
     MEASURE,
   };
@@ -101,6 +103,9 @@ public:
   bool processAddNetLabel() noexcept;
   bool processDrawPolygon() noexcept;
   bool processAddText() noexcept;
+  bool processAddImage(const QByteArray& data = QByteArray(),
+                       const QString& format = QString(),
+                       const QString& basename = QString()) noexcept;
   bool processDrawWire() noexcept;
   bool processMeasure() noexcept;
   bool processAbortCommand() noexcept;

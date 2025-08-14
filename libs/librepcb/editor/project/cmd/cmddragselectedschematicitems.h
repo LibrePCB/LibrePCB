@@ -39,6 +39,7 @@ class Schematic;
 
 namespace editor {
 
+class CmdImageEdit;
 class CmdPolygonEdit;
 class CmdSchematicNetLabelEdit;
 class CmdSchematicNetPointEdit;
@@ -95,6 +96,7 @@ private:
   QList<CmdSchematicNetLabelEdit*> mNetLabelEditCmds;
   QList<CmdPolygonEdit*> mPolygonEditCmds;
   QList<CmdTextEdit*> mTextEditCmds;
+  QList<CmdImageEdit*> mImageEditCmds;
 };
 
 /*******************************************************************************

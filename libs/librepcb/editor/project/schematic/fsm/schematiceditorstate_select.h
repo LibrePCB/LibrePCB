@@ -38,6 +38,7 @@ namespace librepcb {
 
 class Angle;
 class Polygon;
+class SI_Image;
 class SI_NetLabel;
 class SI_Polygon;
 class SI_Symbol;
@@ -48,6 +49,7 @@ class Text;
 namespace editor {
 
 class CmdDragSelectedSchematicItems;
+class CmdImageEdit;
 class CmdPolygonEdit;
 
 /*******************************************************************************
@@ -118,6 +120,7 @@ private:  // Methods
   bool copySelectedItemsToClipboard() noexcept;
   bool pasteFromClipboard() noexcept;
   bool findPolygonVerticesAtPosition(const Point& pos) noexcept;
+  bool findImageHandleAtPosition(const Point& pos) noexcept;
   bool openPropertiesDialog(std::shared_ptr<QGraphicsItem> item) noexcept;
   void openSymbolPropertiesDialog(SI_Symbol& symbol) noexcept;
   void openNetLabelPropertiesDialog(SI_NetLabel& netlabel) noexcept;
@@ -133,6 +136,7 @@ private:  // Data
     SELECTING,  ///< left mouse button pressed to draw selection rect
     MOVING,  ///< left mouse button pressed to move items
     MOVING_POLYGON_VERTICES,  ///< left mouts butten pressed to move vertices
+    RESIZING_IMAGE,  ///< left mouts butten pressed to resize image
     PASTING,  ///< move pasted items
   };
 
@@ -146,6 +150,13 @@ private:  // Data
   QVector<int> mSelectedPolygonVertices;
   /// The polygon edit command (nullptr if not editing)
   std::unique_ptr<CmdPolygonEdit> mCmdPolygonEdit;
+
+  /// The current image selected for editing (nullptr if none)
+  QPointer<SI_Image> mSelectedImage;
+  /// The original aspect ratio of the currently selected image
+  qreal mSelectedImageAspectRatio;
+  /// The image edit command (nullptr if not editing)
+  std::unique_ptr<CmdImageEdit> mCmdImageEdit;
 
   /// Signal/slot connections only when in this state
   QList<QMetaObject::Connection> mConnections;

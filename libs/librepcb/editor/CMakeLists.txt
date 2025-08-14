@@ -641,6 +641,10 @@ add_library(
   project/cmd/cmdschematicadd.h
   project/cmd/cmdschematicedit.cpp
   project/cmd/cmdschematicedit.h
+  project/cmd/cmdschematicimageadd.cpp
+  project/cmd/cmdschematicimageadd.h
+  project/cmd/cmdschematicimageremove.cpp
+  project/cmd/cmdschematicimageremove.h
   project/cmd/cmdschematicnetlabeladd.cpp
   project/cmd/cmdschematicnetlabeladd.h
   project/cmd/cmdschematicnetlabeledit.cpp
@@ -759,6 +763,8 @@ add_library(
   project/schematic/fsm/schematiceditorstate.h
   project/schematic/fsm/schematiceditorstate_addcomponent.cpp
   project/schematic/fsm/schematiceditorstate_addcomponent.h
+  project/schematic/fsm/schematiceditorstate_addimage.cpp
+  project/schematic/fsm/schematiceditorstate_addimage.h
   project/schematic/fsm/schematiceditorstate_addnetlabel.cpp
   project/schematic/fsm/schematiceditorstate_addnetlabel.h
   project/schematic/fsm/schematiceditorstate_addtext.cpp

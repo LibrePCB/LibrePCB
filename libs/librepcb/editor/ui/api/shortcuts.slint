@@ -880,6 +880,9 @@ export global Shortcuts {
         } else if is-shortcut(event, Cmd.tool-text) {
             Backend.trigger-tab(section, tab, TabAction.tool-text);
             return true;
+        } else if is-shortcut(event, Cmd.tool-image) {
+            Backend.trigger-tab(section, tab, TabAction.tool-image);
+            return true;
         } else if is-shortcut(event, Cmd.tool-wire) {
             Backend.trigger-tab(section, tab, TabAction.tool-wire);
             return true;

@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "schematicselectionquery.h"
 
+#include "../../graphics/imagegraphicsitem.h"
 #include "../../graphics/polygongraphicsitem.h"
 #include "graphicsitems/sgi_netlabel.h"
 #include "graphicsitems/sgi_netline.h"
@@ -31,6 +32,7 @@
 #include "graphicsitems/sgi_text.h"
 #include "schematicgraphicsscene.h"
 
+#include <librepcb/core/project/schematic/items/si_image.h>
 #include <librepcb/core/project/schematic/items/si_netlabel.h>
 #include <librepcb/core/project/schematic/items/si_netline.h>
 #include <librepcb/core/project/schematic/items/si_netpoint.h>
@@ -83,7 +85,7 @@ QHash<SI_NetSegment*, SchematicSelectionQuery::NetSegmentItems>
 int SchematicSelectionQuery::getResultCount() const noexcept {
   return mResultSymbols.count() + mResultNetPoints.count() +
       mResultNetLines.count() + mResultNetLabels.count() +
-      mResultPolygons.count() + mResultTexts.count();
+      mResultPolygons.count() + mResultTexts.count() + mResultImages.count();
 }
 
 /*******************************************************************************
@@ -149,6 +151,15 @@ void SchematicSelectionQuery::addSelectedSymbolTexts() noexcept {
        it++) {
     if (it.key()->getSymbol() && it.value()->isSelected()) {
       mResultTexts.insert(it.key());
+    }
+  }
+}
+
+void SchematicSelectionQuery::addSelectedImages() noexcept {
+  for (auto it = mScene.getImages().begin(); it != mScene.getImages().end();
+       it++) {
+    if (it.value()->isSelected()) {
+      mResultImages.insert(it.key());
     }
   }
 }
