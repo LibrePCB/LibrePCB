@@ -20,16 +20,13 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "bomgeneratordialog.h"
+#include "bomreviewdialog.h"
 
-#include "../dialogs/filedialog.h"
-#include "../editorcommandset.h"
 #include "../modelview/partinformationdelegate.h"
 #include "../workspace/desktopservices.h"
 #include "partinformationtooltip.h"
-#include "ui_bomgeneratordialog.h"
+#include "ui_bomreviewdialog.h"
 
-#include <librepcb/core/attribute/attributesubstitutor.h>
 #include <librepcb/core/export/bom.h>
 #include <librepcb/core/export/bomcsvwriter.h>
 #include <librepcb/core/fileio/csvfile.h>
@@ -41,7 +38,6 @@
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/project.h>
-#include <librepcb/core/project/projectattributelookup.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
@@ -57,14 +53,14 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BomGeneratorDialog::BomGeneratorDialog(const WorkspaceSettings& settings,
-                                       Project& project, const Board* board,
-                                       QWidget* parent) noexcept
+BomReviewDialog::BomReviewDialog(const WorkspaceSettings& settings,
+                                 Project& project, const Board* board,
+                                 QWidget* parent) noexcept
   : QDialog(parent),
     mSettings(settings),
     mProject(project),
     mBom(new Bom(QStringList(), {})),
-    mUi(new Ui::BomGeneratorDialog),
+    mUi(new Ui::BomReviewDialog),
     mPartToolTip(new PartInformationToolTip(settings, this)),
     mPartInfoProgress(0),
     mUpdatePartInformationScheduled(false) {
@@ -82,15 +78,7 @@ BomGeneratorDialog::BomGeneratorDialog(const WorkspaceSettings& settings,
       mProject.getCircuit().getAssemblyVariants().count() > 1;
   mUi->lblAssemblyVariant->setVisible(multipleAssemblyVariants);
   mUi->cbxAssemblyVariant->setVisible(multipleAssemblyVariants);
-  QString outPath = "./output/{{VERSION}}/{{PROJECT}}_BOM";
-  if (multipleAssemblyVariants) {
-    outPath += "_{{VARIANT}}";
-  }
-  mUi->edtOutputPath->setText(outPath % ".csv");
   mUi->lblNote->setText("ⓘ " % mUi->lblNote->text());
-  mBtnGenerate =
-      mUi->buttonBox->addButton(tr("&Generate"), QDialogButtonBox::AcceptRole);
-  mBtnGenerate->setDefault(true);
 
   // Setup part information tooltip.
   auto setProviderInfo = [this]() {
@@ -127,15 +115,6 @@ BomGeneratorDialog::BomGeneratorDialog(const WorkspaceSettings& settings,
         }
       });
 
-  // Add browse action.
-  const EditorCommandSet& cmd = EditorCommandSet::instance();
-  mUi->edtOutputPath->addAction(
-      cmd.inputBrowse.createAction(
-          mUi->edtOutputPath, this,
-          &BomGeneratorDialog::btnChooseOutputPathClicked,
-          EditorCommand::ActionFlag::WidgetShortcut),
-      QLineEdit::TrailingPosition);
-
   // List boards.
   mUi->cbxBoard->addItem(tr("None"));
   foreach (const Board* brd, mProject.getBoards()) {
@@ -169,29 +148,25 @@ BomGeneratorDialog::BomGeneratorDialog(const WorkspaceSettings& settings,
   partInfoTimer->start();
   connect(&PartInformationProvider::instance(),
           &PartInformationProvider::serviceOperational, this,
-          &BomGeneratorDialog::updatePartsInformation);
+          &BomReviewDialog::updatePartsInformation);
   connect(&PartInformationProvider::instance(),
           &PartInformationProvider::newPartsInformationAvailable, this,
-          &BomGeneratorDialog::updatePartsInformation);
+          &BomReviewDialog::updatePartsInformation);
 
   connect(
       mUi->cbxBoard,
       static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-      this, &BomGeneratorDialog::updateBom);
+      this, &BomReviewDialog::updateBom);
   connect(
       mUi->cbxAssemblyVariant,
       static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-      this, &BomGeneratorDialog::updateBom);
+      this, &BomReviewDialog::updateBom);
   connect(mUi->edtAttributes, &QLineEdit::textEdited, this,
-          &BomGeneratorDialog::updateAttributes);
+          &BomReviewDialog::updateAttributes);
   connect(mUi->tableWidget, &QTableWidget::cellDoubleClicked, this,
-          &BomGeneratorDialog::tableCellDoubleClicked);
-  connect(mUi->btnBrowseOutputDir, &QPushButton::clicked, this,
-          &BomGeneratorDialog::btnOpenOutputDirectoryClicked);
-  connect(mBtnGenerate, &QPushButton::clicked, this,
-          &BomGeneratorDialog::btnGenerateClicked);
+          &BomReviewDialog::tableCellDoubleClicked);
   connect(mUi->buttonBox, &QDialogButtonBox::rejected, this,
-          &BomGeneratorDialog::reject);
+          &BomReviewDialog::reject);
 
   // Load the window geometry and settings.
   // Note: Do not use restoreGeometry(), only store the window size (but not
@@ -203,7 +178,7 @@ BomGeneratorDialog::BomGeneratorDialog(const WorkspaceSettings& settings,
   }
 }
 
-BomGeneratorDialog::~BomGeneratorDialog() noexcept {
+BomReviewDialog::~BomReviewDialog() noexcept {
   // Save the window geometry and settings.
   QSettings cs;
   cs.setValue("bom_generator_dialog/window_size", size());
@@ -213,7 +188,7 @@ BomGeneratorDialog::~BomGeneratorDialog() noexcept {
  *  General Methods
  ******************************************************************************/
 
-bool BomGeneratorDialog::eventFilter(QObject* obj, QEvent* e) noexcept {
+bool BomReviewDialog::eventFilter(QObject* obj, QEvent* e) noexcept {
   if (mPartToolTip && (e->type() == QEvent::Leave) &&
       ((!mPartToolTip->isVisible()) ||
        ((!mPartToolTip->rect().contains(
@@ -227,41 +202,7 @@ bool BomGeneratorDialog::eventFilter(QObject* obj, QEvent* e) noexcept {
  *  GUI Event Handlers
  ******************************************************************************/
 
-void BomGeneratorDialog::btnChooseOutputPathClicked() noexcept {
-  QString fp = FileDialog::getSaveFileName(
-      this, tr("Save to"), getOutputFilePath().getParentDir().toStr(), "*.csv");
-  if (!fp.isEmpty()) {
-    mUi->edtOutputPath->setText(fp);
-  }
-}
-
-void BomGeneratorDialog::btnOpenOutputDirectoryClicked() noexcept {
-  DesktopServices ds(mSettings);
-  ds.openLocalPath(getOutputFilePath().getParentDir());
-}
-
-void BomGeneratorDialog::btnGenerateClicked() noexcept {
-  try {
-    BomCsvWriter writer(*mBom);
-    std::shared_ptr<CsvFile> csv = writer.generateCsv();  // can throw
-    csv->saveToFile(getOutputFilePath());  // can throw
-
-    QString btnSuccessText = tr("Success!");
-    QString btnGenerateText = mBtnGenerate->text();
-    if (btnGenerateText != btnSuccessText) {
-      mBtnGenerate->setText(btnSuccessText);
-      QTimer::singleShot(500, this, [this, btnGenerateText]() {
-        if (mBtnGenerate) {
-          mBtnGenerate->setText(btnGenerateText);
-        }
-      });
-    }
-  } catch (const Exception& e) {
-    QMessageBox::critical(this, tr("Error"), e.getMsg());
-  }
-}
-
-void BomGeneratorDialog::tableCellDoubleClicked(int row, int column) noexcept {
+void BomReviewDialog::tableCellDoubleClicked(int row, int column) noexcept {
   if (auto item = mUi->tableWidget->item(row, column)) {
     const auto data =
         item->data(Qt::UserRole).value<PartInformationDelegate::Data>();
@@ -276,7 +217,7 @@ void BomGeneratorDialog::tableCellDoubleClicked(int row, int column) noexcept {
  *  Private Methods
  ******************************************************************************/
 
-void BomGeneratorDialog::updateAttributes() noexcept {
+void BomReviewDialog::updateAttributes() noexcept {
   try {
     QStringList attributes;
     foreach (const QString str,
@@ -295,7 +236,7 @@ void BomGeneratorDialog::updateAttributes() noexcept {
   }
 }
 
-void BomGeneratorDialog::updateBom() noexcept {
+void BomReviewDialog::updateBom() noexcept {
   if (auto avUuid = getAssemblyVariantUuid(false)) {
     const Board* board =
         mProject.getBoardByIndex(mUi->cbxBoard->currentIndex() - 1);
@@ -307,7 +248,7 @@ void BomGeneratorDialog::updateBom() noexcept {
   }
 }
 
-void BomGeneratorDialog::updateTable() noexcept {
+void BomReviewDialog::updateTable() noexcept {
   mUi->tableWidget->clear();
   mUi->lblTotalPrice->clear();
 
@@ -345,7 +286,7 @@ void BomGeneratorDialog::updateTable() noexcept {
   }
 }
 
-void BomGeneratorDialog::updatePartsInformation() noexcept {
+void BomReviewDialog::updatePartsInformation() noexcept {
   if (!mSettings.autofetchLivePartInformation.get()) {
     return;
   }
@@ -427,14 +368,14 @@ void BomGeneratorDialog::updatePartsInformation() noexcept {
   PartInformationProvider::instance().requestScheduledParts();
 }
 
-std::shared_ptr<AssemblyVariant> BomGeneratorDialog::getAssemblyVariant()
+std::shared_ptr<AssemblyVariant> BomReviewDialog::getAssemblyVariant()
     const noexcept {
   auto uuid = getAssemblyVariantUuid(false);
   return uuid ? mProject.getCircuit().getAssemblyVariants().find(*uuid)
               : std::shared_ptr<AssemblyVariant>();
 }
 
-std::optional<Uuid> BomGeneratorDialog::getAssemblyVariantUuid(
+std::optional<Uuid> BomReviewDialog::getAssemblyVariantUuid(
     bool throwIfNullopt) const {
   const std::optional<Uuid> uuid =
       Uuid::tryFromString(mUi->cbxAssemblyVariant->currentData().toString());
@@ -442,22 +383,6 @@ std::optional<Uuid> BomGeneratorDialog::getAssemblyVariantUuid(
     throw LogicError(__FILE__, __LINE__, "No assembly variant selected.");
   }
   return uuid;
-}
-
-FilePath BomGeneratorDialog::getOutputFilePath() const noexcept {
-  QString path = mUi->edtOutputPath->text().trimmed();
-  path = AttributeSubstitutor::substitute(
-      path, ProjectAttributeLookup(mProject, getAssemblyVariant()),
-      [&](const QString& str) {
-        return FilePath::cleanFileName(
-            str, FilePath::ReplaceSpaces | FilePath::KeepCase);
-      });
-
-  if (QDir::isAbsolutePath(path)) {
-    return FilePath(path);
-  } else {
-    return mProject.getPath().getPathTo(path);
-  }
 }
 
 /*******************************************************************************
