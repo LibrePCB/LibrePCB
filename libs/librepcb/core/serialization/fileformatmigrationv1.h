@@ -66,6 +66,7 @@ public:
   FileFormatMigrationV1& operator=(const FileFormatMigrationV1& rhs) = delete;
 
 protected:
+  virtual void upgradeSettings(SExpression& root, QList<Message>& messages);
   virtual void upgradeOutputJobs(SExpression& root);
 };
 
