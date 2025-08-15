@@ -110,6 +110,7 @@ public:
     out.set_tool_text(l2s(cmd.toolText, out.get_tool_text()));
     out.set_tool_name(l2s(cmd.toolName, out.get_tool_name()));
     out.set_tool_value(l2s(cmd.toolValue, out.get_tool_value()));
+    out.set_tool_image(l2s(cmd.toolImage, out.get_tool_image()));
     out.set_tool_pin(l2s(cmd.toolPin, out.get_tool_pin()));
     out.set_tool_pad_tht(l2s(cmd.toolPadTht, out.get_tool_pad_tht()));
     out.set_tool_pad_smt(l2s(cmd.toolPadSmt, out.get_tool_pad_smt()));

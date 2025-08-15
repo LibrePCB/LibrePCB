@@ -38,11 +38,13 @@
 namespace librepcb {
 
 class Angle;
+class Image;
 class Polygon;
 
 namespace editor {
 
 class CmdDragSelectedSymbolItems;
+class CmdImageEdit;
 class CmdPolygonEdit;
 class SymbolClipboardData;
 
@@ -61,7 +63,8 @@ class SymbolEditorState_Select final : public SymbolEditorState {
     SELECTING,
     MOVING,
     PASTING,
-    MOVING_POLYGON_VERTEX
+    MOVING_POLYGON_VERTEX,
+    RESIZING_IMAGE,
   };
 
 public:
@@ -126,6 +129,7 @@ private:  // Methods
   QList<std::shared_ptr<QGraphicsItem>> findItemsAtPosition(
       const Point& pos) noexcept;
   bool findPolygonVerticesAtPosition(const Point& pos) noexcept;
+  bool findImageHandleAtPosition(const Point& pos) noexcept;
   void setState(SubState state) noexcept;
   void scheduleUpdateAvailableFeatures() noexcept;
   SymbolEditorFsmAdapter::Features updateAvailableFeatures() noexcept;
@@ -141,6 +145,13 @@ private:  // Types / Data
   QVector<int> mSelectedPolygonVertices;
   /// The polygon edit command (nullptr if not editing)
   std::unique_ptr<CmdPolygonEdit> mCmdPolygonEdit;
+
+  /// The current image selected for editing (nullptr if none)
+  std::shared_ptr<Image> mSelectedImage;
+  /// The original aspect ratio of the currently selected image
+  qreal mSelectedImageAspectRatio;
+  /// The image edit command (nullptr if not editing)
+  std::unique_ptr<CmdImageEdit> mCmdImageEdit;
 
   /// Signal/slot connections only when in this state
   QList<QMetaObject::Connection> mConnections;

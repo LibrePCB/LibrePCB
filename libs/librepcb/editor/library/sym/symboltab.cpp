@@ -29,6 +29,7 @@
 #include "../../rulecheck/rulecheckmessagesmodel.h"
 #include "../../undostack.h"
 #include "../../utils/editortoolbox.h"
+#include "../../utils/imagehelpers.h"
 #include "../../utils/slinthelpers.h"
 #include "../../utils/uihelpers.h"
 #include "../../workspace/categorytreemodel.h"
@@ -476,7 +477,14 @@ void SymbolTab::trigger(ui::TabAction a) noexcept {
       break;
     }
     case ui::TabAction::Paste: {
-      mFsm->processPaste();
+      QByteArray data;
+      QString basename;
+      QString format;
+      if (ImageHelpers::getImageFromClipboard(data, format, basename)) {
+        mFsm->processStartAddingImage(data, format, basename);
+      } else {
+        mFsm->processPaste();
+      }
       break;
     }
     case ui::TabAction::Delete: {
@@ -591,6 +599,10 @@ void SymbolTab::trigger(ui::TabAction a) noexcept {
     }
     case ui::TabAction::ToolText: {
       mFsm->processStartDrawTexts();
+      break;
+    }
+    case ui::TabAction::ToolImage: {
+      mFsm->processStartAddingImage();
       break;
     }
     case ui::TabAction::ToolPin: {
@@ -1214,6 +1226,13 @@ void SymbolTab::fsmToolEnter(SymbolEditorState_DrawText& state) noexcept {
   mFsmStateConnections.append(connect(this, &SymbolTab::vAlignRequested, &state,
                                       &SymbolEditorState_DrawText::setVAlign));
 
+  onDerivedUiDataChanged.notify();
+}
+
+void SymbolTab::fsmToolEnter(SymbolEditorState_AddImage& state) noexcept {
+  Q_UNUSED(state);
+
+  mTool = ui::EditorTool::Image;
   onDerivedUiDataChanged.notify();
 }
 

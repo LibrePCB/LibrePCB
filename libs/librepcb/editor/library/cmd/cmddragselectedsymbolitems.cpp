@@ -23,10 +23,12 @@
 #include "cmddragselectedsymbolitems.h"
 
 #include "../../cmd/cmdcircleedit.h"
+#include "../../cmd/cmdimageedit.h"
 #include "../../cmd/cmdpolygonedit.h"
 #include "../../cmd/cmdtextedit.h"
 #include "../../graphics/circlegraphicsitem.h"
 #include "../../graphics/graphicsscene.h"
+#include "../../graphics/imagegraphicsitem.h"
 #include "../../graphics/polygongraphicsitem.h"
 #include "../../graphics/textgraphicsitem.h"
 #include "../cmd/cmdsymbolpinedit.h"
@@ -104,6 +106,19 @@ CmdDragSelectedSymbolItems::CmdDragSelectedSymbolItems(
     ++count;
   }
 
+  QList<std::shared_ptr<ImageGraphicsItem>> images = item.getSelectedImages();
+  foreach (const std::shared_ptr<ImageGraphicsItem>& image, images) {
+    Q_ASSERT(image);
+    mImageEditCmds.append(new CmdImageEdit(*image->getObj()));
+    // As the image does not support mirroring, its origin will move when
+    // mirror is invoked. TO avoid drifting away, we its the center point here.
+    mCenterPos += image->getObj()->getCenter();
+    if (!image->getObj()->getPosition().isOnGrid(grid)) {
+      mHasOffTheGridElements = true;
+    }
+    ++count;
+  }
+
   // Note: If only 1 item is selected, use its exact position as center.
   if (count > 1) {
     mCenterPos /= count;
@@ -121,7 +136,7 @@ CmdDragSelectedSymbolItems::~CmdDragSelectedSymbolItems() noexcept {
 
 int CmdDragSelectedSymbolItems::getSelectedItemsCount() const noexcept {
   return mPinEditCmds.count() + mCircleEditCmds.count() +
-      mPolygonEditCmds.count() + mTextEditCmds.count();
+      mPolygonEditCmds.count() + mTextEditCmds.count() + mImageEditCmds.count();
 }
 
 /*******************************************************************************
@@ -140,6 +155,9 @@ void CmdDragSelectedSymbolItems::snapToGrid(
     cmd->snapToGrid(grid, true);
   }
   foreach (CmdTextEdit* cmd, mTextEditCmds) {
+    cmd->snapToGrid(grid, true);
+  }
+  foreach (CmdImageEdit* cmd, mImageEditCmds) {
     cmd->snapToGrid(grid, true);
   }
   mSnappedToGrid = true;
@@ -164,6 +182,9 @@ void CmdDragSelectedSymbolItems::translate(const Point& deltaPos) noexcept {
     foreach (CmdTextEdit* cmd, mTextEditCmds) {
       cmd->translate(deltaPos, true);
     }
+    foreach (CmdImageEdit* cmd, mImageEditCmds) {
+      cmd->translate(deltaPos, true);
+    }
     mDeltaPos += deltaPos;
     mCenterPos += deltaPos;
   }
@@ -182,6 +203,9 @@ void CmdDragSelectedSymbolItems::rotate(const Angle& angle) noexcept {
   foreach (CmdTextEdit* cmd, mTextEditCmds) {
     cmd->rotate(angle, mCenterPos, true);
   }
+  foreach (CmdImageEdit* cmd, mImageEditCmds) {
+    cmd->rotate(angle, mCenterPos, true);
+  }
   mDeltaRot += angle;
 }
 
@@ -196,6 +220,9 @@ void CmdDragSelectedSymbolItems::mirror(Qt::Orientation orientation) noexcept {
     cmd->mirrorGeometry(orientation, mCenterPos, true);
   }
   foreach (CmdTextEdit* cmd, mTextEditCmds) {
+    cmd->mirror(orientation, mCenterPos, true);
+  }
+  foreach (CmdImageEdit* cmd, mImageEditCmds) {
     cmd->mirror(orientation, mCenterPos, true);
   }
   mMirrored = !mMirrored;
@@ -226,6 +253,9 @@ bool CmdDragSelectedSymbolItems::performExecute() {
   while (mTextEditCmds.count() > 0) {
     appendChild(mTextEditCmds.takeLast());
   }
+  while (mImageEditCmds.count() > 0) {
+    appendChild(mImageEditCmds.takeLast());
+  }
 
   // execute all child commands
   return UndoCommandGroup::performExecute();  // can throw
@@ -244,6 +274,8 @@ void CmdDragSelectedSymbolItems::deleteAllCommands() noexcept {
   mPolygonEditCmds.clear();
   qDeleteAll(mTextEditCmds);
   mTextEditCmds.clear();
+  qDeleteAll(mImageEditCmds);
+  mImageEditCmds.clear();
 }
 
 /*******************************************************************************

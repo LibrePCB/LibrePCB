@@ -17,85 +17,75 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_CMDDRAGSELECTEDSYMBOLITEMS_H
-#define LIBREPCB_EDITOR_CMDDRAGSELECTEDSYMBOLITEMS_H
+#ifndef LIBREPCB_EDITOR_CMDIMAGEADD_H
+#define LIBREPCB_EDITOR_CMDIMAGEADD_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../undocommandgroup.h"
+#include "../undocommand.h"
 
-#include <librepcb/core/types/angle.h>
-#include <librepcb/core/types/point.h>
+#include <librepcb/core/geometry/image.h>
 
 #include <QtCore>
+
+#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class TransactionalDirectory;
+
 namespace editor {
 
-class CmdCircleEdit;
-class CmdImageEdit;
-class CmdPolygonEdit;
-class CmdSymbolPinEdit;
-class CmdTextEdit;
-class SymbolGraphicsItem;
-
 /*******************************************************************************
- *  Class CmdDragSelectedSymbolItems
+ *  Class CmdImageAdd
  ******************************************************************************/
 
 /**
- * @brief The CmdDragSelectedSymbolItems class
+ * @brief The CmdImageAdd class
  */
-class CmdDragSelectedSymbolItems final : public UndoCommandGroup {
+class CmdImageAdd final : public UndoCommand {
 public:
   // Constructors / Destructor
-  CmdDragSelectedSymbolItems() = delete;
-  CmdDragSelectedSymbolItems(const CmdDragSelectedSymbolItems& other) = delete;
-  explicit CmdDragSelectedSymbolItems(SymbolGraphicsItem& item,
-                                      const PositiveLength& grid) noexcept;
-  ~CmdDragSelectedSymbolItems() noexcept;
+  CmdImageAdd() = delete;
+  CmdImageAdd(const CmdImageAdd& other) = delete;
 
-  // Getters
-  int getSelectedItemsCount() const noexcept;
-  bool hasOffTheGridElements() const noexcept { return mHasOffTheGridElements; }
-
-  // General Methods
-  void snapToGrid(const PositiveLength& grid) noexcept;
-  void setDeltaToStartPos(const Point& delta) noexcept;
-  void translate(const Point& deltaPos) noexcept;
-  void rotate(const Angle& angle) noexcept;
-  void mirror(Qt::Orientation orientation) noexcept;
+  /**
+   * @brief Constructor
+   *
+   * @param list        The list to add the image to.
+   * @param dir         The directory to add the file to.
+   * @param image       The image to add.
+   * @param fileContent The file content to add. If NULL, no file is added,
+   *                    only verified that the file exists already. If not
+   *                    NULL, it is verified that the file does not exist yet.
+   */
+  CmdImageAdd(ImageList& list, TransactionalDirectory& dir,
+              std::shared_ptr<Image> image,
+              const QByteArray& fileContent) noexcept;
+  ~CmdImageAdd() noexcept;
 
   // Operator Overloadings
-  CmdDragSelectedSymbolItems& operator=(const CmdDragSelectedSymbolItems& rhs) =
-      delete;
+  CmdImageAdd& operator=(const CmdImageAdd& rhs) = delete;
 
-private:
-  // Private Methods
-
+private:  // Methods
   /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;
 
-  void deleteAllCommands() noexcept;
+  /// @copydoc ::librepcb::editor::UndoCommand::performUndo()
+  void performUndo() override;
 
-  // Private Member Variables
-  Point mCenterPos;
-  Point mDeltaPos;
-  Angle mDeltaRot;
-  bool mMirrored;
-  bool mSnappedToGrid;
-  bool mHasOffTheGridElements;
+  /// @copydoc ::librepcb::editor::UndoCommand::performRedo()
+  void performRedo() override;
 
-  // Move commands
-  QList<CmdSymbolPinEdit*> mPinEditCmds;
-  QList<CmdCircleEdit*> mCircleEditCmds;
-  QList<CmdPolygonEdit*> mPolygonEditCmds;
-  QList<CmdTextEdit*> mTextEditCmds;
-  QList<CmdImageEdit*> mImageEditCmds;
+private:  // Data
+  ImageList& mList;
+  TransactionalDirectory& mDirectory;
+  std::shared_ptr<Image> mImage;
+  const QByteArray mFileContent;
 };
 
 /*******************************************************************************

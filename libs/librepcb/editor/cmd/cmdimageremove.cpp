@@ -20,21 +20,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "cmdremoveselectedsymbolitems.h"
+#include "cmdimageremove.h"
 
-#include "../../cmd/cmdcircleedit.h"
-#include "../../cmd/cmdimageremove.h"
-#include "../../cmd/cmdpolygonedit.h"
-#include "../../cmd/cmdtextedit.h"
-#include "../../graphics/circlegraphicsitem.h"
-#include "../../graphics/imagegraphicsitem.h"
-#include "../../graphics/polygongraphicsitem.h"
-#include "../../graphics/textgraphicsitem.h"
-#include "../sym/symbolgraphicsitem.h"
-#include "../sym/symbolpingraphicsitem.h"
-#include "cmdsymbolpinedit.h"
-
-#include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/fileio/transactionaldirectory.h>
 
 #include <QtCore>
 
@@ -48,50 +36,58 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-CmdRemoveSelectedSymbolItems::CmdRemoveSelectedSymbolItems(
-    Symbol& sym, SymbolGraphicsItem& item) noexcept
-  : UndoCommandGroup(tr("Remove Symbol Elements")),
-    mSymbol(sym),
-    mGraphicsItem(item) {
+CmdImageRemove::CmdImageRemove(ImageList& list, TransactionalDirectory& dir,
+                               std::shared_ptr<Image> image) noexcept
+  : UndoCommand(tr("Remove Image")),
+    mList(list),
+    mDirectory(dir),
+    mImage(image),
+    mFileContent(),
+    mIndex(-1) {
 }
 
-CmdRemoveSelectedSymbolItems::~CmdRemoveSelectedSymbolItems() noexcept {
+CmdImageRemove::~CmdImageRemove() noexcept {
 }
 
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/
 
-bool CmdRemoveSelectedSymbolItems::performExecute() {
-  // remove pins
-  foreach (const auto& pin, mGraphicsItem.getSelectedPins()) {
-    appendChild(new CmdSymbolPinRemove(mSymbol.getPins(), &pin->getObj()));
+bool CmdImageRemove::performExecute() {
+  // Check if this was the last image referencing the file. In this case, the
+  // file will be removed too.
+  bool fileReferencedByOtherImages = false;
+  for (const std::shared_ptr<Image>& img : mList.values()) {
+    if ((img != mImage) && (img->getFileName() == mImage->getFileName())) {
+      fileReferencedByOtherImages = true;
+      break;
+    }
+  }
+  if (!fileReferencedByOtherImages) {
+    mFileContent = mDirectory.readIfExists(*mImage->getFileName());
   }
 
-  // remove circles
-  foreach (const auto& circle, mGraphicsItem.getSelectedCircles()) {
-    appendChild(new CmdCircleRemove(mSymbol.getCircles(), &circle->getObj()));
-  }
+  // Memorize current image index.
+  mIndex = mList.indexOf(mImage.get());
+  if (mIndex < 0) throw LogicError(__FILE__, __LINE__, "Element not in list.");
 
-  // remove polygons
-  foreach (const auto& polygon, mGraphicsItem.getSelectedPolygons()) {
-    appendChild(
-        new CmdPolygonRemove(mSymbol.getPolygons(), &polygon->getObj()));
-  }
+  performRedo();  // can throw
+  return true;
+}
 
-  // remove texts
-  foreach (const auto& text, mGraphicsItem.getSelectedTexts()) {
-    appendChild(new CmdTextRemove(mSymbol.getTexts(), &text->getObj()));
+void CmdImageRemove::performUndo() {
+  if (!mFileContent.isNull()) {
+    mDirectory.write(*mImage->getFileName(), mFileContent);  // can throw
   }
+  mList.insert(mIndex, mImage);
+}
 
-  // remove images
-  foreach (const auto& image, mGraphicsItem.getSelectedImages()) {
-    appendChild(new CmdImageRemove(mSymbol.getImages(), mSymbol.getDirectory(),
-                                   image->getObj()));
+void CmdImageRemove::performRedo() {
+  if (!mFileContent.isNull()) {
+    mDirectory.removeFile(*mImage->getFileName());  // can throw
   }
-
-  // execute all child commands
-  return UndoCommandGroup::performExecute();  // can throw
+  auto item = mList.take(mIndex);
+  Q_ASSERT(item == mImage);
 }
 
 /*******************************************************************************

@@ -81,6 +81,8 @@ export global Backend {
         } else if action == TabAction.tool-value {
             Data.sections[section].symbol-tabs[tab].tool = EditorTool.value;
             Data.sections[section].package-tabs[tab].tool = EditorTool.value;
+        } else if action == TabAction.tool-image {
+            Data.sections[section].symbol-tabs[tab].tool = EditorTool.image;
         } else if action == TabAction.tool-pin {
             Data.sections[section].symbol-tabs[tab].tool = EditorTool.pin;
         } else if action == TabAction.tool-pad-tht {

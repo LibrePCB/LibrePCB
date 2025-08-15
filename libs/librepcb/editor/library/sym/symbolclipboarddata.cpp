@@ -25,11 +25,14 @@
 #include "../../graphics/circlegraphicsitem.h"
 #include "../../graphics/graphicslayerlist.h"
 #include "../../graphics/graphicsscene.h"
+#include "../../graphics/imagegraphicsitem.h"
 #include "../../graphics/polygongraphicsitem.h"
 #include "../../graphics/textgraphicsitem.h"
 #include "symbolpingraphicsitem.h"
 
 #include <librepcb/core/application.h>
+#include <librepcb/core/fileio/transactionaldirectory.h>
+#include <librepcb/core/fileio/transactionalfilesystem.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -46,19 +49,42 @@ namespace editor {
 
 SymbolClipboardData::SymbolClipboardData(const Uuid& symbolUuid,
                                          const Point& cursorPos) noexcept
-  : mSymbolUuid(symbolUuid), mCursorPos(cursorPos) {
+  : mFileSystem(TransactionalFileSystem::openRW(FilePath::getRandomTempPath())),
+    mSymbolUuid(symbolUuid),
+    mCursorPos(cursorPos) {
 }
 
-SymbolClipboardData::SymbolClipboardData(const SExpression& node)
-  : mSymbolUuid(deserialize<Uuid>(node.getChild("symbol/@0"))),
-    mCursorPos(node.getChild("cursor_position")),
-    mPins(node),
-    mPolygons(node),
-    mCircles(node),
-    mTexts(node) {
+SymbolClipboardData::SymbolClipboardData(const QByteArray& mimeData)
+  : SymbolClipboardData(Uuid::createRandom(), Point()) {
+  mFileSystem->loadFromZip(mimeData);  // can throw
+
+  const std::unique_ptr<const SExpression> root =
+      SExpression::parse(mFileSystem->read("symbol.lp"), FilePath());
+  mSymbolUuid = deserialize<Uuid>(root->getChild("symbol/@0"));
+  mCursorPos = Point(root->getChild("cursor_position"));
+  mPins.loadFromSExpression(*root);
+  mPolygons.loadFromSExpression(*root);
+  mCircles.loadFromSExpression(*root);
+  mTexts.loadFromSExpression(*root);
+  mImages.loadFromSExpression(*root);
 }
 
 SymbolClipboardData::~SymbolClipboardData() noexcept {
+  // Clean up the temporary directory, but destroy the TransactionalFileSystem
+  // object first since it has a lock on the directory.
+  FilePath fp = mFileSystem->getAbsPath();
+  mFileSystem.reset();
+  QDir(fp.toStr()).removeRecursively();
+}
+
+/*******************************************************************************
+ *  Getters
+ ******************************************************************************/
+
+std::unique_ptr<TransactionalDirectory> SymbolClipboardData::getDirectory(
+    const QString& path) noexcept {
+  return std::unique_ptr<TransactionalDirectory>(
+      new TransactionalDirectory(mFileSystem, path));
 }
 
 /*******************************************************************************
@@ -81,11 +107,17 @@ std::unique_ptr<QMimeData> SymbolClipboardData::toMimeData() {
   root->ensureLineBreak();
   mTexts.serialize(*root);
   root->ensureLineBreak();
+  mImages.serialize(*root);
+  root->ensureLineBreak();
 
   const QByteArray sexpr = root->toByteArray();
+  mFileSystem->write("symbol.lp", sexpr);
+  const QByteArray zip = mFileSystem->exportToZip();
+
   std::unique_ptr<QMimeData> data(new QMimeData());
   data->setImageData(generatePixmap());
-  data->setData(getMimeType(), sexpr);
+  data->setData(getMimeType(), zip);
+  data->setData("application/zip", zip);
   // Note: At least on one system the clipboard didn't work if no text was
   // set, so let's also copy the SExpression as text as a workaround. This
   // might be useful anyway, e.g. for debugging purposes.
@@ -97,10 +129,8 @@ std::unique_ptr<SymbolClipboardData> SymbolClipboardData::fromMimeData(
     const QMimeData* mime) {
   QByteArray content = mime ? mime->data(getMimeType()) : QByteArray();
   if (!content.isNull()) {
-    const std::unique_ptr<const SExpression> root =
-        SExpression::parse(content, FilePath());
     return std::unique_ptr<SymbolClipboardData>(
-        new SymbolClipboardData(*root));  // can throw
+        new SymbolClipboardData(content));  // can throw
   } else {
     return nullptr;
   }
@@ -115,6 +145,8 @@ bool SymbolClipboardData::isValid(const QMimeData* mime) noexcept {
  ******************************************************************************/
 
 QPixmap SymbolClipboardData::generatePixmap() noexcept {
+  std::unique_ptr<TransactionalDirectory> dir = getDirectory();
+
   // Maybe it's good that we don't pass the workspace here, to get
   // workspace-independent pixmaps?
   std::unique_ptr<GraphicsLayerList> layers =
@@ -133,6 +165,9 @@ QPixmap SymbolClipboardData::generatePixmap() noexcept {
   }
   for (Text& text : mTexts) {
     items.append(std::make_shared<TextGraphicsItem>(text, *layers));
+  }
+  for (const auto& image : mImages.values()) {
+    items.append(std::make_shared<ImageGraphicsItem>(*dir, image, *layers));
   }
   foreach (const auto& item, items) {
     scene.addItem(*item);
