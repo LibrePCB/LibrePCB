@@ -71,8 +71,9 @@ public:
     SymbolPinsWithComponentSignal = (1 << 5),  // Subset of SymbolPins.
     Polygons = (1 << 6),
     Texts = (1 << 7),
+    Images = (1 << 8),
     All = NetPoints | NetLines | NetLabels | Symbols | SymbolPins | Polygons |
-        Texts,
+        Texts | Images,
 
     // Match behavior
     AcceptNearMatch = (1 << 10),
@@ -95,6 +96,13 @@ public:
   virtual bool exit() noexcept { return true; }
 
   // Event Handlers
+  virtual bool processAddImage(const QByteArray& data, const QString& format,
+                               const QString& basename) noexcept {
+    Q_UNUSED(data);
+    Q_UNUSED(basename);
+    Q_UNUSED(format);
+    return false;
+  }
   virtual bool processAddComponent(
       const QString& searchTerm = QString()) noexcept {
     Q_UNUSED(searchTerm);

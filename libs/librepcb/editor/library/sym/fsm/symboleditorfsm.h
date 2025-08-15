@@ -71,6 +71,7 @@ private:  // Types
     DRAW_POLYGON,
     DRAW_CIRCLE,
     DRAW_TEXT,
+    ADD_IMAGE,
     MEASURE,
   };
 
@@ -124,6 +125,9 @@ public:
   bool processStartDrawPolygons() noexcept;
   bool processStartDrawCircles() noexcept;
   bool processStartDrawTexts() noexcept;
+  bool processStartAddingImage(const QByteArray& data = QByteArray(),
+                               const QString& format = QString(),
+                               const QString& basename = QString()) noexcept;
   bool processStartDxfImport() noexcept;
   bool processStartMeasure() noexcept;
   bool processGridIntervalChanged(const PositiveLength& interval) noexcept;

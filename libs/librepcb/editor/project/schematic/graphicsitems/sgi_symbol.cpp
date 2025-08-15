@@ -25,6 +25,7 @@
 #include "../../../graphics/circlegraphicsitem.h"
 #include "../../../graphics/graphicslayer.h"
 #include "../../../graphics/graphicslayerlist.h"
+#include "../../../graphics/imagegraphicsitem.h"
 #include "../../../graphics/origincrossgraphicsitem.h"
 #include "../../../graphics/polygongraphicsitem.h"
 #include "../schematicgraphicsscene.h"
@@ -89,6 +90,16 @@ SGI_Symbol::SGI_Symbol(SI_Symbol& symbol,
                                        obj.getLineWidth());
     }
     mPolygonGraphicsItems.append(i);
+  }
+
+  for (const auto& obj :
+       const_cast<ImageList&>(mSymbol.getLibSymbol().getImages()).values()) {
+    auto i = std::make_shared<ImageGraphicsItem>(
+        mSymbol.getLibSymbol().getDirectory(), obj, layers, this);
+    i->setFlag(QGraphicsItem::ItemIsSelectable, true);
+    i->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
+    mShape |= i->mapToParent(i->shape());
+    mImageGraphicsItems.append(i);
   }
 
   updatePosition();

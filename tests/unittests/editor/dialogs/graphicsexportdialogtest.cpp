@@ -951,12 +951,19 @@ TEST_F(GraphicsExportDialogTest, testMinLineWidth) {
 
 TEST_F(GraphicsExportDialogTest, testLayerColors) {
   const QStringList layers = {
-      Theme::Color::sSchematicFrames,        Theme::Color::sSchematicOutlines,
-      Theme::Color::sSchematicGrabAreas,     Theme::Color::sSchematicPinLines,
-      Theme::Color::sSchematicPinNames,      Theme::Color::sSchematicPinNumbers,
-      Theme::Color::sSchematicNames,         Theme::Color::sSchematicValues,
-      Theme::Color::sSchematicWires,         Theme::Color::sSchematicNetLabels,
-      Theme::Color::sSchematicDocumentation, Theme::Color::sSchematicComments,
+      Theme::Color::sSchematicFrames,
+      Theme::Color::sSchematicOutlines,
+      Theme::Color::sSchematicGrabAreas,
+      Theme::Color::sSchematicPinLines,
+      Theme::Color::sSchematicPinNames,
+      Theme::Color::sSchematicPinNumbers,
+      Theme::Color::sSchematicNames,
+      Theme::Color::sSchematicValues,
+      Theme::Color::sSchematicWires,
+      Theme::Color::sSchematicNetLabels,
+      Theme::Color::sSchematicImageBorders,
+      Theme::Color::sSchematicDocumentation,
+      Theme::Color::sSchematicComments,
       Theme::Color::sSchematicGuide,
   };
   QList<std::pair<QString, QColor>> defaultValue;

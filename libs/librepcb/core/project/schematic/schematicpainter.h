@@ -37,6 +37,7 @@
 namespace librepcb {
 
 class Circle;
+class Image;
 class Path;
 class Polygon;
 class Schematic;
@@ -84,12 +85,15 @@ class SchematicPainter final : public GraphicsPagePainter {
     QList<Pin> pins;
     QList<Polygon> polygons;
     QList<Circle> circles;
+    QList<Image> images;
+    // Note: QPixmap is only allowed in the GUI thread so we have to use QImage.
+    QHash<QString, QImage> imageFiles;
   };
 
 public:
   // Constructors / Destructor
   SchematicPainter() = delete;
-  explicit SchematicPainter(const Schematic& schematic,
+  explicit SchematicPainter(const Schematic& schematic, QStringList* errors,
                             bool thumbnail = false) noexcept;
   SchematicPainter(const SchematicPainter& other) = delete;
   ~SchematicPainter() noexcept;
@@ -110,6 +114,9 @@ private:  // Data
   QList<Label> mNetLabels;
   QList<Polygon> mPolygons;
   QList<Text> mTexts;
+  QList<Image> mImages;
+  // Note: QPixmap is only allowed in the GUI thread so we have to use QImage.
+  QHash<QString, QImage> mImageFiles;
 };
 
 /*******************************************************************************

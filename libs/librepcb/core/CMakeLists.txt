@@ -167,6 +167,8 @@ add_library(
   geometry/circle.h
   geometry/hole.cpp
   geometry/hole.h
+  geometry/image.cpp
+  geometry/image.h
   geometry/junction.cpp
   geometry/junction.h
   geometry/netlabel.cpp
@@ -416,6 +418,8 @@ add_library(
   project/projectloader.h
   project/schematic/items/si_base.cpp
   project/schematic/items/si_base.h
+  project/schematic/items/si_image.cpp
+  project/schematic/items/si_image.h
   project/schematic/items/si_netlabel.cpp
   project/schematic/items/si_netlabel.h
   project/schematic/items/si_netline.cpp

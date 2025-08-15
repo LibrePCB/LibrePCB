@@ -29,6 +29,7 @@
 #include "../../rulecheck/rulecheckmessagesmodel.h"
 #include "../../undostack.h"
 #include "../../utils/editortoolbox.h"
+#include "../../utils/imagehelpers.h"
 #include "../../utils/slinthelpers.h"
 #include "../../utils/uihelpers.h"
 #include "../../workspace/desktopservices.h"
@@ -449,7 +450,14 @@ void SchematicTab::trigger(ui::TabAction a) noexcept {
       break;
     }
     case ui::TabAction::Paste: {
-      mFsm->processPaste();
+      QByteArray data;
+      QString basename;
+      QString format;
+      if (ImageHelpers::getImageFromClipboard(data, format, basename)) {
+        mFsm->processAddImage(data, format, basename);
+      } else {
+        mFsm->processPaste();
+      }
       break;
     }
     case ui::TabAction::Delete: {
@@ -575,6 +583,10 @@ void SchematicTab::trigger(ui::TabAction a) noexcept {
     }
     case ui::TabAction::ToolText: {
       mFsm->processAddText();
+      break;
+    }
+    case ui::TabAction::ToolImage: {
+      mFsm->processAddImage();
       break;
     }
     case ui::TabAction::ToolComponent: {
@@ -1033,6 +1045,13 @@ void SchematicTab::fsmToolEnter(SchematicEditorState_AddText& state) noexcept {
   onDerivedUiDataChanged.notify();
 }
 
+void SchematicTab::fsmToolEnter(SchematicEditorState_AddImage& state) noexcept {
+  Q_UNUSED(state);
+
+  mTool = ui::EditorTool::Image;
+  onDerivedUiDataChanged.notify();
+}
+
 void SchematicTab::fsmToolEnter(SchematicEditorState_Measure& state) noexcept {
   Q_UNUSED(state);
 
@@ -1076,8 +1095,8 @@ void SchematicTab::execGraphicsExportDialog(
     progress.setMinimumDuration(100);
     QList<std::shared_ptr<GraphicsPagePainter>> pages;
     for (int i = 0; i < count; ++i) {
-      pages.append(
-          std::make_shared<SchematicPainter>(*mProject.getSchematicByIndex(i)));
+      pages.append(std::make_shared<SchematicPainter>(
+          *mProject.getSchematicByIndex(i), nullptr));
       progress.setValue(i + 1);
       if (progress.wasCanceled()) {
         return;

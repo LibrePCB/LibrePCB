@@ -30,6 +30,7 @@
  ******************************************************************************/
 namespace librepcb {
 
+class SI_Image;
 class SI_NetLabel;
 class SI_NetLine;
 class SI_NetPoint;
@@ -84,6 +85,7 @@ public:
     return mResultPolygons;
   }
   const QSet<SI_Text*>& getTexts() const noexcept { return mResultTexts; }
+  const QSet<SI_Image*>& getImages() const noexcept { return mResultImages; }
 
   /**
    * @brief Get net points, net lines and net labels grouped by net segment
@@ -106,6 +108,7 @@ public:
   void addSelectedPolygons() noexcept;
   void addSelectedSchematicTexts() noexcept;
   void addSelectedSymbolTexts() noexcept;
+  void addSelectedImages() noexcept;
   /**
    * @brief Add net points of the selected net lines
    *
@@ -132,6 +135,7 @@ private:  // Data
   QSet<SI_NetLabel*> mResultNetLabels;
   QSet<SI_Polygon*> mResultPolygons;
   QSet<SI_Text*> mResultTexts;
+  QSet<SI_Image*> mResultImages;
 };
 
 /*******************************************************************************

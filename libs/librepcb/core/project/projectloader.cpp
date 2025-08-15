@@ -55,6 +55,7 @@
 #include "erc/electricalrulecheck.h"
 #include "project.h"
 #include "projectlibrary.h"
+#include "schematic/items/si_image.h"
 #include "schematic/items/si_netlabel.h"
 #include "schematic/items/si_netline.h"
 #include "schematic/items/si_netpoint.h"
@@ -436,6 +437,10 @@ void ProjectLoader::loadSchematic(Project& p, const QString& relativeFilePath) {
   foreach (const SExpression* node, root->getChildren("text")) {
     SI_Text* text = new SI_Text(*schematic, Text(*node));
     schematic->addText(*text);
+  }
+  foreach (const SExpression* node, root->getChildren("image")) {
+    SI_Image* image = new SI_Image(*schematic, Image(*node));
+    schematic->addImage(*image);
   }
 }
 

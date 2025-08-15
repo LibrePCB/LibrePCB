@@ -42,6 +42,7 @@ namespace editor {
 
 class SchematicEditorState;
 class SchematicEditorState_AddComponent;
+class SchematicEditorState_AddImage;
 class SchematicEditorState_AddNetLabel;
 class SchematicEditorState_AddText;
 class SchematicEditorState_DrawPolygon;
@@ -103,6 +104,7 @@ public:
   virtual void fsmToolEnter(
       SchematicEditorState_DrawPolygon& state) noexcept = 0;
   virtual void fsmToolEnter(SchematicEditorState_AddText& state) noexcept = 0;
+  virtual void fsmToolEnter(SchematicEditorState_AddImage& state) noexcept = 0;
   virtual void fsmToolEnter(SchematicEditorState_Measure& state) noexcept = 0;
 };
 

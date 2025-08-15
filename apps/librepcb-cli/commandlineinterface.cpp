@@ -883,18 +883,22 @@ bool CommandLineInterface::openProject(
       std::shared_ptr<GraphicsExportSettings> settings =
           std::make_shared<GraphicsExportSettings>();
       GraphicsExport::Pages pages;
+      QStringList errors;
       foreach (const Schematic* schematic, project->getSchematics()) {
         pages.append(std::make_pair(
-            std::make_shared<SchematicPainter>(*schematic), settings));
+            std::make_shared<SchematicPainter>(*schematic, &errors), settings));
       }
       graphicsExport.startExport(pages, destPath);
       const GraphicsExport::Result result = graphicsExport.waitForFinished();
+      if (!result.errorMsg.isEmpty()) {
+        errors.append(result.errorMsg);
+      }
       foreach (const FilePath& writtenFile, result.writtenFiles) {
         print(QString("  => '%1'").arg(prettyPath(writtenFile, destPathStr)));
         writtenFilesCounter[writtenFile]++;
       }
-      if (!result.errorMsg.isEmpty()) {
-        printErr("  " % tr("ERROR") % ": " % result.errorMsg);
+      for (const QString& errorMsg : errors) {
+        printErr("  " % tr("ERROR") % ": " % errorMsg);
         success = false;
       }
     }
@@ -1467,19 +1471,23 @@ bool CommandLineInterface::openSymbol(
 
       // Create pages with symbol painter
       GraphicsExport::Pages pages;
-      pages.append(
-          std::make_pair(std::make_shared<SymbolPainter>(*symbol), settings));
+      QStringList errors;
+      pages.append(std::make_pair(
+          std::make_shared<SymbolPainter>(*symbol, &errors), settings));
 
       // Start export and wait for completion
       graphicsExport.startExport(pages, destPath);
       const GraphicsExport::Result result = graphicsExport.waitForFinished();
+      if (!result.errorMsg.isEmpty()) {
+        errors.append(result.errorMsg);
+      }
 
       // Report results
       foreach (const FilePath& writtenFile, result.writtenFiles) {
         print(QString("  => '%1'").arg(prettyPath(writtenFile, destPathStr)));
       }
-      if (!result.errorMsg.isEmpty()) {
-        printErr("  " % tr("ERROR") % ": " % result.errorMsg);
+      for (const QString& errorMsg : errors) {
+        printErr("  " % tr("ERROR") % ": " % errorMsg);
         success = false;
       }
     }

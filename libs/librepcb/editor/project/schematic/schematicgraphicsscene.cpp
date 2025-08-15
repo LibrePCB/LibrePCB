@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "schematicgraphicsscene.h"
 
+#include "../../graphics/imagegraphicsitem.h"
 #include "../../graphics/polygongraphicsitem.h"
 #include "graphicsitems/sgi_netlabel.h"
 #include "graphicsitems/sgi_netline.h"
@@ -31,6 +32,7 @@
 #include "graphicsitems/sgi_text.h"
 
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/project/schematic/items/si_image.h>
 #include <librepcb/core/project/schematic/items/si_netlabel.h>
 #include <librepcb/core/project/schematic/items/si_netline.h>
 #include <librepcb/core/project/schematic/items/si_netpoint.h>
@@ -74,6 +76,9 @@ SchematicGraphicsScene::SchematicGraphicsScene(
   foreach (SI_Text* obj, mSchematic.getTexts()) {
     addText(*obj);
   }
+  foreach (SI_Image* obj, mSchematic.getImages()) {
+    addImage(*obj);
+  }
 
   connect(&mSchematic, &Schematic::symbolAdded, this,
           &SchematicGraphicsScene::addSymbol);
@@ -91,6 +96,10 @@ SchematicGraphicsScene::SchematicGraphicsScene(
           &SchematicGraphicsScene::addText);
   connect(&mSchematic, &Schematic::textRemoved, this,
           &SchematicGraphicsScene::removeText);
+  connect(&mSchematic, &Schematic::imageAdded, this,
+          &SchematicGraphicsScene::addImage);
+  connect(&mSchematic, &Schematic::imageRemoved, this,
+          &SchematicGraphicsScene::removeImage);
 }
 
 SchematicGraphicsScene::~SchematicGraphicsScene() noexcept {
@@ -116,6 +125,9 @@ SchematicGraphicsScene::~SchematicGraphicsScene() noexcept {
   }
   foreach (SI_Text* obj, mTexts.keys()) {
     removeText(*obj);
+  }
+  foreach (SI_Image* obj, mImages.keys()) {
+    removeImage(*obj);
   }
 }
 
@@ -143,6 +155,9 @@ void SchematicGraphicsScene::selectAll() noexcept {
     item->setSelected(true);
   }
   foreach (auto item, mTexts) {
+    item->setSelected(true);
+  }
+  foreach (auto item, mImages) {
     item->setSelected(true);
   }
 }
@@ -183,6 +198,9 @@ void SchematicGraphicsScene::selectItemsInRect(const Point& p1,
       item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));
     }
   }
+  foreach (auto item, mImages) {
+    item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));
+  }
 }
 
 void SchematicGraphicsScene::clearSelection() noexcept {
@@ -205,6 +223,9 @@ void SchematicGraphicsScene::clearSelection() noexcept {
     item->setSelected(false);
   }
   foreach (auto item, mTexts) {
+    item->setSelected(false);
+  }
+  foreach (auto item, mImages) {
     item->setSelected(false);
   }
 }
@@ -423,6 +444,24 @@ void SchematicGraphicsScene::addText(SI_Text& text) noexcept {
 
 void SchematicGraphicsScene::removeText(SI_Text& text) noexcept {
   if (std::shared_ptr<SGI_Text> item = mTexts.take(&text)) {
+    removeItem(*item);
+  } else {
+    Q_ASSERT(false);
+  }
+}
+
+void SchematicGraphicsScene::addImage(SI_Image& image) noexcept {
+  Q_ASSERT(!mImages.contains(&image));
+  std::shared_ptr<ImageGraphicsItem> item = std::make_shared<ImageGraphicsItem>(
+      mSchematic.getDirectory(), image.getImage(), mLayers);
+  item->setZValue(ZValue_Images);
+  item->setEditable(true);
+  addItem(*item);
+  mImages.insert(&image, item);
+}
+
+void SchematicGraphicsScene::removeImage(SI_Image& image) noexcept {
+  if (std::shared_ptr<ImageGraphicsItem> item = mImages.take(&image)) {
     removeItem(*item);
   } else {
     Q_ASSERT(false);

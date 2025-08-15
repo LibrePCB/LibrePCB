@@ -850,6 +850,15 @@ export global EditorCommandSet {
         key: "v",
     };
 
+    in property <EditorCommand> tool-image: {
+        icon: @image-url("../../../../bootstrap-icons/icons/image.svg"),
+        text: "Add Image",
+        status-tip: "Add graphical image objects (e.g. a logo)",
+        shortcut: "",
+        modifiers: { alt: false, control: false, shift: false, meta: false },
+        key: "",
+    };
+
     in property <EditorCommand> tool-pin: {
         icon: @image-url(""),
         text: "Add Pin",

@@ -146,6 +146,7 @@ public:
   void fsmToolEnter(SymbolEditorState_AddNames& state) noexcept override;
   void fsmToolEnter(SymbolEditorState_AddValues& state) noexcept override;
   void fsmToolEnter(SymbolEditorState_DrawText& state) noexcept override;
+  void fsmToolEnter(SymbolEditorState_AddImage& state) noexcept override;
   void fsmToolEnter(SymbolEditorState_AddPins& state) noexcept override;
   void fsmToolEnter(SymbolEditorState_Measure& state) noexcept override;
 

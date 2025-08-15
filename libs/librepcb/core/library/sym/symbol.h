@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../../geometry/circle.h"
+#include "../../geometry/image.h"
 #include "../../geometry/polygon.h"
 #include "../../geometry/text.h"
 #include "../libraryelement.h"
@@ -62,6 +63,7 @@ public:
     PolygonsEdited,
     CirclesEdited,
     TextsEdited,
+    ImagesEdited,
   };
   Signal<Symbol, Event> onEdited;
   typedef Slot<Symbol, Event> OnEditedSlot;
@@ -94,6 +96,8 @@ public:
   const CircleList& getCircles() const noexcept { return mCircles; }
   TextList& getTexts() noexcept { return mTexts; }
   const TextList& getTexts() const noexcept { return mTexts; }
+  ImageList& getImages() noexcept { return mImages; }
+  const ImageList& getImages() const noexcept { return mImages; }
 
   // General Methods
   virtual RuleCheckMessageList runChecks() const override;
@@ -130,6 +134,9 @@ private:  // Methods
   void textsEdited(const TextList& list, int index,
                    const std::shared_ptr<const Text>& text,
                    TextList::Event event) noexcept;
+  void imagesEdited(const ImageList& list, int index,
+                    const std::shared_ptr<const Image>& image,
+                    ImageList::Event event) noexcept;
 
 private:  // Data
   PositiveLength mGridInterval;
@@ -138,12 +145,14 @@ private:  // Data
   PolygonList mPolygons;
   CircleList mCircles;
   TextList mTexts;
+  ImageList mImages;
 
   // Slots
   SymbolPinList::OnEditedSlot mPinsEditedSlot;
   PolygonList::OnEditedSlot mPolygonsEditedSlot;
   CircleList::OnEditedSlot mCirclesEditedSlot;
   TextList::OnEditedSlot mTextsEditedSlot;
+  ImageList::OnEditedSlot mImagesEditedSlot;
 };
 
 /*******************************************************************************

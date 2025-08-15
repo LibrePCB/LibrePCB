@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/core/geometry/image.h>
 #include <librepcb/core/geometry/junction.h>
 #include <librepcb/core/geometry/netlabel.h>
 #include <librepcb/core/geometry/netline.h>
@@ -251,6 +252,7 @@ public:
   }
   PolygonList& getPolygons() noexcept { return mPolygons; }
   TextList& getTexts() noexcept { return mTexts; }
+  ImageList& getImages() noexcept { return mImages; }
 
   // General Methods
   std::unique_ptr<QMimeData> toMimeData() const;
@@ -275,6 +277,7 @@ private:  // Data
   SerializableObjectList<NetSegment, NetSegment> mNetSegments;
   PolygonList mPolygons;
   TextList mTexts;
+  ImageList mImages;
 };
 
 /*******************************************************************************

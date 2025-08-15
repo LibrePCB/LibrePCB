@@ -158,6 +158,18 @@ public:
    */
   void loadBoardRenderingColors(int innerLayerCount) noexcept;
 
+  /**
+   * @brief Helper to prepare a QImage for painting
+   *
+   * If black/white mode is enabled, the image is converted to grayscale
+   * (with inverted colors if the background is black). Otherwise the image
+   * is returned as-is.
+   *
+   * @param img   The image to convert.
+   * @return      The converted image.
+   */
+  QImage convertImageColors(QImage img) const noexcept;
+
   // Operator Overloadings
   GraphicsExportSettings& operator=(const GraphicsExportSettings& rhs) noexcept;
   bool operator==(const GraphicsExportSettings& rhs) const noexcept;

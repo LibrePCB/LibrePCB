@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "schematiceditorstate.h"
 
+#include "../../../graphics/imagegraphicsitem.h"
 #include "../../../graphics/polygongraphicsitem.h"
 #include "../../../undostack.h"
 #include "../../../widgets/graphicsview.h"
@@ -36,6 +37,7 @@
 
 #include <librepcb/core/geometry/polygon.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/project/schematic/items/si_image.h>
 #include <librepcb/core/project/schematic/items/si_netlabel.h>
 #include <librepcb/core/project/schematic/items/si_netline.h>
 #include <librepcb/core/project/schematic/items/si_netpoint.h>
@@ -146,6 +148,7 @@ QList<std::shared_ptr<QGraphicsItem>> SchematicEditorState::findItemsAtPos(
   //   60: texts
   //   70: symbols with any grab area below cursor
   //   80: polygons
+  //   90: images
   //
   // And for items not directly under the cursor, but very close to the cursor,
   // add +1000. For items not under the cursor, but on the next grid interval,
@@ -284,6 +287,13 @@ QList<std::shared_ptr<QGraphicsItem>> SchematicEditorState::findItemsAtPos(
     for (auto it = scene->getTexts().begin(); it != scene->getTexts().end();
          it++) {
       processItem(it.value(), it.key()->getPosition(), 60, false, std::nullopt);
+    }
+  }
+
+  if (flags.testFlag(FindFlag::Images)) {
+    for (auto it = scene->getImages().begin(); it != scene->getImages().end();
+         it++) {
+      processItem(it.value(), it.key()->getPosition(), 90, false, std::nullopt);
     }
   }
 

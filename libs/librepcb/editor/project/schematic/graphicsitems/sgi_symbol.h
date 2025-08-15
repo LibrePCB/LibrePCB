@@ -39,6 +39,7 @@ namespace editor {
 
 class CircleGraphicsItem;
 class GraphicsLayerList;
+class ImageGraphicsItem;
 class OriginCrossGraphicsItem;
 class PolygonGraphicsItem;
 
@@ -86,6 +87,7 @@ private:  // Data
   std::shared_ptr<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
   QVector<std::shared_ptr<CircleGraphicsItem>> mCircleGraphicsItems;
   QVector<std::shared_ptr<PolygonGraphicsItem>> mPolygonGraphicsItems;
+  QVector<std::shared_ptr<ImageGraphicsItem>> mImageGraphicsItems;
   QPainterPath mShape;
 
   // Slots

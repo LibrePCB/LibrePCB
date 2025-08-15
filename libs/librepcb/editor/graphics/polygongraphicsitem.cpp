@@ -226,9 +226,9 @@ void PolygonGraphicsItem::updateZValue() noexcept {
   if (mPolygon.isFilled()) {
     setZValue(0);
   } else if (mPolygon.isGrabArea()) {
-    setZValue(-1);
+    setZValue(-2);
   } else {
-    setZValue(1);
+    setZValue(2);
   }
 }
 

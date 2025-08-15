@@ -129,6 +129,13 @@ public:
   virtual bool processEditProperties() noexcept { return false; }
   virtual bool processImportPins() noexcept { return false; }
   virtual bool processImportDxf() noexcept { return false; }
+  virtual bool processAddImage(const QByteArray& data, const QString& format,
+                               const QString& basename) noexcept {
+    Q_UNUSED(data);
+    Q_UNUSED(basename);
+    Q_UNUSED(format);
+    return false;
+  }
   virtual bool processAbortCommand() noexcept { return false; }
   virtual bool processGridIntervalChanged(
       const PositiveLength& interval) noexcept {
@@ -141,6 +148,7 @@ public:
 
 signals:
   void pasteRequested();
+  void abortRequested();
 
 protected:  // Methods
   void requestPaste(std::unique_ptr<SymbolClipboardData> data) noexcept;

@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "cmdpasteschematicitems.h"
 
+#include "../../graphics/imagegraphicsitem.h"
 #include "../../graphics/polygongraphicsitem.h"
 #include "../../project/cmd/cmdcomponentinstanceadd.h"
 #include "../../project/cmd/cmdcompsiginstsetnetsignal.h"
@@ -29,12 +30,14 @@
 #include "../../project/cmd/cmdnetsignaladd.h"
 #include "../../project/cmd/cmdnetsignaledit.h"
 #include "../../project/cmd/cmdprojectlibraryaddelement.h"
+#include "../../project/cmd/cmdschematicimageadd.h"
 #include "../../project/cmd/cmdschematicnetlabeladd.h"
 #include "../../project/cmd/cmdschematicnetsegmentadd.h"
 #include "../../project/cmd/cmdschematicnetsegmentaddelements.h"
 #include "../../project/cmd/cmdschematicpolygonadd.h"
 #include "../../project/cmd/cmdschematictextadd.h"
 #include "../../project/cmd/cmdsymbolinstanceadd.h"
+#include "../../utils/imagehelpers.h"
 #include "../schematic/graphicsitems/sgi_netlabel.h"
 #include "../schematic/graphicsitems/sgi_netline.h"
 #include "../schematic/graphicsitems/sgi_netpoint.h"
@@ -51,6 +54,7 @@
 #include <librepcb/core/project/circuit/componentsignalinstance.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectlibrary.h>
+#include <librepcb/core/project/schematic/items/si_image.h>
 #include <librepcb/core/project/schematic/items/si_netlabel.h>
 #include <librepcb/core/project/schematic/items/si_netline.h>
 #include <librepcb/core/project/schematic/items/si_netpoint.h>
@@ -375,6 +379,33 @@ bool CmdPasteSchematicItems::performExecute() {
     SI_Text* item = new SI_Text(mSchematic, copy);
     execNewChildCmd(new CmdSchematicTextAdd(*item));
     if (auto graphicsItem = mScene.getTexts().value(item)) {
+      graphicsItem->setSelected(true);
+    }
+  }
+
+  // Paste images
+  for (const Image& image : mData->getImages()) {
+    // If the chosen file already exists in the schematic, just reuse it to
+    // avoid data duplication. Otherwise, determine the name of the new
+    // file to be created.
+    const QByteArray data =
+        mData->getDirectory()->readIfExists(*image.getFileName());
+    if (data.isEmpty()) continue;  // Skip images with missing file.
+    std::optional<FileProofName> fileName =
+        ImageHelpers::findExistingFile(mSchematic.getDirectory(), data);
+    const bool fileExists = fileName.has_value();
+    if (!fileName) {
+      fileName = ImageHelpers::getUnusedFileName(mSchematic.getDirectory(),
+                                                 image.getFileBasename(),
+                                                 image.getFileExtension());
+    }
+    Q_ASSERT(fileName);
+    Image copy(Uuid::createRandom(), image);  // assign new UUID
+    copy.setPosition(copy.getPosition() + mPosOffset);  // move
+    SI_Image* item = new SI_Image(mSchematic, copy);
+    execNewChildCmd(new CmdSchematicImageAdd(*item, mSchematic.getDirectory(),
+                                             fileExists ? QByteArray() : data));
+    if (auto graphicsItem = mScene.getImages().value(item)) {
       graphicsItem->setSelected(true);
     }
   }

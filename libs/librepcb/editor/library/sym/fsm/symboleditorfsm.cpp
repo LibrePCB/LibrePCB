@@ -23,6 +23,7 @@
 #include "symboleditorfsm.h"
 
 #include "../symbolclipboarddata.h"
+#include "symboleditorstate_addimage.h"
 #include "symboleditorstate_addnames.h"
 #include "symboleditorstate_addpins.h"
 #include "symboleditorstate_addvalues.h"
@@ -60,6 +61,7 @@ SymbolEditorFsm::SymbolEditorFsm(const Context& context) noexcept
   mStates.insert(State::DRAW_CIRCLE, new SymbolEditorState_DrawCircle(context));
   mStates.insert(State::DRAW_ARC, new SymbolEditorState_DrawArc(context));
   mStates.insert(State::DRAW_TEXT, new SymbolEditorState_DrawText(context));
+  mStates.insert(State::ADD_IMAGE, new SymbolEditorState_AddImage(context));
   mStates.insert(State::MEASURE, new SymbolEditorState_Measure(context));
 
   enterNextState(State::SELECT);
@@ -282,6 +284,22 @@ bool SymbolEditorFsm::processStartDrawTexts() noexcept {
   return setNextState(State::DRAW_TEXT);
 }
 
+bool SymbolEditorFsm::processStartAddingImage(
+    const QByteArray& data, const QString& format,
+    const QString& basename) noexcept {
+  const State oldState = mCurrentState;
+  if (!setNextState(State::ADD_IMAGE)) {
+    return false;
+  }
+  if (SymbolEditorState* state = getCurrentState()) {
+    if (state->processAddImage(data, format, basename)) {
+      return true;
+    }
+  }
+  setNextState(oldState);  // restore previous state
+  return false;
+}
+
 bool SymbolEditorFsm::processStartDxfImport() noexcept {
   setNextState(State::SELECT);
   if (SymbolEditorState* state = getCurrentState()) {
@@ -321,7 +339,11 @@ bool SymbolEditorFsm::setNextState(State state) noexcept {
   if (!leaveCurrentState()) {
     return false;
   }
-  return enterNextState(state);
+  if (!enterNextState(state)) {
+    enterNextState(State::SELECT);
+    return false;
+  }
+  return true;
 }
 
 bool SymbolEditorFsm::leaveCurrentState() noexcept {
@@ -331,6 +353,8 @@ bool SymbolEditorFsm::leaveCurrentState() noexcept {
     }
     disconnect(state, &SymbolEditorState::pasteRequested, this,
                &SymbolEditorFsm::handlePasteRequest);
+    disconnect(state, &SymbolEditorState::abortRequested, this,
+               &SymbolEditorFsm::processAbortCommand);
   }
   if (mCurrentState != State::SELECT) {
     // Only memorize states other than SELECT.
@@ -348,6 +372,8 @@ bool SymbolEditorFsm::enterNextState(State state) noexcept {
     }
     connect(nextState, &SymbolEditorState::pasteRequested, this,
             &SymbolEditorFsm::handlePasteRequest, Qt::QueuedConnection);
+    connect(nextState, &SymbolEditorState::abortRequested, this,
+            &SymbolEditorFsm::processAbortCommand, Qt::QueuedConnection);
   }
   mCurrentState = state;
   return true;

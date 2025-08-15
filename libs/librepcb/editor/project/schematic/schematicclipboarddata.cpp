@@ -51,7 +51,8 @@ SchematicClipboardData::SchematicClipboardData(
     mSymbolInstances(),
     mNetSegments(),
     mPolygons(),
-    mTexts() {
+    mTexts(),
+    mImages() {
 }
 
 SchematicClipboardData::SchematicClipboardData(const QByteArray& mimeData)
@@ -68,6 +69,7 @@ SchematicClipboardData::SchematicClipboardData(const QByteArray& mimeData)
   mNetSegments.loadFromSExpression(*root);
   mPolygons.loadFromSExpression(*root);
   mTexts.loadFromSExpression(*root);
+  mImages.loadFromSExpression(*root);
 }
 
 SchematicClipboardData::~SchematicClipboardData() noexcept {
@@ -111,6 +113,8 @@ std::unique_ptr<QMimeData> SchematicClipboardData::toMimeData() const {
   mPolygons.serialize(*root);
   root->ensureLineBreak();
   mTexts.serialize(*root);
+  root->ensureLineBreak();
+  mImages.serialize(*root);
   root->ensureLineBreak();
 
   const QByteArray sexpr = root->toByteArray();

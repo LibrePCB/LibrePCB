@@ -23,12 +23,15 @@
 #include "cmdpastesymbolitems.h"
 
 #include "../../cmd/cmdcircleedit.h"
+#include "../../cmd/cmdimageadd.h"
 #include "../../cmd/cmdpolygonedit.h"
 #include "../../cmd/cmdtextedit.h"
 #include "../../graphics/circlegraphicsitem.h"
 #include "../../graphics/holegraphicsitem.h"
+#include "../../graphics/imagegraphicsitem.h"
 #include "../../graphics/polygongraphicsitem.h"
 #include "../../graphics/textgraphicsitem.h"
+#include "../../utils/imagehelpers.h"
 #include "../sym/symbolclipboarddata.h"
 #include "../sym/symbolgraphicsitem.h"
 #include "../sym/symbolpingraphicsitem.h"
@@ -161,6 +164,39 @@ bool CmdPasteSymbolItems::performExecute() {
       graphicsItem->setSelected(true);
     } else {
       qCritical() << "Could not select text graphics item!";
+    }
+  }
+
+  for (const Image& image : mData->getImages().sortedByUuid()) {
+    Uuid uuid = image.getUuid();
+    if (mSymbol.getImages().contains(uuid) ||
+        (mSymbol.getUuid() != mData->getSymbolUuid())) {
+      uuid = Uuid::createRandom();
+    }
+    // If the chosen file already exists in the symbol, just reuse it to
+    // avoid data duplication. Otherwise, determine the name of the new
+    // file to be created.
+    const QByteArray data =
+        mData->getDirectory()->readIfExists(*image.getFileName());
+    if (data.isEmpty()) continue;  // Skip images with missing file.
+    std::optional<FileProofName> fileName =
+        ImageHelpers::findExistingFile(mSymbol.getDirectory(), data);
+    const bool fileExists = fileName.has_value();
+    if (!fileName) {
+      fileName = ImageHelpers::getUnusedFileName(mSymbol.getDirectory(),
+                                                 image.getFileBasename(),
+                                                 image.getFileExtension());
+    }
+    Q_ASSERT(fileName);
+    std::shared_ptr<Image> copy = std::make_shared<Image>(uuid, image);
+    copy->setFileName(*fileName);
+    copy->setPosition(copy->getPosition() + mPosOffset);
+    execNewChildCmd(new CmdImageAdd(mSymbol.getImages(), mSymbol.getDirectory(),
+                                    copy, fileExists ? QByteArray() : data));
+    if (auto graphicsItem = mGraphicsItem.getGraphicsItem(copy)) {
+      graphicsItem->setSelected(true);
+    } else {
+      qCritical() << "Could not select image graphics item!";
     }
   }
 

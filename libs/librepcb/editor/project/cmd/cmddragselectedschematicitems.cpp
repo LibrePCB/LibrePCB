@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "cmddragselectedschematicitems.h"
 
+#include "../../cmd/cmdimageedit.h"
 #include "../../cmd/cmdpolygonedit.h"
 #include "../../cmd/cmdtextedit.h"
 #include "../../project/cmd/cmdschematicnetlabeledit.h"
@@ -32,6 +33,7 @@
 #include "../schematic/schematicselectionquery.h"
 
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/project/schematic/items/si_image.h>
 #include <librepcb/core/project/schematic/items/si_netlabel.h>
 #include <librepcb/core/project/schematic/items/si_netline.h>
 #include <librepcb/core/project/schematic/items/si_netpoint.h>
@@ -74,6 +76,7 @@ CmdDragSelectedSchematicItems::CmdDragSelectedSchematicItems(
   query.addSelectedPolygons();
   query.addSelectedSchematicTexts();
   query.addSelectedSymbolTexts();
+  query.addSelectedImages();
   query.addNetPointsOfNetLines();
 
   // Find the center of all elements and create undo commands.
@@ -114,6 +117,14 @@ CmdDragSelectedSchematicItems::CmdDragSelectedSchematicItems(
     CmdTextEdit* cmd = new CmdTextEdit(text->getTextObj());
     mTextEditCmds.append(cmd);
   }
+  foreach (SI_Image* image, query.getImages()) {
+    // As the image does not support mirroring, its origin will move when
+    // mirror is invoked. TO avoid drifting away, we its the center point here.
+    mCenterPos += image->getImage()->getCenter();
+    ++mItemCount;
+    CmdImageEdit* cmd = new CmdImageEdit(*image->getImage());
+    mImageEditCmds.append(cmd);
+  }
 
   // Note: If only 1 item is selected, use its exact position as center.
   if (mItemCount > 1) {
@@ -146,6 +157,9 @@ void CmdDragSelectedSchematicItems::snapToGrid() noexcept {
   foreach (CmdTextEdit* cmd, mTextEditCmds) {
     cmd->snapToGrid(grid, true);
   }
+  foreach (CmdImageEdit* cmd, mImageEditCmds) {
+    cmd->snapToGrid(grid, true);
+  }
   mSnappedToGrid = true;
 }
 
@@ -175,6 +189,9 @@ void CmdDragSelectedSchematicItems::setCurrentPosition(
     foreach (CmdTextEdit* cmd, mTextEditCmds) {
       cmd->translate(delta - mDeltaPos, true);
     }
+    foreach (CmdImageEdit* cmd, mImageEditCmds) {
+      cmd->translate(delta - mDeltaPos, true);
+    }
     mDeltaPos = delta;
   }
 }
@@ -199,6 +216,9 @@ void CmdDragSelectedSchematicItems::rotate(
     cmd->rotate(angle, center, true);
   }
   foreach (CmdTextEdit* cmd, mTextEditCmds) {
+    cmd->rotate(angle, center, true);
+  }
+  foreach (CmdImageEdit* cmd, mImageEditCmds) {
     cmd->rotate(angle, center, true);
   }
   mDeltaAngle += angle;
@@ -226,6 +246,9 @@ void CmdDragSelectedSchematicItems::mirror(
   foreach (CmdTextEdit* cmd, mTextEditCmds) {
     cmd->mirror(orientation, center, true);
   }
+  foreach (CmdImageEdit* cmd, mImageEditCmds) {
+    cmd->mirror(orientation, center, true);
+  }
   mMirrored = !mMirrored;
 }
 
@@ -249,6 +272,8 @@ bool CmdDragSelectedSchematicItems::performExecute() {
     mPolygonEditCmds.clear();
     qDeleteAll(mTextEditCmds);
     mTextEditCmds.clear();
+    qDeleteAll(mImageEditCmds);
+    mImageEditCmds.clear();
     return false;
   }
 
@@ -273,6 +298,9 @@ bool CmdDragSelectedSchematicItems::performExecute() {
     appendChild(cmd);  // can throw
   }
   foreach (CmdTextEdit* cmd, mTextEditCmds) {
+    appendChild(cmd);  // can throw
+  }
+  foreach (CmdImageEdit* cmd, mImageEditCmds) {
     appendChild(cmd);  // can throw
   }
 

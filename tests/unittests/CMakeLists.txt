@@ -41,6 +41,7 @@ add_executable(
   core/fileio/versionfiletest.cpp
   core/fileio/zipwriterziparchivetest.cpp
   core/geometry/holetest.cpp
+  core/geometry/imagetest.cpp
   core/geometry/pathtest.cpp
   core/geometry/polygontest.cpp
   core/geometry/stroketexttest.cpp

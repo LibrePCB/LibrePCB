@@ -132,7 +132,8 @@ void OutputJobRunner::removeUnknownFiles(const QList<FilePath>& files) {
 }
 
 GraphicsExport::Pages OutputJobRunner::buildPages(const GraphicsOutputJob& job,
-                                                  bool rebuildPlanes) {
+                                                  bool rebuildPlanes,
+                                                  QStringList* errors) {
   using Type = GraphicsOutputJob::Content::Type;
 
   GraphicsExport::Pages pages;
@@ -187,7 +188,7 @@ GraphicsExport::Pages OutputJobRunner::buildPages(const GraphicsOutputJob& job,
           Q_UNUSED(board);  // TODO
           foreach (const Schematic* schematic, mProject.getSchematics()) {
             std::shared_ptr<GraphicsPagePainter> painter =
-                std::make_shared<SchematicPainter>(*schematic);
+                std::make_shared<SchematicPainter>(*schematic, errors);
             pages.append(std::make_pair(painter, settings));
           }
         }
@@ -270,7 +271,9 @@ void OutputJobRunner::run(const OutputJob& job) {
 
 void OutputJobRunner::runImpl(const GraphicsOutputJob& job) {
   // Build pages.
-  const GraphicsExport::Pages pages = buildPages(job, true);  // can throw
+  QStringList errors;
+  const GraphicsExport::Pages pages =
+      buildPages(job, true, &errors);  // can throw
 
   // Determine lookup objects.
   QSet<Board*> allBoards;
@@ -318,7 +321,10 @@ void OutputJobRunner::runImpl(const GraphicsOutputJob& job) {
     }
   }
   if (!result.errorMsg.isEmpty()) {
-    throw RuntimeError(__FILE__, __LINE__, result.errorMsg);
+    errors.append(result.errorMsg);
+  }
+  if (!errors.isEmpty()) {
+    throw RuntimeError(__FILE__, __LINE__, errors.join("; "));
   }
 }
 

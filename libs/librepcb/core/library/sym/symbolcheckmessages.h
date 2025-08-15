@@ -57,6 +57,37 @@ public:
 };
 
 /*******************************************************************************
+ *  Class MsgInvalidImageFile
+ ******************************************************************************/
+
+/**
+ * @brief The MsgInvalidImageFile class
+ */
+class MsgInvalidImageFile final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgInvalidImageFile)
+
+public:
+  enum class Error {
+    FileMissing,
+    FileReadError,
+    UnsupportedFormat,
+    ImageLoadError,
+  };
+
+  // Constructors / Destructor
+  MsgInvalidImageFile() = delete;
+  explicit MsgInvalidImageFile(const QString& fileName, Error error,
+                               const QString& details) noexcept;
+  MsgInvalidImageFile(const MsgInvalidImageFile& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~MsgInvalidImageFile() noexcept {}
+
+private:
+  static QString buildMessagePattern(Error error) noexcept;
+  static QString buildDescription(const QString& details) noexcept;
+};
+
+/*******************************************************************************
  *  Class MsgMissingSymbolName
  ******************************************************************************/
 

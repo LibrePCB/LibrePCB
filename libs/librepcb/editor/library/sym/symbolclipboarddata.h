@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include <librepcb/core/geometry/circle.h>
+#include <librepcb/core/geometry/image.h>
 #include <librepcb/core/geometry/polygon.h>
 #include <librepcb/core/geometry/text.h>
 #include <librepcb/core/library/sym/symbolpin.h>
@@ -37,6 +38,10 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class TransactionalDirectory;
+class TransactionalFileSystem;
+
 namespace editor {
 
 /*******************************************************************************
@@ -52,14 +57,16 @@ public:
   SymbolClipboardData() = delete;
   SymbolClipboardData(const SymbolClipboardData& other) = delete;
   SymbolClipboardData(const Uuid& symbolUuid, const Point& cursorPos) noexcept;
-  explicit SymbolClipboardData(const SExpression& node);
+  explicit SymbolClipboardData(const QByteArray& mimeData);
   ~SymbolClipboardData() noexcept;
 
   // Getters
   bool getItemCount() const noexcept {
     return mPins.count() + mPolygons.count() + mCircles.count() +
-        mTexts.count();
+        mTexts.count() + mImages.count();
   }
+  std::unique_ptr<TransactionalDirectory> getDirectory(
+      const QString& path = "") noexcept;
   const Uuid& getSymbolUuid() const noexcept { return mSymbolUuid; }
   const Point& getCursorPos() const noexcept { return mCursorPos; }
   SymbolPinList& getPins() noexcept { return mPins; }
@@ -70,6 +77,8 @@ public:
   const CircleList& getCircles() const noexcept { return mCircles; }
   TextList& getTexts() noexcept { return mTexts; }
   const TextList& getTexts() const noexcept { return mTexts; }
+  ImageList& getImages() noexcept { return mImages; }
+  const ImageList& getImages() const noexcept { return mImages; }
 
   // General Methods
   std::unique_ptr<QMimeData> toMimeData();
@@ -85,12 +94,14 @@ private:  // Methods
   static QString getMimeType() noexcept;
 
 private:  // Data
+  std::shared_ptr<TransactionalFileSystem> mFileSystem;
   Uuid mSymbolUuid;
   Point mCursorPos;
   SymbolPinList mPins;
   PolygonList mPolygons;
   CircleList mCircles;
   TextList mTexts;
+  ImageList mImages;
 };
 
 /*******************************************************************************
