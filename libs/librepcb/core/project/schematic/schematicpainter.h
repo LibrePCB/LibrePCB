@@ -114,6 +114,9 @@ private:  // Data
   QList<Label> mNetLabels;
   QList<Polygon> mPolygons;
   QList<Text> mTexts;
+  QList<Image> mImages;
+  // Note: QPixmap is only allowed in the GUI thread so we have to use QImage.
+  QHash<QString, QImage> mImageFiles;
 };
 
 /*******************************************************************************

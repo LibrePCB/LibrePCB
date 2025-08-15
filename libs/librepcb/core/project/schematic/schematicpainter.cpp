@@ -28,6 +28,7 @@
 #include "../../library/sym/symbol.h"
 #include "../../workspace/theme.h"
 #include "../circuit/netsignal.h"
+#include "items/si_image.h"
 #include "items/si_netlabel.h"
 #include "items/si_netline.h"
 #include "items/si_netpoint.h"
@@ -121,6 +122,29 @@ SchematicPainter::SchematicPainter(const Schematic& schematic,
       Text copy(text->getTextObj());
       copy.setText(text->getText());  // Memorize substituted text.
       mTexts.append(copy);
+    }
+  }
+  foreach (const SI_Image* image, schematic.getImages()) {
+    try {
+      const Image& img = *image->getImage();
+      if (!mImageFiles.contains(*img.getFileName())) {
+        const QByteArray content =
+            schematic.getDirectory().read(*img.getFileName());  // can throw
+        QString error = "Unknown error.";
+        if (auto pix =
+                Image::tryLoad(content, img.getFileExtension(), &error)) {
+          mImageFiles.insert(*img.getFileName(), *pix);
+        } else {
+          throw RuntimeError(__FILE__, __LINE__,
+                             QString("Failed to load image '%1': %2")
+                                 .arg(*img.getFileName(), error));
+        }
+      }
+      mImages.append(img);
+    } catch (const Exception& e) {
+      if (errors) {
+        errors->append(e.getMsg());
+      }
     }
   }
   foreach (const SI_NetSegment* segment, schematic.getNetSegments()) {
@@ -254,6 +278,15 @@ void SchematicPainter::paint(
                  settings.getColor(Theme::Color::sSchematicPinNumbers), true,
                  false, false);
     }
+  }
+
+  // Draw Images.
+  foreach (const Image& image, mImages) {
+    p.drawImage(
+        image.getPosition(), image.getRotation(),
+        settings.convertImageColors(mImageFiles.value(*image.getFileName())),
+        image.getWidth(), image.getHeight(), image.getBorderWidth(),
+        settings.getColor(Theme::Color::sSchematicImageBorders));
   }
 
   // Draw Polygons.

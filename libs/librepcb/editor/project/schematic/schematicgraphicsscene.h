@@ -36,6 +36,7 @@
 namespace librepcb {
 
 class NetSignal;
+class SI_Image;
 class SI_NetLabel;
 class SI_NetLine;
 class SI_NetPoint;
@@ -49,6 +50,7 @@ class Schematic;
 namespace editor {
 
 class GraphicsLayerList;
+class ImageGraphicsItem;
 class PolygonGraphicsItem;
 class SGI_NetLabel;
 class SGI_NetLine;
@@ -82,6 +84,7 @@ public:
     ZValue_TextAnchors,  ///< For ::librepcb::SI_Text anchor lines
     ZValue_Symbols,  ///< For ::librepcb::SI_Symbol items
     ZValue_SymbolPins,  ///< For ::librepcb::SI_SymbolPin items
+    ZValue_Images,  ///< For ::librepcb::SI_Image items
     ZValue_Polygons,  ///< For ::librepcb::SI_Polygon items
     ZValue_Texts,  ///< For ::librepcb::SI_Text items
     ZValue_NetLabels,  ///< For ::librepcb::SI_NetLabel items
@@ -127,6 +130,10 @@ public:
   const QHash<SI_Text*, std::shared_ptr<SGI_Text>>& getTexts() noexcept {
     return mTexts;
   }
+  const QHash<SI_Image*, std::shared_ptr<ImageGraphicsItem>>&
+      getImages() noexcept {
+    return mImages;
+  }
 
   // General Methods
   void selectAll() noexcept;
@@ -159,6 +166,8 @@ private:  // Methods
   void removePolygon(SI_Polygon& polygon) noexcept;
   void addText(SI_Text& text) noexcept;
   void removeText(SI_Text& text) noexcept;
+  void addImage(SI_Image& image) noexcept;
+  void removeImage(SI_Image& image) noexcept;
 
 private:  // Data
   Schematic& mSchematic;
@@ -171,6 +180,7 @@ private:  // Data
   QHash<SI_NetLabel*, std::shared_ptr<SGI_NetLabel>> mNetLabels;
   QHash<SI_Polygon*, std::shared_ptr<PolygonGraphicsItem>> mPolygons;
   QHash<SI_Text*, std::shared_ptr<SGI_Text>> mTexts;
+  QHash<SI_Image*, std::shared_ptr<ImageGraphicsItem>> mImages;
 };
 
 /*******************************************************************************
