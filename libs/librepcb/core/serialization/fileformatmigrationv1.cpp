@@ -168,6 +168,15 @@ void FileFormatMigrationV1::upgradeProject(TransactionalDirectory& dir,
     dir.write(fp, root->toByteArray());
   }
 
+  // Settings.
+  {
+    const QString fp = "project/settings.lp";
+    std::unique_ptr<SExpression> root =
+        SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+    upgradeSettings(*root, messages);
+    dir.write(fp, root->toByteArray());
+  }
+
   // Output Jobs.
   {
     const QString fp = "project/jobs.lp";
@@ -224,6 +233,28 @@ void FileFormatMigrationV1::upgradeMetadata(SExpression& root,
         Message::Severity::Note,
         "Project version has been adjusted due to more restrictive naming "
         "requirements. Please review the new version number.",
+        1));
+  }
+}
+
+void FileFormatMigrationV1::upgradeSettings(SExpression& root,
+                                            QList<Message>& messages) {
+  // The manual BOM export has been removed. If the user has configured custom
+  // BOM attributes, just remind him to use output jobs now.
+  QStringList customBomAttributes;
+  for (const SExpression* node :
+       root.getChild("custom_bom_attributes").getChildren("attribute")) {
+    customBomAttributes.append(node->getChild("@0").getValue());
+  }
+  if (!customBomAttributes.isEmpty()) {
+    messages.append(buildMessage(
+        Message::Severity::Note,
+        tr("The project has set custom attributes for the BOM export (%1). But "
+           "in LibrePCB 2.0, the manual BOM export has been removed in favor "
+           "of the more powerful output jobs feature. Please use output jobs "
+           "now to generate the BOM. When you add a new BOM output job, those "
+           "custom attributes will automatically be imported.")
+            .arg(customBomAttributes.join(", ")),
         1));
   }
 }
