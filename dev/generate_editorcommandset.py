@@ -194,6 +194,10 @@ def parse_cxx():
             if re.match(r'EditorCommand [^_]\w+{', line):
                 current_command = line
             elif current_command is not None:
+                if current_command.endswith('"') and line.startswith('"'):
+                    # It's a multiline string, remove quotes around newline.
+                    current_command = current_command[:-1]
+                    line = line[1:]
                 current_command += line
                 if line == '};':
                     commands.append(EditorCommand(current_command))
