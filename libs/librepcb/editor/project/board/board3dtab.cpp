@@ -221,6 +221,10 @@ void Board3dTab::deactivate() noexcept {
 
 void Board3dTab::trigger(ui::TabAction a) noexcept {
   switch (a) {
+    case ui::TabAction::BillOfMaterials: {
+      mProjectEditor.execBomReviewDialog(&mBoard);
+      break;
+    }
     case ui::TabAction::Save: {
       mProjectEditor.saveProject();
       break;

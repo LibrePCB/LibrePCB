@@ -32,7 +32,7 @@
 #include "../utils/standardeditorcommandhandler.h"
 #include "../utils/uihelpers.h"
 #include "board/boardeditor.h"
-#include "bomgeneratordialog.h"
+#include "bomreviewdialog.h"
 #include "cmd/cmdboardadd.h"
 #include "cmd/cmdboardremove.h"
 #include "cmd/cmdschematicadd.h"
@@ -277,10 +277,10 @@ void ProjectEditor::trigger(ui::ProjectAction a) noexcept {
       break;
     }
 
-    case ui::ProjectAction::ExportBom: {
-      execBomGeneratorDialog((mProject->getBoards().count() == 1)
-                                 ? mProject->getBoardByIndex(0)
-                                 : nullptr);
+    case ui::ProjectAction::BillOfMaterials: {
+      execBomReviewDialog((mProject->getBoards().count() == 1)
+                              ? mProject->getBoardByIndex(0)
+                              : nullptr);
       break;
     }
 
@@ -476,10 +476,10 @@ void ProjectEditor::execOutputJobsDialog(const QString& typeName) noexcept {
   dlg.exec();
 }
 
-void ProjectEditor::execBomGeneratorDialog(const Board* board) noexcept {
-  BomGeneratorDialog dialog(mWorkspace.getSettings(), *mProject, board,
-                            qApp->activeWindow());
-  connect(&dialog, &BomGeneratorDialog::projectSettingsModified, this,
+void ProjectEditor::execBomReviewDialog(const Board* board) noexcept {
+  BomReviewDialog dialog(mWorkspace.getSettings(), *mProject, board,
+                         qApp->activeWindow());
+  connect(&dialog, &BomReviewDialog::projectSettingsModified, this,
           &ProjectEditor::setManualModificationsMade);
   dialog.exec();
 }

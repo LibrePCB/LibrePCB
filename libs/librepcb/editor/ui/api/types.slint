@@ -612,13 +612,13 @@ export enum TabAction {
     print,
     export-image,
     export-pdf,
-    export-bom,
     export-fabrication-data,
     export-pick-place,
     export-d356-netlist,
     export-specctra,
     import-specctra,
     import-dxf,
+    bill-of-materials,
     open-datasheet,
     abort,
 
@@ -1340,7 +1340,7 @@ export struct BoardData {
 export enum ProjectAction {
     close,
     save,
-    export-bom,
+    bill-of-materials,
     export-lppz,
     open-folder,
     open-output-jobs,
