@@ -82,6 +82,7 @@ component RuleCheckListItem inherits Rectangle {
                 enabled: root.enabled && (item.action != RuleCheckMessageAction.autofix);
 
                 clicked => {
+                    model[index].action-window-id = Data.window-id;
                     model[index].action = RuleCheckMessageAction.autofix;
                 }
             }
@@ -116,6 +117,13 @@ export component RuleCheckPanel inherits Rectangle {
     property <int> selected-index: -1;
     property <RuleCheckMessageData> selected-item: model[selected-index];
     property <bool> item-selected: (selected-index >= 0) && (selected-index < model.length);
+    property <bool> zoom-to-location: {
+        if check.type == RuleCheckType.drc {
+            Data.drc-zoom-to-location
+        } else {
+            Data.erc-zoom-to-location
+        }
+    };
 
     function set-current-index(index: int, force-zoom: bool) {
         if ((index + 1) * item-height) > (view.height - view.viewport-y) {
@@ -124,7 +132,8 @@ export component RuleCheckPanel inherits Rectangle {
             view.viewport-y = -(index * item-height);
         }
         selected-index = index;
-        if Data.rule-check-zoom-to-location || force-zoom {
+        model[index].action-window-id = Data.window-id;
+        if zoom-to-location || force-zoom {
             model[index].action = RuleCheckMessageAction.highlight-and-zoom-to;
         } else {
             model[index].action = RuleCheckMessageAction.highlight;
@@ -199,16 +208,20 @@ export component RuleCheckPanel inherits Rectangle {
                     }
                 }
 
-                if check.type == RuleCheckType.drc: zoom-to-location-btn := IconButton {
+                if (check.type == RuleCheckType.erc) || (check.type == RuleCheckType.drc): zoom-to-location-btn := IconButton {
                     width: self.height;
                     icon: @image-url("../../../font-awesome/svgs/solid/location-crosshairs.svg");
                     icon-scale: 0.7;
                     tooltip: @tr("Zoom to Location");
-                    checked: Data.rule-check-zoom-to-location;
+                    checked: zoom-to-location;
                     enabled: check.state != RuleCheckState.running;
 
                     clicked => {
-                        Data.rule-check-zoom-to-location = !Data.rule-check-zoom-to-location;
+                        if check.type == RuleCheckType.drc {
+                            Data.drc-zoom-to-location = !Data.drc-zoom-to-location;
+                        } else {
+                            Data.erc-zoom-to-location = !Data.erc-zoom-to-location;
+                        }
                     }
                 }
             }

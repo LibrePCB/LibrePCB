@@ -63,7 +63,9 @@
 #include <librepcb/core/library/dev/device.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/project/erc/electricalrulecheckmessages.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/project/schematic/schematic.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <librepcb/core/workspace/workspacesettings.h>
@@ -317,9 +319,10 @@ MainWindow::MainWindow(GuiApplication& app,
     qInfo() << "Could not restore window geometry, thus maximizing.";
     mWidget->setWindowState(Qt::WindowMaximized | Qt::WindowActive);
   }
-  d.set_rule_check_zoom_to_location(
-      cs.value(mSettingsPrefix % "/rule_check_zoom_to_location", true)
-          .toBool());
+  d.set_erc_zoom_to_location(
+      cs.value(mSettingsPrefix % "/erc_zoom_to_location", true).toBool());
+  d.set_drc_zoom_to_location(
+      cs.value(mSettingsPrefix % "/drc_zoom_to_location", true).toBool());
   d.set_order_pcb_open_web_browser(
       cs.value(mSettingsPrefix % "/order_open_web_browser", true).toBool());
   const int sectionCount = cs.beginReadArray(mSettingsPrefix % "/sections");
@@ -442,6 +445,31 @@ void MainWindow::showStatusBarMessage(const QString& message, int timeoutMs) {
   }
 }
 
+void MainWindow::highlightErcMessage(
+    ProjectEditor& prjEditor, std::shared_ptr<const RuleCheckMessage> msg,
+    bool zoomTo) noexcept {
+  auto ercMsg = std::dynamic_pointer_cast<const ErcMsgBase>(msg);
+  if (!ercMsg) {
+    qCritical() << "ERC message is not derived from ErcMsgBase.";
+    return;
+  }
+  std::optional<int> schIndex;
+  for (int i = 0; i < prjEditor.getSchematics().count(); ++i) {
+    auto se = prjEditor.getSchematics().at(i);
+    if (ercMsg->getSchematic() == se->getSchematic().getUuid()) {
+      schIndex = i;
+      break;
+    }
+  }
+  if (!schIndex) {
+    qCritical() << "ERC message from unknown schematic.";
+    return;
+  }
+  if (auto tab = openSchematicTab(prjEditor.getUiIndex(), *schIndex)) {
+    tab->highlightErcMessage(ercMsg, zoomTo);
+  }
+}
+
 void MainWindow::setCurrentLibrary(int index) noexcept {
   const ui::Data& d = mWindow->global<ui::Data>();
   d.fn_set_current_library(index);
@@ -478,8 +506,10 @@ slint::CloseRequestResponse MainWindow::closeRequested() noexcept {
   QSettings cs;
   const ui::Data& d = mWindow->global<ui::Data>();
   cs.setValue(mSettingsPrefix % "/geometry", mWidget->saveGeometry());
-  cs.setValue(mSettingsPrefix % "/rule_check_zoom_to_location",
-              d.get_rule_check_zoom_to_location());
+  cs.setValue(mSettingsPrefix % "/erc_zoom_to_location",
+              d.get_erc_zoom_to_location());
+  cs.setValue(mSettingsPrefix % "/drc_zoom_to_location",
+              d.get_drc_zoom_to_location());
   cs.setValue(mSettingsPrefix % "/order_open_web_browser",
               d.get_order_pcb_open_web_browser());
   cs.beginWriteArray(mSettingsPrefix % "/sections", mSections->count());
@@ -1314,14 +1344,18 @@ void MainWindow::openDeviceTab(LibraryEditor& editor, const FilePath& fp,
   }
 }
 
-void MainWindow::openSchematicTab(int projectIndex, int index) noexcept {
-  if (!switchToProjectTab<SchematicTab>(projectIndex, index)) {
-    if (auto prjEditor = mApp.getProjects().value(projectIndex)) {
-      if (auto schEditor = prjEditor->getSchematics().value(index)) {
-        addTab(std::make_shared<SchematicTab>(mApp, *schEditor));
-      }
+std::shared_ptr<SchematicTab> MainWindow::openSchematicTab(int projectIndex,
+                                                           int index) noexcept {
+  if (auto tab = switchToProjectTab<SchematicTab>(projectIndex, index)) {
+    return tab;
+  } else if (auto prjEditor = mApp.getProjects().value(projectIndex)) {
+    if (auto schEditor = prjEditor->getSchematics().value(index)) {
+      auto tab = std::make_shared<SchematicTab>(mApp, *schEditor);
+      addTab(tab);
+      return tab;
     }
   }
+  return nullptr;
 }
 
 void MainWindow::openBoard2dTab(int projectIndex, int index) noexcept {
@@ -1371,13 +1405,14 @@ bool MainWindow::switchToLibraryElementTab(const FilePath& fp) noexcept {
 }
 
 template <typename T>
-bool MainWindow::switchToProjectTab(int prjIndex, int objIndex) noexcept {
+std::shared_ptr<T> MainWindow::switchToProjectTab(int prjIndex,
+                                                  int objIndex) noexcept {
   for (auto section : *mSections) {
-    if (section->switchToProjectTab<T>(prjIndex, objIndex)) {
-      return true;
+    if (auto tab = section->switchToProjectTab<T>(prjIndex, objIndex)) {
+      return tab;
     }
   }
-  return false;
+  return nullptr;
 }
 
 /*******************************************************************************

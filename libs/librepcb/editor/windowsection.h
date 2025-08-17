@@ -110,18 +110,18 @@ public:
   }
 
   template <typename T>
-  bool switchToProjectTab(int prjIndex, int objIndex) noexcept {
+  std::shared_ptr<T> switchToProjectTab(int prjIndex, int objIndex) noexcept {
     for (int i = 0; i < mTabs->count(); ++i) {
       if (auto tab = std::dynamic_pointer_cast<T>(mTabs->at(i))) {
         if ((tab->getProjectIndex() == prjIndex) &&
             (tab->getProjectObjectIndex() == objIndex)) {
           setCurrentTab(i);
           highlight();
-          return true;
+          return tab;
         }
       }
     }
-    return false;
+    return nullptr;
   }
 
   /**

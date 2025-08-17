@@ -179,6 +179,7 @@ ProjectEditor::ProjectEditor(
   connect(mUndoStack.get(), &UndoStack::stateModified, this, [this]() {
     scheduleErcRun();
     onUiDataChanged.notify();
+    emit ercMarkersInvalidated();
   });
 
   // Setup delay timer for ERC to avoid extensive CPU load.
@@ -761,6 +762,10 @@ void ProjectEditor::runErc() noexcept {
               mProject.get(), &Project::setErcMessageApproved);
       connect(mErcMessages.get(), &RuleCheckMessagesModel::approvalChanged,
               this, &ProjectEditor::setManualModificationsMade);
+      connect(mErcMessages.get(), &RuleCheckMessagesModel::highlightRequested,
+              this, &ProjectEditor::ercMarkersInvalidated);
+      connect(mErcMessages.get(), &RuleCheckMessagesModel::highlightRequested,
+              this, &ProjectEditor::ercMessageHighlightRequested);
     }
     mErcMessages->setMessages(messages, approvals);
     mErcExecutionError.clear();

@@ -24,8 +24,11 @@
  *  Includes
  ******************************************************************************/
 #include "../../rulecheck/rulecheckmessage.h"
+#include "../../types/uuid.h"
 
 #include <QtCore>
+
+#include <optional>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -37,9 +40,55 @@ class ComponentSignalInstance;
 class ComponentSymbolVariantItem;
 class NetClass;
 class NetSignal;
+class SI_NetLine;
 class SI_NetPoint;
 class SI_NetSegment;
+class SI_Symbol;
 class SI_SymbolPin;
+
+/*******************************************************************************
+ *  Class ErcMsgBase
+ ******************************************************************************/
+
+/**
+ * @brief Base class for all ERC messages
+ *
+ * Provides the functionality for the "go to problem" feature for all ERC
+ * messages. Constructors of derived classes can just call one of the
+ * #setLocation() methods to specify the location of the problem.
+ */
+class ErcMsgBase : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(ErcMsgBase)
+
+public:
+  // Constructors / Destructor
+  ErcMsgBase() = delete;
+  explicit ErcMsgBase(Severity severity, const QString& msg,
+                      const QString& description,
+                      const QString& approvalName) noexcept
+    : RuleCheckMessage(severity, msg, description, approvalName),
+      mSchematic() {}
+  ErcMsgBase(const ErcMsgBase& other) noexcept
+    : RuleCheckMessage(other), mSchematic(other.mSchematic) {}
+  virtual ~ErcMsgBase() noexcept {}
+
+  // Getters
+  const std::optional<Uuid>& getSchematic() const noexcept {
+    return mSchematic;
+  }
+
+protected:
+  bool setLocation(const NetSignal& net) noexcept;
+  bool setLocation(const ComponentInstance& component) noexcept;
+  bool setLocation(const ComponentSignalInstance& signal) noexcept;
+  void setLocation(const SI_Symbol& symbol) noexcept;
+  void setLocation(const SI_SymbolPin& pin) noexcept;
+  bool setLocation(const SI_NetSegment& segment) noexcept;
+  void setLocation(const SI_NetPoint& netPoint) noexcept;
+  void setLocation(const SI_NetLine& netLine) noexcept;
+
+  std::optional<Uuid> mSchematic;
+};
 
 /*******************************************************************************
  *  Class ErcMsgUnusedNetClass
@@ -48,7 +97,7 @@ class SI_SymbolPin;
 /**
  * @brief The ErcMsgUnusedNetClass class
  */
-class ErcMsgUnusedNetClass final : public RuleCheckMessage {
+class ErcMsgUnusedNetClass final : public ErcMsgBase {
   Q_DECLARE_TR_FUNCTIONS(ErcMsgUnusedNetClass)
 
 public:
@@ -56,7 +105,7 @@ public:
   ErcMsgUnusedNetClass() = delete;
   explicit ErcMsgUnusedNetClass(const NetClass& netClass) noexcept;
   ErcMsgUnusedNetClass(const ErcMsgUnusedNetClass& other) noexcept
-    : RuleCheckMessage(other) {}
+    : ErcMsgBase(other) {}
   virtual ~ErcMsgUnusedNetClass() noexcept {}
 };
 
@@ -67,15 +116,14 @@ public:
 /**
  * @brief The ErcMsgOpenNet class
  */
-class ErcMsgOpenNet final : public RuleCheckMessage {
+class ErcMsgOpenNet final : public ErcMsgBase {
   Q_DECLARE_TR_FUNCTIONS(ErcMsgOpenNet)
 
 public:
   // Constructors / Destructor
   ErcMsgOpenNet() = delete;
   explicit ErcMsgOpenNet(const NetSignal& net) noexcept;
-  ErcMsgOpenNet(const ErcMsgOpenNet& other) noexcept
-    : RuleCheckMessage(other) {}
+  ErcMsgOpenNet(const ErcMsgOpenNet& other) noexcept : ErcMsgBase(other) {}
   virtual ~ErcMsgOpenNet() noexcept {}
 };
 
@@ -86,15 +134,16 @@ public:
 /**
  * @brief The ErcMsgOpenWireInSegment class
  */
-class ErcMsgOpenWireInSegment final : public RuleCheckMessage {
+class ErcMsgOpenWireInSegment final : public ErcMsgBase {
   Q_DECLARE_TR_FUNCTIONS(ErcMsgOpenWireInSegment)
 
 public:
   // Constructors / Destructor
   ErcMsgOpenWireInSegment() = delete;
-  explicit ErcMsgOpenWireInSegment(const SI_NetSegment& segment) noexcept;
+  explicit ErcMsgOpenWireInSegment(const SI_NetSegment& segment,
+                                   const SI_NetLine& openWire) noexcept;
   ErcMsgOpenWireInSegment(const ErcMsgOpenWireInSegment& other) noexcept
-    : RuleCheckMessage(other) {}
+    : ErcMsgBase(other) {}
   virtual ~ErcMsgOpenWireInSegment() noexcept {}
 };
 
@@ -105,7 +154,7 @@ public:
 /**
  * @brief The ErcMsgUnconnectedRequiredSignal class
  */
-class ErcMsgUnconnectedRequiredSignal final : public RuleCheckMessage {
+class ErcMsgUnconnectedRequiredSignal final : public ErcMsgBase {
   Q_DECLARE_TR_FUNCTIONS(ErcMsgUnconnectedRequiredSignal)
 
 public:
@@ -115,7 +164,7 @@ public:
       const ComponentSignalInstance& signal) noexcept;
   ErcMsgUnconnectedRequiredSignal(
       const ErcMsgUnconnectedRequiredSignal& other) noexcept
-    : RuleCheckMessage(other) {}
+    : ErcMsgBase(other) {}
   virtual ~ErcMsgUnconnectedRequiredSignal() noexcept {}
 };
 
@@ -126,7 +175,7 @@ public:
 /**
  * @brief The ErcMsgForcedNetSignalNameConflict class
  */
-class ErcMsgForcedNetSignalNameConflict final : public RuleCheckMessage {
+class ErcMsgForcedNetSignalNameConflict final : public ErcMsgBase {
   Q_DECLARE_TR_FUNCTIONS(ErcMsgForcedNetSignalNameConflict)
 
 public:
@@ -136,7 +185,7 @@ public:
       const ComponentSignalInstance& signal) noexcept;
   ErcMsgForcedNetSignalNameConflict(
       const ErcMsgForcedNetSignalNameConflict& other) noexcept
-    : RuleCheckMessage(other) {}
+    : ErcMsgBase(other) {}
   virtual ~ErcMsgForcedNetSignalNameConflict() noexcept {}
 
 private:
@@ -150,7 +199,7 @@ private:
 /**
  * @brief The ErcMsgUnplacedRequiredGate class
  */
-class ErcMsgUnplacedRequiredGate final : public RuleCheckMessage {
+class ErcMsgUnplacedRequiredGate final : public ErcMsgBase {
   Q_DECLARE_TR_FUNCTIONS(ErcMsgUnplacedRequiredSymbol)
 
 public:
@@ -160,7 +209,7 @@ public:
       const ComponentInstance& component,
       const ComponentSymbolVariantItem& gate) noexcept;
   ErcMsgUnplacedRequiredGate(const ErcMsgUnplacedRequiredGate& other) noexcept
-    : RuleCheckMessage(other) {}
+    : ErcMsgBase(other) {}
   virtual ~ErcMsgUnplacedRequiredGate() noexcept {}
 };
 
@@ -171,7 +220,7 @@ public:
 /**
  * @brief The ErcMsgUnplacedOptionalGate class
  */
-class ErcMsgUnplacedOptionalGate final : public RuleCheckMessage {
+class ErcMsgUnplacedOptionalGate final : public ErcMsgBase {
   Q_DECLARE_TR_FUNCTIONS(ErcMsgUnplacedOptionalSymbol)
 
 public:
@@ -181,7 +230,7 @@ public:
       const ComponentInstance& component,
       const ComponentSymbolVariantItem& gate) noexcept;
   ErcMsgUnplacedOptionalGate(const ErcMsgUnplacedOptionalGate& other) noexcept
-    : RuleCheckMessage(other) {}
+    : ErcMsgBase(other) {}
   virtual ~ErcMsgUnplacedOptionalGate() noexcept {}
 };
 
@@ -192,7 +241,7 @@ public:
 /**
  * @brief The ErcMsgConnectedPinWithoutWire class
  */
-class ErcMsgConnectedPinWithoutWire final : public RuleCheckMessage {
+class ErcMsgConnectedPinWithoutWire final : public ErcMsgBase {
   Q_DECLARE_TR_FUNCTIONS(ErcMsgConnectedPinWithoutWire)
 
 public:
@@ -201,7 +250,7 @@ public:
   explicit ErcMsgConnectedPinWithoutWire(const SI_SymbolPin& pin) noexcept;
   ErcMsgConnectedPinWithoutWire(
       const ErcMsgConnectedPinWithoutWire& other) noexcept
-    : RuleCheckMessage(other) {}
+    : ErcMsgBase(other) {}
   virtual ~ErcMsgConnectedPinWithoutWire() noexcept {}
 };
 
@@ -212,7 +261,7 @@ public:
 /**
  * @brief The ErcMsgUnconnectedJunction class
  */
-class ErcMsgUnconnectedJunction final : public RuleCheckMessage {
+class ErcMsgUnconnectedJunction final : public ErcMsgBase {
   Q_DECLARE_TR_FUNCTIONS(ErcMsgUnconnectedJunction)
 
 public:
@@ -220,7 +269,7 @@ public:
   ErcMsgUnconnectedJunction() = delete;
   explicit ErcMsgUnconnectedJunction(const SI_NetPoint& netPoint) noexcept;
   ErcMsgUnconnectedJunction(const ErcMsgUnconnectedJunction& other) noexcept
-    : RuleCheckMessage(other) {}
+    : ErcMsgBase(other) {}
   virtual ~ErcMsgUnconnectedJunction() noexcept {}
 };
 

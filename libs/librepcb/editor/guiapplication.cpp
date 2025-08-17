@@ -541,6 +541,8 @@ std::shared_ptr<ProjectEditor> GuiApplication::openProject(
         *this, std::move(project), index, loader.getUpgradeMessages());
     connect(editor.get(), &ProjectEditor::statusBarMessageChanged, this,
             &GuiApplication::statusBarMessageChanged);
+    connect(editor.get(), &ProjectEditor::ercMessageHighlightRequested, this,
+            &GuiApplication::highlightErcMessage);
     connect(editor.get(), &ProjectEditor::projectLibraryUpdaterRequested, this,
             &GuiApplication::openProjectLibraryUpdater);
     mProjects->append(editor);
@@ -899,6 +901,21 @@ void GuiApplication::openProjectLibraryUpdater(
         [this](const FilePath& fp) { openProject(fp, qApp->activeWindow()); });
   }
   mProjectLibraryUpdater->show();
+}
+
+void GuiApplication::highlightErcMessage(
+    std::shared_ptr<const RuleCheckMessage> msg, bool zoomTo,
+    int windowId) noexcept {
+  ProjectEditor* prjEditor = dynamic_cast<ProjectEditor*>(sender());
+  if (!prjEditor) {
+    qCritical() << "Signal from unknown ProjectEditor.";
+    return;
+  }
+  if (auto win = getWindowById(windowId)) {
+    win->highlightErcMessage(*prjEditor, msg, zoomTo);
+  } else {
+    qCritical() << "Unknown window ID:" << windowId;
+  }
 }
 
 std::shared_ptr<MainWindow> GuiApplication::getCurrentWindow() noexcept {
