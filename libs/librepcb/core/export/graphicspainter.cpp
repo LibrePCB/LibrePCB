@@ -183,6 +183,27 @@ void GraphicsPainter::drawText(const Point& position, const Angle& rotation,
   mPainter.restore();
 }
 
+void GraphicsPainter::drawImage(
+    const Point& position, const Angle& rotation, const QImage& image,
+    const PositiveLength& width, const PositiveLength& height,
+    const std::optional<UnsignedLength>& borderWidth,
+    const QColor& borderColor) noexcept {
+  const QRectF imageRect(0, -height->toPx(), width->toPx(), height->toPx());
+
+  mPainter.save();
+  mPainter.translate(position.toPxQPointF());
+  mPainter.rotate(-rotation.toDeg());
+  mPainter.drawImage(imageRect, image, QRectF(image.rect()));
+  if (borderWidth && (borderColor != Qt::transparent)) {
+    mPainter.setBrush(Qt::NoBrush);
+    mPainter.setPen(QPen(borderColor, getPenWidthPx(**borderWidth),
+                         Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    const qreal m = (*borderWidth)->toPx() / 2;
+    mPainter.drawRect(imageRect.adjusted(-m, -m, m, m));
+  }
+  mPainter.restore();
+}
+
 void GraphicsPainter::drawSymbolPin(const Point& position,
                                     const Angle& rotation, const Length& length,
                                     const QColor& lineColor,

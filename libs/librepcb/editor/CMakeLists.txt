@@ -21,6 +21,12 @@ add_library(
   cmd/cmdcircleedit.h
   cmd/cmdholeedit.cpp
   cmd/cmdholeedit.h
+  cmd/cmdimageadd.cpp
+  cmd/cmdimageadd.h
+  cmd/cmdimageedit.cpp
+  cmd/cmdimageedit.h
+  cmd/cmdimageremove.cpp
+  cmd/cmdimageremove.h
   cmd/cmdlistelementinsert.h
   cmd/cmdlistelementremove.h
   cmd/cmdlistelementsswap.h
@@ -87,6 +93,8 @@ add_library(
   graphics/graphicsscene.h
   graphics/holegraphicsitem.cpp
   graphics/holegraphicsitem.h
+  graphics/imagegraphicsitem.cpp
+  graphics/imagegraphicsitem.h
   graphics/linegraphicsitem.cpp
   graphics/linegraphicsitem.h
   graphics/origincrossgraphicsitem.cpp
@@ -334,6 +342,8 @@ add_library(
   library/sym/fsm/symboleditorfsmadapter.h
   library/sym/fsm/symboleditorstate.cpp
   library/sym/fsm/symboleditorstate.h
+  library/sym/fsm/symboleditorstate_addimage.cpp
+  library/sym/fsm/symboleditorstate_addimage.h
   library/sym/fsm/symboleditorstate_addnames.cpp
   library/sym/fsm/symboleditorstate_addnames.h
   library/sym/fsm/symboleditorstate_addpins.cpp
@@ -631,6 +641,10 @@ add_library(
   project/cmd/cmdschematicadd.h
   project/cmd/cmdschematicedit.cpp
   project/cmd/cmdschematicedit.h
+  project/cmd/cmdschematicimageadd.cpp
+  project/cmd/cmdschematicimageadd.h
+  project/cmd/cmdschematicimageremove.cpp
+  project/cmd/cmdschematicimageremove.h
   project/cmd/cmdschematicnetlabeladd.cpp
   project/cmd/cmdschematicnetlabeladd.h
   project/cmd/cmdschematicnetlabeledit.cpp
@@ -749,6 +763,8 @@ add_library(
   project/schematic/fsm/schematiceditorstate.h
   project/schematic/fsm/schematiceditorstate_addcomponent.cpp
   project/schematic/fsm/schematiceditorstate_addcomponent.h
+  project/schematic/fsm/schematiceditorstate_addimage.cpp
+  project/schematic/fsm/schematiceditorstate_addimage.h
   project/schematic/fsm/schematiceditorstate_addnetlabel.cpp
   project/schematic/fsm/schematiceditorstate_addnetlabel.h
   project/schematic/fsm/schematiceditorstate_addtext.cpp
@@ -804,6 +820,8 @@ add_library(
   utils/dismissablemessagecontext.h
   utils/editortoolbox.cpp
   utils/editortoolbox.h
+  utils/imagehelpers.cpp
+  utils/imagehelpers.h
   utils/lengtheditcontext.cpp
   utils/lengtheditcontext.h
   utils/measuretool.cpp

@@ -27,6 +27,8 @@
 
 #include <QtCore>
 
+#include <optional>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -66,7 +68,10 @@ public:
   FileFormatMigrationV1& operator=(const FileFormatMigrationV1& rhs) = delete;
 
 protected:
+  virtual void upgradeMetadata(SExpression& root, QList<Message>& messages);
   virtual void upgradeOutputJobs(SExpression& root);
+  virtual void upgradeCircuit(SExpression& root, QList<Message>& messages);
+  virtual std::optional<QString> upgradeFileProofName(QString name);
 };
 
 /*******************************************************************************

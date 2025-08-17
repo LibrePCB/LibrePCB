@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "symboleditorstate_select.h"
 
+#include "../../../cmd/cmdimageedit.h"
 #include "../../../cmd/cmdpolygonedit.h"
 #include "../../../dialogs/circlepropertiesdialog.h"
 #include "../../../dialogs/dxfimportdialog.h"
@@ -29,9 +30,11 @@
 #include "../../../dialogs/textpropertiesdialog.h"
 #include "../../../editorcommandset.h"
 #include "../../../graphics/circlegraphicsitem.h"
+#include "../../../graphics/imagegraphicsitem.h"
 #include "../../../graphics/polygongraphicsitem.h"
 #include "../../../graphics/textgraphicsitem.h"
 #include "../../../undostack.h"
+#include "../../../utils/imagehelpers.h"
 #include "../../../utils/menubuilder.h"
 #include "../../cmd/cmddragselectedsymbolitems.h"
 #include "../../cmd/cmdpastesymbolitems.h"
@@ -65,7 +68,8 @@ SymbolEditorState_Select::SymbolEditorState_Select(
     mStartPos(),
     mSelectedPolygon(nullptr),
     mSelectedPolygonVertices(),
-    mCmdPolygonEdit() {
+    mCmdPolygonEdit(),
+    mSelectedImageAspectRatio(1) {
 }
 
 SymbolEditorState_Select::~SymbolEditorState_Select() noexcept {
@@ -158,6 +162,29 @@ bool SymbolEditorState_Select::processGraphicsSceneMouseMoved(
       mCmdPolygonEdit->setPath(Path(vertices), true);
       return true;
     }
+    case SubState::RESIZING_IMAGE: {
+      if (!mSelectedImage) {
+        return false;
+      }
+      if (!mCmdImageEdit) {
+        mCmdImageEdit.reset(new CmdImageEdit(*mSelectedImage));
+        scheduleUpdateAvailableFeatures();
+      }
+      if (!e.modifiers.testFlag(Qt::ShiftModifier)) {
+        currentPos.mapToGrid(getGridInterval());
+      }
+      const Point relPos = currentPos.rotated(-mSelectedImage->getRotation(),
+                                              mSelectedImage->getPosition()) -
+          mSelectedImage->getPosition();
+      const Length width = relPos.getX();
+      const Length height =
+          Length::fromMm(width.toMm() / mSelectedImageAspectRatio);
+      if ((width > 0) && (height > 0)) {
+        mCmdImageEdit->setWidth(PositiveLength(width), true);
+        mCmdImageEdit->setHeight(PositiveLength(height), true);
+      }
+      return true;
+    }
     default: {
       return false;
     }
@@ -175,6 +202,8 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
           findItemsAtPosition(mStartPos);
       if (findPolygonVerticesAtPosition(mStartPos) && (!mContext.readOnly)) {
         setState(SubState::MOVING_POLYGON_VERTEX);
+      } else if (findImageHandleAtPosition(mStartPos) && (!mContext.readOnly)) {
+        setState(SubState::RESIZING_IMAGE);
       } else if (items.isEmpty()) {
         // start selecting
         clearSelectionRect(true);
@@ -280,6 +309,17 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
       if (mCmdPolygonEdit) {
         try {
           mContext.undoStack.execCmd(mCmdPolygonEdit.release());
+        } catch (const Exception& e) {
+          QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+        }
+      }
+      setState(SubState::IDLE);
+      return true;
+    }
+    case SubState::RESIZING_IMAGE: {
+      if (mCmdImageEdit) {
+        try {
+          mContext.undoStack.execCmd(mCmdImageEdit.release());
         } catch (const Exception& e) {
           QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
         }
@@ -569,6 +609,11 @@ bool SymbolEditorState_Select::processAbortCommand() noexcept {
       setState(SubState::IDLE);
       return true;
     }
+    case SubState::RESIZING_IMAGE: {
+      mCmdImageEdit.reset();
+      setState(SubState::IDLE);
+      return true;
+    }
     case SubState::PASTING: {
       try {
         mCmdDragSelectedItems.reset();
@@ -793,6 +838,18 @@ bool SymbolEditorState_Select::copySelectedItemsToClipboard() noexcept {
       Q_ASSERT(text);
       data.getTexts().append(std::make_shared<Text>(text->getObj()));
     }
+    std::unique_ptr<TransactionalDirectory> dir = data.getDirectory();
+    foreach (const std::shared_ptr<ImageGraphicsItem>& image,
+             item->getSelectedImages()) {
+      Q_ASSERT(image);
+      const QString fileName = *image->getObj()->getFileName();
+      const QByteArray content =
+          mContext.symbol.getDirectory().readIfExists(fileName);
+      if (!content.isNull()) {
+        dir->write(fileName, content);
+      }
+      data.getImages().append(std::make_shared<Image>(*image->getObj()));
+    }
     if (data.getItemCount() > 0) {
       qApp->clipboard()->setMimeData(data.toMimeData().release());
       mAdapter.fsmSetStatusBarMessage(tr("Copied to clipboard!"), 2000);
@@ -1011,6 +1068,26 @@ bool SymbolEditorState_Select::findPolygonVerticesAtPosition(
   return false;
 }
 
+bool SymbolEditorState_Select::findImageHandleAtPosition(
+    const Point& pos) noexcept {
+  SymbolGraphicsItem* item = getGraphicsItem();
+  if (!item) return false;
+
+  for (auto ptr : mContext.symbol.getImages().values()) {
+    auto graphicsItem = item->getGraphicsItem(ptr);
+    if (graphicsItem && graphicsItem->isSelected() &&
+        graphicsItem->isResizeHandleAtPosition(pos)) {
+      mSelectedImage = ptr;
+      mSelectedImageAspectRatio =
+          ptr->getWidth()->toMm() / ptr->getHeight()->toMm();
+      return true;
+    }
+  }
+
+  mSelectedImage.reset();
+  return false;
+}
+
 void SymbolEditorState_Select::setState(SubState state) noexcept {
   if (state != mState) {
     mState = state;
@@ -1030,7 +1107,8 @@ SymbolEditorFsmAdapter::Features
     features |= SymbolEditorFsmAdapter::Feature::Select;
     if (!mContext.readOnly) {
       features |= SymbolEditorFsmAdapter::Feature::ImportGraphics;
-      if (SymbolClipboardData::isValid(qApp->clipboard()->mimeData())) {
+      if (SymbolClipboardData::isValid(qApp->clipboard()->mimeData()) ||
+          ImageHelpers::isImageInClipboard()) {
         features |= SymbolEditorFsmAdapter::Feature::Paste;
       }
     }

@@ -49,6 +49,7 @@ SymbolCheck::~SymbolCheck() noexcept {
 
 RuleCheckMessageList SymbolCheck::runChecks() const {
   RuleCheckMessageList msgs = LibraryElementCheck::runChecks();
+  checkInvalidImageFiles(msgs);
   checkDuplicatePinNames(msgs);
   checkPinNamesInversionSign(msgs);
   checkOffTheGridPins(msgs);
@@ -62,6 +63,49 @@ RuleCheckMessageList SymbolCheck::runChecks() const {
 /*******************************************************************************
  *  Protected Methods
  ******************************************************************************/
+
+void SymbolCheck::checkInvalidImageFiles(MsgList& msgs) const {
+  using Error = MsgInvalidImageFile::Error;
+  typedef std::optional<std::pair<Error, QString>> Result;
+
+  auto getError = [this](const Image& image) {
+    try {
+      if (!mSymbol.getDirectory().fileExists(*image.getFileName())) {
+        return std::make_optional(
+            std::make_pair(Error::FileMissing, QString()));
+      }
+      const QByteArray content =
+          mSymbol.getDirectory().read(*image.getFileName());  // can throw
+      QString error = "Unknown error.";
+      if (Image::tryLoad(content, image.getFileExtension(), &error)) {
+        return Result();  // Success.
+      } else if (!Image::getSupportedExtensions().contains(
+                     image.getFileExtension())) {
+        return std::make_optional(
+            std::make_pair(Error::UnsupportedFormat, error));
+      } else {
+        return std::make_optional(std::make_pair(Error::ImageLoadError, error));
+      }
+    } catch (const Exception& e) {
+      return std::make_optional(
+          std::make_pair(Error::FileReadError, e.getMsg()));
+    }
+  };
+
+  // Emit the warning only once per filename.
+  QMap<QString, Result> errors;
+  for (const Image& image : mSymbol.getImages()) {
+    if (!errors.contains(*image.getFileName())) {
+      errors.insert(*image.getFileName(), getError(image));
+    }
+  }
+  for (auto it = errors.begin(); it != errors.end(); it++) {
+    if (it.value()) {
+      msgs.append(std::make_shared<MsgInvalidImageFile>(
+          it.key(), it.value()->first, it.value()->second));
+    }
+  }
+}
 
 void SymbolCheck::checkDuplicatePinNames(MsgList& msgs) const {
   QSet<CircuitIdentifier> pinNames;

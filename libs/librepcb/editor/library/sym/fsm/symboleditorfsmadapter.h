@@ -38,6 +38,7 @@ namespace editor {
 
 class GraphicsScene;
 class SymbolEditorState;
+class SymbolEditorState_AddImage;
 class SymbolEditorState_AddNames;
 class SymbolEditorState_AddPins;
 class SymbolEditorState_AddValues;
@@ -102,6 +103,7 @@ public:
   virtual void fsmToolEnter(SymbolEditorState_AddNames& state) noexcept = 0;
   virtual void fsmToolEnter(SymbolEditorState_AddValues& state) noexcept = 0;
   virtual void fsmToolEnter(SymbolEditorState_DrawText& state) noexcept = 0;
+  virtual void fsmToolEnter(SymbolEditorState_AddImage& state) noexcept = 0;
   virtual void fsmToolEnter(SymbolEditorState_AddPins& state) noexcept = 0;
   virtual void fsmToolEnter(SymbolEditorState_Measure& state) noexcept = 0;
 };

@@ -136,6 +136,7 @@ public:
   void fsmToolEnter(SchematicEditorState_AddComponent& state) noexcept override;
   void fsmToolEnter(SchematicEditorState_DrawPolygon& state) noexcept override;
   void fsmToolEnter(SchematicEditorState_AddText& state) noexcept override;
+  void fsmToolEnter(SchematicEditorState_AddImage& state) noexcept override;
   void fsmToolEnter(SchematicEditorState_Measure& state) noexcept override;
 
   // Operator Overloadings

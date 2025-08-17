@@ -47,14 +47,17 @@ Symbol::Symbol(const Uuid& uuid, const Version& version, const QString& author,
     mPolygons(),
     mCircles(),
     mTexts(),
+    mImages(),
     mPinsEditedSlot(*this, &Symbol::pinsEdited),
     mPolygonsEditedSlot(*this, &Symbol::polygonsEdited),
     mCirclesEditedSlot(*this, &Symbol::circlesEdited),
-    mTextsEditedSlot(*this, &Symbol::textsEdited) {
+    mTextsEditedSlot(*this, &Symbol::textsEdited),
+    mImagesEditedSlot(*this, &Symbol::imagesEdited) {
   mPins.onEdited.attach(mPinsEditedSlot);
   mPolygons.onEdited.attach(mPolygonsEditedSlot);
   mCircles.onEdited.attach(mCirclesEditedSlot);
   mTexts.onEdited.attach(mTextsEditedSlot);
+  mImages.onEdited.attach(mImagesEditedSlot);
 }
 
 Symbol::Symbol(std::unique_ptr<TransactionalDirectory> directory,
@@ -68,14 +71,17 @@ Symbol::Symbol(std::unique_ptr<TransactionalDirectory> directory,
     mPolygons(root),
     mCircles(root),
     mTexts(root),
+    mImages(root),
     mPinsEditedSlot(*this, &Symbol::pinsEdited),
     mPolygonsEditedSlot(*this, &Symbol::polygonsEdited),
     mCirclesEditedSlot(*this, &Symbol::circlesEdited),
-    mTextsEditedSlot(*this, &Symbol::textsEdited) {
+    mTextsEditedSlot(*this, &Symbol::textsEdited),
+    mImagesEditedSlot(*this, &Symbol::imagesEdited) {
   mPins.onEdited.attach(mPinsEditedSlot);
   mPolygons.onEdited.attach(mPolygonsEditedSlot);
   mCircles.onEdited.attach(mCirclesEditedSlot);
   mTexts.onEdited.attach(mTextsEditedSlot);
+  mImages.onEdited.attach(mImagesEditedSlot);
 }
 
 Symbol::~Symbol() noexcept {
@@ -87,7 +93,7 @@ Symbol::~Symbol() noexcept {
 
 bool Symbol::isEmpty() const noexcept {
   return mPins.isEmpty() && mPolygons.isEmpty() && mCircles.isEmpty() &&
-      mTexts.isEmpty();
+      mTexts.isEmpty() && mImages.isEmpty();
 }
 
 RuleCheckMessageList Symbol::runChecks() const {
@@ -140,6 +146,8 @@ void Symbol::serialize(SExpression& root) const {
   root.ensureLineBreak();
   mTexts.serialize(root);
   root.ensureLineBreak();
+  mImages.serialize(root);
+  root.ensureLineBreak();
   serializeMessageApprovals(root);
   root.ensureLineBreak();
 }
@@ -186,6 +194,16 @@ void Symbol::textsEdited(const TextList& list, int index,
   Q_UNUSED(text);
   Q_UNUSED(event);
   onEdited.notify(Event::TextsEdited);
+}
+
+void Symbol::imagesEdited(const ImageList& list, int index,
+                          const std::shared_ptr<const Image>& image,
+                          ImageList::Event event) noexcept {
+  Q_UNUSED(list);
+  Q_UNUSED(index);
+  Q_UNUSED(image);
+  Q_UNUSED(event);
+  onEdited.notify(Event::ImagesEdited);
 }
 
 /*******************************************************************************

@@ -28,6 +28,7 @@
 #include "../../library/sym/symbol.h"
 #include "../../workspace/theme.h"
 #include "../circuit/netsignal.h"
+#include "items/si_image.h"
 #include "items/si_netlabel.h"
 #include "items/si_netline.h"
 #include "items/si_netpoint.h"
@@ -51,7 +52,7 @@ namespace librepcb {
  ******************************************************************************/
 
 SchematicPainter::SchematicPainter(const Schematic& schematic,
-                                   bool thumbnail) noexcept
+                                   QStringList* errors, bool thumbnail) noexcept
   : mDefaultFont(Application::getDefaultSansSerifFont()),
     mNetLabelFont(Application::getDefaultMonospaceFont()) {
   mNetLabelFont.setPixelSize(4);
@@ -89,6 +90,28 @@ SchematicPainter::SchematicPainter(const Schematic& schematic,
         mTexts.append(copy);
       }
     }
+    for (const Image& image : symbol->getLibSymbol().getImages()) {
+      try {
+        if (!sym.imageFiles.contains(*image.getFileName())) {
+          const QByteArray content = symbol->getLibSymbol().getDirectory().read(
+              *image.getFileName());  // can throw
+          QString error = "Unknown error.";
+          if (auto pix =
+                  Image::tryLoad(content, image.getFileExtension(), &error)) {
+            sym.imageFiles.insert(*image.getFileName(), *pix);
+          } else {
+            throw RuntimeError(__FILE__, __LINE__,
+                               QString("Failed to load image '%1': %2")
+                                   .arg(*image.getFileName(), error));
+          }
+        }
+        sym.images.append(image);
+      } catch (const Exception& e) {
+        if (errors) {
+          errors->append(e.getMsg());
+        }
+      }
+    }
     mSymbols.append(sym);
   }
   foreach (const SI_Polygon* polygon, schematic.getPolygons()) {
@@ -99,6 +122,29 @@ SchematicPainter::SchematicPainter(const Schematic& schematic,
       Text copy(text->getTextObj());
       copy.setText(text->getText());  // Memorize substituted text.
       mTexts.append(copy);
+    }
+  }
+  foreach (const SI_Image* image, schematic.getImages()) {
+    try {
+      const Image& img = *image->getImage();
+      if (!mImageFiles.contains(*img.getFileName())) {
+        const QByteArray content =
+            schematic.getDirectory().read(*img.getFileName());  // can throw
+        QString error = "Unknown error.";
+        if (auto pix =
+                Image::tryLoad(content, img.getFileExtension(), &error)) {
+          mImageFiles.insert(*img.getFileName(), *pix);
+        } else {
+          throw RuntimeError(__FILE__, __LINE__,
+                             QString("Failed to load image '%1': %2")
+                                 .arg(*img.getFileName(), error));
+        }
+      }
+      mImages.append(img);
+    } catch (const Exception& e) {
+      if (errors) {
+        errors->append(e.getMsg());
+      }
     }
   }
   foreach (const SI_NetSegment* segment, schematic.getNetSegments()) {
@@ -137,30 +183,75 @@ void SchematicPainter::paint(
 
   // Draw Symbols.
   foreach (const Symbol& symbol, mSymbols) {
-    // Draw grab areas first to make them appearing behind every other graphics
-    // item. Otherwise they might completely cover (hide) other items.
-    for (bool grabArea : {true, false}) {
-      // Draw Symbol Polygons.
+    // Helper to draw grab areas first to make them appearing behind every other
+    // graphics item. Otherwise they might completely cover (hide) other items.
+    // Images shall be drawn in front of filled polygons/circles, but behind
+    // non-filled polygons/circles.
+    enum class ShapeType { GrabArea, Filled, Others };
+    auto doDraw = [](ShapeType type, bool grabArea, bool filled) {
+      if (type == ShapeType::GrabArea) {
+        return grabArea && (!filled);
+      } else if (type == ShapeType::Filled) {
+        return filled;
+      } else {
+        return (!grabArea) && (!filled);
+      }
+    };
+    auto drawShapes = [&symbol, &settings, &p, &doDraw](ShapeType type) {
+      // Draw Polygons.
       foreach (const Polygon& polygon, symbol.polygons) {
-        if (polygon.isGrabArea() != grabArea) continue;
-        const QString color = polygon.getLayer().getThemeColor();
-        p.drawPolygon(symbol.transform.map(polygon.getPath()),
-                      *polygon.getLineWidth(), settings.getColor(color),
-                      settings.getFillColor(color, polygon.isFilled(),
-                                            polygon.isGrabArea()));
+        if (doDraw(type, polygon.isGrabArea(), polygon.isFilled())) {
+          const QString color = polygon.getLayer().getThemeColor();
+          p.drawPolygon(symbol.transform.map(polygon.getPath()),
+                        *polygon.getLineWidth(), settings.getColor(color),
+                        settings.getFillColor(color, polygon.isFilled(),
+                                              polygon.isGrabArea()));
+        }
       }
 
-      // Draw Symbol Circles.
+      // Draw Circles.
       foreach (const Circle& circle, symbol.circles) {
-        if (circle.isGrabArea() != grabArea) continue;
-        const QString color = circle.getLayer().getThemeColor();
-        p.drawCircle(symbol.transform.map(circle.getCenter()),
-                     *circle.getDiameter(), *circle.getLineWidth(),
-                     settings.getColor(color),
-                     settings.getFillColor(color, circle.isFilled(),
-                                           circle.isGrabArea()));
+        if (doDraw(type, circle.isGrabArea(), circle.isFilled())) {
+          const QString color = circle.getLayer().getThemeColor();
+          p.drawCircle(symbol.transform.map(circle.getCenter()),
+                       *circle.getDiameter(), *circle.getLineWidth(),
+                       settings.getColor(color),
+                       settings.getFillColor(color, circle.isFilled(),
+                                             circle.isGrabArea()));
+        }
       }
+    };
+
+    // Draw grab-area shapes.
+    drawShapes(ShapeType::GrabArea);
+
+    // Draw filled shaped.
+    drawShapes(ShapeType::Filled);
+
+    // Draw images.
+    // Note that if the symbol is mirrored, we do not mirror the image but
+    // just fit it into its mirrored bounding box because most images are
+    // not mirrorable as they might contain text. Most symbol images will
+    // probably be company logos (or other logos) anyway which are not
+    // intended to be mirrored.
+    foreach (const Image& image, symbol.images) {
+      Point pos = symbol.transform.map(image.getPosition());
+      Angle rot = symbol.transform.mapNonMirrorable(image.getRotation());
+      if (symbol.transform.getMirrored()) {
+        pos +=
+            Point(-image.getWidth(), 0)
+                .rotated(-image.getRotation() + symbol.transform.getRotation());
+        rot += Angle::deg180();
+      }
+      p.drawImage(pos, rot,
+                  settings.convertImageColors(
+                      symbol.imageFiles.value(*image.getFileName())),
+                  image.getWidth(), image.getHeight(), image.getBorderWidth(),
+                  settings.getColor(Theme::Color::sSchematicImageBorders));
     }
+
+    // Draw line shapes (no fill, no grab area).
+    drawShapes(ShapeType::Others);
 
     // Draw Symbol Pins.
     foreach (const Pin& pin, symbol.pins) {
@@ -187,6 +278,15 @@ void SchematicPainter::paint(
                  settings.getColor(Theme::Color::sSchematicPinNumbers), true,
                  false, false);
     }
+  }
+
+  // Draw Images.
+  foreach (const Image& image, mImages) {
+    p.drawImage(
+        image.getPosition(), image.getRotation(),
+        settings.convertImageColors(mImageFiles.value(*image.getFileName())),
+        image.getWidth(), image.getHeight(), image.getBorderWidth(),
+        settings.getColor(Theme::Color::sSchematicImageBorders));
   }
 
   // Draw Polygons.

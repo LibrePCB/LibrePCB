@@ -22,14 +22,17 @@
  ******************************************************************************/
 #include "schematiceditorstate_select.h"
 
+#include "../../../cmd/cmdimageedit.h"
 #include "../../../cmd/cmdpolygonedit.h"
 #include "../../../dialogs/polygonpropertiesdialog.h"
 #include "../../../dialogs/textpropertiesdialog.h"
 #include "../../../editorcommandset.h"
+#include "../../../graphics/imagegraphicsitem.h"
 #include "../../../graphics/polygongraphicsitem.h"
 #include "../../../library/sym/symbolclipboarddata.h"
 #include "../../../undostack.h"
 #include "../../../utils/editortoolbox.h"
+#include "../../../utils/imagehelpers.h"
 #include "../../../utils/menubuilder.h"
 #include "../../cmd/cmddragselectedschematicitems.h"
 #include "../../cmd/cmdpasteschematicitems.h"
@@ -46,6 +49,7 @@
 #include <librepcb/core/attribute/attributesubstitutor.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectattributelookup.h>
+#include <librepcb/core/project/schematic/items/si_image.h>
 #include <librepcb/core/project/schematic/items/si_netlabel.h>
 #include <librepcb/core/project/schematic/items/si_netpoint.h>
 #include <librepcb/core/project/schematic/items/si_polygon.h>
@@ -72,7 +76,10 @@ SchematicEditorState_Select::SchematicEditorState_Select(
     mSubState(SubState::IDLE),
     mSelectedPolygon(nullptr),
     mSelectedPolygonVertices(),
-    mCmdPolygonEdit() {
+    mCmdPolygonEdit(),
+    mSelectedImage(nullptr),
+    mSelectedImageAspectRatio(1),
+    mCmdImageEdit() {
 }
 
 SchematicEditorState_Select::~SchematicEditorState_Select() noexcept {
@@ -300,6 +307,12 @@ bool SchematicEditorState_Select::processAbortCommand() noexcept {
         mSubState = SubState::IDLE;
         return true;
       }
+      case SubState::RESIZING_IMAGE: {
+        mCmdImageEdit.reset();
+        mSelectedImage = nullptr;
+        mSubState = SubState::IDLE;
+        return true;
+      }
       default: {
         break;
       }
@@ -342,6 +355,27 @@ bool SchematicEditorState_Select::processGraphicsSceneMouseMoved(
       return true;
     }
 
+    case SubState::RESIZING_IMAGE: {
+      if (!mSelectedImage) {
+        return false;
+      }
+      Point pos = e.scenePos;
+      if (!e.modifiers.testFlag(Qt::ShiftModifier)) {
+        pos.mapToGrid(getGridInterval());
+      }
+      const Point relPos = pos.rotated(-mSelectedImage->getRotation(),
+                                       mSelectedImage->getPosition()) -
+          mSelectedImage->getPosition();
+      const Length width = relPos.getX();
+      const Length height =
+          Length::fromMm(width.toMm() / mSelectedImageAspectRatio);
+      if ((width > 0) && (height > 0)) {
+        mCmdImageEdit->setWidth(PositiveLength(width), true);
+        mCmdImageEdit->setHeight(PositiveLength(height), true);
+      }
+      return true;
+    }
+
     default:
       break;
   }
@@ -364,6 +398,10 @@ bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
       // start moving polygon vertex
       mCmdPolygonEdit.reset(new CmdPolygonEdit(mSelectedPolygon->getPolygon()));
       mSubState = SubState::MOVING_POLYGON_VERTICES;
+      return true;
+    } else if (findImageHandleAtPosition(e.scenePos)) {
+      mCmdImageEdit.reset(new CmdImageEdit(*mSelectedImage->getImage()));
+      mSubState = SubState::RESIZING_IMAGE;
       return true;
     } else {
       // handle items selection
@@ -470,6 +508,14 @@ bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
     }
     mSelectedPolygon = nullptr;
     mSelectedPolygonVertices.clear();
+    mSubState = SubState::IDLE;
+  } else if (mSubState == SubState::RESIZING_IMAGE) {
+    try {
+      mContext.undoStack.execCmd(mCmdImageEdit.release());
+    } catch (const Exception& e) {
+      QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+    }
+    mSelectedImage = nullptr;
     mSubState = SubState::IDLE;
   }
 
@@ -902,6 +948,9 @@ bool SchematicEditorState_Select::pasteFromClipboard() noexcept {
         data.reset(new SchematicClipboardData(symbolData->getSymbolUuid(),
                                               symbolData->getCursorPos(),
                                               AssemblyVariantList()));
+        std::unique_ptr<TransactionalDirectory> dir = data->getDirectory();
+        std::unique_ptr<const TransactionalDirectory> symbolDir =
+            const_cast<SymbolClipboardData&>(*symbolData).getDirectory();
         for (const auto& polygon : symbolData->getPolygons()) {
           data->getPolygons().append(std::make_shared<Polygon>(polygon));
         }
@@ -920,6 +969,11 @@ bool SchematicEditorState_Select::pasteFromClipboard() noexcept {
             copy->setText(textValue);
           }
           data->getTexts().append(copy);
+        }
+        for (const auto& image : symbolData->getImages()) {
+          dir->write(*image.getFileName(),
+                     symbolDir->read(*image.getFileName()));
+          data->getImages().append(std::make_shared<Image>(image));
         }
       }
     }
@@ -987,6 +1041,25 @@ bool SchematicEditorState_Select::findPolygonVerticesAtPosition(
   return false;
 }
 
+bool SchematicEditorState_Select::findImageHandleAtPosition(
+    const Point& pos) noexcept {
+  if (SchematicGraphicsScene* scene = getActiveSchematicScene()) {
+    for (auto it = scene->getImages().begin(); it != scene->getImages().end();
+         it++) {
+      if (it.value()->isSelected() &&
+          it.value()->isResizeHandleAtPosition(pos)) {
+        mSelectedImage = it.key();
+        mSelectedImageAspectRatio = it.key()->getImage()->getWidth()->toMm() /
+            it.key()->getImage()->getHeight()->toMm();
+        return true;
+      }
+    }
+  }
+
+  mSelectedImage = nullptr;
+  return false;
+}
+
 bool SchematicEditorState_Select::openPropertiesDialog(
     std::shared_ptr<QGraphicsItem> item) noexcept {
   if (auto symbol = std::dynamic_pointer_cast<SGI_Symbol>(item)) {
@@ -1043,9 +1116,6 @@ void SchematicEditorState_Select::scheduleUpdateAvailableFeatures() noexcept {
 }
 
 void SchematicEditorState_Select::updateAvailableFeatures() noexcept {
-  SchematicGraphicsScene* scene = getActiveSchematicScene();
-  if (!scene) return;
-
   SchematicEditorFsmAdapter::Features features;
   if (mSubState == SubState::PASTING) {
     features |= SchematicEditorFsmAdapter::Feature::Rotate;
@@ -1054,70 +1124,85 @@ void SchematicEditorState_Select::updateAvailableFeatures() noexcept {
     features |= SchematicEditorFsmAdapter::Feature::Select;
 
     if (SchematicClipboardData::isValid(qApp->clipboard()->mimeData()) ||
-        SymbolClipboardData::isValid(qApp->clipboard()->mimeData())) {
+        SymbolClipboardData::isValid(qApp->clipboard()->mimeData()) ||
+        ImageHelpers::isImageInClipboard()) {
       features |= SchematicEditorFsmAdapter::Feature::Paste;
     }
 
-    SchematicSelectionQuery query(*scene);
-    query.addSelectedSymbols();
-    query.addSelectedNetPoints();
-    query.addSelectedNetLines();
-    query.addSelectedNetLabels();
-    query.addSelectedPolygons();
-    query.addSelectedSchematicTexts();
-    query.addSelectedSymbolTexts();
-    if (!query.isResultEmpty()) {
-      features |= SchematicEditorFsmAdapter::Feature::Cut;
-      features |= SchematicEditorFsmAdapter::Feature::Copy;
-      features |= SchematicEditorFsmAdapter::Feature::Remove;
-      features |= SchematicEditorFsmAdapter::Feature::Rotate;
-      features |= SchematicEditorFsmAdapter::Feature::Mirror;
-    }
-    if (!query.getSymbols().isEmpty()) {
-      features |= SchematicEditorFsmAdapter::Feature::ResetTexts;
-    }
-    if ((!query.getSymbols().isEmpty()) || (!query.getNetLabels().isEmpty()) ||
-        (!query.getPolygons().isEmpty()) || (!query.getTexts().isEmpty())) {
-      features |= SchematicEditorFsmAdapter::Feature::Properties;
-    }
-    foreach (auto ptr, query.getSymbols()) {
-      if (features.testFlag(SchematicEditorFsmAdapter::Feature::SnapToGrid)) {
-        break;
+    // Note: Also update features if the tab is not opened currently, as
+    // clipboard changes can happen at any time.
+    if (SchematicGraphicsScene* scene = getActiveSchematicScene()) {
+      SchematicSelectionQuery query(*scene);
+      query.addSelectedSymbols();
+      query.addSelectedNetPoints();
+      query.addSelectedNetLines();
+      query.addSelectedNetLabels();
+      query.addSelectedPolygons();
+      query.addSelectedSchematicTexts();
+      query.addSelectedSymbolTexts();
+      query.addSelectedImages();
+      if (!query.isResultEmpty()) {
+        features |= SchematicEditorFsmAdapter::Feature::Cut;
+        features |= SchematicEditorFsmAdapter::Feature::Copy;
+        features |= SchematicEditorFsmAdapter::Feature::Remove;
+        features |= SchematicEditorFsmAdapter::Feature::Rotate;
+        features |= SchematicEditorFsmAdapter::Feature::Mirror;
       }
-      if (!ptr->getPosition().isOnGrid(getGridInterval())) {
-        features |= SchematicEditorFsmAdapter::Feature::SnapToGrid;
+      if (!query.getSymbols().isEmpty()) {
+        features |= SchematicEditorFsmAdapter::Feature::ResetTexts;
       }
-    }
-    foreach (auto ptr, query.getNetPoints()) {
-      if (features.testFlag(SchematicEditorFsmAdapter::Feature::SnapToGrid)) {
-        break;
+      if ((!query.getSymbols().isEmpty()) ||
+          (!query.getNetLabels().isEmpty()) ||
+          (!query.getPolygons().isEmpty()) || (!query.getTexts().isEmpty())) {
+        features |= SchematicEditorFsmAdapter::Feature::Properties;
       }
-      if (!ptr->getPosition().isOnGrid(getGridInterval())) {
-        features |= SchematicEditorFsmAdapter::Feature::SnapToGrid;
+      foreach (auto ptr, query.getSymbols()) {
+        if (features.testFlag(SchematicEditorFsmAdapter::Feature::SnapToGrid)) {
+          break;
+        }
+        if (!ptr->getPosition().isOnGrid(getGridInterval())) {
+          features |= SchematicEditorFsmAdapter::Feature::SnapToGrid;
+        }
       }
-    }
-    foreach (auto ptr, query.getNetLabels()) {
-      if (features.testFlag(SchematicEditorFsmAdapter::Feature::SnapToGrid)) {
-        break;
+      foreach (auto ptr, query.getNetPoints()) {
+        if (features.testFlag(SchematicEditorFsmAdapter::Feature::SnapToGrid)) {
+          break;
+        }
+        if (!ptr->getPosition().isOnGrid(getGridInterval())) {
+          features |= SchematicEditorFsmAdapter::Feature::SnapToGrid;
+        }
       }
-      if (!ptr->getPosition().isOnGrid(getGridInterval())) {
-        features |= SchematicEditorFsmAdapter::Feature::SnapToGrid;
+      foreach (auto ptr, query.getNetLabels()) {
+        if (features.testFlag(SchematicEditorFsmAdapter::Feature::SnapToGrid)) {
+          break;
+        }
+        if (!ptr->getPosition().isOnGrid(getGridInterval())) {
+          features |= SchematicEditorFsmAdapter::Feature::SnapToGrid;
+        }
       }
-    }
-    foreach (auto ptr, query.getPolygons()) {
-      if (features.testFlag(SchematicEditorFsmAdapter::Feature::SnapToGrid)) {
-        break;
+      foreach (auto ptr, query.getPolygons()) {
+        if (features.testFlag(SchematicEditorFsmAdapter::Feature::SnapToGrid)) {
+          break;
+        }
+        if (!ptr->getPolygon().getPath().isOnGrid(getGridInterval())) {
+          features |= SchematicEditorFsmAdapter::Feature::SnapToGrid;
+        }
       }
-      if (!ptr->getPolygon().getPath().isOnGrid(getGridInterval())) {
-        features |= SchematicEditorFsmAdapter::Feature::SnapToGrid;
+      foreach (auto ptr, query.getTexts()) {
+        if (features.testFlag(SchematicEditorFsmAdapter::Feature::SnapToGrid)) {
+          break;
+        }
+        if (!ptr->getPosition().isOnGrid(getGridInterval())) {
+          features |= SchematicEditorFsmAdapter::Feature::SnapToGrid;
+        }
       }
-    }
-    foreach (auto ptr, query.getTexts()) {
-      if (features.testFlag(SchematicEditorFsmAdapter::Feature::SnapToGrid)) {
-        break;
-      }
-      if (!ptr->getPosition().isOnGrid(getGridInterval())) {
-        features |= SchematicEditorFsmAdapter::Feature::SnapToGrid;
+      foreach (auto ptr, query.getImages()) {
+        if (features.testFlag(SchematicEditorFsmAdapter::Feature::SnapToGrid)) {
+          break;
+        }
+        if (!ptr->getPosition().isOnGrid(getGridInterval())) {
+          features |= SchematicEditorFsmAdapter::Feature::SnapToGrid;
+        }
       }
     }
   } else {

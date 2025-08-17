@@ -190,6 +190,7 @@ void GraphicsExportSettings::loadColorsFromTheme(const Theme& theme,
     addColor(Theme::Color::sSchematicValues, false);
     addColor(Theme::Color::sSchematicWires, false);
     addColor(Theme::Color::sSchematicNetLabels, false);
+    addColor(Theme::Color::sSchematicImageBorders, false);
     addColor(Theme::Color::sSchematicDocumentation, false);
     addColor(Theme::Color::sSchematicComments, false);
     addColor(Theme::Color::sSchematicGuide, false);
@@ -263,6 +264,28 @@ void GraphicsExportSettings::loadBoardRenderingColors(
   addColor(Theme::Color::sBoardLegendBot, Qt::transparent);
   addColor(Theme::Color::sBoardSolderPasteBot, Qt::darkGray);
   addColor(Theme::Color::sBoardGlueBot, QColor(200, 50, 50, 80));  // untested
+}
+
+QImage GraphicsExportSettings::convertImageColors(QImage img) const noexcept {
+  if (mBlackWhite && (img.width() > 0) && (img.height() > 0)) {
+    const bool invert = (mBackgroundColor == Qt::black);
+    const QImage::Format originalFormat = img.format();
+    img.convertTo(QImage::Format_ARGB32);
+    for (int y = 0; y < img.height(); ++y) {
+      QRgb* line = reinterpret_cast<QRgb*>(img.scanLine(y));
+      for (int x = 0; x < img.width(); ++x) {
+        QRgb& pixel = line[x];
+        int gray = qBound(0,
+                          qRound(0.299 * qRed(pixel) + 0.587 * qGreen(pixel) +
+                                 0.114 * qBlue(pixel)),
+                          255);
+        if (invert) gray = 255 - gray;
+        pixel = qRgba(gray, gray, gray, qAlpha(pixel));
+      }
+    }
+    img.convertTo(originalFormat);
+  }
+  return img;
 }
 
 /*******************************************************************************

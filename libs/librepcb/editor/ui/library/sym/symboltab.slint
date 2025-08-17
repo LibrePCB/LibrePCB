@@ -508,6 +508,16 @@ component SymbolEditorTab inherits TouchArea {
             }
         }
 
+        tool-image-btn := ToolButton {
+            cmd: Cmd.tool-image;
+            checked: tabs[index].tool == EditorTool.image;
+            enabled: !read-only;
+
+            clicked => {
+                tool-triggered(TabAction.tool-image);
+            }
+        }
+
         tool-pin-btn := ToolButton {
             cmd: Cmd.tool-pin;
             icon: @image-url("../../../../../../img/actions/add_symbol_pin.png");

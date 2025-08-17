@@ -56,6 +56,7 @@ public:
   SymbolCheck& operator=(const SymbolCheck& rhs) = delete;
 
 protected:  // Methods
+  void checkInvalidImageFiles(MsgList& msgs) const;
   void checkDuplicatePinNames(MsgList& msgs) const;
   void checkPinNamesInversionSign(MsgList& msgs) const;
   void checkOffTheGridPins(MsgList& msgs) const;

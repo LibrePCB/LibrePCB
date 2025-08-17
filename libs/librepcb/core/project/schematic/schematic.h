@@ -43,6 +43,7 @@ class NetSignal;
 class Point;
 class Project;
 class SI_Base;
+class SI_Image;
 class SI_NetLabel;
 class SI_NetLine;
 class SI_NetPoint;
@@ -70,6 +71,7 @@ class SI_Text;
  *  - polygon:          ::librepcb::SI_Polygon
  *  - circle:           TODO
  *  - text:             ::librepcb::SI_Text
+ *  - image:            ::librepcb::SI_Image
  */
 class Schematic final : public QObject {
   Q_OBJECT
@@ -87,6 +89,9 @@ public:
   Project& getProject() const noexcept { return mProject; }
   const QString& getDirectoryName() const noexcept { return mDirectoryName; }
   TransactionalDirectory& getDirectory() noexcept { return *mDirectory; }
+  const TransactionalDirectory& getDirectory() const noexcept {
+    return *mDirectory;
+  }
   bool isEmpty() const noexcept;
 
   // Getters: Attributes
@@ -128,6 +133,11 @@ public:
   void addText(SI_Text& text);
   void removeText(SI_Text& text);
 
+  // Image Methods
+  const QMap<Uuid, SI_Image*>& getImages() const noexcept { return mImages; }
+  void addImage(SI_Image& image);
+  void removeImage(SI_Image& image);
+
   // General Methods
   void addToProject();
   void removeFromProject();
@@ -153,6 +163,8 @@ signals:
   void polygonRemoved(SI_Polygon& polygon);
   void textAdded(SI_Text& text);
   void textRemoved(SI_Text& text);
+  void imageAdded(SI_Image& image);
+  void imageRemoved(SI_Image& image);
 
   void attributesChanged();
 
@@ -173,6 +185,7 @@ private:
   QMap<Uuid, SI_NetSegment*> mNetSegments;
   QMap<Uuid, SI_Polygon*> mPolygons;
   QMap<Uuid, SI_Text*> mTexts;
+  QMap<Uuid, SI_Image*> mImages;
 };
 
 /*******************************************************************************

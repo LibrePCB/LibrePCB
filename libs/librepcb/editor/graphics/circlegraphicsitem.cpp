@@ -108,9 +108,9 @@ void CircleGraphicsItem::updateZValue() noexcept {
   if (mCircle.isFilled()) {
     setZValue(0);
   } else if (mCircle.isGrabArea()) {
-    setZValue(-1);
+    setZValue(-2);
   } else {
-    setZValue(1);
+    setZValue(2);
   }
 }
 

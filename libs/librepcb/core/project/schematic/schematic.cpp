@@ -29,6 +29,7 @@
 #include "../../serialization/sexpression.h"
 #include "../../utils/scopeguardlist.h"
 #include "../project.h"
+#include "items/si_image.h"
 #include "items/si_netlabel.h"
 #include "items/si_netline.h"
 #include "items/si_netpoint.h"
@@ -75,6 +76,8 @@ Schematic::~Schematic() noexcept {
   Q_ASSERT(!mIsAddedToProject);
 
   // delete all items
+  qDeleteAll(mImages);
+  mImages.clear();
   qDeleteAll(mTexts);
   mTexts.clear();
   qDeleteAll(mPolygons);
@@ -91,7 +94,7 @@ Schematic::~Schematic() noexcept {
 
 bool Schematic::isEmpty() const noexcept {
   return (mSymbols.isEmpty() && mNetSegments.isEmpty() && mPolygons.isEmpty() &&
-          mTexts.isEmpty());
+          mTexts.isEmpty() && mImages.isEmpty());
 }
 
 /*******************************************************************************
@@ -224,6 +227,41 @@ void Schematic::removeText(SI_Text& text) {
 }
 
 /*******************************************************************************
+ *  Image Methods
+ ******************************************************************************/
+
+void Schematic::addImage(SI_Image& image) {
+  if ((!mIsAddedToProject) || (mImages.values().contains(&image)) ||
+      (&image.getSchematic() != this)) {
+    throw LogicError(__FILE__, __LINE__);
+  }
+  if (mImages.contains(image.getUuid())) {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString("There is already an image with the UUID \"%1\"!")
+            .arg(image.getUuid().toStr()));
+  }
+  // Note that we don't verify here that the referenced image file actually
+  // exists in the schematic directory. We could do that, but if for any reason
+  // the file is missing, it would somehow be bad user experience if the project
+  // cannot be opened at all. Better the problem is just reported in some other
+  // way (to be implemented) so the user can easily fix it by removing and
+  // re-adding the image. Missing images in symbols aren't fatal errors either.
+  image.addToSchematic();  // can throw
+  mImages.insert(image.getUuid(), &image);
+  emit imageAdded(image);
+}
+
+void Schematic::removeImage(SI_Image& image) {
+  if ((!mIsAddedToProject) || (mImages.value(image.getUuid()) != &image)) {
+    throw LogicError(__FILE__, __LINE__);
+  }
+  image.removeFromSchematic();  // can throw
+  mImages.remove(image.getUuid());
+  emit imageRemoved(image);
+}
+
+/*******************************************************************************
  *  General Methods
  ******************************************************************************/
 
@@ -233,7 +271,7 @@ void Schematic::addToProject() {
   }
 
   ScopeGuardList sgl(mSymbols.count() + mNetSegments.count() +
-                     mPolygons.count() + mTexts.count());
+                     mPolygons.count() + mTexts.count() + mImages.count());
   foreach (SI_Symbol* symbol, mSymbols) {
     symbol->addToSchematic();  // can throw
     sgl.add([symbol]() { symbol->removeFromSchematic(); });
@@ -249,6 +287,10 @@ void Schematic::addToProject() {
   foreach (SI_Text* text, mTexts) {
     text->addToSchematic();  // can throw
     sgl.add([text]() { text->removeFromSchematic(); });
+  }
+  foreach (SI_Image* image, mImages) {
+    image->addToSchematic();  // can throw
+    sgl.add([image]() { image->removeFromSchematic(); });
   }
 
   // Move directory atomically (last step which could throw an exception).
@@ -268,7 +310,11 @@ void Schematic::removeFromProject() {
   }
 
   ScopeGuardList sgl(mSymbols.count() + mNetSegments.count() +
-                     mPolygons.count() + mTexts.count());
+                     mPolygons.count() + mTexts.count() + mImages.count());
+  foreach (SI_Image* image, mImages) {
+    image->removeFromSchematic();  // can throw
+    sgl.add([image]() { image->addToSchematic(); });
+  }
   foreach (SI_Text* text, mTexts) {
     text->removeFromSchematic();  // can throw
     sgl.add([text]() { text->addToSchematic(); });
@@ -323,6 +369,11 @@ void Schematic::save() {
   for (const SI_Text* obj : mTexts) {
     root->ensureLineBreak();
     obj->getTextObj().serialize(root->appendList("text"));
+  }
+  root->ensureLineBreak();
+  for (const SI_Image* obj : mImages) {
+    root->ensureLineBreak();
+    obj->getImage()->serialize(root->appendList("image"));
   }
   root->ensureLineBreak();
   mDirectory->write("schematic.lp", root->toByteArray());

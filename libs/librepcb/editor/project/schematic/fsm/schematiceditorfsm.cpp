@@ -23,6 +23,7 @@
 #include "schematiceditorfsm.h"
 
 #include "schematiceditorstate_addcomponent.h"
+#include "schematiceditorstate_addimage.h"
 #include "schematiceditorstate_addnetlabel.h"
 #include "schematiceditorstate_addtext.h"
 #include "schematiceditorstate_drawpolygon.h"
@@ -57,6 +58,7 @@ SchematicEditorFsm::SchematicEditorFsm(const Context& context,
   mStates.insert(State::DRAW_POLYGON,
                  new SchematicEditorState_DrawPolygon(context));
   mStates.insert(State::ADD_TEXT, new SchematicEditorState_AddText(context));
+  mStates.insert(State::ADD_IMAGE, new SchematicEditorState_AddImage(context));
   mStates.insert(State::MEASURE, new SchematicEditorState_Measure(context));
 
   // Connect the requestLeavingState() signal of all states to the
@@ -132,6 +134,22 @@ bool SchematicEditorFsm::processDrawPolygon() noexcept {
 
 bool SchematicEditorFsm::processAddText() noexcept {
   return setNextState(State::ADD_TEXT);
+}
+
+bool SchematicEditorFsm::processAddImage(const QByteArray& data,
+                                         const QString& format,
+                                         const QString& basename) noexcept {
+  State oldState = mCurrentState;
+  if (!setNextState(State::ADD_IMAGE)) {
+    return false;
+  }
+  if (SchematicEditorState* state = getCurrentStateObj()) {
+    if (state->processAddImage(data, format, basename)) {
+      return true;
+    }
+  }
+  setNextState(oldState);  // restore previous state
+  return false;
 }
 
 bool SchematicEditorFsm::processDrawWire() noexcept {
@@ -353,7 +371,11 @@ bool SchematicEditorFsm::setNextState(State state) noexcept {
   if (!leaveCurrentState()) {
     return false;
   }
-  return enterNextState(state);
+  if (!enterNextState(state)) {
+    enterNextState(State::SELECT);
+    return false;
+  }
+  return true;
 }
 
 bool SchematicEditorFsm::leaveCurrentState() noexcept {

@@ -23,9 +23,11 @@
 #include "cmdremoveselectedsymbolitems.h"
 
 #include "../../cmd/cmdcircleedit.h"
+#include "../../cmd/cmdimageremove.h"
 #include "../../cmd/cmdpolygonedit.h"
 #include "../../cmd/cmdtextedit.h"
 #include "../../graphics/circlegraphicsitem.h"
+#include "../../graphics/imagegraphicsitem.h"
 #include "../../graphics/polygongraphicsitem.h"
 #include "../../graphics/textgraphicsitem.h"
 #include "../sym/symbolgraphicsitem.h"
@@ -80,6 +82,12 @@ bool CmdRemoveSelectedSymbolItems::performExecute() {
   // remove texts
   foreach (const auto& text, mGraphicsItem.getSelectedTexts()) {
     appendChild(new CmdTextRemove(mSymbol.getTexts(), &text->getObj()));
+  }
+
+  // remove images
+  foreach (const auto& image, mGraphicsItem.getSelectedImages()) {
+    appendChild(new CmdImageRemove(mSymbol.getImages(), mSymbol.getDirectory(),
+                                   image->getObj()));
   }
 
   // execute all child commands

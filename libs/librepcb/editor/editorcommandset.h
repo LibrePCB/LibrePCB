@@ -993,6 +993,15 @@ public:
       {QKeySequence(Qt::Key_V)},
       &categoryTools,
   };
+  EditorCommand toolImage{
+      "tool_image",  // clang-format break
+      QT_TR_NOOP("Add Image"),
+      QT_TR_NOOP("Add graphical image objects (e.g. a logo)"),
+      ":/bi/image.svg",
+      EditorCommand::Flags(),
+      {},
+      &categoryTools,
+  };
   EditorCommand toolPin{
       "tool_pin",  // clang-format break
       QT_TR_NOOP("Add Pin"),

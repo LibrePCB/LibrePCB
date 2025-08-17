@@ -37,6 +37,7 @@ namespace librepcb {
 namespace editor {
 
 class CmdCircleEdit;
+class CmdImageEdit;
 class CmdPolygonEdit;
 class CmdSymbolPinEdit;
 class CmdTextEdit;
@@ -94,6 +95,7 @@ private:
   QList<CmdCircleEdit*> mCircleEditCmds;
   QList<CmdPolygonEdit*> mPolygonEditCmds;
   QList<CmdTextEdit*> mTextEditCmds;
+  QList<CmdImageEdit*> mImageEditCmds;
 };
 
 /*******************************************************************************

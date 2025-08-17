@@ -57,8 +57,14 @@ struct FileProofNameVerifier {
 };
 
 struct FileProofNameConstraint {
+  static const constexpr std::size_t MAX_LEN = 20;  // Keep in sync with regex!
+
   static QRegularExpression regex() noexcept {
-    return QRegularExpression("\\A[-a-zA-Z0-9_+().]{1,20}\\z");
+    // The negative lookahead makes sure that any string consisting of only
+    // dots (no matter how many) will be invalid (i.e. ".", ".." etc.).
+    // This is required since those dots have special meaning for file systems
+    // and cannot be used as file names.
+    return QRegularExpression("\\A(?!\\.+\\z)[-a-zA-Z0-9_+().]{1,20}\\z");
   }
 
   bool operator()(const QString& value) const noexcept {
@@ -134,9 +140,13 @@ inline std::size_t qHash(const FileProofName& key,
 }
 
 inline static QString cleanFileProofName(const QString& userInput) noexcept {
-  return Toolbox::cleanUserInputString(userInput,
-                                       QRegularExpression("[^-a-zA-Z0-9_+().]"),
-                                       true, false, false, "-", 20);
+  QString s = Toolbox::cleanUserInputString(
+      userInput, QRegularExpression("[^-a-zA-Z0-9_+().]"), true, false, false,
+      "-", 20);
+  if ((!s.isEmpty()) && (!FileProofNameConstraint()(s))) {
+    s.clear();  // Consists of only dots -> invalid.
+  }
+  return s;
 }
 
 inline static std::optional<FileProofName> parseFileProofName(
