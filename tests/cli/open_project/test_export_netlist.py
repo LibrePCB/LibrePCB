@@ -13,6 +13,7 @@ Test command "open-project --export-netlist"
 
 @pytest.mark.parametrize("project", [params.EMPTY_PROJECT_LPP_PARAM])
 def test_if_project_without_boards_succeeds(cli, project):
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
 
     # remove all boards first
@@ -43,6 +44,7 @@ SUCCESS
     ],
 )
 def test_export_project_with_two_boards_implicit(cli, project):
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     fp = project.output_dir + "/netlist/{{BOARD}}.d356"
     dir = cli.abspath(project.output_dir + "/netlist")
@@ -71,6 +73,7 @@ SUCCESS
     ],
 )
 def test_export_project_with_two_boards_explicit_one(cli, project):
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     fp = project.output_dir + "/netlist/{{BOARD}}.d356"
     dir = cli.abspath(project.output_dir + "/netlist")
@@ -92,6 +95,7 @@ SUCCESS
 
 @pytest.mark.parametrize("project", [params.PROJECT_WITH_TWO_BOARDS_LPP])
 def test_export_project_with_two_conflicting_boards_fails(cli, project):
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     fp = project.output_dir + "/netlist.d356"
     code, stdout, stderr = cli.run(

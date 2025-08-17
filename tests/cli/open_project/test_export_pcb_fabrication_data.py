@@ -20,6 +20,7 @@ Test command "open-project --export-pcb-fabrication-data"
     ],
 )
 def test_if_project_without_boards_succeeds(cli, project):
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
 
     # remove all boards first
@@ -49,6 +50,7 @@ SUCCESS
     ],
 )
 def test_export_project_with_one_board_implicit(cli, project):
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     dir = cli.abspath(project.output_dir + "/gerber")
     assert not os.path.exists(dir)
@@ -84,6 +86,7 @@ SUCCESS
     ],
 )
 def test_export_project_with_one_board_explicit(cli, project):
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     dir = cli.abspath(project.output_dir + "/gerber")
     assert not os.path.exists(dir)
@@ -122,6 +125,7 @@ def test_if_exporting_invalid_board_fails(cli, project):
     """
     Note: Test with passing the argument as "--arg <value>".
     """
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     dir = cli.abspath(project.output_dir + "/gerber")
     assert not os.path.exists(dir)
@@ -146,6 +150,7 @@ Finished with errors!
     ],
 )
 def test_export_project_with_two_boards_implicit(cli, project):
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     dir = cli.abspath(project.output_dir + "/gerber")
     assert not os.path.exists(dir)
@@ -191,6 +196,7 @@ SUCCESS
     ],
 )
 def test_export_project_with_two_boards_explicit_one(cli, project):
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     dir = cli.abspath(project.output_dir + "/gerber")
     assert not os.path.exists(dir)
@@ -226,6 +232,7 @@ SUCCESS
     ],
 )
 def test_export_project_with_two_boards_explicit_two(cli, project):
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     dir = cli.abspath(project.output_dir + "/gerber")
     assert not os.path.exists(dir)
@@ -274,6 +281,7 @@ SUCCESS
     ],
 )
 def test_export_project_with_two_conflicting_boards_fails(cli, project):
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
 
     # change gerber output path to the same for both boards
@@ -336,6 +344,7 @@ Finished with errors!
     ],
 )
 def test_export_project_with_two_conflicting_boards_succeeds_explicit(cli, project):
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
 
     # change gerber output path to the same for both boards
@@ -382,6 +391,7 @@ def test_export_with_custom_settings(cli, project):
       - Test with passing the argument as "--arg <value>".
       - Test attributes '{{BOARD_INDEX}}' and '{{BOARD_DIRNAME}}' in path.
     """
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     settings = """
       (fabrication_output_settings
@@ -451,6 +461,7 @@ SUCCESS
     ],
 )
 def test_if_export_with_nonexistent_settings_fails(cli, project):
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     dir = cli.abspath(project.output_dir + "/gerber")
     assert not os.path.exists(dir)
@@ -481,6 +492,7 @@ Finished with errors!
     ],
 )
 def test_if_export_with_invalid_settings_fails(cli, project):
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     with open(cli.abspath("settings.lp"), mode="w") as f:
         f.write("foobar")
@@ -504,3 +516,44 @@ Finished with errors!
 """)
     assert code == 1
     assert not os.path.exists(dir)
+
+
+@pytest.mark.parametrize(
+    "project",
+    [
+        params.EMPTY_PROJECT_LPP_PARAM,
+    ],
+)
+def test_deprecation_warning(cli, project):
+    cli.add_project(project.dir, as_lppz=project.is_lppz)
+    dir = cli.abspath(project.output_dir + "/gerber")
+    assert not os.path.exists(dir)
+    code, stdout, stderr = cli.run(
+        "open-project", "--export-pcb-fabrication-data", project.path
+    )
+    assert stderr == nofmt("""\
+WARNING: The command or option '--export-pcb-fabrication-data' is deprecated \
+and will be removed in a future release. Please see '--run-jobs' for a \
+possible replacement. For now, the command will be executed, but the CLI will \
+return with a nonzero exit code. As a temporary workaround, this warning and \
+the nonzero exit code can be suppressed with the environment variable \
+'LIBREPCB_SUPPRESS_DEPRECATION_WARNINGS=1'.
+""")
+    assert stdout == nofmt(f"""\
+Open project '{project.path}'...
+Export PCB fabrication data...
+  Board 'default':
+    => '{project.output_dir_native}//gerber//Empty_Project_DRILLS-NPTH.drl'
+    => '{project.output_dir_native}//gerber//Empty_Project_DRILLS-PTH.drl'
+    => '{project.output_dir_native}//gerber//Empty_Project_OUTLINES.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_COPPER-TOP.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_COPPER-BOTTOM.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_SOLDERMASK-TOP.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_SOLDERMASK-BOTTOM.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-TOP.gbr'
+    => '{project.output_dir_native}//gerber//Empty_Project_SILKSCREEN-BOTTOM.gbr'
+Finished with warnings!
+""").replace("//", os.sep)
+    assert code == 2
+    assert os.path.exists(dir)
+    assert len(os.listdir(dir)) == 9

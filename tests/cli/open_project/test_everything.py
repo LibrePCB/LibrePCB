@@ -20,6 +20,7 @@ Test command "open-project" with all available options
     ],
 )
 def test_everything(cli, project):
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
 
     # prepare "--export-schematics"

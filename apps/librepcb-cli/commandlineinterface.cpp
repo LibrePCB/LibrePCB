@@ -314,6 +314,27 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
           .arg("--minify"),
       tr("file"));
 
+  // Mark deprecated options.
+  QMap<QString, QString> deprecations;
+  auto setDeprecated = [&](QCommandLineOption& option,
+                           const QCommandLineOption& replacement) {
+    option.setDescription("[" % tr("Deprecated, replaced by:").toUpper() %
+                          " --" % replacement.names().value(0) % "] " %
+                          option.description());
+    for (const QString& name : option.names()) {
+      deprecations.insert(name, replacement.names().value(0));
+    }
+  };
+  setDeprecated(exportSchematicsOption, runAllJobsOption);
+  setDeprecated(exportBomOption, runAllJobsOption);
+  setDeprecated(exportBoardBomOption, runAllJobsOption);
+  setDeprecated(bomAttributesOption, runAllJobsOption);
+  setDeprecated(exportPcbFabricationDataOption, runAllJobsOption);
+  setDeprecated(pcbFabricationSettingsOption, customJobsOption);
+  setDeprecated(exportPnpTopOption, runAllJobsOption);
+  setDeprecated(exportPnpBottomOption, runAllJobsOption);
+  setDeprecated(exportNetlistOption, runAllJobsOption);
+
   // Build help text.
   const QString executable = args.value(0);
   QString helpText = parser.helpText() % "\n" % tr("Commands:") % "\n";
@@ -471,6 +492,17 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
     return 1;
   }
 
+  // Check for deprecated options.
+  bool usedDeprecatedFeatures = false;
+  if (!suppressDeprecationWarnings()) {
+    for (auto it = deprecations.begin(); it != deprecations.end(); it++) {
+      if (parser.isSet(it.key())) {
+        printDeprecationWarning("--" + it.key(), "--" + it.value());
+        usedDeprecatedFeatures = true;
+      }
+    }
+  }
+
   // Execute command
   bool cmdSuccess = false;
   if (command == "open-project") {
@@ -528,12 +560,20 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
   } else {
     printErr("Internal failure.");  // No tr() because this cannot occur.
   }
-  if (cmdSuccess) {
-    print(tr("SUCCESS"));
-    return 0;
-  } else {
+
+  // Report status with the exit code:
+  //  - 0: Success
+  //  - 1: Errors
+  //  - 2: Warnings
+  if (!cmdSuccess) {
     print(tr("Finished with errors!"));
     return 1;
+  } else if (usedDeprecatedFeatures) {
+    print(tr("Finished with warnings!"));
+    return 2;
+  } else {
+    print(tr("SUCCESS"));
+    return 0;
   }
 }
 
@@ -1775,6 +1815,29 @@ void CommandLineInterface::print(const QString& str) noexcept {
 void CommandLineInterface::printErr(const QString& str) noexcept {
   QTextStream s(stderr);
   s << str << '\n';
+}
+
+bool CommandLineInterface::suppressDeprecationWarnings() noexcept {
+  return qgetenv("LIBREPCB_SUPPRESS_DEPRECATION_WARNINGS") == "1";
+}
+
+void CommandLineInterface::printDeprecationWarning(
+    const QString& deprecatedCommand, const QString& newCommand) noexcept {
+  QString s = tr("Warning").toUpper() + ": ";
+  s += tr("The command or option '%1' is deprecated and will be removed in a "
+          "future release.")
+           .arg(deprecatedCommand);
+  if (!newCommand.isEmpty()) {
+    s +=
+        " " + tr("Please see '%1' for a possible replacement.").arg(newCommand);
+  }
+  s += " " +
+      tr("For now, the command will be executed, but the CLI will return with "
+         "a nonzero exit code. As a temporary workaround, this warning and the "
+         "nonzero exit code can be suppressed with the environment variable "
+         "'%1'.")
+          .arg("LIBREPCB_SUPPRESS_DEPRECATION_WARNINGS=1");
+  printErr(s);
 }
 
 /*******************************************************************************

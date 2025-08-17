@@ -6,6 +6,7 @@ import sys
 import shutil
 import pytest
 import subprocess
+from copy import deepcopy
 
 
 CLI_DIR = os.path.dirname(__file__)
@@ -32,6 +33,7 @@ class CliExecutor(object):
                 "'--librepcb-executable'.".format(self.executable)
             )
         self.tmpdir = tmpdir
+        self.suppress_deprecation_warnings = False
 
     def __enter__(self):
         return self
@@ -78,7 +80,8 @@ class CliExecutor(object):
         return p.returncode, stdout, stderr
 
     def _env(self):
-        env = os.environ
+        # Important: Use deepcopy to avoid propagating these changes to following runs!
+        env = deepcopy(os.environ)
         # Make output independent from the system's language
         env["LC_ALL"] = "C"
         # Override configuration location to make tests independent of existing configs
@@ -88,6 +91,9 @@ class CliExecutor(object):
         # Disable warning about unstable file format, since tests are run also
         # on the (unstable) master branch
         env["LIBREPCB_DISABLE_UNSTABLE_WARNING"] = "1"
+        # Disable deprecation warnings for specific tests
+        if self.suppress_deprecation_warnings:
+            env["LIBREPCB_SUPPRESS_DEPRECATION_WARNINGS"] = "1"
         return env
 
 

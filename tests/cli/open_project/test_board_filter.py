@@ -17,6 +17,7 @@ Test command "open-project --board --board-index"
     ],
 )
 def test_no_filter(cli, project):
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     code, stdout, stderr = cli.run(
         "open-project", "--export-board-bom={{BOARD}}.csv", project.path
@@ -39,6 +40,7 @@ SUCCESS
     ],
 )
 def test_filter_by_name(cli, project):
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     code, stdout, stderr = cli.run(
         "open-project", "--export-board-bom={{BOARD}}.csv", "--board=copy", project.path
@@ -60,6 +62,7 @@ SUCCESS
     ],
 )
 def test_filter_by_names(cli, project):
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     code, stdout, stderr = cli.run(
         "open-project",
@@ -87,6 +90,7 @@ SUCCESS
     ],
 )
 def test_filter_by_invalid_name(cli, project):
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     code, stdout, stderr = cli.run(
         "open-project", "--export-board-bom={{BOARD}}.csv", "--board=foo", project.path
@@ -107,6 +111,7 @@ Finished with errors!
     ],
 )
 def test_filter_by_index(cli, project):
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     code, stdout, stderr = cli.run(
         "open-project",
@@ -131,6 +136,7 @@ SUCCESS
     ],
 )
 def test_filter_by_indices(cli, project):
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     code, stdout, stderr = cli.run(
         "open-project",
@@ -158,6 +164,7 @@ SUCCESS
     ],
 )
 def test_filter_by_invalid_index(cli, project):
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     code, stdout, stderr = cli.run(
         "open-project",
@@ -185,6 +192,7 @@ Finished with errors!
     ],
 )
 def test_filter_by_name_and_index_same(cli, project):
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     code, stdout, stderr = cli.run(
         "open-project",
@@ -210,6 +218,7 @@ SUCCESS
     ],
 )
 def test_filter_by_name_and_index_different(cli, project):
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     code, stdout, stderr = cli.run(
         "open-project",
