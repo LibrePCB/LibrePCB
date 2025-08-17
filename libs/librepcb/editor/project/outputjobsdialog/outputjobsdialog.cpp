@@ -57,6 +57,8 @@
 #include <librepcb/core/job/netlistoutputjob.h>
 #include <librepcb/core/job/pickplaceoutputjob.h>
 #include <librepcb/core/job/projectjsonoutputjob.h>
+#include <librepcb/core/project/board/board.h>
+#include <librepcb/core/project/board/boardfabricationoutputsettings.h>
 #include <librepcb/core/project/outputjobrunner.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectattributelookup.h>
@@ -70,6 +72,35 @@
  ******************************************************************************/
 namespace librepcb {
 namespace editor {
+
+static std::shared_ptr<GerberExcellonOutputJob> migratedBoardFabSettings(
+    const Project& prj) noexcept {
+  if (auto brd = prj.getBoards().value(0)) {
+    const BoardFabricationOutputSettings& old =
+        brd->getFabricationOutputSettings();
+    auto job = GerberExcellonOutputJob::defaultStyle();
+    job->setSuffixDrills(old.getSuffixDrills());
+    job->setSuffixDrillsNpth(old.getSuffixDrillsNpth());
+    job->setSuffixDrillsPth(old.getSuffixDrillsPth());
+    job->setSuffixDrillsBlindBuried(old.getSuffixDrillsBlindBuried());
+    job->setSuffixOutlines(old.getSuffixOutlines());
+    job->setSuffixCopperTop(old.getSuffixCopperTop());
+    job->setSuffixCopperInner(old.getSuffixCopperInner());
+    job->setSuffixCopperBot(old.getSuffixCopperBot());
+    job->setSuffixSolderMaskTop(old.getSuffixSolderMaskTop());
+    job->setSuffixSolderMaskBot(old.getSuffixSolderMaskBot());
+    job->setSuffixSilkscreenTop(old.getSuffixSilkscreenTop());
+    job->setSuffixSilkscreenBot(old.getSuffixSilkscreenBot());
+    job->setSuffixSolderPasteTop(old.getSuffixSolderPasteTop());
+    job->setSuffixSolderPasteBot(old.getSuffixSolderPasteBot());
+    job->setMergeDrillFiles(old.getMergeDrillFiles());
+    job->setUseG85SlotCommand(old.getUseG85SlotCommand());
+    job->setEnableSolderPasteTop(old.getEnableSolderPasteTop());
+    job->setEnableSolderPasteBot(old.getEnableSolderPasteBot());
+    return job;
+  }
+  return nullptr;
+}
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -110,7 +141,10 @@ OutputJobsDialog::OutputJobsDialog(const WorkspaceSettings& settings,
   connect(mUi->msgAddDefaultJobs, &MessageWidget::linkActivated, this,
           [this](const QString& link) {
             Q_UNUSED(link);
-            auto gerber = GerberExcellonOutputJob::defaultStyle();
+            auto gerber = migratedBoardFabSettings(mProject);
+            if (!gerber) {
+              gerber = GerberExcellonOutputJob::defaultStyle();
+            }
             auto pnp = std::make_shared<PickPlaceOutputJob>();
             auto bom = std::make_shared<BomOutputJob>();
             // For file format v2, we import the custom BOM attributes coming
@@ -225,6 +259,10 @@ void OutputJobsDialog::preselectJobByType(const QString& typeName) noexcept {
            "At the bottom left of this dialog you can add one of the two "
            "pre-configured Gerber/Excellon output jobs and adjust it according "
            "your needs.") +
+        (migratedBoardFabSettings(mProject)
+             ? (" " +
+                tr("Or you can import the old settings from LibrePCB 1.x."))
+             : "") +
         "</p>";
     if (mJobs.isEmpty()) {
       text += "<p>" +
@@ -286,6 +324,12 @@ void OutputJobsDialog::addClicked() noexcept {
                  escape(GerberExcellonOutputJob::getTypeTrStatic() % " (" %
                         tr("Protel Style") % ")"),
                  [&]() { add(GerberExcellonOutputJob::protelStyle()); });
+  if (auto job = migratedBoardFabSettings(mProject)) {
+    menu.addAction(QIcon(":/img/actions/export_gerber.png"),
+                   escape(GerberExcellonOutputJob::getTypeTrStatic() % " (" %
+                          tr("Import Old Settings") % ")"),
+                   [&, job]() { add(job); });
+  }
   menu.addAction(QIcon(":/img/actions/export_pick_place_file.png"),
                  escape(PickPlaceOutputJob::getTypeTrStatic()),
                  [&]() { add(std::make_shared<PickPlaceOutputJob>()); });
