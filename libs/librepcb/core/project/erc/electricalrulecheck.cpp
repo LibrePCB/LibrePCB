@@ -180,7 +180,8 @@ void ElectricalRuleCheck::checkNetSegments(const Schematic& schematic,
       foreach (const SI_NetLine* netLine, netSegment->getNetLines()) {
         if (netLine->getStartPoint().isOpen() ||
             netLine->getEndPoint().isOpen()) {
-          msgs.append(std::make_shared<ErcMsgOpenWireInSegment>(*netSegment));
+          msgs.append(
+              std::make_shared<ErcMsgOpenWireInSegment>(*netSegment, *netLine));
           break;
         }
       }

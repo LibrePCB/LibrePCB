@@ -63,8 +63,11 @@ class SlintGraphicsView final : public QObject {
           scale + delta.scale * factor,
       };
     }
+    bool operator==(const Projection& rhs) const noexcept {
+      return (offset == rhs.offset) && (scale == rhs.scale);
+    }
     bool operator!=(const Projection& rhs) const noexcept {
-      return (offset != rhs.offset) || (scale != rhs.scale);
+      return !(*this == rhs);
     }
     Projection operator-(const Projection& rhs) const noexcept {
       return Projection{

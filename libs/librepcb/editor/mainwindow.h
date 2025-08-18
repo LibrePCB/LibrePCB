@@ -36,13 +36,16 @@
 namespace librepcb {
 
 class FilePath;
+class RuleCheckMessage;
 
 namespace editor {
 
 class GuiApplication;
 class LibraryEditor;
 class MainWindowTestAdapter;
+class ProjectEditor;
 class ProjectReadmeRenderer;
+class SchematicTab;
 class WindowSection;
 class WindowTab;
 
@@ -78,6 +81,9 @@ public:
   void showPanelPage(ui::PanelPage page) noexcept;
   void popUpNotifications() noexcept;
   void showStatusBarMessage(const QString& message, int timeoutMs);
+  void highlightErcMessage(ProjectEditor& prjEditor,
+                           std::shared_ptr<const RuleCheckMessage> msg,
+                           bool zoomTo) noexcept;
   void setCurrentLibrary(int index) noexcept;
   void setCurrentProject(int index) noexcept;
 
@@ -112,7 +118,8 @@ private:
                         bool copyFrom) noexcept;
   void openDeviceTab(LibraryEditor& editor, const FilePath& fp,
                      bool copyFrom) noexcept;
-  void openSchematicTab(int projectIndex, int index) noexcept;
+  std::shared_ptr<SchematicTab> openSchematicTab(int projectIndex,
+                                                 int index) noexcept;
   void openBoard2dTab(int projectIndex, int index) noexcept;
   void openBoard3dTab(int projectIndex, int index) noexcept;
   void updateHomeTabSection() noexcept;
@@ -121,7 +128,7 @@ private:
   template <typename T>
   bool switchToLibraryElementTab(const FilePath& fp) noexcept;
   template <typename T>
-  bool switchToProjectTab(int prjIndex, int objIndex) noexcept;
+  std::shared_ptr<T> switchToProjectTab(int prjIndex, int objIndex) noexcept;
 
   const int mId;
   const QString mSettingsPrefix;

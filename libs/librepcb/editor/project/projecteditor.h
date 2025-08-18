@@ -42,6 +42,7 @@ namespace librepcb {
 class Board;
 class NetSignal;
 class Project;
+class RuleCheckMessage;
 class Workspace;
 
 namespace editor {
@@ -175,6 +176,9 @@ signals:
   void projectAboutToBeSaved();
   void projectSavedToDisk();
   void ercUnapprovedCountChanged();
+  void ercMessageHighlightRequested(std::shared_ptr<const RuleCheckMessage> msg,
+                                    bool zoomTo, int windowId);
+  void ercMarkersInvalidated();
   void highlightedNetSignalsChanged();
   void projectLibraryUpdaterRequested(const FilePath& fp);
   void statusBarMessageChanged(const QString& message, int timeoutMs);

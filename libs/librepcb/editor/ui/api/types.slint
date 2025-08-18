@@ -279,6 +279,7 @@ export struct RuleCheckMessageData {
     description: string,
     approved: bool,
     supports-autofix: bool,
+    action-window-id: int,  // Set by UI *before* action is set
     action: RuleCheckMessageAction,  // Set by UI, handled in backend
 }
 

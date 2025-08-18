@@ -43,6 +43,7 @@
 
 #include <librepcb/core/attribute/attributetype.h>
 #include <librepcb/core/attribute/attributeunit.h>
+#include <librepcb/core/project/erc/electricalrulecheckmessages.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/schematic/items/si_symbol.h>
 #include <librepcb/core/project/schematic/schematic.h>
@@ -165,6 +166,8 @@ SchematicTab::SchematicTab(GuiApplication& app, SchematicEditor& editor,
               mFsm->processAbortCommand();
             }
           });
+  connect(&mProjectEditor, &ProjectEditor::ercMarkersInvalidated, this,
+          &SchematicTab::clearErcMarker);
 
   // Connect undo stack.
   connect(&mProjectEditor.getUndoStack(), &UndoStack::stateModified, this,
@@ -216,6 +219,7 @@ SchematicTab::SchematicTab(GuiApplication& app, SchematicEditor& editor,
 }
 
 SchematicTab::~SchematicTab() noexcept {
+  clearErcMarker();  // Avoid dangling pointers.
   deactivate();
   mView->setEventHandler(nullptr);
 
@@ -382,6 +386,36 @@ void SchematicTab::setDerivedUiData(const ui::SchematicTabData& data) noexcept {
   requestRepaint();
 }
 
+void SchematicTab::highlightErcMessage(
+    const std::shared_ptr<const ErcMsgBase>& msg, bool zoomTo) noexcept {
+  if ((!msg) || msg->getLocations().isEmpty()) {
+    // Position on schematic not known.
+    clearErcMarker();
+  } else if (mScene) {
+    const ThemeColor& color =
+        mApp.getWorkspace().getSettings().themes.getActive().getColor(
+            Theme::Color::sSchematicOverlays);
+    QPainterPath path = Path::toQPainterPathPx(msg->getLocations(), true);
+    mErcLocationGraphicsItem.reset(new QGraphicsPathItem());
+    mErcLocationGraphicsItem->setZValue(
+        SchematicGraphicsScene::ZValue_VisibleNetPoints);
+    mErcLocationGraphicsItem->setPen(QPen(color.getPrimaryColor(), 0));
+    mErcLocationGraphicsItem->setBrush(color.getSecondaryColor());
+    mErcLocationGraphicsItem->setPath(path);
+    mScene->addItem(*mErcLocationGraphicsItem.get());
+
+    const QRectF rect = path.boundingRect();
+    const qreal boxMargin = Length(1000000).toPx();
+    mScene->setSceneRectMarker(
+        rect.adjusted(-boxMargin, -boxMargin, boxMargin, boxMargin));
+    if (zoomTo) {
+      const qreal zoomMargin = Length(20000000).toPx();
+      mView->zoomToSceneRect(
+          rect.adjusted(-zoomMargin, -zoomMargin, zoomMargin, zoomMargin));
+    }
+  }
+}
+
 void SchematicTab::activate() noexcept {
   mScene.reset(new SchematicGraphicsScene(
       mSchematic, *mLayers, mProjectEditor.getHighlightedNetSignals(), this));
@@ -402,6 +436,7 @@ void SchematicTab::activate() noexcept {
 void SchematicTab::deactivate() noexcept {
   mProjectEditor.unregisterActiveSchematicTab(this);
   mSearchContext.deinit();
+  mErcLocationGraphicsItem.reset();
   mScene.reset();
 }
 
@@ -425,7 +460,11 @@ void SchematicTab::trigger(ui::TabAction a) noexcept {
       break;
     }
     case ui::TabAction::Abort: {
-      mFsm->processAbortCommand();
+      if (mErcLocationGraphicsItem) {
+        clearErcMarker();
+      } else {
+        mFsm->processAbortCommand();
+      }
       break;
     }
     case ui::TabAction::Save: {
@@ -1053,6 +1092,13 @@ void SchematicTab::updateMessages() noexcept {
     mMsgInstallLibraries.setActive(empty && noLibs);
     mMsgAddDrawingFrame.setActive(empty && (!noLibs));
   } catch (const Exception& e) {
+  }
+}
+
+void SchematicTab::clearErcMarker() noexcept {
+  mErcLocationGraphicsItem.reset();
+  if (mScene) {
+    mScene->setSceneRectMarker(QRectF());
   }
 }
 

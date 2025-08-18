@@ -40,6 +40,7 @@
 namespace librepcb {
 
 class AttributeUnit;
+class ErcMsgBase;
 
 namespace editor {
 
@@ -80,6 +81,8 @@ public:
   void setUiData(const ui::TabData& data) noexcept override;
   ui::SchematicTabData getDerivedUiData() const noexcept;
   void setDerivedUiData(const ui::SchematicTabData& data) noexcept;
+  void highlightErcMessage(const std::shared_ptr<const ErcMsgBase>& msg,
+                           bool zoomTo) noexcept;
   void activate() noexcept override;
   void deactivate() noexcept override;
   void trigger(ui::TabAction a) noexcept override;
@@ -151,6 +154,7 @@ signals:
 
 private:
   void updateMessages() noexcept;
+  void clearErcMarker() noexcept;
   void execGraphicsExportDialog(GraphicsExportDialog::Output output,
                                 const QString& settingsKey) noexcept;
   void goToSymbol(const QString& name, int index) noexcept;
@@ -201,6 +205,7 @@ private:
   // FSM
   QVector<QMetaObject::Connection> mFsmStateConnections;
   QScopedPointer<SchematicEditorFsm> mFsm;
+  std::unique_ptr<QGraphicsPathItem> mErcLocationGraphicsItem;
 
   // Objects in active state
   std::unique_ptr<SchematicGraphicsScene> mScene;
