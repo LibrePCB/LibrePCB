@@ -86,11 +86,123 @@ curl 'https://api.librepcb.org/api/v1/libraries/v0.1'
 
 Following resources are available:
 
-| Path         | Description                           |
-|--------------|---------------------------------------|
-| [/libraries] | Fetch list of available libraries     |
-| [/order]     | Upload a project to start ordering it |
-| [/parts]     | Request live information about parts  |
+| Path         | Description                                  |
+|--------------|----------------------------------------------|
+| [/info]      | Get general information about the API server |
+| [/libraries] | Fetch list of available libraries            |
+| [/order]     | Upload a project to start ordering it        |
+| [/parts]     | Request live information about parts         |
+
+
+## Info {#doc_server_api_resources_info}
+
+The resource path `/info` provides some general information about the API
+server or about the upstream LibrePCB project.
+
+One purpose of this resource is to fetch information about the latest released
+LibrePCB version (version number, download URLs etc.).
+
+This resource also contains information about the capabilities of the API
+server, for example which resource endpoints are implemented. Calling this
+endpoint avoids that clients require to call every resource endpoint
+individually (and possibly ending up in HTTP errors). It is recommended that
+clients check this endpoint e.g. once per day before trying to access any other
+API resource.
+
+The response is an object with following properties:
+
+| Name                   | Type    | Description                                           |
+|------------------------|---------|-------------------------------------------------------|
+| stable_version  | string  | Version number of the latest stable LibrePCB release  |
+| preview_version | string  | Version number of the latest preview LibrePCB release |
+| stable_url_appimage
+| libraries       | `null` or `{}` | Whether the `/libraries` endpoint is supported |
+| order           | `null` or `{}` | Whether the `/order` endpoint is supported     |
+| parts           | `null` or `{}` | Whether the `/parts` endpoint is supported     |
+
+*Notes:*
+- *Both `stable_version` and `preview_version` shall contain the
+  version number exactly as specified in `CMakeLists.txt` (e.g. `1.2.3-rc4`).*
+- *If there is currently no preview version available, the content of
+  `preview_version` should be equal to `stable_version`.*
+- The resource capabilities (`libraries`, `order`, `parts`) are usually just
+  empty objects (which means the resource is supported) but may be extended
+  with properties in future. Unsupported resources may either not appear
+  in the response at all (preferred), or as `null` values.*
+
+The `latest_stable` and `latest_preview` objects contain the following
+properties:
+
+| Name                   | Type    | Description                                           |
+|------------------------|---------|-------------------------------------------------------|
+| version  | string  | Version number of the latest stable LibrePCB release  |
+| changelog_url | string | URL to the release notes / changelog |
+| appimage_url | string  | |
+| url_appimage | string  | |
+| url_appimage | string  | |
+
+### Example
+
+**Request:**
+
+~~~{.sh}
+curl 'https://api.librepcb.org/api/v1/info'
+~~~
+
+**Response:**
+
+~~~{.json}
+{
+  "stable_version": {
+    "version": "1.3.0",
+    "release_date": "2025-08-15",
+    "changelog_url": "https://librepcb.org/blog/2025-03-24_release_1.3.0/",
+    "linux_x86_64_appimage": {
+      "min_libc": "2.28",
+      "url": "https://.../librepcb-1.3.0-linux-x86_64.AppImage",
+      "size": 52428800,
+      "sha256": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4"
+    },
+    "linux_x86_64_tgz": {
+      "min_libc": "2.28",
+      "url": "https://.../librepcb-1.3.0-linux-x86_64.tar.gz",
+      "size": 52428800,
+      "sha256": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4"
+    },
+    "mac_x86_64_dmg": {
+      "min_macos": "11.2",
+      "url": "https://.../librepcb-1.3.0-mac-x86_64.dmg",
+      "size": 52428800,
+      "sha256": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4"
+    },
+    "mac_arm64_dmg": {
+      "min_macos": "13.0",
+      "url": "https://.../librepcb-1.3.0-mac-arm64.dmg",
+      "size": 52428800,
+      "sha256": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4"
+    },
+    "windows_x86_64_zip": {
+      "min_windows": "10.0",
+      "url": "https://.../librepcb-1.3.0-windows-x86_64.zip",
+      "size": 52428800,
+      "sha256": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4"
+    },
+    "windows_x86_64_installer_exe": {
+      "min_windows": "10.0",
+      "url": "https://.../librepcb-installer-1.3.0-windows-x86_64.exe",
+      "size": 52428800,
+      "sha256": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4"
+    },
+  },
+  "preview_version": {
+    "version": "2.0.0-rc1",
+    "changelog_url": "https://librepcb.org/blog/2025-08-01_release_2.0.0-rc1/",
+  },
+  "libraries": {},
+  "order": null,
+  "parts": {}
+}
+~~~
 
 
 ## Libraries {#doc_server_api_resources_libraries}
