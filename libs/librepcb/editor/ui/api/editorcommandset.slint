@@ -418,10 +418,10 @@ export global EditorCommandSet {
         key: "p",
     };
 
-    in property <EditorCommand> generate-bom: {
+    in property <EditorCommand> bill-of-materials: {
         icon: @image-url("../../../../font-awesome/svgs/solid/file-csv.svg"),
-        text: "Generate Bill Of Materials...",
-        status-tip: "Generate bill of materials (BOM) file",
+        text: "Bill Of Materials...",
+        status-tip: "Open the project's bill of materials (BOM) to see part availability, prices etc.",
         shortcut: "F9",
         modifiers: { alt: false, control: false, shift: false, meta: false },
         key: Key.F9,
@@ -610,7 +610,7 @@ export global EditorCommandSet {
     in property <EditorCommand> move-align: {
         icon: @image-url(""),
         text: "Move/Align Objects",
-        status-tip: "Move and/or align the selected object(s) vertically or ",
+        status-tip: "Move and/or align the selected object(s) vertically or horizontally",
         shortcut: "A",
         modifiers: { alt: false, control: false, shift: false, meta: false },
         key: "a",

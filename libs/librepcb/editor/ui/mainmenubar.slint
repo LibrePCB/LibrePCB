@@ -211,19 +211,6 @@ export component MainMenuBar inherits Rectangle {
                     }
                 }
 
-                export-bom-item := MenuItem {
-                    cmd: Cmd.generate-bom;
-                    enabled: (Data.current-tab.type == TabType.schematic) || (Data.current-tab.type == TabType.board-2d) || (Data.current-tab.type == TabType.board-3d);
-
-                    clicked => {
-                        if Data.current-tab.type == TabType.schematic {
-                            Backend.trigger-project(Data.current-schematic-tab.project-index, ProjectAction.export-bom);
-                        } else {
-                            Helpers.trigger-current-tab-action(TabAction.export-bom);
-                        }
-                    }
-                }
-
                 export-fabrication-data-item := MenuItem {
                     cmd: Cmd.generate-fabrication-data;
                     enabled: Data.current-tab.type == TabType.board-2d;
@@ -1095,11 +1082,15 @@ export component MainMenuBar inherits Rectangle {
 
                 MenuSeparator { }
 
-                generate-bom-item := MenuItem {
-                    cmd: Cmd.generate-bom;
+                bill-of-materials-item := MenuItem {
+                    cmd: Cmd.bill-of-materials;
 
                     clicked => {
-                        Helpers.trigger-current-project-action(ProjectAction.export-bom);
+                        if (Data.current-tab.type == TabType.board-2d) || (Data.current-tab.type == TabType.board-3d) {
+                            Helpers.trigger-current-tab-action(TabAction.bill-of-materials);
+                        } else {
+                            Backend.trigger-project(Data.current-schematic-tab.project-index, ProjectAction.bill-of-materials);
+                        }
                     }
                 }
 

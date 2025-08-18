@@ -47,8 +47,8 @@ export global Shortcuts {
         } else if is-shortcut(event, Cmd.export-lppz) {
             Backend.trigger-project(project, ProjectAction.export-lppz);
             return true;
-        } else if is-shortcut(event, Cmd.generate-bom) {
-            Backend.trigger-project(project, ProjectAction.export-bom);
+        } else if is-shortcut(event, Cmd.bill-of-materials) {
+            Backend.trigger-project(project, ProjectAction.bill-of-materials);
             return true;
         } else if is-shortcut(event, Cmd.output-jobs) {
             Backend.trigger-project(project, ProjectAction.open-output-jobs);

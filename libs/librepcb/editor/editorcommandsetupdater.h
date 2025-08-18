@@ -62,7 +62,7 @@ public:
     out.set_export_specctra_dsn(l2s(cmd.exportSpecctraDsn, out.get_export_specctra_dsn()));
     out.set_export_step(l2s(cmd.exportStep, out.get_export_step()));
     out.set_print(l2s(cmd.print, out.get_print()));
-    out.set_generate_bom(l2s(cmd.generateBom, out.get_generate_bom()));
+    out.set_bill_of_materials(l2s(cmd.billOfMaterials, out.get_bill_of_materials()));
     out.set_generate_fabrication_data(l2s(cmd.generateFabricationData, out.get_generate_fabrication_data()));
     out.set_generate_pick_place(l2s(cmd.generatePickPlace, out.get_generate_pick_place()));
     out.set_generate_d356_netlist(l2s(cmd.generateD356Netlist, out.get_generate_d356_netlist()));

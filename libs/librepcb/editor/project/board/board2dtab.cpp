@@ -573,8 +573,8 @@ void Board2dTab::trigger(ui::TabAction a) noexcept {
       execGraphicsExportDialog(GraphicsExportDialog::Output::Pdf, "pdf_export");
       break;
     }
-    case ui::TabAction::ExportBom: {
-      mProjectEditor.execBomGeneratorDialog(&mBoard);
+    case ui::TabAction::BillOfMaterials: {
+      mProjectEditor.execBomReviewDialog(&mBoard);
       break;
     }
     case ui::TabAction::ExportFabricationData: {

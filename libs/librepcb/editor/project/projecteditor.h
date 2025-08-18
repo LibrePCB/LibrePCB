@@ -146,7 +146,7 @@ public:
 
   void execOutputJobsDialog(const QString& typeName = QString()) noexcept;
 
-  void execBomGeneratorDialog(const Board* board) noexcept;
+  void execBomReviewDialog(const Board* board) noexcept;
 
   /**
    * @brief Execute the *.lppz export dialog (blocking)

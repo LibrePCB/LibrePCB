@@ -547,10 +547,20 @@ public:
       {QKeySequence(Qt::CTRL | Qt::Key_P)},
       &categoryImportExport,
   };
-  EditorCommand generateBom{
-      "generate_bom",  // clang-format break
-      QT_TR_NOOP("Generate Bill Of Materials"),
-      QT_TR_NOOP("Generate bill of materials (BOM) file"),
+  // EditorCommand generateBom{
+  //     "generate_bom",  // clang-format break
+  //     QT_TR_NOOP("Generate Bill Of Materials"),
+  //     QT_TR_NOOP("Generate bill of materials (BOM) file"),
+  //     ":/fa/solid/file-csv.svg",
+  //     EditorCommand::Flag::OpensPopup,
+  //     {QKeySequence(Qt::Key_F9)},
+  //     &categoryImportExport,
+  // };
+  EditorCommand billOfMaterials{
+      "bill_of_materials",  // clang-format break
+      QT_TR_NOOP("Bill Of Materials"),
+      QT_TR_NOOP("Open the project's bill of materials (BOM) to see part "
+                 "availability, prices etc."),
       ":/fa/solid/file-csv.svg",
       EditorCommand::Flag::OpensPopup,
       {QKeySequence(Qt::Key_F9)},

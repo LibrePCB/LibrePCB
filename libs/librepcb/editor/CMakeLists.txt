@@ -496,9 +496,9 @@ add_library(
   project/board/graphicsitems/bgi_via.h
   project/board/graphicsitems/bgi_zone.cpp
   project/board/graphicsitems/bgi_zone.h
-  project/bomgeneratordialog.cpp
-  project/bomgeneratordialog.h
-  project/bomgeneratordialog.ui
+  project/bomreviewdialog.cpp
+  project/bomreviewdialog.h
+  project/bomreviewdialog.ui
   project/cmd/cmdaddcomponenttocircuit.cpp
   project/cmd/cmdaddcomponenttocircuit.h
   project/cmd/cmdadddevicetoboard.cpp

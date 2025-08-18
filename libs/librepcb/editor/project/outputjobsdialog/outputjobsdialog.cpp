@@ -112,6 +112,11 @@ OutputJobsDialog::OutputJobsDialog(const WorkspaceSettings& settings,
             Q_UNUSED(link);
             auto gerber = GerberExcellonOutputJob::defaultStyle();
             auto pnp = std::make_shared<PickPlaceOutputJob>();
+            auto bom = std::make_shared<BomOutputJob>();
+            // For file format v2, we import the custom BOM attributes coming
+            // from the legacy BOM export dialog as a smooth migration to
+            // output jobs.
+            bom->setCustomAttributes(mProject.getCustomBomAttributes());
             auto archive = std::make_shared<ArchiveOutputJob>();
             archive->setInputJobs({
                 {gerber->getUuid(), QString()},
@@ -120,7 +125,7 @@ OutputJobsDialog::OutputJobsDialog(const WorkspaceSettings& settings,
             mJobs.append(GraphicsOutputJob::boardAssemblyPdf());
             mJobs.append(gerber);
             mJobs.append(pnp);
-            mJobs.append(std::make_shared<BomOutputJob>());
+            mJobs.append(bom);
             mJobs.append(archive);
             mJobs.append(std::make_shared<LppzOutputJob>());
             updateJobsList();
@@ -291,8 +296,14 @@ void OutputJobsDialog::addClicked() noexcept {
                  escape(NetlistOutputJob::getTypeTrStatic()),
                  [&]() { add(std::make_shared<NetlistOutputJob>()); });
   menu.addAction(QIcon(":/img/actions/generate_bom.png"),
-                 escape(BomOutputJob::getTypeTrStatic()),
-                 [&]() { add(std::make_shared<BomOutputJob>()); });
+                 escape(BomOutputJob::getTypeTrStatic()), [&]() {
+                   auto job = std::make_shared<BomOutputJob>();
+                   // For file format v2, we import the custom BOM attributes
+                   // coming from the legacy BOM export dialog as a smooth
+                   // migration to output jobs.
+                   job->setCustomAttributes(mProject.getCustomBomAttributes());
+                   add(job);
+                 });
   menu.addAction(QIcon(":/img/actions/generate_ibom.png"),
                  escape(InteractiveHtmlBomOutputJob::getTypeTrStatic()), [&]() {
                    add(std::make_shared<InteractiveHtmlBomOutputJob>());
