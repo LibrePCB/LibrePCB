@@ -403,6 +403,14 @@ void SlintGraphicsView::zoom(const QPointF& center, qreal factor) noexcept {
 }
 
 void SlintGraphicsView::smoothTo(const Projection& projection) noexcept {
+  // Do not start an animation if we are already at the desired projection.
+  // This can happen for example when locating the same DRC message on a board
+  // multiple times consecutively. The animation is not only useless then,
+  // but also disturbes the user if he immediately starts to drag/zoom manually.
+  if (projection == mProjection) {
+    return;
+  }
+
   mAnimationDataStart = mProjection;
   mAnimationDataDelta = projection - mProjection;
 

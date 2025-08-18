@@ -80,7 +80,7 @@ signals:
   void errorCountChanged(int count);
   void approvalChanged(const SExpression& approval, bool approved);
   void highlightRequested(std::shared_ptr<const RuleCheckMessage> msg,
-                          bool zoomTo);
+                          bool zoomTo, int windowId);
 
 private:
   void sortMessages() noexcept;
@@ -91,6 +91,8 @@ private:
   QSet<SExpression> mApprovals;
   int mUnapprovedCount;
   int mErrorCount;
+
+  int mActionWindowId;
 };
 
 /*******************************************************************************

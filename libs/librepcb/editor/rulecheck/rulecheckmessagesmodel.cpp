@@ -40,7 +40,7 @@ namespace editor {
  ******************************************************************************/
 
 RuleCheckMessagesModel::RuleCheckMessagesModel(QObject* parent) noexcept
-  : QObject(parent), mUnapprovedCount(0), mErrorCount(0) {
+  : QObject(parent), mUnapprovedCount(0), mErrorCount(0), mActionWindowId(0) {
 }
 
 RuleCheckMessagesModel::~RuleCheckMessagesModel() noexcept {
@@ -89,6 +89,7 @@ std::optional<ui::RuleCheckMessageData> RuleCheckMessagesModel::row_data(
         q2s(msg->getDescription()),  // Description
         mApprovals.contains(msg->getApproval()),  // Approved
         mAutofixHandler && mAutofixHandler(msg, true),  // Supports autofix
+        mActionWindowId,  // Action window ID
         ui::RuleCheckMessageAction::None,  // Action
     };
   } else {
@@ -99,6 +100,7 @@ std::optional<ui::RuleCheckMessageData> RuleCheckMessagesModel::row_data(
 void RuleCheckMessagesModel::set_row_data(
     std::size_t i, const ui::RuleCheckMessageData& data) noexcept {
   if (auto msg = mMessages.value(i)) {
+    mActionWindowId = data.action_window_id;
     if (data.approved && (!mApprovals.contains(msg->getApproval()))) {
       mApprovals.insert(msg->getApproval());
       emit approvalChanged(msg->getApproval(), true);
@@ -110,9 +112,9 @@ void RuleCheckMessagesModel::set_row_data(
       sortMessages();
       updateCounters();
     } else if (data.action == ui::RuleCheckMessageAction::Highlight) {
-      emit highlightRequested(msg, false);
+      emit highlightRequested(msg, false, mActionWindowId);
     } else if (data.action == ui::RuleCheckMessageAction::HighlightAndZoomTo) {
-      emit highlightRequested(msg, true);
+      emit highlightRequested(msg, true, mActionWindowId);
     } else if (data.action == ui::RuleCheckMessageAction::Autofix) {
       QMetaObject::invokeMethod(
           this,

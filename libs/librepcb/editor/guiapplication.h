@@ -37,6 +37,7 @@
  ******************************************************************************/
 namespace librepcb {
 
+class RuleCheckMessage;
 class Workspace;
 
 namespace editor {
@@ -142,6 +143,9 @@ private:
   void openProjectsPassedByCommandLine() noexcept;
   void openProjectPassedByOs(const QString& file, bool silent = false) noexcept;
   void openProjectLibraryUpdater(const FilePath& project) noexcept;
+
+  void highlightErcMessage(std::shared_ptr<const RuleCheckMessage> msg,
+                           bool zoomTo, int windowId) noexcept;
 
   std::shared_ptr<MainWindow> getCurrentWindow() noexcept;
   void updateLibrariesContainStandardComponents() noexcept;

@@ -24,6 +24,7 @@
 
 #include "../../library/cmp/componentsignal.h"
 #include "../../library/cmp/componentsymbolvariantitem.h"
+#include "../../library/sym/symbolpin.h"
 #include "../circuit/componentinstance.h"
 #include "../circuit/componentsignalinstance.h"
 #include "../circuit/netclass.h"
@@ -40,15 +41,87 @@
 namespace librepcb {
 
 /*******************************************************************************
+ *  ErcMsgBase
+ ******************************************************************************/
+
+bool ErcMsgBase::setLocation(const NetSignal& net) noexcept {
+  for (const SI_NetSegment* seg : net.getSchematicNetSegments()) {
+    if (setLocation(*seg)) {
+      return true;
+    }
+  }
+  for (const ComponentSignalInstance* cmpSig : net.getComponentSignals()) {
+    if (setLocation(*cmpSig)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool ErcMsgBase::setLocation(const ComponentInstance& component) noexcept {
+  for (const SI_Symbol* sym : component.getSymbols()) {
+    setLocation(*sym);
+    return true;
+  }
+  return false;
+}
+
+bool ErcMsgBase::setLocation(const ComponentSignalInstance& signal) noexcept {
+  for (const SI_SymbolPin* pin : signal.getRegisteredSymbolPins()) {
+    setLocation(*pin);
+    return true;
+  }
+  return setLocation(signal.getComponentInstance());
+}
+
+void ErcMsgBase::setLocation(const SI_Symbol& symbol) noexcept {
+  mSchematic = symbol.getSchematic().getUuid();
+  mLocations.append(
+      Path::circle(PositiveLength(2000000)).translated(symbol.getPosition()));
+}
+
+void ErcMsgBase::setLocation(const SI_SymbolPin& pin) noexcept {
+  mLocations.append(
+      Path::circle(PositiveLength(1100000)).translated(pin.getPosition()));
+  mSchematic = pin.getSchematic().getUuid();
+}
+
+bool ErcMsgBase::setLocation(const SI_NetSegment& segment) noexcept {
+  for (const SI_NetLine* nl : segment.getNetLines()) {
+    mLocations.append(Path::obround(nl->getStartPoint().getPosition(),
+                                    nl->getEndPoint().getPosition(),
+                                    PositiveLength(nl->getWidth() + 1)));
+  }
+  if (!segment.getNetLines().isEmpty()) {
+    mSchematic = segment.getSchematic().getUuid();
+    return true;
+  }
+  return false;
+}
+
+void ErcMsgBase::setLocation(const SI_NetPoint& netPoint) noexcept {
+  mSchematic = netPoint.getSchematic().getUuid();
+  mLocations.append(
+      Path::circle(PositiveLength(1100000)).translated(netPoint.getPosition()));
+}
+
+void ErcMsgBase::setLocation(const SI_NetLine& netLine) noexcept {
+  mSchematic = netLine.getSchematic().getUuid();
+  mLocations.append(Path::obround(netLine.getStartPoint().getPosition(),
+                                  netLine.getEndPoint().getPosition(),
+                                  PositiveLength(netLine.getWidth() + 1)));
+}
+
+/*******************************************************************************
  *  ErcMsgUnusedNetClass
  ******************************************************************************/
 
 ErcMsgUnusedNetClass::ErcMsgUnusedNetClass(const NetClass& netClass) noexcept
-  : RuleCheckMessage(Severity::Hint,
-                     tr("Unused net class: '%1'").arg(*netClass.getName()),
-                     tr("There are no nets assigned to the net class, so you "
-                        "could remove it."),
-                     "unused_netclass") {
+  : ErcMsgBase(Severity::Hint,
+               tr("Unused net class: '%1'").arg(*netClass.getName()),
+               tr("There are no nets assigned to the net class, so you "
+                  "could remove it."),
+               "unused_netclass") {
   mApproval->appendChild("netclass", netClass.getUuid());
 }
 
@@ -57,13 +130,15 @@ ErcMsgUnusedNetClass::ErcMsgUnusedNetClass(const NetClass& netClass) noexcept
  ******************************************************************************/
 
 ErcMsgOpenNet::ErcMsgOpenNet(const NetSignal& net) noexcept
-  : RuleCheckMessage(Severity::Warning,
-                     tr("Less than two pins in net: '%1'").arg(*net.getName()),
-                     tr("The net is connected to less than two pins, so it "
-                        "does not represent an electrical connection. Check if "
-                        "you missed to connect more pins."),
-                     "open_net") {
+  : ErcMsgBase(Severity::Warning,
+               tr("Less than two pins in net: '%1'").arg(*net.getName()),
+               tr("The net is connected to less than two pins, so it "
+                  "does not represent an electrical connection. Check if "
+                  "you missed to connect more pins."),
+               "open_net") {
   mApproval->appendChild("net", net.getUuid());
+
+  setLocation(net);
 }
 
 /*******************************************************************************
@@ -71,8 +146,8 @@ ErcMsgOpenNet::ErcMsgOpenNet(const NetSignal& net) noexcept
  ******************************************************************************/
 
 ErcMsgOpenWireInSegment::ErcMsgOpenWireInSegment(
-    const SI_NetSegment& segment) noexcept
-  : RuleCheckMessage(
+    const SI_NetSegment& segment, const SI_NetLine& openWire) noexcept
+  : ErcMsgBase(
         Severity::Warning,
         tr("Open wire in net: '%1'").arg(*segment.getNetSignal().getName()),
         tr("The wire has an open (unconnected) end with no net "
@@ -81,6 +156,8 @@ ErcMsgOpenWireInSegment::ErcMsgOpenWireInSegment(
            "cross mark)."),
         "open_wire") {
   mApproval->appendChild("segment", segment.getUuid());
+
+  setLocation(openWire);
 }
 
 /*******************************************************************************
@@ -89,19 +166,21 @@ ErcMsgOpenWireInSegment::ErcMsgOpenWireInSegment(
 
 ErcMsgUnconnectedRequiredSignal::ErcMsgUnconnectedRequiredSignal(
     const ComponentSignalInstance& signal) noexcept
-  : RuleCheckMessage(Severity::Error,
-                     tr("Unconnected component signal: '%1:%2'")
-                         .arg(*signal.getComponentInstance().getName(),
-                              *signal.getCompSignal().getName()),
-                     tr("The component signal is marked as required, but is "
-                        "not connected to any net. Add a wire to the "
-                        "corresponding symbol pin to connect it to a net."),
-                     "unconnected_required_signal") {
+  : ErcMsgBase(Severity::Error,
+               tr("Unconnected component signal: '%1:%2'")
+                   .arg(*signal.getComponentInstance().getName(),
+                        *signal.getCompSignal().getName()),
+               tr("The component signal is marked as required, but is "
+                  "not connected to any net. Add a wire to the "
+                  "corresponding symbol pin to connect it to a net."),
+               "unconnected_required_signal") {
   mApproval->ensureLineBreak();
   mApproval->appendChild("component", signal.getComponentInstance().getUuid());
   mApproval->ensureLineBreak();
   mApproval->appendChild("signal", signal.getCompSignal().getUuid());
   mApproval->ensureLineBreak();
+
+  setLocation(signal);
 }
 
 /*******************************************************************************
@@ -110,7 +189,7 @@ ErcMsgUnconnectedRequiredSignal::ErcMsgUnconnectedRequiredSignal(
 
 ErcMsgForcedNetSignalNameConflict::ErcMsgForcedNetSignalNameConflict(
     const ComponentSignalInstance& signal) noexcept
-  : RuleCheckMessage(
+  : ErcMsgBase(
         Severity::Error,
         tr("Net name conflict: '%1' != '%2' ('%3:%4')")
             .arg(getSignalNet(signal), signal.getForcedNetSignalName(),
@@ -126,6 +205,8 @@ ErcMsgForcedNetSignalNameConflict::ErcMsgForcedNetSignalNameConflict(
   mApproval->ensureLineBreak();
   mApproval->appendChild("signal", signal.getCompSignal().getUuid());
   mApproval->ensureLineBreak();
+
+  setLocation(signal);
 }
 
 QString ErcMsgForcedNetSignalNameConflict::getSignalNet(
@@ -141,18 +222,20 @@ QString ErcMsgForcedNetSignalNameConflict::getSignalNet(
 ErcMsgUnplacedRequiredGate::ErcMsgUnplacedRequiredGate(
     const ComponentInstance& component,
     const ComponentSymbolVariantItem& gate) noexcept
-  : RuleCheckMessage(Severity::Error,
-                     tr("Unplaced required gate: '%1:%2'")
-                         .arg(*component.getName(), *gate.getSuffix()),
-                     tr("The gate '%1' of '%2' is marked as required, but it "
-                        "is not added to the schematic.")
-                         .arg(*gate.getSuffix(), *component.getName()),
-                     "unplaced_required_gate") {
+  : ErcMsgBase(Severity::Error,
+               tr("Unplaced required gate: '%1:%2'")
+                   .arg(*component.getName(), *gate.getSuffix()),
+               tr("The gate '%1' of '%2' is marked as required, but it "
+                  "is not added to the schematic.")
+                   .arg(*gate.getSuffix(), *component.getName()),
+               "unplaced_required_gate") {
   mApproval->ensureLineBreak();
   mApproval->appendChild("component", component.getUuid());
   mApproval->ensureLineBreak();
   mApproval->appendChild("gate", gate.getUuid());
   mApproval->ensureLineBreak();
+
+  setLocation(component);
 }
 
 /*******************************************************************************
@@ -162,7 +245,7 @@ ErcMsgUnplacedRequiredGate::ErcMsgUnplacedRequiredGate(
 ErcMsgUnplacedOptionalGate::ErcMsgUnplacedOptionalGate(
     const ComponentInstance& component,
     const ComponentSymbolVariantItem& gate) noexcept
-  : RuleCheckMessage(
+  : ErcMsgBase(
         Severity::Warning,
         tr("Unplaced gate: '%1:%2'")
             .arg(*component.getName(), *gate.getSuffix()),
@@ -174,6 +257,8 @@ ErcMsgUnplacedOptionalGate::ErcMsgUnplacedOptionalGate(
   mApproval->ensureLineBreak();
   mApproval->appendChild("gate", gate.getUuid());
   mApproval->ensureLineBreak();
+
+  setLocation(component);
 }
 
 /*******************************************************************************
@@ -182,7 +267,7 @@ ErcMsgUnplacedOptionalGate::ErcMsgUnplacedOptionalGate(
 
 ErcMsgConnectedPinWithoutWire::ErcMsgConnectedPinWithoutWire(
     const SI_SymbolPin& pin) noexcept
-  : RuleCheckMessage(
+  : ErcMsgBase(
         Severity::Warning,
         tr("Connected pin without wire: '%1:%2'")
             .arg(pin.getSymbol().getName(), pin.getName()),
@@ -197,6 +282,8 @@ ErcMsgConnectedPinWithoutWire::ErcMsgConnectedPinWithoutWire(
   mApproval->ensureLineBreak();
   mApproval->appendChild("pin", pin.getLibPinUuid());
   mApproval->ensureLineBreak();
+
+  setLocation(pin);
 }
 
 /*******************************************************************************
@@ -205,7 +292,7 @@ ErcMsgConnectedPinWithoutWire::ErcMsgConnectedPinWithoutWire(
 
 ErcMsgUnconnectedJunction::ErcMsgUnconnectedJunction(
     const SI_NetPoint& netPoint) noexcept
-  : RuleCheckMessage(
+  : ErcMsgBase(
         Severity::Hint,
         tr("Unconnected junction in net: '%1'")
             .arg(*netPoint.getNetSignalOfNetSegment().getName()),
@@ -221,6 +308,8 @@ ErcMsgUnconnectedJunction::ErcMsgUnconnectedJunction(
   mApproval->ensureLineBreak();
   mApproval->appendChild("junction", netPoint.getUuid());
   mApproval->ensureLineBreak();
+
+  setLocation(netPoint);
 }
 
 /*******************************************************************************
