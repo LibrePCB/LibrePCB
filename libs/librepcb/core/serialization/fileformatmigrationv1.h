@@ -46,6 +46,13 @@ class SExpression;
 class FileFormatMigrationV1 : public FileFormatMigration {
   Q_OBJECT
 
+protected:
+  struct ProjectContext {
+    // Counters for emitting messages.
+    int boardCount = 0;
+    bool hasGerberOutputJob = false;
+  };
+
 public:
   // Constructors / Destructor
   explicit FileFormatMigrationV1(QObject* parent = nullptr) noexcept;
@@ -70,7 +77,7 @@ public:
 protected:
   virtual void upgradeMetadata(SExpression& root, QList<Message>& messages);
   virtual void upgradeSettings(SExpression& root, QList<Message>& messages);
-  virtual void upgradeOutputJobs(SExpression& root);
+  virtual void upgradeOutputJobs(SExpression& root, ProjectContext& context);
   virtual void upgradeCircuit(SExpression& root, QList<Message>& messages);
   virtual std::optional<QString> upgradeFileProofName(QString name);
 };

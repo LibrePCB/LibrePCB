@@ -124,6 +124,8 @@ void FileFormatMigrationV1::upgradeProject(TransactionalDirectory& dir,
   // just call virtual protected methods which do the upgrade. This allows
   // FileFormatMigrationUnstable to override them with partial upgrades.
 
+  ProjectContext context;
+
   // Version File.
   upgradeVersionFile(dir, ".librepcb-project");
 
@@ -182,7 +184,7 @@ void FileFormatMigrationV1::upgradeProject(TransactionalDirectory& dir,
     const QString fp = "project/jobs.lp";
     std::unique_ptr<SExpression> root =
         SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-    upgradeOutputJobs(*root);
+    upgradeOutputJobs(*root, context);
     dir.write(fp, root->toByteArray());
   }
 
@@ -193,6 +195,27 @@ void FileFormatMigrationV1::upgradeProject(TransactionalDirectory& dir,
         SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
     upgradeCircuit(*root, messages);
     dir.write(fp, root->toByteArray());
+  }
+
+  // Boards.
+  foreach (const QString& dirName, dir.getDirs("boards")) {
+    QString fp = "boards/" % dirName % "/board.lp";
+    if (dir.fileExists(fp)) {
+      ++context.boardCount;
+    }
+  }
+
+  // Emit messages at the very end to avoid duplicate messages caused my
+  // multiple schematics/boards.
+  if ((context.boardCount > 0) && (!context.hasGerberOutputJob)) {
+    messages.append(buildMessage(
+        Message::Severity::Warning,
+        tr("The dedicated Gerber/Excellon generator dialog has been removed "
+           "in favor of the more powerful output jobs, and the corresponding "
+           "output settings will be removed from boards in an upcoming "
+           "release. It is recommended to add a Gerber/Excellon output job "
+           "now, as this allows to migrate the old export settings."),
+        1));
   }
 }
 
@@ -259,7 +282,8 @@ void FileFormatMigrationV1::upgradeSettings(SExpression& root,
   }
 }
 
-void FileFormatMigrationV1::upgradeOutputJobs(SExpression& root) {
+void FileFormatMigrationV1::upgradeOutputJobs(SExpression& root,
+                                              ProjectContext& context) {
   for (SExpression* jobNode : root.getChildren("job")) {
     if (jobNode->getChild("type/@0").getValue() == "graphics") {
       for (SExpression* contentNode : jobNode->getChildren("content")) {
@@ -303,6 +327,8 @@ void FileFormatMigrationV1::upgradeOutputJobs(SExpression& root) {
           }
         }
       }
+    } else if (jobNode->getChild("type/@0").getValue() == "gerber_excellon") {
+      context.hasGerberOutputJob = true;
     }
   }
 }
