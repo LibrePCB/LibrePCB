@@ -20,6 +20,7 @@ Test command "open-project --export-pnp-top --export-pnp-bottom"
     ],
 )
 def test_if_unknown_file_extension_fails(cli, project, argument, side):
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     code, stdout, stderr = cli.run("open-project", argument, project.path)
     assert stderr == nofmt("""\
@@ -37,6 +38,7 @@ Finished with errors!
 @pytest.mark.parametrize("project", [params.EMPTY_PROJECT_LPP_PARAM])
 @pytest.mark.parametrize("ext", ["csv", "gbr"])
 def test_if_project_without_boards_succeeds(cli, project, ext):
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
 
     # remove all boards first
@@ -76,6 +78,7 @@ SUCCESS
 )
 @pytest.mark.parametrize("ext", ["csv", "gbr"])
 def test_export_project_with_two_boards_implicit(cli, project, ext):
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     fp_top = project.output_dir + "/pnp/{{BOARD}}_top." + ext
     fp_bot = project.output_dir + "/pnp/{{BOARD}}_bot." + ext
@@ -113,6 +116,7 @@ SUCCESS
 )
 @pytest.mark.parametrize("ext", ["csv", "gbr"])
 def test_export_project_with_two_boards_explicit_one(cli, project, ext):
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     fp_top = project.output_dir + "/pnp/{{BOARD}}_top." + ext
     fp_bot = project.output_dir + "/pnp/{{BOARD}}_bot." + ext
@@ -142,6 +146,7 @@ SUCCESS
 @pytest.mark.parametrize("project", [params.PROJECT_WITH_TWO_BOARDS_LPP])
 @pytest.mark.parametrize("ext", ["csv", "gbr"])
 def test_export_project_with_two_conflicting_boards_fails(cli, project, ext):
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     fp_top = project.output_dir + "/top." + ext
     fp_bot = project.output_dir + "/bot." + ext

@@ -20,6 +20,7 @@ Test command "open-project --export-schematics"
     ],
 )
 def test_if_unknown_file_extension_fails(cli, project):
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     code, stdout, stderr = cli.run(
         "open-project", "--export-schematics=foo.bar", project.path
@@ -44,6 +45,7 @@ Finished with errors!
     ],
 )
 def test_exporting_pdf_with_relative_path(cli, project):
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     path = cli.abspath("sch.pdf")
     assert not os.path.exists(path)
@@ -72,6 +74,7 @@ def test_exporting_pdf_with_absolute_path(cli, project):
     """
     Note: Test with passing the argument as "--arg <value>".
     """
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     path = cli.abspath("schematic with spaces.pdf")
     assert not os.path.exists(path)
@@ -97,6 +100,7 @@ SUCCESS
     ],
 )
 def test_exporting_images(cli, file_extension):
+    cli.suppress_deprecation_warnings = True
     project = params.PROJECT_WITH_TWO_BOARDS_LPPZ
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     path = cli.abspath("schematic with spaces." + file_extension)
@@ -123,6 +127,7 @@ SUCCESS
     ],
 )
 def test_if_output_directories_are_created(cli, project):
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     dir = cli.abspath("nonexistent directory/nested")
     path = os.path.join(dir, "schematic.pdf")
@@ -139,4 +144,35 @@ SUCCESS
 """)
     assert code == 0
     assert os.path.exists(dir)
+    assert os.path.exists(path)
+
+
+@pytest.mark.parametrize(
+    "project",
+    [
+        params.EMPTY_PROJECT_LPP_PARAM,
+    ],
+)
+def test_deprecation_warning(cli, project):
+    cli.add_project(project.dir, as_lppz=project.is_lppz)
+    path = cli.abspath("sch.pdf")
+    assert not os.path.exists(path)
+    code, stdout, stderr = cli.run(
+        "open-project", "--export-schematics=sch.pdf", project.path
+    )
+    assert stderr == nofmt("""\
+WARNING: The command or option '--export-schematics' is deprecated and will \
+be removed in a future release. Please see '--run-jobs' for a possible \
+replacement. For now, the command will be executed, but the CLI will return \
+with a nonzero exit code. As a temporary workaround, this warning and the \
+nonzero exit code can be suppressed with the environment variable \
+'LIBREPCB_SUPPRESS_DEPRECATION_WARNINGS=1'.
+""")
+    assert stdout == nofmt(f"""\
+Open project '{project.path}'...
+Export schematics to 'sch.pdf'...
+  => 'sch.pdf'
+Finished with warnings!
+""")
+    assert code == 2
     assert os.path.exists(path)

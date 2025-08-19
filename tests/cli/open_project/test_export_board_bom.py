@@ -13,6 +13,7 @@ Test command "open-project --export-board-bom"
 
 @pytest.mark.parametrize("project", [params.EMPTY_PROJECT_LPP_PARAM])
 def test_if_project_without_boards_succeeds(cli, project):
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
 
     # remove all boards first
@@ -43,6 +44,7 @@ SUCCESS
     ],
 )
 def test_export_project_with_two_boards_implicit(cli, project):
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     fp = project.output_dir + "/bom/{{BOARD}}.csv"
     dir = cli.abspath(project.output_dir + "/bom")
@@ -74,6 +76,7 @@ def test_export_project_with_two_boards_explicit_one_attributes(cli, project):
     """
     Note: Test with passing the argument as "--arg <value>".
     """
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     fp = project.output_dir + "/bom/{{BOARD}}.csv"
     dir = cli.abspath(project.output_dir + "/bom")
@@ -103,6 +106,7 @@ SUCCESS
 
 @pytest.mark.parametrize("project", [params.PROJECT_WITH_TWO_BOARDS_LPP_PARAM])
 def test_export_project_with_two_boards_with_variant(cli, project):
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     fp = project.output_dir + "/bom/{{BOARD}}_{{VARIANT}}.csv"
     dir = cli.abspath(project.output_dir + "/bom")
@@ -125,6 +129,7 @@ SUCCESS
 
 @pytest.mark.parametrize("project", [params.PROJECT_WITH_TWO_BOARDS_LPP])
 def test_export_project_with_two_conflicting_boards_fails(cli, project):
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     fp = project.output_dir + "/bom.csv"
     code, stdout, stderr = cli.run(

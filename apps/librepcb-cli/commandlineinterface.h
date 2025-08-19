@@ -119,6 +119,9 @@ private:  // Methods
   static bool failIfFileFormatUnstable() noexcept;
   static void print(const QString& str) noexcept;
   static void printErr(const QString& str) noexcept;
+  static bool suppressDeprecationWarnings() noexcept;
+  static void printDeprecationWarning(const QString& deprecatedCommand,
+                                      const QString& newCommand) noexcept;
 };
 
 /*******************************************************************************

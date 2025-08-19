@@ -13,6 +13,7 @@ Test command "open-project --export-bom"
 
 @pytest.mark.parametrize("project", [params.EMPTY_PROJECT_LPP_PARAM])
 def test_if_project_without_boards_succeeds(cli, project):
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
 
     # remove all boards first
@@ -44,6 +45,7 @@ SUCCESS
     ],
 )
 def test_export_multiple_files(cli, project):
+    cli.suppress_deprecation_warnings = True
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     relpath1 = project.output_dir + "/bom1.csv"
     abspath1 = cli.abspath(relpath1)

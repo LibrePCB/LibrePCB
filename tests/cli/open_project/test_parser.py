@@ -36,35 +36,44 @@ Options:
   --outdir <path>                    Override the output base directory of
                                      jobs. If not set, the standard output
                                      directory from the project is used.
-  --export-schematics <file>         Export schematics to given file(s).
+  --export-schematics <file>         [DEPRECATED, REPLACED BY: --run-jobs]
+                                     Export schematics to given file(s).
                                      Existing files will be overwritten.
                                      Supported file extensions: pdf, svg, ***
-  --export-bom <file>                Export generic BOM to given file(s).
+  --export-bom <file>                [DEPRECATED, REPLACED BY: --run-jobs]
+                                     Export generic BOM to given file(s).
                                      Existing files will be overwritten.
                                      Supported file extensions: csv
-  --export-board-bom <file>          Export board-specific BOM to given
-                                     file(s). Existing files will be
-                                     overwritten. Supported file extensions: csv
-  --bom-attributes <attributes>      Comma-separated list of additional
+  --export-board-bom <file>          [DEPRECATED, REPLACED BY: --run-jobs]
+                                     Export board-specific BOM to given file(s).
+                                     Existing files will be overwritten.
+                                     Supported file extensions: csv
+  --bom-attributes <attributes>      [DEPRECATED, REPLACED BY: --run-jobs]
+                                     Comma-separated list of additional
                                      attributes to be exported to the BOM.
                                      Example: "SUPPLIER, SKU"
-  --export-pcb-fabrication-data      Export PCB fabrication data
+  --export-pcb-fabrication-data      [DEPRECATED, REPLACED BY: --run-jobs]
+                                     Export PCB fabrication data
                                      (Gerber/Excellon) according the fabrication
                                      output settings of boards. Existing files
                                      will be overwritten.
-  --pcb-fabrication-settings <file>  Override PCB fabrication output settings
-                                     by providing a *.lp file containing custom
+  --pcb-fabrication-settings <file>  [DEPRECATED, REPLACED BY: --jobs] Override
+                                     PCB fabrication output settings by
+                                     providing a *.lp file containing custom
                                      settings. If not set, the settings from the
                                      boards will be used instead.
-  --export-pnp-top <file>            Export pick&place file for automated
+  --export-pnp-top <file>            [DEPRECATED, REPLACED BY: --run-jobs]
+                                     Export pick&place file for automated
                                      assembly of the top board side. Existing
                                      files will be overwritten. Supported file
                                      extensions: csv, gbr
-  --export-pnp-bottom <file>         Export pick&place file for automated
+  --export-pnp-bottom <file>         [DEPRECATED, REPLACED BY: --run-jobs]
+                                     Export pick&place file for automated
                                      assembly of the bottom board side. Existing
                                      files will be overwritten. Supported file
                                      extensions: csv, gbr
-  --export-netlist <file>            Export netlist file for automated PCB
+  --export-netlist <file>            [DEPRECATED, REPLACED BY: --run-jobs]
+                                     Export netlist file for automated PCB
                                      testing. Existing files will be
                                      overwritten. Supported file extensions:
                                      d356
