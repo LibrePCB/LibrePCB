@@ -79,6 +79,7 @@ protected:
   virtual void upgradeSettings(SExpression& root, QList<Message>& messages);
   virtual void upgradeOutputJobs(SExpression& root, ProjectContext& context);
   virtual void upgradeCircuit(SExpression& root, QList<Message>& messages);
+  virtual void upgradeBoard(SExpression& root);
   virtual std::optional<QString> upgradeFileProofName(QString name);
 };
 
