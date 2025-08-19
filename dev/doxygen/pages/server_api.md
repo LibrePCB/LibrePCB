@@ -123,8 +123,8 @@ The response is an object with following properties:
 *Notes:*
 - *Both `stable_version` and `preview_version` shall contain the
   version number exactly as specified in `CMakeLists.txt` (e.g. `1.2.3-rc4`).*
-- *If there is currently no preview version available, the content of
-  `preview_version` should be equal to `stable_version`.*
+- *If there is currently no preview version available, the whole
+  `preview_version` property should be omitted from the response*
 - The resource capabilities (`libraries`, `order`, `parts`) are usually just
   empty objects (which means the resource is supported) but may be extended
   with properties in future. Unsupported resources may either not appear
@@ -157,47 +157,51 @@ curl 'https://api.librepcb.org/api/v1/info'
     "version": "1.3.0",
     "release_date": "2025-08-15",
     "changelog_url": "https://librepcb.org/blog/2025-03-24_release_1.3.0/",
+    "download_url": "https://librepcb.org/download/",
     "linux_x86_64_appimage": {
-      "min_libc": "2.28",
+      "requires": {"libc": "2.28"},
       "url": "https://.../librepcb-1.3.0-linux-x86_64.AppImage",
       "size": 52428800,
       "sha256": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4"
     },
     "linux_x86_64_tgz": {
-      "min_libc": "2.28",
+      "requires": {"libc": "2.28"},
       "url": "https://.../librepcb-1.3.0-linux-x86_64.tar.gz",
       "size": 52428800,
       "sha256": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4"
     },
     "mac_x86_64_dmg": {
-      "min_macos": "11.2",
+      "requires": {"macos": "11.2"},
       "url": "https://.../librepcb-1.3.0-mac-x86_64.dmg",
       "size": 52428800,
       "sha256": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4"
     },
     "mac_arm64_dmg": {
-      "min_macos": "13.0",
+      "requires": {"macos": "13.0"},
       "url": "https://.../librepcb-1.3.0-mac-arm64.dmg",
       "size": 52428800,
       "sha256": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4"
     },
     "windows_x86_64_zip": {
-      "min_windows": "10.0",
+      "requires": {"windows": "10.0"},
       "url": "https://.../librepcb-1.3.0-windows-x86_64.zip",
       "size": 52428800,
       "sha256": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4"
     },
-    "windows_x86_64_installer_exe": {
-      "min_windows": "10.0",
+    "windows_x86_64_innosetup": {
+      "requires": {"windows": "10.0"},
       "url": "https://.../librepcb-installer-1.3.0-windows-x86_64.exe",
       "size": 52428800,
       "sha256": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4"
-    },
+    }
   },
-  "preview_version": {
-    "version": "2.0.0-rc1",
-    "changelog_url": "https://librepcb.org/blog/2025-08-01_release_2.0.0-rc1/",
-  },
+  "news": [
+    {
+      "date": "2025-05-20T00:00:00Z",
+      "title": "Library Updates Q1 2025",
+      "url": "https://librepcb.org/blog/2025-05-20_library_updates/"
+    }
+  ],
   "libraries": {},
   "order": null,
   "parts": {}
