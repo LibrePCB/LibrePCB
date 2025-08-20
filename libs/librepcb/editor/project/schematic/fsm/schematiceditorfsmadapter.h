@@ -75,6 +75,7 @@ public:
   Q_DECLARE_FLAGS(Features, Feature)
 
   virtual SchematicGraphicsScene* fsmGetGraphicsScene() noexcept = 0;
+  virtual bool fsmGetIgnoreLocks() const noexcept = 0;
   virtual void fsmSetViewCursor(
       const std::optional<Qt::CursorShape>& shape) noexcept = 0;
   virtual void fsmSetViewGrayOut(bool grayOut) noexcept = 0;

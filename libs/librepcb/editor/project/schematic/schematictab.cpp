@@ -119,6 +119,7 @@ SchematicTab::SchematicTab(GuiApplication& app, SchematicEditor& editor,
                    .getSettings()
                    .themes.getActive()
                    .getSchematicGridStyle()),
+    mIgnorePlacementLocks(false),
     mFrameIndex(0),
     mToolFeatures(),
     mTool(ui::EditorTool::Select),
@@ -299,6 +300,7 @@ ui::SchematicTabData SchematicTab::getDerivedUiData() const noexcept {
       l2s(*mSchematic.getGridInterval()),  // Grid interval
       l2s(mSchematic.getGridUnit()),  // Length unit
       mPinNumbersLayer && mPinNumbersLayer->isVisible(),  // Show pin numbers
+      mIgnorePlacementLocks,  // Ignore placement locks
       mMsgInstallLibraries.getUiData(),  // Message "install libraries"
       mMsgAddDrawingFrame.getUiData(),  // Message "add schematic frame"
       mTool,  // Tool
@@ -366,6 +368,9 @@ void SchematicTab::setDerivedUiData(const ui::SchematicTabData& data) noexcept {
     cs.setValue("schematic_editor/show_pin_numbers", data.show_pin_numbers);
   }
 
+  // Placement locks
+  mIgnorePlacementLocks = data.ignore_placement_locks;
+
   // Messages
   mMsgInstallLibraries.setUiData(data.install_libraries_msg);
   mMsgAddDrawingFrame.setUiData(data.add_drawing_frame_msg);
@@ -419,7 +424,8 @@ void SchematicTab::highlightErcMessage(
 
 void SchematicTab::activate() noexcept {
   mScene.reset(new SchematicGraphicsScene(
-      mSchematic, *mLayers, mProjectEditor.getHighlightedNetSignals(), this));
+      mSchematic, *mLayers, mProjectEditor.getHighlightedNetSignals(),
+      mIgnorePlacementLocks, this));
   mScene->setGridInterval(mSchematic.getGridInterval());
   connect(&mProjectEditor, &ProjectEditor::highlightedNetSignalsChanged,
           mScene.get(), &SchematicGraphicsScene::updateHighlightedNetSignals);
@@ -761,6 +767,10 @@ bool SchematicTab::graphicsSceneRightMouseButtonReleased(
 
 SchematicGraphicsScene* SchematicTab::fsmGetGraphicsScene() noexcept {
   return mScene.get();
+}
+
+bool SchematicTab::fsmGetIgnoreLocks() const noexcept {
+  return mIgnorePlacementLocks;
 }
 
 void SchematicTab::fsmSetViewCursor(

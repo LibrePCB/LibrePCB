@@ -99,7 +99,7 @@ public:
   explicit SchematicGraphicsScene(
       Schematic& schematic, const GraphicsLayerList& layers,
       std::shared_ptr<const QSet<const NetSignal*>> highlightedNetSignals,
-      QObject* parent = nullptr) noexcept;
+      bool& ignorePlacementLocks, QObject* parent = nullptr) noexcept;
   virtual ~SchematicGraphicsScene() noexcept;
 
   // Getters
@@ -173,6 +173,7 @@ private:  // Data
   Schematic& mSchematic;
   const GraphicsLayerList& mLayers;
   std::shared_ptr<const QSet<const NetSignal*>> mHighlightedNetSignals;
+  const bool& mIgnorePlacementLocks;
   QHash<SI_Symbol*, std::shared_ptr<SGI_Symbol>> mSymbols;
   QHash<SI_SymbolPin*, std::shared_ptr<SGI_SymbolPin>> mSymbolPins;
   QHash<SI_NetPoint*, std::shared_ptr<SGI_NetPoint>> mNetPoints;

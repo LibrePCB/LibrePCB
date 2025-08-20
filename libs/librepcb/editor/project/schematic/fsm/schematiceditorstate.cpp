@@ -176,9 +176,10 @@ QList<std::shared_ptr<QGraphicsItem>> SchematicEditorState::findItemsAtPos(
   auto processItem = [&pos, &posExact, &posArea, &posAreaLarge, &posAreaInGrid,
                       flags, &except, &addItem, &canSkip](
                          std::shared_ptr<QGraphicsItem> item,
+                         std::shared_ptr<QGraphicsItem> itemToAdd,
                          const Point& nearestPos, int priority, bool large,
                          const std::optional<UnsignedLength>& maxDistance) {
-    if (except.contains(item)) {
+    if (except.contains(itemToAdd)) {
       return false;
     }
     auto prio = std::make_pair(priority, 0);
@@ -196,7 +197,7 @@ QList<std::shared_ptr<QGraphicsItem>> SchematicEditorState::findItemsAtPos(
       return false;
     }
     if (grabArea.contains(posExact)) {
-      addItem(prio, item);
+      addItem(prio, itemToAdd);
       return true;
     }
     prio = std::make_pair(priority + 1000, distanceInt);
@@ -206,7 +207,7 @@ QList<std::shared_ptr<QGraphicsItem>> SchematicEditorState::findItemsAtPos(
     if ((flags &
          (FindFlag::AcceptNearMatch | FindFlag::AcceptNearestWithinGrid)) &&
         grabArea.intersects(large ? posAreaLarge : posArea)) {
-      addItem(prio, item);
+      addItem(prio, itemToAdd);
       return true;
     }
     prio = std::make_pair(distanceInt + 2000, priority);  // Swapped order!
@@ -215,7 +216,7 @@ QList<std::shared_ptr<QGraphicsItem>> SchematicEditorState::findItemsAtPos(
     }
     if ((flags & FindFlag::AcceptNearestWithinGrid) &&
         (!posAreaInGrid.isEmpty()) && grabArea.intersects(posAreaInGrid)) {
-      addItem(prio, item);
+      addItem(prio, itemToAdd);
       return true;
     }
     return false;
@@ -224,7 +225,7 @@ QList<std::shared_ptr<QGraphicsItem>> SchematicEditorState::findItemsAtPos(
   if (flags.testFlag(FindFlag::NetPoints)) {
     for (auto it = scene->getNetPoints().begin();
          it != scene->getNetPoints().end(); it++) {
-      processItem(it.value(), it.key()->getPosition(),
+      processItem(it.value(), it.value(), it.key()->getPosition(),
                   it.key()->isVisibleJunction() ? 0 : 10, false, std::nullopt);
     }
   }
@@ -233,7 +234,7 @@ QList<std::shared_ptr<QGraphicsItem>> SchematicEditorState::findItemsAtPos(
     for (auto it = scene->getNetLines().begin();
          it != scene->getNetLines().end(); it++) {
       processItem(
-          it.value(),
+          it.value(), it.value(),
           Toolbox::nearestPointOnLine(pos.mappedToGrid(getGridInterval()),
                                       it.key()->getStartPoint().getPosition(),
                                       it.key()->getEndPoint().getPosition()),
@@ -244,7 +245,8 @@ QList<std::shared_ptr<QGraphicsItem>> SchematicEditorState::findItemsAtPos(
   if (flags.testFlag(FindFlag::NetLabels)) {
     for (auto it = scene->getNetLabels().begin();
          it != scene->getNetLabels().end(); it++) {
-      processItem(it.value(), it.key()->getPosition(), 30, false, std::nullopt);
+      processItem(it.value(), it.value(), it.key()->getPosition(), 30, false,
+                  std::nullopt);
     }
   }
 
@@ -253,9 +255,9 @@ QList<std::shared_ptr<QGraphicsItem>> SchematicEditorState::findItemsAtPos(
          it++) {
       // Higher priority if origin cross is below cursor. Required for
       // https://github.com/LibrePCB/LibrePCB/issues/1319.
-      if (!processItem(it.value(), it.key()->getPosition(), 40, false,
-                       UnsignedLength(700000))) {
-        processItem(it.value(), it.key()->getPosition(), 70, false,
+      if (!processItem(it.value(), it.value(), it.key()->getPosition(), 50,
+                       false, UnsignedLength(700000))) {
+        processItem(it.value(), it.value(), it.key()->getPosition(), 70, false,
                     std::nullopt);
       }
     }
@@ -267,7 +269,7 @@ QList<std::shared_ptr<QGraphicsItem>> SchematicEditorState::findItemsAtPos(
          it != scene->getSymbolPins().end(); it++) {
       if (flags.testFlag(FindFlag::SymbolPins) ||
           (it.key()->getComponentSignalInstance())) {
-        processItem(it.value(), it.key()->getPosition(), 40, false,
+        processItem(it.value(), it.value(), it.key()->getPosition(), 40, false,
                     std::nullopt);
       }
     }
@@ -277,7 +279,7 @@ QList<std::shared_ptr<QGraphicsItem>> SchematicEditorState::findItemsAtPos(
     for (auto it = scene->getPolygons().begin();
          it != scene->getPolygons().end(); it++) {
       processItem(
-          it.value(),
+          it.value(), it.value(),
           it.key()->getPolygon().getPath().calcNearestPointBetweenVertices(pos),
           80, true, std::nullopt);  // Probably large grab area makes sense?
     }
@@ -286,14 +288,27 @@ QList<std::shared_ptr<QGraphicsItem>> SchematicEditorState::findItemsAtPos(
   if (flags.testFlag(FindFlag::Texts)) {
     for (auto it = scene->getTexts().begin(); it != scene->getTexts().end();
          it++) {
-      processItem(it.value(), it.key()->getPosition(), 60, false, std::nullopt);
+      if ((!it.key()->getTextObj().isLocked()) ||
+          mAdapter.fsmGetIgnoreLocks()) {
+        processItem(it.value(), it.value(), it.key()->getPosition(), 60, false,
+                    std::nullopt);
+      } else if (flags.testFlag(FindFlag::Symbols)) {
+        // Text is locked, so it cannot be dragged. But if it attached to a
+        // symbol, drag the symbol instead, i.e. consider the text as part of
+        // the symbols grab area.
+        if (auto symItem = it.value()->getSymbolGraphicsItem().lock()) {
+          processItem(it.value(), symItem, it.key()->getPosition(), 70, false,
+                      std::nullopt);
+        }
+      }
     }
   }
 
   if (flags.testFlag(FindFlag::Images)) {
     for (auto it = scene->getImages().begin(); it != scene->getImages().end();
          it++) {
-      processItem(it.value(), it.key()->getPosition(), 90, false, std::nullopt);
+      processItem(it.value(), it.value(), it.key()->getPosition(), 90, false,
+                  std::nullopt);
     }
   }
 
