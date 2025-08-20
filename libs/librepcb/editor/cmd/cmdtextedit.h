@@ -70,6 +70,7 @@ public:
               bool immediate) noexcept;
   void mirror(const Angle& rotation, const Point& center,
               bool immediate) noexcept;
+  void setLocked(bool locked, bool immediate) noexcept;
 
   // Operator Overloadings
   CmdTextEdit& operator=(const CmdTextEdit& rhs) = delete;
@@ -104,6 +105,8 @@ private:
   PositiveLength mNewHeight;
   Alignment mOldAlign;
   Alignment mNewAlign;
+  bool mOldLocked;
+  bool mNewLocked;
 };
 
 /*******************************************************************************

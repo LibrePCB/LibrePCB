@@ -1062,7 +1062,7 @@ void MainWindow::openSymbolTab(LibraryEditor& editor, const FilePath& fp,
             sym->getTexts().append(std::make_shared<Text>(
                 Uuid::createRandom(), text.getLayer(), text.getText(),
                 text.getPosition(), text.getRotation(), text.getHeight(),
-                text.getAlign()));
+                text.getAlign(), text.isLocked()));
           }
           // Copy images but generate new UUIDs.
           for (const Image& image : src->getImages()) {

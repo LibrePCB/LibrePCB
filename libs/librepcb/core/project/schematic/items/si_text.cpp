@@ -117,6 +117,10 @@ void SI_Text::textEdited(const Text& text, Text::Event event) noexcept {
       updateText();
       break;
     }
+    case Text::Event::LockedChanged: {
+      onEdited.notify(Event::LockedChanged);
+      break;
+    }
     default:
       break;
   }

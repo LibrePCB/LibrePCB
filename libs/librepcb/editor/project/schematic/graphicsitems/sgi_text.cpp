@@ -112,6 +112,10 @@ void SGI_Text::textEdited(const SI_Text& obj, SI_Text::Event event) noexcept {
     case SI_Text::Event::TextChanged:
       updateText();
       break;
+    case SI_Text::Event::LockedChanged: {
+      updateAnchorLayer();
+      break;
+    }
     default:
       qWarning() << "Unhandled switch-case in SGI_Text::textEdited():"
                  << static_cast<int>(event);
@@ -143,11 +147,13 @@ void SGI_Text::updateText() noexcept {
 
 void SGI_Text::updateAnchorLayer() noexcept {
   Q_ASSERT(mAnchorGraphicsItem);
-  if (mText.getSymbol() && isSelected()) {
+  if (mText.getSymbol() && (!mText.getTextObj().isLocked()) && isSelected()) {
     mAnchorGraphicsItem->setLayer(mLayers.get(mText.getTextObj().getLayer()));
   } else {
     mAnchorGraphicsItem->setLayer(nullptr);
   }
+
+  mTextGraphicsItem->setOriginCrossVisible(!mText.getTextObj().isLocked());
 }
 
 void SGI_Text::updateAnchorLine() noexcept {

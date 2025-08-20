@@ -59,6 +59,7 @@ public:
   Text& getObj() noexcept { return mText; }
 
   // Setters
+  void setOriginCrossVisible(bool visible) noexcept;
   void setTextOverride(const std::optional<QString>& text) noexcept;
 
   // Inherited from QGraphicsItem

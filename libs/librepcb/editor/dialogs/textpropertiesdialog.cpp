@@ -67,6 +67,7 @@ TextPropertiesDialog::TextPropertiesDialog(Text& text, UndoStack& undoStack,
   mUi->edtPosX->setValue(mText.getPosition().getX());
   mUi->edtPosY->setValue(mText.getPosition().getY());
   mUi->edtRotation->setValue(mText.getRotation());
+  mUi->cbxLock->setChecked(mText.isLocked());
 
   // set focus to text so the user can immediately start typing to change it
   mUi->edtText->selectAll();
@@ -88,6 +89,7 @@ void TextPropertiesDialog::setReadOnly(bool readOnly) noexcept {
   mUi->edtPosX->setReadOnly(readOnly);
   mUi->edtPosY->setReadOnly(readOnly);
   mUi->edtRotation->setReadOnly(readOnly);
+  mUi->cbxLock->setDisabled(readOnly);
   if (readOnly) {
     mUi->buttonBox->setStandardButtons(QDialogButtonBox::StandardButton::Close);
   } else {
@@ -133,6 +135,7 @@ bool TextPropertiesDialog::applyChanges() noexcept {
     cmd->setPosition(Point(mUi->edtPosX->getValue(), mUi->edtPosY->getValue()),
                      false);
     cmd->setRotation(mUi->edtRotation->getValue(), false);
+    cmd->setLocked(mUi->cbxLock->isChecked(), false);
     mUndoStack.execCmd(cmd.release());
     return true;
   } catch (const Exception& e) {

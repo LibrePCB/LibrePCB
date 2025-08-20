@@ -80,6 +80,11 @@ TextGraphicsItem::~TextGraphicsItem() noexcept {
  *  Setters
  ******************************************************************************/
 
+void TextGraphicsItem::setOriginCrossVisible(bool visible) noexcept {
+  mOriginCrossGraphicsItem->setLayer(
+      visible ? mLayers.get(Theme::Color::sSchematicReferences) : nullptr);
+}
+
 void TextGraphicsItem::setTextOverride(
     const std::optional<QString>& text) noexcept {
   if (text != mTextOverride) {

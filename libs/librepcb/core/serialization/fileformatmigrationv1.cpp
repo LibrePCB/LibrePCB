@@ -71,6 +71,7 @@ void FileFormatMigrationV1::upgradeSymbol(TransactionalDirectory& dir) {
     std::unique_ptr<SExpression> root =
         SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
     root->appendChild("grid_interval", SExpression::createToken("2.54"));
+    upgradeTexts(*root, true);
     dir.write(fp, root->toByteArray());
   }
 }
@@ -195,6 +196,17 @@ void FileFormatMigrationV1::upgradeProject(TransactionalDirectory& dir,
         SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
     upgradeCircuit(*root, messages);
     dir.write(fp, root->toByteArray());
+  }
+
+  // Schematics.
+  foreach (const QString& dirName, dir.getDirs("schematics")) {
+    QString fp = "schematics/" % dirName % "/schematic.lp";
+    if (dir.fileExists(fp)) {
+      std::unique_ptr<SExpression> root =
+          SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+      upgradeSchematic(*root);
+      dir.write(fp, root->toByteArray());
+    }
   }
 
   // Boards.
@@ -378,6 +390,13 @@ void FileFormatMigrationV1::upgradeCircuit(SExpression& root,
   }
 }
 
+void FileFormatMigrationV1::upgradeSchematic(SExpression& root) {
+  for (SExpression* symbolNode : root.getChildren("symbol")) {
+    upgradeTexts(*symbolNode, true);  // Lock texts depending on layer.
+  }
+  upgradeTexts(root, false);  // Do not lock any schematic text.
+}
+
 void FileFormatMigrationV1::upgradeBoard(SExpression& root) {
   // DRC approvals.
   SExpression& drcNode = root.getChild("design_rule_check");
@@ -396,6 +415,16 @@ void FileFormatMigrationV1::upgradeBoard(SExpression& root) {
   // Devices
   for (SExpression* devNode : root.getChildren("device")) {
     devNode->appendChild("glue", SExpression::createToken("true"));
+  }
+}
+
+void FileFormatMigrationV1::upgradeTexts(SExpression& node, bool allowLock) {
+  for (SExpression* child : node.getChildren("text")) {
+    const QString layer = child->getChild("layer/@0").getValue();
+    const bool lock =
+        allowLock && (layer != "sym_names") && (layer != "sym_values");
+    child->appendChild("lock",
+                       SExpression::createToken(lock ? "true" : "false"));
   }
 }
 

@@ -189,7 +189,7 @@ std::unique_ptr<Symbol> EagleLibraryConverter::createSymbol(
         log);
   }
   foreach (const auto& obj, eagleSymbol.getTexts()) {
-    if (auto lpObj = C::tryConvertSchematicText(obj)) {
+    if (auto lpObj = C::tryConvertSchematicText(obj, true)) {
       symbol->getTexts().append(lpObj);
     } else {
       log.warning(tr("Skipped text on layer %1 (%2).")

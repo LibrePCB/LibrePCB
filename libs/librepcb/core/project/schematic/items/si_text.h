@@ -54,6 +54,7 @@ public:
     PositionChanged,
     LayerNameChanged,
     TextChanged,
+    LockedChanged,
   };
   Signal<SI_Text, Event> onEdited;
   typedef Slot<SI_Text, Event> OnEditedSlot;

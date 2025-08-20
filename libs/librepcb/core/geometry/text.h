@@ -58,6 +58,7 @@ public:
     RotationChanged,
     HeightChanged,
     AlignChanged,
+    LockedChanged,
   };
   Signal<Text, Event> onEdited;
   typedef Slot<Text, Event> OnEditedSlot;
@@ -68,18 +69,19 @@ public:
   Text(const Uuid& uuid, const Text& other) noexcept;
   Text(const Uuid& uuid, const Layer& layer, const QString& text,
        const Point& pos, const Angle& rotation, const PositiveLength& height,
-       const Alignment& align) noexcept;
+       const Alignment& align, bool locked) noexcept;
   explicit Text(const SExpression& node);
   ~Text() noexcept;
 
   // Getters
   const Uuid& getUuid() const noexcept { return mUuid; }
   const Layer& getLayer() const noexcept { return *mLayer; }
+  const QString& getText() const noexcept { return mText; }
   const Point& getPosition() const noexcept { return mPosition; }
   const Angle& getRotation() const noexcept { return mRotation; }
   const PositiveLength& getHeight() const noexcept { return mHeight; }
   const Alignment& getAlign() const noexcept { return mAlign; }
-  const QString& getText() const noexcept { return mText; }
+  bool isLocked() const noexcept { return mLocked; }
 
   // Setters
   bool setLayer(const Layer& layer) noexcept;
@@ -88,6 +90,7 @@ public:
   bool setRotation(const Angle& rotation) noexcept;
   bool setHeight(const PositiveLength& height) noexcept;
   bool setAlign(const Alignment& align) noexcept;
+  bool setLocked(bool locked) noexcept;
 
   // General Methods
 
@@ -111,6 +114,7 @@ private:  // Data
   Angle mRotation;
   PositiveLength mHeight;
   Alignment mAlign;
+  bool mLocked;
 };
 
 /*******************************************************************************

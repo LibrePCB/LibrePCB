@@ -35,7 +35,7 @@ namespace editor {
  ******************************************************************************/
 
 CmdTextEdit::CmdTextEdit(Text& text) noexcept
-  : UndoCommand(tr("Edit text")),
+  : UndoCommand(tr("Edit Text")),
     mText(text),
     mOldLayer(&text.getLayer()),
     mNewLayer(mOldLayer),
@@ -48,7 +48,9 @@ CmdTextEdit::CmdTextEdit(Text& text) noexcept
     mOldHeight(text.getHeight()),
     mNewHeight(mOldHeight),
     mOldAlign(text.getAlign()),
-    mNewAlign(mOldAlign) {
+    mNewAlign(mOldAlign),
+    mOldLocked(text.isLocked()),
+    mNewLocked(mOldLocked) {
 }
 
 CmdTextEdit::~CmdTextEdit() noexcept {
@@ -134,6 +136,12 @@ void CmdTextEdit::mirror(const Angle& rotation, const Point& center,
   setAlignment(mNewAlign.mirroredH(), immediate);
 }
 
+void CmdTextEdit::setLocked(bool locked, bool immediate) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewLocked = locked;
+  if (immediate) mText.setLocked(mNewLocked);
+}
+
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/
@@ -147,6 +155,7 @@ bool CmdTextEdit::performExecute() {
   if (mNewRotation != mOldRotation) return true;
   if (mNewHeight != mOldHeight) return true;
   if (mNewAlign != mOldAlign) return true;
+  if (mNewLocked != mOldLocked) return true;
   return false;
 }
 
@@ -157,6 +166,7 @@ void CmdTextEdit::performUndo() {
   mText.setRotation(mOldRotation);
   mText.setHeight(mOldHeight);
   mText.setAlign(mOldAlign);
+  mText.setLocked(mOldLocked);
 }
 
 void CmdTextEdit::performRedo() {
@@ -166,6 +176,7 @@ void CmdTextEdit::performRedo() {
   mText.setRotation(mNewRotation);
   mText.setHeight(mNewHeight);
   mText.setAlign(mNewAlign);
+  mText.setLocked(mNewLocked);
 }
 
 /*******************************************************************************
