@@ -202,6 +202,10 @@ void FileFormatMigrationV1::upgradeProject(TransactionalDirectory& dir,
     QString fp = "boards/" % dirName % "/board.lp";
     if (dir.fileExists(fp)) {
       ++context.boardCount;
+      std::unique_ptr<SExpression> root =
+          SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+      upgradeBoard(*root);
+      dir.write(fp, root->toByteArray());
     }
   }
 
@@ -354,6 +358,22 @@ void FileFormatMigrationV1::upgradeCircuit(SExpression& root,
         "Assembly variants have been renamed due to more restrictive naming "
         "requirements. Please review the new names.",
         renamedAssemblyVariants));
+  }
+}
+
+void FileFormatMigrationV1::upgradeBoard(SExpression& root) {
+  // DRC approvals.
+  SExpression& drcNode = root.getChild("design_rule_check");
+  const QString approvalsVersion =
+      drcNode.getChild("approvals_version/@0").getValue();
+  for (SExpression* approvalNode : drcNode.getChildren("approved")) {
+    SExpression& approvalTypeNode = approvalNode->getChild("@0");
+    if ((approvalTypeNode.getValue() == "useless_via") &&
+        (approvalsVersion != "2")) {
+      approvalTypeNode.setValue("invalid_via");
+    } else if (approvalTypeNode.getValue() == "antennae_via") {
+      approvalTypeNode.setValue("useless_via");
+    }
   }
 }
 

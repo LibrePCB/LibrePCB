@@ -1451,8 +1451,6 @@ QString DrcMsgForbiddenVia::determineDescription(
  *  Class DrcMsgInvalidVia
  ******************************************************************************/
 
-// The key `useless_via` is used for backwards compatibility and should be
-// replaced with `invalid_via` for the next major release.
 DrcMsgInvalidVia::DrcMsgInvalidVia(const BoardDesignRuleCheckData::Segment& ns,
                                    const Data::Via& via,
                                    const QVector<Path>& locations) noexcept
@@ -1461,7 +1459,7 @@ DrcMsgInvalidVia::DrcMsgInvalidVia(const BoardDesignRuleCheckData::Segment& ns,
                          .arg(netNameWithFallback(ns.netName)),
                      tr("The via is only drilled between one layer and is "
                         "therefore invalid."),
-                     "useless_via", locations) {
+                     "invalid_via", locations) {
   mApproval->ensureLineBreak();
   mApproval->appendChild("netsegment", ns.uuid);
   mApproval->ensureLineBreak();
@@ -1517,10 +1515,6 @@ DrcMsgUselessZone::DrcMsgUselessZone(const Data::Zone& zone,
  *  DrcMsgUselessVia
  ******************************************************************************/
 
-// Because the key `useless_via` is used by the InvalidVia
-// message and can't be changed for backwards compatibility reasons,
-// `antennae_via` is used here. This can be changed to `useless_via` for the
-// next major release.
 DrcMsgUselessVia::DrcMsgUselessVia(const BoardDesignRuleCheckData::Segment& ns,
                                    const Data::Via& via,
                                    const QVector<Path>& locations) noexcept
@@ -1529,7 +1523,7 @@ DrcMsgUselessVia::DrcMsgUselessVia(const BoardDesignRuleCheckData::Segment& ns,
                          .arg(netNameWithFallback(ns.netName)),
                      tr("The via is connected on less than two layers, thus it "
                         "seems to be useless."),
-                     "antennae_via", locations) {
+                     "useless_via", locations) {
   mApproval->ensureLineBreak();
   mApproval->appendChild("netsegment", ns.uuid);
   mApproval->ensureLineBreak();

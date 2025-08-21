@@ -54,7 +54,7 @@ TEST(BoardDesignRuleCheckTest, testMessages) {
       {"missing_device", {"checkForUnplacedComponents"}},
       {"missing_connection", {"checkForMissingConnections"}},
       {"unused_layer", {"checkUsedLayers"}},
-      {"antennae_via", {"checkVias", "checkVias2", "checkVias3"}},
+      {"useless_via", {"checkVias", "checkVias2", "checkVias3"}},
   };
 
   // Open project from test data directory.
