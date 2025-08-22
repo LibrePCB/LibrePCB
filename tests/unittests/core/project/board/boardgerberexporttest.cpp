@@ -88,6 +88,14 @@ TEST(BoardGerberExportTest, test) {
                            "/{{PROJECT}}");
   BoardGerberExport grbExport(*board);
   grbExport.exportPcbLayers(config);
+  grbExport.exportGlueLayer(
+      BoardGerberExport::BoardSide::Top,
+      project->getCircuit().getAssemblyVariants().first()->getUuid(),
+      testDataDir.getPathTo("actual/test_project_GLUE-TOP.gbr"));
+  grbExport.exportGlueLayer(
+      BoardGerberExport::BoardSide::Bottom,
+      project->getCircuit().getAssemblyVariants().first()->getUuid(),
+      testDataDir.getPathTo("actual/test_project_GLUE-BOTTOM.gbr"));
   grbExport.exportComponentLayer(
       BoardGerberExport::BoardSide::Top,
       project->getCircuit().getAssemblyVariants().first()->getUuid(),

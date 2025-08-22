@@ -64,32 +64,42 @@ GerberX3OutputJobWidget::GerberX3OutputJobWidget(
   // Output path.
   auto setupOutputPath =
       [this](QCheckBox* checkBox, QLineEdit* lineEdit,
-             bool (GerberX3OutputJob::*getCreate)() const noexcept,
-             void (GerberX3OutputJob::*setCreate)(bool) noexcept,
+             bool (GerberX3OutputJob::*getEnable)() const noexcept,
+             void (GerberX3OutputJob::*setEnable)(bool) noexcept,
              const QString& (GerberX3OutputJob::*getPath)() const noexcept,
              void (GerberX3OutputJob::*setPath)(const QString&) noexcept) {
         connect(checkBox, &QCheckBox::toggled, lineEdit,
                 &QLineEdit::setEnabled);
-        checkBox->setChecked((*mJob.*getCreate)());
         connect(
             checkBox, &QCheckBox::toggled, this,
-            [this, setCreate](bool checked) { (*mJob.*setCreate)(checked); });
+            [this, setEnable](bool checked) { (*mJob.*setEnable)(checked); });
+        checkBox->setChecked((*mJob.*getEnable)());
         lineEdit->setText((*mJob.*getPath)());
         connect(lineEdit, &QLineEdit::textEdited, this,
                 [this, setPath](QString text) {
                   (*mJob.*setPath)(text.replace("\\", "/").trimmed());
                 });
       };
-  setupOutputPath(mUi->cbxCreateTop, mUi->edtOutputTop,  // break
-                  &GerberX3OutputJob::getCreateTop,  // break
-                  &GerberX3OutputJob::setCreateTop,  // break
-                  &GerberX3OutputJob::getOutputPathTop,  // break
-                  &GerberX3OutputJob::setOutputPathTop);
-  setupOutputPath(mUi->cbxCreateBottom, mUi->edtOutputBottom,  // break
-                  &GerberX3OutputJob::getCreateBottom,  // break
-                  &GerberX3OutputJob::setCreateBottom,  // break
-                  &GerberX3OutputJob::getOutputPathBottom,  // break
-                  &GerberX3OutputJob::setOutputPathBottom);
+  setupOutputPath(mUi->cbxComponentsTop, mUi->edtComponentsTop,  // break
+                  &GerberX3OutputJob::getEnableComponentsTop,  // break
+                  &GerberX3OutputJob::setEnableComponentsTop,  // break
+                  &GerberX3OutputJob::getOutputPathComponentsTop,  // break
+                  &GerberX3OutputJob::setOutputPathComponentsTop);
+  setupOutputPath(mUi->cbxComponentsBot, mUi->edtComponentsBot,  // break
+                  &GerberX3OutputJob::getEnableComponentsBot,  // break
+                  &GerberX3OutputJob::setEnableComponentsBot,  // break
+                  &GerberX3OutputJob::getOutputPathComponentsBot,  // break
+                  &GerberX3OutputJob::setOutputPathComponentsBot);
+  setupOutputPath(mUi->cbxGlueTop, mUi->edtGlueTop,  // break
+                  &GerberX3OutputJob::getEnableGlueTop,  // break
+                  &GerberX3OutputJob::setEnableGlueTop,  // break
+                  &GerberX3OutputJob::getOutputPathGlueTop,  // break
+                  &GerberX3OutputJob::setOutputPathGlueTop);
+  setupOutputPath(mUi->cbxGlueBot, mUi->edtGlueBot,  // break
+                  &GerberX3OutputJob::getEnableGlueBot,  // break
+                  &GerberX3OutputJob::setEnableGlueBot,  // break
+                  &GerberX3OutputJob::getOutputPathGlueBot,  // break
+                  &GerberX3OutputJob::setOutputPathGlueBot);
 
   // List custom boards.
   QList<Uuid> allBoardUuids;

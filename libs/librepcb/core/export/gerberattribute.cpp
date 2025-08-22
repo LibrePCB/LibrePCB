@@ -252,6 +252,23 @@ GerberAttribute GerberAttribute::fileFunctionPaste(BoardSide side) noexcept {
   }
 }
 
+GerberAttribute GerberAttribute::fileFunctionGlue(BoardSide side) noexcept {
+  switch (side) {
+    case BoardSide::Top: {
+      return GerberAttribute(Type::File, ".FileFunction", {"Glue", "Top"});
+    }
+    case BoardSide::Bottom: {
+      return GerberAttribute(Type::File, ".FileFunction", {"Glue", "Bot"});
+    }
+    default: {
+      qCritical()
+          << "Unhandled switch-case in GerberAttribute::fileFunctionGlue():"
+          << static_cast<int>(side);
+      return GerberAttribute();
+    }
+  }
+}
+
 GerberAttribute GerberAttribute::fileFunctionPlatedThroughHole(
     int fromLayer, int toLayer) noexcept {
   return GerberAttribute(

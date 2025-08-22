@@ -94,6 +94,12 @@ void GerberGenerator::setFileFunctionPaste(BoardSide side,
   mFileAttributes.append(GerberAttribute::filePolarity(polarity));
 }
 
+void GerberGenerator::setFileFunctionGlue(BoardSide side,
+                                          Polarity polarity) noexcept {
+  mFileAttributes.append(GerberAttribute::fileFunctionGlue(side));
+  mFileAttributes.append(GerberAttribute::filePolarity(polarity));
+}
+
 void GerberGenerator::setFileFunctionComponent(int layer,
                                                BoardSide side) noexcept {
   mFileAttributes.append(GerberAttribute::fileFunctionComponent(layer, side));

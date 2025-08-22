@@ -63,25 +63,39 @@ public:
   const AssemblyVariantSet& getAssemblyVariants() const noexcept {
     return mAssemblyVariants;
   }
-  bool getCreateTop() const noexcept { return mCreateTop; }
-  bool getCreateBottom() const noexcept { return mCreateBottom; }
-  const QString& getOutputPathTop() const noexcept { return mOutputPathTop; }
-  const QString& getOutputPathBottom() const noexcept {
-    return mOutputPathBottom;
+  bool getEnableComponentsTop() const noexcept { return mEnableComponentsTop; }
+  bool getEnableComponentsBot() const noexcept { return mEnableComponentsBot; }
+  const QString& getOutputPathComponentsTop() const noexcept {
+    return mOutputPathComponentsTop;
+  }
+  const QString& getOutputPathComponentsBot() const noexcept {
+    return mOutputPathComponentsBot;
+  }
+  bool getEnableGlueTop() const noexcept { return mEnableGlueTop; }
+  bool getEnableGlueBot() const noexcept { return mEnableGlueBot; }
+  const QString& getOutputPathGlueTop() const noexcept {
+    return mOutputPathGlueTop;
+  }
+  const QString& getOutputPathGlueBot() const noexcept {
+    return mOutputPathGlueBot;
   }
 
   // Setters
   void setBoards(const BoardSet& boards) noexcept;
   void setAssemblyVariants(const AssemblyVariantSet& avs) noexcept;
-  void setCreateTop(bool create) noexcept;
-  void setCreateBottom(bool create) noexcept;
-  void setOutputPathTop(const QString& path) noexcept;
-  void setOutputPathBottom(const QString& path) noexcept;
+  void setEnableComponentsTop(bool create) noexcept;
+  void setEnableComponentsBot(bool create) noexcept;
+  void setOutputPathComponentsTop(const QString& path) noexcept;
+  void setOutputPathComponentsBot(const QString& path) noexcept;
+  void setEnableGlueTop(bool create) noexcept;
+  void setEnableGlueBot(bool create) noexcept;
+  void setOutputPathGlueTop(const QString& path) noexcept;
+  void setOutputPathGlueBot(const QString& path) noexcept;
 
   // General Methods
   static QString getTypeName() noexcept { return "gerber_x3"; }
   static QString getTypeTrStatic() noexcept {
-    return tr("Pick&Place (Gerber X3)");
+    return tr("Pick&Place / Glue Mask (Gerber X3)");
   }
   virtual std::shared_ptr<OutputJob> cloneShared() const noexcept override;
 
@@ -95,10 +109,14 @@ private:  // Methods
 private:  // Data
   BoardSet mBoards;
   AssemblyVariantSet mAssemblyVariants;
-  bool mCreateTop;
-  bool mCreateBottom;
-  QString mOutputPathTop;
-  QString mOutputPathBottom;
+  bool mEnableComponentsTop;
+  bool mEnableComponentsBot;
+  QString mOutputPathComponentsTop;
+  QString mOutputPathComponentsBot;
+  bool mEnableGlueTop;
+  bool mEnableGlueBot;
+  QString mOutputPathGlueTop;
+  QString mOutputPathGlueBot;
 };
 
 }  // namespace librepcb

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>395</width>
-    <height>296</height>
+    <width>495</width>
+    <height>373</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -37,47 +37,34 @@
       </font>
      </property>
      <property name="text">
-      <string>Gerber X3 pick&amp;place position file export for boards.</string>
+      <string>Gerber X3 pick&amp;place position file &amp; glue mask (RS-274X) export for boards.</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>
      </property>
     </widget>
    </item>
-   <item row="1" column="0" colspan="2">
+   <item row="2" column="0" colspan="2">
     <widget class="Line" name="line">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
-   <item row="2" column="0">
+   <item row="3" column="0">
     <widget class="QLabel" name="label_4">
      <property name="text">
       <string>Name:</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="1">
+   <item row="3" column="1">
     <widget class="QLineEdit" name="edtName"/>
    </item>
-   <item row="3" column="0">
-    <widget class="QCheckBox" name="cbxCreateTop">
-     <property name="text">
-      <string>Output Top:</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1">
-    <widget class="QLineEdit" name="edtOutputTop"/>
-   </item>
    <item row="4" column="0">
-    <widget class="QCheckBox" name="cbxCreateBottom">
+    <widget class="QCheckBox" name="cbxComponentsTop">
      <property name="text">
-      <string>Output Bottom:</string>
+      <string>Top Components:</string>
      </property>
      <property name="checked">
       <bool>true</bool>
@@ -85,23 +72,36 @@
     </widget>
    </item>
    <item row="4" column="1">
-    <widget class="QLineEdit" name="edtOutputBottom"/>
+    <widget class="QLineEdit" name="edtComponentsTop"/>
    </item>
-   <item row="5" column="0" colspan="2">
+   <item row="5" column="0">
+    <widget class="QCheckBox" name="cbxComponentsBot">
+     <property name="text">
+      <string>Bottom Components:</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <widget class="QLineEdit" name="edtComponentsBot"/>
+   </item>
+   <item row="8" column="0" colspan="2">
     <widget class="Line" name="line_2">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
-   <item row="6" column="0">
+   <item row="9" column="0">
     <widget class="QLabel" name="label_2">
      <property name="text">
       <string>Boards:</string>
      </property>
     </widget>
    </item>
-   <item row="6" column="1">
+   <item row="9" column="1">
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -161,14 +161,14 @@
      </item>
     </layout>
    </item>
-   <item row="7" column="0">
+   <item row="10" column="0">
     <widget class="QLabel" name="label_5">
      <property name="text">
       <string>Assembly Variants:</string>
      </property>
     </widget>
    </item>
-   <item row="7" column="1">
+   <item row="10" column="1">
     <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -228,12 +228,48 @@
      </item>
     </layout>
    </item>
+   <item row="6" column="0">
+    <widget class="QCheckBox" name="cbxGlueTop">
+     <property name="text">
+      <string>Top Glue Mask:</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0">
+    <widget class="QCheckBox" name="cbxGlueBot">
+     <property name="text">
+      <string>Bottom Glue Mask:</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1">
+    <widget class="QLineEdit" name="edtGlueTop"/>
+   </item>
+   <item row="7" column="1">
+    <widget class="QLineEdit" name="edtGlueBot"/>
+   </item>
+   <item row="1" column="0" colspan="2">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>&lt;b&gt;Please note that support for glue export is considered experimental&lt;/b&gt; since we do not yet have much experience with this process. If you have experience with application of glue for assembly, please let us know how we can improve LibrePCB in this regard.</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="btnGrpVariants"/>
   <buttongroup name="btnGrpBoards"/>
+  <buttongroup name="btnGrpVariants"/>
  </buttongroups>
 </ui>

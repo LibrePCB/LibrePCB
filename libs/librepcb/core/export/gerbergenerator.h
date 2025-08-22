@@ -76,6 +76,7 @@ public:
   void setFileFunctionSolderMask(BoardSide side, Polarity polarity) noexcept;
   void setFileFunctionLegend(BoardSide side, Polarity polarity) noexcept;
   void setFileFunctionPaste(BoardSide side, Polarity polarity) noexcept;
+  void setFileFunctionGlue(BoardSide side, Polarity polarity) noexcept;
   void setFileFunctionComponent(int layer, BoardSide side) noexcept;
   void setLayerPolarity(Polarity p) noexcept;
   void drawLine(const Point& start, const Point& end,
