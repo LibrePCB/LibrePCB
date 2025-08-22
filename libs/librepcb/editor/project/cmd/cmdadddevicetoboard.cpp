@@ -139,9 +139,9 @@ bool CmdAddDeviceToBoard::performExecute() {
   }
 
   // create new device (ownership by board)
-  mDeviceInstance =
-      new BI_Device(mBoard, mComponentInstance, mDeviceUuid, *mFootprintUuid,
-                    mPosition, mRotation, mMirror, false, true);  // can throw
+  mDeviceInstance = new BI_Device(mBoard, mComponentInstance, mDeviceUuid,
+                                  *mFootprintUuid, mPosition, mRotation,
+                                  mMirror, false, true, true);  // can throw
 
   // Assign 3D model. Use the default model if no valid preferred model was
   // specified.

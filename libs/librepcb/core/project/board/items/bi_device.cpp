@@ -50,7 +50,7 @@ namespace librepcb {
 BI_Device::BI_Device(Board& board, ComponentInstance& compInstance,
                      const Uuid& deviceUuid, const Uuid& footprintUuid,
                      const Point& position, const Angle& rotation, bool mirror,
-                     bool locked, bool loadInitialStrokeTexts)
+                     bool locked, bool glue, bool loadInitialStrokeTexts)
   : BI_Base(board),
     onEdited(*this),
     mCompInstance(compInstance),
@@ -61,7 +61,8 @@ BI_Device::BI_Device(Board& board, ComponentInstance& compInstance,
     mPosition(position),
     mRotation(rotation),
     mMirrored(mirror),
-    mLocked(locked) {
+    mLocked(locked),
+    mEnableGlue(glue) {
   // get device from library
   mLibDevice = mBoard.getProject().getLibrary().getDevice(deviceUuid);
   if (!mLibDevice) {
@@ -325,6 +326,12 @@ void BI_Device::setLocked(bool locked) noexcept {
   }
 }
 
+void BI_Device::setEnableGlue(bool enable) noexcept {
+  if (enable != mEnableGlue) {
+    mEnableGlue = enable;
+  }
+}
+
 void BI_Device::setAttributes(const AttributeList& attributes) noexcept {
   if (attributes != mAttributes) {
     mAttributes = attributes;
@@ -398,6 +405,7 @@ void BI_Device::serialize(SExpression& root) const {
   root.appendChild("rotation", mRotation);
   root.appendChild("flip", mMirrored);
   root.appendChild("lock", mLocked);
+  root.appendChild("glue", mEnableGlue);
   root.ensureLineBreak();
   mAttributes.serialize(root);
   root.ensureLineBreak();

@@ -392,6 +392,11 @@ void FileFormatMigrationV1::upgradeBoard(SExpression& root) {
       approvalTypeNode.setValue("useless_via");
     }
   }
+
+  // Devices
+  for (SExpression* devNode : root.getChildren("device")) {
+    devNode->appendChild("glue", SExpression::createToken("true"));
+  }
 }
 
 std::optional<QString> FileFormatMigrationV1::upgradeFileProofName(

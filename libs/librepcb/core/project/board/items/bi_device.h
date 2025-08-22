@@ -75,7 +75,7 @@ public:
   BI_Device(Board& board, ComponentInstance& compInstance,
             const Uuid& deviceUuid, const Uuid& footprintUuid,
             const Point& position, const Angle& rotation, bool mirror,
-            bool locked, bool loadInitialStrokeTexts);
+            bool locked, bool glue, bool loadInitialStrokeTexts);
   ~BI_Device() noexcept;
 
   // Getters
@@ -93,6 +93,7 @@ public:
   const Angle& getRotation() const noexcept { return mRotation; }
   bool getMirrored() const noexcept { return mMirrored; }
   bool isLocked() const noexcept { return mLocked; }
+  bool isGlueEnabled() const noexcept { return mEnableGlue; }
   const AttributeList& getAttributes() const noexcept { return mAttributes; }
   BI_FootprintPad* getPad(const Uuid& padUuid) const noexcept {
     return mPads.value(padUuid);
@@ -112,6 +113,7 @@ public:
   void setRotation(const Angle& rot) noexcept;
   void setMirrored(bool mirror);
   void setLocked(bool locked) noexcept;
+  void setEnableGlue(bool enable) noexcept;
   void setAttributes(const AttributeList& attributes) noexcept;
   void setModel(const std::optional<Uuid>& uuid);
 
@@ -160,6 +162,7 @@ private:
   Angle mRotation;
   bool mMirrored;
   bool mLocked;
+  bool mEnableGlue;
   AttributeList mAttributes;  ///< Not used yet, but specified in file format
 
   QMap<Uuid, BI_FootprintPad*> mPads;  ///< key: footprint pad UUID

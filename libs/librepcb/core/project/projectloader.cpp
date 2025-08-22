@@ -659,7 +659,8 @@ void ProjectLoader::loadBoardDeviceInstance(Board& b, const SExpression& node) {
                     Point(node.getChild("position")),
                     deserialize<Angle>(node.getChild("rotation/@0")),
                     deserialize<bool>(node.getChild("flip/@0")),
-                    deserialize<bool>(node.getChild("lock/@0")), false);
+                    deserialize<bool>(node.getChild("lock/@0")),
+                    deserialize<bool>(node.getChild("glue/@0")), false);
   device->setAttributes(AttributeList(node));
   {
     // Load 3D package model. But after upgrading the project library, assign

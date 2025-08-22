@@ -153,7 +153,7 @@ bool CmdPasteBoardItems::performExecute() {
     std::unique_ptr<BI_Device> device(
         new BI_Device(mBoard, *cmpInst, dev.libDeviceUuid, dev.libFootprintUuid,
                       dev.position + mPosOffset, dev.rotation, dev.mirrored,
-                      dev.locked, false));
+                      dev.locked, dev.glue, false));
     for (const BoardStrokeTextData& text : dev.strokeTexts) {
       // Note: Keep the UUID since it acts as a reference to the original
       // library footprint text.
