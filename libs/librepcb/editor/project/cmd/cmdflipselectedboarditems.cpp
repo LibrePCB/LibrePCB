@@ -40,10 +40,10 @@
 #include <librepcb/core/library/pkg/footprintpad.h>
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/items/bi_device.h>
-#include <librepcb/core/project/board/items/bi_footprintpad.h>
 #include <librepcb/core/project/board/items/bi_hole.h>
 #include <librepcb/core/project/board/items/bi_netline.h>
 #include <librepcb/core/project/board/items/bi_netpoint.h>
+#include <librepcb/core/project/board/items/bi_pad.h>
 #include <librepcb/core/project/board/items/bi_plane.h>
 #include <librepcb/core/project/board/items/bi_polygon.h>
 #include <librepcb/core/project/board/items/bi_stroketext.h>
@@ -170,7 +170,7 @@ bool CmdFlipSelectedBoardItems::performExecute() {
     netsegments.insert(&via->getNetSegment());
   }
   foreach (BI_Device* device, query.getDeviceInstances()) {
-    foreach (BI_FootprintPad* pad, device->getPads()) {
+    foreach (BI_Pad* pad, device->getPads()) {
       if (pad->getNetSegmentOfLines()) {
         netsegments.insert(pad->getNetSegmentOfLines());
       }

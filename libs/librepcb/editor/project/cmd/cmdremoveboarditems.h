@@ -33,11 +33,11 @@
 namespace librepcb {
 
 class BI_Device;
-class BI_FootprintPad;
 class BI_Hole;
 class BI_NetLine;
 class BI_NetPoint;
 class BI_NetSegment;
+class BI_Pad;
 class BI_Plane;
 class BI_Polygon;
 class BI_StrokeText;
@@ -61,7 +61,7 @@ private:
     QSet<BI_Via*> vias;
     QSet<BI_NetPoint*> netpoints;
     QSet<BI_NetLine*> netlines;
-    QSet<BI_FootprintPad*> pads;
+    QSet<BI_Pad*> pads;
   };
   typedef QHash<BI_NetSegment*, NetSegmentItems> NetSegmentItemList;
 
@@ -127,7 +127,7 @@ private:  // Methods
   bool performExecute() override;
 
   void removeNetSegmentItems(BI_NetSegment& netsegment,
-                             const QSet<BI_FootprintPad*>& padsToDisconnect,
+                             const QSet<BI_Pad*>& padsToDisconnect,
                              const QSet<BI_Via*>& viasToRemove,
                              const QSet<BI_NetPoint*>& netpointsToRemove,
                              const QSet<BI_NetLine*>& netlinesToRemove);

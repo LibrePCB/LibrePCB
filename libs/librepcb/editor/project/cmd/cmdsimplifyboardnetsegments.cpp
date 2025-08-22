@@ -28,10 +28,10 @@
 #include <librepcb/core/algorithm/netsegmentsimplifier.h>
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/items/bi_device.h>
-#include <librepcb/core/project/board/items/bi_footprintpad.h>
 #include <librepcb/core/project/board/items/bi_netline.h>
 #include <librepcb/core/project/board/items/bi_netpoint.h>
 #include <librepcb/core/project/board/items/bi_netsegment.h>
+#include <librepcb/core/project/board/items/bi_pad.h>
 #include <librepcb/core/types/layer.h>
 
 #include <QtCore>
@@ -91,7 +91,7 @@ void CmdSimplifyBoardNetSegments::simplifySegment(BI_NetSegment& segment) {
       return *it;
     }
     std::optional<int> id;
-    if (auto pad = dynamic_cast<const BI_FootprintPad*>(&anchor)) {
+    if (auto pad = dynamic_cast<const BI_Pad*>(&anchor)) {
       const bool isTht = pad->getLibPad().isTht();
       id = simplifier.addAnchor(
           NetSegmentSimplifier::AnchorType::PinOrPad, pad->getPosition(),
@@ -146,7 +146,7 @@ void CmdSimplifyBoardNetSegments::simplifySegment(BI_NetSegment& segment) {
       return static_cast<BI_NetLineAnchor*>(via);
     }
     BI_NetLineAnchor* oldAnchor = anchors.key(anchorId, nullptr);  // can be 0
-    if (auto pad = dynamic_cast<BI_FootprintPad*>(oldAnchor)) {
+    if (auto pad = dynamic_cast<BI_Pad*>(oldAnchor)) {
       return static_cast<BI_NetLineAnchor*>(pad);
     } else if (auto oldNp = dynamic_cast<BI_NetPoint*>(oldAnchor)) {
       BI_NetPoint* newNp =

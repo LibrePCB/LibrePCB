@@ -31,17 +31,17 @@
 #include "../../cmd/cmdcombineboardnetsegments.h"
 #include "../../cmd/cmdsimplifyboardnetsegments.h"
 #include "../boardgraphicsscene.h"
-#include "../graphicsitems/bgi_footprintpad.h"
 #include "../graphicsitems/bgi_netline.h"
 #include "../graphicsitems/bgi_netpoint.h"
+#include "../graphicsitems/bgi_pad.h"
 #include "../graphicsitems/bgi_via.h"
 
 #include <librepcb/core/library/pkg/footprintpad.h>
 #include <librepcb/core/project/board/board.h>
-#include <librepcb/core/project/board/items/bi_footprintpad.h>
 #include <librepcb/core/project/board/items/bi_netline.h>
 #include <librepcb/core/project/board/items/bi_netpoint.h>
 #include <librepcb/core/project/board/items/bi_netsegment.h>
+#include <librepcb/core/project/board/items/bi_pad.h>
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/types/layer.h>
@@ -249,7 +249,7 @@ void BoardEditorState_DrawTrace::setLayer(const Layer& layer) noexcept {
     // at the current position, i.e. at the end of the current trace segment.
     Point startPos = mFixedStartAnchor->getPosition();
     BI_Via* via = dynamic_cast<BI_Via*>(mFixedStartAnchor);
-    BI_FootprintPad* pad = dynamic_cast<BI_FootprintPad*>(mFixedStartAnchor);
+    BI_Pad* pad = dynamic_cast<BI_Pad*>(mFixedStartAnchor);
     if (pad && (!pad->getLibPad().isTht())) {
       pad = nullptr;
     }
@@ -325,9 +325,11 @@ void BoardEditorState_DrawTrace::setViaDrillDiameter(
  *  Private Methods
  ******************************************************************************/
 
-bool BoardEditorState_DrawTrace::startPositioning(
-    Board& board, const Point& pos, BI_NetPoint* fixedPoint, BI_Via* fixedVia,
-    BI_FootprintPad* fixedPad) noexcept {
+bool BoardEditorState_DrawTrace::startPositioning(Board& board,
+                                                  const Point& pos,
+                                                  BI_NetPoint* fixedPoint,
+                                                  BI_Via* fixedVia,
+                                                  BI_Pad* fixedPad) noexcept {
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
@@ -407,7 +409,7 @@ bool BoardEditorState_DrawTrace::startPositioning(
               &via->getVia().getVia().getStartLayer()))) {
         layer = &via->getVia().getVia().getStartLayer();
       }
-    } else if (auto pad = std::dynamic_pointer_cast<BGI_FootprintPad>(item)) {
+    } else if (auto pad = std::dynamic_pointer_cast<BGI_Pad>(item)) {
       mFixedStartAnchor = &pad->getPad();
       mCurrentNetSegment = pad->getPad().getNetSegmentOfLines();
       netsignal = pad->getPad().getCompSigInstNetSignal();
@@ -535,7 +537,7 @@ bool BoardEditorState_DrawTrace::addNextNetPoint(
           }
         }
       }
-      if (auto pad = findItemAtPos<BGI_FootprintPad>(
+      if (auto pad = findItemAtPos<BGI_Pad>(
               mTargetPos,
               FindFlag::FootprintPads | FindFlag::AcceptNextGridMatch, &layer,
               {netsignal})) {
@@ -600,8 +602,7 @@ bool BoardEditorState_DrawTrace::addNextNetPoint(
           // valid result. Vias already have a NetSegment, Pads may not
           if (BI_Via* via = dynamic_cast<BI_Via*>(otherAnchor)) {
             otherNetSegment = &via->getNetSegment();
-          } else if (BI_FootprintPad* pad =
-                         dynamic_cast<BI_FootprintPad*>(otherAnchor)) {
+          } else if (BI_Pad* pad = dynamic_cast<BI_Pad*>(otherAnchor)) {
             CmdBoardNetSegmentAdd* cmd = new CmdBoardNetSegmentAdd(
                 scene.getBoard(), pad->getCompSigInstNetSignal());
             mContext.undoStack.appendToCmdGroup(cmd);  // can throw
@@ -750,7 +751,7 @@ void BoardEditorState_DrawTrace::updateNetpointPositions() noexcept {
     if (auto via = std::dynamic_pointer_cast<BGI_Via>(item)) {
       mTargetPos = via->getVia().getPosition();
       isOnVia = true;
-    } else if (auto pad = std::dynamic_pointer_cast<BGI_FootprintPad>(item)) {
+    } else if (auto pad = std::dynamic_pointer_cast<BGI_Pad>(item)) {
       mTargetPos = pad->getPad().getPosition();
       isOnVia = (pad->getPad().getLibPad().isTht());
     } else if (auto netpoint = std::dynamic_pointer_cast<BGI_NetPoint>(item)) {

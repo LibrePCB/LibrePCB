@@ -24,7 +24,6 @@
 
 #include "boardgraphicsscene.h"
 #include "graphicsitems/bgi_device.h"
-#include "graphicsitems/bgi_footprintpad.h"
 #include "graphicsitems/bgi_hole.h"
 #include "graphicsitems/bgi_netline.h"
 #include "graphicsitems/bgi_netpoint.h"
@@ -36,7 +35,6 @@
 
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/items/bi_device.h>
-#include <librepcb/core/project/board/items/bi_footprintpad.h>
 #include <librepcb/core/project/board/items/bi_hole.h>
 #include <librepcb/core/project/board/items/bi_netline.h>
 #include <librepcb/core/project/board/items/bi_netpoint.h>

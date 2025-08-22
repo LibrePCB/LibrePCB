@@ -31,10 +31,10 @@
 #include "../project.h"
 #include "board.h"
 #include "items/bi_device.h"
-#include "items/bi_footprintpad.h"
 #include "items/bi_hole.h"
 #include "items/bi_netline.h"
 #include "items/bi_netsegment.h"
+#include "items/bi_pad.h"
 #include "items/bi_plane.h"
 #include "items/bi_polygon.h"
 #include "items/bi_stroketext.h"
@@ -58,7 +58,7 @@ BoardPainter::BoardPainter(const Board& board)
   foreach (const BI_Device* device, board.getDeviceInstances()) {
     Footprint fpt;
     fpt.transform = Transform(*device);
-    foreach (const BI_FootprintPad* pad, device->getPads()) {
+    foreach (const BI_Pad* pad, device->getPads()) {
       Pad padObj;
       padObj.transform = Transform(*pad);
       for (const PadHole& hole : pad->getLibPad().getHoles()) {

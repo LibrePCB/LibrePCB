@@ -29,9 +29,9 @@
 #include "../../project.h"
 #include "../board.h"
 #include "bi_device.h"
-#include "bi_footprintpad.h"
 #include "bi_netline.h"
 #include "bi_netpoint.h"
+#include "bi_pad.h"
 #include "bi_via.h"
 
 #include <QtCore>
@@ -355,7 +355,7 @@ bool BI_NetSegment::areAllNetPointsConnectedTogether() const noexcept {
   QSet<const BI_Via*> vias;
   QSet<const BI_NetPoint*> points;
   QSet<const BI_NetLine*> lines;
-  QSet<const BI_FootprintPad*> pads;
+  QSet<const BI_Pad*> pads;
   findAllConnectedNetPoints(*p, vias, pads, points, lines);
   return (vias.count() == mVias.count()) &&
       (points.count() == mNetPoints.count()) &&
@@ -364,7 +364,7 @@ bool BI_NetSegment::areAllNetPointsConnectedTogether() const noexcept {
 
 void BI_NetSegment::findAllConnectedNetPoints(
     const BI_NetLineAnchor& p, QSet<const BI_Via*>& vias,
-    QSet<const BI_FootprintPad*>& pads, QSet<const BI_NetPoint*>& points,
+    QSet<const BI_Pad*>& pads, QSet<const BI_NetPoint*>& points,
     QSet<const BI_NetLine*>& lines) const noexcept {
   if (const BI_Via* via = dynamic_cast<const BI_Via*>(&p)) {
     if (vias.contains(via)) return;
@@ -380,8 +380,7 @@ void BI_NetSegment::findAllConnectedNetPoints(
         lines.insert(netline);
       }
     }
-  } else if (const BI_FootprintPad* pad =
-                 dynamic_cast<const BI_FootprintPad*>(&p)) {
+  } else if (const BI_Pad* pad = dynamic_cast<const BI_Pad*>(&p)) {
     if (pads.contains(pad)) return;
     pads.insert(pad);
     foreach (const BI_NetLine* netline, mNetLines) {

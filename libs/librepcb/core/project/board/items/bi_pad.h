@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_BI_FOOTPRINTPAD_H
-#define LIBREPCB_CORE_BI_FOOTPRINTPAD_H
+#ifndef LIBREPCB_CORE_BI_PAD_H
+#define LIBREPCB_CORE_BI_PAD_H
 
 /*******************************************************************************
  *  Includes
@@ -39,13 +39,13 @@ class ComponentSignalInstance;
 class PackagePad;
 
 /*******************************************************************************
- *  Class BI_FootprintPad
+ *  Class BI_Pad
  ******************************************************************************/
 
 /**
- * @brief The BI_FootprintPad class
+ * @brief The BI_Pad class
  */
-class BI_FootprintPad final : public BI_Base, public BI_NetLineAnchor {
+class BI_Pad final : public BI_Base, public BI_NetLineAnchor {
   Q_OBJECT
 
 public:
@@ -57,14 +57,14 @@ public:
     TextChanged,
     GeometriesChanged,
   };
-  Signal<BI_FootprintPad, Event> onEdited;
-  typedef Slot<BI_FootprintPad, Event> OnEditedSlot;
+  Signal<BI_Pad, Event> onEdited;
+  typedef Slot<BI_Pad, Event> OnEditedSlot;
 
   // Constructors / Destructor
-  BI_FootprintPad() = delete;
-  BI_FootprintPad(const BI_FootprintPad& other) = delete;
-  BI_FootprintPad(BI_Device& device, const Uuid& padUuid);
-  ~BI_FootprintPad();
+  BI_Pad() = delete;
+  BI_Pad(const BI_Pad& other) = delete;
+  BI_Pad(BI_Device& device, const Uuid& padUuid);
+  ~BI_Pad();
 
   // Getters
 
@@ -121,7 +121,7 @@ public:
   }
 
   // Operator Overloadings
-  BI_FootprintPad& operator=(const BI_FootprintPad& rhs) = delete;
+  BI_Pad& operator=(const BI_Pad& rhs) = delete;
 
 private:  // Methods
   void deviceEdited(const BI_Device& obj, BI_Device::Event event) noexcept;

@@ -39,11 +39,11 @@
 #include "board.h"
 #include "drc/boarddesignrulechecksettings.h"
 #include "items/bi_device.h"
-#include "items/bi_footprintpad.h"
 #include "items/bi_hole.h"
 #include "items/bi_netline.h"
 #include "items/bi_netpoint.h"
 #include "items/bi_netsegment.h"
+#include "items/bi_pad.h"
 #include "items/bi_plane.h"
 #include "items/bi_polygon.h"
 #include "items/bi_stroketext.h"
@@ -378,7 +378,7 @@ std::unique_ptr<SExpression> BoardSpecctraExport::genLibraryImage(
 }
 
 std::unique_ptr<SExpression> BoardSpecctraExport::genLibraryPadStack(
-    const BI_FootprintPad& pad) const {
+    const BI_Pad& pad) const {
   std::unique_ptr<SExpression> root = SExpression::createList("padstack");
   root->appendChild(QString("pad-"));
   root->ensureLineBreak();

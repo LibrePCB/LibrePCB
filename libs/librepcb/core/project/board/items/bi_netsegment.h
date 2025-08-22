@@ -38,8 +38,8 @@
 namespace librepcb {
 
 class BI_Device;
-class BI_FootprintPad;
 class BI_NetLineAnchor;
+class BI_Pad;
 class NetSignal;
 
 /*******************************************************************************
@@ -134,7 +134,7 @@ private:
   bool areAllNetPointsConnectedTogether() const noexcept;
   void findAllConnectedNetPoints(const BI_NetLineAnchor& p,
                                  QSet<const BI_Via*>& vias,
-                                 QSet<const BI_FootprintPad*>& pads,
+                                 QSet<const BI_Pad*>& pads,
                                  QSet<const BI_NetPoint*>& points,
                                  QSet<const BI_NetLine*>& lines) const noexcept;
 

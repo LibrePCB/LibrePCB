@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_BGI_FOOTPRINTPAD_H
-#define LIBREPCB_EDITOR_BGI_FOOTPRINTPAD_H
+#ifndef LIBREPCB_EDITOR_BGI_PAD_H
+#define LIBREPCB_EDITOR_BGI_PAD_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include "bgi_device.h"
 
-#include <librepcb/core/project/board/items/bi_footprintpad.h>
+#include <librepcb/core/project/board/items/bi_pad.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -45,27 +45,27 @@ class GraphicsLayerList;
 class PrimitiveFootprintPadGraphicsItem;
 
 /*******************************************************************************
- *  Class BGI_FootprintPad
+ *  Class BGI_Pad
  ******************************************************************************/
 
 /**
- * @brief The BGI_FootprintPad class
+ * @brief The BGI_Pad class
  */
-class BGI_FootprintPad final : public QGraphicsItemGroup {
-  Q_DECLARE_TR_FUNCTIONS(BGI_FootprintPad)
+class BGI_Pad final : public QGraphicsItemGroup {
+  Q_DECLARE_TR_FUNCTIONS(BGI_Pad)
 
 public:
   // Constructors / Destructor
-  BGI_FootprintPad() = delete;
-  BGI_FootprintPad(const BGI_FootprintPad& other) = delete;
-  BGI_FootprintPad(BI_FootprintPad& pad, std::weak_ptr<BGI_Device> deviceItem,
-                   const GraphicsLayerList& layers,
-                   std::shared_ptr<const QSet<const NetSignal*>>
-                       highlightedNetSignals) noexcept;
-  virtual ~BGI_FootprintPad() noexcept;
+  BGI_Pad() = delete;
+  BGI_Pad(const BGI_Pad& other) = delete;
+  BGI_Pad(BI_Pad& pad, std::weak_ptr<BGI_Device> deviceItem,
+          const GraphicsLayerList& layers,
+          std::shared_ptr<const QSet<const NetSignal*>>
+              highlightedNetSignals) noexcept;
+  virtual ~BGI_Pad() noexcept;
 
   // General Methods
-  BI_FootprintPad& getPad() noexcept { return mPad; }
+  BI_Pad& getPad() noexcept { return mPad; }
   const std::weak_ptr<BGI_Device>& getDeviceGraphicsItem() noexcept {
     return mDeviceGraphicsItem;
   }
@@ -75,11 +75,10 @@ public:
   QPainterPath shape() const noexcept override;
 
   // Operator Overloadings
-  BGI_FootprintPad& operator=(const BGI_FootprintPad& rhs) = delete;
+  BGI_Pad& operator=(const BGI_Pad& rhs) = delete;
 
 private:  // Methods
-  void padEdited(const BI_FootprintPad& obj,
-                 BI_FootprintPad::Event event) noexcept;
+  void padEdited(const BI_Pad& obj, BI_Pad::Event event) noexcept;
   void deviceGraphicsItemEdited(const BGI_Device& obj,
                                 BGI_Device::Event event) noexcept;
   virtual QVariant itemChange(GraphicsItemChange change,
@@ -89,13 +88,13 @@ private:  // Methods
   void updateHightlighted(bool selected) noexcept;
 
 private:  // Data
-  BI_FootprintPad& mPad;
+  BI_Pad& mPad;
   std::weak_ptr<BGI_Device> mDeviceGraphicsItem;
   std::shared_ptr<const QSet<const NetSignal*>> mHighlightedNetSignals;
   QScopedPointer<PrimitiveFootprintPadGraphicsItem> mGraphicsItem;
 
   // Slots
-  BI_FootprintPad::OnEditedSlot mOnPadEditedSlot;
+  BI_Pad::OnEditedSlot mOnPadEditedSlot;
   BGI_Device::OnEditedSlot mOnDeviceEditedSlot;
 };
 

@@ -29,11 +29,11 @@
 #include "../circuit/netsignal.h"
 #include "board.h"
 #include "items/bi_device.h"
-#include "items/bi_footprintpad.h"
 #include "items/bi_hole.h"
 #include "items/bi_netline.h"
 #include "items/bi_netpoint.h"
 #include "items/bi_netsegment.h"
+#include "items/bi_pad.h"
 #include "items/bi_plane.h"
 #include "items/bi_polygon.h"
 #include "items/bi_via.h"
@@ -169,7 +169,7 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
   layers.insert(&Layer::boardCutouts());
   foreach (const BI_Device* device, board.getDeviceInstances()) {
     const Transform transform(*device);
-    foreach (const BI_FootprintPad* pad, device->getPads()) {
+    foreach (const BI_Pad* pad, device->getPads()) {
       std::optional<Uuid> netSignalUuid;
       if (const NetSignal* netSignal = pad->getCompSigInstNetSignal()) {
         netSignalUuid = netSignal->getUuid();

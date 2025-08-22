@@ -29,7 +29,7 @@
 #include "cmdcombinenetsignals.h"
 #include "cmdremoveboarditems.h"
 
-#include <librepcb/core/project/board/items/bi_footprintpad.h>
+#include <librepcb/core/project/board/items/bi_pad.h>
 #include <librepcb/core/project/circuit/componentsignalinstance.h>
 #include <librepcb/core/project/circuit/netsignal.h>
 #include <librepcb/core/project/schematic/items/si_netsegment.h>
@@ -121,7 +121,7 @@ void CmdChangeNetSignalOfSchematicNetSegment::updateCompSigInstNetSignal(
     ComponentSignalInstance& cmpSig) {
   // disconnect traces from pads in all boards
   QHash<Board*, QSet<BI_NetLine*>> boardNetLinesToRemove;
-  foreach (BI_FootprintPad* pad, cmpSig.getRegisteredFootprintPads()) {
+  foreach (BI_Pad* pad, cmpSig.getRegisteredFootprintPads()) {
     Q_ASSERT(pad && pad->isAddedToBoard());
     boardNetLinesToRemove[&pad->getBoard()] += pad->getNetLines();
   }

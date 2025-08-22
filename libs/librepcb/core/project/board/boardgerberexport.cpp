@@ -41,11 +41,11 @@
 #include "board.h"
 #include "boardfabricationoutputsettings.h"
 #include "items/bi_device.h"
-#include "items/bi_footprintpad.h"
 #include "items/bi_hole.h"
 #include "items/bi_netline.h"
 #include "items/bi_netpoint.h"
 #include "items/bi_netsegment.h"
+#include "items/bi_pad.h"
 #include "items/bi_plane.h"
 #include "items/bi_polygon.h"
 #include "items/bi_stroketext.h"
@@ -262,7 +262,7 @@ void BoardGerberExport::exportComponentLayer(BoardSide side,
       }
 
       // Export component pins.
-      foreach (const BI_FootprintPad* pad, device->getPads()) {
+      foreach (const BI_Pad* pad, device->getPads()) {
         if (pad->getLibPad().getFunctionIsFiducial()) {
           continue;
         }
@@ -287,7 +287,7 @@ void BoardGerberExport::exportComponentLayer(BoardSide side,
       (side == BoardSide::Bottom) ? Layer::botCopper() : Layer::topCopper();
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
     int padNumber = 1;
-    foreach (const BI_FootprintPad* pad, device->getPads()) {
+    foreach (const BI_Pad* pad, device->getPads()) {
       if (pad->getLibPad().getFunctionIsFiducial() && pad->isOnLayer(cuLayer)) {
         ProjectAttributeLookup lookup(*device, nullptr);
         const QString designator =
@@ -617,7 +617,7 @@ int BoardGerberExport::drawPthDrills(ExcellonGenerator& gen) const {
 
   // footprint pads
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
-    foreach (const BI_FootprintPad* pad, device->getPads()) {
+    foreach (const BI_Pad* pad, device->getPads()) {
       const FootprintPad& libPad = pad->getLibPad();
       const Transform transform(*pad);
       const ExcellonGenerator::Function function =
@@ -823,8 +823,8 @@ void BoardGerberExport::drawDevice(GerberGenerator& gen,
   QString component = *device.getComponentInstance().getName();
 
   // draw pads
-  foreach (const BI_FootprintPad* pad, device.getPads()) {
-    drawFootprintPad(gen, *pad, layer);
+  foreach (const BI_Pad* pad, device.getPads()) {
+    drawPad(gen, *pad, layer);
   }
 
   // draw polygons
@@ -899,9 +899,8 @@ void BoardGerberExport::drawDevice(GerberGenerator& gen,
   }
 }
 
-void BoardGerberExport::drawFootprintPad(GerberGenerator& gen,
-                                         const BI_FootprintPad& pad,
-                                         const Layer& layer) const {
+void BoardGerberExport::drawPad(GerberGenerator& gen, const BI_Pad& pad,
+                                const Layer& layer) const {
   using PadFunction = Pad::Function;
   using ApertureFunction = GerberAttribute::ApertureFunction;
   const QMap<PadFunction, ApertureFunction> functionMap = {

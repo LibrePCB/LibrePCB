@@ -24,10 +24,10 @@
 
 #include "graphicsitems/bgi_airwire.h"
 #include "graphicsitems/bgi_device.h"
-#include "graphicsitems/bgi_footprintpad.h"
 #include "graphicsitems/bgi_hole.h"
 #include "graphicsitems/bgi_netline.h"
 #include "graphicsitems/bgi_netpoint.h"
+#include "graphicsitems/bgi_pad.h"
 #include "graphicsitems/bgi_plane.h"
 #include "graphicsitems/bgi_polygon.h"
 #include "graphicsitems/bgi_stroketext.h"
@@ -37,11 +37,11 @@
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/items/bi_airwire.h>
 #include <librepcb/core/project/board/items/bi_device.h>
-#include <librepcb/core/project/board/items/bi_footprintpad.h>
 #include <librepcb/core/project/board/items/bi_hole.h>
 #include <librepcb/core/project/board/items/bi_netline.h>
 #include <librepcb/core/project/board/items/bi_netpoint.h>
 #include <librepcb/core/project/board/items/bi_netsegment.h>
+#include <librepcb/core/project/board/items/bi_pad.h>
 #include <librepcb/core/project/board/items/bi_plane.h>
 #include <librepcb/core/project/board/items/bi_polygon.h>
 #include <librepcb/core/project/board/items/bi_stroketext.h>
@@ -128,8 +128,8 @@ BoardGraphicsScene::~BoardGraphicsScene() noexcept {
   foreach (BI_Device* obj, mDevices.keys()) {
     removeDevice(*obj);
   }
-  foreach (BI_FootprintPad* obj, mFootprintPads.keys()) {
-    removeFootprintPad(*obj);
+  foreach (BI_Pad* obj, mPads.keys()) {
+    removePad(*obj);
   }
   foreach (BI_Via* obj, mVias.keys()) {
     removeVia(*obj);
@@ -168,7 +168,7 @@ void BoardGraphicsScene::selectAll() noexcept {
   foreach (auto item, mDevices) {
     item->setSelected(true);
   }
-  foreach (auto item, mFootprintPads) {
+  foreach (auto item, mPads) {
     item->setSelected(true);
   }
   foreach (auto item, mNetPoints) {
@@ -206,7 +206,7 @@ void BoardGraphicsScene::selectItemsInRect(const Point& p1,
   // In case this turns out to be problematic in some cases, we should
   // reconsider this.
   QSet<std::shared_ptr<BGI_Device>> selectedDevices;
-  foreach (auto item, mFootprintPads) {
+  foreach (auto item, mPads) {
     if (auto device = item->getDeviceGraphicsItem().lock()) {
       if ((!selectedDevices.contains(device)) &&
           item->mapToScene(item->shape()).intersects(rectPx)) {
@@ -270,7 +270,7 @@ void BoardGraphicsScene::clearSelection() noexcept {
   foreach (auto item, mDevices) {
     item->setSelected(false);
   }
-  foreach (auto item, mFootprintPads) {
+  foreach (auto item, mPads) {
     item->setSelected(false);
   }
   foreach (auto item, mNetPoints) {
@@ -300,7 +300,7 @@ void BoardGraphicsScene::clearSelection() noexcept {
 }
 
 void BoardGraphicsScene::updateHighlightedNetSignals() noexcept {
-  foreach (auto item, mFootprintPads) {
+  foreach (auto item, mPads) {
     item->updateHighlightedNetSignals();
   }
   foreach (auto item, mVias) {
@@ -343,8 +343,8 @@ void BoardGraphicsScene::addDevice(BI_Device& device) noexcept {
   addItem(*item);
   mDevices.insert(&device, item);
 
-  foreach (BI_FootprintPad* obj, device.getPads()) {
-    addFootprintPad(*obj, item);
+  foreach (BI_Pad* obj, device.getPads()) {
+    addPad(*obj, item);
   }
   foreach (BI_StrokeText* obj, device.getStrokeTexts()) {
     addStrokeText(*obj);
@@ -365,8 +365,8 @@ void BoardGraphicsScene::removeDevice(BI_Device& device) noexcept {
   foreach (BI_StrokeText* obj, device.getStrokeTexts()) {
     removeStrokeText(*obj);
   }
-  foreach (BI_FootprintPad* obj, device.getPads()) {
-    removeFootprintPad(*obj);
+  foreach (BI_Pad* obj, device.getPads()) {
+    removePad(*obj);
   }
 
   if (std::shared_ptr<BGI_Device> item = mDevices.take(&device)) {
@@ -376,17 +376,17 @@ void BoardGraphicsScene::removeDevice(BI_Device& device) noexcept {
   }
 }
 
-void BoardGraphicsScene::addFootprintPad(
-    BI_FootprintPad& pad, std::weak_ptr<BGI_Device> device) noexcept {
-  Q_ASSERT(!mFootprintPads.contains(&pad));
-  std::shared_ptr<BGI_FootprintPad> item = std::make_shared<BGI_FootprintPad>(
-      pad, device, mLayers, mHighlightedNetSignals);
+void BoardGraphicsScene::addPad(BI_Pad& pad,
+                                std::weak_ptr<BGI_Device> device) noexcept {
+  Q_ASSERT(!mPads.contains(&pad));
+  std::shared_ptr<BGI_Pad> item =
+      std::make_shared<BGI_Pad>(pad, device, mLayers, mHighlightedNetSignals);
   addItem(*item);
-  mFootprintPads.insert(&pad, item);
+  mPads.insert(&pad, item);
 }
 
-void BoardGraphicsScene::removeFootprintPad(BI_FootprintPad& pad) noexcept {
-  if (std::shared_ptr<BGI_FootprintPad> item = mFootprintPads.take(&pad)) {
+void BoardGraphicsScene::removePad(BI_Pad& pad) noexcept {
+  if (std::shared_ptr<BGI_Pad> item = mPads.take(&pad)) {
     removeItem(*item);
   } else {
     Q_ASSERT(false);

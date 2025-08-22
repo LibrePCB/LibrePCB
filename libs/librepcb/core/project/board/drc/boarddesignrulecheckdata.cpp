@@ -37,11 +37,11 @@
 #include "../board.h"
 #include "../items/bi_airwire.h"
 #include "../items/bi_device.h"
-#include "../items/bi_footprintpad.h"
 #include "../items/bi_hole.h"
 #include "../items/bi_netline.h"
 #include "../items/bi_netpoint.h"
 #include "../items/bi_netsegment.h"
+#include "../items/bi_pad.h"
 #include "../items/bi_plane.h"
 #include "../items/bi_polygon.h"
 #include "../items/bi_stroketext.h"
@@ -154,7 +154,7 @@ BoardDesignRuleCheckData::BoardDesignRuleCheckData(
         {},
         {},
     };
-    foreach (const BI_FootprintPad* pad, dev->getPads()) {
+    foreach (const BI_Pad* pad, dev->getPads()) {
       QSet<const Layer*> layersWithTraces;
       foreach (const BI_NetLine* netLine, pad->getNetLines()) {
         layersWithTraces.insert(&netLine->getLayer());
@@ -216,7 +216,7 @@ BoardDesignRuleCheckData::BoardDesignRuleCheckData(
   auto convertAnchor = [](const BI_NetLineAnchor& a) {
     AirWireAnchor ret;
     ret.position = a.getPosition();
-    if (const BI_FootprintPad* pad = dynamic_cast<const BI_FootprintPad*>(&a)) {
+    if (const BI_Pad* pad = dynamic_cast<const BI_Pad*>(&a)) {
       ret.device = pad->getDevice().getComponentInstanceUuid();
       ret.pad = pad->getLibPadUuid();
     } else if (const BI_NetPoint* np = dynamic_cast<const BI_NetPoint*>(&a)) {

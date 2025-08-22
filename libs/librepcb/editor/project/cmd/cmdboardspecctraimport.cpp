@@ -31,10 +31,10 @@
 #include <librepcb/core/project/board/boarddesignrules.h>
 #include <librepcb/core/project/board/boardnetsegmentsplitter.h>
 #include <librepcb/core/project/board/items/bi_device.h>
-#include <librepcb/core/project/board/items/bi_footprintpad.h>
 #include <librepcb/core/project/board/items/bi_netline.h>
 #include <librepcb/core/project/board/items/bi_netpoint.h>
 #include <librepcb/core/project/board/items/bi_netsegment.h>
+#include <librepcb/core/project/board/items/bi_pad.h>
 #include <librepcb/core/project/board/items/bi_via.h>
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
@@ -517,7 +517,7 @@ bool CmdBoardSpecctraImport::performExecute() {
     for (const ComponentSignalInstance* cmpSig :
          (netSignal ? netSignal->getComponentSignals()
                     : QList<ComponentSignalInstance*>{})) {
-      for (const BI_FootprintPad* pad : cmpSig->getRegisteredFootprintPads()) {
+      for (const BI_Pad* pad : cmpSig->getRegisteredFootprintPads()) {
         Point pos = pad->getPosition();
         QList<Point>& coordinates = pad->getLibPad().isTht()
             ? wireCoordinates
@@ -542,10 +542,11 @@ bool CmdBoardSpecctraImport::performExecute() {
         const Layer* endLayer = pad->getLibPad().isTht()
             ? &Layer::botCopper()
             : &pad->getSolderLayer();
-        anchors.append(AnchorData{
-            pos, startLayer, endLayer,
-            TraceAnchor::pad(pad->getDevice().getComponentInstanceUuid(),
-                             pad->getLibPadUuid())});
+        anchors.append(
+            AnchorData{pos, startLayer, endLayer,
+                       TraceAnchor::footprintPad(
+                           pad->getDevice().getComponentInstanceUuid(),
+                           pad->getLibPadUuid())});
       }
     }
 
@@ -660,7 +661,7 @@ bool CmdBoardSpecctraImport::performExecute() {
         } else if (std::optional<Uuid> anchor = trace.getP1().tryGetVia()) {
           p1 = viaMap[*anchor];
         } else if (std::optional<TraceAnchor::PadAnchor> anchor =
-                       trace.getP1().tryGetPad()) {
+                       trace.getP1().tryGetFootprintPad()) {
           BI_Device* device =
               mBoard.getDeviceInstanceByComponentUuid(anchor->device);
           p1 = device ? device->getPad(anchor->pad) : nullptr;
@@ -671,7 +672,7 @@ bool CmdBoardSpecctraImport::performExecute() {
         } else if (std::optional<Uuid> anchor = trace.getP2().tryGetVia()) {
           p2 = viaMap[*anchor];
         } else if (std::optional<TraceAnchor::PadAnchor> anchor =
-                       trace.getP2().tryGetPad()) {
+                       trace.getP2().tryGetFootprintPad()) {
           BI_Device* device =
               mBoard.getDeviceInstanceByComponentUuid(anchor->device);
           p2 = device ? device->getPad(anchor->pad) : nullptr;

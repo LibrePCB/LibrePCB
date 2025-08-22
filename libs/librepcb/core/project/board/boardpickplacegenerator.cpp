@@ -31,7 +31,7 @@
 #include "../projectattributelookup.h"
 #include "board.h"
 #include "items/bi_device.h"
-#include "items/bi_footprintpad.h"
+#include "items/bi_pad.h"
 
 #include <QtCore>
 
@@ -82,7 +82,7 @@ std::shared_ptr<PickPlaceData> BoardPickPlaceGenerator::generate() noexcept {
     const QString pkgName = *device->getLibPackage().getNames().value(locale);
 
     // Determine fiducials to be exported.
-    foreach (const BI_FootprintPad* pad, device->getPads()) {
+    foreach (const BI_Pad* pad, device->getPads()) {
       if (pad->getLibPad().getFunctionIsFiducial()) {
         QVector<PickPlaceDataItem::BoardSide> sides;
         if (pad->isOnLayer(Layer::topCopper())) {

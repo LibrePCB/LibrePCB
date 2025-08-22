@@ -20,7 +20,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "bgi_footprintpad.h"
+#include "bgi_pad.h"
 
 #include "../../../graphics/primitivefootprintpadgraphicsitem.h"
 #include "../boardgraphicsscene.h"
@@ -28,7 +28,7 @@
 #include <librepcb/core/library/cmp/componentsignal.h>
 #include <librepcb/core/library/pkg/packagepad.h>
 #include <librepcb/core/project/board/items/bi_device.h>
-#include <librepcb/core/project/board/items/bi_footprintpad.h>
+#include <librepcb/core/project/board/items/bi_pad.h>
 #include <librepcb/core/project/circuit/componentsignalinstance.h>
 #include <librepcb/core/project/circuit/netsignal.h>
 #include <librepcb/core/types/layer.h>
@@ -47,18 +47,17 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BGI_FootprintPad::BGI_FootprintPad(BI_FootprintPad& pad,
-                                   std::weak_ptr<BGI_Device> deviceItem,
-                                   const GraphicsLayerList& layers,
-                                   std::shared_ptr<const QSet<const NetSignal*>>
-                                       highlightedNetSignals) noexcept
+BGI_Pad::BGI_Pad(BI_Pad& pad, std::weak_ptr<BGI_Device> deviceItem,
+                 const GraphicsLayerList& layers,
+                 std::shared_ptr<const QSet<const NetSignal*>>
+                     highlightedNetSignals) noexcept
   : QGraphicsItemGroup(),
     mPad(pad),
     mDeviceGraphicsItem(deviceItem),
     mHighlightedNetSignals(highlightedNetSignals),
     mGraphicsItem(new PrimitiveFootprintPadGraphicsItem(layers, false, this)),
-    mOnPadEditedSlot(*this, &BGI_FootprintPad::padEdited),
-    mOnDeviceEditedSlot(*this, &BGI_FootprintPad::deviceGraphicsItemEdited) {
+    mOnPadEditedSlot(*this, &BGI_Pad::padEdited),
+    mOnDeviceEditedSlot(*this, &BGI_Pad::deviceGraphicsItemEdited) {
   setFlag(QGraphicsItem::ItemHasNoContents, true);
   setFlag(QGraphicsItem::ItemIsSelectable, true);
 
@@ -77,14 +76,14 @@ BGI_FootprintPad::BGI_FootprintPad(BI_FootprintPad& pad,
   }
 }
 
-BGI_FootprintPad::~BGI_FootprintPad() noexcept {
+BGI_Pad::~BGI_Pad() noexcept {
 }
 
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
 
-void BGI_FootprintPad::updateHighlightedNetSignals() noexcept {
+void BGI_Pad::updateHighlightedNetSignals() noexcept {
   updateHightlighted(isSelected());
 }
 
@@ -92,13 +91,13 @@ void BGI_FootprintPad::updateHighlightedNetSignals() noexcept {
  *  Inherited from QGraphicsItem
  ******************************************************************************/
 
-QPainterPath BGI_FootprintPad::shape() const noexcept {
+QPainterPath BGI_Pad::shape() const noexcept {
   Q_ASSERT(mGraphicsItem);
   return mGraphicsItem->mapToParent(mGraphicsItem->shape());
 }
 
-QVariant BGI_FootprintPad::itemChange(GraphicsItemChange change,
-                                      const QVariant& value) noexcept {
+QVariant BGI_Pad::itemChange(GraphicsItemChange change,
+                             const QVariant& value) noexcept {
   if ((change == ItemSelectedHasChanged) && mGraphicsItem) {
     updateHightlighted(value.toBool());
   }
@@ -109,56 +108,55 @@ QVariant BGI_FootprintPad::itemChange(GraphicsItemChange change,
  *  Private Methods
  ******************************************************************************/
 
-void BGI_FootprintPad::padEdited(const BI_FootprintPad& obj,
-                                 BI_FootprintPad::Event event) noexcept {
+void BGI_Pad::padEdited(const BI_Pad& obj, BI_Pad::Event event) noexcept {
   Q_UNUSED(obj);
   switch (event) {
-    case BI_FootprintPad::Event::PositionChanged:
+    case BI_Pad::Event::PositionChanged:
       setPos(obj.getPosition().toPxQPointF());
       break;
-    case BI_FootprintPad::Event::RotationChanged:
+    case BI_Pad::Event::RotationChanged:
       mGraphicsItem->setRotation(obj.getRotation());
       break;
-    case BI_FootprintPad::Event::MirroredChanged:
+    case BI_Pad::Event::MirroredChanged:
       mGraphicsItem->setMirrored(obj.getMirrored());
       updateLayer();
       break;
-    case BI_FootprintPad::Event::TextChanged:
+    case BI_Pad::Event::TextChanged:
       mGraphicsItem->setText(obj.getText());
       updateToolTip();
       break;
-    case BI_FootprintPad::Event::GeometriesChanged:
+    case BI_Pad::Event::GeometriesChanged:
       mGraphicsItem->setGeometries(obj.getGeometries(),
                                    *obj.getLibPad().getCopperClearance());
       break;
     default:
-      qWarning() << "Unhandled switch-case in BGI_FootprintPad::padEdited():"
+      qWarning() << "Unhandled switch-case in BGI_Pad::padEdited():"
                  << static_cast<int>(event);
       break;
   }
 }
 
-void BGI_FootprintPad::deviceGraphicsItemEdited(
-    const BGI_Device& obj, BGI_Device::Event event) noexcept {
+void BGI_Pad::deviceGraphicsItemEdited(const BGI_Device& obj,
+                                       BGI_Device::Event event) noexcept {
   if (event == BGI_Device::Event::SelectionChanged) {
     setSelected(obj.isSelected());
   }
 }
 
-void BGI_FootprintPad::updateLayer() noexcept {
+void BGI_Pad::updateLayer() noexcept {
   if (mPad.getLibPad().isTht()) {
-    setZValue(BoardGraphicsScene::ZValue_FootprintPadsTop);
+    setZValue(BoardGraphicsScene::ZValue_PadsTop);
     mGraphicsItem->setLayer(Theme::Color::sBoardPads);
   } else if (mPad.getSolderLayer() == Layer::topCopper()) {
-    setZValue(BoardGraphicsScene::ZValue_FootprintPadsTop);
+    setZValue(BoardGraphicsScene::ZValue_PadsTop);
     mGraphicsItem->setLayer(Theme::Color::sBoardCopperTop);
   } else {
-    setZValue(BoardGraphicsScene::ZValue_FootprintPadsBottom);
+    setZValue(BoardGraphicsScene::ZValue_PadsBottom);
     mGraphicsItem->setLayer(Theme::Color::sBoardCopperBot);
   }
 }
 
-void BGI_FootprintPad::updateToolTip() noexcept {
+void BGI_Pad::updateToolTip() noexcept {
   Q_ASSERT(mGraphicsItem);
   QString s;
   s += "<b>" % tr("Pad:") % " ";
@@ -182,7 +180,7 @@ void BGI_FootprintPad::updateToolTip() noexcept {
   mGraphicsItem->setToolTipText(s);
 }
 
-void BGI_FootprintPad::updateHightlighted(bool selected) noexcept {
+void BGI_Pad::updateHightlighted(bool selected) noexcept {
   mGraphicsItem->setSelected(
       selected ||
       mHighlightedNetSignals->contains(mPad.getCompSigInstNetSignal()));

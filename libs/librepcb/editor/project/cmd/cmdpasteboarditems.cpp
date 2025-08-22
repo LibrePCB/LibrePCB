@@ -51,11 +51,11 @@
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boardnetsegmentsplitter.h>
 #include <librepcb/core/project/board/items/bi_device.h>
-#include <librepcb/core/project/board/items/bi_footprintpad.h>
 #include <librepcb/core/project/board/items/bi_hole.h>
 #include <librepcb/core/project/board/items/bi_netline.h>
 #include <librepcb/core/project/board/items/bi_netpoint.h>
 #include <librepcb/core/project/board/items/bi_netsegment.h>
+#include <librepcb/core/project/board/items/bi_pad.h>
 #include <librepcb/core/project/board/items/bi_plane.h>
 #include <librepcb/core/project/board/items/bi_polygon.h>
 #include <librepcb/core/project/board/items/bi_stroketext.h>
@@ -178,8 +178,8 @@ bool CmdPasteBoardItems::performExecute() {
       const Uuid& pad = it.key().second;
       if (!pastedDevices.contains(device)) {
         // Device was not pasted, so we have to replace all pads by junctions
-        splitter.replaceFootprintPadByJunctions(TraceAnchor::pad(device, pad),
-                                                it.value());
+        splitter.replaceFootprintPadByJunctions(
+            TraceAnchor::footprintPad(device, pad), it.value());
       }
     }
     for (const Via& v : seg.vias) {
@@ -225,7 +225,7 @@ bool CmdPasteBoardItems::performExecute() {
         } else if (std::optional<Uuid> anchor = trace.getP1().tryGetVia()) {
           p1 = viaMap[*anchor];
         } else if (std::optional<TraceAnchor::PadAnchor> anchor =
-                       trace.getP1().tryGetPad()) {
+                       trace.getP1().tryGetFootprintPad()) {
           Q_ASSERT(pastedDevices.contains(anchor->device));
           BI_Device* device =
               mBoard.getDeviceInstanceByComponentUuid(anchor->device);
@@ -237,7 +237,7 @@ bool CmdPasteBoardItems::performExecute() {
         } else if (std::optional<Uuid> anchor = trace.getP2().tryGetVia()) {
           p2 = viaMap[*anchor];
         } else if (std::optional<TraceAnchor::PadAnchor> anchor =
-                       trace.getP2().tryGetPad()) {
+                       trace.getP2().tryGetFootprintPad()) {
           Q_ASSERT(pastedDevices.contains(anchor->device));
           BI_Device* device =
               mBoard.getDeviceInstanceByComponentUuid(anchor->device);

@@ -46,11 +46,11 @@
 #include "drc/boarddesignrulechecksettings.h"
 #include "items/bi_airwire.h"
 #include "items/bi_device.h"
-#include "items/bi_footprintpad.h"
 #include "items/bi_hole.h"
 #include "items/bi_netline.h"
 #include "items/bi_netpoint.h"
 #include "items/bi_netsegment.h"
+#include "items/bi_pad.h"
 #include "items/bi_plane.h"
 #include "items/bi_polygon.h"
 #include "items/bi_stroketext.h"
@@ -179,7 +179,7 @@ std::shared_ptr<SceneData3D> Board::buildScene3D(
                         *obj->getComponentInstance().getName());
       }
     }
-    foreach (const BI_FootprintPad* pad, obj->getPads()) {
+    foreach (const BI_Pad* pad, obj->getPads()) {
       const Transform padTransform(*pad);
       auto geometries = pad->getGeometries();
       for (auto it = geometries.begin(); it != geometries.end(); it++) {
@@ -755,7 +755,7 @@ void Board::copyFrom(const Board& other) {
     for (auto it = devMap.begin(); it != devMap.end(); ++it) {
       const BI_Device& oldDev = *it.key();
       BI_Device& newDev = *it.value();
-      foreach (const BI_FootprintPad* pad, oldDev.getPads()) {
+      foreach (const BI_Pad* pad, oldDev.getPads()) {
         anchorsMap.insert(pad, newDev.getPad(pad->getLibPadUuid()));
       }
     }
