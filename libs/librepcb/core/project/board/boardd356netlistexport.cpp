@@ -31,8 +31,8 @@
 #include "../project.h"
 #include "board.h"
 #include "items/bi_device.h"
-#include "items/bi_footprintpad.h"
 #include "items/bi_netsegment.h"
+#include "items/bi_pad.h"
 #include "items/bi_via.h"
 
 #include <QtCore>
@@ -92,7 +92,7 @@ QByteArray BoardD356NetlistExport::generate() const {
 
   // Footprint Pads.
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
-    foreach (const BI_FootprintPad* pad, device->getPads()) {
+    foreach (const BI_Pad* pad, device->getPads()) {
       QString netName;
       if (const NetSignal* netSignal = pad->getCompSigInstNetSignal()) {
         netName = *netSignal->getName();

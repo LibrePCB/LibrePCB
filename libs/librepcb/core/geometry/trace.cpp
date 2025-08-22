@@ -35,15 +35,17 @@ namespace librepcb {
 
 TraceAnchor::TraceAnchor(const std::optional<Uuid>& junction,
                          const std::optional<Uuid>& via,
-                         const std::optional<PadAnchor>& pad) noexcept
-  : mJunction(junction), mVia(via), mPad(pad) {
-  Q_ASSERT(((junction) && (!via) && (!pad)) ||
-           ((!junction) && (via) && (!pad)) ||
-           ((!junction) && (!via) && (pad)));
+                         const std::optional<PadAnchor>& footprintPad) noexcept
+  : mJunction(junction), mVia(via), mFootprintPad(footprintPad) {
+  Q_ASSERT(((junction) && (!via) && (!footprintPad)) ||
+           ((!junction) && (via) && (!footprintPad)) ||
+           ((!junction) && (!via) && (footprintPad)));
 }
 
 TraceAnchor::TraceAnchor(const TraceAnchor& other) noexcept
-  : mJunction(other.mJunction), mVia(other.mVia), mPad(other.mPad) {
+  : mJunction(other.mJunction),
+    mVia(other.mVia),
+    mFootprintPad(other.mFootprintPad) {
 }
 
 TraceAnchor::TraceAnchor(const SExpression& node) {
@@ -52,8 +54,8 @@ TraceAnchor::TraceAnchor(const SExpression& node) {
   } else if (const SExpression* viaNode = node.tryGetChild("via")) {
     mVia = deserialize<Uuid>(viaNode->getChild("@0"));
   } else {
-    mPad = PadAnchor{deserialize<Uuid>(node.getChild("device/@0")),
-                     deserialize<Uuid>(node.getChild("pad/@0"))};
+    mFootprintPad = PadAnchor{deserialize<Uuid>(node.getChild("device/@0")),
+                              deserialize<Uuid>(node.getChild("pad/@0"))};
   }
 }
 
@@ -65,9 +67,9 @@ void TraceAnchor::serialize(SExpression& root) const {
     root.appendChild("junction", *mJunction);
   } else if (mVia) {
     root.appendChild("via", *mVia);
-  } else if (mPad) {
-    root.appendChild("device", mPad->device);
-    root.appendChild("pad", mPad->pad);
+  } else if (mFootprintPad) {
+    root.appendChild("device", mFootprintPad->device);
+    root.appendChild("pad", mFootprintPad->pad);
   } else {
     throw LogicError(__FILE__, __LINE__);
   }
@@ -75,13 +77,13 @@ void TraceAnchor::serialize(SExpression& root) const {
 
 bool TraceAnchor::operator==(const TraceAnchor& rhs) const noexcept {
   return (mJunction == rhs.mJunction) && (mVia == rhs.mVia) &&
-      (mPad == rhs.mPad);
+      (mFootprintPad == rhs.mFootprintPad);
 }
 
 TraceAnchor& TraceAnchor::operator=(const TraceAnchor& rhs) noexcept {
   mJunction = rhs.mJunction;
   mVia = rhs.mVia;
-  mPad = rhs.mPad;
+  mFootprintPad = rhs.mFootprintPad;
   return *this;
 }
 
@@ -93,7 +95,8 @@ TraceAnchor TraceAnchor::via(const Uuid& via) noexcept {
   return TraceAnchor(std::nullopt, via, std::nullopt);
 }
 
-TraceAnchor TraceAnchor::pad(const Uuid& device, const Uuid& pad) noexcept {
+TraceAnchor TraceAnchor::footprintPad(const Uuid& device,
+                                      const Uuid& pad) noexcept {
   return TraceAnchor(std::nullopt, std::nullopt, PadAnchor{device, pad});
 }
 

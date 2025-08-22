@@ -34,11 +34,11 @@
  ******************************************************************************/
 namespace librepcb {
 
-class BI_FootprintPad;
 class BI_NetLine;
 class BI_NetLineAnchor;
 class BI_NetPoint;
 class BI_NetSegment;
+class BI_Pad;
 class BI_Via;
 class Layer;
 class NetSignal;
@@ -142,14 +142,14 @@ private:
    *                          beginning a new trace.
    * @param fixedVia          The BI_Via used as the start anchor, when
    *                          beginning a new trace.
-   * @param fixedPad          The BI_FootprintPad used as the start anchor,
+   * @param fixedPad          The BI_Pad used as the start anchor,
    *                          when beginning a new trace.
    * @return True, when the tracing is successfully started.
    */
   bool startPositioning(Board& board, const Point& pos,
                         BI_NetPoint* fixedPoint = nullptr,
                         BI_Via* fixedVia = nullptr,
-                        BI_FootprintPad* fixedPad = nullptr) noexcept;
+                        BI_Pad* fixedPad = nullptr) noexcept;
 
   /**
    * @brief Finalize the BI_NetLines and connect them to other

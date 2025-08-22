@@ -20,7 +20,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "bi_footprintpad.h"
+#include "bi_pad.h"
 
 #include "../../../library/cmp/componentsignal.h"
 #include "../../../library/dev/device.h"
@@ -46,14 +46,14 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BI_FootprintPad::BI_FootprintPad(BI_Device& device, const Uuid& padUuid)
+BI_Pad::BI_Pad(BI_Device& device, const Uuid& padUuid)
   : BI_Base(device.getBoard()),
     onEdited(*this),
     mDevice(device),
     mFootprintPad(nullptr),
     mPackagePad(nullptr),
     mComponentSignalInstance(nullptr),
-    mOnDeviceEditedSlot(*this, &BI_FootprintPad::deviceEdited) {
+    mOnDeviceEditedSlot(*this, &BI_Pad::deviceEdited) {
   mFootprintPad =
       mDevice.getLibFootprint().getPads().get(padUuid).get();  // can throw
   if (mFootprintPad->getPackagePadUuid()) {
@@ -72,13 +72,12 @@ BI_FootprintPad::BI_FootprintPad(BI_Device& device, const Uuid& padUuid)
           mDevice.getComponentInstance().getSignalInstance(*cmpSignalUuid);
       connect(mComponentSignalInstance,
               &ComponentSignalInstance::netSignalChanged, this,
-              &BI_FootprintPad::netSignalChanged);
+              &BI_Pad::netSignalChanged);
     }
   }
 
   if (NetSignal* netsignal = getCompSigInstNetSignal()) {
-    connect(netsignal, &NetSignal::nameChanged, this,
-            &BI_FootprintPad::updateText);
+    connect(netsignal, &NetSignal::nameChanged, this, &BI_Pad::updateText);
   }
 
   updateTransform();
@@ -87,12 +86,12 @@ BI_FootprintPad::BI_FootprintPad(BI_Device& device, const Uuid& padUuid)
 
   mDevice.onEdited.attach(mOnDeviceEditedSlot);
   connect(&mBoard, &Board::designRulesModified, this,
-          &BI_FootprintPad::updateGeometries);
+          &BI_Pad::updateGeometries);
   connect(&mBoard, &Board::innerLayerCountChanged, this,
-          &BI_FootprintPad::updateGeometries);
+          &BI_Pad::updateGeometries);
 }
 
-BI_FootprintPad::~BI_FootprintPad() {
+BI_Pad::~BI_Pad() {
   Q_ASSERT(!isUsed());
 }
 
@@ -100,11 +99,11 @@ BI_FootprintPad::~BI_FootprintPad() {
  *  Getters
  ******************************************************************************/
 
-const Uuid& BI_FootprintPad::getLibPadUuid() const noexcept {
+const Uuid& BI_Pad::getLibPadUuid() const noexcept {
   return mFootprintPad->getUuid();
 }
 
-Pad::ComponentSide BI_FootprintPad::getComponentSide() const noexcept {
+Pad::ComponentSide BI_Pad::getComponentSide() const noexcept {
   if (getMirrored()) {
     return (mFootprintPad->getComponentSide() == Pad::ComponentSide::Top)
         ? Pad::ComponentSide::Bottom
@@ -114,7 +113,7 @@ Pad::ComponentSide BI_FootprintPad::getComponentSide() const noexcept {
   }
 }
 
-const Layer& BI_FootprintPad::getSolderLayer() const noexcept {
+const Layer& BI_Pad::getSolderLayer() const noexcept {
   if (mFootprintPad->isTht()) {
     return (getComponentSide() == Pad::ComponentSide::Bottom)
         ? Layer::topCopper()
@@ -126,7 +125,7 @@ const Layer& BI_FootprintPad::getSolderLayer() const noexcept {
   }
 }
 
-bool BI_FootprintPad::isOnLayer(const Layer& layer) const noexcept {
+bool BI_Pad::isOnLayer(const Layer& layer) const noexcept {
   if (mFootprintPad->isTht()) {
     return layer.isCopper();
   } else {
@@ -134,7 +133,7 @@ bool BI_FootprintPad::isOnLayer(const Layer& layer) const noexcept {
   }
 }
 
-NetSignal* BI_FootprintPad::getCompSigInstNetSignal() const noexcept {
+NetSignal* BI_Pad::getCompSigInstNetSignal() const noexcept {
   if (mComponentSignalInstance) {
     return mComponentSignalInstance->getNetSignal();
   } else {
@@ -142,16 +141,16 @@ NetSignal* BI_FootprintPad::getCompSigInstNetSignal() const noexcept {
   }
 }
 
-TraceAnchor BI_FootprintPad::toTraceAnchor() const noexcept {
-  return TraceAnchor::pad(mDevice.getComponentInstanceUuid(),
-                          mFootprintPad->getUuid());
+TraceAnchor BI_Pad::toTraceAnchor() const noexcept {
+  return TraceAnchor::footprintPad(mDevice.getComponentInstanceUuid(),
+                                   mFootprintPad->getUuid());
 }
 
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
 
-void BI_FootprintPad::addToBoard() {
+void BI_Pad::addToBoard() {
   if (isAddedToBoard() || isUsed()) {
     throw LogicError(__FILE__, __LINE__);
   }
@@ -163,7 +162,7 @@ void BI_FootprintPad::addToBoard() {
   invalidatePlanes();
 }
 
-void BI_FootprintPad::removeFromBoard() {
+void BI_Pad::removeFromBoard() {
   if ((!isAddedToBoard()) || isUsed()) {
     throw LogicError(__FILE__, __LINE__);
   }
@@ -175,7 +174,7 @@ void BI_FootprintPad::removeFromBoard() {
   invalidatePlanes();
 }
 
-void BI_FootprintPad::registerNetLine(BI_NetLine& netline) {
+void BI_Pad::registerNetLine(BI_NetLine& netline) {
   if ((!isAddedToBoard()) || (mRegisteredNetLines.contains(&netline)) ||
       (netline.getBoard() != mBoard)) {
     throw LogicError(__FILE__, __LINE__);
@@ -213,7 +212,7 @@ void BI_FootprintPad::registerNetLine(BI_NetLine& netline) {
   updateGeometries();
 }
 
-void BI_FootprintPad::unregisterNetLine(BI_NetLine& netline) {
+void BI_Pad::unregisterNetLine(BI_NetLine& netline) {
   if ((!isAddedToBoard()) || (!mRegisteredNetLines.contains(&netline))) {
     throw LogicError(__FILE__, __LINE__);
   }
@@ -225,8 +224,8 @@ void BI_FootprintPad::unregisterNetLine(BI_NetLine& netline) {
  *  Private Slots
  ******************************************************************************/
 
-void BI_FootprintPad::deviceEdited(const BI_Device& obj,
-                                   BI_Device::Event event) noexcept {
+void BI_Pad::deviceEdited(const BI_Device& obj,
+                          BI_Device::Event event) noexcept {
   Q_UNUSED(obj);
   switch (event) {
     case BI_Device::Event::BoardLayersChanged:
@@ -239,22 +238,21 @@ void BI_FootprintPad::deviceEdited(const BI_Device& obj,
     case BI_Device::Event::StopMaskOffsetsChanged:
       break;
     default: {
-      qWarning() << "Unhandled switch-case in BI_FootprintPad::deviceEdited():"
+      qWarning() << "Unhandled switch-case in BI_Pad::deviceEdited():"
                  << static_cast<int>(event);
       break;
     }
   }
 }
 
-void BI_FootprintPad::netSignalChanged(NetSignal* from, NetSignal* to) {
+void BI_Pad::netSignalChanged(NetSignal* from, NetSignal* to) {
   Q_ASSERT(!isUsed());  // no netlines must be connected when netsignal changes!
   if (from) {
-    disconnect(from, &NetSignal::nameChanged, this,
-               &BI_FootprintPad::updateText);
+    disconnect(from, &NetSignal::nameChanged, this, &BI_Pad::updateText);
     mBoard.scheduleAirWiresRebuild(from);
   }
   if (to) {
-    connect(to, &NetSignal::nameChanged, this, &BI_FootprintPad::updateText);
+    connect(to, &NetSignal::nameChanged, this, &BI_Pad::updateText);
     mBoard.scheduleAirWiresRebuild(to);
   }
   invalidatePlanes();
@@ -265,7 +263,7 @@ void BI_FootprintPad::netSignalChanged(NetSignal* from, NetSignal* to) {
  *  Private Methods
  ******************************************************************************/
 
-void BI_FootprintPad::updateTransform() noexcept {
+void BI_Pad::updateTransform() noexcept {
   Transform transform(mDevice);
   const Point position = transform.map(mFootprintPad->getPosition());
   const Angle rotation = transform.mapMirrorable(mFootprintPad->getRotation());
@@ -291,7 +289,7 @@ void BI_FootprintPad::updateTransform() noexcept {
   }
 }
 
-void BI_FootprintPad::updateText() noexcept {
+void BI_Pad::updateText() noexcept {
   QString text;
   if (mPackagePad) {
     text += *mPackagePad->getName();
@@ -321,7 +319,7 @@ void BI_FootprintPad::updateText() noexcept {
   }
 }
 
-void BI_FootprintPad::updateGeometries() noexcept {
+void BI_Pad::updateGeometries() noexcept {
   const QSet<const Layer*> layers = mBoard.getCopperLayers() +
       QSet<const Layer*>{
           &Layer::topStopMask(),
@@ -342,7 +340,7 @@ void BI_FootprintPad::updateGeometries() noexcept {
   }
 }
 
-void BI_FootprintPad::invalidatePlanes() noexcept {
+void BI_Pad::invalidatePlanes() noexcept {
   if (mFootprintPad->isTht()) {
     mBoard.invalidatePlanes();
   } else {
@@ -350,20 +348,20 @@ void BI_FootprintPad::invalidatePlanes() noexcept {
   }
 }
 
-QString BI_FootprintPad::getLibraryDeviceName() const noexcept {
+QString BI_Pad::getLibraryDeviceName() const noexcept {
   return *mDevice.getLibDevice().getNames().getDefaultValue();
 }
 
-QString BI_FootprintPad::getComponentInstanceName() const noexcept {
+QString BI_Pad::getComponentInstanceName() const noexcept {
   return *mDevice.getComponentInstance().getName();
 }
 
-QString BI_FootprintPad::getPadNameOrUuid() const noexcept {
+QString BI_Pad::getPadNameOrUuid() const noexcept {
   return mPackagePad ? *mPackagePad->getName()
                      : mFootprintPad->getUuid().toStr();
 }
 
-QString BI_FootprintPad::getNetSignalName() const noexcept {
+QString BI_Pad::getNetSignalName() const noexcept {
   if (const NetSignal* signal = getCompSigInstNetSignal()) {
     return *signal->getName();
   } else {
@@ -371,8 +369,7 @@ QString BI_FootprintPad::getNetSignalName() const noexcept {
   }
 }
 
-UnsignedLength BI_FootprintPad::getSizeForMaskOffsetCalculaton()
-    const noexcept {
+UnsignedLength BI_Pad::getSizeForMaskOffsetCalculaton() const noexcept {
   if (mFootprintPad->getShape() == Pad::Shape::Custom) {
     // Width/height of the shape are not directly known and difficulat/heavy to
     // determine. So let's consider the pad as small to always get the smallest
@@ -384,7 +381,7 @@ UnsignedLength BI_FootprintPad::getSizeForMaskOffsetCalculaton()
   }
 }
 
-QList<PadGeometry> BI_FootprintPad::getGeometryOnLayer(
+QList<PadGeometry> BI_Pad::getGeometryOnLayer(
     const Layer& layer) const noexcept {
   if (layer.isCopper()) {
     return getGeometryOnCopperLayer(layer);
@@ -432,7 +429,7 @@ QList<PadGeometry> BI_FootprintPad::getGeometryOnLayer(
   return result;
 }
 
-QList<PadGeometry> BI_FootprintPad::getGeometryOnCopperLayer(
+QList<PadGeometry> BI_Pad::getGeometryOnCopperLayer(
     const Layer& layer) const noexcept {
   Q_ASSERT(layer.isCopper());
 
@@ -485,7 +482,7 @@ QList<PadGeometry> BI_FootprintPad::getGeometryOnCopperLayer(
   return result;
 }
 
-bool BI_FootprintPad::isConnectedOnLayer(const Layer& layer) const noexcept {
+bool BI_Pad::isConnectedOnLayer(const Layer& layer) const noexcept {
   foreach (const BI_NetLine* line, mRegisteredNetLines) {
     if (line->getLayer() == layer) {
       return true;

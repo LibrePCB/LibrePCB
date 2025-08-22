@@ -30,10 +30,10 @@
 #include "../circuit/netsignal.h"
 #include "../project.h"
 #include "board.h"
-#include "items/bi_footprintpad.h"
 #include "items/bi_netline.h"
 #include "items/bi_netpoint.h"
 #include "items/bi_netsegment.h"
+#include "items/bi_pad.h"
 #include "items/bi_plane.h"
 #include "items/bi_via.h"
 
@@ -73,7 +73,7 @@ QVector<std::pair<const BI_NetLineAnchor*, const BI_NetLineAnchor*>>
   // pads
   foreach (ComponentSignalInstance* cmpSig, mNetSignal.getComponentSignals()) {
     Q_ASSERT(cmpSig);
-    foreach (BI_FootprintPad* pad, cmpSig->getRegisteredFootprintPads()) {
+    foreach (BI_Pad* pad, cmpSig->getRegisteredFootprintPads()) {
       if (&pad->getBoard() != &mBoard) continue;
       const Point& pos = pad->getPosition();
       int id = builder.addPoint(pos);

@@ -478,14 +478,14 @@ add_library(
   project/board/graphicsitems/bgi_airwire.h
   project/board/graphicsitems/bgi_device.cpp
   project/board/graphicsitems/bgi_device.h
-  project/board/graphicsitems/bgi_footprintpad.cpp
-  project/board/graphicsitems/bgi_footprintpad.h
   project/board/graphicsitems/bgi_hole.cpp
   project/board/graphicsitems/bgi_hole.h
   project/board/graphicsitems/bgi_netline.cpp
   project/board/graphicsitems/bgi_netline.h
   project/board/graphicsitems/bgi_netpoint.cpp
   project/board/graphicsitems/bgi_netpoint.h
+  project/board/graphicsitems/bgi_pad.cpp
+  project/board/graphicsitems/bgi_pad.h
   project/board/graphicsitems/bgi_plane.cpp
   project/board/graphicsitems/bgi_plane.h
   project/board/graphicsitems/bgi_polygon.cpp

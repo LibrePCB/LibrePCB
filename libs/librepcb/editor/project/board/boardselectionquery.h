@@ -31,7 +31,6 @@
 namespace librepcb {
 
 class BI_Device;
-class BI_FootprintPad;
 class BI_Hole;
 class BI_NetLine;
 class BI_NetPoint;

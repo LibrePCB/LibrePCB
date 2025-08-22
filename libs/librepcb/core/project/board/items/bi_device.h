@@ -37,7 +37,7 @@
  ******************************************************************************/
 namespace librepcb {
 
-class BI_FootprintPad;
+class BI_Pad;
 class Board;
 class ComponentInstance;
 class Device;
@@ -95,10 +95,10 @@ public:
   bool isLocked() const noexcept { return mLocked; }
   bool isGlueEnabled() const noexcept { return mEnableGlue; }
   const AttributeList& getAttributes() const noexcept { return mAttributes; }
-  BI_FootprintPad* getPad(const Uuid& padUuid) const noexcept {
+  BI_Pad* getPad(const Uuid& padUuid) const noexcept {
     return mPads.value(padUuid);
   }
-  const QMap<Uuid, BI_FootprintPad*>& getPads() const noexcept { return mPads; }
+  const QMap<Uuid, BI_Pad*>& getPads() const noexcept { return mPads; }
   const QHash<Uuid, std::optional<Length>>& getHoleStopMasks() const noexcept {
     return mHoleStopMaskOffsets;
   }
@@ -165,7 +165,7 @@ private:
   bool mEnableGlue;
   AttributeList mAttributes;  ///< Not used yet, but specified in file format
 
-  QMap<Uuid, BI_FootprintPad*> mPads;  ///< key: footprint pad UUID
+  QMap<Uuid, BI_Pad*> mPads;  ///< key: footprint pad UUID
   QMap<Uuid, BI_StrokeText*> mStrokeTexts;
   QHash<Uuid, std::optional<Length>> mHoleStopMaskOffsets;
 };

@@ -53,7 +53,7 @@ TEST_F(TraceTest, testConstructFromSExpression) {
             obj.getUuid());
   EXPECT_EQ("bot_cu", obj.getLayer().getId());
   EXPECT_EQ(PositiveLength(500000), obj.getWidth());
-  EXPECT_EQ(TraceAnchor::pad(
+  EXPECT_EQ(TraceAnchor::footprintPad(
                 Uuid::fromString("0d8f2ef9-34f4-4400-a313-f17cdcdfe924"),
                 Uuid::fromString("65ab6c75-b264-4fed-b445-d3d98c956008")),
             obj.getStartPoint());
@@ -63,9 +63,10 @@ TEST_F(TraceTest, testConstructFromSExpression) {
 }
 
 TEST_F(TraceTest, testSerializeAndDeserialize) {
-  Trace obj1(Uuid::createRandom(), Layer::topCopper(), PositiveLength(123),
-             TraceAnchor::junction(Uuid::createRandom()),
-             TraceAnchor::pad(Uuid::createRandom(), Uuid::createRandom()));
+  Trace obj1(
+      Uuid::createRandom(), Layer::topCopper(), PositiveLength(123),
+      TraceAnchor::junction(Uuid::createRandom()),
+      TraceAnchor::footprintPad(Uuid::createRandom(), Uuid::createRandom()));
   std::unique_ptr<SExpression> sexpr1 = SExpression::createList("obj");
   obj1.serialize(*sexpr1);
 

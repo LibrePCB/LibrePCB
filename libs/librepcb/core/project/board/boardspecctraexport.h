@@ -37,8 +37,8 @@
 namespace librepcb {
 
 class BI_Device;
-class BI_FootprintPad;
 class BI_NetSegment;
+class BI_Pad;
 class BI_Via;
 class Board;
 class Hole;
@@ -83,8 +83,7 @@ private:
   std::unique_ptr<SExpression> genLibraryImage(
       const BI_Device& dev,
       std::vector<std::unique_ptr<SExpression>>& fptPadStacks) const;
-  std::unique_ptr<SExpression> genLibraryPadStack(
-      const BI_FootprintPad& pad) const;
+  std::unique_ptr<SExpression> genLibraryPadStack(const BI_Pad& pad) const;
   std::unique_ptr<SExpression> genNetwork() const;
   std::unique_ptr<SExpression> genWiring() const;
   std::unique_ptr<SExpression> genWiringPadStack(const BI_Via& via) const;

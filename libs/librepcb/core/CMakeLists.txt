@@ -364,8 +364,6 @@ add_library(
   project/board/items/bi_base.h
   project/board/items/bi_device.cpp
   project/board/items/bi_device.h
-  project/board/items/bi_footprintpad.cpp
-  project/board/items/bi_footprintpad.h
   project/board/items/bi_hole.cpp
   project/board/items/bi_hole.h
   project/board/items/bi_netline.cpp
@@ -374,6 +372,8 @@ add_library(
   project/board/items/bi_netpoint.h
   project/board/items/bi_netsegment.cpp
   project/board/items/bi_netsegment.h
+  project/board/items/bi_pad.cpp
+  project/board/items/bi_pad.h
   project/board/items/bi_plane.cpp
   project/board/items/bi_plane.h
   project/board/items/bi_polygon.cpp

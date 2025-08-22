@@ -129,7 +129,7 @@ TEST(BoardClipboardDataTest, testToFromMimeDataPopulated) {
   netSegment1->traces.append(std::make_shared<Trace>(
       Uuid::createRandom(), Layer::botCopper(), PositiveLength(10),
       TraceAnchor::junction(Uuid::createRandom()),
-      TraceAnchor::pad(Uuid::createRandom(), Uuid::createRandom())));
+      TraceAnchor::footprintPad(Uuid::createRandom(), Uuid::createRandom())));
 
   std::shared_ptr<BoardClipboardData::NetSegment> netSegment2 =
       std::make_shared<BoardClipboardData::NetSegment>(
@@ -152,7 +152,7 @@ TEST(BoardClipboardDataTest, testToFromMimeDataPopulated) {
   netSegment2->traces.append(std::make_shared<Trace>(
       Uuid::createRandom(), Layer::botCopper(), PositiveLength(10),
       TraceAnchor::junction(Uuid::createRandom()),
-      TraceAnchor::pad(Uuid::createRandom(), Uuid::createRandom())));
+      TraceAnchor::footprintPad(Uuid::createRandom(), Uuid::createRandom())));
 
   std::shared_ptr<BoardClipboardData::Plane> plane1 =
       std::make_shared<BoardClipboardData::Plane>(
