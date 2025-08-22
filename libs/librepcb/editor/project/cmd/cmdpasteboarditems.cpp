@@ -39,6 +39,7 @@
 #include "../board/graphicsitems/bgi_hole.h"
 #include "../board/graphicsitems/bgi_netline.h"
 #include "../board/graphicsitems/bgi_netpoint.h"
+#include "../board/graphicsitems/bgi_pad.h"
 #include "../board/graphicsitems/bgi_plane.h"
 #include "../board/graphicsitems/bgi_polygon.h"
 #include "../board/graphicsitems/bgi_stroketext.h"
@@ -182,6 +183,9 @@ bool CmdPasteBoardItems::performExecute() {
             TraceAnchor::footprintPad(device, pad), it.value());
       }
     }
+    for (const FootprintPad& p : seg.pads) {
+      splitter.addPad(p, false);
+    }
     for (const Via& v : seg.vias) {
       splitter.addVia(v, false);
     }
@@ -201,9 +205,16 @@ bool CmdPasteBoardItems::performExecute() {
           new BI_NetSegment(mBoard, Uuid::createRandom(), netsignal);
       execNewChildCmd(new CmdBoardNetSegmentAdd(*copy));
 
-      // Add vias, netpoints and netlines
+      // Add pads, vias, netpoints and netlines
       std::unique_ptr<CmdBoardNetSegmentAddElements> cmdAddElements(
           new CmdBoardNetSegmentAddElements(*copy));
+      QHash<Uuid, BI_Pad*> padMap;
+      for (const FootprintPad& p : segment.pads) {
+        FootprintPad copy(Uuid::createRandom(), p);
+        copy.setPosition(p.getPosition() + mPosOffset);
+        BI_Pad* pad = cmdAddElements->addPad(copy);
+        padMap.insert(p.getUuid(), pad);
+      }
       QHash<Uuid, BI_Via*> viaMap;
       for (const Via& v : segment.vias) {
         BI_Via* via = cmdAddElements->addVia(
@@ -224,6 +235,9 @@ bool CmdPasteBoardItems::performExecute() {
                 trace.getStartPoint().tryGetJunction()) {
           start = netPointMap[*anchor];
         } else if (std::optional<Uuid> anchor =
+                       trace.getStartPoint().tryGetPad()) {
+          start = padMap[*anchor];
+        } else if (std::optional<Uuid> anchor =
                        trace.getStartPoint().tryGetVia()) {
           start = viaMap[*anchor];
         } else if (std::optional<TraceAnchor::PadAnchor> anchor =
@@ -236,6 +250,9 @@ bool CmdPasteBoardItems::performExecute() {
         BI_NetLineAnchor* end = nullptr;
         if (std::optional<Uuid> anchor = trace.getEndPoint().tryGetJunction()) {
           end = netPointMap[*anchor];
+        } else if (std::optional<Uuid> anchor =
+                       trace.getEndPoint().tryGetPad()) {
+          end = padMap[*anchor];
         } else if (std::optional<Uuid> anchor =
                        trace.getEndPoint().tryGetVia()) {
           end = viaMap[*anchor];
@@ -255,6 +272,11 @@ bool CmdPasteBoardItems::performExecute() {
       execNewChildCmd(cmdAddElements.release());
 
       // Select pasted net segment items.
+      foreach (BI_Pad* pad, copy->getPads()) {
+        if (auto item = mScene.getPads().value(pad)) {
+          item->setSelected(true);
+        }
+      }
       foreach (BI_Via* via, copy->getVias()) {
         if (auto item = mScene.getVias().value(via)) {
           item->setSelected(true);

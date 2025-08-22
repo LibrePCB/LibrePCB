@@ -520,7 +520,7 @@ bool CmdBoardSpecctraImport::performExecute() {
                     : QList<ComponentSignalInstance*>{})) {
       for (const BI_Pad* pad : cmpSig->getRegisteredFootprintPads()) {
         Point pos = pad->getPosition();
-        QList<Point>& coordinates = pad->getLibPad().isTht()
+        QList<Point>& coordinates = pad->getProperties().isTht()
             ? wireCoordinates
             : wireCoordinatesPerLayer[&pad->getSolderLayer()];
         if (!coordinates.contains(pos)) {
@@ -537,17 +537,17 @@ bool CmdBoardSpecctraImport::performExecute() {
             continue;
           }
         }
-        const Layer* startLayer = pad->getLibPad().isTht()
+        const Layer* startLayer = pad->getProperties().isTht()
             ? &Layer::topCopper()
             : &pad->getSolderLayer();
-        const Layer* endLayer = pad->getLibPad().isTht()
+        const Layer* endLayer = pad->getProperties().isTht()
             ? &Layer::botCopper()
             : &pad->getSolderLayer();
-        anchors.append(
-            AnchorData{pos, startLayer, endLayer,
-                       TraceAnchor::footprintPad(
-                           pad->getDevice().getComponentInstanceUuid(),
-                           pad->getLibPadUuid())});
+        Q_ASSERT(pad->getDevice());  // Footprint pads must have a device.
+        anchors.append(AnchorData{
+            pos, startLayer, endLayer,
+            TraceAnchor::footprintPad(
+                pad->getDevice()->getComponentInstanceUuid(), pad->getUuid())});
       }
     }
 

@@ -31,6 +31,7 @@
 #include "../projectattributelookup.h"
 #include "board.h"
 #include "items/bi_device.h"
+#include "items/bi_netsegment.h"
 #include "items/bi_pad.h"
 
 #include <QtCore>
@@ -83,7 +84,7 @@ std::shared_ptr<PickPlaceData> BoardPickPlaceGenerator::generate() noexcept {
 
     // Determine fiducials to be exported.
     foreach (const BI_Pad* pad, device->getPads()) {
-      if (pad->getLibPad().getFunctionIsFiducial()) {
+      if (pad->getProperties().getFunctionIsFiducial()) {
         QVector<PickPlaceDataItem::BoardSide> sides;
         if (pad->isOnLayer(Layer::topCopper())) {
           sides.append(PickPlaceDataItem::BoardSide::Top);
@@ -126,6 +127,31 @@ std::shared_ptr<PickPlaceData> BoardPickPlaceGenerator::generate() noexcept {
     // Add all items.
     for (const PickPlaceDataItem& item : items) {
       data->addItem(item);
+    }
+  }
+
+  // Export board-level fiducials.
+  int fiducialNumber = 1;
+  foreach (const BI_NetSegment* netSegment, mBoard.getNetSegments()) {
+    foreach (const BI_Pad* pad, netSegment->getPads()) {
+      if (pad->getProperties().getFunctionIsFiducial()) {
+        QVector<PickPlaceDataItem::BoardSide> sides;
+        if (pad->isOnLayer(Layer::topCopper())) {
+          sides.append(PickPlaceDataItem::BoardSide::Top);
+        }
+        if (pad->isOnLayer(Layer::botCopper())) {
+          sides.append(PickPlaceDataItem::BoardSide::Bottom);
+        }
+        const QString designator = QString("FID%1").arg(fiducialNumber);
+        const Angle rotation =
+            pad->getMirrored() ? -pad->getRotation() : pad->getRotation();
+        foreach (const auto side, sides) {
+          data->addItem(PickPlaceDataItem(
+              designator, QString(), QString(), QString(), pad->getPosition(),
+              rotation, side, PickPlaceDataItem::Type::Fiducial, true));
+        }
+        ++fiducialNumber;
+      }
     }
   }
 

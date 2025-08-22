@@ -1097,13 +1097,14 @@ void EagleProjectImport::importBoard(Project& project,
             foreach (BI_Pad* pad, cmpSigInst->getRegisteredFootprintPads()) {
               if ((pad->isOnLayer(layer)) &&
                   (pad->getPosition() - pos).getLength() < Length(100)) {
+                Q_ASSERT(pad->getDevice());  // Always set for footprint pads.
                 padMap.insert(
-                    std::make_pair(pad->getDevice().getComponentInstanceUuid(),
-                                   pad->getLibPadUuid()),
+                    std::make_pair(pad->getDevice()->getComponentInstanceUuid(),
+                                   pad->getUuid()),
                     pad);
                 return TraceAnchor::footprintPad(
-                    pad->getDevice().getComponentInstanceUuid(),
-                    pad->getLibPadUuid());
+                    pad->getDevice()->getComponentInstanceUuid(),
+                    pad->getUuid());
               }
             }
           }
@@ -1183,6 +1184,7 @@ void EagleProjectImport::importBoard(Project& project,
         BI_NetSegment* netSegment =
             new BI_NetSegment(*board, Uuid::createRandom(), netSignal);
         board->addNetSegment(*netSegment);
+        QList<BI_Pad*> pads;
         QList<BI_Via*> vias;
         QList<BI_NetPoint*> netPoints;
         QList<BI_NetLine*> netLines;
@@ -1203,7 +1205,7 @@ void EagleProjectImport::importBoard(Project& project,
                                          *getAnchor(trace.getEndPoint()),
                                          trace.getLayer(), trace.getWidth()));
         }
-        netSegment->addElements(vias, netPoints, netLines);
+        netSegment->addElements(pads, vias, netPoints, netLines);
       }
     } catch (const Exception& e) {
       log.critical(QString("Failed to import segment of net '%1': %2")

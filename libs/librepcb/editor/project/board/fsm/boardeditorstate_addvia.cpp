@@ -415,7 +415,7 @@ void BoardEditorState_AddVia::updateClosestNetSignal(
     if (auto netline = std::dynamic_pointer_cast<BGI_NetLine>(item)) {
       netsignal = netline->getNetLine().getNetSegment().getNetSignal();
     } else if (auto pad = std::dynamic_pointer_cast<BGI_Pad>(item)) {
-      netsignal = pad->getPad().getCompSigInstNetSignal();
+      netsignal = pad->getPad().getNetSignal();
     } else if (auto via = std::dynamic_pointer_cast<BGI_Via>(item)) {
       netsignal = via->getVia().getNetSegment().getNetSignal();
     } else if (!netsignal) {

@@ -249,7 +249,7 @@ void BoardEditorState_DrawTrace::setLayer(const Layer& layer) noexcept {
     Point startPos = mFixedStartAnchor->getPosition();
     BI_Via* via = dynamic_cast<BI_Via*>(mFixedStartAnchor);
     BI_Pad* pad = dynamic_cast<BI_Pad*>(mFixedStartAnchor);
-    if (pad && (!pad->getLibPad().isTht())) {
+    if (pad && (!pad->getProperties().isTht())) {
       pad = nullptr;
     }
     if (via || pad) {
@@ -382,10 +382,10 @@ bool BoardEditorState_DrawTrace::startPositioning(Board& board,
       }
       if ((!fixedPad->isOnLayer(*layer)) &&
           board.getCopperLayers().contains(&fixedPad->getSolderLayer())) {
-        Q_ASSERT(!fixedPad->getLibPad().isTht());
+        Q_ASSERT(!fixedPad->getProperties().isTht());
         layer = &fixedPad->getSolderLayer();
       }
-      netsignal = fixedPad->getCompSigInstNetSignal();
+      netsignal = fixedPad->getNetSignal();
       if (!netsignal) {
         // Note: We might remove this restriction some day, but then we should
         // ensure that it's not possible to connect several pads together with
@@ -411,7 +411,7 @@ bool BoardEditorState_DrawTrace::startPositioning(Board& board,
     } else if (auto pad = std::dynamic_pointer_cast<BGI_Pad>(item)) {
       mFixedStartAnchor = &pad->getPad();
       mCurrentNetSegment = pad->getPad().getNetSegmentOfLines();
-      netsignal = pad->getPad().getCompSigInstNetSignal();
+      netsignal = pad->getPad().getNetSignal();
       if (!netsignal) {
         // Note: We might remove this restriction some day, but then we should
         // ensure that it's not possible to connect several pads together with
@@ -419,7 +419,7 @@ bool BoardEditorState_DrawTrace::startPositioning(Board& board,
         // to pads of no net.
         throwPadNotConnectedException();
       }
-      if (!pad->getPad().getLibPad().isTht()) {
+      if (!pad->getPad().getProperties().isTht()) {
         layer = &pad->getPad().getSolderLayer();
       }
     } else if (auto netline = std::dynamic_pointer_cast<BGI_NetLine>(item)) {
@@ -542,7 +542,7 @@ bool BoardEditorState_DrawTrace::addNextNetPoint(
               {netsignal})) {
         if (mCurrentSnapActive || mTargetPos == pad->getPad().getPosition()) {
           otherAnchors.append(&pad->getPad());
-          if (mAddVia && mViaLayer && pad->getPad().getLibPad().isTht()) {
+          if (mAddVia && mViaLayer && pad->getPad().getProperties().isTht()) {
             mCurrentLayer = mViaLayer;
           }
         }
@@ -603,7 +603,7 @@ bool BoardEditorState_DrawTrace::addNextNetPoint(
             otherNetSegment = &via->getNetSegment();
           } else if (BI_Pad* pad = dynamic_cast<BI_Pad*>(otherAnchor)) {
             CmdBoardNetSegmentAdd* cmd = new CmdBoardNetSegmentAdd(
-                scene.getBoard(), pad->getCompSigInstNetSignal());
+                scene.getBoard(), pad->getNetSignal());
             mContext.undoStack.appendToCmdGroup(cmd);  // can throw
             otherNetSegment = cmd->getNetSegment();
           }
@@ -738,7 +738,7 @@ void BoardEditorState_DrawTrace::updateNetpointPositions() noexcept {
       isOnVia = true;
     } else if (auto pad = std::dynamic_pointer_cast<BGI_Pad>(item)) {
       mTargetPos = pad->getPad().getPosition();
-      isOnVia = (pad->getPad().getLibPad().isTht());
+      isOnVia = (pad->getPad().getProperties().isTht());
     } else if (auto netpoint = std::dynamic_pointer_cast<BGI_NetPoint>(item)) {
       mTargetPos = netpoint->getNetPoint().getPosition();
     } else if (auto netline = std::dynamic_pointer_cast<BGI_NetLine>(item)) {

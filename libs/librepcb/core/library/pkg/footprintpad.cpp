@@ -41,6 +41,11 @@ FootprintPad::FootprintPad(const FootprintPad& other) noexcept
   mHoles.onEdited.attach(mHolesEditedSlot);
 }
 
+FootprintPad::FootprintPad(const Uuid& uuid, const FootprintPad& other) noexcept
+  : FootprintPad(other) {
+  mUuid = uuid;
+}
+
 FootprintPad::FootprintPad(
     const Uuid& uuid, const std::optional<Uuid>& pkgPadUuid, const Point& pos,
     const Angle& rot, Shape shape, const PositiveLength& width,

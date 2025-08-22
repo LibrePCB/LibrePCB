@@ -340,12 +340,12 @@ std::unique_ptr<SExpression> BoardSpecctraExport::genLibraryImage(
     root->ensureLineBreak();
     auto& pinNode = root->appendList("pin");
     pinNode.appendChild(id);
-    pinNode.appendChild(
-        "rotate",
-        SExpression::createToken(pad->getLibPad().getRotation().toDegString()));
-    pinNode.appendChild(pad->getLibPadUuid().toStr().replace("-", ""));
-    pinNode.appendChild(toToken(pad->getLibPad().getPosition().getX()));
-    pinNode.appendChild(toToken(pad->getLibPad().getPosition().getY()));
+    pinNode.appendChild("rotate",
+                        SExpression::createToken(
+                            pad->getProperties().getRotation().toDegString()));
+    pinNode.appendChild(pad->getUuid().toStr().replace("-", ""));
+    pinNode.appendChild(toToken(pad->getProperties().getPosition().getX()));
+    pinNode.appendChild(toToken(pad->getProperties().getPosition().getY()));
   }
   for (const auto& hole : dev.getLibFootprint().getHoles()) {
     root->ensureLineBreak();
@@ -388,7 +388,7 @@ std::unique_ptr<SExpression> BoardSpecctraExport::genLibraryPadStack(
   typedef std::pair<const Layer*, QList<PadGeometry>> LayerGeometry;
   QList<LayerGeometry> geometries;
   const Layer& solderLayer = pad.getSolderLayer();
-  if (pad.getLibPad().isTht()) {
+  if (pad.getProperties().isTht()) {
     // Always use full THT pad annular rings because automatic annulars depend
     // on whether a trace is connected or not. But connections might be made
     // in an external software, so we don't know which pads will be connected.
@@ -492,7 +492,7 @@ std::unique_ptr<SExpression> BoardSpecctraExport::genNetwork() const {
     for (const auto& cmpSig : net->getComponentSignals()) {
       const QString cmpName = *cmpSig->getComponentInstance().getName();
       for (const auto& pad : cmpSig->getRegisteredFootprintPads()) {
-        const QString padId = pad->getLibPadUuid().toStr().replace("-", "");
+        const QString padId = pad->getUuid().toStr().replace("-", "");
         pinsNode.ensureLineBreak();
         pinsNode.appendChild(SExpression::createToken(cmpName + "-" + padId));
       }

@@ -695,6 +695,13 @@ void ProjectLoader::loadBoardNetSegment(Board& b, const SExpression& node) {
       new BI_NetSegment(b, deserialize<Uuid>(node.getChild("@0")), netSignal);
   b.addNetSegment(*netSegment);
 
+  // Load pads.
+  QList<BI_Pad*> pads;
+  foreach (const SExpression* child, node.getChildren("pad")) {
+    BI_Pad* pad = new BI_Pad(*netSegment, FootprintPad(*child));
+    pads.append(pad);
+  }
+
   // Load vias.
   QList<BI_Via*> vias;
   foreach (const SExpression* child, node.getChildren("via")) {
@@ -774,7 +781,7 @@ void ProjectLoader::loadBoardNetSegment(Board& b, const SExpression& node) {
   }
 
   // Add vias, net points & net lines.
-  netSegment->addElements(vias, netPoints, netLines);
+  netSegment->addElements(pads, vias, netPoints, netLines);
 }
 
 void ProjectLoader::loadBoardPlane(Board& b, const SExpression& node) {

@@ -171,11 +171,11 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
     const Transform transform(*device);
     foreach (const BI_Pad* pad, device->getPads()) {
       std::optional<Uuid> netSignalUuid;
-      if (const NetSignal* netSignal = pad->getCompSigInstNetSignal()) {
+      if (const NetSignal* netSignal = pad->getNetSignal()) {
         netSignalUuid = netSignal->getUuid();
       }
       data->pads.append(PadData{Transform(*pad), netSignalUuid,
-                                pad->getLibPad().getCopperClearance(),
+                                pad->getProperties().getCopperClearance(),
                                 pad->getGeometries()});
     }
     for (const Polygon& polygon : device->getLibFootprint().getPolygons()) {
@@ -260,6 +260,11 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
     std::optional<Uuid> netSignalUuid;
     if (const NetSignal* netSignal = segment->getNetSignal()) {
       netSignalUuid = netSignal->getUuid();
+    }
+    for (const BI_Pad* pad : segment->getPads()) {
+      data->pads.append(PadData{Transform(*pad), netSignalUuid,
+                                pad->getProperties().getCopperClearance(),
+                                pad->getGeometries()});
     }
     for (const BI_Via* via : segment->getVias()) {
       data->vias.append(ViaData{

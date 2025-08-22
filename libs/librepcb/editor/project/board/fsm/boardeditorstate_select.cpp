@@ -765,7 +765,7 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
     if (auto pad = std::dynamic_pointer_cast<BGI_Pad>(selectedItem)) {
       // Pads have no context menu, thus open the context menu of its footprint.
       // Fixes https://github.com/LibrePCB/LibrePCB/issues/1060.
-      if (auto fpt = scene->getDevices().value(&pad->getPad().getDevice())) {
+      if (auto fpt = scene->getDevices().value(pad->getPad().getDevice())) {
         selectedItem = fpt;
         selectedItem->setSelected(true);
       }
@@ -1962,6 +1962,7 @@ void BoardEditorState_Select::updateAvailableFeatures() noexcept {
 
     BoardSelectionQuery query(*scene, true);
     query.addDeviceInstancesOfSelectedFootprints();
+    query.addSelectedBoardPads();
     query.addSelectedVias();
     query.addSelectedNetPoints();
     query.addSelectedNetLines();
@@ -1982,8 +1983,9 @@ void BoardEditorState_Select::updateAvailableFeatures() noexcept {
       features |= BoardEditorFsmAdapter::Feature::ResetTexts;
     }
     if ((!query.getDeviceInstances().isEmpty()) ||
-        (!query.getVias().isEmpty()) || (!query.getPlanes().isEmpty()) ||
-        (!query.getZones().isEmpty()) || (!query.getPolygons().isEmpty()) ||
+        (!query.getPads().isEmpty()) || (!query.getVias().isEmpty()) ||
+        (!query.getPlanes().isEmpty()) || (!query.getZones().isEmpty()) ||
+        (!query.getPolygons().isEmpty()) ||
         (!query.getStrokeTexts().isEmpty()) || (!query.getHoles().isEmpty())) {
       features |= BoardEditorFsmAdapter::Feature::Properties;
     }
@@ -2005,6 +2007,14 @@ void BoardEditorState_Select::updateAvailableFeatures() noexcept {
         features |= BoardEditorFsmAdapter::Feature::Unlock;
       } else {
         features |= BoardEditorFsmAdapter::Feature::Lock;
+      }
+    }
+    foreach (auto ptr, query.getPads()) {
+      if (features.testFlag(BoardEditorFsmAdapter::Feature::SnapToGrid)) {
+        break;
+      }
+      if (!ptr->getPosition().isOnGrid(getGridInterval())) {
+        features |= BoardEditorFsmAdapter::Feature::SnapToGrid;
       }
     }
     foreach (auto ptr, query.getVias()) {

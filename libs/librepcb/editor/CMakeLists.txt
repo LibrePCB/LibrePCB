@@ -535,6 +535,8 @@ add_library(
   project/cmd/cmdboardnetsegmentremove.h
   project/cmd/cmdboardnetsegmentremoveelements.cpp
   project/cmd/cmdboardnetsegmentremoveelements.h
+  project/cmd/cmdboardpadedit.cpp
+  project/cmd/cmdboardpadedit.h
   project/cmd/cmdboardplaneadd.cpp
   project/cmd/cmdboardplaneadd.h
   project/cmd/cmdboardplaneedit.cpp

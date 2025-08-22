@@ -70,6 +70,7 @@ public:
   // Constructors / Destructor
   FootprintPad() = delete;
   FootprintPad(const FootprintPad& other) noexcept;
+  FootprintPad(const Uuid& uuid, const FootprintPad& other) noexcept;
   FootprintPad(const Uuid& uuid, const std::optional<Uuid>& pkgPadUuid,
                const Point& pos, const Angle& rot, Shape shape,
                const PositiveLength& width, const PositiveLength& height,

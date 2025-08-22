@@ -20,12 +20,10 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "cmdboardnetsegmentremoveelements.h"
+#include "cmdboardpadedit.h"
 
-#include <librepcb/core/project/board/board.h>
-#include <librepcb/core/project/board/items/bi_netline.h>
-#include <librepcb/core/project/board/items/bi_netpoint.h>
-#include <librepcb/core/project/board/items/bi_netsegment.h>
+#include <librepcb/core/project/board/items/bi_pad.h>
+#include <librepcb/core/types/layer.h>
 
 #include <QtCore>
 
@@ -39,50 +37,80 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-CmdBoardNetSegmentRemoveElements::CmdBoardNetSegmentRemoveElements(
-    BI_NetSegment& segment) noexcept
-  : UndoCommand(tr("Remove Vias/Pads/Traces")), mNetSegment(segment) {
+CmdBoardPadEdit::CmdBoardPadEdit(BI_Pad& pad) noexcept
+  : UndoCommand(tr("Edit Pad")),
+    mPad(pad),
+    mOldPos(pad.getPosition()),
+    mNewPos(mOldPos),
+    mOldRotation(pad.getRotation()),
+    mNewRotation(mOldRotation) {
+  Q_ASSERT(pad.getNetSegment());  // Only board pads are mutable.
 }
 
-CmdBoardNetSegmentRemoveElements::~CmdBoardNetSegmentRemoveElements() noexcept {
+CmdBoardPadEdit::~CmdBoardPadEdit() noexcept {
+  if (!wasEverExecuted()) {
+    mPad.setPosition(mOldPos);
+    mPad.setRotation(mOldRotation);
+  }
 }
 
 /*******************************************************************************
- *  General Methods
+ *  Setters
  ******************************************************************************/
 
-void CmdBoardNetSegmentRemoveElements::removePad(BI_Pad& pad) {
-  mPads.append(&pad);
+void CmdBoardPadEdit::setPosition(const Point& pos, bool immediate) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewPos = pos;
+  if (immediate) mPad.setPosition(mNewPos);
 }
 
-void CmdBoardNetSegmentRemoveElements::removeVia(BI_Via& via) {
-  mVias.append(&via);
+void CmdBoardPadEdit::translate(const Point& deltaPos,
+                                bool immediate) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewPos += deltaPos;
+  if (immediate) mPad.setPosition(mNewPos);
 }
 
-void CmdBoardNetSegmentRemoveElements::removeNetPoint(BI_NetPoint& netpoint) {
-  mNetPoints.append(&netpoint);
+void CmdBoardPadEdit::snapToGrid(const PositiveLength& gridInterval,
+                                 bool immediate) noexcept {
+  setPosition(mNewPos.mappedToGrid(gridInterval), immediate);
 }
 
-void CmdBoardNetSegmentRemoveElements::removeNetLine(BI_NetLine& netline) {
-  mNetLines.append(&netline);
+void CmdBoardPadEdit::rotate(const Angle& angle, const Point& center,
+                             bool immediate) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewPos.rotate(angle, center);
+  mNewRotation += angle;
+  if (immediate) {
+    mPad.setPosition(mNewPos);
+    mPad.setRotation(mNewRotation);
+  }
 }
 
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/
 
-bool CmdBoardNetSegmentRemoveElements::performExecute() {
+bool CmdBoardPadEdit::performExecute() {
+  if (!mPad.getNetSegment()) {
+    throw LogicError(__FILE__, __LINE__);  // Only board pads are mutable.
+  }
+
   performRedo();  // can throw
 
-  return true;
+  if (mNewPos != mOldPos) return true;
+  if (mNewRotation != mOldRotation) return true;
+  return false;
 }
 
-void CmdBoardNetSegmentRemoveElements::performUndo() {
-  mNetSegment.addElements(mPads, mVias, mNetPoints, mNetLines);  // can throw
+void CmdBoardPadEdit::performUndo() {
+  mPad.setPosition(mOldPos);
+  mPad.setRotation(mOldRotation);
 }
 
-void CmdBoardNetSegmentRemoveElements::performRedo() {
-  mNetSegment.removeElements(mPads, mVias, mNetPoints, mNetLines);  // can throw
+void CmdBoardPadEdit::performRedo() {
+  mPad.setPosition(mNewPos);
+  mPad.setRotation(mNewRotation);
 }
 
 /*******************************************************************************

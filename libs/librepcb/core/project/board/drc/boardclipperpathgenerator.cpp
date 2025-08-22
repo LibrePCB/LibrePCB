@@ -140,6 +140,13 @@ void BoardClipperPathGenerator::addCopper(
   // Net segment items.
   for (const Data::Segment& ns : data.segments) {
     if (netsignals.isEmpty() || netsignals.contains(ns.net)) {
+      // Pads.
+      for (const Data::Pad& pad : ns.pads) {
+        if (!pad.geometries[&layer].isEmpty()) {
+          addPad(pad, layer);
+        }
+      }
+
       // Vias.
       for (const Data::Via& via : ns.vias) {
         if (Via::isOnLayer(layer, *via.startLayer, *via.endLayer)) {
@@ -235,8 +242,24 @@ void BoardClipperPathGenerator::addStopMaskOpenings(const Data& data,
     }
   }
 
-  // Vias.
+  // Net segment items.
   for (const Data::Segment& ns : data.segments) {
+    // Pads.
+    for (const Data::Pad& pad : ns.pads) {
+      const Transform padTransform(pad.position, pad.rotation, pad.mirror);
+      foreach (PadGeometry geometry, pad.geometries.value(&layer)) {
+        if (offset != 0) {
+          geometry = geometry.withOffset(offset);
+        }
+        ClipperHelpers::unite(
+            mPaths,
+            ClipperHelpers::convert(padTransform.map(geometry.toOutlines()),
+                                    mMaxArcTolerance),
+            ClipperLib::pftEvenOdd, ClipperLib::pftNonZero);
+      }
+    }
+
+    // Vias.
     for (const Data::Via& via : ns.vias) {
       const std::optional<PositiveLength> stopMaskDia =
           layer.isTop() ? via.stopMaskDiameterTop : via.stopMaskDiameterBot;

@@ -63,10 +63,9 @@ TEST_F(TraceTest, testConstructFromSExpression) {
 }
 
 TEST_F(TraceTest, testSerializeAndDeserialize) {
-  Trace obj1(
-      Uuid::createRandom(), Layer::topCopper(), PositiveLength(123),
-      TraceAnchor::junction(Uuid::createRandom()),
-      TraceAnchor::footprintPad(Uuid::createRandom(), Uuid::createRandom()));
+  Trace obj1(Uuid::createRandom(), Layer::topCopper(), PositiveLength(123),
+             TraceAnchor::junction(Uuid::createRandom()),
+             TraceAnchor::pad(Uuid::createRandom()));
   std::unique_ptr<SExpression> sexpr1 = SExpression::createList("obj");
   obj1.serialize(*sexpr1);
 

@@ -40,6 +40,7 @@ class BoardGraphicsScene;
 class CmdBoardHoleEdit;
 class CmdBoardNetLineEdit;
 class CmdBoardNetPointEdit;
+class CmdBoardPadEdit;
 class CmdBoardPlaneEdit;
 class CmdBoardPolygonEdit;
 class CmdBoardStrokeTextEdit;
@@ -107,6 +108,7 @@ private:
   // Move commands
   QList<CmdDeviceInstanceEdit*> mDeviceEditCmds;
   QList<CmdDeviceStrokeTextsReset*> mDeviceStrokeTextsResetCmds;
+  QList<CmdBoardPadEdit*> mPadEditCmds;  // Only board pads.
   QList<CmdBoardViaEdit*> mViaEditCmds;
   QList<CmdBoardNetPointEdit*> mNetPointEditCmds;
   QList<CmdBoardNetLineEdit*> mNetLineEditCmds;
