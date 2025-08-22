@@ -35,36 +35,55 @@ namespace librepcb {
  ******************************************************************************/
 
 GerberX3OutputJob::GerberX3OutputJob() noexcept
-  : OutputJob(
-        getTypeName(), Uuid::createRandom(),
-        elementNameFromTr("GerberX3OutputJob", QT_TR_NOOP("Pick&Place X3"))),
+  : OutputJob(getTypeName(), Uuid::createRandom(),
+              elementNameFromTr("GerberX3OutputJob",
+                                QT_TR_NOOP("Pick&Place / Glue Mask"))),
     mBoards(BoardSet::onlyDefault()),
     mAssemblyVariants(AssemblyVariantSet::all()),
-    mCreateTop(true),
-    mCreateBottom(true),
-    mOutputPathTop("assembly/{{PROJECT}}_{{VERSION}}_PnP_{{VARIANT}}_TOP.gbr"),
-    mOutputPathBottom(
-        "assembly/{{PROJECT}}_{{VERSION}}_PnP_{{VARIANT}}_BOT.gbr") {
+    mEnableComponentsTop(true),
+    mEnableComponentsBot(true),
+    mOutputPathComponentsTop(
+        "assembly/{{PROJECT}}_{{VERSION}}_PnP_{{VARIANT}}_TOP.gbr"),
+    mOutputPathComponentsBot(
+        "assembly/{{PROJECT}}_{{VERSION}}_PnP_{{VARIANT}}_BOT.gbr"),
+    mEnableGlueTop(false),
+    mEnableGlueBot(false),
+    mOutputPathGlueTop(
+        "assembly/{{PROJECT}}_{{VERSION}}_GLUE_{{VARIANT}}_TOP.gbr"),
+    mOutputPathGlueBot(
+        "assembly/{{PROJECT}}_{{VERSION}}_GLUE_{{VARIANT}}_BOT.gbr") {
 }
 
 GerberX3OutputJob::GerberX3OutputJob(const GerberX3OutputJob& other) noexcept
   : OutputJob(other),
     mBoards(other.mBoards),
     mAssemblyVariants(other.mAssemblyVariants),
-    mCreateTop(other.mCreateTop),
-    mCreateBottom(other.mCreateBottom),
-    mOutputPathTop(other.mOutputPathTop),
-    mOutputPathBottom(other.mOutputPathBottom) {
+    mEnableComponentsTop(other.mEnableComponentsTop),
+    mEnableComponentsBot(other.mEnableComponentsBot),
+    mOutputPathComponentsTop(other.mOutputPathComponentsTop),
+    mOutputPathComponentsBot(other.mOutputPathComponentsBot),
+    mEnableGlueTop(other.mEnableGlueTop),
+    mEnableGlueBot(other.mEnableGlueBot),
+    mOutputPathGlueTop(other.mOutputPathGlueTop),
+    mOutputPathGlueBot(other.mOutputPathGlueBot) {
 }
 
 GerberX3OutputJob::GerberX3OutputJob(const SExpression& node)
   : OutputJob(node),
     mBoards(node, "board"),
     mAssemblyVariants(node, "variant"),
-    mCreateTop(deserialize<bool>(node.getChild("top/create/@0"))),
-    mCreateBottom(deserialize<bool>(node.getChild("bottom/create/@0"))),
-    mOutputPathTop(node.getChild("top/output/@0").getValue()),
-    mOutputPathBottom(node.getChild("bottom/output/@0").getValue()) {
+    mEnableComponentsTop(
+        deserialize<bool>(node.getChild("components_top/create/@0"))),
+    mEnableComponentsBot(
+        deserialize<bool>(node.getChild("components_bot/create/@0"))),
+    mOutputPathComponentsTop(
+        node.getChild("components_top/output/@0").getValue()),
+    mOutputPathComponentsBot(
+        node.getChild("components_bot/output/@0").getValue()),
+    mEnableGlueTop(deserialize<bool>(node.getChild("glue_top/create/@0"))),
+    mEnableGlueBot(deserialize<bool>(node.getChild("glue_bot/create/@0"))),
+    mOutputPathGlueTop(node.getChild("glue_top/output/@0").getValue()),
+    mOutputPathGlueBot(node.getChild("glue_bot/output/@0").getValue()) {
 }
 
 GerberX3OutputJob::~GerberX3OutputJob() noexcept {
@@ -79,7 +98,12 @@ QString GerberX3OutputJob::getTypeTr() const noexcept {
 }
 
 QIcon GerberX3OutputJob::getTypeIcon() const noexcept {
-  return QIcon(":/img/actions/export_pick_place_file.png");
+  if ((mEnableGlueTop || mEnableGlueBot) && (!mEnableComponentsTop) &&
+      (!mEnableComponentsBot)) {
+    return QIcon(":/img/glue.png");
+  } else {
+    return QIcon(":/img/actions/export_pick_place_file.png");
+  }
 }
 
 /*******************************************************************************
@@ -101,30 +125,60 @@ void GerberX3OutputJob::setAssemblyVariants(
   }
 }
 
-void GerberX3OutputJob::setCreateTop(bool create) noexcept {
-  if (create != mCreateTop) {
-    mCreateTop = create;
+void GerberX3OutputJob::setEnableComponentsTop(bool create) noexcept {
+  if (create != mEnableComponentsTop) {
+    mEnableComponentsTop = create;
     onEdited.notify(Event::PropertyChanged);
   }
 }
 
-void GerberX3OutputJob::setCreateBottom(bool create) noexcept {
-  if (create != mCreateBottom) {
-    mCreateBottom = create;
+void GerberX3OutputJob::setEnableComponentsBot(bool create) noexcept {
+  if (create != mEnableComponentsBot) {
+    mEnableComponentsBot = create;
     onEdited.notify(Event::PropertyChanged);
   }
 }
 
-void GerberX3OutputJob::setOutputPathTop(const QString& path) noexcept {
-  if (path != mOutputPathTop) {
-    mOutputPathTop = path;
+void GerberX3OutputJob::setOutputPathComponentsTop(
+    const QString& path) noexcept {
+  if (path != mOutputPathComponentsTop) {
+    mOutputPathComponentsTop = path;
     onEdited.notify(Event::PropertyChanged);
   }
 }
 
-void GerberX3OutputJob::setOutputPathBottom(const QString& path) noexcept {
-  if (path != mOutputPathBottom) {
-    mOutputPathBottom = path;
+void GerberX3OutputJob::setOutputPathComponentsBot(
+    const QString& path) noexcept {
+  if (path != mOutputPathComponentsBot) {
+    mOutputPathComponentsBot = path;
+    onEdited.notify(Event::PropertyChanged);
+  }
+}
+
+void GerberX3OutputJob::setEnableGlueTop(bool create) noexcept {
+  if (create != mEnableGlueTop) {
+    mEnableGlueTop = create;
+    onEdited.notify(Event::PropertyChanged);
+  }
+}
+
+void GerberX3OutputJob::setEnableGlueBot(bool create) noexcept {
+  if (create != mEnableGlueBot) {
+    mEnableGlueBot = create;
+    onEdited.notify(Event::PropertyChanged);
+  }
+}
+
+void GerberX3OutputJob::setOutputPathGlueTop(const QString& path) noexcept {
+  if (path != mOutputPathGlueTop) {
+    mOutputPathGlueTop = path;
+    onEdited.notify(Event::PropertyChanged);
+  }
+}
+
+void GerberX3OutputJob::setOutputPathGlueBot(const QString& path) noexcept {
+  if (path != mOutputPathGlueBot) {
+    mOutputPathGlueBot = path;
     onEdited.notify(Event::PropertyChanged);
   }
 }
@@ -147,23 +201,35 @@ void GerberX3OutputJob::serializeDerived(SExpression& root) const {
   root.ensureLineBreak();
   mAssemblyVariants.serialize(root, "variant");
   root.ensureLineBreak();
-  SExpression& top = root.appendList("top");
-  top.appendChild("create", mCreateTop);
-  top.appendChild("output", mOutputPathTop);
+  SExpression& cmpTop = root.appendList("components_top");
+  cmpTop.appendChild("create", mEnableComponentsTop);
+  cmpTop.appendChild("output", mOutputPathComponentsTop);
   root.ensureLineBreak();
-  SExpression& bottom = root.appendList("bottom");
-  bottom.appendChild("create", mCreateBottom);
-  bottom.appendChild("output", mOutputPathBottom);
+  SExpression& cmpBot = root.appendList("components_bot");
+  cmpBot.appendChild("create", mEnableComponentsBot);
+  cmpBot.appendChild("output", mOutputPathComponentsBot);
+  SExpression& glueTop = root.appendList("glue_top");
+  glueTop.appendChild("create", mEnableGlueTop);
+  glueTop.appendChild("output", mOutputPathGlueTop);
+  root.ensureLineBreak();
+  SExpression& glueBot = root.appendList("glue_bot");
+  glueBot.appendChild("create", mEnableGlueBot);
+  glueBot.appendChild("output", mOutputPathGlueBot);
+  root.ensureLineBreak();
 }
 
 bool GerberX3OutputJob::equals(const OutputJob& rhs) const noexcept {
   const GerberX3OutputJob& other = static_cast<const GerberX3OutputJob&>(rhs);
   if (mBoards != other.mBoards) return false;
   if (mAssemblyVariants != other.mAssemblyVariants) return false;
-  if (mCreateTop != other.mCreateTop) return false;
-  if (mCreateBottom != other.mCreateBottom) return false;
-  if (mOutputPathTop != other.mOutputPathTop) return false;
-  if (mOutputPathBottom != other.mOutputPathBottom) return false;
+  if (mEnableComponentsTop != other.mEnableComponentsTop) return false;
+  if (mEnableComponentsBot != other.mEnableComponentsBot) return false;
+  if (mOutputPathComponentsTop != other.mOutputPathComponentsTop) return false;
+  if (mOutputPathComponentsBot != other.mOutputPathComponentsBot) return false;
+  if (mEnableGlueTop != other.mEnableGlueTop) return false;
+  if (mEnableGlueBot != other.mEnableGlueBot) return false;
+  if (mOutputPathGlueTop != other.mOutputPathGlueTop) return false;
+  if (mOutputPathGlueBot != other.mOutputPathGlueBot) return false;
   return true;
 }
 

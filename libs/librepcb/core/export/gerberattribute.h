@@ -117,6 +117,7 @@ public:
   static GerberAttribute fileFunctionSolderMask(BoardSide side) noexcept;
   static GerberAttribute fileFunctionLegend(BoardSide side) noexcept;
   static GerberAttribute fileFunctionPaste(BoardSide side) noexcept;
+  static GerberAttribute fileFunctionGlue(BoardSide side) noexcept;
   static GerberAttribute fileFunctionPlatedThroughHole(int fromLayer,
                                                        int toLayer) noexcept;
   static GerberAttribute fileFunctionNonPlatedThroughHole(int fromLayer,

@@ -449,30 +449,56 @@ void OutputJobRunner::runImpl(const GerberX3OutputJob& job) {
   const QVector<std::shared_ptr<AssemblyVariant>> assemblyVariants =
       getAssemblyVariants(job.getAssemblyVariants());
 
-  QVector<std::pair<BoardGerberExport::BoardSide, QString>> sides;
-  if (job.getCreateTop()) {
-    sides.append(std::make_pair(BoardGerberExport::BoardSide::Top,
-                                job.getOutputPathTop()));
+  enum class JobFileType { Components, Glue };
+  struct JobFile {
+    JobFileType type;
+    BoardGerberExport::BoardSide side;
+    QString outPath;
+  };
+  QVector<JobFile> jobFiles;
+  if (job.getEnableComponentsTop()) {
+    jobFiles.append(JobFile{JobFileType::Components,
+                            BoardGerberExport::BoardSide::Top,
+                            job.getOutputPathComponentsTop()});
   }
-  if (job.getCreateBottom()) {
-    sides.append(std::make_pair(BoardGerberExport::BoardSide::Bottom,
-                                job.getOutputPathBottom()));
+  if (job.getEnableComponentsBot()) {
+    jobFiles.append(JobFile{JobFileType::Components,
+                            BoardGerberExport::BoardSide::Bottom,
+                            job.getOutputPathComponentsBot()});
+  }
+  if (job.getEnableGlueTop()) {
+    jobFiles.append(JobFile{JobFileType::Glue,
+                            BoardGerberExport::BoardSide::Top,
+                            job.getOutputPathGlueTop()});
+  }
+  if (job.getEnableGlueBot()) {
+    jobFiles.append(JobFile{JobFileType::Glue,
+                            BoardGerberExport::BoardSide::Bottom,
+                            job.getOutputPathGlueBot()});
   }
 
   foreach (const Board* board, boards) {
     foreach (const std::shared_ptr<AssemblyVariant>& av, assemblyVariants) {
-      foreach (const auto& pair, sides) {
+      foreach (const JobFile& jobFile, jobFiles) {
         const FilePath fp = mWriter->beginWritingFile(
             job.getUuid(),
             AttributeSubstitutor::substitute(
-                pair.second, ProjectAttributeLookup(*board, av),
+                jobFile.outPath, ProjectAttributeLookup(*board, av),
                 [&](const QString& str) {
                   return FilePath::cleanFileName(
                       str, FilePath::ReplaceSpaces | FilePath::KeepCase);
                 }));  // can throw
 
         BoardGerberExport gen(*board);
-        gen.exportComponentLayer(pair.first, av->getUuid(), fp);  // can throw
+        if (jobFile.type == JobFileType::Components) {
+          gen.exportComponentLayer(jobFile.side, av->getUuid(),
+                                   fp);  // can throw
+        } else if (jobFile.type == JobFileType::Glue) {
+          gen.exportGlueLayer(jobFile.side, av->getUuid(),
+                              fp);  // can throw
+        } else {
+          throw LogicError(__FILE__, __LINE__);
+        }
       }
     }
   }

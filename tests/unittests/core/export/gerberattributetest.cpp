@@ -161,6 +161,18 @@ TEST_F(GerberAttributeTest, testFileFunctionPaste) {
           .toStdString());
 }
 
+TEST_F(GerberAttributeTest, testFileFunctionGlue) {
+  EXPECT_EQ("G04 #@! TF.FileFunction,Glue,Top*\n",
+            GerberAttribute::fileFunctionGlue(GerberAttribute::BoardSide::Top)
+                .toGerberString()
+                .toStdString());
+  EXPECT_EQ(
+      "G04 #@! TF.FileFunction,Glue,Bot*\n",
+      GerberAttribute::fileFunctionGlue(GerberAttribute::BoardSide::Bottom)
+          .toGerberString()
+          .toStdString());
+}
+
 TEST_F(GerberAttributeTest, testFileFunctionPlatedThroughHoleExcellon) {
   EXPECT_EQ("; #@! TF.FileFunction,Plated,2,5,PTH\n",
             GerberAttribute::fileFunctionPlatedThroughHole(2, 5)

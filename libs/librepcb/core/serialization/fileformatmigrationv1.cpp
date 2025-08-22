@@ -333,6 +333,23 @@ void FileFormatMigrationV1::upgradeOutputJobs(SExpression& root,
       }
     } else if (jobNode->getChild("type/@0").getValue() == "gerber_excellon") {
       context.hasGerberOutputJob = true;
+    } else if (jobNode->getChild("type/@0").getValue() == "gerber_x3") {
+      jobNode->getChild("top").setName("components_top");
+      jobNode->getChild("bottom").setName("components_bot");
+      SExpression& glueTop = jobNode->appendList("glue_top");
+      glueTop.appendChild("create", SExpression::createToken("false"));
+      glueTop.appendChild(
+          "output",
+          SExpression::createString(
+              "assembly/{{PROJECT}}_{{VERSION}}_GLUE_{{VARIANT}}_TOP.gbr"));
+      root.ensureLineBreak();
+      SExpression& glueBot = jobNode->appendList("glue_bot");
+      glueBot.appendChild("create", SExpression::createToken("false"));
+      glueBot.appendChild(
+          "output",
+          SExpression::createString(
+              "assembly/{{PROJECT}}_{{VERSION}}_GLUE_{{VARIANT}}_BOT.gbr"));
+      root.ensureLineBreak();
     }
   }
 }

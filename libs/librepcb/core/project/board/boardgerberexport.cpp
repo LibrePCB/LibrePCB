@@ -135,6 +135,25 @@ void BoardGerberExport::exportPcbLayers(
   exportLayerBottomSolderPaste(settings);
 }
 
+void BoardGerberExport::exportGlueLayer(BoardSide side,
+                                        const Uuid& assemblyVariant,
+                                        const FilePath& filePath) const {
+  GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
+                      *mProject.getVersion());
+  if (side == BoardSide::Top) {
+    gen.setFileFunctionGlue(GerberGenerator::BoardSide::Top,
+                            GerberGenerator::Polarity::Positive);
+    drawGlueLayer(gen, Layer::topGlue(), assemblyVariant);
+  } else {
+    gen.setFileFunctionGlue(GerberGenerator::BoardSide::Bottom,
+                            GerberGenerator::Polarity::Positive);
+    drawGlueLayer(gen, Layer::botGlue(), assemblyVariant);
+  }
+  gen.generate();
+  trackFileBeforeWrite(filePath);  // can throw
+  gen.saveToFile(filePath);
+}
+
 void BoardGerberExport::exportComponentLayer(BoardSide side,
                                              const Uuid& assemblyVariant,
                                              const FilePath& filePath) const {
@@ -650,6 +669,26 @@ void BoardGerberExport::drawLayer(GerberGenerator& gen,
     drawDevice(gen, *device, layer);
   }
 
+  // draw all non-footprint objects
+  drawLayerExceptDevices(gen, layer);
+}
+
+void BoardGerberExport::drawGlueLayer(GerberGenerator& gen, const Layer& layer,
+                                      const Uuid& assemblyVariant) const {
+  // draw footprints incl. pads (only those contained in the assembly variant)
+  foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
+    Q_ASSERT(device);
+    if (device->isInAssemblyVariant(assemblyVariant)) {
+      drawDevice(gen, *device, layer);
+    }
+  }
+
+  // draw all non-footprint objects
+  drawLayerExceptDevices(gen, layer);
+}
+
+void BoardGerberExport::drawLayerExceptDevices(GerberGenerator& gen,
+                                               const Layer& layer) const {
   // draw vias and traces (grouped by net)
   foreach (const BI_NetSegment* netsegment, mBoard.getNetSegments()) {
     Q_ASSERT(netsegment);

@@ -84,6 +84,8 @@ public:
 
   // General Methods
   void exportPcbLayers(const BoardFabricationOutputSettings& settings) const;
+  void exportGlueLayer(BoardSide side, const Uuid& assemblyVariant,
+                       const FilePath& filePath) const;
   void exportComponentLayer(BoardSide side, const Uuid& assemblyVariant,
                             const FilePath& filePath) const;
 
@@ -122,6 +124,9 @@ private:
   int drawPthDrills(ExcellonGenerator& gen) const;
   QMap<LayerPair, QList<const BI_Via*> > getBlindBuriedVias() const;
   void drawLayer(GerberGenerator& gen, const Layer& layer) const;
+  void drawGlueLayer(GerberGenerator& gen, const Layer& layer,
+                     const Uuid& assemblyVariant) const;
+  void drawLayerExceptDevices(GerberGenerator& gen, const Layer& layer) const;
   void drawVia(GerberGenerator& gen, const BI_Via& via, const Layer& layer,
                const QString& netName) const;
   void drawDevice(GerberGenerator& gen, const BI_Device& device,

@@ -149,6 +149,7 @@
         <file>command_toolbars/wire_straight.png</file>
         <file>command_toolbars/wire_v_h.png</file>
         <file>empty.png</file>
+        <file>glue.png</file>
         <file>gnd.svg</file>
         <file>inductor-eu.svg</file>
         <file>library/3d_model.png</file>
