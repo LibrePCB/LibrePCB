@@ -69,9 +69,7 @@ void FileFormatMigrationUnstable::upgradeSymbol(TransactionalDirectory& dir) {
     const QString fp = "symbol.lp";
     std::unique_ptr<SExpression> root =
         SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-    if (!root->tryGetChild("grid_interval")) {
-      root->appendChild("grid_interval", SExpression::createToken("2.54"));
-    }
+    upgradeTexts(*root, true);
     dir.write(fp, root->toByteArray());
   }
 }

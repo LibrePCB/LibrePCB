@@ -458,7 +458,7 @@ TEST_F(EagleTypeConverterTest, testTryConvertSchematicTextSize) {
 TEST_F(EagleTypeConverterTest, testTryConvertSchematicText) {
   QString xml =
       "<text x=\"1\" y=\"2\" size=\"1.778\" layer=\"94\">foo\nbar</text>";
-  auto out = C::tryConvertSchematicText(parseagle::Text(dom(xml)));
+  auto out = C::tryConvertSchematicText(parseagle::Text(dom(xml)), true);
   ASSERT_TRUE(out);
   EXPECT_EQ(Layer::symbolOutlines().getId().toStdString(),
             out->getLayer().getId().toStdString());
@@ -467,6 +467,7 @@ TEST_F(EagleTypeConverterTest, testTryConvertSchematicText) {
   EXPECT_EQ(PositiveLength(2500000), out->getHeight());  // Scaled.
   EXPECT_EQ(Alignment(HAlign::left(), VAlign::bottom()), out->getAlign());
   EXPECT_EQ("foo\nbar", out->getText().toStdString());
+  EXPECT_EQ(true, out->isLocked());  // Because of the layer.
 }
 
 TEST_F(EagleTypeConverterTest, testTryConvertBoardTextSize) {

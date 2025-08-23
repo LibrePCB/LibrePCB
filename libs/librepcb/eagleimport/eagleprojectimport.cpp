@@ -473,6 +473,7 @@ void EagleProjectImport::importSchematic(Project& project,
           if (symInst->getMirrored()) {
             copy.setAlign(copy.getAlign().mirroredV());
           }
+          copy.setLocked(true);
           SI_Text* obj = new SI_Text(*schematic, copy);
           symInst->addText(*obj);
         }
@@ -515,7 +516,7 @@ void EagleProjectImport::importSchematic(Project& project,
   // Texts
   foreach (const parseagle::Text& eagleObj, sheet.getTexts()) {
     try {
-      if (auto lpObj = C::tryConvertSchematicText(eagleObj)) {
+      if (auto lpObj = C::tryConvertSchematicText(eagleObj, false)) {
         SI_Text* obj = new SI_Text(*schematic, *lpObj);
         schematic->addText(*obj);
       } else {

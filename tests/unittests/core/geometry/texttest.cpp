@@ -45,7 +45,7 @@ TEST_F(TextTest, testConstructFromSExpression) {
   std::unique_ptr<SExpression> sexpr = SExpression::parse(
       "(text eabf43fb-496b-4dc8-8ff7-ffac67991390 (layer sym_names) "
       "(value \"{{NAME}}\") (align center bottom) (height 2.54) "
-      "(position 1.234 2.345) (rotation 45.0))",
+      "(position 1.234 2.345) (rotation 45.0) (lock true))",
       FilePath());
   Text obj(*sexpr);
   EXPECT_EQ(Uuid::fromString("eabf43fb-496b-4dc8-8ff7-ffac67991390"),
@@ -56,12 +56,13 @@ TEST_F(TextTest, testConstructFromSExpression) {
   EXPECT_EQ(PositiveLength(2540000), obj.getHeight());
   EXPECT_EQ(Point(1234000, 2345000), obj.getPosition());
   EXPECT_EQ(Angle::deg45(), obj.getRotation());
+  EXPECT_EQ(true, obj.isLocked());
 }
 
 TEST_F(TextTest, testSerializeAndDeserialize) {
   Text obj1(Uuid::createRandom(), Layer::botCopper(), "foo bar", Point(12, 34),
             Angle(56), PositiveLength(78),
-            Alignment(HAlign::right(), VAlign::center()));
+            Alignment(HAlign::right(), VAlign::center()), false);
   std::unique_ptr<SExpression> sexpr1 = SExpression::createList("obj");
   obj1.serialize(*sexpr1);
 

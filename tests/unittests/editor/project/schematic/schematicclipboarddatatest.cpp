@@ -103,12 +103,12 @@ TEST(SchematicClipboardDataTest, testToFromMimeDataPopulated) {
 
   std::shared_ptr<Text> text1 = std::make_shared<Text>(
       Uuid::createRandom(), Layer::botCopper(), "text 1", Point(1, 2), Angle(3),
-      PositiveLength(4), Alignment(HAlign::left(), VAlign::top()));
+      PositiveLength(4), Alignment(HAlign::left(), VAlign::top()), true);
 
-  std::shared_ptr<Text> text2 =
-      std::make_shared<Text>(Uuid::createRandom(), Layer::topCopper(), "text 2",
-                             Point(10, 20), Angle(30), PositiveLength(40),
-                             Alignment(HAlign::center(), VAlign::bottom()));
+  std::shared_ptr<Text> text2 = std::make_shared<Text>(
+      Uuid::createRandom(), Layer::topCopper(), "text 2", Point(10, 20),
+      Angle(30), PositiveLength(40),
+      Alignment(HAlign::center(), VAlign::bottom()), false);
 
   std::shared_ptr<SchematicClipboardData::ComponentInstance> component1 =
       std::make_shared<SchematicClipboardData::ComponentInstance>(

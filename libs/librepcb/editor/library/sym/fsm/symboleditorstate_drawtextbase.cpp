@@ -47,14 +47,16 @@ SymbolEditorState_DrawTextBase::SymbolEditorState_DrawTextBase(
     const Context& context, Mode mode) noexcept
   : SymbolEditorState(context),
     mMode(mode),
-    mCurrentProperties(Uuid::createRandom(),  // Not relevant
-                       Layer::symbolNames(),  // Layer
-                       QString(),  // Text
-                       Point(),  // Position
-                       Angle::deg0(),  // Rotation
-                       PositiveLength(1),  // Height
-                       Alignment(HAlign::left(), VAlign::bottom())  // Alignment
-                       ),
+    mCurrentProperties(
+        Uuid::createRandom(),  // Not relevant
+        Layer::symbolNames(),  // Layer
+        QString(),  // Text
+        Point(),  // Position
+        Angle::deg0(),  // Rotation
+        PositiveLength(1),  // Height
+        Alignment(HAlign::left(), VAlign::bottom()),  // Alignment
+        false  // Locked
+        ),
     mCurrentText(nullptr),
     mCurrentGraphicsItem(nullptr) {
   resetToDefaultParameters();
@@ -307,6 +309,7 @@ void SymbolEditorState_DrawTextBase::resetToDefaultParameters() noexcept {
       setHAlign(HAlign::left());
       setVAlign(VAlign::bottom());
       setText("{{NAME}}");
+      mCurrentProperties.setLocked(false);
       break;
     case Mode::VALUE:
       // Set all properties according library conventions
@@ -315,6 +318,7 @@ void SymbolEditorState_DrawTextBase::resetToDefaultParameters() noexcept {
       setHAlign(HAlign::left());
       setVAlign(VAlign::top());
       setText("{{VALUE}}");
+      mCurrentProperties.setLocked(false);
       break;
     default:
       // Set properties to something reasonable
@@ -323,6 +327,7 @@ void SymbolEditorState_DrawTextBase::resetToDefaultParameters() noexcept {
       setHAlign(HAlign::left());
       setVAlign(VAlign::bottom());
       setText("Text");  // Non-empty to avoid invisible graphics item
+      mCurrentProperties.setLocked(true);
       break;
   }
 }

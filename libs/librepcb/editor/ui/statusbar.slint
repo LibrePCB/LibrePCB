@@ -348,11 +348,25 @@ export component StatusBar inherits Rectangle {
             };
             icon-scale: 0.6;
             color-enabled: white;
-            checked: Data.current-board-2d-tab.ignore-placement-locks;
-            enabled: Data.current-tab.type == TabType.board-2d;
+            checked: {
+                if Data.current-tab.type == TabType.schematic {
+                    Data.current-schematic-tab.ignore-placement-locks
+                } else if Data.current-tab.type == TabType.board-2d {
+                    Data.current-board-2d-tab.ignore-placement-locks
+                } else {
+                    false
+                }
+            };
+            enabled: (Data.current-tab.type == TabType.schematic) || (Data.current-tab.type == TabType.board-2d);
 
             clicked => {
-                Data.current-section.board-2d-tabs[Data.current-section.current-tab-index].ignore-placement-locks = !self.checked;
+                if Data.current-tab.type == TabType.schematic {
+                    Data.current-section.schematic-tabs[Data.current-section.current-tab-index].ignore-placement-locks = !self.checked;
+                } else if Data.current-tab.type == TabType.board-2d {
+                    Data.current-section.board-2d-tabs[Data.current-section.current-tab-index].ignore-placement-locks = !self.checked;
+                } else {
+                    debug("Unsupported tab type for ignoring placement locks.");
+                }
             }
         }
 

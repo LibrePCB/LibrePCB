@@ -621,11 +621,13 @@ PositiveLength EagleTypeConverter::convertSchematicTextSize(double s) {
 }
 
 std::shared_ptr<Text> EagleTypeConverter::tryConvertSchematicText(
-    const parseagle::Text& t) {
+    const parseagle::Text& t, bool allowLocked) {
   if (auto layer = tryConvertSchematicLayer(t.getLayer())) {
     const bool mirror = t.getRotation().getMirror();
     const Angle rotation = convertAngle(t.getRotation().getAngle());
     const Alignment alignment = convertAlignment(t.getAlignment());
+    const bool locked = allowLocked && (*layer != Layer::symbolNames()) &&
+        (*layer != Layer::symbolValues());
     return std::make_shared<Text>(
         Uuid::createRandom(),  // UUID
         *layer,  // Layer
@@ -633,7 +635,8 @@ std::shared_ptr<Text> EagleTypeConverter::tryConvertSchematicText(
         convertPoint(t.getPosition()),  // Position
         mirror ? -rotation : rotation,  // Rotation
         convertSchematicTextSize(t.getSize()),  // Height
-        mirror ? alignment.mirroredH() : alignment  // Alignment
+        mirror ? alignment.mirroredH() : alignment,  // Alignment
+        locked  // Locked
     );
   } else {
     return nullptr;
@@ -653,7 +656,8 @@ std::shared_ptr<Text> EagleTypeConverter::tryConvertSchematicAttribute(
         convertPoint(t.getPosition()),  // Position
         mirror ? -rotation : rotation,  // Rotation
         convertSchematicTextSize(t.getSize()),  // Height
-        mirror ? alignment.mirroredH() : alignment  // Alignment
+        mirror ? alignment.mirroredH() : alignment,  // Alignment
+        t.getConstant()  // Locked (not verified yet if getConstant() is good)
     );
   } else {
     return nullptr;

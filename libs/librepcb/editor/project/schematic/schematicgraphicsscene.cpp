@@ -59,11 +59,12 @@ namespace editor {
 SchematicGraphicsScene::SchematicGraphicsScene(
     Schematic& schematic, const GraphicsLayerList& layers,
     std::shared_ptr<const QSet<const NetSignal*>> highlightedNetSignals,
-    QObject* parent) noexcept
+    bool& ignorePlacementLocks, QObject* parent) noexcept
   : GraphicsScene(parent),
     mSchematic(schematic),
     mLayers(layers),
-    mHighlightedNetSignals(highlightedNetSignals) {
+    mHighlightedNetSignals(highlightedNetSignals),
+    mIgnorePlacementLocks(ignorePlacementLocks) {
   foreach (SI_Symbol* obj, mSchematic.getSymbols()) {
     addSymbol(*obj);
   }
@@ -167,8 +168,20 @@ void SchematicGraphicsScene::selectItemsInRect(const Point& p1,
   GraphicsScene::setSelectionRect(p1, p2);
   const QRectF rectPx = QRectF(p1.toPxQPointF(), p2.toPxQPointF()).normalized();
   foreach (auto item, mSymbols) {
-    const bool selectSymbol =
-        item->mapToScene(item->shape()).intersects(rectPx);
+    bool selectSymbol = item->mapToScene(item->shape()).intersects(rectPx);
+    // Locked symbol texts shall act as an extended grab area for the symbol.
+    if ((!selectSymbol) && (!mIgnorePlacementLocks)) {
+      for (SI_Text* text : item->getSymbol().getTexts()) {
+        if (text->getTextObj().isLocked()) {
+          if (auto textItem = mTexts.value(text)) {
+            if (textItem->mapToScene(textItem->shape()).intersects(rectPx)) {
+              selectSymbol = true;
+              break;
+            }
+          }
+        }
+      }
+    }
     item->setSelected(selectSymbol);
   }
   foreach (auto item, mSymbolPins) {
@@ -192,9 +205,11 @@ void SchematicGraphicsScene::selectItemsInRect(const Point& p1,
     item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));
   }
   foreach (auto item, mTexts) {
-    if (auto symbol = item->getSymbolGraphicsItem().lock()) {
-      item->setSelected(symbol->isSelected());
-    } else {
+    auto symbol = item->getSymbolGraphicsItem().lock();
+    if (symbol && symbol->isSelected()) {
+      item->setSelected(true);
+    } else if ((!item->getText().getTextObj().isLocked()) ||
+               mIgnorePlacementLocks) {
       item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));
     }
   }

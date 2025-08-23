@@ -48,14 +48,16 @@ SchematicEditorState_AddText::SchematicEditorState_AddText(
     const Context& context) noexcept
   : SchematicEditorState(context),
     mIsUndoCmdActive(false),
-    mCurrentProperties(Uuid::createRandom(),  // UUID is not relevant here
-                       Layer::schematicComments(),  // Layer
-                       "{{PROJECT}}",  // Text
-                       Point(),  // Position is not relevant here
-                       Angle::deg0(),  // Rotation
-                       PositiveLength(1500000),  // Height
-                       Alignment(HAlign::left(), VAlign::bottom())  // Alignment
-                       ),
+    mCurrentProperties(
+        Uuid::createRandom(),  // UUID is not relevant here
+        Layer::schematicComments(),  // Layer
+        "{{PROJECT}}",  // Text
+        Point(),  // Position is not relevant here
+        Angle::deg0(),  // Rotation
+        PositiveLength(1500000),  // Height
+        Alignment(HAlign::left(), VAlign::bottom()),  // Alignment
+        false  // Locked
+        ),
     mCurrentTextToPlace(nullptr) {
 }
 

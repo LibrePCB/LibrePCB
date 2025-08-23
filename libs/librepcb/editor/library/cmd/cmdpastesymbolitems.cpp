@@ -158,7 +158,7 @@ bool CmdPasteSymbolItems::performExecute() {
     }
     std::shared_ptr<Text> copy = std::make_shared<Text>(
         uuid, text.getLayer(), text.getText(), text.getPosition() + mPosOffset,
-        text.getRotation(), text.getHeight(), text.getAlign());
+        text.getRotation(), text.getHeight(), text.getAlign(), text.isLocked());
     execNewChildCmd(new CmdTextInsert(mSymbol.getTexts(), copy));
     if (auto graphicsItem = mGraphicsItem.getGraphicsItem(copy)) {
       graphicsItem->setSelected(true);

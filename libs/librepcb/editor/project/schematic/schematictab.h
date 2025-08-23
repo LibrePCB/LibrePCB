@@ -114,6 +114,7 @@ public:
 
   // SchematicEditorFsmAdapter
   SchematicGraphicsScene* fsmGetGraphicsScene() noexcept override;
+  bool fsmGetIgnoreLocks() const noexcept override;
   void fsmSetViewCursor(
       const std::optional<Qt::CursorShape>& shape) noexcept override;
   void fsmSetViewGrayOut(bool grayOut) noexcept override;
@@ -180,6 +181,7 @@ private:
   SearchContext mSearchContext;
   Theme::GridStyle mGridStyle;
   QPointF mSceneImagePos;
+  bool mIgnorePlacementLocks;
   int mFrameIndex;
 
   // Current tool

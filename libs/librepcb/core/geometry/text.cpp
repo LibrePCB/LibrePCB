@@ -41,7 +41,8 @@ Text::Text(const Text& other) noexcept
     mPosition(other.mPosition),
     mRotation(other.mRotation),
     mHeight(other.mHeight),
-    mAlign(other.mAlign) {
+    mAlign(other.mAlign),
+    mLocked(other.mLocked) {
 }
 
 Text::Text(const Uuid& uuid, const Text& other) noexcept : Text(other) {
@@ -50,7 +51,8 @@ Text::Text(const Uuid& uuid, const Text& other) noexcept : Text(other) {
 
 Text::Text(const Uuid& uuid, const Layer& layer, const QString& text,
            const Point& pos, const Angle& rotation,
-           const PositiveLength& height, const Alignment& align) noexcept
+           const PositiveLength& height, const Alignment& align,
+           bool locked) noexcept
   : onEdited(*this),
     mUuid(uuid),
     mLayer(&layer),
@@ -58,7 +60,8 @@ Text::Text(const Uuid& uuid, const Layer& layer, const QString& text,
     mPosition(pos),
     mRotation(rotation),
     mHeight(height),
-    mAlign(align) {
+    mAlign(align),
+    mLocked(locked) {
 }
 
 Text::Text(const SExpression& node)
@@ -69,7 +72,8 @@ Text::Text(const SExpression& node)
     mPosition(node.getChild("position")),
     mRotation(deserialize<Angle>(node.getChild("rotation/@0"))),
     mHeight(deserialize<PositiveLength>(node.getChild("height/@0"))),
-    mAlign(node.getChild("align")) {
+    mAlign(node.getChild("align")),
+    mLocked(deserialize<bool>(node.getChild("lock/@0"))) {
 }
 
 Text::~Text() noexcept {
@@ -139,6 +143,16 @@ bool Text::setAlign(const Alignment& align) noexcept {
   return true;
 }
 
+bool Text::setLocked(bool locked) noexcept {
+  if (locked == mLocked) {
+    return false;
+  }
+
+  mLocked = locked;
+  onEdited.notify(Event::LockedChanged);
+  return true;
+}
+
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
@@ -146,12 +160,14 @@ bool Text::setAlign(const Alignment& align) noexcept {
 void Text::serialize(SExpression& root) const {
   root.appendChild(mUuid);
   root.appendChild("layer", *mLayer);
-  root.appendChild("value", mText);
+  root.appendChild("height", mHeight);
   root.ensureLineBreak();
   mAlign.serialize(root.appendList("align"));
-  root.appendChild("height", mHeight);
   mPosition.serialize(root.appendList("position"));
   root.appendChild("rotation", mRotation);
+  root.appendChild("lock", mLocked);
+  root.ensureLineBreak();
+  root.appendChild("value", mText);
   root.ensureLineBreak();
 }
 
@@ -167,6 +183,7 @@ bool Text::operator==(const Text& rhs) const noexcept {
   if (mRotation != rhs.mRotation) return false;
   if (mHeight != rhs.mHeight) return false;
   if (mAlign != rhs.mAlign) return false;
+  if (mLocked != rhs.mLocked) return false;
   return true;
 }
 
@@ -181,6 +198,7 @@ Text& Text::operator=(const Text& rhs) noexcept {
   setRotation(rhs.mRotation);
   setHeight(rhs.mHeight);
   setAlign(rhs.mAlign);
+  setLocked(rhs.mLocked);
   return *this;
 }
 

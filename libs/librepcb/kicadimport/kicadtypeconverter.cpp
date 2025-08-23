@@ -198,11 +198,13 @@ std::shared_ptr<Text> KiCadTypeConverter::convertSymbolText(
     rotation += Angle::deg180();
   }
 
+  // Note: These are probably pure graphical text (not NAME or VALUE) so it
+  // makes sense to lock them?
   return std::make_shared<Text>(Uuid::createRandom(), Layer::symbolOutlines(),
                                 t.text, convertFootprintPoint(t.position),
                                 rotation,
                                 convertSymbolTextHeight(t.fontSize.height()),
-                                Alignment::fromQt(t.alignment));
+                                Alignment::fromQt(t.alignment), true);
 }
 
 std::shared_ptr<Text> KiCadTypeConverter::convertSymbolPropertyToText(
@@ -234,7 +236,7 @@ std::shared_ptr<Text> KiCadTypeConverter::convertSymbolPropertyToText(
   return std::make_shared<Text>(Uuid::createRandom(), *layer, text,
                                 convertSymbolPoint(p.position), rotation,
                                 convertSymbolTextHeight(p.fontSize.height()),
-                                Alignment::fromQt(p.alignment));
+                                Alignment::fromQt(p.alignment), false);
 }
 
 QList<std::pair<QString, QStringList>>

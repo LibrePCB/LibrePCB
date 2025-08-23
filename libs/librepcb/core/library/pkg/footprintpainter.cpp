@@ -197,7 +197,7 @@ void FootprintPainter::initContentByColor() const noexcept {
       mContentByColor[color].texts.append(
           Text(text.getUuid(), text.getLayer(), text.getText(),
                text.getPosition() + baselineOffset, rotation,
-               PositiveLength(totalHeight), align));
+               PositiveLength(totalHeight), align, true));
     }
   }
 }
