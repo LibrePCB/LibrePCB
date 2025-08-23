@@ -678,7 +678,8 @@ void BoardGerberExport::drawGlueLayer(GerberGenerator& gen, const Layer& layer,
   // draw footprints incl. pads (only those contained in the assembly variant)
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
     Q_ASSERT(device);
-    if (device->isInAssemblyVariant(assemblyVariant)) {
+    if (device->isGlueEnabled() &&
+        device->isInAssemblyVariant(assemblyVariant)) {
       drawDevice(gen, *device, layer);
     }
   }

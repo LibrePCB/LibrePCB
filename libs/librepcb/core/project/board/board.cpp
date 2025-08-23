@@ -733,7 +733,7 @@ void Board::copyFrom(const Board& other) {
         *this, device->getComponentInstance(), device->getLibDevice().getUuid(),
         device->getLibFootprint().getUuid(), device->getPosition(),
         device->getRotation(), device->getMirrored(), device->isLocked(),
-        false);
+        device->isGlueEnabled(), false);
     copy->setAttributes(device->getAttributes());
     if (const PackageModel* model = device->getLibModel()) {
       copy->setModel(model->getUuid());

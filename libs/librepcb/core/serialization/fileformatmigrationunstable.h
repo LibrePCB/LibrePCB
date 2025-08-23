@@ -70,6 +70,10 @@ public:
   // Operator Overloadings
   FileFormatMigrationUnstable& operator=(
       const FileFormatMigrationUnstable& rhs) = delete;
+
+protected:
+  virtual void upgradeOutputJobs(SExpression& root, ProjectContext& context) override;
+  virtual void upgradeBoard(SExpression& root) override;
 };
 
 /*******************************************************************************

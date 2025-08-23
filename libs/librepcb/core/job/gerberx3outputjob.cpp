@@ -208,6 +208,7 @@ void GerberX3OutputJob::serializeDerived(SExpression& root) const {
   SExpression& cmpBot = root.appendList("components_bot");
   cmpBot.appendChild("create", mEnableComponentsBot);
   cmpBot.appendChild("output", mOutputPathComponentsBot);
+  root.ensureLineBreak();
   SExpression& glueTop = root.appendList("glue_top");
   glueTop.appendChild("create", mEnableGlueTop);
   glueTop.appendChild("output", mOutputPathGlueTop);

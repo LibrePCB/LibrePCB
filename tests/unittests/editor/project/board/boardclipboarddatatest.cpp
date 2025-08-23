@@ -97,14 +97,14 @@ TEST(BoardClipboardDataTest, testToFromMimeDataPopulated) {
   std::shared_ptr<BoardClipboardData::Device> device1 =
       std::make_shared<BoardClipboardData::Device>(
           Uuid::createRandom(), Uuid::createRandom(), Uuid::createRandom(),
-          Point::fromMm(1, 2), Angle::fromDeg(45), false, true,
+          Point::fromMm(1, 2), Angle::fromDeg(45), false, true, false,
           AttributeList{attribute1, attribute2},
           QList<BoardStrokeTextData>{strokeText1, strokeText2});
 
   std::shared_ptr<BoardClipboardData::Device> device2 =
       std::make_shared<BoardClipboardData::Device>(
           Uuid::createRandom(), Uuid::createRandom(), Uuid::createRandom(),
-          Point::fromMm(10, 20), Angle::fromDeg(-45), true, false,
+          Point::fromMm(10, 20), Angle::fromDeg(-45), true, false, true,
           AttributeList{attribute2, attribute1},
           QList<BoardStrokeTextData>{strokeText2, strokeText1});
 

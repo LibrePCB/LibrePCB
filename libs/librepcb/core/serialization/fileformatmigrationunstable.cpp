@@ -110,6 +110,23 @@ void FileFormatMigrationUnstable::upgradeWorkspaceData(
 }
 
 /*******************************************************************************
+ *  Protected Methods
+ ******************************************************************************/
+
+void FileFormatMigrationUnstable::upgradeOutputJobs(SExpression& root,
+                                              ProjectContext& context) {
+  Q_UNUSED(root);
+  Q_UNUSED(context);
+}
+
+void FileFormatMigrationUnstable::upgradeBoard(SExpression& root) {
+  // Devices
+  for (SExpression* devNode : root.getChildren("device")) {
+    devNode->appendChild("glue", SExpression::createToken("true"));
+  }
+}
+
+/*******************************************************************************
  *  End of File
  ******************************************************************************/
 

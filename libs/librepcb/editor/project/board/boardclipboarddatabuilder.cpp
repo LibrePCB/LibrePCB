@@ -108,7 +108,7 @@ std::unique_ptr<BoardClipboardData> BoardClipboardDataBuilder::generate(
         device->getComponentInstanceUuid(), device->getLibDevice().getUuid(),
         device->getLibFootprint().getUuid(), device->getPosition(),
         device->getRotation(), device->getMirrored(), device->isLocked(),
-        device->getAttributes(), strokeTexts));
+        device->isGlueEnabled(), device->getAttributes(), strokeTexts));
     // Add pad positions
     foreach (const BI_FootprintPad* pad, device->getPads()) {
       data->getPadPositions().insert(

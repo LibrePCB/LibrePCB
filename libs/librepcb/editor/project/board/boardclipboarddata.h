@@ -74,13 +74,14 @@ public:
     Angle rotation;
     bool mirrored;
     bool locked;
+    bool glue;
     AttributeList attributes;
     QList<BoardStrokeTextData> strokeTexts;
     Signal<Device> onEdited;  ///< Dummy event, not used
 
     Device(const Uuid& componentUuid, const Uuid& libDeviceUuid,
            const Uuid& libFootprintUuid, const Point& position,
-           const Angle& rotation, bool mirrored, bool locked,
+           const Angle& rotation, bool mirrored, bool locked, bool glue,
            const AttributeList& attributes,
            const QList<BoardStrokeTextData>& strokeTexts)
       : componentUuid(componentUuid),
@@ -90,6 +91,7 @@ public:
         rotation(rotation),
         mirrored(mirrored),
         locked(locked),
+        glue(glue),
         attributes(attributes),
         strokeTexts(strokeTexts),
         onEdited(*this) {}
@@ -102,6 +104,7 @@ public:
         rotation(deserialize<Angle>(node.getChild("rotation/@0"))),
         mirrored(deserialize<bool>(node.getChild("flip/@0"))),
         locked(deserialize<bool>(node.getChild("lock/@0"))),
+        glue(deserialize<bool>(node.getChild("glue/@0"))),
         attributes(node),
         strokeTexts(),
         onEdited(*this) {
@@ -121,6 +124,7 @@ public:
       root.appendChild("rotation", rotation);
       root.appendChild("flip", mirrored);
       root.appendChild("lock", locked);
+      root.appendChild("glue", glue);
       root.ensureLineBreak();
       attributes.serialize(root);
       foreach (const BoardStrokeTextData& strokeText, strokeTexts) {
@@ -136,7 +140,8 @@ public:
           (libFootprintUuid != rhs.libFootprintUuid) ||
           (position != rhs.position) || (rotation != rhs.rotation) ||
           (mirrored != rhs.mirrored) || (locked != rhs.locked) ||
-          (attributes != rhs.attributes) || (strokeTexts != rhs.strokeTexts);
+          (glue != rhs.glue) || (attributes != rhs.attributes) ||
+          (strokeTexts != rhs.strokeTexts);
     }
   };
 

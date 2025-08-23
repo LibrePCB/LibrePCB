@@ -848,7 +848,7 @@ void EagleProjectImport::importBoard(Project& project,
         *board, *cmpInst, libDev.getUuid(),
         libPkg.getFootprints().first()->getUuid(),
         C::convertPoint(eagleElem.getPosition()), mirror ? -rotation : rotation,
-        mirror, eagleElem.getLocked(), !eagleElem.getSmashed());
+        mirror, eagleElem.getLocked(), true, !eagleElem.getSmashed());
     board->addDeviceInstance(*devInst);
 
     // Add stroke texts.
