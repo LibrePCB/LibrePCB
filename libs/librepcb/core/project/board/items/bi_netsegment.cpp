@@ -175,7 +175,9 @@ void BI_NetSegment::addElements(const QList<BI_Via*>& vias,
   if (!areAllNetPointsConnectedTogether()) {
     throw LogicError(
         __FILE__, __LINE__,
-        QString("The netsegment with the UUID \"%1\" is not cohesive!")
+        QString("The netsegment with the UUID \"%1\" is not cohesive! If this "
+                "error occurs after opening an existing project with a newer "
+                "LibrePCB version, please contact us.")
             .arg(mUuid.toStr()));
   }
 
@@ -344,32 +346,41 @@ bool BI_NetSegment::areAllNetPointsConnectedTogether() const noexcept {
     p = mVias.first();
   } else if (mNetPoints.count() > 0) {
     p = mNetPoints.first();
+  } else if (mNetLines.count() > 0) {
+    p = &mNetLines.first()->getStartPoint();
   } else {
-    return true;  // there are no vias or netpoints => must be "connected
-                  // together" :)
+    return true;  // Empty net segment is considered as valid.
   }
   Q_ASSERT(p);
   QSet<const BI_Via*> vias;
   QSet<const BI_NetPoint*> points;
+  QSet<const BI_NetLine*> lines;
   QSet<const BI_FootprintPad*> pads;
-  findAllConnectedNetPoints(*p, vias, pads, points);
+  findAllConnectedNetPoints(*p, vias, pads, points, lines);
   return (vias.count() == mVias.count()) &&
-      (points.count() == mNetPoints.count());
+      (points.count() == mNetPoints.count()) &&
+      (lines.count() == mNetLines.count());
 }
 
 void BI_NetSegment::findAllConnectedNetPoints(
     const BI_NetLineAnchor& p, QSet<const BI_Via*>& vias,
-    QSet<const BI_FootprintPad*>& pads,
-    QSet<const BI_NetPoint*>& points) const noexcept {
+    QSet<const BI_FootprintPad*>& pads, QSet<const BI_NetPoint*>& points,
+    QSet<const BI_NetLine*>& lines) const noexcept {
   if (const BI_Via* via = dynamic_cast<const BI_Via*>(&p)) {
     if (vias.contains(via)) return;
     vias.insert(via);
     foreach (const BI_NetLine* netline, mNetLines) {
       if (&netline->getStartPoint() == via) {
-        findAllConnectedNetPoints(netline->getEndPoint(), vias, pads, points);
+        findAllConnectedNetPoints(netline->getEndPoint(), vias, pads, points,
+                                  lines);
       }
       if (&netline->getEndPoint() == via) {
-        findAllConnectedNetPoints(netline->getStartPoint(), vias, pads, points);
+        findAllConnectedNetPoints(netline->getStartPoint(), vias, pads, points,
+                                  lines);
+      }
+      if ((&netline->getStartPoint() == via) ||
+          (&netline->getEndPoint() == via)) {
+        lines.insert(netline);
       }
     }
   } else if (const BI_FootprintPad* pad =
@@ -378,10 +389,16 @@ void BI_NetSegment::findAllConnectedNetPoints(
     pads.insert(pad);
     foreach (const BI_NetLine* netline, mNetLines) {
       if (&netline->getStartPoint() == pad) {
-        findAllConnectedNetPoints(netline->getEndPoint(), vias, pads, points);
+        findAllConnectedNetPoints(netline->getEndPoint(), vias, pads, points,
+                                  lines);
       }
       if (&netline->getEndPoint() == pad) {
-        findAllConnectedNetPoints(netline->getStartPoint(), vias, pads, points);
+        findAllConnectedNetPoints(netline->getStartPoint(), vias, pads, points,
+                                  lines);
+      }
+      if ((&netline->getStartPoint() == pad) ||
+          (&netline->getEndPoint() == pad)) {
+        lines.insert(netline);
       }
     }
   } else if (const BI_NetPoint* np = dynamic_cast<const BI_NetPoint*>(&p)) {
@@ -389,10 +406,16 @@ void BI_NetSegment::findAllConnectedNetPoints(
     points.insert(np);
     foreach (const BI_NetLine* netline, mNetLines) {
       if (&netline->getStartPoint() == np) {
-        findAllConnectedNetPoints(netline->getEndPoint(), vias, pads, points);
+        findAllConnectedNetPoints(netline->getEndPoint(), vias, pads, points,
+                                  lines);
       }
       if (&netline->getEndPoint() == np) {
-        findAllConnectedNetPoints(netline->getStartPoint(), vias, pads, points);
+        findAllConnectedNetPoints(netline->getStartPoint(), vias, pads, points,
+                                  lines);
+      }
+      if ((&netline->getStartPoint() == np) ||
+          (&netline->getEndPoint() == np)) {
+        lines.insert(netline);
       }
     }
   } else {
