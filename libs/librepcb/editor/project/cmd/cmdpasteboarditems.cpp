@@ -183,7 +183,7 @@ bool CmdPasteBoardItems::performExecute() {
             TraceAnchor::footprintPad(device, pad), it.value());
       }
     }
-    for (const FootprintPad& p : seg.pads) {
+    for (const BoardPadData& p : seg.pads) {
       splitter.addPad(p, false);
     }
     for (const Via& v : seg.vias) {
@@ -209,10 +209,13 @@ bool CmdPasteBoardItems::performExecute() {
       std::unique_ptr<CmdBoardNetSegmentAddElements> cmdAddElements(
           new CmdBoardNetSegmentAddElements(*copy));
       QHash<Uuid, BI_Pad*> padMap;
-      for (const FootprintPad& p : segment.pads) {
-        FootprintPad copy(Uuid::createRandom(), p);
-        copy.setPosition(p.getPosition() + mPosOffset);
-        BI_Pad* pad = cmdAddElements->addPad(copy);
+      for (const BoardPadData& p : segment.pads) {
+        BI_Pad* pad = cmdAddElements->addPad(BoardPadData(
+            Uuid::createRandom(), p.getPosition() + mPosOffset, p.getRotation(),
+            p.getShape(), p.getWidth(), p.getHeight(), p.getRadius(),
+            p.getCustomShapeOutline(), p.getStopMaskConfig(),
+            p.getSolderPasteConfig(), p.getCopperClearance(),
+            p.getComponentSide(), p.getFunction(), p.getHoles(), p.isLocked()));
         padMap.insert(p.getUuid(), pad);
       }
       QHash<Uuid, BI_Via*> viaMap;

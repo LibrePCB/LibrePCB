@@ -27,8 +27,8 @@
 #include <librepcb/core/geometry/junction.h>
 #include <librepcb/core/geometry/trace.h>
 #include <librepcb/core/geometry/via.h>
-#include <librepcb/core/library/pkg/footprintpad.h>
 #include <librepcb/core/project/board/boardholedata.h>
+#include <librepcb/core/project/board/boardpaddata.h>
 #include <librepcb/core/project/board/boardpolygondata.h>
 #include <librepcb/core/project/board/boardstroketextdata.h>
 #include <librepcb/core/project/board/boardzonedata.h>
@@ -150,7 +150,7 @@ public:
     static constexpr const char* tagname = "netsegment";
 
     std::optional<CircuitIdentifier> netName;
-    FootprintPadList pads;
+    BoardPadDataList pads;
     ViaList vias;
     JunctionList junctions;
     TraceList traces;

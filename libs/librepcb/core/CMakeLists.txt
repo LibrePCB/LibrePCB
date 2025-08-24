@@ -334,6 +334,8 @@ add_library(
   project/board/boardinteractivehtmlbomgenerator.h
   project/board/boardnetsegmentsplitter.cpp
   project/board/boardnetsegmentsplitter.h
+  project/board/boardpaddata.cpp
+  project/board/boardpaddata.h
   project/board/boardpainter.cpp
   project/board/boardpainter.h
   project/board/boardpickplacegenerator.cpp

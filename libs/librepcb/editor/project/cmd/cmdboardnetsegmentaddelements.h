@@ -59,7 +59,7 @@ public:
 
   // General Methods
   BI_Pad* addPad(BI_Pad& pad);
-  BI_Pad* addPad(const FootprintPad& pad);
+  BI_Pad* addPad(const BoardPadData& pad);
   BI_Via* addVia(BI_Via& via);
   BI_Via* addVia(const Via& via);
   BI_NetPoint* addNetPoint(BI_NetPoint& netpoint);

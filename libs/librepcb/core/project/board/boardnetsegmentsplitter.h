@@ -26,7 +26,7 @@
 #include "../../geometry/junction.h"
 #include "../../geometry/trace.h"
 #include "../../geometry/via.h"
-#include "../../library/pkg/footprintpad.h"
+#include "boardpaddata.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -50,7 +50,7 @@ public:
   // Types
   struct Segment {
     JunctionList junctions;
-    FootprintPadList pads;
+    BoardPadDataList pads;
     ViaList vias;
     TraceList traces;
   };
@@ -64,7 +64,7 @@ public:
   void replaceFootprintPadByJunctions(const TraceAnchor& anchor,
                                       const Point& pos) noexcept;
   void addJunction(const Junction& junction) noexcept;
-  void addPad(const FootprintPad& pad, bool replaceByJunctions) noexcept;
+  void addPad(const BoardPadData& pad, bool replaceByJunctions) noexcept;
   void addVia(const Via& via, bool replaceByJunctions) noexcept;
   void addTrace(const Trace& trace) noexcept;
   QList<Segment> split() noexcept;
@@ -78,7 +78,7 @@ private:  // Methods
                             const Layer& layer) noexcept;
   void findConnectedLinesAndPoints(
       const TraceAnchor& anchor,
-      QList<std::shared_ptr<FootprintPad>>& availablePads,
+      QList<std::shared_ptr<BoardPadData>>& availablePads,
       QList<std::shared_ptr<Via>>& availableVias,
       QList<std::shared_ptr<Trace>>& availableTraces, Segment& segment)
 
@@ -86,7 +86,7 @@ private:  // Methods
 
 private:  // Data
   JunctionList mJunctions;
-  FootprintPadList mPads;
+  BoardPadDataList mPads;
   ViaList mVias;
   TraceList mTraces;
 

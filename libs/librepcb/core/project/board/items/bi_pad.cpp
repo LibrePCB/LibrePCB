@@ -46,11 +46,12 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BI_Pad::BI_Pad(BI_NetSegment& netsegment, const FootprintPad& properties)
+BI_Pad::BI_Pad(BI_NetSegment& netsegment, const BoardPadData& properties)
   : BI_Base(netsegment.getBoard()),
     onEdited(*this),
     mNetSegment(&netsegment),
     mDevice(nullptr),
+    mFootprintPad(nullptr),
     mPackagePad(nullptr),
     mComponentSignalInstance(nullptr),
     mProperties(properties),
@@ -66,19 +67,29 @@ BI_Pad::BI_Pad(BI_NetSegment& netsegment, const FootprintPad& properties)
           &BI_Pad::updateGeometries);
 }
 
+static BoardPadData convertFootprintPad(const FootprintPad& pad) {
+  return BoardPadData(pad.getUuid(), pad.getPosition(), pad.getRotation(),
+                      pad.getShape(), pad.getWidth(), pad.getHeight(),
+                      pad.getRadius(), pad.getCustomShapeOutline(),
+                      pad.getStopMaskConfig(), pad.getSolderPasteConfig(),
+                      pad.getCopperClearance(), pad.getComponentSide(),
+                      pad.getFunction(), pad.getHoles(), true);
+}
+
 BI_Pad::BI_Pad(BI_Device& device, const Uuid& padUuid)
   : BI_Base(device.getBoard()),
     onEdited(*this),
     mNetSegment(nullptr),
     mDevice(&device),
+    mFootprintPad(
+        mDevice->getLibFootprint().getPads().get(padUuid).get()),  // can throw
     mPackagePad(nullptr),
     mComponentSignalInstance(nullptr),
-    mProperties(
-        *mDevice->getLibFootprint().getPads().get(padUuid)),  // can throw
+    mProperties(convertFootprintPad(*mFootprintPad)),
     mMirrored(false),
     mText(),
     mOnDeviceEditedSlot(*this, &BI_Pad::deviceEdited) {
-  if (auto pkgPad = mProperties.getPackagePadUuid()) {
+  if (auto pkgPad = mFootprintPad->getPackagePadUuid()) {
     mPackagePad =
         mDevice->getLibPackage().getPads().get(*pkgPad).get();  // can throw
 

@@ -56,12 +56,12 @@ void BoardNetSegmentSplitter::addJunction(const Junction& junction) noexcept {
   mJunctions.append(std::make_shared<Junction>(junction));
 }
 
-void BoardNetSegmentSplitter::addPad(const FootprintPad& pad,
+void BoardNetSegmentSplitter::addPad(const BoardPadData& pad,
                                      bool replaceByJunctions) noexcept {
   if (replaceByJunctions) {
     mAnchorsToReplace[TraceAnchor::pad(pad.getUuid())] = pad.getPosition();
   } else {
-    mPads.append(std::make_shared<FootprintPad>(pad));
+    mPads.append(std::make_shared<BoardPadData>(pad));
   }
 }
 
@@ -88,7 +88,7 @@ QList<BoardNetSegmentSplitter::Segment>
   // Split netsegment by anchors and lines.
   // IMPORTANT: Make shallow copies to keep all references valid even though
   // findConnectedLinesAndPoints() removes items from these lists.
-  QList<std::shared_ptr<FootprintPad>> availablePads = mPads.values();
+  QList<std::shared_ptr<BoardPadData>> availablePads = mPads.values();
   QList<std::shared_ptr<Via>> availableVias = mVias.values();
   QList<std::shared_ptr<Trace>> availableTraces = mTraces.values();
   while (!availableTraces.isEmpty()) {
@@ -141,7 +141,7 @@ TraceAnchor BoardNetSegmentSplitter::replaceAnchor(
 
 void BoardNetSegmentSplitter::findConnectedLinesAndPoints(
     const TraceAnchor& anchor,
-    QList<std::shared_ptr<FootprintPad>>& availablePads,
+    QList<std::shared_ptr<BoardPadData>>& availablePads,
     QList<std::shared_ptr<Via>>& availableVias,
     QList<std::shared_ptr<Trace>>& availableTraces, Segment& segment) noexcept {
   if (std::optional<Uuid> junctionUuid = anchor.tryGetJunction()) {
@@ -151,7 +151,7 @@ void BoardNetSegmentSplitter::findConnectedLinesAndPoints(
       }
     }
   } else if (std::optional<Uuid> padUuid = anchor.tryGetPad()) {
-    if (std::shared_ptr<FootprintPad> pad = mPads.find(*padUuid)) {
+    if (std::shared_ptr<BoardPadData> pad = mPads.find(*padUuid)) {
       if (availablePads.contains(pad)) {
         segment.pads.append(pad);
         availablePads.removeOne(pad);

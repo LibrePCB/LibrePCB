@@ -24,7 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../../../geometry/path.h"
-#include "../../../library/pkg/footprintpad.h"
+#include "../boardpaddata.h"
 #include "bi_device.h"
 #include "bi_netline.h"
 
@@ -36,6 +36,7 @@
 namespace librepcb {
 
 class ComponentSignalInstance;
+class FootprintPad;
 class PackagePad;
 
 /*******************************************************************************
@@ -72,7 +73,7 @@ public:
    * @param netsegment  Net segment of the pad.
    * @param properties  Pad properties.
    */
-  BI_Pad(BI_NetSegment& netsegment, const FootprintPad& properties);
+  BI_Pad(BI_NetSegment& netsegment, const BoardPadData& properties);
   /**
    * @brief Construct a footprint pad
    *
@@ -93,7 +94,7 @@ public:
     return mComponentSignalInstance;
   }
   NetSignal* getNetSignal() const noexcept;
-  const FootprintPad& getProperties() const noexcept { return mProperties; }
+  const BoardPadData& getProperties() const noexcept { return mProperties; }
   const Uuid& getUuid() const noexcept { return mProperties.getUuid(); }
 
   /**
@@ -174,6 +175,11 @@ private:  // Data
   /// @attention  This is `nullptr if this is a board pad.
   BI_Device* mDevice;
 
+  /// The footprint pad of the device
+  ///
+  /// @attention  This is `nullptr` if this is a board pad!
+  const FootprintPad* mFootprintPad;
+
   /// The package pad where this footprint pad is connected to
   ///
   /// @attention  This is `nullptr` if this is a board pad or the footprint pad
@@ -194,7 +200,7 @@ private:  // Data
   ///
   /// If this is a board pad, the properties are the single source of truth,
   /// and can be modified with the setters on this class.
-  FootprintPad mProperties;
+  BoardPadData mProperties;
 
   // Cached Properties
   Point mPosition;

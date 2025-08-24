@@ -55,7 +55,7 @@ BI_Pad* CmdBoardNetSegmentAddElements::addPad(BI_Pad& pad) {
   return &pad;
 }
 
-BI_Pad* CmdBoardNetSegmentAddElements::addPad(const FootprintPad& pad) {
+BI_Pad* CmdBoardNetSegmentAddElements::addPad(const BoardPadData& pad) {
   BI_Pad* p = new BI_Pad(mNetSegment, pad);
   return addPad(*p);
 }

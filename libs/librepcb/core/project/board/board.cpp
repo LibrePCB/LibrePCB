@@ -779,7 +779,7 @@ void Board::copyFrom(const Board& other) {
     QList<BI_Pad*> pads;
     foreach (const BI_Pad* pad, netSegment->getPads()) {
       BI_Pad* padCopy = new BI_Pad(
-          *copy, FootprintPad(Uuid::createRandom(), pad->getProperties()));
+          *copy, BoardPadData(Uuid::createRandom(), pad->getProperties()));
       pads.append(padCopy);
       anchorsMap.insert(pad, padCopy);
     }

@@ -698,7 +698,7 @@ void ProjectLoader::loadBoardNetSegment(Board& b, const SExpression& node) {
   // Load pads.
   QList<BI_Pad*> pads;
   foreach (const SExpression* child, node.getChildren("pad")) {
-    BI_Pad* pad = new BI_Pad(*netSegment, FootprintPad(*child));
+    BI_Pad* pad = new BI_Pad(*netSegment, BoardPadData(*child));
     pads.append(pad);
   }
 

@@ -629,7 +629,7 @@ int BoardGerberExport::drawPthDrills(ExcellonGenerator& gen) const {
 
   // Helper to draw a pad.
   auto drawPad = [&gen, &count](const BI_Pad* pad) {
-    const FootprintPad& libPad = pad->getProperties();
+    const BoardPadData& libPad = pad->getProperties();
     const Transform transform(*pad);
     const ExcellonGenerator::Function function =
         (libPad.getFunction() == Pad::Function::PressFitPad)
