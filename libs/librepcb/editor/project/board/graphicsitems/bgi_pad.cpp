@@ -112,6 +112,17 @@ QVariant BGI_Pad::itemChange(GraphicsItemChange change,
 void BGI_Pad::padEdited(const BI_Pad& obj, BI_Pad::Event event) noexcept {
   Q_UNUSED(obj);
   switch (event) {
+    case BI_Pad::Event::UuidChanged:
+    case BI_Pad::Event::ShapeChanged:
+    case BI_Pad::Event::WidthChanged:
+    case BI_Pad::Event::HeightChanged:
+    case BI_Pad::Event::RadiusChanged:
+    case BI_Pad::Event::CustomShapeOutlineChanged:
+    case BI_Pad::Event::StopMaskConfigChanged:
+    case BI_Pad::Event::SolderPasteConfigChanged:
+    case BI_Pad::Event::FunctionChanged:
+    case BI_Pad::Event::LockedChanged:
+      break;
     case BI_Pad::Event::PositionChanged:
       setPos(obj.getPosition().toPxQPointF());
       break;
@@ -120,6 +131,10 @@ void BGI_Pad::padEdited(const BI_Pad& obj, BI_Pad::Event event) noexcept {
       break;
     case BI_Pad::Event::MirroredChanged:
       mGraphicsItem->setMirrored(obj.getMirrored());
+      updateLayer();
+      break;
+    case BI_Pad::Event::ComponentSideChanged:
+    case BI_Pad::Event::HolesEdited:
       updateLayer();
       break;
     case BI_Pad::Event::TextChanged:

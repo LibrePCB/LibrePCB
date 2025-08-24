@@ -53,9 +53,22 @@ public:
   ~CmdBoardPadEdit() noexcept;
 
   // Setters
+  void setComponentSideAndHoles(Pad::ComponentSide side,
+                                const PadHoleList& holes, bool immediate);
+  void setFunction(Pad::Function function, bool immediate) noexcept;
+  void setShape(Pad::Shape shape, bool immediate) noexcept;
+  void setWidth(const PositiveLength& width, bool immediate) noexcept;
+  void setHeight(const PositiveLength& height, bool immediate) noexcept;
+  void setRadius(const UnsignedLimitedRatio& radius, bool immediate) noexcept;
+  void setCustomShapeOutline(const Path& outline) noexcept;
+  void setStopMaskConfig(const MaskConfig& config, bool immediate) noexcept;
+  void setSolderPasteConfig(const MaskConfig& config) noexcept;
+  void setCopperClearance(const UnsignedLength& clearance,
+                          bool immediate) noexcept;
   void setPosition(const Point& pos, bool immediate) noexcept;
   void translate(const Point& deltaPos, bool immediate) noexcept;
   void snapToGrid(const PositiveLength& gridInterval, bool immediate) noexcept;
+  void setRotation(const Angle& angle, bool immediate) noexcept;
   void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
 
 private:
@@ -76,10 +89,8 @@ private:
   BI_Pad& mPad;
 
   // General Attributes
-  Point mOldPos;
-  Point mNewPos;
-  Angle mOldRotation;
-  Angle mNewRotation;
+  BoardPadData mOldProperties;
+  BoardPadData mNewProperties;
 };
 
 /*******************************************************************************

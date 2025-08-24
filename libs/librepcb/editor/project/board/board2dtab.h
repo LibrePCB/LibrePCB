@@ -33,6 +33,7 @@
 #include "fsm/boardeditorstate_drawtrace.h"
 #include "windowtab.h"
 
+#include <librepcb/core/geometry/pad.h>
 #include <librepcb/core/geometry/zone.h>
 
 #include <QtCore>
@@ -165,6 +166,7 @@ public:
   void fsmToolEnter(BoardEditorState_Select& state) noexcept override;
   void fsmToolEnter(BoardEditorState_DrawTrace& state) noexcept override;
   void fsmToolEnter(BoardEditorState_AddVia& state) noexcept override;
+  void fsmToolEnter(BoardEditorState_AddPad& state) noexcept override;
   void fsmToolEnter(BoardEditorState_DrawPolygon& state) noexcept override;
   void fsmToolEnter(BoardEditorState_AddStrokeText& state) noexcept override;
   void fsmToolEnter(BoardEditorState_DrawPlane& state) noexcept override;
@@ -183,6 +185,10 @@ signals:
   void filledRequested(bool filled);
   void mirroredRequested(bool mirrored);
   void valueRequested(const QString& value);
+  void componentSideRequested(Pad::ComponentSide side);
+  void shapeRequested(const ui::PadShape shape);
+  void ratioRequested(const UnsignedLimitedRatio& ratio);
+  void pressFitRequested(bool pressFit);
   void zoneRuleRequested(Zone::Rule rule, bool enable);
 
 private:
@@ -269,6 +275,11 @@ private:
   QString mToolValue;
   std::shared_ptr<slint::VectorModel<slint::SharedString>>
       mToolValueSuggestions;
+  Pad::ComponentSide mToolComponentSide;
+  ui::PadShape mToolShape;
+  UnsignedLimitedRatio mToolRatio;
+  bool mToolFiducial;
+  bool mToolPressFit;
   Zone::Rules mToolZoneRules;
 
   // Unplaced components

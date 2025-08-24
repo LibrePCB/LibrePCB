@@ -52,9 +52,24 @@ class BI_Pad final : public BI_Base, public BI_NetLineAnchor {
 public:
   // Signals
   enum class Event {
+    // Base class properties
+    UuidChanged,
     PositionChanged,
     RotationChanged,
+    ShapeChanged,
+    WidthChanged,
+    HeightChanged,
+    RadiusChanged,
+    CustomShapeOutlineChanged,
+    StopMaskConfigChanged,
+    SolderPasteConfigChanged,
+    CopperClearanceChanged,
+    ComponentSideChanged,
+    FunctionChanged,
+    HolesEdited,
+    // Derived class properties
     MirroredChanged,
+    LockedChanged,
     TextChanged,
     GeometriesChanged,
   };
@@ -132,6 +147,18 @@ public:
   // Setters
   void setPosition(const Point& position) noexcept;
   void setRotation(const Angle& rotation) noexcept;
+  void setShape(Pad::Shape shape) noexcept;
+  void setWidth(const PositiveLength& width) noexcept;
+  void setHeight(const PositiveLength& height) noexcept;
+  void setRadius(const UnsignedLimitedRatio& radius) noexcept;
+  void setCustomShapeOutline(const Path& outline) noexcept;
+  void setStopMaskConfig(const MaskConfig& config) noexcept;
+  void setSolderPasteConfig(const MaskConfig& config) noexcept;
+  void setCopperClearance(const UnsignedLength& clearance) noexcept;
+  void setComponentSideAndHoles(Pad::ComponentSide side,
+                                const PadHoleList& holes);
+  void setFunction(Pad::Function function) noexcept;
+  void setLocked(bool locked) noexcept;
 
   // General Methods
   void addToBoard() override;

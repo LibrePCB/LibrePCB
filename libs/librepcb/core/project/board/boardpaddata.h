@@ -83,6 +83,8 @@ public:
   ~BoardPadData() noexcept;
 
   // Getters
+  using Pad::getHoles;
+  PadHoleList& getHoles() noexcept { return mHoles; }
   bool isLocked() const noexcept { return mLocked; }
 
   // Setters

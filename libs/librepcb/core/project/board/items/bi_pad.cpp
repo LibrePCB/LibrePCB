@@ -194,6 +194,125 @@ void BI_Pad::setRotation(const Angle& rotation) noexcept {
   }
 }
 
+void BI_Pad::setShape(Pad::Shape shape) noexcept {
+  if (!mNetSegment) return;
+
+  if (mProperties.setShape(shape)) {
+    updateGeometries();
+    onEdited.notify(Event::ShapeChanged);
+  }
+}
+
+void BI_Pad::setWidth(const PositiveLength& width) noexcept {
+  if (!mNetSegment) return;
+
+  if (mProperties.setWidth(width)) {
+    updateGeometries();
+    onEdited.notify(Event::WidthChanged);
+  }
+}
+
+void BI_Pad::setHeight(const PositiveLength& height) noexcept {
+  if (!mNetSegment) return;
+
+  if (mProperties.setHeight(height)) {
+    updateGeometries();
+    onEdited.notify(Event::HeightChanged);
+  }
+}
+
+void BI_Pad::setRadius(const UnsignedLimitedRatio& radius) noexcept {
+  if (!mNetSegment) return;
+
+  if (mProperties.setRadius(radius)) {
+    updateGeometries();
+    onEdited.notify(Event::RadiusChanged);
+  }
+}
+
+void BI_Pad::setCustomShapeOutline(const Path& outline) noexcept {
+  if (!mNetSegment) return;
+
+  if (mProperties.setCustomShapeOutline(outline)) {
+    updateGeometries();
+    onEdited.notify(Event::CustomShapeOutlineChanged);
+  }
+}
+
+void BI_Pad::setStopMaskConfig(const MaskConfig& config) noexcept {
+  if (!mNetSegment) return;
+
+  if (mProperties.setStopMaskConfig(config)) {
+    updateGeometries();
+    onEdited.notify(Event::StopMaskConfigChanged);
+  }
+}
+
+void BI_Pad::setSolderPasteConfig(const MaskConfig& config) noexcept {
+  if (!mNetSegment) return;
+
+  if (mProperties.setSolderPasteConfig(config)) {
+    updateGeometries();
+    onEdited.notify(Event::SolderPasteConfigChanged);
+  }
+}
+
+void BI_Pad::setCopperClearance(const UnsignedLength& clearance) noexcept {
+  if (!mNetSegment) return;
+
+  if (mProperties.setCopperClearance(clearance)) {
+    invalidatePlanes();
+    onEdited.notify(Event::CopperClearanceChanged);
+  }
+}
+
+void BI_Pad::setComponentSideAndHoles(Pad::ComponentSide side,
+                                      const PadHoleList& holes) {
+  if (!mNetSegment) return;
+
+  if (holes.isEmpty()) {
+    const Layer& smtLayer = (side == Pad::ComponentSide::Bottom)
+        ? Layer::botCopper()
+        : Layer::topCopper();
+    for (const BI_NetLine* nl : mRegisteredNetLines) {
+      if (nl->getLayer() != smtLayer) {
+        throw LogicError(__FILE__, __LINE__,
+                         "Cannot modify pad with traces connected to it.");
+      }
+    }
+  }
+
+  bool modified = false;
+  if (mProperties.setComponentSide(side)) {
+    onEdited.notify(Event::ComponentSideChanged);
+    modified = true;
+  }
+  if (holes != mProperties.getHoles()) {
+    mProperties.getHoles() = holes;
+    onEdited.notify(Event::HolesEdited);
+    modified = true;
+  }
+  if (modified) {
+    updateGeometries();
+  }
+}
+
+void BI_Pad::setFunction(Pad::Function function) noexcept {
+  if (!mNetSegment) return;
+
+  if (mProperties.setFunction(function)) {
+    onEdited.notify(Event::FunctionChanged);
+  }
+}
+
+void BI_Pad::setLocked(bool locked) noexcept {
+  if (!mNetSegment) return;
+
+  if (mProperties.setLocked(locked)) {
+    onEdited.notify(Event::LockedChanged);
+  }
+}
+
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/

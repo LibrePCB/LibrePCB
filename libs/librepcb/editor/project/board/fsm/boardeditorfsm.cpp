@@ -24,6 +24,7 @@
 
 #include "boardeditorstate_adddevice.h"
 #include "boardeditorstate_addhole.h"
+#include "boardeditorstate_addpad.h"
 #include "boardeditorstate_addstroketext.h"
 #include "boardeditorstate_addvia.h"
 #include "boardeditorstate_drawplane.h"
@@ -55,6 +56,38 @@ BoardEditorFsm::BoardEditorFsm(const Context& context, QObject* parent) noexcept
   mStates.insert(State::ADD_STROKE_TEXT,
                  new BoardEditorState_AddStrokeText(context));
   mStates.insert(State::ADD_VIA, new BoardEditorState_AddVia(context));
+  mStates.insert(State::ADD_THT_PAD,
+                 new BoardEditorState_AddPad(
+                     context, BoardEditorState_AddPad::PadType::THT,
+                     Pad::Function::StandardPad));
+  mStates.insert(State::ADD_SMT_PAD_STANDARD,
+                 new BoardEditorState_AddPad(
+                     context, BoardEditorState_AddPad::PadType::SMT,
+                     Pad::Function::StandardPad));
+  mStates.insert(State::ADD_SMT_PAD_THERMAL,
+                 new BoardEditorState_AddPad(
+                     context, BoardEditorState_AddPad::PadType::SMT,
+                     Pad::Function::ThermalPad));
+  mStates.insert(State::ADD_SMT_PAD_BGA,
+                 new BoardEditorState_AddPad(
+                     context, BoardEditorState_AddPad::PadType::SMT,
+                     Pad::Function::BgaPad));
+  mStates.insert(State::ADD_SMT_PAD_EDGE_CONNECTOR,
+                 new BoardEditorState_AddPad(
+                     context, BoardEditorState_AddPad::PadType::SMT,
+                     Pad::Function::EdgeConnectorPad));
+  mStates.insert(State::ADD_SMT_PAD_TEST,
+                 new BoardEditorState_AddPad(
+                     context, BoardEditorState_AddPad::PadType::SMT,
+                     Pad::Function::TestPad));
+  mStates.insert(State::ADD_SMT_PAD_LOCAL_FIDUCIAL,
+                 new BoardEditorState_AddPad(
+                     context, BoardEditorState_AddPad::PadType::SMT,
+                     Pad::Function::LocalFiducial));
+  mStates.insert(State::ADD_SMT_PAD_GLOBAL_FIDUCIAL,
+                 new BoardEditorState_AddPad(
+                     context, BoardEditorState_AddPad::PadType::SMT,
+                     Pad::Function::GlobalFiducial));
   mStates.insert(State::ADD_DEVICE, new BoardEditorState_AddDevice(context));
   mStates.insert(State::DRAW_POLYGON,
                  new BoardEditorState_DrawPolygon(context));
@@ -98,6 +131,29 @@ bool BoardEditorFsm::processAddStrokeText() noexcept {
 
 bool BoardEditorFsm::processAddVia() noexcept {
   return setNextState(State::ADD_VIA);
+}
+
+bool BoardEditorFsm::processAddThtPad() noexcept {
+  return setNextState(State::ADD_THT_PAD);
+}
+
+bool BoardEditorFsm::processAddSmtPad(Pad::Function function) noexcept {
+  switch (function) {
+    case Pad::Function::ThermalPad:
+      return setNextState(State::ADD_SMT_PAD_THERMAL);
+    case Pad::Function::BgaPad:
+      return setNextState(State::ADD_SMT_PAD_BGA);
+    case Pad::Function::EdgeConnectorPad:
+      return setNextState(State::ADD_SMT_PAD_EDGE_CONNECTOR);
+    case Pad::Function::TestPad:
+      return setNextState(State::ADD_SMT_PAD_TEST);
+    case Pad::Function::LocalFiducial:
+      return setNextState(State::ADD_SMT_PAD_LOCAL_FIDUCIAL);
+    case Pad::Function::GlobalFiducial:
+      return setNextState(State::ADD_SMT_PAD_GLOBAL_FIDUCIAL);
+    default:
+      return setNextState(State::ADD_SMT_PAD_STANDARD);
+  }
 }
 
 bool BoardEditorFsm::processAddDevice(ComponentInstance& component,

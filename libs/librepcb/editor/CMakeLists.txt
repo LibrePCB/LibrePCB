@@ -432,6 +432,9 @@ add_library(
   project/board/boardeditor.h
   project/board/boardgraphicsscene.cpp
   project/board/boardgraphicsscene.h
+  project/board/boardpadpropertiesdialog.cpp
+  project/board/boardpadpropertiesdialog.h
+  project/board/boardpadpropertiesdialog.ui
   project/board/boardpickplacegeneratordialog.cpp
   project/board/boardpickplacegeneratordialog.h
   project/board/boardpickplacegeneratordialog.ui
@@ -458,6 +461,8 @@ add_library(
   project/board/fsm/boardeditorstate_adddevice.h
   project/board/fsm/boardeditorstate_addhole.cpp
   project/board/fsm/boardeditorstate_addhole.h
+  project/board/fsm/boardeditorstate_addpad.cpp
+  project/board/fsm/boardeditorstate_addpad.h
   project/board/fsm/boardeditorstate_addstroketext.cpp
   project/board/fsm/boardeditorstate_addstroketext.h
   project/board/fsm/boardeditorstate_addvia.cpp
