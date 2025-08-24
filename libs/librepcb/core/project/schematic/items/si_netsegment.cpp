@@ -203,7 +203,9 @@ void SI_NetSegment::addNetPointsAndNetLines(
   if (!areAllNetPointsConnectedTogether()) {
     throw RuntimeError(
         __FILE__, __LINE__,
-        QString("The netsegment with the UUID \"%1\" is not cohesive!")
+        QString("The netsegment with the UUID \"%1\" is not cohesive! If this "
+                "error occurs after opening an existing project with a newer "
+                "LibrePCB version, please contact us.")
             .arg(mUuid.toStr()));
   }
 
@@ -385,30 +387,41 @@ bool SI_NetSegment::checkAttributesValidity() const noexcept {
 }
 
 bool SI_NetSegment::areAllNetPointsConnectedTogether() const noexcept {
-  if (mNetPoints.count() > 1) {
-    const SI_NetPoint* firstPoint = mNetPoints.first();
-    QSet<const SI_SymbolPin*> pins;
-    QSet<const SI_NetPoint*> points;
-    findAllConnectedNetPoints(*firstPoint, pins, points);
-    return (points.count() == mNetPoints.count());
+  const SI_NetLineAnchor* p = nullptr;
+  if (mNetPoints.count() > 0) {
+    p = mNetPoints.first();
+  } else if (mNetLines.count() > 0) {
+    p = &mNetLines.first()->getStartPoint();
   } else {
-    return true;  // there is only 0 or 1 netpoint => must be "connected
-                  // together" :)
+    return true;  // Empty net segment is considered as valid.
   }
+  Q_ASSERT(p);
+  QSet<const SI_SymbolPin*> pins;
+  QSet<const SI_NetPoint*> points;
+  QSet<const SI_NetLine*> lines;
+  findAllConnectedNetPoints(*p, pins, points, lines);
+  return (points.count() == mNetPoints.count()) &&
+      (lines.count() == mNetLines.count());
 }
 
 void SI_NetSegment::findAllConnectedNetPoints(
     const SI_NetLineAnchor& p, QSet<const SI_SymbolPin*>& pins,
-    QSet<const SI_NetPoint*>& points) const noexcept {
+    QSet<const SI_NetPoint*>& points,
+    QSet<const SI_NetLine*>& lines) const noexcept {
   if (const SI_SymbolPin* pin = dynamic_cast<const SI_SymbolPin*>(&p)) {
     if (pins.contains(pin)) return;
     pins.insert(pin);
     foreach (const SI_NetLine* netline, mNetLines) {
       if (&netline->getStartPoint() == pin) {
-        findAllConnectedNetPoints(netline->getEndPoint(), pins, points);
+        findAllConnectedNetPoints(netline->getEndPoint(), pins, points, lines);
       }
       if (&netline->getEndPoint() == pin) {
-        findAllConnectedNetPoints(netline->getStartPoint(), pins, points);
+        findAllConnectedNetPoints(netline->getStartPoint(), pins, points,
+                                  lines);
+      }
+      if ((&netline->getStartPoint() == pin) ||
+          (&netline->getEndPoint() == pin)) {
+        lines.insert(netline);
       }
     }
   } else if (const SI_NetPoint* np = dynamic_cast<const SI_NetPoint*>(&p)) {
@@ -416,10 +429,15 @@ void SI_NetSegment::findAllConnectedNetPoints(
     points.insert(np);
     foreach (const SI_NetLine* netline, mNetLines) {
       if (&netline->getStartPoint() == np) {
-        findAllConnectedNetPoints(netline->getEndPoint(), pins, points);
+        findAllConnectedNetPoints(netline->getEndPoint(), pins, points, lines);
       }
       if (&netline->getEndPoint() == np) {
-        findAllConnectedNetPoints(netline->getStartPoint(), pins, points);
+        findAllConnectedNetPoints(netline->getStartPoint(), pins, points,
+                                  lines);
+      }
+      if ((&netline->getStartPoint() == np) ||
+          (&netline->getEndPoint() == np)) {
+        lines.insert(netline);
       }
     }
   } else {
