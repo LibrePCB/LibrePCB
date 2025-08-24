@@ -123,7 +123,7 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
 
   // Automatically set/clear custom shape outline to improve user experience.
   mAutoCustomOutline = mPad.getCustomShapeOutline();
-  if (mPad.getShape() != FootprintPad::Shape::Custom) {
+  if (mPad.getShape() != Pad::Shape::Custom) {
     const QVector<Path> outlines = mPad.getGeometry().toOutlines();
     if (!outlines.isEmpty()) {
       mAutoCustomOutline = outlines.first().toOpenPath();
@@ -185,8 +185,8 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
           mUi->edtSolderPasteOffset, &LengthEdit::setEnabled);
 
   // Populate functions.
-  for (int i = 0; i < static_cast<int>(FootprintPad::Function::_COUNT); ++i) {
-    const FootprintPad::Function value = static_cast<FootprintPad::Function>(i);
+  for (int i = 0; i < static_cast<int>(Pad::Function::_COUNT); ++i) {
+    const Pad::Function value = static_cast<Pad::Function>(i);
     mUi->cbxFunction->addItem(FootprintPad::getFunctionDescriptionTr(value),
                               QVariant::fromValue(value));
   }
@@ -203,13 +203,13 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
   mUi->cbxPackagePad->setCurrentIndex(currentPadIndex);
   mUi->cbxFunction->setCurrentIndex(
       mUi->cbxFunction->findData(QVariant::fromValue(mPad.getFunction())));
-  if (mPad.getComponentSide() == FootprintPad::ComponentSide::Bottom) {
+  if (mPad.getComponentSide() == Pad::ComponentSide::Bottom) {
     mUi->btnComponentSideBottom->setChecked(true);
   } else {
     mUi->btnComponentSideTop->setChecked(true);
   }
   switch (mPad.getShape()) {
-    case FootprintPad::Shape::RoundedRect:
+    case Pad::Shape::RoundedRect:
       mUi->btnShapeRound->setChecked(*mPad.getRadius() ==
                                      Ratio::fromPercent(100));
       mUi->btnShapeRect->setChecked(*mPad.getRadius() == Ratio::fromPercent(0));
@@ -217,10 +217,10 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
           (*mPad.getRadius() != Ratio::fromPercent(0)) &&
           (*mPad.getRadius() != Ratio::fromPercent(100)));
       break;
-    case FootprintPad::Shape::RoundedOctagon:
+    case Pad::Shape::RoundedOctagon:
       mUi->btnShapeOctagon->setChecked(true);
       break;
-    case FootprintPad::Shape::Custom:
+    case Pad::Shape::Custom:
       mUi->btnShapeCustom->setChecked(true);
       break;
     default:
@@ -481,22 +481,22 @@ bool FootprintPadPropertiesDialog::applyChanges() noexcept {
         Uuid::tryFromString(mUi->cbxPackagePad->currentData().toString());
     cmd->setPackagePadUuid(pkgPad, false);
     QVariant function = mUi->cbxFunction->currentData();
-    if (function.isValid() && function.canConvert<FootprintPad::Function>()) {
-      cmd->setFunction(function.value<FootprintPad::Function>(), false);
+    if (function.isValid() && function.canConvert<Pad::Function>()) {
+      cmd->setFunction(function.value<Pad::Function>(), false);
     }
     if (mUi->btnComponentSideTop->isChecked()) {
-      cmd->setComponentSide(FootprintPad::ComponentSide::Top, false);
+      cmd->setComponentSide(Pad::ComponentSide::Top, false);
     } else if (mUi->btnComponentSideBottom->isChecked()) {
-      cmd->setComponentSide(FootprintPad::ComponentSide::Bottom, false);
+      cmd->setComponentSide(Pad::ComponentSide::Bottom, false);
     } else {
       Q_ASSERT(false);
     }
     if (mUi->btnShapeOctagon->isChecked()) {
-      cmd->setShape(FootprintPad::Shape::RoundedOctagon, false);
+      cmd->setShape(Pad::Shape::RoundedOctagon, false);
     } else if (mUi->btnShapeCustom->isChecked()) {
-      cmd->setShape(FootprintPad::Shape::Custom, false);
+      cmd->setShape(Pad::Shape::Custom, false);
     } else {
-      cmd->setShape(FootprintPad::Shape::RoundedRect, false);
+      cmd->setShape(Pad::Shape::RoundedRect, false);
     }
     cmd->setRadius(mUi->edtRadiusRatio->getValue(), false);
     cmd->setWidth(mUi->edtWidth->getValue(), false);

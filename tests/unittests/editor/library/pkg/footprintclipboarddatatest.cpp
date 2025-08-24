@@ -82,20 +82,18 @@ TEST(FootprintClipboardDataTest, testToFromMimeDataPopulated) {
 
   std::shared_ptr<FootprintPad> footprintPad1 = std::make_shared<FootprintPad>(
       Uuid::createRandom(), packagePad1->getUuid(), Point(12, 34), Angle(56),
-      FootprintPad::Shape::RoundedOctagon, PositiveLength(11),
-      PositiveLength(22), UnsignedLimitedRatio(Ratio::fromPercent(50)), Path(),
-      MaskConfig::off(), MaskConfig::automatic(), UnsignedLength(0),
-      FootprintPad::ComponentSide::Bottom, FootprintPad::Function::Unspecified,
-      PadHoleList{});
+      Pad::Shape::RoundedOctagon, PositiveLength(11), PositiveLength(22),
+      UnsignedLimitedRatio(Ratio::fromPercent(50)), Path(), MaskConfig::off(),
+      MaskConfig::automatic(), UnsignedLength(0), Pad::ComponentSide::Bottom,
+      Pad::Function::Unspecified, PadHoleList{});
 
   std::shared_ptr<FootprintPad> footprintPad2 = std::make_shared<FootprintPad>(
       Uuid::createRandom(), std::nullopt, Point(12, 34), Angle(56),
-      FootprintPad::Shape::RoundedRect, PositiveLength(123),
-      PositiveLength(456), UnsignedLimitedRatio(Ratio::fromPercent(100)),
+      Pad::Shape::RoundedRect, PositiveLength(123), PositiveLength(456),
+      UnsignedLimitedRatio(Ratio::fromPercent(100)),
       Path({Vertex(Point(1, 2), Angle(3)), Vertex(Point(4, 5), Angle(6))}),
       MaskConfig::automatic(), MaskConfig::manual(Length(123456)),
-      UnsignedLength(123456), FootprintPad::ComponentSide::Top,
-      FootprintPad::Function::TestPad,
+      UnsignedLength(123456), Pad::ComponentSide::Top, Pad::Function::TestPad,
       PadHoleList{std::make_shared<PadHole>(Uuid::createRandom(),
                                             PositiveLength(789),
                                             makeNonEmptyPath(Point(0, 0)))});

@@ -535,10 +535,10 @@ TEST_F(EagleTypeConverterTest, testConvertThtPad) {
   EXPECT_EQ(out.first->getUuid(), out.second->getPackagePadUuid());
   EXPECT_EQ(Point(1000000, 2000000), out.second->getPosition());
   EXPECT_EQ(Angle(0), out.second->getRotation());
-  EXPECT_EQ(FootprintPad::Shape::RoundedRect, out.second->getShape());
+  EXPECT_EQ(Pad::Shape::RoundedRect, out.second->getShape());
   EXPECT_EQ(PositiveLength(2250000), out.second->getWidth());  // 1.5*drill
   EXPECT_EQ(PositiveLength(2250000), out.second->getHeight());  // 1.5*drill
-  EXPECT_EQ(FootprintPad::ComponentSide::Top, out.second->getComponentSide());
+  EXPECT_EQ(Pad::ComponentSide::Top, out.second->getComponentSide());
   ASSERT_EQ(1, out.second->getHoles().count());
   EXPECT_EQ(PositiveLength(1500000),
             out.second->getHoles().first()->getDiameter());
@@ -554,10 +554,10 @@ TEST_F(EagleTypeConverterTest, testConvertThtPadRotated) {
   EXPECT_EQ(out.first->getUuid(), out.second->getPackagePadUuid());
   EXPECT_EQ(Point(1000000, 2000000), out.second->getPosition());
   EXPECT_EQ(Angle(90000000), out.second->getRotation());
-  EXPECT_EQ(FootprintPad::Shape::RoundedOctagon, out.second->getShape());
+  EXPECT_EQ(Pad::Shape::RoundedOctagon, out.second->getShape());
   EXPECT_EQ(PositiveLength(2540000), out.second->getWidth());
   EXPECT_EQ(PositiveLength(2540000), out.second->getHeight());
-  EXPECT_EQ(FootprintPad::ComponentSide::Top, out.second->getComponentSide());
+  EXPECT_EQ(Pad::ComponentSide::Top, out.second->getComponentSide());
   ASSERT_EQ(1, out.second->getHoles().count());
   EXPECT_EQ(PositiveLength(1500000),
             out.second->getHoles().first()->getDiameter());
@@ -571,10 +571,10 @@ TEST_F(EagleTypeConverterTest, testConvertSmtPad) {
   EXPECT_EQ(out.first->getUuid(), out.second->getPackagePadUuid());
   EXPECT_EQ(Point(1000000, 2000000), out.second->getPosition());
   EXPECT_EQ(Angle(0), out.second->getRotation());
-  EXPECT_EQ(FootprintPad::Shape::RoundedRect, out.second->getShape());
+  EXPECT_EQ(Pad::Shape::RoundedRect, out.second->getShape());
   EXPECT_EQ(PositiveLength(3000000), out.second->getWidth());
   EXPECT_EQ(PositiveLength(4000000), out.second->getHeight());
-  EXPECT_EQ(FootprintPad::ComponentSide::Top, out.second->getComponentSide());
+  EXPECT_EQ(Pad::ComponentSide::Top, out.second->getComponentSide());
   EXPECT_EQ(0, out.second->getHoles().count());
 }
 
@@ -587,11 +587,10 @@ TEST_F(EagleTypeConverterTest, testConvertSmtPadRotated) {
   EXPECT_EQ(out.first->getUuid(), out.second->getPackagePadUuid());
   EXPECT_EQ(Point(1000000, 2000000), out.second->getPosition());
   EXPECT_EQ(Angle(90000000), out.second->getRotation());
-  EXPECT_EQ(FootprintPad::Shape::RoundedRect, out.second->getShape());
+  EXPECT_EQ(Pad::Shape::RoundedRect, out.second->getShape());
   EXPECT_EQ(PositiveLength(3000000), out.second->getWidth());
   EXPECT_EQ(PositiveLength(4000000), out.second->getHeight());
-  EXPECT_EQ(FootprintPad::ComponentSide::Bottom,
-            out.second->getComponentSide());
+  EXPECT_EQ(Pad::ComponentSide::Bottom, out.second->getComponentSide());
   EXPECT_EQ(0, out.second->getHoles().count());
 }
 

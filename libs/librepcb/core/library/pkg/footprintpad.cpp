@@ -22,8 +22,6 @@
  ******************************************************************************/
 #include "footprintpad.h"
 
-#include "../../types/layer.h"
-
 #include <QtCore>
 
 /*******************************************************************************
@@ -32,139 +30,13 @@
 namespace librepcb {
 
 /*******************************************************************************
- *  Non-Member Functions
- ******************************************************************************/
-
-template <>
-std::unique_ptr<SExpression> serialize(const FootprintPad::Shape& obj) {
-  switch (obj) {
-    case FootprintPad::Shape::RoundedRect:
-      return SExpression::createToken("roundrect");
-    case FootprintPad::Shape::RoundedOctagon:
-      return SExpression::createToken("octagon");
-    case FootprintPad::Shape::Custom:
-      return SExpression::createToken("custom");
-    default:
-      throw LogicError(__FILE__, __LINE__);
-  }
-}
-
-template <>
-inline FootprintPad::Shape deserialize(const SExpression& node) {
-  const QString str = node.getValue();
-  if (str == QLatin1String("roundrect")) {
-    return FootprintPad::Shape::RoundedRect;
-  } else if (str == QLatin1String("octagon")) {
-    return FootprintPad::Shape::RoundedOctagon;
-  } else if (str == QLatin1String("custom")) {
-    return FootprintPad::Shape::Custom;
-  } else {
-    throw RuntimeError(__FILE__, __LINE__,
-                       QString("Unknown footprint pad shape: '%1'").arg(str));
-  }
-}
-
-template <>
-std::unique_ptr<SExpression> serialize(const FootprintPad::ComponentSide& obj) {
-  switch (obj) {
-    case FootprintPad::ComponentSide::Top:
-      return SExpression::createToken("top");
-    case FootprintPad::ComponentSide::Bottom:
-      return SExpression::createToken("bottom");
-    default:
-      throw LogicError(__FILE__, __LINE__);
-  }
-}
-
-template <>
-inline FootprintPad::ComponentSide deserialize(const SExpression& node) {
-  const QString str = node.getValue();
-  if (str == QLatin1String("top")) {
-    return FootprintPad::ComponentSide::Top;
-  } else if (str == QLatin1String("bottom")) {
-    return FootprintPad::ComponentSide::Bottom;
-  } else {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        QString("Unknown footprint pad component side: '%1'").arg(str));
-  }
-}
-
-template <>
-std::unique_ptr<SExpression> serialize(const FootprintPad::Function& obj) {
-  switch (obj) {
-    case FootprintPad::Function::Unspecified:
-      return SExpression::createToken("unspecified");
-    case FootprintPad::Function::StandardPad:
-      return SExpression::createToken("standard");
-    case FootprintPad::Function::PressFitPad:
-      return SExpression::createToken("pressfit");
-    case FootprintPad::Function::ThermalPad:
-      return SExpression::createToken("thermal");
-    case FootprintPad::Function::BgaPad:
-      return SExpression::createToken("bga");
-    case FootprintPad::Function::EdgeConnectorPad:
-      return SExpression::createToken("edge_connector");
-    case FootprintPad::Function::TestPad:
-      return SExpression::createToken("test");
-    case FootprintPad::Function::LocalFiducial:
-      return SExpression::createToken("local_fiducial");
-    case FootprintPad::Function::GlobalFiducial:
-      return SExpression::createToken("global_fiducial");
-    default:
-      throw LogicError(__FILE__, __LINE__);
-  }
-}
-
-template <>
-inline FootprintPad::Function deserialize(const SExpression& node) {
-  const QString str = node.getValue();
-  if (str == QLatin1String("unspecified")) {
-    return FootprintPad::Function::Unspecified;
-  } else if (str == QLatin1String("standard")) {
-    return FootprintPad::Function::StandardPad;
-  } else if (str == QLatin1String("pressfit")) {
-    return FootprintPad::Function::PressFitPad;
-  } else if (str == QLatin1String("thermal")) {
-    return FootprintPad::Function::ThermalPad;
-  } else if (str == QLatin1String("bga")) {
-    return FootprintPad::Function::BgaPad;
-  } else if (str == QLatin1String("edge_connector")) {
-    return FootprintPad::Function::EdgeConnectorPad;
-  } else if (str == QLatin1String("test")) {
-    return FootprintPad::Function::TestPad;
-  } else if (str == QLatin1String("local_fiducial")) {
-    return FootprintPad::Function::LocalFiducial;
-  } else if (str == QLatin1String("global_fiducial")) {
-    return FootprintPad::Function::GlobalFiducial;
-  } else {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        QString("Unknown footprint pad function: '%1'").arg(str));
-  }
-}
-
-/*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
 FootprintPad::FootprintPad(const FootprintPad& other) noexcept
-  : onEdited(*this),
-    mUuid(other.mUuid),
+  : Pad(other),
+    onEdited(*this),
     mPackagePadUuid(other.mPackagePadUuid),
-    mPosition(other.mPosition),
-    mRotation(other.mRotation),
-    mShape(other.mShape),
-    mWidth(other.mWidth),
-    mHeight(other.mHeight),
-    mRadius(other.mRadius),
-    mCustomShapeOutline(other.mCustomShapeOutline),
-    mStopMaskConfig(other.mStopMaskConfig),
-    mSolderPasteConfig(other.mSolderPasteConfig),
-    mCopperClearance(other.mCopperClearance),
-    mComponentSide(other.mComponentSide),
-    mFunction(other.mFunction),
-    mHoles(other.mHoles),
     mHolesEditedSlot(*this, &FootprintPad::holesEdited) {
   mHoles.onEdited.attach(mHolesEditedSlot);
 }
@@ -176,172 +48,24 @@ FootprintPad::FootprintPad(
     const Path& customShapeOutline, const MaskConfig& autoStopMask,
     const MaskConfig& autoSolderPaste, const UnsignedLength& copperClearance,
     ComponentSide side, Function function, const PadHoleList& holes) noexcept
-  : onEdited(*this),
-    mUuid(uuid),
+  : Pad(uuid, pos, rot, shape, width, height, radius, customShapeOutline,
+        autoStopMask, autoSolderPaste, copperClearance, side, function, holes),
+    onEdited(*this),
     mPackagePadUuid(pkgPadUuid),
-    mPosition(pos),
-    mRotation(rot),
-    mShape(shape),
-    mWidth(width),
-    mHeight(height),
-    mRadius(radius),
-    mCustomShapeOutline(customShapeOutline),
-    mStopMaskConfig(autoStopMask),
-    mSolderPasteConfig(autoSolderPaste),
-    mCopperClearance(copperClearance),
-    mComponentSide(side),
-    mFunction(function),
-    mHoles(holes),
     mHolesEditedSlot(*this, &FootprintPad::holesEdited) {
   mHoles.onEdited.attach(mHolesEditedSlot);
 }
 
 FootprintPad::FootprintPad(const SExpression& node)
-  : onEdited(*this),
-    mUuid(deserialize<Uuid>(node.getChild("@0"))),
+  : Pad(node),
+    onEdited(*this),
     mPackagePadUuid(
         deserialize<std::optional<Uuid>>(node.getChild("package_pad/@0"))),
-    mPosition(node.getChild("position")),
-    mRotation(deserialize<Angle>(node.getChild("rotation/@0"))),
-    mShape(deserialize<Shape>(node.getChild("shape/@0"))),
-    mWidth(deserialize<PositiveLength>(node.getChild("size/@0"))),
-    mHeight(deserialize<PositiveLength>(node.getChild("size/@1"))),
-    mRadius(deserialize<UnsignedLimitedRatio>(node.getChild("radius/@0"))),
-    mCustomShapeOutline(node),
-    mStopMaskConfig(deserialize<MaskConfig>(node.getChild("stop_mask/@0"))),
-    mSolderPasteConfig(
-        deserialize<MaskConfig>(node.getChild("solder_paste/@0"))),
-    mCopperClearance(
-        deserialize<UnsignedLength>(node.getChild("clearance/@0"))),
-    mComponentSide(deserialize<ComponentSide>(node.getChild("side/@0"))),
-    mFunction(deserialize<Function>(node.getChild("function/@0"))),
-    mHoles(node),
     mHolesEditedSlot(*this, &FootprintPad::holesEdited) {
   mHoles.onEdited.attach(mHolesEditedSlot);
 }
 
 FootprintPad::~FootprintPad() noexcept {
-}
-
-/*******************************************************************************
- *  Getters
- ******************************************************************************/
-
-bool FootprintPad::getFunctionIsFiducial() const noexcept {
-  return (mFunction == Function::LocalFiducial) ||
-      (mFunction == Function::GlobalFiducial);
-}
-
-bool FootprintPad::getFunctionNeedsSoldering() const noexcept {
-  switch (mFunction) {
-    case Function::EdgeConnectorPad:
-    case Function::TestPad:
-    case Function::LocalFiducial:
-    case Function::GlobalFiducial:
-      return false;
-    default:
-      return true;
-  }
-}
-
-bool FootprintPad::isTht() const noexcept {
-  return !mHoles.isEmpty();
-}
-
-bool FootprintPad::isOnLayer(const Layer& layer) const noexcept {
-  if (isTht()) {
-    return layer.isCopper();
-  } else {
-    return (layer == getSmtLayer());
-  }
-}
-
-const Layer& FootprintPad::getSmtLayer() const noexcept {
-  if (mComponentSide == ComponentSide::Bottom) {
-    return Layer::botCopper();
-  } else {
-    return Layer::topCopper();
-  }
-}
-
-bool FootprintPad::hasTopCopper() const noexcept {
-  return isTht() || (mComponentSide == ComponentSide::Top);
-}
-
-bool FootprintPad::hasBottomCopper() const noexcept {
-  return isTht() || (mComponentSide == ComponentSide::Bottom);
-}
-
-bool FootprintPad::hasAutoTopStopMask() const noexcept {
-  return mStopMaskConfig.isEnabled() &&
-      (isTht() || (mComponentSide == ComponentSide::Top));
-}
-
-bool FootprintPad::hasAutoBottomStopMask() const noexcept {
-  return mStopMaskConfig.isEnabled() &&
-      (isTht() || (mComponentSide == ComponentSide::Bottom));
-}
-
-bool FootprintPad::hasAutoTopSolderPaste() const noexcept {
-  return mSolderPasteConfig.isEnabled() &&
-      (isTht() != (mComponentSide == ComponentSide::Top));
-}
-
-bool FootprintPad::hasAutoBottomSolderPaste() const noexcept {
-  return mSolderPasteConfig.isEnabled() &&
-      (isTht() != (mComponentSide == ComponentSide::Bottom));
-}
-
-PadGeometry FootprintPad::getGeometry() const noexcept {
-  switch (mShape) {
-    case Shape::RoundedRect:
-      return PadGeometry::roundedRect(mWidth, mHeight, mRadius, mHoles);
-    case Shape::RoundedOctagon:
-      return PadGeometry::roundedOctagon(mWidth, mHeight, mRadius, mHoles);
-    case Shape::Custom:
-      return PadGeometry::custom(mCustomShapeOutline, mHoles);
-    default:
-      qCritical() << "Unhandled switch-case in FootprintPad::getGeometry():"
-                  << static_cast<int>(mShape);
-      Q_ASSERT(false);
-      return PadGeometry::roundedRect(mWidth, mHeight, mRadius, mHoles);
-  }
-}
-
-QHash<const Layer*, QList<PadGeometry>> FootprintPad::buildPreviewGeometries()
-    const noexcept {
-  const PadGeometry geometry = getGeometry();
-  const Length stopMaskOffset = getStopMaskConfig().getOffset()
-      ? *getStopMaskConfig().getOffset()
-      : Length(100000);
-  const Length solderPasteOffset = getSolderPasteConfig().getOffset()
-      ? *getSolderPasteConfig().getOffset()
-      : Length(100000);
-
-  QHash<const Layer*, QList<PadGeometry>> geometries;
-  if (hasTopCopper()) {
-    geometries.insert(&Layer::topCopper(), {geometry});
-  }
-  if (hasAutoTopStopMask()) {
-    geometries.insert(&Layer::topStopMask(),
-                      {geometry.withOffset(stopMaskOffset)});
-  }
-  if (hasAutoTopSolderPaste()) {
-    geometries.insert(&Layer::topSolderPaste(),
-                      {geometry.withOffset(-solderPasteOffset)});
-  }
-  if (hasBottomCopper()) {
-    geometries.insert(&Layer::botCopper(), {geometry});
-  }
-  if (hasAutoBottomStopMask()) {
-    geometries.insert(&Layer::botStopMask(),
-                      {geometry.withOffset(stopMaskOffset)});
-  }
-  if (hasAutoBottomSolderPaste()) {
-    geometries.insert(&Layer::botSolderPaste(),
-                      {geometry.withOffset(-solderPasteOffset)});
-  }
-  return geometries;
 }
 
 /*******************************************************************************
@@ -355,16 +79,6 @@ bool FootprintPad::setPosition(const Point& pos) noexcept {
 
   mPosition = pos;
   onEdited.notify(Event::PositionChanged);
-  return true;
-}
-
-bool FootprintPad::setPackagePadUuid(const std::optional<Uuid>& pad) noexcept {
-  if (pad == mPackagePadUuid) {
-    return false;
-  }
-
-  mPackagePadUuid = pad;
-  onEdited.notify(Event::PackagePadUuidChanged);
   return true;
 }
 
@@ -479,6 +193,16 @@ bool FootprintPad::setFunction(Function function) noexcept {
   return true;
 }
 
+bool FootprintPad::setPackagePadUuid(const std::optional<Uuid>& pad) noexcept {
+  if (pad == mPackagePadUuid) {
+    return false;
+  }
+
+  mPackagePadUuid = pad;
+  onEdited.notify(Event::PackagePadUuidChanged);
+  return true;
+}
+
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
@@ -511,21 +235,8 @@ void FootprintPad::serialize(SExpression& root) const {
  ******************************************************************************/
 
 bool FootprintPad::operator==(const FootprintPad& rhs) const noexcept {
-  if (mUuid != rhs.mUuid) return false;
+  if (Pad::operator!=(rhs)) return false;
   if (mPackagePadUuid != rhs.mPackagePadUuid) return false;
-  if (mPosition != rhs.mPosition) return false;
-  if (mRotation != rhs.mRotation) return false;
-  if (mShape != rhs.mShape) return false;
-  if (mWidth != rhs.mWidth) return false;
-  if (mHeight != rhs.mHeight) return false;
-  if (mRadius != rhs.mRadius) return false;
-  if (mCustomShapeOutline != rhs.mCustomShapeOutline) return false;
-  if (mStopMaskConfig != rhs.mStopMaskConfig) return false;
-  if (mSolderPasteConfig != rhs.mSolderPasteConfig) return false;
-  if (mCopperClearance != rhs.mCopperClearance) return false;
-  if (mComponentSide != rhs.mComponentSide) return false;
-  if (mFunction != rhs.mFunction) return false;
-  if (mHoles != rhs.mHoles) return false;
   return true;
 }
 
@@ -534,7 +245,6 @@ FootprintPad& FootprintPad::operator=(const FootprintPad& rhs) noexcept {
     mUuid = rhs.mUuid;
     onEdited.notify(Event::UuidChanged);
   }
-  setPackagePadUuid(rhs.mPackagePadUuid);
   setPosition(rhs.mPosition);
   setRotation(rhs.mRotation);
   setShape(rhs.mShape);
@@ -548,50 +258,8 @@ FootprintPad& FootprintPad::operator=(const FootprintPad& rhs) noexcept {
   setComponentSide(rhs.mComponentSide);
   setFunction(rhs.mFunction);
   mHoles = rhs.mHoles;
+  setPackagePadUuid(rhs.mPackagePadUuid);
   return *this;
-}
-
-/*******************************************************************************
- *  Static Methods
- ******************************************************************************/
-
-UnsignedLimitedRatio FootprintPad::getRecommendedRadius(
-    const PositiveLength& width, const PositiveLength& height) noexcept {
-  // Use 50% ratio, but maximum 0.25mm as recommended by IPC7351C.
-  const PositiveLength size = std::min(width, height);
-  Ratio maxRadius = Ratio::fromNormalized(qreal(0.5) / size->toMm());
-  maxRadius /= Ratio::fromPercent(1);
-  maxRadius *= Ratio::fromPercent(1);
-  return UnsignedLimitedRatio(
-      qBound(Ratio::fromPercent(0), maxRadius, Ratio::fromPercent(50)));
-}
-
-QString FootprintPad::getFunctionDescriptionTr(Function function) noexcept {
-  switch (function) {
-    case Function::Unspecified:
-      return tr("Not Specified");
-    case Function::StandardPad:
-      return tr("Standard Pad (soldered)");
-    case Function::PressFitPad:
-      return tr("Press-Fit Pad (THT, soldered)");
-    case Function::ThermalPad:
-      return tr("Thermal Pad (SMT, soldered)");
-    case Function::BgaPad:
-      return tr("BGA Pad (SMT, soldered)");
-    case Function::EdgeConnectorPad:
-      return tr("Edge Connector Pad (SMT, no soldering)");
-    case Function::TestPad:
-      return tr("Test Pad (SMT, no soldering)");
-    case Function::LocalFiducial:
-      return tr("Local Footprint Fiducial (SMT, no soldering)");
-    case Function::GlobalFiducial:
-      return tr("Global Board Fiducial (SMT, no soldering)");
-    default:
-      qCritical() << "Unhandled switch-case in "
-                     "FootprintPad::getFunctionDescriptionTr():"
-                  << static_cast<int>(function);
-      return QString();
-  }
 }
 
 /*******************************************************************************

@@ -43,12 +43,12 @@ namespace editor {
  ******************************************************************************/
 
 PackageEditorState_AddPads::PackageEditorState_AddPads(
-    Context& context, PadType type, FootprintPad::Function function) noexcept
+    Context& context, PadType type, Pad::Function function) noexcept
   : PackageEditorState(context),
     mPadType(type),
     mCurrentProperties(
         Uuid::createRandom(), std::nullopt, Point(0, 0), Angle::deg0(),
-        FootprintPad::Shape::RoundedRect,  // Commonly used pad shape
+        Pad::Shape::RoundedRect,  // Commonly used pad shape
         PositiveLength(2500000),  // There is no default/recommended pad size
         PositiveLength(1300000),  // -> choose reasonable multiple of 0.1mm
         UnsignedLimitedRatio(Ratio::fromPercent(100)),  // Rounded pad
@@ -56,7 +56,7 @@ PackageEditorState_AddPads::PackageEditorState_AddPads(
         MaskConfig::automatic(),  // Stop mask
         MaskConfig::off(),  // Solder paste
         UnsignedLength(0),  // Copper clearance
-        FootprintPad::ComponentSide::Top,  // Default side
+        Pad::ComponentSide::Top,  // Default side
         function,  // Supplied by library editor
         PadHoleList{}),
     mCurrentPad(nullptr),
@@ -67,32 +67,32 @@ PackageEditorState_AddPads::PackageEditorState_AddPads(
     mCurrentProperties.setHeight(PositiveLength(700000));
     mCurrentProperties.setSolderPasteConfig(MaskConfig::automatic());
     switch (function) {
-      case FootprintPad::Function::ThermalPad:
+      case Pad::Function::ThermalPad:
         mCurrentProperties.setRadius(
             UnsignedLimitedRatio(Ratio::fromPercent(0)));
         mCurrentProperties.setWidth(PositiveLength(2000000));
         mCurrentProperties.setHeight(PositiveLength(2000000));
         break;
-      case FootprintPad::Function::BgaPad:
+      case Pad::Function::BgaPad:
         mCurrentProperties.setRadius(
             UnsignedLimitedRatio(Ratio::fromPercent(100)));
         mCurrentProperties.setWidth(PositiveLength(300000));
         mCurrentProperties.setHeight(PositiveLength(300000));
         break;
-      case FootprintPad::Function::EdgeConnectorPad:
+      case Pad::Function::EdgeConnectorPad:
         mCurrentProperties.setRadius(
             UnsignedLimitedRatio(Ratio::fromPercent(0)));
         mCurrentProperties.setSolderPasteConfig(MaskConfig::off());
         break;
-      case FootprintPad::Function::TestPad:
+      case Pad::Function::TestPad:
         mCurrentProperties.setRadius(
             UnsignedLimitedRatio(Ratio::fromPercent(100)));
         mCurrentProperties.setWidth(PositiveLength(700000));
         mCurrentProperties.setHeight(PositiveLength(700000));
         mCurrentProperties.setSolderPasteConfig(MaskConfig::off());
         break;
-      case FootprintPad::Function::LocalFiducial:
-      case FootprintPad::Function::GlobalFiducial:
+      case Pad::Function::LocalFiducial:
+      case Pad::Function::GlobalFiducial:
         mCurrentProperties.setRadius(
             UnsignedLimitedRatio(Ratio::fromPercent(100)));
         mCurrentProperties.setWidth(PositiveLength(1000000));
@@ -206,7 +206,7 @@ void PackageEditorState_AddPads::setPackagePad(
 }
 
 void PackageEditorState_AddPads::setComponentSide(
-    FootprintPad::ComponentSide side) noexcept {
+    Pad::ComponentSide side) noexcept {
   if (mCurrentProperties.setComponentSide(side)) {
     emit componentSideChanged(mCurrentProperties.getComponentSide());
   }
@@ -217,7 +217,7 @@ void PackageEditorState_AddPads::setComponentSide(
   }
 }
 
-void PackageEditorState_AddPads::setShape(FootprintPad::Shape shape) noexcept {
+void PackageEditorState_AddPads::setShape(Pad::Shape shape) noexcept {
   if (mCurrentProperties.setShape(shape)) {
     emit shapeChanged(mCurrentProperties.getShape());
     applyRecommendedRoundedRectRadius();
@@ -323,8 +323,7 @@ void PackageEditorState_AddPads::setStopMaskConfig(
   }
 }
 
-void PackageEditorState_AddPads::setFunction(
-    FootprintPad::Function function) noexcept {
+void PackageEditorState_AddPads::setFunction(Pad::Function function) noexcept {
   if (mCurrentProperties.setFunction(function)) {
     emit functionChanged(mCurrentProperties.getFunction());
   }
