@@ -165,7 +165,7 @@ private:
    * @brief Abort or cancel the current drawing of the trace.
    * @param showErrMsgBox When true, show an error message in a pop-up box.
    */
-  bool abortPositioning(bool showErrMsgBox) noexcept;
+  bool abortPositioning(bool showErrMsgBox, bool simplifySegment) noexcept;
 
   /**
    * @brief Update the currently active traces according
