@@ -67,8 +67,8 @@ void BoardNetSegmentSplitter::addVia(const Via& via,
 
 void BoardNetSegmentSplitter::addTrace(const Trace& trace) noexcept {
   std::shared_ptr<Trace> copy = std::make_shared<Trace>(trace);
-  copy->setStartPoint(replaceAnchor(copy->getStartPoint(), copy->getLayer()));
-  copy->setEndPoint(replaceAnchor(copy->getEndPoint(), copy->getLayer()));
+  copy->setAnchors(replaceAnchor(copy->getP1(), copy->getLayer()),
+                   replaceAnchor(copy->getP2(), copy->getLayer()));
   mTraces.append(copy);
 }
 
@@ -83,8 +83,8 @@ QList<BoardNetSegmentSplitter::Segment>
   QList<std::shared_ptr<Trace>> availableTraces = mTraces.values();
   while (!availableTraces.isEmpty()) {
     Segment segment;
-    findConnectedLinesAndPoints(availableTraces.first()->getStartPoint(),
-                                availableVias, availableTraces, segment);
+    findConnectedLinesAndPoints(availableTraces.first()->getP1(), availableVias,
+                                availableTraces, segment);
     segments.append(segment);
   }
   Q_ASSERT(availableTraces.isEmpty());
@@ -141,15 +141,14 @@ void BoardNetSegmentSplitter::findConnectedLinesAndPoints(
   }
   for (int i = 0; i < mTraces.count(); ++i) {
     std::shared_ptr<Trace> trace = mTraces.value(i);
-    if (((trace->getStartPoint() == anchor) ||
-         (trace->getEndPoint() == anchor)) &&
+    if (((trace->getP1() == anchor) || (trace->getP2() == anchor)) &&
         availableTraces.contains(trace) &&
         (!segment.traces.contains(trace.get()))) {
       segment.traces.append(trace);
       availableTraces.removeOne(trace);
-      findConnectedLinesAndPoints(trace->getStartPoint(), availableVias,
+      findConnectedLinesAndPoints(trace->getP1(), availableVias,
                                   availableTraces, segment);
-      findConnectedLinesAndPoints(trace->getEndPoint(), availableVias,
+      findConnectedLinesAndPoints(trace->getP2(), availableVias,
                                   availableTraces, segment);
     }
   }

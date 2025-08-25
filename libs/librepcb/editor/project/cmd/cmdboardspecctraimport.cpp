@@ -285,8 +285,8 @@ bool CmdBoardSpecctraImport::performExecute() {
   };
   struct OldTrace {
     Uuid uuid;
-    Point start;
-    Point end;
+    Point p1;
+    Point p2;
     const Layer* layer;
     Length width;
   };
@@ -306,9 +306,9 @@ bool CmdBoardSpecctraImport::performExecute() {
                                           np->getLayerOfTraces()});
     }
     foreach (const BI_NetLine* nl, seg->getNetLines()) {
-      oldSeg.traces.append(OldTrace{
-          nl->getUuid(), nl->getStartPoint().getPosition(),
-          nl->getEndPoint().getPosition(), &nl->getLayer(), *nl->getWidth()});
+      oldSeg.traces.append(OldTrace{nl->getUuid(), nl->getP1().getPosition(),
+                                    nl->getP2().getPosition(), &nl->getLayer(),
+                                    *nl->getWidth()});
     }
     foreach (const BI_Via* via, seg->getVias()) {
       oldSeg.vias.append(via->getVia());
@@ -335,17 +335,17 @@ bool CmdBoardSpecctraImport::performExecute() {
     ++newUuids;
     return std::optional<OldJunction>();
   };
-  auto findNetLineImpl = [&](const NetSignal* net, Point start, Point end,
+  auto findNetLineImpl = [&](const NetSignal* net, Point p1, Point p2,
                              const Layer& layer,
                              const std::optional<Length>& width) {
-    if (start > end) std::swap(start, end);
+    if (p1 > p2) std::swap(p1, p2);
     for (const OldSegment& seg : oldSegments) {
       if (seg.net == net) {
         for (const OldTrace& nl : seg.traces) {
-          Point nlStart = nl.start;
-          Point nlEnd = nl.end;
-          if (nlStart > nlEnd) std::swap(nlStart, nlEnd);
-          if (fuzzyCompare(nlStart, start) && fuzzyCompare(nlEnd, end) &&
+          Point nlP1 = nl.p1;
+          Point nlP2 = nl.p2;
+          if (nlP1 > nlP2) std::swap(nlP1, nlP2);
+          if (fuzzyCompare(nlP1, p1) && fuzzyCompare(nlP2, p2) &&
               (nl.layer == &layer) && ((!width) || (nl.width == *width)) &&
               (!reusedUuids.contains(nl.uuid))) {
             reusedUuids.insert(nl.uuid);
@@ -356,14 +356,13 @@ bool CmdBoardSpecctraImport::performExecute() {
     }
     return std::optional<OldTrace>();
   };
-  auto findNetLine = [&](const NetSignal* net, Point start, Point end,
+  auto findNetLine = [&](const NetSignal* net, Point p1, Point p2,
                          const Layer& layer, const Length& width) {
     // First try to match including trace width, then ignore it because it
     // might have been changed during the DSN -> SES roundtrip.
-    if (auto nl = findNetLineImpl(net, start, end, layer, width)) {
+    if (auto nl = findNetLineImpl(net, p1, p2, layer, width)) {
       return nl;
-    } else if (auto nl =
-                   findNetLineImpl(net, start, end, layer, std::nullopt)) {
+    } else if (auto nl = findNetLineImpl(net, p1, p2, layer, std::nullopt)) {
       return nl;
     } else {
       ++newUuids;
@@ -606,7 +605,7 @@ bool CmdBoardSpecctraImport::performExecute() {
         Point p1 = wire.path.getVertices().at(i).getPos();
         const std::optional<OldTrace> oldNl =
             findNetLine(netSignal, p0, p1, *wire.layer, wire.width);
-        if (oldNl && (!fuzzyCompare(oldNl->start, p0))) {
+        if (oldNl && (!fuzzyCompare(oldNl->p1, p0))) {
           std::swap(p0, p1);  // Avoid change in file format.
         }
         splitter.addTrace(Trace(oldNl ? oldNl->uuid : Uuid::createRandom(),
@@ -655,37 +654,34 @@ bool CmdBoardSpecctraImport::performExecute() {
         netPointMap.insert(junction.getUuid(), netpoint);
       }
       for (const Trace& trace : segment.traces) {
-        BI_NetLineAnchor* start = nullptr;
-        if (std::optional<Uuid> anchor =
-                trace.getStartPoint().tryGetJunction()) {
-          start = netPointMap[*anchor];
-        } else if (std::optional<Uuid> anchor =
-                       trace.getStartPoint().tryGetVia()) {
-          start = viaMap[*anchor];
+        BI_NetLineAnchor* p1 = nullptr;
+        if (std::optional<Uuid> anchor = trace.getP1().tryGetJunction()) {
+          p1 = netPointMap[*anchor];
+        } else if (std::optional<Uuid> anchor = trace.getP1().tryGetVia()) {
+          p1 = viaMap[*anchor];
         } else if (std::optional<TraceAnchor::PadAnchor> anchor =
-                       trace.getStartPoint().tryGetPad()) {
+                       trace.getP1().tryGetPad()) {
           BI_Device* device =
               mBoard.getDeviceInstanceByComponentUuid(anchor->device);
-          start = device ? device->getPad(anchor->pad) : nullptr;
+          p1 = device ? device->getPad(anchor->pad) : nullptr;
         }
-        BI_NetLineAnchor* end = nullptr;
-        if (std::optional<Uuid> anchor = trace.getEndPoint().tryGetJunction()) {
-          end = netPointMap[*anchor];
-        } else if (std::optional<Uuid> anchor =
-                       trace.getEndPoint().tryGetVia()) {
-          end = viaMap[*anchor];
+        BI_NetLineAnchor* p2 = nullptr;
+        if (std::optional<Uuid> anchor = trace.getP2().tryGetJunction()) {
+          p2 = netPointMap[*anchor];
+        } else if (std::optional<Uuid> anchor = trace.getP2().tryGetVia()) {
+          p2 = viaMap[*anchor];
         } else if (std::optional<TraceAnchor::PadAnchor> anchor =
-                       trace.getEndPoint().tryGetPad()) {
+                       trace.getP2().tryGetPad()) {
           BI_Device* device =
               mBoard.getDeviceInstanceByComponentUuid(anchor->device);
-          end = device ? device->getPad(anchor->pad) : nullptr;
+          p2 = device ? device->getPad(anchor->pad) : nullptr;
         }
-        if ((!start) || (!end)) {
+        if ((!p1) || (!p2)) {
           throw LogicError(__FILE__, __LINE__);
         }
         BI_NetLine* netline =
-            new BI_NetLine(*copy, trace.getUuid(), *start, *end,
-                           trace.getLayer(), trace.getWidth());
+            new BI_NetLine(*copy, trace.getUuid(), *p1, *p2, trace.getLayer(),
+                           trace.getWidth());
         cmdAddElements->addNetLine(*netline);
       }
       execNewChildCmd(cmdAddElements.release());

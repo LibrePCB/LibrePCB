@@ -77,11 +77,11 @@ BI_NetLine* CmdBoardNetSegmentAddElements::addNetLine(BI_NetLine& netline) {
 }
 
 BI_NetLine* CmdBoardNetSegmentAddElements::addNetLine(
-    BI_NetLineAnchor& startPoint, BI_NetLineAnchor& endPoint,
-    const Layer& layer, const PositiveLength& width) {
-  BI_NetLine* netline = new BI_NetLine(mNetSegment, Uuid::createRandom(),
-                                       startPoint, endPoint, layer,
-                                       width);  // can throw
+    BI_NetLineAnchor& a, BI_NetLineAnchor& b, const Layer& layer,
+    const PositiveLength& width) {
+  BI_NetLine* netline =
+      new BI_NetLine(mNetSegment, Uuid::createRandom(), a, b, layer,
+                     width);  // can throw
   return addNetLine(*netline);
 }
 

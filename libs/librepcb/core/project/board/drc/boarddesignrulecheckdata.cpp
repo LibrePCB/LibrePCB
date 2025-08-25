@@ -83,8 +83,8 @@ BoardDesignRuleCheckData::BoardDesignRuleCheckData(
                                     np->getNetLines().count()});
     }
     foreach (const BI_NetLine* nl, ns->getNetLines()) {
-      nsd.traces.append(Trace{nl->getUuid(), nl->getStartPoint().getPosition(),
-                              nl->getEndPoint().getPosition(), nl->getWidth(),
+      nsd.traces.append(Trace{nl->getUuid(), nl->getP1().getPosition(),
+                              nl->getP2().getPosition(), nl->getWidth(),
                               &nl->getLayer()});
     }
     foreach (const BI_Via* biVia, ns->getVias()) {

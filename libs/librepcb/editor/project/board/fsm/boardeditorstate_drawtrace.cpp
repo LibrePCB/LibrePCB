@@ -426,8 +426,8 @@ bool BoardEditorState_DrawTrace::startPositioning(
       layer = &netline->getNetLine().getLayer();
       // get closest point on the netline
       Point posOnNetline = Toolbox::nearestPointOnLine(
-          posOnGrid, netline->getNetLine().getStartPoint().getPosition(),
-          netline->getNetLine().getEndPoint().getPosition());
+          posOnGrid, netline->getNetLine().getP1().getPosition(),
+          netline->getNetLine().getP2().getPosition());
       std::unique_ptr<CmdBoardSplitNetLine> cmdSplit(
           new CmdBoardSplitNetLine(netline->getNetLine(), posOnNetline));
       mFixedStartAnchor = cmdSplit->getSplitPoint();
@@ -556,8 +556,8 @@ bool BoardEditorState_DrawTrace::addNextNetPoint(
     }
     foreach (auto item, items) {
       if (auto netLine = std::dynamic_pointer_cast<BGI_NetLine>(item)) {
-        if (otherAnchors.contains(&netLine->getNetLine().getStartPoint()) ||
-            otherAnchors.contains(&netLine->getNetLine().getEndPoint())) {
+        if (otherAnchors.contains(&netLine->getNetLine().getP1()) ||
+            otherAnchors.contains(&netLine->getNetLine().getP2())) {
           continue;
         }
         // TODO(5n8ke): does snapping need to be handled?
@@ -743,8 +743,8 @@ void BoardEditorState_DrawTrace::updateNetpointPositions() noexcept {
     } else if (auto netline = std::dynamic_pointer_cast<BGI_NetLine>(item)) {
       // Get closest point on the netline.
       mTargetPos = Toolbox::nearestPointOnLine(
-          mTargetPos, netline->getNetLine().getStartPoint().getPosition(),
-          netline->getNetLine().getEndPoint().getPosition());
+          mTargetPos, netline->getNetLine().getP1().getPosition(),
+          netline->getNetLine().getP2().getPosition());
     }
   }
 

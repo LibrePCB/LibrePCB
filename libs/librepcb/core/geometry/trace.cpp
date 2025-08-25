@@ -78,6 +78,31 @@ bool TraceAnchor::operator==(const TraceAnchor& rhs) const noexcept {
       (mPad == rhs.mPad);
 }
 
+bool TraceAnchor::operator<(const TraceAnchor& rhs) const noexcept {
+  // Note: This operator is relevant for the file format, do not modify
+  // unless you know exactly what you're doing!
+  if (mJunction.has_value() != rhs.mJunction.has_value()) {
+    return rhs.mJunction.has_value();
+  } else if (mVia.has_value() != rhs.mVia.has_value()) {
+    return rhs.mVia.has_value();
+  } else if (mPad.has_value() != rhs.mPad.has_value()) {
+    return rhs.mPad.has_value();
+  } else if (mJunction) {
+    return (*mJunction) < (*rhs.mJunction);
+  } else if (mVia) {
+    return (*mVia) < (*rhs.mVia);
+  } else if (mPad) {
+    if (mPad->device != rhs.mPad->device) {
+      return mPad->device < rhs.mPad->device;
+    } else {
+      return mPad->pad < rhs.mPad->pad;
+    }
+  } else {
+    qWarning() << "Unhandled branch in TraceAnchor::operator<().";
+    return false;
+  }
+}
+
 TraceAnchor& TraceAnchor::operator=(const TraceAnchor& rhs) noexcept {
   mJunction = rhs.mJunction;
   mVia = rhs.mVia;
@@ -106,8 +131,8 @@ Trace::Trace(const Trace& other) noexcept
     mUuid(other.mUuid),
     mLayer(other.mLayer),
     mWidth(other.mWidth),
-    mStart(other.mStart),
-    mEnd(other.mEnd) {
+    mP1(other.mP1),
+    mP2(other.mP2) {
 }
 
 Trace::Trace(const Uuid& uuid, const Trace& other) noexcept : Trace(other) {
@@ -115,13 +140,14 @@ Trace::Trace(const Uuid& uuid, const Trace& other) noexcept : Trace(other) {
 }
 
 Trace::Trace(const Uuid& uuid, const Layer& layer, const PositiveLength& width,
-             const TraceAnchor& start, const TraceAnchor& end) noexcept
+             const TraceAnchor& a, const TraceAnchor& b) noexcept
   : onEdited(*this),
     mUuid(uuid),
     mLayer(&layer),
     mWidth(width),
-    mStart(start),
-    mEnd(end) {
+    mP1(a),
+    mP2(b) {
+  normalizeAnchors(mP1, mP2);
 }
 
 Trace::Trace(const SExpression& node)
@@ -129,8 +155,9 @@ Trace::Trace(const SExpression& node)
     mUuid(deserialize<Uuid>(node.getChild("@0"))),
     mLayer(deserialize<const Layer*>(node.getChild("layer/@0"))),
     mWidth(deserialize<PositiveLength>(node.getChild("width/@0"))),
-    mStart(node.getChild("from")),
-    mEnd(node.getChild("to")) {
+    mP1(node.getChild("from")),
+    mP2(node.getChild("to")) {
+  normalizeAnchors(mP1, mP2);
 }
 
 Trace::~Trace() noexcept {
@@ -170,23 +197,15 @@ bool Trace::setWidth(const PositiveLength& width) noexcept {
   return true;
 }
 
-bool Trace::setStartPoint(const TraceAnchor& start) noexcept {
-  if (start == mStart) {
+bool Trace::setAnchors(TraceAnchor a, TraceAnchor b) noexcept {
+  normalizeAnchors(a, b);
+  if ((a == mP1) && (b == mP2)) {
     return false;
   }
 
-  mStart = start;
-  onEdited.notify(Event::StartPointChanged);
-  return true;
-}
-
-bool Trace::setEndPoint(const TraceAnchor& end) noexcept {
-  if (end == mEnd) {
-    return false;
-  }
-
-  mEnd = end;
-  onEdited.notify(Event::EndPointChanged);
+  mP1 = a;
+  mP2 = b;
+  onEdited.notify(Event::AnchorsChanged);
   return true;
 }
 
@@ -199,9 +218,9 @@ void Trace::serialize(SExpression& root) const {
   root.appendChild("layer", *mLayer);
   root.appendChild("width", mWidth);
   root.ensureLineBreak();
-  mStart.serialize(root.appendList("from"));
+  mP1.serialize(root.appendList("from"));
   root.ensureLineBreak();
-  mEnd.serialize(root.appendList("to"));
+  mP2.serialize(root.appendList("to"));
   root.ensureLineBreak();
 }
 
@@ -213,8 +232,8 @@ bool Trace::operator==(const Trace& rhs) const noexcept {
   if (mUuid != rhs.mUuid) return false;
   if (mLayer != rhs.mLayer) return false;
   if (mWidth != rhs.mWidth) return false;
-  if (mStart != rhs.mStart) return false;
-  if (mEnd != rhs.mEnd) return false;
+  if (mP1 != rhs.mP1) return false;
+  if (mP2 != rhs.mP2) return false;
   return true;
 }
 
@@ -222,9 +241,18 @@ Trace& Trace::operator=(const Trace& rhs) noexcept {
   setUuid(rhs.mUuid);
   setLayer(*rhs.mLayer);
   setWidth(rhs.mWidth);
-  setStartPoint(rhs.mStart);
-  setEndPoint(rhs.mEnd);
+  setAnchors(rhs.mP1, rhs.mP2);
   return *this;
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+void Trace::normalizeAnchors(TraceAnchor& start, TraceAnchor& end) noexcept {
+  if (end < start) {
+    std::swap(start, end);
+  }
 }
 
 /*******************************************************************************

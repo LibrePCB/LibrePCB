@@ -268,10 +268,9 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
     }
     for (const BI_NetLine* netline : segment->getNetLines()) {
       if (layers.contains(&netline->getLayer())) {
-        data->traces.append(TraceData{&netline->getLayer(), netSignalUuid,
-                                      netline->getStartPoint().getPosition(),
-                                      netline->getEndPoint().getPosition(),
-                                      netline->getWidth()});
+        data->traces.append(TraceData{
+            &netline->getLayer(), netSignalUuid, netline->getP1().getPosition(),
+            netline->getP2().getPosition(), netline->getWidth()});
       }
     }
   }

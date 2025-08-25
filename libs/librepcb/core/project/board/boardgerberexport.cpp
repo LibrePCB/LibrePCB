@@ -703,11 +703,10 @@ void BoardGerberExport::drawLayerExceptDevices(GerberGenerator& gen,
     foreach (const BI_NetLine* netline, netsegment->getNetLines()) {
       Q_ASSERT(netline);
       if (netline->getLayer() == layer) {
-        gen.drawLine(netline->getStartPoint().getPosition(),
-                     netline->getEndPoint().getPosition(),
-                     positiveToUnsigned(netline->getWidth()),
-                     GerberAttribute::ApertureFunction::Conductor, net,
-                     QString());
+        gen.drawLine(
+            netline->getP1().getPosition(), netline->getP2().getPosition(),
+            positiveToUnsigned(netline->getWidth()),
+            GerberAttribute::ApertureFunction::Conductor, net, QString());
       }
     }
   }

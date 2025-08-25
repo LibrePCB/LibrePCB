@@ -1622,8 +1622,7 @@ RuleCheckMessageList BoardDesignRuleCheck::checkZones(const Data& data) {
       // Check traces.
       for (const Data::Trace& trace : ns.traces) {
         if (noCopperLayers.contains(trace.layer)) {
-          const Path area = Path::obround(trace.startPosition,
-                                          trace.endPosition, trace.width);
+          const Path area = Path::obround(trace.p1, trace.p2, trace.width);
           const QPainterPath areaPx = area.toQPainterPathPx();
           if (zoneAreaPx.intersects(areaPx)) {
             messages.append(std::make_shared<DrcMsgCopperInKeepoutZone>(
@@ -2390,7 +2389,7 @@ bool BoardDesignRuleCheck::isViaUseless(const Data& data,
 
 QVector<Path> BoardDesignRuleCheck::getTraceLocation(
     const Data::Trace& trace) noexcept {
-  return {Path::obround(trace.startPosition, trace.endPosition, trace.width)};
+  return {Path::obround(trace.p1, trace.p2, trace.width)};
 }
 
 QVector<Path> BoardDesignRuleCheck::getHoleLocation(

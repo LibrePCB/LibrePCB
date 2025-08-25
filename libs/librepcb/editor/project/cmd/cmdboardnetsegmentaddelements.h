@@ -62,9 +62,8 @@ public:
   BI_NetPoint* addNetPoint(BI_NetPoint& netpoint);
   BI_NetPoint* addNetPoint(const Point& position);
   BI_NetLine* addNetLine(BI_NetLine& netline);
-  BI_NetLine* addNetLine(BI_NetLineAnchor& startPoint,
-                         BI_NetLineAnchor& endPoint, const Layer& layer,
-                         const PositiveLength& width);
+  BI_NetLine* addNetLine(BI_NetLineAnchor& a, BI_NetLineAnchor& b,
+                         const Layer& layer, const PositiveLength& width);
 
 private:
   // Private Methods

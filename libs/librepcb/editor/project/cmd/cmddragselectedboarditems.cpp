@@ -114,8 +114,8 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
   }
   foreach (BI_NetLine* netline, query.getNetLines()) {
     Q_ASSERT(netline);
-    mCenterPos += netline->getStartPoint().getPosition();
-    mCenterPos += netline->getEndPoint().getPosition();
+    mCenterPos += netline->getP1().getPosition();
+    mCenterPos += netline->getP2().getPosition();
     mItemCount += 2;
     CmdBoardNetLineEdit* cmd = new CmdBoardNetLineEdit(*netline);
     mNetLineEditCmds.append(cmd);

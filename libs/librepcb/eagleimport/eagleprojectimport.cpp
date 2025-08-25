@@ -1134,11 +1134,11 @@ void EagleProjectImport::importBoard(Project& project,
                            .arg(eagleWire.getLayer()));
           continue;
         }
-        const TraceAnchor startAnchor =
+        const TraceAnchor p1 =
             getOrCreateAnchor(*layer, C::convertPoint(eagleWire.getP1()));
-        const TraceAnchor endAnchor =
+        const TraceAnchor p2 =
             getOrCreateAnchor(*layer, C::convertPoint(eagleWire.getP2()));
-        if (startAnchor == endAnchor) {
+        if (p1 == p2) {
           log.info("Attaching a trace to a pad removed a short trace segment.");
           continue;
         }
@@ -1155,10 +1155,9 @@ void EagleProjectImport::importBoard(Project& project,
           log.critical(
               tr("Curved trace is not supported, converting to straight."));
         }
-        splitter.addTrace(
-            Trace(Uuid::createRandom(), *layer,
-                  PositiveLength(C::convertLength(eagleWire.getWidth())),
-                  startAnchor, endAnchor));
+        splitter.addTrace(Trace(
+            Uuid::createRandom(), *layer,
+            PositiveLength(C::convertLength(eagleWire.getWidth())), p1, p2));
       }
 
       // Determine segments and add them to the board.
@@ -1199,10 +1198,9 @@ void EagleProjectImport::importBoard(Project& project,
           netPoints.append(np);
         }
         for (const Trace& trace : segment.traces) {
-          netLines.append(new BI_NetLine(*netSegment, trace.getUuid(),
-                                         *getAnchor(trace.getStartPoint()),
-                                         *getAnchor(trace.getEndPoint()),
-                                         trace.getLayer(), trace.getWidth()));
+          netLines.append(new BI_NetLine(
+              *netSegment, trace.getUuid(), *getAnchor(trace.getP1()),
+              *getAnchor(trace.getP2()), trace.getLayer(), trace.getWidth()));
         }
         netSegment->addElements(vias, netPoints, netLines);
       }

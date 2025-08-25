@@ -115,10 +115,10 @@ QVector<std::pair<const BI_NetLineAnchor*, const BI_NetLineAnchor*>>
     }
     foreach (const BI_NetLine* netline, netsegment->getNetLines()) {
       Q_ASSERT(netline);
-      Q_ASSERT(anchorMap.contains(&netline->getStartPoint()));
-      Q_ASSERT(anchorMap.contains(&netline->getEndPoint()));
-      builder.addEdge(anchorMap[&netline->getStartPoint()],
-                      anchorMap[&netline->getEndPoint()]);
+      Q_ASSERT(anchorMap.contains(&netline->getP1()));
+      Q_ASSERT(anchorMap.contains(&netline->getP2()));
+      builder.addEdge(anchorMap[&netline->getP1()],
+                      anchorMap[&netline->getP2()]);
     }
   }
 

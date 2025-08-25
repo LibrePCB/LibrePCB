@@ -264,8 +264,8 @@ void BoardClipperPathGenerator::addTrace(const Data::Trace& trace,
                                          const Length& offset) {
   const Length width = trace.width + (offset * 2);
   if (width > 0) {
-    const Path sceneOutline = Path::obround(
-        trace.startPosition, trace.endPosition, PositiveLength(width));
+    const Path sceneOutline =
+        Path::obround(trace.p1, trace.p2, PositiveLength(width));
     ClipperHelpers::unite(
         mPaths, {ClipperHelpers::convert(sceneOutline, mMaxArcTolerance)},
         ClipperLib::pftEvenOdd, ClipperLib::pftEvenOdd);
