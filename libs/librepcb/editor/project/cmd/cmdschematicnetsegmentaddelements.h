@@ -58,8 +58,7 @@ public:
   SI_NetPoint* addNetPoint(SI_NetPoint& netpoint);
   SI_NetPoint* addNetPoint(const Point& position);
   SI_NetLine* addNetLine(SI_NetLine& netline);
-  SI_NetLine* addNetLine(SI_NetLineAnchor& startPoint,
-                         SI_NetLineAnchor& endPoint);
+  SI_NetLine* addNetLine(SI_NetLineAnchor& a, SI_NetLineAnchor& b);
 
 private:
   // Private Methods

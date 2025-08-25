@@ -263,18 +263,18 @@ bool CmdPasteSchematicItems::performExecute() {
       netPointMap.insert(junction.getUuid(), netpoint);
     }
     for (const NetLine& nl : seg.lines) {
-      SI_NetLineAnchor* start = nullptr;
-      if (std::optional<Uuid> anchor = nl.getStartPoint().tryGetJunction()) {
-        start = netPointMap[*anchor];
-        Q_ASSERT(start);
+      SI_NetLineAnchor* p1 = nullptr;
+      if (std::optional<Uuid> anchor = nl.getP1().tryGetJunction()) {
+        p1 = netPointMap[*anchor];
+        Q_ASSERT(p1);
       } else if (std::optional<NetLineAnchor::PinAnchor> anchor =
-                     nl.getStartPoint().tryGetPin()) {
+                     nl.getP1().tryGetPin()) {
         SI_Symbol* symbol = mSchematic.getSymbols().value(
             symbolMap.value(anchor->symbol, Uuid::createRandom()));
         Q_ASSERT(symbol);
         SI_SymbolPin* pin = symbol->getPin(anchor->pin);
         Q_ASSERT(pin);
-        start = pin;
+        p1 = pin;
         ComponentSignalInstance* sigInst = pin->getComponentSignalInstance();
         if (sigInst && (sigInst->getNetSignal() != netSignal)) {
           execNewChildCmd(new CmdCompSigInstSetNetSignal(*sigInst, netSignal));
@@ -285,18 +285,18 @@ bool CmdPasteSchematicItems::performExecute() {
       } else {
         throw LogicError(__FILE__, __LINE__);
       }
-      SI_NetLineAnchor* end = nullptr;
-      if (std::optional<Uuid> anchor = nl.getEndPoint().tryGetJunction()) {
-        end = netPointMap[*anchor];
-        Q_ASSERT(end);
+      SI_NetLineAnchor* p2 = nullptr;
+      if (std::optional<Uuid> anchor = nl.getP2().tryGetJunction()) {
+        p2 = netPointMap[*anchor];
+        Q_ASSERT(p2);
       } else if (std::optional<NetLineAnchor::PinAnchor> anchor =
-                     nl.getEndPoint().tryGetPin()) {
+                     nl.getP2().tryGetPin()) {
         SI_Symbol* symbol = mSchematic.getSymbols().value(
             symbolMap.value(anchor->symbol, Uuid::createRandom()));
         Q_ASSERT(symbol);
         SI_SymbolPin* pin = symbol->getPin(anchor->pin);
         Q_ASSERT(pin);
-        end = pin;
+        p2 = pin;
         ComponentSignalInstance* sigInst = pin->getComponentSignalInstance();
         if (sigInst && (sigInst->getNetSignal() != netSignal)) {
           execNewChildCmd(new CmdCompSigInstSetNetSignal(*sigInst, netSignal));
@@ -307,7 +307,7 @@ bool CmdPasteSchematicItems::performExecute() {
       } else {
         throw LogicError(__FILE__, __LINE__);
       }
-      cmdAddElements->addNetLine(*start, *end);
+      cmdAddElements->addNetLine(*p1, *p2);
     }
     execNewChildCmd(cmdAddElements.release());
 

@@ -288,12 +288,10 @@ bool SchematicEditorState_DrawWire::startPositioning(
         std::unique_ptr<CmdSchematicNetSegmentAddElements> cmdAdd(
             new CmdSchematicNetSegmentAddElements(*netsegment));
         mFixedStartAnchor = cmdAdd->addNetPoint(Toolbox::nearestPointOnLine(
-            pos, netline->getNetLine().getStartPoint().getPosition(),
-            netline->getNetLine().getEndPoint().getPosition()));
-        cmdAdd->addNetLine(*mFixedStartAnchor,
-                           netline->getNetLine().getStartPoint());
-        cmdAdd->addNetLine(*mFixedStartAnchor,
-                           netline->getNetLine().getEndPoint());
+            pos, netline->getNetLine().getP1().getPosition(),
+            netline->getNetLine().getP2().getPosition()));
+        cmdAdd->addNetLine(*mFixedStartAnchor, netline->getNetLine().getP1());
+        cmdAdd->addNetLine(*mFixedStartAnchor, netline->getNetLine().getP2());
         mContext.undoStack.appendToCmdGroup(cmdAdd.release());  // can throw
         std::unique_ptr<CmdSchematicNetSegmentRemoveElements> cmdRemove(
             new CmdSchematicNetSegmentRemoveElements(*netsegment));
@@ -457,9 +455,8 @@ bool SchematicEditorState_DrawWire::addNextNetPoint(
           std::unique_ptr<CmdSchematicNetSegmentAddElements> cmdAdd(
               new CmdSchematicNetSegmentAddElements(*otherNetSegment));
           otherAnchor = cmdAdd->addNetPoint(pos);
-          cmdAdd->addNetLine(*otherAnchor,
-                             netline->getNetLine().getStartPoint());
-          cmdAdd->addNetLine(*otherAnchor, netline->getNetLine().getEndPoint());
+          cmdAdd->addNetLine(*otherAnchor, netline->getNetLine().getP1());
+          cmdAdd->addNetLine(*otherAnchor, netline->getNetLine().getP2());
           mContext.undoStack.appendToCmdGroup(cmdAdd.release());  // can throw
           std::unique_ptr<CmdSchematicNetSegmentRemoveElements> cmdRemove(
               new CmdSchematicNetSegmentRemoveElements(*otherNetSegment));
@@ -477,8 +474,10 @@ bool SchematicEditorState_DrawWire::addNextNetPoint(
           std::unique_ptr<CmdSchematicNetSegmentAddElements> cmdAdd(
               new CmdSchematicNetSegmentAddElements(
                   mPositioningNetPoint2->getNetSegment()));
-          cmdAdd->addNetLine(*otherAnchor,
-                             mPositioningNetLine2->getStartPoint());
+          SI_NetLineAnchor* np2 =
+              mPositioningNetLine2->getOtherPoint(*mPositioningNetPoint2);
+          if (!np2) throw LogicError(__FILE__, __LINE__);
+          cmdAdd->addNetLine(*otherAnchor, *np2);
           mContext.undoStack.appendToCmdGroup(cmdAdd.release());  // can throw
           std::unique_ptr<CmdSchematicNetSegmentRemoveElements> cmdRemove(
               new CmdSchematicNetSegmentRemoveElements(
@@ -635,8 +634,8 @@ Point SchematicEditorState_DrawWire::updateNetpointPositions(
       pos = pin->getPin().getPosition();
     } else if (auto netline = std::dynamic_pointer_cast<SGI_NetLine>(item)) {
       pos = Toolbox::nearestPointOnLine(
-          pos, netline->getNetLine().getStartPoint().getPosition(),
-          netline->getNetLine().getEndPoint().getPosition());
+          pos, netline->getNetLine().getP1().getPosition(),
+          netline->getNetLine().getP2().getPosition());
     } else if (item) {
       qCritical() << "Found item below cursor, but it has an unexpected type!";
     }

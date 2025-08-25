@@ -167,8 +167,8 @@ void SchematicSelectionQuery::addSelectedImages() noexcept {
 void SchematicSelectionQuery::addNetPointsOfNetLines(
     bool onlyIfAllNetLinesSelected) noexcept {
   foreach (SI_NetLine* netline, mResultNetLines) {
-    SI_NetPoint* p1 = dynamic_cast<SI_NetPoint*>(&netline->getStartPoint());
-    SI_NetPoint* p2 = dynamic_cast<SI_NetPoint*>(&netline->getEndPoint());
+    SI_NetPoint* p1 = dynamic_cast<SI_NetPoint*>(&netline->getP1());
+    SI_NetPoint* p2 = dynamic_cast<SI_NetPoint*>(&netline->getP2());
     if (p1 &&
         ((!onlyIfAllNetLinesSelected) ||
          (mResultNetLines.contains(p1->getNetLines())))) {

@@ -162,8 +162,8 @@ SchematicPainter::SchematicPainter(const Schematic& schematic,
       }
     }
     for (const SI_NetLine* netline : segment->getNetLines()) {
-      mNetLines.append(Line{netline->getStartPoint().getPosition(),
-                            netline->getEndPoint().getPosition(),
+      mNetLines.append(Line{netline->getP1().getPosition(),
+                            netline->getP2().getPosition(),
                             netline->getWidth()});
     }
   }

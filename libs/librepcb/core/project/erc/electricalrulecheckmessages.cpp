@@ -88,8 +88,8 @@ void ErcMsgBase::setLocation(const SI_SymbolPin& pin) noexcept {
 
 bool ErcMsgBase::setLocation(const SI_NetSegment& segment) noexcept {
   for (const SI_NetLine* nl : segment.getNetLines()) {
-    mLocations.append(Path::obround(nl->getStartPoint().getPosition(),
-                                    nl->getEndPoint().getPosition(),
+    mLocations.append(Path::obround(nl->getP1().getPosition(),
+                                    nl->getP2().getPosition(),
                                     PositiveLength(nl->getWidth() + 1)));
   }
   if (!segment.getNetLines().isEmpty()) {
@@ -107,8 +107,8 @@ void ErcMsgBase::setLocation(const SI_NetPoint& netPoint) noexcept {
 
 void ErcMsgBase::setLocation(const SI_NetLine& netLine) noexcept {
   mSchematic = netLine.getSchematic().getUuid();
-  mLocations.append(Path::obround(netLine.getStartPoint().getPosition(),
-                                  netLine.getEndPoint().getPosition(),
+  mLocations.append(Path::obround(netLine.getP1().getPosition(),
+                                  netLine.getP2().getPosition(),
                                   PositiveLength(netLine.getWidth() + 1)));
 }
 

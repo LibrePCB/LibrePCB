@@ -178,8 +178,7 @@ void ElectricalRuleCheck::checkNetSegments(const Schematic& schematic,
     if (netSegment->getNetLabels().isEmpty() &&
         (!mOpenNetSignals.contains(&netSegment->getNetSignal()))) {
       foreach (const SI_NetLine* netLine, netSegment->getNetLines()) {
-        if (netLine->getStartPoint().isOpen() ||
-            netLine->getEndPoint().isOpen()) {
+        if (netLine->getP1().isOpen() || netLine->getP2().isOpen()) {
           msgs.append(
               std::make_shared<ErcMsgOpenWireInSegment>(*netSegment, *netLine));
           break;

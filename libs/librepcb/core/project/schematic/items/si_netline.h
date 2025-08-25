@@ -77,9 +77,8 @@ public:
   // Constructors / Destructor
   SI_NetLine() = delete;
   SI_NetLine(const SI_NetLine& other) = delete;
-  SI_NetLine(SI_NetSegment& segment, const Uuid& uuid,
-             SI_NetLineAnchor& startPoint, SI_NetLineAnchor& endPoint,
-             const UnsignedLength& width);
+  SI_NetLine(SI_NetSegment& segment, const Uuid& uuid, SI_NetLineAnchor& a,
+             SI_NetLineAnchor& b, const UnsignedLength& width);
   ~SI_NetLine() noexcept;
 
   // Getters
@@ -89,8 +88,8 @@ public:
   const UnsignedLength& getWidth() const noexcept {
     return mNetLine.getWidth();
   }
-  SI_NetLineAnchor& getStartPoint() const noexcept { return *mStartPoint; }
-  SI_NetLineAnchor& getEndPoint() const noexcept { return *mEndPoint; }
+  SI_NetLineAnchor& getP1() const noexcept { return *mP1; }
+  SI_NetLineAnchor& getP2() const noexcept { return *mP2; }
   SI_NetLineAnchor* getOtherPoint(
       const SI_NetLineAnchor& firstPoint) const noexcept;
   NetSignal& getNetSignalOfNetSegment() const noexcept;
@@ -111,8 +110,8 @@ private:  // Data
   NetLine mNetLine;
 
   // References
-  SI_NetLineAnchor* mStartPoint;
-  SI_NetLineAnchor* mEndPoint;
+  SI_NetLineAnchor* mP1;
+  SI_NetLineAnchor* mP2;
 };
 
 /*******************************************************************************

@@ -660,8 +660,8 @@ void EagleProjectImport::importSchematic(Project& project,
         }
         for (const NetLine& line : segment.netlines) {
           netLines.append(new SI_NetLine(
-              *netSegment, line.getUuid(), *getAnchor(line.getStartPoint()),
-              *getAnchor(line.getEndPoint()), line.getWidth()));
+              *netSegment, line.getUuid(), *getAnchor(line.getP1()),
+              *getAnchor(line.getP2()), line.getWidth()));
         }
         netSegment->addNetPointsAndNetLines(netPoints, netLines);
         for (const NetLabel& label : segment.netlabels) {

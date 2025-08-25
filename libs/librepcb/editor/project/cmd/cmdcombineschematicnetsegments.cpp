@@ -88,13 +88,13 @@ bool CmdCombineSchematicNetSegments::performExecute() {
     }
   }
   foreach (SI_NetLine* netline, mOldSegment.getNetLines()) {
-    SI_NetLineAnchor* startPoint =
-        anchorMap.value(&netline->getStartPoint(), &netline->getStartPoint());
-    Q_ASSERT(startPoint);
-    SI_NetLineAnchor* endPoint =
-        anchorMap.value(&netline->getEndPoint(), &netline->getEndPoint());
-    Q_ASSERT(endPoint);
-    SI_NetLine* newNetLine = cmdAdd->addNetLine(*startPoint, *endPoint);
+    SI_NetLineAnchor* p1 =
+        anchorMap.value(&netline->getP1(), &netline->getP1());
+    Q_ASSERT(p1);
+    SI_NetLineAnchor* p2 =
+        anchorMap.value(&netline->getP2(), &netline->getP2());
+    Q_ASSERT(p2);
+    SI_NetLine* newNetLine = cmdAdd->addNetLine(*p1, *p2);
     Q_ASSERT(newNetLine);
   }
   execNewChildCmd(new CmdSchematicNetSegmentRemove(mOldSegment));  // can throw

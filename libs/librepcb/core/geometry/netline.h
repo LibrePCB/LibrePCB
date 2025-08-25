@@ -80,6 +80,7 @@ public:
   bool operator!=(const NetLineAnchor& rhs) const noexcept {
     return !(*this == rhs);
   }
+  bool operator<(const NetLineAnchor& rhs) const noexcept;
   NetLineAnchor& operator=(const NetLineAnchor& rhs) noexcept;
 
   // Static Methods
@@ -104,6 +105,10 @@ private:  // Data
  *
  * The main purpose of this class is to serialize and deserialize schematic
  * net lines.
+ *
+ * @note The order of anchors (P1 & P2) is deterministic (sorted) to ensure a
+ *       canonical file format & behavior. The constructor and #setAnchors()
+ *       will automatically swap the passed anchors if needed.
  */
 class NetLine final {
   Q_DECLARE_TR_FUNCTIONS(NetLine)
@@ -113,8 +118,7 @@ public:
   enum class Event {
     UuidChanged,
     WidthChanged,
-    StartPointChanged,
-    EndPointChanged,
+    AnchorsChanged,
   };
   Signal<NetLine, Event> onEdited;
   typedef Slot<NetLine, Event> OnEditedSlot;
@@ -123,22 +127,21 @@ public:
   NetLine() = delete;
   NetLine(const NetLine& other) noexcept;
   NetLine(const Uuid& uuid, const NetLine& other) noexcept;
-  NetLine(const Uuid& uuid, const UnsignedLength& width,
-          const NetLineAnchor& start, const NetLineAnchor& end) noexcept;
+  NetLine(const Uuid& uuid, const UnsignedLength& width, const NetLineAnchor& a,
+          const NetLineAnchor& b) noexcept;
   explicit NetLine(const SExpression& node);
   ~NetLine() noexcept;
 
   // Getters
   const Uuid& getUuid() const noexcept { return mUuid; }
   const UnsignedLength& getWidth() const noexcept { return mWidth; }
-  const NetLineAnchor& getStartPoint() const noexcept { return mStart; }
-  const NetLineAnchor& getEndPoint() const noexcept { return mEnd; }
+  const NetLineAnchor& getP1() const noexcept { return mP1; }
+  const NetLineAnchor& getP2() const noexcept { return mP2; }
 
   // Setters
   bool setUuid(const Uuid& uuid) noexcept;
   bool setWidth(const UnsignedLength& width) noexcept;
-  bool setStartPoint(const NetLineAnchor& start) noexcept;
-  bool setEndPoint(const NetLineAnchor& end) noexcept;
+  bool setAnchors(NetLineAnchor a, NetLineAnchor b) noexcept;
 
   // General Methods
 
@@ -154,11 +157,15 @@ public:
   bool operator!=(const NetLine& rhs) const noexcept { return !(*this == rhs); }
   NetLine& operator=(const NetLine& rhs) noexcept;
 
+private:  // Methods
+  static void normalizeAnchors(NetLineAnchor& start,
+                               NetLineAnchor& end) noexcept;
+
 private:  // Data
   Uuid mUuid;
   UnsignedLength mWidth;
-  NetLineAnchor mStart;
-  NetLineAnchor mEnd;
+  NetLineAnchor mP1;
+  NetLineAnchor mP2;
 };
 
 /*******************************************************************************
